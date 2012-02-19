@@ -1,0 +1,7 @@
+body {
+	padding-top: 60px;
+}
+
+.container>footer p {
+	text-align: center; /* center align it with the container */
+}
