@@ -1,0 +1,24 @@
+// Bootstrap Reset
+@import "bootstrap.less";
+
+@bodyPadding:	@navbarHeight + 20;
+@bgGradient1:   #ff7201;
+@bgGradient2:   #ffa501;
+
+body {
+	padding-top: @bodyPadding ;
+}
+
+#main_content {	
+  padding-top: 1em;
+  #gradient > .vertical(@bgGradient1, @bgGradient2);
+  .border-radius(4px);	
+  color: white;
+  label {
+  	color: white;
+    #font > .serif(20px, normal, 1);
+  }
+  label.help-inline {
+     #font > .serif(12px, normal, 1); 
+  }
+}

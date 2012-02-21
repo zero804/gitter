@@ -8,41 +8,34 @@
 <head>
 <meta charset="utf-8">
 
-<title>Modular Backbone Bootstrap</title>
-<!--
-<link rel="stylesheet" href="css/bootstrap.css">
--->
+<title>Troupe</title>
 
-<link rel="stylesheet" href="bootstrap/css/bootstrap.css">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="bootstrap/css/troupe.css">
 
-<script data-main="js/main" src="js/libs/require/require.js"></script>
+<script data-main="js/signup" src="js/libs/require/require.js"></script>
 </head>
 <body>
-	<div class="navbar navbar-fixed-top">
-		<div class="navbar-inner">
-			<div class="container">
-				<a class="brand" href="#">Sample</a>
-				<div class="nav-collapse">
-          <ul class="nav">
-            <li class="active"><a href="#">Home</a></li>
-            <li><a href="#/projects">Projects</a></li>
-            <li><a href="#/users">Users</a></li>
-          </ul>
-          </div>
+	<div class="container">
+		<div class="content">
+			<div class="page-header">
+				<h1>Troupe</h1>
+			</div>
+			<div class="row" id="main_content">
+				<div class="span12">
+					<form class="form-vertical" id="signupForm">
+						<label for="troupeName">Pick a name</label> 
+						<input id="troupeName" name="troupeName" type="text" class="span3" placeholder="Troupe name…"> 
+						
+						<label for="email">Enter your email address</label> 
+						<input id="email" name="email" type="text" class="span3 required email" placeholder="Your email address…">
+						
+						<div>
+							<button type="submit" class="btn btn-primary">Create</button>
+						</div>
+					</form>
+				</div>
 			</div>
 		</div>
 	</div>
-
-    <div class="container">
-      <div class="content" id="page">
-      </div>
-      
-      <footer>
-        <p>&copy; Company 2012</p>
-      </footer>
-
-    </div> <!-- /container -->
-
 </body>
 </html>

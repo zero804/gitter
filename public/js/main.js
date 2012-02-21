@@ -11,7 +11,9 @@ require.config({
     text: 'libs/require/text',
     mustache: 'libs/mustache/mustache',
     templates: '../templates'
-  }
+  },
+  priority: ['jquery']
+
 
 });
 
