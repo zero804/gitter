@@ -23,10 +23,7 @@ app.configure(function() {
 });
 
 app.get('/users', function(req, res){
-  res.render('users', {
-    title: 'Users',
-    users: []
-  });
+  
 });
 
 app.get('/troupenameavailable', function(request, response) {
@@ -39,7 +36,10 @@ app.get('/troupenameavailable', function(request, response) {
 });
 
 app.get('/confirm', function(req, res) {
-  
+  res.render('confirm', {
+    title: 'Users',
+    users: []
+  });
 });
 
 
