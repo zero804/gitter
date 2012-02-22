@@ -1,9 +1,30 @@
 var express = require('express'),
-	Resource = require('express-resource');
+	Resource = require('express-resource'),
+	tmpl = require('./server/mustache-template');
 
-var app = express.createServer(express.logger());
+var form = require("express-form"),
+    filter = form.filter,
+    validate = form.validate;
 
-app.use(express.static(__dirname + '/public'));
+var app = express.createServer(
+    express.cookieParser(),
+    express.session({ secret: 'all your moo' })
+);
+
+app.configure(function() {
+  app.use(express.bodyParser());
+  app.use(app.router);
+  app.use(express.logger());
+  app.use(express.static(__dirname + '/public'));
+  
+  app.set('view engine', 'mustache');
+  app.set('view options',{layout:false});  
+  app.register(".mustache", tmpl);
+});
+
+app.get('/users', function(req, res){
+  
+});
 
 app.get('/troupenameavailable', function(request, response) {
   
@@ -12,45 +33,44 @@ app.get('/troupenameavailable', function(request, response) {
   } else {
     response.send(true);
   }
-
 });
 
-app.resource('api/projects', 
-{
-  index: function(req, res){
-    res.send('forum index');
-  },
-
-  new: function(req, res){
-    res.send('new forum');
-  },
-
-  create: function(req, res){
-    res.send('create forum');
-  },
-
-  show: function(req, res){
-    res.send(req.project);
-  },
-
-  edit: function(req, res){
-    res.send('edit forum ' + req.forum.title);
-  },
-
-  update:  function(req, res){
-    res.send('update forum ' + req.forum.title);
-  },
-
-  destroy: function(req, res){
-    res.send('destroy forum ' + req.forum.title);
-  },
-
-  load: function(id, fn){
-    process.nextTick(function(){
-      fn(null, { id: id, title: 'Ferrets' });
-    });
-  }
+app.get('/confirm', function(req, res) {
+  res.render('confirm', {
+    title: 'Users',
+    users: []
+  });
 });
+
+
+app.post(
+    '/signup',
+
+    // Form filter and validation middleware
+    form(
+      filter("troupeName").trim(),
+      validate("troupeName").required().is(/^[a-z]+$/),
+      filter("email").trim(),
+      validate("email").isEmail()
+    ),
+
+    // Express request-handler now receives filtered and validated data
+    function(req, res){
+      if (!req.form.isValid) {
+        // Handle errors
+        console.log(req.form.errors);
+
+      } else {
+        // Or, use filtered form data from the form object:
+        console.log("Username:", req.form.troupeName);
+        console.log("Email:", req.form.email);
+      }
+      
+      res.redirect("/confirm");
+    }
+);
+
+app.resource('api/projects',  require('./server/resources/projects.js'));
 
 var port = process.env.PORT || 3000;
 app.listen(port, function() {

@@ -1,1 +1,10 @@
 /node_modules
+/.DS_Store
+**/.DS_Store
+/.project
+public/.DS_Store
+public/bootstrap/.DS_Store
+public/js/.DS_Store
+public/js/libs/.DS_Store
+public/js/views/.DS_Store
+public/templates/.DS_Store
