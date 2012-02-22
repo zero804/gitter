@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "dependencies": {
     "express": "2.5.7",
-    "express-resource": "0.2.4" 
+    "express-resource": "0.2.4",
+    "express-form": "0.6.2",
+    "mongoose": "2.5.8",
+    "hogan": "1.0.5-dev",
+    "consolidate": "0.1.0"
   }
 }
