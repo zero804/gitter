@@ -1,41 +1,84 @@
-<!doctype html>
-<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
-<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
-<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!-->
-<html class="no-js" lang="en">
-<!--<![endif]-->
+<!DOCTYPE html>
+
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en"> <!--<![endif]-->
 <head>
-<meta charset="utf-8">
+	<meta charset="utf-8" />
 
-<title>Troupe</title>
+	<!-- Set the viewport width to device width for mobile -->
+	<meta name="viewport" content="width=device-width" />
 
-<link rel="stylesheet" href="bootstrap/css/troupe.css">
+	<title>Start a Troupe</title>
+  
+	<!-- Included CSS Files -->
+	<link rel="stylesheet" href="stylesheets/foundation.css">
+	<link rel="stylesheet" href="stylesheets/app.css">
+    <link rel="stylesheet" href="stylesheets/troupe.css">
 
-<script data-main="js/signup" src="js/libs/require/require.js"></script>
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" href="stylesheets/ie.css">
+	<![endif]-->
+
+
+	<!-- IE Fix for HTML5 Tags -->
+	<!--[if lt IE 9]>
+		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+
 </head>
 <body>
+
+	<!-- container for top area -->
 	<div class="container">
-		<div class="content">
-			<div class="page-header">
-				<h1>Troupe</h1>
-			</div>
-			<div class="row" id="main_content">
-				<div class="span12">
-					<form class="form-vertical" id="signupForm">
-						<label for="troupeName">Pick a name</label> 
-						<input id="troupeName" name="troupeName" type="text" class="span3" placeholder="Troupe name…"> 
-						
-						<label for="email">Enter your email address</label> 
-						<input id="email" name="email" type="text" class="span3 required email" placeholder="Your email address…">
-						
-						<div>
-							<button type="submit" class="btn btn-primary">Create</button>
-						</div>
-					</form>
-				</div>
-			</div>
+		<div class="row">
+			<div class="twelve columns">
+
+            
+            <div class="row" style="height:50px"><!-- blank 50 px row --></div>
+            
+            <div class="row">
+            	<img src="images/logo.png">
+            </div>
+            
+             <div class="row" style="height:20px"><!-- blank 50 px row --></div>
+            
+          </div>
+       </div>
+     </div>
+     
+     <!-- container for orange area -->
+       
+    <div style="background-image:url(images/bgt_orange.png)">
+		<div class="container"  style="background-image:url(images/bg_orange.png);background-position:top;background-repeat:no-repeat">    
+            <div class="row">	
+                <div class="six columns" style="height:420px">
+                 	<br>
+                    <H1>Pick a name</H1>
+        			<input class="TroupeInput" type="text" name="TroupeName" value=" ">
+                    <H1>Enter your email address</H1>
+        			<input class="TroupeInput" type="text" name="TroupeName" value=" ">
+                    
+                </div>
+        
+                <div class="six columns">
+                    blank space out to the right
+        
+                </div>
+            </div>
 		</div>
 	</div>
+
+
+
+
+	<!-- Included JS Files -->
+	<script src="javascripts/jquery.min.js"></script>
+	<script src="javascripts/modernizr.foundation.js"></script>
+	<script src="javascripts/foundation.js"></script>
+	<script src="javascripts/app.js"></script>
+
 </body>
 </html>
