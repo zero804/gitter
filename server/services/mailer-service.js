@@ -21,6 +21,8 @@ module.exports = {
       var plaintextTemplate = troupeTemplate.compile(plaintextTemplateFile);
       var plaintext = plaintextTemplate.render(options.data);
       
+      console.log(plaintext);
+      
       // send an e-mail
       nodemailer.send_mail(
           // e-mail options

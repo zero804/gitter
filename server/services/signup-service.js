@@ -1,10 +1,19 @@
 var persistence = require("./persistence-service"),
-    mailerService = require("./mailer-service");
+    mailerService = require("./mailer-service"),
+    uuid = require('node-uuid');
+
 
 module.exports = {
     newSignup: function(options) {
+      var confirmationCode = uuid.v4();
+      
       var user = new persistence.User();
       user.email = options.email;
+      user.confirmationCode = confirmationCode;
+      
+      var confirmLink = "http://trou.pe/confirm/" + confirmationCode;
+
+      console.log("confirmLink is " + confirmLink);
       
       user.save(function (err) {
         if(err == null) {
@@ -17,7 +26,8 @@ module.exports = {
                 to: user.email,
                 subject: "Welcome to troupe",
                 data: {
-                  troupeName: options.troupeName
+                  troupeName: options.troupeName,
+                  confirmLink: confirmLink
                 }
               });
               
