@@ -1,6 +1,7 @@
 var form = require("express-form"),
     filter = form.filter,
-    validate = form.validate;
+    validate = form.validate,
+    signupService = require("../services/signup-service");
 
 module.exports = {
     install: function(app) {
@@ -22,12 +23,21 @@ module.exports = {
             console.log(req.form.errors);
 
           } else {
-            // Or, use filtered form data from the form object:
-            console.log("Username:", req.form.troupeName);
-            console.log("Email:", req.form.email);
+            
+            signupService.newSignup({
+              troupeName: req.form.troupeName,
+              email: req.form.email,
+              onSuccess: function() {
+                res.redirect("/confirm");
+              },
+              onFailure: function() {
+                // TODO better handling
+                res.redirect("/");
+              }
+            });
+             
           }
           
-          res.redirect("/confirm");
         }
       );
     }
