@@ -11,7 +11,7 @@ module.exports = {
         // Form filter and validation middleware
         form(
           filter("troupeName").trim(),
-          validate("troupeName").required().is(/^[a-z]+$/),
+          validate("troupeName").required().is(/^[a-zA-Z0-9 ]+$/),
           filter("email").trim(),
           validate("email").isEmail()
         ),
