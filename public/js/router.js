@@ -35,12 +35,6 @@ define([
         return view;
     },
 
-    newProject: function() {
-      console.log("add");
-
-      this.showView( '#page', new ProjectEditView({ model: new ProjectsModel(), collection: projectsCollection }));
-    },
-    
     defaultAction: function(actions){
       this.showView( '#primary-view', new MainHomeView({}) );
     },
