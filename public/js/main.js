@@ -13,8 +13,6 @@ require.config({
     templates: '../templates'
   },
   priority: ['jquery']
-
-
 });
 
 require([
