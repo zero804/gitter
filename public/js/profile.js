@@ -2,8 +2,8 @@ require.config({
   paths : {
     jquery : 'libs/jquery/jquery-min',
     jquery_validate : 'libs/jquery.validate-1.9/jquery.validate.min',
-    underscore: 'libs/underscore/underscore-min',
-    backbone: 'libs/backbone/backbone-optamd3-min'
+    underscore: 'libs/underscore/underscore-1.3.1-min',
+    backbone: 'libs/backbone/backbone-0.9.1-min'
   },
   priority : [ 'jquery' ]
 });
