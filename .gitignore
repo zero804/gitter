@@ -11,3 +11,4 @@ public/templates/.DS_Store
 public/bootstrap/less/.DS_Store
 
 /npm-debug.log
+public/bootstrap/less/responsive.css

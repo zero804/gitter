@@ -6,49 +6,86 @@
 <html class="no-js" lang="en">
 <!--<![endif]-->
 <head>
-<meta charset="utf-8">
+	<meta charset="utf-8">
 
-<title>Troupe</title>
+	<title>Troupe</title>
 
-<link rel="stylesheet" href="bootstrap/css/troupe.css">
+	<link rel="stylesheet" href="bootstrap/css/troupe.css">
 
-<script data-main="js/app.js" src="js/libs/require/require.js"></script>
+	<script data-main="js/app.js" src="js/libs/require/require.js"></script>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+
 </head>
 <body>
-<div class="navbar navbar-fixed-top">
-  <div class="navbar-inner">
-    <div class="container-fluid">
-	    <ul class="nav">
-		  <li class="active">
-		    <a href="#">Home</a>
-		  </li>
-		  <li><a href="#">Link</a></li>
-		  <li><a href="#">Link</a></li>
-		</ul>    
-    </div>
-  </div>
-</div>
 
-<div class="container-fluid main-container">
-	<div class="content">
-		<div class="row-fluid">
-			<div class="span2">
-				<div class="well main-nav">
-					<ul class="nav nav-list">
-						<li class="nav-header">List header</li>
-						<li><a href="#"><i class="icon-home"></i>Everything</a></li>
-						<li><a href="#statusphere"><i class="icon-comment"></i>Status Updates</a></li>
-						<li><a href="#mail"><i class="icon-envelope"></i>Mail</a></li>
-						<li><a href="#chat"><i class="icon-inbox"></i>Chat</a></li>
-						<li><a href="#files"><i class="icon-file"></i>Files</a></li>
-						<li><a href="#people"><i class="icon-user"></i>People</a></li>
-					</ul>
-				</div>
-			</div>
-			<div class="span10" id="primary-view">Loading...</div>
-		</div>
-	</div>
-</div>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid" style="height:45px">
+          <a class="brand" href="#"><img src="images/logo_small.png"></a>
+          <div class="nav-collapse">
+
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="well sidebar-nav">
+            <ul class="nav nav-list">
+              <li class="nav-header">A Blank Troupe Name</li>
+              <li><a href="#"><i class="icon-th"></i> Everything</a></li>
+              <li><a href="#statusphere"><i class="icon-th-list"></i> Status Updates</a></li>
+              <li><a href="#mail"><i class="icon-envelope"></i> Mail</a></li>
+              <li><a href="#chat"><i class="icon-comment"></i> Chat</a></li>
+              <li><a href="#files"><i class="icon-folder-open"></i> Files</a></li>
+              <li><a href="#people"><i class="icon-user"></i> People</a></li>
+            </ul>
+          </div><!--/.well -->
+        </div><!--/span-->
+        <div class="span9"  id="primary-view">
+ 			<div class="well">
+           	  <div class="row-fluid">
+                  <div class="span12">
+                    <H1>Nothing to see here</H1><br>
+                   
+                    This Troupe is blank.
+                    
+                  </div><!--span-->
+             	 
+               </div><!--row-->
+            </div><!--well-->
+            
+            <!-- debug well for the modals -->
+            <div class="well">
+            	<a data-toggle="modal" href="#shareModal" class="btn btn-primary">Launch Share Modal</a>
+				<a data-toggle="modal" href="#noauthModal" class="btn btn-primary">Launch NoAuth Modal</a>
+                <a data-toggle="modal" href="#loginModal" class="btn btn-primary">Launch Login Modal</a>
+                <a data-toggle="modal" href="#noaccessModal" class="btn btn-primary">Launch NoAccess Modal</a>     
+            </div>
+            
+        </div><!--/span-->
+      </div><!--/row-->
+
+      <hr>
+
+      <footer>
+        <p>&copy; Troupe 2012</p>
+      </footer>
+
+    </div><!--/.fluid-container-->
+    
 
 </body>
 </html>
