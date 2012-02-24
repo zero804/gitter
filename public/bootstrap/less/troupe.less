@@ -5,6 +5,14 @@
 @bgGradient1:   #ff7201;
 @bgGradient2:   #ffa501;
 
+@baseImages: "/images";
+@bgTiledurl: %("%s/bgt_orange.png", @baseImages);
+@bgOrangeurl: %("%s/bg_orange.png", @baseImages);
+
+@rradius: 6px;
+
+@heroText: white;
+
 body {
 	padding-top: @bodyPadding ;
 }
@@ -30,4 +38,45 @@ body {
 
 .main-nav {
 	.border-radius(0px);
+}
+
+.troupe-bg-tiled {
+	background-image: url(@bgTiledurl);
+}
+
+.troupe-hero {
+  padding-left: @rradius;
+  padding-right:@rradius;
+  margin-bottom: 30px;
+  background-color: #f5f5f5;
+  -webkit-border-radius: @rradius;
+  -moz-border-radius: @rradius;
+  border-radius: @rradius;
+  background-image: url(@bgTiledurl);
+}
+
+.troupe-hero-content{
+	padding: 35px;
+	background-image: url(@bgOrangeurl);
+	background-position:top;
+	background-repeat:no-repeat;
+}
+
+.troupe-hero h1 {
+  margin-bottom: 20px;
+  font-size: 60px;
+  line-height: 1;
+  letter-spacing: -1px;
+  color: @heroText;
+}
+
+.troupe-hero h2 {
+	color: @heroText;
+}
+
+.troupe-hero p {
+  font-size: 18px;
+  font-weight: 200;
+  line-height: 27px;
+  color: @heroText;
 }
