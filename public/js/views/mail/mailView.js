@@ -4,9 +4,9 @@ define([
   'underscore',
   'backbone',
   'mustache',
-  'text!templates/home/main.mustache'
+  'text!templates/mail/mail.mustache'
 ], function($, _, Backbone, Mustache, template){
-  var MainHomeView = Backbone.View.extend({    
+  var MailView = Backbone.View.extend({    
     render: function() {
       var compiledTemplate = Mustache.render(template, { });
       $(this.el).html(compiledTemplate);
@@ -15,5 +15,5 @@ define([
     
   });
 
-  return MainHomeView;
+  return MailView;
 });

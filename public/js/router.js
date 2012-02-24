@@ -3,23 +3,22 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'models/projects',
   'views/home/main',
-  'views/projects/list',
-  'views/users/list',
-  'views/projects/edit',
-  'collections/projects'
-], function($, _, Backbone, ProjectsModel, MainHomeView, ProjectListView, userListView, ProjectEditView, ProjectsCollection){
-  var projectsCollection = new ProjectsCollection();
-
+  'views/status/statusView',
+  'views/mail/mailView',
+  'views/chat/chatView',
+  'views/file/fileView',
+  'views/people/peopleView'
+], function($, _, Backbone, MainHomeView, StatusView, MailView, ChatView, FileView, PeopleView){
   var AppRouter = Backbone.Router.extend({
     routes: {
-      // Define some URL routes
-      'projects': 'showProjects',
-      'projects/new': 'newProject',
-      'projects/:id': 'viewProject',
-      'users': 'showUsers',
-
+      'statusphere': 'showStatusView',
+      'mail': 'showMailView',
+      'chat': 'showChatView',
+      'files': 'showFileView',
+      'people': 'showPeopleView',
+      //'projects/:id': 'viewProject',
+      
       // Default
       '*actions': 'defaultAction'
     },
@@ -31,18 +30,9 @@ define([
             this.currentView.close();
 
         $(selector).html(view.render().el);
+
         this.currentView = view;
         return view;
-    },
-
-    showProjects: function(){
-    	this.showView('#page', new ProjectListView({ router: this, collection: projectsCollection }));
-    },
-    
-    // As above, call render on our loaded module
-    // 'views/users/list'
-    showUsers: function(){
-      userListView.render();
     },
 
     newProject: function() {
@@ -52,10 +42,29 @@ define([
     },
     
     defaultAction: function(actions){
-      this.showView( '#page', new MainHomeView({}) );
-    }
+      this.showView( '#primary-view', new MainHomeView({}) );
+    },
 
+    showStatusView: function() {
+      this.showView( '#primary-view', new StatusView({}) );
+    },
+    
+    showMailView: function() {
+      this.showView( '#primary-view', new MailView({}) );
+    },
+    
+    showChatView: function() {
+      this.showView( '#primary-view', new ChatView({}) );      
+    },
+    
+    showFileView: function() {
+      this.showView( '#primary-view', new FileView({}) );      
+    },
+    
+    showPeopleView: function() {
+      this.showView( '#primary-view', new PeopleView({}) );            
+    }
   });
   
-  return new AppRouter();
+  return AppRouter;
 });
