@@ -8,9 +8,16 @@ module.exports = {
       });
       
       app.get('/confirm/:confirmationCode', function(req, res, next){
-        signupService.confirm(req.params.confirmationCode, function(result, err) {
+        signupService.confirm(req.params.confirmationCode, function(err, user) {
           if (err) return next(err);
-          res.send(req.params.confirmationCode);
+          
+          req.session.user = {
+              id: user._id
+          };
+          
+          console.log(JSON.stringify(req.session.user));
+          
+          res.redirect('/profile');
         });
       });
       

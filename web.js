@@ -5,7 +5,7 @@ var express = require('express'),
 var app = express.createServer(
     express.cookieParser(),
     express.session({ secret: 'all your moo' })
-);
+); 
 
 app.configure(function() {
   app.use(express.bodyParser());
@@ -20,6 +20,8 @@ app.configure(function() {
 
 require('./server/handlers/confirm').install(app);
 require('./server/handlers/signup').install(app);
+require('./server/handlers/profile').install(app);
+require('./server/handlers/app').install(app);
 
 app.resource('api/projects',  require('./server/resources/projects.js'));
 
