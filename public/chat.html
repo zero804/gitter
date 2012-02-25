@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Blank Troupe</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="bootstrap/css/troupe.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+    </style>
+    <link href="bootstrap/css/responsive.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  </head>
+
+
+<!-- 
+body onload for modal, commented out because it's annoying to test with! You may want to launch this another way instead of onload as there are various states that can launch modals.
+
+  <body onload="$('#shareModal').modal(open)">
+-->
+
+  <body>
+  
+   <!-- #Share Modal
+   
+   the modal below is shown if there are no other users in the Troupe. If someone has been invited, but not joined/accepted, that should probably count as being a user to make this show less, otherwise it could get irritating -->
+              
+    <div class="modal hide fade" id="shareModal">
+        <div class="modal-header">
+          <a class="close" data-dismiss="modal">×</a>
+          <h3>Share with others</h3>
+        </div>
+        <div class="modal-body">
+          <strong>Your Troupe address is: http://trou.pe/x6hfy3</strong><br>
+          <em>Give this to others and they will easily be able to join.</em>
+          <br><br>
+          <Strong>Invite others by email</Strong><br>
+          <form class="form-inline">
+          <input type="text" name="inviteName" value="Name">&nbsp;<input type="text" name="inviteEmail" value="Email address">&nbsp;<a href="#" class="btn btn-mini">+</a>
+          <br><br>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <a href="#" class="btn btn-primary">Send Invite</a>
+          <a href="#" class="btn" data-dismiss="modal">Close</a>
+        </div>
+    </div> <!--Share modal-->
+    
+       <!-- #Unauthenticated Modal
+   
+       This modal is shown if an unauthenticated user tries to access any Troupe. 
+       NB: None of the Troupe content should be rendered as that would be seriously uncool security wise
+       
+       
+        -->
+              
+    <div class="modal hide fade" id="noauthModal">
+        <div class="modal-header">
+          <a class="close" data-dismiss="modal">×</a>
+          <h3>Join this Troupe or sign in</h3>
+        </div>
+        <div class="modal-body">
+        You will need to be accepted by the owners of this Troupe before you can begin using it. Visit our website to create your own Troupe.
+                    <br><br>
+        <div class="row-fluid">
+          	<div class="span7">
+             
+                    <label>Enter your name</label>
+                    <input type="text" name="personName"><br><br>
+                    <label>Enter your email address</label>
+                    <input type="text" name="personName"><br><br>
+       		</div> <!-- span8--> 
+            <div class="span5">
+            	<br><br><br>	
+              <a class="btn" type="Button" href="javascript:$('#loginModal').modal('show');$('#noauthModal').modal('toggle');">Existing users sign in</a>
+ 
+            </div> <!-- span4 -->
+        	</div> <!-- row -->
+        </div> <!-- modal body-->
+        <div class="modal-footer">
+          <a href="#" class="btn btn-primary">Join</a>
+          <a href="#" class="btn" data-dismiss="modal">Close</a>
+        </div>
+    </div> <!--NoAuth modal-->
+    
+    <!-- #Login Modal
+   
+     This modal is shown when a user clicks on Login.
+     NB: None of the Troupe content should be rendered as that would be seriously uncool security wise
+     
+    -->
+              
+    <div class="modal hide fade" id="loginModal">
+        <div class="modal-header">
+          <a class="close" data-dismiss="modal">×</a>
+          <h3>Sign in to Troupe</h3>
+        </div>
+        <div class="modal-body">
+             
+            <label>Email address</label>
+            <input type="text" name="personName" value=""><br><br>
+            <label>Password</label>
+            <input type="password" name="personName" value=""><br><br>
+       		
+        </div> <!-- modal body-->
+        <div class="modal-footer">
+          <a href="#" class="btn btn-primary">Sign in</a>
+          <a href="#" class="btn" data-dismiss="modal">Close</a>
+        </div>
+    </div> <!--Login modal-->
+
+  <!-- #NoAcces Modal
+   
+       This modal is shown if the user is authenticated, but not a member of the Troupe they are trying to access 
+       NB: None of the Troupe content should be rendered as that would be seriously uncool security wise
+       
+       
+        -->
+              
+    <div class="modal hide fade" id="noaccessModal">
+        <div class="modal-header">
+          <a class="close" data-dismiss="modal">×</a>
+          <h3>Join this Troupe</h3>
+        </div>
+        <div class="modal-body">
+        You will need to be accepted by the owners of this Troupe before you can begin using it.<br><Br>
+        Click <strong>Join</strong> and we'll send a request to them, it may take a little while to respond, so check your email every now and then.
+                   
+        </div> <!-- modal body-->
+        <div class="modal-footer">
+          <a href="#" class="btn btn-primary">Join</a>
+          <a href="#" class="btn" data-dismiss="modal">Close</a>
+        </div>
+    </div> <!--NoAccess modal-->
+
+    
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid" style="height:45px">
+          <a class="brand" href="/"><img src="images/logo_small.png"></a>
+          <div class="nav-collapse">
+
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="well sidebar-nav">
+            <ul class="nav nav-list">
+              <li class="nav-header">A Blank Troupe Name</li>
+              <li></i><a href="#"><i class="icon-th"></i> Everything</a></li>
+              <li></i><a href="#"><i class="icon-th-list"></i> Status Updates</a></li>
+              <li></i><a href="#"><i class="icon-envelope"></i> Mail</a></li>
+              <li></i><a href="#"><i class="icon-comment"></i> Chat</a></li>
+              <li></i><a href="#"><i class="icon-folder-open"></i> Files</a></li>
+              <li></i><a href="#"><i class="icon-user"></i> People</a></li>
+            </ul>
+          </div><!--/.well -->
+        </div><!--/span-->
+        
+        
+        <!-- right hand side content, we probably want to put this into a chat moustache template -->
+        
+        
+        <div class="span9">
+ 			<div class="box">
+           	  <div class="row-fluid">
+                  <div class="span1">
+                    <img src="images/tmp/dp_andrew.png" class="dp">
+                    
+                  </div><!--span-->
+             	  <div class="span8">
+                    <textarea class="input-xlarge chatbox">Say someting</textarea>
+                  </div><!--span-->
+                  <div class="span3 test" style="text-align:right;">
+                    <a href="#" rel="tooltip" title="Mike Bartlett" class="dp-tooltip"><img src="images/tmp/dp_mike.png" class="dp"></a>
+                    <a href="#" rel="tooltip" title="Matt Rees" class="dp-tooltip"><img src="images/tmp/dp_matt.png" class="dp offline"></a>
+                    <a href="#" rel="tooltip" title="Adam Sandler" class="dp-tooltip"><img src="images/tmp/dp_adam.png" class="dp offline"></a>
+                  </div><!--span-->
+             	 
+               </div><!--row-->
+            </div><!--box-->
+            <div class="box white">
+            Chat content
+            </div>
+            
+            <!-- debug well for the modals -->
+            <div class="well">
+            	<a data-toggle="modal" href="#shareModal" class="btn btn-primary">Launch Share Modal</a>
+				<a data-toggle="modal" href="#noauthModal" class="btn btn-primary">Launch NoAuth Modal</a>
+                <a data-toggle="modal" href="#loginModal" class="btn btn-primary">Launch Login Modal</a>
+                <a data-toggle="modal" href="#noaccessModal" class="btn btn-primary">Launch NoAccess Modal</a>     
+            </div>
+            
+        </div><!--/span-->
+      </div><!--/row-->
+
+	  <!-- end right hand side chat content. below here is just footer stuffs -->
+
+
+      <hr>
+
+      <footer>
+        <p>&copy; Troupe 2012</p>
+      </footer>
+
+    </div><!--/.fluid-container-->
+    
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="bootstrap/js/jquery.js"></script>
+    <script src="bootstrap/js/bootstrap-alert.js"></script>
+    <script src="bootstrap/js/bootstrap-modal.js"></script>
+    <script src="bootstrap/js/bootstrap-transition.js"></script>
+    <script src="bootstrap/js/bootstrap-tooltip.js"></script>
+    <script src="bootstrap/js/application.js"></script>
+
+  </body>
+</html>
