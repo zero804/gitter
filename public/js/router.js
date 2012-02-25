@@ -4,12 +4,13 @@ define([
   'underscore',
   'backbone',
   'views/home/main',
+  'views/login/login',
   'views/status/statusView',
   'views/mail/mailView',
   'views/chat/chatView',
   'views/file/fileView',
   'views/people/peopleView'
-], function($, _, Backbone, MainHomeView, StatusView, MailView, ChatView, FileView, PeopleView){
+], function($, _, Backbone, MainHomeView, LoginView, StatusView, MailView, ChatView, FileView, PeopleView){
   var AppRouter = Backbone.Router.extend({
     routes: {
       'statusphere': 'showStatusView',
@@ -17,6 +18,7 @@ define([
       'chat': 'showChatView',
       'files': 'showFileView',
       'people': 'showPeopleView',
+      'login': 'showLoginDialog',
       //'projects/:id': 'viewProject',
       
       // Default
@@ -53,10 +55,15 @@ define([
     
     showFileView: function() {
       this.showView( '#primary-view', new FileView({}) );      
-    },
+    },  
     
     showPeopleView: function() {
       this.showView( '#primary-view', new PeopleView({}) );            
+    },
+    
+    showLoginDialog: function() {
+      var loginView = new LoginView({ router: this });
+      loginView.show();
     }
   });
   
