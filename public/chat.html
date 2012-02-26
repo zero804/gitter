@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Blank Troupe</title>
+    <title>Chat</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -205,18 +205,53 @@ body onload for modal, commented out because it's annoying to test with! You may
                   </div><!--span-->
              	 
                </div><!--row-->
-            </div><!--box-->
-            <div class="box white">
-            Chat content
-            </div>
+           
+            	<div class="row-fluid">
+                	<div class="span12"><hr></div>
+                </div>
             
-            <!-- debug well for the modals -->
-            <div class="well">
-            	<a data-toggle="modal" href="#shareModal" class="btn btn-primary">Launch Share Modal</a>
-				<a data-toggle="modal" href="#noauthModal" class="btn btn-primary">Launch NoAuth Modal</a>
-                <a data-toggle="modal" href="#loginModal" class="btn btn-primary">Launch Login Modal</a>
-                <a data-toggle="modal" href="#noaccessModal" class="btn btn-primary">Launch NoAccess Modal</a>     
-            </div>
+            <!-- the chat content below is an ugly ugly hack, will sort it out. Fluid rows have their downside. -->
+            
+            
+              <div class="row-fluid">
+                    <div class="span1"><img src="images/tmp/dp_spacer.png" class="dp dpspacer"></div>
+                    <div class="span10 chat-bubble-containter remote">
+                      <div class="chat-bubble remote">This is some stuff Mike said. It wasn't very interesting.</div>
+                      
+                     </div>
+                    <div class="span1"><a href="#" rel="tooltip" title="Mike Bartlett" class="dp-tooltip"><img src="images/tmp/dp_mike.png" class="dp"></a></div>
+              </div>
+          
+              <div class="row-fluid">
+                    <div class="span1"><img src="images/tmp/dp_andrew.png" class="dp"></div>
+                    <div class="span10 chat-bubble-containter">
+                      <div class="chat-bubble">something something something</div>
+                      
+                     </div>
+                    <div class="span1"><img src="images/tmp/dp_spacer.png" class="dp dpspacer"></div>
+              </div>
+              
+              <div class="row-fluid">
+                    <div class="span1"><img src="images/tmp/dp_spacer.png" class="dp dpspacer"></div>
+                    <div class="span10 chat-bubble-containter remote">
+                      <div class="chat-bubble remote">Blah blah blah, I'm Welsh but not really.</div>
+                      
+                     </div>
+                    <div class="span1"><a href="#" rel="tooltip" title="Matt Rees" class="dp-tooltip"><img src="images/tmp/dp_matt.png" class="dp"></a></div>
+              </div>
+              
+              <div class="row-fluid">
+                    <div class="span1"><img src="images/tmp/dp_spacer.png" class="dp dpspacer"></div>
+                    <div class="span10 chat-bubble-containter remote">
+                      <div class="chat-bubble remote">Something Matt would say.</div>
+                      
+                     </div>
+                    <div class="span1"><a href="#" rel="tooltip" title="Matt Rees" class="dp-tooltip"><img src="images/tmp/dp_matt.png" class="dp"></a></div>
+              </div>
+              
+              
+             </div> <!-- box -->
+            
             
         </div><!--/span-->
       </div><!--/row-->
