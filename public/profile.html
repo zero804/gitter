@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Start a Troupe</title>
+    <title>Troupe - profile</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -32,6 +32,23 @@
   </head>
 
   <body>
+  
+   <!-- #Image Modal -->
+              
+    <div class="modal hide fade" id="imageModal">
+        <div class="modal-header">
+          <a class="close" data-dismiss="modal">×</a>
+          <h3>Upload a picture</h3>
+        </div>
+        <div class="modal-body">
+          
+              <input type="file">
+        </div>
+        <div class="modal-footer">
+          <a href="#" class="btn btn-primary">Save picture</a>
+          <a href="#" class="btn" data-dismiss="modal">Close</a>
+        </div>
+    </div> <!--image modal-->
 
     <div class="container">
     
@@ -47,47 +64,30 @@
       <!-- Main hero unit for a primary marketing message or call to action -->
       <div class="troupe-hero">
         <div class="troupe-hero-content">
-          <h1>Talk together</h1>
-          <p>Troupe makes it easy for teams of people to talk together. Create your Troupe and start talking.</p>
-          
-          <div class="row"><form name="signupForm" id="signupForm" method="post" action="/signup">
-            <div class="span4">
-              <H2>Name your Troupe</H2>
-              <input type="text" name="troupeName" placeholder="Pick anything, it's not unique">
-                          
-            </div>
-            <div class="span4">
-              <H2>Enter your email address</H2>
-              <input name="email" type="text" class="span4" placeholder="We'll send you an email to confirm this">
-            </div>
-           </form>
+          <h1>A few details and you're done</h1>
+          <div class="row-fluid">
+            <div class="span6">
+              <div class="box white">
+              	<div class="row-fluid">
+                  <div class="span 2">
+                    <a href="#imageModal" data-toggle="modal" rel="tooltip" title="Click here to set your picture" class="dp-tooltip"><img src="images/tmp/dp_spacer.png" class="dp"></a>
+                  </div>
+                  <div class="span10">
+                  
+                  	<input type="text" id="realName" name="realName" placeholder="Click here and type your name">
+                    <input type="password" id="password" name="password" placeholder="Then choose a password">
+                  </div>
+                </div>
+              </div>
+             </div>
            </div>
+          
                  
-              <p><br><a href="#" onClick="document.getElementById('signupForm').submit(); return false;" class="btn btn-primary btn-large">Get Started &raquo;</a></p>
+              <p><br><a href="#" class="btn btn-primary btn-large">Get Started &raquo;</a></p>
         </div>
        </div>
        
        
-
-      <!-- Example row of columns -->
-      <div class="row">
-        <div class="span4">
-          <h2>Group Chat</h2>
-           <p>Working on a project together, find it difficult to talk together easily? No problem, your Troupe has a group chat to make communication simple. </p>
-          <p><a class="btn" href="#">View details &raquo;</a></p>
-        </div>
-        <div class="span4">
-          <h2>Group File Storage</h2>
-           <p>Sharing files within your team proving a little tricky? No problem, each Troupe comes with a 500MB shared folder. Or you can just connect it to Dropbox.</p>
-          <p><a class="btn" href="#">View details &raquo;</a></p>
-       </div>
-        <div class="span4">
-          <h2>Mobile</h2>
-          <p>Got the latest shiny iPhone or Android handset? Troupe works on most smart phones keeping you in touch with your team even from the top of Eyjafjallajökull.</p>
-          <p><a class="btn" href="#">View details &raquo;</a></p>
-        </div>
-      </div>
-
       <hr>
 
       <footer>
@@ -104,7 +104,22 @@
     <script src="bootstrap/js/jquery.js"></script>
     <script src="bootstrap/js/bootstrap-tooltip.js"></script>
     <script src="bootstrap/js/bootstrap-popover.js"></script>
+    <script src="bootstrap/js/bootstrap-transition.js"></script>
+    <script src="bootstrap/js/bootstrap-modal.js"></script>
+    
+    
+    <script>
+	
+	$('.dp-tooltip').tooltip();
+	
+	var timer = null;
+	$('#password').keydown(function(){
+		   clearTimeout(timer); 
+		   timer = setTimeout("$('.dp-tooltip').tooltip('toggle');", 1000)
+	});
 
-
+	
+	
+	</script>
   </body>
 </html>
