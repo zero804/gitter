@@ -20,10 +20,21 @@ var TroupeSchema = new Schema({
   status: { type: String, enum: ['INACTIVE', 'ACTIVE'], default: 'INACTIVE'}  
 });
 
+var EmailSchema = new Schema({
+  from: { type: String },
+  troupeURI: { type: String },
+  subject: { type : String },
+  mail: { type: String}
+ });
+  
+
 var User = mongoose.model('User', UserSchema);
 var Troupe = mongoose.model('Troupe', TroupeSchema);
+var Email = mongoose.model('Email', EmailSchema);
+
 
 module.exports = {
     User: User,
-    Troupe: Troupe
+    Troupe: Troupe,
+	Email: Email
 };
