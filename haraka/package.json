@@ -1,0 +1,8 @@
+{
+  "name": "haraka_local",
+  "version": "0.0.1",
+  "dependencies": {   
+  	"Haraka": "1.2.0",
+    "mongoose": "2.5.8"
+  }
+}
