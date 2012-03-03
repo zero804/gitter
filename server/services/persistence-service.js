@@ -17,7 +17,7 @@ var UserSchema = new Schema({
 var TroupeSchema = new Schema({
   name: { type: String },
   uri: { type: String },
-  status: { type: String, enum: ['INACTIVE'], default: 'INACTIVE'}  
+  status: { type: String, enum: ['INACTIVE', 'ACTIVE'], default: 'INACTIVE'}  
 });
 
 var User = mongoose.model('User', UserSchema);
