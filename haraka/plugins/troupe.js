@@ -1,9 +1,13 @@
 // troupe
 
-// documentation via: haraka -c /Users/mike/Documents/TroupeGit/troupe1/roger/haraka -h plugins/troupe
-
-// Put your plugin code here
-// type: `haraka -h Plugins` for documentation on how to create a plugin
+// Ok, what this does is:
+//   1) Check the sender is valid - for now this is just seeing if the user exists, it should match user to troupe when we have that mapping
+//   2) Check the recipient matches a troupe URI
+//   3) Stores this all on Mongo, including the full message payload
+//
+// If (1) or (2) fail, we bounce the message
+//
+// What needs to happen next is to deliver the message to the Troupe recipients
 
 var persistence = require("./../../server/services/persistence-service.js")
 
@@ -87,6 +91,9 @@ exports.hook_rcpt = function(next, connection, params) {
 // now lets move on and deliver the mail to the database
 
 exports.hook_queue = function(next, connection) {
+	var subject = connection.transaction.header.get("Subject");
+	var date = connection.transaction.header.get("Date");
+	
     var lines = connection.transaction.data_lines;
     if (lines.length === 0) {
         return next(DENY);
@@ -96,7 +103,10 @@ exports.hook_queue = function(next, connection) {
 	 var storeMail = new persistence.Email();
 	  storeMail.from = from.toString();
 	  storeMail.troupeURI = who.toString();
+	  storeMail.subject = subject;
+	  storeMail.date = date;
 	  storeMail.mail = lines.join('');
+	  
 	  
 	
 	  storeMail.save(function(err) {
