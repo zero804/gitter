@@ -30,6 +30,9 @@ require([
     this.unbind();
   };
 
+  $('.dp-tooltip').tooltip();
+  $('.chat-bubble').tooltip();
+
   var router = new AppRouter();
     
   Backbone.history.start();
