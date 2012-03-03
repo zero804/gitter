@@ -24,6 +24,7 @@ var EmailSchema = new Schema({
   from: { type: String },
   troupeURI: { type: String },
   subject: { type : String },
+  date: {type: Date },
   mail: { type: String}
  });
   
