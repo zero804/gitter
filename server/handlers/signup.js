@@ -26,16 +26,16 @@ module.exports = {
             
             signupService.newSignup({
               troupeName: req.form.troupeName,
-              email: req.form.email,
-              onSuccess: function() {
-                res.redirect("/confirm");
-              },
-              onFailure: function() {
-                // TODO better handling
+              email: req.form.email
+            }, function(err) {
+              if(err) {
                 res.redirect("/");
-              }
+                return;
+              } 
+
+              res.redirect("/confirm");
             });
-             
+            
           }
           
         }
