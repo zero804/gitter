@@ -56,13 +56,6 @@ exports.hook_rcpt = function(next, connection, params) {
   var loc = tmp.indexOf("@");
   who = tmp.substring(1, loc);
 
-
-  // I don't entirely understand the node queue system, but I guess this is NOT
-  // the way to do it as I've seen the output of the Mongo query happen after
-  // the entire Haraka script has finished running. I tried using whatTroupe =
-  // persistance.Troupe.findOne blah blah but that only returned some fucked up
-  // query object rather than the response. Sigh. Almost get it, but not 100%
-
   persistence.Troupe.findOne({
     uri : who
   }, function(err, whatTroupe) {
