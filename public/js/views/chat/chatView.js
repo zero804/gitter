@@ -6,10 +6,15 @@ define([
   'mustache',
   'text!templates/chat/chat.mustache'
 ], function($, _, Backbone, Mustache, template){
+  
   var ChatView = Backbone.View.extend({    
     render: function() {
       var compiledTemplate = Mustache.render(template, { });
       $(this.el).html(compiledTemplate);
+      
+      $('.dp-tooltip', this.el).tooltip();
+      $('.chat-bubble', this.el).tooltip();
+      
       return this;
     }
     
