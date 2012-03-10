@@ -23,7 +23,7 @@ var TroupeSchema = new Schema({
 var EmailSchema = new Schema({
   from: { type: String },
   fromName: { type: String},
-  troupeURI: { type: String },
+  troupeId: ObjectId,
   subject: { type : String },
   date: {type: Date },
   mail: { type: String}

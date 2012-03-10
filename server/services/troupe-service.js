@@ -15,7 +15,7 @@ function userHasAccessToTroupe(user, troupe) {
   return troupe.users.indexOf(user.id) >= 0;
 }
 
-function distributeEmail(options, callback) {
+function validateTroupeEmail(options, callback) {
   var from = options.from;
   var to = options.to;
   
@@ -23,6 +23,7 @@ function distributeEmail(options, callback) {
   var uri = to.split('@')[0];
   var user = null;
   var troupe = null;
+  console.log("Options: " + JSON.stringify(options));
   
   userService.findByEmail(from, function(err, fromUser) {
     if(err) callback(err);
@@ -31,21 +32,13 @@ function distributeEmail(options, callback) {
     findByUri(uri, function(err, troupe) {
       if(err) callback(err);
       if(!troupe) callback("Troupe not found for uri " + uri);
-      
+      console.dir(fromUser);
       if(!userHasAccessToTroupe(fromUser, troupe)) {
         callback("Access denied");
       } 
 
-      var userIds = troupe.users;
-      
-      userService.findByIds(userIds, function(err, users) {
-        if(err) callback(err);
-        if(!users) callback("No users returned");
-        
-        var emailAddresses = users.map(function(item) { return item.email; } );
-        
-        callback(null, emailAddresses); 
-      });
+      callback(null,troupe);
+	  
     });
   });
   
@@ -53,7 +46,7 @@ function distributeEmail(options, callback) {
 
 module.exports = {
   findByUri: findByUri,
-  distributeEmail: distributeEmail,
+  validateTroupeEmail: validateTroupeEmail,
   userHasAccessToTroupe: userHasAccessToTroupe
 
 };
