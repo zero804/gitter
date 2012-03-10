@@ -8,6 +8,14 @@ module.exports = {
         troupeService.findByUri(appUri, function(err, troupe) {
           if(err) return next(err); 
           if(!troupe) return next("Troupe: " + appUri + " not found.");
+
+          
+          if(req.user) {
+            if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
+              res.redirect("/" + appUri + "/accessdenied");
+              return;
+            }
+          }
           
           var troupeContext = {
               user: req.user,
@@ -23,6 +31,11 @@ module.exports = {
           
         });
         
+      });
+      
+      app.get('/:appUri/accessdenied', function(req, res, next) {
+        res.render('app-accessdenied', {
+        });
       });
     }
 };

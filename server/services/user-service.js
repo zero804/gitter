@@ -1,7 +1,8 @@
 "use strict";
 
 var persistence = require("./persistence-service"),
-    sechash = require('sechash');
+    sechash = require('sechash'),
+    mongoose = require("mongoose");
 
 module.exports = {
   newUser: function(options) {
@@ -31,6 +32,12 @@ module.exports = {
     persistence.User.findById(id, function(err, user) {
       callback(err, user);
     });
+  },
+  
+  findByIds: function(ids, callback) {
+    persistence.User.where('_id').in(ids)
+      .slaveOk()
+      .run(callback);
   },
   
   findDefaultTroupeForUser: function(id, callback) {
