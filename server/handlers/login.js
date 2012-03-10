@@ -1,4 +1,3 @@
-var signupService = require("../services/signup-service");
 var passport = require("passport");
 
 function ensureAuthenticated(req, res, next) {

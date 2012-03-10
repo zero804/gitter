@@ -5,6 +5,12 @@ var form = require("express-form"),
 
 module.exports = {
     install: function(app) {
+      app.get(
+        '/',
+        function(req, res) {
+          res.render('signup');
+        }
+      );
       app.post(
         '/signup',
 

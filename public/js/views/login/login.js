@@ -38,6 +38,14 @@ define([
       $.post("/login", this.$el.find("form").serialize(), function(data, textStatus, jqXHR) {
         if(!data.failed) {
           self.$el.modal('hide');
+          return;
+        }
+        
+        var incorrectBox = $('.incorrect-password', self.$el);
+        if(incorrectBox.is(":visible")) {
+          incorrectBox.effect("highlight", {}, "normal");
+        } else {
+          incorrectBox.show('fast');
         }
       });
 
