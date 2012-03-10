@@ -16,7 +16,8 @@ var UserSchema = new Schema({
 var TroupeSchema = new Schema({
   name: { type: String },
   uri: { type: String },
-  status: { type: String, enum: ['INACTIVE', 'ACTIVE'], default: 'INACTIVE'}  
+  status: { type: String, enum: ['INACTIVE', 'ACTIVE'], default: 'INACTIVE'},
+  users: [ObjectId]
 });
 
 var EmailSchema = new Schema({

@@ -22,6 +22,7 @@ function newTroupeForExistingUser(options, user, callback) {
   var troupe = new persistence.Troupe();
   troupe.name = options.troupeName;
   troupe.uri = uri;
+  troupe.users = [user.id];
   
   var troupeLink = "http://trou.pe/" + uri;
 
@@ -59,6 +60,7 @@ function newTroupeForNewUser(options, callback) {
     var troupe = new persistence.Troupe();
     troupe.name = options.troupeName;
     troupe.uri = uri;
+    troupe.users = [user.id];
     
     troupe.save(function(err) {
       if(err) {

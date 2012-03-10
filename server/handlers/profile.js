@@ -2,6 +2,7 @@ var form = require("express-form"),
     filter = form.filter,
     validate = form.validate,
     signupService = require("../services/signup-service"),
+    userService = require("../services/user-service"),
     passport = require('passport');
 
 module.exports = {
@@ -51,8 +52,13 @@ module.exports = {
                 });
                 return;
               } 
+              
+              userService.findDefaultTroupeForUser(req.user.id, function(err, troupe) {
+                if(err) return next(err);
+                if(!troupe) return next("Unable to determine default troupe for user");
 
-              res.redirect("/app");
+                res.redirect("/" + troupe.uri);
+              });
             });
           }
         );
