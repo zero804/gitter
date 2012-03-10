@@ -5,8 +5,6 @@ var Schema = mongoose.Schema,
 
 mongoose.connect('mongodb://localhost/troupe');
 
-console.log("Connecting to mongodb");
-
 var UserSchema = new Schema({
   displayName: { type: String }, 
   email: { type: String },
