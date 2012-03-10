@@ -1,4 +1,5 @@
-var signupService = require("../services/signup-service");
+var signupService = require("../services/signup-service"),
+passport = require('passport');
 
 module.exports = {
     install: function(app) {
@@ -7,19 +8,16 @@ module.exports = {
         });
       });
       
-      app.get('/confirm/:confirmationCode', function(req, res, next){
-        signupService.confirm(req.params.confirmationCode, function(err, user) {
-          if (err) return next(err);
-          
-          req.session.user = {
-              id: user._id
-          };
-          
-          console.log(JSON.stringify(req.session.user));
-          
-          res.redirect('/profile');
-        });
-      });
+      app.get('/confirm/:confirmationCode',         
+        passport.authenticate('confirm'),
+        function(req, res, next){
+          console.dir(req.user);
+          signupService.confirm(req.user, function(err, user) {
+            if (err) return next(err);
+            res.redirect('/profile');
+          });
+        }
+      );
       
     }
 };

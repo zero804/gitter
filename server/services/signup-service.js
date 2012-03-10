@@ -1,7 +1,8 @@
 var persistence = require("./persistence-service"),
     mailerService = require("./mailer-service"),
     userService = require("./user-service"),
-    uuid = require('node-uuid');
+    uuid = require('node-uuid'),
+    sechash = require('sechash');
 
 function createUniqueUri() {
   var chars = "0123456789abcdefghiklmnopqrstuvwxyz";
@@ -89,7 +90,7 @@ module.exports = {
     //     * If the user exists but hasn't previously confirmed their email - then we need to figure out something... should we resend the same confirmation code that was previously sent out or should we send a new one. Say someone creates 3 Troupes in a row, each one will generate a different confirmation code. It's the email address you are confirming not the Troupe. 
     //       
 
-    userService.findExistingUser(options.email, function(err, user) {
+    userService.findByEmail(options.email, function(err, user) {
       if(err) {
         callback(err, null);
         return;
@@ -101,27 +102,32 @@ module.exports = {
         newTroupeForNewUser(options, callback);
       }
     });
-
   },
     
-  confirm: function(confirmationCode, callbackFunction) {
-    persistence.User.findOne({confirmationCode: confirmationCode}, function(err, user) {
-      if(err) {
-        callbackFunction(err, null);
-        return;
-      }
+  confirm: function(user, callbackFunction) {
+    if(!user) return callbackFunction(new Error("No user found"));
+    
+    user.confirmationCode = null;
+    user.status = 'ACTIVE';
+    
+    user.save(function(err) {
+      callbackFunction(err, user);
+    });
+  },
+  
+  updateProfile: function(options, callback) {
+    var user = options.user;
+    
+    if(user.passwordHash) return callback("User already has a password set");
+    
+    sechash.strongHash('md5', options.password, function(err, hash3) {
+      if(err) return callback(err);
       
-      if(user == null) {
-        callbackFunction(new Error("No user found for given confirmation code: " + confirmationCode), null);
-        return;
-      }
-      
-      user.confirmationCode = null;
-      user.status = 'ACTIVE';
-      
+      user.passwordHash = hash3;
+      user.displayName = options.displayName;
       user.save(function(err) {
-        callbackFunction(err, user);
+        callback(err);
       });
     });
-  }  
+  }
 };
