@@ -1,4 +1,7 @@
-var persistence = require("./persistence-service");
+"use strict";
+
+var persistence = require("./persistence-service"),
+    sechash = require('sechash');
 
 module.exports = {
   newUser: function(options) {
@@ -12,9 +15,45 @@ module.exports = {
     console.log("saved user")
   },
 
-  findExistingUser: function(email, callback) {
+  findByEmail: function(email, callback) {
     persistence.User.findOne({email: email}, function(err, user) {
       callback(err, user);
     });
+  },
+  
+  findByConfirmationCode: function(confirmationCode, callback) {
+    persistence.User.findOne({confirmationCode: confirmationCode}, function(err, user) {
+      callback(err, user);
+    });
+  },
+    
+  findById: function(id, callback) {
+    persistence.User.findById(id, function(err, user) {
+      callback(err, user);
+    });
+  },
+  
+  updateInitialPassword: function(userId, password, callback) {
+    persistence.User.findById(userId, function(err, user) {
+      if(user.passwordHash) return callback("User already has a password set");
+      
+       sechash.strongHash('md5', password, function(err, hash3) {
+         user.passwordHash = hash3;
+         return callback(false);
+       });
+    });
+  },
+  
+  checkPassword: function(user, password, callback) {
+    if(!user.passwordHash) {
+      /* User has not yet set their password */
+      callback(false);
+    }
+    
+    sechash.testHash(password, user.passwordHash, function(err, match) {
+      if(err) return callback(false);
+      callback(match);
+    });
   }
+  
 };

@@ -8,10 +8,11 @@ mongoose.connect('mongodb://localhost/troupe');
 console.log("Connecting to mongodb");
 
 var UserSchema = new Schema({
-  name: { type: String }, 
+  displayName: { type: String }, 
   email: { type: String },
   confirmationCode: {type: String },
-  status: { type: String, enum: ['UNCONFIRMED', 'ACTIVE'], default: 'UNCONFIRMED'}
+  status: { type: String, enum: ['UNCONFIRMED', 'ACTIVE'], default: 'UNCONFIRMED'},
+  passwordHash: { type: String }
 });
 
 var TroupeSchema = new Schema({
@@ -36,7 +37,7 @@ var Email = mongoose.model('Email', EmailSchema);
 
 
 module.exports = {
-    User: User,
-    Troupe: Troupe,
+  User: User,
+  Troupe: Troupe,
 	Email: Email
 };

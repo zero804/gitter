@@ -43,6 +43,7 @@
         </div>
 
         <!-- Main hero unit for a primary marketing message or call to action -->
+        <form action="/updateprofile" method="post">
         <div class="troupe-hero">
             <div class="troupe-hero-content">
                 <h1>A few details and you're done</h1>
@@ -54,8 +55,9 @@
                                     <a href="#imageModal" data-toggle="modal" rel="tooltip" title="Click here to set your picture" class="dp-tooltip"><img src="images/tmp/dp_spacer.png" class="dp" alt=""></a>
                                 </div>
                                 <div class="span10">
-
-                                    <input type="text" id="realName" name="realName" placeholder="Click here and type your name"> <input type="password" id="password" name="password" placeholder="Then choose a password">
+                                    <input type="text" id="displayName" name="displayName" value="{{displayName}}" placeholder="Click here and type your name"> 
+                                    
+                                    <input type="password" id="password" name="password" value="{{password}}" placeholder="Then choose a password">
                                 </div>
                             </div>
                         </div>
@@ -65,11 +67,11 @@
 
                 <p>
                     <br>
-                    <a href="#" class="btn btn-primary btn-large getstarted">Get Started &raquo;</a>
+                    <input type="submit"  class="btn btn-primary btn-large getstarted" name="submit" value="Get Started &raquo;">
                 </p>
             </div>
         </div>
-
+        </form>
 
         <hr>
 

@@ -19,7 +19,7 @@ module.exports = {
         // Express request-handler now receives filtered and validated data
         function(req, res){
           if (!req.form.isValid) {
-            // Handle errors
+            // TODO: Handle errors
             console.log(req.form.errors);
 
           } else {

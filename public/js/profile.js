@@ -25,7 +25,7 @@ function(_, Backbone, $, v, Bootstrap) {
       //"click .check"              : "toggleDone",
       "dblclick div.todo-text"    : "edit",
       "click span.todo-destroy"   : "clear",
-      "click .getstarted"         : "proceedToApp",
+      //"click .getstarted"         : "proceedToApp",
       "keydown #password"         : "toggleTooltip"
     },
   
