@@ -37,7 +37,7 @@ define([
       var self = this;
       $.post("/login", this.$el.find("form").serialize(), function(data, textStatus, jqXHR) {
         if(!data.failed) {
-          self.$el.modal('hide');
+          window.location.reload();
           return;
         }
         

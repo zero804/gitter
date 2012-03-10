@@ -18,8 +18,6 @@ define([
       'chat': 'showChatView',
       'files': 'showFileView',
       'people': 'showPeopleView',
-      'login': 'showLoginDialog',
-      //'projects/:id': 'viewProject',
       
       // Default
       '*actions': 'defaultAction'
@@ -27,7 +25,6 @@ define([
 
     /* Taken from http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
     showView: function(selector, view) {
-        console.log("Current View: " + selector);
         if (this.currentView)
             this.currentView.close();
 
@@ -59,11 +56,6 @@ define([
     
     showPeopleView: function() {
       this.showView( '#primary-view', new PeopleView({}) );            
-    },
-    
-    showLoginDialog: function() {
-      var loginView = new LoginView({ router: this });
-      loginView.show();
     }
   });
   

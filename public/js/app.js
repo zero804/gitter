@@ -18,9 +18,10 @@ require([
   'underscore',
   'backbone',
   'router', 
+  'router-login',
   'bootstrap',
   'jqueryui'
-], function($, _, Backbone, AppRouter, Bootstrap, jqUI) {
+], function($, _, Backbone, AppRouter, AppRouterLogin, Bootstrap, jqUI) {
   
   /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
   Backbone.View.prototype.close = function () {
@@ -35,12 +36,15 @@ require([
   $('.dp-tooltip').tooltip();
   $('.chat-bubble').tooltip();
 
-  var router = new AppRouter();
-    
-  Backbone.history.start();
-
   if(!window.troupeContext.user) {
-    router.navigate("login", {trigger: true});
+    var router = new AppRouterLogin();
+
+    Backbone.history.start();
+    
+    return;
   }
   
+  var router = new AppRouter();
+
+  Backbone.history.start();
 });
