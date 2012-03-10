@@ -49,7 +49,6 @@ passport.use(new ConfirmStrategy(function(confirmationCode, done) {
 
 
 passport.serializeUser(function(user, done) {
-  console.log("Serialing: " + user.id);
   done(null, user.id);
 });
 
@@ -60,7 +59,6 @@ passport.deserializeUser(function(id, done) {
     if(err) return done(err);
     if(!user) return done(null, false);
 
-    console.log("found: " + user)
     /* Todo: consider using a seperate object for the security user */
     return done(null, user);
   });
