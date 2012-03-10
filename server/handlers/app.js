@@ -21,6 +21,7 @@ module.exports = {
               user: req.user,
               troupe: {
                 "uri": troupe.uri,
+                "id": troupe.id,
                 "name": troupe.name
               }
           };

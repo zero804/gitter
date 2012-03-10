@@ -4,13 +4,13 @@ define([
   'underscore',
   'backbone',
   'views/home/main',
-  'views/login/login',
+  'views/share/share',
   'views/status/statusView',
   'views/mail/mailView',
   'views/chat/chatView',
   'views/file/fileView',
   'views/people/peopleView'
-], function($, _, Backbone, MainHomeView, LoginView, StatusView, MailView, ChatView, FileView, PeopleView){
+], function($, _, Backbone, MainHomeView, ShareView, StatusView, MailView, ChatView, FileView, PeopleView){
   var AppRouter = Backbone.Router.extend({
     routes: {
       'statusphere': 'showStatusView',
@@ -56,6 +56,11 @@ define([
     
     showPeopleView: function() {
       this.showView( '#primary-view', new PeopleView({}) );            
+    },
+    
+    showShareDialog: function() {
+      var loginView = new ShareView({ router: this });
+      loginView.show();
     }
   });
   
