@@ -6,7 +6,7 @@ define([
   'mustache',
   'text!templates/login/login.mustache'
 ], function($, _, Backbone, Mustache, template) {
-  var MainHomeView = Backbone.View.extend({    
+  var LoginView = Backbone.View.extend({    
     tagName: "div",
     className: "modal hide fade",
 
@@ -27,7 +27,7 @@ define([
       var self = this;
       this.$el.on('hidden', function () {
         self.remove();
-        self.router.navigate("");
+        window.location.href = "/";
       });
       
       this.$el.modal('show');
@@ -60,5 +60,5 @@ define([
     
   });
 
-  return MainHomeView;
+  return LoginView;
 });

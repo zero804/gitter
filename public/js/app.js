@@ -37,14 +37,13 @@ require([
   $('.chat-bubble').tooltip();
 
   if(!window.troupeContext.user) {
-    var router = new AppRouterLogin();
-
+    window.troupeApp = new AppRouterLogin();
+    
     Backbone.history.start();
     
     return;
   }
   
-  var router = new AppRouter();
-
+  window.troupeApp = new AppRouter();
   Backbone.history.start();
 });

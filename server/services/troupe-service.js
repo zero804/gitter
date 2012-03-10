@@ -9,9 +9,13 @@ function findByUri(uri, callback) {
   });
 }
 
+function findById(id, callback) {
+  persistence.Troupe.findById(id, function(err, troupe) {
+    callback(err, troupe);
+  });
+}
+
 function userHasAccessToTroupe(user, troupe) {
-  console.dir(user);
-  console.dir(troupe);
   return troupe.users.indexOf(user.id) >= 0;
 }
 
@@ -46,6 +50,7 @@ function validateTroupeEmail(options, callback) {
 
 module.exports = {
   findByUri: findByUri,
+  findById: findById,
   validateTroupeEmail: validateTroupeEmail,
   userHasAccessToTroupe: userHasAccessToTroupe
 

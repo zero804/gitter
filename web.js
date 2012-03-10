@@ -88,8 +88,11 @@ require('./server/handlers/profile').install(app);
 require('./server/handlers/login').install(app);
 
 /* REST resources: not used yet */
-app.resource('api/projects',  require('./server/resources/projects.js'));
+var troupesResource = app.resource('troupes',  require('./server/resources/troupes.js'));
+var sharesResource = app.resource('shares',  require('./server/resources/shares.js'));
+troupesResource.add(sharesResource);
 
+/* This should be last */
 require('./server/handlers/app').install(app);
 
 
