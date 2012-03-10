@@ -33,6 +33,12 @@ module.exports = {
     });
   },
   
+  findDefaultTroupeForUser: function(id, callback) {
+    persistence.Troupe.findOne({ users: id }, function(err, troupe) {
+      callback(err, troupe);
+    });
+  },
+  
   updateInitialPassword: function(userId, password, callback) {
     persistence.User.findById(userId, function(err, user) {
       if(user.passwordHash) return callback("User already has a password set");
