@@ -17,25 +17,35 @@ exports.hook_queue = function(next, connection) {
   
 	toName = toName.replace(/\n/g,"");
 	fromName = fromName.replace(/\n/g,"");
+	subject = subject.replace(/\n/g,"");
+	
+	
+	
+	if (fromName.indexOf("<") > 0)  {
+	  var fromEmail = fromName.substring(fromName.indexOf("<") + 1, fromName.indexOf(">"));
+	  fromName = fromName.substring(0, fromName.indexOf("<")-1);					 
+	 } 
+	else { 
+	   var fromEmail = fromName;
+	 }
 	
 	
 	connection.logdebug("To: " + JSON.stringify(toName));
 	connection.logdebug("From: " + fromName);
+	connection.logdebug("Email: " + fromEmail);
 	
-	troupeService.validateTroupeEmail({ to: toName, from: fromName}, function(err, troupe) {
-	  if (err) return next(DENY);
-	  if (!troupe) return next (DENY);
-	  
-	  
+	troupeService.validateTroupeEmail({ to: toName, from: fromEmail}, function(err, troupe) {
+	  if (err) return next(DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.");
+	  if (!troupe) return next (DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.")  
 	  
 	  var storeMail = new persistence.Email();
-	  storeMail.from = fromName;
+	  storeMail.from = fromEmail;
 	  storeMail.troupeId = troupe.id;
 	  storeMail.subject = subject;
 	  storeMail.date = date;
 	  storeMail.fromName = fromName;
 	  storeMail.mail = lines.join('');
-	  
+	  storeMail.delivered = false;
 	  
 	
 	  storeMail.save(function(err) {
