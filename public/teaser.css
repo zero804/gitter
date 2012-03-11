@@ -15,12 +15,34 @@ html {
 	height:100%;	
 }
 
-.centerleft {
-  position: relative;
-  top: 50%;
-  margin-top: -50px;
+.cl {
+  padding-top: 100px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.cr {
+  padding-top: 140px;
+  padding-left: 30px;
+  padding-right: 30px;
 }
 
 .panel {
-	background-image:url(images/broken_noise.png)
+	background-image:url(images/black_paper.png)
+}
+
+.texty {
+	color: #CCC;
+	font-family: 'Advent Pro', sans-serif;
+	font-size:24px;
+	line-height:24px;
+}
+
+.bigger {
+	font-size: 36px;
+	line-height:36px;
+}
+
+.smaller {
+	font-size:14px;
 }
