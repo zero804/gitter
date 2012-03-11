@@ -12,8 +12,10 @@ function Strategy(options, verify) {
   }
   if (!verify) throw new Error('local authentication strategy requires a verify function');
   
+  var name = options.name ? options.name : "confirm";
+  
   passport.Strategy.call(this);
-  this.name = 'confirm';
+  this.name = name;
   this.verify = verify;
 }
 

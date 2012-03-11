@@ -19,34 +19,14 @@ function(_, Backbone, $, v, Bootstrap) {
     
     initialize: function (args) {
       $('.dp-tooltip').tooltip();
+      $("input#displayName").focus();
     },
     
     events: {
-      //"click .check"              : "toggleDone",
-      "dblclick div.todo-text"    : "edit",
-      "click span.todo-destroy"   : "clear",
-      //"click .getstarted"         : "proceedToApp",
-      "keydown #password"         : "toggleTooltip"
-    },
-  
-    proceedToApp: function() {
-      window.location.href = '/app';
-      return false;
-    },
-    
-    // Switch this view into `"editing"` mode, displaying the input field.
-    edit: function() {
-      $(this.el).addClass("editing");
-      this.input.focus();
-    },
-    
-    // Remove the item, destroy the model.
-    clear: function() {
-      this.model.destroy();
+      "keydown #password"         : "toggleTooltip",
     },
     
     toggleTooltip: function() {
-      console.log(arguments);
       clearTimeout(tooltipTimer); 
       tooltipTimer = setTimeout(function() { 
         $('.dp-tooltip').tooltip('hide');
