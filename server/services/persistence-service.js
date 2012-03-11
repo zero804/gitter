@@ -26,7 +26,8 @@ var EmailSchema = new Schema({
   troupeId: ObjectId,
   subject: { type : String },
   date: {type: Date },
-  mail: { type: String}
+  mail: { type: String},
+  delivered: { type: Boolean}
  });
   
 
