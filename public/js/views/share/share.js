@@ -35,6 +35,10 @@ define([
         self.remove();
       });
       
+      this.$el.on('shown', function () {
+        $("input.f-name", this.el).focus();
+      });
+      
       this.$el.modal('show');
     },
     
@@ -44,6 +48,7 @@ define([
       });
       $(this.el).html(compiledTemplate);
       $("form", this.el).append($(rowTemplate));
+      
       return this;
     },
     
@@ -74,23 +79,25 @@ define([
       var controlGroups = $("form .control-group", this.$el);
       for(var i = 0; i < controlGroups.length; i++) {
         var cg = controlGroups[i];
-        var name = $(".f-name", cg).val();
+        var displayName = $(".f-name", cg).val();
         var email = $(".f-email", cg).val();
         invites.push({
-          name: name,
+          displayName: displayName,
           email: email
         });
       }
       
-      $.post(
-        "/troupes/" + window.troupeContext.troupe.id + "/shares",
-        JSON.stringify(invites),
-        function(data) {
-          window.alert("fuckit");
-        },
-        "json")
-        .error(function() { window.alert("fucked")})
-      
+      var self = this;
+      $.ajax({
+        url: "/troupes/" + window.troupeContext.troupe.id + "/shares",
+        contentType: "application/json",
+        data: JSON.stringify(invites),
+        dataType: "json",
+        type: "POST",
+        success: function(data) {
+          self.$el.modal('hide');
+        }
+      });
       
       return false;
     }

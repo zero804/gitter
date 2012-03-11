@@ -7,13 +7,34 @@ var persistence = require("./persistence-service"),
 module.exports = {
   newUser: function(options) {
     var user = new persistence.User(options);
-    user.name = options.name;
+    user.displayName = options.display;
     user.email = options.email;
+    user.status = options.status ? options.status : "UNCONFIRMED";
+    
     user.save(function (err) {
-      console.log("Save failed:" + JSON.stringify(err) + ", " + err );
+      if(err) console.log("Save failed:" + JSON.stringify(err) + ", " + err );
     });
-
-    console.log("saved user")
+  },
+  
+  findOrCreateUserForEmail: function(options, callback) {
+    var displayName = options.displayName;
+    var email = options.email;
+    
+    persistence.User.findOne({email: email}, function(err, user) {
+      if(err) return callback(err);
+      if(user) return callback(err, user);
+      
+      /* User does not exist */
+      var user = new persistence.User(options);
+      user.displayName = displayName;
+      user.email = email;
+      user.save(function (err) {
+        if(err) return callback(err);
+        
+        return callback(null, user);
+      });
+    });
+    
   },
 
   findByEmail: function(email, callback) {

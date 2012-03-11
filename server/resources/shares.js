@@ -1,3 +1,4 @@
+var troupeService = require("../services/troupe-service");
 
 module.exports = {
     index: function(req, res){
@@ -9,7 +10,13 @@ module.exports = {
     },
 
     create: function(req, res) {
-      res.send(req.share);
+      var shares = req.body;
+      for(var i = 0; i < shares.length; i++) {
+        var share = shares[i];
+        troupeService.addInvite(req.troupe, share.displayName, share.email);
+      }
+      
+      res.send(shares);
     },
 
     show: function(req, res){

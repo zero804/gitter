@@ -11,7 +11,6 @@ module.exports = {
       app.get('/confirm/:confirmationCode',         
         passport.authenticate('confirm'),
         function(req, res, next){
-          console.dir(req.user);
           signupService.confirm(req.user, function(err, user) {
             if (err) return next(err);
             res.redirect('/profile');
