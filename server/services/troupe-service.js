@@ -16,7 +16,7 @@ function findById(id, callback) {
 }
 
 function userHasAccessToTroupe(user, troupe) {
-  return troupe.users.indexOf(user.id) >= 0;
+  return troupe.users.indexOf(user.id) >=  0;
 }
 
 function validateTroupeEmail(options, callback) {
@@ -30,13 +30,13 @@ function validateTroupeEmail(options, callback) {
   console.log("Options: " + JSON.stringify(options));
   
   userService.findByEmail(from, function(err, fromUser) {
-    if(err) callback(err);
-    if(!fromUser) callback("Access denied");
+    if(err) return callback(err);
+    if(!fromUser) return callback("Access denied");
+	console.log("fromUser: " + JSON.stringify(fromUser));
     
     findByUri(uri, function(err, troupe) {
-      if(err) callback(err);
-      if(!troupe) callback("Troupe not found for uri " + uri);
-      console.dir(fromUser);
+      if(err) return callback(err);
+      if(!troupe) return callback("Troupe not found for uri " + uri);
       if(!userHasAccessToTroupe(fromUser, troupe)) {
         callback("Access denied");
       } 
