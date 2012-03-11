@@ -8,11 +8,11 @@ var express = require('express'),
 	LocalStrategy = require('passport-local').Strategy,
 	ConfirmStrategy = require('./server/utils/confirm-strategy').Strategy;
   
-var RedisStore = require('connect-redis')(express);
+//var RedisStore = require('connect-redis')(express);
 
 var app = express.createServer(
     express.cookieParser(),
-    express.session({ secret: 'keyboard cat', store: new RedisStore})
+    express.session({ secret: 'keyboard cat'/*, store: new RedisStore*/})
 ); 
 
 passport.use(new LocalStrategy({
