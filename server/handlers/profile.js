@@ -1,3 +1,5 @@
+"use strict";
+
 var form = require("express-form"),
     filter = form.filter,
     validate = form.validate,
@@ -9,9 +11,17 @@ module.exports = {
     install: function(app) {
       app.get('/profile', 
         function(req, res) {
-        res.render('profile', {
-          flash: req.flash
-        });
+          var displayName;
+          if(req.form && "displayName" in req.form) { 
+            displayName = req.form.displayName;
+          } else {
+            displayName = req.user.displayName
+          }
+        
+          res.render('profile', {
+            flash: req.flash,
+            displayName: req.user.displayName
+          });
       });   
 
       app.post(

@@ -20,6 +20,14 @@ var TroupeSchema = new Schema({
   users: [ObjectId]
 });
 
+var Invite = new Schema({
+  troupeId: ObjectId,
+  displayName: { type: String },
+  email: { type: String },
+  code: { type: String },
+  status: { type: String, enum: ['UNUSED', 'USED'], default: 'UNUSED'}
+});
+
 var EmailSchema = new Schema({
   from: { type: String },
   fromName: { type: String},
@@ -33,10 +41,11 @@ var EmailSchema = new Schema({
 var User = mongoose.model('User', UserSchema);
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var Email = mongoose.model('Email', EmailSchema);
-
+var Invite = mongoose.model('Invite', Invite);
 
 module.exports = {
   User: User,
   Troupe: Troupe,
-	Email: Email
+	Email: Email,
+	Invite: Invite
 };

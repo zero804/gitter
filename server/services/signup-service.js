@@ -1,3 +1,5 @@
+"use strict";
+
 var persistence = require("./persistence-service"),
     mailerService = require("./mailer-service"),
     userService = require("./user-service"),
