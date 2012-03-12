@@ -8,11 +8,11 @@ var express = require('express'),
 	LocalStrategy = require('passport-local').Strategy,
 	ConfirmStrategy = require('./server/utils/confirm-strategy').Strategy;
   
-//var RedisStore = require('connect-redis')(express);
+var RedisStore = require('connect-redis')(express);
 
 var app = express.createServer(
     express.cookieParser(),
-    express.session({ secret: 'keyboard cat'/*, store: new RedisStore*/})
+    express.session({ secret: 'keyboard cat', store: new RedisStore})
 ); 
 
 passport.use(new LocalStrategy({
@@ -109,7 +109,9 @@ require('./server/handlers/invite').install(app);
 /* REST resources: not used yet */
 var troupesResource = app.resource('troupes',  require('./server/resources/troupes.js'));
 var sharesResource = app.resource('shares',  require('./server/resources/shares.js'));
+var usersResource = app.resource('users',  require('./server/resources/users.js'));
 troupesResource.add(sharesResource);
+troupesResource.add(usersResource);
 
 /* This should be last */
 require('./server/handlers/app').install(app);
