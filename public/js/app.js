@@ -33,17 +33,60 @@ require([
     this.unbind();
   };
 
+  var troupeApp;
+  
   $('.dp-tooltip').tooltip();
   $('.chat-bubble').tooltip();
 
+  var AppView = Backbone.View.extend({
+    el: 'body',
+    
+    initialize: function() {
+      this.buildToolbar();
+    },
+    
+    events: {
+      "click .menu-profile": "profileMenuClicked",
+      "click .menu-settings": "settingsMenuClicked",
+      "click .menu-signout": "signoutMenuClicked",
+      
+    },
+    
+    buildToolbar: function() {
+      if(window.troupeContext.user) {
+        $(".label-displayName").text(window.troupeContext.user.displayName);
+        $(".menu-security").show();
+      } 
+      
+    },
+    
+    profileMenuClicked: function() {
+      troupeApp.navigate("profile", {trigger: true});
+    },
+    
+    settingsMenuClicked: function() {
+      troupeApp.navigate("settings", {trigger: true});
+    },
+    
+    signoutMenuClicked: function() {
+      troupeApp.navigate("signout", {trigger: true});
+    }
+   
+
+  });
+  var app = new AppView();
+
+  
   if(!window.troupeContext.user) {
     window.troupeApp = new AppRouterLogin();
-    
+    troupeApp = window.troupeApp;
     Backbone.history.start();
     
     return;
   }
   
   window.troupeApp = new AppRouter();
+  troupeApp = window.troupeApp;
+  
   Backbone.history.start();
 });

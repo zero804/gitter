@@ -37,19 +37,20 @@
           <a class="brand" href="/"><img src="images/logo_small2.png"></a>
           <div class="nav-collapse">
 
-            <ul class="nav pull-right">
+            <ul class="nav pull-right menu-security" style="display:none">
             
-            <li class="divider-vertical"></li>
-            
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><script type="text/javascript">document.write(window.troupeContext.user.displayName);</script>&nbsp;<b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                <li><a href="#">Profile</a></li>
-                <li><a href="#">Settings</a></li>
-                <li class="divider"></li>
-                <li><a href="#">Sign out</a></li>
-              </ul>
-
+                <li class="divider-vertical"></li>
+                
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="label-displayName"></span>&nbsp;<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li><a href="#" class="menu-profile">Profile</a></li>
+                    <li><a href="#" class="menu-settings">Settings</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#" class="menu-signout">Sign out</a></li>
+                  </ul>
+                </li>
+            </ul>
           </div><!--/.nav-collapse -->
         </div>
       </div>
