@@ -4,13 +4,8 @@ define([
   'underscore',
   'backbone',
   'views/home/main',
-  'views/share/share',
-  'views/status/statusView',
-  'views/mail/mailView',
-  'views/chat/chatView',
-  'views/file/fileView',
-  'views/people/peopleView'
-], function($, _, Backbone, MainHomeView, ShareView, StatusView, MailView, ChatView, FileView, PeopleView){
+  'views/share/share'
+], function($, _, Backbone, MainHomeView, ShareView){
   var AppRouter = Backbone.Router.extend({
     routes: {
       'statusphere': 'showStatusView',
@@ -18,6 +13,7 @@ define([
       'chat': 'showChatView',
       'files': 'showFileView',
       'people': 'showPeopleView',
+      'profile': 'showProfileView',
       
       // Default
       '*actions': 'defaultAction'
@@ -33,34 +29,47 @@ define([
         this.currentView = view;
         return view;
     },
+    
+    showAsync: function(file) {
+      var self = this;
+      require([file],
+          function (View) {
+            var view = new View({ router: self });
+            self.showView( '#primary-view', view);            
+          });
+    },
 
     defaultAction: function(actions){
       this.showView( '#primary-view', new MainHomeView({}) );
     },
 
     showStatusView: function() {
-      this.showView( '#primary-view', new StatusView({}) );
+      this.showAsync('views/status/statusView');
     },
     
     showMailView: function() {
-      this.showView( '#primary-view', new MailView({}) );
+      this.showAsync('views/mail/mailView');
     },
     
     showChatView: function() {
-      this.showView( '#primary-view', new ChatView({}) );      
+      this.showAsync('views/chat/chatView');
     },
     
     showFileView: function() {
-      this.showView( '#primary-view', new FileView({}) );      
+      this.showAsync('views/file/fileView');
     },  
     
     showPeopleView: function() {
-      this.showView( '#primary-view', new PeopleView({}) );            
+      this.showAsync("views/people/peopleView");
     },
     
     showShareDialog: function() {
       var loginView = new ShareView({ router: this });
       loginView.show();
+    },
+    
+    showProfileView: function() {
+      this.showAsync("views/profile/profileView");
     }
   });
   

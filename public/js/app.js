@@ -55,7 +55,7 @@ require([
     buildToolbar: function() {
       if(window.troupeContext.user) {
         $(".label-displayName").text(window.troupeContext.user.displayName);
-		$(".label-troupeName").text(window.troupeContext.troupe.name);
+        $(".label-troupeName").text(window.troupeContext.troupe.name);
         $(".menu-security").show();
       } 
       
@@ -63,14 +63,17 @@ require([
     
     profileMenuClicked: function() {
       troupeApp.navigate("profile", {trigger: true});
+      return false;
     },
     
     settingsMenuClicked: function() {
       troupeApp.navigate("settings", {trigger: true});
+      return false;
     },
     
     signoutMenuClicked: function() {
       troupeApp.navigate("signout", {trigger: true});
+      return false;
     }
    
 
