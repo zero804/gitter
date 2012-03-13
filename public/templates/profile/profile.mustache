@@ -1,0 +1,32 @@
+<div class="well">
+    <div class="row-fluid">
+        <div class="span12">
+            <H1>Profile</H1>
+            <br>
+
+            <!-- people content -->
+
+            <div class="box white frame-people">
+            
+                <form action="/updateprofile" method="post">
+                    <div class="row-fluid">
+                        <div class="span 2">
+                            <a href="#imageModal" data-toggle="modal" rel="tooltip" title="Click here to set your picture" class="dp-tooltip"><img src="images/tmp/dp_spacer.png" class="dp" alt=""></a>
+                        </div>
+                        <div class="span10">
+                            <input type="text" id="displayName" name="displayName" value="{{displayName}}" placeholder="Click here and type your name"> <input type="password" id="password" name="password" value="{{password}}"
+                                placeholder="Then choose a password">
+                        </div>
+                    </div>
+
+                </form>
+        
+            </div>
+
+
+        </div>
+        <!--span-->
+    </div>
+    <!--row-->
+</div>
+<!--well-->
