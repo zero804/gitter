@@ -55,6 +55,7 @@ require([
     buildToolbar: function() {
       if(window.troupeContext.user) {
         $(".label-displayName").text(window.troupeContext.user.displayName);
+		$(".label-troupeName").text(window.troupeContext.troupe.name);
         $(".menu-security").show();
       } 
       

@@ -17,23 +17,25 @@ html {
 
 .cl {
   padding-top: 100px;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 0px;
 }
 
 .cr {
   padding-top: 140px;
   padding-left: 30px;
   padding-right: 30px;
+  
 }
 
 .panel {
-	background-image:url(images/black_paper.png)
+	background-image:url(images/black_paper.png);
 }
 
 .texty {
 	color: #CCC;
 	font-family: 'Advent Pro', sans-serif;
+	/*font-family: 'Droid Serif', serif; */
+	
 	font-size:24px;
 	line-height:24px;
 }
