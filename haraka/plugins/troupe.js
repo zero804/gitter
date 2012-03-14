@@ -1,15 +1,14 @@
 // troupe service to deliver mails to mongo database
 
-var persistence = require("./../../server/services/persistence-service.js")
+var persistence = require("./../../server/services/persistence-service.js");
  
 var troupeService = require("./../../server/services/troupe-service.js");
-
 
 exports.hook_data = function (next, connection) {
     // enable mail body parsing
     connection.transaction.parse_body = 1;
     next();
-}
+};
 
 exports.hook_queue = function(next, connection) {
 	// Get some stuff from the header to store later
@@ -17,6 +16,7 @@ exports.hook_queue = function(next, connection) {
 	var date = connection.transaction.header.get("Date");
 	var fromName = connection.transaction.header.get("From");
 	var toName = connection.transaction.header.get("To");
+
 	
 	var lines = connection.transaction.data_lines;
     if (!lines) return next(DENY);
@@ -28,7 +28,7 @@ exports.hook_queue = function(next, connection) {
 	// do some string parsing for email formats such as Name <email>
 	
 	if (fromName.indexOf("<") > 0)  {
-	  var fromEmail = fromName.substring(fromName.indexOf("<") + 1, fromName.indexOf(">"));
+     var fromEmail = fromName.substring(fromName.indexOf("<") + 1, fromName.indexOf(">"));
 	  fromName = fromName.substring(0, fromName.indexOf("<")-1);					 
 	 } 
 	else { 
@@ -46,8 +46,8 @@ exports.hook_queue = function(next, connection) {
 		//connection.logdebug("Multipart message");
 		var preview = connection.transaction.body.children[0].bodytext;
 	}
-	
-	if (preview.length>255) preview=preview.substring(0,255);
+
+if (preview.length>255) preview=preview.substring(0,255);
 	
 	//connection.logdebug("Body: " + JSON.stringify(connection.transaction.body.bodytext));
     //connection.logdebug("Children: " + JSON.stringify(connection.transaction.body.children.length));
@@ -71,7 +71,7 @@ exports.hook_queue = function(next, connection) {
 	  });
 	  
 	  
-																		  
+						if 												  
 																		  
 	})
 	
