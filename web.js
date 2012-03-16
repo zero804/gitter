@@ -28,7 +28,7 @@ passport.use(new LocalStrategy({
           console.log("User not yet activated");
           return done(null, false);
         }
-        
+        console.log("Checking password");
         userService.checkPassword(user, password, function(match) {
           if(!match) return done(null, false);
         
@@ -88,17 +88,19 @@ app.configure(function() {
   app.set('view engine', 'mustache');
   app.set('view options',{layout:false});  
   app.register(".mustache", tmpl);
-
   app.use(express.logger());
-  
-//  app.use(express.cookieParser());
   app.use(express.bodyParser());
-//  app.use(express.session({ secret: 'keyboard cat', store: new RedisStore}));
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
 }); 
+
+var everyone = require("now").initialize(app);
+
+everyone.now.distributeMessage = function(message){
+  everyone.now.receiveMessage("moo", message);
+};
 
 require('./server/handlers/confirm').install(app);
 require('./server/handlers/signup').install(app);

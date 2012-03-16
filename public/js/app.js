@@ -8,7 +8,8 @@ require.config({
     backbone: 'libs/backbone/backbone-0.9.1',
     text: 'libs/require/text',
     mustache: 'libs/mustache/mustache',
-    templates: '../templates'
+    templates: '../templates',
+    now: '/nowjs/now'
   },
   priority: ['jquery']
 });
@@ -22,7 +23,6 @@ require([
   'bootstrap',
   'jqueryui'
 ], function($, _, Backbone, AppRouter, AppRouterLogin, Bootstrap, jqUI) {
-  
   /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
   Backbone.View.prototype.close = function () {
     console.log('Closing view ' + this);

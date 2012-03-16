@@ -13,3 +13,5 @@ public/bootstrap/less/.DS_Store
 
 /npm-debug.log
 public/bootstrap/less/responsive.css
+/.externalToolBuilders
+/.settings
