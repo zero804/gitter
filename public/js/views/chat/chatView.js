@@ -4,10 +4,39 @@ define([
   'underscore',
   'backbone',
   'mustache',
-  'text!templates/chat/chat.mustache'
-], function($, _, Backbone, Mustache, template){
+  'text!templates/chat/chat.mustache',
+  'text!templates/chat/chat-row.mustache',
+  'components/chat/chat-component'
+], function($, _, Backbone, Mustache, template, rowTemplate, chat){
   
   var ChatView = Backbone.View.extend({    
+    initialize: function() {
+      $(document).bind('chat', this.onMessage);
+    },
+    
+    events: {
+      "keydown .chatbox":          "detectReturn"
+    },
+    
+    beforeClose: function() {
+      $(document).unbind('chat', this.onMessage);
+    },
+    
+    onMessage: function(event, msg) {
+      var compiledTemplate = Mustache.render(rowTemplate, msg);
+      $(".frame-chat", this.el).prepend(compiledTemplate);
+    },
+    
+    detectReturn: function(e) {
+      if(e.keyCode == 13 && e.ctrlKey) {
+        this.send();
+      }
+    },
+    
+    send: function() {
+      chat.send($(".chatbox").val());
+    },
+    
     render: function() {
       var compiledTemplate = Mustache.render(template, { });
       $(this.el).html(compiledTemplate);

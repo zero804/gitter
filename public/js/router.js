@@ -4,9 +4,15 @@ define([
   'underscore',
   'backbone',
   'views/home/main',
-  'views/share/share'
-], function($, _, Backbone, MainHomeView, ShareView){
+  'views/share/share',
+  'components/chat/chat-component'
+], function($, _, Backbone, MainHomeView, ShareView, chat){
   var AppRouter = Backbone.Router.extend({
+    
+    initialize: function() {
+      chat.connect();
+    },
+    
     routes: {
       'statusphere': 'showStatusView',
       'mail': 'showMailView',
