@@ -28,6 +28,13 @@ var Invite = new Schema({
   status: { type: String, enum: ['UNUSED', 'USED'], default: 'UNUSED'}
 });
 
+var ChatMessage = new Schema({
+  fromUserId: ObjectId,
+  toTroupeId: ObjectId,
+  text: String,
+  sent: { type: Date, default: Date.now }
+});
+
 var EmailSchema = new Schema({
   from: { type: String },
   fromName: { type: String},
@@ -37,17 +44,19 @@ var EmailSchema = new Schema({
   preview: {type: String},
   mail: { type: String},
   delivered: { type: Boolean}
- });
+});
   
 
 var User = mongoose.model('User', UserSchema);
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var Email = mongoose.model('Email', EmailSchema);
 var Invite = mongoose.model('Invite', Invite);
+var ChatMessage = mongoose.model('ChatMessage', ChatMessage);
 
 module.exports = {
   User: User,
   Troupe: Troupe,
 	Email: Email,
-	Invite: Invite
+	Invite: Invite,
+	ChatMessage: ChatMessage
 };
