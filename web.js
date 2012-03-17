@@ -10,10 +10,12 @@ var express = require('express'),
   
 var RedisStore = require('connect-redis')(express);
 
-var app = express.createServer(
-    express.cookieParser(),
-    express.session({ secret: 'keyboard cat', store: new RedisStore})
-); 
+var app = express.createServer(); 
+
+app.set('views', __dirname + '/public/templates');
+app.set('view engine', 'mustache');
+app.set('view options',{layout:false});  
+app.register(".mustache", tmpl);
 
 passport.use(new LocalStrategy({
       usernameField: 'email',
@@ -82,26 +84,30 @@ passport.deserializeUser(function(id, done) {
 
 });
 
+var sessionStore = new RedisStore();
 
 app.configure(function() {
   app.set('views', __dirname + '/public/templates');
   app.set('view engine', 'mustache');
   app.set('view options',{layout:false});  
   app.register(".mustache", tmpl);
+  
   app.use(express.logger());
+  app.use(express.cookieParser());
   app.use(express.bodyParser());
+  app.use(express.session({ secret: 'keyboard cat', store: sessionStore}));
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
-}); 
+  app.use(express.errorHandler({ showStack: true, dumpExceptions: true }));
+  
 
-var everyone = require("now").initialize(app);
+});
 
-everyone.now.distributeMessage = function(message){
-  everyone.now.receiveMessage("moo", message);
-};
 
+
+require('./server/now').install(app, sessionStore);
 require('./server/handlers/confirm').install(app);
 require('./server/handlers/signup').install(app);
 require('./server/handlers/profile').install(app);
@@ -112,12 +118,13 @@ require('./server/handlers/invite').install(app);
 var troupesResource = app.resource('troupes',  require('./server/resources/troupes.js'));
 var sharesResource = app.resource('shares',  require('./server/resources/shares.js'));
 var usersResource = app.resource('users',  require('./server/resources/users.js'));
+var chatMessagesResource = app.resource('chatMessages',  require('./server/resources/chat-messages.js'));
 troupesResource.add(sharesResource);
 troupesResource.add(usersResource);
+troupesResource.add(chatMessagesResource);
 
 /* This should be last */
 require('./server/handlers/app').install(app);
-
 
 var port = process.env.PORT || 5000;
 app.listen(port, function() {
