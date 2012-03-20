@@ -44,6 +44,7 @@ define([
     },
     
     unsubscribeTroupeChatMessages: function() {
+      console.log("unsubscribeTroupeChatMessages");
       if(connected) {
         now.unsubscribeToTroupeChat(window.troupeContext.troupe.id);
       }
