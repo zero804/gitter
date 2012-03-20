@@ -4,6 +4,7 @@ var express = require('express'),
 	tmpl = require('./server/mustache-template'),
 	userService = require('./server/services/user-service'),
 	troupeService = require('./server/services/troupe-service'),
+  mailService = require('./server/services/mail-service'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
 	ConfirmStrategy = require('./server/utils/confirm-strategy').Strategy;
@@ -108,12 +109,15 @@ require('./server/handlers/profile').install(app);
 require('./server/handlers/login').install(app);
 require('./server/handlers/invite').install(app);
 
+
 /* REST resources: not used yet */
 var troupesResource = app.resource('troupes',  require('./server/resources/troupes.js'));
 var sharesResource = app.resource('shares',  require('./server/resources/shares.js'));
 var usersResource = app.resource('users',  require('./server/resources/users.js'));
+var mailsResource = app.resource('mails', require('./server/resources/mails.js'));
 troupesResource.add(sharesResource);
 troupesResource.add(usersResource);
+troupesResource.add(mailsResource);
 
 /* This should be last */
 require('./server/handlers/app').install(app);
