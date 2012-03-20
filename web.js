@@ -7,7 +7,13 @@ var express = require('express'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
 	ConfirmStrategy = require('./server/utils/confirm-strategy').Strategy;
-  
+ 
+/* TODO: put all our prototypes in a module */
+Array.prototype.narrow = function() {
+  return this.map(function(value) { return value.narrow(); });
+};
+
+
 var RedisStore = require('connect-redis')(express);
 
 var app = express.createServer(); 
