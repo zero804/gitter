@@ -30,6 +30,16 @@ function storeEmail(options, callback) {
   });
 }
 
+function findByTroupe(id, callback) {
+  console.log('Looking for emails in' + id);
+  persistence.Email.find({troupeId: id}, function(err, mails) {
+      // It would probably be a good idea NOT to return back the message body here, because they can be pretty large and all we want is the preview text
+      // HTF would I do that?
+      callback(err, mails);
+    });
+}
+
 module.exports = {
-  storeEmail: storeEmail
+  storeEmail: storeEmail,
+  findByTroupe: findByTroupe
 };

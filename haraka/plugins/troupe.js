@@ -47,7 +47,8 @@ exports.hook_queue = function(next, connection) {
 		preview = connection.transaction.body.children[0].bodytext;
 	}
 	
-	if (preview.length>255) preview=preview.substring(0,255);
+	if (preview.length>255) preview=preview.substring(0,252) + "...";
+	preview = preview.replace(/\n/g,"");
 	
 	//connection.logdebug("Body: " + JSON.stringify(connection.transaction.body.bodytext));
     //connection.logdebug("Children: " + JSON.stringify(connection.transaction.body.children.length));
@@ -57,12 +58,14 @@ exports.hook_queue = function(next, connection) {
 	//connection.logdebug("Email: " + fromEmail);
 	//connection.logdebug("Preview: " + preview);
 	//connection.logdebug("Mail Body : "+ lines.join(''));
+  connection.logdebug("Date: " + date);
 	
 	troupeService.validateTroupeEmail({ to: toName, from: fromEmail}, function(err, troupe) {
     if (err) return next(DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.");
     if (!troupe) return next (DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.");
 
-    mailService.storeEmail({ fromEmail: fromEmail, troupeID: troupe.ID, subject: subject, date: date, fromName: fromName, preview: preview, mailBody: lines.join('')}, function(err) {
+    connection.logdebug("TroupeID: "+ troupe.id);
+    mailService.storeEmail({ fromEmail: fromEmail, troupeId: troupe.id, subject: subject, date: date, fromName: fromName, preview: preview, mailBody: lines.join('')}, function(err) {
       if (err) return next(DENY, "Failed to store the email");
       connection.logdebug("Stored the email.");
       return next(OK);
