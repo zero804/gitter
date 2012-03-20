@@ -33,12 +33,12 @@ define([
     },
     
     chatWindowScroll: function() {
-      console.dir(arguments);
+      console.dir("chatwindowscroll");
       if($(window).scrollTop() == $(document).height() - $(window).height()) {
         console.log("LOADING MORE");
         this.loadNextMessages();
         /*
-        $('div#loadmoreajaxloader').show();
+        $('div#loadmoreajaxloder').show();
         $.ajax({
           url: "loadmore.php",
           success: function(html) {

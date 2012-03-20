@@ -127,9 +127,12 @@ var troupesResource = app.resource('troupes',  require('./server/resources/troup
 var sharesResource = app.resource('shares',  require('./server/resources/shares.js'));
 var usersResource = app.resource('users',  require('./server/resources/users.js'));
 var mailsResource = app.resource('mails', require('./server/resources/mails.js'));
+var chatMessagesResource = app.resource('chatMessages',  require('./server/resources/chat-messages.js'));
+
 troupesResource.add(sharesResource);
 troupesResource.add(usersResource);
 troupesResource.add(mailsResource);
+troupesResource.add(chatMessagesResource);
 
 /* This should be last */
 require('./server/handlers/app').install(app);
