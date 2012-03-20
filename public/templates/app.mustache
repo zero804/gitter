@@ -10,7 +10,11 @@
 
 	<title>Troupe</title>
 
-	<link rel="stylesheet" href="bootstrap/css/troupe.css">
+	<link rel="stylesheet" href="bootstrap/css/trp.css">
+  <link rel="stylesheet" href="bootstrap/css/font-awesome.css">
+  <link href="bootstrap/css/responsive.css" rel="stylesheet">
+
+  <link href='http://fonts.googleapis.com/css?family=Pontano+Sans' rel='stylesheet' type='text/css'>
 
 	<script data-main="js/app.js" src="js/libs/require/require.js"></script>
 	<script type="text/javascript">
@@ -30,71 +34,69 @@
 
 </head>
 <body>
-
-        <div class="navbar navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container-fluid" style="height:45px">
-          <a class="brand" href="/"><img src="images/logo_small2.png"></a>
-          <div class="nav-collapse">
-
-            <ul class="nav pull-right menu-security" style="display:none">
-            
-                <li class="divider-vertical"></li>
-                
-                <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="label-displayName"></span>&nbsp;<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li><a href="#" class="menu-profile">Profile</a></li>
-                    <li><a href="#" class="menu-settings">Settings</a></li>
-                    <li class="divider"></li>
-                    <li><a href="#" class="menu-signout">Sign out</a></li>
-                  </ul>
-                </li>
-            </ul>
-          </div><!--/.nav-collapse -->
+  <div class="container">
+      <div class="row">
+        <div class="span1">&nbsp;</div>
+        <div class="span2">
+          <div>
+            <img src="images/logo_green.png">
+          </div>
         </div>
+        <div class="span8">
+          <ul class="nav pull-right">
+            <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="label-displayName"></span> <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="#">Profile</a></li>
+              <li><a href="#">Settings</a></li>
+              <li class="divider"></li>
+              <li><a href="#">Sign out</a></li>
+            </ul>
+          </ul>
+          <ul class="nav pull-right">
+            <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Troupes <b class="caret"></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+            <ul class="dropdown-menu">
+              <li><a href="#">NW10 Massive</a></li>
+              <li><a href="#">My other awesome troupe</a></li>
+            </ul>
+          </ul>
+        </div>
+        <div class="span1">&nbsp;</div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="span1">&nbsp;</div>
+        <div class="span2">
+            <div class="navbox">
+              <img src="images/tmp/trp_nike.png" class="rounded">
+              <li class="nav nav-list navitem"><a href="#"><i class="icon-asterisk navicon" style="vertical-align:middle"></i><span class="navtext">Everything</span></a></li>
+              <li class="nav nav-list navitem"><a href="#chat"><i class="icon-comments navicon" style="vertical-align:middle"></i><span class="navtext">Chat</span></a></li>
+              <li class="nav nav-list navitem"><a href="#mail"><i class="icon-envelope navicon" style="vertical-align:middle"></i><span class="navtext">Mail</span></a></li>
+              <li class="nav nav-list navitem"><a href="#statusphere"><i class="icon-th-list navicon" style="vertical-align:middle"></i><span class="navtext">Status Updates</span></a></li>
+              <li class="nav nav-list navitem"><a href="#files"><i class="icon-folder-open navicon" style="vertical-align:middle"></i><span class="navtext">Files</span></a></li>
+              <li class="nav nav-list navitem lastnav selected"><a href="#people"><i class="icon-user navicon" style="vertical-align:middle"></i><span class="navtext">People</span></a></li>
+              <br><br>              
+            </div>
+        </div>
+        <div class="span8">
+          <div class="row-fluid">
+            <div class="contentHeader"><span class="label-troupeName"></div>
+          </div>
+          <div class="row-fluid">
+            <div class="contentBody" id="primary-view">
+
+              <h3>Loading, loading, loading...</h3>
+              <p>This is where a distracting loading graphic will be displayed....</p>
+              <img src="/images/ajax-loader.gif">
+
+            </div>
+          </div>
+        </div>
+        <div class="span1">&nbsp;</div>
       </div>
     </div>
-
-    <div class="container-fluid">
-      <div class="row-fluid">
-        <div class="span3">  
-          <div class="well sidebar-nav">
-            <ul class="nav nav-list">
-              <li class="nav-header"><span class="label-troupeName"></span></li>
-              <li><a href="#"><i class="icon-th"></i> Everything</a></li>
-              <li><a href="#statusphere"><i class="icon-th-list"></i> Status Updates</a></li>
-              <li><a href="#mail"><i class="icon-envelope"></i> Mail</a></li>
-              <li><a href="#chat"><i class="icon-comment"></i> Chat</a></li>
-              <li><a href="#files"><i class="icon-folder-open"></i> Files</a></li>
-              <li><a href="#people"><i class="icon-user"></i> People</a></li>
-            </ul>
-          </div><!--/.well -->
-        </div><!--/span-->
-        
-        
-        <div class="span9"  id="primary-view">
- 			<div class="well">
-           	  <div class="row-fluid">
-                  <div class="span12">
-                    <h3>Loading, loading, loading...</h3>
-                    <p>This is where a distracting loading graphic will be displayed....</p>
-                    <img src="/images/ajax-loader.gif">
-                  </div><!--span-->
-             	 
-               </div><!--row-->
-            </div><!--well-->
-            
-        </div><!--/span-->
-      </div><!--/row-->
-
-      <hr>
-
-      <footer>
-        <p>&copy; Troupe 2012</p>
-      </footer>
-
-    </div><!--/.fluid-container-->
+ 
     
 </body>
 </html>
