@@ -28,8 +28,9 @@ define([
     },
     
     detectReturn: function(e) {
-      if(e.keyCode == 13 && e.ctrlKey) {
+      if(e.keyCode == 13) {
         this.send();
+        // changed it to just enter, tried for ages to reset the textarea after send, with not much luck!
       }
     },
     
