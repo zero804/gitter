@@ -36,7 +36,15 @@ define([
       $(".frame-mails", this.el).empty();
       while(mails.length > 0) {
         var p1 = mails.shift();
-        
+
+        //Manipulate the date out of ISO format
+        //Can probably do a better job here showing cleaner dates, take into account local time zone
+        //And probably do this in some function elsewhere
+        p1.date = Date.parse(p1.date);
+        var d = new Date(p1.date);
+        p1.date = d.toUTCString();
+
+
         var rowHtml = Mustache.render(rowTemplate, {
           personName: p1.fromName,
           preview: p1.preview,
