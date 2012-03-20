@@ -33,26 +33,8 @@ define([
     },
     
     chatWindowScroll: function() {
-      console.dir("chatwindowscroll");
       if($(window).scrollTop() == $(document).height() - $(window).height()) {
-        console.log("LOADING MORE");
         this.loadNextMessages();
-        /*
-        $('div#loadmoreajaxloder').show();
-        $.ajax({
-          url: "loadmore.php",
-          success: function(html) {
-            if(html)
-            {
-              $("#postswrapper").append(html);
-              $('div#loadmoreajaxloader').hide();
-            }else
-            {
-              $('div#loadmoreajaxloader').html('<center>No more posts to show.</center>');
-            }
-          }
-        });
-        */
       }
     }, 
     
@@ -105,7 +87,7 @@ define([
 
           // TODO: speed this up
           var items = [];
-          for(var i = data.length - 1; i >= 0; i--) {
+          for(var i = 0; i < data.length; i++) {
             var compiledTemplate = Mustache.render(rowTemplate, data[i]);
             items.push(compiledTemplate);
           }

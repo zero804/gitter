@@ -3,6 +3,7 @@
 var passport = require('passport'),
     nowjs = require("now"),
     redis = require("redis"),
+    winston = require('winston'),
     chatService = require("./services/chat-service"),
     troupeService = require("./services/troupe-service"),
     appEvents = require("./app-events"),
@@ -38,6 +39,8 @@ module.exports = {
         loadSessionWithUser(this.user, sessionStore, function(err, user) {
           if(err) return;
           if(!user) return;
+
+          winston.info("User connected to now");
       
           redisClient.rpush("socket." + user.id, self.user.clientId, redisClient.print);
         });
@@ -49,6 +52,8 @@ module.exports = {
         loadSessionWithUser(this.user, sessionStore, function(err, user) {
           if(err) return;
           if(!user) return;
+
+          winston.info("User disconnected from now");
 
           redisClient.lrem("socket." + user.id, 0, self.user.clientId, redisClient.print);
         });
@@ -67,6 +72,8 @@ module.exports = {
             
             if(!troupeService.userHasAccessToTroupe(user, troupe)) return;
             
+            winston.info("User subscribed to group chat");
+            
             var group = nowjs.getGroup("troup." + troupe.id);
             group.addUser(self.user.clientId);
           });
@@ -74,8 +81,10 @@ module.exports = {
       };
 
       everyone.now.unsubscribeToTroupeChat = function(troupeId) {
+        winston.info("User unsubscribed from group chat");
+        
         var group = nowjs.getGroup("troup." + troupeId);
-        group.addUser(this.user.clientId);
+        group.removeUser(this.user.clientId);
       };
       
       everyone.now.newChatMessageToTroupe = function(options) {
@@ -83,11 +92,17 @@ module.exports = {
           if(err) return;
           if(!user) return;
           
+          winston.info("User sent new message to troupe: " + options.text);
+          
           /* 
            * TODO: check security that this user can send messages to this troupe. This should probably
            * happen in the message service 
            */
-          chatService.newChatMessageToTroupe(options.troupeId, user, options.text, function(err, chatMessage) {});
+          chatService.newChatMessageToTroupe(options.troupeId, user, options.text, function(err, chatMessage) {
+            if(err) {
+              winston.warn("Failed to persist new chat message: " + err);
+            }
+          });
           
         });
       };

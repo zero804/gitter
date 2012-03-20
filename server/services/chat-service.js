@@ -38,7 +38,7 @@ module.exports = {
   findChatMessagesForTroupe: function(troupeId, options, callback) {
     persistence.ChatMessage
       .where('toTroupeId', troupeId)
-      .asc('sent')
+      .desc('sent')
       .limit(options.limit)
       .skip(options.skip)
       .slaveOk()
