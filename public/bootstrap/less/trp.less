@@ -1,0 +1,190 @@
+// Bootstrap Reset
+@import "bootstrap.less";
+
+// Our colour palette
+@col1: #c8d246; // light green 
+@col2: #556c3c; // dark green
+@col3: #858c2f; // dark green for gradient background
+@col4: #efeeee; // light grey
+@col5: #051313; // nearly black
+
+// Our fonts
+@font1: 'Pontano Sans', sans-serif;
+
+@bodyPadding:	 20px;
+
+@baseImages: "../../images";
+
+@bgGreen: %("%s/bg_green.png", @baseImages);
+
+html {
+
+
+}
+
+a:hover {
+text-decoration: none;
+color: @col5;
+}
+a:link {
+text-decoration: none;
+}
+a:visited {
+text-decoration: none;
+}
+
+a {
+  color: @col2;
+}
+
+body {
+  background-image: url(@bgGreen);
+  background-repeat: repeat-x;
+  background-attachment: fixed;
+  background-color: @col3;
+  padding-top: @bodyPadding;
+}
+
+.navbox {
+  min-height: 20px;
+  padding: 0px;
+  margin-bottom: 0px;
+  max-width:180px;
+  background-color: @col4;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 0px;
+}
+
+.contentHeader {
+  height: 57px;
+  padding: 0px;
+  margin-bottom: 0px;
+  background-color: @col2;
+  -webkit-border-radius: 4px 4px 0px 0px;
+  -moz-border-radius: 4px 4px 0px 0px;
+  border-radius: 4px 4px 0px 0px;
+  font-size: 12px;
+  line-height: 57px;
+  font-family: @font1;
+  font-size: 18px;
+  color: @col4;
+  padding-left: 20px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+.contentBody {
+  min-height: 57px;
+  padding: 20px;
+  margin-bottom: 0px;
+  background-color: @col4;
+  -webkit-border-radius: 0px 0px 4px 4px;
+  -moz-border-radius: 0px 0px 4px 4px;
+  border-radius: 0px 0px 4px 4px;
+  font-size: 12px;
+  min-height:500px;
+}
+
+.rounded {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+
+.navicon {
+  vertical-align: middle;
+  font-size: 20px;
+  padding: 15px 10px 10px 0px;
+}
+
+.navtext {
+  vertical-align: middle;
+  font-family: @font1;
+  font-size:14px;
+}
+
+.navitem {
+  border-top:1px solid white;
+  border-bottom: 1px solid #e1dcdc;
+}
+
+.lastnav {
+  border-bottom: 0px;
+}
+
+#navitem li:hover {
+  background: #000;
+}
+
+.marginless {
+  margin: 0;
+}
+
+.chat-bubble {
+  min-height: 15px;
+  padding: 15px;
+  margin-bottom: 5px;
+  background-color:#FFF;
+  border: 1px solid #aaa;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  display:inline-block; 
+}
+
+.chat-bubble-containter {
+  
+}
+
+.remote {
+  text-align:right; 
+}
+
+.right {
+  text-align:right; 
+}
+
+.white {
+  background-color:#FFF;
+}
+
+.dp {
+  background:#FFF;
+  padding: 1px;
+  border: 1px solid #ddd;
+  box-shadow: 1px 1px 1px #888;
+}
+
+.offline {
+  opacity:0.2;
+  filter:alpha(opacity=20); /* For IE8 and earlier */
+}
+
+.mobile {
+  opacity:0.4;
+  filter:alpha(opacity=60); /* For IE8 and earlier */
+}
+
+.dpspacer {
+  opacity:0.0;
+  filter:alpha(opacity=0); /* For IE8 and earlier */
+}
+
+.chatbox {
+  width:100%; 
+  height:44px;
+}
+
+.dp-tooltip{
+  display: inline-block;
+}
+
+.datarow {
+  padding-bottom: 20px;
+}
+
+

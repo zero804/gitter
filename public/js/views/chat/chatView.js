@@ -65,7 +65,7 @@ define([
     },
     
     detectReturn: function(e) {
-      if(e.keyCode == 13 && e.ctrlKey) {
+      if(e.keyCode == 13) {
         return this.send();
       }
     },
