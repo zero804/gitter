@@ -6,7 +6,7 @@ module.exports = {
       userService.findByIds(req.troupe.users, function(err, users) {
         if(err) return next(err);
         
-        res.send(users);
+        res.send(users.narrow());
       });
     },
 

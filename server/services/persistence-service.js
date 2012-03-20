@@ -13,6 +13,13 @@ var UserSchema = new Schema({
   passwordHash: { type: String }
 });
 
+UserSchema.methods.narrow = function() {
+  return {
+    id: this.id,
+    displayName: this.displayName
+  };
+};
+
 var TroupeSchema = new Schema({
   name: { type: String },
   uri: { type: String },
