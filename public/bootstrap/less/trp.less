@@ -7,6 +7,7 @@
 @col3: #858c2f; // dark green for gradient background
 @col4: #efeeee; // light grey
 @col5: #051313; // nearly black
+@col6: #e0f0e3; // grey with hint of green
 
 // Our fonts
 @font1: 'Pontano Sans', sans-serif;
@@ -112,12 +113,23 @@ body {
   border-bottom: 1px solid #e1dcdc;
 }
 
-.lastnav {
-  border-bottom: 0px;
+.navitem:hover {
+  background-color: @col6;
+  cursor: pointer;
 }
 
-#navitem li:hover {
-  background: #000;
+.navitem:hover a{
+  color: @col5;
+}
+
+.lastnav:hover {
+  -webkit-border-radius: 0px 0px 4px 4px;
+  -moz-border-radius: 0px 0px 4px 4px;
+  border-radius: 0px 0px 4px 4px;
+}
+
+.lastnav {
+  border-bottom: 0px;
 }
 
 .marginless {
