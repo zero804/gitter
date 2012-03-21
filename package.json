@@ -19,6 +19,7 @@
     "hiredis": "0.1.14",
     "now": "0.8.1",
     "eventemitter2": "0.4.9",
-    "winston": "0.5.10"
+    "winston": "0.5.10",
+    "mailparser": "0.2.22"
   }
 }

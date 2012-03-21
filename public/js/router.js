@@ -5,8 +5,9 @@ define([
   'backbone',
   'views/home/main',
   'views/share/share',
+  'views/fullMail/FullMailView',
   'components/chat/chat-component'
-], function($, _, Backbone, MainHomeView, ShareView, chat){
+], function($, _, Backbone, MainHomeView, ShareView, FullMailView, chat){
   var AppRouter = Backbone.Router.extend({
     
     initialize: function() {
@@ -63,7 +64,7 @@ define([
     
     showFileView: function() {
       this.showAsync('views/file/fileView');
-    },  
+    },
     
     showPeopleView: function() {
       this.showAsync("views/people/peopleView");
@@ -72,6 +73,11 @@ define([
     showShareDialog: function() {
       var loginView = new ShareView({ router: this });
       loginView.show();
+    },
+
+    showMailDialog: function(id) {
+      var mailView = new FullMailView({ router: this });
+      mailView.show(id);
     },
     
     showProfileView: function() {
