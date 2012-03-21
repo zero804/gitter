@@ -23,7 +23,7 @@ define([
     },
     
     events: {
-      
+      "click .clickPoint-showEmail": "showEmail"
     },
     
     render: function() {
@@ -49,11 +49,16 @@ define([
           personName: p1.fromName,
           preview: p1.preview,
           subject: p1.subject,
+          id: p1._id,
           date: p1.date
         });
         
         $(".frame-mails", this.el).append(rowHtml);
       }
+    },
+
+    showEmail: function() {
+      //window.troupeApp.showMailDialog(5);
     }
     
   });
