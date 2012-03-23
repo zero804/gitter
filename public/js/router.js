@@ -5,9 +5,8 @@ define([
   'backbone',
   'views/home/main',
   'views/share/share',
-  'views/fullMail/FullMailView',
   'components/chat/chat-component'
-], function($, _, Backbone, MainHomeView, ShareView, FullMailView, chat){
+], function($, _, Backbone, MainHomeView, ShareView, chat){
   var AppRouter = Backbone.Router.extend({
     
     initialize: function() {
@@ -17,6 +16,7 @@ define([
     routes: {
       'statusphere': 'showStatusView',
       'mail': 'showMailView',
+      'mail/:id': 'showMailItemView',
       'chat': 'showChatView',
       'files': 'showFileView',
       'people': 'showPeopleView',
@@ -37,11 +37,11 @@ define([
         return view;
     },
     
-    showAsync: function(file) {
+    showAsync: function(file, params) {
       var self = this;
       require([file],
           function (View) {
-            var view = new View({ router: self });
+            var view = new View({ router: self, params: params });
             self.showView( '#primary-view', view);            
           });
     },
@@ -75,9 +75,8 @@ define([
       loginView.show();
     },
 
-    showMailDialog: function(id) {
-      var mailView = new FullMailView({ router: this });
-      mailView.show(id);
+    showMailItemView: function(id) {
+      this.showAsync("views/mail/itemView",id);
     },
     
     showProfileView: function() {

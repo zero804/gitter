@@ -52,6 +52,18 @@ var EmailSchema = new Schema({
   mail: { type: String},
   delivered: { type: Boolean}
 });
+
+EmailSchema.methods.narrow = function () {
+  return {
+    _id: this._id,
+    from: this.from,
+    fromName: this.fromName,
+    subject: this.subject,
+    date: this.date,
+    preview: this.preview,
+  };
+
+};
   
 
 var User = mongoose.model('User', UserSchema);

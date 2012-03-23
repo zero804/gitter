@@ -3,11 +3,13 @@ var troupeService = require("../services/troupe-service"),
 
 module.exports = {
     index: function(req, res, next) {
-      mailService.findByTroupe(req.troupe.id, function(err, mails) {
+      var id = "4f689496e363dc07f1000006"; // will figure out how to pull this from the request later
+      mailService.findById(id, function(err, mail) {
         if(err) return next(err);
         
-        res.send(mails.narrow());
-      });
+       res.send(mail);
+       });
+      //res.send('hello');
     },
 
     new: function(req, res){
@@ -19,7 +21,7 @@ module.exports = {
     },
 
     show: function(req, res){
-      res.send(req.mail);
+      res.send(500);
     },
 
     edit: function(req, res){
@@ -34,9 +36,10 @@ module.exports = {
       res.send(500);
     },
 
-    load: function(id, callback){
-      console.log("MailId: " +id);
-      mailService.findById(id,callback);
+    load: function(id, fn){
+      process.nextTick(function(){
+        fn(null, { id: id, title: 'SHARE' });
+      });
     }
 
 };
