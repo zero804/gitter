@@ -14,7 +14,6 @@ Array.prototype.narrow = function() {
   return this.map(function(value) { return value.narrow(); });
 };
 
-
 var RedisStore = require('connect-redis')(express);
 
 var app = express.createServer(); 
