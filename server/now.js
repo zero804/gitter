@@ -16,7 +16,6 @@ function loadSession(user, sessionStore, callback) {
   sessionStore.get(sid, callback);
 }
 
-
 /* Theoretically this should be done by express middleware, but it seems have some bugs right now */
 function loadSessionWithUser(user, sessionStore, callback) {
   loadSession(user, sessionStore, function(err, session) {
@@ -29,7 +28,10 @@ function loadSessionWithUser(user, sessionStore, callback) {
 
 module.exports = {
     install: function(app, sessionStore) {
-      everyone = nowjs.initialize(app);
+      everyone = nowjs.initialize(app, { 
+        // "host" : "trou.pe", 
+        // "port" : 443
+      });
       
       /* TODO: shutdown client at end of session */
       redisClient = redis.createClient();
