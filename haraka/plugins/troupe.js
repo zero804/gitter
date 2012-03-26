@@ -72,9 +72,11 @@ exports.hook_queue = function(next, connection) {
       connection.logdebug("Text body:", mail_object.text); // How are you today?
       connection.logdebug("Rich text:", mail_object.html);
 
-      preview = mail_object.text;
-      if (preview.length>255) preview=preview.substring(0,252) + "...";
-      preview = preview.replace(/\n/g,"");
+      if (mail_object.text) {
+        preview = mail_object.text;
+        if (preview.length>255) preview=preview.substring(0,252) + "...";
+        preview = preview.replace(/\n/g,"");
+      }
 
       var storedMailBody;
 
@@ -87,42 +89,43 @@ exports.hook_queue = function(next, connection) {
         storedMailBody = mail_object.text;
       }
 
-      for(var i = 0; i < mail_object.attachments.length; i++) {
-        var attachment = mail_object.attachments[i];
-        connection.logdebug("Working with file: " + attachment.fileName);
-        connection.logdebug("Working with generated file: " + attachment.generatedFileName);
+      if (mail_object.attachments) {
+        for(var i = 0; i < mail_object.attachments.length; i++) {
+          var attachment = mail_object.attachments[i];
+          connection.logdebug("Working with file: " + attachment.fileName);
+          connection.logdebug("Working with generated file: " + attachment.generatedFileName);
 
-        temp.open('attachment', function(err, tempFileInfo) {
-          connection.logdebug("Temporary file created:  *********************" + tempFileInfo.path);
+          temp.open('attachment', function(err, tempFileInfo) {
+            connection.logdebug("Temporary file created:  *********************" + tempFileInfo.path);
 
-          var fileName = tempFileInfo.path;
+            var fileName = tempFileInfo.path;
 
-          var ws = fs.createWriteStream(fileName);
+            var ws = fs.createWriteStream(fileName);
 
-          ws.on("close", function() {          
-            fileService.storeFile({
-              troupeId: troupe.id,
-              creatorUserId: user.id,
-              fileName: attachment.generatedFileName,
-              mimeType: attachment.contentType,
-              file: fileName
-            }, function(err, savedFile){
-              if (err) return; // for now we're not going to fail if the attachment didn't fail
-              connection.logdebug("File: " + JSON.stringify(savedFile));
-              savedAttachments.push(savedFile.id);
-              connection.logdebug("Saved a file.");
+            ws.on("close", function() {          
+              fileService.storeFile({
+                troupeId: troupe.id,
+                creatorUserId: user.id,
+                fileName: attachment.generatedFileName,
+                mimeType: attachment.contentType,
+                file: fileName
+              }, function(err, savedFile){
+                if (err) return; // for now we're not going to fail if the attachment didn't fail
+                connection.logdebug("File: " + JSON.stringify(savedFile));
+                savedAttachments.push(savedFile.id);
+                connection.logdebug("Saved a file.");
 
-              // Delete the temporary file */
-              //fs.unlink(tempFileInfo.path);
+                // Delete the temporary file */
+                //fs.unlink(tempFileInfo.path);
+              });
             });
+            ws.write(attachment.content);
+            ws.end();
+
+            return;
           });
-          ws.write(attachment.content);
-          ws.end();
-
-          return;
-        });
+        }
       }
-
       //connection.logdebug("TroupeID: "+ troupe.id);
       mailService.storeEmail({ fromEmail: fromEmail, troupeId: troupe.id, subject: subject, date: date, fromName: fromName, preview: preview, mailBody: storedMailBody}, function(err) {
         if (err) return next(DENY, "Failed to store the email");
