@@ -89,9 +89,11 @@ exports.hook_queue = function(next, connection) {
 
       for(var i = 0; i < mail_object.attachments.length; i++) {
         var attachment = mail_object.attachments[i];
+        connection.logdebug("Working with file: " + attachment.fileName);
+        connection.logdebug("Working with generated file: " + attachment.generatedFileName);
 
         temp.open('attachment', function(err, tempFileInfo) {
-                  connection.logdebug("Temporary file created:  *********************" + tempFileInfo.path);
+          connection.logdebug("Temporary file created:  *********************" + tempFileInfo.path);
 
           var fileName = tempFileInfo.path;
 
@@ -106,6 +108,7 @@ exports.hook_queue = function(next, connection) {
               file: fileName
             }, function(err, savedFile){
               if (err) return; // for now we're not going to fail if the attachment didn't fail
+              connection.logdebug("File: " + JSON.stringify(savedFile));
               savedAttachments.push(savedFile.id);
               connection.logdebug("Saved a file.");
 

@@ -127,13 +127,13 @@ var troupesResource = app.resource('troupes',  require('./server/resources/troup
 var sharesResource = app.resource('shares',  require('./server/resources/shares.js'));
 var usersResource = app.resource('users',  require('./server/resources/users.js'));
 var mailsResource = app.resource('mails', require('./server/resources/mails.js'));
-var fullMailResource = app.resource('fullMail', require('./server/resources/fullMail.js'));
+var filesResource = app.resource('files', require('./server/resources/files.js'));
 var chatMessagesResource = app.resource('chatMessages',  require('./server/resources/chat-messages.js'));
 
 troupesResource.add(sharesResource);
 troupesResource.add(usersResource);
 troupesResource.add(mailsResource);
-troupesResource.add(fullMailResource);
+troupesResource.add(filesResource);
 troupesResource.add(chatMessagesResource);
 
 /* This should be last */
