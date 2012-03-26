@@ -3,6 +3,13 @@
 var persistence = require("./persistence-service");
 var mongoose = require("mongoose");
 
+function findByTroupe(id, callback) {
+  //console.log('Looking for emails in' + id);
+  persistence.File.find({troupeId: id}, function(err, files) {
+      callback(err, files);
+    });
+}
+
 function storeFile(options, callback){
   var troupeId = options.troupeId;
   var creatorUserId = options.creatorUserId;
@@ -41,5 +48,6 @@ function storeFile(options, callback){
 }
 
 module.exports = {
+  findByTroupe: findByTroupe,
   storeFile: storeFile
 };
