@@ -26,7 +26,7 @@ function storeFile(options, callback){
 
   file.save(function(err) {
       if (err) return callback(err);
-      process.stdout.write("FILE SAVE: File to save is: " + temporaryFile);
+      //process.stdout.write("FILE SAVE: File to save is: " + temporaryFile);
 
       var db = mongoose.connection.db;
       var GridStore = mongoose.mongo.GridStore;
