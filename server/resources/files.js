@@ -1,12 +1,11 @@
 var troupeService = require("../services/troupe-service"),
-    mailService = require("../services/mail-service");
+    fileService = require("../services/file-service");
 
 module.exports = {
     index: function(req, res, next) {
-      mailService.findByTroupe(req.troupe.id, function(err, mails) {
+      fileService.findByTroupe(req.troupe.id, function(err, files) {
         if(err) return next(err);
-        
-        res.send(mails.narrow());
+        res.send(files);
       });
     },
 
