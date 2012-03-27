@@ -52,18 +52,39 @@ var EmailSchema = new Schema({
   mail: { type: String},
   delivered: { type: Boolean}
 });
-  
+
+EmailSchema.methods.narrow = function () {
+  return {
+    _id: this._id,
+    from: this.from,
+    fromName: this.fromName,
+    subject: this.subject,
+    date: this.date,
+    preview: this.preview
+  };
+
+};
+
+var FileSchema = new Schema({
+  troupeId: ObjectId,
+  creatorUserId: ObjectId,
+  fileName: {type: String},
+  mimeType: { type: String}
+});
+
 
 var User = mongoose.model('User', UserSchema);
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var Email = mongoose.model('Email', EmailSchema);
 var Invite = mongoose.model('Invite', Invite);
 var ChatMessage = mongoose.model('ChatMessage', ChatMessage);
+var File = mongoose.model('File', FileSchema);
 
 module.exports = {
   User: User,
   Troupe: Troupe,
 	Email: Email,
 	Invite: Invite,
-	ChatMessage: ChatMessage
+	ChatMessage: ChatMessage,
+  File: File
 };

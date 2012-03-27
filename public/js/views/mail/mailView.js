@@ -9,7 +9,8 @@ define([
 ], function($, _, Backbone, Mustache, template, rowTemplate){
   var MailView = Backbone.View.extend({    
     
-    initialize: function() {
+    initialize: function(options) {
+      this.router = options.router;
       var self = this;
       $.ajax({
         url: "/troupes/" + window.troupeContext.troupe.id + "/mails",
@@ -23,13 +24,21 @@ define([
     },
     
     events: {
-      
+      //"click .clickPoint-showEmail": "showEmail"
     },
     
     render: function() {
       var compiledTemplate = Mustache.render(template, { });
       $(this.el).html(compiledTemplate);
       return this;
+    },
+
+    onClickGenerator: function(id) {
+      var self = this;
+
+      return function() {
+        self.router.navigate("mail/" + id, {trigger: true});
+      };
     },
     
     renderMails: function(mails) {
@@ -49,11 +58,18 @@ define([
           personName: p1.fromName,
           preview: p1.preview,
           subject: p1.subject,
+          id: p1._id,
           date: p1.date
         });
         
-        $(".frame-mails", this.el).append(rowHtml);
+        var item = $(rowHtml);
+        $(".frame-mails", this.el).append(item);
+        item.on('click', this.onClickGenerator(p1._id));
       }
+    },
+
+    showEmail: function() {
+      //window.troupeApp.showMailDialog(5);
     }
     
   });

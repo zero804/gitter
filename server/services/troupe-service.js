@@ -43,7 +43,7 @@ function validateTroupeEmail(options, callback) {
         callback("Access denied");
       } 
 
-      callback(null,troupe);
+      callback(null,troupe, fromUser);
           
     });
   });

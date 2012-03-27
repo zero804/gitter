@@ -16,6 +16,7 @@ define([
     routes: {
       'statusphere': 'showStatusView',
       'mail': 'showMailView',
+      'mail/:id': 'showMailItemView',
       'chat': 'showChatView',
       'files': 'showFileView',
       'people': 'showPeopleView',
@@ -36,11 +37,11 @@ define([
         return view;
     },
     
-    showAsync: function(file) {
+    showAsync: function(file, params) {
       var self = this;
       require([file],
           function (View) {
-            var view = new View({ router: self });
+            var view = new View({ router: self, params: params });
             self.showView( '#primary-view', view);            
           });
     },
@@ -63,7 +64,7 @@ define([
     
     showFileView: function() {
       this.showAsync('views/file/fileView');
-    },  
+    },
     
     showPeopleView: function() {
       this.showAsync("views/people/peopleView");
@@ -72,6 +73,10 @@ define([
     showShareDialog: function() {
       var loginView = new ShareView({ router: this });
       loginView.show();
+    },
+
+    showMailItemView: function(id) {
+      this.showAsync("views/mail/itemView",id);
     },
     
     showProfileView: function() {
