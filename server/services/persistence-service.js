@@ -72,6 +72,16 @@ var FileSchema = new Schema({
   mimeType: { type: String}
 });
 
+FileSchema.methods.narrow = function () {
+  return {
+    _id: this._id,
+    fileName: this.fileName,
+    mimeType: this.mimeType,
+    url: '/troupes/' + encodeURIComponent(this.troupeId) + '/downloads/' + encodeURIComponent(this.fileName)
+  };
+
+};
+
 
 var User = mongoose.model('User', UserSchema);
 var Troupe = mongoose.model('Troupe', TroupeSchema);
