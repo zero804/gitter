@@ -27,7 +27,7 @@ var TroupeSchema = new Schema({
   users: [ObjectId]
 });
 
-var Invite = new Schema({
+var InviteSchema = new Schema({
   troupeId: ObjectId,
   displayName: { type: String },
   email: { type: String },
@@ -35,7 +35,7 @@ var Invite = new Schema({
   status: { type: String, enum: ['UNUSED', 'USED'], default: 'UNUSED'}
 });
 
-var ChatMessage = new Schema({
+var ChatMessageSchema = new Schema({
   fromUserId: ObjectId,
   toTroupeId: ObjectId,
   text: String,
@@ -76,8 +76,8 @@ var FileSchema = new Schema({
 var User = mongoose.model('User', UserSchema);
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var Email = mongoose.model('Email', EmailSchema);
-var Invite = mongoose.model('Invite', Invite);
-var ChatMessage = mongoose.model('ChatMessage', ChatMessage);
+var Invite = mongoose.model('Invite', InviteSchema);
+var ChatMessage = mongoose.model('ChatMessage', ChatMessageSchema);
 var File = mongoose.model('File', FileSchema);
 
 module.exports = {
