@@ -1,11 +1,13 @@
+"use strict";
+
 /**
  * Filter nulls
  * @return {Array} array with no null values.
  */
 Array.prototype.filterNulls = function() {
-    return this.filter(function(f) {
-        return !(f === null || f === undefined);
-    });
+  return this.filter(function(f) {
+    return !(f === null || f === undefined);
+  });
 };
 
 /**
@@ -13,10 +15,43 @@ Array.prototype.filterNulls = function() {
  * @return {Object} hash of ids.
  */
 Array.prototype.indexById = function() {
-    var a = {};
-    this.forEach(function(item) {
-        a[item._id] = item;
-    });
+  var a = {};
+  this.forEach(function(item) {
+    a[item._id] = item;
+  });
 
-    return a;
+  return a;
 };
+
+function keys(object) {
+    var k = [];
+    for (var i in object) if (object.hasOwnProperty(i)) {
+      k.push(i);
+    }
+    return k;
+}
+
+function extract(propertyName) {
+    return function(item) {
+      return item[propertyName];
+    };
+}
+
+/**
+ * Index an array
+ * @return {Object} hash of ids.
+ */
+Array.prototype.distinct = function() {
+  var a = {};
+  this.forEach(function(item) {
+    a[item] = 1;
+  });
+
+  return keys(a);
+};
+
+module.exports = {
+  keys: keys,
+  extract: extract
+};
+

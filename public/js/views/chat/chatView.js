@@ -16,8 +16,8 @@ define([
     
     initialize: function() {
       this.scrollEventBound = _.bind(this.chatWindowScroll, this);
-      $(document).bind('chat', this.onMessage);
-      $(window).bind('scroll', this.scrollEventBound);
+      $(document).bind('chat', this, this.onMessage);
+      $(window).bind('scroll', this, this.scrollEventBound);
       
       chat.subscribeTroupeChatMessages();
     },
@@ -36,14 +36,25 @@ define([
       if($(window).scrollTop() == $(document).height() - $(window).height()) {
         this.loadNextMessages();
       }
-    }, 
+    },
     
     onMessage: function(event, msg) {
-      var compiledTemplate = Mustache.render(rowTemplate, msg);
+      var self = event.data;
+      var compiledTemplate = Mustache.render(rowTemplate,  self.prepareForTemplate(msg));
+
       var item = $(compiledTemplate);
       item.hide();
       $(".frame-chat", this.el).prepend(item);
       item.show('slide', {}, 'fast');
+    },
+
+    prepareForTemplate: function(msg) {
+       return {
+          text: msg.text,
+          sent: msg.sent,
+          fromUserDisplayName: msg.fromUser.displayName,
+          fromUserAvatarUrlSmall: msg.fromUser.avatarUrlSmall
+        };
     },
     
     detectReturn: function(e) {
@@ -88,7 +99,7 @@ define([
           // TODO: speed this up
           var items = [];
           for(var i = 0; i < data.length; i++) {
-            var compiledTemplate = Mustache.render(rowTemplate, data[i]);
+            var compiledTemplate = Mustache.render(rowTemplate, self.prepareForTemplate(data[i]));
             items.push(compiledTemplate);
           }
           var chatFrame = $(".frame-chat", this.el);

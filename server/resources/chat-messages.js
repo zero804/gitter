@@ -1,4 +1,6 @@
-var chatService = require("../services/chat-service");
+var chatService = require("../services/chat-service"),
+    c = require("../utils/collections"),
+    userService = require("../services/user-service");
 
 module.exports = {
     index: function(req, res, next) {
@@ -10,11 +12,29 @@ module.exports = {
           limit: limit ? limit: 50
       };
 
-      console.log("skip=" + skip + ", limit = " + limit);
       chatService.findChatMessagesForTroupe(req.troupe.id, options, function(err, chatMessages) {
         if(err) return next(err);
+
+        var userIds = chatMessages.map(c.extract('fromUserId')).filterNulls().distinct();
+
+        userService.findByIds(userIds, function(err, users) {
+          if (err) return res.send(500);
+
+          var usersIndexed = users.indexById();
+
+          res.send(chatMessages.map(function(item) {
+            var user = usersIndexed[item.fromUserId];
+
+            return {
+              id: item._id,
+              text: item.text,
+              sent: item.sent,
+              fromUser: user ? user.narrow() : null,
+              toTroupe: req.troupe.narrow()
+            };
+          }));
+        });
         
-        res.send(chatMessages);
       });
     },
 
