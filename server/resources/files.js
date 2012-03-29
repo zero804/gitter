@@ -4,8 +4,9 @@ var troupeService = require("../services/troupe-service"),
 module.exports = {
     index: function(req, res, next) {
       fileService.findByTroupe(req.troupe.id, function(err, files) {
-        if(err) return next(err);
-        res.send(files);
+        if (err) return next(err);
+
+        res.send(files.narrow());
       });
     },
 
@@ -18,7 +19,7 @@ module.exports = {
     },
 
     show: function(req, res){
-      res.send(req.mail);
+      res.send(req.file);
     },
 
     edit: function(req, res){
@@ -33,9 +34,8 @@ module.exports = {
       res.send(500);
     },
 
-    load: function(id, callback){
-      console.log("MailId: " +id);
-      mailService.findById(id,callback);
+    load: function(id, callback) {
+      0
     }
 
 };
