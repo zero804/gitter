@@ -92,6 +92,9 @@ exports.hook_queue = function(next, connection) {
     var mailparser = new MailParser({
     });
 
+
+    // I THINK THIS IS OLD FROM WHEN WE TRIED THE ATTACHMENT MAILPARSER STREAMS
+    // CAN DELETE?
     // mailparser.on("attachment", function(attachment){
     //                   connection.logdebug("NEW ATTACHMENT file created *********************");
 

@@ -29,7 +29,7 @@ define([
 
     fileIcon: function(fileName){
       var icon = "unknown.png";
-      var ext = fileName.substring(fileName.lastIndexOf(".")+1,fileName.length);
+      var ext = fileName.substring(fileName.lastIndexOf(".")+1,fileName.length).toLowerCase();
       switch(ext){
         case "jpg": case "jpeg":
           icon = "jpg.png";
@@ -51,6 +51,9 @@ define([
           break;
         case "mov":
           icon = "mov.png";
+          break;
+        case "gif":
+          icon = "gif.png";
           break;
       }
 
