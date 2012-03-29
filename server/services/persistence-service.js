@@ -10,13 +10,17 @@ var UserSchema = new Schema({
   email: { type: String },
   confirmationCode: {type: String },
   status: { type: String, enum: ['UNCONFIRMED', 'ACTIVE'], default: 'UNCONFIRMED'},
-  passwordHash: { type: String }
+  passwordHash: { type: String },   
+  avatarUrlSmall: String,
+  avatarUrlMedium: String
 });
 
 UserSchema.methods.narrow = function() {
   return {
     id: this.id,
-    displayName: this.displayName
+    displayName: this.displayName,
+    avatarUrlSmall: this.avatarUrlSmall,
+    avatarUrlMedium: this.avatarUrlMedium
   };
 };
 
@@ -26,6 +30,16 @@ var TroupeSchema = new Schema({
   status: { type: String, enum: ['INACTIVE', 'ACTIVE'], default: 'INACTIVE'},
   users: [ObjectId]
 });
+
+TroupeSchema.methods.narrow = function () {
+  return {
+    id: this._id,
+    name: this.name,
+    uri: this.uri,
+    users: this.users
+  };
+
+};
 
 var InviteSchema = new Schema({
   troupeId: ObjectId,
