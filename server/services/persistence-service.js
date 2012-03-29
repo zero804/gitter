@@ -35,8 +35,7 @@ TroupeSchema.methods.narrow = function () {
   return {
     id: this._id,
     name: this.name,
-    uri: this.uri,
-    users: this.users
+    uri: this.uri
   };
 
 };
@@ -55,6 +54,17 @@ var ChatMessageSchema = new Schema({
   text: String,
   sent: { type: Date, default: Date.now }
 });
+
+
+ChatMessageSchema.methods.narrow = function (user, troupe) {
+  return {
+    id: this._id,
+    text: this.text,
+    sent: this.sent,
+    fromUser: user ? user.narrow() : null,
+    toTroupe: troupe ? troupe.narrow() : null
+  };
+};
 
 var EmailSchema = new Schema({
   from: { type: String },

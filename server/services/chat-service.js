@@ -21,7 +21,8 @@ module.exports = {
       chatMessage.save(function (err) {
         if(err) return callback(err);
         
-        appEvents.troupeChat(troupe.id, chatMessage);
+        appEvents.troupeChat(troupe.id, chatMessage.narrow(user, troupe));
+        
         return callback(null, chatMessage);
       });
       

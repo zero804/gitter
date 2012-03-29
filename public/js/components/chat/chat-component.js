@@ -11,12 +11,9 @@ define([
   
   var module = {
     connect: function() {
-      now.receiveMessage = function(name, message){
-        $(document).trigger('chat', {to: name, from: name, text: message });
-      };
-      
+
       now.onTroupeChatMessage = function(message) {
-        $(document).trigger('chat', { text: message.text });
+        $(document).trigger('chat', message);
       };
       
       now.ready(function(){
@@ -24,7 +21,7 @@ define([
         if(subscribeOnConnect) {
           module.subscribeTroupeChatMessages();
         }
-      }); 
+      });
 
     },
     
@@ -44,8 +41,7 @@ define([
     },
     
     unsubscribeTroupeChatMessages: function() {
-      console.log("unsubscribeTroupeChatMessages");
-      if(connected) {
+     if (connected) {
         now.unsubscribeToTroupeChat(window.troupeContext.troupe.id);
       }
       subscribeOnConnect = false;
