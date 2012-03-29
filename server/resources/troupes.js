@@ -1,36 +1,54 @@
-var troupeService = require("../services/troupe-service");
+var troupeService = require("../services/troupe-service"),
+  userService = require("../services/user-service"),
+  collections = require("../utils/collections");
 
 module.exports = {
-    index: function(req, res){
-      res.send('troupes index');
-    },
+  index: function(req, res) {
+    res.send('troupes index');
+  },
 
-    new: function(req, res){
-      res.send('new troupe');
-    },
+  new: function(req, res) {
+    res.send('new troupe');
+  },
 
-    create: function(req, res){
-      res.send('create troupe');
-    },
+  create: function(req, res) {
+    res.send('create troupe');
+  },
 
-    show: function(req, res){
-      res.send(req.troupe);
-    },
+  show: function(req, res) {
+    var t = req.troupe;
 
-    edit: function(req, res){
-      res.send('edit forum ' + req.troupe.title);
-    },
+    userService.findByIds(t.users, function(err, users) {
+      if (err) return res.send(500);
 
-    update:  function(req, res){
-      res.send('update forum ' + req.troupe.title);
-    },
+      var usersIndexed = users.indexById();
 
-    destroy: function(req, res){
-      res.send('destroy forum ' + req.troupe.title);
-    },
+      res.send({
+        id: t._id,
+        name: t.name,
+        uri: t.uri,
+        users: t.users.map(function(userId) {
+          return usersIndexed[userId];
+        }).filterNulls().narrow()
+      });
+    });
 
-    load: function(id, callback) {
-      troupeService.findById(id, callback);
-    }
+  },
+
+  edit: function(req, res) {
+    res.send('edit forum ' + req.troupe.title);
+  },
+
+  update: function(req, res) {
+    res.send('update forum ' + req.troupe.title);
+  },
+
+  destroy: function(req, res) {
+    res.send('destroy forum ' + req.troupe.title);
+  },
+
+  load: function(id, callback) { /** TODO: Add security */
+    troupeService.findById(id, callback);
+  }
 
 };

@@ -37,7 +37,7 @@ function storeFile(options, callback){
       });
 
       gs.writeFile(temporaryFile, function(err) {
-        if(err) return callback(err);
+        if (err) return callback(err);
         return callback(err, file);
       });
 
@@ -46,10 +46,6 @@ function storeFile(options, callback){
 }
 
 function findByFileName(troupeId, fileName, callback) {
-  console.log("troupeId= " + troupeId);
-
-  console.log("fileName= " + fileName);
-  
   persistence.File.findOne({ troupeId: troupeId, fileName: fileName}, callback);
 }
 
