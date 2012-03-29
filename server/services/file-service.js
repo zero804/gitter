@@ -17,7 +17,6 @@ function storeFile(options, callback){
   var mimeType = options.mimeType;
   var temporaryFile = options.file;
 
-
   var file = new persistence.File();
   file.troupeId = troupeId;
   file.creatorUserId = creatorUserId;
@@ -37,17 +36,25 @@ function storeFile(options, callback){
           }
       });
 
-      gs.writeFile( temporaryFile, function(err) {
+      gs.writeFile(temporaryFile, function(err) {
         if(err) return callback(err);
         return callback(err, file);
       });
 
     });
 
+}
 
+function findByFileName(troupeId, fileName, callback) {
+  console.log("troupeId= " + troupeId);
+
+  console.log("fileName= " + fileName);
+  
+  persistence.File.findOne({ troupeId: troupeId, fileName: fileName}, callback);
 }
 
 module.exports = {
   findByTroupe: findByTroupe,
+  findByFileName: findByFileName,
   storeFile: storeFile
 };
