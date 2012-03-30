@@ -5,10 +5,12 @@ define([
   'backbone',
   'views/home/main',
   'views/share/share',
-  'components/chat/chat-component'
-], function($, _, Backbone, MainHomeView, ShareView, chat){
+  'components/chat/chat-component',
+  'views/app/appView'
+], function($, _, Backbone, MainHomeView, ShareView, chat, AppView){
   var AppRouter = Backbone.Router.extend({
-    
+    appView: new AppView(),
+
     initialize: function() {
       chat.connect();
     },
