@@ -17,6 +17,14 @@ function findById(id, callback) {
   });
 }
 
+function findAllTroupesForUser(userId, callback) {
+  persistence.Troupe
+    .where('users', userId)
+    .asc('name')
+    .slaveOk()
+    .run(callback);
+}
+
 function userHasAccessToTroupe(user, troupe) {
   return troupe.users.indexOf(user.id) >=  0;
 }
@@ -112,6 +120,7 @@ function acceptInvite(code, user, callback) {
 module.exports = {
   findByUri: findByUri,
   findById: findById,
+  findAllTroupesForUser: findAllTroupesForUser,
   validateTroupeEmail: validateTroupeEmail,
   userHasAccessToTroupe: userHasAccessToTroupe,
   addInvite: addInvite,
