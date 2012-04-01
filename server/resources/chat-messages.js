@@ -25,13 +25,7 @@ module.exports = {
           res.send(chatMessages.map(function(item) {
             var user = usersIndexed[item.fromUserId];
 
-            return {
-              id: item._id,
-              text: item.text,
-              sent: item.sent,
-              fromUser: user ? user.narrow() : null,
-              toTroupe: req.troupe.narrow()
-            };
+            return item.narrow(user, req.troupe);
           }));
         });
         

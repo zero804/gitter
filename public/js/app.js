@@ -3,7 +3,8 @@ require.config({
     jquery: 'libs/jquery/jquery-min',
     jquery_validate : 'libs/jquery.validate-1.9/jquery.validate.min',
     jqueryui: 'libs/jquery-ui-1.8.18/jquery-ui-1.8.18.custom.min',
-    bootstrap: '../bootstrap/js/bootstrap.min',
+    jquery_timeago: 'libs/jquery.timeago-0.11.1/jquery.timeago',
+    bootstrap: '../bootstrap/js/bootstrap',
     underscore: 'libs/underscore/underscore-1.3.1-min',
     backbone: 'libs/backbone/backbone-0.9.1',
     text: 'libs/require/text',
@@ -18,7 +19,7 @@ require([
   'jquery',
   'underscore',
   'backbone',
-  'router', 
+  'router',
   'router-login',
   'bootstrap',
   'jqueryui'
@@ -48,7 +49,7 @@ require([
     events: {
       "click .menu-profile": "profileMenuClicked",
       "click .menu-settings": "settingsMenuClicked",
-      "click .menu-signout": "signoutMenuClicked",
+      "click .menu-signout": "signoutMenuClicked"
       
     },
     
@@ -57,7 +58,7 @@ require([
         $(".label-displayName").text(window.troupeContext.user.displayName);
         $(".label-troupeName").text(window.troupeContext.troupe.name);
         $(".menu-security").show();
-      } 
+      }
       
     },
     

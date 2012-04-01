@@ -6,7 +6,7 @@ module.exports = {
         var appUri = req.params.appUri;
         
         troupeService.findByUri(appUri, function(err, troupe) {
-          if(err) return next(err); 
+          if(err) return next(err);
           if(!troupe) return next("Troupe: " + appUri + " not found.");
 
           
@@ -18,7 +18,7 @@ module.exports = {
           }
           
           var troupeContext = {
-              user: req.user,
+              user: req.user ? req.user.narrow() : null,
               troupe: {
                 "uri": troupe.uri,
                 "id": troupe.id,
