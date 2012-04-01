@@ -32,12 +32,10 @@ define([
 
 
     addOneTroupe: function(model) {
-      console.log("Add One");
       this.troupeSelectorMenu.append("<li><a href='" + model.get("uri") + "'>"+ model.get("name") + "</a></li>");
     },
 
     addAllTroupes: function() {
-      console.log("Add All");
       this.troupeSelectorMenu.empty();
       this.troupeCollection.each(this.addOneTroupe, this);
     }

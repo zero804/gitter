@@ -96,9 +96,9 @@ module.exports = {
           
           winston.info("User sent new message to troupe: " + options.text);
           
-          /* 
+          /*
            * TODO: check security that this user can send messages to this troupe. This should probably
-           * happen in the message service 
+           * happen in the message service
            */
           chatService.newChatMessageToTroupe(options.troupeId, user, options.text, function(err, chatMessage) {
             if(err) {
@@ -114,6 +114,6 @@ module.exports = {
         group.now.onTroupeChatMessage(message);
       });
       
-    },
+    }
     
 };

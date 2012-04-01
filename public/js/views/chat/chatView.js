@@ -6,11 +6,13 @@ define([
   'mustache',
   'text!templates/chat/chat.mustache',
   'text!templates/chat/chat-row.mustache',
-  'components/chat/chat-component'
-], function($, _, Backbone, Mustache, template, rowTemplate, chat){
+  'text!templates/chat/chat-row-current.mustache',
+  'components/chat/chat-component',
+  'jquery_timeago'
+], function($, _, Backbone, Mustache, template, rowTemplate, rowCurrentTemplate, chat, _timeago) {
   var PAGE_SIZE = 50;
   
-  var ChatView = Backbone.View.extend({   
+  var ChatView = Backbone.View.extend({
     chatMessageSkip: 0,
     chatMessageLimit: PAGE_SIZE,
     
@@ -40,12 +42,39 @@ define([
     
     onMessage: function(event, msg) {
       var self = event.data;
-      var compiledTemplate = Mustache.render(rowTemplate,  self.prepareForTemplate(msg));
+      
+
+      var compiledTemplate = self.renderMessage(msg);
 
       var item = $(compiledTemplate);
       item.hide();
+      self.attachTooltipHandlers(item);
+
       $(".frame-chat", this.el).prepend(item);
       item.show('slide', {}, 'fast');
+
+    },
+    
+    attachTooltipHandlers: function(item) {
+      $('.chat-bubble', item).each(this.attachTooltipHandlerToItem);
+      $('.dp-tooltip', item).tooltip();
+    },
+
+    attachTooltipHandlerToItem: function(index, el) {
+      var jel = $(el);
+      if(jel.data("timeago-attached")) return;
+      if(!jel.data("sent")) return;
+      jel.data("timeago-attached", true);
+
+      jel.tooltip({title: function() { return $.timeago(new Date($(this).data("sent"))); }});
+    },
+
+    renderMessage: function(msg) {
+      if(msg.fromUser.id == window.troupeContext.user.id) {
+        return Mustache.render(rowCurrentTemplate,  this.prepareForTemplate(msg));
+      }
+
+      return Mustache.render(rowTemplate,  this.prepareForTemplate(msg));
     },
 
     prepareForTemplate: function(msg) {
@@ -73,9 +102,9 @@ define([
     render: function() {
       var compiledTemplate = Mustache.render(template, { });
       $(this.el).html(compiledTemplate);
-      
-      $('.dp-tooltip', this.el).tooltip();
-      $('.chat-bubble', this.el).tooltip();
+
+      this.attachTooltipHandlers(this.el);
+
       
       this.loadNextMessages();
       
@@ -99,11 +128,18 @@ define([
           // TODO: speed this up
           var items = [];
           for(var i = 0; i < data.length; i++) {
-            var compiledTemplate = Mustache.render(rowTemplate, self.prepareForTemplate(data[i]));
+            var compiledTemplate = self.renderMessage(data[i]);
             items.push(compiledTemplate);
           }
+
           var chatFrame = $(".frame-chat", this.el);
           chatFrame.append(items.join(''));
+
+          self.attachTooltipHandlers(chatFrame);
+
+
+
+
           self.chatMessageSkip += PAGE_SIZE;
         }
       });
