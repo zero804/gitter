@@ -14,7 +14,7 @@ define([
     initialize: function() {
       chat.connect();
     },
-    
+
     routes: {
       'statusphere': 'showStatusView',
       'mail': 'showMailView',
@@ -22,8 +22,9 @@ define([
       'chat': 'showChatView',
       'files': 'showFileView',
       'people': 'showPeopleView',
+      'people/:tab': 'showPeopleView',
       'profile': 'showProfileView',
-      
+
       // Default
       '*actions': 'defaultAction'
     },
@@ -38,13 +39,13 @@ define([
         this.currentView = view;
         return view;
     },
-    
+
     showAsync: function(file, params) {
       var self = this;
       require([file],
           function (View) {
             var view = new View({ router: self, params: params });
-            self.showView( '#primary-view', view);            
+            self.showView( '#primary-view', view);
           });
     },
 
@@ -55,23 +56,23 @@ define([
     showStatusView: function() {
       this.showAsync('views/status/statusView');
     },
-    
+
     showMailView: function() {
       this.showAsync('views/mail/mailView');
     },
-    
+
     showChatView: function() {
       this.showAsync('views/chat/chatView');
     },
-    
+
     showFileView: function() {
       this.showAsync('views/file/fileView');
     },
-    
-    showPeopleView: function() {
-      this.showAsync("views/people/peopleView");
+
+    showPeopleView: function(tab) {
+      this.showAsync("views/people/peopleView", { tab: tab });
     },
-    
+
     showShareDialog: function() {
       var loginView = new ShareView({ router: this });
       loginView.show();
@@ -80,11 +81,11 @@ define([
     showMailItemView: function(id) {
       this.showAsync("views/mail/itemView",id);
     },
-    
+
     showProfileView: function() {
       this.showAsync("views/profile/profileView");
     }
   });
-  
+
   return AppRouter;
 });

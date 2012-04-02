@@ -1,25 +1,19 @@
 <div class="row-fluid">
     <div class="span1">
-        <img src="images/tmp/dp_andrew.png" class="dp">
+        <img src="{{person1AvatarUrl}}" class="dp">
     </div>
     <div class="span5">
         <h3>{{person1Name}}</h3>
-        {{#person1MakeAdmin}}
-        <a href="#" class="btn btn-mini button-makeAdmin">Make admin</a>
-        {{/person1MakeAdmin}}
         {{#person1Remove}}
         <a href="#removeConfirmModal" data-toggle="modal" class="btn btn-mini btn-danger button-remove">Remove</a>
         {{/person1Remove}}
     </div>
     {{#person2}}
     <div class="span1">
-        <img src="images/tmp/dp_mike.png" class="dp">
+        <img src="{{person2AvatarUrl}}" class="dp">
     </div>
     <div class="span5">
         <h3>{{person2Name}}</h3>
-        {{#person2MakeAdmin}}
-        <a href="#" class="btn btn-mini button-makeAdmin">Make admin</a>
-        {{/person2MakeAdmin}}
         {{#person2Remove}}
         <a href="#removeConfirmModal" data-toggle="modal" class="btn btn-mini btn-danger button-remove">Remove</a>
         {{/person2Remove}}
