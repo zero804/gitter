@@ -14,7 +14,6 @@ define([
     troupeSelectorMenu: $("#menu-troupe-selector"),
 
     initialize: function() {
-      console.log("Fetching troupe Collection");
       this.troupeCollection.on('change', this.addAllTroupes, this);
 
       this.troupeCollection.on('add', this.addOneTroupe, this);

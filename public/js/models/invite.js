@@ -2,17 +2,17 @@ define([
   'underscore',
   'backbone'
 ], function(_, Backbone) {
-  var TroupeModel = Backbone.Model.extend({
+  var InviteModel = Backbone.Model.extend({
     idAttribute: "id",
 
     defaults: {
     },
 
     initialize: function() {
-      console.log("TroupeModel initialize");
+      console.log("InviteModel initialize");
     }
 
   });
 
-  return TroupeModel;
+  return InviteModel;
 });

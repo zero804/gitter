@@ -8,7 +8,7 @@ var express = require('express'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
 	ConfirmStrategy = require('./server/utils/confirm-strategy').Strategy;
-  
+
 /* TODO: put all our prototypes in a module */
 Array.prototype.narrow = function() {
   return this.map(function(value) { return value.narrow(); });
@@ -16,11 +16,11 @@ Array.prototype.narrow = function() {
 
 var RedisStore = require('connect-redis')(express);
 
-var app = express.createServer(); 
+var app = express.createServer();
 
 app.set('views', __dirname + '/public/templates');
 app.set('view engine', 'mustache');
-app.set('view options',{layout:false});  
+app.set('view options',{layout:false});
 app.register(".mustache", tmpl);
 
 passport.use(new LocalStrategy({
@@ -31,7 +31,7 @@ passport.use(new LocalStrategy({
       userService.findByEmail(email, function(err, user) {
         if(err) return done(err);
         if(!user) return done(null, false);
-        
+
         if(user.status != 'ACTIVE') {
           console.log("User not yet activated");
           return done(null, false);
@@ -39,7 +39,7 @@ passport.use(new LocalStrategy({
         console.log("Checking password");
         userService.checkPassword(user, password, function(match) {
           if(!match) return done(null, false);
-        
+
           /* Todo: consider using a seperate object for the security user */
           return done(null, user);
 
@@ -52,7 +52,7 @@ passport.use(new ConfirmStrategy({ name: "confirm" }, function(confirmationCode,
     userService.findByConfirmationCode(confirmationCode, function(err, user) {
       if(err) return done(err);
       if(!user) return done(null, false);
-      
+
       return done(null, user);
     });
   })
@@ -62,16 +62,16 @@ passport.use(new ConfirmStrategy({ name: "accept" }, function(confirmationCode, 
   troupeService.findInviteByCode(confirmationCode, function(err, invite) {
     if(err) return done(err);
     if(!invite) return done(null, false);
-    
+
     if(invite.status != 'UNUSED') {
       return done(new Error("This invite has already been used"));
     }
-    
-    
+
+
     userService.findOrCreateUserForEmail({ displayName: invite.displayName, email: invite.email, status: "ACTIVE" }, function(err, user) {
-      return done(null, user);  
+      return done(null, user);
     });
-    
+
   });
 })
 );
@@ -96,9 +96,9 @@ var sessionStore = new RedisStore();
 app.configure(function() {
   app.set('views', __dirname + '/public/templates');
   app.set('view engine', 'mustache');
-  app.set('view options',{layout:false});  
+  app.set('view options',{layout:false});
   app.register(".mustache", tmpl);
-  
+
   app.use(express.logger());
   app.use(express.cookieParser());
   app.use(express.bodyParser());
@@ -108,9 +108,9 @@ app.configure(function() {
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
   app.use(express.errorHandler({ showStack: true, dumpExceptions: true }));
-  
 
-}); 
+
+});
 
 
 
@@ -124,7 +124,7 @@ require('./server/handlers/invite').install(app);
 
 /* REST resources: not used yet */
 var troupesResource = app.resource('troupes',  require('./server/resources/troupes.js'));
-var sharesResource = app.resource('shares',  require('./server/resources/shares.js'));
+var sharesResource = app.resource('invites',  require('./server/resources/invites.js'));
 var usersResource = app.resource('users',  require('./server/resources/users.js'));
 var mailsResource = app.resource('mails', require('./server/resources/mails.js'));
 var filesResource = app.resource('files', require('./server/resources/files.js'));

@@ -2,21 +2,25 @@ var troupeService = require("../services/troupe-service");
 
 module.exports = {
     index: function(req, res){
-      res.send('share index');
+      troupeService.findAllUnusedInvitesForTroupe(req.troupe.id, function(err, invites) {
+        if(err) res.send(500);
+
+        res.send(invites.narrow());
+      });
     },
 
     new: function(req, res){
-      res.send('new share');
+      res.send('new invites');
     },
 
     create: function(req, res) {
-      var shares = req.body;
-      for(var i = 0; i < shares.length; i++) {
-        var share = shares[i];
+      var invites = req.body;
+      for(var i = 0; i < invites.length; i++) {
+        var share = invites[i];
         troupeService.addInvite(req.troupe, share.displayName, share.email);
       }
       
-      res.send(shares);
+      res.send(invites.narrow());
     },
 
     show: function(req, res){
@@ -31,14 +35,13 @@ module.exports = {
       res.send('update forum ' + req.share.title);
     },
 
-    destroy: function(req, res){
-      res.send('destroy forum ' + req.share.title);
+    destroy: function(req, res) {
+      req.invite.remove();
+      res.send(200);
     },
 
-    load: function(id, fn){
-      process.nextTick(function(){
-        fn(null, { id: id, title: 'SHARE' });
-      });
+    load: function(id, callback){
+      troupeService.findInviteById(id, callback);
     }
 
 };

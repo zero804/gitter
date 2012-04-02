@@ -6,8 +6,8 @@ define([
   'mustache',
   'text!templates/profile/profile.mustache'
 ], function($, _, Backbone, Mustache, template){
-  var ProfileView = Backbone.View.extend({    
-    
+  var ProfileView = Backbone.View.extend({
+  
     initialize: function() {
     },
     
