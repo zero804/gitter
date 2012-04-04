@@ -93,19 +93,8 @@ exports.hook_queue = function(next, connection) {
     });
 
 
-    // I THINK THIS IS OLD FROM WHEN WE TRIED THE ATTACHMENT MAILPARSER STREAMS
-    // CAN DELETE?
-    // mailparser.on("attachment", function(attachment){
-    //                   connection.logdebug("NEW ATTACHMENT file created *********************");
-
-      
-
-      
-
-    // });
-
     mailparser.on("end", function(mail_object){
-      connection.logdebug("Text body:", mail_object.text); // How are you today?
+      connection.logdebug("Text body:", mail_object.text);
       connection.logdebug("Rich text:", mail_object.html);
 
       if (mail_object.text) {
@@ -131,43 +120,11 @@ exports.hook_queue = function(next, connection) {
           connection.logdebug("Working with file: " + attachment.fileName);
           connection.logdebug("Working with generated file: " + attachment.generatedFileName);
           saveFile(troupe.id, user.id, attachment.generatedFileName,attachment.contentType,attachment.content);
-
-          // THIS IS WHAT WE USED TO HAVE HERE AND HAVE NOW PUT INTO A FUNCTION
-          //
-          // temp.open('attachment', function(err, tempFileInfo) {
-          //   connection.logdebug("Temporary file created:  *********************" + tempFileInfo.path);
-
-          //   var fileName = tempFileInfo.path;
-
-          //   var ws = fs.createWriteStream(fileName);
-
-          //   ws.on("close", function() {
-          //     fileService.storeFile({
-          //       troupeId: troupe.id,
-          //       creatorUserId: user.id,
-          //       fileName: attachment.generatedFileName,
-          //       mimeType: attachment.contentType,
-          //       file: fileName
-          //     }, function(err, savedFile){
-          //       if (err) return; // for now we're not going to fail if the attachment didn't fail
-          //       connection.logdebug("File: " + JSON.stringify(savedFile));
-          //       savedAttachments.push(savedFile.id);
-          //       connection.logdebug("Saved a file.");
-
-          //       // Delete the temporary file */
-          //       fs.unlink(tempFileInfo.path);
-          //     });
-          //   });
-          //   ws.write(attachment.content);
-          //   ws.end();
-
-          //   return;
-          // });
         }
       }
 
       //connection.logdebug("TroupeID: "+ troupe.id);
-      mailService.storeEmail({ fromEmail: fromEmail, troupeId: troupe.id, subject: subject, date: date, fromName: fromName, preview: preview, mailBody: storedMailBody}, function(err) {
+      mailService.storeEmail({ fromEmail: fromEmail, troupeId: troupe.id, subject: subject, date: date, fromName: fromName, preview: preview, mailBody: storedMailBody, plainText: mail_object.text, richText: mail_object.html}, function(err) {
         if (err) return next(DENY, "Failed to store the email");
         connection.logdebug("Stored the email.");
 

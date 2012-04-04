@@ -82,8 +82,7 @@ var EmailSchema = new Schema({
   subject: { type : String },
   date: {type: Date },
   preview: {type: String},
-  mail: { type: String},
-  delivered: { type: Boolean}
+  mail: { type: String}
 });
 
 EmailSchema.methods.narrow = function () {
@@ -97,6 +96,17 @@ EmailSchema.methods.narrow = function () {
   };
 
 };
+
+var QueueMailSchema = new Schema({
+  from: { type: String },
+  fromName: { type: String},
+  troupeId: ObjectId,
+  subject: { type : String },
+  date: {type: Date },
+  plainText: { type: String},
+  richText: { type: String},
+  delivered: {type: Boolean}
+});
 
 var FileSchema = new Schema({
   troupeId: ObjectId,
@@ -119,6 +129,7 @@ FileSchema.methods.narrow = function () {
 var User = mongoose.model('User', UserSchema);
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var Email = mongoose.model('Email', EmailSchema);
+var QueueMail = mongoose.model('QueueMail', QueueMailSchema);
 var Invite = mongoose.model('Invite', InviteSchema);
 var ChatMessage = mongoose.model('ChatMessage', ChatMessageSchema);
 var File = mongoose.model('File', FileSchema);
@@ -127,6 +138,7 @@ module.exports = {
   User: User,
   Troupe: Troupe,
 	Email: Email,
+  QueueMail: QueueMail,
 	Invite: Invite,
 	ChatMessage: ChatMessage,
   File: File
