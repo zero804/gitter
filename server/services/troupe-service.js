@@ -17,6 +17,25 @@ function findById(id, callback) {
   });
 }
 
+function findMemberEmails(id, callback) {
+  findById(id, function(err,troupe) {
+    if(err) callback(err);
+    if(!troupe) callback("No troupe returned");
+
+    var userIds = troupe.users;
+
+    userService.findByIds(userIds, function(err, users) {
+      if(err) callback(err);
+      if(!users) callback("No users returned");
+      
+      var emailAddresses = users.map(function(item) { return item.email; } );
+      
+      callback(null, emailAddresses);
+    });
+
+  });
+}
+
 function findAllTroupesForUser(userId, callback) {
   persistence.Troupe
     .where('users', userId)
@@ -139,5 +158,6 @@ module.exports = {
   findInviteById: findInviteById,
   findInviteByCode: findInviteByCode,
   acceptInvite: acceptInvite,
+  findMemberEmails: findMemberEmails,
   findAllUnusedInvitesForTroupe: findAllUnusedInvitesForTroupe
 };
