@@ -37,25 +37,55 @@ function validateTroupeEmail(options, callback) {
   var uri = to.split('@')[0];
   var user = null;
   var troupe = null;
-  console.log("Options: " + JSON.stringify(options));
 
   userService.findByEmail(from, function(err, fromUser) {
     if(err) return callback(err);
     if(!fromUser) return callback("Access denied");
-        console.log("fromUser: " + JSON.stringify(fromUser));
 
     findByUri(uri, function(err, troupe) {
       if(err) return callback(err);
       if(!troupe) return callback("Troupe not found for uri " + uri);
       if(!userHasAccessToTroupe(fromUser, troupe)) {
-        callback("Access denied");
+        return callback("Access denied");
       }
 
-      callback(null,troupe, fromUser);
+      return callback(null,troupe, fromUser);
 
     });
   });
+}
 
+function validateTroupeEmailAndReturnDistributionList(options, callback) {
+  var from = options.from;
+  var to = options.to;
+
+  /* TODO: Make this email parsing better! */
+  var uri = to.split('@')[0];
+  var user = null;
+  var troupe = null;
+
+  userService.findByEmail(from, function(err, fromUser) {
+    if(err) return callback(err);
+    if(!fromUser) return callback("Access denied");
+
+    findByUri(uri, function(err, troupe) {
+      if(err) return callback(err);
+      if(!troupe) return callback("Troupe not found for uri " + uri);
+      if(!userHasAccessToTroupe(fromUser, troupe)) {
+        return callback("Access denied");
+      }
+
+      userService.findByIds(troupe.users, function(err, users) {
+        if(err) return callback(err);
+
+        var emailAddresses = users.map(function(user) {
+          return user.email;
+        });
+
+        return callback(null, troupe, fromUser, emailAddresses);
+      });
+    });
+  });
 }
 
 function addInvite(troupe, displayName, email) {
@@ -134,6 +164,7 @@ module.exports = {
   findById: findById,
   findAllTroupesForUser: findAllTroupesForUser,
   validateTroupeEmail: validateTroupeEmail,
+  validateTroupeEmailAndReturnDistributionList: validateTroupeEmailAndReturnDistributionList,
   userHasAccessToTroupe: userHasAccessToTroupe,
   addInvite: addInvite,
   findInviteById: findInviteById,

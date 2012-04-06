@@ -20,7 +20,7 @@ module.exports = {
         troupeService.addInvite(req.troupe, share.displayName, share.email);
       }
       
-      res.send(invites.narrow());
+      res.send(invites);
     },
 
     show: function(req, res){
@@ -36,7 +36,7 @@ module.exports = {
     },
 
     destroy: function(req, res) {
-      req.invite.remove();
+      console.log(req.invite);
       res.send(200);
     },
 

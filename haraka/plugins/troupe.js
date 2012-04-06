@@ -47,6 +47,8 @@ exports.hook_data = function (next, connection) {
 };
 
 exports.hook_queue = function(next, connection) {
+  return next();
+  
 	// Get some stuff from the header to store later
 	var subject = connection.transaction.header.get("Subject");
 	var date = connection.transaction.header.get("Date");
