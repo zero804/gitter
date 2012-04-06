@@ -108,7 +108,6 @@ TroupeSESTransport.prototype.handleMessage = function(emailMessage, rawEmail, ca
           }
       };
 
-  console.dir(params);
   //Execute the request on the correct protocol
   if(urlparts.protocol.substr() == "https:") {
       request = https.request(reqObj, this.responseHandler.bind(this, callback));
@@ -125,21 +124,16 @@ TroupeSESTransport.prototype.handleMessage = function(emailMessage, rawEmail, ca
  * @param {Object} response HTTP Response object
  */
 TroupeSESTransport.prototype.responseHandler = function(callback, response) {
-    console.log("RESPONSE HANDLED....");
-
     var body = "";
     response.setEncoding('utf8');
 
     //Re-assembles response data
     response.on('data', function(d) {
-        console.log(">> DATA HANDLED....");
-
         body += d.toString();
     });
 
     //Performs error handling and executes callback, if it exists
     response.on('end', function(err) {
-        console.log(">> RESPONSE ENDED....");
 
         if(err instanceof Error) {
             return callback && callback(err, null);
