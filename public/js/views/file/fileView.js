@@ -65,6 +65,14 @@ define([
       $(this.el).html(compiledTemplate);
       return this;
     },
+
+    onClickGenerator: function(url) {
+      var self = this;
+      alert(url);
+      return function() {
+        window.open(url);
+      };
+    },
     
     renderFiles: function(files) {
       $(".frame-files", this.el).empty();
@@ -73,12 +81,14 @@ define([
 
         var rowHtml = Mustache.render(rowTemplate, {
           fileName: p1.fileName,
+          url: p1.url,
           mimeType: p1.mimeType,  // I think the mimeType may actually be useless, eg. I got this for a PPT I attached in Mac Mail (application/vnd.openxmlformats-officedocument.presentationml.presentation)
           fileIcon: this.fileIcon(p1.fileName)
         });
         
         var item = $(rowHtml);
         $(".frame-files", this.el).append(item);
+        item.on('click', this.onClickGenerator(p1.url));
       }
     }
     
