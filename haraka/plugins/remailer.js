@@ -14,7 +14,7 @@ var sesTransport = new TroupeSESTransport({
 
 function continueResponse(next) {
   //return next (DENY, "Debug mode bounce.");
-  next();
+  return next(OK);
 };
 
 exports.hook_queue = function(next, connection) {

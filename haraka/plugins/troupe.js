@@ -6,11 +6,10 @@ var fileService = require("./../../server/services/file-service.js");
 var MailParser = require("mailparser").MailParser;
 var temp = require('temp');
 var fs   = require('fs');
+var console = require("console");
 
 function saveFile(troupeId, creatorUserId, fileName, mimeType, content) {
   temp.open('attachment', function(err, tempFileInfo) {
-  //console.log("Temporary file created:  *********************" + tempFileInfo.path);
-
     var tempFileName = tempFileInfo.path;
 
     var ws = fs.createWriteStream(tempFileName);
@@ -37,8 +36,7 @@ function saveFile(troupeId, creatorUserId, fileName, mimeType, content) {
 
     return;
   });
-
-};
+}
 
 exports.hook_data = function (next, connection) {
     // enable mail body parsing
@@ -46,9 +44,7 @@ exports.hook_data = function (next, connection) {
     next();
 };
 
-exports.hook_queue = function(next, connection) {
-  return next();
-  
+exports.hook_queue = function(next, connection) {  
 	// Get some stuff from the header to store later
 	var subject = connection.transaction.header.get("Subject");
 	var date = connection.transaction.header.get("Date");
@@ -56,16 +52,16 @@ exports.hook_queue = function(next, connection) {
 	var toName = connection.transaction.header.get("To");
 	var preview;
 	var fromEmail;
-	
+
 	var lines = connection.transaction.data_lines;
-    if (!lines) return next(DENY);
-  
+  if (!lines) return next(DENY);
+
 	toName = toName.replace(/\n/g,"");
 	fromName = fromName.replace(/\n/g,"");
 	subject = subject.replace(/\n/g,"");
-	
+
 	// do some string parsing for email formats such as Name <email>
-	
+
 	if (fromName.indexOf("<") > 0)  {
     fromEmail = fromName.substring(fromName.indexOf("<") + 1, fromName.indexOf(">"));
     fromName = fromName.substring(0, fromName.indexOf("<")-1);
@@ -73,7 +69,7 @@ exports.hook_queue = function(next, connection) {
   else {
     fromEmail = fromName;
   }
-	
+
 	//connection.logdebug("Body: " + JSON.stringify(connection.transaction.body.bodytext));
     //connection.logdebug("Children: " + JSON.stringify(connection.transaction.body.children.length));
 	//connection.logdebug("Child: " + connection.transaction.body.children[0].bodytext);
@@ -84,7 +80,7 @@ exports.hook_queue = function(next, connection) {
 	//connection.logdebug("Mail Body : "+ lines.join(''));
  	//connection.logdebug("Date: " + date);
 
-  
+
 	troupeService.validateTroupeEmail({ to: toName, from: fromEmail}, function(err, troupe, user) {
     if (err) return next(DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.");
     if (!troupe) return next (DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.");
@@ -131,7 +127,7 @@ exports.hook_queue = function(next, connection) {
         connection.logdebug("Stored the email.");
 
         //return next(OK);
-        return next (DENY, "Debug mode bounce.");
+        return next ();
       });
 
     });
