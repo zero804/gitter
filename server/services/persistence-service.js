@@ -48,7 +48,7 @@ var InviteSchema = new Schema({
   status: { type: String, enum: ['UNUSED', 'USED'], default: 'UNUSED'}
 });
 
-InviteSchema  .methods.narrow = function () {
+InviteSchema.methods.narrow = function () {
   return {
     id: this._id,
     displayName: this.displayName,
