@@ -22,6 +22,7 @@
     "winston": "0.5.10",
     "mailparser": "0.2.22",
     "nodemailer": "0.3.14",
-    "temp": "0.4.0"
+    "temp": "0.4.0",
+    "less": "1.3.0"
   }
 }
