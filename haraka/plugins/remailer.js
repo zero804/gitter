@@ -35,7 +35,15 @@ exports.hook_queue = function(next, connection) {
       return continueResponse(next);
     }
 
-    /* Once we've got the troupe email verified, we should be able to get rid of this */
+    var newSubject = transaction.header.get("Subject");
+    newSubject = newSubject ? newSubject : "";
+
+    if(newSubject.indexOf("[" + troupe.name + "]") < 0) {
+      newSubject = "[" + troupe.name + "] " + newSubject;
+      transaction.remove_header("Subject");
+      transaction.add_header("Subject", newSubject);
+    }
+
     transaction.remove_header("From");
     transaction.add_header("From", fromUser.displayName + " <" + fromUser.email + ">");
 
@@ -57,9 +65,7 @@ exports.hook_queue = function(next, connection) {
     sesTransport.sendMail(mail, function(error, response){
         if (error) {
           connection.logdebug(error);
-        } else {
-          connection.logdebug("sent" + response.message);
-        }
+        } 
 
         return continueResponse(next);
     });
