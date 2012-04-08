@@ -114,7 +114,7 @@ app.configure(function() {
 
 
 
-require('./server/now').install(app, sessionStore);
+//require('./server/now').install(app, sessionStore);
 require('./server/handlers/confirm').install(app);
 require('./server/handlers/signup').install(app);
 require('./server/handlers/profile').install(app);
