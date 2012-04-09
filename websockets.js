@@ -1,5 +1,6 @@
 "use strict";
 
+var express = require('express');
 var http = require('http');
 var fs = require('fs');
 var https = require('https');
@@ -9,34 +10,7 @@ var options = {
   cert: fs.readFileSync('/etc/nginx/server.crt')
 };
 
-/*
-var httpServer = http.createServer(function (req, res) {
-  res.writeHead(200, { 'Content-Type': 'text/html' });
-  res.end("Nothing here");
-});
-
-var httpsServer = https.createServer(options, function (req, res) {
-  res.writeHead(200, { 'Content-Type': 'text/html' });
-  res.end("Nothing here");
-});
-
-httpServer.listen(80, "10.11.12.14", onServerStartup);
-httpsServer.listen(443, "10.11.12.14", onServerStartup);
-
-var serverStartCount = 0;
-function onServerStartup() {
-  serverStartCount++;
-  if(serverStartCount == 2) {
-    require('./server/now').install(httpServer, sessionStore);
-
-    process.setgid("troupe");
-    process.setuid("troupe");
-  }
-}
-*/
-
-
-var app = require('express').createServer(options);
+var app = express.createServer(options);
 
 app.get('/', function(req, res) {
   res.send('Nothing to see here.');

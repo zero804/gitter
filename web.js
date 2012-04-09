@@ -94,6 +94,7 @@ passport.deserializeUser(function(id, done) {
 var sessionStore = new RedisStore();
 
 app.configure(function() {
+  app.set('basepath', 'https://trou.pe');
   app.set('views', __dirname + '/public/templates');
   app.set('view engine', 'mustache');
   app.set('view options',{layout:false});
