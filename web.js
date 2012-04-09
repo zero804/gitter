@@ -36,7 +36,7 @@ passport.use(new LocalStrategy({
           console.log("User not yet activated");
           return done(null, false);
         }
-        console.log("Checking password");
+
         userService.checkPassword(user, password, function(match) {
           if(!match) return done(null, false);
 
@@ -77,10 +77,12 @@ passport.use(new ConfirmStrategy({ name: "accept" }, function(confirmationCode, 
 );
 
 passport.serializeUser(function(user, done) {
+  console.log("Serializing " + user.id);
   done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
+  console.log("Deserializing " + id);
   userService.findById(id, function(err, user) {
     if(err) return done(err);
     if(!user) return done(null, false);
@@ -93,8 +95,18 @@ passport.deserializeUser(function(id, done) {
 
 var sessionStore = new RedisStore();
 
-app.configure(function() {
+app.configure('dev', function(){
+  app.set('basepath', 'http://localhost:5000');
+  app.use(express.errorHandler({ showStack: true, dumpExceptions: true }));
+
+});
+
+app.configure('prod', function() {
   app.set('basepath', 'https://trou.pe');
+  app.use(express.errorHandler({ showStack: false, dumpExceptions: false }));
+});
+
+app.configure(function() {
   app.set('views', __dirname + '/public/templates');
   app.set('view engine', 'mustache');
   app.set('view options',{layout:false});
@@ -108,12 +120,7 @@ app.configure(function() {
   app.use(passport.session());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
-  app.use(express.errorHandler({ showStack: true, dumpExceptions: true }));
-
-
 });
-
-
 
 //require('./server/now').install(app, sessionStore);
 require('./server/handlers/confirm').install(app);
@@ -121,7 +128,6 @@ require('./server/handlers/signup').install(app);
 require('./server/handlers/profile').install(app);
 require('./server/handlers/login').install(app);
 require('./server/handlers/invite').install(app);
-
 
 /* REST resources: not used yet */
 var troupesResource = app.resource('troupes',  require('./server/resources/troupes.js'));
