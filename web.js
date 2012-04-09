@@ -8,21 +8,10 @@ var express = require('express'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
 	ConfirmStrategy = require('./server/utils/confirm-strategy').Strategy,
+  config = require('./server/utils/config'),
   nconf = require('nconf');
 
-/* Load configuration parameters */
-var nodeEnv = process.env['NODE_ENV'];
-if(!nodeEnv) {
-  nodeEnv = 'dev';
-  process.env['NODE_ENV'] = nodeEnv;
-}
-
-console.log("Using environment: " + nodeEnv);
-
-nconf.argv()
-     .env();
-nconf.add('user', { type: 'file', file: './config/config.' + nodeEnv + '.json'  });
-nconf.add('defaults', { type: 'file', file: './config/config.default.json' });
+config.configure();
 
 /* TODO: put all our prototypes in a module */
 Array.prototype.narrow = function() {
