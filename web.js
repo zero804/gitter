@@ -10,7 +10,8 @@ var express = require('express'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
 	ConfirmStrategy = require('./server/utils/confirm-strategy').Strategy,
-  nconf = require('./server/utils/config').configure();
+  nconf = require('./server/utils/config').configure(),
+  httpUtils = require('./server/utils/http');
 
 /* TODO: put all our prototypes in a module */
 Array.prototype.narrow = function() {

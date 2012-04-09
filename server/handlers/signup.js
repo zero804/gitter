@@ -42,12 +42,12 @@ module.exports = {
             email: req.form.email
           }, function(err, id) {
             if(err) {
-              res.redirect("/");
+              res.relativeRedirect("/");
               return;
             }
 
             req.session.newTroupeId = id;
-            res.redirect("/confirm");
+            res.relativeRedirect("/confirm");
           });
 
         }
@@ -64,7 +64,7 @@ module.exports = {
         function(req, res, next){
           signupService.confirm(req.user, function(err, user) {
             if (err) return next(err);
-            res.redirect('/profile');
+            res.relativeRedirect('/profile');
           });
         }
       );
@@ -79,7 +79,7 @@ module.exports = {
 
             /* TODO: a proper confirmation screen that the email has been resent */
             req.session.newTroupeId = req.params.id;
-            res.redirect("/confirm");
+            res.relativeRedirect("/confirm");
           });
 
         }

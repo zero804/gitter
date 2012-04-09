@@ -45,7 +45,6 @@ module.exports = {
             }
 
             if (!req.form.isValid) {
-              console.log("Form is invalid");
               res.render('profile', {
                 flash: req.flash,
                 errors: req.form.errors,
@@ -61,9 +60,6 @@ module.exports = {
               password: req.form.password
             }, function(err) {
               if(err) {
-                console.dir(err);
-                console.log("Unable to update profile");
-
                 res.render('profile', {
                   flash: req.flash,
                   displayName: req.form.displayName
@@ -75,7 +71,7 @@ module.exports = {
                 if(err) return next(err);
                 if(!troupe) return next("Unable to determine default troupe for user");
 
-                res.redirect("/" + troupe.uri);
+                res.relativeRedirect("/" + troupe.uri);
                 return;
               });
             });

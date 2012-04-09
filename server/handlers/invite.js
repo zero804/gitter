@@ -13,11 +13,11 @@ module.exports = {
           /* User has been set passport/accept */
           troupeService.acceptInvite(req.params.confirmationCode, req.user, function(err, troupe) {
             if(!req.user.passwordHash) {
-              res.redirect("/profile");
+              res.relativeRedirect("/profile");
               return;
             }
 
-            res.redirect("/" + troupe.uri);
+            res.relativeRedirect("/" + troupe.uri);
 
           });
 
