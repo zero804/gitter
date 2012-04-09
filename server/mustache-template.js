@@ -10,8 +10,6 @@ module.exports = {
   compile : function(source, options) {
     var views = (options && options.settings && options.settings.views) || './views/';
 
-    console.log("MOO" + views);
-
     var tc = hogan.compile(source);
     // we need overwrite for this specific template
     // rp (RenderPartials) function to provide partial content

@@ -11,7 +11,8 @@ var express = require('express'),
 	LocalStrategy = require('passport-local').Strategy,
 	ConfirmStrategy = require('./server/utils/confirm-strategy').Strategy,
   nconf = require('./server/utils/config').configure(),
-  httpUtils = require('./server/utils/http');
+  httpUtils = require('./server/utils/http'),
+  winston = require('winston');
 
 /* TODO: put all our prototypes in a module */
 Array.prototype.narrow = function() {
@@ -37,7 +38,7 @@ passport.use(new LocalStrategy({
         if(!user) return done(null, false);
 
         if(user.status != 'ACTIVE') {
-          console.log("User not yet activated");
+          winston.info("User not yet activated");
           return done(null, false);
         }
 
@@ -53,6 +54,8 @@ passport.use(new LocalStrategy({
 ));
 
 passport.use(new ConfirmStrategy({ name: "confirm" }, function(confirmationCode, done) {
+    winston.info("Invoking confirm strategy");
+
     userService.findByConfirmationCode(confirmationCode, function(err, user) {
       if(err) return done(err);
       if(!user) return done(null, false);
@@ -63,6 +66,8 @@ passport.use(new ConfirmStrategy({ name: "confirm" }, function(confirmationCode,
 );
 
 passport.use(new ConfirmStrategy({ name: "accept" }, function(confirmationCode, done) {
+  winston.info("Invoking accept strategy");
+
   troupeService.findInviteByCode(confirmationCode, function(err, invite) {
     if(err) return done(err);
     if(!invite) return done(null, false);
@@ -70,7 +75,6 @@ passport.use(new ConfirmStrategy({ name: "accept" }, function(confirmationCode, 
     if(invite.status != 'UNUSED') {
       return done(new Error("This invite has already been used"));
     }
-
 
     userService.findOrCreateUserForEmail({ displayName: invite.displayName, email: invite.email, status: "ACTIVE" }, function(err, user) {
       return done(null, user);
@@ -81,12 +85,12 @@ passport.use(new ConfirmStrategy({ name: "accept" }, function(confirmationCode, 
 );
 
 passport.serializeUser(function(user, done) {
-  console.log("Serializing " + user.id);
+  winston.info("Serializing " + user.id);
   done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
-  console.log("Deserializing " + id);
+  winston.info("Deserializing " + id);
   userService.findById(id, function(err, user) {
     if(err) return done(err);
     if(!user) return done(null, false);
