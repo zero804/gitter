@@ -7,7 +7,22 @@ var express = require('express'),
   mailService = require('./server/services/mail-service'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
-	ConfirmStrategy = require('./server/utils/confirm-strategy').Strategy;
+	ConfirmStrategy = require('./server/utils/confirm-strategy').Strategy,
+  nconf = require('nconf');
+
+/* Load configuration parameters */
+var nodeEnv = process.env['NODE_ENV'];
+if(!nodeEnv) {
+  nodeEnv = 'dev';
+  process.env['NODE_ENV'] = nodeEnv;
+}
+
+console.log("Using environment: " + nodeEnv);
+
+nconf.argv()
+     .env();
+nconf.add('user', { type: 'file', file: './config/config.' + nodeEnv + '.json'  });
+nconf.add('defaults', { type: 'file', file: './config/config.default.json' });
 
 /* TODO: put all our prototypes in a module */
 Array.prototype.narrow = function() {
@@ -95,18 +110,8 @@ passport.deserializeUser(function(id, done) {
 
 var sessionStore = new RedisStore();
 
-app.configure('dev', function(){
-  app.set('basepath', 'http://localhost:5000');
-  app.use(express.errorHandler({ showStack: true, dumpExceptions: true }));
-
-});
-
-app.configure('prod', function() {
-  app.set('basepath', 'https://trou.pe');
-  app.use(express.errorHandler({ showStack: false, dumpExceptions: false }));
-});
-
 app.configure(function() {
+  app.set('basepath', nconf.get('web:basepath'));
   app.set('views', __dirname + '/public/templates');
   app.set('view engine', 'mustache');
   app.set('view options',{layout:false});
@@ -120,9 +125,11 @@ app.configure(function() {
   app.use(passport.session());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
+
+  app.use(express.errorHandler({ showStack: nconf.get('express:showStack'), dumpExceptions: nconf.get('express:dumpExceptions') }));
 });
 
-//require('./server/now').install(app, sessionStore);
+require('./server/now').install(app, sessionStore);
 require('./server/handlers/confirm').install(app);
 require('./server/handlers/signup').install(app);
 require('./server/handlers/profile').install(app);
@@ -148,7 +155,7 @@ troupesResource.add(chatMessagesResource);
 /* This should be last */
 require('./server/handlers/app').install(app);
 
-var port = process.env.PORT || 5000;
+var port = nconf.get("PORT");
 app.listen(port, function() {
   console.log("Listening on " + port);
 });

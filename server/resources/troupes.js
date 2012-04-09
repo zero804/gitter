@@ -4,6 +4,10 @@ var troupeService = require("../services/troupe-service"),
 
 module.exports = {
   index: function(req, res) {
+    if(!req.user) {
+      return res.send(403);
+    }
+
     troupeService.findAllTroupesForUser(req.user.id, function(err, troupes) {
       if (err) return res.send(500);
 
