@@ -16,7 +16,7 @@ module.exports = {
 
           if(req.user) {
             if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
-              res.redirect("/" + appUri + "/accessdenied");
+              res.relativeRedirect("/" + appUri + "/accessdenied");
               return;
             }
           }
