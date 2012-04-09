@@ -1,3 +1,5 @@
+/*jshint globalstrict:true, trailing:false */
+/*global console:false, require: true, module: true */
 "use strict";
 
 var form = require("express-form"),
@@ -5,28 +7,30 @@ var form = require("express-form"),
     validate = form.validate,
     signupService = require("../services/signup-service"),
     userService = require("../services/user-service"),
-    passport = require('passport');
+    passport = require('passport'),
+    middleware = require('./middleware');
 
 module.exports = {
     install: function(app) {
-      app.get('/profile', 
+      app.get('/profile',
+        middleware.ensureLoggedIn,
         function(req, res) {
           var displayName;
-          if(req.form && "displayName" in req.form) { 
+          if(req.form && "displayName" in req.form) {
             displayName = req.form.displayName;
           } else {
-            displayName = req.user.displayName
+            displayName = req.user.displayName;
           }
-        
+
           res.render('profile', {
             flash: req.flash,
             displayName: req.user.displayName
           });
-      });   
+      });
 
       app.post(
           '/updateprofile',
-
+          middleware.ensureLoggedIn,
           // Form filter and validation middleware
           form(
             filter("displayName").trim(),
@@ -37,41 +41,46 @@ module.exports = {
           // Express request-handler now receives filtered and validated data
           function(req, res, next) {
             if(!req.user) {
-              return next("Not signed in")
+              return next("Not signed in");
             }
-            
+
             if (!req.form.isValid) {
+              console.log("Form is invalid");
               res.render('profile', {
                 flash: req.flash,
                 errors: req.form.errors,
                 displayName: req.form.displayName
               });
-              
+
               return;
             }
-            
+
             signupService.updateProfile({
               user: req.user,
               displayName: req.form.displayName,
-              password: req.form.password,
+              password: req.form.password
             }, function(err) {
               if(err) {
+                console.dir(err);
+                console.log("Unable to update profile");
+
                 res.render('profile', {
                   flash: req.flash,
                   displayName: req.form.displayName
                 });
                 return;
-              } 
-              
+              }
+
               userService.findDefaultTroupeForUser(req.user.id, function(err, troupe) {
                 if(err) return next(err);
                 if(!troupe) return next("Unable to determine default troupe for user");
 
                 res.redirect("/" + troupe.uri);
+                return;
               });
             });
           }
         );
-      
+
     }
 };

@@ -1,3 +1,7 @@
+/*jshint globalstrict:true, trailing:false */
+/*global console:false, require: true, module: true */
+"use strict";
+
 var passport = require("passport");
 
 function ensureAuthenticated(req, res, next) {
@@ -14,11 +18,11 @@ module.exports = {
 
       /* Cheap trick for testing */
       app.get('/login', function(req, res) {
-        res.render("login/login")
+        res.render("login/login");
       });
       
       app.get('/loginsuccess', ensureAuthenticated, function(req, res) {
-        res.send({ 
+        res.send({     
           failed: false,
           user: req.user
         });

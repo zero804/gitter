@@ -1,3 +1,7 @@
+/*jshint globalstrict:true, trailing:false */
+/*global console:false, require: true, module: true */
+"use strict";
+
 var troupeService = require("../services/troupe-service"),
     fileService = require("../services/file-service");
 

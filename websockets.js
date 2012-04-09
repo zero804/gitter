@@ -1,13 +1,11 @@
+/*global console:false, require: true, module: true, process: false, __dirname:false */
 "use strict";
 
 var express = require('express');
 var http = require('http');
 var fs = require('fs');
 var https = require('https');
-var config = require('./server/utils/config');
-var nconf = require("nconf");
-
-config.configure();
+var nconf = require('./server/utils/config').configure();
 
 var options = {
   key: fs.readFileSync(nconf.get("web:privateKeyFile")),

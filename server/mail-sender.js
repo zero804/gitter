@@ -1,3 +1,7 @@
+/*jshint globalstrict:true, trailing:false */
+/*global console:false, require: true, module: true, process: false */
+"use strict";
+
 var mailService = require("./services/mail-service.js");
 var troupeService = require("./services/troupe-service.js");
 var nodemailer = require("nodemailer");

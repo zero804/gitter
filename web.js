@@ -1,3 +1,5 @@
+/*global console:false, require: true, module: true, process: false, __dirname:false */
+"use strict";
 
 var express = require('express'),
 	Resource = require('express-resource'),
@@ -8,10 +10,7 @@ var express = require('express'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
 	ConfirmStrategy = require('./server/utils/confirm-strategy').Strategy,
-  config = require('./server/utils/config'),
-  nconf = require('nconf');
-
-config.configure();
+  nconf = require('./server/utils/config').configure();
 
 /* TODO: put all our prototypes in a module */
 Array.prototype.narrow = function() {
@@ -100,10 +99,10 @@ passport.deserializeUser(function(id, done) {
 var sessionStore = new RedisStore();
 
 app.configure(function() {
-  app.set('basepath', nconf.get('web:basepath'));
+  app.set('basepath', "/");
   app.set('views', __dirname + '/public/templates');
   app.set('view engine', 'mustache');
-  app.set('view options',{layout:false});
+  app.set('view options', { layout: false } );
   app.register(".mustache", tmpl);
 
   app.use(express.logger());
@@ -121,7 +120,6 @@ app.configure(function() {
 });
 
 require('./server/now').install(app, sessionStore);
-require('./server/handlers/confirm').install(app);
 require('./server/handlers/signup').install(app);
 require('./server/handlers/profile').install(app);
 require('./server/handlers/login').install(app);

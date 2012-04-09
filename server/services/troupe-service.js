@@ -1,9 +1,12 @@
+/*jshint globalstrict:true, trailing:false */
+/*global console:false, require: true, module: true */
 "use strict";
 
 var persistence = require("./persistence-service"),
     userService = require("./user-service"),
     mailerService = require("./mailer-service"),
-    uuid = require('node-uuid');
+    uuid = require('node-uuid'),
+    nconf = require("../utils/config").configure();
 
 function findByUri(uri, callback) {
   persistence.Troupe.findOne({uri: uri}, function(err, troupe) {
@@ -117,7 +120,7 @@ function addInvite(troupe, displayName, email) {
   invite.code = code;
   invite.save();
 
-  var acceptLink = "http://trou.pe/accept/" + code;
+  var acceptLink = nconf.get("web:basepath") + "/accept/" + code;
 
   mailerService.sendEmail({
     templateFile: "inviteemail",
