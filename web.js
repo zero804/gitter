@@ -107,13 +107,15 @@ app.configure(function() {
   app.register(".mustache", tmpl);
 
   app.use(express.logger());
+
+  app.use(express.static(__dirname + '/public'));
+
   app.use(express.cookieParser());
   app.use(express.bodyParser());
-  app.use(express.session({ secret: 'keyboard cat', store: sessionStore}));
+  app.use(express.session({ secret: 'keyboard cat', store: sessionStore, cookie: { path: '/', httpOnly: true, maxAge: 14400000, domain: nconf.get("web:cookieDomain") }}));
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(app.router);
-  app.use(express.static(__dirname + '/public'));
 
   app.use(express.errorHandler({ showStack: nconf.get('express:showStack'), dumpExceptions: nconf.get('express:dumpExceptions') }));
 });
