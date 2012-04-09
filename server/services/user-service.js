@@ -1,3 +1,5 @@
+/*jshint globalstrict:true, trailing:false */
+/*global console:false, require: true, module: true */
 "use strict";
 
 var persistence = require("./persistence-service"),
@@ -25,7 +27,7 @@ module.exports = {
       if(user) return callback(err, user);
       
       /* User does not exist */
-      var user = new persistence.User(options);
+      user = new persistence.User(options);
       user.displayName = displayName;
       user.email = email;
       user.save(function (err) {

@@ -1,3 +1,5 @@
+/*jshint globalstrict:true, trailing:false */
+/*global console:false, require: true, module: true, process: false */
 "use strict";
 
 var passport = require('passport'),
@@ -7,7 +9,7 @@ var passport = require('passport'),
     chatService = require("./services/chat-service"),
     troupeService = require("./services/troupe-service"),
     appEvents = require("./app-events"),
-    nconf = require('nconf'),
+    nconf = require('./utils/config').configure(),
     everyone,
     redisClient;
 

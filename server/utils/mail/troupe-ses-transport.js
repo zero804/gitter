@@ -1,9 +1,11 @@
+/*jshint globalstrict:true, trailing:false */
 /*
  * This file is based on the original SES module for Nodemailer by dfellis
  * https://github.com/andris9/Nodemailer/blob/11fb3ef560b87e1c25e8bc15c2179df5647ea6f5/lib/engines/SES.js
  */
-
+/*global require: true, module: true */
 "use strict";
+
 
 // NB! Amazon SES does not allow unicode filenames on attachments!
 
@@ -11,7 +13,7 @@ var http = require('http'),
     https = require('https'),
     crypto = require('crypto'),
     urllib = require("url"),
-    console = require("console")
+    console = require("console");
 
 
 // Expose to the world

@@ -1,8 +1,12 @@
+/*jshint globalstrict:true, trailing:false */
+/*global console:false, require: true, module: true, process: false */
+"use strict";
+
 /**
  * Module dependencies.
  */
-var passport = require('passport')
-  , util = require('util');
+var passport = require('passport'), 
+    util = require('util');
 
 
 function Strategy(options, verify) {

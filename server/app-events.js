@@ -1,3 +1,5 @@
+/*jshint globalstrict:true, trailing:false */
+/*global console:false, require: true, module: true, process: false */
 "use strict";
 
 /* TODO: distribute this */

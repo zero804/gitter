@@ -1,3 +1,7 @@
+/*jshint globalstrict:true, trailing:false */
+/*global console:false, require: true, module: true */
+"use strict";
+
 var chatService = require("../services/chat-service"),
     c = require("../utils/collections"),
     userService = require("../services/user-service");
