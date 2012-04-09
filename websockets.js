@@ -10,18 +10,28 @@ var nconf = require("nconf");
 config.configure();
 
 var options = {
-  key: fs.readFileSync('/etc/nginx/server.key'),
-  cert: fs.readFileSync('/etc/nginx/server.crt')
+  key: fs.readFileSync(nconf.get("web:privateKeyFile")),
+  cert: fs.readFileSync(nconf.get("web:certificateFile"))
 };
 
 var app = express.createServer(options);
 
+var RedisStore = require('connect-redis')(express);
+var sessionStore = new RedisStore();
+
+app.configure(function() {
+  app.use(express.logger());
+
+  app.use(express.cookieParser());
+  app.use(express.bodyParser());
+  app.use(express.session({ secret: 'keyboard cat', store: sessionStore, cookie: { path: '/', httpOnly: true, maxAge: 14400000, domain: nconf.get("web:cookieDomain") }}));
+
+  app.use(express.errorHandler({ showStack: nconf.get('express:showStack'), dumpExceptions: nconf.get('express:dumpExceptions') }));
+});
+
 app.get('/', function(req, res) {
   res.send('Nothing to see here. You must be lost.');
 });
-
-var RedisStore = require('connect-redis')(express);
-var sessionStore = new RedisStore();
 
 require('./server/now').install(app, sessionStore);
 
@@ -37,6 +47,6 @@ process.nextTick(function() {
   var gid = nconf.get("runtime:gid");
 
   console.log("Switching to UID/GID: " + uid+ ":" + gid);
-  process.setgid(gid);
-  process.setuid(uid);
+  if(gid) process.setgid(gid);
+  if(uid) process.setuid(uid);
 });
