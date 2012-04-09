@@ -7,6 +7,7 @@ var passport = require('passport'),
     chatService = require("./services/chat-service"),
     troupeService = require("./services/troupe-service"),
     appEvents = require("./app-events"),
+    nconf = require('nconf'),
     everyone,
     redisClient;
 
@@ -29,8 +30,8 @@ function loadSessionWithUser(user, sessionStore, callback) {
 module.exports = {
     install: function(app, sessionStore) {
       everyone = nowjs.initialize(app, {
-         "host" : "ws.trou.pe",
-         "port" : 443
+         "host" : nconf.get("ws:hostname"),
+         "port" : nconf.get("ws:port")
       });
 
       /* TODO: shutdown client at end of session */
