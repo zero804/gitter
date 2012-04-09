@@ -34,7 +34,7 @@ app.listen(port, bindIp);
 
 process.nextTick(function() {
   var uid = nconf.get("runtime:uid");
-  var gid = nconf("runtime:gid");
+  var gid = nconf.get("runtime:gid");
 
   console.log("Switching to UID/GID: " + uid+ ":" + gid);
   process.setgid(gid);
