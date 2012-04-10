@@ -2,22 +2,29 @@
 /*global console:false, require: true, module: true, process: false */
 "use strict";
 
-/* TODO: distribute this */
+var Hook = require('hook.io').Hook;
+var winston = require('winston');
 
-var EventEmitter2 = require('eventemitter2').EventEmitter2;
-
-var server = new EventEmitter2({
-  wildcard: true, // should the event emitter use wildcards.
-  delimiter: '::', // the delimiter used to segment namespaces, defaults to `.`.
-  maxListeners: 20 // the max number of listeners that can be assigned to an event, defaults to 10.
+var hook = new Hook({
+  debug:true,
+  "port": 5984,
+  ignoreSTDIN: true,
+  'hook-port': 9999
 });
+hook.start();
+
+//hook.start();
 
 module.exports = {
   troupeChat: function(troupeId, chatMessage) {
-    server.emit('chat', troupeId, chatMessage);
+    hook.emit('chat', { troupeId: troupeId, chatMessage: chatMessage });
   },
-  
+
   onTroupeChat: function(callback) {
-    server.on('chat', callback);
+    winston.info("Subscribing to chat messages");
+    hook.on('chat', function(data) {
+      winston.debug("Incoming chat message");
+      callback(data);
+    });
   }
 };
