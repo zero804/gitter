@@ -93,9 +93,13 @@ module.exports = {
       };
 
       everyone.now.newChatMessageToTroupe = function(options) {
+        winston.info("User sent new message to troupe: " + options.text);
+
         loadSessionWithUser(this.user, sessionStore, function(err, user) {
-          if(err) return;
-          if(!user) return;
+          if(err || !user) {
+            winston.info("Rejecting chat message to troupe: " + JSON.stringify(err) + "," + user);
+            return;
+          }
 
           winston.info("User sent new message to troupe: " + options.text);
 
