@@ -112,8 +112,13 @@ module.exports = {
         });
       };
 
-      appEvents.onTroupeChat(function(troupeId, message) {
+      appEvents.onTroupeChat(function(data) {
+        winston.info("New chat message on bus");
+        var troupeId = data.troupeId;
+        var message = data.message;
+
         var group = nowjs.getGroup("troup." + troupeId);
+        console.dir(group);
         group.now.onTroupeChatMessage(message);
       });
 
