@@ -6,6 +6,9 @@ var http = require('http');
 var fs = require('fs');
 var https = require('https');
 var nconf = require('./server/utils/config').configure();
+var passport = require('passport');
+var winston = require('winston');
+var userService = require('./server/services/user-service');
 
 var options = {
   key: fs.readFileSync(nconf.get("web:privateKeyFile")),
@@ -26,6 +29,20 @@ app.configure(function() {
 
   app.use(express.errorHandler({ showStack: nconf.get('express:showStack'), dumpExceptions: nconf.get('express:dumpExceptions') }));
 });
+
+
+passport.deserializeUser(function(id, done) {
+  winston.info("Deserializing " + id);
+  userService.findById(id, function(err, user) {
+    if(err) return done(err);
+    if(!user) return done(null, false);
+
+    /* Todo: consider using a seperate object for the security user */
+    return done(null, user);
+  });
+
+});
+
 
 app.get('/', function(req, res) {
   res.send('Nothing to see here. You must be lost.');

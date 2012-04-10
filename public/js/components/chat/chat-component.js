@@ -16,7 +16,7 @@ define([
         $(document).trigger('chat', message);
       };
       
-      now.ready(function(){
+      now.ready(function() {
         connected = true;
         if(subscribeOnConnect) {
           module.subscribeTroupeChatMessages();
