@@ -3,7 +3,7 @@
 "use strict";
 
 var passport = require("passport");
-var nconf = require('./server/utils/config').configure();
+var nconf = require('../utils/config').configure();
 
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
