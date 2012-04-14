@@ -16,6 +16,7 @@ function storeEmail(options, callback) {
   var preview = options.preview;
   var plainText = options.plainText;
   var richText = options.richText;
+  var attachments = options.attachments;
   
   var storeMail = new persistence.Email();
       
@@ -27,25 +28,11 @@ function storeEmail(options, callback) {
   storeMail.mail = mailBody;
   storeMail.preview = preview;
   storeMail.delivered = false;
+  storeMail.attachments = attachments;
   
   storeMail.save(function(err) {
       if (err) return callback(err);
-
-      var storeQueueMail = new persistence.QueueMail();
-      storeQueueMail.from = fromEmail;
-      storeQueueMail.troupeId = troupeId;
-      storeQueueMail.subject = subject;
-      storeQueueMail.date = date;
-      storeQueueMail.fromName = fromName;
-      storeQueueMail.plainText = plainText;
-      storeQueueMail.richText = richText;
-      storeQueueMail.delivered = false;
-
-      storeQueueMail.save(function(err) {
-        if (err) return callback(err);
-      });
-
-      callback(null);
+      callback(null, storeMail);
   });
 }
 

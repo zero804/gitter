@@ -3,13 +3,13 @@ var mailService = require("./../../server/services/mail-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
 var nodemailer = require("nodemailer");
 var TroupeSESTransport = require("./../../server/utils/mail/troupe-ses-transport"),
-    RawMailComposer = require("./../../server/utils/mail/raw-mail-composer");
+    RawMailComposer = require("./../../server/utils/mail/raw-mail-composer"),
+    nconf = require("./../../server/utils/config").configure();
 
 // Create an Amazon SES transport object
 var sesTransport = new TroupeSESTransport({
-  AWSAccessKeyID: "AKIAJU4GW2JINRMDW66Q",
-  AWSSecretKey: "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",
-  ServiceUrl: "https://email.us-east-1.amazonaws.com" // optional
+  AWSAccessKeyID: nconf.get("amazon:accessKey"),
+  AWSSecretKey: nconf.get("amazon:secretKey")
 });
 
 function continueResponse(next) {
