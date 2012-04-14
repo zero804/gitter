@@ -68,7 +68,6 @@ define([
 
     onClickGenerator: function(url) {
       var self = this;
-      alert(url);
       return function() {
         window.open(url);
       };
