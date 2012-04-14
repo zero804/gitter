@@ -24,11 +24,10 @@
             <h3>Upload a picture</h3>
         </div>
         <div class="modal-body">
-
-            <input type="file">
+            <div id="file-uploader"></div>
         </div>
         <div class="modal-footer">
-            <a href="#" class="btn btn-primary">Save picture</a> <a href="#" class="btn" data-dismiss="modal">Close</a>
+            <a href="#" class="btn btn-primary button-save-picture">Save picture</a> <a href="#" class="btn" data-dismiss="modal">Close</a>
         </div>
     </div>
     <!--image modal-->
@@ -55,8 +54,8 @@
                                     <a href="#imageModal" data-toggle="modal" rel="tooltip" title="Click here to set your picture" class="dp-tooltip"><img src="images/tmp/dp_spacer.png" class="dp" alt=""></a>
                                 </div>
                                 <div class="span10">
-                                    <input type="text" id="displayName" name="displayName" value="{{displayName}}" placeholder="Click here and type your name"> 
-                                    
+                                    <input type="text" id="displayName" name="displayName" value="{{displayName}}" placeholder="Click here and type your name">
+
                                     <input type="password" id="password" name="password" value="{{password}}" placeholder="Then choose a password">
                                 </div>
                             </div>

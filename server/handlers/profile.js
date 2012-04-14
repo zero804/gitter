@@ -78,5 +78,14 @@ module.exports = {
           }
         );
 
+        app.post(
+          '/profile/image',
+          middleware.ensureLoggedIn,
+          function(req, res, next) {
+            console.dir(req.body);
+            res.send({ success: true });
+            return;
+          }
+        );
     }
 };
