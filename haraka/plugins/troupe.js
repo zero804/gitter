@@ -7,8 +7,14 @@ var MailParser = require("mailparser").MailParser;
 var temp = require('temp');
 var fs   = require('fs');
 var console = require("console");
+var Q = require("q");
 
-function saveFile(troupeId, creatorUserId, fileName, mimeType, content) {
+function continueResponse(next) {
+  return next (DENY, "Debug mode bounce.");
+  //return next(OK);
+};
+
+function saveFile(troupeId, creatorUserId, fileName, mimeType, content, callback) {
   temp.open('attachment', function(err, tempFileInfo) {
     var tempFileName = tempFileInfo.path;
 
@@ -21,14 +27,13 @@ function saveFile(troupeId, creatorUserId, fileName, mimeType, content) {
         fileName: fileName,
         mimeType: mimeType,
         file: tempFileName
-      }, function(err, savedFile){
-        if (err) return; // for now we're not going to fail if the attachment didn't fail
-        //connection.logdebug("File: " + JSON.stringify(savedFile));
-        //savedAttachments.push(savedFile.id);  <--- WHAT IS THAT SUPPOSED TO DO???????????
-        //connection.logdebug("Saved a file.");
+      }, function(err, savedFile) {
+        if (err) return callback(err); // for now we're not going to fail if the attachment didn't fail
 
         // Delete the temporary file */
         fs.unlink(tempFileInfo.path);
+
+        callback(null, savedFile);
       });
     });
     ws.write(content);
@@ -85,7 +90,6 @@ exports.hook_queue = function(next, connection) {
     if (err) return next(DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.");
     if (!troupe) return next (DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.");
 
-    var savedAttachments = [];
 
     var mailparser = new MailParser({
     });
@@ -112,22 +116,48 @@ exports.hook_queue = function(next, connection) {
         storedMailBody = mail_object.text;
       }
 
+      var allAttachmentSaves = [];
+
       if (mail_object.attachments) {
         for(var i = 0; i < mail_object.attachments.length; i++) {
+          var deferred = Q.defer();
+
           var attachment = mail_object.attachments[i];
           connection.logdebug("Working with file: " + attachment.fileName);
           connection.logdebug("Working with generated file: " + attachment.generatedFileName);
-          saveFile(troupe.id, user.id, attachment.generatedFileName,attachment.contentType,attachment.content);
+          saveFile(troupe.id, user.id, attachment.generatedFileName,attachment.contentType,attachment.content, deferred.node());
+
+          allAttachmentSaves.push(deferred.promise);
         }
       }
 
-      //connection.logdebug("TroupeID: "+ troupe.id);
-      mailService.storeEmail({ fromEmail: fromEmail, troupeId: troupe.id, subject: subject, date: date, fromName: fromName, preview: preview, mailBody: storedMailBody, plainText: mail_object.text, richText: mail_object.html}, function(err) {
-        if (err) return next(DENY, "Failed to store the email");
-        connection.logdebug("Stored the email.");
+      Q.all(allAttachmentSaves).then(function(savedAttachments) {
+        var savedAttachmentIds = savedAttachments.map(function(item) { return item.id; });
+        console.dir(savedAttachmentIds);
 
-        //return next(OK);
-        return next ();
+        mailService.storeEmail({ 
+          fromEmail: fromEmail, 
+          troupeId: troupe.id, 
+          subject: subject, 
+          date: date, 
+          fromName: fromName, 
+          preview: preview, 
+          mailBody: storedMailBody, 
+          plainText: mail_object.text, 
+          richText: mail_object.html,
+          attachments: savedAttachmentIds }, function(err, mail) {
+            console.dir(["Saved Mail", arguments]);
+
+            if (err) return next(DENY, "Failed to store the email");
+            connection.logdebug("Stored the email.");
+
+            return continueResponse(next);
+          });
+
+
+      }).fail(function(err) {
+        connection.logdebug("An error occurred: " + err);
+        return next (DENY, "Unable to persist email");
       });
 
     });
