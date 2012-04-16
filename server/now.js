@@ -23,6 +23,7 @@ function loadSession(user, sessionStore, callback) {
 function loadSessionWithUser(user, sessionStore, callback) {
   loadSession(user, sessionStore, function(err, session) {
     if(err) return callback(err);
+    if(!session) return callback("No session for user");
     if(!session.passport.user) return callback(null, null);
 
     passport.deserializeUser(session.passport.user, callback);
@@ -33,7 +34,7 @@ module.exports = {
     install: function(app, sessionStore) {
       everyone = nowjs.initialize(app, {
          "host" : nconf.get("ws:hostname"),
-         "port" : nconf.get("ws:port")
+         "port" : nconf.get("ws:externalPort")
       });
 
       /* TODO: shutdown client at end of session */
