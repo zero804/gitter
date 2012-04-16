@@ -10,6 +10,24 @@ define([
     events: {
       "click .share":          "shareClicked"
     },
+
+    initialize: function(options) {
+      if(options && options.params) {
+        this.initialTab = options.params.tab;
+      }
+
+      var self = this;
+      $.ajax({
+        url: "/troupes/" + window.troupeContext.troupe.id + "/users",
+        contentType: "application/json",
+        dataType: "json",
+        type: "GET",
+        success: function(data) {
+          var members = data.length;
+          if (members==1) window.troupeApp.showShareDialog();
+        }
+      });
+    },
     
     render: function() {
       var compiledTemplate = Mustache.render(template, { });
