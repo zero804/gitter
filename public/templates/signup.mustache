@@ -19,6 +19,7 @@
       }
     </style>
     <link href="bootstrap/css/responsive.css" rel="stylesheet">
+    <script data-main="js/signup.js" src="js/libs/require/require.js"></script>
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -51,17 +52,16 @@
           <div class="row"><form name="signupForm" id="signupForm" method="post" action="/signup">
             <div class="span4">
               <H2>Name your Troupe</H2>
-              <input type="text" name="troupeName" placeholder="Pick anything, it's not unique">
+              <input type="text" class="validateable" rel="tooltip" title="Please choose a name for your Troupe." name="troupeName" placeholder="Pick anything, it's not unique">
                           
             </div>
             <div class="span4">
               <H2>Enter your email address</H2>
-              <input name="email" type="text" class="span4" placeholder="We'll send you an email to confirm this">
+              <input name="email" type="text" class="span4 validateable" rel="tooltip" title="Please type your email address here." placeholder="We'll send you an email to confirm this">
             </div>
-           </form>
            </div>
-                 
-              <p><br><a href="#" onClick="document.getElementById('signupForm').submit(); return false;" class="btn btn-primary btn-large">Get Started &raquo;</a></p>
+              <br>
+              <p><br><input type="submit" class="btn btn-primary btn-large" value="Get Started &raquo;"></p></form>
         </div>
        </div>
        
