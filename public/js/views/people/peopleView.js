@@ -94,8 +94,8 @@ define([
           person2Name: p2 ? p2.displayName : null,
           person2: p2,
           more: users.length > 0,
-          person1AvatarUrl: p1.avatarUrlSmall,
-          person2AvatarUrl: p2 ? p2.avatarUrlSmall : null,
+          person1AvatarUrl: p1.avatarUrl,
+          person2AvatarUrl: p2 ? p2.avatarUrl : null,
           person1Remove: p1.id != window.troupeContext.user.id,
           person2Remove: p2 && p2.id != window.troupeContext.user.id
         });

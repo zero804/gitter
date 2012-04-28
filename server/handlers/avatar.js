@@ -26,7 +26,6 @@ function displayAvatarFor(user, res) {
 
     var gs = new GridStore(db, avatarFile, "r");
     gs.open(function(err, gs) {
-      console.dir(arguments);
       if(err) {
         redirectToGravatar(user, res);
         return;

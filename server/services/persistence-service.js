@@ -23,9 +23,16 @@ UserSchema.methods.narrow = function() {
   return {
     id: this.id,
     displayName: this.displayName,
-    avatarUrlSmall: this.avatarUrlSmall,
-    avatarUrlMedium: this.avatarUrlMedium
+    avatarUrl: this.getAvatarUrl()
   };
+};
+
+UserSchema.methods.getAvatarUrl = function() {
+  if(this.avatarUrlSmall) {
+    return this.avatarUrlSmall;
+  }
+
+  return "/avatar/" + this.id;
 };
 
 var TroupeSchema = new Schema({
