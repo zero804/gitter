@@ -1,8 +1,11 @@
 require.config({
   paths: {
-    jquery: 'libs/jquery/jquery-min',
+    //jquery: 'libs/jquery/jquery-min',
+    jquery: '//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min',
+    //jqueryui: 'libs/jquery-ui-1.8.18/jquery-ui-1.8.18.custom.min',
+    jqueryui: '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min',
+
     jquery_validate : 'libs/jquery.validate-1.9/jquery.validate.min',
-    jqueryui: 'libs/jquery-ui-1.8.18/jquery-ui-1.8.18.custom.min',
     jquery_timeago: 'libs/jquery.timeago-0.11.1/jquery.timeago',
     bootstrap: '../bootstrap/js/bootstrap',
     underscore: 'libs/underscore/underscore-1.3.1-min',

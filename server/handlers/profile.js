@@ -24,7 +24,8 @@ module.exports = {
 
           res.render('profile', {
             flash: req.flash,
-            displayName: req.user.displayName
+            displayName: req.user.displayName,
+            noPassword: !req.user.passwordHash
           });
       });
 
@@ -78,14 +79,5 @@ module.exports = {
           }
         );
 
-        app.post(
-          '/profile/image',
-          middleware.ensureLoggedIn,
-          function(req, res, next) {
-            console.dir(req.body);
-            res.send({ success: true });
-            return;
-          }
-        );
     }
 };

@@ -129,6 +129,7 @@ require('./server/handlers/signup').install(app);
 require('./server/handlers/profile').install(app);
 require('./server/handlers/login').install(app);
 require('./server/handlers/invite').install(app);
+require('./server/handlers/avatar').install(app);
 
 /* REST resources: not used yet */
 var troupesResource = app.resource('troupes',  require('./server/resources/troupes.js'));

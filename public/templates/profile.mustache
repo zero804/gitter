@@ -15,23 +15,6 @@
 <script data-main="js/profile.js" src="js/libs/require/require.js" type="text/javascript"></script>
 </head>
 <body>
-
-    <!-- #Image Modal -->
-
-    <div class="modal hide fade" id="imageModal">
-        <div class="modal-header">
-            <a class="close" data-dismiss="modal">×</a>
-            <h3>Upload a picture</h3>
-        </div>
-        <div class="modal-body">
-            <div id="file-uploader"></div>
-        </div>
-        <div class="modal-footer">
-            <a href="#" class="btn btn-primary button-save-picture">Save picture</a> <a href="#" class="btn" data-dismiss="modal">Close</a>
-        </div>
-    </div>
-    <!--image modal-->
-
     <div class="container" id="page">
 
         <div class="row">
@@ -51,12 +34,14 @@
                         <div class="box white">
                             <div class="row-fluid">
                                 <div class="span 2">
-                                    <a href="#imageModal" data-toggle="modal" rel="tooltip" title="Click here to set your picture" class="dp-tooltip"><img src="images/tmp/dp_spacer.png" class="dp" alt=""></a>
+                                    <a href="#imageModal" data-toggle="modal" rel="tooltip" title="Click here to set your picture" class="dp-tooltip"><img src="/avatar" class="dp image-avatar" height="48" width="48" alt=""></a>
                                 </div>
                                 <div class="span10">
                                     <input type="text" id="displayName" name="displayName" value="{{displayName}}" placeholder="Click here and type your name">
-
+                                    {{#noPassword}}
                                     <input type="password" id="password" name="password" value="{{password}}" placeholder="Then choose a password">
+                                    {{/noPassword}}
+
                                 </div>
                             </div>
                         </div>
@@ -79,10 +64,23 @@
         </footer>
 
 
+        <div class="modal hide fade" id="imageModal">
+            <div class="modal-header">
+                <a class="close" data-dismiss="modal">×</a>
+                <h3>Upload a picture</h3>
+            </div>
+            <div class="modal-body">
+                <form target="uploadFrame" method="post" enctype="multipart/form-data" action="/avatar">
+                    <input type="file" name="files">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-primary button-save-picture">Save picture</a> <a href="#" class="btn" data-dismiss="modal">Close</a>
+            </div>
+        </div>
+        <iframe src="" name="uploadFrame" id="uploadFrame" style="display:none"></iframe>
 
     </div>
-    <!-- /container -->
-
 
 </body>
 </html>
