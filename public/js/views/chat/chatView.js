@@ -82,7 +82,7 @@ define([
           text: msg.text,
           sent: msg.sent,
           fromUserDisplayName: msg.fromUser.displayName,
-          fromUserAvatarUrlSmall: msg.fromUser.avatarUrlSmall
+          fromUserAvatarUrlSmall: "/avatar/" + msg.fromUser.id
         };
     },
     
