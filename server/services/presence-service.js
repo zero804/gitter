@@ -161,6 +161,10 @@ function removeActiveSocket(socketId, callback) {
   redisClient.srem("presence:activesockets", socketId, callback);
 }
 
+function listOnlineUsersForTroupe(troupeId, callback) {
+  if(!callback) callback = defaultRedisCallback;
+  redisClient.lrange("troupe_users:" + troupeId, 0, -1, callback);
+}
 
 resetClientState();
 
@@ -230,6 +234,10 @@ module.exports = {
     removeActiveSocket(socketId);
     /* Manage user in troupe presence */
     // Find out what troupe (if any) this socket is associated with
+  },
+
+  findOnlineUsersForTroupe: function(troupeId, callback) {
+    listOnlineUsersForTroupe(troupeId, callback);
   }
 
 

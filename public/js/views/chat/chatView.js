@@ -7,42 +7,99 @@ define([
   'text!templates/chat/chat.mustache',
   'text!templates/chat/chat-row.mustache',
   'text!templates/chat/chat-row-current.mustache',
+  'text!templates/chat/user-avatar.mustache',
   'components/chat/chat-component',
   'jquery_timeago'
-], function($, _, Backbone, Mustache, template, rowTemplate, rowCurrentTemplate, chat, _timeago) {
+], function($, _, Backbone, Mustache, template, rowTemplate, rowCurrentTemplate, userAvatarTemplate, chat, _timeago) {
   var PAGE_SIZE = 50;
-  
+
   var ChatView = Backbone.View.extend({
     chatMessageSkip: 0,
     chatMessageLimit: PAGE_SIZE,
-    
+
     initialize: function() {
       this.scrollEventBound = _.bind(this.chatWindowScroll, this);
+      _.bindAll(this, "userLoggedIntoTroupe", "userLoggedOutOfTroupe");
+
       $(document).bind('chat', this, this.onMessage);
       $(window).bind('scroll', this, this.scrollEventBound);
-      
       chat.subscribeTroupeChatMessages();
+
+      $(document).bind('userLoggedIntoTroupe', this.userLoggedIntoTroupe);
+      $(document).bind('userLoggedOutOfTroupe', this.userLoggedOutOfTroupe);
+
+      this.refreshUsers();
     },
-    
+
     events: {
       "keydown .chatbox":          "detectReturn"
     },
-    
+
     beforeClose: function() {
       chat.unsubscribeTroupeChatMessages();
       $(document).unbind('chat', this.onMessage);
       $(window).unbind('scroll', this.scrollEventBound);
+      $(document).unbind('userLoggedIntoTroupe', this.userLoggedIntoTroupe);
+      $(document).unbind('userLoggedOutOfTroupe', this.userLoggedOutOfTroupe);
+
     },
-    
+
+    userLoggedIntoTroupe: function(event, data) {
+      console.dir(data);
+      var img = $('.panel-online-status .avatar-' + data.userId + " img");
+      img.removeClass('offline', 500);
+    },
+
+
+    userLoggedOutOfTroupe: function(event, data) {
+      var img = $('.panel-online-status .avatar-' + data.userId + " img");
+      img.addClass('offline', 500);
+    },
+
     chatWindowScroll: function() {
       if($(window).scrollTop() == $(document).height() - $(window).height()) {
         this.loadNextMessages();
       }
     },
-    
+
+    refreshUsers: function() {
+      var self = this;
+      $.ajax({
+        url: "/troupes/" + window.troupeContext.troupe.id + "/users",
+        contentType: "application/json",
+        dataType: "json",
+        type: "GET",
+        success: function(data) {
+          self.renderUsers(data);
+        }
+      });
+
+    },
+
+    renderUsers: function(data) {
+      var panel = $('.panel-online-status');
+      panel.empty();
+      // Sort by online=true, name
+      data.sort(function(a, b) { return - ((a.online ? 1 : 0) - (b.online ? 1 : 0)) });
+
+      for(var i = 0; i < data.length; i++) {
+        var d = data[i];
+        /* Skip current user */
+        if(d.id == window.troupeContext.user.id) continue;
+        var avatar = Mustache.render(userAvatarTemplate,  {
+          id: d.id,
+          displayName: d.displayName,
+          additionalClasses: d.online ? "" : "offline"
+        } );
+        panel.append(avatar);
+      }
+      $('.dp-tooltip', panel).tooltip();
+    },
+
+
     onMessage: function(event, msg) {
       var self = event.data;
-      
+
 
       var compiledTemplate = self.renderMessage(msg);
 
@@ -54,7 +111,7 @@ define([
       item.show('slide', {}, 'fast');
 
     },
-    
+
     attachTooltipHandlers: function(item) {
       $('.chat-bubble', item).each(this.attachTooltipHandlerToItem);
       $('.dp-tooltip', item).tooltip();
@@ -85,32 +142,32 @@ define([
           fromUserAvatarUrlSmall: "/avatar/" + msg.fromUser.id
         };
     },
-    
+
     detectReturn: function(e) {
       if(e.keyCode == 13) {
         return this.send();
       }
     },
-    
+
     send: function() {
       var chatBox = $(".chatbox");
       chat.send(chatBox.val());
       chatBox.val('');
       return false;
     },
-    
+
     render: function() {
       var compiledTemplate = Mustache.render(template, { });
       $(this.el).html(compiledTemplate);
 
       this.attachTooltipHandlers(this.el);
 
-      
+
       this.loadNextMessages();
-      
+
       return this;
     },
-    
+
     loadNextMessages: function() {
       var self = this;
       $.ajax({
@@ -144,7 +201,7 @@ define([
         }
       });
     }
-    
+
   });
 
   return ChatView;
