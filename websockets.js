@@ -61,7 +61,9 @@ process.nextTick(function() {
   var uid = nconf.get("runtime:uid");
   var gid = nconf.get("runtime:gid");
 
-  console.log("Switching to UID/GID: " + uid+ ":" + gid);
-  if(gid) process.setgid(gid);
-  if(uid) process.setuid(uid);
+  if(uid || gid) {
+    console.log("Switching to UID/GID: " + uid+ ":" + gid);
+    if(gid) process.setgid(gid);
+    if(uid) process.setuid(uid);
+  }
 });

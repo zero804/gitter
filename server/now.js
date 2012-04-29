@@ -8,6 +8,7 @@ var passport = require('passport'),
     winston = require('winston'),
     chatService = require("./services/chat-service"),
     troupeService = require("./services/troupe-service"),
+    presenceService = require("./services/presence-service"),
     appEvents = require("./app-events"),
     nconf = require('./utils/config').configure(),
     everyone,
@@ -30,6 +31,22 @@ function loadSessionWithUser(user, sessionStore, callback) {
   });
 }
 
+function loadUserAndTroupe(nowJsUser, troupeId, sessionStore, callback) {
+  loadSessionWithUser(nowJsUser, sessionStore, function(err, user) {
+    if(err) return callback(err);
+    if(!user) return callback("User not found");
+
+    troupeService.findById(troupeId, function(err, troupe) {
+      if(err) return callback(err);
+      if(!troupe) return callback("Troupe not found");
+
+      if(!troupeService.userHasAccessToTroupe(user, troupe)) return callback("Access denied");
+
+      callback(err, user, troupe);
+    });
+  });
+}
+
 module.exports = {
     install: function(app, sessionStore) {
       everyone = nowjs.initialize(app, {
@@ -37,18 +54,13 @@ module.exports = {
          "port" : nconf.get("ws:externalPort")
       });
 
-      /* TODO: shutdown client at end of session */
-      redisClient = redis.createClient();
-
       nowjs.on('connect', function() {
         var self = this;
         loadSessionWithUser(this.user, sessionStore, function(err, user) {
           if(err) return;
           if(!user) return;
 
-          winston.info("User connected to now");
-
-          redisClient.rpush("socket." + user.id, self.user.clientId, redisClient.print);
+          presenceService.userSocketConnected(user.id, self.user.clientId);
         });
       });
 
@@ -59,37 +71,41 @@ module.exports = {
           if(err) return;
           if(!user) return;
 
-          winston.info("User disconnected from now");
-
-          redisClient.lrem("socket." + user.id, 0, self.user.clientId, redisClient.print);
+          presenceService.userSocketDisconnected(user.id, self.user.clientId);
         });
       });
+
+      everyone.now.subscribeToTroupe = function(troupeId) {
+        var self = this;
+
+        loadUserAndTroupe(this.user, troupeId, sessionStore, function(err, user, troupe) {
+          winston.info("User subscribed to group chat");
+
+          presenceService.userSubscribedToTroupe(user.id, troupe.id, self.user.clientId);
+
+          var group = nowjs.getGroup("troup." + troupe.id);
+          group.addUser(self.user.clientId);
+        });
+      };
+
+      /* TODO: add unsubscribe from troupe ? (not needed yet: simply reloading the page should close the socket) */
 
       everyone.now.subscribeToTroupeChat = function(troupeId) {
         var self = this;
 
-        loadSessionWithUser(this.user, sessionStore, function(err, user) {
+        loadUserAndTroupe(this.user, troupeId, sessionStore, function(err, user, troupe) {
           if(err) return;
-          if(!user) return;
+          winston.info("User subscribed to group chat");
 
-          troupeService.findById(troupeId, function(err, troupe) {
-            if(err) return;
-            if(!troupe) return;
-
-            if(!troupeService.userHasAccessToTroupe(user, troupe)) return;
-
-            winston.info("User subscribed to group chat");
-
-            var group = nowjs.getGroup("troup." + troupe.id);
-            group.addUser(self.user.clientId);
-          });
+          var group = nowjs.getGroup("troup." + troupe.id + ".chat");
+          group.addUser(self.user.clientId);
         });
       };
 
       everyone.now.unsubscribeToTroupeChat = function(troupeId) {
         winston.info("User unsubscribed from group chat");
 
-        var group = nowjs.getGroup("troup." + troupeId);
+        var group = nowjs.getGroup("troup." + troupeId + ".chat");
         group.removeUser(this.user.clientId);
       };
 
@@ -121,7 +137,7 @@ module.exports = {
         winston.info("New chat message on bus");
         var troupeId = data.troupeId;
 
-        var group = nowjs.getGroup("troup." + troupeId);
+        var group = nowjs.getGroup("troup." + troupeId + ".chat");
         group.now.onTroupeChatMessage(data.chatMessage);
       });
 
