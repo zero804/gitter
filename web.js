@@ -110,7 +110,9 @@ app.configure(function() {
   app.set('view options', { layout: false } );
   app.register(".mustache", tmpl);
 
-  app.use(express.logger());
+  if(nconf.get("express:logging")) {
+    app.use(express.logger());
+  }
 
   app.use(express.static(__dirname + '/public'));
 
