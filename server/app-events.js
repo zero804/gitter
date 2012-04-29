@@ -16,15 +16,27 @@ hook.start();
 //hook.start();
 
 module.exports = {
+  userLoggedIntoTroupe: function(userId, troupeId) {
+    hook.emit('userLoggedIntoTroupe', { troupeId: troupeId, userId: userId });
+  },
+
+  onUserLoggedIntoTroupe: function(callback) {
+    hook.on('userLoggedIntoTroupe', callback);
+  },
+
+  userLoggedOutOfTroupe: function(userId, troupeId) {
+    hook.emit('userLoggedOutOfTroupe', { troupeId: troupeId, userId: userId });
+  },
+
+  onUserLoggedOutOfTroupe: function(callback) {
+    hook.on('userLoggedOutOfTroupe', callback);
+  },
+
   troupeChat: function(troupeId, chatMessage) {
     hook.emit('chat', { troupeId: troupeId, chatMessage: chatMessage });
   },
 
   onTroupeChat: function(callback) {
-    winston.info("Subscribing to chat messages");
-    hook.on('chat', function(data) {
-      winston.debug("Incoming chat message");
-      callback(data);
-    });
+    hook.on('chat', callback);
   }
 };

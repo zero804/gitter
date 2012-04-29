@@ -13,7 +13,8 @@ require.config({
     text: 'libs/require/text',
     mustache: 'libs/mustache/mustache',
     templates: '../templates',
-    now: '/nowjs/now'
+    now: '/nowjs/now',
+    noty: 'libs/jquery-noty-1.1.1/jquery.noty'
   },
   priority: ['jquery']
 });

@@ -4,6 +4,7 @@
 
 var redis = require("redis"),
     winston = require('winston'),
+    appEvents = require('../app-events.js'),
     redisClient;
 
 function resetClientState() {
@@ -186,6 +187,7 @@ module.exports = {
       if(initialJoin) {
         /* User joining this troupe for the first time.... */
         winston.info("User " + userId + " has just joined " + troupeId);
+        appEvents.userLoggedIntoTroupe(userId, troupeId);
       }
     });
 
@@ -209,6 +211,8 @@ module.exports = {
       removeUserFromTroupe(userId, troupeId, function(err, lastConnectionForUserInTroupe) {
         if(lastConnectionForUserInTroupe) {
           winston.info("User " + userId + " is gone from " + troupeId);
+
+          appEvents.userLoggedOutOfTroupe(userId, troupeId);
 
           getNumberOfUsersInTroupe(troupeId, function(err, count) {
             if(err) return winston.error("Redis error: " + err);
