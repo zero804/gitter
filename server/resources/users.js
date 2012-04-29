@@ -3,14 +3,28 @@
 "use strict";
 
 var troupeService = require("../services/troupe-service"),
-    userService = require("../services/user-service");
+    userService = require("../services/user-service"),
+    presenceService = require("../services/presence-service"),
+    Q = require("q");
 
 module.exports = {
     index: function(req, res, next) {
-      userService.findByIds(req.troupe.users, function(err, users) {
-        if(err) return next(err);
-        
-        res.send(users.narrow());
+      var usersDeferred = Q.defer();
+      var presenceDeferred = Q.defer();
+
+      userService.findByIds(req.troupe.users, usersDeferred.node());
+      presenceService.findOnlineUsersForTroupe(req.troupe.id, presenceDeferred.node());
+
+      Q.all([usersDeferred.promise, presenceDeferred.promise]).spread(function(users, presence) {
+        console.dir(presence);
+        var a = users.narrow();
+        a.forEach(function(item) {
+          item.online = presence.indexOf(item.id) >= 0;
+        });
+
+        res.send(a);
+      }).fail(function(error) {
+        next(err);
       });
     },
 
