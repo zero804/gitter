@@ -11,10 +11,15 @@ define([
 
   var module = {
     connect: function() {
+      function createTrigger(name) {
+        return function(message) {
+          $(document).trigger(name, message);
+        }
+      }
 
-      now.onTroupeChatMessage = function(message) {
-        $(document).trigger('chat', message);
-      };
+      now.onTroupeChatMessage = createTrigger('chat');
+      now.onUserLoggedIntoTroupe = createTrigger('userLoggedIntoTroupe');
+      now.onUserLoggedOutOfTroupe = createTrigger('userLoggedOutOfTroupe');
 
       now.ready(function() {
         connected = true;

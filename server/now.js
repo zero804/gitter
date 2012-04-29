@@ -7,10 +7,12 @@ var passport = require('passport'),
     redis = require("redis"),
     winston = require('winston'),
     chatService = require("./services/chat-service"),
+    userService = require("./services/user-service"),
     troupeService = require("./services/troupe-service"),
     presenceService = require("./services/presence-service"),
     appEvents = require("./app-events"),
     nconf = require('./utils/config').configure(),
+    Q = require("q"),
     everyone,
     redisClient;
 
@@ -79,8 +81,6 @@ module.exports = {
         var self = this;
 
         loadUserAndTroupe(this.user, troupeId, sessionStore, function(err, user, troupe) {
-          winston.info("User subscribed to group chat");
-
           presenceService.userSubscribedToTroupe(user.id, troupe.id, self.user.clientId);
 
           var group = nowjs.getGroup("troup." + troupe.id);
@@ -95,7 +95,6 @@ module.exports = {
 
         loadUserAndTroupe(this.user, troupeId, sessionStore, function(err, user, troupe) {
           if(err) return;
-          winston.info("User subscribed to group chat");
 
           var group = nowjs.getGroup("troup." + troupe.id + ".chat");
           group.addUser(self.user.clientId);
@@ -141,6 +140,43 @@ module.exports = {
         group.now.onTroupeChatMessage(data.chatMessage);
       });
 
+      appEvents.onUserLoggedIntoTroupe(function(data) {
+        var troupeId = data.troupeId;
+        var userId = data.userId;
+
+        var deferredT = Q.defer();
+        var deferredU = Q.defer();
+
+        userService.findById(userId, deferredU.node());
+        troupeService.findById(troupeId, deferredT.node());
+
+        Q.all([deferredT.promise, deferredU.promise]).spread(function(troupe, user) {
+          var group = nowjs.getGroup("troup." + troupeId);
+          group.now.onUserLoggedIntoTroupe({
+            userId: userId,
+            displayName: user.displayName
+          });
+        });
+      });
+
+      appEvents.onUserLoggedOutOfTroupe(function(data) {
+        var troupeId = data.troupeId;
+        var userId = data.userId;
+
+        var deferredT = Q.defer();
+        var deferredU = Q.defer();
+
+        userService.findById(userId, deferredU.node());
+        troupeService.findById(troupeId, deferredT.node());
+
+        Q.all([deferredT.promise, deferredU.promise]).spread(function(troupe, user) {
+          var group = nowjs.getGroup("troup." + troupeId);
+          group.now.onUserLoggedOutOfTroupe({
+            userId: userId,
+            displayName: user.displayName
+          });
+        });
+      });
     }
 
 };

@@ -3,9 +3,10 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'collections/troupes'
-], function($, _, Backbone, TroupeCollection) {
-  
+  'collections/troupes',
+  'noty'
+], function($, _, Backbone, TroupeCollection, notyStub) {
+
   var AppView = Backbone.View.extend({
     el: 'body',
 
@@ -23,8 +24,38 @@ define([
       this.troupeCollection.fetch({
         success: function() { self.addAllTroupes(); }
       });
+
+      $(document).on('userLoggedIntoTroupe', function(event, data) {
+        console.dir(arguments);
+        noty({
+          "text": data.displayName + " has logged into the troupe.",
+          "layout":"bottomRight",
+          "type":"information",
+          "animateOpen":{"height":"toggle"},
+          "animateClose":{"height":"toggle"},
+          "speed":500,
+          "timeout":3000,
+          "closeButton":false,
+          "closeOnSelfClick":true,
+          "closeOnSelfOver":false});
+      });
+
+      $(document).on('userLoggedOutOfTroupe', function(event, data) {
+        noty({
+          "text": data.displayName + " has left the troupe.",
+          "layout":"bottomRight",
+          "type":"information",
+          "animateOpen":{"height":"toggle"},
+          "animateClose":{"height":"toggle"},
+          "speed":500,
+          "timeout":3000,
+          "closeButton":false,
+          "closeOnSelfClick":true,
+          "closeOnSelfOver":false});
+      });
+
     },
-    
+
     events: {
       //"keydown .chatbox":          "detectReturn"
     },
