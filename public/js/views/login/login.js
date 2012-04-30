@@ -35,18 +35,24 @@ define([
     
     signinClicked: function() {
       var self = this;
-      $.post("/login", this.$el.find("form").serialize(), function(data, textStatus, jqXHR) {
-        if(!data.failed) {
-          window.location.reload();
-          return;
-        }
-        
-        var incorrectBox = $('.incorrect-password', self.$el);
-        if(incorrectBox.is(":visible")) {
-          incorrectBox.effect("highlight", {}, "normal");
-        } else {
-          incorrectBox.show('fast');
-        }
+      $.ajax({
+        type: 'POST',
+        url: "/login",
+        data: this.$el.find("form").serialize(),
+        success: function(data, textStatus, jqXHR) {
+          if(!data.failed) {
+            window.location.reload();
+            return;
+          }
+          
+          var incorrectBox = $('.incorrect-password', self.$el);
+          if(incorrectBox.is(":visible")) {
+            incorrectBox.effect("highlight", {}, "normal");
+          } else {
+            incorrectBox.show('fast');
+          }
+        },
+        dataType: 'json'
       });
 
       return false;

@@ -128,6 +128,7 @@ app.configure(function() {
 
 require('./server/now').install(app, sessionStore);
 require('./server/handlers/signup').install(app);
+require('./server/handlers/signout').install(app);
 require('./server/handlers/profile').install(app);
 require('./server/handlers/login').install(app);
 require('./server/handlers/invite').install(app);
