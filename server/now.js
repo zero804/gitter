@@ -73,7 +73,11 @@ module.exports = {
           if(err) return;
           if(!user) return;
 
-          presenceService.userSocketDisconnected(user.id, self.user.clientId);
+          /* Give the user 10 seconds to log back into before reporting that they're disconnected */
+          setTimeout(function(){ 
+            presenceService.userSocketDisconnected(user.id, self.user.clientId);
+          }, 10000);
+
         });
       });
 
