@@ -74,6 +74,7 @@ define([
     },
     
     renderFiles: function(files) {
+      if (files.length === 0) $("#frame-help").show();
       $(".frame-files", this.el).empty();
       while(files.length > 0) {
         var p1 = files.shift();

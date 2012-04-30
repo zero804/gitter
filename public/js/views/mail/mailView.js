@@ -28,7 +28,12 @@ define([
     },
     
     render: function() {
-      var compiledTemplate = Mustache.render(template, { });
+      var self = this;
+      // we probably want to pull in the domain from config, e.g. for beta.trou.pe
+      var emailAddress = window.troupeContext.troupe.uri + '@trou.pe';
+      var compiledTemplate = Mustache.render(template, {
+        emailAddress: emailAddress
+      });
       $(this.el).html(compiledTemplate);
       return this;
     },
@@ -42,7 +47,10 @@ define([
     },
     
     renderMails: function(mails) {
+
+      if (mails.length === 0) $("#frame-help").show();
       $(".frame-mails", this.el).empty();
+
       while(mails.length > 0) {
         var p1 = mails.shift();
 
