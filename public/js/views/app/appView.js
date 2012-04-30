@@ -26,7 +26,10 @@ define([
       });
 
       $(document).on('userLoggedIntoTroupe', function(event, data) {
-        console.dir(arguments);
+        if(data.userId == window.troupeContext.user.id) {
+          return;
+        }
+        
         noty({
           "text": data.displayName + " has logged into the troupe.",
           "layout":"bottomRight",
