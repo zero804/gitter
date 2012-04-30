@@ -23,6 +23,8 @@ require.config({
 require(
     [ 'jquery', 'jquery_validate' ],
     function($, v) {
+      var loginFormVisible = false;
+
       var validationErrors = {};
       function attachTooltipHandlerToItem(index, el) {
         var jel = $(el);
@@ -31,6 +33,32 @@ require(
             return v ? v:"";
           }});
       }
+      $('.button-existing-users-login').popover({
+        placement: 'bottom',
+        trigger: 'manual',
+        title: 'Login',
+        content: function() {
+          return $('#loginFormContent').html();
+        }
+      });
+
+      $('.button-existing-users-login').on('click', function() {
+        if(loginFormVisible) {
+          $('.button-existing-users-login').popover('hide');
+        } else {
+          $('.button-existing-users-login').popover('show');
+
+          $('.popover .button-login-cancel').on('click', function() {
+              $('.button-existing-users-login').popover('hide');
+              loginFormVisible = false;
+              return false;
+          });
+
+        }
+        loginFormVisible = !loginFormVisible;
+      });
+
+
       $('#signupForm .validateable').each(attachTooltipHandlerToItem);
       $("#signupForm").validate({
         debug: true,
