@@ -1,0 +1,115 @@
+// Bootstrap Reset
+@import "bootstrap.less";
+
+// Our colour palette
+@col1: #c8d246; // light green 
+@col2: #556c3c; // dark green
+@col3: #9ea637; // dark green for gradient background
+@col4: #efeeee; // light grey
+@col5: #051313; // nearly black
+@col6: #e0f0e3; // grey with hint of green
+
+// Our fonts
+@font1: 'Pontano Sans', sans-serif;
+
+@bodyPadding:	 20px;
+@bodyFont: 14px;
+
+@baseImages: "../../m/images";
+
+@bgGreen: %("%s/bg_green.png", @baseImages);
+
+body {
+  background-image: url(@bgGreen);
+  background-repeat: repeat-x;
+  background-attachment: fixed;
+  background-color: @col3;
+  padding-top: @bodyPadding;
+  margin-bottom: 50px;
+  font-size:20px;
+}
+
+a {
+  color: @col2;
+}
+
+a:hover {
+  text-decoration: none;
+  color: @col5;
+}
+a:link {
+  text-decoration: none;
+}
+a:visited {
+  text-decoration: none;
+}
+
+.loginForm {
+  background: @col4;
+  padding-left: 40px;
+  padding-right: 40px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin: 0px;
+}
+
+.loginField {
+  width: 230px;
+}
+
+.loginLabel {
+  font-size: 16px;
+}
+
+.navbox {
+  min-height: 20px;
+  padding: 0px;
+  margin-bottom: 0px;
+  width:100%;
+  background-color: @col4;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 0px;
+}
+
+.navtext {
+  vertical-align: middle;
+  font-family: @font1;
+  font-size:14px;
+}
+
+.navitem {
+  border-top:1px solid white;
+  border-bottom: 1px solid #e1dcdc;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.navicon {
+  vertical-align: middle;
+  font-size: 20px;
+  padding: 15px 10px 10px 0px;
+}
+
+.navtext {
+  vertical-align: middle;
+  font-family: @font1;
+  font-size:14px;
+}
+
+.badge {
+  background-color: @col2;
+  min-width: 18px;
+  text-align: middle;
+  color: white;
+    -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+}
+
+/* READD THIS AGAIN LATER @import "../../js/libs/jquery.fileupload/jquery.fileupload.less"; */
+@import "../../js/libs/jquery-noty-1.1.1/jquery.noty.css";
+@import "../../js/libs/jquery-noty-1.1.1/noty_theme_default.css";
+
+
