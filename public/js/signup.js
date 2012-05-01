@@ -37,6 +37,7 @@ require(
         placement: 'bottom',
         trigger: 'manual',
         title: 'Login',
+        width: 300,
         content: function() {
           return $('#loginFormContent').html();
         }
