@@ -75,6 +75,10 @@ exports.hook_queue = function(next, connection) {
     fromEmail = fromName;
   }
 
+  if (toName.indexOf("<") > 0)  {
+    toName = toName.substring(toName.indexOf("<") + 1, toName.indexOf(">"));
+  }
+
 	//connection.logdebug("Body: " + JSON.stringify(connection.transaction.body.bodytext));
     //connection.logdebug("Children: " + JSON.stringify(connection.transaction.body.children.length));
 	//connection.logdebug("Child: " + connection.transaction.body.children[0].bodytext);
@@ -87,6 +91,8 @@ exports.hook_queue = function(next, connection) {
 
 
 	troupeService.validateTroupeEmail({ to: toName, from: fromEmail}, function(err, troupe, user) {
+    connection.logdebug("From: " + fromEmail);
+    connection.logdebug("To:" + toName);
     if (err) return next(DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.");
     if (!troupe) return next (DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.");
 
