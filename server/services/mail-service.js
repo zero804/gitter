@@ -36,9 +36,18 @@ function storeEmail(options, callback) {
   });
 }
 
+function compare(a,b) {
+  if (a.date > b.date)
+     return -1;
+  if (a.date < b.date)
+    return 1;
+  return 0;
+}
+
 function findByTroupe(id, callback) {
   //console.log('Looking for emails in' + id);
   persistence.Email.find({troupeId: id}, function(err, mails) {
+      mails.sort(compare);
       callback(err, mails);
     });
 }
