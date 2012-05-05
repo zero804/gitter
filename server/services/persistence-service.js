@@ -48,7 +48,6 @@ TroupeSchema.methods.narrow = function () {
     name: this.name,
     uri: this.uri
   };
-
 };
 
 var InviteSchema = new Schema({
@@ -65,7 +64,6 @@ InviteSchema.methods.narrow = function () {
     displayName: this.displayName,
     email: this.email
   };
-
 };
 
 var ChatMessageSchema = new Schema({
@@ -109,11 +107,30 @@ EmailSchema.methods.narrow = function () {
 
 };
 
+var FileVersionSchema = new Schema({
+  creatorUserId: ObjectId,
+  createdDate: { type: Date },
+  deleted: { type: Boolean, default: false },
+
+  /* In future, this might change, but for the moment, use a URI-type source */
+  source: { type: String }
+});
+
+FileVersionSchema.methods.narrow = function () {
+  return {
+    creatorUserId: this.creatorUserId,
+    createdDate: this.createdDate,
+    source: this.source,
+    deleted: this.deleted
+  };
+};
+
 var FileSchema = new Schema({
   troupeId: ObjectId,
-  creatorUserId: ObjectId,
+  //creatorUserId: ObjectId,
   fileName: {type: String},
-  mimeType: { type: String}
+  mimeType: { type: String},
+  versions: [FileVersionSchema]
 });
 
 FileSchema.methods.narrow = function () {
@@ -121,11 +138,10 @@ FileSchema.methods.narrow = function () {
     _id: this._id,
     fileName: this.fileName,
     mimeType: this.mimeType,
+    versions: this.versions.narrow(),
     url: '/troupes/' + encodeURIComponent(this.troupeId) + '/downloads/' + encodeURIComponent(this.fileName)
   };
-
 };
-
 
 var User = mongoose.model('User', UserSchema);
 var Troupe = mongoose.model('Troupe', TroupeSchema);
@@ -133,6 +149,8 @@ var Email = mongoose.model('Email', EmailSchema);
 var Invite = mongoose.model('Invite', InviteSchema);
 var ChatMessage = mongoose.model('ChatMessage', ChatMessageSchema);
 var File = mongoose.model('File', FileSchema);
+var FileVersion = mongoose.model('FileVersion', FileVersionSchema);
+
 
 module.exports = {
   User: User,
@@ -140,5 +158,6 @@ module.exports = {
 	Email: Email,
 	Invite: Invite,
 	ChatMessage: ChatMessage,
-  File: File
+  File: File,
+  FileVersion: FileVersion
 };

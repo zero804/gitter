@@ -8,7 +8,7 @@ var troupeService = require('../services/troupe-service'),
 
 module.exports = {
     index: function(req, res, next) {
-      res.send(500);
+      res.relativeRedirect("/troupes" + req.troupe.id + "/files/");
     },
 
     new: function(req, res) {
@@ -16,26 +16,38 @@ module.exports = {
     },
 
     create: function(req, res) {
-      res.send(500);
+      var files = req.files;
+      for(var k in req.files) {
+        if(files.hasOwnProperty(k)) {
+          var file = files[k];
+
+          fileService.storeFile({
+            troupeId: req.troupe.id,
+            creatorUserId: req.user.id,
+            fileName: file.name,
+            mimeType: file.type,
+            file: file.path
+          }, function(err, file) {
+            if(err) return response.send(500);
+
+            res.relativeRedirect("/troupes" + req.troupe.id + "/files/" + file.id);
+          });
+        }
+      }
     },
 
     show: function(req, res) {
       var fileName = '' + req.params.download + (req.params.format ? '.' + req.params.format : '');
 
-      fileService.findByFileName(req.troupe.id, fileName, function(err, file) {
+      fileService.getFileStream(req.troupe.id, fileName, 0, function(err, mimeType, stream) {
         if (err) return res.send(500);
-        if (!file) return res.send(404);
+        if (!stream) return res.send(404);
 
-        var db = mongoose.connection.db;
-        var GridStore = mongoose.mongo.GridStore;
-        var gs = new GridStore(db, file.id, 'r');
-        gs.open(function(err, gs) {
-          var readStream = gs.stream(true);
-          res.contentType(file.mimeType);
-          
-          readStream.pipe(res);
-        });
+        res.contentType(mimeType);
+
+        stream.pipe(res);
       });
+
     },
 
     edit: function(req, res) {
