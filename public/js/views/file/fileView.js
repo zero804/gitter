@@ -78,7 +78,7 @@ define([
     createUploader: function(element) {
       var uploader = new qq.FileUploader({
         element: element,
-        action: 'do-nothing.htm',
+        action: '/troupes/' + window.troupeContext.troupe.id + '/downloads/',
         debug: true
       });       
     },
