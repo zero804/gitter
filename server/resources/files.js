@@ -39,7 +39,7 @@ module.exports = {
     },
 
     load: function(id, callback) {
-      0
+      fileService.findById(id, callback);
     }
 
 };
