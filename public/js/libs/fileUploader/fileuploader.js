@@ -252,7 +252,7 @@ qq.FileUploaderBasic = function(o){
     this._options = {
         // set to true to see the server response
         debug: false,
-        action: '/troupe/' + window.troupeContext.troupe.id + '/downloads',
+        action: '',
         params: {},
         button: null,
         multiple: true,
