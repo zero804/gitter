@@ -5,8 +5,9 @@ define([
   'backbone',
   'mustache',
   'text!templates/file/file.mustache',
-  'text!templates/file/row.mustache'
-], function($, _, Backbone, Mustache, template, rowTemplate){
+  'text!templates/file/row.mustache',
+  'fileUploader'
+], function($, _, Backbone, Mustache, template, rowTemplate, fileUploaderStub ){
   var FileView = Backbone.View.extend({    
     
     initialize: function(options) {
@@ -63,6 +64,7 @@ define([
     render: function() {
       var compiledTemplate = Mustache.render(template, { });
       $(this.el).html(compiledTemplate);
+      this.createUploader($('.fileuploader',this.el)[0]);
       return this;
     },
 
@@ -71,6 +73,14 @@ define([
       return function() {
         window.open(url);
       };
+    },
+
+    createUploader: function(element) {
+      var uploader = new qq.FileUploader({
+        element: element,
+        action: 'do-nothing.htm',
+        debug: true
+      });       
     },
     
     renderFiles: function(files) {
