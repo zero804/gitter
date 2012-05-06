@@ -127,7 +127,6 @@ FileVersionSchema.methods.narrow = function () {
 
 var FileSchema = new Schema({
   troupeId: ObjectId,
-  //creatorUserId: ObjectId,
   fileName: {type: String},
   mimeType: { type: String},
   versions: [FileVersionSchema]
@@ -135,7 +134,7 @@ var FileSchema = new Schema({
 
 FileSchema.methods.narrow = function () {
   return {
-    _id: this._id,
+    id: this._id,
     fileName: this.fileName,
     mimeType: this.mimeType,
     versions: this.versions.narrow(),

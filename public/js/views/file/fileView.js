@@ -6,24 +6,49 @@ define([
   'mustache',
   'text!templates/file/file.mustache',
   'text!templates/file/row.mustache',
-  'fileUploader'
-], function($, _, Backbone, Mustache, template, rowTemplate, fileUploaderStub ){
+  'fileUploader',
+  'collections/files'
+], function($, _, Backbone, Mustache, template, rowTemplate, fileUploaderStub, FileCollection){
   var FileView = Backbone.View.extend({    
-    
+    collection: new FileCollection(),
     initialize: function(options) {
       this.router = options.router;
-      var self = this;
-      $.ajax({
-        url: "/troupes/" + window.troupeContext.troupe.id + "/files",
-        contentType: "application/json",
-        dataType: "json",
-        type: "GET",
-        success: function(data) {
-          self.renderFiles(data);
-        }
-      });
+
+      _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onFileEvent')
+
+      this.collection.bind('add', this.onCollectionAdd);
+      this.collection.bind('reset', this.onCollectionReset);
+
+      $(document).on('file', this.onFileEvent);
     },
-    
+
+    beforeClose: function() {
+      $(document).unbind('file', this.onFileEvent);
+    },
+
+    onFileEvent: function(event, data) {
+      this.collection.fetch();
+    },
+
+    onCollectionReset: function() {
+      $(".frame-files", this.el).empty();
+      this.collection.each(this.onCollectionAdd);
+    },
+
+    onCollectionAdd: function(item) {
+        console.dir(item);
+        var rowHtml = Mustache.render(rowTemplate, {
+          fileName: item.get('fileName'),
+          url: item.get('url'),
+          mimeType: item.get('mimeType'),  
+          fileIcon: this.fileIcon(item.get('fileName'))
+        });
+        
+        var el = $(rowHtml);
+        $(".frame-files", this.el).append(el);
+        el.on('click', this.onClickGenerator(item.get('url')));
+    },
+
     events: {
 
     },
@@ -65,6 +90,8 @@ define([
       var compiledTemplate = Mustache.render(template, { });
       $(this.el).html(compiledTemplate);
       this.createUploader($('.fileuploader',this.el)[0]);
+
+      this.collection.fetch();
       return this;
     },
 
@@ -81,7 +108,6 @@ define([
         action: '/troupes/' + window.troupeContext.troupe.id + '/downloads/',
         debug: true,
         onComplete: function() {
-          window.alert("Complete");
         }
       });       
     },

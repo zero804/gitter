@@ -6,6 +6,7 @@ var persistence = require("./persistence-service");
 var mongoose = require("mongoose");
 var mime = require("mime");
 var winston = require("winston");
+var appEvents = require("../app-events");
 
 function createFileName(fileId, version) {
   return "attachment:" + fileId + ":" + version;
@@ -41,11 +42,8 @@ function uploadFileToGrid(file, version, temporaryFile, callback) {
 function getFileStream(troupeId, fileName, version, callback) {
   console.dir(["getFileStream", arguments]);
   findByFileName(troupeId, fileName, function(err, file) {
-      console.dir(["findByFileName", arguments]);
-
     if (err) return callback(err)
     if (!file) return callback(null, null);
-
 
     if(file.versions.length === 0) {
       console.dir(file);
@@ -126,7 +124,12 @@ function storeFile(options, callback) {
       file.save(function(err) {
           if (err) return callback(err);
 
-          uploadFileToGrid(file, 1, temporaryFile, callback);
+          uploadFileToGrid(file, 1, temporaryFile, function(err, file) {
+            if(!err) {
+              appEvents.fileEvent('create', troupeId, file.id);
+            }
+            callback(err, file);
+          });
         });
 
       return;
@@ -142,7 +145,12 @@ function storeFile(options, callback) {
     file.versions.push(version);
     file.save(function(err) {
         if (err) return callback(err);
-        uploadFileToGrid(file, file.versions.length, temporaryFile, callback);
+        uploadFileToGrid(file, file.versions.length, temporaryFile, function(err, file) {
+          if(!err) {
+            appEvents.fileEvent('createVersion', troupeId, file.id);
+          }
+          callback(err, file);
+        });
       });
   });
 }
