@@ -1,4 +1,3 @@
-/*jshint globalstrict:true, trailing:false */
 /*global console:false, require: true, module: true, process: false */
 "use strict";
 
@@ -81,14 +80,28 @@ module.exports = {
         });
       });
 
-      everyone.now.subscribeToTroupe = function(troupeId) {
+      everyone.now.subscribeToTroupe = function(troupeId, callback) {
         var self = this;
-
+        if(!callback) callback = function() {}
+ 
         loadUserAndTroupe(this.user, troupeId, sessionStore, function(err, user, troupe) {
+          if(err) {
+            winston.warn('Error while loading user and troupe in subscribeToTroupe: ' + err);
+            callback({ description: "Server error", reauthenticate: true });
+            return;
+          };
+
+          if(!user || !troupe) {
+            callback({ description: "Authentication failure", reauthenticate: true });
+            return;
+          };
+
           presenceService.userSubscribedToTroupe(user.id, troupe.id, self.user.clientId);
 
           var group = nowjs.getGroup("troup." + troupe.id);
           group.addUser(self.user.clientId);
+
+          callback(null);
         });
       };
 

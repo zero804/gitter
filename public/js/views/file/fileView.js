@@ -79,7 +79,10 @@ define([
       var uploader = new qq.FileUploader({
         element: element,
         action: '/troupes/' + window.troupeContext.troupe.id + '/downloads/',
-        debug: true
+        debug: true,
+        onComplete: function() {
+          window.alert("Complete");
+        }
       });       
     },
     

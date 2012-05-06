@@ -64,7 +64,6 @@ module.exports = {
         }
       );
 
-
       app.post(
         '/avatar',
         middleware.ensureLoggedIn,

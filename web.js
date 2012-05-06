@@ -114,6 +114,9 @@ app.configure(function() {
     app.use(express.logger());
   }
 
+  /* Additional body parsers */
+  require('./server/utils/bodyparsers-additional.js').install();
+
   app.use(express.static(__dirname + '/public'));
 
   app.use(express.cookieParser());

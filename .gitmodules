@@ -1,0 +1,3 @@
+[submodule "patched-modules/node-formidable"]
+	path = patched-modules/node-formidable
+	url = https://github.com/scriby/node-formidable.git

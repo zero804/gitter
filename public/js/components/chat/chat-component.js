@@ -1,8 +1,9 @@
 define([
   'jquery',
   'underscore',
-  'now'
-], function($, _, Backbone, nowStub){
+  'now',
+  'noty'
+], function($, _, Backbone, nowStub, notyStub){
 
   "use strict";
 
@@ -23,7 +24,23 @@ define([
 
       now.ready(function() {
         connected = true;
-        now.subscribeToTroupe(window.troupeContext.troupe.id);
+        now.subscribeToTroupe(window.troupeContext.troupe.id, function(err) {
+          if(err) { 
+            noty({
+              text:"There is a communication problem with the Troupe server. Please try reload the page.",
+              layout: "top",
+              type:"error",
+              animateOpen:{"height":"toggle"},
+              animateClose:{"height":"toggle"},
+              speed:500,
+              timeout:5000,
+              closeButton:false,
+              closeOnSelfClick:true,
+              closeOnSelfOver:false,
+              modal:false
+            });
+          }
+        });
         if(subscribeOnConnect) {
           module.subscribeTroupeChatMessages();
         }
