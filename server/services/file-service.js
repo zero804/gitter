@@ -4,6 +4,8 @@
 
 var persistence = require("./persistence-service");
 var mongoose = require("mongoose");
+var mime = require("mime");
+var winston = require("winston");
 
 function createFileName(fileId, version) {
   return "attachment:" + fileId + ":" + version;
@@ -16,12 +18,10 @@ function findById(id, callback) {
   });
 }
 
-function uploadFileToGrid(fileId, version, file, temporaryFile, callback) {
-  console.dir(["uploadFileToGrid", arguments]);
-
+function uploadFileToGrid(file, version, temporaryFile, callback) {
   var db = mongoose.connection.db;
   var GridStore = mongoose.mongo.GridStore;
-  var gridFileName = createFileName(fileId, 1);
+  var gridFileName = createFileName(file.id, version);
   var gs = new GridStore(db, gridFileName, "w", {
       "content_type": file.mimeType,
       "metadata":{
@@ -39,29 +39,46 @@ function uploadFileToGrid(fileId, version, file, temporaryFile, callback) {
 }
 
 function getFileStream(troupeId, fileName, version, callback) {
-  
+  console.dir(["getFileStream", arguments]);
   findByFileName(troupeId, fileName, function(err, file) {
+      console.dir(["findByFileName", arguments]);
+
     if (err) return callback(err)
     if (!file) return callback(null, null);
+
+
+    if(file.versions.length === 0) {
+      console.dir(file);
+      return callback(null, null, null);
+    }
 
     if(version == 0) {
       version = file.versions.length;
     }
 
+
     var db = mongoose.connection.db;
     var GridStore = mongoose.mongo.GridStore;
-    var gridFileName = createFileName(file.id, 1);
+    var gridFileName = createFileName(file.id, version);
 
-    var gs = new GridStore(db, gridFileName, 'r');
-    gs.open(function(err, gs) {
-      if(err) return callback(err);
-      if(!gs) return callback(null, null);
+    GridStore.exist(db, gridFileName, function(err, result) {
+      if(!result) {
+        winston.warn("File " + gridFileName + " does not exist.");
+        return callback(null, null);
+      }
 
-      var readStream = gs.stream(true);
-      
-      callback(null, file.mimeType, readStream);
-      
+      var gs = new GridStore(db, gridFileName, 'r');
+      gs.open(function(err, gs) {
+        if(err) return callback(err);
+        if(!gs) return callback(null, null);
+
+        var readStream = gs.stream(true);        
+        callback(null, file.mimeType, readStream);
+        
+      });
+
     });
+
   });
 }
 
@@ -83,6 +100,12 @@ function storeFile(options, callback) {
   var temporaryFile = options.file;
   var version, file;
 
+  /* Try figure out a better mimeType for the file */
+  if(mimeType === "application/octet-stream") {
+    var guessedMimeType = mime.lookup(fileName);
+    if(guessedMimeType) mimeType = guessedMimeType;
+  }
+
   findByFileName(troupeId, fileName, function(err, file) {
     if(err) return callback(err);
 
@@ -103,7 +126,7 @@ function storeFile(options, callback) {
       file.save(function(err) {
           if (err) return callback(err);
 
-          uploadFileToGrid(file.Id, 1, file, temporaryFile, callback);
+          uploadFileToGrid(file, 1, temporaryFile, callback);
         });
 
       return;
@@ -119,7 +142,7 @@ function storeFile(options, callback) {
     file.versions.push(version);
     file.save(function(err) {
         if (err) return callback(err);
-        uploadFileToGrid(file.id, file.versions.length, file, temporaryFile, callback);
+        uploadFileToGrid(file, file.versions.length, temporaryFile, callback);
       });
   });
 }

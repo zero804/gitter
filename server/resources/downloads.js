@@ -4,11 +4,14 @@
 
 var troupeService = require('../services/troupe-service'),
     fileService = require('../services/file-service'),
-    mongoose = require("mongoose");
+    mongoose = require("mongoose"),
+    fs = require("fs"),
+    temp = require("temp"),
+    winston = require('winston');
 
 module.exports = {
     index: function(req, res, next) {
-      res.relativeRedirect("/troupes" + req.troupe.id + "/files/");
+      res.relativeRedirect("/troupes/" + req.troupe.id + "/files/");
     },
 
     new: function(req, res) {
@@ -16,8 +19,9 @@ module.exports = {
     },
 
     create: function(req, res) {
+      /* File was uploaded through HTTP Form Upload */
       var files = req.files;
-      for(var k in req.files) {
+      for(var k in files) {
         if(files.hasOwnProperty(k)) {
           var file = files[k];
 
@@ -29,8 +33,7 @@ module.exports = {
             file: file.path
           }, function(err, file) {
             if(err) return response.send(500);
-
-            res.relativeRedirect("/troupes" + req.troupe.id + "/files/" + file.id);
+            res.send({ success: true });
           });
         }
       }
@@ -38,13 +41,16 @@ module.exports = {
 
     show: function(req, res) {
       var fileName = '' + req.params.download + (req.params.format ? '.' + req.params.format : '');
-
+      winston.info('Serving ' + fileName);
       fileService.getFileStream(req.troupe.id, fileName, 0, function(err, mimeType, stream) {
-        if (err) return res.send(500);
-        if (!stream) return res.send(404);
+        if(err || !stream) {
+          res.contentType("text/html");
+
+          if (err) return res.send(500);
+          return res.send(404);
+        }
 
         res.contentType(mimeType);
-
         stream.pipe(res);
       });
 

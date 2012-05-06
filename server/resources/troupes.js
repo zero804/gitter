@@ -59,8 +59,17 @@ module.exports = {
     res.send('destroy forum ' + req.troupe.title);
   },
 
-  load: function(id, callback) { /** TODO: Add security */
-    troupeService.findById(id, callback);
+  load: function(req, id, callback) { 
+    if(!req.user) return callback(401);
+
+    troupeService.findById(id, function(err, troupe) {
+
+      if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
+        return callback(403);
+      }
+
+      return callback(null, troupe);
+    });
   }
 
 };
