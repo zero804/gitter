@@ -38,5 +38,14 @@ module.exports = {
 
   onTroupeChat: function(callback) {
     hook.on('chat', callback);
+  },
+
+  fileEvent: function(event, troupeId, fileId) {
+    hook.emit('file', { event: event, fileId: fileId, troupeId: troupeId });
+  },
+
+  onFileEvent: function(callback) {
+    hook.on('file', callback);
   }
+
 };

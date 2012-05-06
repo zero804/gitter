@@ -9,6 +9,7 @@ var passport = require('passport'),
     userService = require("./services/user-service"),
     troupeService = require("./services/troupe-service"),
     presenceService = require("./services/presence-service"),
+    fileService = require("./services/file-service"),
     appEvents = require("./app-events"),
     nconf = require('./utils/config').configure(),
     Q = require("q"),
@@ -194,6 +195,21 @@ module.exports = {
           });
         });
       });
+
+      appEvents.onFileEvent(function(data) {
+        var event = data.event;
+        var fileId = data.fileId;
+        var troupeId = data.troupeId;
+
+        fileService.findById(fileId, function(err, file) {
+          var group = nowjs.getGroup("troup." + troupeId);
+          group.now.onFileEvent({
+            event: event,
+            file: file.narrow()
+          });
+        });
+
+      }); 
     }
 
 };

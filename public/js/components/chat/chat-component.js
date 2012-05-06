@@ -21,6 +21,7 @@ define([
       now.onTroupeChatMessage = createTrigger('chat');
       now.onUserLoggedIntoTroupe = createTrigger('userLoggedIntoTroupe');
       now.onUserLoggedOutOfTroupe = createTrigger('userLoggedOutOfTroupe');
+      now.onFileEvent = createTrigger('file');
 
       now.ready(function() {
         connected = true;
