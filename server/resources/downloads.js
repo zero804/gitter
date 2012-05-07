@@ -31,8 +31,10 @@ module.exports = {
             fileName: file.name,
             mimeType: file.type,
             file: file.path
-          }, function(err, file) {
+          }, function(err, fileAndVersion) {
             if(err) return response.send(500);
+
+            /* The AJAX file upload component we use requires an object shaped like this (below) */
             res.send({ success: true });
           });
         }

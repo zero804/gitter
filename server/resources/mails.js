@@ -9,7 +9,6 @@ module.exports = {
     index: function(req, res, next) {
       mailService.findByTroupe(req.troupe.id, function(err, mails) {
         if(err) return next(err);
-        
         res.send(mails.narrow());
       });
     },
@@ -23,6 +22,7 @@ module.exports = {
     },
 
     show: function(req, res){
+      var m = req.mail;
       res.send(req.mail);
     },
 
@@ -39,7 +39,6 @@ module.exports = {
     },
 
     load: function(id, callback){
-      console.log("MailId: " +id);
       mailService.findById(id,callback);
     }
 
