@@ -7,6 +7,10 @@ var mongoose = require("mongoose");
 var mime = require("mime");
 var winston = require("winston");
 var appEvents = require("../app-events");
+var console = require("console");
+var Q = require("q");
+var crypto = require('crypto');
+var fs = require('fs');
 
 /* private */
 function createFileName(fileId, version) {
@@ -41,6 +45,66 @@ function uploadFileToGrid(file, version, temporaryFile, callback) {
   });
 }
 
+function calculateMd5ForFile(temporaryFile, callback) {
+  var md5sum = crypto.createHash('md5');
+  var s = fs.ReadStream(temporaryFile);
+
+  s.on('data', function(d) {
+    md5sum.update(d);
+  });
+
+  s.on('end', function() {
+    var d = md5sum.digest('hex');
+    callback(null, d);
+  });
+}
+
+/* private */
+function compareHashSums(gridFileName, temporaryFile, callback) {
+  var db = mongoose.connection.db;
+  var GridStore = mongoose.mongo.GridStore;
+
+  var gsOp = Q.defer();
+  var fsOp = Q.defer();
+
+  var gs = new GridStore(db, gridFileName, "r");
+  gs.open(function(err, gridStore) {
+    if (err) return gsOp.reject(new Error(err));
+
+    gsOp.resolve(gs.md5);
+
+    gs.close(function(err) {});
+  });
+
+  calculateMd5ForFile(temporaryFile, fsOp.node());
+
+  Q.all([gsOp.promise, fsOp.promise]).spread(function(gsMd5, fsMd5) {
+    callback(null, gsMd5 === fsMd5);
+  }).fail(function(err) {
+    return callback(err);
+  });
+
+}
+
+/* private */
+function checkIfFileExistsAndIdentical(file, version, temporaryFile, callback) {
+  var db = mongoose.connection.db;
+  var GridStore = mongoose.mongo.GridStore;
+  var gridFileName = createFileName(file.id, version);
+
+  var join = Q.defer();
+
+  GridStore.exist(db, gridFileName, function(err, result) {
+    if (err) return callback(err)
+
+    if(!result) return callback(null, false);
+
+    compareHashSums(gridFileName, temporaryFile, callback);
+  });
+
+  
+}
+
 function getFileStream(troupeId, fileName, version, callback) {
   findByFileName(troupeId, fileName, function(err, file) {
     if (err) return callback(err)
@@ -54,7 +118,6 @@ function getFileStream(troupeId, fileName, version, callback) {
     if(version == 0) {
       version = file.versions.length;
     }
-
 
     var db = mongoose.connection.db;
     var GridStore = mongoose.mongo.GridStore;
@@ -151,18 +214,31 @@ function storeFile(options, callback) {
     version.source = null; //TODO: add source
 
     /* File exists, add a version */
-    file.versions.push(version);
     file.save(function(err) {
         if (err) return callback(err);
-        uploadFileToGrid(file, file.versions.length, temporaryFile, function(err, file) {
-          if(!err) {
-            appEvents.fileEvent('createVersion', troupeId, file.id);
+        checkIfFileExistsAndIdentical(file, file.versions.length, temporaryFile, function(err, existsAndIdentical) {
+          if(err) return callback(err);
+
+          if(existsAndIdentical) {
+            winston.info("File already exists and is identical to the latest version.");
+            return callback(null, {
+              file: file,
+              version: file.versions.length
+            });
           }
-          
-          callback(err, {
-            file: file,
-            version: file.versions.length
+
+          file.versions.push(version);
+          uploadFileToGrid(file, file.versions.length, temporaryFile, function(err, file) {
+            if(!err) {
+              appEvents.fileEvent('createVersion', troupeId, file.id);
+            }
+            
+            callback(err, {
+              file: file,
+              version: file.versions.length
+            });
           });
+
         });
       });
   });
