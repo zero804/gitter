@@ -3,7 +3,22 @@
 "use strict";
 
 var troupeService = require("../services/troupe-service"),
-    mailService = require("../services/mail-service");
+    mailService = require("../services/mail-service"),
+    fileService = require("../services/file-service"),
+    winston = require('winston');
+
+function compose(m, attachments) {
+  return {
+    fromName: m.fromName,
+    date: m.date,
+    subject: m.subject,
+    troupeId: m.troupeId,
+    from: m.from,
+    id: m.id,
+    mail: m.mail,
+    attachments: attachments
+  };
+}
 
 module.exports = {
     index: function(req, res, next) {
@@ -23,7 +38,38 @@ module.exports = {
 
     show: function(req, res){
       var m = req.mail;
-      res.send(req.mail);
+
+      if(m.attachments) {
+        var fileIds = m.attachments.map(function(item) { return item.fileId; } );
+        console.dir(fileIds);
+
+        fileService.findByIds(fileIds, function(err, files) {
+          if(err) return res.send(500);
+
+          var indexedFiles = files.indexById();
+
+          console.dir(indexedFiles);
+
+          var attachments = m.attachments.map(function(item) { 
+            var file = indexedFiles[item.fileId];
+            if(!file) {
+              winston.warn('Unable to find attachment. Something might be wrong')
+              return null;
+            }
+
+            return {
+              file: file.narrow(),
+              version: item.version
+            };
+
+          });
+
+          res.send(compose(m, attachments.filterNulls()));
+        });
+
+      } else {
+        res.send(compose(m, []));
+      }
     },
 
     edit: function(req, res){

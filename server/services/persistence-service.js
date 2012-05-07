@@ -84,6 +84,11 @@ ChatMessageSchema.methods.narrow = function (user, troupe) {
   };
 };
 
+var EmailAttachmentSchema = new Schema({
+  fileId: ObjectId,
+  version: Number
+});
+
 var EmailSchema = new Schema({
   from: { type: String },
   fromName: { type: String},
@@ -92,12 +97,12 @@ var EmailSchema = new Schema({
   date: {type: Date },
   preview: {type: String},
   mail: { type: String},
-  attachments: [ObjectId]
+  attachments: [EmailAttachmentSchema]
 });
 
 EmailSchema.methods.narrow = function () {
   return {
-    _id: this._id,
+    id: this.id,
     from: this.from,
     fromName: this.fromName,
     subject: this.subject,
@@ -145,6 +150,7 @@ FileSchema.methods.narrow = function () {
 var User = mongoose.model('User', UserSchema);
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var Email = mongoose.model('Email', EmailSchema);
+var EmailAttachment = mongoose.model('EmailAttachment', EmailAttachmentSchema);
 var Invite = mongoose.model('Invite', InviteSchema);
 var ChatMessage = mongoose.model('ChatMessage', ChatMessageSchema);
 var File = mongoose.model('File', FileSchema);
@@ -155,6 +161,7 @@ module.exports = {
   User: User,
   Troupe: Troupe,
 	Email: Email,
+  EmailAttachment: EmailAttachment,
 	Invite: Invite,
 	ChatMessage: ChatMessage,
   File: File,

@@ -66,13 +66,13 @@ define([
           personName: p1.fromName,
           preview: p1.preview,
           subject: p1.subject,
-          id: p1._id,
+          id: p1.id,
           date: p1.date
         });
         
         var item = $(rowHtml);
         $(".frame-mails", this.el).append(item);
-        item.on('click', this.onClickGenerator(p1._id));
+        item.on('click', this.onClickGenerator(p1.id));
       }
     },
 

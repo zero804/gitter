@@ -3,8 +3,8 @@
 "use strict";
 
 var persistence = require("./persistence-service"),
-    uuid = require('node-uuid');
-
+    uuid = require('node-uuid'),
+    console = require('console');
 
 function storeEmail(options, callback) {
   var fromEmail = options.fromEmail;
@@ -28,9 +28,11 @@ function storeEmail(options, callback) {
   storeMail.mail = mailBody;
   storeMail.preview = preview;
   storeMail.delivered = false;
-  storeMail.attachments = attachments;
-  
+  storeMail.attachments = attachments ? attachments.map(function(item) { return new persistence.EmailAttachment(item)}) : [];
+
   storeMail.save(function(err) {
+      console.dir(["save", arguments]);
+
       if (err) return callback(err);
       callback(null, storeMail);
   });
