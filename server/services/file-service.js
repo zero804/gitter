@@ -167,10 +167,17 @@ function storeFile(options, callback) {
       });
   });
 }
+  
+function findByIds(ids, callback) {
+  persistence.File.where('_id').in(ids)
+    .slaveOk()
+    .run(callback);
+};
 
 module.exports = {
   findByTroupe: findByTroupe,
   findById: findById,
+  findByIds: findByIds,
   findByFileName: findByFileName,
   storeFile: storeFile,
   getFileStream: getFileStream

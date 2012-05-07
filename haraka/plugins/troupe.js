@@ -1,6 +1,8 @@
 /*jshint globalstrict:true, trailing:false */
 /*global console:false, require: true, module: true */
 
+"use strict";
+
 // troupe service to deliver mails to mongo database
 
 var mailService = require("./../../server/services/mail-service.js");
@@ -12,6 +14,7 @@ var fs   = require('fs');
 var console = require("console");
 var Q = require("q");
 var sanitizer = require("./../../server/utils/sanitizer.js");
+var winston = require('winston');
 
 function continueResponse(next) {
   return next (DENY, "Debug mode bounce.");
@@ -46,6 +49,9 @@ function saveFile(troupeId, creatorUserId, fileName, mimeType, content, callback
     return;
   });
 }
+
+
+
 
 exports.hook_data = function (next, connection) {
     // enable mail body parsing
@@ -101,6 +107,16 @@ exports.hook_queue = function(next, connection) {
 
       var allAttachmentSaves = [];
       var attachmentsByContentId = {};
+      
+      /** Creates a callback which will associate a file and an attachment */
+      function associateFileVersionWithAttachment(attachment) {
+        return function(fileVersion) {
+          /* Store a reference from the content-id to the saved fileVersion so that we can use it later */
+          if(attachment.contentId && fileVersion) {
+            attachmentsByContentId[attachment.contentId] = fileVersion;
+          }
+        }
+      }
 
       if (mail_object.attachments) {
         for(var i = 0; i < mail_object.attachments.length; i++) {
@@ -109,24 +125,20 @@ exports.hook_queue = function(next, connection) {
           var attachment = mail_object.attachments[i];
 
           console.dir(["attachment", attachment]);
-          saveFile(troupe.id, user.id, attachment.generatedFileName,attachment.contentType,attachment.content, function(err, value) {
-            /* Store a reference from the content-id to the saved fileVersion so that we can use it later */
-            if(attachment.contentId && value) {
-              attachmentsByContentId[attachment.contentId] = value;
-            }
+          saveFile(troupe.id, user.id, attachment.generatedFileName,attachment.contentType,attachment.content, deferred.node());
 
-            /* Then carry on with promise */
-            deferred.node()(err, value);
-          });
+          var promise = deferred.promise;
+          promise.then(associateFileVersionWithAttachment(attachment));
   
-          allAttachmentSaves.push(deferred.promise);
+          allAttachmentSaves.push(promise);
         }
       }
+      
 
       Q.all(allAttachmentSaves).then(function(savedAttachments) {
+        var savedAttachments = savedAttachments.map(function(item) { return { fileId: item.file.id, version: item.version } });
+        
         console.dir(attachmentsByContentId);
-
-        var savedAttachmentIds = savedAttachments.map(function(item) { return item.file.id; });
 
         var storedMailBody;
 
@@ -143,17 +155,19 @@ exports.hook_queue = function(next, connection) {
             if(attachment.contentDisposition === 'inline' && attachment.contentId) {
               var fileVersion = attachmentsByContentId[attachment.contentId];
 
+              if(!fileVersion) {
+                winston.warn("Unable to find attachment for contentId. Something is probably broken.");
+                continue;
+              }
+
               var attachmentUrl = "/troupes/" + troupe.id + "/downloads/" + encodeURI(fileVersion.file.fileName) + "?version=" + fileVersion.version;
-              console.log("AA " + attachmentUrl + " <- " + attachment.contentId );
-              console.log(storedMailBody);
               storedMailBody = storedMailBody.replace(new RegExp("\\bcid:" + attachment.contentId + "\\b", "ig"), attachmentUrl);
-              console.log(storedMailBody);
             }
           }
         }
 
         storedMailBody = sanitizer.sanitize(storedMailBody);
-        
+
         mailService.storeEmail({ 
           fromEmail: fromEmail, 
           troupeId: troupe.id, 
@@ -164,7 +178,7 @@ exports.hook_queue = function(next, connection) {
           mailBody: storedMailBody, 
           plainText: mail_object.text, 
           richText: mail_object.html,
-          attachments: savedAttachmentIds }, function(err, savedMail) {
+          attachments: savedAttachments }, function(err, savedMail) {
             console.dir(["Saved Mail", arguments]);
 
             if (err) return next(DENY, "Failed to store the email");
