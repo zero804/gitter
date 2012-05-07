@@ -63,7 +63,7 @@ define([
         var li = $('<li class="link-attachment"></li>');
         var a = $('<a>');
 
-        if(this.linkToLatestVersion) {
+        if(self.linkToLatestVersion) {
           a.attr('href', item.file.url);
         } else {
           a.attr('href', item.file.url + "?version=" + item.version);
