@@ -42,7 +42,7 @@ define([
     
     renderMailItem: function() {
       $('.label-subject',this.el).text(this.mail.subject);
-      $('.label-body',this.el).text(this.mail.mail);
+      $('.label-body',this.el).html(this.mail.mail);
     }
 
 

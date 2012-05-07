@@ -1,3 +1,6 @@
+/*jshint globalstrict:true, trailing:false */
+/*global console:false, require: true, module: true */
+
 // troupe service to deliver mails to mongo database
 
 var mailService = require("./../../server/services/mail-service.js");
@@ -8,6 +11,7 @@ var temp = require('temp');
 var fs   = require('fs');
 var console = require("console");
 var Q = require("q");
+var sanitizer = require("./../../server/utils/sanitizer.js");
 
 function continueResponse(next) {
   return next (DENY, "Debug mode bounce.");
@@ -27,13 +31,13 @@ function saveFile(troupeId, creatorUserId, fileName, mimeType, content, callback
         fileName: fileName,
         mimeType: mimeType,
         file: tempFileName
-      }, function(err, savedFile) {
-        if (err) return callback(err); // for now we're not going to fail if the attachment didn't fail
+      }, function(err, fileAndVersion) {
+        if (err) return callback(err); 
 
         // Delete the temporary file */
         fs.unlink(tempFileInfo.path);
 
-        callback(null, savedFile);
+        callback(null, fileAndVersion);
       });
     });
     ws.write(content);
@@ -79,17 +83,6 @@ exports.hook_queue = function(next, connection) {
     toName = toName.substring(toName.indexOf("<") + 1, toName.indexOf(">"));
   }
 
-	//connection.logdebug("Body: " + JSON.stringify(connection.transaction.body.bodytext));
-    //connection.logdebug("Children: " + JSON.stringify(connection.transaction.body.children.length));
-	//connection.logdebug("Child: " + connection.transaction.body.children[0].bodytext);
-	//connection.logdebug("To: " + JSON.stringify(toName));
-	//connection.logdebug("From: " + fromName);
-	//connection.logdebug("Email: " + fromEmail);
-	//connection.logdebug("Preview: " + preview);
-	//connection.logdebug("Mail Body : "+ lines.join(''));
- 	//connection.logdebug("Date: " + date);
-
-
 	troupeService.validateTroupeEmail({ to: toName, from: fromEmail}, function(err, troupe, user) {
     connection.logdebug("From: " + fromEmail);
     connection.logdebug("To:" + toName);
@@ -97,50 +90,70 @@ exports.hook_queue = function(next, connection) {
     if (!troupe) return next (DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.");
 
 
-    var mailparser = new MailParser({
-    });
-
+    var mailparser = new MailParser({});
 
     mailparser.on("end", function(mail_object){
-      connection.logdebug("Text body:", mail_object.text);
-      connection.logdebug("Rich text:", mail_object.html);
-
       if (mail_object.text) {
         preview = mail_object.text;
         if (preview.length>255) preview=preview.substring(0,252) + "...";
         preview = preview.replace(/\n/g,"");
       }
 
-      var storedMailBody;
-
-      if (mail_object.html) {
-        connection.logdebug("Storing HTML body.");
-        storedMailBody = mail_object.html;
-      }
-      else {
-        connection.logdebug("Storing bording old text body.");
-        storedMailBody = mail_object.text;
-      }
-
       var allAttachmentSaves = [];
+      var attachmentsByContentId = {};
 
       if (mail_object.attachments) {
         for(var i = 0; i < mail_object.attachments.length; i++) {
           var deferred = Q.defer();
 
           var attachment = mail_object.attachments[i];
-          connection.logdebug("Working with file: " + attachment.fileName);
-          connection.logdebug("Working with generated file: " + attachment.generatedFileName);
-          saveFile(troupe.id, user.id, attachment.generatedFileName,attachment.contentType,attachment.content, deferred.node());
 
+          console.dir(["attachment", attachment]);
+          saveFile(troupe.id, user.id, attachment.generatedFileName,attachment.contentType,attachment.content, function(err, value) {
+            /* Store a reference from the content-id to the saved fileVersion so that we can use it later */
+            if(attachment.contentId && value) {
+              attachmentsByContentId[attachment.contentId] = value;
+            }
+
+            /* Then carry on with promise */
+            deferred.node()(err, value);
+          });
+  
           allAttachmentSaves.push(deferred.promise);
         }
       }
 
       Q.all(allAttachmentSaves).then(function(savedAttachments) {
-        var savedAttachmentIds = savedAttachments.map(function(item) { return item.id; });
-        console.dir(savedAttachmentIds);
+        console.dir(attachmentsByContentId);
 
+        var savedAttachmentIds = savedAttachments.map(function(item) { return item.file.id; });
+
+        var storedMailBody;
+
+        if (mail_object.html) {
+          storedMailBody = mail_object.html;
+        } else {
+          storedMailBody = mail_object.text;
+        }
+
+        if (mail_object.attachments) {
+          for(var i = 0; i < mail_object.attachments.length; i++) {
+            var attachment = mail_object.attachments[i];
+
+            if(attachment.contentDisposition === 'inline' && attachment.contentId) {
+              var fileVersion = attachmentsByContentId[attachment.contentId];
+
+              var attachmentUrl = "/troupes/" + troupe.id + "/downloads/" + encodeURI(fileVersion.file.fileName) + "?version=" + fileVersion.version;
+              console.log("AA " + attachmentUrl + " <- " + attachment.contentId );
+              console.log(storedMailBody);
+              storedMailBody = storedMailBody.replace(new RegExp("\\bcid:" + attachment.contentId + "\\b", "ig"), attachmentUrl);
+              console.log(storedMailBody);
+            }
+          }
+        }
+
+        storedMailBody = sanitizer.sanitize(storedMailBody);
+        
         mailService.storeEmail({ 
           fromEmail: fromEmail, 
           troupeId: troupe.id, 
@@ -151,7 +164,7 @@ exports.hook_queue = function(next, connection) {
           mailBody: storedMailBody, 
           plainText: mail_object.text, 
           richText: mail_object.html,
-          attachments: savedAttachmentIds }, function(err, mail) {
+          attachments: savedAttachmentIds }, function(err, savedMail) {
             console.dir(["Saved Mail", arguments]);
 
             if (err) return next(DENY, "Failed to store the email");
