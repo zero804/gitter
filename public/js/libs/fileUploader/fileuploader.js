@@ -82,7 +82,13 @@ qq.preventDefault = function(e){
 qq.insertBefore = function(a, b){
     b.parentNode.insertBefore(a, b);
 };
-qq.remove = function(element){
+
+qq.timedRemove = function(element){
+    var t = setTimeout("qq.remove(element);", 3000);
+}
+
+
+qq.remove = function(element, timer){
     element.parentNode.removeChild(element);
 };
 
@@ -390,8 +396,7 @@ qq.FileUploaderBasic.prototype = {
     },       
     _uploadFile: function(fileContainer){      
         var id = this._handler.add(fileContainer);
-        var fileName = this._handler.getName(id);
-        
+        var fileName = this._handler.getName(id);        
         if (this._options.onSubmit(id, fileName) !== false){
             this._onSubmit(id, fileName);
             this._handler.upload(id, this._options.params);
@@ -486,17 +491,17 @@ qq.FileUploader = function(o){
                 
         template: '<div class="qq-uploader">' + 
                 '<div class="qq-upload-drop-area rounded"><span>Drop files here to upload</span></div>' +
-                '<div class="qq-upload-button btn btn-primary right">Upload a file</div>' +
-                '<ul class="qq-upload-list"></ul>' + 
+                '<div class="right"><div class="qq-upload-button btn btn-primary">Upload a file</div></div>' +
+                '<div class="qq-upload-list rounded"></div>' + 
              '</div>',
 
         // template for one item in file list
         fileTemplate: '<li>' +
                 '<span class="qq-upload-file"></span>' +
                 '<span class="qq-upload-spinner"></span>' +
-                '<span class="qq-upload-size"></span>' +
+                '<span class="right" style="align:right"><span class="qq-upload-size"></span>' +
                 '<a class="qq-upload-cancel" href="#">Cancel</a>' +
-                '<span class="qq-upload-failed-text">Failed</span>' +
+                '<span class="qq-upload-failed-text">Failed</span></span>' +
             '</li>',        
         
         classes: {
@@ -612,8 +617,10 @@ qq.extend(qq.FileUploader.prototype, {
 
         // mark completed
         var item = this._getItemByFileId(id);                
-        qq.remove(this._find(item, 'cancel'));
-        qq.remove(this._find(item, 'spinner'));
+        //qq.remove(this._find(item, 'cancel'));
+        //qq.remove(this._find(item, 'spinner'));
+        qq.remove(item);
+
         
         if (result.success){
             qq.addClass(item, this._classes.success);    
