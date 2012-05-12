@@ -14,8 +14,6 @@ module.exports = {
           files.file.name = decodeURIComponent(files.file.name);
         }
 
-        console.dir(["XXX", files]);
-
         req.files = files;
         fn();
       });

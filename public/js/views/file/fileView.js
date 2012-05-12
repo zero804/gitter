@@ -9,7 +9,7 @@ define([
   'fileUploader',
   'collections/files'
 ], function($, _, Backbone, Mustache, template, rowTemplate, fileUploaderStub, FileCollection){
-  var FileView = Backbone.View.extend({    
+  var FileView = Backbone.View.extend({
     collection: new FileCollection(),
     initialize: function(options) {
       this.router = options.router;
@@ -40,13 +40,13 @@ define([
         var rowHtml = Mustache.render(rowTemplate, {
           fileName: item.get('fileName'),
           url: item.get('url'),
-          mimeType: item.get('mimeType'),  
+          mimeType: item.get('mimeType'),
           fileIcon: this.fileIcon(item.get('fileName'))
         });
-        
+
         var el = $(rowHtml);
         $(".frame-files", this.el).append(el);
-        el.on('click', this.onClickGenerator(item.get('url')));
+        el.on('click', this.onClickGenerator(item));
     },
 
     events: {
@@ -56,7 +56,7 @@ define([
     fileIcon: function(fileName) {
       return '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + fileName;
     },
-    
+
     render: function() {
       var compiledTemplate = Mustache.render(template, { });
       $(this.el).html(compiledTemplate);
@@ -66,10 +66,10 @@ define([
       return this;
     },
 
-    onClickGenerator: function(url) {
+    onClickGenerator: function(file) {
       var self = this;
       return function() {
-        window.open(url);
+        window.open(file.get('embeddedUrl'));
       };
     },
 
@@ -80,9 +80,9 @@ define([
         debug: true,
         onComplete: function() {
         }
-      });       
+      });
     },
-    
+
     renderFiles: function(files) {
       if (files.length === 0) $("#frame-help").show();
       $(".frame-files", this.el).empty();
@@ -95,13 +95,13 @@ define([
           mimeType: p1.mimeType,  // I think the mimeType may actually be useless, eg. I got this for a PPT I attached in Mac Mail (application/vnd.openxmlformats-officedocument.presentationml.presentation)
           fileIcon: this.fileIcon(p1.fileName)
         });
-        
+
         var item = $(rowHtml);
         $(".frame-files", this.el).append(item);
         item.on('click', this.onClickGenerator(p1.url));
       }
     }
-    
+
   });
 
   return FileView;
