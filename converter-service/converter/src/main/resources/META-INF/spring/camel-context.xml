@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xmlns:context="http://www.springframework.org/schema/context"
+       
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+          http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	">
+	
+  <context:component-scan base-package="com.troupe"/>
+  <context:annotation-config/>
+       
+  <camel:camelContext id="cc" xmlns="http://camel.apache.org/schema/spring">
+    <package>com.troupe</package>
+    <!-- here is a sample which processes the input files
+         (leaving them in place - see the 'noop' flag)
+         then performs content based routing on the message
+         using XPath -->
+    <route>
+      <from uri="file:src/data?noop=true"/>
+      <choice>
+        <when>
+          <xpath>/person/city = 'London'</xpath>
+          <to uri="file:target/messages/uk"/>
+        </when>
+        <otherwise>
+          <to uri="file:target/messages/others"/>
+        </otherwise>
+      </choice>
+    </route>
+    
+    <route>
+    	<from uri="jetty:http://0.0.0.0:9021/createpdf"/>
+    	<to uri="bean:conversionHandler"/>
+    </route>
+  </camel:camelContext>
+
+</beans>

@@ -10,6 +10,12 @@ module.exports = {
       form.parse(req, function(err, fields, files) {
         if(err) return fn(err);
 
+        if(files && files.file && files.file.name) {
+          files.file.name = decodeURIComponent(files.file.name);
+        }
+
+        console.dir(["XXX", files]);
+
         req.files = files;
         fn();
       });
