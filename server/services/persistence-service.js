@@ -143,7 +143,8 @@ FileSchema.methods.narrow = function () {
     fileName: this.fileName,
     mimeType: this.mimeType,
     versions: this.versions.narrow(),
-    url: '/troupes/' + encodeURIComponent(this.troupeId) + '/downloads/' + encodeURIComponent(this.fileName)
+    url: '/troupes/' + encodeURIComponent(this.troupeId) + '/downloads/' + encodeURIComponent(this.fileName),
+    embeddedUrl: '/pdfjs/web/viewer.html?file=/troupes/' + encodeURIComponent(this.troupeId) + '/embedded/' + encodeURIComponent(this.fileName)
   };
 };
 
