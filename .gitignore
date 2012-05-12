@@ -16,3 +16,7 @@ public/bootstrap/less/responsive.css
 /.settings
 troupe.sublime-project
 troupe.sublime-workspace
+converter-service/converter/.classpath
+converter-service/converter/.project
+converter-service/converter/.settings
+converter-service/converter/target

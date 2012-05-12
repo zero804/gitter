@@ -1,3 +1,6 @@
 [submodule "patched-modules/node-formidable"]
 	path = patched-modules/node-formidable
 	url = https://github.com/scriby/node-formidable.git
+[submodule "public/pdfjs"]
+	path = public/pdfjs
+	url = https://github.com/mozilla/pdf.js.git

@@ -1,8 +1,9 @@
 /*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*global require: true, module: true */
 "use strict";
 
 var persistence = require("./persistence-service");
+var embeddedFileService = require("./embedded-file-service");
 var mongoose = require("mongoose");
 var mime = require("mime");
 var winston = require("winston");
@@ -10,13 +11,20 @@ var appEvents = require("../app-events");
 var console = require("console");
 var Q = require("q");
 var crypto = require('crypto');
-var fs = require('fs');
+var fs = require('fs'),
+    im = require('imagemagick');
 
 /* private */
 function createFileName(fileId, version) {
   return "attachment:" + fileId + ":" + version;
 }
 
+function createEmbeddedFileName(fileId, version) {
+  return "embedded:" + fileId + ":" + version;
+}
+function createThumbNailFileName(fileId, version) {
+  return "thumb:" + fileId + ":" + version;
+}
 /* public */
 function findById(id, callback) {
   persistence.File.findOne({_id:id} , function(err, file) {
@@ -95,33 +103,30 @@ function checkIfFileExistsAndIdentical(file, version, temporaryFile, callback) {
   var join = Q.defer();
 
   GridStore.exist(db, gridFileName, function(err, result) {
-    if (err) return callback(err)
+    if (err) return callback(err);
 
     if(!result) return callback(null, false);
 
     compareHashSums(gridFileName, temporaryFile, callback);
   });
-
-  
 }
 
-function getFileStream(troupeId, fileName, version, callback) {
+function locateAndStream(troupeId, fileName, version, gridFileNamingStrategy, callback) {
   findByFileName(troupeId, fileName, function(err, file) {
-    if (err) return callback(err)
+    if (err) return callback(err);
     if (!file) return callback(null, null);
 
     if(file.versions.length === 0) {
-      console.dir(file);
       return callback(null, null, null);
     }
 
-    if(version == 0) {
+    if(!version) {
       version = file.versions.length;
     }
 
     var db = mongoose.connection.db;
     var GridStore = mongoose.mongo.GridStore;
-    var gridFileName = createFileName(file.id, version);
+    var gridFileName = gridFileNamingStrategy(file.id, version);
 
     GridStore.exist(db, gridFileName, function(err, result) {
       if(!result) {
@@ -134,14 +139,26 @@ function getFileStream(troupeId, fileName, version, callback) {
         if(err) return callback(err);
         if(!gs) return callback(null, null);
 
-        var readStream = gs.stream(true);        
-        callback(null, file.mimeType, readStream);
-        
+        var readStream = gs.stream(true);
+        callback(null, gs.contentType, readStream);
       });
 
     });
 
   });
+
+}
+
+function getFileEmbeddedStream(troupeId, fileName, version, callback) {
+  locateAndStream(troupeId, fileName, version, function(fileId, version) { return createEmbeddedFileName(fileId, version); }, callback);
+}
+
+function getThumbnailStream(troupeId, fileName, version, callback) {
+  locateAndStream(troupeId, fileName, version, function(fileId, version) { return createThumbNailFileName(fileId, version); }, callback);
+}
+
+function getFileStream(troupeId, fileName, version, callback) {
+  locateAndStream(troupeId, fileName, version, function(fileId, version) { return createFileName(fileId, version); }, callback);
 }
 
 function findByTroupe(id, callback) {
@@ -158,7 +175,7 @@ function findByFileName(troupeId, fileName, callback) {
  * Store a file and return a callback referencing the file and the version
  */
 /* public */
-function storeFile(options, callback) {
+function storeFileVersionInGrid(options, callback) {
   var troupeId = options.troupeId;
   var creatorUserId = options.creatorUserId;
   var fileName = options.fileName;
@@ -166,11 +183,6 @@ function storeFile(options, callback) {
   var temporaryFile = options.file;
   var version, file;
 
-  /* Try figure out a better mimeType for the file */
-  if(mimeType === "application/octet-stream") {
-    var guessedMimeType = mime.lookup(fileName);
-    if(guessedMimeType) mimeType = guessedMimeType;
-  }
 
   findByFileName(troupeId, fileName, function(err, file) {
     if(err) return callback(err);
@@ -199,7 +211,8 @@ function storeFile(options, callback) {
 
             callback(err, {
               file: file,
-              version: 1
+              version: 1,
+              alreadyExists: false
             });
           });
         });
@@ -223,7 +236,8 @@ function storeFile(options, callback) {
             winston.info("File already exists and is identical to the latest version.");
             return callback(null, {
               file: file,
-              version: file.versions.length
+              version: file.versions.length,
+              alreadyExists: true
             });
           }
 
@@ -232,10 +246,10 @@ function storeFile(options, callback) {
             if(!err) {
               appEvents.fileEvent('createVersion', troupeId, file.id);
             }
-            
             callback(err, {
               file: file,
-              version: file.versions.length
+              version: file.versions.length,
+              alreadyExists: false
             });
           });
 
@@ -243,12 +257,106 @@ function storeFile(options, callback) {
       });
   });
 }
-  
+
+function generateAndPersistThumbnailForFile(fileName, originalFileName, troupeId, fileId, version) {
+  var resizedPath = fileName + "-small.jpg";
+  winston.info("Converting " + fileName + " to thumbnail");
+  im.convert(['-define','jpeg:size=48x48',fileName + "[0]",'-thumbnail','48x48^','-gravity','center','-extent','48x48',resizedPath], 
+    function(err, stdout, stderr) {
+      if (err) return winston.error(err);
+
+      var db = mongoose.connection.db;
+      var GridStore = mongoose.mongo.GridStore;
+      var gridFileName = createThumbNailFileName(fileId, version);
+      var gs = new GridStore(db, gridFileName, "w", {
+          "content_type": "image/jpeg",
+          "metadata":{
+            /* Attributes go here */
+            usage: "thumbnail",
+            troupeId: troupeId,
+            fileName: originalFileName,
+            version: version
+          }
+      });
+
+      gs.writeFile(resizedPath, function(err) {
+        if (err) return winston.error(err);
+        winston.info("Successfully persisted " + resizedPath + " as " + gridFileName);
+      });
+    });
+}
+
+function generateEmbeddedVersionOfFile(options, callback) {
+  embeddedFileService.generateEmbeddedFile({
+    fileName: options.file,
+    mimeType: options.mimeType
+  }, callback);
+}
+
+function storeFile(options, callback) {
+  var fileName = options.fileName;
+  var mimeType = options.mimeType;
+  var temporaryFile = options.file;
+  var troupeId = options.troupeId;
+
+  /* Need to correct the mimeType from time to time */
+  /* Try figure out a better mimeType for the file */
+  if(!mimeType || mimeType === "application/octet-stream") {
+    var guessedMimeType = mime.lookup(fileName);
+    winston.info("Guessed mime type of " + fileName + " to be " + guessedMimeType);
+    if(guessedMimeType) {
+      mimeType = guessedMimeType;
+      options.mimeType = mimeType;
+    }
+  }
+
+  storeFileVersionInGrid(options, function(err, fileAndVersion) {
+    if(err) return callback(err);
+    if(fileAndVersion.alreadyExists) return callback(err, fileAndVersion);
+
+    generateEmbeddedVersionOfFile(options, function(err, embeddedFileInfo) {
+      if(err) return winston.error(err);
+
+      var fileForThumb = embeddedFileInfo.conversionNotRequired ? temporaryFile : embeddedFileInfo.fileName;
+
+      generateAndPersistThumbnailForFile(fileForThumb, temporaryFile, troupeId, fileAndVersion.file.id, fileAndVersion.version);
+
+      if(embeddedFileInfo.conversionNotRequired) {
+        /* No need to persist the embedded file */
+        return;
+      }
+
+      var db = mongoose.connection.db;
+      var GridStore = mongoose.mongo.GridStore;
+      var gridFileName = createEmbeddedFileName(fileAndVersion.file.id, fileAndVersion.version);
+      var gs = new GridStore(db, gridFileName, "w", {
+          "content_type": embeddedFileInfo.mimeType,
+          "metadata":{
+            /* Attributes go here */
+            usage: "embedded",
+            troupeId: fileAndVersion.file.troupeId,
+            fileName: fileAndVersion.file.fileName
+          }
+      });
+
+      gs.writeFile(embeddedFileInfo.fileName, function(err) {
+        if (err) return winston.error(err);
+      });
+
+    });
+
+    /** Continue regardless of what happens in generate... */
+    callback(err, fileAndVersion);
+
+  });
+}
+
+
 function findByIds(ids, callback) {
   persistence.File.where('_id').in(ids)
     .slaveOk()
     .run(callback);
-};
+}
 
 module.exports = {
   findByTroupe: findByTroupe,
@@ -256,5 +364,7 @@ module.exports = {
   findByIds: findByIds,
   findByFileName: findByFileName,
   storeFile: storeFile,
-  getFileStream: getFileStream
+  getFileStream: getFileStream,
+  getFileEmbeddedStream: getFileEmbeddedStream,
+  getThumbnailStream: getThumbnailStream
 };

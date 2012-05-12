@@ -144,6 +144,8 @@ var usersResource = app.resource('users',  require('./server/resources/users.js'
 var mailsResource = app.resource('mails', require('./server/resources/mails.js'));
 var filesResource = app.resource('files', require('./server/resources/files.js'));
 var downloadsResource = app.resource('downloads',  require('./server/resources/downloads.js'));
+var embeddedResource = app.resource('embedded',  require('./server/resources/embedded.js'));
+var thumbnailsResource = app.resource('thumbnails',  require('./server/resources/thumbnails.js'));
 var chatMessagesResource = app.resource('chatMessages',  require('./server/resources/chat-messages.js'));
 
 troupesResource.add(sharesResource);
@@ -152,6 +154,8 @@ troupesResource.add(mailsResource);
 troupesResource.add(filesResource);
 troupesResource.add(downloadsResource);
 troupesResource.add(chatMessagesResource);
+troupesResource.add(embeddedResource);
+troupesResource.add(thumbnailsResource);
 
 /* This should be last */
 require('./server/handlers/app').install(app);

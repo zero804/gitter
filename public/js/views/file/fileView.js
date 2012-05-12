@@ -53,37 +53,8 @@ define([
 
     },
 
-    fileIcon: function(fileName){
-      var icon = "unknown.png";
-      var ext = fileName.substring(fileName.lastIndexOf(".")+1,fileName.length).toLowerCase();
-      switch(ext){
-        case "jpg": case "jpeg":
-          icon = "jpg.png";
-          break;
-        case "png":
-          icon = "png.png";
-          break;
-        case "pdf":
-          icon = "pdf.png";
-          break;
-        case "ppt": case "pptx":
-          icon = "ppt.png";
-          break;
-        case "xls": case "xlsx":
-          icon = "xls.png";
-          break;
-        case "doc": case "docx":
-          icon = "doc.png";
-          break;
-        case "mov":
-          icon = "mov.png";
-          break;
-        case "gif":
-          icon = "gif.png";
-          break;
-      }
-
-      return icon;
+    fileIcon: function(fileName) {
+      return '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + fileName;
     },
     
     render: function() {

@@ -6,7 +6,6 @@ var troupeService = require('../services/troupe-service'),
     fileService = require('../services/file-service'),
     mongoose = require("mongoose"),
     fs = require("fs"),
-    temp = require("temp"),
     winston = require('winston');
 
 module.exports = {
@@ -53,6 +52,7 @@ module.exports = {
         }
 
         res.contentType(mimeType);
+        res.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
         stream.pipe(res);
       });
 
