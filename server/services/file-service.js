@@ -34,6 +34,7 @@ function findById(id, callback) {
 
 /* private */
 function uploadFileToGrid(file, version, temporaryFile, callback) {
+  winston.info('Version:' + version);
   var db = mongoose.connection.db;
   var GridStore = mongoose.mongo.GridStore;
   var gridFileName = createFileName(file.id, version);
@@ -220,41 +221,40 @@ function storeFileVersionInGrid(options, callback) {
       return;
     }
 
-    /* Create a new version and push it onto the array of version */
-    version = new persistence.FileVersion();
-    version.creatorUserId = creatorUserId; 
-    version.createdDate = Date.now;
-    version.source = null; //TODO: add source
+    checkIfFileExistsAndIdentical(file, file.versions.length, temporaryFile, function(err, existsAndIdentical) {
+      if(err) return callback(err);
 
-    /* File exists, add a version */
-    file.save(function(err) {
+      if(existsAndIdentical) {
+        winston.info("File already exists and is identical to the latest version.");
+        return callback(null, {
+          file: file,
+          version: file.versions.length,
+          alreadyExists: true
+        });
+      }
+
+      /* Create a new version and push it onto the array of version */
+      version = new persistence.FileVersion();
+      version.creatorUserId = creatorUserId; 
+      version.createdDate = Date.now;
+      version.source = null; //TODO: add source 
+      file.versions.push(version)
+
+      /* File exists, add a version */
+      file.save(function(err) {
         if (err) return callback(err);
-        checkIfFileExistsAndIdentical(file, file.versions.length, temporaryFile, function(err, existsAndIdentical) {
-          if(err) return callback(err);
-
-          if(existsAndIdentical) {
-            winston.info("File already exists and is identical to the latest version.");
-            return callback(null, {
-              file: file,
-              version: file.versions.length,
-              alreadyExists: true
-            });
+        uploadFileToGrid(file, file.versions.length, temporaryFile, function(err, file) {
+          if(!err) {
+            appEvents.fileEvent('createVersion', troupeId, file.id);
           }
-
-          file.versions.push(version);
-          uploadFileToGrid(file, file.versions.length, temporaryFile, function(err, file) {
-            if(!err) {
-              appEvents.fileEvent('createVersion', troupeId, file.id);
-            }
-            callback(err, {
-              file: file,
-              version: file.versions.length,
-              alreadyExists: false
-            });
+          callback(err, {
+            file: file,
+            version: file.versions.length,
+            alreadyExists: false
           });
-
         });
       });
+    });
   });
 }
 
