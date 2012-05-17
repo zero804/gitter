@@ -12,6 +12,7 @@ var express = require('express'),
 	ConfirmStrategy = require('./server/utils/confirm-strategy').Strategy,
   nconf = require('./server/utils/config').configure(),
   httpUtils = require('./server/utils/http'),
+  rememberMe = require('./server/utils/rememberme-middleware'),
   winston = require('winston');
 
 /* TODO: put all our prototypes in a module */
@@ -85,12 +86,10 @@ passport.use(new ConfirmStrategy({ name: "accept" }, function(confirmationCode, 
 );
 
 passport.serializeUser(function(user, done) {
-  winston.info("Serializing " + user.id);
   done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
-  winston.info("Deserializing " + id);
   userService.findById(id, function(err, user) {
     if(err) return done(err);
     if(!user) return done(null, false);
@@ -124,6 +123,7 @@ app.configure(function() {
   app.use(express.session({ secret: 'keyboard cat', store: sessionStore, cookie: { path: '/', httpOnly: true, maxAge: 14400000, domain: nconf.get("web:cookieDomain"), secure: false /*nconf.get("web:secureCookies") Express won't sent the cookie as the https offloading is happening in nginx. Need to have connection.proxySecure set*/ }}));
   app.use(passport.initialize());
   app.use(passport.session());
+  app.use(rememberMe.rememberMeMiddleware());
   app.use(app.router);
 
   app.use(express.errorHandler({ showStack: nconf.get('express:showStack'), dumpExceptions: nconf.get('express:dumpExceptions') }));
