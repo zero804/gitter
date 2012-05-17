@@ -8,6 +8,12 @@ module.exports = {
       return next();
     }
 
-    next(new Error('Unauthorized'));
+    if(req.accepts('application/json')) {
+      return next(new Error('Unauthorized'));
+    } else {
+      res.relativeRedirect('/login');
+    }
+
+
   }
 };

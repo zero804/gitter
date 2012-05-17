@@ -2,9 +2,12 @@
 /*global console:false, require: true, module: true */
 "use strict";
 
-var passport = require("passport");
+var passport = require("passport"),
+    winston = require("winston");
 var nconf = require('../utils/config').configure(),
-    troupeService = require("../services/troupe-service");
+    troupeService = require("../services/troupe-service"),
+    rememberMe = require('../utils/rememberme-middleware'),
+    middleware = require('./middleware');
 
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
@@ -18,13 +21,24 @@ module.exports = {
       app.post('/login',
         passport.authenticate('local', { failureRedirect: basepath + '/login' }),
         function(req, res) {
-          if(req.accepts('application/json')) {
-            res.send({
-              failed: false,
-              user: req.user
+          function sendAffirmativeResponse() {
+            if(req.accepts('application/json')) {
+              res.send({
+                failed: false,
+                user: req.user
+              });
+            } else {
+              res.relativeRedirect('/select-troupe');
+            }
+          }
+
+          if(req.body.rememberMe) {
+            rememberMe.generateAuthToken(req, res, req.user.id, {}, function(err) {
+              if(err) winston.error(err);
+              sendAffirmativeResponse();
             });
           } else {
-            res.relativeRedirect('/select-troupe');
+            sendAffirmativeResponse();
           }
         });
 
@@ -38,8 +52,9 @@ module.exports = {
       });
 
 
-      app.get('/select-troupe', function(req, res) {
-
+      app.get('/select-troupe', 
+        middleware.ensureLoggedIn,
+        function(req, res) {
         troupeService.findAllTroupesForUser(req.user.id, function(err, troupes) {
           if (err) return res.send(500);
 

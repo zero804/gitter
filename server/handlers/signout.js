@@ -6,6 +6,7 @@ module.exports = {
     install: function(app) {
       /* Cheap trick for testing */
       app.get('/signout', function(req, res) {
+        res.clearCookie("auth");
         req.session.destroy();
         res.relativeRedirect('/');
       });

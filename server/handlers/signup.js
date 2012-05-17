@@ -13,6 +13,10 @@ module.exports = {
       app.get(
         '/',
         function(req, res) {
+          if(req.user) {
+            res.relativeRedirect("/select-troupe");
+            return;
+          }
           res.render('signup');
         }
       );
@@ -29,7 +33,7 @@ module.exports = {
           validate("email").isEmail()
         ),
 
-        function(req, res){
+        function(req, res) {
           if (!req.form.isValid) {
             // TODO: Handle errors
             console.log(req.form.errors);
