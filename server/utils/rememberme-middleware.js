@@ -58,6 +58,9 @@ module.exports = {
 
       redisClient.get("rememberme:" + key, function(err, storedValue) {
         if(err) return fail();
+        if(!storedValue) return fail();
+
+        redisClient.del("rememberme:" + key);
 
         var stored = JSON.parse(storedValue);
 
