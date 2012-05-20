@@ -8,6 +8,11 @@ define([
 
     render: function() {
       return this;
+    },
+
+    close: function() {
+      console.log("close miview");
+      this.off();
     }
 
   });

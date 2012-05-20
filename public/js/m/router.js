@@ -13,22 +13,41 @@ define([
   function initRouter() {
       console.log("ROUTING");
 
-      new $.mobile.Router({
+      var router;
+      /* Taken from http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
+      function showView(view) {
+          if (router.currentView)
+              router.currentView.close();
+
+          view.render();
+
+          router.currentView = view;
+          return view;
+      }
+
+      router = new $.mobile.Router({
         "#chat":   { handler: 'chat', events: "s" },
         "#mail":   { handler: 'mail', events: "s" },
+        "#mailitem":   { handler: 'mailitem', events: "s" },
         "#file": { handler: 'file', events: "s" }
       }, {
         chat: function(){
           console.log("CHAT");
-          //new chatView().render();
+          showView(new ChatView());
         },
 
         mail: function(){
           console.log("MAIL");
-          //new mailView().render();
+          showView(new MailView());
+        },
+
+        mailitem: function(){
+          console.log("MAILITEM");
+          showView(new MailItemView());
         },
 
         file: function(){
+          showView(new FileView());
           //new fileView().render();
         },
 
