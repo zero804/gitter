@@ -9,6 +9,11 @@ define([
     render: function() {
 
       return this;
+    },
+
+    close: function() {
+      console.log("close mailview");
+      this.off();
     }
 
   });

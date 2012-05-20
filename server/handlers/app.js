@@ -13,7 +13,6 @@ module.exports = {
           if(err) return next(err);
           if(!troupe) return next("Troupe: " + appUri + " not found.");
 
-
           if(req.user) {
             if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
               res.relativeRedirect("/" + appUri + "/accessdenied");
@@ -30,7 +29,14 @@ module.exports = {
               }
           };
 
-          res.render('app', {
+          var page;
+          if(req.headers['user-agent'].indexOf('Mobile') >= 0) {
+            page = 'm/mobile';
+          } else {
+            page = 'app';
+          }
+
+          res.render(page, {
             troupeContext: JSON.stringify(troupeContext)
           });
 
