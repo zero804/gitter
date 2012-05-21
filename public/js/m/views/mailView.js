@@ -20,9 +20,6 @@ define([
         type: "GET",
         success: function(data) {
           self.renderMails(data);
-        },
-        complete: function() {
-          // We need to tell JQM to make this new content into a listview, otherwise the styling isn't applied.
           $('#maillist').listview('refresh');
         }
       });
@@ -48,7 +45,7 @@ define([
         var mailsForDate = mailsByDate[date];
 
         var dividerHtml = Mustache.render(dividerTemplate, {
-          date: date,
+          date: utils.formatDate(new Date(date)),
           count: mailsForDate.length
         });
 
