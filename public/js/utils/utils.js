@@ -23,6 +23,11 @@ define([
     extractDateFromDateTime: function(dateTime) {
       if(!dateTime) return null;
       return new Date(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDate());
+    },
+
+    formatDate: function(dateTime) {
+      if(!dateTime) return "";
+      return dateTime.toLocaleDateString();
     }
   };
 
