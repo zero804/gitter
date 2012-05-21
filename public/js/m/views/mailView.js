@@ -2,8 +2,10 @@ define([
        'underscore',
        'backbone',
        'mustache',
-       'text!templates/mail/row.mustache'
-], function(_, Backbone, Mustache, rowTemplate){
+       '/js/utils/utils.js',
+       'text!templates/mail/row.mustache',
+       'text!templates/mail/divider.mustache'
+], function(_, Backbone, Mustache, utils, rowTemplate, dividerTemplate){
 
   var MailView = Backbone.View.extend({
     el: '#mail',
@@ -34,27 +36,46 @@ define([
       //if (mails.length === 0) $("#frame-help").show(); // TODO IMPLEMENT NO MAIL VIEW
       $("#maillist", this.el).empty();
 
+      var mailsByDate = utils.index(mails, function(mail) {
+        return utils.extractDateFromDateTime(new Date(mail.date));
+      });
+
+      var dates = _.keys(mailsByDate);
+      dates.sort();
+
+      for(var i = 0; i < dates.length; i++) {
+        var date =  dates[i];
+        var mailsForDate = mailsByDate[date];
+
+        var dividerHtml = Mustache.render(dividerTemplate, {
+          date: date,
+          count: mailsForDate.length
+        });
+
+        $("#maillist", this.el).append($(dividerHtml));
+
+        for(var j = 0; j < mailsForDate.length; j++) {
+          var mail = mailsForDate[j];
+
+          //TODO: Clever date manipulation for the list view
+          //Manipulate the date out of ISO format
+          //Can probably do a better job here showing cleaner dates, take into account local time zone
+          //And probably do this in some function elsewhere
+
+          var rowHtml = Mustache.render(rowTemplate, {
+            personName: mail.fromName,
+            preview: mail.preview,
+            subject: mail.subject,
+            id: mail.id
+          });
+
+          var item = $(rowHtml);
+          $("#maillist", this.el).append(item);
+        }
+      }
+
       while(mails.length > 0) {
         var p1 = mails.shift();
-
-        //TODO: Clever date manipulation for the list view
-        
-        //Manipulate the date out of ISO format
-        //Can probably do a better job here showing cleaner dates, take into account local time zone
-        //And probably do this in some function elsewhere
-        p1.date = Date.parse(p1.date);
-        var d = new Date(p1.date);
-        p1.date = d.toUTCString();
-        var rowHtml = Mustache.render(rowTemplate, {
-          personName: p1.fromName,
-          preview: p1.preview,
-          subject: p1.subject,
-          id: p1.id,
-          date: p1.date
-        });
-        
-        var item = $(rowHtml);
-        $("#maillist", this.el).append(item);
         //item.on('click', this.onClickGenerator(p1.id));
       }
     },
