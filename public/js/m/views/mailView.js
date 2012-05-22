@@ -63,6 +63,7 @@ define([
             personName: mail.fromName,
             preview: mail.preview,
             subject: mail.subject,
+            time: utils.extractTimeFromDateTime(new Date(mail.date)),
             id: mail.id
           });
 

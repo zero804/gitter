@@ -25,6 +25,12 @@ define([
       return new Date(dateTime.getFullYear(), dateTime.getMonth(), dateTime.getDate());
     },
 
+    extractTimeFromDateTime: function(dateTime) {
+      if (!dateTime) return null;
+      var time = dateTime.getHours() + ":" + dateTime.getMinutes();
+      return time;
+    },
+
     formatDate: function(dateTime) {
       if(!dateTime) return "";
       return dateTime.toLocaleDateString();
