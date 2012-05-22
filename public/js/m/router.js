@@ -28,7 +28,7 @@ define([
       router = new $.mobile.Router({
         "#chat":   { handler: 'chat', events: "s" },
         "#mail":   { handler: 'mail', events: "s" },
-        "#mailitem":   { handler: 'mailitem', events: "s" },
+        "#mailitem/:id":   { handler: 'mailitem', events: "s" },
         "#file": { handler: 'file', events: "s" }
       }, {
         chat: function(){
@@ -43,7 +43,7 @@ define([
 
         mailitem: function(){
           console.log("MAILITEM");
-          showView(new MailItemView());
+          showView(new MailItemView(id));
         },
 
         file: function(){
