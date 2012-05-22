@@ -8,6 +8,8 @@ require({
     mustache: '/js/libs/mustache/mustache',
     templates: '/templates/m',
     order : '/js/libs/require/order',
+    collections: '/js/collections',
+    models: '/js/models',
     'jquery.mobile.router': '/js/libs/jquery.mobile.router/jquery.mobile.router'
   }
 }, [
