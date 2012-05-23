@@ -10,12 +10,9 @@
 
 	<title>Troupe</title>
 
-	<link rel="stylesheet" href="bootstrap/css/trp.css">
-  <link rel="stylesheet" href="bootstrap/css/font-awesome.css">
-  <link href="bootstrap/css/responsive.css" rel="stylesheet">
-
-  <link href='http://fonts.googleapis.com/css?family=Pontano+Sans' rel='stylesheet' type='text/css'>
-
+	<link rel="stylesheet" href="bootstrap/css/trp2.css">
+  <link href='http://fonts.googleapis.com/css?family=Lustria' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Gudea' rel='stylesheet' type='text/css'>
 	<script data-main="js/app.js" src="js/libs/require/require.js"></script>
 	<script type="text/javascript">
 	window.troupeContext = {{{troupeContext}}};
@@ -27,73 +24,107 @@
 
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href="images/favicon.ico">
-    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
-    <link REL="SHORTCUT ICON" HREF="favicon.ico">
 
 </head>
 <body>
-  <div class="container">
-      <div class="row">
-        <div class="span1">&nbsp;</div>
-        <div class="span2">
-          <div>
-            <img src="images/logo_green.png">
-          </div>
-        </div>
-        <div class="span8">
-          <ul class="nav pull-right">
-            <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="label-displayName"></span> <b class="caret"></b></a>
-            <ul class="dropdown-menu">
-              <li><a href="#">Profile</a></li>
-              <li><a href="#">Settings</a></li>
-              <li class="divider"></li>
-              <li><a href="/signout">Sign out</a></li>
-            </ul>
-          </ul>
-          <ul class="nav pull-right">
-            <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Troupes <b class="caret"></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
-            <ul class="dropdown-menu" id="menu-troupe-selector">
-            </ul>
-          </ul>
-        </div>
-        <div class="span1">&nbsp;</div>
+  <div id="trpHeaderWrap">
+    <div id="trpHeaderContainer">
+      <div id="trpHeader">
+        <ul>
+          <li><img src="images/2/logo-small.png" class="trpSpace24"></li>
+          <li><h1>Nike superfly campaign team</h1></li>
+        </ul>
       </div>
-      <br>
-      <div class="row">
-        <div class="span1">&nbsp;</div>
-        <div class="span2">
-            <div class="navbox">
-              <img src="images/tmp/trp_nike.png" class="rounded">
-              <li class="nav nav-list navitem"><a href="#"><i class="icon-asterisk navicon" style="vertical-align:middle"></i><span class="navtext">Everything</span></a></li>
-              <li class="nav nav-list navitem"><a href="#chat"><i class="icon-comments navicon" style="vertical-align:middle"></i><span class="navtext">Chat</span></a></li>
-              <li class="nav nav-list navitem"><a href="#mail"><i class="icon-envelope navicon" style="vertical-align:middle"></i><span class="navtext">Mail</span></a></li>
-              <li class="nav nav-list navitem"><a href="#statusphere"><i class="icon-th-list navicon" style="vertical-align:middle"></i><span class="navtext">Status Updates</span></a></li>
-              <li class="nav nav-list navitem"><a href="#files"><i class="icon-folder-open navicon" style="vertical-align:middle"></i><span class="navtext">Files</span></a></li>
-              <li class="nav nav-list navitem lastnav"><a href="#people"><i class="icon-user navicon" style="vertical-align:middle"></i><span class="navtext">People</span></a></li>
-              <br><br>              
-            </div>
-        </div>
-        <div class="span8">
-          <div class="row-fluid">
-            <div class="contentHeader"><span class="label-troupeName"></div>
-          </div>
-          <div class="row-fluid">
-            <div class="contentBody" id="primary-view">
-
-              <h3>Loading, loading, loading...</h3>
-              <p>This is where a distracting loading graphic will be displayed....</p>
-              <img src="/images/ajax-loader.gif">
-
-            </div>
-          </div>
-        </div>
-        <div class="span1">&nbsp;</div>
+      <div id="trpHeaderRight">
+        <ul>
+          <li><img src="images/2/icon-person.png" class="trpSpace24"></li>
+          <li><img src="images/2/icon-settings.png"></li>
+        </ul>
       </div>
     </div>
+  </div>
+
+<!--   <div id="trpNavWrap">
+    <div id="trpNavContainer">
+      <div id="trpNav">
+        <ul>
+          <li>Everything</li>
+          <li>Chat</li>
+          <li>Mail</li>
+          <li>Files</li>
+          <li>People</li>
+        </ul>
+      </div>
+    </div>
+  </div> -->
+
+  <div id="trpNavWrap">
+    <div id="trpNavContainer">
+      <div id="trpNav">
+
+        <div id="trpNavItemContainer">
+          <div id="trpNavItemIcon">
+            <img src="/images/2/icon-everything.png">
+          </div>
+          <div id="trpNavItemText">
+            Everything
+          </div>
+        </div>
+
+        <div id="trpNavItemContainer">
+          <div id="trpNavItemIcon">
+            <img src="/images/2/icon-chat-selected.png">
+          </div>
+          <div id="trpNavItemText">
+            Chat
+          </div>
+        </div>
+
+        <div id="trpNavItemContainer">
+          <div id="trpNavItemIcon">
+            <img src="/images/2/icon-mail.png">
+          </div>
+          <div id="trpNavItemText">
+            Mail
+          </div>
+        </div>
+
+        <div id="trpNavItemContainer">
+          <div id="trpNavItemIcon">
+            <img src="/images/2/icon-files.png">
+          </div>
+          <div id="trpNavItemText">
+            Files
+          </div>
+        </div>
+
+        <div id="trpNavItemContainer">
+          <div id="trpNavItemIcon">
+            <img src="/images/2/icon-people.png">
+          </div>
+          <div id="trpNavItemText">
+            People
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div id="trpContentWrap">
+    <div id="trpContentContainer">
+
+      <div class="contentBody" id="primary-view">
+
+        <h3>Loading, loading, loading...</h3>
+        <p>This is where a distracting loading graphic will be displayed....</p>
+        <img src="/images/ajax-loader.gif">
+
+      </div>
+
+    </div>
+  </div>
+
     
 </body>
 </html>
