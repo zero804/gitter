@@ -1,18 +1,19 @@
 define([
        'underscore',
        'backbone',
-       'mustache',
-       'text!templates/mail/item.mustache'
+       'mustache'
 ], function(_, Backbone){
 
   var MailView = Backbone.View.extend({
     el: '#mailitem',
 
     initialize: function(options) {
-      this.router = options.router;
+      console.log('INIT, init');
+      this.mailId = options.id;
       var self = this;
+
       $.ajax({
-        url: "/troupes/" + window.troupeContext.troupe.id + "/mails/" + this.id,
+        url: "/troupes/" + window.troupeContext.troupe.id + "/mails/" + this.mailId,
         contentType: "application/json",
         dataType: "json",
         type: "GET",
@@ -24,13 +25,15 @@ define([
     },
 
     renderMailItem: function() {
+      console.log('Rendering');
       $('.label-subject',this.el).text(this.mail.subject);
       $('.label-body',this.el).html(this.mail.mail);
-
-      this.generateAttachmentMenu();
+      console.log('End Rendering');
+      //this.generateAttachmentMenu();
     },
 
     render: function() {
+      console.log("Render called");
       return this;
     },
 
