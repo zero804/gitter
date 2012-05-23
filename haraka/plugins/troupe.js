@@ -38,7 +38,7 @@ function saveFile(troupeId, creatorUserId, fileName, mimeType, content, callback
         if (err) return callback(err); 
 
         // Delete the temporary file */
-        fs.unlink(tempFileInfo.path);
+        //fs.unlink(tempFileInfo.path);
 
         callback(null, fileAndVersion);
       });
