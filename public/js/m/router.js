@@ -1,3 +1,5 @@
+/*jshint globalstrict:true, trailing:false */
+/*global require: true, module: true, console: true */
 define([
   'jquery',
   'jqueryM',
@@ -9,7 +11,7 @@ define([
   '/js/m/views/mailItemView.js',
   '/js/m/views/fileView.js'
 ], function($, $$, _, jqmRouter, Backbone, ChatView, MailView, MailItemView, FileView) {
-
+  "use strict";
   function initRouter() {
       console.log("ROUTING");
 
@@ -28,7 +30,7 @@ define([
       router = new $.mobile.Router({
         "#chat":   { handler: 'chat', events: "s" },
         "#mail":   { handler: 'mail', events: "s" },
-        "#mailitem/:id":   { handler: 'mailitem', events: "s" },
+        "#mailitem([?](.*))?":   { handler: 'mailitem', events: "s" },
         "#file": { handler: 'file', events: "s" }
       }, {
         chat: function(){
@@ -41,12 +43,15 @@ define([
           showView(new MailView());
         },
 
-        mailitem: function(){
+        mailitem: function(eventName, urlMatches){
           console.log("MAILITEM");
-          showView(new MailItemView(id));
+          var id = urlMatches[2];
+          console.dir(arguments);
+          showView(new MailItemView({id: id}));
         },
 
         file: function(){
+          console.log("FILE");
           showView(new FileView());
           //new fileView().render();
         },

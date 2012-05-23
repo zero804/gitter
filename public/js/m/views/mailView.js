@@ -11,7 +11,7 @@ define([
     el: '#mail',
 
     initialize: function(options) {
-      //this.router = options.router; THIS DOESNT SEEM TO DO ANYTHING?!
+      //this.router = options.router;
       var self = this;
       $.ajax({
         url: "/troupes/" + window.troupeContext.troupe.id + "/mails",
