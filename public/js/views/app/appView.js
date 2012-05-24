@@ -12,7 +12,7 @@ define([
 
     troupeCollection: new TroupeCollection(),
 
-    troupeSelectorMenu: $("#menu-troupe-selector"),
+    troupeSelectorMenu: $("#trpTroupeSelector"),
 
     initialize: function() {
       this.troupeCollection.on('change', this.addAllTroupes, this);
@@ -60,12 +60,26 @@ define([
     },
 
     events: {
-      //"keydown .chatbox":          "detectReturn"
+         "click #trpSelectorArrow"  : "toggleSelector"
     },
 
+    toggleSelector: function(){
+      if ($('#trpTroupeSelector').height() === 0) $('#trpTroupeSelector').animate({
+        height: '900px'
+      }, 300);
+      else $('#trpTroupeSelector').animate({
+        height: '0px'
+      }, 300);
+    },
+
+    hideSelector: function(){
+      $('#trpTroupeSelector').animate({
+        height: '0px'
+      }, 300);
+    },
 
     addOneTroupe: function(model) {
-      this.troupeSelectorMenu.append("<li><a href='" + model.get("uri") + "'>"+ model.get("name") + "</a></li>");
+      this.troupeSelectorMenu.append("<div class='trpTroupeSelectorItem'><h1><a href='" + model.get("uri") + "'>"+ model.get("name") + "</a></h1></div>");
     },
 
     addAllTroupes: function() {

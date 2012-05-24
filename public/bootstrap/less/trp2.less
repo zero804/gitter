@@ -9,6 +9,8 @@
 @col5: #1dd0cd; // turquoise
 @col6: #fcb316; // moutard
 @col7: #f8f6f7; // off-white
+@col8: #d6d6d6; // darker off-white for borders and ting
+@col9: #149a55; // darker col1
 
 // Our fonts
 @font1: 'Pontano Sans', sans-serif;
@@ -21,7 +23,7 @@
 @bgGreen: %("%s/bg_green.png", @baseImages);
 
 html {
-
+ background-color: @col7;
 
 }
 
@@ -35,6 +37,7 @@ h1 {
   top: 0;
   left: 0;
   width: 100%;  
+  z-index: 1;
 }
 
 #trpHeaderContainer {
@@ -93,29 +96,55 @@ h1 {
 }
 
 #trpHeaderRight ul li a{
-  color: #90b874;
-  font-weight: bold;
-  font-size: 1.4em;
   margin-right: 5px;
   text-decoration: none;
 }
 
 #trpContentWrap {
-  position: fixed;
-  left: 250px;
   height: 100%; 
-  width: 100%;
+  display: inline;
+  overflow: scroll;
 }
 
 #trpContentContainer {
   margin: 0 auto;
   font-size: 1.4em;
-  overflow: auto;
   padding: 90px 0 40px;
+  padding-left: 250px;
+  padding-right: 20px;
+  background-color: @col7;
 }
 
-.trpSpace24 {
-  margin-right: 20px;
+#trpTroupeSelector {
+  position: absolute;
+  z-index: 2;
+  top: 64px;
+  width:100%;
+  height: 0px;
+  overflow: hidden;
+}
+
+#trpTroupeSelector h1 a{
+  color: white;
+  text-decoration: none;
+}
+
+.trpTroupeSelectorItem {
+  padding-top: 10px;
+  padding-left: 75px;
+  padding-bottom: 10px;
+  text-decoration: none;
+  border-bottom: thin solid @col1;
+  background-color: @col9;
+}
+
+.trpTroupeSelectorItem:hover{
+  background-color: @col1;
+  cursor: pointer;
+}
+
+#trpSelectorArrow {
+  padding-left: 10px;
 }
 
 #trpNavWrap {
@@ -125,6 +154,7 @@ h1 {
   width: 235px;
   height: 100%; 
   background-image: url('/images/2/bg-nav.png'); 
+  float: left;
 }
 
 #trpNavContainer {
@@ -164,7 +194,139 @@ h1 {
   color: black;
 }
 
+.trpChatContainer {
+}
 
+.trpChatBubble {
+  position:relative;
+  padding:15px;
+  margin-bottom: 24px;
+  border:1px solid @col8;
+  color:#333;
+  background:#fff;
+  /* css3 */
+  -webkit-border-radius:3px;
+  -moz-border-radius:3px;
+  border-radius:3px;
+  font-family: 'Gudea', sans-serif;
+  font-size: 18px;
+  color: #7b797a;
+  letter-spacing: 1px;
+  font-family: 'Yanone Kaffeesatz', sans-serif;
+  max-width: 500px;
+}
+
+.trpChatBubble:before {
+  content:"";
+  position:absolute;
+  bottom:-20px; /* value = - border-top-width - border-bottom-width */
+  left:40px; /* controls horizontal position */
+    border-width:20px 20px 0;
+  border-style:solid;
+    border-color:#5a8f00 transparent;
+    /* reduce the damage in FF3.0 */
+    display:block; 
+    width:0;
+}
+
+/* creates the smaller  triangle */
+.trpChatBubble:after {
+  content:"";
+  position:absolute;
+  bottom:-13px; /* value = - border-top-width - border-bottom-width */
+  left:47px; /* value = (:before left) + (:before border-left) - (:after border-left) */
+  border-width:13px 13px 0;
+  border-style:solid;
+  border-color:#fff transparent;
+    /* reduce the damage in FF3.0 */
+    display:block; 
+    width:0;
+}
+
+.trpChatBubble.remote {
+  float: right;
+}
+
+.trpChatBubble.local {
+  float: left;
+}
+
+.trpChatBubble.right {
+  margin-right:30px;
+}
+
+/* creates the larger triangle */
+.trpChatBubble.local:before {
+  top:10px; /* controls vertical position */
+  bottom:auto;
+  left:-5px; /* value = - border-left-width - border-right-width */
+  border-width:15px 5px 15px 0;
+  border-color:transparent @col8;
+}
+
+/* creates the smaller  triangle */
+.trpChatBubble.local:after {
+  top:11px; /* value = (:before top) + (:before border-top) - (:after border-top) */
+  bottom:auto;
+  left:-4px; /* value = - border-left-width - border-right-width */
+  border-width:14px 5px 14px 0;
+  border-color:transparent white;
+}
+
+/* Variant : right
+------------------------------------------ */
+
+/* creates the larger triangle */
+.trpChatBubble.remote:before {
+  top:10px; /* controls vertical position */
+  bottom:auto;
+    left:auto;
+  right:-5px; /* value = - border-left-width - border-right-width */
+  border-width:15px 0 15px 5px;
+  border-color:transparent @col8;
+}
+
+/* creates the smaller  triangle */
+.trpChatBubble.remote:after {
+  top:11px; /* value = (:before top) + (:before border-top) - (:after border-top) */
+  bottom:auto;
+    left:auto;
+  right:-4px; /* value = - border-left-width - border-right-width */
+  border-width:14px 0 14px 5px;
+  border-color:transparent white;
+}
+
+.trpChatPictureLocal {
+  float: left;
+  padding-right: 20px;
+  padding-left: 20px;
+}
+
+.trpChatPictureRemote {
+  float: right;
+  padding-right: 20px;
+  padding-left: 20px;
+}
+
+.trpChatRemote {
+  text-align:right; 
+}
+
+.trpSpace24 {
+  margin-right: 20px;
+}
+
+.trpDisplayPicture{
+  -webkit-border-radius: 50em;
+  -moz-border-radius: 50em;
+  border-radius: 50em;
+  /*border: solid thin #dcdcdc;*/
+  background-color: transparent;
+}
+
+.trpNewLine {
+  clear: both;
+}
 
 
 
