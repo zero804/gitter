@@ -116,7 +116,7 @@ define([
     },
 
     attachTooltipHandlers: function(item) {
-      $('.chat-bubble', item).each(this.attachTooltipHandlerToItem);
+      $('.trpChatBubble', item).each(this.attachTooltipHandlerToItem);
       $('.dp-tooltip', item).tooltip();
     },
 

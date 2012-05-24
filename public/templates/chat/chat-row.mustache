@@ -1,13 +1,11 @@
-
-<div class="row-fluid">
-    <div class="span1">
-        <img src="images/tmp/dp_spacer.png" class="dp dpspacer">
-    </div>
-    <div class="span10 chat-bubble-containter remote">
-        <div class="chat-bubble remote timeago" rel="tooltip" data-sent="{{sent}}">{{text}}</div>
-
-    </div>
-    <div class="span1">
-        <a name="#" rel="tooltip" title="{{fromUserDisplayName}}" class="dp-tooltip"><img src="{{fromUserAvatarUrlSmall}}" class="dp"></a>
-    </div>
+<br class="trpNewLine">
+  <div>
+      <img src="images/tmp/dp_spacer.png" class="dp dpspacer">
+  </div>
+  <div class="trpChatPictureRemote">
+      <a name="#" rel="tooltip" title="{{fromUserDisplayName}}" class="dp-tooltip"><img src="{{fromUserAvatarUrlSmall}}" class="trpDisplayPicture"></a>
+  </div>
+  <div class="trpChatContainer">
+      <div class="trpChatBubble remote timeago" rel="tooltip" data-sent="{{sent}}">{{text}}</div>
+  </div>
 </div>
