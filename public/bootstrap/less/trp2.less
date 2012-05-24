@@ -109,8 +109,8 @@ h1 {
 #trpContentContainer {
   margin: 0 auto;
   font-size: 1.4em;
-  padding: 90px 0 40px;
-  padding-left: 250px;
+  padding: 65px 0 0px;
+  padding-left: 235px;
   padding-right: 20px;
   background-color: @col7;
 }
@@ -197,6 +197,42 @@ h1 {
 .trpChatContainer {
 }
 
+.trpChatIcon {
+  float: left;
+}
+
+#trpChatInput {
+  width:100%;
+  background-color: white;
+  padding-left: 30px;
+  height: 80px;
+  border-bottom: 1px solid @col8;
+}
+  
+.trpChatBox {
+  border-style: none;  
+  overflow: auto; 
+  resize: none;
+  padding: 22px;
+  font-size: 18px;
+  color: #7b797a;
+  letter-spacing: 1px;
+  font-family: 'Yanone Kaffeesatz', sans-serif;
+  width: 500px;
+  -webkit-appearance: none;
+}
+
+.trpChatBox:focus{
+     outline: none;
+}
+
+textarea, input { outline: none; }
+
+.trpChatIcon {
+  padding-top: 25px;
+  padding-right: 30px;
+}
+
 .trpChatBubble {
   position:relative;
   padding:15px;
@@ -208,7 +244,6 @@ h1 {
   -webkit-border-radius:3px;
   -moz-border-radius:3px;
   border-radius:3px;
-  font-family: 'Gudea', sans-serif;
   font-size: 18px;
   color: #7b797a;
   letter-spacing: 1px;
