@@ -60,23 +60,29 @@ define([
     },
 
     events: {
-         "click #trpSelectorArrow"  : "toggleSelector"
+         "click #trpSelectorArrow"  : "toggleSelector",
+         "click #trpPersonIcon" : "toggleUserMenu"
     },
 
     toggleSelector: function(){
       if ($('#trpTroupeSelector').height() === 0) $('#trpTroupeSelector').animate({
         height: '900px'
-      }, 300);
+      }, 500);
       else $('#trpTroupeSelector').animate({
         height: '0px'
       }, 300);
     },
 
-    hideSelector: function(){
-      $('#trpTroupeSelector').animate({
+    toggleUserMenu: function() {
+      if ($('#trpUserMenu').height() === 0) $('#trpUserMenu').animate({
+        height: '200px'
+      }, 500);
+      else $('#trpUserMenu').animate({
         height: '0px'
       }, 300);
+
     },
+
 
     addOneTroupe: function(model) {
       this.troupeSelectorMenu.append("<div class='trpTroupeSelectorItem'><h1><a href='" + model.get("uri") + "'>"+ model.get("name") + "</a></h1></div>");
