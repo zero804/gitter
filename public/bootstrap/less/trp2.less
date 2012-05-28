@@ -1,6 +1,6 @@
 // Bootstrap Reset
-@import "bootstrap.less";
-
+/*@import "bootstrap.less";
+*/
 // Our colour palette
 @col1: #1dce73; // lumo green 
 @col2: #d54f68; // pinky red
@@ -22,6 +22,10 @@
 
 @bgGreen: %("%s/bg_green.png", @baseImages);
 
+body {
+  margin: 0;
+}
+
 html {
  background-color: @col7;
 
@@ -30,6 +34,7 @@ html {
 h1 {
   font-family: 'Lustria', serif;
   font-size: 24px;
+  margin: 0;
 }
 
 #trpHeaderWrap {
@@ -214,16 +219,16 @@ h1 {
   overflow: auto; 
   resize: none;
   padding: 22px;
+  max-height: 30px;
   font-size: 18px;
   color: #7b797a;
   letter-spacing: 1px;
   font-family: 'Yanone Kaffeesatz', sans-serif;
   width: 500px;
-  -webkit-appearance: none;
 }
 
-.trpChatBox:focus{
-     outline: none;
+.trpChatBox:focus {
+ outline: none;       
 }
 
 textarea, input { outline: none; }
