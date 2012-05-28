@@ -1,6 +1,11 @@
 // Bootstrap Reset
 /*@import "bootstrap.less";
 */
+
+@import "variables.less"; // Modify this for custom colors, font-sizes, etc
+@import "mixins.less";
+@import "modals.less";
+
 // Our colour palette
 @col1: #1dce73; // lumo green 
 @col2: #d54f68; // pinky red
@@ -150,6 +155,36 @@ h1 {
 
 #trpSelectorArrow {
   padding-left: 10px;
+}
+
+#trpUserMenu {
+  position: absolute;
+  z-index: 2;
+  top: 64px;
+  width:250px;
+  right: 0px;
+  height: 0px;
+  overflow: hidden;
+}
+
+#trpUserMenu h1 a{
+  color: white;
+  text-decoration: none;
+}
+
+.trpUserMenuItem {
+  padding-top: 10px;
+  padding-right: 70px;
+  padding-bottom: 10px;
+  text-decoration: none;
+  border-bottom: thin solid @col1;
+  background-color: @col9;
+  text-align: right;
+}
+
+.trpUserMenuItem:hover{
+  background-color: @col1;
+  cursor: pointer;
 }
 
 #trpNavWrap {
