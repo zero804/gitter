@@ -21,8 +21,9 @@ define([
       this.scrollEventBound = _.bind(this.chatWindowScroll, this);
       _.bindAll(this, "userLoggedIntoTroupe", "userLoggedOutOfTroupe");
 
-      $(document).bind('chat', this, this.onMessage);
       $(window).bind('scroll', this, this.scrollEventBound);
+
+      $(document).bind('chat', this, this.onMessage);
       chat.subscribeTroupeChatMessages();
 
       $(document).bind('userLoggedIntoTroupe', this.userLoggedIntoTroupe);
@@ -37,8 +38,10 @@ define([
 
     beforeClose: function() {
       chat.unsubscribeTroupeChatMessages();
-      $(document).unbind('chat', this.onMessage);
+
       $(window).unbind('scroll', this.scrollEventBound);
+
+      $(document).unbind('chat', this.onMessage);
       $(document).unbind('userLoggedIntoTroupe', this.userLoggedIntoTroupe);
       $(document).unbind('userLoggedOutOfTroupe', this.userLoggedOutOfTroupe);
 

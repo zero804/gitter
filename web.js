@@ -6,14 +6,14 @@ var express = require('express'),
 	tmpl = require('./server/mustache-template'),
 	userService = require('./server/services/user-service'),
 	troupeService = require('./server/services/troupe-service'),
-  mailService = require('./server/services/mail-service'),
+	mailService = require('./server/services/mail-service'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
 	ConfirmStrategy = require('./server/utils/confirm-strategy').Strategy,
-  nconf = require('./server/utils/config').configure(),
-  httpUtils = require('./server/utils/http'),
-  rememberMe = require('./server/utils/rememberme-middleware'),
-  winston = require('winston');
+    nconf = require('./server/utils/config').configure(),
+    httpUtils = require('./server/utils/http'),
+    rememberMe = require('./server/utils/rememberme-middleware'),
+    winston = require('winston');
 
 /* TODO: put all our prototypes in a module */
 Array.prototype.narrow = function() {
@@ -136,6 +136,9 @@ require('./server/handlers/profile').install(app);
 require('./server/handlers/login').install(app);
 require('./server/handlers/invite').install(app);
 require('./server/handlers/avatar').install(app);
+
+// TEMPORARY!
+require('./server/handlers/mobile').install(app);
 
 /* REST resources: not used yet */
 var troupesResource = app.resource('troupes',  require('./server/resources/troupes.js'));
