@@ -124,6 +124,7 @@ function addInvite(troupe, displayName, email) {
 
   mailerService.sendEmail({
     templateFile: "inviteemail",
+    from: 'signup-robot@trou.pe',
     to: email,
     subject: "You been invited to join the " + troupe.name + " troupe",
     data: {
