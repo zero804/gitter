@@ -19,7 +19,8 @@ var mimeTypesWithNoConversionRequired = [
   "application/pdf",
   "image/gif",
   "image/jpeg",
-  "image/png"
+  "image/png",
+  "image/tiff"
 ];
 
 function generatePdfFile(options, callback) {
@@ -41,7 +42,7 @@ function generatePdfFile(options, callback) {
   }, function(res) {
     if(res.statusCode != 200) {
       res.destroy();
-      return callback("Service returned an invalid response: " + res.statusCode);
+      return callback("Converter service returned an invalid response: " + res.statusCode);
     }
 
     var tempName = temp.path({prefix: 'embedded', suffix: '.pdf'});

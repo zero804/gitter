@@ -74,7 +74,7 @@ module.exports = {
           if(!user) return;
 
           /* Give the user 10 seconds to log back into before reporting that they're disconnected */
-          setTimeout(function(){ 
+          setTimeout(function(){
             presenceService.userSocketDisconnected(user.id, self.user.clientId);
           }, 10000);
 
@@ -83,23 +83,23 @@ module.exports = {
 
       everyone.now.subscribeToTroupe = function(troupeId, callback) {
         var self = this;
-        if(!callback) callback = function() {}
- 
+        if(!callback) callback = function() {};
+
         loadUserAndTroupe(this.user, troupeId, sessionStore, function(err, user, troupe) {
           if(err) {
             winston.warn('Error while loading user and troupe in subscribeToTroupe: ' + err);
             callback({ description: "Server error", reauthenticate: true });
             return;
-          };
+          }
 
           if(!user || !troupe) {
             callback({ description: "Authentication failure", reauthenticate: true });
             return;
-          };
+          }
 
           presenceService.userSubscribedToTroupe(user.id, troupe.id, self.user.clientId);
 
-          var group = nowjs.getGroup("troup." + troupe.id);
+          var group = nowjs.getGroup("troupe." + troupe.id);
           group.addUser(self.user.clientId);
 
           callback(null);
@@ -114,7 +114,7 @@ module.exports = {
         loadUserAndTroupe(this.user, troupeId, sessionStore, function(err, user, troupe) {
           if(err) return;
 
-          var group = nowjs.getGroup("troup." + troupe.id + ".chat");
+          var group = nowjs.getGroup("troupe." + troupe.id + ".chat");
           group.addUser(self.user.clientId);
         });
       };
@@ -122,7 +122,7 @@ module.exports = {
       everyone.now.unsubscribeToTroupeChat = function(troupeId) {
         winston.info("User unsubscribed from group chat");
 
-        var group = nowjs.getGroup("troup." + troupeId + ".chat");
+        var group = nowjs.getGroup("troupe." + troupeId + ".chat");
         group.removeUser(this.user.clientId);
       };
 
@@ -151,10 +151,11 @@ module.exports = {
       };
 
       appEvents.onTroupeChat(function(data) {
-        winston.info("New chat message on bus");
         var troupeId = data.troupeId;
+        var group = nowjs.getGroup("troupe." + troupeId + ".chat");
 
-        var group = nowjs.getGroup("troup." + troupeId + ".chat");
+        winston.info("New chat message on bus");
+
         group.now.onTroupeChatMessage(data.chatMessage);
       });
 
@@ -162,17 +163,21 @@ module.exports = {
         var troupeId = data.troupeId;
         var userId = data.userId;
 
-        var deferredT = Q.defer();
-        var deferredU = Q.defer();
+        var group = nowjs.getGroup("troupe." + troupeId);
+        group.count(function (count) {
+          if(!count) { winston.info("Count==" + count); return; }
 
-        userService.findById(userId, deferredU.node());
-        troupeService.findById(troupeId, deferredT.node());
+          var deferredT = Q.defer();
+          var deferredU = Q.defer();
 
-        Q.all([deferredT.promise, deferredU.promise]).spread(function(troupe, user) {
-          var group = nowjs.getGroup("troup." + troupeId);
-          group.now.onUserLoggedIntoTroupe({
-            userId: userId,
-            displayName: user.displayName
+          userService.findById(userId, deferredU.node());
+          troupeService.findById(troupeId, deferredT.node());
+
+          Q.all([deferredT.promise, deferredU.promise]).spread(function(troupe, user) {
+            group.now.onUserLoggedIntoTroupe({
+              userId: userId,
+              displayName: user.displayName
+            });
           });
         });
       });
@@ -181,19 +186,24 @@ module.exports = {
         var troupeId = data.troupeId;
         var userId = data.userId;
 
-        var deferredT = Q.defer();
-        var deferredU = Q.defer();
+        var group = nowjs.getGroup("troupe." + troupeId);
+        group.count(function (count) {
+          if(!count) { winston.info("Count==" + count); return; }
 
-        userService.findById(userId, deferredU.node());
-        troupeService.findById(troupeId, deferredT.node());
+          var deferredT = Q.defer();
+          var deferredU = Q.defer();
 
-        Q.all([deferredT.promise, deferredU.promise]).spread(function(troupe, user) {
-          var group = nowjs.getGroup("troup." + troupeId);
-          group.now.onUserLoggedOutOfTroupe({
-            userId: userId,
-            displayName: user.displayName
+          userService.findById(userId, deferredU.node());
+          troupeService.findById(troupeId, deferredT.node());
+
+          Q.all([deferredT.promise, deferredU.promise]).spread(function(troupe, user) {
+            group.now.onUserLoggedOutOfTroupe({
+              userId: userId,
+              displayName: user.displayName
+            });
           });
         });
+
       });
 
       appEvents.onFileEvent(function(data) {
@@ -201,16 +211,19 @@ module.exports = {
         var fileId = data.fileId;
         var troupeId = data.troupeId;
 
-        fileService.findById(fileId, function(err, file) {
-          winston.info("Bridging file event to now.js clients");
+        var group = nowjs.getGroup("troupe." + troupeId);
+        group.count(function (count) {
+          if(!count) { winston.info("Count==" + count); return; }
 
-          var group = nowjs.getGroup("troup." + troupeId);
-          group.now.onFileEvent({
-            event: event,
-            file: file.narrow()
+          fileService.findById(fileId, function(err, file) {
+            winston.info("Bridging file event to now.js clients");
+
+            group.now.onFileEvent({
+              event: event,
+              file: file.narrow()
+            });
           });
         });
-
       });
     }
 
