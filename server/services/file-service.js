@@ -238,7 +238,7 @@ function storeFileVersionInGrid(options, callback) {
       version.creatorUserId = creatorUserId; 
       version.createdDate = Date.now;
       version.source = null; //TODO: add source 
-      file.versions.push(version)
+      file.versions.push(version);
 
       /* File exists, add a version */
       file.save(function(err) {
