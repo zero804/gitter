@@ -6,6 +6,10 @@ var TroupeSESTransport = require("./../../server/utils/mail/troupe-ses-transport
     RawMailComposer = require("./../../server/utils/mail/raw-mail-composer"),
     nconf = require("./../../server/utils/config").configure();
 
+
+var emailDomain = nconf.get("email:domain");
+var emailDomainWithAt = "@" + emailDomain;
+
 // Create an Amazon SES transport object
 var sesTransport = new TroupeSESTransport({
   AWSAccessKeyID: nconf.get("amazon:accessKey"),
@@ -15,7 +19,7 @@ var sesTransport = new TroupeSESTransport({
 function continueResponse(next) {
   //return next (DENY, "Debug mode bounce.");
   return next(OK);
-};
+}
 
 exports.hook_queue = function(next, connection) {
 	var mailFrom = connection.transaction.mail_from;
@@ -48,16 +52,16 @@ exports.hook_queue = function(next, connection) {
     transaction.add_header("From", fromUser.displayName + " <" + fromUser.email + ">");
 
     transaction.remove_header("To");
-    transaction.add_header("To", troupe.name + " <" + troupe.uri + "@trou.pe>");
+    transaction.add_header("To", troupe.name + " <" + troupe.uri + emailDomainWithAt + ">");
 
     transaction.remove_header("Reply-To");
-    transaction.add_header("Reply-To", troupe.name + "<" + troupe.uri + "@trou.pe>");
+    transaction.add_header("Reply-To", troupe.name + "<" + troupe.uri + emailDomainWithAt + ">");
 
     transaction.remove_header("Return-Path");
-    transaction.add_header("Return-Path", "troupe-bounces@trou.pe");
+    transaction.add_header("Return-Path", "troupe-bounces" + emailDomainWithAt);
 
     var mail = new RawMailComposer({
-      source: troupe.uri + "@trou.pe",
+      source: troupe.uri + emailDomainWithAt,
       destinations: emailAddresses,
       message: transaction.data_lines.join('')
     });
