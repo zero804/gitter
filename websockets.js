@@ -43,7 +43,6 @@ passport.deserializeUser(function(id, done) {
 
 });
 
-
 app.get('/', function(req, res) {
   res.send('Nothing to see here. You must be lost.');
 });
