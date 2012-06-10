@@ -10,6 +10,10 @@ var persistence = require("./persistence-service"),
     sechash = require('sechash'),
     nconf = require("../utils/config").configure();
 
+
+var emailDomain = nconf.get("email:domain");
+var emailDomainWithAt = "@" + emailDomain;
+
 function createUniqueUri() {
   var chars = "0123456789abcdefghiklmnopqrstuvwxyz";
 
@@ -73,7 +77,7 @@ function sendConfirmationForExistingUser(user, troupe) {
   mailerService.sendEmail({
     templateFile: "signupemail_existing",
     to: user.email,
-    from: 'signup-robot@trou.pe',
+    from: 'signup-robot' + emailDomainWithAt,
     subject: "You created a new Troupe",
     data: {
       troupeName: troupe.name,
@@ -87,7 +91,7 @@ function sendConfirmationForNewUser(user, troupe) {
   mailerService.sendEmail({
     templateFile: "signupemail",
     to: user.email,
-    from: 'signup-robot@trou.pe',
+    from: 'signup-robot' + emailDomainWithAt,
     subject: "Welcome to Troupe",
     data: {
       troupeName: troupe.name,

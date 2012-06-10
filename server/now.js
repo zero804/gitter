@@ -202,6 +202,8 @@ module.exports = {
         var troupeId = data.troupeId;
 
         fileService.findById(fileId, function(err, file) {
+          winston.info("Bridging file event to now.js clients");
+
           var group = nowjs.getGroup("troup." + troupeId);
           group.now.onFileEvent({
             event: event,
@@ -209,7 +211,7 @@ module.exports = {
           });
         });
 
-      }); 
+      });
     }
 
 };
