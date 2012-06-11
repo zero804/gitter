@@ -155,8 +155,11 @@ module.exports = {
         var group = nowjs.getGroup("troupe." + troupeId + ".chat");
 
         winston.info("New chat message on bus");
+        group.count(function (count) {
+          if(!count) { winston.info("Count==" + count); return; }
 
-        group.now.onTroupeChatMessage(data.chatMessage);
+          group.now.onTroupeChatMessage(data.chatMessage);
+        });
       });
 
       appEvents.onUserLoggedIntoTroupe(function(data) {
