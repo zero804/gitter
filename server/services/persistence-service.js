@@ -137,15 +137,19 @@ var FileSchema = new Schema({
   versions: [FileVersionSchema]
 });
 
-FileSchema.methods.narrow = function () {
+function narrowFile(file) {
   return {
-    id: this._id,
-    fileName: this.fileName,
-    mimeType: this.mimeType,
-    versions: this.versions.narrow(),
-    url: '/troupes/' + encodeURIComponent(this.troupeId) + '/downloads/' + encodeURIComponent(this.fileName),
-    embeddedUrl: '/pdfjs/web/viewer.html?file=/troupes/' + encodeURIComponent(this.troupeId) + '/embedded/' + encodeURIComponent(this.fileName)
-  };
+      id: file._id,
+      fileName: file.fileName,
+      mimeType: file.mimeType,
+      versions: file.versions.narrow(),
+      url: '/troupes/' + encodeURIComponent(file.troupeId) + '/downloads/' + encodeURIComponent(file.fileName),
+      embeddedUrl: '/pdfjs/web/viewer.html?file=/troupes/' + encodeURIComponent(file.troupeId) + '/embedded/' + encodeURIComponent(file.fileName)
+    };
+}
+
+FileSchema.methods.narrow = function () {
+  return narrowFile(this);
 };
 
 var User = mongoose.model('User', UserSchema);
@@ -166,5 +170,6 @@ module.exports = {
 	Invite: Invite,
 	ChatMessage: ChatMessage,
   File: File,
-  FileVersion: FileVersion
+  FileVersion: FileVersion,
+  narrowFile: narrowFile
 };

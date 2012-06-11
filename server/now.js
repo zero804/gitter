@@ -5,6 +5,7 @@ var passport = require('passport'),
     nowjs = require("now"),
     redis = require("redis"),
     winston = require('winston'),
+    persistence = require("./services/persistence-service"),
     chatService = require("./services/chat-service"),
     userService = require("./services/user-service"),
     troupeService = require("./services/troupe-service"),
@@ -223,7 +224,7 @@ module.exports = {
 
             group.now.onFileEvent({
               event: event,
-              file: file.narrow()
+              file: persistence.narrowFile(file)
             });
           });
         });
