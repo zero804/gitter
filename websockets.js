@@ -30,7 +30,6 @@ app.configure(function() {
   app.use(express.errorHandler({ showStack: nconf.get('express:showStack'), dumpExceptions: nconf.get('express:dumpExceptions') }));
 });
 
-
 passport.deserializeUser(function(id, done) {
   winston.info("Deserializing " + id);
   userService.findById(id, function(err, user) {

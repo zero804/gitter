@@ -34,7 +34,8 @@ function findById(id, callback) {
 
 /* private */
 function uploadFileToGrid(file, version, temporaryFile, callback) {
-  winston.info('Version:' + version);
+  winston.info('Uploading file to grid: ' + file.fileName + "(" + version + ")");
+
   var db = mongoose.connection.db;
   var GridStore = mongoose.mongo.GridStore;
   var gridFileName = createFileName(file.id, version);

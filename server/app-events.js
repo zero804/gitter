@@ -2,50 +2,69 @@
 /*global console:false, require: true, module: true, process: false */
 "use strict";
 
-var Hook = require('hook.io').Hook;
+var events = require('events');
+
 var winston = require('winston');
+var redis = require('redis');
+var client = redis.createClient();
+var pubClient = redis.createClient();
+var eventEmitter = new events.EventEmitter();
 
-var hook = new Hook({
-  debug:true,
-  "port": 5984,
-  ignoreSTDIN: true,
-  'hook-port': 9999
+var subscriptions = {};
+
+client.on("message", function (channel, message) {
+  eventEmitter.emit(channel, JSON.parse(message));
 });
-hook.start();
 
-//hook.start();
+function emit(event, data) {
+  winston.info("Emit", arguments);
+  pubClient.publish(event, JSON.stringify(data));
+}
+
+function on(event, callback) {
+  if(!subscriptions[event]) {
+    client.subscribe(event);
+
+    subscriptions[event] = true;
+  }
+
+  eventEmitter.on(event, function(message) {
+    winston.info("Event received", message);
+    callback(message);
+  });
+}
 
 module.exports = {
   userLoggedIntoTroupe: function(userId, troupeId) {
-    hook.emit('userLoggedIntoTroupe', { troupeId: troupeId, userId: userId });
+    emit('userLoggedIntoTroupe', { troupeId: troupeId, userId: userId });
   },
 
   onUserLoggedIntoTroupe: function(callback) {
-    hook.on('userLoggedIntoTroupe', callback);
+    on('userLoggedIntoTroupe', callback);
   },
 
   userLoggedOutOfTroupe: function(userId, troupeId) {
-    hook.emit('userLoggedOutOfTroupe', { troupeId: troupeId, userId: userId });
+    emit('userLoggedOutOfTroupe', { troupeId: troupeId, userId: userId });
   },
 
   onUserLoggedOutOfTroupe: function(callback) {
-    hook.on('userLoggedOutOfTroupe', callback);
+    on('userLoggedOutOfTroupe', callback);
   },
 
   troupeChat: function(troupeId, chatMessage) {
-    hook.emit('chat', { troupeId: troupeId, chatMessage: chatMessage });
+    emit('chat', { troupeId: troupeId, chatMessage: chatMessage });
   },
 
   onTroupeChat: function(callback) {
-    hook.on('chat', callback);
+    on('chat', callback);
   },
 
   fileEvent: function(event, troupeId, fileId) {
-    hook.emit('file', { event: event, fileId: fileId, troupeId: troupeId });
+    emit('file', { event: event, fileId: fileId, troupeId: troupeId });
   },
 
   onFileEvent: function(callback) {
-    hook.on('file', callback);
+    on('file', callback);
   }
 
 };
