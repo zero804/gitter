@@ -9,6 +9,11 @@ var Schema = mongoose.Schema,
 
 mongoose.connect('mongodb://localhost/troupe');
 
+/* TODO: put all our prototypes in a module */
+Array.prototype.narrow = function() {
+  return this.map(function(value) { return value.narrow(); });
+};
+
 var UserSchema = new Schema({
   displayName: { type: String }, 
   email: { type: String },
@@ -112,6 +117,7 @@ EmailSchema.methods.narrow = function () {
 
 };
 
+
 var FileVersionSchema = new Schema({
   creatorUserId: ObjectId,
   createdDate: { type: Date },
@@ -121,13 +127,17 @@ var FileVersionSchema = new Schema({
   source: { type: String }
 });
 
-FileVersionSchema.methods.narrow = function () {
+function narrowFileVersion(fileVersion) {
   return {
-    creatorUserId: this.creatorUserId,
-    createdDate: this.createdDate,
-    source: this.source,
-    deleted: this.deleted
+    creatorUserId: fileVersion.creatorUserId,
+    createdDate: fileVersion.createdDate,
+    source: fileVersion.source,
+    deleted: fileVersion.deleted
   };
+}
+
+FileVersionSchema.methods.narrow = function () {
+  return narrowFileVersion(this);
 };
 
 var FileSchema = new Schema({
@@ -142,7 +152,7 @@ function narrowFile(file) {
       id: file._id,
       fileName: file.fileName,
       mimeType: file.mimeType,
-      versions: file.versions.narrow(),
+      versions: file.versions.map(narrowFileVersion),
       url: '/troupes/' + encodeURIComponent(file.troupeId) + '/downloads/' + encodeURIComponent(file.fileName),
       embeddedUrl: '/pdfjs/web/viewer.html?file=/troupes/' + encodeURIComponent(file.troupeId) + '/embedded/' + encodeURIComponent(file.fileName)
     };
@@ -171,5 +181,6 @@ module.exports = {
 	ChatMessage: ChatMessage,
   File: File,
   FileVersion: FileVersion,
-  narrowFile: narrowFile
+  narrowFile: narrowFile,
+  narrowFileVersion: narrowFileVersion
 };
