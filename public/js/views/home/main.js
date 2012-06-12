@@ -24,7 +24,7 @@ define([
         type: "GET",
         success: function(data) {
           var members = data.length;
-          if (members==1) window.troupeApp.showShareDialog();
+          //if (members==1) window.troupeApp.showShareDialog();
         }
       });
     },
