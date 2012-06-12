@@ -22,6 +22,7 @@ function continueResponse(next) {
 }
 
 exports.hook_queue = function(next, connection) {
+  console.log("Starting remailer");
 	var mailFrom = connection.transaction.mail_from;
 	var rcptTo = connection.transaction.rcpt_to;
   var transaction = connection.transaction;
