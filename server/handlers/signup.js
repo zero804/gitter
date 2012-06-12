@@ -11,7 +11,7 @@ var form = require("express-form"),
 module.exports = {
     install: function(app) {
       app.get(
-        '/',
+        '/x',
         function(req, res) {
           if(req.user) {
             res.relativeRedirect("/select-troupe");
