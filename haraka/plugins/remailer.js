@@ -2,6 +2,7 @@
 var mailService = require("./../../server/services/mail-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
 var nodemailer = require("nodemailer");
+var console = require("console");
 var TroupeSESTransport = require("./../../server/utils/mail/troupe-ses-transport"),
     RawMailComposer = require("./../../server/utils/mail/raw-mail-composer"),
     nconf = require("./../../server/utils/config").configure();
@@ -22,6 +23,7 @@ function continueResponse(next) {
 }
 
 exports.hook_queue = function(next, connection) {
+  console.log("Starting remailer");
 	var mailFrom = connection.transaction.mail_from;
 	var rcptTo = connection.transaction.rcpt_to;
   var transaction = connection.transaction;
@@ -38,6 +40,8 @@ exports.hook_queue = function(next, connection) {
       /* If  there's no-one to distribute the email to, don't continue */
       return continueResponse(next);
     }
+
+    console.log("Delivering emails");
 
     var newSubject = transaction.header.get("Subject");
     newSubject = newSubject ? newSubject : "";
@@ -70,7 +74,7 @@ exports.hook_queue = function(next, connection) {
         if (error) {
           connection.logerror(error);
         }
-
+        console.log("Apparently I successfully delivered some mails");
         return continueResponse(next);
     });
 

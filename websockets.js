@@ -11,8 +11,8 @@ var winston = require('winston');
 var userService = require('./server/services/user-service');
 
 var options = {
-  key: fs.readFileSync(nconf.get("web:privateKeyFile")),
-  cert: fs.readFileSync(nconf.get("web:certificateFile"))
+  key: fs.readFileSync(nconf.get("ws:privateKeyFile")),
+  cert: fs.readFileSync(nconf.get("ws:certificateFile"))
 };
 
 var app = express.createServer(options);

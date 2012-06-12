@@ -136,6 +136,7 @@ require('./server/handlers/profile').install(app);
 require('./server/handlers/login').install(app);
 require('./server/handlers/invite').install(app);
 require('./server/handlers/avatar').install(app);
+require('./server/handlers/landing').install(app);
 
 // TEMPORARY!
 require('./server/handlers/mobile').install(app);
