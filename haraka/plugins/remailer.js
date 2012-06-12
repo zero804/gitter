@@ -68,8 +68,8 @@ exports.hook_queue = function(next, connection) {
 
     sesTransport.sendMail(mail, function(error, response){
         if (error) {
-          connection.logdebug(error);
-        } 
+          connection.logerror(error);
+        }
 
         return continueResponse(next);
     });
