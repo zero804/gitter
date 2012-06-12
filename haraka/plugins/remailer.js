@@ -39,6 +39,8 @@ exports.hook_queue = function(next, connection) {
       return continueResponse(next);
     }
 
+    console.log("Delivering emails");
+
     var newSubject = transaction.header.get("Subject");
     newSubject = newSubject ? newSubject : "";
 
@@ -70,7 +72,7 @@ exports.hook_queue = function(next, connection) {
         if (error) {
           connection.logdebug(error);
         } 
-
+        console.log("Apparently I successfully delivered some mails");
         return continueResponse(next);
     });
 
