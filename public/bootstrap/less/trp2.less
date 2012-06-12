@@ -1,10 +1,10 @@
 // Bootstrap Reset
-/*@import "bootstrap.less";
-*/
+@import "bootstrap.less";
 
-@import "variables.less"; // Modify this for custom colors, font-sizes, etc
+
+/*@import "variables.less"; // Modify this for custom colors, font-sizes, etc
 @import "mixins.less";
-@import "modals.less";
+@import "modals.less";*/
 
 // Our colour palette
 @col1: #1dce73; // lumo green 
@@ -53,6 +53,10 @@ h1 {
 #trpHeaderContainer {
   height: 64px;
   background-color: @col1;
+}
+
+#trpFiles {
+  background-color: @col2;
 }
 
 #trpHeader {
@@ -123,6 +127,7 @@ h1 {
   padding-left: 235px;
   padding-right: 20px;
   background-color: @col7;
+  min-width: 650px;
 }
 
 #trpTroupeSelector {
@@ -161,7 +166,7 @@ h1 {
   position: absolute;
   z-index: 2;
   top: 64px;
-  width:250px;
+  width:100%;
   right: 0px;
   height: 0px;
   overflow: hidden;
