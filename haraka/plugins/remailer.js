@@ -44,7 +44,9 @@ exports.hook_queue = function(next, connection) {
     console.log("Delivering emails");
 
     var newSubject = transaction.header.get("Subject");
-    newSubject = newSubject ? newSubject : "";
+    newSubject = newSubject ? newSubject.replace(/\n/g,'') : "";
+
+    console.dir(["newSubject", newSubject]);
 
     if(newSubject.indexOf("[" + troupe.name + "]") < 0) {
       newSubject = "[" + troupe.name + "] " + newSubject;
@@ -52,8 +54,11 @@ exports.hook_queue = function(next, connection) {
       transaction.add_header("Subject", newSubject);
     }
 
+    //transaction.remove_header("X-On-Behalf-Of");
+    //transaction.add_header("X-On-Behalf-Of", fromUser.displayName + " <" + fromUser.email + ">");
+
     transaction.remove_header("From");
-    transaction.add_header("From", fromUser.displayName + " <" + fromUser.email + ">");
+    transaction.add_header("From", fromUser.displayName  + " for " + troupe.name + " <" + troupe.uri + emailDomainWithAt + ">");
 
     transaction.remove_header("To");
     transaction.add_header("To", troupe.name + " <" + troupe.uri + emailDomainWithAt + ">");
@@ -74,6 +79,7 @@ exports.hook_queue = function(next, connection) {
         if (error) {
           connection.logerror(error);
         }
+
         console.log("Apparently I successfully delivered some mails");
         return continueResponse(next);
     });
