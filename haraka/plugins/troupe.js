@@ -18,7 +18,7 @@ var winston = require('winston');
 
 function continueResponse(next) {
   //return next (DENY, "Debug mode bounce.");
-  return next(OK);
+  return next();
 };
 
 function saveFile(troupeId, creatorUserId, fileName, mimeType, content, callback) {

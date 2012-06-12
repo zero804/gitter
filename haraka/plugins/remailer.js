@@ -2,6 +2,7 @@
 var mailService = require("./../../server/services/mail-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
 var nodemailer = require("nodemailer");
+var console = require("console");
 var TroupeSESTransport = require("./../../server/utils/mail/troupe-ses-transport"),
     RawMailComposer = require("./../../server/utils/mail/raw-mail-composer"),
     nconf = require("./../../server/utils/config").configure();
