@@ -20,7 +20,8 @@ var mimeTypesWithNoConversionRequired = [
   "image/gif",
   "image/jpeg",
   "image/png",
-  "image/tiff"
+  "image/tiff",
+  "image/vnd.adobe.photoshop"
 ];
 
 function generatePdfFile(options, callback) {
