@@ -262,7 +262,7 @@ function storeFileVersionInGrid(options, callback) {
 function generateAndPersistThumbnailForFile(fileName, originalFileName, troupeId, fileId, version) {
   var resizedPath = fileName + "-small.jpg";
   winston.info("Converting " + fileName + " to thumbnail");
-  im.convert(['-define','jpeg:size=48x48',fileName + "[0]",'-thumbnail','48x48^','-gravity','center','-extent','48x48',resizedPath], 
+  im.convert(['-define','jpeg:size=128x128',fileName + "[0]",'-thumbnail','128x128^','-gravity','NorthWest','-extent','128x128',resizedPath], 
     function(err, stdout, stderr) {
       if (err) return winston.error(err);
 
