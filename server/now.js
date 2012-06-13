@@ -50,6 +50,18 @@ function loadUserAndTroupe(nowJsUser, troupeId, sessionStore, callback) {
   });
 }
 
+/**
+ * Fetch a now.js group by name and call the callback if the group has users
+ */
+function getGroup(groupName, callback) {
+  var group = nowjs.getGroup(groupName);
+
+  group.count(function (count) {
+    if(!count) { return; }
+    callback(group);
+  });
+}
+
 module.exports = {
     install: function(app, sessionStore) {
       everyone = nowjs.initialize(app, {
@@ -153,12 +165,7 @@ module.exports = {
 
       appEvents.onTroupeChat(function(data) {
         var troupeId = data.troupeId;
-        var group = nowjs.getGroup("troupe." + troupeId + ".chat");
-
-        winston.info("New chat message on bus");
-        group.count(function (count) {
-          if(!count) { winston.info("Count==" + count); return; }
-
+        var group = getGroup("troupe." + troupeId + ".chat", function (group) {
           group.now.onTroupeChatMessage(data.chatMessage);
         });
       });
@@ -167,10 +174,7 @@ module.exports = {
         var troupeId = data.troupeId;
         var userId = data.userId;
 
-        var group = nowjs.getGroup("troupe." + troupeId);
-        group.count(function (count) {
-          if(!count) { winston.info("Count==" + count); return; }
-
+        getGroup("troupe." + troupeId, function(group) {
           var deferredT = Q.defer();
           var deferredU = Q.defer();
 
@@ -184,16 +188,14 @@ module.exports = {
             });
           });
         });
+
       });
 
       appEvents.onUserLoggedOutOfTroupe(function(data) {
         var troupeId = data.troupeId;
         var userId = data.userId;
 
-        var group = nowjs.getGroup("troupe." + troupeId);
-        group.count(function (count) {
-          if(!count) { winston.info("Count==" + count); return; }
-
+        getGroup("troupe." + troupeId, function(group) {
           var deferredT = Q.defer();
           var deferredU = Q.defer();
 
@@ -206,8 +208,8 @@ module.exports = {
               displayName: user.displayName
             });
           });
-        });
 
+        });
       });
 
       appEvents.onFileEvent(function(data) {
@@ -215,10 +217,7 @@ module.exports = {
         var fileId = data.fileId;
         var troupeId = data.troupeId;
 
-        var group = nowjs.getGroup("troupe." + troupeId);
-        group.count(function (count) {
-          if(!count) { winston.info("Count==" + count); return; }
-
+        getGroup("troupe." + troupeId, function(group) {
           fileService.findById(fileId, function(err, file) {
             winston.info("Bridging file event to now.js clients");
 
@@ -227,6 +226,7 @@ module.exports = {
               file: persistence.narrowFile(file)
             });
           });
+
         });
       });
     }
