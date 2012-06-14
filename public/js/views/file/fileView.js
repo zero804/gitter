@@ -95,7 +95,8 @@ define([
     onClickGenerator: function(file) {
       var self = this;
       return function() {
-        window.open(file.get('embeddedUrl'));
+        //window.open(file.get('embeddedUrl'));
+        window.open(file.get('url'));
       };
     },
 
