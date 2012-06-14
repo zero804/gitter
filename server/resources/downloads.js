@@ -42,7 +42,6 @@ module.exports = {
 
     show: function(req, res) {
       var fileName = '' + req.params.download + (req.params.format ? '.' + req.params.format : '');
-      winston.info('Serving ' + fileName);
       fileService.getFileStream(req.troupe.id, fileName, 0, function(err, mimeType, stream) {
         if(err || !stream) {
           res.contentType("text/html");
@@ -52,7 +51,10 @@ module.exports = {
         }
 
         res.contentType(mimeType);
-        res.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+        if(!req.query["embedded"]) {
+          res.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+        }
+        
         stream.pipe(res);
       });
 

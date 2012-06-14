@@ -195,6 +195,7 @@ function storeFileVersionInGrid(options, callback) {
       file.troupeId = troupeId;
       file.fileName = fileName;
       file.mimeType = mimeType;
+      file.embeddedViewType = embeddedFileService.determineEmbeddedViewType(mimeType);
 
       version = new persistence.FileVersion();
       version.creatorUserId = creatorUserId; 
@@ -262,7 +263,7 @@ function storeFileVersionInGrid(options, callback) {
 function generateAndPersistThumbnailForFile(fileName, originalFileName, troupeId, fileId, version) {
   var resizedPath = fileName + "-small.jpg";
   winston.info("Converting " + fileName + " to thumbnail");
-  im.convert(['-define','jpeg:size=128x128',fileName + "[0]",'-thumbnail','128x128^','-gravity','NorthWest','-extent','128x128',resizedPath], 
+  im.convert(['-define','jpeg:size=128x128',fileName + "[0]", '-auto-orient', '-thumbnail','128x128^','-gravity','NorthWest','-extent','128x128',resizedPath], 
     function(err, stdout, stderr) {
       if (err) return winston.error(err);
 

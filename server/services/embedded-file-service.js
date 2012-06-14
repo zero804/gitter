@@ -17,6 +17,7 @@ var http = require('http'),
 
 var mimeTypesWithNoConversionRequired = [
   "application/pdf",
+  "text/plain",
   "image/gif",
   "image/jpeg",
   "image/png",
@@ -73,10 +74,37 @@ function generatePdfFile(options, callback) {
   stream.pipe(req);
 }
 
+function determineEmbeddedViewType(mimeType) {
+  if(/^image\//.test(mimeType)) {
+    return "DOWNLOAD";
+  }
+
+  if([
+    'application/pdf',
+    'text/plain'
+    ].indexOf(mimeType) >= 0) {
+    return "DOWNLOAD";
+  }
+
+  if([
+    'application/msword',
+    'application/rtf',
+    'text/csv',
+    'application/vnd.ms-excel',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ].indexOf(mimeType) >= 0) {
+    return "PDF";
+  }
+
+  return 'NONE';
+}
+
 function generateEmbeddedFile(options, callback) {
   return generatePdfFile(options, callback);
 }
 
 module.exports = {
+  determineEmbeddedViewType: determineEmbeddedViewType,
   generateEmbeddedFile: generateEmbeddedFile
 };
