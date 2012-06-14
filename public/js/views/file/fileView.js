@@ -14,12 +14,36 @@ define([
     initialize: function(options) {
       this.router = options.router;
 
-      _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onFileEvent')
+      _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onFileEvent', 'onPreviewLinkClick');
 
       this.collection.bind('add', this.onCollectionAdd);
       this.collection.bind('reset', this.onCollectionReset);
 
       $(document).on('file', this.onFileEvent);
+    },
+
+    onPreviewLinkClick: function(event) {
+      var row = $(event.target).closest('tr');
+      var item = row.data('item');
+
+      var url = null;
+      switch(item.get('embeddedViewType')) {
+        case 'NONE':
+          url = null;
+          break;
+        case 'DOWNLOAD':
+          url = item.get('url') + '?embedded=1';
+          break;
+        case 'PDF':
+          url = '/pdfjs/web/viewer.html?file=' + item.get('embeddedUrl');
+          break;
+      }
+
+      console.log("URL=" + url);
+
+       $('#previewModal').modal('show');
+       $('#previewFrame').attr('src', url);
+       return false;
     },
 
     beforeClose: function() {
@@ -36,7 +60,6 @@ define([
     },
 
     onCollectionAdd: function(item) {
-        console.dir(item);
         var rowHtml = Mustache.render(rowTemplate, {
           fileName: item.get('fileName'),
           url: item.get('url'),
@@ -45,8 +68,11 @@ define([
         });
 
         var el = $(rowHtml);
+        el.data("item", item);
         $(".frame-files", this.el).append(el);
-        el.on('click', this.onClickGenerator(item));
+        $('.link-preview', el).on('click', this.onPreviewLinkClick);
+
+        //el.on('click', this.onClickGenerator(item));
     },
 
     events: {

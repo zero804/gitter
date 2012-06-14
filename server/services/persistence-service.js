@@ -144,6 +144,7 @@ var FileSchema = new Schema({
   troupeId: ObjectId,
   fileName: {type: String},
   mimeType: { type: String},
+  embeddedViewType: { type: String, enum: ['DOWNLOAD', 'PDF', 'NONE'], default: 'NONE'},
   versions: [FileVersionSchema]
 });
 
@@ -154,7 +155,8 @@ function narrowFile(file) {
       mimeType: file.mimeType,
       versions: file.versions.map(narrowFileVersion),
       url: '/troupes/' + encodeURIComponent(file.troupeId) + '/downloads/' + encodeURIComponent(file.fileName),
-      embeddedUrl: '/pdfjs/web/viewer.html?file=/troupes/' + encodeURIComponent(file.troupeId) + '/embedded/' + encodeURIComponent(file.fileName)
+      embeddedViewType: file.embeddedViewType,
+      embeddedUrl: '/troupes/' + encodeURIComponent(file.troupeId) + '/embedded/' + encodeURIComponent(file.fileName)
     };
 }
 
