@@ -10,7 +10,7 @@ var mimeIcons = {
   'image/jpeg': '/images/mime/jpg.png',
   'image/png': '/images/mime/png.png',
   'image/gif': '/images/mime/gif.png',
-  'application/octet-stream': '/images/mime/png.png',
+  'application/octet-stream': '/images/mime/unknown.png',
   'application/msword': '/images/mime/doc.png'
 };
 
@@ -29,7 +29,6 @@ module.exports = {
 
     show: function(req, res) {
       var fileName = '' + req.params.thumbnail + (req.params.format ? '.' + req.params.format : '');
-      winston.info('Serving ' + fileName);
       fileService.getThumbnailStream(req.troupe.id, fileName, 0, function(err, mimeType, stream) {
         if(err || !stream) {
           var redirectImage = mimeIcons[mimeType];
