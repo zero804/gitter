@@ -7,8 +7,9 @@ define([
   'text!templates/file/file.mustache',
   'text!templates/file/row.mustache',
   'fileUploader',
-  'collections/files'
-], function($, _, Backbone, Mustache, template, rowTemplate, fileUploaderStub, FileCollection){
+  'collections/files',
+  'jquery_colorbox'
+], function($, _, Backbone, Mustache, template, rowTemplate, fileUploaderStub, FileCollection, cbStub){
   var FileView = Backbone.View.extend({
     collection: new FileCollection(),
     initialize: function(options) {
@@ -23,27 +24,55 @@ define([
     },
 
     onPreviewLinkClick: function(event) {
+      function getPreviewOptions(item) {
+        var previewMimeType = item.get('previewMimeType');
+        var mimeType = item.get('previewMimeType');
+
+        if(/^image\//.test(previewMimeType)) {
+          return {
+            href: item.get('embeddedUrl') + '?embedded=1',
+            photo: true
+          };
+        }
+
+        if(previewMimeType == 'application/pdf') {
+          return {
+            href: '/pdfjs/web/viewer.html?file=' + item.get('embeddedUrl'),
+            iframe: true,
+            width: "80%",
+            height: "80%"
+          };
+        }
+
+        if(/^image\//.test(mimeType)) {
+          return {
+            href: item.get('url') + '?embedded=1',
+            photo: true
+          };
+        }
+
+        if(mimeType == 'application/pdf') {
+          return {
+            width: "80%",
+            height: "80%",
+            href:  '/pdfjs/web/viewer.html?file=' + item.get('url') + "?embedded=1",
+            iframe: true
+          };
+        }
+      }
+
       var row = $(event.target).closest('tr');
       var item = row.data('item');
 
-      var url = null;
-      switch(item.get('embeddedViewType')) {
-        case 'NONE':
-          url = null;
-          break;
-        case 'DOWNLOAD':
-          url = item.get('url') + '?embedded=1';
-          break;
-        case 'PDF':
-          url = '/pdfjs/web/viewer.html?file=' + item.get('embeddedUrl');
-          break;
+      var previewOptions = getPreviewOptions(item);
+      if(previewOptions) {
+        previewOptions.title = item.get('fileName');
+        $.colorbox(previewOptions);
       }
 
-      console.log("URL=" + url);
-
-       $('#previewModal').modal('show');
-       $('#previewFrame').attr('src', url);
-       return false;
+      //$('#previewModal').modal('show');
+      //$('#previewFrame').attr('src', previewUrl);
+      return false;
     },
 
     beforeClose: function() {

@@ -145,7 +145,6 @@ var FileSchema = new Schema({
   fileName: {type: String},
   mimeType: { type: String},
   previewMimeType: { type: String},
-  embeddedViewType: { type: String, enum: ['DOWNLOAD', 'PDF', 'NONE'], default: 'NONE'},
   versions: [FileVersionSchema]
 });
 

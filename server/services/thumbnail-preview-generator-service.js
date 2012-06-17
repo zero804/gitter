@@ -124,7 +124,11 @@ function onCreateFileVersion(data) {
       }, function(err) {
         if(err) return winston.error("Unexpected error uploading file to gridfs", err);
 
-        persistence.File.update({ _id: fileId }, { previewMimeType: result.mimeType });
+        winston.debug("Updating previewMimeType to " + result.mimeType + " for file " + fileId);
+        persistence.File.update({ _id: fileId }, { previewMimeType: result.mimeType }, {}, function(err, numAffected) {
+          if(err) return winston.error("Error updating previewMimeType", err);
+          if(!numAffected) return winston.error("Update of previewMimeType affected zero rows. Something is wrong.");
+        });
       });
 
       /* Sometimes we don't know what out thumbnail generation stategy is going to be until we've generated the preview */
