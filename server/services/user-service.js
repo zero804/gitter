@@ -73,7 +73,7 @@ module.exports = {
     persistence.User.findById(userId, function(err, user) {
       if(user.passwordHash) return callback("User already has a password set");
       
-       sechash.strongHash('md5', password, function(err, hash3) {
+       sechash.strongHash('sha512', password, function(err, hash3) {
          user.passwordHash = hash3;
          return callback(false);
        });

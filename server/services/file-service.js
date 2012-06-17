@@ -3,7 +3,6 @@
 "use strict";
 
 var persistence = require("./persistence-service");
-var embeddedFileService = require("./embedded-file-service");
 var mongoose = require("mongoose");
 var mime = require("mime");
 var winston = require("winston");
@@ -11,20 +10,22 @@ var appEvents = require("../app-events");
 var console = require("console");
 var Q = require("q");
 var crypto = require('crypto');
-var fs = require('fs'),
-    im = require('imagemagick');
+var fs = require('fs');
 
 /* private */
 function createFileName(fileId, version) {
   return "attachment:" + fileId + ":" + version;
 }
 
+/* TODO: remove all referneced to embedded, we're calling them preview from now on */
 function createEmbeddedFileName(fileId, version) {
-  return "embedded:" + fileId + ":" + version;
+  return "preview:" + fileId + ":" + version;
 }
+
 function createThumbNailFileName(fileId, version) {
   return "thumb:" + fileId + ":" + version;
 }
+
 /* public */
 function findById(id, callback) {
   persistence.File.findOne({_id:id} , function(err, file) {
@@ -195,7 +196,6 @@ function storeFileVersionInGrid(options, callback) {
       file.troupeId = troupeId;
       file.fileName = fileName;
       file.mimeType = mimeType;
-      file.embeddedViewType = embeddedFileService.determineEmbeddedViewType(mimeType);
 
       version = new persistence.FileVersion();
       version.creatorUserId = creatorUserId; 
@@ -209,7 +209,8 @@ function storeFileVersionInGrid(options, callback) {
 
           uploadFileToGrid(file, 1, temporaryFile, function(err, file) {
             if(!err) {
-              appEvents.fileEvent('create', troupeId, file.id);
+              appEvents.fileEvent('createNew', { troupeId: troupeId, fileId: file.id });
+              appEvents.fileEvent('createVersion', { troupeId: troupeId, fileId: file.id, version: 1, temporaryFile: temporaryFile, mimeType: file.mimeType });
             }
 
             callback(err, {
@@ -245,9 +246,10 @@ function storeFileVersionInGrid(options, callback) {
       /* File exists, add a version */
       file.save(function(err) {
         if (err) return callback(err);
-        uploadFileToGrid(file, file.versions.length, temporaryFile, function(err, file) {
+        var versionNumber = file.versions.length;
+        uploadFileToGrid(file, versionNumber, temporaryFile, function(err, file) {
           if(!err) {
-            appEvents.fileEvent('createVersion', troupeId, file.id);
+            appEvents.fileEvent('createVersion', { troupeId: troupeId, fileId: file.id, version: versionNumber, temporaryFile: temporaryFile, mimeType: file.mimeType });
           }
           callback(err, {
             file: file,
@@ -258,41 +260,6 @@ function storeFileVersionInGrid(options, callback) {
       });
     });
   });
-}
-
-function generateAndPersistThumbnailForFile(fileName, originalFileName, troupeId, fileId, version) {
-  var resizedPath = fileName + "-small.jpg";
-  winston.info("Converting " + fileName + " to thumbnail");
-  im.convert(['-define','jpeg:size=128x128',fileName + "[0]", '-auto-orient', '-thumbnail','128x128^','-gravity','NorthWest','-extent','128x128',resizedPath], 
-    function(err, stdout, stderr) {
-      if (err) return winston.error(err);
-
-      var db = mongoose.connection.db;
-      var GridStore = mongoose.mongo.GridStore;
-      var gridFileName = createThumbNailFileName(fileId, version);
-      var gs = new GridStore(db, gridFileName, "w", {
-          "content_type": "image/jpeg",
-          "metadata":{
-            /* Attributes go here */
-            usage: "thumbnail",
-            troupeId: troupeId,
-            fileName: originalFileName,
-            version: version
-          }
-      });
-
-      gs.writeFile(resizedPath, function(err) {
-        if (err) return winston.error(err);
-        winston.info("Successfully persisted " + resizedPath + " as " + gridFileName);
-      });
-    });
-}
-
-function generateEmbeddedVersionOfFile(options, callback) {
-  embeddedFileService.generateEmbeddedFile({
-    fileName: options.file,
-    mimeType: options.mimeType
-  }, callback);
 }
 
 function storeFile(options, callback) {
@@ -315,37 +282,6 @@ function storeFile(options, callback) {
   storeFileVersionInGrid(options, function(err, fileAndVersion) {
     if(err) return callback(err);
     if(fileAndVersion.alreadyExists) return callback(err, fileAndVersion);
-
-    generateEmbeddedVersionOfFile(options, function(err, embeddedFileInfo) {
-      if(err) return winston.error(err);
-
-      var fileForThumb = embeddedFileInfo.conversionNotRequired ? temporaryFile : embeddedFileInfo.fileName;
-
-      generateAndPersistThumbnailForFile(fileForThumb, temporaryFile, troupeId, fileAndVersion.file.id, fileAndVersion.version);
-
-      if(embeddedFileInfo.conversionNotRequired) {
-        /* No need to persist the embedded file */
-        return;
-      }
-
-      var db = mongoose.connection.db;
-      var GridStore = mongoose.mongo.GridStore;
-      var gridFileName = createEmbeddedFileName(fileAndVersion.file.id, fileAndVersion.version);
-      var gs = new GridStore(db, gridFileName, "w", {
-          "content_type": embeddedFileInfo.mimeType,
-          "metadata":{
-            /* Attributes go here */
-            usage: "embedded",
-            troupeId: fileAndVersion.file.troupeId,
-            fileName: fileAndVersion.file.fileName
-          }
-      });
-
-      gs.writeFile(embeddedFileInfo.fileName, function(err) {
-        if (err) return winston.error(err);
-      });
-
-    });
 
     /** Continue regardless of what happens in generate... */
     callback(err, fileAndVersion);

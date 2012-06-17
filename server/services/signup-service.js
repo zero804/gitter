@@ -166,7 +166,7 @@ module.exports = {
 
     if(user.passwordHash) return callback("User already has a password set");
 
-    sechash.strongHash('md5', options.password, function(err, hash3) {
+    sechash.strongHash('sha512', options.password, function(err, hash3) {
       if(err) return callback(err);
 
       user.passwordHash = hash3;
