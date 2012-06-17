@@ -34,6 +34,7 @@ passport.use(new LocalStrategy({
       passwordField: 'password'
     },
     function(email, password, done) {
+      winston.debug("Attempting to authenticate " + email);
       userService.findByEmail(email, function(err, user) {
         if(err) return done(err);
         if(!user) return done(null, false);
@@ -137,6 +138,9 @@ require('./server/handlers/login').install(app);
 require('./server/handlers/invite').install(app);
 require('./server/handlers/avatar').install(app);
 require('./server/handlers/landing').install(app);
+
+// TEMP
+require('./server/services/thumbnail-preview-generator-service').install();
 
 // TEMPORARY!
 require('./server/handlers/mobile').install(app);

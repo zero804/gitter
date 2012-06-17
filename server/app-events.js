@@ -5,6 +5,7 @@
 var events = require('events');
 
 var winston = require('winston');
+var _ = require('underscore');
 var redis = require('redis');
 var client = redis.createClient();
 var pubClient = redis.createClient();
@@ -59,8 +60,8 @@ module.exports = {
     on('chat', callback);
   },
 
-  fileEvent: function(event, troupeId, fileId) {
-    emit('file', { event: event, fileId: fileId, troupeId: troupeId });
+  fileEvent: function(event, options) {
+    emit('file', _.extend(options, { event: event }));
   },
 
   onFileEvent: function(callback) {

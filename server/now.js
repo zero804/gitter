@@ -213,7 +213,16 @@ module.exports = {
       });
 
       appEvents.onFileEvent(function(data) {
+        winston.debug("onFileEvent -> now.js ", data);
         var event = data.event;
+        switch(event) {
+          case 'createVersion':
+          case 'createThumbnail':
+          break;
+        default:
+          return;
+        }
+
         var fileId = data.fileId;
         var troupeId = data.troupeId;
 
