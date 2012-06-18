@@ -66,6 +66,30 @@ module.exports = {
 
   onFileEvent: function(callback) {
     on('file', callback);
+  },
+
+  newEmailEvent: function(emailId, troupeId) {
+    emit('newEmail', {
+      emailId: emailId,
+      troupeId: troupeId
+    });
+  },
+
+  onNewEmailEvent: function(callback) {
+    on('newEmail', callback);
+  },
+
+  newNotification: function(troupeId, userId, notificationText, notificationLink) {
+    emit('newNotification', {
+      troupeId: troupeId,
+      userId: userId,
+      notificationText: notificationText,
+      notificationLink: notificationLink
+    });
+  },
+
+  onNewNotification: function(callback) {
+    on('newNotification', callback);
   }
 
 };

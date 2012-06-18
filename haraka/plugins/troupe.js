@@ -1,5 +1,5 @@
 /*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*global require: true, module: true, exports: true, DENY: true */
 
 "use strict";
 
@@ -8,6 +8,7 @@
 var mailService = require("./../../server/services/mail-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
 var fileService = require("./../../server/services/file-service.js");
+var appEvents = require("./../../server/app-events");
 var MailParser = require("mailparser").MailParser;
 var temp = require('temp');
 var fs   = require('fs');
@@ -19,7 +20,7 @@ var winston = require('winston');
 function continueResponse(next) {
   //return next (DENY, "Debug mode bounce.");
   return next();
-};
+}
 
 function saveFile(troupeId, creatorUserId, fileName, mimeType, content, callback) {
   temp.open('attachment', function(err, tempFileInfo) {
@@ -35,7 +36,7 @@ function saveFile(troupeId, creatorUserId, fileName, mimeType, content, callback
         mimeType: mimeType,
         file: tempFileName
       }, function(err, fileAndVersion) {
-        if (err) return callback(err); 
+        if (err) return callback(err);
 
         // Delete the temporary file */
         //fs.unlink(tempFileInfo.path);
@@ -59,7 +60,7 @@ exports.hook_data = function (next, connection) {
     next();
 };
 
-exports.hook_queue = function(next, connection) {  
+exports.hook_queue = function(next, connection) {
 	// Get some stuff from the header to store later
 	var subject = connection.transaction.header.get("Subject");
 	var date = connection.transaction.header.get("Date");
@@ -107,7 +108,7 @@ exports.hook_queue = function(next, connection) {
 
       var allAttachmentSaves = [];
       var attachmentsByContentId = {};
-      
+
       /** Creates a callback which will associate a file and an attachment */
       function associateFileVersionWithAttachment(attachment) {
         return function(fileVersion) {
@@ -115,7 +116,7 @@ exports.hook_queue = function(next, connection) {
           if(attachment.contentId && fileVersion) {
             attachmentsByContentId[attachment.contentId] = fileVersion;
           }
-        }
+        };
       }
 
       if (mail_object.attachments) {
@@ -129,17 +130,12 @@ exports.hook_queue = function(next, connection) {
 
           var promise = deferred.promise;
           promise.then(associateFileVersionWithAttachment(attachment));
-  
+
           allAttachmentSaves.push(promise);
         }
       }
-      
 
       Q.all(allAttachmentSaves).then(function(savedAttachments) {
-        var savedAttachments = savedAttachments.map(function(item) { return { fileId: item.file.id, version: item.version } });
-        
-        console.dir(attachmentsByContentId);
-
         var storedMailBody;
 
         if (mail_object.html) {
@@ -168,18 +164,19 @@ exports.hook_queue = function(next, connection) {
 
         storedMailBody = sanitizer.sanitize(storedMailBody);
 
-        mailService.storeEmail({ 
-          fromEmail: fromEmail, 
-          troupeId: troupe.id, 
-          subject: subject, 
-          date: date, 
-          fromName: fromName, 
-          preview: preview, 
-          mailBody: storedMailBody, 
-          plainText: mail_object.text, 
+        mailService.storeEmail({
+          fromEmail: fromEmail,
+          fromUserId: user.id,
+          troupeId: troupe.id,
+          subject: subject,
+          date: date,
+          fromName: fromName,
+          preview: preview,
+          mailBody: storedMailBody,
+          plainText: mail_object.text,
           richText: mail_object.html,
           attachments: savedAttachments }, function(err, savedMail) {
-            console.dir(["Saved Mail", arguments]);
+            appEvents.newEmailEvent(savedMail.id, troupe.id);
 
             if (err) return next(DENY, "Failed to store the email");
             connection.logdebug("Stored the email.");

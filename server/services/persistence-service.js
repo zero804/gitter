@@ -43,7 +43,7 @@ UserSchema.methods.getAvatarUrl = function() {
 var TroupeSchema = new Schema({
   name: { type: String },
   uri: { type: String },
-  status: { type: String, enum: ['INACTIVE', 'ACTIVE'], default: 'INACTIVE'},
+  status: { type: String, "enum": ['INACTIVE', 'ACTIVE'], "default": 'INACTIVE'},
   users: [ObjectId]
 });
 
@@ -60,7 +60,7 @@ var InviteSchema = new Schema({
   displayName: { type: String },
   email: { type: String },
   code: { type: String },
-  status: { type: String, enum: ['UNUSED', 'USED'], default: 'UNUSED'}
+  status: { type: String, "enum": ['UNUSED', 'USED'], "default": 'UNUSED'}
 });
 
 InviteSchema.methods.narrow = function () {
@@ -75,7 +75,7 @@ var ChatMessageSchema = new Schema({
   fromUserId: ObjectId,
   toTroupeId: ObjectId,
   text: String,
-  sent: { type: Date, default: Date.now }
+  sent: { type: Date, "default": Date.now }
 });
 
 
@@ -97,6 +97,7 @@ var EmailAttachmentSchema = new Schema({
 var EmailSchema = new Schema({
   from: { type: String },
   fromName: { type: String},
+  fromUserId: ObjectId,
   troupeId: ObjectId,
   subject: { type : String },
   date: {type: Date },
@@ -165,6 +166,15 @@ FileSchema.methods.narrow = function () {
   return narrowFile(this);
 };
 
+var NotificationSchema = new Schema({
+  troupeId: ObjectId,
+  userId: ObjectId,
+  notificationName: {type: String},
+  data: { type: {}},
+  createdDate: { type: Date, "default": Date.now }
+});
+
+
 var User = mongoose.model('User', UserSchema);
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var Email = mongoose.model('Email', EmailSchema);
@@ -173,6 +183,7 @@ var Invite = mongoose.model('Invite', InviteSchema);
 var ChatMessage = mongoose.model('ChatMessage', ChatMessageSchema);
 var File = mongoose.model('File', FileSchema);
 var FileVersion = mongoose.model('FileVersion', FileVersionSchema);
+var Notification = mongoose.model('Notification', NotificationSchema);
 
 
 module.exports = {
@@ -184,6 +195,7 @@ module.exports = {
 	ChatMessage: ChatMessage,
   File: File,
   FileVersion: FileVersion,
+  Notification: Notification,
   narrowFile: narrowFile,
   narrowFileVersion: narrowFileVersion
 };

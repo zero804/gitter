@@ -29,7 +29,7 @@ define([
         if(data.userId == window.troupeContext.user.id) {
           return;
         }
-        
+
         noty({
           "text": data.displayName + " has logged into the troupe.",
           "layout":"bottomRight",
@@ -57,6 +57,19 @@ define([
           "closeOnSelfOver":false});
       });
 
+     $(document).on('notification', function(event, data) {
+        noty({
+          "text": "Notification!!!!",
+          "layout":"bottomRight",
+          "type":"information",
+          "animateOpen":{"height":"toggle"},
+          "animateClose":{"height":"toggle"},
+          "speed":500,
+          "timeout":3000,
+          "closeButton":false,
+          "closeOnSelfClick":true,
+          "closeOnSelfOver":false});
+      });
     },
 
     events: {
