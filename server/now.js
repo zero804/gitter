@@ -1,3 +1,4 @@
+/*jshint globalstrict:true, trailing:false */
 /*global console:false, require: true, module: true, process: false */
 "use strict";
 
@@ -237,6 +238,30 @@ module.exports = {
           });
 
         });
+      });
+
+      appEvents.onNewNotification(function(data) {
+        var troupeId = data.troupeId;
+        var userId = data.userId;
+        var notificationText = data.notificationText;
+        var notificationLink = data.notificationLink;
+
+        /* Directed at a troupe? */
+        if(troupeId) {
+          getGroup("troupe." + troupeId, function(group) {
+            group.now.onNotification({
+              troupeId: troupeId,
+              notificationText: notificationText,
+              notificationLink: notificationLink
+            });
+          });
+        }
+
+        /* Directed at a user? */
+        if(userId) {
+          winston.error("DIRECT USER NOTIFICATIONS NOT YET IMPLEMENTED!!");
+          // TODO
+        }
       });
     }
 

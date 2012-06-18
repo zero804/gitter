@@ -63,7 +63,8 @@ function getPreviewGenerationStrategy(mimeType) {
 
 function getThumbnailGenerationStrategy(mimeType) {
   if([
-    'application/pdf'
+    'application/pdf',
+    'text/plain'
     ].indexOf(mimeType) >= 0) {
     return imageMagickThumbnailGenerationStategy;
   }

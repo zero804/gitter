@@ -28,7 +28,8 @@ function createThumbNailFileName(fileId, version) {
 
 /* public */
 function findById(id, callback) {
-  persistence.File.findOne({_id:id} , function(err, file) {
+  persistence.File.findById(id , function(err, file) {
+    winston.debug("persistence.File.findById: *********************");
     callback(err, file);
   });
 }
