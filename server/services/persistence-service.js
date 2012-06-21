@@ -18,7 +18,7 @@ var UserSchema = new Schema({
   displayName: { type: String }, 
   email: { type: String },
   confirmationCode: {type: String },
-  status: { type: String, enum: ['UNCONFIRMED', 'ACTIVE'], default: 'UNCONFIRMED'},
+  status: { type: String, "enum": ['UNCONFIRMED', 'ACTIVE'], "default": 'UNCONFIRMED'},
   passwordHash: { type: String },   
   avatarUrlSmall: String,
   avatarUrlMedium: String
@@ -115,14 +115,12 @@ EmailSchema.methods.narrow = function () {
     date: this.date,
     preview: this.preview
   };
-
 };
-
 
 var FileVersionSchema = new Schema({
   creatorUserId: ObjectId,
   createdDate: { type: Date },
-  deleted: { type: Boolean, default: false },
+  deleted: { type: Boolean, "default": false },
 
   /* In future, this might change, but for the moment, use a URI-type source */
   source: { type: String }

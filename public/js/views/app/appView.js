@@ -4,25 +4,37 @@ define([
   'underscore',
   'backbone',
   'collections/troupes',
+  'collections/notifications',
   'noty'
-], function($, _, Backbone, TroupeCollection, notyStub) {
+], function($, _, Backbone, TroupeCollection, NotificationCollection, notyStub) {
 
   var AppView = Backbone.View.extend({
     el: 'body',
 
     troupeCollection: new TroupeCollection(),
 
+    notificationCollection: new NotificationCollection(),
+
     troupeSelectorMenu: $("#menu-troupe-selector"),
+
+    notificationSelectorMenu: $("#menu-notification-selector"),
 
     initialize: function() {
       this.troupeCollection.on('change', this.addAllTroupes, this);
-
       this.troupeCollection.on('add', this.addOneTroupe, this);
       this.troupeCollection.on('refresh', this.addAllTroupes, this);
+
+      this.notificationCollection.on('change', this.addAllNotifications, this);
+      this.notificationCollection.on('add', this.addOneNotification, this);
+      this.notificationCollection.on('refresh', this.addAllNotifications, this);
 
       var self = this;
       this.troupeCollection.fetch({
         success: function() { self.addAllTroupes(); }
+      });
+
+      this.notificationCollection.fetch({
+        success: function() { self.addAllNotifications(); }
       });
 
       $(document).on('userLoggedIntoTroupe', function(event, data) {
@@ -58,8 +70,9 @@ define([
       });
 
      $(document).on('notification', function(event, data) {
+        self.notificationCollection.add(data, { at: 0 });
         noty({
-          "text": "Notification!!!!",
+          "text": data.notificationText,
           "layout":"bottomRight",
           "type":"information",
           "animateOpen":{"height":"toggle"},
@@ -84,6 +97,21 @@ define([
     addAllTroupes: function() {
       this.troupeSelectorMenu.empty();
       this.troupeCollection.each(this.addOneTroupe, this);
+    },
+
+    addOneNotification: function(model, collection, options) {
+      var item = "<li><a href='" + model.get("notificationLink") + "'>"+ model.get("notificationText") + "</a></li>";
+
+      if(options.index === 0) {
+        this.notificationSelectorMenu.prepend(item);
+      } else {
+        this.notificationSelectorMenu.append(item);
+      }
+    },
+
+    addAllNotifications: function() {
+      this.notificationSelectorMenu.empty();
+      this.notificationCollection.each(this.addOneNotification, this);
     }
 
   });
