@@ -58,7 +58,9 @@ function formatNotification(notification) {
   if(!textTemplate || !linkTemplate) { winston.warn("Unknown notification ", notification.notificationName); return null; }
 
   return {
+    id: notification.id,
     troupeId: notification.troupeId,
+    createdDate: notification.createdDate,
     notificationText: textTemplate.render(templateData),
     notificationLink: linkTemplate.render(templateData)
   };

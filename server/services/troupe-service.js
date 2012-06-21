@@ -67,6 +67,7 @@ function validateTroupeEmail(options, callback) {
     findByUri(uri, function(err, troupe) {
       if(err) return callback(err);
       if(!troupe) return callback("Troupe not found for uri " + uri);
+
       if(!userHasAccessToTroupe(fromUser, troupe)) {
         return callback("Access denied");
       }

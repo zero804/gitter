@@ -19,7 +19,7 @@ module.exports = {
     });
   },
 
-  new: function(req, res) {
+  "new": function(req, res) {
     res.send('new troupe');
   },
 
@@ -63,6 +63,8 @@ module.exports = {
     if(!req.user) return callback(401);
 
     troupeService.findById(id, function(err, troupe) {
+      if(err) return callback(500);
+      if(!troupe) return callback(404);
 
       if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
         return callback(403);

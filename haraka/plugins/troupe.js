@@ -125,7 +125,6 @@ exports.hook_queue = function(next, connection) {
 
           var attachment = mail_object.attachments[i];
 
-          console.dir(["attachment", attachment]);
           saveFile(troupe.id, user.id, attachment.generatedFileName,attachment.contentType,attachment.content, deferred.node());
 
           var promise = deferred.promise;
@@ -164,6 +163,13 @@ exports.hook_queue = function(next, connection) {
 
         storedMailBody = sanitizer.sanitize(storedMailBody);
 
+        var savedAttachmentsForPersist = savedAttachments.map(function(item) {
+          return {
+            fileId: item.file.id,
+            version: item.version
+          };
+        });
+
         mailService.storeEmail({
           fromEmail: fromEmail,
           fromUserId: user.id,
@@ -175,7 +181,7 @@ exports.hook_queue = function(next, connection) {
           mailBody: storedMailBody,
           plainText: mail_object.text,
           richText: mail_object.html,
-          attachments: savedAttachments }, function(err, savedMail) {
+          attachments: savedAttachmentsForPersist }, function(err, savedMail) {
             appEvents.newEmailEvent(savedMail.id, troupe.id);
 
             if (err) return next(DENY, "Failed to store the email");
