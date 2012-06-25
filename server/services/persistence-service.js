@@ -119,6 +119,8 @@ EmailSchema.methods.narrow = function () {
 };
 
 var ConversationSchema = new Schema({
+  troupeId: ObjectId,
+  updated: { type: Date, "default": Date.now },
   subject: { type: String },
   emails: [EmailSchema]
 });
@@ -184,7 +186,7 @@ var User = mongoose.model('User', UserSchema);
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var Email = mongoose.model('Email', EmailSchema);
 var EmailAttachment = mongoose.model('EmailAttachment', EmailAttachmentSchema);
-var Conversation = mongoose.model('ConversationSchema', ConversationSchema);
+var Conversation = mongoose.model('Conversation', ConversationSchema);
 var Invite = mongoose.model('Invite', InviteSchema);
 var ChatMessage = mongoose.model('ChatMessage', ChatMessageSchema);
 var File = mongoose.model('File', FileSchema);

@@ -1,5 +1,5 @@
 // troupe service to redeliver mails to troupe users
-var mailService = require("./../../server/services/mail-service.js");
+var conversationService = require("./../../server/services/conversation-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
 var nodemailer = require("nodemailer");
 var console = require("console");
@@ -89,9 +89,11 @@ exports.hook_queue = function(next, connection) {
             if(err || !result) return errorResponse(next);
 
             var emailId = connection.transaction.notes.emailId;
+            var conversationId = connection.transaction.notes.conversationId;
+
             var messageId = result.SendRawEmailResult ? result.SendRawEmailResult.MessageId + "@email.amazonses.com": null;
 
-            mailService.updateEmailWithMessageId(emailId, messageId, function(err) {
+            conversationService.updateEmailWithMessageId(conversationId, emailId, messageId, function(err) {
               if(err)  return errorResponse(next, err);
               return continueResponse(next);
             });

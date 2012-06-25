@@ -5,7 +5,8 @@
 
 // troupe service to deliver mails to mongo database
 
-var mailService = require("./../../server/services/mail-service.js");
+//var mailService = require("./../../server/services/mail-service.js");
+var conversationService = require("./../../server/services/conversation-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
 var fileService = require("./../../server/services/file-service.js");
 var appEvents = require("./../../server/app-events");
@@ -71,6 +72,8 @@ exports.hook_queue = function(next, connection) {
 	var date = connection.transaction.header.get("Date");
 	var fromName = connection.transaction.header.get("From");
 	var toName = connection.transaction.header.get("To");
+  var inReplyTo = connection.transaction.header.get("In-Reply-To");
+
 	var preview;
 	var fromEmail;
 
@@ -80,7 +83,7 @@ exports.hook_queue = function(next, connection) {
 	toName = toName.replace(/\n/g,"");
 	fromName = fromName.replace(/\n/g,"");
 	subject = subject.replace(/\n/g,"");
-
+  inReplyTo = inReplyTo.replace(/[<>\n]/g,"");
 	// do some string parsing for email formats such as Name <email>
 
 	if (fromName.indexOf("<") > 0)  {
@@ -175,24 +178,22 @@ exports.hook_queue = function(next, connection) {
           };
         });
 
-        mailService.storeEmail({
-          fromEmail: fromEmail,
+        conversationService.storeEmailInConversation({
           fromUserId: user.id,
           troupeId: troupe.id,
           subject: subject,
+          inReplyTo: inReplyTo,
           date: date,
           fromName: fromName,
           preview: preview,
           mailBody: storedMailBody,
-          plainText: mail_object.text,
-          richText: mail_object.html,
-          attachments: savedAttachmentsForPersist }, function(err, savedMail) {
-            appEvents.newEmailEvent(savedMail.id, troupe.id);
-
+          attachments: savedAttachmentsForPersist }, function(err, conversation, savedMail) {
             if (err) return next(SOFTDENY, "Failed to store the email");
+
+            // NEW CONV EVENT! appEvents.newEmailEvent(savedMail.id, troupe.id);
             connection.logdebug("Stored the email.");
             connection.transaction.notes.emailId = savedMail.id;
-            console.dir(connection.transaction.notes);
+            connection.transaction.notes.conversationId = conversation.id;
 
             return continueResponse(next);
           });
