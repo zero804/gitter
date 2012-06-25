@@ -9,11 +9,16 @@ var Schema = mongoose.Schema,
 
 mongoose.connect('mongodb://localhost/troupe');
 
+/* TODO: put all our prototypes in a module */
+Array.prototype.narrow = function() {
+  return this.map(function(value) { return value.narrow(); });
+};
+
 var UserSchema = new Schema({
   displayName: { type: String }, 
   email: { type: String },
   confirmationCode: {type: String },
-  status: { type: String, enum: ['UNCONFIRMED', 'ACTIVE'], default: 'UNCONFIRMED'},
+  status: { type: String, "enum": ['UNCONFIRMED', 'ACTIVE'], "default": 'UNCONFIRMED'},
   passwordHash: { type: String },   
   avatarUrlSmall: String,
   avatarUrlMedium: String
@@ -38,7 +43,7 @@ UserSchema.methods.getAvatarUrl = function() {
 var TroupeSchema = new Schema({
   name: { type: String },
   uri: { type: String },
-  status: { type: String, enum: ['INACTIVE', 'ACTIVE'], default: 'INACTIVE'},
+  status: { type: String, "enum": ['INACTIVE', 'ACTIVE'], "default": 'INACTIVE'},
   users: [ObjectId]
 });
 
@@ -55,7 +60,7 @@ var InviteSchema = new Schema({
   displayName: { type: String },
   email: { type: String },
   code: { type: String },
-  status: { type: String, enum: ['UNUSED', 'USED'], default: 'UNUSED'}
+  status: { type: String, "enum": ['UNUSED', 'USED'], "default": 'UNUSED'}
 });
 
 InviteSchema.methods.narrow = function () {
@@ -70,7 +75,7 @@ var ChatMessageSchema = new Schema({
   fromUserId: ObjectId,
   toTroupeId: ObjectId,
   text: String,
-  sent: { type: Date, default: Date.now }
+  sent: { type: Date, "default": Date.now }
 });
 
 
@@ -92,6 +97,7 @@ var EmailAttachmentSchema = new Schema({
 var EmailSchema = new Schema({
   from: { type: String },
   fromName: { type: String},
+  fromUserId: ObjectId,
   troupeId: ObjectId,
   subject: { type : String },
   date: {type: Date },
@@ -109,44 +115,63 @@ EmailSchema.methods.narrow = function () {
     date: this.date,
     preview: this.preview
   };
-
 };
 
 var FileVersionSchema = new Schema({
   creatorUserId: ObjectId,
   createdDate: { type: Date },
-  deleted: { type: Boolean, default: false },
+  deleted: { type: Boolean, "default": false },
 
   /* In future, this might change, but for the moment, use a URI-type source */
   source: { type: String }
 });
 
-FileVersionSchema.methods.narrow = function () {
+function narrowFileVersion(fileVersion) {
   return {
-    creatorUserId: this.creatorUserId,
-    createdDate: this.createdDate,
-    source: this.source,
-    deleted: this.deleted
+    creatorUserId: fileVersion.creatorUserId,
+    createdDate: fileVersion.createdDate,
+    source: fileVersion.source,
+    deleted: fileVersion.deleted
   };
+}
+
+FileVersionSchema.methods.narrow = function () {
+  return narrowFileVersion(this);
 };
 
 var FileSchema = new Schema({
   troupeId: ObjectId,
   fileName: {type: String},
   mimeType: { type: String},
+  previewMimeType: { type: String},
   versions: [FileVersionSchema]
 });
 
-FileSchema.methods.narrow = function () {
+function narrowFile(file) {
   return {
-    id: this._id,
-    fileName: this.fileName,
-    mimeType: this.mimeType,
-    versions: this.versions.narrow(),
-    url: '/troupes/' + encodeURIComponent(this.troupeId) + '/downloads/' + encodeURIComponent(this.fileName),
-    embeddedUrl: '/pdfjs/web/viewer.html?file=/troupes/' + encodeURIComponent(this.troupeId) + '/embedded/' + encodeURIComponent(this.fileName)
-  };
+      id: file._id,
+      fileName: file.fileName,
+      mimeType: file.mimeType,
+      versions: file.versions.map(narrowFileVersion),
+      url: '/troupes/' + encodeURIComponent(file.troupeId) + '/downloads/' + encodeURIComponent(file.fileName),
+      previewMimeType: file.previewMimeType,
+      embeddedViewType: file.embeddedViewType,
+      embeddedUrl: '/troupes/' + encodeURIComponent(file.troupeId) + '/embedded/' + encodeURIComponent(file.fileName)
+    };
+}
+
+FileSchema.methods.narrow = function () {
+  return narrowFile(this);
 };
+
+var NotificationSchema = new Schema({
+  troupeId: ObjectId,
+  userId: ObjectId,
+  notificationName: {type: String},
+  data: { type: {}},
+  createdDate: { type: Date, "default": Date.now }
+});
+
 
 var User = mongoose.model('User', UserSchema);
 var Troupe = mongoose.model('Troupe', TroupeSchema);
@@ -156,6 +181,7 @@ var Invite = mongoose.model('Invite', InviteSchema);
 var ChatMessage = mongoose.model('ChatMessage', ChatMessageSchema);
 var File = mongoose.model('File', FileSchema);
 var FileVersion = mongoose.model('FileVersion', FileVersionSchema);
+var Notification = mongoose.model('Notification', NotificationSchema);
 
 
 module.exports = {
@@ -166,5 +192,8 @@ module.exports = {
 	Invite: Invite,
 	ChatMessage: ChatMessage,
   File: File,
-  FileVersion: FileVersion
+  FileVersion: FileVersion,
+  Notification: Notification,
+  narrowFile: narrowFile,
+  narrowFileVersion: narrowFileVersion
 };

@@ -22,7 +22,13 @@ module.exports = {
       var plaintextTemplate = troupeTemplate.compile(plaintextTemplateFile);
       var plaintext = plaintextTemplate.render(options.data);
 
-      console.log(plaintext);
+      console.dir({
+        from: options.from,
+        to: options.to,
+        subject: options.subject,
+        html: html,
+        text: plaintext
+      });
 
       sesTransport.sendMail({
         from: options.from,

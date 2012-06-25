@@ -1,13 +1,10 @@
-<div class="row-fluid datarow highlight">
-  <div class="span1">
-    <img src="{{fileIcon}}">
-  </div>
-  <div class="span8 highlight">
-    <h3>{{fileName}}</h3>
-    {{mimeType}}
-  </div>
-  <div class="span3 right">
-    {{date}}
-  </div>
-</div>
-   
+<tr>
+    <td><a href="#previewModal" class="link-preview"><img src="{{fileIcon}}" class="thumbnail"></a></td>
+    <td>
+      <strong>{{fileName}}</strong><br>
+      {{mimeType}}
+    </td>
+    <td>
+      <a class="btn btn-small  btn-primary" href="{{url}}"><i class="icon-download"></i></a>
+    </td>
+</tr>

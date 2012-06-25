@@ -1,3 +1,4 @@
+/*jshint globalstrict:true, trailing:false */
 /*global console:false, require: true, module: true, process: false */
 "use strict";
 
@@ -5,6 +6,7 @@ var passport = require('passport'),
     nowjs = require("now"),
     redis = require("redis"),
     winston = require('winston'),
+    persistence = require("./services/persistence-service"),
     chatService = require("./services/chat-service"),
     userService = require("./services/user-service"),
     troupeService = require("./services/troupe-service"),
@@ -49,6 +51,18 @@ function loadUserAndTroupe(nowJsUser, troupeId, sessionStore, callback) {
   });
 }
 
+/**
+ * Fetch a now.js group by name and call the callback if the group has users
+ */
+function getGroup(groupName, callback) {
+  var group = nowjs.getGroup(groupName);
+
+  group.count(function (count) {
+    if(!count) { return; }
+    callback(group);
+  });
+}
+
 module.exports = {
     install: function(app, sessionStore) {
       everyone = nowjs.initialize(app, {
@@ -74,7 +88,7 @@ module.exports = {
           if(!user) return;
 
           /* Give the user 10 seconds to log back into before reporting that they're disconnected */
-          setTimeout(function(){ 
+          setTimeout(function(){
             presenceService.userSocketDisconnected(user.id, self.user.clientId);
           }, 10000);
 
@@ -83,23 +97,23 @@ module.exports = {
 
       everyone.now.subscribeToTroupe = function(troupeId, callback) {
         var self = this;
-        if(!callback) callback = function() {}
- 
+        if(!callback) callback = function() {};
+
         loadUserAndTroupe(this.user, troupeId, sessionStore, function(err, user, troupe) {
           if(err) {
             winston.warn('Error while loading user and troupe in subscribeToTroupe: ' + err);
             callback({ description: "Server error", reauthenticate: true });
             return;
-          };
+          }
 
           if(!user || !troupe) {
             callback({ description: "Authentication failure", reauthenticate: true });
             return;
-          };
+          }
 
           presenceService.userSubscribedToTroupe(user.id, troupe.id, self.user.clientId);
 
-          var group = nowjs.getGroup("troup." + troupe.id);
+          var group = nowjs.getGroup("troupe." + troupe.id);
           group.addUser(self.user.clientId);
 
           callback(null);
@@ -114,7 +128,7 @@ module.exports = {
         loadUserAndTroupe(this.user, troupeId, sessionStore, function(err, user, troupe) {
           if(err) return;
 
-          var group = nowjs.getGroup("troup." + troupe.id + ".chat");
+          var group = nowjs.getGroup("troupe." + troupe.id + ".chat");
           group.addUser(self.user.clientId);
         });
       };
@@ -122,7 +136,7 @@ module.exports = {
       everyone.now.unsubscribeToTroupeChat = function(troupeId) {
         winston.info("User unsubscribed from group chat");
 
-        var group = nowjs.getGroup("troup." + troupeId + ".chat");
+        var group = nowjs.getGroup("troupe." + troupeId + ".chat");
         group.removeUser(this.user.clientId);
       };
 
@@ -151,65 +165,104 @@ module.exports = {
       };
 
       appEvents.onTroupeChat(function(data) {
-        winston.info("New chat message on bus");
         var troupeId = data.troupeId;
-
-        var group = nowjs.getGroup("troup." + troupeId + ".chat");
-        group.now.onTroupeChatMessage(data.chatMessage);
+        var group = getGroup("troupe." + troupeId + ".chat", function (group) {
+          group.now.onTroupeChatMessage(data.chatMessage);
+        });
       });
 
       appEvents.onUserLoggedIntoTroupe(function(data) {
         var troupeId = data.troupeId;
         var userId = data.userId;
 
-        var deferredT = Q.defer();
-        var deferredU = Q.defer();
+        getGroup("troupe." + troupeId, function(group) {
+          var deferredT = Q.defer();
+          var deferredU = Q.defer();
 
-        userService.findById(userId, deferredU.node());
-        troupeService.findById(troupeId, deferredT.node());
+          userService.findById(userId, deferredU.node());
+          troupeService.findById(troupeId, deferredT.node());
 
-        Q.all([deferredT.promise, deferredU.promise]).spread(function(troupe, user) {
-          var group = nowjs.getGroup("troup." + troupeId);
-          group.now.onUserLoggedIntoTroupe({
-            userId: userId,
-            displayName: user.displayName
+          Q.all([deferredT.promise, deferredU.promise]).spread(function(troupe, user) {
+            group.now.onUserLoggedIntoTroupe({
+              userId: userId,
+              displayName: user.displayName
+            });
           });
         });
+
       });
 
       appEvents.onUserLoggedOutOfTroupe(function(data) {
         var troupeId = data.troupeId;
         var userId = data.userId;
 
-        var deferredT = Q.defer();
-        var deferredU = Q.defer();
+        getGroup("troupe." + troupeId, function(group) {
+          var deferredT = Q.defer();
+          var deferredU = Q.defer();
 
-        userService.findById(userId, deferredU.node());
-        troupeService.findById(troupeId, deferredT.node());
+          userService.findById(userId, deferredU.node());
+          troupeService.findById(troupeId, deferredT.node());
 
-        Q.all([deferredT.promise, deferredU.promise]).spread(function(troupe, user) {
-          var group = nowjs.getGroup("troup." + troupeId);
-          group.now.onUserLoggedOutOfTroupe({
-            userId: userId,
-            displayName: user.displayName
+          Q.all([deferredT.promise, deferredU.promise]).spread(function(troupe, user) {
+            group.now.onUserLoggedOutOfTroupe({
+              userId: userId,
+              displayName: user.displayName
+            });
           });
+
         });
       });
 
       appEvents.onFileEvent(function(data) {
+        winston.debug("onFileEvent -> now.js ", data);
         var event = data.event;
+        switch(event) {
+          case 'createVersion':
+          case 'createThumbnail':
+          break;
+        default:
+          return;
+        }
+
         var fileId = data.fileId;
         var troupeId = data.troupeId;
 
-        fileService.findById(fileId, function(err, file) {
-          var group = nowjs.getGroup("troup." + troupeId);
-          group.now.onFileEvent({
-            event: event,
-            file: file.narrow()
-          });
-        });
+        getGroup("troupe." + troupeId, function(group) {
+          fileService.findById(fileId, function(err, file) {
+            winston.info("Bridging file event to now.js clients");
 
-      }); 
+            group.now.onFileEvent({
+              event: event,
+              file: persistence.narrowFile(file)
+            });
+          });
+
+        });
+      });
+
+      appEvents.onNewNotification(function(data) {
+        var troupeId = data.troupeId;
+        var userId = data.userId;
+        var notificationText = data.notificationText;
+        var notificationLink = data.notificationLink;
+
+        /* Directed at a troupe? */
+        if(troupeId) {
+          getGroup("troupe." + troupeId, function(group) {
+            group.now.onNotification({
+              troupeId: troupeId,
+              notificationText: notificationText,
+              notificationLink: notificationLink
+            });
+          });
+        }
+
+        /* Directed at a user? */
+        if(userId) {
+          winston.error("DIRECT USER NOTIFICATIONS NOT YET IMPLEMENTED!!");
+          // TODO
+        }
+      });
     }
 
 };
