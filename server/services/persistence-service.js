@@ -103,6 +103,7 @@ var EmailSchema = new Schema({
   date: {type: Date },
   preview: {type: String},
   mail: { type: String},
+  messageId: { type: String},
   attachments: [EmailAttachmentSchema]
 });
 
@@ -116,6 +117,12 @@ EmailSchema.methods.narrow = function () {
     preview: this.preview
   };
 };
+
+var ConversationSchema = new Schema({
+  subject: { type: String },
+  emails: [EmailSchema]
+});
+
 
 var FileVersionSchema = new Schema({
   creatorUserId: ObjectId,
@@ -177,6 +184,7 @@ var User = mongoose.model('User', UserSchema);
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var Email = mongoose.model('Email', EmailSchema);
 var EmailAttachment = mongoose.model('EmailAttachment', EmailAttachmentSchema);
+var Conversation = mongoose.model('ConversationSchema', ConversationSchema);
 var Invite = mongoose.model('Invite', InviteSchema);
 var ChatMessage = mongoose.model('ChatMessage', ChatMessageSchema);
 var File = mongoose.model('File', FileSchema);
@@ -189,6 +197,7 @@ module.exports = {
   Troupe: Troupe,
 	Email: Email,
   EmailAttachment: EmailAttachment,
+  Conversation: Conversation,
 	Invite: Invite,
 	ChatMessage: ChatMessage,
   File: File,

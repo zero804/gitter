@@ -6,7 +6,8 @@ var console = require("console");
 var TroupeSESTransport = require("./../../server/utils/mail/troupe-ses-transport"),
     RawMailComposer = require("./../../server/utils/mail/raw-mail-composer"),
     nconf = require("./../../server/utils/config").configure();
-
+var winston = require("winston");
+var xml2js = require("xml2js");
 
 var emailDomain = nconf.get("email:domain");
 var emailDomainWithAt = "@" + emailDomain;
@@ -20,6 +21,11 @@ var sesTransport = new TroupeSESTransport({
 function continueResponse(next) {
   //return next (DENY, "Debug mode bounce.");
   return next(OK);
+}
+
+function errorResponse(next, err) {
+  winston.error("DENYSOFT due to error " + err);
+  return next(DENYSOFT);
 }
 
 exports.hook_queue = function(next, connection) {
@@ -46,16 +52,11 @@ exports.hook_queue = function(next, connection) {
     var newSubject = transaction.header.get("Subject");
     newSubject = newSubject ? newSubject.replace(/\n/g,'') : "";
 
-    console.dir(["newSubject", newSubject]);
-
     if(newSubject.indexOf("[" + troupe.name + "]") < 0) {
       newSubject = "[" + troupe.name + "] " + newSubject;
       transaction.remove_header("Subject");
       transaction.add_header("Subject", newSubject);
     }
-
-    //transaction.remove_header("X-On-Behalf-Of");
-    //transaction.add_header("X-On-Behalf-Of", fromUser.displayName + " <" + fromUser.email + ">");
 
     transaction.remove_header("From");
     transaction.add_header("From", fromUser.displayName  + " for " + troupe.name + " <" + troupe.uri + emailDomainWithAt + ">");
@@ -78,10 +79,25 @@ exports.hook_queue = function(next, connection) {
     sesTransport.sendMail(mail, function(error, response){
         if (error) {
           connection.logerror(error);
+          return errorResponse(next);
         }
 
         console.log("Apparently I successfully delivered some mails");
-        return continueResponse(next);
+
+        var parser = new xml2js.Parser();
+        parser.parseString(response.message, function (err, result) {
+            if(err || !result) return errorResponse(next);
+
+            var emailId = connection.transaction.notes.emailId;
+            var messageId = result.SendRawEmailResult ? result.SendRawEmailResult.MessageId + "@email.amazonses.com": null;
+
+            mailService.updateEmailWithMessageId(emailId, messageId, function(err) {
+              if(err)  return errorResponse(next, err);
+              return continueResponse(next);
+            });
+
+        });
+
     });
 
 
