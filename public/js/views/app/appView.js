@@ -4,32 +4,44 @@ define([
   'underscore',
   'backbone',
   'collections/troupes',
+  'collections/notifications',
   'noty'
-], function($, _, Backbone, TroupeCollection, notyStub) {
+], function($, _, Backbone, TroupeCollection, NotificationCollection, notyStub) {
 
   var AppView = Backbone.View.extend({
     el: 'body',
 
     troupeCollection: new TroupeCollection(),
 
-    troupeSelectorMenu: $("#trpTroupeSelector"),
+    notificationCollection: new NotificationCollection(),
+
+    troupeSelectorMenu: $("#menu-troupe-selector"),
+
+    notificationSelectorMenu: $("#menu-notification-selector"),
 
     initialize: function() {
       this.troupeCollection.on('change', this.addAllTroupes, this);
-
       this.troupeCollection.on('add', this.addOneTroupe, this);
       this.troupeCollection.on('refresh', this.addAllTroupes, this);
+
+      this.notificationCollection.on('change', this.addAllNotifications, this);
+      this.notificationCollection.on('add', this.addOneNotification, this);
+      this.notificationCollection.on('refresh', this.addAllNotifications, this);
 
       var self = this;
       this.troupeCollection.fetch({
         success: function() { self.addAllTroupes(); }
       });
 
+      this.notificationCollection.fetch({
+        success: function() { self.addAllNotifications(); }
+      });
+
       $(document).on('userLoggedIntoTroupe', function(event, data) {
         if(data.userId == window.troupeContext.user.id) {
           return;
         }
-        
+
         noty({
           "text": data.displayName + " has logged into the troupe.",
           "layout":"bottomRight",
@@ -57,40 +69,49 @@ define([
           "closeOnSelfOver":false});
       });
 
+     $(document).on('notification', function(event, data) {
+        self.notificationCollection.add(data, { at: 0 });
+        noty({
+          "text": data.notificationText,
+          "layout":"bottomRight",
+          "type":"information",
+          "animateOpen":{"height":"toggle"},
+          "animateClose":{"height":"toggle"},
+          "speed":500,
+          "timeout":3000,
+          "closeButton":false,
+          "closeOnSelfClick":true,
+          "closeOnSelfOver":false});
+      });
     },
 
     events: {
-         "click #trpSelectorArrow"  : "toggleSelector",
-         "click #trpPersonIcon" : "toggleUserMenu"
-    },
-
-    toggleSelector: function(){
-      if ($('#trpTroupeSelector').height() === 0) $('#trpTroupeSelector').animate({
-        height: '900px'
-      }, 500);
-      else $('#trpTroupeSelector').animate({
-        height: '0px'
-      }, 300);
-    },
-
-    toggleUserMenu: function() {
-      if ($('#trpUserMenu').height() === 0) $('#trpUserMenu').animate({
-        height: '200px'
-      }, 500);
-      else $('#trpUserMenu').animate({
-        height: '0px'
-      }, 300);
-
+      //"keydown .chatbox":          "detectReturn"
     },
 
 
     addOneTroupe: function(model) {
-      this.troupeSelectorMenu.append("<div class='trpTroupeSelectorItem'><h1><a href='" + model.get("uri") + "'>"+ model.get("name") + "</a></h1></div>");
+      this.troupeSelectorMenu.append("<li><a href='" + model.get("uri") + "'>"+ model.get("name") + "</a></li>");
     },
 
     addAllTroupes: function() {
       this.troupeSelectorMenu.empty();
       this.troupeCollection.each(this.addOneTroupe, this);
+    },
+
+    addOneNotification: function(model, collection, options) {
+      var item = "<li><a href='" + model.get("notificationLink") + "'>"+ model.get("notificationText") + "</a></li>";
+
+      if(options.index === 0) {
+        this.notificationSelectorMenu.prepend(item);
+      } else {
+        this.notificationSelectorMenu.append(item);
+      }
+    },
+
+    addAllNotifications: function() {
+      this.notificationSelectorMenu.empty();
+      this.notificationCollection.each(this.addOneNotification, this);
     }
 
   });

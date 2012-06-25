@@ -7,6 +7,8 @@ require.config({
 
     jquery_validate : 'libs/jquery.validate-1.9/jquery.validate.min',
     jquery_timeago: 'libs/jquery.timeago-0.11.1/jquery.timeago',
+    jquery_colorbox: 'libs/jquery.colorbox-1.3.19/jquery.colorbox-min',
+
     bootstrap: '../bootstrap/js/bootstrap',
     underscore: 'libs/underscore/underscore-1.3.1-min',
     backbone: 'libs/backbone/backbone-0.9.1',

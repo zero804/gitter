@@ -6,7 +6,7 @@ var express = require('express'),
 	tmpl = require('./server/mustache-template'),
 	userService = require('./server/services/user-service'),
 	troupeService = require('./server/services/troupe-service'),
-  mailService = require('./server/services/mail-service'),
+	mailService = require('./server/services/mail-service'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
 	ConfirmStrategy = require('./server/utils/confirm-strategy').Strategy,
@@ -34,6 +34,7 @@ passport.use(new LocalStrategy({
       passwordField: 'password'
     },
     function(email, password, done) {
+      winston.debug("Attempting to authenticate " + email);
       userService.findByEmail(email, function(err, user) {
         if(err) return done(err);
         if(!user) return done(null, false);
@@ -136,6 +137,11 @@ require('./server/handlers/profile').install(app);
 require('./server/handlers/login').install(app);
 require('./server/handlers/invite').install(app);
 require('./server/handlers/avatar').install(app);
+require('./server/handlers/landing').install(app);
+
+// TEMP
+require('./server/services/thumbnail-preview-generator-service').install();
+require('./server/services/notification-generator-service').install();
 
 // TEMPORARY!
 require('./server/handlers/mobile').install(app);
@@ -150,6 +156,7 @@ var downloadsResource = app.resource('downloads',  require('./server/resources/d
 var embeddedResource = app.resource('embedded',  require('./server/resources/embedded.js'));
 var thumbnailsResource = app.resource('thumbnails',  require('./server/resources/thumbnails.js'));
 var chatMessagesResource = app.resource('chatMessages',  require('./server/resources/chat-messages.js'));
+var notificationsResource = app.resource('notifications',  require('./server/resources/notifications.js'));
 
 troupesResource.add(sharesResource);
 troupesResource.add(usersResource);
@@ -159,6 +166,7 @@ troupesResource.add(downloadsResource);
 troupesResource.add(chatMessagesResource);
 troupesResource.add(embeddedResource);
 troupesResource.add(thumbnailsResource);
+troupesResource.add(notificationsResource);
 
 /* This should be last */
 require('./server/handlers/app').install(app);

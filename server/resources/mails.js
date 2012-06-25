@@ -28,7 +28,7 @@ module.exports = {
       });
     },
 
-    new: function(req, res){
+    "new": function(req, res){
       res.send(500);
     },
 
@@ -39,37 +39,38 @@ module.exports = {
     show: function(req, res){
       var m = req.mail;
 
+      console.dir(m);
+
       if(m.attachments) {
-        var fileIds = m.attachments.map(function(item) { return item.fileId; } );
-        console.dir(fileIds);
+        var fileIds = m.attachments.map(function(item) { return item.fileId; } ).filterNulls();
+        if(fileIds) {
+          fileService.findByIds(fileIds, function(err, files) {
+            if(err) return res.send(500);
 
-        fileService.findByIds(fileIds, function(err, files) {
-          if(err) return res.send(500);
+            var indexedFiles = files.indexById();
 
-          var indexedFiles = files.indexById();
+            var attachments = m.attachments.map(function(item) { 
+              var file = indexedFiles[item.fileId];
+              if(!file) {
+                winston.warn('Unable to find attachment. Something might be wrong');
+                return null;
+              }
 
-          console.dir(indexedFiles);
+              return {
+                file: file.narrow(),
+                version: item.version
+              };
 
-          var attachments = m.attachments.map(function(item) { 
-            var file = indexedFiles[item.fileId];
-            if(!file) {
-              winston.warn('Unable to find attachment. Something might be wrong')
-              return null;
-            }
+            });
 
-            return {
-              file: file.narrow(),
-              version: item.version
-            };
-
+            res.send(compose(m, attachments.filterNulls()));
           });
 
-          res.send(compose(m, attachments.filterNulls()));
-        });
-
-      } else {
-        res.send(compose(m, []));
+          return;
+        }
       }
+
+      res.send(compose(m, []));
     },
 
     edit: function(req, res){

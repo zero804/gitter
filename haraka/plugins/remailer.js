@@ -2,9 +2,14 @@
 var mailService = require("./../../server/services/mail-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
 var nodemailer = require("nodemailer");
+var console = require("console");
 var TroupeSESTransport = require("./../../server/utils/mail/troupe-ses-transport"),
     RawMailComposer = require("./../../server/utils/mail/raw-mail-composer"),
     nconf = require("./../../server/utils/config").configure();
+
+
+var emailDomain = nconf.get("email:domain");
+var emailDomainWithAt = "@" + emailDomain;
 
 // Create an Amazon SES transport object
 var sesTransport = new TroupeSESTransport({
@@ -15,9 +20,10 @@ var sesTransport = new TroupeSESTransport({
 function continueResponse(next) {
   //return next (DENY, "Debug mode bounce.");
   return next(OK);
-};
+}
 
 exports.hook_queue = function(next, connection) {
+  console.log("Starting remailer");
 	var mailFrom = connection.transaction.mail_from;
 	var rcptTo = connection.transaction.rcpt_to;
   var transaction = connection.transaction;
@@ -35,8 +41,12 @@ exports.hook_queue = function(next, connection) {
       return continueResponse(next);
     }
 
+    console.log("Delivering emails");
+
     var newSubject = transaction.header.get("Subject");
-    newSubject = newSubject ? newSubject : "";
+    newSubject = newSubject ? newSubject.replace(/\n/g,'') : "";
+
+    console.dir(["newSubject", newSubject]);
 
     if(newSubject.indexOf("[" + troupe.name + "]") < 0) {
       newSubject = "[" + troupe.name + "] " + newSubject;
@@ -44,29 +54,33 @@ exports.hook_queue = function(next, connection) {
       transaction.add_header("Subject", newSubject);
     }
 
+    //transaction.remove_header("X-On-Behalf-Of");
+    //transaction.add_header("X-On-Behalf-Of", fromUser.displayName + " <" + fromUser.email + ">");
+
     transaction.remove_header("From");
-    transaction.add_header("From", fromUser.displayName + " <" + fromUser.email + ">");
+    transaction.add_header("From", fromUser.displayName  + " for " + troupe.name + " <" + troupe.uri + emailDomainWithAt + ">");
 
     transaction.remove_header("To");
-    transaction.add_header("To", troupe.name + " <" + troupe.uri + "@trou.pe>");
+    transaction.add_header("To", troupe.name + " <" + troupe.uri + emailDomainWithAt + ">");
 
     transaction.remove_header("Reply-To");
-    transaction.add_header("Reply-To", troupe.name + "<" + troupe.uri + "@trou.pe>");
+    transaction.add_header("Reply-To", troupe.name + "<" + troupe.uri + emailDomainWithAt + ">");
 
     transaction.remove_header("Return-Path");
-    transaction.add_header("Return-Path", "troupe-bounces@trou.pe");
+    transaction.add_header("Return-Path", "troupe-bounces" + emailDomainWithAt);
 
     var mail = new RawMailComposer({
-      source: troupe.uri + "@trou.pe",
+      source: troupe.uri + emailDomainWithAt,
       destinations: emailAddresses,
       message: transaction.data_lines.join('')
     });
 
     sesTransport.sendMail(mail, function(error, response){
         if (error) {
-          connection.logdebug(error);
-        } 
+          connection.logerror(error);
+        }
 
+        console.log("Apparently I successfully delivered some mails");
         return continueResponse(next);
     });
 

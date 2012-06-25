@@ -67,6 +67,7 @@ function validateTroupeEmail(options, callback) {
     findByUri(uri, function(err, troupe) {
       if(err) return callback(err);
       if(!troupe) return callback("Troupe not found for uri " + uri);
+
       if(!userHasAccessToTroupe(fromUser, troupe)) {
         return callback("Access denied");
       }
@@ -124,6 +125,7 @@ function addInvite(troupe, displayName, email) {
 
   mailerService.sendEmail({
     templateFile: "inviteemail",
+    from: 'signup-robot@trou.pe',
     to: email,
     subject: "You been invited to join the " + troupe.name + " troupe",
     data: {
