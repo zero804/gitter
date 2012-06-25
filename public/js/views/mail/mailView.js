@@ -64,6 +64,10 @@ define([
         // will sort this out properly, bloody dates
         p1.date = "Aug 22nd";
 
+        if(p1.preview.length > 200) {
+          p1.preview = p1.preview.substring(0,200)+"...";
+        }
+
 
         var rowHtml = Mustache.render(rowTemplate, {
           personName: p1.fromName,
