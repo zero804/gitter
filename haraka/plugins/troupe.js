@@ -1,5 +1,5 @@
 /*jshint globalstrict:true, trailing:false */
-/*global require: true, module: true, exports: true, DENY: true */
+/*global require: true, module: true, exports: true, DENY: true, SOFTDENY: true */
 
 "use strict";
 
@@ -16,6 +16,11 @@ var console = require("console");
 var Q = require("q");
 var sanitizer = require("./../../server/utils/sanitizer.js");
 var winston = require('winston');
+var nconf = require("./../../server/utils/config").configure();
+var uuid = require('node-uuid');
+
+var emailDomain = nconf.get("email:domain");
+var emailDomainWithAt = "@" + emailDomain;
 
 function continueResponse(next) {
   //return next (DENY, "Debug mode bounce.");
@@ -184,8 +189,10 @@ exports.hook_queue = function(next, connection) {
           attachments: savedAttachmentsForPersist }, function(err, savedMail) {
             appEvents.newEmailEvent(savedMail.id, troupe.id);
 
-            if (err) return next(DENY, "Failed to store the email");
+            if (err) return next(SOFTDENY, "Failed to store the email");
             connection.logdebug("Stored the email.");
+            connection.transaction.notes.emailId = savedMail.id;
+            console.dir(connection.transaction.notes);
 
             return continueResponse(next);
           });

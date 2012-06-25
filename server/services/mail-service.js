@@ -38,6 +38,14 @@ function storeEmail(options, callback) {
   });
 }
 
+function updateEmailWithMessageId(emailId, messageId, callback) {
+  persistence.Email.update({ _id: emailId }, { messageId: messageId }, {}, function(err, numAffected) {
+    if(err) return callback(err);
+    if(numAffected !== 1) return callback("No matching email found");
+    callback(null);
+  });
+}
+
 function compare(a,b) {
   if (a.date > b.date)
      return -1;
@@ -62,5 +70,6 @@ function findById(id, callback) {
 module.exports = {
   storeEmail: storeEmail,
   findById: findById,
-  findByTroupe: findByTroupe
+  findByTroupe: findByTroupe,
+  updateEmailWithMessageId: updateEmailWithMessageId
 };
