@@ -16,6 +16,7 @@
 @col7: #f8f6f7; // off-white
 @col8: #d6d6d6; // darker off-white for borders and ting
 @col9: #149a55; // darker col1
+@col10: #7b797a; // dark grey
 
 // Our fonts
 @font1: 'Pontano Sans', sans-serif;
@@ -57,6 +58,10 @@ h1 {
 
 #trpFiles {
   background-color: @col2;
+}
+
+.right {
+  text-align:right; 
 }
 
 #trpHeader {
@@ -225,13 +230,13 @@ h1 {
 #trpNavItemText {
   font-family: 'Gudea', sans-serif;
   font-size: 16px;
-  color: #7b797a;
+  color: @col10;
 }
 
 #trpNavItemText a {
   font-family: 'Gudea', sans-serif;
   font-size: 16px;
-  color: #7b797a;
+  color: @col10;
   text-decoration: none;
 }
 
@@ -392,8 +397,71 @@ textarea, input { outline: none; }
   text-align:right; 
 }
 
+.trpFileViewContainer {
+  
+}
+
+.trpFileViewItem {
+  float: left;
+  padding-bottom: 40px;
+  padding-left: 40px;
+}
+
+.trpFileThumbnail {
+  border: 1px solid @col8;
+}
+
+.trpFileDownloadButton {
+  padding-right: 10px;
+}
+
+.trpFilename {
+  border-left: 1px solid @col8;
+  height: 20px;
+  padding-left: 10px;
+  font-size: 12px;
+  color: @col10;
+  font-family: 'Gudea', sans-serif;
+}
+
+.trpFileUploadContainer {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid @col8;
+  margin-left: 20px;
+  margin-bottom: 20px;
+
+}
+
+.trpFileUploadArea {
+  position:absolute; 
+  top:0;  
+  width:620px; 
+  height:100%;
+  width: 100%;
+  z-index:2;
+  font-family: 'Lustria', serif;
+  font-size: 16px;
+  color: @col10;
+  margin-top: 15px;
+
+}
+
 .trpSpace24 {
   margin-right: 20px;
+}
+
+.trpButton {
+  color: @col10;
+  border: 1px solid @col8;
+  font-family: 'Gudea', sans-serif;
+  font-size: 12px;
+  padding: 10px;
+  display: inline-block;
+  -webkit-border-radius:3px;
+  -moz-border-radius:3px;
+  border-radius:3px;
+  background-color: white;
 }
 
 .trpDisplayPicture{
