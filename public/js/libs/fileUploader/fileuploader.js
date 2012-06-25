@@ -489,9 +489,9 @@ qq.FileUploader = function(o){
         // if set, will be used instead of qq-upload-list in template
         listElement: null,
                 
-        template: '<div class="qq-uploader">' + 
-                '<div class="qq-upload-drop-area rounded"><span>Drop files here to upload</span></div>' +
-                '<div class="right"><div class="qq-upload-button btn btn-primary">Upload a file</div></div>' +
+        template: '<div class="qq-uploader trpFileUploadContainer">' + 
+                '<div class="qq-upload-drop-area trpFileUploadArea">Drag and drop any file here</div>' +
+                '<div class="right"><div class="qq-upload-button trpButton">Upload a file</div></div>' +
                 '<div class="qq-upload-list rounded"></div>' + 
              '</div>',
 
@@ -569,13 +569,13 @@ qq.extend(qq.FileUploader.prototype, {
                 qq.removeClass(dropArea, self._classes.dropActive);  
             },
             onDrop: function(e){
-                dropArea.style.display = 'none';
+                //dropArea.style.display = 'none';
                 qq.removeClass(dropArea, self._classes.dropActive);
                 self._uploadFileList(e.dataTransfer.files);    
             }
         });
                 
-        dropArea.style.display = 'none';
+        //dropArea.style.display = 'none';
 
         qq.attach(document, 'dragenter', function(e){     
             if (!dz._isValidFileDrag(e)) return; 

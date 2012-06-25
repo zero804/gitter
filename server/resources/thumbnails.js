@@ -10,8 +10,8 @@ var mimeIcons = {
   'image/jpeg': '/images/mime/jpg.png',
   'image/png': '/images/mime/png.png',
   'image/gif': '/images/mime/gif.png',
-  'application/octet-stream': '/images/mime/unknown.png',
-  'application/msword': '/images/mime/doc.png'
+  'application/octet-stream': '/images/2/mime/unknown.png',
+  'application/msword': '/images/2/mime/doc.png'
 };
 
 module.exports = {
@@ -36,7 +36,7 @@ module.exports = {
             return res.relativeRedirect(redirectImage);
           }
 
-          return res.relativeRedirect("/images/mime/unknown.png");
+          return res.relativeRedirect("/images/2/mime/unknown.png");
         }
 
         res.contentType(mimeType);
