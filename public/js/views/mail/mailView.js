@@ -61,6 +61,9 @@ define([
         var d = new Date(p1.date);
         p1.date = d.toUTCString();
 
+        // will sort this out properly, bloody dates
+        p1.date = "Aug 22nd";
+
 
         var rowHtml = Mustache.render(rowTemplate, {
           personName: p1.fromName,
