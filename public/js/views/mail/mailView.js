@@ -4,9 +4,10 @@ define([
   'underscore',
   'backbone',
   'mustache',
+  'dateFormat',
   'text!templates/mail/mail.mustache',
   'text!templates/mail/row.mustache'
-], function($, _, Backbone, Mustache, template, rowTemplate){
+], function($, _, Backbone, Mustache, dateFormat, template, rowTemplate){
   var MailView = Backbone.View.extend({    
     
     initialize: function(options) {
@@ -62,7 +63,17 @@ define([
         p1.date = d.toUTCString();
 
         // will sort this out properly, bloody dates
-        p1.date = "Aug 22nd";
+        //p1.date = "Aug 22nd";
+        var now = new Date();
+
+        if (now.getDate() === d.getDate() && now.getMonth() === d.getMonth() && now.getFullYear() === d.getFullYear()) {
+          p1.date = d.format('h:MM TT');
+        }
+        else {
+          p1.date = d.format('mmm d');
+        }
+
+        
 
         var rowHtml = Mustache.render(rowTemplate, {
           personName: p1.fromName,
