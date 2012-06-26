@@ -68,7 +68,6 @@ define([
           p1.preview = p1.preview.substring(0,200)+"...";
         }
 
-
         var rowHtml = Mustache.render(rowTemplate, {
           personName: p1.fromName,
           preview: p1.preview,
