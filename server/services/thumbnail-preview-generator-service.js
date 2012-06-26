@@ -56,9 +56,10 @@ function getPreviewGenerationStrategy(mimeType) {
     return pdfPreviewGenerationStategy;
   }
 
-  if(/^image\//.test(mimeType)) {
+  if(/^image\//.test(mimeType) || 'application/postscript'.indexOf(mimeType) >= 0) {
     return imageMagickPreviewGenerationStategy;
   }
+
 }
 
 function getThumbnailGenerationStrategy(mimeType) {
