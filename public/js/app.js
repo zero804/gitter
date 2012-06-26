@@ -17,7 +17,7 @@ require.config({
     templates: '../templates',
     now: '/nowjs/now',
     noty: 'libs/jquery-noty-1.1.1/jquery.noty',
-    fileUploader: 'libs/fileUploader/fileuploader',
+    fileUploader: 'libs/fileUploader/fileuploader'
   },
   priority: ['jquery']
 });
