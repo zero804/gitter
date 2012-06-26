@@ -34,6 +34,14 @@ function findById(id, callback) {
   });
 }
 
+function deleteById(id, callback) {
+  persistence.File.findById(id , function(err, file) {
+    winston.debug("Deleted File!");
+    file.remove();
+    callback(err);
+  });
+}
+
 /* private */
 function uploadFileToGrid(file, version, temporaryFile, callback) {
   winston.info('Uploading file to grid: ' + file.fileName + "(" + version + ")");

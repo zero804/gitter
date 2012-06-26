@@ -9,6 +9,8 @@ require.config({
     jquery_timeago: 'libs/jquery.timeago-0.11.1/jquery.timeago',
     jquery_colorbox: 'libs/jquery.colorbox-1.3.19/jquery.colorbox-min',
 
+    dateFormat: 'libs/dateFormat-1.2.3/date.format',
+
     bootstrap: '../bootstrap/js/bootstrap',
     underscore: 'libs/underscore/underscore-1.3.1-min',
     backbone: 'libs/backbone/backbone-0.9.1',
