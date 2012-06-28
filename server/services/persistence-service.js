@@ -126,6 +126,14 @@ var ConversationSchema = new Schema({
 });
 
 
+ConversationSchema.methods.narrow = function () {
+  return {
+    id: this.id,
+    subject: this.subject
+  };
+};
+
+
 var FileVersionSchema = new Schema({
   creatorUserId: ObjectId,
   createdDate: { type: Date },

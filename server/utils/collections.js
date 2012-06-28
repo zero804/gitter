@@ -13,6 +13,13 @@ Array.prototype.filterNulls = function() {
 };
 
 /**
+ * Push all the items in an array
+ */
+Array.prototype.pushAll = function(items) {
+  Array.push.apply(this, items);
+};
+
+/**
  * Index an array
  * @return {Object} hash of ids.
  */
