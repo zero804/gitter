@@ -36,7 +36,7 @@ function imageMagickPreviewGenerationStategy(fileName, mimeType, callback) {
 }
 
 function imageMagickThumbnailGenerationStategy(fileName, mimeType, callback) {
-  image.generateThumbnail(fileName, 128, 128, function(err, thumbnailFile) {
+  image.generateThumbnail(fileName, 180, 180, function(err, thumbnailFile) {
     if(err) return callback(err);
 
     callback(null, { fileName: thumbnailFile, mimeType: 'image/jpeg' });
@@ -56,9 +56,10 @@ function getPreviewGenerationStrategy(mimeType) {
     return pdfPreviewGenerationStategy;
   }
 
-  if(/^image\//.test(mimeType)) {
+  if(/^image\//.test(mimeType) || 'application/postscript'.indexOf(mimeType) >= 0) {
     return imageMagickPreviewGenerationStategy;
   }
+
 }
 
 function getThumbnailGenerationStrategy(mimeType) {
