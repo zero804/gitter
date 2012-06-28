@@ -151,6 +151,7 @@ var troupesResource = app.resource('troupes',  require('./server/resources/troup
 var sharesResource = app.resource('invites',  require('./server/resources/invites.js'));
 var usersResource = app.resource('users',  require('./server/resources/users.js'));
 var mailsResource = app.resource('mails', require('./server/resources/mails.js'));
+var conversationsResource = app.resource('conversations', require('./server/resources/conversations.js'));
 var filesResource = app.resource('files', require('./server/resources/files.js'));
 var downloadsResource = app.resource('downloads',  require('./server/resources/downloads.js'));
 var embeddedResource = app.resource('embedded',  require('./server/resources/embedded.js'));
@@ -161,6 +162,7 @@ var notificationsResource = app.resource('notifications',  require('./server/res
 troupesResource.add(sharesResource);
 troupesResource.add(usersResource);
 troupesResource.add(mailsResource);
+troupesResource.add(conversationsResource);
 troupesResource.add(filesResource);
 troupesResource.add(downloadsResource);
 troupesResource.add(chatMessagesResource);

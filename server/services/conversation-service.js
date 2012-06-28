@@ -77,6 +77,7 @@ function storeEmailInConversation(options, callback) {
 }
 
 function updateEmailWithMessageId(conversationId, emailId, messageId, callback) {
+
   persistence.Conversation.findById(conversationId, function(err, conversation) {
     if(err) return callback(err);
 
@@ -94,7 +95,21 @@ function updateEmailWithMessageId(conversationId, emailId, messageId, callback) 
   });*/
 }
 
+function findByTroupe(id, callback) {
+  persistence.Conversation
+    .where('troupeId', id)
+    .desc('updated')
+    .slaveOk()
+    .exec(callback);
+}
+
+function findById(id, callback) {
+  persistence.Conversation.findById(id, callback);
+}
+
 module.exports = {
   storeEmailInConversation: storeEmailInConversation,
-  updateEmailWithMessageId: updateEmailWithMessageId
+  updateEmailWithMessageId: updateEmailWithMessageId,
+  findByTroupe: findByTroupe,
+  findById: findById
 };
