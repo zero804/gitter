@@ -1,17 +1,14 @@
-<div class="row-fluid datarow highlight clickPoint-showEmail">
-  <div class="span1">
-    <img src="images/tmp/dp_andrew.png" class="dp">
-  </div>
-  <div class="span8 highlight">
-    <h3>{{subject}}</h3>
-    {{preview}}
-  </div>
-  <div class="span2 right">
-    {{date}}
-  </div>
-  <div class="span1 right">
-    <!-- when we support attachments, an icon will go here -->
-    <i class="icon-gift"></i>
+<div class="trpMailRowContainer">
+  <div class="trpMailRow clickPoint-showEmail">
+    <div class="trpMailLeft">
+      <div class="trpMailDisplayPicture"><img src="images/tmp/dp_andrew.png" class="trpDisplayPicture"></div>
+      <div class="trpMailFromSubject">{{personName}}: {{subject}}</div>
+      <div class="trpMailPreview">{{preview}}</div>
+    </div>
+    <div class="trpMailRight">
+      <div class="trpMailIcons"><img src="images/2/icon-small-fav.png"></div>
+      <div class="trpMailDate">{{date}}</div>
+    </div>
   </div>
 </div>
    

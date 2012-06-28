@@ -4,9 +4,10 @@ define([
   'underscore',
   'backbone',
   'mustache',
+  'dateFormat',
   'text!templates/mail/mail.mustache',
   'text!templates/mail/row.mustache'
-], function($, _, Backbone, Mustache, template, rowTemplate){
+], function($, _, Backbone, Mustache, dateFormat, template, rowTemplate){
   var MailView = Backbone.View.extend({    
     
     initialize: function(options) {
@@ -30,7 +31,7 @@ define([
     render: function() {
       var self = this;
       // we probably want to pull in the domain from config, e.g. for beta.trou.pe
-      var emailAddress = window.troupeContext.troupe.uri + '@trou.pe';
+      var emailAddress = window.troupeContext.troupe.uri + '@beta.trou.pe';
       var compiledTemplate = Mustache.render(template, {
         emailAddress: emailAddress
       });
@@ -45,7 +46,7 @@ define([
         self.router.navigate("mail/" + id, {trigger: true});
       };
     },
-    
+
     renderMails: function(mails) {
 
       if (mails.length === 0) $("#frame-help").show();
@@ -61,6 +62,18 @@ define([
         var d = new Date(p1.date);
         p1.date = d.toUTCString();
 
+        // will sort this out properly, bloody dates
+        //p1.date = "Aug 22nd";
+        var now = new Date();
+
+        if (now.getDate() === d.getDate() && now.getMonth() === d.getMonth() && now.getFullYear() === d.getFullYear()) {
+          p1.date = d.format('h:MM TT');
+        }
+        else {
+          p1.date = d.format('mmm d');
+        }
+
+        
 
         var rowHtml = Mustache.render(rowTemplate, {
           personName: p1.fromName,
@@ -73,6 +86,15 @@ define([
         var item = $(rowHtml);
         $(".frame-mails", this.el).append(item);
         item.on('click', this.onClickGenerator(p1.id));
+// WHY WONT THIS WORK GIVES SYNTAX ERROR
+//         var p=$('#fos p');
+// var divh=$('#fos').height();
+// while ($(p).outerHeight()>divh) {
+//     $(p).text(function (index, text) {
+//         return text.replace(/\W*\s(\S)*$/, '...');
+//     });
+// }​
+
       }
     },
 

@@ -1,10 +1,4 @@
-<tr>
-    <td><a href="#previewModal" class="link-preview"><img src="{{fileIcon}}" class="thumbnail"></a></td>
-    <td>
-      <strong>{{fileName}}</strong><br>
-      {{mimeType}}
-    </td>
-    <td>
-      <a class="btn btn-small  btn-primary" href="{{url}}"><i class="icon-download"></i></a>
-    </td>
-</tr>
+<div class="trpFileViewItem">
+	<div><a href="#previewModal" class="link-preview"><img src="{{fileIcon}}" width="180" class="trpFileThumbnail"></a></div>
+	<div><a href="{{url}}"><img class="trpFileDownloadButton" src="images/2/icon-small-download.png"></a><span class="trpFilename"> {{fileName}}</span></div>
+</div>

@@ -1,0 +1,563 @@
+// Bootstrap Reset
+@import "bootstrap.less";
+
+
+/*@import "variables.less"; // Modify this for custom colors, font-sizes, etc
+@import "mixins.less";
+@import "modals.less";*/
+
+// Our colour palette
+@col1: #1dce73; // lumo green 
+@col2: #d54f68; // pinky red
+@col3: #4a4257; // dark purple
+@col4: #c0c9c8; // mid grey
+@col5: #1dd0cd; // turquoise
+@col6: #fcb316; // moutard
+@col7: #f8f6f7; // off-white
+@col8: #d6d6d6; // darker off-white for borders and ting
+@col9: #149a55; // darker col1
+@col10: #7b797a; // dark grey
+
+// Our fonts
+@font1: 'Pontano Sans', sans-serif;
+
+@bodyPadding:	 20px;
+@bodyFont: 14px;
+
+@baseImages: "../../images";
+
+@bgGreen: %("%s/bg_green.png", @baseImages);
+
+body {
+  margin: 0;
+}
+
+html {
+ background-color: @col7;
+
+}
+
+h1 {
+  font-family: 'Lustria', serif;
+  font-size: 24px;
+  margin: 0;
+}
+
+#trpHeaderWrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;  
+  z-index: 10;
+}
+
+#trpHeaderContainer {
+  height: 64px;
+  background-color: @col1;
+}
+
+#trpFiles {
+  background-color: @col2;
+}
+
+.right {
+  text-align:right; 
+}
+
+#trpHeader {
+  margin: 0 auto;
+  position: relative;
+  top: 16px;
+  left: 30px;
+}
+
+#trpHeader ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  position: absolute;
+}
+
+#trpHeader ul li {
+  float: left;
+  margin-right: 5px;
+}
+
+#trpHeader ul li a{
+  color: #90b874;
+  font-weight: bold;
+  font-size: 1.4em;
+  margin-right: 5px;
+  text-decoration: none;
+}
+
+#trpHeader h1{
+  color: white;
+}
+
+#trpHeaderRight {
+  margin: 0 auto;
+  position: relative;
+  top: 24px;
+}
+
+#trpHeaderRight ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  position: absolute;
+  right: 24px;
+}
+
+#trpHeaderRight ul li {
+  float: left;
+  margin-right: 5px;
+}
+
+#trpHeaderRight ul li a{
+  margin-right: 5px;
+  text-decoration: none;
+}
+
+#trpContentWrap {
+  height: 100%; 
+  display: inline;
+  overflow: scroll;
+}
+
+#trpContentContainer {
+  margin: 0 auto;
+  font-size: 1.4em;
+  padding: 65px 0 0px;
+  padding-left: 235px;
+  padding-right: 20px;
+  background-color: @col7;
+  min-width: 650px;
+}
+
+#trpTroupeSelector {
+  position: absolute;
+  z-index: 3;
+  top: 64px;
+  width:100%;
+  height: 0px;
+  overflow: hidden;
+}
+
+#trpTroupeSelector h1 a{
+  color: white;
+  text-decoration: none;
+}
+
+.trpTroupeSelectorItem {
+  padding-top: 10px;
+  padding-left: 75px;
+  padding-bottom: 10px;
+  text-decoration: none;
+  border-bottom: thin solid @col1;
+  background-color: @col9;
+}
+
+.trpTroupeSelectorItem:hover{
+  background-color: @col1;
+  cursor: pointer;
+}
+
+#trpSelectorArrow {
+  padding-left: 10px;
+}
+
+#trpUserMenu {
+  position: absolute;
+  z-index: 5;
+  top: 64px;
+  width:250px;
+  right: 58px;
+  height: 0px;
+  overflow: hidden;
+  -webkit-box-shadow: 0px 1px 8px #000;
+  background-color: white;
+}
+
+#trpUserMenu h1 a{
+  color: white;
+  text-decoration: none;
+}
+
+.trpUserMenuItem {
+  padding-top: 10px;
+  padding-right: 70px;
+  padding-bottom: 10px;
+  text-decoration: none;
+  text-align: right;
+}
+
+.trpUserMenuItem:hover{
+  background-color: @col1;
+  cursor: pointer;
+}
+
+#trpNavWrap {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  width: 235px;
+  height: 100%; 
+  background-image: url('/images/2/bg-nav.png'); 
+  float: left;
+}
+
+#trpNavContainer {
+
+}
+
+#trpNav {
+
+}
+
+#trpNavItemContainer {
+  padding-left: 32px;
+  padding-top: 17px;
+  padding-bottom: 17px;
+  border-bottom:thin solid #e2e2e2;
+}
+
+#trpNavItemIcon {
+  float: left;
+  padding-right: 20px;
+}
+
+#trpNavItemText a {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 15px;
+  color: @col10;
+  text-decoration: none;
+}
+
+#trpNavItemText a:hover{
+  color: black;
+}
+
+.trpChatContainer {
+}
+
+.trpChatIcon {
+  float: left;
+}
+
+#trpChatInput {
+  width:100%;
+  background-color: white;
+  padding-left: 30px;
+  height: 80px;
+  border-bottom: 1px solid @col8;
+}
+  
+.trpChatBox {
+  border-style: none;  
+  overflow: auto; 
+  resize: none;
+  padding: 22px;
+  max-height: 30px;
+  font-size: 18px;
+  color: #7b797a;
+  letter-spacing: 1px;
+  font-family: 'Yanone Kaffeesatz', sans-serif;
+  width: 500px;
+}
+
+.trpChatBox:focus {
+ outline: none;       
+}
+
+textarea, input { outline: none; }
+
+.trpChatIcon {
+  padding-top: 25px;
+  padding-right: 30px;
+}
+
+.trpChatBubble {
+  position:relative;
+  padding:15px;
+  margin-bottom: 24px;
+  border:1px solid @col8;
+  color:#333;
+  background:#fff;
+  /* css3 */
+  -webkit-border-radius:3px;
+  -moz-border-radius:3px;
+  border-radius:3px;
+  font-size: 18px;
+  color: #7b797a;
+  letter-spacing: 1px;
+  font-family: 'Yanone Kaffeesatz', sans-serif;
+  max-width: 500px;
+}
+
+.trpChatBubble:before {
+  content:"";
+  position:absolute;
+  bottom:-20px; /* value = - border-top-width - border-bottom-width */
+  left:40px; /* controls horizontal position */
+    border-width:20px 20px 0;
+  border-style:solid;
+    border-color:#5a8f00 transparent;
+    /* reduce the damage in FF3.0 */
+    display:block; 
+    width:0;
+}
+
+/* creates the smaller  triangle */
+.trpChatBubble:after {
+  content:"";
+  position:absolute;
+  bottom:-13px; /* value = - border-top-width - border-bottom-width */
+  left:47px; /* value = (:before left) + (:before border-left) - (:after border-left) */
+  border-width:13px 13px 0;
+  border-style:solid;
+  border-color:#fff transparent;
+    /* reduce the damage in FF3.0 */
+    display:block; 
+    width:0;
+}
+
+.trpChatBubble.remote {
+  float: right;
+}
+
+.trpChatBubble.local {
+  float: left;
+}
+
+.trpChatBubble.right {
+  margin-right:30px;
+}
+
+/* creates the larger triangle */
+.trpChatBubble.local:before {
+  top:10px; /* controls vertical position */
+  bottom:auto;
+  left:-5px; /* value = - border-left-width - border-right-width */
+  border-width:15px 5px 15px 0;
+  border-color:transparent @col8;
+}
+
+/* creates the smaller  triangle */
+.trpChatBubble.local:after {
+  top:11px; /* value = (:before top) + (:before border-top) - (:after border-top) */
+  bottom:auto;
+  left:-4px; /* value = - border-left-width - border-right-width */
+  border-width:14px 5px 14px 0;
+  border-color:transparent white;
+}
+
+/* Variant : right
+------------------------------------------ */
+
+/* creates the larger triangle */
+.trpChatBubble.remote:before {
+  top:10px; /* controls vertical position */
+  bottom:auto;
+    left:auto;
+  right:-5px; /* value = - border-left-width - border-right-width */
+  border-width:15px 0 15px 5px;
+  border-color:transparent @col8;
+}
+
+/* creates the smaller  triangle */
+.trpChatBubble.remote:after {
+  top:11px; /* value = (:before top) + (:before border-top) - (:after border-top) */
+  bottom:auto;
+    left:auto;
+  right:-4px; /* value = - border-left-width - border-right-width */
+  border-width:14px 0 14px 5px;
+  border-color:transparent white;
+}
+
+.trpChatPictureLocal {
+  float: left;
+  padding-right: 20px;
+  padding-left: 20px;
+}
+
+.trpChatPictureRemote {
+  float: right;
+  padding-right: 20px;
+  padding-left: 20px;
+}
+
+.trpChatRemote {
+  text-align:right; 
+}
+
+.trpFileViewContainer {
+  
+}
+
+.trpFileViewItem {
+  float: left;
+  padding-bottom: 40px;
+  padding-left: 40px;
+}
+
+.trpFileThumbnail {
+  border: 1px solid @col8;
+}
+
+.trpFileDownloadButton {
+  padding-right: 10px;
+}
+
+.trpFilename {
+  border-left: 1px solid @col8;
+  height: 20px;
+  padding-left: 10px;
+  font-size: 12px;
+  color: @col10;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.trpFileUploadContainer {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid @col8;
+  margin-left: 20px;
+  margin-bottom: 20px;
+}
+
+.trpFileUploadArea {
+  position:absolute; 
+  top:0;  
+  width:620px; 
+  height:100%;
+  width: 100%;
+  z-index:2;
+  font-family: 'Lustria', serif;
+  font-size: 16px;
+  color: @col10;
+  margin-top: 15px;
+}
+
+.trpMailViewHeader {
+  padding-bottom: 20px;
+  padding-top: 20px;
+}
+
+.trpMailSorter {
+  float: left;
+  padding-top: 10px;
+  padding-left: 20px;
+  font-family: 'Lustria', serif;
+  font-size: 14px;
+
+}
+
+.trpMailButton {
+
+}
+
+.trpMailRowContainer {
+  border-top: 1px solid @col8;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin-left: 20px;
+  padding-right: 20px;
+}
+
+
+.trpMailRowContainer:hover {
+  background-color: @col8;
+  cursor: pointer;
+}
+
+.trpMailRow {
+
+}
+
+
+.trpMailDisplayPicture {
+  padding-left: 20px;
+  padding-right: 20px;
+  float: left;
+}
+
+.trpMailFromSubject {
+  font-family: 'Lustria', serif;
+  font-size: 18px;
+  height: 23px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trpMailPreview {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 13px;
+  color: @col10;
+  height: 36px;
+  overflow: hidden;
+}
+
+.trpMailIcons {
+  float: left;
+  padding-right: 40px;
+}
+
+.trpMailDate {
+  float: left;
+  font-family: 'Lustria', serif;
+  font-size: 14px;
+  color: @col10;
+}
+
+.trpMailLeft {
+  display:inline-block;
+  width: 80%;
+
+}
+
+.trpMailRight {
+  display:inline-block;
+  float: right;
+}
+
+
+.trpSpace24 {
+  margin-right: 20px;
+}
+
+.trpButton {
+  color: @col10;
+  border: 1px solid @col8;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  padding: 10px;
+  display: inline-block;
+  -webkit-border-radius:3px;
+  -moz-border-radius:3px;
+  border-radius:3px;
+  background-color: white;
+}
+
+.trpDisplayPicture{
+  -webkit-border-radius: 50em;
+  -moz-border-radius: 50em;
+  border-radius: 50em;
+  /*border: solid thin #dcdcdc;*/
+  background-color: transparent;
+}
+
+.trpNewLine {
+  clear: both;
+}
+
+
+
+
+/* READD THIS AGAIN LATER @import "../../js/libs/jquery.fileupload/jquery.fileupload.less"; */
+@import "../../js/libs/jquery-noty-1.1.1/jquery.noty.css";
+@import "../../js/libs/jquery-noty-1.1.1/noty_theme_default.css";
+@import "../../js/libs/fileUploader/fileuploader.less";
+
+

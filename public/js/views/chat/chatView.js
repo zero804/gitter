@@ -33,7 +33,7 @@ define([
     },
 
     events: {
-      "keydown .chatbox":          "detectReturn"
+      "keydown .trpChatBox":          "detectReturn"
     },
 
     beforeClose: function() {
@@ -73,7 +73,7 @@ define([
         dataType: "json",
         type: "GET",
         success: function(data) {
-          self.renderUsers(data);
+          //self.renderUsers(data);
         }
       });
 
@@ -102,21 +102,18 @@ define([
 
     onMessage: function(event, msg) {
       var self = event.data;
-
-
       var compiledTemplate = self.renderMessage(msg);
-
       var item = $(compiledTemplate);
-      item.hide();
+      //item.hide();
       self.attachTooltipHandlers(item);
 
       $(".frame-chat", this.el).prepend(item);
-      item.show('slide', {}, 'fast');
+      //item.show('slide', {}, 'fast');
 
     },
 
     attachTooltipHandlers: function(item) {
-      $('.chat-bubble', item).each(this.attachTooltipHandlerToItem);
+      $('.trpChatBubble', item).each(this.attachTooltipHandlerToItem);
       $('.dp-tooltip', item).tooltip();
     },
 
@@ -153,7 +150,7 @@ define([
     },
 
     send: function() {
-      var chatBox = $(".chatbox");
+      var chatBox = $(".trpChatBox");
       chat.send(chatBox.val());
       chatBox.val('');
       return false;
@@ -162,12 +159,8 @@ define([
     render: function() {
       var compiledTemplate = Mustache.render(template, { });
       $(this.el).html(compiledTemplate);
-
       this.attachTooltipHandlers(this.el);
-
-
       this.loadNextMessages();
-
       return this;
     },
 
