@@ -523,6 +523,59 @@ textarea, input { outline: none; }
 }
 
 
+.trpPeopleViewHeader {
+  padding-bottom: 20px;
+  padding-top: 15px;
+  margin-left: 20px;
+  color: @col10;
+  border-bottom: 1px solid @col8;
+}
+
+.trpPeopleHeader {
+  float: left;
+  padding-top: 10px;
+  font-family: 'Lustria', serif;
+  font-size: 18px;
+}
+
+.trpPeopleTab {
+  float: left;
+  padding-left: 40px;
+  padding-bottom: 20px;
+  min-height: 100%;
+}
+
+.trpPeopleViewItem {
+  float: left;
+  padding: 0px 10px 40px 40px;
+}
+
+.trpPersonAvatar {
+  float: left;
+}
+
+.trpPersonDetails {
+  float: left;
+  padding-left: 20px;
+}
+
+.trpPersonName {
+  font-family: 'Lustria', serif;
+  font-size: 18px;
+  color: black;
+}
+
+.trpPersonRemove {
+  font-family: 'Lustria', serif;
+  font-size: 14px;
+  color: @col10;
+}
+
+.trpPersonRemove:hover {
+  color: @col1;
+  cursor: pointer;
+}
+
 .trpSpace24 {
   margin-right: 20px;
 }
@@ -532,7 +585,7 @@ textarea, input { outline: none; }
   border: 1px solid @col8;
   font-family: 'Open Sans', sans-serif;
   font-size: 12px;
-  padding: 10px;
+  padding: 5px 10px 5px 10px;
   display: inline-block;
   -webkit-border-radius:3px;
   -moz-border-radius:3px;
@@ -552,7 +605,38 @@ textarea, input { outline: none; }
   clear: both;
 }
 
+.trpTabItem {
+  float: left;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  color: @col10;
+  padding: 10px 20px 0px 20px;
+  min-height: 100%;
+  cursor: pointer;
+}
 
+.trpTabItem a {
+  text-decoration: none;
+}
+
+.trpTabItem {
+  float: left;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  color: @col10;
+  padding: 10px 20px 0px 20px;
+  min-height: 100%;
+}
+
+.trpTabActive {
+  border-top: 1px solid @col8;
+  border-left: 1px solid @col8;
+  border-right: 1px solid @col8;
+  border-bottom: 1px solid @col7;
+  color: @col1;
+  padding-bottom: 20px;
+  cursor: default;
+}
 
 
 /* READD THIS AGAIN LATER @import "../../js/libs/jquery.fileupload/jquery.fileupload.less"; */
