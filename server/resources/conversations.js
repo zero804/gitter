@@ -26,7 +26,7 @@ module.exports = {
       conversationService.findByTroupe(req.troupe.id, function(err, conversations) {
         if(err) return next(err);
 
-        restSerializer.serialize(conversations, restSerializer.ConversationStrategy, function(err, serialized) {
+        restSerializer.serialize(conversations, restSerializer.ConversationMinStrategy, function(err, serialized) {
           if(err) return next(err);
           res.send(serialized);
         });

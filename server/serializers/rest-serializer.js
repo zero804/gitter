@@ -22,7 +22,6 @@ function execPreloads(preloads, callback) {
 
   Q.all(promises)
       .then(function() {
-        console.log("PRELOADS DONE!");
         callback(null);
       })
       .fail(function(err) {
@@ -34,8 +33,6 @@ function UserIdStrategy() {
   var self = this;
 
   this.preload = function(ids, callback) {
-    console.dir("PRELOAD....................");
-    console.dir(ids);
 
     userService.findByIds(ids.distinct(), function(err, users) {
       if(err) return callback(err);
@@ -68,8 +65,6 @@ function EmailStrategy() {
   var userStategy = new UserIdStrategy();
 
   this.preload = function(items, callback) {
-    console.dir(["***********emails!!", items]);
-
     var allUsers = items.map(function(i) { return i.fromUserId; });
 
     console.dir(allUsers);
@@ -115,6 +110,26 @@ function ConversationStrategy()  {
   };
 }
 
+function ConversationMinStrategy()  {
+  this.preload = function(items, callback) {
+    callback();
+  };
+
+  this.map = function(item) {
+    item.emails.forEach(function(i) { 
+    });
+
+    return {
+      id: item.id,
+      troupeId: item.troupeId,
+      updated: item.updated,
+      subject: item.subject,
+      emailCount: item.emails.length,
+      hasAttachments: hasAttachments;
+    };
+  };
+}
+
 /* This method should move */
 function serialize(items, Strategy, callback) {
   if(!items) return null;
@@ -140,5 +155,6 @@ function serialize(items, Strategy, callback) {
 
 module.exports = {
   ConversationStrategy: ConversationStrategy,
+  ConversationMinStrategy: ConversationMinStrategy,
   serialize: serialize
 }
