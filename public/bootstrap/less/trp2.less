@@ -549,7 +549,6 @@ textarea, input { outline: none; }
 .trpPeopleTab {
   float: left;
   padding-left: 40px;
-  padding-bottom: 20px;
   min-height: 100%;
 }
 
@@ -614,27 +613,22 @@ textarea, input { outline: none; }
   clear: both;
 }
 
-.trpTabItem {
-  float: left;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 14px;
-  color: @col10;
-  padding: 10px 20px 0px 20px;
-  min-height: 100%;
-  cursor: pointer;
-}
-
 .trpTabItem a {
   text-decoration: none;
 }
 
 .trpTabItem {
-  float: left;
   font-family: 'Open Sans', sans-serif;
   font-size: 14px;
   color: @col10;
-  padding: 10px 20px 0px 20px;
-  min-height: 100%;
+}
+
+.trpTabItem.active {
+  color: @col1;
+}
+
+.nav-tabs > .active > a, {
+  color: @col1;
 }
 
 .trpTabActive {
