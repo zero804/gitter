@@ -4,15 +4,15 @@ define([
   'underscore',
   'backbone',
   'mustache',
-  'text!templates/conversation/item.mustache',
-], function($, _, Backbone, Mustache, template, rowTemplate) {
-  var FullMailView = Backbone.View.extend({ 
+  'text!views/conversation/conversationDetailView.mustache'
+], function($, _, Backbone, Mustache, template) {
+  return Backbone.View.extend({
     events: {
       "click .link-version": "switchLinkToVersions"
     },
 
     linkToLatestVersion: false,
-    
+
     initialize: function(options) {
       _.bindAll(this, "switchLinkToVersions");
       this.router = options.router;
@@ -29,7 +29,7 @@ define([
     load: function() {
       var self = this;
       $.ajax({
-        url: "/troupes/" + window.troupeContext.troupe.id + "/mails/" + this.id,
+        url: "/troupes/" + window.troupeContext.troupe.id + "/conversations/" + this.id,
         contentType: "application/json",
         dataType: "json",
         type: "GET",
@@ -69,13 +69,13 @@ define([
           a.attr('href', item.file.url + "?version=" + item.version);
         }
         a.attr('target', "_new");
-        a.text(item.file.fileName); 
+        a.text(item.file.fileName);
         li.append(a);
 
         if(self.linkToLatestVersion) {
-          a.text(item.file.fileName); 
+          a.text(item.file.fileName);
         } else {
-          a.text(item.file.fileName + " (v" + item.version + ")"); 
+          a.text(item.file.fileName + " (v" + item.version + ")");
         }
 
         li.append(a);
@@ -87,6 +87,4 @@ define([
     }
     
   });
-
-  return FullMailView;
 });
