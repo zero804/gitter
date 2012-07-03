@@ -67,8 +67,6 @@ function EmailStrategy() {
   this.preload = function(items, callback) {
     var allUsers = items.map(function(i) { return i.fromUserId; });
 
-    console.dir(allUsers);
-
     execPreloads([{
       strategy: userStategy,
       data: allUsers.distinct()
@@ -111,13 +109,30 @@ function ConversationStrategy()  {
 }
 
 function ConversationMinStrategy()  {
+  var userStategy = new UserIdStrategy();
+
   this.preload = function(items, callback) {
-    callback();
+    var lastUsers = items.map(function(i) { return i.emails[i.emails.length - 1].fromUserId; });
+
+    execPreloads([{
+      strategy: userStategy,
+      data: lastUsers.distinct()
+    }], callback);
   };
 
   this.map = function(item) {
-    item.emails.forEach(function(i) { 
+    var hasAttachments = false;
+    item.emails.forEach(function(i) {
+      hasAttachments = hasAttachments || i.attachments.length > 0;
     });
+
+    var preview = "";
+    var lastSender = null;
+    if(item.emails) {
+      var lastEmail = item.emails[item.emails.length - 1];
+      preview = lastEmail.preview;
+      lastSender = userStategy.map(lastEmail.fromUserId);
+    }
 
     return {
       id: item.id,
@@ -125,7 +140,9 @@ function ConversationMinStrategy()  {
       updated: item.updated,
       subject: item.subject,
       emailCount: item.emails.length,
-      hasAttachments: hasAttachments;
+      preview: preview,
+      lastSender: lastSender,
+      hasAttachments: hasAttachments
     };
   };
 }
