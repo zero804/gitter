@@ -411,19 +411,78 @@ textarea, input { outline: none; }
 
 .trpFileThumbnail {
   border: 1px solid @col8;
+  float: right;
+  width: 180px;
+  height: 180px;
 }
 
-.trpFileDownloadButton {
-  padding-right: 10px;
+.trpFileDetails {
+  width: 100%;
+  background-color: red;
 }
 
 .trpFilename {
-  border-left: 1px solid @col8;
+  margin-top: 5px;
+  float: left;
   height: 20px;
-  padding-left: 10px;
   font-size: 12px;
   color: @col10;
   font-family: 'Open Sans', sans-serif;
+}
+
+.trpFileActionMenuButton {
+  margin-top: 5px;
+  padding: 5px 10px 5px 10px;
+  float: right;
+  border-left: 1px solid @col8;
+}
+
+.trpFileActionMenu {
+  display: none;
+  position: absolute;
+  z-index: 3;
+  float: right;
+  clear: both;
+  margin-top: 186px;
+  margin-left:86px;
+  width: 96px;
+  -webkit-box-shadow: 3px 2px 5px -1px rgba(50, 50, 50, 0.75);
+  -moz-box-shadow:    3px 2px 5px -1px rgba(50, 50, 50, 0.75);
+  box-shadow:         3px 2px 5px -1px rgba(50, 50, 50, 0.75);
+}
+
+.trpFileActionMenuTop {
+  margin-left: 56px;
+  width: 20px;
+  height: 20px;
+  border: 0;
+}
+
+.trpFileActionMenuBottom {
+  width: 96px;
+  background: @col7;
+}
+
+.trpFileActionMenuItem {
+  font-size: 12px;
+  color: @col10;
+  font-family: 'Open Sans', sans-serif;
+  padding: 5px 0px 5px 10px;
+}
+
+.trpFileActionMenuItem a {
+  text-decoration: none;
+  color: @col10;
+}
+
+.trpFileActionMenuItem a:hover {
+  text-decoration: none;
+  color: @col1;
+}
+
+.trpFileActionMenuItem:hover {
+  color: @col1;
+  background-color: white;
 }
 
 .trpFileUploadContainer {
