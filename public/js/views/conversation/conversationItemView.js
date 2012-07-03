@@ -23,6 +23,8 @@ define([
       var data = this.model.toJSON();
       data.personName = data.lastSender.displayName;
       data.avatarUrl = data.lastSender.avatarUrl;
+      data.detailUrl = "#mail/" + data.id;
+
       var compiledTemplate = Mustache.render(template, data);
 
       $(this.el).html(compiledTemplate);
