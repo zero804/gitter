@@ -17,7 +17,7 @@ define([
 
     routes: {
       'statusphere': 'showStatusView',
-      'mail': 'showMailView',
+      'mail': 'showConversationView',
       'mail/:id': 'showMailItemView',
       'chat': 'showChatView',
       'files': 'showFileView',
@@ -57,8 +57,8 @@ define([
       this.showAsync('views/status/statusView');
     },
 
-    showMailView: function() {
-      this.showAsync('views/mail/mailView');
+    showConversationView: function() {
+      this.showAsync('views/conversation/conversationView');
     },
 
     showChatView: function() {

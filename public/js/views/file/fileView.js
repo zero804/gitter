@@ -145,12 +145,6 @@ define([
         onComplete: function() {
         }
       });
-    },
-
-    renderFiles: function(files) {
-  
-     // YOU VAGINE! THIS DOESNT GET CALLED ANYMORE!!!!!!!
-
     }
 
   });
