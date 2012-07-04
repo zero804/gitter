@@ -80,7 +80,6 @@ define([
     },
 
     onFileEvent: function(event, data) {
-      console.log("onFileEvent");
       this.collection.fetch();
     },
 
