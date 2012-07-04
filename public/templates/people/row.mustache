@@ -1,28 +1,7 @@
-<div class="row-fluid">
-    <div class="span1">
-        <img src="{{person1AvatarUrl}}" class="dp">
+<div class="trpPeopleViewItem">
+    <div class="trpPersonAvatar"><img src="{{personAvatarUrl}}" class="trpDisplayPicture"></div>
+    <div class="trpPersonDetails">
+        <div class="trpPersonName">{{personName}}</div>
+        <div class="trpPersonRemove">Remove</div>
     </div>
-    <div class="span5">
-        <h3>{{person1Name}}</h3>
-        {{#person1Remove}}
-        <a href="#removeConfirmModal" data-toggle="modal" class="btn btn-mini btn-danger button-remove">Remove</a>
-        {{/person1Remove}}
-    </div>
-    {{#person2}}
-    <div class="span1">
-        <img src="{{person2AvatarUrl}}" class="dp">
-    </div>
-    <div class="span5">
-        <h3>{{person2Name}}</h3>
-        {{#person2Remove}}
-        <a href="#removeConfirmModal" data-toggle="modal" class="btn btn-mini btn-danger button-remove">Remove</a>
-        {{/person2Remove}}
-    </div>
-    {{/person2}}
-    
 </div>
-{{#more}}
-<div class="row-fluid">
-    <hr>
-</div>
-{{/more}}

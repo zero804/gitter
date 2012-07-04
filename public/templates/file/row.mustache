@@ -1,4 +1,17 @@
 <div class="trpFileViewItem">
 	<div><a href="#previewModal" class="link-preview"><img src="{{fileIcon}}" width="180" class="trpFileThumbnail"></a></div>
-	<div><a href="{{url}}"><img class="trpFileDownloadButton" src="images/2/icon-small-download.png"></a><span class="trpFilename"> {{fileName}}</span></div>
+	<div class="trpFileDetails">
+		<div class="trpFilename"> {{fileName}}</div>
+		<div><img src="images/2/icon-file-action.png" class="trpFileActionMenuButton">
+	</div>
+	<div class="trpFileActionMenu">
+		<div class="trpFileActionMenuTop"> </div>
+		<div class="trpFileActionMenuBottom">
+			<div class="trpFileActionMenuItem"><a a href="{{url}}">Download</a></div>
+			<div class="trpFileActionMenuItem">Preview</div>
+			<div class="trpFileActionMenuItem">Versions</div>
+			<div class="trpFileActionMenuItem">Delete</div>
+		</div>
+	</div>
 </div>
+
