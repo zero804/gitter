@@ -13,7 +13,7 @@ require.config({
 
     bootstrap: '../bootstrap/js/bootstrap',
     underscore: 'libs/underscore/underscore-1.3.1-min',
-    backbone: 'libs/backbone/backbone-0.9.1',
+    backbone: 'libs/backbone/backbone-0.9.2',
     text: 'libs/require/text',
     mustache: 'libs/mustache/mustache',
     templates: '../templates',

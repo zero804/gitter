@@ -80,7 +80,8 @@ function EmailStrategy() {
       from: userStategy.map(item.fromUserId),
       subject: item.subject,
       date: item.date,
-      preview: item.preview
+      preview: item.preview,
+      mail: item.mail
     };
   };
 }

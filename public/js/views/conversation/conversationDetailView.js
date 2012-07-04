@@ -4,26 +4,26 @@ define([
   'underscore',
   'backbone',
   'mustache',
-  'text!views/conversation/conversationDetailView.mustache'
-], function($, _, Backbone, Mustache, template) {
+  'text!views/conversation/conversationDetailView.mustache',
+  'models/conversationDetail',
+  'views/conversation/conversationDetailItemView'
+], function($, _, Backbone, Mustache, template, ConversationDetailModel, ConversationDetailItemView) {
   return Backbone.View.extend({
+    model: new ConversationDetailModel(),
+
     events: {
-      "click .link-version": "switchLinkToVersions"
+//      "click .link-version": "switchLinkToVersions"
     },
 
-    linkToLatestVersion: false,
-
     initialize: function(options) {
-      _.bindAll(this, "switchLinkToVersions");
+      _.bindAll(this, 'onEmailCollectionAdd', 'onEmailCollectionReset');
+
+      this.model.emailCollection.bind('add', this.onEmailCollectionAdd);
+      this.model.emailCollection.bind('reset', this.onEmailCollectionReset);
+
       this.router = options.router;
       this.id = options.params;
       this.load();
-    },
-
-    switchLinkToVersions: function() {
-      this.linkToLatestVersion = !this.linkToLatestVersion;
-      this.generateAttachmentMenu();
-      return false;
     },
 
     load: function() {
@@ -33,58 +33,28 @@ define([
         contentType: "application/json",
         dataType: "json",
         type: "GET",
-        success: function(data) {
-          self.mail = data;
-          self.renderMailItem();
+        success: function(conversation) {
+          self.model.set(conversation);
         }
       });
 
     },
-    
+
     render: function() {
       var compiledTemplate = Mustache.render(template);
       $(this.el).html(compiledTemplate);
       return this;
     },
-    
-    renderMailItem: function() {
-      $('.label-subject',this.el).text(this.mail.subject);
-      $('.label-body',this.el).html(this.mail.mail);
 
-      this.generateAttachmentMenu();
+    onEmailCollectionReset: function() {
+      console.dir(this.model.emailCollection);
+      $(".frame-emails", this.el).empty();
+      this.model.emailCollection.each(this.onEmailCollectionAdd);
     },
 
-    generateAttachmentMenu: function() {
-      var menu = $('#attachments-menu',this.el);
-      $('.link-attachment', menu).remove();
-
-      var self = this;
-      _.each(this.mail.attachments, function(item) {
-        var li = $('<li class="link-attachment"></li>');
-        var a = $('<a>');
-
-        if(self.linkToLatestVersion) {
-          a.attr('href', item.file.url);
-        } else {
-          a.attr('href', item.file.url + "?version=" + item.version);
-        }
-        a.attr('target', "_new");
-        a.text(item.file.fileName);
-        li.append(a);
-
-        if(self.linkToLatestVersion) {
-          a.text(item.file.fileName);
-        } else {
-          a.text(item.file.fileName + " (v" + item.version + ")");
-        }
-
-        li.append(a);
-
-        menu.prepend(li);
-      });
-
-      $('.link-version', this.$el).text(this.linkToLatestVersion ? "Link to embedded versions" : "Link to latest versions");
+    onEmailCollectionAdd: function(item) {
+      $(".frame-emails", this.el).append(new ConversationDetailItemView({ model: item }).render().el);
     }
-    
+
   });
 });
