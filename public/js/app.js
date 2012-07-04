@@ -1,29 +1,8 @@
-require.config({
-  paths: {
-    //jquery: 'libs/jquery/jquery-min',
-    jquery: '//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min',
-    //jqueryui: 'libs/jquery-ui-1.8.18/jquery-ui-1.8.18.custom.min',
-    jqueryui: '//ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min',
-
-    jquery_validate : 'libs/jquery.validate-1.9/jquery.validate.min',
-    jquery_timeago: 'libs/jquery.timeago-0.11.1/jquery.timeago',
-    jquery_colorbox: 'libs/jquery.colorbox-1.3.19/jquery.colorbox-min',
-
-    dateFormat: 'libs/dateFormat-1.2.3/date.format',
-
-    bootstrap: '../bootstrap/js/bootstrap',
-    dropdown: '../bootstrap/js/bootstrap-dropdown',
-    underscore: 'libs/underscore/underscore-1.3.1-min',
-    backbone: 'libs/backbone/backbone-0.9.2',
-    text: 'libs/require/text',
-    mustache: 'libs/mustache/mustache',
-    templates: '../templates',
-    now: '/nowjs/now',
-    noty: 'libs/jquery-noty-1.1.1/jquery.noty',
-    fileUploader: 'libs/fileUploader/fileuploader'
-  },
-  priority: ['jquery']
-});
+/*
+ * Beware of using CDN libraries if you're using compiling r.js modules
+ * http://requirejs.org/docs/api.html#config-shim
+ */
+require.config(window.require_config);
 
 require([
   'jquery',
