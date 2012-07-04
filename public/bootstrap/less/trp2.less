@@ -252,12 +252,20 @@ h1 {
   height: 80px;
   border-bottom: 1px solid @col8;
 }
+
+.trpChatRow {
+  background: red;
+  padding-left: 20px;
+}
   
+.trpChatRowRemote {
+  padding-right: 20px;
+}
 .trpChatBox {
   border-style: none;  
   overflow: auto; 
   resize: none;
-  padding: 22px;
+  padding: 18px;
   max-height: 30px;
   font-size: 18px;
   color: #7b797a;
@@ -279,8 +287,8 @@ textarea, input { outline: none; }
 
 .trpChatBubble {
   position:relative;
-  padding:15px;
-  margin-bottom: 24px;
+  padding:12px;
+  margin-bottom: 12px;
   border:1px solid @col8;
   color:#333;
   background:#fff;
@@ -403,19 +411,78 @@ textarea, input { outline: none; }
 
 .trpFileThumbnail {
   border: 1px solid @col8;
+  float: right;
+  width: 180px;
+  height: 180px;
 }
 
-.trpFileDownloadButton {
-  padding-right: 10px;
+.trpFileDetails {
+  width: 100%;
+  background-color: red;
 }
 
 .trpFilename {
-  border-left: 1px solid @col8;
+  margin-top: 5px;
+  float: left;
   height: 20px;
-  padding-left: 10px;
   font-size: 12px;
   color: @col10;
   font-family: 'Open Sans', sans-serif;
+}
+
+.trpFileActionMenuButton {
+  margin-top: 5px;
+  padding: 5px 10px 5px 10px;
+  float: right;
+  border-left: 1px solid @col8;
+}
+
+.trpFileActionMenu {
+  display: none;
+  position: absolute;
+  z-index: 3;
+  float: right;
+  clear: both;
+  margin-top: 186px;
+  margin-left:86px;
+  width: 96px;
+  -webkit-box-shadow: 3px 2px 5px -1px rgba(50, 50, 50, 0.75);
+  -moz-box-shadow:    3px 2px 5px -1px rgba(50, 50, 50, 0.75);
+  box-shadow:         3px 2px 5px -1px rgba(50, 50, 50, 0.75);
+}
+
+.trpFileActionMenuTop {
+  margin-left: 56px;
+  width: 20px;
+  height: 20px;
+  border: 0;
+}
+
+.trpFileActionMenuBottom {
+  width: 96px;
+  background: @col7;
+}
+
+.trpFileActionMenuItem {
+  font-size: 12px;
+  color: @col10;
+  font-family: 'Open Sans', sans-serif;
+  padding: 5px 0px 5px 10px;
+}
+
+.trpFileActionMenuItem a {
+  text-decoration: none;
+  color: @col10;
+}
+
+.trpFileActionMenuItem a:hover {
+  text-decoration: none;
+  color: @col1;
+}
+
+.trpFileActionMenuItem:hover {
+  color: @col1;
+  background-color: white;
 }
 
 .trpFileUploadContainer {
@@ -523,6 +590,59 @@ textarea, input { outline: none; }
 }
 
 
+.trpPeopleViewHeader {
+  padding-bottom: 20px;
+  padding-top: 15px;
+  margin-left: 20px;
+  color: @col10;
+  border-bottom: 1px solid @col8;
+}
+
+.trpPeopleHeader {
+  float: left;
+  padding-top: 10px;
+  font-family: 'Lustria', serif;
+  font-size: 18px;
+}
+
+.trpPeopleTab {
+  float: left;
+  padding-left: 40px;
+  min-height: 100%;
+}
+
+.trpPeopleViewItem {
+  float: left;
+  padding: 0px 10px 40px 40px;
+  min-width: 240px;
+}
+
+.trpPersonAvatar {
+  float: left;
+}
+
+.trpPersonDetails {
+  float: left;
+  padding-left: 20px;
+}
+
+.trpPersonName {
+  font-family: 'Lustria', serif;
+  font-size: 18px;
+  color: black;
+}
+
+.trpPersonRemove {
+  font-family: 'Lustria', serif;
+  font-size: 14px;
+  color: @col10;
+}
+
+.trpPersonRemove:hover {
+  color: @col1;
+  cursor: pointer;
+}
+
 .trpSpace24 {
   margin-right: 20px;
 }
@@ -532,7 +652,7 @@ textarea, input { outline: none; }
   border: 1px solid @col8;
   font-family: 'Open Sans', sans-serif;
   font-size: 12px;
-  padding: 10px;
+  padding: 5px 10px 5px 10px;
   display: inline-block;
   -webkit-border-radius:3px;
   -moz-border-radius:3px;
@@ -552,7 +672,33 @@ textarea, input { outline: none; }
   clear: both;
 }
 
+.trpTabItem a {
+  text-decoration: none;
+}
 
+.trpTabItem {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  color: @col10;
+}
+
+.trpTabItem.active {
+  color: @col1;
+}
+
+.nav-tabs > .active > a, {
+  color: @col1;
+}
+
+.trpTabActive {
+  border-top: 1px solid @col8;
+  border-left: 1px solid @col8;
+  border-right: 1px solid @col8;
+  border-bottom: 1px solid @col7;
+  color: @col1;
+  padding-bottom: 20px;
+  cursor: default;
+}
 
 
 /* READD THIS AGAIN LATER @import "../../js/libs/jquery.fileupload/jquery.fileupload.less"; */

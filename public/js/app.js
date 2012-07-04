@@ -12,6 +12,7 @@ require.config({
     dateFormat: 'libs/dateFormat-1.2.3/date.format',
 
     bootstrap: '../bootstrap/js/bootstrap',
+    dropdown: '../bootstrap/js/bootstrap-dropdown',
     underscore: 'libs/underscore/underscore-1.3.1-min',
     backbone: 'libs/backbone/backbone-0.9.2',
     text: 'libs/require/text',
@@ -31,8 +32,9 @@ require([
   'router',
   'router-login',
   'bootstrap',
+  'dropdown',
   'jqueryui'
-], function($, _, Backbone, AppRouter, AppRouterLogin, Bootstrap, jqUI) {
+], function($, _, Backbone, AppRouter, AppRouterLogin, Bootstrap, Dropdown, jqUI) {
   /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
   Backbone.View.prototype.close = function () {
     console.log('Closing view ' + this);

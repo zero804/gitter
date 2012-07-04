@@ -8,14 +8,15 @@ define([
   'text!templates/file/row.mustache',
   'fileUploader',
   'collections/files',
-  'jquery_colorbox'
-], function($, _, Backbone, Mustache, template, rowTemplate, fileUploaderStub, FileCollection, cbStub){
+  'jquery_colorbox',
+  'dropdown',
+], function($, _, Backbone, Mustache, template, rowTemplate, fileUploaderStub, FileCollection, cbStub, Dropdown){
   var FileView = Backbone.View.extend({
     collection: new FileCollection(),
     initialize: function(options) {
       this.router = options.router;
 
-      _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onFileEvent', 'onPreviewLinkClick');
+      _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onFileEvent', 'onPreviewLinkClick', 'showFileActionMenu', 'hideFileActionMenu');
 
       this.collection.bind('add', this.onCollectionAdd);
       this.collection.bind('reset', this.onCollectionReset);
@@ -107,12 +108,21 @@ define([
         el.data("item", item);
         $(".frame-files", this.el).append(el);
         $('.link-preview', el).on('click', this.onPreviewLinkClick);
-
         //el.on('click', this.onClickGenerator(item));
     },
 
     events: {
+      "click .trpFileActionMenuButton": "showFileActionMenu"
+    },
 
+
+    showFileActionMenu: function(e) {
+      $(".trpFileActionMenu").show();
+      return false;
+    },
+
+    hideFileActionMenu: function(e) {
+      $(".trpFileActionMenu").hide();
     },
 
     fileIcon: function(fileName) {
@@ -120,6 +130,7 @@ define([
     },
 
     render: function() {
+      $('body, html').on('click', this.hideFileActionMenu);
       var compiledTemplate = Mustache.render(template, { });
       $(this.el).html(compiledTemplate);
       this.createUploader($('.fileuploader',this.el)[0]);

@@ -30,7 +30,7 @@ define([
     },
 
     events: {
-      "click .button-remove": "removeUser"
+      "click .trpPersonRemove": "removeUser"
     },
 
     render: function() {
@@ -87,17 +87,11 @@ define([
       $(".frame-people", this.el).empty();
       while(users.length > 0) {
         var p1 = users.shift();
-        var p2 = users.shift();
 
         var rowHtml = Mustache.render(rowTemplate, {
-          person1Name: p1.displayName,
-          person2Name: p2 ? p2.displayName : null,
-          person2: p2,
-          more: users.length > 0,
-          person1AvatarUrl: p1.avatarUrl,
-          person2AvatarUrl: p2 ? p2.avatarUrl : null,
-          person1Remove: p1.id != window.troupeContext.user.id,
-          person2Remove: p2 && p2.id != window.troupeContext.user.id
+          personName: p1.displayName,
+          personAvatarUrl: p1.avatarUrl,
+          personRemove: p1.id != window.troupeContext.user.id
         });
 
         $(".frame-people", this.el).append(rowHtml);
