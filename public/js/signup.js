@@ -1,10 +1,4 @@
-require.config({
-  paths : {
-    jquery : 'libs/jquery/jquery-min',
-    jquery_validate : 'libs/jquery.validate-1.9/jquery.validate.min'
-  },
-  priority : [ 'jquery' ]
-});
+require.config(window.require_config);
 
 // Two weird things I can't figure out here.
 // Firstly, the first time you click Get Started if you haven't touched any of the form elements, no tooltip shows
