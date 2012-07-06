@@ -3,13 +3,12 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'mustache',
   'dateFormat',
-  'text!templates/mail/mail.mustache',
-  'text!templates/mail/row.mustache'
-], function($, _, Backbone, Mustache, dateFormat, template, rowTemplate){
-  var MailView = Backbone.View.extend({    
-    
+  'hgn!templates/mail/mail',
+  'hgn!templates/mail/row'
+], function($, _, Backbone, dateFormat, template, rowTemplate){
+  var MailView = Backbone.View.extend({
+
     initialize: function(options) {
       this.router = options.router;
       var self = this;
@@ -23,16 +22,16 @@ define([
         }
       });
     },
-    
+
     events: {
       //"click .clickPoint-showEmail": "showEmail"
     },
-    
+
     render: function() {
       var self = this;
       // we probably want to pull in the domain from config, e.g. for beta.trou.pe
       var emailAddress = window.troupeContext.troupe.uri + '@beta.trou.pe';
-      var compiledTemplate = Mustache.render(template, {
+      var compiledTemplate = template({
         emailAddress: emailAddress
       });
       $(this.el).html(compiledTemplate);
@@ -73,16 +72,14 @@ define([
           p1.date = d.format('mmm d');
         }
 
-        
-
-        var rowHtml = Mustache.render(rowTemplate, {
+        var rowHtml = rowTemplate({
           personName: p1.fromName,
           preview: p1.preview,
           subject: p1.subject,
           id: p1.id,
           date: p1.date
         });
-        
+
         var item = $(rowHtml);
         $(".frame-mails", this.el).append(item);
         item.on('click', this.onClickGenerator(p1.id));
@@ -101,7 +98,7 @@ define([
     showEmail: function() {
       //window.troupeApp.showMailDialog(5);
     }
-    
+
   });
 
   return MailView;

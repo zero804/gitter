@@ -3,17 +3,16 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'mustache',
-  'text!templates/file/row.mustache',
+  'hgn!templates/file/row',
   'collections/files'
-], function($, _, Backbone, Mustache, rowTemplate, FileCollection){
+], function($, _, Backbone, rowTemplate, FileCollection){
   var FileView = Backbone.View.extend({
     el: '#file',
     collection: new FileCollection(),
     initialize: function(options) {
       //this.router = options.router;
 
-      _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onFileEvent')
+      _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onFileEvent');
 
       this.collection.bind('add', this.onCollectionAdd);
       this.collection.bind('reset', this.onCollectionReset);
@@ -36,7 +35,7 @@ define([
 
     onCollectionAdd: function(item) {
         console.dir(item);
-        var rowHtml = Mustache.render(rowTemplate, {
+        var rowHtml = rowTemplate( {
           fileName: item.get('fileName'),
           url: item.get('url'),
           mimeType: item.get('mimeType'),
@@ -68,7 +67,7 @@ define([
       while(files.length > 0) {
         var p1 = files.shift();
 
-        var rowHtml = Mustache.render(rowTemplate, {
+        var rowHtml = rowTemplate({
           fileName: p1.fileName,
           url: p1.url,
           mimeType: p1.mimeType,  // I think the mimeType may actually be useless, eg. I got this for a PPT I attached in Mac Mail (application/vnd.openxmlformats-officedocument.presentationml.presentation)

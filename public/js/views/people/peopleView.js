@@ -3,13 +3,12 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'mustache',
-  'text!templates/people/people.mustache',
-  'text!templates/people/row.mustache',
+  'hgn!templates/people/people',
+  'hgn!templates/people/row',
   'views/confirmDialog',
   'views/people/inviteItemView',
   'collections/invites'
-], function($, _, Backbone, Mustache, template, rowTemplate, ConfirmDialog, InviteItemView, InviteCollection){
+], function($, _, Backbone, template, rowTemplate, ConfirmDialog, InviteItemView, InviteCollection){
   var PeopleView = Backbone.View.extend({
 
     initialize: function(options) {
@@ -35,7 +34,7 @@ define([
 
     render: function() {
       var self = this;
-      var compiledTemplate = Mustache.render(template, { });
+      var compiledTemplate = template({ });
       $(this.el).html(compiledTemplate);
 
       if(this.initialTab) {
@@ -88,7 +87,7 @@ define([
       while(users.length > 0) {
         var p1 = users.shift();
 
-        var rowHtml = Mustache.render(rowTemplate, {
+        var rowHtml = rowTemplate({
           personName: p1.displayName,
           personAvatarUrl: p1.avatarUrl,
           personRemove: p1.id != window.troupeContext.user.id

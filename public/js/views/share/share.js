@@ -3,10 +3,9 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'mustache',
-  'text!templates/share/share.mustache',
-  'text!templates/share/share-row.mustache'
-], function($, _, Backbone, Mustache, template, rowTemplate) {
+  'hgn!templates/share/share',
+  'hgn!templates/share/share-row'
+], function($, _, Backbone, template, rowTemplate) {
   var ShareView = Backbone.View.extend({
     tagName: "div",
     className: "modal hide fade",
@@ -43,11 +42,11 @@ define([
     },
 
     render: function() {
-      var compiledTemplate = Mustache.render(template, {
+      var compiledTemplate = template({
         uri: window.troupeContext.troupe.uri
       });
       $(this.el).html(compiledTemplate);
-      $("form", this.el).append($(rowTemplate));
+      $("form", this.el).append($(rowTemplate({})));
 
       return this;
     },
@@ -56,7 +55,7 @@ define([
       var target = $(event.target);
       var rowDiv = target.parent();
       target.remove();
-      $(rowTemplate).insertAfter(rowDiv);
+      $(rowTemplate({})).insertAfter(rowDiv);
     },
 
     recordKeyPress: function() {

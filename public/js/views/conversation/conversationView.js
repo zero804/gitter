@@ -3,16 +3,15 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'mustache',
   'dateFormat',
-  'text!views/conversation/conversationView.mustache',
+  'hgn!views/conversation/conversationView',
   'collections/conversations',
   'views/conversation/conversationItemView'
-], function($, _, Backbone, Mustache, dateFormat, template, ConversationCollection, ConversationItemView){
+], function($, _, Backbone, dateFormat, template, ConversationCollection, ConversationItemView){
   var ConversationView = Backbone.View.extend({
-    collection: new ConversationCollection(),
-
     initialize: function(options) {
+      this.collection = new ConversationCollection();
+
       _.bindAll(this, 'onCollectionAdd', 'onCollectionReset');
 
       this.collection.bind('add', this.onCollectionAdd);
@@ -28,7 +27,7 @@ define([
     render: function() {
       var self = this;
 
-      var compiledTemplate = Mustache.render(template, {});
+      var compiledTemplate = template({});
 
       $(this.el).html(compiledTemplate);
       return this;

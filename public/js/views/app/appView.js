@@ -11,15 +11,13 @@ define([
   var AppView = Backbone.View.extend({
     el: 'body',
 
-    troupeCollection: new TroupeCollection(),
-
-    notificationCollection: new NotificationCollection(),
-
-    troupeSelectorMenu: $("#trpTroupeSelector"),
-
-    notificationSelectorMenu: $("#menu-notification-selector"),
-
     initialize: function() {
+      this.troupeCollection = new TroupeCollection();
+      this.notificationCollection = new NotificationCollection();
+
+      this.troupeSelectorMenu = $("#trpTroupeSelector");
+      this.notificationSelectorMenu = $("#menu-notification-selector");
+
       this.troupeCollection.on('change', this.addAllTroupes, this);
       this.troupeCollection.on('add', this.addOneTroupe, this);
       this.troupeCollection.on('refresh', this.addAllTroupes, this);

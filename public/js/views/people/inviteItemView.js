@@ -2,11 +2,9 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'mustache',
-  'text!templates/people/invite-item.mustache',
-  'views/confirmDialog',
-
-  ], function($, _, Backbone, Mustache, template, ConfirmDialog) {
+  'hgn!templates/people/invite-item',
+  'views/confirmDialog'
+  ], function($, _, Backbone, template, ConfirmDialog) {
     var InviteItemView = Backbone.View.extend({
 
       tagName:  "tr",
@@ -21,8 +19,7 @@ define([
       },
 
       render: function() {
-        console.dir(this.model);
-        var compiledTemplate = Mustache.render(template, this.model.toJSON());
+        var compiledTemplate = template(this.model.toJSON());
         this.$el.html(compiledTemplate);
 
         return this;

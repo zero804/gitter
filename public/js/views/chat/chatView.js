@@ -3,14 +3,13 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'mustache',
-  'text!templates/chat/chat.mustache',
-  'text!templates/chat/chat-row.mustache',
-  'text!templates/chat/chat-row-current.mustache',
-  'text!templates/chat/user-avatar.mustache',
+  'hgn!templates/chat/chat',
+  'hgn!templates/chat/chat-row',
+  'hgn!templates/chat/chat-row-current',
+  'hgn!templates/chat/user-avatar',
   'components/chat/chat-component',
   'jquery_timeago'
-], function($, _, Backbone, Mustache, template, rowTemplate, rowCurrentTemplate, userAvatarTemplate, chat, _timeago) {
+], function($, _, Backbone, template, rowTemplate, rowCurrentTemplate, userAvatarTemplate, chat, _timeago) {
   var PAGE_SIZE = 50;
 
   var ChatView = Backbone.View.extend({
@@ -89,11 +88,12 @@ define([
         var d = data[i];
         /* Skip current user */
         if(d.id == window.troupeContext.user.id) continue;
-        var avatar = Mustache.render(userAvatarTemplate,  {
+        var avatar = userAvatarTemplate({
           id: d.id,
           displayName: d.displayName,
           additionalClasses: d.online ? "" : "offline"
-        } );
+        });
+
         panel.append(avatar);
       }
       $('.dp-tooltip', panel).tooltip();
@@ -128,10 +128,10 @@ define([
 
     renderMessage: function(msg) {
       if(msg.fromUser.id == window.troupeContext.user.id) {
-        return Mustache.render(rowCurrentTemplate,  this.prepareForTemplate(msg));
+        return rowCurrentTemplate(this.prepareForTemplate(msg));
       }
 
-      return Mustache.render(rowTemplate,  this.prepareForTemplate(msg));
+      return rowTemplate(this.prepareForTemplate(msg));
     },
 
     prepareForTemplate: function(msg) {
@@ -157,8 +157,7 @@ define([
     },
 
     render: function() {
-      var compiledTemplate = Mustache.render(template, { });
-      $(this.el).html(compiledTemplate);
+      $(this.el).html(template({}));
       this.attachTooltipHandlers(this.el);
       this.loadNextMessages();
       return this;
