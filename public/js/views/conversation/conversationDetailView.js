@@ -9,8 +9,6 @@ define([
   'views/conversation/conversationDetailItemView'
 ], function($, _, Backbone, Mustache, template, ConversationDetailModel, ConversationDetailItemView) {
   return Backbone.View.extend({
-    model: new ConversationDetailModel(),
-
     events: {
 //      "click .link-version": "switchLinkToVersions"
     },
@@ -18,6 +16,7 @@ define([
     initialize: function(options) {
       _.bindAll(this, 'onEmailCollectionAdd', 'onEmailCollectionReset');
 
+      this.model = new ConversationDetailModel();
       this.model.emailCollection.bind('add', this.onEmailCollectionAdd);
       this.model.emailCollection.bind('reset', this.onEmailCollectionReset);
 
