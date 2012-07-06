@@ -3,10 +3,9 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'mustache',
-  'text!templates/home/main.mustache'
-], function($, _, Backbone, Mustache, template){
-  var MainHomeView = Backbone.View.extend({    
+  'hgn!templates/home/main'
+], function($, _, Backbone, template){
+  var MainHomeView = Backbone.View.extend({
     events: {
       "click .share":          "shareClicked"
     },
@@ -30,7 +29,7 @@ define([
     },
     
     render: function() {
-      var compiledTemplate = Mustache.render(template, { });
+      var compiledTemplate = template({ });
       $(this.el).html(compiledTemplate);
       return this;
     },

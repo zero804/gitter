@@ -3,10 +3,9 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'mustache',
-  'text!templates/mail/item.mustache',
-], function($, _, Backbone, Mustache, template, rowTemplate) {
-  var FullMailView = Backbone.View.extend({ 
+  'hgn!templates/mail/item'
+], function($, _, Backbone, template) {
+  var FullMailView = Backbone.View.extend({
     events: {
       "click .link-version": "switchLinkToVersions"
     },
@@ -42,7 +41,7 @@ define([
     },
     
     render: function() {
-      var compiledTemplate = Mustache.render(template);
+      var compiledTemplate = template({});
       $(this.el).html(compiledTemplate);
       return this;
     },
@@ -69,13 +68,13 @@ define([
           a.attr('href', item.file.url + "?version=" + item.version);
         }
         a.attr('target', "_new");
-        a.text(item.file.fileName); 
+        a.text(item.file.fileName);
         li.append(a);
 
         if(self.linkToLatestVersion) {
-          a.text(item.file.fileName); 
+          a.text(item.file.fileName);
         } else {
-          a.text(item.file.fileName + " (v" + item.version + ")"); 
+          a.text(item.file.fileName + " (v" + item.version + ")");
         }
 
         li.append(a);

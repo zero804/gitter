@@ -3,16 +3,15 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'mustache',
-  'text!templates/status/status.mustache'
-], function($, _, Backbone, Mustache, template){
-  var StatusView = Backbone.View.extend({    
+  'hgn!templates/status/status'
+], function($, _, Backbone, template){
+  var StatusView = Backbone.View.extend({
     render: function() {
-      var compiledTemplate = Mustache.render(template, { });
+      var compiledTemplate = template({ });
       $(this.el).html(compiledTemplate);
       return this;
     }
-    
+
   });
 
   return StatusView;

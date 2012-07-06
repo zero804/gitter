@@ -3,18 +3,17 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'mustache',
-  'text!templates/file/file.mustache',
-  'text!templates/file/row.mustache',
+  'hgn!templates/file/file',
+  'hgn!templates/file/row',
   'fileUploader',
   'collections/files',
   'jquery_colorbox',
-  'dropdown',
-], function($, _, Backbone, Mustache, template, rowTemplate, fileUploaderStub, FileCollection, cbStub, Dropdown){
+  'dropdown'
+], function($, _, Backbone, template, rowTemplate, fileUploaderStub, FileCollection, cbStub, Dropdown){
   var FileView = Backbone.View.extend({
-    collection: new FileCollection(),
     initialize: function(options) {
       this.router = options.router;
+      this.collection = new FileCollection();
 
       _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onFileEvent', 'onPreviewLinkClick', 'showFileActionMenu', 'hideFileActionMenu');
 
@@ -97,7 +96,7 @@ define([
             f = f.substring(0,21)+"...";
         }
 
-        var rowHtml = Mustache.render(rowTemplate, {
+        var rowHtml = rowTemplate({
           fileName: f,
           url: item.get('url'),
           mimeType: item.get('mimeType'),
@@ -131,7 +130,7 @@ define([
 
     render: function() {
       $('body, html').on('click', this.hideFileActionMenu);
-      var compiledTemplate = Mustache.render(template, { });
+      var compiledTemplate = template({ });
       $(this.el).html(compiledTemplate);
       this.createUploader($('.fileuploader',this.el)[0]);
 

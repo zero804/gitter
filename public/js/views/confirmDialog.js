@@ -3,9 +3,8 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'mustache',
-  'text!templates/confirm-dialog.mustache'
-], function($, _, Backbone, Mustache, template) {
+  'hgn!templates/confirm-dialog'
+], function($, _, Backbone, template) {
   var ConfirmDialog = Backbone.View.extend({
     tagName: "div",
     className: "modal hide fade",
@@ -37,13 +36,12 @@ define([
       if(this.options.onButtonPress) {
         this.options.onButtonPress(value);
       }
-      
       this.$el.modal('hide');
       return false;
     },
 
     render: function() {
-      var compiledTemplate = Mustache.render(template, {
+      var compiledTemplate = template({
         title: this.options.title,
         message: this.options.message
       });

@@ -3,10 +3,9 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'mustache',
-  'text!views/conversation/conversationDetailItemView.mustache',
-  'text!views/conversation/conversationDetailItemViewBody.mustache'
-], function($, _, Backbone, Mustache, template, bodyTemplate) {
+  'hgn!views/conversation/conversationDetailItemView',
+  'hgn!views/conversation/conversationDetailItemViewBody'
+], function($, _, Backbone, template, bodyTemplate) {
   return Backbone.View.extend({
     events: {
 //      "click .link-version": "switchLinkToVersions"
@@ -23,7 +22,7 @@ define([
     render: function() {
       var data = this.getTemplateModel();
 
-      var compiledTemplate = Mustache.render(template, data);
+      var compiledTemplate = template(data);
       var $compiled = this.$el.html(compiledTemplate);
       $compiled.on('click', this.onHeaderClick);
       return this;
@@ -45,7 +44,7 @@ define([
 
       var data = this.getTemplateModel();
 
-      this.mailbody = $(Mustache.render(bodyTemplate, data));
+      this.mailbody = $(bodyTemplate(data));
       this.$el.append(this.mailbody);
 
       return false;

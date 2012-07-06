@@ -3,9 +3,8 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'mustache',
-  'text!templates/login/login.mustache'
-], function($, _, Backbone, Mustache, template) {
+  'hgn!templates/login/login'
+], function($, _, Backbone, template) {
   var LoginView = Backbone.View.extend({    
     tagName: "div",
     className: "modal hide fade",
@@ -59,7 +58,7 @@ define([
     },
     
     render: function() {
-      var compiledTemplate = Mustache.render(template, { });
+      var compiledTemplate = template({ });
       $(this.el).html(compiledTemplate);
       return this;
     }

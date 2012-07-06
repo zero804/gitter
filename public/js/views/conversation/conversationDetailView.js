@@ -3,16 +3,11 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'mustache',
-  'text!views/conversation/conversationDetailView.mustache',
+  'hgn!views/conversation/conversationDetailView',
   'models/conversationDetail',
   'views/conversation/conversationDetailItemView'
-], function($, _, Backbone, Mustache, template, ConversationDetailModel, ConversationDetailItemView) {
+], function($, _, Backbone, template, ConversationDetailModel, ConversationDetailItemView) {
   return Backbone.View.extend({
-    events: {
-//      "click .link-version": "switchLinkToVersions"
-    },
-
     initialize: function(options) {
       _.bindAll(this, 'onEmailCollectionAdd', 'onEmailCollectionReset');
 
@@ -23,6 +18,10 @@ define([
       this.router = options.router;
       this.id = options.params;
       this.load();
+    },
+
+    events: {
+//      "click .link-version": "switchLinkToVersions"
     },
 
     load: function() {
@@ -40,7 +39,7 @@ define([
     },
 
     render: function() {
-      var compiledTemplate = Mustache.render(template);
+      var compiledTemplate = template({});
       $(this.el).html(compiledTemplate);
       return this;
     },

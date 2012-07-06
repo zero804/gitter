@@ -3,11 +3,11 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'mustache',
   'dateFormat',
-  'text!views/conversation/conversationItemView.mustache',
-  'models/conversationDetail'
-], function($, _, Backbone, Mustache, dateFormat, template, ConversationDetail) {
+  'hgn!views/conversation/conversationItemView',
+  'models/conversationDetail',
+  'views/widgets/avatar'
+], function($, _, Backbone, dateFormat, template, ConversationDetail, AvatarView) {
   var ConversationItemView = Backbone.View.extend({
 
     initialize: function(options) {
@@ -21,13 +21,12 @@ define([
       var self = this;
 
       var data = this.model.toJSON();
-      data.personName = data.lastSender.displayName;
-      data.avatarUrl = data.lastSender.avatarUrl;
       data.detailUrl = "#mail/" + data.id;
 
-      var compiledTemplate = Mustache.render(template, data);
+      var compiledTemplate = template(data);
 
       $(this.el).html(compiledTemplate);
+      this.avatar = new AvatarView({ user: data.lastSender, el: this.$(".widget-avatar") }).render();
 
       return this;
     }
