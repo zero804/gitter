@@ -3,11 +3,14 @@ define([
   'jquery',
   'underscore',
   'backbone',
+  'views/base',
   'hgn!views/conversation/conversationDetailView',
   'models/conversationDetail',
   'views/conversation/conversationDetailItemView'
-], function($, _, Backbone, template, ConversationDetailModel, ConversationDetailItemView) {
-  return Backbone.View.extend({
+], function($, _, Backbone, TroupeViews, template, ConversationDetailModel, ConversationDetailItemView) {
+  return TroupeViews.Base.extend({
+    template: template,
+
     initialize: function(options) {
       _.bindAll(this, 'onEmailCollectionAdd', 'onEmailCollectionReset');
 
@@ -38,11 +41,7 @@ define([
 
     },
 
-    render: function() {
-      var compiledTemplate = template({});
-      $(this.el).html(compiledTemplate);
-      return this;
-    },
+    getRenderData: function() { return {}; },
 
     onEmailCollectionReset: function() {
       console.dir(this.model.emailCollection);

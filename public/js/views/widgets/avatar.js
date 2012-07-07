@@ -1,10 +1,10 @@
 define([
   'jquery',
   'underscore',
-  'backbone',
+  'views/base',
   'hgn!views/widgets/avatar'
-], function($, _, Backbone, template) {
-  return Backbone.View.extend({
+], function($, _, TroupeViews, template) {
+  return TroupeViews.Base.extend({
     initialize: function(options) {
       this.user = options.user || {};
     },

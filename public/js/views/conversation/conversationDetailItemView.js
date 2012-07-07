@@ -3,12 +3,17 @@ define([
   'jquery',
   'underscore',
   'backbone',
+  'views/base',
   'hgn!views/conversation/conversationDetailItemView',
-  'hgn!views/conversation/conversationDetailItemViewBody'
-], function($, _, Backbone, template, bodyTemplate) {
-  return Backbone.View.extend({
+  'hgn!views/conversation/conversationDetailItemViewBody',
+  'views/widgets/avatar'
+
+], function($, _, Backbone, TroupeViews, template, bodyTemplate, AvatarView) {
+  return TroupeViews.Base.extend({
+    template: template,
+
     events: {
-//      "click .link-version": "switchLinkToVersions"
+      "click .clickPoint-showEmail": "onHeaderClick"
     },
 
     attributes: {
@@ -16,24 +21,17 @@ define([
     },
 
     initialize: function(options) {
-      _.bindAll(this, 'onHeaderClick');
     },
 
-    render: function() {
-      var data = this.getTemplateModel();
-
-      var compiledTemplate = template(data);
-      var $compiled = this.$el.html(compiledTemplate);
-      $compiled.on('click', this.onHeaderClick);
-      return this;
-    },
-
-    getTemplateModel: function() {
+    getRenderData: function() {
       var data = this.model.toJSON();
       data.personName = data.from.displayName;
       data.avatarUrl = data.from.avatarUrl;
-
       return data;
+    },
+
+    afterRender: function(dom, data) {
+      this.avatar = new AvatarView({ user: data.from, el: this.$(".widget-avatar") }).render();
     },
 
     onHeaderClick: function(event) {
@@ -42,7 +40,7 @@ define([
         return false;
       }
 
-      var data = this.getTemplateModel();
+      var data = this.getRenderData();
 
       this.mailbody = $(bodyTemplate(data));
       this.$el.append(this.mailbody);

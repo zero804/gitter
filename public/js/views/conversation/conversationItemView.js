@@ -3,32 +3,35 @@ define([
   'jquery',
   'underscore',
   'backbone',
+  'views/base',
   'dateFormat',
   'hgn!views/conversation/conversationItemView',
   'models/conversationDetail',
   'views/widgets/avatar'
-], function($, _, Backbone, dateFormat, template, ConversationDetail, AvatarView) {
-  var ConversationItemView = Backbone.View.extend({
+], function($, _, Backbone, TroupeViews, dateFormat, template, ConversationDetail, AvatarView) {
+  var ConversationItemView = TroupeViews.Base.extend({
+    template: template,
 
     initialize: function(options) {
     },
 
     events: {
-      //"click .clickPoint-showEmail": "showEmail"
+      "click .clickPoint-showEmail": "showEmail"
     },
 
-    render: function() {
-      var self = this;
-
+    getRenderData: function() {
       var data = this.model.toJSON();
       data.detailUrl = "#mail/" + data.id;
 
-      var compiledTemplate = template(data);
+      return data;
+    },
 
-      $(this.el).html(compiledTemplate);
+    afterRender: function(dom, data) {
       this.avatar = new AvatarView({ user: data.lastSender, el: this.$(".widget-avatar") }).render();
+    },
 
-      return this;
+    showEmail: function(event) {
+      window.troupeApp.navigate("mail/" + this.model.get('id'), {trigger: true});
     }
 
   });
