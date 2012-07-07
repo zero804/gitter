@@ -1,12 +1,11 @@
 <div class="trpMailRowContainer">
   <div class="trpMailRow clickPoint-showEmail">
     <div class="trpMailLeft">
-      <div class="trpMailDisplayPicture widget-avatar"></div>
+      <div class="trpMailDisplayPicture">{{widget "avatar" user=lastSender}}</div>
       <div class="trpMailFromSubject">{{subject}}</div>
       <div class="trpMailPreview"><a href="{{detailUrl}}">{{preview}}</a></div>
     </div>
     <div class="trpMailRight">
-      {{#view}}{{/view}}
       <div class="trpMailIcons"><img src="images/2/icon-small-fav.png"></div>
       <div class="trpMailDate">{{date}}</div>
     </div>

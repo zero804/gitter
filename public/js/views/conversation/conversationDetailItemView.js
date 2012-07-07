@@ -30,10 +30,6 @@ define([
       return data;
     },
 
-    afterRender: function(dom, data) {
-      this.avatar = new AvatarView({ user: data.from, el: this.$(".widget-avatar") }).render();
-    },
-
     onHeaderClick: function(event) {
       if(this.mailbody) {
         $(this.mailbody).toggle();
