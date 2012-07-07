@@ -3,10 +3,10 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hgn!templates/chat/chat',
-  'hgn!templates/chat/chat-row',
-  'hgn!templates/chat/chat-row-current',
-  'hgn!templates/chat/user-avatar',
+  'hbs!templates/chat/chat',
+  'hbs!templates/chat/chat-row',
+  'hbs!templates/chat/chat-row-current',
+  'hbs!templates/chat/user-avatar',
   'components/chat/chat-component',
   'jquery_timeago'
 ], function($, _, Backbone, template, rowTemplate, rowCurrentTemplate, userAvatarTemplate, chat, _timeago) {

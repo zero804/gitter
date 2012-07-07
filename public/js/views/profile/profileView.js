@@ -3,7 +3,7 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hgn!templates/profile/profile'
+  'hbs!templates/profile/profile'
 ], function($, _, Backbone, template){
   var ProfileView = Backbone.View.extend({
 

@@ -4,8 +4,8 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'hgn!views/conversation/conversationDetailItemView',
-  'hgn!views/conversation/conversationDetailItemViewBody',
+  'hbs!views/conversation/conversationDetailItemView',
+  'hbs!views/conversation/conversationDetailItemViewBody',
   'views/widgets/avatar'
 
 ], function($, _, Backbone, TroupeViews, template, bodyTemplate, AvatarView) {

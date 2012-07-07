@@ -3,7 +3,7 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hgn!templates/confirm-dialog'
+  'hbs!templates/confirm-dialog'
 ], function($, _, Backbone, template) {
   var ConfirmDialog = Backbone.View.extend({
     tagName: "div",

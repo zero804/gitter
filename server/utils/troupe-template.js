@@ -4,19 +4,19 @@
 
 var fs = require("fs");
 var path = require("path");
-var hogan = require('hogan');
+var handlebars = require('handlebars');
 
-function loadSource(sourceFile) {
-  var sourceFileName = 'public/templates/' + sourceFile + '.mustache';
-  
-  // TODO: make this async
-  return fs.readFileSync(sourceFileName, "utf-8");
-}
+// TODO: add caching!
 
 module.exports = {
-  compile : function(sourceFile, options) {
-    var source = loadSource(sourceFile);
-    var template = hogan.compile(source, options);
-    return template;
+  compile : function(sourceFile, callback) {
+    var sourceFileName = 'public/templates/' + sourceFile + '.hbs';
+
+    fs.readFile(sourceFileName, 'utf-8', function (err, source) {
+      if (err) return callback(err);
+      var template = handlebars.compile(source);
+      callback(null, template);
+    });
+
   }
 };

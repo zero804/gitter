@@ -4,8 +4,8 @@ define([
   'underscore',
   'backbone',
   'dateFormat',
-  'hgn!templates/mail/mail',
-  'hgn!templates/mail/row'
+  'hbs!templates/mail/mail',
+  'hbs!templates/mail/row'
 ], function($, _, Backbone, dateFormat, template, rowTemplate){
   var MailView = Backbone.View.extend({
 

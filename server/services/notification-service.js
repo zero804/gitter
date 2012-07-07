@@ -5,13 +5,13 @@
 var persistence = require("./persistence-service");
 var appEvents = require("../app-events");
 var winston = require("winston");
-var hogan = require('hogan');
+var handlebars = require('handlebars');
 var _ = require('underscore');
 
 function compile(map) {
   for(var k in map) {
     if(map.hasOwnProperty(k)) {
-      map[k] = hogan.compile(map[k]);
+      map[k] = handlebars.compile(map[k]);
     }
   }
   return map;
@@ -61,8 +61,8 @@ function formatNotification(notification) {
     id: notification.id,
     troupeId: notification.troupeId,
     createdDate: notification.createdDate,
-    notificationText: textTemplate.render(templateData),
-    notificationLink: linkTemplate.render(templateData)
+    notificationText: textTemplate(templateData),
+    notificationLink: linkTemplate(templateData)
   };
 }
 

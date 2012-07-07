@@ -3,9 +3,9 @@
 "use strict";
 
 var nodemailer = require('nodemailer'),
-    hogan = require('hogan'),
     troupeTemplate = require('../utils/troupe-template'),
-    nconf = require("../utils/config").configure();
+    nconf = require("../utils/config").configure(),
+    winston = require("winston");
 
 var sesTransport = nodemailer.createTransport("SES", {
     AWSAccessKeyID: nconf.get("amazon:accessKey"),
@@ -15,25 +15,30 @@ var sesTransport = nodemailer.createTransport("SES", {
 module.exports = {
     sendEmail: function(options) {
       var htmlTemplateFile = options.templateFile + "_html";
-      var htmlTemplate = troupeTemplate.compile(htmlTemplateFile);
-      var html = htmlTemplate.render(options.data);
+      troupeTemplate.compile(htmlTemplateFile, function(err, htmlTemplate) {
+        if(err) return winston.error("Unable to load HTML template", err);
+        var html = htmlTemplate(options.data);
 
-      var plaintextTemplateFile = options.templateFile;
-      var plaintextTemplate = troupeTemplate.compile(plaintextTemplateFile);
-      var plaintext = plaintextTemplate.render(options.data);
+        var plaintextTemplateFile = options.templateFile;
+        troupeTemplate.compile(plaintextTemplateFile, function(err, plaintextTemplate) {
+          if(err) return winston.error("Unable to load template", err);
 
-      sesTransport.sendMail({
-        from: options.from,
-        to: options.to,
-        subject: options.subject,
-        html: html,
-        text: plaintext
-      }, function(error, response){
-        if(error) {
-          console.log(error);
-        }else{
-          console.log("Message sent: " + response.message);
-        }
+          var plaintext = plaintextTemplate(options.data);
+
+          sesTransport.sendMail({
+            from: options.from,
+            to: options.to,
+            subject: options.subject,
+            html: html,
+            text: plaintext
+          }, function(error, response){
+            if(error) {
+              console.log(error);
+            }else{
+              console.log("Message sent: " + response.message);
+            }
+          });
+        });
       });
 
     }

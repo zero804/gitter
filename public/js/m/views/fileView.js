@@ -3,7 +3,7 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hgn!templates/file/row',
+  'hbs!templates/file/row',
   'collections/files'
 ], function($, _, Backbone, rowTemplate, FileCollection){
   var FileView = Backbone.View.extend({
