@@ -28,6 +28,12 @@ define([
 
     render: function() {
       var data = this.getRenderData();
+      data.view = function() {
+        return function(inner) {
+          return "<view data-viewId='1'></view>";
+        };
+      };
+
       var dom = $(this.template(data));
       $(this.el).html(dom);
       if(this.afterRender) { this.afterRender(dom, data); }
