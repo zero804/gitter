@@ -12,7 +12,8 @@ require([
   'router-login',
   'bootstrap',
   'dropdown',
-  'jqueryui'
+  'jqueryui',
+  'template/helpers/all'
 ], function($, _, Backbone, AppRouter, AppRouterLogin, Bootstrap, Dropdown, jqUI) {
   /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
   Backbone.View.prototype.close = function () {
@@ -25,63 +26,63 @@ require([
   };
 
   var troupeApp;
-  
+
   $('.dp-tooltip').tooltip();
   $('.chat-bubble').tooltip();
 
   var AppView = Backbone.View.extend({
     el: 'body',
-    
+
     initialize: function() {
       this.buildToolbar();
     },
-    
+
     events: {
       "click .menu-profile": "profileMenuClicked",
       "click .menu-settings": "settingsMenuClicked",
       "click .menu-signout": "signoutMenuClicked"
-      
+
     },
-    
+
     buildToolbar: function() {
       if(window.troupeContext.user) {
         $(".label-displayName").text(window.troupeContext.user.displayName);
         $(".label-troupeName").text(window.troupeContext.troupe.name);
         $(".menu-security").show();
       }
-      
+
     },
-    
+
     profileMenuClicked: function() {
       troupeApp.navigate("profile", {trigger: true});
       return false;
     },
-    
+
     settingsMenuClicked: function() {
       troupeApp.navigate("settings", {trigger: true});
       return false;
     },
-    
+
     signoutMenuClicked: function() {
       troupeApp.navigate("signout", {trigger: true});
       return false;
     }
-   
+
 
   });
   var app = new AppView();
 
-  
+
   if(!window.troupeContext.user) {
     window.troupeApp = new AppRouterLogin();
     troupeApp = window.troupeApp;
     Backbone.history.start();
-    
+
     return;
   }
-  
+
   window.troupeApp = new AppRouter();
   troupeApp = window.troupeApp;
-  
+
   Backbone.history.start();
 });

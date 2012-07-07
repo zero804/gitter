@@ -28,13 +28,26 @@ define([
 
     render: function() {
       var data = this.getRenderData();
-      data.view = function() {
-        return function(inner) {
-          return "<view data-viewId='1'></view>";
-        };
-      };
+
+      function replaceElementWithWidget(element, options) {
+          require(['views/widgets/' + options.widgetName], function(Widget) {
+            var widget = new Widget(options.model);
+            widget.render();
+            $(element).replaceWith(widget.el);
+          });
+      }
+
 
       var dom = $(this.template(data));
+      if(data.renderViews) {
+        dom.find('view').each(function () {
+          var id = this.getAttribute('data-id'),
+              attrs = data.renderViews[id];
+              replaceElementWithWidget(this, attrs);
+      });
+
+      }
+      console.log("DOM Generated", data);
       $(this.el).html(dom);
       if(this.afterRender) { this.afterRender(dom, data); }
 

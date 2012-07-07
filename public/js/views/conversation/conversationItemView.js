@@ -26,10 +26,6 @@ define([
       return data;
     },
 
-    afterRender: function(dom, data) {
-      this.avatar = new AvatarView({ user: data.lastSender, el: this.$(".widget-avatar") }).render();
-    },
-
     showEmail: function(event) {
       window.troupeApp.navigate("mail/" + this.model.get('id'), {trigger: true});
     }
