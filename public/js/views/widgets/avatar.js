@@ -10,10 +10,13 @@ define([
     },
 
     render: function() {
-      $(this.el).html(template({
+      this.$el.html(template({
         userDisplayName: this.user.displayName,
         userAvatarUrl: this.user.avatarUrl
       }));
+
+      this.$el.find('img').tooltip();
+
       return this;
     }
 
