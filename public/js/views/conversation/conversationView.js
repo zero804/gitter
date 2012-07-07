@@ -3,12 +3,15 @@ define([
   'jquery',
   'underscore',
   'backbone',
+  'views/base',
   'dateFormat',
   'hgn!views/conversation/conversationView',
   'collections/conversations',
   'views/conversation/conversationItemView'
-], function($, _, Backbone, dateFormat, template, ConversationCollection, ConversationItemView){
-  var ConversationView = Backbone.View.extend({
+], function($, _, Backbone, TroupeViews, dateFormat, template, ConversationCollection, ConversationItemView){
+  var ConversationView = TroupeViews.Base.extend({
+    template: template,
+
     initialize: function(options) {
       this.collection = new ConversationCollection();
 
@@ -24,14 +27,7 @@ define([
       //"click .clickPoint-showEmail": "showEmail"
     },
 
-    render: function() {
-      var self = this;
-
-      var compiledTemplate = template({});
-
-      $(this.el).html(compiledTemplate);
-      return this;
-    },
+    getRenderData: function() { return {}; },
 
     onCollectionReset: function() {
       $(".frame-conversations", this.el).empty();
