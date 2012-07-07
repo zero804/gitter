@@ -3,22 +3,20 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hbs!templates/chat/chat',
-  'hbs!templates/chat/chat-row',
-  'hbs!templates/chat/chat-row-current',
-  'hbs!templates/chat/user-avatar',
+  'views/base',
+  'hbs!./chat',
   'components/chat/chat-component',
-  'jquery_timeago'
-], function($, _, Backbone, template, rowTemplate, rowCurrentTemplate, userAvatarTemplate, chat, _timeago) {
+  './chatViewItem'
+], function($, _, Backbone, TroupeViews, template, chat, ChatViewItem) {
   var PAGE_SIZE = 50;
 
-  var ChatView = Backbone.View.extend({
+  var ChatView = TroupeViews.Base.extend({
+    template: template,
     chatMessageSkip: 0,
     chatMessageLimit: PAGE_SIZE,
 
     initialize: function() {
       this.scrollEventBound = _.bind(this.chatWindowScroll, this);
-      _.bindAll(this, "userLoggedIntoTroupe", "userLoggedOutOfTroupe");
 
       $(window).bind('scroll', this, this.scrollEventBound);
 
@@ -28,7 +26,7 @@ define([
       $(document).bind('userLoggedIntoTroupe', this.userLoggedIntoTroupe);
       $(document).bind('userLoggedOutOfTroupe', this.userLoggedOutOfTroupe);
 
-      this.refreshUsers();
+      this.loadNextMessages();
     },
 
     events: {
@@ -43,20 +41,9 @@ define([
       $(document).unbind('chat', this.onMessage);
       $(document).unbind('userLoggedIntoTroupe', this.userLoggedIntoTroupe);
       $(document).unbind('userLoggedOutOfTroupe', this.userLoggedOutOfTroupe);
-
     },
 
-    userLoggedIntoTroupe: function(event, data) {
-      console.dir(data);
-      var img = $('.panel-online-status .avatar-' + data.userId + " img");
-      img.removeClass('offline', 500);
-    },
-
-
-    userLoggedOutOfTroupe: function(event, data) {
-      var img = $('.panel-online-status .avatar-' + data.userId + " img");
-      img.addClass('offline', 500);
-    },
+    getRenderData: function() { return {}; },
 
     chatWindowScroll: function() {
       if($(window).scrollTop() == $(document).height() - $(window).height()) {
@@ -64,83 +51,13 @@ define([
       }
     },
 
-    refreshUsers: function() {
-      var self = this;
-      $.ajax({
-        url: "/troupes/" + window.troupeContext.troupe.id + "/users",
-        contentType: "application/json",
-        dataType: "json",
-        type: "GET",
-        success: function(data) {
-          //self.renderUsers(data);
-        }
-      });
-
-    },
-
-    renderUsers: function(data) {
-      var panel = $('.panel-online-status');
-      panel.empty();
-      // Sort by online=true, name
-      data.sort(function(a, b) { return - ((a.online ? 1 : 0) - (b.online ? 1 : 0)) });
-
-      for(var i = 0; i < data.length; i++) {
-        var d = data[i];
-        /* Skip current user */
-        if(d.id == window.troupeContext.user.id) continue;
-        var avatar = userAvatarTemplate({
-          id: d.id,
-          displayName: d.displayName,
-          additionalClasses: d.online ? "" : "offline"
-        });
-
-        panel.append(avatar);
-      }
-      $('.dp-tooltip', panel).tooltip();
-    },
-
-
     onMessage: function(event, msg) {
       var self = event.data;
-      var compiledTemplate = self.renderMessage(msg);
-      var item = $(compiledTemplate);
-      //item.hide();
-      self.attachTooltipHandlers(item);
+      var current = msg.fromUser.id == window.troupeContext.user.id;
 
-      $(".frame-chat", this.el).prepend(item);
-      //item.show('slide', {}, 'fast');
+      $(".frame-chat", this.el).prepend(new ChatViewItem({ message: msg, current: current}).render().el);
 
-    },
-
-    attachTooltipHandlers: function(item) {
-      $('.trpChatBubble', item).each(this.attachTooltipHandlerToItem);
-      $('.dp-tooltip', item).tooltip();
-    },
-
-    attachTooltipHandlerToItem: function(index, el) {
-      var jel = $(el);
-      if(jel.data("timeago-attached")) return;
-      if(!jel.data("sent")) return;
-      jel.data("timeago-attached", true);
-
-      jel.tooltip({title: function() { return $.timeago(new Date($(this).data("sent"))); }});
-    },
-
-    renderMessage: function(msg) {
-      if(msg.fromUser.id == window.troupeContext.user.id) {
-        return rowCurrentTemplate(this.prepareForTemplate(msg));
-      }
-
-      return rowTemplate(this.prepareForTemplate(msg));
-    },
-
-    prepareForTemplate: function(msg) {
-       return {
-          text: msg.text,
-          sent: msg.sent,
-          fromUserDisplayName: msg.fromUser.displayName,
-          fromUserAvatarUrlSmall: "/avatar/" + msg.fromUser.id
-        };
+      return;
     },
 
     detectReturn: function(e) {
@@ -154,13 +71,6 @@ define([
       chat.send(chatBox.val());
       chatBox.val('');
       return false;
-    },
-
-    render: function() {
-      $(this.el).html(template({}));
-      this.attachTooltipHandlers(this.el);
-      this.loadNextMessages();
-      return this;
     },
 
     loadNextMessages: function() {
@@ -178,18 +88,14 @@ define([
           }
 
           // TODO: speed this up
-          var items = [];
-          for(var i = 0; i < data.length; i++) {
-            var compiledTemplate = self.renderMessage(data[i]);
-            items.push(compiledTemplate);
-          }
-
           var chatFrame = $(".frame-chat", this.el);
-          chatFrame.append(items.join(''));
 
-          self.attachTooltipHandlers(chatFrame);
+          for(var i = 0; i < data.length; i++) {
+            var msg = data[i];
+            var current = msg.fromUser.id == window.troupeContext.user.id;
 
-
+            chatFrame.append(new ChatViewItem({ message: msg, current: current}).render().el);
+          }
 
 
           self.chatMessageSkip += PAGE_SIZE;

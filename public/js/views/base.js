@@ -47,7 +47,6 @@ define([
       });
 
       }
-      console.log("DOM Generated", data);
       $(this.el).html(dom);
       if(this.afterRender) { this.afterRender(dom, data); }
 

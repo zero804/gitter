@@ -6,9 +6,8 @@ define([
   'views/base',
   'dateFormat',
   'hbs!views/conversation/conversationItemView',
-  'models/conversationDetail',
-  'views/widgets/avatar'
-], function($, _, Backbone, TroupeViews, dateFormat, template, ConversationDetail, AvatarView) {
+  'models/conversationDetail'
+  ], function($, _, Backbone, TroupeViews, dateFormat, template, ConversationDetail) {
   var ConversationItemView = TroupeViews.Base.extend({
     template: template,
 
