@@ -3,7 +3,7 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hgn!templates/login/login'
+  'hbs!templates/login/login'
 ], function($, _, Backbone, template) {
   var LoginView = Backbone.View.extend({    
     tagName: "div",

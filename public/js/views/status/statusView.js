@@ -3,7 +3,7 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hgn!templates/status/status'
+  'hbs!templates/status/status'
 ], function($, _, Backbone, template){
   var StatusView = Backbone.View.extend({
     render: function() {

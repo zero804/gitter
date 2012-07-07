@@ -3,7 +3,7 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hgn!templates/home/main'
+  'hbs!templates/home/main'
 ], function($, _, Backbone, template){
   var MainHomeView = Backbone.View.extend({
     events: {

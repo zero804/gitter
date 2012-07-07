@@ -3,8 +3,8 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hgn!templates/share/share',
-  'hgn!templates/share/share-row'
+  'hbs!templates/share/share',
+  'hbs!templates/share/share-row'
 ], function($, _, Backbone, template, rowTemplate) {
   var ShareView = Backbone.View.extend({
     tagName: "div",

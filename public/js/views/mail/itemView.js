@@ -3,7 +3,7 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hgn!templates/mail/item'
+  'hbs!templates/mail/item'
 ], function($, _, Backbone, template) {
   var FullMailView = Backbone.View.extend({
     events: {

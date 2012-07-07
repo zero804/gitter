@@ -3,7 +3,8 @@
 
 var express = require('express'),
 	Resource = require('express-resource'),
-	tmpl = require('./server/mustache-template'),
+	//tmpl = require('./server/mustache-template'),
+  fs = require('fs'),
 	userService = require('./server/services/user-service'),
 	troupeService = require('./server/services/troupe-service'),
 	mailService = require('./server/services/mail-service'),
@@ -24,10 +25,16 @@ var RedisStore = require('connect-redis')(express);
 
 var app = express.createServer();
 
+var hbs = require('hbs');
+// TODO:come up with a better solution that this!
+hbs.registerPartial('require_config', fs.readFileSync(__dirname + '/public/templates/require_config.hbs', 'utf8'));
+
+app.set('basepath', "/");
+app.set('view engine', 'hbs');
 app.set('views', __dirname + '/public/templates');
-app.set('view engine', 'mustache');
+//app.set('view engine', 'mustache');
 app.set('view options',{layout:false});
-app.register(".mustache", tmpl);
+//app.register(".mustache", tmpl);
 
 passport.use(new LocalStrategy({
       usernameField: 'email',
@@ -104,12 +111,6 @@ passport.deserializeUser(function(id, done) {
 var sessionStore = new RedisStore();
 
 app.configure(function() {
-  app.set('basepath', "/");
-  app.set('views', __dirname + '/public/templates');
-  app.set('view engine', 'mustache');
-  app.set('view options', { layout: false } );
-  app.register(".mustache", tmpl);
-
   if(nconf.get("express:logging")) {
     app.use(express.logger());
   }
@@ -117,7 +118,7 @@ app.configure(function() {
   /* Additional body parsers */
   require('./server/utils/bodyparsers-additional.js').install();
 
-  app.use(express.static(__dirname + '/public'));
+  app.use(express['static'](__dirname + '/public'));
 
   app.use(express.cookieParser());
   app.use(express.bodyParser());

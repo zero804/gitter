@@ -2,7 +2,7 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hgn!views/widgets/avatar'
+  'hbs!views/widgets/avatar'
 ], function($, _, TroupeViews, template) {
   return TroupeViews.Base.extend({
     initialize: function(options) {

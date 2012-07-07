@@ -5,7 +5,7 @@ define([
   'backbone',
   'views/base',
   'dateFormat',
-  'hgn!views/conversation/conversationItemView',
+  'hbs!views/conversation/conversationItemView',
   'models/conversationDetail',
   'views/widgets/avatar'
 ], function($, _, Backbone, TroupeViews, dateFormat, template, ConversationDetail, AvatarView) {

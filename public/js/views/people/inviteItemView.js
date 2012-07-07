@@ -2,7 +2,7 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hgn!templates/people/invite-item',
+  'hbs!templates/people/invite-item',
   'views/confirmDialog'
   ], function($, _, Backbone, template, ConfirmDialog) {
     var InviteItemView = Backbone.View.extend({

@@ -3,8 +3,8 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hgn!templates/people/people',
-  'hgn!templates/people/row',
+  'hbs!templates/people/people',
+  'hbs!templates/people/row',
   'views/confirmDialog',
   'views/people/inviteItemView',
   'collections/invites'
