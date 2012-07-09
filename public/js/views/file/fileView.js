@@ -114,14 +114,21 @@ define([
       "click .trpFileActionMenuButton": "showFileActionMenu"
     },
 
-
     showFileActionMenu: function(e) {
       $(".trpFileActionMenu").show();
+      $(".trpFileActionMenuTop").show();
+      $('.trpFileActionMenuBottom').slideDown('fast', function() {
+          // Animation complete.
+      });
       return false;
     },
 
-    hideFileActionMenu: function(e) {
-      $(".trpFileActionMenu").hide();
+    hideFileActionMenu: function(e) {  
+      $(".trpFileActionMenuTop").hide();
+      $('.trpFileActionMenuBottom').slideUp('fast', function() {
+        $(".trpFileActionMenu").hide();
+      });
+      
     },
 
     fileIcon: function(fileName) {
