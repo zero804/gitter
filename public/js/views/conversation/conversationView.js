@@ -13,6 +13,7 @@ define([
     template: template,
 
     initialize: function(options) {
+      // we probably want to pull in the domain from config, e.g. for beta.trou.pe
       this.collection = new ConversationCollection();
 
       _.bindAll(this, 'onCollectionAdd', 'onCollectionReset');
@@ -27,7 +28,10 @@ define([
       //"click .clickPoint-showEmail": "showEmail"
     },
 
-    getRenderData: function() { return {}; },
+    getRenderData: function() {
+      var emailAddress = window.troupeContext.troupe.uri + '@beta.trou.pe';
+      return { "emailAddress" : emailAddress };
+    },
 
     onCollectionReset: function() {
       $(".frame-conversations", this.el).empty();
