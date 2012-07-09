@@ -34,11 +34,14 @@ define([
     },
 
     onCollectionReset: function() {
+      // Probably not the best way to do this, want to show/hide frame-help if there are no mails/conversations
+      $("#frame-help").show();
       $(".frame-conversations", this.el).empty();
       this.collection.each(this.onCollectionAdd);
     },
 
     onCollectionAdd: function(item) {
+      $("#frame-help").hide();
       $(".frame-conversations", this.el).append(new ConversationItemView({ model: item }).render().el);
     }
 
