@@ -92,9 +92,9 @@ define([
 
       var f = item.get('fileName');
 
-       if(f.length > 21) {
-            f = f.substring(0,21)+"...";
-        }
+       // if(f.length > 20) {
+       //      f = f.substring(0,20)+"...";
+       //  }
 
         var rowHtml = rowTemplate({
           fileName: f,
