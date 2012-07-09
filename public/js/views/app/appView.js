@@ -90,10 +90,10 @@ define([
     },
 
     toggleSelector: function(){
-      if ($('#trpTroupeSelector').is(':hidden')) $('#trpTroupeSelector').slideDown('fast', function() {
+      if ($('#trpTroupeSelector').is(':hidden')) $('#trpTroupeSelector').slideDown(350, function() {
           // Animation complete.
       });
-      else $('#trpTroupeSelector').slideUp('fast', function() {
+      else $('#trpTroupeSelector').slideUp(350, function() {
           // Animation complete.
       });
     },
