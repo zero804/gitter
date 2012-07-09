@@ -90,39 +90,31 @@ define([
     },
 
     toggleSelector: function(){
-      if ($('#trpTroupeSelector').height() === 0) $('#trpTroupeSelector').animate({
-        height: '900px'
-      }, 500);
-      else $('#trpTroupeSelector').animate({
-        height: '0px'
-      }, 300);
+      if ($('#trpTroupeSelector').is(':hidden')) $('#trpTroupeSelector').slideDown('fast', function() {
+          // Animation complete.
+      });
+      else $('#trpTroupeSelector').slideUp('fast', function() {
+          // Animation complete.
+      });
     },
 
     toggleUserMenu: function() {
-      // if ($('#trpUserMenu').height() === 0) $('#trpUserMenu').animate({
-      //   height: '200px'
-      // }, 500);
-      // else $('#trpUserMenu').animate({
-      //   height: '0px'
-      // }, 300);
-
       if ($('#trpUserMenu').is(':hidden')) $('#trpUserMenu').slideDown('fast', function() {
           // Animation complete.
       });
       else $('#trpUserMenu').slideUp('fast', function() {
           // Animation complete.
       });
-
     },
 
-
     addOneTroupe: function(model) {
-      this.troupeSelectorMenu.append("<div class='trpTroupeSelectorItem'><h1><a href='" + model.get("uri") + "'>"+ model.get("name") + "</a></h1></div>");
+      this.troupeSelectorMenu.append("<div class='trpTroupeSelectorItem'><a href='" + model.get("uri") + "'>"+ model.get("name") + "</a></div>");
     },
 
     addAllTroupes: function() {
       this.troupeSelectorMenu.empty();
       this.troupeCollection.each(this.addOneTroupe, this);
+      this.troupeSelectorMenu.append("<div class='trpTroupeSelectorAdd'><a href=''>Start a new Troupe</a></div>");
     },
 
     addOneNotification: function(model, collection, options) {

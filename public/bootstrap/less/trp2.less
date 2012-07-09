@@ -28,6 +28,14 @@
 
 @bgGreen: %("%s/bg_green.png", @baseImages);
 
+
+/*Mixins*/
+.trpShadow {
+  -webkit-box-shadow: 3px 2px 5px -1px rgba(50, 50, 50, 0.75);
+  -moz-box-shadow:    3px 2px 5px -1px rgba(50, 50, 50, 0.75);
+  box-shadow:         3px 2px 5px -1px rgba(50, 50, 50, 0.75);
+}
+
 body {
   margin: 0;
 }
@@ -139,9 +147,10 @@ h1 {
   position: absolute;
   z-index: 3;
   top: 64px;
-  width:100%;
-  height: 0px;
   overflow: hidden;
+  display: none;
+  left: 60px;
+  .trpShadow;
 }
 
 #trpTroupeSelector h1 a{
@@ -150,18 +159,38 @@ h1 {
 }
 
 .trpTroupeSelectorItem {
-  padding-top: 10px;
-  padding-left: 75px;
-  padding-bottom: 10px;
+  padding-top: 20px;
+  padding-left: 20px;
+  padding-bottom: 20px;
+  padding-right: 60px;
   text-decoration: none;
-  border-bottom: thin solid @col1;
-  background-color: @col9;
+  border-top: thin solid white;
+  background-color: @col1;
+  font-family: 'Lustria', serif;
+  font-size: 18px;
+  cursor: pointer;
 }
 
 .trpTroupeSelectorItem:hover{
   background-color: @col1;
-  cursor: pointer;
 }
+
+.trpTroupeSelectorItem a{
+  text-decoration: none;
+  color: white;
+}
+
+.trpTroupeSelectorAdd {
+  .trpTroupeSelectorItem;
+  background-color: white;
+  color: @col1;
+}
+
+.trpTroupeSelectorAdd a {
+  text-decoration: none;
+  color: @col1;
+}
+
 
 #trpSelectorArrow {
   padding-left: 10px;
@@ -174,9 +203,7 @@ h1 {
   width:100px;
   right: 58px;
   overflow: hidden;
-  -webkit-box-shadow: 3px 2px 5px -1px rgba(50, 50, 50, 0.75);
-  -moz-box-shadow:    3px 2px 5px -1px rgba(50, 50, 50, 0.75);
-  box-shadow:         3px 2px 5px -1px rgba(50, 50, 50, 0.75);
+  .trpShadow;
   background-color: white;
   display: none;
 }
@@ -455,9 +482,7 @@ textarea, input { outline: none; }
   margin-top: 186px;
   margin-left:86px;
   width: 96px;
-  -webkit-box-shadow: 3px 2px 5px -1px rgba(50, 50, 50, 0.75);
-  -moz-box-shadow:    3px 2px 5px -1px rgba(50, 50, 50, 0.75);
-  box-shadow:         3px 2px 5px -1px rgba(50, 50, 50, 0.75);
+  .trpShadow;
 }
 
 .trpFileActionMenuTop {
