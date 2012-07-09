@@ -3,12 +3,12 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hbs!templates/people/people',
-  'hbs!templates/people/row',
+  'hbs!views/people/people',
+  'hbs!views/people/item',
   'views/confirmDialog',
   'views/people/inviteItemView',
   'collections/invites'
-], function($, _, Backbone, template, rowTemplate, ConfirmDialog, InviteItemView, InviteCollection){
+], function($, _, Backbone, template, itemTemplate, ConfirmDialog, InviteItemView, InviteCollection){
   var PeopleView = Backbone.View.extend({
 
     initialize: function(options) {
@@ -87,13 +87,13 @@ define([
       while(users.length > 0) {
         var p1 = users.shift();
 
-        var rowHtml = rowTemplate({
+        var itemHtml = itemTemplate({
           personName: p1.displayName,
           personAvatarUrl: p1.avatarUrl,
           personRemove: p1.id != window.troupeContext.user.id
         });
 
-        $(".frame-people", this.el).append(rowHtml);
+        $(".frame-people", this.el).append(itemHtml);
       }
     },
 
