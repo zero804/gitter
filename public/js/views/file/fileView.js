@@ -3,13 +3,13 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hbs!templates/file/file',
-  'hbs!templates/file/row',
+  'hbs!views/file/file',
+  'hbs!views/file/item',
   'fileUploader',
   'collections/files',
   'jquery_colorbox',
   'dropdown'
-], function($, _, Backbone, template, rowTemplate, fileUploaderStub, FileCollection, cbStub, Dropdown){
+], function($, _, Backbone, template, itemTemplate, fileUploaderStub, FileCollection, cbStub, Dropdown){
   var FileView = Backbone.View.extend({
     initialize: function(options) {
       this.router = options.router;
@@ -96,14 +96,14 @@ define([
        //      f = f.substring(0,20)+"...";
        //  }
 
-        var rowHtml = rowTemplate({
+        var itemHtml = itemTemplate({
           fileName: f,
           url: item.get('url'),
           mimeType: item.get('mimeType'),
           fileIcon: this.fileIcon(item.get('fileName'))
         });
 
-        var el = $(rowHtml);
+        var el = $(itemHtml);
         el.data("item", item);
         $(".frame-files", this.el).append(el);
         $('.link-preview', el).on('click', this.onPreviewLinkClick);
