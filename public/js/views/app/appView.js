@@ -99,12 +99,19 @@ define([
     },
 
     toggleUserMenu: function() {
-      if ($('#trpUserMenu').height() === 0) $('#trpUserMenu').animate({
-        height: '200px'
-      }, 500);
-      else $('#trpUserMenu').animate({
-        height: '0px'
-      }, 300);
+      // if ($('#trpUserMenu').height() === 0) $('#trpUserMenu').animate({
+      //   height: '200px'
+      // }, 500);
+      // else $('#trpUserMenu').animate({
+      //   height: '0px'
+      // }, 300);
+
+      if ($('#trpUserMenu').is(':hidden')) $('#trpUserMenu').slideDown('fast', function() {
+          // Animation complete.
+      });
+      else $('#trpUserMenu').slideUp('fast', function() {
+          // Animation complete.
+      });
 
     },
 

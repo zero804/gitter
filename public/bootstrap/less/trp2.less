@@ -171,30 +171,35 @@ h1 {
   position: absolute;
   z-index: 5;
   top: 64px;
-  width:250px;
+  width:100px;
   right: 58px;
-  height: 0px;
   overflow: hidden;
-  -webkit-box-shadow: 0px 1px 8px #000;
+  -webkit-box-shadow: 3px 2px 5px -1px rgba(50, 50, 50, 0.75);
+  -moz-box-shadow:    3px 2px 5px -1px rgba(50, 50, 50, 0.75);
+  box-shadow:         3px 2px 5px -1px rgba(50, 50, 50, 0.75);
   background-color: white;
-}
-
-#trpUserMenu h1 a{
-  color: white;
-  text-decoration: none;
+  display: none;
 }
 
 .trpUserMenuItem {
+  padding-left: 10px;
   padding-top: 10px;
-  padding-right: 70px;
+  padding-right: 5px;
   padding-bottom: 10px;
   text-decoration: none;
-  text-align: right;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
 }
 
 .trpUserMenuItem:hover{
   background-color: @col1;
   cursor: pointer;
+  text-decoration: none;
+}
+
+.trpUserMenuItem a{
+  text-decoration: none;
+  color: @col10;
 }
 
 #trpNavWrap {
