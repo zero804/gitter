@@ -9,9 +9,10 @@ define([
   'views/app/appView'
 ], function($, _, Backbone, MainHomeView, ShareView, chat, AppView){
   var AppRouter = Backbone.Router.extend({
-    appView: new AppView(),
 
     initialize: function() {
+      this.appView = new AppView();
+
       chat.connect();
     },
 
