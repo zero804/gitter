@@ -37,6 +37,7 @@ module.exports = {
           }
 
           res.render(page, {
+            troupe: troupe,
             troupeContext: JSON.stringify(troupeContext)
           });
 
