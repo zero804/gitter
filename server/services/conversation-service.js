@@ -88,11 +88,6 @@ function updateEmailWithMessageId(conversationId, emailId, messageId, callback) 
     });
   });
 
-  /*{ _id: emailId }, { messageId: messageId }, {}, function(err, numAffected) {
-    if(err) return callback(err);
-    if(numAffected !== 1) return callback("No matching email found");
-    callback(null);
-  });*/
 }
 
 function findByTroupe(id, callback) {

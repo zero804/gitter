@@ -3,11 +3,9 @@
 
 var express = require('express'),
 	Resource = require('express-resource'),
-	//tmpl = require('./server/mustache-template'),
   fs = require('fs'),
 	userService = require('./server/services/user-service'),
 	troupeService = require('./server/services/troupe-service'),
-	mailService = require('./server/services/mail-service'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
 	ConfirmStrategy = require('./server/utils/confirm-strategy').Strategy,
@@ -151,7 +149,6 @@ require('./server/handlers/mobile').install(app);
 var troupesResource = app.resource('troupes',  require('./server/resources/troupes.js'));
 var sharesResource = app.resource('invites',  require('./server/resources/invites.js'));
 var usersResource = app.resource('users',  require('./server/resources/users.js'));
-var mailsResource = app.resource('mails', require('./server/resources/mails.js'));
 var conversationsResource = app.resource('conversations', require('./server/resources/conversations.js'));
 var filesResource = app.resource('files', require('./server/resources/files.js'));
 var downloadsResource = app.resource('downloads',  require('./server/resources/downloads.js'));
@@ -162,7 +159,6 @@ var notificationsResource = app.resource('notifications',  require('./server/res
 
 troupesResource.add(sharesResource);
 troupesResource.add(usersResource);
-troupesResource.add(mailsResource);
 troupesResource.add(conversationsResource);
 troupesResource.add(filesResource);
 troupesResource.add(downloadsResource);

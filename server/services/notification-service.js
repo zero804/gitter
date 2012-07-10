@@ -19,13 +19,13 @@ function compile(map) {
 
 /* TODO: externalize and internationalise this! */
 var notificationTemplates = compile({
-  "email:new": "New email with subject \"{{subject}}\" from {{from}}" ,
+  "mail:new": "New email with subject \"{{subject}}\" from {{from}}" ,
   "file:createVersion": "Version {{version}}  of {{fileName}} created.",
   "file:createNew": "New file {{fileName}} created."
 });
 
 var notificationLinkTemplates = compile({
-  "email:new": "#mail/{{emailId}}",
+  "mail:new": "#mail/{{emailId}}",
   "file:createVersion": "#files",
   "file:createNew": "#files"
 });

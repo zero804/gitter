@@ -11,7 +11,9 @@ var passport = require('passport'),
     userService = require("./services/user-service"),
     troupeService = require("./services/troupe-service"),
     presenceService = require("./services/presence-service"),
+    conversationService = require("./services/conversation-service"),
     fileService = require("./services/file-service"),
+    restSerializer = require("./serializers/rest-serializer"),
     appEvents = require("./app-events"),
     nconf = require('./utils/config').configure(),
     Q = require("q"),
@@ -214,6 +216,38 @@ module.exports = {
             group.now.onFileEvent({
               event: event,
               file: persistence.narrowFile(file)
+            });
+          });
+
+        });
+      });
+
+
+      appEvents.onMailEvent(function(data) {
+        winston.debug("onMailEvent -> now.js ", data);
+        var event = data.event;
+        if(event !== 'new') {
+          /* Filter..... */
+          return;
+        }
+
+        var troupeId = data.troupeId;
+        var conversationId = data.conversationId;
+        var mailIndex = data.mailIndex;
+
+
+
+        getGroup("troupe." + troupeId, function(group) {
+          conversationService.findById(conversationId, function(err, conversation) {
+            if(err || !conversation) return winston.error("Notification failure", err);
+
+            restSerializer.serialize(conversation, restSerializer.ConversationMinStrategy, function(err, serializedConversation) {
+              if(err || !serializedConversation) return winston.error("Notification failure", err);
+
+              group.now.onMailEvent({
+                event: event,
+                conversation: serializedConversation
+              });
             });
           });
 

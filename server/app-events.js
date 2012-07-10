@@ -68,15 +68,17 @@ module.exports = {
     on('file', callback);
   },
 
-  newEmailEvent: function(emailId, troupeId) {
-    emit('newEmail', {
-      emailId: emailId,
-      troupeId: troupeId
+  mailEvent: function(event, troupeId, conversationId, mailIndex) {
+    emit('mail', {
+      event: event,
+      troupeId: troupeId, 
+      conversationId: conversationId,
+      mailIndex: mailIndex
     });
   },
 
-  onNewEmailEvent: function(callback) {
-    on('newEmail', callback);
+  onMailEvent: function(callback) {
+    on('mail', callback);
   },
 
   newNotification: function(troupeId, userId, notificationText, notificationLink) {

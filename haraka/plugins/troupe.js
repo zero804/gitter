@@ -5,7 +5,6 @@
 
 // troupe service to deliver mails to mongo database
 
-//var mailService = require("./../../server/services/mail-service.js");
 var conversationService = require("./../../server/services/conversation-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
 var fileService = require("./../../server/services/file-service.js");
@@ -190,7 +189,8 @@ exports.hook_queue = function(next, connection) {
           attachments: savedAttachmentsForPersist }, function(err, conversation, savedMail) {
             if (err) return next(SOFTDENY, "Failed to store the email");
 
-            // NEW CONV EVENT! appEvents.newEmailEvent(savedMail.id, troupe.id);
+            appEvents.mailEvent('new', troupe.id, conversation.id, conversation.emails.length);
+
             connection.logdebug("Stored the email.");
             connection.transaction.notes.emailId = savedMail.id;
             connection.transaction.notes.conversationId = conversation.id;
