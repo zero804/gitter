@@ -5,13 +5,29 @@ define([
   'backbone',
   'collections/troupes',
   'collections/notifications',
+  'views/widgets/nav',
   'noty'
-], function($, _, Backbone, TroupeCollection, NotificationCollection, notyStub) {
+], function($, _, Backbone, TroupeCollection, NotificationCollection, NavView, notyStub) {
 
   var AppView = Backbone.View.extend({
     el: 'body',
 
     initialize: function() {
+      var self = this;
+      function attachNavView(selector) {
+        var e = self.$el.find(selector);
+        return new NavView({ el: e }).render();
+      }
+
+      this.nav = {
+        'everything': attachNavView('#nav-everything'),
+        'chat': attachNavView('#nav-chat'),
+        'mail': attachNavView('#nav-mail'),
+        'files': attachNavView('#nav-files'),
+        'people': attachNavView('#nav-people')
+      };
+
+
       this.troupeCollection = new TroupeCollection();
       this.notificationCollection = new NotificationCollection();
 
@@ -26,13 +42,20 @@ define([
       this.notificationCollection.on('add', this.addOneNotification, this);
       this.notificationCollection.on('refresh', this.addAllNotifications, this);
 
-      var self = this;
       this.troupeCollection.fetch({
         success: function() { self.addAllTroupes(); }
       });
 
       this.notificationCollection.fetch({
         success: function() { self.addAllNotifications(); }
+      });
+
+      $(document).on('chat', function(event, data) {
+        self.nav['chat'].incrementNotificationValue();
+      });
+
+      $(document).on('file', function(event, data) {
+        self.nav['files'].incrementNotificationValue();
       });
 
       $(document).on('userLoggedIntoTroupe', function(event, data) {

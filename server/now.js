@@ -120,26 +120,6 @@ module.exports = {
         });
       };
 
-      /* TODO: add unsubscribe from troupe ? (not needed yet: simply reloading the page should close the socket) */
-
-      everyone.now.subscribeToTroupeChat = function(troupeId) {
-        var self = this;
-
-        loadUserAndTroupe(this.user, troupeId, sessionStore, function(err, user, troupe) {
-          if(err) return;
-
-          var group = nowjs.getGroup("troupe." + troupe.id + ".chat");
-          group.addUser(self.user.clientId);
-        });
-      };
-
-      everyone.now.unsubscribeToTroupeChat = function(troupeId) {
-        winston.info("User unsubscribed from group chat");
-
-        var group = nowjs.getGroup("troupe." + troupeId + ".chat");
-        group.removeUser(this.user.clientId);
-      };
-
       everyone.now.newChatMessageToTroupe = function(options) {
         winston.info("User sent new message to troupe: " + options.text);
 
@@ -166,7 +146,7 @@ module.exports = {
 
       appEvents.onTroupeChat(function(data) {
         var troupeId = data.troupeId;
-        var group = getGroup("troupe." + troupeId + ".chat", function (group) {
+        var group = getGroup("troupe." + troupeId, function (group) {
           group.now.onTroupeChatMessage(data.chatMessage);
         });
       });
