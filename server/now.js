@@ -246,7 +246,8 @@ module.exports = {
 
               group.now.onMailEvent({
                 event: event,
-                conversation: serializedConversation
+                conversation: serializedConversation,
+                mailIndex: mailIndex
               });
             });
           });
