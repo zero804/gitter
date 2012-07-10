@@ -228,7 +228,7 @@ h1 {
   color: @col10;
 }
 
-#trpNavWrap {
+.trpNavWrap {
   position: fixed;
   top: 64px;
   left: 0;
@@ -238,35 +238,42 @@ h1 {
   float: left;
 }
 
-#trpNavContainer {
+
+.trpNav {
 
 }
 
-#trpNav {
+.trpNavContainer {
 
 }
 
-#trpNavItemContainer {
+.trpNavItemContainer {
   padding-left: 32px;
   padding-top: 17px;
   padding-bottom: 17px;
   border-bottom:thin solid #e2e2e2;
 }
 
-#trpNavItemIcon {
+.trpNavItemIcon {
   float: left;
   padding-right: 20px;
 }
 
-#trpNavItemText a {
-  font-family: 'Open Sans', sans-serif;
-  font-size: 15px;
-  color: @col10;
-  text-decoration: none;
+.trpNavItemText {
+  a {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 15px;
+    color: @col10;
+    text-decoration: none;
+  }
+
+  a:hover{
+    color: black;
+  }
 }
 
-#trpNavItemText a:hover{
-  color: black;
+.trpNavNotification {
+  float: right
 }
 
 .trpChatContainer {

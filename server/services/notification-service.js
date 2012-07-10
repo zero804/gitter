@@ -86,9 +86,7 @@ module.exports = {
   },
 
   /* Find all notifications for a troupe */
-  findByTroupe: findByTroupe,
-
-  listByTroupe: function(id, options, callback) {
+  findByTroupe: function(id, options, callback) {
     findByTroupe(id, options, function(err, notifications) {
       if(err) return callback(err);
       callback(null, notifications.map(formatNotification).filterNulls());

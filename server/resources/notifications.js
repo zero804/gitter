@@ -6,7 +6,7 @@ var notificationService = require("../services/notification-service");
 
 module.exports = {
     index: function(req, res, next) {
-      notificationService.listByTroupe(req.troupe.id, {}, function(err, notifications) {
+      notificationService.findByTroupe(req.troupe.id, {}, function(err, notifications) {
         if (err) return next(err);
 
         res.send(notifications);

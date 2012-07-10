@@ -8,7 +8,6 @@ define([
   "use strict";
 
   var connected = false;
-  var subscribeOnConnect = true;
 
   var module = {
     connect: function() {
@@ -43,9 +42,6 @@ define([
             });
           }
         });
-        if(subscribeOnConnect) {
-          module.subscribeTroupeChatMessages();
-        }
       });
 
     },
@@ -55,21 +51,6 @@ define([
         troupeId: window.troupeContext.troupe.id,
         text: message
       });
-    },
-
-    subscribeTroupeChatMessages: function() {
-      if(connected) {
-        now.subscribeToTroupeChat(window.troupeContext.troupe.id);
-      } else {
-        subscribeOnConnect = true;
-      }
-    },
-
-    unsubscribeTroupeChatMessages: function() {
-     if (connected) {
-        now.unsubscribeToTroupeChat(window.troupeContext.troupe.id);
-      }
-      subscribeOnConnect = false;
     }
   };
 
