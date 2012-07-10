@@ -59,6 +59,7 @@ define([
       });
 
       $(document).on('mail', function(event, data) {
+        console.log(arguments);
         self.nav['mail'].incrementNotificationValue();
       });
 

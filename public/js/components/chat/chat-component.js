@@ -4,7 +4,7 @@ define([
   'now',
   'noty'
 ], function($, _, Backbone, nowStub, notyStub){
-  /*global now:false, noty: false */
+  /*global now:false, noty: false, console: false */
   "use strict";
 
   var connected = false;
@@ -13,6 +13,7 @@ define([
     connect: function() {
       function createTrigger(name) {
         return function(message) {
+          console.log("Trigger for " + name + " on message", message);
           $(document).trigger(name, message);
         };
       }
