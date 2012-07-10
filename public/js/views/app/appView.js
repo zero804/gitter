@@ -58,6 +58,10 @@ define([
         self.nav['files'].incrementNotificationValue();
       });
 
+      $(document).on('mail', function(event, data) {
+        self.nav['mail'].incrementNotificationValue();
+      });
+
       $(document).on('userLoggedIntoTroupe', function(event, data) {
         if(data.userId == window.troupeContext.user.id) {
           return;

@@ -22,6 +22,7 @@ define([
       now.onUserLoggedOutOfTroupe = createTrigger('userLoggedOutOfTroupe');
       now.onFileEvent = createTrigger('file');
       now.onNotification = createTrigger('notification');
+      now.onMailEvent = createTrigger('mail');
 
       now.ready(function() {
         connected = true;

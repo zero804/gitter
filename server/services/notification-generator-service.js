@@ -6,10 +6,9 @@ var persistence = require("./persistence-service");
 var appEvents = require("../app-events");
 var fileService = require("./file-service");
 var winston = require("winston");
-var mailService = require("./mail-service");
 var userService = require("./user-service");
 var notificationService = require("./notification-service");
-
+var conversationService = require("./conversation-service");
 
 
 module.exports = {
@@ -47,28 +46,33 @@ module.exports = {
 
     });
 
-    appEvents.onNewEmailEvent(function(data) {
+    appEvents.onMailEvent(function(data) {
+      var event =  data.event;
       var troupeId = data.troupeId;
-      var emailId = data.emailId;
-      mailService.findById(emailId, function(err, email) {
-        if(err) return winston.error("notificationService: error loading email", err);
-        if(!email) return winston.error("notificationService: unable to find email", emailId);
+      var conversationId = data.conversationId;
+      var mailIndex = data.mailIndex;
+
+      conversationService.findById(conversationId, function(err, conversation) {
+        if(err) return winston.error("notificationService: error loading conversation", err);
+        if(!conversation) return winston.error("notificationService: unable to find conversation", conversationId);
+        var email = conversation.emails[mailIndex - 1];
 
         userService.findById(email.fromUserId, function(err, user) {
           if(err) return winston.error("notificationService: error loading user", err);
           if(!user) return winston.error("notificationService: unable to find user", email.fromUserId);
 
           var notificationData = {
-            emailId: email.id,
+            conversationId: conversationId,
+            mailIndex: mailIndex,
             subject: email.subject,
             from: user.displayName,
             fromUserId: email.id
           };
 
-          notificationService.createTroupeNotification(troupeId, "email:new", notificationData);
+          notificationService.createTroupeNotification(troupeId, "mail:" + event, notificationData);
         });
 
-      })
+      });
     });
 
   }
