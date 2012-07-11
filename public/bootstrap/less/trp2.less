@@ -260,6 +260,7 @@ h1 {
 }
 
 .trpNavItemText {
+  display: inline-block;
   a {
     font-family: 'Open Sans', sans-serif;
     font-size: 15px;
@@ -269,11 +270,24 @@ h1 {
 
   a:hover{
     color: black;
+
   }
 }
 
 .trpNavNotification {
-  float: right
+  display: inline-block;
+  margin-left: 10px;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  background-color: @col1;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 9px;
+  color: white;
+  height: 16px;
+  width: 16px;
+  text-align: center;
+  padding-top: 2px;
 }
 
 .trpChatContainer {
