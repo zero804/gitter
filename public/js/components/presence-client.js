@@ -7,12 +7,22 @@ define([
 
   var onlineUsers = {};
 
+  function updateAvatars(id, online) {
+    if(online) {
+      $('.offline.avatar-' + id).removeClass('offline');
+    } else {
+      $('.avatar-' + id).addClass('offline');
+    }
+  }
+
   $(document).on('userLoggedIntoTroupe', function(event, data) {
     onlineUsers[data.userId] = true;
+    updateAvatars(data.userId, true);
   });
 
   $(document).on('userLoggedOutOfTroupe', function(event, data) {
     delete onlineUsers[data.userId];
+    updateAvatars(data.userId, false);
   });
 
   function refreshUsers() {
@@ -22,11 +32,21 @@ define([
       dataType: "json",
       type: "GET",
       success: function(data) {
+        var oldOnlineUsers = onlineUsers;
         onlineUsers = {};
         for(var i = 0; i < data.length; i++) {
-          if(data[i].online) {
-            onlineUsers[data[i].id] = true;
+          var online = data[i].online;
+          var prev = oldOnlineUsers[id];
+          var id = data[i].id;
+
+          if(online) {
+            onlineUsers[id] = true;
           }
+
+          if(online && !prev || !online && prev) {
+            updateAvatars(id, online);
+          }
+
         }
       }
     });

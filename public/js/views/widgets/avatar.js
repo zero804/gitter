@@ -12,6 +12,7 @@ define([
 
     render: function() {
       this.$el.html(template({
+        id: this.user.id,
         userDisplayName: this.user.displayName,
         userAvatarUrl: this.user.avatarUrl,
         offline: !presenceClient.isOnline(this.user.id)
