@@ -7,18 +7,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-
-    <!-- Le styles -->
     <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="bootstrap/css/troupe.css" rel="stylesheet">
+    <link href="bootstrap/css/trp2.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Lustria' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:200' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
     <link REL="SHORTCUT ICON" HREF="favicon.ico">
-    <style type="text/css">
-      body {
-        padding-top: 60px;
-        padding-bottom: 40px;
-      }
-    </style>
-    <link href="bootstrap/css/responsive.css" rel="stylesheet">
+
     {{>require_config}}
     <script data-main="js/signup.js" src="js/libs/require/2.0.2/require-min.js"></script>
 
@@ -36,16 +31,16 @@
 
   <body>
 
-    <div class="container">
-
-    <div class="row">
-    	<div class="span10">
-        <img src="images/logo_med.png"><Br><br>
-      </div>
-      <div class="span2">
-        <input type="button" class="btn btn-primary btn-large pull-right button-existing-users-login" value="Existing users &raquo;">
-        <div id="loginFormContent" style="display: none">
-          <form id="loginForm" class="marginless" method="post" action="/login">
+    <div class="trpHomeTopStripContainer">
+      <div class="trpHomeTopStrip">
+        <div class="trpHomeLogo"><img src="images/2/logo-white.png"></div>
+        <div class="trpHomeMenu">
+          <div class="trpHomeMenuItem trpPadV14">Features</div>
+          <div class="trpHomeMenuItem trpPadV14">Apps</div>
+          <div class="trpHomeMenuItem trpPadV14 button-existing-users-login">
+            Sign in
+            <div id="loginFormContent" style="display: none">
+             <form id="loginForm" class="marginless" method="post" action="/login">
 
                   <div class="alert alert-error incorrect-password" style="display: none">
                   Login failed. <a href="/forgottenpassword">Click here to request a new password.</a>
@@ -67,65 +62,84 @@
           </form>
 
         </div>
+          </div>
+          <div class="trpHomeMenuItem trpButtonBig trpBtnWhite">Sign up</div>
+        </div>
+      </div>
+      <div class="trpHomeDivider">
+        <img src="images/2/divider-purple.png">
+      </div>
+      <div class="trpHomeHero">
+        <div class="trpHeroText">
+          The quick and simple way to chat, share and work together. Anytime, anywhere.
+          <br><br>
+          <div class="trpHomeMenuItem trpButtonBig trpBtnWhite">Sign up</div>
+        </div>
+        <div class="trpHeroImage"><img src="images/2/hero-files.png"></div>
       </div>
     </div>
 
-      <!-- Main hero unit for a primary marketing message or call to action -->
-      <div class="troupe-hero">
-        <div class="troupe-hero-content">
-          <h1>Talk together</h1>
-          <p>Troupe makes it easy for teams of people to talk together. Create your Troupe and start talking.</p>
 
-          <div class="row"><form name="signupForm" id="signupForm" method="post" action="/signup">
-            <div class="span4">
-              <H2>Name your Troupe</H2>
-              <input type="text" class="validateable" rel="tooltip" title="Please choose a name for your Troupe." name="troupeName" placeholder="Pick anything, it's not unique">
-
-            </div>
-            <div class="span4">
-              <H2>Enter your email address</H2>
-              <input name="email" type="text" class="span4 validateable" rel="tooltip" title="Please type your email address here." placeholder="We'll send you an email to confirm this">
-            </div>
-           </div>
-              <br>
-              <p><br><input type="submit" class="btn btn-primary btn-large" value="Get Started &raquo;"></p></form>
-        </div>
-       </div>
-
-
-
-      <!-- Example row of columns -->
-      <div class="row">
-        <div class="span4">
-          <h2>Group Chat</h2>
-           <p>Working on a project together, find it difficult to talk together easily? No problem, your Troupe has a group chat to make communication simple. </p>
-          <p><a class="btn" href="#">View details &raquo;</a></p>
-        </div>
-        <div class="span4">
-          <h2>Group File Storage</h2>
-           <p>Sharing files within your team proving a little tricky? No problem, each Troupe comes with a 500MB shared folder. Or you can just connect it to Dropbox.</p>
-          <p><a class="btn" href="#">View details &raquo;</a></p>
-       </div>
-        <div class="span4">
-          <h2>Mobile</h2>
-          <p>Got the latest shiny iPhone or Android handset? Troupe works on most smart phones keeping you in touch with your team even from the top of Eyjafjallajökull.</p>
-          <p><a class="btn" href="#">View details &raquo;</a></p>
-        </div>
+    <div class="trpHomeMidStripContainer">
+      <div class="trpMidStrip">
+        <img src="images/2/line.png" class="trpLine">Why you'll love using Troupe<img src="images/2/line.png" class="trpLine">
       </div>
 
-      <hr>
+      <div class="trpFeatures">
+        <div class="trpFeature">
+          <div class="trpFeatureImage"><img src="images/2/feature-chat.png"></div>
+          <div class="trpFeatureText">
+            <div class="trpFeatureHead">Quick and simple chat</div>
+            <div class="trpFeatureBody">Group chat allows you to easily stay in touch with everyone in your Troupe. Need a quick answer or to discuss the latest presentation, just chat with anyone even on their mobiles.</div>
+          </div>
+        </div>
 
-      <footer>
-        <p>&copy; Troupe 2012</p>
-      </footer>
+        <div class="trpFeature">
+          <div class="trpFeatureImage"><img src="images/2/feature-files.png"></div>
+           <div class="trpFeatureText">
+            <div class="trpFeatureHead">Share and view files</div>
+            <div class="trpFeatureBody">The simplest shared folder you've ever used. Keep all the files together, view them on your mobile, easy versioning just in case you need to back to the last one.</div>
+          </div>
+        </div>
+
+        <div class="trpFeature">
+          <div class="trpFeatureImage"><img src="images/2/feature-email.png"></div>
+           <div class="trpFeatureText">
+            <div class="trpFeatureHead">All the emails in one place</div>
+            <div class="trpFeatureBody">Group emails are a pain. Troupe makes this simple by giving your group an email address and keeping everyone in the loop.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="trpHomeAppStripContainer">
+      <div class="trpHomeAppStrip">
+        <img src="images/2/line.png" class="trpLine">You can use Troupe anytime, anywhere<img src="images/2/line.png" class="trpLine">
+      </div>
+
+      <div class="trpApps">
+        <div class="trpApp">
+          <div class="trpAppImage"><img src="images/2/app-laptop.png"></div>
+          <div class="trpAppText">On a computer</div>
+        </div>
+        <div class="trpApp">
+          <div class="trpAppImage"><img src="images/2/app-tablet.png"></div>
+          <div class="trpAppText">On tablets</div>
+        </div>
+        <div class="trpApp">
+          <div class="trpAppImage"><img src="images/2/app-phone.png"></div>
+          <div class="trpAppText">On smartphones</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="trpHomeFooterStripContainer">
+      <div class="trpFooterStrip">
+        <img src="images/2/logo-mark-green.png" class="trpLine">
+      </div>
+    </div>
 
 
-
-    </div> <!-- /container -->
-
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
     <script src="bootstrap/js/jquery.js"></script>
     <script src="bootstrap/js/bootstrap-tooltip.js"></script>
     <script src="bootstrap/js/bootstrap-popover.js"></script>
