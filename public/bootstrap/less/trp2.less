@@ -7,16 +7,18 @@
 @import "modals.less";*/
 
 // Our colour palette
-@col1: #1dce73; // lumo green 
-@col2: #d54f68; // pinky red
-@col3: #4a4257; // dark purple
-@col4: #c0c9c8; // mid grey
-@col5: #1dd0cd; // turquoise
-@col6: #fcb316; // moutard
-@col7: #f8f6f7; // off-white
-@col8: #d6d6d6; // darker off-white for borders and ting
-@col9: #149a55; // darker col1
-@col10: #7b797a; // dark grey
+@trpGreen: #1dce73; // lumo green 
+@trpRed: #d54f68; // pinky red
+@trpPurple: #4a4257; // dark purple
+@trpGrey: #c0c9c8; // mid grey
+@trpCyan: #1dd0cd; // turquoise
+@trpYellow: #fcb316; // moutard
+@trpOffWhite: #f8f6f7; // off-white
+@trpLightGrey: #d6d6d6; // darker off-white for borders and ting
+@trpDarkGreen: #149a55; // darker col1
+@trpDarkGrey: #7b797a; // dark grey
+@trpDarkerGrey: #666666; // dark grey
+@trpCream: #f9f9f6; //light cream
 
 // Our fonts
 @font1: 'Pontano Sans', sans-serif;
@@ -41,7 +43,7 @@ body {
 }
 
 html {
- background-color: @col7;
+ background-color: @trpOffWhite;
 
 }
 
@@ -50,6 +52,169 @@ h1 {
   font-size: 24px;
   margin: 0;
 }
+
+.trpHomeTopStripContainer {
+  background-color: @trpPurple;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  display: block;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+}
+
+.trpHomeTopStrip {
+  min-width: 960px;
+  display: inline-block;
+  margin: 0px auto;
+  text-align: left;
+  padding-top: 26px;
+  padding-bottom: 26px;
+}
+
+.trpHomeLogo {
+  float: left;
+}
+
+.trpHomeMenu {
+  float: right;
+  color: white;
+  display: inline-block;
+}
+
+.trpHomeMenuItem {
+  display: inline-block;
+  float: left;
+  padding-right: 26px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  font-weight: lighter;
+}
+
+.trpHomeHero {
+  padding-top: 20px;
+  display: inline-block;
+  min-width: 960px;
+}
+
+.trpHeroText {
+  float: left;
+  max-width: 260px;
+  padding-right: 20px;
+  padding-top: 40px;
+  font-family: 'Lustria', serif;
+  font-size: 24px;
+  font-weight: 100;
+  color: white;
+  text-align: left;
+}
+
+.trpHeroImage {
+  float: right;
+  display: block;
+  height: 392px;
+}
+
+.trpHomeMidStripContainer {
+  background-color: white;
+  width: 100%;
+  text-align: center;
+  margin-top: -4px;
+  padding-top: 38px;
+}
+
+.trpMidStrip {
+  font-family: 'Lustria', serif;
+  font-size: 16px;
+  color: @trpDarkerGrey;
+  padding-top: 10px;
+}
+
+.trpFeatures {
+  display: inline-block;
+  min-width: 960px;
+  padding-top: 28px;
+  text-align: center;
+}
+
+.trpFeature {
+  display: inline-block;
+  width: 240px;
+  vertical-align: top;
+  padding: 20px;
+  margin: 20px;
+}
+
+.trpFeatureHead {
+  font-family: 'Lustria', serif;
+  font-size: 18px;
+  padding-top: 10px;
+  padding-bottom: 6px;
+  color: @trpDarkerGrey;
+}
+
+.trpFeatureBody {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  font-weight: lighter;
+  color: @trpDarkGrey;
+}
+
+.trpHomeAppStripContainer {
+  background-color: @trpCream;
+  width: 100%;
+  text-align: center;
+  margin-top: -4px;
+  padding-top: 38px;
+}
+
+.trpHomeAppStrip {
+  font-family: 'Lustria', serif;
+  font-size: 16px;
+  color: @trpDarkerGrey;
+  padding-top: 10px;
+}
+
+.trpApps {
+  display: inline-block;
+  min-width: 960px;
+  padding-top: 28px;
+  padding-bottom: 28px;
+  text-align: center;
+}
+
+.trpApp {
+  display: inline-block;
+  min-width: 240px;
+  height: 208px;
+  vertical-align: top;
+  padding: 5px;
+  margin: 20px;
+}
+
+.trpAppText {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  font-weight: lighter;
+  color: @trpDarkGrey;
+}
+
+.trpHomeFooterStripContainer {
+  background-color: white;
+  width: 100%;
+  text-align: center;
+  margin-top: -4px;
+  padding-top: 38px;
+  padding-bottom: 38px;
+}
+
+.trpFooterStrip {
+  font-family: 'Lustria', serif;
+  font-size: 16px;
+  color: @trpDarkerGrey;
+  padding-top: 10px;
+}
+
 
 #trpHeaderWrap {
   position: fixed;
@@ -61,11 +226,11 @@ h1 {
 
 #trpHeaderContainer {
   height: 64px;
-  background-color: @col1;
+  background-color: @trpGreen;
 }
 
 #trpFiles {
-  background-color: @col2;
+  background-color: @trpRed;
 }
 
 .right {
@@ -139,7 +304,7 @@ h1 {
   padding: 65px 0 0px;
   padding-left: 235px;
   padding-right: 20px;
-  background-color: @col7;
+  background-color: @trpOffWhite;
   min-width: 650px;
 }
 
@@ -165,14 +330,14 @@ h1 {
   padding-right: 60px;
   text-decoration: none;
   border-top: thin solid white;
-  background-color: @col1;
+  background-color: @trpGreen;
   font-family: 'Lustria', serif;
   font-size: 18px;
   cursor: pointer;
 }
 
 .trpTroupeSelectorItem:hover{
-  background-color: @col1;
+  background-color: @trpGreen;
 }
 
 .trpTroupeSelectorItem a{
@@ -183,12 +348,12 @@ h1 {
 .trpTroupeSelectorAdd {
   .trpTroupeSelectorItem;
   background-color: white;
-  color: @col1;
+  color: @trpGreen;
 }
 
 .trpTroupeSelectorAdd a {
   text-decoration: none;
-  color: @col1;
+  color: @trpGreen;
 }
 
 #trpSelectorArrow {
@@ -218,14 +383,14 @@ h1 {
 }
 
 .trpUserMenuItem:hover{
-  background-color: @col1;
+  background-color: @trpGreen;
   cursor: pointer;
   text-decoration: none;
 }
 
 .trpUserMenuItem a{
   text-decoration: none;
-  color: @col10;
+  color: @trpDarkGrey;
 }
 
 .trpNavWrap {
@@ -264,7 +429,7 @@ h1 {
   a {
     font-family: 'Open Sans', sans-serif;
     font-size: 15px;
-    color: @col10;
+    color: @trpDarkGrey;
     text-decoration: none;
   }
 
@@ -280,7 +445,7 @@ h1 {
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
   border-radius: 50%;
-  background-color: @col1;
+  background-color: @trpGreen;
   font-family: 'Open Sans', sans-serif;
   font-size: 9px;
   color: white;
@@ -302,7 +467,7 @@ h1 {
   background-color: white;
   padding-left: 30px;
   height: 80px;
-  border-bottom: 1px solid @col8;
+  border-bottom: 1px solid @trpLightGrey;
 }
 
 .trpChatRow {
@@ -341,7 +506,7 @@ textarea, input { outline: none; }
   position:relative;
   padding:12px;
   margin-bottom: 12px;
-  border:1px solid @col8;
+  border:1px solid @trpLightGrey;
   color:#333;
   background:#fff;
   /* css3 */
@@ -400,7 +565,7 @@ textarea, input { outline: none; }
   bottom:auto;
   left:-5px; /* value = - border-left-width - border-right-width */
   border-width:15px 5px 15px 0;
-  border-color:transparent @col8;
+  border-color:transparent @trpLightGrey;
 }
 
 /* creates the smaller  triangle */
@@ -422,7 +587,7 @@ textarea, input { outline: none; }
     left:auto;
   right:-5px; /* value = - border-left-width - border-right-width */
   border-width:15px 0 15px 5px;
-  border-color:transparent @col8;
+  border-color:transparent @trpLightGrey;
 }
 
 /* creates the smaller  triangle */
@@ -462,7 +627,7 @@ textarea, input { outline: none; }
 }
 
 .trpFileThumbnail {
-  border: 1px solid @col8;
+  border: 1px solid @trpLightGrey;
   float: right;
   width: 180px;
   height: 180px;
@@ -478,7 +643,7 @@ textarea, input { outline: none; }
   float: left;
   height: 20px;
   font-size: 12px;
-  color: @col10;
+  color: @trpDarkGrey;
   font-family: 'Open Sans', sans-serif;
   width: 150px;
   overflow: hidden;
@@ -490,7 +655,7 @@ textarea, input { outline: none; }
   margin-top: 5px;
   padding: 5px 10px 5px 10px;
   float: right;
-  border-left: 1px solid @col8;
+  border-left: 1px solid @trpLightGrey;
 }
 
 .trpFileActionMenu {
@@ -516,35 +681,35 @@ textarea, input { outline: none; }
 .trpFileActionMenuBottom {
   display: none;
   width: 96px;
-  background: @col7;
+  background: @trpOffWhite;
 }
 
 .trpFileActionMenuItem {
   font-size: 12px;
-  color: @col10;
+  color: @trpDarkGrey;
   font-family: 'Open Sans', sans-serif;
   padding: 5px 0px 5px 10px;
 }
 
 .trpFileActionMenuItem a {
   text-decoration: none;
-  color: @col10;
+  color: @trpDarkGrey;
 }
 
 .trpFileActionMenuItem a:hover {
   text-decoration: none;
-  color: @col1;
+  color: @trpGreen;
 }
 
 .trpFileActionMenuItem:hover {
-  color: @col1;
+  color: @trpGreen;
   background-color: white;
 }
 
 .trpFileUploadContainer {
   padding-top: 10px;
   padding-bottom: 10px;
-  border-bottom: 1px solid @col8;
+  border-bottom: 1px solid @trpLightGrey;
   margin-left: 20px;
   margin-bottom: 20px;
 }
@@ -558,7 +723,7 @@ textarea, input { outline: none; }
   z-index:2;
   font-family: 'Lustria', serif;
   font-size: 16px;
-  color: @col10;
+  color: @trpDarkGrey;
   margin-top: 15px;
 }
 
@@ -581,7 +746,7 @@ textarea, input { outline: none; }
 }
 
 .trpMailRowContainer {
-  border-top: 1px solid @col8;
+  border-top: 1px solid @trpLightGrey;
   padding-top: 20px;
   padding-bottom: 20px;
   margin-left: 20px;
@@ -590,7 +755,7 @@ textarea, input { outline: none; }
 
 
 .trpMailRowContainer:hover {
-  background-color: @col8;
+  background-color: @trpLightGrey;
   cursor: pointer;
 }
 
@@ -623,7 +788,7 @@ textarea, input { outline: none; }
 .trpMailPreview {
   font-family: 'Open Sans', sans-serif;
   font-size: 13px;
-  color: @col10;
+  color: @trpDarkGrey;
   height: 36px;
   overflow: hidden;
 }
@@ -637,7 +802,7 @@ textarea, input { outline: none; }
   float: left;
   font-family: 'Lustria', serif;
   font-size: 14px;
-  color: @col10;
+  color: @trpDarkGrey;
 }
 
 .trpMailLeft {
@@ -656,8 +821,8 @@ textarea, input { outline: none; }
   padding-bottom: 20px;
   padding-top: 15px;
   margin-left: 20px;
-  color: @col10;
-  border-bottom: 1px solid @col8;
+  color: @trpDarkGrey;
+  border-bottom: 1px solid @trpLightGrey;
 }
 
 .trpPeopleHeader {
@@ -697,11 +862,11 @@ textarea, input { outline: none; }
 .trpPersonRemove {
   font-family: 'Lustria', serif;
   font-size: 14px;
-  color: @col10;
+  color: @trpDarkGrey;
 }
 
 .trpPersonRemove:hover {
-  color: @col1;
+  color: @trpGreen;
   cursor: pointer;
 }
 
@@ -709,9 +874,14 @@ textarea, input { outline: none; }
   margin-right: 20px;
 }
 
+.trpPadV14 {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
 .trpButton {
-  color: @col10;
-  border: 1px solid @col8;
+  color: @trpDarkGrey;
+  border: 1px solid @trpLightGrey;
   font-family: 'Open Sans', sans-serif;
   font-size: 12px;
   padding: 5px 10px 5px 10px;
@@ -720,6 +890,20 @@ textarea, input { outline: none; }
   -moz-border-radius:3px;
   border-radius:3px;
   background-color: white;
+}
+
+.trpButtonBig {
+  -webkit-border-radius:3px;
+  -moz-border-radius:3px;
+  border-radius:3px;
+  padding: 14px 2px 14px 2px;
+  text-align: center;
+  min-width: 76px;
+}
+
+.trpBtnWhite {
+  background-color: white;
+  color: @trpPurple;
 }
 
 .trpDisplayPicture{
@@ -741,25 +925,30 @@ textarea, input { outline: none; }
 .trpTabItem {
   font-family: 'Open Sans', sans-serif;
   font-size: 14px;
-  color: @col10;
+  color: @trpDarkGrey;
 }
 
 .trpTabItem.active {
-  color: @col1;
+  color: @trpGreen;
 }
 
 .nav-tabs > .active > a, {
-  color: @col1;
+  color: @trpGreen;
 }
 
 .trpTabActive {
-  border-top: 1px solid @col8;
-  border-left: 1px solid @col8;
-  border-right: 1px solid @col8;
-  border-bottom: 1px solid @col7;
-  color: @col1;
+  border-top: 1px solid @trpLightGrey;
+  border-left: 1px solid @trpLightGrey;
+  border-right: 1px solid @trpLightGrey;
+  border-bottom: 1px solid @trpOffWhite;
+  color: @trpGreen;
   padding-bottom: 20px;
   cursor: default;
+}
+
+.trpLine {
+  vertical-align: middle;
+  padding: 0 20px 0 20px;
 }
 
 /*Bootstrap Customisations*/
