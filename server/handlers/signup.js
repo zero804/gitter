@@ -34,6 +34,7 @@ module.exports = {
         ),
 
         function(req, res) {
+          console.log("request", req.headers);
           if (!req.form.isValid) {
             // TODO: Handle errors
             console.log(req.form.errors);
@@ -46,12 +47,20 @@ module.exports = {
             email: req.form.email
           }, function(err, id) {
             if(err) {
-              res.relativeRedirect("/");
+              if(req.accepts('application/json')) {
+                res.send(500);
+              } else {
+                res.relativeRedirect("/");
+              }
               return;
             }
 
             req.session.newTroupeId = id;
-            res.relativeRedirect("/confirm");
+            if(req.accepts('application/json')) {
+              res.send({ success: true });
+            } else {
+              res.relativeRedirect("/confirm");
+            }
           });
 
         }
@@ -73,17 +82,21 @@ module.exports = {
         }
       );
 
-      app.get('/resendconfirmation/:id',
+      app.post('/resendconfirmation',
         function(req, res) {
           signupService.resendConfirmation({
-            troupeId: req.params.id
+            troupeId: req.session.newTroupeId
           }, function(err, id) {
             /* TODO: better error handling */
             if(err) return res.send(500);
 
+            if(req.accepts('application/json')) {
+              res.send({ success: true });
+            } else {
+              res.relativeRedirect("/confirm");
+            }
+
             /* TODO: a proper confirmation screen that the email has been resent */
-            req.session.newTroupeId = req.params.id;
-            res.relativeRedirect("/confirm");
           });
 
         }
