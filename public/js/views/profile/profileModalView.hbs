@@ -1,10 +1,23 @@
 <div class="trpModalProfile">
+    <form action="/updateprofile" method="post">
     <div class="trpModalTitle">A few details and you're done</div>
 
     <div class="trpModalProfilePic"><img src="images/2/avatar-default-round.png"></div>
+    <div class="trpModalSubtext"><a href="">Change picture</a></div>
     <div class="trpProfileForm">
       <input type="text" id="displayName" class="trpInput" name="displayName" value="{{displayName}}" placeholder="Click here and type your name"><br>
       <input type="password" id="password" class="trpInput" name="password" value="{{password}}" placeholder="Then choose a password">
     </div>
-    <div class="trpModalButton trpButtonBig trpBtnGreen sendInvites">Save</div>
+    <input type="submit" class="trpButtonBig trpBtnGreen getstarted" name="submit" value="Save">
+    </form>
  </div>
+
+ <!--
+
+<form target="uploadFrame" method="post" enctype="multipart/form-data" action="/avatar">
+  <input type="file" name="files">
+</form>
+<a href="#" class="btn btn-primary button-save-picture">Save picture</a>
+ <iframe src="" name="uploadFrame" id="uploadFrame" style="display:none"></iframe>
+
+
