@@ -83,9 +83,18 @@ define([
 
   TroupeViews.Modal =   TroupeViews.Base.extend({
     template: modalTemplate,
-
+    className: "modal",
     initialize: function(options) {
-      this.view = options.view;
+      this.options = {
+        keyboard: true,
+        backdrop: true,
+        fade: true,
+        autoRemove: true
+      };
+      _.bindAll(this, 'hide');
+      _.extend(this.options, options);
+      this.view = this.options.view;
+      this.view.dialog = this;
     },
 
     getRenderData: function() {
@@ -95,17 +104,30 @@ define([
     },
 
     afterRender: function() {
-      // attach the view here
+      this.$el.hide();
+
       var modalBody = this.$el.find('.modal-body');
       modalBody.append(this.view.render().el);
+      this.$el.find('.close').on('click', this.hide);
+    },
+
+    onClose: function() {
+      this.view.dialog = null;
+      this.$el.find('.close').off('click');
+    },
+
+    prepare: function() {
+      if(!this.rendered) {
+        this.render();
+        this.rendered = true;
+      }
     },
 
     show: function() {
       var that = this;
       if (this.isShown) return;
 
-      this.render();
-      this.$el.hide();
+      this.prepare();
 
       $('body').addClass('modal-open');
 
@@ -114,7 +136,7 @@ define([
 
       this.escape();
       this.backdrop(function () {
-        var transition = $.support.transition && that.$el.hasClass('fade');
+        var transition = $.support.transition && that.options.fade;
 
         if(!that.$el.parent().length) {
           that.$el.appendTo(document.body); //don't move modals dom position
@@ -138,31 +160,70 @@ define([
       });
     },
 
+    hide: function ( e ) {
+      if(e) e.preventDefault();
+
+      if (!this.isShown) return;
+
+      var that = this;
+      this.isShown = false;
+
+      $('body').removeClass('modal-open');
+
+      this.escape();
+
+      this.$el
+        .trigger('hide')
+        .removeClass('in');
+
+      if($.support.transition && this.options.fade) {
+        this.hideWithTransition(this);
+      } else {
+        this.hideModal();
+      }
+    },
+
+    transitionTo: function(newDialog) {
+      newDialog.options.backdrop = false;
+      var backdrop = this.$backdrop;
+      this.$backdrop = null;
+      this.hide();
+      backdrop.modal = newDialog;
+      newDialog.show();
+      newDialog.$backdrop = backdrop;
+
+    },
+
     /* Modal private methods */
     hideWithTransition: function() {
       var that = this;
       var timeout = setTimeout(function () {
             that.$el.off($.support.transition.end);
-            that.hideModal(that);
+            that.hideModal();
           }, 500);
 
       this.$el.one($.support.transition.end, function() {
         clearTimeout(timeout);
-        that.hideModal(that);
+        that.hideModal();
       });
     },
 
     hideModal: function () {
+      console.log("hideModal");
       this.$el
         .hide()
         .trigger('hidden');
 
-      this.backdrop(this);
+      this.backdrop();
+
+      if(this.options.autoRemove) {
+        this.close();
+      }
     },
 
     backdrop: function( callback ) {
       var that = this;
-      var animate = this.$el.hasClass('fade') ? 'fade' : '';
+      var animate = this.options.fade ? 'fade' : '';
 
       if (this.isShown && this.options.backdrop) {
         var doAnimate = $.support.transition && animate;
@@ -171,8 +232,12 @@ define([
           .appendTo(document.body);
 
         if (this.options.backdrop != 'static') {
-          this.$backdrop.click($.proxy(this.hide, this));
+          var bd = this.$backdrop;
+          this.$backdrop.click(function() {
+            bd.modal.hide();
+          });
         }
+        this.$backdrop.modal = this;
 
         if (doAnimate) { this.$backdrop[0].offsetWidth; } // force reflow
 
@@ -187,10 +252,10 @@ define([
       } else if (!this.isShown && this.$backdrop) {
         this.$backdrop.removeClass('in');
 
-        if($.support.transition && this.$el.hasClass('fade')) {
+        if($.support.transition && this.options.fade) {
           this.$backdrop.one($.support.transition.end, $.proxy(removeBackdrop, this));
         } else {
-          this.removeBackdrop(this);
+          this.removeBackdrop();
         }
 
       } else if (callback) {
@@ -206,11 +271,11 @@ define([
     escape: function () {
       var that = this;
       if (this.isShown && this.options.keyboard) {
-        $(document).on('keyup.dismiss.modal', function ( e ) {
+        $(document).on('keyup', function ( e ) {
           if(e.which == 27) that.hide();
         });
       } else if (!this.isShown) {
-        $(document).off('keyup.dismiss.modal');
+        $(document).off('keyup');
       }
     }
   });

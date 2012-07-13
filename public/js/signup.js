@@ -19,8 +19,10 @@ require(
     'jquery',
     'views/base',
     'views/signup/signupModalView',
+    'views/signup/signupModalConfirmView',
+
     'jquery_validate' ],
-    function($, TroupeViews, SignupModalView) {
+    function($, TroupeViews, SignupModalView, SignupModalConfirmView) {
       var loginFormVisible = false;
 
       var validationErrors = {};
@@ -33,7 +35,17 @@ require(
       }
 
       $('.button-signup').on('click', function() {
-        new TroupeViews.Modal({ view: new SignupModalView() }).show();
+        var view = new SignupModalView();
+        var modal = new TroupeViews.Modal({ view: view });
+        view.on('signup.complete', function() {
+          window.alert("SIGNUP COMPLETE");
+
+          modal.off('signup.complete');
+          modal.transitionTo(new TroupeViews.Modal({ view: new SignupModalConfirmView() }));
+        });
+
+        modal.show();
+
         return false;
       });
 
