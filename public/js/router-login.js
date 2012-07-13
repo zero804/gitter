@@ -29,7 +29,7 @@ define([
 
       if(window.troupeContext.profileNotCompleted) {
         view = new ProfileModalView();
-        modal = new TroupeViews.Modal({ view: view });
+        modal = new TroupeViews.Modal({ view: view, disableClose: true  });
         modal.show();
       }
     }

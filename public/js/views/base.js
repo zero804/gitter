@@ -8,6 +8,16 @@ define([
   /*global require:true console:true setTimeout:true*/
   "use strict";
 
+  /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
+  Backbone.View.prototype.close = function () {
+    console.log('Closing view ' + this);
+    if (this.beforeClose) {
+      this.beforeClose();
+    }
+    this.remove();
+    this.unbind();
+  };
+
   var TroupeViews = {};
 
   TroupeViews.Base = Backbone.View.extend({
@@ -89,7 +99,8 @@ define([
         keyboard: true,
         backdrop: true,
         fade: true,
-        autoRemove: true
+        autoRemove: true,
+        disableClose: false
       };
       _.bindAll(this, 'hide');
       _.extend(this.options, options);
@@ -99,7 +110,8 @@ define([
 
     getRenderData: function() {
       return {
-        title: "Modal"
+        title: "Modal",
+        disableClose: this.options.disableClose 
       };
     },
 
@@ -231,7 +243,7 @@ define([
         this.$backdrop = $('<div class="modal-backdrop ' + animate + '" />')
           .appendTo(document.body);
 
-        if (this.options.backdrop != 'static') {
+        if (this.options.backdrop != 'static' && !this.options.disableClose) {
           var bd = this.$backdrop;
           this.$backdrop.click(function() {
             bd.modal.hide();
@@ -269,6 +281,7 @@ define([
     },
 
     escape: function () {
+      if(this.options.disableClose) return;
       var that = this;
       if (this.isShown && this.options.keyboard) {
         $(document).on('keyup', function ( e ) {

@@ -49,16 +49,18 @@ module.exports = {
             page = 'app';
           }
 
-          var startScript;
+          var startScript, troupeName;
           if(req.user && !profileNotCompleted && troupeData) {
             startScript = "app";
+            troupeName = troupe.name;
           } else {
             startScript = "app-login";
+            troupeName = "Welcome";
           }
 
           res.render(page, {
             startScript: startScript,
-            troupe: troupe,
+            troupeName: troupeName,
             troupeContext: JSON.stringify(troupeContext)
           });
 
