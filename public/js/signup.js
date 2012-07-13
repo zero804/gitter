@@ -20,8 +20,9 @@ require(
     'views/base',
     'views/signup/signupModalView',
     'views/signup/signupModalConfirmView',
+    'views/login/loginModalView',
     'jquery_validate' ],
-    function($, TroupeViews, SignupModalView, SignupModalConfirmView) {
+    function($, TroupeViews, SignupModalView, SignupModalConfirmView, LoginModalView) {
       var loginFormVisible = false;
 
       var validationErrors = {};
@@ -47,31 +48,21 @@ require(
         return false;
       });
 
-      $('.button-existing-users-login').popover({
-        placement: 'bottom',
-        trigger: 'manual',
-        title: 'Login',
-        width: 300,
-        content: function() {
-          return $('#loginFormContent').html();
-        }
-      });
 
       $('.button-existing-users-login').on('click', function() {
-        if(loginFormVisible) {
-          $('.button-existing-users-login').popover('hide');
-        } else {
-          $('.button-existing-users-login').popover('show');
+        var view = new LoginModalView();
+        var modal = new TroupeViews.Modal({ view: view });
+        view.on('login.complete', function(data) {
+          modal.off('login.complete');
 
-          $('.popover .button-login-cancel').on('click', function() {
-              $('.button-existing-users-login').popover('hide');
-              loginFormVisible = false;
-              return false;
-          });
+          window.location.href="/" + data.defaultTroupe.uri;
+        });
 
-        }
-        loginFormVisible = !loginFormVisible;
+        modal.show();
+
+        return false;
       });
+
 
 
       $('#signupForm .validateable').each(attachTooltipHandlerToItem);
