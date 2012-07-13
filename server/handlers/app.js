@@ -55,7 +55,11 @@ module.exports = {
             troupeName = troupe.name;
           } else {
             startScript = "app-login";
-            troupeName = "Welcome";
+            if(profileNotCompleted) {
+              troupeName = troupe.name;
+            } else {
+              troupeName = "Welcome";
+            }
           }
 
           res.render(page, {
