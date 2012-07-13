@@ -57,7 +57,7 @@ module.exports = {
 
             req.session.newTroupeId = id;
             if(req.accepts('application/json')) {
-              res.send({ success: true });
+              res.send({ success: true, troupeName: req.form.troupeName, email: req.form.email });
             } else {
               res.relativeRedirect("/confirm");
             }

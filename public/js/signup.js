@@ -37,11 +37,10 @@ require(
       $('.button-signup').on('click', function() {
         var view = new SignupModalView();
         var modal = new TroupeViews.Modal({ view: view });
-        view.on('signup.complete', function() {
-          window.alert("SIGNUP COMPLETE");
-
+        view.on('signup.complete', function(data) {
           modal.off('signup.complete');
-          modal.transitionTo(new TroupeViews.Modal({ view: new SignupModalConfirmView() }));
+
+          modal.transitionTo(new TroupeViews.Modal({ view: new SignupModalConfirmView({ data: data }) }));
         });
 
         modal.show();

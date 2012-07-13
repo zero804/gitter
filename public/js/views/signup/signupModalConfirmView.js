@@ -9,11 +9,17 @@ define([
     template: template,
 
     initialize: function(options) {
+      if(!options) options = {};
+      this.data = options.data;
       _.bindAll(this, 'onResendLinkClicked');
     },
 
     events: {
       "click .button-resend": "onResendLinkClicked"
+    },
+
+    getRenderData: function() {
+      return this.data;
     },
 
     onResendLinkClicked: function(e) {
