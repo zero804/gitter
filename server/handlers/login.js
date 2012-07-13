@@ -8,6 +8,7 @@ var nconf = require('../utils/config').configure(),
     troupeService = require("../services/troupe-service"),
     rememberMe = require('../utils/rememberme-middleware'),
     middleware = require('./middleware');
+var userService = require('../services/user-service');
 
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
@@ -23,10 +24,16 @@ module.exports = {
         function(req, res) {
           function sendAffirmativeResponse() {
             if(req.accepts('application/json')) {
-              res.send({
-                failed: false,
-                user: req.user
+              userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
+                if (err) troupe = null;
+                res.send({
+                  failed: false,
+                  user: req.user, 
+                  defaultTroupe: troupe
+                });
               });
+
+              
             } else {
               res.relativeRedirect('/select-troupe');
             }
