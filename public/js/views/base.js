@@ -97,7 +97,7 @@ define([
     afterRender: function() {
       // attach the view here
       var modalBody = this.$el.find('.modal-body');
-      modalBody.replaceWith(this.view.render().el);
+      modalBody.append(this.view.render().el);
     },
 
     show: function() {
