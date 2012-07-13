@@ -9,12 +9,11 @@ require([
   'underscore',
   'backbone',
   'router',
-  'router-login',
   'bootstrap',
   'dropdown',
   'jqueryui',
   'template/helpers/all'
-], function($, _, Backbone, AppRouter, AppRouterLogin, Bootstrap, Dropdown, jqUI) {
+], function($, _, Backbone, AppRouter, Bootstrap, Dropdown, jqUI) {
   /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
   Backbone.View.prototype.close = function () {
     console.log('Closing view ' + this);
@@ -70,16 +69,18 @@ require([
 
 
   });
-  var app = new AppView();
 
-
-  if(!window.troupeContext.user) {
-    window.troupeApp = new AppRouterLogin();
-    troupeApp = window.troupeApp;
-    Backbone.history.start();
+  if(!window.troupeContext.user || window.troupeContext.profileNotCompleted) {
+    require('router-login', function(AppRouterLogin) {
+      window.troupeApp = new AppRouterLogin();
+      troupeApp = window.troupeApp;
+      Backbone.history.start();
+    });
 
     return;
   }
+
+  var app = new AppView();
 
   window.troupeApp = new AppRouter();
   troupeApp = window.troupeApp;

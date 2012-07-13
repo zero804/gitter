@@ -18,7 +18,7 @@ var UserSchema = new Schema({
   displayName: { type: String }, 
   email: { type: String },
   confirmationCode: {type: String },
-  status: { type: String, "enum": ['UNCONFIRMED', 'ACTIVE'], "default": 'UNCONFIRMED'},
+  status: { type: String, "enum": ['UNCONFIRMED', 'PROFILE_NOT_COMPLETED', 'ACTIVE'], "default": 'UNCONFIRMED'},
   passwordHash: { type: String },   
   avatarUrlSmall: String,
   avatarUrlMedium: String
