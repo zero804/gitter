@@ -28,7 +28,7 @@ define([
         data: form.serialize(),
         type: "POST",
         success: function(data) {
-          that.trigger('signup.complete');
+          that.trigger('signup.complete', data);
         }
       });
     }
