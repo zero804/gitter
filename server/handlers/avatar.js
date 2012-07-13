@@ -21,12 +21,12 @@ function displayAvatarFor(user, res) {
   var GridStore = mongoose.mongo.GridStore;
   var avatarFile = "avatar-" + user.id;
   GridStore.exist(db, avatarFile, function(err, exists) {
-    if(err || !exists) return redirectToGravatar(user, res);
+    if(err || !exists) return redirectToDefault(user, res);
 
     var gs = new GridStore(db, avatarFile, "r");
     gs.open(function(err, gs) {
       if(err) {
-        redirectToGravatar(user, res);
+        redirectToDefault(user, res);
         return;
       }
 
