@@ -8,9 +8,8 @@ var middleware = require('./middleware'),
     mongoose = require("mongoose"),
     userService = require('../services/user-service.js');
 
-function redirectToGravatar(user, res) {
-  var hash = sechash.basicHash('md5', user.email.toLowerCase());
-  res.redirect("https://secure.gravatar.com/avatar/" + hash + "?size=48&d=mm");
+function redirectToDefault(user, res) {
+  res.redirect("/images/2/avatar-default.png");
 }
 
 function displayAvatarFor(user, res) {
