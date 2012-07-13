@@ -9,7 +9,7 @@
 // Our colour palette
 @trpGreen: #1dce73; // lumo green 
 @trpRed: #d54f68; // pinky red
-@trpPurple: #4a4257; // dark purple
+@trpPurple: #494259; // dark purple
 @trpGrey: #c0c9c8; // mid grey
 @trpCyan: #1dd0cd; // turquoise
 @trpYellow: #fcb316; // moutard
@@ -149,7 +149,7 @@ h1 {
 .trpFeatureHead {
   font-family: 'Lustria', serif;
   font-size: 18px;
-  padding-top: 0px;
+  padding-top: 16px;
   padding-bottom: 6px;
   color: @trpDarkerGrey;
 }
@@ -900,11 +900,18 @@ textarea, input { outline: none; }
   padding: 14px 2px 14px 2px;
   text-align: center;
   min-width: 76px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
 }
 
 .trpBtnWhite {
   background-color: white;
   color: @trpPurple;
+}
+
+.trpBtnGreen {
+  background-color: @trpGreen;
+  color: white;
 }
 
 .trpDisplayPicture{
@@ -956,14 +963,67 @@ textarea, input { outline: none; }
   cursor: pointer;
 }
 
+.trpModalHeader {
+  padding: 4px 16px 16px 16px;
+  display: inline-block;
+  width: 95%;
+}
+
+.trpModalLogo {
+  float: left;
+}
+
+.trpModalMenu > a {
+  float: right;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  color: @trpDarkGrey;
+  padding-top: 10px;
+}
+
+.trpModalTitle {
+  font-family: 'Lustria', serif;
+  font-size: 18px;
+  color: @trpDarkGrey;
+  padding-bottom: 12px;
+}
+
+.trpModalSubtext {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  color: @trpDarkGrey;
+  padding: 8px 0px 12px 0px;
+}
+
+.trpModalButton {
+  display: inline-block;
+}
+
+.trpInput {
+  border: 1px solid @trpGrey;
+  padding: 10px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  color: @trpDarkGrey;
+  .border-radius(0px);
+}
 /*Bootstrap Customisations*/
 
-.modals l {
+.modal {
   .border-radius(0px);
+}
+
+.modal-header {
+  .border-radius(0px);
+  padding: 5px 10px;
 }
 
 .modal-footer {
   .border-radius(0px);
+}
+
+.modal-body {
+  padding: 24px;
 }
 
 .nav-tabs {
