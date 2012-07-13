@@ -15,8 +15,12 @@ require.config(window.require_config);
 // Anyhoo, it's a bit of a mess at the moment, but at least it won't submit with bad shit in it.
 
 require(
-    [ 'jquery', 'jquery_validate' ],
-    function($, v) {
+    [
+    'jquery',
+    'views/base',
+    'views/signup/signupModalView',
+    'jquery_validate' ],
+    function($, TroupeViews, SignupModalView) {
       var loginFormVisible = false;
 
       var validationErrors = {};
@@ -27,6 +31,12 @@ require(
             return v ? v:"";
           }});
       }
+
+      $('.button-signup').on('click', function() {
+        new TroupeViews.Modal({ view: new SignupModalView() }).show();
+        return false;
+      });
+
       $('.button-existing-users-login').popover({
         placement: 'bottom',
         trigger: 'manual',
