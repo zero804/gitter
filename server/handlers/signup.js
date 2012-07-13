@@ -75,9 +75,9 @@ module.exports = {
       app.get('/confirm/:confirmationCode',
         passport.authenticate('confirm'),
         function(req, res, next){
-          signupService.confirm(req.user, function(err, user) {
+          signupService.confirm(req.user, function(err, user, troupe) {
             if (err) return next(err);
-            res.relativeRedirect('/profile');
+            res.relativeRedirect('/' + troupe.uri);
           });
         }
       );

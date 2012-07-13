@@ -3,6 +3,7 @@
 "use strict";
 
 var troupeService = require("../services/troupe-service");
+var userService = require("../services/user-service");
 
 module.exports = {
     install: function(app) {
@@ -13,20 +14,32 @@ module.exports = {
           if(err) return next(err);
           if(!troupe) return next("Troupe: " + appUri + " not found.");
 
+          var profileNotCompleted;
+
+          var troupeData = {
+            "uri": troupe.uri,
+            "id": troupe.id,
+            "name": troupe.name
+          };
+          var accessDenied;
+
           if(req.user) {
             if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
-              res.relativeRedirect("/" + appUri + "/accessdenied");
-              return;
+              accessDenied = true;
+              troupeData = null;
             }
+
+            profileNotCompleted = req.user.status == 'PROFILE_NOT_COMPLETED';
+
+          } else {
+            troupeData = null;
           }
 
           var troupeContext = {
               user: req.user ? req.user.narrow() : null,
-              troupe: {
-                "uri": troupe.uri,
-                "id": troupe.id,
-                "name": troupe.name
-              }
+              troupe: troupeData,
+              profileNotCompleted: profileNotCompleted,
+              accessDenied: accessDenied
           };
 
           var page;
@@ -36,7 +49,15 @@ module.exports = {
             page = 'app';
           }
 
+          var startScript;
+          if(req.user && !profileNotCompleted && troupeData) {
+            startScript = "app";
+          } else {
+            startScript = "app-login";
+          }
+
           res.render(page, {
+            startScript: startScript,
             troupe: troupe,
             troupeContext: JSON.stringify(troupeContext)
           });

@@ -20,7 +20,6 @@ require(
     'views/base',
     'views/signup/signupModalView',
     'views/signup/signupModalConfirmView',
-
     'jquery_validate' ],
     function($, TroupeViews, SignupModalView, SignupModalConfirmView) {
       var loginFormVisible = false;

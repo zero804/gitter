@@ -3,19 +3,36 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'views/login/login'
-], function($, _, Backbone, LoginView){
-  var AppRouterLogin = Backbone.Router.extend({
+  'views/base',
+  'views/login/loginModalView',
+  'views/profile/profileModalView'
+], function($, _, Backbone, TroupeViews, LoginModalView, ProfileModalView) {
+  return Backbone.Router.extend({
     routes: {
       '*actions': 'defaultAction'
     },
 
-    defaultAction: function(actions){
-      var loginView = new LoginView({ router: this });
-      loginView.show();
+    defaultAction: function(actions) {
+      $('#primary-view').html('');
+      var view, modal;
+      if(!window.troupeContext.user) {
+        view = new LoginModalView();
+        modal = new TroupeViews.Modal({ view: view, disableClose: true });
+        view.on('login.complete', function(data) {
+          modal.off('login.complete');
+
+          window.location.href="/" + data.defaultTroupe.uri;
+        });
+
+        modal.show();
+      }
+
+      if(window.troupeContext.profileNotCompleted) {
+        view = new ProfileModalView();
+        modal = new TroupeViews.Modal({ view: view });
+        modal.show();
+      }
     }
-    
+
   });
-  
-  return AppRouterLogin;
 });

@@ -128,10 +128,15 @@ module.exports = {
     if(!user) return callbackFunction(new Error("No user found"));
 
     user.confirmationCode = null;
-    user.status = 'ACTIVE';
+    user.status = 'PROFILE_NOT_COMPLETED';
 
     user.save(function(err) {
-      callbackFunction(err, user);
+      troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
+        if(err) return callbackFunction(new Error("Error finding troupes for user"));
+        if(troupes.length < 1) return callbackFunction(new Error("Could not find troupe for user"));
+
+        callbackFunction(err, user, troupes[0]);
+      });
     });
   },
 
@@ -149,7 +154,7 @@ module.exports = {
       userService.findById(troupe.users[0], function(err, user) {
         console.dir(err);
         if(err || !user) return callback("Invalid state");
-        if(user.status == 'ACTIVE') {
+        if(user.status != 'UNCONFIRMED') {
           sendConfirmationForExistingUser(user, troupe);
         } else {
           sendConfirmationForNewUser(user, troupe);
