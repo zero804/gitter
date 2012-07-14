@@ -11,11 +11,21 @@ define([
     template: template,
 
     initialize: function(options) {
-      _.bindAll(this, 'onFormSubmit');
+      this.existingUser = options.existingUser;
+      _.bindAll(this, 'onFormSubmit', 'onPasswordChange');
+    },
+
+    getRenderData: function() {
+      return {
+        existingUser: this.existingUser,
+        displayName: this.existingUser ? window.troupeContext.user.displayName : ""
+      };
     },
 
     events: {
-      "submit form#updateprofileform": "onFormSubmit"
+      "submit form#updateprofileform": "onFormSubmit",
+      "keyup #password": "onPasswordChange",
+      "change #password": "onPasswordChange"
     },
 
     reloadAvatar: function() {
@@ -44,6 +54,20 @@ define([
 
     },
 
+    onPasswordChange: function(e) {
+      if(!this.existingUser) return;
+      var pw = this.$el.find('#password');
+      if(!pw.val()) return;
+
+      if(!this.oldPasswordVisible) {
+        var field = this.$el.find('#oldPassword');
+        field.show();
+        field.removeAttr('value');
+        field.attr('placeholder', "Type your old password here");
+        this.oldPasswordVisible = true;
+      }
+    },
+
     onFormSubmit: function(e) {
       if(e) e.preventDefault();
 
@@ -51,13 +75,20 @@ define([
       var that = this;
 
       $.ajax({
-        url: "/updateprofile",
+        url: "/profile",
         contentType: "application/x-www-form-urlencoded",
         dataType: "json",
         data: form.serialize(),
         type: "POST",
         success: function(data) {
-          that.trigger('profile.complete', data);
+          if(data.success) {
+            window.troupeContext.user.displayName = data.displayName;
+            that.trigger('profile.complete', data);
+          } else {
+            if(data.authFailure) {
+              window.alert("You old password is incorrect");
+            }
+          }
         }
       });
     }
