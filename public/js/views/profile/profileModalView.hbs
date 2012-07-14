@@ -1,12 +1,28 @@
 <div class="trpModalProfile">
-  <div class="trpModalTitle">A few details and you're done</div>
+
+  <div class="trpModalTitle">
+    {{#if existingUser}}
+       TODO(MB): CHANGE THE TITLE HERE
+    {{else}}
+      A few details and you're done
+    {{/if}}
+  </div>
+
 
   <div class="trpModalProfilePic"><img class="image-avatar trpDisplayPicture" src="/avatar"></div>
   <div class="trpModalSubtext"><a href="#" class="button-choose-avatar">Change picture</a></div>
   <form action="/updateprofile" method="post" id="updateprofileform">
     <div class="trpProfileForm">
       <input type="text" id="displayName" class="trpInput" name="displayName" value="{{displayName}}" placeholder="Click here and type your name"><br>
-      <input type="password" id="password" class="trpInput" name="password" value="{{password}}" placeholder="Then choose a password">
+      {{#if existingUser}}
+        <input type="password" id="password" class="trpInput" name="password" value="" placeholder="Enter a new password here if you would like to change it"><br>
+      {{else}}
+        <input type="password" id="password" class="trpInput" name="password" value="" placeholder="Then choose a password"><br>
+      {{/if}}
+
+      {{#existingUser}}
+      <input type="password" id="oldPassword" class="trpInput hide" name="oldPassword"><br>
+      {{/existingUser}}
     </div>
     <input type="submit" class="trpButtonBig trpBtnGreen getstarted" name="submit" value="Save">
   </form>

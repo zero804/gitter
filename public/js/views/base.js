@@ -265,7 +265,7 @@ define([
         this.$backdrop.removeClass('in');
 
         if($.support.transition && this.options.fade) {
-          this.$backdrop.one($.support.transition.end, $.proxy(removeBackdrop, this));
+          this.$backdrop.one($.support.transition.end, $.proxy(this.removeBackdrop, this));
         } else {
           this.removeBackdrop();
         }

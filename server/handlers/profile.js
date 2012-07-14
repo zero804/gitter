@@ -31,13 +31,14 @@ module.exports = {
       });
 
       app.post(
-          '/updateprofile',
+          '/profile',
           middleware.ensureLoggedIn,
           // Form filter and validation middleware
           form(
             filter("displayName").trim(),
-            validate("displayName").required().is(/^[a-zA-Z \-\']+$/),
-            filter("password").trim()
+            validate("displayName").required().is(/^[a-zA-Z\. \-\']+$/),
+            filter("password").trim(),
+            filter("oldPassword").trim()
           ),
 
           // Express request-handler now receives filtered and validated data
@@ -61,18 +62,26 @@ module.exports = {
               return;
             }
 
-            signupService.updateProfile({
-              user: req.user,
+            userService.updateProfile({
+              userId: req.user.id,
               displayName: req.form.displayName,
-              password: req.form.password
+              password: req.form.password,
+              oldPassword: req.form.oldPassword
             }, function(err) {
               if(err) {
+                if(err.authFailure && req.accepts("application/json")) {
+                  res.send({ authFailure: true });
+                  return;
+                }
                 winston.error("Unable to update profile", err);
                 return next(err);
               }
 
               if(req.accepts("application/json")) {
-                res.send({ success: true });
+                res.send({ 
+                  success: true,
+                  displayName: req.form.displayName
+                });
               } else {
                 userService.findDefaultTroupeForUser(req.user.id, function(err, troupe) {
                   if(err) return next(err);

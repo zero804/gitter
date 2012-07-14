@@ -164,22 +164,5 @@ module.exports = {
       });
 
     });
-  },
-
-  updateProfile: function(options, callback) {
-    var user = options.user;
-
-    if(user.passwordHash) return callback("User already has a password set");
-
-    sechash.strongHash('sha512', options.password, function(err, hash3) {
-      if(err) return callback(err);
-
-      user.passwordHash = hash3;
-      user.displayName = options.displayName;
-      user.status = 'ACTIVE';
-      user.save(function(err) {
-        callback(err);
-      });
-    });
   }
 };
