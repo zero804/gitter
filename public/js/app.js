@@ -8,12 +8,13 @@ require([
   'jquery',
   'underscore',
   'backbone',
+  'views/base',
   'router',
   'bootstrap',
   'dropdown',
   'jqueryui',
   'template/helpers/all'
-], function($, _, Backbone, AppRouter, Bootstrap, Dropdown, jqUI) {
+], function($, _, Backbone, TroupeViews, AppRouter, Bootstrap, Dropdown, jqUI) {
   var troupeApp;
 
   $('.dp-tooltip').tooltip();
@@ -34,17 +35,22 @@ require([
     },
 
     buildToolbar: function() {
-      if(window.troupeContext.user) {
-        $(".label-displayName").text(window.troupeContext.user.displayName);
-        $(".label-troupeName").text(window.troupeContext.troupe.name);
-        $(".menu-security").show();
-      }
-
+      //$(".label-displayName").text(window.troupeContext.user.displayName);
+      //$(".label-troupeName").text(window.troupeContext.troupe.name);
+      //$(".menu-security").show();
     },
 
     profileMenuClicked: function() {
-      troupeApp.navigate("profile", {trigger: true});
-      return false;
+      require(['views/profile/profileModalView'], function(ProfileModalView) {
+        view = new ProfileModalView({ existingUser: true });
+        modal = new TroupeViews.Modal({ view: view  });
+
+        view.on('profile.complete', function(data) {
+          modal.off('profile.complete');
+          modal.hide();
+        });
+        modal.show();
+      });
     },
 
     settingsMenuClicked: function() {
@@ -59,16 +65,6 @@ require([
 
 
   });
-
-  if(!window.troupeContext.user || window.troupeContext.profileNotCompleted) {
-    require('router-login', function(AppRouterLogin) {
-      window.troupeApp = new AppRouterLogin();
-      troupeApp = window.troupeApp;
-      Backbone.history.start();
-    });
-
-    return;
-  }
 
   var app = new AppView();
 

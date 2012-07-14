@@ -6,7 +6,7 @@ var persistence = require("./persistence-service"),
     sechash = require('sechash'),
     mongoose = require("mongoose");
 
-module.exports = {
+var userService = {
   newUser: function(options) {
     var user = new persistence.User(options);
     user.displayName = options.display;
@@ -90,6 +90,59 @@ module.exports = {
       if(err) return callback(false);
       callback(match);
     });
+  },
+
+  updateProfile: function(options, callback) {
+    var userId = options.userId;
+    var password = options.password;
+    var oldPassword = options.oldPassword;
+    var displayName = options.displayName;
+
+    userService.findById(userId, function(err, user) {
+      if(err) return callback(err);
+      if(!user) return callback("User not found");
+
+      function generateNewHashSaveUser() {
+        console.log("Generating new password for " + password);
+        sechash.strongHash('sha512', password, function(err, hash3) {
+          if(err) return callback(err);
+
+          user.passwordHash = hash3;
+          user.displayName = options.displayName;
+          user.save(function(err) {
+            callback(err);
+          });
+        });
+      }
+
+      switch(user.status) {
+        case 'PROFILE_NOT_COMPLETED':
+          if(user.passwordHash) return callback("User already has a password set");
+          user.status = 'ACTIVE';
+          generateNewHashSaveUser();
+          break;
+
+        case 'ACTIVE':
+          if(password) {
+            sechash.testHash(oldPassword, user.passwordHash, function(err, match) {
+              if(err) return callback(err);
+              if(!match) return callback({authFailure: true });
+              generateNewHashSaveUser();
+            });
+          } else {
+            user.displayName = options.displayName;
+            user.save(function(err) {
+              callback(err);
+            });
+          }
+          break;
+
+        default:
+          callback("Invalid user status");
+      }
+    });
   }
 
 };
+
+module.exports = userService;

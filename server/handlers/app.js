@@ -62,9 +62,6 @@ module.exports = {
             }
           }
 
-          console.log("startScript", startScript);
-          console.log("troupeName", troupeName);
-
           res.render(page, {
             startScript: startScript,
             troupeName: troupeName,
