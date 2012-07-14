@@ -17,6 +17,7 @@ define([
     },
 
     onFormSubmit: function(e) {
+      $('.login-failure').hide();
       if(e) e.preventDefault();
       var form = this.$el.find('form');
       var that = this;
@@ -28,6 +29,10 @@ define([
         data: form.serialize(),
         type: "POST",
         success: function(data) {
+           if(data.failed) {
+            $('.login-failure').show('fast');
+            return;
+          }
           that.trigger('login.complete', data);
         }
       });
