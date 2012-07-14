@@ -1,9 +1,6 @@
+
 <div class="trpModalTitle">Sign in to Troupe</div>
    <form id="loginForm" class="marginless" method="post" action="/login">
-      <div class="alert alert-error incorrect-password" style="display: none">
-      Login failed. <a href="/forgottenpassword">Click here to request a new password.</a>
-      </div>
-
       <input name="email" id="email" type="text" class="trpInput" placeholder="Email address" autofocus>
 
       <input name="password" id="password" type="password" class="trpInput" placeholder="Password">
@@ -16,3 +13,6 @@
        <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen signin">Sign in</button>
       </div>
     </form>
+    <div class="trpModalFailure login-failure" style="display:none">
+  <span class="trpModalTitle trpDarkGrey">Login failed.</span><br> <a href="/forgottenpassword" class="trpModalSubtext trpDarkGrey">Click here to request a new password.</a>
+</div>

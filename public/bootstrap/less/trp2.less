@@ -990,6 +990,12 @@ textarea, input { outline: none; }
   padding-bottom: 12px;
 }
 
+.trpModalFailure {
+  background-color: @trpRed;
+  margin: -12px -24px 0px -24px;
+  padding: 16px 24px 16px 24px;
+}
+
 .trpModalSubtext {
   font-family: 'Open Sans', sans-serif;
   font-size: 12px;
@@ -1033,10 +1039,17 @@ textarea, input { outline: none; }
 .trpGreen {
   color: @trpGreen;
 }
+
+.trpDarkGrey {
+  color: white;
+}
+
 /*Bootstrap Customisations*/
 
 .modal {
   .border-radius(0px);
+   max-height: 600px;
+   overflow: hidden;
 }
 
 .modal-header {
@@ -1049,7 +1062,7 @@ textarea, input { outline: none; }
 }
 
 .modal-body {
-  padding: 24px;
+  padding: 24px 24px 0px 24px;
 }
 
 .nav-tabs {
