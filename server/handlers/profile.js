@@ -8,7 +8,8 @@ var form = require("express-form"),
     signupService = require("../services/signup-service"),
     userService = require("../services/user-service"),
     passport = require('passport'),
-    middleware = require('./middleware');
+    middleware = require('./middleware'),
+    winston = require("winston");
 
 module.exports = {
     install: function(app) {
@@ -46,11 +47,16 @@ module.exports = {
             }
 
             if (!req.form.isValid) {
-              res.render('profile', {
-                flash: req.flash,
-                errors: req.form.errors,
-                displayName: req.form.displayName
-              });
+              if(req.accepts("application/json")) {
+                winston.info("Form is not valid");
+                 res.send(500);
+              } else {
+                res.render('profile', {
+                  flash: req.flash,
+                  errors: req.form.errors,
+                  displayName: req.form.displayName
+                });
+              }
 
               return;
             }
@@ -61,20 +67,22 @@ module.exports = {
               password: req.form.password
             }, function(err) {
               if(err) {
-                res.render('profile', {
-                  flash: req.flash,
-                  displayName: req.form.displayName
-                });
-                return;
+                winston.error("Unable to update profile", err);
+                return next(err);
               }
 
-              userService.findDefaultTroupeForUser(req.user.id, function(err, troupe) {
-                if(err) return next(err);
-                if(!troupe) return next("Unable to determine default troupe for user");
+              if(req.accepts("application/json")) {
+                res.send({ success: true });
+              } else {
+                userService.findDefaultTroupeForUser(req.user.id, function(err, troupe) {
+                  if(err) return next(err);
+                  if(!troupe) return next("Unable to determine default troupe for user");
 
-                res.relativeRedirect("/" + troupe.uri);
-                return;
-              });
+                  res.relativeRedirect("/" + troupe.uri);
+                  return;
+                });
+              }
+
             });
           }
         );

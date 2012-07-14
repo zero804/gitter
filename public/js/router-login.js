@@ -30,6 +30,12 @@ define([
       if(window.troupeContext.profileNotCompleted) {
         view = new ProfileModalView();
         modal = new TroupeViews.Modal({ view: view, disableClose: true  });
+
+        view.on('profile.complete', function(data) {
+          modal.off('profile.complete');
+          modal.close();
+          window.location.reload(true);
+        });
         modal.show();
       }
     }

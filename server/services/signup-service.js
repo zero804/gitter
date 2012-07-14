@@ -176,6 +176,7 @@ module.exports = {
 
       user.passwordHash = hash3;
       user.displayName = options.displayName;
+      user.status = 'ACTIVE';
       user.save(function(err) {
         callback(err);
       });
