@@ -10,7 +10,7 @@ define([
   var AppRouter = Backbone.Router.extend({
 
     initialize: function() {
-      this.appView = new AppView();
+      this.appView = new AppView({ router: this });
 
       chat.connect();
     },
