@@ -11,8 +11,9 @@ define([
     template: template,
 
     initialize: function(options) {
-      this.existingUser = options.existingUser;
       _.bindAll(this, 'onFormSubmit', 'onPasswordChange');
+      if (!options) return;
+      this.existingUser = options.existingUser;
     },
 
     getRenderData: function() {
