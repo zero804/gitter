@@ -293,7 +293,40 @@ define([
     }
   });
 
+  TroupeViews.Menu = Backbone.View.extend({
+    initialize: function(options) {
+      _.bindAll(this, 'toggleMenu', 'showMenu', 'hideMenu');
 
+      this.triggerEl = $(options.triggerEl);
+      this.triggerEl.on('click', this.toggleMenu);
+    },
+
+    onClose: function() {
+      this.triggerEl.off();
+    },
+
+    toggleMenu: function(){
+      if (this.$el.is(':hidden')) {
+        this.showMenu();
+      } else {
+        this.hideMenu();
+      }
+    },
+
+    showMenu: function() {
+      this.$el.slideDown('fast', function() {
+          // Animation complete.
+          $('body').on('click', this.hideMenu);
+      });
+    },
+
+    hideMenu: function() {
+      $('body').off('click', this.hideMenu);
+      this.$el.slideUp('fast', function() {
+          // Animation complete.
+      });
+    }
+  });
 
   return TroupeViews;
 });

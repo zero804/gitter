@@ -5,15 +5,29 @@ define([
   'backbone',
   'collections/troupes',
   'collections/notifications',
+  'views/base',
   'views/widgets/nav',
   'noty'
-], function($, _, Backbone, TroupeCollection, NotificationCollection, NavView, notyStub) {
+], function($, _, Backbone, TroupeCollection, NotificationCollection, TroupeViews, NavView, notyStub) {
 
   var AppView = Backbone.View.extend({
     el: 'body',
 
-    initialize: function() {
+    events: {
+        "click .menu-profile": "profileMenuClicked",
+        "click .menu-settings": "settingsMenuClicked",
+        "click .menu-signout": "signoutMenuClicked",
+
+         "click #trpSelectorArrow"  : "toggleSelector"
+         //"click #trpPersonIcon" : "toggleUserMenu"
+    },
+
+    initialize: function(options) {
       var self = this;
+      this.router = options.router;
+
+      _.bindAll(this, 'profileMenuClicked', 'settingsMenuClicked', 'signoutMenuClicked', 'toggleSelector');
+
       function attachNavView(selector) {
         var e = self.$el.find(selector);
         return new NavView({ el: e }).render();
@@ -27,12 +41,13 @@ define([
         'people': attachNavView('#nav-people')
       };
 
-
       this.troupeCollection = new TroupeCollection();
       this.notificationCollection = new NotificationCollection();
 
-      this.troupeSelectorMenu = $("#trpTroupeSelector");
-      this.notificationSelectorMenu = $("#menu-notification-selector");
+
+      this.troupeSelectorMenu = new TroupeViews.Menu({ el: "#trpTroupeSelector", triggerEl: "#menu-notification-selector" });
+
+      this.userMenu = new TroupeViews.Menu({ el: "#trpUserMenu", triggerEl: "#trpPersonIcon" });
 
       this.troupeCollection.on('change', this.addAllTroupes, this);
       this.troupeCollection.on('add', this.addOneTroupe, this);
@@ -111,12 +126,6 @@ define([
       });
     },
 
-    events: {
-      //"keydown .chatbox":          "detectReturn"
-         "click #trpSelectorArrow"  : "toggleSelector",
-         "click #trpPersonIcon" : "toggleUserMenu"
-    },
-
     toggleSelector: function(){
       if ($('#trpTroupeSelector').is(':hidden')) $('#trpTroupeSelector').slideDown(350, function() {
           // Animation complete.
@@ -125,24 +134,58 @@ define([
           // Animation complete.
       });
     },
+/*
+    showUserMenu: function() {
+      $('#trpUserMenu').slideDown('fast', function() {
+          // Animation complete.
+      });
+    },
+
+    hideUserMenu: function() {
+      $('#trpUserMenu').slideUp('fast', function() {
+          // Animation complete.
+      });
+    },
 
     toggleUserMenu: function() {
-      if ($('#trpUserMenu').is(':hidden')) $('#trpUserMenu').slideDown('fast', function() {
-          // Animation complete.
+      if ($('#trpUserMenu').is(':hidden')) {
+        this.showUserMenu();
+      } else {
+        this.hideUserMenu();
+      }
+    },
+*/
+    profileMenuClicked: function() {
+      require(['views/profile/profileModalView'], function(ProfileModalView) {
+        view = new ProfileModalView({ existingUser: true });
+        modal = new TroupeViews.Modal({ view: view  });
+
+        view.on('profile.complete', function(data) {
+          modal.off('profile.complete');
+          modal.hide();
+        });
+        modal.show();
       });
-      else $('#trpUserMenu').slideUp('fast', function() {
-          // Animation complete.
-      });
+    },
+
+    settingsMenuClicked: function() {
+      troupeApp.navigate("settings", {trigger: true});
+      return false;
+    },
+
+    signoutMenuClicked: function() {
+      troupeApp.navigate("signout", {trigger: true});
+      return false;
     },
 
     addOneTroupe: function(model) {
-      this.troupeSelectorMenu.append("<div class='trpTroupeSelectorItem'><a href='" + model.get("uri") + "'>"+ model.get("name") + "</a></div>");
+      this.troupeSelectorMenu.$el.append("<div class='trpTroupeSelectorItem'><a href='" + model.get("uri") + "'>"+ model.get("name") + "</a></div>");
     },
 
     addAllTroupes: function() {
-      this.troupeSelectorMenu.empty();
+      this.troupeSelectorMenu.$el.empty();
       this.troupeCollection.each(this.addOneTroupe, this);
-      this.troupeSelectorMenu.append("<div class='trpTroupeSelectorAdd'><a href=''>Start a new Troupe</a></div>");
+      this.troupeSelectorMenu.$el.append("<div class='trpTroupeSelectorAdd'><a href=''>Start a new Troupe</a></div>");
     },
 
     addOneNotification: function(model, collection, options) {

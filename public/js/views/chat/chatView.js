@@ -64,8 +64,11 @@ define([
 
     send: function() {
       var chatBox = $(".trpChatBox");
-      chat.send(chatBox.val());
-      chatBox.val('');
+      var val = chatBox.val().trim();
+      if(val) {
+        chat.send(chatBox.val());
+        chatBox.val('');
+      }
       return false;
     },
 
