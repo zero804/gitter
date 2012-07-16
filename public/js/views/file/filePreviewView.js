@@ -17,7 +17,7 @@ define([
     getRenderData: function() {
       var item = this.model;
       var previewMimeType = item.get('previewMimeType');
-      var mimeType = item.get('previewMimeType');
+      var mimeType = item.get('mimeType');
 
       if(/^image\//.test(previewMimeType)) {
         return {
