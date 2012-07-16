@@ -36,6 +36,7 @@ module.exports = {
     },
 
     destroy: function(req, res){
+      // TODO(AN): delete from GridFS
       console.log("file: ", req.file);
       req.file.remove(function(err) {
         if(err) {
