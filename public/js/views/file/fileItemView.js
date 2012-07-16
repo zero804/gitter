@@ -12,17 +12,30 @@ define([
 
     events: {
       "click .trpFileActionMenuButton": "showFileActionMenu",
-      "click .link-preview" : "onPreviewLinkClick"
+      "click .link-preview": "onPreviewLinkClick",
+      "click .link-delete":  "onDeleteLinkClick"
     },
 
     initialize: function(options) {
-      _.bindAll(this, 'onPreviewLinkClick', 'showFileActionMenu', 'hideFileActionMenu');
+      _.bindAll(this, 'onPreviewLinkClick', 'showFileActionMenu', 'hideFileActionMenu', 'onDeleteLinkClick');
     },
 
     onPreviewLinkClick: function(e) {
       var view = new FilePreviewView({ model: this.model });
       var modal = new TroupeViews.Modal({ view: view  });
       modal.show();
+
+      return false;
+    },
+
+    onDeleteLinkClick: function(e) {
+      //TODO(AN): replace window.confirm with a nice dialog!
+      if(window.confirm("Delete " + this.model.get('fileName') + "?")) {
+        this.model.destroy({
+          success: function(model, response) {
+          }
+        });
+      }
 
       return false;
     },
@@ -45,11 +58,12 @@ define([
     },
 
     hideFileActionMenu: function(e) {
+      var self = this;
       $('body, html').off('click', this.hideFileActionMenu);
 
       this.$el.find(".trpFileActionMenuTop").hide();
       this.$el.find('.trpFileActionMenuBottom').slideUp('fast', function() {
-        this.$el.find(".trpFileActionMenu").hide();
+        self.$el.find(".trpFileActionMenu").hide();
       });
     },
 

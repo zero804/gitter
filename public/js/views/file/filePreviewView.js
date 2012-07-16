@@ -62,7 +62,7 @@ define([
       if(data.photo) {
         el = this.make("img", {"src": data.href });
       } else if(data.iframe) {
-        el = this.make("iframe", {"src": data.href, width: "500px", height: "500px"});
+        el = this.make("iframe", {"src": data.href, width: "500", height: "400"});
       } else if(data.noPreviewAvailable) {
         el = this.make("p", { }, "No preview available.");
       }

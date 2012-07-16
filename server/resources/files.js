@@ -3,7 +3,8 @@
 "use strict";
 
 var troupeService = require("../services/troupe-service"),
-    fileService = require("../services/file-service");
+    fileService = require("../services/file-service"),
+    winston = require("winston");
 
 module.exports = {
     index: function(req, res, next) {
@@ -14,7 +15,7 @@ module.exports = {
       });
     },
 
-    new: function(req, res){
+    'new': function(req, res){
       res.send(500);
     },
 
@@ -35,7 +36,16 @@ module.exports = {
     },
 
     destroy: function(req, res){
-      res.send(500);
+      console.log("file: ", req.file);
+      req.file.remove(function(err) {
+        if(err) {
+          winston.error("Unable to remove file", err);
+          res.send(500);
+          return;
+        }
+
+        res.send({ success: true });
+      });
     },
 
     load: function(id, callback) {
