@@ -10,7 +10,6 @@ require([
   'backbone',
   'router-login',
   'bootstrap',
-  'dropdown',
   'template/helpers/all'
 ], function($, _, Backbone, AppRouterLogin, Bootstrap) {
   /*jshint trailing:false */
