@@ -7,10 +7,9 @@ define([
   'hbs!./fileView',
   './fileItemView',
   'fileUploader',
-  'collections/files',
-  'jquery_colorbox'
-], function($, _, Backbone, TroupeViews, template, FileItemView, fileUploaderStub, FileCollection, cbStub){
-  var FileView = TroupeViews.Base.extend({
+  'collections/files'
+], function($, _, Backbone, TroupeViews, template, FileItemView, fileUploaderStub, FileCollection) {
+  return TroupeViews.Base.extend({
     template: template,
 
     initialize: function(options) {
@@ -65,5 +64,4 @@ define([
 
   });
 
-  return FileView;
 });

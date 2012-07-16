@@ -4,9 +4,10 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'hbs!./fileItemView'
-], function($, _, Backbone, TroupeViews, template){
-  var FileView = TroupeViews.Base.extend({
+  'hbs!./fileItemView',
+  './filePreviewView'
+], function($, _, Backbone, TroupeViews, template, FilePreviewView){
+  return TroupeViews.Base.extend({
     template: template,
 
     events: {
@@ -18,57 +19,13 @@ define([
       _.bindAll(this, 'onPreviewLinkClick', 'showFileActionMenu', 'hideFileActionMenu');
     },
 
-    onPreviewLinkClick: function(event) {
-      var item = this.model;
-
-      console.log("onPreviewLinkClick");
-
-      function getPreviewOptions() {
-        var previewMimeType = item.get('previewMimeType');
-        var mimeType = item.get('previewMimeType');
-
-        if(/^image\//.test(previewMimeType)) {
-          return {
-            href: item.get('embeddedUrl') + '?embedded=1',
-            photo: true
-          };
-        }
-
-        if(previewMimeType == 'application/pdf') {
-          return {
-            href: '/pdfjs/web/viewer.html?file=' + item.get('embeddedUrl'),
-            iframe: true,
-            width: "80%",
-            height: "80%"
-          };
-        }
-
-        if(/^image\//.test(mimeType)) {
-          return {
-            href: item.get('url') + '?embedded=1',
-            photo: true
-          };
-        }
-
-        if(mimeType == 'application/pdf') {
-          return {
-            width: "80%",
-            height: "80%",
-            href:  '/pdfjs/web/viewer.html?file=' + item.get('url') + "?embedded=1",
-            iframe: true
-          };
-        }
-      }
-
-      var previewOptions = getPreviewOptions(item);
-      if(previewOptions) {
-        previewOptions.title = item.get('fileName');
-        $.colorbox(previewOptions);
-      }
+    onPreviewLinkClick: function(e) {
+      var view = new FilePreviewView({ model: this.model });
+      var modal = new TroupeViews.Modal({ view: view  });
+      modal.show();
 
       return false;
     },
-
 
     getRenderData: function() {
       var data = this.model.toJSON();
@@ -98,16 +55,6 @@ define([
 
     fileIcon: function(fileName) {
       return '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + fileName;
-    },
-
-    onClickGenerator: function(file) {
-      var self = this;
-      return function() {
-        //window.open(file.get('embeddedUrl'));
-        window.open(file.get('url'));
-      };
     }
   });
-
-  return FileView;
 });
