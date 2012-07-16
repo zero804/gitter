@@ -7,8 +7,7 @@ define([
   'hbs!views/file/item',
   'fileUploader',
   'collections/files',
-  'jquery_colorbox',
-  'dropdown'
+  'jquery_colorbox'
 ], function($, _, Backbone, template, itemTemplate, fileUploaderStub, FileCollection, cbStub, Dropdown){
   var FileView = Backbone.View.extend({
     initialize: function(options) {

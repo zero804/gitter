@@ -11,10 +11,8 @@ require([
   'views/base',
   'router',
   'bootstrap',
-  'dropdown',
-  'jqueryui',
   'template/helpers/all'
-], function($, _, Backbone, TroupeViews, AppRouter, Bootstrap, Dropdown, jqUI) {
+], function($, _, Backbone, TroupeViews, AppRouter) {
   var troupeApp;
 
   // THESE TWO LINES WILL NOT REMAIN HERE FOREVER
