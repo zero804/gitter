@@ -3,75 +3,37 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hbs!views/file/file',
-  'hbs!views/file/item',
+  'views/base',
+  'hbs!./fileView',
+  './fileItemView',
   'fileUploader',
   'collections/files',
   'jquery_colorbox'
-], function($, _, Backbone, template, itemTemplate, fileUploaderStub, FileCollection, cbStub, Dropdown){
-  var FileView = Backbone.View.extend({
+], function($, _, Backbone, TroupeViews, template, FileItemView, fileUploaderStub, FileCollection, cbStub){
+  var FileView = TroupeViews.Base.extend({
+    template: template,
+
     initialize: function(options) {
       this.router = options.router;
       this.collection = new FileCollection();
 
-      _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onFileEvent', 'onPreviewLinkClick', 'showFileActionMenu', 'hideFileActionMenu');
+      _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onFileEvent');
 
       this.collection.bind('add', this.onCollectionAdd);
       this.collection.bind('reset', this.onCollectionReset);
 
+      this.collection.fetch();
+
       $(document).on('file', this.onFileEvent);
     },
 
-    onPreviewLinkClick: function(event) {
-      function getPreviewOptions(item) {
-        var previewMimeType = item.get('previewMimeType');
-        var mimeType = item.get('previewMimeType');
+    getRenderData: function() {
+      return {};
+    },
 
-        if(/^image\//.test(previewMimeType)) {
-          return {
-            href: item.get('embeddedUrl') + '?embedded=1',
-            photo: true
-          };
-        }
-
-        if(previewMimeType == 'application/pdf') {
-          return {
-            href: '/pdfjs/web/viewer.html?file=' + item.get('embeddedUrl'),
-            iframe: true,
-            width: "80%",
-            height: "80%"
-          };
-        }
-
-        if(/^image\//.test(mimeType)) {
-          return {
-            href: item.get('url') + '?embedded=1',
-            photo: true
-          };
-        }
-
-        if(mimeType == 'application/pdf') {
-          return {
-            width: "80%",
-            height: "80%",
-            href:  '/pdfjs/web/viewer.html?file=' + item.get('url') + "?embedded=1",
-            iframe: true
-          };
-        }
-      }
-
-      var row = $(event.target).closest('tr');
-      var item = row.data('item');
-
-      var previewOptions = getPreviewOptions(item);
-      if(previewOptions) {
-        previewOptions.title = item.get('fileName');
-        $.colorbox(previewOptions);
-      }
-
-      //$('#previewModal').modal('show');
-      //$('#previewFrame').attr('src', previewUrl);
-      return false;
+    afterRender: function() {
+      this.filesFrame = this.$el.find(".frame-files");
+      this.createUploader(this.$el.find(".fileuploader")[0]);
     },
 
     beforeClose: function() {
@@ -83,73 +45,12 @@ define([
     },
 
     onCollectionReset: function() {
-      $(".frame-files", this.el).empty();
+      this.filesFrame.empty();
       this.collection.each(this.onCollectionAdd);
     },
 
     onCollectionAdd: function(item) {
-
-      var f = item.get('fileName');
-
-       // if(f.length > 20) {
-       //      f = f.substring(0,20)+"...";
-       //  }
-
-        var itemHtml = itemTemplate({
-          fileName: f,
-          url: item.get('url'),
-          mimeType: item.get('mimeType'),
-          fileIcon: this.fileIcon(item.get('fileName'))
-        });
-
-        var el = $(itemHtml);
-        el.data("item", item);
-        $(".frame-files", this.el).append(el);
-        $('.link-preview', el).on('click', this.onPreviewLinkClick);
-        //el.on('click', this.onClickGenerator(item));
-    },
-
-    events: {
-      "click .trpFileActionMenuButton": "showFileActionMenu"
-    },
-
-    showFileActionMenu: function(e) {
-      $(".trpFileActionMenu").show();
-      $(".trpFileActionMenuTop").show();
-      $('.trpFileActionMenuBottom').slideDown('fast', function() {
-          // Animation complete.
-      });
-      return false;
-    },
-
-    hideFileActionMenu: function(e) {  
-      $(".trpFileActionMenuTop").hide();
-      $('.trpFileActionMenuBottom').slideUp('fast', function() {
-        $(".trpFileActionMenu").hide();
-      });
-      
-    },
-
-    fileIcon: function(fileName) {
-      return '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + fileName;
-    },
-
-    render: function() {
-      $('body, html').on('click', this.hideFileActionMenu);
-      var compiledTemplate = template({ });
-      $(this.el).html(compiledTemplate);
-      this.createUploader($('.fileuploader',this.el)[0]);
-
-      this.collection.fetch();
-      return this;
-    },
-
-    onClickGenerator: function(file) {
-      var self = this;
-      return function() {
-        //window.open(file.get('embeddedUrl'));
-        window.open(file.get('url'));
-      };
+      this.filesFrame.append(new FileItemView({ model: item }).render().el);
     },
 
     createUploader: function(element) {
