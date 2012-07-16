@@ -3,12 +3,9 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'views/base',
-  'hbs!./filePreviewView'
-], function($, _, Backbone, TroupeViews, template){
+  'views/base'
+], function($, _, Backbone, TroupeViews){
   return TroupeViews.Base.extend({
-    template: template,
-
     events: {
       //"click .trpFileActionMenuButton": "showFileActionMenu",
     },
@@ -63,9 +60,11 @@ define([
       var data = this.getRenderData();
       var el;
       if(data.photo) {
-        el = this.make("img", {"src": data.href} );
+        el = this.make("img", {"src": data.href });
       } else if(data.iframe) {
-        el = this.make("iframe", {"src": data.href, width: "500px", height: "500px"} );
+        el = this.make("iframe", {"src": data.href, width: "500px", height: "500px"});
+      } else if(data.noPreviewAvailable) {
+        el = this.make("p", { }, "No preview available.");
       }
 
       this.$el.append(el);
