@@ -63,7 +63,12 @@ define([
       });
 
       }
-      $(this.el).html(dom);
+      this.$el.html(dom);
+      if(this.model) {
+        var id = this.model.get('id');
+        this.$el.addClass('model-id-' + id);
+      }
+
       if(this.afterRender) { this.afterRender(dom, data); }
 
       this.$el.addClass("view");
@@ -88,6 +93,7 @@ define([
       if (this.onClose) { this.onClose(); }
       this.trigger('close');
       this.off();
+      this.el._view = null;
     }
   });
 

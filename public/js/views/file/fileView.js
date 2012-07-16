@@ -16,9 +16,10 @@ define([
       this.router = options.router;
       this.collection = new FileCollection();
 
-      _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onFileEvent');
+      _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onCollectionRemove', 'onFileEvent');
 
       this.collection.bind('add', this.onCollectionAdd);
+      this.collection.bind('remove', this.onCollectionRemove);
       this.collection.bind('reset', this.onCollectionReset);
 
       this.collection.fetch();
@@ -50,6 +51,12 @@ define([
 
     onCollectionAdd: function(item) {
       this.filesFrame.append(new FileItemView({ model: item }).render().el);
+    },
+
+    onCollectionRemove: function(item) {
+      this.filesFrame.find('.model-id-' + item.get('id')).each(function(index, item) {
+        if(item._view) item._view.remove();
+      });
     },
 
     createUploader: function(element) {
