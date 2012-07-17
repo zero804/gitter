@@ -4,6 +4,9 @@
 
 var userService = require("../services/user-service");
 var Q = require("q");
+var _ = require("underscore");
+var handlebars = require('handlebars');
+var winston = require("winston");
 
 function concatArraysOfArrays(a) {
   var result = [];
@@ -148,6 +151,113 @@ function ConversationMinStrategy()  {
   };
 }
 
+function ChatStrategy()  {
+  var userStategy = new UserIdStrategy();
+
+  this.preload = function(items, callback) {
+    var users = items.map(function(i) { return i.fromUserId; });
+
+    execPreloads([{
+      strategy: userStategy,
+      data: users.distinct()
+    }], callback);
+  };
+
+  this.map = function(item) {
+    return {
+      id: item._id,
+      text: item.text,
+      sent: item.sent,
+      fromUser: userStategy.map(item.fromUserId)
+    };
+  };
+}
+
+function FileStrategy() {
+  var userStategy = new UserIdStrategy();
+
+  this.preload = function(items, callback) {
+    var users = items.map(function(i) { return i.versions.map(function(j) { return j.creatorUserId; }); });
+    users = _.flatten(users, true);
+
+    execPreloads([{
+      strategy: userStategy,
+      data: _.uniq(users)
+    }], callback);
+  };
+
+  this.narrowFileVersion = function(item) {
+    return {
+      creatorUser: userStategy.map(item.creatorUserId),
+      createdDate: item.createdDate,
+      source: item.source,
+      deleted: item.deleted
+    };
+  };
+
+  this.map = function(item) {
+    return {
+      id: item._id,
+      fileName: item.fileName,
+      mimeType: item.mimeType,
+      versions: item.versions.map(this.narrowFileVersion),
+      url: '/troupes/' + encodeURIComponent(item.troupeId) + '/downloads/' + encodeURIComponent(item.fileName),
+      previewMimeType: item.previewMimeType,
+      embeddedViewType: item.embeddedViewType,
+      embeddedUrl: '/troupes/' + encodeURIComponent(item.troupeId) + '/embedded/' + encodeURIComponent(item.fileName)
+    };
+  };
+
+}
+
+function compileTemplates(map) {
+  for(var k in map) {
+    if(map.hasOwnProperty(k)) {
+      map[k] = handlebars.compile(map[k]);
+    }
+  }
+  return map;
+}
+
+/* TODO: externalize and internationalise this! */
+var notificationTemplates = compileTemplates({
+  "mail:new": "New email with subject \"{{subject}}\" from {{from}}" ,
+  "file:createVersion": "Version {{version}}  of {{fileName}} created.",
+  "file:createNew": "New file {{fileName}} created."
+});
+
+var notificationLinkTemplates = compileTemplates({
+  "mail:new": "#mail/{{emailId}}",
+  "file:createVersion": "#files",
+  "file:createNew": "#files"
+});
+
+function NotificationStrategy() {
+
+  this.preload = function(items, callback) {
+    callback(null);
+  };
+
+
+  this.map = function(item) {
+    var templateData = {};
+    _.extend(templateData, item.data, { troupeId: item.troupeId });
+
+    var textTemplate = notificationTemplates[item.notificationName];
+    var linkTemplate = notificationLinkTemplates[item.notificationName];
+
+    if(!textTemplate || !linkTemplate) { winston.warn("Unknown notification ", item.notificationName); return null; }
+
+    return {
+      id: item.id,
+      troupeId: item.troupeId,
+      createdDate: item.createdDate,
+      notificationText: textTemplate(templateData),
+      notificationLink: linkTemplate(templateData)
+    };
+  };
+}
+
 /* This method should move */
 function serialize(items, Strategy, callback) {
   if(!items) return null;
@@ -171,8 +281,22 @@ function serialize(items, Strategy, callback) {
 
 }
 
+function getStrategy(modelName, toCollection) {
+  switch(modelName) {
+    case 'conversation':
+      return toCollection ? ConversationMinStrategy : ConversationStrategy;
+    case 'file':
+      return FileStrategy;
+    case 'notification':
+      return NotificationStrategy;
+    case 'chat':
+      return ChatStrategy;
+  }
+}
+
 module.exports = {
   ConversationStrategy: ConversationStrategy,
   ConversationMinStrategy: ConversationMinStrategy,
+  getStrategy: getStrategy,
   serialize: serialize
 }

@@ -24,6 +24,10 @@ define([
       now.onFileEvent = createTrigger('file');
       now.onNotification = createTrigger('notification');
       now.onMailEvent = createTrigger('mail');
+      now.onDataChange = function(message) {
+          console.log("Data change for on message", message);
+          $(document).trigger('data:moo', message);
+      };
 
       now.ready(function() {
         connected = true;

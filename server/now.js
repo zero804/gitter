@@ -278,6 +278,44 @@ module.exports = {
           // TODO
         }
       });
+
+      appEvents.onDataChange(function(data) {
+        console.log("nowjs: onDataChange", data);
+
+        var troupeId = data.troupeId;
+        var modelId = data.modelId;
+        var modelName = data.modelName;
+        var operation = data.operation;
+        var model = data.model;
+
+        getGroup("troupe." + troupeId, function(group) {
+          if(operation === 'save') {
+            console.log("Preparing model ", model);
+
+            var strategy = restSerializer.getStrategy(modelName, true);
+            restSerializer.serialize(model, strategy, function(err, serializedModel) {
+              if(err || !serializedModel) return winston.error("Serialization failure failure", err);
+              console.log("onDataChange", serializedModel);
+              group.now.onDataChange({
+                troupeId: troupeId,
+                modelName: modelName,
+                operation: operation,
+                id: modelId,
+                model: serializedModel
+              });
+            });
+          } else {
+            group.now.onDataChange({
+              troupeId: troupeId,
+              modelName: modelName,
+              operation: operation,
+              id: modelId
+            });
+          }
+        });
+
+      });
+
     }
 
 };

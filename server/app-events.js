@@ -18,7 +18,7 @@ client.on("message", function (channel, message) {
 });
 
 function emit(event, data) {
-  winston.info("Emit", arguments);
+  winston.info("Emit", event);
   pubClient.publish(event, JSON.stringify(data));
 }
 
@@ -92,6 +92,20 @@ module.exports = {
 
   onNewNotification: function(callback) {
     on('newNotification', callback);
+  },
+
+  dataChange: function(modelName, operation, modelId, troupeId, model) {
+    emit('dataChange', {
+      modelName: modelName,
+      operation: operation,
+      modelId: modelId,
+      troupeId: troupeId,
+      model: model
+    });
+  },
+
+  onDataChange: function(callback) {
+    on('dataChange', callback);
   }
 
 };
