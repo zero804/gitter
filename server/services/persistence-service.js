@@ -3,9 +3,9 @@
 "use strict";
 
 var mongoose = require("mongoose");
-
-var Schema = mongoose.Schema, 
+var Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId;
+var appEvents = require("../app-events");
 
 mongoose.connect('mongodb://localhost/troupe');
 
@@ -19,7 +19,7 @@ var UserSchema = new Schema({
   email: { type: String },
   confirmationCode: {type: String },
   status: { type: String, "enum": ['UNCONFIRMED', 'PROFILE_NOT_COMPLETED', 'ACTIVE'], "default": 'UNCONFIRMED'},
-  passwordHash: { type: String },   
+  passwordHash: { type: String },
   avatarUrlSmall: String,
   avatarUrlMedium: String
 });
@@ -73,7 +73,7 @@ InviteSchema.methods.narrow = function () {
 
 var ChatMessageSchema = new Schema({
   fromUserId: ObjectId,
-  toTroupeId: ObjectId,
+  toTroupeId: ObjectId,  //TODO: rename to troupeId
   text: String,
   sent: { type: Date, "default": Date.now }
 });
@@ -201,6 +201,32 @@ var File = mongoose.model('File', FileSchema);
 var FileVersion = mongoose.model('FileVersion', FileVersionSchema);
 var Notification = mongoose.model('Notification', NotificationSchema);
 
+function attachNotificationListenersToSchema(schema, name, extractor) {
+  if(!extractor) {
+    extractor = function(model) {
+      return {
+        id: model.id,
+        troupeId: model.troupeId
+      };
+    };
+  }
+
+  schema.post('save', function(model, numAffected) {
+    var e = extractor(model);
+    console.log("Save " + name + ". troupeId=", model.troupeId);
+    appEvents.dataChange(name, 'save', e.id, e.troupeId, model);
+  });
+}
+
+attachNotificationListenersToSchema(ConversationSchema, 'conversation');
+attachNotificationListenersToSchema(FileSchema, 'file');
+attachNotificationListenersToSchema(NotificationSchema, 'notification');
+attachNotificationListenersToSchema(ChatMessageSchema, 'chat', function(model) {
+  return {
+    id: model.id,
+    troupeId: model.toTroupeId
+  };
+});
 
 module.exports = {
   User: User,
