@@ -4,14 +4,20 @@
 
 var troupeService = require("../services/troupe-service"),
     fileService = require("../services/file-service"),
-    winston = require("../utils/winston");
+    winston = require("../utils/winston"),
+    restSerializer = require("../serializers/rest-serializer");
+
 
 module.exports = {
     index: function(req, res, next) {
       fileService.findByTroupe(req.troupe.id, function(err, files) {
         if (err) return next(err);
 
-        res.send(files.narrow());
+        restSerializer.serialize(files, restSerializer.FileStrategy, function(err, serializedFiles) {
+          console.dir(err);
+          if (err) return next(err);
+          res.send(serializedFiles);
+        });
       });
     },
 

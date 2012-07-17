@@ -311,6 +311,9 @@ function getStrategy(modelName, toCollection) {
 module.exports = {
   ConversationStrategy: ConversationStrategy,
   ConversationMinStrategy: ConversationMinStrategy,
+  NotificationStrategy: NotificationStrategy,
+  FileStrategy: FileStrategy,
+  ChatStrategy: ChatStrategy,
   getStrategy: getStrategy,
   serialize: serialize
 }

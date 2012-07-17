@@ -280,7 +280,6 @@ module.exports = {
       });
 
       appEvents.onDataChange(function(data) {
-        console.log("nowjs: onDataChange", data);
 
         var troupeId = data.troupeId;
         var modelId = data.modelId;
@@ -290,13 +289,13 @@ module.exports = {
 
         getGroup("troupe." + troupeId, function(group) {
           if(operation === 'update') {
-            console.log("Preparing model ", model);
+            winston.debug("Preparing model ", model);
 
             var strategy = restSerializer.getStrategy(modelName, true);
             restSerializer.serialize(model, strategy, function(err, serializedModel) {
               if(err) return winston.error("Serialization failure" , err);
               if(!serializedModel) return winston.error("No model returned from serializer");
-              console.log("onDataChange", serializedModel);
+
               group.now.onDataChange({
                 troupeId: troupeId,
                 modelName: modelName,
