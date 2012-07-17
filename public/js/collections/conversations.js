@@ -2,15 +2,13 @@ define([
   'jquery',
   'underscore',
   'backbone',
+  './base',
   'models/conversation'
-], function($, _, Backbone, ConversationModel) {
-  var ConversationCollection = Backbone.Collection.extend({
+], function($, _, Backbone, TroupeCollections, ConversationModel) {
+  return TroupeCollections.LiveCollection.extend({
     model: ConversationModel,
-    url: "/troupes/" + window.troupeContext.troupe.id + "/conversations",
-    initialize: function() {
-    }
-
+    modelName: 'conversation',
+    nestedUrl: "conversations"
   });
 
-  return ConversationCollection;
 });

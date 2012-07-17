@@ -5,7 +5,7 @@
 var nodemailer = require('nodemailer'),
     troupeTemplate = require('../utils/troupe-template'),
     nconf = require("../utils/config").configure(),
-    winston = require("winston");
+    winston = require("../utils/winston");
 
 var sesTransport = nodemailer.createTransport("SES", {
     AWSAccessKeyID: nconf.get("amazon:accessKey"),

@@ -6,7 +6,7 @@ var troupeService = require("../services/troupe-service"),
     conversationService = require("../services/conversation-service"),
     fileService = require("../services/file-service"),
     restSerializer = require("../serializers/rest-serializer"),
-    winston = require('winston');
+    winston = require('../utils/winston');
 
 function compose(m, attachments) {
   return {

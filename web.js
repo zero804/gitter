@@ -12,7 +12,7 @@ var express = require('express'),
   nconf = require('./server/utils/config').configure(),
   httpUtils = require('./server/utils/http'),
   rememberMe = require('./server/utils/rememberme-middleware'),
-  winston = require('winston');
+  winston = require('./server/utils/winston');
 
 /* TODO: put all our prototypes in a module */
 Array.prototype.narrow = function() {
@@ -172,5 +172,5 @@ require('./server/handlers/app').install(app);
 
 var port = nconf.get("PORT");
 app.listen(port, function() {
-  console.log("Listening on " + port);
+  winston.info("Listening on " + port);
 });

@@ -4,7 +4,7 @@
 
 var events = require('events');
 
-var winston = require('winston');
+var winston = require('./utils/winston');
 var _ = require('underscore');
 var redis = require('redis');
 var client = redis.createClient();

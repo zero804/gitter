@@ -9,7 +9,7 @@ var appEvents = require("../app-events");
 
 mongoose.connect('mongodb://localhost/troupe');
 
-/* TODO: put all our prototypes in a module */
+/* TODO(AN): remove narrow. Deprecated */
 Array.prototype.narrow = function() {
   return this.map(function(value) { return value.narrow(); });
 };
@@ -24,6 +24,7 @@ var UserSchema = new Schema({
   avatarUrlMedium: String
 });
 
+/* TODO(AN): remove narrow. Deprecated */
 UserSchema.methods.narrow = function() {
   return {
     id: this.id,
@@ -47,6 +48,7 @@ var TroupeSchema = new Schema({
   users: [ObjectId]
 });
 
+/* TODO(AN): remove narrow. Deprecated */
 TroupeSchema.methods.narrow = function () {
   return {
     id: this._id,
@@ -63,6 +65,7 @@ var InviteSchema = new Schema({
   status: { type: String, "enum": ['UNUSED', 'USED'], "default": 'UNUSED'}
 });
 
+/* TODO(AN): remove narrow. Deprecated */
 InviteSchema.methods.narrow = function () {
   return {
     id: this._id,
@@ -78,7 +81,7 @@ var ChatMessageSchema = new Schema({
   sent: { type: Date, "default": Date.now }
 });
 
-
+/* TODO(AN): remove narrow. Deprecated */
 ChatMessageSchema.methods.narrow = function (user, troupe) {
   return {
     id: this._id,
@@ -107,6 +110,7 @@ var EmailSchema = new Schema({
   attachments: [EmailAttachmentSchema]
 });
 
+/* TODO(AN): remove narrow. Deprecated */
 EmailSchema.methods.narrow = function () {
   return {
     id: this.id,
@@ -125,7 +129,7 @@ var ConversationSchema = new Schema({
   emails: [EmailSchema]
 });
 
-
+/* TODO(AN): remove narrow. Deprecated */
 ConversationSchema.methods.narrow = function () {
   return {
     id: this.id,
@@ -143,6 +147,7 @@ var FileVersionSchema = new Schema({
   source: { type: String }
 });
 
+/* TODO(AN): remove narrow. Deprecated */
 function narrowFileVersion(fileVersion) {
   return {
     creatorUserId: fileVersion.creatorUserId,
@@ -152,6 +157,7 @@ function narrowFileVersion(fileVersion) {
   };
 }
 
+/* TODO(AN): remove narrow. Deprecated */
 FileVersionSchema.methods.narrow = function () {
   return narrowFileVersion(this);
 };
@@ -164,6 +170,7 @@ var FileSchema = new Schema({
   versions: [FileVersionSchema]
 });
 
+/* TODO(AN): remove narrow. Deprecated */
 function narrowFile(file) {
   return {
       id: file._id,
@@ -177,6 +184,7 @@ function narrowFile(file) {
     };
 }
 
+/* TODO(AN): remove narrow. Deprecated */
 FileSchema.methods.narrow = function () {
   return narrowFile(this);
 };
@@ -214,13 +222,19 @@ function attachNotificationListenersToSchema(schema, name, extractor) {
   schema.post('save', function(model, numAffected) {
     var e = extractor(model);
     console.log("Save " + name + ". troupeId=", model.troupeId);
-    appEvents.dataChange(name, 'save', e.id, e.troupeId, model);
+    appEvents.dataChange(name, 'update', e.id, e.troupeId, model);
+  });
+
+  schema.post('remove', function(model, numAffected) {
+    var e = extractor(model);
+    console.log("Remove " + name + ". troupeId=", model.troupeId);
+    appEvents.dataChange(name, 'remove', e.id, e.troupeId);
   });
 }
 
 attachNotificationListenersToSchema(ConversationSchema, 'conversation');
 attachNotificationListenersToSchema(FileSchema, 'file');
-attachNotificationListenersToSchema(NotificationSchema, 'notification');
+//attachNotificationListenersToSchema(NotificationSchema, 'notification');
 attachNotificationListenersToSchema(ChatMessageSchema, 'chat', function(model) {
   return {
     id: model.id,

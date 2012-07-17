@@ -5,7 +5,7 @@
 var passport = require('passport'),
     nowjs = require("now"),
     redis = require("redis"),
-    winston = require('winston'),
+    winston = require('./utils/winston'),
     persistence = require("./services/persistence-service"),
     chatService = require("./services/chat-service"),
     userService = require("./services/user-service"),
@@ -289,12 +289,13 @@ module.exports = {
         var model = data.model;
 
         getGroup("troupe." + troupeId, function(group) {
-          if(operation === 'save') {
+          if(operation === 'update') {
             console.log("Preparing model ", model);
 
             var strategy = restSerializer.getStrategy(modelName, true);
             restSerializer.serialize(model, strategy, function(err, serializedModel) {
-              if(err || !serializedModel) return winston.error("Serialization failure failure", err);
+              if(err) return winston.error("Serialization failure" , err);
+              if(!serializedModel) return winston.error("No model returned from serializer");
               console.log("onDataChange", serializedModel);
               group.now.onDataChange({
                 troupeId: troupeId,
