@@ -5,19 +5,21 @@ define([
   'backbone',
   'views/base',
   'hbs!./fileItemView',
-  './filePreviewView'
-], function($, _, Backbone, TroupeViews, template, FilePreviewView){
+  './filePreviewView',
+  './fileVersionsView'
+], function($, _, Backbone, TroupeViews, template, FilePreviewView, FileVersionsView){
   return TroupeViews.Base.extend({
     template: template,
 
     events: {
       "click .trpFileActionMenuButton": "showFileActionMenu",
       "click .link-preview": "onPreviewLinkClick",
-      "click .link-delete":  "onDeleteLinkClick"
+      "click .link-delete":  "onDeleteLinkClick",
+      "click .link-versions":  "onVersionsLinkClick"
     },
 
     initialize: function(options) {
-      _.bindAll(this, 'onPreviewLinkClick', 'showFileActionMenu', 'hideFileActionMenu', 'onDeleteLinkClick');
+      _.bindAll(this, 'onPreviewLinkClick', 'showFileActionMenu', 'hideFileActionMenu', 'onDeleteLinkClick', 'onVersionsLinkClick');
     },
 
     onPreviewLinkClick: function(e) {
@@ -36,6 +38,14 @@ define([
           }
         });
       }
+
+      return false;
+    },
+
+    onVersionsLinkClick: function(e) {
+      var view = new FileVersionsView({ model: this.model });
+      var modal = new TroupeViews.Modal({ view: view  });
+      modal.show();
 
       return false;
     },
