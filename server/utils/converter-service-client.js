@@ -2,7 +2,7 @@
 /*global require: true, module: true */
 "use strict";
 
-var winston = require("winston");
+var winston = require("./winston");
 var fs = require('fs');
 var http = require('http'),
     temp = require("temp");

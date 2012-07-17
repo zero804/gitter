@@ -6,7 +6,7 @@
 
 var persistence = require("./persistence-service");
 var appEvents = require("../app-events");
-var winston = require("winston");
+var winston = require("../utils/winston");
 var image = require("../utils/image");
 var converterService = require("../utils/converter-service-client");
 var gridfs = require("../utils/gridfs");

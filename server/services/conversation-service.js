@@ -5,7 +5,7 @@
 var persistence = require("./persistence-service"),
     uuid = require('node-uuid'),
     console = require('console'),
-    winston = require('winston');
+    winston = require('../utils/winston');
 
 function findConversation(options, callback) {
   var troupeId = options.troupeId;

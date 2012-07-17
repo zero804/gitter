@@ -9,7 +9,7 @@ var form = require("express-form"),
     userService = require("../services/user-service"),
     passport = require('passport'),
     middleware = require('./middleware'),
-    winston = require("winston");
+    winston = require("../utils/winston");
 
 module.exports = {
     install: function(app) {

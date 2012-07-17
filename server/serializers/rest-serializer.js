@@ -6,7 +6,7 @@ var userService = require("../services/user-service");
 var Q = require("q");
 var _ = require("underscore");
 var handlebars = require('handlebars');
-var winston = require("winston");
+var winston = require("../utils/winston");
 
 function concatArraysOfArrays(a) {
   var result = [];
@@ -17,7 +17,7 @@ function concatArraysOfArrays(a) {
 }
 
 function execPreloads(preloads, callback) {
-  var promises = preloads.map(function(i) { 
+  var promises = preloads.map(function(i) {
     var deferred = Q.defer();
     i.strategy.preload(i.data, deferred.node());
     return deferred.promise;
@@ -25,9 +25,11 @@ function execPreloads(preloads, callback) {
 
   Q.all(promises)
       .then(function() {
-        callback(null);
+        winston.debug("Preloads succeeded");
+        callback();
       })
       .fail(function(err) {
+        winston.error("Preloads failed", err);
         callback(err);
       });
 }
@@ -36,11 +38,15 @@ function UserIdStrategy() {
   var self = this;
 
   this.preload = function(ids, callback) {
+    winston.debug("Preloading users: ", ids);
 
-    userService.findByIds(ids.distinct(), function(err, users) {
-      if(err) return callback(err);
+    userService.findByIds(_.uniq(ids), function(err, users) {
+      if(err) {
+        winston.error("Error loading users", err);
+        return callback(err);
+      }
       self.users = users.indexById();
-      callback(null);
+      callback(null, true);
     });
   };
 
@@ -179,28 +185,32 @@ function FileStrategy() {
   this.preload = function(items, callback) {
     var users = items.map(function(i) { return i.versions.map(function(j) { return j.creatorUserId; }); });
     users = _.flatten(users, true);
+    users = _.uniq(users);
+
 
     execPreloads([{
       strategy: userStategy,
-      data: _.uniq(users)
+      data: users
     }], callback);
   };
 
-  this.narrowFileVersion = function(item) {
-    return {
-      creatorUser: userStategy.map(item.creatorUserId),
-      createdDate: item.createdDate,
-      source: item.source,
-      deleted: item.deleted
-    };
-  };
 
   this.map = function(item) {
+
+    function narrowFileVersion(item) {
+      return {
+        creatorUser: userStategy.map(item.creatorUserId),
+        createdDate: item.createdDate,
+        source: item.source,
+        deleted: item.deleted
+      };
+    }
+
     return {
       id: item._id,
       fileName: item.fileName,
       mimeType: item.mimeType,
-      versions: item.versions.map(this.narrowFileVersion),
+      versions: item.versions.map(narrowFileVersion),
       url: '/troupes/' + encodeURIComponent(item.troupeId) + '/downloads/' + encodeURIComponent(item.fileName),
       previewMimeType: item.previewMimeType,
       embeddedViewType: item.embeddedViewType,
@@ -274,8 +284,12 @@ function serialize(items, Strategy, callback) {
   var strat = new Strategy();
 
   strat.preload(items, function(err) {
-    if(err) return callback(err);
+    if(err) {
+      winston.error("Error during preload", err);
+      return callback(err);
+    }
 
+    winston.debug("Mapping items");
     callback(null, pkg(items.map(strat.map)));
   });
 

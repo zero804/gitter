@@ -7,7 +7,7 @@ var sanitizer = require("sanitizer");
 var console = require("console");
 var temp = require("temp");
 var im = require('imagemagick');
-var winston = require('winston');
+var winston = require('./winston');
 
 module.exports = {
   generateThumbnail: function (fileName, width, height, callback) {

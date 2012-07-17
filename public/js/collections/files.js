@@ -2,15 +2,12 @@ define([
   'jquery',
   'underscore',
   'backbone',
+  './base',
   'models/file'
-], function($, _, Backbone, FileModel) {
-  var FileCollection = Backbone.Collection.extend({
+], function($, _, Backbone, TroupeCollections, FileModel) {
+  return TroupeCollections.LiveCollection.extend({
     model: FileModel,
-    url: "/troupes/" + window.troupeContext.troupe.id + "/files",
-    initialize: function() {
-    }
-
+    modelName: 'file',
+    nestedUrl: "files"
   });
-
-  return FileCollection;
 });

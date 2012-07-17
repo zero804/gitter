@@ -13,7 +13,7 @@ define([
     connect: function() {
       function createTrigger(name) {
         return function(message) {
-          console.log("Trigger for " + name + " on message", message);
+          //console.log("Trigger for " + name + " on message", message);
           $(document).trigger(name, message);
         };
       }
@@ -25,8 +25,8 @@ define([
       now.onNotification = createTrigger('notification');
       now.onMailEvent = createTrigger('mail');
       now.onDataChange = function(message) {
-          console.log("Data change for on message", message);
-          $(document).trigger('data:moo', message);
+          console.log("Data change for: " + message.modelName, message);
+          $(document).trigger('datachange:' + message.modelName, message);
       };
 
       now.ready(function() {

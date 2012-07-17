@@ -4,7 +4,7 @@
 
 var troupeService = require('../services/troupe-service'),
     fileService = require('../services/file-service'),
-    winston = require('winston');
+    winston = require('../utils/winston');
 
 var mimeIcons = {
   'image/jpeg': '/images/mime/jpg.png',

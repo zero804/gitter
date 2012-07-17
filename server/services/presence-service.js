@@ -3,7 +3,7 @@
 "use strict";
 
 var redis = require("redis"),
-    winston = require('winston'),
+    winston = require('../utils/winston'),
     appEvents = require('../app-events.js'),
     redisClient;
 
@@ -29,7 +29,7 @@ function resetClientState() {
 }
 
 
-console.log("Presence service establishing redis client");
+winston.info("Presence service establishing redis client");
 /* TODO: shutdown client at end of session */
 redisClient = redis.createClient();
 
@@ -202,7 +202,7 @@ module.exports = {
     removeSocketFromUserSockets(socketId, userId, function(err, lastDisconnect) {
       if(lastDisconnect) {
         removeUserFromActiveUsers(userId);
-        winston.error("User " + userId + " is now offline");
+        winston.info("User " + userId + " is now offline");
       }
     });
 
@@ -221,7 +221,7 @@ module.exports = {
           getNumberOfUsersInTroupe(troupeId, function(err, count) {
             if(err) return winston.error("Redis error: " + err);
 
-            if(count == 0) {
+            if(count === 0) {
               winston.info("The last user has disconnected from troupe " + troupeId);
               removeTroupe(troupeId);
             }

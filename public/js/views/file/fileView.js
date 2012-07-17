@@ -22,9 +22,11 @@ define([
       this.collection.bind('remove', this.onCollectionRemove);
       this.collection.bind('reset', this.onCollectionReset);
 
+      this.collection.listen();
+
       this.collection.fetch();
 
-      $(document).on('file', this.onFileEvent);
+      //$(document).on('file', this.onFileEvent);
     },
 
     getRenderData: function() {
@@ -37,7 +39,8 @@ define([
     },
 
     beforeClose: function() {
-      $(document).unbind('file', this.onFileEvent);
+      this.collection.unlisten();
+      //$(document).unbind('file', this.onFileEvent);
     },
 
     onFileEvent: function(event, data) {
