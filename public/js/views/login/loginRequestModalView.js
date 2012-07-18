@@ -14,6 +14,7 @@ define([
 
     events: {
       "submit form": "onFormSubmit",
+      "click .signin" : "onFormSubmit", // delete this line
       "click #existing-user" : "showLoginForm"
     },
 
@@ -22,7 +23,7 @@ define([
     },
 
     onFormSubmit: function(e) {
-     
+      alert("Create request and show content in loginRequestModalView");
     }
   });
 
