@@ -5,8 +5,9 @@ define([
   'backbone',
   'views/base',
   'hbs!templates/home/main',
-  'views/login/loginRequestModalView'
-], function($, _, Backbone, TroupeViews, template, RequestModalView){
+  'views/login/loginRequestModalView',
+  'views/login/loginRequestConfirmModalView'
+], function($, _, Backbone, TroupeViews, template, RequestModalView, RequestConfirmModalView){
   var MainHomeView = Backbone.View.extend({
     events: {
       "click .share":          "shareClicked",
@@ -16,6 +17,10 @@ define([
     requestClicked: function() {
       var view = new RequestModalView({ model: this.model });
       var modal = new TroupeViews.Modal({ view: view  });
+      view.on('request.complete', function() {
+          modal.off('request.complete');
+          modal.transitionTo(new TroupeViews.Modal({ view: new RequestConfirmModalView({ }) }));
+        });
       modal.show();
 
       return false;

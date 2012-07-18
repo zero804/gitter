@@ -23,7 +23,9 @@ define([
     },
 
     onFormSubmit: function(e) {
-      alert("Create request and show content in loginRequestModalView");
+      alert("Create request");
+      var that = this;
+      that.trigger('request.complete');
     }
   });
 
