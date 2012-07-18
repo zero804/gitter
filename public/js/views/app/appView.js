@@ -18,8 +18,7 @@ define([
         "click .menu-profile": "profileMenuClicked",
         "click .menu-settings": "settingsMenuClicked",
         "click .menu-signout": "signoutMenuClicked",
-
-         "click #troupe-selector-arrow"  : "toggleSelector"
+        "click #troupe-selector-arrow"  : "toggleSelector"
          //"click #trpPersonIcon" : "toggleUserMenu"
     },
 
@@ -132,7 +131,7 @@ define([
     },
 
     toggleSelector: function(){
-      if ($('#troupe-selector').is(':hidden')) $('#troupe-selectorM').slideDown(350, function() {
+      if ($('#troupe-selector').is(':hidden')) $('#troupe-selector').slideDown(350, function() {
           // Animation complete.
       });
       else $('#troupe-selector').slideUp(350, function() {
