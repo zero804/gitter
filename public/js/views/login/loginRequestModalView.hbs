@@ -1,0 +1,18 @@
+
+<div class="trpModalTitle">Request access to join</div>
+<div class="trpModalSubtext">You need to request access to this Troupe to join.</div>
+<div class="trpModalRequestForm">
+ <!-- don't show the input fields if the user is already signed in, but do show the submit button -->
+  <input type="text" size="5" name="requestName" placeholder="Name" class="trpInput f-name">&nbsp;
+  <input type="text" name="requestEmail" placeholder="Email address" class="trpInput f-email">
+  <div class="trpRequestSubmit">
+   <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen signin">Request Access</button>
+  </div>
+</div>
+ <!-- don't show this div if the user is already signed in -->
+<div class="trpModalExistingUsers" id="existing-user">
+Existing user? Click here to login.
+</div>
+
+<!-- show the footer div if the user is signed in -->
+<!--<div class="trpModalFooter"> </div> -->

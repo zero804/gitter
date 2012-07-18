@@ -3,11 +3,22 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hbs!templates/home/main'
-], function($, _, Backbone, template){
+  'views/base',
+  'hbs!templates/home/main',
+  'views/login/loginRequestModalView'
+], function($, _, Backbone, TroupeViews, template, RequestModalView){
   var MainHomeView = Backbone.View.extend({
     events: {
-      "click .share":          "shareClicked"
+      "click .share":          "shareClicked",
+      "click .request": "requestClicked"
+    },
+
+    requestClicked: function() {
+      var view = new RequestModalView({ model: this.model });
+      var modal = new TroupeViews.Modal({ view: view  });
+      modal.show();
+
+      return false;
     },
 
     initialize: function(options) {
