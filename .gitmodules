@@ -3,4 +3,4 @@
 	url = https://github.com/scriby/node-formidable.git
 [submodule "public/pdfjs"]
 	path = public/pdfjs
-url=https://github.com/suprememoocow/pdf.js
+url=https://github.com/mozilla/pdf.js.git
