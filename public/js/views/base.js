@@ -30,6 +30,15 @@ define([
       if(options.template) this.template = options.template;
     },
 
+    addCleanup: function(callback) {
+      var self = this;
+      function t() {
+        self.off('cleanup', t);
+        callback();
+      }
+      self.on('cleanup', t);
+    },
+
     getRenderData: function() {
       if (this.model) {
         return this.model.toJSON();
@@ -90,6 +99,7 @@ define([
     },
 
     close: function () {
+      this.trigger('cleanup');
       if (this.beforeClose) {
         this.beforeClose();
       }
@@ -342,13 +352,26 @@ define([
   });
 
   TroupeViews.Collection = TroupeViews.Base.extend({
-    initialize: function(options) {
-      this.itemView = options.itemView;
-      _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onCollectionRemove');
 
-      this.collection.bind('add', this.onCollectionAdd);
-      this.collection.bind('remove', this.onCollectionRemove);
-      this.collection.bind('reset', this.onCollectionReset);
+    constructor: function(options) {
+      var self = this;
+      TroupeViews.Base.prototype.constructor.apply(this, arguments);
+      if(!options) options = {};
+
+      if(options.itemView) {
+        this.itemView = options.itemView;
+      }
+
+      _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onCollectionRemove');
+      this.collection.on('add', this.onCollectionAdd);
+      this.collection.on('remove', this.onCollectionRemove);
+      this.collection.on('reset', this.onCollectionReset);
+
+      this.addCleanup(function() {
+        self.collection.off('add', self.onCollectionAdd);
+        self.collection.off('remove', self.onCollectionRemove);
+        self.collection.off('reset', self.onCollectionReset);
+      });
     },
 
     renderInternal: function() {
