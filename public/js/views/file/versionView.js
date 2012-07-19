@@ -4,9 +4,8 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'hbs!./fileVersionsView',
-  './versionView'
-], function($, _, Backbone, TroupeViews, template, VersionView){
+  'hbs!./versionView'
+], function($, _, Backbone, TroupeViews, template){
   return TroupeViews.Base.extend({
     template: template,
 
@@ -17,11 +16,6 @@ define([
     },
 
     afterRender: function() {
-      new TroupeViews.Collection({
-        collection: this.model.get('versions'),
-        itemView: VersionView,
-        el: this.$el.find('.frame-versions')
-      }).render();
     },
 
     beforeClose: function() {

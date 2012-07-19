@@ -37,7 +37,7 @@ define([
       return data;
     },
 
-    afterRender: function(dom, data) {
+    afterRender: function(data) {
       dom.find('.trpChatBubble').tooltip({title: function() { return $.timeago(new Date(data.sent)); }});
     }
   });
