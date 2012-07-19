@@ -26,7 +26,6 @@ define([
     },
 
     events: {
-//      "click .link-version": "switchLinkToVersions"
     },
 
     load: function() {
