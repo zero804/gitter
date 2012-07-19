@@ -140,7 +140,7 @@ ConversationSchema.methods.narrow = function () {
 
 var FileVersionSchema = new Schema({
   creatorUserId: ObjectId,
-  createdDate: { type: Date },
+  createdDate: { type: Date, "default": Date.now },
   deleted: { type: Boolean, "default": false },
 
   /* In future, this might change, but for the moment, use a URI-type source */
