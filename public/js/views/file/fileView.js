@@ -8,13 +8,15 @@ define([
   './fileItemView',
   'fileUploader',
   'collections/files'
-], function($, _, Backbone, TroupeViews, template, FileItemView, fileUploaderStub, FileModels) {
+], function($, _, Backbone, TroupeViews, template, FileItemView, fileUploaderStub, fileModels) {
+  "use strict";
+
   return TroupeViews.Base.extend({
     template: template,
 
     initialize: function(options) {
       this.router = options.router;
-      this.collection = new FileModels.FileCollection();
+      this.collection = new fileModels.FileCollection();
 
       _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onCollectionRemove', 'onFileEvent');
 
