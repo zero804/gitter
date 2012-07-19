@@ -3,12 +3,14 @@ define([
   'jquery',
   'underscore',
   'backbone',
+  'views/base',
   'hbs!views/people/people',
   'hbs!views/people/item',
   'views/confirmDialog',
   'views/people/inviteItemView',
-  'collections/invites'
-], function($, _, Backbone, template, itemTemplate, ConfirmDialog, InviteItemView, InviteCollection){
+  'collections/invites',
+  'views/share/shareModalView'
+], function($, _, Backbone, TroupeViews, template, itemTemplate, ConfirmDialog, InviteItemView, InviteCollection, ShareModalView){
   var PeopleView = Backbone.View.extend({
 
     initialize: function(options) {
@@ -29,7 +31,8 @@ define([
     },
 
     events: {
-      "click .trpPersonRemove": "removeUser"
+      "click .trpPersonRemove": "removeUser",
+      "click #share-button" : "showShareView"
     },
 
     render: function() {
@@ -49,6 +52,14 @@ define([
       });
 
       return this;
+    },
+
+    showShareView: function() {
+      var view = new ShareModalView({ model: this.model });
+      var modal = new TroupeViews.Modal({ view: view  });
+      modal.show();
+
+      return false;
     },
 
     onTabSelected: function(tab) {

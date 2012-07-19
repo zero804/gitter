@@ -18,8 +18,7 @@ define([
         "click .menu-profile": "profileMenuClicked",
         "click .menu-settings": "settingsMenuClicked",
         "click .menu-signout": "signoutMenuClicked",
-
-         "click #trpSelectorArrow"  : "toggleSelector"
+        "click #troupe-selector-arrow"  : "toggleSelector"
          //"click #trpPersonIcon" : "toggleUserMenu"
     },
 
@@ -46,9 +45,9 @@ define([
       //this.notificationCollection = new NotificationCollection();
 
 
-      this.troupeSelectorMenu = new TroupeViews.Menu({ el: "#trpTroupeSelector", triggerEl: "#menu-notification-selector" });
+      this.troupeSelectorMenu = new TroupeViews.Menu({ el: "#troupe-selector", triggerEl: "#menu-notification-selector" });
 
-      this.userMenu = new TroupeViews.Menu({ el: "#trpUserMenu", triggerEl: "#trpPersonIcon" });
+      this.userMenu = new TroupeViews.Menu({ el: "#troupe-user-menu", triggerEl: "#trpPersonIcon" });
 
       this.troupeCollection.on('change', this.addAllTroupes, this);
       this.troupeCollection.on('add', this.addOneTroupe, this);
@@ -132,10 +131,10 @@ define([
     },
 
     toggleSelector: function(){
-      if ($('#trpTroupeSelector').is(':hidden')) $('#trpTroupeSelector').slideDown(350, function() {
+      if ($('#troupe-selector').is(':hidden')) $('#troupe-selector').slideDown(350, function() {
           // Animation complete.
       });
-      else $('#trpTroupeSelector').slideUp(350, function() {
+      else $('#troupe-selector').slideUp(350, function() {
           // Animation complete.
       });
     },
