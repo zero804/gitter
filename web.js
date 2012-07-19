@@ -24,6 +24,8 @@ var RedisStore = require('connect-redis')(express);
 var app = express.createServer();
 
 var hbs = require('hbs');
+
+hbs.registerHelper('cdn', require('./server/utils/cdn-helper'));
 // TODO:come up with a better solution that this!
 hbs.registerPartial('require_config', fs.readFileSync(__dirname + '/public/templates/require_config.hbs', 'utf8'));
 
