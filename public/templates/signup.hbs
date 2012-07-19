@@ -6,15 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="bootstrap/css/trp2.css" rel="stylesheet">
-    <link href='https://fonts.googleapis.com/css?family=Lustria' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:200' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+    <!--
+    <link href='{{cdn "bootstrap/css/bootstrap.css" }}' rel="stylesheet">
+    -->
+    <link href='{{cdn "bootstrap/css/trp2.css" }}' rel="stylesheet">
+    <link href='//fonts.googleapis.com/css?family=Lustria' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Yanone+Kaffeesatz:200' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
     <link REL="SHORTCUT ICON" HREF="favicon.ico">
 
     {{>require_config}}
-    <script data-main="js/signup.js" src="js/libs/require/2.0.2/require-min.js"></script>
+<!--
+    <script data-main='{{cdn "js/signup.js" }}' src='{{cdn "js/libs/require/2.0.2/require-min.js"}}'></script>
+-->
+    <script data-main='js/signup.js' src='js/libs/require/2.0.2/require-min.js'></script>
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -22,17 +27,17 @@
     <![endif]-->
 
     <!-- Le fav and touch icons -->
-    <link rel="shortcut icon" href="images/favicon.ico">
-    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+    <link rel="shortcut icon" href='{{ cdn "images/favicon.ico"}}'>
+    <link rel="apple-touch-icon" href='{{ cdn "images/apple-touch-icon.png" }}'>
+    <link rel="apple-touch-icon" sizes="72x72" href='{{ cdn "images/apple-touch-icon-72x72.png" }}'>
+    <link rel="apple-touch-icon" sizes="114x114" href='{{ cdn "images/apple-touch-icon-114x114.png" }}'>
   </head>
 
   <body>
 
     <div class="trpHomeTopStripContainer">
       <div class="trpHomeTopStrip">
-        <div class="trpHomeLogo"><img src="images/2/logo-white.png"></div>
+        <div class="trpHomeLogo"><img src='{{ cdn "images/2/logo-white.png" }}'></div>
         <div class="trpHomeMenu">
           <div class="trpHomeMenuItem trpPadV14">Features</div>
           <div class="trpHomeMenuItem trpPadV14">Apps</div>
@@ -43,7 +48,7 @@
         </div>
       </div>
       <div class="trpHomeDivider">
-        <img src="images/2/divider-purple.png">
+        <img src='{{ cdn "images/2/divider-purple.png" }}'>
       </div>
       <div class="trpHomeHero">
         <div class="trpHeroText">
@@ -51,19 +56,19 @@
           <br><br>
           <a class="trpHomeMenuItem trpButtonBig trpBtnWhite button-signup" href="#">Sign up</a>
         </div>
-        <div class="trpHeroImage"><img src="images/2/hero-files.png"></div>
+        <div class="trpHeroImage"><img src='{{ cdn "images/2/hero-files.png"}}'></div>
       </div>
     </div>
 
 
     <div class="trpHomeMidStripContainer">
       <div class="trpMidStrip">
-        <img src="images/2/line.png" class="trpLine">Why you'll love using Troupe<img src="images/2/line.png" class="trpLine">
+        <img src="images/2/line.png" class="trpLine">Why you'll love using Troupe<img src='{{ cdn "images/2/line.png" }}' class="trpLine">
       </div>
 
       <div class="trpFeatures">
         <div class="trpFeature">
-          <div class="trpFeatureImage"><img src="images/2/feature-chat.png"></div>
+          <div class="trpFeatureImage"><img src='{{ cdn "images/2/feature-chat.png" }}'></div>
           <div class="trpFeatureText">
             <div class="trpFeatureHead">Quick and simple chat</div>
             <div class="trpFeatureBody">Group chat allows you to easily stay in touch with everyone in your Troupe. Need a quick answer or to discuss the latest presentation, just chat with anyone even on their mobiles.</div>
@@ -71,7 +76,7 @@
         </div>
 
         <div class="trpFeature">
-          <div class="trpFeatureImage"><img src="images/2/feature-files.png"></div>
+          <div class="trpFeatureImage"><img src='{{ cdn "images/2/feature-files.png" }}'></div>
            <div class="trpFeatureText">
             <div class="trpFeatureHead">Share and view files</div>
             <div class="trpFeatureBody">The simplest shared folder you've ever used. Keep all the files together, view them on your mobile, easy versioning just in case you need to go back to the last one.</div>
@@ -79,7 +84,7 @@
         </div>
 
         <div class="trpFeature">
-          <div class="trpFeatureImage"><img src="images/2/feature-email.png"></div>
+          <div class="trpFeatureImage"><img src='{{ cdn "images/2/feature-email.png" }}'></div>
            <div class="trpFeatureText">
             <div class="trpFeatureHead">All the emails in one place</div>
             <div class="trpFeatureBody">Group emails are a pain. Troupe makes this simple by giving your group an email address and keeping everyone in the loop.</div>
@@ -90,20 +95,20 @@
 
     <div class="trpHomeAppStripContainer">
       <div class="trpHomeAppStrip">
-        <img src="images/2/line.png" class="trpLine">You can use Troupe anytime, anywhere<img src="images/2/line.png" class="trpLine">
+        <img src='{{ cdn "images/2/line.png" }}' class="trpLine">You can use Troupe anytime, anywhere<img src='{{ cdn "images/2/line.png" }}' class="trpLine">
       </div>
 
       <div class="trpApps">
         <div class="trpApp">
-          <div class="trpAppImage"><img src="images/2/app-laptop.png"></div>
+          <div class="trpAppImage"><img src='{{ cdn "images/2/app-laptop.png" }}'></div>
           <div class="trpAppText">On a computer</div>
         </div>
         <div class="trpApp">
-          <div class="trpAppImage"><img src="images/2/app-tablet.png"></div>
+          <div class="trpAppImage"><img src='{{ cdn "images/2/app-tablet.png" }}'></div>
           <div class="trpAppText">On tablets</div>
         </div>
         <div class="trpApp">
-          <div class="trpAppImage"><img src="images/2/app-phone.png"></div>
+          <div class="trpAppImage"><img src='{{ cdn "images/2/app-phone.png" }}'></div>
           <div class="trpAppText">On smartphones</div>
         </div>
       </div>
@@ -111,15 +116,15 @@
 
     <div class="trpHomeFooterStripContainer">
       <div class="trpFooterStrip">
-        <img src="images/2/logo-mark-green.png" class="trpLine">
+        <img src='{{ cdn "images/2/logo-mark-green.png" }}' class="trpLine">
       </div>
     </div>
 
-
+<!--
     <script src="bootstrap/js/jquery.js"></script>
     <script src="bootstrap/js/bootstrap-tooltip.js"></script>
     <script src="bootstrap/js/bootstrap-popover.js"></script>
-
+-->
 
   </body>
 </html>
