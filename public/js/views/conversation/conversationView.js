@@ -8,13 +8,15 @@ define([
   'hbs!views/conversation/conversationView',
   'collections/conversations',
   'views/conversation/conversationItemView'
-], function($, _, Backbone, TroupeViews, dateFormat, template, ConversationCollection, ConversationItemView){
-  var ConversationView = TroupeViews.Base.extend({
+], function($, _, Backbone, TroupeViews, dateFormat, template, conversationModels, ConversationItemView){
+  "use strict";
+
+  return TroupeViews.Base.extend({
     template: template,
 
     initialize: function(options) {
       // we probably want to pull in the domain from config, e.g. for beta.trou.pe
-      this.collection = new ConversationCollection();
+      this.collection = new conversationModels.ConversationCollection();
 
       _.bindAll(this, 'onCollectionAdd', 'onCollectionReset');
 
@@ -47,6 +49,4 @@ define([
 
   });
 
-
-  return ConversationView;
 });

@@ -20,10 +20,7 @@ define([
       },
 
       initialize: function() {
-        var versions = this.get('versions');
-        if(_.isArray(versions)) {
-          this.set('versions', new exports.FileVersionCollection());
-        }
+        this.convertArrayToCollection('versions', exports.FileVersionCollection);
       }
 
       /*

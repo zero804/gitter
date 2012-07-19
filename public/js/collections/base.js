@@ -10,6 +10,13 @@
 
   var exports = {
     Model: Backbone.Model.extend({
+      convertArrayToCollection: function(attr, Collection) {
+        var val = this.get(attr);
+        if(_.isArray(val)) {
+          this.set(attr, new Collection(val));
+        }
+      },
+
       set: function(key, value, options) {
         var attrs, attr, val;
 

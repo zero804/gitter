@@ -6,6 +6,8 @@ define([
   'hbs!templates/file/row',
   'collections/files'
 ], function($, _, Backbone, rowTemplate, FileModels){
+  "use strict";
+
   var FileView = Backbone.View.extend({
     el: '#file',
     collection: new FileModels.FileCollection(),

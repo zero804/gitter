@@ -1,21 +1,31 @@
 define([
   'jquery',
   'underscore',
-  'backbone',
-  'models/notification'
-], function($, _, Backbone, NotificationModel) {
-  var baseUrl;
-  if(window.troupeContext.troupe) {
-    baseUrl = "/troupes/" + window.troupeContext.troupe.id + "/notifications";
-  }
+  'backbone'
+], function($, _, Backbone) {
+  "use strict";
 
-  var NotificationCollection = Backbone.Collection.extend({
-    model: NotificationModel,
-    url: baseUrl,
+  var exports = {};
+
+  exports.NotificationModel = Backbone.Model.extend({
+    idAttribute: "id",
+
+    defaults: {
+    },
+
     initialize: function() {
     }
 
   });
 
-  return NotificationCollection;
+  exports.NotificationCollection = Backbone.Collection.extend({
+    model: exports.NotificationModel,
+    initialize: function() {
+      this.url = "/troupes/" + window.troupeContext.troupe.id + "/notifications";
+
+    }
+
+  });
+
+  return exports;
 });
