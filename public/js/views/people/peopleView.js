@@ -10,7 +10,9 @@ define([
   'views/people/inviteItemView',
   'collections/invites',
   'views/share/shareModalView'
-], function($, _, Backbone, TroupeViews, template, itemTemplate, ConfirmDialog, InviteItemView, InviteCollection, ShareModalView){
+], function($, _, Backbone, TroupeViews, template, itemTemplate, ConfirmDialog, InviteItemView, inviteModels, ShareModalView){
+  "use strict";
+
   var PeopleView = Backbone.View.extend({
 
     initialize: function(options) {
@@ -72,7 +74,7 @@ define([
 
     onInviteTabSelected: function() {
       if(!this.invites) {
-        this.invites = new InviteCollection();
+        this.invites = new inviteModels.InviteCollection();
 
         this.invites.bind('add', this.onAddOneInvite, this);
         this.invites.bind('reset', this.onAddAllInvites, this);

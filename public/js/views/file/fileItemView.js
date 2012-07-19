@@ -4,10 +4,11 @@ define([
   'underscore',
   'backbone',
   'views/base',
+  'views/rivets-backbone',
   'hbs!./fileItemView',
   './filePreviewView',
   './fileVersionsView'
-], function($, _, Backbone, TroupeViews, template, FilePreviewView, FileVersionsView){
+], function($, _, Backbone, TroupeViews, rivet, template, FilePreviewView, FileVersionsView){
   return TroupeViews.Base.extend({
     template: template,
 
@@ -20,6 +21,19 @@ define([
 
     initialize: function(options) {
       _.bindAll(this, 'onPreviewLinkClick', 'showFileActionMenu', 'hideFileActionMenu', 'onDeleteLinkClick', 'onVersionsLinkClick');
+    },
+
+    getRenderData: function() {
+      var data = this.model.toJSON();
+      data.fileIcon = this.fileIcon(this.model.get('fileName'));
+      return data;
+    },
+
+    afterRender: function() {
+
+    },
+
+    beforeClose: function() {
     },
 
     onPreviewLinkClick: function(e) {
@@ -50,11 +64,6 @@ define([
       return false;
     },
 
-    getRenderData: function() {
-      var data = this.model.toJSON();
-      data.fileIcon = this.fileIcon(this.model.get('fileName'));
-      return data;
-    },
 
     showFileActionMenu: function(e) {
       $('body, html').on('click', this.hideFileActionMenu);

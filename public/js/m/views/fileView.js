@@ -5,10 +5,12 @@ define([
   'backbone',
   'hbs!templates/file/row',
   'collections/files'
-], function($, _, Backbone, rowTemplate, FileCollection){
+], function($, _, Backbone, rowTemplate, FileModels){
+  "use strict";
+
   var FileView = Backbone.View.extend({
     el: '#file',
-    collection: new FileCollection(),
+    collection: new FileModels.FileCollection(),
     initialize: function(options) {
       //this.router = options.router;
 

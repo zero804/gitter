@@ -9,7 +9,8 @@ define([
   'views/widgets/nav',
   'jqueryui',
   'noty'
-], function($, _, Backbone, TroupeCollection, NotificationCollection, TroupeViews, NavView) {
+], function($, _, Backbone, troupeModels, notificationModels, TroupeViews, NavView) {
+  "use strict";
 
   var AppView = Backbone.View.extend({
     el: 'body',
@@ -41,7 +42,7 @@ define([
         'people': attachNavView('#nav-people')
       };
 
-      this.troupeCollection = new TroupeCollection();
+      this.troupeCollection = new troupeModels.TroupeCollection();
       //this.notificationCollection = new NotificationCollection();
 
 

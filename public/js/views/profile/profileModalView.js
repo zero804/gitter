@@ -34,7 +34,7 @@ define([
       this.$el.find('.image-avatar').attr('src', "/avatar?_dc=" + Date.now());
     },
 
-    afterRender: function(dom) {
+    afterRender: function() {
       var self = this;
       var myUpload = self.$el.find('.button-choose-avatar').upload({
         name: 'files',
