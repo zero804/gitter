@@ -42,9 +42,7 @@ define([
       return {};
     },
 
-    render: function() {
-      var data = this.getRenderData();
-
+    renderInternal: function(data) {
       function replaceElementWithWidget(element, options) {
           require(['views/widgets/' + options.widgetName], function(Widget) {
             var widget = new Widget(options.model);
@@ -60,35 +58,44 @@ define([
           var id = this.getAttribute('data-id'),
               attrs = data.renderViews[id];
               replaceElementWithWidget(this, attrs);
-      });
-
+        });
       }
       this.$el.html(dom);
+      return dom;
+    },
+
+    render: function() {
+      var data = this.getRenderData();
+
+      var dom = this.renderInternal(data);
       if(this.model) {
         var id = this.model.get('id');
         this.$el.addClass('model-id-' + id);
       }
 
-      if(this.afterRender) { this.afterRender(dom, data); }
+      if(this.afterRender) { this.afterRender(data); }
 
       this.$el.addClass("view");
       this.el._view = this;
       return this;
     },
 
-    close: function () {
-      console.log("BASE CLOSE");
-      if (this.beforeClose) {
-        this.beforeClose();
-      }
-
-      this.remove();
-      this.$el.find('.view').each(function(index, viewElement) {
+    removeSubViews: function($el) {
+      $el.find('.view').each(function(index, viewElement) {
         if(viewElement._view) {
           viewElement._view.close();
           viewElement._view = null;
         }
       });
+    },
+
+    close: function () {
+      if (this.beforeClose) {
+        this.beforeClose();
+      }
+
+      this.remove();
+      this.removeSubViews(this.$el);
 
       if (this.onClose) { this.onClose(); }
       this.trigger('close');
@@ -332,6 +339,44 @@ define([
           // Animation complete.
       });
     }
+  });
+
+  TroupeViews.Collection = TroupeViews.Base.extend({
+    initialize: function(options) {
+      this.itemView = options.itemView;
+      _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onCollectionRemove');
+
+      this.collection.bind('add', this.onCollectionAdd);
+      this.collection.bind('remove', this.onCollectionRemove);
+      this.collection.bind('reset', this.onCollectionReset);
+    },
+
+    renderInternal: function() {
+      var self = this;
+      this.collection.each(function(item) {
+        self.$el.append(new self.itemView({ model: item }).render().el);
+      });
+    },
+
+    events: {
+    },
+
+    onCollectionReset: function() {
+      this.$el.empty();
+      this.removeSubViews(this.$el);
+      this.collection.each(this.onCollectionAdd);
+    },
+
+    onCollectionAdd: function(item) {
+      this.$el.append(new this.itemView({ model: item }).render().el);
+    },
+
+    onCollectionRemove: function(item) {
+      this.$el.find('.model-id-' + item.get('id')).each(function(index, item) {
+        if(item._view) item._view.remove();
+      });
+    }
+
   });
 
   return TroupeViews;

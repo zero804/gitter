@@ -5,9 +5,10 @@ define([
   'backbone',
   'views/base',
   'dateFormat',
-  'hbs!views/conversation/conversationItemView',
-  'models/conversationDetail'
-  ], function($, _, Backbone, TroupeViews, dateFormat, template, ConversationDetail) {
+  'hbs!views/conversation/conversationItemView'
+], function($, _, Backbone, TroupeViews, dateFormat, template) {
+  "use strict";
+
   var ConversationItemView = TroupeViews.Base.extend({
     template: template,
 

@@ -5,16 +5,18 @@ define([
   'backbone',
   'views/base',
   'hbs!views/conversation/conversationDetailView',
-  'models/conversationDetail',
+  'collections/conversations',
   'views/conversation/conversationDetailItemView'
-], function($, _, Backbone, TroupeViews, template, ConversationDetailModel, ConversationDetailItemView) {
+], function($, _, Backbone, TroupeViews, template, conversationModels, ConversationDetailItemView) {
+  "use strict";
+
   return TroupeViews.Base.extend({
     template: template,
 
     initialize: function(options) {
       _.bindAll(this, 'onEmailCollectionAdd', 'onEmailCollectionReset');
 
-      this.model = new ConversationDetailModel();
+      this.model = new conversationModels.ConversationDetail();
       this.model.emailCollection.bind('add', this.onEmailCollectionAdd);
       this.model.emailCollection.bind('reset', this.onEmailCollectionReset);
 
@@ -24,7 +26,6 @@ define([
     },
 
     events: {
-//      "click .link-version": "switchLinkToVersions"
     },
 
     load: function() {
@@ -44,7 +45,6 @@ define([
     getRenderData: function() { return {}; },
 
     onEmailCollectionReset: function() {
-      console.dir(this.model.emailCollection);
       $(".frame-emails", this.el).empty();
       this.model.emailCollection.each(this.onEmailCollectionAdd);
     },
