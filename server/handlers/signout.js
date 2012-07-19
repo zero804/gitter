@@ -8,7 +8,7 @@ module.exports = {
       app.get('/signout', function(req, res) {
         res.clearCookie("auth");
         req.session.destroy();
-        res.relativeRedirect('/');
+        res.relativeRedirect('/x');
       });
 
     }

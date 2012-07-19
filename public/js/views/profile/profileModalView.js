@@ -19,7 +19,8 @@ define([
     getRenderData: function() {
       return {
         existingUser: this.existingUser,
-        displayName: this.existingUser ? window.troupeContext.user.displayName : ""
+        // displayName: this.existingUser ? window.troupeContext.user.displayName : ""
+        displayName: window.troupeContext.user.displayName
       };
     },
 
