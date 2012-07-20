@@ -5,6 +5,7 @@ NEWTAG=`git log -n 1 --pretty=format:%h`
 if [ "XX$OLDTAG" != "XX$NEWTAG" ]; then
   if [ "XX$OLDTAG" != "XX$" ]; then
     for i in `s3cmd ls s3://troupe-cdn|awk '{print $2}'|grep -v "$OLDTAG"`; do 
+      echo removing $i
       s3cmd rm $i
     done
   fi
