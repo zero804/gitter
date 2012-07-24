@@ -162,8 +162,8 @@ define([
 */
     profileMenuClicked: function() {
       require(['views/profile/profileModalView'], function(ProfileModalView) {
-        view = new ProfileModalView({ existingUser: true });
-        modal = new TroupeViews.Modal({ view: view  });
+        var view = new ProfileModalView({ existingUser: true });
+        var modal = new TroupeViews.Modal({ view: view });
 
         view.on('profile.complete', function(data) {
           modal.off('profile.complete');
