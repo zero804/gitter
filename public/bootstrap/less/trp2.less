@@ -22,6 +22,7 @@
 
 // Our fonts
 @font1: 'Pontano Sans', sans-serif;
+
 @font-face {
 font-family: 'StagWeb-Light';
     src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.eot');
@@ -33,6 +34,30 @@ font-family: 'StagWeb-Light';
     font-style: normal;
     font-stretch: normal;
 }
+
+@font-face {
+    font-family: 'StagWeb-Thin';
+    src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.eot');
+    src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.eot?#iefix') format('embedded-opentype'),
+       url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.woff') format('woff'),
+       url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.ttf') format('truetype'),
+       url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.svg#StagWeb-Thin') format('svg');
+    font-weight: 100;
+    font-style: normal;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: 'StagSansWeb-Light';
+    src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.eot');
+    src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.eot?#iefix') format('embedded-opentype'),
+       url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.woff') format('woff'),
+       url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.ttf') format('truetype'),
+       url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.svg#StagSansWeb-Light') format('svg');
+    font-weight: 400;
+    font-style: normal;
+    font-stretch: normal;
+    }
 
 
 @bodyPadding:	 20px;
@@ -114,10 +139,11 @@ h1 {
   max-width: 260px;
   padding-right: 20px;
   padding-top: 40px;
-  font-family: 'StagWeb-Light', serif;
+  font-family: 'StagWeb-Thin', serif;
   font-size: 24px;
   color: white;
   text-align: left;
+  line-height: 1.3em;
 }
 
 .trpHeroImage {
@@ -135,8 +161,8 @@ h1 {
 }
 
 .trpMidStrip {
-  font-family: 'Lustria', serif;
-  font-size: 16px;
+  font-family: 'StagWeb-Light', serif;
+  font-size: 18px;
   color: @trpDarkerGrey;
   padding-top: 10px;
 }
@@ -158,7 +184,7 @@ h1 {
 }
 
 .trpFeatureHead {
-  font-family: 'Lustria', serif;
+  font-family: 'StagWeb-Light', serif;
   font-size: 18px;
   padding-top: 16px;
   padding-bottom: 6px;
@@ -166,12 +192,12 @@ h1 {
 }
 
 .trpFeatureBody {
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'StagSansWeb-Light', sans-serif;
   font-size: 14px;
   font-weight: lighter;
   color: @trpDarkGrey;
+  line-height: 1.4em;
 }
-
 .trpHomeAppStripContainer {
   background-color: @trpCream;
   width: 100%;
@@ -181,8 +207,8 @@ h1 {
 }
 
 .trpHomeAppStrip {
-  font-family: 'Lustria', serif;
-  font-size: 16px;
+  font-family: 'StagWeb-Light', serif;
+  font-size: 18px;
   color: @trpDarkerGrey;
   padding-top: 10px;
 }
@@ -205,7 +231,7 @@ h1 {
 }
 
 .trpAppText {
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'StagSansWeb-Light', sans-serif;
   font-size: 14px;
   font-weight: lighter;
   color: @trpDarkGrey;
@@ -1086,6 +1112,7 @@ textarea, input { outline: none; }
    max-height: 600px;
    overflow: hidden;
 }
+
 
 .modal-header {
   .border-radius(0px);
