@@ -11,6 +11,13 @@ define([
 
     initialize: function(options) {
       _.bindAll(this, 'onFormSubmit');
+      this.uri = options.uri;
+    },
+
+    getRenderData: function() {
+      return {
+        uri: this.uri
+      };
     },
 
     events: {
