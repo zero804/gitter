@@ -21,7 +21,11 @@
 @trpCream: #f9f9f6; //light cream
 
 // Our fonts
-@font1: 'Pontano Sans', sans-serif;
+
+@fontSerif: 'StagWeb-Light', serif;
+/*@fontSans: 'StagSansWeb-Light', sans-serif;*/
+@fontSans: 'Open Sans', sans-serif;
+@fontThin: 'StagWeb-Thin', serif;
 
 @font-face {
 font-family: 'StagWeb-Light';
@@ -75,6 +79,36 @@ font-family: 'StagWeb-Light';
   box-shadow:         3px 2px 5px -1px rgba(50, 50, 50, 0.75);
 }
 
+.trpH1 {
+  font-family: @fontSerif;
+  font-size: 24px;
+}
+
+.trpH2 {
+  font-family: @fontSerif;
+  font-size: 18px;
+}
+
+.trpH3 {
+  font-family: @fontSerif;
+  font-size: 16px; 
+}
+
+.trpBodyText {
+  font-family: @fontSans;
+  font-size: 14px;
+}
+
+.trpBodyEm {
+  font-family: @fontSans;
+  font-size: 16px;
+}
+
+.trpBodySmall {
+  font-family: @fontSans;
+  font-size: 12px;
+}
+
 body {
   margin: 0;
 }
@@ -85,8 +119,7 @@ html {
 }
 
 h1 {
-  font-family: 'Lustria', serif;
-  font-size: 24px;
+  .trpH1;
   margin: 0;
 }
 
@@ -123,8 +156,7 @@ h1 {
   display: inline-block;
   float: left;
   padding-right: 26px;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 12px;
+  .trpBodySmall;
   font-weight: lighter;
 }
 
@@ -139,7 +171,7 @@ h1 {
   max-width: 260px;
   padding-right: 20px;
   padding-top: 40px;
-  font-family: 'StagWeb-Thin', serif;
+  font-family: @fontThin;
   font-size: 24px;
   color: white;
   text-align: left;
@@ -161,8 +193,7 @@ h1 {
 }
 
 .trpMidStrip {
-  font-family: 'StagWeb-Light', serif;
-  font-size: 18px;
+  .trpH2;
   color: @trpDarkerGrey;
   padding-top: 10px;
 }
@@ -184,16 +215,14 @@ h1 {
 }
 
 .trpFeatureHead {
-  font-family: 'StagWeb-Light', serif;
-  font-size: 18px;
+  .trpH2;
   padding-top: 16px;
   padding-bottom: 6px;
   color: @trpDarkerGrey;
 }
 
 .trpFeatureBody {
-  font-family: 'StagSansWeb-Light', sans-serif;
-  font-size: 14px;
+  .trpBodyText;
   font-weight: lighter;
   color: @trpDarkGrey;
   line-height: 1.4em;
@@ -207,8 +236,7 @@ h1 {
 }
 
 .trpHomeAppStrip {
-  font-family: 'StagWeb-Light', serif;
-  font-size: 18px;
+  .trpH2;
   color: @trpDarkerGrey;
   padding-top: 10px;
 }
@@ -231,8 +259,7 @@ h1 {
 }
 
 .trpAppText {
-  font-family: 'StagSansWeb-Light', sans-serif;
-  font-size: 14px;
+  .trpBodyText;
   font-weight: lighter;
   color: @trpDarkGrey;
 }
@@ -247,8 +274,7 @@ h1 {
 }
 
 .trpFooterStrip {
-  font-family: 'Lustria', serif;
-  font-size: 16px;
+  .trpH3;
   color: @trpDarkerGrey;
   padding-top: 10px;
 }
@@ -266,10 +292,6 @@ h1 {
   height: 64px;
   background-color: @trpGreen;
 }
-
-/*#trpFiles {
-  background-color: @trpRed;
-}*/
 
 .right {
   text-align:right; 
@@ -373,8 +395,7 @@ h1 {
   text-decoration: none;
   border-top: thin solid white;
   background-color: @trpGreen;
-  font-family: 'Lustria', serif;
-  font-size: 18px;
+  .trpH2;
   cursor: pointer;
 }
 
@@ -420,8 +441,7 @@ h1 {
   padding-right: 5px;
   padding-bottom: 10px;
   text-decoration: none;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 12px;
+  .trpBodySmall;
 }
 
 .trpUserMenuItem:hover{
@@ -469,8 +489,7 @@ h1 {
 .trpNavItemText {
   display: inline-block;
   a {
-    font-family: 'Open Sans', sans-serif;
-    font-size: 15px;
+    .trpBodyEm;
     color: @trpDarkGrey;
     text-decoration: none;
   }
@@ -488,7 +507,7 @@ h1 {
   -moz-border-radius: 50%;
   border-radius: 50%;
   background-color: @trpGreen;
-  font-family: 'Open Sans', sans-serif;
+  font-family: @fontSans;
   font-size: 9px;
   color: white;
   height: 16px;
@@ -526,10 +545,8 @@ h1 {
   resize: none;
   padding: 18px;
   max-height: 30px;
-  font-size: 18px;
   color: #7b797a;
-  letter-spacing: 1px;
-  font-family: 'Yanone Kaffeesatz', sans-serif;
+  .trpH2;
   width: 500px;
 }
 
@@ -555,10 +572,8 @@ textarea, input { outline: none; }
   -webkit-border-radius:3px;
   -moz-border-radius:3px;
   border-radius:3px;
-  font-size: 18px;
+  .trpBodyEm;
   color: #7b797a;
-  letter-spacing: 1px;
-  font-family: 'Yanone Kaffeesatz', sans-serif;
   max-width: 500px;
 }
 
@@ -684,9 +699,8 @@ textarea, input { outline: none; }
   margin-top: 5px;
   float: left;
   height: 20px;
-  font-size: 12px;
   color: @trpDarkGrey;
-  font-family: 'Open Sans', sans-serif;
+  .trpBodySmall;
   width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -727,10 +741,9 @@ textarea, input { outline: none; }
 }
 
 .trpFileActionMenuItem {
-  font-size: 12px;
   color: @trpDarkGrey;
-  font-family: 'Open Sans', sans-serif;
   padding: 5px 0px 5px 10px;
+  .trpBodySmall;
 }
 
 .trpFileActionMenuItem a {
@@ -763,8 +776,7 @@ textarea, input { outline: none; }
   height:100%;
   width: 100%;
   z-index:2;
-  font-family: 'Lustria', serif;
-  font-size: 16px;
+  .trpH3;
   color: @trpDarkGrey;
   margin-top: 15px;
 }
@@ -778,8 +790,7 @@ textarea, input { outline: none; }
   float: left;
   padding-top: 10px;
   padding-left: 20px;
-  font-family: 'Lustria', serif;
-  font-size: 14px;
+  .trpH3;
 
 }
 
@@ -819,8 +830,7 @@ textarea, input { outline: none; }
 }
 
 .trpMailFromSubject {
-  font-family: 'Lustria', serif;
-  font-size: 18px;
+  .trpH2;
   height: 23px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -828,8 +838,7 @@ textarea, input { outline: none; }
 }
 
 .trpMailPreview {
-  font-family: 'Open Sans', sans-serif;
-  font-size: 13px;
+  .trpBodyText;
   color: @trpDarkGrey;
   height: 36px;
   overflow: hidden;
@@ -842,8 +851,7 @@ textarea, input { outline: none; }
 
 .trpMailDate {
   float: left;
-  font-family: 'Lustria', serif;
-  font-size: 14px;
+  .trpBodyText;
   color: @trpDarkGrey;
 }
 
@@ -870,8 +878,7 @@ textarea, input { outline: none; }
 .trpPeopleHeader {
   float: left;
   padding-top: 10px;
-  font-family: 'Lustria', serif;
-  font-size: 18px;
+  .trpH2;
 }
 
 .trpPeopleTab {
@@ -896,14 +903,12 @@ textarea, input { outline: none; }
 }
 
 .trpPersonName {
-  font-family: 'Lustria', serif;
-  font-size: 18px;
+  .trpH3;
   color: black;
 }
 
 .trpPersonRemove {
-  font-family: 'Lustria', serif;
-  font-size: 14px;
+  .trpBodySmall;
   color: @trpDarkGrey;
 }
 
@@ -924,8 +929,7 @@ textarea, input { outline: none; }
 .trpButton {
   color: @trpDarkGrey;
   border: 1px solid @trpLightGrey;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 12px;
+  .trpBodySmall;
   padding: 5px 10px 5px 10px;
   display: inline-block;
   -webkit-border-radius:3px;
@@ -942,8 +946,7 @@ textarea, input { outline: none; }
   padding: 14px 8px 14px 8px;
   text-align: center;
   min-width: 76px;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 12px;
+  .trpBodySmall;
   text-decoration: none;
   border: none;
 }
@@ -975,8 +978,7 @@ textarea, input { outline: none; }
 }
 
 .trpTabItem {
-  font-family: 'Open Sans', sans-serif;
-  font-size: 14px;
+  .trpBodyText;
   color: @trpDarkGrey;
 }
 
@@ -1020,8 +1022,7 @@ textarea, input { outline: none; }
 
 .trpModalMenu > a {
   float: right;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 12px;
+  .trpBodySmall;
   color: @trpDarkGrey;
   padding-top: 10px;
 }
@@ -1031,8 +1032,7 @@ textarea, input { outline: none; }
 }
 
 .trpModalTitle {
-  font-family: 'Lustria', serif;
-  font-size: 18px;
+  .trpH2;
   color: @trpDarkGrey;
   padding-bottom: 12px;
 }
@@ -1044,8 +1044,7 @@ textarea, input { outline: none; }
 }
 
 .trpModalSubtext {
-  font-family: 'Open Sans', sans-serif;
-  font-size: 12px;
+  .trpBodySmall;
   color: @trpDarkGrey;
   padding: 8px 0px 12px 0px;
 }
@@ -1068,8 +1067,7 @@ textarea, input { outline: none; }
 .trpModalExistingUsers {
   background-color: @trpPurple;
   color: white;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 12px;
+  .trpBodySmall;
   margin: 12px -24px 0px -24px;
   padding: 16px 24px 16px 24px;
   cursor: pointer;
@@ -1091,8 +1089,7 @@ textarea, input { outline: none; }
 .trpInput {
   border: 1px solid @trpGrey;
   padding: 10px;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 12px;
+  .trpBodySmall;
   color: @trpDarkGrey;
   .border-radius(0px);
 }
