@@ -57,7 +57,7 @@ define([
     },
 
     showShareView: function() {
-      var view = new ShareModalView({ model: this.model });
+      var view = new ShareModalView({ model: this.model, uri: window.troupeContext.troupe.uri });
       var modal = new TroupeViews.Modal({ view: view  });
       modal.show();
 
