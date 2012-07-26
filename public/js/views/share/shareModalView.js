@@ -1,4 +1,6 @@
 // Filename: views/home/main
+// TODO: Confirmation after invite sent
+
 define([
   'jquery',
   'underscore',
@@ -65,7 +67,7 @@ define([
             alert('Oopsie daisy')
             return;
           }
-          // that.trigger('share.complete', data);
+          that.trigger('share.complete', data);
 
         }
       });
