@@ -33,7 +33,7 @@ define([
     },
 
     events: {
-      "click .trpPersonRemove": "removeUser",
+      "click .remove": "removeUser",
       "click #share-button" : "showShareView"
     },
 
