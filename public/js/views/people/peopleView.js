@@ -1,4 +1,8 @@
 // Filename: views/home/main
+// TODO: Confirmation after invite sent
+// TODO: Implement remove user properly
+// TODO: Fix showing invites
+
 define([
   'jquery',
   'underscore',
@@ -59,6 +63,12 @@ define([
     showShareView: function() {
       var view = new ShareModalView({ model: this.model, uri: window.troupeContext.troupe.uri });
       var modal = new TroupeViews.Modal({ view: view  });
+
+      view.on('share.complete', function(data) {
+          modal.off('share.complete');
+          modal.hide();
+        });
+
       modal.show();
 
       return false;
