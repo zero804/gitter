@@ -171,7 +171,7 @@ define([
 
       this.escape();
       this.backdrop(function () {
-        var transition = $.support.transition && that.options.fade;
+        var transition = $.support.transition && that.$el.hasClass('fade');
 
         if(!that.$el.parent().length) {
           that.$el.appendTo(document.body); //don't move modals dom position

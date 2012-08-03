@@ -15,11 +15,11 @@ define([
     },
 
     requestClicked: function() {
-      var view = new RequestModalView({ model: this.model });
+      var view = new RequestModalView({ });
       var modal = new TroupeViews.Modal({ view: view  });
-      view.on('request.complete', function() {
+      view.on('request.complete', function(data) {
           modal.off('request.complete');
-          modal.transitionTo(new TroupeViews.Modal({ view: new RequestConfirmModalView({ }) }));
+          modal.transitionTo(new TroupeViews.Modal({ view: new RequestConfirmModalView({ data: data }) }));
         });
       modal.show();
 

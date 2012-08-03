@@ -1,4 +1,6 @@
 // Filename: views/home/main
+// TODO: Actually create a request
+// TODO: Better transition to request confirm page
 define([
   'jquery',
   'underscore',
@@ -23,7 +25,7 @@ define([
     },
 
     onFormSubmit: function(e) {
-      alert("Create request");
+      // alert("Create request");
       var that = this;
       that.trigger('request.complete');
     }
