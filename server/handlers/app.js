@@ -31,7 +31,6 @@ module.exports = {
             }
 
             profileNotCompleted = req.user.status == 'PROFILE_NOT_COMPLETED';
-            
           } else {
             troupeData = null;
           }
@@ -54,12 +53,12 @@ module.exports = {
             page = 'app';
           }
 
-          var startScript, troupeName;
+          var login, troupeName;
           if(req.user && !profileNotCompleted && troupeData) {
-            startScript = "app";
+            login  = false;
             troupeName = troupe.name;
           } else {
-            startScript = "app-login";
+            login = true;
             if(profileNotCompleted) {
               troupeName = troupe.name;
             } else {
@@ -68,7 +67,7 @@ module.exports = {
           }
 
           res.render(page, {
-            startScript: startScript,
+            login: login,
             troupeName: troupeName,
             troupeContext: JSON.stringify(troupeContext)
           });
