@@ -1,4 +1,6 @@
 // Filename: views/home/main
+// TODO: Confirmation after invite sent
+
 define([
   'jquery',
   'underscore',
@@ -11,6 +13,13 @@ define([
 
     initialize: function(options) {
       _.bindAll(this, 'onFormSubmit');
+      this.uri = options.uri;
+    },
+
+    getRenderData: function() {
+      return {
+        uri: this.uri
+      };
     },
 
     events: {
@@ -58,7 +67,7 @@ define([
             alert('Oopsie daisy')
             return;
           }
-          // that.trigger('share.complete', data);
+          that.trigger('share.complete', data);
 
         }
       });

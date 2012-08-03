@@ -9,7 +9,8 @@ define([
     template: template,
 
     initialize: function(options) {
-      _.bindAll(this, 'onFormSubmit');
+      if(!options) options = {};
+      this.data = options.data;
     },
 
     events: {
