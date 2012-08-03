@@ -1,3 +1,4 @@
+(function () {
 // lib/handlebars/base.js
 var Handlebars = {};
 
@@ -93,6 +94,7 @@ Handlebars.registerHelper('log', function(context) {
   Handlebars.log(context);
 });
 ;
+//>>excludeStart('excludeHbsParser', pragmas.excludeHbsParser)
 // lib/handlebars/compiler/parser.js
 /* Jison generated parser */
 var handlebars = (function(){
@@ -480,25 +482,7 @@ lexer.conditions = {"mu":{"rules":[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,2
 parser.lexer = lexer;
 return parser;
 })();
-if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
-exports.parser = handlebars;
-exports.parse = function () { return handlebars.parse.apply(handlebars, arguments); }
-exports.main = function commonjsMain(args) {
-    if (!args[1])
-        throw new Error('Usage: '+args[0]+' FILE');
-    if (typeof process !== 'undefined') {
-        var source = require('fs').readFileSync(require('path').join(process.cwd(), args[1]), "utf8");
-    } else {
-        var cwd = require("file").path(require("file").cwd());
-        var source = cwd.join(args[1]).read({charset: "utf-8"});
-    }
-    return exports.parser.parse(source);
-}
-if (typeof module !== 'undefined' && require.main === module) {
-  exports.main(typeof process !== 'undefined' ? process.argv.slice(1) : require("system").args);
-}
-};
-;
+
 // lib/handlebars/compiler/base.js
 Handlebars.Parser = handlebars;
 
@@ -619,6 +603,7 @@ Handlebars.log = function(level, str) { Handlebars.logger.log(level, str); };
   };
 
 })();;
+//>>excludeEnd('excludeHbsParser')
 // lib/handlebars/utils.js
 Handlebars.Exception = function(message) {
   var tmp = Error.prototype.constructor.apply(this, arguments);
@@ -999,13 +984,13 @@ Handlebars.JavaScriptCompiler = function() {};
     // PUBLIC API: You can override these methods in a subclass to provide
     // alternative compiled forms for name lookup and buffering semantics
     nameLookup: function(parent, name, type) {
-			if (/^[0-9]+$/.test(name)) {
+            if (/^[0-9]+$/.test(name)) {
         return parent + "[" + name + "]";
       } else if (JavaScriptCompiler.isValidJavaScriptVariableName(name)) {
-	    	return parent + "." + name;
-			}
-			else {
-				return parent + "['" + name + "']";
+            return parent + "." + name;
+            }
+            else {
+                return parent + "['" + name + "']";
       }
     },
 
@@ -1223,7 +1208,7 @@ Handlebars.JavaScriptCompiler = function() {};
     lookup: function(name) {
       var topStack = this.topStack();
       this.source.push(topStack + " = (" + topStack + " === null || " + topStack + " === undefined || " + topStack + " === false ? " +
- 				topStack + " : " + this.nameLookup(topStack, name, 'context') + ");");
+                topStack + " : " + this.nameLookup(topStack, name, 'context') + ");");
     },
 
     pushStringParam: function(string) {
@@ -1447,15 +1432,15 @@ Handlebars.JavaScriptCompiler = function() {};
     compilerWords[reservedWords[i]] = true;
   }
 
-	JavaScriptCompiler.isValidJavaScriptVariableName = function(name) {
-		if(!JavaScriptCompiler.RESERVED_WORDS[name] && /^[a-zA-Z_$][0-9a-zA-Z_$]+$/.test(name)) {
-			return true;
-		}
-		return false;
-	}
+    JavaScriptCompiler.isValidJavaScriptVariableName = function(name) {
+        if(!JavaScriptCompiler.RESERVED_WORDS[name] && /^[a-zA-Z_$][0-9a-zA-Z_$]+$/.test(name)) {
+            return true;
+        }
+        return false;
+    }
 
 })(Handlebars.Compiler, Handlebars.JavaScriptCompiler);
-
+//>>excludeStart('excludeHbsParser', pragmas.excludeHbsParser)
 Handlebars.precompile = function(string, options) {
   options = options || {};
 
@@ -1483,6 +1468,7 @@ Handlebars.compile = function(string, options) {
     return compiled.call(this, context, options);
   };
 };
+//>>excludeEnd('excludeHbsParser')
 ;
 // lib/handlebars/runtime.js
 Handlebars.VM = {
@@ -1548,3 +1534,10 @@ Handlebars.VM = {
 
 Handlebars.template = Handlebars.VM.template;
 ;
+
+// AMD Define
+define(function(){
+    return Handlebars;
+});
+
+})();

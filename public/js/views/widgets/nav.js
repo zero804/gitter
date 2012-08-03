@@ -1,7 +1,8 @@
 define([
   'jquery',
   'underscore',
-  'backbone'
+  'backbone',
+  'jqueryui'
 ], function($, _, Backbone) {
   return Backbone.View.extend({
     initialize: function(options) {

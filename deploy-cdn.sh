@@ -14,7 +14,7 @@ if [ "XX$OLDTAG" != "XX$NEWTAG" ]; then
   s3cmd --config /etc/s3cfg cp --acl-public --recursive s3://troupe-cdn/$OLDTAG/ s3://troupe-cdn/$NEWTAG/
   echo $NEWTAG > /var/log/troupe/cdn-version
   chown troupe:troupe /var/log/troupe/cdn-version
-  s3cmd --config /etc/s3cfg sync --delete-removed --acl-public /opt/troupe/app/public/ s3://troupe-cdn/$NEWTAG/ --exclude "*.git*"
+  s3cmd --config /etc/s3cfg sync --delete-removed --acl-public /opt/troupe/app/public-processed/ s3://troupe-cdn/$NEWTAG/ --exclude "*.git*" --exclude "*.gz"
   cd ..
 fi
 

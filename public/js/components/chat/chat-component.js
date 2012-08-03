@@ -3,11 +3,13 @@ define([
   'underscore',
   'now',
   'noty'
-], function($, _, Backbone, nowStub, notyStub){
-  /*global now:false, noty: false, console: false */
+], function($, _, nowInitialize){
+  /*global console: false */
   "use strict";
 
   var connected = false;
+
+  var now = nowInitialize(window.troupeContext.websockets.nowjs, window.troupeContext.websockets.socketio);
 
   var module = {
     connect: function() {
@@ -33,7 +35,7 @@ define([
         connected = true;
         now.subscribeToTroupe(window.troupeContext.troupe.id, function(err) {
           if(err) {
-            noty({
+            $.noty({
               text:"There is a communication problem with the Troupe server. Please try reload the page.",
               layout: "top",
               type:"error",

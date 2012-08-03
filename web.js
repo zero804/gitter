@@ -27,11 +27,11 @@ var hbs = require('hbs');
 
 hbs.registerHelper('cdn', require('./server/utils/cdn-helper'));
 // TODO:come up with a better solution that this!
-hbs.registerPartial('require_config', fs.readFileSync(__dirname + '/public/templates/require_config.hbs', 'utf8'));
+hbs.registerPartial('require_config', fs.readFileSync(__dirname + '/' + nconf.get('web:staticContent') +'/templates/require_config.hbs', 'utf8'));
 
 app.set('basepath', "/");
 app.set('view engine', 'hbs');
-app.set('views', __dirname + '/public/templates');
+app.set('views', __dirname + '/' + nconf.get('web:staticContent') +'/templates');
 //app.set('view engine', 'mustache');
 app.set('view options',{layout:false});
 //app.register(".mustache", tmpl);
@@ -118,7 +118,7 @@ app.configure(function() {
   /* Additional body parsers */
   require('./server/utils/bodyparsers-additional.js').install();
 
-  app.use(express['static'](__dirname + '/public'));
+  app.use(express['static'](__dirname + "/" + nconf.get('web:staticContent')));
 
   app.use(express.cookieParser());
   app.use(express.bodyParser());

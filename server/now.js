@@ -69,7 +69,8 @@ module.exports = {
     install: function(app, sessionStore) {
       everyone = nowjs.initialize(app, {
          "host" : nconf.get("ws:hostname"),
-         "port" : nconf.get("ws:externalPort")
+         "port" : nconf.get("ws:externalPort"),
+         "autoHost": false
       });
 
       nowjs.on('connect', function() {

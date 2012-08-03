@@ -16,11 +16,7 @@
     <link REL="SHORTCUT ICON" HREF="favicon.ico">
 
     {{>require_config}}
-<!--
-    <script data-main='{{cdn "js/signup.js" }}' src='{{cdn "js/libs/require/2.0.2/require-min.js"}}'></script>
--->
-    <script data-main='js/signup.js' src='js/libs/require/2.0.2/require-min.js'></script>
-
+    <script data-main='{{cdn "js/signup.js" }}' src='{{cdn "js/libs/require/2.0.4/require-jquery-min.js"}}'></script>
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -37,7 +33,7 @@
 
     <div class="trpHomeTopStripContainer">
       <div class="trpHomeTopStrip">
-        <div class="trpHomeLogo"><img src='{{ cdn "images/2/logo-white.png" }}'></div>
+        <div class="trpHomeLogo"><img src='{{ cdn "images/2/logo-white.png" }}' height="36" width="109"></div>
         <div class="trpHomeMenu">
           <div class="trpHomeMenuItem trpPadV14">Features</div>
           <div class="trpHomeMenuItem trpPadV14">Apps</div>
@@ -56,19 +52,19 @@
           <br><br>
           <a class="trpHomeMenuItem trpButtonBig trpBtnWhite button-signup" href="#">Sign up</a>
         </div>
-        <div class="trpHeroImage"><img src='{{ cdn "images/2/hero-files.png"}}'></div>
+        <div class="trpHeroImage"><img src='{{ cdn "images/2/hero-files.png"}}'  width="602" height="392"></div>
       </div>
     </div>
 
 
     <div class="trpHomeMidStripContainer">
       <div class="trpMidStrip">
-        <img src="images/2/line.png" class="trpLine">Why you'll love using Troupe<img src='{{ cdn "images/2/line.png" }}' class="trpLine">
+        <img src='{{ cdn "images/2/line.png" }}' class="trpLine" width="74" height="1">Why you'll love using Troupe<img src='{{ cdn "images/2/line.png" }}' class="trpLine" width="74" height="1">
       </div>
 
       <div class="trpFeatures">
         <div class="trpFeature">
-          <div class="trpFeatureImage"><img src='{{ cdn "images/2/feature-chat.png" }}'></div>
+          <div class="trpFeatureImage"><img src='{{ cdn "images/2/feature-chat.png" }}' width="64" height="64"></div>
           <div class="trpFeatureText">
             <div class="trpFeatureHead">Quick and simple chat</div>
             <div class="trpFeatureBody">Group chat allows you to easily stay in touch with everyone in your Troupe. Need a quick answer or to discuss the latest presentation, just chat with anyone even on their mobiles.</div>
@@ -76,7 +72,7 @@
         </div>
 
         <div class="trpFeature">
-          <div class="trpFeatureImage"><img src='{{ cdn "images/2/feature-files.png" }}'></div>
+          <div class="trpFeatureImage"><img src='{{ cdn "images/2/feature-files.png" }}' width="64" height="64"></div>
            <div class="trpFeatureText">
             <div class="trpFeatureHead">Share and view files</div>
             <div class="trpFeatureBody">The simplest shared folder you've ever used. Keep all the files together, view them on your mobile, easy versioning just in case you need to go back to the last one.</div>
@@ -84,7 +80,7 @@
         </div>
 
         <div class="trpFeature">
-          <div class="trpFeatureImage"><img src='{{ cdn "images/2/feature-email.png" }}'></div>
+          <div class="trpFeatureImage"><img src='{{ cdn "images/2/feature-email.png" }}' width="64" height="64"></div>
            <div class="trpFeatureText">
             <div class="trpFeatureHead">All the emails in one place</div>
             <div class="trpFeatureBody">Group emails are a pain. Troupe makes this simple by giving your group an email address and keeping everyone in the loop.</div>
@@ -95,20 +91,20 @@
 
     <div class="trpHomeAppStripContainer">
       <div class="trpHomeAppStrip">
-        <img src='{{ cdn "images/2/line.png" }}' class="trpLine">You can use Troupe anytime, anywhere<img src='{{ cdn "images/2/line.png" }}' class="trpLine">
+        <img src='{{ cdn "images/2/line.png" }}' class="trpLine" width="74" height="1">You can use Troupe anytime, anywhere<img src='{{ cdn "images/2/line.png" }}' class="trpLine" width="74" height="1">
       </div>
 
       <div class="trpApps">
         <div class="trpApp">
-          <div class="trpAppImage"><img src='{{ cdn "images/2/app-laptop.png" }}'></div>
+          <div class="trpAppImage"><img src='{{ cdn "images/2/app-laptop.png" }}' width="305" height="185"></div>
           <div class="trpAppText">On a computer</div>
         </div>
         <div class="trpApp">
-          <div class="trpAppImage"><img src='{{ cdn "images/2/app-tablet.png" }}'></div>
+          <div class="trpAppImage"><img src='{{ cdn "images/2/app-tablet.png" }}' width="175" height="185"></div>
           <div class="trpAppText">On tablets</div>
         </div>
         <div class="trpApp">
-          <div class="trpAppImage"><img src='{{ cdn "images/2/app-phone.png" }}'></div>
+          <div class="trpAppImage"><img src='{{ cdn "images/2/app-phone.png" }}' width="69" height="185"></div>
           <div class="trpAppText">On smartphones</div>
         </div>
       </div>
@@ -116,7 +112,7 @@
 
     <div class="trpHomeFooterStripContainer">
       <div class="trpFooterStrip">
-        <img src='{{ cdn "images/2/logo-mark-green.png" }}' class="trpLine">
+        <img src='{{ cdn "images/2/logo-mark-green.png" }}' class="trpLine"  width="24" height="36">
       </div>
     </div>
 
