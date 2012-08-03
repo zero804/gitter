@@ -7,7 +7,6 @@ define([
   'collections/notifications',
   'views/base',
   'views/widgets/nav',
-  'jqueryui',
   'noty'
 ], function($, _, Backbone, troupeModels, notificationModels, TroupeViews, NavView) {
   "use strict";
@@ -88,7 +87,7 @@ define([
           return;
         }
 
-        noty({
+        $.noty({
           "text": data.displayName + " has logged into the troupe.",
           "layout":"bottomRight",
           "type":"information",
@@ -102,7 +101,7 @@ define([
       });
 
       $(document).on('userLoggedOutOfTroupe', function(event, data) {
-        noty({
+        $.noty({
           "text": data.displayName + " has left the troupe.",
           "layout":"bottomRight",
           "type":"information",
@@ -117,7 +116,7 @@ define([
 
      $(document).on('notification', function(event, data) {
         //self.notificationCollection.add(data, { at: 0 });
-        noty({
+        $.noty({
           "text": data.notificationText,
           "layout":"bottomRight",
           "type":"information",

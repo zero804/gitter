@@ -2,7 +2,7 @@ define([
   'jquery',
   'underscore'
 ], function($, _) {
-  /*global now:false, noty: false, console: false, window: false, document: false */
+  /*global console: false, window: false, document: false */
   "use strict";
 
   var onlineUsers = {};

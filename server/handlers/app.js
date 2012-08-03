@@ -4,6 +4,7 @@
 
 var troupeService = require("../services/troupe-service");
 var userService = require("../services/user-service");
+var nconf = require('../utils/config').configure();
 
 module.exports = {
     install: function(app) {
@@ -30,7 +31,7 @@ module.exports = {
             }
 
             profileNotCompleted = req.user.status == 'PROFILE_NOT_COMPLETED';
-
+            
           } else {
             troupeData = null;
           }
@@ -39,7 +40,11 @@ module.exports = {
               user: req.user ? req.user.narrow() : null,
               troupe: troupeData,
               profileNotCompleted: profileNotCompleted,
-              accessDenied: accessDenied
+              accessDenied: accessDenied,
+              websockets: {
+                nowjs: nconf.get('ws:nowjsUrl')
+              }
+
           };
 
           var page;
