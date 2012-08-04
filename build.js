@@ -15,7 +15,11 @@
         },
         {
             name: "app",
-            exclude: ["jquery"]
+            exclude: ["jquery"],
+            include: [
+                "views/widgets/avatar",
+                "views/widgets/nav"
+            ]
         },
         {
             name: "views/status/statusView",
