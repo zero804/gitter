@@ -23,11 +23,9 @@ module.exports = {
       chatService.findChatMessagesForTroupe(req.troupe.id, options, function(err, chatMessages) {
         if(err) return next(err);
 
-        var ids = _.uniq(c.extract('fromUserId').filter(predicates.notNull));
+        var ids = _.uniq(chatMessages.map(c.extract('fromUserId')).filter(predicates.notNull));
 
-        var userIds = chatMessages.map(ids);
-
-        userService.findByIds(userIds, function(err, users) {
+        userService.findByIds(ids, function(err, users) {
           if (err) return res.send(500);
 
           var usersIndexed = c.indexById(users);
