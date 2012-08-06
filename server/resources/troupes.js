@@ -6,6 +6,9 @@ var troupeService = require("../services/troupe-service"),
   userService = require("../services/user-service"),
   collections = require("../utils/collections");
 
+var predicates = collections.predicates;
+
+
 module.exports = {
   index: function(req, res) {
     if(!req.user) {
@@ -33,7 +36,7 @@ module.exports = {
     userService.findByIds(t.users, function(err, users) {
       if (err) return res.send(500);
 
-      var usersIndexed = users.indexById();
+      var usersIndexed = collections.indexById(users);
 
       res.send({
         id: t._id,
@@ -41,7 +44,7 @@ module.exports = {
         uri: t.uri,
         users: t.users.map(function(userId) {
           return usersIndexed[userId];
-        }).filterNulls().narrow()
+        }).filter(predicates.notNull).narrow()
       });
     });
 

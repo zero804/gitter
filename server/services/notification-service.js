@@ -5,8 +5,10 @@
 var persistence = require("./persistence-service");
 var appEvents = require("../app-events");
 var winston = require("../utils/winston");
+var c = require("../utils/collections");
 var handlebars = require('handlebars');
 var _ = require('underscore');
+var predicates = c.predicates;
 
 function compile(map) {
   for(var k in map) {
@@ -89,7 +91,7 @@ module.exports = {
   findByTroupe: function(id, options, callback) {
     findByTroupe(id, options, function(err, notifications) {
       if(err) return callback(err);
-      callback(null, notifications.map(formatNotification).filterNulls());
+      callback(null, notifications.map(formatNotification).filter(predicates.notNull));
     });
   }
 

@@ -7,6 +7,9 @@ var Q = require("q");
 var _ = require("underscore");
 var handlebars = require('handlebars');
 var winston = require("../utils/winston");
+var collections = require("../utils/collections");
+
+var predicates = collections.predicates;
 
 function concatArraysOfArrays(a) {
   var result = [];
@@ -45,7 +48,7 @@ function UserIdStrategy() {
         winston.error("Error loading users", err);
         return callback(err);
       }
-      self.users = users.indexById();
+      self.users = collections.indexById(users);
       callback(null, true);
     });
   };
@@ -78,7 +81,7 @@ function EmailStrategy() {
 
     execPreloads([{
       strategy: userStategy,
-      data: allUsers.distinct()
+      data: _(allUsers).uniq()
     }], callback);
 
   };
@@ -126,7 +129,7 @@ function ConversationMinStrategy()  {
 
     execPreloads([{
       strategy: userStategy,
-      data: lastUsers.distinct()
+      data: _.uniq(lastUsers)
     }], callback);
   };
 
@@ -165,7 +168,7 @@ function ChatStrategy()  {
 
     execPreloads([{
       strategy: userStategy,
-      data: users.distinct()
+      data: _.uniq(users)
     }], callback);
   };
 
