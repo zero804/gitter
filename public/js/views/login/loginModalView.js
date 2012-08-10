@@ -9,7 +9,20 @@ define([
     template: template,
 
     initialize: function(options) {
+      if (options) {
+        this.initialEmail = options.email;
+        this.fromSignup = options.fromSignup;
+      }
       _.bindAll(this, 'onFormSubmit');
+    },
+
+    getRenderData: function() {
+      return {
+        email: this.initialEmail,
+        autofocusEmail: this.initialEmail ? '': 'autofocus',
+        autofocusPassword: this.initialEmail ? 'autofocus' : '',
+        troupeUri: this.fromSignup ? null : window.location.pathname.replace(/\//g,'')
+      };
     },
 
     events: {

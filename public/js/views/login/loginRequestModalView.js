@@ -11,7 +11,18 @@ define([
     template: template,
 
     initialize: function(options) {
+      if(options) {
+        this.authenticated = options.authenticated;
+      }
+
       _.bindAll(this, 'onFormSubmit');
+    },
+
+    getRenderData: function() {
+      return {
+        troupeUri: window.location.pathname.replace(/\//g,''),
+        authenticated: this.authenticated
+      };
     },
 
     events: {
@@ -21,13 +32,31 @@ define([
     },
 
     showLoginForm: function(e) {
-      alert("Transition to login form");
+      this.trigger('request.login');
     },
 
     onFormSubmit: function(e) {
-      // alert("Create request");
+      var form = this.$el.find('form');
       var that = this;
-      that.trigger('request.complete');
+      var postUri =  this.authenticated ? "/requestAccessExistingUser" : "/requestAccessNewUser";
+
+      $.ajax({
+        url: postUri,
+        contentType: "application/x-www-form-urlencoded",
+        dataType: "json",
+        data: form.serialize(),
+        type: "POST",
+        success: function(data) {
+          if(data.success) {
+            that.trigger('request.complete', data);
+            return;
+          }
+          alert('Something went wrong. Oppsie daisy.');
+
+        }
+      });
+
+      return false;
     }
   });
 

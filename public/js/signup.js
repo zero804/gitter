@@ -50,7 +50,7 @@ require(
 
 
       $('.button-existing-users-login').on('click', function() {
-        var view = new LoginModalView();
+        var view = new LoginModalView({ fromSignup:true });
         var modal = new TroupeViews.Modal({ view: view });
         view.on('login.complete', function(data) {
           modal.off('login.complete');

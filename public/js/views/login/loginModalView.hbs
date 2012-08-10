@@ -1,9 +1,10 @@
 
 <div class="trpModalTitle">Sign in to Troupe</div>
    <form id="loginForm" class="marginless" method="post" action="/login">
-      <input name="email" id="email" type="text" class="trpInput" placeholder="Email address" autofocus>
+      <input type="hidden" name="troupeUri" value="{{troupeUri}}">
+      <input name="email" id="email" type="text" class="trpInput" placeholder="Email address" {{autofocusEmail}} value="{{email}}">
 
-      <input name="password" id="password" type="password" class="trpInput" placeholder="Password">
+      <input name="password" id="password" type="password" class="trpInput" {{autofocusPassword}}  placeholder="Password">
 
       <label class="checkbox">
           <input type="checkbox" name="rememberMe" value="1" checked>

@@ -164,5 +164,54 @@ module.exports = {
       });
 
     });
+  },
+
+  /* 
+   * Logic for this bad boy:
+   * This will get called when a user has not logged in but is attempted to access a troupe
+   * What we do is:
+   * - If the email address does not exist, create a new UNCONFIRMED user and add a request for the troupe
+   * - IF the email address does exist and the user account is:
+   *    - UNCONFIRMED: don't create a new account, but update the name and add a request for the troupe (if one does not already exist)
+   *    - COFIRMED: then throw an error saying that the user needs to login
+   * callback is function(err)
+   */
+  newSignupWithAccessRequest: function(options, callback) {
+    var email = options.email;
+    var name = options.name;
+    var troupeId = options.troupeId;
+
+    userService.findByEmail(email, function(err, user) {
+      if(err) return callback(err);
+
+      if(!user) {
+        // Create a new user and add the request. The users confirmation code will not be set until the first time one one of 
+        // their requests is accepted
+        user = new persistence.User();
+        user.status = 'UNCONFIRMED';
+        user.email = email;
+        user.name = name;
+
+        user.save(function (err) {
+          if(err) return callback(err);
+
+          troupeService.addRequest(troupeId, user.id, function(err, request) {
+            if(err) return callback(err);
+            callback(null);
+          });
+        });
+
+      } else {
+        if(user.status === 'UNCONFIRMED') {
+          // Add a request for the troupe
+          troupeService.addRequest(troupeId, user.id, function(err, request) {
+            if(err) return callback(err);
+            callback(null);
+          });
+        } else {
+          callback({ userExists: true });
+        }
+      }
+    });
   }
 };
