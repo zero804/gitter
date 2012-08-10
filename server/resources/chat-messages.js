@@ -5,7 +5,8 @@
 var chatService = require("../services/chat-service"),
     c = require("../utils/collections"),
     userService = require("../services/user-service"),
-    _ = require("underscore");
+    _ = require("underscore"),
+    restSerializer = require("../serializers/rest-serializer");
 
 var predicates = c.predicates;
 
@@ -23,18 +24,9 @@ module.exports = {
       chatService.findChatMessagesForTroupe(req.troupe.id, options, function(err, chatMessages) {
         if(err) return next(err);
 
-        var ids = _.uniq(chatMessages.map(c.extract('fromUserId')).filter(predicates.notNull));
-
-        userService.findByIds(ids, function(err, users) {
-          if (err) return res.send(500);
-
-          var usersIndexed = c.indexById(users);
-
-          res.send(chatMessages.map(function(item) {
-            var user = usersIndexed[item.fromUserId];
-
-            return item.narrow(user, req.troupe);
-          }));
+        restSerializer.serialize(chatMessages, restSerializer.ChatStrategy, function(err, serialized) {
+          if(err) return next(err);
+          res.send(serialized);
         });
       });
     },
