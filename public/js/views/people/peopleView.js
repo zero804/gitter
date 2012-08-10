@@ -13,8 +13,9 @@ define([
   'views/confirmDialog',
   'views/people/inviteItemView',
   'collections/invites',
-  'views/share/shareModalView'
-], function($, _, Backbone, TroupeViews, template, itemTemplate, ConfirmDialog, InviteItemView, inviteModels, ShareModalView){
+  'views/share/shareModalView',
+  './requestTabView'
+], function($, _, Backbone, TroupeViews, template, itemTemplate, ConfirmDialog, InviteItemView, inviteModels, ShareModalView, RequestTabView){
   "use strict";
 
   var PeopleView = Backbone.View.extend({
@@ -45,6 +46,8 @@ define([
       var self = this;
       var compiledTemplate = template({ });
       $(this.el).html(compiledTemplate);
+
+      this.$el.find('#requests').html(new RequestTabView().render().el);
 
       if(this.initialTab) {
         $("#tab-people-" + this.initialTab, this.el).tab('show');

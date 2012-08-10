@@ -1,0 +1,13 @@
+<div class="trpPeopleViewItem">
+    <div class="trpPersonAvatar">{{widget "avatar" user=user}}</div>
+    <div class="trpPersonDetails">
+        <div class="trpPersonName">{{user.displayName}} {{#if displayEmail}}({{user.email}}){{/if}}</div>
+        {{#if displayModeRequest}}
+            <a class="trpPersonAction accept" href="#">Accept</a>
+            <a class="trpPersonAction reject" href="#">Reject</a>
+        {{/if}}
+        {{#if displayModeTroupeUsers}}
+            <a class="trpPersonAction remove"  href="#">Remove</a>
+        {{/if}}
+    </div>
+</div>

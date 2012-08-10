@@ -24,11 +24,11 @@ module.exports = {
 
         res.send(a);
       }).fail(function(error) {
-        next(err);
+        next(error);
       });
     },
 
-    new: function(req, res){
+    'new': function(req, res){
       res.send(500);
     },
 
@@ -52,10 +52,8 @@ module.exports = {
       res.send(500);
     },
 
-    load: function(id, fn){
-      process.nextTick(function(){
-        fn(null, { id: id, title: 'SHARE' });
-      });
+    load: function(req, id, callback) {
+      throw new Error("");
     }
 
 };

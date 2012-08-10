@@ -4,9 +4,11 @@
 
 var persistence = require("./persistence-service"),
     userService = require("./user-service"),
+    emailNotificationService = require("./email-notification-service"),
     mailerService = require("./mailer-service"),
     uuid = require('node-uuid'),
-    nconf = require("../utils/config").configure();
+    nconf = require("../utils/config").configure(),
+    winston = require("winston");
 
 function findByUri(uri, callback) {
   persistence.Troupe.findOne({uri: uri}, function(err, troupe) {
@@ -204,6 +206,60 @@ function addRequest(troupeId, userId, callback) {
   });
 }
 
+/* 
+ * callback is function(err, requests) 
+ */
+function findAllOutstandingRequestsForTroupe(troupeId, callback) {
+  persistence.Request
+      .where('troupeId', troupeId)
+      .where('status', 'PENDING')
+      .slaveOk()
+      .run(callback);
+}
+
+function findPendingRequestForTroupeAndUser(troupeId, userId, callback) {
+  persistence.Request.findOne( {
+    troupeId: troupeId,
+    userId: userId,
+    status: 'PENDING'
+  }, callback);
+}
+
+function acceptRequest(request, callback) {
+  console.log(typeof request);
+
+  findById(request.troupeId, function(err, troupe) {
+    if(err) return callback(err);
+    if(!troupe) { winston.error("Unable to find troupe", request.troupeId); return callback("Unable to find troupe"); }
+
+    userService.findById(request.userId, function(err, user) {
+      if(err) return callback(err);
+      if(!user) { winston.error("Unable to find user", request.userId); return callback("Unable to find user"); }
+
+      if(user.status === 'UNCONFIRMED' && !user.confirmationCode) {
+         var confirmationCode = uuid.v4();
+         user.confirmationCode = confirmationCode;
+         user.save(function(err) {
+          emailNotificationService.sendConfirmationForNewUser(user, troupe);
+         });
+      }
+
+      /** Add the user to the troupe */
+      troupe.users.push(user.id);
+      troupe.save(function(err) {
+        if(err) winston.error("Unable to save troupe", err);
+        return callback(err, request);
+      });
+
+      request.status = 'ACCEPTED';
+      request.save(function(err) {
+        if(err) winston.error("Unable to save request", err);
+        return callback(err, request);
+      });
+    });
+  });
+}
+
 module.exports = {
   findByUri: findByUri,
   findById: findById,
@@ -217,5 +273,8 @@ module.exports = {
   acceptInvite: acceptInvite,
   findMemberEmails: findMemberEmails,
   findAllUnusedInvitesForTroupe: findAllUnusedInvitesForTroupe,
-  addRequest: addRequest
+  addRequest: addRequest,
+  findAllOutstandingRequestsForTroupe: findAllOutstandingRequestsForTroupe,
+  findPendingRequestForTroupeAndUser: findPendingRequestForTroupeAndUser,
+  acceptRequest: acceptRequest
 };

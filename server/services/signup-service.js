@@ -3,16 +3,13 @@
 "use strict";
 
 var persistence = require("./persistence-service"),
-    mailerService = require("./mailer-service"),
+    emailNotificationService = require("./email-notification-service"),
     troupeService = require("./troupe-service"),
     userService = require("./user-service"),
     uuid = require('node-uuid'),
     sechash = require('sechash'),
     nconf = require("../utils/config").configure();
 
-
-var emailDomain = nconf.get("email:domain");
-var emailDomainWithAt = "@" + emailDomain;
 
 function createUniqueUri() {
   var chars = "0123456789abcdefghiklmnopqrstuvwxyz";
@@ -71,34 +68,6 @@ function newTroupeForNewUser(options, callback) {
   });
 }
 
-function sendConfirmationForExistingUser(user, troupe) {
-  var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri;
-
-  mailerService.sendEmail({
-    templateFile: "signupemail_existing",
-    to: user.email,
-    from: 'signup-robot' + emailDomainWithAt,
-    subject: "You created a new Troupe",
-    data: {
-      troupeName: troupe.name,
-      troupeLink: troupeLink
-    }
-  });
-}
-
-function sendConfirmationForNewUser(user, troupe) {
-  var confirmLink = nconf.get("web:basepath") + "/confirm/" + user.confirmationCode;
-  mailerService.sendEmail({
-    templateFile: "signupemail",
-    to: user.email,
-    from: 'signup-robot' + emailDomainWithAt,
-    subject: "Welcome to Troupe",
-    data: {
-      troupeName: troupe.name,
-      confirmLink: confirmLink
-    }
-  });
-}
 
 module.exports = {
   newSignup: function(options, callback) {
@@ -131,6 +100,7 @@ module.exports = {
     user.status = 'PROFILE_NOT_COMPLETED';
 
     user.save(function(err) {
+      console.dir(troupeService); 
       troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
         if(err) return callbackFunction(new Error("Error finding troupes for user"));
         if(troupes.length < 1) return callbackFunction(new Error("Could not find troupe for user"));
@@ -155,9 +125,9 @@ module.exports = {
         console.dir(err);
         if(err || !user) return callback("Invalid state");
         if(user.status != 'UNCONFIRMED') {
-          sendConfirmationForExistingUser(user, troupe);
+          emailNotificationService.sendConfirmationForExistingUser(user, troupe);
         } else {
-          sendConfirmationForNewUser(user, troupe);
+          emailNotificationService.sendConfirmationForNewUser(user, troupe);
         }
 
         callback(null, troupe.id);
@@ -190,7 +160,7 @@ module.exports = {
         user = new persistence.User();
         user.status = 'UNCONFIRMED';
         user.email = email;
-        user.name = name;
+        user.displayName = name;
 
         user.save(function (err) {
           if(err) return callback(err);
