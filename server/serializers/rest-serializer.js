@@ -28,11 +28,9 @@ function execPreloads(preloads, callback) {
 
   Q.all(promises)
       .then(function() {
-        winston.debug("Preloads succeeded");
         callback();
       })
       .fail(function(err) {
-        winston.error("Preloads failed", err);
         callback(err);
       });
 }
