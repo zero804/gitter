@@ -366,6 +366,7 @@ define([
       if(options.itemView) {
         this.itemView = options.itemView;
       }
+      this.itemViewOptions = options.itemViewOptions ? options.itemViewOptions : {};
 
       _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onCollectionRemove');
       this.collection.on('add', this.onCollectionAdd);
@@ -382,7 +383,8 @@ define([
     renderInternal: function() {
       var self = this;
       this.collection.each(function(item) {
-        self.$el.append(new self.itemView({ model: item }).render().el);
+        var options = _.extend(this.itemViewOptions, { model: item });
+        self.$el.append(new self.itemView(options).render().el);
       });
     },
 
@@ -396,7 +398,8 @@ define([
     },
 
     onCollectionAdd: function(item) {
-      this.$el.append(new this.itemView({ model: item }).render().el);
+      var options = _.extend(this.itemViewOptions, { model: item });
+      this.$el.append(new this.itemView(options).render().el);
     },
 
     onCollectionRemove: function(item) {

@@ -66,6 +66,7 @@ function UserIdStrategy() {
     return {
       id: user.id,
       displayName: user.displayName,
+      email: user.email,
       avatarUrl: getAvatarUrl()
     };
   };
@@ -310,6 +311,7 @@ function getStrategy(modelName, toCollection) {
 }
 
 module.exports = {
+  UserIdStrategy: UserIdStrategy,
   ConversationStrategy: ConversationStrategy,
   ConversationMinStrategy: ConversationMinStrategy,
   NotificationStrategy: NotificationStrategy,

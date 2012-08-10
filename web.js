@@ -151,6 +151,7 @@ require('./server/handlers/mobile').install(app);
 /* REST resources: not used yet */
 var troupesResource = app.resource('troupes',  require('./server/resources/troupes.js'));
 var sharesResource = app.resource('invites',  require('./server/resources/invites.js'));
+var requestsResource = app.resource('requests',  require('./server/resources/requests.js'));
 var usersResource = app.resource('users',  require('./server/resources/users.js'));
 var conversationsResource = app.resource('conversations', require('./server/resources/conversations.js'));
 var filesResource = app.resource('files', require('./server/resources/files.js'));
@@ -161,6 +162,7 @@ var chatMessagesResource = app.resource('chatMessages',  require('./server/resou
 var notificationsResource = app.resource('notifications',  require('./server/resources/notifications.js'));
 
 troupesResource.add(sharesResource);
+troupesResource.add(requestsResource);
 troupesResource.add(usersResource);
 troupesResource.add(conversationsResource);
 troupesResource.add(filesResource);

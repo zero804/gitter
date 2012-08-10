@@ -76,7 +76,8 @@ InviteSchema.methods.narrow = function () {
 
 var RequestSchema = new Schema({
   troupeId: ObjectId,
-  userId: ObjectId
+  userId: ObjectId,
+  status: { type: String, "enum": ['PENDING', 'ACCEPTED', 'REJECTED'], "default": 'PENDING'}
 });
 
 var ChatMessageSchema = new Schema({
