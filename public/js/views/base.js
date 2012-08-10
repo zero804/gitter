@@ -168,6 +168,7 @@ define([
 
       this.isShown = true;
       this.$el.trigger('show');
+      this.trigger('show');
 
       this.escape();
       this.backdrop(function () {
@@ -188,9 +189,11 @@ define([
         if(transition) {
           that.$el.one($.support.transition.end, function () { 
             that.$el.trigger('shown');
+            this.trigger('shown');
            });
         } else {
           that.$el.trigger('shown');
+          this.trigger('shown');
         }
       });
     },
@@ -210,7 +213,9 @@ define([
       this.$el
         .trigger('hide')
         .removeClass('in');
-
+      
+      this.trigger('hide');
+      
       if($.support.transition && this.options.fade) {
         this.hideWithTransition(this);
       } else {
@@ -244,11 +249,11 @@ define([
     },
 
     hideModal: function () {
-      console.log("hideModal");
       this.$el
         .hide()
         .trigger('hidden');
 
+      this.trigger('hidden');
       this.backdrop();
 
       if(this.options.autoRemove) {

@@ -22,18 +22,41 @@ module.exports = {
       app.post('/login',
         passport.authenticate('local', { failureRedirect: basepath + '/login' }),
         function(req, res) {
+          var troupeUri = req.body.troupeUri;
+          winston.info("Login with requested troupe: ", troupeUri);
           function sendAffirmativeResponse() {
             if(req.accepts('application/json')) {
-              userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
-                if (err) troupe = null;
-                res.send({
-                  failed: false,
-                  user: req.user, 
-                  defaultTroupe: troupe
-                });
-              });
+              if(troupeUri) {
+                troupeService.findByUri(troupeUri, function(err, troupe) {
+                  if(err) return res.send(500);
 
-              
+                  var a = {};
+
+                  if(troupe) {
+                     a[troupeUri] = troupeService.userHasAccessToTroupe(req.user, troupe);
+                  } else {
+                    // Troupe doesn't exist, just say the user doesn't have access
+                     a[troupeUri] = false;
+                  }
+
+                  res.send({
+                    failed: false,
+                    user: req.user, 
+                    defaultTroupe: troupe,
+                    hasAccessToTroupe: a
+                  });
+
+                });
+              } else {
+                userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
+                  if (err) troupe = null;
+                  res.send({
+                    failed: false,
+                    user: req.user, 
+                    defaultTroupe: troupe
+                  });
+                });
+              }
             } else {
               res.relativeRedirect('/select-troupe');
             }

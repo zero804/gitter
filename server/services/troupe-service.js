@@ -183,6 +183,27 @@ function acceptInvite(code, user, callback) {
 }
 
 
+/*
+ * callback is function(err, request)
+ */
+function addRequest(troupeId, userId, callback) {
+  persistence.Request.findOne({troupeId: troupeId, userId: userId}, function(err, request) {
+    if(err) return callback(err);
+    if(request) {
+      /* Already exists */
+      return callback(null, request);
+    }
+
+    request = new persistence.Request();
+    request.troupeId = troupeId;
+    request.userId = userId;
+    request.save(function(err) {
+      if(err) return callback(err);
+      callback(null, request);
+    });
+  });
+}
+
 module.exports = {
   findByUri: findByUri,
   findById: findById,
@@ -195,5 +216,6 @@ module.exports = {
   findInviteByCode: findInviteByCode,
   acceptInvite: acceptInvite,
   findMemberEmails: findMemberEmails,
-  findAllUnusedInvitesForTroupe: findAllUnusedInvitesForTroupe
+  findAllUnusedInvitesForTroupe: findAllUnusedInvitesForTroupe,
+  addRequest: addRequest
 };

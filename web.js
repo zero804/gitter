@@ -137,6 +137,7 @@ require('./server/handlers/signout').install(app);
 require('./server/handlers/profile').install(app);
 require('./server/handlers/login').install(app);
 require('./server/handlers/invite').install(app);
+require('./server/handlers/request-access').install(app);
 require('./server/handlers/avatar').install(app);
 require('./server/handlers/landing').install(app);
 

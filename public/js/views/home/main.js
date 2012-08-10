@@ -7,7 +7,9 @@ define([
   'hbs!templates/home/main',
   'views/login/loginRequestModalView',
   'views/login/loginRequestConfirmModalView'
-], function($, _, Backbone, TroupeViews, template, RequestModalView, RequestConfirmModalView){
+], function($, _, Backbone, TroupeViews, template, RequestModalView, RequestConfirmModalView) {
+  "use strict";
+  
   var MainHomeView = Backbone.View.extend({
     events: {
       "click .share":          "shareClicked",

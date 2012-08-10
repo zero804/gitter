@@ -74,6 +74,11 @@ InviteSchema.methods.narrow = function () {
   };
 };
 
+var RequestSchema = new Schema({
+  troupeId: ObjectId,
+  userId: ObjectId
+});
+
 var ChatMessageSchema = new Schema({
   fromUserId: ObjectId,
   toTroupeId: ObjectId,  //TODO: rename to troupeId
@@ -204,6 +209,7 @@ var Email = mongoose.model('Email', EmailSchema);
 var EmailAttachment = mongoose.model('EmailAttachment', EmailAttachmentSchema);
 var Conversation = mongoose.model('Conversation', ConversationSchema);
 var Invite = mongoose.model('Invite', InviteSchema);
+var Request = mongoose.model('Request', RequestSchema);
 var ChatMessage = mongoose.model('ChatMessage', ChatMessageSchema);
 var File = mongoose.model('File', FileSchema);
 var FileVersion = mongoose.model('FileVersion', FileVersionSchema);
@@ -249,6 +255,7 @@ module.exports = {
   EmailAttachment: EmailAttachment,
   Conversation: Conversation,
 	Invite: Invite,
+  Request: Request,
 	ChatMessage: ChatMessage,
   File: File,
   FileVersion: FileVersion,
