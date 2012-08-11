@@ -34,7 +34,7 @@ function newTroupeForExistingUser(options, user, callback) {
   troupe.save(function(err) {
     if(err) return callback(err);
 
-    sendConfirmationForExistingUser(user, troupe);
+    emailNotificationService.sendConfirmationForExistingUser(user, troupe);
     callback(null, troupe.id);
   });
 }
@@ -61,7 +61,7 @@ function newTroupeForNewUser(options, callback) {
     troupe.save(function(err) {
       if(err) return  callback(err);
 
-      sendConfirmationForNewUser(user, troupe);
+      emailNotificationService.sendConfirmationForNewUser(user, troupe);
 
       callback(null, troupe.id);
     });
