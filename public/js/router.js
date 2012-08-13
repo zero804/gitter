@@ -22,7 +22,6 @@ define([
       'chat': 'showChatView',
       'files': 'showFileView',
       'people': 'showPeopleView',
-      'people/:tab': 'showPeopleView',
       'profile': 'showProfileView',
 
       // Default
@@ -73,8 +72,8 @@ define([
       this.showAsync('views/file/fileView');
     },
 
-    showPeopleView: function(tab) {
-      this.showAsync("views/people/peopleView", { tab: tab });
+    showPeopleView: function() {
+      this.showAsync("views/people/peopleView");
     },
 
     showShareDialog: function() {
