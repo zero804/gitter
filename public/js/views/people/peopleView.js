@@ -11,11 +11,10 @@ define([
   'hbs!views/people/people',
   'hbs!views/people/item',
   'views/confirmDialog',
-  'views/people/inviteItemView',
-  'collections/invites',
   'views/share/shareModalView',
-  './requestTabView'
-], function($, _, Backbone, TroupeViews, template, itemTemplate, ConfirmDialog, InviteItemView, inviteModels, ShareModalView, RequestTabView){
+  './requestTabView',
+  './inviteTabView'
+], function($, _, Backbone, TroupeViews, template, itemTemplate, ConfirmDialog, ShareModalView, RequestTabView, InviteTabView){
   "use strict";
 
   var PeopleView = Backbone.View.extend({
@@ -48,16 +47,17 @@ define([
       $(this.el).html(compiledTemplate);
 
       this.$el.find('#requests').html(new RequestTabView().render().el);
+      this.$el.find('#invites').html(new InviteTabView().render().el);
 
       if(this.initialTab) {
         $("#tab-people-" + this.initialTab, this.el).tab('show');
         this.onTabSelected(this.initialTab);
       } else {
-        this.onTabSelected('users');
+
       }
 
       $('a[data-toggle="tab"]', this.el).on('shown', function (e) {
-        self.onTabSelected($(e.target).data('tab-id'));
+
       });
 
       return this;
@@ -75,37 +75,6 @@ define([
       modal.show();
 
       return false;
-    },
-
-    onTabSelected: function(tab) {
-      switch(tab) {
-        case 'invites':
-          this.onInviteTabSelected();
-          break;
-      }
-    },
-
-    onInviteTabSelected: function() {
-      if(!this.invites) {
-        this.invites = new inviteModels.InviteCollection();
-
-        this.invites.bind('add', this.onAddOneInvite, this);
-        this.invites.bind('reset', this.onAddAllInvites, this);
-        //this.invites.bind('all', this.render, this);
-      }
-
-      this.invites.fetch();
-    },
-
-    onAddOneInvite: function(item) {
-      console.log("rendering" + item);
-      var view = new InviteItemView({model: item});
-      $("#tbody-invites", this.el).append(view.render().el);
-    },
-
-    onAddAllInvites: function() {
-       $("#tbody-invites", this.el).empty();
-      this.invites.each(this.onAddOneInvite);
     },
 
     renderUsers: function(users) {
