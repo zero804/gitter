@@ -3,19 +3,20 @@
 // TODO: Implement remove user properly
 // TODO: Fix showing invites
 
+console.log("Start of PeopleView");
+
 define([
   'jquery',
   'underscore',
   'backbone',
   'views/base',
-  'hbs!views/people/people',
-  'hbs!views/people/item',
+  'hbs!./people',
+  'hbs!./item',
   'views/confirmDialog',
   'views/share/shareModalView',
   './requestTabView',
   './inviteTabView'
 ], function($, _, Backbone, TroupeViews, template, itemTemplate, ConfirmDialog, ShareModalView, RequestTabView, InviteTabView){
-  "use strict";
 
   var PeopleView = Backbone.View.extend({
 
