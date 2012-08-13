@@ -73,6 +73,7 @@ define([
     },
 
     showPeopleView: function() {
+      console.log("Showing People View");
       this.showAsync("views/people/peopleView");
     },
 
