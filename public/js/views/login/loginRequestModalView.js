@@ -1,6 +1,6 @@
 // Filename: views/home/main
-// TODO: Actually create a request
 // TODO: Better transition to request confirm page
+
 define([
   'jquery',
   'underscore',
