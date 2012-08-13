@@ -12,11 +12,9 @@ define([
   'views/base',
   'hbs!./people',
   'hbs!./item',
-  'views/confirmDialog',
-  'views/share/shareModalView',
   './requestTabView',
   './inviteTabView'
-], function($, _, Backbone, TroupeViews, template, itemTemplate, ConfirmDialog, ShareModalView, RequestTabView, InviteTabView) {
+], function($, _, Backbone, TroupeViews, template, itemTemplate, RequestTabView, InviteTabView) {
 
   console.log("Just about to enter backbone code");
 
