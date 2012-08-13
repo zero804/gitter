@@ -16,7 +16,7 @@ define([
   'views/share/shareModalView',
   './requestTabView',
   './inviteTabView'
-], function($, _, Backbone, TroupeViews, template, itemTemplate, ConfirmDialog, ShareModalView, RequestTabView, InviteTabView){
+], function($, _, Backbone, TroupeViews, template, itemTemplate, ConfirmDialog, ShareModalView, RequestTabView, InviteTabView) {
 
   console.log("Just about to enter backbone code");
 
