@@ -10,6 +10,9 @@ define([
   'hbs!./shareModalView',
   'hbs!./share-row'
 ], function($, _, TroupeViews, template, rowTemplate) {
+
+    console.log("Start of shareModalView");
+
     return TroupeViews.Base.extend({
     template: template,
 
