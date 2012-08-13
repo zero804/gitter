@@ -1,6 +1,8 @@
 // Filename: views/home/main
 // TODO: Confirmation after invite sent
 
+console.log("opened shareModalView");
+
 define([
   'jquery',
   'underscore',
