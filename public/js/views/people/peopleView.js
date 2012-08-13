@@ -18,6 +18,8 @@ define([
   './inviteTabView'
 ], function($, _, Backbone, TroupeViews, template, itemTemplate, ConfirmDialog, ShareModalView, RequestTabView, InviteTabView){
 
+  console.log("Just about to enter backbone code");
+
   var PeopleView = Backbone.View.extend({
 
     initialize: function(options) {
