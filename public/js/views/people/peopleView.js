@@ -3,8 +3,6 @@
 // TODO: Implement remove user properly
 // TODO: Fix showing invites
 
-console.log("Start of PeopleView");
-
 define([
   'jquery',
   'underscore',
@@ -17,12 +15,9 @@ define([
   './inviteTabView'
 ], function($, _, Backbone, TroupeViews, template, itemTemplate, ConfirmDialog, RequestTabView, InviteTabView) {
 
-  console.log("Just about to enter backbone code");
-
   var PeopleView = Backbone.View.extend({
 
     initialize: function(options) {
-      console.log("Initialize PeopleView");
       if(options && options.params) {
         this.initialTab = options.params.tab;
       }
@@ -34,7 +29,6 @@ define([
         dataType: "json",
         type: "GET",
         success: function(data) {
-          console.log("Succesfully pulled users");
           self.renderUsers(data);
         }
       });
@@ -46,7 +40,6 @@ define([
     },
 
     render: function() {
-      console.log("Entering Render");
       var self = this;
       var compiledTemplate = template({ });
       $(this.el).html(compiledTemplate);
@@ -83,7 +76,6 @@ define([
     },
 
     renderUsers: function(users) {
-      console.log("Entering renderUsers");
       $(".frame-people", this.el).empty();
       while(users.length > 0) {
         var p1 = users.shift();
