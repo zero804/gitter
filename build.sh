@@ -4,9 +4,9 @@ npm install
 
 rm -r public-processed
 
-# ./node_modules/.bin/r.js -o build.js
+./node_modules/.bin/r.js -o build.js
 
-cp -r public/ public-processed/
+#cp -r public/ public-processed/
 
 mkdir -p public-processed/bootstrap/css/
 
