@@ -49,7 +49,8 @@ define([
     },
 
     defaultAction: function(actions){
-      this.showView( '#primary-view', new MainHomeView({}) );
+      // this.showView( '#primary-view', new MainHomeView({}) );
+      this.showChatView();
     },
 
     showStatusView: function() {
