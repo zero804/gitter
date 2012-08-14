@@ -11,10 +11,9 @@ define([
   'hbs!./people',
   'hbs!./item',
   'views/confirmDialog',
-  'views/share/shareModalView',
   './requestTabView',
   './inviteTabView'
-], function($, _, Backbone, TroupeViews, template, itemTemplate, ConfirmDialog, ShareModalView, RequestTabView, InviteTabView) {
+], function($, _, Backbone, TroupeViews, template, itemTemplate, ConfirmDialog, RequestTabView, InviteTabView) {
 
   var PeopleView = Backbone.View.extend({
 
