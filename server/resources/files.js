@@ -16,8 +16,9 @@ module.exports = {
           return next(err);
         }
 
+        console.log("Files: " + JSON.stringify(files));
+
         restSerializer.serialize(files, restSerializer.FileStrategy, function(err, serializedFiles) {
-          console.dir(err);
           if (err) {
             console.log("Error in Serializer:" + err);
             return next(err);
