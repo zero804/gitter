@@ -92,6 +92,12 @@ font-family: 'StagWeb-Light';
   font-size: 16px; 
 }
 
+.trpH4 {
+  font-family: @fontSerif;
+  font-size: 14px; 
+}
+
+
 .trpBodyText {
   font-family: @fontSans;
   font-size: 14px;
@@ -368,7 +374,6 @@ h1 {
   font-size: 1.4em;
   padding: 65px 0 0px;
   padding-left: 235px;
-  padding-right: 20px;
 /*  background-color: @trpOffWhite;*/
   background-color: white;
   min-width: 650px;
@@ -517,6 +522,30 @@ h1 {
   text-align: center;
   padding-top: 2px;
 }
+
+
+/*Common View elements*/
+
+.trpSectionViewHeader {
+  padding-bottom: 20px;
+  padding-top: 20px;
+  padding-right: 20px;
+}
+
+.trpItemSorter {
+  float: left;
+  padding-top: 10px;
+  padding-left: 20px;
+  .trpH4;
+}
+
+.trpIconSmall {
+  padding: 0 0 2px 8px;
+}
+
+
+/*Chat elements*/
+
 
 .trpChatContainer {
 }
@@ -802,34 +831,20 @@ textarea, input { outline: none; }
   padding-left: 8px;
 }
 
-.trpMailViewHeader {
-  padding-bottom: 20px;
-  padding-top: 20px;
-}
-
-.trpMailSorter {
-  float: left;
-  padding-top: 10px;
-  padding-left: 20px;
-  .trpH3;
-
-}
-
 .trpMailButton {
 
 }
 
 .trpMailRowContainer {
-  border-top: 1px solid @trpLightGrey;
+  border-top: 1px solid @trpOffWhite;
   padding-top: 20px;
   padding-bottom: 20px;
-  margin-left: 20px;
   padding-right: 20px;
 }
 
 
 .trpMailRowContainer:hover {
-  background-color: @trpLightGrey;
+  background-color: @trpOffWhite;
   cursor: pointer;
 }
 
@@ -844,11 +859,6 @@ textarea, input { outline: none; }
   float: left;
 }
 
-.offline {
-  opacity: 0.2;
-  filter: alpha(opacity=20);
-  /* For IE8 and earlier */
-}
 
 .trpMailFromSubject {
   .trpH2;
@@ -856,6 +866,7 @@ textarea, input { outline: none; }
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  padding-bottom: 0px;
 }
 
 .trpMailPreview {
@@ -863,11 +874,14 @@ textarea, input { outline: none; }
   color: @trpDarkGrey;
   height: 36px;
   overflow: hidden;
+  margin-top: -4px;
 }
 
 .trpMailIcons {
   float: left;
-  padding-right: 40px;
+  width: 18px;
+  height: 16px;
+  padding: 0 20px 0 20px;
 }
 
 .trpMailDate {
@@ -887,6 +901,14 @@ textarea, input { outline: none; }
   float: right;
 }
 
+.trpMailBackButton {
+  padding-left: 32px;
+}
+
+.trpMailBody {
+  padding-left: 88px;
+  .trpBodyText;
+}
 
 .trpPeopleViewHeader {
   padding-bottom: 20px;
@@ -1122,10 +1144,11 @@ textarea, input { outline: none; }
   color: @trpGreen;
 }
 
-.trpDarkGrey {
-  color: white;
+.offline {
+  opacity: 0.2;
+  filter: alpha(opacity=20);
+  /* For IE8 and earlier */
 }
-
 /*Bootstrap Customisations*/
 
 .modal {
