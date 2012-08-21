@@ -46,15 +46,12 @@ define([
     onHeaderClick: function(event) {
       if(this.mailbody) {
         $(this.mailbody).toggle();
+        // For some reason using toggle (which adjusts css display property) causes other issues, so this just toggles visibility
         if(this.$el.find('.trpMailPreview').css("visibility") == 'hidden') {
           this.$el.find('.trpMailPreview').css("visibility","visible");
           return false;
         }
-        if(this.$el.find('.trpMailPreview').css("visibility") == 'visible') {
-          this.$el.find('.trpMailPreview').css("visibility","hidden");
-          return false;
-        }
-
+        this.$el.find('.trpMailPreview').css("visibility","hidden");
         return false;
       }
 
