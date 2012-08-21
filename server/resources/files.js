@@ -11,11 +11,17 @@ var troupeService = require("../services/troupe-service"),
 module.exports = {
     index: function(req, res, next) {
       fileService.findByTroupe(req.troupe.id, function(err, files) {
-        if (err) return next(err);
+        if (err) {
+          console.log("Error in findByTroupe: " + err);
+          return next(err);
+        }
 
         restSerializer.serialize(files, restSerializer.FileStrategy, function(err, serializedFiles) {
           console.dir(err);
-          if (err) return next(err);
+          if (err) {
+            console.log("Error in Serializer:" + err);
+            return next(err);
+          }
           res.send(serializedFiles);
         });
       });
