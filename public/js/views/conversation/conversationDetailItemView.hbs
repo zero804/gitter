@@ -1,11 +1,11 @@
 <div class="trpMailRow clickPoint-showEmail frame-header">
   <div class="trpMailLeft">
     <div class="trpMailDisplayPicture">{{widget "avatar" user=from}}</div>
-    <div class="trpMailFromSubject">{{personName}}: {{subject}}</div>
+    <div class="trpMailFromSubject">{{personName}}</div>
     <div class="trpMailPreview">{{preview}}</div>
   </div>
   <div class="trpMailRight">
-    <div class="trpMailIcons"><img src="images/2/icon-small-fav.png"></div>
-    <div class="trpMailDate">{{date}}</div>
+      <div class="trpMailIcons">{{#hasAttachments}}<img src="images/2/icon-small-attachment.png" width="18" height="16">{{/hasAttachments}}</div>
+      <div class="trpMailDate">{{date}}</div>
   </div>
 </div>

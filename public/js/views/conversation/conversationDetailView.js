@@ -13,6 +13,8 @@ define([
   return TroupeViews.Base.extend({
     template: template,
 
+
+
     initialize: function(options) {
       _.bindAll(this, 'onEmailCollectionAdd', 'onEmailCollectionReset');
 
@@ -26,6 +28,7 @@ define([
     },
 
     events: {
+      "click .back-button" : "goBack"
     },
 
     load: function() {
@@ -42,7 +45,15 @@ define([
 
     },
 
-    getRenderData: function() { return {}; },
+    getRenderData: function() {
+      var data = this.model.toJSON();
+      return data;
+    },
+
+
+    goBack: function () {
+      window.history.back();
+    },
 
     onEmailCollectionReset: function() {
       $(".frame-emails", this.el).empty();

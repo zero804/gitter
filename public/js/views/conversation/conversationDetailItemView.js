@@ -4,16 +4,17 @@ define([
   'underscore',
   'backbone',
   'views/base',
+  'dateFormat',
   'hbs!views/conversation/conversationDetailItemView',
   'hbs!views/conversation/conversationDetailItemViewBody',
   'views/widgets/avatar'
 
-], function($, _, Backbone, TroupeViews, template, bodyTemplate, AvatarView) {
+], function($, _, Backbone, TroupeViews, dateFormat, template, bodyTemplate, AvatarView) {
   return TroupeViews.Base.extend({
     template: template,
 
     events: {
-      "click .clickPoint-showEmail": "onHeaderClick"
+      "click .clickPoint-showEmail": "onHeaderClick",
     },
 
     attributes: {
@@ -27,19 +28,46 @@ define([
       var data = this.model.toJSON();
       data.personName = data.from.displayName;
       data.avatarUrl = data.from.avatarUrl;
+
+      data.date = Date.parse(data.date);
+      var d = new Date(data.date);
+      data.date = d.toUTCString();
+      var now = new Date();
+      if (now.getDate() === d.getDate() && now.getMonth() === d.getMonth() && now.getFullYear() === d.getFullYear()) {
+        data.date = d.format('h:MM TT');
+      }
+      else {
+        data.date = d.format('mmm d');
+      }
+
       return data;
     },
 
     onHeaderClick: function(event) {
       if(this.mailbody) {
         $(this.mailbody).toggle();
+        if(this.$el.find('.trpMailPreview').css("visibility") == 'hidden') {
+          this.$el.find('.trpMailPreview').css("visibility","visible");
+          return false;
+        }
+        if(this.$el.find('.trpMailPreview').css("visibility") == 'visible') {
+          this.$el.find('.trpMailPreview').css("visibility","hidden");
+          return false;
+        }
+
         return false;
       }
 
       var data = this.getRenderData();
 
+      data.mail = data.mail.replace(/\t/g, '    ')
+       .replace(/  /g, '&nbsp; ')
+       .replace(/  /g, ' &nbsp;') // handles "W&nbsp;  W"
+       .replace(/\r\n|\n|\r/g, '<br />');
+
       this.mailbody = $(bodyTemplate(data));
       this.$el.append(this.mailbody);
+      this.$el.find('.trpMailPreview').css("visibility","hidden");
 
       return false;
 
