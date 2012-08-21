@@ -175,6 +175,8 @@ function getFileStream(troupeId, fileName, version, callback) {
 
 function findByTroupe(id, callback) {
   persistence.File.find({troupeId: id}, function(err, files) {
+
+      console.log("file-service: troupeid:  " + id + " files: " + files);
       callback(err, files);
     });
 }
