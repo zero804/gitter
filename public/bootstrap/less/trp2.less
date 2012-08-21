@@ -13,7 +13,7 @@
 @trpGrey: #c0c9c8; // mid grey
 @trpCyan: #1dd0cd; // turquoise
 @trpYellow: #fcb316; // moutard
-@trpOffWhite: #f8f6f7; // off-white
+@trpOffWhite: #f6f6f6; // off-white
 @trpLightGrey: #d6d6d6; // darker off-white for borders and ting
 @trpDarkGreen: #149a55; // darker col1
 @trpDarkGrey: #7b797a; // dark grey
@@ -531,6 +531,7 @@ h1 {
   padding-top: 15px;
   padding-right: 20px;
   height: 30px;
+  border-bottom: 1px solid @trpOffWhite;
 }
 
 .trpItemSorter {
@@ -837,7 +838,7 @@ textarea, input { outline: none; }
 }
 
 .trpMailRowContainer {
-  border-top: 1px solid @trpOffWhite;
+  border-bottom: 1px solid @trpOffWhite;
   padding-top: 20px;
   padding-bottom: 20px;
   padding-right: 20px;
@@ -911,18 +912,12 @@ textarea, input { outline: none; }
   .trpBodyText;
 }
 
-.trpPeopleViewHeader {
-  padding-bottom: 20px;
-  padding-top: 15px;
-  margin-left: 20px;
-  color: @trpDarkGrey;
-  border-bottom: 1px solid @trpLightGrey;
-}
 
 .trpPeopleHeader {
   float: left;
   padding-top: 10px;
-  .trpH2;
+  padding-left: 20px;
+  .trpH4;
 }
 
 .trpPeopleTab {
@@ -1172,12 +1167,36 @@ textarea, input { outline: none; }
   padding: 24px 24px 0px 24px;
 }
 
+.nav > li > a:hover {
+  text-decoration: none;
+  background-color: @trpOffWhite;
+}
+
 .nav-tabs {
-  height: 50px;
+  height: 46px;
+  border-bottom: 1px solid @trpOffWhite;
+}
+
+.nav-tabs > li > a {
+  padding-top: 15px;
+  padding-bottom: 9px;
+  height: 100%;
+  border: 1px solid transparent;
+  &:hover {
+    border-color: @trpOffWhite @trpOffWhite @trpOffWhite;
+  }
+}
+
+.nav-tabs > .active > a,
+.nav-tabs > .active > a:hover {
+  background-color: @white;
+  border: 1px solid @trpOffWhite;
+  border-bottom-color: transparent;
+  cursor: default;
 }
 
 .nav-tabs > li {
-  height: 25px;
+  height: 21px;
 }
 
 .nav-tabs > li > a {
