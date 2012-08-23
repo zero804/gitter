@@ -17,11 +17,11 @@ define([
     },
 
     afterRender: function() {
-      new TroupeViews.Collection({
-        collection: this.model.get('versions'),
-        itemView: VersionView,
-        el: this.$el.find('.frame-versions')
-      }).render();
+      // new TroupeViews.Collection({
+      //   collection: this.model.get('versions'),
+      //   itemView: VersionView,
+      //   el: this.$el.find('.frame-versions')
+      // }).render();
     },
 
     beforeClose: function() {
