@@ -47,7 +47,10 @@ module.exports = {
 
     destroy: function(req, res) {
       console.log(req.request);
-      res.send(500);
+      troupeService.rejectRequest(req.request, function(err, request) {
+        if(err) return res.send(500);
+        res.send(200);
+      });
     },
 
     load: function(req, id, callback){
