@@ -18,7 +18,7 @@ define([
         "click .menu-profile": "profileMenuClicked",
         "click .menu-settings": "settingsMenuClicked",
         "click .menu-signout": "signoutMenuClicked",
-        "click #troupe-selector-arrow"  : "toggleSelector"
+        "click #troupe-selector-arrow"  : "toggleSelector",
          //"click #trpPersonIcon" : "toggleUserMenu"
     },
 
@@ -47,7 +47,7 @@ define([
 
       this.troupeSelectorMenu = new TroupeViews.Menu({ el: "#troupe-selector", triggerEl: "#menu-notification-selector" });
 
-      this.userMenu = new TroupeViews.Menu({ el: "#troupe-user-menu", triggerEl: "#trpPersonIcon" });
+      this.userMenu = new TroupeViews.Menu({ el: "#troupe-user-menu", triggerEl: "#person-icon" });
 
       this.troupeCollection.on('change', this.addAllTroupes, this);
       this.troupeCollection.on('add', this.addOneTroupe, this);
@@ -138,27 +138,7 @@ define([
           // Animation complete.
       });
     },
-/*
-    showUserMenu: function() {
-      $('#trpUserMenu').slideDown('fast', function() {
-          // Animation complete.
-      });
-    },
 
-    hideUserMenu: function() {
-      $('#trpUserMenu').slideUp('fast', function() {
-          // Animation complete.
-      });
-    },
-
-    toggleUserMenu: function() {
-      if ($('#trpUserMenu').is(':hidden')) {
-        this.showUserMenu();
-      } else {
-        this.hideUserMenu();
-      }
-    },
-*/
     profileMenuClicked: function() {
       require(['views/profile/profileModalView'], function(ProfileModalView) {
         var view = new ProfileModalView({ existingUser: true });
