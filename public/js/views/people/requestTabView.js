@@ -12,11 +12,11 @@ define([
     template: template,
 
     events: {
-      //"click .clickPoint-showEmail": "onHeaderClick"
+
     },
 
     attributes: {
-      //'class': 'trpMailRowContainer'
+
     },
 
     initialize: function(options) {
