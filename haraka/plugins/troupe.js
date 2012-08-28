@@ -177,10 +177,13 @@ exports.hook_queue = function(next, connection) {
           };
         });
 
+        // strip out the name of the troupe if it appears in the subject, we don't want it duplicated
+        var newSubject = subject.replace("[" + troupe.name + "] ",""); 
+
         conversationService.storeEmailInConversation({
           fromUserId: user.id,
           troupeId: troupe.id,
-          subject: subject,
+          subject: newSubject,
           inReplyTo: inReplyTo,
           date: date,
           fromName: fromName,
