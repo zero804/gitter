@@ -260,6 +260,20 @@ function acceptRequest(request, callback) {
   });
 }
 
+
+function rejectRequest(request, callback) {
+  console.log(typeof request);
+  findById(request.troupeId, function(err, troupe) {
+    if(err) return callback(err);
+    if(!troupe) { winston.error("Unable to find troupe", request.troupeId); return callback("Unable to find troupe"); }
+    request.status = 'REJECTED';
+    request.save(function(err) {
+      if(err) winston.error("Unable to save request", err);
+      return callback(err, request);
+    });
+  });
+}
+
 module.exports = {
   findByUri: findByUri,
   findById: findById,
@@ -276,5 +290,6 @@ module.exports = {
   addRequest: addRequest,
   findAllOutstandingRequestsForTroupe: findAllOutstandingRequestsForTroupe,
   findPendingRequestForTroupeAndUser: findPendingRequestForTroupeAndUser,
-  acceptRequest: acceptRequest
+  acceptRequest: acceptRequest,
+  rejectRequest: rejectRequest
 };
