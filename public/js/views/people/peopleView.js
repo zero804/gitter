@@ -57,19 +57,19 @@ define([
     //   return {};
     // },
 
-    showShareView: function() {
-      var view = new ShareModalView({ model: this.model, uri: window.troupeContext.troupe.uri });
-      var modal = new TroupeViews.Modal({ view: view  });
+   //  showShareView: function() {
+   //    var view = new ShareModalView({ model: this.model, uri: window.troupeContext.troupe.uri });
+   //    var modal = new TroupeViews.Modal({ view: view  });
 
-      view.on('share.complete', function(data) {
-          modal.off('share.complete');
-          modal.hide();
-        });
+   //    view.on('share.complete', function(data) {
+   //        modal.off('share.complete');
+   //        modal.hide();
+   //      });
 
-      modal.show();
+   //    modal.show();
 
-      return false;
-    },
+   //    return false;
+   //  },
 
     removeUser: function() {
       var c = new ConfirmDialog({
