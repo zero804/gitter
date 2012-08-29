@@ -8,6 +8,7 @@ define([
   return TroupeViews.Base.extend({
     initialize: function(options) {
       this.user = options.user || {};
+      this.showEmail = options.showEmail || {};
     },
 
     render: function() {
