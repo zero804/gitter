@@ -40,7 +40,7 @@ define([
     },
 
     afterRender: function(e) {
-      $("form", this.el).prepend($(rowTemplate({})));
+      // $("form", this.el).prepend($(rowTemplate({})));
     },
 
     onFormSubmit: function(e) {
