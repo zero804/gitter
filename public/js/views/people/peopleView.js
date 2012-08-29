@@ -10,11 +10,10 @@ define([
   'views/base',
   'hbs!./people',
   'views/confirmDialog',
-  'views/share/shareModalView',
   './userTabView',
   './requestTabView',
   './inviteTabView'
-], function($, _, Backbone, TroupeViews, template, ConfirmDialog, ShareModalView, UserTabView, RequestTabView, InviteTabView) {
+], function($, _, Backbone, TroupeViews, template, ConfirmDialog, UserTabView, RequestTabView, InviteTabView) {
   "use strict";
 
   return TroupeViews.Base.extend({
