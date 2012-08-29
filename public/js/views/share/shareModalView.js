@@ -8,7 +8,7 @@ define([
   'underscore',
   'views/base',
   'hbs!./shareModalView',
-  'hbs!./shareRow'
+  'hbs!./share-row'
 ], function($, _, TroupeViews, template, rowTemplate) {
 
     console.log("Start of shareModalView");
