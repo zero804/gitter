@@ -927,7 +927,7 @@ textarea, input { outline: none; }
 .trpPeopleViewItem {
   float: left;
   padding: 0px 10px 40px 40px;
-  min-width: 300px;
+  min-width: 280px;
 }
 
 .trpPersonAvatar {
@@ -942,6 +942,15 @@ textarea, input { outline: none; }
 .trpPersonName {
   .trpH3;
   color: black;
+  width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trpPersonEmail {
+  .trpBodySmall;
+  color: @trpDarkGrey;
 }
 
 .trpPersonAction {
