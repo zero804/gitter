@@ -20,8 +20,8 @@ define([
     template: template,
 
     events: {
-      "click .remove": "removeUser",
-      "click #share-button" : "showShareView"
+      "click .remove": "removeUser"
+      // "click #share-button" : "showShareView"
     },
 
     attributes: {
