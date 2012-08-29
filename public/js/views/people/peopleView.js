@@ -10,18 +10,19 @@ define([
   'views/base',
   'hbs!./people',
   'views/confirmDialog',
+  'views/share/shareModalView',
   './userTabView',
   './requestTabView',
   './inviteTabView'
-], function($, _, Backbone, TroupeViews, template, ConfirmDialog, UserTabView, RequestTabView, InviteTabView) {
+], function($, _, Backbone, TroupeViews, template, ConfirmDialog, ShareModalView, UserTabView, RequestTabView, InviteTabView) {
   "use strict";
 
   return TroupeViews.Base.extend({
     template: template,
 
     events: {
-      "click .remove": "removeUser"
-      // "click #share-button" : "showShareView"
+      "click .remove": "removeUser",
+      "click #share-button" : "showShareView"
     },
 
     attributes: {
@@ -56,19 +57,19 @@ define([
     //   return {};
     // },
 
-   //  showShareView: function() {
-   //    var view = new ShareModalView({ model: this.model, uri: window.troupeContext.troupe.uri });
-   //    var modal = new TroupeViews.Modal({ view: view  });
+    showShareView: function() {
+      var view = new ShareModalView({ model: this.model, uri: window.troupeContext.troupe.uri });
+      var modal = new TroupeViews.Modal({ view: view  });
 
-   //    view.on('share.complete', function(data) {
-   //        modal.off('share.complete');
-   //        modal.hide();
-   //      });
+      view.on('share.complete', function(data) {
+          modal.off('share.complete');
+          modal.hide();
+        });
 
-   //    modal.show();
+      modal.show();
 
-   //    return false;
-   //  },
+      return false;
+    },
 
     removeUser: function() {
       var c = new ConfirmDialog({
