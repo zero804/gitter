@@ -1,4 +1,7 @@
 // Filename: views/home/main
+
+// TODO: Better way to show the subject here, right now it will be set multiple times as this is called per conversationDetailItemView
+
 define([
   'jquery',
   'underscore',
@@ -39,6 +42,9 @@ define([
       else {
         data.date = d.format('mmm d');
       }
+
+      // This is the bit that could be done better, probably better done in conversationDetailView
+      $("#subject").html(data.subject);
 
       return data;
     },
