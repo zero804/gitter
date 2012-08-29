@@ -17,13 +17,13 @@ define([
     template: template,
 
     initialize: function(options) {
-      _.bindAll(this, 'onFormSubmit');
-      this.uri = options.uri;
+      // _.bindAll(this, 'onFormSubmit');
+      // this.uri = options.uri;
     },
 
     getRenderData: function() {
       return {
-        uri: this.uri
+        // uri: this.uri
       };
     },
 
