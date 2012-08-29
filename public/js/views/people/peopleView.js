@@ -9,42 +9,35 @@ define([
   'backbone',
   'views/base',
   'hbs!./people',
-  'hbs!./item',
   'views/confirmDialog',
   'views/share/shareModalView',
+  './userTabView',
   './requestTabView',
   './inviteTabView'
-], function($, _, Backbone, TroupeViews, template, itemTemplate, ConfirmDialog, ShareModalView, RequestTabView, InviteTabView) {
+], function($, _, Backbone, TroupeViews, template, ConfirmDialog, ShareModalView, UserTabView, RequestTabView, InviteTabView) {
+  "use strict";
 
-  var PeopleView = Backbone.View.extend({
-
-    initialize: function(options) {
-      if(options && options.params) {
-        this.initialTab = options.params.tab;
-      }
-
-      var self = this;
-      $.ajax({
-        url: "/troupes/" + window.troupeContext.troupe.id + "/users",
-        contentType: "application/json",
-        dataType: "json",
-        type: "GET",
-        success: function(data) {
-          self.renderUsers(data);
-        }
-      });
-    },
+  return TroupeViews.Base.extend({
+    template: template,
 
     events: {
       "click .remove": "removeUser",
       "click #share-button" : "showShareView"
     },
 
-    render: function() {
-      var self = this;
-      var compiledTemplate = template({ });
-      $(this.el).html(compiledTemplate);
+    attributes: {
 
+    },
+
+    initialize: function(options) {
+      if(options && options.params) {
+        this.initialTab = options.params.tab;
+      }
+    },
+
+    afterRender:function() {
+      var self = this;
+      this.$el.find('#users').html(new UserTabView().render().el);
       this.$el.find('#requests').html(new RequestTabView().render().el);
       this.$el.find('#invites').html(new InviteTabView().render().el);
 
@@ -58,9 +51,11 @@ define([
       $('a[data-toggle="tab"]', this.el).on('shown', function (e) {
 
       });
-
-      return this;
     },
+
+    // getRenderData: function() {
+    //   return {};
+    // },
 
     showShareView: function() {
       var view = new ShareModalView({ model: this.model, uri: window.troupeContext.troupe.uri });
@@ -76,21 +71,6 @@ define([
       return false;
     },
 
-    renderUsers: function(users) {
-      $(".frame-people", this.el).empty();
-      while(users.length > 0) {
-        var p1 = users.shift();
-
-        var itemHtml = itemTemplate({
-          personName: p1.displayName,
-          personAvatarUrl: p1.avatarUrl,
-          personRemove: p1.id != window.troupeContext.user.id
-        });
-
-        $(".frame-people", this.el).append(itemHtml);
-      }
-    },
-
     removeUser: function() {
       var c = new ConfirmDialog({
         title: "Are you sure?",
@@ -103,5 +83,4 @@ define([
 
   });
 
-  return PeopleView;
 });
