@@ -21,7 +21,6 @@ define([
     template: template,
 
     events: {
-      "click .remove": "removeUser",
       "click #share-button" : "showShareView"
     },
 
@@ -67,16 +66,6 @@ define([
         });
 
       modal.show();
-
-      return false;
-    },
-
-    removeUser: function() {
-      var c = new ConfirmDialog({
-        title: "Are you sure?",
-        message: "Are you sure you want to remove user...."
-      });
-      c.show();
 
       return false;
     }
