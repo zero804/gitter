@@ -18,6 +18,11 @@ define([
       this.router = options.router;
       this.collection = new fileModels.FileCollection();
 
+      _.bindAll(this, 'onCollectionAdd', 'onCollectionReset');
+
+      this.collection.bind('add', this.onCollectionAdd);
+      this.collection.bind('reset', this.onCollectionReset);
+
       this.collection.listen();
       this.collection.fetch();
 
@@ -36,6 +41,20 @@ define([
         collection: this.collection,
         el: this.$el.find(".frame-files")});
       this.createUploader(this.$el.find(".fileuploader")[0]);
+    },
+
+    onCollectionReset: function() {
+      // Probably not the best way to do this, want to show/hide frame-help if there are no files
+      console.log("Reset collection");
+      $("#frame-help").show();
+      $(".frame-files", this.el).empty();
+      this.collection.each(this.onCollectionAdd);
+    },
+
+    onCollectionAdd: function(item) {
+      console.log("Collection add");
+      $("#frame-help").hide();
+      $(".frame-files", this.el).append(new FileItemView({ model: item }).render().el);
     },
 
     createUploader: function(element) {
