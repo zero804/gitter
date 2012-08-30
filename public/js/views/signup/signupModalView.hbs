@@ -1,9 +1,14 @@
 <div class="trpModalTitle">Create a Troupe</div>
-   <div class="trpCreateForm">
-   		<form>
-     		<input placeholder="Choose a name for your Troupe" class="trpInput" name="troupeName" autofocus><br>
-     		<input placeholder="Enter your email address" class="trpInput" name="email">
-     		<div class="trpModalSubtext">We will send you a confirmation email</div>
-     		<input type="submit" name="submit" value="Create" class="trpModalButton trpButtonBig trpBtnGreen" />
- 			</form>
-   	</div>
+<div class="trpCreateForm">
+	<form>
+		<input placeholder="Choose a name for your Troupe" class="trpInput" name="troupeName" autofocus><br>
+		{{#unless existingUser}}
+   		<input placeholder="Enter your email address" class="trpInput" name="email">
+   		<div class="trpModalSubtext">We will send you a confirmation email</div>
+    {{/unless}}
+    {{#if userId}}
+      <input type="hidden" name="userId" value="{{userId}}">
+    {{/if}}
+		<input type="submit" name="submit" value="Create" class="trpModalButton trpButtonBig trpBtnGreen" />
+	</form>
+</div>

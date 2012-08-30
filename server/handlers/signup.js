@@ -6,6 +6,8 @@ var form = require("express-form"),
     filter = form.filter,
     validate = form.validate,
     signupService = require("../services/signup-service"),
+    userService = require("../services/user-service"),
+    troupeService = require("../services/troupe-service"),
     passport = require('passport');
 
 module.exports = {
@@ -30,7 +32,8 @@ module.exports = {
           filter("troupeName").trim(),
           validate("troupeName").required().is(/^[a-zA-Z0-9 ]+$/),
           filter("email").trim(),
-          validate("email").isEmail()
+          validate("email").isEmail(),
+          filter("userId").trim()
         ),
 
         function(req, res) {
@@ -42,26 +45,70 @@ module.exports = {
             return res.send(500);
           }
 
-          signupService.newSignup({
-            troupeName: req.form.troupeName,
-            email: req.form.email
-          }, function(err, id) {
-            if(err) {
+          // we can either get an email address for a new user
+          if (req.form.email) {
+            console.log("Got an Email address, must be a new user");
+            signupService.newSignup({
+              troupeName: req.form.troupeName,
+              email: req.form.email
+            }, function(err, id) {
+              if(err) {
+                if(req.accepts('application/json')) {
+                  res.send(500);
+                } else {
+                  res.relativeRedirect("/");
+                }
+                return;
+              }
+
+              req.session.newTroupeId = id;
               if(req.accepts('application/json')) {
+                res.send({ success: true, troupeName: req.form.troupeName, email: req.form.email });
+              } else {
+                res.relativeRedirect("/confirm");
+              }
+            });
+          }
+
+          // or we can get a user id for an existing user, in which case we need to lookup his email address
+          // there are probably better ways to do this, but i don't them. MB
+          if (req.form.userId) {
+            console.log("Got a userID, must be an existing user who is clearly awesome");
+            userService.findById(req.form.userId, function(err,user) {
+              if(err) {
                 res.send(500);
               } else {
-                res.relativeRedirect("/");
-              }
-              return;
-            }
+                console.log("Got a user, his email is: " + JSON.stringify(user));
 
-            req.session.newTroupeId = id;
-            if(req.accepts('application/json')) {
-              res.send({ success: true, troupeName: req.form.troupeName, email: req.form.email });
-            } else {
-              res.relativeRedirect("/confirm");
-            }
-          });
+                signupService.newSignup({
+                  troupeName: req.form.troupeName,
+                  email: user.email
+                }, function(err,id) {
+                  if(err) {
+                    if(req.accepts('application/json')) {
+                      res.send(500);
+                    } else {
+                      res.relativeRedirect("/");
+                    }
+                    return;
+                  }
+
+                  troupeService.findById(id, function(err,troupe) {
+                    if (err) {
+                      res.send(500);
+                    }
+                    else {
+                      console.log("Got a troupe, it is:" + JSON.stringify(troupe));
+                      res.send({ success: true, redirectTo: troupe.uri});
+                    }
+                  });
+
+                  // res.send(200);
+                });
+
+              }
+            });
+          }
 
         }
       );

@@ -35,7 +35,7 @@ require(
       }
 
       $('.button-signup').on('click', function() {
-        var view = new SignupModalView();
+        var view = new SignupModalView({existingUser: false});
         var modal = new TroupeViews.Modal({ view: view });
         view.on('signup.complete', function(data) {
           modal.off('signup.complete');
