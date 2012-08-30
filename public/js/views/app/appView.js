@@ -6,9 +6,10 @@ define([
   'collections/troupes',
   'collections/notifications',
   'views/base',
+  'views/signup/signupModalView',
   'views/widgets/nav',
   'noty'
-], function($, _, Backbone, troupeModels, notificationModels, TroupeViews, NavView) {
+], function($, _, Backbone, troupeModels, notificationModels, TroupeViews, SignupModalView, NavView) {
   "use strict";
 
   var AppView = Backbone.View.extend({
@@ -19,6 +20,7 @@ define([
         "click .menu-settings": "settingsMenuClicked",
         "click .menu-signout": "signoutMenuClicked",
         "click #troupe-selector-arrow"  : "toggleSelector",
+        "click .add-troupe" : "addTroupeClicked"
          //"click #trpPersonIcon" : "toggleUserMenu"
     },
 
@@ -26,7 +28,7 @@ define([
       var self = this;
       this.router = options.router;
 
-      _.bindAll(this, 'profileMenuClicked', 'settingsMenuClicked', 'signoutMenuClicked', 'toggleSelector');
+      _.bindAll(this, 'profileMenuClicked', 'settingsMenuClicked', 'signoutMenuClicked', 'toggleSelector', 'addTroupeClicked');
 
       function attachNavView(selector) {
         var e = self.$el.find(selector);
@@ -162,6 +164,18 @@ define([
       return false;
     },
 
+    addTroupeClicked: function () {
+      var view = new SignupModalView( {existingUser: true} );
+        var modal = new TroupeViews.Modal({ view: view });
+        view.on('signup.complete', function(data) {
+          modal.off('signup.complete');
+        });
+
+        modal.show();
+
+        return false;
+    },
+
     addOneTroupe: function(model) {
       this.troupeSelectorMenu.$el.append("<div class='trpTroupeSelectorItem'><a href='" + model.get("uri") + "'>"+ model.get("name") + "</a></div>");
     },
@@ -169,7 +183,7 @@ define([
     addAllTroupes: function() {
       this.troupeSelectorMenu.$el.empty();
       this.troupeCollection.each(this.addOneTroupe, this);
-      this.troupeSelectorMenu.$el.append("<div class='trpTroupeSelectorAdd'><a href=''>Start a new Troupe</a></div>");
+      this.troupeSelectorMenu.$el.append("<div class='trpTroupeSelectorAdd add-troupe'>Start a new Troupe</div>");
     }
 
     /*,
