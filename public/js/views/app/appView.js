@@ -7,9 +7,10 @@ define([
   'collections/notifications',
   'views/base',
   'views/signup/signupModalView',
+  'views/share/shareModalView',
   'views/widgets/nav',
   'noty'
-], function($, _, Backbone, troupeModels, notificationModels, TroupeViews, SignupModalView, NavView) {
+], function($, _, Backbone, troupeModels, notificationModels, TroupeViews, SignupModalView, ShareModalView, NavView) {
   "use strict";
 
   var AppView = Backbone.View.extend({
@@ -42,6 +43,29 @@ define([
         'files': attachNavView('#nav-files'),
         'people': attachNavView('#nav-people')
       };
+
+      $.ajax({
+        url: "/troupes/" + window.troupeContext.troupe.id + "/users",
+        contentType: "application/json",
+        dataType: "json",
+        type: "GET",
+        success: function(data) {
+          var members = data.length; 
+          $.ajax({
+            url: "/troupes/" + window.troupeContext.troupe.id + "/invites",
+            contentType: "application/json",
+            dataType: "json",
+            type: "GET",
+            success: function(data) {
+              members = members + data.length;
+              if (members== 1) self.showShareView();
+            }
+          });
+
+        }
+      });
+
+
 
       this.troupeCollection = new troupeModels.TroupeCollection();
       //this.notificationCollection = new NotificationCollection();
@@ -142,6 +166,7 @@ define([
     },
 
     profileMenuClicked: function() {
+      console.log(JSON.stringify(window.troupeContext));
       require(['views/profile/profileModalView'], function(ProfileModalView) {
         var view = new ProfileModalView({ existingUser: true });
         var modal = new TroupeViews.Modal({ view: view });
@@ -184,6 +209,20 @@ define([
       this.troupeSelectorMenu.$el.empty();
       this.troupeCollection.each(this.addOneTroupe, this);
       this.troupeSelectorMenu.$el.append("<div class='trpTroupeSelectorAdd add-troupe'>Start a new Troupe</div>");
+    },
+
+    showShareView: function() {
+      var view = new ShareModalView({ model: this.model, uri: window.troupeContext.troupe.uri });
+      var modal = new TroupeViews.Modal({ view: view  });
+
+      view.on('share.complete', function(data) {
+          modal.off('share.complete');
+          modal.hide();
+        });
+
+      modal.show();
+
+      return false;
     }
 
     /*,
