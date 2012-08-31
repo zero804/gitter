@@ -189,11 +189,11 @@ define([
         if(transition) {
           that.$el.one($.support.transition.end, function () { 
             that.$el.trigger('shown');
-            this.trigger('shown');
+            that.trigger('shown');
            });
         } else {
           that.$el.trigger('shown');
-          this.trigger('shown');
+          that.trigger('shown');
         }
       });
     },
@@ -378,12 +378,12 @@ define([
         self.collection.off('remove', self.onCollectionRemove);
         self.collection.off('reset', self.onCollectionReset);
       });
-    },
+    },  
 
     renderInternal: function() {
       var self = this;
       this.collection.each(function(item) {
-        var options = _.extend(this.itemViewOptions, { model: item });
+        var options = _.extend(self.itemViewOptions, { model: item });
         self.$el.append(new self.itemView(options).render().el);
       });
     },
