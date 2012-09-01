@@ -5,8 +5,10 @@ define([
   'views/home/main',
   'views/share/share',
   'components/chat/chat-component',
-  'views/app/appView'
-], function($, _, Backbone, MainHomeView, ShareView, chat, AppView){
+  'views/app/appView',
+  'components/desktopNotifications',
+  'components/soundNotifications'
+], function($, _, Backbone, MainHomeView, ShareView, chat, AppView, desktopNotifications, soundNotifications) {
   var AppRouter = Backbone.Router.extend({
 
     initialize: function() {
