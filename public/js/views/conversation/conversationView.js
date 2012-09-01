@@ -11,6 +11,13 @@ define([
 ], function($, _, Backbone, TroupeViews, dateFormat, template, conversationModels, ConversationItemView){
   "use strict";
 
+  function makeSort(sortField) {
+    return function(e) {
+      e.preventDefault();
+      this.collectionView.sortBy(sortField);
+    };
+  }
+
   return TroupeViews.Base.extend({
     template: template,
 
@@ -18,16 +25,19 @@ define([
       // we probably want to pull in the domain from config, e.g. for beta.trou.pe
       this.collection = new conversationModels.ConversationCollection();
 
-      _.bindAll(this, 'onCollectionAdd', 'onCollectionReset');
-
-      this.collection.bind('add', this.onCollectionAdd);
-      this.collection.bind('reset', this.onCollectionReset);
-
+      this.collection.listen();
       this.collection.fetch();
+
+      var self = this;
+      this.addCleanup(function() {
+        self.collection.unlisten();
+      });
     },
 
     events: {
-      //"click .clickPoint-showEmail": "showEmail"
+      "click .link-sort-from": makeSort('from'),
+      "click .link-sort-date": makeSort('date'),
+      "click .link-sort-subject": makeSort('subject')
     },
 
     getRenderData: function() {
@@ -35,16 +45,27 @@ define([
       return { "emailAddress" : emailAddress };
     },
 
-    onCollectionReset: function() {
-      // Probably not the best way to do this, want to show/hide frame-help if there are no mails/conversations
-      $("#frame-help").show();
-      $(".frame-conversations", this.el).empty();
-      this.collection.each(this.onCollectionAdd);
-    },
-
-    onCollectionAdd: function(item) {
-      $("#frame-help").hide();
-      $(".frame-conversations", this.el).append(new ConversationItemView({ model: item }).render().el);
+    afterRender: function() {
+      this.collectionView = new TroupeViews.Collection({
+        itemView: ConversationItemView,
+        collection: this.collection,
+        el: this.$el.find(".frame-conversations"),
+        noItemsElement: this.$el.find("#frame-help"),
+        sortMethods: {
+          "from": function(conversation) {
+            var lastSender = conversation.get('lastSender');
+            if(!lastSender) return null;
+            return lastSender.displayName;
+          },
+          "subject": function(conversation) {
+            var fileName = conversation.get('subject');
+            return fileName ? fileName.toLowerCase() : '';
+          },
+          "date": function(conversation) {
+            return conversation.get("updated");
+          }
+        }
+      });
     }
 
   });

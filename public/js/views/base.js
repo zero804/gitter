@@ -356,6 +356,25 @@ define([
     }
   });
 
+  // Used for switching from a single param comparator to a double param comparator
+  function sortByComparator(sortByFunction) {
+    return function(left, right) {
+      var l = sortByFunction(left);
+      var r = sortByFunction(right);
+
+      if (l === void 0) return 1;
+      if (r === void 0) return -1;
+
+      return l < r ? -1 : l > r ? 1 : 0;
+    };
+  }
+
+  function reverseComparatorFunction(comparatorFunction) {
+    return function(left, right) {
+      return -1 * comparatorFunction(left, right);
+    };
+  }
+
   TroupeViews.Collection = TroupeViews.Base.extend({
 
     constructor: function(options) {
@@ -367,6 +386,7 @@ define([
         this.itemView = options.itemView;
       }
       this.itemViewOptions = options.itemViewOptions ? options.itemViewOptions : {};
+      this.sortMethods = options.sortMethods ? options.sortMethods : {};
 
       _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onCollectionRemove');
       this.collection.on('add', this.onCollectionAdd);
@@ -391,21 +411,83 @@ define([
     events: {
     },
 
+    sortMethods: {
+
+    },
+
+    sortBy: function(field) {
+      var reverse = false;
+
+      // Sort by the same field twice switches the direction
+      if(field === this.currentSortByField) {
+        if(field.indexOf("-") === 0) {
+          field = field.substring(1);
+        } else {
+          field = "-" + field;
+        }
+      }
+
+      var fieldLookup;
+      if(field.indexOf("-") === 0) {
+        fieldLookup = field.substring(1);
+        reverse = true;
+      } else {
+        fieldLookup = field;
+      }
+
+      var sortByMethod = this.sortMethods[fieldLookup];
+      if(!sortByMethod) return;
+
+      this.currentSortByField = field;
+
+      var comparator = sortByComparator(sortByMethod);
+      if(reverse) {
+        comparator = reverseComparatorFunction(comparator);
+      }
+
+      this.collection.comparator = comparator;
+      this.collection.sort();
+    },
+
+    checkForNoItems: function() {
+      if(this.options.noItemsElement) {
+        if(this.collection.length === 0) {
+          if(this.noItemsElementHidden === true) {
+            $(this.options.noItemsElement).show();
+            this.noItemsElementHidden = false;
+          }
+        } else {
+          if(this.noItemsElementHidden === false) {
+            $(this.options.noItemsElement).hide();
+            this.noItemsElementHidden = true;
+          }
+        }
+      }
+    },
+
     onCollectionReset: function() {
-      this.$el.empty();
-      this.removeSubViews(this.$el);
-      this.collection.each(this.onCollectionAdd);
+      var el = this.$el;
+      var self = this;
+      el.empty();
+      this.removeSubViews(el);
+      this.collection.each(function(item) {
+        var options = _.extend(self.itemViewOptions, { model: item });
+        el.append(new self.itemView(options).render().el);
+      });
+      this.checkForNoItems();
     },
 
     onCollectionAdd: function(item) {
       var options = _.extend(this.itemViewOptions, { model: item });
       this.$el.append(new this.itemView(options).render().el);
+      this.checkForNoItems();
     },
 
     onCollectionRemove: function(item) {
       this.$el.find('.model-id-' + item.get('id')).each(function(index, item) {
         if(item._view) item._view.remove();
       });
+      this.checkForNoItems();
     }
 
   });
