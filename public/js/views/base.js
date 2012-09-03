@@ -324,7 +324,7 @@ define([
   TroupeViews.Menu = Backbone.View.extend({
     initialize: function(options) {
       _.bindAll(this, 'toggleMenu', 'showMenu', 'hideMenu');
-
+      $('body, html').on('click', this.hideMenu);
       this.triggerEl = $(options.triggerEl);
       this.triggerEl.on('click', this.toggleMenu);
     },
@@ -336,6 +336,7 @@ define([
     toggleMenu: function(){
       if (this.$el.is(':hidden')) {
         this.showMenu();
+        return false;
       } else {
         this.hideMenu();
       }
