@@ -64,11 +64,9 @@ define([
       return false;
     },
 
-
     showFileActionMenu: function(e) {
       $('body, html').on('click', this.hideFileActionMenu);
-
-      this.$el.find(".trpFileActionMenu").show();
+      this.$el.find(".trpFileActionMenu").fadeIn('fast');
       this.$el.find(".trpFileActionMenuTop").show();
       this.$el.find('.trpFileActionMenuBottom').slideDown('fast', function() {
           // Animation complete.
@@ -79,9 +77,7 @@ define([
     hideFileActionMenu: function(e) {
       var self = this;
       $('body, html').off('click', this.hideFileActionMenu);
-
-      this.$el.find(".trpFileActionMenuTop").hide();
-      this.$el.find('.trpFileActionMenuBottom').slideUp('fast', function() {
+      this.$el.find('.trpFileActionMenu').fadeOut('fast', function() {
         self.$el.find(".trpFileActionMenu").hide();
       });
     },
