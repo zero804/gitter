@@ -12,7 +12,6 @@ define([
 
 
   function getSupportedAudioType() {
-    return "wav"; // TODO: convert  files!
     var snd = new Audio('');
     if(snd.canPlayType('audio/ogg')) {
       return "ogg";
