@@ -21,6 +21,7 @@ define([
   return TroupeViews.Base.extend({
     template: template,
     initialize: function(options) {
+      _.bindAll(this, 'showSortMenu', 'hideSortMenu');
       var self = this;
       this.router = options.router;
       this.collection = new fileModels.FileCollection();
@@ -41,7 +42,8 @@ define([
       "click .link-sort-filename": makeSort('fileName'),
       "click .link-sort-mtime": makeSort('mtime'),
       "click .link-sort-filetype": makeSort('mimeType'),
-      "click .link-sort-groupby": makeSort('mimeType') // TODO: do something else
+      "click .link-sort-groupby": makeSort('mimeType'), 
+      "click .file-sorter": "showSortMenu"
     },
 
     afterRender: function() {
@@ -77,7 +79,20 @@ define([
         onComplete: function() {
         }
       });
+    },
+
+    showSortMenu: function(e) {
+      $('body, html').on('click', this.hideSortMenu);
+      this.$el.find(".trpSortMenu").fadeIn('fast');
+      return false;
+    },
+
+    hideSortMenu: function(e) {
+      var self = this;
+      $('body, html').off('click', this.hideSortMenu);
+      this.$el.find('.trpSortMenu').fadeOut('fast');
     }
+
 
   });
 
