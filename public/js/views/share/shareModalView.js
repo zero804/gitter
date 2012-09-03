@@ -69,7 +69,6 @@ define([
         type: "POST",
         success: function(data) {
            if(data.failed) {
-            alert('Oopsie daisy')
             return;
           }
           that.trigger('share.complete', data);
