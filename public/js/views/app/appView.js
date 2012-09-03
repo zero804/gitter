@@ -157,9 +157,11 @@ define([
     },
 
     toggleSelector: function(){
-      if ($('#troupe-selector').is(':hidden')) $('#troupe-selector').slideDown(350, function() {
-          // Animation complete.
-      });
+      if ($('#troupe-selector').is(':hidden')) {
+        $('#troupe-selector').slideDown(350, function() {
+          });
+        return false;
+      }
       else $('#troupe-selector').slideUp(350, function() {
           // Animation complete.
       });

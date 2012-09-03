@@ -22,7 +22,7 @@ define([
     template: template,
 
     initialize: function(options) {
-      // we probably want to pull in the domain from config, e.g. for beta.trou.pe
+      _.bindAll(this, 'showSortMenu', 'hideSortMenu');
       this.collection = new conversationModels.ConversationCollection();
 
       this.collection.listen();
@@ -37,10 +37,12 @@ define([
     events: {
       "click .link-sort-from": makeSort('from'),
       "click .link-sort-date": makeSort('date'),
-      "click .link-sort-subject": makeSort('subject')
+      "click .link-sort-subject": makeSort('subject'),
+      "click .mail-sorter": "showSortMenu"
     },
 
     getRenderData: function() {
+      // we probably want to pull in the domain from config, e.g. for beta.trou.pe
       var emailAddress = window.troupeContext.troupe.uri + '@beta.trou.pe';
       return { "emailAddress" : emailAddress };
     },
@@ -66,6 +68,18 @@ define([
           }
         }
       });
+    },
+ 
+    showSortMenu: function(e) {
+      $('body, html').on('click', this.hideSortMenu);
+      this.$el.find(".trpSortMenu").fadeIn('fast');
+      return false;
+    },
+
+    hideSortMenu: function(e) {
+      var self = this;
+      $('body, html').off('click', this.hideSortMenu);
+      this.$el.find('.trpSortMenu').fadeOut('fast');
     }
 
   });
