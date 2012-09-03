@@ -556,6 +556,60 @@ h1 {
   color: @trpGreen;
 }
 
+.trpSortMenuButton {
+  margin-top: 5px;
+  padding: 5px 10px 5px 10px;
+  float: right;
+  border-left: 1px solid @trpLightGrey;
+  background-color: red;
+}
+
+.trpSortMenu {
+  display: none;
+  position: absolute;
+  z-index: 3;
+  float: right;
+  clear: both;
+  width: 86px;
+  .trpShadow;
+}
+
+.trpSortMenuTop {
+  margin-left: 56px;
+  width: 20px;
+  height: 24px;
+  border: 0;
+}
+
+.trpSortMenuBottom {
+  width: 86px;
+  background: white;
+}
+
+.trpSortMenuItem {
+  color: @trpDarkGrey;
+  padding: 5px 0px 5px 20px;
+  .trpBodySmall;
+}
+
+.trpSortMenuItem a {
+  text-decoration: none;
+  color: @trpDarkGrey;
+}
+
+.trpSortMenuItem a:hover {
+  text-decoration: none;
+  color: @trpGreen;
+}
+
+.trpSortMenuItem:hover {
+  color: @trpGreen;
+  background-color: @trpOffWhite;
+}
+
+
+
+
 /*Chat elements*/
 
 
@@ -719,7 +773,7 @@ textarea, input { outline: none; }
 
 .trpFileViewItem {
   float: left;
-  padding-top: 20px;
+  padding-top: 10px;
   padding-bottom: 20px;
   padding-left: 20px;
   padding-right: 20px;
@@ -778,7 +832,7 @@ textarea, input { outline: none; }
 .trpFileActionMenuBottom {
   display: none;
   width: 96px;
-  background: @trpOffWhite;
+  background: white;
 }
 
 .trpFileActionMenuItem {
@@ -799,7 +853,7 @@ textarea, input { outline: none; }
 
 .trpFileActionMenuItem:hover {
   color: @trpGreen;
-  background-color: white;
+  background-color: @trpOffWhite;
 }
 
 .trpFileUploadContainer {
@@ -818,13 +872,19 @@ textarea, input { outline: none; }
 }
 
 .trpFileToolbar {
-  padding-bottom: 8px;
+  padding-top: 8px;
+  padding-right: 20px;
 }
 
 .trpFileSorter {
   float: left;
   padding-left: 20px;
+  padding-top: 4px;
   .trpBodySmall;
+}
+
+.trpFileSorterArrow {
+  padding-left: 8px;
 }
 
 

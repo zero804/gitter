@@ -1,21 +1,16 @@
 <div class="fileuploader trpFileUploadContainer"></div>
 
-<!-- <div class="trpFileToolbar">
-  <div class="trpFileSorter">Sort by</div>
-  <div class="trpFileViewer right"><img src="images/2/icon-small-grid-selected.png" class="trpFileViewIcon" width="14" height="14"><img src="images/2/icon-small-list.png" class="trpFileViewIcon" width="14" height="14"></div>
-</div> -->
-<div>
-  <div class="btn-group">
-    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-      Sort
-      <span class="caret"></span>
-    </a>
-    <ul class="dropdown-menu">
-      <li><a class="link-sort-filename" href="#">File Name</a></li>
-      <li><a class="link-sort-mtime" href="#">Modified Date</a></li>
-      <li><a class="link-sort-filetype" href="#">File Type</a></li>
-    </ul>
+<div class="trpFileToolbar">
+  <div class="trpFileSorter file-sorter">Sort by<span class="trpFileSorterArrow"><img src="images/2/icon-small-dropdown-black.png"></span></div>
+  <div class="trpSortMenu">
+    <div class="trpSortMenuTop"> </div>
+    <div class="trpSortMenuBottom">
+      <div class="trpSortMenuItem link-sort-mtime"><a href="#">Date</a></div>
+      <div class="trpSortMenuItem link-sort-filename"><a href="#" class="link-preview">Name</a></div>
+      <div class="trpSortMenuItem link-sort-filetype"><a href="#" class="link-versions">Type</a></div>
+    </div>
   </div>
+  <div class="trpFileViewer right"><img src="images/2/icon-small-grid-selected.png" class="trpFileViewIcon" width="14" height="14"><img src="images/2/icon-small-list.png" class="trpFileViewIcon" width="14" height="14"></div>
 </div>
 <div class="frame-files">
 
