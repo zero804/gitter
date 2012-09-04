@@ -442,7 +442,19 @@ h1 {
   display: none;
 }
 
-.trpUserMenuItem {
+.trpAddMenu {
+  position: absolute;
+  z-index: 5;
+  top: 64px;
+  width:180px;
+  right: 108px;
+  overflow: hidden;
+  .trpShadow;
+  background-color: white;
+  display: none;
+}
+
+.trpMenuItem {
   padding-left: 10px;
   padding-top: 10px;
   padding-right: 5px;
@@ -451,17 +463,20 @@ h1 {
   .trpBodySmall;
 }
 
-.trpUserMenuItem:hover{
+.trpMenuItem:hover{
   background-color: @trpGreen;
   cursor: pointer;
   text-decoration: none;
 }
 
-.trpUserMenuItem a{
+.trpMenuItem a{
   text-decoration: none;
   color: @trpDarkGrey;
 }
 
+.trpMenuItem:hover a{
+  color: white;
+}
 .trpNavWrap {
   position: fixed;
   top: 64px;

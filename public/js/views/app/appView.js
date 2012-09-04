@@ -21,7 +21,9 @@ define([
         "click .menu-settings": "settingsMenuClicked",
         "click .menu-signout": "signoutMenuClicked",
         "click #troupe-selector-arrow"  : "toggleSelector",
-        "click .add-troupe" : "addTroupeClicked"
+        "click .add-troupe" : "addTroupeClicked",
+        "click .menu-add-troupe" : "addTroupeClicked",
+        "click .menu-add-person" : "showShareView"
          //"click #trpPersonIcon" : "toggleUserMenu"
     },
 
@@ -74,6 +76,7 @@ define([
       this.troupeSelectorMenu = new TroupeViews.Menu({ el: "#troupe-selector", triggerEl: "#menu-notification-selector" });
 
       this.userMenu = new TroupeViews.Menu({ el: "#troupe-user-menu", triggerEl: "#person-icon" });
+      this.userMenu = new TroupeViews.Menu({ el: "#troupe-add-menu", triggerEl: "#add-icon" });
 
       this.troupeCollection.on('change', this.addAllTroupes, this);
       this.troupeCollection.on('add', this.addOneTroupe, this);
