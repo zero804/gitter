@@ -78,6 +78,7 @@ define([
       this.userMenu = new TroupeViews.Menu({ el: "#troupe-user-menu", triggerEl: "#person-icon" });
       this.addPersonMenu = new TroupeViews.Menu({ el: "#troupe-add-menu", triggerEl: "#add-icon" });
       this.notifyMenu = new TroupeViews.Menu({ el: "#troupe-notify-menu", triggerEl: "#notify-icon" });
+      this.settingsMenu = new TroupeViews.Menu({ el: "#troupe-settings-menu", triggerEl: "#settings-icon" });
 
       this.troupeCollection.on('change', this.addAllTroupes, this);
       this.troupeCollection.on('add', this.addOneTroupe, this);
