@@ -455,17 +455,13 @@ define([
     },
 
     checkForNoItems: function() {
+      console.log("Check for no items");
       if(this.options.noItemsElement) {
         if(this.collection.length === 0) {
-          if(this.noItemsElementHidden === true) {
             $(this.options.noItemsElement).show();
-            this.noItemsElementHidden = false;
           }
-        } else {
-          if(this.noItemsElementHidden === false) {
+        else {
             $(this.options.noItemsElement).hide();
-            this.noItemsElementHidden = true;
-          }
         }
       }
     },
