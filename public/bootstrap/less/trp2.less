@@ -304,14 +304,13 @@ h1 {
 
 .trpHeader {
   margin: 0 auto;
-  position: relative;
-  top: 16px;
   left: 30px;
 }
 
 .trpHeader ul {
+  padding-top: 16px;
+  padding-left: 32px;
   margin: 0;
-  padding: 0;
   list-style: none;
   position: absolute;
 }
@@ -336,7 +335,7 @@ h1 {
 .trpHeaderRight {
   margin: 0 auto;
   position: relative;
-  top: 24px;
+  height: 64px;
 }
 
 .trpHeaderRight ul {
@@ -350,6 +349,24 @@ h1 {
 .trpHeaderRight ul li {
   float: left;
   margin-right: 5px;
+  padding-top: 21px;
+  padding-bottom: 21px;
+}
+
+.trpNotifyContainer {
+  margin-top: -3px;
+}
+.trpNotifyBadge {
+  padding: 4px 7px 4px 7px;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  background-color: white;
+  font-family: @fontSans;
+  font-size: 9px;
+  color: @trpDarkGrey;
+  text-align: center;
+  margin-right: 18px;
 }
 
 .trpHeaderRight ul li a{
@@ -521,6 +538,7 @@ h1 {
 
   }
 }
+
 
 .trpNavNotification {
   display: inline-block;
