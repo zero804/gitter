@@ -324,7 +324,7 @@ define([
   TroupeViews.Menu = Backbone.View.extend({
     initialize: function(options) {
       _.bindAll(this, 'toggleMenu', 'showMenu', 'hideMenu');
-      $('body, html').on('click', this.hideMenu);
+      // $('body, html').on('click', this.hideMenu);
       this.triggerEl = $(options.triggerEl);
       this.triggerEl.on('click', this.toggleMenu);
     },
@@ -343,6 +343,8 @@ define([
     },
 
     showMenu: function() {
+      console.log("on: " + $(this.triggerEl));
+      $(this.triggerEl).css('background-color', 'white');
       this.$el.slideDown('fast', function() {
           // Animation complete.
           $('body').on('click', this.hideMenu);
@@ -350,6 +352,8 @@ define([
     },
 
     hideMenu: function() {
+      console.log("off: " + this.triggerEl);
+      $(this.triggerEl).css('background-color', 'transparent');
       $('body').off('click', this.hideMenu);
       this.$el.slideUp('fast', function() {
           // Animation complete.
