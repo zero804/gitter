@@ -20,7 +20,7 @@ define([
         "click .menu-profile": "profileMenuClicked",
         "click .menu-settings": "settingsMenuClicked",
         "click .menu-signout": "signoutMenuClicked",
-        "click #troupe-selector-arrow"  : "toggleSelector",
+        "click .troupe-selector"  : "toggleSelector",
         "click .add-troupe" : "addTroupeClicked",
         "click .menu-add-troupe" : "addTroupeClicked",
         "click .menu-add-person" : "showShareView"
@@ -160,6 +160,7 @@ define([
     },
 
     toggleSelector: function(){
+      console.log("Selector clicked");
       if ($('#troupe-selector').is(':hidden')) {
         $('#troupe-selector').slideDown(350, function() {
           });
