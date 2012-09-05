@@ -44,8 +44,13 @@ define([
         data: form.serialize(),
         type: "POST",
         success: function(data) {
-          console.log(JSON.stringify(data));
-          window.location.href = "/" + data.redirectTo;
+          if (data.redirectTo) {
+            console.log(JSON.stringify(data));
+            window.location.href = "/" + data.redirectTo;
+          }
+          else {
+             that.trigger('signup.complete', data);
+           }
         }
       });
     }
