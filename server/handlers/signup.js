@@ -30,7 +30,7 @@ module.exports = {
         // Form filter and validation middleware
         form(
           filter("troupeName").trim(),
-          validate("troupeName").required().is(/^[a-zA-Z0-9 ]+$/),
+          validate("troupeName").required(),
           filter("email").trim(),
           validate("email").isEmail(),
           filter("userId").trim()
