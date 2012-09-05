@@ -25,7 +25,7 @@ mongoose.connection.on("open", function(){
         console.error(err);
       }
       else{
-        console.log('OK! Sent number: ' + count + ' at ' + ts);
+        console.log('OK! Sent Conversations number: ' + count + ' at ' + ts);
         process.exit(code=0)
       }
     });
