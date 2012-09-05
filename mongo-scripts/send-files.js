@@ -11,23 +11,21 @@ mongoose.connect('mongodb://localhost/troupe');
 
 var ts = Math.round((new Date()).getTime() / 1000);
 
-var TroupeSchema = new Schema({
-  name: { type: String },
-  uri: { type: String },
-  status: { type: String, "enum": ['INACTIVE', 'ACTIVE'], "default": 'INACTIVE'}
+var FileSchema = new Schema({
+  fileName: {type: String}
 });
 
-var Troupes = mongoose.model('troupes', TroupeSchema);
+var Files = mongoose.model('files', FileSchema);
 
 mongoose.connection.on("open", function(){
   console.log("Mongoose connected");
-  Troupes.count({}, function( err, count){
-    ducksnode.push ('74814', {value: count, timestamp: ts}, function(err, response_status){
+  Files.count({}, function( err, count){
+    ducksnode.push ('74833', {value: count, timestamp: ts}, function(err, response_status){
       if (err){
         console.error(err);
       }
       else{
-        console.log('OK! Sent Troupes number: ' + count + ' at ' + ts);
+        console.log('OK! Sent Files number: ' + count + ' at ' + ts);
         process.exit(code=0)
       }
     });
