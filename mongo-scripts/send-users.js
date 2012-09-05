@@ -26,7 +26,7 @@ var Users = mongoose.model('users', UserSchema);
 mongoose.connection.on("open", function(){
   console.log("Mongoose connected");
   Users.count({}, function( err, count){
-    ducksnode.push ('74811', {value: count, timestamp: ts}, function(err, response_status){
+    ducksnode.push ('74845', {value: count, timestamp: ts}, function(err, response_status){
       if (err){
         console.error(err);
       }
