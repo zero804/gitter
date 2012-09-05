@@ -25,7 +25,8 @@ window.require_config = {
     now: 'libs/nowjs/0.8.1/now',
     noty: 'libs/jquery-noty/1.1.1/jquery.noty',
     fileUploader: 'libs/fileUploader/fileuploader',
-    templates: '../templates'
+    templates: '../templates',
+    ga: '//ssl.google-analytics.com/ga' // TODO: change this back to just 'ga'
   },
   shim: {
     'bootstrap': {
@@ -40,6 +41,9 @@ window.require_config = {
     },
     'noty': {
       deps: ['jquery']
+    },
+    'ga': {
+      exports: '_gaq'
     },
     /*
     Handlebars: {

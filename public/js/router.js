@@ -7,11 +7,16 @@ define([
   'components/chat/chat-component',
   'views/app/appView',
   'components/desktopNotifications',
-  'components/soundNotifications'
-], function($, _, Backbone, MainHomeView, ShareView, chat, AppView, desktopNotifications, soundNotifications) {
+  'components/soundNotifications',
+  'ga'
+], function($, _, Backbone, MainHomeView, ShareView, chat, AppView, desktopNotifications, soundNotifications, _gaq) {
+  _gaq.push(['_setAccount', 'UA-34596351-1']);
+  _gaq.push(['_trackPageview']);
+
   var AppRouter = Backbone.Router.extend({
 
     initialize: function() {
+
       this.appView = new AppView({ router: this });
 
       chat.connect();
@@ -56,32 +61,44 @@ define([
     },
 
     showStatusView: function() {
+      _gaq.push(['_trackEvent', 'page', 'status', 'status']);
+
       this.showAsync('views/status/statusView');
     },
 
     showConversationView: function() {
+      _gaq.push(['_trackEvent', 'page', 'conversation', 'conversation']);
+
       this.showAsync('views/conversation/conversationView');
     },
 
     showConversationDetailView: function(id) {
+      _gaq.push(['_trackEvent', 'page', 'conversationDetail', 'conversationDetail']);
+
       this.showAsync("views/conversation/conversationDetailView",id);
     },
 
     showChatView: function() {
+      _gaq.push(['_trackEvent', 'page', 'chat', 'chat']);
+
       this.showAsync('views/chat/chatView');
     },
 
     showFileView: function() {
+      _gaq.push(['_trackEvent', 'page', 'file', 'file']);
+
       this.showAsync('views/file/fileView');
     },
 
     showPeopleView: function() {
-      console.log("Showing People View");
+      _gaq.push(['_trackEvent', 'page', 'people', 'people']);
+
       this.showAsync("views/people/peopleView");
-      console.log("ROUTER: After showAsync");
     },
 
     showShareDialog: function() {
+      _gaq.push(['_trackEvent', 'page', 'share', 'share']);
+
       var loginView = new ShareView({ router: this });
       loginView.show();
     },
@@ -91,6 +108,8 @@ define([
     },
 
     showProfileView: function() {
+      _gaq.push(['_trackEvent', 'page', 'profile', 'profile']);
+
       this.showAsync("views/profile/profileView");
     }
   });
