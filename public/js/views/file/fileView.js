@@ -76,6 +76,7 @@ define([
         element: element,
         action: '/troupes/' + window.troupeContext.troupe.id + '/downloads/',
         debug: true,
+        extraDropzones: [qq.getByClass(document, 'trpContentContainer')[0]],
         onComplete: function() {
         }
       });
