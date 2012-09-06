@@ -17,10 +17,29 @@ define([
       this.current = options.current;
     },
 
+    // TODO: Replace this with something else like https://github.com/ljosa/urlize.js or http://benalman.com/projects/javascript-linkify/
+    linkify: function(inputText) {
+      //URLs starting with http://, https://, or ftp://
+      var replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@()*#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+      var replacedText = inputText.replace(replacePattern1, '<a href="$1" target="_blank">$1</a>');
+
+      //URLs starting with www. (without // before it, or it'd re-link the ones done above)
+      var replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+      replacedText = replacedText.replace(replacePattern2, '$1<a href="http://$2" target="_blank">$2</a>');
+
+      //Change email addresses to mailto:: links
+      var replacePattern3 = /(\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6})/gim;
+      replacedText = replacedText.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
+
+      return replacedText;
+    },
+
     events: {
     },
 
     getRenderData: function() {
+      // console.log("Message:" + this.message.text);
+      // this.message.text=this.linkify(this.message.text);
       var data = _.extend(this.message, {});
 
       /* TODO: css selectors should be able to handle this from a single class on a parent div */
@@ -39,6 +58,8 @@ define([
 
     afterRender: function(data) {
       this.$el.find('.trpChatBubble').tooltip({title: function() { return $.timeago(new Date(data.sent)); }});
+      var html=this.linkify(this.$el.find('.trpChatBubble').html());
+      this.$el.find('.trpChatBubble').html(html);
     }
   });
 
