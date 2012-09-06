@@ -12,14 +12,22 @@ require([
   'router',
   'bootstrap',
   'template/helpers/all'
-], function($, _, Backbone, TroupeViews, AppRouter) {
+], function($, _, Backbone, TroupeViews, appRouter) {
   var troupeApp;
 
   // THESE TWO LINES WILL NOT REMAIN HERE FOREVER
   $('.dp-tooltip').tooltip();
   $('.chat-bubble').tooltip();
 
-  window.troupeApp = new AppRouter();
+  window.troupeApp = appRouter;
   troupeApp = window.troupeApp;
   Backbone.history.start();
+
+  // Asynchronously load tracker
+  require([
+    'utils/tracking'
+  ], function(tracking) {
+    // No need to do anything here
+  });
+
 });
