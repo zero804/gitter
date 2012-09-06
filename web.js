@@ -140,6 +140,7 @@ require('./server/handlers/invite').install(app);
 require('./server/handlers/request-access').install(app);
 require('./server/handlers/avatar').install(app);
 require('./server/handlers/landing').install(app);
+require('./server/handlers/legals').install(app);
 
 // TEMP
 require('./server/services/thumbnail-preview-generator-service').install();
