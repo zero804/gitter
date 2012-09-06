@@ -582,7 +582,7 @@ qq.FileUploader = function(o){
         template: '<div class="qq-uploader">' + 
                 '<div class="qq-upload-drop-area trpFileUploadArea">Drag and drop any file here</div>' +
                 '<div class="right"><div class="qq-upload-button trpButton">Upload a file</div></div>' +
-                '<div class="qq-upload-list rounded"></div>' + 
+                '<div class="qq-upload-list"></div>' + 
              '</div>',
 
         // template for one item in file list
