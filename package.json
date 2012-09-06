@@ -36,6 +36,7 @@
     "requirejs": "2.0.6",
     "uglify-js": "1.3.3",
     "pkginfo": "0.2.3",
-    "ducksnode": "0.1.0"
+    "ducksnode": "0.1.0",
+    "diskspace" : "0.1.5"
   }
 }
