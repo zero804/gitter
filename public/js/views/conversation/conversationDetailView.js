@@ -16,11 +16,12 @@ define([
 
 
     initialize: function(options) {
-      _.bindAll(this, 'onEmailCollectionAdd', 'onEmailCollectionReset');
+      _.bindAll(this, 'onEmailCollectionAdd', 'onEmailCollectionReset', 'onSubjectChange');
 
       this.model = new conversationModels.ConversationDetail();
       this.model.emailCollection.bind('add', this.onEmailCollectionAdd);
       this.model.emailCollection.bind('reset', this.onEmailCollectionReset);
+      this.model.bind('change:subject', this.onSubjectChange);
 
       this.router = options.router;
       this.id = options.params;
@@ -43,6 +44,10 @@ define([
         }
       });
 
+    },
+
+    onSubjectChange: function() {
+      this.$el.find('.label-subject').text(this.model.get('subject'));
     },
 
     getRenderData: function() {

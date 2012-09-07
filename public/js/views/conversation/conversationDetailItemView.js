@@ -17,7 +17,7 @@ define([
     template: template,
 
     events: {
-      "click .clickPoint-showEmail": "onHeaderClick",
+      "click .clickPoint-showEmail": "onHeaderClick"
     },
 
     attributes: {
@@ -31,7 +31,9 @@ define([
       var data = this.model.toJSON();
       data.personName = data.from.displayName;
       data.avatarUrl = data.from.avatarUrl;
+      data.hasAttachments = !!data.attachments;
 
+      // TODO Date.parse doesn't work in loads of browsers
       data.date = Date.parse(data.date);
       var d = new Date(data.date);
       data.date = d.toUTCString();
@@ -42,10 +44,6 @@ define([
       else {
         data.date = d.format('mmm d');
       }
-
-      // This is the bit that could be done better, probably better done in conversationDetailView
-      $("#subject").html(data.subject);
-
       return data;
     },
 

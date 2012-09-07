@@ -153,20 +153,6 @@ var FileVersionSchema = new Schema({
   source: { type: String }
 });
 
-/* TODO(AN): remove narrow. Deprecated */
-function narrowFileVersion(fileVersion) {
-  return {
-    creatorUserId: fileVersion.creatorUserId,
-    createdDate: fileVersion.createdDate,
-    source: fileVersion.source,
-    deleted: fileVersion.deleted
-  };
-}
-
-/* TODO(AN): remove narrow. Deprecated */
-FileVersionSchema.methods.narrow = function () {
-  return narrowFileVersion(this);
-};
 
 var FileSchema = new Schema({
   troupeId: ObjectId,
@@ -175,25 +161,6 @@ var FileSchema = new Schema({
   previewMimeType: { type: String},
   versions: [FileVersionSchema]
 });
-
-/* TODO(AN): remove narrow. Deprecated */
-function narrowFile(file) {
-  return {
-      id: file._id,
-      fileName: file.fileName,
-      mimeType: file.mimeType,
-      versions: file.versions.map(narrowFileVersion),
-      url: '/troupes/' + encodeURIComponent(file.troupeId) + '/downloads/' + encodeURIComponent(file.fileName),
-      previewMimeType: file.previewMimeType,
-      embeddedViewType: file.embeddedViewType,
-      embeddedUrl: '/troupes/' + encodeURIComponent(file.troupeId) + '/embedded/' + encodeURIComponent(file.fileName)
-    };
-}
-
-/* TODO(AN): remove narrow. Deprecated */
-FileSchema.methods.narrow = function () {
-  return narrowFile(this);
-};
 
 var NotificationSchema = new Schema({
   troupeId: ObjectId,
@@ -260,7 +227,5 @@ module.exports = {
 	ChatMessage: ChatMessage,
   File: File,
   FileVersion: FileVersion,
-  Notification: Notification,
-  narrowFile: narrowFile,
-  narrowFileVersion: narrowFileVersion
+  Notification: Notification
 };
