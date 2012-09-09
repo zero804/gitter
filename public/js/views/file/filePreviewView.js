@@ -22,8 +22,13 @@ define([
 
     initialize: function(options) {
       var self = this;
-      _.bindAll(this, 'onLinkPreviousClick', 'onLinkNextClick', 'modelChange');
+      _.bindAll(this, 'onLinkPreviousClick', 'onLinkNextClick', 'modelChange', 'onMenuItemClicked');
       this.navigationController = options.navigationController;
+      this.on('menuItemClicked', this.onMenuItemClicked);
+    },
+
+    onMenuItemClicked: function(id) {
+      window.location.href = this.model.get("url");
     },
 
     modelChange: function() {
@@ -53,16 +58,20 @@ define([
     onLinkNextClick: function(e) {
       e.preventDefault();
       var m = this.navigationController.getNext();
-      this.model = m;
-      this.modelChange();
+      if(m) {
+        this.model = m;
+        this.modelChange();
+      }
     },
 
     onLinkPreviousClick: function(e) {
 
       e.preventDefault();
       var m = this.navigationController.getPrevious();
-      this.model = m;
-      this.modelChange();
+      if(m) {
+        this.model = m;
+        this.modelChange();
+      }
     },
 
     getRenderData: function() {

@@ -123,11 +123,11 @@ define([
         backdrop: true,
         fade: true,
         autoRemove: true,
+        menuItems: [],
         disableClose: false
       };
-      _.bindAll(this, 'hide');
+      _.bindAll(this, 'hide', 'onMenuItemClicked');
       _.extend(this.options, options);
-
 
       this.view = this.options.view;
       this.view.dialog = this;
@@ -140,12 +140,40 @@ define([
       };
     },
 
+    onMenuItemClicked: function(id) {
+      console.log("Menu Item ", id);
+      this.view.trigger('menuItemClicked', id);
+    },
+
     afterRender: function() {
+      var self = this;
       this.$el.hide();
 
       var modalBody = this.$el.find('.modal-body');
       modalBody.append(this.view.render().el);
       this.$el.find('.close').on('click', this.hide);
+
+      /* Render menu items */
+      if(this.options.menuItems) {
+        var menuItems = this.$el.find(".frame-menu-items");
+        var all = [];
+        _.each(this.options.menuItems, function(item) {
+          var menuItem = $(self.make("a", {"href": "#" }));
+          menuItem.text(item.text);
+          all.push(menuItem);
+
+          menuItem.on('click', function(e) {
+            e.preventDefault();
+            self.onMenuItemClicked(item.id);
+          });
+
+          menuItems.append(menuItem);
+
+          self.addCleanup(function() {
+            _.each(all, function(i) { i.off(); });
+          });
+        });
+      }
     },
 
     onClose: function() {

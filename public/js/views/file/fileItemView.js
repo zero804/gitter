@@ -31,7 +31,6 @@ define([
     },
 
     afterRender: function() {
-
     },
 
     beforeClose: function() {
@@ -72,7 +71,12 @@ define([
       };
 
       var view = new FilePreviewView({ model: currentModel, navigationController: navigationController });
-      var modal = new TroupeViews.Modal({ view: view, className: 'modal trpFilePreview' });
+      var modal = new TroupeViews.Modal({ view: view, className: 'modal trpFilePreview', menuItems: [
+      {
+        id: "download",
+        text: "Download"
+      }
+      ]});
       modal.show();
 
       return false;
