@@ -21,6 +21,7 @@ define([
 
     initialize: function(options) {
       _.bindAll(this, 'onPreviewLinkClick', 'showFileActionMenu', 'hideFileActionMenu', 'onDeleteLinkClick', 'onVersionsLinkClick');
+      this.parentCollection = options.parentCollection;
     },
 
     getRenderData: function() {
@@ -37,8 +38,41 @@ define([
     },
 
     onPreviewLinkClick: function(e) {
-      var view = new FilePreviewView({ model: this.model });
-      var modal = new TroupeViews.Modal({ view: view  });
+      var self = this;
+      var currentModel = self.model;
+
+      var navigationController = {
+        hasNext: function() {
+          var i = self.parentCollection.indexOf(currentModel);
+          return i < self.parentCollection.length - 1;
+        },
+
+        getNext: function() {
+          var i = self.parentCollection.indexOf(currentModel);
+          if(i < self.parentCollection.length - 1) {
+            currentModel = self.parentCollection.at(i + 1);
+            return currentModel;
+          }
+          return null;
+        },
+
+        hasPrevious: function() {
+          var i = self.parentCollection.indexOf(currentModel);
+          return i > 0;
+        },
+
+        getPrevious: function() {
+          var i = self.parentCollection.indexOf(currentModel);
+          if(i > 0) {
+            currentModel = self.parentCollection.at(i - 1);
+            return currentModel;
+          }
+          return null;
+        }
+      };
+
+      var view = new FilePreviewView({ model: currentModel, navigationController: navigationController });
+      var modal = new TroupeViews.Modal({ view: view, className: 'modal trpFilePreview' });
       modal.show();
 
       return false;
