@@ -34,8 +34,15 @@ module.exports = {
       res.send(500);
     },
 
-    show: function(req, res){
-      res.send(req.file);
+    show: function(req, res, next) {
+      restSerializer.serialize(req.file, restSerializer.FileStrategy, function(err, serializedFile) {
+        if (err) {
+          console.log("Error in Serializer:" + err);
+          return next(err);
+        }
+
+        res.send(serializedFile);
+      });
     },
 
     edit: function(req, res){
