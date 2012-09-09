@@ -24,7 +24,10 @@ define([
       }).render();
     },
 
-    beforeClose: function() {
+    getRenderData: function () {
+      var d = this.model.toJSON();
+      d.fileIcon = '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + d.fileName;
+      return d;
     }
 
   });

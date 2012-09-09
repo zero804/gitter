@@ -90,9 +90,10 @@ function FileStrategy() {
 
 
   this.map = function(item) {
-
+    var versionIndex = 1;
     function narrowFileVersion(item) {
       return {
+        versionNumber: versionIndex++,
         creatorUser: userStategy.map(item.creatorUserId),
         createdDate: item.createdDate,
         source: item.source,
