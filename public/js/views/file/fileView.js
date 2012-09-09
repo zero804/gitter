@@ -42,13 +42,16 @@ define([
       "click .link-sort-filename": makeSort('fileName'),
       "click .link-sort-mtime": makeSort('mtime'),
       "click .link-sort-filetype": makeSort('mimeType'),
-      "click .link-sort-groupby": makeSort('mimeType'), 
+      "click .link-sort-groupby": makeSort('mimeType'),
       "click .file-sorter": "showSortMenu"
     },
 
     afterRender: function() {
       this.collectionView = new TroupeViews.Collection({
         itemView: FileItemView,
+        itemViewOptions: {
+          parentCollection: this.collection
+        },
         collection: this.collection,
         el: this.$el.find(".frame-files"),
         noItemsElement: this.$el.find("#frame-help"),

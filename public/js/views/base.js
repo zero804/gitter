@@ -127,6 +127,8 @@ define([
       };
       _.bindAll(this, 'hide');
       _.extend(this.options, options);
+
+
       this.view = this.options.view;
       this.view.dialog = this;
     },
