@@ -42,7 +42,6 @@ define([
       "click .link-sort-filename": makeSort('fileName'),
       "click .link-sort-mtime": makeSort('mtime'),
       "click .link-sort-filetype": makeSort('mimeType'),
-      "click .link-sort-groupby": makeSort('mimeType'),
       "click .file-sorter": "showSortMenu"
     },
 
@@ -60,7 +59,7 @@ define([
             var versions = file.get('versions');
             if(!versions || !versions.length) return null;
             var version = versions.at(versions.length - 1);
-            return version.createdDate;
+            return version.get('createdDate');
           },
           "fileName": function(file) {
             var fileName = file.get('fileName');
