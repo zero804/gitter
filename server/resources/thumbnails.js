@@ -38,7 +38,7 @@ module.exports = {
 
           return res.relativeRedirect("/images/2/mime/unknown.png");
         }
-
+        res.header('Expires', 'Fri, 31 Dec 1998 12:00:00 GMT');
         res.contentType(mimeType);
         stream.pipe(res);
       });
