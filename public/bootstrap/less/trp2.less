@@ -1037,6 +1037,49 @@ textarea, input { outline: none; }
   padding-left: 8px;
 }
 
+
+
+.trpFilePreviewLeft, .trpFilePreviewRight {
+  position: absolute;
+  bottom: 0px;
+  height: 100%;
+  width: 10%;
+  cursor: pointer;
+  outline: none;
+  background: transparent url('blank.gif');
+  z-index: 1102;
+  background-repeat: no-repeat;
+/*  margin: 18px;*/
+  margin-top: 60px;
+  margin-left: 18px;
+  margin-right: 18px;
+}
+
+.trpFilePreviewLeft {
+  left: 0px;
+  background-image: url('../../images/2/icon-file-preview-left.png');
+  background-position: left center;
+}
+
+.trpFilePreviewRight {
+  right: 0px;
+  background-image: url('../../images/2/icon-file-preview-right.png');
+  background-position: right center;
+}
+
+.trpFilePreviewItemContainer {
+   display:table-cell;
+   vertical-align:middle;
+}
+
+.trpFilePreviewItem {
+  max-width: 100%;
+  max-height: 100%;
+  margin: auto;
+  display: block;
+}
+
+
 .trpMailButton {
 
 }
@@ -1280,9 +1323,10 @@ textarea, input { outline: none; }
 }
 
 .trpModalHeader {
-  padding: 4px 16px 8px 16px;
-  display: inline-block;
-  width: 95%;
+  padding: 4px 8px 8px 16px;
+  height: 60px;
+/*  display: inline-block;*/
+/*  width: 95%;*/
 }
 
 .trpModalLogo {
@@ -1294,11 +1338,13 @@ textarea, input { outline: none; }
   float: right;
   .trpBodySmall;
   color: @trpDarkGrey;
-  padding-top: 10px;
+  padding-top: 6px;
+  text-decoration: none;
 }
 
 .trpModalClose {
   float: right;
+  padding-left: 12px;
 }
 
 .trpModalTitle {
@@ -1397,36 +1443,8 @@ textarea, input { outline: none; }
 
 }
 
-.trpFilePreviewLeft, .trpFilePreviewRight {
-  position: absolute;
-  bottom: 0px;
-  height: 100%;
-  width: 10%;
-  cursor: pointer;
-  outline: none;
-  background: transparent url('blank.gif');
-  z-index: 1102;
-  background-repeat: no-repeat;
-  margin: 18px;
-}
-
-.trpFilePreviewLeft {
-  left: 0px;
-  background-image: url('../../images/2/icon-file-preview-left.png');
-  background-position: left center;
-}
-
-.trpFilePreviewRight {
-  right: 0px;
-  background-image: url('../../images/2/icon-file-preview-right.png');
-  background-position: right center;
-}
-
-.trpFilePreviewItem {
-  max-width: 100%;
-  max-height: 100%;
-  margin: auto;
-  display: block;
+.trpFilePreview .modal-body {
+  padding: 24px;
 }
 
 .modal-header {
@@ -1441,10 +1459,6 @@ textarea, input { outline: none; }
 .modal-body {
   position: relative;
   padding: 24px 24px 0px 24px;
-}
-
-.trpFilePreview .modal-body {
-  padding: 24px;
 }
 
 .nav > li > a:hover {
