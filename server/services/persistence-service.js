@@ -183,6 +183,7 @@ var File = mongoose.model('File', FileSchema);
 var FileVersion = mongoose.model('FileVersion', FileVersionSchema);
 var Notification = mongoose.model('Notification', NotificationSchema);
 
+/** */
 function attachNotificationListenersToSchema(schema, name, extractor) {
   if(!extractor) {
     extractor = function(model) {
@@ -193,10 +194,20 @@ function attachNotificationListenersToSchema(schema, name, extractor) {
     };
   }
 
-  schema.post('save', function(model, numAffected) {
-    var e = extractor(model);
-    console.log("Save " + name + ". troupeId=", model.troupeId);
-    appEvents.dataChange(name, 'update', e.id, e.troupeId, model);
+  schema.pre('save', function (next) {
+    var isNewInstance = this.isNew;
+
+    this.post('save', function(postNext) {
+      console.log(arguments);
+      var e = extractor(this);
+      console.log(["POST model = ", this]);
+      console.log(["POST e = ", e]);
+
+      appEvents.dataChange(name, isNewInstance ? 'create' : 'update', e.id, e.troupeId, this);
+      postNext();
+    });
+
+    next();
   });
 
   schema.post('remove', function(model, numAffected) {
