@@ -1,19 +1,5 @@
 require.config(window.require_config);
 
-// Two weird things I can't figure out here.
-// Firstly, the first time you click Get Started if you haven't touched any of the form elements, no tooltip shows
-// even though the tooltip show call looks like it happens - I tested to make sure it was being executed by putting an alert before it
-// I thought it maybe had something to do with the form field automatically focusing, so I turned focusInvalid on the validater off
-// and that didn't do anything. 
-//
-// AH! I figured it out. The tooltip element hasn't been created yet or something like that. If I pre-create the tooltip in the HTML (see the moustache file)
-// then it's all fine. But this is a filthy hack.
-
-// The second bit I don't get is that the tooltips continue to show afterwards, even if I try to set options.trigger to manual, they still still
-// on hover and focus. Annoying.
-//
-// Anyhoo, it's a bit of a mess at the moment, but at least it won't submit with bad shit in it.
-
 require(
     [
     'jquery',
@@ -33,6 +19,41 @@ require(
             return v ? v:"";
           }});
       }
+
+jQuery(function($) { 
+
+  // settings
+  var $slider = $('.slider'); // class or id of carousel slider
+  var $slide = 'li'; // could also use 'img' if you're not using a ul
+  var $transition_time = 1500; // 1 second
+  var $time_between_slides = 4000; // 4 seconds
+
+  function slides(){
+    return $slider.find($slide);
+  }
+
+  slides().fadeOut();
+
+  // set active classes
+  slides().first().addClass('active');
+  slides().first().fadeIn($transition_time);
+
+  $interval = setInterval(
+    function(){
+      var $i = $slider.find($slide + '.active').index();
+
+      slides().eq($i).removeClass('active');
+      slides().eq($i).fadeOut($transition_time);
+
+      if (slides().length == $i + 1) $i = -1; // loop to start
+
+      slides().eq($i + 1).fadeIn($transition_time);
+      slides().eq($i + 1).addClass('active');
+    }
+    , $transition_time +  $time_between_slides 
+  );
+
+});
 
       $('.button-signup').on('click', function() {
         var view = new SignupModalView({existingUser: false});
