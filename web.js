@@ -5,6 +5,7 @@ var express = require('express'),
 	Resource = require('express-resource'),
   fs = require('fs'),
 	userService = require('./server/services/user-service'),
+  unreadItemService = require('./server/services/unread-item-service'),
 	troupeService = require('./server/services/troupe-service'),
 	passport = require('passport'),
 	LocalStrategy = require('passport-local').Strategy,
@@ -180,3 +181,6 @@ var port = nconf.get("PORT");
 app.listen(port, function() {
   winston.info("Listening on " + port);
 });
+
+/* TODO: make sure this only happens once. Need to move across to a queue at some point */
+unreadItemService.installListener();

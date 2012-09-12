@@ -3,6 +3,8 @@
 "use strict";
 
 var troupeService = require("./troupe-service");
+var appEvents = require("../app-events");
+
 var redis = require("redis");
 var winston = require("winston");
 
@@ -10,60 +12,85 @@ var redisClient = redis.createClient();
 
 var DEFAULT_ITEM_TYPES = ['file', 'chat'];
 
+
+function newItem(troupeId, itemType, itemId) {
+  troupeService.findById(troupeId, function(err, troupe) {
+    if(err) return winston.error("Unable to load troupeId " + troupeId, err);
+
+    var userIds = troupe.users;
+
+      // multi chain with an individual callback
+    var multi = redisClient.multi();
+    userIds.forEach(function(userId) {
+      multi.sadd("unread:" + itemType + ":" + userId, itemId);
+    });
+
+    multi.exec(function(err, replies) {
+      if(err) winston.error("unreadItemService.newItem failed", err);
+    });
+
+  });
+}
+
+function markItemsRead(userId, items) {
+  var multi = redisClient.multi();
+
+  items.forEach(function(item) {
+    multi.srem("unread:" + item.itemType + ":" + userId, item.itemId);
+  });
+
+  multi.exec(function(err, replies) {
+    if(err) winston.error("unreadItemService.markItemsRead failed", err);
+  });
+}
+
+function getUserUnreadCounts(userId, callback) {
+  var multi = redisClient.multi();
+
+  DEFAULT_ITEM_TYPES.forEach(function(itemType) {
+    multi.scard("unread:" + itemType + ":" + userId);
+  });
+
+  multi.exec(function(err, replies) {
+    if(err) {
+      winston.error("unreadItemService.getUserUnreadCounts failed", err);
+      return callback(err);
+    }
+
+    var result = {};
+
+    DEFAULT_ITEM_TYPES.forEach(function(itemType, index) {
+      var reply = replies[index];
+      result[itemType] = reply;
+    });
+
+    return result;
+  });
+}
+
+
 module.exports = {
-  newItem: function(troupeId, itemType, itemId) {
-    troupeService.findById(troupeId, function(err, troupe) {
-      if(err) return winston.error("Unable to load troupeId " + troupeId, err);
+  newItem: newItem,
+  markItemsRead: markItemsRead,
+  getUserUnreadCounts: getUserUnreadCounts,
 
-      var userIds = troupe.users;
+  /* TODO: make sure only one of these gets installed for the whole app */
+  installListener: function() {
+      appEvents.onDataChange(function(data) {
+        var troupeId = data.troupeId;
+        var modelId = data.modelId;
+        var modelName = data.modelName;
+        var operation = data.operation;
+        var model = data.model;
 
-        // multi chain with an individual callback
-      var multi = redisClient.multi();
-      userIds.forEach(function(userId) {
-        multi.sadd("unread:" + itemType + ":" + userId, itemId);
+        console.log("******************SSS", data);
+
+        if(operation === 'create' && (modelName === 'file' || modelName === 'chat')) {
+          console.log("newItem", troupeId, modelName, modelId);
+          newItem(troupeId, modelName, modelId);
+        }
+
       });
-
-      multi.exec(function(err, replies) {
-        if(err) winston.error("unreadItemService.newItem failed", err);
-      });
-
-    });
-  },
-
-  markItemsRead: function(userId, items) {
-    var multi = redisClient.multi();
-
-    items.forEach(function(item) {
-      multi.srem("unread:" + item.itemType + ":" + userId, item.itemId);
-    });
-
-    multi.exec(function(err, replies) {
-      if(err) winston.error("unreadItemService.markItemsRead failed", err);
-    });
-  },
-
-  getUserUnreadCounts: function(userId, callback) {
-    var multi = redisClient.multi();
-
-    DEFAULT_ITEM_TYPES.forEach(function(itemType) {
-      multi.scard("unread:" + itemType + ":" + userId);
-    });
-
-    multi.exec(function(err, replies) {
-      if(err) {
-        winston.error("unreadItemService.getUserUnreadCounts failed", err);
-        return callback(err);
-      }
-
-      var result = {};
-
-      DEFAULT_ITEM_TYPES.forEach(function(itemType, index) {
-        var reply = replies[index];
-        result[itemType] = reply;
-      });
-
-      return result;
-    });
   }
 
 };
