@@ -32,9 +32,9 @@ function findMemberEmails(id, callback) {
     userService.findByIds(userIds, function(err, users) {
       if(err) callback(err);
       if(!users) callback("No users returned");
-      
+
       var emailAddresses = users.map(function(item) { return item.email; } );
-      
+
       callback(null, emailAddresses);
     });
 
