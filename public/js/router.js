@@ -31,6 +31,17 @@ define([
       '*actions': 'defaultAction'
     },
 
+    resetIcons: function() {
+      var chatIconSrc = $('#chat-icon').attr("src").replace('-selected.png', ".png");
+      var fileIconSrc = $('#file-icon').attr("src").replace('-selected.png', ".png");
+      var mailIconSrc = $('#mail-icon').attr("src").replace('-selected.png', ".png");
+      var peopleIconSrc = $('#people-icon').attr("src").replace('-selected.png', ".png");
+      $('#chat-icon').attr("src", chatIconSrc);
+      $('#file-icon').attr("src", fileIconSrc);
+      $('#mail-icon').attr("src", mailIconSrc);
+      $('#people-icon').attr("src", peopleIconSrc);
+    },
+
     /* Taken from http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
     showView: function(selector, view) {
         if (this.currentView)
@@ -61,7 +72,10 @@ define([
     },
 
     showConversationView: function() {
+      this.resetIcons();
       this.showAsync('views/conversation/conversationView');
+      var mailIconSrc = $('#mail-icon').attr("src").match(/[^\.]+/) + "-selected.png";
+      $('#mail-icon').attr("src", mailIconSrc);
     },
 
     showConversationDetailView: function(id) {
@@ -69,15 +83,24 @@ define([
     },
 
     showChatView: function() {
+      this.resetIcons();
       this.showAsync('views/chat/chatView');
+      var chatIconSrc = $('#chat-icon').attr("src").match(/[^\.]+/) + "-selected.png";
+      $('#chat-icon').attr("src", chatIconSrc);
     },
 
     showFileView: function() {
+      this.resetIcons();
       this.showAsync('views/file/fileView');
+      var fileIconSrc = $('#file-icon').attr("src").match(/[^\.]+/) + "-selected.png";
+      $('#file-icon').attr("src", fileIconSrc);
     },
 
     showPeopleView: function() {
+      this.resetIcons();
       this.showAsync("views/people/peopleView");
+      var peopleIconSrc = $('#people-icon').attr("src").match(/[^\.]+/) + "-selected.png";
+      $('#people-icon').attr("src", peopleIconSrc);
     },
 
     showShareDialog: function() {
