@@ -1,15 +1,9 @@
 <div class="trpMailBody clickPoint-showEmail ">{{{mail}}}
 </div>
-<div class="trpMailBodyBottomToolbar">
+<div class="trpMailBodyToolbar">
   {{#if attachments}}
-  <div class="trpAttachments pulldown-attachments">Attachments<span class="trpAttachmentsArrow"><img src="images/2/icon-small-dropdown-black.png"></span></div>
-  <div class="trpAttachmentsMenu">
-    <div class="trpAttachmentsMenuTop"> </div>
-    <div class="trpAttachmentsMenuBottom">
       {{#each attachments}}
-        <div class="trpAttachmentsMenuItem link-attachment"><a href="{{url}}" target="_new">{{fileName}}</a></div>
+        <div class="trpMailAttachmentItem link-attachment"><a href="{{url}}" target="_new"><img src="{{thumbnailUrl}}" width="50" height="50" title="{{{fileName}}}"></a></div>
       {{/each}}
-    </div>
-  </div>
   {{/if}}
 </div>
