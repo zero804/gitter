@@ -4,6 +4,7 @@
 
 var userService = require("../services/user-service");
 var fileService = require("../services/file-service");
+var unreadItemService = require("../services/unread-item-service");
 var Q = require("q");
 var _ = require("underscore");
 var handlebars = require('handlebars');
@@ -291,25 +292,65 @@ function ConversationMinStrategy()  {
   };
 }
 
-function ChatStrategy()  {
+function UnreadItemStategy(options) {
+  var self = this;
+  var itemType = options.itemType;
+
+  this.preload = function(userId, callback) {
+    unreadItemService.getUnreadItems(userId, itemType, function(err, ids) {
+      if(err) return callback(err);
+
+      var hash = {};
+      ids.forEach(function(id) {
+        hash[id] = true;
+      });
+
+      self.unreadIds = hash;
+      callback(null);
+    });
+  };
+
+  this.map = function(id) {
+    return !!self.unreadIds[id];
+  };
+}
+
+function ChatStrategy(options)  {
+  if(!options) options = {};
+
   var userStategy = new UserIdStrategy();
+  var unreadItemStategy = new UnreadItemStategy({ itemType: 'chat' });
 
   this.preload = function(items, callback) {
     var users = items.map(function(i) { return i.fromUserId; });
 
-    execPreloads([{
+    var strategies = [{
       strategy: userStategy,
       data: _.uniq(users)
-    }], callback);
+    }];
+
+    if(options.currentUserId) {
+      strategies.push({
+        strategy: unreadItemStategy,
+        data: options.currentUserId
+      });
+    }
+    execPreloads(strategies, callback);
   };
 
   this.map = function(item) {
-    return {
+    var d = {
       id: item._id,
       text: item.text,
       sent: item.sent,
       fromUser: userStategy.map(item.fromUserId)
     };
+
+    if(options.currentUserId) {
+      d.unread = unreadItemStategy.map(item._id);
+    }
+
+    return d;
   };
 }
 
@@ -362,7 +403,7 @@ function NotificationStrategy() {
 }
 
 /* This method should move */
-function serialize(items, Strategy, callback) {
+function serialize(items, strat, callback) {
   if(!items) return null;
 
   var single = !Array.isArray(items);
@@ -373,8 +414,6 @@ function serialize(items, Strategy, callback) {
   function pkg(i) {
     return single ? i[0] : i;
   }
-
-  var strat = new Strategy();
 
   strat.preload(items, function(err) {
     if(err) {

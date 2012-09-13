@@ -24,7 +24,7 @@ module.exports = {
       chatService.findChatMessagesForTroupe(req.troupe.id, options, function(err, chatMessages) {
         if(err) return next(err);
 
-        restSerializer.serialize(chatMessages, restSerializer.ChatStrategy, function(err, serialized) {
+        restSerializer.serialize(chatMessages, new restSerializer.ChatStrategy( { currentUserId: req.user.id } ), function(err, serialized) {
           if(err) return next(err);
           res.send(serialized);
         });
