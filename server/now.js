@@ -289,7 +289,7 @@ module.exports = {
         var model = data.model;
 
         getGroup("troupe." + troupeId, function(group) {
-          if(operation === 'update') {
+          if(operation === 'create' || operation === 'update') {
             winston.debug("Preparing model ", model);
 
             var strategy = restSerializer.getStrategy(modelName, true);
