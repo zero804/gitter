@@ -3,7 +3,8 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!./signupModalView'
+  'hbs!./signupModalView',
+  'jquery_validate'
 ], function($, _, TroupeViews, template) {
   return TroupeViews.Base.extend({
     template: template,
@@ -54,6 +55,7 @@ define([
         }
       });
     }
+
   });
 
 });

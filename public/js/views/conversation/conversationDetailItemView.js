@@ -31,7 +31,8 @@ define([
       var data = this.model.toJSON();
       data.personName = data.from.displayName;
       data.avatarUrl = data.from.avatarUrl;
-      data.hasAttachments = !!data.attachments;
+
+      if (data.attachments.length===0) { data.hasAttachments = false; } else { data.hasAttachments = true; }
 
       // TODO Date.parse doesn't work in loads of browsers
       data.date = Date.parse(data.date);
