@@ -12,7 +12,7 @@ module.exports = {
         if(err) res.send(500);
         var userIds = requests.map(function(item) { return item.userId; });
 
-        restSerializer.serialize(userIds, restSerializer.UserIdStrategy, function(err, serialized) {
+        restSerializer.serialize(userIds, new restSerializer.UserIdStrategy(), function(err, serialized) {
           if(err) return next(err);
           res.send(serialized);
         });

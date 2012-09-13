@@ -16,7 +16,7 @@ module.exports = {
           return next(err);
         }
 
-        restSerializer.serialize(files, restSerializer.FileStrategy, function(err, serializedFiles) {
+        restSerializer.serialize(files, new restSerializer.FileStrategy(), function(err, serializedFiles) {
           if (err) {
             console.log("Error in Serializer:" + err);
             return next(err);
@@ -35,7 +35,7 @@ module.exports = {
     },
 
     show: function(req, res, next) {
-      restSerializer.serialize(req.file, restSerializer.FileStrategy, function(err, serializedFile) {
+      restSerializer.serialize(req.file, new restSerializer.FileStrategy(), function(err, serializedFile) {
         if (err) {
           console.log("Error in Serializer:" + err);
           return next(err);

@@ -242,7 +242,7 @@ module.exports = {
           conversationService.findById(conversationId, function(err, conversation) {
             if(err || !conversation) return winston.error("Notification failure", err);
 
-            restSerializer.serialize(conversation, restSerializer.ConversationMinStrategy, function(err, serializedConversation) {
+            restSerializer.serialize(conversation, new restSerializer.ConversationMinStrategy(), function(err, serializedConversation) {
               if(err || !serializedConversation) return winston.error("Notification failure", err);
 
               group.now.onMailEvent({
@@ -292,8 +292,8 @@ module.exports = {
           if(operation === 'create' || operation === 'update') {
             winston.debug("Preparing model ", model);
 
-            var strategy = restSerializer.getStrategy(modelName, true);
-            restSerializer.serialize(model, strategy, function(err, serializedModel) {
+            var Strategy = restSerializer.getStrategy(modelName, true);
+            restSerializer.serialize(model, new Strategy(), function(err, serializedModel) {
               if(err) return winston.error("Serialization failure" , err);
               if(!serializedModel) return winston.error("No model returned from serializer");
 

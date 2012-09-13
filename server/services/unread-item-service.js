@@ -68,10 +68,24 @@ function getUserUnreadCounts(userId, callback) {
   });
 }
 
+function getUnreadItems(userId, itemType, callback) {
+    redisClient.smembers("unread:" + itemType + ":" + userId, function(err, members) {
+      if(err) {
+        winston.warn("unreadItemService.getUnreadItems failed", err);
+
+        // Mask error
+        return callback(null, []);
+      }
+
+      callback(null, members);
+    });
+}
+
 
 module.exports = {
   newItem: newItem,
   markItemsRead: markItemsRead,
+  getUnreadItems: getUnreadItems,
   getUserUnreadCounts: getUserUnreadCounts,
 
   /* TODO: make sure only one of these gets installed for the whole app */
@@ -82,8 +96,6 @@ module.exports = {
         var modelName = data.modelName;
         var operation = data.operation;
         var model = data.model;
-
-        console.log("******************SSS", data);
 
         if(operation === 'create' && (modelName === 'file' || modelName === 'chat')) {
           console.log("newItem", troupeId, modelName, modelId);
