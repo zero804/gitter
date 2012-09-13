@@ -162,6 +162,7 @@ var embeddedResource = app.resource('embedded',  require('./server/resources/emb
 var thumbnailsResource = app.resource('thumbnails',  require('./server/resources/thumbnails.js'));
 var chatMessagesResource = app.resource('chatMessages',  require('./server/resources/chat-messages.js'));
 var notificationsResource = app.resource('notifications',  require('./server/resources/notifications.js'));
+var unreadItemsResource = app.resource('unreadItems',  require('./server/resources/unread-items.js'));
 
 troupesResource.add(sharesResource);
 troupesResource.add(requestsResource);
@@ -173,6 +174,7 @@ troupesResource.add(chatMessagesResource);
 troupesResource.add(embeddedResource);
 troupesResource.add(thumbnailsResource);
 troupesResource.add(notificationsResource);
+troupesResource.add(unreadItemsResource);
 
 /* This should be last */
 require('./server/handlers/app').install(app);
