@@ -50,7 +50,7 @@ jQuery(function($) {
       slides().eq($i + 1).fadeIn($transition_time);
       slides().eq($i + 1).addClass('active');
     }
-    , $transition_time +  $time_between_slides 
+    , $transition_time +  $time_between_slides
   );
 
 });
@@ -65,6 +65,25 @@ jQuery(function($) {
         });
 
         modal.show();
+        $("#signup-form").validate({
+          debug: true,
+          showErrors: function(errorMap, errorList) {
+            $('.signup-failure').show();
+            var errors = "";
+            $.each(errorList, function () { errors += this.message + "<br>"; });
+            $('#failure-text').html(errors);
+          },
+          messages: {
+            troupeName: {
+              minlength: "Please choose a longer name for your Troupe, it needs to be at least 4 letters.",
+              required: "Please choose a name for your Troupe. "
+            },
+          email : {
+            required: "We need to know your email address",
+            email: "Hmmm, that doesn't look like your email address."
+            }
+          }
+          });
 
         return false;
       });
@@ -80,55 +99,7 @@ jQuery(function($) {
         });
 
         modal.show();
-
         return false;
-      });
-
-
-
-      $('#signupForm .validateable').each(attachTooltipHandlerToItem);
-      $("#signupForm").validate({
-        debug: true,
-        focusInvalid: false,
-        submitHandler: function(form) {
-          form.submit();
-        },
-        showErrors: function(errorMap, errorList){
-          $('#signupForm .validateable').each(function(index, el) {
-            if (errorMap[el.name]) {
-              $(el).data('tooltip').options.placement = 'bottom';
-              $(el).data('tooltip').options.trigger = 'focus';
-              $(el).tooltip('show');
-            } else {
-              $(el).tooltip('hide');
-            }
-
-          });
-          validationErrors = errorMap;
-        },
-        errorClass : "help-inline",
-        rules : {
-          troupeName : {
-            maxlength : 32,
-            minlength: 4,
-            required : true
-          },
-          email : {
-            required: true,
-            email: true
-          }
-        },
-        messages: {
-          troupeName: {
-            minlength: "Please choose a longer name for your Troupe. It needs to be at least 4 letters.",
-            required: "Please choose a name for your Troupe."
-          },
-          email : {
-            required: "Please type your email address here.",
-            email: "Hmmm, that doesn't look like an email address."
-          }
-        }
-  
       });
 });
     
