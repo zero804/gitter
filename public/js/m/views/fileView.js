@@ -36,7 +36,6 @@ define([
     },
 
     onCollectionAdd: function(item) {
-        console.dir(item);
         var rowHtml = rowTemplate( {
           fileName: item.get('fileName'),
           url: item.get('url'),
