@@ -110,7 +110,8 @@ function FileStrategy() {
       url: '/troupes/' + encodeURIComponent(item.troupeId) + '/downloads/' + encodeURIComponent(item.fileName),
       previewMimeType: item.previewMimeType,
       embeddedViewType: item.embeddedViewType,
-      embeddedUrl: '/troupes/' + encodeURIComponent(item.troupeId) + '/embedded/' + encodeURIComponent(item.fileName)
+      embeddedUrl: '/troupes/' + encodeURIComponent(item.troupeId) + '/embedded/' + encodeURIComponent(item.fileName),
+      thumbnailUrl: '/troupes/' + encodeURIComponent(item.troupeId) + '/thumbnails/' + encodeURIComponent(item.fileName)
     };
   };
 
