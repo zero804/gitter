@@ -64,7 +64,8 @@ function getUserUnreadCounts(userId, callback) {
       result[itemType] = reply;
     });
 
-    return result;
+    callback(null, result);
+
   });
 }
 
