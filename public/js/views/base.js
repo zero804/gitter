@@ -411,6 +411,10 @@ define([
     };
   }
 
+  /* This should go somewhere better */
+  TroupeViews.sortByComparator = sortByComparator;
+  TroupeViews.reverseComparatorFunction = reverseComparatorFunction;
+
   TroupeViews.Collection = TroupeViews.Base.extend({
 
     constructor: function(options) {
@@ -509,9 +513,19 @@ define([
       this.checkForNoItems();
     },
 
-    onCollectionAdd: function(item) {
-      var options = _.extend(this.itemViewOptions, { model: item });
-      this.$el.append(new this.itemView(options).render().el);
+    onCollectionAdd: function(model, collection, options) {
+      console.log("ADD: ", arguments);
+      var o = _.extend(this.itemViewOptions, { model: model });
+      var el = new this.itemView(o).render().el;
+
+      if(options.index === 0) {
+        this.$el.prepend(el);
+      } else if(options.index >= collection.length - 1) {
+        this.$el.append(el);
+      } else {
+        // TODO: correct place in-collection!
+        this.$el.append(el);
+      }
       this.checkForNoItems();
     },
 

@@ -198,10 +198,7 @@ function attachNotificationListenersToSchema(schema, name, extractor) {
     var isNewInstance = this.isNew;
 
     this.post('save', function(postNext) {
-      console.log(arguments);
       var e = extractor(this);
-      console.log(["POST model = ", this]);
-      console.log(["POST e = ", e]);
 
       appEvents.dataChange(name, isNewInstance ? 'create' : 'update', e.id, e.troupeId, this);
       postNext();
