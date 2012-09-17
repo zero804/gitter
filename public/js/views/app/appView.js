@@ -100,6 +100,7 @@ define([
       });
       */
 
+      /*
       $(document).on('chat', function(event, data) {
         self.nav['chat'].incrementNotificationValue();
       });
@@ -111,6 +112,14 @@ define([
       $(document).on('mail', function(event, data) {
         console.log(arguments);
         self.nav['mail'].incrementNotificationValue();
+      });
+      */
+
+      $(document).on('itemUnreadCountChanged', function(event, data) {
+        var v = self.nav[data.itemType];
+        if(v) {
+          v.updateNotificationValue(data.count);
+        }
       });
 
       $(document).on('userLoggedIntoTroupe', function(event, data) {
