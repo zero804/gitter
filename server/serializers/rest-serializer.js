@@ -340,18 +340,14 @@ function ChatStrategy(options)  {
   };
 
   this.map = function(item) {
-    var d = {
+    return {
       id: item._id,
       text: item.text,
       sent: item.sent,
-      fromUser: userStategy.map(item.fromUserId)
+      fromUser: userStategy.map(item.fromUserId),
+      unread: options.currentUserId ? unreadItemStategy.map(item._id) : true
     };
 
-    if(options.currentUserId) {
-      d.unread = unreadItemStategy.map(item._id);
-    }
-
-    return d;
   };
 }
 

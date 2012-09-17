@@ -32,7 +32,7 @@ function newItem(troupeId, itemType, itemId) {
   });
 }
 
-function markItemsRead(userId, items) {
+function markItemsRead(userId, troupeId, items) {
   var multi = redisClient.multi();
 
   items.forEach(function(item) {

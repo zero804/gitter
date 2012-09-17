@@ -53,6 +53,10 @@ define([
         data.chatBubbleAdditional = 'remote';
       }
 
+      if(this.message.unread) {
+        data.chatRowClass = data.chatRowClass + " unread";
+      }
+
       return data;
     },
 

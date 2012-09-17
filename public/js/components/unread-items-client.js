@@ -24,36 +24,55 @@ define([
       dataType: "json",
       type: "POST",
       success: function(data) {
+        console.log(data);
       }
     });
   }
 
   $(document).on('itemRead', function(event, data) {
+    console.log("UNREAD", data);
+
     readNotificationQueue.push(data);
     if(!timeoutHandle) {
-      timeoutHandle = window.setTimeout(send, 1000);
+      timeoutHandle = window.setTimeout(send, 2000);
     }
   });
 
-/*
-  $(document).on('userLoggedOutOfTroupe', function(event, data) {
-  });
+  var windowTimeout = null;
 
-  function refreshUnreadCounts() {
-  }
+  function windowScrollOnTimeout() {
+    windowTimeout = null;
+    var $window = $(window);
+    var scrollTop = $window.scrollTop();
+    var scrollBottom = scrollTop + $window.height();
+    var vpH = $(document).height();
 
-  refreshUnreadCounts();
-  window.setInterval(refreshUsers, 10 * 60 * 1000);
+    $.each($('.unread:visible'), function (index, element) {
+      var $e = $(element);
+      var itemType = $e.data('itemType');
+      var itemId = $e.data('itemId');
 
-  return {
-    isOnline: function(id) {
-      if(id == window.troupeContext.user.id) {
-        return true;
+      $e.removeClass('unread');
+
+      if(itemType && itemId) {
+        var top = $e.offset().top;
+        var height = $e.height();
+
+        if (scrollTop < (top + height)) {
+          $(document).trigger('itemRead', {
+            itemType: itemType,
+            itemId: itemId
+          });
+        }
       }
 
-      return onlineUsers[id] ? true : false;
-    }
-  };
-*/
+    });
+  }
 
+  function windowScroll() {
+    if(!windowTimeout) {
+      windowTimeout = window.setTimeout(windowScrollOnTimeout, 250);
+    }
+  }
+  $(window).on('scroll', windowScroll);
 });
