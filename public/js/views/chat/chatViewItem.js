@@ -12,11 +12,6 @@ define([
   return TroupeViews.Base.extend({
     template: template,
 
-    initialize: function(options) {
-      this.message = options.message;
-      this.current = options.current;
-    },
-
     // TODO: Replace this with something else like https://github.com/ljosa/urlize.js or http://benalman.com/projects/javascript-linkify/
     linkify: function(inputText) {
       //URLs starting with http://, https://, or ftp://
@@ -38,12 +33,14 @@ define([
     },
 
     getRenderData: function() {
-      // console.log("Message:" + this.message.text);
-      // this.message.text=this.linkify(this.message.text);
-      var data = _.extend(this.message, {});
+      var data = this.model.toJSON();
+
+      data.text = this.linkify(data.text);
+
+      var current = data.fromUser.id == window.troupeContext.user.id;
 
       /* TODO: css selectors should be able to handle this from a single class on a parent div */
-      if(this.current) {
+      if(current) {
         data.chatRowClass = 'trpChatRow';
         data.chatRowPictureClass = 'trpChatPictureLocal';
         data.chatBubbleAdditional = 'local';
@@ -53,7 +50,7 @@ define([
         data.chatBubbleAdditional = 'remote';
       }
 
-      if(this.message.unread) {
+      if(data.unread) {
         data.chatRowClass = data.chatRowClass + " unread";
       }
 
@@ -62,8 +59,6 @@ define([
 
     afterRender: function(data) {
       this.$el.find('.trpChatBubble').tooltip({title: function() { return $.timeago(new Date(data.sent)); }});
-      var html=this.linkify(this.$el.find('.trpChatBubble').html());
-      this.$el.find('.trpChatBubble').html(html);
     }
   });
 

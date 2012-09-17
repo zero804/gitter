@@ -106,7 +106,7 @@
         var id = data.id;
         var newModel = data.model;
         var model = this.get(id);
-        if(operation === 'update') {
+        if(operation === 'update' || operation === 'create') {
           if(!model) {
             console.log("Adding a new model");
             this.add(newModel);
