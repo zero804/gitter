@@ -30,11 +30,9 @@ define([
   }
 
   $(document).on('itemRead', function(event, data) {
-    console.log("UNREAD", data);
-
     readNotificationQueue.push(data);
     if(!timeoutHandle) {
-      timeoutHandle = window.setTimeout(send, 2000);
+      timeoutHandle = window.setTimeout(send, 1000);
     }
   });
 
@@ -74,5 +72,15 @@ define([
       windowTimeout = window.setTimeout(windowScrollOnTimeout, 250);
     }
   }
+
   $(window).on('scroll', windowScroll);
+
+  $(document).on('collectionReset', function(event, data) {
+    windowScrollOnTimeout();
+  });
+
+  $(document).on('collectionAdd', function(event, data) {
+    windowScrollOnTimeout();
+  });
+
 });

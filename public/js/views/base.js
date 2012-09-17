@@ -511,6 +511,8 @@ define([
         el.append(new self.itemView(options).render().el);
       });
       this.checkForNoItems();
+
+      $(document).trigger('collectionReset', { });
     },
 
     onCollectionAdd: function(model, collection, options) {
@@ -527,6 +529,7 @@ define([
         this.$el.append(el);
       }
       this.checkForNoItems();
+      $(document).trigger('collectionAdd', { });
     },
 
     onCollectionRemove: function(item) {

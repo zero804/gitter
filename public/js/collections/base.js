@@ -6,6 +6,7 @@
   'backbone'
 ], function($, _, Backbone) {
   /* jshint trailing:false browser:true */
+  /*global console: false, window: false, document: false */
   "use strict";
 
   var exports = {
