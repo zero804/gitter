@@ -7,8 +7,9 @@ define([
   'components/chat/chat-component',
   'views/app/appView',
   'components/desktopNotifications',
-  'components/soundNotifications'
-], function($, _, Backbone, MainHomeView, ShareView, chat, AppView, desktopNotifications, soundNotifications) {
+  'components/soundNotifications',
+  'components/unread-items-client'
+], function($, _, Backbone, MainHomeView, ShareView, chat, AppView, desktopNotifications, soundNotifications, unreadItemsClient) {
 
   var AppRouter = Backbone.Router.extend({
     initialize: function() {

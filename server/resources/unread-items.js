@@ -21,8 +21,12 @@ module.exports = {
       res.send(500);
     },
 
-    create: function(req, res) {
-      res.send(500);
+    create: function(req, res, next) {
+      var unreadItems = req.body;
+      unreadItemService.markItemsRead(req.user.id, req.troupe.id, unreadItems, function(err, result) {
+        if(err) return next(err);
+        res.send({ sucess: true });
+      });
     },
 
     show: function(req, res){
