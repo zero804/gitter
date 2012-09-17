@@ -5,6 +5,8 @@ define([
   /*global console: false, window: false, document: false */
   "use strict";
 
+  var unreadItemsCache = {};
+
   var readNotificationQueue = [];
   var timeoutHandle = null;
 
@@ -29,7 +31,22 @@ define([
     });
   }
 
+  $(document).on('datachange:*', function(event, data) {
+    if(data.operation === 'create') {
+      var itemType = data.modelName;
+      var currentCount = unreadItemsCache[itemType];
+      unreadItemsCache[itemType] =  currentCount ? currentCount + 1 : 1;
+    }
+
+    console.log("A DATACHANGE HAPPENED!", unreadItemsCache);
+  });
+
   $(document).on('itemRead', function(event, data) {
+    var itemType = data.itemType;
+    unreadItemsCache[itemType] = unreadItemsCache[itemType] ? unreadItemsCache[itemType] - 1 : 0;
+
+    console.log("An item was read", unreadItemsCache);
+
     readNotificationQueue.push(data);
     if(!timeoutHandle) {
       timeoutHandle = window.setTimeout(send, 1000);
@@ -41,9 +58,10 @@ define([
   function windowScrollOnTimeout() {
     windowTimeout = null;
     var $window = $(window);
+    var $document = $(document);
     var scrollTop = $window.scrollTop();
     var scrollBottom = scrollTop + $window.height();
-    var vpH = $(document).height();
+    var vpH = $document.height();
 
     $.each($('.unread:visible'), function (index, element) {
       var $e = $(element);
@@ -56,8 +74,9 @@ define([
         var top = $e.offset().top;
         var height = $e.height();
 
+        // TODO: fix this, it's not quite right
         if (scrollTop < (top + height)) {
-          $(document).trigger('itemRead', {
+          $document.trigger('itemRead', {
             itemType: itemType,
             itemId: itemId
           });

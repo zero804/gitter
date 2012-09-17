@@ -29,6 +29,7 @@ define([
       now.onDataChange = function(message) {
           console.log("Data change for: " + message.modelName, message);
           $(document).trigger('datachange:' + message.modelName, message);
+          $(document).trigger('datachange:*', message);
       };
 
       now.ready(function() {
