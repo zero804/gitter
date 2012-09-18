@@ -8,8 +8,9 @@ define([
   'underscore',
   'views/base',
   'hbs!./shareModalView',
-  'hbs!./shareRow'
-], function($, _, TroupeViews, template, rowTemplate) {
+  'hbs!./shareRow',
+  'zeroClipboard'
+], function($, _, TroupeViews, template, rowTemplate, zeroClipboard) {
 
     console.log("Start of shareModalView");
 
@@ -29,7 +30,15 @@ define([
 
     events: {
       "click .addrow": "addRow",
-      "submit form": "onFormSubmit"
+      "submit form": "onFormSubmit",
+      "hover #copy-button" : "createClipboard"
+    },
+
+    createClipboard : function() {
+      ZeroClipboard.setMoviePath( 'swf/ZeroClipboard.swf' );
+      var clip = new ZeroClipboard.Client();
+      clip.setText( 'https://beta.trou.pe/' + this.uri );
+      clip.glue( 'copy-button');
     },
 
     addRow: function(event) {
@@ -41,6 +50,7 @@ define([
 
     afterRender: function(e) {
       $("form", this.el).prepend($(rowTemplate({})));
+      // this.createClipboard();
     },
 
     onFormSubmit: function(e) {
