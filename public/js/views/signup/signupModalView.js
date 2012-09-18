@@ -33,6 +33,33 @@ define([
      }
     },
 
+    afterRender : function() {
+      this.validateForm();
+    },
+
+    validateForm : function () {
+      var validateEl = this.$el.find('#signup-form');
+      validateEl.validate({
+        debug: true,
+        showErrors: function(errorMap, errorList) {
+          if (errorList.length > 0) $('.signup-failure').show();
+          var errors = "";
+          $.each(errorList, function () { errors += this.message + "<br>"; });
+          $('#failure-text').html(errors);
+        },
+        messages: {
+          troupeName: {
+            minlength: "Please choose a longer name for your Troupe, it needs to be at least 4 letters.",
+            required: "Please choose a name for your Troupe. "
+          },
+        email : {
+          required: "We need to know your email address",
+          email: "Hmmm, that doesn't look like your email address."
+          }
+        }
+        });
+    },
+
     onFormSubmit: function(e) {
       if(e) e.preventDefault();
       var form = this.$el.find('form');
