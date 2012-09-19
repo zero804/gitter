@@ -43,7 +43,7 @@ define([
       this.nav = {
         'chat': attachNavView('#nav-chat', 'chat'),
         'mail': attachNavView('#nav-mail', 'mail'),
-        'files': attachNavView('#nav-files', 'files'),
+        'file': attachNavView('#nav-files', 'file'),
         'people': attachNavView('#nav-people', 'people')
       };
 

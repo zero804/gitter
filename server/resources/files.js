@@ -16,7 +16,8 @@ module.exports = {
           return next(err);
         }
 
-        restSerializer.serialize(files, new restSerializer.FileStrategy(), function(err, serializedFiles) {
+        var strategy = new restSerializer.FileStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });
+        restSerializer.serialize(files, strategy, function(err, serializedFiles) {
           if (err) {
             console.log("Error in Serializer:" + err);
             return next(err);

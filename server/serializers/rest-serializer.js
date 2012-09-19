@@ -74,7 +74,10 @@ function UserIdStrategy() {
   };
 }
 
-function FileStrategy() {
+function FileStrategy(options) {
+  if(!options) options = {};
+
+  var unreadItemStategy = new UnreadItemStategy({ itemType: 'file' });
   var userStategy = new UserIdStrategy();
 
   this.preload = function(items, callback) {
@@ -82,11 +85,19 @@ function FileStrategy() {
     users = _.flatten(users, true);
     users = _.uniq(users);
 
-
-    execPreloads([{
+    var strategies = [{
       strategy: userStategy,
       data: users
-    }], callback);
+    }];
+
+    if(options.currentUserId) {
+      strategies.push({
+        strategy: unreadItemStategy,
+        data: { userId: options.currentUserId, troupeId: options.troupeId }
+      });
+    }
+
+    execPreloads(strategies, callback);
   };
 
 
@@ -111,7 +122,8 @@ function FileStrategy() {
       previewMimeType: item.previewMimeType,
       embeddedViewType: item.embeddedViewType,
       embeddedUrl: '/troupes/' + encodeURIComponent(item.troupeId) + '/embedded/' + encodeURIComponent(item.fileName),
-      thumbnailUrl: '/troupes/' + encodeURIComponent(item.troupeId) + '/thumbnails/' + encodeURIComponent(item.fileName)
+      thumbnailUrl: '/troupes/' + encodeURIComponent(item.troupeId) + '/thumbnails/' + encodeURIComponent(item.fileName),
+      unread: options.currentUserId ? unreadItemStategy.map(item._id) : true
     };
   };
 
@@ -298,6 +310,7 @@ function UnreadItemStategy(options) {
   var itemType = options.itemType;
 
   this.preload = function(data, callback) {
+    console.log("unreadItemService.getUnreadItems", data);
     unreadItemService.getUnreadItems(data.userId, data.troupeId, itemType, function(err, ids) {
       if(err) return callback(err);
 
