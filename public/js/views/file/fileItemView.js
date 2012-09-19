@@ -27,6 +27,7 @@ define([
     getRenderData: function() {
       var data = this.model.toJSON();
       data.fileIcon = this.fileIcon(this.model.get('fileName'));
+      data.additionalClasses = data.unread ? 'unread' : '';
       return data;
     },
 

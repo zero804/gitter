@@ -516,7 +516,6 @@ define([
     },
 
     onCollectionAdd: function(model, collection, options) {
-      console.log("ADD: ", arguments);
       var o = _.extend(this.itemViewOptions, { model: model });
       var el = new this.itemView(o).render().el;
 
