@@ -48,7 +48,19 @@ module.exports = {
 
                 });
               } else {
-                userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
+                console.log("***** WRPONG **** doing this wrong bit");
+                if (req.user.lastTroupe) {
+                  troupeService.findById(req.user.lastTroupe, function (err,troupe) {
+                    if (err) troupe = null;
+                    res.send({
+                      failed: false,
+                      user: req.user, 
+                      defaultTroupe: troupe
+                    });
+                  });
+                }
+                else {
+                  userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
                   if (err) troupe = null;
                   res.send({
                     failed: false,
@@ -56,6 +68,7 @@ module.exports = {
                     defaultTroupe: troupe
                   });
                 });
+                }
               }
             } else {
               res.relativeRedirect('/select-troupe');
@@ -85,16 +98,22 @@ module.exports = {
       app.get('/select-troupe', 
         middleware.ensureLoggedIn,
         function(req, res) {
-        troupeService.findAllTroupesForUser(req.user.id, function(err, troupes) {
-          if (err) return res.send(500);
+          if (req.user.lastTroupe) {
+            console.log("****** FOUND USER LAST TROUPE ******");
+            troupeService.findById(req.user.lastTroupe, function (err,troupe) {
+              if (err) troupe = null;
+              res.redirect('/' + troupe.uri);
+            });
+          }
 
-          res.render('select-troupe', {
-            troupes: troupes
-          });
+          else {
+            userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
+              if (err) troupe = null;
+              res.redirect('/' + troupe.uri);
+            }); 
+          }
+          
         });
-
-
-      });
 
     }
 };

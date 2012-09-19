@@ -77,6 +77,13 @@ var userService = {
     });
   },
 
+// This really may not be correct because it's actually just doing the same as a find troupe by Id
+  findLastVisitedTroupeForUser: function(troupeid, callback) {
+    persistence.Troupe.findById(id, function(err, troupe) {
+      callback(err, troupe);
+    });
+  },
+
   findDefaultTroupeForUser: function(id, callback) {
     persistence.Troupe.findOne({ users: id }, function(err, troupe) {
       callback(err, troupe);
