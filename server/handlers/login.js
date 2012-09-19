@@ -48,7 +48,6 @@ module.exports = {
 
                 });
               } else {
-                console.log("***** WRPONG **** doing this wrong bit");
                 if (req.user.lastTroupe) {
                   troupeService.findById(req.user.lastTroupe, function (err,troupe) {
                     if (err) troupe = null;
@@ -99,7 +98,6 @@ module.exports = {
         middleware.ensureLoggedIn,
         function(req, res) {
           if (req.user.lastTroupe) {
-            console.log("****** FOUND USER LAST TROUPE ******");
             troupeService.findById(req.user.lastTroupe, function (err,troupe) {
               if (err) troupe = null;
               res.redirect('/' + troupe.uri);
