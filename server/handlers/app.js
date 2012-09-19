@@ -3,6 +3,7 @@
 "use strict";
 
 var troupeService = require("../services/troupe-service");
+var winston = require("../utils/winston");
 var userService = require("../services/user-service");
 var nconf = require('../utils/config').configure();
 
@@ -57,6 +58,10 @@ module.exports = {
           if(req.user && !profileNotCompleted && troupeData) {
             login  = false;
             troupeName = troupe.name;
+            winston.info("*********** User: " + req.user.id + " visited Troupe successfully: " + troupe.id);
+            userService.saveLastVisitedTroupeforUser(req.user.id, troupe.id, function(err) {
+              if (err) winston.info("Something went wrong saving the user last troupe visited: " + err)
+            });
           } else {
             login = true;
             if(profileNotCompleted) {
