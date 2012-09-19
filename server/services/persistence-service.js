@@ -21,7 +21,8 @@ var UserSchema = new Schema({
   status: { type: String, "enum": ['UNCONFIRMED', 'PROFILE_NOT_COMPLETED', 'ACTIVE'], "default": 'UNCONFIRMED'},
   passwordHash: { type: String },
   avatarUrlSmall: String,
-  avatarUrlMedium: String
+  avatarUrlMedium: String,
+  lastTroupe: ObjectId
 });
 
 /* TODO(AN): remove narrow. Deprecated */

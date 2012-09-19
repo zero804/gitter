@@ -64,6 +64,19 @@ var userService = {
       .run(callback);
   },
 
+  saveLastVisitedTroupeforUser: function(userId, troupeId, callback) {
+    console.log("Saving last visited Troupe for user: " + userId);
+    userService.findById(userId, function(err, user) {
+      if(err) return callback(err);
+      if(!user) return callback("User not found");
+      user.lastTroupe = troupeId;
+      console.log("ACTUALLY SAVING NOW");
+      user.save(function(err) {
+        callback(err);
+      });
+    });
+  },
+
   findDefaultTroupeForUser: function(id, callback) {
     persistence.Troupe.findOne({ users: id }, function(err, troupe) {
       callback(err, troupe);
