@@ -297,8 +297,8 @@ function UnreadItemStategy(options) {
   var self = this;
   var itemType = options.itemType;
 
-  this.preload = function(userId, callback) {
-    unreadItemService.getUnreadItems(userId, itemType, function(err, ids) {
+  this.preload = function(data, callback) {
+    unreadItemService.getUnreadItems(data.userId, data.troupeId, itemType, function(err, ids) {
       if(err) return callback(err);
 
       var hash = {};
@@ -333,7 +333,7 @@ function ChatStrategy(options)  {
     if(options.currentUserId) {
       strategies.push({
         strategy: unreadItemStategy,
-        data: options.currentUserId
+        data: { userId: options.currentUserId, troupeId: options.troupeId }
       });
     }
     execPreloads(strategies, callback);

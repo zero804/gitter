@@ -9,8 +9,9 @@ define([
   'views/signup/signupModalView',
   'views/share/shareModalView',
   'views/widgets/nav',
-  'noty'
-], function($, _, Backbone, troupeModels, notificationModels, TroupeViews, SignupModalView, ShareModalView, NavView) {
+  'noty',
+  'components/unread-items-client'
+], function($, _, Backbone, troupeModels, notificationModels, TroupeViews, SignupModalView, ShareModalView, NavView, notyStub, unreadItemsClient) {
   "use strict";
 
   var AppView = Backbone.View.extend({
@@ -33,17 +34,17 @@ define([
 
       _.bindAll(this, 'profileMenuClicked', 'settingsMenuClicked', 'signoutMenuClicked', 'toggleSelector', 'addTroupeClicked');
 
-      function attachNavView(selector) {
+      function attachNavView(selector, itemType) {
+        var v = unreadItemsClient.getValue(itemType);
         var e = self.$el.find(selector);
-        return new NavView({ el: e }).render();
+        return new NavView({ el: e, initialUnreadCount: v }).render();
       }
 
       this.nav = {
-        'everything': attachNavView('#nav-everything'),
-        'chat': attachNavView('#nav-chat'),
-        'mail': attachNavView('#nav-mail'),
-        'files': attachNavView('#nav-files'),
-        'people': attachNavView('#nav-people')
+        'chat': attachNavView('#nav-chat', 'chat'),
+        'mail': attachNavView('#nav-mail', 'mail'),
+        'files': attachNavView('#nav-files', 'files'),
+        'people': attachNavView('#nav-people', 'people')
       };
 
       $.ajax({

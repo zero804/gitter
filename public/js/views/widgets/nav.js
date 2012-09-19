@@ -7,7 +7,13 @@ define([
   return Backbone.View.extend({
     initialize: function(options) {
       this.notificationCount = this.$el.find('.label-notification');
-      this.notificationCount.hide();
+      var c = options.initialUnreadCount;
+      if(c > 0) {
+        this.notificationCount.text(c);
+        this.notificationCount.show();
+      } else {
+        this.notificationCount.hide();
+      }
     },
 
     events: {
@@ -15,24 +21,26 @@ define([
     },
 
     updateNotificationValue: function(value) {
-      this.notificationCount.text(value);
-      if(!this.currentValue && value) {
+      var c = value > 0 ? value : 0;
+
+      this.notificationCount.text(c ? c : "");
+
+      if(!this.currentValue && c) {
         this.notificationCount.show('fast');
-      } else if(this.currentValue && !value) {
+      } else if(this.currentValue && !c) {
         this.notificationCount.hide('fast');
       }
 
-      this.currentValue = value;
-      this.$el.effect('highlight', {}, 600);
+      this.currentValue = c;
+
+      if(c > this.currentValue) {
+        this.$el.effect('highlight', {}, 600);
+      }
     },
 
 
     incrementNotificationValue: function() {
       this.updateNotificationValue(this.currentValue ? this.currentValue + 1 : 1);
-    },
-
-    removeUser: function() {
-      window.alert("Blah!");
     }
   });
 
