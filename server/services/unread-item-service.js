@@ -44,7 +44,7 @@ function markItemsRead(userId, troupeId, items) {
   });
 }
 
-function getUserUnreadCounts(userId, callback) {
+function getUserUnreadCounts(userId, troupeId, callback) {
   var multi = redisClient.multi();
 
   DEFAULT_ITEM_TYPES.forEach(function(itemType) {
@@ -69,7 +69,7 @@ function getUserUnreadCounts(userId, callback) {
   });
 }
 
-function getUnreadItems(userId, itemType, callback) {
+function getUnreadItems(userId, troupeId, itemType, callback) {
     redisClient.smembers("unread:" + itemType + ":" + userId, function(err, members) {
       if(err) {
         winston.warn("unreadItemService.getUnreadItems failed", err);

@@ -5,7 +5,7 @@ define([
   /*global console: false, window: false, document: false */
   "use strict";
 
-  var unreadItemsCache = {};
+  var unreadItemsCache = window.troupeContext.unreadItemCounts ? window.troupeContext.unreadItemCounts : {};
   var unreadItemsDelayed = {};
 
   var readNotificationQueue = [];
@@ -40,7 +40,6 @@ define([
         if(value !== delayedValue) {
           unreadItemsDelayed[k] = value;
 
-          console.log("Item unread count changed", k, value);
           $(document).trigger('itemUnreadCountChanged', {
             itemType: k,
             count: value
@@ -67,16 +66,12 @@ define([
       unreadItemsCache[itemType] =  currentCount ? currentCount + 1 : 1;
       triggerCountUpdate();
     }
-
-    console.log("A DATACHANGE HAPPENED!", unreadItemsCache);
   });
 
   $(document).on('itemRead', function(event, data) {
     var itemType = data.itemType;
     unreadItemsCache[itemType] = unreadItemsCache[itemType] ? unreadItemsCache[itemType] - 1 : -1;
     triggerCountUpdate();
-
-    console.log("An item was read", unreadItemsCache);
 
     readNotificationQueue.push(data);
     if(!timeoutHandle) {
@@ -119,7 +114,7 @@ define([
 
   function windowScroll() {
     if(!windowTimeout) {
-      windowTimeout = window.setTimeout(windowScrollOnTimeout, 250);
+      windowTimeout = window.setTimeout(windowScrollOnTimeout, 90);
     }
   }
 
@@ -132,5 +127,14 @@ define([
   $(document).on('collectionAdd', function(event, data) {
     windowScrollOnTimeout();
   });
+
+  notifyUpdates();
+
+  return {
+    getValue: function(itemType) {
+      var v = unreadItemsCache[itemType];
+      return v ? v : 0;
+    }
+  };
 
 });

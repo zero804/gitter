@@ -10,7 +10,7 @@ module.exports = {
       var troupe = req.troupe.id;
 
       console.log("INDEX");
-      unreadItemService.getUserUnreadCounts(userId, function(err, data) {
+      unreadItemService.getUserUnreadCounts(userId, req.troupe.id, function(err, data) {
         if(err) return next(err);
 
         res.send(data);

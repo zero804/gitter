@@ -112,8 +112,6 @@ function checkIfFileExistsAndIdentical(file, version, temporaryFile, callback) {
   var GridStore = mongoose.mongo.GridStore;
   var gridFileName = createFileName(file.id, version);
 
-  var join = Q.defer();
-
   GridStore.exist(db, gridFileName, function(err, result) {
     if (err) return callback(err);
 
