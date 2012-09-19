@@ -16,6 +16,7 @@ module.exports = {
         '/x',
         function(req, res) {
           if(req.user) {
+            console.log("Directing to select troupe");
             res.relativeRedirect("/select-troupe");
             return;
           }
