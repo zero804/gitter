@@ -20,6 +20,8 @@ define([
     var sendQueue = readNotificationQueue;
     readNotificationQueue = [];
 
+    console.log("Sending read notifications: ", sendQueue);
+
     $.ajax({
       url: "/troupes/" + window.troupeContext.troupe.id + "/unreadItems",
       contentType: "application/json",
@@ -55,7 +57,7 @@ define([
       updateHandle = window.setTimeout(function() {
         updateHandle = null;
         notifyUpdates();
-      }, 1000);
+      }, 500);
     }
   }
 
@@ -68,16 +70,19 @@ define([
     }
   });
 
-  $(document).on('itemRead', function(event, data) {
-    var itemType = data.itemType;
+  function queueReadNotification(itemType, itemId) {
     unreadItemsCache[itemType] = unreadItemsCache[itemType] ? unreadItemsCache[itemType] - 1 : -1;
     triggerCountUpdate();
 
-    readNotificationQueue.push(data);
+    readNotificationQueue.push({
+      itemType: itemType,
+      itemId: itemId
+    });
+
     if(!timeoutHandle) {
       timeoutHandle = window.setTimeout(send, 1000);
     }
-  });
+  }
 
   var windowTimeout = null;
 
@@ -87,25 +92,21 @@ define([
     var $document = $(document);
     var scrollTop = $window.scrollTop();
     var scrollBottom = scrollTop + $window.height();
-    var vpH = $document.height();
 
     $.each($('.unread:visible'), function (index, element) {
       var $e = $(element);
       var itemType = $e.data('itemType');
       var itemId = $e.data('itemId');
 
-      $e.removeClass('unread');
-
       if(itemType && itemId) {
         var top = $e.offset().top;
-        var height = $e.height();
 
-        // TODO: fix this, it's not quite right
-        if (scrollTop < (top + height)) {
-          $document.trigger('itemRead', {
-            itemType: itemType,
-            itemId: itemId
-          });
+        if (top >= scrollTop && top <= scrollBottom) {
+          $e.removeClass('unread');
+          $e.addClass('read');
+
+          console.log("Found unread item within display view", itemType, itemId);
+          queueReadNotification(itemType, itemId);
         }
       }
 

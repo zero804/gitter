@@ -10,6 +10,7 @@ define([
   'jquery_timeago'
 ], function($, _, Backbone, TroupeViews, template, chat) {
   return TroupeViews.Base.extend({
+    unreadItemType: 'chat',
     template: template,
 
     // TODO: Replace this with something else like https://github.com/ljosa/urlize.js or http://benalman.com/projects/javascript-linkify/
@@ -48,10 +49,6 @@ define([
         data.chatRowClass = 'trpChatRowRemote';
         data.chatRowPictureClass = 'trpChatPictureRemote';
         data.chatBubbleAdditional = 'remote';
-      }
-
-      if(data.unread) {
-        data.chatRowClass = data.chatRowClass + " unread";
       }
 
       return data;

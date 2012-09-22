@@ -65,8 +65,8 @@ define([
       if(data.renderViews) {
         dom.find('view').each(function () {
           var id = this.getAttribute('data-id'),
-              attrs = data.renderViews[id];
-              replaceElementWithWidget(this, attrs);
+          attrs = data.renderViews[id];
+          replaceElementWithWidget(this, attrs);
         });
       }
       this.$el.html(dom);
@@ -79,12 +79,24 @@ define([
       var dom = this.renderInternal(data);
       if(this.model) {
         var id = this.model.get('id');
-        this.$el.addClass('model-id-' + id);
+        var e = this.$el;
+
+        e.addClass('model-id-' + id);
+        if(this.model.get('unread')) {
+          e.addClass('unread');
+          e.data('itemId', id);
+          if(this.unreadItemType) {
+            e.data('itemType', this.unreadItemType);
+            console.log("itemType", this.unreadItemType);
+          }
+        }
       }
 
       if(this.afterRender) { this.afterRender(data); }
 
       this.$el.addClass("view");
+
+      // Bit dodgy this next line as it could cause IE circular ref problems
       this.el._view = this;
       return this;
     },
@@ -490,7 +502,6 @@ define([
     },
 
     checkForNoItems: function() {
-      console.log("Check for no items");
       if(this.options.noItemsElement) {
         if(this.collection.length === 0) {
             $(this.options.noItemsElement).show();

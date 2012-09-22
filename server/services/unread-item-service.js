@@ -22,7 +22,7 @@ function newItem(troupeId, itemType, itemId) {
       // multi chain with an individual callback
     var multi = redisClient.multi();
     userIds.forEach(function(userId) {
-      multi.sadd("unread:" + itemType + ":" + userId, itemId);
+      multi.sadd("unread:" + itemType + ":" + userId + ":" + troupeId, itemId);
     });
 
     multi.exec(function(err, replies) {
@@ -36,7 +36,7 @@ function markItemsRead(userId, troupeId, items) {
   var multi = redisClient.multi();
 
   items.forEach(function(item) {
-    multi.srem("unread:" + item.itemType + ":" + userId, item.itemId);
+    multi.srem("unread:" + item.itemType + ":" + userId + ":" + troupeId, item.itemId);
   });
 
   multi.exec(function(err, replies) {
@@ -48,7 +48,7 @@ function getUserUnreadCounts(userId, troupeId, callback) {
   var multi = redisClient.multi();
 
   DEFAULT_ITEM_TYPES.forEach(function(itemType) {
-    multi.scard("unread:" + itemType + ":" + userId);
+    multi.scard("unread:" + itemType + ":" + userId + ":" + troupeId);
   });
 
   multi.exec(function(err, replies) {
@@ -70,7 +70,7 @@ function getUserUnreadCounts(userId, troupeId, callback) {
 }
 
 function getUnreadItems(userId, troupeId, itemType, callback) {
-    redisClient.smembers("unread:" + itemType + ":" + userId, function(err, members) {
+    redisClient.smembers("unread:" + itemType + ":" + userId + ":" + troupeId, function(err, members) {
       if(err) {
         winston.warn("unreadItemService.getUnreadItems failed", err);
 

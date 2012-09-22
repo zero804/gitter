@@ -21,6 +21,8 @@ define([
     },
 
     updateNotificationValue: function(value) {
+      console.log("updateNotificationValue: ", value);
+
       var c = value > 0 ? value : 0;
 
       this.notificationCount.text(c ? c : "");
@@ -31,11 +33,12 @@ define([
         this.notificationCount.hide('fast');
       }
 
-      this.currentValue = c;
-
       if(c > this.currentValue) {
         this.$el.effect('highlight', {}, 600);
       }
+
+      this.currentValue = c;
+
     },
 
 
