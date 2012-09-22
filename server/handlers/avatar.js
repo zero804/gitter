@@ -24,13 +24,15 @@ function displayAvatarFor(user, res) {
     if(err || !exists) return redirectToDefault(user, res);
 
     var gs = new GridStore(db, avatarFile, "r");
+
     gs.open(function(err, gs) {
       if(err) {
         redirectToDefault(user, res);
         return;
       }
 
-      console.log("gs", gs.md5);
+      res.setHeader("Cache-Control","max-age=86400");
+      res.setHeader('ETag', gs.md5);
 
       gs.stream(true).pipe(res);
     });
