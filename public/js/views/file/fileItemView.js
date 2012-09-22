@@ -11,7 +11,7 @@ define([
 ], function($, _, Backbone, TroupeViews, rivet, template, FilePreviewView, FileVersionsView){
   return TroupeViews.Base.extend({
     template: template,
-
+    unreadItemType: 'file',
     events: {
       "click .trpFileActionMenuButton": "showFileActionMenu",
       "click .link-preview": "onPreviewLinkClick",
@@ -27,7 +27,6 @@ define([
     getRenderData: function() {
       var data = this.model.toJSON();
       data.fileIcon = this.fileIcon(this.model.get('fileName'));
-      data.additionalClasses = data.unread ? 'unread' : '';
       return data;
     },
 
