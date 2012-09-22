@@ -13,7 +13,7 @@ module.exports = {
       });
     },
 
-    new: function(req, res){
+    "new": function(req, res){
       res.send('new invites');
     },
 
@@ -23,7 +23,7 @@ module.exports = {
         var share = invites[i];
         troupeService.addInvite(req.troupe, share.displayName, share.email);
       }
-      
+
       res.send(invites);
     },
 

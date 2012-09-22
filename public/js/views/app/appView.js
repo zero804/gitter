@@ -117,9 +117,19 @@ define([
       */
 
       $(document).on('itemUnreadCountChanged', function(event, data) {
-        var v = self.nav[data.itemType];
+        var itemType = data.itemType;
+        var v = self.nav[itemType];
         if(v) {
           v.updateNotificationValue(data.count);
+          return;
+        }
+
+        // People Tab
+        if(itemType === 'invite' || itemType === 'request') {
+          var count = unreadItemsClient.getValue('invite');
+          count = count + unreadItemsClient.getValue('request');
+
+          self.nav['people'].updateNotificationValue(count);
         }
       });
 
