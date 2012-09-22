@@ -30,6 +30,8 @@ function displayAvatarFor(user, res) {
         return;
       }
 
+      console.log("gs", gs.md5);
+
       gs.stream(true).pipe(res);
     });
 
@@ -49,10 +51,10 @@ module.exports = {
       app.get(
         '/avatar/:userId',
         middleware.ensureLoggedIn,
-        function(req, res) {
+        function(req, res, next) {
           var userId = req.params.userId;
           userService.findById(userId, function(err, user) {
-            if(err) return res.send(500);
+            if(err) return next(err);
             if(!user) return res.send(404);
 
             displayAvatarFor(user, res);
@@ -73,7 +75,7 @@ module.exports = {
 
           im.convert(['-define','jpeg:size=48x48',inPath,'-thumbnail','48x48^','-gravity','center','-extent','48x48',resizedPath], 
             function(err, stdout, stderr) {
-              if (err) return res.send(500);
+              if (err) return next(err);
 
               var db = mongoose.connection.db;
               var GridStore = mongoose.mongo.GridStore;
@@ -85,7 +87,7 @@ module.exports = {
               });
 
               gs.writeFile(resizedPath, function(err) {
-                if (err) return res.send(500);
+                if (err) return next(err);
 
                 /* If we've pushed the avatar to a CDN, get rid of it */
                 if(req.user.avatarUrlSmall) {
