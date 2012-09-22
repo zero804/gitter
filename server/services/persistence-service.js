@@ -217,6 +217,8 @@ function attachNotificationListenersToSchema(schema, name, extractor) {
 
 attachNotificationListenersToSchema(ConversationSchema, 'conversation');
 attachNotificationListenersToSchema(FileSchema, 'file');
+attachNotificationListenersToSchema(InviteSchema, 'invite');
+attachNotificationListenersToSchema(RequestSchema, 'request');
 //attachNotificationListenersToSchema(NotificationSchema, 'notification');
 attachNotificationListenersToSchema(ChatMessageSchema, 'chat', function(model) {
   return {

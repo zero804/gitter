@@ -293,6 +293,13 @@ module.exports = {
             winston.debug("Preparing model ", model);
 
             var Strategy = restSerializer.getStrategy(modelName, true);
+
+            // No strategy, ignore it 
+            if(!Strategy) {
+              winston.info("Skipping serialization as " + modelName + " has no serialization strategy");
+              return;
+            }
+
             restSerializer.serialize(model, new Strategy(), function(err, serializedModel) {
               if(err) return winston.error("Serialization failure" , err);
               if(!serializedModel) return winston.error("No model returned from serializer");

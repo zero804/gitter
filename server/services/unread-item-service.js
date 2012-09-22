@@ -98,7 +98,9 @@ module.exports = {
         var operation = data.operation;
         var model = data.model;
 
-        if(operation === 'create' && (modelName === 'file' || modelName === 'chat')) {
+        console.log("unreadItemService:onDataChange", modelName, operation);
+
+        if(operation === 'create' && (modelName === 'file' || modelName === 'chat' || modelName === 'invite' || modelName === 'request')) {
           console.log("newItem", troupeId, modelName, modelId);
           newItem(troupeId, modelName, modelId);
         }
