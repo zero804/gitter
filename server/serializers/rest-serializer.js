@@ -412,6 +412,39 @@ function NotificationStrategy() {
   };
 }
 
+function InviteStrategy() {
+
+  this.preload = function(items, callback) {
+    callback(null);
+  };
+
+  this.map = function(item) {
+    return {
+      id: item._id,
+      displayName: item.displayName,
+      email: item.email
+    };
+  };
+}
+
+function RequestStrategy() {
+  var userStategy = new UserIdStrategy();
+
+  this.preload = function(requests, callback) {
+    var userIds =  requests.map(function(item) { return item.userId; });
+
+    execPreloads([{
+      strategy: userStategy,
+      data: _.uniq(userIds)
+    }], callback);
+  };
+
+  this.map = function(item) {
+    return userStategy.map(item.userId);
+  };
+}
+
+
 /* This method should move */
 function serialize(items, strat, callback) {
   if(!items) return null;
@@ -447,6 +480,10 @@ function getStrategy(modelName, toCollection) {
       return NotificationStrategy;
     case 'chat':
       return ChatStrategy;
+    case 'invite':
+      return InviteStrategy;
+    case 'request':
+      return RequestStrategy;
   }
 }
 
@@ -457,6 +494,9 @@ module.exports = {
   NotificationStrategy: NotificationStrategy,
   FileStrategy: FileStrategy,
   ChatStrategy: ChatStrategy,
+  InviteStrategy: InviteStrategy,
+  RequestStrategy: RequestStrategy,
+
   getStrategy: getStrategy,
   serialize: serialize
 }
