@@ -5,7 +5,8 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!./loginRequestModalView'
+  'hbs!./loginRequestModalView',
+  'jquery_validate'
 ], function($, _, TroupeViews, template) {
   return TroupeViews.Base.extend({
     template: template,
@@ -15,7 +16,7 @@ define([
         this.authenticated = options.authenticated;
       }
 
-      _.bindAll(this, 'onFormSubmit');
+      _.bindAll(this, 'onFormSubmit','validateForm');
     },
 
     getRenderData: function() {
@@ -25,11 +26,49 @@ define([
       };
     },
 
+    afterRender: function() {
+      // if (!this.authenticated) this.validateForm();
+    },
+
     events: {
       "submit form": "onFormSubmit",
-      "click .signin" : "onFormSubmit", // delete this line
-      "click #existing-user" : "showLoginForm"
+      // "click .signin" : "onFormSubmit", // delete this line
+      "click #existing-user" : "showLoginForm",
+      "hover #submit-button" : "validateForm"
     },
+
+     validateForm : function () {
+      var validateEl = this.$el.find('#requestAccess');
+      validateEl.validate({
+        rules: {
+          name: "required",
+          email: {
+            required: true,
+            email: true
+            }
+        },
+        debug: true,
+        showErrors: function(errorMap, errorList) {
+          console.log("errorList: " + errorList.length);
+          console.dir(errorList);
+          if (errorList.length === 0) $('.request-failure').hide();
+          if (errorList.length > 0) $('.request-failure').show();
+          var errors = "";
+          $.each(errorList, function () { errors += this.message + "<br>"; });
+          $('#failure-text').html(errors);
+        },
+        messages: {
+          name: {
+            required: "Please tell us your name. "
+          },
+        email : {
+          required: "We need to know your email address.",
+          email: "Hmmm, that doesn't look like an email address."
+          }
+        }
+        });
+    },
+
 
     showLoginForm: function(e) {
       this.trigger('request.login');

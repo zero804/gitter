@@ -4,21 +4,23 @@
 <div class="trpModalSubtext">You need to request access to this Troupe to join.</div>
 <div class="trpModalRequestForm">
  <!-- don't show the input fields if the user is already signed in, but do show the submit button -->
-  <form id="requestAccess" class="marginless" method="post" action="/requestAccess">
+  <form id="requestAccess">
     <input type="hidden" name="troupeUri" value="{{troupeUri}}">
     {{^authenticated}}
-        <input type="text" size="5" name="name" placeholder="Name" class="trpInput f-name">&nbsp;
-        <input type="text" name="email" placeholder="Email address" class="trpInput f-email">
+        <input type="text" size="5" name="name" placeholder="Name" class="trpInput f-name requried">&nbsp;
+        <input type="text" name="email" placeholder="Email address" class="trpInput f-email required email">
     {{/authenticated}}
     <div class="trpRequestSubmit">
-     <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen signin">Request Access</button>
+     <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen signin" id="submit-button">Request Access</button>
     </div>
   </form>
 </div>
-
 {{^authenticated}}
    <!-- don't show this div if the user is already signed in -->
   <div class="trpModalExistingUsers" id="existing-user">
   Existing user? Click here to login.
   </div>
 {{/authenticated}}
+<div class="trpModalFailure request-failure" style="display:none">
+  <span class="trpModalTitle"><span class="trpModalFailureText" id="failure-text">Invite failed.</span></span>
+</div>
