@@ -778,8 +778,6 @@ h1 {
   .trpBodySmall;
 }
 
-
-
 /*Chat elements*/
 
 
@@ -853,7 +851,7 @@ textarea, input { outline: none; }
 
 .read .trpChatRowRemote .trpChatBubble,
 .read .trpChatRow .trpChatBubble {
-  background-color: green; /* Fix this yeah */
+  background-color: @trpYellow; /* Fix this yeah */
 }
 
 .trpChatBubble a {
@@ -1534,6 +1532,10 @@ textarea, input { outline: none; }
   display: inline-block;
 }
 /*Bootstrap Customisations*/
+
+.modal-success {
+  display: none;
+}
 
 .modal {
   .border-radius(0px);

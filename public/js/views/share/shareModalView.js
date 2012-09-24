@@ -81,8 +81,9 @@ define([
            if(data.failed) {
             return;
           }
+          $('.modal-content').hide();
+          $('.modal-success').show();
           that.trigger('share.complete', data);
-
         }
       });
     }
