@@ -31,7 +31,40 @@ define([
     events: {
       "click .addrow": "addRow",
       "submit form": "onFormSubmit",
-      "hover #copy-button" : "createClipboard"
+      "hover #copy-button" : "createClipboard",
+      "hover #submit-button" : "validateForm"
+    },
+
+    validateForm : function () {
+      var validateEl = this.$el.find('#share-form');
+      validateEl.validate({
+        rules: {
+          displayName: "required",
+          inviteEmail: {
+            required: true,
+            email: true
+            }
+        },
+        debug: true,
+        showErrors: function(errorMap, errorList) {
+          console.log("errorList: " + errorList.length);
+          console.dir(errorList);
+          if (errorList.length === 0) $('.share-failure').hide();
+          if (errorList.length > 0) $('.share-failure').show();
+          var errors = "";
+          $.each(errorList, function () { errors += this.message + "<br>"; });
+          $('#failure-text').html(errors);
+        },
+        messages: {
+          displayName: {
+            required: "Please tell us your friend's name. "
+          },
+        inviteEmail : {
+          required: "We need to know your friend's email address to send an invite.",
+          email: "Hmmm, that doesn't look like an email address."
+          }
+        }
+        });
     },
 
     createClipboard : function() {
