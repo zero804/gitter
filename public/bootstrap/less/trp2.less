@@ -1353,6 +1353,7 @@ textarea, input { outline: none; }
   .trpBodySmall;
   text-decoration: none;
   border: none;
+  display: inline-block;
 }
 
 .trpBtnWhite {
@@ -1366,6 +1367,11 @@ textarea, input { outline: none; }
 
 .trpBtnGreen {
   background-color: @trpGreen;
+  color: white;
+}
+
+.trpBtnGrey {
+  background-color: @trpDarkGrey;
   color: white;
 }
 
@@ -1457,7 +1463,7 @@ textarea, input { outline: none; }
 .trpModalSubtext {
   .trpBodySmall;
   color: @trpDarkGrey;
-  padding: 8px 0px 12px 0px;
+  padding: 0px 0px 20px 0px;
 }
 
 .trpModalFailureText {

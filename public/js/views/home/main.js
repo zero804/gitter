@@ -5,9 +5,8 @@ define([
   'backbone',
   'views/base',
   'hbs!templates/home/main',
-  'views/login/loginRequestModalView',
-  'views/login/loginRequestConfirmModalView'
-], function($, _, Backbone, TroupeViews, template, RequestModalView, RequestConfirmModalView) {
+  'views/login/loginRequestModalView'
+], function($, _, Backbone, TroupeViews, template, RequestModalView) {
   "use strict";
   
   var MainHomeView = Backbone.View.extend({
@@ -19,12 +18,7 @@ define([
     requestClicked: function() {
       var view = new RequestModalView({ });
       var modal = new TroupeViews.Modal({ view: view  });
-      view.on('request.complete', function(data) {
-          modal.off('request.complete');
-          modal.transitionTo(new TroupeViews.Modal({ view: new RequestConfirmModalView({ data: data }) }));
-        });
       modal.show();
-
       return false;
     },
 
@@ -32,18 +26,6 @@ define([
       if(options && options.params) {
         this.initialTab = options.params.tab;
       }
-
-      var self = this;
-      $.ajax({
-        url: "/troupes/" + window.troupeContext.troupe.id + "/users",
-        contentType: "application/json",
-        dataType: "json",
-        type: "GET",
-        success: function(data) {
-          var members = data.length;
-          //if (members==1) window.troupeApp.showShareDialog();
-        }
-      });
     },
     
     render: function() {
