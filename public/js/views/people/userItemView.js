@@ -12,6 +12,7 @@ define([
 
     initialize: function(options) {
       this.displayMode = options.displayMode;
+      this.unreadItemType = this.displayMode;
     },
 
     events: {
@@ -21,13 +22,21 @@ define([
     },
 
     getRenderData: function() {
-      return {
-        user: this.model.toJSON(),
+      var model = this.model.toJSON();
+
+      var m = {
+        id: model.id,
+        displayMode: this.displayMode,
+        user: this.displayMode == 'request' ? model.user : model,
         displayEmail: this.displayMode == 'request' || this.displayMode == 'invite',
         displayModeRequest: this.displayMode == 'request',
         displayModeInvite: this.displayMode == 'invite',
-        displayModeUser: this.displayMode == 'user'
+        displayModeUser: this.displayMode == 'user',
+        unread: model.unread
       };
+
+      console.log("render", m);
+      return m;
     },
 
     afterRender: function(data) {

@@ -66,15 +66,6 @@ var InviteSchema = new Schema({
   status: { type: String, "enum": ['UNUSED', 'USED'], "default": 'UNUSED'}
 });
 
-/* TODO(AN): remove narrow. Deprecated */
-InviteSchema.methods.narrow = function () {
-  return {
-    id: this._id,
-    displayName: this.displayName,
-    email: this.email
-  };
-};
-
 var RequestSchema = new Schema({
   troupeId: ObjectId,
   userId: ObjectId,

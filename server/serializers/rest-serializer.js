@@ -412,35 +412,64 @@ function NotificationStrategy() {
   };
 }
 
-function InviteStrategy() {
+function InviteStrategy(options) {
+  if(!options) options = {};
+
+  var unreadItemStategy = new UnreadItemStategy({ itemType: 'invite' });
 
   this.preload = function(items, callback) {
-    callback(null);
+    if(options.currentUserId) {
+      execPreloads([{
+        strategy: unreadItemStategy,
+        data: { userId: options.currentUserId, troupeId: options.troupeId }
+      }], callback);
+    } else {
+      callback(null);
+    }
+
   };
 
   this.map = function(item) {
     return {
       id: item._id,
       displayName: item.displayName,
-      email: item.email
+      email: item.email,
+      avatarUrl: '/images/2/avatar-default.png', // TODO: fix
+      unread: options.currentUserId ? unreadItemStategy.map(item._id) : true
     };
   };
 }
 
-function RequestStrategy() {
+function RequestStrategy(options) {
+  if(!options) options = {};
+
   var userStategy = new UserIdStrategy();
+  var unreadItemStategy = new UnreadItemStategy({ itemType: 'request' });
 
   this.preload = function(requests, callback) {
     var userIds =  requests.map(function(item) { return item.userId; });
 
-    execPreloads([{
+    var strategies = [{
       strategy: userStategy,
       data: _.uniq(userIds)
-    }], callback);
+    }];
+
+    if(options.currentUserId) {
+      strategies.push({
+        strategy: unreadItemStategy,
+        data: { userId: options.currentUserId, troupeId: options.troupeId }
+      });
+    }
+    execPreloads(strategies, callback);
+
   };
 
   this.map = function(item) {
-    return userStategy.map(item.userId);
+    return {
+      id: item._id,
+      user: userStategy.map(item.userId),
+      unread: options.currentUserId ? unreadItemStategy.map(item._id) : true
+    };
   };
 }
 

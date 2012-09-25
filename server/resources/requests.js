@@ -9,11 +9,12 @@ var troupeService = require("../services/troupe-service"),
 module.exports = {
     index: function(req, res, next){
       troupeService.findAllOutstandingRequestsForTroupe(req.troupe.id, function(err, requests) {
-        if(err) res.send(500);
-        var userIds = requests.map(function(item) { return item.userId; });
+        if(err) return next(err);
 
-        restSerializer.serialize(userIds, new restSerializer.UserIdStrategy(), function(err, serialized) {
+        var strategy = new restSerializer.RequestStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });
+        restSerializer.serialize(requests, strategy, function(err, serialized) {
           if(err) return next(err);
+
           res.send(serialized);
         });
 
