@@ -2,14 +2,22 @@
 /*global console:false, require: true, module: true */
 "use strict";
 
-var troupeService = require("../services/troupe-service");
+var troupeService = require("../services/troupe-service"),
+    restSerializer = require("../serializers/rest-serializer");
 
 module.exports = {
-    index: function(req, res){
+    index: function(req, res, next) {
       troupeService.findAllUnusedInvitesForTroupe(req.troupe.id, function(err, invites) {
-        if(err) res.send(500);
+        if(err) return next(err);
 
-        res.send(invites.narrow());
+        var strategy = new restSerializer.InviteStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });
+
+        restSerializer.serialize(invites, strategy, function(err, serialized) {
+          if(err) return next(err);
+
+          res.send(serialized);
+        });
+
       });
     },
 
