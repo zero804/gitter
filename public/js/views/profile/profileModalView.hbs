@@ -15,13 +15,13 @@
     <div class="trpProfileForm">
       <input type="text" id="displayName" class="trpInput" name="displayName" value="{{displayName}}" placeholder="Click here and type your name"><br>
       {{#if existingUser}}
-        <input type="password" id="password" class="trpInput" name="password" value="" placeholder="Enter a new password here if you would like to change it"><br>
+        <input type="password" id="password" class="trpInput" name="password" value="" placeholder="Optional: Change password"><br>
       {{else}}
         <input type="password" id="password" class="trpInput" name="password" value="" placeholder="Then choose a password"><br>
       {{/if}}
 
       {{#existingUser}}
-      <input type="password" id="oldPassword" class="trpInput hide" name="oldPassword"><br>
+      <input type="password" id="oldPassword" placeholder="Enter your OLD password" class="trpInput hide" name="oldPassword"><br>
       {{/existingUser}}
     </div>
     <input type="submit" class="trpButtonBig trpBtnGreen getstarted" name="submit" value="Save">

@@ -9,7 +9,8 @@ define([
   'views/base',
   'hbs!./shareModalView',
   'hbs!./shareRow',
-  'zeroClipboard'
+  'zeroClipboard',
+  'jquery_placeholder'
 ], function($, _, TroupeViews, template, rowTemplate, zeroClipboard) {
 
     console.log("Start of shareModalView");
@@ -79,11 +80,18 @@ define([
       var rowDiv = target.parent().parent();
       target.remove();
       $(rowTemplate({})).insertAfter(rowDiv);
+      var displayNameEl = this.$el.find('#displayName');
+      displayNameEl.placeholder();
+      var emailEl = this.$el.find('#inviteEmail');
+      emailEl.placeholder();
     },
 
     afterRender: function(e) {
       $("form", this.el).prepend($(rowTemplate({})));
-      // this.createClipboard();
+      var displayNameEl = this.$el.find('#displayName');
+      displayNameEl.placeholder();
+      var emailEl = this.$el.find('#inviteEmail');
+      emailEl.placeholder();
     },
 
     onFormSubmit: function(e) {

@@ -3,7 +3,8 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!./loginModalView'
+  'hbs!./loginModalView',
+  'jquery_placeholder'
 ], function($, _, TroupeViews, template) {
   return TroupeViews.Base.extend({
     template: template,
@@ -25,8 +26,15 @@ define([
       };
     },
 
+    afterRender: function() {
+      var loginEl = this.$el.find('#email');
+      loginEl.placeholder();
+      var passwordEl = this.$el.find('#password');
+      passwordEl.placeholder();
+    },
+
     events: {
-      "submit form": "onFormSubmit"
+      "submit form": "onFormSubmit",
     },
 
     onFormSubmit: function(e) {

@@ -4,7 +4,8 @@ define([
   'underscore',
   'views/base',
   'hbs!./signupModalView',
-  'jquery_validate'
+  'jquery_validate',
+  'jquery_placeholder'
 ], function($, _, TroupeViews, template) {
   return TroupeViews.Base.extend({
     template: template,
@@ -35,6 +36,10 @@ define([
 
     afterRender : function() {
       this.validateForm();
+      var troupeEl = this.$el.find('#troupeName');
+      troupeEl.placeholder();
+      var emailEl = this.$el.find('#email');
+      emailEl.placeholder();
     },
 
     validateForm : function () {
