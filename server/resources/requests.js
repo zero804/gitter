@@ -55,7 +55,8 @@ module.exports = {
     },
 
     load: function(req, id, callback){
-      troupeService.findPendingRequestForTroupeAndUser(req.troupe.id, id, callback);
+      console.log("Loading ID:", id);
+      troupeService.findPendingRequestForTroupe(req.troupe.id, id, callback);
     }
 
 };

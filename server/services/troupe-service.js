@@ -218,10 +218,10 @@ function findAllOutstandingRequestsForTroupe(troupeId, callback) {
       .run(callback);
 }
 
-function findPendingRequestForTroupeAndUser(troupeId, userId, callback) {
+function findPendingRequestForTroupe(troupeId, id, callback) {
   persistence.Request.findOne( {
     troupeId: troupeId,
-    userId: userId,
+    _id: id,
     status: 'PENDING'
   }, callback);
 }
@@ -290,7 +290,7 @@ module.exports = {
   findAllUnusedInvitesForTroupe: findAllUnusedInvitesForTroupe,
   addRequest: addRequest,
   findAllOutstandingRequestsForTroupe: findAllOutstandingRequestsForTroupe,
-  findPendingRequestForTroupeAndUser: findPendingRequestForTroupeAndUser,
+  findPendingRequestForTroupe: findPendingRequestForTroupe,
   acceptRequest: acceptRequest,
   rejectRequest: rejectRequest
 };
