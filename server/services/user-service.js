@@ -52,7 +52,6 @@ var userService = {
   },
 
   findById: function(id, callback) {
-    console.log("ID is" + id);
     persistence.User.findById(id, function(err, user) {
       callback(err, user);
     });

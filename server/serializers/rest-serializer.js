@@ -41,8 +41,6 @@ function UserIdStrategy() {
   var self = this;
 
   this.preload = function(ids, callback) {
-    winston.debug("Preloading users: ", ids);
-
     userService.findByIds(_.uniq(ids), function(err, users) {
       if(err) {
         winston.error("Error loading users", err);
