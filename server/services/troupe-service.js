@@ -113,7 +113,7 @@ function validateTroupeEmailAndReturnDistributionList(options, callback) {
   });
 }
 
-function addInvite(troupe, displayName, email) {
+function addInvite(troupe, senderDisplayName, displayName, email) {
   var code = uuid.v4();
 
   var invite = new persistence.Invite();
@@ -133,7 +133,8 @@ function addInvite(troupe, displayName, email) {
     data: {
       displayName: displayName,
       troupeName: troupe.name,
-      acceptLink: acceptLink
+      acceptLink: acceptLink,
+      senderDisplayName: senderDisplayName
     }
   });
 

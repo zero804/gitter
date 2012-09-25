@@ -21,7 +21,7 @@ module.exports = {
       var invites = req.body;
       for(var i = 0; i < invites.length; i++) {
         var share = invites[i];
-        troupeService.addInvite(req.troupe, share.displayName, share.email);
+        troupeService.addInvite(req.troupe, req.user.displayName, share.displayName, share.email);
       }
 
       res.send(invites);
