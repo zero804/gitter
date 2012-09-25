@@ -32,12 +32,16 @@ define([
 
     events: {
       "submit form": "onFormSubmit",
-      // "click .signin" : "onFormSubmit", // delete this line
       "click #existing-user" : "showLoginForm",
-      "hover #submit-button" : "validateForm"
+      "hover #submit-button" : "validateForm",
+      "click #cancel-button" : "goBack"
     },
 
-     validateForm : function () {
+    goBack : function () {
+      history.back();
+    },
+
+    validateForm : function () {
       var validateEl = this.$el.find('#requestAccess');
       validateEl.validate({
         rules: {
@@ -69,7 +73,6 @@ define([
         });
     },
 
-
     showLoginForm: function(e) {
       this.trigger('request.login');
     },
@@ -87,7 +90,8 @@ define([
         type: "POST",
         success: function(data) {
           if(data.success) {
-            that.trigger('request.complete', data);
+          $('.modal-content').hide();
+          $('.modal-success').show();
             return;
           }
           alert('Something went wrong. Oppsie daisy.');
