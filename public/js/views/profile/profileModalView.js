@@ -4,7 +4,8 @@ define([
   'underscore',
   'views/base',
   'hbs!./profileModalView',
-  'jquery_ocupload'
+  'jquery_ocupload',
+  'jquery_placeholder'
 ], function($, _, TroupeViews, template) {
 
   return TroupeViews.Base.extend({
@@ -35,6 +36,13 @@ define([
     },
 
     afterRender: function() {
+      var displayNameEl = this.$el.find('#displayName');
+      displayNameEl.placeholder();
+      var passwordEl = this.$el.find('#password');
+      passwordEl.placeholder();
+      var oldpasswordEl = this.$el.find('#oldpassword');
+      oldpasswordEl.placeholder();
+
       var self = this;
       var myUpload = self.$el.find('.button-choose-avatar').upload({
         name: 'files',

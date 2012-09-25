@@ -6,8 +6,8 @@
     <form id="requestAccess">
       <input type="hidden" name="troupeUri" value="{{troupeUri}}">
       {{^authenticated}}
-          <input type="text" size="5" name="name" placeholder="Name" class="trpInput f-name requried">&nbsp;
-          <input type="text" name="email" placeholder="Email address" class="trpInput f-email required email">
+          <input type="text" size="5" name="name" placeholder="Name" id="name" class="trpInput f-name requried">&nbsp;
+          <input type="text" name="email" placeholder="Email address" id="email" class="trpInput f-email required email">
       {{/authenticated}}
       <div class="trpRequestSubmit">
        <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen signin" id="submit-button">Request Access</button>

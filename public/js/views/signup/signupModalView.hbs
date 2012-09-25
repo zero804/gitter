@@ -1,9 +1,9 @@
 <div class="trpModalTitle">Create a Troupe</div>
 <div class="trpCreateForm">
 	<form id="signup-form">
-		<input placeholder="Choose a name for your Troupe" class="trpInput required" minlength="4" name="troupeName" autofocus><br>
+		<input placeholder="Choose a name for your Troupe" class="trpInput required" minlength="4" name="troupeName" id="troupeName" autofocus><br>
 		{{#unless existingUser}}
-   		<input placeholder="Enter your email address" class="trpInput required email" name="email">
+   		<input placeholder="Enter your email address" class="trpInput required email" name="email" id="email">
    		<div class="trpModalSubtext">We will send you a confirmation email</div>
     {{/unless}}
     {{#if userId}}
