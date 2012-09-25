@@ -10,7 +10,7 @@ var winston = require("winston");
 
 var redisClient = redis.createClient();
 
-var DEFAULT_ITEM_TYPES = ['file', 'chat'];
+var DEFAULT_ITEM_TYPES = ['file', 'chat', 'invite', 'request'];
 
 
 function newItem(troupeId, itemType, itemId) {

@@ -35,7 +35,14 @@ define([
       _.bindAll(this, 'profileMenuClicked', 'settingsMenuClicked', 'signoutMenuClicked', 'toggleSelector', 'addTroupeClicked');
 
       function attachNavView(selector, itemType) {
-        var v = unreadItemsClient.getValue(itemType);
+        var v;
+        if(itemType == 'people') {
+          v = unreadItemsClient.getValue('request') +
+              unreadItemsClient.getValue('invite');
+        } else {
+          v = unreadItemsClient.getValue(itemType);
+        }
+
         var e = self.$el.find(selector);
         return new NavView({ el: e, initialUnreadCount: v }).render();
       }
@@ -117,6 +124,8 @@ define([
       */
 
       $(document).on('itemUnreadCountChanged', function(event, data) {
+        console.log("itemUnreadCountChanged", arguments);
+
         var itemType = data.itemType;
         var v = self.nav[itemType];
         if(v) {
