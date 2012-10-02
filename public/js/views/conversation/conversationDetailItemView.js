@@ -25,6 +25,7 @@ define([
     },
 
     initialize: function(options) {
+      this.initialIndex = options.index;
     },
 
     getRenderData: function() {
@@ -41,11 +42,21 @@ define([
       var now = new Date();
       if (now.getDate() === d.getDate() && now.getMonth() === d.getMonth() && now.getFullYear() === d.getFullYear()) {
         data.date = d.format('h:MM TT');
-      }
-      else {
+      } else {
         data.date = d.format('mmm d');
       }
+
+      data.initialIndex = this.initialIndex;
       return data;
+    },
+
+    afterRender: function() {
+      if(this.initialIndex === 0) {
+          var mailbody = this.generateMailBody();
+
+          this.$el.find("#initialBody").replaceWith(mailbody);
+          this.$el.find('.trpMailPreview').css("visibility","hidden");
+      }
     },
 
     onHeaderClick: function(event) {
@@ -60,19 +71,28 @@ define([
         return false;
       }
 
-      var data = this.getRenderData();
+      var mailbody = this.generateMailBody();
 
+      this.$el.append(mailbody);
+      this.$el.find('.trpMailPreview').css("visibility","hidden");
+
+      return false;
+
+    },
+
+    generateMailBody: function() {
+      if(this.mailbody) {
+        return this.mailbody;
+      }
+
+      var data = this.getRenderData();
       data.mail = data.mail.replace(/\t/g, '    ')
        .replace(/  /g, '&nbsp; ')
        .replace(/  /g, ' &nbsp;') // handles "W&nbsp;  W"
        .replace(/\r\n|\n|\r/g, '<br />');
 
       this.mailbody = $(bodyTemplate(data));
-      this.$el.append(this.mailbody);
-      this.$el.find('.trpMailPreview').css("visibility","hidden");
-
-      return false;
-
+      return this.mailbody;
     }
 
   });

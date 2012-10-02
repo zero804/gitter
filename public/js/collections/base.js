@@ -101,18 +101,14 @@
       },
 
       onDataChange: function(e, data) {
-        console.log("New dataChange event", data);
-
         var operation = data.operation;
         var id = data.id;
         var newModel = data.model;
         var model = this.get(id);
         if(operation === 'update' || operation === 'create') {
           if(!model) {
-            console.log("Adding a new model");
             this.add(newModel);
           } else {
-            console.log("Updating an existing model");
             var parsed = model.parse(newModel);
             model.set(parsed);
           }
