@@ -34,15 +34,14 @@ define([
     defaults: {
     },
 
-    initialize: function() {
-      console.log("INIT ConversationDetail");
+    initialize: function(options) {
       this.emailCollection = new exports.EmailCollection();
       this.on('change:emails', this.resetEmails, this);
-      //this.messages.on("reset", this.updateCounts);
+
+      this.url = "/troupes/" + window.troupeContext.troupe.id + "/conversations/" + options.id;
     },
 
     resetEmails: function() {
-      console.dir('RESET EMAILS!!!');
       this.emailCollection.reset(this.get('emails'));
     }
 
