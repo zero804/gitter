@@ -450,12 +450,12 @@ define([
         self.collection.off('remove', self.onCollectionRemove);
         self.collection.off('reset', self.onCollectionReset);
       });
-    },  
+    },
 
     renderInternal: function() {
       var self = this;
-      this.collection.each(function(item) {
-        var options = _.extend(self.itemViewOptions, { model: item });
+      this.collection.each(function(item, index) {
+        var options = _.extend(self.itemViewOptions, { model: item, index: index });
         self.$el.append(new self.itemView(options).render().el);
       });
     },
@@ -517,8 +517,8 @@ define([
       var self = this;
       el.empty();
       this.removeSubViews(el);
-      this.collection.each(function(item) {
-        var options = _.extend(self.itemViewOptions, { model: item });
+      this.collection.each(function(item, index) {
+        var options = _.extend(self.itemViewOptions, { model: item, index: index });
         el.append(new self.itemView(options).render().el);
       });
       this.checkForNoItems();
@@ -527,7 +527,8 @@ define([
     },
 
     onCollectionAdd: function(model, collection, options) {
-      var o = _.extend(this.itemViewOptions, { model: model });
+      var index = collection.indexOf(model);
+      var o = _.extend(this.itemViewOptions, { model: model, index: index });
       var el = new this.itemView(o).render().el;
 
       if(options.index === 0) {

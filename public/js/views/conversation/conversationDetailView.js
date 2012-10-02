@@ -13,19 +13,17 @@ define([
   return TroupeViews.Base.extend({
     template: template,
 
-
-
     initialize: function(options) {
-      _.bindAll(this, /*'onEmailCollectionAdd', 'onEmailCollectionReset',*/ 'onSubjectChange');
+      _.bindAll(this, 'onSubjectChange');
 
       this.router = options.router;
       this.id = options.params;
 
       this.model = new conversationModels.ConversationDetail({ id: this.id });
-      //this.model.emailCollection.bind('add', this.onEmailCollectionAdd);
-      //this.model.emailCollection.bind('reset', this.onEmailCollectionReset);
       this.model.bind('change:subject', this.onSubjectChange);
       this.model.fetch();
+
+      // TODO: live-view the conversations collection
     },
 
     events: {
@@ -40,38 +38,12 @@ define([
       this.collectionView = new TroupeViews.Collection({
         itemView: ConversationDetailItemView,
         collection: this.model.emailCollection,
-        el: this.$el.find(".frame-emails")//,
-        //noItemsElement: this.$el.find("#frame-help"),
-        /*sortMethods: {
-          "mtime": function(file) {
-            var versions = file.get('versions');
-            if(!versions || !versions.length) return null;
-            var version = versions.at(versions.length - 1);
-            return version.get('createdDate');
-          },
-          "fileName": function(file) {
-            var fileName = file.get('fileName');
-            return fileName ? fileName.toLowerCase() : '';
-          },
-          "mimeType": function(file) {
-            return file.get("mimeType");
-          }
-        }*/
+        el: this.$el.find(".frame-emails")
       });
     },
 
     goBack: function () {
       window.history.back();
-    }/*,
-
-    onEmailCollectionReset: function() {
-      $(".frame-emails", this.el).empty();
-      this.model.emailCollection.each(this.onEmailCollectionAdd);
-    },
-
-    onEmailCollectionAdd: function(item) {
-      $(".frame-emails", this.el).append(new ConversationDetailItemView({ model: item }).render().el);
-    }*/
-
+    }
   });
 });

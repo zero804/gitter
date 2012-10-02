@@ -8,4 +8,7 @@
       <div class="trpMailIcons">{{#hasAttachments}}<img src="images/2/icon-small-attachment.png" width="18" height="16">{{/hasAttachments}}</div>
       <div class="trpMailDate">{{date}}</div>
   </div>
+  {{#unless initialIndex}}
+  <div id="initialBody">
+  {{/unless}}
 </div>
