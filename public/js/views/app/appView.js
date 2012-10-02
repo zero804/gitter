@@ -44,6 +44,10 @@ define([
         }
 
         var e = self.$el.find(selector);
+
+        var navItems = self.$el.find(".trpNavNotification");
+        navItems.css({"visibility":"visible"});
+
         return new NavView({ el: e, initialUnreadCount: v }).render();
       }
 
@@ -75,11 +79,8 @@ define([
         }
       });
 
-
-
       this.troupeCollection = new troupeModels.TroupeCollection();
       //this.notificationCollection = new NotificationCollection();
-
 
       this.troupeSelectorMenu = new TroupeViews.Menu({ el: "#troupe-selector", triggerEl: "#menu-notification-selector" });
 
@@ -189,6 +190,7 @@ define([
           "closeOnSelfOver":false});
       });
     },
+
 
     toggleSelector: function(){
       console.log("Selector clicked");
