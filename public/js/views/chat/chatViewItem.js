@@ -40,6 +40,8 @@ define([
 
       var current = data.fromUser.id == window.troupeContext.user.id;
 
+      data.displayName = data.fromUser.displayName;
+
       /* TODO: css selectors should be able to handle this from a single class on a parent div */
       if(current) {
         data.chatRowClass = 'trpChatRow';
