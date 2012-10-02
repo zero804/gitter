@@ -4,6 +4,9 @@
     {{widget "avatar" user=fromUser}}
   </div>
   <div class="trpChatContainer">
-    <div class="trpChatBubble timeago {{chatBubbleAdditional}}" rel="tooltip">{{{text}}}</div>
+    <div class="trpChatBubble timeago {{chatBubbleAdditional}}" rel="tooltip">
+      <div class="trpChatFrom">{{{displayName}}}</div>
+    	<div class="trpChatText">{{{text}}}</div>
+    </div>
   </div>
 </div>

@@ -8,12 +8,13 @@
 
 // Our colour palette
 @trpGreen: #1dce73; // lumo green 
-@trpRed: #d54f68; // pinky red
+@trpRed: #d54f68; // pinky red 
 @trpPurple: #494259; // dark purple
 @trpGrey: #c0c9c8; // mid grey
 @trpCyan: #1dd0cd; // turquoise
 @trpYellow: #fcb316; // moutard
 @trpOffWhite: #f6f6f6; // off-white
+@trpVeryLightGrey: #fbfbfb;
 @trpLightGrey: #d6d6d6; // darker off-white for borders and ting
 @trpDarkGreen: #149a55; // darker col1
 @trpDarkGrey: #636363; // dark grey
@@ -797,12 +798,11 @@ h1 {
 }
 
 .trpChatRow {
-  background: red;
   padding-left: 20px;
 }
   
 .trpChatRowRemote {
-  padding-right: 20px;
+  padding-left: 20px;
 }
 .trpChatBox {
   border-style: none;  
@@ -833,7 +833,7 @@ textarea, input { outline: none; }
   border:1px solid @trpLightGrey;
   color:#333;
 /*  background:#fff;*/
-  background-color: @trpOffWhite;
+  background-color: @trpVeryLightGrey;
   /* css3 */
   -webkit-border-radius:3px;
   -moz-border-radius:3px;
@@ -844,16 +844,24 @@ textarea, input { outline: none; }
   word-wrap: break-word;
 }
 
-.unread .trpChatRow .trpChatBubble,
-.unread .trpChatRowRemote .trpChatBubble,
-.unread .trpPeopleViewItem {
-/*  background-color: yellow; /* Fix this yeah */
+.trpChatBubble.remote {
+  background-color: white;
 }
 
-.read .trpChatRowRemote .trpChatBubble,
-.read .trpChatRow .trpChatBubble,
+.trpChatFrom {
+  color: @trpLightGrey;
+}
+
+.unread .trpChatRow .trpChatBubble .trpChatFrom,
+.unread .trpChatRowRemote .trpChatBubble .trpChatFrom,
+.unread .trpPeopleViewItem {
+  color: @trpGreen;
+}
+
+.read .trpChatRowRemote .trpChatBubble .trpChatFrom,
+.read .trpChatRow .trpChatBubble .trpChatFrom,
 .read .trpPeopleViewItem {
-/*  background-color: @trpYellow; /* Fix this yeah */
+/*  color: @trpGreen;*/
 }
 
 .trpChatBubble a {
@@ -888,56 +896,37 @@ textarea, input { outline: none; }
 }
 
 .trpChatBubble.remote {
-  float: right;
+  float: left;
 }
 
 .trpChatBubble.local {
   float: left;
 }
 
-.trpChatBubble.right {
+/*.trpChatBubble.right {
   margin-right:30px;
-}
+}*/
 
 /* creates the larger triangle */
-.trpChatBubble.local:before {
+.trpChatBubble:before {
   top:10px; /* controls vertical position */
   bottom:auto;
-  left:-5px; /* value = - border-left-width - border-right-width */
-  border-width:15px 5px 15px 0;
+  left:-10px; /* value = - border-left-width - border-right-width */
+  border-width:12px 10px 12px 0;
   border-color:transparent @trpLightGrey;
 }
 
 /* creates the smaller  triangle */
-.trpChatBubble.local:after {
+.trpChatBubble:after {
   top:11px; /* value = (:before top) + (:before border-top) - (:after border-top) */
   bottom:auto;
-  left:-4px; /* value = - border-left-width - border-right-width */
-  border-width:14px 5px 14px 0;
-  border-color:transparent @trpOffWhite;
+  left:-9px; /* value = - border-left-width - border-right-width */
+  border-width:11px 10px 11px 0;
+  border-color:transparent @trpVeryLightGrey;
 }
 
-/* Variant : right
------------------------------------------- */
-
-/* creates the larger triangle */
-.trpChatBubble.remote:before {
-  top:10px; /* controls vertical position */
-  bottom:auto;
-    left:auto;
-  right:-5px; /* value = - border-left-width - border-right-width */
-  border-width:15px 0 15px 5px;
-  border-color:transparent @trpLightGrey;
-}
-
-/* creates the smaller  triangle */
 .trpChatBubble.remote:after {
-  top:11px; /* value = (:before top) + (:before border-top) - (:after border-top) */
-  bottom:auto;
-    left:auto;
-  right:-4px; /* value = - border-left-width - border-right-width */
-  border-width:14px 0 14px 5px;
-  border-color:transparent @trpOffWhite;
+  border-color:transparent white;
 }
 
 .trpChatPictureLocal {
@@ -947,14 +936,12 @@ textarea, input { outline: none; }
 }
 
 .trpChatPictureRemote {
-  float: right;
+  float: left;
   padding-right: 20px;
   padding-left: 20px;
 }
 
-.trpChatRemote {
-  text-align:right; 
-}
+/* File Style (sorry) */
 
 .trpFileViewItem {
   float: left;
