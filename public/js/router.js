@@ -54,6 +54,8 @@ define([
         if (this.currentView)
             this.currentView.close();
 
+        $(window).scrollTop(0);
+
         $(selector).html(view.render().el);
 
         this.currentView = view;

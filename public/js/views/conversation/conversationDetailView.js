@@ -16,49 +16,53 @@ define([
 
 
     initialize: function(options) {
-      _.bindAll(this, 'onEmailCollectionAdd', 'onEmailCollectionReset', 'onSubjectChange');
-
-      this.model = new conversationModels.ConversationDetail();
-      this.model.emailCollection.bind('add', this.onEmailCollectionAdd);
-      this.model.emailCollection.bind('reset', this.onEmailCollectionReset);
-      this.model.bind('change:subject', this.onSubjectChange);
+      _.bindAll(this, /*'onEmailCollectionAdd', 'onEmailCollectionReset',*/ 'onSubjectChange');
 
       this.router = options.router;
       this.id = options.params;
-      this.load();
+
+      this.model = new conversationModels.ConversationDetail({ id: this.id });
+      //this.model.emailCollection.bind('add', this.onEmailCollectionAdd);
+      //this.model.emailCollection.bind('reset', this.onEmailCollectionReset);
+      this.model.bind('change:subject', this.onSubjectChange);
+      this.model.fetch();
     },
 
     events: {
       "click .back-button" : "goBack"
     },
 
-    load: function() {
-      var self = this;
-      $.ajax({
-        url: "/troupes/" + window.troupeContext.troupe.id + "/conversations/" + this.id,
-        contentType: "application/json",
-        dataType: "json",
-        type: "GET",
-        success: function(conversation) {
-          self.model.set(conversation);
-        }
-      });
-
-    },
-
     onSubjectChange: function() {
       this.$el.find('.label-subject').text(this.model.get('subject'));
     },
 
-    getRenderData: function() {
-      var data = this.model.toJSON();
-      return data;
+    afterRender: function() {
+      this.collectionView = new TroupeViews.Collection({
+        itemView: ConversationDetailItemView,
+        collection: this.model.emailCollection,
+        el: this.$el.find(".frame-emails")//,
+        //noItemsElement: this.$el.find("#frame-help"),
+        /*sortMethods: {
+          "mtime": function(file) {
+            var versions = file.get('versions');
+            if(!versions || !versions.length) return null;
+            var version = versions.at(versions.length - 1);
+            return version.get('createdDate');
+          },
+          "fileName": function(file) {
+            var fileName = file.get('fileName');
+            return fileName ? fileName.toLowerCase() : '';
+          },
+          "mimeType": function(file) {
+            return file.get("mimeType");
+          }
+        }*/
+      });
     },
-
 
     goBack: function () {
       window.history.back();
-    },
+    }/*,
 
     onEmailCollectionReset: function() {
       $(".frame-emails", this.el).empty();
@@ -67,7 +71,7 @@ define([
 
     onEmailCollectionAdd: function(item) {
       $(".frame-emails", this.el).append(new ConversationDetailItemView({ model: item }).render().el);
-    }
+    }*/
 
   });
 });
