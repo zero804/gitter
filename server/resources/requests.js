@@ -47,6 +47,7 @@ module.exports = {
     },
 
     destroy: function(req, res) {
+      console.log("Removing request");
       console.log(req.request);
       troupeService.rejectRequest(req.request, function(err, request) {
         if(err) return res.send(500);

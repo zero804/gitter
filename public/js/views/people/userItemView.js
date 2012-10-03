@@ -73,17 +73,17 @@ define([
     },
 
     onRemoveClicked: function() {
-      // var that = this;
-      // $.ajax({
-      //   url: "/troupes/" + window.troupeContext.troupe.id + "/users/" + this.model.get('id'),
-      //   dataType: "json",
-      //   data: "",
-      //   type: "DELETE",
-      //   success: function(data) {
-      //     that.trigger('remove.complete', { userId: this.model.get('id') } );
-      //   }
-      // });
-      alert("Not yet implemented");
+      var that = this;
+      var thisPerson = this;
+      $.ajax({
+        url: "/troupes/" + window.troupeContext.troupe.id + "/users/" + this.model.get('id'),
+        data: "",
+        type: "DELETE",
+        success: function(data) {
+          console.log("Removed this person");
+          thisPerson.$el.toggle();
+        }
+      });
       return false;
     }
   });
