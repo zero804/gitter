@@ -37,8 +37,7 @@ define([
       function attachNavView(selector, itemType) {
         var v;
         if(itemType == 'people') {
-          v = unreadItemsClient.getValue('request') +
-              unreadItemsClient.getValue('invite');
+          v = unreadItemsClient.getValue('request');
         } else {
           v = unreadItemsClient.getValue(itemType);
         }
@@ -135,11 +134,8 @@ define([
         }
 
         // People Tab
-        if(itemType === 'invite' || itemType === 'request') {
-          var count = unreadItemsClient.getValue('invite');
-          count = count + unreadItemsClient.getValue('request');
-
-          self.nav['people'].updateNotificationValue(count);
+        if(itemType === 'request') {
+          self.nav['people'].updateNotificationValue(data.count);
         }
       });
 
