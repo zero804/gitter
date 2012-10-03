@@ -27,12 +27,13 @@
 </div>
 <div class="modal-success">
   <div class="trpModalTitle">Request has been sent</div>
-  <div class="trpModalSubtext">The members of the Troupe have been notified about your request. Once you've been accepted, you'll receive an email to let you know.
+  <div class="trpModalSubtext">The members of the Troupe have been notified about your request. Once you've been accepted, you'll receive an email to let you know.<br><br>
     {{^authenticated}}
-    <br><br>In the mean-time, why not learn more about Troupe?<br><br>
-    <a href="/x" class="trpButtonBig trpBtnGreen">Show me more</a>
-  </div>
+    In the mean-time, why not learn more about Troupe?<br><br>
+      <a href="/x" class="trpButtonBig trpBtnGreen">Show me more</a>
     {{/authenticated}}
-  <div><br><button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="cancel-button">Close</button> </div> 
+      <a href="javascript:history.back();" class="trpModalButton trpButtonBig trpBtnGrey" id="cancel-button">Close</a>
+  </div>
+  <div>
 </div>
 
