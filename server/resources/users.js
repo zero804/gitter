@@ -49,11 +49,17 @@ module.exports = {
     },
 
     destroy: function(req, res){
-      res.send(500);
+      console.log("Delete user:" + req.user);
+      console.log("From Troupe: " + req.troupe._id);
+      troupeService.removeUserFromTroupe(req.troupe._id, req.user, function (err) {
+      if(err) return res.send(500);
+        res.send(200);
+      });
     },
 
     load: function(req, id, callback) {
-      throw new Error("");
+      console.log("Load*** Troupe: " + req.troupe.id + " ID: " + id);
+      troupeService.findUserInTroupe(req.troupe.id, id, callback);
     }
 
 };
