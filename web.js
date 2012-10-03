@@ -49,7 +49,9 @@ passport.use(new LocalStrategy({
 
         if(user.status != 'ACTIVE') {
           winston.info("User not yet activated");
-          return done(null, false);
+          if (user.status != 'PROFILE_NOT_COMPLETED') {
+            return done(null, false);
+          }
         }
 
         userService.checkPassword(user, password, function(match) {
