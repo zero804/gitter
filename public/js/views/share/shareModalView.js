@@ -1,8 +1,3 @@
-// Filename: views/home/main
-// TODO: Confirmation after invite sent
-
-console.log("opened shareModalView");
-
 define([
   'jquery',
   'underscore',
@@ -12,8 +7,6 @@ define([
   'zeroClipboard',
   'jquery_placeholder'
 ], function($, _, TroupeViews, template, rowTemplate, zeroClipboard) {
-
-    console.log("Start of shareModalView");
 
     return TroupeViews.Base.extend({
     template: template,
