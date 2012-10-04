@@ -5,74 +5,57 @@ define([
   /*global console: false, window: false, document: false */
   "use strict";
 
-  var unreadItemsCache = window.troupeContext.unreadItemCounts ? window.troupeContext.unreadItemCounts : {};
-  var unreadItemsDelayed = {};
+  var unreadItemsCache = {};
+
+  function syncCounts(newValues) {
+
+    var keys = [];
+    var i;
+    for(i in newValues) if (newValues.hasOwnProperty(i)) keys.push(i);
+    for(i in unreadItemsCache) if (unreadItemsCache.hasOwnProperty(i)) keys.push(i);
+
+    for(i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      var value = unreadItemsCache[k];
+      var newValue = newValues[k];
+      if(value !== newValue) {
+        unreadItemsCache[k] = newValue;
+
+        $(document).trigger('itemUnreadCountChanged', {
+          itemType: k,
+          count: newValue
+        });
+      }
+    }
+  }
 
   var readNotificationQueue = [];
   var timeoutHandle = null;
-
-  function send() {
-    timeoutHandle = null;
-    if(!readNotificationQueue) {
-      return;
-    }
-
-    var sendQueue = readNotificationQueue;
-    readNotificationQueue = [];
-
-    console.log("Sending read notifications: ", sendQueue);
-
-    $.ajax({
-      url: "/troupes/" + window.troupeContext.troupe.id + "/unreadItems",
-      contentType: "application/json",
-      data: JSON.stringify(sendQueue),
-      dataType: "json",
-      type: "POST",
-      success: function(data) {
-        console.log(data);
-      }
-    });
-  }
-
-  function notifyUpdates() {
-    for(var k in unreadItemsCache) {
-      if(unreadItemsCache.hasOwnProperty(k)) {
-        var value = unreadItemsCache[k];
-        var delayedValue = unreadItemsDelayed[k];
-        if(value !== delayedValue) {
-          unreadItemsDelayed[k] = value;
-
-          $(document).trigger('itemUnreadCountChanged', {
-            itemType: k,
-            count: value
-          });
-        }
-      }
-    }
-  }
-
-  var updateHandle = null;
-  function triggerCountUpdate() {
-    if(!updateHandle) {
-      updateHandle = window.setTimeout(function() {
-        updateHandle = null;
-        notifyUpdates();
-      }, 500);
-    }
-  }
-
-  $(document).on('datachange:*', function(event, data) {
-    if(data.operation === 'create') {
-      var itemType = data.modelName;
-      var currentCount = unreadItemsCache[itemType];
-      unreadItemsCache[itemType] =  currentCount ? currentCount + 1 : 1;
-      triggerCountUpdate();
-    }
-  });
-
   function queueReadNotification(itemType, itemId) {
-    unreadItemsCache[itemType] = unreadItemsCache[itemType] ? unreadItemsCache[itemType] - 1 : -1;
-    triggerCountUpdate();
+
+    function send() {
+      timeoutHandle = null;
+      if(!readNotificationQueue) {
+        return;
+      }
+
+      var sendQueue = readNotificationQueue;
+      readNotificationQueue = [];
+
+      console.log("Sending read notifications: ", sendQueue);
+
+      $.ajax({
+        url: "/troupes/" + window.troupeContext.troupe.id + "/unreadItems",
+        contentType: "application/json",
+        data: JSON.stringify(sendQueue),
+        type: "POST",
+        success: function() {
+          // TODO: sort this out
+          console.log("done");
+        }
+      });
+    }
+
 
     readNotificationQueue.push({
       itemType: itemType,
@@ -81,6 +64,29 @@ define([
 
     if(!timeoutHandle) {
       timeoutHandle = window.setTimeout(send, 1000);
+    }
+  }
+
+  var fetchTimeout = null;
+  function fetchCounts() {
+
+    function fetchCountsOnTimeout() {
+      fetchTimeout = null;
+      $.ajax({
+        url: "/troupes/" + window.troupeContext.troupe.id + "/unreadItems",
+        contentType: "application/json",
+        dataType: "json",
+        type: "GET",
+        success: function(newUnreadCounts) {
+          // TODO: sort this out
+          syncCounts(newUnreadCounts);
+          console.log(newUnreadCounts);
+        }
+      });
+    }
+
+    if(!fetchTimeout) {
+      fetchTimeout = window.setTimeout(fetchCountsOnTimeout, 500);
     }
   }
 
@@ -125,11 +131,15 @@ define([
     windowScrollOnTimeout();
   });
 
+  $(document).on('troupeUnreadCountsChange', function(event, data) {
+    syncCounts(data.counts);
+  });
+
   $(document).on('collectionAdd', function(event, data) {
     windowScrollOnTimeout();
   });
 
-  notifyUpdates();
+  syncCounts(window.troupeContext.unreadItemCounts ? window.troupeContext.unreadItemCounts : {});
 
   return {
     getValue: function(itemType) {

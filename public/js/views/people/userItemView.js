@@ -44,6 +44,8 @@ define([
     },
 
     onAcceptClicked: function() {
+      this.model.save();
+      /*
       var that = this;
       var thisPerson = this;
       $.ajax({
@@ -55,21 +57,20 @@ define([
           that.trigger('accept.complete', { userId: this.model.get('id') } );
         }
       });
+      */
       return false;
     },
 
     onRejectClicked: function() {
       var that = this;
-      var thisPerson = this;
-      $.ajax({
-        url: "/troupes/" + window.troupeContext.troupe.id + "/requests/" + this.model.get('id'),
-        data: "",
-        type: "DELETE",
+
+      this.model.destroy({
         success: function(data) {
-          thisPerson.$el.toggle();
+          console.log("SUCCESS!");
           that.trigger('reject.complete', { userId: this.model.get('id') } );
         }
       });
+
       return false;
     },
 

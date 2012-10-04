@@ -18,7 +18,6 @@ client.on("message", function (channel, message) {
 });
 
 function emit(event, data) {
-  winston.info("Emit", event);
   pubClient.publish(event, JSON.stringify(data));
 }
 
@@ -36,6 +35,23 @@ function on(event, callback) {
 }
 
 module.exports = {
+  unreadRecalcRequired: function() {
+    emit('unreadRecalcRequired', true);
+  },
+
+  onUnreadRecalcRequired: function(callback) {
+    on('unreadRecalcRequired', callback);
+  },
+
+  troupeUnreadCountsChange: function(data) {
+    console.dir(data);
+    emit('troupeUnreadCountsChange', data);
+  },
+
+  onTroupeUnreadCountsChange: function(callback) {
+    on('troupeUnreadCountsChange', callback);
+  },
+
   userLoggedIntoTroupe: function(userId, troupeId) {
     emit('userLoggedIntoTroupe', { troupeId: troupeId, userId: userId });
   },

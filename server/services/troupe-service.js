@@ -256,14 +256,11 @@ function acceptRequest(request, callback) {
       troupe.users.push(user.id);
       troupe.save(function(err) {
         if(err) winston.error("Unable to save troupe", err);
+
+        request.remove();
         return callback(err, request);
       });
 
-      request.status = 'ACCEPTED';
-      request.save(function(err) {
-        if(err) winston.error("Unable to save request", err);
-        return callback(err, request);
-      });
     });
   });
 }
@@ -274,10 +271,11 @@ function rejectRequest(request, callback) {
   findById(request.troupeId, function(err, troupe) {
     if(err) return callback(err);
     if(!troupe) { winston.error("Unable to find troupe", request.troupeId); return callback("Unable to find troupe"); }
-    request.status = 'REJECTED';
-    request.save(function(err) {
+
+
+    request.remove(function(err) {
       if(err) winston.error("Unable to save request", err);
-      return callback(err, request);
+      return callback(null);
     });
   });
 }

@@ -3,7 +3,6 @@
 "use strict";
 
 var troupeService = require("../services/troupe-service"),
-    _ = require("underscore"),
     restSerializer = require("../serializers/rest-serializer");
 
 module.exports = {
@@ -38,25 +37,21 @@ module.exports = {
     },
 
     /* This means the user has been accepted */
-    update:  function(req, res) {
-      console.log(req.request);
-      troupeService.acceptRequest(req.request, function(err, request) {
-        if(err) return res.send(500);
+    update:  function(req, res, next) {
+      troupeService.acceptRequest(req.request, function(err) {
+        if(err) return next(err);
         res.send(200);
       });
     },
 
-    destroy: function(req, res) {
-      console.log("Removing request");
-      console.log(req.request);
-      troupeService.rejectRequest(req.request, function(err, request) {
-        if(err) return res.send(500);
+    destroy: function(req, res, next) {
+      troupeService.rejectRequest(req.request, function(err) {
+        if(err) return next(err);
         res.send(200);
       });
     },
 
     load: function(req, id, callback){
-      console.log("Loading ID:", id);
       troupeService.findPendingRequestForTroupe(req.troupe.id, id, callback);
     }
 

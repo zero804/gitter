@@ -9,7 +9,6 @@ module.exports = {
       var userId = req.user.id;
       var troupe = req.troupe.id;
 
-      console.log("INDEX");
       unreadItemService.getUserUnreadCounts(userId, req.troupe.id, function(err, data) {
         if(err) return next(err);
 
@@ -23,9 +22,11 @@ module.exports = {
 
     create: function(req, res, next) {
       var unreadItems = req.body;
-      unreadItemService.markItemsRead(req.user.id, req.troupe.id, unreadItems, function(err, result) {
+      unreadItemService.markItemsRead(req.user.id, req.troupe.id, unreadItems, function(err) {
         if(err) return next(err);
-        res.send({ sucess: true });
+
+        res.send(200);
+
       });
     },
 
