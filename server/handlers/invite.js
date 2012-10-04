@@ -7,21 +7,23 @@ passport = require('passport');
 
 module.exports = {
     install: function(app) {
-      app.get('/accept/:confirmationCode',
-        passport.authenticate('accept'),
-        function(req, res, next) {
+      app.get('/:troupeUri/accept/:confirmationCode', function(req, res, next) {
+        passport.authenticate('accept',  function(err, user, info) {
+          if(err || !user) {
+            res.relativeRedirect("/" + req.params.troupeUri);
+            return;
+          }
           /* User has been set passport/accept */
           troupeService.acceptInvite(req.params.confirmationCode, req.user, function(err, troupe) {
-            // if(!req.user.passwordHash) {
-            //   res.relativeRedirect("/profile");
-            //   return;
-            // }
+            if (err) {
+              res.relativeRedirect("/" + req.params.troupeUri);
+            }
 
             res.relativeRedirect("/" + troupe.uri);
 
           });
 
-        }
-      );
+        })(req,res, next);
+      });
     }
 };

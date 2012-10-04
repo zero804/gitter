@@ -85,7 +85,7 @@ passport.use(new ConfirmStrategy({ name: "accept" }, function(confirmationCode, 
     if(!invite) return done(null, false);
 
     if(invite.status != 'UNUSED') {
-      return done(new Error("This invite has already been used"));
+      return done(null, false);
     }
 
     userService.findOrCreateUserForEmail({ displayName: invite.displayName, email: invite.email, status: "PROFILE_NOT_COMPLETED" }, function(err, user) {
