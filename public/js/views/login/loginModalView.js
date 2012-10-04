@@ -35,6 +35,39 @@ define([
 
     events: {
       "submit form": "onFormSubmit",
+      "click .trpModalFailureText" : "resetClicked",
+      "click #send-reset" : "sendResetClicked",
+      "click #go-back" : "backClicked"
+    },
+
+    backClicked: function(e) {
+      this.$el.find('.login-content').show();
+      this.$el.find('.resetpwd-content').hide();
+    },
+
+    resetClicked: function(e) {
+      this.$el.find('.login-content').hide();
+      this.$el.find('.resetpwd-content').show();
+      this.$el.find('#resetEmailAddress').text(this.$el.find('#email').val());
+    },
+
+    sendResetClicked: function(e) {
+      var form = this.$el.find('form');
+      $.ajax({
+        url: "/reset",
+        contentType: "application/x-www-form-urlencoded",
+        dataType: "json",
+        data: form.serialize(),
+        type: "POST",
+        success: function(data) {
+           if(data.failed) {
+            return;
+          }
+            this.$el.find('.resetpwd-content').hide();
+            this.$el.find('.resetpwd-confirm').show();
+        }
+      });
+
     },
 
     onFormSubmit: function(e) {
