@@ -386,7 +386,6 @@ define([
     },
 
     showMenu: function() {
-      console.log("on: " + $(this.triggerEl));
       $(this.triggerEl).css('background-color', 'white');
       this.$el.slideDown('fast', function() {
           // Animation complete.
@@ -395,7 +394,6 @@ define([
     },
 
     hideMenu: function() {
-      console.log("off: " + this.triggerEl);
       $(this.triggerEl).css('background-color', 'transparent');
       $('body').off('click', this.hideMenu);
       this.$el.slideUp('fast', function() {
@@ -548,6 +546,8 @@ define([
     },
 
     onCollectionRemove: function(item) {
+      console.log("onCollectionRemove", item);
+
       this.$el.find('.model-id-' + item.get('id')).each(function(index, item) {
         if(item._view) item._view.remove();
       });

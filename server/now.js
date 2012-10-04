@@ -75,9 +75,14 @@ module.exports = {
 
       nowjs.on('connect', function() {
         var self = this;
+
         loadSessionWithUser(this.user, sessionStore, function(err, user) {
           if(err) return;
           if(!user) return;
+
+          console.log("Adding user to " + user.id);
+
+          nowjs.getGroup("user." + user.id).addUser(self.user.clientId);
 
           presenceService.userSocketConnected(user.id, self.user.clientId);
         });
@@ -89,6 +94,8 @@ module.exports = {
         loadSessionWithUser(this.user, sessionStore, function(err, user) {
           if(err) return;
           if(!user) return;
+
+          nowjs.getGroup("user." + user.id).removeUser(self.user.clientId);
 
           /* Give the user 10 seconds to log back into before reporting that they're disconnected */
           setTimeout(function(){
@@ -152,6 +159,16 @@ module.exports = {
         var group = getGroup("troupe." + troupeId, function (group) {
           group.now.onTroupeChatMessage(data.chatMessage);
         });
+      });
+
+
+      appEvents.onTroupeUnreadCountsChange(function(data) {
+        var troupeId = data.troupeId;
+        var userId = data.userId;
+        var counts = data.counts;
+        console.dir([">>>>>>>>>>", counts]);
+        var group = nowjs.getGroup("user." + userId);
+        group.now.onTroupeUnreadCountsChange(data);
       });
 
       appEvents.onUserLoggedIntoTroupe(function(data) {

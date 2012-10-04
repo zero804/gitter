@@ -7,11 +7,50 @@ var appEvents = require("../app-events");
 
 var redis = require("redis");
 var winston = require("winston");
-
 var redisClient = redis.createClient();
 
-var DEFAULT_ITEM_TYPES = ['file', 'chat', 'invite', 'request'];
+var DEFAULT_ITEM_TYPES = ['file', 'chat', 'request'];
+var RECALC_WORK_SET_NAME = 'unread-item-recalc-set';
+var RECALC_WORK_PUB_QUEUE = 'unread-item-recalc-set';
 
+function doRecalculationWork() {
+  redisClient.spop(RECALC_WORK_SET_NAME, function(err, value) {
+    if(err) return winston.error(err);
+    if(!value) {
+      winston.info("All recalculations complete");
+      return;
+    }
+
+    var a = value.split(":");
+    if(a.length == 2) {
+      var userId = a[0];
+      var troupeId = a[1];
+
+      getUserUnreadCounts(userId, troupeId, function(err, counts) {
+
+        // Notify the user
+        appEvents.troupeUnreadCountsChange({
+          userId: userId,
+          troupeId: troupeId,
+          counts: counts
+        });
+
+      });
+    }
+
+    // Do the next bit of work
+    doRecalculationWork();
+  });
+}
+
+appEvents.onUnreadRecalcRequired(function() {
+  winston.info("onUnreadRecalcRequired");
+  doRecalculationWork();
+});
+
+function publishRecountNotification() {
+  appEvents.unreadRecalcRequired();
+}
 
 function newItem(troupeId, itemType, itemId) {
   troupeService.findById(troupeId, function(err, troupe) {
@@ -21,26 +60,64 @@ function newItem(troupeId, itemType, itemId) {
 
       // multi chain with an individual callback
     var multi = redisClient.multi();
+    var m2 = redisClient.multi();
     userIds.forEach(function(userId) {
       multi.sadd("unread:" + itemType + ":" + userId + ":" + troupeId, itemId);
+      m2.sadd(RECALC_WORK_SET_NAME, userId + ":" + troupeId);
     });
 
     multi.exec(function(err, replies) {
       if(err) winston.error("unreadItemService.newItem failed", err);
+      m2.exec(function(err, replies) {
+        if(err) return winston.error(err);
+        publishRecountNotification();
+      });
     });
 
   });
 }
 
-function markItemsRead(userId, troupeId, items) {
+function removeItem(troupeId, itemType, itemId) {
+  troupeService.findById(troupeId, function(err, troupe) {
+    if(err) return winston.error("Unable to load troupeId " + troupeId, err);
+
+    var userIds = troupe.users;
+
+      // multi chain with an individual callback
+    var multi = redisClient.multi();
+    var m2 = redisClient.multi();
+
+    userIds.forEach(function(userId) {
+      multi.srem("unread:" + itemType + ":" + userId + ":" + troupeId, itemId);
+      m2.sadd(RECALC_WORK_SET_NAME, userId + ":" + troupeId);
+    });
+
+    multi.exec(function(err, replies) {
+      if(err) return winston.error("unreadItemService.removeItem failed", err);
+
+      m2.exec(function(err, replies) {
+        if(err) return winston.error(err);
+        publishRecountNotification();
+      });
+    });
+
+  });
+}
+
+function markItemsRead(userId, troupeId, items, callback) {
   var multi = redisClient.multi();
 
   items.forEach(function(item) {
     multi.srem("unread:" + item.itemType + ":" + userId + ":" + troupeId, item.itemId);
   });
+  multi.sadd(RECALC_WORK_SET_NAME, userId + ":" + troupeId);
 
   multi.exec(function(err, replies) {
-    if(err) winston.error("unreadItemService.markItemsRead failed", err);
+    if(err) return callback(err);
+
+    publishRecountNotification();
+
+    callback();
   });
 }
 
@@ -85,6 +162,7 @@ function getUnreadItems(userId, troupeId, itemType, callback) {
 
 module.exports = {
   newItem: newItem,
+  removeItem: removeItem,
   markItemsRead: markItemsRead,
   getUnreadItems: getUnreadItems,
   getUserUnreadCounts: getUserUnreadCounts,
@@ -98,11 +176,13 @@ module.exports = {
         var operation = data.operation;
         var model = data.model;
 
-        console.log("unreadItemService:onDataChange", modelName, operation);
+        if((modelName === 'file' || modelName === 'chat' || modelName === 'invite' || modelName === 'request')) {
+          if(operation === 'create') {
+            newItem(troupeId, modelName, modelId);
+          } else if(operation === 'remove') {
+            removeItem(troupeId, modelName, modelId);
+          }
 
-        if(operation === 'create' && (modelName === 'file' || modelName === 'chat' || modelName === 'invite' || modelName === 'request')) {
-          console.log("newItem", troupeId, modelName, modelId);
-          newItem(troupeId, modelName, modelId);
         }
 
       });
