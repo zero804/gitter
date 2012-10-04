@@ -1,6 +1,4 @@
 // Filename: views/home/main
-// TODO: Confirmation after invite sent
-// TODO: Implement remove user properly
 // TODO: Fix showing invites
 
 define([
