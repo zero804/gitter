@@ -15,24 +15,36 @@ define([
       '*actions': 'defaultAction'
     },
 
+
     defaultAction: function(actions) {
       $('#primary-view').html('');
       var view, modal;
+
+      function createLoginModal(email) {
+        var loginView = new LoginModalView( { email: email });
+        var loginModal = new TroupeViews.Modal({ view: loginView, disableClose: true });
+        loginView.on('login.complete', function(data) {
+          loginView.off('login.complete');
+          window.location.href="/" + data.defaultTroupe.uri;
+        });
+        return loginModal;
+      }
+
       /* Is a user logged in? */
       if(!window.troupeContext.user) {
+        if (window.localStorage.defaultTroupeEmail) {
+          var modal1 = createLoginModal(window.localStorage.defaultTroupeEmail);
+          modal1.show();
+          return;
+        }
+
         view = new RequestModalView({ });
         modal = new TroupeViews.Modal({ view: view, disableClose: true });
   
         view.on('request.login', function(data) {
           modal.off('request.login');
           if (!data) data = {};
-          var loginView = new LoginModalView( { email: data.email });
-          var loginModal = new TroupeViews.Modal({ view: loginView, disableClose: true });
-          loginView.on('login.complete', function(data) {
-            modal.off('login.complete');
-            window.location.href="/" + data.defaultTroupe.uri;
-          });
-
+          var loginModal = createLoginModal("");
           modal.transitionTo(loginModal);
         });
 

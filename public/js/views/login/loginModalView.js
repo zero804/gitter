@@ -77,6 +77,10 @@ define([
 
     },
 
+    markUserAsExisting: function(email) {
+      window.localStorage.defaultTroupeEmail = email;
+    },
+
     onFormSubmit: function(e) {
       $('.login-failure').hide();
       if(e) e.preventDefault();
@@ -94,7 +98,9 @@ define([
             $('.login-failure').show('fast');
             return;
           }
+          that.markUserAsExisting(that.$el.find('#email').val());
           that.trigger('login.complete', data);
+
         }
       });
     }
