@@ -168,9 +168,7 @@ function findUserInTroupe(troupeId, userId, callback) {
 function removeUserFromTroupe(troupeId, userId, callback) {
    findById(troupeId, function(err, troupe) {
       troupe.users.remove(userId);
-      troupe.save();
-      console.log("Removed user from Troupe");
-      return callback(err);
+      troupe.save(callback);
    });
 }
 

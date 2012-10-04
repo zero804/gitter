@@ -5,7 +5,8 @@
 var troupeService = require("../services/troupe-service"),
     userService = require("../services/user-service"),
     presenceService = require("../services/presence-service"),
-    Q = require("q");
+    Q = require("q"),
+    _ = require("underscore");
 
 module.exports = {
     index: function(req, res, next) {
@@ -48,18 +49,17 @@ module.exports = {
       res.send(500);
     },
 
-    destroy: function(req, res){
-      console.log("Delete user:" + req.user);
-      console.log("From Troupe: " + req.troupe._id);
-      troupeService.removeUserFromTroupe(req.troupe._id, req.user, function (err) {
-      if(err) return res.send(500);
+    destroy: function(req, res, next){
+      var user = req.user; // NB NB NB, not the usual req.user, but the req.RESOURCEish user. Capish? 
+      troupeService.removeUserFromTroupe(req.troupe._id, user.id, function (err) {
+      if(err) return next(err);
         res.send(200);
       });
     },
 
     load: function(req, id, callback) {
-      console.log("Load*** Troupe: " + req.troupe.id + " ID: " + id);
-      troupeService.findUserInTroupe(req.troupe.id, id, callback);
+      var userInTroupeId = _.find(req.troupe.users, function(v) { console.log(v); return v == id;} );
+      userService.findById(userInTroupeId, callback);
     }
 
 };
