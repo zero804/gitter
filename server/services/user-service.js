@@ -4,7 +4,9 @@
 
 var persistence = require("./persistence-service"),
     sechash = require('sechash'),
-    mongoose = require("mongoose");
+    mongoose = require("mongoose"),
+    emailNotificationService = require("./email-notification-service"),
+    uuid = require('node-uuid');
 
 var userService = {
   newUser: function(options) {
@@ -48,6 +50,36 @@ var userService = {
   findByConfirmationCode: function(confirmationCode, callback) {
     persistence.User.findOne({confirmationCode: confirmationCode}, function(err, user) {
       callback(err, user);
+    });
+  },
+
+  requestPasswordReset: function(email, callback) {
+    persistence.User.findOne({email: email}, function(err, user) {
+      if(err || !user) return callback(err, user);
+
+      if(user.passwordResetCode) {
+        /* Resend the password reset code to the user */
+      } else {
+        user.passwordResetCode = uuid.v4();
+        user.save(); // Async save
+      }
+
+      emailNotificationService.sendPasswordResetForUser(user);
+      callback(err, user);
+    });
+  },
+
+  findAndUsePasswordResetCode: function(passwordResetCode, callback) {
+    persistence.User.findOne({passwordResetCode: passwordResetCode}, function(err, user) {
+      if(err || !user) return callback(err, user);
+
+      user.passwordResetCode = null;
+      user.status = 'PROFILE_NOT_COMPLETED';
+      user.passwordHash = null;
+      user.save(function(err) {
+        if(err) return callback(err);
+        callback(err, user);
+      });
     });
   },
 
