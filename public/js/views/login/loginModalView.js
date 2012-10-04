@@ -52,6 +52,7 @@ define([
     },
 
     sendResetClicked: function(e) {
+      var that = this;
       var form = this.$el.find('form');
       $.ajax({
         url: "/reset",
@@ -63,8 +64,8 @@ define([
            if(data.failed) {
             return;
           }
-            this.$el.find('.resetpwd-content').hide();
-            this.$el.find('.resetpwd-confirm').show();
+            that.$el.find('.resetpwd-content').hide();
+            that.$el.find('.resetpwd-confirm').show();
         }
       });
 
