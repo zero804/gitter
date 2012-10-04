@@ -38,7 +38,13 @@ define([
       this.collectionView = new TroupeViews.Collection({
         itemView: ConversationDetailItemView,
         collection: this.model.emailCollection,
-        el: this.$el.find(".frame-emails")
+        el: this.$el.find(".frame-emails"),
+        sortMethods: {
+          "date": function(email) {
+            return email.get('date');
+          }
+        },
+        defaultSort: "date"
       });
     },
 

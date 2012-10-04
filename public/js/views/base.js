@@ -440,6 +440,10 @@ define([
       this.itemViewOptions = options.itemViewOptions ? options.itemViewOptions : {};
       this.sortMethods = options.sortMethods ? options.sortMethods : {};
 
+      if (this.defaultSort) {
+        this.sortBy(this.defaultSort);
+      }
+
       _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onCollectionRemove');
       this.collection.on('add', this.onCollectionAdd);
       this.collection.on('remove', this.onCollectionRemove);
