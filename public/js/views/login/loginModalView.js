@@ -37,7 +37,8 @@ define([
       "submit form": "onFormSubmit",
       "click .trpModalFailureText" : "resetClicked",
       "click #send-reset" : "sendResetClicked",
-      "click #go-back" : "backClicked"
+      "click #go-back" : "backClicked",
+      "click #button-close" : "closeClicked"
     },
 
     backClicked: function(e) {
@@ -49,6 +50,10 @@ define([
       this.$el.find('.login-content').hide();
       this.$el.find('.resetpwd-content').show();
       this.$el.find('#resetEmailAddress').text(this.$el.find('#email').val());
+    },
+
+    closeClicked: function(e) {
+      this.trigger('login.close');
     },
 
     sendResetClicked: function(e) {
@@ -64,6 +69,7 @@ define([
            if(data.failed) {
             return;
           }
+            that.$el.find('#resetEmail').text(that.$el.find('#email').val());
             that.$el.find('.resetpwd-content').hide();
             that.$el.find('.resetpwd-confirm').show();
         }

@@ -78,6 +78,11 @@ jQuery(function($) {
           window.location.href="/" + data.defaultTroupe.uri;
         });
 
+        view.on('login.close', function(data) {
+          modal.off('login.close');
+          modal.hide();
+        });
+
         modal.show();
         return false;
       });
