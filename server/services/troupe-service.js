@@ -123,7 +123,7 @@ function addInvite(troupe, senderDisplayName, displayName, email) {
   invite.code = code;
   invite.save();
 
-  var acceptLink = nconf.get("web:basepath") + "/accept/" + code;
+  var acceptLink = nconf.get("web:basepath") + "/" + troupe.uri + "/accept/" + code;
 
   mailerService.sendEmail({
     templateFile: "inviteemail",
