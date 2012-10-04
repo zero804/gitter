@@ -3,8 +3,9 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!./userItemView'
-], function($, _, TroupeViews, template) {
+  'hbs!./userItemView',
+  './confirmRemoveModalView'
+], function($, _, TroupeViews, template, ConfirmRemoveModalView) {
   "use strict";
 
   return TroupeViews.Base.extend({
@@ -73,6 +74,36 @@ define([
     },
 
     onRemoveClicked: function() {
+      var that = this;
+      var thisPerson = this;
+      var view = new ConfirmRemoveModalView({ model: this.model });
+      var modal = new TroupeViews.Modal({ view: view  });
+
+      view.on('confirm.yes', function(data) {
+          modal.off('confirm.yes');
+          modal.hide();
+           $.ajax({
+              url: "/troupes/" + window.troupeContext.troupe.id + "/users/" + this.model.get('id'),
+              data: "",
+              type: "DELETE",
+              success: function(data) {
+                console.log("Removed this person");
+                thisPerson.$el.toggle();
+              }
+            });
+      });
+
+      view.on('confirm.no', function(data) {
+        modal.off('confirm.no');
+        modal.hide();
+       });
+
+      modal.show();
+
+      return false;
+    },
+
+    removeUser: function() {
       var that = this;
       var thisPerson = this;
       $.ajax({
