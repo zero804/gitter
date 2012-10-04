@@ -158,13 +158,6 @@ function findAllUnusedInvitesForTroupe(troupeId, callback) {
       .run(callback);
 }
 
-function findUserInTroupe(troupeId, userId, callback) {
-  findById(troupeId, function(err, troupe) {
-    console.log("Returning back what you sent me: " + userId);
-    return callback(err, userId);
-  });
-}
-
 function removeUserFromTroupe(troupeId, userId, callback) {
    findById(troupeId, function(err, troupe) {
       troupe.users.remove(userId);
@@ -307,6 +300,5 @@ module.exports = {
   findPendingRequestForTroupe: findPendingRequestForTroupe,
   acceptRequest: acceptRequest,
   rejectRequest: rejectRequest,
-  removeUserFromTroupe: removeUserFromTroupe,
-  findUserInTroupe : findUserInTroupe
+  removeUserFromTroupe: removeUserFromTroupe
 };
