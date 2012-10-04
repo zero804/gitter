@@ -26,6 +26,20 @@ module.exports = {
     });
   },
 
+  sendPasswordResetForUser: function (user) {
+    var resetLink = nconf.get("web:basepath") + "/reset/" + user.passwordResetCode;
+
+    mailerService.sendEmail({
+      templateFile: "resetemail",
+      to: user.email,
+      from: 'admin-robot' + emailDomainWithAt,
+      subject: "You requested a password reset",
+      data: {
+        resetLink: resetLink
+      }
+    });
+  },
+
   sendConfirmationForNewUser: function (user, troupe) {
     var confirmLink = nconf.get("web:basepath") + "/confirm/" + user.confirmationCode;
     mailerService.sendEmail({

@@ -93,6 +93,23 @@ module.exports = {
         }
       });
 
+      app.post('/reset', function(req, res, next) {
+        userService.requestPasswordReset(req.body.email, function(err, user) {
+          if(err) return next(err);
+          if(!user) {
+            res.send({ failed: true });
+            return;
+          }
+
+          res.send({ success: true });
+        });
+      });
+
+      app.get('/reset/:confirmationCode', 
+        passport.authenticate('passwordreset'),
+        function(req, res, next) {
+          res.relativeRedirect("/select-troupe");
+        });
 
       app.get('/select-troupe', 
         middleware.ensureLoggedIn,

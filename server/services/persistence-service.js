@@ -20,6 +20,7 @@ var UserSchema = new Schema({
   confirmationCode: {type: String },
   status: { type: String, "enum": ['UNCONFIRMED', 'PROFILE_NOT_COMPLETED', 'ACTIVE'], "default": 'UNCONFIRMED'},
   passwordHash: { type: String },
+  passwordResetCode: String,
   avatarUrlSmall: String,
   avatarUrlMedium: String,
   lastTroupe: ObjectId

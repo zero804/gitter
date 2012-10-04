@@ -57,6 +57,11 @@ passport.use(new LocalStrategy({
         userService.checkPassword(user, password, function(match) {
           if(!match) return done(null, false);
 
+          if(user.passwordResetCode) {
+            user.passwordResetCode = null;
+            user.save();
+          }
+
           /* Todo: consider using a seperate object for the security user */
           return done(null, user);
 
@@ -94,6 +99,16 @@ passport.use(new ConfirmStrategy({ name: "accept" }, function(confirmationCode, 
 
   });
 })
+);
+
+passport.use(new ConfirmStrategy({ name: "passwordreset" }, function(confirmationCode, done) {
+    userService.findAndUsePasswordResetCode(confirmationCode, function(err, user) {
+      if(err) return done(err);
+      if(!user) return done(null, false);
+
+      return done(null, user);
+    });
+  })
 );
 
 passport.serializeUser(function(user, done) {
