@@ -40,6 +40,20 @@ module.exports = {
     });
   },
 
+  sendConfirmationforNewUserRequest: function(user, troupe) {
+    var confirmLink = nconf.get("web:basepath") + "/confirm/" + user.confirmationCode;
+    mailerService.sendEmail({
+      templateFile: "signupemailfromrequest",
+      to: user.email,
+      from: 'signup-robot' + emailDomainWithAt,
+      subject: "Welcome to Troupe",
+      data: {
+        troupeName: troupe.name,
+        confirmLink: confirmLink
+      }
+    }); 
+  },
+
   sendConfirmationForNewUser: function (user, troupe) {
     var confirmLink = nconf.get("web:basepath") + "/confirm/" + user.confirmationCode;
     mailerService.sendEmail({
