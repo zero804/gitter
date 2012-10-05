@@ -41,15 +41,11 @@ define([
         el: this.$el.find(".frame-emails"),
         sortMethods: {
           "date": function(email) {
-            return email.get('date-');
+            return email.get('date');
           }
         },
-        defaultSort: "date-"
+        defaultSort: "-date"
       });
-      // not sure if this is a hack or genius. I'm guessing its a hack because base.js is supposed to do the sort by default.
-      // it wasn't working with setting default to "date" in case you were wondering. the only time anything actually had an effect
-      // was when i put this line below in, then all of a sudden it started sorting
-      this.collectionView.sortBy("date");
 
     },
 
