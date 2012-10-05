@@ -438,8 +438,8 @@ define([
       this.itemViewOptions = options.itemViewOptions ? options.itemViewOptions : {};
       this.sortMethods = options.sortMethods ? options.sortMethods : {};
 
-      if (this.defaultSort) {
-        this.sortBy(this.defaultSort);
+      if (this.options.defaultSort) {
+        this.sortBy(this.options.defaultSort);
       }
 
       _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onCollectionRemove');
