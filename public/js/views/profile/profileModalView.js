@@ -96,6 +96,7 @@ define([
             that.trigger('profile.complete', data);
           } else {
             if(data.authFailure) {
+              that.$el.find('#oldPassword').val("");
               window.alert("You old password is incorrect");
             }
           }
