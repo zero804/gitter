@@ -23,7 +23,8 @@ var UserSchema = new Schema({
   passwordResetCode: String,
   avatarUrlSmall: String,
   avatarUrlMedium: String,
-  lastTroupe: ObjectId
+  lastTroupe: ObjectId,
+  userToken: String // TODO: move to OAuth
 });
 
 /* TODO(AN): remove narrow. Deprecated */
