@@ -159,6 +159,7 @@ require('./server/handlers/request-access').install(app);
 require('./server/handlers/avatar').install(app);
 require('./server/handlers/landing').install(app);
 require('./server/handlers/legals').install(app);
+require('./server/handlers/token').install(app);
 require('./server/handlers/installChromeExtension').install(app);
 
 // TEMP

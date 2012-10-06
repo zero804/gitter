@@ -74,6 +74,8 @@ module.exports = {
       });
 
       nowjs.on('connect', function() {
+        console.log("Socket connected");
+
         var self = this;
 
         loadSessionWithUser(this.user, sessionStore, function(err, user) {

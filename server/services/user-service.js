@@ -108,16 +108,26 @@ var userService = {
     });
   },
 
-// This really may not be correct because it's actually just doing the same as a find troupe by Id
-  findLastVisitedTroupeForUser: function(troupeid, callback) {
-    persistence.Troupe.findById(id, function(err, troupe) {
+  findDefaultTroupeForUser: function(id, callback) {
+    persistence.Troupe.findOne({ users: id }, function(err, troupe) {
       callback(err, troupe);
     });
   },
 
-  findDefaultTroupeForUser: function(id, callback) {
-    persistence.Troupe.findOne({ users: id }, function(err, troupe) {
-      callback(err, troupe);
+  getUserToken: function(userId, callback) {
+    userService.findById(userId, function(err, user) {
+      if(err) return callback(err);
+      if(!user) return callback(err);
+
+      if(user.userToken) {
+        return callback(err, user.userToken);
+      }
+
+      // TODO: serious revamp of this security. This is not safe.
+      var userToken = uuid.v4();
+      user.userToken = userToken;
+      user.save(); // Async is fine
+      callback(err, userToken);
     });
   },
 
