@@ -1,0 +1,47 @@
+body {
+	margin: 0;
+	padding: 0;
+	background-color: #1dce73;
+}
+
+.trpTroupeItem {
+  display: inline-block;
+  min-width: 200px;
+  padding-top: 20px;
+  padding-left: 20px;
+  padding-bottom: 20px;
+  padding-right: 60px;
+  text-decoration: none;
+  border-top: thin solid white;
+  background-color: #1dce73;
+  cursor: pointer;
+}
+
+.trpTroupeItem:hover {
+  background-color: #21f185;
+}
+
+.trpTroupeName {
+   color: white; 
+   display: inline-block;
+}
+
+.trpTroupeBadgeContainer {
+  display: inline-block;
+}
+
+.trpBadge {
+  display: inline-block;
+  margin-left: 10px;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  background-color: #494259;
+  font-size: 9px;
+  color: white;
+  padding: 2px 2px 2px 2px;
+  text-align: center;
+  vertical-align: middle;
+  min-width: 15px;
+  margin-top: -4px;
+}
