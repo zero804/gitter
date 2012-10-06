@@ -29,7 +29,7 @@ define([
       chrome.webstore.install(undefined, function() {
         that.$el.find('#installer-frame').attr('src', '/install-chrome-extension');
         that.trigger('install.complete');
-      }, function() { alert("Failed!");});
+      }, function(message) { alert("Failed!" + message);});
     },
 
     cancelClicked: function() {
