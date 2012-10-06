@@ -4,7 +4,7 @@
 
 var troupeService = require("./troupe-service");
 var appEvents = require("../app-events");
-
+var _ = require("underscore");
 var redis = require("redis");
 var winston = require("winston");
 var redisClient = redis.createClient();
@@ -58,18 +58,23 @@ function newItem(troupeId, itemType, itemId) {
 
     var userIds = troupe.users;
 
+    var data = {};
+    data[itemType] = [itemId];
+
       // multi chain with an individual callback
     var multi = redisClient.multi();
     var m2 = redisClient.multi();
     userIds.forEach(function(userId) {
+      appEvents.newUnreadItem(userId, troupeId, data);
+
       multi.sadd("unread:" + itemType + ":" + userId + ":" + troupeId, itemId);
-      m2.sadd(RECALC_WORK_SET_NAME, userId + ":" + troupeId);
     });
 
     multi.exec(function(err, replies) {
       if(err) winston.error("unreadItemService.newItem failed", err);
       m2.exec(function(err, replies) {
         if(err) return winston.error(err);
+
         publishRecountNotification();
       });
     });
@@ -83,13 +88,16 @@ function removeItem(troupeId, itemType, itemId) {
 
     var userIds = troupe.users;
 
-      // multi chain with an individual callback
+    var data = {};
+    data[itemType] = [itemId];
+
     var multi = redisClient.multi();
     var m2 = redisClient.multi();
 
     userIds.forEach(function(userId) {
+      appEvents.unreadItemsRemoved(userId, troupeId, data);
+
       multi.srem("unread:" + itemType + ":" + userId + ":" + troupeId, itemId);
-      m2.sadd(RECALC_WORK_SET_NAME, userId + ":" + troupeId);
     });
 
     multi.exec(function(err, replies) {
@@ -97,6 +105,7 @@ function removeItem(troupeId, itemType, itemId) {
 
       m2.exec(function(err, replies) {
         if(err) return winston.error(err);
+
         publishRecountNotification();
       });
     });
@@ -105,12 +114,20 @@ function removeItem(troupeId, itemType, itemId) {
 }
 
 function markItemsRead(userId, troupeId, items, callback) {
+
+  appEvents.unreadItemsRemoved(userId, troupeId, items);
+
   var multi = redisClient.multi();
 
-  items.forEach(function(item) {
-    multi.srem("unread:" + item.itemType + ":" + userId + ":" + troupeId, item.itemId);
+  var keys = _.keys(items);
+  keys.forEach(function(itemType) {
+    var ids = items[itemType];
+    console.log("IDS: ", ids);
+
+    ids.forEach(function(id) {
+      multi.srem("unread:" + itemType + ":" + userId + ":" + troupeId, id);
+    });
   });
-  multi.sadd(RECALC_WORK_SET_NAME, userId + ":" + troupeId);
 
   multi.exec(function(err, replies) {
     if(err) return callback(err);
@@ -159,6 +176,24 @@ function getUnreadItems(userId, troupeId, itemType, callback) {
     });
 }
 
+function getUnreadItemsForUser(userId, troupeId, callback) {
+  var multi = redisClient.multi();
+
+  DEFAULT_ITEM_TYPES.forEach(function(itemType) {
+    multi.smembers("unread:" + itemType + ":" + userId + ":" + troupeId);
+  });
+
+  multi.exec(function(err, replies) {
+    var result = {};
+
+    DEFAULT_ITEM_TYPES.forEach(function(itemType, index) {
+      var reply = replies[index];
+      result[itemType] = reply;
+    });
+
+    callback(null, result);
+  });
+}
 
 module.exports = {
   newItem: newItem,
@@ -166,6 +201,7 @@ module.exports = {
   markItemsRead: markItemsRead,
   getUnreadItems: getUnreadItems,
   getUserUnreadCounts: getUserUnreadCounts,
+  getUnreadItemsForUser: getUnreadItemsForUser,
 
   /* TODO: make sure only one of these gets installed for the whole app */
   installListener: function() {

@@ -43,6 +43,32 @@ module.exports = {
     on('unreadRecalcRequired', callback);
   },
 
+
+  newUnreadItem: function(userId, troupeId, items) {
+    emit('newUnreadItem', {
+      userId: userId,
+      troupeId: troupeId, 
+      items: items
+    });
+  },
+
+  onNewUnreadItem: function(callback) {
+    on('newUnreadItem', callback);
+  },
+
+
+  unreadItemsRemoved: function(userId, troupeId, items) {
+    emit('unreadItemRemoved', {
+      userId: userId,
+      troupeId: troupeId, 
+      items: items
+    });
+  },
+
+  onUnreadItemsRemoved: function(callback) {
+    on('unreadItemRemoved', callback);
+  },
+
   troupeUnreadCountsChange: function(data) {
     console.dir(data);
     emit('troupeUnreadCountsChange', data);

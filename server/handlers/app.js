@@ -22,15 +22,16 @@ module.exports = {
           if(!troupe) return next("Troupe: " + appUri + " not found.");
 
           if(req.user) {
-            unreadItemService.getUserUnreadCounts(req.user.id, troupe.id, function(err, unreadItemCounts) {
+            unreadItemService.getUnreadItemsForUser(req.user.id, troupe.id, function(err, unreadItems) {
               if(err) return next(err);
-              renderPage(unreadItemCounts);
+              renderPage(unreadItems);
             });
+
           } else {
             renderPage(null);
           }
 
-          function renderPage(unreadItemCounts) {
+          function renderPage(unreadItems) {
             var profileNotCompleted;
 
             var troupeData = {
@@ -55,7 +56,7 @@ module.exports = {
                 user: req.user ? req.user.narrow() : null,
                 troupe: troupeData,
                 profileNotCompleted: profileNotCompleted,
-                unreadItemCounts: unreadItemCounts,
+                unreadItems: unreadItems,
                 accessDenied: accessDenied,
                 websockets: {
                   nowjs: nconf.get('ws:nowjsUrl')

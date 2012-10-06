@@ -102,40 +102,12 @@ define([
         success: function() { self.addAllTroupes(); }
       });
 
-      /*
-      this.notificationCollection.fetch({
-        success: function() { self.addAllNotifications(); }
-      });
-      */
-
-      /*
-      $(document).on('chat', function(event, data) {
-        self.nav['chat'].incrementNotificationValue();
-      });
-
-      $(document).on('file', function(event, data) {
-        self.nav['files'].incrementNotificationValue();
-      });
-
-      $(document).on('mail', function(event, data) {
-        console.log(arguments);
-        self.nav['mail'].incrementNotificationValue();
-      });
-      */
-
       $(document).on('itemUnreadCountChanged', function(event, data) {
-        console.log("itemUnreadCountChanged", arguments);
-
         var itemType = data.itemType;
-        var v = self.nav[itemType];
+        var v = self.nav[itemType == 'request' ? 'people' : itemType];
         if(v) {
-          v.updateNotificationValue(data.count);
-          return;
-        }
-
-        // People Tab
-        if(itemType === 'request') {
-          self.nav['people'].updateNotificationValue(data.count);
+          var value = unreadItemsClient.getValue(itemType);
+          v.updateNotificationValue(value);
         }
       });
 
