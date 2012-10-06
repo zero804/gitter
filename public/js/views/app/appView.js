@@ -24,7 +24,8 @@ define([
         "click .troupe-selector"  : "toggleSelector",
         "click .add-troupe" : "addTroupeClicked",
         "click .menu-add-troupe" : "addTroupeClicked",
-        "click .menu-add-person" : "showShareView"
+        "click .menu-add-person" : "showShareView",
+        "click #install-chrome-extension" : "installChromeExtensionClicked"
          //"click #trpPersonIcon" : "toggleUserMenu"
     },
 
@@ -159,6 +160,25 @@ define([
       });
     },
 
+    installChromeExtensionClicked: function() {
+      console.log("Install Chrome extension clicked");
+      require(['views/modals/installChromeExtensionModalView'], function(InstallChromeExtensionsModalView) {
+        var view = new InstallChromeExtensionsModalView({ });
+        var modal = new TroupeViews.Modal({ view: view });
+
+        view.on('install.complete', function(data) {
+          modal.off('install.complete');
+          modal.hide();
+        });
+
+        view.on('install.cancel', function(data) {
+          modal.off('install.cancel');
+          modal.hide();
+        });
+
+        modal.show();
+      });
+    },
 
     toggleSelector: function(){
       console.log("Selector clicked");
@@ -173,7 +193,6 @@ define([
     },
 
     profileMenuClicked: function() {
-      console.log(JSON.stringify(window.troupeContext));
       require(['views/profile/profileModalView'], function(ProfileModalView) {
         var view = new ProfileModalView({ existingUser: true });
         var modal = new TroupeViews.Modal({ view: view });
