@@ -1,24 +1,24 @@
-window.setTimeout(function() {
-  console.log("Connecting to NOW");
-  var now = nowInitialize('http://localhost:5000/');
+(function() {
+  function scriptLoaded() {
+    var socket = io.connect('http://localhost:5000');
+    socket.on('message', function (data) {
+      console.log(data);
+      socket.emit('my other event', { my: 'data' });
+    });
 
-  now.onTroupeUnreadCountsChange = function() {
-    console.log(this, arguments);
-  };
+    socket.on('connect', function () { // TIP: you can avoid listening on `connect` and listen on events directly too!
+      socket.send('hello');
+    });
+  }
 
-  now.onTroupeChatMessage = function() {
-    console.log(this, arguments);
-  };
+  var fileref = document.createElement('script');
+  fileref.setAttribute('type', 'text/javascript');
+  fileref.setAttribute('src', 'https://localhost/socket.io/socket.io.js');
+  fileref.onload = scriptLoaded;
+  document.body.appendChild(fileref);
+})();
 
-  now.onUserLoggedIntoTroupe = function() {
-    console.log(this, arguments);
-  };
 
-  now.ready(function() {
-    window.alert("Connected!");
-  });
-
-}, 1000);
 
 /*
 

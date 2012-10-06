@@ -70,7 +70,10 @@ module.exports = {
       everyone = nowjs.initialize(app, {
          "host" : nconf.get("ws:hostname"),
          "port" : nconf.get("ws:externalPort"),
-         "autoHost": false
+         "autoHost": false,
+         "socketio" : {
+           "log level": 3
+         }
       });
 
       nowjs.on('connect', function() {

@@ -7,19 +7,22 @@
     "default_icon": "icon.png",
     "default_popup": "popup.html"
   },
+  "content_security_policy": "script-src 'self' https://localhost/; object-src 'self'",
+
   "content_scripts": [
     {
-      "matches": ["https://beta.trou.pe/*", "http://localhost:5000/*"],
+      "matches": ["https://beta.trou.pe/*", "http://localhost:5000/*", "https://localhost/"],
       "js": ["troupe-content-script.js"]
     }
   ],
-  "background": {
-    "scripts": ["socket.io.js", "now-0.8.1.js", "background.js"]
+  "background": { 
+    "scripts": ["now.js", "background.js"]
   },
   "permissions": [
     "storage",
     "notifications",
     "https://beta.trou.pe/",
-    "http://localhost/"
+    "http://localhost/",
+    "https://localhost/"
   ]
 }

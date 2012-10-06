@@ -1,4 +1,3 @@
-
 (function () {
   var nowObjects = {};
   var noConflict = function (uri, options) {
@@ -543,10 +542,10 @@
     var dependenciesLoaded = 0;
 
     var scriptLoaded = function () {
-      //dependenciesLoaded++;
-      //if (dependenciesLoaded !== dependencies.length) {
-      //  return;
-      //}
+      dependenciesLoaded++;
+      if (dependenciesLoaded !== dependencies.length) {
+        return;
+      }
       socket = io.connect(uri + '/', now.core.options.socketio || {});
       now.core.socketio = socket;
       socket.on('connect', function () {
@@ -585,7 +584,6 @@
       });
     };
 
-    /*
     for (var i = 0, ii = dependencies.length; i < ii; i++) {
       if (window[dependencies[i]['key']]) {
         scriptLoaded();
@@ -604,9 +602,6 @@
       }
       document.getElementsByTagName('head')[0].appendChild(fileref);
     }
-    */
-    scriptLoaded();
-
     return (nowObjects[uri] = now);
   };
   window.nowInitialize = noConflict;
