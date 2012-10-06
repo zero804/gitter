@@ -9,7 +9,7 @@ module.exports = {
       var userId = req.user.id;
       var troupe = req.troupe.id;
 
-      unreadItemService.getUserUnreadCounts(userId, req.troupe.id, function(err, data) {
+      unreadItemService.getUnreadItemsForUser(userId, req.troupe.id, function(err, data) {
         if(err) return next(err);
 
         res.send(data);

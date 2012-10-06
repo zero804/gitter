@@ -24,6 +24,8 @@ define([
       now.onUserLoggedIntoTroupe = createTrigger('userLoggedIntoTroupe');
       now.onUserLoggedOutOfTroupe = createTrigger('userLoggedOutOfTroupe');
       now.onTroupeUnreadCountsChange = createTrigger('troupeUnreadCountsChange');
+      now.onNewUnreadItems = createTrigger('newUnreadItems');
+      now.onUnreadItemsRemoved = createTrigger('unreadItemsRemoved');
 
       now.onFileEvent = createTrigger('file');
       now.onNotification = createTrigger('notification');

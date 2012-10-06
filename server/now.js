@@ -166,9 +166,27 @@ module.exports = {
         var troupeId = data.troupeId;
         var userId = data.userId;
         var counts = data.counts;
-        console.dir([">>>>>>>>>>", counts]);
+
         var group = nowjs.getGroup("user." + userId);
         group.now.onTroupeUnreadCountsChange(data);
+      });
+
+      appEvents.onNewUnreadItem(function(data) {
+        var troupeId = data.troupeId;
+        var userId = data.userId;
+        var items = data.items;
+
+        var group = nowjs.getGroup("user." + userId);
+        group.now.onNewUnreadItems(items);
+      });
+
+      appEvents.onUnreadItemsRemoved(function(data) {
+        var troupeId = data.troupeId;
+        var userId = data.userId;
+        var items = data.items;
+
+        var group = nowjs.getGroup("user." + userId);
+        group.now.onUnreadItemsRemoved(items);
       });
 
       appEvents.onUserLoggedIntoTroupe(function(data) {
