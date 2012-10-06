@@ -28,6 +28,7 @@ define([
       console.log("Now install");
       chrome.webstore.install(undefined, function() {
         that.$el.find('#installer-frame').attr('src', '/install-chrome-extension');
+        that.trigger('install.complete');
       }, function() { alert("Failed!");});
     },
 
