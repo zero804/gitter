@@ -327,6 +327,44 @@ function UnreadItemStategy(options) {
   };
 }
 
+function AllUnreadItemCountStategy(options) {
+  var self = this;
+  var userId = options.userId;
+
+  this.preload = function(troupeIds, callback) {
+    var promises = troupeIds.map(function(i) {
+      var deferred = Q.defer();
+      unreadItemService.getUserUnreadCounts(userId, i, deferred.node());
+      return deferred.promise;
+    });
+
+    Q.all(promises)
+        .then(function(results) {
+          self.unreadCounts = {};
+          results.forEach(function(counts, index) {
+            var troupeId = troupeIds[index];
+            var total = 0;
+            _.keys(counts).forEach(function(key) {
+              total = total + counts[key];
+            });
+
+            self.unreadCounts[troupeId] = total;
+          });
+          console.dir(arguments);
+          callback();
+        })
+        .fail(function(err) {
+          callback(err);
+        });
+
+  };
+
+  this.map = function(id) {
+    return self.unreadCounts[id] ? self.unreadCounts[id] : 0;
+  };
+}
+
+
 function ChatStrategy(options)  {
   if(!options) options = {};
 
@@ -413,13 +451,33 @@ function NotificationStrategy() {
 function InviteStrategy(options) {
   if(!options) options = {};
 
-  var unreadItemStategy = new UnreadItemStategy({ itemType: 'invite' });
+  this.preload = function(items, callback) {
+    callback(null);
+  };
+
+  this.map = function(item) {
+    return {
+      id: item._id,
+      displayName: item.displayName,
+      email: item.email,
+      avatarUrl: '/images/2/avatar-default.png' // TODO: fix
+    };
+  };
+}
+
+
+function TroupeStrategy(options) {
+  if(!options) options = {};
+
+  var unreadItemStategy = new AllUnreadItemCountStategy({ userId: options.currentUserId });
 
   this.preload = function(items, callback) {
+    var troupeIds = items.map(function(i) { return i.id; });
+
     if(options.currentUserId) {
       execPreloads([{
         strategy: unreadItemStategy,
-        data: { userId: options.currentUserId, troupeId: options.troupeId }
+        data: troupeIds
       }], callback);
     } else {
       callback(null);
@@ -429,14 +487,14 @@ function InviteStrategy(options) {
 
   this.map = function(item) {
     return {
-      id: item._id,
-      displayName: item.displayName,
-      email: item.email,
-      avatarUrl: '/images/2/avatar-default.png', // TODO: fix
-      unread: options.currentUserId ? unreadItemStategy.map(item._id) : true
+      id: item.id,
+      name: item.name,
+      uri: item.uri,
+      unreadItems: options.currentUserId ? unreadItemStategy.map(item.id) : 0
     };
   };
 }
+
 
 function RequestStrategy(options) {
   if(!options) options = {};
@@ -511,6 +569,8 @@ function getStrategy(modelName, toCollection) {
       return InviteStrategy;
     case 'request':
       return RequestStrategy;
+    case 'troupe':
+      return TroupeStrategy;
   }
 }
 
@@ -523,6 +583,7 @@ module.exports = {
   ChatStrategy: ChatStrategy,
   InviteStrategy: InviteStrategy,
   RequestStrategy: RequestStrategy,
+  TroupeStrategy: TroupeStrategy,
 
   getStrategy: getStrategy,
   serialize: serialize
