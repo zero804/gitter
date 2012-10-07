@@ -4,21 +4,29 @@
 
 var troupeService = require("../services/troupe-service"),
   userService = require("../services/user-service"),
-  collections = require("../utils/collections");
+  collections = require("../utils/collections"),
+  restSerializer = require("../serializers/rest-serializer");
+
 
 var predicates = collections.predicates;
 
 
 module.exports = {
-  index: function(req, res) {
+  index: function(req, res, next) {
     if(!req.user) {
       return res.send(403);
     }
 
     troupeService.findAllTroupesForUser(req.user.id, function(err, troupes) {
-      if (err) return res.send(500);
+      if (err) return next(err);
 
-      res.send(troupes.narrow());
+      var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id });
+
+      restSerializer.serialize(troupes, strategy, function(err, serialized) {
+        if(err) return next(err);
+
+        res.send(serialized);
+      });
     });
   },
 
