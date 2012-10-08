@@ -9,7 +9,7 @@ Zepto(function($){
   var allUnreadItems = 0;
 
   chrome.browserAction.setBadgeBackgroundColor({
-            color: "#494259"
+            color: "#1dce73"
           });
 
   $.getJSON(baseUrl + 'troupes/', function(data){
