@@ -6,6 +6,12 @@ Zepto(function($){
 
   var template = $('#template').html();
 
+  var allUnreadItems = 0;
+
+  chrome.browserAction.setBadgeBackgroundColor({
+            color: "#494259"
+          });
+
   $.getJSON(baseUrl + 'troupes/', function(data){
     $(document.body).empty();
     $.each(data, function(index, item) {
@@ -15,6 +21,9 @@ Zepto(function($){
 
       if(item.unreadItems) {
         el.find('.trpBadge').text(item.unreadItems);
+        console.log(item.unreadItems);
+        allUnreadItems = allUnreadItems + item.unreadItems;
+        chrome.browserAction.setBadgeText({text:allUnreadItems.toString()});
       } else {
         el.find('.trpTroupeBadgeContainer').hide();
       }
