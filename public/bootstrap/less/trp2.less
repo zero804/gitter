@@ -17,7 +17,8 @@
 @trpVeryLightGrey: #fbfbfb;
 @trpLightGrey: #d6d6d6; // darker off-white for borders and ting
 @trpDarkGreen: #149a55; // darker col1
-@trpDarkGrey: #636363; // dark grey
+/*@trpDarkGrey: #636363; // dark grey*/
+@trpDarkGrey: #333;
 @trpDarkerGrey: #666666; // dark grey
 @trpCream: #f9f9f6; //light cream
 
@@ -80,12 +81,12 @@ font-family: 'StagWeb-Light';
 
 .trpH1 {
   font-family: @fontSerif;
-  font-size: 20px;
+  font-size: 24px;
 }
 
 .trpH2 {
   font-family: @fontSerif;
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .trpH3 {
@@ -98,15 +99,19 @@ font-family: 'StagWeb-Light';
   font-size: 14px; 
 }
 
-
 .trpBodyText {
   font-family: @fontSans;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .trpBodyEm {
   font-family: @fontSans;
   font-size: 16px;
+}
+
+.trpBodyMedium {
+  font-family: @fontSans;
+  font-size: 14px; 
 }
 
 .trpBodySmall {
@@ -383,7 +388,7 @@ h1 {
 }
 
 .trpHeaderContainer {
-  height: 64px;
+  height: 70px;
   background-color: @trpGreen;
 }
 
@@ -519,7 +524,7 @@ h1 {
   text-decoration: none;
   border-top: thin solid white;
   background-color: @trpGreen;
-  .trpH2;
+  .trpH1;
   cursor: pointer;
 }
 
@@ -536,6 +541,9 @@ h1 {
   .trpTroupeSelectorItem;
   background-color: white;
   color: @trpGreen;
+  padding: 20px 60px 20px 20px;
+  border-top: thin solid white;
+  .trpH1;
 }
 
 .trpTroupeSelectorAdd a {
@@ -689,8 +697,8 @@ h1 {
 /*Common View elements*/
 
 .trpSectionViewHeader {
-  padding-bottom: 16px;
-  padding-top: 15px;
+  padding-bottom: 28px;
+  padding-top: 20px;
   padding-right: 20px;
   height: 30px;
   border-bottom: 1px solid @trpOffWhite;
@@ -777,7 +785,7 @@ h1 {
   float: left;
   padding-left: 20px;
   padding-top: 4px;
-  .trpBodySmall;
+  .trpBodyText;
 }
 
 /*Chat elements*/
@@ -826,8 +834,8 @@ textarea, input { outline: none; }
 
 .trpChatBubble {
   position:relative;
-  padding:12px;
-  margin-bottom: 12px;
+  padding:18px 20px 18px 20px;
+  margin-bottom: 24px;
   border:1px solid @trpLightGrey;
   color:#333;
 /*  background:#fff;*/
@@ -836,7 +844,7 @@ textarea, input { outline: none; }
   -webkit-border-radius:3px;
   -moz-border-radius:3px;
   border-radius:3px;
-  .trpBodyText;
+  .trpBodyEm;
   color: @trpDarkGrey;
   max-width: 500px;
   word-wrap: break-word;
@@ -943,10 +951,10 @@ textarea, input { outline: none; }
 
 .trpFileViewItem {
   float: left;
-  padding-top: 10px;
-  padding-bottom: 20px;
-  padding-left: 20px;
-  padding-right: 20px;
+  padding-top: 20px;
+  padding-bottom: 30px;
+  padding-left: 30px;
+  padding-right: 30px;
 }
 
 .unread .trpFileViewItem {
@@ -969,11 +977,11 @@ textarea, input { outline: none; }
 }
 
 .trpFilename {
-  margin-top: 5px;
+  margin-top: 12px;
   float: left;
   height: 20px;
   color: @trpDarkGrey;
-  .trpBodySmall;
+  .trpBodyMedium;
   width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -981,7 +989,7 @@ textarea, input { outline: none; }
 }
 
 .trpFileActionMenuButton {
-  margin-top: 5px;
+  margin-top: 12px;
   padding: 5px 10px 5px 10px;
   float: right;
   border-left: 1px solid @trpLightGrey;
@@ -1044,7 +1052,7 @@ textarea, input { outline: none; }
   width:620px; 
   height:100%;
   width: 100%;
-  .trpH4;
+  .trpBodyText;
   padding-left: 20px;
   padding-top: 10px;
 }
@@ -1173,7 +1181,7 @@ textarea, input { outline: none; }
 
 .trpMailFromSubject {
   .trpH2;
-  height: 23px;
+  height: 30px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1580,7 +1588,7 @@ textarea, input { outline: none; }
 }
 
 .nav-tabs {
-  height: 46px;
+  height: 58px;
   border-bottom: 1px solid @trpOffWhite;
 }
 
@@ -1603,7 +1611,7 @@ textarea, input { outline: none; }
 }
 
 .nav-tabs > li {
-  height: 21px;
+  height: 34px;
 }
 
 .nav-tabs > li > a {
