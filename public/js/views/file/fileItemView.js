@@ -7,8 +7,10 @@ define([
   'views/rivets-backbone',
   'hbs!./fileItemView',
   './filePreviewView',
-  './fileVersionsView'
+  './fileVersionsView',
 ], function($, _, Backbone, TroupeViews, rivet, template, FilePreviewView, FileVersionsView){
+  "use strict";
+
   return TroupeViews.Base.extend({
     template: template,
     unreadItemType: 'file',
@@ -20,17 +22,29 @@ define([
     },
 
     initialize: function(options) {
-      _.bindAll(this, 'onPreviewLinkClick', 'showFileActionMenu', 'hideFileActionMenu', 'onDeleteLinkClick', 'onVersionsLinkClick');
+      var self = this;
+      _.bindAll(this, 'rerender', 'onPreviewLinkClick', 'showFileActionMenu', 'hideFileActionMenu', 'onDeleteLinkClick', 'onVersionsLinkClick');
       this.parentCollection = options.parentCollection;
+
+      this.model.on('change:versions', this.rerender);
+
+      this.addCleanup(function() {
+        self.model.off('change:versions');
+      });
     },
 
     getRenderData: function() {
       var data = this.model.toJSON();
       data.fileIcon = this.fileIcon(this.model.get('fileName'));
+
+      var versions = this.model.get('versions');
+      data.useSpinner = versions.at(versions.length - 1).get('thumbnailStatus') === 'GENERATING';
       return data;
     },
 
-    afterRender: function() {
+    rerender: function() {
+      var el = this.render().el;
+      //this.$el.replaceWith();
     },
 
     beforeClose: function() {

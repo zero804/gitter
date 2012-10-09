@@ -1,5 +1,11 @@
 <div class="trpFileViewItem">
-	<div><a href="#" class="link-preview"><img src="{{fileIcon}}" width="180" class="trpFileThumbnail"></a></div>
+	<div><a href="#" class="link-preview">
+	{{#if useSpinner}}
+		<img src="/images/ajax-loader.gif" width="180" class="trpFileThumbnail">
+	{{else}}
+		<img src="{{fileIcon}}" width="180" class="trpFileThumbnail">
+	{{/if}}
+	</a></div>
 	<div class="trpFileDetails">
 		<div class="trpFilename" title="{{fileName}}">{{fileName}}</div>
 		<div><img src="images/2/icon-file-action.png" class="trpFileActionMenuButton">

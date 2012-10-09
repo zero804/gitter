@@ -23,13 +23,6 @@ define([
         this.convertArrayToCollection('versions', exports.FileVersionCollection);
       }
 
-      /*
-      parse: function(response) {
-        response.versions;
-        return response;
-      }
-      */
-
     });
 
   exports.FileCollection = TroupeCollections.LiveCollection.extend({

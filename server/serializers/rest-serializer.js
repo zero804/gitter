@@ -106,6 +106,7 @@ function FileStrategy(options) {
         versionNumber: versionIndex++,
         creatorUser: userStategy.map(item.creatorUserId),
         createdDate: item.createdDate,
+        thumbnailStatus: item.thumbnailStatus,
         source: item.source,
         deleted: item.deleted
       };
@@ -350,7 +351,6 @@ function AllUnreadItemCountStategy(options) {
 
             self.unreadCounts[troupeId] = total;
           });
-          console.dir(arguments);
           callback();
         })
         .fail(function(err) {
