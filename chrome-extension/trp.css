@@ -4,9 +4,16 @@ body {
 	background-color: #1dce73;
 }
 
+@font-face {
+font-family: 'StagWeb-Light';
+src: local('StagWeb-Light'), url(/StagWeb-Light.woff) format('woff');
+    font-style: normal;
+    font-stretch: normal;
+}
+
 .trpTroupeItem {
   display: inline-block;
-  min-width: 200px;
+  min-width: 280px;
   padding-top: 20px;
   padding-left: 20px;
   padding-bottom: 20px;
@@ -22,8 +29,10 @@ body {
 }
 
 .trpTroupeName {
-   color: white; 
-   display: inline-block;
+  color: white; 
+  display: inline-block;
+  font-family: 'StagWeb-Light', serif;
+  font-size: 18px;
 }
 
 .trpTroupeBadgeContainer {
