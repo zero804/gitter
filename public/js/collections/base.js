@@ -51,8 +51,12 @@
         for (attr in attrs) {
           val = attrs[attr];
 
+          // -- This is different from base backbone. If the attr is a collection
+          // -- reset the collection
           if(now[attr] instanceof Backbone.Collection) {
             now[attr].reset(val);
+            (options.silent ? this._silent : changes)[attr] = true;
+
             continue;
           }
 

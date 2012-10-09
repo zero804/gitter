@@ -81,7 +81,7 @@ var ChatMessageSchema = new Schema({
   sent: { type: Date, "default": Date.now }
 });
 
-/* TODO(AN): remove narrow. Deprecated */
+/* TODO(AN): remove narrow. Deprecated 
 ChatMessageSchema.methods.narrow = function (user, troupe) {
   return {
     id: this._id,
@@ -91,6 +91,7 @@ ChatMessageSchema.methods.narrow = function (user, troupe) {
     toTroupe: troupe ? troupe.narrow() : null
   };
 };
+*/
 
 var EmailAttachmentSchema = new Schema({
   fileId: ObjectId,
@@ -110,7 +111,7 @@ var EmailSchema = new Schema({
   attachments: [EmailAttachmentSchema]
 });
 
-/* TODO(AN): remove narrow. Deprecated */
+/* TODO(AN): remove narrow. Deprecated
 EmailSchema.methods.narrow = function () {
   return {
     id: this.id,
@@ -121,6 +122,7 @@ EmailSchema.methods.narrow = function () {
     preview: this.preview
   };
 };
+ */
 
 var ConversationSchema = new Schema({
   troupeId: ObjectId,
@@ -129,19 +131,20 @@ var ConversationSchema = new Schema({
   emails: [EmailSchema]
 });
 
-/* TODO(AN): remove narrow. Deprecated */
+/* TODO(AN): remove narrow. Deprecated 
 ConversationSchema.methods.narrow = function () {
   return {
     id: this.id,
     subject: this.subject
   };
 };
-
+*/
 
 var FileVersionSchema = new Schema({
   creatorUserId: ObjectId,
   createdDate: { type: Date, "default": Date.now },
   deleted: { type: Boolean, "default": false },
+  thumbnailStatus: { type: String, "enum": ['GENERATING', 'GENERATED', 'NO_THUMBNAIL'], "default": 'GENERATED'}, // In future, the default should be GENERATING
 
   /* In future, this might change, but for the moment, use a URI-type source */
   source: { type: String }

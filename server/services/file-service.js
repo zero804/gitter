@@ -29,14 +29,12 @@ function createThumbNailFileName(fileId, version) {
 /* public */
 function findById(id, callback) {
   persistence.File.findById(id , function(err, file) {
-    winston.debug("persistence.File.findById: *********************");
     callback(err, file);
   });
 }
 
 function deleteById(id, callback) {
   persistence.File.findById(id , function(err, file) {
-    winston.debug("Deleted File!");
     file.remove();
     callback(err);
   });
@@ -207,6 +205,7 @@ function storeFileVersionInGrid(options, callback) {
       version = new persistence.FileVersion();
       version.creatorUserId = creatorUserId; 
       version.createdDate = Date.now;
+      version.thumbnailStatus = 'GENERATING';
       version.source = null; //TODO: add source
 
       file.versions = [version];
@@ -247,6 +246,7 @@ function storeFileVersionInGrid(options, callback) {
       version = new persistence.FileVersion();
       version.creatorUserId = creatorUserId; 
       version.createdDate = Date.now;
+      version.thumbnailStatus = 'GENERATING';
       version.source = null; //TODO: add source 
       file.versions.push(version);
 

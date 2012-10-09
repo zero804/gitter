@@ -28,6 +28,7 @@ window.require_config = {
     fileUploader: 'libs/fileUploader/fileuploader',
     templates: '../templates',
     zeroClipboard: 'libs/zeroClipboard/ZeroClipboard',
+    spinjs: 'libs/spinjs/1.7.2/spin',
     ga: '//ssl.google-analytics.com/ga' // TODO: change this back to just 'ga'
   },
   shim: {
@@ -62,6 +63,9 @@ window.require_config = {
       deps: [],
       exports: 'rivets'
     },
+    'spinjs': {
+      exports: 'Spinner'
+    }
 
   },
   hbs : {

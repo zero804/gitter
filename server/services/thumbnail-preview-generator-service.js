@@ -83,25 +83,49 @@ function onCreateFileVersion(data) {
   var mimeType = data.mimeType;
   var version = data.version;
 
-  function thumbnailGenerationCallback(err, result) {
-    if(err) return winston.error("Thumbnail generation failed", err);
 
-      /* Save the preview to the gridfs */
-      gridfs.uploadFile({
-        fileName: "thumb:" + fileId + ":" + version,
-        localFileName: result.fileName,
-        mimeType: result.mimeType,
-        metadata: {
-          usage: "thumbnail",
-          fileId: fileId,
-          troupeId: troupeId,
-          version: version
-        }
-      }, function(err) {
-        if(err) return winston.error("Unexpected error uploading file to gridfs", err);
+  // Some Embedded function
+  function updateVersionThumbnailStatus(status) {
+    persistence.File.findById(fileId, function(err, file) {
+      if(err) return winston.error("Unable to update thumbnail status", err);
 
-        appEvents.fileEvent('createThumbnail', { troupeId: troupeId, fileId: fileId, version: version });
+      file.versions[version - 1].thumbnailStatus = status;
+      file.save(function(err) {
+        if(err) winston.error("Unable to save update to thumbnail status", err);
       });
+
+    });
+  }
+
+  function thumbnailGenerationCallback(err, result) {
+    if(err) {
+      winston.error("Thumbnail generation failed", err);
+      updateVersionThumbnailStatus('NO_THUMBNAIL');
+      return;
+    }
+
+    /* Save the preview to the gridfs */
+    gridfs.uploadFile({
+      fileName: "thumb:" + fileId + ":" + version,
+      localFileName: result.fileName,
+      mimeType: result.mimeType,
+      metadata: {
+        usage: "thumbnail",
+        fileId: fileId,
+        troupeId: troupeId,
+        version: version
+      }
+    }, function(err) {
+      if(err) {
+        winston.error("Unexpected error uploading file to gridfs", err);
+        updateVersionThumbnailStatus('NO_THUMBNAIL');
+        return ;
+      } 
+
+      updateVersionThumbnailStatus('GENERATED');
+
+      appEvents.fileEvent('createThumbnail', { troupeId: troupeId, fileId: fileId, version: version });
+    });
   }
 
   winston.debug("Generating thumbnails and previews for latest version file", data);
@@ -151,10 +175,12 @@ function onCreateFileVersion(data) {
   } else {
     if(!previewGenerationStrategy) {
       winston.warn(mimeType + " has no thumbnail generation strategy");
+      updateVersionThumbnailStatus('NO_THUMBNAIL');
     }
   }
 }
 
+/* Listen for file events and generate a thumbnail */
 function install() {
   appEvents.onFileEvent(function(data) {
     switch(data.event) {

@@ -72,7 +72,7 @@ module.exports = {
          "port" : nconf.get("ws:externalPort"),
          "autoHost": false,
          "socketio" : {
-           "log level": 3
+           "log level": 1
          }
       });
 
@@ -254,10 +254,16 @@ module.exports = {
           fileService.findById(fileId, function(err, file) {
             winston.info("Bridging file event to now.js clients");
 
-            group.now.onFileEvent({
-              event: event,
-              file: persistence.narrowFile(file)
+            restSerializer.serialize(file, new restSerializer.FileStrategy(), function(err, serializedFile) {
+              if(err || !serializedFile) return winston.error("Notification failure", err);
+
+              group.now.onFileEvent({
+                event: event,
+                file: serializedFile
+              });
+
             });
+
           });
 
         });

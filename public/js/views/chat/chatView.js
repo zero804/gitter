@@ -23,13 +23,7 @@ define([
       this.scrollEventBound = _.bind(this.chatWindowScroll, this);
 
       $(window).bind('scroll', this, this.scrollEventBound);
-
       this.collection = new chatModels.ChatCollection();
-      this.collection.comparator = TroupeViews.reverseComparatorFunction(
-                                    TroupeViews.sortByComparator(
-                                      function(model) { return model.get('sent'); }
-                                    )
-                                   );
       this.collection.listen();
 
       this.addCleanup(function() {
@@ -53,23 +47,13 @@ define([
       this.collectionView = new TroupeViews.Collection({
         itemView: ChatViewItem,
         collection: this.collection,
-        el: this.$el.find(".frame-chat")//,
-        //noItemsElement: this.$el.find("#frame-help"),
-        /*sortMethods: {
-          "mtime": function(file) {
-            var versions = file.get('versions');
-            if(!versions || !versions.length) return null;
-            var version = versions.at(versions.length - 1);
-            return version.get('createdDate');
-          },
-          "fileName": function(file) {
-            var fileName = file.get('fileName');
-            return fileName ? fileName.toLowerCase() : '';
-          },
-          "mimeType": function(file) {
-            return file.get("mimeType");
+        el: this.$el.find(".frame-chat"),
+        sortMethods: {
+          "sent": function(model) {
+            return model.get('sent');
           }
-        }*/
+        },
+        defaultSort: "-sent"
       });
     },
 
@@ -113,31 +97,10 @@ define([
           return;
         }
 
-        // TODO: speed this up
-        /*var chatFrame = self.$el.find(".frame-chat");
-
-        data.each(function(msg) {
-          var current = msg.get('fromUser').id == window.troupeContext.user.id;
-
-          chatFrame.append(new ChatViewItem({ message: msg.toJSON(), current: current}).render().el);
-        });
-        */
         self.chatMessageSkip += PAGE_SIZE;
       }
 
       this.collection.fetch({ add: true, data: { skip: this.chatMessageSkip, limit: this.chatMessageLimit }, success: success });
-
-      /*
-      $.ajax({
-        url: "/troupes/" + window.troupeContext.troupe.id + "/chatMessages",
-        contentType: "application/json",
-        data: { skip: this.chatMessageSkip, limit: this.chatMessageLimit },
-        dataType: "json",
-        type: "GET",
-        success: function(data) {
-        }
-      });
-      */
     }
 
   });
