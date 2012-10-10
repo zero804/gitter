@@ -106,6 +106,8 @@ function compareHashSums(gridFileName, temporaryFile, callback) {
 
 /* private */
 function checkIfFileExistsAndIdentical(file, version, temporaryFile, callback) {
+  winston.debug("checkIfFileExistsAndIdentical");
+
   var db = mongoose.connection.db;
   var GridStore = mongoose.mongo.GridStore;
   var gridFileName = createFileName(file.id, version);
@@ -120,6 +122,8 @@ function checkIfFileExistsAndIdentical(file, version, temporaryFile, callback) {
 }
 
 function locateAndStream(troupeId, fileName, version, gridFileNamingStrategy, callback) {
+  winston.debug("locateAndStream");
+
   findByFileName(troupeId, fileName, function(err, file) {
     if (err) return callback(err);
     if (!file) return callback(null, null);
@@ -184,6 +188,8 @@ function findByFileName(troupeId, fileName, callback) {
  */
 /* public */
 function storeFileVersionInGrid(options, callback) {
+  winston.debug("storeFileVersionInGrid");
+
   var troupeId = options.troupeId;
   var creatorUserId = options.creatorUserId;
   var fileName = options.fileName;
@@ -270,6 +276,8 @@ function storeFileVersionInGrid(options, callback) {
 }
 
 function storeFile(options, callback) {
+  winston.debug("storeFile");
+
   var fileName = options.fileName;
   var mimeType = options.mimeType;
   var temporaryFile = options.file;
