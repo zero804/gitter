@@ -1,7 +1,29 @@
 <div class="trpFileViewItem">
 	<div><a href="#" class="link-preview">
 	{{#if useSpinner}}
-		<img src="/images/ajax-loader.gif" width="180" class="trpFileThumbnail">
+<!-- 		<img src="/images/ajax-loader.gif" width="180" class="trpFileThumbnail"> -->
+		<div class="trpFileThumbnail">
+      <div class="spinnerContainer">
+  			<div class="floatingCirclesG">
+  				<div class="f_circleG" id="frotateG_01">
+  				</div>
+  				<div class="f_circleG" id="frotateG_02">
+  				</div>
+  				<div class="f_circleG" id="frotateG_03">
+  				</div>
+  				<div class="f_circleG" id="frotateG_04">
+  				</div>
+  				<div class="f_circleG" id="frotateG_05">
+  				</div>
+  				<div class="f_circleG" id="frotateG_06">
+  				</div>
+  				<div class="f_circleG" id="frotateG_07">
+  				</div>
+  				<div class="f_circleG" id="frotateG_08">
+  				</div>
+  			</div>
+      </div>
+		</div>
 	{{else}}
 		<img src="{{fileIcon}}" width="180" class="trpFileThumbnail">
 	{{/if}}
