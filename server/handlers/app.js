@@ -66,7 +66,7 @@ module.exports = {
 
             var page;
             if(req.headers['user-agent'].indexOf('Mobile') >= 0) {
-              page = 'm/mobile';
+              page = 'app';
             } else {
               page = 'app';
             }
