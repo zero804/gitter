@@ -26,7 +26,8 @@ define([
 
     getRenderData: function () {
       var d = this.model.toJSON();
-      d.fileIcon = '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + d.fileName;
+      var latestVersion = this.model.get('versions').length - 1;
+      d.fileIcon = '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + d.fileName + "?version=" + latestVersion;
       return d;
     }
 

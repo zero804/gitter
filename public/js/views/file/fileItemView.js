@@ -35,7 +35,8 @@ define([
 
     getRenderData: function() {
       var data = this.model.toJSON();
-      data.fileIcon = this.fileIcon(this.model.get('fileName'));
+      var latestVersion = this.model.get('versions').length;
+      data.fileIcon = this.fileIcon(this.model.get('fileName'), latestVersion);
 
       var versions = this.model.get('versions');
       data.useSpinner = versions.at(versions.length - 1).get('thumbnailStatus') === 'GENERATING';
@@ -134,8 +135,8 @@ define([
       });
     },
 
-    fileIcon: function(fileName) {
-      return '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + fileName;
+    fileIcon: function(fileName,version) {
+      return '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + fileName + "?version=" + version;
     }
   });
 });
