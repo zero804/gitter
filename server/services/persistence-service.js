@@ -81,18 +81,6 @@ var ChatMessageSchema = new Schema({
   sent: { type: Date, "default": Date.now }
 });
 
-/* TODO(AN): remove narrow. Deprecated 
-ChatMessageSchema.methods.narrow = function (user, troupe) {
-  return {
-    id: this._id,
-    text: this.text,
-    sent: this.sent,
-    fromUser: user ? user.narrow() : null,
-    toTroupe: troupe ? troupe.narrow() : null
-  };
-};
-*/
-
 var EmailAttachmentSchema = new Schema({
   fileId: ObjectId,
   version: Number
@@ -111,18 +99,11 @@ var EmailSchema = new Schema({
   attachments: [EmailAttachmentSchema]
 });
 
-/* TODO(AN): remove narrow. Deprecated
-EmailSchema.methods.narrow = function () {
-  return {
-    id: this.id,
-    from: this.from,
-    fromName: this.fromName,
-    subject: this.subject,
-    date: this.date,
-    preview: this.preview
-  };
-};
- */
+/*
+EmailSchema.pre('save', function (next) {
+  next();
+});
+*/
 
 var ConversationSchema = new Schema({
   troupeId: ObjectId,
@@ -130,15 +111,6 @@ var ConversationSchema = new Schema({
   subject: { type: String },
   emails: [EmailSchema]
 });
-
-/* TODO(AN): remove narrow. Deprecated 
-ConversationSchema.methods.narrow = function () {
-  return {
-    id: this.id,
-    subject: this.subject
-  };
-};
-*/
 
 var FileVersionSchema = new Schema({
   creatorUserId: ObjectId,
