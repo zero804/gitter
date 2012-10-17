@@ -42,7 +42,7 @@ var userService = {
   },
 
   findByEmail: function(email, callback) {
-    persistence.User.findOne({email: email}, function(err, user) {
+    persistence.User.findOne({email: email.toLowerCase()}, function(err, user) {
       callback(err, user);
     });
   },
