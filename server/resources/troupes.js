@@ -38,24 +38,14 @@ module.exports = {
     res.send('create troupe');
   },
 
-  show: function(req, res) {
-    var t = req.troupe;
+  show: function(req, res, next) {
+    var strategy = new restSerializer.TroupeStrategy({ mapUsers: true });
 
-    userService.findByIds(t.users, function(err, users) {
-      if (err) return res.send(500);
+    restSerializer.serialize(req.troupe, strategy, function(err, serialized) {
+      if(err) return next(err);
 
-      var usersIndexed = collections.indexById(users);
-
-      res.send({
-        id: t._id,
-        name: t.name,
-        uri: t.uri,
-        users: t.users.map(function(userId) {
-          return usersIndexed[userId];
-        }).filter(predicates.notNull).narrow()
-      });
+      res.send(serialized);
     });
-
   },
 
   edit: function(req, res) {
