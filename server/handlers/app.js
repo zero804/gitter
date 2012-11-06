@@ -6,6 +6,7 @@ var troupeService = require("../services/troupe-service");
 var winston = require("../utils/winston");
 var userService = require("../services/user-service");
 var unreadItemService = require("../services/unread-item-service");
+var restSerializer = require("../serializers/rest-serializer");
 var nconf = require('../utils/config').configure();
 var Q = require("q");
 
@@ -24,14 +25,27 @@ module.exports = {
           if(req.user) {
             unreadItemService.getUnreadItemsForUser(req.user.id, troupe.id, function(err, unreadItems) {
               if(err) return next(err);
-              renderPage(unreadItems);
+              serializeUserAndRenderPage(unreadItems);
             });
 
           } else {
-            renderPage(null);
+            serializeUserAndRenderPage(null);
           }
 
-          function renderPage(unreadItems) {
+          function serializeUserAndRenderPage(unreadItems) {
+            if(!req.user) return renderPage(unreadItems, null);
+
+            var strategy = new restSerializer.UserStrategy();
+
+            restSerializer.serialize(req.user, strategy, function(err, serialized) {
+              if(err) return next(err);
+
+              renderPage(unreadItems, serialized);
+            });
+
+          }
+
+          function renderPage(unreadItems, serializedUser) {
             var profileNotCompleted;
 
             var troupeData = {
@@ -53,7 +67,7 @@ module.exports = {
             }
 
             var troupeContext = {
-                user: req.user ? req.user.narrow() : null,
+                user: serializedUser,
                 troupe: troupeData,
                 profileNotCompleted: profileNotCompleted,
                 unreadItems: unreadItems,
@@ -75,10 +89,11 @@ module.exports = {
             if(req.user && !profileNotCompleted && troupeData) {
               login  = false;
               troupeName = troupe.name;
-              winston.info("*********** User: " + req.user.id + " visited Troupe successfully: " + troupe.id);
+
               userService.saveLastVisitedTroupeforUser(req.user.id, troupe.id, function(err) {
                 if (err) winston.info("Something went wrong saving the user last troupe visited: " + err);
               });
+
             } else {
               login = true;
               if(profileNotCompleted) {

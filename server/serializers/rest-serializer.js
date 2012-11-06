@@ -39,22 +39,12 @@ function execPreloads(preloads, callback) {
       });
 }
 
-function UserIdStrategy() {
-  var self = this;
-
-  this.preload = function(ids, callback) {
-    userService.findByIds(_.uniq(ids), function(err, users) {
-      if(err) {
-        winston.error("Error loading users", err);
-        return callback(err);
-      }
-      self.users = collections.indexById(users);
-      callback(null, true);
-    });
+function UserStrategy() {
+  this.preload = function(users, callback) {
+    callback(null, true);
   };
 
-  this.map = function(id) {
-    var user = self.users[id];
+  this.map = function(user) {
     if(!user) return null;
 
     function getAvatarUrl() {
@@ -71,6 +61,28 @@ function UserIdStrategy() {
       email: user.email,
       avatarUrl: getAvatarUrl()
     };
+  };
+}
+
+function UserIdStrategy() {
+  var self = this;
+
+  var userStategy = new UserStrategy();
+
+  this.preload = function(ids, callback) {
+    userService.findByIds(_.uniq(ids), function(err, users) {
+      if(err) {
+        winston.error("Error loading users", err);
+        return callback(err);
+      }
+      self.users = collections.indexById(users);
+      callback(null, true);
+    });
+  };
+
+  this.map = function(id) {
+    var user = self.users[id];
+    return userStategy.map(user);
   };
 }
 
@@ -593,10 +605,13 @@ function getStrategy(modelName, toCollection) {
       return RequestStrategy;
     case 'troupe':
       return TroupeStrategy;
+    case 'user':
+      return UserStrategy;
   }
 }
 
 module.exports = {
+  UserStrategy: UserStrategy,
   UserIdStrategy: UserIdStrategy,
   ConversationStrategy: ConversationStrategy,
   ConversationMinStrategy: ConversationMinStrategy,
