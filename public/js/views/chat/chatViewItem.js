@@ -36,7 +36,7 @@ define([
     getRenderData: function() {
       var data = this.model.toJSON();
 
-      // We need to parse the text a little to hyperlink known links and escape html to prevent injection 
+      // We need to parse the text a little to hyperlink known links and escape html to prevent injection
       data.text = _.escape(data.text);
       data.text = this.linkify(data.text);
 

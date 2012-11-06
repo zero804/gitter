@@ -3,7 +3,7 @@ define([
   'underscore',
   'backbone',
   './base',
-  'moment'
+  '../utils/momentWrapper'
 ], function($, _, Backbone, TroupeCollections, moment) {
   /*jslint browser: true*/
   "use strict";
@@ -14,8 +14,6 @@ define([
     idAttribute: "id",
     parse: function(response) {
       response.sent = moment.utc(response.sent);
-      console.log("RESPONSE", response);
-
       return response;
     }
   });

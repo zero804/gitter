@@ -3,7 +3,7 @@ define([
   'underscore',
   'backbone',
   './base',
-  'moment'
+  '../utils/momentWrapper'
 ], function($, _, Backbone, TroupeCollections, moment) {
   "use strict";
 

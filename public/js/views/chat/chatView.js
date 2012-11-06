@@ -8,7 +8,7 @@ define([
   'components/chat/chat-component',
   './chatViewItem',
   'collections/chat',
-  'moment'
+  '../../utils/momentWrapper'
 ], function($, _, Backbone, TroupeViews, template, chat, ChatViewItem, chatModels, moment) {
   "use strict";
 

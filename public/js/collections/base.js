@@ -14,7 +14,7 @@
       convertArrayToCollection: function(attr, Collection) {
         var val = this.get(attr);
         if(_.isArray(val)) {
-          this.set(attr, new Collection(val));
+          this.set(attr, new Collection(val, { parse: true }));
         }
       },
 

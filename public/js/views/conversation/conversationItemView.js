@@ -22,16 +22,7 @@ define([
       var data = this.model.toJSON();
       data.detailUrl = "#mail/" + data.id;
 
-      data.updated = Date.parse(data.updated);
-      var d = new Date(data.updated);
-      data.updated = d.toUTCString();
-      var now = new Date();
-      if (now.getDate() === d.getDate() && now.getMonth() === d.getMonth() && now.getFullYear() === d.getFullYear()) {
-        data.updated = d.format('h:MM TT');
-      }
-      else {
-        data.updated = d.format('mmm d');
-      }
+      data.updated = data.updated ? data.updated.calendar() : null;
 
       return data;
     },
