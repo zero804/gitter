@@ -28,7 +28,7 @@ define([
       var optimisticModel = this.find(function(model) {
         return !model.id && model.get('text') === newModel.get('text');
       });
-      optimisticModel.set('text', optimisticModel.get('text') + " 111111");
+
       return optimisticModel;
     }
   });
