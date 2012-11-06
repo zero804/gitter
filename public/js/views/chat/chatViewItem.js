@@ -5,9 +5,7 @@ define([
   'backbone',
   'views/base',
   'hbs!./chatViewItem',
-  'components/chat/chat-component',
-  /* No result */
-  'jquery_timeago'
+  'components/chat/chat-component'
 ], function($, _, Backbone, TroupeViews, template, chat) {
   return TroupeViews.Base.extend({
     unreadItemType: 'chat',
@@ -59,7 +57,7 @@ define([
     },
 
     afterRender: function(data) {
-      this.$el.find('.trpChatBubble').tooltip({title: function() { return $.timeago(new Date(data.sent)); }});
+      this.$el.find('.trpChatBubble').tooltip({title: function() { return data.sent ? data.sent.from(new Date()) : null; }});
     }
   });
 
