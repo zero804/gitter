@@ -7,8 +7,9 @@ define([
   'hbs!./chat',
   'components/chat/chat-component',
   './chatViewItem',
-  'collections/chat'
-], function($, _, Backbone, TroupeViews, template, chat, ChatViewItem, chatModels) {
+  'collections/chat',
+  'moment'
+], function($, _, Backbone, TroupeViews, template, chat, ChatViewItem, chatModels, moment) {
   "use strict";
 
   var PAGE_SIZE = 50;
@@ -82,7 +83,11 @@ define([
       var chatBox = $(".trpChatBox");
       var val = chatBox.val().trim();
       if(val) {
-        chat.send(chatBox.val());
+        this.collection.create({
+          text: val,
+          fromUser: window.troupeContext.user,
+          sent: moment()
+        });
         chatBox.val('');
       }
       return false;

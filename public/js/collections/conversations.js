@@ -2,12 +2,12 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  './base'
-], function($, _, Backbone, TroupeCollections) {
+  './base',
+  'moment'
+], function($, _, Backbone, TroupeCollections, moment) {
   "use strict";
 
   var exports = {};
-
 
   exports.EmailModel = Backbone.Model.extend({
     idAttribute: "id",
@@ -16,6 +16,11 @@ define([
     },
 
     initialize: function() {
+      var date = this.get('date');
+      if(date && typeof date === 'string') {
+        date = moment.utc(date);
+        this.set('date', date);
+      }
     }
 
   });
@@ -42,7 +47,13 @@ define([
     },
 
     resetEmails: function() {
-      this.emailCollection.reset(this.get('emails'));
+      var emails = this.get('emails');
+      this.emailCollection.reset(emails);
+    },
+
+    parse: function(response) {
+      response.updated = moment.utc(response.updated);
+      return response;
     }
 
   });
@@ -54,6 +65,11 @@ define([
     },
 
     initialize: function() {
+    },
+
+    parse: function(response) {
+      response.updated = moment.utc(response.updated);
+      return response;
     }
 
   });

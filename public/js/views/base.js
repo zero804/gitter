@@ -79,6 +79,7 @@ define([
       var dom = this.renderInternal(data);
       if(this.model) {
         var id = this.model.get('id');
+        if(!id) id = this.model.cid;
         var e = this.$el;
 
         e.addClass('model-id-' + id);
@@ -548,7 +549,10 @@ define([
     onCollectionRemove: function(item) {
       console.log("onCollectionRemove", item);
 
-      this.$el.find('.model-id-' + item.get('id')).each(function(index, item) {
+      var id = item.get('id');
+      if(!id) id= item.cid;
+
+      this.$el.find('.model-id-' + id).each(function(index, item) {
         if(item._view) item._view.remove();
       });
       this.checkForNoItems();
