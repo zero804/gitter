@@ -2,8 +2,9 @@ define([
   'jquery',
   'underscore',
   'now',
-  'noty'
-], function($, _, nowInitialize){
+  'noty',
+  'collections/chat'
+], function($, _, nowInitialize, chatModels){
   /*global console: false */
   "use strict";
 
@@ -55,14 +56,6 @@ define([
             });
           }
         });
-      });
-
-    },
-
-    send: function(message) {
-      now.newChatMessageToTroupe({
-        troupeId: window.troupeContext.troupe.id,
-        text: message
       });
     }
   };

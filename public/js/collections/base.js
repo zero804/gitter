@@ -109,16 +109,28 @@
         var id = data.id;
         var newModel = data.model;
         var model = this.get(id);
-        if(operation === 'update' || operation === 'create') {
-          if(!model) {
-            this.add(newModel);
-          } else {
-            var parsed = model.parse(newModel);
-            model.set(parsed);
-          }
-        } else if(operation === 'remove') {
-          if(!model) return;
-          this.remove(model);
+        var parsed = new this.model(newModel, { parse: true });
+
+        switch(operation) {
+          case 'create':
+          case 'update':
+            if(!model) {
+              if(this.findModelForOptimisticMerge) {
+                model = this.findModelForOptimisticMerge(parsed);
+                if(model) {
+                  this.remove(model);
+                }
+              }
+              this.add(parsed);
+            } else {
+              model.set(parsed);
+            }
+            break;
+
+          case 'remove':
+            if(!model) return;
+            this.remove(model);
+            break;
         }
       }
     })

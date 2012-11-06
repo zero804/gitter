@@ -141,30 +141,6 @@ module.exports = {
         });
       };
 
-      everyone.now.newChatMessageToTroupe = function(options) {
-        winston.info("User sent new message to troupe: " + options.text);
-
-        loadSessionWithUser(this.user, sessionStore, function(err, user) {
-          if(err || !user) {
-            winston.info("Rejecting chat message to troupe: " + JSON.stringify(err) + "," + user);
-            return;
-          }
-
-          winston.info("User sent new message to troupe: " + options.text);
-
-          /*
-           * TODO: check security that this user can send messages to this troupe. This should probably
-           * happen in the message service
-           */
-          chatService.newChatMessageToTroupe(options.troupeId, user, options.text, function(err, chatMessage) {
-            if(err) {
-              winston.warn("Failed to persist new chat message: " + err);
-            }
-          });
-
-        });
-      };
-
       appEvents.onTroupeChat(function(data) {
         var troupeId = data.troupeId;
         var group = getGroup("troupe." + troupeId, function (group) {

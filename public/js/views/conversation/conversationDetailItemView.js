@@ -7,12 +7,11 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'dateFormat',
   'hbs!views/conversation/conversationDetailItemView',
   'hbs!views/conversation/conversationDetailItemViewBody',
-  'views/widgets/avatar'
-
-], function($, _, Backbone, TroupeViews, dateFormat, template, bodyTemplate, AvatarView) {
+  'views/widgets/avatar',
+  'moment'
+], function($, _, Backbone, TroupeViews, template, bodyTemplate, AvatarView, moment) {
   return TroupeViews.Base.extend({
     template: template,
 
@@ -35,8 +34,11 @@ define([
 
       if (data.attachments.length===0) { data.hasAttachments = false; } else { data.hasAttachments = true; }
 
-      // TODO Date.parse doesn't work in loads of browsers
-      data.date = Date.parse(data.date);
+      var now = moment();
+      var ago = moment(data.date).from(now);
+
+      data.date = ago;
+      /*
       var d = new Date(data.date);
       data.date = d.toUTCString();
       var now = new Date();
@@ -45,6 +47,7 @@ define([
       } else {
         data.date = d.format('mmm d');
       }
+      */
 
       data.initialIndex = this.initialIndex;
       return data;

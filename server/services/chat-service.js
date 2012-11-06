@@ -8,31 +8,26 @@ var persistence = require("./persistence-service"),
     appEvents = require("../app-events"); // TODO: decouple service from socket
 
 module.exports = {
-  newChatMessageToTroupe: function(troupeId, user, text, callback) {
-    troupeService.findById(troupeId, function(err, troupe) {
+  newChatMessageToTroupe: function(troupe, user, text, callback) {
+    if(!troupe) return callback("Invalid troupe");
+
+    if(!troupeService.userHasAccessToTroupe(user, troupe)) return callback("Access denied");
+
+    var chatMessage = new persistence.ChatMessage();
+    chatMessage.fromUserId = user.id;
+    chatMessage.toTroupeId = troupe.id;
+    chatMessage.text = text;
+    chatMessage.save(function (err) {
       if(err) return callback(err);
-      if(!troupe) return callback();
 
-      if(!troupeService.userHasAccessToTroupe(user, troupe)) return callback("Access denied");
-
-      var chatMessage = new persistence.ChatMessage();
-      chatMessage.fromUserId = user.id;
-      chatMessage.toTroupeId = troupe.id;
-      chatMessage.text = text;
-      chatMessage.save(function (err) {
+      var strategy = new restSerializer.ChatStrategy({ user: user, troupeId: troupe.id });
+      restSerializer.serialize(chatMessage, strategy, function(err, serialized) {
         if(err) return callback(err);
 
-        var strategy = new restSerializer.ChatStrategy({ user: user, troupeId: troupe.id });
-        restSerializer.serialize(chatMessage, strategy, function(err, serialized) {
-          if(err) return callback(err);
-
-          appEvents.troupeChat(troupe.id, serialized);
-        });
-
-        return callback(null, chatMessage);
+        appEvents.troupeChat(troupe.id, serialized);
       });
-      
-      
+
+      return callback(null, chatMessage);
     });
   },
   

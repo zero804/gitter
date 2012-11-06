@@ -4,9 +4,8 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'dateFormat',
   'hbs!views/conversation/conversationItemView'
-], function($, _, Backbone, TroupeViews, dateFormat, template) {
+], function($, _, Backbone, TroupeViews, template) {
   "use strict";
 
   var ConversationItemView = TroupeViews.Base.extend({
@@ -33,7 +32,7 @@ define([
       else {
         data.updated = d.format('mmm d');
       }
-      
+
       return data;
     },
 
