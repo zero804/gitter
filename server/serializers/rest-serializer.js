@@ -478,19 +478,32 @@ function TroupeStrategy(options) {
   if(!options) options = {};
 
   var unreadItemStategy = new AllUnreadItemCountStategy({ userId: options.currentUserId });
+  var userIdStategy = options.mapUsers ? new UserIdStrategy() : null;
 
   this.preload = function(items, callback) {
-    var troupeIds = items.map(function(i) { return i.id; });
+
+    var strategies = [];
 
     if(options.currentUserId) {
-      execPreloads([{
+      var troupeIds = items.map(function(i) { return i.id; });
+
+      strategies.push({
         strategy: unreadItemStategy,
         data: troupeIds
-      }], callback);
-    } else {
-      callback(null);
+      });
     }
 
+    if(options.mapUsers) {
+      var userIds = _.uniq(_.flatten(items.map(function(troupe) { return troupe.users; })));
+
+      strategies.push({
+        strategy: userIdStategy,
+        data: userIds
+      });
+
+    }
+
+    execPreloads(strategies, callback);
   };
 
   this.map = function(item) {
@@ -498,7 +511,8 @@ function TroupeStrategy(options) {
       id: item.id,
       name: item.name,
       uri: item.uri,
-      unreadItems: options.currentUserId ? unreadItemStategy.map(item.id) : 0
+      users: options.mapUsers ? item.users.map(function(userId) { return userIdStategy.map(userId); }) : undefined,
+      unreadItems: options.currentUserId ? unreadItemStategy.map(item.id) : undefined
     };
   };
 }
