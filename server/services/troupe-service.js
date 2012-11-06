@@ -7,7 +7,7 @@ var persistence = require("./persistence-service"),
     emailNotificationService = require("./email-notification-service"),
     mailerService = require("./mailer-service"),
     uuid = require('node-uuid'),
-    nconf = require("../utils/config").configure(),
+    nconf = require('../utils/config'),
     winston = require("winston");
 
 function findByUri(uri, callback) {

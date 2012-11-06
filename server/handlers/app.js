@@ -7,7 +7,7 @@ var winston = require("../utils/winston");
 var userService = require("../services/user-service");
 var unreadItemService = require("../services/unread-item-service");
 var restSerializer = require("../serializers/rest-serializer");
-var nconf = require('../utils/config').configure();
+var nconf = require('../utils/config');
 var Q = require("q");
 
 module.exports = {

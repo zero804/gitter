@@ -2,7 +2,7 @@
 /*global console:false, require: true, module: true */
 "use strict";
 
-var nconf = require('./config').configure();
+var nconf = require('../utils/config');
 var fs = require("fs");
 
 function passthrough(url) {

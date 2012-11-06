@@ -8,7 +8,7 @@ var form = require("express-form"),
     signupService = require("../services/signup-service"),
     troupeService = require("../services/troupe-service"),
     passport = require('passport'),
-    winston = require('winston');
+    winston = require('../utils/winston');
 
 module.exports = {
     install: function(app) {

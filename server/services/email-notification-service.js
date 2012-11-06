@@ -3,7 +3,7 @@
 "use strict";
 
 var mailerService = require("./mailer-service");
-var nconf = require("../utils/config").configure();
+var nconf = require('../utils/config');
 
 
 var emailDomain = nconf.get("email:domain");
