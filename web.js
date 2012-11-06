@@ -18,11 +18,6 @@ var express = require('express'),
   handlebars = require('handlebars'),
   expressHbs = require('express-hbs');
 
-/* TODO: put all our prototypes in a module */
-Array.prototype.narrow = function() {
-  return this.map(function(value) { return value.narrow(); });
-};
-
 var RedisStore = require('connect-redis')(express);
 
 var app = express();
@@ -178,8 +173,6 @@ require('./server/handlers/installChromeExtension').install(app);
 require('./server/services/thumbnail-preview-generator-service').install();
 require('./server/services/notification-generator-service').install();
 
-// TEMPORARY!
-require('./server/handlers/mobile').install(app);
 
 /* REST resources: not used yet */
 var troupesResource = app.resource('troupes',  require('./server/resources/troupes.js'));

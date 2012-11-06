@@ -9,11 +9,6 @@ var appEvents = require("../app-events");
 
 mongoose.connect('mongodb://localhost/troupe');
 
-/* TODO(AN): remove narrow. Deprecated */
-Array.prototype.narrow = function() {
-  return this.map(function(value) { return value.narrow(); });
-};
-
 var UserSchema = new Schema({
   displayName: { type: String }, 
   email: { type: String },
@@ -26,15 +21,6 @@ var UserSchema = new Schema({
   lastTroupe: ObjectId,
   userToken: String // TODO: move to OAuth
 });
-
-/* TODO(AN): remove narrow. Deprecated */
-UserSchema.methods.narrow = function() {
-  return {
-    id: this.id,
-    displayName: this.displayName,
-    avatarUrl: this.getAvatarUrl()
-  };
-};
 
 UserSchema.methods.getAvatarUrl = function() {
   if(this.avatarUrlSmall) {

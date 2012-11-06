@@ -9,8 +9,6 @@ var troupeService = require("../services/troupe-service"),
 
 module.exports = {
     index: function(req, res, next) {
-
-
       var strategy = new restSerializer.UserIdStrategy();
 
       restSerializer.serialize(req.troupe.users, strategy, function(err, serialized) {
