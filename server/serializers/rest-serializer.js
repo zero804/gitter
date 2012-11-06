@@ -22,6 +22,8 @@ function concatArraysOfArrays(a) {
 }
 
 function execPreloads(preloads, callback) {
+  if(!preloads) return callback();
+
   var promises = preloads.map(function(i) {
     var deferred = Q.defer();
     i.strategy.preload(i.data, deferred.node());
@@ -368,16 +370,21 @@ function AllUnreadItemCountStategy(options) {
 function ChatStrategy(options)  {
   if(!options) options = {};
 
-  var userStategy = new UserIdStrategy();
+  var userStategy = options.user ? null : new UserIdStrategy();
   var unreadItemStategy = new UnreadItemStategy({ itemType: 'chat' });
 
   this.preload = function(items, callback) {
     var users = items.map(function(i) { return i.fromUserId; });
 
-    var strategies = [{
-      strategy: userStategy,
-      data: _.uniq(users)
-    }];
+    var strategies = [];
+
+    // If the user is fixed in options, we don't need to look them up using a strategy...
+    if(userStategy) {
+      strategies.push({
+        strategy: userStategy,
+        data: _.uniq(users)
+      });
+    }
 
     if(options.currentUserId) {
       strategies.push({
@@ -385,6 +392,7 @@ function ChatStrategy(options)  {
         data: { userId: options.currentUserId, troupeId: options.troupeId }
       });
     }
+
     execPreloads(strategies, callback);
   };
 
@@ -393,7 +401,7 @@ function ChatStrategy(options)  {
       id: item._id,
       text: item.text,
       sent: item.sent,
-      fromUser: userStategy.map(item.fromUserId),
+      fromUser: options.user ? options.user : userStategy.map(item.fromUserId),
       unread: options.currentUserId ? unreadItemStategy.map(item._id) : true
     };
 
