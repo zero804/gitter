@@ -8,7 +8,7 @@ var persistence = require("./persistence-service"),
     userService = require("./user-service"),
     uuid = require('node-uuid'),
     sechash = require('sechash'),
-    nconf = require("../utils/config").configure();
+    nconf = require('../utils/config');
 
 
 function createUniqueUri() {

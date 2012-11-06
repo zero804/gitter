@@ -4,9 +4,9 @@
 
 var passport = require("passport"),
     winston = require("../utils/winston");
-var nconf = require('../utils/config').configure(),
+var nconf = require('../utils/config'),
     troupeService = require("../services/troupe-service"),
-    rememberMe = require('../utils/rememberme-middleware'),
+    rememberMe = require('../web/rememberme-middleware'),
     middleware = require('./middleware');
 var userService = require('../services/user-service');
 

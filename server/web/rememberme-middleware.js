@@ -4,7 +4,7 @@
 
 var uuid = require('node-uuid'),
     sechash = require('sechash'),
-    winston = require('./winston'),
+    winston = require('../utils/winston'),
     redis = require("redis");
 
 var redisClient = redis.createClient();

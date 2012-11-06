@@ -2,7 +2,7 @@
 /*global console:false, require: true, module: true, process: false */
 "use strict";
 
-var nconf = require('./config').configure();
+var nconf = require('./config');
 var winston = require("winston");
 
 var logger = new (winston.Logger)({

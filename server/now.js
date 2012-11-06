@@ -15,7 +15,7 @@ var passport = require('passport'),
     fileService = require("./services/file-service"),
     restSerializer = require("./serializers/rest-serializer"),
     appEvents = require("./app-events"),
-    nconf = require('./utils/config').configure(),
+    nconf = require('./utils/config'),
     Q = require("q"),
     everyone,
     redisClient;
