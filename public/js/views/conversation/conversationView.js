@@ -4,11 +4,10 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'dateFormat',
   'hbs!views/conversation/conversationView',
   'collections/conversations',
   'views/conversation/conversationItemView'
-], function($, _, Backbone, TroupeViews, dateFormat, template, conversationModels, ConversationItemView){
+], function($, _, Backbone, TroupeViews, template, conversationModels, ConversationItemView){
   "use strict";
 
   function makeSort(sortField) {

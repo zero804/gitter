@@ -10,7 +10,7 @@ define([
   'hbs!views/conversation/conversationDetailItemView',
   'hbs!views/conversation/conversationDetailItemViewBody',
   'views/widgets/avatar',
-  'moment'
+  '../../utils/momentWrapper'
 ], function($, _, Backbone, TroupeViews, template, bodyTemplate, AvatarView, moment) {
   return TroupeViews.Base.extend({
     template: template,
@@ -34,20 +34,7 @@ define([
 
       if (data.attachments.length===0) { data.hasAttachments = false; } else { data.hasAttachments = true; }
 
-      var now = moment();
-      var ago = moment(data.date).from(now);
-
-      data.date = ago;
-      /*
-      var d = new Date(data.date);
-      data.date = d.toUTCString();
-      var now = new Date();
-      if (now.getDate() === d.getDate() && now.getMonth() === d.getMonth() && now.getFullYear() === d.getFullYear()) {
-        data.date = d.format('h:MM TT');
-      } else {
-        data.date = d.format('mmm d');
-      }
-      */
+      data.date = data.date.calendar();
 
       data.initialIndex = this.initialIndex;
       return data;

@@ -2,13 +2,21 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  './base'
-], function($, _, Backbone, TroupeCollections) {
+  './base',
+  '../utils/momentWrapper'
+], function($, _, Backbone, TroupeCollections, moment) {
   "use strict";
 
   var exports = {};
 
-  exports.FileVersionModel = Backbone.Model.extend({});
+  exports.FileVersionModel = Backbone.Model.extend({
+    parse: function(response) {
+      response.createdDate = moment.utc(response.createdDate);
+      return response;
+    }
+
+  });
+
   exports.FileVersionCollection  = Backbone.Collection.extend({
     model: exports.FileVersionModel
   });
