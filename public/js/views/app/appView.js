@@ -60,14 +60,12 @@ define([
 
       $.ajax({
         url: "/troupes/" + window.troupeContext.troupe.id + "/users",
-        contentType: "application/json",
         dataType: "json",
         type: "GET",
         success: function(data) {
           var members = data.length; 
           $.ajax({
             url: "/troupes/" + window.troupeContext.troupe.id + "/invites",
-            contentType: "application/json",
             dataType: "json",
             type: "GET",
             success: function(data) {

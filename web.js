@@ -1,9 +1,10 @@
-/*global console:false, require: true, module: true, process: false, __dirname:false */
+/*jslint node: true */
 "use strict";
 
 var express = require('express'),
 	Resource = require('express-resource'),
   fs = require('fs'),
+  http = require('http'),
 	userService = require('./server/services/user-service'),
   unreadItemService = require('./server/services/unread-item-service'),
 	troupeService = require('./server/services/troupe-service'),
@@ -13,7 +14,9 @@ var express = require('express'),
   nconf = require('./server/utils/config').configure(),
   httpUtils = require('./server/utils/http'),
   rememberMe = require('./server/utils/rememberme-middleware'),
-  winston = require('./server/utils/winston');
+  winston = require('./server/utils/winston'),
+  handlebars = require('handlebars'),
+  expressHbs = require('express-hbs');
 
 /* TODO: put all our prototypes in a module */
 Array.prototype.narrow = function() {
@@ -22,19 +25,28 @@ Array.prototype.narrow = function() {
 
 var RedisStore = require('connect-redis')(express);
 
-var app = express.createServer();
+var app = express();
 
-var hbs = require('hbs');
+var server = http.createServer(app);
 
-hbs.registerHelper('cdn', require('./server/utils/cdn-helper'));
+handlebars.registerHelper('cdn', require('./server/utils/cdn-helper'));
+
 // TODO:come up with a better solution that this!
-hbs.registerPartial('require_config', fs.readFileSync(__dirname + '/' + nconf.get('web:staticContent') +'/templates/require_config.hbs', 'utf8'));
+//hbs.registerPartial('require_config', fs.readFileSync(__dirname + '/' + nconf.get('web:staticContent') +'/templates/require_config.hbs', 'utf8'));
 
-app.set('basepath', "/");
+//app.set('basepath', "/");
+//app.set('view engine', 'hbs');
+//app.engine('hbs', require('hjs').__express);
+// Use `.hbs` for extensions and find partials in `views/partials`.
+app.engine('hbs', expressHbs.express3({
+  partialsDir: __dirname + '/' + nconf.get('web:staticContent') +'/templates/partials',
+  handlebars: handlebars
+}));
 app.set('view engine', 'hbs');
+
 app.set('views', __dirname + '/' + nconf.get('web:staticContent') +'/templates');
 //app.set('view engine', 'mustache');
-app.set('view options',{layout:false});
+//app.set('view options',{layout:false});
 //app.register(".mustache", tmpl);
 
 passport.use(new LocalStrategy({
@@ -149,7 +161,7 @@ app.configure(function() {
   app.use(express.errorHandler({ showStack: nconf.get('express:showStack'), dumpExceptions: nconf.get('express:dumpExceptions') }));
 });
 
-require('./server/now').install(app, sessionStore);
+require('./server/now').install(server, sessionStore);
 require('./server/handlers/signup').install(app);
 require('./server/handlers/signout').install(app);
 require('./server/handlers/profile').install(app);
@@ -199,7 +211,7 @@ troupesResource.add(unreadItemsResource);
 require('./server/handlers/app').install(app);
 
 var port = nconf.get("PORT");
-app.listen(port, function() {
+server.listen(port, function() {
   winston.info("Listening on " + port);
 });
 

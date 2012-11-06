@@ -1,4 +1,4 @@
-/*global console:false, require: true, module: true, process: false, __dirname:false */
+/*jslint node: true */
 "use strict";
 
 var express = require('express');
@@ -15,7 +15,9 @@ var options = {
   cert: fs.readFileSync(nconf.get("ws:certificateFile"))
 };
 
-var app = express.createServer(options);
+
+var app = express();
+var server = https.createServer(options, app);
 
 var RedisStore = require('connect-redis')(express);
 var sessionStore = new RedisStore();
@@ -53,7 +55,7 @@ var bindIp = nconf.get("ws:bindIp");
 
 console.log("Binding websockets service to " + bindIp + ":" + port);
 
-app.listen(port, bindIp);
+server.listen(port, bindIp);
 
 process.nextTick(function() {
   var uid = nconf.get("runtime:uid");
