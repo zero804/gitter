@@ -14,7 +14,6 @@ define([
 
       $.ajax({
         url: "/troupes/" + window.troupeContext.troupe.id + "/mails/" + this.mailId,
-        contentType: "application/json",
         dataType: "json",
         type: "GET",
         success: function(data) {

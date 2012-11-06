@@ -28,7 +28,6 @@ define([
   function refreshUsers() {
     $.ajax({
       url: "/troupes/" + window.troupeContext.troupe.id + "/users",
-      contentType: "application/json",
       dataType: "json",
       type: "GET",
       success: function(data) {

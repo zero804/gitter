@@ -1,31 +1,21 @@
-/*jshint globalstrict:true, trailing:false */
+/*jshint globalstrict:true, trailing:false node:true*/
 /*global console:false, require: true, module: true */
 "use strict";
 
 var troupeService = require("../services/troupe-service"),
     userService = require("../services/user-service"),
-    presenceService = require("../services/presence-service"),
-    Q = require("q"),
+    restSerializer = require("../serializers/rest-serializer"),
     _ = require("underscore");
 
 module.exports = {
     index: function(req, res, next) {
-      var usersDeferred = Q.defer();
-      var presenceDeferred = Q.defer();
 
-      userService.findByIds(req.troupe.users, usersDeferred.node());
-      presenceService.findOnlineUsersForTroupe(req.troupe.id, presenceDeferred.node());
 
-      Q.all([usersDeferred.promise, presenceDeferred.promise]).spread(function(users, presence) {
-        console.dir(presence);
-        var a = users.narrow();
-        a.forEach(function(item) {
-          item.online = presence.indexOf(item.id) >= 0;
-        });
+      var strategy = new restSerializer.UserIdStrategy();
 
-        res.send(a);
-      }).fail(function(error) {
-        next(error);
+      restSerializer.serialize(req.troupe.users, strategy, function(err, serialized) {
+        if(err) return next(err);
+        res.send(serialized);
       });
     },
 

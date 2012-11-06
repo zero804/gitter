@@ -23,7 +23,6 @@ define([
       var self = this;
       $.ajax({
         url: "/troupes/" + window.troupeContext.troupe.id + "/chatMessages",
-        contentType: "application/json",
         data: { skip: this.chatMessageSkip, limit: this.chatMessageLimit },
         dataType: "json",
         type: "GET",

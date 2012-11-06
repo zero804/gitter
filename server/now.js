@@ -23,6 +23,12 @@ var passport = require('passport'),
 /* Theoretically this should be done by express middleware, but it seems have some bugs right now */
 function loadSession(user, sessionStore, callback) {
   var sid = decodeURIComponent(user.cookie['connect.sid']);
+  if(!sid) return callback("Session has no cookie");
+
+  // Express3 changes. Split on the '.'
+  // This hackery will not last much longer
+  sid = sid.split('.')[0];
+  sid = sid.split(':')[1];
   sessionStore.get(sid, callback);
 }
 
@@ -66,8 +72,8 @@ function getGroup(groupName, callback) {
 }
 
 module.exports = {
-    install: function(app, sessionStore) {
-      everyone = nowjs.initialize(app, {
+    install: function(server, sessionStore) {
+      everyone = nowjs.initialize(server, {
          "host" : nconf.get("ws:hostname"),
          "port" : nconf.get("ws:externalPort"),
          "autoHost": false,
