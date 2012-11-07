@@ -10,7 +10,7 @@ var appEvents = require("../app-events");
 mongoose.connect('mongodb://localhost/troupe');
 
 var UserSchema = new Schema({
-  displayName: { type: String }, 
+  displayName: { type: String },
   email: { type: String },
   confirmationCode: {type: String },
   status: { type: String, "enum": ['UNCONFIRMED', 'PROFILE_NOT_COMPLETED', 'ACTIVE'], "default": 'UNCONFIRMED'},
@@ -126,6 +126,25 @@ var NotificationSchema = new Schema({
 });
 
 
+var OAuthClientSchema = new Schema({
+  name: String,
+  clientId: String,
+  clientSecret: String
+});
+
+var OAuthCodeSchema = new Schema({
+  code: String,
+  clientId: ObjectId,
+  redirectUri: String,
+  userId: ObjectId
+});
+
+var OAuthAccessTokenSchema= new Schema({
+  token: String,
+  userId: ObjectId,
+  clientId: ObjectId
+});
+
 var User = mongoose.model('User', UserSchema);
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var Email = mongoose.model('Email', EmailSchema);
@@ -137,6 +156,11 @@ var ChatMessage = mongoose.model('ChatMessage', ChatMessageSchema);
 var File = mongoose.model('File', FileSchema);
 var FileVersion = mongoose.model('FileVersion', FileVersionSchema);
 var Notification = mongoose.model('Notification', NotificationSchema);
+
+var OAuthClient = mongoose.model('OAuthClient', OAuthClientSchema);
+var OAuthCode = mongoose.model('OAuthCode', OAuthCodeSchema);
+var OAuthAccessToken = mongoose.model('OAuthAccessToken', OAuthAccessTokenSchema);
+
 
 /** */
 function attachNotificationListenersToSchema(schema, name, extractor) {
@@ -192,5 +216,8 @@ module.exports = {
 	ChatMessage: ChatMessage,
   File: File,
   FileVersion: FileVersion,
-  Notification: Notification
+  Notification: Notification,
+  OAuthClient: OAuthClient,
+  OAuthCode: OAuthCode,
+  OAuthAccessToken: OAuthAccessToken
 };
