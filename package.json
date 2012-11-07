@@ -7,7 +7,7 @@
     "express-form": "git://github.com/suprememoocow/express-form.git",
     "express-hbs": "0.1.x",
     "hbs": "1.0.9",
-    "formidable": "1.0.x",
+    "formidable": "git://github.com/scriby/node-formidable.git",
     "mongoose": "2.5.8",
     "consolidate": "0.1.0",
     "nodemailer": "0.3.14",
@@ -38,6 +38,10 @@
     "pkginfo": "0.2.3",
     "ducksnode": "0.1.0",
     "diskspace": "0.1.5",
-    "hjs": "*"
+    "hjs": "*",
+    "oauth2orize": "~0.1.0",
+    "connect-ensure-login": "~0.1.0",
+    "passport-http": "~0.2.1",
+    "passport-oauth2-client-password": "~0.1.0"
   }
 }

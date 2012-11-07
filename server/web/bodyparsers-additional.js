@@ -6,7 +6,7 @@ var winston = require("winston");
 
 /* Patched version of formidable that can handle octet-streams */
 /* See https://github.com/scriby/node-formidable */
-var formidable = require('../../patched-modules/node-formidable');
+var formidable = require('formidable');
 
 module.exports = {
   install: function() {
