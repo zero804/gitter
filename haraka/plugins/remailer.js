@@ -5,7 +5,7 @@ var nodemailer = require("nodemailer");
 var console = require("console");
 var TroupeSESTransport = require("./../../server/utils/mail/troupe-ses-transport"),
     RawMailComposer = require("./../../server/utils/mail/raw-mail-composer"),
-    nconf = require("./../../server/utils/config").configure();
+    nconf = require("./../../server/utils/config");
 var winston = require("winston");
 var xml2js = require("xml2js");
 
