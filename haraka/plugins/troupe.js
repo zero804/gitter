@@ -16,7 +16,7 @@ var console = require("console");
 var Q = require("q");
 var sanitizer = require("./../../server/utils/sanitizer.js");
 var winston = require('winston');
-var nconf = require("./../../server/utils/config").configure();
+var nconf = require("./../../server/utils/config");
 var uuid = require('node-uuid');
 
 var emailDomain = nconf.get("email:domain");
@@ -178,7 +178,7 @@ exports.hook_queue = function(next, connection) {
         });
 
         // strip out the name of the troupe if it appears in the subject, we don't want it duplicated
-        var newSubject = subject.replace("[" + troupe.name + "] ",""); 
+        var newSubject = subject.replace("[" + troupe.name + "] ","");
 
         conversationService.storeEmailInConversation({
           fromUserId: user.id,
