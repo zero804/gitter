@@ -2,12 +2,13 @@
   "name": "troupe",
   "version": "0.0.1",
   "dependencies": {
+    "formidable": "git://github.com/felixge/node-formidable.git",
     "express": "3.0.x",
     "express-resource": "1.0.x",
     "express-form": "git://github.com/suprememoocow/express-form.git",
+    "fineuploader-express-middleware": "git://github.com/suprememoocow/fineuploader-express-middleware.git",
     "express-hbs": "0.1.x",
     "hbs": "1.0.9",
-    "formidable": "git://github.com/scriby/node-formidable.git",
     "mongoose": "2.5.8",
     "consolidate": "0.1.0",
     "nodemailer": "0.3.14",
@@ -43,6 +44,7 @@
     "connect-ensure-login": "~0.1.0",
     "passport-http": "~0.2.1",
     "passport-oauth2-client-password": "~0.1.0",
-    "passport-http-bearer": "~0.2.0"
+    "passport-http-bearer": "~0.2.0",
+    "connect": "~2.6.2"
   }
 }

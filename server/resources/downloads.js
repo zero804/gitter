@@ -13,11 +13,12 @@ module.exports = {
       res.relativeRedirect("/troupes/" + req.troupe.id + "/files/");
     },
 
-    new: function(req, res) {
+    "new": function(req, res) {
       res.send(500);
     },
 
-    create: function(req, res) {
+    create: function(req, res, next) {
+      winston.log("New file upload started..... ");
       /* File was uploaded through HTTP Form Upload */
       var files = req.files;
       for(var k in files) {
@@ -31,7 +32,7 @@ module.exports = {
             mimeType: file.type,
             file: file.path
           }, function(err, fileAndVersion) {
-            if(err) return response.send(500);
+            if(err) return next(err);
 
             /* The AJAX file upload component we use requires an object shaped like this (below) */
             res.send({ success: true });
@@ -54,7 +55,7 @@ module.exports = {
         if(!req.query["embedded"]) {
           res.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
         }
-        
+
         stream.pipe(res);
       });
 
