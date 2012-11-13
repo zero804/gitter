@@ -25,53 +25,63 @@ module.exports = {
           var troupeUri = req.body.troupeUri;
           winston.info("Login with requested troupe: ", troupeUri);
           function sendAffirmativeResponse() {
-            if(req.accepts('application/json')) {
-              if(troupeUri) {
-                troupeService.findByUri(troupeUri, function(err, troupe) {
-                  if(err) return res.send(500);
 
-                  var a = {};
+            switch(req.accepts(['json','html'])) {
+              case "json":
+                if(troupeUri) {
+                  troupeService.findByUri(troupeUri, function(err, troupe) {
+                    if(err) return res.send(500);
 
-                  if(troupe) {
-                     a[troupeUri] = troupeService.userHasAccessToTroupe(req.user, troupe);
-                  } else {
-                    // Troupe doesn't exist, just say the user doesn't have access
-                     a[troupeUri] = false;
-                  }
+                    var a = {};
 
-                  res.send({
-                    failed: false,
-                    user: req.user, 
-                    defaultTroupe: troupe,
-                    hasAccessToTroupe: a
+                    if(troupe) {
+                       a[troupeUri] = troupeService.userHasAccessToTroupe(req.user, troupe);
+                    } else {
+                      // Troupe doesn't exist, just say the user doesn't have access
+                       a[troupeUri] = false;
+                    }
+
+                    res.send({
+                      failed: false,
+                      user: req.user,
+                      defaultTroupe: troupe,
+                      hasAccessToTroupe: a
+                    });
+
                   });
-
-                });
-              } else {
-                if (req.user.lastTroupe) {
-                  troupeService.findById(req.user.lastTroupe, function (err,troupe) {
+                } else {
+                  if (req.user.lastTroupe) {
+                    troupeService.findById(req.user.lastTroupe, function (err,troupe) {
+                      if (err) troupe = null;
+                      res.send({
+                        failed: false,
+                        user: req.user,
+                        defaultTroupe: troupe
+                      });
+                    });
+                  }
+                  else {
+                    userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
                     if (err) troupe = null;
                     res.send({
                       failed: false,
-                      user: req.user, 
+                      user: req.user,
                       defaultTroupe: troupe
                     });
                   });
+                  }
                 }
-                else {
-                  userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
-                  if (err) troupe = null;
-                  res.send({
-                    failed: false,
-                    user: req.user, 
-                    defaultTroupe: troupe
-                  });
-                });
+                break;
+
+              case "html":
+                if(req.session.returnTo) {
+                  res.relativeRedirect(req.session.returnTo);
+                } else {
+                  res.relativeRedirect('/select-troupe');
                 }
-              }
-            } else {
-              res.relativeRedirect('/select-troupe');
+                break;
             }
+
           }
 
           if(req.body.rememberMe) {
@@ -85,12 +95,8 @@ module.exports = {
         });
 
       app.get('/login', function(req, res) {
-        if(req.accepts('application/json')) {
-          res.send({ failed: true });
-        } else {
-          res.render('login', {
-          });
-        }
+        res.render('login', {
+        });
       });
 
       app.post('/reset', function(req, res, next) {
@@ -105,13 +111,13 @@ module.exports = {
         });
       });
 
-      app.get('/reset/:confirmationCode', 
+      app.get('/reset/:confirmationCode',
         passport.authenticate('passwordreset'),
         function(req, res, next) {
           res.relativeRedirect("/select-troupe");
         });
 
-      app.get('/select-troupe', 
+      app.get('/select-troupe',
         middleware.ensureLoggedIn,
         function(req, res) {
           if (req.user.lastTroupe) {
@@ -125,9 +131,9 @@ module.exports = {
             userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
               if (err) troupe = null;
               res.redirect('/' + troupe.uri);
-            }); 
+            });
           }
-          
+
         });
 
     }
