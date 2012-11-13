@@ -28,13 +28,14 @@ require('./services/thumbnail-preview-generator-service').install();
 require('./services/notification-generator-service').install();
 unreadItemService.installListener(); // TODO: make sure this only happens once. Need to move across to a queue at some point
 
+// APIS
 require('./resources/').install(app);
+require('./api/v1/').install(app);
 
 app.get('/oauth/authorize', oauth2.authorization);
 app.post('/oauth/authorize/decision', oauth2.decision);
 app.post('/oauth/token', oauth2.token);
 app.post('/oauth/bearerLogin', oauth2.bearerLogin);
-
 
 /* This should be last */
 require('./handlers/app').install(app);
