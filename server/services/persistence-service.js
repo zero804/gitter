@@ -19,6 +19,15 @@ var UserSchema = new Schema({
   avatarUrlSmall: String,
   avatarUrlMedium: String,
   lastTroupe: ObjectId,
+  location: {
+    timestamp: Date,
+    coordinate: {
+      lon: Number,
+      lat: Number
+    },
+    speed: Number,
+    altitude: Number
+  },
   userToken: String // TODO: move to OAuth
 });
 

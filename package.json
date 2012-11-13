@@ -45,6 +45,7 @@
     "passport-http": "~0.2.1",
     "passport-oauth2-client-password": "~0.1.0",
     "passport-http-bearer": "~0.2.0",
-    "connect": "~2.6.2"
+    "connect": "~2.6.2",
+    "moment": "~1.7.2"
   }
 }

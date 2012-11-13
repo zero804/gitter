@@ -114,6 +114,24 @@ var userService = {
     });
   },
 
+  setUserLocation: function(userId, location, callback) {
+    userService.findById(userId, function(err, user) {
+      if(err) return callback(err);
+      if(!user) return callback(err);
+
+      user.location.timestamp = location.timestamp;
+      user.location.coordinate.lon = location.lon;
+      user.location.coordinate.lat = location.lat;
+      user.location.speed = location.speed;
+      user.location.altitude = location.altitude;
+
+      user.save(function(err) {
+        return callback(err, user);
+      });
+
+    });
+  },
+
   getUserToken: function(userId, callback) {
     userService.findById(userId, function(err, user) {
       if(err) return callback(err);
