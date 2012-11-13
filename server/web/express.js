@@ -6,7 +6,8 @@ var express = require('express'),
   nconf = require('../utils/config'),
   handlebars = require('handlebars'),
   expressHbs = require('express-hbs'),
-  http = require('./http');
+  http = require('./http'),
+  fineuploaderExpressMiddleware = require('fineuploader-express-middleware');
 
 module.exports = {
   installFull: function(app, server, sessionStore) {
@@ -22,13 +23,11 @@ module.exports = {
       app.use(express.logger());
     }
 
-    /* Additional body parsers */
-    require('./bodyparsers-additional.js').install();
-
     app.use(express['static'](__dirname + "/../../" + nconf.get('web:staticContent')));
 
     app.use(express.cookieParser());
     app.use(express.bodyParser());
+    app.use(fineuploaderExpressMiddleware());
     app.use(express.session({ secret: 'keyboard cat', store: sessionStore, cookie: { path: '/', httpOnly: true, maxAge: 14400000, domain: nconf.get("web:cookieDomain"), secure: false /*nconf.get("web:secureCookies") Express won't sent the cookie as the https offloading is happening in nginx. Need to have connection.proxySecure set*/ }}));
     app.use(passport.initialize());
     app.use(passport.session());
