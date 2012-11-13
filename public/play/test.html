@@ -112,7 +112,7 @@ font-family: 'StagWeb-Light';
 
   .trpContactItem {
     display: block;
-    max-width: 450px;
+    max-width: 400px;
   }
 
   .trpContactNameContainer {
@@ -127,7 +127,7 @@ font-family: 'StagWeb-Light';
   }
 
   .trpContactStatus {
-    max-width: 300px;
+    max-width: 270px;
     display: inline-block;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -321,13 +321,11 @@ $("#show").click(function() {
   $('.trpSideBar').animate({
     right: 0,
   }, 200, 'swing', function () {
-    // $('.trpDisplayPicture').css("visibility","visible");
   }
     );});
 
 
 $("#hide").click(function() {
-  $('.sideBarElement').hide();
   $('.trpSideBar').animate({
     right: -90
   }, 200, 'swing', function () {
