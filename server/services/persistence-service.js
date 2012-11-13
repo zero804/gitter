@@ -128,7 +128,7 @@ var NotificationSchema = new Schema({
 
 var OAuthClientSchema = new Schema({
   name: String,
-  clientId: String,
+  clientKey: String,
   clientSecret: String
 });
 

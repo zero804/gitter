@@ -7,7 +7,8 @@
 var oauth2orize = require('oauth2orize'),
     passport = require('passport'),
     login = require('connect-ensure-login'),
-    oauthService = require('../servers/oauth-service');
+    oauthService = require('../services/oauth-service'),
+    mongoose = require('mongoose');
 
 // create OAuth 2.0 server
 var server = oauth2orize.createServer();
@@ -30,6 +31,7 @@ server.serializeClient(function(client, done) {
 });
 
 server.deserializeClient(function(id, done) {
+  console.log("deserializing,", arguments);
   oauthService.findClientById(id, function(err, client) {
     if (err) { return done(err); }
     return done(null, client);
@@ -66,10 +68,18 @@ server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, do
 // code.
 
 server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, done) {
+  console.log("exchange,", arguments);
   oauthService.findAuthorizationCode(code, function(err, authCode) {
+    console.log("findAuthorizationCode,", arguments);
+
     if (err) { return done(err); }
-    if (client.id !== authCode.clientId) { return done(null, false); }
+    console.log("1,", client._id, authCode.clientId,client._id.equals(authCode.clientId));
+
+    if (!client._id.equals(authCode.clientId)) { return done(null, false); }
+    console.log("2,");
+
     if (redirectUri !== authCode.redirectUri) { return done(null, false); }
+    console.log("3,2");
 
     var token = uid(256);
     oauthService.saveAccessToken(token, authCode.userId, authCode.clientId, function(err) {
@@ -99,8 +109,8 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, do
 
 exports.authorization = [
   login.ensureLoggedIn(),
-  server.authorization(function(clientId, redirectUri, done) {
-    oauthService.findClientByClientId(clientId, function(err, client) {
+  server.authorization(function(clientKey, redirectUri, done) {
+    oauthService.findClientByClientKey(clientKey, function(err, client) {
       if (err) { return done(err); }
       // WARNING: For security purposes, it is highly advisable to check that
       //          redirectUri provided by the client matches one registered with
@@ -109,8 +119,9 @@ exports.authorization = [
       return done(null, client, redirectUri);
     });
   }),
+
   function(req, res){
-    res.render('dialog', { transactionId: req.oauth2.transactionId, user: req.user, client: req.oauth2.client });
+    res.render('dialog', { transactionId: req.oauth2.transactionID, user: req.user, client: req.oauth2.client });
   }
 ];
 
@@ -138,6 +149,14 @@ exports.token = [
   passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
   server.token(),
   server.errorHandler()
+];
+
+exports.bearerLogin = [
+  passport.authenticate('bearer', { session: true }),
+  function(req, res) {
+    console.log("Bearer Login!");
+    res.relativeRedirect("/x");
+  }
 ];
 
 function uid(len) {
