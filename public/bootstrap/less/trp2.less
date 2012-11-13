@@ -6,68 +6,9 @@
 @import "mixins.less";
 @import "modals.less";*/
 
-// Our colour palette
-@trpGreen: #1dce73; // lumo green 
-@trpRed: #d54f68; // pinky red 
-@trpPurple: #494259; // dark purple
-@trpGrey: #c0c9c8; // mid grey
-@trpCyan: #1dd0cd; // turquoise
-@trpYellow: #fcb316; // moutard
-@trpOffWhite: #f6f6f6; // off-white
-@trpVeryLightGrey: #fbfbfb;
-@trpLightGrey: #d6d6d6; // darker off-white for borders and ting
-@trpDarkGreen: #149a55; // darker col1
-/*@trpDarkGrey: #636363; // dark grey*/
-@trpDarkGrey: #333;
-@trpDarkerGrey: #666666; // dark grey
-@trpCream: #f9f9f6; //light cream
-
-// Our fonts
-
-@fontSerif: 'StagWeb-Light', serif;
-/*@fontSansLight: 'StagSansWeb-Light', sans-serif;*/
-@fontSans: 'Open Sans', sans-serif;
-@fontThin: 'StagWeb-Thin', serif;
-
-@font-face {
-font-family: 'StagWeb-Light';
-    src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.eot');
-    src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.eot?#iefix') format('embedded-opentype'),
-       url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.woff') format('woff'),
-       url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.ttf') format('truetype'),
-       url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.svg#StagWeb-Light') format('svg');
-    font-weight: 300;
-    font-style: normal;
-    font-stretch: normal;
-}
-
-@font-face {
-    font-family: 'StagWeb-Thin';
-    src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.eot');
-    src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.eot?#iefix') format('embedded-opentype'),
-       url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.woff') format('woff'),
-       url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.ttf') format('truetype'),
-       url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.svg#StagWeb-Thin') format('svg');
-    font-weight: 100;
-    font-style: normal;
-    font-stretch: normal;
-}
-
-@font-face {
-    font-family: 'StagSansWeb-Light';
-    src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.eot');
-    src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.eot?#iefix') format('embedded-opentype'),
-       url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.woff') format('woff'),
-       url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.ttf') format('truetype'),
-       url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.svg#StagSansWeb-Light') format('svg');
-    font-weight: 400;
-    font-style: normal;
-    font-stretch: normal;
-    }
-
-
-@bodyPadding:	 20px;
-@bodyFont: 14px;
+@import "trpColours.less";
+@import "trpFonts.less";
+@import "trpButtons.less";
 
 @baseImages: "../../images";
 
@@ -77,47 +18,6 @@ font-family: 'StagWeb-Light';
   -webkit-box-shadow: 3px 2px 5px -1px rgba(50, 50, 50, 0.75);
   -moz-box-shadow:    3px 2px 5px -1px rgba(50, 50, 50, 0.75);
   box-shadow:         3px 2px 5px -1px rgba(50, 50, 50, 0.75);
-}
-
-.trpH1 {
-  font-family: @fontSerif;
-  font-size: 24px;
-}
-
-.trpH2 {
-  font-family: @fontSerif;
-  font-size: 20px;
-}
-
-.trpH3 {
-  font-family: @fontSerif;
-  font-size: 16px; 
-}
-
-.trpH4 {
-  font-family: @fontSerif;
-  font-size: 14px; 
-}
-
-.trpBodyText {
-  font-family: @fontSans;
-  font-size: 16px;
-}
-
-.trpBodyEm {
-  font-family: @fontSans;
-  font-size: 16px;
-}
-
-.trpBodyMedium {
-  font-family: @fontSans;
-  font-size: 14px; 
-}
-
-.trpBodySmall {
-  font-family: @fontSans;
-  font-size: 12px;
-/*  letter-spacing: 0.1em;*/
 }
 
 body {
@@ -1372,55 +1272,12 @@ h1 {
   padding-bottom: 14px;
 }
 
-.trpButton {
-  color: @trpDarkGrey;
-  border: 1px solid @trpLightGrey;
-  .trpBodySmall;
-  padding: 5px 10px 5px 10px;
-  display: inline-block;
-  -webkit-border-radius:3px;
-  -moz-border-radius:3px;
-  border-radius:3px;
-  background-color: white;
-  cursor: pointer;
-}
 
-.trpButtonBig {
-  -webkit-border-radius:3px;
-  -moz-border-radius:3px;
-  border-radius:3px;
-  padding: 14px 8px 14px 8px;
-  text-align: center;
-  min-width: 76px;
-  .trpBodySmall;
-  text-decoration: none;
-  border: none;
-  display: inline-block;
-}
-
-.trpButtonBig:hover {
-/*  background-color: black;*/
-  opacity: 0.9;
-}
-
-.trpBtnWhite {
-  background-color: white;
-  color: @trpPurple;
-}
 
 .trpWhite {
   color: white;
 }
 
-.trpBtnGreen {
-  background-color: @trpGreen;
-  color: white;
-}
-
-.trpBtnGrey {
-  background-color: @trpDarkGrey;
-  color: white;
-}
 
 .trpDisplayPicture{
   -webkit-border-radius: 50em;
