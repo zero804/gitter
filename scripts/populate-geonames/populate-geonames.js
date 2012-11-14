@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 var csv = require('csv-stream');
+var persistenceService = require("../../server/services/persistence-service");
 
 var fs = require('fs');
 
+var count = 0;
 var countries = {};
 fs.createReadStream('data/countryInfo.txt').pipe(csv.createStream({
     delimiter : '\t', // default is ,
@@ -13,9 +15,9 @@ fs.createReadStream('data/countryInfo.txt').pipe(csv.createStream({
         'fips',
         'Country',
         'Capital'
-    ], 
+    ],
     escapeChar : '"', // default is an empty string
-    enclosedChar : '"' // default is an empty string  
+    enclosedChar : '"' // default is an empty string
 })).on('data',function(data){
     if(data['ISO'].indexOf('#') !== 0) {
         countries[data['ISO']] = data['Country'];
@@ -28,11 +30,11 @@ fs.createReadStream('data/countryInfo.txt').pipe(csv.createStream({
         columns : [
             'code',
             'name'
-        ], 
+        ],
         escapeChar : '"', // default is an empty string
-        enclosedChar : '"' // default is an empty string  
+        enclosedChar : '"' // default is an empty string
     })).on('data',function(data){
-        regions[data.code] = data.name;    
+        regions[data.code] = data.name;
     }).on('end',function(){
         // All of these arguments are optional.
         var options = {
@@ -58,33 +60,58 @@ fs.createReadStream('data/countryInfo.txt').pipe(csv.createStream({
                 'dem',
                 'timezone',
                 'modification date'
-            ], // by default read the first line and use values found as columns 
+            ], // by default read the first line and use values found as columns
             escapeChar : '"', // default is an empty string
             enclosedChar : '"' // default is an empty string
-        }
+        };
 
         var csvStream = csv.createStream(options);
 
         fs.createReadStream('data/cities15000.txt').pipe(csvStream)
-            .on('data',function(data){
-               if(data['feature class'] === 'P') {
+        .on('data',function(data){
+         if(data['feature class'] === 'P') {
                 // outputs an object containing a set of key/value pair representing a line found in the csv file.
-                    console.log({
-                        geonameid: data.geonameid,
-                        name: data.name,
-                        coordinate: {
-                            lon: data.longitude,
-                            lat: data.latitude
-                        },
-                        region: { code: data['admin1 code'], name: regions[data['country code'] + "." + data['admin1 code']] },
-                        country: { code: data['country code'], name: countries[data['country code']] },
-                        timezone: data.timezone
+                var adminCode = data['admin1 code'];
+                adminCode = adminCode ? adminCode : null;
 
+                var countryCode = data['country code'];
+                countryCode = countryCode ? countryCode : null;
+
+                var regionName = regions[countryCode + "." + adminCode];
+                regionName = regionName ? regionName : null;
+
+                var countryName =  countries[countryCode];
+                countryName = countryName ? countryName : null;
+
+                var populatedPlace = {
+                    geonameid: data.geonameid,
+                    name: data.name,
+                    coordinate: {
+                        lon: data.longitude,
+                        lat: data.latitude
+                    },
+                    region: { code: adminCode, name: regionName },
+                    country: { code: countryCode, name: countryName },
+                    timezone: data.timezone
+                };
+
+                persistenceService.GeoPopulatedPlace.update(
+                    { geonameid: populatedPlace.geonameid },
+                    populatedPlace,
+                    { upsert: true },
+                    function(err, numberAffected) {
+                        if(err) {
+                            return console.error(err);
+                        }
+                        console.log("Affected " + numberAffected + " rows (total " + ++total + ")");
                     });
             }
-            });
+        })
+        .on('end',function(data){
+            console.log("Finished");
+        });
     });
 
-     
+
 });
 
