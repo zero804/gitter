@@ -134,12 +134,15 @@ var NotificationSchema = new Schema({
   createdDate: { type: Date, "default": Date.now }
 });
 
-
+/*
+ * OAuth Stuff
+ */
 var OAuthClientSchema = new Schema({
   name: String,
   clientKey: String,
   clientSecret: String
 });
+OAuthClientSchema.index({ clientKey: 1 });
 
 var OAuthCodeSchema = new Schema({
   code: String,
@@ -153,6 +156,29 @@ var OAuthAccessTokenSchema= new Schema({
   userId: ObjectId,
   clientId: ObjectId
 });
+
+
+/*
+ * Reverse Geocoder Stuff
+ */
+var GeoPopulatedPlaceSchema= new Schema({
+  geonameid: String,
+  name: String,
+  coordinate: {
+    lon: Number,
+    lat: Number
+  },
+  region: {
+    code: String,
+    name: String
+  },
+  country: {
+    code: String,
+    name: String
+  },
+  timezone: String
+});
+GeoPopulatedPlaceSchema.index({ coordinate: "2d" });
 
 var User = mongoose.model('User', UserSchema);
 var Troupe = mongoose.model('Troupe', TroupeSchema);
@@ -170,6 +196,7 @@ var OAuthClient = mongoose.model('OAuthClient', OAuthClientSchema);
 var OAuthCode = mongoose.model('OAuthCode', OAuthCodeSchema);
 var OAuthAccessToken = mongoose.model('OAuthAccessToken', OAuthAccessTokenSchema);
 
+var GeoPopulatedPlace = mongoose.model('GeoPopulatedPlaceSchema', GeoPopulatedPlaceSchema);
 
 /** */
 function attachNotificationListenersToSchema(schema, name, extractor) {
@@ -228,5 +255,6 @@ module.exports = {
   Notification: Notification,
   OAuthClient: OAuthClient,
   OAuthCode: OAuthCode,
-  OAuthAccessToken: OAuthAccessToken
+  OAuthAccessToken: OAuthAccessToken,
+  GeoPopulatedPlace: GeoPopulatedPlace
 };

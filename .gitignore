@@ -20,3 +20,10 @@ converter-service/converter/.classpath
 converter-service/converter/.project
 converter-service/converter/.settings
 converter-service/converter/target
+scripts/populate-geonames/data/admin1CodesASCII.txt
+scripts/populate-geonames/data/cities15000.txt
+scripts/populate-geonames/data/cities15000.zip
+scripts/populate-geonames/data/countryInfo.txt
+public/bootstrap/less/mtrp.css
+public/bootstrap/less/trpColours.css
+public/bootstrap/less/trpFonts.css
