@@ -9,11 +9,13 @@ define([
     initialize: function(options) {
       this.user = options.user || {};
       this.showEmail = options.showEmail || {};
+      this.showBadge = options.showBadge;
     },
 
     render: function() {
       this.$el.html(template({
         id: this.user.id,
+        showBadge: this.showBadge,
         userDisplayName: this.user.displayName,
         userAvatarUrl: this.user.avatarUrl,
         offline: !presenceClient.isOnline(this.user.id)

@@ -1,5 +1,5 @@
 <div class="trpPeopleViewItem">
-    <div class="trpPersonAvatar">{{widget "avatar" user=user}}</div>
+    <div class="trpPersonAvatar">{{widget "avatar" user=user showBadge=true}}</div>
     <div class="trpPersonDetails">
         <div class="trpPersonName">{{user.displayName}}<br><span class="trpPersonEmail">{{#if displayEmail}}{{user.email}}{{/if}}</span></div>
         {{#if displayModeRequest}}
