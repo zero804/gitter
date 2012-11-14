@@ -413,8 +413,7 @@ h1 {
   -moz-border-radius: 50%;
   border-radius: 50%;
   background-color: white;
-  font-family: @fontSans;
-  font-size: 9px;
+  .trpBodyTiny;
   color: @trpDarkGrey;
   text-align: center;
   margin-right: 4px;
@@ -1279,12 +1278,46 @@ h1 {
 }
 
 
-.trpDisplayPicture{
+/*.trpDisplayPicture{
   -webkit-border-radius: 50em;
   -moz-border-radius: 50em;
   border-radius: 50em;
-  /*border: solid thin #dcdcdc;*/
   background-color: transparent;
+}*/
+
+.trpDisplayPicture{
+  position: relative;
+  display: inline-block;
+  -webkit-border-radius: 5em;
+  -moz-border-radius: 5em;
+  border-radius: 5em;
+  border: 2px solid white;
+  width: 48px;
+  height: 48px;
+}
+
+.trpStatus {
+  position: absolute;
+  top: 5px;
+  left: -3px;
+  -webkit-border-radius: 5em;
+  -moz-border-radius: 5em;
+  border-radius: 5em;
+  border: 2px solid white;
+  width: 8px;
+  height: 8px;  
+}
+
+.trpStatusOnline {
+  background-color: #06ff00;
+}
+
+.trpStatusAway {
+  background-color: #fcb316;
+}
+
+.trpStatusBusy {
+  background-color: #ff2400;
 }
 
 .trpNewLine {
@@ -1293,6 +1326,24 @@ h1 {
 
 .trpTabItem a {
   text-decoration: none;
+}
+
+.trpDPUnreadCount {
+  position: absolute;
+  top: 5px;
+  right: -8px;
+  background-color: #4a4257;
+  -webkit-border-radius: 5em;
+  -moz-border-radius: 5em;
+  border-radius: 5em;
+  border: 2px solid white;
+  width: 14px;
+  height: 14px;
+  .trpBodyTiny;
+  color: white;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 14px;
 }
 
 .trpTabItem {
