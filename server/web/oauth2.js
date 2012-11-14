@@ -55,6 +55,8 @@ server.deserializeClient(function(id, done) {
 server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, done) {
   var code = uid(16);
 
+  console.log("Granted access to ", client.name, " for ", user.displayName);
+
   oauthService.saveAuthorizationCode(code, client.id, redirectUri, user.id, function(err) {
     if (err) { return done(err); }
     done(null, code);
@@ -68,7 +70,8 @@ server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, do
 // code.
 
 server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, done) {
-  console.log("exchange,", arguments);
+  console.log("Exchange auth token with client,", client.name);
+
   oauthService.findAuthorizationCode(code, function(err, authCode) {
     console.log("findAuthorizationCode,", arguments);
 
