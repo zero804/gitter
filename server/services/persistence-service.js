@@ -276,5 +276,6 @@ module.exports = {
   OAuthClient: OAuthClient,
   OAuthCode: OAuthCode,
   OAuthAccessToken: OAuthAccessToken,
-  GeoPopulatedPlace: GeoPopulatedPlace
+  GeoPopulatedPlace: GeoPopulatedPlace,
+  UserLocationHistory: UserLocationHistory
 };
