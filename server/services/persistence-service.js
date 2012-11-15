@@ -35,6 +35,18 @@ var UserSchema = new Schema({
   },
   userToken: String // TODO: move to OAuth
 });
+UserSchema.index({ email: 1 });
+
+var UserLocationHistorySchema = new Schema({
+  userId: ObjectId,
+  timestamp: Date,
+  coordinate: {
+      lon: Number,
+      lat: Number
+  },
+  speed: Number
+});
+UserLocationHistorySchema.index({ userId: 1 });
 
 UserSchema.methods.getAvatarUrl = function() {
   if(this.avatarUrlSmall) {
@@ -50,15 +62,7 @@ var TroupeSchema = new Schema({
   status: { type: String, "enum": ['INACTIVE', 'ACTIVE'], "default": 'INACTIVE'},
   users: [ObjectId]
 });
-
-/* TODO(AN): remove narrow. Deprecated */
-TroupeSchema.methods.narrow = function () {
-  return {
-    id: this._id,
-    name: this.name,
-    uri: this.uri
-  };
-};
+TroupeSchema.index({ uri: 1 });
 
 var InviteSchema = new Schema({
   troupeId: ObjectId,
@@ -80,6 +84,7 @@ var ChatMessageSchema = new Schema({
   text: String,
   sent: { type: Date, "default": Date.now }
 });
+ChatMessageSchema.index({ toTroupeId: 1, sent: -1 });
 
 var EmailAttachmentSchema = new Schema({
   fileId: ObjectId,
@@ -111,6 +116,7 @@ var ConversationSchema = new Schema({
   subject: { type: String },
   emails: [EmailSchema]
 });
+ConversationSchema.index({ troupeId: 1 });
 
 var FileVersionSchema = new Schema({
   creatorUserId: ObjectId,
@@ -130,6 +136,7 @@ var FileSchema = new Schema({
   previewMimeType: { type: String},
   versions: [FileVersionSchema]
 });
+FileSchema.index({ troupeId: 1 });
 
 var NotificationSchema = new Schema({
   troupeId: ObjectId,
@@ -138,6 +145,8 @@ var NotificationSchema = new Schema({
   data: { type: {}},
   createdDate: { type: Date, "default": Date.now }
 });
+NotificationSchema.index({ troupeId: 1 });
+NotificationSchema.index({ userId: 1 });
 
 /*
  * OAuth Stuff
@@ -155,12 +164,14 @@ var OAuthCodeSchema = new Schema({
   redirectUri: String,
   userId: ObjectId
 });
+OAuthCodeSchema.index({ code: 1 });
 
 var OAuthAccessTokenSchema= new Schema({
   token: String,
   userId: ObjectId,
   clientId: ObjectId
 });
+OAuthAccessTokenSchema.index({ token: 1 });
 
 
 /*
@@ -188,6 +199,8 @@ GeoPopulatedPlaceSchema.index({ coordinate: "2d" });
 GeoPopulatedPlaceSchema.index({ geonameid: 1 });
 
 var User = mongoose.model('User', UserSchema);
+var UserLocationHistory = mongoose.model('UserLocationHistory', UserLocationHistorySchema);
+
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var Email = mongoose.model('Email', EmailSchema);
 var EmailAttachment = mongoose.model('EmailAttachment', EmailAttachmentSchema);
