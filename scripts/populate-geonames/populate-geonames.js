@@ -70,7 +70,7 @@ fs.createReadStream('data/countryInfo.txt').pipe(csv.createStream({
 
         var csvStream = csv.createStream(options);
 
-        fs.createReadStream('data/ZA.txt').pipe(csvStream)
+        fs.createReadStream('data/cities15000.txt').pipe(csvStream)
         .on('data',function(data){
          if(data['feature class'] === 'P') {
                 // outputs an object containing a set of key/value pair representing a line found in the csv file.
