@@ -7,7 +7,8 @@ var passport = require("passport"),
 var nconf = require('../utils/config'),
     troupeService = require("../services/troupe-service"),
     rememberMe = require('../web/rememberme-middleware'),
-    middleware = require('./middleware');
+    middleware = require('./middleware'),
+    login = require('connect-ensure-login');
 var userService = require('../services/user-service');
 
 function ensureAuthenticated(req, res, next) {
@@ -24,8 +25,9 @@ module.exports = {
         function(req, res) {
           var troupeUri = req.body.troupeUri;
           winston.info("Login with requested troupe: ", troupeUri);
-          function sendAffirmativeResponse() {
 
+          function sendAffirmativeResponse() {
+            console.log("Login was successful!: ", req.accepts(['json','html']));
             switch(req.accepts(['json','html'])) {
               case "json":
                 if(troupeUri) {
@@ -75,8 +77,10 @@ module.exports = {
 
               case "html":
                 if(req.session.returnTo) {
+                  console.log("Returning to Previous URL");
                   res.relativeRedirect(req.session.returnTo);
                 } else {
+                  console.log("Going to Select Troupe");
                   res.relativeRedirect('/select-troupe');
                 }
                 break;
@@ -85,11 +89,13 @@ module.exports = {
           }
 
           if(req.body.rememberMe) {
+            console.log("Remember me");
             rememberMe.generateAuthToken(req, res, req.user.id, {}, function(err) {
               if(err) winston.error(err);
               sendAffirmativeResponse();
             });
           } else {
+            console.log("Don't remember me");
             sendAffirmativeResponse();
           }
         });
@@ -118,7 +124,7 @@ module.exports = {
         });
 
       app.get('/select-troupe',
-        middleware.ensureLoggedIn,
+        login.ensureLoggedIn(),
         function(req, res) {
           if (req.user.lastTroupe) {
             troupeService.findById(req.user.lastTroupe, function (err,troupe) {
