@@ -154,7 +154,9 @@ NotificationSchema.index({ userId: 1 });
 var OAuthClientSchema = new Schema({
   name: String,
   clientKey: String,
-  clientSecret: String
+  clientSecret: String,
+  registeredRedirectUri: String,
+  canSkipAuthorization: Boolean
 });
 OAuthClientSchema.index({ clientKey: 1 });
 
