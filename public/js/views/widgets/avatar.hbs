@@ -1,2 +1,6 @@
-<img src="{{userAvatarUrl}}" class="trpDisplayPicture {{#offline}}offline{{/offline}} avatar-{{id}}" height="48" width="48" rel="tooltip" title="{{userDisplayName}}">
+<!-- <img src="{{userAvatarUrl}}" class="trpDisplayPicture {{#offline}}offline{{/offline}} avatar-{{id}}" height="48" width="48" rel="tooltip" title="{{userDisplayName}}"> -->
 
+      <div class="trpDisplayPicture avatar-{{id}}" style="background-image: url('{{userAvatarUrl}}');" title="{{userDisplayName}}">
+        <div class="trpStatus trpStatusOnline {{#offline}}trpStatusAway{{/offline}}" id="status"> </div>
+        {{#showBadge}}<div class="trpDPUnreadCount">12</div>{{/showBadge}}
+      </div>
