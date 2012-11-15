@@ -93,7 +93,7 @@ function updateEmailWithMessageId(conversationId, emailId, messageId, callback) 
 function findByTroupe(id, callback) {
   persistence.Conversation
     .where('troupeId', id)
-    .desc('updated')
+    .sort({ updated: 'desc' })
     .slaveOk()
     .exec(callback);
 }

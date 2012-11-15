@@ -6,7 +6,9 @@ var persistence = require("./persistence-service"),
     sechash = require('sechash'),
     mongoose = require("mongoose"),
     emailNotificationService = require("./email-notification-service"),
-    uuid = require('node-uuid');
+    uuid = require('node-uuid'),
+    geocodingService = require("./geocoding-service"),
+    winston = require("../utils/winston");
 
 var userService = {
   newUser: function(options) {
@@ -92,7 +94,7 @@ var userService = {
   findByIds: function(ids, callback) {
     persistence.User.where('_id').in(ids)
       .slaveOk()
-      .run(callback);
+      .exec(callback);
   },
 
   saveLastVisitedTroupeforUser: function(userId, troupeId, callback) {
@@ -119,16 +121,38 @@ var userService = {
       if(err) return callback(err);
       if(!user) return callback(err);
 
-      user.location.timestamp = location.timestamp;
-      user.location.coordinate.lon = location.lon;
-      user.location.coordinate.lat = location.lat;
-      user.location.speed = location.speed;
-      user.location.altitude = location.altitude;
 
-      user.save(function(err) {
-        return callback(err, user);
+      function persistUserLocation(named) {
+        function nullIfUndefined(v) { return v ? v : null; }
+
+        if(!named) named = {};
+        user.location.timestamp = location.timestamp;
+        user.location.coordinate.lon = location.lon;
+        user.location.coordinate.lat = location.lat;
+        user.location.speed = location.speed;
+        user.location.altitude = location.altitude;
+        user.location.named.place = nullIfUndefined(named.place);
+        user.location.named.region = nullIfUndefined(named.region);
+        user.location.named.countryCode = nullIfUndefined(named.countryCode);
+
+        user.save(function(err) {
+          return callback(err, user);
+        });
+      }
+
+      geocodingService.reverseGeocode( { lat: location.lat, lon: location.lon }, function(err, location) {
+        if(err || !location) {
+          winston.error("Reverse geocoding failure ", err);
+          persistUserLocation(null);
+          return;
+        } else {
+          persistUserLocation({
+            place: location.name,
+            region: location.region.name,
+            countryCode: location.country.code
+          });
+        }
       });
-
     });
   },
 

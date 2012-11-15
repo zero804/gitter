@@ -26,7 +26,12 @@ var UserSchema = new Schema({
       lat: Number
     },
     speed: Number,
-    altitude: Number
+    altitude: Number,
+    named: {
+      place: String,
+      region: String,
+      countryCode: String
+    }
   },
   userToken: String // TODO: move to OAuth
 });
@@ -176,9 +181,11 @@ var GeoPopulatedPlaceSchema= new Schema({
     code: String,
     name: String
   },
+  population: Number,
   timezone: String
 });
 GeoPopulatedPlaceSchema.index({ coordinate: "2d" });
+GeoPopulatedPlaceSchema.index({ geonameid: 1 });
 
 var User = mongoose.model('User', UserSchema);
 var Troupe = mongoose.model('Troupe', TroupeSchema);
@@ -196,7 +203,7 @@ var OAuthClient = mongoose.model('OAuthClient', OAuthClientSchema);
 var OAuthCode = mongoose.model('OAuthCode', OAuthCodeSchema);
 var OAuthAccessToken = mongoose.model('OAuthAccessToken', OAuthAccessTokenSchema);
 
-var GeoPopulatedPlace = mongoose.model('GeoPopulatedPlaceSchema', GeoPopulatedPlaceSchema);
+var GeoPopulatedPlace = mongoose.model('GeoPopulatedPlaces', GeoPopulatedPlaceSchema);
 
 /** */
 function attachNotificationListenersToSchema(schema, name, extractor) {

@@ -27,3 +27,8 @@ scripts/populate-geonames/data/countryInfo.txt
 public/bootstrap/less/mtrp.css
 public/bootstrap/less/trpColours.css
 public/bootstrap/less/trpFonts.css
+scripts/populate-geonames/data/GB.txt
+scripts/populate-geonames/data/GB.zip
+scripts/populate-geonames/data/ZA.txt
+scripts/populate-geonames/data/ZA.zip
+scripts/populate-geonames/data/readme.txt

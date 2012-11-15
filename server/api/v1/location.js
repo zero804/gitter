@@ -6,9 +6,6 @@ var moment = require('moment');
 
 module.exports = {
   create: function(req, res, next) {
-    console.log("NEW", req.body);
-    console.log("NEW", req.user);
-
     var timestamp = moment.utc(req.body.timestamp);
 
     userService.setUserLocation(req.user.id, {

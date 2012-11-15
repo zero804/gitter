@@ -154,7 +154,6 @@ exports.token = [
 exports.bearerLogin = [
   passport.authenticate('bearer', { session: true }),
   function(req, res) {
-    console.log("Bearer Login!");
     res.relativeRedirect("/x");
   }
 ];

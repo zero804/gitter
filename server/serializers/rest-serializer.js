@@ -263,7 +263,7 @@ function ConversationStrategy()  {
     var allEmails = concatArraysOfArrays(items.map(function(i) { return i.emails; }));
 
     execPreloads([{
-      strategy: emailStrategy, 
+      strategy: emailStrategy,
       data: allEmails
     }], callback);
   };
@@ -583,7 +583,6 @@ function serialize(items, strat, callback) {
       return callback(err);
     }
 
-    winston.debug("Mapping items");
     callback(null, pkg(items.map(strat.map)));
   });
 
