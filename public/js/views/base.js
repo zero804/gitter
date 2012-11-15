@@ -20,9 +20,13 @@ define([
 
   var TroupeViews = {};
 
+  /* Use the compact views */
+  var compactView = window.navigator.userAgent.indexOf("Mobile/") !== -1;
+
   TroupeViews.Base = Backbone.View.extend({
     template: null,
     autoClose: true,
+    compactView: compactView,
 
     constructor: function(options) {
       Backbone.View.prototype.constructor.apply(this, arguments);
@@ -75,6 +79,9 @@ define([
 
     render: function() {
       var data = this.getRenderData();
+      if(data) {
+        data.compactView = compactView;
+      }
 
       var dom = this.renderInternal(data);
       if(this.model) {
@@ -149,7 +156,7 @@ define([
     getRenderData: function() {
       return {
         title: "Modal",
-        disableClose: this.options.disableClose 
+        disableClose: this.options.disableClose
       };
     },
 
@@ -230,7 +237,7 @@ define([
         that.$el.addClass('in');
 
         if(transition) {
-          that.$el.one($.support.transition.end, function () { 
+          that.$el.one($.support.transition.end, function () {
             that.$el.trigger('shown');
             that.trigger('shown');
            });
@@ -256,9 +263,9 @@ define([
       this.$el
         .trigger('hide')
         .removeClass('in');
-      
+
       this.trigger('hide');
-      
+
       if($.support.transition && this.options.fade) {
         this.hideWithTransition(this);
       } else {
