@@ -4,7 +4,10 @@ var persistenceService = require("../../server/services/persistence-service");
 
 var fs = require('fs');
 
-var count = 0;
+var total = 0;
+var totalFinished = 0;
+var ended = false;
+
 var countries = {};
 fs.createReadStream('data/countryInfo.txt').pipe(csv.createStream({
     delimiter : '\t', // default is ,
@@ -67,7 +70,7 @@ fs.createReadStream('data/countryInfo.txt').pipe(csv.createStream({
 
         var csvStream = csv.createStream(options);
 
-        fs.createReadStream('data/cities15000.txt').pipe(csvStream)
+        fs.createReadStream('data/ZA.txt').pipe(csvStream)
         .on('data',function(data){
          if(data['feature class'] === 'P') {
                 // outputs an object containing a set of key/value pair representing a line found in the csv file.
@@ -83,6 +86,9 @@ fs.createReadStream('data/countryInfo.txt').pipe(csv.createStream({
                 var countryName =  countries[countryCode];
                 countryName = countryName ? countryName : null;
 
+                var population = parseInt(data['population'], 10);
+                population = population ? population : null;
+
                 var populatedPlace = {
                     geonameid: data.geonameid,
                     name: data.name,
@@ -92,23 +98,36 @@ fs.createReadStream('data/countryInfo.txt').pipe(csv.createStream({
                     },
                     region: { code: adminCode, name: regionName },
                     country: { code: countryCode, name: countryName },
+                    population: population,
                     timezone: data.timezone
                 };
 
+                total++;
                 persistenceService.GeoPopulatedPlace.update(
                     { geonameid: populatedPlace.geonameid },
                     populatedPlace,
                     { upsert: true },
                     function(err, numberAffected) {
+                        totalFinished++;
                         if(err) {
-                            return console.error(err);
+                            console.error(err);
+                        } else {
+                            console.log("Affected " + numberAffected + " rows (total " + totalFinished + "/" + total + ")");
                         }
-                        console.log("Affected " + numberAffected + " rows (total " + ++total + ")");
+
+                        if(ended && total == totalFinished) {
+                            process.exit();
+                        }
                     });
             }
         })
         .on('end',function(data){
             console.log("Finished");
+            ended = true;
+
+            if(total == totalFinished) {
+                process.exit();
+            }
         });
     });
 

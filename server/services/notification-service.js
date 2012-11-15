@@ -44,7 +44,7 @@ function findByTroupe(id, options, callback) {
   if(options.skip) q.skip(options.skip);
   if(options.limit) q.limit(options.limit);
 
-  q.desc('createdDate')
+  q.sort({ createdDate: 'desc' })
         .slaveOk()
         .exec(callback);
 }
@@ -52,7 +52,6 @@ function findByTroupe(id, options, callback) {
 function formatNotification(notification) {
   var templateData = {};
   _.extend(templateData, notification.data, { troupeId: notification.troupeId });
-  console.dir(templateData);
 
   var textTemplate = notificationTemplates[notification.notificationName];
   var linkTemplate = notificationLinkTemplates[notification.notificationName];

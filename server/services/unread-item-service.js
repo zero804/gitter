@@ -6,7 +6,7 @@ var troupeService = require("./troupe-service");
 var appEvents = require("../app-events");
 var _ = require("underscore");
 var redis = require("redis");
-var winston = require("winston");
+var winston = require("../utils/winston");
 var redisClient = redis.createClient();
 
 var DEFAULT_ITEM_TYPES = ['file', 'chat', 'request'];

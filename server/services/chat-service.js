@@ -30,22 +30,22 @@ module.exports = {
       return callback(null, chatMessage);
     });
   },
-  
+
   findById: function(id, callback) {
     persistence.ChatMessage.findById(id, function(err, chatMessage) {
       callback(err, chatMessage);
     });
   },
-  
+
   findChatMessagesForTroupe: function(troupeId, options, callback) {
     persistence.ChatMessage
       .where('toTroupeId', troupeId)
-      .desc('sent')
+      .sort({ sent: 'desc' })
       .limit(options.limit)
       .skip(options.skip)
       .slaveOk()
-      .run(callback);
+      .exec(callback);
   }
-  
-  
+
+
 };

@@ -44,9 +44,9 @@ function findMemberEmails(id, callback) {
 function findAllTroupesForUser(userId, callback) {
   persistence.Troupe
     .where('users', userId)
-    .asc('name')
+    .sort({ name: 'asc' })
     .slaveOk()
-    .run(callback);
+    .exec(callback);
 }
 
 function userHasAccessToTroupe(user, troupe) {
@@ -153,9 +153,9 @@ function findInviteByCode(code, callback) {
 function findAllUnusedInvitesForTroupe(troupeId, callback) {
    persistence.Invite.where('troupeId').equals(troupeId)
       .where('status').equals('UNUSED')
-      .asc('displayName', 'email')
+      .sort({ displayName: 'asc', email: 'asc' } )
       .slaveOk()
-      .run(callback);
+      .exec(callback);
 }
 
 function removeUserFromTroupe(troupeId, userId, callback) {
@@ -214,15 +214,15 @@ function addRequest(troupeId, userId, callback) {
   });
 }
 
-/* 
- * callback is function(err, requests) 
+/*
+ * callback is function(err, requests)
  */
 function findAllOutstandingRequestsForTroupe(troupeId, callback) {
   persistence.Request
       .where('troupeId', troupeId)
       .where('status', 'PENDING')
       .slaveOk()
-      .run(callback);
+      .exec(callback);
 }
 
 function findPendingRequestForTroupe(troupeId, id, callback) {

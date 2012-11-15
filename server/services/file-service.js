@@ -209,7 +209,7 @@ function storeFileVersionInGrid(options, callback) {
       file.mimeType = mimeType;
 
       version = new persistence.FileVersion();
-      version.creatorUserId = creatorUserId; 
+      version.creatorUserId = creatorUserId;
       version.createdDate = Date.now;
       version.thumbnailStatus = 'GENERATING';
       version.source = null; //TODO: add source
@@ -250,10 +250,10 @@ function storeFileVersionInGrid(options, callback) {
 
       /* Create a new version and push it onto the array of version */
       version = new persistence.FileVersion();
-      version.creatorUserId = creatorUserId; 
+      version.creatorUserId = creatorUserId;
       version.createdDate = Date.now;
       version.thumbnailStatus = 'GENERATING';
-      version.source = null; //TODO: add source 
+      version.source = null; //TODO: add source
       file.versions.push(version);
 
       /* File exists, add a version */
@@ -308,7 +308,7 @@ function storeFile(options, callback) {
 function findByIds(ids, callback) {
   persistence.File.where('_id').in(ids)
     .slaveOk()
-    .run(callback);
+    .exec(callback);
 }
 
 module.exports = {
