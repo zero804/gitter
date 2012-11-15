@@ -52,5 +52,8 @@
   "devDependencies": {
     "better-assert": "~0.1.0",
     "mocha": "~1.7.0"
+  },
+  "scripts": {
+    "test": "make test"
   }
 }
