@@ -121,11 +121,24 @@ var userService = {
       if(err) return callback(err);
       if(!user) return callback(err);
 
+      /* Save new history */
+      var history = new persistence.UserLocationHistory({
+        userId: user.id,
+        timestamp: location.timestamp,
+        coordinate: {
+            lon:  location.lon,
+            lat: location.lat
+        },
+        speed: location.speed
+      }).save(function(err) {
+        if(err) winston.error("User location history save failed: ", err);
+      });
 
       function persistUserLocation(named) {
         function nullIfUndefined(v) { return v ? v : null; }
 
         if(!named) named = {};
+
         user.location.timestamp = location.timestamp;
         user.location.coordinate.lon = location.lon;
         user.location.coordinate.lat = location.lat;
@@ -140,16 +153,17 @@ var userService = {
         });
       }
 
-      geocodingService.reverseGeocode( { lat: location.lat, lon: location.lon }, function(err, location) {
-        if(err || !location) {
+      geocodingService.reverseGeocode( { lat: location.lat, lon: location.lon }, function(err, namedLocation) {
+        if(err || !namedLocation) {
           winston.error("Reverse geocoding failure ", err);
           persistUserLocation(null);
           return;
         } else {
+          winston.info("User location (" + location.lon + "," + location.lat + ") mapped to " + namedLocation.name);
           persistUserLocation({
-            place: location.name,
-            region: location.region.name,
-            countryCode: location.country.code
+            place: namedLocation.name,
+            region: namedLocation.region.name,
+            countryCode: namedLocation.country.code
           });
         }
       });
