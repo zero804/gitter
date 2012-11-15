@@ -39,7 +39,9 @@ function execPreloads(preloads, callback) {
       });
 }
 
-function UserStrategy() {
+function UserStrategy(options) {
+  options = options ? options : {};
+
   this.preload = function(users, callback) {
     callback(null, true);
   };
@@ -55,19 +57,35 @@ function UserStrategy() {
       return "/avatar/" + user.id;
     }
 
+    function getLocationDescription(named) {
+      return named.place + ", " + named.region;
+    }
+
+    var location;
+    if(true /* options.showLocation */ && user.location.timestamp) {
+      location = {
+        description: getLocationDescription(user.location.named),
+        timestamp: user.location.timestamp,
+        countryCode: user.location.countryCode
+      };
+    } else {
+      location = undefined;
+    }
+
     return {
       id: user.id,
       displayName: user.displayName,
       email: user.email,
-      avatarUrl: getAvatarUrl()
+      avatarUrl: getAvatarUrl(),
+      location: location
     };
   };
 }
 
-function UserIdStrategy() {
+function UserIdStrategy(options) {
   var self = this;
 
-  var userStategy = new UserStrategy();
+  var userStategy = new UserStrategy(options);
 
   this.preload = function(ids, callback) {
     userService.findByIds(_.uniq(ids), function(err, users) {
