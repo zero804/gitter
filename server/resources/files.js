@@ -12,14 +12,14 @@ module.exports = {
     index: function(req, res, next) {
       fileService.findByTroupe(req.troupe.id, function(err, files) {
         if (err) {
-          console.log("Error in findByTroupe: " + err);
+          winston.error("Error in findByTroupe: ", err);
           return next(err);
         }
 
         var strategy = new restSerializer.FileStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });
         restSerializer.serialize(files, strategy, function(err, serializedFiles) {
           if (err) {
-            console.log("Error in Serializer:" + err);
+            winston.error("Error in Serializer:" + err);
             return next(err);
           }
           res.send(serializedFiles);
@@ -38,7 +38,7 @@ module.exports = {
     show: function(req, res, next) {
       restSerializer.serialize(req.file, new restSerializer.FileStrategy(), function(err, serializedFile) {
         if (err) {
-          console.log("Error in Serializer:" + err);
+          winston.error("Error in Serializer:" + err);
           return next(err);
         }
 
@@ -56,7 +56,6 @@ module.exports = {
 
     destroy: function(req, res){
       // TODO(AN): delete from GridFS
-      console.log("file: ", req.file);
       req.file.remove(function(err) {
         if(err) {
           winston.error("Unable to remove file", err);

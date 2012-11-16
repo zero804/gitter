@@ -8,7 +8,8 @@ var form = require("express-form"),
     signupService = require("../services/signup-service"),
     userService = require("../services/user-service"),
     troupeService = require("../services/troupe-service"),
-    passport = require('passport');
+    passport = require('passport'),
+    winston = require('winston');
 
 module.exports = {
     install: function(app) {
@@ -16,7 +17,6 @@ module.exports = {
         '/x',
         function(req, res) {
           if(req.user) {
-            console.log("Directing to select troupe");
             res.relativeRedirect("/select-troupe");
             return;
           }
@@ -38,17 +38,15 @@ module.exports = {
         ),
 
         function(req, res) {
-          console.log("request", req.headers);
           if (!req.form.isValid) {
             // TODO: Handle errors
-            console.log(req.form.errors);
+            winston.info("User form has errors", req.form.errors);
             /* TODO: make this nice */
             return res.send(500);
           }
 
           // we can either get an email address for a new user
           if (req.form.email) {
-            console.log("Got an Email address, must be a new user");
             signupService.newSignup({
               troupeName: req.form.troupeName,
               email: req.form.email
@@ -74,12 +72,11 @@ module.exports = {
           // or we can get a user id for an existing user, in which case we need to lookup his email address
           // there are probably better ways to do this, but i don't them. MB
           if (req.form.userId) {
-            console.log("Got a userID, must be an existing user who is clearly awesome");
             userService.findById(req.form.userId, function(err,user) {
               if(err) {
                 res.send(500);
               } else {
-                console.log("Got a user, his email is: " + JSON.stringify(user));
+                winston.info("Got a user, his email is: ", user);
 
                 signupService.newSignup({
                   troupeName: req.form.troupeName,
@@ -97,9 +94,7 @@ module.exports = {
                   troupeService.findById(id, function(err,troupe) {
                     if (err) {
                       res.send(500);
-                    }
-                    else {
-                      console.log("Got a troupe, it is:" + JSON.stringify(troupe));
+                    } else {
                       res.send({ success: true, redirectTo: troupe.uri});
                     }
                   });

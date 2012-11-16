@@ -83,7 +83,7 @@ module.exports = {
       });
 
       nowjs.on('connect', function() {
-        console.log("Socket connected");
+        winston.info("Incoming nowjs socket connected");
 
         var self = this;
 
@@ -91,7 +91,7 @@ module.exports = {
           if(err) return;
           if(!user) return;
 
-          console.log("Adding user to " + user.id);
+          winston.info("User connected", user.id);
 
           nowjs.getGroup("user." + user.id).addUser(self.user.clientId);
 

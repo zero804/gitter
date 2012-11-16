@@ -32,7 +32,7 @@ require('./now').install(server, sessionStore);
 var port = nconf.get("ws:port");
 var bindIp = nconf.get("ws:bindIp");
 
-console.log("Binding websockets service to " + bindIp + ":" + port);
+winston.info("Binding websockets service to " + bindIp + ":" + port);
 
 server.listen(port, bindIp);
 
@@ -42,7 +42,7 @@ var gid = nconf.get("runtime:gid");
 if(uid || gid) {
 
   process.nextTick(function() {
-      console.log("Switching to UID/GID: " + uid+ ":" + gid);
+      winston.info("Switching to UID/GID: " + uid+ ":" + gid);
       if(gid) process.setgid(gid);
       if(uid) process.setuid(uid);
   });

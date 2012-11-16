@@ -28,8 +28,9 @@ module.exports = {
         function(req, res) {
           winston.info("Form", req.form);
           if (!req.form.isValid) {
+            winston.info("User form has errors", req.form.errors);
             // TODO: Handle errors
-            console.log(req.form.errors);
+
             /* TODO: make this nice */
             return res.send(500);
           }
@@ -72,7 +73,7 @@ module.exports = {
           winston.info("Form", req.form);
           if (!req.form.isValid) {
             // TODO: Handle errors
-            console.log(req.form.errors);
+            winston.info("User form has errors", req.form.errors);
             /* TODO: make this nice */
             return res.send(500);
           }

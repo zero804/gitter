@@ -33,9 +33,9 @@ module.exports = {
             text: plaintext
           }, function(error, response){
             if(error) {
-              console.log(error);
-            }else{
-              console.log("Message sent: " + response.message);
+              winston.error("SES Email Error", error);
+            } else {
+              winston.info("Email sent successfully through SES", response.message);
             }
           });
         });

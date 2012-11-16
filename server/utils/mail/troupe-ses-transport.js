@@ -72,10 +72,6 @@ TroupeSESTransport.prototype.handleMessage = function(emailMessage, rawEmail, ca
       date = new Date(),
       urlparts = urllib.parse(this.options.ServiceUrl);
 
-  console.log("************* RAW Email ****************");
-  console.log(rawEmail);
-
-
   var params = {
     'Action': 'SendRawEmail',
     'RawMessage.Data': (new Buffer(rawEmail, "utf-8")).toString('base64'),

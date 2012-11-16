@@ -341,7 +341,6 @@ function UnreadItemStategy(options) {
   var itemType = options.itemType;
 
   this.preload = function(data, callback) {
-    console.log("unreadItemService.getUnreadItems", data);
     unreadItemService.getUnreadItems(data.userId, data.troupeId, itemType, function(err, ids) {
       if(err) return callback(err);
 
