@@ -28,7 +28,8 @@ define([
         "click .add-troupe" : "addTroupeClicked",
         "click .menu-add-troupe" : "addTroupeClicked",
         "click .menu-add-person" : "showShareView",
-        "click #install-chrome-extension" : "installChromeExtensionClicked"
+        "click #install-chrome-extension" : "installChromeExtensionClicked",
+        "click .trpNavItemText" : "resetMenu"
          //"click #trpPersonIcon" : "toggleUserMenu"
     },
 
@@ -185,12 +186,16 @@ define([
     },
 
     resetMenu: function(){
-      $('#body').animate({
-        right: -200
-      }, 200, 'swing', function () {
+      console.log("Reset Menu");
+      if (this.compactView) {
+        console.log("Compact:" + this.compactView);
+        $('#body').animate({
+          left: -0
+        }, 200, 'swing', function () {
 
-       }
-      );
+         }
+        );
+      }
     },
 
     toggleSelector: function(){
