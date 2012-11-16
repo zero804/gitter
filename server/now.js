@@ -5,7 +5,7 @@
 var passport = require('passport'),
     nowjs = require("now"),
     redis = require("redis"),
-    winston = require('./utils/winston'),
+    winston = require('winston'),
     persistence = require("./services/persistence-service"),
     chatService = require("./services/chat-service"),
     userService = require("./services/user-service"),
@@ -322,7 +322,7 @@ module.exports = {
 
             var Strategy = restSerializer.getStrategy(modelName, true);
 
-            // No strategy, ignore it 
+            // No strategy, ignore it
             if(!Strategy) {
               winston.info("Skipping serialization as " + modelName + " has no serialization strategy");
               return;

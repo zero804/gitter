@@ -1,12 +1,14 @@
 /*jslint node: true */
 "use strict";
 
+/* Configure winston before all else! */
+var winston = require('./utils/winston');
+
 var express = require('express'),
 	Resource = require('express-resource'),
   http = require('http'),
   unreadItemService = require('./services/unread-item-service'),
   nconf = require('./utils/config'),
-  winston = require('./utils/winston'),
   oauth2 = require('./web/oauth2');
 
 var app = express();

@@ -2,7 +2,7 @@
 "use strict";
 
 var persistenceService = require("./persistence-service");
-var winston = require("../utils/winston");
+var winston = require("winston");
 
 exports.findClientById = function(id, callback) {
   persistenceService.OAuthClient.findById(id, callback);

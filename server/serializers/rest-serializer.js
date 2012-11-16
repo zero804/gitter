@@ -8,7 +8,7 @@ var unreadItemService = require("../services/unread-item-service");
 var Q = require("q");
 var _ = require("underscore");
 var handlebars = require('handlebars');
-var winston = require("../utils/winston");
+var winston = require("winston");
 var collections = require("../utils/collections");
 
 var predicates = collections.predicates;

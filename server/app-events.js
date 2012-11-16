@@ -4,7 +4,7 @@
 
 var events = require('events');
 
-var winston = require('./utils/winston');
+var winston = require('winston');
 var _ = require('underscore');
 var redis = require('redis');
 var client = redis.createClient();
@@ -47,7 +47,7 @@ module.exports = {
   newUnreadItem: function(userId, troupeId, items) {
     emit('newUnreadItem', {
       userId: userId,
-      troupeId: troupeId, 
+      troupeId: troupeId,
       items: items
     });
   },
@@ -60,7 +60,7 @@ module.exports = {
   unreadItemsRemoved: function(userId, troupeId, items) {
     emit('unreadItemRemoved', {
       userId: userId,
-      troupeId: troupeId, 
+      troupeId: troupeId,
       items: items
     });
   },
@@ -113,7 +113,7 @@ module.exports = {
   mailEvent: function(event, troupeId, conversationId, mailIndex) {
     emit('mail', {
       event: event,
-      troupeId: troupeId, 
+      troupeId: troupeId,
       conversationId: conversationId,
       mailIndex: mailIndex
     });

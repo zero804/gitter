@@ -9,7 +9,7 @@ var oauth2orize = require('oauth2orize'),
     login = require('connect-ensure-login'),
     oauthService = require('../services/oauth-service'),
     mongoose = require('mongoose'),
-    winston = require('../utils/winston');
+    winston = require('winston');
 
 // create OAuth 2.0 server
 var server = oauth2orize.createServer();

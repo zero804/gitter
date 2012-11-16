@@ -8,7 +8,7 @@ var persistence = require("./persistence-service"),
     emailNotificationService = require("./email-notification-service"),
     uuid = require('node-uuid'),
     geocodingService = require("./geocoding-service"),
-    winston = require("../utils/winston");
+    winston = require("winston");
 
 var userService = {
   newUser: function(options) {
