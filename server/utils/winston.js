@@ -5,11 +5,26 @@
 var nconf = require('./config');
 var winston = require("winston");
 
-var logger = new (winston.Logger)({
-    transports: [
-      new (winston.transports.Console)({ colorize: true, timestamp: true})
-    ]
+winston.remove(winston.transports.Console);
+winston.add(winston.transports.Console, {
+  colorize: nconf.get("logging:colorize"),
+  timestamp: nconf.get("logging:timestamp"),
+  level: nconf.get("logging:level")
 });
 
+if(nconf.get("logging:loggly")) {
+  console.log("Loggly!");
+  //
+  // Requiring `winston-loggly` will expose
+  // `winston.transports.Loggly`
+  //
+  require('winston-loggly');
 
-module.exports = logger;
+  winston.add(winston.transports.Loggly, {
+    level: nconf.get("logging:logglyLevel"),
+    subdomain: nconf.get("logging:logglySubdomain"),
+    inputToken: nconf.get("logging:logglyInputToken")
+  });
+}
+
+module.exports = winston;

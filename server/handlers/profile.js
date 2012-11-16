@@ -9,7 +9,7 @@ var form = require("express-form"),
     userService = require("../services/user-service"),
     passport = require('passport'),
     middleware = require('./middleware'),
-    winston = require("../utils/winston");
+    winston = require("winston");
 
 module.exports = {
     install: function(app) {
@@ -78,7 +78,7 @@ module.exports = {
               }
 
               if(req.accepts("application/json")) {
-                res.send({ 
+                res.send({
                   success: true,
                   displayName: req.form.displayName
                 });

@@ -4,7 +4,7 @@
 
 var troupeService = require('../services/troupe-service'),
     fileService = require('../services/file-service'),
-    winston = require('../utils/winston');
+    winston = require('winston');
 
 module.exports = {
     index: function(req, res, next) {

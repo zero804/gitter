@@ -4,7 +4,7 @@
 
 var uuid = require('node-uuid'),
     sechash = require('sechash'),
-    winston = require('../utils/winston'),
+    winston = require('winston'),
     redis = require("redis");
 
 var redisClient = redis.createClient();
@@ -15,7 +15,7 @@ function generateAuthToken(req, res, userId, options, callback) {
 
   var key = uuid.v4();
   var token = uuid.v4();
-  res.cookie('auth', key + ":" + token, { 
+  res.cookie('auth', key + ":" + token, {
     maxAge: 1000 * 60 * 60 * 24 * timeToLiveDays,
     secure: false,
     httpOnly: true

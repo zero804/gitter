@@ -3,8 +3,8 @@
 "use strict";
 
 var passport = require("passport"),
-    winston = require("../utils/winston");
-var nconf = require('../utils/config'),
+    winston = require("winston"),
+    nconf = require('../utils/config'),
     troupeService = require("../services/troupe-service"),
     rememberMe = require('../web/rememberme-middleware'),
     middleware = require('./middleware'),

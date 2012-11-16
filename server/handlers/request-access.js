@@ -8,7 +8,7 @@ var form = require("express-form"),
     signupService = require("../services/signup-service"),
     troupeService = require("../services/troupe-service"),
     passport = require('passport'),
-    winston = require('../utils/winston');
+    winston = require('winston');
 
 module.exports = {
     install: function(app) {
@@ -43,14 +43,14 @@ module.exports = {
               name: req.form.name,
               email: req.form.email
             }, function(err, userId) {
-              if(err) { 
+              if(err) {
                 winston.error("newSignupWithAccessRequest failed", err);
 
                 if(err.userExists) {
                   return res.send({ success: false, userExists: true });
                 }
 
-                return res.send(500); 
+                return res.send(500);
               }
 
               res.send({ success: true });
@@ -83,7 +83,7 @@ module.exports = {
 
 
             troupeService.addRequest(troupe.id, req.user.id, function(err, request) {
-              if(err) return res.send(500); 
+              if(err) return res.send(500);
               res.send({ success: true });
             });
 
