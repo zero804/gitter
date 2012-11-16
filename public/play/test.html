@@ -271,7 +271,7 @@ font-family: 'StagWeb-Light';
 
 .slidingview_wrapper {
   position:absolute;
-  top:40px;
+  top:0px;
   bottom:0px;
   left:0px;
   right:0px;
@@ -283,6 +283,7 @@ font-family: 'StagWeb-Light';
 .trpContentWrap {
   padding: 0px;
   margin: 0px;
+  height: 100%;
 /*  overflow-x: hidden;*/
 /*  overflow-y: auto;*/
 }
@@ -357,7 +358,7 @@ font-family: 'StagWeb-Light';
       <div class="trpContentContainer">
 
         <div class="contentBody" id="primary-view">
-              <!-- <div class="trpToolbarContainer">
+<!--               <div class="trpToolbarContainer">
                 <ul class="trpToolbar">
                   <li class="trpToolbarItem"><img src="icon-small-chat.png"></li>
                   <li class="trpToolbarItem"><img src="icon-small-folder.png"></li>
@@ -501,11 +502,7 @@ font-family: 'StagWeb-Light';
 
 $(document).ready(function() {
 
-      $(document).ready( function() {
-        
-        //Setup the ViewNavigator
-        new SlidingView( 'sidebar', 'body' ); 
-      } );
+   new SlidingView( 'sidebar', 'body' ); 
       
 
   $('.sideBarElement').hide();
