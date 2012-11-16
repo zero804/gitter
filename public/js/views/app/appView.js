@@ -10,11 +10,14 @@ define([
   'views/share/shareModalView',
   'views/widgets/nav',
   'noty',
-  'components/unread-items-client'
-], function($, _, Backbone, troupeModels, notificationModels, TroupeViews, SignupModalView, ShareModalView, NavView, notyStub, unreadItemsClient) {
+  'components/unread-items-client',
+  'slider',
+  'retina',
+  'animateEnhanced'
+], function($, _, Backbone, troupeModels, notificationModels, TroupeViews, SignupModalView, ShareModalView, NavView, notyStub, unreadItemsClient, SliderView, RetinaDisplay) {
   "use strict";
 
-  var AppView = Backbone.View.extend({
+  var AppView = TroupeViews.Base.extend({
     el: 'body',
 
     events: {
@@ -30,10 +33,13 @@ define([
     },
 
     initialize: function(options) {
+      if (this.compactView) new SlidingView( 'sidebar', 'body' ); 
       var self = this;
       this.router = options.router;
 
       _.bindAll(this, 'profileMenuClicked', 'settingsMenuClicked', 'signoutMenuClicked', 'toggleSelector', 'addTroupeClicked');
+
+
 
       function attachNavView(selector, itemType) {
         var v;
@@ -176,6 +182,15 @@ define([
 
         modal.show();
       });
+    },
+
+    resetMenu: function(){
+      $('#body').animate({
+        right: -200
+      }, 200, 'swing', function () {
+
+       }
+      );
     },
 
     toggleSelector: function(){
