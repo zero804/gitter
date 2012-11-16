@@ -1,6 +1,6 @@
 <div class="trpChatInput">
   <div class="trpChatIcon"><img src="/images/2/icon-chat.png"></div>
-  <div><textarea class="trpChatBox" placeholder="Click here, type something to say and press Enter to send."></textarea></div>
+  <div><textarea class="trpChatBox" {{^compactView}}placeholder="Click here, type something to say and press Enter to send."{{/compactView}}{{#compactView}}placeholder="Touch here and type something"{{/compactView}}></textarea></div>
 </div>
 
 <!-- the chat content below is an ugly ugly hack, will sort it out. Fluid rows have their downside. -->
