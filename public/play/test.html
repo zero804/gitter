@@ -246,141 +246,253 @@ font-family: 'StagWeb-Light';
     margin-bottom: 6px;
   }
 
+.slidingview_sidebar {
+  position:absolute;
+  width:235px;
+  left:0px;
+  top:0px;
+  bottom:0px;
+  transform: translate3d(0,0,0);
+  -webkit-transform: translate3d(0,0,0);
+/*  overflow:hidden;*/
+}
+
+.slidingview_body {
+  position:absolute;
+  left:0px;
+  top:0px;
+  bottom:0px;
+  transform: translate3d(0,0,0);
+  -webkit-transform: translate3d(0,0,0);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+
+.slidingview_wrapper {
+  position:absolute;
+  top:40px;
+  bottom:0px;
+  left:0px;
+  right:0px;
+  overflow: hidden;
+  padding: 0px;
+  margin: 0px;
+}
+
+.trpContentWrap {
+  padding: 0px;
+  margin: 0px;
+/*  overflow-x: hidden;*/
+/*  overflow-y: auto;*/
+}
+.trpContentContainer {
+  padding: 0px;
+  margin: 0px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overflow: hidden;
+  max-width: 250px;
+}
+
 	</style>
 </head>
 
 <body>
   
-<div class="trpProfileHeader trpBodyEm">
-  Souper Troupers
-</div>
-<!-- <div class="trpToolbarContainer">
-  <ul class="trpToolbar">
-    <li class="trpToolbarItem"><img src="icon-small-chat.png"></li>
-    <li class="trpToolbarItem"><img src="icon-small-folder.png"></li>
-    <li class="trpToolbarItem"><img src="icon-small-mail.png"></li>
-  </ul>
-</div> -->
-<div class="trpContactRoster">
-      <div class="trpDisplayPicture andrew-status" id="andrew-status1" rel="tooltip" style="background-image: url('andrew.png');">
-        <div class="trpStatus trpStatusOnline" id="status"> </div>
+        
+  <div class="trpProfileHeader trpBodyEm">
+    Souper Troupers
+  </div>
+  
+  <div class="slidingview_wrapper">  
+    <div class="trpNavWrap" id="sidebar">
+      <div class="trpNavContainer">
+        <div class="trpNav">
+          <div class="trpNavItemContainer" id="nav-chat">
+            <div class="trpNavItemIcon">
+              <img src='images/2/icon-chat.png' id="chat-icon" width="20" height="17">
+            </div>
+            <div class="trpNavItemText">
+              <a href="#chat">Chat</a>
+            </div>     
+            <div class="trpNavNotification label-notification"></div>
+          </div>
+
+          <div class="trpNavItemContainer" id="nav-mail">
+            <div class="trpNavItemIcon">
+              <img src='images/2/icon-mail.png' id="mail-icon" width="19" height="11">
+            </div>
+            <div class="trpNavItemText">
+              <a href="#mail">Mail</a>
+            </div>
+            <div class="trpNavNotification label-notification"></div>
+          </div>
+
+          <div class="trpNavItemContainer" id="nav-files">
+            <div class="trpNavItemIcon">
+              <img src='images/2/icon-files.png' id="file-icon" width="19" height="18">
+            </div>
+            <div class="trpNavItemText">
+              <a href="#files">Files</a>
+            </div>
+            <div class="trpNavNotification label-notification"></div>
+          </div>
+
+          <div class="trpNavItemContainer" id="nav-people">
+            <div class="trpNavItemIcon">
+              <img src='images/2/icon-people.png' id="people-icon" width="21" height="19">
+            </div>
+            <div class="trpNavItemText">
+              <a href="#people">People</a>
+            </div>
+            <div class="trpNavNotification label-notification"></div>
+          </div>
+
+        </div>
       </div>
-      <div class="trpDisplayPicture" style="background-image: url('mike.png');">
-        <div class="trpStatus trpStatusAway" id="status"> </div>
-      </div>
-      <div class="trpDisplayPicture" style="background-image: url('richard.png');">
-        <div class="trpStatus trpStatusBusy" id="status"> </div>
-      </div>
-</div>
-  
-<div class="trpContactList" style="display: none"> 
-  <div class="trpContactItem">
-    <div class="trpDisplayPicture andrew-status" id="andrew-status" style="background-image: url('andrew.png');">
-      <div class="trpStatus trpStatusOnline" id="status"> </div>
-      <div class="unread">12</div>
     </div>
-    <div class="trpContactNameContainer">
-      <div class="trpContactName">Andrew Newdigate</div>
-      <div class="trpContactStatus">Researching geoencoding APIs</div>
-    </div>
-    <div class="trpContactLocation"><img src="icon-small-home.png" id="andrew-location" rel="tooltip"></div>      
-  </div>
-  
-  <div class="trpContactItem">
-    <div class="trpDisplayPicture" style="background-image: url('mike.png');">
-      <div class="trpStatus trpStatusAway" id="status"> </div>
-      <div class="unread">12</div>
-    </div>
-    <div class="trpContactNameContainer">
-      <div class="trpContactName">Mike Bartlett</div>
-      <div class="trpContactStatus">Doing somethign really longwinded and shit</div>
-    </div>
-    <div class="trpContactLocation"><img src="icon-small-pin.png"></div>      
-  </div>
-</div>
-  
-  
-<div class="trpChatStrip">
-  <div class="trpChatRowRemote2" style="padding: 4px">
-    <div class="trpDisplayPicture" style="background-image: url('mike.png');"> </div>
-    <div class="trpChatBubble remote" style="vertical-align: top; margin-left: 8px">
-      <div class="trpChatText trpBodyMedium">Hi there guys</div>
-    </div>
-  </div>
-  
-  <div class="trpChatRowRemote2" style="padding: 4px">
-    <div class="trpDisplayPicture andrew-status" rel="tooltip" style="background-image: url('andrew.png');"> </div>
-    <div class="trpChatBubble remote" style="vertical-align: top; margin-left: 8px">
-      <div class="trpChatText trpBodyMedium">Hey Mike, what's happening, fancy lunch at Pret</div>
-    </div>
-  </div>
-  
-  <div class="trpChatRowRemote2" style="padding: 4px">
-    <div class="trpDisplayPicture" style="background-image: url('mike.png');"> </div>
-    <div class="trpChatBubble remote" style="vertical-align: top; margin-left: 8px">
-      <div class="trpChatText trpBodyMedium">No it's cool, I had a late 2nd breakfast today</div>
-    </div>
-  </div>
-  
-</div>    
     
+    <div class="trpContentWrap" id="body">
+      <div class="trpContentContainer">
 
-<div class="trpSideBar" id="sidebar">
+        <div class="contentBody" id="primary-view">
+              <!-- <div class="trpToolbarContainer">
+                <ul class="trpToolbar">
+                  <li class="trpToolbarItem"><img src="icon-small-chat.png"></li>
+                  <li class="trpToolbarItem"><img src="icon-small-folder.png"></li>
+                  <li class="trpToolbarItem"><img src="icon-small-mail.png"></li>
+                </ul>
+              </div> -->
 
-<br><br><br>
-<div class="trpDisplayPicture sideBarElement" style="background-image: url('andrew.png');">
-  <div class="trpStatus trpStatusOnline" id="status"> </div>
-  <div class="unread">12</div>
-</div>
+              <div class="trpContactRoster">
+                    <div class="trpDisplayPicture andrew-status" id="andrew-status1" rel="tooltip" style="background-image: url('andrew.png');">
+                      <div class="trpStatus trpStatusOnline" id="status"> </div>
+                    </div>
+                    <div class="trpDisplayPicture" style="background-image: url('mike.png');">
+                      <div class="trpStatus trpStatusAway" id="status"> </div>
+                    </div>
+                    <div class="trpDisplayPicture" style="background-image: url('richard.png');">
+                      <div class="trpStatus trpStatusBusy" id="status"> </div>
+                    </div>
+              </div>
+                
+              <div class="trpContactList" style="display: none"> 
+                <div class="trpContactItem">
+                  <div class="trpDisplayPicture andrew-status" id="andrew-status" style="background-image: url('andrew.png');">
+                    <div class="trpStatus trpStatusOnline" id="status"> </div>
+                    <div class="unread">12</div>
+                  </div>
+                  <div class="trpContactNameContainer">
+                    <div class="trpContactName">Andrew Newdigate</div>
+                    <div class="trpContactStatus">Researching geoencoding APIs</div>
+                  </div>
+                  <div class="trpContactLocation"><img src="icon-small-home.png" id="andrew-location" rel="tooltip"></div>      
+                </div>
+                
+                <div class="trpContactItem">
+                  <div class="trpDisplayPicture" style="background-image: url('mike.png');">
+                    <div class="trpStatus trpStatusAway" id="status"> </div>
+                    <div class="unread">12</div>
+                  </div>
+                  <div class="trpContactNameContainer">
+                    <div class="trpContactName">Mike Bartlett</div>
+                    <div class="trpContactStatus">Doing somethign really longwinded and shit</div>
+                  </div>
+                  <div class="trpContactLocation"><img src="icon-small-pin.png"></div>      
+                </div>
+              </div>
+                
+                
+              <div class="trpChatStrip">
+                <div class="trpChatRowRemote2" style="padding: 4px">
+                  <div class="trpDisplayPicture" style="background-image: url('mike.png');"> </div>
+                  <div class="trpChatBubble remote" style="vertical-align: top; margin-left: 8px">
+                    <div class="trpChatText trpBodyMedium">Hi there guys</div>
+                  </div>
+                </div>
+                
+                <div class="trpChatRowRemote2" style="padding: 4px">
+                  <div class="trpDisplayPicture andrew-status" rel="tooltip" style="background-image: url('andrew.png');"> </div>
+                  <div class="trpChatBubble remote" style="vertical-align: top; margin-left: 8px">
+                    <div class="trpChatText trpBodyMedium">Hey Mike, what's happening, fancy lunch at Pret</div>
+                  </div>
+                </div>
+                
+                <div class="trpChatRowRemote2" style="padding: 4px">
+                  <div class="trpDisplayPicture" style="background-image: url('mike.png');"> </div>
+                  <div class="trpChatBubble remote" style="vertical-align: top; margin-left: 8px">
+                    <div class="trpChatText trpBodyMedium">No it's cool, I had a late 2nd breakfast today</div>
+                  </div>
+                </div>
+                
+              </div>    
+                  
 
-<br><Br><Br>
-  
-  <div class="trpDisplayPicture sideBarElement" style="background-image: url('mike.png');">
-  <div class="trpStatus trpStatusAway" id="status"> </div>
-  <div class="unread">12</div>
-</div>
-<br><Br><Br>
-  
-  <div class="trpDisplayPicture sideBarElement" style="background-image: url('richard.png');">
-  <div class="trpStatus trpStatusBusy" id="status"> </div>
-  <div class="unread">12</div>
-</div>
-<br><Br><Br>
-  
-</div>
+<!--               <div class="trpSideBar" id="sidebar">
 
-<div id="andrew-status-tooltip" style="display:none">
-  <div class="trpTooltipLeft">
-    <div class="trpH3">Available</div>
-    <div class="trpBodySmall">Active just over 2 minutes ago</div>
-    <div class="trpBodySmall">Has a meeting at 15:30</div>
-  </div>
-</div>
+              <br><br><br>
+              <div class="trpDisplayPicture sideBarElement" style="background-image: url('andrew.png');">
+                <div class="trpStatus trpStatusOnline" id="status"> </div>
+                <div class="unread">12</div>
+              </div>
 
-<div id="andrew-location-tooltip" style="display:none">
-  <div class="trpTooltipLeft">
-    <div class="trpH3">In the office</div>
-    <div class="trpBodySmall">London, United Kingdom</div>
-  </div>
-  <div class="trpTooltipRight">
-    <img src="clouds.png" width="48" height="23">
-    <img src="clock.png" width="65" height="21">
-  </div>
-</div>
+              <br><Br><Br>
+                
+                <div class="trpDisplayPicture sideBarElement" style="background-image: url('mike.png');">
+                <div class="trpStatus trpStatusAway" id="status"> </div>
+                <div class="unread">12</div>
+              </div>
+              <br><Br><Br>
+                
+                <div class="trpDisplayPicture sideBarElement" style="background-image: url('richard.png');">
+                <div class="trpStatus trpStatusBusy" id="status"> </div>
+                <div class="unread">12</div>
+              </div>
+              <br><Br><Br>
+                
+              </div>
 
-<br><br><br><br><br><br><Br><br><br><br><br><br><br>
-  
-  <div id="show">
-  Show
-</div>
-<div id="hide">
-  hide
-</div>
+              <div id="andrew-status-tooltip" style="display:none">
+                <div class="trpTooltipLeft">
+                  <div class="trpH3">Available</div>
+                  <div class="trpBodySmall">Active just over 2 minutes ago</div>
+                  <div class="trpBodySmall">Has a meeting at 15:30</div>
+                </div>
+              </div>
 
-<br><br><br><Br><br><br><br><br><br><br>
+              <div id="andrew-location-tooltip" style="display:none">
+                <div class="trpTooltipLeft">
+                  <div class="trpH3">In the office</div>
+                  <div class="trpBodySmall">London, United Kingdom</div>
+                </div>
+                <div class="trpTooltipRight">
+                  <img src="clouds.png" width="48" height="23">
+                  <img src="clock.png" width="65" height="21">
+                </div>
+              </div>
+ -->
+              <br><br><br><br><br><br><Br><br><br><br><br><br><br>
+                
+                <div id="show">
+                Show
+              </div>
+              <div id="hide">
+                hide
+              </div>
 
+              <br><br><br><Br><br><br><br><br><br><br>
+                
+                </div>
+                </div>
+                </div>
+</div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 <script src="bootstrap.js"></script>
+<script src="slidingview.js"></script>
+<script src="jquery.animate-enhanced.js"></script>
+
+
 <script>
 
   window.addEventListener('load', function() {
@@ -388,6 +500,14 @@ font-family: 'StagWeb-Light';
   }, false);
 
 $(document).ready(function() {
+
+      $(document).ready( function() {
+        
+        //Setup the ViewNavigator
+        new SlidingView( 'sidebar', 'body' ); 
+      } );
+      
+
   $('.sideBarElement').hide();
 
   $('.andrew-status').tooltip({ 
