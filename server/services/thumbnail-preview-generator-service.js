@@ -53,7 +53,6 @@ function getPreviewGenerationStrategy(mimeType) {
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'application/vnd.openxmlformats-officedocument.presentationml.presentation'
     ].indexOf(mimeType) >= 0) {
-    console.log("**************** Yes, I'm going to make a PDF out of this file. **************");
     return pdfPreviewGenerationStategy;
   }
 

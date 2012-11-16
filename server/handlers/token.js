@@ -9,7 +9,6 @@ module.exports = {
     install: function(app) {
       app.get('/token',
         function(req, res, next) {
-          console.log("............ token");
           if(!req.user) return res.send(401);
           userService.getUserToken(req.user.id, function(err, token) {
             if(err || !token) return next(err);
