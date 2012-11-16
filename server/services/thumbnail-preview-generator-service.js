@@ -6,7 +6,7 @@
 
 var persistence = require("./persistence-service");
 var appEvents = require("../app-events");
-var winston = require("../utils/winston");
+var winston = require("winston");
 var image = require("../utils/image");
 var converterService = require("../utils/converter-service-client");
 var gridfs = require("../utils/gridfs");
@@ -120,7 +120,7 @@ function onCreateFileVersion(data) {
         winston.error("Unexpected error uploading file to gridfs", err);
         updateVersionThumbnailStatus('NO_THUMBNAIL');
         return ;
-      } 
+      }
 
       updateVersionThumbnailStatus('GENERATED');
 

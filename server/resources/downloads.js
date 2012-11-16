@@ -6,7 +6,7 @@ var troupeService = require('../services/troupe-service'),
     fileService = require('../services/file-service'),
     mongoose = require("mongoose"),
     fs = require("fs"),
-    winston = require('../utils/winston');
+    winston = require('winston');
 
 module.exports = {
     index: function(req, res, next) {

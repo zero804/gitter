@@ -3,7 +3,7 @@
 "use strict";
 
 var redis = require("redis"),
-    winston = require('../utils/winston'),
+    winston = require('winston'),
     appEvents = require('../app-events.js'),
     redisClient;
 

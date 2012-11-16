@@ -3,7 +3,7 @@
 "use strict";
 
 var troupeService = require("../services/troupe-service");
-var winston = require("../utils/winston");
+var winston = require("winston");
 var userService = require("../services/user-service");
 var unreadItemService = require("../services/unread-item-service");
 var restSerializer = require("../serializers/rest-serializer");

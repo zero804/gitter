@@ -2,7 +2,7 @@
 "use strict";
 
 var GeoPopulatedPlace = require("./persistence-service").GeoPopulatedPlace;
-var winston = require("../utils/winston");
+var winston = require("winston");
 
 
 var earthRadiansMultiplier = (6371 * Math.PI / 180);

@@ -3,7 +3,7 @@
 "use strict";
 
 var mongoose = require("mongoose");
-var winston = require("./winston");
+var winston = require("winston");
 
 /* private */
 function uploadFile(options, callback) {
