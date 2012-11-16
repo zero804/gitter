@@ -167,7 +167,7 @@
           }
           if(!(currVar[prop] && typeof currVar[prop] === "object")) {
             currVar[prop] = {};
-          } 
+          }
           currVar = currVar[prop];
         }
         return currVar;
@@ -536,16 +536,19 @@
 
     };
 
+    /*
     var dependencies = [
       { key: 'io', path: '/' + now.core.options.socketio.resource + '/socket.io.js'}
     ];
     var dependenciesLoaded = 0;
+    */
 
     var scriptLoaded = function () {
-      dependenciesLoaded++;
+      /*dependenciesLoaded++;
       if (dependenciesLoaded !== dependencies.length) {
         return;
       }
+      */
       socket = io.connect(uri + '/', now.core.options.socketio || {});
       now.core.socketio = socket;
       socket.on('connect', function () {
@@ -583,7 +586,8 @@
         fqnMap.data = {};
       });
     };
-
+    scriptLoaded();
+    /*
     for (var i = 0, ii = dependencies.length; i < ii; i++) {
       if (window[dependencies[i]['key']]) {
         scriptLoaded();
@@ -600,8 +604,10 @@
           }
         };
       }
+
       document.getElementsByTagName('head')[0].appendChild(fileref);
     }
+    */
     return (nowObjects[uri] = now);
   };
   window.nowInitialize = noConflict;

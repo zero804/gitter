@@ -28,7 +28,8 @@ window.require_config = {
     templates: '../templates',
     zeroClipboard: 'libs/zeroClipboard/ZeroClipboard',
     spinjs: 'libs/spinjs/1.7.2/spin',
-    ga: '//ssl.google-analytics.com/ga' // TODO: change this back to just 'ga'
+    socketio: 'libs/socket.io/0.9.11/socket.io.min',
+    ga: '//ssl.google-analytics.com/ga'
   },
   shim: {
     'bootstrap': {
@@ -36,6 +37,7 @@ window.require_config = {
       exports: 'Bootstrap'
     },
     'now': {
+      deps: ['socketio'],
       exports: 'nowInitialize'
     },
     'noty': {
@@ -44,11 +46,6 @@ window.require_config = {
     'ga': {
       exports: '_gaq'
     },
-    /*
-    Handlebars: {
-      exports: 'Handlebars'
-    },
-    */
     'jqueryui':  ['jquery'],
     'jquery_validate':  ['jquery'],
     'jquery_colorbox': ['jquery'],
