@@ -80,7 +80,7 @@ module.exports = {
 
             var page;
             if(req.headers['user-agent'].indexOf('Mobile') >= 0) {
-              page = 'app';
+              page = 'app-mobile';
             } else {
               page = 'app';
             }
