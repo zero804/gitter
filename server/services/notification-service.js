@@ -4,7 +4,7 @@
 
 var persistence = require("./persistence-service");
 var appEvents = require("../app-events");
-var winston = require("../utils/winston");
+var winston = require("winston");
 var c = require("../utils/collections");
 var handlebars = require('handlebars');
 var _ = require('underscore');
