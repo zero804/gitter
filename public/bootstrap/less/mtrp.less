@@ -10,6 +10,18 @@ html {
  background-color: @trpGreen;
 }
 
+.mtrpMobileSpinner {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  opacity: 0.9;
+  text-align: center;
+  z-index: 2000;
+}
+
 .mtrpLoginContainer {
 	text-align: center;
 
@@ -83,6 +95,11 @@ border-left: 1px solid @trpLightGrey;
 			}
 
 @media screen and (max-width: 600px) {
+
+  .trpSpinner {
+    padding-top: 200px;
+  }
+
   .trpNavWrap {
       top: 50px;
       width: 320px;
@@ -132,6 +149,40 @@ border-left: 1px solid @trpLightGrey;
     padding-left: 0px;
   }
 
+  .trpFileViewItem {
+    float: left;
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 0px;
+    display: block;
+    clear: both;
+    }
+
+    .trpFileThumbnailContainer {
+      display: inline-block;
+      width: 60px;
+    }
+
+    .trpFilename {
+    margin-top: 20px;
+    padding-left: 20px;
+    float: none;
+    height: 20px;
+    color: @trpDarkGrey;
+    .trpBodyMedium;
+    width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  .trpFileThumbnail {
+      width: 60px;
+      height: 60px;
+  }
 
 }
 
