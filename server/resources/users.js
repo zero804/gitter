@@ -38,7 +38,7 @@ module.exports = {
     },
 
     destroy: function(req, res, next){
-      var user = req.user; // NB NB NB, not the usual req.user, but the req.RESOURCEish user. Capish? 
+      var user = req.user; // NB NB NB, not the usual req.user, but the req.RESOURCEish user. Capish?
       troupeService.removeUserFromTroupe(req.troupe._id, user.id, function (err) {
       if(err) return next(err);
         res.send(200);
@@ -46,7 +46,7 @@ module.exports = {
     },
 
     load: function(req, id, callback) {
-      var userInTroupeId = _.find(req.troupe.users, function(v) { console.log(v); return v == id;} );
+      var userInTroupeId = _.find(req.troupe.users, function(v) { return v == id;} );
       userService.findById(userInTroupeId, callback);
     }
 

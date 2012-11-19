@@ -29,7 +29,7 @@ function on(event, callback) {
   }
 
   eventEmitter.on(event, function(message) {
-    winston.info("Event received", message);
+    winston.info("Event received", { message: message });
     callback(message);
   });
 }

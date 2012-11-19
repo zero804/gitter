@@ -8,7 +8,8 @@ var persistence = require("./persistence-service"),
     userService = require("./user-service"),
     uuid = require('node-uuid'),
     sechash = require('sechash'),
-    nconf = require('../utils/config');
+    nconf = require('../utils/config'),
+    winston = require('winston');
 
 
 function createUniqueUri() {
@@ -24,6 +25,8 @@ function createUniqueUri() {
 }
 
 function newTroupeForExistingUser(options, user, callback) {
+  winston.info("New troupe for existing user", options);
+
   var uri = createUniqueUri();
 
   var troupe = new persistence.Troupe();
@@ -40,6 +43,8 @@ function newTroupeForExistingUser(options, user, callback) {
 }
 
 function newTroupeForNewUser(options, callback) {
+  winston.info("New troupe for new user", options);
+
   var confirmationCode = uuid.v4();
   var user = new persistence.User();
   user.email = options.email;
@@ -71,6 +76,8 @@ function newTroupeForNewUser(options, callback) {
 
 module.exports = {
   newSignup: function(options, callback) {
+    winston.info("New signup ", options);
+
 
     // We shouldn't have duplicate users in the system, so we should:
     //     * Check if the user exists
@@ -94,13 +101,15 @@ module.exports = {
   },
 
   confirm: function(user, callbackFunction) {
+    winston.info("User confirmation ", user);
+
     if(!user) return callbackFunction(new Error("No user found"));
 
     user.confirmationCode = null;
     user.status = 'PROFILE_NOT_COMPLETED';
 
     user.save(function(err) {
-      console.dir(troupeService); 
+      console.dir(troupeService);
       troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
         if(err) return callbackFunction(new Error("Error finding troupes for user"));
         if(troupes.length < 1) return callbackFunction(new Error("Could not find troupe for user"));
@@ -111,19 +120,19 @@ module.exports = {
   },
 
   resendConfirmation: function(options, callback) {
+    winston.info("Resending confirmation ", options);
+
     troupeService.findById(options.troupeId, function(err, troupe) {
       if(err) return callback(err);
 
       if(troupe.users.length != 1) {
-        console.log("A confirmation resent cannot be performed as the troupe has multiple users");
+        winston.error("A confirmation resent cannot be performed as the troupe has multiple users");
         return callback("Invalid state");
       }
 
-      console.log("ID = " + troupe.users[0]);
 
       userService.findById(troupe.users[0], function(err, user) {
-        console.dir(err);
-        if(err || !user) return callback("Invalid state");
+        if(err || !user) return callback(err, user);
         if(user.status != 'UNCONFIRMED') {
           emailNotificationService.sendConfirmationForExistingUser(user, troupe);
         } else {
@@ -136,7 +145,7 @@ module.exports = {
     });
   },
 
-  /* 
+  /*
    * Logic for this bad boy:
    * This will get called when a user has not logged in but is attempted to access a troupe
    * What we do is:
@@ -147,6 +156,8 @@ module.exports = {
    * callback is function(err)
    */
   newSignupWithAccessRequest: function(options, callback) {
+    winston.info("New signup with access request ", options);
+
     var email = options.email;
     var name = options.name;
     var troupeId = options.troupeId;
@@ -155,7 +166,7 @@ module.exports = {
       if(err) return callback(err);
 
       if(!user) {
-        // Create a new user and add the request. The users confirmation code will not be set until the first time one one of 
+        // Create a new user and add the request. The users confirmation code will not be set until the first time one one of
         // their requests is accepted
         user = new persistence.User();
         user.status = 'UNCONFIRMED';

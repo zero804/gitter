@@ -234,8 +234,6 @@ function findPendingRequestForTroupe(troupeId, id, callback) {
 }
 
 function acceptRequest(request, callback) {
-  console.log(typeof request);
-
   findById(request.troupeId, function(err, troupe) {
     if(err) return callback(err);
     if(!troupe) { winston.error("Unable to find troupe", request.troupeId); return callback("Unable to find troupe"); }
@@ -267,7 +265,6 @@ function acceptRequest(request, callback) {
 
 
 function rejectRequest(request, callback) {
-  console.log(typeof request);
   findById(request.troupeId, function(err, troupe) {
     if(err) return callback(err);
     if(!troupe) { winston.error("Unable to find troupe", request.troupeId); return callback("Unable to find troupe"); }

@@ -13,7 +13,6 @@ winston.add(winston.transports.Console, {
 });
 
 if(nconf.get("logging:loggly")) {
-  console.log("Loggly!");
   //
   // Requiring `winston-loggly` will expose
   // `winston.transports.Loggly`

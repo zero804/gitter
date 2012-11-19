@@ -83,7 +83,7 @@ module.exports = {
       });
 
       nowjs.on('connect', function() {
-        console.log("Socket connected");
+        winston.info("Incoming nowjs socket connected");
 
         var self = this;
 
@@ -91,7 +91,7 @@ module.exports = {
           if(err) return;
           if(!user) return;
 
-          console.log("Adding user to " + user.id);
+          winston.info("User connected", { userId: user.id });
 
           nowjs.getGroup("user." + user.id).addUser(self.user.clientId);
 
@@ -122,7 +122,7 @@ module.exports = {
 
         loadUserAndTroupe(this.user, troupeId, sessionStore, function(err, user, troupe) {
           if(err) {
-            winston.warn('Error while loading user and troupe in subscribeToTroupe: ' + err);
+            winston.warn('Error while loading user and troupe in subscribeToTroupe: ',  { exception: err } );
             callback({ description: "Server error", reauthenticate: true });
             return;
           }
@@ -237,7 +237,7 @@ module.exports = {
             winston.info("Bridging file event to now.js clients");
 
             restSerializer.serialize(file, new restSerializer.FileStrategy(), function(err, serializedFile) {
-              if(err || !serializedFile) return winston.error("Notification failure", err);
+              if(err || !serializedFile) return winston.error("Notification failure", { exception: err });
 
               group.now.onFileEvent({
                 event: event,
@@ -268,7 +268,7 @@ module.exports = {
 
         getGroup("troupe." + troupeId, function(group) {
           conversationService.findById(conversationId, function(err, conversation) {
-            if(err || !conversation) return winston.error("Notification failure", err);
+            if(err || !conversation) return winston.error("Notification failure", { exception: err});
 
             restSerializer.serialize(conversation, new restSerializer.ConversationMinStrategy(), function(err, serializedConversation) {
               if(err || !serializedConversation) return winston.error("Notification failure", err);
@@ -318,7 +318,7 @@ module.exports = {
 
         getGroup("troupe." + troupeId, function(group) {
           if(operation === 'create' || operation === 'update') {
-            winston.debug("Preparing model ", model);
+            winston.debug("Preparing model ", { model: model });
 
             var Strategy = restSerializer.getStrategy(modelName, true);
 

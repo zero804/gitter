@@ -122,7 +122,6 @@ function markItemsRead(userId, troupeId, items, callback) {
   var keys = _.keys(items);
   keys.forEach(function(itemType) {
     var ids = items[itemType];
-    console.log("IDS: ", ids);
 
     ids.forEach(function(id) {
       multi.srem("unread:" + itemType + ":" + userId + ":" + troupeId, id);

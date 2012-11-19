@@ -90,7 +90,7 @@ function UserIdStrategy(options) {
   this.preload = function(ids, callback) {
     userService.findByIds(_.uniq(ids), function(err, users) {
       if(err) {
-        winston.error("Error loading users", err);
+        winston.error("Error loading users", { exception: err });
         return callback(err);
       }
       self.users = collections.indexById(users);
@@ -167,7 +167,7 @@ function FileIdStrategy(options) {
   this.preload = function(ids, callback) {
     fileService.findByIds(ids, function(err, files) {
       if(err) {
-        winston.error("Error loading files", err);
+        winston.error("Error loading files", { exception: err });
         return callback(err);
       }
       self.files = collections.indexById(files);
@@ -183,7 +183,7 @@ function FileIdStrategy(options) {
   this.map = function(fileId) {
     var file = self.files[fileId];
     if(!file) {
-      winston.warn("Unable to locate fileId ", fileId);
+      winston.warn("Unable to locate fileId ", { fileId: fileId });
       return null;
     }
 
@@ -212,7 +212,7 @@ function FileIdAndVersionStrategy() {
     var file = fileIdStrategy.map(fileAndVersion.fileId);
 
     if(!file) {
-      winston.warn("Unable to locate file ", fileAndVersion.fileId);
+      winston.warn("Unable to locate file ", { fileId: fileAndVersion.fileId });
       return null;
     }
 
@@ -341,7 +341,6 @@ function UnreadItemStategy(options) {
   var itemType = options.itemType;
 
   this.preload = function(data, callback) {
-    console.log("unreadItemService.getUnreadItems", data);
     unreadItemService.getUnreadItems(data.userId, data.troupeId, itemType, function(err, ids) {
       if(err) return callback(err);
 
@@ -474,7 +473,10 @@ function NotificationStrategy() {
     var textTemplate = notificationTemplates[item.notificationName];
     var linkTemplate = notificationLinkTemplates[item.notificationName];
 
-    if(!textTemplate || !linkTemplate) { winston.warn("Unknown notification ", item.notificationName); return null; }
+    if(!textTemplate || !linkTemplate) {
+      winston.warn("Unknown notification ", { notificationName: item.notificationName});
+      return null;
+    }
 
     return {
       id: item.id,
@@ -597,7 +599,7 @@ function serialize(items, strat, callback) {
 
   strat.preload(items, function(err) {
     if(err) {
-      winston.error("Error during preload", err);
+      winston.error("Error during preload", { exception: err });
       return callback(err);
     }
 

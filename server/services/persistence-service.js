@@ -246,7 +246,6 @@ function attachNotificationListenersToSchema(schema, name, extractor) {
 
   schema.post('remove', function(model, numAffected) {
     var e = extractor(model);
-    console.log("Remove " + name + ". troupeId=", model.troupeId);
     appEvents.dataChange(name, 'remove', e.id, e.troupeId);
   });
 }
