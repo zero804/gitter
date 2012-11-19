@@ -18,7 +18,7 @@ module.exports = {
     },
 
     create: function(req, res, next) {
-      winston.log("New file upload started..... ");
+      winston.info("New file upload started..... ");
       /* File was uploaded through HTTP Form Upload */
       var files = req.files;
       for(var k in files) {

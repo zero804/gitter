@@ -8,7 +8,8 @@ var express = require('express'),
   expressHbs = require('express-hbs'),
   winston = require('winston'),
   http = require('./http'),
-  fineuploaderExpressMiddleware = require('fineuploader-express-middleware');
+  fineuploaderExpressMiddleware = require('fineuploader-express-middleware'),
+  cabinet = require('cabinet');
 
 module.exports = {
   installFull: function(app, server, sessionStore) {
@@ -24,7 +25,30 @@ module.exports = {
       app.use(express.logger());
     }
 
-    app.use(express['static'](__dirname + "/../../" + nconf.get('web:staticContent')));
+    //app.use(express['static'](__dirname + "/../../" + nconf.get('web:staticContent')));
+    var staticFiles = __dirname + "/../../" + nconf.get('web:staticContent');
+    console.log("Static data: " + staticFiles);
+
+    var cabinetMiddleware = cabinet(staticFiles, {
+      ignore: ['.git', 'node_modules'],
+      hidden: false,
+      coffee: false,
+      expires: 0,
+      gzip: true,
+      /*
+      less: {
+        // Specify search paths for @import directives
+        paths: ['.',__dirname + '/static/stylesheets']
+      },
+      */
+        // Activates in-memory cache
+      cache: {
+        maxSize: 16384, // 16Kb pero object
+        maxObjects:256
+      }
+    });
+    app.use(cabinetMiddleware);
+
 
     app.use(express.cookieParser());
     app.use(express.bodyParser());

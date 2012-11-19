@@ -11,7 +11,7 @@ module.exports = {
       res.relativeRedirect("/troupes/" + req.troupe.id + "/files/");
     },
 
-    new: function(req, res) {
+    'new': function(req, res) {
       res.send(500);
     },
 
@@ -21,7 +21,8 @@ module.exports = {
 
     show: function(req, res) {
       var fileName = '' + req.params.embedded + (req.params.format ? '.' + req.params.format : '');
-      winston.info('Serving ' + fileName);
+
+      winston.info('Serving file ', { fileName: fileName } );
       fileService.getFileEmbeddedStream(req.troupe.id, fileName, 0, function(err, mimeType, stream) {
         if(err || !stream) {
           res.contentType("text/html");

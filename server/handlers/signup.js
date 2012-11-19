@@ -40,7 +40,7 @@ module.exports = {
         function(req, res) {
           if (!req.form.isValid) {
             // TODO: Handle errors
-            winston.info("User form has errors", req.form.errors);
+            winston.info("User form has errors", { errors: req.form.errors });
             /* TODO: make this nice */
             return res.send(500);
           }

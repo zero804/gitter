@@ -10,7 +10,7 @@ var redis = require("redis"),
 function resetClientState() {
   function clearState(collection, item, name) {
     redisClient.smembers(collection, function(err, members) {
-      if(err) return winston.error("Redis error: " + err);
+      if(err) return winston.error("Redis error", { exception: err });
 
       if(members.length) {
         var keysToDelete = members.map(function(userId) { return item + ":" + userId });
@@ -34,7 +34,7 @@ winston.info("Presence service establishing redis client");
 redisClient = redis.createClient();
 
 function defaultRedisCallback(err) {
-  if(err) winston.error("Redis error: " + err);
+  if(err) winston.error("Redis error ", { exception: err });
 }
 
 function addUserToActiveUsers(userId, callback) {
@@ -209,7 +209,7 @@ module.exports = {
     getTroupeAssociatedToSocket(socketId, function(err, troupeId) {
       disassociateSocketFromTroupe(socketId);
 
-      if(err) return winston.error("Redis error: " + err);
+      if(err) return winston.error("Redis error: ", { exception: err });
       if(!troupeId) return; /* No associated with a troupe. Fuggitaboutit */
 
       removeUserFromTroupe(userId, troupeId, function(err, lastConnectionForUserInTroupe) {
