@@ -86,11 +86,11 @@ function onCreateFileVersion(data) {
   // Some Embedded function
   function updateVersionThumbnailStatus(status) {
     persistence.File.findById(fileId, function(err, file) {
-      if(err) return winston.error("Unable to update thumbnail status", err);
+      if(err) return winston.error("Unable to update thumbnail status", { exception: err });
 
       file.versions[version - 1].thumbnailStatus = status;
       file.save(function(err) {
-        if(err) winston.error("Unable to save update to thumbnail status", err);
+        if(err) winston.error("Unable to save update to thumbnail status", { exception: err });
       });
 
     });
@@ -98,7 +98,7 @@ function onCreateFileVersion(data) {
 
   function thumbnailGenerationCallback(err, result) {
     if(err) {
-      winston.error("Thumbnail generation failed", err);
+      winston.error("Thumbnail generation failed", { exception: err });
       updateVersionThumbnailStatus('NO_THUMBNAIL');
       return;
     }
@@ -116,7 +116,7 @@ function onCreateFileVersion(data) {
       }
     }, function(err) {
       if(err) {
-        winston.error("Unexpected error uploading file to gridfs", err);
+        winston.error("Unexpected error uploading file to gridfs", { exception: err });
         updateVersionThumbnailStatus('NO_THUMBNAIL');
         return ;
       }
@@ -134,7 +134,7 @@ function onCreateFileVersion(data) {
 
   if(previewGenerationStrategy) {
     previewGenerationStrategy(temporaryFile, mimeType, function(err, result) {
-      if(err) return winston.error("Preview generation failed", err);
+      if(err) return winston.error("Preview generation failed", { exception: err });
 
       /* Save the preview to the gridfs */
       gridfs.uploadFile({
@@ -148,7 +148,7 @@ function onCreateFileVersion(data) {
           version: version
         }
       }, function(err) {
-        if(err) return winston.error("Unexpected error uploading file to gridfs", err);
+        if(err) return winston.error("Unexpected error uploading file to gridfs", { exception: err });
 
         winston.debug("Updating previewMimeType to " + result.mimeType + " for file " + fileId);
         persistence.File.update({ _id: fileId }, { previewMimeType: result.mimeType }, {}, function(err, numAffected) {

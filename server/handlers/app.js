@@ -91,7 +91,7 @@ module.exports = {
               troupeName = troupe.name;
 
               userService.saveLastVisitedTroupeforUser(req.user.id, troupe.id, function(err) {
-                if (err) winston.info("Something went wrong saving the user last troupe visited: " + err);
+                if (err) winston.info("Something went wrong saving the user last troupe visited: ", { exception: err });
               });
 
             } else {

@@ -14,7 +14,7 @@ var BearerStrategy = require('passport-http-bearer').Strategy;
 var oauthService = require('../services/oauth-service');
 
 function emailPasswordUserStrategy(email, password, done) {
-  winston.debug("Attempting to authenticate " + email);
+  winston.debug("Attempting to authenticate ", { email: email });
   userService.findByEmail(email, function(err, user) {
     if(err) return done(err);
     if(!user) return done(null, false);
