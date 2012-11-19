@@ -7,7 +7,6 @@ module.exports = {
       app.get(
         '/',
         function(req, res) {
-          throw new Error("Arg!");
           res.render('landing');
         }
       );

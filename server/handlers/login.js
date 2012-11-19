@@ -24,7 +24,7 @@ module.exports = {
         passport.authenticate('local', { failureRedirect: basepath + '/login' }),
         function(req, res) {
           var troupeUri = req.body.troupeUri;
-          winston.info("Login with requested troupe: ", troupeUri);
+          winston.info("Login with requested troupe: ", { uri: troupeUri });
 
           function sendAffirmativeResponse() {
             switch(req.accepts(['json','html'])) {

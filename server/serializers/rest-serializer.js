@@ -599,7 +599,7 @@ function serialize(items, strat, callback) {
 
   strat.preload(items, function(err) {
     if(err) {
-      winston.error("Error during preload", err);
+      winston.error("Error during preload", { exception: err });
       return callback(err);
     }
 

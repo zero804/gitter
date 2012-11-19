@@ -26,9 +26,8 @@ module.exports = {
         ),
 
         function(req, res) {
-          winston.info("Form", req.form);
           if (!req.form.isValid) {
-            winston.info("User form has errors", req.form.errors);
+            winston.info("User form has errors", { errors: req.form.errors } );
             // TODO: Handle errors
 
             /* TODO: make this nice */
@@ -36,8 +35,8 @@ module.exports = {
           }
 
           troupeService.findByUri(req.form.troupeUri, function(err, troupe) {
-            if(err) { winston.error("findByUri failed", err); return  res.send(500); }
-            if(!troupe) { winston.error("No troupe with uri", req.form.troupeUri); return res.send(404); }
+            if(err) { winston.error("findByUri failed", { exception: err } ); return  res.send(500); }
+            if(!troupe) { winston.error("No troupe with uri", { uri: req.form.troupeUri }); return res.send(404); }
 
             signupService.newSignupWithAccessRequest({
               troupeId: troupe.id,
@@ -45,7 +44,7 @@ module.exports = {
               email: req.form.email
             }, function(err, userId) {
               if(err) {
-                winston.error("newSignupWithAccessRequest failed", err);
+                winston.error("newSignupWithAccessRequest failed", { exception: err } );
 
                 if(err.userExists) {
                   return res.send({ success: false, userExists: true });
