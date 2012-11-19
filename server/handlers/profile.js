@@ -73,7 +73,7 @@ module.exports = {
                   res.send({ authFailure: true });
                   return;
                 }
-                winston.error("Unable to update profile", err);
+                winston.error("Unable to update profile", { exception: err });
                 return next(err);
               }
 

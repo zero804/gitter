@@ -21,7 +21,7 @@ module.exports = {
       var version = data.version;
 
       fileService.findById(fileId, function(err, file) {
-        if(err) return winston.error("notificationService: error loading file", err);
+        if(err) return winston.error("notificationService: error loading file", { exception: err });
         if(!file) return winston.error("notificationService: unable to find file", fileId);
 
         var notificationData = {
@@ -53,12 +53,12 @@ module.exports = {
       var mailIndex = data.mailIndex;
 
       conversationService.findById(conversationId, function(err, conversation) {
-        if(err) return winston.error("notificationService: error loading conversation", err);
+        if(err) return winston.error("notificationService: error loading conversation", { exception: err });
         if(!conversation) return winston.error("notificationService: unable to find conversation", conversationId);
         var email = conversation.emails[mailIndex - 1];
 
         userService.findById(email.fromUserId, function(err, user) {
-          if(err) return winston.error("notificationService: error loading user", err);
+          if(err) return winston.error("notificationService: error loading user", { exception: err });
           if(!user) return winston.error("notificationService: unable to find user", email.fromUserId);
 
           var notificationData = {

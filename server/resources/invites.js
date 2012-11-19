@@ -48,7 +48,6 @@ module.exports = {
     },
 
     destroy: function(req, res) {
-      console.log(req.invite);
       res.send(200);
     },
 

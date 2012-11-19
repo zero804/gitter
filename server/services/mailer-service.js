@@ -21,7 +21,7 @@ module.exports = {
 
         var plaintextTemplateFile = options.templateFile;
         troupeTemplate.compile(plaintextTemplateFile, function(err, plaintextTemplate) {
-          if(err) return winston.error("Unable to load template", err);
+          if(err) return winston.error("Unable to load template", { exception: err });
 
           var plaintext = plaintextTemplate(options.data);
 
@@ -33,9 +33,9 @@ module.exports = {
             text: plaintext
           }, function(error, response){
             if(error) {
-              console.log(error);
-            }else{
-              console.log("Message sent: " + response.message);
+              winston.error("SES Email Error", { exception: error });
+            } else {
+              winston.info("Email sent successfully through SES", { message: response.message });
             }
           });
         });

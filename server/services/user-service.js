@@ -18,11 +18,13 @@ var userService = {
     user.status = options.status ? options.status : "UNCONFIRMED";
 
     user.save(function (err) {
-      if(err) console.log("Save failed:" + JSON.stringify(err) + ", " + err );
+      if(err) winston.error("User save failed: ", err);
     });
   },
 
   findOrCreateUserForEmail: function(options, callback) {
+    winston.info("Locating or creating user", options);
+
     var displayName = options.displayName;
     var email = options.email;
 
@@ -50,12 +52,15 @@ var userService = {
   },
 
   findByConfirmationCode: function(confirmationCode, callback) {
+
     persistence.User.findOne({confirmationCode: confirmationCode}, function(err, user) {
       callback(err, user);
     });
   },
 
   requestPasswordReset: function(email, callback) {
+    winston.info("Requesting password reset", email);
+
     persistence.User.findOne({email: email}, function(err, user) {
       if(err || !user) return callback(err, user);
 
@@ -72,6 +77,8 @@ var userService = {
   },
 
   findAndUsePasswordResetCode: function(passwordResetCode, callback) {
+    winston.info("Using password reset code", passwordResetCode);
+
     persistence.User.findOne({passwordResetCode: passwordResetCode}, function(err, user) {
       if(err || !user) return callback(err, user);
 
@@ -98,12 +105,12 @@ var userService = {
   },
 
   saveLastVisitedTroupeforUser: function(userId, troupeId, callback) {
-    console.log("Saving last visited Troupe for user: " + userId);
+    winston.info("Saving last visited Troupe for user: ", userId);
     userService.findById(userId, function(err, user) {
       if(err) return callback(err);
       if(!user) return callback("User not found");
       user.lastTroupe = troupeId;
-      console.log("ACTUALLY SAVING NOW");
+
       user.save(function(err) {
         callback(err);
       });
@@ -188,6 +195,8 @@ var userService = {
   },
 
   updateInitialPassword: function(userId, password, callback) {
+    winston.info("Initial password reset", userId);
+
     persistence.User.findById(userId, function(err, user) {
       if(user.passwordHash) return callback("User already has a password set");
 
@@ -211,6 +220,8 @@ var userService = {
   },
 
   updateProfile: function(options, callback) {
+    winston.info("User profile update", options);
+
     var userId = options.userId;
     var password = options.password;
     var oldPassword = options.oldPassword;
@@ -221,7 +232,6 @@ var userService = {
       if(!user) return callback("User not found");
 
       function generateNewHashSaveUser() {
-        console.log("Generating new password for " + password);
         sechash.strongHash('sha512', password, function(err, hash3) {
           if(err) return callback(err);
 
