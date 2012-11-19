@@ -5,7 +5,7 @@
   </div>
   <div class="trpChatContainer">
     <div class="trpChatBubble timeago {{chatBubbleAdditional}}" rel="tooltip">
-      <div class="trpChatFrom">{{{displayName}}}</div>
+      {{^compactView}}<div class="trpChatFrom">{{{displayName}}}</div>{{/compactView}}
     	<div class="trpChatText">{{{text}}}</div>
     </div>
   </div>

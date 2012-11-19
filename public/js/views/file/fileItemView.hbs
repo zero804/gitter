@@ -1,3 +1,4 @@
+{{^compactView}}
 <div class="trpFileViewItem">
 	<div><a href="#" class="link-preview">
 	{{#if useSpinner}}
@@ -42,4 +43,14 @@
 		</div>
 	</div>
 </div>
+{{/compactView}}
+
+{{#compactView}}
+<div class="trpFileViewItem">
+	<div class="trpFileThumbnailContainer"><img src="{{fileIcon}}" width="40" height="40" class="trpFileThumbnail"></div>
+	<div class="trpFilename">{{fileName}}</div>
+</div>
+{{/compactView}}
+
+
 

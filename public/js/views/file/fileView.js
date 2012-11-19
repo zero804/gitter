@@ -70,7 +70,7 @@ define([
           }
         }
       });
-      this.createUploader(this.$el.find(".fileuploader")[0]);
+      if (!this.compactView) this.createUploader(this.$el.find(".fileuploader")[0]);
     },
 
     createUploader: function(element) {

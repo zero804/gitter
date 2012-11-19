@@ -35,7 +35,8 @@ define([
     },
 
     events: {
-      "keydown .trpChatBox":          "detectReturn"
+      "keydown .trpChatBox":          "detectReturn",
+      "blur .trpChatBox" : "blurChat"
     },
 
     beforeClose: function() {
@@ -43,6 +44,10 @@ define([
     },
 
     getRenderData: function() { return {}; },
+
+    blurChat: function(){
+      console.log("BLURB!");
+    },
 
     afterRender: function() {
       this.collectionView = new TroupeViews.Collection({
