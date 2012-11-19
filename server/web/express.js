@@ -35,12 +35,11 @@ module.exports = {
       coffee: false,
       expires: 0,
       gzip: true,
-      /*
       less: {
         // Specify search paths for @import directives
-        paths: ['.',__dirname + '/static/stylesheets']
+        //paths: ['.',__dirname + '/static/stylesheets']
+        paths: ['.',staticFiles + "/bootstrap/less"]
       },
-      */
         // Activates in-memory cache
       cache: {
         maxSize: 16384, // 16Kb pero object
