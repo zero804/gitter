@@ -67,6 +67,7 @@ html {
 	-webkit-transform: translate3d(0,0,0);
   overflow-x: hidden;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 
@@ -110,6 +111,8 @@ border-left: 1px solid @trpLightGrey;
   .trpContentContainer {
       padding: 50px 0 0px;
   	  padding-left: 0px;
+      min-width: 300px;
+      max-width: 320px;
   }
 
   .trpHeaderTitle {
@@ -121,6 +124,10 @@ border-left: 1px solid @trpLightGrey;
     height: 50px;
   }
 
+    .trpChatContainer {
+    max-width: 300px;
+  }
+
   .trpChatInput {
     padding-bottom: 15px;
     padding-top: 0px;
@@ -129,24 +136,36 @@ border-left: 1px solid @trpLightGrey;
     height: 30px;
   }
 
+  .frame-chat {
+    max-width: 320px;
+    overflow: hidden;
+  }
+
   .trpChatBox {
     font-size: 12px;
     padding: 12px;
     max-height: 20px;
     background-color: transparent;
+    max-width: 210px;
+    display: inline-block;
   }
 
   .trpChatBubble {
     max-width: 160px;
     margin-bottom: 6px;
+    padding-left: 20px;
   }
 
   .trpChatRow {
     padding-left: 0px;
+    max-width: 320px;
+    overflow-x: hidden;
   }
 
   .trpChatRowRemote {
     padding-left: 0px;
+    max-width: 320px;
+    overflow-x: hidden;
   }
 
   .trpFileViewItem {
@@ -171,7 +190,7 @@ border-left: 1px solid @trpLightGrey;
     height: 20px;
     color: @trpDarkGrey;
     .trpBodyMedium;
-    width: 200px;
+    max-width: 200px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
