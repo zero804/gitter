@@ -4,10 +4,12 @@
     <div class="trpMailFromSubject">{{personName}}</div>
     <div class="trpMailPreview">{{preview}}</div>
   </div>
+  {{^compactView}}
   <div class="trpMailRight">
       <div class="trpMailIcons">{{#hasAttachments}}<img src="images/2/icon-small-attachment.png" width="18" height="16">{{/hasAttachments}}</div>
       <div class="trpMailDate">{{date}}</div>
   </div>
+  {{/compactView}}
   {{#unless initialIndex}}
   <div id="initialBody">
   {{/unless}}

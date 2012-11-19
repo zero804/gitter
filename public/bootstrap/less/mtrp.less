@@ -10,6 +10,18 @@ html {
  background-color: @trpGreen;
 }
 
+.mtrpMobileSpinner {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  opacity: 0.9;
+  text-align: center;
+  z-index: 2000;
+}
+
 .mtrpLoginContainer {
 	text-align: center;
 
@@ -83,6 +95,11 @@ border-left: 1px solid @trpLightGrey;
 			}
 
 @media screen and (max-width: 600px) {
+
+  .trpSpinner {
+    padding-top: 160px;
+  }
+
   .trpNavWrap {
       top: 50px;
       width: 320px;
@@ -91,6 +108,7 @@ border-left: 1px solid @trpLightGrey;
   }
 
   .trpContentContainer {
+      padding: 50px 0 0px;
   	  padding-left: 0px;
   }
 
@@ -102,6 +120,93 @@ border-left: 1px solid @trpLightGrey;
   .trpHeaderContainer {
     height: 50px;
   }
+
+  .trpChatInput {
+    padding-bottom: 15px;
+    padding-top: 0px;
+    padding-right: 0px;
+    border-bottom: 1px solid @trpOffWhite;
+    height: 30px;
+  }
+
+  .trpChatBox {
+    font-size: 12px;
+    padding: 12px;
+    max-height: 20px;
+    background-color: transparent;
+  }
+
+  .trpChatBubble {
+    max-width: 160px;
+    margin-bottom: 6px;
+  }
+
+  .trpChatRow {
+    padding-left: 0px;
+  }
+
+  .trpChatRowRemote {
+    padding-left: 0px;
+  }
+
+  .trpFileViewItem {
+    float: left;
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 0px;
+    display: block;
+    clear: both;
+    }
+
+    .trpFileThumbnailContainer {
+      display: inline-block;
+      width: 60px;
+    }
+
+    .trpFilename {
+    margin-top: 20px;
+    padding-left: 20px;
+    float: none;
+    height: 20px;
+    color: @trpDarkGrey;
+    .trpBodyMedium;
+    width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  .trpFileThumbnail {
+      width: 60px;
+      height: 60px;
+  }
+
+  .trpMailRowContainer {
+    border-bottom: 1px solid @trpOffWhite;
+    padding-top: 24px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+    max-width: 350px;
+  }
+
+.trpMailBody {
+  padding-left: 20px;
+  margin-right: 0px;
+  .trpBodyText;
+  word-wrap: break-word;
+  display: inline-block;
+  max-width: 350px;
+  
+}
+
+  .trpMailDisplayPicture {
+  padding-left: 20px;
+  padding-right: 20px;
+  float: left;
+}
 
 }
 
