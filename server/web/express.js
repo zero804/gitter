@@ -21,13 +21,13 @@ module.exports = {
 
     app.set('view engine', 'hbs');
     app.set('views', __dirname + '/../../' + nconf.get('web:staticContent') +'/templates');
-    if(nconf.get("express:logging")) {
-      app.use(express.logger());
+
+    if(nconf.get("express:logging") && nconf.get("express:logStatic")) {
+      app.use(express.logger(nconf.get("express:loggingConfig")));
     }
 
     //app.use(express['static'](__dirname + "/../../" + nconf.get('web:staticContent')));
     var staticFiles = __dirname + "/../../" + nconf.get('web:staticContent');
-    console.log("Static data: " + staticFiles);
 
     var cabinetMiddleware = cabinet(staticFiles, {
       ignore: ['.git', 'node_modules'],
@@ -48,6 +48,9 @@ module.exports = {
     });
     app.use(cabinetMiddleware);
 
+    if(nconf.get("express:logging") && !nconf.get("express:logStatic")) {
+      app.use(express.logger(nconf.get("express:loggingConfig")));
+    }
 
     app.use(express.cookieParser());
     app.use(express.bodyParser());
@@ -61,7 +64,7 @@ module.exports = {
 
     var expressErrorHandler = express.errorHandler({ showStack: nconf.get('express:showStack'), dumpExceptions: nconf.get('express:dumpExceptions') });
     app.use(function(err, req, res, next) {
-      winston.error("An unexpected error occurred", err, req.path);
+      winston.error("An unexpected error occurred", { error: err, path: req.path } );
       expressErrorHandler(err, req, res, next);
     });
 
