@@ -45,6 +45,13 @@ module.exports = {
 
           }
 
+          function getNowJsUrl(req) {
+            var url = nconf.get('ws:nowjsUrl');
+            if(url) return url;
+
+            return req.protocol + "://" + req.headers.host;
+          }
+
           function renderPage(unreadItems, serializedUser) {
             var profileNotCompleted;
 
@@ -73,7 +80,7 @@ module.exports = {
                 unreadItems: unreadItems,
                 accessDenied: accessDenied,
                 websockets: {
-                  nowjs: nconf.get('ws:nowjsUrl')
+                  nowjs: getNowJsUrl(req)
                 }
 
             };
