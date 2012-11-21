@@ -1,3 +1,6 @@
+/*jslint node: true */
+"use strict";
+
 var geocodingService = require('../../server/services/geocoding-service');
 
 var assert = require("better-assert");
