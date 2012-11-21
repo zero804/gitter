@@ -144,7 +144,9 @@ module.exports = {
       appEvents.onTroupeChat(function(data) {
         var troupeId = data.troupeId;
         var group = getGroup("troupe." + troupeId, function (group) {
-          group.now.onTroupeChatMessage(data.chatMessage);
+          if(group && group.now && group.now.onTroupeChatMessage) {
+            group.now.onTroupeChatMessage(data.chatMessage);
+          }
         });
       });
 
@@ -155,7 +157,9 @@ module.exports = {
         var counts = data.counts;
 
         var group = nowjs.getGroup("user." + userId);
-        group.now.onTroupeUnreadCountsChange(data);
+        if(group && group.now && group.now.onTroupeUnreadCountsChange) {
+          group.now.onTroupeUnreadCountsChange(data);
+        }
       });
 
       appEvents.onNewUnreadItem(function(data) {
@@ -164,7 +168,9 @@ module.exports = {
         var items = data.items;
 
         var group = nowjs.getGroup("user." + userId);
-        group.now.onNewUnreadItems(items);
+        if(group && group.now && group.now.onNewUnreadItems) {
+          group.now.onNewUnreadItems(items);
+        }
       });
 
       appEvents.onUnreadItemsRemoved(function(data) {
@@ -173,7 +179,9 @@ module.exports = {
         var items = data.items;
 
         var group = nowjs.getGroup("user." + userId);
-        group.now.onUnreadItemsRemoved(items);
+        if(group && group.now && group.now.onUnreadItemsRemoved) {
+          group.now.onUnreadItemsRemoved(items);
+        }
       });
 
       appEvents.onUserLoggedIntoTroupe(function(data) {
@@ -181,6 +189,10 @@ module.exports = {
         var userId = data.userId;
 
         getGroup("troupe." + troupeId, function(group) {
+          if(!group || !group.now || !group.now.onUserLoggedIntoTroupe) {
+            return;
+          }
+
           var deferredT = Q.defer();
           var deferredU = Q.defer();
 
@@ -202,6 +214,10 @@ module.exports = {
         var userId = data.userId;
 
         getGroup("troupe." + troupeId, function(group) {
+          if(!group || !group.now || !group.now.onUserLoggedOutOfTroupe) {
+            return;
+          }
+
           var deferredT = Q.defer();
           var deferredU = Q.defer();
 
@@ -219,7 +235,6 @@ module.exports = {
       });
 
       appEvents.onFileEvent(function(data) {
-        winston.debug("onFileEvent -> now.js ", data);
         var event = data.event;
         switch(event) {
           case 'createVersion':
@@ -233,6 +248,10 @@ module.exports = {
         var troupeId = data.troupeId;
 
         getGroup("troupe." + troupeId, function(group) {
+          if(!group || !group.now || !group.now.onFileEvent) {
+            return;
+          }
+
           fileService.findById(fileId, function(err, file) {
             winston.info("Bridging file event to now.js clients");
 
@@ -253,7 +272,6 @@ module.exports = {
 
 
       appEvents.onMailEvent(function(data) {
-        winston.debug("onMailEvent -> now.js ", data);
         var event = data.event;
         if(event !== 'new') {
           /* Filter..... */
@@ -264,9 +282,11 @@ module.exports = {
         var conversationId = data.conversationId;
         var mailIndex = data.mailIndex;
 
-
-
         getGroup("troupe." + troupeId, function(group) {
+          if(!group || !group.now || !group.now.onMailEvent) {
+            return;
+          }
+
           conversationService.findById(conversationId, function(err, conversation) {
             if(err || !conversation) return winston.error("Notification failure", { exception: err});
 
@@ -293,6 +313,10 @@ module.exports = {
         /* Directed at a troupe? */
         if(troupeId) {
           getGroup("troupe." + troupeId, function(group) {
+            if(!group || !group.now || !group.now.onNotification) {
+              return;
+            }
+
             group.now.onNotification({
               troupeId: troupeId,
               notificationText: notificationText,
@@ -317,6 +341,10 @@ module.exports = {
         var model = data.model;
 
         getGroup("troupe." + troupeId, function(group) {
+          if(!group || !group.now || !group.now.onDataChange) {
+            return;
+          }
+
           if(operation === 'create' || operation === 'update') {
             winston.debug("Preparing model ", { model: model });
 
