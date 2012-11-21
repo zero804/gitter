@@ -3,7 +3,7 @@
 @import "trpButtons.less";
 
 body {
-  margin-top: 20px;
+  margin: 0px;
 }
 
 html {
@@ -23,26 +23,57 @@ html {
 }
 
 .mtrpLoginContainer {
-	text-align: center;
-
+  text-align: center; /* Chrome,Safari4+ */
+  background: -webkit-gradient(linear, 0 0, 0 100%, from(#19aa67), to(#1dce73));
+  background: -webkit-linear-gradient(#19aa67 0%, #1dce73 100%);
+  background: -moz-linear-gradient(#19aa67 0%, #1dce73 100%);
+  background: -o-linear-gradient(#19aa67 0%, #1dce73 100%);
+  background: linear-gradient(#19aa67 0%, #1dce73 100%); 
 }
 
 .mtrpLoginLogo {
 	text-align: center;
+  padding-top: 40px;
 }
 
 .mtrpLoginForm {
-	margin-top: 20px;
+	margin-top: 40px;
 	text-align: center;
 	display: inline-block;
 }
 
 .mtrpLoginFormItem {
 	.trpBodyText;
-	margin-bottom: 20px;
 	display: block;
 	height: 40px;
 	width: 200px;
+  border: none;
+  border-radius: 0px;
+}
+
+.mtrpLoginSignup {
+  display: inline-block;
+  text-align: left;
+  float: left;
+}
+
+.mtrpLoginSubmit {
+  display: inline-block;
+  text-align: right;
+  vertical-align: top;
+  float: right;
+
+}
+
+.mtrpLoginFieldContainer input:not(:last-child) {
+    border-bottom: 1px #ddd solid;
+}
+
+.mtrpLoginFieldContainer {
+  border-radius: 5px;
+  background-color: white;
+  padding: 5px;
+  margin-bottom: 10px;
 }
 
 /* Sliding view classes */
