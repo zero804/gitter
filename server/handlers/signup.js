@@ -16,6 +16,7 @@ module.exports = {
       app.get(
         '/x',
         function(req, res) {
+          // console.log ("Compact: " this.compactView);
           if(req.user) {
             res.relativeRedirect("/select-troupe");
             return;
