@@ -27,7 +27,8 @@ define([
       return data;
     },
 
-    showEmail: function(event) {
+    showEmail: function(e) {
+      e.preventDefault();
       window.troupeApp.navigate("mail/" + this.model.get('id'), {trigger: true});
     }
 
