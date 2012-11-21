@@ -25,7 +25,8 @@ html {
 .mtrpLoginContainer {
   position: absolute;
   height: 100%;
-  width: 100%;
+  width: 320px;
+  overflow-x: hidden;
   text-align: center; /* Chrome,Safari4+ */
   background: -webkit-gradient(linear, 0 0, 0 100%, from(#19aa67), to(#1dce73));
   background: -webkit-linear-gradient(#19aa67 0%, #1dce73 100%);
@@ -129,7 +130,22 @@ border-left: 1px solid @trpLightGrey;
 
 			}
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 320px) {
+
+  .mtrpSignupForm {
+    left: 320px;
+    top: 120px;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    .trpH2;
+    color: white;
+/*    -webkit-transition: left 1s linear;*/
+  }
+
+  .mtrpLoginBack {
+    margin-top: 20px;
+  }
 
   .modal {
     top: 0px;
