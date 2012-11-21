@@ -32,7 +32,11 @@ define([
     },
 
     reloadAvatar: function() {
-      this.$el.find('.image-avatar').attr('src', "/avatar?_dc=" + Date.now());
+      var newAvatarURL = 'url(/avatar?_dc=' + Date.now() + ')';
+      console.log("New URL: " + newAvatarURL);
+      console.log("Avatar URL:" + this.$el.find('.image-avatar').css('background-image'));
+      this.$el.find('.image-avatar').css('background-image', newAvatarURL);
+      console.log("Avatar URL:" + this.$el.find('.image-avatar').css('background-image'));
     },
 
     afterRender: function() {
