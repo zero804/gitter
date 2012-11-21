@@ -17,23 +17,53 @@
   <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:200' rel='stylesheet' type='text/css'>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
   <link rel="shortcut icon" href="images/favicon.ico">
+    
+  <script src="/js/libs/zepto/zepto.js"></script>
 
 </head>
+
 <body>
   <div class="mtrpLoginContainer">
     <div class="mtrpLoginLogo"><img src="{{cdn "images/2/logo-mark-white.png"}}"></div>
     <div class="mtrpLoginForm">
       <form action="/login" method="post" name="loginform">
-        <input name="email" id="email" type="text" class="mtrpLoginFormItem" placeholder="Email address">
-        <input name="password" id="password" type="password" class="mtrpLoginFormItem" placeholder="Password">
-        <a href="javascript: submitform()" class="trpButtonBig trpBtnWhite" id="submit">Login &raquo;</a>
+        <div class="mtrpLoginFieldContainer">
+          <input name="email" id="email" type="text" class="mtrpLoginFormItem" placeholder="Email address">
+          <input name="password" id="password" type="password" class="mtrpLoginFormItem" placeholder="Password">
+        </div>
+        <div class="mtrpLoginSignup">
+          <a href="#" class="trpButtonBig trpBtnWhite" id="submit">New user</a>
+        </div>
+        <div class="mtrpLoginSubmit">
+          <a href="javascript: submitform()" class="trpButtonBig trpBtnWhite" id="submit">Login &raquo;</a>
+        </div>
+        <input type="submit" style="visibility: hidden">
       </form>
     </div>
+    
+    <div class="mtrpSignupForm">
+      Sorry, Troupe is invite only<br> at the moment<br>
+      <a href="#" class="mtrpLoginBack trpButtonBig trpBtnWhite" id="submit">Back</a>
+      
+    </div>
+    
   </div>
+  
 
   <script src="/js/libs/retina/retina.js"></script>
 
   <script>
+
+    $('.mtrpLoginSignup').on('click', function(e) {
+      $('.mtrpSignupForm').anim({translate3d: '-320px,0,0'}, 0.5, 'swing');
+      $('.mtrpLoginForm').anim({translate3d: '-320px,0,0'}, 0.5, 'swing');
+    });
+
+    $('.mtrpLoginBack').on('click', function(e) {
+      $('.mtrpSignupForm').anim({translate3d: '320px,0,0'}, 0.5, 'swing');
+      $('.mtrpLoginForm').anim({translate3d: '0,0,0'}, 0.5, 'swing');
+    });
+
     function submitform()
       {
         document.loginform.submit();
