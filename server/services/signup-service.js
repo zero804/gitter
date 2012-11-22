@@ -101,15 +101,15 @@ module.exports = {
   },
 
   confirm: function(user, callbackFunction) {
-    winston.info("User confirmation ", user);
+    winston.debug("User confirmation ", user);
 
     if(!user) return callbackFunction(new Error("No user found"));
 
-    user.confirmationCode = null;
     user.status = 'PROFILE_NOT_COMPLETED';
 
     user.save(function(err) {
-      console.dir(troupeService);
+      if(err) return callbackFunction(err);
+
       troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
         if(err) return callbackFunction(new Error("Error finding troupes for user"));
         if(troupes.length < 1) return callbackFunction(new Error("Could not find troupe for user"));

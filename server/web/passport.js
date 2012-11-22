@@ -66,38 +66,63 @@ module.exports = {
         emailPasswordUserStrategy
     ));
 
-    passport.use(new ConfirmStrategy({ name: "confirm" }, function(confirmationCode, done) {
-        winston.info("Invoking confirm strategy");
+    passport.use(new ConfirmStrategy({ name: "confirm" }, function(confirmationCode, req, done) {
+      var self = this;
 
-        userService.findByConfirmationCode(confirmationCode, function(err, user) {
-          if(err) return done(err);
-          if(!user) return done(null, false);
+      winston.debug("Confirming user with code", { confirmationCode: confirmationCode });
 
-          return done(null, user);
-        });
-      })
-    );
+      userService.findByConfirmationCode(confirmationCode, function(err, user) {
+        if(err) return done(err);
+        if(!user) return done(null, false);
 
-    passport.use(new ConfirmStrategy({ name: "accept" }, function(confirmationCode, done) {
-      winston.info("Invoking accept strategy");
+        if(user.status !== 'UNCONFIRMED') {
+          winston.debug("Confirmation already used", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
+          if(!user.lastTroupe) {
+            return self.redirect("/x");
+          }
+
+          troupeService.findById(user.lastTroupe, function(err, troupe) {
+            if(err || !troupe) return self.redirect("/x");
+
+            return self.redirect("/" + troupe.uri);
+          });
+
+        }
+
+        return done(null, user);
+      });
+    })
+  );
+
+    passport.use(new ConfirmStrategy({ name: "accept" }, function(confirmationCode, req, done) {
+      var self = this;
+      winston.debug("Invoking accept strategy", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
 
       troupeService.findInviteByCode(confirmationCode, function(err, invite) {
         if(err) return done(err);
         if(!invite) return done(null, false);
 
-        if(invite.status != 'UNUSED') {
-          return done(null, false);
+        if(invite.status !== 'UNUSED') {
+          /* The invite has already been used. We need to fail authentication, but go to the troupe */
+          winston.debug("Invite has already been used", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
+
+          return self.redirect("/" + req.params.troupeUri);
         }
+
+        winston.debug("Invite accepted", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
 
         userService.findOrCreateUserForEmail({ displayName: invite.displayName, email: invite.email, status: "PROFILE_NOT_COMPLETED" }, function(err, user) {
           return done(null, user);
         });
 
+
+
+
       });
     })
     );
 
-    passport.use(new ConfirmStrategy({ name: "passwordreset" }, function(confirmationCode, done) {
+    passport.use(new ConfirmStrategy({ name: "passwordreset" }, function(confirmationCode, req, done) {
         userService.findAndUsePasswordResetCode(confirmationCode, function(err, user) {
           if(err) return done(err);
           if(!user) return done(null, false);

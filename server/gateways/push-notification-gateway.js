@@ -38,9 +38,9 @@ var apnsConnection = new apns.Connection({
     errorCallback: sendError
 });
 
-sendUserNotification('4faae858889d9e0000000003', 'Hello', function(err) {
-  if(err) winston.error("Notification error", { exception: err });
-});
+//sendUserNotification('4faae858889d9e0000000003', 'Hello', function(err) {
+//  if(err) winston.error("Notification error", { exception: err });
+//});
 
 function failedDelivery(timeSinceEpoch, deviceToken) {
   winston.error("Failed delivery. Need to remove device", { time: timeSinceEpoch });
