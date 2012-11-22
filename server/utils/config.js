@@ -15,7 +15,8 @@ console.log("Using environment: " + nodeEnv);
 
 nconf.argv()
      .env();
-nconf.add('user', { type: 'file', file: './config/config.' + nodeEnv + '.json'  });
+nconf.add('user', { type: 'file', file: './config/config.user-overrides.json'  });
+nconf.add('nodeEnv', { type: 'file', file: './config/config.' + nodeEnv + '.json'  });
 nconf.add('defaults', { type: 'file', file: './config/config.default.json' });
 
 module.exports = nconf;

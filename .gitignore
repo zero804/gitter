@@ -32,3 +32,4 @@ scripts/populate-geonames/data/GB.zip
 scripts/populate-geonames/data/ZA.txt
 scripts/populate-geonames/data/ZA.zip
 scripts/populate-geonames/data/readme.txt
+config.user-overrides.json
