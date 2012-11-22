@@ -1,5 +1,4 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jslint node: true */
 "use strict";
 
 var mongoose = require("mongoose");
@@ -200,6 +199,19 @@ var GeoPopulatedPlaceSchema= new Schema({
 GeoPopulatedPlaceSchema.index({ coordinate: "2d" });
 GeoPopulatedPlaceSchema.index({ geonameid: 1 });
 
+/*
+ * Push Notifications
+ */
+ var PushNotificationDeviceSchema = new Schema({
+  userId: ObjectId,
+  deviceId: String,
+  appleToken: Buffer,
+  deviceType: { type: String, "enum": ['APPLE', 'ANDROID']}
+});
+PushNotificationDeviceSchema.index({ deviceId: 1 });
+PushNotificationDeviceSchema.index({ userId: 1 });
+
+
 var User = mongoose.model('User', UserSchema);
 var UserLocationHistory = mongoose.model('UserLocationHistory', UserLocationHistorySchema);
 
@@ -219,6 +231,8 @@ var OAuthCode = mongoose.model('OAuthCode', OAuthCodeSchema);
 var OAuthAccessToken = mongoose.model('OAuthAccessToken', OAuthAccessTokenSchema);
 
 var GeoPopulatedPlace = mongoose.model('GeoPopulatedPlaces', GeoPopulatedPlaceSchema);
+
+var PushNotificationDevice = mongoose.model('PushNotificationDevice', PushNotificationDeviceSchema);
 
 /** */
 function attachNotificationListenersToSchema(schema, name, extractor) {
@@ -278,5 +292,6 @@ module.exports = {
   OAuthCode: OAuthCode,
   OAuthAccessToken: OAuthAccessToken,
   GeoPopulatedPlace: GeoPopulatedPlace,
-  UserLocationHistory: UserLocationHistory
+  UserLocationHistory: UserLocationHistory,
+  PushNotificationDevice: PushNotificationDevice
 };
