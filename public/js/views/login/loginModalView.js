@@ -66,12 +66,12 @@ define([
         data: form.serialize(),
         type: "POST",
         success: function(data) {
-           if(data.failed) {
+          if(data.failed) {
             return;
           }
-            that.$el.find('#resetEmail').text(that.$el.find('#email').val());
-            that.$el.find('.resetpwd-content').hide();
-            that.$el.find('.resetpwd-confirm').show();
+          that.$el.find('#resetEmail').text(that.$el.find('#email').val());
+          that.$el.find('.resetpwd-content').hide();
+          that.$el.find('.resetpwd-confirm').show();
         }
       });
 
@@ -93,8 +93,12 @@ define([
         dataType: "json",
         data: form.serialize(),
         type: "POST",
+        error: function(jqXHR, textStatus, errorThrown) {
+          $('.login-failure').show('fast');
+        },
         success: function(data) {
-           if(data.failed) {
+          console.log("Login success");
+          if(data.failed) {
             $('.login-failure').show('fast');
             return;
           }

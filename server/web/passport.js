@@ -15,21 +15,28 @@ var oauthService = require('../services/oauth-service');
 
 function emailPasswordUserStrategy(email, password, done) {
   winston.debug("Attempting to authenticate ", { email: email });
+
   userService.findByEmail(email, function(err, user) {
     if(err) return done(err);
-    if(!user) return done(null, false);
+    if(!user) {
+      winston.warn("Unable to login as email address not found", { email: email });
+      return done();
+    }
 
-    if(user.status != 'ACTIVE') {
-      winston.info("User not yet activated");
-      if (user.status != 'PROFILE_NOT_COMPLETED') {
-        return done(null, false);
-      }
+    if(user.status != 'ACTIVE' && user.status != 'PROFILE_NOT_COMPLETED') {
+      winston.warn("User attempted to login but account not yet activated", { email: email });
+      return done();
     }
 
     userService.checkPassword(user, password, function(match) {
-      if(!match) return done(null, false);
+      if(!match) {
+        winston.warn("Login failed. Passwords did not match", { email: email });
+        return done();
+      }
 
       if(user.passwordResetCode) {
+        winston.warn("Login successful but user has password reset code. Deleting password reset.", { email: email });
+
         user.passwordResetCode = null;
         user.save();
       }

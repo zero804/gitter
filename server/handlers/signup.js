@@ -7,6 +7,7 @@ var form = require("express-form"),
     validate = form.validate,
     signupService = require("../services/signup-service"),
     userService = require("../services/user-service"),
+    middleware = require("../web/middleware"),
     troupeService = require("../services/troupe-service"),
     passport = require('passport'),
     winston = require('winston');
@@ -115,7 +116,7 @@ module.exports = {
       });
 
       app.get('/confirm/:confirmationCode',
-        passport.authenticate('confirm'),
+        middleware.authenticate('confirm', { failureRedirect: '/confirm-failed' } ),
         function(req, res, next){
           signupService.confirm(req.user, function(err, user, troupe) {
             if (err) return next(err);

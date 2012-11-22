@@ -6,10 +6,10 @@
  */
 var oauth2orize = require('oauth2orize'),
     passport = require('passport'),
-    login = require('connect-ensure-login'),
+    middleware = require('./middleware'),
     oauthService = require('../services/oauth-service'),
     mongoose = require('mongoose'),
-    winston = require('winston');
+    winston = require('winston')
 
 // create OAuth 2.0 server
 var server = oauth2orize.createServer();
@@ -102,7 +102,7 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, do
 // first, and rendering the `dialog` view.
 
 exports.authorization = [
-  login.ensureLoggedIn(),
+  middleware.ensureLoggedIn(),
   server.authorization(function(clientKey, redirectUri, done) {
     oauthService.findClientByClientKey(clientKey, function(err, client) {
       if (err) { return done(err); }
@@ -133,7 +133,7 @@ exports.authorization = [
 // a response.
 
 exports.decision = [
-  login.ensureLoggedIn(),
+  middleware.ensureLoggedIn(),
   server.decision()
 ];
 

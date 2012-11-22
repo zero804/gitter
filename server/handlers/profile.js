@@ -8,13 +8,13 @@ var form = require("express-form"),
     signupService = require("../services/signup-service"),
     userService = require("../services/user-service"),
     passport = require('passport'),
-    middleware = require('./middleware'),
+    middleware = require('../web/middleware'),
     winston = require("winston");
 
 module.exports = {
     install: function(app) {
       app.get('/profile',
-        middleware.ensureLoggedIn,
+        middleware.ensureLoggedIn(),
         function(req, res) {
           var displayName;
           if(req.form && "displayName" in req.form) {
@@ -32,7 +32,7 @@ module.exports = {
 
       app.post(
           '/profile',
-          middleware.ensureLoggedIn,
+          middleware.ensureLoggedIn(),
           // Form filter and validation middleware
           form(
             filter("displayName").trim(),
