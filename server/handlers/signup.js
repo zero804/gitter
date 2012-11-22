@@ -99,8 +99,6 @@ module.exports = {
                       res.send({ success: true, redirectTo: troupe.uri});
                     }
                   });
-
-                  // res.send(200);
                 });
 
               }

@@ -174,8 +174,9 @@ function acceptInvite(code, user, callback) {
       if(err) return callback(err);
       if(!troupe) return callback(new Error("Cannot find troupe referenced by invite."));
 
-      if(invite.status != 'UNUSED') {
-        return callback(new Error("Invitation has already been used."));
+      var originalStatus = invite.status;
+      if(originalStatus != 'UNUSED') {
+        return callback(null, troupe, originalStatus);
       }
 
       invite.status = 'USED';
@@ -184,7 +185,7 @@ function acceptInvite(code, user, callback) {
       troupe.users.push(user.id);
       troupe.save(function(err) {
         if(err) return callback(err);
-        return callback(null, troupe);
+        return callback(null, troupe, originalStatus);
       });
 
     });
