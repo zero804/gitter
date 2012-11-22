@@ -83,9 +83,17 @@ module.exports = {
         if(!user) return done(null, false);
 
         if(user.status !== 'UNCONFIRMED') {
-          winston.debug("Confirmation already used", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
+          winston.debug("Confirmation already used", { confirmationCode: confirmationCode });
           if(!user.lastTroupe) {
-            return self.redirect("/x");
+            troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
+              if(err) return done(err);
+
+              if(troupes.length) {
+                return self.redirect("/" + troupes[0].uri);
+              } else {
+                return self.redirect("/x");
+              }
+            });
           }
 
           troupeService.findById(user.lastTroupe, function(err, troupe) {
@@ -94,6 +102,7 @@ module.exports = {
             return self.redirect("/" + troupe.uri);
           });
 
+          return;
         }
 
         return done(null, user);
@@ -121,9 +130,6 @@ module.exports = {
         userService.findOrCreateUserForEmail({ displayName: invite.displayName, email: invite.email, status: "PROFILE_NOT_COMPLETED" }, function(err, user) {
           return done(null, user);
         });
-
-
-
 
       });
     })
