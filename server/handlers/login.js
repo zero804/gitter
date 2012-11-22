@@ -6,98 +6,73 @@ var passport = require("passport"),
     winston = require("winston"),
     nconf = require('../utils/config'),
     troupeService = require("../services/troupe-service"),
-    rememberMe = require('../web/rememberme-middleware'),
-    middleware = require('./middleware'),
-    login = require('connect-ensure-login');
-var userService = require('../services/user-service');
-
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  res.relativeRedirect('/loginfail');
-}
+    middleware = require('../web/middleware'),
+    userService = require('../services/user-service');
 
 module.exports = {
     install: function(app) {
       var basepath = nconf.get("web:basepath");
 
       app.post('/login',
-        passport.authenticate('local', { failureRedirect: basepath + '/login' }),
-        function(req, res) {
+        middleware.authenticate('local', { failureRedirect: '/login' }),
+        middleware.rememberMe,
+        function(req, res, next) {
           var troupeUri = req.body.troupeUri;
           winston.info("Login with requested troupe: ", { uri: troupeUri });
 
-          function sendAffirmativeResponse() {
-            switch(req.accepts(['json','html'])) {
-              case "json":
-                if(troupeUri) {
-                  troupeService.findByUri(troupeUri, function(err, troupe) {
-                    if(err) return res.send(500);
+          if(req.accepts(['json','html']) === 'json') {
+            if(troupeUri) {
+              troupeService.findByUri(troupeUri, function(err, troupe) {
+                if(err) return res.send(500);
 
-                    var a = {};
+                var a = {};
 
-                    if(troupe) {
-                       a[troupeUri] = troupeService.userHasAccessToTroupe(req.user, troupe);
-                    } else {
-                      // Troupe doesn't exist, just say the user doesn't have access
-                       a[troupeUri] = false;
-                    }
-
-                    res.send({
-                      failed: false,
-                      user: req.user,
-                      defaultTroupe: troupe,
-                      hasAccessToTroupe: a
-                    });
-
-                  });
+                if(troupe) {
+                  a[troupeUri] = troupeService.userHasAccessToTroupe(req.user, troupe);
                 } else {
-                  if (req.user.lastTroupe) {
-                    troupeService.findById(req.user.lastTroupe, function (err,troupe) {
-                      if (err) troupe = null;
-                      res.send({
-                        failed: false,
-                        user: req.user,
-                        defaultTroupe: troupe
-                      });
-                    });
-                  }
-                  else {
-                    userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
-                    if (err) troupe = null;
-                    res.send({
-                      failed: false,
-                      user: req.user,
-                      defaultTroupe: troupe
-                    });
-                  });
-                  }
+                  // Troupe doesn't exist, just say the user doesn't have access
+                  a[troupeUri] = false;
                 }
-                break;
 
-              case "html":
-                if(req.session.returnTo) {
-                  res.relativeRedirect(req.session.returnTo);
-                } else {
-                  res.relativeRedirect('/select-troupe');
-                }
-                break;
+                res.send({
+                  failed: false,
+                  user: req.user,
+                  defaultTroupe: troupe,
+                  hasAccessToTroupe: a
+                });
+              });
+            } else {
+              if (req.user.lastTroupe) {
+                troupeService.findById(req.user.lastTroupe, function (err,troupe) {
+                  if (err) troupe = null;
+                  res.send({
+                    failed: false,
+                    user: req.user,
+                    defaultTroupe: troupe
+                  });
+                });
+              } else {
+                userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
+                  if (err) troupe = null;
+                  res.send({
+                    failed: false,
+                    user: req.user,
+                    defaultTroupe: troupe
+                  });
+                });
+              }
             }
-
-          }
-
-          if(req.body.rememberMe) {
-            rememberMe.generateAuthToken(req, res, req.user.id, {}, function(err) {
-              if(err) winston.error(err);
-              sendAffirmativeResponse();
-            });
           } else {
-            sendAffirmativeResponse();
+            if(req.session.returnTo) {
+              res.relativeRedirect(req.session.returnTo);
+            } else {
+              res.relativeRedirect('/select-troupe');
+            }
           }
         });
 
       app.get('/login', function(req, res) {
-        res.render('m.login.hbs', {
-        });
+        res.render('m.login.hbs', { });
       });
 
       app.post('/reset', function(req, res, next) {
@@ -113,13 +88,13 @@ module.exports = {
       });
 
       app.get('/reset/:confirmationCode',
-        passport.authenticate('passwordreset'),
+        middleware.authenticate('passwordreset', { failureRedirect: '/password-reset-failed' } ),
         function(req, res, next) {
           res.relativeRedirect("/select-troupe");
         });
 
       app.get('/select-troupe',
-        login.ensureLoggedIn(),
+        middleware.ensureLoggedIn(),
         function(req, res) {
           if (req.user.lastTroupe) {
             troupeService.findById(req.user.lastTroupe, function (err,troupe) {

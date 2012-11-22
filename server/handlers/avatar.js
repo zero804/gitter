@@ -2,7 +2,7 @@
 /*global console:false, require: true, module: true */
 "use strict";
 
-var middleware = require('./middleware'),
+var middleware = require('../web/middleware'),
     im = require('imagemagick'),
     sechash = require('sechash'),
     mongoose = require("mongoose"),
@@ -44,7 +44,7 @@ module.exports = {
     install: function(app) {
       app.get(
         '/avatar',
-        middleware.ensureLoggedIn,
+        middleware.ensureLoggedIn(),
         function(req, res) {
           displayAvatarFor(req.user, res);
         }
@@ -52,7 +52,7 @@ module.exports = {
 
       app.get(
         '/avatar/:userId',
-        middleware.ensureLoggedIn,
+        middleware.ensureLoggedIn(),
         function(req, res, next) {
           var userId = req.params.userId;
           userService.findById(userId, function(err, user) {
@@ -69,13 +69,13 @@ module.exports = {
 
       app.post(
         '/avatar',
-        middleware.ensureLoggedIn,
+        middleware.ensureLoggedIn(),
         function(req, res, next) {
           var file = req.files.files;
           var inPath = file.path;
           var resizedPath = file.path + "-small.jpg";
 
-          im.convert(['-define','jpeg:size=48x48',inPath,'-thumbnail','48x48^','-gravity','center','-extent','48x48',resizedPath], 
+          im.convert(['-define','jpeg:size=48x48',inPath,'-thumbnail','48x48^','-gravity','center','-extent','48x48',resizedPath],
             function(err, stdout, stderr) {
               if (err) return next(err);
 

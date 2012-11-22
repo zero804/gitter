@@ -95,8 +95,8 @@ define([
         type: "POST",
         success: function(data) {
           if(data.success) {
-          $('.modal-content').hide();
-          $('.modal-success').show();
+            $('.modal-content').hide();
+            $('.modal-success').show();
             return;
           }
           alert('Something went wrong. Oppsie daisy.');
