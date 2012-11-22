@@ -44,8 +44,17 @@ exports.authenticate = function(scheme, options) {
         return;
       }
 
-      winston.info("Authentication succeeded", { scheme: scheme });
-      req.login(user, options, next);
+      winston.info("Authentication succeeded, logging user in", { scheme: scheme, userId: user.id });
+
+      req.login(user, options, function(err) {
+        if(err) {
+          winston.info("Passport login failed", { exception: err });
+          return next(err);
+        }
+
+        winston.info("Passport login succeeded");
+        next();
+      });
     })(req, res, next);
   };
 };
