@@ -13,8 +13,9 @@ module.exports = {
             res.relativeRedirect("/" + req.params.troupeUri);
             return;
           }
+
           /* User has been set passport/accept */
-          troupeService.acceptInvite(req.params.confirmationCode, req.user, function(err, troupe) {
+          troupeService.acceptInvite(req.params.confirmationCode, user, function(err, troupe) {
             if (err) {
               res.relativeRedirect("/" + req.params.troupeUri);
             }
