@@ -31,6 +31,8 @@ window.require_config = {
     slider: 'libs/slidingview/slidingview',
     animateEnhanced: 'libs/animate-enhanced/jquery.animate-enhanced',
     retina: 'libs/retina/retina',
+    // THIS WILL ONLY HAPPEN WHEN REQUIRE JQUERY IS NOT LOADED
+    jquery: 'libs/zepto/zepto', 
     socketio: 'libs/socket.io/0.9.11/socket.io.min',
     ga: '//ssl.google-analytics.com/ga'
   },
@@ -60,6 +62,9 @@ window.require_config = {
     },
     'spinjs': {
       exports: 'Spinner'
+    },
+    'jquery': {
+      exports: 'Zepto'
     }
 
   },
