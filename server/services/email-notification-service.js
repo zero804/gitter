@@ -4,11 +4,8 @@
 
 var mailerService = require("./mailer-service");
 var nconf = require('../utils/config');
-
-
 var emailDomain = nconf.get("email:domain");
 var emailDomainWithAt = "@" + emailDomain;
-
 
 module.exports = {
   sendConfirmationForExistingUser: function (user, troupe) {
@@ -51,7 +48,7 @@ module.exports = {
         troupeName: troupe.name,
         confirmLink: confirmLink
       }
-    }); 
+    });
   },
 
   sendConfirmationForNewUser: function (user, troupe) {
@@ -64,6 +61,23 @@ module.exports = {
       data: {
         troupeName: troupe.name,
         confirmLink: confirmLink
+      }
+    });
+  },
+
+  sendInvite: function(troupe, displayName, email, code, senderDisplayName) {
+    var acceptLink = nconf.get("web:basepath") + "/" + troupe.uri + "/accept/" + code;
+
+    mailerService.sendEmail({
+      templateFile: "inviteemail",
+      from: 'signup-robot' + emailDomainWithAt,
+      to: email,
+      subject: "You been invited to join the " + troupe.name + " troupe",
+      data: {
+        displayName: displayName,
+        troupeName: troupe.name,
+        acceptLink: acceptLink,
+        senderDisplayName: senderDisplayName
       }
     });
   }

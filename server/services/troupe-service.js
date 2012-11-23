@@ -5,7 +5,6 @@
 var persistence = require("./persistence-service"),
     userService = require("./user-service"),
     emailNotificationService = require("./email-notification-service"),
-    mailerService = require("./mailer-service"),
     uuid = require('node-uuid'),
     nconf = require('../utils/config'),
     winston = require("winston");
@@ -123,21 +122,7 @@ function addInvite(troupe, senderDisplayName, displayName, email) {
   invite.code = code;
   invite.save();
 
-  var acceptLink = nconf.get("web:basepath") + "/" + troupe.uri + "/accept/" + code;
-
-  mailerService.sendEmail({
-    templateFile: "inviteemail",
-    from: 'signup-robot@trou.pe',
-    to: email,
-    subject: "You been invited to join the " + troupe.name + " troupe",
-    data: {
-      displayName: displayName,
-      troupeName: troupe.name,
-      acceptLink: acceptLink,
-      senderDisplayName: senderDisplayName
-    }
-  });
-
+  emailNotificationService.sendInvite(troupe, displayName, email, code, senderDisplayName);
 }
 
 function findInviteById(id, callback) {

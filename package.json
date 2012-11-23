@@ -50,7 +50,8 @@
     "winston-loggly": "~0.6.0",
     "express-winston": "~0.1.2",
     "cabinet": "0.2.0",
-    "apn": "~1.2.4"
+    "apn": "~1.2.4",
+    "kue": "~0.5.0"
   },
   "devDependencies": {
     "better-assert": "~0.1.0",

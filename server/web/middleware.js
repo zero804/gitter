@@ -48,7 +48,7 @@ exports.authenticate = function(scheme, options) {
 
       req.login(user, options, function(err) {
         if(err) {
-          winston.info("Passport login failed", { exception: err });
+          winston.info("Passport login failed", { exception: err  });
           return next(err);
         }
 
