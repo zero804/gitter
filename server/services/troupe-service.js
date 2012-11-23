@@ -263,6 +263,13 @@ function rejectRequest(request, callback) {
   });
 }
 
+function findUsersForTroupe(troupeId, callback) {
+  persistence.Troupe.findById(troupeId, 'users', function(err, user) {
+    if(err) return callback(err);
+    callback(null, user.users);
+  });
+}
+
 module.exports = {
   findByUri: findByUri,
   findById: findById,
@@ -281,5 +288,6 @@ module.exports = {
   findPendingRequestForTroupe: findPendingRequestForTroupe,
   acceptRequest: acceptRequest,
   rejectRequest: rejectRequest,
-  removeUserFromTroupe: removeUserFromTroupe
+  removeUserFromTroupe: removeUserFromTroupe,
+  findUsersForTroupe: findUsersForTroupe
 };

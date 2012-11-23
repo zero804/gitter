@@ -1,55 +1,81 @@
 /*jslint node: true */
 "use strict";
 
-var pushNotificationService = require("../services/push-notification-service");
-var winston = require("winston");
-var nconf = require('../utils/config');
-var apns = require('apn');
+var kue = require('kue'),
+    jobs = kue.createQueue(),
+    _ = require('underscore'),
+    winston = require("winston");
 
-function sendUserNotification(userId, message, callback) {
-  pushNotificationService.findDevicesForUser(userId, function(err, devices) {
-    if(err) return callback(err);
-    devices.forEach(function(device) {
+exports.startWorkers = function() {
+  var pushNotificationService = require("../services/push-notification-service");
+  var nconf = require('../utils/config');
+  var apns = require('apn');
 
-      if(device.deviceType === 'APPLE') {
-        winston.info("Sending apple push notification");
-        var note = new apns.Notification();
-        note.badge = 3;
-        note.alert = "You have a new message";
-        note.device = new apns.Device(device.appleToken);
+  function directSendUserNotification(userIds, message, callback) {
+    pushNotificationService.findDevicesForUsers(userIds, function(err, devices) {
+      if(err) return callback(err);
 
-        apnsConnection.sendNotification(note);
-      }
+      winston.debug("Sending to " + devices.length + " devices for " + userIds.length + " users");
 
+      devices.forEach(function(device) {
+
+        if(device.deviceType === 'APPLE') {
+          winston.info("Sending apple push notification");
+          var note = new apns.Notification();
+          note.badge = 0;
+          note.alert = message;
+          note.device = new apns.Device(device.appleToken);
+
+          apnsConnection.sendNotification(note);
+        }
+      });
+
+      callback();
     });
+  }
+
+  function errorEventOccurred(err, notification) {
+    winston.error("APN error", { exception: err, notification: notification });
+  }
+
+  winston.info("Starting APN");
+  var apnsConnection = new apns.Connection({
+      cert: nconf.get('apn:cert'),
+      key: nconf.get('apn:key'),
+      gateway: nconf.get('apn:gateway'),
+      enhanced: true,
+      errorCallback: errorEventOccurred
   });
-}
 
-function sendError(err, notification) {
-  winston.error("APN error", { exception: err, notification: notification });
-}
+  //sendUserNotification('4faae858889d9e0000000003', 'Hello', function(err) {
+  //  if(err) winston.error("Notification error", { exception: err });
+  //});
 
-winston.info("Starting APN");
-var apnsConnection = new apns.Connection({
-    cert: nconf.get('apn:cert'),
-    key: nconf.get('apn:key'),
-    gateway: nconf.get('apn:gateway'),
-    enhanced: true,
-    errorCallback: sendError
-});
+  function failedDeliveryEventOccurred(timeSinceEpoch, deviceToken) {
+    winston.error("Failed delivery. Need to remove device", { time: timeSinceEpoch });
+  }
 
-//sendUserNotification('4faae858889d9e0000000003', 'Hello', function(err) {
-//  if(err) winston.error("Notification error", { exception: err });
-//});
+  var feedback = new apns.Feedback({
+      cert: nconf.get('apn:cert'),
+      key: nconf.get('apn:key'),
+      gateway: nconf.get('apn:feedback'),
+      feedback: failedDeliveryEventOccurred,
+      interval: nconf.get('feedbackInterval')
+  });
 
-function failedDelivery(timeSinceEpoch, deviceToken) {
-  winston.error("Failed delivery. Need to remove device", { time: timeSinceEpoch });
-}
+  jobs.process('push-notification', function(job, done) {
+    directSendUserNotification(job.data.userIds, job.data.message, done);
+  });
+};
 
-var feedback = new apns.Feedback({
-    cert: nconf.get('apn:cert'),
-    key: nconf.get('apn:key'),
-    gateway: nconf.get('apn:feedback'),
-    feedback: failedDelivery,
-    interval: nconf.get('feedbackInterval')
-});
+exports.sendUserNotification = function(userIds, message) {
+
+  if(!Array.isArray(userIds)) userIds = [userIds];
+
+  jobs.create('push-notification', {
+    title: message,
+    userIds: userIds,
+    message: message
+  }).attempts(5)
+    .save();
+};
