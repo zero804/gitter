@@ -3,6 +3,8 @@
 
 exports.startWorkers = function() {
   require('./mailer-service').startWorkers();
+  require('../gateways/push-notification-gateway').startWorkers();
+
   require('./kue-cleanup-service').startCleanupJob();
 
   var kue = require('kue');

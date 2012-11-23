@@ -1,15 +1,15 @@
 /*jslint node: true */
 "use strict";
 
-var nodemailer = require('nodemailer'),
-    troupeTemplate = require('../utils/troupe-template'),
-    nconf = require('../utils/config'),
-    winston = require("winston"),
-    kue = require('kue'),
+var kue = require('kue'),
     jobs = kue.createQueue(),
     _ = require('underscore');
 
 exports.startWorkers = function() {
+  var nodemailer = require('nodemailer'),
+      troupeTemplate = require('../utils/troupe-template'),
+      nconf = require('../utils/config'),
+      winston = require("winston");
 
   var sesTransport = nodemailer.createTransport("SES", {
       AWSAccessKeyID: nconf.get("amazon:accessKey"),
