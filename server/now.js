@@ -346,7 +346,7 @@ module.exports = {
           }
 
           if(operation === 'create' || operation === 'update') {
-            winston.debug("Preparing model ", { model: model });
+            winston.debug("Data has changed. Change will be serialized and pushed to clients.", { model: model });
 
             var Strategy = restSerializer.getStrategy(modelName, true);
 

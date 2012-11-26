@@ -32,6 +32,8 @@ unreadItemService.installListener(); // TODO: make sure this only happens once. 
 
 require('./gateways/push-notification-gateway');
 
+require('./services/kue-workers').startWorkers();
+
 // APIS
 require('./resources/').install(app);
 require('./api/v1/').install(app);

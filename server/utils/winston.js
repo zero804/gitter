@@ -9,7 +9,8 @@ winston.remove(winston.transports.Console);
 winston.add(winston.transports.Console, {
   colorize: nconf.get("logging:colorize"),
   timestamp: nconf.get("logging:timestamp"),
-  level: nconf.get("logging:level")
+  level: nconf.get("logging:level"),
+  prettyPrint: nconf.get("logging:prettyPrint")
 });
 
 if(nconf.get("logging:loggly")) {

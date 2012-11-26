@@ -29,8 +29,12 @@ function on(event, callback) {
   }
 
   eventEmitter.on(event, function(message) {
-    winston.info("Event received", { message: message });
-    callback(message);
+    try {
+      callback(message);
+    } catch(e) {
+      winston.error("Appevent handler failed with error", { exception: e });
+      console.error(e.stack);
+    }
   });
 }
 
