@@ -100,21 +100,21 @@ module.exports = {
     });
   },
 
-  confirm: function(user, callbackFunction) {
-    winston.debug("User confirmation ", user);
-
-    if(!user) return callbackFunction(new Error("No user found"));
+  confirm: function(user, callback) {
+    if(!user) return callback(new Error("No user found"));
+    winston.debug("Confirming user", { id: user.id, status: user.status });
 
     user.status = 'PROFILE_NOT_COMPLETED';
 
     user.save(function(err) {
-      if(err) return callbackFunction(err);
+      if(err) return callback(err);
 
+      winston.debug("User saved, finding troupe to redirect to", { id: user.id, status: user.status });
       troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
-        if(err) return callbackFunction(new Error("Error finding troupes for user"));
-        if(troupes.length < 1) return callbackFunction(new Error("Could not find troupe for user"));
+        if(err) return callback(new Error("Error finding troupes for user"));
+        if(troupes.length < 1) return callback(new Error("Could not find troupe for user"));
 
-        callbackFunction(err, user, troupes[0]);
+        callback(err, user, troupes[0]);
       });
     });
   },

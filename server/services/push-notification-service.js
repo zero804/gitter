@@ -23,3 +23,9 @@ exports.registerAppleUser = function(deviceId, userId, callback) {
 exports.findDevicesForUser = function(userId, callback) {
   PushNotificationDevice.find({ userId: userId }, callback);
 };
+
+exports.findDevicesForUsers = function(userIds, callback) {
+  PushNotificationDevice
+    .where('userId').in(userIds)
+    .exec(callback);
+};

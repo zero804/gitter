@@ -118,8 +118,15 @@ module.exports = {
       app.get('/confirm/:confirmationCode',
         middleware.authenticate('confirm', { failureRedirect: '/confirm-failed' } ),
         function(req, res, next){
+          winston.debug("Confirmation authenticated");
+
           signupService.confirm(req.user, function(err, user, troupe) {
-            if (err) return next(err);
+            if (err) {
+              winston.error("Signup service confirmation failed", { exception: err } );
+              return next(err);
+            }
+
+            winston.debug("Redirecting newly confirmed user to troupe ", { troupeUri: troupe.uri } );
             res.relativeRedirect('/' + troupe.uri);
           });
         }
