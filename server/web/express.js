@@ -11,6 +11,15 @@ var express = require('express'),
   fineuploaderExpressMiddleware = require('fineuploader-express-middleware'),
   cabinet = require('cabinet');
 
+function ios6PostCachingFix() {
+  return function(req, res, next) {
+    if(req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE' || req.method === 'PATCH') {
+      res.set('Cache-Control', 'no-cache');
+    }
+    next();
+  };
+}
+
 module.exports = {
   installFull: function(app, server, sessionStore) {
     handlebars.registerHelper('cdn', require('./cdn-helper'));
@@ -56,6 +65,7 @@ module.exports = {
     app.use(express.bodyParser());
     app.use(fineuploaderExpressMiddleware());
 
+    app.use(ios6PostCachingFix());
     app.use(express.session({ secret: 'keyboard cat', store: sessionStore, cookie: { path: '/', httpOnly: true, maxAge: 14400000, domain: nconf.get("web:cookieDomain"), secure: false /*nconf.get("web:secureCookies") Express won't sent the cookie as the https offloading is happening in nginx. Need to have connection.proxySecure set*/ }}));
     app.use(passport.initialize());
     app.use(passport.session());
