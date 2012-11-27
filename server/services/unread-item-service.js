@@ -119,6 +119,9 @@ function markItemsRead(userId, troupeId, items, callback) {
 
   var multi = redisClient.multi();
 
+  // lrt stands for "last read time" - it's the last time a user read something
+  multi.set("lrt:" + userId, Date.now());
+
   var keys = _.keys(items);
   keys.forEach(function(itemType) {
     var ids = items[itemType];
@@ -162,6 +165,23 @@ function getUserUnreadCounts(userId, troupeId, callback) {
   });
 }
 
+/** Returns hash[userId] = unixTime for each of the queried users */
+function findLastReadTimesForUsers(userIds, callback) {
+  var keysToQuery = userIds.map(function(userId) { return "lrt:" + userId;});
+  redisClient.mget(keysToQuery, function(err, times) {
+    if(err) return callback(err);
+    var result = {};
+    times.forEach(function(time, index) {
+      if(time) {
+        var userId = userIds[index];
+        result[userId] = time;
+      }
+    });
+
+    callback(null, result);
+  });
+}
+
 function getUnreadItems(userId, troupeId, itemType, callback) {
     redisClient.smembers("unread:" + itemType + ":" + userId + ":" + troupeId, function(err, members) {
       if(err) {
@@ -201,6 +221,7 @@ module.exports = {
   getUnreadItems: getUnreadItems,
   getUserUnreadCounts: getUserUnreadCounts,
   getUnreadItemsForUser: getUnreadItemsForUser,
+  findLastReadTimesForUsers: findLastReadTimesForUsers,
 
   /* TODO: make sure only one of these gets installed for the whole app */
   installListener: function() {

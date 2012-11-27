@@ -1,5 +1,4 @@
- /*jshint globalstrict:true, trailing:false */
-/*global require: true, module: true */
+/*jslint node: true */
 "use strict";
 
 var persistence = require("./persistence-service"),

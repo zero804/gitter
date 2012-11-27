@@ -91,6 +91,11 @@ function cleanupJob() {
 
 winston.debug('Running kue completed job clean-up');
 
+function promotionJob() {
+  jobs.promote();
+}
+
 exports.startCleanupJob = function() {
   setInterval(cleanupJob, timer);
+  setInterval(promotionJob, 5000);
 };

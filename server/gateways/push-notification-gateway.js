@@ -26,7 +26,9 @@ exports.startWorkers = function() {
           note.alert = message;
           note.device = new apns.Device(device.appleToken);
 
-          apnsConnection.sendNotification(note);
+          process.nextTick(function() {
+            apnsConnection.sendNotification(note);
+          });
         }
       });
 
@@ -35,7 +37,7 @@ exports.startWorkers = function() {
   }
 
   function errorEventOccurred(err, notification) {
-    winston.error("APN error", { exception: err, notification: notification });
+    winston.error("APN error", { exception: err, notification: notification.payload });
   }
 
   winston.info("Starting APN");
@@ -63,13 +65,12 @@ exports.startWorkers = function() {
       interval: nconf.get('feedbackInterval')
   });
 
-  jobs.process('push-notification', function(job, done) {
+  jobs.process('push-notification', 20, function(job, done) {
     directSendUserNotification(job.data.userIds, job.data.message, done);
   });
 };
 
 exports.sendUserNotification = function(userIds, message) {
-
   if(!Array.isArray(userIds)) userIds = [userIds];
 
   jobs.create('push-notification', {

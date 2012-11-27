@@ -206,7 +206,8 @@ GeoPopulatedPlaceSchema.index({ geonameid: 1 });
   userId: ObjectId,
   deviceId: String,
   appleToken: Buffer,
-  deviceType: { type: String, "enum": ['APPLE', 'ANDROID']}
+  deviceType: { type: String, "enum": ['APPLE', 'ANDROID']},
+  timestamp: Date
 });
 PushNotificationDeviceSchema.index({ deviceId: 1 });
 PushNotificationDeviceSchema.index({ userId: 1 });
