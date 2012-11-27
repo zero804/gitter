@@ -26,29 +26,29 @@
 <body>
   <div class="mtrpLoginContainer">
     <div class="mtrpLoginLogo"><img src="{{cdn "images/2/logo-mark-white.png"}}"></div>
-    <div class="mtrpLoginForm">
+    <div class="mtrpLoginForm" id="panel-login">
       <form name="loginform" id="loginform">
         <div class="mtrpLoginFieldContainer">
           <input name="email" value="mike.bartlett@gmail.com" id="email" type="text" class="mtrpLoginFormItem" placeholder="Email address">
           <input name="password" id="password" type="password" class="mtrpLoginFormItem" placeholder="Password">
         </div>
-        <div class="mtrpLoginSignup">
+        <div class="mtrpLoginSignup" id="button-signup">
           <a href="#" class="trpButtonBig trpBtnWhite" id="new-user">New user</a>
         </div>
-        <div class="mtrpLoginSubmit">
+        <div class="mtrpLoginSubmit" id="button-login">
           <a href="#" class="trpButtonBig trpBtnWhite" id="submit">Login &raquo;</a>
         </div>
         <input type="submit" style="visibility: hidden">
       </form>
     </div>
     
-    <div class="mtrpSignupForm">
+    <div class="mtrpSignupForm" id="panel-signup">
       Sorry, Troupe is invite only<br> at the moment<br>
-      <a href="#" class="mtrpLoginBack trpButtonBig trpBtnWhite" id="submit">Back</a>    
+      <a href="#" class="mtrpLoginBack trpButtonBig trpBtnWhite" id="button-back">Back</a>    
     </div>
    
-   <div class="mtrpLoginFailure" style="display:none">
-     Login failed. Forgot password?
+   <div class="mtrpLoginFailure" id="panel-failure">
+     Login failed.
    </div>
    
   </div>
