@@ -154,6 +154,7 @@ exports.token = [
 exports.bearerLogin = [
   passport.authenticate('bearer', { session: true }),
   function(req, res) {
+    winston.info("oauth: user logged in via bearerLogin", { user: req.user.displayName });
     res.relativeRedirect("/select-troupe");
   }
 ];
