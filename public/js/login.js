@@ -6,33 +6,47 @@ require(
     'retina' ],
     function($) {
 
-      $('.mtrpLoginSignup').on('click', function(e) {
-        $('.mtrpSignupForm').anim({translate3d: '-320px,0,0'}, 0.5, 'swing');
-        $('.mtrpLoginForm').anim({translate3d: '-320px,0,0'}, 0.5, 'swing');
+      $('#button-signup').on('click', function(e) {
+        $('#panel-signup').anim({translate3d: '-320px,0,0'}, 0.5, 'swing');
+        $('#panel-login').anim({translate3d: '-320px,0,0'}, 0.5, 'swing');
       });
 
-      $('.mtrpLoginBack').on('click', function(e) {
-        $('.mtrpSignupForm').anim({translate3d: '320px,0,0'}, 0.5, 'swing');
-        $('.mtrpLoginForm').anim({translate3d: '0,0,0'}, 0.5, 'swing');
+      $('#button-back').on('click', function(e) {
+        $('#panel-signup').anim({translate3d: '320px,0,0'}, 0.5, 'swing');
+        $('#panel-login').anim({translate3d: '0,0,0'}, 0.5, 'swing');
       });
 
-      $('.mtrpLoginSubmit').on('click', function(e) {
+      $('#button-login').on('click', function(e) {
         e.preventDefault();
         submitForm();
+      });
+
+      $('#password').on('blur', function(e) {
+        hideLoginFailure();
       });
 
       $("#loginform").submit(function(e) {
         e.preventDefault();
+        $("#password").blur();
         submitForm();
-    });
+      });
 
-      // function submitForm()
-      // {
-      //   document.loginform.submit();
-      // }
+      var showingFailure = false;
+
+      function showLoginFailure() {
+        $('#panel-failure').anim({translate3d: '0px, -160px,0'}, 0.5, 'swing');
+        showingFailure = true;
+      }
+
+      function hideLoginFailure() {
+        if (showingFailure) {
+          $('#panel-failure').anim({translate3d: '0px, 160px,0'}, 0.5, 'swing');
+          showingFailure = false;
+        }
+      }
 
       function submitForm() {
-
+        hideLoginFailure();
         var form = $('#loginform');
         var that = this;
 
@@ -44,7 +58,7 @@ require(
           type: "POST",
           error: function(jqXHR, textStatus, errorThrown) {
             console.log("Error");
-            $('.mtrpLoginFailure').show('fast');
+            showLoginFailure();
 
           },
           success: function(data) {
@@ -52,7 +66,7 @@ require(
             console.log("Login success, default uri returned: " + data.defaultTroupe.uri);
             if(data.failed) {
               console.log("No it actually failed");
-              $('.mtrpLoginFailure').show('fast');
+              showLoginFailure();
               return;
             }
             window.location.href="/" + data.defaultTroupe.uri;
