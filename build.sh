@@ -13,6 +13,7 @@ mkdir -p public-processed/bootstrap/css/
 ./node_modules/less/bin/lessc -x public-processed/bootstrap/less/troupe.less  > public-processed/bootstrap/css/troupe.css
 ./node_modules/less/bin/lessc -x public-processed/bootstrap/less/trp.less  > public-processed/bootstrap/css/trp.css
 ./node_modules/less/bin/lessc -x public-processed/bootstrap/less/trp2.less  > public-processed/bootstrap/css/trp2.css
+./node_modules/less/bin/lessc -x public-processed/bootstrap/less/mtrp.less  > public-processed/bootstrap/css/mtrp.css
 
 # while IFS= read -r -d $'\0' file; do 
 #   echo Uglifying $file
