@@ -83,7 +83,7 @@ module.exports = {
       });
 
       nowjs.on('connect', function() {
-        winston.info("Incoming nowjs socket connected");
+        winston.info("nowjs: Incoming nowjs socket connected");
 
         var self = this;
 
@@ -91,7 +91,7 @@ module.exports = {
           if(err) return;
           if(!user) return;
 
-          winston.info("User connected", { userId: user.id });
+          winston.info("nowjs: User connected", { userId: user.id });
 
           nowjs.getGroup("user." + user.id).addUser(self.user.clientId);
 
@@ -122,7 +122,7 @@ module.exports = {
 
         loadUserAndTroupe(this.user, troupeId, sessionStore, function(err, user, troupe) {
           if(err) {
-            winston.warn('Error while loading user and troupe in subscribeToTroupe: ',  { exception: err } );
+            winston.warn('nowjs: Error while loading user and troupe in subscribeToTroupe: ',  { exception: err } );
             callback({ description: "Server error", reauthenticate: true });
             return;
           }
@@ -253,10 +253,10 @@ module.exports = {
           }
 
           fileService.findById(fileId, function(err, file) {
-            winston.info("Bridging file event to now.js clients");
+            winston.info("nowjs: Bridging file event to now.js clients");
 
             restSerializer.serialize(file, new restSerializer.FileStrategy(), function(err, serializedFile) {
-              if(err || !serializedFile) return winston.error("Notification failure", { exception: err });
+              if(err || !serializedFile) return winston.error("nowjs: Notification failure", { exception: err });
 
               group.now.onFileEvent({
                 event: event,
@@ -288,10 +288,10 @@ module.exports = {
           }
 
           conversationService.findById(conversationId, function(err, conversation) {
-            if(err || !conversation) return winston.error("Notification failure", { exception: err});
+            if(err || !conversation) return winston.error("nowjs: Notification failure", { exception: err});
 
             restSerializer.serialize(conversation, new restSerializer.ConversationMinStrategy(), function(err, serializedConversation) {
-              if(err || !serializedConversation) return winston.error("Notification failure", err);
+              if(err || !serializedConversation) return winston.error("nowjs: Notification failure", err);
 
               group.now.onMailEvent({
                 event: event,
@@ -327,7 +327,7 @@ module.exports = {
 
         /* Directed at a user? */
         if(userId) {
-          winston.error("DIRECT USER NOTIFICATIONS NOT YET IMPLEMENTED!!");
+          winston.error("nowjs: DIRECT USER NOTIFICATIONS NOT YET IMPLEMENTED!!");
           // TODO
         }
       });
@@ -346,19 +346,19 @@ module.exports = {
           }
 
           if(operation === 'create' || operation === 'update') {
-            winston.debug("Data has changed. Change will be serialized and pushed to clients.", { model: model });
+            winston.debug("nowjs: Data has changed. Change will be serialized and pushed to clients.", { model: model });
 
             var Strategy = restSerializer.getStrategy(modelName, true);
 
             // No strategy, ignore it
             if(!Strategy) {
-              winston.info("Skipping serialization as " + modelName + " has no serialization strategy");
+              winston.info("nowjs: Skipping serialization as " + modelName + " has no serialization strategy");
               return;
             }
 
             restSerializer.serialize(model, new Strategy(), function(err, serializedModel) {
-              if(err) return winston.error("Serialization failure" , err);
-              if(!serializedModel) return winston.error("No model returned from serializer");
+              if(err) return winston.error("nowjs: Serialization failure" , err);
+              if(!serializedModel) return winston.error("nowjs: No model returned from serializer");
 
               group.now.onDataChange({
                 troupeId: troupeId,

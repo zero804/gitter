@@ -1,6 +1,10 @@
 /*jslint node: true */
 "use strict";
 
+////////////////////////////////////////////////////////////
+// TODO: remove notifications from the system. We're using unreaditems now instead
+////////////////////////////////////////////////////////////
+
 var persistence = require("./persistence-service");
 var appEvents = require("../app-events");
 var winston = require("winston");

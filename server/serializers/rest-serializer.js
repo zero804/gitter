@@ -3,6 +3,8 @@
 "use strict";
 
 var userService = require("../services/user-service");
+var chatService = require("../services/chat-service");
+var troupeService = require("../services/troupe-service");
 var fileService = require("../services/file-service");
 var unreadItemService = require("../services/unread-item-service");
 var Q = require("q");
@@ -401,6 +403,7 @@ function ChatStrategy(options)  {
 
   var userStategy = options.user ? null : new UserIdStrategy();
   var unreadItemStategy = new UnreadItemStategy({ itemType: 'chat' });
+  var troupeStrategy = options.includeTroupe ? new TroupeIdStrategy(options) : null;
 
   this.preload = function(items, callback) {
     var users = items.map(function(i) { return i.fromUserId; });
@@ -422,6 +425,13 @@ function ChatStrategy(options)  {
       });
     }
 
+    if(troupeStrategy) {
+      strategies.push({
+        strategy: troupeStrategy,
+        data: _.uniq(items.map(function(i) { return i.toTroupeId; }))
+      });
+    }
+
     execPreloads(strategies, callback);
   };
 
@@ -431,12 +441,45 @@ function ChatStrategy(options)  {
       text: item.text,
       sent: item.sent,
       fromUser: options.user ? options.user : userStategy.map(item.fromUserId),
-      unread: options.currentUserId ? unreadItemStategy.map(item._id) : true
+      unread: options.currentUserId ? unreadItemStategy.map(item._id) : true,
+      troupe: troupeStrategy ? troupeStrategy.map(item.toTroupeId) : undefined
     };
 
   };
 }
 
+
+function ChatIdStrategy(options) {
+  var chatStrategy = new ChatStrategy(options);
+  var self = this;
+
+  this.preload = function(ids, callback) {
+    chatService.findByIds(ids, function(err, chats) {
+      if(err) {
+        winston.error("Error loading chats", { exception: err });
+        return callback(err);
+      }
+      self.chats = collections.indexById(chats);
+
+      execPreloads([{
+        strategy: chatStrategy,
+        data: chats
+      }], callback);
+
+    });
+  };
+
+  this.map = function(chatId) {
+    var chat = self.chats[chatId];
+    if(!chat) {
+      winston.warn("Unable to locate chatId ", { chatId: chatId });
+      return null;
+    }
+
+    return chatStrategy.map(chat);
+  };
+
+}
 function compileTemplates(map) {
   for(var k in map) {
     if(map.hasOwnProperty(k)) {
@@ -509,14 +552,14 @@ function InviteStrategy(options) {
 function TroupeStrategy(options) {
   if(!options) options = {};
 
-  var unreadItemStategy = new AllUnreadItemCountStategy({ userId: options.currentUserId });
+  var unreadItemStategy = options.currentUserId ? new AllUnreadItemCountStategy({ userId: options.currentUserId }) : null;
   var userIdStategy = options.mapUsers ? new UserIdStrategy() : null;
 
   this.preload = function(items, callback) {
 
     var strategies = [];
 
-    if(options.currentUserId) {
+    if(unreadItemStategy) {
       var troupeIds = items.map(function(i) { return i.id; });
 
       strategies.push({
@@ -525,7 +568,7 @@ function TroupeStrategy(options) {
       });
     }
 
-    if(options.mapUsers) {
+    if(userIdStategy) {
       var userIds = _.uniq(_.flatten(items.map(function(troupe) { return troupe.users; })));
 
       strategies.push({
@@ -543,12 +586,43 @@ function TroupeStrategy(options) {
       id: item.id,
       name: item.name,
       uri: item.uri,
-      users: options.mapUsers ? item.users.map(function(userId) { return userIdStategy.map(userId); }) : undefined,
-      unreadItems: options.currentUserId ? unreadItemStategy.map(item.id) : undefined
+      users: userIdStategy ? item.users.map(function(userId) { return userIdStategy.map(userId); }) : undefined,
+      unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined
     };
   };
 }
 
+function TroupeIdStrategy(options) {
+  var troupeStrategy = new TroupeStrategy(options);
+  var self = this;
+
+  this.preload = function(ids, callback) {
+    troupeService.findByIds(ids, function(err, troupes) {
+      if(err) {
+        winston.error("Error loading troupes", { exception: err });
+        return callback(err);
+      }
+      self.troupes = collections.indexById(troupes);
+
+      execPreloads([{
+        strategy: troupeStrategy,
+        data: troupes
+      }], callback);
+
+    });
+  };
+
+  this.map = function(troupeId) {
+    var troupe = self.troupes[troupeId];
+    if(!troupeId) {
+      winston.warn("Unable to locate troupeId ", { troupeId: troupeId });
+      return null;
+    }
+
+    return troupeStrategy.map(troupe);
+  };
+
+}
 
 function RequestStrategy(options) {
   if(!options) options = {};
@@ -618,12 +692,16 @@ function getStrategy(modelName, toCollection) {
       return NotificationStrategy;
     case 'chat':
       return ChatStrategy;
+    case 'chatId':
+      return ChatIdStrategy;
     case 'invite':
       return InviteStrategy;
     case 'request':
       return RequestStrategy;
     case 'troupe':
       return TroupeStrategy;
+    case 'troupeId':
+      return TroupeIdStrategy;
     case 'user':
       return UserStrategy;
   }
@@ -637,10 +715,11 @@ module.exports = {
   NotificationStrategy: NotificationStrategy,
   FileStrategy: FileStrategy,
   ChatStrategy: ChatStrategy,
+  ChatIdStrategy: ChatIdStrategy,
   InviteStrategy: InviteStrategy,
   RequestStrategy: RequestStrategy,
   TroupeStrategy: TroupeStrategy,
-
+  TroupeIdStrategy: TroupeIdStrategy,
   getStrategy: getStrategy,
   serialize: serialize
 }

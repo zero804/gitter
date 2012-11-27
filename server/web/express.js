@@ -43,7 +43,7 @@ module.exports = {
       hidden: false,
       coffee: false,
       expires: 0,
-      gzip: true,
+      gzip: false,
       less: {
         // Specify search paths for @import directives
         //paths: ['.',__dirname + '/static/stylesheets']

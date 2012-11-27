@@ -1,38 +1,41 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jslint node: true */
 "use strict";
 
-function keys(object) {
+exports.keys = function(object) {
     var k = [];
     for (var i in object) if (object.hasOwnProperty(i)) {
       k.push(i);
     }
     return k;
-}
+};
 
-function extract(propertyName) {
+exports.extract = function(propertyName) {
     return function(item) {
       return item[propertyName];
     };
-}
+};
 
-module.exports = {
-  keys: keys,
-  extract: extract,
-  indexById: function(array) {
-    var a = {};
-    array.forEach(function(item) {
-      a[item._id] = item;
-    });
+exports.indexById = function(array) {
+  var a = {};
+  array.forEach(function(item) {
+    a[item._id] = item;
+  });
 
-    return a;
-  },
+  return a;
+};
 
-  predicates: {
-      notNull: function(v) {
-        return (v !== null) && (v !== undefined);
-      }
+exports.hashArray = function(array) {
+  var a = {};
+  array.forEach(function(item) {
+    a[item] = true;
+  });
 
+  return a;
+};
+
+exports.predicates = {
+  notNull: function(v) {
+    return (v !== null) && (v !== undefined);
   }
 };
 
