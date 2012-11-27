@@ -5,6 +5,9 @@ require(
     'jquery',
     'retina' ],
     function($) {
+      if(window.localStorage.defaultTroupeEmail) {
+        $('#email').val(window.localStorage.defaultTroupeEmail);
+      }
 
       $('#button-signup').on('click', function(e) {
         $('#panel-signup').anim({translate3d: '-320px,0,0'}, 0.5, 'swing');
@@ -27,6 +30,8 @@ require(
 
       $("#loginform").submit(function(e) {
         e.preventDefault();
+        window.localStorage.defaultTroupeEmail = $('#email').val();
+
         $("#password").blur();
         submitForm();
       });
@@ -62,16 +67,15 @@ require(
 
           },
           success: function(data) {
-            console.dir(data);
-            console.log("Login success, default uri returned: " + data.defaultTroupe.uri);
             if(data.failed) {
               console.log("No it actually failed");
               showLoginFailure();
               return;
             }
-            window.location.href="/" + data.defaultTroupe.uri;
+
+            window.location.href = data.redirectTo;
           }
         });
       }
 });
-    
+

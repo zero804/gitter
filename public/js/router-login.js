@@ -25,7 +25,7 @@ define([
         var loginModal = new TroupeViews.Modal({ view: loginView, disableClose: true });
         loginView.on('login.complete', function(data) {
           loginView.off('login.complete');
-          window.location.href="/" + data.defaultTroupe.uri;
+          window.location.href = data.redirectTo;
         });
         return loginModal;
       }
@@ -40,7 +40,7 @@ define([
 
         view = new RequestModalView({ });
         modal = new TroupeViews.Modal({ view: view, disableClose: true });
-  
+
         view.on('request.login', function(data) {
           modal.off('request.login');
           if (!data) data = {};

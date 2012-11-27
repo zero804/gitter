@@ -17,7 +17,7 @@
   <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:200' rel='stylesheet' type='text/css'>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
   <link rel="shortcut icon" href="images/favicon.ico">
-    
+
   {{>require_config}}
   <script data-main='{{cdn "js/login.js" }}' src='{{cdn "js/libs/require/2.0.4/require.js"}}'></script>
 
@@ -29,7 +29,7 @@
     <div class="mtrpLoginForm" id="panel-login">
       <form name="loginform" id="loginform">
         <div class="mtrpLoginFieldContainer">
-          <input name="email" value="mike.bartlett@gmail.com" id="email" type="text" class="mtrpLoginFormItem" placeholder="Email address">
+          <input name="email" value="" id="email" type="email" class="mtrpLoginFormItem" placeholder="Email address">
           <input name="password" id="password" type="password" class="mtrpLoginFormItem" placeholder="Password">
         </div>
         <div class="mtrpLoginSignup" id="button-signup">
@@ -41,17 +41,17 @@
         <input type="submit" style="visibility: hidden">
       </form>
     </div>
-    
+
     <div class="mtrpSignupForm" id="panel-signup">
       Sorry, Troupe is invite only<br> at the moment<br>
-      <a href="#" class="mtrpLoginBack trpButtonBig trpBtnWhite" id="button-back">Back</a>    
+      <a href="#" class="mtrpLoginBack trpButtonBig trpBtnWhite" id="button-back">Back</a>
     </div>
-   
+
    <div class="mtrpLoginFailure" id="panel-failure">
      Login failed.
    </div>
-   
+
   </div>
-  
+
 </body>
 </html>
