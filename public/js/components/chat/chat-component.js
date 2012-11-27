@@ -10,7 +10,7 @@ define([
 
   var connected = false;
 
-  var now = nowInitialize(window.troupeContext.websockets.nowjs, window.troupeContext.websockets.socketio);
+  var now = nowInitialize(window.troupeContext.websockets.nowjs, window.troupeContext.websockets.options);
 
   var module = {
     connect: function() {
