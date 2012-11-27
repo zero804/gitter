@@ -40,7 +40,7 @@ require(
         view.on('login.complete', function(data) {
           modal.off('login.complete');
 
-          window.location.href="/" + data.defaultTroupe.uri;
+          window.location.href= data.redirectTo;
         });
 
         view.on('login.close', function(data) {
@@ -52,4 +52,4 @@ require(
         return false;
       });
 });
-    
+

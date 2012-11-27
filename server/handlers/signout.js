@@ -1,15 +1,13 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jslint node: true */
 "use strict";
 
-module.exports = {
-    install: function(app) {
-      /* Cheap trick for testing */
-      app.get('/signout', function(req, res) {
-        res.clearCookie("auth");
-        req.session.destroy();
-        res.relativeRedirect('/x');
-      });
+var middleware = require('../web/middleware');
 
-    }
+exports.install = function(app) {
+  /* Cheap trick for testing */
+  app.get('/signout',
+    middleware.logout(),
+    function(req, res) {
+      res.relativeRedirect('/x');
+    });
 };

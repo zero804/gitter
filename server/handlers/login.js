@@ -9,6 +9,43 @@ var passport = require("passport"),
     middleware = require('../web/middleware'),
     userService = require('../services/user-service');
 
+function handleJsonLogin(req, res) {
+  var troupeUri = req.body.troupeUri;
+  winston.info("login: Performing json login");
+
+  function sendUri(uri) {
+    res.send({
+      failed: false,
+      user: req.user,
+      redirectTo: uri
+    });
+  }
+
+  function sendTroupe(err,troupe) {
+    if (err) return sendUri("/select-troupe");
+
+    return sendUri(troupe.uri);
+  }
+
+  if(req.session.returnTo) {
+    sendUri(req.session.returnTo);
+
+    return;
+  }
+
+  if(troupeUri) {
+    sendUri("/" + troupeUri);
+    return;
+  }
+
+  if (req.user.lastTroupe) {
+    troupeService.findById(req.user.lastTroupe, sendTroupe);
+    return;
+  }
+
+  userService.findDefaultTroupeForUser(req.user.id, sendTroupe);
+}
+
 module.exports = {
     install: function(app) {
       var basepath = nconf.get("web:basepath");
@@ -17,58 +54,19 @@ module.exports = {
         middleware.authenticate('local', { failureRedirect: '/login' }),
         middleware.rememberMe,
         function(req, res, next) {
-          var troupeUri = req.body.troupeUri;
-          winston.info("Login with requested troupe: ", { uri: troupeUri });
 
-          if(req.accepts(['json','html']) === 'json') {
-            if(troupeUri) {
-              troupeService.findByUri(troupeUri, function(err, troupe) {
-                if(err) return res.send(500);
+          if(req.accepts(['html', 'json']) === 'json')
+            return handleJsonLogin(req, res);
 
-                var a = {};
-
-                if(troupe) {
-                  a[troupeUri] = troupeService.userHasAccessToTroupe(req.user, troupe);
-                } else {
-                  // Troupe doesn't exist, just say the user doesn't have access
-                  a[troupeUri] = false;
-                }
-
-                res.send({
-                  failed: false,
-                  user: req.user,
-                  defaultTroupe: troupe,
-                  hasAccessToTroupe: a
-                });
-              });
-            } else {
-              if (req.user.lastTroupe) {
-                troupeService.findById(req.user.lastTroupe, function (err,troupe) {
-                  if (err) troupe = null;
-                  res.send({
-                    failed: false,
-                    user: req.user,
-                    defaultTroupe: troupe
-                  });
-                });
-              } else {
-                userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
-                  if (err) troupe = null;
-                  res.send({
-                    failed: false,
-                    user: req.user,
-                    defaultTroupe: troupe
-                  });
-                });
-              }
-            }
+          if(req.session.returnTo) {
+            winston.info("login: Returning user to original URL ", { url: req.session.returnTo });
+            res.relativeRedirect(req.session.returnTo);
           } else {
-            if(req.session.returnTo) {
-              res.relativeRedirect(req.session.returnTo);
-            } else {
-              res.relativeRedirect('/select-troupe');
-            }
+            winston.info("login: Forwarding to select-troupe", { url: req.session.returnTo });
+
+            res.relativeRedirect('/select-troupe');
           }
+
         });
 
       app.get('/login', function(req, res) {

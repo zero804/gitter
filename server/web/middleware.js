@@ -25,6 +25,15 @@ exports.ensureLoggedIn = function(options) {
 
 };
 
+exports.logout = function(options) {
+  return function(req, res, next) {
+    req.logout();
+    res.clearCookie("auth");
+    next();
+  };
+
+};
+
 exports.authenticate = function(scheme, options) {
   return function(req, res, next) {
     winston.debug("Attempting authentication", { scheme: scheme });
