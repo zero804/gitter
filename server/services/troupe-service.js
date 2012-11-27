@@ -15,6 +15,12 @@ function findByUri(uri, callback) {
   });
 }
 
+function findByIds(ids, callback) {
+  persistence.Troupe
+    .where('_id').in(ids)
+    .exec(callback);
+}
+
 function findById(id, callback) {
   persistence.Troupe.findById(id, function(err, troupe) {
     callback(err, troupe);
@@ -273,6 +279,7 @@ function findUsersForTroupe(troupeId, callback) {
 module.exports = {
   findByUri: findByUri,
   findById: findById,
+  findByIds: findByIds,
   findAllTroupesForUser: findAllTroupesForUser,
   validateTroupeEmail: validateTroupeEmail,
   validateTroupeEmailAndReturnDistributionList: validateTroupeEmailAndReturnDistributionList,

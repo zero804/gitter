@@ -10,14 +10,14 @@ var redis = require("redis"),
 function resetClientState() {
   function clearState(collection, item, name) {
     redisClient.smembers(collection, function(err, members) {
-      if(err) return winston.error("Redis error", { exception: err });
+      if(err) return winston.error("presence: Redis error", { exception: err });
 
       if(members.length) {
         var keysToDelete = members.map(function(userId) { return item + ":" + userId });
         keysToDelete.push(collection);
 
         redisClient.del(keysToDelete, function(err, count) {
-          winston.info("Removed " + (count - 1) + " stale " + name + "(s).");
+          winston.info("presence: Removed " + (count - 1) + " stale " + name + "(s).");
         });
       }
     });
@@ -28,13 +28,11 @@ function resetClientState() {
   clearState("presence:activesockets", "socket_troupe", "socket");
 }
 
-
-winston.info("Presence service establishing redis client");
 /* TODO: shutdown client at end of session */
 redisClient = redis.createClient();
 
 function defaultRedisCallback(err) {
-  if(err) winston.error("Redis error ", { exception: err });
+  if(err) winston.error("presence: Redis error ", { exception: err });
 }
 
 function addUserToActiveUsers(userId, callback) {
@@ -125,7 +123,7 @@ function removeUserFromTroupe(userId, troupeId, callback) {
   redisClient.lrem("troupe_users:" + troupeId, 1, userId, function(err, count) {
     if(err) return callback(err);
     if(count != 1) {
-      winston.warn("Inconsistent state: userId " + userId + " was removed from troupe " + troupeId + " " + count + " times. Expecting once.");
+      winston.warn("presence: Inconsistent state: userId " + userId + " was removed from troupe " + troupeId + " " + count + " times. Expecting once.");
     }
 
     /* TODO: make the troupe_users keys into SORTED SETS */
@@ -147,11 +145,11 @@ function removeTroupe(troupeId, callback) {
   if(!callback) callback = defaultRedisCallback;
 
   redisClient.del("troupe_users:" + troupeId, function(err) {
-    if(err) return winston.error("Redis error: " + err);
+    if(err) return winston.error("presence: Redis error: " + err);
   });
 
   redisClient.srem("presence:activetroupes", troupeId, function(err, count) {
-    if(err) return winston.error("Redis error: " + err);
+    if(err) return winston.error("presence: Redis error: " + err);
   });
 
 }
@@ -172,7 +170,7 @@ module.exports = {
   userSocketConnected: function(userId, socketId) {
     addUserToActiveUsers(userId, function(err, initialConnection) {
       if(initialConnection) {
-        winston.info("User " + userId + " connected.");
+        winston.info("presence: User " + userId + " connected.");
       }
     });
 
@@ -183,14 +181,14 @@ module.exports = {
   userSubscribedToTroupe: function(userId, troupeId, socketId) {
     addTroupeToActiveTroupes(troupeId, function(err, initialConnection) {
       if(initialConnection) {
-        winston.info("Troupe " + troupeId + " activated");
+        winston.info("presence: Troupe " + troupeId + " activated");
       }
     });
 
     addUserToTroupe(userId, troupeId, function(err, initialJoin) {
       if(initialJoin) {
         /* User joining this troupe for the first time.... */
-        winston.info("User " + userId + " has just joined " + troupeId);
+        winston.info("presence: User " + userId + " has just joined " + troupeId);
         appEvents.userLoggedIntoTroupe(userId, troupeId);
       }
     });
@@ -202,27 +200,27 @@ module.exports = {
     removeSocketFromUserSockets(socketId, userId, function(err, lastDisconnect) {
       if(lastDisconnect) {
         removeUserFromActiveUsers(userId);
-        winston.info("User " + userId + " is now offline");
+        winston.info("presence: User " + userId + " is now offline");
       }
     });
 
     getTroupeAssociatedToSocket(socketId, function(err, troupeId) {
       disassociateSocketFromTroupe(socketId);
 
-      if(err) return winston.error("Redis error: ", { exception: err });
+      if(err) return winston.error("presence: Redis error: ", { exception: err });
       if(!troupeId) return; /* No associated with a troupe. Fuggitaboutit */
 
       removeUserFromTroupe(userId, troupeId, function(err, lastConnectionForUserInTroupe) {
         if(lastConnectionForUserInTroupe) {
-          winston.info("User " + userId + " is gone from " + troupeId);
+          winston.info("presence: User " + userId + " is gone from " + troupeId);
 
           appEvents.userLoggedOutOfTroupe(userId, troupeId);
 
           getNumberOfUsersInTroupe(troupeId, function(err, count) {
-            if(err) return winston.error("Redis error: " + err);
+            if(err) return winston.error("presence: Redis error: " + err);
 
             if(count === 0) {
-              winston.info("The last user has disconnected from troupe " + troupeId);
+              winston.info("presence: The last user has disconnected from troupe " + troupeId);
               removeTroupe(troupeId);
             }
 
