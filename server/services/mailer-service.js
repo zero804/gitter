@@ -47,13 +47,13 @@ exports.startWorkers = function() {
     });
   }
 
-  jobs.process('email', function(job, done) {
+  jobs.process('email', 20, function(job, done) {
     sendEmailDirect(job.data, done);
   });
 };
 
 exports.sendEmail = function(options) {
-  jobs.create('email', 20, _.extend(options, { title: "Email to " + options.to }))
+  jobs.create('email', _.extend(options, { title: "Email to " + options.to }))
     .attempts(5)
     .save();
 };
