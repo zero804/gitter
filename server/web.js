@@ -30,8 +30,6 @@ require('./services/thumbnail-preview-generator-service').install();
 require('./services/notification-generator-service').install();
 unreadItemService.installListener(); // TODO: make sure this only happens once. Need to move across to a queue at some point
 
-require('./gateways/push-notification-gateway');
-
 require('./services/kue-workers').startWorkers();
 
 // APIS
