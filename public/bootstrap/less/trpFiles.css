@@ -1,0 +1,235 @@
+/*@trpDarkGrey: #636363; // dark grey*/
+.trpWhite {
+  color: white;
+}
+/*@fontSansLight: 'StagSansWeb-Light', sans-serif;*/
+@font-face {
+  font-family: 'StagWeb-Light';
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.eot');
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.eot?#iefix') format('embedded-opentype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.woff') format('woff'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.ttf') format('truetype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.svg#StagWeb-Light') format('svg');
+  font-weight: 300;
+  font-style: normal;
+  font-stretch: normal;
+}
+@font-face {
+  font-family: 'StagWeb-Thin';
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.eot');
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.eot?#iefix') format('embedded-opentype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.woff') format('woff'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.ttf') format('truetype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.svg#StagWeb-Thin') format('svg');
+  font-weight: 100;
+  font-style: normal;
+  font-stretch: normal;
+}
+@font-face {
+  font-family: 'StagSansWeb-Light';
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.eot');
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.eot?#iefix') format('embedded-opentype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.woff') format('woff'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.ttf') format('truetype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.svg#StagSansWeb-Light') format('svg');
+  font-weight: 400;
+  font-style: normal;
+  font-stretch: normal;
+}
+.trpH1 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 24px;
+}
+.trpH2 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 20px;
+}
+.trpH3 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 16px;
+}
+.trpH4 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 14px;
+}
+.trpBodyText {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+}
+.trpBodyEm {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+}
+.trpBodyMedium {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+}
+.trpBodySmall {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+}
+.trpBodyTiny {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 9px;
+}
+.trpFileViewItem {
+  float: left;
+  padding-top: 20px;
+  padding-bottom: 30px;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+.unread .trpFileViewItem {
+  /*  background-color: yellow; /* Fix this yeah */
+
+}
+.read .trpFileViewItem {
+  /*  background-color: green; /* Fix this yeah */
+
+}
+.trpFileThumbnail {
+  border: 1px solid #d6d6d6;
+  float: right;
+  width: 180px;
+  height: 180px;
+}
+.trpFileDetails {
+  width: 100%;
+}
+.trpFilename {
+  margin-top: 12px;
+  float: left;
+  height: 20px;
+  color: #333333;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.trpFileActionMenuButton {
+  margin-top: 12px;
+  padding: 5px 10px 5px 10px;
+  float: right;
+  border-left: 1px solid #d6d6d6;
+}
+.trpFileActionMenu {
+  display: none;
+  position: absolute;
+  z-index: 3;
+  float: right;
+  clear: both;
+  margin-top: 186px;
+  margin-left: 86px;
+  width: 96px;
+}
+.trpFileActionMenuTop {
+  display: none;
+  margin-left: 56px;
+  width: 20px;
+  height: 20px;
+  border: 0;
+}
+.trpFileActionMenuBottom {
+  display: none;
+  width: 96px;
+  background: white;
+}
+.trpFileActionMenuItem {
+  color: #333333;
+  padding: 5px 0px 5px 10px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+}
+.trpFileActionMenuItem a {
+  text-decoration: none;
+  color: #333333;
+}
+.trpFileActionMenuItem a:hover {
+  text-decoration: none;
+  color: #1dce73;
+}
+.trpFileActionMenuItem:hover {
+  color: #1dce73;
+  background-color: #f6f6f6;
+}
+.trpFileUploadArea {
+  position: absolute;
+  top: 0;
+  width: 620px;
+  height: 100%;
+  width: 100%;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  padding-left: 20px;
+  padding-top: 10px;
+}
+.trpFileToolbar {
+  padding-top: 8px;
+  padding-right: 20px;
+}
+.trpFileViewIcon {
+  padding-left: 8px;
+}
+.trpFilePreviewLeft,
+.trpFilePreviewRight {
+  position: absolute;
+  bottom: 0px;
+  height: 100%;
+  width: 10%;
+  cursor: pointer;
+  outline: none;
+  background: transparent url('blank.gif');
+  z-index: 1102;
+  background-repeat: no-repeat;
+  /*  margin: 18px;*/
+
+  margin-top: 60px;
+  margin-left: 18px;
+  margin-right: 18px;
+}
+.trpFilePreviewLeft {
+  left: 0px;
+  background-image: url('../../images/2/icon-file-preview-left.png');
+  background-position: left center;
+}
+.trpFilePreviewRight {
+  right: 0px;
+  background-image: url('../../images/2/icon-file-preview-right.png');
+  background-position: right center;
+}
+.trpFilePreviewItemContainer {
+  display: table-cell;
+  vertical-align: middle;
+}
+.trpFilePreviewItem {
+  max-width: 100%;
+  max-height: 100%;
+  margin: auto;
+  display: block;
+}
+.trpFileVersionThumbnail {
+  border: 1px solid #d6d6d6;
+  display: inline-block;
+  width: 180px;
+  height: 180px;
+}
+.trpFileVersionInfo {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  color: #333333;
+  padding-top: 8px;
+  padding-bottom: 12px;
+}
+.trpFileVersionItem {
+  padding-top: 4px;
+}
+.trpFileVersionNo {
+  display: inline-block;
+  width: 30px;
+}
+.trpFileVersionPerson {
+  display: inline-block;
+  width: 200px;
+}
+.trpFileVersionDate {
+  display: inline-block;
+  width: 150px;
+}
+.trpFileVersionDownload {
+  display: inline-block;
+  width: 120px;
+  text-align: right;
+}
