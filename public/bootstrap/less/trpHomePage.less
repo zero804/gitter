@@ -1,0 +1,298 @@
+@import "bootstrap.less";
+
+@import "trpColours.less";
+@import "trpFonts.less";
+@import "trpButtons.less";
+@import "trpCommon.less";
+
+body {
+  margin: 0;
+}
+
+html {
+ background-color: white;
+
+}
+
+h1 {
+  .trpH1;
+  margin: 0;
+}
+
+.trpHomeTopStripContainer {
+  background-color: white;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  display: block;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+}
+
+.trpHomeTopStrip {
+  min-width: 960px;
+  display: inline-block;
+  margin: 0px auto;
+  text-align: left;
+  padding-top: 20px;
+  padding-bottom: 12px;
+}
+
+.trpHomeLogo {
+  float: left;
+}
+
+.trpHomeMenu {
+  float: right;
+  color: white;
+  display: inline-block;
+}
+
+.trpHomeMenuItem {
+  display: inline-block;
+  float: left;
+  padding-right: 26px;
+  padding-left: 26px;
+  .trpBodyEm;
+  font-weight: lighter;
+  color: @trpDarkGrey;
+}
+
+.trpHomeHeroStripContainer {
+  background-color: white;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  display: block;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+  background-image: url('../../images/2/home-hero-image.jpg');
+  background-size: cover;
+  height: 540px;
+}
+
+.trpHomeHero {
+  display: inline-block;
+  padding-top: 20px;
+  width: 960px;
+  text-align: left;
+  min-height: 540px;
+
+}
+
+.trpHeroText {
+  display: inline-block;
+  max-width: 350px;
+  padding-right: 20px;
+  padding-top: 40px;
+  font-family: @fontSerif;
+  font-size: 32px;
+  color: white;
+  text-align: left;
+  line-height: 1.3em;
+  vertical-align: top;
+}
+
+.trpHeroImage {
+  position: absolute;
+  right: 0px;
+  top: 112px;
+  display: inline-block;
+  text-align: right;
+}
+
+.trpHomeMidStripContainer {
+  background-color: white;
+  width: 100%;
+  text-align: center;
+  margin-top: -4px;
+  padding-top: 38px;
+}
+
+.trpMidStrip {
+  font-family: @fontSerif;
+  font-size: 28px;
+  color: @trpDarkGrey;
+  padding-top: 10px;
+}
+
+.trpFeatures {
+  display: inline-block;
+  min-width: 960px;
+  padding-top: 8px;
+  padding-bottom: 18px;
+  text-align: center;
+}
+
+.trpFeature {
+  display: inline-block;
+  width: 240px;
+  vertical-align: top;
+  padding: 20px;
+  margin: 20px;
+}
+
+.trpFeatureHead {
+  .trpH2;
+  padding-top: 16px;
+  padding-bottom: 6px;
+  color: @trpDarkGrey;
+}
+
+.trpFeatureBody {
+  .trpBodyText;
+  font-weight: lighter;
+  color: @trpDarkGrey;
+  line-height: 1.4em;
+}
+
+.trpHomeVideoStripContainer {
+  background-color: white;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  display: block;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+  background-image: url('../../images/2/home-video-image.jpg');
+  background-size: cover;
+  height: 506px;
+}
+
+.trpHomeVideo {
+  .trpHomeHero;
+  font-family: @fontSerif;
+  font-size: 30px;
+  color: white;
+  text-align: center;
+  padding-top: 40px;
+}
+
+.trpHomeVideoSubtext {
+  font-family: @fontThin;
+  font-size: 16px;
+  padding-top: 40px;
+  font-weight: normal;
+}
+
+.trpHomeAppStripContainer {
+  background-color: white;
+  width: 100%;
+  text-align: center;
+  margin-top: -4px;
+  padding-top: 38px;
+}
+
+.trpHomeAppStrip {
+  .trpMidStrip;
+  padding-top: 10px;
+}
+
+.trpLegalHero {
+  padding-top: 20px;
+  display: inline-block;
+  min-width: 960px;
+}
+
+.trpLegalHeader{
+  float: left;
+  max-width: 600px;
+  padding-right: 20px;
+  padding-top: 40px;
+  font-family: @fontThin;
+  font-size: 24px;
+  color: white;
+  text-align: left;
+  line-height: 1.3em;
+}
+
+.trpLegalText p {
+  float: left;
+  max-width: 600px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+  font-family: @fontThin;
+  font-size: 16px;
+  color: white;
+  text-align: left;
+  line-height: 1.3em;
+  letter-spacing: 0.1em;
+}
+
+.trpLegalMidStripContainer {
+  background-color: white;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  display: block;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+  padding-top: 10px;
+}
+
+.trpLegalHero {
+  display: inline-block;
+  min-width: 960px;
+}
+
+.trpLegalBodyHeader{
+  float: left;
+  max-width: 900px;
+  padding-right: 20px;
+  font-family: @fontThin;
+  font-size: 24px;
+  color: white;
+  text-align: left;
+  line-height: 1.3em;
+}
+
+.trpLegalBody p {
+  float: left;
+  max-width: 900px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+  font-family: @fontThin;
+  font-size: 16px;
+  color: @trpDarkGrey;
+  text-align: left;
+  line-height: 1.3em;
+  letter-spacing: 0.1em;
+}
+
+.trpApps {
+  display: inline-block;
+  min-width: 960px;
+  padding-top: 28px;
+  padding-bottom: 28px;
+  text-align: center;
+}
+
+.trpApp {
+  display: inline-block;
+  min-width: 240px;
+  height: 208px;
+  vertical-align: top;
+  padding: 5px;
+  margin: 20px;
+}
+
+.trpAppText {
+  .trpBodyText;
+  font-weight: lighter;
+  color: @trpDarkGrey;
+}
+
+.trpHomeFooterStripContainer {
+  background-color: white;
+  width: 100%;
+  text-align: center;
+  margin-top: -4px;
+  padding-top: 38px;
+  padding-bottom: 38px;
+}
+
+.trpFooterStrip {
+  .trpH3;
+  color: @trpDarkerGrey;
+  padding-top: 10px;
+}
