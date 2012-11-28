@@ -80,8 +80,16 @@ module.exports = {
                 unreadItems: unreadItems,
                 accessDenied: accessDenied,
                 websockets: {
-                  nowjs: getNowJsUrl(req)
+                  nowjs: getNowJsUrl(req),
+                  options: {
+                    // Temporary fix to see if getting rid of websockets
+                    // Sorts out out ios crashes
+                    socketio: {
+                        "transports": ["xhr-polling"]
+                    }
+                  }
                 }
+
 
             };
 
