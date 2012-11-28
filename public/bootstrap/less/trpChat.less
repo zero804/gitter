@@ -1,0 +1,158 @@
+@import "trpColours.less";
+@import "trpFonts.less";
+
+.trpChatContainer {
+}
+
+.trpChatInput {
+/*  width:100%;
+  background-color: white;
+  padding-left: 30px;
+  height: 61px;
+  border-bottom: 1px solid @trpOffWhite;  */
+}
+
+.trpChatRow {
+  padding-left: 20px;
+}
+
+.trpChatRowRemote {
+  padding-left: 20px;
+}
+.trpChatBox {
+  border-style: none;
+  overflow: auto;
+  resize: none;
+  padding: 12px;
+  max-height: 30px;
+  color: #7b797a;
+  .trpH2;
+  width: 500px;
+  box-shadow: none;
+}
+
+.trpChatIcon {
+  padding-top: 10px;
+  padding-right: 30px;
+  padding-left: 30px;
+  float: left;
+}
+
+.trpChatBubble {
+  position:relative;
+  padding:18px 20px 18px 20px;
+  margin-bottom: 24px;
+  border:1px solid @trpLightGrey;
+  color:#333;
+/*  background:#fff;*/
+  background-color: @trpVeryLightGrey;
+  /* css3 */
+  -webkit-border-radius:3px;
+  -moz-border-radius:3px;
+  border-radius:3px;
+  .trpBodyEm;
+  color: @trpDarkGrey;
+  max-width: 500px;
+  word-wrap: break-word;
+}
+
+.trpChatBubble.remote {
+  background-color: white;
+}
+
+.trpChatFrom {
+  color: @trpLightGrey;
+}
+
+.unread .trpChatRow .trpChatBubble .trpChatFrom,
+.unread .trpChatRowRemote .trpChatBubble .trpChatFrom,
+.unread .trpPeopleViewItem {
+  color: @trpGreen;
+}
+
+.read .trpChatRowRemote .trpChatBubble .trpChatFrom,
+.read .trpChatRow .trpChatBubble .trpChatFrom,
+.read .trpPeopleViewItem {
+/*  color: @trpGreen;*/
+}
+
+.trpChatBubble a {
+  color: @trpPurple;
+}
+
+.trpChatBubble:before {
+  content:"";
+  position:absolute;
+  bottom:-20px; /* value = - border-top-width - border-bottom-width */
+  left:40px; /* controls horizontal position */
+    border-width:20px 20px 0;
+  border-style:solid;
+    border-color:#5a8f00 transparent;
+    /* reduce the damage in FF3.0 */
+    display:block;
+    width:0;
+}
+
+/* creates the smaller  triangle */
+.trpChatBubble:after {
+  content:"";
+  position:absolute;
+  bottom:-13px; /* value = - border-top-width - border-bottom-width */
+  left:47px; /* value = (:before left) + (:before border-left) - (:after border-left) */
+  border-width:13px 13px 0;
+  border-style:solid;
+  border-color:#fff transparent;
+    /* reduce the damage in FF3.0 */
+    display:block;
+    width:0;
+}
+
+.trpChatBubble.remote {
+  display: inline-block;
+}
+
+.trpChatBubble.local {
+  display: inline-block;
+}
+
+/*.trpChatBubble.right {
+  margin-right:30px;
+}*/
+
+/* creates the larger triangle */
+.trpChatBubble:before {
+  top:10px; /* controls vertical position */
+  bottom:auto;
+  left:-10px; /* value = - border-left-width - border-right-width */
+  border-width:12px 10px 12px 0;
+  border-color:transparent @trpLightGrey;
+}
+
+/* creates the smaller  triangle */
+.trpChatBubble:after {
+  top:11px; /* value = (:before top) + (:before border-top) - (:after border-top) */
+  bottom:auto;
+  left:-9px; /* value = - border-left-width - border-right-width */
+  border-width:11px 10px 11px 0;
+  border-color:transparent @trpVeryLightGrey;
+}
+
+.trpChatBubble.remote:after {
+  border-color:transparent white;
+}
+
+.trpChatPictureLocal {
+  float: left;
+  padding-right: 20px;
+  padding-left: 20px;
+  width: 48px;
+  height: 48px;
+}
+
+.trpChatPictureRemote {
+  float: left;
+  padding-right: 20px;
+  padding-left: 20px;
+  width: 48px;
+  height: 48px;
+}

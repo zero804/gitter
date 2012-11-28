@@ -1,0 +1,153 @@
+/*@trpDarkGrey: #636363; // dark grey*/
+.trpWhite {
+  color: white;
+}
+/*@fontSansLight: 'StagSansWeb-Light', sans-serif;*/
+@font-face {
+  font-family: 'StagWeb-Light';
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.eot');
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.eot?#iefix') format('embedded-opentype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.woff') format('woff'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.ttf') format('truetype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.svg#StagWeb-Light') format('svg');
+  font-weight: 300;
+  font-style: normal;
+  font-stretch: normal;
+}
+@font-face {
+  font-family: 'StagWeb-Thin';
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.eot');
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.eot?#iefix') format('embedded-opentype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.woff') format('woff'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.ttf') format('truetype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.svg#StagWeb-Thin') format('svg');
+  font-weight: 100;
+  font-style: normal;
+  font-stretch: normal;
+}
+@font-face {
+  font-family: 'StagSansWeb-Light';
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.eot');
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.eot?#iefix') format('embedded-opentype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.woff') format('woff'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.ttf') format('truetype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.svg#StagSansWeb-Light') format('svg');
+  font-weight: 400;
+  font-style: normal;
+  font-stretch: normal;
+}
+.trpH1 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 24px;
+}
+.trpH2 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 20px;
+}
+.trpH3 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 16px;
+}
+.trpH4 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 14px;
+}
+.trpBodyText {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+}
+.trpBodyEm {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+}
+.trpBodyMedium {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+}
+.trpBodySmall {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+}
+.trpBodyTiny {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 9px;
+}
+.trpMailRowContainer {
+  border-bottom: 1px solid #f6f6f6;
+  padding-top: 24px;
+  padding-bottom: 20px;
+  padding-right: 20px;
+}
+.trpMailRowContainer:hover {
+  background-color: #f6f6f6;
+  cursor: pointer;
+}
+.trpMailDisplayPicture {
+  padding-left: 40px;
+  padding-right: 20px;
+  float: left;
+}
+.trpMailFromSubject {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 20px;
+  height: 30px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-bottom: 0px;
+}
+.trpMailPreview {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  color: #333333;
+  height: 48px;
+  overflow: hidden;
+  margin-top: -4px;
+  word-wrap: break-word;
+}
+.trpMailIcons {
+  float: left;
+  width: 18px;
+  height: 16px;
+  padding: 0 20px 0 20px;
+}
+.trpMailDate {
+  float: left;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  color: #333333;
+}
+.trpMailLeft {
+  display: inline-block;
+  width: 80%;
+}
+.trpMailRight {
+  display: inline-block;
+  float: right;
+}
+.trpMailBackButton {
+  padding-left: 32px;
+  cursor: pointer;
+  float: left;
+  display: inline-block;
+}
+.trpMailSubject {
+  padding-left: 108px;
+  font-family: 'StagWeb-Light', serif;
+  font-size: 20px;
+  padding-top: 6px;
+}
+.trpMailBody {
+  padding-left: 108px;
+  margin-right: 200px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  word-wrap: break-word;
+  display: inline-block;
+}
+.trpMailBodyToolbar {
+  position: absolute;
+  top: 210px;
+  right: 20px;
+  max-width: 180px;
+  display: inline-block;
+  vertical-align: top;
+  text-align: right;
+}
+.trpMailAttachmentItem {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  text-align: right;
+  display: inline-block;
+}

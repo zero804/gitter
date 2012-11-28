@@ -1,0 +1,58 @@
+@import "trpColours.less";
+@import "trpFonts.less";
+
+
+.trpPeopleHeader {
+  float: left;
+  padding-top: 10px;
+  padding-left: 20px;
+  .trpH4;
+}
+
+.trpPeopleTab {
+  float: left;
+  padding-left: 40px;
+  min-height: 100%;
+}
+
+.trpPeopleViewItem {
+  float: left;
+  padding: 0px 10px 40px 40px;
+  min-width: 280px;
+}
+
+.trpPersonAvatar {
+  float: left;
+}
+
+.trpPersonDetails {
+  float: left;
+  padding-left: 20px;
+}
+
+.trpPersonName {
+  .trpH3;
+  color: @trpDarkGrey;
+  width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trpPersonEmail {
+  .trpBodySmall;
+  color: @trpDarkGrey;
+}
+
+.trpPersonAction {
+  .trpBodySmall;
+  color: @trpDarkGrey;
+  float: left;
+  clear: none;
+  padding-right: 12px;
+}
+
+.trpPersonAction:hover {
+  color: @trpGreen;
+  cursor: pointer;
+}
