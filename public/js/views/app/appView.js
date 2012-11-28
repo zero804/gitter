@@ -34,7 +34,7 @@ define([
     },
 
     initialize: function(options) {
-      if (this.compactView) new SlidingView( 'sidebar', 'body' ); 
+      // if (this.compactView) new SlidingView( 'sidebar', 'body' ); 
       var self = this;
       this.router = options.router;
 
@@ -87,26 +87,22 @@ define([
       this.troupeCollection = new troupeModels.TroupeCollection();
       //this.notificationCollection = new NotificationCollection();
 
-      this.troupeSelectorMenu = new TroupeViews.Menu({ el: "#troupe-selector", triggerEl: "#menu-notification-selector" });
+      if (!this.compactView) this.troupeSelectorMenu = new TroupeViews.Menu({ el: "#troupe-selector", triggerEl: "#menu-notification-selector" });
 
       this.userMenu = new TroupeViews.Menu({ el: "#troupe-user-menu", triggerEl: "#person-icon" });
       this.addPersonMenu = new TroupeViews.Menu({ el: "#troupe-add-menu", triggerEl: "#add-icon" });
       this.notifyMenu = new TroupeViews.Menu({ el: "#troupe-notify-menu", triggerEl: "#notify-icon" });
       this.settingsMenu = new TroupeViews.Menu({ el: "#troupe-settings-menu", triggerEl: "#settings-icon" });
 
-      this.troupeCollection.on('change', this.addAllTroupes, this);
-      this.troupeCollection.on('add', this.addOneTroupe, this);
-      this.troupeCollection.on('refresh', this.addAllTroupes, this);
-
-      /*
-      this.notificationCollection.on('change', this.addAllNotifications, this);
-      this.notificationCollection.on('add', this.addOneNotification, this);
-      this.notificationCollection.on('refresh', this.addAllNotifications, this);
-      */
-
-      this.troupeCollection.fetch({
-        success: function() { self.addAllTroupes(); }
-      });
+      if (!this.compactView) {
+        this.troupeCollection.on('change', this.addAllTroupes, this);
+        this.troupeCollection.on('add', this.addOneTroupe, this);
+        this.troupeCollection.on('refresh', this.addAllTroupes, this);
+      
+        this.troupeCollection.fetch({
+          success: function() { self.addAllTroupes(); }
+        });
+      }
 
       $(document).on('itemUnreadCountChanged', function(event, data) {
         var itemType = data.itemType;
