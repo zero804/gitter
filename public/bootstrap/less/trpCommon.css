@@ -1,0 +1,139 @@
+/*@trpDarkGrey: #636363; // dark grey*/
+.trpWhite {
+  color: white;
+}
+/*@fontSansLight: 'StagSansWeb-Light', sans-serif;*/
+@font-face {
+  font-family: 'StagWeb-Light';
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.eot');
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.eot?#iefix') format('embedded-opentype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.woff') format('woff'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.ttf') format('truetype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.svg#StagWeb-Light') format('svg');
+  font-weight: 300;
+  font-style: normal;
+  font-stretch: normal;
+}
+@font-face {
+  font-family: 'StagWeb-Thin';
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.eot');
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.eot?#iefix') format('embedded-opentype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.woff') format('woff'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.ttf') format('truetype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.svg#StagWeb-Thin') format('svg');
+  font-weight: 100;
+  font-style: normal;
+  font-stretch: normal;
+}
+@font-face {
+  font-family: 'StagSansWeb-Light';
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.eot');
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.eot?#iefix') format('embedded-opentype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.woff') format('woff'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.ttf') format('truetype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.svg#StagSansWeb-Light') format('svg');
+  font-weight: 400;
+  font-style: normal;
+  font-stretch: normal;
+}
+.trpH1 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 24px;
+}
+.trpH2 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 20px;
+}
+.trpH3 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 16px;
+}
+.trpH4 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 14px;
+}
+.trpBodyText {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+}
+.trpBodyEm {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+}
+.trpBodyMedium {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+}
+.trpBodySmall {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+}
+.trpBodyTiny {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 9px;
+}
+.trpPadV14 {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+.trpModalHeader {
+  padding: 4px 8px 8px 16px;
+  height: 60px;
+}
+.trpModalLogo {
+  float: left;
+  padding-top: 12px;
+}
+.trpModalMenu > a {
+  float: right;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  color: #333333;
+  padding-top: 6px;
+  text-decoration: none;
+}
+.trpModalClose {
+  float: right;
+  padding-left: 12px;
+}
+.trpModalTitle {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 20px;
+  color: #333333;
+  padding-bottom: 12px;
+}
+.trpModalBody {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  color: #333333;
+  padding-bottom: 12px;
+}
+.trpModalFailure {
+  background-color: #d54f68;
+  margin: 0px -24px 0px -24px;
+  padding: 16px 24px 16px 24px;
+}
+.trpModalSubtext {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  color: #333333;
+  padding: 0px 0px 20px 0px;
+}
+.trpModalFailureText {
+  color: white;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  padding: 8px 0px 12px 0px;
+}
+.trpModalButton {
+  display: inline-block;
+}
+.trpModalProfile {
+  text-align: center;
+}
+.trpModalProfilePic {
+  padding: 8px 0px 12px 0px;
+}
+.trpModalFooter {
+  padding-bottom: 24px;
+}
+.trpModalExistingUsers {
+  background-color: #494259;
+  color: white;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  margin: 12px -24px 0px -24px;
+  padding: 16px 24px 16px 24px;
+  cursor: pointer;
+}
