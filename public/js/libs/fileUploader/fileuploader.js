@@ -580,7 +580,7 @@ qq.FileUploader = function(o){
         failUploadText: 'Upload failed',
 
         template: '<div class="qq-uploader">' + 
-                '<div class="qq-upload-drop-area trpFileUploadArea">Drag and drop any file here</div>' +
+                '<div class="qq-upload-drop-area trpFileUploadArea trpSectionTitle">Drag and drop any file here</div>' +
                 '<div class="right"><div class="qq-upload-button trpButton">Upload a file</div></div>' +
                 '<div class="qq-upload-list"></div>' + 
              '</div>',
