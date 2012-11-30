@@ -22,12 +22,8 @@
 
   {{>require_wrapper}}
 
-  {{#login}}
-    <script data-main='{{cdn "js/app-login.js" }}' src='{{cdn "js/libs/require/2.0.4/require-jquery-min.js" }}' type="text/javascript"></script>
-  {{/login}}
-  {{^login}}
-    <script data-main='{{cdn "js/router-mobile-chat.js" }}' src='{{cdn "js/libs/require/2.0.4/require-jquery-min.js" }}' type="text/javascript"></script>
-  {{/login}}
+  {{{bootScript "js/router-mobile-chat.js" }}}
+
 	<script type="text/javascript">
 	window.troupeContext = {{{troupeContext}}};
 	</script>

@@ -59,7 +59,8 @@ module.exports = function( grunt ) {
       // inlining ftw
       inlineText: true,
       pragmas: {
-        doExclude: true
+        doExclude: true,
+        excludeHbs: true
       },
       /*
       pragmasOnSave: {
@@ -179,6 +180,6 @@ module.exports = function( grunt ) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-exec');
 
-  grunt.registerTask('process', 'copy less requirejs min');
+  grunt.registerTask('process', 'copy less requirejs min exec:gzip');
 
 };

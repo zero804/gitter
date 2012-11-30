@@ -1,5 +1,5 @@
 require([
-  'Handlebars'
+  'handlebars'
 ], function ( Handlebars ) {
 
   function widget ( widgetName, model ) {
