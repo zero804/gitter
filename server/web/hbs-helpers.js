@@ -49,17 +49,18 @@ if(!useCdn) {
   }
 }
 
+var minified = nconf.get("web:minified");
 
 exports.bootScript = function(url) {
-  var scriptLocation = exports.cdn(url);
+  var scriptLocation = exports.cdn("js/" + url);
   var requireScript = exports.cdn("js/libs/require/2.0.6/require.js");
 
-  if(true) {
+  if(minified) {
     return "<script src='" + requireScript + "' type='text/javascript'></script>\n" +
-           "<script type='text/javascript'>\nrequire(['core-libraries'], function (common) { require(['" + url + "']); });\n</script>";
+           "<script type='text/javascript'>\nrequire.config({ baseUrl: 'js/' }); \nrequire(['core-libraries'], function (common) { require(['" + url + "']); });\n</script>";
 
   }
-
+  console.log("Made: ", url, scriptLocation);
   return "<script data-main='" + scriptLocation + ".js' src='" + requireScript + "' type='text/javascript'></script>";
 
 };
