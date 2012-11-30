@@ -1,9 +1,10 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jslint node: true */
 "use strict";
 
 var nconf = require('../utils/config');
 var fs = require("fs");
+
+var cdnId = -1;
 
 function passthrough(url) {
   return "/" + url;
@@ -15,9 +16,8 @@ function cdnSingle(url) {
 }
 
 function cdnMulti(url) {
-  var c  = this.cdnId === 0 || this.cdnId ? this.cdnId : -1;
-  var d = (c + 1) % hostLength;
-  this.cdnId = d;
+  var d = (cdnId + 1) % hostLength;
+  cdnId = d;
 
   return "//" + hosts[d] +cdnPrefix + "/" + url;
 }
@@ -25,7 +25,7 @@ function cdnMulti(url) {
 var useCdn = nconf.get("cdn:use");
 
 if(!useCdn) {
-  module.exports = passthrough;
+  exports.cdn = passthrough;
 } else {
   var hosts = nconf.get("cdn:hosts");
   var hostLength = hosts.length;
@@ -43,8 +43,16 @@ if(!useCdn) {
   }
 
   if(hostLength > 1) {
-    module.exports = cdnSingle;
+    exports.cdn = cdnSingle;
   } else {
-    module.exports = cdnMulti;
+    exports.cdn = cdnMulti;
   }
 }
+
+
+exports.bootScript = function(url) {
+  var scriptLocation = exports.cdn(url);
+  var requireScript = exports.cdn("js/libs/require/2.0.4/require-jquery.js");
+
+  return "<script data-main='" + scriptLocation + "' src='" + requireScript + "' type='text/javascript'></script>";
+};

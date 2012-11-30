@@ -23,7 +23,9 @@ function ios6PostCachingFix() {
 
 module.exports = {
   installFull: function(app, server, sessionStore) {
-    handlebars.registerHelper('cdn', require('./cdn-helper'));
+    handlebars.registerHelper('cdn', require('./hbs-helpers').cdn);
+    handlebars.registerHelper('bootScript', require('./hbs-helpers').bootScript);
+
     app.engine('hbs', expressHbs.express3({
       partialsDir: __dirname + '/../../' + nconf.get('web:staticContent') +'/templates/partials',
       handlebars: handlebars
