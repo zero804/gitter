@@ -52,7 +52,14 @@ if(!useCdn) {
 
 exports.bootScript = function(url) {
   var scriptLocation = exports.cdn(url);
-  var requireScript = exports.cdn("js/libs/require/2.0.4/require-jquery.js");
+  var requireScript = exports.cdn("js/libs/require/2.0.6/require.js");
 
-  return "<script data-main='" + scriptLocation + "' src='" + requireScript + "' type='text/javascript'></script>";
+  if(true) {
+    return "<script src='" + requireScript + "' type='text/javascript'></script>\n" +
+           "<script type='text/javascript'>\nrequire(['core-libraries'], function (common) { require(['" + url + "']); });\n</script>";
+
+  }
+
+  return "<script data-main='" + scriptLocation + ".js' src='" + requireScript + "' type='text/javascript'></script>";
+
 };
