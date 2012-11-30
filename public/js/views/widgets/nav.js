@@ -2,8 +2,8 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'jqueryui'
-], function($, _, Backbone) {
+  'jquery_effect_highlight'
+], function($, _, Backbone, _highlight) {
   return Backbone.View.extend({
     initialize: function(options) {
       this.notificationCount = this.$el.find('.label-notification');

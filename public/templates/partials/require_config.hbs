@@ -1,22 +1,16 @@
-
-<script type="text/javascript">
-window.require_config = {
+requirejs.config({
   paths: {
     /* rjs plugins */
     text: 'libs/require/2.0.4/text',
-    hgn: 'libs/require/2.0.4/hgn',
-    hogan: 'libs/require/2.0.4/hogan',
     hbs: 'libs/require/2.0.4/hbs',
     Handlebars: 'libs/handlebars/1.0beta6/handlebars',
     /* core libs */
     underscore: 'libs/underscore/1.3.1/underscore-1.3.1-min',
-    jqueryui: [
-      'libs/jquery-ui/1.8.22/jquery-ui-1.8.22.custom.min'
-    ],
     jquery_validate : 'libs/jquery.validate/1.9/jquery.validate.min',
     jquery_colorbox: 'libs/jquery.colorbox/1.3.19/jquery.colorbox-min',
     jquery_ocupload: 'libs/jquery.ocupload/1.1.2/jquery.ocupload-1.1.2-mod',
     jquery_placeholder: 'libs/jquery.placeholder/jquery.placeholder',
+    jquery_effect_highlight: 'libs/jqueryui/1.9.2/jquery-ui-1.9.2.highlight-effect.min',
     moment: 'libs/momentjs/1.7.2/moment.min',
     bootstrap: '../bootstrap/js/bootstrap',
     bootstrap_dropdown: '../bootstrap/js/bootstrap-dropdown',
@@ -27,12 +21,12 @@ window.require_config = {
     fileUploader: 'libs/fileUploader/fileuploader',
     templates: '../templates',
     zeroClipboard: 'libs/zeroClipboard/ZeroClipboard',
-    spinjs: 'libs/spinjs/1.7.2/spin', 
+    spinjs: 'libs/spinjs/1.7.2/spin',
     slider: 'libs/slidingview/slidingview',
     animateEnhanced: 'libs/animate-enhanced/jquery.animate-enhanced',
     retina: 'libs/retina/retina',
     // THIS WILL ONLY HAPPEN WHEN REQUIRE JQUERY IS NOT LOADED
-    jquery: 'libs/zepto/zepto', 
+    jquery: 'libs/zepto/zepto',
     socketio: 'libs/socket.io/0.9.11/socket.io.min',
     ga: '//ssl.google-analytics.com/ga'
   },
@@ -74,5 +68,4 @@ window.require_config = {
       // won't work as well.
       disableI18n : true
   }
-};
-</script>
+});

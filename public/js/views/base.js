@@ -2,8 +2,9 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hbs!./modal'
-], function($, _, Backbone, modalTemplate) {
+  'hbs!./modal',
+  '../template/helpers/all'
+], function($, _, Backbone, modalTemplate, helpers) {
   /*jshint trailing:false */
   /*global require:true console:true setTimeout:true*/
   "use strict";

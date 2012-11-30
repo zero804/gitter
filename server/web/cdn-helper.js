@@ -6,7 +6,7 @@ var nconf = require('../utils/config');
 var fs = require("fs");
 
 function passthrough(url) {
-  return url;
+  return "/" + url;
 }
 
 

@@ -1,0 +1,69 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+<head>
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+	<meta charset="utf-8">
+
+	<title>{{troupeName}} - Troupe</title>
+
+	<link rel="stylesheet" href='{{cdn "bootstrap/css/trp2.css" }}'>
+  <link rel="stylesheet" href='{{cdn "bootstrap/css/trpChat.css" }}'>
+
+  <link href='https://fonts.googleapis.com/css?family=Lustria' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:200' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+  <link rel="chrome-webstore-item"
+    href="https://chrome.google.com/webstore/detail/edpmlaohjokcmefhjghaeeikjjcjplmi">
+
+  {{>require_wrapper}}
+
+  {{#login}}
+    <script data-main='{{cdn "js/app-login.js" }}' src='{{cdn "js/libs/require/2.0.4/require-jquery-min.js" }}' type="text/javascript"></script>
+  {{/login}}
+  {{^login}}
+    <script data-main='{{cdn "js/router-mobile-chat.js" }}' src='{{cdn "js/libs/require/2.0.4/require-jquery-min.js" }}' type="text/javascript"></script>
+  {{/login}}
+	<script type="text/javascript">
+	window.troupeContext = {{{troupeContext}}};
+	</script>
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+
+</head>
+<body>
+  <div class="trpContentWrap">
+    <div class="trpContentContainer">
+
+      <div class="contentBody" id="primary-view">
+
+        <div class="trpChatInput trpSectionViewHeader">
+          <div class="trpChatIcon"><img src="/images/2/icon-chat.png"></div>
+          <div><textarea class="trpChatBox" {{^compactView}}placeholder="Click here, type something to say and press Enter to send."{{/compactView}}{{#compactView}}placeholder="Touch here and type something"{{/compactView}}></textarea></div>
+        </div>
+
+        <!-- the chat content below is an ugly ugly hack, will sort it out. Fluid rows have their downside. -->
+        <div class="frame-chat">
+
+
+        </div>
+
+        <div id="loadmoreajaxloader" style="display:none">MOO</div>
+        </div> <!-- box -->
+
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

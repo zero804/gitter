@@ -3,13 +3,14 @@ define([
   'jquery',
   'underscore',
   'backbone',
+  'bootstrap',
   'views/base',
   'hbs!./chat',
   'components/chat/chat-component',
   './chatViewItem',
   'collections/chat',
   '../../utils/momentWrapper'
-], function($, _, Backbone, TroupeViews, template, chat, ChatViewItem, chatModels, moment) {
+], function($, _, Backbone, _bootstrap, TroupeViews, template, chat, ChatViewItem, chatModels, moment) {
   "use strict";
 
   var PAGE_SIZE = 50;
