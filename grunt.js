@@ -163,7 +163,7 @@ module.exports = function( grunt ) {
     },
     exec: {
       gzip: {
-        command: 'build/gzip-processed.sh'
+        command: 'build-scripts/gzip-processed.sh'
       }
     }
 
