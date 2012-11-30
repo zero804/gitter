@@ -7,6 +7,9 @@ module.exports = function( grunt ) {
   // https://github.com/cowboy/grunt/blob/master/docs/getting_started.md
   //
   grunt.initConfig({
+    clean: {
+        folder: "public-processed/"
+    },
 
     // generate application cache manifest
     manifest:{
@@ -20,9 +23,9 @@ module.exports = function( grunt ) {
           timestamp: true
         },
         src: [
-            "js/**/*.js",
-            "js/*.min.js",
-            "css/*.css"
+            "js/router.js",
+            "bootstrap/core-libraries.js",
+            "bootstrap/css/*.css"
         ],
         dest: "manifest.appcache"
       }
@@ -36,20 +39,23 @@ module.exports = function( grunt ) {
 
       modules: [
           {
+            name: "core-libraries"
+          },
+          {
               name: "signup",
-              exclude: ["jquery"]
+              exclude: ["core-libraries"]
           },
           {
               name: "router",
-              exclude: ["jquery"]
+              exclude: ["core-libraries"]
           },
           {
               name: "router-mobile-chat",
-              exclude: ["jquery"]
+              exclude: ["core-libraries"]
           },
           {
               name: "views/chat/chatView",
-              exclude: ["jquery","router"]
+              exclude: ["core-libraries","router"]
           }
       ],
 
@@ -58,21 +64,7 @@ module.exports = function( grunt ) {
 
       // inlining ftw
       inlineText: true,
-      pragmas: {
-        doExclude: true,
-        excludeHbs: true
-      },
-      /*
-      pragmasOnSave: {
-          //removes Handlebars.Parser code (used to compile template strings) set
-          //it to `false` if you need to parse template strings even after build
-          excludeHbsParser : true,
-          // kills the entire plugin set once it's built.
-          excludeHbs: true,
-          // removes i18n precompiler, handlebars and json2
-          excludeAfterBuild: true
-      },
-      */
+
       logLevel: 1
     },
 
@@ -126,15 +118,19 @@ module.exports = function( grunt ) {
     },
 
     min: {
-      a: {
+      "core-libraries": {
+        src: ['public-processed/js/core-libraries.js'],
+        dest: 'public-processed/js/core-libraries.js'
+      },
+      "router-mobile-chat": {
         src: ['public-processed/js/router-mobile-chat.js'],
         dest: 'public-processed/js/router-mobile-chat.js'
       },
-      b: {
+      "chatView": {
         src: ['public-processed/js/views/chat/chatView.js'],
         dest: 'public-processed/js/views/chat/chatView.js'
       },
-      c: {
+      "router": {
         src: ['public-processed/js/router.js'],
         dest: 'public-processed/js/router.js'
       }
@@ -179,7 +175,8 @@ module.exports = function( grunt ) {
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-exec');
+  grunt.loadNpmTasks('grunt-clean');
 
-  grunt.registerTask('process', 'copy less requirejs min exec:gzip');
+  grunt.registerTask('process', 'clean copy less requirejs min exec:gzip');
 
 };

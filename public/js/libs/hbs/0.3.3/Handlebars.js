@@ -1,10 +1,7 @@
 // lib/handlebars/base.js
 (function () {
-
-// lib/handlebars/base.js
-
 /*jshint eqnull:true*/
-this.Handlebars = {};
+var Handlebars = {};
 
 (function(Handlebars) {
 
@@ -111,8 +108,9 @@ Handlebars.registerHelper('log', function(context) {
   Handlebars.log(context);
 });
 
-}(this.Handlebars));
+}(Handlebars));
 ;
+//>>excludeStart('excludeHbsParser', pragmas.excludeHbsParser)
 // lib/handlebars/compiler/parser.js
 /* Jison generated parser */
 var handlebars = (function(){
@@ -570,25 +568,6 @@ parser.lexer = lexer;
 function Parser () { this.yy = {}; }Parser.prototype = parser;parser.Parser = Parser;
 return new Parser;
 })();
-if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
-exports.parser = handlebars;
-exports.Parser = handlebars.Parser;
-exports.parse = function () { return handlebars.parse.apply(handlebars, arguments); }
-exports.main = function commonjsMain(args) {
-    if (!args[1])
-        throw new Error('Usage: '+args[0]+' FILE');
-    var source, cwd;
-    if (typeof process !== 'undefined') {
-        source = require('fs').readFileSync(require('path').resolve(args[1]), "utf8");
-    } else {
-        source = require("file").path(require("file").cwd()).join(args[1]).read({charset: "utf-8"});
-    }
-    return exports.parser.parse(source);
-}
-if (typeof module !== 'undefined' && require.main === module) {
-  exports.main(typeof process !== 'undefined' ? process.argv.slice(1) : require("system").args);
-}
-};
 ;
 // lib/handlebars/compiler/base.js
 Handlebars.Parser = handlebars;
@@ -730,6 +709,7 @@ Handlebars.log = function(level, str) { Handlebars.logger.log(level, str); };
   };
 
 })();;
+//>>excludeEnd('excludeHbsParser')
 // lib/handlebars/utils.js
 Handlebars.Exception = function(message) {
   var tmp = Error.prototype.constructor.apply(this, arguments);
@@ -1829,6 +1809,7 @@ Handlebars.JavaScriptCompiler = function() {};
 
 })(Handlebars.Compiler, Handlebars.JavaScriptCompiler);
 
+//>>excludeStart('excludeHbsParser', pragmas.excludeHbsParser)
 Handlebars.precompile = function(string, options) {
   options = options || {};
 
@@ -1856,6 +1837,7 @@ Handlebars.compile = function(string, options) {
     return compiled.call(this, context, options);
   };
 };
+//>>excludeEnd('excludeHbsParser')
 ;
 // lib/handlebars/runtime.js
 Handlebars.VM = {
@@ -1921,7 +1903,6 @@ Handlebars.VM = {
 
 Handlebars.template = Handlebars.VM.template;
 ;
-
 
 // AMD Define
 define(function(){
