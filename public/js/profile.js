@@ -1,5 +1,3 @@
-require.config(window.require_config);
-
 require(
     [ 'underscore', 'backbone', 'jquery', 'jquery_validate', 'bootstrap' ],
 function(_, Backbone, $, v, Bootstrap) {
@@ -23,7 +21,7 @@ function(_, Backbone, $, v, Bootstrap) {
     toggleTooltip: function() {
       clearTimeout(tooltipTimer);
       tooltipTimer = setTimeout(function() {
-        $('.dp-tooltip').tooltip('hide'); 
+        $('.dp-tooltip').tooltip('hide');
       }, 1000);
     },
 

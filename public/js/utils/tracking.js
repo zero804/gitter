@@ -1,7 +1,6 @@
 define([
-  'ga',
-  'router'
-], function(_gaq, appRouter) {
+  'ga'
+], function(_gaq) {
 
   _gaq.push(['_setAccount', 'UA-34596351-1']);
 
@@ -29,7 +28,7 @@ define([
       3 // Page level variable
    ]);
 
-  appRouter.bind("all",function(route, router) {
+  window.troupeApp.bind("all",function(route, router) {
     trackPageView();
   });
 });

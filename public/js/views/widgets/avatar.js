@@ -3,8 +3,9 @@ define([
   'underscore',
   'views/base',
   'hbs!views/widgets/avatar',
-  'components/presence-client'
-], function($, _, TroupeViews, template, presenceClient) {
+  'components/presence-client',
+  'bootstrap'
+], function($, _, TroupeViews, template, presenceClient, _bootstrap) {
   return TroupeViews.Base.extend({
     initialize: function(options) {
       this.user = options.user || {};

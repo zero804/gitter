@@ -9,7 +9,8 @@ var express = require('express'),
   winston = require('winston'),
   http = require('./http'),
   fineuploaderExpressMiddleware = require('fineuploader-express-middleware'),
-  cabinet = require('cabinet');
+  cabinet = require('cabinet'),
+  fs = require('fs');
 
 function ios6PostCachingFix() {
   return function(req, res, next) {
@@ -27,6 +28,8 @@ module.exports = {
       partialsDir: __dirname + '/../../' + nconf.get('web:staticContent') +'/templates/partials',
       handlebars: handlebars
     }));
+
+    // registerAllTemplatesAsPartials(__dirname + '/../../' + nconf.get('web:staticContent') +'/js/views');
 
     app.set('view engine', 'hbs');
     app.set('views', __dirname + '/../../' + nconf.get('web:staticContent') +'/templates');

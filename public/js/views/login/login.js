@@ -3,8 +3,9 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hbs!templates/login/m.login'
-], function($, _, Backbone, template) {
+  'hbs!templates/login/m.login',
+  'jquery_effect_highlight'
+], function($, _, Backbone, template, _highlight) {
   var LoginView = Backbone.View.extend({
     tagName: "div",
     className: "modal hide fade",

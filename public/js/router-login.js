@@ -1,5 +1,4 @@
-// Filename: router.js
-define([
+require([
   'jquery',
   'underscore',
   'backbone',
@@ -10,7 +9,7 @@ define([
 ], function($, _, Backbone, TroupeViews, LoginModalView, ProfileModalView, RequestModalView) {
   "use strict";
 
-  return Backbone.Router.extend({
+  var AppRouter = Backbone.Router.extend({
     routes: {
       '*actions': 'defaultAction'
     },
@@ -74,4 +73,9 @@ define([
     }
 
   });
+
+  var troupeApp = new AppRouter();
+  window.troupeApp = troupeApp;
+  Backbone.history.start();
+
 });
