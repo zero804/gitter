@@ -46,6 +46,10 @@ module.exports = function( grunt ) {
           {
               name: "router-mobile-chat",
               exclude: ["jquery"]
+          },
+          {
+              name: "views/chat/chatView",
+              exclude: ["jquery","router"]
           }
       ],
 
@@ -121,9 +125,17 @@ module.exports = function( grunt ) {
     },
 
     min: {
-      dist: {
+      a: {
         src: ['public-processed/js/router-mobile-chat.js'],
         dest: 'public-processed/js/router-mobile-chat.js'
+      },
+      b: {
+        src: ['public-processed/js/views/chat/chatView.js'],
+        dest: 'public-processed/js/views/chat/chatView.js'
+      },
+      c: {
+        src: ['public-processed/js/router.js'],
+        dest: 'public-processed/js/router.js'
       }
     },
 
@@ -167,6 +179,6 @@ module.exports = function( grunt ) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-exec');
 
-  grunt.registerTask('process', 'copy less requirejs');
+  grunt.registerTask('process', 'copy less requirejs min');
 
 };
