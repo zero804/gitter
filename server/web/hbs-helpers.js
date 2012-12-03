@@ -53,14 +53,18 @@ var minified = nconf.get("web:minified");
 
 exports.bootScript = function(url) {
   var scriptLocation = exports.cdn("js/" + url);
-  var requireScript = exports.cdn("js/libs/require/2.0.6/require.js");
+  var requireScript;
 
   if(minified) {
+    requireScript = exports.cdn("js/libs/require/2.0.6/require-min.js");
+    var baseUrl = exports.cdn("js/");
+
     return "<script src='" + requireScript + "' type='text/javascript'></script>\n" +
-           "<script type='text/javascript'>\nrequire.config({ baseUrl: 'js/' }); \nrequire(['core-libraries'], function (common) { require(['" + url + "']); });\n</script>";
+           "<script type='text/javascript'>\nrequire.config({ baseUrl: '" + baseUrl + "' }); \nrequire(['core-libraries'], function (common) { require(['" + url + "']); });\n</script>";
 
   }
-  console.log("Made: ", url, scriptLocation);
+
+  requireScript = exports.cdn("js/libs/require/2.0.6/require.js");
   return "<script data-main='" + scriptLocation + ".js' src='" + requireScript + "' type='text/javascript'></script>";
 
 };
