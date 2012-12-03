@@ -133,6 +133,10 @@ module.exports = function( grunt ) {
       "router": {
         src: ['public-processed/js/router.js'],
         dest: 'public-processed/js/router.js'
+      },
+      "signup": {
+        src: ['public-processed/js/signup.js'],
+        dest: 'public-processed/js/signup.js'
       }
     },
 

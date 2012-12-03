@@ -36,7 +36,7 @@ if(!useCdn) {
   } else {
     var cdnPrefixFile = nconf.get("cdn:prefixFile");
     if(cdnPrefixFile) {
-        cdnPrefix = "/" + ("" + fs.readFileSync(cdnPrefixFile)).trim();
+        cdnPrefix = "/s/" + ("" + fs.readFileSync(cdnPrefixFile)).trim();
     } else {
       cdnPrefix = "";
     }
