@@ -47,14 +47,31 @@ module.exports = function( grunt ) {
           },
           {
               name: "router",
+              include: [
+                "views/widgets/avatar",
+                "views/widgets/nav"
+              ],
               exclude: ["core-libraries"]
           },
           {
               name: "router-mobile-chat",
               exclude: ["core-libraries"]
           },
+          /* Views */
           {
               name: "views/chat/chatView",
+              exclude: ["core-libraries","router"]
+          },
+          {
+              name: "views/file/fileView",
+              exclude: ["core-libraries","router"]
+          },
+          {
+              name: "views/conversation/conversationView",
+              exclude: ["core-libraries","router"]
+          },
+          {
+              name: "views/people/peopleView",
               exclude: ["core-libraries","router"]
           }
       ],
@@ -126,10 +143,6 @@ module.exports = function( grunt ) {
         src: ['public-processed/js/router-mobile-chat.js'],
         dest: 'public-processed/js/router-mobile-chat.js'
       },
-      "chatView": {
-        src: ['public-processed/js/views/chat/chatView.js'],
-        dest: 'public-processed/js/views/chat/chatView.js'
-      },
       "router": {
         src: ['public-processed/js/router.js'],
         dest: 'public-processed/js/router.js'
@@ -137,6 +150,22 @@ module.exports = function( grunt ) {
       "signup": {
         src: ['public-processed/js/signup.js'],
         dest: 'public-processed/js/signup.js'
+      },
+      "chatView": {
+        src: ['public-processed/js/views/chat/chatView.js'],
+        dest: 'public-processed/js/views/chat/chatView.js'
+      },
+      "fileView": {
+        src: ['public-processed/js/views/file/chatView.js'],
+        dest: 'public-processed/js/views/file/chatView.js'
+      },
+      "conversationView": {
+        src: ['public-processed/js/views/conversation/conversationView.js'],
+        dest: 'public-processed/js/views/conversation/conversationView.js'
+      },
+      "peopleView": {
+        src: ['public-processed/js/views/people/peopleView.js'],
+        dest: 'public-processed/js/views/people/peopleView.js'
       }
     },
 
