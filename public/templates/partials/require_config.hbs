@@ -1,14 +1,14 @@
-requirejs.config({
+require.config({
+  waitSeconds: 5,
   paths: {
-
     hbs: 'libs/hbs/0.3.3/hbs',
     i18nprecompile: 'libs/hbs/0.3.3/hbs/i18nprecompile',
     json2: 'libs/hbs/0.3.3/hbs/json2',
 
-    handlebars: 'libs/handlebars/1.0.rc.1/handlebars',
+    handlebars: 'libs/hbs/0.3.3/Handlebars',
+    underscore: 'libs/underscore/1.3.3/underscore',
+    jquery: 'libs/jquery/1.8.3/jquery-min',
 
-    /* core libs */
-    underscore: 'libs/underscore/1.3.1/underscore-1.3.1-min',
     jquery_validate : 'libs/jquery.validate/1.9/jquery.validate.min',
     jquery_colorbox: 'libs/jquery.colorbox/1.3.19/jquery.colorbox-min',
     jquery_ocupload: 'libs/jquery.ocupload/1.1.2/jquery.ocupload-1.1.2-mod',
@@ -28,8 +28,6 @@ requirejs.config({
     slider: 'libs/slidingview/slidingview',
     animateEnhanced: 'libs/animate-enhanced/jquery.animate-enhanced',
     retina: 'libs/retina/retina',
-    // THIS WILL ONLY HAPPEN WHEN REQUIRE JQUERY IS NOT LOADED
-    jquery: 'libs/zepto/zepto',
     socketio: 'libs/socket.io/0.9.11/socket.io.min',
     ga: '//ssl.google-analytics.com/ga'
   },
@@ -37,9 +35,6 @@ requirejs.config({
     'bootstrap': {
       deps: ['underscore', 'jquery'],
       exports: 'Bootstrap'
-    },
-    'handlebars': {
-      exports: 'Handlebars'
     },
     'now': {
       deps: ['socketio'],
@@ -50,6 +45,9 @@ requirejs.config({
     },
     'ga': {
       exports: '_gaq'
+    },
+    'jquery':  {
+      exports: 'jQuery'
     },
     'jqueryui':  ['jquery'],
     'jquery_validate':  ['jquery'],
@@ -62,16 +60,10 @@ requirejs.config({
     },
     'spinjs': {
       exports: 'Spinner'
-    },
-    'jquery': {
-      exports: 'Zepto'
     }
-
   },
   hbs : {
       templateExtension : 'hbs',
-      // if disableI18n is `true` it won't load locales and the i18n helper
-      // won't work as well.
       disableI18n : true
   }
 });
