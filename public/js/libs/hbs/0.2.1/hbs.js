@@ -8,7 +8,7 @@
 /* Yes, deliciously evil. */
 /*jslint evil: true, strict: false, plusplus: false, regexp: false */
 /*global require: false, XMLHttpRequest: false, ActiveXObject: false,
-define: false, process: false, window: false */  
+define: false, process: false, window: false */
 define([
 //>>excludeStart('excludeHbs', pragmas.excludeHbs)
 'Handlebars', './hbs/underscore', './hbs/i18nprecompile', './hbs/json2'
@@ -256,7 +256,7 @@ define([
             }
 
             // This finds the Helper dependencies since it's soooo similar
-            function getExternalDeps( nodes ) { 
+            function getExternalDeps( nodes ) {
               var res   = [];
               var helpersres = [];
 
@@ -364,7 +364,7 @@ define([
                     }
                     catch(e){
                       console.log('error injecting styles');
-                    } 
+                    }
                   }
 
                   if ( ! config.isBuild && ! config.serverRender ) {

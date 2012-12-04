@@ -9,7 +9,6 @@ var express = require('express'),
   winston = require('winston'),
   http = require('./http'),
   fineuploaderExpressMiddleware = require('fineuploader-express-middleware'),
-  cabinet = require('cabinet'),
   fs = require('fs');
 
 function ios6PostCachingFix() {
@@ -40,27 +39,8 @@ module.exports = {
       app.use(express.logger(nconf.get("express:loggingConfig")));
     }
 
-    //app.use(express['static'](__dirname + "/../../" + nconf.get('web:staticContent')));
     var staticFiles = __dirname + "/../../" + nconf.get('web:staticContent');
-
-    var cabinetMiddleware = cabinet(staticFiles, {
-      ignore: ['.git', 'node_modules'],
-      hidden: false,
-      coffee: false,
-      expires: 0,
-      gzip: false,
-      less: {
-        // Specify search paths for @import directives
-        //paths: ['.',__dirname + '/static/stylesheets']
-        paths: ['.',staticFiles + "/bootstrap/less"]
-      },
-        // Activates in-memory cache
-      cache: {
-        maxSize: 16384, // 16Kb pero object
-        maxObjects:256
-      }
-    });
-    app.use(cabinetMiddleware);
+    app.use(express['static'](staticFiles));
 
     if(nconf.get("express:logging") && !nconf.get("express:logStatic")) {
       app.use(express.logger(nconf.get("express:loggingConfig")));

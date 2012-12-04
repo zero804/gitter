@@ -7,6 +7,9 @@ module.exports = function( grunt ) {
   // https://github.com/cowboy/grunt/blob/master/docs/getting_started.md
   //
   grunt.initConfig({
+    clean: {
+        folder: "public-processed/"
+    },
 
     // generate application cache manifest
     manifest:{
@@ -20,9 +23,9 @@ module.exports = function( grunt ) {
           timestamp: true
         },
         src: [
-            "js/**/*.js",
-            "js/*.min.js",
-            "css/*.css"
+            "js/router.js",
+            "bootstrap/core-libraries.js",
+            "bootstrap/css/*.css"
         ],
         dest: "manifest.appcache"
       }
@@ -36,20 +39,40 @@ module.exports = function( grunt ) {
 
       modules: [
           {
+            name: "core-libraries"
+          },
+          {
               name: "signup",
-              exclude: ["jquery"]
+              exclude: ["core-libraries"]
           },
           {
               name: "router",
-              exclude: ["jquery"]
+              include: [
+                "views/widgets/avatar",
+                "views/widgets/nav"
+              ],
+              exclude: ["core-libraries"]
           },
           {
               name: "router-mobile-chat",
-              exclude: ["jquery"]
+              exclude: ["core-libraries"]
           },
+          /* Views */
           {
               name: "views/chat/chatView",
-              exclude: ["jquery","router"]
+              exclude: ["core-libraries","router"]
+          },
+          {
+              name: "views/file/fileView",
+              exclude: ["core-libraries","router"]
+          },
+          {
+              name: "views/conversation/conversationView",
+              exclude: ["core-libraries","router"]
+          },
+          {
+              name: "views/people/peopleView",
+              exclude: ["core-libraries","router"]
           }
       ],
 
@@ -58,21 +81,7 @@ module.exports = function( grunt ) {
 
       // inlining ftw
       inlineText: true,
-      pragmas: {
-        doExclude: true,
-        excludeHbs: true
-      },
-      /*
-      pragmasOnSave: {
-          //removes Handlebars.Parser code (used to compile template strings) set
-          //it to `false` if you need to parse template strings even after build
-          excludeHbsParser : true,
-          // kills the entire plugin set once it's built.
-          excludeHbs: true,
-          // removes i18n precompiler, handlebars and json2
-          excludeAfterBuild: true
-      },
-      */
+
       logLevel: 1
     },
 
@@ -126,17 +135,37 @@ module.exports = function( grunt ) {
     },
 
     min: {
-      a: {
+      "core-libraries": {
+        src: ['public-processed/js/core-libraries.js'],
+        dest: 'public-processed/js/core-libraries.js'
+      },
+      "router-mobile-chat": {
         src: ['public-processed/js/router-mobile-chat.js'],
         dest: 'public-processed/js/router-mobile-chat.js'
       },
-      b: {
+      "router": {
+        src: ['public-processed/js/router.js'],
+        dest: 'public-processed/js/router.js'
+      },
+      "signup": {
+        src: ['public-processed/js/signup.js'],
+        dest: 'public-processed/js/signup.js'
+      },
+      "chatView": {
         src: ['public-processed/js/views/chat/chatView.js'],
         dest: 'public-processed/js/views/chat/chatView.js'
       },
-      c: {
-        src: ['public-processed/js/router.js'],
-        dest: 'public-processed/js/router.js'
+      "fileView": {
+        src: ['public-processed/js/views/file/chatView.js'],
+        dest: 'public-processed/js/views/file/chatView.js'
+      },
+      "conversationView": {
+        src: ['public-processed/js/views/conversation/conversationView.js'],
+        dest: 'public-processed/js/views/conversation/conversationView.js'
+      },
+      "peopleView": {
+        src: ['public-processed/js/views/people/peopleView.js'],
+        dest: 'public-processed/js/views/people/peopleView.js'
       }
     },
 
@@ -167,7 +196,7 @@ module.exports = function( grunt ) {
     },
     exec: {
       gzip: {
-        command: 'build/gzip-processed.sh'
+        command: 'build-scripts/gzip-processed.sh'
       }
     }
 
@@ -179,7 +208,8 @@ module.exports = function( grunt ) {
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-exec');
+  grunt.loadNpmTasks('grunt-clean');
 
-  grunt.registerTask('process', 'copy less requirejs min exec:gzip');
+  grunt.registerTask('process', 'clean copy less requirejs min exec:gzip');
 
 };
