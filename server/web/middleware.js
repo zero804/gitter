@@ -5,23 +5,51 @@ var passport = require("passport"),
     winston = require("winston"),
     rememberMe = require('../web/rememberme-middleware');
 
+/* Ensures that the person is logging in. However, if they present a bearer token,
+ * we'll try log them in first
+ */
 exports.ensureLoggedIn = function(options) {
   if(!options) options = {};
   var setReturnTo = (options.setReturnTo === undefined) ? true : options.setReturnTo;
 
-  return function(req, res, next) {
-    if (!req.isAuthenticated || !req.isAuthenticated()) {
-      if(req.accepts(['json','html']) === 'json') {
-        return next(401);
-      }
+  var bearerLogin = passport.authenticate('bearer', { session: true });
 
-      if (setReturnTo && req.session) {
-        req.session.returnTo = req.url;
+  return [
+    function(req, res, next) {
+      if (req.headers && req.headers['authorization']) {
+        var parts = req.headers['authorization'].split(' ');
+        if (parts.length == 2) {
+          var scheme = parts[0];
+          if(/OAuth2/.test(scheme)) {
+            // Dodgy hack to sort out problem with RestKit
+            req.headers['authorization'] = 'Bearer ' + parts[1];
+            bearerLogin(req, res, next);
+            return;
+          }
+          if (/Bearer/i.test(scheme)) {
+            bearerLogin(req, res, next);
+            return;
+          }
+        }
       }
-      return res.redirect("/login");
+      next();
+    },
+    function(req, res, next) {
+      if (!req.isAuthenticated || !req.isAuthenticated()) {
+        if(req.accepts(['json','html']) === 'json') {
+          winston.error("middleware: User is not logged in. Ye shall not pass!");
+          res.send(401, { success: false, loginRequired: true });
+          return;
+        }
+
+        if (setReturnTo && req.session) {
+          req.session.returnTo = req.url;
+        }
+        return res.redirect("/login");
+      }
+      next();
     }
-    next();
-  };
+  ];
 
 };
 
