@@ -56,27 +56,38 @@ module.exports = function( grunt ) {
           },
           {
               name: "router",
-              include: ["router-core"],
+              include: [
+                "views/widgets/avatar",
+                "views/widgets/nav"
+              ],
               exclude: ["core-libraries"]
           },
           {
               name: "router-login",
-              include: ["router-core"],
+              include: [
+                "views/widgets/avatar"
+              ],
               exclude: ["core-libraries"]
           },
           {
               name: "router-mobile-chat",
-              include: ["router-core"],
+              include: [
+                "views/widgets/avatar"
+              ],
               exclude: ["core-libraries"]
           },
           {
               name: "router-mobile-files",
-              include: ["router-core"],
+              include: [
+                "views/widgets/avatar"
+              ],
               exclude: ["core-libraries"]
           },
           {
               name: "router-mobile-conversations",
-              include: ["router-core"],
+              include: [
+                "views/widgets/avatar"
+              ],
               exclude: ["core-libraries"]
           },
           /* Views */
