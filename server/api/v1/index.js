@@ -2,10 +2,11 @@
 "use strict";
 
 var passport = require('passport');
+var middleware = require('../../web/middleware');
 
 module.exports = {
   install: function(app) {
-    var auth = passport.authenticate('bearer', { session: false });
+    var auth = middleware.ensureLoggedIn();
 
     app.all('/api/v1/location', auth);
     app.resource('api/v1/location', require('./location.js'));
