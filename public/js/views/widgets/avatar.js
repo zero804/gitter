@@ -11,6 +11,12 @@ define([
       this.user = options.user || {};
       this.showEmail = options.showEmail || {};
       this.showBadge = options.showBadge;
+      if (options.user.location) {
+        this.user.location = options.user.location.description;
+      }
+      else {
+        this.user.location = "";
+      }
     },
 
     render: function() {
@@ -19,10 +25,14 @@ define([
         showBadge: this.showBadge,
         userDisplayName: this.user.displayName,
         userAvatarUrl: this.user.avatarUrl,
+        userLocation: this.user.location,
         offline: !presenceClient.isOnline(this.user.id)
       }));
 
-      this.$el.find('img').tooltip();
+      this.$el.find('div').tooltip({
+        html : true,
+        placement : "right",
+      });
 
       return this;
     }
