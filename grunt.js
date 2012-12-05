@@ -193,7 +193,8 @@ module.exports = function( grunt ) {
           "public/bootstrap/css/trpChat.css": "public-processed/bootstrap/less/trpChat.less",
           "public/bootstrap/css/trpFiles.css": "public-processed/bootstrap/less/trpFiles.less",
           "public/bootstrap/css/trpMails.css": "public-processed/bootstrap/less/trpMails.less",
-          "public/bootstrap/css/trpPeople.css": "public-processed/bootstrap/less/trpPeople.less"
+          "public/bootstrap/css/trpPeople.css": "public-processed/bootstrap/less/trpPeople.less",
+          "public/bootstrap/css/trpMobileChat.css": "public-processed/bootstrap/less/trpMobileChat.less"
         }
       }
     },
