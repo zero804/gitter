@@ -1,0 +1,523 @@
+/*@trpDarkGrey: #636363; // dark grey*/
+.trpWhite {
+  color: white;
+}
+/*@fontSansLight: 'StagSansWeb-Light', sans-serif;*/
+@font-face {
+  font-family: 'StagWeb-Light';
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.eot');
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.eot?#iefix') format('embedded-opentype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.woff') format('woff'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.ttf') format('truetype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.svg#StagWeb-Light') format('svg');
+  font-weight: 300;
+  font-style: normal;
+  font-stretch: normal;
+}
+@font-face {
+  font-family: 'StagWeb-Thin';
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.eot');
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.eot?#iefix') format('embedded-opentype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.woff') format('woff'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.ttf') format('truetype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.svg#StagWeb-Thin') format('svg');
+  font-weight: 100;
+  font-style: normal;
+  font-stretch: normal;
+}
+@font-face {
+  font-family: 'StagSansWeb-Light';
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.eot');
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.eot?#iefix') format('embedded-opentype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.woff') format('woff'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.ttf') format('truetype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.svg#StagSansWeb-Light') format('svg');
+  font-weight: 400;
+  font-style: normal;
+  font-stretch: normal;
+}
+.trpH1 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 24px;
+}
+.trpH2 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 20px;
+}
+.trpH3 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 16px;
+}
+.trpH4 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 14px;
+}
+.trpBodyText {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+}
+.trpBodyEm {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+}
+.trpBodyMedium {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+}
+.trpBodySmall {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+}
+.trpBodyTiny {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 9px;
+}
+.trpSectionViewHeader {
+  padding: 20px 20px 28px 0;
+  height: 30px;
+  border-bottom: 1px solid #f6f6f6;
+}
+.trpSectionTitle {
+  float: left;
+  padding-top: 10px;
+  padding-left: 20px;
+  font-family: 'StagWeb-Light', serif;
+  font-size: 14px;
+  font-family: 'StagWeb-Light', serif;
+  font-size: 14px;
+}
+.trpPadV14 {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+.trpLine {
+  vertical-align: middle;
+  padding: 0 20px 0 20px;
+}
+.trpHand {
+  cursor: pointer;
+}
+.trpShadow {
+  -webkit-box-shadow: 3px 2px 5px -1px rgba(50, 50, 50, 0.75);
+  -moz-box-shadow: 3px 2px 5px -1px rgba(50, 50, 50, 0.75);
+  box-shadow: 3px 2px 5px -1px rgba(50, 50, 50, 0.75);
+}
+/*Forms*/
+.trpInput {
+  border: 1px solid #c0c9c8;
+  padding: 10px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  color: #333333;
+  border-radius: 0px;
+}
+/* Modals */
+.trpModalHeader {
+  padding: 4px 8px 8px 16px;
+  height: 60px;
+}
+.trpModalLogo {
+  float: left;
+  padding-top: 12px;
+}
+.trpModalMenu > a {
+  float: right;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  color: #333333;
+  padding-top: 6px;
+  text-decoration: none;
+}
+.trpModalClose {
+  float: right;
+  padding-left: 12px;
+}
+.trpModalTitle {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 20px;
+  font-family: 'StagWeb-Light', serif;
+  font-size: 20px;
+  color: #333333;
+  padding-bottom: 12px;
+}
+.trpModalBody {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  color: #333333;
+  padding-bottom: 12px;
+}
+.trpModalFailure {
+  background-color: #d54f68;
+  margin: 0px -24px 0px -24px;
+  padding: 16px 24px 16px 24px;
+}
+.trpModalSubtext {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  color: #333333;
+  padding: 0px 0px 20px 0px;
+}
+.trpModalFailureText {
+  color: white;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  padding: 8px 0px 12px 0px;
+}
+.trpModalButton {
+  display: inline-block;
+}
+.trpModalProfile {
+  text-align: center;
+}
+.trpModalProfilePic {
+  padding: 8px 0px 12px 0px;
+}
+.trpModalFooter {
+  padding-bottom: 24px;
+}
+.trpModalExistingUsers {
+  background-color: #494259;
+  color: white;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  margin: 12px -24px 0px -24px;
+  padding: 16px 24px 16px 24px;
+  cursor: pointer;
+}
+/* Bootstrap overrides*//*Bootstrap Customisations*/
+.modal-success {
+  display: none;
+}
+.modal {
+  border-radius: 0px;
+  max-height: 600px;
+  overflow: hidden;
+}
+.modal.trpFilePreview {
+  left: 10%;
+  top: 10%;
+  width: auto;
+  max-height: 100%;
+  margin: 0 0 0 0;
+}
+.trpFilePreview .modal-body {
+  padding: 24px;
+}
+.modal-header {
+  border-radius: 0px;
+  padding: 5px 10px;
+}
+.modal-footer {
+  border-radius: 0px;
+}
+.modal-body {
+  position: relative;
+  padding: 24px 24px 0px 24px;
+}
+.nav > li > a:hover {
+  text-decoration: none;
+  background-color: #f6f6f6;
+}
+.nav-tabs {
+  height: 58px;
+  border-bottom: 1px solid #f6f6f6;
+}
+.nav-tabs > li > a {
+  padding-top: 15px;
+  padding-bottom: 9px;
+  height: 100%;
+  border: 1px solid transparent;
+}
+.nav-tabs > li > a:hover {
+  border-color: #f6f6f6 #f6f6f6 #f6f6f6;
+}
+.nav-tabs > .active > a,
+.nav-tabs > .active > a:hover {
+  background-color: white;
+  border: 1px solid #f6f6f6;
+  border-bottom-color: transparent;
+  cursor: default;
+}
+.nav-tabs > li {
+  height: 34px;
+}
+.nav-tabs > li > a {
+  padding-top: 15px;
+  height: 100%;
+}
+.tooltip {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+}
+.tooltip-inner {
+  /*  background-color: @trpPurple;*/
+
+}
+/*@trpDarkGrey: #636363; // dark grey*/
+.trpWhite {
+  color: white;
+}
+/*@fontSansLight: 'StagSansWeb-Light', sans-serif;*/
+@font-face {
+  font-family: 'StagWeb-Light';
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.eot');
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.eot?#iefix') format('embedded-opentype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.woff') format('woff'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.ttf') format('truetype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Light.svg#StagWeb-Light') format('svg');
+  font-weight: 300;
+  font-style: normal;
+  font-stretch: normal;
+}
+@font-face {
+  font-family: 'StagWeb-Thin';
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.eot');
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.eot?#iefix') format('embedded-opentype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.woff') format('woff'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.ttf') format('truetype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagWeb-Thin.svg#StagWeb-Thin') format('svg');
+  font-weight: 100;
+  font-style: normal;
+  font-stretch: normal;
+}
+@font-face {
+  font-family: 'StagSansWeb-Light';
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.eot');
+  src: url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.eot?#iefix') format('embedded-opentype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.woff') format('woff'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.ttf') format('truetype'), url('//s3.amazonaws.com/trpstatic/fonts/stag/StagSansWeb-Light.svg#StagSansWeb-Light') format('svg');
+  font-weight: 400;
+  font-style: normal;
+  font-stretch: normal;
+}
+.trpH1 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 24px;
+}
+.trpH2 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 20px;
+}
+.trpH3 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 16px;
+}
+.trpH4 {
+  font-family: 'StagWeb-Light', serif;
+  font-size: 14px;
+}
+.trpBodyText {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+}
+.trpBodyEm {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+}
+.trpBodyMedium {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+}
+.trpBodySmall {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+}
+.trpBodyTiny {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 9px;
+}
+.trpChatInput {
+  /*  width:100%;
+  background-color: white;
+  padding-left: 30px;
+  height: 61px;
+  border-bottom: 1px solid @trpOffWhite;  */
+
+}
+.trpChatRow {
+  padding-left: 20px;
+}
+.trpChatRowRemote {
+  padding-left: 20px;
+}
+.trpChatBox {
+  border-style: none;
+  overflow: auto;
+  resize: none;
+  padding: 12px;
+  max-height: 30px;
+  color: #7b797a;
+  font-family: 'StagWeb-Light', serif;
+  font-size: 20px;
+  font-family: 'StagWeb-Light', serif;
+  font-size: 20px;
+  width: 500px;
+  box-shadow: none;
+}
+.trpChatIcon {
+  padding-top: 10px;
+  padding-right: 30px;
+  padding-left: 30px;
+  float: left;
+}
+.trpChatBubble {
+  position: relative;
+  padding: 18px 20px 18px 20px;
+  margin-bottom: 24px;
+  border: 1px solid #d6d6d6;
+  color: #333;
+  /*  background:#fff;*/
+
+  background-color: #fbfbfb;
+  /* css3 */
+
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  color: #333333;
+  max-width: 500px;
+  word-wrap: break-word;
+}
+.trpChatBubble.remote {
+  background-color: white;
+}
+.trpChatFrom {
+  color: #d6d6d6;
+}
+.unread .trpChatRow .trpChatBubble .trpChatFrom,
+.unread .trpChatRowRemote .trpChatBubble .trpChatFrom,
+.unread .trpPeopleViewItem {
+  color: #1dce73;
+}
+.read .trpChatRowRemote .trpChatBubble .trpChatFrom,
+.read .trpChatRow .trpChatBubble .trpChatFrom,
+.read .trpPeopleViewItem {
+  /*  color: @trpGreen;*/
+
+}
+.trpChatBubble a {
+  color: #494259;
+}
+.trpChatBubble:before {
+  content: "";
+  position: absolute;
+  bottom: -20px;
+  /* value = - border-top-width - border-bottom-width */
+
+  left: 40px;
+  /* controls horizontal position */
+
+  border-width: 20px 20px 0;
+  border-style: solid;
+  border-color: #5a8f00 transparent;
+  /* reduce the damage in FF3.0 */
+
+  display: block;
+  width: 0;
+}
+/* creates the smaller  triangle */
+.trpChatBubble:after {
+  content: "";
+  position: absolute;
+  bottom: -13px;
+  /* value = - border-top-width - border-bottom-width */
+
+  left: 47px;
+  /* value = (:before left) + (:before border-left) - (:after border-left) */
+
+  border-width: 13px 13px 0;
+  border-style: solid;
+  border-color: #fff transparent;
+  /* reduce the damage in FF3.0 */
+
+  display: block;
+  width: 0;
+}
+.trpChatBubble.remote {
+  display: inline-block;
+}
+.trpChatBubble.local {
+  display: inline-block;
+}
+/*.trpChatBubble.right {
+  margin-right:30px;
+}*/
+/* creates the larger triangle */
+.trpChatBubble:before {
+  top: 10px;
+  /* controls vertical position */
+
+  bottom: auto;
+  left: -10px;
+  /* value = - border-left-width - border-right-width */
+
+  border-width: 12px 10px 12px 0;
+  border-color: transparent #d6d6d6;
+}
+/* creates the smaller  triangle */
+.trpChatBubble:after {
+  top: 11px;
+  /* value = (:before top) + (:before border-top) - (:after border-top) */
+
+  bottom: auto;
+  left: -9px;
+  /* value = - border-left-width - border-right-width */
+
+  border-width: 11px 10px 11px 0;
+  border-color: transparent #fbfbfb;
+}
+.trpChatBubble.remote:after {
+  border-color: transparent white;
+}
+.trpChatPictureLocal {
+  float: left;
+  padding-right: 20px;
+  width: 48px;
+  height: 48px;
+}
+.trpChatPictureRemote {
+  float: left;
+  padding-right: 20px;
+  width: 48px;
+  height: 48px;
+}
+@media screen and (max-width: 320px) {
+  .trpChatContainer {
+    max-width: 300px;
+  }
+  .trpChatInput {
+    padding-bottom: 15px;
+    padding-top: 0px;
+    padding-right: 0px;
+    border-bottom: 1px solid #f6f6f6;
+    height: 30px;
+  }
+  .frame-chat {
+    max-width: 320px;
+    overflow: hidden;
+  }
+  .trpChatBox {
+    font-size: 12px;
+    padding: 12px;
+    max-height: 20px;
+    background-color: transparent;
+    max-width: 210px;
+    display: inline-block;
+  }
+  .trpChatBubble {
+    max-width: 170px;
+    margin-bottom: 6px;
+    padding-left: 20px;
+  }
+  .trpChatRow {
+    padding-left: 0px;
+    max-width: 320px;
+    overflow-x: hidden;
+  }
+  .trpChatRowRemote {
+    padding-left: 0px;
+    max-width: 320px;
+    overflow-x: hidden;
+  }
+}
