@@ -6,6 +6,7 @@ define([
   return {
     'mail': function() {
       ///this.navIcon('#mail-icon');
+
       this.showAsync('views/conversation/conversationView');
     },
 

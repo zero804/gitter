@@ -101,13 +101,31 @@ module.exports = function( grunt ) {
       all: ['test/**/*.html']
     },
 
+    reload: {
+      port: 35729, // LR default
+      liveReload: true
+      /*
+        port: 6001,
+          proxy: {
+              host: 'localhost',
+              port: 5000
+          }
+      */
+    },
+
     // default watch configuration
     watch: {
+      reload: {
+        files: [
+          'public/**'
+        ],
+        tasks: 'reload'
+      },
       less: {
         files: [
-          'public/bootstrap/less/**'
+          'public/**/*.less'
         ],
-        tasks: 'less'
+        tasks: 'reload'
       }
     },
 
@@ -221,6 +239,7 @@ module.exports = function( grunt ) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-exec');
   grunt.loadNpmTasks('grunt-clean');
+  grunt.loadNpmTasks('grunt-reload');
 
   grunt.registerTask('process', 'clean less copy requirejs min exec:gzip');
 
