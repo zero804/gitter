@@ -145,6 +145,10 @@ module.exports = {
         renderAppPage(req, res, next, 'mobile/file-app');
       });
 
+      app.get('/:appUri/mails', function(req, res, next) {
+        renderAppPage(req, res, next, 'mobile/conversation-app');
+      });
+
       app.get('/:appUri/accessdenied', function(req, res, next) {
         res.render('app-accessdenied', {
         });
