@@ -103,14 +103,11 @@ module.exports = function( grunt ) {
 
     // default watch configuration
     watch: {
-      reload: {
+      less: {
         files: [
-          'app/*.html',
-          'app/styles/**/*.css',
-          'app/scripts/**/*.js',
-          'app/images/**/*'
+          'public/bootstrap/less/**'
         ],
-        tasks: 'reload'
+        tasks: 'less'
       }
     },
 
@@ -187,14 +184,17 @@ module.exports = function( grunt ) {
           yuicompress: true
         },
         files: {
-          "public/bootstrap/css/trp2.css" : "public-processed/bootstrap/less/trp2.less",
-          "public/bootstrap/css/mtrp.css": "public-processed/bootstrap/less/mtrp.less",
-          "public/bootstrap/css/trpHomePage.css": "public-processed/bootstrap/less/trpHomePage.less",
-          "public/bootstrap/css/trpChat.css": "public-processed/bootstrap/less/trpChat.less",
-          "public/bootstrap/css/trpFiles.css": "public-processed/bootstrap/less/trpFiles.less",
-          "public/bootstrap/css/trpMails.css": "public-processed/bootstrap/less/trpMails.less",
-          "public/bootstrap/css/trpPeople.css": "public-processed/bootstrap/less/trpPeople.less",
-          "public/bootstrap/css/trpMobileChat.css": "public-processed/bootstrap/less/trpMobileChat.less"
+          "public/bootstrap/css/trp2.css" : "public/bootstrap/less/trp2.less",
+          "public/bootstrap/css/mtrp.css": "public/bootstrap/less/mtrp.less",
+          "public/bootstrap/css/trpHomePage.css": "public/bootstrap/less/trpHomePage.less",
+          "public/bootstrap/css/trpChat.css": "public/bootstrap/less/trpChat.less",
+          "public/bootstrap/css/trpFiles.css": "public/bootstrap/less/trpFiles.less",
+          "public/bootstrap/css/trpMails.css": "public/bootstrap/less/trpMails.less",
+          "public/bootstrap/css/trpPeople.css": "public/bootstrap/less/trpPeople.less",
+          "public/bootstrap/css/trpMobileChat.css": "public/bootstrap/less/trpMobileChat.less",
+          "public/bootstrap/css/trpMobileFiles.css": "public/bootstrap/less/trpMobileFiles.less",
+          "public/bootstrap/css/trpMobileConversations.css": "public/bootstrap/less/trpMobileConversations.less"
+
         }
       }
     },
@@ -222,6 +222,6 @@ module.exports = function( grunt ) {
   grunt.loadNpmTasks('grunt-exec');
   grunt.loadNpmTasks('grunt-clean');
 
-  grunt.registerTask('process', 'clean copy less requirejs min exec:gzip');
+  grunt.registerTask('process', 'clean less copy requirejs min exec:gzip');
 
 };
