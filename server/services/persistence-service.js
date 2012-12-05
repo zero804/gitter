@@ -15,8 +15,7 @@ var UserSchema = new Schema({
   status: { type: String, "enum": ['UNCONFIRMED', 'PROFILE_NOT_COMPLETED', 'ACTIVE'], "default": 'UNCONFIRMED'},
   passwordHash: { type: String },
   passwordResetCode: String,
-  avatarUrlSmall: String,
-  avatarUrlMedium: String,
+  avatarVersion: { type: Number, "default": 0 },
   lastTroupe: ObjectId,
   location: {
     timestamp: Date,
@@ -46,14 +45,6 @@ var UserLocationHistorySchema = new Schema({
   speed: Number
 });
 UserLocationHistorySchema.index({ userId: 1 });
-
-UserSchema.methods.getAvatarUrl = function() {
-  if(this.avatarUrlSmall) {
-    return this.avatarUrlSmall;
-  }
-
-  return "/avatar/" + this.id;
-};
 
 var TroupeSchema = new Schema({
   name: { type: String },
