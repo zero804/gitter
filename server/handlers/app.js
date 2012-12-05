@@ -9,6 +9,7 @@ var unreadItemService = require("../services/unread-item-service");
 var restSerializer = require("../serializers/rest-serializer");
 var nconf = require('../utils/config');
 var Q = require("q");
+var middleware = require('../web/middleware');
 
 function renderAppPage(req, res, next, page) {
 
@@ -137,17 +138,23 @@ module.exports = {
 
       });
 
-      app.get('/:appUri/chat', function(req, res, next) {
-        renderAppPage(req, res, next, 'mobile/chat-app');
-      });
+      app.get('/:appUri/chat',
+        middleware.ensureLoggedIn(),
+        function(req, res, next) {
+          renderAppPage(req, res, next, 'mobile/chat-app');
+        });
 
-      app.get('/:appUri/files', function(req, res, next) {
-        renderAppPage(req, res, next, 'mobile/file-app');
-      });
+      app.get('/:appUri/files',
+        middleware.ensureLoggedIn(),
+        function(req, res, next) {
+          renderAppPage(req, res, next, 'mobile/file-app');
+        });
 
-      app.get('/:appUri/mails', function(req, res, next) {
-        renderAppPage(req, res, next, 'mobile/conversation-app');
-      });
+      app.get('/:appUri/mails',
+        middleware.ensureLoggedIn(),
+        function(req, res, next) {
+          renderAppPage(req, res, next, 'mobile/conversation-app');
+        });
 
       app.get('/:appUri/accessdenied', function(req, res, next) {
         res.render('app-accessdenied', {
