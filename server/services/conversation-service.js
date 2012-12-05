@@ -16,7 +16,7 @@ function findConversation(options, callback) {
         .where('troupeId', troupeId)
         .where('emails.messageId', inReplyTo)
         .limit(1)
-        .sort('updated', 1)
+        .sort({ updated: 'desc' })
         .exec(function(err, results) {
           if(err) return callback(err);
           if(!results) return callback(null, null);
