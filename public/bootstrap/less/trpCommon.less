@@ -11,6 +11,17 @@
   .trpH4;
 }
 
+.trpDisplayPicture{
+  position: relative;
+  display: inline-block;
+  -webkit-border-radius: 5em;
+  -moz-border-radius: 5em;
+  border-radius: 5em;
+  border: 2px solid white;
+  width: 48px;
+  height: 48px;
+}
+
 
 .trpPadV14 {
   padding-top: 14px;
@@ -39,7 +50,7 @@
   padding: 10px;
   .trpBodySmall;
   color: @trpDarkGrey;
-  .border-radius(0px);
+  border-radius: 0px;
 }
 
 /* Modals */
@@ -131,7 +142,7 @@
 }
 
 .modal {
-  .border-radius(0px);
+  border-radius: 0px;
    max-height: 600px;
    overflow: hidden;
 }
@@ -150,12 +161,12 @@
 }
 
 .modal-header {
-  .border-radius(0px);
+  border-radius: 0px;
   padding: 5px 10px;
 }
 
 .modal-footer {
-  .border-radius(0px);
+  border-radius: 0px;
 }
 
 .modal-body {
@@ -185,7 +196,7 @@
 
 .nav-tabs > .active > a,
 .nav-tabs > .active > a:hover {
-  background-color: @white;
+  background-color: white;
   border: 1px solid @trpOffWhite;
   border-bottom-color: transparent;
   cursor: default;

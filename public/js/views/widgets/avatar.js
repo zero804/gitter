@@ -31,7 +31,7 @@ define([
 
       this.$el.find('div').tooltip({
         html : true,
-        placement : "bottom",
+        placement : "right",
       });
 
       return this;
