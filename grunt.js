@@ -101,6 +101,9 @@ module.exports = function( grunt ) {
           },
           {
               name: "views/conversation/conversationView",
+              include: [
+                "views/conversation/conversationDetailView"
+              ],
               exclude: ["core-libraries","router"]
           },
           {
@@ -197,8 +200,8 @@ module.exports = function( grunt ) {
         dest: 'public-processed/js/views/chat/chatView.js'
       },
       "fileView": {
-        src: ['public-processed/js/views/file/chatView.js'],
-        dest: 'public-processed/js/views/file/chatView.js'
+        src: ['public-processed/js/views/file/fileView.js'],
+        dest: 'public-processed/js/views/file/fileView.js'
       },
       "conversationView": {
         src: ['public-processed/js/views/conversation/conversationView.js'],
