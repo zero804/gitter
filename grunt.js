@@ -1,3 +1,4 @@
+
 module.exports = function( grunt ) {
   'use strict';
 
@@ -59,12 +60,22 @@ module.exports = function( grunt ) {
               exclude: ["core-libraries"]
           },
           {
+              name: "router-login",
+              include: ["router-core"],
+              exclude: ["core-libraries"]
+          },
+          {
               name: "router-mobile-chat",
               include: ["router-core"],
               exclude: ["core-libraries"]
           },
           {
-              name: "router-mobile-file",
+              name: "router-mobile-files",
+              include: ["router-core"],
+              exclude: ["core-libraries"]
+          },
+          {
+              name: "router-mobile-conversations",
               include: ["router-core"],
               exclude: ["core-libraries"]
           },
