@@ -1,6 +1,6 @@
 require([
-  './widget',
-  './cdn'
+  'template/helpers/widget',
+  'template/helpers/cdn'
 ], function() {
   return {};
 });
