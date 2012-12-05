@@ -155,7 +155,7 @@
   height: 48px;
 }
 
-@media screen and (max-width: 320px) {
+@media screen and (device-width: 320px) and (orientation: portrait) {
 
   .trpChatContainer {
     max-width: 300px;
@@ -205,4 +205,52 @@
 
 }
 
+@media only screen and (device-width: 320px) and (orientation: landscape)  {
 
+  .trpChatContainer {
+    max-width: 460px;
+  }
+
+  .trpChatInput {
+    padding-bottom: 15px;
+    padding-top: 0px;
+    padding-right: 0px;
+    border-bottom: 1px solid @trpOffWhite;
+    height: 30px;
+  }
+
+
+  .frame-chat {
+    max-width: 480px;
+    overflow: hidden;
+  }
+
+  .trpChatBox {
+    font-size: 12px;
+    padding: 12px;
+    max-height: 20px;
+    background-color: transparent;
+    max-width: 210px;
+    display: inline-block;
+    margin-top: -4px;
+  }
+
+  .trpChatBubble {
+    max-width: 300px;
+    margin-bottom: 6px;
+    padding-left: 20px;
+  }
+
+  .trpChatRow {
+    padding-left: 0px;
+    max-width: 480px;
+    overflow-x: hidden;
+  }
+
+  .trpChatRowRemote {
+    padding-left: 0px;
+    max-width: 480px;
+    overflow-x: hidden;
+  }
+
+}
