@@ -9,32 +9,36 @@ var middleware = require('../web/middleware'),
     userService = require('../services/user-service.js');
 
 function redirectToDefault(user, res) {
-  res.redirect("/images/2/avatar-default.png");
+  res.redirect(301, "/images/2/avatar-default.png");
 }
 
-function displayAvatarFor(user, res) {
-  if(user.avatarUrlSmall) {
-    return res.redirect(user.avatarUrlSmall);
-  }
-
+function displayAvatarFor(userId, req, res) {
   var db = mongoose.connection.db;
   var GridStore = mongoose.mongo.GridStore;
-  var avatarFile = "avatar-" + user.id;
+  var avatarFile = "avatar-" + userId;
   GridStore.exist(db, avatarFile, function(err, exists) {
-    if(err || !exists) return redirectToDefault(user, res);
+    if(err || !exists) return redirectToDefault(userId, res);
 
     var gs = new GridStore(db, avatarFile, "r");
 
     gs.open(function(err, gs) {
       if(err) {
-        redirectToDefault(user, res);
+        redirectToDefault(userId, res);
         return;
       }
 
-      res.setHeader("Cache-Control","max-age=86400");
+      res.setHeader("Cache-Control","public");
       res.setHeader('ETag', gs.md5);
+      res.setHeader('Vary', 'Accept');
+      res.setHeader('Expires', new Date(Date.now() + 365 * 86400 * 1000));
 
-      gs.stream(true).pipe(res);
+      var presentedEtag = req.get('If-None-Match');
+      if(!presentedEtag || presentedEtag !== gs.md5) {
+        gs.stream(true).pipe(res);
+        return;
+      }
+
+      res.send(304);
     });
 
   });
@@ -46,7 +50,7 @@ module.exports = {
         '/avatar',
         middleware.ensureLoggedIn(),
         function(req, res) {
-          displayAvatarFor(req.user, res);
+          displayAvatarFor(req.user.id, req, res);
         }
       );
 
@@ -55,15 +59,17 @@ module.exports = {
         middleware.ensureLoggedIn(),
         function(req, res, next) {
           var userId = req.params.userId;
-          userService.findById(userId, function(err, user) {
-            if(err) return next(err);
-            if(!user) return res.send(404);
+          displayAvatarFor(userId, req, res);
+        }
+      );
 
-            displayAvatarFor(user, res);
-
-
-          });
-
+      app.get(
+        '/avatar/:userId/:version.:type',
+        middleware.ensureLoggedIn(),
+        function(req, res, next) {
+          /* Ignore the version and always serve up the latest */
+          var userId = req.params.userId;
+          displayAvatarFor(userId, req, res);
         }
       );
 
@@ -91,11 +97,8 @@ module.exports = {
               gs.writeFile(resizedPath, function(err) {
                 if (err) return next(err);
 
-                /* If we've pushed the avatar to a CDN, get rid of it */
-                if(req.user.avatarUrlSmall) {
-                  req.user.avatarUrlSmall = null;
-                  req.user.save();
-                }
+                req.user.avatarVersion = req.user.avatarVersion ? 1 : req.user.avatarVersion + 1;
+                req.user.save();
 
                 res.send({ success: true });
               });

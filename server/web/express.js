@@ -40,7 +40,7 @@ module.exports = {
     }
 
     var staticFiles = __dirname + "/../../" + nconf.get('web:staticContent');
-    app.use(express['static'](staticFiles));
+    app.use(express['static'](staticFiles, { maxAge: 365 * 86400 * 1000 } ));
 
     if(nconf.get("express:logging") && !nconf.get("express:logStatic")) {
       app.use(express.logger(nconf.get("express:loggingConfig")));
