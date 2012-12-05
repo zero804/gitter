@@ -12,8 +12,11 @@ var _ = require("underscore");
 var handlebars = require('handlebars');
 var winston = require("winston");
 var collections = require("../utils/collections");
+var cdn = require('../web/cdn');
 
 var predicates = collections.predicates;
+
+
 
 function concatArraysOfArrays(a) {
   var result = [];
@@ -52,11 +55,10 @@ function UserStrategy(options) {
     if(!user) return null;
 
     function getAvatarUrl() {
-      if(user.avatarUrlSmall) {
-        return user.avatarUrlSmall;
+      if(user.avatarVersion === 0) {
+        return cdn("images/2/avatar-default.png");
       }
-
-      return "/avatar/" + user.id;
+      return cdn("avatar/" + user.id + "/" + user.avatarVersion + ".jpg", { notStatic: true });
     }
 
     function getLocationDescription(named) {
