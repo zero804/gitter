@@ -66,7 +66,6 @@
     "grunt-exec": "~0.3.0",
     "grunt-clean": "~0.3.0",
     "grunt": "~0.3.17",
-    "v8-profiler": "~3.6.2-1",
     "grunt-reload": "~0.2.0"
   },
   "scripts": {
