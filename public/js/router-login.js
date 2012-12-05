@@ -2,18 +2,18 @@ require([
   'jquery',
   'underscore',
   'backbone',
+  './base-router',
   'views/base',
   'views/login/loginModalView',
   'views/profile/profileModalView',
   'views/login/loginRequestModalView'
-], function($, _, Backbone, TroupeViews, LoginModalView, ProfileModalView, RequestModalView) {
+], function($, _, Backbone, BaseRouter, TroupeViews, LoginModalView, ProfileModalView, RequestModalView) {
   "use strict";
 
-  var AppRouter = Backbone.Router.extend({
+  var AppRouter = BaseRouter.extend({
     routes: {
       '*actions': 'defaultAction'
     },
-
 
     defaultAction: function(actions) {
       $('#primary-view').html('');

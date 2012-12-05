@@ -2,17 +2,20 @@ require([
   'jquery',
   'underscore',
   'backbone',
+  './base-router',
   'views/home/main',
   'views/share/share',
   'components/chat/chat-component',
   'views/app/appView',
   'components/desktopNotifications',
   'components/soundNotifications',
-  'components/unread-items-client'
-], function($, _, Backbone, MainHomeView, ShareView, chat, AppView, desktopNotifications, soundNotifications, unreadItemsClient) {
+  'components/unread-items-client',
+  'routes/mail-routes'
+], function($, _, Backbone, BaseRouter, MainHomeView, ShareView, chat, AppView, desktopNotifications, soundNotifications, unreadItemsClient, mailRoutes) {
 
-  var AppRouter = Backbone.Router.extend({
+  var AppRouter = BaseRouter.extend({
     initialize: function() {
+      this.createRouteMixins(mailRoutes);
 
       this.appView = new AppView({ router: this });
 
@@ -21,8 +24,7 @@ require([
 
     routes: {
       'statusphere': 'showStatusView',
-      'mail': 'showConversationView',
-      'mail/:id': 'showConversationDetailView',
+
       'chat': 'showChatView',
       'files': 'showFileView',
       'people': 'showPeopleView',
@@ -32,50 +34,7 @@ require([
       '*actions': 'defaultAction'
     },
 
-    // TODO: FIX This method is fishy!
-    resetIcons: function() {
-      function removeSelected(selector) {
-        var s = $(selector);
-        if(s.length === 0) return;
-        var src = s.attr("src").replace('-selected.png', ".png");
-        s.attr("src", src);
-      }
-      removeSelected('#chat-icon');
-      removeSelected('#file-icon');
-      removeSelected('#mail-icon');
-      removeSelected('#people-icon');
-    },
-
-    navIcon: function(iconId) {
-      this.resetIcons();
-      //var iconSrc = $(iconId).attr("src").match(/[^\.]+/) + "-selected.png";
-      //$(iconId).attr("src", iconSrc);
-    },
-
-    /* Taken from http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
-    showView: function(selector, view) {
-        if (this.currentView)
-            this.currentView.close();
-
-        $(selector).html(view.render().el);
-
-        $(window).scrollTop(0);
-
-        this.currentView = view;
-        return view;
-    },
-
-    showAsync: function(file, params) {
-      var self = this;
-      require([file],
-          function (View) {
-            var view = new View({ router: self, params: params });
-            self.showView( '#primary-view', view);
-          });
-    },
-
     defaultAction: function(actions){
-      // this.showView( '#primary-view', new MainHomeView({}) );
       this.showChatView();
     },
 
@@ -83,14 +42,6 @@ require([
       this.showAsync('views/status/statusView');
     },
 
-    showConversationView: function() {
-      this.navIcon('#mail-icon');
-      this.showAsync('views/conversation/conversationView');
-    },
-
-    showConversationDetailView: function(id) {
-      this.showAsync("views/conversation/conversationDetailView",id);
-    },
 
     showChatView: function() {
       this.navIcon('#chat-icon');
@@ -110,10 +61,6 @@ require([
     showShareDialog: function() {
       var loginView = new ShareView({ router: this });
       loginView.show();
-    },
-
-    showMailItemView: function(id) {
-      this.showAsync("views/mail/itemView",id);
     },
 
     showProfileView: function() {
