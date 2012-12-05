@@ -104,13 +104,6 @@ module.exports = function( grunt ) {
     reload: {
       port: 35729, // LR default
       liveReload: true
-      /*
-        port: 6001,
-          proxy: {
-              host: 'localhost',
-              port: 5000
-          }
-      */
     },
 
     // default watch configuration
@@ -125,7 +118,7 @@ module.exports = function( grunt ) {
         files: [
           'public/**/*.less'
         ],
-        tasks: 'reload'
+        tasks: 'less'
       }
     },
 
