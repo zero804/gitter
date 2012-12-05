@@ -1,6 +1,9 @@
 /*jslint node: true */
 "use strict";
 
+/* Listen for SIGUSR1 signals to start/stop profiling */
+require('./utils/profiler');
+
 /* Configure winston before all else! */
 var winston = require('./utils/winston');
 

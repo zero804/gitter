@@ -1,5 +1,12 @@
+var middleware = require('../web/middleware');
+
 module.exports = {
   install: function(app) {
+
+    var auth = middleware.ensureLoggedIn();
+
+    app.all('/troupes', auth);
+    app.all('/troupes/*', auth);
 
     var troupesResource = app.resource('troupes',  require('./troupes.js'));
 

@@ -183,10 +183,16 @@ module.exports = {
      */
     passport.use(new BearerStrategy(
       function(accessToken, done) {
-
         oauthService.findAccessToken(accessToken, function(err, token) {
-          if (err) { return done(err); }
-          if (!token) { return done(null, false); }
+          if (err) {
+            winston.error("passport: Access token find failed", { exception: err });
+            return done(err);
+          }
+
+          if (!token) {
+            winston.info("passport: Access token presented does not exist", { exception: err });
+            return done(null, false);
+          }
 
           userService.findById(token.userId, function(err, user) {
             if (err) { return done(err); }
