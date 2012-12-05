@@ -46,7 +46,7 @@ module.exports = function( grunt ) {
               exclude: ["core-libraries"]
           },
           {
-              name: "router",
+              name: "router-core",
               include: [
                 "views/widgets/avatar",
                 "views/widgets/nav"
@@ -54,7 +54,18 @@ module.exports = function( grunt ) {
               exclude: ["core-libraries"]
           },
           {
+              name: "router",
+              include: ["router-core"],
+              exclude: ["core-libraries"]
+          },
+          {
               name: "router-mobile-chat",
+              include: ["router-core"],
+              exclude: ["core-libraries"]
+          },
+          {
+              name: "router-mobile-file",
+              include: ["router-core"],
               exclude: ["core-libraries"]
           },
           /* Views */

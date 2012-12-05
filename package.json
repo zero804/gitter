@@ -65,7 +65,8 @@
     "grunt-contrib-copy": "~0.3.2",
     "grunt-exec": "~0.3.0",
     "grunt-clean": "~0.3.0",
-    "grunt": "~0.3.17"
+    "grunt": "~0.3.17",
+    "v8-profiler": "~3.6.2-1"
   },
   "scripts": {
     "test": "make test"

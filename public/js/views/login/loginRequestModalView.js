@@ -59,7 +59,6 @@ define([
         debug: true,
         showErrors: function(errorMap, errorList) {
           console.log("errorList: " + errorList.length);
-          console.dir(errorList);
           if (errorList.length === 0) $('.request-failure').hide();
           if (errorList.length > 0) $('.request-failure').show();
           var errors = "";
