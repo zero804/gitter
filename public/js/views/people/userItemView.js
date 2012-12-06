@@ -35,8 +35,6 @@ define([
         displayModeUser: this.displayMode == 'user',
         unread: model.unread
       };
-
-      console.log("render", m);
       return m;
     },
 
