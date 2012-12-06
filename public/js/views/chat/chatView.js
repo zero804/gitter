@@ -37,6 +37,7 @@ define([
 
     events: {
       "keydown .trpChatBox":          "detectReturn",
+      "focusout .trpChatBox": "send",
       "blur .trpChatBox" : "blurChat"
     },
 
