@@ -135,16 +135,18 @@ module.exports = function( grunt ) {
     watch: {
       reload: {
         files: [
-          'public/**'
+          'public/js/**/*.js',
+          'public/**/*.hbs',
+          'public/bootstrap/css/*.css'
         ],
         tasks: 'reload'
-      },
-      less: {
-        files: [
-          'public/**/*.less'
-        ],
-        tasks: 'less'
-      }
+      }//,
+      //less: {
+       // files: [
+        //  'public/**/*.less'
+        //],
+        //tasks: 'less'
+      //}
     },
 
     // default lint configuration, change this to match your setup:
@@ -260,5 +262,6 @@ module.exports = function( grunt ) {
   grunt.loadNpmTasks('grunt-reload');
 
   grunt.registerTask('process', 'clean less copy requirejs min exec:gzip');
+  grunt.registerTask('watchr', 'reload watch');
 
 };
