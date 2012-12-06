@@ -56,7 +56,7 @@ module.exports = {
 
       app.get(
         '/avatar/:userId',
-        middleware.ensureLoggedIn(),
+        // middleware.ensureLoggedIn(),
         function(req, res, next) {
           var userId = req.params.userId;
           displayAvatarFor(userId, req, res);
@@ -65,7 +65,7 @@ module.exports = {
 
       app.get(
         '/avatar/:userId/:version.:type',
-        middleware.ensureLoggedIn(),
+        // middleware.ensureLoggedIn(),
         function(req, res, next) {
           /* Ignore the version and always serve up the latest */
           var userId = req.params.userId;
