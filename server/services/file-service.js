@@ -106,8 +106,6 @@ function compareHashSums(gridFileName, temporaryFile, callback) {
 
 /* private */
 function checkIfFileExistsAndIdentical(file, version, temporaryFile, callback) {
-  winston.debug("checkIfFileExistsAndIdentical");
-
   var db = mongoose.connection.db;
   var GridStore = mongoose.mongo.GridStore;
   var gridFileName = createFileName(file.id, version);
@@ -121,15 +119,16 @@ function checkIfFileExistsAndIdentical(file, version, temporaryFile, callback) {
   });
 }
 
-function locateAndStream(troupeId, fileName, version, gridFileNamingStrategy, callback) {
-  winston.debug("locateAndStream");
-
+/**
+ * Callback signature is function(err, mimeType, etagMatches, etag, stream);
+ */
+function locateAndStream(troupeId, fileName, version, presentedEtag, gridFileNamingStrategy, callback) {
   findByFileName(troupeId, fileName, function(err, file) {
     if (err) return callback(err);
-    if (!file) return callback(null, null);
+    if (!file) return callback(/* no match */);
 
     if(file.versions.length === 0) {
-      return callback(null, null, null);
+      return callback(/* no match */);
     }
 
     if(!version) {
@@ -143,16 +142,20 @@ function locateAndStream(troupeId, fileName, version, gridFileNamingStrategy, ca
     GridStore.exist(db, gridFileName, function(err, result) {
       if(!result) {
         winston.warn("File " + gridFileName + " does not exist.");
-        return callback(null, null);
+        return callback(/* no match */);
       }
 
       var gs = new GridStore(db, gridFileName, 'r');
       gs.open(function(err, gs) {
         if(err) return callback(err);
-        if(!gs) return callback(null, null);
+        if(!gs) return callback(/* no match */);
+
+        if(presentedEtag && presentedEtag === gs.md5) {
+          return callback(null, gs.contentType, true, gs.md5);
+        }
 
         var readStream = gs.stream(true);
-        callback(null, gs.contentType, readStream);
+        callback(null, gs.contentType, false, gs.md5, readStream);
       });
 
     });
@@ -161,16 +164,22 @@ function locateAndStream(troupeId, fileName, version, gridFileNamingStrategy, ca
 
 }
 
-function getFileEmbeddedStream(troupeId, fileName, version, callback) {
-  locateAndStream(troupeId, fileName, version, function(fileId, version) { return createEmbeddedFileName(fileId, version); }, callback);
+function getFileEmbeddedStream(troupeId, fileName, version, presentedEtag, callback) {
+  locateAndStream(troupeId, fileName, version, presentedEtag, function(fileId, version) {
+    return createEmbeddedFileName(fileId, version);
+  }, callback);
 }
 
-function getThumbnailStream(troupeId, fileName, version, callback) {
-  locateAndStream(troupeId, fileName, version, function(fileId, version) { return createThumbNailFileName(fileId, version); }, callback);
+function getThumbnailStream(troupeId, fileName, version, presentedEtag, callback) {
+  locateAndStream(troupeId, fileName, version, presentedEtag, function(fileId, version) {
+    return createThumbNailFileName(fileId, version);
+  }, callback);
 }
 
-function getFileStream(troupeId, fileName, version, callback) {
-  locateAndStream(troupeId, fileName, version, function(fileId, version) { return createFileName(fileId, version); }, callback);
+function getFileStream(troupeId, fileName, version, presentedEtag, callback) {
+  locateAndStream(troupeId, fileName, version, presentedEtag, function(fileId, version) {
+    return createFileName(fileId, version);
+  }, callback);
 }
 
 function findByTroupe(id, callback) {

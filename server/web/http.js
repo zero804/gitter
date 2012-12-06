@@ -10,11 +10,14 @@ var http = require('http'),
  * This is needed as connect/express attempt to be too smart for their own good behind proxies (like NGINX) and convert relative URLS into absolute URLS. Unfortunately behind a proxy the URL will proably we wrong.
  * TODO: raise this as a bug in express
  */
-res.relativeRedirect = function(url, status){
+res.relativeRedirect = function(status, url){
   var req = this.req;
   var body;
 
-  status = status || 302;
+  if(!url) {
+    url = status;
+    status = 302;
+  }
 
   // Support text/{plain,html} by default
   if (req.accepts('html')) {
