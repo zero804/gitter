@@ -1,3 +1,4 @@
+{{^compactView}}
 <link rel="stylesheet" href="bootstrap/css/trpPeople.css">
 <div class="trpSectionViewHeader">
   <div class="trpSectionTitle">Who's in the Troupe</div>
@@ -21,4 +22,12 @@
   <div class="tab-pane" id="requests">
   </div>
 </div>
- 
+{{/compactView}}
+
+{{#compactView}}
+<Br>
+<div id="requests"></div>
+<div id="users"></div>
+<div id="invites"></div>
+
+ {{/compactView}}
