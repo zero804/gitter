@@ -27,14 +27,6 @@ module.exports = {
       });
     },
 
-    'new': function(req, res){
-      res.send(500);
-    },
-
-    create: function(req, res) {
-      res.send(500);
-    },
-
     show: function(req, res, next) {
       restSerializer.serialize(req.file, new restSerializer.FileStrategy(), function(err, serializedFile) {
         if (err) {
@@ -46,21 +38,12 @@ module.exports = {
       });
     },
 
-    edit: function(req, res){
-      res.send(500);
-    },
-
-    update:  function(req, res){
-      res.send(500);
-    },
-
-    destroy: function(req, res){
+    destroy: function(req, res, next){
       // TODO(AN): delete from GridFS
       req.file.remove(function(err) {
         if(err) {
           winston.error("Unable to remove file", { exception: err });
-          res.send(500);
-          return;
+          return next(err);
         }
 
         res.send({ success: true });
