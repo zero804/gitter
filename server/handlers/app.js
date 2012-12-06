@@ -156,6 +156,12 @@ module.exports = {
           renderAppPage(req, res, next, 'mobile/conversation-app');
         });
 
+      app.get('/:appUri/people',
+        middleware.ensureLoggedIn(),
+        function(req, res, next) {
+          renderAppPage(req, res, next, 'mobile/people-app');
+        });
+
       app.get('/:appUri/accessdenied', function(req, res, next) {
         res.render('app-accessdenied', {
         });

@@ -34,8 +34,8 @@ define([
 
     afterRender:function() {
       var self = this;
-      this.$el.find('#users').html(new UserTabView().render().el);
       this.$el.find('#requests').html(new RequestTabView().render().el);
+      this.$el.find('#users').html(new UserTabView().render().el);
       this.$el.find('#invites').html(new InviteTabView().render().el);
 
       if(this.initialTab) {
