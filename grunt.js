@@ -231,7 +231,8 @@ module.exports = function( grunt ) {
           "public/bootstrap/css/trpPeople.css": "public/bootstrap/less/trpPeople.less",
           "public/bootstrap/css/trpMobileChat.css": "public/bootstrap/less/trpMobileChat.less",
           "public/bootstrap/css/trpMobileFiles.css": "public/bootstrap/less/trpMobileFiles.less",
-          "public/bootstrap/css/trpMobileConversations.css": "public/bootstrap/less/trpMobileConversations.less"
+          "public/bootstrap/css/trpMobileConversations.css": "public/bootstrap/less/trpMobileConversations.less",
+          "public/bootstrap/css/trpMobilePeople.css": "public/bootstrap/less/trpMobilePeople.less"
 
         }
       }
