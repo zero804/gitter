@@ -90,6 +90,13 @@ module.exports = function( grunt ) {
               ],
               exclude: ["core-libraries"]
           },
+          {
+              name: "router-mobile-people",
+              include: [
+                "views/widgets/avatar"
+              ],
+              exclude: ["core-libraries"]
+          },
           /* Views */
           {
               name: "views/chat/chatView",
