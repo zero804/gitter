@@ -6,6 +6,8 @@ require([
   'views/base',
   'routes/mail-routes'
 ], function($, _, Backbone, BaseRouter, TroupeViews, mailRoutes) {
+  /*jslint browser: true */
+  /*global console:false, require: true */
   "use strict";
 
   var AppRouter = BaseRouter.extend({
