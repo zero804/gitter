@@ -1,11 +1,13 @@
-/*jshint globalstrict:true, trailing:false */
+ /*jshint globalstrict:true, trailing:false */
 /*global console:false, require: true, module: true */
 "use strict";
 
 var uuid = require('node-uuid'),
     sechash = require('sechash'),
     winston = require('winston'),
-    redis = require("redis");
+    redis = require("redis"),
+    userService = require('../services/user-service');
+
 
 var redisClient = redis.createClient();
 
@@ -38,8 +40,10 @@ module.exports = {
 
   rememberMeMiddleware: function(options) {
     return function(req, res, next) {
-      function fail() {
+      function fail(err) {
         res.clearCookie("auth");
+        if(err) return next(err);
+
         return next();
       }
 
@@ -49,16 +53,20 @@ module.exports = {
       /* Auth cookie */
       if(!req.cookies.auth) return next();
 
-      winston.info('Client has presented a rememberme auth cookie, attempting reauthentication');
+      winston.info('rememberme: Client has presented a rememberme auth cookie, attempting reauthentication');
 
       var authToken = req.cookies.auth.split(":", 2);
 
       var key = authToken[0];
       var hash = authToken[1];
 
+
       redisClient.get("rememberme:" + key, function(err, storedValue) {
         if(err) return fail();
-        if(!storedValue) return fail();
+        if(!storedValue) {
+          winston.info("rememberme: Client presented illegal rememberme token ", { token: key });
+          return fail();
+        }
 
         redisClient.del("rememberme:" + key);
 
@@ -67,14 +75,24 @@ module.exports = {
         sechash.testHash(hash, stored.hash, function(err, match) {
           if(err || !match) return fail();
           var userId = stored.userId;
-          req._passport.instance.deserializeUser(userId, function(err, user) {
-            if (err)  return fail();
-            req._passport.session.user = userId;
-            req.user = user;
-            res.clearCookie("auth");
-            generateAuthToken(req, res, userId, options, function(err) {
-              next(err);
+          userService.findById(userId, function(err, user) {
+            if(err)  return fail(err);
+            if(!user) return fail();
+
+            req.login(user, options, function(err) {
+              if(err) {
+                winston.info("rememberme: Passport login failed", { exception: err  });
+                return fail(err);
+              }
+
+              winston.info("rememberme: Passport login succeeded");
+
+              generateAuthToken(req, res, userId, options, function(err) {
+                next(err);
+              });
+
             });
+
           });
 
         });

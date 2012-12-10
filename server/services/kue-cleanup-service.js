@@ -89,13 +89,10 @@ function cleanupJob() {
   });
 }
 
-winston.debug('Running kue completed job clean-up');
-
-function promotionJob() {
-  jobs.promote();
-}
 
 exports.startCleanupJob = function() {
+  winston.debug('Running kue completed job clean-up');
+
   setInterval(cleanupJob, timer);
-  setInterval(promotionJob, 5000);
+  jobs.promote(5000);
 };
