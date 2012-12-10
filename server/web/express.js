@@ -22,6 +22,18 @@ function ios6PostCachingFix() {
 
 module.exports = {
   installFull: function(app, server, sessionStore) {
+    function configureLogging() {
+      var accessLogFile = nconf.get("logging:accessLogFile");
+      var stream = accessLogFile ? fs.createWriteStream(accessLogFile, { flags: 'a' }) : null;
+
+      var loggingOptions = {
+        format: nconf.get("logging:loggingFormat"),
+        stream: stream
+      };
+
+      app.use(express.logger(loggingOptions));
+    }
+
     handlebars.registerHelper('cdn', require('./hbs-helpers').cdn);
     handlebars.registerHelper('bootScript', require('./hbs-helpers').bootScript);
 
@@ -34,16 +46,18 @@ module.exports = {
 
     app.set('view engine', 'hbs');
     app.set('views', __dirname + '/../../' + nconf.get('web:staticContent') +'/templates');
+    app.set('trust proxy', true);
 
-    if(nconf.get("express:logging") && nconf.get("express:logStatic")) {
-      app.use(express.logger(nconf.get("express:loggingConfig")));
+    if(nconf.get("logging:access") && nconf.get("logging:logStaticAccess")) {
+      configureLogging();
     }
 
     var staticFiles = __dirname + "/../../" + nconf.get('web:staticContent');
     app.use(express['static'](staticFiles, { maxAge: 365 * 86400 * 1000 } ));
 
-    if(nconf.get("express:logging") && !nconf.get("express:logStatic")) {
-      app.use(express.logger(nconf.get("express:loggingConfig")));
+    if(nconf.get("logging:access") && !nconf.get("logging:logStaticAccess")) {
+      configureLogging();
+      //app.use(express.logger(nconf.get("logging:loggingFormat")));
     }
 
     app.use(express.cookieParser());
@@ -66,7 +80,7 @@ module.exports = {
   },
 
   installSocket: function(app, server, sessionStore) {
-    if(nconf.get("express:logging")) {
+    if(nconf.get("logging:access")) {
       app.use(express.logger());
     }
 
