@@ -57,7 +57,6 @@ module.exports = {
 
     if(nconf.get("logging:access") && !nconf.get("logging:logStaticAccess")) {
       configureLogging();
-      //app.use(express.logger(nconf.get("logging:loggingFormat")));
     }
 
     app.use(express.cookieParser());
