@@ -9,7 +9,7 @@
 
 .trpPeopleViewItem {
   float: left;
-  padding: 0px 10px 40px 40px;
+  padding: 20px 10px 20px 40px;
   min-width: 280px;
 }
 
@@ -51,12 +51,22 @@
 
 @media screen and (max-width: 320px) {
 
+  body {
+    margin: 0px;
+    padding: 0px;
+  }
+
   .trpPeopleViewItem {
   float: left;
-  padding: 0px 10px 40px 20px;
-  min-width: 280px;
+  padding: 20px 10px 20px 20px;
+  width: 100%;
+  border-bottom: 1px solid @trpOffWhite;
 }
 
+.trpPersonName {
+  padding-top: 16px;
+  .trpBodyText;
+}
 
 
 }
