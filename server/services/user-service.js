@@ -8,7 +8,9 @@ var persistence = require("./persistence-service"),
     emailNotificationService = require("./email-notification-service"),
     uuid = require('node-uuid'),
     geocodingService = require("./geocoding-service"),
-    winston = require("winston");
+    winston = require("winston"),
+    statsService = require("./stats-service");
+
 
 var userService = {
   newUser: function(options) {
@@ -124,6 +126,10 @@ var userService = {
   },
 
   setUserLocation: function(userId, location, callback) {
+    statsService.send("location_submission", {
+      userId: userId
+    });
+
     userService.findById(userId, function(err, user) {
       if(err) return callback(err);
       if(!user) return callback(err);

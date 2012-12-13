@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>What's happening in Troupe?</title>
+<style>
+
+@import url(style.css);
+
+</style>
+</head>
+<body>
+  <a href="?resolution=sec">Seconds</a> |
+  <a href="?resolution=minute">Minute</a> |
+  <a href="?resolution=5-minute">5 Minutes</a> |
+  <a href="?resolution=hour">Hour</a> |
+  <a href="?resolution=day">Day</a> |
+
+  <h1>What's happening on Troupe?</h1>
+  <div id="t"></div>
+
+  <p><strong>User logins</strong>: successful manual user logins through the web application.</p>
+  <div id="troupe_user_logins">
+  </div>
+
+  <p><strong>Failed logins</strong>: failed logins</p>
+  <div id="troupe_login_failed">
+  </div>
+
+  <p><strong>Chats</strong>: all new chats across all troupes.</p>
+  <div id="troupe_new_chat">
+  </div>
+
+
+  <p><strong>Location Submissions</strong>: each time a mobile phone submits the location of a user.</p>
+  <div id="troupe_location_submission">
+  </div>
+
+  <div id="b"></div>
+
+<script src="/js/libs/d3/v2/d3.v2.js"></script>
+<script src="/js/libs/cubism/v1/cubism.v1.js"></script>
+<script>
+
+var urlParams = {};
+(function () {
+    var match,
+        pl     = /\+/g,  // Regex for replacing addition symbol with a space
+        search = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+        query  = window.location.search.substring(1);
+
+    while (match = search.exec(query))
+       urlParams[decode(match[1])] = decode(match[2]);
+})();
+
+/*
+1e4 - 10-second
+6e4 - 1-minute
+3e5 - 5-minute
+36e5 - 1-hour
+864e5 - 1-day
+*/
+var size;
+var res;
+
+switch(urlParams.resolution) {
+  case 'minute':
+    res = 6e4;
+    break;
+
+  case '5-minute':
+    res = 3e5;
+    break;
+
+  case 'hour':
+    res = 36e5; // 1 hour
+    break;
+
+  case 'day':
+    res = 864e5; // 1 day
+    break;
+
+  case 'sec':
+  default:
+    res = 1e4; // 10 second
+}
+
+
+var size = window.innerWidth - 40;
+
+var context = cubism.context()
+    .step(res)
+    .size(size);
+
+var cube = context.cube("/dashboard");
+
+var bindings = {
+  "#troupe_user_logins": "sum(troupe_user_login)",
+  "#troupe_login_failed": "sum(troupe_login_failed)",
+  "#troupe_new_chat": "sum(troupe_new_chat)",
+  "#troupe_location_submission": "sum(troupe_location_submission)"
+};
+
+d3.select("#t").selectAll(".axis")
+    .data(["top"])
+    .enter().append("div")
+    .attr("class", function(d) { return d + " axis"; })
+    .each(function(d) { d3.select(this).call(context.axis().ticks(12).orient(d)); });
+
+d3.select("#b").selectAll(".axis")
+    .data(["bottom"])
+    .enter().append("div")
+    .attr("class", function(d) { return d + " axis"; })
+    .each(function(d) { d3.select(this).call(context.axis().ticks(12).orient(d)); });
+
+
+d3.select("body").append("div")
+    .attr("class", "rule")
+    .call(context.rule());
+
+Object.keys(bindings).forEach(function(k) {
+  var v = bindings[k];
+  d3.select(k).selectAll(".horizon")
+    .data([cube.metric(v)])
+    .enter().insert("div", ".bottom")
+    .attr("class", "horizon")
+    .call(context.horizon()
+      .extent([0, 10])
+      .height(120)
+    );
+
+});
+
+context.on("focus", function(i) {
+//  d3.selectAll(".value").style("right", i == null ? null : context.size() - i + "px");
+  d3.selectAll(".value").style("left", i == null ? null : i + "px");
+});
+
+</script>
+</body>
+</html>

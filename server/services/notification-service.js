@@ -126,7 +126,21 @@ exports.createTroupeChatNotification = function(info) {
       notificationText = notificationText.substring(0, 100) + '…';
     }
 
-    pushNotificationGateway.sendUserNotification(troupe.users, notificationText);
+    // Never send the message to the person that entered it
+    var users = troupe.users.filter(function(userId) { return userId !== info.fromUserId; });
+
+    console.dir(users);
+
+    if(!users.length) {
+      return;
+    }
+
+    pushNotificationGateway.sendUserNotification(troupe.users, {
+      message: notificationText,
+      sound: 'chat.caf',
+      payload: { uri: troupe.uri, page: 'chat' }
+    });
+
   });
 };
 

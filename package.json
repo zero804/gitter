@@ -51,7 +51,8 @@
     "express-winston": "~0.1.2",
     "apn": "~1.2.4",
     "kue": "~0.5.0",
-    "file": "~0.2.1"
+    "file": "~0.2.1",
+    "cube": "~0.2.4"
   },
   "devDependencies": {
     "better-assert": "~0.1.0",
