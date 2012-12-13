@@ -126,7 +126,7 @@ var userService = {
   },
 
   setUserLocation: function(userId, location, callback) {
-    statsService.send("location_submission", {
+    statsService.event("location_submission", {
       userId: userId
     });
 

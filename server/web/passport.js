@@ -22,7 +22,7 @@ function emailPasswordUserStrategy(email, password, done) {
     if(!user) {
       winston.warn("Unable to login as email address not found", { email: email });
 
-      statsService.send("login_failed", {
+      statsService.event("login_failed", {
         email: email,
         reason: 'email_not_found'
       });
@@ -33,7 +33,7 @@ function emailPasswordUserStrategy(email, password, done) {
     if(user.status != 'ACTIVE' && user.status != 'PROFILE_NOT_COMPLETED') {
       winston.warn("User attempted to login but account not yet activated", { email: email });
 
-      statsService.send("login_failed", {
+      statsService.event("login_failed", {
         email: email,
         reason: 'account_not_activated'
       });
@@ -45,7 +45,7 @@ function emailPasswordUserStrategy(email, password, done) {
       if(!match) {
         winston.warn("Login failed. Passwords did not match", { email: email });
 
-        statsService.send("login_failed", {
+        statsService.event("login_failed", {
           email: email,
           reason: 'password_mismatch'
         });
@@ -60,7 +60,7 @@ function emailPasswordUserStrategy(email, password, done) {
         user.save();
       }
 
-      statsService.send("user_login", {
+      statsService.event("user_login", {
         userId: user.id
       });
 

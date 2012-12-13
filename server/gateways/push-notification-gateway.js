@@ -4,7 +4,8 @@
 var kue = require('kue'),
     jobs = kue.createQueue(),
     _ = require('underscore'),
-    winston = require("winston");
+    winston = require("winston"),
+    statsService = require("../services/stats-service");
 
 var errorDescriptions = {
   0: 'No errors encountered',
@@ -35,6 +36,7 @@ exports.startWorkers = function() {
       winston.debug("Sending to " + devices.length + " potential devices for " + userIds.length + " users");
 
       devices.forEach(function(device) {
+        var sent = false;
         if(device.deviceType === 'APPLE' && device.appleToken) {
           winston.info("Sending apple push notification", { notification: notification });
           var note = new apns.Notification();
@@ -45,7 +47,21 @@ exports.startWorkers = function() {
           note.payload = payload;
 
           apnsConnection.sendNotification(note);
+          sent = true;
         }
+
+        // Android/google push notification goes here
+
+        // Blackberry push goes here
+
+        // Finally, send statistics out
+        if(sent) {
+          statsService.event("push_notification", {
+            userId: device.userId,
+            deviceType: device.deviceType
+          });
+        }
+
       });
 
       callback();
