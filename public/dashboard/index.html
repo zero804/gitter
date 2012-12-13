@@ -36,6 +36,11 @@
   <div id="troupe_location_submission">
   </div>
 
+
+  <p><strong>Push Notifications</strong>: each time a mobile phone is sent a push notification.</p>
+  <div id="troupe_push_notification">
+  </div>
+
   <div id="b"></div>
 
 <script src="/js/libs/d3/v2/d3.v2.js"></script>
@@ -99,7 +104,8 @@ var bindings = {
   "#troupe_user_logins": "sum(troupe_user_login)",
   "#troupe_login_failed": "sum(troupe_login_failed)",
   "#troupe_new_chat": "sum(troupe_new_chat)",
-  "#troupe_location_submission": "sum(troupe_location_submission)"
+  "#troupe_location_submission": "sum(troupe_location_submission)",
+  "#troupe_push_notification": "sum(troupe_push_notification)"
 };
 
 d3.select("#t").selectAll(".axis")
@@ -126,7 +132,6 @@ Object.keys(bindings).forEach(function(k) {
     .enter().insert("div", ".bottom")
     .attr("class", "horizon")
     .call(context.horizon()
-      .extent([0, 10])
       .height(120)
     );
 

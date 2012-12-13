@@ -26,7 +26,7 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
       appEvents.troupeChat(troupe.id, serialized);
     });
 
-    statsService.send("new_chat", {
+    statsService.event("new_chat", {
       fromUserId: user.id,
       toTroupeId: troupe.id
     });

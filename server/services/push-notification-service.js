@@ -7,6 +7,7 @@ var nconf = require('../utils/config');
 var redis = require("redis"),
     redisClient = redis.createClient();
 
+
 var minimumUserAlertIntervalS = nconf.get("notifications:minimumUserAlertInterval");
 
 
