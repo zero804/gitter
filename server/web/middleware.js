@@ -74,7 +74,9 @@ exports.authenticate = function(scheme, options) {
         winston.info("Authentication failed ", { scheme: scheme });
 
         if(req.accepts(['json','html']) === 'json') {
-          res.send(401);
+          var reason = info ? info.reason : undefined;
+
+          res.send(401, { success: false, reason: reason });
         } else {
           res.relativeRedirect(options.failureRedirect);
         }

@@ -87,6 +87,9 @@ define([
       var form = this.$el.find('form');
       var that = this;
 
+      $('.login-failure-account-not-activated').hide('fast');
+      $('.login-failure').hide('fast');
+
       $.ajax({
         url: "/login",
         contentType: "application/x-www-form-urlencoded",
@@ -94,6 +97,17 @@ define([
         data: form.serialize(),
         type: "POST",
         error: function(jqXHR, textStatus, errorThrown) {
+          if(jqXHR.status == 401) {
+            try {
+              var data = jQuery.parseJSON(jqXHR.responseText);
+
+              if(data.reason === "account_not_activated") {
+                $('.login-failure-account-not-activated').show('fast');
+                return;
+              }
+            } catch(e) {
+            }
+          }
           $('.login-failure').show('fast');
         },
         success: function(data) {
@@ -104,7 +118,6 @@ define([
           }
           that.markUserAsExisting(that.$el.find('#email').val());
           that.trigger('login.complete', data);
-
         }
       });
     }

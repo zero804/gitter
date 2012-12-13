@@ -129,8 +129,6 @@ exports.createTroupeChatNotification = function(info) {
     // Never send the message to the person that entered it
     var users = troupe.users.filter(function(userId) { return userId !== info.fromUserId; });
 
-    console.dir(users);
-
     if(!users.length) {
       return;
     }
