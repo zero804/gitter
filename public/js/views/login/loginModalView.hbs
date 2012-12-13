@@ -1,33 +1,28 @@
 <div class="login-content">
   <div class="trpModalTitle">Sign in to Troupe</div>
-     <form id="loginForm" class="marginless" method="post" action="/login">
-        <input type="hidden" name="troupeUri" value="{{troupeUri}}">
-        <input name="email" id="email" type="text" class="trpInput" placeholder="Email address" {{autofocusEmail}} value="{{email}}">
+   <form id="loginForm" class="marginless" method="post" action="/login">
+      <input type="hidden" name="troupeUri" value="{{troupeUri}}">
+      <input name="email" id="email" type="text" class="trpInput" placeholder="Email address" {{autofocusEmail}} value="{{email}}">
 
-        <input name="password" id="password" type="password" class="trpInput" {{autofocusPassword}}  placeholder="Password">
+      <input name="password" id="password" type="password" class="trpInput" {{autofocusPassword}}  placeholder="Password">
 
-        <label class="checkbox">
-            <input type="checkbox" name="rememberMe" value="1" checked>
-            <span class="trpModalSubtext">Remember me on this computer</span>
-        </label>
-        <div class="trpLoginSubmit">
-         <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen signin" id="signin-button">Sign in</button>
-        </div>
-      </form>
-      <div class="trpModalFailure login-failure login-message" style="display:none">
-        <span class="trpModalTitle"><span class="trpWhite">Login failed.</span></span><br> <a href="#" class="trpModalFailureText button-request-new-password">Click here to request a new password.</a>
+      <label class="checkbox">
+          <input type="checkbox" name="rememberMe" value="1" checked>
+          <span class="trpModalSubtext">Remember me on this computer</span>
+      </label>
+      <div class="trpLoginSubmit">
+       <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen signin" id="signin-button">Sign in</button>
       </div>
-      <div class="trpModalFailure login-failure-account-not-activated  login-message" style="display:none">
-        <span class="trpModalTitle"><span class="trpWhite">Login failed.</span></span><br>
-        <span class="trpModalFailureText">You're account has not yet been activated. Please follow the link from your activation email.</span><br>
-        <a href="#" class="trpModalFailureText button-resend-confirmation">Resend confirmation email</a>
-      </div>
-      <div class="trpModalFailure login-failure-confirmation-resent  login-message" style="display:none">
-        <span class="trpModalTitle"><span class="trpWhite">Confirmation Resent.</span></span><br>
-        <span class="trpModalFailureText">Your confirmation email has been resent. Please remember to check your spam folder if it doesn't arrive.</span><br>
-      </div>
-
-</div>
+    </form>
+    <div class="trpModalFailure login-failure login-message" style="display:none">
+      <span class="trpModalTitle"><span class="trpWhite">Login failed.</span></span><br> <a href="#" class="trpModalFailureText button-request-new-password">Click here to request a new password.</a>
+    </div>
+    <div class="trpModalFailure login-failure-account-not-activated  login-message" style="display:none">
+      <span class="trpModalTitle"><span class="trpWhite">Login failed.</span></span><br>
+      <span class="trpModalFailureText">You're account has not yet been activated. Please follow the link from your activation email.</span><br>
+      <a href="#" class="trpModalFailureText button-resend-confirmation">Resend confirmation email</a>
+    </div>
+  </div>
 <div class="resetpwd-content" style="display:none">
   <div class="trpModalTitle">Reset Password</div>
   <div class="trpModalBody">To reset your password, we will send you an email to <span class="trpGreen" id="resetEmailAddress">. </span></div>
@@ -39,4 +34,10 @@
   <div class="trpModalBody">We just sent you an email to <span class="trpGreen" id="resetEmail"></span>.<br><br>This will contain a link that you can click on to reset your password.</div>
   <button type="button" class="trpModalButton trpButtonBig trpBtnGreen" id="button-close">Close</button><br><Br>
 </div>
+<div class="resend-confirm" style="display:none">
+  <div class="trpModalTitle">On it's way!</div>
+  <div class="trpModalBody">Your confirmation email has been resent.<br><br>Please remember to check your spam or junk mail folder just in case it accidently got delivered there.</div>
+  <button type="button" class="trpModalButton trpButtonBig trpBtnGreen" id="button-close">Close</button><br><Br>
+</div>
+
 
