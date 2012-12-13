@@ -136,7 +136,8 @@ define([
         data: form.serialize(),
         type: "POST",
         success: function(data) {
-          that.$el.find('.login-failure-confirmation-resent').show('fast');
+          that.$el.find('.login-content').hide('fast');
+          that.$el.find('.resend-confirm').show('fast');
         }
       });
     }
