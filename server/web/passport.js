@@ -27,18 +27,18 @@ function emailPasswordUserStrategy(email, password, done) {
         reason: 'email_not_found'
       });
 
-      return done();
+      return done(null, null, { reason: "login_failed" });
     }
 
     if(user.status != 'ACTIVE' && user.status != 'PROFILE_NOT_COMPLETED') {
-      winston.warn("User attempted to login but account not yet activated", { email: email });
+      winston.warn("User attempted to login but account not yet activated", { email: email, status: user.status });
 
       statsService.event("login_failed", {
         email: email,
         reason: 'account_not_activated'
       });
 
-      return done();
+      return done(null, null, { reason: "account_not_activated" });
     }
 
     userService.checkPassword(user, password, function(match) {
@@ -50,7 +50,7 @@ function emailPasswordUserStrategy(email, password, done) {
           reason: 'password_mismatch'
         });
 
-        return done();
+        return done(null, null, { reason: "login_failed" });
       }
 
       if(user.passwordResetCode) {
@@ -133,7 +133,7 @@ module.exports = {
     })
   );
 
-    passport.use(new ConfirmStrategy({ name: "accept" }, function(confirmationCode, req, done) {
+  passport.use(new ConfirmStrategy({ name: "accept" }, function(confirmationCode, req, done) {
       var self = this;
       winston.debug("Invoking accept strategy", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
 
@@ -156,7 +156,7 @@ module.exports = {
 
       });
     })
-    );
+  );
 
     passport.use(new ConfirmStrategy({ name: "passwordreset" }, function(confirmationCode, req, done) {
         userService.findAndUsePasswordResetCode(confirmationCode, function(err, user) {
