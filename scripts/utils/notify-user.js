@@ -23,6 +23,6 @@ var opts = require("nomnom")
    })
    .parse();
 
-pushNotificationGateway.sendUserNotification(opts.user, { message: opts.message, sound: opts.sound, payload: { uri: 'rwkut2', app: 'files' } }, function() {
+pushNotificationGateway.sendUserNotification(opts.user, { message: opts.message, sound: opts.sound, payload: { uri: 'txkw2b', page: 'files' } }, function() {
   process.exit();
 });
