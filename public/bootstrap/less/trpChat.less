@@ -45,7 +45,7 @@
   border:1px solid @trpLightGrey;
   color:#333;
 /*  background:#fff;*/
-  background-color: @trpVeryLightGrey;
+  background-color: @trpOffWhite;
   /* css3 */
   -webkit-border-radius:3px;
   -moz-border-radius:3px;
@@ -134,7 +134,7 @@
   bottom:auto;
   left:-9px; /* value = - border-left-width - border-right-width */
   border-width:11px 10px 11px 0;
-  border-color:transparent @trpVeryLightGrey;
+  border-color:transparent @trpOffWhite;
 }
 
 .trpChatBubble.remote:after {
@@ -157,6 +157,35 @@
 
 @media screen and (device-width: 320px) and (orientation: portrait) {
 
+  .trpChatIcon {
+    padding-top: 14px;
+    padding-left: 18px;
+  }
+
+  .trpChatBubble:before {
+    top: 5px;
+  }
+
+  .trpChatBubble:after {
+    top: 6px;
+  }
+
+  .trpChatPictureLocal {
+    padding-right: 10px;
+  }
+
+  .trpDisplayPicture {
+    width: 32px;
+    height: 32px;
+    background-size: 32px 32px;
+  }
+
+  .trpChatBubble {
+    max-width: 170px;
+    margin-bottom: 6px;
+    padding:9px 10px 9px 10px;
+  }
+
   .trpChatContainer {
     max-width: 300px;
   }
@@ -177,7 +206,7 @@
 
   .trpChatBox {
     font-size: 12px;
-    padding: 12px;
+    padding: 20px;
     max-height: 20px;
     background-color: transparent;
     max-width: 210px;
@@ -185,14 +214,8 @@
     margin-top: -4px;
   }
 
-  .trpChatBubble {
-    max-width: 170px;
-    margin-bottom: 6px;
-    padding-left: 20px;
-  }
-
   .trpChatRow {
-    padding-left: 0px;
+    padding-left: 10px;
     max-width: 320px;
     overflow-x: hidden;
   }
@@ -218,7 +241,6 @@
     border-bottom: 1px solid @trpOffWhite;
     height: 30px;
   }
-
 
   .frame-chat {
     max-width: 480px;
