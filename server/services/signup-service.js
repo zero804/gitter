@@ -121,28 +121,51 @@ module.exports = {
 
   resendConfirmation: function(options, callback) {
     winston.info("Resending confirmation ", options);
+    var email = options.email;
 
-    troupeService.findById(options.troupeId, function(err, troupe) {
-      if(err) return callback(err);
+    // This option occurs if the user has possibly lost their session
+    // and is trying to get the confirmation sent at a later stage
+    if(options.email) {
+        userService.findByEmail(email, function(err, user) {
+          if(err || !user) return callback(err, null);
 
-      if(troupe.users.length != 1) {
-        winston.error("A confirmation resent cannot be performed as the troupe has multiple users");
-        return callback("Invalid state");
-      }
+          if(user.status != 'UNCONFIRMED') {
+            return callback("User is not unconfirmed...", null);
+          }
 
+          troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
+            if(err || !troupes.length) return callback(err, null);
 
-      userService.findById(troupe.users[0], function(err, user) {
-        if(err || !user) return callback(err, user);
-        if(user.status != 'UNCONFIRMED') {
-          emailNotificationService.sendConfirmationForExistingUser(user, troupe);
-        } else {
-          emailNotificationService.sendConfirmationForNewUser(user, troupe);
+            // This list should always contain a single value for a new user
+            var troupe = troupes[0];
+            emailNotificationService.sendConfirmationForNewUser(user, troupe);
+            callback(null, troupe.id);
+          });
+        });
+
+    } else {
+      troupeService.findById(options.troupeId, function(err, troupe) {
+        if(err) return callback(err);
+
+        if(troupe.users.length != 1) {
+          winston.error("A confirmation resent cannot be performed as the troupe has multiple users");
+          return callback("Invalid state");
         }
 
-        callback(null, troupe.id);
-      });
 
-    });
+        userService.findById(troupe.users[0], function(err, user) {
+          if(err || !user) return callback(err, user);
+          if(user.status != 'UNCONFIRMED') {
+            emailNotificationService.sendConfirmationForExistingUser(user, troupe);
+          } else {
+            emailNotificationService.sendConfirmationForNewUser(user, troupe);
+          }
+
+          callback(null, troupe.id);
+        });
+
+      });
+    }
   },
 
   /*

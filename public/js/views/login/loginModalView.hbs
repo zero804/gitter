@@ -14,13 +14,17 @@
          <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen signin" id="signin-button">Sign in</button>
         </div>
       </form>
-      <div class="trpModalFailure login-failure" style="display:none">
-        <span class="trpModalTitle"><span class="trpWhite">Login failed.</span></span><br> <a href="#" class="trpModalFailureText">Click here to request a new password.</a>
+      <div class="trpModalFailure login-failure login-message" style="display:none">
+        <span class="trpModalTitle"><span class="trpWhite">Login failed.</span></span><br> <a href="#" class="trpModalFailureText button-request-new-password">Click here to request a new password.</a>
       </div>
-      <div class="trpModalFailure login-failure-account-not-activated" style="display:none">
+      <div class="trpModalFailure login-failure-account-not-activated  login-message" style="display:none">
         <span class="trpModalTitle"><span class="trpWhite">Login failed.</span></span><br>
         <span class="trpModalFailureText">You're account has not yet been activated. Please follow the link from your activation email.</span><br>
-        <a href="" class="trpModalFailureText">Resend confirmation email</a>
+        <a href="#" class="trpModalFailureText button-resend-confirmation">Resend confirmation email</a>
+      </div>
+      <div class="trpModalFailure login-failure-confirmation-resent  login-message" style="display:none">
+        <span class="trpModalTitle"><span class="trpWhite">Confirmation Resent.</span></span><br>
+        <span class="trpModalFailureText">Your confirmation email has been resent. Please remember to check your spam folder if it doesn't arrive.</span><br>
       </div>
 
 </div>

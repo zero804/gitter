@@ -35,10 +35,11 @@ define([
 
     events: {
       "submit form": "onFormSubmit",
-      "click .trpModalFailureText" : "resetClicked",
+      "click .button-request-new-password" : "resetClicked",
       "click #send-reset" : "sendResetClicked",
       "click #go-back" : "backClicked",
-      "click #button-close" : "closeClicked"
+      "click #button-close" : "closeClicked",
+      "click .button-resend-confirmation": "resendConfirmation"
     },
 
     backClicked: function(e) {
@@ -87,8 +88,7 @@ define([
       var form = this.$el.find('form');
       var that = this;
 
-      $('.login-failure-account-not-activated').hide('fast');
-      $('.login-failure').hide('fast');
+      that.$el.find('.login-message').hide('fast');
 
       $.ajax({
         url: "/login",
@@ -102,22 +102,41 @@ define([
               var data = jQuery.parseJSON(jqXHR.responseText);
 
               if(data.reason === "account_not_activated") {
-                $('.login-failure-account-not-activated').show('fast');
+                that.$el.find('.login-failure-account-not-activated').show('fast');
                 return;
               }
             } catch(e) {
             }
           }
-          $('.login-failure').show('fast');
+          that.$el.find('.login-failure').show('fast');
         },
         success: function(data) {
           console.log("Login success");
           if(data.failed) {
-            $('.login-failure').show('fast');
+            that.$el.find('.login-failure').show('fast');
             return;
           }
           that.markUserAsExisting(that.$el.find('#email').val());
           that.trigger('login.complete', data);
+        }
+      });
+    },
+
+    resendConfirmation: function(e) {
+      if(e) e.preventDefault();
+      var form = this.$el.find('form');
+      var that = this;
+
+      that.$el.find('.login-message').hide('fast');
+
+      $.ajax({
+        url: "/resendconfirmation",
+        contentType: "application/x-www-form-urlencoded",
+        dataType: "json",
+        data: form.serialize(),
+        type: "POST",
+        success: function(data) {
+          that.$el.find('.login-failure-confirmation-resent').show('fast');
         }
       });
     }

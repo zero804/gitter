@@ -135,9 +135,10 @@ module.exports = {
       app.post('/resendconfirmation',
         function(req, res, next) {
           signupService.resendConfirmation({
+            email: req.body.email,
             troupeId: req.session.newTroupeId
           }, function(err, id) {
-            /* TODO: better error handling */
+            /* TODO: better error xhandling */
             if(err) return next(err);
 
             if(req.accepts('application/json')) {
