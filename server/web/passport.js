@@ -12,6 +12,7 @@ var BasicStrategy = require('passport-http').BasicStrategy;
 var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
 var BearerStrategy = require('passport-http-bearer').Strategy;
 var oauthService = require('../services/oauth-service');
+var statsService = require("../services/stats-service");
 
 function emailPasswordUserStrategy(email, password, done) {
   winston.debug("Attempting to authenticate ", { email: email });
@@ -20,17 +21,35 @@ function emailPasswordUserStrategy(email, password, done) {
     if(err) return done(err);
     if(!user) {
       winston.warn("Unable to login as email address not found", { email: email });
+
+      statsService.send("login_failed", {
+        email: email,
+        reason: 'email_not_found'
+      });
+
       return done();
     }
 
     if(user.status != 'ACTIVE' && user.status != 'PROFILE_NOT_COMPLETED') {
       winston.warn("User attempted to login but account not yet activated", { email: email });
+
+      statsService.send("login_failed", {
+        email: email,
+        reason: 'account_not_activated'
+      });
+
       return done();
     }
 
     userService.checkPassword(user, password, function(match) {
       if(!match) {
         winston.warn("Login failed. Passwords did not match", { email: email });
+
+        statsService.send("login_failed", {
+          email: email,
+          reason: 'password_mismatch'
+        });
+
         return done();
       }
 
@@ -40,6 +59,10 @@ function emailPasswordUserStrategy(email, password, done) {
         user.passwordResetCode = null;
         user.save();
       }
+
+      statsService.send("user_login", {
+        userId: user.id
+      });
 
       /* Todo: consider using a seperate object for the security user */
       return done(null, user);

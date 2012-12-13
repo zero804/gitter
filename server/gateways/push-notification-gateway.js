@@ -6,29 +6,45 @@ var kue = require('kue'),
     _ = require('underscore'),
     winston = require("winston");
 
+var errorDescriptions = {
+  0: 'No errors encountered',
+  1: 'Processing error',
+  2: 'Missing device token',
+  3: 'Missing topic',
+  4: 'Missing payload',
+  5: 'Invalid token size',
+  6: 'Invalid topic size',
+  7: 'Invalid payload size',
+  8: 'Invalid token',
+  255: 'None (unknown)'
+};
+
 exports.startWorkers = function() {
   var pushNotificationService = require("../services/push-notification-service");
   var nconf = require('../utils/config');
   var apns = require('apn');
 
-  function directSendUserNotification(userIds, message, callback) {
+  function directSendUserNotification(userIds, notification, callback) {
+    var message = notification.message;
+    var sound = notification.sound;
+    var payload = notification.payload;
+
     pushNotificationService.findDevicesForUsers(userIds, function(err, devices) {
       if(err) return callback(err);
 
-      winston.debug("Sending to " + devices.length + " devices for " + userIds.length + " users");
+      winston.debug("Sending to " + devices.length + " potential devices for " + userIds.length + " users");
 
       devices.forEach(function(device) {
-
-        if(device.deviceType === 'APPLE') {
-          winston.info("Sending apple push notification");
+        if(device.deviceType === 'APPLE' && device.appleToken) {
+          winston.info("Sending apple push notification", { notification: notification });
           var note = new apns.Notification();
           note.badge = 0;
+          note.sound = sound;
           note.alert = message;
           note.device = new apns.Device(device.appleToken);
+          note.payload = payload;
 
-          process.nextTick(function() {
-            apnsConnection.sendNotification(note);
-          });
+          apnsConnection.sendNotification(note);
         }
       });
 
@@ -37,7 +53,8 @@ exports.startWorkers = function() {
   }
 
   function errorEventOccurred(err, notification) {
-    winston.error("APN error", { exception: err, notification: notification.payload });
+    var errorDescription = errorDescriptions[err];
+    winston.error("APN error", { exception: err, errorDescription: errorDescription, notification: notification ? notification.payload : null });
   }
 
   winston.info("Starting APN");
@@ -48,10 +65,6 @@ exports.startWorkers = function() {
       enhanced: true,
       errorCallback: errorEventOccurred
   });
-
-  //sendUserNotification('4faae858889d9e0000000003', 'Hello', function(err) {
-  //  if(err) winston.error("Notification error", { exception: err });
-  //});
 
   function failedDeliveryEventOccurred(timeSinceEpoch, deviceToken) {
     winston.error("Failed delivery. Need to remove device", { time: timeSinceEpoch });
@@ -66,17 +79,17 @@ exports.startWorkers = function() {
   });
 
   jobs.process('push-notification', 20, function(job, done) {
-    directSendUserNotification(job.data.userIds, job.data.message, done);
+    directSendUserNotification(job.data.userIds, job.data.notification, done);
   });
 };
 
-exports.sendUserNotification = function(userIds, message) {
+exports.sendUserNotification = function(userIds, notification, callback) {
   if(!Array.isArray(userIds)) userIds = [userIds];
 
   jobs.create('push-notification', {
-    title: message,
+    title: notification.message,
     userIds: userIds,
-    message: message
+    notification: notification
   }).attempts(5)
-    .save();
+    .save(callback);
 };

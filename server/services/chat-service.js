@@ -4,7 +4,8 @@
 var persistence = require("./persistence-service"),
     troupeService = require("./troupe-service"),
     restSerializer = require("../serializers/rest-serializer"),
-    appEvents = require("../app-events"); // TODO: decouple service from socket
+    appEvents = require("../app-events"),
+    statsService = require("./stats-service");
 
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   if(!troupe) return callback("Invalid troupe");
@@ -25,6 +26,10 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
       appEvents.troupeChat(troupe.id, serialized);
     });
 
+    statsService.send("new_chat", {
+      fromUserId: user.id,
+      toTroupeId: troupe.id
+    });
     return callback(null, chatMessage);
   });
 };
