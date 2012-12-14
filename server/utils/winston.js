@@ -4,6 +4,7 @@
 
 var nconf = require('./config');
 var winston = require("winston");
+var _ = require("underscore");
 
 winston.remove(winston.transports.Console);
 winston.add(winston.transports.Console, {
@@ -26,5 +27,24 @@ if(nconf.get("logging:loggly")) {
     inputToken: nconf.get("logging:logglyInputToken")
   });
 }
+
+winston.prefix = function(prefix) {
+  return winston;
+
+  /*
+   TODO: add prefixes, something like this:
+  console.log("PREFIX IS " + prefix);
+  var a = {};
+  _.extend(a, winston, {
+    log: function (level, msg, obj) {
+
+      console.log("LOGGING " + prefix);
+
+      return winston.log(level, prefix + ": " + msg, obj);
+    }
+  });
+  return a;
+  */
+};
 
 module.exports = winston;

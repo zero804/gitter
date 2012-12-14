@@ -48,7 +48,6 @@ define([
     getRenderData: function() { return {}; },
 
     blurChat: function(){
-      console.log("BLURB!");
     },
 
     afterRender: function() {
@@ -71,6 +70,7 @@ define([
       }
     },
 
+/*
     onMessage: function(event, msg) {
       var self = event.data;
       var current = msg.fromUser.id == window.troupeContext.user.id;
@@ -79,6 +79,7 @@ define([
 
       return;
     },
+*/
 
     detectReturn: function(e) {
       if(e.keyCode == 13) {

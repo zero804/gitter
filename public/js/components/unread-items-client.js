@@ -7,11 +7,22 @@ define([
 
   var unreadItemsCountsCache = {};
   var unreadItems = window.troupeContext.unreadItems;
+  var recentlyMarkedRead = {};
+  window.setInterval(function() {
+    var now = Date.now();
+
+    _.keys(recentlyMarkedRead, function(key) {
+      if(now - recentlyMarkedRead[key] > 5000) {
+        console.log("Done with "+ key);
+        delete recentlyMarkedRead[key];
+      }
+    });
+  }, 5000);
 
   function syncCounts() {
     var keys = _.union(_.keys(unreadItemsCountsCache), _.keys(unreadItems));
 
-    keys.forEach(function(k) {
+    _.each(keys, function(k) {
       var value = unreadItemsCountsCache[k];
       var newValue = unreadItems[k] ? unreadItems[k].length : 0;
       if(value !== newValue) {
@@ -27,11 +38,23 @@ define([
 
   var readNotificationQueue = {};
   var timeoutHandle = null;
+
   function markItemRead(itemType, itemId) {
+
+    recentlyMarkedRead[itemType + "/" + itemId] = Date.now();
+
     var a = unreadItems[itemType];
     if(a) {
-      unreadItems[itemType] = _.without(a, itemId);
+      var lengthBefore = a.length;
+      a = _.without(a, itemId);
+      unreadItems[itemType] = a;
+      if(a.length !== lengthBefore - 1) {
+        console.log("Item " + itemType + "/" + itemId + "marked as read, but not found in unread items.");
+      }
+
       syncCounts();
+    } else {
+      console.log("No unread items of type " + itemType + " found.");
     }
 
     if(!readNotificationQueue[itemType]) {
@@ -103,15 +126,24 @@ define([
   });
 
   $(document).on('newUnreadItems', function(event, data) {
+    console.log("newUnreadItems", data);
+
     var itemTypes = _.keys(data);
     _.each(itemTypes, function(itemType) {
       var ids = data[itemType];
 
-      if(!unreadItems[itemType]) {
-        unreadItems[itemType] = ids;
-      } else {
-        unreadItems[itemType] = _.union(unreadItems[itemType], ids);
+      var filtered = _.filter(ids, function(itemId) { return !recentlyMarkedRead[itemType + "/" + itemId]; });
+
+      if(filtered.length < ids.length) {
+        console.log("Some items have been marked as read before they even appeared");
       }
+
+      if(!unreadItems[itemType]) {
+        unreadItems[itemType] = filtered;
+      } else {
+        unreadItems[itemType] = _.union(unreadItems[itemType], filtered);
+      }
+
     });
 
     syncCounts();

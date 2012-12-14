@@ -32,7 +32,6 @@ define([
       now.onNotification = createTrigger('notification');
       now.onMailEvent = createTrigger('mail');
       now.onDataChange = function(message) {
-          console.log("Data change for: " + message.modelName, message);
           $(document).trigger('datachange:' + message.modelName, message);
           $(document).trigger('datachange:*', message);
       };
