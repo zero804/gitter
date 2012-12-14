@@ -105,32 +105,43 @@
       },
 
       onDataChange: function(e, data) {
+        console.log(["onDataChange", e, data]);
         var operation = data.operation;
         var id = data.id;
         var newModel = data.model;
-        var model = this.get(id);
+        var existing = this.get(id);
         var parsed = new this.model(newModel, { parse: true });
 
         switch(operation) {
           case 'create':
           case 'update':
-            if(!model) {
+            if(!existing) {
               if(this.findModelForOptimisticMerge) {
-                model = this.findModelForOptimisticMerge(parsed);
-                if(model) {
-                  this.remove(model);
+                console.log("Looking for a candidate for ", parsed);
+
+                existing = this.findModelForOptimisticMerge(parsed);
+                if(existing) {
+                  console.log("Optimistic merge found candidate");
+                  this.remove(existing);
+                } else {
+                  console.log("Optimistic merge did not find a candidate");
                 }
               }
               this.add(parsed);
             } else {
-              model.set(parsed);
+              this.remove(existing);
+              this.add(parsed);
             }
             break;
 
           case 'remove':
-            if(!model) return;
-            this.remove(model);
+            if(!existing) return;
+            this.remove(existing);
             break;
+
+          default:
+            console.log("Unknown operation " + operation + ", ignoring");
+
         }
       }
     })
