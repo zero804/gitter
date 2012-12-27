@@ -2,7 +2,7 @@
 "use strict";
 
 var PushNotificationDevice = require("./persistence-service").PushNotificationDevice;
-var winston = require("winston");
+var winston = require("winston").prefix("notifications");
 var nconf = require('../utils/config');
 var redis = require("redis"),
     redisClient = redis.createClient();
@@ -11,10 +11,10 @@ var redis = require("redis"),
 var minimumUserAlertIntervalS = nconf.get("notifications:minimumUserAlertInterval");
 
 
-exports.registerAppleDevice = function(deviceId, deviceToken, callback) {
+exports.registerAppleDevice = function(deviceId, deviceToken, deviceName, callback) {
   PushNotificationDevice.findOneAndUpdate(
     { deviceId: deviceId },
-    { deviceId: deviceId, appleToken: deviceToken, deviceType: 'APPLE', timestamp: new Date() },
+    { deviceId: deviceId, appleToken: deviceToken, deviceType: 'APPLE', deviceName: deviceName, timestamp: new Date() },
     { upsert: true },
     callback);
 };

@@ -44,7 +44,6 @@ function doRecalculationWork() {
 }
 
 appEvents.onUnreadRecalcRequired(function() {
-  winston.info("onUnreadRecalcRequired");
   doRecalculationWork();
 });
 
@@ -52,10 +51,9 @@ function publishRecountNotification() {
   appEvents.unreadRecalcRequired();
 }
 
-function newItem(troupeId, itemType, itemId) {
+function newItem(troupeId, creatorUserId, itemType, itemId) {
   troupeService.findById(troupeId, function(err, troupe) {
     if(err) return winston.error("Unable to load troupeId " + troupeId, err);
-
     var userIds = troupe.users;
 
     var data = {};
@@ -63,20 +61,19 @@ function newItem(troupeId, itemType, itemId) {
 
       // multi chain with an individual callback
     var multi = redisClient.multi();
-    var m2 = redisClient.multi();
     userIds.forEach(function(userId) {
-      appEvents.newUnreadItem(userId, troupeId, data);
+      if(!creatorUserId || userId != creatorUserId) {
+        appEvents.newUnreadItem(userId, troupeId, data);
 
-      multi.sadd("unread:" + itemType + ":" + userId + ":" + troupeId, itemId);
+        multi.sadd("unread:" + itemType + ":" + userId + ":" + troupeId, itemId);
+      } else{
+        winston.info("Not sending to " + userId, creatorUserId);
+      }
     });
 
     multi.exec(function(err, replies) {
       if(err) winston.error("unreadItemService.newItem failed", err);
-      m2.exec(function(err, replies) {
-        if(err) return winston.error(err);
-
-        publishRecountNotification();
-      });
+      publishRecountNotification();
     });
 
   });
@@ -214,6 +211,26 @@ function getUnreadItemsForUser(userId, troupeId, callback) {
   });
 }
 
+/* TODO: make this better, more OO-ey */
+function findCreatingUserIdModel(modelName, model) {
+
+  switch(modelName) {
+    case "file":
+      return model.versions[model.versions.length - 1].creatorUserId;
+
+    case "chat":
+      return model.fromUserId;
+
+    case "invite":
+    case "request":
+      return null;
+
+    default:
+      winston.warn("unread-items: unknown model type", { modelName: modelName });
+      return null;
+  }
+}
+
 module.exports = {
   newItem: newItem,
   removeItem: removeItem,
@@ -232,9 +249,11 @@ module.exports = {
         var operation = data.operation;
         var model = data.model;
 
-        if((modelName === 'file' || modelName === 'chat' || modelName === 'invite' || modelName === 'request')) {
+        if(DEFAULT_ITEM_TYPES.indexOf(modelName) >= 0) {
           if(operation === 'create') {
-            newItem(troupeId, modelName, modelId);
+            var creatingUserId = findCreatingUserIdModel(modelName, model);
+
+            newItem(troupeId, creatingUserId, modelName, modelId);
           } else if(operation === 'remove') {
             removeItem(troupeId, modelName, modelId);
           }

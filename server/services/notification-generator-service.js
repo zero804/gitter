@@ -2,7 +2,7 @@
 "use strict";
 
 var appEvents = require("../app-events");
-var winston = require("winston");
+var winston = require("winston").prefix("notification-gen: ");
 var pushNotificationService = require("./push-notification-service");
 var nconf = require('../utils/config');
 var Q = require("q");
@@ -250,6 +250,10 @@ exports.startWorkers = function() {
 
       /* Ignore any notifications for users who've received a notification in the last 10 seconds */
       notifications = notifications.filter(function(notification) { return userIdsHash[notification.userId]; });
+      if(!notifications.length) {
+        winston.info("spoolQueuedNotifications: everyone has been notified already");
+        return callback();
+      }
 
       var notificationTypeHash = hashNotificationsByType(notifications);
 
@@ -269,6 +273,9 @@ exports.startWorkers = function() {
           hashKeys.forEach(function(itemType, i) {
             var ids = notificationTypeHash[itemType];
             var results = concatenatedResults[i];
+            if(!results) {
+              console.dir(concatenatedResults);
+            }
             results.forEach(function(result, j) {
               var itemId = ids[j];
               resultHash[itemType + ":" + itemId] = result;
@@ -302,7 +309,6 @@ exports.startWorkers = function() {
   }
 
   jobs.process('delayed-notification', 20, function(job, done) {
-    winston.info("Incoming job", { data: job.data });
     spoolQueuedNotifications(job.data.notifications, done);
   });
 
