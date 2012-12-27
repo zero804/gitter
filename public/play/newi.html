@@ -7,6 +7,8 @@
 
 <body>
 
+<div class="left-menu-hotspot" id="left-menu-hotspot"></div>
+
 <div class="leftmenu" id="left-menu">
 	<ul>
 		<li>Souper Troupers</li>
@@ -81,51 +83,70 @@
 
 var leftmenu = false;
 
+function hideMenu() {
+    console.log("Showing menu");
+    $("#left-menu").animate({
+      left: '-280px'
+    }, 250, function() {
+      // $("#left-menu").hide();
+    });
+    $("#menu-toggle-button").animate({
+      left: '0px'
+    }, 250, function() {
+
+    });
+    $("#content-frame").animate({
+      marginLeft: '0px'
+    }, 250, function() {
+      
+    });
+    leftmenu = false;
+}
+
+function showMenu() {
+  console.log("animating left menu");
+    $("#left-menu").animate({
+      left: '0px'
+    }, 250, function() {
+      // $("#left-menu").show();
+    });
+    $("#menu-toggle-button").animate({
+      left: '280px'
+    }, 250, function() {
+    });
+    $("#content-frame").animate({
+      marginLeft: '280px'
+    }, 250, function() {
+      
+    });
+    leftmenu = true;
+}
+
+
+function toggleMenu() {
+  if (leftmenu) {
+    console.log("animating left menu");
+    hideMenu();
+
+  } else
+  {
+    showMenu();
+  }
+}
 
 $("#menu-toggle").click(function() {
-
-	if (leftmenu) {
-		console.log("animating left menu");
-		$("#left-menu").animate({
-			left: '-280px'
-		}, 250, function() {
-			// $("#left-menu").hide();
-		});
-		$("#menu-toggle-button").animate({
-			left: '0px'
-		}, 250, function() {
-
-		});
-		$("#content-frame").animate({
-			marginLeft: '0px'
-		}, 250, function() {
-			
-		});
-		leftmenu = false;
-		$("#hide-left").attr('value','->');
-	} else
-	{
-		console.log("animating left menu");
-		$("#left-menu").animate({
-			left: '0px'
-		}, 250, function() {
-			// $("#left-menu").show();
-		});
-		$("#menu-toggle-button").animate({
-			left: '280px'
-		}, 250, function() {
-		});
-		$("#content-frame").animate({
-			marginLeft: '280px'
-		}, 250, function() {
-			
-		});
-		leftmenu = true;
-		$("#hide-left").attr('value','<-');
-
-	}
+  toggleMenu();
 });
 
+$("#left-menu-hotspot").mouseenter(function() {
+  console.log("HOVER");
+  showMenu();
+});
+
+$("#left-menu").mouseleave(function() {
+  console.log("mouseout");
+  hideMenu();
+});
 
 </script>
 
