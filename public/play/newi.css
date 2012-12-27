@@ -1,5 +1,6 @@
 body {
 	margin: 0;
+	background-color: #ecf1ec;
 }
 
 @font-face {
@@ -31,7 +32,7 @@ li {
 
 .leftmenu {
 	font-family: 'StagSansWeb-Light';
-	position: absolute;
+	position: fixed;
 	width: 280px;
 	left: -280px;
 	top: 0px;
@@ -45,7 +46,7 @@ li {
 
 
 .content {
-	background-color: #f9f7f7;
+	background-color: #ecf1ec;
 	margin-left: 0px;
 	height: 100%;
 	text-align: center;
@@ -63,7 +64,7 @@ li {
 	text-align: left;
 	font-family: 'StagSansWeb-Light';
 	font-size: 24px;
-	font-color: #2b2b2b;
+	color: #333;
 	padding-top: 14px;
 }
 
@@ -115,10 +116,12 @@ li {
 	min-height: 48px;
 	vertical-align: top;
 	width: 380px;
+	max-width: 400px;
 	border-radius: 0px 5px 5px 0px;
 	font-family: 'Open Sans';
 	font-size: 14px;
-	padding: 10px;
+	padding: 12px;
+	line-height: 150%;
 }
 
 .inputboxtextarea {
