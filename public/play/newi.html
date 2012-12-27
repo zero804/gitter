@@ -26,7 +26,7 @@
 	<div class="header">
 		<div class="header-content">Souper Troupers</div>
 	</div>
-	<div class="chatframe">
+	<div class="chatframe" id="chat-frame">
 		<div class="chat-input">
 			<div class="chat-input-display-picture" style="background-image: url('dude.jpg')"></div><div class="inputbox"><textarea class="inputboxtextarea" placeholder="Click here to say something."></textarea></div>
 		</div>
@@ -84,11 +84,11 @@
 var leftmenu = false;
 
 function hideMenu() {
-    console.log("Showing menu");
+    console.log("Hiding menu");
     $("#left-menu").animate({
       left: '-280px'
     }, 250, function() {
-      // $("#left-menu").hide();
+      $("left-menu-hotspot").show();
     });
     $("#menu-toggle-button").animate({
       left: '0px'
@@ -104,22 +104,25 @@ function hideMenu() {
 }
 
 function showMenu() {
-  console.log("animating left menu");
-    $("#left-menu").animate({
-      left: '0px'
-    }, 250, function() {
-      // $("#left-menu").show();
-    });
-    $("#menu-toggle-button").animate({
-      left: '280px'
-    }, 250, function() {
-    });
-    $("#content-frame").animate({
-      marginLeft: '280px'
-    }, 250, function() {
-      
-    });
-    leftmenu = true;
+
+    if (!leftmenu) {
+      console.log("Showing menu");
+      $("#left-menu").animate({
+        left: '0px'
+      }, 250, function() {
+        // $("#left-menu").show();
+      });
+      $("#menu-toggle-button").animate({
+        left: '280px'
+      }, 250, function() {
+      });
+      $("#content-frame").animate({
+        marginLeft: '280px'
+      }, 250, function() {  
+      });
+      $("left-menu-hotspot").hide();
+      leftmenu = true;
+    }
 }
 
 
@@ -139,12 +142,12 @@ $("#menu-toggle").click(function() {
 });
 
 $("#left-menu-hotspot").mouseenter(function() {
-  console.log("HOVER");
+  console.log("hotspot activated");
   showMenu();
 });
 
-$("#left-menu").mouseleave(function() {
-  console.log("mouseout");
+$("#chat-frame").mouseenter(function() {
+  console.log("mouse left the menu");
   hideMenu();
 });
 
