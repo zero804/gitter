@@ -17,12 +17,9 @@ define([
     },
 
     events: {
-      //"click .trpPersonRemove": "removeUser"
     },
 
     updateNotificationValue: function(value) {
-      console.log("updateNotificationValue: ", value);
-
       var c = value > 0 ? value : 0;
 
       this.notificationCount.text(c ? c : "");

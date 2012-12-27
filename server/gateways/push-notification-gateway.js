@@ -70,7 +70,11 @@ exports.startWorkers = function() {
 
   function errorEventOccurred(err, notification) {
     var errorDescription = errorDescriptions[err];
-    winston.error("APN error", { exception: err, errorDescription: errorDescription, notification: notification ? notification.payload : null });
+    winston.error("APN error", {
+      exception: err,
+      errorDescription: errorDescription,
+      notification: notification ? notification.payload : null
+    });
   }
 
   winston.info("Starting APN");

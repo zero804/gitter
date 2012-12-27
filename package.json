@@ -52,7 +52,8 @@
     "apn": "~1.2.4",
     "kue": "~0.5.0",
     "file": "~0.2.1",
-    "cube": "~0.2.4"
+    "cube": "~0.2.4",
+    "nomnom": "~1.5.2"
   },
   "devDependencies": {
     "better-assert": "~0.1.0",
