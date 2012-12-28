@@ -1,6 +1,6 @@
 body {
 	margin: 0;
-	background-color: #ecf1ec;
+	background-color: white;
 }
 
 @font-face {
@@ -44,6 +44,22 @@ li {
 	z-index: 12;
 }
 
+.rightpanel {
+	font-family: 'StagSansWeb-Light';
+	position: absolute;
+	width: 280px;
+	right: -280px;
+	top: 60px;
+	height: 100%;
+	overflow: hidden;
+	color: white;
+	font-size: 20px;
+	z-index: 12;
+	background-color: #ecf1ec;
+	padding-top: 40px;
+}
+
+
 
 .content {
 	background-color: #ecf1ec;
@@ -56,6 +72,7 @@ li {
 	width: 100%;
 	height: 60px;
 	background-color: white;
+	border-bottom: 0px solid #1dce73;
 }
 
 .header-content {
@@ -113,11 +130,11 @@ li {
 .chatbox {
 	background-color: white;
 	display: inline-block;
-	min-height: 48px;
+	min-height: 24px;
 	vertical-align: top;
 	width: 380px;
 	max-width: 400px;
-	border-radius: 0px 5px 5px 0px;
+	border-radius: 0px 5px 5px 5px;
 	font-family: 'Open Sans';
 	font-size: 14px;
 	padding: 12px;

@@ -32,6 +32,9 @@
 		</div>
     <div class="chat-content">
       <div class="chat-item">
+        <div class="chat-input-display-picture" style="background-image: url('mike.png')"></div><div class="chatbox">awesome</div>
+      </div>
+      <div class="chat-item">
         <div class="chat-input-display-picture" style="background-image: url('andrew.png')"></div><div class="chatbox">looking great richard, the only one i wanted to discuss was the navigation menu, technically it's quite difficult to do, especially with older browser versions</div>
       </div>
       <div class="chat-item">
@@ -79,25 +82,67 @@
 	</div>
 </div>
 
+<div class="rightpanel" id="right-panel">
+  <div class="image-preview" id="image-preview">
+    <img src="images/big surfer.jpg" width="240" height="240">
+  </div>
+</div>
+
 <script>
 
 var leftmenu = false;
+var rightpanel = false;
+
+function hidePanel() {
+    console.log("Hiding panel");
+    $("#right-panel").animate({
+      right: '-280px'
+    }, 350, function() {
+
+    });
+
+    $("#content-frame").animate({
+      marginRight: '0px'
+    }, 350, function() {
+      
+    });
+    rightpanel = false;
+}
+
+function showPanel() {
+
+    if (!rightpanel) {
+      console.log("Showing panel");
+      $("#right-panel").animate({
+        right: '0px'
+      }, 350, function() {
+        // $("#left-menu").show();
+      });
+
+      $("#content-frame").animate({
+        marginRight: '280px'
+      }, 350, function() {  
+      });
+
+      rightpanel = true;
+    }
+}
 
 function hideMenu() {
     console.log("Hiding menu");
     $("#left-menu").animate({
       left: '-280px'
-    }, 250, function() {
+    }, 350, function() {
       $("left-menu-hotspot").show();
     });
     $("#menu-toggle-button").animate({
       left: '0px'
-    }, 250, function() {
+    }, 350, function() {
 
     });
     $("#content-frame").animate({
       marginLeft: '0px'
-    }, 250, function() {
+    }, 350, function() {
       
     });
     leftmenu = false;
@@ -109,16 +154,16 @@ function showMenu() {
       console.log("Showing menu");
       $("#left-menu").animate({
         left: '0px'
-      }, 250, function() {
+      }, 350, function() {
         // $("#left-menu").show();
       });
       $("#menu-toggle-button").animate({
         left: '280px'
-      }, 250, function() {
+      }, 350, function() {
       });
       $("#content-frame").animate({
         marginLeft: '280px'
-      }, 250, function() {  
+      }, 350, function() {  
       });
       $("left-menu-hotspot").hide();
       leftmenu = true;
@@ -128,12 +173,21 @@ function showMenu() {
 
 function toggleMenu() {
   if (leftmenu) {
-    console.log("animating left menu");
     hideMenu();
 
   } else
   {
     showMenu();
+  }
+}
+
+function togglePanel() {
+  if (rightpanel) {
+    hidePanel();
+
+  } else
+  {
+    showPanel();
   }
 }
 
@@ -149,6 +203,17 @@ $("#left-menu-hotspot").mouseenter(function() {
 $("#chat-frame").mouseenter(function() {
   console.log("mouse left the menu");
   hideMenu();
+});
+
+
+$(".thumbnail").click(function() {
+  console.log("click on thumbnail");
+  togglePanel();
+});
+
+$("#image-preview").click(function() {
+  console.log("click on preview");
+  hidePanel();
 });
 
 </script>
