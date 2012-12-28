@@ -98,7 +98,7 @@ function hidePanel() {
     $("#right-panel").animate({
       right: '-280px'
     }, 350, function() {
-
+        $("#right-panel").hide();
     });
 
     $("#content-frame").animate({
@@ -113,6 +113,7 @@ function showPanel() {
 
     if (!rightpanel) {
       console.log("Showing panel");
+      $("#right-panel").show();
       $("#right-panel").animate({
         right: '0px'
       }, 350, function() {
