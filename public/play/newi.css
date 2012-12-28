@@ -1,6 +1,7 @@
 body {
 	margin: 0;
 	background-color: white;
+	overflow-x: hidden;
 }
 
 @font-face {
@@ -57,6 +58,7 @@ li {
 	z-index: 12;
 	background-color: #ecf1ec;
 	padding-top: 40px;
+	display: none;
 }
 
 
