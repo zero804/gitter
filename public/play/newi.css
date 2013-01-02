@@ -43,6 +43,7 @@ li {
 	color: white;
 	font-size: 20px;
 	z-index: 12;
+	border-right: 2px solid #1dce73;
 }
 
 .rightpanel {
@@ -79,12 +80,44 @@ li {
 
 .header-content {
 	display: inline-block;
-	min-width: 700px;
+	min-width: 500px;
 	text-align: left;
 	font-family: 'StagSansWeb-Light';
+/*	font-family: 'Open Sans';*/
 	font-size: 24px;
 	color: #333;
 	padding-top: 14px;
+}
+
+.header-toolbar {
+	display: inline-block;
+	min-width: 200px;
+	height: 60px;
+	vertical-align: top;
+	text-align: left;
+}
+
+.settings-button {
+	display: inline-block;
+	padding-top: 14px;
+	border-top: 2px solid #1dce73;
+	margin: 0;
+}
+
+.profile-button {
+	display: inline-block;
+	padding-top: 14px;
+	padding-left: 12px;
+	border-top: 2px solid #1dce73;
+	margin: 0;
+}
+
+.display-picture-profile {
+	display: inline-block;
+	border-radius: 50em;
+	width: 24px;
+	height: 24px;
+	background-size: contain;
 }
 
 
@@ -100,14 +133,16 @@ li {
 .chat-input-display-picture {
 	height: 48px;
 	width: 48px;
-	border-radius: 5px 0px 0px 5px;
+/*	border-radius: 5px 0px 0px 5px;*/
+	border-radius: 50em;
 	display: inline-block;
 }
 
 .display-picture {
 	height: 48px;
 	width: 48px;
-	border-radius: 5px 5px 5px 5px;
+/*	border-radius: 5px 5px 5px 5px;*/
+	border-radius: 50em;
 	display: inline-block;
 	opacity: 0.8;
 }
@@ -118,7 +153,8 @@ li {
 	height: 48px;
 	vertical-align: top;
 	width: 400px;
-	border-radius: 0px 5px 5px 0px;
+	border-radius: 5px 5px 5px 5px;
+	margin-left: 12px;
 }
 
 .chat-content {
@@ -136,11 +172,12 @@ li {
 	vertical-align: top;
 	width: 380px;
 	max-width: 400px;
-	border-radius: 0px 5px 5px 5px;
+	border-radius: 5px 5px 5px 5px;
 	font-family: 'Open Sans';
 	font-size: 14px;
 	padding: 12px;
 	line-height: 150%;
+	margin-left: 12px;
 }
 
 .inputboxtextarea {
@@ -185,12 +222,42 @@ textarea {
 }
 
 .mail-item-picture {
-	width: 32px;
-	height: 32px;
-	border-radius: 2px;
+	width: 16px;
+	height: 16px;
+/*	border-radius: 2px;*/
+/*	border-radius: 50em;*/
 	display: inline-block;
-	background-size: contain;
-/*	border: 1px solid ddd;*/
+	opacity: 0.8;
+}
+
+.image-container {
+	display: inline-block;
+}
+
+.image-close {
+	position: absolute;
+	display: inline-block;
+	top: 40px;
+	right: 40px;
+	background-color: #1dce73;
+	width: 12px;
+}
+
+.image-details {
+	padding: 8px 0 8px 0;
+	font-family: 'Open Sans';
+	font-size: 14px;
+	color: #333;
+	display: inline-block;
+	width: 224px;
+}
+
+.button-green {
+	margin-top: 12px;
+	padding: 12px;
+	background-color: #1dce73;
+	color: white;
+	width: 216px;
 }
 
 .mail-item {
@@ -202,18 +269,19 @@ textarea {
 	font-family: 'Open Sans';
 	font-size: 12px;
 	vertical-align: top;
-	padding-top: 5px;
 	padding-left: 5px;
-	max-width: 158px;
+	max-width: 180px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+
 }
 
 .menutoggle {
 	position: fixed;
 	left: 0px;
 	top: 100px;
+	background-color: #1dce73;
 }
 
 
