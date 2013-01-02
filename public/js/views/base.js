@@ -557,12 +557,20 @@ define([
     onCollectionRemove: function(item) {
       console.log("onCollectionRemove", item);
 
-      var id = item.get('id');
-      if(!id) id= item.cid;
+      var cid = item.cid;
+      if(cid) {
+        this.$el.find('.model-id-' + cid).each(function(index, item) {
+          if(item._view) item._view.remove();
+        });
+      } else {
+        var id = item.id;
+        if(id) {
+          this.$el.find('.model-id-' + id).each(function(index, item) {
+            if(item._view) item._view.remove();
+          });
+        }
 
-      this.$el.find('.model-id-' + id).each(function(index, item) {
-        if(item._view) item._view.remove();
-      });
+      }
       this.checkForNoItems();
     }
 

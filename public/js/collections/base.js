@@ -104,39 +104,53 @@
         $(document).unbind('datachange:' + this.modelName, this.onDataChange);
       },
 
+      findExistingModel: function(id, newModel) {
+        var existing = this.get(id);
+        if(existing) return existing;
+
+        if(this.findModelForOptimisticMerge) {
+          console.log("Looking for a candidate for ", newModel);
+
+          existing = this.findModelForOptimisticMerge(newModel);
+        }
+
+        return existing;
+      },
+
       onDataChange: function(e, data) {
-        console.log(["onDataChange", e, data]);
+        console.log(["onDataChange", {
+          operation: data.operation,
+          id: data.id
+        }]);
+
         var operation = data.operation;
         var id = data.id;
         var newModel = data.model;
-        var existing = this.get(id);
         var parsed = new this.model(newModel, { parse: true });
+
+        console.log("WARNING: as collection stands: ", this.toJSON());
+
+        var existing = this.findExistingModel(id, parsed);
 
         switch(operation) {
           case 'create':
           case 'update':
-            if(!existing) {
-              if(this.findModelForOptimisticMerge) {
-                console.log("Looking for a candidate for ", parsed);
-
-                existing = this.findModelForOptimisticMerge(parsed);
-                if(existing) {
-                  console.log("Optimistic merge found candidate");
-                  this.remove(existing);
-                } else {
-                  console.log("Optimistic merge did not find a candidate");
-                }
-              }
-              this.add(parsed);
-            } else {
+            if(existing) {
+              var l = this.length;
               this.remove(existing);
-              this.add(parsed);
+              if(this.length !== l - 1) {
+                console.log("Nothing was deleted. This is a problem.");
+              }
             }
+
+            this.add(parsed);
             break;
 
           case 'remove':
-            if(!existing) return;
-            this.remove(existing);
+            if(existing) {
+              this.remove(existing);
+            }
+
             break;
 
           default:
