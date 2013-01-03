@@ -7,8 +7,10 @@ require([
   'views/chat/chatView',
   'views/file/fileView',
   'views/conversation/conversationView',
-  'utils/vent'
-], function($, _, Backbone, Marionette, AppIntegratedView, ChatView, FileView, ConversationView, vent) {
+  'utils/vent',
+  'collections/files'
+
+], function($, _, Backbone, Marionette, AppIntegratedView, ChatView, FileView, ConversationView, vent, fileModels) {
   /*jslint browser: true*/
   /*global require */
   "use strict";
@@ -20,7 +22,8 @@ require([
     peopleRosterRegion: "#people-roster",
     fileRegion: "#file-list",
     mailRegion: "#mail-list",
-    rightPanelRegion: "#right-panel"
+    rightPanelRegion: "#right-panel",
+    modalRegion: "#modal-panel"
   });
 
   var appView = new AppIntegratedView();
@@ -31,6 +34,7 @@ require([
 
     doStuff: function(){
       this.trigger("stuff:done", this.stuff);
+
     }
   });
 
@@ -46,17 +50,23 @@ require([
     var chatView = new ChatView();
     app.chatRegion.show(chatView);
 
-    //var fileView = new FileView();
-    //app.fileRegion.show(fileView);
+    var fileCollection = new fileModels.FileCollection();
+    fileCollection.listen();
+    fileCollection.fetch();
 
-    var conversationView = new ConversationView();
-    app.mailRegion.show(conversationView);
+    var fileView = new FileView({
+      collection: fileCollection
+    });
+    app.fileRegion.show(fileView);
+
+    //var conversationView = new ConversationView();
+    //app.mailRegion.show(conversationView);
 
   });
 
   var router;
   app.on("initialize:after", function(){
-    new Router({
+    router = new Router({
       controller: controller
     });
 
