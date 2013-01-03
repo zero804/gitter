@@ -18,8 +18,8 @@ define([
       "click #menu-toggle":             "onMenuToggle",
       "mouseenter #left-menu-hotspot":  "onLeftMenuHotspot",
       "mouseenter #chat-frame":         "onMouseEnterChatFrame",
-      "mouseenter #header-frame":       "onMouseEnterHeader",
-      "mouseleave #header-frame":       "onMouseLeaveHeader"
+      "mouseenter #header-wrapper":       "onMouseEnterHeader",
+      "mouseleave #header-wrapper":       "onMouseLeaveHeader"
     },
 
     initialize: function() {
