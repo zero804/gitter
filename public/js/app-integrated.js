@@ -3,8 +3,10 @@ require([
   'underscore',
   'backbone',
   'marionette',
-  'views/chat/chatView'
-], function($, _, Backbone, Marionette, ChatView) {
+  'views/chat/chatView',
+  'views/file/fileView',
+  'views/conversation/conversationView'
+], function($, _, Backbone, Marionette, ChatView, FileView, ConversationView) {
   /*jslint browser: true*/
   /*global require */
   "use strict";
@@ -18,6 +20,7 @@ require([
     mailRegion: "#mail-list",
     rightPanelRegion: "#right-panel"
   });
+
 
   var Controller = Marionette.Controller.extend({
     initialize: function(options){
@@ -36,13 +39,25 @@ require([
     }
   });
 
-  var router = new Router({
-    controller: controller
-  });
-
   app.addInitializer(function(options){
     var chatView = new ChatView();
     app.chatRegion.show(chatView);
+
+    //var fileView = new FileView();
+    //app.fileRegion.show(fileView);
+
+    var conversationView = new ConversationView();
+    app.mailRegion.show(conversationView);
+
+  });
+
+  app.on("initialize:after", function(){
+    var router = new Router({
+      controller: controller
+    });
+
+    router.initialize();
+    Backbone.history.start();
   });
 
   // Asynchronously load tracker
