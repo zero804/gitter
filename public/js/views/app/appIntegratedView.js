@@ -13,10 +13,13 @@ define([
     el: 'body',
     leftmenu: false,
     rightpanel: false,
+    profilemenu: false,
     events: {
       "click #menu-toggle":             "onMenuToggle",
       "mouseenter #left-menu-hotspot":  "onLeftMenuHotspot",
-      "mouseenter #chat-frame":         "onMouseEnterChatFrame"
+      "mouseenter #chat-frame":         "onMouseEnterChatFrame",
+      "mouseenter #header-frame":       "onMouseEnterHeader",
+      "mouseleave #header-frame":       "onMouseLeaveHeader"
     },
 
     initialize: function() {
@@ -24,6 +27,27 @@ define([
       vent.on("detailView:show", function() {
         self.showPanel("#right-panel");
       });
+    },
+
+    showProfileMenu: function() {
+      if (!this.profilemenu) {
+        console.log("Animating profile menu");
+        $(".trpProfileMenu").animate({
+            width: '120px'
+        }, 250);
+        this.profilemenu = true;
+      }
+    },
+
+
+    hideProfileMenu: function() {
+      if (this.profilemenu) {
+        console.log("Hiding profile menu");
+        $(".trpProfileMenu").animate({
+            width: '0px'
+        }, 250);
+        this.profilemenu = false;
+      }
     },
 
     hidePanel: function (whichPanel) {
@@ -142,13 +166,19 @@ define([
     },
 
     onLeftMenuHotspot: function() {
-      console.log("hotspot activated");
       this.showMenu();
     },
 
     onMouseEnterChatFrame: function() {
-      console.log("mouse left the menu");
       this.hideMenu();
+    },
+
+    onMouseEnterHeader: function() {
+      this.showProfileMenu();
+    },
+
+    onMouseLeaveHeader: function() {
+      this.hideProfileMenu();
     }
   });
 });
