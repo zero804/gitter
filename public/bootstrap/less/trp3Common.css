@@ -3,3 +3,10 @@
   width: 48px;
   border-radius: 50em;
 }
+.trpButtonGreen {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #1dce73;
+  color: white;
+  width: 216px;
+}
