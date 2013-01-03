@@ -3,10 +3,12 @@ require([
   'underscore',
   'backbone',
   'marionette',
+  'views/app/appIntegratedView',
   'views/chat/chatView',
   'views/file/fileView',
-  'views/conversation/conversationView'
-], function($, _, Backbone, Marionette, ChatView, FileView, ConversationView) {
+  'views/conversation/conversationView',
+  'utils/vent'
+], function($, _, Backbone, Marionette, AppIntegratedView, ChatView, FileView, ConversationView, vent) {
   /*jslint browser: true*/
   /*global require */
   "use strict";
@@ -21,6 +23,7 @@ require([
     rightPanelRegion: "#right-panel"
   });
 
+  var appView = new AppIntegratedView();
 
   var Controller = Marionette.Controller.extend({
     initialize: function(options){
@@ -58,6 +61,10 @@ require([
 
     router.initialize();
     Backbone.history.start();
+  });
+
+  vent.on("conversation:view", function(model) {
+    window.alert("Conversation view: " + model.id);
   });
 
   // Asynchronously load tracker

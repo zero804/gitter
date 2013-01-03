@@ -4,8 +4,9 @@ define([
   'underscore',
   'backbone',
   'views/base',
+  'utils/vent',
   'hbs!views/conversation/conversationItemView'
-], function($, _, Backbone, TroupeViews, template) {
+], function($, _, Backbone, TroupeViews, vent, template) {
   "use strict";
 
   var ConversationItemView = TroupeViews.Base.extend({
@@ -29,7 +30,8 @@ define([
 
     showEmail: function(e) {
       e.preventDefault();
-      window.troupeApp.navigate("mail/" + this.model.get('id'), {trigger: true});
+      vent.trigger("conversation:view", this.model);
+      //window.troupeApp.navigate("mail/" + this.model.get('id'), {trigger: true});
     }
 
   });
