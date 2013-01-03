@@ -36,9 +36,9 @@ define([
     },
 
     events: {
-      "keydown .trpChatBox":          "detectReturn",
-      "focusout .trpChatBox": "send",
-      "blur .trpChatBox" : "blurChat"
+      "keydown #chat-input":          "detectReturn",
+      "focusout #chat-input": "send",
+      "blur #chat-input" : "blurChat"
     },
 
     beforeClose: function() {
@@ -88,7 +88,7 @@ define([
     },
 
     send: function() {
-      var chatBox = $(".trpChatBox");
+      var chatBox = $("#chat-input");
       var val = chatBox.val().trim();
       if(val) {
         this.collection.create({
