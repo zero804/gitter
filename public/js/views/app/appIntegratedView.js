@@ -37,6 +37,11 @@ define([
         marginRight: '0px'
       }, 350, function() {
 
+      $("#header-frame").animate({
+        marginRight: '0px'
+      }, 350, function() {
+      });
+
       });
       this.rightpanel = false;
     },
@@ -48,49 +53,19 @@ define([
           right: '0px'
         }, 350, function() {
       // $("#left-menu").show();
-    });
+        });
 
         $("#content-frame").animate({
           marginRight: '280px'
         }, 350, function() {
         });
 
+        $("#header-frame").animate({
+          marginRight: '280px'
+        }, 350, function() {
+        });
+
         this.rightpanel = true;
-      }
-    },
-
-    hideMenu: function() {
-      $("#left-menu").animate({
-        left: '-280px'
-      }, 350, function() {
-        $("left-menu-hotspot").show();
-      });
-      $("#menu-toggle-button").animate({
-        left: '0px'
-      }, 350, function() {
-
-      });
-      $("#content-frame").animate({
-        marginLeft: '0px'
-      }, 350, function() {
-
-      });
-      this.leftmenu = false;
-    },
-
-    togglePanel: function(whichPanel) {
-      if (this.rightpanel) {
-        this.hidePanel(whichPanel);
-      } else {
-        this.showPanel(whichPanel);
-      }
-    },
-
-    toggleMenu: function() {
-      if (this.leftmenu) {
-        this.hideMenu();
-      } else {
-        this.showMenu();
       }
     },
 
@@ -112,8 +87,54 @@ define([
         marginLeft: '280px'
       }, 350);
 
+      $("#header-frame").animate({
+        marginLeft: '280px'
+      }, 350);
+
       $("left-menu-hotspot").hide();
       this.leftmenu = true;
+    },
+
+    hideMenu: function() {
+      $("#left-menu").animate({
+        left: '-280px'
+      }, 350, function() {
+        $("left-menu-hotspot").show();
+      });
+
+      $("#menu-toggle-button").animate({
+        left: '0px'
+      }, 350, function() {
+
+      });
+
+      $("#content-frame").animate({
+        marginLeft: '0px'
+      }, 350, function() {
+      });
+
+      $("#header-frame").animate({
+        marginLeft: '0px'
+      }, 350, function() {
+      });
+
+      this.leftmenu = false;
+    },
+
+    togglePanel: function(whichPanel) {
+      if (this.rightpanel) {
+        this.hidePanel(whichPanel);
+      } else {
+        this.showPanel(whichPanel);
+      }
+    },
+
+    toggleMenu: function() {
+      if (this.leftmenu) {
+        this.hideMenu();
+      } else {
+        this.showMenu();
+      }
     },
 
     onMenuToggle: function() {
