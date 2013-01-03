@@ -130,7 +130,7 @@ module.exports = {
         if(req.headers['user-agent'].indexOf('Mobile') >= 0) {
           page = 'app-mobile';
         } else {
-          page = 'app';
+          page = 'app-integrated';
         }
 
         renderAppPage(req, res, next, page);
