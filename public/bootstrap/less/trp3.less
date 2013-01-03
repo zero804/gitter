@@ -8,6 +8,10 @@ div {
 	display: inline-block;
 }
 
+a {
+	text-decoration: none;
+}
+
 @import "trpColours.less";
 @import "trpWebFonts.less";
 @import "trpFonts.less";
@@ -103,6 +107,32 @@ div {
 	padding-left: 12px;
 	border-top: 2px solid @trpGreen;
 	margin: 0;
+}
+
+.trpProfileMenu {
+	font-family: 'Open Sans';
+	font-size: 14px;
+	color: #333;
+	vertical-align: top;
+	display: inline-block;
+	padding-top: 18px;
+	border-top: 2px solid #1dce73;
+	margin: 0;
+	width: 0px;	
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.trpProfileItem {
+	padding-left: 14px;
+}
+
+.trpProfileItem a:hover {
+	color: #1dce73;
+}
+
+.trpProfileItem a {
+	color: #333;
 }
 
 .trpDisplayPictureSmall {

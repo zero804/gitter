@@ -4,6 +4,10 @@ body {
 	overflow-x: hidden;
 }
 
+a {
+	text-decoration: none;
+}
+
 @font-face {
 font-family: 'StagSansWeb-Light';
     src: url('StagSansWeb-Light.eot?#iefix') format('embedded-opentype'),
@@ -62,8 +66,6 @@ li {
 	display: none;
 }
 
-
-
 .content {
 	background-color: #ecf1ec;
 	margin-left: 0px;
@@ -110,6 +112,28 @@ li {
 	padding-left: 12px;
 	border-top: 2px solid #1dce73;
 	margin: 0;
+}
+
+.trpProfileMenu {
+	font-family: 'Open Sans';
+	font-size: 14px;
+	color: #333;
+	vertical-align: top;
+	display: inline-block;
+	padding-top: 18px;
+	border-top: 2px solid #1dce73;
+	margin: 0;
+	width: 0px;	
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.trpProfileItem {
+	padding-left: 14px;
+}
+
+.trpProfileItem a:hover {
+	color: #1dce73;
 }
 
 .display-picture-profile {
