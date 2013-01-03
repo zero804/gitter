@@ -1,18 +1,40 @@
-// Filename: views/home/main
 define([
   'jquery',
   'underscore',
   'backbone',
+  'marionette',
   'views/base',
   'views/rivets-backbone',
   'hbs!./fileItemView',
   './filePreviewView',
-  './fileVersionsView',
-], function($, _, Backbone, TroupeViews, rivet, template, FilePreviewView, FileVersionsView){
+  './fileVersionsView'
+], function($, _, Backbone, Marionette, TroupeViews, rivet, template, FilePreviewView, FileVersionsView) {
+  /*jslint browser: true*/
+  /*global require console */
   "use strict";
 
-  return TroupeViews.Base.extend({
+  return Marionette.ItemView.extend({
     template: template,
+    serializeData: function(){
+      var data = this.model.toJSON();
+
+      var versions = this.model.get('versions');
+
+      var latestVersion = versions.length;
+      data.fileIcon = this.fileIcon(this.model.get('fileName'), latestVersion);
+      data.useSpinner = versions.at(versions.length - 1).get('thumbnailStatus') === 'GENERATING';
+
+      return data;
+    },
+
+    fileIcon: function(fileName, version) {
+      return '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + fileName + "?version=" + version;
+    }
+  });
+
+  // TODO: DELETE THIS STUFF?
+
+  return TroupeViews.Base.extend({
     unreadItemType: 'file',
     events: {
       "click .trpFileActionMenuButton": "showFileActionMenu",

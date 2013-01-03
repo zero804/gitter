@@ -2,8 +2,9 @@
 define([
   'jquery',
   'underscore',
-  'backbone'
-  ], function($, _, Backbone) {
+  'backbone',
+  'utils/vent'
+  ], function($, _, Backbone, vent) {
   /*jslint browser: true*/
   /*global require console */
   "use strict";
@@ -18,8 +19,14 @@ define([
       "mouseenter #chat-frame":         "onMouseEnterChatFrame"
     },
 
+    initialize: function() {
+      var self = this;
+      vent.on("detailView:show", function() {
+        self.showPanel("#right-panel");
+      });
+    },
+
     hidePanel: function (whichPanel) {
-      console.log("Hiding panel");
       $(whichPanel).animate({
         right: '-280px'
       }, 350, function() {
@@ -36,7 +43,6 @@ define([
 
     showPanel: function(whichPanel) {
       if (!this.rightpanel) {
-        console.log("Showing panel");
         $(whichPanel).show();
         $(whichPanel).animate({
           right: '0px'
@@ -54,7 +60,6 @@ define([
     },
 
     hideMenu: function() {
-      console.log("Hiding menu");
       $("#left-menu").animate({
         left: '-280px'
       }, 350, function() {
@@ -91,8 +96,6 @@ define([
 
     showMenu: function() {
       if (this.leftmenu) return;
-
-      console.log("Showing menu");
 
       $("#left-menu").animate({
         left: '0px'
