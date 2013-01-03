@@ -238,6 +238,7 @@ module.exports = function( grunt ) {
         },
         files: {
           "public/bootstrap/css/trp2.css" : "public/bootstrap/less/trp2.less",
+          "public/bootstrap/css/trp3.css" : "public/bootstrap/less/trp3.less",
           "public/bootstrap/css/mtrp.css": "public/bootstrap/less/mtrp.less",
           "public/bootstrap/css/trpHomePage.css": "public/bootstrap/less/trpHomePage.less",
           "public/bootstrap/css/trpChat.css": "public/bootstrap/less/trpChat.less",
