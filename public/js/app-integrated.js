@@ -54,13 +54,14 @@ require([
 
   });
 
+  var router;
   app.on("initialize:after", function(){
-    var router = new Router({
+    new Router({
       controller: controller
     });
 
     router.initialize();
-    Backbone.history.start();
+    Backbone.history.start({pushState: true});
   });
 
   vent.on("conversation:view", function(model) {
