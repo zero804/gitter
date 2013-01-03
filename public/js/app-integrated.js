@@ -59,8 +59,8 @@ require([
     });
     app.fileRegion.show(fileView);
 
-    //var conversationView = new ConversationView();
-    //app.mailRegion.show(conversationView);
+    var conversationView = new ConversationView();
+    app.mailRegion.show(conversationView);
 
   });
 
