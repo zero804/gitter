@@ -9,8 +9,8 @@ require([
   'views/conversation/conversationView',
   'utils/vent',
   'collections/files',
-  'views/file/fileVersionsView'
-], function($, _, Backbone, Marionette, AppIntegratedView, ChatView, FileView, ConversationView, vent, fileModels, FileVersionsView) {
+  'views/file/fileDetailView'
+], function($, _, Backbone, Marionette, AppIntegratedView, ChatView, FileView, ConversationView, vent, fileModels, FileDetailView) {
   /*jslint browser: true*/
   /*global require console */
   "use strict";
@@ -35,7 +35,7 @@ require([
 
     showFileDetail: function(id) {
       function showDetail() {
-        var view = new FileVersionsView({
+        var view = new FileDetailView({
           model: fileCollection.get(id)
         });
         app.rightPanelRegion.show(view);
@@ -45,9 +45,8 @@ require([
       if(fileCollection.length > 0) {
         showDetail();
       } else {
-        fileCollection.once('reset', function() {
-          showDetail();
-        });
+        var callback = function() { fileCollection.off('reset', callback, this); showDetail(); };
+        fileCollection.on('reset', callback, this);
       }
     }
   });
