@@ -1,0 +1,128 @@
+body {
+	margin: 0;
+	background-color: white;
+	overflow-x: hidden;
+}
+
+div {
+	display: inline-block;
+}
+
+@import "trpColours.less";
+@import "trpWebFonts.less";
+@import "trpFonts.less";
+
+@import "trp3Common.less";
+
+@import "trp3Chat.less";
+@import "trp3Mail.less";
+
+.trpLeftMenuHotspot {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 40px;
+	height: 100%;
+	z-index: 10;
+}
+
+.trpLeftMenu {
+	.trpH1;
+	position: fixed;
+	width: 280px;
+	left: -280px;
+	top: 0px;
+	background-color: @trpGreen;
+	height: 100%;
+	overflow: hidden;
+	color: white;
+	z-index: 12;
+	border-right: 2px solid @trpGreen;
+}
+
+.trpMenuTab {
+	position: fixed;
+	left: 0px;
+	top: 100px;
+	background-color: @trpGreen;
+}
+
+.trpContentPanel {
+	background-color: #ecf1ec;
+	margin-left: 0px;
+	height: 100%;
+	text-align: center;
+}
+
+.trpHeaderContainer {
+	width: 100%;
+	height: 60px;
+	background-color: white;
+	border-bottom: 0px solid #1dce73;
+}
+
+.trpHeaderTitle {
+	.trpH1;
+	min-width: 500px;
+	text-align: left;
+	color: #333;
+	padding-top: 14px;
+}
+
+.trpHeaderToolbar {
+	min-width: 200px;
+	height: 60px;
+	vertical-align: top;
+	text-align: left;
+}
+
+.trpSettingsButton {
+	padding-top: 14px;
+	border-top: 2px solid @trpGreen;
+	margin: 0;
+}
+
+.trpProfileButton {
+	padding-top: 14px;
+	padding-left: 12px;
+	border-top: 2px solid @trpGreen;
+	margin: 0;
+}
+
+.trpDisplayPictureSmall {
+	border-radius: 50em;
+	width: 24px;
+	height: 24px;
+	background-size: contain;
+}
+
+.trpChatPanel {
+	min-width: 500px;
+	max-width: 600px;
+	height: 100%;
+	text-align: left;
+	padding-top: 40px;
+	border-radius: 5px;
+}
+
+.trpToolbar {
+	min-width: 200px;
+	max-width: 200px;
+	height: 100%;
+	text-align: left;
+	padding-top: 40px;
+	vertical-align: top;
+
+}
+
+.trpToolbarHeader {
+	font-family: 'Open Sans';
+	font-size: 12px;
+	text-transform: uppercase;
+	padding-top: 12px;
+	padding-bottom: 4px;
+}
+
+
+
+
