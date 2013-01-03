@@ -8,11 +8,11 @@ require([
   'views/file/fileView',
   'views/conversation/conversationView',
   'utils/vent',
-  'collections/files'
-
-], function($, _, Backbone, Marionette, AppIntegratedView, ChatView, FileView, ConversationView, vent, fileModels) {
+  'collections/files',
+  'views/file/fileVersionsView'
+], function($, _, Backbone, Marionette, AppIntegratedView, ChatView, FileView, ConversationView, vent, fileModels, FileVersionsView) {
   /*jslint browser: true*/
-  /*global require */
+  /*global require console */
   "use strict";
 
   var app = new Marionette.Application();
@@ -26,15 +26,29 @@ require([
     modalRegion: "#modal-panel"
   });
 
+  var fileCollection;
   var appView = new AppIntegratedView();
 
   var Controller = Marionette.Controller.extend({
     initialize: function(options){
     },
 
-    doStuff: function(){
-      this.trigger("stuff:done", this.stuff);
+    showFileDetail: function(id) {
+      function showDetail() {
+        var view = new FileVersionsView({
+          model: fileCollection.get(id)
+        });
+        app.rightPanelRegion.show(view);
+        vent.trigger("detailView:show");
+      }
 
+      if(fileCollection.length > 0) {
+        showDetail();
+      } else {
+        fileCollection.once('reset', function() {
+          showDetail();
+        });
+      }
     }
   });
 
@@ -42,7 +56,7 @@ require([
 
   var Router = Marionette.AppRouter.extend({
     appRoutes: {
-      "some/route": "doStuff"
+      "file/:id": "showFileDetail"
     }
   });
 
@@ -50,7 +64,7 @@ require([
     var chatView = new ChatView();
     app.chatRegion.show(chatView);
 
-    var fileCollection = new fileModels.FileCollection();
+    fileCollection = new fileModels.FileCollection();
     fileCollection.listen();
     fileCollection.fetch();
 
@@ -71,7 +85,7 @@ require([
     });
 
     router.initialize();
-    Backbone.history.start({pushState: true});
+    Backbone.history.start();
   });
 
   vent.on("conversation:view", function(model) {

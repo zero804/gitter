@@ -70,17 +70,6 @@ define([
       }
     },
 
-/*
-    onMessage: function(event, msg) {
-      var self = event.data;
-      var current = msg.fromUser.id == window.troupeContext.user.id;
-
-      $(".frame-chat", this.el).prepend(new ChatViewItem({ message: msg, current: current}).render().el);
-
-      return;
-    },
-*/
-
     detectReturn: function(e) {
       if(e.keyCode == 13) {
         return this.send();
