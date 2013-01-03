@@ -23,7 +23,6 @@ define([
     initialize: function(options) {
       _.bindAll(this, 'showSortMenu', 'hideSortMenu');
       var self = this;
-      this.router = options.router;
       this.collection = new fileModels.FileCollection();
 
       this.collection.listen();

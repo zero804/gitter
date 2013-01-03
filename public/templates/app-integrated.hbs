@@ -12,6 +12,8 @@
 	<title>{{troupeName}} - Troupe</title>
 
 	<link rel="stylesheet" href='{{cdn "play/newi.css" }}'>
+  <link rel="stylesheet" href='{{cdn "bootstrap/css/trp2.css" }}'>
+
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
   <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/edpmlaohjokcmefhjghaeeikjjcjplmi">
 
@@ -79,12 +81,12 @@
 
     </div>
     <div class="toolbar">
-      <div class="people-roster">
+      <div class="people-roster" id="people-roster">
         <div class="display-picture" style="background-image: url('andrew.png')"></div>
         <div class="display-picture" style="background-image: url('mike.png')"></div>
         <div class="display-picture" style="background-image: url('richard.png')"></div>
       </div>
-      <div class="file-list">
+      <div class="file-list" id="file-list">
           <div class="toolbar-header">Files</div>
           <div class="thumbnail" style="background-image: url('thumbs/surfer.jpg')"></div>
           <div class="thumbnail" style="background-image: url('thumbs/brief.jpeg')"></div>
@@ -94,7 +96,7 @@
           <div class="thumbnail" style="background-image: url('thumbs/shoe.jpeg')"></div>
           <div class="thumbnail" style="background-image: url('thumbs/waves.jpg')"></div>
       </div>
-      <div class="mail-list">
+      <div class="mail-list" id="mail-list">
           <div class="toolbar-header">Mails</div>
           <div class="mail-item">
             <div class="mail-item-picture" style="background-image: url('mail16.png')"></div>
