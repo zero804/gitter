@@ -34,34 +34,54 @@ require([
 
   var Controller = Marionette.Controller.extend({
     initialize: function(options){
+      vent.on('navigable-dialog:open', this.onNavigableDialogOpen, this);
+      vent.on('navigable-dialog:close', this.onNavigableDialogClose, this);
+    },
+
+    onNavigableDialogOpen: function(dialog) {
+      if(this.currentModal) {
+        console.warn("Already a navigable dialog!");
+      }
+      this.currentModal = dialog;
+    },
+
+    onNavigableDialogClose: function(dialog) {
+      this.currentModal = null;
+    },
+
+    closeDialogs: function() {
+      if(this.currentModal) {
+        this.currentModal.navigationalHide();
+        this.currentModal = null;
+      }
     },
 
     showFileDetail: function(id) {
       // Do we need to wait for file collection to load?
       if(fileCollection.length === 0) {
-        fileCollection.on('reset', this.showFileDetail, this);
+        fileCollection.once('reset', function() { this.showFileDetail(id); }, this);
         return;
-      } else {
-        // TODO: use 'once' instead of on and off when we upgrade
-        fileCollection.off('reset', this.showFileDetail, this);
       }
 
+      this.closeDialogs();
+
+      var model = fileCollection.get(id);
       var view = new FileDetailView({
-        model: fileCollection.get(id)
+        model: model
       });
       app.rightPanelRegion.show(view);
       vent.trigger("detailView:show");
+
     },
 
     showFilePreview: function(id) {
       // Do we need to wait for file collection to load?
       if(fileCollection.length === 0) {
-        fileCollection.on('reset', this.showFilePreview, this);
+        fileCollection.once('reset', function() { this.showFilePreview(id); }, this);
         return;
-      } else {
-        // TODO: use 'once' instead of on and off when we upgrade
-        fileCollection.off('reset', this.showFilePreview, this);
       }
+
+      this.closeDialogs();
 
       var self = this;
       var currentModel = fileCollection.get(id);
@@ -97,12 +117,15 @@ require([
       };
 
       var view = new FilePreviewView({ model: currentModel, navigationController: navigationController });
-      var modal = new TroupeViews.Modal({ view: view, className: 'modal trpFilePreview', menuItems: [
-      {
-        id: "download",
-        text: "Download"
-      }
-      ]});
+      var modal = new TroupeViews.Modal({
+        view: view,
+        className: 'modal trpFilePreview',
+        navigable: true,
+        menuItems: [{
+          id: "download",
+          text: "Download"
+        }]
+      });
       modal.show();
     }
   });
