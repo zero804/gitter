@@ -11,6 +11,7 @@ define([
     template: template,
 
     events: {
+      "click .link-delete":   "onDeleteLinkClick"
     },
 
     initialize: function(options) {
@@ -21,7 +22,20 @@ define([
       var latestVersion = this.model.get('versions').length - 1;
       d.fileIcon = '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + d.fileName + "?version=" + latestVersion;
       d.previewUrl = '#file/preview/' + d.id;
+      d.versionsUrl = '#file/versions/' + d.id;
+
       return d;
+    },
+
+
+    onDeleteLinkClick: function(e) {
+      //TODO(AN): replace window.confirm with a nice dialog!
+      if(window.confirm("Delete " + this.model.get('fileName') + "?")) {
+        this.model.destroy({
+          success: function(model, response) {
+          }
+        });
+      }
     }
 
   });

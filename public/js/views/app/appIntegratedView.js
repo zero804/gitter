@@ -27,6 +27,9 @@ define([
       vent.on("detailView:show", function() {
         self.showPanel("#right-panel");
       });
+      vent.on("detailView:hide", function() {
+        self.hidePanel("#right-panel");
+      });
     },
 
     showProfileMenu: function() {

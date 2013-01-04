@@ -56,6 +56,12 @@ require([
       }
     },
 
+    showDefaultView: function(id) {
+      this.closeDialogs();
+      app.rightPanelRegion.reset();
+      vent.trigger("detailView:hide");
+    },
+
     showFileDetail: function(id) {
       // Do we need to wait for file collection to load?
       if(fileCollection.length === 0) {
@@ -71,7 +77,6 @@ require([
       });
       app.rightPanelRegion.show(view);
       vent.trigger("detailView:show");
-
     },
 
     showFilePreview: function(id) {
@@ -86,6 +91,7 @@ require([
       var self = this;
       var currentModel = fileCollection.get(id);
 
+      // TODO: move this gunk somewhere else!!
       var navigationController = {
         hasNext: function() {
           var i = fileCollection.indexOf(currentModel);
@@ -127,15 +133,37 @@ require([
         }]
       });
       modal.show();
+    },
+
+    showFileVersions: function(id) {
+      // Do we need to wait for file collection to load?
+      if(fileCollection.length === 0) {
+        fileCollection.once('reset', function() { this.showFileVersions(id); }, this);
+        return;
+      }
+
+      this.closeDialogs();
+
+      var model = fileCollection.get(id);
+
+      var view = new FileVersionsView({ model: model });
+      var modal = new TroupeViews.Modal({ view: view, navigable: true });
+      modal.show();
+
+      return false;
     }
+
   });
 
   var controller = new Controller();
 
   var Router = Marionette.AppRouter.extend({
     appRoutes: {
+      "":                 "showDefaultView",
       "file/:id":         "showFileDetail",
-      "file/preview/:id": "showFilePreview"
+      "file/preview/:id": "showFilePreview",
+      "file/versions/:id": "showFileVersions"
+
     }
   });
 
