@@ -15,9 +15,9 @@ define([
     rightpanel: false,
     profilemenu: false,
     events: {
-      "click #menu-toggle":             "onMenuToggle",
-      "mouseenter #left-menu-hotspot":  "onLeftMenuHotspot",
-      "mouseenter #chat-frame":         "onMouseEnterChatFrame",
+    "click #menu-toggle":               "onMenuToggle",
+      "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
+      "mouseenter #chat-frame":           "onMouseEnterChatFrame",
       "mouseenter #header-wrapper":       "onMouseEnterHeader",
       "mouseleave #header-wrapper":       "onMouseLeaveHeader"
     },

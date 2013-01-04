@@ -3,8 +3,9 @@ define([
   'underscore',
   'backbone',
   'hbs!./modal',
-  '../template/helpers/all'
-], function($, _, Backbone, modalTemplate, helpers) {
+  '../template/helpers/all',
+  'utils/vent'
+], function($, _, Backbone, modalTemplate, helpers, vent) {
   /*jshint trailing:false */
   /*global require:true console:true setTimeout:true*/
   "use strict";
@@ -145,7 +146,8 @@ define([
         fade: true,
         autoRemove: true,
         menuItems: [],
-        disableClose: false
+        disableClose: false,
+        navigable: false
       };
       _.bindAll(this, 'hide', 'onMenuItemClicked');
       _.extend(this.options, options);
@@ -210,6 +212,10 @@ define([
     },
 
     show: function() {
+      if(this.options.navigable) {
+        vent.trigger('navigable-dialog:open', this);
+      }
+
       var that = this;
       if (this.isShown) return;
 
@@ -232,7 +238,7 @@ define([
         that.$el.show();
 
         if (transition) {
-          that.$el[0].offsetWidth; // force reflow
+          var o = that.$el[0].offsetWidth; // force reflow
         }
 
         that.$el.addClass('in');
@@ -252,7 +258,25 @@ define([
     hide: function ( e ) {
       if(e) e.preventDefault();
 
+      if(this.options.navigable) {
+        window.history.back();
+      }
+
+      this.hideInternal();
+    },
+
+    /* Called after navigation to close an navigable dialog box */
+    navigationalHide: function() {
+      this.options.fade = false;
+      this.hideInternal();
+    },
+
+    hideInternal: function() {
       if (!this.isShown) return;
+
+      if(this.options.navigable) {
+        vent.trigger('navigable-dialog:close', this);
+      }
 
       var that = this;
       this.isShown = false;
@@ -268,6 +292,7 @@ define([
       this.trigger('hide');
 
       if($.support.transition && this.options.fade) {
+        console.log("Closing dialog with transition");
         this.hideWithTransition(this);
       } else {
         this.hideModal();
