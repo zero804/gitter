@@ -10,10 +10,12 @@ require([
   'views/conversation/conversationView',
   'utils/vent',
   'collections/files',
+  'collections/conversations',
   'views/file/fileDetailView',
   'views/file/filePreviewView',
-  'views/file/fileVersionsView'
-], function($, _, Backbone, Marionette, TroupeViews, AppIntegratedView, ChatView, FileView, ConversationView, vent, fileModels, FileDetailView, FilePreviewView, FileVersionsView) {
+  'views/file/fileVersionsView',
+  'views/conversation/conversationDetailView'
+], function($, _, Backbone, Marionette, TroupeViews, AppIntegratedView, ChatView, FileView, ConversationView, vent, fileModels, conversationModels, FileDetailView, FilePreviewView, FileVersionsView, ConversationDetailView) {
   /*jslint browser: true*/
   /*global require console */
   "use strict";
@@ -29,7 +31,7 @@ require([
     modalRegion: "#modal-panel"
   });
 
-  var fileCollection;
+  var fileCollection, conversationCollection;
   var appView = new AppIntegratedView();
 
   var Controller = Marionette.Controller.extend({
@@ -149,8 +151,21 @@ require([
       var view = new FileVersionsView({ model: model });
       var modal = new TroupeViews.Modal({ view: view, navigable: true });
       modal.show();
+    },
 
-      return false;
+    showMail: function(id) {
+      if(conversationCollection.length === 0) {
+        conversationCollection.once('reset', function() { this.showMail(id); }, this);
+        return;
+      }
+
+      this.closeDialogs();
+
+      var model = conversationCollection.get(id);
+
+      var view = new ConversationDetailView({ id: id, masterModel: model });
+      var modal = new TroupeViews.Modal({ view: view, navigable: true });
+      modal.show();
     }
 
   });
@@ -159,11 +174,11 @@ require([
 
   var Router = Marionette.AppRouter.extend({
     appRoutes: {
-      "":                 "showDefaultView",
-      "file/:id":         "showFileDetail",
-      "file/preview/:id": "showFilePreview",
-      "file/versions/:id": "showFileVersions"
-
+      "":                   "showDefaultView",
+      "file/:id":           "showFileDetail",
+      "file/preview/:id":   "showFilePreview",
+      "file/versions/:id":  "showFileVersions",
+      "mail/:id":           "showMail"
     }
   });
 
@@ -180,7 +195,15 @@ require([
     });
     app.fileRegion.show(fileView);
 
-    var conversationView = new ConversationView();
+
+    conversationCollection = new conversationModels.ConversationCollection();
+    conversationCollection.listen();
+    conversationCollection.fetch();
+
+    var conversationView = new ConversationView({
+      collection: conversationCollection
+    });
+
     app.mailRegion.show(conversationView);
 
   });
