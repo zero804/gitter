@@ -17,7 +17,7 @@ define([
       _.bindAll(this, 'onSubjectChange');
 
       this.router = options.router;
-      this.id = options.params;
+      this.id = options.id ? options.id : options.params;
 
       this.model = new conversationModels.ConversationDetail({ id: this.id });
       this.model.bind('change:subject', this.onSubjectChange);

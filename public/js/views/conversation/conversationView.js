@@ -22,15 +22,6 @@ define([
 
     initialize: function(options) {
       _.bindAll(this, 'showSortMenu', 'hideSortMenu');
-      this.collection = new conversationModels.ConversationCollection();
-
-      this.collection.listen();
-      this.collection.fetch();
-
-      var self = this;
-      this.addCleanup(function() {
-        self.collection.unlisten();
-      });
     },
 
     events: {
@@ -71,7 +62,7 @@ define([
         }
       });
     },
- 
+
     showSortMenu: function(e) {
       $('body, html').on('click', this.hideSortMenu);
       this.$el.find(".trpSortMenu").fadeIn('fast');
