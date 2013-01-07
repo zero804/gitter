@@ -54,6 +54,7 @@ define([
     },
 
     hidePanel: function (whichPanel) {
+
       $(whichPanel).animate({
         right: '-280px'
       }, 350, function() {
@@ -63,13 +64,13 @@ define([
       $("#content-frame").animate({
         marginRight: '0px'
       }, 350, function() {
+      });
 
       $("#header-frame").animate({
         marginRight: '0px'
       }, 350, function() {
       });
-
-      });
+      
       this.rightpanel = false;
     },
 
