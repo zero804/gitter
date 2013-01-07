@@ -9,9 +9,10 @@ define([
 ], function($, _, Backbone, TroupeViews, template, VersionView){
   return TroupeViews.Base.extend({
     template: template,
-
+    buttonMenu : false,
     events: {
-      "click .link-delete":   "onDeleteLinkClick"
+      "click .link-delete":   "onDeleteLinkClick",
+      "click #file-preview-menu": "onMenuClick"
     },
 
     initialize: function(options) {
@@ -27,6 +28,17 @@ define([
       return d;
     },
 
+    onMenuClick: function(e) {
+      console.log("Clicked on the file menu");
+      if (!this.buttonMenu) {
+        $("#file-preview-menu-items").slideDown('fast');
+        this.buttonMenu = true;
+      }
+      else {
+        $("#file-preview-menu-items").slideUp('fast');
+        this.buttonMenu = false;
+      }
+    },
 
     onDeleteLinkClick: function(e) {
       //TODO(AN): replace window.confirm with a nice dialog!
