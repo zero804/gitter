@@ -1,12 +1,16 @@
 
-<div class="trpFileVersionThumbnail"><img src="{{fileIcon}}" width="180" height="180"></div>
+<div class="trpFileVersionThumbnail"><a href="{{previewUrl}}" class="link-preview"><img src="{{fileIcon}}" width="180" height="180"></a></div>
 
 <div class="trpFileDetails">
   <div class="trpFilename" title="{{fileName}}">{{fileName}}</div>
-  <div><img src="images/2/icon-file-action.png" class="trpFileActionMenuButton">
 </div>
 
-<div class="trpFileActionMenu trpShadow">
+<div class="trpActionButton">
+  <div class="trpButtonGreen trpFileButton"><a href="{{url}}">Download</a></div>
+</div>
+
+
+<!-- <div class="trpFileActionMenu trpShadow">
   <div class="trpFileActionMenuTop"> </div>
   <div class="trpFileActionMenuBottom">
     <div class="trpFileActionMenuItem"><a href="{{url}}">Download</a></div>
@@ -15,3 +19,4 @@
     <div class="trpFileActionMenuItem"><a href="#" class="link-delete">Delete</a></div>
   </div>
 </div>
+ -->
