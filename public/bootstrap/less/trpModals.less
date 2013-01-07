@@ -94,8 +94,12 @@
 
 .modal {
   border-radius: 0px;
-   max-height: 600px;
+   max-height: 80%;
    overflow: hidden;
+}
+
+body.modal-open {
+    overflow: hidden;
 }
 
 
@@ -123,6 +127,7 @@
 }
 
 .modal-body {
-  position: relative;
   padding: 24px 24px 0px 24px;
+  max-height: 400px;
+  overflow-y: auto;
 }
