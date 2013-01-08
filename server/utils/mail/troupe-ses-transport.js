@@ -3,7 +3,7 @@
  * This file is based on the original SES module for Nodemailer by dfellis
  * https://github.com/andris9/Nodemailer/blob/11fb3ef560b87e1c25e8bc15c2179df5647ea6f5/lib/engines/SES.js
  */
-/*global require: true, module: true */
+/*jshint node:true */
 "use strict";
 
 
@@ -13,8 +13,8 @@ var http = require('http'),
     https = require('https'),
     crypto = require('crypto'),
     urllib = require("url"),
-    console = require("console");
-
+    Q = require("q"),
+    _ = require("underscore");
 
 // Expose to the world
 module.exports = TroupeSESTransport;
@@ -64,13 +64,19 @@ TroupeSESTransport.prototype.sendMail = function(emailMessage, callback) {
 /**
  * <p>Compiles and sends the request to SES with e-mail data</p>
  *
- * @param {String} email Compiled raw e-mail as a string
+ * @param {String} emailMessage Compiled raw e-mail as a string
+ * @param {String} rawEmail created by generateMessage
  * @param {Function} callback Callback function to run once the message has been sent
  */
 TroupeSESTransport.prototype.handleMessage = function(emailMessage, rawEmail, callback) {
   var request,
+      self = this,
       date = new Date(),
       urlparts = urllib.parse(this.options.ServiceUrl);
+
+  if(!emailMessage.destinations) {
+    return callback("Email has no destinations. Cannot send.");
+  }
 
   var params = {
     'Action': 'SendRawEmail',
@@ -79,44 +85,57 @@ TroupeSESTransport.prototype.handleMessage = function(emailMessage, rawEmail, ca
     'Timestamp': this.ISODateString(date)
   };
 
-  if(emailMessage.source) {
-    params['Source'] = emailMessage.source;
+  params['Source'] = emailMessage.source;
+
+  var recipients = emailMessage.destinations.slice(0);
+  var promises = [];
+  while(recipients.length) {
+    var q = Q.defer();
+    sendMessageToRecipients(recipients.splice(0, 50), q.node());
+    promises.push(q.promise);
   }
 
-  if(emailMessage.destinations) {
-    // TODO: figure out a nice way of handling more than 50 messages
-    if(emailMessage.destinations.length > 50) return callback("A single email message cannot contain more than 50 addresses.");
+  Q.all(promises)
+  .then(callback)
+  .fail(callback);
 
-    for(var i = 0; i < emailMessage.destinations.length; i++) {
-      var c = i + 1;
-      params['Destinations.member.' + c] = emailMessage.destinations[i];
+  function sendMessageToRecipients (destinations, callback) {
+
+    var myParams = _.extend(params);
+
+    for(var i = 0; i < destinations.length; i++) {
+      myParams['Destinations.member.' + (i + 1)] = destinations[i];
     }
+
+    myParams = self.buildKeyValPairs(myParams);
+
+    var reqObj = {
+            host: urlparts.hostname,
+            path: urlparts.path || "/",
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Length': myParams.length,
+                'Date': date.toUTCString(),
+                'X-Amzn-Authorization':
+                    ['AWS3-HTTPS AWSAccessKeyID='+self.options.AWSAccessKeyID,
+                    "Signature="+self.buildSignature(date.toUTCString(), self.options.AWSSecretKey),
+                    "Algorithm=HmacSHA256"].join(",")
+            }
+        };
+
+    console.dir(myParams);
+
+    //Execute the request on the correct protocol
+    if(urlparts.protocol.substr() == "https:") {
+        request = https.request(reqObj, self.responseHandler.bind(self, callback));
+        console.dir(reqObj);
+    } else {
+        request = http.request(reqObj, self.responseHandler.bind(self, callback));
+    }
+    request.end(myParams);
   }
 
-  params = this.buildKeyValPairs(params);
-
-  var reqObj = {
-          host: urlparts.hostname,
-          path: urlparts.path || "/",
-          method: "POST",
-          headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-              'Content-Length': params.length,
-              'Date': date.toUTCString(),
-              'X-Amzn-Authorization':
-                  ['AWS3-HTTPS AWSAccessKeyID='+this.options.AWSAccessKeyID,
-                  "Signature="+this.buildSignature(date.toUTCString(), this.options.AWSSecretKey),
-                  "Algorithm=HmacSHA256"].join(",")
-          }
-      };
-
-  //Execute the request on the correct protocol
-  if(urlparts.protocol.substr() == "https:") {
-      request = https.request(reqObj, this.responseHandler.bind(this, callback));
-  } else {
-      request = http.request(reqObj, this.responseHandler.bind(this, callback));
-  }
-  request.end(params);
 };
 
 /**
