@@ -96,7 +96,7 @@ TroupeSESTransport.prototype.handleMessage = function(emailMessage, rawEmail, ca
   }
 
   Q.all(promises)
-  .then(callback)
+  .then(function(allResults) { callback(null, allResults); })
   .fail(callback);
 
   function sendMessageToRecipients (destinations, callback) {
@@ -124,12 +124,12 @@ TroupeSESTransport.prototype.handleMessage = function(emailMessage, rawEmail, ca
             }
         };
 
-    console.dir(myParams);
+   //console.dir(myParams);
 
     //Execute the request on the correct protocol
     if(urlparts.protocol.substr() == "https:") {
         request = https.request(reqObj, self.responseHandler.bind(self, callback));
-        console.dir(reqObj);
+        //console.dir(reqObj);
     } else {
         request = http.request(reqObj, self.responseHandler.bind(self, callback));
     }
