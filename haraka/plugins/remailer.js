@@ -73,7 +73,7 @@ exports.hook_queue = function(next, connection) {
     var mail = new RawMailComposer({
       source: troupe.uri + emailDomainWithAt,
       destinations: emailAddresses,
-      message: transaction.data_lines.join('')
+      message: transaction.message_stream
     });
 
     sesTransport.sendMail(mail, function(error, response){
