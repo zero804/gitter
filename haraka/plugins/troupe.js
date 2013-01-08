@@ -76,8 +76,8 @@ exports.hook_queue = function(next, connection) {
 	var preview;
 	var fromEmail;
 
-	var lines = connection.transaction.data_lines;
-  if (!lines) return next(DENY);
+ // var lines = connection.transaction.message_stream;
+  //if (!lines) return next(DENY);
 
 	toName = toName.replace(/\n/g,"");
 	fromName = fromName.replace(/\n/g,"");
@@ -209,8 +209,7 @@ exports.hook_queue = function(next, connection) {
 
     });
 
-    mailparser.write(lines.join(''));
-    mailparser.end();
+    connection.transaction.message_stream.pipe(mailparser);
 
   });
 

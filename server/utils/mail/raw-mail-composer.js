@@ -4,9 +4,11 @@
 
 var Stream = require("stream").Stream;
 var utillib = require("util");
+var console = require("console");
 
 function RawMailComposer(options){
     Stream.call(this);
+    this.writable = true;
     options = options || {};
     this.options = options;
     this.destinations = options.destinations;
@@ -14,9 +16,17 @@ function RawMailComposer(options){
 }
 utillib.inherits(RawMailComposer, Stream);
 
-RawMailComposer.prototype.streamMessage = function(){
-  this.emit("data", new Buffer(this.options.message, "utf-8"));
+RawMailComposer.prototype.streamMessage = function() {
+  this.options.message.pipe(this);
+};
+
+RawMailComposer.prototype.end = function(){
   this.emit("end");
+};
+
+RawMailComposer.prototype.write = function(buffer) {
+  this.emit("data", buffer);
+  return true; // keep sending
 };
 
 module.exports = RawMailComposer;
