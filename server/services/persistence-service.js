@@ -90,7 +90,7 @@ var EmailSchema = new Schema({
   date: {type: Date },
   preview: {type: String},
   mail: { type: String},
-  messageId: { type: String},
+  messageIds: [ String ],
   attachments: [EmailAttachmentSchema]
 });
 

@@ -1,3 +1,7 @@
+/*jshint node:true */
+/*global OK:true DENY: true DENYSOFT: true */
+"use strict";
+
 // troupe service to redeliver mails to troupe users
 var conversationService = require("./../../server/services/conversation-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
@@ -8,6 +12,7 @@ var TroupeSESTransport = require("./../../server/utils/mail/troupe-ses-transport
     nconf = require("./../../server/utils/config");
 var winston = require("winston");
 var xml2js = require("xml2js");
+var Q = require("q");
 
 var emailDomain = nconf.get("email:domain");
 var emailDomainWithAt = "@" + emailDomain;
@@ -24,7 +29,7 @@ function continueResponse(next) {
 }
 
 function errorResponse(next, err) {
-  winston.error("DENYSOFT due to error " + err);
+  winston.error("DENYSOFT due to error", { exception: err });
   return next(DENYSOFT);
 }
 
@@ -76,29 +81,40 @@ exports.hook_queue = function(next, connection) {
       message: transaction.message_stream
     });
 
-    sesTransport.sendMail(mail, function(error, response){
+    sesTransport.sendMail(mail, function(error, responses){
         if (error) {
           connection.logerror(error);
-          return errorResponse(next);
+          return errorResponse(next, error);
         }
 
-        console.log("Apparently I successfully delivered some mails");
+        console.log("Apparently I successfully delivered some mails ");
+        var promises = responses.map(function(response) {
+          var parser = new xml2js.Parser();
+          var q = Q.defer();
+          parser.parseString(response.message, q.node());
+          return q.promise;
+        });
 
-        var parser = new xml2js.Parser();
-        parser.parseString(response.message, function (err, result) {
-            if(err || !result) return errorResponse(next);
+
+        Q.all(promises)
+         .then(function(results) {
+            var messageIds = results.map(function(result) {
+              console.dir(result.SendRawEmailResponse.SendRawEmailResult[0].MessageId);
+              return result.SendRawEmailResponse.SendRawEmailResult ?
+                result.SendRawEmailResponse.SendRawEmailResult[0].MessageId + "@email.amazonses.com" : null;
+            });
 
             var emailId = connection.transaction.notes.emailId;
             var conversationId = connection.transaction.notes.conversationId;
 
-            var messageId = result.SendRawEmailResult ? result.SendRawEmailResult.MessageId + "@email.amazonses.com": null;
-
-            conversationService.updateEmailWithMessageId(conversationId, emailId, messageId, function(err) {
+            conversationService.updateEmailWithMessageIds(conversationId, emailId, messageIds, function(err) {
               if(err)  return errorResponse(next, err);
               return continueResponse(next);
             });
-
-        });
+         })
+         .fail(function(err) {
+            return errorResponse(next, err);
+         });
 
     });
 
