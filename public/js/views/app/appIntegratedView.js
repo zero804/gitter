@@ -19,7 +19,7 @@ define([
       "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
       "mouseenter #chat-frame":           "onMouseEnterChatFrame",
       "mouseenter #header-wrapper":       "onMouseEnterHeader",
-      "mouseleave #header-wrapper":       "onMouseLeaveHeader"
+      "mouseenter #content-frame":        "onMouseEnterContent"
     },
 
     initialize: function() {
@@ -179,6 +179,10 @@ define([
 
     onMouseEnterHeader: function() {
       this.showProfileMenu();
+    },
+
+    onMouseEnterContent: function() {
+      this.hideProfileMenu();
     },
 
     onMouseLeaveHeader: function() {
