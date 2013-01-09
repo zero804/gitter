@@ -1,145 +1,120 @@
-/*jshint globalstrict:true, trailing:false */
-/*
- * This file is based on the original SES module for Nodemailer by dfellis
- * https://github.com/andris9/Nodemailer/blob/11fb3ef560b87e1c25e8bc15c2179df5647ea6f5/lib/engines/SES.js
- */
 /*jshint node:true */
+/*global OK:true DENY: true DENYSOFT: true */
 "use strict";
 
+var nconf = require ('../config');
+var url = require ('url');
+var Q = require('q');
+var _ = require('underscore');
+var https = require('https');
+var xml2js = require('xml2js');
+var crypto = require('crypto');
 
-// NB! Amazon SES does not allow unicode filenames on attachments!
-
-var http = require('http'),
-    https = require('https'),
-    crypto = require('crypto'),
-    urllib = require("url"),
-    Q = require("q"),
-    _ = require("underscore");
-
-// Expose to the world
-module.exports = TroupeSESTransport;
-
-/**
- * <p>Generates a Transport object for Amazon SES</p>
- *
- * <p>Possible options can be the following:</p>
- *
- * <ul>
- *     <li><b>AWSAccessKeyID</b> - AWS access key (required)</li>
- *     <li><b>AWSSecretKey</b> - AWS secret (required)</li>
- *     <li><b>ServiceUrl</b> - optional API endpoint URL (defaults to <code>"https://email.us-east-1.amazonaws.com"</code>)
- * </ul>
- *
- * @constructor
- * @param {Object} options Options object for the SES transport
- */
-function TroupeSESTransport(options){
-    this.options = options || {};
-
-    //Set defaults if necessary
-    this.options.ServiceUrl = this.options.ServiceUrl || "https://email.us-east-1.amazonaws.com";
+function TroupeSESTransport () {
+  this.AWSAccessKeyID = nconf.get("amazon:accessKey");
+  console.log('access key '+this.AWSAccessKeyID);
+  this.AWSSecretKey = nconf.get("amazon:secretKey");
+  this.ServiceUrl = "https://email.us-east-1.amazonaws.com";
 }
 
 /**
- * <p>Compiles a mailcomposer message and forwards it to handler that sends it.</p>
- *
- * @param {Object} emailMessage MailComposer object
- * @param {Function} callback Callback function to run when the sending is completed
+ * Sends an email in the form of a message stream to SES, returns a callback of the form
+ * callback(err, messageIds)
+ * - where messageIds is an array of one of more message identifiers used for the distribution from SES
  */
-TroupeSESTransport.prototype.sendMail = function(emailMessage, callback) {
+TroupeSESTransport.prototype.sendMail = function(from, recipients, stream, callback) {
 
-    //Check if required config settings set
-    if(!this.options.AWSAccessKeyID || !this.options.AWSSecretKey) {
-        return callback(new Error("Missing AWS Credentials"));
-    }
-
-    this.generateMessage(emailMessage, (function(err, rawEmail){
-        if(err){
-            return callback(err);
-        }
-        this.handleMessage(emailMessage, rawEmail, callback);
-    }).bind(this));
-};
-
-/**
- * <p>Compiles and sends the request to SES with e-mail data</p>
- *
- * @param {String} emailMessage Compiled raw e-mail as a string
- * @param {String} rawEmail created by generateMessage
- * @param {Function} callback Callback function to run once the message has been sent
- */
-TroupeSESTransport.prototype.handleMessage = function(emailMessage, rawEmail, callback) {
-  var request,
-      self = this,
-      date = new Date(),
-      urlparts = urllib.parse(this.options.ServiceUrl);
-
-  if(!emailMessage.destinations) {
-    return callback("Email has no destinations. Cannot send.");
-  }
+  var request;
+  var self = this;
+  var date = new Date();
+  var urlparts = url.parse(this.ServiceUrl);
 
   var params = {
     'Action': 'SendRawEmail',
-    'RawMessage.Data': (new Buffer(rawEmail, "utf-8")).toString('base64'),
+    'RawMessage.Data': (new Buffer(stream, "utf-8")).toString('base64'),
     'Version': '2010-12-01',
-    'Timestamp': this.ISODateString(date)
+    'Timestamp': this.ISODateString(date),
+    'Source': from
   };
 
-  params['Source'] = emailMessage.source;
+  /* chunk the outgoing message into mails with max 50 recipients (due to SES limit) */
 
-  var recipients = emailMessage.destinations.slice(0);
-  var promises = [];
-  while(recipients.length) {
-    var q = Q.defer();
-    sendMessageToRecipients(recipients.splice(0, 50), q.node());
-    promises.push(q.promise);
+  var SESLimit = 50;
+  var recipientsRemaining = recipients.slice(0);
+  // we must only return to caller once all these mails have been posted
+  var mailPromises = [];
+
+  while (recipientsRemaining.length) {
+    var defered = Q.defer();
+    sendMessageToRecipients(recipientsRemaining.splice(0, 50), defered.node());
+    mailPromises.push(defered.promise);
   }
 
-  Q.all(promises)
-  .then(function(allResults) { callback(null, allResults); })
+  Q.all(mailPromises)
+  .then(function(messageIds) {
+    callback(null, messageIds);
+  })
   .fail(callback);
 
+  /* Sends the message to up to MAX 50 recipients, returns a callback(err, messageId) */
   function sendMessageToRecipients (destinations, callback) {
+    console.log('sending a SES mail chunk (<= 50 recipients)');
+    console.dir(destinations);
 
     var myParams = _.extend(params);
 
-    for(var i = 0; i < destinations.length; i++) {
+    for(var i = 0; i < destinations.length & i < 50; i++) {
       myParams['Destinations.member.' + (i + 1)] = destinations[i];
     }
 
     myParams = self.buildKeyValPairs(myParams);
 
     var reqObj = {
-            host: urlparts.hostname,
-            path: urlparts.path || "/",
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Content-Length': myParams.length,
-                'Date': date.toUTCString(),
-                'X-Amzn-Authorization':
-                    ['AWS3-HTTPS AWSAccessKeyID='+self.options.AWSAccessKeyID,
-                    "Signature="+self.buildSignature(date.toUTCString(), self.options.AWSSecretKey),
-                    "Algorithm=HmacSHA256"].join(",")
-            }
-        };
+        host: urlparts.hostname,
+        path: urlparts.path || "/",
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': myParams.length,
+            'Date': date.toUTCString(),
+            'X-Amzn-Authorization':
+                ['AWS3-HTTPS AWSAccessKeyID='+self.AWSAccessKeyID,
+                "Signature="+self.buildSignature(date.toUTCString(), self.AWSSecretKey),
+                "Algorithm=HmacSHA256"].join(",")
+        }
+    };
 
-   //console.dir(myParams);
+    /* Take the XML response, extract the messageId, then call the callback */
+    function extractMessageIdFromResponse(errPostingToSES, response) {
+      // console.log('interpreting message id from SES mail');
 
-    //Execute the request on the correct protocol
-    if(urlparts.protocol.substr() == "https:") {
-        request = https.request(reqObj, self.responseHandler.bind(self, callback));
-        //console.dir(reqObj);
-    } else {
-        request = http.request(reqObj, self.responseHandler.bind(self, callback));
+      if(errPostingToSES)
+          return callback(errPostingToSES);
+
+      var parser = new xml2js.Parser();
+
+      parser.parseString(response.message, function(errParsingXML, parsedResult) {
+        var messageId =
+          parsedResult.SendRawEmailResponse.SendRawEmailResult ?
+          parsedResult.SendRawEmailResponse.SendRawEmailResult[0].MessageId + "@email.amazonses.com" :
+          null;
+        // return ONE messageId string to caller (which is the outer sendMail function)
+        callback(null, messageId);
+      });
     }
-    request.end(myParams);
-  }
 
+    // post the request, extract the message id from response
+    https
+    .request(reqObj, self.responseHandler.bind(self, extractMessageIdFromResponse))
+    .end(myParams);
+
+  }
 };
 
 /**
- * <p>Handles the response for the HTTP request to SES</p>
+ * Handles the response for the HTTP request to SES.
+ * Interprets the statusCode so before the caller tries to interpret the specific XML result.
+ * Buffers the response data for the caller to put into XML parser.
  *
  * @param {Function} callback Callback function to run on end (binded)
  * @param {Object} response HTTP Response object
@@ -170,32 +145,7 @@ TroupeSESTransport.prototype.responseHandler = function(callback, response) {
 };
 
 /**
- * <p>Compiles the messagecomposer object to a string.</p>
- *
- * <p>It really sucks but I don't know a good way to stream a POST request with
- * unknown legth, so the message needs to be fully composed as a string.</p>
- *
- * @param {Object} emailMessage MailComposer object
- * @param {Function} callback Callback function to run once the message has been compiled
- */
-
-TroupeSESTransport.prototype.generateMessage = function(emailMessage, callback) {
-    var email = "";
-
-    emailMessage.on("data", function(chunk){
-        email += (chunk || "").toString("utf-8");
-    });
-
-    emailMessage.on("end", function(chunk){
-        email += (chunk || "").toString("utf-8");
-        callback(null, email);
-    });
-
-    emailMessage.streamMessage();
-};
-
-/**
- * <p>Converts an object into a Array with "key=value" values</p>
+ * <p>Converts an object into an Array with "key=value" values</p>
  *
  * @param {Object} config Object with keys and values
  * @return {Array} Array of key-value pairs
@@ -252,3 +202,4 @@ TroupeSESTransport.prototype.strPad = function(n){
     return n<10 ? '0'+n : n;
 };
 
+module.exports = new TroupeSESTransport();
