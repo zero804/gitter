@@ -1,5 +1,5 @@
 /*jshint node:true */
-/*global OK:true DENY: true DENYSOFT: true */
+/*global OK:true DENY: true DENYSOFT: true console: true */
 "use strict";
 
 // troupe service to redeliver mails to troupe users
@@ -7,21 +7,14 @@ var conversationService = require("./../../server/services/conversation-service.
 var troupeService = require("./../../server/services/troupe-service.js");
 var nodemailer = require("nodemailer");
 var console = require("console");
-var TroupeSESTransport = require("./../../server/utils/mail/troupe-ses-transport"),
-    RawMailComposer = require("./../../server/utils/mail/raw-mail-composer"),
-    nconf = require("./../../server/utils/config");
+var troupeSESTransport = require("./../../server/utils/mail/troupe-ses-transport");
+var nconf = require("./../../server/utils/config");
 var winston = require("winston");
 var xml2js = require("xml2js");
 var Q = require("q");
 
 var emailDomain = nconf.get("email:domain");
 var emailDomainWithAt = "@" + emailDomain;
-
-// Create an Amazon SES transport object
-var sesTransport = new TroupeSESTransport({
-  AWSAccessKeyID: nconf.get("amazon:accessKey"),
-  AWSSecretKey: nconf.get("amazon:secretKey")
-});
 
 function continueResponse(next) {
   //return next (DENY, "Debug mode bounce.");
@@ -34,18 +27,23 @@ function errorResponse(next, err) {
 }
 
 exports.hook_queue = function(next, connection) {
-  console.log("Starting remailer");
+  console.log("Starting remailer (hook_queue)");
+
+  // extract details from haraka transaction
 	var mailFrom = connection.transaction.mail_from;
 	var rcptTo = connection.transaction.rcpt_to;
   var transaction = connection.transaction;
   var from = mailFrom.address();
+  var emailId = connection.transaction.notes.emailId;
+  var conversationId = connection.transaction.notes.conversationId;
 
   // TODO: handle each recipient!
   var to = rcptTo[0].address();
 
-	troupeService.validateTroupeEmailAndReturnDistributionList({ to: to, from: from}, function(err, troupe, fromUser, emailAddresses) {
-    if (err) return next(DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.");
-    if (!troupe) return next (DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.");
+  // looks up the troupe for the mail's TO address
+	troupeService.validateTroupeEmailAndReturnDistributionList({ to: to, from: from}, function(errValidating, troupe, fromUser, emailAddresses) {
+    if (errValidating | !troupe)
+        return next(DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.");
 
     if(!emailAddresses) {
       /* If  there's no-one to distribute the email to, don't continue */
@@ -54,6 +52,7 @@ exports.hook_queue = function(next, connection) {
 
     console.log("Delivering emails");
 
+    // normalize headers
     var newSubject = transaction.header.get("Subject");
     newSubject = newSubject ? newSubject.replace(/\n/g,'') : "";
 
@@ -75,49 +74,31 @@ exports.hook_queue = function(next, connection) {
     transaction.remove_header("Return-Path");
     transaction.add_header("Return-Path", "troupe-bounces" + emailDomainWithAt);
 
-    var mail = new RawMailComposer({
-      source: troupe.uri + emailDomainWithAt,
-      destinations: emailAddresses,
-      message: transaction.message_stream
-    });
+    // send mail
+    var sesFrom = troupe.uri + emailDomainWithAt;
+    var sesRecipients = emailAddresses;
+    var sesStream = transaction.message_stream;
 
-    sesTransport.sendMail(mail, function(error, responses){
-        if (error) {
-          connection.logerror(error);
-          return errorResponse(next, error);
+    troupeSESTransport.sendMail(sesFrom, sesRecipients, sesStream, function(errorSendingMail, messageIds){
+
+        if (errorSendingMail) {
+          connection.logerror(errorSendingMail);
+
+          return errorResponse(next, errorSendingMail);
         }
 
-        console.log("Apparently I successfully delivered some mails ");
-        var promises = responses.map(function(response) {
-          var parser = new xml2js.Parser();
-          var q = Q.defer();
-          parser.parseString(response.message, q.node());
-          return q.promise;
+        console.log("All messages have been queued on SES and ids have been returned: ");
+        console.dir(["messageIds", messageIds]);
+
+        conversationService.updateEmailWithMessageIds(conversationId, emailId, messageIds, function(errorUpdatingMessageIds) {
+          if(errorUpdatingMessageIds)
+              return errorResponse(next, errorUpdatingMessageIds);
+
+          console.log("Message ids saved in db successfully.");
+          return continueResponse(next);
         });
 
-
-        Q.all(promises)
-         .then(function(results) {
-            var messageIds = results.map(function(result) {
-              console.dir(result.SendRawEmailResponse.SendRawEmailResult[0].MessageId);
-              return result.SendRawEmailResponse.SendRawEmailResult ?
-                result.SendRawEmailResponse.SendRawEmailResult[0].MessageId + "@email.amazonses.com" : null;
-            });
-
-            var emailId = connection.transaction.notes.emailId;
-            var conversationId = connection.transaction.notes.conversationId;
-
-            conversationService.updateEmailWithMessageIds(conversationId, emailId, messageIds, function(err) {
-              if(err)  return errorResponse(next, err);
-              return continueResponse(next);
-            });
-         })
-         .fail(function(err) {
-            return errorResponse(next, err);
-         });
-
     });
-
 
   });
 
