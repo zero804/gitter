@@ -9,6 +9,7 @@ var _ = require('underscore');
 var https = require('https');
 var xml2js = require('xml2js');
 var crypto = require('crypto');
+var io = require('../io');
 
 function TroupeSESTransport () {
   this.AWSAccessKeyID = nconf.get("amazon:accessKey");
@@ -29,86 +30,95 @@ TroupeSESTransport.prototype.sendMail = function(from, recipients, stream, callb
   var date = new Date();
   var urlparts = url.parse(this.ServiceUrl);
 
-  var params = {
-    'Action': 'SendRawEmail',
-    'RawMessage.Data': (new Buffer(stream, "utf-8")).toString('base64'),
-    'Version': '2010-12-01',
-    'Timestamp': this.ISODateString(date),
-    'Source': from
-  };
+  // we need to buffer the contents of the stream
+  // before we can actually construct the message (due to the signing required).
+  io.readStreamIntoString(stream, function(err, mailString) {
+    console.log("buffering of incoming mail complete: " + mailString);
 
-  /* chunk the outgoing message into mails with max 50 recipients (due to SES limit) */
-
-  var SESLimit = 50;
-  var recipientsRemaining = recipients.slice(0);
-  // we must only return to caller once all these mails have been posted
-  var mailPromises = [];
-
-  while (recipientsRemaining.length) {
-    var defered = Q.defer();
-    sendMessageToRecipients(recipientsRemaining.splice(0, 50), defered.node());
-    mailPromises.push(defered.promise);
-  }
-
-  Q.all(mailPromises)
-  .then(function(messageIds) {
-    callback(null, messageIds);
-  })
-  .fail(callback);
-
-  /* Sends the message to up to MAX 50 recipients, returns a callback(err, messageId) */
-  function sendMessageToRecipients (destinations, callback) {
-    console.log('sending a SES mail chunk (<= 50 recipients)');
-    console.dir(destinations);
-
-    var myParams = _.extend(params);
-
-    for(var i = 0; i < destinations.length & i < 50; i++) {
-      myParams['Destinations.member.' + (i + 1)] = destinations[i];
-    }
-
-    myParams = self.buildKeyValPairs(myParams);
-
-    var reqObj = {
-        host: urlparts.hostname,
-        path: urlparts.path || "/",
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Content-Length': myParams.length,
-            'Date': date.toUTCString(),
-            'X-Amzn-Authorization':
-                ['AWS3-HTTPS AWSAccessKeyID='+self.AWSAccessKeyID,
-                "Signature="+self.buildSignature(date.toUTCString(), self.AWSSecretKey),
-                "Algorithm=HmacSHA256"].join(",")
-        }
+    var params = {
+      'Action': 'SendRawEmail',
+      'Version': '2010-12-01',
+      'Timestamp': self.ISODateString(date),
+      'RawMessage.Data': new Buffer(mailString).toString('base64'),
+      'Source': from
     };
 
-    /* Take the XML response, extract the messageId, then call the callback */
-    function extractMessageIdFromResponse(errPostingToSES, response) {
-      // console.log('interpreting message id from SES mail');
+    /* chunk the outgoing message into mails with max 50 recipients (due to SES limit) */
 
-      if(errPostingToSES)
-          return callback(errPostingToSES);
+    var SESLimit = 50;
+    var recipientsRemaining = recipients.slice(0);
+    // we must only return to caller once all these mails have been posted
+    var mailPromises = [];
 
-      var parser = new xml2js.Parser();
-
-      parser.parseString(response.message, function(errParsingXML, parsedResult) {
-        var messageId =
-          parsedResult.SendRawEmailResponse.SendRawEmailResult ?
-          parsedResult.SendRawEmailResponse.SendRawEmailResult[0].MessageId + "@email.amazonses.com" :
-          null;
-        // return ONE messageId string to caller (which is the outer sendMail function)
-        callback(null, messageId);
-      });
+    while (recipientsRemaining.length) {
+      var defered = Q.defer();
+      sendMessageToRecipients(recipientsRemaining.splice(0, 50), defered.node());
+      mailPromises.push(defered.promise);
     }
 
-    // post the request, extract the message id from response
-    https
-    .request(reqObj, self.responseHandler.bind(self, extractMessageIdFromResponse))
-    .end(myParams);
+    Q.all(mailPromises)
+    .then(function(messageIds) {
+      callback(null, messageIds);
+    })
+    .fail(callback);
 
-  }
+    /* Sends the message to up to MAX 50 recipients, returns a callback(err, messageId) */
+    function sendMessageToRecipients (destinations, callback) {
+      console.log('sending a SES mail chunk (<= 50 recipients)');
+      console.dir(destinations);
+
+      var myParams = _.extend(params);
+
+      for(var i = 0; i < destinations.length & i < 50; i++) {
+        myParams['Destinations.member.' + (i + 1)] = destinations[i];
+      }
+
+      myParams = self.buildKeyValPairs(myParams);
+
+      var reqObj = {
+          host: urlparts.hostname,
+          path: urlparts.path || "/",
+          method: "POST",
+          headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Content-Length': myParams.length,
+              'Date': date.toUTCString(),
+              'X-Amzn-Authorization':
+                  ['AWS3-HTTPS AWSAccessKeyID='+self.AWSAccessKeyID,
+                  "Signature="+self.buildSignature(date.toUTCString(), self.AWSSecretKey),
+                  "Algorithm=HmacSHA256"].join(",")
+          }
+      };
+
+      /* Take the XML response, extract the messageId, then call the callback */
+      function extractMessageIdFromResponse(errPostingToSES, response) {
+        // console.log('interpreting message id from SES mail');
+
+        if(errPostingToSES)
+            return callback(errPostingToSES);
+
+        var parser = new xml2js.Parser();
+
+        parser.parseString(response.message, function(errParsingXML, parsedResult) {
+          var messageId =
+            parsedResult.SendRawEmailResponse.SendRawEmailResult ?
+            parsedResult.SendRawEmailResponse.SendRawEmailResult[0].MessageId + "@email.amazonses.com" :
+            null;
+          // return ONE messageId string to caller (which is the outer sendMail function)
+          callback(null, messageId);
+        });
+      }
+
+      console.dir(myParams);
+
+      // post the request, extract the message id from response
+      https
+      .request(reqObj, self.responseHandler.bind(self, extractMessageIdFromResponse))
+      .end(myParams);
+
+    }
+
+  });
 };
 
 /**
