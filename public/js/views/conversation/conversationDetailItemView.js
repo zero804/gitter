@@ -45,7 +45,7 @@ define([
           var mailbody = this.generateMailBody();
 
           this.$el.find("#initialBody").replaceWith(mailbody);
-          this.$el.find('.trpMailPreview').css("visibility","hidden");
+          this.$el.find('.trpMailPreview').hide();
       }
     },
 
@@ -53,18 +53,18 @@ define([
       if(this.mailbody) {
         $(this.mailbody).toggle();
         // For some reason using toggle (which adjusts css display property) causes other issues, so this just toggles visibility
-        if(this.$el.find('.trpMailPreview').css("visibility") == 'hidden') {
-          this.$el.find('.trpMailPreview').css("visibility","visible");
+        if(this.$el.find('.trpMailPreview').is(':visible')) {
+          this.$el.find('.trpMailPreview').hide();
           return false;
         }
-        this.$el.find('.trpMailPreview').css("visibility","hidden");
+        this.$el.find('.trpMailPreview').show();
         return false;
       }
 
       var mailbody = this.generateMailBody();
 
       this.$el.append(mailbody);
-      this.$el.find('.trpMailPreview').css("visibility","hidden");
+      this.$el.find('.trpMailPreview').hide();
 
       return false;
 
