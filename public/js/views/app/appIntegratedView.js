@@ -19,7 +19,9 @@ define([
       "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
       "mouseenter #chat-frame":           "onMouseEnterChatFrame",
       "mouseenter #header-wrapper":       "onMouseEnterHeader",
-      "mouseenter #content-frame":        "onMouseEnterContent"
+      "mouseenter #content-frame":        "onMouseEnterContent",
+      "click #file-header":               "onFileHeaderClick",
+      "click #mail-header":               "onMailHeaderClick"
     },
 
     initialize: function() {
@@ -30,6 +32,14 @@ define([
       vent.on("detailView:hide", function() {
         self.hidePanel("#right-panel");
       });
+    },
+
+    toggleFiles: function () {
+      $("#file-list").slideToggle(350);
+    },
+
+    toggleMails: function () {
+      $("#mail-list").slideToggle(350);
     },
 
     showProfileMenu: function() {
@@ -187,6 +197,15 @@ define([
 
     onMouseLeaveHeader: function() {
       this.hideProfileMenu();
-    }
+    },
+
+    onMailHeaderClick: function() {
+        this.toggleMails();
+    },
+
+    onFileHeaderClick: function() {
+        this.toggleFiles();
+    },
+
   });
 });
