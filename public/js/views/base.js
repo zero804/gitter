@@ -355,7 +355,7 @@ define([
         }
         this.$backdrop.modal = this;
 
-        if (doAnimate) { this.$backdrop[0].offsetWidth; } // force reflow
+        if (doAnimate) { var x = this.$backdrop[0].offsetWidth; } // force reflow
 
         this.$backdrop.addClass('in');
 
