@@ -107,6 +107,7 @@ var ConversationSchema = new Schema({
   emails: [EmailSchema]
 });
 ConversationSchema.index({ troupeId: 1 });
+ConversationSchema.index({ 'emails.messageIds': 1 });
 
 var FileVersionSchema = new Schema({
   creatorUserId: ObjectId,
