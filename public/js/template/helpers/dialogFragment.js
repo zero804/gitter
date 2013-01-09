@@ -4,8 +4,14 @@ require([
 
   function dialogFragment(fragment) {
     if(!this._dialogFragmentPrimaryLocation) {
-      var currentFragment = window.location.hash.split('|', 1);
-      this._dialogFragmentPrimaryLocation = currentFragment[0];
+      var hash = window.location.hash;
+      if(!hash) {
+        this._dialogFragmentPrimaryLocation = '#';
+      } else {
+        var currentFragment = hash.split('|', 1);
+        this._dialogFragmentPrimaryLocation = currentFragment[0];
+      }
+
     }
 
     return this._dialogFragmentPrimaryLocation + "|" + fragment;

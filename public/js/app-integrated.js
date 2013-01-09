@@ -20,6 +20,29 @@ require([
   /*global require console */
   "use strict";
 
+  $(document).on("click", "a", function(event) {
+    if(this.href) {
+      var href = $(this).attr('href');
+      if(href.substring(0, 2) === "#|") {
+        event.preventDefault();
+
+        href = href.substring(2);
+
+        var currentFragment;
+        var hash = window.location.hash;
+
+        if(!hash) {
+          currentFragment = '#';
+        } else {
+          currentFragment = hash.split('|', 1)[0];
+        }
+
+        window.location = currentFragment + "|" + href;
+      }
+    }
+
+    return true;
+  });
 
   var app = new Marionette.Application();
   app.addRegions({
