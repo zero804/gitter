@@ -65,8 +65,8 @@ define([
   return TroupeViews.Base.extend({
     template: template,
     events: {
-      "click .link-prev": "onLinkPreviousClick",
-      "click .link-next": "onLinkNextClick"
+      //"click .link-prev": "onLinkPreviousClick",
+      //"click .link-next": "onLinkNextClick"
     },
 
     initialize: function(options) {
@@ -123,15 +123,12 @@ define([
       }
     },
 
-    getRenderData: function() {
-      console.log(">getRenderData", this.model);
-
+    getImageRenderData: function() {
       var item = this.model;
       var previewMimeType = item.get('previewMimeType');
       var mimeType = item.get('mimeType');
 
       if(/^image\//.test(mimeType)) {
-        console.log("file is an image");
         return {
           href: item.get('url') + '?embedded=1',
           photo: true
@@ -139,7 +136,6 @@ define([
       }
 
       if(mimeType == 'application/pdf') {
-        console.log("file is a pdf");
         return {
           width: "80%",
           height: "80%",
@@ -149,7 +145,6 @@ define([
       }
 
       if(/^image\//.test(previewMimeType)) {
-                console.log("file has an image preview");
         return {
           href: item.get('embeddedUrl') + '?embedded=1',
           photo: true
@@ -157,20 +152,30 @@ define([
       }
 
       if(previewMimeType == 'application/pdf') {
-        console.log("file has a pdf preview");
         return {
-          href: '/pdfjs/web/viewer.html?file=' + item.get('embeddedUrl'),
+          href:  pdfViewUrl(item.get('embeddedUrl')),
           iframe: true,
           width: "80%",
           height: "80%"
         };
       }
 
-        console.log("file has no preview");
-
       return {
         noPreviewAvailable: true
       };
+    },
+
+    getPreviewLinkUrl: function(model) {
+      if(!model) return null;
+      return "#|#file/preview/" + model.id;
+    },
+
+    getRenderData: function() {
+      var data = this.getImageRenderData();
+      data.prevLink = this.getPreviewLinkUrl(this.navigationController.getPrevious());
+      data.nextLink = this.getPreviewLinkUrl(this.navigationController.getNext());
+      console.dir(data);
+      return data;
     },
 
     afterRender: function() {

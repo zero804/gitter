@@ -1,5 +1,9 @@
-<a class="trpFilePreviewLeft link-prev" href="#">
-</a>
+{{#if prevLink}}
+<a class="trpFilePreviewLeft" href="{{prevLink}}"></a>
+{{/if}}
+
 <div class="trpFilePreviewItemContainer frame-preview"></div>
-<a class="trpFilePreviewRight link-next" href="#">
-</a>
+
+{{#if nextLink}}
+<a class="trpFilePreviewRight" href="{{nextLink}}"></a>
+{{/if}}
