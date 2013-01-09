@@ -1,6 +1,7 @@
 <div class="modal-header">
     <div class="trpModalHeader">
-    	<div class="trpModalLogo"><img src="images/2/logo-green.png"></div>
+    	{{^customTitle}}<div class="trpModalLogo"><img src="images/2/logo-green.png"></div>{{/customTitle}}
+      {{#customTitle}}{{title}}{{/customTitle}}
     	<div class="trpModalMenu frame-menu-items">
     		<div class="trpModalClose">
      		   {{^disableClose}}

@@ -201,7 +201,7 @@ require([
       var model = conversationCollection.get(id);
 
       var view = new ConversationDetailView({ id: id, masterModel: model });
-      var modal = new TroupeViews.Modal({ view: view, navigable: true });
+      var modal = new TroupeViews.Modal({ view: view, navigable: true, title: model.get('subject') });
       modal.show();
     }
 
