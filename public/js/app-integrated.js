@@ -172,6 +172,30 @@ require([
 
   var controller = new Controller();
 
+  var History = function() {
+    Backbone.History.apply(this);
+  };
+
+  _.extend(History.prototype, Backbone.History.prototype, {
+    // Attempt to load the current URL fragment. If a route succeeds with a
+    // match, returns `true`. If no defined routes matches the fragment,
+    // returns `false`.
+    loadUrl: function(fragmentOverride) {
+      var fragment = this.fragment = this.getFragment(fragmentOverride);
+      if(fragment.indexOf("|") < 0) {
+          var args = Array.prototype.slice.apply(arguments);
+          return Backbone.History.prototype.loadUrl.apply(this, arguments);
+      }
+
+      var fragments = fragment.split("|");
+      _.each(fragments, function(fragment) {
+        Backbone.History.prototype.loadUrl.call(this, fragment);
+      }, this);
+
+      return true;
+    }
+  });
+
   var Router = Marionette.AppRouter.extend({
     appRoutes: {
       "":                   "showDefaultView",
@@ -210,6 +234,8 @@ require([
 
   var router;
   app.on("initialize:after", function(){
+    Backbone.history = new History();
+
     router = new Router({
       controller: controller
     });
