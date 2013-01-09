@@ -77,6 +77,8 @@ exports.hook_queue = function(next, connection) {
     // send mail
     var sesFrom = troupe.uri + emailDomainWithAt;
     var sesRecipients = emailAddresses;
+    // ERR the above header changes are no longer changing the headers in the message_stream with haraka 2.0
+    // which means amazon rejects the sender address.
     var sesStream = transaction.message_stream;
 
     troupeSESTransport.sendMail(sesFrom, sesRecipients, sesStream, function(errorSendingMail, messageIds){
