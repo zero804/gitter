@@ -10,12 +10,10 @@
 .trpMailItemPicture {
 	width: 16px;
 	height: 16px;
-	display: inline-block;
 	opacity: 0.8;
 }
 
 .trpMailItemSubject {
-	display: inline-block;
 	font-family: 'Open Sans';
 	font-size: 12px;
 	vertical-align: top;
@@ -25,4 +23,59 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 
+}
+
+.trpMailRow {
+	display: block;
+}
+
+.trpMailRowContainer {
+	display: block;
+	border-bottom: 1px @trpLightGrey solid;
+	padding-bottom: 12px;
+	padding-top: 12px
+}
+
+.trpMailRowContainer:first-child {
+	padding-top: 0px;
+}
+
+.trpMailRowContainer:last-child {
+	border-bottom: none;
+}
+
+.trpMailHeader {
+	display: block;
+	width: 100%;
+	cursor: pointer;
+}
+
+.trpMailDisplayPicture {
+	vertical-align: top;
+}
+
+.trpMailFrom {
+	display: block;
+	.trpBodyEm;
+}
+
+.trpMailDate {
+	display: block;
+	.trpBodySmall;
+}
+
+.trpMailDetails {
+	padding-left: 8px;
+}
+
+.trpMailPreview {
+	display: block;
+	padding: 12px 0px;
+	.trpBodyMedium;
+}
+
+.trpMailBody {
+	display: block;
+	padding: 12px 0px;
+	.trpBodyMedium;
 }
