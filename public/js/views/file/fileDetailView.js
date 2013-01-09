@@ -11,8 +11,7 @@ define([
     template: template,
     buttonMenu : false,
     events: {
-      "click .link-delete":   "onDeleteLinkClick",
-      "click #file-preview-menu": "onMenuClick"
+      "click .link-delete":   "onDeleteLinkClick"
     },
 
     initialize: function(options) {
@@ -33,8 +32,7 @@ define([
       if (!this.buttonMenu) {
         $("#file-preview-menu-items").show();
         this.buttonMenu = true;
-      }
-      else {
+      } else {
         $("#file-preview-menu-items").hide();
         this.buttonMenu = false;
       }
