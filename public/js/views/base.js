@@ -147,6 +147,7 @@ define([
         autoRemove: true,
         menuItems: [],
         disableClose: false,
+        title: '',
         navigable: false
       };
       _.bindAll(this, 'hide', 'onMenuItemClicked');
@@ -157,8 +158,15 @@ define([
     },
 
     getRenderData: function() {
+      if (this.options.title.length > 0 ) {
+        var customTitle = true; 
+      }
+      else { 
+        var customTitle = false; 
+      }
       return {
-        title: "Modal",
+        customTitle: customTitle,
+        title: this.options.title,
         disableClose: this.options.disableClose
       };
     },
