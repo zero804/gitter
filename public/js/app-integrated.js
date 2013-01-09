@@ -44,6 +44,10 @@ require([
     return true;
   });
 
+  $(document).on("click", ".trpButtonDropdown .trpButtonMenu", function(event) {
+    $(this).parent().next().toggle();
+  });
+
   var app = new Marionette.Application();
   app.addRegions({
     leftMenuRegiom: "#left-menu",

@@ -27,17 +27,6 @@ define([
       return d;
     },
 
-    onMenuClick: function(e) {
-      console.log("Clicked on the file menu");
-      if (!this.buttonMenu) {
-        $("#file-preview-menu-items").show();
-        this.buttonMenu = true;
-      } else {
-        $("#file-preview-menu-items").hide();
-        this.buttonMenu = false;
-      }
-    },
-
     onDeleteLinkClick: function(e) {
       //TODO(AN): replace window.confirm with a nice dialog!
       if(window.confirm("Delete " + this.model.get('fileName') + "?")) {
