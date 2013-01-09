@@ -20,6 +20,7 @@ require([
   /*global require console */
   "use strict";
 
+
   var app = new Marionette.Application();
   app.addRegions({
     leftMenuRegiom: "#left-menu",
@@ -31,6 +32,8 @@ require([
     modalRegion: "#modal-panel"
   });
 
+
+  var router;
   var fileCollection, conversationCollection;
   var appView = new AppIntegratedView();
 
@@ -38,6 +41,14 @@ require([
     initialize: function(options){
       vent.on('navigable-dialog:open', this.onNavigableDialogOpen, this);
       vent.on('navigable-dialog:close', this.onNavigableDialogClose, this);
+      vent.on('navigable-dialog:navigate-close', this.onNavigableDialogNavigateClose, this);
+    },
+
+    onNavigableDialogNavigateClose: function() {
+      var url = window.location.hash.substring(1);
+      var parts = url.split('|', 1);
+
+      router.navigate(parts[0], {trigger: true});
     },
 
     onNavigableDialogOpen: function(dialog) {
@@ -59,7 +70,6 @@ require([
     },
 
     showDefaultView: function(id) {
-      this.closeDialogs();
       app.rightPanelRegion.reset();
       vent.trigger("detailView:hide");
     },
@@ -231,8 +241,6 @@ require([
     app.mailRegion.show(conversationView);
 
   });
-
-  var router;
   app.on("initialize:after", function(){
     Backbone.history = new History();
 

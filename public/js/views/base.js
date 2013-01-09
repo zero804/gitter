@@ -259,7 +259,7 @@ define([
       if(e) e.preventDefault();
 
       if(this.options.navigable) {
-        window.history.back();
+        vent.trigger("navigable-dialog:navigate-close");
       }
 
       this.hideInternal();
