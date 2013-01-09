@@ -13,6 +13,55 @@ define([
   var headerHeight = 110;
   var dialogWidth = 36;
 
+  function detectAdobeReader() {
+    try {
+      if(window.ActiveXObject) {
+        var control = null;
+
+        //
+        // load the activeX control
+        //
+        try {
+          // AcroPDF.PDF is used by version 7 and later
+          control = new ActiveXObject('AcroPDF.PDF');
+        } catch(e) {}
+
+        if(!control) {
+          try {
+            // PDF.PdfCtrl is used by version 6 and earlier
+            control = new ActiveXObject('PDF.PdfCtrl');
+          } catch(e) {}
+        }
+
+        return !!control;
+      }
+
+      if(navigator.plugins['Adobe Acrobat']) {
+        return true;
+      }
+
+      for(var key in navigator.plugins) {
+        if(navigator.plugins[key].name == "Chrome PDF Viewer" || navigator.plugins[key].name == "Adobe Acrobat") {
+          return true;
+        }
+      }
+
+    } catch(e) {
+      return false;
+    }
+
+    return false;
+  }
+
+  /** If a PDF plugin is installed, use it directly */
+  function pdfViewUrl(url) {
+    if(detectAdobeReader()) {
+      return url + "?embedded=1";
+    } else {
+      return '/pdfjs/web/viewer.html?file=' + url + "?embedded=1";
+    }
+  }
+
   return TroupeViews.Base.extend({
     template: template,
     events: {
@@ -94,7 +143,7 @@ define([
         return {
           width: "80%",
           height: "80%",
-          href:  '/pdfjs/web/viewer.html?file=' + item.get('url') + "?embedded=1",
+          href:  pdfViewUrl(item.get('url')),
           iframe: true
         };
       }
