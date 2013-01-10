@@ -15,8 +15,9 @@ require([
   'views/file/fileDetailView',
   'views/file/filePreviewView',
   'views/file/fileVersionsView',
-  'views/conversation/conversationDetailView'
-], function($, _, Backbone, Marionette, TroupeViews, AppIntegratedView, ChatView, FileView, ConversationView, vent, troupeModels, fileModels, conversationModels, FileDetailView, filePreviewView, fileVersionsView, conversationDetailView) {
+  'views/conversation/conversationDetailView',
+  'views/toolbar/troupeCollectionView'
+], function($, _, Backbone, Marionette, TroupeViews, AppIntegratedView, ChatView, FileView, ConversationView, vent, troupeModels, fileModels, conversationModels, FileDetailView, filePreviewView, fileVersionsView, conversationDetailView, TroupeCollectionView) {
   /*jslint browser: true*/
   /*global require console */
   "use strict";
@@ -52,7 +53,7 @@ require([
 
   var app = new Marionette.Application();
   app.addRegions({
-    leftMenuRegiom: "#left-menu",
+    leftMenuRegion: "#left-menu",
     chatRegion: "#chat-frame",
     peopleRosterRegion: "#people-roster",
     fileRegion: "#file-list",
@@ -138,8 +139,6 @@ require([
         var region, viewDetails;
 
         function loadItemIntoView() {
-          console.log("Loading item into view");
-
           var model = viewDetails.collection.get(viewDetails.id);
 
           var cv = region.currentView;
@@ -207,11 +206,16 @@ require([
 
     troupeCollection = new troupeModels.TroupeCollection();
     troupeCollection.fetch();
+
+    var troupeCollectionView = new TroupeCollectionView({
+      collection: troupeCollection
+    });
+
+    app.leftMenuRegion.show(troupeCollectionView);
   });
 
   app.on("initialize:after", function(){
-    router = new Router({
-    });
+    router = new Router({});
 
     router.initialize();
     Backbone.history.start();
