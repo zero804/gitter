@@ -114,7 +114,7 @@ TroupeSESTransport.prototype.sendMailStream = function(from, recipients, stream,
   // before we can actually construct the message (due to the signing required).
   io.readStreamIntoString(stream, function(err, string) {
     if(err) return callback(err);
-    console.log(string);
+    //console.log(string);
     self.sendMailString(from, recipients, string, callback);
   });
 

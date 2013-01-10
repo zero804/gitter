@@ -70,7 +70,7 @@ exports.hook_queue = function(next, connection) {
 	var subject = connection.transaction.header.get("Subject");
 	var date = connection.transaction.header.get("Date");
 	var fromName = connection.transaction.header.get("From");
-	var toName = connection.transaction.header.get("To");
+	var toName = connection.transaction.header.get("To");   // TODO this must use foreach connection.transaction.rcpt_to[i].address()
   var inReplyTo = connection.transaction.header.get("In-Reply-To");
 
 	var preview;
@@ -79,6 +79,7 @@ exports.hook_queue = function(next, connection) {
  // var lines = connection.transaction.message_stream;
   //if (!lines) return next(DENY);
 
+  // TODO use a battle hardened parser for the addresses in this smtp exchange
 	toName = toName.replace(/\n/g,"");
 	fromName = fromName.replace(/\n/g,"");
 	subject = subject.replace(/\n/g,"");
