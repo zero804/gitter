@@ -212,6 +212,16 @@ define([
       }
     },
 
+    supportsModelReplacement: function() {
+      return this.view &&
+              this.view.supportsModelReplacement &&
+              this.view.supportsModelReplacement();
+    },
+
+    replaceModel: function(model) {
+      return this.view.replaceModel(model);
+    },
+
     show: function() {
       if(this.options.navigable) {
         vent.trigger('navigable-dialog:open', this);

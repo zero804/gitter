@@ -257,10 +257,6 @@ require([
     Backbone.history.start();
   });
 
-  vent.on("conversation:view", function(model) {
-    window.alert("Conversation view: " + model.id);
-  });
-
   // Asynchronously load tracker
   /*
   not working with marionette yet

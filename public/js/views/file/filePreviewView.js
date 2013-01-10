@@ -65,13 +65,11 @@ define([
   var PreviewView = TroupeViews.Base.extend({
     template: template,
     events: {
-      //"click .link-prev": "onLinkPreviousClick",
-      //"click .link-next": "onLinkNextClick"
     },
 
     initialize: function(options) {
       var self = this;
-      _.bindAll(this, 'onLinkPreviousClick', 'onLinkNextClick', 'modelChange', 'onMenuItemClicked');
+      _.bindAll(this, 'onMenuItemClicked');
       this.on('menuItemClicked', this.onMenuItemClicked);
     },
 
@@ -79,25 +77,27 @@ define([
       window.location.href = this.model.get("url");
     },
 
-    modelChange: function() {
-      console.log("model change");
+    supportsModelReplacement: function() {
+      return true;
+    },
+
+    replaceModel: function(model) {
+      this.model = model;
+      this.onModelChange();
+    },
+
+    onModelChange: function() {
       var body = this.$el.find('.frame-preview');
       body.empty();
 
       var data = this.getRenderData();
-      console.log(data);
       var el;
       if(data.photo) {
-        console.log(">photo");
-
         el = this.make("img", {"src": data.href, "class": "trpFilePreviewItem" });
       } else if(data.iframe) {
-              console.log(">iframe");
         el = this.make("iframe", {"src": data.href, width: "100%", height: "100%", "class": "trpFilePreviewItem" });
       } else {
-        console.log(">nothing");
         el = this.make("img", {"src": "/images/2/mime/unknown.png", "class": "trpFilePreviewItem" });
-        //el = this.make("p", { }, "No preview available for " + this.model.get('fileName'));
       }
 
       body.append(el);
@@ -118,25 +118,6 @@ define([
         return this.collection.at(i - 1);
       }
       return null;
-    },
-
-    onLinkNextClick: function(e) {
-      e.preventDefault();
-      var m = this.navigationController.getNext();
-      if(m) {
-        this.model = m;
-        this.modelChange();
-      }
-    },
-
-    onLinkPreviousClick: function(e) {
-
-      e.preventDefault();
-      var m = this.navigationController.getPrevious();
-      if(m) {
-        this.model = m;
-        this.modelChange();
-      }
     },
 
     getImageRenderData: function() {
@@ -202,7 +183,7 @@ define([
       var w= Math.round($(window).width() * 0.8)  - dialogWidth;
       body.width(w);
 
-      this.modelChange();
+      this.onModelChange();
 
       return this;
     }
