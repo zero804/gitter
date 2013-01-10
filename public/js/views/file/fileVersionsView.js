@@ -7,7 +7,7 @@ define([
   'hbs!./fileVersionsView',
   './versionView'
 ], function($, _, Backbone, TroupeViews, template, VersionView){
-  return TroupeViews.Base.extend({
+  var View = TroupeViews.Base.extend({
     template: template,
 
     events: {
@@ -32,4 +32,17 @@ define([
     }
 
   });
+
+
+  var Modal = TroupeViews.Modal.extend({
+    initialize: function(options) {
+      TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+      this.view = new View({ model: this.model });
+    }
+  });
+
+  return {
+    View: View,
+    Modal: Modal
+  }
 });
