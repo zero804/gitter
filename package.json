@@ -53,7 +53,8 @@
     "kue": "~0.5.0",
     "file": "~0.2.1",
     "cube": "~0.2.4",
-    "nomnom": "~1.5.2"
+    "nomnom": "~1.5.2",
+    "mimelib": "~0.2.10"
   },
   "devDependencies": {
     "better-assert": "~0.1.0",
