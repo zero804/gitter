@@ -30,8 +30,8 @@ exports.hook_queue = function(next, connection) {
   console.log("Starting remailer (hook_queue)");
 
   // extract details from haraka transaction
-	var mailFrom = connection.transaction.mail_from;
-	var rcptTo = connection.transaction.rcpt_to;
+  var mailFrom = connection.transaction.mail_from;
+  var rcptTo = connection.transaction.rcpt_to;
   var transaction = connection.transaction;
   var from = mailFrom.address();
   var emailId = connection.transaction.notes.emailId;
@@ -41,9 +41,9 @@ exports.hook_queue = function(next, connection) {
   var to = rcptTo[0].address();
 
   // looks up the troupe for the mail's TO address
-	troupeService.validateTroupeEmailAndReturnDistributionList({ to: to, from: from}, function(errValidating, troupe, fromUser, emailAddresses) {
+  troupeService.validateTroupeEmailAndReturnDistributionList({ to: to, from: from}, function(errValidating, troupe, fromUser, emailAddresses) {
     if (errValidating | !troupe)
-        return next(DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.");
+      return next(DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.");
 
     if(!emailAddresses) {
       /* If  there's no-one to distribute the email to, don't continue */
@@ -81,24 +81,24 @@ exports.hook_queue = function(next, connection) {
     // which means amazon rejects the sender address.
     var sesStream = transaction.message_stream;
 
-    troupeSESTransport.sendMail(sesFrom, sesRecipients, sesStream, function(errorSendingMail, messageIds){
+    troupeSESTransport.sendMailStream(sesFrom, sesRecipients, sesStream, function(errorSendingMail, messageIds){
 
-        if (errorSendingMail) {
-          connection.logerror(errorSendingMail);
+      if (errorSendingMail) {
+        connection.logerror(errorSendingMail);
 
-          return errorResponse(next, errorSendingMail);
-        }
+        return errorResponse(next, errorSendingMail);
+      }
 
-        console.log("All messages have been queued on SES and ids have been returned: ");
-        console.dir(["messageIds", messageIds]);
+      console.log("All messages have been queued on SES and ids have been returned: ");
+      console.dir(["messageIds", messageIds]);
 
-        conversationService.updateEmailWithMessageIds(conversationId, emailId, messageIds, function(errorUpdatingMessageIds) {
-          if(errorUpdatingMessageIds)
-              return errorResponse(next, errorUpdatingMessageIds);
+      conversationService.updateEmailWithMessageIds(conversationId, emailId, messageIds, function(errorUpdatingMessageIds) {
+        if(errorUpdatingMessageIds)
+          return errorResponse(next, errorUpdatingMessageIds);
 
-          console.log("Message ids saved in db successfully.");
-          return continueResponse(next);
-        });
+        console.log("Message ids saved in db successfully.");
+        return continueResponse(next);
+      });
 
     });
 
