@@ -147,25 +147,18 @@ define([
         autoRemove: true,
         menuItems: [],
         disableClose: false,
-        title: '',
+        title: null,
         navigable: false
       };
       _.bindAll(this, 'hide', 'onMenuItemClicked');
       _.extend(this.options, options);
 
       this.view = this.options.view;
-      this.view.dialog = this;
     },
 
     getRenderData: function() {
-      if (this.options.title.length > 0 ) {
-        var customTitle = true; 
-      }
-      else { 
-        var customTitle = false; 
-      }
       return {
-        customTitle: customTitle,
+        customTitle: !!this.options.title,
         title: this.options.title,
         disableClose: this.options.disableClose
       };
@@ -224,6 +217,8 @@ define([
         vent.trigger('navigable-dialog:open', this);
       }
 
+      this.view.dialog = this;
+
       var that = this;
       if (this.isShown) return;
 
@@ -265,11 +260,18 @@ define([
 
     hide: function ( e ) {
       if(e) e.preventDefault();
+      if(this.navigable) {
+        var hash = window.location.hash;
+        var currentFragment;
+        if(!hash) {
+          currentFragment = '#';
+        } else {
+          currentFragment = hash.split('|', 1)[0];
+        }
 
-      if(this.options.navigable) {
-        vent.trigger("navigable-dialog:navigate-close");
+        window.location = currentFragment;
+        return;
       }
-
       this.hideInternal();
     },
 
@@ -281,10 +283,6 @@ define([
 
     hideInternal: function() {
       if (!this.isShown) return;
-
-      if(this.options.navigable) {
-        vent.trigger('navigable-dialog:close', this);
-      }
 
       var that = this;
       this.isShown = false;

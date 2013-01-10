@@ -15,7 +15,7 @@ require([
   'views/file/filePreviewView',
   'views/file/fileVersionsView',
   'views/conversation/conversationDetailView'
-], function($, _, Backbone, Marionette, TroupeViews, AppIntegratedView, ChatView, FileView, ConversationView, vent, fileModels, conversationModels, FileDetailView, FilePreviewView, FileVersionsView, ConversationDetailView) {
+], function($, _, Backbone, Marionette, TroupeViews, AppIntegratedView, ChatView, FileView, ConversationView, vent, fileModels, conversationModels, FileDetailView, filePreviewView, fileVersionsView, conversationDetailView) {
   /*jslint browser: true*/
   /*global require console */
   "use strict";
@@ -44,6 +44,7 @@ require([
     return true;
   });
 
+  // Make drop down menus drop down
   $(document).on("click", ".trpButtonDropdown .trpButtonMenu", function(event) {
     $(this).parent().next().toggle();
   });
@@ -55,192 +56,173 @@ require([
     peopleRosterRegion: "#people-roster",
     fileRegion: "#file-list",
     mailRegion: "#mail-list",
-    rightPanelRegion: "#right-panel",
-    modalRegion: "#modal-panel"
+    rightPanelRegion: "#right-panel"
   });
 
+  /* This is a special region which acts like a region, but is implemented completely differently */
+  app.dialogRegion = {
+    currentView: null,
+    show: function(view) {
+      if(this.currentView) {
+        console.log("Closing view: " + this.currentView);
+        this.currentView.fade = false;
+        this.currentView.hideInternal();
+      }
+      this.currentView = view;
+      view.navigable = true;
+      view.show();
+    },
+    close: function() {
+      if(this.currentView) {
+        console.log("Closing view: " + this.currentView);
+        this.currentView.navigationalHide();
+        this.currentView = null;
+      }
+    }
+  };
 
   var router;
   var fileCollection, conversationCollection;
-  var appView = new AppIntegratedView();
-
-  var Controller = Marionette.Controller.extend({
-    initialize: function(options){
-      vent.on('navigable-dialog:open', this.onNavigableDialogOpen, this);
-      vent.on('navigable-dialog:close', this.onNavigableDialogClose, this);
-      vent.on('navigable-dialog:navigate-close', this.onNavigableDialogNavigateClose, this);
-    },
-
-    onNavigableDialogNavigateClose: function() {
-      var url = window.location.hash.substring(1);
-      var parts = url.split('|', 1);
-
-      router.navigate(parts[0], {trigger: true});
-    },
-
-    onNavigableDialogOpen: function(dialog) {
-      if(this.currentModal) {
-        console.warn("Already a navigable dialog!");
-      }
-      this.currentModal = dialog;
-    },
-
-    onNavigableDialogClose: function(dialog) {
-      this.currentModal = null;
-    },
-
-    closeDialogs: function() {
-      if(this.currentModal) {
-        this.currentModal.navigationalHide();
-        this.currentModal = null;
-      }
-    },
-
-    showDefaultView: function(id) {
-      app.rightPanelRegion.reset();
-      vent.trigger("detailView:hide");
-    },
-
-    showFileDetail: function(id) {
-      // Do we need to wait for file collection to load?
-      if(fileCollection.length === 0) {
-        fileCollection.once('reset', function() { this.showFileDetail(id); }, this);
-        return;
-      }
-
-      this.closeDialogs();
-
-      var model = fileCollection.get(id);
-      var view = new FileDetailView({
-        model: model
-      });
-      app.rightPanelRegion.show(view);
-      vent.trigger("detailView:show");
-    },
-
-    showFilePreview: function(id) {
-      // Do we need to wait for file collection to load?
-      if(fileCollection.length === 0) {
-        fileCollection.once('reset', function() { this.showFilePreview(id); }, this);
-        return;
-      }
-
-      this.closeDialogs();
-
-      var self = this;
-      var currentModel = fileCollection.get(id);
-
-      // TODO: move this gunk somewhere else!!
-      var navigationController = {
-        hasNext: function() {
-          var i = fileCollection.indexOf(currentModel);
-          return i < fileCollection.length - 1;
-        },
-
-        getNext: function() {
-          var i = fileCollection.indexOf(currentModel);
-          if(i < fileCollection.length - 1) {
-            currentModel = fileCollection.at(i + 1);
-            return currentModel;
-          }
-          return null;
-        },
-
-        hasPrevious: function() {
-          var i = fileCollection.indexOf(currentModel);
-          return i > 0;
-        },
-
-        getPrevious: function() {
-          var i = fileCollection.indexOf(currentModel);
-          if(i > 0) {
-            currentModel = fileCollection.at(i - 1);
-            return currentModel;
-          }
-          return null;
-        }
-      };
-
-      var view = new FilePreviewView({ model: currentModel, navigationController: navigationController });
-      var modal = new TroupeViews.Modal({
-        view: view,
-        className: 'modal trpFilePreview',
-        navigable: true,
-        menuItems: [{
-          id: "download",
-          text: "Download"
-        }]
-      });
-      modal.show();
-    },
-
-    showFileVersions: function(id) {
-      // Do we need to wait for file collection to load?
-      if(fileCollection.length === 0) {
-        fileCollection.once('reset', function() { this.showFileVersions(id); }, this);
-        return;
-      }
-
-      this.closeDialogs();
-
-      var model = fileCollection.get(id);
-
-      var view = new FileVersionsView({ model: model });
-      var modal = new TroupeViews.Modal({ view: view, navigable: true });
-      modal.show();
-    },
-
-    showMail: function(id) {
-      if(conversationCollection.length === 0) {
-        conversationCollection.once('reset', function() { this.showMail(id); }, this);
-        return;
-      }
-
-      this.closeDialogs();
-
-      var model = conversationCollection.get(id);
-
-      var view = new ConversationDetailView({ id: id, masterModel: model });
-      var modal = new TroupeViews.Modal({ view: view, navigable: true, title: model.get('subject') });
-      modal.show();
-    }
-
-  });
-
-  var controller = new Controller();
+  var appView = new AppIntegratedView({ app: app });
 
   var History = function() {
     Backbone.History.apply(this);
   };
 
+  // Cached regex for cleaning leading hashes and slashes .
+  var routeStripper = /^[#\/]/;
+
   _.extend(History.prototype, Backbone.History.prototype, {
     // Attempt to load the current URL fragment. If a route succeeds with a
     // match, returns `true`. If no defined routes matches the fragment,
     // returns `false`.
-    loadUrl: function(fragmentOverride) {
-      var fragment = this.fragment = this.getFragment(fragmentOverride);
-      if(fragment.indexOf("|") < 0) {
-          var args = Array.prototype.slice.apply(arguments);
-          return Backbone.History.prototype.loadUrl.apply(this, arguments);
+    // Get the cross-browser normalized URL fragment, either from the URL,
+    // the hash, or the override.
+    cleanFragment: function(fragment, forcePushState) {
+      if (!fragment) {
+        return "";
       }
 
+      if (!fragment.indexOf(this.options.root)) fragment = fragment.substr(this.options.root.length);
+      return fragment.replace(routeStripper, '');
+    },
+
+    findCallback: function(fragment) {
+      var result = null;
+      _.any(this.handlers, function(handler) {
+        if (handler.route.test(fragment)) {
+          result = handler.callback;
+          return true;
+        }
+      });
+      return result;
+    },
+
+    loadUrl: function(fragmentOverride) {
+      var fragment = this.fragment = this.getFragment(fragmentOverride);
+
       var fragments = fragment.split("|");
-      _.each(fragments, function(fragment) {
-        Backbone.History.prototype.loadUrl.call(this, fragment);
-      }, this);
+      var f0 = this.cleanFragment(fragments[0]);
+      var f1 = this.cleanFragment(fragments[1]);
 
       return true;
     }
   });
 
-  var Router = Marionette.AppRouter.extend({
-    appRoutes: {
-      "":                   "showDefaultView",
-      "file/:id":           "showFileDetail",
-      "file/preview/:id":   "showFilePreview",
-      "file/versions/:id":  "showFileVersions",
-      "mail/:id":           "showMail"
+  var Router = Backbone.Router.extend({
+    initialize: function(options) {
+      this.regionsFragments = {};
+      this.route(/^(.*?)$/, "handle");
+    },
+
+    regionFragmentMapping: [
+      'rightPanelRegion',
+      'dialogRegion'
+    ],
+
+    getViewDetails: function(fragment) {
+
+      var routes = [
+        { re: /^file\/(\w+)$/,            viewType: FileDetailView,               collection: fileCollection },
+        { re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: fileCollection },
+        { re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: fileCollection },
+        { re: /^mail\/(\w+)$/,            viewType: conversationDetailView.Modal, collection: conversationCollection }
+      ];
+
+      var match = null;
+      _.any(routes, function(route) {
+        if(route.re.test(fragment)) {
+          match = route;
+          return true;
+        }
+      });
+
+      if(!match) return null;
+
+      var result = match.re.exec(fragment);
+
+      return {
+        viewType: match.viewType,
+        collection: match.collection,
+        id: result[1]
+      };
+    },
+
+    handle: function(path) {
+      var parts = path.split("|");
+
+      this.regionFragmentMapping.forEach(function(regionName, index) {
+        var fragment = parts[index] ? parts[index] : "";
+
+        if(fragment.substring(0, 1) === '#') {
+          fragment = fragment.substring(1);
+        }
+
+        var region, viewDetails;
+
+        function loadItemIntoView() {
+          console.log("Loading item into view");
+
+          var model = viewDetails.collection.get(viewDetails.id);
+
+          var cv = region.currentView;
+
+          if(cv instanceof viewDetails.viewType &&
+            cv.supportsModelReplacement &&
+            cv.supportsModelReplacement()) {
+            cv.replaceModel(model);
+          } else {
+            var view = new viewDetails.viewType({ model: model, collection: viewDetails.collection });
+            region.show(view);
+          }
+        }
+
+        if(this.regionsFragments[regionName] !== fragment) {
+          this.regionsFragments[regionName] = fragment;
+
+          region = app[regionName];
+
+          if(fragment) {
+            // lookup handler:
+            viewDetails = this.getViewDetails(fragment);
+
+            if(viewDetails) {
+              if(viewDetails.collection.length === 0) {
+                viewDetails.collection.once('reset', loadItemIntoView, this);
+              } else {
+                loadItemIntoView();
+              }
+              return;
+            }
+          }
+
+          region.close();
+        } else {
+          // This hasn't changed....
+        }
+      }, this);
     }
+
   });
 
   app.addInitializer(function(options){
@@ -256,7 +238,6 @@ require([
     });
     app.fileRegion.show(fileView);
 
-
     conversationCollection = new conversationModels.ConversationCollection();
     conversationCollection.listen();
     conversationCollection.fetch();
@@ -266,13 +247,10 @@ require([
     });
 
     app.mailRegion.show(conversationView);
-
   });
-  app.on("initialize:after", function(){
-    Backbone.history = new History();
 
+  app.on("initialize:after", function(){
     router = new Router({
-      controller: controller
     });
 
     router.initialize();

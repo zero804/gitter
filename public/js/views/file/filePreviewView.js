@@ -62,7 +62,7 @@ define([
     }
   }
 
-  return TroupeViews.Base.extend({
+  var PreviewView = TroupeViews.Base.extend({
     template: template,
     events: {
       //"click .link-prev": "onLinkPreviousClick",
@@ -72,7 +72,6 @@ define([
     initialize: function(options) {
       var self = this;
       _.bindAll(this, 'onLinkPreviousClick', 'onLinkNextClick', 'modelChange', 'onMenuItemClicked');
-      this.navigationController = options.navigationController;
       this.on('menuItemClicked', this.onMenuItemClicked);
     },
 
@@ -102,6 +101,23 @@ define([
       }
 
       body.append(el);
+    },
+
+    getNext: function() {
+      var i = this.collection.indexOf(this.model);
+      if(i < this.collection.length - 1) {
+        return this.collection.at(i + 1);
+      }
+
+      return null;
+    },
+
+    getPrevious: function() {
+      var i = this.collection.indexOf(this.model);
+      if(i > 0) {
+        return this.collection.at(i - 1);
+      }
+      return null;
     },
 
     onLinkNextClick: function(e) {
@@ -172,8 +188,8 @@ define([
 
     getRenderData: function() {
       var data = this.getImageRenderData();
-      data.prevLink = this.getPreviewLinkUrl(this.navigationController.getPrevious());
-      data.nextLink = this.getPreviewLinkUrl(this.navigationController.getNext());
+      data.prevLink = this.getPreviewLinkUrl(this.getPrevious());
+      data.nextLink = this.getPreviewLinkUrl(this.getNext());
       console.dir(data);
       return data;
     },
@@ -190,22 +206,23 @@ define([
 
       return this;
     }
-    /*
-    render: function() {
-      var data = this.getRenderData();
-      var el;
-      if(data.photo) {
-        el = this.make("img", {"src": data.href });
-      } else if(data.iframe) {
-        el = this.make("iframe", {"src": data.href, width: "500", height: "400"});
-      } else if(data.noPreviewAvailable) {
-        el = this.make("p", { }, "No preview available.");
-      }
-
-      this.$el.append(el);
-      return this;
-    }
-    */
   });
+
+  var Modal = TroupeViews.Modal.extend({
+    className: 'modal trpFilePreview',
+    menuItems: [{
+      id: "download",
+      text: "Download"
+    }],
+    initialize: function(options) {
+      TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+      this.view = new PreviewView({ model: this.model, collection: this.collection });
+    }
+  });
+
+  return {
+    Modal: Modal,
+    PreviewView: PreviewView
+  };
 
 });

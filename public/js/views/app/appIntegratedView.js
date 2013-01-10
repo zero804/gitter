@@ -24,13 +24,22 @@ define([
       "click #mail-header":               "onMailHeaderClick"
     },
 
-    initialize: function() {
+    initialize: function(options) {
       var self = this;
-      vent.on("detailView:show", function() {
+      this.app = options.app;
+
+      this.app.rightPanelRegion.on('show', function() {
+        console.log("SHOW PANEL");
         self.showPanel("#right-panel");
       });
-      vent.on("detailView:hide", function() {
-        self.hidePanel("#right-panel");
+
+      this.app.rightPanelRegion.on('close', function() {
+        window.setTimeout(function() {
+          if(!self.app.rightPanelRegion.currentView) {
+            console.log("CLOSE PANEL");
+            self.hidePanel("#right-panel");
+          }
+        }, 100);
       });
     },
 
@@ -44,7 +53,7 @@ define([
 
     showProfileMenu: function() {
       if (!this.profilemenu) {
-        console.log("Animating profile menu");
+
         $(".trpProfileMenu").animate({
             width: '120px'
         }, 250);
@@ -55,7 +64,6 @@ define([
 
     hideProfileMenu: function() {
       if (this.profilemenu) {
-        console.log("Hiding profile menu");
         $(".trpProfileMenu").animate({
             width: '0px'
         }, 250);
@@ -80,7 +88,7 @@ define([
         marginRight: '0px'
       }, 350, function() {
       });
-      
+
       this.rightpanel = false;
     },
 
@@ -205,7 +213,7 @@ define([
 
     onFileHeaderClick: function() {
         this.toggleFiles();
-    },
+    }
 
   });
 });

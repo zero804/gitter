@@ -10,7 +10,7 @@ define([
 ], function($, _, Backbone, TroupeViews, template, conversationModels, ConversationDetailItemView) {
   "use strict";
 
-  return TroupeViews.Base.extend({
+  var View = TroupeViews.Base.extend({
     template: template,
 
     initialize: function(options) {
@@ -53,4 +53,17 @@ define([
       window.history.back();
     }
   });
+
+  var Modal = TroupeViews.Modal.extend({
+    initialize: function(options) {
+      TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+      this.view = new View({ id: this.model.id, masterModel: this.model });
+    }
+  });
+
+  return {
+    View: View,
+    Modal: Modal
+  };
+
 });
