@@ -9,13 +9,14 @@ require([
   'views/file/fileView',
   'views/conversation/conversationView',
   'utils/vent',
+  'collections/troupes',
   'collections/files',
   'collections/conversations',
   'views/file/fileDetailView',
   'views/file/filePreviewView',
   'views/file/fileVersionsView',
   'views/conversation/conversationDetailView'
-], function($, _, Backbone, Marionette, TroupeViews, AppIntegratedView, ChatView, FileView, ConversationView, vent, fileModels, conversationModels, FileDetailView, filePreviewView, fileVersionsView, conversationDetailView) {
+], function($, _, Backbone, Marionette, TroupeViews, AppIntegratedView, ChatView, FileView, ConversationView, vent, troupeModels, fileModels, conversationModels, FileDetailView, filePreviewView, fileVersionsView, conversationDetailView) {
   /*jslint browser: true*/
   /*global require console */
   "use strict";
@@ -82,52 +83,8 @@ require([
   };
 
   var router;
-  var fileCollection, conversationCollection;
+  var fileCollection, conversationCollection, troupeCollection;
   var appView = new AppIntegratedView({ app: app });
-
-  var History = function() {
-    Backbone.History.apply(this);
-  };
-
-  // Cached regex for cleaning leading hashes and slashes .
-  var routeStripper = /^[#\/]/;
-
-  _.extend(History.prototype, Backbone.History.prototype, {
-    // Attempt to load the current URL fragment. If a route succeeds with a
-    // match, returns `true`. If no defined routes matches the fragment,
-    // returns `false`.
-    // Get the cross-browser normalized URL fragment, either from the URL,
-    // the hash, or the override.
-    cleanFragment: function(fragment, forcePushState) {
-      if (!fragment) {
-        return "";
-      }
-
-      if (!fragment.indexOf(this.options.root)) fragment = fragment.substr(this.options.root.length);
-      return fragment.replace(routeStripper, '');
-    },
-
-    findCallback: function(fragment) {
-      var result = null;
-      _.any(this.handlers, function(handler) {
-        if (handler.route.test(fragment)) {
-          result = handler.callback;
-          return true;
-        }
-      });
-      return result;
-    },
-
-    loadUrl: function(fragmentOverride) {
-      var fragment = this.fragment = this.getFragment(fragmentOverride);
-
-      var fragments = fragment.split("|");
-      var f0 = this.cleanFragment(fragments[0]);
-      var f1 = this.cleanFragment(fragments[1]);
-
-      return true;
-    }
-  });
 
   var Router = Backbone.Router.extend({
     initialize: function(options) {
@@ -247,6 +204,9 @@ require([
     });
 
     app.mailRegion.show(conversationView);
+
+    troupeCollection = new troupeModels.TroupeCollection();
+    troupeCollection.fetch();
   });
 
   app.on("initialize:after", function(){

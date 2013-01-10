@@ -100,6 +100,11 @@ define([
         el = this.make("img", {"src": "/images/2/mime/unknown.png", "class": "trpFilePreviewItem" });
       }
 
+      var prev = this.getPreviewLinkUrl(this.getPrevious());
+      var next = this.getPreviewLinkUrl(this.getNext());
+      this.$el.find('a.link-prev').attr('href', prev)[prev ? 'show' : 'hide']();
+      this.$el.find('a.link-next').attr('href', next)[next ? 'show' : 'hide']();
+
       body.append(el);
     },
 
@@ -120,7 +125,12 @@ define([
       return null;
     },
 
-    getImageRenderData: function() {
+    getPreviewLinkUrl: function(model) {
+      if(!model) return null;
+      return "#|#file/preview/" + model.id;
+    },
+
+    getRenderData: function() {
       var item = this.model;
       var previewMimeType = item.get('previewMimeType');
       var mimeType = item.get('mimeType');
@@ -160,19 +170,7 @@ define([
       return {
         noPreviewAvailable: true
       };
-    },
 
-    getPreviewLinkUrl: function(model) {
-      if(!model) return null;
-      return "#|#file/preview/" + model.id;
-    },
-
-    getRenderData: function() {
-      var data = this.getImageRenderData();
-      data.prevLink = this.getPreviewLinkUrl(this.getPrevious());
-      data.nextLink = this.getPreviewLinkUrl(this.getNext());
-      console.dir(data);
-      return data;
     },
 
     afterRender: function() {
