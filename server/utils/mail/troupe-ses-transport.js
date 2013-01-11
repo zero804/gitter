@@ -93,7 +93,7 @@ TroupeSESTransport.prototype.sendMailString = function(from, recipients, string,
       });
     }
 
-    console.dir(myParams);
+    //console.dir(myParams);
 
     // post the request, extract the message id from response
     https.request(reqObj, self.responseHandler.bind(self, extractMessageIdFromResponse)).end(myParams);

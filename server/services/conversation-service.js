@@ -79,6 +79,7 @@ exports.updateEmailWithMessageIds = function(conversationId, emailId, messageIds
 
   persistence.Conversation.findById(conversationId, function(err, conversation) {
     if(err) return callback(err);
+    if(!conversation) return callback("Conversation #" + conversationId + " does not exist.");
 
     conversation.emails
       .filter(function(i) { return i.id == emailId; })
