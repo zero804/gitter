@@ -26,11 +26,11 @@ define([
 
       $(window).bind('scroll', this, this.scrollEventBound);
       this.collection = new chatModels.ChatCollection();
-      this.collection.listen();
+      //this.collection.listen();
 
-      this.addCleanup(function() {
-        self.collection.unlisten();
-      });
+      //this.addCleanup(function() {
+      //  self.collection.unlisten();
+      //});
 
       this.loadNextMessages();
     },
