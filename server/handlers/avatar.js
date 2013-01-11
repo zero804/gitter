@@ -6,7 +6,8 @@ var middleware = require('../web/middleware'),
     im = require('imagemagick'),
     sechash = require('sechash'),
     mongoose = require("mongoose"),
-    userService = require('../services/user-service.js');
+    userService = require('../services/user-service.js'),
+    restSerializer = require("../serializers/rest-serializer");
 
 function redirectToDefault(user, res) {
   res.redirect(301, "/images/2/avatar-default.png");
@@ -77,7 +78,7 @@ module.exports = {
         '/avatar',
         middleware.ensureLoggedIn(),
         function(req, res, next) {
-          var file = req.files.files;
+          var file = req.files.file;
           var inPath = file.path;
           var resizedPath = file.path + "-small.jpg";
 
@@ -97,10 +98,19 @@ module.exports = {
               gs.writeFile(resizedPath, function(err) {
                 if (err) return next(err);
 
-                req.user.avatarVersion = req.user.avatarVersion ? 1 : req.user.avatarVersion + 1;
+                req.user.avatarVersion = req.user.avatarVersion ? req.user.avatarVersion + 1 : 1;
                 req.user.save();
 
-                res.send({ success: true });
+                var strategy = new restSerializer.UserStrategy();
+
+                restSerializer.serialize(req.user, strategy, function(err, serialized) {
+                  if(err) return next(err);
+
+                  res.send({
+                      success: true,
+                      user: serialized
+                  });
+                });
               });
             });
         }

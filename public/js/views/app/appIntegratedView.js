@@ -32,7 +32,7 @@ define([
       this.app = options.app;
 
       var uploader = new qq.FineUploader({
-        element: document.getElementById("file-upload-button"),
+        element: $("<span></span")[0],
         dragAndDrop: {
           extraDropzones: [document.body],
           hideDropzones: false,
@@ -140,7 +140,7 @@ define([
       if (($(document).width() < 1380) && (this.rightpanel)) {
         this.shifted = true;
         $('#right-panel').animate({ right: uiVars.shiftedPanelValue }, 350);
-        
+
         $("#content-frame").animate({
           marginRight: uiVars.shiftedMarginValue,
           marginLeft: uiVars.menuSlideValue

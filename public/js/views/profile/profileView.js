@@ -3,12 +3,12 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!./profileModalView',
-  'jquery_ocupload',
+  'hbs!./profileView',
+  'fineuploader',
   'jquery_placeholder'
-], function($, _, TroupeViews, template) {
+], function($, _, TroupeViews, template, qq) {
 
-  return TroupeViews.Base.extend({
+  var View = TroupeViews.Base.extend({
     template: template,
 
     initialize: function(options) {
@@ -31,12 +31,11 @@ define([
       "change #password": "onPasswordChange"
     },
 
-    reloadAvatar: function() {
-      var newAvatarURL = 'url(/avatar?_dc=' + Date.now() + ')';
-      console.log("New URL: " + newAvatarURL);
-      console.log("Avatar URL:" + this.$el.find('.image-avatar').css('background-image'));
+    reloadAvatar: function(user) {
+      $(document).trigger('avatar:change', { userId: user.id, avatarUrl: user.avatarUrl });
+
+      var newAvatarURL = 'url("' + user.avatarUrl + '")';
       this.$el.find('.image-avatar').css('background-image', newAvatarURL);
-      console.log("Avatar URL:" + this.$el.find('.image-avatar').css('background-image'));
     },
 
     afterRender: function() {
@@ -48,23 +47,29 @@ define([
       oldpasswordEl.placeholder();
 
       var self = this;
-      var myUpload = self.$el.find('.button-choose-avatar').upload({
-        name: 'files',
-        action: '/avatar',
-        enctype: 'multipart/form-data',
-        params: {},
-        autoSubmit: true,
-        onSubmit: function() {},
-        onComplete: function(response) {
-          response = JSON.parse(response);
-          if(response && response.success) {
-            self.reloadAvatar();
-          } else {
-            /* TODO Handle. Something went wrong. */
-          }
+      var uploader = new qq.FineUploaderBasic({
+        button: self.$el.find('.button-choose-avatar')[0],
+        multiple: false,
+        validation: {
+          allowedExtensions: ["png", "gif", "jpeg", "jpg"]
         },
-        onSelect: function() {}
+        request: {
+          endpoint: '/avatar/'
+        },
+        callbacks: {
+          onSubmit: function(id, fileName) {},
+          // return false to cancel submit
+          onComplete: function(id, fileName, response) {
+            if(response.success) {
+              window.troupeContext.user = response.user;
+              self.reloadAvatar(response.user);
+            } else {
+              // TODO: deal with this!
+            }
+          }
+        }
       });
+
 
     },
 
@@ -97,7 +102,7 @@ define([
         success: function(data) {
           if(data.success) {
             window.troupeContext.user.displayName = data.displayName;
-            that.trigger('profile.complete', data);
+            that.dialog.hide();
           } else {
             if(data.authFailure) {
               that.$el.find('#oldPassword').val("");
@@ -107,7 +112,18 @@ define([
         }
       });
     }
-
   });
+
+  var Modal = TroupeViews.Modal.extend({
+    initialize: function(options) {
+      TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+      this.view = new View({ });
+    }
+  });
+
+  return {
+    View: View,
+    Modal: Modal
+  };
 
 });

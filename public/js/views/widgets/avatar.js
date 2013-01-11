@@ -12,6 +12,23 @@ define([
       this.user = options.user ? options.user : {};
       this.showEmail = options.showEmail || {};
       this.showBadge = options.showBadge;
+      var self = this;
+      function avatarChange(event, data) {
+        if(data.userId === self.getUserId()) {
+          self.$el.find('div.trpDisplayPicture').css('background-image', 'url("' + data.avatarUrl + '")');
+        }
+      }
+
+      $(document).on('avatar:change', avatarChange);
+      this.addCleanup(function() {
+        $(document).off('avatar:change', avatarChange);
+      });
+    },
+
+    getUserId: function() {
+      if(this.model) return this.model.id;
+      if(this.user) return this.user.id;
+      return null;
     },
 
     getRenderData: function() {

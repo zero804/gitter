@@ -19,10 +19,11 @@ require([
   'views/file/fileVersionsView',
   'views/conversation/conversationDetailView',
   'views/toolbar/troupeCollectionView',
-  'views/people/peopleCollectionView'
+  'views/people/peopleCollectionView',
+  'views/profile/profileView'
 ], function($, _, Backbone, Marionette, TroupeViews, chat, AppIntegratedView, ChatView, FileView, ConversationView,
             vent, troupeModels, fileModels, conversationModels, userModels, FileDetailView, filePreviewView, fileVersionsView,
-            conversationDetailView, TroupeCollectionView, PeopleCollectionView) {
+            conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView) {
 
   /*jslint browser: true*/
   /*global require console */
@@ -112,7 +113,10 @@ require([
         { re: /^file\/(\w+)$/,            viewType: FileDetailView,               collection: fileCollection },
         { re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: fileCollection },
         { re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: fileCollection },
-        { re: /^mail\/(\w+)$/,            viewType: conversationDetailView.Modal, collection: conversationCollection }
+        { re: /^mail\/(\w+)$/,            viewType: conversationDetailView.Modal, collection: conversationCollection },
+
+        { re: /^profile$/,                viewType: profileView.Modal }
+
       ];
 
       var match = null;
@@ -147,18 +151,23 @@ require([
         var region, viewDetails;
 
         function loadItemIntoView() {
-          var model = viewDetails.collection.get(viewDetails.id);
 
+          var model = viewDetails.collection ? viewDetails.collection.get(viewDetails.id) : null;
           var cv = region.currentView;
 
-          if(cv instanceof viewDetails.viewType &&
-            cv.supportsModelReplacement &&
-            cv.supportsModelReplacement()) {
-            cv.replaceModel(model);
-          } else {
-            var view = new viewDetails.viewType({ model: model, collection: viewDetails.collection });
-            region.show(view);
+          if(viewDetails.collection) {
+            if(cv instanceof viewDetails.viewType &&
+              cv.supportsModelReplacement &&
+              cv.supportsModelReplacement()) {
+              cv.replaceModel(model);
+              return;
+            }
           }
+
+          /* Default case: load the view from scratch */
+          var view = new viewDetails.viewType({ model: model, collection: viewDetails.collection });
+          region.show(view);
+
         }
 
         if(this.regionsFragments[regionName] !== fragment) {
@@ -171,7 +180,7 @@ require([
             viewDetails = this.getViewDetails(fragment);
 
             if(viewDetails) {
-              if(viewDetails.collection.length === 0) {
+              if(viewDetails.collection && viewDetails.collection.length === 0) {
                 viewDetails.collection.once('reset', loadItemIntoView, this);
               } else {
                 loadItemIntoView();
