@@ -1,13 +1,18 @@
 define([
   'marionette',
-  'views/widgets/avatar'
-], function(Marionette, AvatarView) {
+  'views/base',
+  'hbs!./peopleItemView'
+], function(Marionette, TroupeViews, peopleItemViewTemplate) {
   /*jslint browser: true*/
   /*global require */
   "use strict";
 
+  var PeopleItemView = TroupeViews.Base.extend({
+    template: peopleItemViewTemplate
+  });
+
   return Marionette.CollectionView.extend({
-    itemView: AvatarView
+    itemView: PeopleItemView
   });
 
 });
