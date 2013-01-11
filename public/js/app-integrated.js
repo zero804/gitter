@@ -1,5 +1,3 @@
-
-
 require([
   'jquery',
   'underscore',
@@ -15,12 +13,17 @@ require([
   'collections/troupes',
   'collections/files',
   'collections/conversations',
+  'collections/users',
   'views/file/fileDetailView',
   'views/file/filePreviewView',
   'views/file/fileVersionsView',
   'views/conversation/conversationDetailView',
-  'views/toolbar/troupeCollectionView'
-], function($, _, Backbone, Marionette, TroupeViews, chat, AppIntegratedView, ChatView, FileView, ConversationView, vent, troupeModels, fileModels, conversationModels, FileDetailView, filePreviewView, fileVersionsView, conversationDetailView, TroupeCollectionView) {
+  'views/toolbar/troupeCollectionView',
+  'views/people/peopleCollectionView'
+], function($, _, Backbone, Marionette, TroupeViews, chat, AppIntegratedView, ChatView, FileView, ConversationView,
+            vent, troupeModels, fileModels, conversationModels, userModels, FileDetailView, filePreviewView, fileVersionsView,
+            conversationDetailView, TroupeCollectionView, PeopleCollectionView) {
+
   /*jslint browser: true*/
   /*global require console */
   "use strict";
@@ -89,7 +92,7 @@ require([
   };
 
   var router;
-  var fileCollection, conversationCollection, troupeCollection;
+  var fileCollection, conversationCollection, troupeCollection, userCollection;
   var appView = new AppIntegratedView({ app: app });
 
   var Router = Backbone.Router.extend({
@@ -209,14 +212,23 @@ require([
 
     app.mailRegion.show(conversationView);
 
+    // Troupe Collections
     troupeCollection = new troupeModels.TroupeCollection();
     troupeCollection.fetch();
 
     var troupeCollectionView = new TroupeCollectionView({
       collection: troupeCollection
     });
-
     app.leftMenuRegion.show(troupeCollectionView);
+
+    // User Collections
+    userCollection = new userModels.UserCollection();
+    userCollection.fetch();
+    var peopleCollectionView = new PeopleCollectionView({
+      collection: userCollection
+    });
+    app.peopleRosterRegion.show(peopleCollectionView);
+
   });
 
   app.on("initialize:after", function(){
