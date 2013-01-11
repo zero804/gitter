@@ -7,7 +7,8 @@ var persistence = require("./persistence-service"),
     emailNotificationService = require("./email-notification-service"),
     uuid = require('node-uuid'),
     nconf = require('../utils/config'),
-    winston = require("winston");
+    winston = require("winston"),
+    collections = require("../utils/collections");
 
 function findByUri(uri, callback) {
   persistence.Troupe.findOne({uri: uri}, function(err, troupe) {
@@ -116,6 +117,42 @@ function validateTroupeEmailAndReturnDistributionList(options, callback) {
       });
     });
   });
+}
+
+/*
+ * This function takes in a userId and a list of troupes
+ * It returns a hash that tells whether the user has access to each troupe,
+ * or null if the troupe represented by the uri does not exist.
+ * For example:
+ * For the input validateTroupeUrisForUser('1', ['a','b','c'],...)
+ * The callback could return:
+ * {
+ *   'a': true,
+ *   'b': false,
+ *   'c': null
+ * }
+ * Mean: User '1' has access to 'a', no access to 'b' and no troupe 'c' exists
+ */
+function validateTroupeUrisForUser(userId, uris, callback) {
+  persistence.Troupe
+    .where('uri').in(uris)
+    .exec(function(err, troupes) {
+      if(err) return callback(err);
+
+      var troupesByUris = collections.indexByProperty(troupes, "uri");
+
+      var result = {};
+      uris.forEach(function(uri) {
+        var troupe = troupesByUris[uri];
+        if(troupe) {
+          result[uri] = troupe.users.indexOf(userId) >= 0;
+        } else {
+          result[uri] = null;
+        }
+      });
+
+      callback(null, result);
+    });
 }
 
 function addInvite(troupe, senderDisplayName, displayName, email) {
@@ -296,5 +333,6 @@ module.exports = {
   acceptRequest: acceptRequest,
   rejectRequest: rejectRequest,
   removeUserFromTroupe: removeUserFromTroupe,
-  findUsersForTroupe: findUsersForTroupe
+  findUsersForTroupe: findUsersForTroupe,
+  validateTroupeUrisForUser: validateTroupeUrisForUser
 };
