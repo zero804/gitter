@@ -7,34 +7,35 @@ define([
   'bootstrap'
 ], function($, _, TroupeViews, template, presenceClient, _bootstrap) {
   return TroupeViews.Base.extend({
+    template: template,
     initialize: function(options) {
-      this.user = options.user || {};
+      this.user = options.user ? options.user : {};
       this.showEmail = options.showEmail || {};
       this.showBadge = options.showBadge;
-      if (options.user.location) {
-        this.user.location = options.user.location.description;
-      }
-      else {
-        this.user.location = "";
-      }
     },
 
-    render: function() {
-      this.$el.html(template({
-        id: this.user.id,
+    getRenderData: function() {
+      var user = this.model ? this.model.toJSON() : this.user;
+      return {
+        id: user.id,
         showBadge: this.showBadge,
-        userDisplayName: this.user.displayName,
-        userAvatarUrl: this.user.avatarUrl,
-        userLocation: this.user.location,
-        offline: !presenceClient.isOnline(this.user.id)
-      }));
+        userDisplayName: user.displayName,
+        userAvatarUrl: user.avatarUrl,
+        userLocation: user.location ? user.location.description : "",
+        offline: !presenceClient.isOnline(user.id)
+      };
+    },
+
+    // TODO: use base classes render() method
+    render: function() {
+      var dom = this.template(this.getRenderData());
+      this.$el.html(dom);
 
       this.$el.find('div').tooltip({
         html : true,
-        placement : "right",
+        placement : "right"
       });
 
-      return this;
     }
 
   });
