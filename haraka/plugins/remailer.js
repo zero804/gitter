@@ -12,9 +12,12 @@ var nconf = require("./../../server/utils/config");
 var winston = require("winston");
 var xml2js = require("xml2js");
 var Q = require("q");
+var Fiber = require('./../../server/utils/fiber');
+var mimelib = require('mimelib');
 
 var emailDomain = nconf.get("email:domain");
 var emailDomainWithAt = "@" + emailDomain;
+var skipRemailer = false;
 
 function continueResponse(next) {
   //return next (DENY, "Debug mode bounce.");
@@ -26,19 +29,12 @@ function errorResponse(next, err) {
   return next(DENYSOFT);
 }
 
-exports.hook_queue = function(next, connection) {
-  console.log("Starting remailer (hook_queue)");
 
-  // extract details from haraka transaction
-  var mailFrom = connection.transaction.mail_from;
-  var rcptTo = connection.transaction.rcpt_to;
+function distributeForTroupe(from, to, next, connection) {
   var transaction = connection.transaction;
-  var from = mailFrom.address();
-  var emailId = connection.transaction.notes.emailId;
-  var conversationId = connection.transaction.notes.conversationId;
 
-  // TODO: handle each recipient!
-  var to = rcptTo[0].address();
+  var conversationAndEmailIdsByTroupe = connection.transaction.notes.conversationAndEmailIdsByTroupe;
+
 
   // looks up the troupe for the mail's TO address
   troupeService.validateTroupeEmailAndReturnDistributionList({ to: to, from: from}, function(errValidating, troupe, fromUser, emailAddresses) {
@@ -77,14 +73,15 @@ exports.hook_queue = function(next, connection) {
     // send mail
     var sesFrom = troupe.uri + emailDomainWithAt;
     var sesRecipients = emailAddresses;
-    // ERR the above header changes are no longer changing the headers in the message_stream with haraka 2.0
-    // which means amazon rejects the sender address.
     var sesStream = transaction.message_stream;
+
+    if (skipRemailer)
+      return next(OK);
 
     troupeSESTransport.sendMailStream(sesFrom, sesRecipients, sesStream, function(errorSendingMail, messageIds){
 
       if (errorSendingMail) {
-        connection.logerror(errorSendingMail);
+        console.log(errorSendingMail);
 
         return errorResponse(next, errorSendingMail);
       }
@@ -92,7 +89,10 @@ exports.hook_queue = function(next, connection) {
       console.log("All messages have been queued on SES and ids have been returned: ");
       console.dir(["messageIds", messageIds]);
 
-      conversationService.updateEmailWithMessageIds(conversationId, emailId, messageIds, function(errorUpdatingMessageIds) {
+      var lookup = conversationAndEmailIdsByTroupe[troupe.id];
+      console.dir(conversationAndEmailIdsByTroupe);
+
+      conversationService.updateEmailWithMessageIds(lookup.conversationId, lookup.emailId, messageIds, function(errorUpdatingMessageIds) {
         if(errorUpdatingMessageIds)
           return errorResponse(next, errorUpdatingMessageIds);
 
@@ -103,7 +103,35 @@ exports.hook_queue = function(next, connection) {
     });
 
   });
+}
 
+function parseAddress(address) {
+  return (address) ? mimelib.parseAddresses(address)[0].address : '';
+}
+
+exports.hook_queue = function(next, connection) {
+  console.log("Starting remailer (hook_queue)");
+
+  // we will wait for all mails to be delivered before calling back
+  var deliveries = new Fiber();
+
+  // run the distributeForTroupe function asynchronously for each recipient troupe
+  // TODO verify: the peristence plugin should have ensured that only valid troupes remain in the haraka transaction rcptTo field
+  for (var toI = 0; toI < connection.transaction.rcpt_to.length; toI++) {
+    var to = parseAddress(connection.transaction.rcpt_to[toI].address());
+
+    distributeForTroupe(parseAddress(connection.transaction.mail_from), to, deliveries.waitor(), connection);
+  }
+
+  deliveries.sync()
+   .then(function() {
+      // now that all the mails have been delivered, finish the queue plugin
+      next(OK);
+    })
+   .fail(function(harakaErrorCode, errorMessage) {
+      // if any of the mails failed to deliver, return their error directly to haraka
+      next(harakaErrorCode, errorMessage);
+    });
 };
 
 
