@@ -66,7 +66,10 @@ function getGroup(groupName, callback) {
   var group = nowjs.getGroup(groupName);
 
   group.count(function (count) {
-    if(!count) { return; }
+    if(!count) {
+      console.log("No one is in group " + groupName);
+      return;
+    }
     callback(group);
   });
 }
@@ -342,8 +345,11 @@ module.exports = {
 
         getGroup("troupe." + troupeId, function(group) {
           if(!group || !group.now || !group.now.onDataChange) {
+            console.log("If a tree falls in a forest");
             return;
           }
+
+          console.log("now: appEvents.onDataChange");
 
           if(operation === 'create' || operation === 'update') {
             winston.debug("nowjs: Data has changed. Change will be serialized and pushed to clients.", { model: model });

@@ -1,9 +1,12 @@
+
+
 require([
   'jquery',
   'underscore',
   'backbone',
   'marionette',
   'views/base',
+  'components/chat/chat-component',
   'views/app/appIntegratedView',
   'views/chat/chatView',
   'views/file/fileView',
@@ -17,7 +20,7 @@ require([
   'views/file/fileVersionsView',
   'views/conversation/conversationDetailView',
   'views/toolbar/troupeCollectionView'
-], function($, _, Backbone, Marionette, TroupeViews, AppIntegratedView, ChatView, FileView, ConversationView, vent, troupeModels, fileModels, conversationModels, FileDetailView, filePreviewView, fileVersionsView, conversationDetailView, TroupeCollectionView) {
+], function($, _, Backbone, Marionette, TroupeViews, chat, AppIntegratedView, ChatView, FileView, ConversationView, vent, troupeModels, fileModels, conversationModels, FileDetailView, filePreviewView, fileVersionsView, conversationDetailView, TroupeCollectionView) {
   /*jslint browser: true*/
   /*global require console */
   "use strict";
@@ -60,6 +63,8 @@ require([
     mailRegion: "#mail-list",
     rightPanelRegion: "#right-panel"
   });
+
+  chat.connect();
 
   /* This is a special region which acts like a region, but is implemented completely differently */
   app.dialogRegion = {
@@ -219,6 +224,8 @@ require([
 
     router.initialize();
     Backbone.history.start();
+
+    console.log("History started");
   });
 
   // Asynchronously load tracker
