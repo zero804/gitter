@@ -25,6 +25,11 @@ div {
 
 a {
 	text-decoration: none;
+	color: #333;
+}
+
+a:hover {
+	text-decoration: underline;
 }
 
 .view {
@@ -55,13 +60,22 @@ a {
 }
 
 .trpLeftMenuWrapper {
-	.trpH2;
+	.trpBodyText;
 	padding-left: 20px;
 }
 
 .trpTroupeList {
 	list-style-type: none;
 	margin: 0;
+}
+
+.trpTroupeList a {
+	color: white;
+	white-space: nowrap;
+	display: block;
+	max-width: 220px;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .trpNewTroupeButton {
@@ -102,11 +116,13 @@ a {
 	text-align: center;
 	position: fixed;
 	z-index: 1000;
+	overflow: hidden;
 }
 
 .trpHeaderContainer {
 	background-color: white;
 	text-align: center;
+	overflow: hidden;
 }
 
 .trpHeaderTitle {
@@ -115,6 +131,7 @@ a {
 	text-align: left;
 	color: #333;
 	padding-top: 14px;
+	height: 60px;
 }
 
 .trpHeaderToolbar {
@@ -186,7 +203,6 @@ a {
 	text-align: left;
 	padding-top: 40px;
 	vertical-align: top;
-
 }
 
 .trpToolbarContent {

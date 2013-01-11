@@ -56,7 +56,7 @@ require([
 
   var app = new Marionette.Application();
   app.addRegions({
-    leftMenuRegion: "#left-menu",
+    leftMenuRegion: "#left-menu-list",
     chatRegion: "#chat-frame",
     peopleRosterRegion: "#people-roster",
     fileRegion: "#file-list",
