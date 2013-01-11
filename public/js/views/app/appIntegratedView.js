@@ -3,8 +3,9 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'utils/vent'
-  ], function($, _, Backbone, vent) {
+  'utils/vent',
+  'fineuploader'
+  ], function($, _, Backbone, vent, qq) {
   /*jslint browser: true*/
   /*global require console */
   "use strict";
@@ -27,6 +28,19 @@ define([
     initialize: function(options) {
       var self = this;
       this.app = options.app;
+
+      var uploader = new qq.FineUploader({
+        element: document.getElementById("file-upload-button"),
+        dragAndDrop: {
+          extraDropzones: [document.body],
+          hideDropzones: false,
+          disableDefaultDropzone: false
+        },
+        request: {
+          endpoint: '/troupes/' + window.troupeContext.troupe.id + '/downloads/'
+        },
+        debug: true
+      });
 
       this.app.rightPanelRegion.on('show', function() {
         console.log("SHOW PANEL");

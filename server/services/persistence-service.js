@@ -244,6 +244,7 @@ function attachNotificationListenersToSchema(schema, name, extractor) {
     this.post('save', function(postNext) {
       var e = extractor(this);
 
+      console.log("dataChange: " + name);
       appEvents.dataChange(name, isNewInstance ? 'create' : 'update', e.id, e.troupeId, this);
       postNext();
     });
