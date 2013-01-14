@@ -5,7 +5,6 @@
 // troupe service to redeliver mails to troupe users
 var conversationService = require("./../../server/services/conversation-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
-var nodemailer = require("nodemailer");
 var console = require("console");
 var troupeSESTransport = require("./../../server/utils/mail/troupe-ses-transport");
 var nconf = require("./../../server/utils/config");
@@ -39,6 +38,7 @@ function distributeForTroupe(from, to, next, connection) {
   // looks up the troupe for the mail's TO address
   troupeService.validateTroupeEmailAndReturnDistributionList({ to: to, from: from}, function(errValidating, troupe, fromUser, emailAddresses) {
     if (errValidating | !troupe)
+      // this should never happen because the gateway prevents it (by removing from to address or denying a non-registered user).
       return next(DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.");
 
     if(!emailAddresses) {
@@ -75,7 +75,7 @@ function distributeForTroupe(from, to, next, connection) {
     var sesRecipients = emailAddresses;
     var sesStream = transaction.message_stream;
 
-    if (skipRemailer)
+    if (skipRemailer) // use this flag (cautiously) for debug purposes
       return next(OK);
 
     troupeSESTransport.sendMailStream(sesFrom, sesRecipients, sesStream, function(errorSendingMail, messageIds){
@@ -116,7 +116,7 @@ exports.hook_queue = function(next, connection) {
   var deliveries = new Fiber();
 
   // run the distributeForTroupe function asynchronously for each recipient troupe
-  // TODO verify: the peristence plugin should have ensured that only valid troupes remain in the haraka transaction rcptTo field
+  // the peristence plugin should have ensured that only valid troupes remain in the haraka transaction rcptTo field
   for (var toI = 0; toI < connection.transaction.rcpt_to.length; toI++) {
     var to = parseAddress(connection.transaction.rcpt_to[toI].address());
 
@@ -126,11 +126,11 @@ exports.hook_queue = function(next, connection) {
   deliveries.sync()
    .then(function() {
       // now that all the mails have been delivered, finish the queue plugin
-      next(OK);
+      return next(OK);
     })
    .fail(function(harakaErrorCode, errorMessage) {
       // if any of the mails failed to deliver, return their error directly to haraka
-      next(harakaErrorCode, errorMessage);
+      return next(harakaErrorCode, errorMessage);
     });
 };
 
