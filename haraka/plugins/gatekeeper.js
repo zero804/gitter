@@ -37,7 +37,7 @@ exports.hook_queue = function (next, connection) {
     console.log("Gateway: Looked up the user for this mail");
 
     // hard deny if not a registered sender.
-    if(!user) next(DENY, "Sorry, your email address is not registered with us, please visit http://trou.pe to register.");
+    if(!user) return next(DENY, "Sorry, your email address is not registered with us, please visit http://trou.pe to register.");
 
     // get the troupe ids from the to addresses in the mail transaction
     var troupeUris = [];
@@ -94,12 +94,12 @@ exports.hook_queue = function (next, connection) {
       if (permittedTroupes.length) {
         console.log("Gateway: Returning to next plugin, there are " + permittedTroupes.length + " mails to receive.");
 
-        next();
+        return next();
       }
       else {
         console.log("Gateway: Cancelling any further plugin execution, there are no mails for them to receive.");
 
-        next(OK); // no further plugins should run
+        return next(OK); // no further plugins should run
       }
 
     });

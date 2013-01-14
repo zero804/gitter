@@ -63,7 +63,7 @@ function saveFile(troupeId, creatorUserId, fileName, mimeType, content, callback
 exports.hook_data = function(next, connection) {
   // enable mail body parsing
   connection.transaction.parse_body = 1;
-  next();
+  return next();
 };
 
 exports.hook_queue = function(next, connection) {
@@ -104,11 +104,11 @@ exports.hook_queue = function(next, connection) {
       .then(function() {
         console.log("All saves have been synced, continue to next plugin.");
         // now that all the mails have been saved, return to the next plugin
-        next();
+        return next();
       }).fail(function(err) {
         // if any of the mails failed to save, return their error directly to haraka
         console.log("One of the saves failed with code " + err);
-        next(DENY);
+        return next(DENY);
       });
 
   }
