@@ -118,7 +118,7 @@ module.exports = function( grunt ) {
               exclude: ["core-libraries","router"]
           },
           {
-              name: "views/profile/profileModalView",
+              name: "views/profile/profileView",
               exclude: ["core-libraries","router"]
           }
       ],
@@ -224,9 +224,9 @@ module.exports = function( grunt ) {
         src: ['public-processed/js/views/people/peopleView.js'],
         dest: 'public-processed/js/views/people/peopleView.js'
       },
-      "profileModalView": {
-        src: ['views/profile/profileModalView.js'],
-        dest: 'views/profile/profileModalView.js'
+      "profileView": {
+        src: ['views/profile/profileView.js'],
+        dest: 'views/profile/profileView.js'
       }
     },
 

@@ -5,9 +5,9 @@ require([
   './base-router',
   'views/base',
   'views/login/loginModalView',
-  'views/profile/profileModalView',
+  'views/profile/profileView',
   'views/login/loginRequestModalView'
-], function($, _, Backbone, BaseRouter, TroupeViews, LoginModalView, ProfileModalView, RequestModalView) {
+], function($, _, Backbone, BaseRouter, TroupeViews, LoginModalView, profileView, RequestModalView) {
   "use strict";
 
   var AppRouter = BaseRouter.extend({
@@ -52,8 +52,7 @@ require([
       }
 
       if(window.troupeContext.profileNotCompleted) {
-        view = new ProfileModalView();
-        modal = new TroupeViews.Modal({ view: view, disableClose: true  });
+        modal = new profileView.Modal({ disableClose: true  });
 
         view.on('profile.complete', function(data) {
           modal.off('profile.complete');

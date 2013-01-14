@@ -151,7 +151,6 @@ require([
         var region, viewDetails;
 
         function loadItemIntoView() {
-
           var model = viewDetails.collection ? viewDetails.collection.get(viewDetails.id) : null;
           var cv = region.currentView;
 
@@ -180,11 +179,14 @@ require([
             viewDetails = this.getViewDetails(fragment);
 
             if(viewDetails) {
-              if(viewDetails.collection && viewDetails.collection.length === 0) {
-                viewDetails.collection.once('reset', loadItemIntoView, this);
-              } else {
-                loadItemIntoView();
+              if(viewDetails.collection) {
+                if(viewDetails.collection.length === 0) {
+                  viewDetails.collection.once('reset', loadItemIntoView, this);
+                  return;
+                }
               }
+
+              loadItemIntoView();
               return;
             }
           }
@@ -237,6 +239,14 @@ require([
       collection: userCollection
     });
     app.peopleRosterRegion.show(peopleCollectionView);
+
+
+    app.collections = {
+      'files': fileCollection,
+      'conversations': conversationCollection,
+      'troupes': troupeCollection,
+      'users': userCollection
+    };
 
   });
 

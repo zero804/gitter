@@ -32,7 +32,7 @@
 	window.troupeContext = {{{troupeContext}}};
   var consoleLog = console.log;
   var startTime = Date.now();
-  console.log = function() {
+  console.flog = function() {
     var args = Array.prototype.slice.call(arguments);
 
     args[0] = (Date.now() - startTime) + " " + args[0];

@@ -32,6 +32,10 @@
           (attrs = {})[key] = val;
         }
 
+        var changes = {};
+        if(!options) options = {};
+        var hasChanges = false;
+
         // For each `set` attribute...
         for (attr in attrs) {
           val = attrs[attr];
@@ -41,8 +45,16 @@
           var currentValue = this.get(attr);
           if(currentValue instanceof Backbone.Collection) {
             currentValue.reset(val);
+            this.changed[attr] = val;
+            changes[attr] = true;
             delete attrs[attr];
+            hasChanges = true;
           }
+        }
+
+        if(hasChanges) {
+          options.changes = changes;
+          this.change(options);
         }
 
         return Backbone.Model.prototype.set.call(this, attrs, options);
@@ -99,22 +111,25 @@
         var newModel = data.model;
         var parsed = new this.model(newModel, { parse: true });
 
-        console.log("WARNING: as collection stands: ", this.toJSON());
-
         var existing = this.findExistingModel(id, parsed);
 
         switch(operation) {
           case 'create':
           case 'update':
             if(existing) {
+              /*
               var l = this.length;
               this.remove(existing);
               if(this.length !== l - 1) {
                 console.log("Nothing was deleted. This is a problem.");
               }
+              */
+              console.log("Existing ", existing, " set ", newModel);
+              existing.set(newModel);
+            } else {
+              this.add(parsed);
             }
 
-            this.add(parsed);
             break;
 
           case 'remove':
