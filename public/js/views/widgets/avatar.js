@@ -12,6 +12,7 @@ define([
       this.user = options.user ? options.user : {};
       this.showEmail = options.showEmail || {};
       this.showBadge = options.showBadge;
+      this.showStatus = options.showStatus;
       var self = this;
       function avatarChange(event, data) {
         if(data.userId === self.getUserId()) {
@@ -36,6 +37,7 @@ define([
       return {
         id: user.id,
         showBadge: this.showBadge,
+        showStatus: this.showStatus,
         userDisplayName: user.displayName,
         userAvatarUrl: user.avatarUrl,
         userLocation: user.location ? user.location.description : "",
