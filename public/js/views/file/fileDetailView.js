@@ -15,6 +15,7 @@ define([
     },
 
     initialize: function(options) {
+      this.setRerenderOnChange();
     },
 
     getRenderData: function () {

@@ -41,7 +41,16 @@ define([
         request: {
           endpoint: '/troupes/' + window.troupeContext.troupe.id + '/downloads/'
         },
-        debug: true
+        callbacks: {
+          onSubmit: function(id, fileName) {},
+          // return false to cancel submit
+          onComplete: function(id, fileName, response) {
+            if(response.success) {
+              self.app.collections['files'].add(response.file, { merge: true });
+              window.location.href = "#file/" + response.file.id;
+            }
+          }
+        }
       });
 
       this.app.rightPanelRegion.on('show', function() {

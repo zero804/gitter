@@ -36,6 +36,21 @@ define([
       if(options.template) this.template = options.template;
     },
 
+    setRerenderOnChange: function() {
+      var self = this;
+      this.model.on('change', this.rerenderOnChange, this);
+
+      this.addCleanup(function() {
+        self.model.off('change', self.rerenderOnChange, this);
+      });
+    },
+
+    rerenderOnChange: function() {
+      console.log("RERENDER ON CHANGE");
+      this.removeSubViews();
+      this.render();
+    },
+
     addCleanup: function(callback) {
       var self = this;
       function t() {

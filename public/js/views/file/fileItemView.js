@@ -13,9 +13,13 @@ define([
   /*global require console */
   "use strict";
 
-  return Marionette.ItemView.extend({
+  return TroupeViews.Base.extend({
     template: template,
-    serializeData: function(){
+    initialize: function(options) {
+      this.setRerenderOnChange();
+    },
+
+    getRenderData: function(){
       var data = this.model.toJSON();
 
       var versions = this.model.get('versions');

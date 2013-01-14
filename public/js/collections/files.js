@@ -14,7 +14,6 @@ define([
       response.createdDate = moment.utc(response.createdDate);
       return response;
     }
-
   });
 
   exports.FileVersionCollection  = Backbone.Collection.extend({
@@ -22,16 +21,15 @@ define([
   });
 
   exports.FileModel = TroupeCollections.Model.extend({
-      idAttribute: "id",
+    idAttribute: "id",
 
-      defaults: {
-      },
+    defaults: {
+    },
 
-      initialize: function() {
-        this.convertArrayToCollection('versions', exports.FileVersionCollection);
-      }
-
-    });
+    initialize: function() {
+      this.convertArrayToCollection('versions', exports.FileVersionCollection);
+    }
+  });
 
   exports.FileCollection = TroupeCollections.LiveCollection.extend({
     model: exports.FileModel,

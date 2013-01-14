@@ -6,7 +6,8 @@ var troupeService = require('../services/troupe-service'),
     fileService = require('../services/file-service'),
     mongoose = require("mongoose"),
     fs = require("fs"),
-    winston = require('winston');
+    winston = require('winston'),
+    restSerializer = require("../serializers/rest-serializer");
 
 module.exports = {
     index: function(req, res, next) {
@@ -30,8 +31,15 @@ module.exports = {
           }, function(err, fileAndVersion) {
             if(err) return next(err);
 
-            /* The AJAX file upload component we use requires an object shaped like this (below) */
-            res.send({ success: true });
+            var strategy = new restSerializer.FileStrategy();
+
+            restSerializer.serialize(fileAndVersion.file, strategy, function(err, serialized) {
+              if(err) return next(err);
+
+              /* The AJAX file upload component we use requires an object shaped like this (below) */
+              res.send({ success: true, file: serialized });
+            });
+
           });
         }
       }
