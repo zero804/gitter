@@ -18,11 +18,13 @@ define([
     },
 
     getRenderData: function() {
-      return {
-        existingUser: this.existingUser,
+      var d = {
+        existingUser: !window.troupeContext.profileNotCompleted,
         // displayName: this.existingUser ? window.troupeContext.user.displayName : ""
         displayName: window.troupeContext.user.displayName
       };
+      console.dir(d);
+      return d;
     },
 
     events: {

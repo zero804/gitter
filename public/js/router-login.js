@@ -52,14 +52,14 @@ require([
       }
 
       if(window.troupeContext.profileNotCompleted) {
-        modal = new profileView.Modal({ disableClose: true  });
+        view = new profileView.Modal({ disableClose: true  });
 
-        view.on('profile.complete', function(data) {
-          modal.off('profile.complete');
-          modal.close();
+        view.on('close', function(data) {
+          view.off('close');
+          //modal.close();
           window.location.reload(true);
         });
-        modal.show();
+        view.show();
         return;
       }
 
