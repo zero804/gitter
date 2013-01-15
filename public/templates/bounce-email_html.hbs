@@ -1,0 +1,40 @@
+<html>
+  <head>
+    <title></title>
+  </head>
+  <body>
+    <p>
+    Oops, there was an error with the troupe addresses you tried to send to.
+    </p>
+
+    {{#if deniedTroupes.length}}
+
+      <p>
+      You aren't allowed to send to the following troupes.
+      Click the links below to gain access for your future mails:
+      </p>
+
+      <ol>
+      {{#each deniedTroupes}}
+        <li><a href="http://{{baseServerPath}}/#{{this}}">Join this troupe</a></li>
+      {{/each}}
+      </ol>
+
+    {{/if}}
+
+    {{#if nonExistantTroupes.length}}
+
+      <p>
+      One or more of the troupe's you tried to send to don't actually exist.
+      Please recheck the email address (you can find it on once you login on the site), and remember to update your address book with the correct address.
+      </p>
+
+      <ol>
+      {{#each nonExistantTroupes}}
+          <li>{{this}}</li>
+      {{/each}}
+      </ol>
+
+    {{/if}}
+  </body>
+</html>
