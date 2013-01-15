@@ -11,7 +11,6 @@ var appEvents = require("./../../server/app-events");
 var MailParser = require("mailparser").MailParser;
 var temp = require('temp');
 var fs = require('fs');
-var console = require("console");
 var Q = require("q");
 var Fiber = require("./../../server/utils/fiber");
 var sanitizer = require("./../../server/utils/sanitizer.js");
@@ -91,12 +90,12 @@ exports.hook_queue = function(next, connection) {
     // return to haraka once all saves have returned
     fiber.sync()
       .then(function() {
-        console.log("All saves have been synced, continue to next plugin.");
+        winston.debug("All saves have been synced, continue to next plugin.");
         // now that all the mails have been saved, return to the next plugin
         return next();
       }).fail(function(err) {
         // if any of the mails failed to save, return their error directly to haraka
-        console.log("One of the saves failed with code " + err);
+        winston.error("One of the saves failed: ", { exception: err });
         return next(DENY);
       });
 
@@ -109,7 +108,7 @@ exports.hook_queue = function(next, connection) {
 // should this function exec the callback with the same params as haraka next is given?
 
 function saveMailForTroupe(mail, toAddress, connection, callback) {
-  console.log("Saving mail from " + mail.from + " to troupe " + toAddress);
+  winston.debug("Saving mail from " + mail.from + " to troupe " + toAddress);
   //console.log("From: " + fromName);
   //console.log("To:" + toAddress);
   //console.log("In-Reply-To:" + inReplyTo);
@@ -203,7 +202,6 @@ function saveMailForTroupe(mail, toAddress, connection, callback) {
       // strip out the name of the troupe if it appears in the subject, we don't want it duplicated
       var newSubject = mail.subject.replace("[" + troupe.name + "] ", "");
 
-      console.log("storeEmailInConversation()");
       conversationService.storeEmailInConversation({
         fromUserId: user.id,
         troupeId: troupe.id,
@@ -219,7 +217,7 @@ function saveMailForTroupe(mail, toAddress, connection, callback) {
 
         appEvents.mailEvent('new', troupe.id, conversation.id, conversation.emails.length);
 
-        connection.logdebug("Stored the email.");
+        winston.debug("Stored the email.");
 
         // Save these values so that the remailer plugin can update the
         // messageId after the message has been remailer
@@ -234,7 +232,7 @@ function saveMailForTroupe(mail, toAddress, connection, callback) {
       });
 
     }).fail(function(err) {
-      connection.logdebug("Unable to save attachment: " + err);
+      winston.error("Unable to save attachment: ", { exception: err });
       return callback(err);
     });
 

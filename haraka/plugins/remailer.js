@@ -1,11 +1,10 @@
 /*jshint node:true, unused: true */
-/*global OK:true DENY: true DENYSOFT: true console: true */
+/*global OK:true DENY: true DENYSOFT: true */
 "use strict";
 
 // troupe service to redeliver mails to troupe users
 var conversationService = require("./../../server/services/conversation-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
-var console = require("console");
 var troupeSESTransport = require("./../../server/utils/mail/troupe-ses-transport");
 var nconf = require("./../../server/utils/config");
 var winston = require("winston");
@@ -44,8 +43,6 @@ function distributeForTroupe(from, to, next, connection) {
       return continueResponse(next);
     }
 
-    console.log("Delivering emails");
-
     // normalize headers
     var newSubject = transaction.header.get("Subject");
     newSubject = newSubject ? newSubject.replace(/\n/g,'') : "";
@@ -68,6 +65,9 @@ function distributeForTroupe(from, to, next, connection) {
     transaction.remove_header("Return-Path");
     transaction.add_header("Return-Path", "troupe-bounces" + emailDomainWithAt);
 
+    // amazon will complain about this header which Mail.app includes when you click redirect.
+    transaction.remove_header("Resent-Cc");
+
     // send mail
     var sesFrom = troupe.uri + emailDomainWithAt;
     var sesRecipients = emailAddresses;
@@ -79,22 +79,20 @@ function distributeForTroupe(from, to, next, connection) {
     troupeSESTransport.sendMailStream(sesFrom, sesRecipients, sesStream, function(errorSendingMail, messageIds){
 
       if (errorSendingMail) {
-        console.log(errorSendingMail);
+        winston.error("Error sending mail through ses: ", { exception: errorSendingMail, from: from, troupe: troupe });
 
         return errorResponse(next, errorSendingMail);
       }
 
-      console.log("All messages have been queued on SES and ids have been returned: ");
-      console.dir(["messageIds", messageIds]);
+      winston.debug("All messages have been queued on SES and ids have been returned: ", { messageIds: messageIds });
 
       var lookup = conversationAndEmailIdsByTroupe[troupe.id];
-      console.dir(conversationAndEmailIdsByTroupe);
 
       conversationService.updateEmailWithMessageIds(lookup.conversationId, lookup.emailId, messageIds, function(errorUpdatingMessageIds) {
         if(errorUpdatingMessageIds)
           return errorResponse(next, errorUpdatingMessageIds);
 
-        console.log("Message ids saved in db successfully.");
+        // winston.debug("Message ids saved in db successfully.");
         return continueResponse(next);
       });
 
@@ -108,7 +106,7 @@ function parseAddress(address) {
 }
 
 exports.hook_queue = function(next, connection) {
-  console.log("Starting remailer (hook_queue)");
+  winston.debug("Starting remailer (hook_queue)");
 
   // we will wait for all mails to be delivered before calling back
   var deliveries = new Fiber();
