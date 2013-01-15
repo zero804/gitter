@@ -45,7 +45,8 @@ define([
               type: "DELETE",
               success: function(data) {
                 console.log("Removed this person");
-                thisPerson.$el.toggle();
+                // thisPerson.$el.toggle();
+                window.location.href = "#";
               }
             });
       });
