@@ -10,6 +10,7 @@ var https = require('https');
 var xml2js = require('xml2js');
 var crypto = require('crypto');
 var io = require('../io');
+var winston = require('../winston');
 
 function TroupeSESTransport() {
   this.AWSAccessKeyID = nconf.get("amazon:accessKey");
@@ -113,7 +114,7 @@ TroupeSESTransport.prototype.sendMailStream = function(from, recipients, stream,
   // we need to buffer the contents of the stream
   // before we can actually construct the message (due to the signing required).
   io.readStreamIntoString(stream, function(err, string) {
-    if(err) return callback(err);
+    if(err) { winston.error("Error reeading stream", { exception: err }); return callback(err); }
     //console.log(string);
     self.sendMailString(from, recipients, string, callback);
   });
@@ -144,6 +145,7 @@ TroupeSESTransport.prototype.responseHandler = function(callback, response) {
       return callback && callback(err, null);
     }
     if(response.statusCode != 200) {
+      winston.error('Email failed: ', { exception: response.statusCode, body: body });
       return callback && callback(new Error('Email failed: ' + response.statusCode + '\n' + body), null);
     }
     return callback && callback(null, {
