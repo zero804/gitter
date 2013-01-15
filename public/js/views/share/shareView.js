@@ -2,18 +2,19 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!./shareModalView',
+  'hbs!./shareView',
   'hbs!./shareRow',
   'zeroClipboard',
-  'jquery_placeholder'
+  'jquery_placeholder',
+  'jquery_validate'
 ], function($, _, TroupeViews, template, rowTemplate, zeroClipboard) {
 
-    return TroupeViews.Base.extend({
+  var View = TroupeViews.Base.extend({
     template: template,
 
     initialize: function(options) {
       _.bindAll(this, 'onFormSubmit');
-      this.uri = options.uri;
+      this.uri = window.troupeContext.troupe.uri;
     },
 
     getRenderData: function() {
@@ -122,5 +123,18 @@ define([
       });
     }
   });
+
+  var Modal = TroupeViews.Modal.extend({
+    initialize: function(options) {
+      TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+      this.view = new View({ });
+    }
+  });
+
+  return {
+    View: View,
+    Modal: Modal
+  };
+
 
 });

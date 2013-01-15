@@ -1,8 +1,9 @@
 define([
   'marionette',
   'views/base',
-  'hbs!./peopleItemView'
-], function(Marionette, TroupeViews, peopleItemViewTemplate) {
+  'hbs!./peopleItemView',
+  'hbs!./peopleAddPersonButtonView'
+], function(Marionette, TroupeViews, peopleItemViewTemplate, peopleAddPersonButtonViewTemplate) {
   /*jslint browser: true*/
   /*global require */
   "use strict";
@@ -11,8 +12,23 @@ define([
     template: peopleItemViewTemplate
   });
 
+  var PeopleAddPersonButtonView = TroupeViews.Base.extend({
+    template: peopleAddPersonButtonViewTemplate,
+    className: 'trpAddButton'
+  });
+
   return Marionette.CollectionView.extend({
-    itemView: PeopleItemView
+    itemView: PeopleItemView,
+
+    initialize: function(options) {
+      this.addButton = new PeopleAddPersonButtonView();
+    },
+
+    onRender: function() {
+      console.log("ON RENDER BITCH");
+      this.$el.append(this.addButton.render().el);
+    }
+
   });
 
 });
