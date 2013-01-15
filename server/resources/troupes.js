@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 /*global console:false, require: true, module: true */
 "use strict";
 
@@ -60,7 +60,7 @@ module.exports = {
     res.send('destroy forum ' + req.troupe.title);
   },
 
-  load: function(req, id, callback) { 
+  load: function(req, id, callback) {
     if(!req.user) return callback(401);
 
     troupeService.findById(id, function(err, troupe) {

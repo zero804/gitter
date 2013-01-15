@@ -1,13 +1,9 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true, process: false */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
+/*global console:false, require: true, module: true */
 "use strict";
 
 var passport = require('passport'),
-    nowjs = require("now"),
-    redis = require("redis"),
     winston = require('winston'),
-    persistence = require("./services/persistence-service"),
-    chatService = require("./services/chat-service"),
     userService = require("./services/user-service"),
     troupeService = require("./services/troupe-service"),
     presenceService = require("./services/presence-service"),
@@ -16,9 +12,10 @@ var passport = require('passport'),
     restSerializer = require("./serializers/rest-serializer"),
     appEvents = require("./app-events"),
     nconf = require('./utils/config'),
+    bayeux = require('./web/bayeux'),
     Q = require("q"),
     everyone,
-    redisClient;
+    nowjs = {};
 
 /* Theoretically this should be done by express middleware, but it seems have some bugs right now */
 function loadSession(user, sessionStore, callback) {
@@ -74,8 +71,77 @@ function getGroup(groupName, callback) {
   });
 }
 
+function getNestedUrlForModel(modelName) {
+  switch(modelName) {
+    case 'chat':
+      return 'chatMessages';
+    case 'conversation':
+      return 'conversations';
+    case 'files':
+      return 'files';
+    default:
+      winston.warn("nowjs: unexpected modelName " + modelName);
+      return modelName + "s";
+  }
+}
+
 module.exports = {
     install: function(server, sessionStore) {
+      var bayeuxServer = bayeux.server;
+      var bayeuxClient = bayeux.client;
+      bayeuxServer.attach(server);
+
+      appEvents.onDataChange(function(data) {
+
+        var troupeId = data.troupeId;
+        var modelId = data.modelId;
+        var modelName = data.modelName;
+        var operation = data.operation;
+        var model = data.model;
+
+        var publishUrl = "/troupes/" + troupeId + "/" + getNestedUrlForModel(modelName) + "/";
+
+        console.log("Publishing to " + publishUrl);
+
+        console.log("now: appEvents.onDataChange");
+
+        if(operation === 'create' || operation === 'update') {
+          winston.debug("nowjs: Data has changed. Change will be serialized and pushed to clients.", { model: model });
+
+          var Strategy = restSerializer.getStrategy(modelName, true);
+
+          // No strategy, ignore it
+          if(!Strategy) {
+            winston.info("nowjs: Skipping serialization as " + modelName + " has no serialization strategy");
+            return;
+          }
+
+          restSerializer.serialize(model, new Strategy(), function(err, serializedModel) {
+            if(err) return winston.error("nowjs: Serialization failure" , err);
+            if(!serializedModel) return winston.error("nowjs: No model returned from serializer");
+
+            bayeuxClient.publish('/foo', {
+              troupeId: troupeId,
+              modelName: modelName,
+              operation: operation,
+              id: modelId,
+              model: serializedModel
+            });
+          });
+        } else {
+          /* For remove operations.... */
+          bayeuxClient.publish('/foo', {
+            troupeId: troupeId,
+            modelName: modelName,
+            operation: operation,
+            id: modelId
+          });
+        }
+
+      });
+
+
+      return;
       everyone = nowjs.initialize(server, {
          "host" : nconf.get("ws:hostname"),
          "port" : nconf.get("ws:externalPort"),
@@ -146,7 +212,7 @@ module.exports = {
 
       appEvents.onTroupeChat(function(data) {
         var troupeId = data.troupeId;
-        var group = getGroup("troupe." + troupeId, function (group) {
+        getGroup("troupe." + troupeId, function (group) {
           if(group && group.now && group.now.onTroupeChatMessage) {
             group.now.onTroupeChatMessage(data.chatMessage);
           }
@@ -155,9 +221,7 @@ module.exports = {
 
 
       appEvents.onTroupeUnreadCountsChange(function(data) {
-        var troupeId = data.troupeId;
         var userId = data.userId;
-        var counts = data.counts;
 
         var group = nowjs.getGroup("user." + userId);
         if(group && group.now && group.now.onTroupeUnreadCountsChange) {
@@ -166,7 +230,6 @@ module.exports = {
       });
 
       appEvents.onNewUnreadItem(function(data) {
-        var troupeId = data.troupeId;
         var userId = data.userId;
         var items = data.items;
 
@@ -177,7 +240,6 @@ module.exports = {
       });
 
       appEvents.onUnreadItemsRemoved(function(data) {
-        var troupeId = data.troupeId;
         var userId = data.userId;
         var items = data.items;
 

@@ -1,0 +1,10 @@
+{
+    "globals": {
+        "require": false
+        "console": false
+    },
+
+    "node" : false,
+    "browser" : true,
+    "unused": true
+}
