@@ -1,4 +1,4 @@
-/*jshint node:true */
+/*jshint node:true, unused: true */
 /*global OK:true DENY: true DENYSOFT: true console: true */
 "use strict";
 
@@ -9,8 +9,6 @@ var console = require("console");
 var troupeSESTransport = require("./../../server/utils/mail/troupe-ses-transport");
 var nconf = require("./../../server/utils/config");
 var winston = require("winston");
-var xml2js = require("xml2js");
-var Q = require("q");
 var Fiber = require('./../../server/utils/fiber');
 var mimelib = require('mimelib');
 
