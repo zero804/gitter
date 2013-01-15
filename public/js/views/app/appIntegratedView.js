@@ -24,8 +24,7 @@ define([
       "mouseenter #header-wrapper":       "onMouseEnterHeader",
       "mouseenter #content-frame":        "onMouseEnterContent",
       "click #file-header":               "onFileHeaderClick",
-      "click #mail-header":               "onMailHeaderClick",
-      "click #add-people-button":         "onAddPeopleClick"
+      "click #mail-header":               "onMailHeaderClick"
     },
 
     initialize: function(options) {
