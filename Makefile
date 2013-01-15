@@ -7,6 +7,7 @@ test:
 		--timeout 200 \
 		--recursive \
 		--growl \
+		--ignore-leaks \
 		$(TESTS)
 
 docs: test-docs
