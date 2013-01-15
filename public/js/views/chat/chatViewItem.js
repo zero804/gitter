@@ -4,9 +4,11 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'hbs!./chatViewItem',
-  'components/chat/chat-component'
-], function($, _, Backbone, TroupeViews, template, chat) {
+  'hbs!./chatViewItem'
+ ], function($, _, Backbone, TroupeViews, template) {
+  /* jshint browser:true unused:true */
+  "use strict";
+
   return TroupeViews.Base.extend({
     unreadItemType: 'chat',
     template: template,

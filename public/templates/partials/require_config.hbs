@@ -32,7 +32,8 @@ require.config({
     animateEnhanced: 'libs/animate-enhanced/jquery.animate-enhanced',
     retina: 'libs/retina/retina',
     socketio: 'libs/socket.io/0.9.11/socket.io.min',
-    ga: '//ssl.google-analytics.com/ga'
+    ga: '//ssl.google-analytics.com/ga',
+    faye: 'libs/faye/0.8.8/faye-browser-min'
   },
   shim: {
     'bootstrap': {
@@ -42,6 +43,9 @@ require.config({
     'backbone': {
       deps: ['underscore', 'jquery'],
       exports: 'Backbone'
+    },
+    'faye': {
+      exports: 'Faye'
     },
     'underscore': {
       exports: '_'

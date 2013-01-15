@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 /*
  * This file is based on the original SES module for Nodemailer by dfellis
  * https://github.com/andris9/Nodemailer/blob/11fb3ef560b87e1c25e8bc15c2179df5647ea6f5/lib/engines/SES.js
