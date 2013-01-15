@@ -25,7 +25,6 @@ define([
     },
 
     onRender: function() {
-      console.log("ON RENDER BITCH");
       this.$el.append(this.addButton.render().el);
     }
 
