@@ -14,7 +14,7 @@ function findConversation(options, callback) {
 
   persistence.Conversation
         .where('troupeId', troupeId)
-        .where('emails.messageId', inReplyTo)
+        .where('emails.messageIds', inReplyTo)
         .limit(1)
         .sort({ updated: 'desc' })
         .exec(function(err, results) {
@@ -24,7 +24,7 @@ function findConversation(options, callback) {
         });
 }
 
-function storeEmailInConversation(options, callback) {
+exports.storeEmailInConversation = function(options, callback) {
   var troupeId = options.troupeId;
   var subject = options.subject;
   var date = options.date;
@@ -73,37 +73,35 @@ function storeEmailInConversation(options, callback) {
         callback(null, conversation, storeMail);
     });
   });
-}
+};
 
-function updateEmailWithMessageId(conversationId, emailId, messageId, callback) {
+exports.updateEmailWithMessageIds = function(conversationId, emailId, messageIds, callback) {
 
   persistence.Conversation.findById(conversationId, function(err, conversation) {
     if(err) return callback(err);
+    if(!conversation) return callback("Conversation #" + conversationId + " does not exist.");
 
-    conversation.emails.filter(function(i) { return i.id == emailId; }).forEach(function(i) { i.messageId = messageId; });
+    conversation.emails
+      .filter(function(i) { return i.id == emailId; })
+      .forEach(function(i) { i.messageIds = messageIds; });
+
     conversation.save(function(err) {
         if (err) return callback(err);
         callback(null);
     });
   });
 
-}
+};
 
-function findByTroupe(id, callback) {
+exports.findByTroupe = function (id, callback) {
   persistence.Conversation
     .where('troupeId', id)
     .sort({ updated: 'desc' })
     .slaveOk()
     .exec(callback);
-}
-
-function findById(id, callback) {
-  persistence.Conversation.findById(id, callback);
-}
-
-module.exports = {
-  storeEmailInConversation: storeEmailInConversation,
-  updateEmailWithMessageId: updateEmailWithMessageId,
-  findByTroupe: findByTroupe,
-  findById: findById
 };
+
+exports.findById = function (id, callback) {
+  persistence.Conversation.findById(id, callback);
+};
+
