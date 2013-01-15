@@ -20,10 +20,11 @@ require([
   'views/conversation/conversationDetailView',
   'views/toolbar/troupeCollectionView',
   'views/people/peopleCollectionView',
-  'views/profile/profileView'
+  'views/profile/profileView',
+  'views/share/shareView'
 ], function($, _, Backbone, Marionette, TroupeViews, chat, AppIntegratedView, ChatView, FileView, ConversationView,
             vent, troupeModels, fileModels, conversationModels, userModels, FileDetailView, filePreviewView, fileVersionsView,
-            conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView) {
+            conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView) {
 
   /*jslint browser: true*/
   /*global require console */
@@ -115,7 +116,8 @@ require([
         { re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: fileCollection },
         { re: /^mail\/(\w+)$/,            viewType: conversationDetailView.Modal, collection: conversationCollection },
 
-        { re: /^profile$/,                viewType: profileView.Modal }
+        { re: /^profile$/,                viewType: profileView.Modal },
+        { re: /^share$/,                  viewType: shareView.Modal }
 
       ];
 

@@ -24,7 +24,8 @@ define([
       "mouseenter #header-wrapper":       "onMouseEnterHeader",
       "mouseenter #content-frame":        "onMouseEnterContent",
       "click #file-header":               "onFileHeaderClick",
-      "click #mail-header":               "onMailHeaderClick"
+      "click #mail-header":               "onMailHeaderClick",
+      "click #add-people-button":         "onAddPeopleClick"
     },
 
     initialize: function(options) {
@@ -267,11 +268,15 @@ define([
     },
 
     onMailHeaderClick: function() {
-        this.toggleMails();
+      this.toggleMails();
     },
 
     onFileHeaderClick: function() {
-        this.toggleFiles();
+      this.toggleFiles();
+    },
+
+    onAddPeopleClick: function() {
+
     }
 
   });
