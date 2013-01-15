@@ -6,10 +6,8 @@ define([
   'marionette',
   'views/base',
   'hbs!./fileView',
-  './fileItemView',
-  'fileUploader',
-  'collections/files'
-], function($, _, Backbone, Marionette, TroupeViews, template, FileItemView, fileUploaderStub, fileModels) {
+  './fileItemView'
+], function($, _, Backbone, Marionette, TroupeViews, template, FileItemView) {
   /*jslint browser: true*/
   /*global require */
   "use strict";
