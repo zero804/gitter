@@ -1,10 +1,9 @@
-/*jshint globalstrict:true, trailing:false */
-/*global require: true, module: true, exports: true, CONT: true, OK: true, DENY: true, SOFTDENY: true */
+/*jshint globalstrict:true, trailing:false, unused: true */
+/*global require: true, exports: true, DENY: true */
 
 "use strict";
 
 // troupe service to deliver mails to mongo database
-var userService = require("./../../server/services/user-service.js");
 var conversationService = require("./../../server/services/conversation-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
 var fileService = require("./../../server/services/file-service.js");
@@ -17,17 +16,7 @@ var Q = require("q");
 var Fiber = require("./../../server/utils/fiber");
 var sanitizer = require("./../../server/utils/sanitizer.js");
 var winston = require('winston');
-var nconf = require("./../../server/utils/config");
-var uuid = require('node-uuid');
 var mimelib = require('mimelib');
-
-var emailDomain = nconf.get("email:domain");
-var emailDomainWithAt = "@" + emailDomain;
-
-function continueResponse(next) {
-  //return next (DENY, "Debug mode bounce.");
-  return next();
-}
 
 function saveFile(troupeId, creatorUserId, fileName, mimeType, content, callback) {
   temp.open('attachment', function(err, tempFileInfo) {

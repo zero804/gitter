@@ -1,15 +1,12 @@
-/*jshint globalstrict:true, trailing:false */
-/*global require: true, module: true, exports: true, OK: true, DENY: true, SOFTDENY: true */
+/*jshint globalstrict:true, trailing:false, unused: true */
+/*global require: true, exports: true, OK: true, CONT: true, DENY: true, SOFTDENY: true */
 
 "use strict";
 
 var userService = require("./../../server/services/user-service.js");
-var conversationService = require("./../../server/services/conversation-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
 var mailerService = require('./../../server/services/mailer-service');
-var MailParser = require("mailparser").MailParser;
 var console = require("console");
-var Fiber = require("./../../server/utils/fiber");
 var nconf = require("./../../server/utils/config");
 var mimelib = require('mimelib');
 
@@ -26,8 +23,7 @@ exports.hook_queue = function (next, connection) {
   var mail = {
     from: parseAddress(connection.transaction.mail_from),
     subject: connection.transaction.header.get("Subject").replace(/\n/g, ""),
-    date: connection.transaction.header.get("Date"),
-    inReplyTo: parseAddress(connection.transaction.header.get("In-Reply-To"))
+    date: connection.transaction.header.get("Date")
   };
 
   console.log("Gateway: Received mail from " + mail.from);
@@ -107,7 +103,7 @@ exports.hook_queue = function (next, connection) {
 };
 
 function sendBounceMail(mail, deniedTroupes, nonExistantTroupes, permittedTroupes) {
-  console.log("Gateway#sendBounceMail(): When I grow up I'm gna bounce this mail from " + mail.from + " that silly user can't send to ", deniedTroupes, nonExistantTroupes);
+  console.log("Gateway#sendBounceMail(): I'm gna bounce this mail from " + mail.from + " that silly user can't send to forbidden: ", deniedTroupes, 'non existant: ', nonExistantTroupes);
 
   mailerService.sendEmail({
     templateFile: "bounce-email",
