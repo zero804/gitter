@@ -79,7 +79,7 @@ exports.hook_queue = function (next, connection) {
 
       // remove invalid troupe id's from the rcpt_to field so the other plugins don't see them.
       addressIndicesToRemove.forEach(function(i) {
-        connection.transaction.rcpt_to.splice(i);
+        connection.transaction.rcpt_to.splice(i, 1);
       });
 
       // send one bounce mail to the sender if there are any forbidden or non-existant troupes
@@ -90,7 +90,7 @@ exports.hook_queue = function (next, connection) {
       if (permittedTroupes.length) {
         console.log("Gateway: Returning to next plugin, there are " + permittedTroupes.length + " mails to receive.");
 
-        return next();
+        return next(CONT);
       }
       else {
         console.log("Gateway: Cancelling any further plugin execution, there are no mails for them to receive.");
