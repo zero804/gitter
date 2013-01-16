@@ -571,7 +571,7 @@ function TroupeStrategy(options) {
     }
 
     if(userIdStategy) {
-      var userIds = _.uniq(_.flatten(items.map(function(troupe) { return troupe.users; })));
+      var userIds = _.uniq(_.flatten(items.map(function(troupe) { return troupe.getUserIds(); })));
 
       strategies.push({
         strategy: userIdStategy,

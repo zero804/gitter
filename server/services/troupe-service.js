@@ -31,7 +31,7 @@ function findMemberEmails(id, callback) {
     if(err) callback(err);
     if(!troupe) callback("No troupe returned");
 
-    var userIds = troupe.users;
+    var userIds = troupe.getUserIds();
 
     userService.findByIds(userIds, function(err, users) {
       if(err) callback(err);
@@ -54,11 +54,11 @@ function findAllTroupesForUser(userId, callback) {
 }
 
 function userHasAccessToTroupe(user, troupe) {
-  return troupe.users.indexOf(user.id) >=  0;
+  return troupe.containsUserId(user.id) >=  0;
 }
 
 function userIdHasAccessToTroupe(userId, troupe) {
-  return troupe.users.indexOf(userId) >=  0;
+  return troupe.containsUserId(userId) >=  0;
 }
 
 function validateTroupeEmail(options, callback) {
@@ -104,7 +104,7 @@ function validateTroupeEmailAndReturnDistributionList(options, callback) {
         return callback("Access denied");
       }
 
-      userService.findByIds(troupe.users, function(err, users) {
+      userService.findByIds(troupe.getUserIds(), function(err, users) {
         if(err) return callback(err);
 
         var emailAddresses = users.map(function(user) {
@@ -150,7 +150,7 @@ function findAllUnusedInvitesForTroupe(troupeId, callback) {
 
 function removeUserFromTroupe(troupeId, userId, callback) {
    findById(troupeId, function(err, troupe) {
-      troupe.users.remove(userId);
+      troupe.removeUserById(userId);
       troupe.save(callback);
    });
 }
@@ -172,7 +172,7 @@ function acceptInvite(code, user, callback) {
       invite.status = 'USED';
       invite.save();
 
-      troupe.users.push(user.id);
+      troupe.addUserById(user.id);
       troupe.save(function(err) {
         if(err) return callback(err);
         return callback(null, troupe, originalStatus);
@@ -242,7 +242,7 @@ function acceptRequest(request, callback) {
       }
 
       /** Add the user to the troupe */
-      troupe.users.push(user.id);
+      troupe.addUserById(user.id);
       troupe.save(function(err) {
         if(err) winston.error("Unable to save troupe", err);
 

@@ -1,5 +1,4 @@
 /*jshint globalstrict:true, trailing:false unused:true node:true*/
-/*global console:false, require: true, module: true */
 "use strict";
 
 var persistence = require("./persistence-service"),
@@ -7,8 +6,6 @@ var persistence = require("./persistence-service"),
     troupeService = require("./troupe-service"),
     userService = require("./user-service"),
     uuid = require('node-uuid'),
-    sechash = require('sechash'),
-    nconf = require('../utils/config'),
     winston = require('winston');
 
 
@@ -32,7 +29,7 @@ function newTroupeForExistingUser(options, user, callback) {
   var troupe = new persistence.Troupe();
   troupe.name = options.troupeName;
   troupe.uri = uri;
-  troupe.users = [user.id];
+  troupe.users.addUserById(user.id);
 
   troupe.save(function(err) {
     if(err) return callback(err);
@@ -61,7 +58,7 @@ function newTroupeForNewUser(options, callback) {
     var troupe = new persistence.Troupe();
     troupe.name = options.troupeName;
     troupe.uri = uri;
-    troupe.users = [user.id];
+    troupe.users.addUserById(user.id);
 
     troupe.save(function(err) {
       if(err) return  callback(err);
@@ -147,13 +144,14 @@ module.exports = {
       troupeService.findById(options.troupeId, function(err, troupe) {
         if(err) return callback(err);
 
-        if(troupe.users.length != 1) {
+        var troupeUsers = troupe.getUserIds();
+        if(troupeUsers.length != 1) {
           winston.error("A confirmation resent cannot be performed as the troupe has multiple users");
           return callback("Invalid state");
         }
 
 
-        userService.findById(troupe.users[0], function(err, user) {
+        userService.findById(troupeUsers[0], function(err, user) {
           if(err || !user) return callback(err, user);
           if(user.status != 'UNCONFIRMED') {
             emailNotificationService.sendConfirmationForExistingUser(user, troupe);

@@ -54,7 +54,7 @@ function publishRecountNotification() {
 function newItem(troupeId, creatorUserId, itemType, itemId) {
   troupeService.findById(troupeId, function(err, troupe) {
     if(err) return winston.error("Unable to load troupeId " + troupeId, err);
-    var userIds = troupe.users;
+    var userIds = troupe.getUserIds();
 
     var data = {};
     data[itemType] = [itemId];
@@ -71,7 +71,7 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
       }
     });
 
-    multi.exec(function(err, replies) {
+    multi.exec(function(err/*, replies*/) {
       if(err) winston.error("unreadItemService.newItem failed", err);
       publishRecountNotification();
     });
@@ -83,7 +83,7 @@ function removeItem(troupeId, itemType, itemId) {
   troupeService.findById(troupeId, function(err, troupe) {
     if(err) return winston.error("Unable to load troupeId " + troupeId, err);
 
-    var userIds = troupe.users;
+    var userIds = troupe.getUserIds();
 
     var data = {};
     data[itemType] = [itemId];
@@ -97,10 +97,10 @@ function removeItem(troupeId, itemType, itemId) {
       multi.srem("unread:" + itemType + ":" + userId + ":" + troupeId, itemId);
     });
 
-    multi.exec(function(err, replies) {
+    multi.exec(function(err/*, replies*/) {
       if(err) return winston.error("unreadItemService.removeItem failed", err);
 
-      m2.exec(function(err, replies) {
+      m2.exec(function(err/*, replies*/) {
         if(err) return winston.error(err);
 
         publishRecountNotification();
