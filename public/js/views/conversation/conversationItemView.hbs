@@ -14,9 +14,21 @@
   </div>
 </div> -->
 
-
+{{^compactView}}
 <div class="trpMailItem">
-    <div class="trpMailItemPicture" style="background-image: url('images/2/icon-mail-black.png')"></div>
+    <div class="trpMailItemPicture" style="background-image: url('/images/2/icon-mail-black.png')"></div>
     <div class="trpMailItemSubject"><a href="{{dialogFragment detailUrl}}">{{subject}}</a></div>
 </div>
+{{/compactView}}
 
+{{#compactView}}
+<div class="trpMailItemMobile clickPoint-showEmail">
+  <div class="trpMailLeft">
+    <div class="trpMailDisplayPicture">{{widget "avatar" user=lastSender}}</div>
+  </div>
+  <div class="trpMailRight">
+    <div class="trpMailSubject">{{subject}}</div>
+    <div class="trpMailPreview">{{preview}}</div>
+  </div>
+</div>
+{{/compactView}}
