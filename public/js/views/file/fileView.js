@@ -8,9 +8,8 @@ define([
   'views/base',
   'hbs!./fileView',
   './fileItemView',
-  'fileUploader',
   'collections/files'
-], function($, _, Backbone, Marionette, TroupeViews, template, FileItemView, fileUploaderStub, fileModels) {
+], function($, _, Backbone, Marionette, TroupeViews, template, FileItemView, fileModels) {
   /*jslint browser: true*/
   /*global require */
   "use strict";
