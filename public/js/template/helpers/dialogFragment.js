@@ -3,18 +3,12 @@ require([
 ], function ( Handlebars ) {
 
   function dialogFragment(fragment) {
-    if(!this._dialogFragmentPrimaryLocation) {
-      var hash = window.location.hash;
-      if(!hash) {
-        this._dialogFragmentPrimaryLocation = '#';
-      } else {
-        var currentFragment = hash.split('|', 1);
-        this._dialogFragmentPrimaryLocation = currentFragment[0];
-      }
-
+    if(window._troupeCompactView) {
+      return fragment;
+    } else {
+      return "#|" + fragment;
     }
 
-    return this._dialogFragmentPrimaryLocation + "|" + fragment;
   }
 
   Handlebars.registerHelper('dialogFragment', dialogFragment);

@@ -25,6 +25,9 @@ define([
   /* Use the compact views */
   var compactView = window.navigator.userAgent.indexOf("Mobile/") !== -1;
 
+  /* This value is used by the dialogFragment Handlebars helper */
+  window._troupeCompactView = compactView;
+
   TroupeViews.Base = Backbone.View.extend({
     template: null,
     autoClose: true,
