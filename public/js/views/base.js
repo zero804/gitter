@@ -48,7 +48,7 @@ define([
 
     rerenderOnChange: function() {
       console.log("RERENDER ON CHANGE");
-      this.removeSubViews();
+      this.removeSubViews(this.$el);
       this.render();
     },
 

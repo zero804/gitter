@@ -98,35 +98,6 @@ module.exports = {
     on('userLoggedOutOfTroupe', callback);
   },
 
-  troupeChat: function(troupeId, chatMessage) {
-    emit('chat', { troupeId: troupeId, chatMessage: chatMessage });
-  },
-
-  onTroupeChat: function(callback) {
-    on('chat', callback);
-  },
-
-  fileEvent: function(event, options) {
-    emit('file', _.extend(options, { event: event }));
-  },
-
-  onFileEvent: function(callback) {
-    on('file', callback);
-  },
-
-  mailEvent: function(event, troupeId, conversationId, mailIndex) {
-    emit('mail', {
-      event: event,
-      troupeId: troupeId,
-      conversationId: conversationId,
-      mailIndex: mailIndex
-    });
-  },
-
-  onMailEvent: function(callback) {
-    on('mail', callback);
-  },
-
   newNotification: function(troupeId, userId, notificationText, notificationLink) {
     emit('newNotification', {
       troupeId: troupeId,
