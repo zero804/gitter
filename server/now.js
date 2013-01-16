@@ -17,60 +17,6 @@ var passport = require('passport'),
     everyone,
     nowjs = {};
 
-/* Theoretically this should be done by express middleware, but it seems have some bugs right now */
-function loadSession(user, sessionStore, callback) {
-  var sid = decodeURIComponent(user.cookie['connect.sid']);
-  if(!sid) return callback("Session has no cookie");
-
-  // Express3 changes. Split on the '.'
-  // This hackery will not last much longer
-  sid = sid.split('.')[0];
-  sid = sid.split(':')[1];
-  sessionStore.get(sid, callback);
-}
-
-/* Theoretically this should be done by express middleware, but it seems have some bugs right now */
-function loadSessionWithUser(user, sessionStore, callback) {
-  loadSession(user, sessionStore, function(err, session) {
-    if(err) return callback(err);
-    if(!session) return callback("No session for user");
-    if(!session.passport.user) return callback(null, null);
-
-    passport.deserializeUser(session.passport.user, callback);
-  });
-}
-
-function loadUserAndTroupe(nowJsUser, troupeId, sessionStore, callback) {
-  loadSessionWithUser(nowJsUser, sessionStore, function(err, user) {
-    if(err) return callback(err);
-    if(!user) return callback("User not found");
-
-    troupeService.findById(troupeId, function(err, troupe) {
-      if(err) return callback(err);
-      if(!troupe) return callback("Troupe not found");
-
-      if(!troupeService.userHasAccessToTroupe(user, troupe)) return callback("Access denied");
-
-      callback(err, user, troupe);
-    });
-  });
-}
-
-/**
- * Fetch a now.js group by name and call the callback if the group has users
- */
-function getGroup(groupName, callback) {
-  var group = nowjs.getGroup(groupName);
-
-  group.count(function (count) {
-    if(!count) {
-      console.log("No one is in group " + groupName);
-      return;
-    }
-    callback(group);
-  });
-}
-
 function getNestedUrlForModel(modelName) {
   switch(modelName) {
     case 'chat':
@@ -91,7 +37,6 @@ module.exports = {
       var bayeuxClient = bayeux.client;
       bayeuxServer.attach(server);
 
-
       appEvents.onDataChange(function(data) {
 
         var troupeId = data.troupeId;
@@ -100,7 +45,7 @@ module.exports = {
         var operation = data.operation;
         var model = data.model;
 
-        var publishUrl = "/troupes/" + troupeId + "/" + getNestedUrlForModel(modelName) + "/";
+        var publishUrl = "/troupes/" + troupeId + "/" + getNestedUrlForModel(modelName);
 
         console.log("Publishing to " + publishUrl);
 
@@ -120,6 +65,8 @@ module.exports = {
           restSerializer.serialize(model, new Strategy(), function(err, serializedModel) {
             if(err) return winston.error("nowjs: Serialization failure" , err);
             if(!serializedModel) return winston.error("nowjs: No model returned from serializer");
+
+            console.log(">>>>>> ", operation, " sending model ", model, " as ", serializedModel);
 
             bayeuxClient.publish(publishUrl, {
               troupeId: troupeId,
@@ -210,16 +157,6 @@ module.exports = {
           callback(null);
         });
       };
-
-      appEvents.onTroupeChat(function(data) {
-        var troupeId = data.troupeId;
-        getGroup("troupe." + troupeId, function (group) {
-          if(group && group.now && group.now.onTroupeChatMessage) {
-            group.now.onTroupeChatMessage(data.chatMessage);
-          }
-        });
-      });
-
 
       appEvents.onTroupeUnreadCountsChange(function(data) {
         var userId = data.userId;

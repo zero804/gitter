@@ -8,11 +8,13 @@
 var winston = require('./utils/winston');
 
 var express = require('express'),
-	Resource = require('express-resource'),
   http = require('http'),
   unreadItemService = require('./services/unread-item-service'),
   nconf = require('./utils/config'),
   oauth2 = require('./web/oauth2');
+
+/* Load express-resource */
+require('express-resource');
 
 var app = express();
 var server = http.createServer(app);
@@ -29,7 +31,6 @@ require('./now').install(server, sessionStore);
 require('./handlers/').install(app);
 
 // TEMP
-require('./services/thumbnail-preview-generator-service').install();
 require('./services/notification-generator-service').install();
 unreadItemService.installListener(); // TODO: make sure this only happens once. Need to move across to a queue at some point
 

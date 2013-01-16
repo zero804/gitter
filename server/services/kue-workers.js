@@ -5,7 +5,7 @@ exports.startWorkers = function() {
   require('./mailer-service').startWorkers();
   require('../gateways/push-notification-gateway').startWorkers();
   require('./notification-generator-service').startWorkers();
-
+  require('./thumbnail-preview-generator-service').startWorkers();
   require('./kue-cleanup-service').startCleanupJob();
 
   var kue = require('kue');
