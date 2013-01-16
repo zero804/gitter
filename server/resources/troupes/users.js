@@ -1,10 +1,9 @@
 /*jshint globalstrict:true, trailing:false unused:true node:true*/
-/*global console:false, require: true, module: true */
 "use strict";
 
-var troupeService = require("../services/troupe-service"),
-    userService = require("../services/user-service"),
-    restSerializer = require("../serializers/rest-serializer"),
+var troupeService = require("../../services/troupe-service"),
+    userService = require("../../services/user-service"),
+    restSerializer = require("../../serializers/rest-serializer"),
     _ = require("underscore");
 
 module.exports = {

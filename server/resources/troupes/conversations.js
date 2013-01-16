@@ -1,25 +1,8 @@
 /*jshint globalstrict:true, trailing:false unused:true node:true*/
-/*global console:false, require: true, module: true */
 "use strict";
 
-var troupeService = require("../services/troupe-service"),
-    conversationService = require("../services/conversation-service"),
-    fileService = require("../services/file-service"),
-    restSerializer = require("../serializers/rest-serializer"),
-    winston = require('winston');
-
-function compose(m, attachments) {
-  return {
-    fromName: m.fromName,
-    date: m.date,
-    subject: m.subject,
-    troupeId: m.troupeId,
-    from: m.from,
-    id: m.id,
-    mail: m.mail,
-    attachments: attachments
-  };
-}
+var conversationService = require("../../services/conversation-service"),
+    restSerializer = require("../../serializers/rest-serializer");
 
 module.exports = {
     index: function(req, res, next) {

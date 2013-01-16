@@ -1,8 +1,7 @@
 /*jshint globalstrict:true, trailing:false unused:true node:true*/
-/*global console:false, require: true, module: true */
 "use strict";
 
-var notificationService = require("../services/notification-service");
+var notificationService = require("../../services/notification-service");
 
 module.exports = {
     index: function(req, res, next) {
