@@ -1,10 +1,11 @@
+/*jshint unused:true browser:true*/
 require([
   'jquery',
   'underscore',
   'backbone',
   'marionette',
   'views/base',
-  'components/chat/chat-component',
+  'components/realtime',
   'views/app/appIntegratedView',
   'views/chat/chatView',
   'views/file/fileView',
@@ -21,12 +22,10 @@ require([
   'views/toolbar/troupeCollectionView',
   'views/people/peopleCollectionView',
   'views/profile/profileView'
-], function($, _, Backbone, Marionette, TroupeViews, chat, AppIntegratedView, ChatView, FileView, ConversationView,
+], function($, _, Backbone, Marionette, TroupeViews, realtime, AppIntegratedView, ChatView, FileView, ConversationView,
             vent, troupeModels, fileModels, conversationModels, userModels, FileDetailView, filePreviewView, fileVersionsView,
             conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView) {
-
-  /*jslint browser: true*/
-  /*global require console */
+  /*global console:true*/
   "use strict";
 
   $(document).on("click", "a", function(event) {
@@ -54,7 +53,7 @@ require([
   });
 
   // Make drop down menus drop down
-  $(document).on("click", ".trpButtonDropdown .trpButtonMenu", function(event) {
+  $(document).on("click", ".trpButtonDropdown .trpButtonMenu", function(/*event*/) {
     $(this).parent().next().toggle();
   });
 
@@ -68,7 +67,10 @@ require([
     rightPanelRegion: "#right-panel"
   });
 
-  chat.connect();
+  //chat.connect();
+  var subscription = realtime.subscribe('/troupes/' + window.troupeContext.troupe.id, function(message) {
+    console.log("MESSAGE!", message);
+  });
 
   /* This is a special region which acts like a region, but is implemented completely differently */
   app.dialogRegion = {
@@ -97,7 +99,7 @@ require([
   var appView = new AppIntegratedView({ app: app });
 
   var Router = Backbone.Router.extend({
-    initialize: function(options) {
+    initialize: function(/*options*/) {
       this.regionsFragments = {};
       this.route(/^(.*?)$/, "handle");
     },
@@ -200,7 +202,7 @@ require([
 
   });
 
-  app.addInitializer(function(options){
+  app.addInitializer(function(/*options*/){
     var chatView = new ChatView();
     app.chatRegion.show(chatView);
 

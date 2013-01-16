@@ -91,6 +91,7 @@ module.exports = {
       var bayeuxClient = bayeux.client;
       bayeuxServer.attach(server);
 
+
       appEvents.onDataChange(function(data) {
 
         var troupeId = data.troupeId;
@@ -120,7 +121,7 @@ module.exports = {
             if(err) return winston.error("nowjs: Serialization failure" , err);
             if(!serializedModel) return winston.error("nowjs: No model returned from serializer");
 
-            bayeuxClient.publish('/foo', {
+            bayeuxClient.publish(publishUrl, {
               troupeId: troupeId,
               modelName: modelName,
               operation: operation,
@@ -130,7 +131,7 @@ module.exports = {
           });
         } else {
           /* For remove operations.... */
-          bayeuxClient.publish('/foo', {
+          bayeuxClient.publish(publishUrl, {
             troupeId: troupeId,
             modelName: modelName,
             operation: operation,

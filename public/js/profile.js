@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 require(
     [ 'underscore', 'backbone', 'jquery', 'jquery_validate', 'bootstrap' ],
 function(_, Backbone, $, v, Bootstrap) {

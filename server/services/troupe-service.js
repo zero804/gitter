@@ -1,12 +1,11 @@
 /*jshint globalstrict:true, trailing:false unused:true node:true*/
-/*global console:false, require: true, module: true */
+/*global require: true, module: true */
 "use strict";
 
 var persistence = require("./persistence-service"),
     userService = require("./user-service"),
     emailNotificationService = require("./email-notification-service"),
     uuid = require('node-uuid'),
-    nconf = require('../utils/config'),
     winston = require("winston");
 
 function findByUri(uri, callback) {
@@ -58,14 +57,16 @@ function userHasAccessToTroupe(user, troupe) {
   return troupe.users.indexOf(user.id) >=  0;
 }
 
+function userIdHasAccessToTroupe(userId, troupe) {
+  return troupe.users.indexOf(userId) >=  0;
+}
+
 function validateTroupeEmail(options, callback) {
   var from = options.from;
   var to = options.to;
 
   /* TODO: Make this email parsing better! */
   var uri = to.split('@')[0];
-  var user = null;
-  var troupe = null;
 
   userService.findByEmail(from, function(err, fromUser) {
     if(err) return callback(err);
@@ -91,8 +92,6 @@ function validateTroupeEmailAndReturnDistributionList(options, callback) {
 
   /* TODO: Make this email parsing better! */
   var uri = to.split('@')[0];
-  var user = null;
-  var troupe = null;
 
   userService.findByEmail(from, function(err, fromUser) {
     if(err) return callback(err);
@@ -237,7 +236,7 @@ function acceptRequest(request, callback) {
       if(user.status === 'UNCONFIRMED' && !user.confirmationCode) {
          var confirmationCode = uuid.v4();
          user.confirmationCode = confirmationCode;
-         user.save(function(err) {
+         user.save(function() {
           emailNotificationService.sendConfirmationforNewUserRequest(user, troupe);
          });
       }
@@ -284,6 +283,7 @@ module.exports = {
   validateTroupeEmail: validateTroupeEmail,
   validateTroupeEmailAndReturnDistributionList: validateTroupeEmailAndReturnDistributionList,
   userHasAccessToTroupe: userHasAccessToTroupe,
+  userIdHasAccessToTroupe: userIdHasAccessToTroupe,
   addInvite: addInvite,
   findInviteById: findInviteById,
   findInviteByCode: findInviteByCode,
