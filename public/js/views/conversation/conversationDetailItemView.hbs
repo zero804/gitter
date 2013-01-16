@@ -1,4 +1,6 @@
+
 <div class="trpMailRow">
+  {{#compactView}}<div class="trpMobileMailContainer">{{/compactView}}
   <div class="trpMailHeader clickPoint-showEmail frame-header">
     <div class="trpMailDisplayPicture">{{widget "avatar" user=from}}</div>
     <div class="trpMailDetails">   
@@ -11,4 +13,5 @@
   {{#unless initialIndex}}
   <div id="initialBody">
   {{/unless}}
+  {{#compactView}}</div>{{/compactView}}
 </div>
