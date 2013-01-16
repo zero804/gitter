@@ -15,10 +15,6 @@ define([
     initialize: function(options) {
     },
 
-    events: {
-      "click .clickPoint-showEmail": "showEmail"
-    },
-
     getRenderData: function() {
       var data = this.model.toJSON();
       data.detailUrl = "#mail/" + data.id;
@@ -26,12 +22,6 @@ define([
       data.updated = data.updated ? data.updated.calendar() : null;
 
       return data;
-    },
-
-    showEmail: function(e) {
-      e.preventDefault();
-      vent.trigger("conversation:view", this.model);
-      //window.troupeApp.navigate("mail/" + this.model.get('id'), {trigger: true});
     }
 
   });

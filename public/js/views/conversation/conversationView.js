@@ -60,7 +60,7 @@ define([
             return conversation.get("updated");
           }
         }
-      });
+      }).render();
     },
 
     showSortMenu: function(e) {
