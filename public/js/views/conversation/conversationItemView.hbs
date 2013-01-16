@@ -22,13 +22,15 @@
 {{/compactView}}
 
 {{#compactView}}
-<div class="trpMailItemMobile clickPoint-showEmail">
-  <div class="trpMailLeft">
-    <div class="trpMailDisplayPicture">{{widget "avatar" user=lastSender}}</div>
+<a href="{{dialogFragment detailUrl}}">
+  <div class="trpMailItemMobile">
+    <div class="trpMailLeft">
+      <div class="trpMailDisplayPicture">{{widget "avatar" user=lastSender}}</div>
+    </div>
+    <div class="trpMailRight">
+      <div class="trpMailSubject">{{subject}}</div>
+      <div class="trpMailPreview">{{preview}}</div>
+    </div>
   </div>
-  <div class="trpMailRight">
-    <div class="trpMailSubject">{{subject}}</div>
-    <div class="trpMailPreview">{{preview}}</div>
-  </div>
-</div>
+</a>
 {{/compactView}}
