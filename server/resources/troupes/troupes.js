@@ -1,15 +1,8 @@
 /*jshint globalstrict:true, trailing:false unused:true node:true*/
-/*global console:false, require: true, module: true */
 "use strict";
 
-var troupeService = require("../services/troupe-service"),
-  userService = require("../services/user-service"),
-  collections = require("../utils/collections"),
-  restSerializer = require("../serializers/rest-serializer");
-
-
-var predicates = collections.predicates;
-
+var troupeService = require("../../services/troupe-service"),
+  restSerializer = require("../../serializers/rest-serializer");
 
 module.exports = {
   index: function(req, res, next) {

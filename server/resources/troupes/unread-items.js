@@ -2,7 +2,7 @@
 /*global console:false, require: true, module: true */
 "use strict";
 
-var unreadItemService = require("../services/unread-item-service");
+var unreadItemService = require("../../services/unread-item-service");
 
 module.exports = {
     index: function(req, res, next) {
