@@ -1,6 +1,5 @@
-  /* jshint trailing:false browser:true */
-  /* global console */
-  define([
+/*jshint unused:true browser:true*/
+define([
   'jquery',
   'underscore',
   'backbone'

@@ -12,7 +12,7 @@ persistenceService.OAuthClient.findOne({ clientKey: WEB_INTERNAL_CLIENT_KEY }, f
   if(err) throw new Error("Unable to load internal client id");
   if(!oauthClient) throw new Error("Unable to load internal client id. Have you loaded it into mongo?");
 
-  webInternalClientId = oauthClient.id;
+  webInternalClientId = oauthClient._id;
 });
 
 
@@ -69,7 +69,7 @@ exports.generateWebToken = function(userId, callback) {
 exports.validateWebToken = function(token, callback) {
   persistenceService.OAuthAccessToken.findOne({ token: token, clientId: webInternalClientId }, function(err, accessToken) {
     if(err) return callback(err);
-    if(!accessToken) return callback("Acess token not found");
+    if(!accessToken) return callback("Access token not found");
 
     return callback(null, accessToken.userId);
   });

@@ -10,7 +10,7 @@ var ClientAuth = function() {};
 
 ClientAuth.prototype.outgoing = function(message, callback) {
   message.ext = message.ext || {};
-  message.ext.token = "1f1f3bc1-ec53-4570-ae10-cd3cfe910554";
+  message.ext.token = "99f782a6-fd45-49a6-82a8-2801c2832296";
   callback(message);
 };
 
@@ -30,7 +30,7 @@ client.bind('transport:up', function() {
 
 client.publish('/foo', {text: 'Hi there'});
 
-var subscription = client.subscribe('/foo', function(message) {
+var subscription = client.subscribe('/troupes/4fda5526219fc80000001d21', function(message) {
   console.log("MESSAGE!", message);
 });
 

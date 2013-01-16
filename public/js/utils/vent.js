@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 /* Simple event bus for the application */
 define([
   'underscore',

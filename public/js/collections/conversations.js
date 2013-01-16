@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 define([
   'jquery',
   'underscore',
@@ -6,7 +7,6 @@ define([
   '../utils/momentWrapper'
 ], function($, _, Backbone, TroupeCollections, moment) {
   "use strict";
-
   var exports = {};
 
   exports.EmailModel = Backbone.Model.extend({
