@@ -5,6 +5,7 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId;
 var appEvents = require("../app-events");
+var mongooseUtils = require("../utils/mongoose-utils");
 
 mongoose.connect('mongodb://localhost/troupe');
 
@@ -53,6 +54,22 @@ var TroupeSchema = new Schema({
   users: [ObjectId]
 });
 TroupeSchema.index({ uri: 1 });
+
+TroupeSchema.methods.getUserIds = function() {
+  return this.users;
+};
+
+TroupeSchema.methods.containsUserId = function(userId) {
+  return this.users.indexOf(userId) >= 0;
+};
+
+TroupeSchema.methods.addUserById = function(userId) {
+  return this.users.push(userId) >= 0;
+};
+
+TroupeSchema.methods.removeUserById = function(userId) {
+  return this.users.remove(userId) >= 0;
+};
 
 var InviteSchema = new Schema({
   troupeId: ObjectId,
@@ -230,6 +247,7 @@ var PushNotificationDevice = mongoose.model('PushNotificationDevice', PushNotifi
 /** */
 function attachNotificationListenersToSchema(schema, name, extractor) {
   if(!extractor) {
+    // Default extractor
     extractor = function(model) {
       return {
         id: model.id,
@@ -238,23 +256,25 @@ function attachNotificationListenersToSchema(schema, name, extractor) {
     };
   }
 
-  schema.pre('save', function (next) {
-    var isNewInstance = this.isNew;
-
-    this.post('save', function(postNext) {
-      var e = extractor(this);
-
+  mongooseUtils.attachNotificationListenersToSchema(schema, {
+    onCreate: function(model, next) {
+      var e = extractor(model);
       console.log("dataChange: " + name);
-      appEvents.dataChange(name, isNewInstance ? 'create' : 'update', e.id, e.troupeId, this);
-      postNext();
-    });
+      appEvents.dataChange(name, 'create', e.id, e.troupeId, model);
+      next();
+    },
 
-    next();
-  });
+    onUpdate: function(model, next) {
+      var e = extractor(model);
+      console.log("dataChange: " + name);
+      appEvents.dataChange(name, 'update', e.id, e.troupeId, model);
+      next();
+    },
 
-  schema.post('remove', function(model, numAffected) {
-    var e = extractor(model);
-    appEvents.dataChange(name, 'remove', e.id, e.troupeId);
+    onRemove: function(model) {
+      var e = extractor(model);
+      appEvents.dataChange(name, 'remove', e.id, e.troupeId);
+    }
   });
 }
 
