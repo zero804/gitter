@@ -3,6 +3,7 @@ define([
   /*jslint browser: true*/
   "use strict";
 
+  // deprecated
   return {
     'mail': function() {
       this.showAsync('views/conversation/conversationView');
