@@ -23,7 +23,15 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
 
+.trpMailSubject {
+  .trpBodyEm;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-bottom: 0px;
+  display: block;
 }
 
 .trpMailRow {
@@ -71,12 +79,30 @@
 
 .trpMailPreview {
 	display: block;
-	padding: 12px 0px;
-	.trpBodyMedium;
+	.trpBodySmall;
+	word-wrap: break-word;
 }
 
 .trpMailBody {
 	display: block;
 	padding: 12px 0px;
 	.trpBodyMedium;
+}
+
+.trpMailLeft {
+	width: 50px;
+	vertical-align: top;
+	padding-left: 5px;
+}
+
+.trpMailRight {
+	width: 220px;
+	vertical-align: top;
+	padding-left: 10px;
+}
+
+.trpMailItemMobile {
+	padding: 10px 0;
+	border-bottom: 1px solid @trpLightGrey;
+	min-width: 320px;
 }
