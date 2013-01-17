@@ -30,7 +30,8 @@ define([
     getRenderData: function() {
       var data = this.model.toJSON();
       data.personName = data.from.displayName;
-      data.avatarUrl = data.from.avatarUrl;
+      data.avatarUrlSmall = data.from.avatarUrlSmall;
+      data.avatarUrlMedium = data.from.avatarUrlMedium;
 
       if (data.attachments.length===0) { data.hasAttachments = false; } else { data.hasAttachments = true; }
 

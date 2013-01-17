@@ -54,11 +54,11 @@ function UserStrategy(options) {
   this.map = function(user) {
     if(!user) return null;
 
-    function getAvatarUrl() {
+    function getAvatarUrl(size) {
       if(user.avatarVersion === 0) {
-        return cdn("images/2/avatar-default.png");
+        return cdn("images/2/avatar-default-" + size + ".png");
       }
-      return cdn("avatar/" + user.id + "/" + user.avatarVersion + ".jpg", { notStatic: true });
+      return cdn("avatar/" + size + "/" + user.id + "/" + user.avatarVersion + ".jpg", { notStatic: true });
     }
 
     function getLocationDescription(named) {
@@ -80,7 +80,8 @@ function UserStrategy(options) {
       id: user.id,
       displayName: user.displayName,
       email: user.email,
-      avatarUrl: getAvatarUrl(),
+      avatarUrlSmall: getAvatarUrl('s'),
+      avatarUrlMedium: getAvatarUrl('m'),
       location: location
     };
   };
@@ -545,7 +546,7 @@ function InviteStrategy(options) {
       id: item._id,
       displayName: item.displayName,
       email: item.email,
-      avatarUrl: '/images/2/avatar-default.png' // TODO: fix
+      avatarUrlSmall: '/images/2/avatar-default.png' // TODO: fix
     };
   };
 }

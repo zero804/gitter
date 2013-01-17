@@ -34,9 +34,9 @@ define([
     },
 
     reloadAvatar: function(user) {
-      $(document).trigger('avatar:change', { userId: user.id, avatarUrl: user.avatarUrl });
+      $(document).trigger('avatar:change', { userId: user.id, avatarUrlSmall: user.avatarUrlSmall, avatarUrlMedium: avatarUrlMedium });
 
-      var newAvatarURL = 'url("' + user.avatarUrl + '")';
+      var newAvatarURL = 'url("' + user.avatarUrlSmall + '")';
       this.$el.find('.image-avatar').css('background-image', newAvatarURL);
     },
 

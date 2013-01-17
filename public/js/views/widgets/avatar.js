@@ -13,6 +13,9 @@ define([
       this.showEmail = options.showEmail || {};
       this.showBadge = options.showBadge;
       this.showStatus = options.showStatus;
+      this.avatarSize = options.size ? options.size : 's';
+      this.avatarUrl = (this.avatarSize == 'm') ? this.user.avatarUrlMedium : this.user.avatarUrlSmall;
+
       var self = this;
       function avatarChange(event, data) {
         if(data.userId === self.getUserId()) {
@@ -39,7 +42,8 @@ define([
         showBadge: this.showBadge,
         showStatus: this.showStatus,
         userDisplayName: user.displayName,
-        userAvatarUrl: user.avatarUrl,
+        avatarUrl: this.avatarUrl,
+        avatarSize: this.avatarSize,
         userLocation: user.location ? user.location.description : "",
         offline: !presenceClient.isOnline(user.id)
       };
