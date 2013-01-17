@@ -18,6 +18,7 @@ var sanitizer = require("./../../server/utils/sanitizer.js");
 var winston = require('winston');
 var nconf = require("./../../server/utils/config");
 var uuid = require('node-uuid');
+var mimelib = require('mimelib');
 
 var emailDomain = nconf.get("email:domain");
 var emailDomainWithAt = "@" + emailDomain;
@@ -70,35 +71,24 @@ exports.hook_queue = function(next, connection) {
 	var subject = connection.transaction.header.get("Subject");
 	var date = connection.transaction.header.get("Date");
 	var fromName = connection.transaction.header.get("From");
-	var toName = connection.transaction.header.get("To");
+	var toName = connection.transaction.header.get("To");   // TODO this must use foreach connection.transaction.rcpt_to[i].address()
   var inReplyTo = connection.transaction.header.get("In-Reply-To");
 
 	var preview;
-	var fromEmail;
 
-	var lines = connection.transaction.data_lines;
-  if (!lines) return next(DENY);
+  // do some string parsing for email formats such as Name <email>
 
-	toName = toName.replace(/\n/g,"");
-	fromName = fromName.replace(/\n/g,"");
+  fromName = mimelib.parseAddresses(fromName)[0].address;
+  toName = mimelib.parseAddresses(toName)[0].address;
+  inReplyTo = (inReplyTo) ? mimelib.parseAddresses(inReplyTo)[0].address : '';
 	subject = subject.replace(/\n/g,"");
-  inReplyTo = inReplyTo.replace(/[<>\n]/g,"");
-	// do some string parsing for email formats such as Name <email>
 
-	if (fromName.indexOf("<") > 0)  {
-    fromEmail = fromName.substring(fromName.indexOf("<") + 1, fromName.indexOf(">"));
-    fromName = fromName.substring(0, fromName.indexOf("<")-1);
-  }
-  else {
-    fromEmail = fromName;
-  }
+  console.log("From: " + fromName);
+  console.log("To:" + toName);
+  console.log("In-Reply-To:" + inReplyTo);
 
-  if (toName.indexOf("<") > 0)  {
-    toName = toName.substring(toName.indexOf("<") + 1, toName.indexOf(">"));
-  }
-
-	troupeService.validateTroupeEmail({ to: toName, from: fromEmail}, function(err, troupe, user) {
-    connection.logdebug("From: " + fromEmail);
+	troupeService.validateTroupeEmail({ to: toName, from: fromName}, function(err, troupe, user) {
+    connection.logdebug("From: " + fromName);
     connection.logdebug("To:" + toName);
     if (err) return next(DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.");
     if (!troupe) return next (DENY, "Sorry, either we don't know you, or we don't know the recipient. You'll never know which.");
@@ -209,8 +199,7 @@ exports.hook_queue = function(next, connection) {
 
     });
 
-    mailparser.write(lines.join(''));
-    mailparser.end();
+    connection.transaction.message_stream.pipe(mailparser);
 
   });
 

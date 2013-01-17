@@ -90,7 +90,7 @@ var EmailSchema = new Schema({
   date: {type: Date },
   preview: {type: String},
   mail: { type: String},
-  messageId: { type: String},
+  messageIds: [ String ],
   attachments: [EmailAttachmentSchema]
 });
 
@@ -107,6 +107,7 @@ var ConversationSchema = new Schema({
   emails: [EmailSchema]
 });
 ConversationSchema.index({ troupeId: 1 });
+ConversationSchema.index({ 'emails.messageIds': 1 });
 
 var FileVersionSchema = new Schema({
   creatorUserId: ObjectId,
