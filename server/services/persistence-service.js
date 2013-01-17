@@ -2,12 +2,45 @@
 "use strict";
 
 var mongoose = require("mongoose");
-var Schema = mongoose.Schema,
-    ObjectId = Schema.ObjectId;
+var Schema = mongoose.Schema;
+var ObjectId = Schema.ObjectId;
 var appEvents = require("../app-events");
 var mongooseUtils = require("../utils/mongoose-utils");
+var _ = require("underscore");
+var winston = require("winston");
 
 mongoose.connect('mongodb://localhost/troupe');
+
+// --------------------------------------------------------------------
+// Utility serialization stuff
+// --------------------------------------------------------------------
+
+// This needs to be late-bound to prevent circular dependencies
+// TODO: review architecture to remove possible circular dependency
+var serializeModel = null;
+function serializeModelLateBound(model, callback) {
+  if(serializeModel === null) {
+    serializeModel = require("../serializers/rest-serializer").serializeModel;
+  }
+  serializeModel(model, callback);
+}
+
+function serializeEvent(url, operation, model, callback) {
+  serializeModelLateBound(model, function(err, serializedModel) {
+    if(err) {
+      winston.error("Silently failing model event: ", { exception: err, url: url, operation: operation });
+    } else {
+      appEvents.dataChange2(url, operation, serializedModel);
+    }
+
+    if(callback) callback();
+  });
+}
+
+// --------------------------------------------------------------------
+// Schemas
+// --------------------------------------------------------------------
+
 
 var UserSchema = new Schema({
   displayName: { type: String },
@@ -35,6 +68,7 @@ var UserSchema = new Schema({
   userToken: String // TODO: move to OAuth
 });
 UserSchema.index({ email: 1 });
+UserSchema.schemaTypeName = 'UserSchema';
 
 var UserLocationHistorySchema = new Schema({
   userId: ObjectId,
@@ -46,29 +80,48 @@ var UserLocationHistorySchema = new Schema({
   speed: Number
 });
 UserLocationHistorySchema.index({ userId: 1 });
+UserLocationHistorySchema.schemaTypeName = 'UserLocationHistorySchema';
+
+var TroupeUserSchema = new Schema({
+  userId: { type: ObjectId }
+  // In future: role
+});
+TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
 
 var TroupeSchema = new Schema({
   name: { type: String },
   uri: { type: String },
   status: { type: String, "enum": ['INACTIVE', 'ACTIVE'], "default": 'INACTIVE'},
-  users: [ObjectId]
+  users: [TroupeUserSchema]
 });
 TroupeSchema.index({ uri: 1 });
+TroupeSchema.schemaTypeName = 'TroupeSchema';
 
 TroupeSchema.methods.getUserIds = function() {
-  return this.users;
+  return this.users.map(function(troupeUser) { return troupeUser.userId; });
 };
 
 TroupeSchema.methods.containsUserId = function(userId) {
-  return this.users.indexOf(userId) >= 0;
+  var user = _.find(this.users, function(troupeUser){ return troupeUser.userId == userId; });
+  return !!user;
 };
 
 TroupeSchema.methods.addUserById = function(userId) {
-  return this.users.push(userId) >= 0;
+  return this.users.push({ userId: userId });
 };
 
 TroupeSchema.methods.removeUserById = function(userId) {
-  return this.users.remove(userId) >= 0;
+  var troupeUser = _.find(this.users, function(troupeUser){ return troupeUser.userId == userId; });
+  if(troupeUser) {
+
+    // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
+    this.post('save', function(postNext) {
+      var url = "/troupes/" + this.id + "/users/";
+      serializeEvent(url, "remove", troupeUser, postNext);
+    });
+
+    troupeUser.remove();
+  }
 };
 
 var InviteSchema = new Schema({
@@ -78,12 +131,14 @@ var InviteSchema = new Schema({
   code: { type: String },
   status: { type: String, "enum": ['UNUSED', 'USED'], "default": 'UNUSED'}
 });
+InviteSchema.schemaTypeName = 'InviteSchema';
 
 var RequestSchema = new Schema({
   troupeId: ObjectId,
   userId: ObjectId,
   status: { type: String, "enum": ['PENDING', 'ACCEPTED', 'REJECTED'], "default": 'PENDING'}
 });
+RequestSchema.schemaTypeName = 'RequestSchema';
 
 var ChatMessageSchema = new Schema({
   fromUserId: ObjectId,
@@ -92,11 +147,13 @@ var ChatMessageSchema = new Schema({
   sent: { type: Date, "default": Date.now }
 });
 ChatMessageSchema.index({ toTroupeId: 1, sent: -1 });
+ChatMessageSchema.schemaTypeName = 'ChatMessageSchema';
 
 var EmailAttachmentSchema = new Schema({
   fileId: ObjectId,
   version: Number
 });
+EmailAttachmentSchema.schemaTypeName = 'EmailAttachmentSchema';
 
 var EmailSchema = new Schema({
   from: { type: String },
@@ -110,6 +167,7 @@ var EmailSchema = new Schema({
   messageId: { type: String},
   attachments: [EmailAttachmentSchema]
 });
+EmailSchema.schemaTypeName = 'EmailSchema';
 
 /*
 EmailSchema.pre('save', function (next) {
@@ -124,6 +182,7 @@ var ConversationSchema = new Schema({
   emails: [EmailSchema]
 });
 ConversationSchema.index({ troupeId: 1 });
+ConversationSchema.schemaTypeName = 'ConversationSchema';
 
 var FileVersionSchema = new Schema({
   creatorUserId: ObjectId,
@@ -134,6 +193,7 @@ var FileVersionSchema = new Schema({
   /* In future, this might change, but for the moment, use a URI-type source */
   source: { type: String }
 });
+FileVersionSchema.schemaTypeName = 'FileVersionSchema';
 
 
 var FileSchema = new Schema({
@@ -144,6 +204,7 @@ var FileSchema = new Schema({
   versions: [FileVersionSchema]
 });
 FileSchema.index({ troupeId: 1 });
+FileSchema.schemaTypeName = 'FileSchema';
 
 var NotificationSchema = new Schema({
   troupeId: ObjectId,
@@ -154,6 +215,7 @@ var NotificationSchema = new Schema({
 });
 NotificationSchema.index({ troupeId: 1 });
 NotificationSchema.index({ userId: 1 });
+NotificationSchema.schemaTypeName = 'NotificationSchema';
 
 /*
  * OAuth Stuff
@@ -166,6 +228,7 @@ var OAuthClientSchema = new Schema({
   canSkipAuthorization: Boolean
 });
 OAuthClientSchema.index({ clientKey: 1 });
+OAuthClientSchema.schemaTypeName = 'OAuthClientSchema';
 
 var OAuthCodeSchema = new Schema({
   code: String,
@@ -174,6 +237,7 @@ var OAuthCodeSchema = new Schema({
   userId: ObjectId
 });
 OAuthCodeSchema.index({ code: 1 });
+OAuthCodeSchema.schemaTypeName = 'OAuthCodeSchema';
 
 var OAuthAccessTokenSchema= new Schema({
   token: String,
@@ -181,6 +245,7 @@ var OAuthAccessTokenSchema= new Schema({
   clientId: ObjectId
 });
 OAuthAccessTokenSchema.index({ token: 1 });
+OAuthAccessTokenSchema.schemaTypeName = 'OAuthAccessTokenSchema';
 
 
 /*
@@ -206,6 +271,7 @@ var GeoPopulatedPlaceSchema= new Schema({
 });
 GeoPopulatedPlaceSchema.index({ coordinate: "2d" });
 GeoPopulatedPlaceSchema.index({ geonameid: 1 });
+GeoPopulatedPlaceSchema.schemaTypeName = 'GeoPopulatedPlaceSchema';
 
 /*
  * Push Notifications
@@ -220,12 +286,14 @@ GeoPopulatedPlaceSchema.index({ geonameid: 1 });
 });
 PushNotificationDeviceSchema.index({ deviceId: 1 });
 PushNotificationDeviceSchema.index({ userId: 1 });
+PushNotificationDeviceSchema.schemaTypeName = 'PushNotificationDeviceSchema';
 
 
 var User = mongoose.model('User', UserSchema);
 var UserLocationHistory = mongoose.model('UserLocationHistory', UserLocationHistorySchema);
 
 var Troupe = mongoose.model('Troupe', TroupeSchema);
+var TroupeUser = mongoose.model('TroupeUser', TroupeUserSchema);
 var Email = mongoose.model('Email', EmailSchema);
 var EmailAttachment = mongoose.model('EmailAttachment', EmailAttachmentSchema);
 var Conversation = mongoose.model('Conversation', ConversationSchema);
@@ -246,34 +314,30 @@ var PushNotificationDevice = mongoose.model('PushNotificationDevice', PushNotifi
 
 /** */
 function attachNotificationListenersToSchema(schema, name, extractor) {
+
   if(!extractor) {
     // Default extractor
     extractor = function(model) {
-      return {
-        id: model.id,
-        troupeId: model.troupeId
-      };
+      return "/troupes/" + model.troupeId + "/" + name + "s";
     };
   }
 
   mongooseUtils.attachNotificationListenersToSchema(schema, {
     onCreate: function(model, next) {
-      var e = extractor(model);
-      console.log("dataChange: " + name);
-      appEvents.dataChange(name, 'create', e.id, e.troupeId, model);
+      var url = extractor(model);
+      serializeEvent(url, 'create', model);
       next();
     },
 
     onUpdate: function(model, next) {
-      var e = extractor(model);
-      console.log("dataChange: " + name);
-      appEvents.dataChange(name, 'update', e.id, e.troupeId, model);
+      var url = extractor(model);
+      serializeEvent(url, 'update', model);
       next();
     },
 
     onRemove: function(model) {
-      var e = extractor(model);
-      appEvents.dataChange(name, 'remove', e.id, e.troupeId);
+      var url = extractor(model);
+      serializeEvent(url, 'remove', model);
     }
   });
 }
@@ -284,15 +348,33 @@ attachNotificationListenersToSchema(InviteSchema, 'invite');
 attachNotificationListenersToSchema(RequestSchema, 'request');
 //attachNotificationListenersToSchema(NotificationSchema, 'notification');
 attachNotificationListenersToSchema(ChatMessageSchema, 'chat', function(model) {
-  return {
-    id: model.id,
-    troupeId: model.toTroupeId
-  };
+  return "/troupes/" + model.toTroupeId + "/chatMessages";
 });
 
 module.exports = {
+  schemas: {
+    UserSchema: UserSchema,
+    UserLocationHistorySchema: UserLocationHistorySchema,
+    TroupeSchema: TroupeSchema,
+    TroupeUserSchema: TroupeUserSchema,
+    EmailSchema: EmailSchema,
+    EmailAttachmentSchema: EmailAttachmentSchema,
+    ConversationSchema: ConversationSchema,
+    InviteSchema: InviteSchema,
+    RequestSchema: RequestSchema,
+    ChatMessageSchema: ChatMessageSchema,
+    FileSchema: FileSchema,
+    FileVersionSchema: FileVersionSchema,
+    NotificationSchema: NotificationSchema,
+    OAuthClientSchema: OAuthClientSchema,
+    OAuthCodeSchema: OAuthCodeSchema,
+    OAuthAccessTokenSchema: OAuthAccessTokenSchema,
+    GeoPopulatedPlaceSchema: GeoPopulatedPlaceSchema,
+    PushNotificationDeviceSchema: PushNotificationDeviceSchema
+  },
   User: User,
   Troupe: Troupe,
+  TroupeUser: TroupeUser,
 	Email: Email,
   EmailAttachment: EmailAttachment,
   Conversation: Conversation,

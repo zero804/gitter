@@ -1,42 +1,36 @@
 /*jshint globalstrict:true, trailing:false unused:true node:true*/
-/*global console:false, require: true, module: true */
 "use strict";
 
-var passport = require('passport'),
-    winston = require('winston'),
-    userService = require("./services/user-service"),
-    troupeService = require("./services/troupe-service"),
-    presenceService = require("./services/presence-service"),
-    conversationService = require("./services/conversation-service"),
-    fileService = require("./services/file-service"),
-    restSerializer = require("./serializers/rest-serializer"),
+var winston = require('winston'),
     appEvents = require("./app-events"),
-    nconf = require('./utils/config'),
-    bayeux = require('./web/bayeux'),
-    Q = require("q"),
-    everyone,
-    nowjs = {};
+    bayeux = require('./web/bayeux');
 
-function getNestedUrlForModel(modelName) {
-  switch(modelName) {
-    case 'chat':
-      return 'chatMessages';
-    case 'conversation':
-      return 'conversations';
-    case 'files':
-      return 'files';
-    default:
-      winston.warn("nowjs: unexpected modelName " + modelName);
-      return modelName + "s";
-  }
-}
+exports.install = function(server) {
+  var bayeuxServer = bayeux.server;
+  var bayeuxClient = bayeux.client;
+  bayeuxServer.attach(server);
 
-module.exports = {
-    install: function(server, sessionStore) {
-      var bayeuxServer = bayeux.server;
-      var bayeuxClient = bayeux.client;
-      bayeuxServer.attach(server);
+  appEvents.onDataChange2(function(data) {
+    var operation = data.operation;
+    var model = data.model;
+    var url = data.url;
 
+    switch(operation) {
+      case 'create':
+      case 'update':
+      case 'remove':
+        bayeuxClient.publish(url, {
+          operation: operation,
+          model: model
+        });
+        break;
+      default:
+        winston.error('Unknown operation', {operation: operation });
+    }
+  });
+};
+
+      /*
       appEvents.onDataChange(function(data) {
 
         var troupeId = data.troupeId;
@@ -77,7 +71,7 @@ module.exports = {
             });
           });
         } else {
-          /* For remove operations.... */
+          / *  For remove operations.... * /
           bayeuxClient.publish(publishUrl, {
             troupeId: troupeId,
             modelName: modelName,
@@ -87,9 +81,9 @@ module.exports = {
         }
 
       });
+      */
 
-
-      return;
+      /*
       everyone = nowjs.initialize(server, {
          "host" : nconf.get("ws:hostname"),
          "port" : nconf.get("ws:externalPort"),
@@ -125,7 +119,7 @@ module.exports = {
 
           nowjs.getGroup("user." + user.id).removeUser(self.user.clientId);
 
-          /* Give the user 10 seconds to log back into before reporting that they're disconnected */
+          / * Give the user 10 seconds to log back into before reporting that they're disconnected * /
           setTimeout(function(){
             presenceService.userSocketDisconnected(user.id, self.user.clientId);
           }, 10000);
@@ -277,7 +271,7 @@ module.exports = {
       appEvents.onMailEvent(function(data) {
         var event = data.event;
         if(event !== 'new') {
-          /* Filter..... */
+          / * Filter..... * /
           return;
         }
 
@@ -313,7 +307,7 @@ module.exports = {
         var notificationText = data.notificationText;
         var notificationLink = data.notificationLink;
 
-        /* Directed at a troupe? */
+        / * Directed at a troupe? * /
         if(troupeId) {
           getGroup("troupe." + troupeId, function(group) {
             if(!group || !group.now || !group.now.onNotification) {
@@ -328,7 +322,7 @@ module.exports = {
           });
         }
 
-        /* Directed at a user? */
+        / * Directed at a user? * /
         if(userId) {
           winston.error("nowjs: DIRECT USER NOTIFICATIONS NOT YET IMPLEMENTED!!");
           // TODO
@@ -387,5 +381,5 @@ module.exports = {
       });
 
     }
+    */
 
-};

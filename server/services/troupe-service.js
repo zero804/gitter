@@ -47,7 +47,7 @@ function findMemberEmails(id, callback) {
 
 function findAllTroupesForUser(userId, callback) {
   persistence.Troupe
-    .where('users', userId)
+    .where('users.userId', userId)
     .sort({ name: 'asc' })
     .slaveOk()
     .exec(callback);
