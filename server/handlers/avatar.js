@@ -7,18 +7,22 @@ var middleware = require('../web/middleware'),
     sechash = require('sechash'),
     mongoose = require("mongoose"),
     userService = require('../services/user-service.js'),
-    restSerializer = require("../serializers/rest-serializer");
+    restSerializer = require("../serializers/rest-serializer"),
+    Fiber = require("../utils/fiber");
 
-function redirectToDefault(user, res) {
+function redirectToDefault(size, user, res) {
   res.redirect(301, "/images/2/avatar-default.png");
 }
 
-function displayAvatarFor(userId, req, res) {
+// size is either 's' or 'm'
+function displayAvatarFor(size, userId, req, res) {
   var db = mongoose.connection.db;
   var GridStore = mongoose.mongo.GridStore;
-  var avatarFile = "avatar-" + userId;
+
+  var avatarFile = "avatar-" + userId + ((size == 'm') ? '-m' : '');
+
   GridStore.exist(db, avatarFile, function(err, exists) {
-    if(err || !exists) return redirectToDefault(userId, res);
+    if(err || !exists) return redirectToDefault(size, userId, res);
 
     var gs = new GridStore(db, avatarFile, "r");
 
@@ -45,13 +49,40 @@ function displayAvatarFor(userId, req, res) {
   });
 }
 
+function scaleAndWriteAvatar(width, height, path, callback) {
+  var saveToPath = path + '-' + width + 'x' + height;
+
+  im.convert(['-define','jpeg:size='+width+'x'+height+'48',path,'-thumbnail',width+'x'+height+'^','-gravity','center','-extent',width+'x'+height,saveToPath],
+    function(err, stdout, stderr) {
+      if (err) {
+        return callback(err);
+      } else {
+        return callback(saveToPath);
+      }
+    }
+  );
+}
+
+function saveAvatarToGridFS(localPath, gridFSFilename, callback) {
+  var db = mongoose.connection.db;
+  var GridStore = mongoose.mongo.GridStore;
+  var gs = new GridStore(db, gridFSFilename, "w", {
+      "content_type": "image/jpeg",
+      "metadata":{
+        /* Attributes go here */
+      }
+  });
+
+  gs.writeFile(localPath, callback);
+}
+
 module.exports = {
     install: function(app) {
       app.get(
         '/avatar',
         middleware.ensureLoggedIn(),
         function(req, res) {
-          displayAvatarFor(req.user.id, req, res);
+          displayAvatarFor('s', req.user.id, req, res);
         }
       );
 
@@ -60,17 +91,18 @@ module.exports = {
         // middleware.ensureLoggedIn(),
         function(req, res, next) {
           var userId = req.params.userId;
-          displayAvatarFor(userId, req, res);
+          displayAvatarFor('s', userId, req, res);
         }
       );
 
       app.get(
-        '/avatar/:userId/:version.:type',
+        '/avatar/:size/:userId/:version.:type',
         // middleware.ensureLoggedIn(),
         function(req, res, next) {
           /* Ignore the version and always serve up the latest */
           var userId = req.params.userId;
-          displayAvatarFor(userId, req, res);
+          var size = req.params.size;
+          displayAvatarFor(size, userId, req, res);
         }
       );
 
@@ -80,38 +112,40 @@ module.exports = {
         function(req, res, next) {
           var file = req.files.file;
           var inPath = file.path;
-          var resizedPath = file.path + "-small.jpg";
+          var resizedPath = file.path + "-.jpg";
+          var mongoPath = "avatar-" + req.user.id;
 
-          im.convert(['-define','jpeg:size=48x48',inPath,'-thumbnail','48x48^','-gravity','center','-extent','48x48',resizedPath],
-            function(err, stdout, stderr) {
-              if (err) return next(err);
+          var fiber = new Fiber();
 
-              var db = mongoose.connection.db;
-              var GridStore = mongoose.mongo.GridStore;
-              var gs = new GridStore(db, "avatar-" + req.user.id, "w", {
-                  "content_type": "image/jpeg",
-                  "metadata":{
-                    /* Attributes go here */
-                  }
-              });
+          scaleAndWriteAvatar(48, 48, inPath, function(resizedPath) {
+            saveAvatarToGridFS(resizedPath, 'avatar-' + req.user.id, fiber.waitor());
+          });
 
-              gs.writeFile(resizedPath, function(err) {
-                if (err) return next(err);
+          scaleAndWriteAvatar(180, 180, inPath, function(resizedPath) {
+            saveAvatarToGridFS(resizedPath, 'avatar-' + req.user.id + '-m', fiber.waitor());
+          });
 
-                req.user.avatarVersion = req.user.avatarVersion ? req.user.avatarVersion + 1 : 1;
-                req.user.save();
 
-                var strategy = new restSerializer.UserStrategy();
+          fiber.sync()
+            .then(function() {
+              //if (err) return next(err);
 
-                restSerializer.serialize(req.user, strategy, function(err, serialized) {
-                  if(err) return next(err);
+              req.user.avatarVersion = req.user.avatarVersion ? req.user.avatarVersion + 1 : 1;
+              req.user.save();
 
-                  res.send({
-                      success: true,
-                      user: serialized
-                  });
+              var strategy = new restSerializer.UserStrategy();
+
+              restSerializer.serialize(req.user, strategy, function(err, serialized) {
+                if(err) return next(err);
+
+                res.send({
+                    success: true,
+                    user: serialized
                 });
               });
+            })
+            .fail(function(err) {
+              next(err);
             });
         }
       );
