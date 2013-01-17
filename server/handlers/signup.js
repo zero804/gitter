@@ -54,6 +54,8 @@ module.exports = {
               email: req.form.email
             }, function(err, id) {
               if(err) {
+                winston.error("Error creating new troupe ", { exception: err });
+
                 if(req.accepts('application/json')) {
                   res.send(500);
                 } else {
@@ -75,6 +77,8 @@ module.exports = {
           // there are probably better ways to do this, but i don't them. MB
           if (req.form.userId) {
             userService.findById(req.form.userId, function(err,user) {
+              winston.error("Error finding user ", { exception: err });
+
               if(err) {
                 res.send(500);
               } else {
@@ -85,6 +89,8 @@ module.exports = {
                   email: user.email
                 }, function(err,id) {
                   if(err) {
+                    winston.error("Error creating new troupe ", { exception: err });
+
                     if(req.accepts('application/json')) {
                       res.send(500);
                     } else {
@@ -95,6 +101,7 @@ module.exports = {
 
                   troupeService.findById(id, function(err,troupe) {
                     if (err) {
+                      winston.error("Error finding troupe ", { exception: err });
                       res.send(500);
                     } else {
                       res.send({ success: true, redirectTo: troupe.uri});
