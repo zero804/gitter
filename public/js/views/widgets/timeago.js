@@ -50,7 +50,7 @@ define([
       if(duration.asDays() >= maxDaysBeforeDateDisplay) {
         v = this.time.format("LL");
       } else {
-        v = duration.humanize();
+        v = duration.humanize() + " ago";
       }
       var fullTime = this.time.format("LLL");
       this.$el.html("<span title='" + fullTime + "'>" + v + "</span>");
