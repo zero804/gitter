@@ -123,6 +123,18 @@ module.exports = {
 
   onDataChange: function(callback) {
     on('dataChange', callback);
+  },
+
+  dataChange2: function(url, operation, model) {
+    emit('dataChange2', {
+      url: url,
+      operation: operation,
+      model: model
+    });
+  },
+
+  onDataChange2: function(callback) {
+    on('dataChange2', callback);
   }
 
 };

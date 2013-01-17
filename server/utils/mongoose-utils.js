@@ -1,17 +1,19 @@
 /*jshint globalstrict:true, trailing:false unused:true node:true*/
-/*global require: true, module: true */
+"use strict";
 
 exports.attachNotificationListenersToSchema = function (schema, listeners) {
 
   if(listeners.onCreate || listeners.onUpdate) {
     schema.pre('save', function (next) {
+      console.dir(this);
+      console.dir(arguments);
       var isNewInstance = this.isNew;
 
       this.post('save', function(postNext) {
         if(isNewInstance) {
-          listeners.onCreate(this, postNext);
+          if(listeners.onCreate) listeners.onCreate(this, postNext);
         } else {
-          listeners.onUpdate(this, postNext);
+          if(listeners.onUpdate) listeners.onUpdate(this, postNext);
         }
       });
 

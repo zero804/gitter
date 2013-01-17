@@ -1,5 +1,4 @@
 /*jshint globalstrict:true, trailing:false unused:true node:true*/
-/*global console:false, require: true, module: true */
 "use strict";
 
 var userService = require("../services/user-service");
@@ -13,7 +12,6 @@ var handlebars = require('handlebars');
 var winston = require("winston");
 var collections = require("../utils/collections");
 var cdn = require('../web/cdn');
-
 var predicates = collections.predicates;
 
 
@@ -198,7 +196,6 @@ function FileIdStrategy(options) {
 
 function FileIdAndVersionStrategy() {
   var fileIdStrategy = new FileIdStrategy();
-  var self = this;
 
   this.preload = function(fileAndVersions, callback) {
     var fileIds = _(fileAndVersions).chain()
@@ -228,8 +225,6 @@ function FileIdAndVersionStrategy() {
 
     // TODO: there is a slight performance gain to be made by not loading all the file versions
     // and only loading the file version (and users) for the needed version
-
-    var versions = file['versions'];
     delete file['versions'];
 
     return _.extend(file, fileVersion);
@@ -550,6 +545,18 @@ function InviteStrategy(options) {
   };
 }
 
+function TroupeUserStrategy(options) {
+  var userIdStategy = new UserIdStrategy(options);
+
+  this.preload = function(troupeUsers, callback) {
+    var userIds = troupeUsers.map(function(troupeUser) { return troupeUser.userId; });
+    userIdStategy.preload(userIds, callback);
+  };
+
+  this.map = function(troupeUser) {
+    return userIdStategy.map(troupeUser.userId);
+  };
+}
 
 function TroupeStrategy(options) {
   if(!options) options = {};
@@ -684,6 +691,7 @@ function serialize(items, strat, callback) {
 
 }
 
+// TODO: deprecate this....
 function getStrategy(modelName, toCollection) {
   switch(modelName) {
     case 'conversation':
@@ -709,6 +717,58 @@ function getStrategy(modelName, toCollection) {
   }
 }
 
+function serializeModel(model, callback) {
+  if(model === null) return callback(null, null);
+  var schema = model.schema;
+  if(!schema) return callback("Model does not have a schema");
+  if(!schema.schemaTypeName) return callback("Schema does not have a schema name");
+
+  var strategy;
+
+  switch(schema.schemaTypeName) {
+    case 'UserSchema':
+      strategy = new UserStrategy();
+      break;
+
+    case 'TroupeSchema':
+      strategy = new TroupeStrategy();
+      break;
+
+    case 'TroupeUserSchema':
+      strategy = new TroupeUserStrategy();
+      break;
+
+    case 'ConversationSchema':
+      strategy = new ConversationMinStrategy();
+      break;
+
+    case 'InviteSchema':
+      strategy = new InviteStrategy();
+      break;
+
+    case 'RequestSchema':
+      strategy = new RequestStrategy();
+      break;
+
+    case 'ChatMessageSchema':
+      strategy = new ChatStrategy();
+      break;
+
+    case 'FileSchema':
+      strategy = new FileStrategy();
+      break;
+
+    case 'NotificationSchema':
+      strategy = new NotificationStrategy();
+      break;
+  }
+
+  if(!strategy) return callback("No strategy for " + schema.schemaTypeName);
+
+
+  serialize(model, strategy, callback);
+}
+
 module.exports = {
   UserStrategy: UserStrategy,
   UserIdStrategy: UserIdStrategy,
@@ -722,6 +782,8 @@ module.exports = {
   RequestStrategy: RequestStrategy,
   TroupeStrategy: TroupeStrategy,
   TroupeIdStrategy: TroupeIdStrategy,
+  TroupeUserStrategy: TroupeUserStrategy,
   getStrategy: getStrategy,
-  serialize: serialize
+  serialize: serialize,
+  serializeModel: serializeModel
 }
