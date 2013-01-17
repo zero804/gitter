@@ -11,7 +11,9 @@ var middleware = require('../web/middleware'),
     Fiber = require("../utils/fiber");
 
 function redirectToDefault(size, user, res) {
-  res.redirect(301, "/images/2/avatar-default.png");
+  var s = (size == 'm') ? '-m' : '-s';
+
+  res.redirect(301, "/images/2/avatar-default"+s+".png");
 }
 
 // size is either 's' or 'm'
@@ -28,7 +30,7 @@ function displayAvatarFor(size, userId, req, res) {
 
     gs.open(function(err, gs) {
       if(err) {
-        redirectToDefault(userId, res);
+        redirectToDefault(size, userId, res);
         return;
       }
 
@@ -112,7 +114,6 @@ module.exports = {
         function(req, res, next) {
           var file = req.files.file;
           var inPath = file.path;
-          var resizedPath = file.path + "-.jpg";
           var mongoPath = "avatar-" + req.user.id;
 
           var fiber = new Fiber();
