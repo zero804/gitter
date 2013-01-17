@@ -1,10 +1,7 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
-var troupeService = require('../services/troupe-service'),
-    fileService = require('../services/file-service'),
-    winston = require('winston');
+var fileService = require('../../services/file-service');
 
 module.exports = {
     index: function(req, res, next) {

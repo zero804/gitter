@@ -1,10 +1,11 @@
+/*jshint unused:true browser:true*/
 require([
   'jquery',
   'underscore',
   'backbone',
   'marionette',
   'views/base',
-  'components/chat/chat-component',
+  'components/realtime',
   'views/app/appIntegratedView',
   'views/chat/chatView',
   'views/file/fileView',
@@ -23,12 +24,10 @@ require([
   'views/people/peopleCollectionView',
   'views/profile/profileView',
   'views/share/shareView'
-], function($, _, Backbone, Marionette, TroupeViews, chat, AppIntegratedView, ChatView, FileView, ConversationView,
+], function($, _, Backbone, Marionette, TroupeViews, realtime, AppIntegratedView, ChatView, FileView, ConversationView,
             vent, troupeModels, fileModels, conversationModels, userModels, FileDetailView, filePreviewView, fileVersionsView,
             PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView) {
-
-  /*jslint browser: true*/
-  /*global require console */
+  /*global console:true*/
   "use strict";
 
   $(document).on("click", "a", function(event) {
@@ -56,7 +55,7 @@ require([
   });
 
   // Make drop down menus drop down
-  $(document).on("click", ".trpButtonDropdown .trpButtonMenu", function(event) {
+  $(document).on("click", ".trpButtonDropdown .trpButtonMenu", function(/*event*/) {
     $(this).parent().next().toggle();
   });
 
@@ -70,7 +69,21 @@ require([
     rightPanelRegion: "#right-panel"
   });
 
-  chat.connect();
+  /*var subscription = */ realtime.subscribe('/troupes/' + window.troupeContext.troupe.id, function(message) {
+    console.log("MESSAGE!", message);
+    if(message.notification === 'presence') {
+      if(message.status === 'in') {
+        $(document).trigger('userLoggedIntoTroupe', message);
+      } else if(message.status === 'out') {
+        $(document).trigger('userLoggedOutOfTroupe', message);
+      }
+    }
+
+  });
+
+  realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
+    console.log("MESSAGE!", message);
+  });
 
   /* This is a special region which acts like a region, but is implemented completely differently */
   app.dialogRegion = {
@@ -99,7 +112,7 @@ require([
   var appView = new AppIntegratedView({ app: app });
 
   var Router = Backbone.Router.extend({
-    initialize: function(options) {
+    initialize: function(/*options*/) {
       this.regionsFragments = {};
       this.route(/^(.*?)$/, "handle");
     },
@@ -204,7 +217,7 @@ require([
 
   });
 
-  app.addInitializer(function(options){
+  app.addInitializer(function(/*options*/){
     var chatView = new ChatView();
     app.chatRegion.show(chatView);
 
@@ -239,6 +252,7 @@ require([
     // User Collections
     userCollection = new userModels.UserCollection();
     userCollection.fetch();
+    userCollection.listen();
     var peopleCollectionView = new PeopleCollectionView({
       collection: userCollection
     });

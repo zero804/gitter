@@ -1,5 +1,4 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var troupeService = require("../services/troupe-service");
@@ -8,15 +7,12 @@ var userService = require("../services/user-service");
 var unreadItemService = require("../services/unread-item-service");
 var restSerializer = require("../serializers/rest-serializer");
 var nconf = require('../utils/config');
-var Q = require("q");
 var middleware = require('../web/middleware');
+var oauthService = require("../services/oauth-service");
 
 function renderAppPage(req, res, next, page) {
 
   var appUri = req.params.appUri;
-
-  var unreadCountDeferred = Q.defer();
-  var troupeLoadDeferred = Q.defer();
 
   troupeService.findByUri(appUri, function(err, troupe) {
     if(err) return next(err);
@@ -33,14 +29,19 @@ function renderAppPage(req, res, next, page) {
     }
 
     function serializeUserAndRenderPage(unreadItems) {
-      if(!req.user) return renderPage(unreadItems, null);
+      if(!req.user) return renderPage(unreadItems, null, null);
 
       var strategy = new restSerializer.UserStrategy();
 
       restSerializer.serialize(req.user, strategy, function(err, serialized) {
         if(err) return next(err);
 
-        renderPage(unreadItems, serialized);
+        oauthService.findOrGenerateWebToken(req.user.id, function(err, token) {
+          if(err) return next(err);
+
+          renderPage(unreadItems, serialized, token);
+        });
+
       });
 
     }
@@ -52,7 +53,7 @@ function renderAppPage(req, res, next, page) {
       return req.protocol + "://" + req.headers.host;
     }
 
-    function renderPage(unreadItems, serializedUser) {
+    function renderPage(unreadItems, serializedUser, accessToken) {
       var profileNotCompleted;
 
       var troupeData = {
@@ -76,6 +77,7 @@ function renderAppPage(req, res, next, page) {
       var troupeContext = {
           user: serializedUser,
           troupe: troupeData,
+          accessToken: accessToken,
           profileNotCompleted: profileNotCompleted,
           unreadItems: unreadItems,
           accessDenied: accessDenied,

@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 define([
   'jquery',
   'underscore',
@@ -5,9 +6,10 @@ define([
   'hbs!./shareView',
   'hbs!./shareRow',
   'zeroClipboard',
-  'jquery_placeholder',
-  'jquery_validate'
-], function($, _, TroupeViews, template, rowTemplate, zeroClipboard) {
+  'jquery_placeholder', // No reference
+  'jquery_validate'  // No reference
+], function($, _, TroupeViews, template, rowTemplate, ZeroClipboard) {
+  "use strict";
 
   var View = TroupeViews.Base.extend({
     template: template,
@@ -42,8 +44,7 @@ define([
         },
         debug: true,
         showErrors: function(errorMap, errorList) {
-          console.log("errorList: " + errorList.length);
-          console.dir(errorList);
+
           if (errorList.length === 0) $('.share-failure').hide();
           if (errorList.length > 0) $('.share-failure').show();
           var errors = "";

@@ -1,17 +1,16 @@
-/*jshint globalstrict:true, trailing:false node:true*/
-/*global console:false, require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
-var troupeService = require("../services/troupe-service"),
-    userService = require("../services/user-service"),
-    restSerializer = require("../serializers/rest-serializer"),
+var troupeService = require("../../services/troupe-service"),
+    userService = require("../../services/user-service"),
+    restSerializer = require("../../serializers/rest-serializer"),
     _ = require("underscore");
 
 module.exports = {
     index: function(req, res, next) {
       var strategy = new restSerializer.UserIdStrategy();
 
-      restSerializer.serialize(req.troupe.users, strategy, function(err, serialized) {
+      restSerializer.serialize(req.troupe.getUserIds(), strategy, function(err, serialized) {
         if(err) return next(err);
         res.send(serialized);
       });
@@ -46,7 +45,7 @@ module.exports = {
     },
 
     load: function(req, id, callback) {
-      var userInTroupeId = _.find(req.troupe.users, function(v) { return v == id;} );
+      var userInTroupeId = _.find(req.troupe.getUserIds(), function(v) { return v == id;} );
       userService.findById(userInTroupeId, callback);
     }
 

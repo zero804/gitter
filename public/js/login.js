@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 require([
   'jquery',
   'retina' ],

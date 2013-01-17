@@ -1,15 +1,18 @@
+/*jshint unused:true browser:true*/
 define([
   'marionette',
   'views/base',
   'hbs!./peopleItemView',
   'hbs!./peopleAddPersonButtonView'
 ], function(Marionette, TroupeViews, peopleItemViewTemplate, peopleAddPersonButtonViewTemplate) {
-  /*jslint browser: true*/
-  /*global require */
   "use strict";
 
   var PeopleItemView = TroupeViews.Base.extend({
-    template: peopleItemViewTemplate
+    template: peopleItemViewTemplate,
+
+    initialize: function(/*options*/) {
+      this.setRerenderOnChange();
+    }
   });
 
   var PeopleAddPersonButtonView = TroupeViews.Base.extend({
@@ -20,7 +23,7 @@ define([
   return Marionette.CollectionView.extend({
     itemView: PeopleItemView,
 
-    initialize: function(options) {
+    initialize: function(/*options*/) {
       this.addButton = new PeopleAddPersonButtonView();
     },
 

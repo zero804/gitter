@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 // Filename: views/home/main
 define([
   'jquery',
@@ -7,8 +8,6 @@ define([
   'views/app/uiVars',
   'fineuploader'
   ], function($, _, Backbone, vent, uiVars, qq) {
-  /*jslint browser: true*/
-  /*global require console */
   "use strict";
 
   return Backbone.View.extend({
@@ -31,19 +30,23 @@ define([
       var self = this;
       this.app = options.app;
 
-      var uploader = new qq.FineUploader({
-        element: $("<span></span")[0],
+      $('body').append('<span id="fineUploader"></span>');
+      this.uploader = new qq.FineUploader({
+        element: $('#fineUploader')[0],
         dragAndDrop: {
           extraDropzones: [document.body],
           hideDropzones: false,
           disableDefaultDropzone: false
         },
+        text: {
+          dragZone: '', // text to display
+          dropProcessing: '',
+          waitingForResponse: ''
+        },
         request: {
           endpoint: '/troupes/' + window.troupeContext.troupe.id + '/downloads/'
         },
         callbacks: {
-          onSubmit: function(id, fileName) {},
-          // return false to cancel submit
           onComplete: function(id, fileName, response) {
             if(response.success) {
               self.app.collections['files'].add(response.file, { merge: true });
@@ -54,14 +57,14 @@ define([
       });
 
       this.app.rightPanelRegion.on('show', function() {
-        console.log("SHOW PANEL");
+        //console.log("SHOW PANEL");
         self.showPanel("#right-panel");
       });
 
       this.app.rightPanelRegion.on('close', function() {
         window.setTimeout(function() {
           if(!self.app.rightPanelRegion.currentView) {
-            console.log("CLOSE PANEL");
+            //console.log("CLOSE PANEL");
             self.hidePanel("#right-panel");
           }
         }, 100);

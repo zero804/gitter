@@ -1,4 +1,4 @@
-/*jslint node: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 ////////////////////////////////////////////////////////////
@@ -133,7 +133,7 @@ exports.createTroupeChatNotification = function(info) {
       return;
     }
 
-    pushNotificationGateway.sendUserNotification(troupe.users, {
+    pushNotificationGateway.sendUserNotification(troupe.getUserIds(), {
       message: notificationText,
       sound: 'chat.caf',
       payload: { uri: troupe.uri, page: 'chat' }

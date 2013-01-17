@@ -1,12 +1,11 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
+/*global require: true, module: true */
 "use strict";
 
 var persistence = require("./persistence-service"),
     userService = require("./user-service"),
     emailNotificationService = require("./email-notification-service"),
     uuid = require('node-uuid'),
-    nconf = require('../utils/config'),
     winston = require("winston");
 
 function findByUri(uri, callback) {
@@ -32,7 +31,7 @@ function findMemberEmails(id, callback) {
     if(err) callback(err);
     if(!troupe) callback("No troupe returned");
 
-    var userIds = troupe.users;
+    var userIds = troupe.getUserIds();
 
     userService.findByIds(userIds, function(err, users) {
       if(err) callback(err);
@@ -48,14 +47,31 @@ function findMemberEmails(id, callback) {
 
 function findAllTroupesForUser(userId, callback) {
   persistence.Troupe
-    .where('users', userId)
+    .where('users.userId', userId)
     .sort({ name: 'asc' })
     .slaveOk()
     .exec(callback);
 }
 
+function findAllTroupesIdsForUser(userId, callback) {
+  persistence.Troupe
+    .where('users.userId', userId)
+    .select('id')
+    .slaveOk()
+    .exec(function(err, result) {
+      if(err) return callback(err);
+
+      var troupeIds = result.map(function(troupe) { return troupe.id; } );
+      return callback(null, troupeIds);
+    });
+}
+
 function userHasAccessToTroupe(user, troupe) {
-  return troupe.users.indexOf(user.id) >=  0;
+  return troupe.containsUserId(user.id) >=  0;
+}
+
+function userIdHasAccessToTroupe(userId, troupe) {
+  return troupe.containsUserId(userId) >=  0;
 }
 
 function validateTroupeEmail(options, callback) {
@@ -64,8 +80,6 @@ function validateTroupeEmail(options, callback) {
 
   /* TODO: Make this email parsing better! */
   var uri = to.split('@')[0];
-  var user = null;
-  var troupe = null;
 
   userService.findByEmail(from, function(err, fromUser) {
     if(err) return callback(err);
@@ -91,8 +105,6 @@ function validateTroupeEmailAndReturnDistributionList(options, callback) {
 
   /* TODO: Make this email parsing better! */
   var uri = to.split('@')[0];
-  var user = null;
-  var troupe = null;
 
   userService.findByEmail(from, function(err, fromUser) {
     if(err) return callback(err);
@@ -105,7 +117,7 @@ function validateTroupeEmailAndReturnDistributionList(options, callback) {
         return callback("Access denied");
       }
 
-      userService.findByIds(troupe.users, function(err, users) {
+      userService.findByIds(troupe.getUserIds(), function(err, users) {
         if(err) return callback(err);
 
         var emailAddresses = users.map(function(user) {
@@ -151,7 +163,7 @@ function findAllUnusedInvitesForTroupe(troupeId, callback) {
 
 function removeUserFromTroupe(troupeId, userId, callback) {
    findById(troupeId, function(err, troupe) {
-      troupe.users.remove(userId);
+      troupe.removeUserById(userId);
       troupe.save(callback);
    });
 }
@@ -173,7 +185,7 @@ function acceptInvite(code, user, callback) {
       invite.status = 'USED';
       invite.save();
 
-      troupe.users.push(user.id);
+      troupe.addUserById(user.id);
       troupe.save(function(err) {
         if(err) return callback(err);
         return callback(null, troupe, originalStatus);
@@ -237,13 +249,13 @@ function acceptRequest(request, callback) {
       if(user.status === 'UNCONFIRMED' && !user.confirmationCode) {
          var confirmationCode = uuid.v4();
          user.confirmationCode = confirmationCode;
-         user.save(function(err) {
+         user.save(function() {
           emailNotificationService.sendConfirmationforNewUserRequest(user, troupe);
          });
       }
 
       /** Add the user to the troupe */
-      troupe.users.push(user.id);
+      troupe.addUserById(user.id);
       troupe.save(function(err) {
         if(err) winston.error("Unable to save troupe", err);
 
@@ -281,9 +293,11 @@ module.exports = {
   findById: findById,
   findByIds: findByIds,
   findAllTroupesForUser: findAllTroupesForUser,
+  findAllTroupesIdsForUser: findAllTroupesIdsForUser,
   validateTroupeEmail: validateTroupeEmail,
   validateTroupeEmailAndReturnDistributionList: validateTroupeEmailAndReturnDistributionList,
   userHasAccessToTroupe: userHasAccessToTroupe,
+  userIdHasAccessToTroupe: userIdHasAccessToTroupe,
   addInvite: addInvite,
   findInviteById: findInviteById,
   findInviteByCode: findInviteByCode,

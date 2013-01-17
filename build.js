@@ -99,7 +99,6 @@
         rivets: 'libs/rivets/0.2.1/rivets',
         now: 'libs/nowjs/0.8.1/now',
         noty: 'libs/jquery-noty/1.1.1/jquery.noty',
-        fileUploader: 'libs/fileUploader/fileuploader',
         templates: '../templates'
     },
 
