@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 define([
   'views/base',
   'utils/momentWrapper'

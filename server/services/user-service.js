@@ -1,10 +1,8 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var persistence = require("./persistence-service"),
     sechash = require('sechash'),
-    mongoose = require("mongoose"),
     emailNotificationService = require("./email-notification-service"),
     uuid = require('node-uuid'),
     geocodingService = require("./geocoding-service"),
@@ -120,7 +118,7 @@ var userService = {
   },
 
   findDefaultTroupeForUser: function(id, callback) {
-    persistence.Troupe.findOne({ users: id }, function(err, troupe) {
+    persistence.Troupe.findOne({ 'users.userId': id }, function(err, troupe) {
       callback(err, troupe);
     });
   },

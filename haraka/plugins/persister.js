@@ -8,7 +8,6 @@
 var conversationService = require("./../../server/services/conversation-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
 var fileService = require("./../../server/services/file-service.js");
-var appEvents = require("./../../server/app-events");
 var MailParser = require("mailparser").MailParser;
 var temp = require('temp');
 var fs   = require('fs');
@@ -181,8 +180,6 @@ exports.hook_queue = function(next, connection) {
           mailBody: storedMailBody,
           attachments: savedAttachmentsForPersist }, function(err, conversation, savedMail) {
             if (err) return next(SOFTDENY, "Failed to store the email");
-
-            appEvents.mailEvent('new', troupe.id, conversation.id, conversation.emails.length);
 
             connection.logdebug("Stored the email.");
             connection.transaction.notes.emailId = savedMail.id;

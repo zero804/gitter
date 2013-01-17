@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 /*global console:false, require: true, module: true, process: false */
 "use strict";
 
@@ -98,35 +98,6 @@ module.exports = {
     on('userLoggedOutOfTroupe', callback);
   },
 
-  troupeChat: function(troupeId, chatMessage) {
-    emit('chat', { troupeId: troupeId, chatMessage: chatMessage });
-  },
-
-  onTroupeChat: function(callback) {
-    on('chat', callback);
-  },
-
-  fileEvent: function(event, options) {
-    emit('file', _.extend(options, { event: event }));
-  },
-
-  onFileEvent: function(callback) {
-    on('file', callback);
-  },
-
-  mailEvent: function(event, troupeId, conversationId, mailIndex) {
-    emit('mail', {
-      event: event,
-      troupeId: troupeId,
-      conversationId: conversationId,
-      mailIndex: mailIndex
-    });
-  },
-
-  onMailEvent: function(callback) {
-    on('mail', callback);
-  },
-
   newNotification: function(troupeId, userId, notificationText, notificationLink) {
     emit('newNotification', {
       troupeId: troupeId,
@@ -152,6 +123,18 @@ module.exports = {
 
   onDataChange: function(callback) {
     on('dataChange', callback);
+  },
+
+  dataChange2: function(url, operation, model) {
+    emit('dataChange2', {
+      url: url,
+      operation: operation,
+      model: model
+    });
+  },
+
+  onDataChange2: function(callback) {
+    on('dataChange2', callback);
   }
 
 };

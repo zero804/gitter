@@ -1,81 +1,153 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true, process: false */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
-var passport = require('passport'),
-    nowjs = require("now"),
-    redis = require("redis"),
-    winston = require('winston'),
-    persistence = require("./services/persistence-service"),
-    chatService = require("./services/chat-service"),
-    userService = require("./services/user-service"),
-    troupeService = require("./services/troupe-service"),
-    presenceService = require("./services/presence-service"),
-    conversationService = require("./services/conversation-service"),
-    fileService = require("./services/file-service"),
-    restSerializer = require("./serializers/rest-serializer"),
-    appEvents = require("./app-events"),
-    nconf = require('./utils/config'),
-    Q = require("q"),
-    everyone,
-    redisClient;
+var winston = require('winston');
+var appEvents = require("./app-events");
+var bayeux = require('./web/bayeux');
+var userService = require('./services/user-service');
+var troupeService = require('./services/troupe-service');
 
-/* Theoretically this should be done by express middleware, but it seems have some bugs right now */
-function loadSession(user, sessionStore, callback) {
-  var sid = decodeURIComponent(user.cookie['connect.sid']);
-  if(!sid) return callback("Session has no cookie");
+exports.install = function(server) {
+  var bayeuxServer = bayeux.server;
+  var bayeuxClient = bayeux.client;
+  bayeuxServer.attach(server);
 
-  // Express3 changes. Split on the '.'
-  // This hackery will not last much longer
-  sid = sid.split('.')[0];
-  sid = sid.split(':')[1];
-  sessionStore.get(sid, callback);
-}
+  appEvents.onDataChange2(function(data) {
+    var operation = data.operation;
+    var model = data.model;
+    var url = data.url;
 
-/* Theoretically this should be done by express middleware, but it seems have some bugs right now */
-function loadSessionWithUser(user, sessionStore, callback) {
-  loadSession(user, sessionStore, function(err, session) {
-    if(err) return callback(err);
-    if(!session) return callback("No session for user");
-    if(!session.passport.user) return callback(null, null);
-
-    passport.deserializeUser(session.passport.user, callback);
-  });
-}
-
-function loadUserAndTroupe(nowJsUser, troupeId, sessionStore, callback) {
-  loadSessionWithUser(nowJsUser, sessionStore, function(err, user) {
-    if(err) return callback(err);
-    if(!user) return callback("User not found");
-
-    troupeService.findById(troupeId, function(err, troupe) {
-      if(err) return callback(err);
-      if(!troupe) return callback("Troupe not found");
-
-      if(!troupeService.userHasAccessToTroupe(user, troupe)) return callback("Access denied");
-
-      callback(err, user, troupe);
-    });
-  });
-}
-
-/**
- * Fetch a now.js group by name and call the callback if the group has users
- */
-function getGroup(groupName, callback) {
-  var group = nowjs.getGroup(groupName);
-
-  group.count(function (count) {
-    if(!count) {
-      console.log("No one is in group " + groupName);
-      return;
+    switch(operation) {
+      case 'create':
+      case 'update':
+      case 'remove':
+        winston.debug("Outbound event: ", { url: url, operation: operation, model: model });
+        bayeuxClient.publish(url, {
+          operation: operation,
+          model: model
+        });
+        break;
+      default:
+        winston.error('Unknown operation', {operation: operation });
     }
-    callback(group);
   });
-}
 
-module.exports = {
-    install: function(server, sessionStore) {
+  ////////////////////
+
+  appEvents.onUserLoggedIntoTroupe(function(data) {
+    var troupeId = data.troupeId;
+    var userId = data.userId;
+
+    bayeuxClient.publish("/troupes/" + troupeId, {
+      notification: "presence",
+      userId: userId,
+      status: "in"
+    });
+
+  });
+
+  appEvents.onUserLoggedOutOfTroupe(function(data) {
+    var troupeId = data.troupeId;
+    var userId = data.userId;
+
+    bayeuxClient.publish("/troupes/" + troupeId, {
+      notification: "presence",
+      userId: userId,
+      status: "out"
+    });
+
+  });
+
+  ////////////////////
+
+  appEvents.onTroupeUnreadCountsChange(function(data) {
+    var userId = data.userId;
+    var troupeId = data.troupeId;
+    var counts = data.counts;
+
+    bayeuxClient.publish("/user/" + userId, {
+      notification: "troupe_unread",
+      troupeId: troupeId,
+      counts: counts
+    });
+
+  });
+
+
+  appEvents.onNewUnreadItem(function(data) {
+    var userId = data.userId;
+    var items = data.items;
+    console.log("onnewunreaditem: ", data);
+  });
+
+  appEvents.onUnreadItemsRemoved(function(data) {
+    var userId = data.userId;
+    var items = data.items;
+
+    console.log("onUnreadItemsRemoved: ", data);
+
+    bayeuxClient.publish("/user/" + userId, {
+      notification: "unread_items_removed",
+      items: items
+    });
+
+  });
+};
+
+      /*
+      appEvents.onDataChange(function(data) {
+
+        var troupeId = data.troupeId;
+        var modelId = data.modelId;
+        var modelName = data.modelName;
+        var operation = data.operation;
+        var model = data.model;
+
+        var publishUrl = "/troupes/" + troupeId + "/" + getNestedUrlForModel(modelName);
+
+        console.log("Publishing to " + publishUrl);
+
+        console.log("now: appEvents.onDataChange");
+
+        if(operation === 'create' || operation === 'update') {
+          winston.debug("nowjs: Data has changed. Change will be serialized and pushed to clients.", { model: model });
+
+          var Strategy = restSerializer.getStrategy(modelName, true);
+
+          // No strategy, ignore it
+          if(!Strategy) {
+            winston.info("nowjs: Skipping serialization as " + modelName + " has no serialization strategy");
+            return;
+          }
+
+          restSerializer.serialize(model, new Strategy(), function(err, serializedModel) {
+            if(err) return winston.error("nowjs: Serialization failure" , err);
+            if(!serializedModel) return winston.error("nowjs: No model returned from serializer");
+
+            console.log(">>>>>> ", operation, " sending model ", model, " as ", serializedModel);
+
+            bayeuxClient.publish(publishUrl, {
+              troupeId: troupeId,
+              modelName: modelName,
+              operation: operation,
+              id: modelId,
+              model: serializedModel
+            });
+          });
+        } else {
+          / *  For remove operations.... * /
+          bayeuxClient.publish(publishUrl, {
+            troupeId: troupeId,
+            modelName: modelName,
+            operation: operation,
+            id: modelId
+          });
+        }
+
+      });
+      */
+
+      /*
       everyone = nowjs.initialize(server, {
          "host" : nconf.get("ws:hostname"),
          "port" : nconf.get("ws:externalPort"),
@@ -111,7 +183,7 @@ module.exports = {
 
           nowjs.getGroup("user." + user.id).removeUser(self.user.clientId);
 
-          /* Give the user 10 seconds to log back into before reporting that they're disconnected */
+          / * Give the user 10 seconds to log back into before reporting that they're disconnected * /
           setTimeout(function(){
             presenceService.userSocketDisconnected(user.id, self.user.clientId);
           }, 10000);
@@ -144,20 +216,8 @@ module.exports = {
         });
       };
 
-      appEvents.onTroupeChat(function(data) {
-        var troupeId = data.troupeId;
-        var group = getGroup("troupe." + troupeId, function (group) {
-          if(group && group.now && group.now.onTroupeChatMessage) {
-            group.now.onTroupeChatMessage(data.chatMessage);
-          }
-        });
-      });
-
-
       appEvents.onTroupeUnreadCountsChange(function(data) {
-        var troupeId = data.troupeId;
         var userId = data.userId;
-        var counts = data.counts;
 
         var group = nowjs.getGroup("user." + userId);
         if(group && group.now && group.now.onTroupeUnreadCountsChange) {
@@ -166,7 +226,6 @@ module.exports = {
       });
 
       appEvents.onNewUnreadItem(function(data) {
-        var troupeId = data.troupeId;
         var userId = data.userId;
         var items = data.items;
 
@@ -177,7 +236,6 @@ module.exports = {
       });
 
       appEvents.onUnreadItemsRemoved(function(data) {
-        var troupeId = data.troupeId;
         var userId = data.userId;
         var items = data.items;
 
@@ -187,55 +245,6 @@ module.exports = {
         }
       });
 
-      appEvents.onUserLoggedIntoTroupe(function(data) {
-        var troupeId = data.troupeId;
-        var userId = data.userId;
-
-        getGroup("troupe." + troupeId, function(group) {
-          if(!group || !group.now || !group.now.onUserLoggedIntoTroupe) {
-            return;
-          }
-
-          var deferredT = Q.defer();
-          var deferredU = Q.defer();
-
-          userService.findById(userId, deferredU.node());
-          troupeService.findById(troupeId, deferredT.node());
-
-          Q.all([deferredT.promise, deferredU.promise]).spread(function(troupe, user) {
-            group.now.onUserLoggedIntoTroupe({
-              userId: userId,
-              displayName: user.displayName
-            });
-          });
-        });
-
-      });
-
-      appEvents.onUserLoggedOutOfTroupe(function(data) {
-        var troupeId = data.troupeId;
-        var userId = data.userId;
-
-        getGroup("troupe." + troupeId, function(group) {
-          if(!group || !group.now || !group.now.onUserLoggedOutOfTroupe) {
-            return;
-          }
-
-          var deferredT = Q.defer();
-          var deferredU = Q.defer();
-
-          userService.findById(userId, deferredU.node());
-          troupeService.findById(troupeId, deferredT.node());
-
-          Q.all([deferredT.promise, deferredU.promise]).spread(function(troupe, user) {
-            group.now.onUserLoggedOutOfTroupe({
-              userId: userId,
-              displayName: user.displayName
-            });
-          });
-
-        });
-      });
 
       appEvents.onFileEvent(function(data) {
         var event = data.event;
@@ -277,7 +286,7 @@ module.exports = {
       appEvents.onMailEvent(function(data) {
         var event = data.event;
         if(event !== 'new') {
-          /* Filter..... */
+          / * Filter..... * /
           return;
         }
 
@@ -313,7 +322,7 @@ module.exports = {
         var notificationText = data.notificationText;
         var notificationLink = data.notificationLink;
 
-        /* Directed at a troupe? */
+        / * Directed at a troupe? * /
         if(troupeId) {
           getGroup("troupe." + troupeId, function(group) {
             if(!group || !group.now || !group.now.onNotification) {
@@ -328,7 +337,7 @@ module.exports = {
           });
         }
 
-        /* Directed at a user? */
+        / * Directed at a user? * /
         if(userId) {
           winston.error("nowjs: DIRECT USER NOTIFICATIONS NOT YET IMPLEMENTED!!");
           // TODO
@@ -387,5 +396,5 @@ module.exports = {
       });
 
     }
+    */
 
-};

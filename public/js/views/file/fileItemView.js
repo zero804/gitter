@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 define([
   'jquery',
   'underscore',
@@ -10,7 +11,6 @@ define([
   './fileVersionsView'
 ], function($, _, Backbone, Marionette, TroupeViews, rivet, template, FilePreviewView, FileVersionsView) {
   /*jslint browser: true*/
-  /*global require console */
   "use strict";
 
   return TroupeViews.Base.extend({

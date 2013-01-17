@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 // Filename: views/home/main
 define([
   'jquery',
@@ -6,11 +7,10 @@ define([
   'bootstrap',
   'views/base',
   'hbs!./chat',
-  'components/chat/chat-component',
   './chatViewItem',
   'collections/chat',
   '../../utils/momentWrapper'
-], function($, _, Backbone, _bootstrap, TroupeViews, template, chat, ChatViewItem, chatModels, moment) {
+], function($, _, Backbone, _bootstrap, TroupeViews, template, ChatViewItem, chatModels, moment) {
   "use strict";
 
   var PAGE_SIZE = 50;

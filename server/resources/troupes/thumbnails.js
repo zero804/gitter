@@ -1,11 +1,7 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
-var troupeService = require('../services/troupe-service'),
-    fileService = require('../services/file-service'),
-    winston = require('winston'),
-    cdn = require('../web/cdn');
+var fileService = require('../../services/file-service');
 
 var mimeIcons = {
   'image/jpeg': '/images/mime/jpg.png',

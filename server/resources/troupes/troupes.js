@@ -1,15 +1,8 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
-var troupeService = require("../services/troupe-service"),
-  userService = require("../services/user-service"),
-  collections = require("../utils/collections"),
-  restSerializer = require("../serializers/rest-serializer");
-
-
-var predicates = collections.predicates;
-
+var troupeService = require("../../services/troupe-service"),
+  restSerializer = require("../../serializers/rest-serializer");
 
 module.exports = {
   index: function(req, res, next) {
@@ -30,14 +23,6 @@ module.exports = {
     });
   },
 
-  "new": function(req, res) {
-    res.send('new troupe');
-  },
-
-  create: function(req, res) {
-    res.send('create troupe');
-  },
-
   show: function(req, res, next) {
     var strategy = new restSerializer.TroupeStrategy({ mapUsers: true });
 
@@ -48,19 +33,7 @@ module.exports = {
     });
   },
 
-  edit: function(req, res) {
-    res.send('edit forum ' + req.troupe.title);
-  },
-
-  update: function(req, res) {
-    res.send('update forum ' + req.troupe.title);
-  },
-
-  destroy: function(req, res) {
-    res.send('destroy forum ' + req.troupe.title);
-  },
-
-  load: function(req, id, callback) { 
+  load: function(req, id, callback) {
     if(!req.user) return callback(401);
 
     troupeService.findById(id, function(err, troupe) {
