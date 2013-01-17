@@ -1,5 +1,5 @@
 {{^compactView}}
-<div class="trpFileSmallThumbnail" title="Filename">
+<div class="trpFileSmallThumbnail" title="{{fileName}}">
   <a href="#file/{{id}}">
     {{#if useSpinner}}
       <div class="trpFileThumbnail">
@@ -25,14 +25,14 @@
         </div>
       </div>
     {{else}}
-      <img src="{{fileIcon}}" width="32" height="32" title="My filename">
+      <img src="{{fileIcon}}" width="32" height="32">
     {{/if}}
   </a>
 </div>
 {{/compactView}}
 
 {{#compactView}}
-<div class="trpFileViewItem">
+<div class="trpFileViewItem" title="{{fileName}}">
   <div class="trpFileThumbnailContainer"><img src="{{fileIcon}}" width="87" height="87" class="trpFileThumbnail"></div>
   <div class="trpFilename">{{fileName}}</div>
 </div>

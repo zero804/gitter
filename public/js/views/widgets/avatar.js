@@ -55,7 +55,7 @@ define([
       var dom = this.template(this.getRenderData());
       this.$el.html(dom);
 
-      this.$el.find('div').tooltip({
+      this.$el.find(':first-child').tooltip({
         html : true,
         placement : "right"
       });

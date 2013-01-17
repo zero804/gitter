@@ -20,6 +20,7 @@ define([
 
     getRenderData: function() {
       var d = {
+        user: window.troupeContext.user,
         existingUser: !window.troupeContext.profileNotCompleted,
         // displayName: this.existingUser ? window.troupeContext.user.displayName : ""
         displayName: window.troupeContext.user.displayName

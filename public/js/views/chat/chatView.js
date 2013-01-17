@@ -45,7 +45,11 @@ define([
       $(window).unbind('scroll', this.scrollEventBound);
     },
 
-    getRenderData: function() { return {}; },
+    getRenderData: function() {
+      return {
+        user: window.troupeContext.user
+      };
+    },
 
     blurChat: function(){
     },
