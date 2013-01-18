@@ -1,11 +1,9 @@
 /*jshint globalstrict:true, trailing:false unused:true node:true*/
-/*global console:false, require: true, module: true, process: false */
 "use strict";
 
 var events = require('events');
 
 var winston = require('winston');
-var _ = require('underscore');
 var redis = require('redis');
 var client = redis.createClient();
 var pubClient = redis.createClient();
@@ -74,7 +72,6 @@ module.exports = {
   },
 
   troupeUnreadCountsChange: function(data) {
-    console.dir(data);
     emit('troupeUnreadCountsChange', data);
   },
 
@@ -135,6 +132,16 @@ module.exports = {
 
   onDataChange2: function(callback) {
     on('dataChange2', callback);
+  },
+
+  userRemovedFromTroupe: function(options) {
+    emit('userRemovedFromTroupe', options);
+  },
+
+  onUserRemovedFromTroupe: function(callback) {
+    on('userRemovedFromTroupe', callback);
   }
+
+
 
 };

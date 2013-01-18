@@ -103,23 +103,32 @@ TroupeSchema.methods.getUserIds = function() {
 };
 
 TroupeSchema.methods.containsUserId = function(userId) {
-  var user = _.find(this.users, function(troupeUser){ return troupeUser.userId == userId; });
+  var user = _.find(this.users, function(troupeUser) {
+    return "" + troupeUser.userId == "" + userId;
+  });
+
   return !!user;
 };
 
 TroupeSchema.methods.addUserById = function(userId) {
-  return this.users.push({ userId: userId });
+  var troupeUser = new TroupeUser({ userId: userId });
+  this.post('save', function(postNext) {
+    var url = "/troupes/" + this.id + "/users";
+    serializeEvent(url, "create", troupeUser, postNext);
+  });
+
+  return this.users.push(troupeUser);
 };
 
 TroupeSchema.methods.removeUserById = function(userId) {
-  winston.debug("Remove userById " + userId);
 
   var troupeUser = _.find(this.users, function(troupeUser){ return troupeUser.userId == userId; });
   if(troupeUser) {
     // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
     this.post('save', function(postNext) {
-      var url = "/troupes/" + this.id + "/users/";
+      var url = "/troupes/" + this.id + "/users";
       serializeEvent(url, "remove", troupeUser, postNext);
+      appEvents.userRemovedFromTroupe({ troupeId: this.id, userId: troupeUser.userId });
     });
 
     troupeUser.remove();

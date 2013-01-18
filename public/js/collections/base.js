@@ -76,8 +76,6 @@ define([
     },
 
     listen: function() {
-      //console.log("Listening on datachange:" + this.modelName);
-      //$(document).bind('datachange:' + this.modelName, this.onDataChange);
       if(this.subscription) return;
       var self = this;
 
@@ -86,11 +84,11 @@ define([
       });
 
       this.subscription.callback(function() {
-        console.log('Subscription is now active!');
+        console.log('Subscription is now active!', arguments);
       });
 
       this.subscription.errback(function(error) {
-        console.log('Subscription error', error.message);
+        console.log('Subscription error', error);
       });
     },
 

@@ -8,32 +8,12 @@ var troupeService = require("../../services/troupe-service"),
 
 module.exports = {
     index: function(req, res, next) {
-      var strategy = new restSerializer.UserIdStrategy();
+      var strategy = new restSerializer.UserIdStrategy( { showPresenceForTroupeId: req.troupe.id });
 
       restSerializer.serialize(req.troupe.getUserIds(), strategy, function(err, serialized) {
         if(err) return next(err);
         res.send(serialized);
       });
-    },
-
-    'new': function(req, res){
-      res.send(500);
-    },
-
-    create: function(req, res) {
-      res.send(500);
-    },
-
-    show: function(req, res){
-      res.send(500);
-    },
-
-    edit: function(req, res){
-      res.send(500);
-    },
-
-    update:  function(req, res){
-      res.send(500);
     },
 
     destroy: function(req, res, next){
