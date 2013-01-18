@@ -23,10 +23,11 @@ require([
   'views/toolbar/troupeCollectionView',
   'views/people/peopleCollectionView',
   'views/profile/profileView',
-  'views/share/shareView'
+  'views/share/shareView',
+  'views/signup/createTroupeView'
 ], function($, _, Backbone, Marionette, TroupeViews, realtime, AppIntegratedView, ChatView, FileView, ConversationView,
             vent, troupeModels, fileModels, conversationModels, userModels, FileDetailView, filePreviewView, fileVersionsView,
-            PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView) {
+            PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView, createTroupeView) {
   /*global console:true*/
   "use strict";
 
@@ -132,7 +133,8 @@ require([
         { re: /^person\/(\w+)$/,          viewType: PersonDetailView,             collection: userCollection },
 
         { re: /^profile$/,                viewType: profileView.Modal },
-        { re: /^share$/,                  viewType: shareView.Modal }
+        { re: /^share$/,                  viewType: shareView.Modal },
+        { re: /^create$/,                 viewType: createTroupeView.Modal }
 
       ];
 
