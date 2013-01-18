@@ -32,11 +32,13 @@ function validateUserForSubTroupeSubscription(options, callback) {
   troupeService.findById(troupeId, function onTroupeFindByIdComplete(err, troupe) {
     if(err || !troupe) return callback(err, !!troupe);
 
-    if(notifyPresenceService) {
+    var result = troupeService.userIdHasAccessToTroupe(userId, troupe);
+    winston.info("Allow user " + userId + " to access troupe " + troupe.uri + ": " + result);
+
+    if(result && notifyPresenceService) {
       presenceService.userSubscribedToTroupe(userId, troupeId, clientId);
     }
 
-    var result = troupeService.userIdHasAccessToTroupe(userId, troupe);
     return callback(null, result);
   });
 }
@@ -56,46 +58,81 @@ function validateUserForUserSubscription(options, callback) {
 // Note that if the redis faye engine is used, this should match
 // TODO: implement redis version
 function InMemoryClientUserLookupStrategy() {
-  this.memoryHash = {};
+  this.clientHash = {};
+  this.userHash = {};
 }
 
 InMemoryClientUserLookupStrategy.prototype.associate = function(clientId, userId, callback) {
-  this.memoryHash[clientId] = userId;
+  this.clientHash[clientId] = userId;
+  var clientIds = this.userHash[userId];
+  if(clientIds) {
+    clientIds.push(clientId);
+  } else {
+    clientIds = [clientId];
+    this.userHash[userId] = clientIds;
+  }
+
   return callback();
 };
 
 InMemoryClientUserLookupStrategy.prototype.disassociate = function(clientId, callback) {
-  var userId = this.memoryHash[clientId];
+  var userId = this.clientHash[clientId];
+  delete this.clientHash[clientId];
 
-  delete this.memoryHash[clientId];
+  if(userId) {
+    var clientIds = this.userHash[userId];
+    if(clientIds) {
+      if(clientIds.length > 0) {
+        clientIds = clientIds.filter(function(f) { return f !== clientId; });
+      }
+
+      // Anything left in the array?
+      if(clientIds.length > 0) {
+        this.userHash[userId] = clientIds;
+      } else {
+        delete this.userHash[userId];
+      }
+    }
+
+  }
+
   return callback(null, userId);
 };
 
 InMemoryClientUserLookupStrategy.prototype.lookupUserIdForClientId = function(clientId, callback) {
-  var userId = this.memoryHash[clientId];
+  var userId = this.clientHash[clientId];
   return callback(null, userId);
 };
 
+
+InMemoryClientUserLookupStrategy.prototype.lookupClientIdsForUserId = function(userId, callback) {
+  var clientIds = this.userHash[userId];
+  return callback(null, clientIds);
+};
+
+var clientUserLookup = new InMemoryClientUserLookupStrategy();
 
 //
 // Auth Extension:authenticate all subscriptions to ensure that the user has access
 // to the given url
 //
 var auth = {
-  clientUserLookup: new InMemoryClientUserLookupStrategy(),
+  clientUserLookup: clientUserLookup,
 
   incoming: function(message, callback) {
     if (message.channel === '/meta/subscribe') {
       this.authorized(message, function(err, allowed) {
         if(err || !allowed) {
-          winston.error("Denying access to subscribe", { message: message, exception: err });
+          //message.subscription = "/invalid";
           message.error = '403::Access denied';
         }
-        winston.info("Allowing user access to channel", { subscription: message.subscription });
+        callback(message);
       });
+
+    } else {
+      callback(message);
     }
 
-    callback(message);
   },
 
   // Authorize a sbscription message
@@ -149,6 +186,8 @@ var auth = {
         if(err) return callback(err);
         if(!userId) return callback("Invalid access token");
 
+        userId = "" + userId;
+
         self.clientUserLookup.associate(clientId, userId, function onAssociateDone(err) {
           if(err) return callback(err);
 
@@ -195,16 +234,16 @@ var server = new faye.NodeAdapter({ mount: '/faye', timeout: 45 });
 var client = server.getClient();
 
 server.addExtension(auth);
-
 server.addExtension(pushOnlyServer);
 client.addExtension(pushOnlyServerClient);
 
 server.bind('disconnect', function(clientId) {
-  auth.clientUserLookup.disassociate(clientId, function onDisassociateDone(err, userId) {
+  clientUserLookup.disassociate(clientId, function onDisassociateDone(err, userId) {
     if(err) { winston.error("Error disassociating user from client", { exception:  err }); return; }
     if(!userId) return;
 
     /* Give the user 10 seconds to log back into before reporting that they're disconnected */
+    winston.info("User socket disconnected: ", { userId: userId, clientId: clientId });
     setTimeout(function(){
       presenceService.userSocketDisconnected(userId, clientId);
     }, 10000);
@@ -214,5 +253,7 @@ server.bind('disconnect', function(clientId) {
 
 module.exports = {
   server: server,
+  engine: server._server._engine,
+  clientUserLookup: clientUserLookup,
   client: client
 };

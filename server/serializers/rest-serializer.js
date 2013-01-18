@@ -6,6 +6,7 @@ var chatService = require("../services/chat-service");
 var troupeService = require("../services/troupe-service");
 var fileService = require("../services/file-service");
 var unreadItemService = require("../services/unread-item-service");
+var presenceService = require("../services/presence-service");
 var Q = require("q");
 var _ = require("underscore");
 var handlebars = require('handlebars');
@@ -42,9 +43,19 @@ function execPreloads(preloads, callback) {
 
 function UserStrategy(options) {
   options = options ? options : {};
+  var onlineUsers;
 
   this.preload = function(users, callback) {
-    callback(null, true);
+    if(options.showPresenceForTroupeId) {
+      presenceService.findOnlineUsersForTroupe(options.showPresenceForTroupeId, function(err, result) {
+
+        if(err) return callback(err);
+        onlineUsers = result;
+        callback(null, true);
+      });
+    } else {
+      callback(null, true);
+    }
   };
 
   this.map = function(user) {
@@ -78,7 +89,8 @@ function UserStrategy(options) {
       email: user.email,
       avatarUrlSmall: getAvatarUrl('s'),
       avatarUrlMedium: getAvatarUrl('m'),
-      location: location
+      location: location,
+      online: onlineUsers ? onlineUsers.indexOf(user.id) >= 0 : undefined
     };
   };
 }
@@ -95,7 +107,7 @@ function UserIdStrategy(options) {
         return callback(err);
       }
       self.users = collections.indexById(users);
-      callback(null, true);
+      userStategy.preload(users, callback);
     });
   };
 

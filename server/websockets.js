@@ -27,7 +27,7 @@ app.get('/', function(req, res) {
   res.send('Nothing to see here. You must be lost.');
 });
 
-require('./now').install(server, sessionStore);
+require('./web/bayeux-events-bridge').install(server);
 
 var port = nconf.get("ws:port");
 var bindIp = nconf.get("ws:bindIp");

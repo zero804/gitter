@@ -75,7 +75,7 @@ require([
   });
 
   /*var subscription = */ realtime.subscribe('/troupes/' + window.troupeContext.troupe.id, function(message) {
-    console.log("MESSAGE!", message);
+    console.log("Subscription!", message);
     if(message.notification === 'presence') {
       if(message.status === 'in') {
         $(document).trigger('userLoggedIntoTroupe', message);
@@ -87,7 +87,7 @@ require([
   });
 
   realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
-    console.log("MESSAGE!", message);
+    console.log("User message!", message);
   });
 
   /* This is a special region which acts like a region, but is implemented completely differently */

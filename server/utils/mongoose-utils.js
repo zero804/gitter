@@ -5,8 +5,6 @@ exports.attachNotificationListenersToSchema = function (schema, listeners) {
 
   if(listeners.onCreate || listeners.onUpdate) {
     schema.pre('save', function (next) {
-      console.dir(this);
-      console.dir(arguments);
       var isNewInstance = this.isNew;
 
       this.post('save', function(postNext) {
