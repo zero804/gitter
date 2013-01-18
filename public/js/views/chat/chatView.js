@@ -37,7 +37,7 @@ define([
 
     events: {
       "keydown #chat-input":          "detectReturn",
-      "focusout #chat-input": "send",
+      "focusout #chat-input": "onFocusOut",
       "blur #chat-input" : "blurChat"
     },
 
@@ -49,6 +49,10 @@ define([
       return {
         user: window.troupeContext.user
       };
+    },
+
+    onFocusOut: function() {
+      if (this.compactView) this.send();
     },
 
     blurChat: function(){
