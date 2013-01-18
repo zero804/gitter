@@ -76,8 +76,6 @@ define([
     },
 
     listen: function() {
-      //console.log("Listening on datachange:" + this.modelName);
-      //$(document).bind('datachange:' + this.modelName, this.onDataChange);
       if(this.subscription) return;
       var self = this;
 
