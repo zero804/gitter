@@ -27,7 +27,7 @@ require('./web/express').installFull(app, server, sessionStore);
 require('./web/passport').install();
 
 require('./web/passport').install();
-require('./now').install(server, sessionStore);
+require('./web/bayeux-events-bridge').install(server);
 require('./handlers/').install(app);
 
 // TEMP
