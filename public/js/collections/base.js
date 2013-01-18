@@ -164,6 +164,73 @@ define([
     }
   });
 
+  /* This is a mixin for Backbone.Model */
+  exports.ReversableCollectionBehaviour = {
+
+    sortMethods: {
+
+    },
+
+    setSortBy: function(field) {
+      var reverse = false;
+
+      // Sort by the same field twice switches the direction
+      if(field === this.currentSortByField) {
+        if(field.indexOf("-") === 0) {
+          field = field.substring(1);
+        } else {
+          field = "-" + field;
+        }
+      }
+
+      var fieldLookup;
+      if(field.indexOf("-") === 0) {
+        fieldLookup = field.substring(1);
+        reverse = true;
+      } else {
+        fieldLookup = field;
+      }
+
+
+      var sortByMethod = function defaultSortByMethod(model) {
+        return model.get(fieldLookup);
+      };
+
+      if (this.sortByMethods[fieldLookup])
+        sortByMethod = this.sortByMethods[fieldLookup];
+
+      this.currentSortByField = field;
+
+      var comparator = sortByComparator(sortByMethod);
+      if(reverse) {
+        comparator = reverseComparatorFunction(comparator);
+      }
+
+      this.comparator = comparator;
+
+      return this.sort();
+    }
+
+  };
+
+  // Used for switching from a single param comparator to a double param comparator
+  function sortByComparator(sortByFunction) {
+    return function(left, right) {
+      var l = sortByFunction(left);
+      var r = sortByFunction(right);
+
+      if (l === void 0) return 1;
+      if (r === void 0) return -1;
+
+      return l < r ? -1 : l > r ? 1 : 0;
+    };
+  }
+
+  function reverseComparatorFunction(comparatorFunction) {
+    return function(left, right) {
+      return -1 * comparatorFunction(left, right);
+    };
+  }
 
   return exports;
 });

@@ -636,5 +636,39 @@ define([
 
   });
 
+  /* This is a mixin for Marionette.CollectionView */
+  TroupeViews.SortableMarionetteView = {
+
+    initializeSorting: function() {
+      this.on('before:render', this.onBeforeRenderSort, this);
+      this.on('render', this.onRenderSort, this);
+    },
+
+    onBeforeRenderSort: function() {
+      this.isRendering = true;
+    },
+    onRenderSort: function() {
+      this.isRendering = false;
+    },
+
+    appendHtml: function(collectionView, itemView, index) {
+
+      if (this.isRendering || index >= collectionView.collection.length - 1) {
+        collectionView.$el.append(itemView.el);
+        return;
+      }
+
+      if (index === 0) {
+        collectionView.$el.prepend(itemView.el);
+        return;
+      }
+
+      var prevModel = this.collection.at(index - 1);
+      var view = collectionView.children.findByModel(prevModel);
+      itemView.$el.insertAfter(view.$el);
+    }
+
+  };
+
   return TroupeViews;
 });
