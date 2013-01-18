@@ -86,11 +86,11 @@ define([
       });
 
       this.subscription.callback(function() {
-        console.log('Subscription is now active!');
+        console.log('Subscription is now active!', arguments);
       });
 
       this.subscription.errback(function(error) {
-        console.log('Subscription error', error.message);
+        console.log('Subscription error', error.message, arguments);
       });
     },
 

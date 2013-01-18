@@ -167,6 +167,8 @@ resetClientState();
 
 module.exports = {
   userSocketConnected: function(userId, socketId) {
+    winston.debug("presence: userSocketConnected: ", { userId: userId, socketId: socketId });
+
     addUserToActiveUsers(userId, function(err, initialConnection) {
       if(initialConnection) {
         winston.info("presence: User " + userId + " connected.");
@@ -196,6 +198,8 @@ module.exports = {
   },
 
   userSocketDisconnected: function(userId, socketId) {
+    winston.debug("presence: userSocketDisconnected: ", { userId: userId, socketId: socketId });
+
     removeSocketFromUserSockets(socketId, userId, function(err, lastDisconnect) {
       if(lastDisconnect) {
         removeUserFromActiveUsers(userId);
