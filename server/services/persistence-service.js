@@ -111,7 +111,13 @@ TroupeSchema.methods.containsUserId = function(userId) {
 };
 
 TroupeSchema.methods.addUserById = function(userId) {
-  return this.users.push({ userId: userId });
+  var troupeUser = new TroupeUser({ userId: userId });
+  this.post('save', function(postNext) {
+    var url = "/troupes/" + this.id + "/users";
+    serializeEvent(url, "create", troupeUser, postNext);
+  });
+
+  return this.users.push(troupeUser);
 };
 
 TroupeSchema.methods.removeUserById = function(userId) {
