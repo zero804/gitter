@@ -48,19 +48,27 @@ a:hover {
 	position: fixed;
 	width: 280px;
 	left: -280px;
-	top: 60px;
+	top: 0px;
 	background-color: @trpGreen;
 	height: 100%;
-	overflow: hidden;
 	color: white;
 	z-index: 1012;
 	border-right: 2px solid @trpGreen;
 	padding-top: 30px;
+	margin-top: 60px;
 }
 
 .trpLeftMenuWrapper {
 	.trpBodyText;
 	padding-left: 20px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	height: 90%;
+}
+
+.trpLeftMenuSpacer {
+	height: 60px;
+	display: block;
 }
 
 .trpTroupeList {
