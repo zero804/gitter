@@ -38,5 +38,29 @@ define([
     nestedUrl: "files"
   });
 
+  _.extend(exports.FileCollection.prototype, TroupeCollections.ReversableCollectionBehaviour, {
+
+    sortByMethods: {
+      "date": function(file) {
+        var versions = file.get('versions');
+        return versions.at(versions.length - 1).get('createdDate');
+      }
+    },
+
+    initialize: function() {
+      TroupeCollections.LiveCollection.prototype.initialize.apply(this, arguments);
+
+      this.setSortBy('-date');
+
+      // note: this calls resort a bit too much, because 'versions' is a collection,
+      // and a change comes through for each attribute on the new version.
+      // ideally we could listen to just the add event
+      var self = this;
+      this.on('change:versions', function() {
+          self.sort();
+      });
+    }
+  });
+
   return exports;
 });

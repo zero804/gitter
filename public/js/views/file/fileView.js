@@ -1,12 +1,23 @@
 /*jshint unused:true browser:true*/
 define([
+  'underscore',
   'marionette',
-  './fileItemView'
-], function(Marionette, FileItemView) {
+  './fileItemView',
+  './../base'
+], function(_, Marionette, FileItemView, TroupeViews) {
   "use strict";
 
-  return Marionette.CollectionView.extend({
-    itemView: FileItemView
+  var FileView = Marionette.CollectionView.extend({
+    itemView: FileItemView,
+
+    initialize: function() {
+      this.initializeSorting();
+    }
+
   });
+
+  _.extend(FileView.prototype, TroupeViews.SortableMarionetteView);
+
+  return FileView;
 
 });
