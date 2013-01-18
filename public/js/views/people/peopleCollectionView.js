@@ -3,11 +3,12 @@ define([
   'marionette',
   'views/base',
   'hbs!./peopleItemView',
-  'hbs!./peopleAddPersonButtonView'
-], function(Marionette, TroupeViews, peopleItemViewTemplate, peopleAddPersonButtonViewTemplate) {
+  'hbs!./peopleCollectionView'
+], function(Marionette, TroupeViews, peopleItemViewTemplate, peopleCollectionViewTemplate) {
   "use strict";
 
   var PeopleItemView = TroupeViews.Base.extend({
+    //tagName: 'span',
     template: peopleItemViewTemplate,
 
     initialize: function(/*options*/) {
@@ -15,20 +16,18 @@ define([
     }
   });
 
-  var PeopleAddPersonButtonView = TroupeViews.Base.extend({
-    template: peopleAddPersonButtonViewTemplate,
-    className: 'trpAddButton'
-  });
-
-  return Marionette.CollectionView.extend({
-    itemView: PeopleItemView,
+  return TroupeViews.Base.extend({
+    template: peopleCollectionViewTemplate,
 
     initialize: function(/*options*/) {
-      this.addButton = new PeopleAddPersonButtonView();
+      this.collectionView = new Marionette.CollectionView({
+        collection: this.collection,
+        itemView: PeopleItemView
+      });
     },
 
-    onRender: function() {
-      this.$el.append(this.addButton.render().el);
+    afterRender: function() {
+      this.$el.find('.frame-people').append(this.collectionView.render().el);
     }
 
   });
