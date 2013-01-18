@@ -22,6 +22,7 @@ define([
       "mouseenter #chat-frame":           "onMouseEnterChatFrame",
       "mouseenter #header-wrapper":       "onMouseEnterHeader",
       "mouseenter #content-frame":        "onMouseEnterContent",
+      "mouseenter #left-menu":            "onMouseEnterLeftMenu",
       "click #file-header":               "onFileHeaderClick",
       "click #mail-header":               "onMailHeaderClick"
     },
@@ -262,6 +263,7 @@ define([
     },
 
     onMouseEnterContent: function() {
+      document.body.style.overflow='auto';
       this.hideProfileMenu();
     },
 
@@ -279,6 +281,10 @@ define([
 
     onAddPeopleClick: function() {
 
+    },
+
+    onMouseEnterLeftMenu: function() {
+      document.body.style.overflow='hidden';  
     }
 
   });
