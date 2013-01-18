@@ -10,6 +10,7 @@ var troupeService = require('./services/troupe-service');
 exports.install = function(server) {
   var bayeuxServer = bayeux.server;
   var bayeuxClient = bayeux.client;
+  var bayeuxEngine = bayeux.engine;
   bayeuxServer.attach(server);
 
   appEvents.onDataChange2(function(data) {
@@ -21,7 +22,6 @@ exports.install = function(server) {
       case 'create':
       case 'update':
       case 'remove':
-        winston.debug("Outbound event: ", { url: url, operation: operation, model: model });
         bayeuxClient.publish(url, {
           operation: operation,
           model: model
@@ -30,6 +30,26 @@ exports.install = function(server) {
       default:
         winston.error('Unknown operation', {operation: operation });
     }
+  });
+
+  appEvents.onUserRemovedFromTroupe(function(options) {
+    var userId = options.userId;
+    // TODO: disconnect only those subscriptions specific to the troupe
+    // var troupeId = options.troupeId;
+
+    bayeux.clientUserLookup.lookupClientIdsForUserId(userId, function(err, clientIds) {
+      if(err) { winston.error("Unable to lookup clientIds for userId"); return; }
+      if(clientIds) {
+        winston.info("Detected user has been removed from troupe. Disconnecting from " + clientIds.length + " faye connections");
+
+        clientIds.forEach(function(clientId) {
+          bayeuxEngine.destroyClient(clientId, function() {
+            winston.info("Destroyed client " + clientId);
+          });
+        });
+      }
+    });
+
   });
 
   ////////////////////

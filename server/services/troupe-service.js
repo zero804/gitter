@@ -46,6 +46,8 @@ function findMemberEmails(id, callback) {
 }
 
 function findAllTroupesForUser(userId, callback) {
+  console.log("findAllTroupesForUser:", userId);
+  console.log("findAllTroupesForUser:", typeof userId);
   persistence.Troupe
     .where('users.userId', userId)
     .sort({ name: 'asc' })
@@ -67,11 +69,11 @@ function findAllTroupesIdsForUser(userId, callback) {
 }
 
 function userHasAccessToTroupe(user, troupe) {
-  return troupe.containsUserId(user.id) >=  0;
+  return troupe.containsUserId(user.id);
 }
 
 function userIdHasAccessToTroupe(userId, troupe) {
-  return troupe.containsUserId(userId) >=  0;
+  return troupe.containsUserId(userId);
 }
 
 function validateTroupeEmail(options, callback) {
