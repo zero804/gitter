@@ -90,7 +90,7 @@ define([
       });
 
       this.subscription.errback(function(error) {
-        console.log('Subscription error', error.message, arguments);
+        console.log('Subscription error', error);
       });
     },
 

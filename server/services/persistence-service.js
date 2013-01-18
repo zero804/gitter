@@ -118,11 +118,9 @@ TroupeSchema.methods.removeUserById = function(userId) {
 
   var troupeUser = _.find(this.users, function(troupeUser){ return troupeUser.userId == userId; });
   if(troupeUser) {
-    winston.debug("Remove userById ", troupeUser);
-
     // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
     this.post('save', function(postNext) {
-      var url = "/troupes/" + this.id + "/users/";
+      var url = "/troupes/" + this.id + "/users";
       serializeEvent(url, "remove", troupeUser, postNext);
       appEvents.userRemovedFromTroupe({ troupeId: this.id, userId: troupeUser.userId });
     });

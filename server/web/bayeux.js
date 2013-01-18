@@ -123,12 +123,16 @@ var auth = {
     if (message.channel === '/meta/subscribe') {
       this.authorized(message, function(err, allowed) {
         if(err || !allowed) {
+          //message.subscription = "/invalid";
           message.error = '403::Access denied';
         }
+        callback(message);
       });
+
+    } else {
+      callback(message);
     }
 
-    callback(message);
   },
 
   // Authorize a sbscription message
