@@ -22,6 +22,8 @@ define([
       "mouseenter #chat-frame":           "onMouseEnterChatFrame",
       "mouseenter #header-wrapper":       "onMouseEnterHeader",
       "mouseenter #content-frame":        "onMouseEnterContent",
+      "click #people-header":             "onPeopleHeaderClick",
+      "click #request-header":               "onRequestHeaderClick",
       "click #file-header":               "onFileHeaderClick",
       "click #mail-header":               "onMailHeaderClick"
     },
@@ -69,6 +71,10 @@ define([
           }
         }, 100);
       });
+    },
+
+    toggleRightPanel: function(id) {
+      $('#'+id).slideToggle(350);
     },
 
     toggleFiles: function () {
@@ -275,6 +281,14 @@ define([
 
     onFileHeaderClick: function() {
       this.toggleFiles();
+    },
+
+    onRequestHeaderClick: function() {
+      this.toggleRightPanel('request-list');
+    },
+
+    onPeopleHeaderClick: function() {
+      this.toggleRightPanel('people-list');
     },
 
     onAddPeopleClick: function() {
