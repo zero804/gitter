@@ -16,6 +16,7 @@ define([
     rightpanel: false,
     profilemenu: false,
     shifted: false,
+    alertpanel: false,
     events: {
     "click #menu-toggle":               "onMenuToggle",
       "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
@@ -24,7 +25,8 @@ define([
       "mouseenter #content-frame":        "onMouseEnterContent",
       "mouseenter #left-menu":            "onMouseEnterLeftMenu",
       "click #file-header":               "onFileHeaderClick",
-      "click #mail-header":               "onMailHeaderClick"
+      "click #mail-header":               "onMailHeaderClick",
+      "keydown":                          "onKeyDown"
     },
 
     initialize: function(options) {
@@ -108,12 +110,7 @@ define([
         $(whichPanel).hide();
       });
 
-      $("#content-frame").animate({
-        marginRight: '0px'
-      }, 350, function() {
-      });
-
-      $("#header-frame").animate({
+      $("#content-frame, #header-frame, #alert-content").animate({
         marginRight: '0px'
       }, 350, function() {
       });
@@ -130,12 +127,7 @@ define([
       // $("#left-menu").show();
         });
 
-        $("#content-frame").animate({
-          marginRight: uiVars.menuSlideValue
-        }, 350, function() {
-        });
-
-        $("#header-frame").animate({
+        $("#content-frame, #header-frame, #alert-content").animate({
           marginRight: uiVars.menuSlideValue
         }, 350, function() {
         });
@@ -154,24 +146,16 @@ define([
         this.shifted = true;
         $('#right-panel').animate({ right: uiVars.shiftedPanelValue }, 350);
 
-        $("#content-frame").animate({
-          marginRight: uiVars.shiftedMarginValue,
-          marginLeft: uiVars.menuSlideValue
-        }, 350);
-
-        $("#header-frame").animate({
+        $("#content-frame, #header-frame, #alert-content").animate({
           marginRight: uiVars.shiftedMarginValue,
           marginLeft: uiVars.menuSlideValue
         }, 350);
 
       } else {
-        $("#content-frame").animate({
+        $("#content-frame, #header-frame, #alert-content").animate({
           marginLeft: uiVars.menuSlideValue
         }, 350);
 
-        $("#header-frame").animate({
-          marginLeft: uiVars.menuSlideValue
-        }, 350);
       }
 
       $("#left-menu").animate({
@@ -193,23 +177,14 @@ define([
         this.shifted = false;
         $('#right-panel').animate({ right: 0 }, 350);
 
-        $("#content-frame").animate({
-          marginLeft: '0px',
-          marginRight: uiVars.menuSlideValue
-        }, 350);
-
-        $("#header-frame").animate({
+        $("#content-frame, #header-frame, #alert-content").animate({
           marginLeft: '0px',
           marginRight: uiVars.menuSlideValue
         }, 350);
 
       } else {
 
-        $("#content-frame").animate({
-          marginLeft: '0px'
-        }, 350);
-
-        $("#header-frame").animate({
+        $("#content-frame, #header-frame, #alert-content").animate({
           marginLeft: '0px'
         }, 350);
 
@@ -246,6 +221,23 @@ define([
       }
     },
 
+    toggleAlert: function() {
+      if (this.alertpanel) {
+        this.alertpanel = false;
+        $("#content-frame, #menu-toggle-button, #left-menu, #right-panel").animate({
+          marginTop: '0px'
+        }, 350);
+      }
+
+      else {
+        this.alertpanel = true;
+         $("#content-frame, #menu-toggle-button, #left-menu, #right-panel").animate({
+          marginTop: '60px'
+        }, 350);
+      }
+      $("#alert-panel").slideToggle(350);
+    },
+
     onMenuToggle: function() {
       this.toggleMenu();
     },
@@ -279,12 +271,25 @@ define([
       this.toggleFiles();
     },
 
-    onAddPeopleClick: function() {
-
+    onMouseEnterLeftMenu: function() {
+      document.body.style.overflow='hidden';
     },
 
-    onMouseEnterLeftMenu: function() {
-      document.body.style.overflow='hidden';  
+    onKeyDown: function(e) {
+
+      // return if a form input has focus
+      if ( $("*:focus").is("textarea, input") ) return;
+
+      // a shows an alert
+      if(e.keyCode == 65) {
+        this.toggleAlert();
+      }
+
+      // t shows Troupe menu
+      if(e.keyCode == 84) {
+        this.toggleMenu();
+      }
+
     }
 
   });
