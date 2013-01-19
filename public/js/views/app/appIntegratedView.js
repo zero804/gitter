@@ -232,7 +232,7 @@ define([
       else {
         this.alertpanel = true;
          $("#content-frame, #menu-toggle-button, #left-menu, #right-panel").animate({
-          marginTop: '60px'
+          marginTop: '120px'
         }, 350);
       }
       $("#alert-panel").slideToggle(350);
