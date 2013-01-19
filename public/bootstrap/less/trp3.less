@@ -48,14 +48,14 @@ a:hover {
 	position: fixed;
 	width: 280px;
 	left: -280px;
-	top: 0px;
+	top: 60px;
 	background-color: @trpGreen;
 	height: 100%;
 	color: white;
 	z-index: 1012;
 	border-right: 2px solid @trpGreen;
 	padding-top: 30px;
-	margin-top: 60px;
+	margin-top: 0px;
 }
 
 .trpLeftMenuWrapper {
@@ -205,6 +205,35 @@ a:hover {
 .trpProfileItem a {
 	color: #333;
 }
+
+
+.trpAlertWrapper {
+	width: 100%;
+	height: 60px;
+	top: 60px;
+	background-color: @trpGreen;
+	text-align: center;
+	position: fixed;
+	z-index: 1080;
+	overflow: hidden;
+	display: none;
+}
+
+.trpAlertContainer {
+	text-align: center;
+	overflow: hidden;
+}
+
+.trpAlertContent {
+	.trpH1;
+	min-width: 700px;
+	text-align: left;
+	color: #333;
+	padding-top: 14px;
+	height: 60px;
+	color: white;
+}
+
 
 .trpDisplayPictureSmall {
 	border-radius: 50em;
