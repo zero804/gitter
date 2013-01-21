@@ -29,8 +29,8 @@ require([
   'views/share/shareView',
   'views/signup/createTroupeView'
 ], function($, _, Backbone, Marionette, TroupeViews, realtime, AppIntegratedView, ChatView, FileView, ConversationView, RequestView,
-            vent, troupeModels, fileModels, conversationModels, userModels, requestModels, FileDetailView, filePreviewView, fileVersionsView, requestDetailView,
-            PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView, createTroupeView) {
+            vent, troupeModels, fileModels, conversationModels, userModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
+            RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView, createTroupeView) {
   /*global console:true*/
   "use strict";
 
@@ -70,7 +70,7 @@ require([
     peopleRosterRegion: "#people-roster",
     fileRegion: "#file-list",
     mailRegion: "#mail-list",
-    requestRegion: "#request-list",
+    requestRegion: "#request-roster",
     rightPanelRegion: "#right-panel"
   });
 
