@@ -58,7 +58,7 @@ function newTroupeForNewUser(options, callback) {
     var troupe = new persistence.Troupe();
     troupe.name = options.troupeName;
     troupe.uri = uri;
-    troupe.users.addUserById(user.id);
+    troupe.addUserById(user.id);
 
     troupe.save(function(err) {
       if(err) return  callback(err);
