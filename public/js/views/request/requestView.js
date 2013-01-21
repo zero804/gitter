@@ -21,11 +21,31 @@ define([
         collection: this.collection,
         itemView: RequestItemView
       });
-      var self= this;
-      this.collection.on('reset', function() {
-        console.dir(self.collection);
-        window.alert(self.collection.length + " items returned in collection ");
+
+      var self = this;
+      function updateVisibility() {
+        self.setVisibility(true);
+      }
+
+      this.setVisibility(false);
+      this.collection.on('add', updateVisibility);
+      this.collection.on('remove', updateVisibility);
+      this.collection.on('reset', updateVisibility);
+
+      this.addCleanup(function() {
+        this.collection.off('add', updateVisibility);
+        this.collection.off('remove', updateVisibility);
+        this.collection.off('reset', updateVisibility);
       });
+    },
+
+    setVisibility: function(animate) {
+      if (this.collection.length > 0) {
+        return (animate) ? this.$el.slideDown() : this.$el.show();
+      }
+      else {
+        return (animate) ? this.$el.slideUp() : this.$el.hide();
+      }
     },
 
     afterRender: function() {
