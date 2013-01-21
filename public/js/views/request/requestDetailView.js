@@ -5,13 +5,15 @@ define([
   'backbone',
   'views/base',
   'hbs!./requestDetailView',
-  './confirmRemoveModalView'
-], function($, _, Backbone, TroupeViews, template, ConfirmRemoveModalView){
+  'hbs!./rejectConfirmation'
+], function($, _, Backbone, TroupeViews, template, rejectConfirmationTemplate){
   return TroupeViews.Base.extend({
     template: template,
     buttonMenu : false,
     events: {
-      "click #person-remove-button": "onRemoveClicked"
+      "click #request-accept-button": "onAcceptClicked",
+      "click #request-reject-button": "onRejectClicked"
+
     },
 
     initialize: function(options) {
@@ -30,36 +32,52 @@ define([
       return d;
     },
 
-    onRemoveClicked: function() {
+    onAcceptClicked: function() {
+      return this.onAccept.apply(this, arguments);
+    },
+
+    onRejectClicked: function() {
       var that = this;
-      var thisPerson = this;
-      var view = new ConfirmRemoveModalView({ model: this.model });
-      var modal = new TroupeViews.Modal({ view: view  });
+      var modal = new TroupeViews.ConfirmationModal({
+        confirmationTitle: "Reject Request?",
+        body: rejectConfirmationTemplate(this.model.toJSON()),
+        buttons: [
+          { id: "yes", text: "Reject", additionalClasses: "" },
+          { id: "no", text: "Cancel"}
+        ]
+      });
 
-      view.on('confirm.yes', function(data) {
-          modal.off('confirm.yes');
-          modal.hide();
-           $.ajax({
-              url: "/troupes/" + window.troupeContext.troupe.id + "/users/" + this.model.get('id'),
-              data: "",
-              type: "DELETE",
-              success: function(data) {
-                console.log("Removed this person");
-                // thisPerson.$el.toggle();
-                window.location.href = "#";
-              }
-            });
-      });
+      modal.on('button.click', function(id) {
+        if (id === "yes")
+          that.onReject();
 
-      view.on('confirm.no', function(data) {
-        modal.off('confirm.no');
+        modal.off('button.click');
         modal.hide();
-       });
+      });
 
       modal.show();
 
       return false;
+    },
+
+    onReject: function() {
+      this.model.destroy({
+        success: function(data) {
+          window.location.href = "#";
+        },
+        error: function(model, resp, options) {
+          console.log("Error rejecting request.");
+        }
+      });
+    },
+
+    onAccept: function() {
+      this.model.save({ success: function() {
+          window.location.href='#';
+        }
+      });
     }
+
 
   });
 });
