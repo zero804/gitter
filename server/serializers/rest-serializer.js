@@ -1,5 +1,4 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var userService = require("../services/user-service");
@@ -7,16 +6,14 @@ var chatService = require("../services/chat-service");
 var troupeService = require("../services/troupe-service");
 var fileService = require("../services/file-service");
 var unreadItemService = require("../services/unread-item-service");
+var presenceService = require("../services/presence-service");
 var Q = require("q");
 var _ = require("underscore");
 var handlebars = require('handlebars');
 var winston = require("winston");
 var collections = require("../utils/collections");
 var cdn = require('../web/cdn');
-
 var predicates = collections.predicates;
-
-
 
 function concatArraysOfArrays(a) {
   var result = [];
@@ -46,19 +43,29 @@ function execPreloads(preloads, callback) {
 
 function UserStrategy(options) {
   options = options ? options : {};
+  var onlineUsers;
 
   this.preload = function(users, callback) {
-    callback(null, true);
+    if(options.showPresenceForTroupeId) {
+      presenceService.findOnlineUsersForTroupe(options.showPresenceForTroupeId, function(err, result) {
+
+        if(err) return callback(err);
+        onlineUsers = result;
+        callback(null, true);
+      });
+    } else {
+      callback(null, true);
+    }
   };
 
   this.map = function(user) {
     if(!user) return null;
 
-    function getAvatarUrl() {
+    function getAvatarUrl(size) {
       if(user.avatarVersion === 0) {
-        return cdn("images/2/avatar-default.png");
+        return cdn("images/2/avatar-default-" + size + ".png");
       }
-      return cdn("avatar/" + user.id + "/" + user.avatarVersion + ".jpg", { notStatic: true });
+      return cdn("avatar/" + size + "/" + user.id + "/" + user.avatarVersion + ".jpg", { notStatic: true });
     }
 
     function getLocationDescription(named) {
@@ -80,8 +87,10 @@ function UserStrategy(options) {
       id: user.id,
       displayName: user.displayName,
       email: user.email,
-      avatarUrl: getAvatarUrl(),
-      location: location
+      avatarUrlSmall: getAvatarUrl('s'),
+      avatarUrlMedium: getAvatarUrl('m'),
+      location: location,
+      online: onlineUsers ? onlineUsers.indexOf(user.id) >= 0 : undefined
     };
   };
 }
@@ -98,7 +107,7 @@ function UserIdStrategy(options) {
         return callback(err);
       }
       self.users = collections.indexById(users);
-      callback(null, true);
+      userStategy.preload(users, callback);
     });
   };
 
@@ -198,7 +207,6 @@ function FileIdStrategy(options) {
 
 function FileIdAndVersionStrategy() {
   var fileIdStrategy = new FileIdStrategy();
-  var self = this;
 
   this.preload = function(fileAndVersions, callback) {
     var fileIds = _(fileAndVersions).chain()
@@ -228,8 +236,6 @@ function FileIdAndVersionStrategy() {
 
     // TODO: there is a slight performance gain to be made by not loading all the file versions
     // and only loading the file version (and users) for the needed version
-
-    var versions = file['versions'];
     delete file['versions'];
 
     return _.extend(file, fileVersion);
@@ -545,11 +551,23 @@ function InviteStrategy(options) {
       id: item._id,
       displayName: item.displayName,
       email: item.email,
-      avatarUrl: '/images/2/avatar-default.png' // TODO: fix
+      avatarUrlSmall: '/images/2/avatar-default.png' // TODO: fix
     };
   };
 }
 
+function TroupeUserStrategy(options) {
+  var userIdStategy = new UserIdStrategy(options);
+
+  this.preload = function(troupeUsers, callback) {
+    var userIds = troupeUsers.map(function(troupeUser) { return troupeUser.userId; });
+    userIdStategy.preload(userIds, callback);
+  };
+
+  this.map = function(troupeUser) {
+    return userIdStategy.map(troupeUser.userId);
+  };
+}
 
 function TroupeStrategy(options) {
   if(!options) options = {};
@@ -571,7 +589,7 @@ function TroupeStrategy(options) {
     }
 
     if(userIdStategy) {
-      var userIds = _.uniq(_.flatten(items.map(function(troupe) { return troupe.users; })));
+      var userIds = _.uniq(_.flatten(items.map(function(troupe) { return troupe.getUserIds(); })));
 
       strategies.push({
         strategy: userIdStategy,
@@ -588,7 +606,7 @@ function TroupeStrategy(options) {
       id: item.id,
       name: item.name,
       uri: item.uri,
-      users: userIdStategy ? item.users.map(function(userId) { return userIdStategy.map(userId); }) : undefined,
+      users: userIdStategy ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
       unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined
     };
   };
@@ -684,6 +702,7 @@ function serialize(items, strat, callback) {
 
 }
 
+// TODO: deprecate this....
 function getStrategy(modelName, toCollection) {
   switch(modelName) {
     case 'conversation':
@@ -709,6 +728,58 @@ function getStrategy(modelName, toCollection) {
   }
 }
 
+function serializeModel(model, callback) {
+  if(model === null) return callback(null, null);
+  var schema = model.schema;
+  if(!schema) return callback("Model does not have a schema");
+  if(!schema.schemaTypeName) return callback("Schema does not have a schema name");
+
+  var strategy;
+
+  switch(schema.schemaTypeName) {
+    case 'UserSchema':
+      strategy = new UserStrategy();
+      break;
+
+    case 'TroupeSchema':
+      strategy = new TroupeStrategy();
+      break;
+
+    case 'TroupeUserSchema':
+      strategy = new TroupeUserStrategy();
+      break;
+
+    case 'ConversationSchema':
+      strategy = new ConversationMinStrategy();
+      break;
+
+    case 'InviteSchema':
+      strategy = new InviteStrategy();
+      break;
+
+    case 'RequestSchema':
+      strategy = new RequestStrategy();
+      break;
+
+    case 'ChatMessageSchema':
+      strategy = new ChatStrategy();
+      break;
+
+    case 'FileSchema':
+      strategy = new FileStrategy();
+      break;
+
+    case 'NotificationSchema':
+      strategy = new NotificationStrategy();
+      break;
+  }
+
+  if(!strategy) return callback("No strategy for " + schema.schemaTypeName);
+
+
+  serialize(model, strategy, callback);
+}
+
 module.exports = {
   UserStrategy: UserStrategy,
   UserIdStrategy: UserIdStrategy,
@@ -722,6 +793,8 @@ module.exports = {
   RequestStrategy: RequestStrategy,
   TroupeStrategy: TroupeStrategy,
   TroupeIdStrategy: TroupeIdStrategy,
+  TroupeUserStrategy: TroupeUserStrategy,
   getStrategy: getStrategy,
-  serialize: serialize
+  serialize: serialize,
+  serializeModel: serializeModel
 }

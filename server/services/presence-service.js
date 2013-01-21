@@ -1,5 +1,4 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var redis = require("redis"),
@@ -13,7 +12,7 @@ function resetClientState() {
       if(err) return winston.error("presence: Redis error", { exception: err });
 
       if(members.length) {
-        var keysToDelete = members.map(function(userId) { return item + ":" + userId });
+        var keysToDelete = members.map(function(userId) { return item + ":" + userId; } );
         keysToDelete.push(collection);
 
         redisClient.del(keysToDelete, function(err, count) {
@@ -69,7 +68,7 @@ function addUserToTroupe(userId, troupeId, callback) {
     if(err) return callback(err);
 
     var initialJoin = presentUsers.indexOf(userId) == -1;
-    redisClient.rpush("troupe_users:" + troupeId, userId, function(err, newLength) {
+    redisClient.rpush("troupe_users:" + troupeId, userId, function(err/*, newLength*/) {
       if(err) return callback(err);
       callback(null, initialJoin);
     });
@@ -89,12 +88,12 @@ function removeSocketFromUserSockets(socketId, userId, callback) {
   var key = "user_sockets:" + userId;
 
   /* Manage user presence */
-  redisClient.lrem(key, 0, socketId, function(err, count) {
+  redisClient.lrem(key, 0, socketId, function(err/*, count*/) {
     if(err) return callback(err);
 
     redisClient.llen(key, function(err, count) {
       if(err) return callback(err);
-      var lastDisconnect = count == 0;
+      var lastDisconnect = count === 0;
 
       callback(null, lastDisconnect);
     });
@@ -148,7 +147,7 @@ function removeTroupe(troupeId, callback) {
     if(err) return winston.error("presence: Redis error: " + err);
   });
 
-  redisClient.srem("presence:activetroupes", troupeId, function(err, count) {
+  redisClient.srem("presence:activetroupes", troupeId, function(err/*, count*/) {
     if(err) return winston.error("presence: Redis error: " + err);
   });
 
@@ -168,6 +167,8 @@ resetClientState();
 
 module.exports = {
   userSocketConnected: function(userId, socketId) {
+    winston.debug("presence: userSocketConnected: ", { userId: userId, socketId: socketId });
+
     addUserToActiveUsers(userId, function(err, initialConnection) {
       if(initialConnection) {
         winston.info("presence: User " + userId + " connected.");
@@ -197,6 +198,8 @@ module.exports = {
   },
 
   userSocketDisconnected: function(userId, socketId) {
+    winston.debug("presence: userSocketDisconnected: ", { userId: userId, socketId: socketId });
+
     removeSocketFromUserSockets(socketId, userId, function(err, lastDisconnect) {
       if(lastDisconnect) {
         removeUserFromActiveUsers(userId);

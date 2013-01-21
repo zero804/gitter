@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 // Filename: views/home/main
 // TODO: Confirmation after invite sent
 

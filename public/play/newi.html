@@ -26,7 +26,7 @@
 	<div class="header">
 		<div class="header-content">Souper Troupers</div>
     <div class="header-toolbar">
-      <div class="settings-button"><img src="images/settings24.png" style="opacity: 0.6"></div><div class="profile-button"><div class="display-picture-profile" style="background-image: url('dude.jpg')"></div></div>
+      <div class="settings-button"><img src="images/settings24.png" style="opacity: 0.6"></div><div class="profile-button" id="profile-button"><div class="display-picture-profile" style="background-image: url('dude.jpg')"></div></div><div class="trpProfileMenu"><span class="trpProfileItem"><a href="">Profile</a></span><span class="trpProfileItem"><a href="">Sign Out</a></span></div>
     </div>
 	</div>
 	<div class="chatframe" id="chat-frame">
@@ -122,6 +122,7 @@
 
 var leftmenu = false;
 var rightpanel = false;
+var profilemenu = false;
 
 function hidePanel(whichPanel) {
     console.log("Hiding panel");
@@ -201,6 +202,27 @@ function showMenu() {
     }
 }
 
+function showProfileMenu() {
+  if (!profilemenu) {
+    console.log("Animating profile menu");
+    $(".trpProfileMenu").animate({
+        width: '120px'
+    }, 350);
+    profilemenu = true;
+  }
+}
+
+
+function hideProfileMenu() {
+  if (profilemenu) {
+    console.log("Hiding profile menu");
+    $(".trpProfileMenu").animate({
+        width: '0px'
+    }, 350);
+    profilemenu = false;
+  }
+}
+
 
 function toggleMenu() {
   if (leftmenu) {
@@ -250,6 +272,16 @@ $("#image-preview").click(function() {
 $(".mail-item").click(function() {
   console.log("click on preview");
   togglePanel("#right-panel-email");
+});
+
+$(".header").mouseenter(function () {
+  console.log("Entered profile icon");
+  showProfileMenu();
+});
+
+$(".header").mouseleave(function () {
+  console.log("Left the header");
+  hideProfileMenu();
 });
 
 </script>

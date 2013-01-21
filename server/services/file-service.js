@@ -1,16 +1,14 @@
-/*jshint globalstrict:true, trailing:false */
-/*global require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var persistence = require("./persistence-service");
 var mongoose = require("mongoose");
 var mime = require("mime");
 var winston = require("winston");
-var appEvents = require("../app-events");
-var console = require("console");
 var Q = require("q");
 var crypto = require('crypto');
 var fs = require('fs');
+var thumbnailPreviewGeneratorService = require("./thumbnail-preview-generator-service");
 
 /* private */
 function createFileName(fileId, version) {
@@ -33,13 +31,6 @@ function findById(id, callback) {
   });
 }
 
-function deleteById(id, callback) {
-  persistence.File.findById(id , function(err, file) {
-    file.remove();
-    callback(err);
-  });
-}
-
 /* private */
 function uploadFileToGrid(file, version, temporaryFile, callback) {
   winston.info('Uploading file to grid: ' + file.fileName + "(" + version + ")");
@@ -59,6 +50,15 @@ function uploadFileToGrid(file, version, temporaryFile, callback) {
 
   gs.writeFile(temporaryFile, function(err) {
     if (err) return callback(err);
+
+    thumbnailPreviewGeneratorService.generateThumbnail({
+      fileId: file.id,
+      troupeId: file.troupeId,
+      temporaryFile: temporaryFile,
+      mimeType: file.mimeType,
+      version: version
+    });
+
     return callback(err, file);
   });
 }
@@ -86,12 +86,12 @@ function compareHashSums(gridFileName, temporaryFile, callback) {
   var fsOp = Q.defer();
 
   var gs = new GridStore(db, gridFileName, "r");
-  gs.open(function(err, gridStore) {
+  gs.open(function(err/*, gridStore*/) {
     if (err) return gsOp.reject(new Error(err));
 
     gsOp.resolve(gs.md5);
 
-    gs.close(function(err) {});
+    gs.close(function(/*err*/) {});
   });
 
   calculateMd5ForFile(temporaryFile, fsOp.node());
@@ -204,7 +204,7 @@ function storeFileVersionInGrid(options, callback) {
   var fileName = options.fileName;
   var mimeType = options.mimeType;
   var temporaryFile = options.file;
-  var version, file;
+  var version;
 
 
   findByFileName(troupeId, fileName, function(err, file) {
@@ -229,11 +229,6 @@ function storeFileVersionInGrid(options, callback) {
           if (err) return callback(err);
 
           uploadFileToGrid(file, 1, temporaryFile, function(err, file) {
-            if(!err) {
-              appEvents.fileEvent('createNew', { troupeId: troupeId, fileId: file.id });
-              appEvents.fileEvent('createVersion', { troupeId: troupeId, fileId: file.id, version: 1, temporaryFile: temporaryFile, mimeType: file.mimeType });
-            }
-
             callback(err, {
               file: file,
               version: 1,
@@ -270,9 +265,6 @@ function storeFileVersionInGrid(options, callback) {
         if (err) return callback(err);
         var versionNumber = file.versions.length;
         uploadFileToGrid(file, versionNumber, temporaryFile, function(err, file) {
-          if(!err) {
-            appEvents.fileEvent('createVersion', { troupeId: troupeId, fileId: file.id, version: versionNumber, temporaryFile: temporaryFile, mimeType: file.mimeType });
-          }
           callback(err, {
             file: file,
             version: file.versions.length,
@@ -289,8 +281,6 @@ function storeFile(options, callback) {
 
   var fileName = options.fileName;
   var mimeType = options.mimeType;
-  var temporaryFile = options.file;
-  var troupeId = options.troupeId;
 
   /* Need to correct the mimeType from time to time */
   /* Try figure out a better mimeType for the file */

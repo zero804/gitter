@@ -1,0 +1,510 @@
+@import "bootstrap.less";
+
+@import "trpColours.less";
+@import "trpWebFonts.less";
+@import "trpFonts.less";
+
+@import "trpModals.less";
+@import "trp3Common.less";
+@import "trpButtons.less";
+
+@import "trp3Chat.less";
+@import "trp3Mail.less";
+@import "trp3Files.less";
+@import "trp3People.less";
+
+@import "../../js/libs/fineuploader/3.1.1/fineuploader.less";
+
+body {
+	margin: 0;
+	background-color: #ecf1ec;
+	overflow-x: hidden;
+}
+
+div {
+	display: inline-block;
+}
+
+a {
+	text-decoration: none;
+	color: #333;
+}
+
+
+a:hover {
+	text-decoration: underline;
+}
+
+.trpLeftMenuHotspot {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 40px;
+	height: 100%;
+	z-index: 10;
+}
+
+.trpLeftMenu {
+	position: fixed;
+	width: 280px;
+	left: -280px;
+	top: 60px;
+	background-color: @trpGreen;
+	height: 100%;
+	color: white;
+	z-index: 1012;
+	border-right: 2px solid @trpGreen;
+	padding-top: 30px;
+	margin-top: 0px;
+}
+
+.trpLeftMenuWrapper {
+	.trpBodyText;
+	padding-left: 20px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	height: 90%;
+}
+
+.trpLeftMenuSpacer {
+	height: 60px;
+	display: block;
+}
+
+.trpTroupeList {
+	list-style-type: none;
+	margin: 0;
+}
+
+.trpTroupeList a {
+	color: white;
+	white-space: nowrap;
+	display: block;
+	max-width: 220px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.trpNewTroupeButton {
+	width: 210px;
+	.trpBodyMedium;
+	margin-top: 20px;
+	background-color: white;
+	padding: 12px;
+	color: @trpGreen;
+}
+
+.trpMenuTab {
+	position: fixed;
+	left: 0px;
+	top: 100px;
+	background-color: @trpGreen;
+	height: 40px;
+	width: 40px;
+}
+
+.trpUnreadBadge {
+	display: none;
+	position: absolute;
+	right: -8px;
+	top: -8px;
+	width: 16px;
+	height: 16px;
+	background-color: @trpPurple;
+	border-radius: 50em;
+	.trpBodyTiny;
+	color: white;
+	text-align: center;
+}
+
+.trpUnreadBadgeCount {
+	margin-top: 3px;
+	margin-left: -2px;
+}
+
+.trpContentPanel {
+	background-color: #ecf1ec;
+	margin-left: 0px;
+	height: 100%;
+	text-align: center;
+	padding-top: 40px;
+}
+
+.trpContentSpacer {
+	width: 100%;
+	min-width: 700px;
+}
+
+.trpHeaderWrapper {
+	width: 100%;
+	height: 60px;
+	background-color: white;
+	text-align: center;
+	position: fixed;
+	z-index: 1000;
+	overflow: hidden;
+}
+
+.trpHeaderContainer {
+	background-color: white;
+	text-align: center;
+	overflow: hidden;
+}
+
+.trpHeaderTitle {
+	.trpH1;
+	min-width: 500px;
+	text-align: left;
+	color: #333;
+	padding-top: 14px;
+	height: 60px;
+}
+
+.trpHeaderToolbar {
+	min-width: 200px;
+	height: 60px;
+	vertical-align: top;
+	text-align: left;
+}
+
+.trpSettingsButton {
+	padding-top: 14px;
+	border-top: 2px solid @trpGreen;
+	margin: 0;
+}
+
+.trpProfileButton {
+	padding-top: 14px;
+	padding-left: 12px;
+	border-top: 2px solid @trpGreen;
+	margin: 0;
+}
+
+.trpProfileMenu {
+	font-family: 'Open Sans';
+	font-size: 14px;
+	color: #333;
+	vertical-align: top;
+	display: inline-block;
+	padding-top: 18px;
+	border-top: 2px solid #1dce73;
+	margin: 0;
+	width: 0px;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.trpProfileItem {
+	padding-left: 14px;
+}
+
+.trpProfileItem a:hover {
+	color: #1dce73;
+}
+
+.trpProfileItem a {
+	color: #333;
+}
+
+
+.trpAlertWrapper {
+	width: 100%;
+	height: 120px;
+	top: 60px;
+	background-color: @trpGreen;
+	text-align: center;
+	position: fixed;
+	z-index: 1080;
+	overflow: hidden;
+	display: none;
+}
+
+.trpAlertContainer {
+	text-align: center;
+	overflow: hidden;
+}
+
+.trpAlertContent {
+	.trpH3;
+	min-width: 718px;
+	text-align: left;
+	color: #333;
+	padding-top: 14px;
+	color: white;
+}
+
+.trpAlertTitle {
+	display: block;
+	margin-bottom: 10px;
+}
+
+
+.trpDisplayPictureSmall {
+	border-radius: 50em;
+	width: 24px;
+	height: 24px;
+	background-size: contain;
+}
+
+.trpChatPanel {
+	min-width: 500px;
+	max-width: 500px;
+	height: 100%;
+	text-align: left;
+	padding-top: 40px;
+	border-radius: 5px;
+}
+
+.trpToolbar {
+	min-width: 200px;
+	max-width: 200px;
+	height: 100%;
+	text-align: left;
+	padding-top: 40px;
+	vertical-align: top;
+}
+
+.trpToolbarContent {
+	width: 200px;
+	vertical-align: top;
+}
+
+.trpToolbarHeader {
+	font-family: 'Open Sans';
+	font-size: 12px;
+	text-transform: uppercase;
+	padding-bottom: 4px;
+	display: block;
+	cursor: pointer;
+}
+
+.trpToolbarList {
+	vertical-align: top;
+	padding-bottom: 12px;
+}
+
+.trpRightPanel {
+	position: absolute;
+	width: 280px;
+	right: -280px;
+	top: 60px;
+	height: 100%;
+	overflow: hidden;
+	color: white;
+	font-size: 20px;
+	z-index: 12;
+	background-color: #ecf1ec;
+	padding-top: 40px;
+	display: none;
+	text-align: left;
+}
+
+.trpItemDetails {
+	padding: 8px 0 8px 0;
+	font-family: 'Open Sans';
+	font-size: 14px;
+	color: #333;
+	display: inline-block;
+	width: 224px;
+}
+
+.trpDetailViewClose {
+	background-color: @trpGreen;
+	position: absolute;
+	right: 40px;
+	text-align: center;
+	.trpBodySmall;
+	padding: 4px 6px;
+	letter-spacing: 1px;
+}
+
+.login-content {
+	width: 100%;
+}
+
+.trpProfileForm {
+	display: block;
+}
+
+/* SPINNER */
+
+.spinnerContainer {
+  display: inline-block;
+  background-color: white;
+  width: 32px;
+  height: 32px;
+}
+
+.floatingCirclesG{
+position:relative;
+width:32px;
+height:32px;
+-moz-transform:scale(0.6);
+-webkit-transform:scale(0.6);
+-ms-transform:scale(0.6);
+-o-transform:scale(0.6);
+transform:scale(0.6);
+}
+
+.f_circleG{
+position:absolute;
+background-color:#FFFFFF;
+height:6px;
+width:6px;
+-moz-border-radius:3px;
+-moz-animation-name:f_fadeG;
+-moz-animation-duration:1.04s;
+-moz-animation-iteration-count:infinite;
+-moz-animation-direction:linear;
+-webkit-border-radius:3px;
+-webkit-animation-name:f_fadeG;
+-webkit-animation-duration:1.04s;
+-webkit-animation-iteration-count:infinite;
+-webkit-animation-direction:linear;
+-ms-border-radius:3px;
+-ms-animation-name:f_fadeG;
+-ms-animation-duration:1.04s;
+-ms-animation-iteration-count:infinite;
+-ms-animation-direction:linear;
+-o-border-radius:3px;
+-o-animation-name:f_fadeG;
+-o-animation-duration:1.04s;
+-o-animation-iteration-count:infinite;
+-o-animation-direction:linear;
+border-radius:3px;
+animation-name:f_fadeG;
+animation-duration:1.04s;
+animation-iteration-count:infinite;
+animation-direction:linear;
+}
+
+#frotateG_01{
+left:0;
+top:13px;
+-moz-animation-delay:0.39s;
+-webkit-animation-delay:0.39s;
+-ms-animation-delay:0.39s;
+-o-animation-delay:0.39s;
+animation-delay:0.39s;
+}
+
+#frotateG_02{
+left:4px;
+top:4px;
+-moz-animation-delay:0.52s;
+-webkit-animation-delay:0.52s;
+-ms-animation-delay:0.52s;
+-o-animation-delay:0.52s;
+animation-delay:0.52s;
+}
+
+#frotateG_03{
+left:13px;
+top:0;
+-moz-animation-delay:0.65s;
+-webkit-animation-delay:0.65s;
+-ms-animation-delay:0.65s;
+-o-animation-delay:0.65s;
+animation-delay:0.65s;
+}
+
+#frotateG_04{
+right:4px;
+top:4px;
+-moz-animation-delay:0.78s;
+-webkit-animation-delay:0.78s;
+-ms-animation-delay:0.78s;
+-o-animation-delay:0.78s;
+animation-delay:0.78s;
+}
+
+#frotateG_05{
+right:0;
+top:13px;
+-moz-animation-delay:0.91s;
+-webkit-animation-delay:0.91s;
+-ms-animation-delay:0.91s;
+-o-animation-delay:0.91s;
+animation-delay:0.91s;
+}
+
+#frotateG_06{
+right:4px;
+bottom:4px;
+-moz-animation-delay:1.04s;
+-webkit-animation-delay:1.04s;
+-ms-animation-delay:1.04s;
+-o-animation-delay:1.04s;
+animation-delay:1.04s;
+}
+
+#frotateG_07{
+left:13px;
+bottom:0;
+-moz-animation-delay:1.17s;
+-webkit-animation-delay:1.17s;
+-ms-animation-delay:1.17s;
+-o-animation-delay:1.17s;
+animation-delay:1.17s;
+}
+
+#frotateG_08{
+left:4px;
+bottom:4px;
+-moz-animation-delay:1.3s;
+-webkit-animation-delay:1.3s;
+-ms-animation-delay:1.3s;
+-o-animation-delay:1.3s;
+animation-delay:1.3s;
+}
+
+@-moz-keyframes f_fadeG{
+0%{
+background-color:#000000}
+
+100%{
+background-color:#FFFFFF}
+
+}
+
+@-webkit-keyframes f_fadeG{
+0%{
+background-color:#000000}
+
+100%{
+background-color:#FFFFFF}
+
+}
+
+@-ms-keyframes f_fadeG{
+0%{
+background-color:#000000}
+
+100%{
+background-color:#FFFFFF}
+
+}
+
+@-o-keyframes f_fadeG{
+0%{
+background-color:#000000}
+
+100%{
+background-color:#FFFFFF}
+
+}
+
+@keyframes f_fadeG{
+0%{
+background-color:#000000}
+
+100%{
+background-color:#FFFFFF}
+
+}
+
+
+
+
+
+

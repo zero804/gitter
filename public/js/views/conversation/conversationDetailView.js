@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 // Filename: views/home/main
 define([
   'jquery',
@@ -10,14 +11,14 @@ define([
 ], function($, _, Backbone, TroupeViews, template, conversationModels, ConversationDetailItemView) {
   "use strict";
 
-  return TroupeViews.Base.extend({
+  var View = TroupeViews.Base.extend({
     template: template,
 
     initialize: function(options) {
       _.bindAll(this, 'onSubjectChange');
 
       this.router = options.router;
-      this.id = options.params;
+      this.id = options.id ? options.id : options.params;
 
       this.model = new conversationModels.ConversationDetail({ id: this.id });
       this.model.bind('change:subject', this.onSubjectChange);
@@ -53,4 +54,17 @@ define([
       window.history.back();
     }
   });
+
+  var Modal = TroupeViews.Modal.extend({
+    initialize: function(options) {
+      TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+      this.view = new View({ id: this.model.id, masterModel: this.model });
+    }
+  });
+
+  return {
+    View: View,
+    Modal: Modal
+  };
+
 });

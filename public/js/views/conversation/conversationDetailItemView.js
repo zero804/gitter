@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 // Filename: views/home/main
 
 // TODO: Better way to show the subject here, right now it will be set multiple times as this is called per conversationDetailItemView
@@ -30,7 +31,8 @@ define([
     getRenderData: function() {
       var data = this.model.toJSON();
       data.personName = data.from.displayName;
-      data.avatarUrl = data.from.avatarUrl;
+      data.avatarUrlSmall = data.from.avatarUrlSmall;
+      data.avatarUrlMedium = data.from.avatarUrlMedium;
 
       if (data.attachments.length===0) { data.hasAttachments = false; } else { data.hasAttachments = true; }
 
@@ -45,7 +47,7 @@ define([
           var mailbody = this.generateMailBody();
 
           this.$el.find("#initialBody").replaceWith(mailbody);
-          this.$el.find('.trpMailPreview').css("visibility","hidden");
+          this.$el.find('.trpMailPreview').hide();
       }
     },
 
@@ -53,18 +55,18 @@ define([
       if(this.mailbody) {
         $(this.mailbody).toggle();
         // For some reason using toggle (which adjusts css display property) causes other issues, so this just toggles visibility
-        if(this.$el.find('.trpMailPreview').css("visibility") == 'hidden') {
-          this.$el.find('.trpMailPreview').css("visibility","visible");
+        if(this.$el.find('.trpMailPreview').is(':visible')) {
+          this.$el.find('.trpMailPreview').hide();
           return false;
         }
-        this.$el.find('.trpMailPreview').css("visibility","hidden");
+        this.$el.find('.trpMailPreview').show();
         return false;
       }
 
       var mailbody = this.generateMailBody();
 
       this.$el.append(mailbody);
-      this.$el.find('.trpMailPreview').css("visibility","hidden");
+      this.$el.find('.trpMailPreview').hide();
 
       return false;
 

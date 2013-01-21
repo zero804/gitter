@@ -1,10 +1,13 @@
+/*jshint unused:true browser:true*/
 define([
   'jquery',
   'underscore',
   'backbone',
   'hbs!./modal',
-  '../template/helpers/all'
-], function($, _, Backbone, modalTemplate, helpers) {
+  '../template/helpers/all',
+  'utils/vent',
+  'hbs!./confirmationView'
+], function($, _, Backbone, modalTemplate, helpers, vent, confirmationViewTemplate) {
   /*jshint trailing:false */
   /*global require:true console:true setTimeout:true*/
   "use strict";
@@ -24,6 +27,9 @@ define([
   /* Use the compact views */
   var compactView = window.navigator.userAgent.indexOf("Mobile/") !== -1;
 
+  /* This value is used by the dialogFragment Handlebars helper */
+  window._troupeCompactView = compactView;
+
   TroupeViews.Base = Backbone.View.extend({
     template: null,
     autoClose: true,
@@ -33,6 +39,21 @@ define([
       Backbone.View.prototype.constructor.apply(this, arguments);
       if(!options) options = {};
       if(options.template) this.template = options.template;
+    },
+
+    setRerenderOnChange: function() {
+      var self = this;
+      this.model.on('change', this.rerenderOnChange, this);
+
+      this.addCleanup(function() {
+        self.model.off('change', self.rerenderOnChange, this);
+      });
+    },
+
+    rerenderOnChange: function() {
+      console.log("RERENDER ON CHANGE");
+      this.removeSubViews(this.$el);
+      this.render();
     },
 
     addCleanup: function(callback) {
@@ -145,18 +166,20 @@ define([
         fade: true,
         autoRemove: true,
         menuItems: [],
-        disableClose: false
+        disableClose: false,
+        title: null,
+        navigable: false
       };
       _.bindAll(this, 'hide', 'onMenuItemClicked');
       _.extend(this.options, options);
 
       this.view = this.options.view;
-      this.view.dialog = this;
     },
 
     getRenderData: function() {
       return {
-        title: "Modal",
+        customTitle: !!this.options.title,
+        title: this.options.title,
         disableClose: this.options.disableClose
       };
     },
@@ -209,7 +232,23 @@ define([
       }
     },
 
+    supportsModelReplacement: function() {
+      return this.view &&
+              this.view.supportsModelReplacement &&
+              this.view.supportsModelReplacement();
+    },
+
+    replaceModel: function(model) {
+      return this.view.replaceModel(model);
+    },
+
     show: function() {
+      if(this.options.navigable) {
+        vent.trigger('navigable-dialog:open', this);
+      }
+
+      this.view.dialog = this;
+
       var that = this;
       if (this.isShown) return;
 
@@ -232,7 +271,7 @@ define([
         that.$el.show();
 
         if (transition) {
-          that.$el[0].offsetWidth; // force reflow
+          var o = that.$el[0].offsetWidth; // force reflow
         }
 
         that.$el.addClass('in');
@@ -251,7 +290,28 @@ define([
 
     hide: function ( e ) {
       if(e) e.preventDefault();
+      if(this.navigable) {
+        var hash = window.location.hash;
+        var currentFragment;
+        if(!hash) {
+          currentFragment = '#';
+        } else {
+          currentFragment = hash.split('|', 1)[0];
+        }
 
+        window.location = currentFragment;
+        return;
+      }
+      this.hideInternal();
+    },
+
+    /* Called after navigation to close an navigable dialog box */
+    navigationalHide: function() {
+      this.options.fade = false;
+      this.hideInternal();
+    },
+
+    hideInternal: function() {
       if (!this.isShown) return;
 
       var that = this;
@@ -268,6 +328,7 @@ define([
       this.trigger('hide');
 
       if($.support.transition && this.options.fade) {
+        console.log("Closing dialog with transition");
         this.hideWithTransition(this);
       } else {
         this.hideModal();
@@ -330,7 +391,7 @@ define([
         }
         this.$backdrop.modal = this;
 
-        if (doAnimate) { this.$backdrop[0].offsetWidth; } // force reflow
+        if (doAnimate) { var x = this.$backdrop[0].offsetWidth; } // force reflow
 
         this.$backdrop.addClass('in');
 
@@ -575,6 +636,75 @@ define([
     }
 
   });
+
+  /* This is a mixin for Marionette.CollectionView */
+  TroupeViews.SortableMarionetteView = {
+
+    initializeSorting: function() {
+      this.on('before:render', this.onBeforeRenderSort, this);
+      this.on('render', this.onRenderSort, this);
+    },
+
+    onBeforeRenderSort: function() {
+      this.isRendering = true;
+    },
+    onRenderSort: function() {
+      this.isRendering = false;
+    },
+
+    appendHtml: function(collectionView, itemView, index) {
+
+      if (this.isRendering || index >= collectionView.collection.length - 1) {
+        collectionView.$el.append(itemView.el);
+        return;
+      }
+
+      if (index === 0) {
+        collectionView.$el.prepend(itemView.el);
+        return;
+      }
+
+      var prevModel = this.collection.at(index - 1);
+      var view = collectionView.children.findByModel(prevModel);
+      itemView.$el.insertAfter(view.$el);
+    }
+
+  };
+
+  TroupeViews.ConfirmationView = TroupeViews.Base.extend({
+    template: confirmationViewTemplate,
+
+    initialize: function(options) {
+      this.options = options;
+    },
+
+    getRenderData: function() {
+      return this.options;
+    },
+
+    events: {
+      "click .button": "buttonClicked"
+    },
+
+    buttonClicked: function(e) {
+      e.preventDefault();
+
+      var id = $(e.target).attr('id');
+
+      if(this.dialog) {
+        this.dialog.trigger('button.click', id);
+      }
+      this.trigger('button.click', id);
+    }
+  });
+
+   TroupeViews.ConfirmationModal = TroupeViews.Modal.extend({
+    initialize: function(options) {
+      options.view = new TroupeViews.ConfirmationView(options);
+      TroupeViews.Modal.prototype.initialize.call(this, options);
+    }
+
+   });
 
   return TroupeViews;
 });

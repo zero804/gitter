@@ -1,27 +1,24 @@
+/*jshint unused:true browser:true*/
 require([
   'jquery',
   'underscore',
   'backbone',
   './base-router',
   'views/base',
-  'components/chat/chat-component',
-  'components/unread-items-client'
-], function($, _, Backbone, BaseRouter, TroupeViews, chat, unreadItemsClient) {
+  'views/chat/chatView'
+], function($, _, Backbone, BaseRouter, TroupeViews, ChatView) {
   "use strict";
 
   var AppRouter = BaseRouter.extend({
-    initialize: function() {
-      chat.connect();
+    routes: {
+      '*actions':     'defaultAction'
     },
 
-    defaultAction: function(actions){
-      this.showChatView();
-    },
-
-    showChatView: function() {
-      this.navIcon('#chat-icon');
-      this.showAsync('views/chat/chatView');
+    defaultAction: function(/*actions*/){
+      var view = new ChatView();
+      this.showView("#primary-view", view);
     }
+
 
   });
 

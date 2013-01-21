@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 /**
 *
 *  Base64 encode / decode

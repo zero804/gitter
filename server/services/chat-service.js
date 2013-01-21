@@ -1,10 +1,8 @@
-/*jslint node: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var persistence = require("./persistence-service"),
     troupeService = require("./troupe-service"),
-    restSerializer = require("../serializers/rest-serializer"),
-    appEvents = require("../app-events"),
     statsService = require("./stats-service");
 
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
@@ -19,17 +17,11 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   chatMessage.save(function (err) {
     if(err) return callback(err);
 
-    var strategy = new restSerializer.ChatStrategy({ user: user, troupeId: troupe.id });
-    restSerializer.serialize(chatMessage, strategy, function(err, serialized) {
-      if(err) return callback(err);
-
-      appEvents.troupeChat(troupe.id, serialized);
-    });
-
     statsService.event("new_chat", {
       fromUserId: user.id,
       toTroupeId: troupe.id
     });
+
     return callback(null, chatMessage);
   });
 };
