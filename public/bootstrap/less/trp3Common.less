@@ -1,0 +1,90 @@
+.trpDisplayPicture {
+
+}
+
+.avatar-s {
+	position: relative;
+	min-height: 48px;
+	min-width: 48px;
+	border-radius: 50em;
+	border: 2px solid white;
+}
+
+.avatar-m {
+	position: relative;
+	min-height: 180px;
+	min-width: 180px;
+}
+
+.trpStatus {
+  position: absolute;
+  top: 5px;
+  left: -3px;
+  border-radius: 5em;
+  border: 2px solid white;
+  width: 8px;
+  height: 8px;
+  display: block;
+}
+
+.trpDisplayPicture.online .trpStatus {
+  background-color: #06ff00;
+}
+
+.trpDisplayPicture.offline .trpStatus {
+  background-color: #fcb316;
+}
+
+.trpDisplayPicture.busy .trpStatus {
+  background-color: #ff2400;
+}
+
+.trpButtonGreen {
+	.trpBodyMedium;
+	margin-top: 12px;
+	padding: 12px;
+	background-color: @trpGreen;
+	color: white;
+}
+
+.trpButtonAction {
+	cursor: pointer;
+}
+
+.trpButtonMenu {
+	float: right;
+	cursor: pointer;
+}
+
+.trpButtonGreen a {
+	color: white;
+}
+
+.trpMainButton {
+	display: block;
+}
+
+.trpButtonMenuItems {
+	display: none;
+}
+
+.trpButtonMenuItem {
+	display: block;
+	padding-top: 10px;
+}
+
+.trpHand {
+	cursor: pointer;
+}
+
+.trpInput {
+  border: 1px solid @trpGrey;
+  padding: 10px;
+  .trpBodyMedium;
+  color: @trpDarkGrey;
+  border-radius: 0px;
+}
+
+.tooltip {
+  .trpBodySmall;
+}

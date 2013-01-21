@@ -1,8 +1,10 @@
+/*jshint unused:true browser:true*/
 define([
 ], function() {
   /*jslint browser: true*/
   "use strict";
 
+  // deprecated
   return {
     'mail': function() {
       this.showAsync('views/conversation/conversationView');

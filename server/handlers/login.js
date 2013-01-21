@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 /*global console:false, require: true, module: true */
 "use strict";
 
@@ -94,18 +94,26 @@ module.exports = {
       app.get('/select-troupe',
         middleware.ensureLoggedIn(),
         function(req, res) {
-          if (req.user.lastTroupe) {
-            troupeService.findById(req.user.lastTroupe, function (err,troupe) {
-              if (err) troupe = null;
+          function findDefaultTroupeForUser() {
+            userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
+              // TODO: deal with users who do not belong to any troupes!
+              if (err || !troupe) { return next("Unable to find default troupe for user. "); }
+
               res.redirect('/' + troupe.uri);
             });
           }
 
-          else {
-            userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
-              if (err) troupe = null;
+          if (req.user.lastTroupe) {
+            troupeService.findById(req.user.lastTroupe, function (err,troupe) {
+              if (err || !troupe) {
+                findDefaultTroupeForUser();
+                return;
+              }
+
               res.redirect('/' + troupe.uri);
             });
+          } else {
+            findDefaultTroupeForUser();
           }
 
         });

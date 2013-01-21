@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 // Filename: views/home/main
 define([
   'jquery',
@@ -22,15 +23,6 @@ define([
 
     initialize: function(options) {
       _.bindAll(this, 'showSortMenu', 'hideSortMenu');
-      this.collection = new conversationModels.ConversationCollection();
-
-      this.collection.listen();
-      this.collection.fetch();
-
-      var self = this;
-      this.addCleanup(function() {
-        self.collection.unlisten();
-      });
     },
 
     events: {
@@ -69,9 +61,9 @@ define([
             return conversation.get("updated");
           }
         }
-      });
+      }).render();
     },
- 
+
     showSortMenu: function(e) {
       $('body, html').on('click', this.hideSortMenu);
       this.$el.find(".trpSortMenu").fadeIn('fast');

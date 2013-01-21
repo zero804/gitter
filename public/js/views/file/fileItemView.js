@@ -1,18 +1,57 @@
-// Filename: views/home/main
+/*jshint unused:true browser:true*/
 define([
   'jquery',
   'underscore',
   'backbone',
+  'marionette',
   'views/base',
   'views/rivets-backbone',
   'hbs!./fileItemView',
   './filePreviewView',
-  './fileVersionsView',
-], function($, _, Backbone, TroupeViews, rivet, template, FilePreviewView, FileVersionsView){
+  './fileVersionsView'
+], function($, _, Backbone, Marionette, TroupeViews, rivet, template, FilePreviewView, FileVersionsView) {
+  /*jslint browser: true*/
   "use strict";
 
   return TroupeViews.Base.extend({
     template: template,
+    initialize: function(options) {
+      this.setRerenderOnChange();
+    },
+
+    getRenderData: function(){
+      var data = this.model.toJSON();
+
+      var versions = this.model.get('versions');
+
+      var latestVersion = versions.length;
+      data.fileIcon = this.fileIcon(this.model.get('fileName'), latestVersion);
+      data.useSpinner = versions.at(versions.length - 1).get('thumbnailStatus') === 'GENERATING';
+
+      return data;
+    },
+
+    render: function() {
+      var r = TroupeViews.Base.prototype.render.call(this);
+
+      this.$el.find(':first-child').tooltip({
+        html : true,
+        placement : "right"
+      });
+
+      return r;
+    },
+
+    fileIcon: function(fileName, version) {
+      return '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + fileName + "?version=" + version;
+    }
+  });
+
+  // TODO: DELETE THIS STUFF?
+
+  /*
+
+  return TroupeViews.Base.extend({
     unreadItemType: 'file',
     events: {
       "click .trpFileActionMenuButton": "showFileActionMenu",
@@ -139,4 +178,6 @@ define([
       return '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + fileName + "?version=" + version;
     }
   });
+  */
+
 });

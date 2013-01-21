@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 define([
   'jquery',
   'underscore',
@@ -7,34 +8,58 @@ define([
   'bootstrap'
 ], function($, _, TroupeViews, template, presenceClient, _bootstrap) {
   return TroupeViews.Base.extend({
+    template: template,
     initialize: function(options) {
-      this.user = options.user || {};
+      this.user = options.user ? options.user : {};
       this.showEmail = options.showEmail || {};
       this.showBadge = options.showBadge;
-      if (options.user.location) {
-        this.user.location = options.user.location.description;
+      this.showStatus = options.showStatus;
+      this.avatarSize = options.size ? options.size : 's';
+      this.avatarUrl = (this.avatarSize == 'm') ? this.user.avatarUrlMedium : this.user.avatarUrlSmall;
+
+      var self = this;
+      function avatarChange(event, data) {
+        if(data.userId === self.getUserId()) {
+          self.$el.find('div.trpDisplayPicture').css('background-image', 'url("' + data.avatarUrl + '")');
+        }
       }
-      else {
-        this.user.location = "";
-      }
+
+      $(document).on('avatar:change', avatarChange);
+      this.addCleanup(function() {
+        $(document).off('avatar:change', avatarChange);
+      });
     },
 
-    render: function() {
-      this.$el.html(template({
-        id: this.user.id,
-        showBadge: this.showBadge,
-        userDisplayName: this.user.displayName,
-        userAvatarUrl: this.user.avatarUrl,
-        userLocation: this.user.location,
-        offline: !presenceClient.isOnline(this.user.id)
-      }));
+    getUserId: function() {
+      if(this.model) return this.model.id;
+      if(this.user) return this.user.id;
+      return null;
+    },
 
-      this.$el.find('div').tooltip({
+    getRenderData: function() {
+      var user = this.model ? this.model.toJSON() : this.user;
+      return {
+        id: user.id,
+        showBadge: this.showBadge,
+        showStatus: this.showStatus,
+        userDisplayName: user.displayName,
+        avatarUrl: this.avatarUrl,
+        avatarSize: this.avatarSize,
+        userLocation: user.location ? user.location.description : "",
+        offline: !presenceClient.isOnline(user.id)
+      };
+    },
+
+    // TODO: use base classes render() method
+    render: function() {
+      var dom = this.template(this.getRenderData());
+      this.$el.html(dom);
+
+      this.$el.find(':first-child').tooltip({
         html : true,
-        placement : "right",
+        placement : "right"
       });
 
-      return this;
     }
 
   });

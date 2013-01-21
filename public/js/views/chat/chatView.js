@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 // Filename: views/home/main
 define([
   'jquery',
@@ -6,11 +7,10 @@ define([
   'bootstrap',
   'views/base',
   'hbs!./chat',
-  'components/chat/chat-component',
   './chatViewItem',
   'collections/chat',
   '../../utils/momentWrapper'
-], function($, _, Backbone, _bootstrap, TroupeViews, template, chat, ChatViewItem, chatModels, moment) {
+], function($, _, Backbone, _bootstrap, TroupeViews, template, ChatViewItem, chatModels, moment) {
   "use strict";
 
   var PAGE_SIZE = 50;
@@ -36,16 +36,24 @@ define([
     },
 
     events: {
-      "keydown .trpChatBox":          "detectReturn",
-      "focusout .trpChatBox": "send",
-      "blur .trpChatBox" : "blurChat"
+      "keydown #chat-input":          "detectReturn",
+      "focusout #chat-input": "onFocusOut",
+      "blur #chat-input" : "blurChat"
     },
 
     beforeClose: function() {
       $(window).unbind('scroll', this.scrollEventBound);
     },
 
-    getRenderData: function() { return {}; },
+    getRenderData: function() {
+      return {
+        user: window.troupeContext.user
+      };
+    },
+
+    onFocusOut: function() {
+      if (this.compactView) this.send();
+    },
 
     blurChat: function(){
     },
@@ -70,17 +78,6 @@ define([
       }
     },
 
-/*
-    onMessage: function(event, msg) {
-      var self = event.data;
-      var current = msg.fromUser.id == window.troupeContext.user.id;
-
-      $(".frame-chat", this.el).prepend(new ChatViewItem({ message: msg, current: current}).render().el);
-
-      return;
-    },
-*/
-
     detectReturn: function(e) {
       if(e.keyCode == 13) {
         return this.send();
@@ -88,7 +85,7 @@ define([
     },
 
     send: function() {
-      var chatBox = $(".trpChatBox");
+      var chatBox = $("#chat-input");
       var val = chatBox.val().trim();
       if(val) {
         this.collection.create({

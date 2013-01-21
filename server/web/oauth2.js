@@ -1,4 +1,4 @@
-/*jslint node: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 /**
@@ -108,7 +108,10 @@ exports.authorization = [
       if (err) { return done(err); }
 
       if(client.registeredRedirectUri !== redirectUri) {
-        winston.warn("Provided redirectUri ", redirectUri, " does not match registered URI ", client.registeredRedirectUri + " for clientKey " + clientKey);
+        winston.warn("Provided redirectUri does not match registered URI for clientKey ", {
+          redirectUri: redirectUri,
+          registeredUri: client.registeredRedirectUri,
+          clientKey: clientKey});
         return done("Redirect URL does not match");
       }
       return done(null, client, redirectUri);
