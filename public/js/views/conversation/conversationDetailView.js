@@ -57,6 +57,7 @@ define([
 
   var Modal = TroupeViews.Modal.extend({
     initialize: function(options) {
+      options.title = this.model.get('subject');
       TroupeViews.Modal.prototype.initialize.apply(this, arguments);
       this.view = new View({ id: this.model.id, masterModel: this.model });
     }
