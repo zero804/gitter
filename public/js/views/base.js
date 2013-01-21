@@ -5,8 +5,9 @@ define([
   'backbone',
   'hbs!./modal',
   '../template/helpers/all',
-  'utils/vent'
-], function($, _, Backbone, modalTemplate, helpers, vent) {
+  'utils/vent',
+  'hbs!./confirmationView'
+], function($, _, Backbone, modalTemplate, helpers, vent, confirmationViewTemplate) {
   /*jshint trailing:false */
   /*global require:true console:true setTimeout:true*/
   "use strict";
@@ -669,6 +670,41 @@ define([
     }
 
   };
+
+  TroupeViews.ConfirmationView = TroupeViews.Base.extend({
+    template: confirmationViewTemplate,
+
+    initialize: function(options) {
+      this.options = options;
+    },
+
+    getRenderData: function() {
+      return this.options;
+    },
+
+    events: {
+      "click .button": "buttonClicked"
+    },
+
+    buttonClicked: function(e) {
+      e.preventDefault();
+
+      var id = $(e.target).attr('id');
+
+      if(this.dialog) {
+        this.dialog.trigger('button.click', id);
+      }
+      this.trigger('button.click', id);
+    }
+  });
+
+   TroupeViews.ConfirmationModal = TroupeViews.Modal.extend({
+    initialize: function(options) {
+      options.view = new TroupeViews.ConfirmationView(options);
+      TroupeViews.Modal.prototype.initialize.call(this, options);
+    }
+
+   });
 
   return TroupeViews;
 });
