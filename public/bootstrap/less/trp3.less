@@ -51,16 +51,24 @@ a:hover {
 	top: 60px;
 	background-color: @trpGreen;
 	height: 100%;
-	overflow: hidden;
 	color: white;
 	z-index: 1012;
 	border-right: 2px solid @trpGreen;
 	padding-top: 30px;
+	margin-top: 0px;
 }
 
 .trpLeftMenuWrapper {
 	.trpBodyText;
 	padding-left: 20px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	height: 90%;
+}
+
+.trpLeftMenuSpacer {
+	height: 60px;
+	display: block;
 }
 
 .trpTroupeList {
@@ -198,6 +206,39 @@ a:hover {
 	color: #333;
 }
 
+
+.trpAlertWrapper {
+	width: 100%;
+	height: 120px;
+	top: 60px;
+	background-color: @trpGreen;
+	text-align: center;
+	position: fixed;
+	z-index: 1080;
+	overflow: hidden;
+	display: none;
+}
+
+.trpAlertContainer {
+	text-align: center;
+	overflow: hidden;
+}
+
+.trpAlertContent {
+	.trpH3;
+	min-width: 718px;
+	text-align: left;
+	color: #333;
+	padding-top: 14px;
+	color: white;
+}
+
+.trpAlertTitle {
+	display: block;
+	margin-bottom: 10px;
+}
+
+
 .trpDisplayPictureSmall {
 	border-radius: 50em;
 	width: 24px;
@@ -275,6 +316,10 @@ a:hover {
 	.trpBodySmall;
 	padding: 4px 6px;
 	letter-spacing: 1px;
+}
+
+.login-content {
+	width: 100%;
 }
 
 .trpProfileForm {

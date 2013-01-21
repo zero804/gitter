@@ -4,18 +4,23 @@
 var troupeService = require("../../services/troupe-service"),
     restSerializer = require("../../serializers/rest-serializer");
 
+function serialize(items, req, res, next) {
+
+  var strategy = new restSerializer.RequestStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });
+  restSerializer.serialize(items, strategy, function(err, serialized) {
+    if(err) return next(err);
+
+    res.send(serialized);
+  });
+
+
+}
 module.exports = {
     index: function(req, res, next){
       troupeService.findAllOutstandingRequestsForTroupe(req.troupe.id, function(err, requests) {
         if(err) return next(err);
 
-        var strategy = new restSerializer.RequestStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });
-        restSerializer.serialize(requests, strategy, function(err, serialized) {
-          if(err) return next(err);
-
-          res.send(serialized);
-        });
-
+        serialize(requests, req, res, next);
       });
     },
 
@@ -39,14 +44,14 @@ module.exports = {
     update:  function(req, res, next) {
       troupeService.acceptRequest(req.request, function(err) {
         if(err) return next(err);
-        res.send(200);
+        serialize(req.request, req, res, next);
       });
     },
 
     destroy: function(req, res, next) {
       troupeService.rejectRequest(req.request, function(err) {
         if(err) return next(err);
-        res.send(200);
+        res.send({ success: true });
       });
     },
 

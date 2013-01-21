@@ -58,7 +58,7 @@
       <div class="trpToolbarHeader">All your Troupes</div>
       <ul class="trpTroupeList" id="left-menu-list">
       </ul>
-      <a href="#|create"><div class="trpNewTroupeButton">Start a new Troupe</div></a>
+      <a href="#|create"><div class="trpNewTroupeButton">Start a new Troupe</div><div class="trpLeftMenuSpacer"></div></a>
     </div>
   </div>
   <div class="trpMenuTab" id="menu-toggle-button"><img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle">
@@ -75,11 +75,21 @@
     </div>
   </div>
 
+  <div class="trpAlertWrapper" id="alert-panel">
+    <div class="trpAlertContainer">
+      <div class="trpAlertContent" id="alert-content">
+        <div class="trpAlertTitle">New requests to join this Troupe</div>
+        <div class="trpDisplayPicture avatar-s" style="background-image: url('/avatar');"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="trpContentPanel" id="content-frame">
     <div class="trpContentSpacer"></div>
     <div class="trpChatPanel" id="chat-frame"></div>
     <div class="trpToolbar">
       <div class="trpToolbarContent">
+        <div class="trpToolbarList" id="request-roster"></div>
         <div class="trpToolbarHeader" id="people-header">People</div>
         <div class="trpToolbarList" id="people-roster"></div>
         <div class="trpToolbarHeader" id="file-header">Files</div>

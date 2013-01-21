@@ -10,14 +10,17 @@ require([
   'views/chat/chatView',
   'views/file/fileView',
   'views/conversation/conversationView',
+  'views/request/requestView',
   'utils/vent',
   'collections/troupes',
   'collections/files',
   'collections/conversations',
   'collections/users',
+  'collections/requests',
   'views/file/fileDetailView',
   'views/file/filePreviewView',
   'views/file/fileVersionsView',
+  'views/request/requestDetailView',
   'views/people/personDetailView',
   'views/conversation/conversationDetailView',
   'views/toolbar/troupeCollectionView',
@@ -25,9 +28,9 @@ require([
   'views/profile/profileView',
   'views/share/shareView',
   'views/signup/createTroupeView'
-], function($, _, Backbone, Marionette, TroupeViews, realtime, AppIntegratedView, ChatView, FileView, ConversationView,
-            vent, troupeModels, fileModels, conversationModels, userModels, FileDetailView, filePreviewView, fileVersionsView,
-            PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView, createTroupeView) {
+], function($, _, Backbone, Marionette, TroupeViews, realtime, AppIntegratedView, ChatView, FileView, ConversationView, RequestView,
+            vent, troupeModels, fileModels, conversationModels, userModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
+            RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView, createTroupeView) {
   /*global console:true*/
   "use strict";
 
@@ -67,6 +70,7 @@ require([
     peopleRosterRegion: "#people-roster",
     fileRegion: "#file-list",
     mailRegion: "#mail-list",
+    requestRegion: "#request-roster",
     rightPanelRegion: "#right-panel"
   });
 
@@ -109,7 +113,7 @@ require([
   };
 
   var router;
-  var fileCollection, conversationCollection, troupeCollection, userCollection;
+  var requestCollection, fileCollection, conversationCollection, troupeCollection, userCollection;
   var appView = new AppIntegratedView({ app: app });
 
   var Router = Backbone.Router.extend({
@@ -126,6 +130,7 @@ require([
     getViewDetails: function(fragment) {
 
       var routes = [
+        { re: /^request\/(\w+)$/,         viewType: RequestDetailView,            collection: requestCollection },
         { re: /^file\/(\w+)$/,            viewType: FileDetailView,               collection: fileCollection },
         { re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: fileCollection },
         { re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: fileCollection },
@@ -223,6 +228,18 @@ require([
     var chatView = new ChatView();
     app.chatRegion.show(chatView);
 
+    // Request Collections
+    requestCollection = new requestModels.RequestCollection();
+    requestCollection.listen();
+    requestCollection.fetch();
+
+    var requestView = new RequestView({
+      collection: requestCollection
+    });
+    app.requestRegion.show(requestView);
+
+    // File Collections
+
     fileCollection = new fileModels.FileCollection();
     fileCollection.listen();
     fileCollection.fetch();
@@ -231,6 +248,8 @@ require([
       collection: fileCollection
     });
     app.fileRegion.show(fileView);
+
+    // Conversation Collections
 
     conversationCollection = new conversationModels.ConversationCollection();
     conversationCollection.listen();
@@ -262,6 +281,7 @@ require([
 
 
     app.collections = {
+      'requests': requestCollection,
       'files': fileCollection,
       'conversations': conversationCollection,
       'troupes': troupeCollection,
