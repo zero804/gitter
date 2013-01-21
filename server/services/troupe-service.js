@@ -158,7 +158,7 @@ function validateTroupeUrisForUser(userId, uris, callback) {
       uris.forEach(function(uri) {
         var troupe = troupesByUris[uri];
         if(troupe) {
-          result[uri] = troupe.users.indexOf(userId) >= 0;
+          result[uri] = troupe.containsUserId(userId);
         } else {
           result[uri] = null;
         }
