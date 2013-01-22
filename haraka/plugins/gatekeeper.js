@@ -11,7 +11,7 @@ var nconf = require("./../../server/utils/config");
 var mimelib = require('mimelib');
 
 var EMAILDOMAIN = nconf.get("email:domain");
-var BASEPATH = nconf.get('basepath');
+var BASEPATH = nconf.get('web:basepath');
 
 /*
 This plugin verfies that the sender can access the requested troupes, and sends bounce emails if necessary.
