@@ -86,7 +86,7 @@ module.exports = {
       });
 
       app.get('/reset/:confirmationCode',
-        middleware.authenticate('passwordreset', { failureRedirect: '/password-reset-failed' } ),
+        middleware.authenticate('passwordreset', { failureRedirect: '/x#passwordResetFailed=true' } ),
         function(req, res, next) {
           res.relativeRedirect("/select-troupe");
         });
