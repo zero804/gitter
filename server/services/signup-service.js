@@ -204,15 +204,10 @@ module.exports = {
         });
 
       } else {
-        if(user.status === 'UNCONFIRMED') {
-          // Add a request for the troupe
-          troupeService.addRequest(troupeId, user.id, function(err, request) {
-            if(err) return callback(err);
-            callback(null);
-          });
-        } else {
-          callback({ userExists: true });
-        }
+        troupeService.addRequest(troupeId, user.id, function(err, request) {
+          if(err) return callback(err);
+          callback(null);
+        });
       }
     });
   }
