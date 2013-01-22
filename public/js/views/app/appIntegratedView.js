@@ -25,7 +25,7 @@ define([
       "mouseenter #content-frame":        "onMouseEnterContent",
       "click #people-header":             "onPeopleHeaderClick",
       "click #request-header":               "onRequestHeaderClick",
-      
+
       "mouseenter #left-menu":            "onMouseEnterLeftMenu",
 
       "click #file-header":               "onFileHeaderClick",
@@ -37,11 +37,13 @@ define([
       var self = this;
       this.app = options.app;
 
+
       $('body').append('<span id="fineUploader"></span>');
+
       this.uploader = new qq.FineUploader({
         element: $('#fineUploader')[0],
         dragAndDrop: {
-          extraDropzones: [document.body],
+          extraDropzones: [$('#dropZone')[0]],
           hideDropzones: false,
           disableDefaultDropzone: false
         },
@@ -288,8 +290,8 @@ define([
     },
 
     onAddPeopleClick: function() {
-	},
-	
+    },
+
     onMouseEnterLeftMenu: function() {
       document.body.style.overflow='hidden';
     },
