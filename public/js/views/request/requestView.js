@@ -41,10 +41,10 @@ define([
 
     setVisibility: function(animate) {
       if (this.collection.length > 0) {
-        return (animate) ? this.$el.slideDown() : this.$el.show();
+        return (animate) ? this.$el.parent().slideDown() : this.$el.parent().show();
       }
       else {
-        return (animate) ? this.$el.slideUp() : this.$el.hide();
+        return (animate) ? this.$el.parent().slideUp() : this.$el.parent().hide();
       }
     },
 
