@@ -123,7 +123,7 @@ a:hover {
 }
 
 .trpTroupeBadge {
-	margin-left: -10px;
+	margin-left: -11px;
 }
 
 .trpTroupeBadge:before {
@@ -142,9 +142,13 @@ a:hover {
 
 
 .trpTroupeName {
-	display: inline;
+	display: block;
 	vertical-align: top;
 	padding-left: 8px;
+	text-overflow: ellipsis;
+	max-width: 230px;
+	overflow: hidden;
+	white-space: nowrap;
 }
 
 
