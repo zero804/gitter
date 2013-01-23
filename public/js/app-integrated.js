@@ -233,6 +233,7 @@ require([
     requestCollection.listen();
     requestCollection.fetch();
 
+    // Request View
     var requestView = new RequestView({
       collection: requestCollection
     });
@@ -244,6 +245,7 @@ require([
     fileCollection.listen();
     fileCollection.fetch();
 
+    // File View
     var fileView = new FileView({
       collection: fileCollection
     });
@@ -255,6 +257,7 @@ require([
     conversationCollection.listen();
     conversationCollection.fetch();
 
+    // Conversation View
     var conversationView = new ConversationView({
       collection: conversationCollection
     });
@@ -274,6 +277,13 @@ require([
     userCollection = new userModels.UserCollection();
     userCollection.fetch();
     userCollection.listen();
+    // send out a change event to avatar widgets that are not necessarily connected to a model object.
+    userCollection.on('change', function(model) {
+      var eventName = "avatar:change";
+      $(document).trigger(eventName, model.toJSON());
+    });
+
+    // People View
     var peopleCollectionView = new PeopleCollectionView({
       collection: userCollection
     });
