@@ -129,7 +129,7 @@ module.exports = {
           });
 
           scaleAndWriteAvatar(180, 180, inPath, function(resizedPath) {
-            saveAvatarToGridFS(resizedPath, 'avatar-' + req.user.id + '-m', waitor2;
+            saveAvatarToGridFS(resizedPath, 'avatar-' + req.user.id + '-m', waitor2);
           });
 
 
