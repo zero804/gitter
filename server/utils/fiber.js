@@ -3,6 +3,9 @@
 
 var Q = require('q');
 
+// note: Make sure that waitors are created at the same callback level as the fiber.sync() is run,
+// so that the waitors are not accidentally only queued in a deeper callback level,
+// which would be after the sync() function is run, instead of before.
 function Fiber() {
   this.waitingFor = [];
 }
