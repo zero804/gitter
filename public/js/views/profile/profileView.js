@@ -57,7 +57,10 @@ define([
           endpoint: '/avatar/'
         },
         callbacks: {
-          onSubmit: function(id, fileName) {},
+          onSubmit: function(id, fileName) {
+            // display spinner
+            self.$el.find('.trpDisplayPicture').css('background', 'url("/images/ajax-loader.gif") center center no-repeat');
+          },
           // return false to cancel submit
           onComplete: function(id, fileName, response) {
             if(response.success) {
