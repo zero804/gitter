@@ -96,7 +96,7 @@ define([
       if (!this.profilemenu) {
 
         $(".trpProfileMenu").animate({
-            width: '120px'
+            width: '124px'
         }, 250);
         this.profilemenu = true;
       }
