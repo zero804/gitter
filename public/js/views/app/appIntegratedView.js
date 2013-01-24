@@ -43,7 +43,7 @@ define([
       this.uploader = new qq.FineUploader({
         element: $('#fineUploader')[0],
         dragAndDrop: {
-          extraDropzones: [$('#dropZone')[0]],
+          extraDropzones: [$('body')[0]],
           hideDropzones: false,
           disableDefaultDropzone: false
         },
