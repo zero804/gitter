@@ -167,8 +167,10 @@ require([
     },
 
     handle: function(path) {
-      window.location.href = window.location.href.replace(/%7C/, '|');
-      path = path.replace(/%7C/, '|');
+      if (window.location.hash.indexOf('#%7C') === 0) {
+        window.location.hash = window.location.hash.replace(/%7C/, '|');
+        path = path.replace(/%7C/, '|');
+      }
       var parts = path.split("|");
 
       this.regionFragmentMapping.forEach(function(regionName, index) {
