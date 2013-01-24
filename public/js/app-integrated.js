@@ -28,10 +28,11 @@ require([
   'views/profile/profileView',
   'views/share/shareView',
   'views/signup/createTroupeView',
-  'hbs!./views/app/appHeader'
+  'hbs!./views/app/appHeader',
+  'views/share/shareView'
 ], function($, _, Backbone, Marionette, TroupeViews, realtime, AppIntegratedView, ChatView, FileView, ConversationView, RequestView,
             vent, troupeModels, fileModels, conversationModels, userModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
-            RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView, createTroupeView, headerViewTemplate) {
+            RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView, createTroupeView, headerViewTemplate, shareTroupeView) {
   /*global console:true*/
   "use strict";
 
@@ -141,7 +142,8 @@ require([
 
         { re: /^profile$/,                viewType: profileView.Modal },
         { re: /^share$/,                  viewType: shareView.Modal },
-        { re: /^create$/,                 viewType: createTroupeView.Modal }
+        { re: /^create$/,                 viewType: createTroupeView.Modal },
+        { re: /^shareTroupe/,            viewType: shareTroupeView.Modal }
 
       ];
 
@@ -165,6 +167,8 @@ require([
     },
 
     handle: function(path) {
+      window.location.href = window.location.href.replace(/%7C/, '|');
+      path = path.replace(/%7C/, '|');
       var parts = path.split("|");
 
       this.regionFragmentMapping.forEach(function(regionName, index) {
