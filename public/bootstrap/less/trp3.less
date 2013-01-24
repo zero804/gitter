@@ -15,7 +15,12 @@
 
 @import "../../js/libs/fineuploader/3.1.1/fineuploader.less";
 
+html {
+	min-height: 100%;
+}
+
 body {
+	min-height: 100%;
 	margin: 0;
 	background-color: #ecf1ec;
 	overflow-x: hidden;
@@ -79,7 +84,6 @@ a:hover {
 .trpTroupeList a {
 	color: white;
 	white-space: nowrap;
-	display: block;
 	max-width: 220px;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -104,23 +108,54 @@ a:hover {
 }
 
 .trpUnreadBadge {
-	display: none;
+/*	display: none;*/
 	position: absolute;
-	right: -8px;
-	top: -8px;
-	width: 16px;
-	height: 16px;
+	right: -9px;
+	top: -9px;
+	width: 15px;
+	height: 15px;
 	background-color: @trpPurple;
 	border-radius: 50em;
 	.trpBodyTiny;
 	color: white;
 	text-align: center;
+	border: 2px solid white;
 }
 
 .trpUnreadBadgeCount {
 	margin-top: 3px;
 	margin-left: -2px;
 }
+
+.trpTroupeBadge {
+	margin-left: -11px;
+}
+
+.trpTroupeBadge:before {
+	content: "";
+	display: inline-block;
+	position: relative;
+	left: -8px;
+	width: 7px;
+	height: 7px;
+	border-radius: 50em;
+	vertical-align: top;
+	margin-top: 4px;
+	background-color: @trpPurple;
+	border: 2px solid white;
+}
+
+
+.trpTroupeName {
+	display: block;
+	vertical-align: top;
+	padding-left: 8px;
+	text-overflow: ellipsis;
+	max-width: 230px;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
 
 .trpContentPanel {
 	background-color: #ecf1ec;
@@ -249,6 +284,7 @@ a:hover {
 .trpChatPanel {
 	min-width: 500px;
 	max-width: 500px;
+	min-height: 600px;
 	height: 100%;
 	text-align: left;
 	padding-top: 40px;

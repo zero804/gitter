@@ -25,7 +25,6 @@ define([
         // displayName: this.existingUser ? window.troupeContext.user.displayName : ""
         displayName: window.troupeContext.user.displayName
       };
-      console.dir(d);
       return d;
     },
 
@@ -33,13 +32,6 @@ define([
       "submit form#updateprofileform": "onFormSubmit",
       "keyup #password": "onPasswordChange",
       "change #password": "onPasswordChange"
-    },
-
-    reloadAvatar: function(user) {
-      $(document).trigger('avatar:change', { userId: user.id, avatarUrlSmall: user.avatarUrlSmall, avatarUrlMedium: avatarUrlMedium });
-
-      var newAvatarURL = 'url("' + user.avatarUrlSmall + '")';
-      this.$el.find('.image-avatar').css('background-image', newAvatarURL);
     },
 
     afterRender: function() {
@@ -51,6 +43,10 @@ define([
       oldpasswordEl.placeholder();
 
       var self = this;
+      // ERR: the image only updates immediately every second attempt,
+      // even though the image is being sent to the server,
+      // and the element background url is changed correctly,
+      // the browser is receiving the old image on first attempt.
       var uploader = new qq.FineUploaderBasic({
         button: self.$el.find('.button-choose-avatar')[0],
         multiple: false,
@@ -61,12 +57,14 @@ define([
           endpoint: '/avatar/'
         },
         callbacks: {
-          onSubmit: function(id, fileName) {},
+          onSubmit: function(id, fileName) {
+            // display spinner
+            self.$el.find('.trpDisplayPicture').css('background', 'url("/images/ajax-loader.gif") center center no-repeat');
+          },
           // return false to cancel submit
           onComplete: function(id, fileName, response) {
             if(response.success) {
               window.troupeContext.user = response.user;
-              self.reloadAvatar(response.user);
             } else {
               // TODO: deal with this!
             }

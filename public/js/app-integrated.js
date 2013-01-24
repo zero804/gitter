@@ -27,10 +27,11 @@ require([
   'views/people/peopleCollectionView',
   'views/profile/profileView',
   'views/share/shareView',
-  'views/signup/createTroupeView'
+  'views/signup/createTroupeView',
+  'hbs!./views/app/appHeader'
 ], function($, _, Backbone, Marionette, TroupeViews, realtime, AppIntegratedView, ChatView, FileView, ConversationView, RequestView,
             vent, troupeModels, fileModels, conversationModels, userModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
-            RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView, createTroupeView) {
+            RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView, createTroupeView, headerViewTemplate) {
   /*global console:true*/
   "use strict";
 
@@ -71,7 +72,8 @@ require([
     fileRegion: "#file-list",
     mailRegion: "#mail-list",
     requestRegion: "#request-roster",
-    rightPanelRegion: "#right-panel"
+    rightPanelRegion: "#right-panel",
+    headerRegion: "#header-region"
   });
 
   /*var subscription = */ realtime.subscribe('/troupes/' + window.troupeContext.troupe.id, function(message) {
@@ -225,6 +227,15 @@ require([
   });
 
   app.addInitializer(function(/*options*/){
+    var headerView = new (TroupeViews.Base.extend({
+      template: headerViewTemplate,
+      getRenderData: function() {
+        return { user: window.troupeContext.user };
+      }
+    }))();
+    app.headerRegion.show(headerView);
+
+    // Chat View (unncessarily manages it's own collections)
     var chatView = new ChatView();
     app.chatRegion.show(chatView);
 
@@ -233,6 +244,7 @@ require([
     requestCollection.listen();
     requestCollection.fetch();
 
+    // Request View
     var requestView = new RequestView({
       collection: requestCollection
     });
@@ -244,6 +256,7 @@ require([
     fileCollection.listen();
     fileCollection.fetch();
 
+    // File View
     var fileView = new FileView({
       collection: fileCollection
     });
@@ -255,6 +268,7 @@ require([
     conversationCollection.listen();
     conversationCollection.fetch();
 
+    // Conversation View
     var conversationView = new ConversationView({
       collection: conversationCollection
     });
@@ -274,6 +288,13 @@ require([
     userCollection = new userModels.UserCollection();
     userCollection.fetch();
     userCollection.listen();
+    // send out a change event to avatar widgets that are not necessarily connected to a model object.
+    userCollection.on('change', function(model) {
+      var eventName = "avatar:change";
+      $(document).trigger(eventName, model.toJSON());
+    });
+
+    // People View
     var peopleCollectionView = new PeopleCollectionView({
       collection: userCollection
     });

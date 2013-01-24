@@ -10,9 +10,7 @@
 
 
   <div class="trpModalProfilePic">
-    <div class="image-avatar trpDisplayPicture">
-    {{ widget "avatar" user=user size='s' }}
-    </div>
+  {{ widget "avatar" user=user size='s' }}
   <div class="trpModalSubtext button-choose-avatar">Change picture</div>
   <form action="/updateprofile" method="post" id="updateprofileform">
     <div class="trpProfileForm">

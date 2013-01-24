@@ -43,7 +43,7 @@ define([
       this.uploader = new qq.FineUploader({
         element: $('#fineUploader')[0],
         dragAndDrop: {
-          extraDropzones: [$('#dropZone')[0]],
+          extraDropzones: [$('body')[0]],
           hideDropzones: false,
           disableDefaultDropzone: false
         },
@@ -300,11 +300,6 @@ define([
 
       // return if a form input has focus
       if ( $("*:focus").is("textarea, input") ) return;
-
-      // a shows an alert
-      if(e.keyCode == 65) {
-        this.toggleAlert();
-      }
 
       // t shows Troupe menu
       if(e.keyCode == 84) {
