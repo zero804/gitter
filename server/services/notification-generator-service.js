@@ -13,8 +13,6 @@ var collections = require("../utils/collections");
 var kue = require('kue');
 var jobs;
 
-var minimumUserAlertIntervalS = nconf.get("notifications:minimumUserAlertInterval");
-var minimumUserAlertIntervalMS = nconf.get("notifications:minimumUserAlertInterval") * 1000;
 var notificationDelayMS = nconf.get("notifications:notificationDelay") * 1000;
 
 function compile(map) {
@@ -79,8 +77,6 @@ function filterUsersForPushNotificationEligibility(userIds, callback) {
  * - User has not received a notification in the last X seconds
  */
 function filterUsersForPushNotificationEligibilityStageTwo(userIds, callback) {
-  var deferUnread = Q.defer();
-
   unreadItemService.findLastReadTimesForUsers(userIds, function(err, lastReadTimes) {
     if(err) return callback(err);
 
@@ -139,7 +135,6 @@ exports.install = function() {
       if(!userIds.length) return winston.debug("collectionFinished: Nobody eligible to notify");
 
       var notifications = [];
-      var items = {};
       userIds.forEach(function(userId) {
         var notification = collected[userId];
 
@@ -193,7 +188,6 @@ exports.startWorkers = function() {
   // NB NB circular reference here! Fix this!
   var pushNotificationGateway = require("../gateways/push-notification-gateway");
   var restSerializer = require("../serializers/rest-serializer");
-  var troupeService = require('./troupe-service');
 
   /*
    * Turn notifications into a {hash[notification.itemType] -> [notifications]};
@@ -239,7 +233,7 @@ exports.startWorkers = function() {
             restSerializer.serialize(itemIds, strategy, function(err, serialized) {
               if(err) return callback(err);
 
-              var messages = serialized.map(function(data, index) { return template(data); });
+              var messages = serialized.map(function(data) { return template(data); });
 
               callback(null, messages);
             });

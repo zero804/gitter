@@ -82,10 +82,14 @@ exports.install = function(server) {
     var userId = data.userId;
     var troupeId = data.troupeId;
     var counts = data.counts;
+    var total = Object.keys(counts)
+                  .map(function(key) { return counts[key]; })
+                  .reduce(function(a, b) { return a + b; });
 
     bayeuxClient.publish("/user/" + userId, {
       notification: "troupe_unread",
       troupeId: troupeId,
+      totalUnreadItems: total,
       counts: counts
     });
 
