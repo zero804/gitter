@@ -34,13 +34,14 @@ function displayAvatarFor(size, userId, req, res) {
         return;
       }
 
+      var eTag = gs.md5;
       res.setHeader("Cache-Control","public");
-      res.setHeader('ETag', gs.md5);
+      res.setHeader('ETag', eTag);
       res.setHeader('Vary', 'Accept');
       res.setHeader('Expires', new Date(Date.now() + 365 * 86400 * 1000));
 
       var presentedEtag = req.get('If-None-Match');
-      if(!presentedEtag || presentedEtag !== gs.md5) {
+      if(!presentedEtag || presentedEtag !== eTag) {
         gs.stream(true).pipe(res);
         return;
       }
@@ -101,6 +102,7 @@ module.exports = {
         '/avatar/:size/:userId/:version.:type',
         // middleware.ensureLoggedIn(),
         function(req, res, next) {
+
           /* Ignore the version and always serve up the latest */
           var userId = req.params.userId;
           var size = req.params.size;
@@ -117,19 +119,22 @@ module.exports = {
           var mongoPath = "avatar-" + req.user.id;
 
           var fiber = new Fiber();
+          // note: create the waitors now so that they aren't created in callbacks
+          // (which are only after the sync function is run).
+          var waitor1 = fiber.waitor();
+          var waitor2 = fiber.waitor();
 
           scaleAndWriteAvatar(48, 48, inPath, function(resizedPath) {
-            saveAvatarToGridFS(resizedPath, 'avatar-' + req.user.id, fiber.waitor());
+            saveAvatarToGridFS(resizedPath, 'avatar-' + req.user.id, waitor1);
           });
 
           scaleAndWriteAvatar(180, 180, inPath, function(resizedPath) {
-            saveAvatarToGridFS(resizedPath, 'avatar-' + req.user.id + '-m', fiber.waitor());
+            saveAvatarToGridFS(resizedPath, 'avatar-' + req.user.id + '-m', waitor2;
           });
 
 
           fiber.sync()
             .then(function() {
-              //if (err) return next(err);
 
               req.user.avatarVersion = req.user.avatarVersion ? req.user.avatarVersion + 1 : 1;
               req.user.save();
