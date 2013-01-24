@@ -68,6 +68,15 @@ exports.findOrGenerateWebToken = function(userId, callback) {
 
 };
 
+exports.validateToken = function(token, callback) {
+  persistenceService.OAuthAccessToken.findOne({ token: token }, function(err, accessToken) {
+    if(err) return callback(err);
+    if(!accessToken) return callback("Access token not found");
+
+    return callback(null, accessToken.userId);
+  });
+};
+
 // TODO: move some of this functionality into redis for speed
 // TODO: make the web tokens expire
 exports.validateWebToken = function(token, callback) {

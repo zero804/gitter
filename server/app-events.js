@@ -72,6 +72,7 @@ module.exports = {
   },
 
   troupeUnreadCountsChange: function(data) {
+    console.log("troupeUnreadCountsChange", data);
     emit('troupeUnreadCountsChange', data);
   },
 
