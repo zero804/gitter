@@ -80,7 +80,7 @@ define([
         success: function(data) {
           if (data.redirectTo) {
             console.log(JSON.stringify(data));
-            window.location.href = "/" + data.redirectTo;
+            window.location.href = "/" + data.redirectTo + "#|shareTroupe";
           }
           else {
              that.trigger('signup.complete', data);

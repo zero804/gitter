@@ -9,7 +9,7 @@ var emailDomainWithAt = "@" + emailDomain;
 
 module.exports = {
   sendConfirmationForExistingUser: function (user, troupe) {
-    var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri;
+    var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri + "#|shareTroupe";
 
     mailerService.sendEmail({
       templateFile: "signupemail_existing",
