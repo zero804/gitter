@@ -53,7 +53,8 @@
     "file": "~0.2.1",
     "cube": "~0.2.4",
     "nomnom": "~1.5.2",
-    "mimelib": "~0.2.10"
+    "mimelib": "~0.2.10",
+    "faye": "~0.8.8"
   },
   "devDependencies": {
     "better-assert": "~0.1.0",
