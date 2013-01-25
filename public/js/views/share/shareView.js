@@ -21,7 +21,8 @@ define([
 
     getRenderData: function() {
       return {
-        uri: this.uri
+        uri: this.uri,
+        basePath: window.troupeContext.basePath
       };
     },
 
