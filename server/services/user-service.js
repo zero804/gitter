@@ -7,14 +7,19 @@ var persistence = require("./persistence-service"),
     uuid = require('node-uuid'),
     geocodingService = require("./geocoding-service"),
     winston = require("winston"),
-    statsService = require("./stats-service");
+    statsService = require("./stats-service"),
+    crypto = require('crypto');
 
+function generateGravatarUrl(email) {
+  return  "https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon";
+}
 
 var userService = {
   newUser: function(options) {
     var user = new persistence.User(options);
     user.displayName = options.display;
     user.email = options.email;
+    user.gravatarImageUrl = generateGravatarUrl;
     user.status = options.status ? options.status : "UNCONFIRMED";
 
     user.save(function (err) {
@@ -234,6 +239,9 @@ var userService = {
     userService.findById(userId, function(err, user) {
       if(err) return callback(err);
       if(!user) return callback("User not found");
+
+      if (!user.gravatarImageUrl)
+        user.gravatarImageUrl = generateGravatarUrl(user.email);
 
       function generateNewHashSaveUser() {
         sechash.strongHash('sha512', password, function(err, hash3) {

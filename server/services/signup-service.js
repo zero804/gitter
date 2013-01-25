@@ -34,7 +34,7 @@ function newTroupeForExistingUser(options, user, callback) {
   troupe.save(function(err) {
     if(err) return callback(err);
     // No need to send an email for existing users
-    // emailNotificationService.sendConfirmationForExistingUser(user, troupe);
+    emailNotificationService.sendConfirmationForExistingUser(user, troupe);
     callback(null, troupe.id);
   });
 }

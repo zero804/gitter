@@ -25,7 +25,7 @@ require([
         var loginModal = new TroupeViews.Modal({ view: loginView, disableClose: true });
         loginView.on('login.complete', function(data) {
           loginView.off('login.complete');
-          window.location.href = data.redirectTo;
+          window.location.reload();
         });
         return loginModal;
       }
