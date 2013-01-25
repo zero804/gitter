@@ -145,6 +145,9 @@ function FileStrategy(options) {
 
 
   this.map = function(item) {
+    if(!item) return null;
+    item = item.toObject();
+
     var versionIndex = 1;
     function narrowFileVersion(item) {
       return {
@@ -709,6 +712,8 @@ function getStrategy(modelName, toCollection) {
       return toCollection ? ConversationMinStrategy : ConversationStrategy;
     case 'file':
       return FileStrategy;
+    case 'fileId':
+      return FileIdStrategy;
     case 'notification':
       return NotificationStrategy;
     case 'chat':

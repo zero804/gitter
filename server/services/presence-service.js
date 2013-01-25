@@ -167,7 +167,7 @@ resetClientState();
 
 module.exports = {
   userSocketConnected: function(userId, socketId) {
-    winston.debug("presence: userSocketConnected: ", { userId: userId, socketId: socketId });
+    //winston.debug("presence: userSocketConnected: ", { userId: userId, socketId: socketId });
 
     addUserToActiveUsers(userId, function(err, initialConnection) {
       if(initialConnection) {
@@ -239,6 +239,31 @@ module.exports = {
 
   findOnlineUsersForTroupe: function(troupeId, callback) {
     listOnlineUsersForTroupe(troupeId, callback);
+  },
+
+  // Given an array of usersIds, returns a hash with the status of each user. If the user is no in the hash
+  // it implies that they're offline
+  // callback(err, status)
+  // with status[userId] = 'online' / <missing>
+  categorizeUsersByOnlineStatus: function(userIds, callback) {
+      var t = process.hrtime();
+      var key = "presence_temp_set:" + process.pid + ":" + t[0] + ":" + t[1];
+
+      var multi = redisClient.multi();
+      multi.sadd(key, userIds);
+      multi.sinter('presence:activeusers',key);
+      multi.del(key);
+      multi.exec(function(err, replies) {
+        if(err) return callback(err);
+
+        var onlineUsers = replies[1];
+        var result = {};
+        if(onlineUsers) onlineUsers.forEach(function(userId) {
+          result[userId] = 'online';
+        });
+
+        return callback(null, result);
+      });
   }
 
 
