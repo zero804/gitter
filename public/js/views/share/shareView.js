@@ -17,6 +17,7 @@ define([
     initialize: function(options) {
       _.bindAll(this, 'onFormSubmit');
       this.uri = window.troupeContext.troupe.uri;
+      this.basePath = window.troupeContext.basePath;
     },
 
     getRenderData: function() {
@@ -67,7 +68,7 @@ define([
     createClipboard : function() {
       ZeroClipboard.setMoviePath( 'swf/ZeroClipboard.swf' );
       var clip = new ZeroClipboard.Client();
-      clip.setText( 'https://beta.trou.pe/' + this.uri );
+      clip.setText( this.basePath + "/" + this.uri );
       clip.glue( 'copy-button');
     },
 
