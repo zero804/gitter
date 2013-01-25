@@ -59,7 +59,8 @@ define([
         callbacks: {
           onSubmit: function(id, fileName) {
             // display spinner
-            self.$el.find('.trpDisplayPicture').css('background', 'url("/images/ajax-loader.gif") center center no-repeat');
+            // self.$el.find('.trpDisplayPicture').css('background', 'url("/images/2/troupe-ajax-guy.gif") center center no-repeat');
+            self.$el.find('.trpDisplayPicture').replaceWith('<img src="/images/2/troupe-ajax-guy.gif" class="trpSpinner"/>');
           },
           // return false to cancel submit
           onComplete: function(id, fileName, response) {
