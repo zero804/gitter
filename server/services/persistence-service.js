@@ -51,6 +51,7 @@ var UserSchema = new Schema({
   passwordHash: { type: String },
   passwordResetCode: String,
   avatarVersion: { type: Number, "default": 0 },
+  gravatarImageUrl: { type: String },
   lastTroupe: ObjectId,
   location: {
     timestamp: Date,
