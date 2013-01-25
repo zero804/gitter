@@ -275,6 +275,13 @@ function findPendingRequestForTroupe(troupeId, id, callback) {
   }, callback);
 }
 
+
+function findRequestsByIds(requestIds, callback) {
+  persistence.Request.findOne( {
+    _id: requestIds
+  }, callback);
+}
+
 function acceptRequest(request, callback) {
   findById(request.troupeId, function(err, troupe) {
     if(err) return callback(err);
@@ -343,6 +350,7 @@ module.exports = {
   findMemberEmails: findMemberEmails,
   findAllUnusedInvitesForTroupe: findAllUnusedInvitesForTroupe,
   addRequest: addRequest,
+  findRequestsByIds: findRequestsByIds,
   findAllOutstandingRequestsForTroupe: findAllOutstandingRequestsForTroupe,
   findPendingRequestForTroupe: findPendingRequestForTroupe,
   acceptRequest: acceptRequest,
