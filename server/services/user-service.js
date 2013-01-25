@@ -19,7 +19,7 @@ var userService = {
     var user = new persistence.User(options);
     user.displayName = options.display;
     user.email = options.email;
-    user.gravatarImageUrl = generateGravatarUrl;
+    user.gravatarImageUrl = generateGravatarUrl(user.email);
     user.status = options.status ? options.status : "UNCONFIRMED";
 
     user.save(function (err) {
