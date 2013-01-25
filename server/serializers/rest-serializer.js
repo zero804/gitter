@@ -63,7 +63,7 @@ function UserStrategy(options) {
 
     function getAvatarUrl(size) {
       if(user.avatarVersion === 0) {
-        return cdn("images/2/avatar-default-" + size + ".png");
+        return user.gravatarImageUrl;
       }
       return cdn("avatar/" + size + "/" + user.id + "/" + user.avatarVersion + ".jpg", { notStatic: true });
     }

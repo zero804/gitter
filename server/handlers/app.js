@@ -81,6 +81,7 @@ function renderAppPage(req, res, next, page) {
           profileNotCompleted: profileNotCompleted,
           unreadItems: unreadItems,
           accessDenied: accessDenied,
+          basePath: nconf.get('web:basepath'),
           websockets: {
             nowjs: getNowJsUrl(req),
             options: {

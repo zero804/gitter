@@ -11,6 +11,8 @@ var middleware = require('../web/middleware'),
     Fiber = require("../utils/fiber");
 
 function redirectToDefault(size, user, res) {
+  // only used as a safety catch when accessing the version urls,
+  // which should never be accessed when a default image is required.
   var s = (size == 'm') ? '-m' : '-s';
 
   res.redirect(301, "/images/2/avatar-default"+s+".png");
