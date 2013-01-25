@@ -41,19 +41,15 @@ function newTroupeForExistingUser(options, user, callback) {
 
 function newTroupeForNewUser(options, callback) {
   winston.info("New troupe for new user", options);
-
   var confirmationCode = uuid.v4();
-  var user = new persistence.User();
-  user.email = options.email;
-  user.confirmationCode = confirmationCode;
 
-  var uri = createUniqueUri();
-
-  user.save(function (err) {
+  userService.newUser({ email: options.email, confirmationCode: confirmationCode }, function (err, user) {
     if(err) {
       callback(err);
       return;
     }
+
+    var uri = createUniqueUri();
 
     var troupe = new persistence.Troupe();
     troupe.name = options.troupeName;

@@ -15,15 +15,19 @@ function generateGravatarUrl(email) {
 }
 
 var userService = {
-  newUser: function(options) {
+  newUser: function(options, callback) {
     var user = new persistence.User(options);
-    user.displayName = options.display;
+    user.displayName = options.displayName;
     user.email = options.email;
+    user.confirmationCode = options.confirmationCode;
+
     user.gravatarImageUrl = generateGravatarUrl(user.email);
     user.status = options.status ? options.status : "UNCONFIRMED";
 
     user.save(function (err) {
-      if(err) winston.error("User save failed: ", err);
+      if(err) { winston.error("User save failed: ", err); }
+
+      return callback(null, user);
     });
   },
 
@@ -37,15 +41,15 @@ var userService = {
       if(err) return callback(err);
       if(user) return callback(err, user);
 
-      /* User does not exist */
-      user = new persistence.User(options);
-      user.displayName = displayName;
-      user.email = email;
-      user.save(function (err) {
+      userService.newUser({
+        displayName: displayName,
+        email: email
+      }, function(err, user) {
         if(err) return callback(err);
 
         return callback(null, user);
       });
+
     });
 
   },
