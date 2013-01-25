@@ -12,7 +12,8 @@ var presenceService = require("../services/presence-service");
 var routes = [
   { re: /^\/troupes\/(\w+)$/, validator: validateUserForTroupeSubscription },
   { re: /^\/troupes\/(\w+)\/(\w+)$/, validator: validateUserForSubTroupeSubscription },
-  { re: /^\/user\/(\w+)$/, validator: validateUserForUserSubscription }
+  { re: /^\/user\/(\w+)$/, validator: validateUserForUserSubscription },
+  { re: /^\/user$/, validator: validateUserForGenericUserSubscription }
 ];
 
 // This strategy ensures that a user can access a given troupe URL
@@ -53,6 +54,17 @@ function validateUserForUserSubscription(options, callback) {
 
   return callback(null, result);
 }
+
+// This strategy ensures that a user can access a URL under a troupe URL
+function validateUserForGenericUserSubscription(options, callback) {
+  var userId = options.userId;
+  var message = options.message;
+  console.log(options);
+
+  message.subscription = "/user/" + userId;
+  return callback(null, true);
+}
+
 
 // Default strategy for matching a clientId to a userId
 // Note that if the redis faye engine is used, this should match
@@ -122,6 +134,8 @@ var auth = {
   incoming: function(message, callback) {
     if (message.channel === '/meta/subscribe') {
       this.authorized(message, function(err, allowed) {
+        if(err) winston.error("Error authorizing message ", { exception: err });
+        if(!allowed) { winston.warn("Client denied access to channel ", { message: message }); }
         if(err || !allowed) {
           //message.subscription = "/invalid";
           message.error = '403::Access denied';
@@ -159,7 +173,7 @@ var auth = {
       var validator = match.route.validator;
       var m = match.match;
 
-      validator({ userId: userId, match: m, clientId: clientId }, function onValidatorFinished(err, result) {
+      validator({ userId: userId, match: m, message: message, clientId: clientId }, function onValidatorFinished(err, result) {
         return callback(err, result);
       });
 
@@ -182,7 +196,7 @@ var auth = {
       var accessToken = ext.token;
       if(!accessToken) return callback("No auth provided");
 
-      oauth.validateWebToken(accessToken, function(err, userId) {
+      oauth.validateToken(accessToken, function(err, userId) {
         if(err) return callback(err);
         if(!userId) return callback("Invalid access token");
 
@@ -236,6 +250,10 @@ var client = server.getClient();
 server.addExtension(auth);
 server.addExtension(pushOnlyServer);
 client.addExtension(pushOnlyServerClient);
+
+server.bind('handshake', function(clientId) {
+ winston.debug("Faye handshake: ", { clientId: clientId });
+});
 
 server.bind('disconnect', function(clientId) {
   clientUserLookup.disassociate(clientId, function onDisassociateDone(err, userId) {

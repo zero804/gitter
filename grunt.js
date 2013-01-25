@@ -32,6 +32,10 @@ module.exports = function( grunt ) {
       }
     },
 
+    htmllint: {
+      all: ["public/**/*.hbs"]
+    },
+
     requirejs: {
       appDir: "public/",
       baseUrl: "js",
@@ -277,6 +281,7 @@ module.exports = function( grunt ) {
   grunt.loadNpmTasks('grunt-exec');
   grunt.loadNpmTasks('grunt-clean');
   grunt.loadNpmTasks('grunt-reload');
+  grunt.loadNpmTasks('grunt-html');
 
   grunt.registerTask('process', 'clean less copy requirejs min exec:gzip');
   grunt.registerTask('watchr', 'reload watch');

@@ -11,10 +11,9 @@ var _ = require("underscore");
 var unreadItemService = require('./unread-item-service');
 var collections = require("../utils/collections");
 var kue = require('kue');
+var presenceService = require("./presence-service");
 var jobs;
 
-var minimumUserAlertIntervalS = nconf.get("notifications:minimumUserAlertInterval");
-var minimumUserAlertIntervalMS = nconf.get("notifications:minimumUserAlertInterval") * 1000;
 var notificationDelayMS = nconf.get("notifications:notificationDelay") * 1000;
 
 function compile(map) {
@@ -28,10 +27,40 @@ function compile(map) {
 
 /* TODO: externalize and internationalise this! */
 var templates = compile({
-  "chat": "{{troupe.name}}\nChat from {{fromUser.displayName}}\n{{text}}",
-  "file": "Stuff are happening with a file"
+  "chat": "{{fromUser.displayName}} chatted\n{{text}}",
+  "file": "New file {{fileName}} uploaded by {{latestVersion.creatorUser.displayName}}"
 });
 
+
+var titleTemplates = compile({
+  "chat": "New chat on {{troupe.name}}",
+  "file": "New file on {{troupe.name}}"
+});
+
+var linkTemplates = compile({
+  "chat": "/{{troupe.uri}}#",
+  "file": "/{{troupe.uri}}#file/{id}"
+});
+
+
+function categorizeUsersByOnlineStatus(userIds, callback) {
+  presenceService.categorizeUsersByOnlineStatus(userIds, function(err, status) {
+    if(err) return callback(err);
+
+    var onlineUsers = [];
+    var offlineUsers = [];
+
+    userIds.forEach(function(userId) {
+      if(status[userId] === 'online') {
+        onlineUsers.push(userId);
+      } else {
+        offlineUsers.push(userId);
+      }
+    });
+
+    return callback(null, onlineUsers, offlineUsers);
+  });
+}
 
 /*
  * Given a bunch of userIds, filter the list, leaving only those eligible for a
@@ -79,8 +108,6 @@ function filterUsersForPushNotificationEligibility(userIds, callback) {
  * - User has not received a notification in the last X seconds
  */
 function filterUsersForPushNotificationEligibilityStageTwo(userIds, callback) {
-  var deferUnread = Q.defer();
-
   unreadItemService.findLastReadTimesForUsers(userIds, function(err, lastReadTimes) {
     if(err) return callback(err);
 
@@ -106,25 +133,6 @@ function filterUsersForPushNotificationEligibilityStageTwo(userIds, callback) {
   });
 }
 
-/*
- * Queue a batch of delayed query notifcations.
- * The notifications object has the following shape:
- * [{ userId: '', notificationType: '', itemId: '' }]
- */
-function queueDelayedNotificationsForSend(notifications) {
-  if(!jobs) {
-    jobs = kue.createQueue();
-  }
-
-  jobs.create('delayed-notification', {
-    title: 'Delayed notification',
-    notifications: notifications
-  }).delay(notificationDelayMS)
-    .attempts(5)
-    .save();
-}
-
-
 exports.install = function() {
   var collect = {};
   var collectTimeout = null;
@@ -134,24 +142,40 @@ exports.install = function() {
     collect = {};
     collectTimeout = null;
 
-    filterUsersForPushNotificationEligibility(Object.keys(collected), function(err, userIds) {
-      if(err) return winston.error("collectionFinished: filterUsersForPushNotificationEligibility failed", { exception: err });
-      if(!userIds.length) return winston.debug("collectionFinished: Nobody eligible to notify");
+    var allUserIds = Object.keys(collected);
+    categorizeUsersByOnlineStatus(allUserIds, function(err, onlineUsers, offlineUsers) {
+      if(err) return winston.error("collectionFinished: categorizeUsersByOnlineStatus failed", { exception: err });
 
-      var notifications = [];
-      var items = {};
-      userIds.forEach(function(userId) {
-        var notification = collected[userId];
+      function dequeueNotifications(users) {
+        var result = [];
 
-        notifications.push({
-          userId: userId,
-          itemType: notification.type,
-          itemId: notification.id,
-          troupeId: notification.troupeId
+        users.forEach(function(userId) {
+          var notification = collected[userId];
+
+          result.push({
+            userId: userId,
+            itemType: notification.type,
+            itemId: notification.id,
+            troupeId: notification.troupeId
+          });
         });
-      });
+        return result;
+      }
+      // If a user is online push the message to them through online channels
+      if(onlineUsers.length) {
+        var immediateNotifications = dequeueNotifications(onlineUsers);
+        queueOnlineNotificationsForSend(immediateNotifications);
+      }
 
-      queueDelayedNotificationsForSend(notifications);
+      if(offlineUsers.length) {
+        filterUsersForPushNotificationEligibility(offlineUsers, function(err, userIds) {
+          if(err) return winston.error("collectionFinished: filterUsersForPushNotificationEligibility failed", { exception: err });
+          if(!userIds.length) return winston.debug("collectionFinished: Nobody eligible for push notifications");
+
+          var delayedNotifications = dequeueNotifications(userIds);
+          queueDelayedNotificationsForSend(delayedNotifications);
+        });
+      }
     });
 
   }
@@ -189,11 +213,45 @@ exports.install = function() {
 };
 
 
+/*
+ * Queue a batch of delayed query notifcations.
+ * The notifications object has the following shape:
+ * [{ userId: '', notificationType: '', itemId: '' }]
+ */
+function queueDelayedNotificationsForSend(notifications) {
+  if(!jobs) {
+    jobs = kue.createQueue();
+  }
+
+  jobs.create('delayed-notification', {
+    title: 'Delayed notification',
+    notifications: notifications
+  }).delay(notificationDelayMS)
+    .attempts(5)
+    .save();
+}
+
+/*
+ * Queue a batch of immediate notifcations.
+ * The notifications object has the following shape:
+ * [{ userId: '', notificationType: '', itemId: '' }]
+ */
+function queueOnlineNotificationsForSend(notifications) {
+  if(!jobs) {
+    jobs = kue.createQueue();
+  }
+
+  jobs.create('online-notification', {
+    title: 'Online notification',
+    notifications: notifications
+  }).attempts(5)
+    .save();
+}
+
 exports.startWorkers = function() {
   // NB NB circular reference here! Fix this!
   var pushNotificationGateway = require("../gateways/push-notification-gateway");
-  var restSerializer = require("../serializers/rest-serializer");
-  var troupeService = require('./troupe-service');
+  var serializer = require("../serializers/notification-serializer");
 
   /*
    * Turn notifications into a {hash[notification.itemType] -> [notifications]};
@@ -209,6 +267,101 @@ exports.startWorkers = function() {
       a.push(notification.itemId);
     });
     return result;
+  }
+
+
+  /* Takes a whole lot of notifications for the same type of message, and turns them into messages */
+  function createNotificationMessage(itemType, itemIds, callback) {
+    var template = templates[itemType];
+    var linkTemplate = linkTemplates[itemType];
+    var titleTemplate = titleTemplates[itemType];
+
+    if(!template) {
+      winston.warn("No template for itemType " + itemType);
+      return callback(null, null);
+    }
+
+    // TODO: move away from resource heavy rest serializer to
+    // a lightweight notification serializer
+    var Strategy = serializer.getStrategy(itemType + "Id");
+    if(Strategy) {
+        var strategy = new Strategy({ includeTroupe: true });
+
+        serializer.serialize(itemIds, strategy, function(err, serialized) {
+          if(err) return callback(err);
+
+          var messages = serialized.map(function(data) {
+            // TODO: sort this ugly hack out
+            // This will fit nicely into the new serializer stuff
+            if(data.versions) { data.latestVersion = data.versions[data.versions.length - 1]; }
+            winston.debug("Data for serailiz", data);
+            return {
+              text: template(data),
+              title: titleTemplate ? titleTemplate(data) : null,
+              sound: "",
+              link: linkTemplate ? linkTemplate(data) : null
+            };
+          });
+
+          callback(null, messages);
+        });
+    } else {
+      winston.warn("No strategy for itemType " + itemType);
+
+      return callback(null, null);
+    }
+  }
+
+  //
+  // Takes an array of notification items, which looks like
+  // [{ userId / itemType / itemId / troupeId }]
+  // callback returns function(err, notificationsWithMessages), with notificationsWithMessages looking like:
+  // [{ notification / message }]
+  //
+  function generateNotificationMessages(notificationsItems, callback) {
+    var notificationTypeHash = hashNotificationsByType(notificationsItems);
+
+    var hashKeys = Object.keys(notificationTypeHash);
+    var promises = [];
+    hashKeys.forEach(function(itemType) {
+      var itemIds = notificationTypeHash[itemType];
+
+      var d = Q.defer();
+      createNotificationMessage(itemType, itemIds, d.node());
+      promises.push(d.promise);
+    });
+
+    Q.all(promises)
+      .then(function(concatenatedResults) {
+        var resultHash = {};
+        hashKeys.forEach(function(itemType, i) {
+          var ids = notificationTypeHash[itemType];
+          var results = concatenatedResults[i];
+          results.forEach(function(result, j) {
+            var itemId = ids[j];
+            resultHash[itemType + ":" + itemId] = result;
+          });
+        });
+
+        winston.info("spoolQueuedNotifications: sending ", { notifications: notificationsItems });
+        var results = [];
+
+        notificationsItems.forEach(function(notification) {
+          var itemType = notification.itemType;
+          var itemId = notification.itemId;
+
+          var message = resultHash[itemType + ":" + itemId];
+
+          if(message) {
+            results.push({ notification: notification, message: message });
+          }
+        });
+
+        callback(null, results);
+      })
+      .fail(function(err) {
+        callback(err);
+      });
   }
 
   function spoolQueuedNotifications(notifications, callback) {
@@ -227,27 +380,6 @@ exports.startWorkers = function() {
       winston.info("spoolQueuedNotifications: sending notifications to ", { userIds: usersForPush });
       var userIdsHash = collections.hashArray(usersForPush);
 
-      /* Takes a whole lot of notifications for the same type of message, and turns them into messages */
-      function createNotificationMessage(itemType, itemIds, callback) {
-        var template = templates[itemType];
-        if(!template) return callback(null, null);
-
-        var Strategy = restSerializer.getStrategy(itemType + "Id");
-        if(Strategy) {
-            var strategy = new Strategy({ includeTroupe: true });
-
-            restSerializer.serialize(itemIds, strategy, function(err, serialized) {
-              if(err) return callback(err);
-
-              var messages = serialized.map(function(data, index) { return template(data); });
-
-              callback(null, messages);
-            });
-        } else {
-          return callback(null, null);
-        }
-      }
-
       /* Ignore any notifications for users who've received a notification in the last 10 seconds */
       notifications = notifications.filter(function(notification) { return userIdsHash[notification.userId]; });
       if(!notifications.length) {
@@ -255,53 +387,48 @@ exports.startWorkers = function() {
         return callback();
       }
 
-      var notificationTypeHash = hashNotificationsByType(notifications);
+      generateNotificationMessages(notifications, function(err, notificationsWithMessages) {
+        if(err) {
+          winston.error("Error while generating notification messages: ", { exception: err });
+          return callback(err);
+        }
 
-      var hashKeys = Object.keys(notificationTypeHash);
-      var promises = [];
-      hashKeys.forEach(function(itemType) {
-        var itemIds = notificationTypeHash[itemType];
+        notificationsWithMessages.forEach(function(notificationsWithMessage) {
+          var notification = notificationsWithMessage.notification;
+          var message = notificationsWithMessage.message;
 
-        var d = Q.defer();
-        createNotificationMessage(itemType, itemIds, d.node());
-        promises.push(d.promise);
-      });
-
-      Q.all(promises)
-        .then(function(concatenatedResults) {
-          var resultHash = {};
-          hashKeys.forEach(function(itemType, i) {
-            var ids = notificationTypeHash[itemType];
-            var results = concatenatedResults[i];
-            if(!results) {
-              console.dir(concatenatedResults);
-            }
-            results.forEach(function(result, j) {
-              var itemId = ids[j];
-              resultHash[itemType + ":" + itemId] = result;
-            });
-          });
-
-          winston.info("spoolQueuedNotifications: sending ", { notifications: notifications });
-
-          notifications.forEach(function(notification) {
-            var itemType = notification.itemType;
-            var itemId = notification.itemId;
-
-            var message = resultHash[itemType + ":" + itemId];
-
-            if(message) {
-              pushNotificationGateway.sendUserNotification(notification.userId, message);
-            }
-          });
-
-          callback();
-        })
-        .fail(function(err) {
-          callback(err);
+          pushNotificationGateway.sendUserNotification(notification.userId, message.text);
         });
 
+      });
+
     });
+  }
+
+  function spoolOnlineNotifications(notifications, callback) {
+    winston.debug("Spooling online notifications", { count: notifications.length });
+
+    generateNotificationMessages(notifications, function(err, notificationsWithMessages) {
+      if(err) {
+        winston.error("Error while generating notification messages: ", { exception: err });
+        return callback(err);
+      }
+
+      notificationsWithMessages.forEach(function(notificationsWithMessage) {
+        var notification = notificationsWithMessage.notification;
+        var message = notificationsWithMessage.message;
+
+        appEvents.userNotification({
+          userId: notification.userId,
+          title: message.title,
+          text: message.text,
+          link: message.link,
+          sound: message.sound
+        });
+      });
+
+    });
+
   }
 
   if(!jobs) {
@@ -310,6 +437,11 @@ exports.startWorkers = function() {
 
   jobs.process('delayed-notification', 20, function(job, done) {
     spoolQueuedNotifications(job.data.notifications, done);
+  });
+
+
+  jobs.process('online-notification', 20, function(job, done) {
+    spoolOnlineNotifications(job.data.notifications, done);
   });
 
 };

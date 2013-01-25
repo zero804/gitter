@@ -24,6 +24,7 @@ exports.install = function(server) {
           operation: operation,
           model: model
         });
+
         break;
       default:
         winston.error('Unknown operation', {operation: operation });
@@ -50,7 +51,23 @@ exports.install = function(server) {
 
   });
 
-  ////////////////////
+  appEvents.onUserNotification(function(data) {
+      var userId = data.userId;
+      var title = data.title;
+      var text = data.text;
+      var link = data.link;
+      var sound = data.sound;
+
+      var url = "/user/" + userId;
+
+      bayeuxClient.publish(url, {
+         notification: "user_notification",
+         title: title,
+         text: text,
+         link: link,
+         sound: sound
+      });
+  });
 
   appEvents.onUserLoggedIntoTroupe(function(data) {
     var troupeId = data.troupeId;
@@ -82,10 +99,14 @@ exports.install = function(server) {
     var userId = data.userId;
     var troupeId = data.troupeId;
     var counts = data.counts;
+    var total = Object.keys(counts)
+                  .map(function(key) { return counts[key]; })
+                  .reduce(function(a, b) { return a + b; });
 
     bayeuxClient.publish("/user/" + userId, {
       notification: "troupe_unread",
       troupeId: troupeId,
+      totalUnreadItems: total,
       counts: counts
     });
 

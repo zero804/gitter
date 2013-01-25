@@ -72,6 +72,7 @@ module.exports = {
   },
 
   troupeUnreadCountsChange: function(data) {
+    console.log("troupeUnreadCountsChange", data);
     emit('troupeUnreadCountsChange', data);
   },
 
@@ -95,6 +96,7 @@ module.exports = {
     on('userLoggedOutOfTroupe', callback);
   },
 
+  // Deprecated
   newNotification: function(troupeId, userId, notificationText, notificationLink) {
     emit('newNotification', {
       troupeId: troupeId,
@@ -104,10 +106,22 @@ module.exports = {
     });
   },
 
+  // Deprecated
   onNewNotification: function(callback) {
     on('newNotification', callback);
   },
 
+  userNotification: function(options) {
+    emit('userNotification',options);
+  },
+
+  // Deprecated
+  onUserNotification: function(callback) {
+    on('userNotification', callback);
+  },
+
+
+  // REMOVE
   dataChange: function(modelName, operation, modelId, troupeId, model) {
     emit('dataChange', {
       modelName: modelName,
@@ -118,6 +132,7 @@ module.exports = {
     });
   },
 
+  // REMOVE
   onDataChange: function(callback) {
     on('dataChange', callback);
   },
