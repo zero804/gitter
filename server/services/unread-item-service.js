@@ -236,18 +236,24 @@ function findCreatingUserIdModel(modelName, model) {
 // TODO: Sort this out!
 function generateNotificationForUrl(url) {
   var match = /^\/troupes\/(\w+)\/(\w+)$/.exec(url);
-  console.log("match", match);
   if(!match) return null;
 
   var model = match[2];
 
-  if(['chatMessages'].indexOf(model) < 0) return null;
+  if(model === 'files') {
+   return {
+      troupeId: match[1],
+      modelName: 'file'
+    };
+  }
 
-  return {
-    troupeId: match[1],
-    modelName: 'chat'
-  };
-
+  if(model === 'chatMessages') {
+    return {
+      troupeId: match[1],
+      modelName: 'chat'
+    };
+  }
+  return null;
 }
 
 /* TODO: make sure only one of these gets installed for the whole app */
