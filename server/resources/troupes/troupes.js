@@ -33,6 +33,23 @@ module.exports = {
     });
   },
 
+  update: function(req, res, next) {
+    var troupe = req.troupe;
+    var updatedTroupe = req.body;
+    var name = updatedTroupe.name;
+    troupeService.updateTroupeName(troupe.id, name, function(err, troupe) {
+      if (err) return next(err);
+
+      var strategy = new restSerializer.TroupeStrategy({ mapUsers: false });
+
+      restSerializer.serialize(troupe, strategy, function(err, serialized) {
+        if(err) return next(err);
+
+        res.send(serialized);
+      });
+    });
+  },
+
   load: function(req, id, callback) {
     if(!req.user) return callback(401);
 
