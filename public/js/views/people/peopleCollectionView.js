@@ -21,6 +21,7 @@ define([
 
     initialize: function(/*options*/) {
       this.collectionView = new Marionette.CollectionView({
+        tagName: "span",
         collection: this.collection,
         itemView: PeopleItemView
       });
