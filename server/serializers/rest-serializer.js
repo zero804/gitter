@@ -28,7 +28,7 @@ function execPreloads(preloads, callback) {
 
   var promises = preloads.map(function(i) {
     var deferred = Q.defer();
-    i.strategy.preload(i.data, deferred.node());
+    i.strategy.preload(i.data, deferred.makeNodeResolver());
     return deferred.promise;
   });
 
@@ -379,7 +379,7 @@ function AllUnreadItemCountStategy(options) {
   this.preload = function(troupeIds, callback) {
     var promises = troupeIds.map(function(i) {
       var deferred = Q.defer();
-      unreadItemService.getUserUnreadCounts(userId, i, deferred.node());
+      unreadItemService.getUserUnreadCounts(userId, i, deferred.makeNodeResolver());
       return deferred.promise;
     });
 

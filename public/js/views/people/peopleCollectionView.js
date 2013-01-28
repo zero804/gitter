@@ -2,8 +2,8 @@
 define([
   'marionette',
   'views/base',
-  'hbs!./peopleItemView',
-  'hbs!./peopleCollectionView'
+  'hbs!./tmpl/peopleItemView',
+  'hbs!./tmpl/peopleCollectionView'
 ], function(Marionette, TroupeViews, peopleItemViewTemplate, peopleCollectionViewTemplate) {
   "use strict";
 

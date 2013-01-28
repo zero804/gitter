@@ -44,7 +44,7 @@ TroupeSESTransport.prototype.sendMailString = function(from, recipients, string,
 
   while(recipientsRemaining.length) {
     var defered = Q.defer();
-    sendMessageToRecipients(recipientsRemaining.splice(0, 50), defered.node());
+    sendMessageToRecipients(recipientsRemaining.splice(0, 50), defered.makeNodeResolver());
     mailPromises.push(defered.promise);
   }
 

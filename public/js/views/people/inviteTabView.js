@@ -5,7 +5,7 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'hbs!./inviteTabView',
+  'hbs!./tmpl/inviteTabView',
   'collections/invites',
   './userItemView'
 ], function($, _, Backbone, TroupeViews, template, inviteModels, UserItemView) {

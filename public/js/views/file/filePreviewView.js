@@ -5,10 +5,9 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'hbs!./filePreviewView'
+  'hbs!./tmpl/filePreviewView'
 ], function($, _, Backbone, TroupeViews, template) {
   /*jslint browser: true*/
-  /*global window console*/
   "use strict";
 
   var headerHeight = 110;

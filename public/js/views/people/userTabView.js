@@ -5,7 +5,7 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'hbs!./userTabView',
+  'hbs!./tmpl/userTabView',
   'collections/users',
   './userItemView'
 ], function($, _, Backbone, TroupeViews, template, userModels, UserItemView) {

@@ -59,7 +59,8 @@ module.exports = function( grunt ) {
                     "views/widgets/nav"
                   ],
                   exclude: ["core-libraries"]
-              },
+              }
+              /*
               {
                   name: "router",
                   include: [
@@ -103,7 +104,7 @@ module.exports = function( grunt ) {
                   ],
                   exclude: ["core-libraries"]
               },
-              /* Views */
+              / * Views * /
               {
                   name: "views/chat/chatView",
                   exclude: ["core-libraries","router"]
@@ -119,14 +120,17 @@ module.exports = function( grunt ) {
                   ],
                   exclude: ["core-libraries","router"]
               },
+              / *
               {
                   name: "views/people/peopleView",
                   exclude: ["core-libraries","router"]
               },
+              * /
               {
                   name: "views/profile/profileView",
                   exclude: ["core-libraries","router"]
               }
+              */
           ],
 
           optimize: "none",
@@ -385,8 +389,7 @@ module.exports = function( grunt ) {
   grunt.loadNpmTasks('grunt-clean');
   grunt.loadNpmTasks('grunt-reload');
 
-  //grunt.registerTask('process', 'clean less copy requirejs min exec:gzip');
-  grunt.registerTask('process', 'clean less copy min exec:gzip');
+  grunt.registerTask('process', 'clean less copy requirejs min exec:gzip');
   grunt.registerTask('watchr', 'reload watch');
 
 };

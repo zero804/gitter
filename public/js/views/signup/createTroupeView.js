@@ -4,7 +4,7 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!./createTroupeView',
+  'hbs!./tmpl/createTroupeView',
   'jquery_validate',
   'jquery_placeholder'
 ], function($, _, TroupeViews, template) {

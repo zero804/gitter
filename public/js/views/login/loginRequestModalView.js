@@ -6,7 +6,7 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!./loginRequestModalView',
+  'hbs!./tmpl/loginRequestModalView',
   'jquery_validate',
   'jquery_placeholder'
 ], function($, _, TroupeViews, template) {

@@ -4,8 +4,8 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'hbs!./requestDetailView',
-  'hbs!./rejectConfirmation'
+  'hbs!./tmpl/requestDetailView',
+  'hbs!./tmpl/rejectConfirmation'
 ], function($, _, Backbone, TroupeViews, template, rejectConfirmationTemplate){
   return TroupeViews.Base.extend({
     template: template,

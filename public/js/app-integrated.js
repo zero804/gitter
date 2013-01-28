@@ -4,6 +4,7 @@ require([
   'underscore',
   'backbone',
   'marionette',
+  'template/helpers/all',
   'views/base',
   'components/realtime',
   'views/app/appIntegratedView',
@@ -28,10 +29,10 @@ require([
   'views/profile/profileView',
   'views/share/shareView',
   'views/signup/createTroupeView',
-  'hbs!./views/app/appHeader',
+  'hbs!./views/app/tmpl/appHeader',
   'views/share/shareView',
   'views/app/troupeSettingsView'
-], function($, _, Backbone, Marionette, TroupeViews, realtime, AppIntegratedView, ChatView, FileView, ConversationView, RequestView,
+], function($, _, Backbone, Marionette, _Helpers, TroupeViews, realtime, AppIntegratedView, ChatView, FileView, ConversationView, RequestView,
             vent, troupeModels, fileModels, conversationModels, userModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView, createTroupeView, headerViewTemplate, shareTroupeView, troupeSettingsView) {
   /*global console:true*/
