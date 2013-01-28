@@ -3,8 +3,8 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!./shareView',
-  'hbs!./shareRow',
+  'hbs!./tmpl/shareView',
+  'hbs!./tmpl/shareRow',
   'zeroClipboard',
   'jquery_placeholder', // No reference
   'jquery_validate'  // No reference

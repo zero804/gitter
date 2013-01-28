@@ -6,10 +6,8 @@ define([
   'backbone',
   'marionette',
   'views/base',
-  'hbs!./troupeListItem'
+  'hbs!./tmpl/troupeListItem'
 ], function($, _, Backbone, Marionette, TroupeViews, troupeListItemTemplate) {
-  /*jslint browser: true*/
-  /*global require */
   "use strict";
 
   var TroupeItemView = Backbone.Marionette.ItemView.extend({

@@ -74,9 +74,9 @@ function filterUsersForPushNotificationEligibility(userIds, callback) {
    var deferUnread = Q.defer();
    var deferAccepting = Q.defer();
 
-  pushNotificationService.findUsersWithDevices(userIds, deferDevices.node());
-  pushNotificationService.findUsersAcceptingNotifications(userIds, deferAccepting.node());
-  unreadItemService.findLastReadTimesForUsers(userIds, deferUnread.node());
+  pushNotificationService.findUsersWithDevices(userIds, deferDevices.makeNodeResolver());
+  pushNotificationService.findUsersAcceptingNotifications(userIds, deferAccepting.makeNodeResolver());
+  unreadItemService.findLastReadTimesForUsers(userIds, deferUnread.makeNodeResolver());
 
   Q.all([deferDevices.promise, deferAccepting.promise, deferUnread.promise]).spread(function(userIds, userIdsAccepting, lastReadTimes) {
     var filteredUsers = [];
@@ -327,7 +327,7 @@ exports.startWorkers = function() {
       var itemIds = notificationTypeHash[itemType];
 
       var d = Q.defer();
-      createNotificationMessage(itemType, itemIds, d.node());
+      createNotificationMessage(itemType, itemIds, d.makeNodeResolver());
       promises.push(d.promise);
     });
 

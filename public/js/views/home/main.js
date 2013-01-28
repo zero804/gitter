@@ -9,7 +9,7 @@ define([
   'views/login/loginRequestModalView'
 ], function($, _, Backbone, TroupeViews, template, RequestModalView) {
   "use strict";
-  
+
   var MainHomeView = Backbone.View.extend({
     events: {
       "click .share":          "shareClicked",
@@ -28,17 +28,17 @@ define([
         this.initialTab = options.params.tab;
       }
     },
-    
+
     render: function() {
       var compiledTemplate = template({ });
       $(this.el).html(compiledTemplate);
       return this;
     },
-    
+
     shareClicked: function() {
       window.troupeApp.showShareDialog();
     }
-    
+
   });
 
   return MainHomeView;

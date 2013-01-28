@@ -4,7 +4,7 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!./loginModalView',
+  'hbs!./tmpl/loginModalView',
   'jquery_placeholder'
 ], function($, _, TroupeViews, template) {
   return TroupeViews.Base.extend({

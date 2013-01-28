@@ -6,7 +6,7 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!./installChromeExtensionModalView'
+  'hbs!./tmpl/installChromeExtensionModalView'
 ], function($, _, TroupeViews, template) {
 
     return TroupeViews.Base.extend({
@@ -16,7 +16,7 @@ define([
     },
 
     // getRenderData: function() {
-      
+
     // },
 
     events: {

@@ -3,10 +3,10 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'hbs!./modal',
+  'hbs!./tmpl/modal',
   '../template/helpers/all',
   'utils/vent',
-  'hbs!./confirmationView'
+  'hbs!./tmpl/confirmationView'
 ], function($, _, Backbone, modalTemplate, helpers, vent, confirmationViewTemplate) {
   /*jshint trailing:false */
   /*global require:true console:true setTimeout:true*/

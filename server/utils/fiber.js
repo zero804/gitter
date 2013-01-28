@@ -14,7 +14,7 @@ function Fiber() {
 // returns a (node style!!) resolver that should be passed as the callback for the async method.
 Fiber.prototype.waitor = function() {
   var d = Q.defer();
-  var resolver = d.node();
+  var resolver = d.makeNodeResolver();
   this.waitingFor.push(d.promise);
 
   return resolver;

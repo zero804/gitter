@@ -4,7 +4,7 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'hbs!./personDetailView',
+  'hbs!./tmpl/personDetailView',
   './confirmRemoveModalView'
 ], function($, _, Backbone, TroupeViews, template, ConfirmRemoveModalView){
   return TroupeViews.Base.extend({
