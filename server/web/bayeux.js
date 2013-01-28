@@ -59,7 +59,6 @@ function validateUserForUserSubscription(options, callback) {
 function validateUserForGenericUserSubscription(options, callback) {
   var userId = options.userId;
   var message = options.message;
-  console.log(options);
 
   message.subscription = "/user/" + userId;
   return callback(null, true);
@@ -261,7 +260,7 @@ server.bind('disconnect', function(clientId) {
     if(!userId) return;
 
     /* Give the user 10 seconds to log back into before reporting that they're disconnected */
-    winston.info("User socket disconnected: ", { userId: userId, clientId: clientId });
+    //winston.debug("User socket disconnected: ", { userId: userId, clientId: clientId });
     setTimeout(function(){
       presenceService.userSocketDisconnected(userId, clientId);
     }, 10000);
