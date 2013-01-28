@@ -59,6 +59,42 @@ module.exports = function( grunt ) {
                     "views/widgets/nav"
                   ],
                   exclude: ["core-libraries"]
+              },
+              {
+                  name: "app-integrated",
+                  include: [
+                    "views/widgets/avatar",
+                    "views/widgets/nav",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "router-mobile-chat",
+                  include: [
+                    "views/widgets/avatar",
+                    "views/widgets/nav",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "router-mobile-files",
+                  include: [
+                    "views/widgets/avatar",
+                    "views/widgets/nav",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "router-mobile-conversations",
+                  include: [
+                    "views/widgets/avatar",
+                    "views/widgets/nav",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
               }
               /*
               {
@@ -103,22 +139,6 @@ module.exports = function( grunt ) {
                     "views/widgets/avatar"
                   ],
                   exclude: ["core-libraries"]
-              },
-              / * Views * /
-              {
-                  name: "views/chat/chatView",
-                  exclude: ["core-libraries","router"]
-              },
-              {
-                  name: "views/file/fileView",
-                  exclude: ["core-libraries","router"]
-              },
-              {
-                  name: "views/conversation/conversationView",
-                  include: [
-                    "views/conversation/conversationDetailView"
-                  ],
-                  exclude: ["core-libraries","router"]
               },
               / *
               {
