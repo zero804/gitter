@@ -87,7 +87,8 @@ require([
         $(document).trigger('userLoggedOutOfTroupe', message);
       }
     }
-
+    if (message.operation === "update")
+      $('.trpHeaderTitle').html(message.model.name);
   });
 
   realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
