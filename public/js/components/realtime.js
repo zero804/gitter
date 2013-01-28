@@ -15,19 +15,24 @@ define([
     callback(message);
   };
 
-  var client = new Faye.Client('/faye');
+  var c = window.troupeContext.websockets;
+  var client = new Faye.Client(c.fayeUrl, c.options);
+  if(c.disable) {
+    for(var i = 0; i < c.length; i++) {
+      client.disable(c.disable[i]);
+    }
+  }
+
   client.addExtension(new ClientAuth());
 
   client.bind('transport:down', function() {
     connected = false;
     // the client is online
-    console.log("TRANSPORT DOWN");
   });
 
   client.bind('transport:up', function() {
     connected = true;
     // the client is online
-    console.log("TRANSPORT UP");
   });
 
   return client;
