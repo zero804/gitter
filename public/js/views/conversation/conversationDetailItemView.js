@@ -8,8 +8,8 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'hbs!views/conversation/conversationDetailItemView',
-  'hbs!views/conversation/conversationDetailItemViewBody',
+  'hbs!./tmpl/conversationDetailItemView',
+  'hbs!./tmpl/conversationDetailItemViewBody',
   'views/widgets/avatar',
   '../../utils/momentWrapper'
 ], function($, _, Backbone, TroupeViews, template, bodyTemplate, AvatarView, moment) {
