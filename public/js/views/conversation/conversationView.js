@@ -5,7 +5,7 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'hbs!views/conversation/conversationView',
+  'hbs!./tmpl/conversationView',
   'collections/conversations',
   'views/conversation/conversationItemView'
 ], function($, _, Backbone, TroupeViews, template, conversationModels, ConversationItemView){
