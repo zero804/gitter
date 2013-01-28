@@ -3,7 +3,7 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!views/widgets/avatar',
+  'hbs!./tmpl/avatar',
   'components/presence-client',
   'bootstrap'
 ], function($, _, TroupeViews, template, presenceClient, _bootstrap) {

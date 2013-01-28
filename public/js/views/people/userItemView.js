@@ -4,7 +4,7 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!./userItemView',
+  'hbs!./tmpl/userItemView',
   './confirmRemoveModalView'
 ], function($, _, TroupeViews, template, ConfirmRemoveModalView) {
   "use strict";

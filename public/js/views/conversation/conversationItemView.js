@@ -6,7 +6,7 @@ define([
   'backbone',
   'views/base',
   'utils/vent',
-  'hbs!views/conversation/conversationItemView'
+  'hbs!./tmpl/conversationItemView'
 ], function($, _, Backbone, TroupeViews, vent, template) {
   "use strict";
 

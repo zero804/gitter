@@ -4,7 +4,7 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!./profileView',
+  'hbs!./tmpl/profileView',
   'fineuploader',
   'jquery_placeholder'
 ], function($, _, TroupeViews, template, qq) {

@@ -6,7 +6,7 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!./confirmRemoveModalView'
+  'hbs!./tmpl/confirmRemoveModalView'
 ], function($, _, TroupeViews, template) {
 
     return TroupeViews.Base.extend({

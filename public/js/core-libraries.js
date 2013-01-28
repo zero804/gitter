@@ -1,11 +1,10 @@
 /*jshint unused:true browser:true*/
 define([
-  'jquery',
   'underscore',
+  'jquery',
   'backbone',
-  'now',
   'handlebars',
   'hbs'
-], function($,_,Backbone,now,Handlebars,hbs) {
+], function() {
   return null;
 });

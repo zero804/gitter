@@ -5,7 +5,7 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'hbs!./chatViewItem'
+  'hbs!./tmpl/chatViewItem'
  ], function($, _, Backbone, TroupeViews, template) {
   /* jshint browser:true unused:true */
   "use strict";

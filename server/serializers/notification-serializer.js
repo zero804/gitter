@@ -15,7 +15,7 @@ function execPreloads(preloads, callback) {
 
   var promises = preloads.map(function(i) {
     var deferred = Q.defer();
-    i.strategy.preload(i.data, deferred.node());
+    i.strategy.preload(i.data, deferred.makeNodeResolver());
     return deferred.promise;
   });
 

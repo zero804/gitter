@@ -1,0 +1,3 @@
+[submodule "public/js/libs/hbs/hbs-master"]
+	path = public/js/libs/hbs/hbs-master
+url=https://github.com/SlexAxton/require-handlebars-plugin.git

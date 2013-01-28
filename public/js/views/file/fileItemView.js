@@ -6,10 +6,8 @@ define([
   'marionette',
   'views/base',
   'views/rivets-backbone',
-  'hbs!./fileItemView',
-  './filePreviewView',
-  './fileVersionsView'
-], function($, _, Backbone, Marionette, TroupeViews, rivet, template, FilePreviewView, FileVersionsView) {
+  'hbs!./tmpl/fileItemView'
+], function($, _, Backbone, Marionette, TroupeViews, rivet, template) {
   /*jslint browser: true*/
   "use strict";
 
