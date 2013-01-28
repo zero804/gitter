@@ -164,106 +164,6 @@ module.exports = function( grunt ) {
       }
     },
 
-    requirejs2: {
-      appDir: "public/",
-      baseUrl: "js",
-      dir: "public-processed/",
-      mainConfigFile: 'public/templates/partials/require_config.hbs',
-
-      modules: [
-          {
-            name: "core-libraries"
-          },
-          {
-              name: "signup",
-              exclude: ["core-libraries"]
-          },
-          {
-              name: "router-core",
-              include: [
-                "views/widgets/avatar",
-                "views/widgets/nav"
-              ],
-              exclude: ["core-libraries"]
-          },
-          {
-              name: "router",
-              include: [
-                "views/widgets/avatar",
-                "views/widgets/nav"
-              ],
-              exclude: ["core-libraries"]
-          },
-          {
-              name: "router-login",
-              include: [
-                "views/widgets/avatar"
-              ],
-              exclude: ["core-libraries"]
-          },
-          {
-              name: "router-mobile-chat",
-              include: [
-                "views/widgets/avatar"
-              ],
-              exclude: ["core-libraries"]
-          },
-          {
-              name: "router-mobile-files",
-              include: [
-                "views/widgets/avatar"
-              ],
-              exclude: ["core-libraries"]
-          },
-          {
-              name: "router-mobile-conversations",
-              include: [
-                "views/widgets/avatar"
-              ],
-              exclude: ["core-libraries"]
-          },
-          {
-              name: "router-mobile-people",
-              include: [
-                "views/widgets/avatar"
-              ],
-              exclude: ["core-libraries"]
-          },
-          /* Views */
-          {
-              name: "views/chat/chatView",
-              exclude: ["core-libraries","router"]
-          },
-          {
-              name: "views/file/fileView",
-              exclude: ["core-libraries","router"]
-          },
-          {
-              name: "views/conversation/conversationView",
-              include: [
-                "views/conversation/conversationDetailView"
-              ],
-              exclude: ["core-libraries","router"]
-          },
-          {
-              name: "views/people/peopleView",
-              exclude: ["core-libraries","router"]
-          },
-          {
-              name: "views/profile/profileView",
-              exclude: ["core-libraries","router"]
-          }
-      ],
-
-      optimize: "none",
-      optimizeCss: "none",
-
-      // inlining ftw
-      inlineText: true,
-
-      logLevel: 5
-    },
-
     // headless testing through PhantomJS
     mocha: {
       all: ['test/**/*.html']
@@ -328,6 +228,10 @@ module.exports = function( grunt ) {
         src: ['public-processed/js/core-libraries.js'],
         dest: 'public-processed/js/core-libraries.js'
       },
+      "app-integrated": {
+        src: ['public-processed/js/app-integrated.js'],
+        dest: 'public-processed/js/app-integrated.js'
+      },
       "router-mobile-chat": {
         src: ['public-processed/js/router-mobile-chat.js'],
         dest: 'public-processed/js/router-mobile-chat.js'
@@ -355,10 +259,6 @@ module.exports = function( grunt ) {
       "peopleView": {
         src: ['public-processed/js/views/people/peopleView.js'],
         dest: 'public-processed/js/views/people/peopleView.js'
-      },
-      "profileView": {
-        src: ['views/profile/profileView.js'],
-        dest: 'views/profile/profileView.js'
       }
     },
 
