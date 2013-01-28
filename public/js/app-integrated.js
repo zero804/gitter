@@ -29,10 +29,11 @@ require([
   'views/share/shareView',
   'views/signup/createTroupeView',
   'hbs!./views/app/appHeader',
-  'views/share/shareView'
+  'views/share/shareView',
+  'views/app/troupeSettingsView'
 ], function($, _, Backbone, Marionette, TroupeViews, realtime, AppIntegratedView, ChatView, FileView, ConversationView, RequestView,
             vent, troupeModels, fileModels, conversationModels, userModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
-            RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView, createTroupeView, headerViewTemplate, shareTroupeView) {
+            RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView, createTroupeView, headerViewTemplate, shareTroupeView, troupeSettingsView) {
   /*global console:true*/
   "use strict";
 
@@ -86,7 +87,8 @@ require([
         $(document).trigger('userLoggedOutOfTroupe', message);
       }
     }
-
+    if (message.operation === "update")
+      $('.trpHeaderTitle').html(message.model.name);
   });
 
   realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
@@ -143,7 +145,8 @@ require([
         { re: /^profile$/,                viewType: profileView.Modal },
         { re: /^share$/,                  viewType: shareView.Modal },
         { re: /^create$/,                 viewType: createTroupeView.Modal },
-        { re: /^shareTroupe/,            viewType: shareTroupeView.Modal }
+        { re: /^shareTroupe/,             viewType: shareTroupeView.Modal },
+        { re: /^troupeSettings/,          viewType: troupeSettingsView }
 
       ];
 

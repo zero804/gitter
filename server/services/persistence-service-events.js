@@ -91,5 +91,8 @@ exports.install = function(persistenceService) {
   attachNotificationListenersToSchema(schemas.ChatMessageSchema, 'chat', function(model) {
     return "/troupes/" + model.toTroupeId + "/chatMessages";
   });
+  attachNotificationListenersToSchema(schemas.TroupeSchema, 'troupe', function(model) {
+    return "/troupes/" + model.id;
+  });
 
 };
