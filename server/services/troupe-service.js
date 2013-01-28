@@ -333,6 +333,18 @@ function findUsersForTroupe(troupeId, callback) {
   });
 }
 
+function updateTroupeName(troupeId, troupeName, callback) {
+  findById(troupeId, function(err, troupe) {
+    if (err) return callback(err);
+    if (!troupe) return callback("Troupe not found");
+
+    troupe.name = troupeName;
+    troupe.save(function(err) {
+      callback(err, troupe);
+    });
+  });
+}
+
 module.exports = {
   findByUri: findByUri,
   findById: findById,
@@ -357,5 +369,6 @@ module.exports = {
   rejectRequest: rejectRequest,
   removeUserFromTroupe: removeUserFromTroupe,
   findUsersForTroupe: findUsersForTroupe,
-  validateTroupeUrisForUser: validateTroupeUrisForUser
+  validateTroupeUrisForUser: validateTroupeUrisForUser,
+  updateTroupeName: updateTroupeName
 };
