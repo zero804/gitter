@@ -7,7 +7,7 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'hbs!./people',
+  'hbs!./tmpl/people',
   'views/confirmDialog',
   'views/share/shareModalView',
   './userTabView',

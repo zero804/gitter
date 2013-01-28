@@ -5,7 +5,7 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'hbs!./fileVersionsView',
+  'hbs!./tmpl/fileVersionsView',
   './versionView'
 ], function($, _, Backbone, TroupeViews, template, VersionView){
   var View = TroupeViews.Base.extend({

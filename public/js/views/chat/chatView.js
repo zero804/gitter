@@ -6,7 +6,7 @@ define([
   'backbone',
   'bootstrap',
   'views/base',
-  'hbs!./chat',
+  'hbs!./tmpl/chat',
   './chatViewItem',
   'collections/chat',
   '../../utils/momentWrapper'

@@ -7,9 +7,11 @@ var express = require('express'),
   handlebars = require('handlebars'),
   expressHbs = require('express-hbs'),
   winston = require('winston'),
-  http = require('./http'),
   fineuploaderExpressMiddleware = require('fineuploader-express-middleware'),
   fs = require('fs');
+
+// Naughty naughty naught, install some extra methods on the express prototype
+require('./http');
 
 function ios6PostCachingFix() {
   return function(req, res, next) {

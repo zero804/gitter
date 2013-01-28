@@ -46,11 +46,11 @@ function renderAppPage(req, res, next, page) {
 
     }
 
-    function getNowJsUrl(req) {
-      var url = nconf.get('ws:nowjsUrl');
+    function getFayeUrl() {
+      var url = nconf.get('ws:fayeUrl');
       if(url) return url;
 
-      return req.protocol + "://" + req.headers.host;
+      return "/faye";
     }
 
     function renderPage(unreadItems, serializedUser, accessToken) {
@@ -83,14 +83,12 @@ function renderAppPage(req, res, next, page) {
           accessDenied: accessDenied,
           basePath: nconf.get('web:basepath'),
           websockets: {
-            nowjs: getNowJsUrl(req),
+            fayeUrl: getFayeUrl(),
             options: {
-              // Temporary fix to see if getting rid of websockets
-              // Sorts out out ios crashes
-              socketio: {
-                  "transports": ["xhr-polling"]
-              }
-            }
+              timeout: 120,
+              retry: 5
+            },
+            disable: ['websocket']
           }
 
 

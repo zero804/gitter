@@ -35,3 +35,4 @@ scripts/populate-geonames/data/readme.txt
 config.user-overrides.json
 scripts/mongo-backup-*
 public/bootstrap/less/*.css
+node_modules_2

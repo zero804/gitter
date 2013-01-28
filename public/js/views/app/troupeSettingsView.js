@@ -1,6 +1,6 @@
 define([
   'views/base',
-  'hbs!./troupeSettingsTemplate'
+  'hbs!./tmpl/troupeSettingsTemplate'
 ], function(TroupeViews, troupeSettingsTemplate) {
 
   return TroupeViews.Modal.extend({

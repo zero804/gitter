@@ -94,7 +94,7 @@ function compareHashSums(gridFileName, temporaryFile, callback) {
     gs.close(function(/*err*/) {});
   });
 
-  calculateMd5ForFile(temporaryFile, fsOp.node());
+  calculateMd5ForFile(temporaryFile, fsOp.makeNodeResolver());
 
   Q.all([gsOp.promise, fsOp.promise]).spread(function(gsMd5, fsMd5) {
     callback(null, gsMd5 === fsMd5);

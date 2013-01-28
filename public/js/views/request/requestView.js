@@ -1,7 +1,7 @@
 define([
   'views/base',
-  'hbs!./requestView',
-  'hbs!./requestItemView'
+  'hbs!./tmpl/requestView',
+  'hbs!./tmpl/requestItemView'
 ], function(TroupeViews, requestViewTemplate, requestItemViewTemplate) {
 
   var RequestItemView = TroupeViews.Base.extend({

@@ -4,6 +4,10 @@
 var nconf = require('../utils/config');
 var fs = require("fs");
 
+// What version of requirejs should the client be loading?
+var REQUIREJS_VERSION = "2.1.4";
+
+// Look through the CDNS
 var cdnId = -1;
 
 function passthrough(url) {
@@ -56,7 +60,7 @@ exports.bootScript = function(url) {
   var requireScript;
 
   if(minified) {
-    requireScript = exports.cdn("js/libs/require/2.0.6/require-min.js");
+    requireScript = exports.cdn("js/libs/require/" + REQUIREJS_VERSION + "/require-min.js");
     var baseUrl = exports.cdn("js/");
 
     return "<script src='" + requireScript + "' type='text/javascript'></script>\n" +
@@ -64,7 +68,7 @@ exports.bootScript = function(url) {
 
   }
 
-  requireScript = exports.cdn("js/libs/require/2.0.6/require.js");
+  requireScript = exports.cdn("js/libs/require/" + REQUIREJS_VERSION + "/require.js");
   return "<script data-main='" + scriptLocation + ".js' src='" + requireScript + "' type='text/javascript'></script>";
 
 };

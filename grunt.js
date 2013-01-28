@@ -36,7 +36,115 @@ module.exports = function( grunt ) {
       all: ["public/**/*.hbs"]
     },
 
-    requirejs: {
+  requirejs: {
+      compile: {
+        options: {
+          appDir: "public/",
+          baseUrl: "js",
+          dir: "public-processed/",
+          mainConfigFile: 'public/templates/partials/require_config.hbs',
+
+          modules: [
+              {
+                name: "core-libraries"
+              },
+              {
+                  name: "signup",
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "router-core",
+                  include: [
+                    "views/widgets/avatar",
+                    "views/widgets/nav"
+                  ],
+                  exclude: ["core-libraries"]
+              }
+              /*
+              {
+                  name: "router",
+                  include: [
+                    "views/widgets/avatar",
+                    "views/widgets/nav"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "router-login",
+                  include: [
+                    "views/widgets/avatar"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "router-mobile-chat",
+                  include: [
+                    "views/widgets/avatar"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "router-mobile-files",
+                  include: [
+                    "views/widgets/avatar"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "router-mobile-conversations",
+                  include: [
+                    "views/widgets/avatar"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "router-mobile-people",
+                  include: [
+                    "views/widgets/avatar"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              / * Views * /
+              {
+                  name: "views/chat/chatView",
+                  exclude: ["core-libraries","router"]
+              },
+              {
+                  name: "views/file/fileView",
+                  exclude: ["core-libraries","router"]
+              },
+              {
+                  name: "views/conversation/conversationView",
+                  include: [
+                    "views/conversation/conversationDetailView"
+                  ],
+                  exclude: ["core-libraries","router"]
+              },
+              / *
+              {
+                  name: "views/people/peopleView",
+                  exclude: ["core-libraries","router"]
+              },
+              * /
+              {
+                  name: "views/profile/profileView",
+                  exclude: ["core-libraries","router"]
+              }
+              */
+          ],
+
+          optimize: "none",
+          optimizeCss: "none",
+
+          // inlining ftw
+          inlineText: true,
+
+          logLevel: 1
+        }
+      }
+    },
+
+    requirejs2: {
       appDir: "public/",
       baseUrl: "js",
       dir: "public-processed/",
@@ -133,7 +241,7 @@ module.exports = function( grunt ) {
       // inlining ftw
       inlineText: true,
 
-      logLevel: 1
+      logLevel: 5
     },
 
     // headless testing through PhantomJS
@@ -273,7 +381,6 @@ module.exports = function( grunt ) {
 
   });
 
-  grunt.loadNpmTasks('grunt-bower');
   grunt.loadNpmTasks('grunt-contrib-manifest');
   grunt.loadNpmTasks('grunt-requirejs');
   grunt.loadNpmTasks('grunt-contrib-less');
@@ -281,7 +388,6 @@ module.exports = function( grunt ) {
   grunt.loadNpmTasks('grunt-exec');
   grunt.loadNpmTasks('grunt-clean');
   grunt.loadNpmTasks('grunt-reload');
-  grunt.loadNpmTasks('grunt-html');
 
   grunt.registerTask('process', 'clean less copy requirejs min exec:gzip');
   grunt.registerTask('watchr', 'reload watch');
