@@ -16,12 +16,13 @@ define([
       _.bindAll(this, 'onFormSubmit', 'onPasswordChange');
       if (!options) return;
       this.existingUser = options.existingUser;
+      this.isExistingUser = !window.troupeContext.profileNotCompleted;
     },
 
     getRenderData: function() {
       var d = {
         user: window.troupeContext.user,
-        existingUser: !window.troupeContext.profileNotCompleted,
+        existingUser: this.isExistingUser,
         // displayName: this.existingUser ? window.troupeContext.user.displayName : ""
         displayName: window.troupeContext.user.displayName
       };
@@ -77,7 +78,7 @@ define([
     },
 
     onPasswordChange: function(e) {
-      if(!this.existingUser) return;
+      if(!this.isExistingUser) return;
       var pw = this.$el.find('#password');
       if(!pw.val()) return;
 
