@@ -258,24 +258,24 @@ function generateNotificationForUrl(url) {
 
 /* TODO: make sure only one of these gets installed for the whole app */
 exports.installListener = function() {
-    appEvents.onDataChange2(function(data) {
-      var url = data.url;
-      var operation = data.operation;
-      var model = data.model;
-      var modelId = data.model.id;
 
-      var info = generateNotificationForUrl(url);
-      if(!info) {
-        return;
-      }
+  appEvents.onDataChange2(function(data) {
+    var url = data.url;
+    var operation = data.operation;
+    var model = data.model;
+    var modelId = data.model.id;
 
-      if(operation === 'create') {
-        var creatingUserId = findCreatingUserIdModel(info.modelName, model);
-        exports.newItem(info.troupeId, creatingUserId, info.modelName, modelId);
-      } else if(operation === 'remove') {
-        exports.removeItem(info.troupeId, info.modelName, modelId);
-      }
+    var info = generateNotificationForUrl(url);
+    if(!info) {
+      return;
+    }
 
+    if(operation === 'create') {
+      var creatingUserId = findCreatingUserIdModel(info.modelName, model);
+      exports.newItem(info.troupeId, creatingUserId, info.modelName, modelId);
+    } else if(operation === 'remove') {
+      exports.removeItem(info.troupeId, info.modelName, modelId);
+    }
 
   });
 };

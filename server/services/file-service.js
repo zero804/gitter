@@ -9,18 +9,19 @@ var Q = require("q");
 var crypto = require('crypto');
 var fs = require('fs');
 var thumbnailPreviewGeneratorService = require("./thumbnail-preview-generator-service");
+var mongooseUtils = require('../utils/mongoose-utils');
 
 /* private */
-function createFileName(fileId, version) {
+function getMainFileName(fileId, version) {
   return "attachment:" + fileId + ":" + version;
 }
 
 /* TODO: remove all referneced to embedded, we're calling them preview from now on */
-function createEmbeddedFileName(fileId, version) {
+function getEmbeddedFileName(fileId, version) {
   return "preview:" + fileId + ":" + version;
 }
 
-function createThumbNailFileName(fileId, version) {
+function getThumbnailFileName(fileId, version) {
   return "thumb:" + fileId + ":" + version;
 }
 
@@ -37,7 +38,7 @@ function uploadFileToGrid(file, version, temporaryFile, callback) {
 
   var db = mongoose.connection.db;
   var GridStore = mongoose.mongo.GridStore;
-  var gridFileName = createFileName(file.id, version);
+  var gridFileName = getMainFileName(file.id, version);
   var gs = new GridStore(db, gridFileName, "w", {
       "content_type": file.mimeType,
       "metadata":{
@@ -108,7 +109,7 @@ function compareHashSums(gridFileName, temporaryFile, callback) {
 function checkIfFileExistsAndIdentical(file, version, temporaryFile, callback) {
   var db = mongoose.connection.db;
   var GridStore = mongoose.mongo.GridStore;
-  var gridFileName = createFileName(file.id, version);
+  var gridFileName = getMainFileName(file.id, version);
 
   GridStore.exist(db, gridFileName, function(err, result) {
     if (err) return callback(err);
@@ -166,19 +167,19 @@ function locateAndStream(troupeId, fileName, version, presentedEtag, gridFileNam
 
 function getFileEmbeddedStream(troupeId, fileName, version, presentedEtag, callback) {
   locateAndStream(troupeId, fileName, version, presentedEtag, function(fileId, version) {
-    return createEmbeddedFileName(fileId, version);
+    return getEmbeddedFileName(fileId, version);
   }, callback);
 }
 
 function getThumbnailStream(troupeId, fileName, version, presentedEtag, callback) {
   locateAndStream(troupeId, fileName, version, presentedEtag, function(fileId, version) {
-    return createThumbNailFileName(fileId, version);
+    return getThumbnailFileName(fileId, version);
   }, callback);
 }
 
 function getFileStream(troupeId, fileName, version, presentedEtag, callback) {
   locateAndStream(troupeId, fileName, version, presentedEtag, function(fileId, version) {
-    return createFileName(fileId, version);
+    return getMainFileName(fileId, version);
   }, callback);
 }
 
@@ -277,8 +278,6 @@ function storeFileVersionInGrid(options, callback) {
 }
 
 function storeFile(options, callback) {
-  winston.debug("storeFile");
-
   var fileName = options.fileName;
   var mimeType = options.mimeType;
 
@@ -310,6 +309,33 @@ function findByIds(ids, callback) {
     .exec(callback);
 }
 
+function deleteFileFromGridStore(fileName, callback) {
+  if(!callback) callback = function(err) {
+    if(err) winston.error("Error while deleting file from gridstore: ", { fileName: fileName, exception: err } );
+  };
+
+  winston.debug("Deleting file from gridstore: ", { fileName: fileName } );
+
+  var db = mongoose.connection.db;
+  var GridStore = mongoose.mongo.GridStore;
+
+  GridStore.unlink(db, fileName, callback);
+}
+
+mongooseUtils.attachNotificationListenersToSchema(persistence.schemas.FileSchema, {
+  onRemove: function(model) {
+    var versions = model.versions;
+    var fileId = model.id;
+
+    versions.forEach(function(fileVersion, index) {
+      var version = index + 1;
+      deleteFileFromGridStore(getMainFileName(fileId, version));
+      deleteFileFromGridStore(getEmbeddedFileName(fileId, version));
+      deleteFileFromGridStore(getThumbnailFileName(fileId, version));
+    });
+  }
+});
+
 module.exports = {
   findByTroupe: findByTroupe,
   findById: findById,
@@ -318,5 +344,10 @@ module.exports = {
   storeFile: storeFile,
   getFileStream: getFileStream,
   getFileEmbeddedStream: getFileEmbeddedStream,
-  getThumbnailStream: getThumbnailStream
-};
+  getThumbnailStream: getThumbnailStream,
+
+  /* For Testing */
+  getMainFileName:getMainFileName,
+  getEmbeddedFileName: getEmbeddedFileName,
+  getThumbnailFileName: getThumbnailFileName
+}
