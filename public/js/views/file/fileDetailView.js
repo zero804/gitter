@@ -9,6 +9,7 @@ define([
   './versionView'
 ], function($, _, Backbone, TroupeViews, template, VersionView){
   return TroupeViews.Base.extend({
+    unreadItemType: 'file',
     template: template,
     buttonMenu : false,
     events: {
