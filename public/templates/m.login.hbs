@@ -13,15 +13,14 @@
   <title>Troupe Login</title>
 
   <link rel="stylesheet" href='{{cdn "bootstrap/css/mtrp.css" }}'>
-  <link href='https://fonts.googleapis.com/css?family=Lustria' rel='stylesheet' type='text/css'>
-  <link href='https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:200' rel='stylesheet' type='text/css'>
-  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
   <link rel="shortcut icon" href="images/favicon.ico">
 
 
   {{>require_wrapper}}
 
   <script data-main='{{cdn "js/login.js" }}' src='{{cdn "js/libs/require/2.0.4/require.js"}}'></script>
+
+  {{>load_font_css}}
 
 </head>
 
@@ -46,7 +45,7 @@
 
     <div class="mtrpSignupForm" id="panel-signup">
       Sorry, Troupe is invite only<br> at the moment<br>
-      <a href="#" class="mtrpLoginBack trpButtonBig trpBtnWhite" id="button-back">Back</a>
+      <!-- <a href="#" class="mtrpLoginBack trpButtonBig trpBtnWhite" id="button-back">Back</a>-->
     </div>
 
    <div class="mtrpLoginFailure" id="panel-failure">
