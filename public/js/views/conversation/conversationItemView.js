@@ -5,15 +5,14 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'utils/vent',
   'hbs!./tmpl/conversationItemView'
-], function($, _, Backbone, TroupeViews, vent, template) {
+], function($, _, Backbone, TroupeViews, template) {
   "use strict";
 
   var ConversationItemView = TroupeViews.Base.extend({
     template: template,
 
-    initialize: function(options) {
+    initialize: function() {
     },
 
     getRenderData: function() {

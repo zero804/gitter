@@ -5,9 +5,8 @@ define([
   'backbone',
   'hbs!./tmpl/modal',
   '../template/helpers/all',
-  'utils/vent',
   'hbs!./tmpl/confirmationView'
-], function($, _, Backbone, modalTemplate, helpers, vent, confirmationViewTemplate) {
+], function($, _, Backbone, modalTemplate, helpers, confirmationViewTemplate) {
   /*jshint trailing:false */
   /*global require:true console:true setTimeout:true*/
   "use strict";
@@ -243,10 +242,6 @@ define([
     },
 
     show: function() {
-      if(this.options.navigable) {
-        vent.trigger('navigable-dialog:open', this);
-      }
-
       this.view.dialog = this;
 
       var that = this;

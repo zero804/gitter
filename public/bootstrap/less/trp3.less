@@ -1,7 +1,7 @@
 @import "bootstrap.less";
 
 @import "trpColours.less";
-@import "trpWebFonts.less";
+//@import "trpWebFonts.less";
 @import "trpFonts.less";
 
 @import "trpModals.less";
@@ -14,6 +14,9 @@
 @import "trp3People.less";
 
 @import "../../js/libs/fineuploader/3.1.1/fineuploader.less";
+
+@import "../../js/libs/notyfy/jquery.notyfy.less";
+@import "../../js/libs/notyfy/default.less";
 
 html {
 	min-height: 100%;
@@ -300,7 +303,7 @@ a:hover {
 }
 
 .trpToolbarHeader {
-	font-family: 'Open Sans';
+	font-family: @fontSans;
 	font-size: 12px;
 	text-transform: uppercase;
 	padding-bottom: 4px;
