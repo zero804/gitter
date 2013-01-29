@@ -116,6 +116,12 @@ exports.install = function(server) {
   appEvents.onNewUnreadItem(function(data) {
     var userId = data.userId;
     var items = data.items;
+
+    bayeuxClient.publish("/user/" + userId, {
+      notification: "unread_items",
+      items: items
+    });
+
   });
 
   appEvents.onUnreadItemsRemoved(function(data) {

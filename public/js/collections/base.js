@@ -77,18 +77,6 @@ define([
       }
     },
 
-    reset: function() {
-      var r = Backbone.Collection.prototype.reset.apply(this, arguments);
-      $(document).trigger('collectionReset');
-      return r;
-    },
-
-    add: function() {
-      var r = Backbone.Collection.prototype.add.apply(this, arguments);
-      $(document).trigger('collectionAdd');
-      return r;
-    },
-
     listen: function() {
       if(this.subscription) return;
       var self = this;

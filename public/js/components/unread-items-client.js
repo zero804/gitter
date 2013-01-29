@@ -105,7 +105,7 @@ define([
       var itemType = $e.data('itemType');
       var itemId = $e.data('itemId');
 
-      console.log("itemType ", itemType, "itemId", itemId);
+      console.log("found an unread item: itemType ", itemType, "itemId", itemId);
 
       if(itemType && itemId) {
         var top = $e.offset().top;
@@ -129,20 +129,23 @@ define([
 
   $(window).on('scroll', windowScroll);
 
+  $(document).on('unreadItemDisplayed', function() {
+    windowScroll();
+  });
+/*
   $(document).on('collectionReset', function() {
-    windowScrollOnTimeout();
+    windowScroll();
   });
 
   $(document).on('collectionAdd', function() {
-    windowScrollOnTimeout();
+    windowScroll();
   });
+*/
 
-  $(document).on('newUnreadItems', function(event, data) {
-    console.log("newUnreadItems", data);
-
-    var itemTypes = _.keys(data);
+  function newUnreadItems(items) {
+    var itemTypes = _.keys(items);
     _.each(itemTypes, function(itemType) {
-      var ids = data[itemType];
+      var ids = items[itemType];
 
       var filtered = _.filter(ids, function(itemId) { return !recentlyMarkedRead[itemType + "/" + itemId]; });
 
@@ -159,13 +162,12 @@ define([
     });
 
     syncCounts();
-  });
+  }
 
-
-  $(document).on('unreadItemsRemoved', function(event, data) {
-    var itemTypes = _.keys(data);
+  function unreadItemsRemoved(items) {
+    var itemTypes = _.keys(items);
     _.each(itemTypes, function(itemType) {
-      var ids = data[itemType];
+      var ids = items[itemType];
 
       if(unreadItems[itemType]) {
         unreadItems[itemType] = _.without(unreadItems[itemType], ids);
@@ -173,7 +175,7 @@ define([
     });
 
     syncCounts();
-  });
+  }
 
 
   return {
@@ -181,6 +183,7 @@ define([
       var v = unreadItems[itemType];
       return v ? v.length : 0;
     },
+
     installTroupeListener: function(troupeCollection) {
       function recount() {
           var newTroupeUnreadTotal = _(troupeUnreadCounts).values().reduce(function(a, b) { return a + b; });
@@ -207,10 +210,13 @@ define([
           if(model) {
             model.set('unreadItems', totalUnreadItems);
           } else {
-            console.log("Cannot find model. Refresh might be required....")
+            console.log("Cannot find model. Refresh might be required....");
           }
           recount();
-
+        } else if(message.notification === 'unread_items') {
+          newUnreadItems(message.items);
+        } else if(message.notification === 'unread_items_removed') {
+          unreadItemsRemoved(message.items);
         }
       });
     }
