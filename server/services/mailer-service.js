@@ -11,6 +11,8 @@ exports.startWorkers = function() {
       nconf = require('../utils/config'),
       winston = require("winston");
 
+  var logEmailToLogger = nconf.get('logging:logEmailContents');
+
   var sesTransport = nodemailer.createTransport("SES", {
       AWSAccessKeyID: nconf.get("amazon:accessKey"),
       AWSSecretKey: nconf.get("amazon:secretKey")
@@ -27,6 +29,9 @@ exports.startWorkers = function() {
         if(err) return winston.error("Unable to load template", { exception: err });
 
         var plaintext = plaintextTemplate(options.data);
+        if(logEmailToLogger) {
+          winston.info("Sending email", plaintext);
+        }
 
         sesTransport.sendMail({
           from: options.from,
