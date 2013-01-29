@@ -31,11 +31,12 @@ require([
   'hbs!./views/app/tmpl/appHeader',
   'views/share/shareView',
   'views/app/troupeSettingsView',
-  'components/webNotifications'
+  'components/webNotifications',
+  'components/unread-items-client'
 ], function($, _, Backbone, Marionette, _Helpers, TroupeViews, realtime, AppIntegratedView, ChatView, FileView, ConversationView, RequestView,
             troupeModels, fileModels, conversationModels, userModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView, createTroupeView, headerViewTemplate, shareTroupeView,
-            troupeSettingsView, webNotifications) {
+            troupeSettingsView, webNotifications, unreadItemsClient) {
   /*global console:true*/
   "use strict";
 
@@ -93,9 +94,7 @@ require([
       $('.trpHeaderTitle').html(message.model.name);
   });
 
-  realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
-    console.log("User message!", message);
-  });
+
 
   /* This is a special region which acts like a region, but is implemented completely differently */
   app.dialogRegion = {
@@ -288,8 +287,9 @@ require([
 
     // Troupe Collections
     troupeCollection = new troupeModels.TroupeCollection();
-    troupeCollection.fetch();
+    unreadItemsClient.installTroupeListener(troupeCollection);
 
+    troupeCollection.fetch();
     var troupeCollectionView = new TroupeCollectionView({
       collection: troupeCollection
     });
