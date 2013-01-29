@@ -16,9 +16,9 @@ define([
 
     var n = $('<div class="notification"></div>');
     n.html(content);
-    n.hide().appendTo(container).show('slow');
+    n.hide().appendTo(container).slideDown();
     setTimeout(function() {
-      n.hide();
+      n.slideUp();
     }, timeout);
   };
 
