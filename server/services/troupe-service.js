@@ -178,6 +178,9 @@ function addInvite(troupe, senderDisplayName, displayName, email) {
   invite.code = code;
   invite.save();
 
+  // TODO: should we treat registered users differently from unregistered people?
+  // At the moment, we treat them all the same...
+
   emailNotificationService.sendInvite(troupe, displayName, email, code, senderDisplayName);
 }
 
