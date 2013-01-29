@@ -48,6 +48,10 @@ function republishUnreadItemCountForUserTroupe(userId, troupeId, callback) {
 }
 
 exports.newItem = function(troupeId, creatorUserId, itemType, itemId) {
+  if(!troupeId) { winston.error("newitem failed. Troupe cannot be null"); return; }
+  if(!itemType) { winston.error("newitem failed. itemType cannot be null"); return; }
+  if(!itemId) { winston.error("newitem failed. itemId cannot be null"); return; }
+
   troupeService.findById(troupeId, function(err, troupe) {
     if(err) return winston.error("Unable to load troupeId " + troupeId, err);
     var userIds = troupe.getUserIds();
@@ -58,7 +62,8 @@ exports.newItem = function(troupeId, creatorUserId, itemType, itemId) {
       // multi chain with an individual callback
     var multi = redisClient.multi();
     userIds.forEach(function(userId) {
-      if(!creatorUserId || userId != creatorUserId) {
+      console.log(">>>>>>> ", creatorUserId, userId);
+      if(!creatorUserId || (("" + userId) != ("" + creatorUserId))) {
         appEvents.newUnreadItem(userId, troupeId, data);
 
         multi.sadd("unread:" + itemType + ":" + userId + ":" + troupeId, itemId);
@@ -215,13 +220,13 @@ exports.getUnreadItemsForUser = function(userId, troupeId, callback) {
 
 /* TODO: make this better, more OO-ey */
 function findCreatingUserIdModel(modelName, model) {
-
+  console.log(">>>> findCreatingUserIdModel", modelName, model);
   switch(modelName) {
     case "file":
-      return model.versions[model.versions.length - 1].creatorUserId;
+      return model.versions[model.versions.length - 1].creatorUser.id;
 
     case "chat":
-      return model.fromUserId;
+      return model.fromUser.id;
 
     case "invite":
     case "request":

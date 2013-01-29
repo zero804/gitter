@@ -29,6 +29,8 @@ define([
   /* This value is used by the dialogFragment Handlebars helper */
   window._troupeCompactView = compactView;
 
+  var cachedWidgets = {};
+
   TroupeViews.Base = Backbone.View.extend({
     template: null,
     autoClose: true,
@@ -50,7 +52,6 @@ define([
     },
 
     rerenderOnChange: function() {
-      console.log("RERENDER ON CHANGE");
       this.removeSubViews(this.$el);
       this.render();
     },
@@ -77,23 +78,46 @@ define([
     },
 
     renderInternal: function(data) {
-      function replaceElementWithWidget(element, options) {
-          require(['views/widgets/' + options.widgetName], function(Widget) {
-            var widget = new Widget(options.model);
-            widget.render();
-            $(element).replaceWith(widget.el);
-          });
+      function replaceElementWithWidget(element, Widget, options) {
+          var widget = new Widget(options.model);
+          widget.render();
+          $(element).replaceWith(widget.el);
       }
 
 
       var dom = $(this.template(data));
+      dom.addClass("view");
+
       if(data.renderViews) {
         dom.find('view').each(function () {
           var id = this.getAttribute('data-id'),
           attrs = data.renderViews[id];
-          replaceElementWithWidget(this, attrs);
+          var self = this;
+          var CachedWidget = cachedWidgets[attrs.widgetName];
+          if(CachedWidget) {
+            replaceElementWithWidget(this, CachedWidget, attrs);
+          } else {
+            require(['views/widgets/' + attrs.widgetName], function(Widget) {
+              cachedWidgets[attrs.widgetName] = Widget;
+              replaceElementWithWidget(self, Widget, attrs);
+            });
+          }
         });
       }
+
+      if(this.model && this.unreadItemType) {
+        var id = this.model.get('id');
+        if(!id) id = this.model.cid;
+
+        dom.addClass('model-id-' + id);
+        if(this.model.get('unread')) {
+          dom.addClass('unread');
+          dom.data('itemId', id);
+          dom.data('itemType', this.unreadItemType);
+          $(document).trigger('unreadItemDisplayed');
+        }
+      }
+
       this.$el.html(dom);
       return dom;
     },
@@ -104,26 +128,10 @@ define([
         data.compactView = compactView;
       }
 
-      var dom = this.renderInternal(data);
-      if(this.model) {
-        var id = this.model.get('id');
-        if(!id) id = this.model.cid;
-        var e = this.$el;
-
-        e.addClass('model-id-' + id);
-        if(this.model.get('unread')) {
-          e.addClass('unread');
-          e.data('itemId', id);
-          if(this.unreadItemType) {
-            e.data('itemType', this.unreadItemType);
-            console.log("itemType", this.unreadItemType);
-          }
-        }
-      }
-
+      console.log("Before RenderInternal");
+      this.renderInternal(data);
       if(this.afterRender) { this.afterRender(data); }
-
-      this.$el.addClass("view");
+      console.log("After Render", this.$el);
 
       // Bit dodgy this next line as it could cause IE circular ref problems
       this.el._view = this;
@@ -607,7 +615,6 @@ define([
         this.$el.append(el);
       }
       this.checkForNoItems();
-      $(document).trigger('collectionAdd', { });
     },
 
     onCollectionRemove: function(item) {

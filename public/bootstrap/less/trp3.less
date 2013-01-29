@@ -20,8 +20,16 @@ html {
 }
 
 // TEMP TEMP TEMP
-.unread {
-	background-color: green;
+
+.view .trpChatBox {
+	-webkit-transition: background-color 0.5s linear;
+  -moz-transition: background-color 0.5s linear;
+  -o-transition: background-color 0.5s linear;
+  transition: background-color 0.5s linear;
+}
+
+.view.unread .trpChatBox {
+	background-color: lightyellow;
 }
 
 body {
