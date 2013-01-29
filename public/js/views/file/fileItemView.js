@@ -11,8 +11,9 @@ define([
   "use strict";
 
   return TroupeViews.Base.extend({
+    unreadItemType: 'file',
     template: template,
-    initialize: function(options) {
+    initialize: function() {
       this.setRerenderOnChange();
     },
 
@@ -49,7 +50,6 @@ define([
   /*
 
   return TroupeViews.Base.extend({
-    unreadItemType: 'file',
     events: {
       "click .trpFileActionMenuButton": "showFileActionMenu",
       "click .link-preview": "onPreviewLinkClick",

@@ -72,7 +72,21 @@ define([
     constructor: function(options) {
       Backbone.Collection.prototype.constructor.call(this, options);
       _.bindAll(this, 'onDataChange');
-      this.url = "/troupes/" + window.troupeContext.troupe.id + "/" + this.nestedUrl;
+      if(!this.url) {
+        this.url = "/troupes/" + window.troupeContext.troupe.id + "/" + this.nestedUrl;
+      }
+    },
+
+    reset: function() {
+      var r = Backbone.Collection.prototype.reset.apply(this, arguments);
+      $(document).trigger('collectionReset');
+      return r;
+    },
+
+    add: function() {
+      var r = Backbone.Collection.prototype.add.apply(this, arguments);
+      $(document).trigger('collectionAdd');
+      return r;
     },
 
     listen: function() {

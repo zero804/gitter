@@ -14,6 +14,7 @@ define([
   var unreadItemsCountsCache = {};
   var unreadItems = window.troupeContext.unreadItems;
   var recentlyMarkedRead = {};
+
   window.setInterval(function() {
     var now = Date.now();
 
@@ -104,6 +105,8 @@ define([
       var itemType = $e.data('itemType');
       var itemId = $e.data('itemId');
 
+      console.log("itemType ", itemType, "itemId", itemId);
+
       if(itemType && itemId) {
         var top = $e.offset().top;
 
@@ -126,7 +129,11 @@ define([
 
   $(window).on('scroll', windowScroll);
 
-  $(document).on('collectionReset', function(event) {
+  $(document).on('collectionReset', function() {
+    windowScrollOnTimeout();
+  });
+
+  $(document).on('collectionAdd', function() {
     windowScrollOnTimeout();
   });
 
@@ -168,9 +175,6 @@ define([
     syncCounts();
   });
 
-  $(document).on('collectionAdd', function(event) {
-    windowScrollOnTimeout();
-  });
 
   return {
     getValue: function(itemType) {
