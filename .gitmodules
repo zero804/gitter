@@ -1,3 +1,6 @@
 [submodule "public/js/libs/hbs/hbs-master"]
 	path = public/js/libs/hbs/hbs-master
 url=https://github.com/SlexAxton/require-handlebars-plugin.git
+[submodule "public/js/libs/notyfy/notyfy-master"]
+	path = public/js/libs/notyfy/notyfy-master
+	url = https://github.com/Craga89/notyfy.git

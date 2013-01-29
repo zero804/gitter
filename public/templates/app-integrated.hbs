@@ -11,11 +11,7 @@
 
 	<title>{{troupeName}} - Troupe</title>
 
-<!-- 	<link rel="stylesheet" href='{{cdn "play/newi.css" }}'>
-  <link rel="stylesheet" href='{{cdn "bootstrap/css/trp2.css" }}'> -->
   <link rel="stylesheet" href='{{cdn "bootstrap/css/trp3.css" }}'>
-
-  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
   <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/edpmlaohjokcmefhjghaeeikjjcjplmi">
 
   {{>require_wrapper}}
@@ -38,7 +34,18 @@
     args[0] = (Date.now() - startTime) + " " + args[0];
     consoleLog.apply(console, args);
   };
-  console.log("Script loaded");
+
+  function loadCss(url) {
+      var link = document.createElement("link");
+      link.type = "text/css";
+      link.rel = "stylesheet";
+      link.href = url;
+      document.getElementsByTagName("head")[0].appendChild(link);
+  }
+
+  // Late load this to speedup requirejs startup time
+  loadCss('https://fonts.googleapis.com/css?family=Open+Sans:300');
+
 	</script>
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>

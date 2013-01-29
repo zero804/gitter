@@ -4,10 +4,9 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'utils/vent',
   'views/app/uiVars',
   'fineuploader'
-  ], function($, _, Backbone, vent, uiVars, qq) {
+  ], function($, _, Backbone, uiVars, qq) {
   "use strict";
 
   return Backbone.View.extend({

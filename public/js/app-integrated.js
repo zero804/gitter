@@ -12,7 +12,6 @@ require([
   'views/file/fileView',
   'views/conversation/conversationView',
   'views/request/requestView',
-  'utils/vent',
   'collections/troupes',
   'collections/files',
   'collections/conversations',
@@ -31,10 +30,12 @@ require([
   'views/signup/createTroupeView',
   'hbs!./views/app/tmpl/appHeader',
   'views/share/shareView',
-  'views/app/troupeSettingsView'
+  'views/app/troupeSettingsView',
+  'components/webNotifications'
 ], function($, _, Backbone, Marionette, _Helpers, TroupeViews, realtime, AppIntegratedView, ChatView, FileView, ConversationView, RequestView,
-            vent, troupeModels, fileModels, conversationModels, userModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
-            RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView, createTroupeView, headerViewTemplate, shareTroupeView, troupeSettingsView) {
+            troupeModels, fileModels, conversationModels, userModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
+            RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView, createTroupeView, headerViewTemplate, shareTroupeView,
+            troupeSettingsView, webNotifications) {
   /*global console:true*/
   "use strict";
 
