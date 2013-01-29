@@ -36,6 +36,7 @@ var userService = {
 
     var displayName = options.displayName;
     var email = options.email;
+    var status = options.status;
 
     persistence.User.findOne({email: email}, function(err, user) {
       if(err) return callback(err);
@@ -43,7 +44,8 @@ var userService = {
 
       userService.newUser({
         displayName: displayName,
-        email: email
+        email: email,
+        status: status
       }, function(err, user) {
         if(err) return callback(err);
 
