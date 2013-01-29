@@ -2,22 +2,37 @@
 define([
   'jquery',
   'underscore',
-  'notyfy',
-  './realtime'
-], function($, _ , notyfy, realtime){
+  './realtime',
+  'handlebars'
+], function($, _ , realtime, handlebars){
   "use strict";
 
-  var defaults = $.notyfy.defaults;
-  defaults.layout = 'bottom';
-  defaults.timeout = 3000;
-  defaults.dismissQueue = true; // If you want to use queue feature set this true
+  var notifications = $('<div id="notification-center" class="notification-center"></div>').appendTo('body');
+
+  $.prototype.notification = function(options) {
+    var container = this;
+    var content = options.content;
+    var timeout = options.timeout ? options.timeout : 5000;
+
+    var n = $('<div class="notification"></div>');
+    n.html(content);
+    n.hide().appendTo(container).show('slow');
+    setTimeout(function() {
+      n.hide();
+    }, timeout);
+  };
 
   realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
-    console.dir(message);
-    notyfy({
-      text: 'notyfy - Yet another jQuery notification plugin',
-      type: 'information'
-    });
+    if (message.notification === 'user_notification') {
+      var tmpl = handlebars.compile('<a href="{{link}}">{{{title}}}: {{{text}}}');
+      notifications.notification({
+        content: tmpl({
+          link: message.link,
+          title: message.title,
+          text: message.text
+        })
+      });
+    }
   });
 
 });
