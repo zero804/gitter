@@ -185,12 +185,13 @@ module.exports = {
       if(!user) {
         // Create a new user and add the request. The users confirmation code will not be set until the first time one one of
         // their requests is accepted
-        user = new persistence.User();
-        user.status = 'UNCONFIRMED';
-        user.email = email;
-        user.displayName = name;
+        var userProperties = {
+          status: 'UNCONFIRMED',
+          email: email,
+          displayName: name
+        };
 
-        user.save(function (err) {
+        user = userService.newUser(userProperties, function(err, user) {
           if(err) return callback(err);
 
           troupeService.addRequest(troupeId, user.id, function(err, request) {
