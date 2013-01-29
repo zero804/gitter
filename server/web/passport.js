@@ -150,7 +150,10 @@ module.exports = {
 
         winston.debug("Invite accepted", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
 
-        userService.findOrCreateUserForEmail({ displayName: invite.displayName, email: invite.email, status: "PROFILE_NOT_COMPLETED" }, function(err, user) {
+        userService.findOrCreateUserForEmail({
+          displayName: invite.displayName,
+          email: invite.email,
+          status: "PROFILE_NOT_COMPLETED" }, function(err, user) {
           return done(null, user);
         });
 
