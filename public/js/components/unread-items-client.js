@@ -1,10 +1,15 @@
 /*jshint unused:true browser:true*/
 define([
   'jquery',
-  'underscore'
-], function($, _) {
+  'underscore',
+  './realtime'
+], function($, _, realtime) {
   /*global console: false, window: false, document: false */
   "use strict";
+
+  var troupeUnreadCounts = {};
+  var troupeUnreadTotal = -1;
+
 
   var unreadItemsCountsCache = {};
   var unreadItems = window.troupeContext.unreadItems;
@@ -91,7 +96,6 @@ define([
   function windowScrollOnTimeout() {
     windowTimeout = null;
     var $window = $(window);
-    var $document = $(document);
     var scrollTop = $window.scrollTop();
     var scrollBottom = scrollTop + $window.height();
 
@@ -122,7 +126,7 @@ define([
 
   $(window).on('scroll', windowScroll);
 
-  $(document).on('collectionReset', function(event, data) {
+  $(document).on('collectionReset', function(event) {
     windowScrollOnTimeout();
   });
 
@@ -164,7 +168,7 @@ define([
     syncCounts();
   });
 
-  $(document).on('collectionAdd', function(event, data) {
+  $(document).on('collectionAdd', function(event) {
     windowScrollOnTimeout();
   });
 
@@ -172,6 +176,39 @@ define([
     getValue: function(itemType) {
       var v = unreadItems[itemType];
       return v ? v.length : 0;
+    },
+    installTroupeListener: function(troupeCollection) {
+      function recount() {
+          var newTroupeUnreadTotal = _(troupeUnreadCounts).values().reduce(function(a, b) { return a + b; });
+          if(newTroupeUnreadTotal !== troupeUnreadTotal) {
+            troupeUnreadTotal = newTroupeUnreadTotal;
+            $(document).trigger('troupeUnreadTotalChange', newTroupeUnreadTotal);
+          }
+      }
+
+      troupeCollection.on('reset', function() {
+        troupeCollection.each(function(troupe) {
+          troupeUnreadCounts[troupe.id] = troupe.get('unreadItems');
+        });
+        recount();
+      });
+
+      realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
+        if(message.notification === 'troupe_unread') {
+          var troupeId = message.troupeId;
+          var totalUnreadItems = message.totalUnreadItems;
+
+          troupeUnreadCounts[troupeId] = totalUnreadItems;
+          var model = troupeCollection.get(troupeId);
+          if(model) {
+            model.set('unreadItems', totalUnreadItems);
+          } else {
+            console.log("Cannot find model. Refresh might be required....")
+          }
+          recount();
+
+        }
+      });
     }
   };
 

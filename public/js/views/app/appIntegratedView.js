@@ -77,6 +77,17 @@ define([
           }
         }, 100);
       });
+
+      $(document).on('troupeUnreadTotalChange', function(event, value) {
+        var badge = self.$el.find('#unread-badge');
+        badge.text(value);
+        if(value > 0) {
+          badge.show();
+        } else {
+          badge.hide();
+        }
+      });
+
     },
 
     toggleRightPanel: function(id) {
@@ -147,8 +158,6 @@ define([
 
     showMenu: function() {
       if (this.leftmenu) return;
-
-      console.log("Test: " + uiVars.blahName);
 
       // if there's not enough space to bring the left panel out, we need to shift things a bit to the right
       if (($(document).width() < 1380) && (this.rightpanel)) {
