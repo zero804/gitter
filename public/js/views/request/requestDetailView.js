@@ -1,4 +1,4 @@
-// Filename: views/home/main
+
 define([
   'jquery',
   'underscore',

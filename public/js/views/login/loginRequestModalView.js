@@ -1,5 +1,5 @@
 /*jshint unused:true browser:true*/
-// Filename: views/home/main
+
 // TODO: Better transition to request confirm page
 
 define([
