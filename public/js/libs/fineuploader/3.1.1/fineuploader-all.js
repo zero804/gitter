@@ -1,4 +1,4 @@
-// Filename: views/home/main
+
 define(['jquery'], function($) { /*jslint browser: true*/
   /*global require */
   "use strict";
