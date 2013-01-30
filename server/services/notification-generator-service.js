@@ -134,6 +134,30 @@ function filterUsersForPushNotificationEligibilityStageTwo(userIds, callback) {
   });
 }
 
+function filterNotificationsRemoveUsersInTroupe(notifications, callback) {
+  var troupeIds = notifications.map(function(n) { return n.troupeId; });
+
+  presenceService.listOnlineUsersForTroupes(troupeIds, function(err, onlineUsersForTroupes) {
+    if(err) return callback(err);
+
+    var sortedUsersForTroupes = {};
+    Object.keys(onlineUsersForTroupes).forEach(function(troupeId) {
+      sortedUsersForTroupes[troupeId] = onlineUsersForTroupes[troupeId].sort();
+    });
+
+    var filtered = notifications.filter(function(notification) {
+      var troupeId = notification.troupeId;
+      var sortedUsers = sortedUsersForTroupes[troupeId];
+      var userId = notification.userId;
+
+      var isNotInTroupe = _.indexOf(sortedUsers, userId, true /* sorted */) < 0;
+      return isNotInTroupe;
+    });
+
+    return callback(null, filtered);
+  });
+}
+
 exports.install = function() {
   var collect = {};
   var collectTimeout = null;
@@ -165,7 +189,12 @@ exports.install = function() {
       // If a user is online push the message to them through online channels
       if(onlineUsers.length) {
         var immediateNotifications = dequeueNotifications(onlineUsers);
-        queueOnlineNotificationsForSend(immediateNotifications);
+        filterNotificationsRemoveUsersInTroupe(immediateNotifications, function(err, notifications) {
+          if(err) return winston.error("collectionFinished: filterNotificationsRemoveUsersInTroupe failed", { exception: err });
+          if(notifications.length) {
+            queueOnlineNotificationsForSend(notifications);
+          }
+        });
       }
 
       if(offlineUsers.length) {
@@ -343,7 +372,6 @@ exports.startWorkers = function() {
           });
         });
 
-        winston.info("spoolQueuedNotifications: sending ", { notifications: notificationsItems });
         var results = [];
 
         notificationsItems.forEach(function(notification) {

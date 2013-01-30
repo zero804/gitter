@@ -27,7 +27,6 @@ module.exports = {
     installTroupeSubResource('embedded', 'embedded.js');
     installTroupeSubResource('thumbnails', 'thumbnails.js');
     installTroupeSubResource('chatMessages', 'chat-messages.js');
-    installTroupeSubResource('notifications', 'notifications.js');
     installTroupeSubResource('unreadItems', 'unread-items.js');
 
     var userResource = app.resource('user',  require('./user/user.js'));
