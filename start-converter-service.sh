@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 echo make sure you compile the service using mvn clean install in the converter-service/converter folder
 echo starting openoffice headless
 /Applications/OpenOffice.org.app/Contents/MacOS/soffice.bin -headless -nofirststartwizard -accept="socket,host=localhost,port=8100;urp;StarOffice.Service" &
