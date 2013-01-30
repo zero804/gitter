@@ -399,6 +399,7 @@ exports.startWorkers = function() {
           pushNotificationGateway.sendUserNotification(notification.userId, message.text);
         });
 
+        return callback();
       });
 
     });
@@ -425,6 +426,8 @@ exports.startWorkers = function() {
           sound: message.sound
         });
       });
+
+      return callback();
 
     });
 
