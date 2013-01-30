@@ -62,7 +62,6 @@ exports.newItem = function(troupeId, creatorUserId, itemType, itemId) {
       // multi chain with an individual callback
     var multi = redisClient.multi();
     userIds.forEach(function(userId) {
-      console.log(">>>>>>> ", creatorUserId, userId);
       if(!creatorUserId || (("" + userId) != ("" + creatorUserId))) {
         appEvents.newUnreadItem(userId, troupeId, data);
 
@@ -220,7 +219,6 @@ exports.getUnreadItemsForUser = function(userId, troupeId, callback) {
 
 /* TODO: make this better, more OO-ey */
 function findCreatingUserIdModel(modelName, model) {
-  console.log(">>>> findCreatingUserIdModel", modelName, model);
   switch(modelName) {
     case "file":
       return model.versions[model.versions.length - 1].creatorUser.id;
@@ -264,7 +262,7 @@ function generateNotificationForUrl(url) {
 /* TODO: make sure only one of these gets installed for the whole app */
 exports.installListener = function() {
 
-  appEvents.onDataChange2(function(data) {
+  appEvents.localOnly.onDataChange2(function(data) {
     var url = data.url;
     var operation = data.operation;
     var model = data.model;

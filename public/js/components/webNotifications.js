@@ -15,8 +15,9 @@ define([
     var n, isNew = false;
 
     // lookup or create the notification element
-    if (options.id)
+    if (options.id) {
       n = this.find('#'+options.id);
+    }
 
     if (!options.id || n.length <= 0) {
       isNew = true;
@@ -24,35 +25,30 @@ define([
     }
 
     // ensure the requested class is on the element
-    if (className)
-      n.addClass(className);
     n.addClass('notification-container');
-
-    // setup the timeouts data storage if necessary
-    if (!container.data('timeouts')) {
-      var t = []; t.running = true;
-      container.data('timeouts', t);
+    if (className) {
+      n.addClass(className);
     }
 
     // attach handlers on the notification-center container
-    var timeouts = container.data('timeouts');
     this.on('mouseenter', /* '.notification',*/ function(e) {
-      if (timeouts.running === true && e.currentTarget === container[0]) {
+
+      if (container.data('notification-hide-running') === true && e.currentTarget === container[0]) {
         // console.log('cancelling timeouts', e);
         // cancel all hide timeouts
-        timeouts.running = false;
-        _.each(timeouts, function(t) {
-          t.pause();
+        container.data('notification-hide-running', false);
+        container.find('.notification').each(function(n) {
+          n.data('notification-hide-timeout').pause();
         });
       }
     });
     this.on('mouseleave', /* '.notification',*/ function(e) {
-      if (timeouts.running === false && e.currentTarget === container[0]) {
+      if (container.data('notification-hide-running') === false && e.currentTarget === container[0]) {
         // console.log('resuming timeouts', e);
         // restart all the hide timeouts
-        timeouts.running = true;
-        _.each(timeouts, function(t) {
-          t.resume(1000);
+        container.data('notification-hide-running', true);
+        container.find('.notification').each(function(n) {
+          n.data('notification-hide-timeout').resume(1000);
         });
       }
     });
@@ -63,15 +59,21 @@ define([
     // add & animate the element if it is new
     if (isNew) {
       n.appendTo(container);
+      // add the hide timeout for this notification
+      n.data('notification-hide-timeout', new Timeout(function() {
+        n.hide('slow');
+      }, timeout));
     }
-    if (n.is(':hidden')) {
-      n.slideDown();
+    else {
+      // restart the hide timeout for this existing notification.
+      // console.log('restarting timeout for existing notification');
+      n.data('notification-hide-timeout').restart();
     }
 
-    // add the hide timeout for this notification
-    timeouts.push(new Timeout(function() {
-      n.slideUp();
-    }, timeout));
+    if (n.is(':hidden')) {
+      n.show('slow');
+    }
+
   };
 
   // Timeout util
@@ -92,6 +94,7 @@ define([
     this.restart = function() {
       start = new Date();
       remaining = delay;
+      window.clearTimeout(timerId);
       timerId = window.setTimeout(callback, remaining);
     };
 
@@ -104,7 +107,7 @@ define([
   realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
     if (message.notification === 'user_notification') {
       // console.log("Got a user_notification event");
-      var tmpl = handlebars.compile('<a href="{{link}}">{{{title}}}: {{{text}}}');
+      var tmpl = handlebars.compile('<div class="notification-header"><a href="{{link}}">{{{title}}}</a></div><div class="notification-text">{{{text}}}</div>');
       notifications.notify({
         content: tmpl({
           link: message.link,
