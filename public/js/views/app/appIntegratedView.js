@@ -30,7 +30,7 @@ define([
 
       "click #file-header":               "onFileHeaderClick",
       "click #mail-header":               "onMailHeaderClick",
-      "keydown":                          "onKeyDown"
+      "keyup":                              "onKeyUp"
     },
 
     initialize: function(options) {
@@ -296,14 +296,22 @@ define([
       document.body.style.overflow='hidden';
     },
 
-    onKeyDown: function(e) {
-
+    onKeyUp: function(e) {
       // return if a form input has focus
-      if ( $("*:focus").is("textarea, input") ) return;
+      if ( $("*:focus").is("textarea, input") ) return true;
+
+      // return in a modal is open
+      if ( $("body").hasClass('modal-open') ) return true;
 
       // t shows Troupe menu
       if(e.keyCode == 84) {
         this.toggleMenu();
+      }
+
+      // esc returns to the mail view
+      if(e.keyCode == 27) {
+        console.log("Escape pushed in app");
+        window.location.href = '#';
       }
 
     }
