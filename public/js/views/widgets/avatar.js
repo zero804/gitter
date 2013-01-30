@@ -9,6 +9,7 @@ define([
 ], function($, _, TroupeViews, template, presenceClient, _bootstrap) {
 
   return TroupeViews.Base.extend({
+    tagName: 'span',
     template: template,
     initialize: function(options) {
       var self = this;

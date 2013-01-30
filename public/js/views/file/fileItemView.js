@@ -12,6 +12,7 @@ define([
 
   return TroupeViews.Base.extend({
     unreadItemType: 'file',
+    tagName: 'span',
     template: template,
     initialize: function() {
       this.setRerenderOnChange();
