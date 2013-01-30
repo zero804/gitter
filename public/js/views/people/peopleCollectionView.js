@@ -8,7 +8,7 @@ define([
   "use strict";
 
   var PeopleItemView = TroupeViews.Base.extend({
-    //tagName: 'span',
+    tagName: 'span',
     template: peopleItemViewTemplate,
 
     initialize: function(/*options*/) {
