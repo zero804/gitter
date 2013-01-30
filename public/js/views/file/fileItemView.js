@@ -5,15 +5,15 @@ define([
   'backbone',
   'marionette',
   'views/base',
-  'views/rivets-backbone',
   'hbs!./tmpl/fileItemView'
-], function($, _, Backbone, Marionette, TroupeViews, rivet, template) {
+], function($, _, Backbone, Marionette, TroupeViews, template) {
   /*jslint browser: true*/
   "use strict";
 
   return TroupeViews.Base.extend({
+    unreadItemType: 'file',
     template: template,
-    initialize: function(options) {
+    initialize: function() {
       this.setRerenderOnChange();
     },
 
@@ -50,7 +50,6 @@ define([
   /*
 
   return TroupeViews.Base.extend({
-    unreadItemType: 'file',
     events: {
       "click .trpFileActionMenuButton": "showFileActionMenu",
       "click .link-preview": "onPreviewLinkClick",

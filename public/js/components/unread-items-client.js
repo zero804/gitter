@@ -1,14 +1,20 @@
 /*jshint unused:true browser:true*/
 define([
   'jquery',
-  'underscore'
-], function($, _) {
+  'underscore',
+  './realtime'
+], function($, _, realtime) {
   /*global console: false, window: false, document: false */
   "use strict";
+
+  var troupeUnreadCounts = {};
+  var troupeUnreadTotal = -1;
+
 
   var unreadItemsCountsCache = {};
   var unreadItems = window.troupeContext.unreadItems;
   var recentlyMarkedRead = {};
+
   window.setInterval(function() {
     var now = Date.now();
 
@@ -91,7 +97,6 @@ define([
   function windowScrollOnTimeout() {
     windowTimeout = null;
     var $window = $(window);
-    var $document = $(document);
     var scrollTop = $window.scrollTop();
     var scrollBottom = scrollTop + $window.height();
 
@@ -99,6 +104,8 @@ define([
       var $e = $(element);
       var itemType = $e.data('itemType');
       var itemId = $e.data('itemId');
+
+      console.log("found an unread item: itemType ", itemType, "itemId", itemId);
 
       if(itemType && itemId) {
         var top = $e.offset().top;
@@ -122,16 +129,23 @@ define([
 
   $(window).on('scroll', windowScroll);
 
-  $(document).on('collectionReset', function(event, data) {
-    windowScrollOnTimeout();
+  $(document).on('unreadItemDisplayed', function() {
+    windowScroll();
+  });
+/*
+  $(document).on('collectionReset', function() {
+    windowScroll();
   });
 
-  $(document).on('newUnreadItems', function(event, data) {
-    console.log("newUnreadItems", data);
+  $(document).on('collectionAdd', function() {
+    windowScroll();
+  });
+*/
 
-    var itemTypes = _.keys(data);
+  function newUnreadItems(items) {
+    var itemTypes = _.keys(items);
     _.each(itemTypes, function(itemType) {
-      var ids = data[itemType];
+      var ids = items[itemType];
 
       var filtered = _.filter(ids, function(itemId) { return !recentlyMarkedRead[itemType + "/" + itemId]; });
 
@@ -148,13 +162,12 @@ define([
     });
 
     syncCounts();
-  });
+  }
 
-
-  $(document).on('unreadItemsRemoved', function(event, data) {
-    var itemTypes = _.keys(data);
+  function unreadItemsRemoved(items) {
+    var itemTypes = _.keys(items);
     _.each(itemTypes, function(itemType) {
-      var ids = data[itemType];
+      var ids = items[itemType];
 
       if(unreadItems[itemType]) {
         unreadItems[itemType] = _.without(unreadItems[itemType], ids);
@@ -162,16 +175,50 @@ define([
     });
 
     syncCounts();
-  });
+  }
 
-  $(document).on('collectionAdd', function(event, data) {
-    windowScrollOnTimeout();
-  });
 
   return {
     getValue: function(itemType) {
       var v = unreadItems[itemType];
       return v ? v.length : 0;
+    },
+
+    installTroupeListener: function(troupeCollection) {
+      function recount() {
+          var newTroupeUnreadTotal = _(troupeUnreadCounts).values().reduce(function(a, b) { return a + b; });
+          if(newTroupeUnreadTotal !== troupeUnreadTotal) {
+            troupeUnreadTotal = newTroupeUnreadTotal;
+            $(document).trigger('troupeUnreadTotalChange', newTroupeUnreadTotal);
+          }
+      }
+
+      troupeCollection.on('reset', function() {
+        troupeCollection.each(function(troupe) {
+          troupeUnreadCounts[troupe.id] = troupe.get('unreadItems');
+        });
+        recount();
+      });
+
+      realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
+        if(message.notification === 'troupe_unread') {
+          var troupeId = message.troupeId;
+          var totalUnreadItems = message.totalUnreadItems;
+
+          troupeUnreadCounts[troupeId] = totalUnreadItems;
+          var model = troupeCollection.get(troupeId);
+          if(model) {
+            model.set('unreadItems', totalUnreadItems);
+          } else {
+            console.log("Cannot find model. Refresh might be required....");
+          }
+          recount();
+        } else if(message.notification === 'unread_items') {
+          newUnreadItems(message.items);
+        } else if(message.notification === 'unread_items_removed') {
+          unreadItemsRemoved(message.items);
+        }
+      });
     }
   };
 

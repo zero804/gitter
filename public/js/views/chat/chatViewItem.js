@@ -43,11 +43,8 @@ define([
       }
 
       return data;
-    },
-
-    afterRender: function(data) {
-      this.$el.find('.trpChatBubble').tooltip({title: function() { return data.sent ? data.sent.from(new Date()) : null; }});
     }
+
   });
 
 });

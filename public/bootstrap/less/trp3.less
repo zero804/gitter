@@ -1,7 +1,7 @@
 @import "bootstrap.less";
 
 @import "trpColours.less";
-@import "trpWebFonts.less";
+//@import "trpWebFonts.less";
 @import "trpFonts.less";
 
 @import "trpModals.less";
@@ -17,6 +17,19 @@
 
 html {
 	min-height: 100%;
+}
+
+// TEMP TEMP TEMP
+
+.view .trpChatBox {
+	-webkit-transition: background-color 0.5s linear;
+  -moz-transition: background-color 0.5s linear;
+  -o-transition: background-color 0.5s linear;
+  transition: background-color 0.5s linear;
+}
+
+.view.unread .trpChatBox {
+	background-color: lightyellow;
 }
 
 body {
@@ -108,7 +121,7 @@ a:hover {
 }
 
 .trpUnreadBadge {
-/*	display: none;*/
+	display: none;
 	position: absolute;
 	right: -9px;
 	top: -9px;
@@ -300,7 +313,7 @@ a:hover {
 }
 
 .trpToolbarHeader {
-	font-family: 'Open Sans';
+	font-family: @fontSans;
 	font-size: 12px;
 	text-transform: uppercase;
 	padding-bottom: 4px;
@@ -356,6 +369,7 @@ a:hover {
 	display: block;
 }
 
+
 .frame-people {
 	overflow: auto;
 }
@@ -363,6 +377,35 @@ a:hover {
 .frame-people .view {
 	display: block;
 	float: left;
+}
+
+.notification-center {
+	display: block;
+	width: 280px;
+	position: fixed;
+	bottom: 50px;
+}
+
+.notification {
+	display: block;
+	padding: 8px;
+	background: @trpGreen;
+	color: white;
+	.trpBodyMedium;
+	text-align: left;
+	margin: 1px;
+}
+
+.notification-header {
+	.trpBodyMedium;
+}
+
+.notification-text {
+	.trpBodySmall;
+}
+
+.notification-error {
+	background: #a44;
 }
 
 /* SPINNER */
