@@ -215,16 +215,6 @@ var FileSchema = new Schema({
 FileSchema.index({ troupeId: 1 });
 FileSchema.schemaTypeName = 'FileSchema';
 
-var NotificationSchema = new Schema({
-  troupeId: ObjectId,
-  userId: ObjectId,
-  notificationName: {type: String},
-  data: { type: {}},
-  createdDate: { type: Date, "default": Date.now }
-});
-NotificationSchema.index({ troupeId: 1 });
-NotificationSchema.index({ userId: 1 });
-NotificationSchema.schemaTypeName = 'NotificationSchema';
 
 /*
  * OAuth Stuff
@@ -311,7 +301,6 @@ var Request = mongoose.model('Request', RequestSchema);
 var ChatMessage = mongoose.model('ChatMessage', ChatMessageSchema);
 var File = mongoose.model('File', FileSchema);
 var FileVersion = mongoose.model('FileVersion', FileVersionSchema);
-var Notification = mongoose.model('Notification', NotificationSchema);
 
 var OAuthClient = mongoose.model('OAuthClient', OAuthClientSchema);
 var OAuthCode = mongoose.model('OAuthCode', OAuthCodeSchema);
@@ -336,7 +325,6 @@ module.exports = {
     ChatMessageSchema: ChatMessageSchema,
     FileSchema: FileSchema,
     FileVersionSchema: FileVersionSchema,
-    NotificationSchema: NotificationSchema,
     OAuthClientSchema: OAuthClientSchema,
     OAuthCodeSchema: OAuthCodeSchema,
     OAuthAccessTokenSchema: OAuthAccessTokenSchema,
@@ -354,7 +342,6 @@ module.exports = {
 	ChatMessage: ChatMessage,
   File: File,
   FileVersion: FileVersion,
-  Notification: Notification,
   OAuthClient: OAuthClient,
   OAuthCode: OAuthCode,
   OAuthAccessToken: OAuthAccessToken,
