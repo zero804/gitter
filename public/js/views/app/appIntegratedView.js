@@ -21,7 +21,6 @@ define([
       "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
       "mouseenter #chat-frame":           "onMouseEnterChatFrame",
       "mouseenter #header-wrapper":       "onMouseEnterHeader",
-      "mouseenter #content-frame":        "onMouseEnterContent",
       "click #people-header":             "onPeopleHeaderClick",
       "click #request-header":            "onRequestHeaderClick",
 
@@ -266,6 +265,7 @@ define([
     },
 
     onMouseEnterChatFrame: function() {
+      this.enableBodyScroll();
       this.hideMenu();
     },
 
@@ -273,9 +273,9 @@ define([
       this.showProfileMenu();
     },
 
-    onMouseEnterContent: function() {
+    enableBodyScroll: function() {
       document.body.style.overflow='auto';
-      this.hideProfileMenu();
+      // this.hideProfileMenu();
     },
 
     onMouseLeaveHeader: function() {
@@ -310,7 +310,6 @@ define([
     },
 
     onMouseEnterToolbar: function() {
-      console.log("Enter toolbar");
       this.disableBodyScroll();
     },
 
