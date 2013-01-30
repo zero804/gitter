@@ -2,6 +2,7 @@
 "use strict";
 
 var appEvents = require("../app-events");
+
 var winston = require("winston").prefix("notification-gen: ");
 var pushNotificationService = require("./push-notification-service");
 var nconf = require('../utils/config');
@@ -177,10 +178,10 @@ exports.install = function() {
         });
       }
     });
-
   }
 
-  appEvents.onNewUnreadItem(function(data) {
+  // Listen for onNewUnreadItem events generated locally
+  appEvents.localOnly.onNewUnreadItem(function(data) {
     var troupeId = data.troupeId;
     var userId = data.userId;
     var items = data.items;
