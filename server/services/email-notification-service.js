@@ -37,7 +37,7 @@ module.exports = {
     });
   },
 
-  sendConfirmationforNewUserRequest: function(user, troupe) {
+  sendConfirmationForNewUserRequest: function(user, troupe) {
     var confirmLink = nconf.get("web:basepath") + "/confirm/" + user.confirmationCode;
     mailerService.sendEmail({
       templateFile: "signupemailfromrequest",
