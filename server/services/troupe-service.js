@@ -301,6 +301,9 @@ function acceptRequest(request, callback) {
           emailNotificationService.sendConfirmationForNewUserRequest(user, troupe);
          });
       }
+      else {
+        emailNotificationService.sendRequestAcceptanceToUser(user, troupe);
+      }
 
       /** Add the user to the troupe */
       troupe.addUserById(user.id);
