@@ -298,7 +298,7 @@ function acceptRequest(request, callback) {
          var confirmationCode = uuid.v4();
          user.confirmationCode = confirmationCode;
          user.save(function() {
-          emailNotificationService.sendConfirmationforNewUserRequest(user, troupe);
+          emailNotificationService.sendConfirmationForNewUserRequest(user, troupe);
          });
       }
 
