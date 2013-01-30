@@ -19,13 +19,15 @@ define([
     events: {
       "click #menu-toggle":               "onMenuToggle",
       "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
-      "mouseenter #chat-frame":           "onMouseEnterChatFrame",
+      "mouseenter #content-frame":        "onMouseEnterContentFrame",
       "mouseenter #header-wrapper":       "onMouseEnterHeader",
       "click #people-header":             "onPeopleHeaderClick",
       "click #request-header":            "onRequestHeaderClick",
 
       "mouseenter #left-menu":            "onMouseEnterLeftMenu",
       "mouseenter #toolbar-frame":        "onMouseEnterToolbar",
+      "mouseleave #toolbar-frame":        "onMouseLeaveToolbar",
+      "mouseleave #header-wrapper":       "onMouseLeaveHeader",
 
       "click #file-header":               "onFileHeaderClick",
       "click #mail-header":               "onMailHeaderClick",
@@ -256,6 +258,15 @@ define([
       $("#alert-panel").slideToggle(350);
     },
 
+    enableBodyScroll: function() {
+      document.body.style.overflow='auto';
+      this.hideProfileMenu();
+    },
+
+    disableBodyScroll: function() {
+      document.body.style.overflow='hidden';
+    },
+
     onMenuToggle: function() {
       this.toggleMenu();
     },
@@ -264,18 +275,12 @@ define([
       this.showMenu();
     },
 
-    onMouseEnterChatFrame: function() {
-      this.enableBodyScroll();
+    onMouseEnterContentFrame: function() {
       this.hideMenu();
     },
 
     onMouseEnterHeader: function() {
       this.showProfileMenu();
-    },
-
-    enableBodyScroll: function() {
-      document.body.style.overflow='auto';
-      // this.hideProfileMenu();
     },
 
     onMouseLeaveHeader: function() {
@@ -301,16 +306,16 @@ define([
     onAddPeopleClick: function() {
     },
 
-    disableBodyScroll: function() {
-      document.body.style.overflow='hidden';
-    },
-
     onMouseEnterLeftMenu: function() {
       this.disableBodyScroll();
     },
 
     onMouseEnterToolbar: function() {
       this.disableBodyScroll();
+    },
+
+    onMouseLeaveToolbar: function() {
+      this.enableBodyScroll();
     },
 
     onKeyUp: function(e) {
