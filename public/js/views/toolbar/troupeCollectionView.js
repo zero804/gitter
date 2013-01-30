@@ -10,9 +10,12 @@ define([
 ], function($, _, Backbone, Marionette, TroupeViews, troupeListItemTemplate) {
   "use strict";
 
-  var TroupeItemView = Backbone.Marionette.ItemView.extend({
+  var TroupeItemView = TroupeViews.Base.extend({
     tagName: 'li',
-    template: troupeListItemTemplate
+    template: troupeListItemTemplate,
+    initialize: function() {
+      this.setRerenderOnChange(true);
+    }
   });
 
   return Backbone.Marionette.CollectionView.extend({

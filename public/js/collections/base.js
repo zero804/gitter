@@ -72,7 +72,9 @@ define([
     constructor: function(options) {
       Backbone.Collection.prototype.constructor.call(this, options);
       _.bindAll(this, 'onDataChange');
-      this.url = "/troupes/" + window.troupeContext.troupe.id + "/" + this.nestedUrl;
+      if(!this.url) {
+        this.url = "/troupes/" + window.troupeContext.troupe.id + "/" + this.nestedUrl;
+      }
     },
 
     listen: function() {
