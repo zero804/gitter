@@ -17,19 +17,20 @@ define([
     shifted: false,
     alertpanel: false,
     events: {
-    "click #menu-toggle":               "onMenuToggle",
+      "click #menu-toggle":               "onMenuToggle",
       "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
       "mouseenter #chat-frame":           "onMouseEnterChatFrame",
       "mouseenter #header-wrapper":       "onMouseEnterHeader",
       "mouseenter #content-frame":        "onMouseEnterContent",
       "click #people-header":             "onPeopleHeaderClick",
-      "click #request-header":               "onRequestHeaderClick",
+      "click #request-header":            "onRequestHeaderClick",
 
       "mouseenter #left-menu":            "onMouseEnterLeftMenu",
+      "mouseenter #toolbar-frame":        "onMouseEnterToolbar",
 
       "click #file-header":               "onFileHeaderClick",
       "click #mail-header":               "onMailHeaderClick",
-      "keyup":                              "onKeyUp"
+      "keyup":                            "onKeyUp"
     },
 
     initialize: function(options) {
@@ -300,8 +301,17 @@ define([
     onAddPeopleClick: function() {
     },
 
-    onMouseEnterLeftMenu: function() {
+    disableBodyScroll: function() {
       document.body.style.overflow='hidden';
+    },
+
+    onMouseEnterLeftMenu: function() {
+      this.disableBodyScroll();
+    },
+
+    onMouseEnterToolbar: function() {
+      console.log("Enter toolbar");
+      this.disableBodyScroll();
     },
 
     onKeyUp: function(e) {

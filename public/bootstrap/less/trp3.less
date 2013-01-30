@@ -313,14 +313,19 @@ a:hover {
 
 .trpToolbar {
 	position: fixed;
-  	display: inline-block;
+  display: inline-block;
 	min-width: 200px;
 	max-width: 200px;
-	height: 100%;
 	text-align: left;
-	padding-top: 40px;
+	margin-top: 40px;
 	vertical-align: top;
 	margin-left: -200px;
+  overflow-y: auto;
+  height: 90%;
+}
+
+.trpToolbarSpacer {
+  height: 40px;
 }
 
 .trpToolbarContent {
