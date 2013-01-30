@@ -294,7 +294,6 @@ exports.startWorkers = function() {
             // TODO: sort this ugly hack out
             // This will fit nicely into the new serializer stuff
             if(data.versions) { data.latestVersion = data.versions[data.versions.length - 1]; }
-            winston.debug("Data for serailiz", data);
             return {
               text: template(data),
               title: titleTemplate ? titleTemplate(data) : null,

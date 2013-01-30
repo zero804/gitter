@@ -11,11 +11,7 @@
 
 	<title>{{troupeName}} - Troupe</title>
 
-<!-- 	<link rel="stylesheet" href='{{cdn "play/newi.css" }}'>
-  <link rel="stylesheet" href='{{cdn "bootstrap/css/trp2.css" }}'> -->
   <link rel="stylesheet" href='{{cdn "bootstrap/css/trp3.css" }}'>
-
-  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
   <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/edpmlaohjokcmefhjghaeeikjjcjplmi">
 
   {{>require_wrapper}}
@@ -38,6 +34,7 @@
     args[0] = (Date.now() - startTime) + " " + args[0];
     consoleLog.apply(console, args);
   };
+
 	</script>
 
   {{>load_font_css}}
@@ -63,7 +60,7 @@
     </div>
   </div>
   <div class="trpMenuTab" id="menu-toggle-button"><img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle">
-    <div class="trpUnreadBadge"><div class="trpUnreadBadgeCount">14</div></div>
+    <div class="trpUnreadBadge" id="unread-badge"><div class="trpUnreadBadgeCount"></div></div>
   </div>
 
 
