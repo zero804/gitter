@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # To initialise
 # config = {_id: 'troupeSet', members: [
 #                          {_id: 0, host: 'localhost:27017'},

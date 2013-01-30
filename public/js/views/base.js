@@ -13,7 +13,6 @@ define([
 
   /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
   Backbone.View.prototype.close = function () {
-    console.log('Closing view ' + this);
     if (this.beforeClose) {
       this.beforeClose();
     }
@@ -128,10 +127,8 @@ define([
         data.compactView = compactView;
       }
 
-      console.log("Before RenderInternal");
       this.renderInternal(data);
       if(this.afterRender) { this.afterRender(data); }
-      console.log("After Render", this.$el);
 
       // Bit dodgy this next line as it could cause IE circular ref problems
       this.el._view = this;
@@ -192,7 +189,6 @@ define([
     },
 
     onMenuItemClicked: function(id) {
-      console.log("Menu Item ", id);
       this.view.trigger('menuItemClicked', id);
     },
 
@@ -331,7 +327,6 @@ define([
       this.trigger('hide');
 
       if($.support.transition && this.options.fade) {
-        console.log("Closing dialog with transition");
         this.hideWithTransition(this);
       } else {
         this.hideModal();
@@ -618,8 +613,6 @@ define([
     },
 
     onCollectionRemove: function(item) {
-      console.log("onCollectionRemove", item);
-
       var cid = item.cid;
       if(cid) {
         this.$el.find('.model-id-' + cid).each(function(index, item) {
