@@ -302,8 +302,8 @@ a:hover {
 
 .trpChatPanel {
   display: inline-block;
-	min-width: 500px;
-	max-width: 500px;
+	min-width: 700px;
+	max-width: 700px;
 	min-height: 600px;
 	height: 100%;
 	text-align: left;
@@ -312,13 +312,15 @@ a:hover {
 }
 
 .trpToolbar {
-  display: inline-block;
+	position: fixed;
+  	display: inline-block;
 	min-width: 200px;
 	max-width: 200px;
 	height: 100%;
 	text-align: left;
 	padding-top: 40px;
 	vertical-align: top;
+	margin-left: -200px;
 }
 
 .trpToolbarContent {
@@ -342,7 +344,7 @@ a:hover {
 }
 
 .trpRightPanel {
-	position: absolute;
+	position: fixed;
 	width: 280px;
 	right: -280px;
 	top: 60px;
