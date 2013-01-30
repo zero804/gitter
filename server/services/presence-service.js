@@ -4,6 +4,7 @@
 var redis = require("redis"),
     winston = require('winston'),
     appEvents = require('../app-events.js'),
+    _ = require("underscore"),
     redisClient;
 
 function resetClientState() {
@@ -163,6 +164,7 @@ function listOnlineUsersForTroupe(troupeId, callback) {
   redisClient.lrange("troupe_users:" + troupeId, 0, -1, callback);
 }
 
+
 resetClientState();
 
 module.exports = {
@@ -264,6 +266,34 @@ module.exports = {
 
         return callback(null, result);
       });
+  },
+
+
+  // Returns the online users for the given troupes
+  // The callback function returns a hash
+  // result[troupeId] = [userIds]
+  listOnlineUsersForTroupes: function(troupeIds, callback) {
+    troupeIds = _.uniq(troupeIds);
+
+    var multi = redisClient.multi();
+
+    troupeIds.forEach(function(troupeId) {
+      multi.lrange("troupe_users:" + troupeId, 0, -1);
+    });
+
+    multi.exec(function(err, replies) {
+      if(err) return callback(err);
+
+      var result = {};
+      troupeIds.forEach(function(troupeId, index) {
+        var onlineUsers = replies[index];
+
+        result[troupeId] = onlineUsers;
+      });
+
+      return callback(null, result);
+    });
+
   }
 
 

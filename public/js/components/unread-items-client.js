@@ -20,7 +20,6 @@ define([
 
     _.keys(recentlyMarkedRead, function(key) {
       if(now - recentlyMarkedRead[key] > 5000) {
-        console.log("Done with "+ key);
         delete recentlyMarkedRead[key];
       }
     });
@@ -186,7 +185,11 @@ define([
 
     installTroupeListener: function(troupeCollection) {
       function recount() {
-          var newTroupeUnreadTotal = _(troupeUnreadCounts).values().reduce(function(a, b) { return a + b; });
+          var newTroupeUnreadTotal = _(troupeUnreadCounts)
+                .values()
+                .map(function(a) { return a > 0 ? 1: 0; })
+                .reduce(function(a,b) { return a + b; });
+
           if(newTroupeUnreadTotal !== troupeUnreadTotal) {
             troupeUnreadTotal = newTroupeUnreadTotal;
             $(document).trigger('troupeUnreadTotalChange', newTroupeUnreadTotal);
