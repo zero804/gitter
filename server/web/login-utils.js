@@ -16,7 +16,7 @@ exports.redirectUserToDefaultTroupe = function(req, res, next) {
 
   if (req.user.lastTroupe) {
     troupeService.findById(req.user.lastTroupe, function (err,troupe) {
-      if (err || !troupe) {
+      if (err || !troupe || !troupeService.userHasAccessToTroupe(req.user, troupe)) {
         findDefaultTroupeForUser();
         return;
       }
