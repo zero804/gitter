@@ -95,7 +95,14 @@ module.exports = function( grunt ) {
                     "views/widgets/timeago"
                   ],
                   exclude: ["core-libraries"]
-              }
+              },
+              {
+                  name: "router-login",
+                  include: [
+                    "views/widgets/avatar"
+                  ],
+                  exclude: ["core-libraries"]
+              }
               /*
               {
                   name: "router",
@@ -239,6 +246,10 @@ module.exports = function( grunt ) {
       "router": {
         src: ['public-processed/js/router.js'],
         dest: 'public-processed/js/router.js'
+      },
+      "router-login": {
+        src: ['public-processed/js/router-login.js'],
+        dest: 'public-processed/js/router-login.js'
       },
       "signup": {
         src: ['public-processed/js/signup.js'],

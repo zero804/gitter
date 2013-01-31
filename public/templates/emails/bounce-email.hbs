@@ -1,23 +1,17 @@
-Oops, there was an error with the troupe addresses you tried to send to.
+Oops, there was an error with the Troupe addresses you tried to send to.
 
 {{#if deniedTroupes.length}}
 
-  You aren't allowed to send to the following troupes.
-  Click the links below to gain access for your future mails:
+You aren't allowed to send emails to that Troupe. Visit the link below to request access to that Troupe.
 
   {{#each deniedTroupes}}
-    - Join this troupe: http://{{baseServerPath}}/#{{this}}
+Join this troupe: http://{{baseServerPath}}/#{{this}}
   {{/each}}
 
 {{/if}}
 
 {{#if nonExistantTroupes.length}}
 
-  One or more of the troupe's you tried to send to don't actually exist.
-  Please recheck the email address (you can find it on once you login on the site), and remember to update your address book with the correct address.
-
-  {{#each nonExistantTroupes}}
-    - {{this}}
-  {{/each}}
+Please recheck the address of the Troupe and try to send your message again.
 
 {{/if}}
