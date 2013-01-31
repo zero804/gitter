@@ -19,7 +19,12 @@ module.exports = {
         function(req, res, next) {
           // console.log ("Compact: " this.compactView);
           if(req.user) {
-            loginUtils.redirectUserToDefaultTroupe(req, res, next);
+            loginUtils.redirectUserToDefaultTroupe(req, res, next, {
+              onNoValidTroupes: function() {
+                res.render('signup', { noValidTroupes: true, userId: req.user.id });
+              }
+            });
+
             return;
           }
           res.render('signup');
