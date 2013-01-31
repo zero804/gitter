@@ -33,10 +33,14 @@ define([
     render: function() {
       var r = TroupeViews.Base.prototype.render.call(this);
 
-      this.$el.find(':first-child').tooltip({
-        html : true,
-        placement : "right"
-      });
+      var firstChild = this.$el.find(':first-child');
+      // tooltips aren't loaded on mobile, they don't work
+      if (firstChild.tooltip) {
+        firstChild.tooltip({
+          html : true,
+          placement : "right"
+        });
+      }
 
       return r;
     },
