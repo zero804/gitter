@@ -37,13 +37,13 @@ require([
     var showingFailure = false;
 
     function showLoginFailure() {
-      $('#panel-failure').anim({translate3d: '0px, -160px,0'}, 0.5, 'swing');
+      $('#panel-failure').slideDown();
       showingFailure = true;
     }
 
     function hideLoginFailure() {
       if (showingFailure) {
-        $('#panel-failure').anim({translate3d: '0px, 160px,0'}, 0.5, 'swing');
+        $('#panel-failure').slideUp();
         showingFailure = false;
       }
     }
