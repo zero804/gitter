@@ -7,13 +7,15 @@ require([
   'views/base',
   'views/file/fileView',
   'views/file/fileDetailView',
-  'collections/files'
-], function($, _, Backbone, BaseRouter, TroupeViews, FileView, FileDetailView, fileModels) {
+  'collections/files',
+  'views/file/mobileFilePreview'
+], function($, _, Backbone, BaseRouter, TroupeViews, FileView, FileDetailView, fileModels, MobileFilePreview) {
   "use strict";
 
   var AppRouter = BaseRouter.extend({
     routes: {
       'file/:id':     'showFile',
+      'preview/:id':  'previewFile',
       '*actions':     'defaultAction'
     },
 
@@ -23,7 +25,7 @@ require([
       this.fileCollection.listen();
     },
 
-    defaultAction: function(actions){
+    defaultAction: function(/*actions*/){
       var fileView = new FileView({ collection: this.fileCollection });
       this.showView("#primary-view", fileView);
     },
@@ -32,6 +34,10 @@ require([
       var model = this.fileCollection.get(id);
       var fileDetailView = new FileDetailView({ model: model });
       this.showView("#primary-view", fileDetailView);
+    },
+
+    previewFile: function(id) {
+      this.showView("#primary-view", new MobileFilePreview({ model: this.fileCollection.get(id) }));
     }
 
   });

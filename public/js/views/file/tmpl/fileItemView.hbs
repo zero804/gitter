@@ -12,7 +12,9 @@
 
 {{#compactView}}
 <div class="trpFileViewItem" title="{{fileName}}">
-  <div class="trpFileThumbnailContainer"><img src="{{fileIcon}}" width="87" height="87" class="trpFileThumbnail"></div>
+  <a href="#preview/{{id}}">
+    <div class="trpFileThumbnailContainer"><img src="{{fileIcon}}" width="87" height="87" class="trpFileThumbnail"></div>
+  </a>
   <div class="trpFilename">{{fileName}}</div>
 </div>
 {{/compactView}}
