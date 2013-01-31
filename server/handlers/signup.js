@@ -9,17 +9,22 @@ var form = require("express-form"),
     userService = require("../services/user-service"),
     middleware = require("../web/middleware"),
     troupeService = require("../services/troupe-service"),
-    passport = require('passport'),
+    loginUtils = require('../web/login-utils'),
     winston = require('winston');
 
 module.exports = {
     install: function(app) {
       app.get(
         '/x',
-        function(req, res) {
+        function(req, res, next) {
           // console.log ("Compact: " this.compactView);
           if(req.user) {
-            res.relativeRedirect("/select-troupe");
+            loginUtils.redirectUserToDefaultTroupe(req, res, next, {
+              onNoValidTroupes: function() {
+                res.render('signup', { noValidTroupes: true, userId: req.user.id });
+              }
+            });
+
             return;
           }
           res.render('signup');

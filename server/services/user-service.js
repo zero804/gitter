@@ -120,11 +120,16 @@ var userService = {
     userService.findById(userId, function(err, user) {
       if(err) return callback(err);
       if(!user) return callback("User not found");
-      user.lastTroupe = troupeId;
 
-      user.save(function(err) {
-        callback(err);
-      });
+      if (user.lastTroupe !== troupeId) {
+        user.lastTroupe = troupeId;
+
+        user.save(function(err) {
+          callback(err);
+        });
+      } else {
+        callback();
+      }
     });
   },
 
