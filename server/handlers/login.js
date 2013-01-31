@@ -1,8 +1,7 @@
 /*jshint globalstrict:true, trailing:false unused:true node:true*/
-/*global console:false, require: true, module: true */
 "use strict";
 
-var passport = require("passport"),
+var loginUtils = require("../web/login-utils"),
     winston = require("winston"),
     nconf = require('../utils/config'),
     troupeService = require("../services/troupe-service"),
@@ -88,34 +87,15 @@ module.exports = {
       app.get('/reset/:confirmationCode',
         middleware.authenticate('passwordreset', { failureRedirect: '/x#passwordResetFailed=true' } ),
         function(req, res, next) {
-          res.relativeRedirect("/select-troupe");
+          loginUtils.redirectUserToDefaultTroupe(req, res, next);
         });
 
+      // Deprecated. Use the loginUtils.redirectUserToDefaultTroupe instead of
+      // redirecting users here. Delete by 28 Feb 2013
       app.get('/select-troupe',
         middleware.ensureLoggedIn(),
-        function(req, res) {
-          function findDefaultTroupeForUser() {
-            userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
-              // TODO: deal with users who do not belong to any troupes!
-              if (err || !troupe) { return next("Unable to find default troupe for user. "); }
-
-              res.redirect('/' + troupe.uri);
-            });
-          }
-
-          if (req.user.lastTroupe) {
-            troupeService.findById(req.user.lastTroupe, function (err,troupe) {
-              if (err || !troupe) {
-                findDefaultTroupeForUser();
-                return;
-              }
-
-              res.redirect('/' + troupe.uri);
-            });
-          } else {
-            findDefaultTroupeForUser();
-          }
-
+        function(req, res, next) {
+          loginUtils.redirectUserToDefaultTroupe(req, res, next);
         });
 
     }

@@ -5,10 +5,11 @@ require([
   'views/signup/signupModalView',
   'views/signup/signupModalConfirmView',
   'views/login/loginModalView',
+  'views/signup/createTroupeView',
   'jquery_validate' // No ref!
  ],
-  function($, TroupeViews, SignupModalView, SignupModalConfirmView, LoginModalView) {
-    var loginFormVisible = false;
+  function($, TroupeViews, SignupModalView, SignupModalConfirmView, LoginModalView, createTroupeView) {
+    //var loginFormVisible = false;
 
     function createLoginModal() {
       var view = new LoginModalView({ fromSignup:true });
@@ -19,21 +20,21 @@ require([
         window.location.href= data.redirectTo;
       });
 
-      view.on('login.close', function(data) {
+      view.on('login.close', function(/*data*/) {
         modal.off('login.close');
         modal.hide();
       });
       return modal;
     }
 
-    var validationErrors = {};
+    /*var validationErrors = {};
     function attachTooltipHandlerToItem(index, el) {
       var jel = $(el);
         jel.tooltip({title: function() {
           var v = validationErrors[el.name];
           return v ? v:"";
         }});
-    }
+    }*/
 
 
     if (window.location.href.indexOf("passwordResetFailed") >= 0) {
@@ -57,18 +58,37 @@ require([
       });
 
       modal.show();
-    }
+    } else if(window.noValidTroupes) {
+      var modal = new TroupeViews.ConfirmationModal({
+        title: "No Troupes yet...",
+        body: "Click 'Get Started' to create your first Troupe",
+        buttons: [{
+          id: 'no-troupes-ok', text: 'OK'
+        }]
+      });
 
-    $('.button-signup').on('click', function() {
-      var view = new SignupModalView({existingUser: false});
-      var modal = new TroupeViews.Modal({ view: view });
-      view.on('signup.complete', function(data) {
-        modal.off('signup.complete');
-
-        modal.transitionTo(new TroupeViews.Modal({ view: new SignupModalConfirmView({ data: data }) }));
+      modal.on('button.click', function(id) {
+        if (id == 'no-troupes-ok')
+          modal.hide();
       });
 
       modal.show();
+    }
+
+    $('.button-signup').on('click', function() {
+      if (window.noValidTroupes) {
+        new createTroupeView.Modal({existingUser: true, userId: window.userId }).show();
+      } else {
+        var view = new SignupModalView({existingUser: false});
+        var modal = new TroupeViews.Modal({ view: view });
+        view.on('signup.complete', function(data) {
+          modal.off('signup.complete');
+
+          modal.transitionTo(new TroupeViews.Modal({ view: new SignupModalConfirmView({ data: data }) }));
+        });
+
+        modal.show();
+      }
       return false;
     });
 

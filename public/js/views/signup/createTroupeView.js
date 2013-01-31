@@ -22,8 +22,8 @@ define([
     },
 
     getRenderData: function() {
-      if (window.troupeContext) {
-        userId = window.troupeContext.user.id;
+      if (window.troupeContext || window.userId) {
+        userId = (window.userId) ? window.userId : window.troupeContext.user.id;
         return {
           existingUser: this.existingUser,
           userId: userId
