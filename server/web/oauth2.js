@@ -8,7 +8,7 @@ var oauth2orize = require('oauth2orize'),
     passport = require('passport'),
     middleware = require('./middleware'),
     oauthService = require('../services/oauth-service'),
-    mongoose = require('mongoose'),
+    loginUtils = require('./login-utils'),
     winston = require('winston')
 
 // create OAuth 2.0 server
@@ -154,11 +154,13 @@ exports.token = [
   server.errorHandler()
 ];
 
+// The bearer login is used by the embedded apps (like IOS) to prevent
+//  the user needing to login via a login prompt when accessing the webapp
 exports.bearerLogin = [
   passport.authenticate('bearer', { session: true }),
-  function(req, res) {
+  function(req, res, next) {
     winston.info("oauth: user logged in via bearerLogin", { user: req.user.displayName });
-    res.relativeRedirect("/select-troupe");
+    loginUtils.redirectUserToDefaultTroupe(req, res, next);
   }
 ];
 
