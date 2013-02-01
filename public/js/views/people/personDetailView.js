@@ -20,6 +20,7 @@ define([
 
     getRenderData: function () {
       var d = this.model.toJSON();
+      d.isSelf = (window.troupeContext.user.id === this.model.id)  ? true : false;
       // var latestVersion = this.model.get('versions').length - 1;
       // d.fileIcon = '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + d.fileName + "?version=" + latestVersion;
       // d.previewUrl = '#file/preview/' + d.id;
