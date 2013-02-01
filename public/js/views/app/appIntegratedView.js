@@ -5,7 +5,8 @@ define([
   'underscore',
   'backbone',
   'views/app/uiVars',
-  'fineuploader'
+  'fineuploader',
+  "nanoScroller"
   ], function($, _, Backbone, uiVars, qq) {
   "use strict";
 
@@ -160,7 +161,7 @@ define([
 
     showMenu: function() {
       if (this.leftmenu) return;
-
+      $("#left-menu-scroll").nanoScroller();
       // if there's not enough space to bring the left panel out, we need to shift things a bit to the right
       if (($(document).width() < 1380) && (this.rightpanel)) {
         this.shifted = true;
@@ -260,7 +261,7 @@ define([
 
     enableBodyScroll: function() {
       document.body.style.overflow='auto';
-      this.hideProfileMenu();
+      // this.hideProfileMenu();
     },
 
     disableBodyScroll: function() {
@@ -276,6 +277,7 @@ define([
     },
 
     onMouseEnterContentFrame: function() {
+      $("#content-scroller").nanoScroller();
       this.hideMenu();
     },
 
@@ -311,6 +313,7 @@ define([
     },
 
     onMouseEnterToolbar: function() {
+      $(".nano").nanoScroller();
       this.disableBodyScroll();
     },
 

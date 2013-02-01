@@ -52,13 +52,16 @@
   <div class="trpLeftMenuHotspot" id="left-menu-hotspot"></div>
 
   <div class="trpLeftMenu" id="left-menu">
-    <div class="trpLeftMenuWrapper">
-      <div class="trpToolbarHeader" style="margin-left: 9px;">All your Troupes</div>
-      <ul class="trpTroupeList" id="left-menu-list">
-      </ul>
-      <a href="#|create"><div class="trpNewTroupeButton">Start a new Troupe</div><div class="trpLeftMenuSpacer"></div></a>
-    </div>
+      <div class="nano" id="left-menu-scroll">
+        <div class="content trpLeftMenuWrapper">
+          <div class="trpToolbarHeader" style="margin-left: 9px;">All your Troupes</div>
+          <ul class="trpTroupeList" id="left-menu-list">
+          </ul>
+          <a href="#|create"><div class="trpNewTroupeButton">Start a new Troupe</div><div class="trpLeftMenuSpacer"></div></a>
+        </div>
+      </div>
   </div>
+
   <div class="trpMenuTab" id="menu-toggle-button"><img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle">
     <div class="trpUnreadBadge" id="unread-badge"><div class="trpUnreadBadgeCount"></div></div>
   </div>
@@ -79,22 +82,27 @@
     </div>
   </div>
 
-  <div class="trpContentPanel" id="content-frame">
-    <div class="trpContentSpacer"></div>
-    <div class="trpChatPanel" id="chat-frame"></div>
-    <div class="trpToolbar" id="toolbar-frame">
-      <div class="trpToolbarContent">
-        <div class="trpToolbarList" id="request-roster" style="display: none;"></div>
-        <div class="trpToolbarHeader" id="people-header">People</div>
-        <div class="trpToolbarList" id="people-roster"></div>
-        <div class="trpToolbarHeader" id="file-header">Files</div>
-        <div class="trpToolbarList" id="file-list"></div>
-        <div class="trpToolbarHeader" id="mail-header">Mails</div>
-        <div class="trpToolbarList" id="mail-list"></div>
-      </div>
-      <div class="trpToolbarSpacer"></div>
+<div class="trpContentPanel" id="content-frame">
+  <div class="trpContentSpacer"></div>
+  <div class="trpChatPanel" id="chat-frame"></div>
+  <div class="trpToolbar nano" id="toolbar-frame">
+    <div class="trpToolbarContent content" id="toolbar-content">
+<!--       <div class="nano" id="toolbar-scroll">
+        <div class="content"> -->
+          <div class="trpToolbarList" id="request-roster" style="display: none;"></div>
+          <div class="trpToolbarHeader" id="people-header">People</div>
+          <div class="trpToolbarList" id="people-roster"></div>
+          <div class="trpToolbarHeader" id="file-header">Files</div>
+          <div class="trpToolbarList" id="file-list"></div>
+          <div class="trpToolbarHeader" id="mail-header">Mails</div>
+          <div class="trpToolbarList" id="mail-list"></div>
+          <div class="trpToolbarSpacer"></div>
+<!--         </div>
+      </div> -->
     </div>
   </div>
+</div>
+
 
 
   <div class="trpRightPanel" id="right-panel">
