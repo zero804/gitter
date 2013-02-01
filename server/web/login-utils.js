@@ -3,6 +3,7 @@
 
 var userService = require("../services/user-service");
 var troupeService = require("../services/troupe-service");
+var nconf = require('../utils/config');
 
 exports.redirectUserToDefaultTroupe = function(req, res, next, options) {
 
@@ -17,13 +18,11 @@ exports.redirectUserToDefaultTroupe = function(req, res, next, options) {
   //
   function findDefaultTroupeForUser() {
     userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
-      // TODO: deal with users who do not belong to any troupes!
       if (err || !troupe) {
         if(onNoValidTroupes) {
           onNoValidTroupes();
         } else {
-          // TODO: replace this with an nconf variable
-          res.redirect('/x');
+          res.redirect(nconf.get('web:homeurl'));
         }
       }
 

@@ -85,7 +85,7 @@ module.exports = {
       });
 
       app.get('/reset/:confirmationCode',
-        middleware.authenticate('passwordreset', { failureRedirect: '/x#passwordResetFailed=true' } ),
+        middleware.authenticate('passwordreset', { failureRedirect: nconf.get('web:homeurl') + '#passwordResetFailed=true' } ),
         function(req, res, next) {
           loginUtils.redirectUserToDefaultTroupe(req, res, next);
         });

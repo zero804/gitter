@@ -49,7 +49,7 @@ define([
               console.log("Removed this person");
               // thisPerson.$el.toggle();
               if (thisPerson.isSelf)
-                window.location = '/x';
+                window.location = window.troupeContext.homeUrl;
               else
                 window.location.href = "#";
             }

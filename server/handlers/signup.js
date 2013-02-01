@@ -10,12 +10,13 @@ var form = require("express-form"),
     middleware = require("../web/middleware"),
     troupeService = require("../services/troupe-service"),
     loginUtils = require('../web/login-utils'),
-    winston = require('winston');
+    winston = require('winston'),
+    nconf = require('../utils/config');
 
 module.exports = {
     install: function(app) {
       app.get(
-        '/x',
+        nconf.get('web:homeurl'),
         function(req, res, next) {
           // console.log ("Compact: " this.compactView);
           if(req.user) {
