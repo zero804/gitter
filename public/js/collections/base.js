@@ -129,7 +129,6 @@ define([
       var parsed = new this.model(newModel, { parse: true });
 
       var existing = this.findExistingModel(id, parsed);
-      console.log("OPERATION IS " + operation);
 
       switch(operation) {
         case 'create':

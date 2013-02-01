@@ -66,8 +66,6 @@ exports.newItem = function(troupeId, creatorUserId, itemType, itemId) {
         appEvents.newUnreadItem(userId, troupeId, data);
 
         multi.sadd("unread:" + itemType + ":" + userId + ":" + troupeId, itemId);
-      } else{
-        winston.info("Not sending to " + userId, creatorUserId);
       }
     });
 

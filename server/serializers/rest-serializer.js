@@ -758,6 +758,10 @@ function serializeModel(model, callback) {
       strategy = new ConversationMinStrategy();
       break;
 
+    case 'EmailSchema':
+      strategy = new EmailStrategy();
+      break;
+
     case 'InviteSchema':
       strategy = new InviteStrategy();
       break;

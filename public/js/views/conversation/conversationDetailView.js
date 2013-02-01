@@ -22,9 +22,12 @@ define([
 
       this.model = new conversationModels.ConversationDetail({ id: this.id });
       this.model.bind('change:subject', this.onSubjectChange);
+      this.model.emailCollection.listen();
       this.model.fetch();
 
-      // TODO: live-view the conversations collection
+      this.addCleanup(function() {
+        this.model.emailCollection.unlisten();
+      });
     },
 
     events: {
