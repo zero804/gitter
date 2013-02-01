@@ -1,6 +1,9 @@
 
-    Oops, there was an error with the Troupe addresses you tried to send to.
+    <p>Oops, there was an error sending your mail to one or more of the Troupes.</p>
 
+    {{#unless userIsRegistered}}
+      <p>You're not signed up for troupe yet, click the troupe link below to sign up.</p>
+    {{/unless}}
 
     {{#if deniedTroupes.length}}
 
