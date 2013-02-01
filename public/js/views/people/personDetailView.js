@@ -15,12 +15,13 @@ define([
     },
 
     initialize: function(options) {
+      this.isSelf = (window.troupeContext.user.id === this.model.id)  ? true : false;
       this.setRerenderOnChange();
     },
 
     getRenderData: function () {
       var d = this.model.toJSON();
-      d.isSelf = (window.troupeContext.user.id === this.model.id)  ? true : false;
+      d.isSelf = this.isSelf;
       // var latestVersion = this.model.get('versions').length - 1;
       // d.fileIcon = '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + d.fileName + "?version=" + latestVersion;
       // d.previewUrl = '#file/preview/' + d.id;
@@ -40,16 +41,19 @@ define([
       view.on('confirm.yes', function(data) {
           modal.off('confirm.yes');
           modal.hide();
-           $.ajax({
-              url: "/troupes/" + window.troupeContext.troupe.id + "/users/" + this.model.get('id'),
-              data: "",
-              type: "DELETE",
-              success: function(data) {
-                console.log("Removed this person");
-                // thisPerson.$el.toggle();
+         $.ajax({
+            url: "/troupes/" + window.troupeContext.troupe.id + "/users/" + this.model.get('id'),
+            data: "",
+            type: "DELETE",
+            success: function(data) {
+              console.log("Removed this person");
+              // thisPerson.$el.toggle();
+              if (thisPerson.isSelf)
+                window.location = '/x';
+              else
                 window.location.href = "#";
-              }
-            });
+            }
+          });
       });
 
       view.on('confirm.no', function(data) {
