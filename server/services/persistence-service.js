@@ -84,12 +84,18 @@ var UserLocationHistorySchema = new Schema({
 UserLocationHistorySchema.index({ userId: 1 });
 UserLocationHistorySchema.schemaTypeName = 'UserLocationHistorySchema';
 
+//
+// User in a Troupe
+//
 var TroupeUserSchema = new Schema({
   userId: { type: ObjectId }
   // In future: role
 });
 TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
 
+//
+// A Troupe
+//
 var TroupeSchema = new Schema({
   name: { type: String },
   uri: { type: String },
@@ -129,6 +135,8 @@ TroupeSchema.methods.removeUserById = function(userId) {
     this.post('save', function(postNext) {
       var url = "/troupes/" + this.id + "/users";
       serializeEvent(url, "remove", troupeUser, postNext);
+
+      // TODO: move this in a remove listener somewhere else in the codebase
       appEvents.userRemovedFromTroupe({ troupeId: this.id, userId: troupeUser.userId });
     });
 
@@ -138,6 +146,9 @@ TroupeSchema.methods.removeUserById = function(userId) {
   }
 };
 
+//
+// An invitation to a person to join a Troupe
+//
 var InviteSchema = new Schema({
   troupeId: ObjectId,
   displayName: { type: String },
@@ -147,6 +158,9 @@ var InviteSchema = new Schema({
 });
 InviteSchema.schemaTypeName = 'InviteSchema';
 
+//
+// A request by a user to join a Troupe
+//
 var RequestSchema = new Schema({
   troupeId: ObjectId,
   userId: ObjectId,
@@ -154,6 +168,9 @@ var RequestSchema = new Schema({
 });
 RequestSchema.schemaTypeName = 'RequestSchema';
 
+//
+// A single chat
+//
 var ChatMessageSchema = new Schema({
   fromUserId: ObjectId,
   toTroupeId: ObjectId,  //TODO: rename to troupeId
@@ -163,6 +180,9 @@ var ChatMessageSchema = new Schema({
 ChatMessageSchema.index({ toTroupeId: 1, sent: -1 });
 ChatMessageSchema.schemaTypeName = 'ChatMessageSchema';
 
+//
+// An email attachment
+//
 var EmailAttachmentSchema = new Schema({
   fileId: ObjectId,
   version: Number
@@ -192,6 +212,26 @@ var ConversationSchema = new Schema({
 ConversationSchema.index({ troupeId: 1 });
 ConversationSchema.index({ 'emails.messageIds': 1 });
 ConversationSchema.schemaTypeName = 'ConversationSchema';
+
+
+ConversationSchema.methods.pushEmail = function(email) {
+  this.post('save', function(postNext) {
+    var url = "/troupes/" + this.troupeId + "/conversations/" + this.id;
+    serializeEvent(url, "create", email, postNext);
+  });
+
+  return this.emails.push(email);
+};
+
+ConversationSchema.methods.removeEmail = function(email) {
+  // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
+  this.post('save', function(postNext) {
+    var url = "/troupes/" + this.troupeId + "/conversations/" + this.id;
+    serializeEvent(url, "remove", email, postNext);
+  });
+
+  email.remove();
+};
 
 var FileVersionSchema = new Schema({
   creatorUserId: ObjectId,

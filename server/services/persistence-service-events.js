@@ -17,6 +17,10 @@ exports.install = function(persistenceService) {
   function serializeEvent(url, operation, model, callback) {
     winston.debug("Serializing " + operation + " to " + url);
 
+    // TODO: consider swapping out the HEAVY WEIGHT restSerializer here for the
+    // light weight notification-serializer as it is much more effeicent. Obviously
+    // consumers of the events will need to be adapted to use objects of the new
+    // shape
     restSerializer.serializeModel(model, function(err, serializedModel) {
       if(err) {
         winston.error("Silently failing model event: ", { exception: err, url: url, operation: operation });
@@ -87,7 +91,6 @@ exports.install = function(persistenceService) {
   attachNotificationListenersToSchema(schemas.FileSchema, 'file');
   attachNotificationListenersToSchema(schemas.InviteSchema, 'invite');
   attachNotificationListenersToSchema(schemas.RequestSchema, 'request');
-  //attachNotificationListenersToSchema(NotificationSchema, 'notification');
   attachNotificationListenersToSchema(schemas.ChatMessageSchema, 'chat', function(model) {
     return "/troupes/" + model.toTroupeId + "/chatMessages";
   });
