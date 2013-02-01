@@ -11,7 +11,7 @@ var presenceService = require("../services/presence-service");
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
   { re: /^\/troupes\/(\w+)$/, validator: validateUserForTroupeSubscription },
-  { re: /^\/troupes\/(\w+)\/(\w+)$/, validator: validateUserForSubTroupeSubscription },
+  { re: /^\/troupes\/(\w+)\/(.+)$/, validator: validateUserForSubTroupeSubscription },
   { re: /^\/user\/(\w+)$/, validator: validateUserForUserSubscription },
   { re: /^\/user$/, validator: validateUserForGenericUserSubscription }
 ];

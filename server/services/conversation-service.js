@@ -2,8 +2,6 @@
 "use strict";
 
 var persistence = require("./persistence-service"),
-    uuid = require('node-uuid'),
-    console = require('console'),
     winston = require('winston');
 
 function findConversation(options, callback) {
@@ -32,7 +30,6 @@ exports.storeEmailInConversation = function(options, callback) {
   var preview = options.preview;
   var attachments = options.attachments;
   var fromUserId = options.fromUserId;
-  var inReplyTo = options.inReplyTo;
 
   var storeMail = new persistence.Email();
   storeMail.fromUserId = fromUserId;
@@ -54,7 +51,7 @@ exports.storeEmailInConversation = function(options, callback) {
       conversation.troupeId = troupeId;
       conversation.updated = Date.now();
       conversation.subject = subject;
-      conversation.emails = [storeMail];
+      conversation.pushEmail(storeMail);
 
       conversation.save(function(err) {
           if (err) return callback(err);
@@ -67,7 +64,7 @@ exports.storeEmailInConversation = function(options, callback) {
     winston.info("Updating existing conversation");
     conversation.subject = subject;
     conversation.updated = Date.now();
-    conversation.emails.push(storeMail);
+    conversation.pushEmail(storeMail);
     conversation.save(function(err) {
         if (err) return callback(err);
         callback(null, conversation, storeMail);

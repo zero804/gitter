@@ -35,7 +35,8 @@ require([
   'components/unread-items-client'
 ], function($, _, Backbone, Marionette, _Helpers, TroupeViews, realtime, AppIntegratedView, ChatView, FileView, ConversationView, RequestView,
             troupeModels, fileModels, conversationModels, userModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
-            RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView, createTroupeView, headerViewTemplate, shareTroupeView,
+            RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView,
+            createTroupeView, headerViewTemplate, shareTroupeView,
             troupeSettingsView, webNotifications, unreadItemsClient) {
   /*global console:true*/
   "use strict";

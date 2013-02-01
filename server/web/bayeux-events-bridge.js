@@ -20,6 +20,7 @@ exports.install = function(server) {
       case 'create':
       case 'update':
       case 'remove':
+        console.dir("Publish to " + url);
         bayeuxClient.publish(url, {
           operation: operation,
           model: model
