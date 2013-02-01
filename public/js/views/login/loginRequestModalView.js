@@ -23,6 +23,7 @@ define([
 
     getRenderData: function() {
       return {
+        homeUrl: window.troupeContext.homeUrl,
         troupeUri: window.location.pathname.replace(/\//g,''),
         authenticated: this.authenticated
       };

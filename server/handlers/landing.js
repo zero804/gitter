@@ -2,13 +2,17 @@
 /*global console:false, require: true, module: true */
 "use strict";
 
+var nconf = require('../utils/config');
+
 module.exports = {
     install: function(app) {
-      app.get(
-        '/',
-        function(req, res) {
-          res.render('landing');
-        }
-      );
+      if (nconf.get('web:homeurl') !== '/') {
+        app.get(
+          '/',
+          function(req, res) {
+            res.render('landing');
+          }
+        );
+      }
     }
 };

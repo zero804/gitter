@@ -2,12 +2,13 @@
 "use strict";
 
 var middleware = require('../web/middleware');
+var nconf = require('../utils/config');
 
 exports.install = function(app) {
   /* Cheap trick for testing */
   app.get('/signout',
     middleware.logout(),
     function(req, res) {
-      res.relativeRedirect('/x');
+      res.relativeRedirect(nconf.get('web:homeurl'));
     });
 };

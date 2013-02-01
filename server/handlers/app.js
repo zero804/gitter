@@ -91,6 +91,7 @@ function renderAppPage(req, res, next, page) {
           baseServer: nconf.get('web:baseserver'),
           basePort: nconf.get('web:baseport'),
           basePath: nconf.get('web:basepath'),
+          homeUrl: nconf.get('web:homeurl'),
           websockets: {
             fayeUrl: getFayeUrl(),
             options: {
