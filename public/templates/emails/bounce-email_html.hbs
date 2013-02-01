@@ -9,7 +9,7 @@
       </p>
 
       {{#each deniedTroupes}}
-      <div class="button"><a href="http://{{baseServerPath}}/#{{this}}">Join this troupe</a></div>
+      <div class="button"><a href="{{../baseServerPath}}/{{this}}">Join this troupe</a></div>
       {{/each}}
       </ol>
 
@@ -18,7 +18,7 @@
     {{#if nonExistantTroupes.length}}
 
       <p>
-    
+
       Please recheck the address of the Troupe and try to send your message again.
       </p>
 
