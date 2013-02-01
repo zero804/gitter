@@ -88,6 +88,8 @@ function renderAppPage(req, res, next, page) {
           profileNotCompleted: profileNotCompleted,
           unreadItems: unreadItems,
           accessDenied: accessDenied,
+          baseServer: nconf.get('web:baseserver'),
+          basePort: nconf.get('web:baseport'),
           basePath: nconf.get('web:basepath'),
           websockets: {
             fayeUrl: getFayeUrl(),

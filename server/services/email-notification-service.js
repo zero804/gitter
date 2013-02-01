@@ -24,7 +24,7 @@ module.exports = {
   },
 
   sendRequestAcceptanceToUser: function(user, troupe) {
-    var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri + "#|shareTroupe";
+    var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri;
 
     mailerService.sendEmail({
       templateFile: "signupemailfromrequest",

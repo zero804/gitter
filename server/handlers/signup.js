@@ -139,7 +139,7 @@ module.exports = {
             }
 
             winston.debug("Redirecting newly confirmed user to troupe ", { troupeUri: troupe.uri } );
-            res.relativeRedirect('/' + troupe.uri + '#|shareTroupe');
+            res.relativeRedirect('/' + troupe.uri);
           });
         }
       );

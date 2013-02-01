@@ -32,15 +32,20 @@ exports.hook_queue = function (next, connection) {
   userService.findByEmail(mail.from, function (err, user) {
     winston.debug("Gateway: Looked up the user for this mail");
 
-    // hard deny if not a registered sender.
-    if(!user) return next(DENY, "Sorry, your email address is not registered with us, please visit http://trou.pe to register.");
-
     // get the troupe ids from the to addresses in the mail transaction
     var troupeUris = [];
     for(var toI = 0; toI < connection.transaction.rcpt_to.length; toI++) {
       troupeUris.push(
           parseAddress(connection.transaction.rcpt_to[toI].address()).split('@')[0]
       );
+    }
+
+    // hard deny if not a registered sender.
+    if(!user) {
+      sendBounceMail(false, mail, troupeUris, [], []);
+
+      return next(OK); // no further plugins should run
+      // return next(DENY, "Sorry, your email address is not registered with us, please visit http://trou.pe to register.");
     }
 
     // fetch the troupes access control hash,
@@ -84,7 +89,7 @@ exports.hook_queue = function (next, connection) {
 
       // send one bounce mail to the sender if there are any forbidden or non-existant troupes
       if (deniedTroupes.length || nonExistantTroupes.length) {
-        sendBounceMail(mail, deniedTroupes, nonExistantTroupes, permittedTroupes);
+        sendBounceMail(true, mail, deniedTroupes, nonExistantTroupes, permittedTroupes);
       }
 
       if (permittedTroupes.length) {
@@ -102,7 +107,7 @@ exports.hook_queue = function (next, connection) {
   });
 };
 
-function sendBounceMail(mail, deniedTroupes, nonExistantTroupes, permittedTroupes) {
+function sendBounceMail(userIsRegistered, mail, deniedTroupes, nonExistantTroupes, permittedTroupes) {
   winston.debug("Gateway#sendBounceMail(): I'm gna bounce this mail from " + mail.from + " that silly user can't send to: ", { deniedTroupes: deniedTroupes, nonExistantTroupes: nonExistantTroupes });
 
   mailerService.sendEmail({
@@ -112,6 +117,7 @@ function sendBounceMail(mail, deniedTroupes, nonExistantTroupes, permittedTroupe
     subject: "Sorry. We can't let you send to one (or more) of those troupes",
     // TODO we probably want to put the actual name of the troupe in here
     data: {
+      userIsRegistered: userIsRegistered,
       mail: mail,
       deniedTroupes: deniedTroupes,
       nonExistantTroupes: nonExistantTroupes,
