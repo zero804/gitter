@@ -1,5 +1,10 @@
 Oops, there was an error with the Troupe addresses you tried to send to.
 
+{{#unless userIsRegistered}}
+  You're not signed up for troupe yet, click the troupe link below to sign up.
+{{/unless}}
+
+
 {{#if deniedTroupes.length}}
 
 You aren't allowed to send emails to that Troupe. Visit the link below to request access to that Troupe.
