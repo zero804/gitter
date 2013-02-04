@@ -1,4 +1,4 @@
-#!/usr/local/bin/node
+#!/usr/bin/env node
 /*jslint node: true */
 "use strict";
 
@@ -55,13 +55,18 @@ if(opts.user) {
    if(!opts.email) { winston.error("Either a userId or email address is requireId"); process.exit(1); }
    userService.findByEmail("" + opts.email, function(err, user) {
       if(err) { winston.error("Error", err); process.exit(1); }
+      if(!user) { winston.error("No user with email address" + opts.email); process.exit(1); }
 
       appEvents.userNotification({
-       userId: user.userId,
+       userId: user.id,
        title: opts.title,
-       text: opts.text,
+       text: opts.message,
        link: opts.link,
        sound: opts.sound
+      });
+
+      process.nextTick(function() {
+        process.exit(0);
       });
 
    });

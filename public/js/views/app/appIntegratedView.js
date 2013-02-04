@@ -174,8 +174,11 @@ define([
         }, 350);
 
       } else {
-        $("#content-frame, #header-frame, #alert-content").animate({
+        $("#header-frame, #alert-content").animate({
           marginLeft: uiVars.menuSlideValue
+        }, 350);
+        $("#content-frame").animate({
+          marginLeft: 160
         }, 350);
 
       }
