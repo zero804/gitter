@@ -274,7 +274,6 @@ define([
     },
 
     onMouseEnterContentFrame: function() {
-      // $("#content-scroller").nanoScroller();
       this.hideMenu();
     },
 
