@@ -135,10 +135,15 @@ define([
         $(whichPanel).hide();
       });
 
-      $("#content-frame, #header-frame, #alert-content").animate({
+      $("#header-frame, #alert-content").animate({
         marginRight: '0px'
       }, 350, function() {
       });
+
+      $("#content-frame").animate({
+          right: '-=160px'
+        }, 350, function() {
+        });
 
       this.rightpanel = false;
     },
@@ -152,8 +157,13 @@ define([
       // $("#left-menu").show();
         });
 
-        $("#content-frame, #header-frame, #alert-content").animate({
+        $("#header-frame, #alert-content").animate({
           marginRight: uiVars.menuSlideValue
+        }, 350, function() {
+        });
+
+        $("#content-frame").animate({
+          right: '+=160px'
         }, 350, function() {
         });
 
@@ -163,14 +173,16 @@ define([
 
     showMenu: function() {
       if (this.leftmenu) return;
+      console.log("Showing the menu");
       // $("#left-menu-scroll").nanoScroller();
 
       // if there's not enough space to bring the left panel out, we need to shift things a bit to the right
-      if (($(document).width() < 1380) && (this.rightpanel)) {
+      // this document.width is a hack to test something. MIKE: FIX IT!!!
+      if (($(document).width() < 380) && (this.rightpanel)) {
         this.shifted = true;
         $('#right-panel').animate({ right: uiVars.shiftedPanelValue }, 350);
 
-        $("#content-frame, #header-frame, #alert-content").animate({
+        $("#header-frame, #alert-content").animate({
           marginRight: uiVars.shiftedMarginValue,
           marginLeft: uiVars.menuSlideValue
         }, 350);
@@ -180,7 +192,7 @@ define([
           marginLeft: uiVars.menuSlideValue
         }, 350);
         $("#content-frame").animate({
-          marginLeft: 160
+          right: '-=160px'
         }, 350);
 
       }
@@ -204,15 +216,19 @@ define([
         this.shifted = false;
         $('#right-panel').animate({ right: 0 }, 350);
 
-        $("#content-frame, #header-frame, #alert-content").animate({
+        $("#header-frame, #alert-content").animate({
           marginLeft: '0px',
           marginRight: uiVars.menuSlideValue
         }, 350);
 
       } else {
 
-        $("#content-frame, #header-frame, #alert-content").animate({
+        $("#header-frame, #alert-content").animate({
           marginLeft: '0px'
+        }, 350);
+
+        $("#content-frame").animate({
+          right: '+=160px'
         }, 350);
 
       }
@@ -274,7 +290,9 @@ define([
     },
 
     onMouseEnterContentFrame: function() {
-      this.hideMenu();
+      if (this.leftmenu) {
+        this.hideMenu();
+      }
     },
 
     onMouseEnterHeader: function() {
