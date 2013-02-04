@@ -20,6 +20,7 @@ define([
     afterRender: function() {
       new TroupeViews.Collection({
          collection: this.model.get('versions'),
+         itemViewOptions: { file: this.model },
          itemView: VersionView,
          el: this.$el.find('.frame-versions')
       }).render();
