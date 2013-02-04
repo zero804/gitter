@@ -10,7 +10,7 @@ define([
   $.prototype.notify = function(options) {
     var container = this;
     var content = options.content;
-    var timeout = options.timeout ? options.timeout : 4000;
+    var timeout = options.timeout ? options.timeout : 6000;
     var className = options.className ? options.className : '';
     var n, isNew = false;
 
@@ -58,7 +58,7 @@ define([
 
     // add & animate the element if it is new
     if (isNew) {
-      n.appendTo(container);
+      n.prependTo(container);
       // add the hide timeout for this notification
       n.data('notification-hide-timeout', new Timeout(function() {
         n.hide('slow');
@@ -71,7 +71,9 @@ define([
     }
 
     if (n.is(':hidden')) {
-      n.show('slow');
+      n.show();
+      n.css({ position: 'relative', left: -1 * n.width() });
+      n.animate({ left: 0 });
     }
 
   };
@@ -107,7 +109,7 @@ define([
   realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
     if (message.notification === 'user_notification') {
       // console.log("Got a user_notification event");
-      var tmpl = handlebars.compile('<div class="notification-header"><a href="{{link}}">{{{title}}}</a></div><div class="notification-text">{{{text}}}</div>');
+      var tmpl = handlebars.compile('<a href="{{link}}"><div class="notification-header">{{{title}}}</div><div class="notification-text">{{{text}}}</div></a>');
       notifications.notify({
         content: tmpl({
           link: message.link,
