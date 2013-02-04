@@ -42,6 +42,8 @@ define([
 
       $('body').append('<span id="fineUploader"></span>');
 
+      $(".nano").nanoScroller({ preventPageScrolling: true });
+
       this.uploader = new qq.FineUploader({
         element: $('#fineUploader')[0],
         dragAndDrop: {
@@ -162,7 +164,7 @@ define([
     showMenu: function() {
       if (this.leftmenu) return;
       // $("#left-menu-scroll").nanoScroller();
-      $(".nano").nanoScroller({ preventPageScrolling: true });
+
       // if there's not enough space to bring the left panel out, we need to shift things a bit to the right
       if (($(document).width() < 1380) && (this.rightpanel)) {
         this.shifted = true;
@@ -263,15 +265,6 @@ define([
       $("#alert-panel").slideToggle(350);
     },
 
-    enableBodyScroll: function() {
-      // document.body.style.overflow='auto';
-      // this.hideProfileMenu();
-    },
-
-    disableBodyScroll: function() {
-      // document.body.style.overflow='hidden';
-    },
-
     onMenuToggle: function() {
       this.toggleMenu();
     },
@@ -281,7 +274,7 @@ define([
     },
 
     onMouseEnterContentFrame: function() {
-      $("#content-scroller").nanoScroller();
+      // $("#content-scroller").nanoScroller();
       this.hideMenu();
     },
 
@@ -313,7 +306,7 @@ define([
     },
 
     onMouseEnterLeftMenu: function() {
-      this.disableBodyScroll();
+      $(".nano").nanoScroller({ preventPageScrolling: true });
     },
 
     onMouseEnterToolbar: function() {
