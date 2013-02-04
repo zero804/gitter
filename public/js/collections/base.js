@@ -54,7 +54,7 @@ define([
 
       if(hasChanges) {
         options.changes = changes;
-        this.change(options);
+        //this.change(options);
 
         // TODO: Probably not the best
         this.trigger('change', this, options);

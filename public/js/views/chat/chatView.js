@@ -110,7 +110,17 @@ define([
         self.chatMessageSkip += PAGE_SIZE;
       }
 
-      this.collection.fetch({ add: true, data: { skip: this.chatMessageSkip, limit: this.chatMessageLimit }, success: success });
+      this.collection.fetch({
+        update: true,
+        add: true,
+        remove: false, // chat messages are never deleted
+        data: {
+          skip: this.chatMessageSkip,
+          limit: this.chatMessageLimit
+        },
+        success: success
+      });
+
     }
 
   });
