@@ -161,7 +161,8 @@ define([
 
     showMenu: function() {
       if (this.leftmenu) return;
-      $("#left-menu-scroll").nanoScroller();
+      // $("#left-menu-scroll").nanoScroller();
+      $(".nano").nanoScroller({ preventPageScrolling: true });
       // if there's not enough space to bring the left panel out, we need to shift things a bit to the right
       if (($(document).width() < 1380) && (this.rightpanel)) {
         this.shifted = true;
@@ -260,12 +261,12 @@ define([
     },
 
     enableBodyScroll: function() {
-      document.body.style.overflow='auto';
+      // document.body.style.overflow='auto';
       // this.hideProfileMenu();
     },
 
     disableBodyScroll: function() {
-      document.body.style.overflow='hidden';
+      // document.body.style.overflow='hidden';
     },
 
     onMenuToggle: function() {
@@ -313,12 +314,11 @@ define([
     },
 
     onMouseEnterToolbar: function() {
-      $(".nano").nanoScroller();
-      this.disableBodyScroll();
+      $(".nano").nanoScroller({ preventPageScrolling: true });
     },
 
     onMouseLeaveToolbar: function() {
-      this.enableBodyScroll();
+
     },
 
     onKeyUp: function(e) {
