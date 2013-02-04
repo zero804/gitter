@@ -514,11 +514,13 @@ define([
       this.collection.on('add', this.onCollectionAdd);
       this.collection.on('remove', this.onCollectionRemove);
       this.collection.on('reset', this.onCollectionReset);
+      this.collection.on('sort', this.onCollectionReset);
 
       this.addCleanup(function() {
         self.collection.off('add', self.onCollectionAdd);
         self.collection.off('remove', self.onCollectionRemove);
         self.collection.off('reset', self.onCollectionReset);
+        self.collection.off('sort', self.onCollectionReset);
       });
     },
 

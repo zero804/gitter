@@ -100,12 +100,12 @@ define([
       this.subscription = null;
     },
 
-    /* TODO: remove when we upgrade to 0.9.9 */
+    /* TODO: remove when we upgrade to 0.9.9
     once: function(ev, callback, context) {
       var onceFn = function() { this.unbind(ev, onceFn); callback.apply(context || this, arguments); };
       this.bind(ev, onceFn);
       return this;
-    },
+    }, */
 
     findExistingModel: function(id, newModel) {
       var existing = this.get(id);
