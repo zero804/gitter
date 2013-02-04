@@ -135,15 +135,12 @@ define([
         $(whichPanel).hide();
       });
 
-      $("#header-frame, #alert-content").animate({
-        marginRight: '0px'
-      }, 350, function() {
-      });
-
-      $("#content-frame").animate({
-          right: '-=160px'
+      if ($(document).width() < 1250) {
+        $("#content-frame, #header-frame, #alert-content").animate({
+          left: '+=110px'
         }, 350, function() {
         });
+      }
 
       this.rightpanel = false;
     },
@@ -157,15 +154,14 @@ define([
       // $("#left-menu").show();
         });
 
-        $("#header-frame, #alert-content").animate({
-          marginRight: uiVars.menuSlideValue
-        }, 350, function() {
-        });
+        if ($(document).width() < 1250) {
 
-        $("#content-frame").animate({
-          right: '+=160px'
-        }, 350, function() {
-        });
+          $("#content-frame, #header-frame, #alert-content").animate({
+            left: '-=110px'
+          }, 350, function() {
+          });
+
+        }
 
         this.rightpanel = true;
       }
@@ -173,37 +169,15 @@ define([
 
     showMenu: function() {
       if (this.leftmenu) return;
-      console.log("Showing the menu");
-      // $("#left-menu-scroll").nanoScroller();
 
-      // if there's not enough space to bring the left panel out, we need to shift things a bit to the right
-      // this document.width is a hack to test something. MIKE: FIX IT!!!
-      if (($(document).width() < 380) && (this.rightpanel)) {
-        this.shifted = true;
-        $('#right-panel').animate({ right: uiVars.shiftedPanelValue }, 350);
-
-        $("#header-frame, #alert-content").animate({
-          marginRight: uiVars.shiftedMarginValue,
-          marginLeft: uiVars.menuSlideValue
-        }, 350);
-
-      } else {
-        $("#header-frame, #alert-content").animate({
-          marginLeft: uiVars.menuSlideValue
-        }, 350);
-        $("#content-frame").animate({
-          right: '-=160px'
-        }, 350);
-
-      }
-
-      $("#left-menu").animate({
-        left: '0px'
+      $("#menu-toggle-button, #left-menu-hotspot, #left-menu, #content-frame, #alert-content, #header-frame").animate({
+        left: "+=280px"
       }, 350);
 
-      $("#menu-toggle-button").animate({
-        left: uiVars.panelWidthValue
+      $("#right-panel").animate({
+        right: "-=280px"
       }, 350);
+
 
       $("left-menu-hotspot").hide();
       this.leftmenu = true;
@@ -211,40 +185,17 @@ define([
 
     hideMenu: function() {
 
-      // if the right panel has been shifted, we need to behave a little differently when hiding the menu
-      if (this.shifted) {
-        this.shifted = false;
-        $('#right-panel').animate({ right: 0 }, 350);
+      if (!this.leftmenu) return;
 
-        $("#header-frame, #alert-content").animate({
-          marginLeft: '0px',
-          marginRight: uiVars.menuSlideValue
-        }, 350);
-
-      } else {
-
-        $("#header-frame, #alert-content").animate({
-          marginLeft: '0px'
-        }, 350);
-
-        $("#content-frame").animate({
-          right: '+=160px'
-        }, 350);
-
-      }
-
-      $("#left-menu").animate({
-        left: uiVars.hidePanelValue
-      }, 350, function() {
-        $("left-menu-hotspot").show();
-      });
-
-      $("#menu-toggle-button").animate({
-        left: '0px'
+      $("#menu-toggle-button, #left-menu-hotspot, #left-menu, #content-frame, #alert-content, #header-frame").animate({
+        left: "-=280px"
       }, 350);
 
+      $("#right-panel").animate({
+        right: "+=280px"
+      }, 350);
 
-
+      $("left-menu-hotspot").hide();
       this.leftmenu = false;
     },
 
