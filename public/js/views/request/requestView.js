@@ -5,7 +5,8 @@ define([
 ], function(TroupeViews, requestViewTemplate, requestItemViewTemplate) {
 
   var RequestItemView = TroupeViews.Base.extend({
-    //tagName: 'span',
+    tagName: 'span',
+    unreadItemType: 'request',
     template: requestItemViewTemplate,
 
     initialize: function(/*options*/) {

@@ -29,18 +29,21 @@ function compile(map) {
 /* TODO: externalize and internationalise this! */
 var templates = compile({
   "chat": "{{fromUser.displayName}} chatted\n{{text}}",
-  "file": "New file {{fileName}} uploaded by {{latestVersion.creatorUser.displayName}}"
+  "file": "New file {{fileName}} uploaded by {{latestVersion.creatorUser.displayName}}",
+  "request": "{{user.displayName}} requested access to the Troupe"
 });
 
 
 var titleTemplates = compile({
   "chat": "New chat on {{troupe.name}}",
-  "file": "New file on {{troupe.name}}"
+  "file": "New file on {{troupe.name}}",
+  "request": "New request on {{troupe.name}}"
 });
 
 var linkTemplates = compile({
   "chat": "/{{troupe.uri}}#",
-  "file": "/{{troupe.uri}}#file/{id}"
+  "file": "/{{troupe.uri}}#file/{id}",
+  "request": "/{{troupe.uri}}#request/{id}"
 });
 
 
@@ -158,6 +161,9 @@ function filterNotificationsRemoveUsersInTroupe(notifications, callback) {
   });
 }
 
+//
+// This installs the listeners that will listen to events
+//
 exports.install = function() {
   var collect = {};
   var collectTimeout = null;
@@ -220,15 +226,17 @@ exports.install = function() {
 
     // Pick the item we're going to notify the user about
     var item = null;
-    ['chat','file'].forEach(function(itemType) {
+    ['chat', 'file', 'request'].forEach(function(itemType) {
       if(!item && items[itemType]) {
         item = {
           troupeId: troupeId,
           type: itemType,
-          id: items[itemType][0]
+          id: items[itemType][0] // TODO: possibly notify the user of multiple items (instead of just the first)
         };
       }
     });
+
+    console.log(data);
 
     /* No item worth picking? Quit */
     if(!item) return;
@@ -311,14 +319,14 @@ exports.startWorkers = function() {
       return callback(null, null);
     }
 
-    // TODO: move away from resource heavy rest serializer to
-    // a lightweight notification serializer
     var Strategy = serializer.getStrategy(itemType + "Id");
     if(Strategy) {
         var strategy = new Strategy({ includeTroupe: true });
 
         serializer.serialize(itemIds, strategy, function(err, serialized) {
           if(err) return callback(err);
+
+          console.dir(serialized);
 
           var messages = serialized.map(function(data) {
             // TODO: sort this ugly hack out

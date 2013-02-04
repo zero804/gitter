@@ -1,6 +1,12 @@
 <a href="#" class="trpWhite"><div class="trpDetailViewClose">x</div></a>
 
-<div class="trpFileVersionThumbnail"><a href="#|{{previewUrl}}" class="link-preview"><img src="{{fileIcon}}" width="180" height="180"></a></div>
+<div class="trpFileVersionThumbnail"><a href="#|{{previewUrl}}" class="link-preview">
+{{#if useSpinner}}
+  <img src="/images/2/troupe-ajax-guy-green.gif" width="180" height="180">
+{{else}}
+  <img src="{{fileIcon}}" width="180" height="180">
+{{/if}}
+</a></div>
 
 <div class="trpItemDetails">
   <div class="trpFilename" title="{{fileName}}">{{fileName}}</div>

@@ -224,7 +224,6 @@ function findCreatingUserIdModel(modelName, model) {
     case "chat":
       return model.fromUser.id;
 
-    case "invite":
     case "request":
       return null;
 
@@ -245,6 +244,13 @@ function generateNotificationForUrl(url) {
    return {
       troupeId: match[1],
       modelName: 'file'
+    };
+  }
+
+  if(model === 'requests') {
+   return {
+      troupeId: match[1],
+      modelName: 'request'
     };
   }
 

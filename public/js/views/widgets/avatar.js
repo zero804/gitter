@@ -56,6 +56,7 @@ define([
     getRenderData: function() {
       var user = this.model ? this.model.toJSON() : this.user;
       var avatarUrl = (this.avatarSize == 'm') ? this.user.avatarUrlMedium : this.user.avatarUrlSmall;
+      var online = presenceClient.isOnline(user.id);
       // console.log("Rending avatar with url " + avatarUrl);
       return {
         id: user.id,
@@ -65,7 +66,8 @@ define([
         avatarUrl: avatarUrl,
         avatarSize: this.avatarSize,
         userLocation: user.location ? user.location.description : "",
-        offline: !presenceClient.isOnline(user.id)
+        online: online,
+        offline: !online
       };
     },
 

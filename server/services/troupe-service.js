@@ -6,7 +6,6 @@ var persistence = require("./persistence-service"),
     userService = require("./user-service"),
     emailNotificationService = require("./email-notification-service"),
     uuid = require('node-uuid'),
-    nconf = require('../utils/config'),
     winston = require("winston"),
     collections = require("../utils/collections");
 
@@ -280,7 +279,7 @@ function findPendingRequestForTroupe(troupeId, id, callback) {
 
 
 function findRequestsByIds(requestIds, callback) {
-  persistence.Request.findOne( {
+  persistence.Request.find( {
     _id: requestIds
   }, callback);
 }

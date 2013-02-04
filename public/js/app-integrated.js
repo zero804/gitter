@@ -38,7 +38,7 @@ require([
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView,
             createTroupeView, headerViewTemplate, shareTroupeView,
             troupeSettingsView, webNotifications, unreadItemsClient) {
-  /*global console:true*/
+  /*global console:true require:true */
   "use strict";
 
   $(document).on("click", "a", function(event) {
@@ -123,6 +123,10 @@ require([
   var requestCollection, fileCollection, conversationCollection, troupeCollection, userCollection;
   var appView = new AppIntegratedView({ app: app });
 
+  function track(name) {
+    $(document).trigger('track', name);
+  }
+
   var Router = Backbone.Router.extend({
     initialize: function(/*options*/) {
       this.regionsFragments = {};
@@ -137,18 +141,18 @@ require([
     getViewDetails: function(fragment) {
 
       var routes = [
-        { re: /^request\/(\w+)$/,         viewType: RequestDetailView,            collection: requestCollection },
-        { re: /^file\/(\w+)$/,            viewType: FileDetailView,               collection: fileCollection },
-        { re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: fileCollection },
-        { re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: fileCollection },
-        { re: /^mail\/(\w+)$/,            viewType: conversationDetailView.Modal, collection: conversationCollection },
-        { re: /^person\/(\w+)$/,          viewType: PersonDetailView,             collection: userCollection },
+        { name: "request",        re: /^request\/(\w+)$/,         viewType: RequestDetailView,            collection: requestCollection },
+        { name: "file",           re: /^file\/(\w+)$/,            viewType: FileDetailView,               collection: fileCollection },
+        { name: "filePreview",    re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: fileCollection },
+        { name: "fileVersions",   re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: fileCollection },
+        { name: "mail",           re: /^mail\/(\w+)$/,            viewType: conversationDetailView.Modal, collection: conversationCollection },
+        { name: "person",         re: /^person\/(\w+)$/,          viewType: PersonDetailView,             collection: userCollection },
 
-        { re: /^profile$/,                viewType: profileView.Modal },
-        { re: /^share$/,                  viewType: shareView.Modal },
-        { re: /^create$/,                 viewType: createTroupeView.Modal },
-        { re: /^shareTroupe/,             viewType: shareTroupeView.Modal },
-        { re: /^troupeSettings/,          viewType: troupeSettingsView }
+        { name: "profile",        re: /^profile$/,                viewType: profileView.Modal },
+        { name: "share",          re: /^share$/,                  viewType: shareView.Modal },
+        { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal },
+        { name: "shareTroupe",    re: /^shareTroupe/,             viewType: shareTroupeView.Modal },
+        { name: "troupeSettings", re: /^troupeSettings/,          viewType: troupeSettingsView }
 
       ];
 
@@ -167,13 +171,15 @@ require([
       return {
         viewType: match.viewType,
         collection: match.collection,
+        name: match.name,
         id: result[1]
       };
     },
 
     handle: function(path) {
-      if (window.location.hash.indexOf('#%7C') === 0) {
-        window.location.hash = window.location.hash.replace(/%7C/, '|');
+      var h = window.location.hash;
+      if (h.indexOf('#%7C') === 0) {
+        window.location.hash = h.replace(/%7C/, '|');
         path = path.replace(/%7C/, '|');
       }
       var parts = path.split("|");
@@ -196,6 +202,8 @@ require([
               cv.supportsModelReplacement &&
               cv.supportsModelReplacement()) {
               cv.replaceModel(model);
+              $(document).trigger('appNavigation');
+
               return;
             }
           }
@@ -203,7 +211,8 @@ require([
           /* Default case: load the view from scratch */
           var view = new viewDetails.viewType({ model: model, collection: viewDetails.collection });
           region.show(view);
-
+          console.log("APPNAV");
+          $(document).trigger('appNavigation');
         }
 
         if(this.regionsFragments[regionName] !== fragment) {
@@ -216,6 +225,8 @@ require([
             viewDetails = this.getViewDetails(fragment);
 
             if(viewDetails) {
+              track(viewDetails.name);
+
               if(viewDetails.collection) {
                 if(viewDetails.collection.length === 0) {
                   viewDetails.collection.once('reset', loadItemIntoView, this);
@@ -225,6 +236,8 @@ require([
 
               loadItemIntoView();
               return;
+            } else {
+              track('unknown');
             }
           }
 
@@ -333,14 +346,11 @@ require([
   });
 
   // Asynchronously load tracker
-  /*
-  not working with marionette yet
   require([
     'utils/tracking'
   ], function(tracking) {
     // No need to do anything here
   });
-  */
 
   app.start();
 
