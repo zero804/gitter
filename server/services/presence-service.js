@@ -165,9 +165,9 @@ function listOnlineUsersForTroupe(troupeId, callback) {
 }
 
 
-resetClientState();
 
 module.exports = {
+  resetClientState: resetClientState,
   userSocketConnected: function(userId, socketId) {
     //winston.debug("presence: userSocketConnected: ", { userId: userId, socketId: socketId });
 
@@ -268,6 +268,9 @@ module.exports = {
       });
   },
 
+  listOnlineUsers: function(callback) {
+    redisClient.smembers("presence:activeusers", callback);
+  },
 
   // Returns the online users for the given troupes
   // The callback function returns a hash

@@ -4,8 +4,11 @@
 var winston = require('winston');
 var appEvents = require("../app-events");
 var bayeux = require('./bayeux');
+var presenceService = require('../services/presence-service');
 
 exports.install = function(server) {
+  presenceService.resetClientState();
+
   var bayeuxServer = bayeux.server;
   var bayeuxClient = bayeux.client;
   var bayeuxEngine = bayeux.engine;
@@ -20,7 +23,7 @@ exports.install = function(server) {
       case 'create':
       case 'update':
       case 'remove':
-        console.dir("Publish to " + url);
+        winston.debug("Publish to " + url);
         bayeuxClient.publish(url, {
           operation: operation,
           model: model
@@ -60,6 +63,7 @@ exports.install = function(server) {
       var sound = data.sound;
 
       var url = "/user/" + userId;
+      winston.debug("Notification to " + url);
 
       bayeuxClient.publish(url, {
          notification: "user_notification",

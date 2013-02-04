@@ -225,7 +225,7 @@ var RequestIdStrategy = idStrategyGenerator(RequestStrategy, troupeService.findR
 
 /* This method should move */
 function serialize(items, strat, callback) {
-  if(!items) return null;
+  if(!items) return callback(null, null);
 
   var single = !Array.isArray(items);
   if(single) {

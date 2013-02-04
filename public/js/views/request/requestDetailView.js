@@ -8,6 +8,7 @@ define([
   'hbs!./tmpl/rejectConfirmation'
 ], function($, _, Backbone, TroupeViews, template, rejectConfirmationTemplate){
   return TroupeViews.Base.extend({
+    unreadItemType: 'request',
     template: template,
     buttonMenu : false,
     events: {
@@ -21,15 +22,7 @@ define([
     },
 
     getRenderData: function () {
-      var d = this.model.toJSON();
-      // var latestVersion = this.model.get('versions').length - 1;
-      // d.fileIcon = '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + d.fileName + "?version=" + latestVersion;
-      // d.previewUrl = '#file/preview/' + d.id;
-      // d.versionsUrl = '#file/versions/' + d.id;
-
-      console.dir("D: " + d);
-
-      return d;
+      return this.model.toJSON();
     },
 
     onAcceptClicked: function() {

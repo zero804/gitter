@@ -128,7 +128,14 @@ define([
 
   $(window).on('scroll', windowScroll);
 
+  // TODO: don't reference this frame directly!
+  $('#toolbar-frame').on('scroll', windowScroll);
+
   $(document).on('unreadItemDisplayed', function() {
+    windowScroll();
+  });
+
+  $(document).on('appNavigation', function() {
     windowScroll();
   });
 /*
