@@ -22,13 +22,13 @@ module.exports = {
           if(req.user) {
             loginUtils.redirectUserToDefaultTroupe(req, res, next, {
               onNoValidTroupes: function() {
-                res.render('signup', { noValidTroupes: true, userId: req.user.id });
+                res.render('signup', { noValidTroupes: JSON.stringify(true), userId: JSON.stringify(req.user.id) });
               }
             });
 
             return;
           }
-          res.render('signup');
+          res.render('signup', { noValidTroupes: JSON.stringify(false), userId: JSON.stringify(null) });
         }
       );
 
