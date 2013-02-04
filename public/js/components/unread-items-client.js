@@ -15,6 +15,15 @@ define([
   var unreadItems = window.troupeContext.unreadItems;
   var recentlyMarkedRead = {};
 
+  function log(fun) {
+    return function() {
+      console.log("Calling " + fun.name, arguments);
+      var r = fun.apply(null, arguments);
+      console.log("Completed " + fun.name, r);
+      return r;
+    };
+  }
+
   window.setInterval(function() {
     var now = Date.now();
 
@@ -25,13 +34,16 @@ define([
     });
   }, 5000);
 
-  function syncCounts() {
+  var syncCounts = function syncCounts() {
     var keys = _.union(_.keys(unreadItemsCountsCache), _.keys(unreadItems));
 
     _.each(keys, function(k) {
       var value = unreadItemsCountsCache[k];
       var newValue = unreadItems[k] ? unreadItems[k].length : 0;
       if(value !== newValue) {
+
+        console.log("Unread items of type: ", k, newValue, "old value was ", value);
+
         window.setTimeout(function() {
           $(document).trigger('itemUnreadCountChanged', {
             itemType: k,
@@ -40,12 +52,12 @@ define([
         }, 200);
       }
     });
-  }
+  };
 
   var readNotificationQueue = {};
   var timeoutHandle = null;
 
-  function markItemRead(itemType, itemId) {
+  var markItemRead = function markItemRead(itemType, itemId) {
 
     recentlyMarkedRead[itemType + "/" + itemId] = Date.now();
 
@@ -90,16 +102,16 @@ define([
     if(!timeoutHandle) {
       timeoutHandle = window.setTimeout(send, 500);
     }
-  }
+  };
 
   var windowTimeout = null;
-  function windowScrollOnTimeout() {
+  var windowScrollOnTimeout = function windowScrollOnTimeout() {
     windowTimeout = null;
     var $window = $(window);
     var scrollTop = $window.scrollTop();
     var scrollBottom = scrollTop + $window.height();
 
-    $.each($('.unread:visible'), function (index, element) {
+    $('.unread').each(function (index, element) {
       var $e = $(element);
       var itemType = $e.data('itemType');
       var itemId = $e.data('itemId');
@@ -118,7 +130,7 @@ define([
       }
 
     });
-  }
+  };
 
   function windowScroll() {
     if(!windowTimeout) {
@@ -183,6 +195,12 @@ define([
     syncCounts();
   }
 
+
+  //windowScrollOnTimeout = log(windowScrollOnTimeout);
+  unreadItemsRemoved = log(unreadItemsRemoved);
+  newUnreadItems = log(newUnreadItems);
+  syncCounts = log(syncCounts);
+  markItemRead = log(markItemRead);
 
   return {
     getValue: function(itemType) {
