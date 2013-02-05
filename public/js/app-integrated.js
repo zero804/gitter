@@ -320,7 +320,11 @@ require([
 
     function updateUserStatus(e, data) {
       var user = userCollection.get(data.userId);
-      user.set('online', (data.status === 'in') ? true : false);
+      if (user) {
+        // the backbone models have not always come through before the presence events,
+        // but they will come with an accurate online status so we can just ignore the presence event
+        user.set('online', (data.status === 'in') ? true : false);
+      }
     }
 
     // send out a change event to avatar widgets that are not necessarily connected to a model object.
