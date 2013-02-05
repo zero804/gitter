@@ -11,25 +11,10 @@ define([
 ], function($, _, Backbone, TroupeViews, template, conversationModels, ConversationItemView){
   "use strict";
 
-  function makeSort(sortField) {
-    return function(e) {
-      e.preventDefault();
-      this.collectionView.sortBy(sortField);
-    };
-  }
-
   return TroupeViews.Base.extend({
     template: template,
 
-    initialize: function(options) {
-      _.bindAll(this, 'showSortMenu', 'hideSortMenu');
-    },
-
-    events: {
-      "click .link-sort-from": makeSort('from'),
-      "click .link-sort-date": makeSort('date'),
-      "click .link-sort-subject": makeSort('subject'),
-      "click .mail-sorter": "showSortMenu"
+    initialize: function(/*options*/) {
     },
 
     getRenderData: function() {
@@ -38,7 +23,6 @@ define([
       var troupeName = window.troupeContext.troupe.name;
       troupeName = troupeName.replace(/\s/g,"%20");
       return { "emailAddress" : emailAddress, "troupeName" : troupeName };
-
     },
 
     afterRender: function() {
@@ -46,34 +30,8 @@ define([
         itemView: ConversationItemView,
         collection: this.collection,
         el: this.$el.find(".frame-conversations"),
-        noItemsElement: this.$el.find("#frame-help"),
-        sortMethods: {
-          "from": function(conversation) {
-            var lastSender = conversation.get('lastSender');
-            if(!lastSender) return null;
-            return lastSender.displayName;
-          },
-          "subject": function(conversation) {
-            var fileName = conversation.get('subject');
-            return fileName ? fileName.toLowerCase() : '';
-          },
-          "date": function(conversation) {
-            return conversation.get("updated");
-          }
-        }
+        noItemsElement: this.$el.find("#frame-help")
       }).render();
-    },
-
-    showSortMenu: function(e) {
-      $('body, html').on('click', this.hideSortMenu);
-      this.$el.find(".trpSortMenu").fadeIn('fast');
-      return false;
-    },
-
-    hideSortMenu: function(e) {
-      var self = this;
-      $('body, html').off('click', this.hideSortMenu);
-      this.$el.find('.trpSortMenu').fadeOut('fast');
     }
 
   });
