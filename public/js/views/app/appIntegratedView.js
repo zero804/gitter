@@ -170,8 +170,15 @@ define([
     showMenu: function() {
       if (this.leftmenu) return;
 
-      $("#menu-toggle-button, #left-menu-hotspot, #left-menu, #content-frame, #alert-content, #header-frame").animate({
+
+
+      $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
         left: "+=280px"
+      }, 350);
+
+
+      $("#content-frame, #alert-content, #header-frame").animate({
+        left: "+=180px"
       }, 350);
 
       $("#right-panel").animate({
@@ -187,8 +194,13 @@ define([
 
       if (!this.leftmenu) return;
 
-      $("#menu-toggle-button, #left-menu-hotspot, #left-menu, #content-frame, #alert-content, #header-frame").animate({
+      $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
         left: "-=280px"
+      }, 350);
+
+
+      $("#content-frame, #alert-content, #header-frame").animate({
+        left: "-=180px"
       }, 350);
 
       $("#right-panel").animate({
