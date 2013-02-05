@@ -26,7 +26,7 @@ define([
       var self = this;
       this.once('render', function() {
         // setup the add file button
-        var addFileButton = $('<div class="trpFileSmallThumbnail" title="Add a File"><a class="add-file" href="#"><img src="/images/2/icon-square-add.png" width="31" height="31"></a></div>');
+        var addFileButton = $('<div class="trpFileSmallThumbnail trpSmallButton" title="Add a File"><a class="add-file" href="#"><img src="/images/2/icon-square-add.png" width="31" height="31"></a></div>');
         self.$el.prepend(addFileButton);
         addFileButton.tooltip({
           html : true,
