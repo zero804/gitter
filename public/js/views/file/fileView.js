@@ -5,17 +5,15 @@ define([
   'backbone',
   'marionette',
   './fileItemView',
+  'hbs!./tmpl/fileHelpView',
   './../base'
-], function($, _, Backbone, Marionette, FileItemView, TroupeViews) {
+], function($, _, Backbone, Marionette, FileItemView, fileHelpView, TroupeViews) {
   "use strict";
 
   var FileView = Marionette.CollectionView.extend({
     itemView: FileItemView,
     emptyView: Backbone.View.extend({
-      render: function() {
-        // insert help text if there are no files
-        this.$el.append('<p class="trpBodyMedium">There are no files, you can drag and drop files here or click the Add button above</p>');
-      }
+      template: fileHelpView
     }),
 
     events: {

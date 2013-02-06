@@ -9,7 +9,6 @@ define([
   'backbone',
   'views/base',
   'hbs!./tmpl/conversationDetailItemView',
-  'hbs!./tmpl/conversationDetailItemViewBody',
   'views/widgets/avatar',
   '../../utils/momentWrapper'
 ], function($, _, Backbone, TroupeViews, template, bodyTemplate, AvatarView, moment) {
@@ -47,18 +46,6 @@ define([
       return data;
     },
 
-    afterRender: function() {
-      /*
-      if(this.initialIndex === 0) {
-          var mailbody = this.generateMailBody();
-
-          this.$el.find("#initialBody").replaceWith(mailbody);
-          this.$el.find('.trpMailPreview').hide();
-      }
-      */
-      // create and show the FULL mail body for the first mail
-    },
-
     onHeaderClick: function(/*event*/) {
       var $preview = this.$el.find('.trpMailPreview');
       var $mailBody = this.$el.find('.trpMailExpanded');
@@ -75,22 +62,7 @@ define([
       }
 
       return false;
-    }/*,
-
-    generateMailBody: function() {
-      if(this.mailbody) {
-        return this.mailbody;
-      }
-
-      var data = this.getRenderData();
-      data.mail = data.mail.replace(/\t/g, '    ')
-       .replace(/  /g, '&nbsp; ')
-       .replace(/  /g, ' &nbsp;') // handles "W&nbsp;  W"
-       .replace(/\r\n|\n|\r/g, '<br />');
-
-      this.mailbody = $(bodyTemplate(data));
-      return this.mailbody;
-    }*/
+    }
 
   });
 });
