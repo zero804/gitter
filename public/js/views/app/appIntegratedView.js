@@ -111,8 +111,10 @@ define([
       if (!this.profilemenu) {
 
         $(".trpProfileMenu").animate({
-            width: '124px'
-        }, 250);
+            width: '132px'
+        }, 250, function () {
+
+        });
         this.profilemenu = true;
       }
     },
