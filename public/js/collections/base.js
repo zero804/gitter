@@ -166,7 +166,7 @@ define([
   /* This is a mixin for Backbone.Model */
   exports.ReversableCollectionBehaviour = {
 
-    sortMethods: {
+    sortByMethods: {
 
     },
 
