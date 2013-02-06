@@ -661,8 +661,13 @@ define([
         return;
       }
 
-      var prevModel = this.collection.at(index - 1);
-      var view = collectionView.children.findByModel(prevModel);
+      var adjacentModel = this.collection.at(index - 1);
+      var view = collectionView.children.findByModel(adjacentModel);
+      if (!view) {
+        adjacentModel = this.collection.at(index + 1);
+        view = collectionView.children.findByModel(adjacentModel);
+      }
+
       itemView.$el.insertAfter(view.$el);
     }
 
