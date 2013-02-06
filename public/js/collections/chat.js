@@ -32,5 +32,7 @@ define([
     }
   });
 
+  _.extend(exports.ChatCollection.prototype, TroupeCollections.ReversableCollectionBehaviour);
+
   return exports;
 });
