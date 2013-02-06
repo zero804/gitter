@@ -27,7 +27,7 @@ define([
 
       $(window).bind('scroll', this, this.scrollEventBound);
       this.collection = new chatModels.ChatCollection();
-      this.collection.setSortBy('+sent');
+      this.collection.setSortBy('-sent');
       this.collection.listen();
 
       this.addCleanup(function() {
