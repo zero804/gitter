@@ -65,6 +65,10 @@ define([
     },
 
     getRenderData: function() {
+      if (this.data) {
+        return this.data;
+      }
+
       if (this.model) {
         return this.model.toJSON();
       }
