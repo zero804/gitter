@@ -1,10 +1,12 @@
 /*jshint unused:true browser:true*/
 define([
+  'jquery',
   'underscore',
+  'backbone',
   'marionette',
   './fileItemView',
   './../base'
-], function(_, Marionette, FileItemView, TroupeViews) {
+], function($, _, Backbone, Marionette, FileItemView, TroupeViews) {
   "use strict";
 
   var FileView = Marionette.CollectionView.extend({
