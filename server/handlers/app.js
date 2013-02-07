@@ -10,128 +10,132 @@ var nconf = require('../utils/config');
 var middleware = require('../web/middleware');
 var oauthService = require("../services/oauth-service");
 var middleware = require('../web/middleware');
+var fileService = require("../services/file-service");
+
+function renderAppPageWithTroupe(req, res, next, page, troupe, data) {
+  if(req.user) {
+    unreadItemService.getUnreadItemsForUser(req.user.id, troupe.id, function(err, unreadItems) {
+      if(err) return next(err);
+      serializeUserAndRenderPage(unreadItems);
+    });
+
+  } else {
+    serializeUserAndRenderPage(null);
+  }
+
+  function serializeUserAndRenderPage(unreadItems) {
+    if(!req.user) return renderPage(unreadItems, null, null);
+
+    var strategy = new restSerializer.UserStrategy();
+
+    restSerializer.serialize(req.user, strategy, function(err, serialized) {
+      if(err) return next(err);
+
+      oauthService.findOrGenerateWebToken(req.user.id, function(err, token) {
+        if(err) return next(err);
+
+        renderPage(unreadItems, serialized, token);
+      });
+
+    });
+
+  }
+
+  function getFayeUrl() {
+    var url = nconf.get('ws:fayeUrl');
+    if(url) return url;
+
+    return "/faye";
+  }
+
+  function renderPage(unreadItems, serializedUser, accessToken) {
+    var profileNotCompleted;
+
+    var troupeData = {
+      "uri": troupe.uri,
+      "id": troupe.id,
+      "name": troupe.name
+    };
+    var accessDenied;
+
+    if(req.user) {
+      if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
+        accessDenied = true;
+        troupeData = null;
+      }
+
+      var status = req.user.status;
+      profileNotCompleted = status == 'PROFILE_NOT_COMPLETED';
+      if(status != 'PROFILE_NOT_COMPLETED' && status != 'ACTIVE') {
+        // Oh dear, something has gone horribly wrong
+        winston.error("Rejecting user. Something has gone wrong! ", { user: req.user });
+        return next("Inconsistent state for user: " + status);
+      }
+
+    } else {
+      troupeData = null;
+    }
+
+    var troupeContext = {
+        user: serializedUser,
+        troupe: troupeData,
+        accessToken: accessToken,
+        profileNotCompleted: profileNotCompleted,
+        unreadItems: unreadItems,
+        accessDenied: accessDenied,
+        baseServer: nconf.get('web:baseserver'),
+        basePort: nconf.get('web:baseport'),
+        basePath: nconf.get('web:basepath'),
+        homeUrl: nconf.get('web:homeurl'),
+        websockets: {
+          fayeUrl: getFayeUrl(),
+          options: {
+            timeout: 120,
+            retry: 5
+          },
+          disable: ['websocket']
+        }
+
+
+    };
+
+
+    var login, troupeName;
+    if(req.user && !profileNotCompleted && troupeData) {
+      login  = false;
+      troupeName = troupe.name;
+
+      userService.saveLastVisitedTroupeforUser(req.user.id, troupe.id, function(err) {
+        if (err) winston.info("Something went wrong saving the user last troupe visited: ", { exception: err });
+      });
+
+    } else {
+      login = true;
+      if(profileNotCompleted) {
+        troupeName = troupe.name;
+      } else {
+        troupeName = "Welcome";
+      }
+    }
+
+    res.render(page, {
+      login: login,
+      data: login ? null : JSON.stringify(data), // Only push the data through if the user is logged in already
+      troupeName: troupeName,
+      troupeContext: JSON.stringify(troupeContext)
+    });
+
+  }
+}
 
 function renderAppPage(req, res, next, page) {
-
   var appUri = req.params.appUri;
 
   troupeService.findByUri(appUri, function(err, troupe) {
     if(err) return next(err);
     if(!troupe) return next("Troupe: " + appUri + " not found.");
 
-    if(req.user) {
-      unreadItemService.getUnreadItemsForUser(req.user.id, troupe.id, function(err, unreadItems) {
-        if(err) return next(err);
-        serializeUserAndRenderPage(unreadItems);
-      });
-
-    } else {
-      serializeUserAndRenderPage(null);
-    }
-
-    function serializeUserAndRenderPage(unreadItems) {
-      if(!req.user) return renderPage(unreadItems, null, null);
-
-      var strategy = new restSerializer.UserStrategy();
-
-      restSerializer.serialize(req.user, strategy, function(err, serialized) {
-        if(err) return next(err);
-
-        oauthService.findOrGenerateWebToken(req.user.id, function(err, token) {
-          if(err) return next(err);
-
-          renderPage(unreadItems, serialized, token);
-        });
-
-      });
-
-    }
-
-    function getFayeUrl() {
-      var url = nconf.get('ws:fayeUrl');
-      if(url) return url;
-
-      return "/faye";
-    }
-
-    function renderPage(unreadItems, serializedUser, accessToken) {
-      var profileNotCompleted;
-
-      var troupeData = {
-        "uri": troupe.uri,
-        "id": troupe.id,
-        "name": troupe.name
-      };
-      var accessDenied;
-
-      if(req.user) {
-        if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
-          accessDenied = true;
-          troupeData = null;
-        }
-
-        var status = req.user.status;
-        profileNotCompleted = status == 'PROFILE_NOT_COMPLETED';
-        if(status != 'PROFILE_NOT_COMPLETED' && status != 'ACTIVE') {
-          // Oh dear, something has gone horribly wrong
-          winston.error("Rejecting user. Something has gone wrong! ", { user: req.user });
-          return next("Inconsistent state for user: " + status);
-        }
-
-      } else {
-        troupeData = null;
-      }
-
-      var troupeContext = {
-          user: serializedUser,
-          troupe: troupeData,
-          accessToken: accessToken,
-          profileNotCompleted: profileNotCompleted,
-          unreadItems: unreadItems,
-          accessDenied: accessDenied,
-          baseServer: nconf.get('web:baseserver'),
-          basePort: nconf.get('web:baseport'),
-          basePath: nconf.get('web:basepath'),
-          homeUrl: nconf.get('web:homeurl'),
-          websockets: {
-            fayeUrl: getFayeUrl(),
-            options: {
-              timeout: 120,
-              retry: 5
-            },
-            disable: ['websocket']
-          }
-
-
-      };
-
-
-      var login, troupeName;
-      if(req.user && !profileNotCompleted && troupeData) {
-        login  = false;
-        troupeName = troupe.name;
-
-        userService.saveLastVisitedTroupeforUser(req.user.id, troupe.id, function(err) {
-          if (err) winston.info("Something went wrong saving the user last troupe visited: ", { exception: err });
-        });
-
-      } else {
-        login = true;
-        if(profileNotCompleted) {
-          troupeName = troupe.name;
-        } else {
-          troupeName = "Welcome";
-        }
-      }
-
-      res.render(page, {
-        login: login,
-        troupeName: troupeName,
-        troupeContext: JSON.stringify(troupeContext)
-      });
-
-    }
-
+    renderAppPageWithTroupe(req, res, next, page, troupe);
   });
 }
 
@@ -193,7 +197,30 @@ module.exports = {
         middleware.rememberMe,
         middleware.ensureLoggedIn(),
         function(req, res, next) {
-          renderAppPage(req, res, next, 'mobile/file-app');
+          var appUri = req.params.appUri;
+
+          troupeService.findByUri(appUri, function(err, troupe) {
+            if(err) return next(err);
+            if(!troupe) return next("Troupe: " + appUri + " not found.");
+
+            fileService.findByTroupe(troupe.id, function(err, files) {
+              if (err) {
+                winston.error("Error in findByTroupe: ", { exception: err });
+                return next(err);
+              }
+
+              var strategy = new restSerializer.FileStrategy({ currentUserId: req.user.id, troupeId: troupe.id });
+              restSerializer.serialize(files, strategy, function(err, serializedFiles) {
+                if (err) {
+                  winston.error("Error in Serializer:", { exception: err });
+                  return next(err);
+                }
+                renderAppPageWithTroupe(req, res, next, 'mobile/file-app', troupe, { 'files': serializedFiles });
+              });
+            });
+          });
+
+
         });
 
       app.get('/:appUri/mails',
@@ -209,8 +236,6 @@ module.exports = {
         function(req, res, next) {
           renderAppPage(req, res, next, 'mobile/people-app');
         });
-
-
 
       app.get('/:appUri/accessdenied', function(req, res) {
         res.render('app-accessdenied', {
