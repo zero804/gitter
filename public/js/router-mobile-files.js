@@ -21,7 +21,8 @@ require([
 
     initialize: function() {
       this.fileCollection = new fileModels.FileCollection();
-      this.fileCollection.fetch();
+      //this.fileCollection.fetch();
+      this.fileCollection.reset(window.troupePreloads['files']);
       this.fileCollection.listen();
     },
 
