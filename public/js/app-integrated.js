@@ -16,6 +16,7 @@ require([
   'collections/files',
   'collections/conversations',
   'collections/users',
+  'collections/chat',
   'collections/requests',
   'views/file/fileDetailView',
   'views/file/filePreviewView',
@@ -34,7 +35,7 @@ require([
   'components/webNotifications',
   'components/unread-items-client'
 ], function($, _, Backbone, Marionette, _Helpers, TroupeViews, realtime, AppIntegratedView, ChatView, FileView, ConversationView, RequestView,
-            troupeModels, fileModels, conversationModels, userModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
+            troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView,
             createTroupeView, headerViewTemplate, shareTroupeView,
             troupeSettingsView, webNotifications, unreadItemsClient) {
@@ -120,7 +121,7 @@ require([
   };
 
   var router;
-  var requestCollection, fileCollection, conversationCollection, troupeCollection, userCollection;
+  var requestCollection, fileCollection, chatCollection, conversationCollection, troupeCollection, userCollection;
   var appView = new AppIntegratedView({ app: app });
 
   function track(name) {
@@ -259,8 +260,15 @@ require([
     }))();
     app.headerRegion.show(headerView);
 
+    chatCollection = new chatModels.ChatCollection();
+    chatCollection.setSortBy('-sent');
+    chatCollection.listen();
+    chatCollection.reset(window.troupePreloads['chatMessages']);
+
     // Chat View (unncessarily manages it's own collections)
-    var chatView = new ChatView();
+    var chatView = new ChatView({
+      collection: chatCollection
+    });
     app.chatRegion.show(chatView);
 
     // Request Collections
@@ -278,7 +286,7 @@ require([
 
     fileCollection = new fileModels.FileCollection();
     fileCollection.listen();
-    fileCollection.fetch();
+    fileCollection.reset(window.troupePreloads['files']);
 
     // File View
     var fileView = new FileView({

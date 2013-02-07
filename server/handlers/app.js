@@ -11,6 +11,8 @@ var middleware = require('../web/middleware');
 var oauthService = require("../services/oauth-service");
 var middleware = require('../web/middleware');
 var fileService = require("../services/file-service");
+var chatService = require("../services/chat-service");
+var Fiber = require("../utils/fiber");
 
 function renderAppPageWithTroupe(req, res, next, page, troupe, data) {
   if(req.user) {
@@ -139,10 +141,46 @@ function renderAppPage(req, res, next, page) {
   });
 }
 
+function preloadFiles(userId, troupeId, callback) {
+  fileService.findByTroupe(troupeId, function(err, files) {
+    if (err) {
+      winston.error("Error in findByTroupe: ", { exception: err });
+      return callback(err);
+    }
+
+    var strategy = new restSerializer.FileStrategy({ currentUserId: userId, troupeId: troupeId });
+    restSerializer.serialize(files, strategy, callback);
+  });
+}
+
+function preloadChats(userId, troupeId, callback) {
+  chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: 50 }, function(err, chatMessages) {
+    if(err) return callback(err);
+
+    var strategy = new restSerializer.ChatStrategy({ currentUserId: userId, troupeId: troupeId });
+    restSerializer.serialize(chatMessages, strategy, callback);
+  });
+
+}
+
+function preloadTroupeMiddleware(req, res, next) {
+  var appUri = req.params.appUri;
+
+  troupeService.findByUri(appUri, function(err, troupe) {
+    if(err) return next(err);
+    if(!troupe) return next("Troupe: " + appUri + " not found.");
+
+    req.troupe = troupe;
+    next();
+  });
+
+}
+
 module.exports = {
     install: function(app) {
       app.get('/:appUri',
         middleware.rememberMe,
+        preloadTroupeMiddleware,
         function(req, res, next) {
         var page;
         if(req.headers['user-agent'].indexOf('Mobile') >= 0) {
@@ -151,8 +189,18 @@ module.exports = {
           page = 'app-integrated';
         }
 
-        renderAppPage(req, res, next, page);
-
+        var f = new Fiber();
+        if(req.user) {
+          preloadFiles(req.user.id, req.troupe.id, f.waitor());
+          preloadChats(req.user.id, req.troupe.id, f.waitor());
+        }
+        f.all()
+          .spread(function(files, chats) {
+            renderAppPageWithTroupe(req, res, next, page, req.troupe, { 'files': files, 'chatsMessage': chats });
+          })
+          .fail(function(err) {
+            next(err);
+          });
 
       });
 
@@ -196,30 +244,17 @@ module.exports = {
       app.get('/:appUri/files',
         middleware.rememberMe,
         middleware.ensureLoggedIn(),
+        preloadTroupeMiddleware,
         function(req, res, next) {
-          var appUri = req.params.appUri;
 
-          troupeService.findByUri(appUri, function(err, troupe) {
-            if(err) return next(err);
-            if(!troupe) return next("Troupe: " + appUri + " not found.");
+          preloadFiles(req.user.id, req.troupe.id, function(err, serializedFiles) {
+            if (err) {
+              winston.error("Error in Serializer:", { exception: err });
+              return next(err);
+            }
 
-            fileService.findByTroupe(troupe.id, function(err, files) {
-              if (err) {
-                winston.error("Error in findByTroupe: ", { exception: err });
-                return next(err);
-              }
-
-              var strategy = new restSerializer.FileStrategy({ currentUserId: req.user.id, troupeId: troupe.id });
-              restSerializer.serialize(files, strategy, function(err, serializedFiles) {
-                if (err) {
-                  winston.error("Error in Serializer:", { exception: err });
-                  return next(err);
-                }
-                renderAppPageWithTroupe(req, res, next, 'mobile/file-app', troupe, { 'files': serializedFiles });
-              });
-            });
+            renderAppPageWithTroupe(req, res, next, 'mobile/file-app', req.troupe, { 'files': serializedFiles });
           });
-
 
         });
 
