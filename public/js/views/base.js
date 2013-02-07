@@ -491,24 +491,35 @@ define([
 
     appendHtml: function(collectionView, itemView, index) {
 
-      if (this.isRendering || index >= collectionView.collection.length - 1) {
+      function findViewAtPos(i) {
+        if (i >= collectionView.collection.length)
+          return;
+
+        return collectionView.children.findByModel(collectionView.collection.at(i));
+      }
+
+      if (this.isRendering) {
+        // if this is during rendering, then the views always come in sort order, so just append
         collectionView.$el.append(itemView.el);
-        return;
       }
+      else {
+        // we are inserting views after rendering, find the adjacent view if there is one already
+        var adjView;
 
-      if (index === 0) {
-        collectionView.$el.prepend(itemView.el);
-        return;
+        if (index === 0) {
+          // find the view that comes after the first one (sometimes there will be a non view that is the first child so we can't prepend)
+          adjView = findViewAtPos(index + 1);
+          if (adjView)
+            itemView.$el.insertBefore(adjView.el);
+          else
+            itemView.$el.appendTo(collectionView.el);
+        }
+        else {
+          // find the view that comes before this one
+          adjView = findViewAtPos(index - 1);
+          itemView.$el.insertAfter(adjView.$el);
+        }
       }
-
-      var adjacentModel = this.collection.at(index - 1);
-      var view = collectionView.children.findByModel(adjacentModel);
-      if (!view) {
-        adjacentModel = this.collection.at(index + 1);
-        view = collectionView.children.findByModel(adjacentModel);
-      }
-
-      itemView.$el.insertAfter(view.$el);
     }
 
   };
