@@ -66,7 +66,7 @@ a:hover {
 	position: fixed;
 	width: 280px;
 	left: -280px;
-	top: 60px;
+	top: 62px;
 	background-color: @trpGreen;
 	height: 100%;
 	color: white;
@@ -177,13 +177,15 @@ a:hover {
 
 
 .trpContentPanel {
-  display: inline-block;
-	background-color: #ecf1ec;
+/*  display: inline-block;*/
+  position: absolute;
+/*	background-color: #ecf1ec;*/
 	margin-left: 0px;
 	height: 100%;
 	width: 100%;
 	text-align: center;
 	padding-top: 40px;
+  right: 0px;
 }
 
 .trpContentSpacer {
@@ -201,10 +203,12 @@ a:hover {
 	position: fixed;
 	z-index: 1000;
 	overflow: hidden;
+	border-top: 2px solid @trpGreen;
 }
 
 .trpHeaderContainer {
   display: inline-block;
+  position: relative;
 	background-color: white;
 	text-align: center;
 	overflow: hidden;
@@ -216,7 +220,7 @@ a:hover {
 	min-width: 500px;
 	text-align: left;
 	color: #333;
-	padding-top: 14px;
+	padding-top: 12px;
 	height: 60px;
 }
 
@@ -232,7 +236,7 @@ a:hover {
   display: inline-block;
 	float: left;
 	padding-top: 16px;
-	border-top: 2px solid @trpGreen;
+/*	border-top: 2px solid @trpGreen;*/
 	margin: 0;
 }
 
@@ -241,7 +245,7 @@ a:hover {
 	float: left;
 	padding-top: 14px;
 	padding-left: 12px;
-	border-top: 2px solid @trpGreen;
+/*	border-top: 2px solid @trpGreen;*/
 	margin: 0;
 }
 
@@ -252,9 +256,10 @@ a:hover {
 	vertical-align: top;
 	display: inline-block;
 	padding-top: 18px;
-	border-top: 2px solid #1dce73;
+/*	border-top: 2px solid #1dce73;*/
 	margin: 0;
-	width: 0px;
+  display: none;
+	width: 132px;
 	overflow: hidden;
 	white-space: nowrap;
 }
@@ -323,7 +328,6 @@ a:hover {
 	margin-top: 40px;
 	vertical-align: top;
 	margin-left: -200px;
-  overflow-y: auto;
   height: 90%;
 }
 
@@ -413,6 +417,14 @@ a:hover {
 	.trpBodyMedium;
 	text-align: left;
 	margin: 1px;
+}
+
+.notification a {
+	color: inherit;
+}
+
+.notification a:hover {
+	text-decoration: none;
 }
 
 .notification-header {

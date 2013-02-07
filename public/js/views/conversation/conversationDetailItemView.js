@@ -9,7 +9,6 @@ define([
   'backbone',
   'views/base',
   'hbs!./tmpl/conversationDetailItemView',
-  'hbs!./tmpl/conversationDetailItemViewBody',
   'views/widgets/avatar',
   '../../utils/momentWrapper'
 ], function($, _, Backbone, TroupeViews, template, bodyTemplate, AvatarView, moment) {
@@ -25,7 +24,7 @@ define([
     },
 
     initialize: function(options) {
-      this.initialIndex = options.index;
+      this.index = options.index;
     },
 
     getRenderData: function() {
@@ -38,53 +37,31 @@ define([
 
       data.date = data.date.calendar();
 
-      data.initialIndex = this.initialIndex;
-      return data;
-    },
-
-    afterRender: function() {
-      if(this.initialIndex === 0) {
-          var mailbody = this.generateMailBody();
-
-          this.$el.find("#initialBody").replaceWith(mailbody);
-          this.$el.find('.trpMailPreview').hide();
-      }
-    },
-
-    onHeaderClick: function(event) {
-      if(this.mailbody) {
-        $(this.mailbody).toggle();
-        // For some reason using toggle (which adjusts css display property) causes other issues, so this just toggles visibility
-        if(this.$el.find('.trpMailPreview').is(':visible')) {
-          this.$el.find('.trpMailPreview').hide();
-          return false;
-        }
-        this.$el.find('.trpMailPreview').show();
-        return false;
-      }
-
-      var mailbody = this.generateMailBody();
-
-      this.$el.append(mailbody);
-      this.$el.find('.trpMailPreview').hide();
-
-      return false;
-
-    },
-
-    generateMailBody: function() {
-      if(this.mailbody) {
-        return this.mailbody;
-      }
-
-      var data = this.getRenderData();
       data.mail = data.mail.replace(/\t/g, '    ')
        .replace(/  /g, '&nbsp; ')
        .replace(/  /g, ' &nbsp;') // handles "W&nbsp;  W"
        .replace(/\r\n|\n|\r/g, '<br />');
 
-      this.mailbody = $(bodyTemplate(data));
-      return this.mailbody;
+      data.index = this.index;
+      return data;
+    },
+
+    onHeaderClick: function(/*event*/) {
+      var $preview = this.$el.find('.trpMailPreview');
+      var $mailBody = this.$el.find('.trpMailExpanded');
+      var showingPreview = this.$el.find('.trpMailPreview').is(':visible');
+
+      // For some reason using toggle (which adjusts css display property) causes other issues, so this just toggles visibility
+      if(showingPreview) {
+        $preview.hide();
+        $mailBody.show();
+      }
+      else {
+        $mailBody.hide();
+        $preview.show();
+      }
+
+      return false;
     }
 
   });

@@ -5,9 +5,10 @@ define([
   'underscore',
   'backbone',
   'views/base',
+  'marionette',
   'hbs!./tmpl/fileVersionsView',
   './versionView'
-], function($, _, Backbone, TroupeViews, template, VersionView){
+], function($, _, Backbone, TroupeViews, Marionette, template, VersionView){
   var View = TroupeViews.Base.extend({
     template: template,
 
@@ -18,8 +19,9 @@ define([
     },
 
     afterRender: function() {
-      new TroupeViews.Collection({
+      new Marionette.CollectionView({
          collection: this.model.get('versions'),
+         itemViewOptions: { file: this.model },
          itemView: VersionView,
          el: this.$el.find('.frame-versions')
       }).render();

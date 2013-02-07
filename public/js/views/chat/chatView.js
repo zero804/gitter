@@ -4,13 +4,14 @@ define([
   'jquery',
   'underscore',
   'backbone',
+  'marionette',
   'bootstrap',
   'views/base',
   'hbs!./tmpl/chat',
   './chatViewItem',
   'collections/chat',
   '../../utils/momentWrapper'
-], function($, _, Backbone, _bootstrap, TroupeViews, template, ChatViewItem, chatModels, moment) {
+], function($, _, Backbone, Marionette, _bootstrap, TroupeViews, template, ChatViewItem, chatModels, moment) {
   "use strict";
 
   var PAGE_SIZE = 50;
@@ -26,6 +27,7 @@ define([
 
       $(window).bind('scroll', this, this.scrollEventBound);
       this.collection = new chatModels.ChatCollection();
+      this.collection.setSortBy('-sent');
       this.collection.listen();
 
       this.addCleanup(function() {
@@ -59,16 +61,15 @@ define([
     },
 
     afterRender: function() {
-      this.collectionView = new TroupeViews.Collection({
+      var CV = Marionette.CollectionView.extend(TroupeViews.SortableMarionetteView);
+
+      this.collectionView = new CV({
         itemView: ChatViewItem,
         collection: this.collection,
         el: this.$el.find(".frame-chat"),
-        sortMethods: {
-          "sent": function(model) {
-            return model.get('sent');
-          }
-        },
-        defaultSort: "-sent"
+        initialize: function() {
+          this.initializeSorting();
+        }
       });
     },
 
@@ -101,7 +102,7 @@ define([
     loadNextMessages: function() {
       var self = this;
 
-      function success(data, resp) {
+      function success(data/*, resp*/) {
         if(!data.length) {
           $(window).unbind('scroll', self.scrollEventBound);
           return;
@@ -110,7 +111,17 @@ define([
         self.chatMessageSkip += PAGE_SIZE;
       }
 
-      this.collection.fetch({ add: true, data: { skip: this.chatMessageSkip, limit: this.chatMessageLimit }, success: success });
+      this.collection.fetch({
+        update: true,
+        add: true,
+        remove: false, // chat messages are never deleted
+        data: {
+          skip: this.chatMessageSkip,
+          limit: this.chatMessageLimit
+        },
+        success: success
+      });
+
     }
 
   });

@@ -1,7 +1,7 @@
 @import "bootstrap.less";
 
 @import "trpColours.less";
-@import "trpWebFonts.less";
+/*@import "trpWebFonts.less";*/
 @import "trpFonts.less";
 @import "trpButtons.less";
 @import "trpCommon.less";
@@ -36,7 +36,7 @@ h1 {
   display: inline-block;
   margin: 0px auto;
   text-align: left;
-  padding-top: 20px;
+  padding-top: 40px;
   padding-bottom: 12px;
 }
 
@@ -58,6 +58,7 @@ h1 {
   .trpBodyEm;
   font-weight: lighter;
   color: @trpDarkGrey;
+  background-color: white;
 }
 
 .trpHomeHeroStripContainer {
@@ -70,7 +71,7 @@ h1 {
   padding-bottom: 0px;
   background-image: url('../../images/2/home-hero-image.jpg');
   background-size: cover;
-  height: 540px;
+  height: 700px;
 }
 
 .trpHomeHero {
@@ -84,10 +85,10 @@ h1 {
 
 .trpHeroText {
   display: inline-block;
-  max-width: 350px;
+  max-width: 380px;
   padding-right: 20px;
   padding-top: 40px;
-  font-family: @fontSerif;
+  font-family: @fontSans;
   font-size: 32px;
   color: white;
   text-align: left;
@@ -98,7 +99,7 @@ h1 {
 .trpHeroImage {
   position: absolute;
   right: 0px;
-  top: 112px;
+  top: 200px;
   display: inline-block;
   text-align: right;
 }
@@ -112,7 +113,7 @@ h1 {
 }
 
 .trpMidStrip {
-  font-family: @fontSerif;
+  font-family: @fontSans;
   font-size: 28px;
   color: @trpDarkGrey;
   padding-top: 10px;
@@ -123,6 +124,7 @@ h1 {
   min-width: 960px;
   padding-top: 8px;
   padding-bottom: 18px;
+  width: 100%;
   text-align: center;
 }
 
@@ -163,7 +165,7 @@ h1 {
 
 .trpHomeVideo {
   .trpHomeHero;
-  font-family: @fontSerif;
+  font-family: @fontSans;
   font-size: 30px;
   color: white;
   text-align: center;
@@ -171,7 +173,7 @@ h1 {
 }
 
 .trpHomeVideoSubtext {
-  font-family: @fontThin;
+  font-family: @fontSans;
   font-size: 16px;
   padding-top: 40px;
   font-weight: normal;

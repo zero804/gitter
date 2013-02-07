@@ -25,7 +25,7 @@ define([
 
       var body = $(document);
       var iframe = this.$el.find('iframe');
-      iframe.css({ width: body.width(), height: body.height() });
+      // iframe.css({ width: body.width(), height: body.height() });
 
       return this;
     }
