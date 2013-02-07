@@ -33,17 +33,10 @@ define([
 
       var isModel = !!this.model;
       if (isModel) {
-        this.model.on('change', avatarChange);
+        this.listenTo(this.model, 'change', avatarChange);
       } else {
-        $(document).on('avatar:change', avatarChange);
+        this.listenTo($(document), 'avatar:change', avatarChange);
       }
-
-      this.addCleanup(function() {
-        if (isModel)
-          self.model.off('avatar:change', avatarChange);
-        else
-          $(document).off('avatar:change', avatarChange);
-      });
     },
 
     getUserId: function() {

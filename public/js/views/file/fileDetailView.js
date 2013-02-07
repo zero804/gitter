@@ -21,11 +21,11 @@ define([
 
     getRenderData: function () {
       var d = this.model.toJSON();
-      var latestVersion = this.model.get('versions').length - 1;
-      d.fileIcon = '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + d.fileName + "?version=" + latestVersion;
+      var latestVersionNumber = this.model.get('versions').length - 1;
+      d.fileIcon = '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + d.fileName + "?version=" + latestVersionNumber;
       d.previewUrl = '#file/preview/' + d.id;
       d.versionsUrl = '#file/versions/' + d.id;
-      d.useSpinner = latestVersion.thumbnailStatus === 'GENERATING';
+      d.useSpinner = this.model.get('versions').at(latestVersionNumber).get('thumbnailStatus') === 'GENERATING';
 
       return d;
     },

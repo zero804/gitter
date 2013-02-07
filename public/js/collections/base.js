@@ -118,7 +118,7 @@ define([
     },
 
     onDataChange: function(data) {
-      console.log(["onDataChange",data]);
+      console.log(""/*,data*/);
 
       var operation = data.operation;
       var newModel = data.model;
@@ -138,7 +138,6 @@ define([
               console.log("Nothing was deleted. This is a problem.");
             }
             */
-            console.log("Existing ", existing, " set ", newModel);
             existing.set(newModel);
           } else {
             this.add(parsed);
