@@ -69,7 +69,6 @@ module.exports = {
     app.use(express.session({ secret: 'keyboard cat', store: sessionStore, cookie: { path: '/', httpOnly: true, maxAge: 14400000, domain: nconf.get("web:cookieDomain"), secure: false /*nconf.get("web:secureCookies") Express won't sent the cookie as the https offloading is happening in nginx. Need to have connection.proxySecure set*/ }}));
     app.use(passport.initialize());
     app.use(passport.session());
-    app.use(require('./rememberme-middleware').rememberMeMiddleware());
     app.use(app.router);
 
     var expressErrorHandler = express.errorHandler({ showStack: nconf.get('express:showStack'), dumpExceptions: nconf.get('express:dumpExceptions') });

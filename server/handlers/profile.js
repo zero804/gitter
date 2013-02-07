@@ -14,6 +14,7 @@ var form = require("express-form"),
 module.exports = {
     install: function(app) {
       app.get('/profile',
+        middleware.rememberMe,
         middleware.ensureLoggedIn(),
         function(req, res) {
           var displayName;
@@ -32,6 +33,7 @@ module.exports = {
 
       app.post(
           '/profile',
+          middleware.rememberMe,
           middleware.ensureLoggedIn(),
           // Form filter and validation middleware
           form(
