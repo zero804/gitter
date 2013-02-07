@@ -47,16 +47,13 @@ define([
           currentValue.reset(val);
           this.changed[attr] = val;
           changes[attr] = true;
+          this.trigger('change:' + attr, this, this.changed[attr]);
           delete attrs[attr];
           hasChanges = true;
         }
       }
 
       if(hasChanges) {
-        options.changes = changes;
-        //this.change(options);
-
-        // TODO: Probably not the best
         this.trigger('change', this, options);
       }
 
