@@ -4,13 +4,14 @@
 
 body {
   margin: 0px;
-  height: 100%;
+height: 100%;
   font-family: @fontSans;
   color: white;
+  overflow: hidden;
 }
 
 html {
-/* background-color: @trpGreen;*/
+ background-color: @trpGreen;
   height: 100%;
 }
 
@@ -27,10 +28,10 @@ html {
 }
 
 .mtrpLoginContainer {
-  /* position: absolute; */
+  position: absolute; 
   height: 100%;
-  /* width: 320px;
-  overflow: hidden; */
+  width: 320px;
+  overflow: hidden; 
   text-align: center; /* Chrome,Safari4+ */
   background: -webkit-gradient(linear, 0 0, 0 100%, from(#19aa67), to(#1dce73));
   background: -webkit-linear-gradient(#19aa67 0%, #1dce73 100%);
@@ -40,15 +41,14 @@ html {
 }
 
 .mtrpLoginFailure {
-  display: none;
   position: absolute;
-  bottom: 0;
+  bottom: -90px;
   width: 100%;
   background-color: @trpRed;
   .trpH3;
   padding: 10px;
   color: white;
-  height: 120px;
+  height: 40px;
   margin-top: 20px;
   padding-top: 40px;
 }
@@ -56,6 +56,12 @@ html {
 .mtrpLoginLogo {
 	text-align: center;
   padding-top: 40px;
+}
+
+.mtrpLoginFormContainer {
+  position: absolute;
+  left: 0px;
+  width: 100%;
 }
 
 .mtrpLoginForm {
