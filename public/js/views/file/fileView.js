@@ -7,7 +7,8 @@ define([
   './fileItemView',
   'hbs!./tmpl/fileHelpView',
   'hbs!./tmpl/fileAddButton',
-  './../base'
+  './../base',
+  './../../../play/bootstrap-tooltip'
 ], function($, _, Backbone, Marionette, FileItemView, fileHelpView, fileAddButtonView, TroupeViews) {
   "use strict";
 
@@ -26,13 +27,16 @@ define([
 
       var self = this;
       this.once('render', function() {
-        // setup the add file button
-        var addFileButton = $(fileAddButtonView());
-        self.$el.prepend(addFileButton);
-        addFileButton.tooltip({
-          html : true,
-          placement : "right"
-        });
+        // no add button for compact view
+        if (window._troupeCompactView !== true) {
+          // setup the add file button
+          var addFileButton = $(fileAddButtonView());
+          self.$el.prepend(addFileButton);
+          addFileButton.tooltip({
+            html : true,
+            placement : "right"
+          });
+        }
       });
     },
 
