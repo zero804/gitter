@@ -26,15 +26,9 @@
 
 	<script type="text/javascript">
 	window.troupeContext = {{{troupeContext}}};
-  var consoleLog = console.log;
-  var startTime = Date.now();
-  console.flog = function() {
-    var args = Array.prototype.slice.call(arguments);
-
-    args[0] = (Date.now() - startTime) + " " + args[0];
-    consoleLog.apply(console, args);
-  };
-
+  {{#if data}}
+  window.troupePreloads = {{{data}}};
+  {{/if}}
 	</script>
 
   {{>load_font_css}}
