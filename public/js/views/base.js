@@ -39,15 +39,15 @@ define([
       Backbone.View.prototype.constructor.apply(this, arguments);
       if(!options) options = {};
       if(options.template) this.template = options.template;
+
+      var self = this;
+      this.addCleanup(function() {
+        self.stopListening();
+      });
     },
 
     setRerenderOnChange: function() {
-      var self = this;
-      this.model.on('change', this.rerenderOnChange, this);
-
-      this.addCleanup(function() {
-        self.model.off('change', self.rerenderOnChange, this);
-      });
+      this.listenTo(this.model, 'change', this.rerenderOnChange);
     },
 
     rerenderOnChange: function() {
