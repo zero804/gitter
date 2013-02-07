@@ -29,15 +29,9 @@ define([
       }
 
       this.setVisibility(false);
-      this.collection.on('add', updateVisibility);
-      this.collection.on('remove', updateVisibility);
-      this.collection.on('reset', updateVisibility);
-
-      this.addCleanup(function() {
-        this.collection.off('add', updateVisibility);
-        this.collection.off('remove', updateVisibility);
-        this.collection.off('reset', updateVisibility);
-      });
+      this.listenTo(this.collection, 'add', updateVisibility);
+      this.listenTo(this.collection, 'remove', updateVisibility);
+      this.listenTo(this.collection, 'reset', updateVisibility);
     },
 
     setVisibility: function(animate) {

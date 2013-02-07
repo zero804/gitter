@@ -20,8 +20,7 @@ require([
         window.location.href= data.redirectTo;
       });
 
-      view.on('login.close', function(/*data*/) {
-        modal.off('login.close');
+      view.once('login.close', function(/*data*/) {
         modal.hide();
       });
       return modal;
@@ -81,9 +80,7 @@ require([
       } else {
         var view = new SignupModalView({existingUser: false});
         var modal = new TroupeViews.Modal({ view: view });
-        view.on('signup.complete', function(data) {
-          modal.off('signup.complete');
-
+        view.once('signup.complete', function(data) {
           modal.transitionTo(new TroupeViews.Modal({ view: new SignupModalConfirmView({ data: data }) }));
         });
 

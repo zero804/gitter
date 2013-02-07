@@ -19,13 +19,12 @@ require([
     defaultAction: function(/*actions*/) {
       $('#primary-view').html('');
 
-      var view, modal, loginModal, requestModal, profileModal;
+      var view, modal, loginModal, requestModal;
 
       function getLoginModal(email) {
         var loginView = new LoginModalView( { email: email });
         loginModal = new TroupeViews.Modal({ view: loginView, disableClose: true });
-        loginView.on('login.complete', function() {
-          loginView.off('login.complete');
+        loginView.once('login.complete', function() {
           window.location.reload();
         });
         loginModal.view.on('request.access', function() {
@@ -39,7 +38,6 @@ require([
       function getRequestModal() {
         requestModal = new TroupeViews.Modal({ view: new RequestModalView({ }), disableClose: true });
         requestModal.view.on('request.login', function() {
-          //modal.off('request.login');
           getLoginModal("");
           requestModal.transitionTo(loginModal);
         });
@@ -67,8 +65,7 @@ require([
       if(window.troupeContext.profileNotCompleted) {
         view = new profileView.Modal({ disableClose: true  });
 
-        view.on('close', function() {
-          view.off('close');
+        view.once('close', function() {
           //modal.close();
           window.location.reload(true);
         });
