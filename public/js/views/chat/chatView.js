@@ -18,21 +18,14 @@ define([
 
   var ChatView = TroupeViews.Base.extend({
     template: template,
-    chatMessageSkip: 0,
+    //chatMessageSkip: 0,
     chatMessageLimit: PAGE_SIZE,
 
     initialize: function() {
-      var self = this;
       this.scrollEventBound = _.bind(this.chatWindowScroll, this);
 
       $(window).bind('scroll', this, this.scrollEventBound);
-      this.collection = new chatModels.ChatCollection();
-      this.collection.setSortBy('-sent');
-      this.collection.listen();
 
-      this.addCleanup(function() {
-        self.collection.unlisten();
-      });
 
       this.loadNextMessages();
     },
@@ -108,7 +101,7 @@ define([
           return;
         }
 
-        self.chatMessageSkip += PAGE_SIZE;
+        //self.chatMessageSkip += PAGE_SIZE;
       }
 
       this.collection.fetch({
@@ -116,7 +109,7 @@ define([
         add: true,
         remove: false, // chat messages are never deleted
         data: {
-          skip: this.chatMessageSkip,
+          skip: this.collection.length,
           limit: this.chatMessageLimit
         },
         success: success
