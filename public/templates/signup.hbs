@@ -11,10 +11,8 @@
     <link href='{{cdn "bootstrap/css/bootstrap.css" }}' rel="stylesheet">
     -->
     <link href='{{cdn "bootstrap/css/trpHomePage.css" }}' rel="stylesheet">
-    <link href='//fonts.googleapis.com/css?family=Lustria' rel='stylesheet' type='text/css'>
-    <link href='//fonts.googleapis.com/css?family=Yanone+Kaffeesatz:200' rel='stylesheet' type='text/css'>
     <link href='//fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
-    <link REL="SHORTCUT ICON" HREF="favicon.ico">
+    <link rel="shortcut icon" href='{{cdn "images/2/favicon8.ico" }}'>
 
     {{>require_wrapper}}
 
@@ -22,7 +20,7 @@
 
     <script type="text/javascript">
     window.noValidTroupes = {{noValidTroupes}};
-    window.userId = '{{userId}}';
+    window.userId = {{{userId}}};
     </script>
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -39,7 +37,7 @@
 
   <body>
 
-    <div class="trpHomeTopStripContainer">
+<!--     <div class="trpHomeTopStripContainer">
       <div class="trpHomeTopStrip">
         <div class="trpHomeLogo"><img src='{{ cdn "images/2/home-logo-black.png" }}' height="46" width="170"></div>
         <div class="trpHomeMenu">
@@ -47,17 +45,25 @@
           <div class="trpHomeMenuItem trpPadV14">Support</div>
           <div class="trpHomeMenuItem trpPadV14 trpHand button-existing-users-login">Sign in</div>
       </div>
-    </div>
+    </div> -->
 
     <div class="trpHomeHeroStripContainer">
+
+      <div class="trpHomeTopStrip">
+        <div class="trpHomeLogo"><img src='{{ cdn "images/2/logo-mark-green-square-white-text.png" }}' height="64" width="240"></div>
+        <div class="trpHomeMenu">
+          <div class="trpHomeMenuItem trpPadV14 trpHand button-existing-users-login">Sign in</div>
+        </div>
+    </div>
+
       <div class="trpHomeHero">
         <div class="trpHeroText">
-          The quick and simple way to chat, share and work together.<br>Anytime, anywhere.
+          The quick and simple way to chat, share and<br>work together.<br><br>Anytime, anywhere.
           <br><br>
           <a class="trpHomeMenuItem trpButtonBig trpBtnWhite button-signup" href="#" id="btn-signup"> Get Started </a>
         </div>
         <div class="trpHeroImage">
-          <img src='{{ cdn "images/2/home-hero-laptop.png" }}'>
+          <img src='{{ cdn "images/2/home-hero-laptop2.png" }}'>
         </div>
       </div>
     </div>

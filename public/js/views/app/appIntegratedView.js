@@ -42,6 +42,8 @@ define([
 
       $('body').append('<span id="fineUploader"></span>');
 
+      $(".nano").nanoScroller({ preventPageScrolling: true });
+
       this.uploader = new qq.FineUploader({
         element: $('#fineUploader')[0],
         dragAndDrop: {
@@ -108,9 +110,13 @@ define([
     showProfileMenu: function() {
       if (!this.profilemenu) {
 
-        $(".trpProfileMenu").animate({
-            width: '124px'
-        }, 250);
+        // $(".trpProfileMenu").animate({
+        //     width: '132px'
+        // }, 250, function () {
+
+        // });
+
+        $(".trpProfileMenu").fadeIn('fast');
         this.profilemenu = true;
       }
     },
@@ -118,9 +124,10 @@ define([
 
     hideProfileMenu: function() {
       if (this.profilemenu) {
-        $(".trpProfileMenu").animate({
-            width: '0px'
-        }, 250);
+        $(".trpProfileMenu").fadeOut('fast');
+        // $(".trpProfileMenu").animate({
+        //     width: '0px'
+        // }, 250);
         this.profilemenu = false;
       }
     },
@@ -133,10 +140,12 @@ define([
         $(whichPanel).hide();
       });
 
-      $("#content-frame, #header-frame, #alert-content").animate({
-        marginRight: '0px'
-      }, 350, function() {
-      });
+      if ($(document).width() < 1250) {
+        $("#content-frame, #header-frame, #alert-content").animate({
+          left: '+=110px'
+        }, 350, function() {
+        });
+      }
 
       this.rightpanel = false;
     },
@@ -150,10 +159,14 @@ define([
       // $("#left-menu").show();
         });
 
-        $("#content-frame, #header-frame, #alert-content").animate({
-          marginRight: uiVars.menuSlideValue
-        }, 350, function() {
-        });
+        if ($(document).width() < 1250) {
+
+          $("#content-frame, #header-frame, #alert-content").animate({
+            left: '-=110px'
+          }, 350, function() {
+          });
+
+        }
 
         this.rightpanel = true;
       }
@@ -161,32 +174,22 @@ define([
 
     showMenu: function() {
       if (this.leftmenu) return;
-      // $("#left-menu-scroll").nanoScroller();
-      $(".nano").nanoScroller({ preventPageScrolling: true });
-      // if there's not enough space to bring the left panel out, we need to shift things a bit to the right
-      if (($(document).width() < 1380) && (this.rightpanel)) {
-        this.shifted = true;
-        $('#right-panel').animate({ right: uiVars.shiftedPanelValue }, 350);
 
-        $("#content-frame, #header-frame, #alert-content").animate({
-          marginRight: uiVars.shiftedMarginValue,
-          marginLeft: uiVars.menuSlideValue
-        }, 350);
 
-      } else {
-        $("#content-frame, #header-frame, #alert-content").animate({
-          marginLeft: uiVars.menuSlideValue
-        }, 350);
 
-      }
-
-      $("#left-menu").animate({
-        left: '0px'
+      $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
+        left: "+=280px"
       }, 350);
 
-      $("#menu-toggle-button").animate({
-        left: uiVars.panelWidthValue
+
+      $("#content-frame, #alert-content, #header-frame").animate({
+        left: "+=180px"
       }, 350);
+
+      $("#right-panel").animate({
+        right: "-=280px"
+      }, 350);
+
 
       $("left-menu-hotspot").hide();
       this.leftmenu = true;
@@ -194,36 +197,22 @@ define([
 
     hideMenu: function() {
 
-      // if the right panel has been shifted, we need to behave a little differently when hiding the menu
-      if (this.shifted) {
-        this.shifted = false;
-        $('#right-panel').animate({ right: 0 }, 350);
+      if (!this.leftmenu) return;
 
-        $("#content-frame, #header-frame, #alert-content").animate({
-          marginLeft: '0px',
-          marginRight: uiVars.menuSlideValue
-        }, 350);
-
-      } else {
-
-        $("#content-frame, #header-frame, #alert-content").animate({
-          marginLeft: '0px'
-        }, 350);
-
-      }
-
-      $("#left-menu").animate({
-        left: uiVars.hidePanelValue
-      }, 350, function() {
-        $("left-menu-hotspot").show();
-      });
-
-      $("#menu-toggle-button").animate({
-        left: '0px'
+      $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
+        left: "-=280px"
       }, 350);
 
 
+      $("#content-frame, #alert-content, #header-frame").animate({
+        left: "-=180px"
+      }, 350);
 
+      $("#right-panel").animate({
+        right: "+=280px"
+      }, 350);
+
+      $("left-menu-hotspot").hide();
       this.leftmenu = false;
     },
 
@@ -260,15 +249,6 @@ define([
       $("#alert-panel").slideToggle(350);
     },
 
-    enableBodyScroll: function() {
-      // document.body.style.overflow='auto';
-      // this.hideProfileMenu();
-    },
-
-    disableBodyScroll: function() {
-      // document.body.style.overflow='hidden';
-    },
-
     onMenuToggle: function() {
       this.toggleMenu();
     },
@@ -278,8 +258,9 @@ define([
     },
 
     onMouseEnterContentFrame: function() {
-      $("#content-scroller").nanoScroller();
-      this.hideMenu();
+      if (this.leftmenu) {
+        this.hideMenu();
+      }
     },
 
     onMouseEnterHeader: function() {
@@ -310,7 +291,7 @@ define([
     },
 
     onMouseEnterLeftMenu: function() {
-      this.disableBodyScroll();
+      $(".nano").nanoScroller({ preventPageScrolling: true });
     },
 
     onMouseEnterToolbar: function() {

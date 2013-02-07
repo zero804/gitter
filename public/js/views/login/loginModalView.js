@@ -23,7 +23,8 @@ define([
         email: this.initialEmail,
         autofocusEmail: this.initialEmail ? '': 'autofocus',
         autofocusPassword: this.initialEmail ? 'autofocus' : '',
-        troupeUri: this.fromSignup ? null : window.location.pathname.replace(/\//g,'')
+        troupeUri: this.fromSignup ? null : window.location.pathname.replace(/\//g,''),
+        fromSignup: this.fromSignup
       };
     },
 
@@ -40,7 +41,8 @@ define([
       "click #send-reset" : "sendResetClicked",
       "click #go-back" : "backClicked",
       "click #button-close" : "closeClicked",
-      "click .button-resend-confirmation": "resendConfirmation"
+      "click .button-resend-confirmation": "resendConfirmation",
+      "click #new-user": "showRequestAccess"
     },
 
     backClicked: function(e) {
@@ -141,6 +143,10 @@ define([
           that.$el.find('.resend-confirm').show('fast');
         }
       });
+    },
+
+    showRequestAccess: function() {
+      this.trigger('request.access');
     }
   });
 

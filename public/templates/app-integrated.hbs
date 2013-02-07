@@ -85,8 +85,10 @@
 <div class="trpContentPanel" id="content-frame">
   <div class="trpContentSpacer"></div>
   <div class="trpChatPanel" id="chat-frame"></div>
-  <div class="trpToolbar nano" id="toolbar-frame">
-    <div class="trpToolbarContent content" id="toolbar-content">
+  <div class="trpToolbar" id="toolbar-frame">
+    <div class="nano">
+      <div class="content">
+        <div class="trpToolbarContent" id="toolbar-content">
           <div class="trpToolbarList" id="request-roster" style="display: none;"></div>
           <div class="trpToolbarHeader" id="people-header">People</div>
           <div class="trpToolbarList" id="people-roster"></div>
@@ -95,6 +97,8 @@
           <div class="trpToolbarHeader" id="mail-header">Mails</div>
           <div class="trpToolbarList" id="mail-list"></div>
           <div class="trpToolbarSpacer"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -109,6 +113,15 @@
       <div class="trpButtonGreen">Download</div>
     </div>
   </div>
+
+<script type="text/javascript">
+  var uvOptions = {};
+  (function() {
+    var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+    uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/BYBA0YJRpGVi5zrb99UoHQ.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+  })();
+</script>
 
 </body>
 </html>

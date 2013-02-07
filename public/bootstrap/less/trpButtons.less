@@ -4,17 +4,13 @@
   .trpBodySmall;
   padding: 5px 10px 5px 10px;
   display: inline-block;
-  -webkit-border-radius:3px;
-  -moz-border-radius:3px;
-  border-radius:3px;
+/*  border-radius:3px;*/
   background-color: white;
   cursor: pointer;
 }
 
 .trpButtonBig {
-  -webkit-border-radius:3px;
-  -moz-border-radius:3px;
-  border-radius:3px;
+/*  border-radius:3px;*/
   padding: 14px 8px 14px 8px;
   text-align: center;
   min-width: 76px;
@@ -53,7 +49,7 @@
 
 .trpCircleButton {
   display: inline-block;
-  background-color: #b5bfb5;
+  background-color: @trpDarkCream;
   text-align: center;
   .trpBodySmall;
   color: white;
@@ -63,6 +59,10 @@
   border-radius: 50em;
   border: 2px solid white;
   float: left;
+}
+
+.trpSmallButton {
+  background-color: @trpDarkCream;
 }
 
 .trpAddButton {

@@ -54,7 +54,7 @@ define([
 
       if(hasChanges) {
         options.changes = changes;
-        this.change(options);
+        //this.change(options);
 
         // TODO: Probably not the best
         this.trigger('change', this, options);
@@ -166,7 +166,7 @@ define([
   /* This is a mixin for Backbone.Model */
   exports.ReversableCollectionBehaviour = {
 
-    sortMethods: {
+    sortByMethods: {
 
     },
 

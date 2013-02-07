@@ -65,6 +65,10 @@ define([
     },
 
     getRenderData: function() {
+      if (this.data) {
+        return this.data;
+      }
+
       if (this.model) {
         return this.model.toJSON();
       }
@@ -470,170 +474,6 @@ define([
     }
   });
 
-  // Used for switching from a single param comparator to a double param comparator
-  function sortByComparator(sortByFunction) {
-    return function(left, right) {
-      var l = sortByFunction(left);
-      var r = sortByFunction(right);
-
-      if (l === void 0) return 1;
-      if (r === void 0) return -1;
-
-      return l < r ? -1 : l > r ? 1 : 0;
-    };
-  }
-
-  function reverseComparatorFunction(comparatorFunction) {
-    return function(left, right) {
-      return -1 * comparatorFunction(left, right);
-    };
-  }
-
-  /* This should go somewhere better */
-  TroupeViews.sortByComparator = sortByComparator;
-  TroupeViews.reverseComparatorFunction = reverseComparatorFunction;
-
-  TroupeViews.Collection = TroupeViews.Base.extend({
-
-    constructor: function(options) {
-      var self = this;
-      TroupeViews.Base.prototype.constructor.apply(this, arguments);
-      if(!options) options = {};
-
-      if(options.itemView) {
-        this.itemView = options.itemView;
-      }
-      this.itemViewOptions = options.itemViewOptions ? options.itemViewOptions : {};
-      this.sortMethods = options.sortMethods ? options.sortMethods : {};
-
-      if (this.options.defaultSort) {
-        this.sortBy(this.options.defaultSort);
-      }
-
-      _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onCollectionRemove');
-      this.collection.on('add', this.onCollectionAdd);
-      this.collection.on('remove', this.onCollectionRemove);
-      this.collection.on('reset', this.onCollectionReset);
-      this.collection.on('sort', this.onCollectionReset);
-
-      this.addCleanup(function() {
-        self.collection.off('add', self.onCollectionAdd);
-        self.collection.off('remove', self.onCollectionRemove);
-        self.collection.off('reset', self.onCollectionReset);
-        self.collection.off('sort', self.onCollectionReset);
-      });
-    },
-
-    renderInternal: function() {
-      var self = this;
-      this.collection.each(function(item, index) {
-        var options = _.extend(self.itemViewOptions, { model: item, index: index });
-        self.$el.append(new self.itemView(options).render().el);
-      });
-    },
-
-    events: {
-    },
-
-    sortMethods: {
-
-    },
-
-    sortBy: function(field) {
-      var reverse = false;
-
-      // Sort by the same field twice switches the direction
-      if(field === this.currentSortByField) {
-        if(field.indexOf("-") === 0) {
-          field = field.substring(1);
-        } else {
-          field = "-" + field;
-        }
-      }
-
-      var fieldLookup;
-      if(field.indexOf("-") === 0) {
-        fieldLookup = field.substring(1);
-        reverse = true;
-      } else {
-        fieldLookup = field;
-      }
-
-      var sortByMethod = this.sortMethods[fieldLookup];
-      if(!sortByMethod) return;
-
-      this.currentSortByField = field;
-
-      var comparator = sortByComparator(sortByMethod);
-      if(reverse) {
-        comparator = reverseComparatorFunction(comparator);
-      }
-
-      this.collection.comparator = comparator;
-      this.collection.sort();
-    },
-
-    checkForNoItems: function() {
-      if(this.options.noItemsElement) {
-        if(this.collection.length === 0) {
-            $(this.options.noItemsElement).show();
-          }
-        else {
-            $(this.options.noItemsElement).hide();
-        }
-      }
-    },
-
-    onCollectionReset: function() {
-      var el = this.$el;
-      var self = this;
-      el.empty();
-      this.removeSubViews(el);
-      this.collection.each(function(item, index) {
-        var options = _.extend(self.itemViewOptions, { model: item, index: index });
-        el.append(new self.itemView(options).render().el);
-      });
-      this.checkForNoItems();
-
-      $(document).trigger('collectionReset', { });
-    },
-
-    onCollectionAdd: function(model, collection, options) {
-      var index = collection.indexOf(model);
-      var o = _.extend(this.itemViewOptions, { model: model, index: index });
-      var el = new this.itemView(o).render().el;
-
-      if(options.index === 0) {
-        this.$el.prepend(el);
-      } else if(options.index >= collection.length - 1) {
-        this.$el.append(el);
-      } else {
-        // TODO: correct place in-collection!
-        this.$el.append(el);
-      }
-      this.checkForNoItems();
-    },
-
-    onCollectionRemove: function(item) {
-      var cid = item.cid;
-      if(cid) {
-        this.$el.find('.model-id-' + cid).each(function(index, item) {
-          if(item._view) item._view.remove();
-        });
-      } else {
-        var id = item.id;
-        if(id) {
-          this.$el.find('.model-id-' + id).each(function(index, item) {
-            if(item._view) item._view.remove();
-          });
-        }
-
-      }
-      this.checkForNoItems();
-    }
-
-  });
-
   /* This is a mixin for Marionette.CollectionView */
   TroupeViews.SortableMarionetteView = {
 
@@ -651,19 +491,35 @@ define([
 
     appendHtml: function(collectionView, itemView, index) {
 
-      if (this.isRendering || index >= collectionView.collection.length - 1) {
+      function findViewAtPos(i) {
+        if (i >= collectionView.collection.length)
+          return;
+
+        return collectionView.children.findByModel(collectionView.collection.at(i));
+      }
+
+      if (this.isRendering) {
+        // if this is during rendering, then the views always come in sort order, so just append
         collectionView.$el.append(itemView.el);
-        return;
       }
+      else {
+        // we are inserting views after rendering, find the adjacent view if there is one already
+        var adjView;
 
-      if (index === 0) {
-        collectionView.$el.prepend(itemView.el);
-        return;
+        if (index === 0) {
+          // find the view that comes after the first one (sometimes there will be a non view that is the first child so we can't prepend)
+          adjView = findViewAtPos(index + 1);
+          if (adjView)
+            itemView.$el.insertBefore(adjView.el);
+          else
+            itemView.$el.appendTo(collectionView.el);
+        }
+        else {
+          // find the view that comes before this one
+          adjView = findViewAtPos(index - 1);
+          itemView.$el.insertAfter(adjView.$el);
+        }
       }
-
-      var prevModel = this.collection.at(index - 1);
-      var view = collectionView.children.findByModel(prevModel);
-      itemView.$el.insertAfter(view.$el);
     }
 
   };

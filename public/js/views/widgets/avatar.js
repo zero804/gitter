@@ -4,9 +4,8 @@ define([
   'underscore',
   'views/base',
   'hbs!./tmpl/avatar',
-  'components/presence-client',
   'bootstrap'
-], function($, _, TroupeViews, template, presenceClient, _bootstrap) {
+], function($, _, TroupeViews, template, _bootstrap) {
 
   return TroupeViews.Base.extend({
     tagName: 'span',
@@ -56,7 +55,7 @@ define([
     getRenderData: function() {
       var user = this.model ? this.model.toJSON() : this.user;
       var avatarUrl = (this.avatarSize == 'm') ? this.user.avatarUrlMedium : this.user.avatarUrlSmall;
-      var online = presenceClient.isOnline(user.id);
+      var online = !!user.online; // only the people view tries to show avatar status so there is a model object, it won't necessarily work in other cases
       // console.log("Rending avatar with url " + avatarUrl);
       return {
         id: user.id,
