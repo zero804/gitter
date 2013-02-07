@@ -1,5 +1,4 @@
 /*jshint globalstrict:true, trailing:false unused:true node:true*/
-/*global console:false, require: true, module: true */
 "use strict";
 
 var form = require("express-form"),
@@ -15,8 +14,8 @@ var form = require("express-form"),
 
 module.exports = {
     install: function(app) {
-      app.get(
-        nconf.get('web:homeurl'),
+      app.get(nconf.get('web:homeurl'),
+        middleware.rememberMe,
         function(req, res, next) {
           // console.log ("Compact: " this.compactView);
           if(req.user) {
@@ -150,7 +149,7 @@ module.exports = {
           signupService.resendConfirmation({
             email: req.body.email,
             troupeId: req.session.newTroupeId
-          }, function(err, id) {
+          }, function(err) {
             /* TODO: better error xhandling */
             if(err) return next(err);
 

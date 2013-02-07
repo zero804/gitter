@@ -9,6 +9,7 @@ var restSerializer = require("../serializers/rest-serializer");
 var nconf = require('../utils/config');
 var middleware = require('../web/middleware');
 var oauthService = require("../services/oauth-service");
+var middleware = require('../web/middleware');
 
 function renderAppPage(req, res, next, page) {
 
@@ -136,7 +137,9 @@ function renderAppPage(req, res, next, page) {
 
 module.exports = {
     install: function(app) {
-      app.get('/:appUri', function(req, res, next) {
+      app.get('/:appUri',
+        middleware.rememberMe,
+        function(req, res, next) {
         var page;
         if(req.headers['user-agent'].indexOf('Mobile') >= 0) {
           page = 'app-mobile';
@@ -149,31 +152,67 @@ module.exports = {
 
       });
 
+
+      app.get('/last/:page',
+        middleware.rememberMe,
+        middleware.ensureLoggedIn(),
+        function(req, res, next) {
+
+          function findDefaultTroupeForUser() {
+            userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
+              if (err || !troupe) {
+                next(500);
+              }
+
+              res.redirect('/' + troupe.uri + "/" + req.params.page);
+            });
+          }
+
+          if (req.user.lastTroupe) {
+            troupeService.findById(req.user.lastTroupe, function (err,troupe) {
+              if (err || !troupe || !troupeService.userHasAccessToTroupe(req.user, troupe)) {
+                findDefaultTroupeForUser();
+                return;
+              }
+
+              res.redirect('/' + troupe.uri + "/" + req.params.page);
+            });
+          } else {
+            findDefaultTroupeForUser();
+          }
+        });
+
       app.get('/:appUri/chat',
+        middleware.rememberMe,
         middleware.ensureLoggedIn(),
         function(req, res, next) {
           renderAppPage(req, res, next, 'mobile/chat-app');
         });
 
       app.get('/:appUri/files',
+        middleware.rememberMe,
         middleware.ensureLoggedIn(),
         function(req, res, next) {
           renderAppPage(req, res, next, 'mobile/file-app');
         });
 
       app.get('/:appUri/mails',
+        middleware.rememberMe,
         middleware.ensureLoggedIn(),
         function(req, res, next) {
           renderAppPage(req, res, next, 'mobile/conversation-app');
         });
 
       app.get('/:appUri/people',
+        middleware.rememberMe,
         middleware.ensureLoggedIn(),
         function(req, res, next) {
           renderAppPage(req, res, next, 'mobile/people-app');
         });
 
-      app.get('/:appUri/accessdenied', function(req, res, next) {
+
+
+      app.get('/:appUri/accessdenied', function(req, res) {
         res.render('app-accessdenied', {
         });
       });

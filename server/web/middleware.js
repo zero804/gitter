@@ -53,7 +53,7 @@ exports.ensureLoggedIn = function(options) {
 
 };
 
-exports.logout = function(options) {
+exports.logout = function() {
   return function(req, res, next) {
     req.logout();
     res.clearCookie("auth");
