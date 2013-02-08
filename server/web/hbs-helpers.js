@@ -60,11 +60,11 @@ exports.bootScript = function(url) {
   var requireScript;
 
   if(minified) {
-    requireScript = exports.cdn("js/libs/require/" + REQUIREJS_VERSION + "/require-min.js");
+    requireScript = exports.cdn("js/core-libraries.js");
     var baseUrl = exports.cdn("js/");
 
-    return "<script src='" + requireScript + "' type='text/javascript'></script>\n" +
-           "<script type='text/javascript'>\nrequire.config({ baseUrl: '" + baseUrl + "' }); \nrequire(['core-libraries'], function (common) { require(['" + url + "']); });\n</script>";
+    return  "<script type='text/javascript'>\nrequire.config({ baseUrl: '" + baseUrl + "' });</script>\n" +
+            "<script defer='defer' async='true' data-main='" + scriptLocation + ".js' src='" + requireScript + "' type='text/javascript'></script>\n";
 
   }
 
