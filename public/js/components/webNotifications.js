@@ -122,7 +122,11 @@ define([
 
   // one notification when the connection to server is down
   // todo: this might also show when an invalid user operation is attempted.
-  $(document).ajaxError(function() {
+  $(document).ajaxError(function(ev, jqxhr, settings, exception) {
+    require(['utils/tracking'], function(tracking) {
+      tracking.trackError("Ajax Error", settings.url, jqxhr.status);
+    });
+
     notifications.notify({
       id: 'ajax-error',
       className: 'notification-error',
