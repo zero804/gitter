@@ -8,7 +8,7 @@ do
 
   if [ `mongo troupe --quiet --eval "print(db.dataUpgrades.find({ \"script\":  \"$file\", \"md5\": \"$md5\"}).length())"` -eq 0 ]; then
     echo executing $file
-    bash "$file"
+    ./"$file"
 
     result=$?
 
@@ -22,3 +22,6 @@ do
   fi;
 
 done
+
+
+

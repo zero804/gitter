@@ -140,9 +140,12 @@ function saveMailForTroupe(mail, toAddress, connection, callback) {
 
       function associateFileVersionWithAttachment(attachment) {
       return function(fileVersion) { /* Store a reference from the content-id to the saved fileVersion so that we can use it later */
+
           if(attachment.contentId && fileVersion) {
             attachmentsByContentId[attachment.contentId] = fileVersion;
           }
+
+          return fileVersion;
         };
       }
 
@@ -153,16 +156,18 @@ function saveMailForTroupe(mail, toAddress, connection, callback) {
 
           var attachment = mail_object.attachments[i];
 
-          saveFile(troupe.id, user.id, attachment.generatedFileName,attachment.contentType,attachment.content, deferred.node());
+          saveFile(troupe.id, user.id, attachment.generatedFileName,attachment.contentType,attachment.content, deferred.makeNodeResolver());
 
           var promise = deferred.promise;
-          promise.then(associateFileVersionWithAttachment(attachment));
+          promise = promise.then(associateFileVersionWithAttachment(attachment));
 
           allAttachmentSaves.push(promise);
         }
       }
+
     // sync once attachments are saved
       Q.all(allAttachmentSaves).then(function(savedAttachments) {
+
         var storedMailBody;
 
         if (mail_object.html) {
@@ -198,44 +203,43 @@ function saveMailForTroupe(mail, toAddress, connection, callback) {
           };
         });
 
-        // strip out the name of the troupe if it appears in the subject, we don't want it duplicated
-      var newSubject = mail.subject.replace("[" + troupe.name + "] ", "");
+          // strip out the name of the troupe if it appears in the subject, we don't want it duplicated
+        var newSubject = mail.subject.replace("[" + troupe.name + "] ", "");
 
         conversationService.storeEmailInConversation({
           fromUserId: user.id,
           troupeId: troupe.id,
           subject: newSubject,
-        inReplyTo: mail.inReplyTo,
-        date: mail.date,
-        fromName: mail.from,
+          inReplyTo: mail.inReplyTo,
+          date: mail.date,
+          fromName: mail.from,
           preview: preview,
           mailBody: storedMailBody,
-        attachments: savedAttachmentsForPersist
-      }, function(err, conversation, savedMail) {
-        if(err) return callback("Failed to store the email");
+          attachments: savedAttachmentsForPersist
+        }, function(err, conversation, savedMail) {
+          if(err) return callback("Failed to store the email");
 
-            connection.logdebug("Stored the email.");
-            connection.transaction.notes.emailId = savedMail.id;
-            connection.transaction.notes.conversationId = conversation.id;
+          connection.logdebug("Stored the email.");
+          connection.transaction.notes.emailId = savedMail.id;
+          connection.transaction.notes.conversationId = conversation.id;
 
-        // Save these values so that the remailer plugin can update the
-        // messageId after the message has been remailer
-        var lookup = {
-          emailId: savedMail.id,
-          conversationId: conversation.id
-        };
-        //console.dir(connection);
-        notes.conversationAndEmailIdsByTroupe[troupe.id] = lookup;
-        //console.log(">>> Configuring ", lookup);
-        return callback();
-          });
+          // Save these values so that the remailer plugin can update the
+          // messageId after the message has been remailer
+          var lookup = {
+            emailId: savedMail.id,
+            conversationId: conversation.id
+          };
 
-      }).fail(function(err) {
-      winston.error("Unable to save attachment: ", { exception: err });
-      return callback(err);
+          notes.conversationAndEmailIdsByTroupe[troupe.id] = lookup;
+          return callback();
+            });
+
+        }).fail(function(err) {
+          winston.error("Unable to save attachment: ", { exception: err });
+          return callback(err);
+        });
+
       });
-
-    });
 }
 
 function parseAddress(address) {
