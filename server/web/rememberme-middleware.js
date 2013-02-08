@@ -46,6 +46,7 @@ module.exports = {
 
         return next();
       }
+      winston.info('rememberme starting');
 
       /* If the user is logged in, no problem */
       if (req.user) return next();
