@@ -13,6 +13,7 @@ var middleware = require('../web/middleware');
 var fileService = require("../services/file-service");
 var chatService = require("../services/chat-service");
 var Fiber = require("../utils/fiber");
+var conversationService = require("../services/conversation-service");
 
 function renderAppPageWithTroupe(req, res, next, page, troupe, data) {
   if(req.user) {
@@ -163,6 +164,20 @@ function preloadChats(userId, troupeId, callback) {
 
 }
 
+function preloadUsers(userId, troupe, callback) {
+  var strategy = new restSerializer.UserIdStrategy( { showPresenceForTroupeId: troupe.id });
+  restSerializer.serialize(troupe.getUserIds(), strategy, callback);
+}
+
+
+function preloadConversations(userId, troupeId, callback) {
+  conversationService.findByTroupe(troupeId, function(err, conversations) {
+    if(err) return callback(err);
+
+    restSerializer.serialize(conversations, new restSerializer.ConversationMinStrategy(), callback);
+  });
+}
+
 function preloadTroupeMiddleware(req, res, next) {
   var appUri = req.params.appUri;
 
@@ -179,7 +194,7 @@ function preloadTroupeMiddleware(req, res, next) {
 module.exports = {
     install: function(app) {
       app.get('/:appUri',
-        middleware.rememberMe,
+        middleware.grantAccessForRememberMeTokenMiddleware,
         preloadTroupeMiddleware,
         function(req, res, next) {
         var page;
@@ -193,10 +208,18 @@ module.exports = {
         if(req.user) {
           preloadFiles(req.user.id, req.troupe.id, f.waitor());
           preloadChats(req.user.id, req.troupe.id, f.waitor());
+          preloadUsers(req.user.id, req.troupe, f.waitor());
+          preloadConversations(req.user.id, req.troupe, f.waitor());
         }
         f.all()
-          .spread(function(files, chats) {
-            renderAppPageWithTroupe(req, res, next, page, req.troupe, { 'files': files, 'chatsMessage': chats });
+          .spread(function(files, chats, users, conversations) {
+            // Send the information through
+            renderAppPageWithTroupe(req, res, next, page, req.troupe, {
+              files: files,
+              chatMessages: chats,
+              users: users,
+              conversations: conversations
+            });
           })
           .fail(function(err) {
             next(err);
@@ -206,7 +229,7 @@ module.exports = {
 
 
       app.get('/last/:page',
-        middleware.rememberMe,
+        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         function(req, res, next) {
 
@@ -235,14 +258,24 @@ module.exports = {
         });
 
       app.get('/:appUri/chat',
-        middleware.rememberMe,
+        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
+        preloadTroupeMiddleware,
         function(req, res, next) {
-          renderAppPage(req, res, next, 'mobile/chat-app');
+
+          preloadChats(req.user.id, req.troupe.id, function(err, serialized) {
+            if (err) {
+              winston.error("Error in Serializer:", { exception: err });
+              return next(err);
+            }
+
+            renderAppPageWithTroupe(req, res, next, 'mobile/chat-app', req.troupe, { 'chatMessages': serialized });
+          });
+
         });
 
       app.get('/:appUri/files',
-        middleware.rememberMe,
+        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         preloadTroupeMiddleware,
         function(req, res, next) {
@@ -259,14 +292,14 @@ module.exports = {
         });
 
       app.get('/:appUri/mails',
-        middleware.rememberMe,
+        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         function(req, res, next) {
           renderAppPage(req, res, next, 'mobile/conversation-app');
         });
 
       app.get('/:appUri/people',
-        middleware.rememberMe,
+        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         function(req, res, next) {
           renderAppPage(req, res, next, 'mobile/people-app');

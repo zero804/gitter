@@ -63,12 +63,12 @@ exports.bootScript = function(url) {
     requireScript = exports.cdn("js/libs/require/" + REQUIREJS_VERSION + "/require-min.js");
     var baseUrl = exports.cdn("js/");
 
-    return "<script src='" + requireScript + "' type='text/javascript'></script>\n" +
-           "<script type='text/javascript'>\nrequire.config({ baseUrl: '" + baseUrl + "' }); \nrequire(['core-libraries'], function (common) { require(['" + url + "']); });\n</script>";
+    return "<script async='true' defer='defer' src='" + requireScript + "' type='text/javascript'></script>\n" +
+           "<script async='true' defer='defer' type='text/javascript'>\nrequire.config({ baseUrl: '" + baseUrl + "' }); \nrequire(['core-libraries'], function (common) { require(['" + url + "']); });\n</script>";
 
   }
 
   requireScript = exports.cdn("js/libs/require/" + REQUIREJS_VERSION + "/require.js");
-  return "<script data-main='" + scriptLocation + ".js' src='" + requireScript + "' type='text/javascript'></script>";
+  return "<script defer='defer' async='true' data-main='" + scriptLocation + ".js' src='" + requireScript + "' type='text/javascript'></script>";
 
 };

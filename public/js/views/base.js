@@ -517,7 +517,11 @@ define([
         else {
           // find the view that comes before this one
           adjView = findViewAtPos(index - 1);
-          itemView.$el.insertAfter(adjView.$el);
+          if(adjView) {
+            itemView.$el.insertAfter(adjView.$el);
+          } else {
+            itemView.$el.appendTo(collectionView.el);
+          }
         }
       }
     }
