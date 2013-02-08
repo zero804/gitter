@@ -6,7 +6,11 @@ define([
   _gaq.push(['_setAccount', 'UA-34596351-1']);
 
   function trackPageView(routeName) {
-    _gaq.push(['_trackPageview', routeName]);
+    _gaq.push(['_trackEvent', 'Route', routeName]);
+  }
+
+  function trackError(message, file, line) {
+    _gaq.push(['_trackEvent', 'Error', message, file, line]);
   }
 
   _gaq.push(['_setCustomVar',
@@ -27,4 +31,10 @@ define([
     trackPageView(routeName);
   });
 
+  return {
+    trackError: trackError
+  };
 });
+
+
+
