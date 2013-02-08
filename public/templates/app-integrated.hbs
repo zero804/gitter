@@ -14,6 +14,13 @@
   <link rel="stylesheet" href='{{cdn "bootstrap/css/trp3.css" }}'>
   <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/edpmlaohjokcmefhjghaeeikjjcjplmi">
 
+  <script type="text/javascript">
+  window.troupeContext = {{{troupeContext}}};
+  {{#if data}}
+  window.troupePreloads = {{{data}}};
+  {{/if}}
+  </script>
+
   {{>require_wrapper}}
 
   {{#login}}
@@ -24,12 +31,6 @@
     {{{bootScript "app-integrated" }}}
   {{/login}}
 
-	<script type="text/javascript">
-	window.troupeContext = {{{troupeContext}}};
-  {{#if data}}
-  window.troupePreloads = {{{data}}};
-  {{/if}}
-	</script>
 
   {{>load_font_css}}
 
