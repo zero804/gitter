@@ -11,17 +11,21 @@
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
 	<meta charset="utf-8">
 
-	<title>{{troupeName}} - Troupe</title>
+	<title>{{troupeName}}</title>
 
   <link rel="stylesheet" href='{{cdn "bootstrap/css/trpMobileConversations.css" }}'>
+
+  <script type="text/javascript">
+  window.troupeContext = {{{troupeContext}}};
+  {{#if data}}
+  window.troupePreloads = {{{data}}};
+  {{/if}}
+  </script>
 
   {{>require_wrapper}}
 
   {{{bootScript "router-mobile-conversations" }}}
 
-	<script type="text/javascript">
-	window.troupeContext = {{{troupeContext}}};
-	</script>
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>

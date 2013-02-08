@@ -3,40 +3,34 @@ require([
   'jquery',
   'underscore',
   'backbone',
-  './base-router',
   'views/base',
-  'views/chat/chatView'
-], function($, _, Backbone, BaseRouter, TroupeViews, ChatView) {
+  'collections/chat',
+  'views/chat/chatInputView',
+  'views/chat/chatCollectionView'
+], function($, _, Backbone, TroupeViews, chatModels, ChatInputView, ChatCollectionView) {
   "use strict";
 
-  var AppRouter = BaseRouter.extend({
-    routes: {
-      '*actions':     'defaultAction'
-    },
+    // Setup the ChatView
+  var chatCollection = new chatModels.ChatCollection();
+  chatCollection.setSortBy('-sent');
+  chatCollection.listen();
+  chatCollection.reset(window.troupePreloads['chatMessages'], { parse: true });
 
-    defaultAction: function(/*actions*/){
-      var view = new ChatView();
-      this.showView("#primary-view", view);
-    }
+  new ChatInputView({
+    el: $('#chat-input'),
+    collection: chatCollection
+  }).render();
 
-
-  });
-
-  var troupeApp = new AppRouter();
-
-  // THESE TWO LINES WILL NOT REMAIN HERE FOREVER
-  //$('.dp-tooltip').tooltip();
-  //$('.chat-bubble').tooltip();
-
-  window.troupeApp = troupeApp;
-  Backbone.history.start();
+  new ChatCollectionView({
+    el: $('#frame-chat'),
+    collection: chatCollection
+  }).render();
 
   // Asynchronously load tracker
   require([
     'utils/tracking'
-  ], function(tracking) {
+  ], function() {
     // No need to do anything here
   });
 
-  return troupeApp;
 });

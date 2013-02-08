@@ -9,7 +9,7 @@ module.exports = {
       if (nconf.get('web:homeurl') !== '/') {
         app.get(
           '/',
-          middleware.rememberMe,
+          middleware.grantAccessForRememberMeTokenMiddleware,
           function(req, res) {
             res.render('landing');
           }
