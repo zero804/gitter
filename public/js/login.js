@@ -7,9 +7,16 @@ require([
       $('#email').val(window.localStorage.defaultTroupeEmail);
     }
 
+    console.log("Document: " + $(document).width());
+    var leftPanelSpacing = (($(document).width() - 320) / 2) + 320;
+
+    console.log("Where am I: " + leftPanelSpacing);
+
+    $('#panel-signup').css('left', leftPanelSpacing + 'px');
+
     $('#button-signup').on('click', function(e) {
       $('#panel-signup, #panel-login').animate( {
-        left: '-=320px'
+        left: '-=' + leftPanelSpacing + 'px'
       }, 350);
 
       // $('#panel-login').animate({translate3d: '-320px,0,0'}, 0.5, 'swing');
@@ -17,7 +24,7 @@ require([
 
     $('#button-back').on('click', function(e) {
       $('#panel-signup, #panel-login').animate( {
-        left: '+=320px'
+        left: '+=' + leftPanelSpacing + 'px'
       }, 350);
     });
 
