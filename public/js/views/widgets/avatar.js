@@ -4,8 +4,8 @@ define([
   'underscore',
   'views/base',
   'hbs!./tmpl/avatar',
-  'bootstrap'
-], function($, _, TroupeViews, template, _bootstrap) {
+  'bootstrap_tooltip'
+], function($, _, TroupeViews, template) {
 
   return TroupeViews.Base.extend({
     tagName: 'span',
@@ -35,7 +35,12 @@ define([
       if (isModel) {
         this.listenTo(this.model, 'change', avatarChange);
       } else {
-        this.listenTo($(document), 'avatar:change', avatarChange);
+        // Unfortunately we can't use listenTo with jquery events
+        $(document).on('avatar:change', avatarChange, this);
+        this.addCleanup(function() {
+          $(document).off('avatar:change', avatarChange, self);
+        });
+
       }
     },
 

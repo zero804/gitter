@@ -26,16 +26,6 @@ require([
       return modal;
     }
 
-    /*var validationErrors = {};
-    function attachTooltipHandlerToItem(index, el) {
-      var jel = $(el);
-        jel.tooltip({title: function() {
-          var v = validationErrors[el.name];
-          return v ? v:"";
-        }});
-    }*/
-
-
     if (window.location.href.indexOf("passwordResetFailed") >= 0) {
       var modal = new TroupeViews.ConfirmationModal({
         confirmationTitle: "Reset Failed",
