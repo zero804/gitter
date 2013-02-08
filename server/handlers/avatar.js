@@ -1,12 +1,9 @@
 /*jshint globalstrict:true, trailing:false unused:true node:true*/
-/*global console:false, require: true, module: true */
 "use strict";
 
 var middleware = require('../web/middleware'),
     im = require('imagemagick'),
-    sechash = require('sechash'),
     mongoose = require("mongoose"),
-    userService = require('../services/user-service.js'),
     restSerializer = require("../serializers/rest-serializer"),
     Fiber = require("../utils/fiber");
 
@@ -58,7 +55,7 @@ function scaleAndWriteAvatar(width, height, path, callback) {
   var saveToPath = path + '-' + width + 'x' + height;
 
   im.convert(['-define','jpeg:size='+width+'x'+height+'48',path,'-thumbnail',width+'x'+height+'^','-gravity','center','-extent',width+'x'+height,saveToPath],
-    function(err, stdout, stderr) {
+    function(err/*, stdout, stderr*/) {
       if (err) {
         return callback(err);
       } else {
@@ -93,8 +90,7 @@ module.exports = {
 
       app.get(
         '/avatar/:userId',
-        // middleware.ensureLoggedIn(),
-        function(req, res, next) {
+        function(req, res) {
           var userId = req.params.userId;
           displayAvatarFor('s', userId, req, res);
         }
@@ -102,8 +98,7 @@ module.exports = {
 
       app.get(
         '/avatar/:size/:userId/:version.:type',
-        // middleware.ensureLoggedIn(),
-        function(req, res, next) {
+        function(req, res) {
 
           /* Ignore the version and always serve up the latest */
           var userId = req.params.userId;

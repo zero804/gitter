@@ -98,7 +98,10 @@ exports.authenticate = function(scheme, options) {
   };
 };
 
-exports.rememberMe = function(req, res, next) {
+exports.grantAccessForRememberMeTokenMiddleware = rememberMe.rememberMeMiddleware(/* No Options */);
+
+
+exports.generateRememberMeTokenMiddleware = function(req, res, next) {
   if(req.body.rememberMe) {
     rememberMe.generateAuthToken(req, res, req.user.id, {}, function(err) {
       if(err) return next(err);

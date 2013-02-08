@@ -47,12 +47,10 @@ function handleJsonLogin(req, res) {
 
 module.exports = {
     install: function(app) {
-      var basepath = nconf.get("web:basepath");
-
       app.post('/login',
         middleware.authenticate('local', { failureRedirect: '/login' }),
-        middleware.rememberMe,
-        function(req, res, next) {
+        middleware.generateRememberMeTokenMiddleware,
+        function(req, res) {
 
           if(req.accepts(['html', 'json']) === 'json')
             return handleJsonLogin(req, res);
