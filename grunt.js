@@ -46,7 +46,10 @@ module.exports = function( grunt ) {
 
           modules: [
               {
-                name: "core-libraries"
+                name: "core-libraries",
+                include: [
+                  "libs/require/2.1.4/require-min"
+                ]
               },
               {
                   name: "signup",
@@ -103,61 +106,6 @@ module.exports = function( grunt ) {
                   ],
                   exclude: ["core-libraries"]
               }
-              /*
-              {
-                  name: "router",
-                  include: [
-                    "views/widgets/avatar",
-                    "views/widgets/nav"
-                  ],
-                  exclude: ["core-libraries"]
-              },
-              {
-                  name: "router-login",
-                  include: [
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
-              {
-                  name: "router-mobile-chat",
-                  include: [
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
-              {
-                  name: "router-mobile-files",
-                  include: [
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
-              {
-                  name: "router-mobile-conversations",
-                  include: [
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
-              {
-                  name: "router-mobile-people",
-                  include: [
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
-              / *
-              {
-                  name: "views/people/peopleView",
-                  exclude: ["core-libraries","router"]
-              },
-              * /
-              {
-                  name: "views/profile/profileView",
-                  exclude: ["core-libraries","router"]
-              }
-              */
           ],
 
           optimize: "none",
