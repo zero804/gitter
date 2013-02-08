@@ -55,8 +55,7 @@ module.exports = function( grunt ) {
               {
                   name: "router-core",
                   include: [
-                    "views/widgets/avatar",
-                    "views/widgets/nav"
+                    "views/widgets/avatar"
                   ],
                   exclude: ["core-libraries"]
               },
@@ -64,7 +63,6 @@ module.exports = function( grunt ) {
                   name: "app-integrated",
                   include: [
                     "views/widgets/avatar",
-                    "views/widgets/nav",
                     "views/widgets/timeago"
                   ],
                   exclude: ["core-libraries"]
@@ -73,7 +71,6 @@ module.exports = function( grunt ) {
                   name: "router-mobile-chat",
                   include: [
                     "views/widgets/avatar",
-                    "views/widgets/nav",
                     "views/widgets/timeago"
                   ],
                   exclude: ["core-libraries"]
@@ -82,7 +79,6 @@ module.exports = function( grunt ) {
                   name: "router-mobile-files",
                   include: [
                     "views/widgets/avatar",
-                    "views/widgets/nav",
                     "views/widgets/timeago"
                   ],
                   exclude: ["core-libraries"]
@@ -91,7 +87,6 @@ module.exports = function( grunt ) {
                   name: "router-mobile-conversations",
                   include: [
                     "views/widgets/avatar",
-                    "views/widgets/nav",
                     "views/widgets/timeago"
                   ],
                   exclude: ["core-libraries"]
@@ -107,8 +102,7 @@ module.exports = function( grunt ) {
               {
                   name: "router",
                   include: [
-                    "views/widgets/avatar",
-                    "views/widgets/nav"
+                    "views/widgets/avatar"
                   ],
                   exclude: ["core-libraries"]
               },

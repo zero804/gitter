@@ -4,7 +4,7 @@ define([
   'underscore',
   'views/base',
   'hbs!./tmpl/avatar',
-  'bootstrap'
+  'bootstrap_tooltip'
 ], function($, _, TroupeViews, template, _bootstrap) {
 
   return TroupeViews.Base.extend({

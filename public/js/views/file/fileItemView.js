@@ -5,8 +5,9 @@ define([
   'backbone',
   'marionette',
   'views/base',
-  'hbs!./tmpl/fileItemView'
-], function($, _, Backbone, Marionette, TroupeViews, template) {
+  'hbs!./tmpl/fileItemView',
+  'bootstrap_tooltip'
+], function($, _, Backbone, Marionette, TroupeViews, template/*, Bootstrap*/) {
   /*jslint browser: true*/
   "use strict";
 
@@ -34,7 +35,6 @@ define([
       var r = TroupeViews.Base.prototype.render.call(this);
 
       var firstChild = this.$el.find(':first-child');
-      // tooltips aren't loaded on mobile, they don't work
       if (firstChild.tooltip) {
         firstChild.tooltip({
           html : true,
