@@ -8,7 +8,8 @@ require([
   'views/base',
   'components/realtime',
   'views/app/appIntegratedView',
-  'views/chat/chatView',
+  'views/chat/chatInputView',
+  'views/chat/chatCollectionView',
   'views/file/fileView',
   'views/conversation/conversationView',
   'views/request/requestView',
@@ -34,7 +35,7 @@ require([
   'views/app/troupeSettingsView',
   'components/webNotifications',
   'components/unread-items-client'
-], function($, _, Backbone, Marionette, _Helpers, TroupeViews, realtime, AppIntegratedView, ChatView, FileView, ConversationView, RequestView,
+], function($, _, Backbone, Marionette, _Helpers, TroupeViews, realtime, AppIntegratedView, ChatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
             troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView,
             createTroupeView, headerViewTemplate, shareTroupeView,
@@ -74,7 +75,6 @@ require([
   var app = new Marionette.Application();
   app.addRegions({
     leftMenuRegion: "#left-menu-list",
-    chatRegion: "#chat-frame",
     peopleRosterRegion: "#people-roster",
     fileRegion: "#file-list",
     mailRegion: "#mail-list",
@@ -260,16 +260,21 @@ require([
     }))();
     app.headerRegion.show(headerView);
 
+    // Setup the ChatView
     chatCollection = new chatModels.ChatCollection();
     chatCollection.setSortBy('-sent');
     chatCollection.listen();
-    chatCollection.reset(window.troupePreloads['chatMessages']);
+    chatCollection.reset(window.troupePreloads['chatMessages'], { parse: true });
 
-    // Chat View (unncessarily manages it's own collections)
-    var chatView = new ChatView({
+    new ChatInputView({
+      el: $('#chat-input'),
       collection: chatCollection
-    });
-    app.chatRegion.show(chatView);
+    }).render();
+
+    new ChatCollectionView({
+      el: $('#frame-chat'),
+      collection: chatCollection
+    }).render();
 
     // Request Collections
     requestCollection = new requestModels.RequestCollection();
@@ -286,7 +291,7 @@ require([
 
     fileCollection = new fileModels.FileCollection();
     fileCollection.listen();
-    fileCollection.reset(window.troupePreloads['files']);
+    fileCollection.reset(window.troupePreloads['files'], { parse: true });
 
     // File View
     var fileView = new FileView({
@@ -298,7 +303,7 @@ require([
 
     conversationCollection = new conversationModels.ConversationCollection();
     conversationCollection.listen();
-    conversationCollection.fetch();
+    conversationCollection.reset(window.troupePreloads['conversations'], { parse: true });
 
     // Conversation View
     var conversationView = new ConversationView({
@@ -319,8 +324,10 @@ require([
 
     // User Collections
     userCollection = new userModels.UserCollection();
-    userCollection.fetch();
+    userCollection.reset(window.troupePreloads['users'], { parse: true });
     userCollection.listen();
+
+    window.troupePreloads = {};
 
     // update online status of user models
     $(document).on('userLoggedIntoTroupe', updateUserStatus);

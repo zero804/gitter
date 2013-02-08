@@ -68,10 +68,12 @@ define([
     modelName: '',
     constructor: function(options) {
       Backbone.Collection.prototype.constructor.call(this, options);
+
       _.bindAll(this, 'onDataChange');
       if(!this.url) {
         this.url = "/troupes/" + window.troupeContext.troupe.id + "/" + this.nestedUrl;
       }
+
     },
 
     listen: function() {
@@ -118,8 +120,6 @@ define([
     },
 
     onDataChange: function(data) {
-      console.log(""/*,data*/);
-
       var operation = data.operation;
       var newModel = data.model;
       var id = newModel.id;
@@ -162,10 +162,6 @@ define([
   /* This is a mixin for Backbone.Model */
   exports.ReversableCollectionBehaviour = {
 
-    sortByMethods: {
-
-    },
-
     setSortBy: function(field) {
       var reverse = false;
 
@@ -186,13 +182,14 @@ define([
         fieldLookup = field;
       }
 
-
-      var sortByMethod = function defaultSortByMethod(model) {
-        return model.get(fieldLookup);
-      };
-
-      if (this.sortByMethods[fieldLookup])
+      var sortByMethod;
+      if (this.sortByMethods && this.sortByMethods[fieldLookup]) {
         sortByMethod = this.sortByMethods[fieldLookup];
+      } else {
+        sortByMethod = function defaultSortByMethod(model) {
+          return model.get(fieldLookup);
+        };
+      }
 
       this.currentSortByField = field;
 

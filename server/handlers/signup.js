@@ -15,7 +15,7 @@ var form = require("express-form"),
 module.exports = {
     install: function(app) {
       app.get(nconf.get('web:homeurl'),
-        middleware.rememberMe,
+        middleware.grantAccessForRememberMeTokenMiddleware,
         function(req, res, next) {
           // console.log ("Compact: " this.compactView);
           if(req.user) {
