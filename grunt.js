@@ -315,6 +315,8 @@ module.exports = function( grunt ) {
   grunt.loadNpmTasks('grunt-reload');
 
   grunt.registerTask('process', 'clean less copy requirejs min exec:gzip');
+  grunt.registerTask('process-no-min', 'clean less copy requirejs min exec:gzip');
+
   grunt.registerTask('watchr', 'reload watch');
 
 };
