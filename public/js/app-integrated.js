@@ -34,12 +34,13 @@ require([
   'views/share/shareView',
   'views/app/troupeSettingsView',
   'components/webNotifications',
-  'components/unread-items-client'
+  'components/unread-items-client',
+  'components/logging'
 ], function($, _, Backbone, Marionette, _Helpers, TroupeViews, realtime, AppIntegratedView, ChatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
             troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView,
             createTroupeView, headerViewTemplate, shareTroupeView,
-            troupeSettingsView, webNotifications, unreadItemsClient) {
+            troupeSettingsView, webNotifications, unreadItemsClient, logging) {
   /*global console:true require:true */
   "use strict";
 
