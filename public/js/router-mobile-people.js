@@ -21,10 +21,6 @@ require([
 
   var troupeApp = new AppRouter();
 
-  // THESE TWO LINES WILL NOT REMAIN HERE FOREVER
-  //$('.dp-tooltip').tooltip();
-  //$('.chat-bubble').tooltip();
-
   window.troupeApp = troupeApp;
   Backbone.history.start();
 
