@@ -95,7 +95,7 @@ define([
       if(data.photo) {
         el = $('<img src="' + data.href + '" class="trpFilePreviewItem" />');
       } else if(data.iframe) {
-        el = $('<iframe src="' + data.href + '" width="100%" height="100%" class="trpFilePreviewItem"');
+        el = $('<iframe src="' + data.href + '" width="100%" height="100%" class="trpFilePreviewItem">');
       } else {
         el = $('<img src="/images/2/mime/unknown.png" class="trpFilePreviewItem"/>');
       }
