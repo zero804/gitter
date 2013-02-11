@@ -74,7 +74,16 @@ module.exports = {
     var expressErrorHandler = express.errorHandler({ showStack: nconf.get('express:showStack'), dumpExceptions: nconf.get('express:dumpExceptions') });
     app.use(function(err, req, res, next) {
       winston.error("An unexpected error occurred", { error: err, path: req.path } );
-      res.render('error' , { homeUrl : nconf.get('web:homeurl') });
+      // res.render('error' , { homeUrl : nconf.get('web:homeurl') });
+
+      console.log('Error:' + err.errorCode);
+
+      if (err.errorCode == 404) {
+         res.render('404' , { homeUrl : nconf.get('web:homeurl') }); 
+       } else
+      {
+        res.render('500' , { homeUrl : nconf.get('web:homeurl') }); 
+      }
       // expressErrorHandler(err, req, res, next);
     });
 
