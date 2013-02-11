@@ -20,9 +20,9 @@ require([
   chatCollection.setSortBy('-sent');
   chatCollection.listen();
   chatCollection.reset(window.troupePreloads['chatMessages'], { parse: true });
-  /*if ($(document).hasAttribute('manifest')) {
+  if ($(document).attr('manifest')) {
     chatCollection.fetch();
-  }*/
+  }
 
   new ChatInputView({
     el: $('#chat-input'),
