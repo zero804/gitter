@@ -10,6 +10,7 @@ var persistence = require("./persistence-service"),
     collections = require("../utils/collections");
 
 function findByUri(uri, callback) {
+
   persistence.Troupe.findOne({uri: uri}, function(err, troupe) {
     callback(err, troupe);
   });
