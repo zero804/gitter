@@ -29,6 +29,13 @@ define([
   window._troupeCompactView = compactView;
 
   var cachedWidgets = {};
+  TroupeViews.preloadWidgets = function(widgets) {
+    var keys = _.keys(widgets);
+    _.each(keys, function(key) {
+      var value = widgets[key];
+      cachedWidgets[key] = value;
+    });
+  };
 
   TroupeViews.Base = Backbone.View.extend({
     template: null,
