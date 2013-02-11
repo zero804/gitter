@@ -61,7 +61,9 @@ define([
       n.prependTo(container);
       // add the hide timeout for this notification
       n.data('notification-hide-timeout', new Timeout(function() {
-        n.hide('slow');
+        n.animate({ left: -1 * n.outerWidth()   }, function() {
+          n.hide('slow');
+        });
       }, timeout));
     }
     else {
@@ -72,7 +74,7 @@ define([
 
     if (n.is(':hidden')) {
       n.show();
-      n.css({ position: 'relative', left: -1 * n.width() });
+      n.css({ position: 'relative', left: -1 * n.outerWidth() });
       n.animate({ left: 0 });
     }
 
