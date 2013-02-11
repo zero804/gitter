@@ -7,8 +7,8 @@ define([
   './fileItemView',
   'hbs!./tmpl/fileHelpView',
   'hbs!./tmpl/fileAddButton',
-  './../base',
-  './../../../play/bootstrap-tooltip'
+  '../base',
+  'bootstrap_tooltip'
 ], function($, _, Backbone, Marionette, FileItemView, fileHelpView, fileAddButtonView, TroupeViews) {
   "use strict";
 

@@ -5,12 +5,11 @@ define([
   'underscore',
   'backbone',
   'marionette',
-  'bootstrap',
   'views/base',
   'hbs!./tmpl/chatInputView',
   'collections/chat',
   '../../utils/momentWrapper'
-], function($, _, Backbone, Marionette, _bootstrap, TroupeViews, template, chatModels, moment) {
+], function($, _, Backbone, Marionette, TroupeViews, template, chatModels, moment) {
   "use strict";
 
   var PAGE_SIZE = 50;
@@ -44,13 +43,12 @@ define([
       var chatBox = this.$el.find("textarea");
       var val = chatBox.val().trim();
       if(val) {
-        var newItem = this.collection.create({
+        this.collection.create({
           text: val,
           fromUser: window.troupeContext.user,
           sent: moment()
         });
 
-        console.log("Inserted new item at " + this.collection.indexOf(newItem));
         chatBox.val('');
       }
       return false;

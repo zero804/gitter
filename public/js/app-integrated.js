@@ -345,8 +345,7 @@ require([
 
     // send out a change event to avatar widgets that are not necessarily connected to a model object.
     userCollection.on('change', function(model) {
-      var eventName = "avatar:change";
-      $(document).trigger(eventName, model.toJSON());
+      $(document).trigger("avatar:change", model.toJSON());
     });
 
     // People View

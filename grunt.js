@@ -39,6 +39,13 @@ module.exports = function( grunt ) {
   requirejs: {
       compile: {
         options: {
+
+          optimize: 'uglify2',
+          generateSourceMaps: true,
+          preserveLicenseComments: false,
+          useSourceUrl: true,
+
+
           appDir: "public/",
           baseUrl: "js",
           dir: "public-processed/",
@@ -46,7 +53,10 @@ module.exports = function( grunt ) {
 
           modules: [
               {
-                name: "core-libraries"
+                name: "core-libraries",
+                include: [
+                  "libs/require/2.1.4/require-min"
+                ]
               },
               {
                   name: "signup",
@@ -55,6 +65,7 @@ module.exports = function( grunt ) {
               {
                   name: "router-core",
                   include: [
+                    "utils/tracking",
                     "views/widgets/avatar"
                   ],
                   exclude: ["core-libraries"]
@@ -62,6 +73,7 @@ module.exports = function( grunt ) {
               {
                   name: "app-integrated",
                   include: [
+                    "utils/tracking",
                     "views/widgets/avatar",
                     "views/widgets/timeago"
                   ],
@@ -70,6 +82,7 @@ module.exports = function( grunt ) {
               {
                   name: "router-mobile-chat",
                   include: [
+                    "utils/tracking",
                     "views/widgets/avatar",
                     "views/widgets/timeago"
                   ],
@@ -78,6 +91,7 @@ module.exports = function( grunt ) {
               {
                   name: "router-mobile-files",
                   include: [
+                    "utils/tracking",
                     "views/widgets/avatar",
                     "views/widgets/timeago"
                   ],
@@ -86,6 +100,7 @@ module.exports = function( grunt ) {
               {
                   name: "router-mobile-conversations",
                   include: [
+                    "utils/tracking",
                     "views/widgets/avatar",
                     "views/widgets/timeago"
                   ],
@@ -94,67 +109,13 @@ module.exports = function( grunt ) {
               {
                   name: "router-login",
                   include: [
+                    "utils/tracking",
                     "views/widgets/avatar"
                   ],
                   exclude: ["core-libraries"]
               }
-              /*
-              {
-                  name: "router",
-                  include: [
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
-              {
-                  name: "router-login",
-                  include: [
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
-              {
-                  name: "router-mobile-chat",
-                  include: [
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
-              {
-                  name: "router-mobile-files",
-                  include: [
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
-              {
-                  name: "router-mobile-conversations",
-                  include: [
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
-              {
-                  name: "router-mobile-people",
-                  include: [
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
-              / *
-              {
-                  name: "views/people/peopleView",
-                  exclude: ["core-libraries","router"]
-              },
-              * /
-              {
-                  name: "views/profile/profileView",
-                  exclude: ["core-libraries","router"]
-              }
-              */
           ],
 
-          optimize: "none",
           optimizeCss: "none",
 
           // inlining ftw
@@ -184,7 +145,7 @@ module.exports = function( grunt ) {
           'public/bootstrap/css/*.css'
         ],
         tasks: 'reload'
-      }//,
+      } //,
       //less: {
        // files: [
         //  'public/**/*.less'
@@ -222,6 +183,12 @@ module.exports = function( grunt ) {
       globals: {
         jQuery: true
       }
+    },
+
+    uglify: {
+      mangle: {toplevel: true},
+      squeeze: {dead_code: false},
+      codegen: {quote_keys: true}
     },
 
     min: {
@@ -303,7 +270,6 @@ module.exports = function( grunt ) {
         command: 'build-scripts/gzip-processed.sh'
       }
     }
-
   });
 
   grunt.loadNpmTasks('grunt-contrib-manifest');
@@ -314,8 +280,8 @@ module.exports = function( grunt ) {
   grunt.loadNpmTasks('grunt-clean');
   grunt.loadNpmTasks('grunt-reload');
 
-  grunt.registerTask('process', 'clean less copy requirejs min exec:gzip');
-  grunt.registerTask('process-no-min', 'clean less copy requirejs min exec:gzip');
+  grunt.registerTask('process', 'clean less copy requirejs exec:gzip');
+  grunt.registerTask('process-no-min', 'clean less copy requirejs exec:gzip');
 
   grunt.registerTask('watchr', 'reload watch');
 
