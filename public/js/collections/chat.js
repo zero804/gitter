@@ -37,7 +37,7 @@ define([
       'sent': function(chat) {
         var sent = chat.get('sent');
         if(!sent) return 0;
-        return sent.unix();
+        return sent.valueOf();
       }
     },
 
