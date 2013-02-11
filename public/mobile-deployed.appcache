@@ -1,0 +1,14 @@
+CACHE MANIFEST
+
+CACHE:
+bootstrap/css/mtrp.css
+bootstrap/css/trpMobileChat.css
+js/core-libraries.js
+js/router-mobile-chat.js
+
+NETWORK:
+*
+/*
+//*
+http://*
+https://*

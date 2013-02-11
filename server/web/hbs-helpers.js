@@ -55,21 +55,22 @@ if(!useCdn) {
 
 var minified = nconf.get("web:minified");
 
-exports.bootScript = function(url) {
-  var requireScript, scriptLocation;
+exports.bootScript = function(url, useCdn) {
+  var requireScript, scriptLocation, cdn = (useCdn) ? exports.cdn : function(a) { return a; };
 
   if(minified) {
 
-    requireScript = exports.cdn("js/core-libraries.js");
-    var baseUrl = exports.cdn("js/");
+    requireScript = cdn("js/core-libraries.js");
+    var baseUrl = cdn("js/");
 
     return  "<script type='text/javascript'>\nwindow.require_config.baseUrl = '" + baseUrl + "';</script>\n" +
             "<script defer='defer' async='true' data-main='" + url + "' src='" + requireScript + "' type='text/javascript'></script>\n";
 
   }
-  var scriptLocation = exports.cdn("js/" + url);
 
-  requireScript = exports.cdn("js/libs/require/" + REQUIREJS_VERSION + "/require.js");
+  scriptLocation = cdn("js/" + url);
+
+  requireScript = cdn("js/libs/require/" + REQUIREJS_VERSION + "/require.js");
   return "<script defer='defer' async='true' data-main='" + scriptLocation + ".js' src='" + requireScript + "' type='text/javascript'></script>";
 
 };

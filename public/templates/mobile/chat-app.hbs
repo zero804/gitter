@@ -7,7 +7,7 @@
 
     <title>{{troupeName}}</title>
 
-    <link rel="stylesheet" href='{{cdn "bootstrap/css/trpMobileChat.css" }}'>
+    <link rel="stylesheet" href='bootstrap/css/trpMobileChat.css'>
 
     <script type="text/javascript">
     window.troupeContext = {{{troupeContext}}};
@@ -19,7 +19,7 @@
 
     {{>require_wrapper}}
 
-    {{{bootScript "router-mobile-chat" }}}
+    {{{bootScript "router-mobile-chat" false }}}
 
     <link rel="shortcut icon" href="images/favicon.ico">
 
