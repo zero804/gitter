@@ -71,10 +71,17 @@ module.exports = {
     app.use(passport.session());
     app.use(app.router);
 
-    var expressErrorHandler = express.errorHandler({ showStack: nconf.get('express:showStack'), dumpExceptions: nconf.get('express:dumpExceptions') });
+    // var expressErrorHandler = express.errorHandler({ showStack: nconf.get('express:showStack'), dumpExceptions: nconf.get('express:dumpExceptions') });
     app.use(function(err, req, res, next) {
       winston.error("An unexpected error occurred", { error: err, path: req.path } );
-      expressErrorHandler(err, req, res, next);
+
+      if (err && err.errorCode === 404) {
+         res.render('404' , { homeUrl : nconf.get('web:homeurl') }); 
+       } else
+      {
+        res.render('500' , { homeUrl : nconf.get('web:homeurl') }); 
+      }
+      // expressErrorHandler(err, req, res, next);
     });
 
   },
