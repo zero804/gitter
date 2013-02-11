@@ -7,13 +7,12 @@
     <meta name="google-site-verification" content="nnoWjW8hKT4umkqn1UrCdVHtLs8Q2pDi5ek0x5PUHug" />
       <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
 
-
     <style type="text/css">
       body {
         background-color: #ecf1ec;
       }
 
-      img {
+      .image {
          position: absolute;
          top: 128px;
          left: 20%;
@@ -46,19 +45,22 @@
 
   <body>
 
-<img src="{{cdn "images/2/sad-face.png"}}" width="128" height="128" title="The sad face">
+    <a href="{{homeUrl}}"><img class="image" src="{{cdn "images/2/sad-face.png"}}" width="128" height="128" title="The sad face"></a>
 
-<div class="error">
-  TROUPE NOT FOUND<br><br>
-  <span class="error-text">Oops. Looks like the Troupe you are looking for isn't here.<br> Check the address and try again.</span>
-</div>
+    <div class="error">
+      TROUPE NOT FOUND<br><br>
+      <span class="error-text">Oops. Looks like the Troupe you are looking for isn't here.<br> Check the address and try again.</span>
+    </div>
 
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="bootstrap/js/jquery.js"></script>
-    <script src="bootstrap/js/bootstrap-tooltip.js"></script>
-    <script src="bootstrap/js/bootstrap-popover.js"></script>
+
+<script type="text/javascript">
+  var uvOptions = {};
+  (function() {
+    var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+    uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/BYBA0YJRpGVi5zrb99UoHQ.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+  })();
+</script>
 
 
   </body>
