@@ -4,7 +4,9 @@ define([
   'jquery',
   'backbone',
   'handlebars',
-  'hbs'
+  'hbs',
+  'bootstrap_tooltip',
+  'marionette'
 ], function() {
   return null;
 });
