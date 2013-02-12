@@ -55,8 +55,8 @@ if(!useCdn) {
 
 var minified = nconf.get("web:minified");
 
-exports.bootScript = function(url, useCdn) {
-  var requireScript, scriptLocation, cdn = (useCdn) ? exports.cdn : function(a) { return a; };
+exports.bootScript = function(url, skipCdn) {
+  var requireScript, scriptLocation, cdn = (skipCdn) ? function(a) { return '/' + a; } : exports.cdn;
 
   if(minified) {
 
