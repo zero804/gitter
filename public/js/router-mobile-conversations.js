@@ -23,6 +23,9 @@ require([
       this.collection = new conversationModels.ConversationCollection();
       this.collection.fetch();
       this.collection.listen();
+      if (window.noupdate) {
+        this.collection.fetch();
+      }
     },
 
     defaultAction: function(actions){

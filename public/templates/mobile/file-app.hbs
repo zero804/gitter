@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html class="no-js" lang="en" {{#useAppCache}}manifest="/mobile.appcache"{{/useAppCache}}>
 <head>
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
@@ -8,18 +8,23 @@
 
 	<title>{{troupeName}} - Troupe</title>
 
-  <link rel="stylesheet" href='{{cdn "bootstrap/css/trpMobileFiles.css" }}'>
+  <link rel="stylesheet" href='/bootstrap/css/trpMobileFiles.css'>
 
   <script type="text/javascript">
   window.troupeContext = {{{troupeContext}}};
   {{#if data}}
   window.troupePreloads = {{{data}}};
   {{/if}}
+
+  window.applicationCache.addEventListener('noupdate', function() {
+    window.noupdate = true;
+  }, false);
+
   </script>
 
   {{>require_wrapper}}
 
-  {{{bootScript "router-mobile-files" }}}
+  {{{bootScript "router-mobile-files" true }}}
 
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href="images/favicon.ico">
