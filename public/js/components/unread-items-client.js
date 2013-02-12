@@ -221,12 +221,14 @@ define([
           }
       }
 
-      troupeCollection.on('reset', function() {
-        troupeCollection.each(function(troupe) {
-          troupeUnreadCounts[troupe.id] = troupe.get('unreadItems');
+      if (troupeCollection) {
+        troupeCollection.on('reset', function() {
+          troupeCollection.each(function(troupe) {
+            troupeUnreadCounts[troupe.id] = troupe.get('unreadItems');
+          });
+          recount();
         });
-        recount();
-      });
+      }
 
       realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
         if(message.notification === 'troupe_unread') {
@@ -234,7 +236,7 @@ define([
           var totalUnreadItems = message.totalUnreadItems;
 
           troupeUnreadCounts[troupeId] = totalUnreadItems;
-          var model = troupeCollection.get(troupeId);
+          var model = (troupeCollection) ? troupeCollection.get(troupeId) : null;
           if(model) {
             model.set('unreadItems', totalUnreadItems);
           } else {

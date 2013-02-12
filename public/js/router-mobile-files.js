@@ -8,8 +8,9 @@ require([
   'views/file/fileView',
   'views/file/fileDetailView',
   'collections/files',
-  'views/file/mobileFilePreview'
-], function($, _, Backbone, BaseRouter, TroupeViews, FileView, FileDetailView, fileModels, MobileFilePreview) {
+  'views/file/mobileFilePreview',
+  'components/unread-items-client'
+], function($, _, Backbone, BaseRouter, TroupeViews, FileView, FileDetailView, fileModels, MobileFilePreview, unreadItemsClient) {
   "use strict";
 
   var AppRouter = BaseRouter.extend({
@@ -26,6 +27,7 @@ require([
       if (window.noupdate) {
         this.fileCollection.fetch();
       }
+      unreadItemsClient.installTroupeListener();
     },
 
     defaultAction: function(/*actions*/){
