@@ -7,8 +7,9 @@ require([
   'collections/chat',
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
-  'views/widgets/avatar'
-], function($, _, Backbone, TroupeViews, chatModels, ChatInputView, ChatCollectionView, AvatarWidget) {
+  'views/widgets/avatar',
+  'components/unread-items-client'
+], function($, _, Backbone, TroupeViews, chatModels, ChatInputView, ChatCollectionView, AvatarWidget, unreadItemsClient) {
   "use strict";
 
   TroupeViews.preloadWidgets({
@@ -23,6 +24,8 @@ require([
   if (window.noupdate) {
     chatCollection.fetch();
   }
+
+  unreadItemsClient.installTroupeListener();
 
   new ChatInputView({
     el: $('#chat-input'),

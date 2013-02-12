@@ -7,8 +7,9 @@ require([
   'views/base',
   'views/conversation/conversationView',
   'views/conversation/conversationDetailView',
-  'collections/conversations'
-], function($, _, Backbone, BaseRouter, TroupeViews, ConversationView, conversationDetailView, conversationModels) {
+  'collections/conversations',
+  'components/unread-items-client'
+], function($, _, Backbone, BaseRouter, TroupeViews, ConversationView, conversationDetailView, conversationModels, unreadItemsClient) {
   /*jslint browser: true, unused: true */
   /*global console:false, require: true */
   "use strict";
@@ -26,6 +27,7 @@ require([
       if (window.noupdate) {
         this.collection.fetch();
       }
+      unreadItemsClient.installTroupeListener();
     },
 
     defaultAction: function(actions){
