@@ -3,8 +3,15 @@ CACHE MANIFEST
 CACHE:
 bootstrap/css/mtrp.css
 bootstrap/css/trpMobileChat.css
+bootstrap/css/trpMobileFiles.css
+bootstrap/css/trpMobileConversations.css
 js/core-libraries.js
 js/router-mobile-chat.js
+js/router-mobile-files.js
+js/router-mobile-conversations.js
+images/2/icon-new-mail-black.png
+images/2/icon-mail-black.png
+images/2/mime/unknown.png
 
 NETWORK:
 *
