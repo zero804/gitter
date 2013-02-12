@@ -12,26 +12,6 @@ module.exports = function( grunt ) {
         folder: "public-processed/"
     },
 
-    // generate application cache manifest
-    manifest:{
-      generate: {
-        options: {
-          basePath: "public/",
-          network: ["http://*", "https://*"],
-          fallback: ["/ /offline.html"],
-          exclude: ["js/jquery.min.js"],
-          preferOnline: false,
-          timestamp: true
-        },
-        src: [
-            "js/router.js",
-            "bootstrap/core-libraries.js",
-            "bootstrap/css/*.css"
-        ],
-        dest: "manifest.appcache"
-      }
-    },
-
     htmllint: {
       all: ["public/**/*.hbs"]
     },
@@ -267,7 +247,10 @@ module.exports = function( grunt ) {
     },
     exec: {
       gzip: {
-        command: 'build-scripts/gzip-processed.sh'
+        command: './build-scripts/gzip-processed.sh'
+      },
+      manifest: {
+        command: './build-scripts/update-manifest.sh'
       }
     }
   });
@@ -280,8 +263,8 @@ module.exports = function( grunt ) {
   grunt.loadNpmTasks('grunt-clean');
   grunt.loadNpmTasks('grunt-reload');
 
-  grunt.registerTask('process', 'clean less copy requirejs exec:gzip');
-  grunt.registerTask('process-no-min', 'clean less copy requirejs exec:gzip');
+  grunt.registerTask('process', 'clean less copy requirejs exec:manifest exec:gzip');
+  grunt.registerTask('process-no-min', 'clean less copy requirejs exec:manifest exec:gzip');
 
   grunt.registerTask('watchr', 'reload watch');
 
