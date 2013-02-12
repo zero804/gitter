@@ -194,6 +194,17 @@ function preloadTroupeMiddleware(req, res, next) {
 
 module.exports = {
     install: function(app) {
+
+      app.get('/mobile.appcache', function(req, res) {
+        if (nconf.get('web:useAppCache')) {
+          res.type('text/cache-manifest');
+          res.sendfile('public/mobile.appcache');
+        }
+        else {
+          res.send(404);
+        }
+      });
+
       app.get('/:appUri',
         middleware.grantAccessForRememberMeTokenMiddleware,
         preloadTroupeMiddleware,
