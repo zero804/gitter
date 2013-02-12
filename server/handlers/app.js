@@ -122,6 +122,7 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, data) {
     }
 
     res.render(page, {
+      useAppCache: nconf.get('web:useAppCache'),
       login: login,
       data: login ? null : JSON.stringify(data), // Only push the data through if the user is logged in already
       troupeName: troupeName,

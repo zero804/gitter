@@ -20,7 +20,7 @@ require([
   chatCollection.setSortBy('-sent');
   chatCollection.listen();
   chatCollection.reset(window.troupePreloads['chatMessages'], { parse: true });
-  if ($(document).attr('manifest')) {
+  if ($(document.documentElement).attr('manifest')) {
     chatCollection.fetch();
   }
 
