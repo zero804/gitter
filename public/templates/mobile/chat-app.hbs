@@ -14,6 +14,29 @@
     {{#if data}}
     window.troupePreloads = {{{data}}};
     {{/if}}
+
+    /*
+    window.applicationCache.addEventListener('cached', function() {
+      console.log('Received first time cache event, no need to fetch new embedded collection data.');
+    }, false);
+
+    window.applicationCache.addEventListener('updateready', function() {
+      console.log('Received updateReady event, the files on the server are newer, reload page.');
+      //window.location.reload();
+    }, false);
+
+    window.applicationCache.addEventListener('obsolete', function() {
+      console.log('Received obsolete event');
+      //window.location.reload();
+    }, false);
+    */
+
+    window.applicationCache.addEventListener('noupdate', function() {
+      // console.log('Received noupdate event, we will fetch new collection data');
+      window.noupdate = true;
+    }, false);
+
+
     </script>
 
 
