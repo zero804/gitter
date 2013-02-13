@@ -350,6 +350,46 @@ function updateTroupeName(troupeId, troupeName, callback) {
   });
 }
 
+function createOneToOneTroupe(userId1, userId2, callback) {
+  throw new Error("Erk");
+  var troupe = new persistence.Troupe({
+    uri: null,
+    name: '',
+    oneToOne: true,
+    status: 'ACTIVE',
+    users: [
+      { userId: userId1 },
+      { userId: userId2 }
+    ]
+  });
+
+  troupe.save(function(err) {
+    return callback(err, troupe);
+  });
+}
+
+function findOrCreateOneToOneTroupe(userId1, userId2, callback) {
+  winston.info('User ids: ' + userId1 + " and " + userId2);
+  persistence.Troupe.findOne({
+    //users: { $all: [ { userId: userId1 }, { userId: userId2 } ]}
+    $and: [
+      { oneToOne: true },
+      { 'users.userId': userId1 },
+      { 'users.userId': userId2 }
+    ]
+  }, function(err, troupe) {
+    if(err) return callback(err);
+
+    // If the troupe can't be found, then we need to create it....
+    if(!troupe) {
+      winston.info('Could not find one to one troupe for ' + userId1 + ' and ' + userId2);
+      return createOneToOneTroupe(userId1, userId2, callback);
+    }
+
+    return callback(null, troupe);
+  });
+}
+
 module.exports = {
   findByUri: findByUri,
   findById: findById,
@@ -375,5 +415,6 @@ module.exports = {
   removeUserFromTroupe: removeUserFromTroupe,
   findUsersForTroupe: findUsersForTroupe,
   validateTroupeUrisForUser: validateTroupeUrisForUser,
-  updateTroupeName: updateTroupeName
+  updateTroupeName: updateTroupeName,
+  findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe
 };
