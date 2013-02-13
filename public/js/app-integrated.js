@@ -35,12 +35,13 @@ require([
   'views/app/troupeSettingsView',
   'components/webNotifications',
   'components/unread-items-client',
-  'components/logging'
+  'components/logging',
+  'filtered-collection'
 ], function($, _, Backbone, Marionette, _Helpers, TroupeViews, realtime, AppIntegratedView, ChatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
             troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView,
             createTroupeView, headerViewTemplate, shareTroupeView,
-            troupeSettingsView, webNotifications, unreadItemsClient, logging) {
+            troupeSettingsView, webNotifications, unreadItemsClient, logging, FilteredCollection) {
   /*global console:true require:true */
   "use strict";
 
@@ -317,11 +318,15 @@ require([
 
     // Troupe Collections
     troupeCollection = new troupeModels.TroupeCollection();
+    var filteredTroupeCollection = new Backbone.FilteredCollection(null, {model: troupeModels.TroupeModel, collection: troupeCollection });
+    filteredTroupeCollection.setFilter(function(m) {
+      return !m.get('oneToOne') || m.get('unreadItems') > 0;
+    });
     unreadItemsClient.installTroupeListener(troupeCollection);
 
     troupeCollection.fetch();
     var troupeCollectionView = new TroupeCollectionView({
-      collection: troupeCollection
+      collection: filteredTroupeCollection
     });
     app.leftMenuRegion.show(troupeCollectionView);
 
