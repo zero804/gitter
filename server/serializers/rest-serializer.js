@@ -633,13 +633,15 @@ function TroupeStrategy(options) {
   }
 
   this.map = function(item) {
+    var otherUser = item.oneToOne && currentUserId ? mapOtherUser(item.users) : undefined;
+    var troupeName = (!item.oneToOne) ? item.name : otherUser.displayName;
     return {
       id: item.id,
-      name: item.name,
+      name: troupeName,
       uri: item.uri,
       oneToOne: item.oneToOne,
       users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
-      user: item.oneToOne && currentUserId ? mapOtherUser(item.users) : undefined,
+      user: otherUser,
       unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined
     };
   };
