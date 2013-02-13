@@ -351,7 +351,7 @@ function updateTroupeName(troupeId, troupeName, callback) {
 }
 
 function createOneToOneTroupe(userId1, userId2, callback) {
-  throw new Error("Erk");
+
   var troupe = new persistence.Troupe({
     uri: null,
     name: '',
