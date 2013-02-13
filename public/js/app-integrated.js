@@ -257,7 +257,7 @@ require([
     var headerView = new (TroupeViews.Base.extend({
       template: headerViewTemplate,
       getRenderData: function() {
-        return { user: window.troupeContext.user };
+        return { user: window.troupeContext.user, troupeContext: troupeContext };
       }
     }))();
     app.headerRegion.show(headerView);
