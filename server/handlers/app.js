@@ -57,7 +57,8 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, data) {
     var troupeData = {
       "uri": troupe.uri,
       "id": troupe.id,
-      "name": troupe.name
+      "name": troupe.name,
+      "oneToOne": troupe.oneToOne
     };
     var accessDenied;
 
@@ -108,10 +109,11 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, data) {
       login  = false;
       troupeName = troupe.name;
 
-      userService.saveLastVisitedTroupeforUser(req.user.id, troupe.id, function(err) {
-        if (err) winston.info("Something went wrong saving the user last troupe visited: ", { exception: err });
-      });
-
+      if (!troupe.oneToOne) {
+        userService.saveLastVisitedTroupeforUser(req.user.id, troupe.id, function(err) {
+          if (err) winston.info("Something went wrong saving the user last troupe visited: ", { exception: err });
+        });
+      }
     } else {
       login = true;
       if(profileNotCompleted) {
@@ -183,7 +185,6 @@ function preloadTroupeMiddleware(req, res, next) {
   var appUri = req.params.appUri;
 
   troupeService.findByUri(appUri, function(err, troupe) {
-    // if(err) return next(err);
     if (err) return next({ errorCode: 500, error: err });
     if(!troupe) return next({ errorCode: 404 });
     req.troupe = troupe;
@@ -205,6 +206,38 @@ module.exports = {
           res.send(404);
         }
       });
+
+      app.get('/one-one/:userId',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        function(req, res, next) {
+          troupeService.findOrCreateOneToOneTroupe(req.user.id, req.params.userId, function(err, troupe) {
+            if(err) return next(err);
+
+
+            var f = new Fiber();
+            preloadFiles(req.user.id, troupe.id, f.waitor());
+            preloadChats(req.user.id, troupe.id, f.waitor());
+            preloadUsers(req.user.id, troupe, f.waitor());
+
+            f.all()
+              .spread(function(files, chats, users) {
+                // Send the information through
+                renderAppPageWithTroupe(req, res, next, 'app-integrated', troupe, {
+                  files: files,
+                  chatMessages: chats,
+                  users: users
+                });
+              })
+              .fail(function(err) {
+                next(err);
+              });
+
+
+          });
+
+        }
+      );
 
       app.get('/:appUri',
         middleware.grantAccessForRememberMeTokenMiddleware,
