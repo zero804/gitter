@@ -15,7 +15,7 @@ var chatService = require("../services/chat-service");
 var Fiber = require("../utils/fiber");
 var conversationService = require("../services/conversation-service");
 
-function renderAppPageWithTroupe(req, res, next, page, troupe, data) {
+function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data) {
   if(req.user) {
     unreadItemService.getUnreadItemsForUser(req.user.id, troupe.id, function(err, unreadItems) {
       if(err) return next(err);
@@ -104,10 +104,10 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, data) {
     };
 
 
-    var login, troupeName;
+    var login, actualTroupeName;
     if(req.user && !profileNotCompleted && troupeData) {
       login  = false;
-      troupeName = troupe.name;
+      actualTroupeName = troupeName;
 
       if (!troupe.oneToOne) {
         userService.saveLastVisitedTroupeforUser(req.user.id, troupe.id, function(err) {
@@ -117,9 +117,9 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, data) {
     } else {
       login = true;
       if(profileNotCompleted) {
-        troupeName = troupe.name;
+        actualTroupeName = troupeName;
       } else {
-        troupeName = "Welcome";
+        actualTroupeName = "Welcome";
       }
     }
 
@@ -127,7 +127,7 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, data) {
       useAppCache: !!nconf.get('web:useAppCache'),
       login: login,
       data: login ? null : JSON.stringify(data), // Only push the data through if the user is logged in already
-      troupeName: troupeName,
+      troupeName: actualTroupeName,
       troupeContext: JSON.stringify(troupeContext)
     });
 
@@ -141,7 +141,7 @@ function renderAppPage(req, res, next, page) {
     if(err) return next(err);
     if(!troupe) return next("Troupe: " + appUri + " not found.");
 
-    renderAppPageWithTroupe(req, res, next, page, troupe);
+    renderAppPageWithTroupe(req, res, next, page, troupe, troupe.name);
   });
 }
 
@@ -211,7 +211,7 @@ module.exports = {
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         function(req, res, next) {
-          troupeService.findOrCreateOneToOneTroupe(req.user.id, req.params.userId, function(err, troupe) {
+          troupeService.findOrCreateOneToOneTroupe(req.user.id, req.params.userId, function(err, troupe, otherUser) {
             if(err) return next(err);
 
 
@@ -223,10 +223,11 @@ module.exports = {
             f.all()
               .spread(function(files, chats, users) {
                 // Send the information through
-                renderAppPageWithTroupe(req, res, next, 'app-integrated', troupe, {
+                renderAppPageWithTroupe(req, res, next, 'app-integrated', troupe, otherUser.displayName, {
                   files: files,
                   chatMessages: chats,
-                  users: users
+                  users: users,
+                  otherUser: otherUser
                 });
               })
               .fail(function(err) {
@@ -260,7 +261,7 @@ module.exports = {
         f.all()
           .spread(function(files, chats, users, conversations) {
             // Send the information through
-            renderAppPageWithTroupe(req, res, next, page, req.troupe, {
+            renderAppPageWithTroupe(req, res, next, page, req.troupe, req.troupe.name, {
               files: files,
               chatMessages: chats,
               users: users,
@@ -315,7 +316,7 @@ module.exports = {
               return next(err);
             }
 
-            renderAppPageWithTroupe(req, res, next, 'mobile/chat-app', req.troupe, { 'chatMessages': serialized });
+            renderAppPageWithTroupe(req, res, next, 'mobile/chat-app', req.troupe, req.troupe.name, { 'chatMessages': serialized });
           });
 
         });
@@ -332,7 +333,7 @@ module.exports = {
               return next(err);
             }
 
-            renderAppPageWithTroupe(req, res, next, 'mobile/file-app', req.troupe, { 'files': serializedFiles });
+            renderAppPageWithTroupe(req, res, next, 'mobile/file-app', req.troupe, req.troupe.name, { 'files': serializedFiles });
           });
 
         });

@@ -634,7 +634,22 @@ function TroupeStrategy(options) {
 
   this.map = function(item) {
     var otherUser = item.oneToOne && currentUserId ? mapOtherUser(item.users) : undefined;
-    var troupeName = (!item.oneToOne) ? item.name : otherUser.displayName;
+    var troupeName, troupeUrl;
+    if(item.oneToOne) {
+      if(otherUser) {
+        troupeName = otherUser.displayName;
+        troupeUrl = "/one-one/" + otherUser.id;
+      } else {
+        winston.debug("Unable to map troupe bits as something has gone horribly wrong");
+        // This should technically never happen......
+        troupeName = null;
+        troupeUrl = null;
+      }
+    } else {
+        troupeName = item.name;
+        troupeUrl = "/" + item.uri;
+    }
+
     return {
       id: item.id,
       name: troupeName,
@@ -642,7 +657,8 @@ function TroupeStrategy(options) {
       oneToOne: item.oneToOne,
       users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
       user: otherUser,
-      unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined
+      unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined,
+      url: troupeUrl
     };
   };
 }

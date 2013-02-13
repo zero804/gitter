@@ -24,7 +24,7 @@ module.exports = {
   },
 
   show: function(req, res, next) {
-    var strategy = new restSerializer.TroupeStrategy({ mapUsers: true });
+    var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true });
 
     restSerializer.serialize(req.troupe, strategy, function(err, serialized) {
       if(err) return next(err);
@@ -40,7 +40,7 @@ module.exports = {
     troupeService.updateTroupeName(troupe.id, name, function(err, troupe) {
       if (err) return next(err);
 
-      var strategy = new restSerializer.TroupeStrategy({ mapUsers: false });
+      var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: false });
 
       restSerializer.serialize(troupe, strategy, function(err, serialized) {
         if(err) return next(err);
