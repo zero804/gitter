@@ -307,11 +307,13 @@ require([
     conversationCollection.reset(window.troupePreloads['conversations'], { parse: true });
 
     // Conversation View
-    var conversationView = new ConversationView({
-      collection: conversationCollection
-    });
+    if (!window.troupeContext.troupe.oneToOne) {
+      var conversationView = new ConversationView({
+        collection: conversationCollection
+      });
+      app.mailRegion.show(conversationView);
+    }
 
-    app.mailRegion.show(conversationView);
 
     // Troupe Collections
     troupeCollection = new troupeModels.TroupeCollection();
