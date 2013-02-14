@@ -64,7 +64,7 @@ define([
     onFormSubmit: function(e) {
 
       var self = this, invites = this.shareTableView.serialize();
-      console.log(invites);
+
       $.ajax({
         url: "/troupes/" + window.troupeContext.troupe.id + "/invites",
         contentType: "application/json",
