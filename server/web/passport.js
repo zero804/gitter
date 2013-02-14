@@ -79,8 +79,8 @@ module.exports = {
       done(null, user.id);
     });
 
-    passport.deserializeUser(function(id, done) {
-      userService.findById(id, function(err, user) {
+    passport.deserializeUser(function deserializeUserCallback(id, done) {
+      userService.findById(id, function findUserByIdCallback(err, user) {
         if(err) return done(err);
         if(!user) return done(null, false);
 
