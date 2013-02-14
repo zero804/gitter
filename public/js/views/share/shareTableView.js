@@ -33,8 +33,8 @@ define([
       // generate an invitation row markup
       var $rowEl = $(rowTemplate(data));
 
-      $rowEl.find('[name=displayName]').placeholder();
-      $rowEl.find('[name=inviteEmail]').placeholder();
+      $rowEl.find('[name=displayName]').placeholder().val(data.displayName);
+      $rowEl.find('[name=inviteEmail]').placeholder().val(data.inviteEmail);
 
       return $rowEl;
     },
