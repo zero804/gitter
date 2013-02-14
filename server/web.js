@@ -11,6 +11,7 @@ var express = require('express'),
   http = require('http'),
   unreadItemService = require('./services/unread-item-service'),
   nconf = require('./utils/config'),
+  redis = require('./utils/redis'),
   oauth2 = require('./web/oauth2');
 
 /* Load express-resource */
@@ -20,7 +21,9 @@ var app = express();
 var server = http.createServer(app);
 
 var RedisStore = require('connect-redis')(express);
-var sessionStore = new RedisStore();
+var sessionStore = new RedisStore({
+  client: redis.createClient()
+});
 
 require('./web/express').installFull(app, server, sessionStore);
 
