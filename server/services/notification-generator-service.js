@@ -41,10 +41,22 @@ var titleTemplates = compile({
 });
 
 var linkTemplates = compile({
-  "chat": "/{{troupe.uri}}#",
-  "file": "/{{troupe.uri}}#file/{id}",
-  "request": "/{{troupe.uri}}#request/{id}"
+  "chat": "{{troupeUrl}}#",
+  "file": "{{troupeUrl}}#file/{{id}}",
+  "request": "{{troupeUrl}}#request/{{id}}"
 });
+
+var senderStrategies = {
+  "chat": function(data) {
+    console.dir(data);
+    return data.fromUser.id;
+  },
+  "file": function(data) {
+    console.dir(data);
+    return data.latestVersion.creatorUser.id;
+  },
+  request: null // Never need this for one-to-ones as there are no requests
+};
 
 
 function categorizeUsersByOnlineStatus(userIds, callback) {
@@ -307,12 +319,21 @@ exports.startWorkers = function() {
     return result;
   }
 
+  function getTroupeUrl(serilizedTroupe, senderUserId) {
+    if(!senderUserId) return null;
+    var userIds = serilizedTroupe.userIds;
+    var otherUserId = userIds.filter(function(userId) { return userId != senderUserId; })[0];
+    if(otherUserId) return "/one-one/" + otherUserId;
+    return null;
+  }
 
   /* Takes a whole lot of notifications for the same type of message, and turns them into messages */
   function createNotificationMessage(itemType, itemIds, callback) {
     var template = templates[itemType];
     var linkTemplate = linkTemplates[itemType];
     var titleTemplate = titleTemplates[itemType];
+
+    var senderStrategy = senderStrategies[itemType];
 
     if(!template) {
       winston.warn("No template for itemType " + itemType);
@@ -325,13 +346,18 @@ exports.startWorkers = function() {
 
         serializer.serialize(itemIds, strategy, function(err, serialized) {
           if(err) return callback(err);
-
-          console.dir(serialized);
+          var senderUserId = null;
 
           var messages = serialized.map(function(data) {
+            if(senderStrategy) {
+              senderUserId = senderStrategy(data);
+            }
+
             // TODO: sort this ugly hack out
             // This will fit nicely into the new serializer stuff
             if(data.versions) { data.latestVersion = data.versions[data.versions.length - 1]; }
+            data.troupeUrl = getTroupeUrl(data.troupe, senderUserId);
+
             return {
               text: template(data),
               title: titleTemplate ? titleTemplate(data) : null,
