@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
-var redis = require("redis"),
+var redis = require("../utils/redis"),
     winston = require('winston'),
     appEvents = require('../app-events.js'),
     _ = require("underscore"),
