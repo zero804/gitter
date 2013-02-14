@@ -136,15 +136,28 @@ function ChatStrategy(options)  {
 function TroupeStrategy(options) {
   if(!options) options = {};
 
+  var senderUserId = options.senderUserId;
+
   this.preload = function(items, callback) {
     callback();
   };
+
+  function getOtherUserUrl(item) {
+    if(!senderUserId) return null;
+    var userIds = item.getUserIds();
+    var otherUserId = userIds.filter(function(userId) { return userId != senderUserId; })[0];
+    if(otherUserId) return "/one-one/" + otherUserId;
+    return null;
+  }
 
   this.map = function(item) {
     return {
       id: item.id,
       name: item.name,
-      uri: item.uri
+      uri: item.uri,
+      oneToOne: item.oneToOne,
+      userIds: item.getUserIds(),
+      url: item.oneToOne ? getOtherUserUrl(item) : "/" + item.uri
     };
   };
 }

@@ -350,6 +350,55 @@ function updateTroupeName(troupeId, troupeName, callback) {
   });
 }
 
+function createOneToOneTroupe(userId1, userId2, callback) {
+
+  var troupe = new persistence.Troupe({
+    uri: null,
+    name: '',
+    oneToOne: true,
+    status: 'ACTIVE',
+    users: [
+      { userId: userId1 },
+      { userId: userId2 }
+    ]
+  });
+
+  troupe.save(function(err) {
+    return callback(err, troupe);
+  });
+}
+
+function findOrCreateOneToOneTroupe(currentUserId, userId2, callback) {
+  if(currentUserId == userId2) return callback("You cannot be in a troupe with yourself.");
+
+  userService.findById(userId2, function(err, user2) {
+    if(err) return callback(err);
+    if(!user2) return callback("User does not exist.");
+
+    persistence.Troupe.findOne({
+      //users: { $all: [ { userId: currentUserId }, { userId: userId2 } ]}
+      $and: [
+        { oneToOne: true },
+        { 'users.userId': currentUserId },
+        { 'users.userId': userId2 }
+      ]
+    }, function(err, troupe) {
+      if(err) return callback(err);
+
+      // If the troupe can't be found, then we need to create it....
+      if(!troupe) {
+        winston.info('Could not find one to one troupe for ' + currentUserId + ' and ' + userId2);
+        return createOneToOneTroupe(currentUserId, userId2, function(err, troupe) {
+          return callback(err, troupe, user2);
+        });
+      }
+
+      return callback(null, troupe, user2);
+    });
+
+  });
+}
+
 module.exports = {
   findByUri: findByUri,
   findById: findById,
@@ -375,5 +424,6 @@ module.exports = {
   removeUserFromTroupe: removeUserFromTroupe,
   findUsersForTroupe: findUsersForTroupe,
   validateTroupeUrisForUser: validateTroupeUrisForUser,
-  updateTroupeName: updateTroupeName
+  updateTroupeName: updateTroupeName,
+  findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe
 };
