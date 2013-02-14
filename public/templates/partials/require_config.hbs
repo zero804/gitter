@@ -22,12 +22,17 @@ require.config({
     retina: 'libs/retina/retina',
     ga: '//ssl.google-analytics.com/ga',
     faye: 'libs/faye/0.8.8/faye-browser-min',
-    nanoScroller: 'libs/nanoScroller/nanoScroller'
+    nanoScroller: 'libs/nanoScroller/nanoScroller',
+    'filtered-collection': 'libs/filtered-collection/filtered-collection'
   },
   shim: {
     'backbone': {
       deps: ['underscore', 'jquery'],
       exports: 'Backbone'
+    },
+    'filtered-collection': {
+      deps: ['underscore','backbone'],
+      exports: 'Backbone.FilteredCollection'
     },
     'faye': {
       exports: 'Faye'

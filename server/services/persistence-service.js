@@ -101,6 +101,7 @@ var TroupeSchema = new Schema({
   name: { type: String },
   uri: { type: String },
   status: { type: String, "enum": ['INACTIVE', 'ACTIVE'], "default": 'INACTIVE'},
+  oneToOne: { type: Boolean, "default": false },
   users: [TroupeUserSchema]
 });
 TroupeSchema.index({ uri: 1 });
@@ -119,6 +120,7 @@ TroupeSchema.methods.containsUserId = function(userId) {
 };
 
 TroupeSchema.methods.addUserById = function(userId) {
+  // TODO: disable this methods for one-to-one troupes
   var troupeUser = new TroupeUser({ userId: userId });
   this.post('save', function(postNext) {
     var url = "/troupes/" + this.id + "/users";
@@ -129,7 +131,7 @@ TroupeSchema.methods.addUserById = function(userId) {
 };
 
 TroupeSchema.methods.removeUserById = function(userId) {
-
+  // TODO: disable this methods for one-to-one troupes
   var troupeUser = _.find(this.users, function(troupeUser){ return troupeUser.userId == userId; });
   if(troupeUser) {
     // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
