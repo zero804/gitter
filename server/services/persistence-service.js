@@ -7,8 +7,58 @@ var ObjectId = Schema.ObjectId;
 var appEvents = require("../app-events");
 var _ = require("underscore");
 var winston = require("winston");
+var nconf = require("../utils/config");
 
-mongoose.connect('mongodb://localhost/troupe');
+var connection = mongoose.connection;
+
+//mongoose.mongo = require('mongodb');
+mongoose.set('debug', nconf.get("mongo:logQueries"));
+
+mongoose.connect(nconf.get("mongo:url"));
+if(nconf.get("mongo:profileSlowQueries")) {
+
+  var nativeDb = mongoose.connection.db;
+  var profileCollection = nativeDb.collection("system.profile");
+  var MAX = 5;
+
+  // Let the rest of the app start first
+  setTimeout(function() {
+    profileCollection.findOne({}, { sort: [[ "ts",  -1 ]] }, function(err, latest) {
+      if(err) winston.debug("Profiling error: ", err);
+
+      var ts = err || !latest ? 0 : latest.ts;
+
+      winston.info("MongoDB profiling enabled");
+      connection.setProfiling(1, MAX, function() {});
+
+      setInterval(function() {
+        profileCollection.find({ ts: { $gt: ts } }, { sort: { ts: 1 }}).toArray(function(err, items) {
+          if(err) return winston.debug("Profiling error: ", err);
+          if(items.length === 0)  return;
+          items.forEach(function(item) {
+            if(item.ts < ts) return;
+
+            if(item.millis > MAX) {
+              winston.warn("Mongo operation exceeded max", item);
+            }
+            if(item.ts > ts) ts = item.ts;
+
+          });
+
+        });
+      }, 1000);
+    });
+
+  }, 2000);
+
+}
+
+connection.on('error', function(err) {
+
+  winston.info("MongoDB connection error", { exception: err });
+  console.error(err);
+  if(err.stack) console.log(err.stack);
+});
 
 // --------------------------------------------------------------------
 // Utility serialization stuff
@@ -100,6 +150,7 @@ var TroupeSchema = new Schema({
   name: { type: String },
   uri: { type: String },
   status: { type: String, "enum": ['INACTIVE', 'ACTIVE'], "default": 'INACTIVE'},
+  oneToOne: { type: Boolean, "default": false },
   users: [TroupeUserSchema]
 });
 TroupeSchema.index({ uri: 1 });
@@ -118,6 +169,7 @@ TroupeSchema.methods.containsUserId = function(userId) {
 };
 
 TroupeSchema.methods.addUserById = function(userId) {
+  // TODO: disable this methods for one-to-one troupes
   var troupeUser = new TroupeUser({ userId: userId });
   this.post('save', function(postNext) {
     var url = "/troupes/" + this.id + "/users";
@@ -128,7 +180,7 @@ TroupeSchema.methods.addUserById = function(userId) {
 };
 
 TroupeSchema.methods.removeUserById = function(userId) {
-
+  // TODO: disable this methods for one-to-one troupes
   var troupeUser = _.find(this.users, function(troupeUser){ return troupeUser.userId == userId; });
   if(troupeUser) {
     // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....

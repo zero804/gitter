@@ -35,12 +35,13 @@ require([
   'views/app/troupeSettingsView',
   'components/webNotifications',
   'components/unread-items-client',
-  'components/logging'
+  'components/logging',
+  'filtered-collection'
 ], function($, _, Backbone, Marionette, _Helpers, TroupeViews, realtime, AppIntegratedView, ChatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
             troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView,
             createTroupeView, headerViewTemplate, shareTroupeView,
-            troupeSettingsView, webNotifications, unreadItemsClient, logging) {
+            troupeSettingsView, webNotifications, unreadItemsClient, logging, FilteredCollection) {
   /*global console:true require:true */
   "use strict";
 
@@ -256,7 +257,7 @@ require([
     var headerView = new (TroupeViews.Base.extend({
       template: headerViewTemplate,
       getRenderData: function() {
-        return { user: window.troupeContext.user };
+        return { user: window.troupeContext.user, troupeContext: troupeContext };
       }
     }))();
     app.headerRegion.show(headerView);
@@ -307,19 +308,25 @@ require([
     conversationCollection.reset(window.troupePreloads['conversations'], { parse: true });
 
     // Conversation View
-    var conversationView = new ConversationView({
-      collection: conversationCollection
-    });
+    if (!window.troupeContext.troupe.oneToOne) {
+      var conversationView = new ConversationView({
+        collection: conversationCollection
+      });
+      app.mailRegion.show(conversationView);
+    }
 
-    app.mailRegion.show(conversationView);
 
     // Troupe Collections
     troupeCollection = new troupeModels.TroupeCollection();
+    var filteredTroupeCollection = new Backbone.FilteredCollection(null, {model: troupeModels.TroupeModel, collection: troupeCollection });
+    filteredTroupeCollection.setFilter(function(m) {
+      return !m.get('oneToOne') || m.get('unreadItems') > 0;
+    });
     unreadItemsClient.installTroupeListener(troupeCollection);
 
     troupeCollection.fetch();
     var troupeCollectionView = new TroupeCollectionView({
-      collection: troupeCollection
+      collection: filteredTroupeCollection
     });
     app.leftMenuRegion.show(troupeCollectionView);
 

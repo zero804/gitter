@@ -15,6 +15,8 @@ exports.install = function(persistenceService) {
   // --------------------------------------------------------------------
 
   function serializeEvent(url, operation, model, callback) {
+    if(!url) { if(callback) callback(); return; }
+
     winston.debug("Serializing " + operation + " to " + url);
 
     // TODO: consider swapping out the HEAVY WEIGHT restSerializer here for the
@@ -95,6 +97,9 @@ exports.install = function(persistenceService) {
     return "/troupes/" + model.toTroupeId + "/chatMessages";
   });
   attachNotificationListenersToSchema(schemas.TroupeSchema, 'troupe', function(model) {
+    // Never serialize any one-to-one troupe events as that's just silly
+    if(model.oneToOne) return null;
+
     return "/troupes/" + model.id;
   });
 
