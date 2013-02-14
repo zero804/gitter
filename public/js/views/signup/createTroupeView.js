@@ -5,9 +5,10 @@ define([
   'underscore',
   'views/base',
   'hbs!./tmpl/createTroupeView',
-  'jquery_validate',
-  'jquery_placeholder'
-], function($, _, TroupeViews, template) {
+  'views/share/shareTableView',
+  'jquery_validate', // no ref
+  'jquery_placeholder' // no ref
+], function($, _, TroupeViews, template, ShareTableView) {
   var View = TroupeViews.Base.extend({
     template: template,
 
@@ -15,6 +16,15 @@ define([
       _.bindAll(this, 'onFormSubmit');
       if (!options) return;
       this.existingUser = options.existingUser;
+
+      /*var invitations = null, troupe = window.troupeContext.troupe;
+      if (window.troupeContext.troupe.oneToOne) {
+        invitations = [
+          { displayName: troupe.user.displayName, inviteEmail: troupe.user.email },
+          {} // an empty input row
+        ];
+      }*/
+      this.shareTableView = new ShareTableView(/*{invitations: invitations}*/);
     },
 
     events: {
@@ -36,11 +46,11 @@ define([
     },
 
     afterRender : function() {
+      this.$el.find('#invites-for-create').append(this.shareTableView.el);
+
       this.validateForm();
-      var troupeEl = this.$el.find('#troupeName');
-      troupeEl.placeholder();
-      var emailEl = this.$el.find('#email');
-      emailEl.placeholder();
+      this.$el.find('#troupeName').placeholder();
+      this.$el.find('#email').placeholder();
     },
 
     validateForm : function () {
