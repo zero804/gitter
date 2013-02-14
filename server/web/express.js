@@ -10,6 +10,14 @@ var express = require('express'),
   fineuploaderExpressMiddleware = require('fineuploader-express-middleware'),
   fs = require('fs');
 
+if(nconf.get('express:showStack')) {
+  try {
+    require("longjohn");
+  } catch(e) {
+    winston.info("Install longjohn using npm install longjohn if you would like better stacktraces.");
+  }
+}
+
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');
 
@@ -71,21 +79,32 @@ module.exports = {
     app.use(passport.session());
     app.use(app.router);
 
-    // var expressErrorHandler = express.errorHandler({ showStack: nconf.get('express:showStack'), dumpExceptions: nconf.get('express:dumpExceptions') });
+    function linkStack(stack) {
+      if(!stack) return;
+      return stack.split(/\n/).map(function(i) {
+        return i.replace(/\(([^:]+):(\d+):(\d+)\)/, function(match, file, line, col) {
+          var ourCode = file.indexOf('node_modules') == -1;
+          var h = "(<a href='subl://open/?url=file://" + file + "&line=" + line + "&column=" + col + "'>" + file + ":" + line + ":" + col + "</a>)";
+          if(ourCode) h = "<b>" + h + "</b>";
+          return h;
+        });
+      }).join('\n');
+    }
+
     app.use(function(err, req, res, next) {
       winston.error("An unexpected error occurred", { error: err, path: req.path } );
-
       if (err && err.errorCode === 404) {
         res.status(404);
-        res.render('404' , { 
+        res.render('404' , {
           homeUrl : nconf.get('web:homeurl')
-        }); 
-       } else
-      {
+        });
+       } else {
+        console.error(err.stack);
         res.status(500);
-        res.render('500' , { 
-          homeUrl : nconf.get('web:homeurl')
-        }); 
+        res.render('500' , {
+          homeUrl : nconf.get('web:homeurl'),
+          stack: nconf.get('express:showStack') ? linkStack(err.stack) : null
+        });
       }
       // expressErrorHandler(err, req, res, next);
     });
