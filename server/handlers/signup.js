@@ -34,6 +34,8 @@ module.exports = {
 
       app.post(
         '/signup',
+        // TODO this will need to be enhanced to accept the invitation inputs that are now on the create dialog,
+        // will need to use json for this instead of form encoded data. Consider doing this through a rest handler.
 
         // Form filter and validation middleware
         form(
@@ -82,9 +84,9 @@ module.exports = {
           // there are probably better ways to do this, but i don't them. MB
           if (req.form.userId) {
             userService.findById(req.form.userId, function(err,user) {
-              winston.error("Error finding user ", { exception: err });
 
               if(err) {
+                winston.error("Error finding user ", { exception: err });
                 res.send(500);
               } else {
                 winston.info("Got a user, his email is: ", user);
@@ -105,6 +107,8 @@ module.exports = {
                   }
 
                   troupeService.findById(id, function(err,troupe) {
+                    // req.form.invites // TODO do we want to add invites here as well?
+
                     if (err) {
                       winston.error("Error finding troupe ", { exception: err });
                       res.send(500);

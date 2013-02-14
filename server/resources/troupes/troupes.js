@@ -33,6 +33,31 @@ module.exports = {
     });
   },
 
+  create: function(req, res, next) {
+    var newTroupe = req.body;
+    var name = newTroupe.name;
+    var oneToOneTroupeId = newTroupe.oneToOneTroupeId;
+    var invites = newTroupe.invites;
+
+    troupeService.findById(oneToOneTroupeId, function(err, troupe) {
+      if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
+        return next(403);
+      }
+
+      troupeService.upgradeOneToOneTroupe({ name: name, oneToOneTroupe: troupe, senderName: req.user.name, invites: invites }, function(err, troupe) {
+        if(err) return next(err);
+
+        var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true });
+        restSerializer.serialize(troupe, strategy, function(err, serialized) {
+          if(err) return next(err);
+
+          res.send(serialized);
+        });
+      });
+
+    });
+  },
+
   update: function(req, res, next) {
     var troupe = req.troupe;
     var updatedTroupe = req.body;

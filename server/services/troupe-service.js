@@ -399,6 +399,43 @@ function findOrCreateOneToOneTroupe(currentUserId, userId2, callback) {
   });
 }
 
+function upgradeOneToOneTroupe(options, callback) {
+  var name = options.name;
+  var senderName = options.senderName;
+  var invites = options.invites;
+  var origTroupe = options.oneToOneTroupe.toObject();
+
+  // create a new, normal troupe, with the current users from the one to one troupe
+  var troupe = new persistence.Troupe({
+    uri: createUniqueUri(),
+    name: name,
+    oneToOne: true,
+    status: 'ACTIVE',
+    users: origTroupe.users
+  });
+
+  troupe.save(function(err) {
+    // add invites for each additional person
+    for(var i = 0; i < invites.length; i++) {
+      addInvite(troupe, senderName, invites[i].displayName, invites[i].email);
+    }
+
+    return callback(err, troupe);
+  });
+}
+
+function createUniqueUri() {
+  var chars = "0123456789abcdefghiklmnopqrstuvwxyz";
+
+  var uri = "";
+  for(var i = 0; i < 6; i++) {
+    var rnum = Math.floor(Math.random() * chars.length);
+    uri += chars.substring(rnum, rnum + 1);
+  }
+
+  return uri;
+}
+
 module.exports = {
   findByUri: findByUri,
   findById: findById,
@@ -425,5 +462,7 @@ module.exports = {
   findUsersForTroupe: findUsersForTroupe,
   validateTroupeUrisForUser: validateTroupeUrisForUser,
   updateTroupeName: updateTroupeName,
-  findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe
+  findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
+  upgradeOneToOneTroupe: upgradeOneToOneTroupe,
+  createUniqueUri: createUniqueUri
 };

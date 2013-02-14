@@ -32,21 +32,26 @@ define([
     },
 
     getRenderData: function() {
+      var isOneToOne = window.troupeContext.troupe.oneToOne;
       if (window.troupeContext || window.userId) {
         userId = (window.userId) ? window.userId : window.troupeContext.user.id;
         return {
           existingUser: this.existingUser,
-          userId: userId
+          userId: userId,
+          isOneToOne: isOneToOne
         };
       } else {
         return {
-          existingUser: this.existingUser
+          existingUser: this.existingUser,
+          isOneToOne: isOneToOne
         };
      }
     },
 
     afterRender : function() {
-      this.$el.find('#invites-for-create').append(this.shareTableView.el);
+      if (window.troupeContext.troupe.oneToOne) {
+        this.$el.find('#invites-for-create').append(this.shareTableView.el);
+      }
 
       this.validateForm();
       this.$el.find('#troupeName').placeholder();
@@ -73,36 +78,63 @@ define([
           email: "Hmmm, that doesn't look like your email address."
           }
         }
-        });
+      });
     },
 
     onFormSubmit: function(e) {
       if(e) e.preventDefault();
-      var form = this.$el.find('form');
-      var that = this;
+      var that = this, form = this.$el.find('form'), serializedForm;
 
-      $.ajax({
-        url: "/signup",
-        contentType: "application/x-www-form-urlencoded",
-        dataType: "json",
-        data: form.serialize(),
-        type: "POST",
-        success: function(data) {
-          if (data.redirectTo) {
-            console.log(JSON.stringify(data));
-            window.location.href = "/" + data.redirectTo + "#|shareTroupe";
+      if (window.troupeContext.troupe.oneToOne) {
+        serializedForm = {
+          name: this.$el.find('form input[name=name]').val(),
+          oneToOneTroupeId: window.troupeContext.troupe.id,
+          invites: this.shareTableView.serialize()
+        };
+
+        $.ajax({
+          url: "/troupes",
+          type: "PUT",
+          contentType: "json",
+          dataType: "json",
+          data: serializedForm,
+          success: function(troupe) {
+            console.log('response from upgrading one to one troupe', troupe);
+            if (troupe.uri) {
+              window.location.href = "/" + troupe.uri + "#|shareTroupe";
+            } else {
+              that.trigger('signup.complete', troupe);
+            }
+
           }
-          else {
-             that.trigger('signup.complete', data);
-           }
-        }
-      });
+        });
+      }
+      else {
+        serializedForm = form.serialize();
+        console.log("Serialized form: " + serializedForm);
+        $.ajax({
+          url: "/signup",
+          contentType: "application/x-www-form-urlencoded",
+          dataType: "json",
+          data: serializedForm,
+          type: "POST",
+          success: function(data) {
+            if (data.redirectTo) {
+              console.log(JSON.stringify(data));
+              window.location.href = "/" + data.redirectTo + "#|shareTroupe";
+            }
+            else {
+               that.trigger('signup.complete', data);
+             }
+          }
+        });
+      }
     }
 
   });
 
 var Modal = TroupeViews.Modal.extend({
-    initialize: function(options) {
+    initialize: function(/* options */) {
       TroupeViews.Modal.prototype.initialize.apply(this, arguments);
       this.view = new View({ });
     }

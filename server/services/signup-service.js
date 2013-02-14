@@ -9,22 +9,10 @@ var persistence = require("./persistence-service"),
     winston = require('winston');
 
 
-function createUniqueUri() {
-  var chars = "0123456789abcdefghiklmnopqrstuvwxyz";
-
-  var uri = "";
-  for(var i = 0; i < 6; i++) {
-    var rnum = Math.floor(Math.random() * chars.length);
-    uri += chars.substring(rnum, rnum + 1);
-  }
-
-  return uri;
-}
-
 function newTroupeForExistingUser(options, user, callback) {
   winston.info("New troupe for existing user", options);
 
-  var uri = createUniqueUri();
+  var uri = troupeService.createUniqueUri();
 
   var troupe = new persistence.Troupe();
   troupe.name = options.troupeName;
@@ -49,7 +37,7 @@ function newTroupeForNewUser(options, callback) {
       return;
     }
 
-    var uri = createUniqueUri();
+    var uri = troupeService.createUniqueUri();
 
     var troupe = new persistence.Troupe();
     troupe.name = options.troupeName;
