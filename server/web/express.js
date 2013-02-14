@@ -10,6 +10,14 @@ var express = require('express'),
   fineuploaderExpressMiddleware = require('fineuploader-express-middleware'),
   fs = require('fs');
 
+if(nconf.get('express:showStack')) {
+  try {
+    require("longjohn");
+  } catch(e) {
+    winston.info("Install longjohn using npm install longjohn if you would like better stacktraces.");
+  }
+}
+
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');
 
