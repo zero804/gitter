@@ -32,7 +32,7 @@ define([
 
       "click #file-header":               "onFileHeaderClick",
       "click #mail-header":               "onMailHeaderClick",
-      "keyup":                            "onKeyUp"
+      "keypress":                         "onKeyPress"
     },
 
     initialize: function(options) {
@@ -302,24 +302,29 @@ define([
 
     },
 
-    onKeyUp: function(e) {
+    onKeyPress: function(e) {
+
       // return if a form input has focus
       if ( $("*:focus").is("textarea, input") ) return true;
 
       // return in a modal is open
       if ( $("body").hasClass('modal-open') ) return true;
 
-      // t shows Troupe menu
-      if(e.keyCode == 84) {
-        this.toggleMenu();
-      }
-
-      // esc returns to the mail view
       if(e.keyCode == 27) {
-        console.log("Escape pushed in app");
         window.location.href = '#';
       }
 
+      if (!this.leftmenu) {
+        $("#chat-input-textarea").focus();
+        return true;
+      }
+
+      // t shows Troupe menu
+      // if(e.keyCode == 84) {
+      //   this.toggleMenu();
+      // }
+
+      // esc returns to the mail view
     }
 
   });
