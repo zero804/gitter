@@ -6,7 +6,7 @@ var winston = require("winston");
 
 var oldError = winston.error;
 winston.error = function(message, data) {
-  if(data.exception && data.exception.stack) {
+  if(data && data.exception && data.exception.stack) {
     console.error(data.exception.stack);
   }
   oldError.apply(winston, arguments);
