@@ -5,7 +5,7 @@
 var uuid = require('node-uuid'),
     sechash = require('sechash'),
     winston = require('winston'),
-    redis = require("redis"),
+    redis = require("../utils/redis"),
     userService = require('../services/user-service');
 
 

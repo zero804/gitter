@@ -4,7 +4,7 @@
 var troupeService = require("./troupe-service");
 var appEvents = require("../app-events");
 var _ = require("underscore");
-var redis = require("redis");
+var redis = require("../utils/redis");
 var winston = require("winston");
 var redisClient = redis.createClient();
 
