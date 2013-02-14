@@ -1,10 +1,16 @@
 /*jshint globalstrict:true, trailing:false unused:true node:true*/
-/*global console:false, require: true, module: true, process: false */
 "use strict";
 
 var nconf = require('./config');
 var winston = require("winston");
-var _ = require("underscore");
+
+var oldError = winston.error;
+winston.error = function(message, data) {
+  if(data.exception && data.exception.stack) {
+    console.error(data.exception.stack);
+  }
+  oldError.apply(winston, arguments);
+};
 
 winston.remove(winston.transports.Console);
 winston.add(winston.transports.Console, {

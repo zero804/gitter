@@ -51,6 +51,9 @@
     <div class="error">
       SOMETHING BROKE<br><br>
       <span class="error-text">You're seeing this error because something has broken on our side. That's entirely unacceptable and we apoligise. Someone has been notified and we will look into it immediately.<br><br>Apologies for the inconvenience.</span>
+      {{#if stack}}
+      <pre style="font-size:small">{{{stack}}}</pre>
+      {{/if}}
     </div>
 
 
