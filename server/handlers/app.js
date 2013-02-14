@@ -54,81 +54,82 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data)
   function renderPage(unreadItems, serializedUser, accessToken) {
     var profileNotCompleted;
 
-    var troupeData = {
-      "uri": troupe.uri,
-      "id": troupe.id,
-      "name": troupe.name,
-      "oneToOne": troupe.oneToOne
-    };
-    var accessDenied;
+    var troupeStrategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true });
 
-    if(req.user) {
-      if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
-        accessDenied = true;
+    restSerializer.serialize(troupe, troupeStrategy, function(err, troupeData) {
+      if(err) return next(err);
+
+      var accessDenied;
+
+      if(req.user) {
+        if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
+          accessDenied = true;
+          troupeData = null;
+        }
+
+        var status = req.user.status;
+        profileNotCompleted = status == 'PROFILE_NOT_COMPLETED';
+        if(status != 'PROFILE_NOT_COMPLETED' && status != 'ACTIVE') {
+          // Oh dear, something has gone horribly wrong
+          winston.error("Rejecting user. Something has gone wrong! ", { user: req.user });
+          return next("Inconsistent state for user: " + status);
+        }
+
+      } else {
         troupeData = null;
       }
 
-      var status = req.user.status;
-      profileNotCompleted = status == 'PROFILE_NOT_COMPLETED';
-      if(status != 'PROFILE_NOT_COMPLETED' && status != 'ACTIVE') {
-        // Oh dear, something has gone horribly wrong
-        winston.error("Rejecting user. Something has gone wrong! ", { user: req.user });
-        return next("Inconsistent state for user: " + status);
-      }
-
-    } else {
-      troupeData = null;
-    }
-
-    var troupeContext = {
-        user: serializedUser,
-        troupe: troupeData,
-        accessToken: accessToken,
-        profileNotCompleted: profileNotCompleted,
-        unreadItems: unreadItems,
-        accessDenied: accessDenied,
-        baseServer: nconf.get('web:baseserver'),
-        basePort: nconf.get('web:baseport'),
-        basePath: nconf.get('web:basepath'),
-        homeUrl: nconf.get('web:homeurl'),
-        websockets: {
-          fayeUrl: getFayeUrl(),
-          options: {
-            timeout: 120,
-            retry: 5
-          },
-          disable: ['websocket']
-        }
+      var troupeContext = {
+          user: serializedUser,
+          troupe: troupeData,
+          accessToken: accessToken,
+          profileNotCompleted: profileNotCompleted,
+          unreadItems: unreadItems,
+          accessDenied: accessDenied,
+          baseServer: nconf.get('web:baseserver'),
+          basePort: nconf.get('web:baseport'),
+          basePath: nconf.get('web:basepath'),
+          homeUrl: nconf.get('web:homeurl'),
+          websockets: {
+            fayeUrl: getFayeUrl(),
+            options: {
+              timeout: 120,
+              retry: 5
+            },
+            disable: ['websocket']
+          }
 
 
-    };
+      };
 
 
-    var login, actualTroupeName;
-    if(req.user && !profileNotCompleted && troupeData) {
-      login  = false;
-      actualTroupeName = troupeName;
-
-      if (!troupe.oneToOne) {
-        userService.saveLastVisitedTroupeforUser(req.user.id, troupe.id, function(err) {
-          if (err) winston.info("Something went wrong saving the user last troupe visited: ", { exception: err });
-        });
-      }
-    } else {
-      login = true;
-      if(profileNotCompleted) {
+      var login, actualTroupeName;
+      if(req.user && !profileNotCompleted && troupeData) {
+        login  = false;
         actualTroupeName = troupeName;
-      } else {
-        actualTroupeName = "Welcome";
-      }
-    }
 
-    res.render(page, {
-      useAppCache: !!nconf.get('web:useAppCache'),
-      login: login,
-      data: login ? null : JSON.stringify(data), // Only push the data through if the user is logged in already
-      troupeName: actualTroupeName,
-      troupeContext: JSON.stringify(troupeContext)
+        if (!troupe.oneToOne) {
+          userService.saveLastVisitedTroupeforUser(req.user.id, troupe.id, function(err) {
+            if (err) winston.info("Something went wrong saving the user last troupe visited: ", { exception: err });
+          });
+        }
+      } else {
+        login = true;
+        if(profileNotCompleted) {
+          actualTroupeName = troupeName;
+        } else {
+          actualTroupeName = "Welcome";
+        }
+      }
+
+      res.render(page, {
+        useAppCache: !!nconf.get('web:useAppCache'),
+        login: login,
+        data: login ? null : JSON.stringify(data), // Only push the data through if the user is logged in already
+        troupeName: actualTroupeName,
+        troupeContext: JSON.stringify(troupeContext)
+      });
+
     });
 
   }
