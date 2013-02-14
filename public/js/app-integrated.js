@@ -76,7 +76,10 @@ require([
 
   var app = new Marionette.Application();
   app.addRegions({
-    leftMenuRegion: "#left-menu-list",
+    leftMenuRecent: "#left-menu-list-recent",
+    leftMenuTroupes: "#left-menu-list",
+    leftMenuPeople: "#left-menu-list-users",
+    leftMenuSearch: "#left-menu-list-search",
     peopleRosterRegion: "#people-roster",
     fileRegion: "#file-list",
     mailRegion: "#mail-list",
@@ -318,17 +321,30 @@ require([
 
     // Troupe Collections
     troupeCollection = new troupeModels.TroupeCollection();
+    unreadItemsClient.installTroupeListener(troupeCollection);
+
     var filteredTroupeCollection = new Backbone.FilteredCollection(null, {model: troupeModels.TroupeModel, collection: troupeCollection });
     filteredTroupeCollection.setFilter(function(m) {
-      return !m.get('oneToOne') || m.get('unreadItems') > 0;
+      return !m.get('oneToOne') /* || m.get('unreadItems') > 0 */;
     });
-    unreadItemsClient.installTroupeListener(troupeCollection);
+
+    var peopleOnlyTroupeCollection = new Backbone.FilteredCollection(null, {model: troupeModels.TroupeModel, collection: troupeCollection });
+    peopleOnlyTroupeCollection.setFilter(function(m) {
+      return m.get('oneToOne');
+    });
+
 
     troupeCollection.fetch();
     var troupeCollectionView = new TroupeCollectionView({
       collection: filteredTroupeCollection
     });
-    app.leftMenuRegion.show(troupeCollectionView);
+    app.leftMenuTroupes.show(troupeCollectionView);
+
+    var oneToOneTroupeCollectionView = new TroupeCollectionView({
+      collection: peopleOnlyTroupeCollection
+    });
+    app.leftMenuPeople.show(oneToOneTroupeCollectionView);
+
 
     // User Collections
     userCollection = new userModels.UserCollection();
