@@ -575,9 +575,10 @@ function TroupeUserStrategy(options) {
 function TroupeStrategy(options) {
   if(!options) options = {};
 
-  var unreadItemStategy = options.currentUserId ? new AllUnreadItemCountStategy({ userId: options.currentUserId }) : null;
-  var userIdStategy = options.mapUsers ? new UserIdStrategy() : null;
+  var currentUserId = options.currentUserId;
 
+  var unreadItemStategy = options.currentUserId ? new AllUnreadItemCountStategy({ userId: options.currentUserId }) : null;
+  var userIdStategy = options.mapUsers || currentUserId ? new UserIdStrategy() : null;
   this.preload = function(items, callback) {
 
     var strategies = [];
@@ -592,7 +593,25 @@ function TroupeStrategy(options) {
     }
 
     if(userIdStategy) {
-      var userIds = _.uniq(_.flatten(items.map(function(troupe) { return troupe.getUserIds(); })));
+
+      var userIds;
+      if(options.mapUsers) {
+        userIds = _.flatten(items.map(function(troupe) { return troupe.getUserIds(); }));
+      } else {
+        userIds = [];
+      }
+
+      // If the currentUserOption has been set, then we will output
+      // a user node on the serialized troupe.
+      if(options.currentUserId) {
+        items.forEach(function(troupe) {
+          if(troupe.oneToOne) {
+            userIds = userIds.concat(troupe.getUserIds());
+          }
+        });
+      }
+
+      userIds = _.uniq(userIds);
 
       strategies.push({
         strategy: userIdStategy,
@@ -604,13 +623,42 @@ function TroupeStrategy(options) {
     execPreloads(strategies, callback);
   };
 
+  function mapOtherUser(users) {
+    var otherUser = users.filter(function(troupeUser) {
+      return troupeUser.userId != currentUserId;
+    })[0];
+    if(otherUser) {
+      return userIdStategy.map(otherUser.userId);
+    }
+  }
+
   this.map = function(item) {
+    var otherUser = item.oneToOne && currentUserId ? mapOtherUser(item.users) : undefined;
+    var troupeName, troupeUrl;
+    if(item.oneToOne) {
+      if(otherUser) {
+        troupeName = otherUser.displayName;
+        troupeUrl = "/one-one/" + otherUser.id;
+      } else {
+        winston.debug("Unable to map troupe bits as something has gone horribly wrong");
+        // This should technically never happen......
+        troupeName = null;
+        troupeUrl = null;
+      }
+    } else {
+        troupeName = item.name;
+        troupeUrl = "/" + item.uri;
+    }
+
     return {
       id: item.id,
-      name: item.name,
+      name: troupeName,
       uri: item.uri,
-      users: userIdStategy ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
-      unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined
+      oneToOne: item.oneToOne,
+      users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
+      user: otherUser,
+      unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined,
+      url: troupeUrl
     };
   };
 }
