@@ -7,8 +7,9 @@ var ObjectId = Schema.ObjectId;
 var appEvents = require("../app-events");
 var _ = require("underscore");
 var winston = require("winston");
+var nconf = require("../utils/config");
 
-mongoose.connect('mongodb://localhost/troupe');
+mongoose.connect(nconf.get("mongo:url"));
 
 // --------------------------------------------------------------------
 // Utility serialization stuff
