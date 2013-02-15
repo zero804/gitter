@@ -156,7 +156,7 @@ require([
 
         { name: "profile",        re: /^profile$/,                viewType: profileView.Modal },
         { name: "share",          re: /^share$/,                  viewType: shareView.Modal },
-        { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal },
+        { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal,       collection: troupeCollection,   skipModelLoad: true },
         { name: "shareTroupe",    re: /^shareTroupe/,             viewType: shareTroupeView.Modal },
         { name: "troupeSettings", re: /^troupeSettings/,          viewType: troupeSettingsView }
 
@@ -177,6 +177,7 @@ require([
       return {
         viewType: match.viewType,
         collection: match.collection,
+        skipModelLoad: match.skipModelLoad ? match.skipModelLoad : /* If there is no collection, skipModelLoad=true */ !match.collection,
         name: match.name,
         id: result[1]
       };
@@ -200,7 +201,7 @@ require([
         var region, viewDetails;
 
         function loadItemIntoView() {
-          var model = viewDetails.collection ? viewDetails.collection.get(viewDetails.id) : null;
+          var model = viewDetails.skipModelLoad ? null : viewDetails.collection.get(viewDetails.id);
           var cv = region.currentView;
 
           if(viewDetails.collection) {
@@ -233,7 +234,10 @@ require([
             if(viewDetails) {
               track(viewDetails.name);
 
-              if(viewDetails.collection) {
+              // If we have a collection and we need to load a model item,
+              // ensure that the collection has already been populated. If it
+              // hasn't, wait until it has
+              if(!viewDetails.skipModelLoad) {
                 if(viewDetails.collection.length === 0) {
                   viewDetails.collection.once('reset', loadItemIntoView, this);
                   return;
