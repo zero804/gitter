@@ -43,9 +43,7 @@ define([
     },
 
     afterRender: function() {
-      // only show the invites fields if we are on a 1-1 troupe (TODO show it always, but first fix the way the add button works)
-      var tx = window.troupeContext;
-      if (tx && tx.troupe.oneToOne) {
+      if (window.troupeContext) {
         this.$el.find('#invites-for-create').append(this.shareTableView.el);
       }
 
@@ -82,14 +80,14 @@ define([
       var that = this, form = this.$el.find('form'), serializedForm;
 
       // we are sometimes executing from the signup page which excludes all the app integrated goodness
-      if (this.collection || window.troupeContext) {
+      if (this.collection && window.troupeContext) {
         serializedForm = {
           name: form.find('form input[name=troupeName]').val(),
           userId: form.find('form input[name=userId]').val(),
           invites: this.shareTableView.serialize()
         };
 
-        if (window.troupe.oneToOne) {
+        if (window.troupeContext.troupe.oneToOne) {
           serializedForm.oneToOneTroupeId = window.troupeContext.troupe.id;
         }
 
