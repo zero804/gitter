@@ -21,7 +21,7 @@ define([
       // once this widget has the id of the user,
       // it will listen to changes on the global user collection,
       // so that it knows when to update.
-      function avatarChange(event, data) {
+      var avatarChange = _.bind(function avatarChangeUnbound(event, data) {
         if(data.id === self.getUserId()) {
           if(self.user) {
             self.user = data;
@@ -29,16 +29,16 @@ define([
 
           self.render();
         }
-      }
+      }, this);
 
       var isModel = !!this.model;
       if (isModel) {
         this.listenTo(this.model, 'change', avatarChange);
       } else {
         // Unfortunately we can't use listenTo with jquery events
-        $(document).on('avatar:change', avatarChange, this);
+        $(document).on('avatar:change', avatarChange);
         this.addCleanup(function() {
-          $(document).off('avatar:change', avatarChange, self);
+          $(document).off('avatar:change', avatarChange);
         });
 
       }
