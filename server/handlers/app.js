@@ -54,7 +54,7 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data)
   function renderPage(unreadItems, serializedUser, accessToken) {
     var profileNotCompleted;
 
-    var troupeStrategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true });
+    var troupeStrategy = new restSerializer.TroupeStrategy({ currentUserId: (req.user) ? req.user.id : null, mapUsers: true });
 
     restSerializer.serialize(troupe, troupeStrategy, function(err, troupeData) {
       if(err) return next(err);
