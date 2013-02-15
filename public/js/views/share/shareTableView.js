@@ -51,20 +51,20 @@ define([
     getValidationConfig: function () {
       return {
         rules: {
-          displayName: "required",
+          //displayName: "required",
           inviteEmail: {
-            required: true,
+            //required: true,
             email: true
-            }
+          }
         },
         debug: true,
         messages: {
-          displayName: {
-            required: "Please tell us your friend's name. "
-          },
-        inviteEmail : {
-          required: "We need to know your friend's email address to send an invite.",
-          email: "Hmmm, that doesn't look like an email address."
+          //displayName: {
+          //  required: "Please tell us your friend's name. "
+          //},
+          inviteEmail : {
+            //required: "We need to know your friend's email address to send an invite.",
+            email: "Hmmm, that doesn't look like an email address."
           }
         }
       };
