@@ -43,9 +43,7 @@ define([
     },
 
     afterRender: function() {
-      if (window.troupeContext) {
-        this.$el.find('#invites-for-create').append(this.shareTableView.el);
-      }
+      this.$el.find('#invites-for-create').append(this.shareTableView.el);
 
       this.validateForm();
       this.$el.find('#troupeName').placeholder();
@@ -77,15 +75,14 @@ define([
 
     onFormSubmit: function(e) {
       if(e) e.preventDefault();
-      var that = this, form = this.$el.find('form'), serializedForm;
+      var that = this, form = this.$el.find('form'), serializedForm = {
+        name: form.find('form input[name=troupeName]').val(),
+        userId: form.find('form input[name=userId]').val(),
+        invites: this.shareTableView.serialize()
+      };
 
       // we are sometimes executing from the signup page which excludes all the app integrated goodness
       if (this.collection && window.troupeContext) {
-        serializedForm = {
-          name: form.find('form input[name=troupeName]').val(),
-          userId: form.find('form input[name=userId]').val(),
-          invites: this.shareTableView.serialize()
-        };
 
         if (window.troupeContext.troupe.oneToOne) {
           serializedForm.oneToOneTroupeId = window.troupeContext.troupe.id;
@@ -101,13 +98,12 @@ define([
       }
       // we are operating from the signup page, without app integrated, so we don't have a collection
       else {
-        serializedForm = form.serialize();
         console.log("Serialized form: " + serializedForm);
         $.ajax({
           url: "/signup",
-          contentType: "application/x-www-form-urlencoded",
+          contentType: "json",
           dataType: "json",
-          data: serializedForm,
+          data: JSON.stringify(serializedForm),
           type: "POST",
           success: function(data) {
             if (data.redirectTo) {
