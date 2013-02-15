@@ -409,7 +409,6 @@ function upgradeOneToOneTroupe(options, callback) {
   var troupe = new persistence.Troupe({
     uri: createUniqueUri(),
     name: name,
-    oneToOne: true,
     status: 'ACTIVE',
     users: origTroupe.users
   });
@@ -417,7 +416,10 @@ function upgradeOneToOneTroupe(options, callback) {
   troupe.save(function(err) {
     // add invites for each additional person
     for(var i = 0; i < invites.length; i++) {
-      addInvite(troupe, senderName, invites[i].displayName, invites[i].email);
+      var displayName = invites[i].displayName;
+      var inviteEmail = invites[i].email;
+      if (displayName && inviteEmail)
+        addInvite(troupe, senderName, displayName, inviteEmail);
     }
 
     return callback(err, troupe);
