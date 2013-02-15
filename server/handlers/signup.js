@@ -14,6 +14,7 @@ var form = require("express-form"),
 
 module.exports = {
     install: function(app) {
+
       app.get(nconf.get('web:homeurl'),
         middleware.grantAccessForRememberMeTokenMiddleware,
         function(req, res, next) {
@@ -38,6 +39,7 @@ module.exports = {
         // will need to use json for this instead of form encoded data. Consider doing this through a rest handler.
 
         // Form filter and validation middleware
+        /*
         form(
           filter("troupeName").trim(),
           validate("troupeName").required(),
@@ -45,20 +47,30 @@ module.exports = {
           validate("email").isEmail(),
           filter("userId").trim()
         ),
+        */
 
         function(req, res) {
+
+          var email = req.body.email;
+          var userId = req.body.userId;
+          var troupeName = req.body.troupeName;
+          var invites = req.body.invites;
+
+          /*
           if (!req.form.isValid) {
             // TODO: Handle errors
             winston.info("User form has errors", { errors: req.form.errors });
-            /* TODO: make this nice */
+            // TODO: make this nice
             return res.send(500);
           }
+          */
 
           // we can either get an email address for a new user
-          if (req.form.email) {
+          if (email) {
             signupService.newSignup({
-              troupeName: req.form.troupeName,
-              email: req.form.email
+              troupeName: troupeName,
+              email: email,
+              invites: invites
             }, function(err, id) {
               if(err) {
                 winston.error("Error creating new troupe ", { exception: err });
@@ -73,7 +85,7 @@ module.exports = {
 
               req.session.newTroupeId = id;
               if(req.accepts('application/json')) {
-                res.send({ success: true, troupeName: req.form.troupeName, email: req.form.email });
+                res.send({ success: true, troupeName: troupeName, email: email });
               } else {
                 res.relativeRedirect("/confirm");
               }
@@ -82,8 +94,10 @@ module.exports = {
 
           // or we can get a user id for an existing user, in which case we need to lookup his email address
           // there are probably better ways to do this, but i don't them. MB
-          if (req.form.userId) {
-            userService.findById(req.form.userId, function(err,user) {
+          else if (userId) {
+            winston.info("Signing up a user with an email: " + email);
+
+            userService.findById(userId, function(err,user) {
 
               if(err) {
                 winston.error("Error finding user ", { exception: err });
@@ -92,8 +106,9 @@ module.exports = {
                 winston.info("Got a user, his email is: ", user);
 
                 signupService.newSignup({
-                  troupeName: req.form.troupeName,
-                  email: user.email
+                  troupeName: troupeName,
+                  email: user.email,
+                  invites: invites
                 }, function(err,id) {
                   if(err) {
                     winston.error("Error creating new troupe ", { exception: err });
@@ -107,7 +122,6 @@ module.exports = {
                   }
 
                   troupeService.findById(id, function(err,troupe) {
-                    // req.form.invites // TODO do we want to add invites here as well?
 
                     if (err) {
                       winston.error("Error finding troupe ", { exception: err });
@@ -120,6 +134,11 @@ module.exports = {
 
               }
             });
+          }
+
+          else {
+            winston.info("Neither a troupe email address or a userId were provided for /signup");
+            res.send(400);
           }
 
         }
