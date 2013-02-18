@@ -2,6 +2,8 @@
 "use strict";
 
 exports.startWorkers = function() {
+  var nconf = require("../utils/config");
+
   require('./mailer-service').startWorkers();
   require('../gateways/push-notification-gateway').startWorkers();
   require('./notification-generator-service').startWorkers();
@@ -10,6 +12,8 @@ exports.startWorkers = function() {
 
   require('./kue-cleanup-service').startCleanupJob();
 
-  var kue = require('kue');
-  kue.app.listen(3000);
+  if(nconf.get("kue:startAdminApp")) {
+    var kue = require('../utils/kue');
+    kue.app.listen(nconf.get("kue:adminAppPort"));
+  }
 };

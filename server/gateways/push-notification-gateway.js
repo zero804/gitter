@@ -1,9 +1,8 @@
 /*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
-var kue = require('kue'),
+var kue = require('../utils/kue'),
     jobs = kue.createQueue(),
-    _ = require('underscore'),
     winston = require("winston"),
     statsService = require("../services/stats-service");
 
