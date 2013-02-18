@@ -196,6 +196,17 @@ function preloadTroupeMiddleware(req, res, next) {
 
 }
 
+function preloadOneToOneTroupeMiddleware(req, res, next) {
+ troupeService.findOrCreateOneToOneTroupe(req.user.id, req.params.userId, function(err, troupe, otherUser) {
+    if (err) return next({ errorCode: 500, error: err });
+    if(!troupe) return next({ errorCode: 404 });
+    req.otherUser = otherUser;
+    req.troupe = troupe;
+    next();
+  });
+
+}
+
 module.exports = {
     install: function(app) {
 
@@ -213,35 +224,63 @@ module.exports = {
       app.get('/one-one/:userId',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
+        preloadOneToOneTroupeMiddleware,
+
         function(req, res, next) {
-          troupeService.findOrCreateOneToOneTroupe(req.user.id, req.params.userId, function(err, troupe, otherUser) {
-            if(err) return next(err);
 
 
-            var f = new Fiber();
-            preloadFiles(req.user.id, troupe.id, f.waitor());
-            preloadChats(req.user.id, troupe.id, f.waitor());
-            preloadUsers(req.user.id, troupe, f.waitor());
+          var f = new Fiber();
+          preloadFiles(req.user.id, req.troupe.id, f.waitor());
+          preloadChats(req.user.id, req.troupe.id, f.waitor());
+          preloadUsers(req.user.id, req.troupe, f.waitor());
 
-            f.all()
-              .spread(function(files, chats, users) {
-                // Send the information through
-                renderAppPageWithTroupe(req, res, next, 'app-integrated', troupe, otherUser.displayName, {
-                  files: files,
-                  chatMessages: chats,
-                  users: users,
-                  otherUser: otherUser
-                });
-              })
-              .fail(function(err) {
-                next(err);
+          f.all()
+            .spread(function(files, chats, users) {
+              // Send the information through
+              renderAppPageWithTroupe(req, res, next, 'app-integrated', req.troupe, req.otherUser.displayName, {
+                files: files,
+                chatMessages: chats,
+                users: users,
+                otherUser: req.otherUser
               });
-
-
-          });
+            })
+            .fail(function(err) {
+              next(err);
+            });
 
         }
       );
+
+      app.get('/one-one/:userId/chat',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        preloadOneToOneTroupeMiddleware,
+        function(req, res, next) {
+          preloadChats(req.user.id, req.troupe.id, function(err, serialized) {
+            if (err) {
+              winston.error("Error in Serializer:", { exception: err });
+              return next(err);
+            }
+
+            renderAppPageWithTroupe(req, res, next, 'mobile/chat-app', req.troupe, req.otherUser.displayName, { 'chatMessages': serialized, otherUser: req.otherUser });
+          });
+      });
+
+      app.get('/one-one/:userId/files',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        preloadOneToOneTroupeMiddleware,
+        function(req, res, next) {
+          preloadFiles(req.user.id, req.troupe.id, function(err, serializedFiles) {
+            if (err) {
+              winston.error("Error in Serializer:", { exception: err });
+              return next(err);
+            }
+
+            renderAppPageWithTroupe(req, res, next, 'mobile/file-app', req.troupe, req.otherUser.displayName, { 'files': serializedFiles, otherUser: req.otherUser });
+          });
+
+      });
 
       app.get('/version', function(req, res, next) {
         res.json({ appVersion: appVersion.getCurrentVersion() });
