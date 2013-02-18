@@ -6,6 +6,8 @@
   <div class="trpFilename" title="{{fileName}}">{{this.displayName}}</div>
 </div>
 
+{{#unless troupe.oneToOne}}
+
 {{^isSelf}}}
 <div class="trpButtonGreen trpFileButton trpButtonDropdown">
   <div class="trpMainButton">
@@ -20,3 +22,4 @@
   </div>
 </div>
 
+{{/unless}}

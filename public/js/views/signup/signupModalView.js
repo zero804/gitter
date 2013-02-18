@@ -37,15 +37,12 @@ define([
 
     afterRender : function() {
       this.validateForm();
-      var troupeEl = this.$el.find('#troupeName');
-      troupeEl.placeholder();
-      var emailEl = this.$el.find('#email');
-      emailEl.placeholder();
+      this.$el.find('#troupeName').placeholder();
+      this.$el.find('#email').placeholder();
     },
 
     validateForm : function () {
-      var validateEl = this.$el.find('#signup-form');
-      validateEl.validate({
+      this.$el.find('#signup-form').validate({
         debug: true,
         showErrors: function(errorMap, errorList) {
           if (errorList.length > 0) $('.signup-failure').show();
@@ -73,13 +70,17 @@ define([
 
       $.ajax({
         url: "/signup",
-        contentType: "application/x-www-form-urlencoded",
+        contentType: "application/json",
         dataType: "json",
-        data: form.serialize(),
+        data: JSON.stringify({
+          troupeName: form.find("input[name=troupeName]").val(),
+          email: form.find("input[name=email]").val()
+        }),
         type: "POST",
         success: function(data) {
+          console.log(JSON.stringify(data));
+
           if (data.redirectTo) {
-            console.log(JSON.stringify(data));
             window.location.href = "/" + data.redirectTo;
           }
           else {

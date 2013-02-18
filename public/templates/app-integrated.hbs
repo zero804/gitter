@@ -29,14 +29,40 @@
   <div class="trpLeftMenuHotspot" id="left-menu-hotspot"></div>
 
   <div class="trpLeftMenu" id="left-menu">
-      <div class="nano" id="left-menu-scroll">
-        <div class="content trpLeftMenuWrapper">
-          <div class="trpToolbarHeader" style="margin-left: 9px;">All your Troupes</div>
+    <div class="trpLeftMenuToolbar">
+      <ul class="trpLeftMenuToolbarItems">
+        <li><img src='{{cdn "images/2/icon-recent.png"}}' class="left-menu-icon" id="icon-recent" data-list="list-recent" width="24" height="24"></li>
+        <li><img src='{{cdn "images/2/icon-troupes.png"}}' class="left-menu-icon selected" id="icon-troupes" data-list="list-troupes" width="24" height="24"></li>
+        <li><img src='{{cdn "images/2/icon-user.png"}}' class="left-menu-icon" id="icon-user" data-list="list-users" width="24" height="24"></li>
+        <li><img src='{{cdn "images/2/icon-search.png"}}' class="left-menu-icon" id="icon-search" data-list="list-search" width="24" height="24"></li>
+      </ul>
+    </div>
+    <div class="nano" id="left-menu-scroll">
+      <div class="content trpLeftMenuWrapper">
+        <div class="trpToolbarList" style="display:none" id="list-recent">
+          <div class="trpToolbarHeader">Recent</div>
+          <ul class="trpRecentList" id="left-menu-list-recent">
+          </ul>
+        </div>
+        <div class="trpToolbarList" style="" id="list-troupes">
+          <div class="trpToolbarHeader">All your Troupes</div>
           <ul class="trpTroupeList" id="left-menu-list">
           </ul>
           <a href="#|create"><div class="trpNewTroupeButton">Start a new Troupe</div><div class="trpLeftMenuSpacer"></div></a>
         </div>
+        <div class="trpToolbarList" style="display:none" id="list-users">
+          <div class="trpToolbarHeader">People</div>
+          <ul class="trpTroupeList" id="left-menu-list-users">
+          </ul>
+        </div>
+        <div class="trpToolbarList" style="display:none" id="list-search">
+          <div class="trpToolbarHeader">Search</div>
+          <div class="trpTroupeListSearch"><input type="text" class="trpInputSmall" id="list-search-input"></div>
+          <ul class="trpTroupeList" id="left-menu-list-search">
+          </ul>
+        </div>
       </div>
+    </div>
   </div>
 
   <div class="trpMenuTab" id="menu-toggle-button"><img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle">
