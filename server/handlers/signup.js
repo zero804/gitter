@@ -33,10 +33,12 @@ module.exports = {
       );
 
 
+      /*
+      Accepts JSON { email, userId, troupeName, invites: [] }
+      Returns { success: true, troupeName, email, redirectTo }
+      */
       app.post(
         '/signup',
-        // TODO this will need to be enhanced to accept the invitation inputs that are now on the create dialog,
-        // will need to use json for this instead of form encoded data. Consider doing this through a rest handler.
 
         // Form filter and validation middleware
         /*
@@ -84,8 +86,9 @@ module.exports = {
               }
 
               req.session.newTroupeId = id;
+              // send back the troupe
               if(req.accepts('application/json')) {
-                res.send({ success: true, troupeName: troupeName, email: email });
+                res.send({ success: true, troupeName: troupeName, email: email /*, redirectTo:  in this case we don't return a troupe URI because the user is not yet confirmed (this is poor consistency) */ });
               } else {
                 res.relativeRedirect("/confirm");
               }
