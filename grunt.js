@@ -251,6 +251,9 @@ module.exports = function( grunt ) {
       },
       manifest: {
         command: './build-scripts/update-manifest.sh'
+      },
+      validateConfig: {
+        command: './node_modules/.bin/jsonlint config/*.json'
       }
     }
   });
@@ -263,8 +266,8 @@ module.exports = function( grunt ) {
   grunt.loadNpmTasks('grunt-clean');
   grunt.loadNpmTasks('grunt-reload');
 
-  grunt.registerTask('process', 'clean less copy requirejs exec:manifest exec:gzip');
-  grunt.registerTask('process-no-min', 'clean less copy requirejs exec:manifest exec:gzip');
+  grunt.registerTask('process', 'exec:validateConfig clean less copy requirejs exec:manifest exec:gzip');
+  grunt.registerTask('process-no-min', 'exec:validateConfig clean less copy requirejs exec:manifest exec:gzip');
 
   grunt.registerTask('watchr', 'reload watch');
 
