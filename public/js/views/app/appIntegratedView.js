@@ -17,6 +17,7 @@ define([
     profilemenu: false,
     shifted: false,
     alertpanel: false,
+    selectedListIcon: "icon-troupes",
     events: {
       "click #menu-toggle":               "onMenuToggle",
       "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
@@ -30,9 +31,14 @@ define([
       "mouseleave #toolbar-frame":        "onMouseLeaveToolbar",
       "mouseleave #header-wrapper":       "onMouseLeaveHeader",
 
+      "mouseenter .left-menu-icon":       "onMouseEnterToolbarItem",
+      "mouseleave .left-menu-icon":       "onMouseLeaveToolbarItem",
+
+      "click .left-menu-icon":            "onLeftMenuListIconClick", 
+
       "click #file-header":               "onFileHeaderClick",
       "click #mail-header":               "onMailHeaderClick",
-      "keypress":                         "onKeyPress"
+      "keypress":                            "onKeyPress"
     },
 
     initialize: function(options) {
@@ -175,6 +181,9 @@ define([
     showMenu: function() {
       if (this.leftmenu) return;
 
+      if (this.selectedListIcon == "icon-search") {
+        this.activateSearchList();
+      }
 
 
       $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
@@ -198,6 +207,10 @@ define([
     hideMenu: function() {
 
       if (!this.leftmenu) return;
+
+      // refocus chat input in case it's lost focus
+      console.log("FOCUS CHAT");
+      $("#chat-input-textarea").focus();
 
       $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
         left: "-=280px"
@@ -302,14 +315,56 @@ define([
 
     },
 
-    onKeyPress: function(e) {
+    onMouseEnterToolbarItem: function(e) {
+      $(e.target).fadeTo(100, 1.0);
+    },
 
+    onMouseLeaveToolbarItem: function(e) {
+      if ($(e.target).hasClass('selected')) return true;
+
+      $(e.target).fadeTo(100, 0.6);
+    },
+
+    onLeftMenuListIconClick: function(e) {
+      // Turn off the old selected list
+      $("#"+this.selectedListIcon).removeClass('selected');
+      $("#"+this.selectedListIcon).fadeTo(100, 0.6);
+      $("#" + $("#"+this.selectedListIcon).data('list')).hide();
+      // TODO: We probably want to destroy the list to remove the dom elements
+
+      // enable the new selected list
+      this.selectedListIcon = $(e.target).attr('id');
+      $("#"+this.selectedListIcon).addClass('selected');
+      $("#" + $("#"+this.selectedListIcon).data('list')).show();
+      // TODO: Related to the above TODO, we probably only want to populate the list now
+
+      if (this.selectedListIcon == 'icon-search') {
+        this.activateSearchList();
+      }
+    },
+
+    activateSearchList: function () {
+      $("#list-search-input").focus();
+    },
+
+    onKeyPress: function(e) {
       // return if a form input has focus
       if ( $("*:focus").is("textarea, input") ) return true;
 
       // return in a modal is open
       if ( $("body").hasClass('modal-open') ) return true;
 
+      if (!this.leftmenu) {
+        $("#chat-input-textarea").focus();
+        return true;
+      }
+
+      // t shows Troupe menu
+      // if(e.keyCode == 84) {
+      //   this.toggleMenu();
+      // }
+
+      // esc returns to the mail view
       if(e.keyCode == 27) {
         window.location.href = '#';
       }
@@ -317,7 +372,7 @@ define([
       if (!this.leftmenu) {
         $("#chat-input-textarea").focus();
         return true;
-      }
+    }
 
       // t shows Troupe menu
       // if(e.keyCode == 84) {

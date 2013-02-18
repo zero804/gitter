@@ -5,6 +5,14 @@
     {{#if userId}}
       <input type="hidden" name="userId" value="{{userId}}">
     {{/if}}
+
+    {{#if isOneToOne}}
+    <div id="invites-for-create">
+      <div class="trpModalTitle">Invite people to the new troupe</div>
+      <!-- Include invite view here. -->
+    </div>
+    {{/if}}
+
 		<input type="submit" name="submit" value="Create" class="trpModalButton trpButtonBig trpBtnGreen" />
 	</form>
 </div>

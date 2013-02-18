@@ -9,34 +9,50 @@ var persistence = require("./persistence-service"),
     winston = require('winston');
 
 
-function createUniqueUri() {
-  var chars = "0123456789abcdefghiklmnopqrstuvwxyz";
+function newTroupe(options, callback) {
+  var user = options.user;
 
-  var uri = "";
-  for(var i = 0; i < 6; i++) {
-    var rnum = Math.floor(Math.random() * chars.length);
-    uri += chars.substring(rnum, rnum + 1);
+  var troupe = new persistence.Troupe();
+  troupe.name = options.troupeName;
+  troupe.uri = troupeService.createUniqueUri();
+
+  // add the user creating the troupe
+  troupe.addUserById(user.id);
+
+  // add other users
+  if (options.users) {
+    for (var a = 0; a < options.users; a++) {
+      troupe.addUserById(options.users[a]);
+    }
   }
 
-  return uri;
+  // invite users
+  if (options.invites) {
+    for (var b = 0; b < options.invites; b++)
+      troupeService.addInvite(troupe, user.displayName, options.invites[b].displayName, options.invites[b].email);
+  }
+
+  troupe.save(function(err) {
+    // send out email notification
+    if (options.isNewUser) {
+      emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
+    }
+    else {
+      emailNotificationService.sendConfirmationForNewUser(user, troupe);
+    }
+
+    callback(err, troupe);
+  });
 }
 
 function newTroupeForExistingUser(options, user, callback) {
   winston.info("New troupe for existing user", options);
 
-  var uri = createUniqueUri();
-
-  var troupe = new persistence.Troupe();
-  troupe.name = options.troupeName;
-  troupe.uri = uri;
-  troupe.addUserById(user.id);
-
-  troupe.save(function(err) {
-    if(err) return callback(err);
-    // No need to send an email for existing users
-    emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
-    callback(null, troupe.id);
+  options.user = user;
+  newTroupe(options, function(err, troupe) {
+    callback(err, troupe.id);
   });
+
 }
 
 function newTroupeForNewUser(options, callback) {
@@ -45,23 +61,12 @@ function newTroupeForNewUser(options, callback) {
 
   userService.newUser({ email: options.email, confirmationCode: confirmationCode }, function (err, user) {
     if(err) {
-      callback(err);
-      return;
+      callback(err); return;
     }
 
-    var uri = createUniqueUri();
-
-    var troupe = new persistence.Troupe();
-    troupe.name = options.troupeName;
-    troupe.uri = uri;
-    troupe.addUserById(user.id);
-
-    troupe.save(function(err) {
-      if(err) return  callback(err);
-
-      emailNotificationService.sendConfirmationForNewUser(user, troupe);
-
-      callback(null, troupe.id);
+    options.user = user;
+    newTroupe(options, function(err, troupe) {
+      callback(err, troupe.id);
     });
   });
 }

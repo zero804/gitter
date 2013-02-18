@@ -6,18 +6,26 @@ define([
   'hbs!./tmpl/shareView',
   'hbs!./tmpl/shareRow',
   'zeroClipboard',
+  './shareTableView',
   'jquery_placeholder', // No reference
   'jquery_validate'  // No reference
-], function($, _, TroupeViews, template, rowTemplate, ZeroClipboard) {
+], function($, _, TroupeViews, template, rowTemplate, ZeroClipboard, ShareTableView) {
   "use strict";
 
   var View = TroupeViews.Base.extend({
     template: template,
 
-    initialize: function(options) {
+    events: {
+      "submit form": "onFormSubmit",
+      "hover #copy-button" : "createClipboard",
+      "hover #submit-button" : "validateForm"
+    },
+
+    initialize: function() {
       _.bindAll(this, 'onFormSubmit');
       this.uri = window.troupeContext.troupe.uri;
       this.basePath = window.troupeContext.basePath;
+      this.shareTableView = new ShareTableView({});
     },
 
     getRenderData: function() {
@@ -27,44 +35,6 @@ define([
       };
     },
 
-    events: {
-      "click .addrow": "addRow",
-      "submit form": "onFormSubmit",
-      "hover #copy-button" : "createClipboard",
-      "hover #submit-button" : "validateForm"
-    },
-
-    validateForm : function () {
-      var validateEl = this.$el.find('#share-form');
-      validateEl.validate({
-        rules: {
-          displayName: "required",
-          inviteEmail: {
-            required: true,
-            email: true
-            }
-        },
-        debug: true,
-        showErrors: function(errorMap, errorList) {
-
-          if (errorList.length === 0) $('.share-failure').hide();
-          if (errorList.length > 0) $('.share-failure').show();
-          var errors = "";
-          $.each(errorList, function () { errors += this.message + "<br>"; });
-          $('#failure-text').html(errors);
-        },
-        messages: {
-          displayName: {
-            required: "Please tell us your friend's name. "
-          },
-        inviteEmail : {
-          required: "We need to know your friend's email address to send an invite.",
-          email: "Hmmm, that doesn't look like an email address."
-          }
-        }
-        });
-    },
-
     createClipboard : function() {
       ZeroClipboard.setMoviePath( 'swf/ZeroClipboard.swf' );
       var clip = new ZeroClipboard.Client();
@@ -72,42 +42,28 @@ define([
       clip.glue( 'copy-button');
     },
 
-    addRow: function(event) {
-      var target = $(event.target);
-      var rowDiv = target.parent().parent();
-      target.remove();
-      $(rowTemplate({})).insertAfter(rowDiv);
-      var displayNameEl = this.$el.find('#displayName');
-      displayNameEl.placeholder();
-      var emailEl = this.$el.find('#inviteEmail');
-      emailEl.placeholder();
+    afterRender: function() {
+      // prepend it to the form, because the submit buttons are below
+      this.$el.find("form").prepend(this.shareTableView.el);
     },
 
-    afterRender: function(e) {
-      $("form", this.el).prepend($(rowTemplate({})));
-      var displayNameEl = this.$el.find('#displayName');
-      displayNameEl.placeholder();
-      var emailEl = this.$el.find('#inviteEmail');
-      emailEl.placeholder();
+    validateForm : function () {
+      var validationConfig = _.extend(this.shareTableView.getValidationConfig(), {
+        showErrors: function(errorMap, errorList) {
+          if (errorList.length === 0) $('.share-failure').hide();
+          if (errorList.length > 0) $('.share-failure').show();
+          var errors = "";
+          $.each(errorList, function () { errors += this.message + "<br>"; });
+          $('#failure-text').html(errors);
+        }
+      });
+
+      this.$el. find('#share-form').validate(validationConfig);
     },
 
     onFormSubmit: function(e) {
-      var invites = [];
 
-      var controlGroups = $("form .control-group", this.$el);
-      for(var i = 0; i < controlGroups.length; i++) {
-        var cg = controlGroups[i];
-        var displayName = $(".f-name", cg).val();
-        var email = $(".f-email", cg).val();
-        invites.push({
-          displayName: displayName,
-          email: email
-        });
-      }
-
-      if(e) e.preventDefault();
-      var form = this.$el.find('form');
-      var that = this;
+      var self = this, invites = this.shareTableView.serialize();
 
       $.ajax({
         url: "/troupes/" + window.troupeContext.troupe.id + "/invites",
@@ -121,14 +77,17 @@ define([
           }
           $('.modal-content').hide();
           $('.modal-success').show();
-          that.trigger('share.complete', data);
+          self.trigger('share.complete', data);
         }
       });
+
+      if(e) e.preventDefault();
+
     }
   });
 
   var Modal = TroupeViews.Modal.extend({
-    initialize: function(options) {
+    initialize: function() {
       TroupeViews.Modal.prototype.initialize.apply(this, arguments);
       this.view = new View({ });
     }

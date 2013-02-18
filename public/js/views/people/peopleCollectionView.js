@@ -20,6 +20,7 @@ define([
     template: peopleCollectionViewTemplate,
 
     initialize: function(/*options*/) {
+      this.data = { isOneToOne: window.troupeContext.troupe.oneToOne };
       this.collectionView = new Marionette.CollectionView({
         tagName: "span",
         collection: this.collection,
