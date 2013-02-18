@@ -27,12 +27,14 @@ define([
 
   client.bind('transport:down', function() {
     connected = false;
-    // the client is online
+    // the client is not online
+    $(document).trigger('realtime:down');
   });
 
   client.bind('transport:up', function() {
     connected = true;
     // the client is online
+    $(document).trigger('realtime:up');
   });
 
   return client;

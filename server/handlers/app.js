@@ -14,6 +14,7 @@ var fileService = require("../services/file-service");
 var chatService = require("../services/chat-service");
 var Fiber = require("../utils/fiber");
 var conversationService = require("../services/conversation-service");
+var appVersion = require("../web/appVersion");
 
 function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data) {
   if(req.user) {
@@ -86,6 +87,7 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data)
           profileNotCompleted: profileNotCompleted,
           unreadItems: unreadItems,
           accessDenied: accessDenied,
+          appVersion: appVersion.getCurrentVersion(),
           baseServer: nconf.get('web:baseserver'),
           basePort: nconf.get('web:baseport'),
           basePath: nconf.get('web:basepath'),
@@ -240,6 +242,10 @@ module.exports = {
 
         }
       );
+
+      app.get('/version', function(req, res, next) {
+        res.json({ appVersion: appVersion.getCurrentVersion() });
+      });
 
       app.get('/:appUri',
         middleware.grantAccessForRememberMeTokenMiddleware,
