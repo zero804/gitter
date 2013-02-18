@@ -35,8 +35,11 @@ define([
         isOneToOne: this.isOneToOne
       };
 
-      if (window.troupeContext || window.userId) {
+      if (window.userId) {
         data.userId = window.userId;
+      }
+      else if (window.troupeContext) {
+        data.userId = window.troupeContext.user.id;
       }
 
       return data;
