@@ -2,7 +2,7 @@
 "use strict";
 
 var _ = require('underscore'),
-    kue = require('kue'),
+    kue = require('../utils/kue'),
     winston = require('winston');
 
 var jobs = kue.createQueue(),

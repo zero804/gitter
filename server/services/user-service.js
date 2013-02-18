@@ -8,7 +8,8 @@ var persistence = require("./persistence-service"),
     geocodingService = require("./geocoding-service"),
     winston = require("winston"),
     statsService = require("./stats-service"),
-    crypto = require('crypto');
+    crypto = require('crypto'),
+    _ = require('underscore');
 
 function generateGravatarUrl(email) {
   return  "https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon";
@@ -110,6 +111,7 @@ var userService = {
   },
 
   findByIds: function(ids, callback) {
+    ids = _.uniq(ids);
     persistence.User.where('_id').in(ids)
       .slaveOk()
       .exec(callback);

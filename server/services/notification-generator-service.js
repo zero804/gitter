@@ -11,7 +11,7 @@ var handlebars = require('handlebars');
 var _ = require("underscore");
 var unreadItemService = require('./unread-item-service');
 var collections = require("../utils/collections");
-var kue = require('kue');
+var kue = require('../utils/kue');
 var presenceService = require("./presence-service");
 var jobs;
 

@@ -4,7 +4,7 @@
 "use strict";
 
 
-var kue = require('kue');
+var kue = require('../server/utils/kue');
 var q = new kue();
 var Q = require('q');
 

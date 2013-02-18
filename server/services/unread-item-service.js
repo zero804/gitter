@@ -8,7 +8,7 @@ var redis = require("../utils/redis");
 var winston = require("winston");
 var redisClient = redis.createClient();
 
-var kue = require('kue'),
+var kue = require('../utils/kue'),
     jobs = kue.createQueue();
 
 var DEFAULT_ITEM_TYPES = ['file', 'chat', 'request'];

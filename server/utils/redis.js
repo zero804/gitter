@@ -1,5 +1,4 @@
 /*jshint node:true */
-/*global consol:true*/
 "use strict";
 
 var nconf = require("./config");
