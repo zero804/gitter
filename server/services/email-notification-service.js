@@ -34,7 +34,8 @@ module.exports = {
       data: {
         troupeName: troupe.name,
         // note: this is not really a confirm link, just a link to the troupe
-        confirmLink: troupeLink
+        confirmLink: troupeLink,
+        baseServerPath: nconf.get("web:basepath")
       }
     });
   },
@@ -62,7 +63,8 @@ module.exports = {
       subject: "Welcome to Troupe",
       data: {
         troupeName: troupe.name,
-        confirmLink: confirmLink
+        confirmLink: confirmLink,
+        baseServerPath: nconf.get("web:basepath")
       }
     });
   },
@@ -76,7 +78,8 @@ module.exports = {
       subject: "Welcome to Troupe",
       data: {
         troupeName: troupe.name,
-        confirmLink: confirmLink
+        confirmLink: confirmLink,
+        baseServerPath: nconf.get("web:basepath")
       }
     });
   },
