@@ -2,64 +2,21 @@
 "use strict";
 
 var nconf = require('../utils/config');
-var fs = require("fs");
+var cdn = require("./cdn");
 
 // What version of requirejs should the client be loading?
 var REQUIREJS_VERSION = "2.1.4";
 
-// Look through the CDNS
-var cdnId = -1;
-
-function passthrough(url) {
-  return "/" + url;
-}
-
-
-function cdnSingle(url) {
-  return "//" + hosts[0] +cdnPrefix + "/" + url;
-}
-
-function cdnMulti(url) {
-  var d = (cdnId + 1) % hostLength;
-  cdnId = d;
-
-  return "//" + hosts[d] +cdnPrefix + "/" + url;
-}
-
-var useCdn = nconf.get("cdn:use");
-
-if(!useCdn) {
-  exports.cdn = passthrough;
-} else {
-  var hosts = nconf.get("cdn:hosts");
-  var hostLength = hosts.length;
-
-  var cdnPrefix = nconf.get("cdn:prefix");
-  if(cdnPrefix) {
-    cdnPrefix = "/" + cdnPrefix;
-  } else {
-    var cdnPrefixFile = nconf.get("cdn:prefixFile");
-    if(cdnPrefixFile) {
-        cdnPrefix = "/s/" + ("" + fs.readFileSync(cdnPrefixFile)).trim();
-    } else {
-      cdnPrefix = "";
-    }
-  }
-
-  if(hostLength > 1) {
-    exports.cdn = cdnSingle;
-  } else {
-    exports.cdn = cdnMulti;
-  }
-}
+exports.cdn = cdn;
 
 var minified = nconf.get("web:minified");
 
-exports.bootScript = function(url, skipCdn) {
-  var requireScript, scriptLocation, cdn = (skipCdn) ? function(a) { return '/' + a; } : exports.cdn;
-
+exports.bootScript = function(url, parameters) {
+  var requireScript, scriptLocation, cdn = (parameters.hash.skipCdn) ? function(a) { return '/' + a; } : exports.cdn;
+  //console.log("SkipCDN is currently set to ", parameters.hash.skipCdn);
   if(minified) {
 
+    // note: when the skipCdn flag was introduced it affected this even though this isn't the file that was requested in this invocation
     requireScript = cdn("js/core-libraries.js");
     var baseUrl = cdn("js/");
 
