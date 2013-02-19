@@ -25,6 +25,9 @@ module.exports = {
             mimeType: file.type,
             file: file.path
           }, function(err, fileAndVersion) {
+
+            // we could (should?) delete the req.files.path here, unless express does that once the req is complete. currently the upload folder is cleared out every hour anyway.
+
             if(err) return next(err);
 
             var strategy = new restSerializer.FileStrategy();
