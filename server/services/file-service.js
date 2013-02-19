@@ -33,7 +33,7 @@ function findById(id, callback) {
 }
 
 /* private */
-function uploadFileToGrid(file, version, temporaryFile, callback) {
+function uploadFileToGrid(file /* mongo file object */, version, temporaryFile, callback) {
   winston.info('Uploading file to grid: ' + file.fileName + "(" + version + ")");
 
   var db = mongoose.connection.db;
@@ -49,13 +49,21 @@ function uploadFileToGrid(file, version, temporaryFile, callback) {
       }
   });
 
+  // write local file to grid fs
   gs.writeFile(temporaryFile, function(err) {
     if (err) return callback(err);
 
+    // the local temp file can be deleted now that it is stored in grid fs,
+    // express is setup to delete files in the upload folder after an hour or so.
+    // thumbnail generator potentially runs on another computer and doesn't callback here, so cant be responsible for deleting the file.
+    // fs.unlink(temporaryFile); // will cause thumbnail generator to always download from mongo and then delete the file itself.
+
+    // generate thumbnail from local file.
     thumbnailPreviewGeneratorService.generateThumbnail({
       fileId: file.id,
       troupeId: file.troupeId,
-      temporaryFile: temporaryFile,
+      temporaryFile: temporaryFile, // passed in as optimisation just in case the thumbnail generator is operating on the same server
+      mongoFileName: gridFileName, // used by the generator to download the file from grid fs
       mimeType: file.mimeType,
       version: version
     });
@@ -204,7 +212,7 @@ function storeFileVersionInGrid(options, callback) {
   var creatorUserId = options.creatorUserId;
   var fileName = options.fileName;
   var mimeType = options.mimeType;
-  var temporaryFile = options.file;
+  var temporaryFile = options.file; // this is the file path
   var version;
 
 
