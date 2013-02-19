@@ -8,7 +8,8 @@ var express = require('express'),
   expressHbs = require('express-hbs'),
   winston = require('winston'),
   fineuploaderExpressMiddleware = require('fineuploader-express-middleware'),
-  fs = require('fs');
+  fs = require('fs'),
+  os = require('os');
 
 if(nconf.get('express:showStack')) {
   try {
@@ -71,7 +72,37 @@ module.exports = {
 
     app.use(express.cookieParser());
     app.use(express.bodyParser());
-    app.use(fineuploaderExpressMiddleware());
+
+    (function fileUploading() {
+      var uploadDir = os.tmpDir() + "/troupe-" + os.hostname();
+      // make sure it exists
+      if (!fs.existsSync(uploadDir)) {
+        winston.info("Creating the temporary file upload directory " + uploadDir);
+        fs.mkdirSync(uploadDir);
+      }
+
+      app.use(fineuploaderExpressMiddleware({ uploadDir: uploadDir }));
+
+      // clean out the file upload directory every few hours
+      setInterval(function() {
+        winston.info("Cleaning up the file upload directory: " + uploadDir);
+
+        var now = new Date();
+        var expiration = nconf.get('express:fileCleanupExpiration') * 60 * 1000 || 60000;
+        fs.readdir(uploadDir, function(e, fileNames) {
+          fileNames.forEach(function(fileName) {
+            fs.stat(uploadDir + '/' + fileName, function (e, stat) {
+              if (e) return winston.error("Error stating file", e);
+              if (now.getTime() - stat.mtime.getTime() > expiration) {
+                winston.info("Deleting temp upload file " + fileName);
+                fs.unlink(uploadDir + '/' + fileName);
+              }
+            });
+          });
+        });
+      }, nconf.get('express:fileCleanupInterval') * 60 * 1000 || 60000);
+
+    }());
 
     app.use(ios6PostCachingFix());
     app.use(express.session({ secret: 'keyboard cat', store: sessionStore, cookie: { path: '/', httpOnly: true, maxAge: 14400000, domain: nconf.get("web:cookieDomain"), secure: false /*nconf.get("web:secureCookies") Express won't sent the cookie as the https offloading is happening in nginx. Need to have connection.proxySecure set*/ }}));
