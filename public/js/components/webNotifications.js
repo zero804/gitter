@@ -122,6 +122,27 @@ define([
     }
   });
 
+
+  // notify for a reload when new versions of the front end are deployed
+  setTimeout(function() {
+    // start in a timeout so that the first load of the page doesn't cause a check
+    $(document).on('realtime:up', function() {
+      // when the web socket goes down and comes back up, it means there was potentially a new version deployment.
+      // make the appcache check whether a reload is necessary.
+      $.getJSON('/version',
+        function(data) {
+          if (window.troupeContext.appVersion !== data.appVersion) {
+            notifications.notify({
+              id: 'app-update',
+              className: 'notification',
+              content: "<a href=\"javascript:window.location.reload()\">There is a new version of the application. Please click here to refresh.</a>"
+            });
+          }
+        }
+      );
+    });
+  }, 6000);
+
   // one notification when the connection to server is down
   // todo: this might also show when an invalid user operation is attempted.
   $(document).ajaxError(function(ev, jqxhr, settings, exception) {
