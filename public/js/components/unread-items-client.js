@@ -17,9 +17,9 @@ define([
 
   function log(fun) {
     return function() {
-      console.log("Calling " + fun.name, arguments);
+      //console.log("Calling " + fun.name, arguments);
       var r = fun.apply(null, arguments);
-      console.log("Completed " + fun.name, r);
+      //console.log("Completed " + fun.name, r);
       return r;
     };
   }
@@ -42,7 +42,7 @@ define([
       var newValue = unreadItems[k] ? unreadItems[k].length : 0;
       if(value !== newValue) {
 
-        console.log("Unread items of type: ", k, newValue, "old value was ", value);
+        //console.log("Unread items of type: ", k, newValue, "old value was ", value);
 
         window.setTimeout(function() {
           $(document).trigger('itemUnreadCountChanged', {
@@ -67,12 +67,12 @@ define([
       a = _.without(a, itemId);
       unreadItems[itemType] = a;
       if(a.length !== lengthBefore - 1) {
-        console.log("Item " + itemType + "/" + itemId + "marked as read, but not found in unread items.");
+        //console.log("Item " + itemType + "/" + itemId + "marked as read, but not found in unread items.");
       }
 
       syncCounts();
     } else {
-      console.log("No unread items of type " + itemType + " found.");
+      //console.log("No unread items of type " + itemType + " found.");
     }
 
     if(!readNotificationQueue[itemType]) {
@@ -87,7 +87,7 @@ define([
       var sendQueue = readNotificationQueue;
       readNotificationQueue = {};
 
-      console.log("Sending read notifications: ", sendQueue);
+      //console.log("Sending read notifications: ", sendQueue);
 
       $.ajax({
         url: "/troupes/" + window.troupeContext.troupe.id + "/unreadItems",
@@ -116,7 +116,7 @@ define([
       var itemType = $e.data('itemType');
       var itemId = $e.data('itemId');
 
-      console.log("found an unread item: itemType ", itemType, "itemId", itemId);
+      //console.log("found an unread item: itemType ", itemType, "itemId", itemId);
 
       if(itemType && itemId) {
         var top = $e.offset().top;
@@ -168,7 +168,7 @@ define([
       var filtered = _.filter(ids, function(itemId) { return !recentlyMarkedRead[itemType + "/" + itemId]; });
 
       if(filtered.length < ids.length) {
-        console.log("Some items have been marked as read before they even appeared");
+        //console.log("Some items have been marked as read before they even appeared");
       }
 
       if(!unreadItems[itemType]) {
