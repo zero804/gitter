@@ -17,9 +17,10 @@ define([
     template: template,
 
     initialize: function(/*options*/) {
+      var tx = window.troupeContext;
       this.data = {
-        emailAddress: window.troupeContext.troupe.uri + '@' + window.troupeContext.baseServer,
-        troupeName: window.troupeContext.troupe.name.replace(/\s/g,"%20")
+        emailAddress: tx.troupe.uri + '@' + tx.baseServer,
+        troupeName: (tx.troupe.name) ? tx.troupe.name.replace(/\s/g,"%20") : ""
       };
     },
 
