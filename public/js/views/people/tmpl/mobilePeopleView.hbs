@@ -1,0 +1,7 @@
+<div class="person">
+  {{ widget "avatar" user=this showStatus=true }}
+  <span class="person-name">{{displayName}}</span>
+  {{^isSelf}}
+  <span class="person-chat-btn"><a href="/one-one/{{id}}/chat">Chat Privately</a></span>
+  {{/isSelf}}
+</div>
