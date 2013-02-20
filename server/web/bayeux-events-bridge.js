@@ -7,7 +7,8 @@ var bayeux = require('./bayeux');
 var presenceService = require('../services/presence-service');
 
 exports.install = function(server) {
-  presenceService.resetClientState();
+  // Not doing this anymore
+  // presenceService.resetClientState();
 
   var bayeuxServer = bayeux.server;
   var bayeuxClient = bayeux.client;

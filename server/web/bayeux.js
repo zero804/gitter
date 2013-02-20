@@ -3,10 +3,12 @@
 "use strict";
 
 var faye = require('faye');
+var fayeRedis = require('faye-redis');
 var oauth = require("../services/oauth-service");
 var winston = require("winston");
 var troupeService = require("../services/troupe-service");
 var presenceService = require("../services/presence-service");
+var nconf = require("../utils/config");
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
@@ -242,7 +244,17 @@ var pushOnlyServerClient = {
   }
 };
 
-var server = new faye.NodeAdapter({ mount: '/faye', timeout: 45 });
+var server = new faye.NodeAdapter({
+  mount: '/faye',
+  timeout: 45,
+  engine: {
+    type: fayeRedis,
+    host: nconf.get("redis:host"),
+    port: nconf.get("redis:port"),
+    ping: 60,
+    namespace: 'fr:'
+  }
+});
 
 var client = server.getClient();
 
@@ -255,6 +267,7 @@ server.bind('handshake', function(clientId) {
 });
 
 server.bind('disconnect', function(clientId) {
+  winston.info("Client " + clientId + " disconnected");
   clientUserLookup.disassociate(clientId, function onDisassociateDone(err, userId) {
     if(err) { winston.error("Error disassociating user from client", { exception:  err }); return; }
     if(!userId) return;
