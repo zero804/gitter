@@ -5,16 +5,16 @@ require([
   'backbone',
   './base-router',
   'collections/users',
-  'views/people/peopleCollectionView',
-  'views/people/personDetailView',
+  'marionette',
+  'views/base',
+  'hbs!./views/people/tmpl/mobilePeopleView',
   'components/unread-items-client',
   'template/helpers/all'
-], function($, _, Backbone, BaseRouter, userModels, PeopleView, PersonDetailView, unreadItemsClient) {
+], function($, _, Backbone, BaseRouter, userModels, Marionette, TroupeViews, PersonViewTemplate, unreadItemsClient) {
   "use strict";
 
   var AppRouter = BaseRouter.extend({
     routes: {
-      'person/:id':     'showPerson',
       '*actions':     'defaultAction'
     },
 
@@ -22,8 +22,10 @@ require([
       var userCollection = this.collection = new userModels.UserCollection();
       userCollection.reset(window.troupePreloads['people'], { parse: true });
       userCollection.listen();
-
-      // window.troupePreloads = {};
+      if (window.noupdate) {
+        this.collection.fetch();
+      }
+      unreadItemsClient.installTroupeListener();
 
       // update online status of user models
       $(document).on('userLoggedIntoTroupe', updateUserStatus);
@@ -45,13 +47,19 @@ require([
     },
 
     defaultAction: function(/* actions */){
-      var pplView = new PeopleView({ collection: this.collection });
-      this.showView("#primary-view", pplView);
-    },
-
-    showPerson: function(id) {
-      var pplView = new PersonDetailView({ model: this.collection.get(id) });
-      this.showView("#primary-view", pplView);
+      this.showView("#primary-view", new Marionette.CollectionView({
+        collection: this.collection,
+        itemView: TroupeViews.Base.extend({
+          template: PersonViewTemplate,
+          getRenderData: function() {
+            var d = this.model.toJSON();
+            if (window.troupeContext.user.id === this.model.id) {
+              d.isSelf = true;
+            }
+            return d;
+          }
+        })
+      }));
     }
 
   });
