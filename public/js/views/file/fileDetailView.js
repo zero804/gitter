@@ -25,7 +25,7 @@ define([
       d.fileIcon = '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + d.fileName + "?version=" + latestVersionNumber;
       d.previewUrl = '#file/preview/' + d.id;
       d.versionsUrl = '#file/versions/' + d.id;
-      d.useSpinner = this.model.get('versions').at(latestVersionNumber).get('thumbnailStatus') === 'GENERATING';
+      d.useSpinner = !this.hasThumb();
 
       return d;
     },
@@ -38,6 +38,11 @@ define([
           }
         });
       }
+    },
+
+    hasThumb: function() {
+      var versions = this.model.get('versions');
+      return versions.at(versions.length - 1).get('thumbnailStatus') !== 'GENERATING';
     }
 
   });
