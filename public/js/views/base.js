@@ -497,6 +497,7 @@ define([
     },
 
     appendHtml: function(collectionView, itemView, index) {
+      //console.log("Inserting new item ", itemView, " at index ", index);
 
       function findViewAtPos(i) {
         if (i >= collectionView.collection.length)
@@ -516,18 +517,27 @@ define([
         if (index === 0) {
           // find the view that comes after the first one (sometimes there will be a non view that is the first child so we can't prepend)
           adjView = findViewAtPos(index + 1);
-          if (adjView)
+          if (adjView) {
             itemView.$el.insertBefore(adjView.el);
-          else
-            itemView.$el.appendTo(collectionView.el);
-        }
-        else {
+          } else {
+            itemView.$el.prependTo(collectionView.el);
+          }
+        } else {
           // find the view that comes before this one
           adjView = findViewAtPos(index - 1);
           if(adjView) {
             itemView.$el.insertAfter(adjView.$el);
           } else {
-            itemView.$el.appendTo(collectionView.el);
+            // It could be the case that n-1 has not yet been inserted,
+            // so we try find whatever is at n+1 and insert before
+            adjView = findViewAtPos(index + 1);
+            if(adjView) {
+              itemView.$el.insertBefore(adjView.el);
+            } else {
+              // We can't find an item before, we can't find an item after,
+              // just give up and insert at the end. (hopefully this will never happen eh?)
+              itemView.$el.appendTo(collectionView.el);
+            }
           }
         }
       }
