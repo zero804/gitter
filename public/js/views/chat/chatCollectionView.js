@@ -8,7 +8,7 @@ define([
 ], function($, _, Marionette, TroupeViews, chatItemTemplate) {
   "use strict";
 
-  var PAGE_SIZE = 50;
+  var PAGE_SIZE = 15;
 
   var ChatViewItem = TroupeViews.Base.extend({
     unreadItemType: 'chat',
@@ -55,14 +55,42 @@ define([
       _.bindAll(this, 'chatWindowScroll');
       this.initializeSorting();
       $(window).on('scroll', this.chatWindowScroll);
-    },
+      var self = this;
+      this.on('after:item:added', function() { self.afterItemAdded(); });
+      this.on('before:item:added', function() { self.beforeItemAdded(); });
+   },
 
     beforeClose: function() {
       $(window).off('scroll', this.chatWindowScroll);
     },
 
+    afterRender: function() {
+      $(window).scrollTop($(document.height()));
+    },
+
+    afterItemAdded: function(view) {
+
+      if (this.isAtBottomOfPage) {
+        // stay at the bottom
+        $(window).scrollTop($(document).height());
+      }
+      else if (this.firstEl) {
+        // keep current position if we are loading more
+        $(document).scrollTop(this.firstEl.offset().top - this.curOffset);
+      }
+
+    },
+
+    beforeItemAdded: function() {
+      //this.firstEl = this.$el[0];
+      this.isAtBottomOfPage = $(window).scrollTop() === $(document).height() - $(window).height();
+      //console.log('scrolltop' + this.isAtBottomOfPage + ' ');
+    },
+
     chatWindowScroll: function() {
-      if($(window).scrollTop() == $(document).height() - $(window).height()) {
+      console.log("scrolling outside");
+      if($(window).scrollTop() === 0) {
+        console.log("scrolling inside");
         this.loadNextMessages();
       }
     },
@@ -70,13 +98,15 @@ define([
     loadNextMessages: function() {
       if(this.loading) return;
 
+      this.firstEl = this.$el.find(':first');
+      this.curOffset = this.firstEl.offset().top - $(document).scrollTop();
+
       var self = this;
       this.loading = true;
       function success(data/*, resp*/) {
         self.loading = false;
         if(!data.length) {
           $(window).off('scroll', self.chatWindowScroll);
-          return;
         }
       }
 
