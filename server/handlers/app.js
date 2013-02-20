@@ -162,7 +162,7 @@ function preloadFiles(userId, troupeId, callback) {
 }
 
 function preloadChats(userId, troupeId, callback) {
-  chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: 50 }, function(err, chatMessages) {
+  chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: 20 }, function(err, chatMessages) {
     if(err) return callback(err);
 
     var strategy = new restSerializer.ChatStrategy({ currentUserId: userId, troupeId: troupeId });
