@@ -98,8 +98,11 @@ define([
     loadNextMessages: function() {
       if(this.loading) return;
 
-      this.firstEl = this.$el.find(':first');
-      this.curOffset = this.firstEl.offset().top - $(document).scrollTop();
+      var chatItemsFrame = this.$el.find('#frame-chat');
+      if (chatItemsFrame.length) {
+        this.firstEl = chatItemsFrame.find(':first');
+        this.curOffset = this.firstEl.offset().top - $(document).scrollTop();
+      }
 
       var self = this;
       this.loading = true;
