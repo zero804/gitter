@@ -2,5 +2,46 @@
 @import "trpColours.less";
 @import "trpiOSFonts.less";
 @import "trpCommon.less";
-@import "trpPeople.less";
+@import "trp3People.less";
+
+body {
+	margin: 5px;
+	margin-top: 10px;
+	background-color: #ecf1ec;
+	height: 100%;
+	overflow: hidden;
+}
+
+html {
+	height: 100%;
+	overflow: hidden;
+}
+
+a {
+	text-decoration: none;
+	color: #333;
+}
+
+.trpMobilePersonName {
+	display: inline-block;
+	vertical-align: top;
+	padding-top: 18px;
+	padding-left: 12px;
+	.trpH3;
+	min-width: 180px;
+	max-width: 180px;
+}
+
+.trpMobileChatButtonContainer {
+	vertical-align: top;
+	display: inline-block;
+	text-align: right;
+}
+
+.trpMobileChatButton {
+	display: inline-block;
+	text-align: center;
+	padding: 8px;
+	background-color: @trpGreen;
+}
 
