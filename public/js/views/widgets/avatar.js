@@ -73,11 +73,12 @@ define([
       var dom = this.template(this.getRenderData());
       this.$el.html(dom);
 
-      this.$el.find(':first-child').tooltip({
-        html : true,
-        placement : "right"
-      });
-
+      if (!window._troupeCompactView) {
+        this.$el.find(':first-child').tooltip({
+          html : true,
+          placement : "right"
+        });
+      }
     }
 
   });

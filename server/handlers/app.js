@@ -394,8 +394,16 @@ module.exports = {
       app.get('/:appUri/people',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
+        preloadTroupeMiddleware,
         function(req, res, next) {
-          renderAppPage(req, res, next, 'mobile/people-app');
+         preloadUsers(req.user.id, req.troupe, function(err, serializedPeople) {
+            if (err) {
+              winston.error("Error in Serializer:", { exception: err });
+              return next(err);
+            }
+
+            renderAppPageWithTroupe(req, res, next, 'mobile/people-app', req.troupe, req.troupe.name, { 'people': serializedPeople });
+          });
         });
 
       app.get('/:appUri/accessdenied', function(req, res) {

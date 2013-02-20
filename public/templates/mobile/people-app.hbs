@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html class="no-js" lang="en" {{#useAppCache}}manifest="/mobile.appcache"{{/useAppCache}}>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
@@ -7,37 +7,35 @@
 
 	<title>{{troupeName}} - Troupe</title>
 
-  <link rel="stylesheet" href='{{cdn "bootstrap/css/trpMobilePeople.css" }}'>
+  <link rel="stylesheet" href='/bootstrap/css/trpMobilePeople.css'>
 
   <script type="text/javascript">
   window.troupeContext = {{{troupeContext}}};
   {{#if data}}
   window.troupePreloads = {{{data}}};
   {{/if}}
+
+  window.applicationCache.addEventListener('noupdate', function() {
+    window.noupdate = true;
+  }, false);
+
   </script>
 
   {{>require_wrapper}}
 
-  {{{bootScript "router-mobile-people" }}}
   {{{bootScript "router-mobile-people" skipCdn=true }}}
   <link rel="shortcut icon" href="images/favicon.ico">
 </head>
 <body>
+    <div class="contentBody" id="primary-view">
 
-      <div class="contentBody" id="primary-view">
+      <!-- the chat content below is an ugly ugly hack, will sort it out. Fluid rows have their downside. -->
+      <div class="frame-people">
 
-        <!-- the chat content below is an ugly ugly hack, will sort it out. Fluid rows have their downside. -->
-        <div class="frame-people">
-
-
-        </div>
-
-        <div id="loadmoreajaxloader" style="display:none">MOO</div>
-        </div> <!-- box -->
 
       </div>
 
-
-
+      <div id="loadmoreajaxloader" style="display:none">MOO</div>
+    </div>
 </body>
 </html>
