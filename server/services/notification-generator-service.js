@@ -48,11 +48,9 @@ var linkTemplates = compile({
 
 var senderStrategies = {
   "chat": function(data) {
-    console.dir(data);
     return data.fromUser.id;
   },
   "file": function(data) {
-    console.dir(data);
     return data.latestVersion.creatorUser.id;
   },
   request: null // Never need this for one-to-ones as there are no requests

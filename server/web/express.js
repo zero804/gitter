@@ -75,6 +75,7 @@ module.exports = {
 
     (function fileUploading() {
       var uploadDir = os.tmpDir() + "/troupe-" + os.hostname();
+
       // make sure it exists
       if (!fs.existsSync(uploadDir)) {
         winston.info("Creating the temporary file upload directory " + uploadDir);

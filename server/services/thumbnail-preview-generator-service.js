@@ -15,6 +15,7 @@ exports.startWorkers = function() {
   var converterService = require("../utils/converter-service-client");
   var gridfs = require("../utils/gridfs");
   var fs = require("fs");
+  var temp = require("temp");
 
   jobs.process('generate-thumbnail', 20, function(job, done) {
     directGenerateThumbnail(job.data.options, done);
@@ -92,21 +93,29 @@ exports.startWorkers = function() {
     var mimeType = data.mimeType;
     var version = data.version;
 
-    // if the file is not on the same server then download from mongo
-    if (fs.existsSync(temporaryFile)) {
-      startConversion(callback);
-    } else {
-      // read the file out of mongodb
-      // store it in a local file,
-      // delete it once thumbnail is generated
+    fs.exists(temporaryFile, function (exists) {
+      // if the file is not on the same server then download from mongo
+      if (exists) {
+        startConversion(callback);
+        return;
+      }
+
+      // Temporary file doesn't exist, generate a new name
+      temporaryFile = temp.path({ prefix: 'thumnail-preview-generator-'});
+
       winston.info("Downloading file from grid fs to create thumbnail.");
-      gridfs.downloadFile({ fileName: mongoFileName, localFileName: temporaryFile }, function() {
-        startConversion(function() {
+      gridfs.downloadFile({ fileName: mongoFileName, localFileName: temporaryFile }, function(err) {
+        if(err) return callback(err);
+
+        startConversion(function(err) {
+          if(err) return callback(err);
           fs.unlink(temporaryFile);
           callback();
         });
       });
-    }
+
+    });
+
 
 
     function startConversion(callback) {
