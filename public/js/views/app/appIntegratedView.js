@@ -67,9 +67,22 @@ define([
         },
         callbacks: {
           onComplete: function(id, fileName, response) {
+            var model;
+
             if(response.success) {
               self.app.collections['files'].add(response.file, { merge: true });
-              window.location.href = "#file/" + response.file.id;
+
+              model = self.app.collections['files'].get(response.file.id);
+              model.on('change', onChange);
+            }
+
+            function onChange() {
+              var versions = model.get('versions');
+              var hasThumb = versions.at(versions.length - 1).get('thumbnailStatus') !== 'GENERATING';
+              if (hasThumb) {
+                window.location.href = "#file/" + response.file.id;
+                model.off('change', onChange);
+              }
             }
           }
         }
