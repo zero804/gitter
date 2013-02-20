@@ -26,7 +26,7 @@ define([
 
       var latestVersion = versions.length;
       data.fileIcon = this.fileIcon(this.model.get('fileName'), latestVersion);
-      data.useSpinner = versions.at(versions.length - 1).get('thumbnailStatus') === 'GENERATING';
+      data.useSpinner = !this.hasThumb();
 
       return data;
     },
@@ -47,6 +47,11 @@ define([
 
     fileIcon: function(fileName, version) {
       return '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + fileName + "?version=" + version;
+    },
+
+    hasThumb: function() {
+      var versions = this.model.get('versions');
+      return versions.at(versions.length - 1).get('thumbnailStatus') !== 'GENERATING';
     }
   });
 
