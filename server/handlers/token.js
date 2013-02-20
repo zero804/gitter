@@ -1,10 +1,9 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
-var userService = require("../services/user-service"),
-passport = require('passport');
+var userService = require("../services/user-service");
 
+//TODO: remove
 module.exports = {
     install: function(app) {
       app.get('/token',

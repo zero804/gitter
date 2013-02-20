@@ -4,10 +4,15 @@
 
 body {
   margin: 0px;
+height: 100%;
+  font-family: @fontSans;
+  color: white;
+  overflow: hidden;
 }
 
 html {
-/* background-color: @trpGreen;*/
+ background-color: @trpGreen;
+  height: 100%;
 }
 
 .mtrpMobileSpinner {
@@ -23,34 +28,48 @@ html {
 }
 
 .mtrpLoginContainer {
-  position: absolute;
+  position: relative; 
   height: 100%;
-  width: 320px;
-  overflow: hidden;
+  width: 100%;
+  overflow: hidden; 
   text-align: center; /* Chrome,Safari4+ */
+
+}
+
+.mtrpLoginOuterContainer {
   background: -webkit-gradient(linear, 0 0, 0 100%, from(#19aa67), to(#1dce73));
   background: -webkit-linear-gradient(#19aa67 0%, #1dce73 100%);
   background: -moz-linear-gradient(#19aa67 0%, #1dce73 100%);
   background: -o-linear-gradient(#19aa67 0%, #1dce73 100%);
-  background: linear-gradient(#19aa67 0%, #1dce73 100%); 
+  background: linear-gradient(#19aa67 0%, #1dce73 100%);
+  width: 100%;
+  height: 100%;
+  text-align: center;
+
 }
 
 .mtrpLoginFailure {
   position: absolute;
-  bottom: -200px;
+  bottom: -90px;
   width: 100%;
   background-color: @trpRed;
   .trpH3;
   padding: 10px;
   color: white;
-  height: 120px;
+  height: 40px;
   margin-top: 20px;
-  padding-top: 40px;
+  padding-top: 30px;
 }
 
 .mtrpLoginLogo {
 	text-align: center;
   padding-top: 40px;
+}
+
+.mtrpLoginFormContainer {
+  position: relative;
+  left: 0px;
+  width: 100%;
 }
 
 .mtrpLoginForm {
@@ -87,7 +106,6 @@ html {
 }
 
 .mtrpLoginFieldContainer {
-  border-radius: 5px;
   background-color: white;
   padding: 5px;
   margin-bottom: 10px;
@@ -138,67 +156,56 @@ html {
 border-left: 1px solid @trpLightGrey;
 }
 
-#sidebar {
-
-			}
-			#body {
-				background-color: white;
-
-			}
-
-@media screen and (max-width: 320px) {
-
-  .mtrpSignupForm {
-    left: 320px;
-    top: 120px;
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    .trpH2;
-    color: white;
+.mtrpSignupForm {
+  left: 320px;
+  top: -170px;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  .trpH2;
+  color: white;
 /*    -webkit-transition: left 1s linear;*/
-  }
-
-  .mtrpLoginBack {
-    margin-top: 20px;
-  }
-
-  .modal {
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-    margin-top: 0px;
-    margin-left: 0px;
-    overflow: scroll;
-  }
-
-  .trpSpinner {
-    padding-top: 160px;
-  }
-
-  .trpNavWrap {
-      top: 50px;
-      width: 320px;
-      background-image: none;
-      background-color: @trpOffWhite;
-      display: none;
-  }
-
-  .trpContentContainer {
-      padding: 0px;
-      min-width: 300px;
-      max-width: 320px;
-  }
-
-  .trpHeaderTitle {
-  	font-size: 14px;
-    margin-top: 0px;
-  }
-
-  .trpHeaderContainer {
-    height: 50px;
-  }
-
 }
+
+.mtrpLoginBack {
+  margin-top: 20px;
+}
+
+.modal {
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  margin-top: 0px;
+  margin-left: 0px;
+  overflow: scroll;
+}
+
+.trpSpinner {
+  padding-top: 160px;
+}
+
+.trpNavWrap {
+    top: 50px;
+    width: 320px;
+    background-image: none;
+    background-color: @trpOffWhite;
+    display: none;
+}
+
+.trpContentContainer {
+    padding: 0px;
+    min-width: 300px;
+    max-width: 320px;
+}
+
+.trpHeaderTitle {
+	font-size: 14px;
+  margin-top: 0px;
+}
+
+.trpHeaderContainer {
+  height: 50px;
+}
+
 

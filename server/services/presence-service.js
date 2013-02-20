@@ -1,10 +1,10 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
-var redis = require("redis"),
+var redis = require("../utils/redis"),
     winston = require('winston'),
     appEvents = require('../app-events.js'),
+    _ = require("underscore"),
     redisClient;
 
 function resetClientState() {
@@ -13,7 +13,7 @@ function resetClientState() {
       if(err) return winston.error("presence: Redis error", { exception: err });
 
       if(members.length) {
-        var keysToDelete = members.map(function(userId) { return item + ":" + userId });
+        var keysToDelete = members.map(function(userId) { return item + ":" + userId; } );
         keysToDelete.push(collection);
 
         redisClient.del(keysToDelete, function(err, count) {
@@ -69,7 +69,7 @@ function addUserToTroupe(userId, troupeId, callback) {
     if(err) return callback(err);
 
     var initialJoin = presentUsers.indexOf(userId) == -1;
-    redisClient.rpush("troupe_users:" + troupeId, userId, function(err, newLength) {
+    redisClient.rpush("troupe_users:" + troupeId, userId, function(err/*, newLength*/) {
       if(err) return callback(err);
       callback(null, initialJoin);
     });
@@ -89,12 +89,12 @@ function removeSocketFromUserSockets(socketId, userId, callback) {
   var key = "user_sockets:" + userId;
 
   /* Manage user presence */
-  redisClient.lrem(key, 0, socketId, function(err, count) {
+  redisClient.lrem(key, 0, socketId, function(err/*, count*/) {
     if(err) return callback(err);
 
     redisClient.llen(key, function(err, count) {
       if(err) return callback(err);
-      var lastDisconnect = count == 0;
+      var lastDisconnect = count === 0;
 
       callback(null, lastDisconnect);
     });
@@ -148,7 +148,7 @@ function removeTroupe(troupeId, callback) {
     if(err) return winston.error("presence: Redis error: " + err);
   });
 
-  redisClient.srem("presence:activetroupes", troupeId, function(err, count) {
+  redisClient.srem("presence:activetroupes", troupeId, function(err/*, count*/) {
     if(err) return winston.error("presence: Redis error: " + err);
   });
 
@@ -164,10 +164,13 @@ function listOnlineUsersForTroupe(troupeId, callback) {
   redisClient.lrange("troupe_users:" + troupeId, 0, -1, callback);
 }
 
-resetClientState();
+
 
 module.exports = {
+  resetClientState: resetClientState,
   userSocketConnected: function(userId, socketId) {
+    //winston.debug("presence: userSocketConnected: ", { userId: userId, socketId: socketId });
+
     addUserToActiveUsers(userId, function(err, initialConnection) {
       if(initialConnection) {
         winston.info("presence: User " + userId + " connected.");
@@ -197,6 +200,8 @@ module.exports = {
   },
 
   userSocketDisconnected: function(userId, socketId) {
+    winston.debug("presence: userSocketDisconnected: ", { userId: userId, socketId: socketId });
+
     removeSocketFromUserSockets(socketId, userId, function(err, lastDisconnect) {
       if(lastDisconnect) {
         removeUserFromActiveUsers(userId);
@@ -236,6 +241,62 @@ module.exports = {
 
   findOnlineUsersForTroupe: function(troupeId, callback) {
     listOnlineUsersForTroupe(troupeId, callback);
+  },
+
+  // Given an array of usersIds, returns a hash with the status of each user. If the user is no in the hash
+  // it implies that they're offline
+  // callback(err, status)
+  // with status[userId] = 'online' / <missing>
+  categorizeUsersByOnlineStatus: function(userIds, callback) {
+      var t = process.hrtime();
+      var key = "presence_temp_set:" + process.pid + ":" + t[0] + ":" + t[1];
+
+      var multi = redisClient.multi();
+      multi.sadd(key, userIds);
+      multi.sinter('presence:activeusers',key);
+      multi.del(key);
+      multi.exec(function(err, replies) {
+        if(err) return callback(err);
+
+        var onlineUsers = replies[1];
+        var result = {};
+        if(onlineUsers) onlineUsers.forEach(function(userId) {
+          result[userId] = 'online';
+        });
+
+        return callback(null, result);
+      });
+  },
+
+  listOnlineUsers: function(callback) {
+    redisClient.smembers("presence:activeusers", callback);
+  },
+
+  // Returns the online users for the given troupes
+  // The callback function returns a hash
+  // result[troupeId] = [userIds]
+  listOnlineUsersForTroupes: function(troupeIds, callback) {
+    troupeIds = _.uniq(troupeIds);
+
+    var multi = redisClient.multi();
+
+    troupeIds.forEach(function(troupeId) {
+      multi.lrange("troupe_users:" + troupeId, 0, -1);
+    });
+
+    multi.exec(function(err, replies) {
+      if(err) return callback(err);
+
+      var result = {};
+      troupeIds.forEach(function(troupeId, index) {
+        var onlineUsers = replies[index];
+
+        result[troupeId] = onlineUsers;
+      });
+
+      return callback(null, result);
+    });
+
   }
 
 

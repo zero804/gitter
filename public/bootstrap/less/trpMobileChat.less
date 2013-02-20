@@ -1,6 +1,59 @@
 
 @import "trpColours.less";
 @import "trpiOSFonts.less";
-@import "trpCommon.less";
-@import "trpChat.less";
+@import "trp3Common.less";
+@import "trp3Chat.less";
 
+
+body {
+	margin-left: 5px;
+	margin-top: 20px;
+	background-color: #ecf1ec;
+}
+
+div {
+	display: inline-block;
+}
+
+a {
+	text-decoration: none;
+	color: #333;
+}
+
+
+/*Mobile Overrides*/
+
+.avatar-s {
+	position: relative;
+	height: 24px;
+	width: 24px;
+	border-radius: 50em;
+	border: 2px solid white;
+  background-size: contain;
+}
+
+.trpChatBox {
+	padding: 6px 8px;
+	margin-left: 4px;
+  width: 254px;
+}
+
+.trpChatInputBox {
+  margin-left: 4px;
+  width: 270px;
+}
+
+
+@media screen and (device-width: 320px) and (orientation: portrait) {
+
+  .trpChatInputBoxTextArea {
+    width: 220px;
+
+  }
+
+  .trpChatInputBox {
+
+  }
+
+
+}

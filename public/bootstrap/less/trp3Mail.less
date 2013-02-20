@@ -1,0 +1,134 @@
+.trpMailItem {
+	display: block;
+	margin-bottom: 4px;
+	min-width: 150px;
+}
+
+.trpMailItem a {
+	color: #333;
+}
+
+.trpMailItemPicture {
+  display: inline-block;
+	width: 16px;
+	height: 16px;
+	opacity: 0.8;
+}
+
+.trpMailItemSubject {
+	display: inline-block;
+	font-family: @fontSans;
+	font-size: 12px;
+	vertical-align: top;
+	padding-left: 5px;
+	min-width: 120px;
+	max-width: 160px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.trpMailSubject {
+  display: inline-block;
+  .trpBodyEm;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-bottom: 0px;
+  display: block;
+}
+
+.trpMailRow {
+	display: block;
+}
+
+.trpMailRowContainer {
+	display: block;
+	border-bottom: 1px @trpLightGrey solid;
+	padding-bottom: 12px;
+	padding-top: 12px
+}
+
+.trpMailRowContainer:first-child {
+	padding-top: 0px;
+}
+
+.frame-emails .trpMailExpanded {
+  display: none;
+}
+
+.frame-emails >:first-child .trpMailExpanded {
+  display: block;
+}
+
+.frame-emails >:first-child .trpMailPreview {
+  display: none;
+}
+
+.trpMailRowContainer:last-child {
+	border-bottom: none;
+}
+
+.trpMailHeader {
+  display: inline-block;
+	display: block;
+	width: 100%;
+	cursor: pointer;
+}
+
+.trpMailDisplayPicture {
+  display: inline-block;
+	vertical-align: top;
+}
+
+.trpMailFrom {
+	display: block;
+	.trpBodyEm;
+}
+
+.trpMailDate {
+	display: block;
+	.trpBodySmall;
+}
+
+.trpMailDetails {
+  display: inline-block;
+	padding-left: 8px;
+}
+
+.trpMailPreview {
+	display: block;
+	.trpBodySmall;
+	word-wrap: break-word;
+}
+
+.trpMailBody {
+	display: block;
+	padding: 12px 0px;
+	.trpBodyMedium;
+}
+
+.trpMailLeft {
+  display: inline-block;
+	width: 50px;
+	vertical-align: top;
+	padding-left: 5px;
+}
+
+.trpMailRight {
+  display: inline-block;
+	width: 220px;
+	vertical-align: top;
+	padding-left: 10px;
+}
+
+.trpMailItemMobile {
+  display: inline-block;
+	padding: 10px 0;
+	border-bottom: 1px solid @trpLightGrey;
+	min-width: 320px;
+}
+
+.trpMailAttachmentItem {
+	display: inline-block;
+}

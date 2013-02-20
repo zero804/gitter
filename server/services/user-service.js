@@ -1,26 +1,34 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var persistence = require("./persistence-service"),
     sechash = require('sechash'),
-    mongoose = require("mongoose"),
     emailNotificationService = require("./email-notification-service"),
     uuid = require('node-uuid'),
     geocodingService = require("./geocoding-service"),
     winston = require("winston"),
-    statsService = require("./stats-service");
+    statsService = require("./stats-service"),
+    crypto = require('crypto'),
+    _ = require('underscore');
 
+function generateGravatarUrl(email) {
+  return  "https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon";
+}
 
 var userService = {
-  newUser: function(options) {
+  newUser: function(options, callback) {
     var user = new persistence.User(options);
-    user.displayName = options.display;
+    user.displayName = options.displayName;
     user.email = options.email;
+    user.confirmationCode = options.confirmationCode;
+
+    user.gravatarImageUrl = generateGravatarUrl(user.email);
     user.status = options.status ? options.status : "UNCONFIRMED";
 
     user.save(function (err) {
-      if(err) winston.error("User save failed: ", err);
+      if(err) { winston.error("User save failed: ", err); }
+
+      return callback(null, user);
     });
   },
 
@@ -29,20 +37,22 @@ var userService = {
 
     var displayName = options.displayName;
     var email = options.email;
+    var status = options.status;
 
     persistence.User.findOne({email: email}, function(err, user) {
       if(err) return callback(err);
       if(user) return callback(err, user);
 
-      /* User does not exist */
-      user = new persistence.User(options);
-      user.displayName = displayName;
-      user.email = email;
-      user.save(function (err) {
+      userService.newUser({
+        displayName: displayName,
+        email: email,
+        status: status
+      }, function(err, user) {
         if(err) return callback(err);
 
         return callback(null, user);
       });
+
     });
 
   },
@@ -101,6 +111,7 @@ var userService = {
   },
 
   findByIds: function(ids, callback) {
+    ids = _.uniq(ids);
     persistence.User.where('_id').in(ids)
       .slaveOk()
       .exec(callback);
@@ -111,16 +122,21 @@ var userService = {
     userService.findById(userId, function(err, user) {
       if(err) return callback(err);
       if(!user) return callback("User not found");
-      user.lastTroupe = troupeId;
 
-      user.save(function(err) {
-        callback(err);
-      });
+      if (user.lastTroupe !== troupeId) {
+        user.lastTroupe = troupeId;
+
+        user.save(function(err) {
+          callback(err);
+        });
+      } else {
+        callback();
+      }
     });
   },
 
   findDefaultTroupeForUser: function(id, callback) {
-    persistence.Troupe.findOne({ users: id }, function(err, troupe) {
+    persistence.Troupe.findOne({ 'users.userId': id }, function(err, troupe) {
       callback(err, troupe);
     });
   },
@@ -236,6 +252,9 @@ var userService = {
     userService.findById(userId, function(err, user) {
       if(err) return callback(err);
       if(!user) return callback("User not found");
+
+      if (!user.gravatarImageUrl)
+        user.gravatarImageUrl = generateGravatarUrl(user.email);
 
       function generateNewHashSaveUser() {
         sechash.strongHash('sha512', password, function(err, hash3) {

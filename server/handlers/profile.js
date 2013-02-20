@@ -1,19 +1,17 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var form = require("express-form"),
     filter = form.filter,
     validate = form.validate,
-    signupService = require("../services/signup-service"),
     userService = require("../services/user-service"),
-    passport = require('passport'),
     middleware = require('../web/middleware'),
     winston = require("winston");
 
 module.exports = {
     install: function(app) {
       app.get('/profile',
+        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         function(req, res) {
           var displayName;
@@ -32,6 +30,7 @@ module.exports = {
 
       app.post(
           '/profile',
+          middleware.grantAccessForRememberMeTokenMiddleware,
           middleware.ensureLoggedIn(),
           // Form filter and validation middleware
           form(

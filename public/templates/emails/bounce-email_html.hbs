@@ -1,0 +1,34 @@
+
+    <p>Oops, there was an error sending your mail to one or more of the Troupes.</p>
+
+    {{#unless userIsRegistered}}
+      <p>You're not signed up for troupe yet, click the troupe link below to sign up.</p>
+    {{/unless}}
+
+    {{#if deniedTroupes.length}}
+
+      <p>
+      You aren't allowed to send emails to that Troupe. Visit the link below to request access to that Troupe.
+      </p>
+
+      {{#each deniedTroupes}}
+      <div class="button"><a href="{{../baseServerPath}}/{{this}}">Join this troupe</a></div>
+      {{/each}}
+      </ol>
+
+    {{/if}}
+
+    {{#if nonExistantTroupes.length}}
+
+      <p>
+
+      Please recheck the address of the Troupe and try to send your message again.
+      </p>
+
+<!--       <ol>
+      {{#each nonExistantTroupes}}
+          <li>{{this}}</li>
+      {{/each}}
+      </ol> -->
+
+    {{/if}}

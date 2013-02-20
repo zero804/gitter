@@ -1,0 +1,10 @@
+<div class="trpChatItem">
+  {{widget "avatar" user=fromUser}}
+  <div class="trpChatBox">
+    <div class="trpChatDetails">
+      <div class="trpChatFrom">{{{displayName}}}</div>
+      <div class="trpChatTime">{{widget "timeago" time=sent}}</div>
+    </div>
+    <div class="trpChatText">{{linkify text}}</div>
+  </div>
+</div>

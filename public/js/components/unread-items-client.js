@@ -1,31 +1,49 @@
+/*jshint unused:true browser:true*/
 define([
   'jquery',
-  'underscore'
-], function($, _) {
+  'underscore',
+  './realtime'
+], function($, _, realtime) {
   /*global console: false, window: false, document: false */
   "use strict";
+
+  var troupeUnreadCounts = {};
+  var troupeUnreadTotal = -1;
+
 
   var unreadItemsCountsCache = {};
   var unreadItems = window.troupeContext.unreadItems;
   var recentlyMarkedRead = {};
+
+  function log(fun) {
+    return function() {
+      //console.log("Calling " + fun.name, arguments);
+      var r = fun.apply(null, arguments);
+      //console.log("Completed " + fun.name, r);
+      return r;
+    };
+  }
+
   window.setInterval(function() {
     var now = Date.now();
 
     _.keys(recentlyMarkedRead, function(key) {
       if(now - recentlyMarkedRead[key] > 5000) {
-        console.log("Done with "+ key);
         delete recentlyMarkedRead[key];
       }
     });
   }, 5000);
 
-  function syncCounts() {
+  var syncCounts = function syncCounts() {
     var keys = _.union(_.keys(unreadItemsCountsCache), _.keys(unreadItems));
 
     _.each(keys, function(k) {
       var value = unreadItemsCountsCache[k];
       var newValue = unreadItems[k] ? unreadItems[k].length : 0;
       if(value !== newValue) {
+
+        //console.log("Unread items of type: ", k, newValue, "old value was ", value);
+
         window.setTimeout(function() {
           $(document).trigger('itemUnreadCountChanged', {
             itemType: k,
@@ -34,12 +52,12 @@ define([
         }, 200);
       }
     });
-  }
+  };
 
   var readNotificationQueue = {};
   var timeoutHandle = null;
 
-  function markItemRead(itemType, itemId) {
+  var markItemRead = function markItemRead(itemType, itemId) {
 
     recentlyMarkedRead[itemType + "/" + itemId] = Date.now();
 
@@ -49,12 +67,12 @@ define([
       a = _.without(a, itemId);
       unreadItems[itemType] = a;
       if(a.length !== lengthBefore - 1) {
-        console.log("Item " + itemType + "/" + itemId + "marked as read, but not found in unread items.");
+        //console.log("Item " + itemType + "/" + itemId + "marked as read, but not found in unread items.");
       }
 
       syncCounts();
     } else {
-      console.log("No unread items of type " + itemType + " found.");
+      //console.log("No unread items of type " + itemType + " found.");
     }
 
     if(!readNotificationQueue[itemType]) {
@@ -69,7 +87,7 @@ define([
       var sendQueue = readNotificationQueue;
       readNotificationQueue = {};
 
-      console.log("Sending read notifications: ", sendQueue);
+      //console.log("Sending read notifications: ", sendQueue);
 
       $.ajax({
         url: "/troupes/" + window.troupeContext.troupe.id + "/unreadItems",
@@ -84,20 +102,21 @@ define([
     if(!timeoutHandle) {
       timeoutHandle = window.setTimeout(send, 500);
     }
-  }
+  };
 
   var windowTimeout = null;
-  function windowScrollOnTimeout() {
+  var windowScrollOnTimeout = function windowScrollOnTimeout() {
     windowTimeout = null;
     var $window = $(window);
-    var $document = $(document);
     var scrollTop = $window.scrollTop();
     var scrollBottom = scrollTop + $window.height();
 
-    $.each($('.unread:visible'), function (index, element) {
+    $('.unread').each(function (index, element) {
       var $e = $(element);
       var itemType = $e.data('itemType');
       var itemId = $e.data('itemId');
+
+      //console.log("found an unread item: itemType ", itemType, "itemId", itemId);
 
       if(itemType && itemId) {
         var top = $e.offset().top;
@@ -111,7 +130,7 @@ define([
       }
 
     });
-  }
+  };
 
   function windowScroll() {
     if(!windowTimeout) {
@@ -121,21 +140,35 @@ define([
 
   $(window).on('scroll', windowScroll);
 
-  $(document).on('collectionReset', function(event, data) {
-    windowScrollOnTimeout();
+  // TODO: don't reference this frame directly!
+  $('#toolbar-frame').on('scroll', windowScroll);
+
+  $(document).on('unreadItemDisplayed', function() {
+    windowScroll();
   });
 
-  $(document).on('newUnreadItems', function(event, data) {
-    console.log("newUnreadItems", data);
+  $(document).on('appNavigation', function() {
+    windowScroll();
+  });
+/*
+  $(document).on('collectionReset', function() {
+    windowScroll();
+  });
 
-    var itemTypes = _.keys(data);
+  $(document).on('collectionAdd', function() {
+    windowScroll();
+  });
+*/
+
+  function newUnreadItems(items) {
+    var itemTypes = _.keys(items);
     _.each(itemTypes, function(itemType) {
-      var ids = data[itemType];
+      var ids = items[itemType];
 
       var filtered = _.filter(ids, function(itemId) { return !recentlyMarkedRead[itemType + "/" + itemId]; });
 
       if(filtered.length < ids.length) {
-        console.log("Some items have been marked as read before they even appeared");
+        //console.log("Some items have been marked as read before they even appeared");
       }
 
       if(!unreadItems[itemType]) {
@@ -147,13 +180,12 @@ define([
     });
 
     syncCounts();
-  });
+  }
 
-
-  $(document).on('unreadItemsRemoved', function(event, data) {
-    var itemTypes = _.keys(data);
+  function unreadItemsRemoved(items) {
+    var itemTypes = _.keys(items);
     _.each(itemTypes, function(itemType) {
-      var ids = data[itemType];
+      var ids = items[itemType];
 
       if(unreadItems[itemType]) {
         unreadItems[itemType] = _.without(unreadItems[itemType], ids);
@@ -161,16 +193,62 @@ define([
     });
 
     syncCounts();
-  });
+  }
 
-  $(document).on('collectionAdd', function(event, data) {
-    windowScrollOnTimeout();
-  });
+
+  //windowScrollOnTimeout = log(windowScrollOnTimeout);
+  unreadItemsRemoved = log(unreadItemsRemoved);
+  newUnreadItems = log(newUnreadItems);
+  syncCounts = log(syncCounts);
+  markItemRead = log(markItemRead);
 
   return {
     getValue: function(itemType) {
       var v = unreadItems[itemType];
       return v ? v.length : 0;
+    },
+
+    installTroupeListener: function(troupeCollection) {
+      function recount() {
+          var newTroupeUnreadTotal = _(troupeUnreadCounts)
+                .values()
+                .map(function(a) { return a > 0 ? 1: 0; })
+                .reduce(function(a,b) { return a + b; });
+
+          if(newTroupeUnreadTotal !== troupeUnreadTotal) {
+            troupeUnreadTotal = newTroupeUnreadTotal;
+            $(document).trigger('troupeUnreadTotalChange', newTroupeUnreadTotal);
+          }
+      }
+
+      if (troupeCollection) {
+        troupeCollection.on('reset', function() {
+          troupeCollection.each(function(troupe) {
+            troupeUnreadCounts[troupe.id] = troupe.get('unreadItems');
+          });
+          recount();
+        });
+      }
+
+      realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
+        if(message.notification === 'troupe_unread') {
+          var troupeId = message.troupeId;
+          var totalUnreadItems = message.totalUnreadItems;
+
+          troupeUnreadCounts[troupeId] = totalUnreadItems;
+          var model = (troupeCollection) ? troupeCollection.get(troupeId) : null;
+          if(model) {
+            model.set('unreadItems', totalUnreadItems);
+          } else {
+            console.log("Cannot find model. Refresh might be required....");
+          }
+          recount();
+        } else if(message.notification === 'unread_items') {
+          newUnreadItems(message.items);
+        } else if(message.notification === 'unread_items_removed') {
+          unreadItemsRemoved(message.items);
+        }
+      });
     }
   };
 

@@ -1,4 +1,4 @@
-/*jslint node: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 exports.keys = function(object) {
@@ -23,6 +23,16 @@ exports.indexById = function(array) {
 
   return a;
 };
+
+exports.indexByProperty = function(array, propertyName) {
+  var a = {};
+  array.forEach(function(item) {
+    a[item[propertyName]] = item;
+  });
+
+  return a;
+};
+
 
 exports.hashArray = function(array) {
   var a = {};

@@ -1,21 +1,18 @@
-// Filename: views/home/main
+/*jshint unused:true browser:true*/
+
 define([
   'jquery',
   'underscore',
   'backbone',
   'views/base',
-  'hbs!views/conversation/conversationItemView'
+  'hbs!./tmpl/conversationItemView'
 ], function($, _, Backbone, TroupeViews, template) {
   "use strict";
 
   var ConversationItemView = TroupeViews.Base.extend({
     template: template,
 
-    initialize: function(options) {
-    },
-
-    events: {
-      "click .clickPoint-showEmail": "showEmail"
+    initialize: function() {
     },
 
     getRenderData: function() {
@@ -25,11 +22,6 @@ define([
       data.updated = data.updated ? data.updated.calendar() : null;
 
       return data;
-    },
-
-    showEmail: function(e) {
-      e.preventDefault();
-      window.troupeApp.navigate("mail/" + this.model.get('id'), {trigger: true});
     }
 
   });

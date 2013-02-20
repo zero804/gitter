@@ -1,4 +1,4 @@
-/*jslint node: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var nconf = require('../utils/config');
@@ -11,9 +11,10 @@ if(!nconf.get("stats:sendStats")) {
 
 var cube = require("cube");
 var statsEnvName = nconf.get("stats:envName");
+var statsUrl = nconf.get("stats:cubeUrl");
 
 // TODO: conf this
-var client = cube.emitter("ws://localhost:1080");
+var client = cube.emitter(statsUrl);
 
 exports.event = function(eventName, data) {
   if(!data) data = {};

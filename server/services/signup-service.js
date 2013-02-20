@@ -1,5 +1,4 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var persistence = require("./persistence-service"),
@@ -7,68 +6,67 @@ var persistence = require("./persistence-service"),
     troupeService = require("./troupe-service"),
     userService = require("./user-service"),
     uuid = require('node-uuid'),
-    sechash = require('sechash'),
-    nconf = require('../utils/config'),
     winston = require('winston');
 
 
-function createUniqueUri() {
-  var chars = "0123456789abcdefghiklmnopqrstuvwxyz";
+function newTroupe(options, callback) {
+  var user = options.user;
 
-  var uri = "";
-  for(var i = 0; i < 6; i++) {
-    var rnum = Math.floor(Math.random() * chars.length);
-    uri += chars.substring(rnum, rnum + 1);
+  var troupe = new persistence.Troupe();
+  troupe.name = options.troupeName;
+  troupe.uri = troupeService.createUniqueUri();
+
+  // add the user creating the troupe
+  troupe.addUserById(user.id);
+
+  // add other users
+  if (options.users) {
+    for (var a = 0; a < options.users; a++) {
+      troupe.addUserById(options.users[a]);
+    }
   }
 
-  return uri;
+  // invite users
+  if (options.invites) {
+    for (var b = 0; b < options.invites; b++)
+      troupeService.addInvite(troupe, user.displayName, options.invites[b].displayName, options.invites[b].email);
+  }
+
+  troupe.save(function(err) {
+    // send out email notification
+    if (options.isNewUser) {
+      emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
+    }
+    else {
+      emailNotificationService.sendConfirmationForNewUser(user, troupe);
+    }
+
+    callback(err, troupe);
+  });
 }
 
 function newTroupeForExistingUser(options, user, callback) {
   winston.info("New troupe for existing user", options);
 
-  var uri = createUniqueUri();
-
-  var troupe = new persistence.Troupe();
-  troupe.name = options.troupeName;
-  troupe.uri = uri;
-  troupe.users = [user.id];
-
-  troupe.save(function(err) {
-    if(err) return callback(err);
-    // No need to send an email for existing users
-    // emailNotificationService.sendConfirmationForExistingUser(user, troupe);
-    callback(null, troupe.id);
+  options.user = user;
+  newTroupe(options, function(err, troupe) {
+    callback(err, troupe.id);
   });
+
 }
 
 function newTroupeForNewUser(options, callback) {
   winston.info("New troupe for new user", options);
-
   var confirmationCode = uuid.v4();
-  var user = new persistence.User();
-  user.email = options.email;
-  user.confirmationCode = confirmationCode;
 
-  var uri = createUniqueUri();
-
-  user.save(function (err) {
+  userService.newUser({ email: options.email, confirmationCode: confirmationCode }, function (err, user) {
     if(err) {
-      callback(err);
-      return;
+      callback(err); return;
     }
 
-    var troupe = new persistence.Troupe();
-    troupe.name = options.troupeName;
-    troupe.uri = uri;
-    troupe.users = [user.id];
-
-    troupe.save(function(err) {
-      if(err) return  callback(err);
-
-      emailNotificationService.sendConfirmationForNewUser(user, troupe);
-
-      callback(null, troupe.id);
+    options.user = user;
+    newTroupe(options, function(err, troupe) {
+      callback(err, troupe.id);
     });
   });
 }
@@ -147,13 +145,14 @@ module.exports = {
       troupeService.findById(options.troupeId, function(err, troupe) {
         if(err) return callback(err);
 
-        if(troupe.users.length != 1) {
+        var troupeUsers = troupe.getUserIds();
+        if(troupeUsers.length != 1) {
           winston.error("A confirmation resent cannot be performed as the troupe has multiple users");
           return callback("Invalid state");
         }
 
 
-        userService.findById(troupe.users[0], function(err, user) {
+        userService.findById(troupeUsers[0], function(err, user) {
           if(err || !user) return callback(err, user);
           if(user.status != 'UNCONFIRMED') {
             emailNotificationService.sendConfirmationForExistingUser(user, troupe);
@@ -191,12 +190,13 @@ module.exports = {
       if(!user) {
         // Create a new user and add the request. The users confirmation code will not be set until the first time one one of
         // their requests is accepted
-        user = new persistence.User();
-        user.status = 'UNCONFIRMED';
-        user.email = email;
-        user.displayName = name;
+        var userProperties = {
+          status: 'UNCONFIRMED',
+          email: email,
+          displayName: name
+        };
 
-        user.save(function (err) {
+        user = userService.newUser(userProperties, function(err, user) {
           if(err) return callback(err);
 
           troupeService.addRequest(troupeId, user.id, function(err, request) {
@@ -206,15 +206,10 @@ module.exports = {
         });
 
       } else {
-        if(user.status === 'UNCONFIRMED') {
-          // Add a request for the troupe
-          troupeService.addRequest(troupeId, user.id, function(err, request) {
-            if(err) return callback(err);
-            callback(null);
-          });
-        } else {
-          callback({ userExists: true });
-        }
+        troupeService.addRequest(troupeId, user.id, function(err, request) {
+          if(err) return callback(err);
+          callback(null);
+        });
       }
     });
   }

@@ -1,28 +1,27 @@
-/*jshint globalstrict:true, trailing:false */
-/*global require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var persistence = require("./persistence-service");
 var mongoose = require("mongoose");
 var mime = require("mime");
 var winston = require("winston");
-var appEvents = require("../app-events");
-var console = require("console");
 var Q = require("q");
 var crypto = require('crypto');
 var fs = require('fs');
+var thumbnailPreviewGeneratorService = require("./thumbnail-preview-generator-service");
+var mongooseUtils = require('../utils/mongoose-utils');
 
 /* private */
-function createFileName(fileId, version) {
+function getMainFileName(fileId, version) {
   return "attachment:" + fileId + ":" + version;
 }
 
 /* TODO: remove all referneced to embedded, we're calling them preview from now on */
-function createEmbeddedFileName(fileId, version) {
+function getEmbeddedFileName(fileId, version) {
   return "preview:" + fileId + ":" + version;
 }
 
-function createThumbNailFileName(fileId, version) {
+function getThumbnailFileName(fileId, version) {
   return "thumb:" + fileId + ":" + version;
 }
 
@@ -33,20 +32,13 @@ function findById(id, callback) {
   });
 }
 
-function deleteById(id, callback) {
-  persistence.File.findById(id , function(err, file) {
-    file.remove();
-    callback(err);
-  });
-}
-
 /* private */
-function uploadFileToGrid(file, version, temporaryFile, callback) {
+function uploadFileToGrid(file /* mongo file object */, version, temporaryFile, callback) {
   winston.info('Uploading file to grid: ' + file.fileName + "(" + version + ")");
 
   var db = mongoose.connection.db;
   var GridStore = mongoose.mongo.GridStore;
-  var gridFileName = createFileName(file.id, version);
+  var gridFileName = getMainFileName(file.id, version);
   var gs = new GridStore(db, gridFileName, "w", {
       "content_type": file.mimeType,
       "metadata":{
@@ -57,8 +49,25 @@ function uploadFileToGrid(file, version, temporaryFile, callback) {
       }
   });
 
+  // write local file to grid fs
   gs.writeFile(temporaryFile, function(err) {
     if (err) return callback(err);
+
+    // the local temp file can be deleted now that it is stored in grid fs,
+    // express is setup to delete files in the upload folder after an hour or so.
+    // thumbnail generator potentially runs on another computer and doesn't callback here, so cant be responsible for deleting the file.
+    // fs.unlink(temporaryFile); // will cause thumbnail generator to always download from mongo and then delete the file itself.
+
+    // generate thumbnail from local file.
+    thumbnailPreviewGeneratorService.generateThumbnail({
+      fileId: file.id,
+      troupeId: file.troupeId,
+      temporaryFile: temporaryFile, // passed in as optimisation just in case the thumbnail generator is operating on the same server
+      mongoFileName: gridFileName, // used by the generator to download the file from grid fs
+      mimeType: file.mimeType,
+      version: version
+    });
+
     return callback(err, file);
   });
 }
@@ -86,15 +95,15 @@ function compareHashSums(gridFileName, temporaryFile, callback) {
   var fsOp = Q.defer();
 
   var gs = new GridStore(db, gridFileName, "r");
-  gs.open(function(err, gridStore) {
+  gs.open(function(err/*, gridStore*/) {
     if (err) return gsOp.reject(new Error(err));
 
     gsOp.resolve(gs.md5);
 
-    gs.close(function(err) {});
+    gs.close(function(/*err*/) {});
   });
 
-  calculateMd5ForFile(temporaryFile, fsOp.node());
+  calculateMd5ForFile(temporaryFile, fsOp.makeNodeResolver());
 
   Q.all([gsOp.promise, fsOp.promise]).spread(function(gsMd5, fsMd5) {
     callback(null, gsMd5 === fsMd5);
@@ -108,7 +117,7 @@ function compareHashSums(gridFileName, temporaryFile, callback) {
 function checkIfFileExistsAndIdentical(file, version, temporaryFile, callback) {
   var db = mongoose.connection.db;
   var GridStore = mongoose.mongo.GridStore;
-  var gridFileName = createFileName(file.id, version);
+  var gridFileName = getMainFileName(file.id, version);
 
   GridStore.exist(db, gridFileName, function(err, result) {
     if (err) return callback(err);
@@ -166,19 +175,19 @@ function locateAndStream(troupeId, fileName, version, presentedEtag, gridFileNam
 
 function getFileEmbeddedStream(troupeId, fileName, version, presentedEtag, callback) {
   locateAndStream(troupeId, fileName, version, presentedEtag, function(fileId, version) {
-    return createEmbeddedFileName(fileId, version);
+    return getEmbeddedFileName(fileId, version);
   }, callback);
 }
 
 function getThumbnailStream(troupeId, fileName, version, presentedEtag, callback) {
   locateAndStream(troupeId, fileName, version, presentedEtag, function(fileId, version) {
-    return createThumbNailFileName(fileId, version);
+    return getThumbnailFileName(fileId, version);
   }, callback);
 }
 
 function getFileStream(troupeId, fileName, version, presentedEtag, callback) {
   locateAndStream(troupeId, fileName, version, presentedEtag, function(fileId, version) {
-    return createFileName(fileId, version);
+    return getMainFileName(fileId, version);
   }, callback);
 }
 
@@ -203,8 +212,8 @@ function storeFileVersionInGrid(options, callback) {
   var creatorUserId = options.creatorUserId;
   var fileName = options.fileName;
   var mimeType = options.mimeType;
-  var temporaryFile = options.file;
-  var version, file;
+  var temporaryFile = options.file; // this is the file path
+  var version;
 
 
   findByFileName(troupeId, fileName, function(err, file) {
@@ -229,11 +238,6 @@ function storeFileVersionInGrid(options, callback) {
           if (err) return callback(err);
 
           uploadFileToGrid(file, 1, temporaryFile, function(err, file) {
-            if(!err) {
-              appEvents.fileEvent('createNew', { troupeId: troupeId, fileId: file.id });
-              appEvents.fileEvent('createVersion', { troupeId: troupeId, fileId: file.id, version: 1, temporaryFile: temporaryFile, mimeType: file.mimeType });
-            }
-
             callback(err, {
               file: file,
               version: 1,
@@ -270,9 +274,6 @@ function storeFileVersionInGrid(options, callback) {
         if (err) return callback(err);
         var versionNumber = file.versions.length;
         uploadFileToGrid(file, versionNumber, temporaryFile, function(err, file) {
-          if(!err) {
-            appEvents.fileEvent('createVersion', { troupeId: troupeId, fileId: file.id, version: versionNumber, temporaryFile: temporaryFile, mimeType: file.mimeType });
-          }
           callback(err, {
             file: file,
             version: file.versions.length,
@@ -285,12 +286,8 @@ function storeFileVersionInGrid(options, callback) {
 }
 
 function storeFile(options, callback) {
-  winston.debug("storeFile");
-
   var fileName = options.fileName;
   var mimeType = options.mimeType;
-  var temporaryFile = options.file;
-  var troupeId = options.troupeId;
 
   /* Need to correct the mimeType from time to time */
   /* Try figure out a better mimeType for the file */
@@ -320,6 +317,33 @@ function findByIds(ids, callback) {
     .exec(callback);
 }
 
+function deleteFileFromGridStore(fileName, callback) {
+  if(!callback) callback = function(err) {
+    if(err) winston.error("Error while deleting file from gridstore: ", { fileName: fileName, exception: err } );
+  };
+
+  winston.debug("Deleting file from gridstore: ", { fileName: fileName } );
+
+  var db = mongoose.connection.db;
+  var GridStore = mongoose.mongo.GridStore;
+
+  GridStore.unlink(db, fileName, callback);
+}
+
+mongooseUtils.attachNotificationListenersToSchema(persistence.schemas.FileSchema, {
+  onRemove: function(model) {
+    var versions = model.versions;
+    var fileId = model.id;
+
+    versions.forEach(function(fileVersion, index) {
+      var version = index + 1;
+      deleteFileFromGridStore(getMainFileName(fileId, version));
+      deleteFileFromGridStore(getEmbeddedFileName(fileId, version));
+      deleteFileFromGridStore(getThumbnailFileName(fileId, version));
+    });
+  }
+});
+
 module.exports = {
   findByTroupe: findByTroupe,
   findById: findById,
@@ -328,5 +352,10 @@ module.exports = {
   storeFile: storeFile,
   getFileStream: getFileStream,
   getFileEmbeddedStream: getFileEmbeddedStream,
-  getThumbnailStream: getThumbnailStream
-};
+  getThumbnailStream: getThumbnailStream,
+
+  /* For Testing */
+  getMainFileName:getMainFileName,
+  getEmbeddedFileName: getEmbeddedFileName,
+  getThumbnailFileName: getThumbnailFileName
+}

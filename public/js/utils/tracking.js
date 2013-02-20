@@ -1,18 +1,17 @@
+/*jshint unused:true browser:true*/
 define([
   'ga'
 ], function(_gaq) {
 
   _gaq.push(['_setAccount', 'UA-34596351-1']);
 
-  function trackPageView() {
-    var hash = location.hash;
-    if(hash) {
-      hash = hash.replace(/\/.*$/,"/");
-    }
-    _gaq.push(['_trackPageview', "app" + hash]);
+  function trackPageView(routeName) {
+    _gaq.push(['_trackEvent', 'Route', routeName]);
   }
 
-  trackPageView();
+  function trackError(message, file, line) {
+    _gaq.push(['_trackEvent', 'Error', message, file, line]);
+  }
 
   _gaq.push(['_setCustomVar',
       1,
@@ -28,7 +27,14 @@ define([
       3 // Page level variable
    ]);
 
-  window.troupeApp.bind("all",function(route, router) {
-    trackPageView();
+  $(document).on('track', function(e, routeName) {
+    trackPageView(routeName);
   });
+
+  return {
+    trackError: trackError
+  };
 });
+
+
+

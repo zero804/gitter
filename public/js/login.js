@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 require([
   'jquery',
   'retina' ],
@@ -6,14 +7,25 @@ require([
       $('#email').val(window.localStorage.defaultTroupeEmail);
     }
 
+    console.log("Document: " + $(document).width());
+    var leftPanelSpacing = (($(document).width() - 320) / 2) + 320;
+
+    console.log("Where am I: " + leftPanelSpacing);
+
+    $('#panel-signup').css('left', leftPanelSpacing + 'px');
+
     $('#button-signup').on('click', function(e) {
-      $('#panel-signup').anim({translate3d: '-320px,0,0'}, 0.5, 'swing');
-      $('#panel-login').anim({translate3d: '-320px,0,0'}, 0.5, 'swing');
+      $('#panel-signup, #panel-login').animate( {
+        left: '-=' + leftPanelSpacing + 'px'
+      }, 350);
+
+      // $('#panel-login').animate({translate3d: '-320px,0,0'}, 0.5, 'swing');
     });
 
     $('#button-back').on('click', function(e) {
-      $('#panel-signup').anim({translate3d: '320px,0,0'}, 0.5, 'swing');
-      $('#panel-login').anim({translate3d: '0,0,0'}, 0.5, 'swing');
+      $('#panel-signup, #panel-login').animate( {
+        left: '+=' + leftPanelSpacing + 'px'
+      }, 350);
     });
 
     $('#button-login').on('click', function(e) {
@@ -22,6 +34,7 @@ require([
     });
 
     $('#password').on('blur', function(e) {
+      console.log("Password blur");
       hideLoginFailure();
     });
 
@@ -36,14 +49,20 @@ require([
     var showingFailure = false;
 
     function showLoginFailure() {
-      $('#panel-failure').anim({translate3d: '0px, -160px,0'}, 0.5, 'swing');
+      console.log("UP YOU SLIDE");
+      // $('#panel-failure').slideUp();
+      $('#panel-failure').animate( {
+        bottom: '0px'
+      }, 350);
       showingFailure = true;
     }
 
     function hideLoginFailure() {
       if (showingFailure) {
-        $('#panel-failure').anim({translate3d: '0px, 160px,0'}, 0.5, 'swing');
-        showingFailure = false;
+        console.log("DOWN YOU SLIDE");
+         $('#panel-failure').animate( {
+            bottom: '-90px'
+          }, 350);
       }
     }
 

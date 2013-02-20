@@ -1,0 +1,478 @@
+@import "bootstrap.less";
+
+@import "trpColours.less";
+//@import "trpWebFonts.less";
+@import "trpFonts.less";
+
+@import "trpModals.less";
+@import "trp3Common.less";
+@import "trpButtons.less";
+
+@import "trp3Chat.less";
+@import "trp3Mail.less";
+@import "trp3Files.less";
+@import "trp3People.less";
+
+@import "../../js/libs/fineuploader/3.1.1/fineuploader.less";
+
+@import "nanoScroller.less";
+
+html {
+	min-height: 100%;
+}
+
+// TEMP TEMP TEMP
+
+.view .trpChatBox {
+	-webkit-transition: background-color 0.5s linear;
+  -moz-transition: background-color 0.5s linear;
+  -o-transition: background-color 0.5s linear;
+  transition: background-color 0.5s linear;
+}
+
+.view.unread .trpChatBox {
+	background-color: lightyellow;
+}
+
+body {
+	min-height: 100%;
+	margin: 0;
+	background-color: #ecf1ec;
+	overflow-x: hidden;
+}
+
+a {
+	text-decoration: none;
+	color: #333;
+}
+
+
+a:hover {
+	text-decoration: underline;
+}
+
+.trpLeftMenuHotspot {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 40px;
+	height: 100%;
+	z-index: 10;
+	display: inline-block;
+}
+
+.trpLeftMenu {
+	display: inline-block;
+	position: fixed;
+	width: 280px;
+	left: -280px;
+	top: 62px;
+	background-color: @trpGreen;
+	height: 100%;
+	color: white;
+	z-index: 1012;
+	border-right: 2px solid @trpGreen;
+	padding-top: 26px;
+	margin-top: 0px;
+}
+
+.trpLeftMenuWrapper {
+  display: inline-block;
+	.trpBodyText;
+	padding-left: 20px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	height: 90%;
+}
+
+.trpLeftMenuToolbar {
+	padding-left: 26px;
+	padding-bottom: 12px;
+}
+
+.trpLeftMenuToolbarItems {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.trpLeftMenuToolbarItems li {
+	display: inline-block;
+	padding-right: 8px;
+}
+
+.left-menu-icon {
+	opacity: 0.6;
+}
+
+.selected {
+	opacity: 1;
+}
+
+.trpLeftMenuSpacer {
+	height: 100px;
+}
+
+.trpTroupeList {
+  display: inline-block;
+	list-style-type: none;
+	margin: 0;
+}
+
+.trpTroupeList a {
+  display: inline-block;
+	color: white;
+	white-space: nowrap;
+	max-width: 220px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.trpTroupeListSearch {
+	padding-left: 8px;
+}
+
+.trpNewTroupeButton {
+  display: inline-block;
+	width: 210px;
+	.trpBodyMedium;
+	margin-top: 20px;
+	background-color: white;
+	padding: 12px;
+	color: @trpGreen;
+}
+
+.trpMenuTab {
+  display: inline-block;
+	position: fixed;
+	left: 0px;
+	top: 100px;
+	background-color: @trpGreen;
+	height: 40px;
+	width: 40px;
+}
+
+.trpUnreadBadge {
+	display: none;
+	position: absolute;
+	right: -9px;
+	top: -9px;
+	width: 15px;
+	height: 15px;
+	background-color: @trpPurple;
+	border-radius: 50em;
+	.trpBodyTiny;
+	color: white;
+	text-align: center;
+	border: 2px solid white;
+}
+
+.trpUnreadBadgeCount {
+  display: inline-block;
+	margin-top: 1px;
+	width: 15px;
+	text-align: center;
+}
+
+.trpTroupeBadge {
+  display: inline-block;
+	margin-left: -11px;
+}
+
+.trpTroupeBadge:before {
+	content: "";
+	display: inline-block;
+	position: relative;
+	left: -8px;
+	width: 7px;
+	height: 7px;
+	border-radius: 50em;
+	vertical-align: top;
+	margin-top: 5px;
+	background-color: @trpPurple;
+	border: 2px solid white;
+}
+
+
+.trpTroupeName {
+	vertical-align: top;
+	padding-left: 8px;
+	text-overflow: ellipsis;
+	max-width: 230px;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+
+.trpContentPanel {
+/*  display: inline-block;*/
+  position: absolute;
+/*	background-color: #ecf1ec;*/
+	margin-left: 0px;
+	height: 100%;
+	width: 100%;
+	text-align: center;
+	padding-top: 40px;
+  right: 0px;
+}
+
+.trpContentSpacer {
+	width: 100%;
+	min-width: 700px;
+  display: inline-block;
+}
+
+.trpHeaderWrapper {
+  display: inline-block;
+	width: 100%;
+	height: 60px;
+	background-color: white;
+	text-align: center;
+	position: fixed;
+	z-index: 1000;
+	overflow: hidden;
+	border-top: 2px solid @trpGreen;
+}
+
+.trpHeaderContainer {
+  display: inline-block;
+  position: relative;
+	background-color: white;
+	text-align: center;
+	overflow: hidden;
+}
+
+.trpHeaderTitle {
+  display: inline-block;
+	.trpH1;
+	min-width: 500px;
+	text-align: left;
+	color: #333;
+	padding-top: 12px;
+	height: 60px;
+}
+
+.trpHeaderToolbar {
+  display: inline-block;
+	min-width: 200px;
+	height: 60px;
+	vertical-align: top;
+	text-align: left;
+}
+
+.trpSettingsButton {
+  display: inline-block;
+	float: left;
+	padding-top: 16px;
+/*	border-top: 2px solid @trpGreen;*/
+	margin: 0;
+}
+
+.trpProfileButton {
+  display: inline-block;
+	float: left;
+	padding-top: 14px;
+	padding-left: 12px;
+/*	border-top: 2px solid @trpGreen;*/
+	margin: 0;
+}
+
+.trpProfileMenu {
+	font-family: 'Open Sans';
+	font-size: 14px;
+	color: #333;
+	vertical-align: top;
+	display: inline-block;
+	padding-top: 18px;
+/*	border-top: 2px solid #1dce73;*/
+	margin: 0;
+  display: none;
+	width: 132px;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.trpProfileItem {
+  display: inline-block;
+	padding-left: 14px;
+}
+
+.trpProfileItem a:hover {
+	color: #1dce73;
+}
+
+.trpProfileItem a {
+	color: #333;
+}
+
+
+.trpAlertWrapper {
+	width: 100%;
+	height: 120px;
+	top: 60px;
+	background-color: @trpGreen;
+	text-align: center;
+	position: fixed;
+	z-index: 1080;
+	overflow: hidden;
+	display: none;
+}
+
+.trpAlertContainer {
+	text-align: center;
+	overflow: hidden;
+}
+
+.trpAlertContent {
+	.trpH3;
+	min-width: 718px;
+	text-align: left;
+	color: #333;
+	padding-top: 14px;
+	color: white;
+}
+
+.trpAlertTitle {
+	margin-bottom: 10px;
+}
+
+.trpChatPanel {
+  display: inline-block;
+	min-width: 700px;
+	max-width: 700px;
+	min-height: 600px;
+	height: 100%;
+	text-align: left;
+	padding-top: 40px;
+	border-radius: 5px;
+}
+
+.trpToolbar {
+	position: fixed;
+  display: inline-block;
+	min-width: 200px;
+	max-width: 200px;
+	text-align: left;
+	margin-top: 40px;
+	vertical-align: top;
+	margin-left: -200px;
+  height: 90%;
+}
+
+.trpToolbarSpacer {
+  height: 40px;
+}
+
+.trpToolbarContent {
+  display: inline-block;
+	width: 200px;
+	vertical-align: top;
+}
+
+.trpToolbarHeader {
+	font-family: @fontSans;
+	font-size: 12px;
+	text-transform: uppercase;
+	padding-bottom: 4px;
+	cursor: pointer;
+	margin-left: 9px;
+}
+
+.trpToolbarList {
+  display: inline-block;
+	vertical-align: top;
+	padding-bottom: 12px;
+}
+
+.trpRightPanel {
+	position: fixed;
+	width: 280px;
+	right: -280px;
+	top: 60px;
+	height: 100%;
+	overflow: hidden;
+	color: white;
+	font-size: 20px;
+	z-index: 12;
+	background-color: #ecf1ec;
+	padding-top: 40px;
+	display: none;
+	text-align: left;
+}
+
+.trpItemDetails {
+	padding: 8px 0 8px 0;
+	font-family: 'Open Sans';
+	font-size: 14px;
+	color: #333;
+	display: inline-block;
+	width: 224px;
+}
+
+.trpDetailViewClose {
+  display: inline-block;
+	background-color: @trpGreen;
+	position: absolute;
+	right: 40px;
+	text-align: center;
+	.trpBodySmall;
+	padding: 4px 6px;
+	letter-spacing: 1px;
+}
+
+.login-content {
+	width: 100%;
+}
+
+.frame-people {
+	overflow: auto;
+}
+
+.frame-people .view {
+	float: left;
+}
+
+.notification-center {
+	width: 280px;
+	position: fixed;
+	bottom: 50px;
+	z-index: 1500;
+}
+
+.notification {
+	padding: 8px;
+	background: @trpGreen;
+	color: white;
+	.trpBodyMedium;
+	text-align: left;
+	margin: 1px;
+}
+
+.notification a {
+	color: inherit;
+}
+
+.notification a:hover {
+	text-decoration: none;
+}
+
+.notification-header {
+	.trpBodyMedium;
+}
+
+.notification-text {
+	.trpBodySmall;
+}
+
+.notification-error {
+	background: #a44;
+}
+
+.qq-upload-list {
+	bottom: 24px;
+}
+
+
+
+
+

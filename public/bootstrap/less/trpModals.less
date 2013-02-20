@@ -3,12 +3,24 @@
 
 .trpModalHeader {
   padding: 4px 8px 8px 16px;
-  height: 60px;
+  height: 44px;
+  display: block;
 }
 
 .trpModalLogo {
   float: left;
+  padding-top: 8px;
+}
+
+.trpModalTitleHeader {
+  float: left;
   padding-top: 12px;
+  .trpH2;
+  color: @trpDarkGrey;
+}
+
+.trpModalMenu {
+    display: block;
 }
 
 .trpModalMenu > a {
@@ -25,27 +37,31 @@
 }
 
 .trpModalTitle {
-  .trpH2;
-  color: @trpDarkGrey;
   padding-bottom: 12px;
+  .trpH3;
+  color: @trpDarkGrey;
+  display: block;
 }
 
 .trpModalBody {
   .trpBodyText;
   color: @trpDarkGrey;
   padding-bottom: 12px;
+  display: block;
 }
 
 .trpModalFailure {
   background-color: @trpRed;
   margin: 0px -24px 0px -24px;
   padding: 16px 24px 16px 24px;
+  display: block;
 }
 
 .trpModalSubtext {
   .trpBodySmall;
   color: @trpDarkGrey;
   padding: 0px 0px 20px 0px;
+  display: block;
 }
 
 .trpModalFailureText {
@@ -60,6 +76,7 @@
 
 .trpModalProfile {
   text-align: center;
+  display: block;
 }
 
 .trpModalProfilePic {
@@ -77,6 +94,7 @@
   margin: 12px -24px 0px -24px;
   padding: 16px 24px 16px 24px;
   cursor: pointer;
+  display: block;
 }
 
 /* Bootstrap overrides*/ 
@@ -89,8 +107,12 @@
 
 .modal {
   border-radius: 0px;
-   max-height: 600px;
+   max-height: 80%;
    overflow: hidden;
+}
+
+body.modal-open {
+    overflow: hidden;
 }
 
 
@@ -110,6 +132,7 @@
 .modal-header {
   border-radius: 0px;
   padding: 5px 10px;
+  display: block;
 }
 
 .modal-footer {
@@ -117,6 +140,8 @@
 }
 
 .modal-body {
-  position: relative;
   padding: 24px 24px 0px 24px;
+  max-height: 400px;
+  overflow-y: auto;
+  display: block;
 }

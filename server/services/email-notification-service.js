@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 /*global console:false, require: true, module: true */
 "use strict";
 
@@ -8,17 +8,34 @@ var emailDomain = nconf.get("email:domain");
 var emailDomainWithAt = "@" + emailDomain;
 
 module.exports = {
-  sendConfirmationForExistingUser: function (user, troupe) {
-    var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri;
+  sendNewTroupeForExistingUser: function (user, troupe) {
+    var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri + "#|shareTroupe";
 
     mailerService.sendEmail({
-      templateFile: "signupemail_existing",
+      templateFile: "newtroupe_email",
       to: user.email,
       from: 'signup-robot' + emailDomainWithAt,
       subject: "You created a new Troupe",
       data: {
         troupeName: troupe.name,
         troupeLink: troupeLink
+      }
+    });
+  },
+
+  sendRequestAcceptanceToUser: function(user, troupe) {
+    var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri;
+
+    mailerService.sendEmail({
+      templateFile: "signupemailfromrequest",
+      to: user.email,
+      from: 'signup-robot' + emailDomainWithAt,
+      subject: "You've been accepted into a troupe",
+      data: {
+        troupeName: troupe.name,
+        // note: this is not really a confirm link, just a link to the troupe
+        confirmLink: troupeLink,
+        baseServerPath: nconf.get("web:basepath")
       }
     });
   },
@@ -37,7 +54,7 @@ module.exports = {
     });
   },
 
-  sendConfirmationforNewUserRequest: function(user, troupe) {
+  sendConfirmationForNewUserRequest: function(user, troupe) {
     var confirmLink = nconf.get("web:basepath") + "/confirm/" + user.confirmationCode;
     mailerService.sendEmail({
       templateFile: "signupemailfromrequest",
@@ -46,7 +63,8 @@ module.exports = {
       subject: "Welcome to Troupe",
       data: {
         troupeName: troupe.name,
-        confirmLink: confirmLink
+        confirmLink: confirmLink,
+        baseServerPath: nconf.get("web:basepath")
       }
     });
   },
@@ -60,7 +78,8 @@ module.exports = {
       subject: "Welcome to Troupe",
       data: {
         troupeName: troupe.name,
-        confirmLink: confirmLink
+        confirmLink: confirmLink,
+        baseServerPath: nconf.get("web:basepath")
       }
     });
   },

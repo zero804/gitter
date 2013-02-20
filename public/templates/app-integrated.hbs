@@ -1,0 +1,156 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+	<meta charset="utf-8">
+
+	<title>{{troupeName}} - Troupe</title>
+
+  <link rel="stylesheet" href='{{cdn "bootstrap/css/trp3.css" }}'>
+  <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/edpmlaohjokcmefhjghaeeikjjcjplmi">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href='{{cdn "images/2/favicon8.ico" }}'>
+    {{>load_font_css}}
+
+</head>
+<body>
+
+  <div class="trpLeftMenuHotspot" id="left-menu-hotspot"></div>
+
+  <div class="trpLeftMenu" id="left-menu">
+    <div class="trpLeftMenuToolbar">
+      <ul class="trpLeftMenuToolbarItems">
+        <!--<li><img src='{{cdn "images/2/icon-recent.png"}}' class="left-menu-icon" id="icon-recent" data-list="list-recent" width="24" height="24"></li>-->
+        <li><img src='{{cdn "images/2/icon-troupes.png"}}' class="left-menu-icon selected" id="icon-troupes" data-list="list-troupes" width="24" height="24"></li>
+        <li><img src='{{cdn "images/2/icon-user.png"}}' class="left-menu-icon" id="icon-user" data-list="list-users" width="24" height="24"></li>
+        <!--<li><img src='{{cdn "images/2/icon-search.png"}}' class="left-menu-icon" id="icon-search" data-list="list-search" width="24" height="24"></li>-->
+      </ul>
+    </div>
+    <div class="nano" id="left-menu-scroll">
+      <div class="content trpLeftMenuWrapper">
+        <!--<div class="trpToolbarList" style="display:none" id="list-recent">
+          <div class="trpToolbarHeader">Recent</div>
+          <ul class="trpRecentList" id="left-menu-list-recent">
+          </ul>
+        </div>-->
+        <div class="trpToolbarList" style="" id="list-troupes">
+          <div class="trpToolbarHeader">All your Troupes</div>
+          <ul class="trpTroupeList" id="left-menu-list">
+          </ul>
+          <a href="#|create"><div class="trpNewTroupeButton">Start a new Troupe</div><div class="trpLeftMenuSpacer"></div></a>
+        </div>
+        <div class="trpToolbarList" style="display:none" id="list-users">
+          <div class="trpToolbarHeader">Private Chats</div>
+          <ul class="trpTroupeList" id="left-menu-list-users">
+          </ul>
+        </div>
+        <!--<div class="trpToolbarList" style="display:none" id="list-search">
+          <div class="trpToolbarHeader">Search</div>
+          <div class="trpTroupeListSearch"><input type="text" class="trpInputSmall" id="list-search-input"></div>
+          <ul class="trpTroupeList" id="left-menu-list-search">
+          </ul>
+        </div>-->
+      </div>
+    </div>
+  </div>
+
+  <div class="trpMenuTab" id="menu-toggle-button"><img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle">
+    <div class="trpUnreadBadge" id="unread-badge"><div class="trpUnreadBadgeCount"></div></div>
+  </div>
+
+
+  <div class="trpHeaderWrapper" id="header-wrapper">
+    <div class="trpHeaderContainer" id="header-frame">
+      <div class="trpHeaderTitle">
+        {{troupeName}}
+      </div>
+      <div class="trpHeaderToolbar" id="header-region">
+      </div>
+    </div>
+  </div>
+
+  <div class="trpAlertWrapper" id="alert-panel">
+    <div class="trpAlertContainer">
+      <div class="trpAlertContent" id="alert-content">
+      </div>
+    </div>
+  </div>
+
+<div class="trpContentPanel" id="content-frame">
+  <div class="trpContentSpacer"></div>
+  <div class="trpChatPanel" id="chat-frame">
+    <div class="trpChatInputArea" id="chat-input">
+    </div>
+    <div id="frame-chat">
+    </div>
+  </div>
+  <div class="trpToolbar" id="toolbar-frame">
+    <div class="nano">
+      <div class="content">
+        <div class="trpToolbarContent" id="toolbar-content">
+          <div class="trpToolbarList" id="request-roster" style="display: none;"></div>
+          <div class="trpToolbarHeader" id="people-header">People</div>
+          <div class="trpToolbarList" id="people-roster"></div>
+          <div class="trpToolbarHeader" id="file-header">Files</div>
+          <div class="trpToolbarList" id="file-list"></div>
+          {{#if troupeContext.troupe.oneToOne}}
+          <div class="trpToolbarHeader" id="mail-header">Mails</div>
+          {{/if}}
+          <div class="trpToolbarList" id="mail-list"></div>
+          <div class="trpToolbarSpacer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  <div class="trpRightPanel" id="right-panel">
+    <div class="trpImageBigThumbnail" id="image-preview">
+    </div>
+    <div class="trpFileDetails">
+      <div class="trpButtonGreen">Download</div>
+    </div>
+  </div>
+
+<script type="text/javascript">
+  window.troupeContext = {{{troupeContext}}};
+  {{#if data}}
+  window.troupePreloads = {{{data}}};
+  {{/if}}
+</script>
+
+{{>require_wrapper}}
+
+{{#login}}
+  {{{bootScript "router-login" }}}
+{{/login}}
+
+{{^login}}
+  {{{bootScript "app-integrated" }}}
+{{/login}}
+
+
+<script type="text/javascript">
+  var uvOptions = {};
+  (function() {
+    var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+    uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/BYBA0YJRpGVi5zrb99UoHQ.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+  })();
+</script>
+
+</body>
+</html>

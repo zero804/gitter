@@ -4,17 +4,13 @@
   .trpBodySmall;
   padding: 5px 10px 5px 10px;
   display: inline-block;
-  -webkit-border-radius:3px;
-  -moz-border-radius:3px;
-  border-radius:3px;
+  border-radius:0px;
   background-color: white;
   cursor: pointer;
 }
 
 .trpButtonBig {
-  -webkit-border-radius:3px;
-  -moz-border-radius:3px;
-  border-radius:3px;
+  border-radius:0px;
   padding: 14px 8px 14px 8px;
   text-align: center;
   min-width: 76px;
@@ -43,3 +39,37 @@
   background-color: @trpDarkGrey;
   color: white;
 }
+
+.trpCopyButton {
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 4px;
+  padding: 3px 10px 4px 10px;
+}
+
+.trpCircleButton {
+  display: inline-block;
+  background-color: @trpDarkCream;
+  text-align: center;
+  .trpBodySmall;
+  color: white;
+  position: relative;
+  min-height: 48px;
+  min-width: 48px;
+  border-radius: 50em;
+  border: 2px solid white;
+  float: left;
+}
+
+.trpSmallButton {
+  background-color: @trpDarkCream;
+}
+
+.trpAddButton {
+  vertical-align: top;  
+}
+
+.trpCircleButtonText {
+  padding-top: 26px;
+}
+

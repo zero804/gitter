@@ -1,4 +1,5 @@
-// Filename: views/home/main
+/*jshint unused:true browser:true*/
+
 define([
   'jquery',
   'underscore',

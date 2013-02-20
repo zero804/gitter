@@ -1,9 +1,7 @@
-/*jslint node: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var persistence = require("./persistence-service"),
-    uuid = require('node-uuid'),
-    console = require('console'),
     winston = require('winston');
 
 function findConversation(options, callback) {
@@ -14,7 +12,7 @@ function findConversation(options, callback) {
 
   persistence.Conversation
         .where('troupeId', troupeId)
-        .where('emails.messageId', inReplyTo)
+        .where('emails.messageIds', inReplyTo)
         .limit(1)
         .sort({ updated: 'desc' })
         .exec(function(err, results) {
@@ -24,7 +22,7 @@ function findConversation(options, callback) {
         });
 }
 
-function storeEmailInConversation(options, callback) {
+exports.storeEmailInConversation = function(options, callback) {
   var troupeId = options.troupeId;
   var subject = options.subject;
   var date = options.date;
@@ -32,7 +30,6 @@ function storeEmailInConversation(options, callback) {
   var preview = options.preview;
   var attachments = options.attachments;
   var fromUserId = options.fromUserId;
-  var inReplyTo = options.inReplyTo;
 
   var storeMail = new persistence.Email();
   storeMail.fromUserId = fromUserId;
@@ -54,7 +51,7 @@ function storeEmailInConversation(options, callback) {
       conversation.troupeId = troupeId;
       conversation.updated = Date.now();
       conversation.subject = subject;
-      conversation.emails = [storeMail];
+      conversation.pushEmail(storeMail);
 
       conversation.save(function(err) {
           if (err) return callback(err);
@@ -67,43 +64,41 @@ function storeEmailInConversation(options, callback) {
     winston.info("Updating existing conversation");
     conversation.subject = subject;
     conversation.updated = Date.now();
-    conversation.emails.push(storeMail);
+    conversation.pushEmail(storeMail);
     conversation.save(function(err) {
         if (err) return callback(err);
         callback(null, conversation, storeMail);
     });
   });
-}
+};
 
-function updateEmailWithMessageId(conversationId, emailId, messageId, callback) {
+exports.updateEmailWithMessageIds = function(conversationId, emailId, messageIds, callback) {
 
   persistence.Conversation.findById(conversationId, function(err, conversation) {
     if(err) return callback(err);
+    if(!conversation) return callback("Conversation #" + conversationId + " does not exist.");
 
-    conversation.emails.filter(function(i) { return i.id == emailId; }).forEach(function(i) { i.messageId = messageId; });
+    conversation.emails
+      .filter(function(i) { return i.id == emailId; })
+      .forEach(function(i) { i.messageIds = messageIds; });
+
     conversation.save(function(err) {
         if (err) return callback(err);
         callback(null);
     });
   });
 
-}
+};
 
-function findByTroupe(id, callback) {
+exports.findByTroupe = function (id, callback) {
   persistence.Conversation
     .where('troupeId', id)
     .sort({ updated: 'desc' })
     .slaveOk()
     .exec(callback);
-}
-
-function findById(id, callback) {
-  persistence.Conversation.findById(id, callback);
-}
-
-module.exports = {
-  storeEmailInConversation: storeEmailInConversation,
-  updateEmailWithMessageId: updateEmailWithMessageId,
-  findByTroupe: findByTroupe,
-  findById: findById
 };
+
+exports.findById = function (id, callback) {
+  persistence.Conversation.findById(id, callback);
+};
+

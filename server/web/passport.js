@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 /*global console:false, require: true, module: true, process: false */
 "use strict";
 
@@ -13,6 +13,7 @@ var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy
 var BearerStrategy = require('passport-http-bearer').Strategy;
 var oauthService = require('../services/oauth-service');
 var statsService = require("../services/stats-service");
+var nconf = require('../utils/config');
 
 function emailPasswordUserStrategy(email, password, done) {
   winston.debug("Attempting to authenticate ", { email: email });
@@ -78,8 +79,8 @@ module.exports = {
       done(null, user.id);
     });
 
-    passport.deserializeUser(function(id, done) {
-      userService.findById(id, function(err, user) {
+    passport.deserializeUser(function deserializeUserCallback(id, done) {
+      userService.findById(id, function findUserByIdCallback(err, user) {
         if(err) return done(err);
         if(!user) return done(null, false);
 
@@ -114,13 +115,13 @@ module.exports = {
               if(troupes.length) {
                 return self.redirect("/" + troupes[0].uri);
               } else {
-                return self.redirect("/x");
+                return self.redirect(nconf.get('web:homeurl'));
               }
             });
           }
 
           troupeService.findById(user.lastTroupe, function(err, troupe) {
-            if(err || !troupe) return self.redirect("/x");
+            if(err || !troupe) return self.redirect(nconf.get('web:homeurl'));
 
             return self.redirect("/" + troupe.uri);
           });
@@ -150,7 +151,10 @@ module.exports = {
 
         winston.debug("Invite accepted", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
 
-        userService.findOrCreateUserForEmail({ displayName: invite.displayName, email: invite.email, status: "PROFILE_NOT_COMPLETED" }, function(err, user) {
+        userService.findOrCreateUserForEmail({
+          displayName: invite.displayName,
+          email: invite.email,
+          status: "PROFILE_NOT_COMPLETED" }, function(err, user) {
           return done(null, user);
         });
 

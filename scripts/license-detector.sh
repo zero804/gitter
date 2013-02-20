@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 for i in `find .. -name LICENSE|sed -E 's/.*\/([^/]+)\/LICENSE/\1/'|sort -u`; do
 	file=`find .. -name LICENSE|grep /$i/|head -1`
