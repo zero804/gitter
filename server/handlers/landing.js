@@ -1,14 +1,19 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
+
+var nconf = require('../utils/config');
+var middleware = require('../web/middleware');
 
 module.exports = {
     install: function(app) {
-      app.get(
-        '/',
-        function(req, res) {
-          res.render('landing');
-        }
-      );
+      if (nconf.get('web:homeurl') !== '/') {
+        app.get(
+          '/',
+          middleware.grantAccessForRememberMeTokenMiddleware,
+          function(req, res) {
+            res.render('landing');
+          }
+        );
+      }
     }
 };

@@ -1,8 +1,7 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
-var passport = require("passport"),
+var loginUtils = require("../web/login-utils"),
     winston = require("winston"),
     nconf = require('../utils/config'),
     troupeService = require("../services/troupe-service"),
@@ -48,12 +47,10 @@ function handleJsonLogin(req, res) {
 
 module.exports = {
     install: function(app) {
-      var basepath = nconf.get("web:basepath");
-
       app.post('/login',
         middleware.authenticate('local', { failureRedirect: '/login' }),
-        middleware.rememberMe,
-        function(req, res, next) {
+        middleware.generateRememberMeTokenMiddleware,
+        function(req, res) {
 
           if(req.accepts(['html', 'json']) === 'json')
             return handleJsonLogin(req, res);
@@ -86,28 +83,17 @@ module.exports = {
       });
 
       app.get('/reset/:confirmationCode',
-        middleware.authenticate('passwordreset', { failureRedirect: '/password-reset-failed' } ),
+        middleware.authenticate('passwordreset', { failureRedirect: nconf.get('web:homeurl') + '#passwordResetFailed=true' } ),
         function(req, res, next) {
-          res.relativeRedirect("/select-troupe");
+          loginUtils.redirectUserToDefaultTroupe(req, res, next);
         });
 
+      // Deprecated. Use the loginUtils.redirectUserToDefaultTroupe instead of
+      // redirecting users here. Delete by 28 Feb 2013
       app.get('/select-troupe',
         middleware.ensureLoggedIn(),
-        function(req, res) {
-          if (req.user.lastTroupe) {
-            troupeService.findById(req.user.lastTroupe, function (err,troupe) {
-              if (err) troupe = null;
-              res.redirect('/' + troupe.uri);
-            });
-          }
-
-          else {
-            userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
-              if (err) troupe = null;
-              res.redirect('/' + troupe.uri);
-            });
-          }
-
+        function(req, res, next) {
+          loginUtils.redirectUserToDefaultTroupe(req, res, next);
         });
 
     }

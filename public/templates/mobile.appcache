@@ -1,0 +1,11 @@
+CACHE MANIFEST
+# Time: Mon Feb 11 2013 14:03:00 GMT+0200 (SAST)
+
+
+
+NETWORK:
+*
+/*
+//*
+http://*
+https://*

@@ -1,8 +1,9 @@
-/*jslint node: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var nconf = require('../utils/config');
 var fs = require("fs");
+var appVersion = require('./appVersion');
 
 var cdnId = -1;
 var hosts, hostLength, cdnPrefix;
@@ -42,12 +43,7 @@ if(!useCdn) {
   if(cdnPrefix) {
     cdnPrefix = "/" + cdnPrefix;
   } else {
-    var cdnPrefixFile = nconf.get("cdn:prefixFile");
-    if(cdnPrefixFile) {
-        cdnPrefix = "/s/" + ("" + fs.readFileSync(cdnPrefixFile)).trim();
-    } else {
-      cdnPrefix = "";
-    }
+    cdnPrefix = appVersion.getCurrentVersion();
   }
 
   if(hostLength > 1) {

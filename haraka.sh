@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-node-dev $DIR/node_modules/.bin/haraka -c $DIR/haraka
+node $DIR/node_modules/Haraka/bin/haraka -c $DIR/haraka
 

@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 /*global require: true, module: true */
 
 "use strict";

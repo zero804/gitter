@@ -1,15 +1,14 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true, process: false */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var events = require('events');
 
 var winston = require('winston');
-var _ = require('underscore');
-var redis = require('redis');
+var redis = require('./utils/redis');
 var client = redis.createClient();
 var pubClient = redis.createClient();
 var eventEmitter = new events.EventEmitter();
+var localEventEmitter = new events.EventEmitter();
 
 var subscriptions = {};
 
@@ -18,10 +17,12 @@ client.on("message", function (channel, message) {
 });
 
 function emit(event, data) {
+  localEventEmitter.emit(event, data);
   pubClient.publish(event, JSON.stringify(data));
 }
 
-function on(event, callback) {
+// Listen for system-wide events
+function onRemote(event, callback) {
   if(!subscriptions[event]) {
     client.subscribe(event);
 
@@ -38,120 +39,125 @@ function on(event, callback) {
   });
 }
 
-module.exports = {
-  unreadRecalcRequired: function() {
-    emit('unreadRecalcRequired', true);
-  },
+// Listen to local-events only
+function onLocalOnly(event, callback) {
+  localEventEmitter.on(event, function(message) {
+    try {
+      callback(message);
+    } catch(e) {
+      winston.error("Appevent handler failed with error", { exception: e });
+      console.error(e.stack);
+    }
+  });
+}
 
-  onUnreadRecalcRequired: function(callback) {
-    on('unreadRecalcRequired', callback);
-  },
+function bind(on) {
+  return {
+    unreadRecalcRequired: function() {
+      emit('unreadRecalcRequired', true);
+    },
+
+    onUnreadRecalcRequired: function(callback) {
+      on('unreadRecalcRequired', callback);
+    },
 
 
-  newUnreadItem: function(userId, troupeId, items) {
-    emit('newUnreadItem', {
-      userId: userId,
-      troupeId: troupeId,
-      items: items
-    });
-  },
+    newUnreadItem: function(userId, troupeId, items) {
+      emit('newUnreadItem', {
+        userId: userId,
+        troupeId: troupeId,
+        items: items
+      });
+    },
 
-  onNewUnreadItem: function(callback) {
-    on('newUnreadItem', callback);
-  },
+    onNewUnreadItem: function(callback) {
+      on('newUnreadItem', callback);
+    },
 
 
-  unreadItemsRemoved: function(userId, troupeId, items) {
-    emit('unreadItemRemoved', {
-      userId: userId,
-      troupeId: troupeId,
-      items: items
-    });
-  },
+    unreadItemsRemoved: function(userId, troupeId, items) {
+      emit('unreadItemRemoved', {
+        userId: userId,
+        troupeId: troupeId,
+        items: items
+      });
+    },
 
-  onUnreadItemsRemoved: function(callback) {
-    on('unreadItemRemoved', callback);
-  },
+    onUnreadItemsRemoved: function(callback) {
+      on('unreadItemRemoved', callback);
+    },
 
-  troupeUnreadCountsChange: function(data) {
-    console.dir(data);
-    emit('troupeUnreadCountsChange', data);
-  },
+    troupeUnreadCountsChange: function(data) {
+      emit('troupeUnreadCountsChange', data);
+    },
 
-  onTroupeUnreadCountsChange: function(callback) {
-    on('troupeUnreadCountsChange', callback);
-  },
+    onTroupeUnreadCountsChange: function(callback) {
+      on('troupeUnreadCountsChange', callback);
+    },
 
-  userLoggedIntoTroupe: function(userId, troupeId) {
-    emit('userLoggedIntoTroupe', { troupeId: troupeId, userId: userId });
-  },
+    userLoggedIntoTroupe: function(userId, troupeId) {
+      emit('userLoggedIntoTroupe', { troupeId: troupeId, userId: userId });
+    },
 
-  onUserLoggedIntoTroupe: function(callback) {
-    on('userLoggedIntoTroupe', callback);
-  },
+    onUserLoggedIntoTroupe: function(callback) {
+      on('userLoggedIntoTroupe', callback);
+    },
 
-  userLoggedOutOfTroupe: function(userId, troupeId) {
-    emit('userLoggedOutOfTroupe', { troupeId: troupeId, userId: userId });
-  },
+    userLoggedOutOfTroupe: function(userId, troupeId) {
+      emit('userLoggedOutOfTroupe', { troupeId: troupeId, userId: userId });
+    },
 
-  onUserLoggedOutOfTroupe: function(callback) {
-    on('userLoggedOutOfTroupe', callback);
-  },
+    onUserLoggedOutOfTroupe: function(callback) {
+      on('userLoggedOutOfTroupe', callback);
+    },
 
-  troupeChat: function(troupeId, chatMessage) {
-    emit('chat', { troupeId: troupeId, chatMessage: chatMessage });
-  },
+    // Deprecated
+    newNotification: function(troupeId, userId, notificationText, notificationLink) {
+      emit('newNotification', {
+        troupeId: troupeId,
+        userId: userId,
+        notificationText: notificationText,
+        notificationLink: notificationLink
+      });
+    },
 
-  onTroupeChat: function(callback) {
-    on('chat', callback);
-  },
+    // Deprecated
+    onNewNotification: function(callback) {
+      on('newNotification', callback);
+    },
 
-  fileEvent: function(event, options) {
-    emit('file', _.extend(options, { event: event }));
-  },
+    userNotification: function(options) {
+      emit('userNotification',options);
+    },
 
-  onFileEvent: function(callback) {
-    on('file', callback);
-  },
+    // Deprecated
+    onUserNotification: function(callback) {
+      on('userNotification', callback);
+    },
 
-  mailEvent: function(event, troupeId, conversationId, mailIndex) {
-    emit('mail', {
-      event: event,
-      troupeId: troupeId,
-      conversationId: conversationId,
-      mailIndex: mailIndex
-    });
-  },
+    dataChange2: function(url, operation, model) {
+      emit('dataChange2', {
+        url: url,
+        operation: operation,
+        model: model
+      });
+    },
 
-  onMailEvent: function(callback) {
-    on('mail', callback);
-  },
+    onDataChange2: function(callback) {
+      on('dataChange2', callback);
+    },
 
-  newNotification: function(troupeId, userId, notificationText, notificationLink) {
-    emit('newNotification', {
-      troupeId: troupeId,
-      userId: userId,
-      notificationText: notificationText,
-      notificationLink: notificationLink
-    });
-  },
+    userRemovedFromTroupe: function(options) {
+      emit('userRemovedFromTroupe', options);
+    },
 
-  onNewNotification: function(callback) {
-    on('newNotification', callback);
-  },
+    onUserRemovedFromTroupe: function(callback) {
+      on('userRemovedFromTroupe', callback);
+    }
+  };
+}
 
-  dataChange: function(modelName, operation, modelId, troupeId, model) {
-    emit('dataChange', {
-      modelName: modelName,
-      operation: operation,
-      modelId: modelId,
-      troupeId: troupeId,
-      model: model
-    });
-  },
 
-  onDataChange: function(callback) {
-    on('dataChange', callback);
-  }
 
-};
+module.exports = bind(onRemote);
+module.exports.localOnly = bind(onLocalOnly);

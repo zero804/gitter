@@ -1,166 +1,228 @@
-  /* jshint trailing:false browser:true */
-  /* global console */
-  define([
+/*jshint unused:true browser:true*/
+define([
   'jquery',
   'underscore',
-  'backbone'
-], function($, _, Backbone) {
-  /* jshint trailing:false browser:true */
-  /*global console: false, window: false, document: false */
+  'backbone',
+  'components/realtime'
+], function($, _, Backbone, realtime) {
+  /*global console:false */
   "use strict";
 
-  var exports = {
-    Model: Backbone.Model.extend({
-      convertArrayToCollection: function(attr, Collection) {
-        var val = this.get(attr);
-        if(_.isArray(val)) {
-          this.set(attr, new Collection(val, { parse: true }));
-        }
-      },
+  var exports = {};
 
-      set: function(key, value, options) {
-        var attrs, attr, val;
-
-        // Handle both `"key", value` and `{key: value}` -style arguments.
-        if (_.isObject(key) || key == null) {
-          attrs = key;
-          options = value;
-        } else {
-          attrs = {};
-          attrs[key] = value;
-        }
-
-        // Extract attributes and options.
-        if(!options) (options = {});
-        if (!attrs) return this;
-        if (attrs instanceof Backbone.Model) attrs = attrs.attributes;
-        if (options.unset) for (attr in attrs) attrs[attr] = void 0;
-
-        // Run validation.
-        if (!this._validate(attrs, options)) return false;
-
-        // Check for changes of `id`.
-        if (this.idAttribute in attrs) this.id = attrs[this.idAttribute];
-
-        var changes = options.changes = {};
-        var now = this.attributes;
-        var escaped = this._escapedAttributes;
-        var prev = this._previousAttributes || {};
-
-        // For each `set` attribute...
-        for (attr in attrs) {
-          val = attrs[attr];
-
-          // -- This is different from base backbone. If the attr is a collection
-          // -- reset the collection
-          if(now[attr] instanceof Backbone.Collection) {
-            now[attr].reset(val);
-            (options.silent ? this._silent : changes)[attr] = true;
-
-            continue;
-          }
-
-          // If the new and current value differ, record the change.
-          if (!_.isEqual(now[attr], val) || (options.unset && _.has(now, attr))) {
-            delete escaped[attr];
-            (options.silent ? this._silent : changes)[attr] = true;
-          }
-
-          // Update or delete the current value.
-          if(options.unset) { delete now[attr]; } else { now[attr] = val; }
-
-          // If the new and previous value differ, record the change.  If not,
-          // then remove changes for this attribute.
-          if (!_.isEqual(prev[attr], val) || (_.has(now, attr) != _.has(prev, attr))) {
-            this.changed[attr] = val;
-            if (!options.silent) this._pending[attr] = true;
-          } else {
-            delete this.changed[attr];
-            delete this._pending[attr];
-          }
-        }
-
-        // Fire the `"change"` events.
-        if (!options.silent) this.change(options);
-        return this;
+  exports.Model = Backbone.Model.extend({
+    convertArrayToCollection: function(attr, Collection) {
+      var val = this.get(attr);
+      if(_.isArray(val)) {
+        this.set(attr, new Collection(val, { parse: true }));
       }
-    }),
+    },
 
-    LiveCollection: Backbone.Collection.extend({
-      nestedUrl: '',
-      modelName: '',
-      constructor: function(options) {
-        Backbone.Collection.prototype.constructor.call(this, options);
-        _.bindAll(this, 'onDataChange');
+    // Set a hash of model attributes on the object, firing `"change"` unless
+    // you choose to silence it.
+    set: function(key, val, options) {
+      var attr, attrs;
+      if (!key) return this;
+
+      // Handle both `"key", value` and `{key: value}` -style arguments.
+      if (_.isObject(key)) {
+        attrs = key;
+        options = val;
+      } else {
+        (attrs = {})[key] = val;
+      }
+
+      var changes = {};
+      if(!options) options = {};
+      var hasChanges = false;
+
+      // For each `set` attribute...
+      for (attr in attrs) {
+        val = attrs[attr];
+
+        // -- This is different from base backbone. If the attr is a collection
+        // -- reset the collection
+        var currentValue = this.get(attr);
+        if(currentValue instanceof Backbone.Collection) {
+          currentValue.reset(val);
+          this.changed[attr] = val;
+          changes[attr] = true;
+          this.trigger('change:' + attr, this, this.changed[attr]);
+          delete attrs[attr];
+          hasChanges = true;
+        }
+      }
+
+      if(hasChanges) {
+        this.trigger('change', this, options);
+      }
+
+      return Backbone.Model.prototype.set.call(this, attrs, options);
+    }
+
+  });
+
+  // LiveCollection: a collection with realtime capabilities
+  exports.LiveCollection = Backbone.Collection.extend({
+    nestedUrl: '',
+    modelName: '',
+    constructor: function(options) {
+      Backbone.Collection.prototype.constructor.call(this, options);
+
+      _.bindAll(this, 'onDataChange');
+      if(!this.url) {
         this.url = "/troupes/" + window.troupeContext.troupe.id + "/" + this.nestedUrl;
-      },
+      }
 
-      listen: function() {
-        console.log("Listening on datachange:" + this.modelName);
-        $(document).bind('datachange:' + this.modelName, this.onDataChange);
-      },
+    },
 
-      unlisten: function() {
-        $(document).unbind('datachange:' + this.modelName, this.onDataChange);
-      },
+    listen: function() {
+      if(this.subscription) return;
+      var self = this;
 
-      findExistingModel: function(id, newModel) {
-        var existing = this.get(id);
-        if(existing) return existing;
+      this.subscription = realtime.subscribe(this.url, function(message) {
+        self.onDataChange(message);
+      });
 
-        if(this.findModelForOptimisticMerge) {
-          console.log("Looking for a candidate for ", newModel);
+      this.subscription.callback(function() {
+        console.log('Subscription is now active!', arguments);
+      });
 
-          existing = this.findModelForOptimisticMerge(newModel);
-        }
+      this.subscription.errback(function(error) {
+        console.log('Subscription error', error);
+      });
+    },
 
-        return existing;
-      },
+    unlisten: function() {
+      if(!this.subscription) return;
+      this.subscription.cancel();
+      this.subscription = null;
+    },
 
-      onDataChange: function(e, data) {
-        console.log(["onDataChange", {
-          operation: data.operation,
-          id: data.id
-        }]);
+    /* TODO: remove when we upgrade to 0.9.9
+    once: function(ev, callback, context) {
+      var onceFn = function() { this.unbind(ev, onceFn); callback.apply(context || this, arguments); };
+      this.bind(ev, onceFn);
+      return this;
+    }, */
 
-        var operation = data.operation;
-        var id = data.id;
-        var newModel = data.model;
-        var parsed = new this.model(newModel, { parse: true });
+    findExistingModel: function(id, newModel) {
+      var existing = this.get(id);
+      if(existing) return existing;
 
-        console.log("WARNING: as collection stands: ", this.toJSON());
+      if(this.findModelForOptimisticMerge) {
+        console.log("Looking for a candidate for ", newModel);
 
-        var existing = this.findExistingModel(id, parsed);
+        existing = this.findModelForOptimisticMerge(newModel);
+      }
 
-        switch(operation) {
-          case 'create':
-          case 'update':
-            if(existing) {
-              var l = this.length;
-              this.remove(existing);
-              if(this.length !== l - 1) {
-                console.log("Nothing was deleted. This is a problem.");
-              }
+      return existing;
+    },
+
+    onDataChange: function(data) {
+      var operation = data.operation;
+      var newModel = data.model;
+      var id = newModel.id;
+      var parsed = new this.model(newModel, { parse: true });
+
+      var existing = this.findExistingModel(id, parsed);
+
+      switch(operation) {
+        case 'create':
+        case 'update':
+          if(existing) {
+            /*
+            var l = this.length;
+            this.remove(existing);
+            if(this.length !== l - 1) {
+              console.log("Nothing was deleted. This is a problem.");
             }
-
+            */
+            existing.set(newModel);
+          } else {
             this.add(parsed);
-            break;
+          }
 
-          case 'remove':
-            if(existing) {
-              this.remove(existing);
-            }
+          break;
 
-            break;
+        case 'remove':
+          if(existing) {
+            this.remove(existing);
+          }
 
-          default:
-            console.log("Unknown operation " + operation + ", ignoring");
+          break;
 
+        default:
+          console.log("Unknown operation " + operation + ", ignoring");
+
+      }
+    }
+  });
+
+  /* This is a mixin for Backbone.Model */
+  exports.ReversableCollectionBehaviour = {
+
+    setSortBy: function(field) {
+      var reverse = false;
+
+      // Sort by the same field twice switches the direction
+      if(field === this.currentSortByField) {
+        if(field.indexOf("-") === 0) {
+          field = field.substring(1);
+        } else {
+          field = "-" + field;
         }
       }
-    })
+
+      var fieldLookup;
+      if(field.indexOf("-") === 0) {
+        fieldLookup = field.substring(1);
+        reverse = true;
+      } else {
+        fieldLookup = field;
+      }
+
+      var sortByMethod;
+      if (this.sortByMethods && this.sortByMethods[fieldLookup]) {
+        sortByMethod = this.sortByMethods[fieldLookup];
+      } else {
+        sortByMethod = function defaultSortByMethod(model) {
+          return model.get(fieldLookup);
+        };
+      }
+
+      this.currentSortByField = field;
+
+      var comparator = sortByComparator(sortByMethod);
+      if(reverse) {
+        comparator = reverseComparatorFunction(comparator);
+      }
+
+      this.comparator = comparator;
+
+      return this.sort();
+    }
 
   };
+
+  // Used for switching from a single param comparator to a double param comparator
+  function sortByComparator(sortByFunction) {
+    return function(left, right) {
+      var l = sortByFunction(left);
+      var r = sortByFunction(right);
+
+      if (l === void 0) return 1;
+      if (r === void 0) return -1;
+
+      return l < r ? -1 : l > r ? 1 : 0;
+    };
+  }
+
+  function reverseComparatorFunction(comparatorFunction) {
+    return function(left, right) {
+      return -1 * comparatorFunction(left, right);
+    };
+  }
 
   return exports;
 });

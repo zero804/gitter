@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 define([
   'jquery',
   'underscore',
@@ -6,7 +7,6 @@ define([
   '../utils/momentWrapper'
 ], function($, _, Backbone, TroupeCollections, moment) {
   "use strict";
-
   var exports = {};
 
   exports.EmailModel = Backbone.Model.extend({
@@ -26,9 +26,11 @@ define([
   });
 
   /* Private Embedded Collections */
-  exports.EmailCollection = Backbone.Collection.extend({
+  exports.EmailCollection = TroupeCollections.LiveCollection.extend({
     model: exports.EmailModel,
-    initialize: function() {
+    modelName: 'email',
+    initialize: function(options) {
+      this.url = "/troupes/" + window.troupeContext.troupe.id + "/conversations/" + options.id;
     }
 
   });
@@ -40,7 +42,7 @@ define([
     },
 
     initialize: function(options) {
-      this.emailCollection = new exports.EmailCollection();
+      this.emailCollection = new exports.EmailCollection({ id: options.id });
       this.on('change:emails', this.resetEmails, this);
 
       this.url = "/troupes/" + window.troupeContext.troupe.id + "/conversations/" + options.id;

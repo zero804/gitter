@@ -1,10 +1,12 @@
+/*jshint unused:true browser:true*/
 define([
-  'jquery',
   'underscore',
+  'jquery',
   'backbone',
-  'now',
   'handlebars',
-  'hbs'
-], function($,_,Backbone,now,Handlebars,hbs) {
+  'hbs',
+  'bootstrap_tooltip',
+  'marionette'
+], function() {
   return null;
 });

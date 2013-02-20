@@ -1,3 +1,4 @@
+/*jshint unused:true browser:true*/
 require([
   'jquery',
   'underscore',
@@ -5,9 +6,9 @@ require([
   './base-router',
   'views/base',
   'views/login/loginModalView',
-  'views/profile/profileModalView',
+  'views/profile/profileView',
   'views/login/loginRequestModalView'
-], function($, _, Backbone, BaseRouter, TroupeViews, LoginModalView, ProfileModalView, RequestModalView) {
+], function($, _, Backbone, BaseRouter, TroupeViews, LoginModalView, profileView, RequestModalView) {
   "use strict";
 
   var AppRouter = BaseRouter.extend({
@@ -15,52 +16,60 @@ require([
       '*actions': 'defaultAction'
     },
 
-    defaultAction: function(actions) {
+    defaultAction: function(/*actions*/) {
       $('#primary-view').html('');
-      var view, modal;
 
-      function createLoginModal(email) {
+      var view, modal, loginModal, requestModal;
+
+      function getLoginModal(email) {
         var loginView = new LoginModalView( { email: email });
-        var loginModal = new TroupeViews.Modal({ view: loginView, disableClose: true });
-        loginView.on('login.complete', function(data) {
-          loginView.off('login.complete');
-          window.location.href = data.redirectTo;
+        loginModal = new TroupeViews.Modal({ view: loginView, disableClose: true });
+        loginView.once('login.complete', function() {
+          window.location.reload();
         });
+        loginModal.view.on('request.access', function() {
+          getRequestModal();
+          loginModal.transitionTo(requestModal);
+        });
+
         return loginModal;
+      }
+
+      function getRequestModal() {
+        requestModal = new TroupeViews.Modal({ view: new RequestModalView({ }), disableClose: true });
+        requestModal.view.on('request.login', function() {
+          getLoginModal("");
+          requestModal.transitionTo(loginModal);
+        });
+
+        return requestModal;
       }
 
       /* Is a user logged in? */
       if(!window.troupeContext.user) {
         if (window.localStorage.defaultTroupeEmail) {
-          var modal1 = createLoginModal(window.localStorage.defaultTroupeEmail);
-          modal1.show();
+          // show the login dialog
+          getLoginModal(window.localStorage.defaultTroupeEmail);
+          loginModal.show();
           return;
         }
+        else {
+          // show the request access modal
+          getRequestModal();
 
-        view = new RequestModalView({ });
-        modal = new TroupeViews.Modal({ view: view, disableClose: true });
-
-        view.on('request.login', function(data) {
-          modal.off('request.login');
-          if (!data) data = {};
-          var loginModal = createLoginModal("");
-          modal.transitionTo(loginModal);
-        });
-
-        modal.show();
-        return;
+          requestModal.show();
+          return;
+        }
       }
 
       if(window.troupeContext.profileNotCompleted) {
-        view = new ProfileModalView();
-        modal = new TroupeViews.Modal({ view: view, disableClose: true  });
+        view = new profileView.Modal({ disableClose: true  });
 
-        view.on('profile.complete', function(data) {
-          modal.off('profile.complete');
-          modal.close();
+        view.once('close', function() {
+          //modal.close();
           window.location.reload(true);
         });
-        modal.show();
+        view.show();
         return;
       }
 

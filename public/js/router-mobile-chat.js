@@ -1,45 +1,47 @@
+/*jshint unused:true browser:true*/
 require([
   'jquery',
   'underscore',
   'backbone',
-  './base-router',
   'views/base',
-  'components/chat/chat-component',
+  'collections/chat',
+  'views/chat/chatInputView',
+  'views/chat/chatCollectionView',
+  'views/widgets/avatar',
   'components/unread-items-client'
-], function($, _, Backbone, BaseRouter, TroupeViews, chat, unreadItemsClient) {
+], function($, _, Backbone, TroupeViews, chatModels, ChatInputView, ChatCollectionView, AvatarWidget, unreadItemsClient) {
   "use strict";
 
-  var AppRouter = BaseRouter.extend({
-    initialize: function() {
-      chat.connect();
-    },
-
-    defaultAction: function(actions){
-      this.showChatView();
-    },
-
-    showChatView: function() {
-      this.navIcon('#chat-icon');
-      this.showAsync('views/chat/chatView');
-    }
-
+  TroupeViews.preloadWidgets({
+    avatar: AvatarWidget
   });
 
-  var troupeApp = new AppRouter();
+    // Setup the ChatView
+  var chatCollection = new chatModels.ChatCollection();
+  chatCollection.setSortBy('-sent');
+  chatCollection.listen();
+  chatCollection.reset(window.troupePreloads['chatMessages'], { parse: true });
+  if (window.noupdate) {
+    chatCollection.fetch();
+  }
 
-  // THESE TWO LINES WILL NOT REMAIN HERE FOREVER
-  //$('.dp-tooltip').tooltip();
-  //$('.chat-bubble').tooltip();
+  unreadItemsClient.installTroupeListener();
 
-  window.troupeApp = troupeApp;
-  Backbone.history.start();
+  new ChatInputView({
+    el: $('#chat-input'),
+    collection: chatCollection
+  }).render();
+
+  new ChatCollectionView({
+    el: $('#frame-chat'),
+    collection: chatCollection
+  }).render();
 
   // Asynchronously load tracker
   require([
     'utils/tracking'
-  ], function(tracking) {
+  ], function() {
     // No need to do anything here
   });
 
-  return troupeApp;
 });

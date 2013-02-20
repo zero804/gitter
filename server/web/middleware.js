@@ -1,4 +1,4 @@
-/*jslint node: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var passport = require("passport"),
@@ -53,7 +53,7 @@ exports.ensureLoggedIn = function(options) {
 
 };
 
-exports.logout = function(options) {
+exports.logout = function() {
   return function(req, res, next) {
     req.logout();
     res.clearCookie("auth");
@@ -98,7 +98,10 @@ exports.authenticate = function(scheme, options) {
   };
 };
 
-exports.rememberMe = function(req, res, next) {
+exports.grantAccessForRememberMeTokenMiddleware = rememberMe.rememberMeMiddleware(/* No Options */);
+
+
+exports.generateRememberMeTokenMiddleware = function(req, res, next) {
   if(req.body.rememberMe) {
     rememberMe.generateAuthToken(req, res, req.user.id, {}, function(err) {
       if(err) return next(err);

@@ -1,17 +1,18 @@
+/*jshint unused:true browser:true*/
 define([
   'jquery',
   'underscore',
   'backbone',
-  'hbs!./modal',
-  '../template/helpers/all'
-], function($, _, Backbone, modalTemplate, helpers) {
+  'hbs!./tmpl/modal',
+  '../template/helpers/all',
+  'hbs!./tmpl/confirmationView'
+], function($, _, Backbone, modalTemplate, helpers, confirmationViewTemplate) {
   /*jshint trailing:false */
   /*global require:true console:true setTimeout:true*/
   "use strict";
 
   /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
   Backbone.View.prototype.close = function () {
-    console.log('Closing view ' + this);
     if (this.beforeClose) {
       this.beforeClose();
     }
@@ -24,6 +25,18 @@ define([
   /* Use the compact views */
   var compactView = window.navigator.userAgent.indexOf("Mobile/") !== -1;
 
+  /* This value is used by the dialogFragment Handlebars helper */
+  window._troupeCompactView = compactView;
+
+  var cachedWidgets = {};
+  TroupeViews.preloadWidgets = function(widgets) {
+    var keys = _.keys(widgets);
+    _.each(keys, function(key) {
+      var value = widgets[key];
+      cachedWidgets[key] = value;
+    });
+  };
+
   TroupeViews.Base = Backbone.View.extend({
     template: null,
     autoClose: true,
@@ -33,6 +46,20 @@ define([
       Backbone.View.prototype.constructor.apply(this, arguments);
       if(!options) options = {};
       if(options.template) this.template = options.template;
+
+      var self = this;
+      this.addCleanup(function() {
+        self.stopListening();
+      });
+    },
+
+    setRerenderOnChange: function() {
+      this.listenTo(this.model, 'change', this.rerenderOnChange);
+    },
+
+    rerenderOnChange: function() {
+      this.removeSubViews(this.$el);
+      this.render();
     },
 
     addCleanup: function(callback) {
@@ -45,6 +72,10 @@ define([
     },
 
     getRenderData: function() {
+      if (this.data) {
+        return this.data;
+      }
+
       if (this.model) {
         return this.model.toJSON();
       }
@@ -57,23 +88,46 @@ define([
     },
 
     renderInternal: function(data) {
-      function replaceElementWithWidget(element, options) {
-          require(['views/widgets/' + options.widgetName], function(Widget) {
-            var widget = new Widget(options.model);
-            widget.render();
-            $(element).replaceWith(widget.el);
-          });
+      function replaceElementWithWidget(element, Widget, options) {
+          var widget = new Widget(options.model);
+          widget.render();
+          $(element).replaceWith(widget.el);
       }
 
 
       var dom = $(this.template(data));
+      dom.addClass("view");
+
       if(data.renderViews) {
         dom.find('view').each(function () {
           var id = this.getAttribute('data-id'),
           attrs = data.renderViews[id];
-          replaceElementWithWidget(this, attrs);
+          var self = this;
+          var CachedWidget = cachedWidgets[attrs.widgetName];
+          if(CachedWidget) {
+            replaceElementWithWidget(this, CachedWidget, attrs);
+          } else {
+            require(['views/widgets/' + attrs.widgetName], function(Widget) {
+              cachedWidgets[attrs.widgetName] = Widget;
+              replaceElementWithWidget(self, Widget, attrs);
+            });
+          }
         });
       }
+
+      if(this.model && this.unreadItemType) {
+        var id = this.model.get('id');
+        if(!id) id = this.model.cid;
+
+        dom.addClass('model-id-' + id);
+        if(this.model.get('unread')) {
+          dom.addClass('unread');
+          dom.data('itemId', id);
+          dom.data('itemType', this.unreadItemType);
+          $(document).trigger('unreadItemDisplayed');
+        }
+      }
+
       this.$el.html(dom);
       return dom;
     },
@@ -84,26 +138,8 @@ define([
         data.compactView = compactView;
       }
 
-      var dom = this.renderInternal(data);
-      if(this.model) {
-        var id = this.model.get('id');
-        if(!id) id = this.model.cid;
-        var e = this.$el;
-
-        e.addClass('model-id-' + id);
-        if(this.model.get('unread')) {
-          e.addClass('unread');
-          e.data('itemId', id);
-          if(this.unreadItemType) {
-            e.data('itemType', this.unreadItemType);
-            console.log("itemType", this.unreadItemType);
-          }
-        }
-      }
-
+      this.renderInternal(data);
       if(this.afterRender) { this.afterRender(data); }
-
-      this.$el.addClass("view");
 
       // Bit dodgy this next line as it could cause IE circular ref problems
       this.el._view = this;
@@ -145,24 +181,25 @@ define([
         fade: true,
         autoRemove: true,
         menuItems: [],
-        disableClose: false
+        disableClose: false,
+        title: null,
+        navigable: false
       };
       _.bindAll(this, 'hide', 'onMenuItemClicked');
       _.extend(this.options, options);
 
       this.view = this.options.view;
-      this.view.dialog = this;
     },
 
     getRenderData: function() {
       return {
-        title: "Modal",
+        customTitle: !!this.options.title,
+        title: this.options.title,
         disableClose: this.options.disableClose
       };
     },
 
     onMenuItemClicked: function(id) {
-      console.log("Menu Item ", id);
       this.view.trigger('menuItemClicked', id);
     },
 
@@ -209,7 +246,19 @@ define([
       }
     },
 
+    supportsModelReplacement: function() {
+      return this.view &&
+              this.view.supportsModelReplacement &&
+              this.view.supportsModelReplacement();
+    },
+
+    replaceModel: function(model) {
+      return this.view.replaceModel(model);
+    },
+
     show: function() {
+      this.view.dialog = this;
+
       var that = this;
       if (this.isShown) return;
 
@@ -232,7 +281,7 @@ define([
         that.$el.show();
 
         if (transition) {
-          that.$el[0].offsetWidth; // force reflow
+          var o = that.$el[0].offsetWidth; // force reflow
         }
 
         that.$el.addClass('in');
@@ -251,7 +300,28 @@ define([
 
     hide: function ( e ) {
       if(e) e.preventDefault();
+      if(this.navigable) {
+        var hash = window.location.hash;
+        var currentFragment;
+        if(!hash) {
+          currentFragment = '#';
+        } else {
+          currentFragment = hash.split('|', 1)[0];
+        }
 
+        window.location = currentFragment;
+        return;
+      }
+      this.hideInternal();
+    },
+
+    /* Called after navigation to close an navigable dialog box */
+    navigationalHide: function() {
+      this.options.fade = false;
+      this.hideInternal();
+    },
+
+    hideInternal: function() {
       if (!this.isShown) return;
 
       var that = this;
@@ -330,7 +400,7 @@ define([
         }
         this.$backdrop.modal = this;
 
-        if (doAnimate) { this.$backdrop[0].offsetWidth; } // force reflow
+        if (doAnimate) { var x = this.$backdrop[0].offsetWidth; } // force reflow
 
         this.$backdrop.addClass('in');
 
@@ -411,170 +481,94 @@ define([
     }
   });
 
-  // Used for switching from a single param comparator to a double param comparator
-  function sortByComparator(sortByFunction) {
-    return function(left, right) {
-      var l = sortByFunction(left);
-      var r = sortByFunction(right);
+  /* This is a mixin for Marionette.CollectionView */
+  TroupeViews.SortableMarionetteView = {
 
-      if (l === void 0) return 1;
-      if (r === void 0) return -1;
-
-      return l < r ? -1 : l > r ? 1 : 0;
-    };
-  }
-
-  function reverseComparatorFunction(comparatorFunction) {
-    return function(left, right) {
-      return -1 * comparatorFunction(left, right);
-    };
-  }
-
-  /* This should go somewhere better */
-  TroupeViews.sortByComparator = sortByComparator;
-  TroupeViews.reverseComparatorFunction = reverseComparatorFunction;
-
-  TroupeViews.Collection = TroupeViews.Base.extend({
-
-    constructor: function(options) {
-      var self = this;
-      TroupeViews.Base.prototype.constructor.apply(this, arguments);
-      if(!options) options = {};
-
-      if(options.itemView) {
-        this.itemView = options.itemView;
-      }
-      this.itemViewOptions = options.itemViewOptions ? options.itemViewOptions : {};
-      this.sortMethods = options.sortMethods ? options.sortMethods : {};
-
-      if (this.options.defaultSort) {
-        this.sortBy(this.options.defaultSort);
-      }
-
-      _.bindAll(this, 'onCollectionAdd', 'onCollectionReset', 'onCollectionRemove');
-      this.collection.on('add', this.onCollectionAdd);
-      this.collection.on('remove', this.onCollectionRemove);
-      this.collection.on('reset', this.onCollectionReset);
-
-      this.addCleanup(function() {
-        self.collection.off('add', self.onCollectionAdd);
-        self.collection.off('remove', self.onCollectionRemove);
-        self.collection.off('reset', self.onCollectionReset);
-      });
+    initializeSorting: function() {
+      this.on('before:render', this.onBeforeRenderSort, this);
+      this.on('render', this.onRenderSort, this);
     },
 
-    renderInternal: function() {
-      var self = this;
-      this.collection.each(function(item, index) {
-        var options = _.extend(self.itemViewOptions, { model: item, index: index });
-        self.$el.append(new self.itemView(options).render().el);
-      });
+    onBeforeRenderSort: function() {
+      this.isRendering = true;
+    },
+    onRenderSort: function() {
+      this.isRendering = false;
+    },
+
+    appendHtml: function(collectionView, itemView, index) {
+
+      function findViewAtPos(i) {
+        if (i >= collectionView.collection.length)
+          return;
+
+        return collectionView.children.findByModel(collectionView.collection.at(i));
+      }
+
+      if (this.isRendering) {
+        // if this is during rendering, then the views always come in sort order, so just append
+        collectionView.$el.append(itemView.el);
+      }
+      else {
+        // we are inserting views after rendering, find the adjacent view if there is one already
+        var adjView;
+
+        if (index === 0) {
+          // find the view that comes after the first one (sometimes there will be a non view that is the first child so we can't prepend)
+          adjView = findViewAtPos(index + 1);
+          if (adjView)
+            itemView.$el.insertBefore(adjView.el);
+          else
+            itemView.$el.appendTo(collectionView.el);
+        }
+        else {
+          // find the view that comes before this one
+          adjView = findViewAtPos(index - 1);
+          if(adjView) {
+            itemView.$el.insertAfter(adjView.$el);
+          } else {
+            itemView.$el.appendTo(collectionView.el);
+          }
+        }
+      }
+    }
+
+  };
+
+  TroupeViews.ConfirmationView = TroupeViews.Base.extend({
+    template: confirmationViewTemplate,
+
+    initialize: function(options) {
+      this.options = options;
+    },
+
+    getRenderData: function() {
+      return this.options;
     },
 
     events: {
+      "click .button": "buttonClicked"
     },
 
-    sortMethods: {
+    buttonClicked: function(e) {
+      e.preventDefault();
 
-    },
+      var id = $(e.target).attr('id');
 
-    sortBy: function(field) {
-      var reverse = false;
-
-      // Sort by the same field twice switches the direction
-      if(field === this.currentSortByField) {
-        if(field.indexOf("-") === 0) {
-          field = field.substring(1);
-        } else {
-          field = "-" + field;
-        }
+      if(this.dialog) {
+        this.dialog.trigger('button.click', id);
       }
+      this.trigger('button.click', id);
+    }
+  });
 
-      var fieldLookup;
-      if(field.indexOf("-") === 0) {
-        fieldLookup = field.substring(1);
-        reverse = true;
-      } else {
-        fieldLookup = field;
-      }
-
-      var sortByMethod = this.sortMethods[fieldLookup];
-      if(!sortByMethod) return;
-
-      this.currentSortByField = field;
-
-      var comparator = sortByComparator(sortByMethod);
-      if(reverse) {
-        comparator = reverseComparatorFunction(comparator);
-      }
-
-      this.collection.comparator = comparator;
-      this.collection.sort();
-    },
-
-    checkForNoItems: function() {
-      if(this.options.noItemsElement) {
-        if(this.collection.length === 0) {
-            $(this.options.noItemsElement).show();
-          }
-        else {
-            $(this.options.noItemsElement).hide();
-        }
-      }
-    },
-
-    onCollectionReset: function() {
-      var el = this.$el;
-      var self = this;
-      el.empty();
-      this.removeSubViews(el);
-      this.collection.each(function(item, index) {
-        var options = _.extend(self.itemViewOptions, { model: item, index: index });
-        el.append(new self.itemView(options).render().el);
-      });
-      this.checkForNoItems();
-
-      $(document).trigger('collectionReset', { });
-    },
-
-    onCollectionAdd: function(model, collection, options) {
-      var index = collection.indexOf(model);
-      var o = _.extend(this.itemViewOptions, { model: model, index: index });
-      var el = new this.itemView(o).render().el;
-
-      if(options.index === 0) {
-        this.$el.prepend(el);
-      } else if(options.index >= collection.length - 1) {
-        this.$el.append(el);
-      } else {
-        // TODO: correct place in-collection!
-        this.$el.append(el);
-      }
-      this.checkForNoItems();
-      $(document).trigger('collectionAdd', { });
-    },
-
-    onCollectionRemove: function(item) {
-      console.log("onCollectionRemove", item);
-
-      var cid = item.cid;
-      if(cid) {
-        this.$el.find('.model-id-' + cid).each(function(index, item) {
-          if(item._view) item._view.remove();
-        });
-      } else {
-        var id = item.id;
-        if(id) {
-          this.$el.find('.model-id-' + id).each(function(index, item) {
-            if(item._view) item._view.remove();
-          });
-        }
-
-      }
-      this.checkForNoItems();
+   TroupeViews.ConfirmationModal = TroupeViews.Modal.extend({
+    initialize: function(options) {
+      options.view = new TroupeViews.ConfirmationView(options);
+      TroupeViews.Modal.prototype.initialize.call(this, options);
     }
 
-  });
+   });
 
   return TroupeViews;
 });

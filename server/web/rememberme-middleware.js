@@ -1,11 +1,11 @@
- /*jshint globalstrict:true, trailing:false */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 /*global console:false, require: true, module: true */
 "use strict";
 
 var uuid = require('node-uuid'),
     sechash = require('sechash'),
     winston = require('winston'),
-    redis = require("redis"),
+    redis = require("../utils/redis"),
     userService = require('../services/user-service');
 
 
@@ -46,6 +46,7 @@ module.exports = {
 
         return next();
       }
+      winston.info('rememberme starting');
 
       /* If the user is logged in, no problem */
       if (req.user) return next();

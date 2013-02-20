@@ -1,11 +1,12 @@
-// Filename: views/home/main
+/*jshint unused:true browser:true*/
+
 // TODO: Better transition to request confirm page
 
 define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!./loginRequestModalView',
+  'hbs!./tmpl/loginRequestModalView',
   'jquery_validate',
   'jquery_placeholder'
 ], function($, _, TroupeViews, template) {
@@ -22,6 +23,7 @@ define([
 
     getRenderData: function() {
       return {
+        homeUrl: window.troupeContext.homeUrl,
         troupeUri: window.location.pathname.replace(/\//g,''),
         authenticated: this.authenticated
       };

@@ -1,10 +1,10 @@
-/*jslint node: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var PushNotificationDevice = require("./persistence-service").PushNotificationDevice;
 var winston = require("winston").prefix("notifications");
 var nconf = require('../utils/config');
-var redis = require("redis"),
+var redis = require("../utils/redis"),
     redisClient = redis.createClient();
 
 

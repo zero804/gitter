@@ -1,70 +1,33 @@
-/*jslint node: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var nconf = require('../utils/config');
-var fs = require("fs");
+var cdn = require("./cdn");
 
-var cdnId = -1;
+// What version of requirejs should the client be loading?
+var REQUIREJS_VERSION = "2.1.4";
 
-function passthrough(url) {
-  return "/" + url;
-}
-
-
-function cdnSingle(url) {
-  return "//" + hosts[0] +cdnPrefix + "/" + url;
-}
-
-function cdnMulti(url) {
-  var d = (cdnId + 1) % hostLength;
-  cdnId = d;
-
-  return "//" + hosts[d] +cdnPrefix + "/" + url;
-}
-
-var useCdn = nconf.get("cdn:use");
-
-if(!useCdn) {
-  exports.cdn = passthrough;
-} else {
-  var hosts = nconf.get("cdn:hosts");
-  var hostLength = hosts.length;
-
-  var cdnPrefix = nconf.get("cdn:prefix");
-  if(cdnPrefix) {
-    cdnPrefix = "/" + cdnPrefix;
-  } else {
-    var cdnPrefixFile = nconf.get("cdn:prefixFile");
-    if(cdnPrefixFile) {
-        cdnPrefix = "/s/" + ("" + fs.readFileSync(cdnPrefixFile)).trim();
-    } else {
-      cdnPrefix = "";
-    }
-  }
-
-  if(hostLength > 1) {
-    exports.cdn = cdnSingle;
-  } else {
-    exports.cdn = cdnMulti;
-  }
-}
+exports.cdn = cdn;
 
 var minified = nconf.get("web:minified");
 
-exports.bootScript = function(url) {
-  var scriptLocation = exports.cdn("js/" + url);
-  var requireScript;
-
+exports.bootScript = function(url, parameters) {
+  var requireScript, scriptLocation, cdn = (parameters.hash.skipCdn) ? function(a) { return '/' + a; } : exports.cdn;
+  //console.log("SkipCDN is currently set to ", parameters.hash.skipCdn);
   if(minified) {
-    requireScript = exports.cdn("js/libs/require/2.0.6/require-min.js");
-    var baseUrl = exports.cdn("js/");
 
-    return "<script src='" + requireScript + "' type='text/javascript'></script>\n" +
-           "<script type='text/javascript'>\nrequire.config({ baseUrl: '" + baseUrl + "' }); \nrequire(['core-libraries'], function (common) { require(['" + url + "']); });\n</script>";
+    // note: when the skipCdn flag was introduced it affected this even though this isn't the file that was requested in this invocation
+    requireScript = cdn("js/core-libraries.js");
+    var baseUrl = cdn("js/");
+
+    return  "<script type='text/javascript'>\nwindow.require_config.baseUrl = '" + baseUrl + "';</script>\n" +
+            "<script defer='defer' async='true' data-main='" + url + "' src='" + requireScript + "' type='text/javascript'></script>\n";
 
   }
 
-  requireScript = exports.cdn("js/libs/require/2.0.6/require.js");
-  return "<script data-main='" + scriptLocation + ".js' src='" + requireScript + "' type='text/javascript'></script>";
+  scriptLocation = cdn("js/" + url);
+
+  requireScript = cdn("js/libs/require/" + REQUIREJS_VERSION + "/require.js");
+  return "<script defer='defer' async='true' data-main='" + scriptLocation + ".js' src='" + requireScript + "' type='text/javascript'></script>";
 
 };

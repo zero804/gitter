@@ -12,124 +12,98 @@ module.exports = function( grunt ) {
         folder: "public-processed/"
     },
 
-    // generate application cache manifest
-    manifest:{
-      generate: {
-        options: {
-          basePath: "public/",
-          network: ["http://*", "https://*"],
-          fallback: ["/ /offline.html"],
-          exclude: ["js/jquery.min.js"],
-          preferOnline: false,
-          timestamp: true
-        },
-        src: [
-            "js/router.js",
-            "bootstrap/core-libraries.js",
-            "bootstrap/css/*.css"
-        ],
-        dest: "manifest.appcache"
-      }
+    htmllint: {
+      all: ["public/**/*.hbs"]
     },
 
-    requirejs: {
-      appDir: "public/",
-      baseUrl: "js",
-      dir: "public-processed/",
-      mainConfigFile: 'public/templates/partials/require_config.hbs',
+  requirejs: {
+      compile: {
+        options: {
 
-      modules: [
-          {
-            name: "core-libraries"
-          },
-          {
-              name: "signup",
-              exclude: ["core-libraries"]
-          },
-          {
-              name: "router-core",
-              include: [
-                "views/widgets/avatar",
-                "views/widgets/nav"
-              ],
-              exclude: ["core-libraries"]
-          },
-          {
-              name: "router",
-              include: [
-                "views/widgets/avatar",
-                "views/widgets/nav"
-              ],
-              exclude: ["core-libraries"]
-          },
-          {
-              name: "router-login",
-              include: [
-                "views/widgets/avatar"
-              ],
-              exclude: ["core-libraries"]
-          },
-          {
-              name: "router-mobile-chat",
-              include: [
-                "views/widgets/avatar"
-              ],
-              exclude: ["core-libraries"]
-          },
-          {
-              name: "router-mobile-files",
-              include: [
-                "views/widgets/avatar"
-              ],
-              exclude: ["core-libraries"]
-          },
-          {
-              name: "router-mobile-conversations",
-              include: [
-                "views/widgets/avatar"
-              ],
-              exclude: ["core-libraries"]
-          },
-          {
-              name: "router-mobile-people",
-              include: [
-                "views/widgets/avatar"
-              ],
-              exclude: ["core-libraries"]
-          },
-          /* Views */
-          {
-              name: "views/chat/chatView",
-              exclude: ["core-libraries","router"]
-          },
-          {
-              name: "views/file/fileView",
-              exclude: ["core-libraries","router"]
-          },
-          {
-              name: "views/conversation/conversationView",
-              include: [
-                "views/conversation/conversationDetailView"
-              ],
-              exclude: ["core-libraries","router"]
-          },
-          {
-              name: "views/people/peopleView",
-              exclude: ["core-libraries","router"]
-          },
-          {
-              name: "views/profile/profileModalView",
-              exclude: ["core-libraries","router"]
-          }
-      ],
+          optimize: 'uglify2',
+          generateSourceMaps: true,
+          preserveLicenseComments: false,
+          useSourceUrl: true,
 
-      optimize: "none",
-      optimizeCss: "none",
 
-      // inlining ftw
-      inlineText: true,
+          appDir: "public/",
+          baseUrl: "js",
+          dir: "public-processed/",
+          mainConfigFile: 'public/templates/partials/require_config.hbs',
 
-      logLevel: 1
+          modules: [
+              {
+                name: "core-libraries",
+                include: [
+                  "libs/require/2.1.4/require-min"
+                ]
+              },
+              {
+                  name: "signup",
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "router-core",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "app-integrated",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "router-mobile-chat",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "router-mobile-files",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "router-mobile-conversations",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "router-login",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar"
+                  ],
+                  exclude: ["core-libraries"]
+              }
+          ],
+
+          optimizeCss: "none",
+
+          // inlining ftw
+          inlineText: true,
+
+          logLevel: 1
+        }
+      }
     },
 
     // headless testing through PhantomJS
@@ -151,7 +125,7 @@ module.exports = function( grunt ) {
           'public/bootstrap/css/*.css'
         ],
         tasks: 'reload'
-      }//,
+      } //,
       //less: {
        // files: [
         //  'public/**/*.less'
@@ -191,10 +165,20 @@ module.exports = function( grunt ) {
       }
     },
 
+    uglify: {
+      mangle: {toplevel: true},
+      squeeze: {dead_code: false},
+      codegen: {quote_keys: true}
+    },
+
     min: {
       "core-libraries": {
         src: ['public-processed/js/core-libraries.js'],
         dest: 'public-processed/js/core-libraries.js'
+      },
+      "app-integrated": {
+        src: ['public-processed/js/app-integrated.js'],
+        dest: 'public-processed/js/app-integrated.js'
       },
       "router-mobile-chat": {
         src: ['public-processed/js/router-mobile-chat.js'],
@@ -203,6 +187,10 @@ module.exports = function( grunt ) {
       "router": {
         src: ['public-processed/js/router.js'],
         dest: 'public-processed/js/router.js'
+      },
+      "router-login": {
+        src: ['public-processed/js/router-login.js'],
+        dest: 'public-processed/js/router-login.js'
       },
       "signup": {
         src: ['public-processed/js/signup.js'],
@@ -223,10 +211,6 @@ module.exports = function( grunt ) {
       "peopleView": {
         src: ['public-processed/js/views/people/peopleView.js'],
         dest: 'public-processed/js/views/people/peopleView.js'
-      },
-      "profileModalView": {
-        src: ['views/profile/profileModalView.js'],
-        dest: 'views/profile/profileModalView.js'
       }
     },
 
@@ -238,6 +222,7 @@ module.exports = function( grunt ) {
         },
         files: {
           "public/bootstrap/css/trp2.css" : "public/bootstrap/less/trp2.less",
+          "public/bootstrap/css/trp3.css" : "public/bootstrap/less/trp3.less",
           "public/bootstrap/css/mtrp.css": "public/bootstrap/less/mtrp.less",
           "public/bootstrap/css/trpHomePage.css": "public/bootstrap/less/trpHomePage.less",
           "public/bootstrap/css/trpChat.css": "public/bootstrap/less/trpChat.less",
@@ -262,13 +247,17 @@ module.exports = function( grunt ) {
     },
     exec: {
       gzip: {
-        command: 'build-scripts/gzip-processed.sh'
+        command: './build-scripts/gzip-processed.sh'
+      },
+      manifest: {
+        command: './build-scripts/update-manifest.sh'
+      },
+      validateConfig: {
+        command: './node_modules/.bin/jsonlint config/*.json'
       }
     }
-
   });
 
-  grunt.loadNpmTasks('grunt-bower');
   grunt.loadNpmTasks('grunt-contrib-manifest');
   grunt.loadNpmTasks('grunt-requirejs');
   grunt.loadNpmTasks('grunt-contrib-less');
@@ -277,7 +266,9 @@ module.exports = function( grunt ) {
   grunt.loadNpmTasks('grunt-clean');
   grunt.loadNpmTasks('grunt-reload');
 
-  grunt.registerTask('process', 'clean less copy requirejs min exec:gzip');
+  grunt.registerTask('process', 'exec:validateConfig clean less copy requirejs exec:manifest exec:gzip');
+  grunt.registerTask('process-no-min', 'exec:validateConfig clean less copy requirejs exec:manifest exec:gzip');
+
   grunt.registerTask('watchr', 'reload watch');
 
 };

@@ -1,0 +1,21 @@
+<div class="trpModalTitle">Create a Troupe</div>
+<div class="trpCreateForm">
+	<form id="signup-form">
+		<input placeholder="Choose a name for your Troupe" class="trpInput required" minlength="4" name="troupeName" id="troupeName" autofocus><br>
+    {{#if userId}}
+      <input type="hidden" name="userId" value="{{userId}}">
+    {{/if}}
+
+    {{#if isOneToOne}}
+    <div id="invites-for-create">
+      <div class="trpModalTitle">Invite people to the new troupe</div>
+      <!-- Include invite view here. -->
+    </div>
+    {{/if}}
+
+		<input type="submit" name="submit" value="Create" class="trpModalButton trpButtonBig trpBtnGreen" />
+	</form>
+</div>
+<div class="trpModalFailure signup-failure" style="display:none">
+  <span class="trpModalTitle"><span class="trpModalFailureText" id="failure-text">Signup failed.</span></span>
+</div>

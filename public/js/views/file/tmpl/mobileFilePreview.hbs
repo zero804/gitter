@@ -1,0 +1,9 @@
+<div class="trpMobileFilePreview">
+  {{#photo}}
+  <img src="{{previewUrl}}" width="100%"/>
+  {{/photo}}
+  {{^photo}}
+  <iframe src="{{previewUrl}}" class="trpMobileFilePreviewFrame"></iframe>
+  {{/photo}}
+</div>
+<a href="#" class="trpMobileMailBack">Back</a>

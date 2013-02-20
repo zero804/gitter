@@ -1,0 +1,11 @@
+<div class="trpPeopleListItem">
+  <div class="trpAvatarContainer">{{ widget "avatar" user=this showStatus=true }}</div>
+  <div class="trpMobilePersonName">{{displayName}}</div>
+  {{^isSelf}}
+  <div class="trpMobileChatButtonContainer">
+  	<a href="/one-one/{{id}}/chat"><div class="trpMobileChatButton">
+  		<img src="{{cdn "images/2/icon-chat-24x24.png"}}" width="24" height="24">
+  	</div></a>
+  </div>
+  {{/isSelf}}
+</div>

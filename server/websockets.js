@@ -1,4 +1,4 @@
-/*jslint node: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var express = require('express');
@@ -27,7 +27,9 @@ app.get('/', function(req, res) {
   res.send('Nothing to see here. You must be lost.');
 });
 
-require('./now').install(server, sessionStore);
+// TEMP
+require('./services/notification-generator-service').install();
+require('./web/bayeux-events-bridge').install(server);
 
 var port = nconf.get("ws:port");
 var bindIp = nconf.get("ws:bindIp");

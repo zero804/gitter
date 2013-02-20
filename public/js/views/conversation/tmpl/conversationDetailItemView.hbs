@@ -1,0 +1,33 @@
+
+<div class="trpMailRow">
+  {{#compactView}}
+  <div class="trpMobileMailContainer">
+  {{/compactView}}
+
+    <div class="trpMailHeader clickPoint-showEmail frame-header">
+      <div class="trpMailDisplayPicture">{{widget "avatar" user=from}}</div>
+      <div class="trpMailDetails">
+        <div class="trpMailFrom">{{personName}}</div>
+        <div class="trpMailDate">{{date}}</div>
+      </div>
+    </div>
+
+    <div class="trpMailPreview">{{preview}}</div>
+
+    <div class="trpMailExpanded">
+      <div class="trpMailBody">{{{mail}}}</div>
+      <div class="trpMailBodyToolbar">
+        {{#if attachments}}
+            {{#each attachments}}
+              <div class="trpMailAttachmentItem link-attachment">
+                <a href="{{url}}" target="_new"><img src="{{thumbnailUrl}}" width="50" height="50" title="{{{fileName}}}"></a>
+              </div>
+            {{/each}}
+        {{/if}}
+      </div>
+    </div>
+
+  {{#compactView}}
+  </div>
+  {{/compactView}}
+</div>

@@ -1,5 +1,4 @@
-/*jshint globalstrict:true, trailing:false */
-/*global console:false, require: true, module: true */
+/*jshint globalstrict:true, trailing:false unused:true node:true*/
 "use strict";
 
 var userService = require("../services/user-service");
@@ -7,16 +6,14 @@ var chatService = require("../services/chat-service");
 var troupeService = require("../services/troupe-service");
 var fileService = require("../services/file-service");
 var unreadItemService = require("../services/unread-item-service");
+var presenceService = require("../services/presence-service");
 var Q = require("q");
 var _ = require("underscore");
 var handlebars = require('handlebars');
 var winston = require("winston");
 var collections = require("../utils/collections");
 var cdn = require('../web/cdn');
-
 var predicates = collections.predicates;
-
-
 
 function concatArraysOfArrays(a) {
   var result = [];
@@ -31,7 +28,7 @@ function execPreloads(preloads, callback) {
 
   var promises = preloads.map(function(i) {
     var deferred = Q.defer();
-    i.strategy.preload(i.data, deferred.node());
+    i.strategy.preload(i.data, deferred.makeNodeResolver());
     return deferred.promise;
   });
 
@@ -46,19 +43,29 @@ function execPreloads(preloads, callback) {
 
 function UserStrategy(options) {
   options = options ? options : {};
+  var onlineUsers;
 
   this.preload = function(users, callback) {
-    callback(null, true);
+    if(options.showPresenceForTroupeId) {
+      presenceService.findOnlineUsersForTroupe(options.showPresenceForTroupeId, function(err, result) {
+
+        if(err) return callback(err);
+        onlineUsers = result;
+        callback(null, true);
+      });
+    } else {
+      callback(null, true);
+    }
   };
 
   this.map = function(user) {
     if(!user) return null;
 
-    function getAvatarUrl() {
+    function getAvatarUrl(size) {
       if(user.avatarVersion === 0) {
-        return cdn("images/2/avatar-default.png");
+        return user.gravatarImageUrl;
       }
-      return cdn("avatar/" + user.id + "/" + user.avatarVersion + ".jpg", { notStatic: true });
+      return cdn("avatar/" + size + "/" + user.id + "/" + user.avatarVersion + ".jpg", { notStatic: true });
     }
 
     function getLocationDescription(named) {
@@ -80,8 +87,10 @@ function UserStrategy(options) {
       id: user.id,
       displayName: user.displayName,
       email: user.email,
-      avatarUrl: getAvatarUrl(),
-      location: location
+      avatarUrlSmall: getAvatarUrl('s'),
+      avatarUrlMedium: getAvatarUrl('m'),
+      location: location,
+      online: onlineUsers ? onlineUsers.indexOf(user.id) >= 0 : undefined
     };
   };
 }
@@ -98,7 +107,7 @@ function UserIdStrategy(options) {
         return callback(err);
       }
       self.users = collections.indexById(users);
-      callback(null, true);
+      userStategy.preload(users, callback);
     });
   };
 
@@ -136,6 +145,9 @@ function FileStrategy(options) {
 
 
   this.map = function(item) {
+    if(!item) return null;
+    item = item.toObject();
+
     var versionIndex = 1;
     function narrowFileVersion(item) {
       return {
@@ -198,7 +210,6 @@ function FileIdStrategy(options) {
 
 function FileIdAndVersionStrategy() {
   var fileIdStrategy = new FileIdStrategy();
-  var self = this;
 
   this.preload = function(fileAndVersions, callback) {
     var fileIds = _(fileAndVersions).chain()
@@ -228,8 +239,6 @@ function FileIdAndVersionStrategy() {
 
     // TODO: there is a slight performance gain to be made by not loading all the file versions
     // and only loading the file version (and users) for the needed version
-
-    var versions = file['versions'];
     delete file['versions'];
 
     return _.extend(file, fileVersion);
@@ -370,7 +379,7 @@ function AllUnreadItemCountStategy(options) {
   this.preload = function(troupeIds, callback) {
     var promises = troupeIds.map(function(i) {
       var deferred = Q.defer();
-      unreadItemService.getUserUnreadCounts(userId, i, deferred.node());
+      unreadItemService.getUserUnreadCounts(userId, i, deferred.makeNodeResolver());
       return deferred.promise;
     });
 
@@ -545,18 +554,31 @@ function InviteStrategy(options) {
       id: item._id,
       displayName: item.displayName,
       email: item.email,
-      avatarUrl: '/images/2/avatar-default.png' // TODO: fix
+      avatarUrlSmall: '/images/2/avatar-default.png' // TODO: fix
     };
   };
 }
 
+function TroupeUserStrategy(options) {
+  var userIdStategy = new UserIdStrategy(options);
+
+  this.preload = function(troupeUsers, callback) {
+    var userIds = troupeUsers.map(function(troupeUser) { return troupeUser.userId; });
+    userIdStategy.preload(userIds, callback);
+  };
+
+  this.map = function(troupeUser) {
+    return userIdStategy.map(troupeUser.userId);
+  };
+}
 
 function TroupeStrategy(options) {
   if(!options) options = {};
 
-  var unreadItemStategy = options.currentUserId ? new AllUnreadItemCountStategy({ userId: options.currentUserId }) : null;
-  var userIdStategy = options.mapUsers ? new UserIdStrategy() : null;
+  var currentUserId = options.currentUserId;
 
+  var unreadItemStategy = options.currentUserId ? new AllUnreadItemCountStategy({ userId: options.currentUserId }) : null;
+  var userIdStategy = options.mapUsers || currentUserId ? new UserIdStrategy() : null;
   this.preload = function(items, callback) {
 
     var strategies = [];
@@ -571,7 +593,25 @@ function TroupeStrategy(options) {
     }
 
     if(userIdStategy) {
-      var userIds = _.uniq(_.flatten(items.map(function(troupe) { return troupe.users; })));
+
+      var userIds;
+      if(options.mapUsers) {
+        userIds = _.flatten(items.map(function(troupe) { return troupe.getUserIds(); }));
+      } else {
+        userIds = [];
+      }
+
+      // If the currentUserOption has been set, then we will output
+      // a user node on the serialized troupe.
+      if(options.currentUserId) {
+        items.forEach(function(troupe) {
+          if(troupe.oneToOne) {
+            userIds = userIds.concat(troupe.getUserIds());
+          }
+        });
+      }
+
+      userIds = _.uniq(userIds);
 
       strategies.push({
         strategy: userIdStategy,
@@ -583,13 +623,42 @@ function TroupeStrategy(options) {
     execPreloads(strategies, callback);
   };
 
+  function mapOtherUser(users) {
+    var otherUser = users.filter(function(troupeUser) {
+      return troupeUser.userId != currentUserId;
+    })[0];
+    if(otherUser) {
+      return userIdStategy.map(otherUser.userId);
+    }
+  }
+
   this.map = function(item) {
+    var otherUser = item.oneToOne && currentUserId ? mapOtherUser(item.users) : undefined;
+    var troupeName, troupeUrl;
+    if(item.oneToOne) {
+      if(otherUser) {
+        troupeName = otherUser.displayName;
+        troupeUrl = "/one-one/" + otherUser.id;
+      } else {
+        winston.debug("Unable to map troupe bits as something has gone horribly wrong");
+        // This should technically never happen......
+        troupeName = null;
+        troupeUrl = null;
+      }
+    } else {
+        troupeName = item.name;
+        troupeUrl = "/" + item.uri;
+    }
+
     return {
       id: item.id,
-      name: item.name,
+      name: troupeName,
       uri: item.uri,
-      users: userIdStategy ? item.users.map(function(userId) { return userIdStategy.map(userId); }) : undefined,
-      unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined
+      oneToOne: item.oneToOne,
+      users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
+      user: otherUser,
+      unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined,
+      url: troupeUrl
     };
   };
 }
@@ -662,7 +731,7 @@ function RequestStrategy(options) {
 
 /* This method should move */
 function serialize(items, strat, callback) {
-  if(!items) return null;
+  if(!items) return callback(null, null);
 
   var single = !Array.isArray(items);
   if(single) {
@@ -684,12 +753,15 @@ function serialize(items, strat, callback) {
 
 }
 
+// TODO: deprecate this....
 function getStrategy(modelName, toCollection) {
   switch(modelName) {
     case 'conversation':
       return toCollection ? ConversationMinStrategy : ConversationStrategy;
     case 'file':
       return FileStrategy;
+    case 'fileId':
+      return FileIdStrategy;
     case 'notification':
       return NotificationStrategy;
     case 'chat':
@@ -709,6 +781,62 @@ function getStrategy(modelName, toCollection) {
   }
 }
 
+function serializeModel(model, callback) {
+  if(model === null) return callback(null, null);
+  var schema = model.schema;
+  if(!schema) return callback("Model does not have a schema");
+  if(!schema.schemaTypeName) return callback("Schema does not have a schema name");
+
+  var strategy;
+
+  switch(schema.schemaTypeName) {
+    case 'UserSchema':
+      strategy = new UserStrategy();
+      break;
+
+    case 'TroupeSchema':
+      strategy = new TroupeStrategy();
+      break;
+
+    case 'TroupeUserSchema':
+      strategy = new TroupeUserStrategy();
+      break;
+
+    case 'ConversationSchema':
+      strategy = new ConversationMinStrategy();
+      break;
+
+    case 'EmailSchema':
+      strategy = new EmailStrategy();
+      break;
+
+    case 'InviteSchema':
+      strategy = new InviteStrategy();
+      break;
+
+    case 'RequestSchema':
+      strategy = new RequestStrategy();
+      break;
+
+    case 'ChatMessageSchema':
+      strategy = new ChatStrategy();
+      break;
+
+    case 'FileSchema':
+      strategy = new FileStrategy();
+      break;
+
+    case 'NotificationSchema':
+      strategy = new NotificationStrategy();
+      break;
+  }
+
+  if(!strategy) return callback("No strategy for " + schema.schemaTypeName);
+
+
+  serialize(model, strategy, callback);
+}
+
 module.exports = {
   UserStrategy: UserStrategy,
   UserIdStrategy: UserIdStrategy,
@@ -722,6 +850,8 @@ module.exports = {
   RequestStrategy: RequestStrategy,
   TroupeStrategy: TroupeStrategy,
   TroupeIdStrategy: TroupeIdStrategy,
+  TroupeUserStrategy: TroupeUserStrategy,
   getStrategy: getStrategy,
-  serialize: serialize
+  serialize: serialize,
+  serializeModel: serializeModel
 }
