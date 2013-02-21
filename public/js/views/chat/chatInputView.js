@@ -50,6 +50,9 @@ define([
         });
 
         chatBox.val('');
+        // go to the bottom of the page when sending a new message
+        $(window).scrollTop($(document).height());
+
       }
       return false;
     }
