@@ -10,6 +10,7 @@ var nconf = require("./../../server/utils/config");
 var winston = require("winston");
 var Fiber = require('./../../server/utils/fiber');
 var mimelib = require('mimelib');
+var statsService = require('./../../server/services/stats-service');
 
 var emailDomain = nconf.get("email:domain");
 var emailDomainWithAt = "@" + emailDomain;
@@ -77,12 +78,13 @@ function distributeForTroupe(from, to, next, connection) {
       return next(OK);
 
     troupeSESTransport.sendMailStream(sesFrom, sesRecipients, sesStream, function(errorSendingMail, messageIds){
-
       if (errorSendingMail) {
         winston.error("Error sending mail through ses: ", { exception: errorSendingMail, from: from, troupe: troupe });
 
         return errorResponse(next, errorSendingMail);
       }
+
+      statsService.event('remailed_email', { recipients: messageIds.length });
 
       winston.debug("All messages have been queued on SES and ids have been returned: ", { messageIds: messageIds });
 

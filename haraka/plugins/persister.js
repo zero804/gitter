@@ -7,6 +7,7 @@
 var conversationService = require("./../../server/services/conversation-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
 var fileService = require("./../../server/services/file-service.js");
+var statsService = require('./../../server/services/stats-service');
 var MailParser = require("mailparser").MailParser;
 var temp = require('temp');
 var fs   = require('fs');
@@ -23,6 +24,11 @@ function saveFile(troupeId, creatorUserId, fileName, mimeType, content, callback
     var ws = fs.createWriteStream(tempFileName);
 
     ws.on("close", function() {
+      statsService.event('new_mail_attachment', {
+        troupeId: troupeId,
+        creatorUserId: creatorUserId
+      });
+
       fileService.storeFile({
         troupeId: troupeId,
         creatorUserId: creatorUserId,
