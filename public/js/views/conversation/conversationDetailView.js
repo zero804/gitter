@@ -34,8 +34,9 @@ define([
       this.model.emailCollection.listen();
       this.model.fetch();
 
+      var self = this;
       this.addCleanup(function() {
-        this.model.emailCollection.unlisten();
+        self.model.emailCollection.unlisten();
       });
     },
 
