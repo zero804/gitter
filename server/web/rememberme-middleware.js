@@ -1,5 +1,4 @@
 /*jshint globalstrict:true, trailing:false unused:true node:true*/
-/*global console:false, require: true, module: true */
 "use strict";
 
 var uuid = require('node-uuid'),
@@ -7,6 +6,7 @@ var uuid = require('node-uuid'),
     winston = require('winston'),
     redis = require("../utils/redis"),
     userService = require('../services/user-service');
+var statsService = require("../services/stats-service");
 
 
 var redisClient = redis.createClient();
@@ -46,7 +46,6 @@ module.exports = {
 
         return next();
       }
-      winston.info('rememberme starting');
 
       /* If the user is logged in, no problem */
       if (req.user) return next();
@@ -65,6 +64,8 @@ module.exports = {
       redisClient.get("rememberme:" + key, function(err, storedValue) {
         if(err) return fail();
         if(!storedValue) {
+          statsService.event('user_login_auto_illegal', { });
+
           winston.info("rememberme: Client presented illegal rememberme token ", { token: key });
           return fail();
         }
@@ -87,6 +88,8 @@ module.exports = {
               }
 
               winston.info("rememberme: Passport login succeeded");
+
+              statsService.event('user_login_auto', { userId: userId });
 
               generateAuthToken(req, res, userId, options, function(err) {
                 next(err);
