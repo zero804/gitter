@@ -3,7 +3,10 @@ var middleware = require('../web/middleware');
 module.exports = {
   install: function(app) {
 
-    var auth = middleware.ensureLoggedIn();
+    var auth = [
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn()
+    ];
 
     // Secure the REST API
     ['/troupes', '/user'].forEach(function(path) {
