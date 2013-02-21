@@ -98,17 +98,18 @@ define([
     loadNextMessages: function() {
       if(this.loading) return;
 
-      var chatItemsFrame = this.$el.find('#frame-chat');
-      if (chatItemsFrame.length) {
-        this.firstEl = chatItemsFrame.find(':first');
+      // if there are no chat items in the view, don't try save the curOffset
+      if (this.$el.find('>').length) {
+        this.firstEl = this.$el.find(':first');
         this.curOffset = this.firstEl.offset().top - $(document).scrollTop();
+        console.log("Loading more messages. Saving curOffset " + this.curOffset);
       }
 
       var self = this;
       this.loading = true;
-      function success(data/*, resp*/) {
+      function success(data, resp) {
         self.loading = false;
-        if(!data.length) {
+        if(!resp.length) {
           $(window).off('scroll', self.chatWindowScroll);
         }
       }
