@@ -1,5 +1,4 @@
 /*jshint globalstrict:true, trailing:false unused:true node:true*/
-/*global console:false, require: true, module: true, process: false */
 "use strict";
 
 var userService = require('../services/user-service');
@@ -107,6 +106,8 @@ module.exports = {
         if(!user) return done(null, false);
 
         if(user.status !== 'UNCONFIRMED') {
+          statsService.event('confirmation_reused', { userId: user.id });
+
           winston.debug("Confirmation already used", { confirmationCode: confirmationCode });
           if(!user.lastTroupe) {
             troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
@@ -129,6 +130,8 @@ module.exports = {
           return;
         }
 
+        statsService.event('confirmation_completed', { userId: user.id });
+
         return done(null, user);
       });
     })
@@ -145,9 +148,12 @@ module.exports = {
         if(invite.status !== 'UNUSED') {
           /* The invite has already been used. We need to fail authentication, but go to the troupe */
           winston.debug("Invite has already been used", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
+          statsService.event('invite_reused', { uri: req.params.troupeUri });
 
           return self.redirect("/" + req.params.troupeUri);
         }
+
+        statsService.event('invite_accepted', { uri: req.params.troupeUri });
 
         winston.debug("Invite accepted", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
 
@@ -165,7 +171,12 @@ module.exports = {
     passport.use(new ConfirmStrategy({ name: "passwordreset" }, function(confirmationCode, req, done) {
         userService.findAndUsePasswordResetCode(confirmationCode, function(err, user) {
           if(err) return done(err);
-          if(!user) return done(null, false);
+          if(!user) {
+            statsService.event('password_reset_invalid', { confirmationCode: confirmationCode });
+            return done(null, false);
+          }
+
+          statsService.event('password_reset_completed', { userId: user.id });
 
           return done(null, user);
         });
