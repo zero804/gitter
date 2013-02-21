@@ -54,42 +54,53 @@ define([
     initialize: function() {
       _.bindAll(this, 'chatWindowScroll');
       this.initializeSorting();
-      $(window).on('scroll', this.chatWindowScroll);
       var self = this;
       this.on('after:item:added', function() { self.afterItemAdded(); });
       this.on('before:item:added', function() { self.beforeItemAdded(); });
+
+      if (window._troupeCompactView) {
+        this.scrollOf = $('#chat-wrapper');
+        this.container = $('#chat-frame');
+      } else {
+        this.scrollOf = window;
+        this.container = document;
+      }
+      $(this.scrollOf).on('scroll', this.chatWindowScroll);
    },
 
     beforeClose: function() {
-      $(window).off('scroll', this.chatWindowScroll);
+      $(this.scrollOf).off('scroll', this.chatWindowScroll);
     },
 
-    afterRender: function() {
-      $(window).scrollTop($(document.height()));
+    onRender: function() {
+      console.log("scrollOf scroll: " + $(this.scrollOf).scrollTop() + " container height: " + $(this.container).height());
+      $(this.scrollOf).scrollTop($(this.container).height());
+
     },
 
     afterItemAdded: function(view) {
 
       if (this.isAtBottomOfPage) {
         // stay at the bottom
-        $(window).scrollTop($(document).height());
+        $(this.scrollOf).scrollTop($(this.container).height());
       }
       else if (this.firstEl) {
         // keep current position if we are loading more
-        $(document).scrollTop(this.firstEl.offset().top - this.curOffset);
+        console.log("resetting to position of firstEl");
+        $(this.scrollOf).scrollTop(this.firstEl.offset().top - this.curOffset);
       }
 
     },
 
     beforeItemAdded: function() {
       //this.firstEl = this.$el[0];
-      this.isAtBottomOfPage = $(window).scrollTop() === $(document).height() - $(window).height();
+      this.isAtBottomOfPage = $(this.scrollOf).scrollTop() === $(this.container).height() - $(this.scrollOf).height();
       //console.log('scrolltop' + this.isAtBottomOfPage + ' ');
     },
 
     chatWindowScroll: function() {
       console.log("scrolling outside");
-      if($(window).scrollTop() === 0) {
+      if($(this.scrollOf).scrollTop() === 0) {
         console.log("scrolling inside");
         this.loadNextMessages();
       }
@@ -101,7 +112,7 @@ define([
       // if there are no chat items in the view, don't try save the curOffset
       if (this.$el.find('>').length) {
         this.firstEl = this.$el.find(':first');
-        this.curOffset = this.firstEl.offset().top - $(document).scrollTop();
+        this.curOffset = this.firstEl.offset().top - $(this.container).scrollTop();
         console.log("Loading more messages. Saving curOffset " + this.curOffset);
       }
 
@@ -110,7 +121,7 @@ define([
       function success(data, resp) {
         self.loading = false;
         if(!resp.length) {
-          $(window).off('scroll', self.chatWindowScroll);
+          $(self.scrollOf).off('scroll', self.chatWindowScroll);
         }
       }
 
