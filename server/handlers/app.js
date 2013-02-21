@@ -129,7 +129,8 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data)
         login: login,
         data: login ? null : JSON.stringify(data), // Only push the data through if the user is logged in already
         troupeName: actualTroupeName,
-        troupeContext: JSON.stringify(troupeContext)
+        troupeContext: JSON.stringify(troupeContext),
+        troupeContextData: troupeContext
       });
 
     });

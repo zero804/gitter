@@ -104,9 +104,9 @@
           <div class="trpToolbarList" id="people-roster"></div>
           <div class="trpToolbarHeader" id="file-header">Files</div>
           <div class="trpToolbarList" id="file-list"></div>
-          {{#if troupeContext.troupe.oneToOne}}
+          {{#unless troupeContextData.troupe.oneToOne}}
           <div class="trpToolbarHeader" id="mail-header">Mails</div>
-          {{/if}}
+          {{/unless}}
           <div class="trpToolbarList" id="mail-list"></div>
           <div class="trpToolbarSpacer"></div>
         </div>
