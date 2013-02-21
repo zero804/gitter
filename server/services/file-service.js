@@ -7,6 +7,7 @@ var mime = require("mime");
 var winston = require("winston");
 var Q = require("q");
 var crypto = require('crypto');
+var statsService = require("./stats-service");
 var fs = require('fs');
 var thumbnailPreviewGeneratorService = require("./thumbnail-preview-generator-service");
 var mongooseUtils = require('../utils/mongoose-utils');
@@ -238,6 +239,10 @@ function storeFileVersionInGrid(options, callback) {
           if (err) return callback(err);
 
           uploadFileToGrid(file, 1, temporaryFile, function(err, file) {
+            if(err) return callback(err);
+
+            statsService.event('new_file', { troupeId: troupeId });
+
             callback(err, {
               file: file,
               version: 1,
@@ -274,6 +279,8 @@ function storeFileVersionInGrid(options, callback) {
         if (err) return callback(err);
         var versionNumber = file.versions.length;
         uploadFileToGrid(file, versionNumber, temporaryFile, function(err, file) {
+          if(err) return callback(err);
+          statsService.event('new_file_version', { troupeId: troupeId });
           callback(err, {
             file: file,
             version: file.versions.length,

@@ -2,6 +2,7 @@
 "use strict";
 
 var persistence = require("./persistence-service"),
+    statsService = require("./stats-service"),
     winston = require('winston');
 
 function findConversation(options, callback) {
@@ -55,6 +56,9 @@ exports.storeEmailInConversation = function(options, callback) {
 
       conversation.save(function(err) {
           if (err) return callback(err);
+          statsService.event('new_conversation', { troupeId: troupeId });
+          statsService.event('new_email', { troupeId: troupeId });
+
           callback(null, conversation, storeMail);
       });
 
@@ -67,6 +71,8 @@ exports.storeEmailInConversation = function(options, callback) {
     conversation.pushEmail(storeMail);
     conversation.save(function(err) {
         if (err) return callback(err);
+        statsService.event('new_email', { troupeId: troupeId });
+
         callback(null, conversation, storeMail);
     });
   });
