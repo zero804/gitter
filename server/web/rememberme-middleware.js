@@ -6,6 +6,7 @@ var uuid = require('node-uuid'),
     sechash = require('sechash'),
     winston = require('winston'),
     redis = require("../utils/redis"),
+    stats = require("../services/stats-service"),
     userService = require('../services/user-service');
 
 
@@ -87,7 +88,7 @@ module.exports = {
               }
 
               winston.info("rememberme: Passport login succeeded");
-
+              stats.event('authenticate', { rememberme: true, userId: userId });
               generateAuthToken(req, res, userId, options, function(err) {
                 next(err);
               });
