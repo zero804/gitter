@@ -41,6 +41,10 @@ define([
       }
     },
 
+    initialize: function() {
+      this.setSortBy('sent');
+    },
+
     findModelForOptimisticMerge: function(newModel) {
       var optimisticModel = this.find(function(model) {
         return !model.id && model.get('text') === newModel.get('text');

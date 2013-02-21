@@ -18,7 +18,6 @@ require([
 
     // Setup the ChatView
   var chatCollection = new chatModels.ChatCollection();
-  chatCollection.setSortBy('-sent');
   chatCollection.listen();
   chatCollection.reset(window.troupePreloads['chatMessages'], { parse: true });
   if (window.noupdate) {
