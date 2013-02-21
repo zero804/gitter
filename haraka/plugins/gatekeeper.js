@@ -6,6 +6,8 @@
 var userService = require("./../../server/services/user-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
 var mailerService = require('./../../server/services/mailer-service');
+var statsService = require('./../../server/services/stats-service');
+
 var winston = require('./../../server/utils/winston');
 var nconf = require("./../../server/utils/config");
 var mimelib = require('mimelib');
@@ -109,6 +111,11 @@ exports.hook_queue = function (next, connection) {
 
 function sendBounceMail(userIsRegistered, mail, deniedTroupes, nonExistantTroupes, permittedTroupes) {
   winston.debug("Gateway#sendBounceMail(): I'm gna bounce this mail from " + mail.from + " that silly user can't send to: ", { deniedTroupes: deniedTroupes, nonExistantTroupes: nonExistantTroupes });
+
+  statsService.event('mail_bounce', {
+    from: mail.from,
+    userIsRegistered: userIsRegistered
+  });
 
   mailerService.sendEmail({
     templateFile: "bounce-email",
