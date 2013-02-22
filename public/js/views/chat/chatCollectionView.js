@@ -72,13 +72,15 @@ define([
     },
 
     onRender: function() {
-      console.log("scrollOf scroll: " + $(this.scrollOf).scrollTop() + " container height: " + $(this.container).height());
-      $(this.scrollOf).scrollTop($(this.container).height());
-
+      // console.log("scrollOf scroll: " + $(this.scrollOf).scrollTop() + " container height: " + $(this.container).height()); 
+      // this is an ugly hack to deal with some weird timing issues
+      var self = this;
+      setTimeout(function() {
+      $(self.scrollOf).scrollTop($(self.container).height());
+      }, 150);
     },
 
     onAfterItemAdded: function() {
-
       if (this.isAtBottomOfPage) {
         // stay at the bottom
         $(this.scrollOf).scrollTop($(this.container).height());
@@ -101,11 +103,10 @@ define([
     },
 
     chatWindowScroll: function() {
-      console.log("scrolling outside");
-      if($(this.scrollOf).scrollTop() === 0) {
-        console.log("scrolling inside");
+      if (this.hasScrolled && $(this.scrollOf).scrollTop() === 0) {
         this.loadNextMessages();
       }
+      this.hasScrolled = true;
     },
 
     loadNextMessages: function() {
