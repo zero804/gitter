@@ -1,4 +1,5 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true browser:true */
+/*global console: true */
 define([
   'jquery',
   'underscore',
@@ -55,8 +56,6 @@ define([
       _.bindAll(this, 'chatWindowScroll');
       this.initializeSorting();
       var self = this;
-      this.on('after:item:added', function() { self.afterItemAdded(); });
-      this.on('before:item:added', function() { self.beforeItemAdded(); });
 
       if (window._troupeCompactView) {
         this.scrollOf = $('#chat-wrapper');
@@ -78,24 +77,27 @@ define([
 
     },
 
-    afterItemAdded: function(view) {
+    onAfterItemAdded: function() {
 
       if (this.isAtBottomOfPage) {
         // stay at the bottom
         $(this.scrollOf).scrollTop($(this.container).height());
       }
-      else if (this.firstEl) {
+      else if (this.firstElBeforeLoad) {
         // keep current position if we are loading more
-        console.log("resetting to position of firstEl");
-        $(this.scrollOf).scrollTop(this.firstEl.offset().top - this.curOffset);
+        // it's very difficult to get an elements co-ordinate within it's parent.
+        // so we readjust the scroll according to how much it's parent has grown,
+        // to be more general we could look at the displacement that the growth caused for the element,
+        // so that we can figure out how much growth occurred above vs below it.
+        $(this.scrollOf).scrollTop(this.scrollPosBeforeAdd + ($(this.container).height() - this.containerHeightBeforeAdd));
       }
 
     },
 
-    beforeItemAdded: function() {
-      //this.firstEl = this.$el[0];
+    onBeforeItemAdded: function() {
       this.isAtBottomOfPage = $(this.scrollOf).scrollTop() === $(this.container).height() - $(this.scrollOf).height();
-      //console.log('scrolltop' + this.isAtBottomOfPage + ' ');
+      this.containerHeightBeforeAdd = $(this.container).height();
+      this.scrollPosBeforeAdd = $(this.scrollOf).scrollTop();
     },
 
     chatWindowScroll: function() {
@@ -111,9 +113,8 @@ define([
 
       // if there are no chat items in the view, don't try save the curOffset
       if (this.$el.find('>').length) {
-        this.firstEl = this.$el.find(':first');
-        this.curOffset = this.firstEl.offset().top - $(this.container).scrollTop();
-        console.log("Loading more messages. Saving curOffset " + this.curOffset);
+        // store the chat item view element that is at the top of the list at this point  (before loading)
+        this.firstElBeforeLoad = this.$el.find(':first');
       }
 
       var self = this;
