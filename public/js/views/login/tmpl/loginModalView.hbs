@@ -24,7 +24,7 @@
     </div>
     <div class="trpModalFailure login-failure-account-not-activated  login-message" style="display:none">
       <span class="trpModalTitle"><span class="trpWhite">Login failed.</span></span><br>
-      <span class="trpModalFailureText">You're account has not yet been activated. Please follow the link from your activation email.</span><br>
+      <span class="trpModalFailureText">Your account has not yet been activated. Please follow the link from your activation email.</span><br>
       <a href="#" class="trpModalFailureText button-resend-confirmation">Resend confirmation email</a>
     </div>
   </div>
@@ -38,6 +38,11 @@
   <div class="trpModalTitle">On it's way!</div>
   <div class="trpModalBody">We just sent you an email to <span class="trpGreen" id="resetEmail"></span>.<br><br>This will contain a link that you can click on to reset your password.</div>
   <button type="button" class="trpModalButton trpButtonBig trpBtnGreen" id="button-close">Close</button><br><Br>
+</div>
+<div class="resetpwd-failed" style="display:none">
+  <div class="trpModalTitle">Can't reset Password</div>
+  <div class="trpModalBody">We can't reset your password, most likely because that email address is not registered.</div>
+  <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="go-back">Back</button><br><br>
 </div>
 <div class="resend-confirm" style="display:none">
   <div class="trpModalTitle">On it's way!</div>
