@@ -65,6 +65,7 @@ define([
         this.container = document;
       }
       $(this.scrollOf).on('scroll', this.chatWindowScroll);
+      this.scrollPosBeforeAdd = 0;
    },
 
     beforeClose: function() {
@@ -72,7 +73,7 @@ define([
     },
 
     onRender: function() {
-      // console.log("scrollOf scroll: " + $(this.scrollOf).scrollTop() + " container height: " + $(this.container).height()); 
+      // console.log("scrollOf scroll: " + $(this.scrollOf).scrollTop() + " container height: " + $(this.container).height());
       // this is an ugly hack to deal with some weird timing issues
       var self = this;
       setTimeout(function() {
@@ -91,7 +92,10 @@ define([
         // so we readjust the scroll according to how much it's parent has grown,
         // to be more general we could look at the displacement that the growth caused for the element,
         // so that we can figure out how much growth occurred above vs below it.
+        //console.log("Resetting scroll from ", $(this.scrollOf).scrollTop(), " to ", this.scrollPosBeforeAdd, " + ", $(this.container).height(), " - ", this.containerHeightBeforeAdd, " = ", this.scrollPosBeforeAdd + ($(this.container).height() - this.containerHeightBeforeAdd));
         $(this.scrollOf).scrollTop(this.scrollPosBeforeAdd + ($(this.container).height() - this.containerHeightBeforeAdd));
+        // we store the accumulated scroll position here because safari doesn't update the scroll position immediately, so we can't read it back accurately.
+        this.scrollPosBeforeAdd += ($(this.container).height() - this.containerHeightBeforeAdd);
       }
 
     },
@@ -99,7 +103,7 @@ define([
     onBeforeItemAdded: function() {
       this.isAtBottomOfPage = $(this.scrollOf).scrollTop() === $(this.container).height() - $(this.scrollOf).height();
       this.containerHeightBeforeAdd = $(this.container).height();
-      this.scrollPosBeforeAdd = $(this.scrollOf).scrollTop();
+      //this.scrollPosBeforeAdd = $(this.scrollOf).scrollTop();
     },
 
     chatWindowScroll: function() {
@@ -116,6 +120,7 @@ define([
       if (this.$el.find('>').length) {
         // store the chat item view element that is at the top of the list at this point  (before loading)
         this.firstElBeforeLoad = this.$el.find(':first');
+        this.scrollPosBeforeAdd = 0;
       }
 
       var self = this;
