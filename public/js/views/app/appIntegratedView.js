@@ -310,7 +310,7 @@ define([
     },
 
     onPeopleHeaderClick: function() {
-      this.toggleRightPanel('people-list');
+      this.toggleRightPanel('people-roster');
     },
 
     onAddPeopleClick: function() {
