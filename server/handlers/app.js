@@ -172,6 +172,17 @@ function preloadChats(userId, troupeId, callback) {
 
 }
 
+
+function preloadTroupes(userId, callback) {
+  troupeService.findAllTroupesForUser(userId, function(err, troupes) {
+    if (err) return callback(err);
+
+    var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
+    restSerializer.serialize(troupes, strategy, callback);
+  });
+}
+
+
 function preloadUsers(userId, troupe, callback) {
   var strategy = new restSerializer.UserIdStrategy( { showPresenceForTroupeId: troupe.id });
   restSerializer.serialize(troupe.getUserIds(), strategy, callback);
@@ -232,14 +243,16 @@ module.exports = {
 
 
           var f = new Fiber();
+          preloadTroupes(req.user.id, f.waitor());
           preloadFiles(req.user.id, req.troupe.id, f.waitor());
           preloadChats(req.user.id, req.troupe.id, f.waitor());
           preloadUsers(req.user.id, req.troupe, f.waitor());
 
           f.all()
-            .spread(function(files, chats, users) {
+            .spread(function(troupes, files, chats, users) {
               // Send the information through
               renderAppPageWithTroupe(req, res, next, 'app-integrated', req.troupe, req.otherUser.displayName, {
+                troupes: troupes,
                 files: files,
                 chatMessages: chats,
                 users: users,
@@ -301,15 +314,17 @@ module.exports = {
 
         var f = new Fiber();
         if(req.user) {
+          preloadTroupes(req.user.id, f.waitor());
           preloadFiles(req.user.id, req.troupe.id, f.waitor());
           preloadChats(req.user.id, req.troupe.id, f.waitor());
           preloadUsers(req.user.id, req.troupe, f.waitor());
           preloadConversations(req.user.id, req.troupe, f.waitor());
         }
         f.all()
-          .spread(function(files, chats, users, conversations) {
+          .spread(function(troupes, files, chats, users, conversations) {
             // Send the information through
             renderAppPageWithTroupe(req, res, next, page, req.troupe, req.troupe.name, {
+              troupes: troupes,
               files: files,
               chatMessages: chats,
               users: users,
