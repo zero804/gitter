@@ -324,6 +324,8 @@ require([
 
     // Troupe Collections
     troupeCollection = new troupeModels.TroupeCollection();
+    troupeCollection.reset(window.troupePreloads['troupes'], { parse: true });
+
     unreadItemsClient.installTroupeListener(troupeCollection);
 
     var filteredTroupeCollection = new Backbone.FilteredCollection(null, {model: troupeModels.TroupeModel, collection: troupeCollection });
@@ -336,8 +338,6 @@ require([
       return m.get('oneToOne');
     });
 
-
-    troupeCollection.fetch();
     var troupeCollectionView = new TroupeCollectionView({
       collection: filteredTroupeCollection
     });
