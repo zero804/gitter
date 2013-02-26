@@ -161,7 +161,7 @@ define([
       });
 
       if ($(document).width() < 1250) {
-        $("#content-frame, #header-frame, #alert-content").animate({
+        $("#content-frame, #header-frame, #alert-content, #chat-input").animate({
           left: '+=110px'
         }, 350, function() {
         });
@@ -181,7 +181,7 @@ define([
 
         if ($(document).width() < 1250) {
 
-          $("#content-frame, #header-frame, #alert-content").animate({
+          $("#content-frame, #header-frame, #alert-content, #chat-input").animate({
             left: '-=110px'
           }, 350, function() {
           });
@@ -205,7 +205,7 @@ define([
       }, 350);
 
 
-      $("#content-frame, #alert-content, #header-frame").animate({
+      $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
         left: "+=180px"
       }, 350);
 
@@ -231,7 +231,7 @@ define([
       }, 350);
 
 
-      $("#content-frame, #alert-content, #header-frame").animate({
+      $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
         left: "-=180px"
       }, 350);
 

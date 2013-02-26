@@ -8,8 +8,9 @@ require([
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
   'views/widgets/avatar',
-  'components/unread-items-client'
-], function($, _, Backbone, TroupeViews, chatModels, ChatInputView, ChatCollectionView, AvatarWidget, unreadItemsClient) {
+  'components/unread-items-client',
+  'scrollfix'
+], function($, _, Backbone, TroupeViews, chatModels, ChatInputView, ChatCollectionView, AvatarWidget, unreadItemsClient, scrollfix) {
   "use strict";
 
   TroupeViews.preloadWidgets({
@@ -18,7 +19,6 @@ require([
 
     // Setup the ChatView
   var chatCollection = new chatModels.ChatCollection();
-  chatCollection.setSortBy('-sent');
   chatCollection.listen();
   chatCollection.reset(window.troupePreloads['chatMessages'], { parse: true });
   if (window.noupdate) {
@@ -36,6 +36,18 @@ require([
     el: $('#frame-chat'),
     collection: chatCollection
   }).render();
+
+
+// Prevent Header & Footer From Showing Browser Chrome
+
+document.addEventListener('touchmove', function(event) {
+   if(event.target.parentNode.className.indexOf('noBounce') != -1 || event.target.className.indexOf('noBounce') != -1 ) {
+  event.preventDefault(); }
+}, false);
+
+// Add ScrollFix
+var scrollingContent = document.getElementById("chat-wrapper");
+new ScrollFix(scrollingContent);
 
   // Asynchronously load tracker
   require([
