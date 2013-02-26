@@ -21,6 +21,7 @@ define([
     events: {
       "click #menu-toggle":               "onMenuToggle",
       "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
+      "mouseenter #menu-toggle":          "onLeftMenuHotspot",
       "mouseenter #content-frame":        "onMouseEnterContentFrame",
       "mouseenter #header-wrapper":       "onMouseEnterHeader",
       "click #people-header":             "onPeopleHeaderClick",
@@ -34,7 +35,7 @@ define([
       "mouseenter .left-menu-icon":       "onMouseEnterToolbarItem",
       "mouseleave .left-menu-icon":       "onMouseLeaveToolbarItem",
 
-      "click .left-menu-icon":            "onLeftMenuListIconClick", 
+      "click .left-menu-icon":            "onLeftMenuListIconClick",
 
       "click #file-header":               "onFileHeaderClick",
       "click #mail-header":               "onMailHeaderClick",
