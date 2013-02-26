@@ -33,7 +33,7 @@ define([
   });
 
   client.bind('transport:up', function() {
-    console.log('transport:down');
+    console.log('transport:up');
     connected = true;
     // the client is online
     $(document).trigger('realtime:up');
