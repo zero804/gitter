@@ -1,12 +1,35 @@
 /*jshint node:true */
 "use strict";
 
-var kue = require('kue');
+var Queue = require('kue');
 var redis = require('./redis');
+var winston = require('./winston');
+var shutdown = require('./shutdown');
 
 // Override createClient
-kue.redis.createClient = function() {
+Queue.redis.createClient = function() {
   return redis.createClient();
 };
 
-module.exports = kue;
+var singletonQueue = new Queue();
+
+Queue.createQueue = function() {
+  return singletonQueue;
+};
+
+shutdown.addHandler('kue', 10, function(callback) {
+  winston.info('Attempting to shutdown kue handlers');
+
+  singletonQueue.shutdown(function(err) {
+    if(err) {
+      winston.error("Error while shutting down kue", { exception: err });
+    } else {
+      winston.info('kue shutdown completed.');
+    }
+
+    callback();
+  }, 25000);
+});
+
+
+module.exports = Queue;

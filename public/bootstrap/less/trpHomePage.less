@@ -74,13 +74,21 @@ h1 {
   height: 700px;
 }
 
+.trpHomeMacAppHeroStripContainer {
+  background-image: url('../../images/2/home-download-image2.jpg');
+}
+
+.trpHomeiOSAppHeroStripContainer {
+  background-image: url('../../images/2/home-ios-download-image.jpg');
+}
+
+
 .trpHomeHero {
   display: inline-block;
   padding-top: 20px;
   width: 960px;
   text-align: left;
   min-height: 540px;
-
 }
 
 .trpHeroText {
@@ -94,8 +102,14 @@ h1 {
   text-align: left;
   line-height: 1.3em;
   vertical-align: top;
-  text-shadow: 0 0 0 transparent,0px -1px 1px rgba(0,0,0,0.55);
+  text-shadow: 0 0 0 transparent,1px 1px 2px rgba(0,0,0,0.55);
 }
+
+.trpHeroMacAppText {
+  font-size: 36px;
+  max-width: 720px;
+}
+
 
 .trpHeroSignup {
   font-size: 32px;
@@ -305,4 +319,53 @@ h1 {
   .trpH3;
   color: @trpDarkerGrey;
   padding-top: 10px;
+}
+
+@media screen and (device-width: 320px) and (orientation: portrait) {
+
+  body {
+    height: 100%;
+  }
+
+  html {
+    height: 100%;
+  }
+
+  .trpHomeHeroStripContainer {
+    height: 100%;
+  }
+
+  .trpHomeTopStrip {
+    min-width: 320px;
+    width: 300px;
+    padding-left: 20px
+  }
+
+  .trpHomeHero {
+    display: inline-block;
+    padding-top: 20px;
+    width: 300px;
+    text-align: left;
+    min-height: 100%;
+    height: 100%;
+  }
+
+  .trpHeroText {
+    padding-left: 10px;
+    padding-top: 0px;
+    font-size: 24px;
+  }
+
+  .trpHeroSignup {
+    padding-left: 10px;
+  }
+
+  .trpHeroMacAppText {
+    font-size: 22px;
+  }
+
+  .trpHeroAppStore {
+    padding-top: 20px;
+  }
+
 }

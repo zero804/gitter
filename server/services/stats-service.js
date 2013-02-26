@@ -2,6 +2,7 @@
 "use strict";
 
 var nconf = require('../utils/config');
+var winston = require('../utils/winston');
 
 if(!nconf.get("stats:sendStats")) {
   /* No-op */
@@ -19,10 +20,13 @@ var client = cube.emitter(statsUrl);
 exports.event = function(eventName, data) {
   if(!data) data = {};
   data.env = statsEnvName;
-  client.send({
+  var event = {
     type: "troupe_" + eventName,
     time: new Date(),
     data: data
-  });
+  };
+
+  winston.debug("Stat", event);
+  client.send(event);
 };
 

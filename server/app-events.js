@@ -9,6 +9,7 @@ var client = redis.createClient();
 var pubClient = redis.createClient();
 var eventEmitter = new events.EventEmitter();
 var localEventEmitter = new events.EventEmitter();
+var shutdown = require('./utils/shutdown');
 
 var subscriptions = {};
 
@@ -157,7 +158,9 @@ function bind(on) {
   };
 }
 
-
+shutdown.addHandler('appevents', 2, function(callback) {
+  pubClient.unsubscribe('*', callback);
+});
 
 module.exports = bind(onRemote);
 module.exports.localOnly = bind(onLocalOnly);

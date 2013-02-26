@@ -13,8 +13,15 @@ var form = require("express-form"),
     nconf = require('../utils/config');
 
 module.exports = {
-    install: function(app) {
 
+    isMobile: function(req) {
+      var userAgent = req.headers['user-agent'] || '';
+      var compactView = userAgent.indexOf("Mobile/") >= 0;
+      return compactView;
+    },
+
+    install: function(app) {
+      var self = this;
       app.get(nconf.get('web:homeurl'),
         middleware.grantAccessForRememberMeTokenMiddleware,
         function(req, res, next) {
@@ -22,13 +29,14 @@ module.exports = {
           if(req.user) {
             loginUtils.redirectUserToDefaultTroupe(req, res, next, {
               onNoValidTroupes: function() {
-                res.render('signup', { noValidTroupes: JSON.stringify(true), userId: JSON.stringify(req.user.id) });
+
+                res.render('signup', { compactView: self.isMobile(req), noValidTroupes: JSON.stringify(true), userId: JSON.stringify(req.user.id) });
               }
             });
 
             return;
           }
-          res.render('signup', { noValidTroupes: JSON.stringify(false), userId: JSON.stringify(null) });
+          res.render('signup', { compactView: self.isMobile(req), noValidTroupes: JSON.stringify(false), userId: JSON.stringify(null) });
         }
       );
 

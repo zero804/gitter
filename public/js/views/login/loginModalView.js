@@ -48,6 +48,7 @@ define([
     backClicked: function(e) {
       this.$el.find('.login-content').show();
       this.$el.find('.resetpwd-content').hide();
+      this.$el.find('.resetpwd-failed').hide();
     },
 
     resetClicked: function(e) {
@@ -71,11 +72,13 @@ define([
         type: "POST",
         success: function(data) {
           if(data.failed) {
-            return;
+            that.$el.find('.resetpwd-content').hide();
+            that.$el.find('.resetpwd-failed').show();
           }
-          that.$el.find('#resetEmail').text(that.$el.find('#email').val());
-          that.$el.find('.resetpwd-content').hide();
-          that.$el.find('.resetpwd-confirm').show();
+          else {
+            that.$el.find('#resetEmail').text(that.$el.find('#email').val());
+            that.$el.find('.resetpwd-confirm').show();
+          }
         }
       });
 

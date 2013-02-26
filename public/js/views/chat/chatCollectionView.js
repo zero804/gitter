@@ -1,4 +1,5 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true browser:true */
+/*global console: true */
 define([
   'jquery',
   'underscore',
@@ -8,7 +9,7 @@ define([
 ], function($, _, Marionette, TroupeViews, chatItemTemplate) {
   "use strict";
 
-  var PAGE_SIZE = 50;
+  var PAGE_SIZE = 15;
 
   var ChatViewItem = TroupeViews.Base.extend({
     unreadItemType: 'chat',
@@ -54,29 +55,80 @@ define([
     initialize: function() {
       _.bindAll(this, 'chatWindowScroll');
       this.initializeSorting();
-      $(window).on('scroll', this.chatWindowScroll);
-    },
+      var self = this;
+
+      if (window._troupeCompactView) {
+        this.scrollOf = $('#chat-wrapper');
+        this.container = $('#chat-frame');
+      } else {
+        this.scrollOf = window;
+        this.container = document;
+      }
+      $(this.scrollOf).on('scroll', this.chatWindowScroll);
+      this.scrollPosBeforeAdd = 0;
+   },
 
     beforeClose: function() {
-      $(window).off('scroll', this.chatWindowScroll);
+      $(this.scrollOf).off('scroll', this.chatWindowScroll);
+    },
+
+    onRender: function() {
+      // console.log("scrollOf scroll: " + $(this.scrollOf).scrollTop() + " container height: " + $(this.container).height());
+      // this is an ugly hack to deal with some weird timing issues
+      var self = this;
+      setTimeout(function() {
+        $(self.scrollOf).scrollTop($(self.container).height());
+      }, 500);
+    },
+
+    onAfterItemAdded: function() {
+      if (this.isAtBottomOfPage) {
+        // stay at the bottom
+        $(this.scrollOf).scrollTop($(this.container).height());
+      }
+      else if (this.firstElBeforeLoad) {
+        // keep current position if we are loading more
+        // it's very difficult to get an elements co-ordinate within it's parent.
+        // so we readjust the scroll according to how much it's parent has grown,
+        // to be more general we could look at the displacement that the growth caused for the element,
+        // so that we can figure out how much growth occurred above vs below it.
+        //console.log("Resetting scroll from ", $(this.scrollOf).scrollTop(), " to ", this.scrollPosBeforeAdd, " + ", $(this.container).height(), " - ", this.containerHeightBeforeAdd, " = ", this.scrollPosBeforeAdd + ($(this.container).height() - this.containerHeightBeforeAdd));
+        $(this.scrollOf).scrollTop(this.scrollPosBeforeAdd + ($(this.container).height() - this.containerHeightBeforeAdd));
+        // we store the accumulated scroll position here because safari doesn't update the scroll position immediately, so we can't read it back accurately.
+        this.scrollPosBeforeAdd += ($(this.container).height() - this.containerHeightBeforeAdd);
+      }
+
+    },
+
+    onBeforeItemAdded: function() {
+      this.isAtBottomOfPage = $(this.scrollOf).scrollTop() === $(this.container).height() - $(this.scrollOf).height();
+      this.containerHeightBeforeAdd = $(this.container).height();
+      //this.scrollPosBeforeAdd = $(this.scrollOf).scrollTop();
     },
 
     chatWindowScroll: function() {
-      if($(window).scrollTop() == $(document).height() - $(window).height()) {
+      if (this.hasScrolled && $(this.scrollOf).scrollTop() === 0) {
         this.loadNextMessages();
       }
+      this.hasScrolled = true;
     },
 
     loadNextMessages: function() {
       if(this.loading) return;
 
+      // if there are no chat items in the view, don't try save the curOffset
+      if (this.$el.find('>').length) {
+        // store the chat item view element that is at the top of the list at this point  (before loading)
+        this.firstElBeforeLoad = this.$el.find(':first');
+        this.scrollPosBeforeAdd = 0;
+      }
+
       var self = this;
       this.loading = true;
-      function success(data/*, resp*/) {
+      function success(data, resp) {
         self.loading = false;
-        if(!data.length) {
-          $(window).off('scroll', self.chatWindowScroll);
-          return;
+        if(!resp.length) {
+          $(self.scrollOf).off('scroll', self.chatWindowScroll);
         }
       }
 

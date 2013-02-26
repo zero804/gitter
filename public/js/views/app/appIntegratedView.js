@@ -21,6 +21,7 @@ define([
     events: {
       "click #menu-toggle":               "onMenuToggle",
       "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
+      "mouseenter #menu-toggle":          "onLeftMenuHotspot",
       "mouseenter #content-frame":        "onMouseEnterContentFrame",
       "mouseenter #header-wrapper":       "onMouseEnterHeader",
       "click #people-header":             "onPeopleHeaderClick",
@@ -34,7 +35,7 @@ define([
       "mouseenter .left-menu-icon":       "onMouseEnterToolbarItem",
       "mouseleave .left-menu-icon":       "onMouseLeaveToolbarItem",
 
-      "click .left-menu-icon":            "onLeftMenuListIconClick", 
+      "click .left-menu-icon":            "onLeftMenuListIconClick",
 
       "click #file-header":               "onFileHeaderClick",
       "click #mail-header":               "onMailHeaderClick",
@@ -160,7 +161,7 @@ define([
       });
 
       if ($(document).width() < 1250) {
-        $("#content-frame, #header-frame, #alert-content").animate({
+        $("#content-frame, #header-frame, #alert-content, #chat-input").animate({
           left: '+=110px'
         }, 350, function() {
         });
@@ -180,7 +181,7 @@ define([
 
         if ($(document).width() < 1250) {
 
-          $("#content-frame, #header-frame, #alert-content").animate({
+          $("#content-frame, #header-frame, #alert-content, #chat-input").animate({
             left: '-=110px'
           }, 350, function() {
           });
@@ -204,7 +205,7 @@ define([
       }, 350);
 
 
-      $("#content-frame, #alert-content, #header-frame").animate({
+      $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
         left: "+=180px"
       }, 350);
 
@@ -230,7 +231,7 @@ define([
       }, 350);
 
 
-      $("#content-frame, #alert-content, #header-frame").animate({
+      $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
         left: "-=180px"
       }, 350);
 
@@ -310,7 +311,7 @@ define([
     },
 
     onPeopleHeaderClick: function() {
-      this.toggleRightPanel('people-list');
+      this.toggleRightPanel('people-roster');
     },
 
     onAddPeopleClick: function() {

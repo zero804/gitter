@@ -14,7 +14,7 @@ define([
 
   var FileView = Marionette.CollectionView.extend({
     itemView: FileItemView,
-    emptyView: Backbone.View.extend({
+    emptyView: TroupeViews.Base.extend({
       template: fileHelpView
     }),
 
