@@ -1,19 +1,19 @@
 /*jshint node:true */
 "use strict";
 
-var Queue = require('kue');
+var kue = require('kue');
 var redis = require('./redis');
 var winston = require('./winston');
 var shutdown = require('./shutdown');
 
 // Override createClient
-Queue.redis.createClient = function() {
+kue.redis.createClient = function() {
   return redis.createClient();
 };
 
-var singletonQueue = new Queue();
+var singletonQueue = kue.createQueue();
 
-Queue.createQueue = function() {
+kue.createQueue = function() {
   return singletonQueue;
 };
 
@@ -32,4 +32,4 @@ shutdown.addHandler('kue', 10, function(callback) {
 });
 
 
-module.exports = Queue;
+module.exports = kue;
