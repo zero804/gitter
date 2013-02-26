@@ -12,13 +12,11 @@ var clients = [];
 shutdown.addHandler('redis', 1, function(callback) {
   var promises = [];
 
-  clients.forEach(function(client, index) {
+  clients.forEach(function(client) {
     var d = Q.defer();
     promises.push(d.promise);
 
-    console.log("Calling quit on " + index);
     client.quit(function() {
-      console.log("Completed quit on " + index);
       d.resolve();
     });
   });

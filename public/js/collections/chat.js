@@ -14,15 +14,15 @@ define([
   exports.ChatModel = TroupeCollections.Model.extend({
     idAttribute: "id",
     parse: function(response) {
-      response.sent = moment.utc(response.sent);
+      response.sent = moment(response.sent, moment.defaultFormat);
       return response;
     },
-    toJSON: function(options) {
+    toJSON: function() {
       var d = _.clone(this.attributes);
       var sent = this.get('sent');
       if(sent) {
         // Turn the moment sent value into a string
-        d.sent = sent.utc();
+        d.sent = sent.format();
       }
       return d;
     }

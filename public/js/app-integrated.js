@@ -218,7 +218,6 @@ require([
           /* Default case: load the view from scratch */
           var view = new viewDetails.viewType({ model: model, collection: viewDetails.collection });
           region.show(view);
-          console.log("APPNAV");
           $(document).trigger('appNavigation');
         }
 
@@ -383,6 +382,7 @@ require([
 
 
     app.collections = {
+      'chats': chatCollection,
       'requests': requestCollection,
       'files': fileCollection,
       'conversations': conversationCollection,
@@ -397,8 +397,6 @@ require([
 
     router.initialize();
     Backbone.history.start();
-
-    console.log("History started");
   });
 
   // Asynchronously load tracker
@@ -409,6 +407,8 @@ require([
   });
 
   app.start();
-
+  window._troupeDebug = {
+    app: app
+  };
   return app;
 });

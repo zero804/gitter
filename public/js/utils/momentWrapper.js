@@ -3,7 +3,6 @@ define([
   'moment'
 ], function(moment) {
   /*jshint trailing:false */
-  /*global require:true console:true setTimeout:true*/
   "use strict";
 
   moment.calendar = {
@@ -14,6 +13,8 @@ define([
     nextWeek : 'dddd [at] LT',
     sameElse : 'LL'
   };
-  
+
+  moment.defaultFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZ';
+
   return moment;
 });
