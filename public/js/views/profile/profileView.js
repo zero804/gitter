@@ -92,6 +92,8 @@ define([
     },
 
     onFormSubmit: function(e) {
+      // TODO really need some validation here, server won't accept names with numbers in them.
+      // can't leave pasword field empty.
       if(e) e.preventDefault();
 
       var form = this.$el.find('form#updateprofileform');

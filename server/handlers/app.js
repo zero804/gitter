@@ -69,8 +69,9 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data)
         }
 
         var status = req.user.status;
-        profileNotCompleted = status == 'PROFILE_NOT_COMPLETED';
-        if(status != 'PROFILE_NOT_COMPLETED' && status != 'ACTIVE') {
+        profileNotCompleted = (status == 'PROFILE_NOT_COMPLETED') || (status == 'UNCONFIRMED');
+
+        if(status != 'UNCONFIRMED' && status != 'PROFILE_NOT_COMPLETED' && status != 'ACTIVE') {
           // Oh dear, something has gone horribly wrong
           winston.error("Rejecting user. Something has gone wrong! ", { user: req.user });
           return next("Inconsistent state for user: " + status);
