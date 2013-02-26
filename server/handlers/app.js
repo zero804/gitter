@@ -242,14 +242,16 @@ module.exports = {
 
 
           var f = new Fiber();
+          preloadTroupes(req.user.id, f.waitor());
           preloadFiles(req.user.id, req.troupe.id, f.waitor());
           preloadChats(req.user.id, req.troupe.id, f.waitor());
           preloadUsers(req.user.id, req.troupe, f.waitor());
 
           f.all()
-            .spread(function(files, chats, users) {
+            .spread(function(troupes, files, chats, users) {
               // Send the information through
               renderAppPageWithTroupe(req, res, next, 'app-integrated', req.troupe, req.otherUser.displayName, {
+                troupes: troupes,
                 files: files,
                 chatMessages: chats,
                 users: users,
