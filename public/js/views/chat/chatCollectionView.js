@@ -76,9 +76,9 @@ define([
       // console.log("scrollOf scroll: " + $(this.scrollOf).scrollTop() + " container height: " + $(this.container).height());
       // this is an ugly hack to deal with some weird timing issues
       var self = this;
-      $(function() {
-      $(self.scrollOf).scrollTop($(self.container).height());
-      });
+      setTimeout(function() {
+        $(self.scrollOf).scrollTop($(self.container).height());
+      }, 500);
     },
 
     onAfterItemAdded: function() {
