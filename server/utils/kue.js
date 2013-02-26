@@ -18,11 +18,17 @@ Queue.createQueue = function() {
 };
 
 shutdown.addHandler('kue', 10, function(callback) {
-  winston.info('Shutting down kue handlers');
+  winston.info('Attempting to shutdown kue handlers');
+
   singletonQueue.shutdown(function(err) {
-    if(err) winston.error("Error while shutting down kue", { exception: err });
+    if(err) {
+      winston.error("Error while shutting down kue", { exception: err });
+    } else {
+      winston.info('kue shutdown completed.');
+    }
+
     callback();
-  }, 20000);
+  }, 25000);
 });
 
 

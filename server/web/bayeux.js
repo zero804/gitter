@@ -9,6 +9,7 @@ var winston = require("winston");
 var troupeService = require("../services/troupe-service");
 var presenceService = require("../services/presence-service");
 var nconf = require("../utils/config");
+var shutdown = require('../utils/shutdown');
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
@@ -279,6 +280,12 @@ server.bind('disconnect', function(clientId) {
     }, 10000);
 
   });
+});
+
+shutdown.addHandler('bayeux', 15, function(callback) {
+  var engine = server._server._engine;
+  engine.disconnect();
+  setTimeout(callback, 1000);
 });
 
 module.exports = {
