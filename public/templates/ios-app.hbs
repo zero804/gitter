@@ -50,15 +50,18 @@
     <div class="trpHomeHeroStripContainer trpHomeiOSAppHeroStripContainer">
 
       <div class="trpHomeTopStrip">
-        <div class="trpHomeLogo"><a href="/"><img src='{{ cdn "images/2/logo-mark-green-square-white-text.png" }}' height="64" width="215"></a></div>
+        <div class="trpHomeLogo"><a href="{{homeUrl}}"><img src='{{ cdn "images/2/logo-mark-green-square-white-text.png" }}' height="64" width="215"></a></div>
+        {{^compactView}}
         <div class="trpHomeMenu">
           <div class="trpHomeMenuItem trpPadV14 trpHand button-existing-users-login">Sign in</div>
         </div>
+        {{/compactView}}
     </div>
 
       <div class="trpHomeHero">
         <div class="trpHeroText trpHeroMacAppText">
-          Work from anywhere with Troupe<br> on your iPhone.
+          {{#compactView}}Work from anywhere with Troupe on your iPhone.{{/compactView}}
+          {{^compactView}}Work from anywhere with Troupe<br> on your iPhone.{{/compactView}}
           <br><br>
         </div>
         <div class="trpHeroSignup">

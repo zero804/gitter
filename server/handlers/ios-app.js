@@ -8,7 +8,9 @@ module.exports = {
       app.get(
         '/ios-app',
         function(req, res) {
-          res.render('ios-app', { homeUrl: nconf.get('web:homeurl') });
+          var userAgent = req.headers['user-agent'] || '';
+          var compactView = userAgent.indexOf("Mobile/") >= 0;
+          res.render('ios-app', { compactView: compactView, homeUrl: nconf.get('web:homeurl') });
         }
       );
     }
