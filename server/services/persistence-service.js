@@ -8,6 +8,7 @@ var appEvents = require("../app-events");
 var _ = require("underscore");
 var winston = require("winston");
 var nconf = require("../utils/config");
+var shutdown = require('../utils/shutdown');
 
 var connection = mongoose.connection;
 
@@ -18,6 +19,10 @@ mongoose.connect(nconf.get("mongo:url"), {
   server: { readPreference: "primaryPreferred" },
   db: { readPreference: "primaryPreferred" },
   replset: { readPreference: "primaryPreferred" }
+});
+
+shutdown.addHandler('mongo', 1, function(callback) {
+  mongoose.disconnect(callback);
 });
 
 if(nconf.get("mongo:profileSlowQueries")) {
