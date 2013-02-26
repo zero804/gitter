@@ -26,12 +26,14 @@ define([
   client.addExtension(new ClientAuth());
 
   client.bind('transport:down', function() {
+    console.log('transport:down');
     connected = false;
     // the client is not online
     $(document).trigger('realtime:down');
   });
 
   client.bind('transport:up', function() {
+    console.log('transport:up');
     connected = true;
     // the client is online
     $(document).trigger('realtime:up');

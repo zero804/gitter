@@ -13,6 +13,7 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   var chatMessage = new persistence.ChatMessage();
   chatMessage.fromUserId = user.id;
   chatMessage.toTroupeId = troupe.id;
+  chatMessage.sent = new Date();
   chatMessage.text = text;
   chatMessage.save(function (err) {
     if(err) return callback(err);

@@ -218,7 +218,6 @@ require([
           /* Default case: load the view from scratch */
           var view = new viewDetails.viewType({ model: model, collection: viewDetails.collection });
           region.show(view);
-          console.log("APPNAV");
           $(document).trigger('appNavigation');
         }
 
@@ -271,7 +270,6 @@ require([
 
     // Setup the ChatView
     chatCollection = new chatModels.ChatCollection();
-    chatCollection.setSortBy('-sent');
     chatCollection.listen();
     chatCollection.reset(window.troupePreloads['chatMessages'], { parse: true });
 
@@ -325,6 +323,8 @@ require([
 
     // Troupe Collections
     troupeCollection = new troupeModels.TroupeCollection();
+    troupeCollection.reset(window.troupePreloads['troupes'], { parse: true });
+
     unreadItemsClient.installTroupeListener(troupeCollection);
 
     var filteredTroupeCollection = new Backbone.FilteredCollection(null, {model: troupeModels.TroupeModel, collection: troupeCollection });
@@ -337,8 +337,6 @@ require([
       return m.get('oneToOne');
     });
 
-
-    troupeCollection.fetch();
     var troupeCollectionView = new TroupeCollectionView({
       collection: filteredTroupeCollection
     });
@@ -383,6 +381,7 @@ require([
 
 
     app.collections = {
+      'chats': chatCollection,
       'requests': requestCollection,
       'files': fileCollection,
       'conversations': conversationCollection,
@@ -397,8 +396,6 @@ require([
 
     router.initialize();
     Backbone.history.start();
-
-    console.log("History started");
   });
 
   // Asynchronously load tracker
@@ -409,6 +406,8 @@ require([
   });
 
   app.start();
-
+  window._troupeDebug = {
+    app: app
+  };
   return app;
 });

@@ -49,13 +49,14 @@
     "winston-loggly": "~0.6.0",
     "express-winston": "~0.1.2",
     "apn": "~1.2.4",
-    "kue": "~0.5.0",
+    "kue": "git://github.com/suprememoocow/kue.git",
     "file": "~0.2.1",
     "cube": "~0.2.4",
     "nomnom": "~1.5.2",
     "mimelib": "~0.2.10",
     "faye": "~0.8.8",
-    "faye-redis": "~0.1.1"
+    "faye-redis": "~0.1.1",
+    "geckoboard-push": "0.0.5"
   },
   "devDependencies": {
     "better-assert": "~0.1.0",

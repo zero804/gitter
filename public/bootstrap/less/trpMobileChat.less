@@ -23,6 +23,19 @@ a {
 
 /*Mobile Overrides*/
 
+.contentBody {
+	position: absolute; 
+	top: 0; 
+	left: 0; 
+	right: 0; 
+	bottom: 60px;
+	width: 320px;
+	max-width: 320px;
+	overflow: scroll; 
+	-webkit-overflow-scrolling: touch;
+}
+
+
 .avatar-s {
 	position: relative;
 	height: 24px;
@@ -38,17 +51,32 @@ a {
   width: 254px;
 }
 
+.trpChatInputArea {
+	position: fixed;
+	bottom: 0px;
+	z-index: 5;
+	background-color: @trpBgColor;
+	padding-bottom: 5px;
+}
+
 .trpChatInputBox {
   margin-left: 4px;
   width: 270px;
 }
 
+.trpChatPanel {
+	padding: 5px;
+}
 
 @media screen and (device-width: 320px) and (orientation: portrait) {
 
   .trpChatInputBoxTextArea {
     width: 220px;
 
+  }
+
+  .trpChatText {
+  	max-width: 255px;
   }
 
   .trpChatInputBox {

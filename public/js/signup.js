@@ -6,7 +6,8 @@ require([
   'views/signup/signupModalConfirmView',
   'views/login/loginModalView',
   'views/signup/createTroupeView',
-  'jquery_validate' // No ref!
+  'jquery_validate', // No ref!
+  'retina'
  ],
   function($, TroupeViews, SignupModalView, SignupModalConfirmView, LoginModalView, createTroupeView) {
     //var loginFormVisible = false;
@@ -85,5 +86,7 @@ require([
       modal.show();
       return false;
     });
+
+    console.log("CompactView:" + window._troupeCompactView);
 });
 
