@@ -23,12 +23,6 @@
     window.userId = {{{userId}}};
     </script>
 
-    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-
-    <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href='{{ cdn "images/favicon.ico"}}'>
     <link rel="apple-touch-icon" href='{{ cdn "images/apple-touch-icon.png" }}'>
     <link rel="apple-touch-icon" sizes="72x72" href='{{ cdn "images/apple-touch-icon-72x72.png" }}'>
@@ -51,27 +45,32 @@
 
       <div class="trpHomeTopStrip">
         <div class="trpHomeLogo"><img src='{{ cdn "images/2/logo-mark-green-square-white-text.png" }}' height="64" width="215"></div>
+        {{^compactView}}
         <div class="trpHomeMenu">
           <div class="trpHomeMenuItem trpPadV14 trpHand button-existing-users-login">Sign in</div>
         </div>
+        {{/compactView}}
     </div>
 
       <div class="trpHomeHero">
         <div class="trpHeroText">
           The quick and simple way to chat, share and<br>work together.<br><br>Anytime, anywhere.
           <br><br>
+          {{#compactView}}Coming soon.{{/compactView}}
         </div>
+        {{^compactView}}
         <div class="trpHeroSignup">
           <a class="trpHomeMenuItem trpButtonBig trpBtnWhite button-signup" href="#" id="btn-signup"> Get Started </a>
         </div>
-        </div>
+
         <div class="trpHeroImage">
           <img src='{{ cdn "images/2/home-hero-laptop2.png" }}'>
         </div>
+        {{/compactView}}
       </div>
     </div>
 
-
+    {{^compactView}}
     <div class="trpHomeMidStripContainer">
       <div class="trpMidStrip">Why you'll love using Troupe</div>
       </div>
@@ -122,6 +121,6 @@
         <a href="#top"><img src='{{ cdn "images/2/logo-mark-green-square-white.png" }}' class="trpLine"></a>
       </div>
     </div>
-
+    {{/compactView}}
   </body>
 </html>

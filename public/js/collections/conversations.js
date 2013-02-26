@@ -18,7 +18,7 @@ define([
     initialize: function() {
       var date = this.get('date');
       if(date && typeof date === 'string') {
-        date = moment.utc(date);
+        date = moment(date, moment.defaultFormat);
         this.set('date', date);
       }
     }
@@ -54,7 +54,7 @@ define([
     },
 
     parse: function(response) {
-      response.updated = moment.utc(response.updated);
+      response.updated = moment(response.updated, moment.defaultFormat);
       return response;
     }
 
