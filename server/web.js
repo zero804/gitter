@@ -12,6 +12,7 @@ var express = require('express'),
   unreadItemService = require('./services/unread-item-service'),
   nconf = require('./utils/config'),
   redis = require('./utils/redis'),
+  shutdown = require('./utils/shutdown'),
   oauth2 = require('./web/oauth2');
 
 /* Load express-resource */
@@ -19,6 +20,19 @@ require('express-resource');
 
 var app = express();
 var server = http.createServer(app);
+
+var gracefullyClosing = false;
+app.use(function(req, res, next) {
+  if(!gracefullyClosing) return next();
+
+  res.setHeader("Connection", "close");
+  res.send(502, "Server is in the process of restarting");
+});
+
+shutdown.addHandler('web', 10, function(callback) {
+  gracefullyClosing = true;
+  server.close(callback);
+});
 
 var RedisStore = require('connect-redis')(express);
 var sessionStore = new RedisStore({
