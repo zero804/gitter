@@ -6,6 +6,7 @@ var fs = require('fs');
 var https = require('https');
 var nconf = require('./utils/config');
 var winston = require('./utils/winston');
+var shutdown = require('./utils/shutdown');
 
 var options = {
   key: fs.readFileSync(nconf.get("ws:privateKeyFile")),
@@ -37,6 +38,20 @@ var bindIp = nconf.get("ws:bindIp");
 winston.info("Binding websockets service to " + bindIp + ":" + port);
 
 server.listen(port, bindIp);
+
+var gracefullyClosing = false;
+app.use(function(req, res, next) {
+  if(!gracefullyClosing) return next();
+
+  res.setHeader("Connection", "close");
+  res.send(502, "Server is in the process of restarting");
+});
+
+shutdown.addHandler('websockets', 10, function(callback) {
+  server.close(function() {
+    callback();
+  });
+});
 
 var uid = nconf.get("runtime:uid");
 var gid = nconf.get("runtime:gid");
