@@ -246,8 +246,6 @@ exports.install = function() {
       }
     });
 
-    console.log(data);
-
     /* No item worth picking? Quit */
     if(!item) return;
 

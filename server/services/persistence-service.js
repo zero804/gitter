@@ -453,7 +453,6 @@ module.exports = {
 };
 
 process.nextTick(function() {
-  console.log("Installing mongoose events");
   var events = require("./persistence-service-events");
   events.install(module.exports);
 });
