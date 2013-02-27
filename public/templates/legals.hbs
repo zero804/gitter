@@ -289,6 +289,7 @@ $("#privacy-policy-button").click(function() {
   {{#if trackingId}}
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', '{{trackingId}}']);
+  _gaq.push(['_setAllowAnchor',true]);
   _gaq.push(['_trackPageview']);
 
   (function() {
