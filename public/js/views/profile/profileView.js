@@ -37,12 +37,8 @@ define([
     },
 
     afterRender: function() {
-      var displayNameEl = this.$el.find('#displayName');
-      displayNameEl.placeholder();
-      var passwordEl = this.$el.find('#password');
-      passwordEl.placeholder();
-      var oldpasswordEl = this.$el.find('#oldpassword');
-      oldpasswordEl.placeholder();
+      this.$el.find('#displayName').placeholder();
+      this.$el.find('#password').placeholder();
 
       var self = this;
       var uploader = new qq.FineUploaderBasic({
@@ -76,7 +72,7 @@ define([
 
     },
 
-    onPasswordChange: function(e) {
+    onPasswordChange: function() {
       if(!this.isExistingUser) return;
       var pw = this.$el.find('#password');
       if(!pw.val()) return;
@@ -86,6 +82,7 @@ define([
         field.show();
         field.removeAttr('value');
         field.attr('placeholder', "Type your old password here");
+        field.placeholder(); // must do this here for IE
         this.oldPasswordVisible = true;
       }
     },
