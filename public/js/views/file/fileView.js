@@ -41,7 +41,7 @@ define([
     },
 
     addFile: function() {
-      $('#fineUploader input[type=file]').click();
+      // $('#fineUploader input[type=file]').click();
     }
 
   });

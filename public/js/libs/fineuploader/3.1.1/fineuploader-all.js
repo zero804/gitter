@@ -464,11 +464,14 @@ define(['jquery'], function($) { /*jslint browser: true*/
 
     // make button suitable container for input
     qq(this._element).css({
-      position: 'relative',
+      position: 'absolute',
+      width: '32px',
+      height: '32px',
       overflow: 'hidden',
+      cursor: 'pointer',
       // Make sure browse button is in the right side
       // in Internet Explorer
-      direction: 'ltr'
+      direction: 'ltr',
     });
 
     this._input = this._createInput();
@@ -504,15 +507,17 @@ define(['jquery'], function($) { /*jslint browser: true*/
         // in Opera only 'browse' button
         // is clickable and it is located at
         // the right side of the input
-        right: 0,
-        top: 0,
+        left: '2px',
+        top: '2px',
         fontFamily: 'Arial',
         // 4 persons reported this, the max values that worked for them were 243, 236, 236, 118
-        fontSize: '118px',
+        fontSize: '40px',
         margin: 0,
         padding: 0,
         cursor: 'pointer',
-        opacity: 0
+        opacity: 0,
+        width: '32px',
+        height: '32px'
       });
 
       this._element.appendChild(input);
@@ -1476,7 +1481,7 @@ define(['jquery'], function($) { /*jslint browser: true*/
         formatProgress: "{percent}% of {total_size}",
         waitingForResponse: "Processing..."
       },
-      template: '<div class="qq-uploader">' + ((!this._options.dragAndDrop || !this._options.dragAndDrop.disableDefaultDropzone) ? '<div class="qq-upload-drop-area"><span>{dragZoneText}</span></div>' : '') + (!this._options.button ? '<div class="qq-upload-button"><div>{uploadButtonText}</div></div>' : '') + '<span class="qq-drop-processing"><span>{dropProcessingText}</span><span class="qq-drop-processing-spinner"></span></span>' + (!this._options.listElement ? '<ul class="qq-upload-list"></ul>' : '') + '</div>',
+      template: '<div class="qq-uploader">' + ((!this._options.dragAndDrop || !this._options.dragAndDrop.disableDefaultDropzone) ? '<div class="qq-upload-drop-area"><span>{dragZoneText}</span></div>' : '') + (!this._options.button ? '<div class="qq-upload-button"></div>' : '') + '<span class="qq-drop-processing"><span>{dropProcessingText}</span><span class="qq-drop-processing-spinner"></span></span>' + (!this._options.listElement ? '<ul class="qq-upload-list"></ul>' : '') + '</div>',
 
       // template for one item in file list
       fileTemplate: '<li>' + '<div class="qq-progress-bar"></div>' + '<span class="qq-upload-spinner"></span>' + '<span class="qq-upload-finished"></span>' + '<span class="qq-upload-file"></span>' + '<span class="qq-upload-size"></span>' + '<a class="qq-upload-cancel" href="#">{cancelButtonText}</a>' + '<a class="qq-upload-retry" href="#">{retryButtonText}</a>' + '<span class="qq-upload-status-text">{statusText}</span>' + '</li>',
