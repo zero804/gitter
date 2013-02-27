@@ -30,6 +30,12 @@ exports.hook_queue = function (next, connection) {
 
   winston.debug("Gateway: Received mail from " + mail.from);
 
+  // hard deny (smtp bounce) if there is no from field
+  if (!validateAddress(mail.from)) {
+    winston.debug("Gateway: Invalid or no sender address, hard bouncing.");
+    return next(DENY, "There was no sender email address specified by your SMTP server");
+  }
+
   // ensure that the user is registered
   userService.findByEmail(mail.from, function (err, user) {
     winston.debug("Gateway: Looked up the user for this mail");
@@ -42,12 +48,11 @@ exports.hook_queue = function (next, connection) {
       );
     }
 
-    // hard deny if not a registered sender.
+    // accept mail and send our own bounce if this is not a registered sender.
     if(!user) {
       sendBounceMail(false, mail, troupeUris, [], []);
 
       return next(OK); // no further plugins should run
-      // return next(DENY, "Sorry, your email address is not registered with us, please visit http://trou.pe to register.");
     }
 
     // fetch the troupes access control hash,
@@ -136,4 +141,19 @@ function sendBounceMail(userIsRegistered, mail, deniedTroupes, nonExistantTroupe
 
 function parseAddress(address) {
   return (address) ? mimelib.parseAddresses(address)[0].address : '';
+}
+
+function validateAddress(address) {
+  if (!address)
+    return false;
+
+  if (typeof address !== 'string' && !(address instanceof String))
+    return false;
+
+  var parts = address.split('@');
+
+  if (parts.length !== 2)
+    return false;
+
+  return (parts[0] && parts[1]);
 }
