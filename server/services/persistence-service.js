@@ -179,6 +179,11 @@ TroupeSchema.methods.containsUserId = function(userId) {
 };
 
 TroupeSchema.methods.addUserById = function(userId) {
+  var exists = this.users.some(function(user) { return user.userId == userId; });
+  if(exists) {
+    throw new Error("User already exists in this troupe.");
+  }
+
   // TODO: disable this methods for one-to-one troupes
   var troupeUser = new TroupeUser({ userId: userId });
   this.post('save', function(postNext) {

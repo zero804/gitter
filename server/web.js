@@ -44,7 +44,11 @@ require('./web/express').installFull(app, server, sessionStore);
 require('./web/passport').install();
 
 require('./web/passport').install();
-require('./web/bayeux-events-bridge').install(server);
+
+if(nconf.get('ws:startFayeInPrimaryApp')) {
+  require('./web/bayeux-events-bridge').install(server);
+}
+
 require('./handlers/').install(app);
 
 // TEMP
