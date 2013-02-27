@@ -2,8 +2,8 @@
 "use strict";
 
 var kue = require('../utils/kue'),
-    jobs = kue.createQueue(),
-    _ = require('underscore');
+    _ = require('underscore'),
+    jobs;
 
 exports.startWorkers = function() {
   var nodemailer = require('nodemailer'),
@@ -11,6 +11,7 @@ exports.startWorkers = function() {
       nconf = require('../utils/config'),
       winston = require("winston");
 
+  jobs = kue.createQueue();
   var logEmailToLogger = nconf.get('logging:logEmailContents');
 
   var sesTransport = nodemailer.createTransport("SES", {
@@ -79,6 +80,8 @@ exports.startWorkers = function() {
 };
 
 exports.sendEmail = function(options) {
+  if(!jobs) jobs = kue.createQueue();
+
   jobs.create('email', _.extend(options, { title: "Email to " + options.to }))
     .attempts(5)
     .save();

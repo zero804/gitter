@@ -13,10 +13,16 @@ if(!nodeEnv) {
 
 console.log("Using environment: " + nodeEnv);
 
+var configDir = __dirname + '/../../config';
+if(process.env['TROUPE_CONFIG_DIR_OVERRIDE']) {
+  configDir = process.env['TROUPE_CONFIG_DIR_OVERRIDE'];
+  console.log("Overridden config directory: " + configDir);
+}
+
 nconf.argv()
      .env();
-nconf.add('user', { type: 'file', file: './config/config.user-overrides.json'  });
-nconf.add('nodeEnv', { type: 'file', file: './config/config.' + nodeEnv + '.json'  });
-nconf.add('defaults', { type: 'file', file: './config/config.default.json' });
+nconf.add('user',     { type: 'file', file: configDir + '/config.user-overrides.json'  });
+nconf.add('nodeEnv',  { type: 'file', file: configDir + '/config.' + nodeEnv + '.json'  });
+nconf.add('defaults', { type: 'file', file: configDir + '/config.default.json' });
 
 module.exports = nconf;

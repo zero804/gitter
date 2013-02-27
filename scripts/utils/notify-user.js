@@ -4,6 +4,7 @@
 
 var appEvents = require('../../server/app-events');
 var userService = require('../../server/services/user-service');
+var shutdown = require('../../server/utils/shutdown');
 
 var winston = require('../../server/utils/winston');
 
@@ -65,9 +66,7 @@ if(opts.user) {
        sound: opts.sound
       });
 
-      process.nextTick(function() {
-        process.exit(0);
-      });
+      shutdown.shutdownGracefully();
 
    });
 }
