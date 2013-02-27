@@ -11,7 +11,7 @@
 
   <div class="trpModalProfilePic">
   {{ widget "avatar" user=user size='s' }}
-  <div class="trpModalSubtext button-choose-avatar">Change picture</div>
+  <div class="button-choose-avatar trpModalSubtext">Change picture</div>
   <form action="/updateprofile" method="post" id="updateprofileform">
     <div class="trpProfileForm">
       <input type="text" id="displayName" class="trpInput" name="displayName" value="{{displayName}}" placeholder="Click here and type your name"><br>
@@ -28,4 +28,8 @@
     <input type="submit" class="trpButtonBig trpBtnGreen getstarted" name="submit" value="Save">
   </form>
  </div>
+ <div class="trpModalFailure form-failure" style="display:none">
+  <span class="trpModalTitle"><span class="trpModalFailureText failure-text">There is an error with the form fields</span></span>
+ </div>
+</div>
 
