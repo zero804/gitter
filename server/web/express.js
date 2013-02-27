@@ -22,6 +22,8 @@ if(nconf.get('express:showStack')) {
 // Naughty naughty naught, install some extra methods on the express prototype
 require('./http');
 
+
+
 function ios6PostCachingFix() {
   return function(req, res, next) {
     if(req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE' || req.method === 'PATCH') {
@@ -47,6 +49,10 @@ module.exports = {
 
     handlebars.registerHelper('cdn', require('./hbs-helpers').cdn);
     handlebars.registerHelper('bootScript', require('./hbs-helpers').bootScript);
+
+    app.locals({
+      trackingId: nconf.get("web:trackingId")
+    });
 
     app.engine('hbs', expressHbs.express3({
       partialsDir: __dirname + '/../../' + nconf.get('web:staticContent') +'/templates/partials',
