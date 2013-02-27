@@ -57,7 +57,12 @@ define([
       var validationConfig = _.extend(this.shareTableView.getValidationConfig());
 
       validationConfig.showErrors = function(errorMap, errorList) {
-        if (errorList.length > 0) $('.signup-failure').show();
+        if (errorList.length > 0) {
+          $('.signup-failure').show();
+        }
+        else {
+          $('.signup-failure').hide();
+        }
         var errors = "";
         $.each(errorList, function () { errors += this.message + "<br>"; });
         $('#failure-text').html(errors);

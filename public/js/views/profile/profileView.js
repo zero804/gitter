@@ -6,6 +6,7 @@ define([
   'views/base',
   'hbs!./tmpl/profileView',
   'fineuploader',
+  'jquery_validate', // no ref
   'jquery_placeholder'
 ], function($, _, TroupeViews, template, qq) {
 
@@ -44,10 +45,6 @@ define([
       oldpasswordEl.placeholder();
 
       var self = this;
-      // ERR: the image only updates immediately every second attempt,
-      // even though the image is being sent to the server,
-      // and the element background url is changed correctly,
-      // the browser is receiving the old image on first attempt.
       var uploader = new qq.FineUploaderBasic({
         button: self.$el.find('.button-choose-avatar')[0],
         multiple: false,
@@ -74,6 +71,8 @@ define([
         }
       });
 
+      // will bind to submit and change events, will not validate immediately.
+      this.validateForm();
 
     },
 
@@ -91,9 +90,60 @@ define([
       }
     },
 
+    validateForm: function() {
+      var self = this;
+      var form = this.$el.find('form#updateprofileform');
+
+      // TODO:
+      // alphanumeracy of displayName should match validation on server (no numbers allowed)
+      // server validation errors should be displayed nicely
+
+      var validation = {
+        rules: {
+          displayName: { required: true, minlength: 4 },
+          password: { minlength: 6 },
+          oldPassword: { required: function() {
+              // if this is an existing user and they have set a value for the password field then oldPassword is required as well.
+              return (self.isExistingUser === true && !!self.$el.find('[name=password]').val());
+            }
+          }
+        },
+        debug: true,
+        messages: {
+          displayName: {
+            required: "Please tell us your name."
+          },
+          password: {
+            minlength: "Password must be at least 6 characters.",
+            required: "You need to set your password for the first time."
+          },
+          oldPassword: {
+            required: "You're trying to change your password. Please enter your old password, or clear the new password field."
+          }
+        },
+        showErrors: function(errorMap, errorList) {
+          if (errorList.length > 0) {
+            self.$el.find('.form-failure').show();
+          }
+          else {
+            self.$el.find('.form-failure').hide();
+          }
+
+          var errors = "";
+          $.each(errorList, function () { errors += this.message + "<br>"; });
+          self.$el.find('.failure-text').html(errors);
+        }
+      };
+
+      if (!this.isExistingUser) {
+        validation.password.required = true;
+      }
+
+      form.validate(validation);
+
+    },
+
     onFormSubmit: function(e) {
-      // TODO really need some validation here, server won't accept names with numbers in them.
-      // can't leave pasword field empty.
       if(e) e.preventDefault();
 
       var form = this.$el.find('form#updateprofileform');
