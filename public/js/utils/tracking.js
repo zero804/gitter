@@ -10,6 +10,7 @@ define([
   }
 
   _gaq.push(['_setAccount', window.troupeTrackingId]);
+  _gaq.push(['_setAllowAnchor',true]);
 
   function trackPageView(routeName) {
     _gaq.push(['_trackEvent', 'Route', routeName]);
