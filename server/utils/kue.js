@@ -13,15 +13,13 @@ kue.redis.createClient = function() {
 
 var singletonQueue;
 
-var _createQueue = kue.createQueue;
+kue._originalCreateQueue = kue.createQueue;
 
 kue.createQueue = function() {
-  console.dir("Creating kue queue");
-  console.error(new Error().stack);
-
   if(singletonQueue) return singletonQueue;
 
-  singletonQueue = _createQueue();
+  singletonQueue = kue._originalCreateQueue();
+
   shutdown.addHandler('kue', 10, function(callback) {
     winston.info('Attempting to shutdown kue handlers');
 
