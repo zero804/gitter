@@ -11,7 +11,7 @@
 
   <div class="trpModalProfilePic">
   {{ widget "avatar" user=user size='s' }}
-  <div class="trpModalSubtext button-choose-avatar">Change picture</div>
+  <div class="button-choose-avatar trpModalSubtext">Change picture</div>
   <form action="/updateprofile" method="post" id="updateprofileform">
     <div class="trpProfileForm">
       <input type="text" id="displayName" class="trpInput" name="displayName" value="{{displayName}}" placeholder="Click here and type your name"><br>
