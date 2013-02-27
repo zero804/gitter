@@ -4,17 +4,26 @@
 var express = require('express');
 var fs = require('fs');
 var https = require('https');
+var http = require('http');
 var nconf = require('./utils/config');
 var winston = require('./utils/winston');
 var shutdown = require('./utils/shutdown');
 
-var options = {
-  key: fs.readFileSync(nconf.get("ws:privateKeyFile")),
-  cert: fs.readFileSync(nconf.get("ws:certificateFile"))
-};
-
 var app = express();
-var server = https.createServer(options, app);
+var server;
+
+if(nconf.get("ws:privateKeyFile")) {
+  var options = {
+    key: fs.readFileSync(nconf.get("ws:privateKeyFile")),
+    cert: fs.readFileSync(nconf.get("ws:certificateFile"))
+  };
+  winston.info("Starting https/wss service");
+  server = https.createServer(options, app);
+} else {
+  winston.info("Starting http/ws service");
+  server = http.createServer(app);
+}
+
 
 var RedisStore = require('connect-redis')(express);
 var sessionStore = new RedisStore();

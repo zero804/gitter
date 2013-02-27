@@ -108,6 +108,8 @@ InMemoryClientUserLookupStrategy.prototype.disassociate = function(clientId, cal
       }
     }
 
+  } else {
+    winston.warn("userLookup: Client " + clientId + " not found.");
   }
 
   return callback(null, userId);

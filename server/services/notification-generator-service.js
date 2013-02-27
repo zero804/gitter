@@ -316,6 +316,11 @@ exports.startWorkers = function() {
   }
 
   function getTroupeUrl(serilizedTroupe, senderUserId) {
+    /* The URL for non-oneToOne troupes is the trivial case */
+    if(!serilizedTroupe.oneToOne) {
+      return "/" + serilizedTroupe.uri;
+    }
+
     if(!senderUserId) return null;
     var userIds = serilizedTroupe.userIds;
     var otherUserId = userIds.filter(function(userId) { return userId != senderUserId; })[0];

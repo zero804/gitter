@@ -4,6 +4,7 @@
 var PushNotificationDevice = require("./persistence-service").PushNotificationDevice;
 var winston = require("winston").prefix("notifications");
 var nconf = require('../utils/config');
+var _ = require('underscore');
 var redis = require("../utils/redis"),
     redisClient = redis.createClient();
 
@@ -32,10 +33,12 @@ exports.findDevicesForUser = function(userId, callback) {
 };
 
 exports.findUsersWithDevices = function(userIds, callback) {
+  userIds = _.uniq(userIds);
   PushNotificationDevice.distinct('userId', { userId: { $in: userIds } }, callback);
 };
 
 exports.findDevicesForUsers = function(userIds, callback) {
+  userIds = _.uniq(userIds);
   PushNotificationDevice
     .where('userId').in(userIds)
     .exec(callback);
@@ -43,6 +46,8 @@ exports.findDevicesForUsers = function(userIds, callback) {
 
 
 exports.findUsersAcceptingNotifications = function(userIds, callback) {
+  userIds = _.uniq(userIds);
+
   var multi = redisClient.multi();
   userIds.forEach(function(userId) {
     multi.exists("nb:" + userId);
@@ -64,6 +69,8 @@ exports.findUsersAcceptingNotifications = function(userIds, callback) {
 };
 
 exports.findAndUpdateUsersAcceptingNotifications = function(userIds, callback) {
+  userIds = _.uniq(userIds);
+
   winston.info("findAndUpdateUsersAcceptingNotifications", { userIds: userIds });
 
   var multi = redisClient.multi();
@@ -85,7 +92,7 @@ exports.findAndUpdateUsersAcceptingNotifications = function(userIds, callback) {
     });
 
     if(response) {
-      m2.exec(function(err, replies) {
+      m2.exec(function(err/*, replies*/) {
         if(err) return callback(err);
 
         callback(null, response);
