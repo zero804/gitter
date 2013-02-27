@@ -3,7 +3,13 @@ define([
   'ga'
 ], function(_gaq) {
 
-  _gaq.push(['_setAccount', 'UA-34596351-1']);
+  if(!window.troupeTrackingId) {
+    return {
+      trackError: function() { console.log("Error!", arguments); }
+    };
+  }
+
+  _gaq.push(['_setAccount', window.troupeTrackingId]);
 
   function trackPageView(routeName) {
     _gaq.push(['_trackEvent', 'Route', routeName]);
