@@ -27,6 +27,8 @@ define([
       3 // Page level variable
    ]);
 
+  _gaq.push(['_trackPageview']);
+
   $(document).on('track', function(e, routeName) {
     trackPageView(routeName);
   });
