@@ -56,7 +56,6 @@ TroupeSESTransport.prototype.sendMailString = function(from, recipients, string,
 
   function sendMessageToRecipients(destinations, callback) {
     console.log('sending a SES mail chunk (<= 50 recipients)');
-    console.dir(destinations);
 
     var myParams = _.extend(params);
 
@@ -92,8 +91,6 @@ TroupeSESTransport.prototype.sendMailString = function(from, recipients, string,
         callback(null, messageId);
       });
     }
-
-    //console.dir(myParams);
 
     // post the request, extract the message id from response
     https.request(reqObj, self.responseHandler.bind(self, extractMessageIdFromResponse)).end(myParams);
