@@ -7,28 +7,6 @@ var redis = require("../utils/redis"),
     _ = require("underscore"),
     redisClient;
 
-function resetClientState() {
-  function clearState(collection, item, name) {
-    redisClient.smembers(collection, function(err, members) {
-      if(err) return winston.error("presence: Redis error", { exception: err });
-
-      if(members.length) {
-        var keysToDelete = members.map(function(userId) { return item + ":" + userId; } );
-        keysToDelete.push(collection);
-
-        redisClient.del(keysToDelete, function(err, count) {
-          winston.info("presence: Removed " + (count - 1) + " stale " + name + "(s).");
-        });
-      }
-    });
-  }
-
-  clearState("presence:activeusers", "user_sockets", "user");
-  clearState("presence:activetroupes", "troupe_users", "troupe");
-  clearState("presence:activesockets", "socket_troupe", "socket");
-}
-
-/* TODO: shutdown client at end of session */
 redisClient = redis.createClient();
 
 function defaultRedisCallback(err) {
@@ -37,7 +15,7 @@ function defaultRedisCallback(err) {
 
 function addUserToActiveUsers(userId, callback) {
   if(!callback) callback = defaultRedisCallback;
-  redisClient.sadd("presence:activeusers", userId, function(err, count) {
+  redisClient.sadd("pr:activeusers", userId, function(err, count) {
     if(err) return callback(err);
     callback(null, count == 1);
   });
@@ -45,7 +23,7 @@ function addUserToActiveUsers(userId, callback) {
 
 function addTroupeToActiveTroupes(troupeId, callback) {
   if(!callback) callback = defaultRedisCallback;
-  redisClient.sadd("presence:activetroupes", troupeId, function(err, count) {
+  redisClient.sadd("pr:activetroupes", troupeId, function(err, count) {
     if(err) return callback(err);
     callback(null, count == 1);
   });
@@ -54,22 +32,22 @@ function addTroupeToActiveTroupes(troupeId, callback) {
 
 function addSocketToUserSockets(userId, socketId, callback) {
   if(!callback) callback = defaultRedisCallback;
-  redisClient.rpush("user_sockets:" + userId, socketId, callback);
+  redisClient.rpush("pr:user_sockets:" + userId, socketId, callback);
 }
 
 function addSocketToActiveSockets(socketId, callback) {
   if(!callback) callback = defaultRedisCallback;
-  redisClient.sadd("presence:activesockets", socketId, callback);
+  redisClient.sadd("pr:activesockets", socketId, callback);
 }
 
 function addUserToTroupe(userId, troupeId, callback) {
   if(!callback) callback = defaultRedisCallback;
 
-  redisClient.lrange("troupe_users:" + troupeId, 0, -1, function(err, presentUsers) {
+  redisClient.lrange("pr:troupe_users:" + troupeId, 0, -1, function(err, presentUsers) {
     if(err) return callback(err);
 
     var initialJoin = presentUsers.indexOf(userId) == -1;
-    redisClient.rpush("troupe_users:" + troupeId, userId, function(err/*, newLength*/) {
+    redisClient.rpush("pr:troupe_users:" + troupeId, userId, function(err/*, newLength*/) {
       if(err) return callback(err);
       callback(null, initialJoin);
     });
@@ -80,13 +58,13 @@ function addUserToTroupe(userId, troupeId, callback) {
 function associateSocketToTroupe(socketId, troupeId, callback) {
   if(!callback) callback = defaultRedisCallback;
 
-  redisClient.set("socket_troupe:" + socketId, troupeId, callback);
+  redisClient.set("pr:socket_troupe:" + socketId, troupeId, callback);
 }
 
 function removeSocketFromUserSockets(socketId, userId, callback) {
   if(!callback) callback = defaultRedisCallback;
 
-  var key = "user_sockets:" + userId;
+  var key = "pr:user_sockets:" + userId;
 
   /* Manage user presence */
   redisClient.lrem(key, 0, socketId, function(err/*, count*/) {
@@ -103,31 +81,31 @@ function removeSocketFromUserSockets(socketId, userId, callback) {
 
 function removeUserFromActiveUsers(userId, callback) {
   if(!callback) callback = defaultRedisCallback;
-  redisClient.srem("presence:activeusers", userId, callback);
+  redisClient.srem("pr:activeusers", userId, callback);
 }
 
 function disassociateSocketFromTroupe(socketId, callback) {
   if(!callback) callback = defaultRedisCallback;
-  redisClient.del("socket_troupe:" + socketId);
+  redisClient.del("pr:socket_troupe:" + socketId);
 }
 
 function getTroupeAssociatedToSocket(socketId, callback) {
   if(!callback) callback = defaultRedisCallback;
-  redisClient.get("socket_troupe:" + socketId, callback);
+  redisClient.get("pr:socket_troupe:" + socketId, callback);
 }
 
 function removeUserFromTroupe(userId, troupeId, callback) {
   if(!callback) callback = defaultRedisCallback;
 
   /* Remove one copy of this user from the troupe active users list */
-  redisClient.lrem("troupe_users:" + troupeId, 1, userId, function(err, count) {
+  redisClient.lrem("pr:troupe_users:" + troupeId, 1, userId, function(err, count) {
     if(err) return callback(err);
     if(count != 1) {
       winston.warn("presence: Inconsistent state: userId " + userId + " was removed from troupe " + troupeId + " " + count + " times. Expecting once.");
     }
 
     /* TODO: make the troupe_users keys into SORTED SETS */
-    redisClient.lrange("troupe_users:" + troupeId, 0, -1, function(err, presentUsers) {
+    redisClient.lrange("pr:troupe_users:" + troupeId, 0, -1, function(err, presentUsers) {
       if(err) return callback(err);
       var lastConnectionForUser = presentUsers.indexOf(userId) == -1;
       callback(null, lastConnectionForUser);
@@ -138,17 +116,17 @@ function removeUserFromTroupe(userId, troupeId, callback) {
 function getNumberOfUsersInTroupe(troupeId, callback) {
   if(!callback) callback = defaultRedisCallback;
 
-  redisClient.llen("troupe_users:" + troupeId, callback);
+  redisClient.llen("pr:troupe_users:" + troupeId, callback);
 }
 
 function removeTroupe(troupeId, callback) {
   if(!callback) callback = defaultRedisCallback;
 
-  redisClient.del("troupe_users:" + troupeId, function(err) {
+  redisClient.del("pr:troupe_users:" + troupeId, function(err) {
     if(err) return winston.error("presence: Redis error: " + err);
   });
 
-  redisClient.srem("presence:activetroupes", troupeId, function(err/*, count*/) {
+  redisClient.srem("pr:activetroupes", troupeId, function(err/*, count*/) {
     if(err) return winston.error("presence: Redis error: " + err);
   });
 
@@ -156,18 +134,17 @@ function removeTroupe(troupeId, callback) {
 
 function removeActiveSocket(socketId, callback) {
   if(!callback) callback = defaultRedisCallback;
-  redisClient.srem("presence:activesockets", socketId, callback);
+  redisClient.srem("pr:activesockets", socketId, callback);
 }
 
 function listOnlineUsersForTroupe(troupeId, callback) {
   if(!callback) callback = defaultRedisCallback;
-  redisClient.lrange("troupe_users:" + troupeId, 0, -1, callback);
+  redisClient.lrange("pr:troupe_users:" + troupeId, 0, -1, callback);
 }
 
 
 
 module.exports = {
-  resetClientState: resetClientState,
   userSocketConnected: function(userId, socketId) {
     //winston.debug("presence: userSocketConnected: ", { userId: userId, socketId: socketId });
 
@@ -249,11 +226,11 @@ module.exports = {
   // with status[userId] = 'online' / <missing>
   categorizeUsersByOnlineStatus: function(userIds, callback) {
       var t = process.hrtime();
-      var key = "presence_temp_set:" + process.pid + ":" + t[0] + ":" + t[1];
+      var key = "pr:presence_temp_set:" + process.pid + ":" + t[0] + ":" + t[1];
 
       var multi = redisClient.multi();
       multi.sadd(key, userIds);
-      multi.sinter('presence:activeusers',key);
+      multi.sinter('pr:activeusers',key);
       multi.del(key);
       multi.exec(function(err, replies) {
         if(err) return callback(err);
@@ -269,7 +246,7 @@ module.exports = {
   },
 
   listOnlineUsers: function(callback) {
-    redisClient.smembers("presence:activeusers", callback);
+    redisClient.smembers("pr:activeusers", callback);
   },
 
   // Returns the online users for the given troupes
@@ -281,7 +258,7 @@ module.exports = {
     var multi = redisClient.multi();
 
     troupeIds.forEach(function(troupeId) {
-      multi.lrange("troupe_users:" + troupeId, 0, -1);
+      multi.lrange("pr:troupe_users:" + troupeId, 0, -1);
     });
 
     multi.exec(function(err, replies) {
