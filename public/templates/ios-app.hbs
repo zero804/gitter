@@ -21,6 +21,9 @@
     <script type="text/javascript">
     window.noValidTroupes = {{noValidTroupes}};
     window.userId = {{{userId}}};
+    {{#if trackingId}}
+      window.troupeTrackingId = '{{trackingId}}';
+    {{/if}}
     </script>
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
