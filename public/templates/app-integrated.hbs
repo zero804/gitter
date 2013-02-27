@@ -131,6 +131,9 @@
   {{#if data}}
   window.troupePreloads = {{{data}}};
   {{/if}}
+  {{#if trackingId}}
+    window.troupeTrackingId = '{{trackingId}}';
+  {{/if}}
 </script>
 
 {{>require_wrapper}}
