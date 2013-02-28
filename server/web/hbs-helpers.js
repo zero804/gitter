@@ -7,9 +7,11 @@ var cdn = require("./cdn");
 // What version of requirejs should the client be loading?
 var REQUIREJS_VERSION = "2.1.4";
 
-exports.cdn = cdn;
-
 var minified = nconf.get("web:minified");
+
+exports.cdn = function(url, parameters) {
+  return cdn(url, parameters ? parameters.hash:null);
+};
 
 exports.bootScript = function(url, parameters) {
   var requireScript, scriptLocation, cdn = (parameters.hash.skipCdn) ? function(a) { return '/' + a; } : exports.cdn;

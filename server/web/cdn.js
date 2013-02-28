@@ -9,26 +9,33 @@ var cdnId = -1;
 var hosts, hostLength, cdnPrefix;
 
 function passthrough(url, options) {
-  return "/" + url;
+  var nonrelative = options && options.nonrelative;
+  var prefix = nonrelative ? nconf.get('web:basepath') + "/" : "/";
+  return prefix + url;
 }
 
 function cdnSingle(url, options) {
+  var nonrelative = options && options.nonrelative;
+  var prefix = nonrelative ? "http://" : "//";
   if(options && options.notStatic === true) {
-    return "//" + hosts[0] + "/" + url;
+    return prefix + hosts[0] + "/" + url;
   }
 
-  return "//" + hosts[0] + cdnPrefix + "/" + url;
+  return prefix + hosts[0] + cdnPrefix + "/" + url;
 }
 
 function cdnMulti(url, options) {
   var d = (cdnId + 1) % hostLength;
   cdnId = d;
 
+  var nonrelative = options && options.nonrelative;
+  var prefix = nonrelative ? "http://" : "//";
+
   if(options && options.notStatic === true) {
-    return "//" + hosts[d] + "/" + url;
+    return prefix + hosts[d] + "/" + url;
   }
 
-  return "//" + hosts[d] +cdnPrefix + "/" + url;
+  return prefix + hosts[d] +cdnPrefix + "/" + url;
 }
 
 var useCdn = nconf.get("cdn:use");
