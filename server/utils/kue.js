@@ -11,25 +11,31 @@ kue.redis.createClient = function() {
   return redis.createClient();
 };
 
-var singletonQueue = kue.createQueue();
+var singletonQueue;
+
+kue._originalCreateQueue = kue.createQueue;
 
 kue.createQueue = function() {
+  if(singletonQueue) return singletonQueue;
+
+  singletonQueue = kue._originalCreateQueue();
+
+  shutdown.addHandler('kue', 10, function(callback) {
+    winston.info('Attempting to shutdown kue handlers');
+
+    singletonQueue.shutdown(function(err) {
+      if(err) {
+        winston.error("Error while shutting down kue", { exception: err });
+      } else {
+        winston.info('kue shutdown completed.');
+      }
+
+      callback();
+    }, 25000);
+  });
+
   return singletonQueue;
 };
-
-shutdown.addHandler('kue', 10, function(callback) {
-  winston.info('Attempting to shutdown kue handlers');
-
-  singletonQueue.shutdown(function(err) {
-    if(err) {
-      winston.error("Error while shutting down kue", { exception: err });
-    } else {
-      winston.info('kue shutdown completed.');
-    }
-
-    callback();
-  }, 25000);
-});
 
 
 module.exports = kue;

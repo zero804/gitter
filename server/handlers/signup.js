@@ -25,7 +25,6 @@ module.exports = {
       app.get(nconf.get('web:homeurl'),
         middleware.grantAccessForRememberMeTokenMiddleware,
         function(req, res, next) {
-          // console.log ("Compact: " this.compactView);
           if(req.user) {
             loginUtils.redirectUserToDefaultTroupe(req, res, next, {
               onNoValidTroupes: function() {

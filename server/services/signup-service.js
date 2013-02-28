@@ -34,7 +34,7 @@ function newTroupe(options, callback) {
 
   troupe.save(function(err) {
     // send out email notification
-    if (options.isNewUser) {
+    if (!options.isNewUser) {
       emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
     }
     else {
@@ -65,6 +65,7 @@ function newTroupeForNewUser(options, callback) {
     }
 
     options.user = user;
+    options.isNewUser = true;
     newTroupe(options, function(err, troupe) {
       callback(err, troupe.id);
     });
@@ -199,18 +200,53 @@ module.exports = {
         user = userService.newUser(userProperties, function(err, user) {
           if(err) return callback(err);
 
-          troupeService.addRequest(troupeId, user.id, function(err, request) {
+          troupeService.addRequest(troupeId, user.id, function(err/*, request */) {
             if(err) return callback(err);
             callback(null);
           });
         });
 
       } else {
-        troupeService.addRequest(troupeId, user.id, function(err, request) {
+        troupeService.addRequest(troupeId, user.id, function(err/*, request */) {
           if(err) return callback(err);
           callback(null);
         });
       }
     });
+  },
+
+  acceptInvite: function (code, user, callback) {
+    // confirm the user if they are not already.
+    if (user.status == 'UNCONFIRMED') {
+      user.status = 'PROFILE_NOT_COMPLETED';
+      user.save();
+    }
+
+    troupeService.findInviteByCode(code, function(err, invite) {
+      if(err) return callback(err);
+      if(!invite) return callback(new Error("Invite code not found"));
+
+      troupeService.findById(invite.troupeId, function(err, troupe) {
+        if(err) return callback(err);
+        if(!troupe) return callback(new Error("Cannot find troupe referenced by invite."));
+
+        var originalStatus = invite.status;
+        if(originalStatus != 'UNUSED') {
+          return callback(null, troupe, originalStatus);
+        }
+
+        invite.status = 'USED';
+        invite.save();
+
+        troupe.addUserById(user.id);
+        troupe.save(function(err) {
+          if(err) return callback(err);
+          return callback(null, troupe, originalStatus);
+        });
+
+      });
+
+    });
   }
+
 };

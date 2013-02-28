@@ -47,7 +47,7 @@ define([
       this.app = options.app;
 
 
-      $('body').append('<span id="fineUploader"></span>');
+      // $('body').append('<span id="fineUploader"></span>');
 
       $(".nano").nanoScroller({ preventPageScrolling: true });
 

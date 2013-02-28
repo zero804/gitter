@@ -22,10 +22,9 @@ shutdown.addHandler('redis', 1, function(callback) {
   });
 
   Q.all(promises).then(function() {
-    console.log("Clients have all quit");
     callback();
   }).fail(function(err) {
-    console.log("Quit failed", err);
+    if(err) console.error("Quit failed", err);
     callback(err);
   });
 });

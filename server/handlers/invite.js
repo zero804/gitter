@@ -2,7 +2,7 @@
 /*global console:false, require: true, module: true */
 "use strict";
 
-var troupeService = require("../services/troupe-service"),
+var signupService = require("../services/signup-service"),
     passport = require('passport'),
     middleware = require('../web/middleware');
 
@@ -12,7 +12,7 @@ module.exports = {
         middleware.authenticate('accept', {}),
         function(req, res, next) {
             /* User has been set passport/accept */
-            troupeService.acceptInvite(req.params.confirmationCode, req.user, function(err, troupe) {
+            signupService.acceptInvite(req.params.confirmationCode, req.user, function(err, troupe) {
               if (err) {
                 res.relativeRedirect("/" + req.params.troupeUri);
                 return;
