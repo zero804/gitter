@@ -34,7 +34,7 @@ function newTroupe(options, callback) {
 
   troupe.save(function(err) {
     // send out email notification
-    if (options.isNewUser) {
+    if (!options.isNewUser) {
       emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
     }
     else {
@@ -65,6 +65,7 @@ function newTroupeForNewUser(options, callback) {
     }
 
     options.user = user;
+    options.isNewUser = true;
     newTroupe(options, function(err, troupe) {
       callback(err, troupe.id);
     });
