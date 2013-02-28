@@ -7,8 +7,7 @@ var eventEmitter = new events.EventEmitter();
 var Q = require('q');
 var _ = require('underscore');
 
-var handlers = {};
-process.on('SIGTERM', function() {
+function shutdownGracefully() {
   winston.info("Starting graceful shutdown procedure");
   setTimeout(function(err) {
       winston.info("Timeout awaiting graceful shutdown. Forcing shutdown.");
@@ -16,7 +15,11 @@ process.on('SIGTERM', function() {
   }, 100000);
 
   performNextShutdownStage();
+}
 
+var handlers = {};
+process.on('SIGTERM', function() {
+  shutdownGracefully();
 });
 
 function performNextShutdownStage() {
@@ -73,8 +76,8 @@ exports.addHandler = function addHandler(stageName, stageNumber, shutdownHandler
   } else {
     o.push(shutdownHandler);
   }
-
-
 };
+
+exports.shutdownGracefully = shutdownGracefully;
 
 

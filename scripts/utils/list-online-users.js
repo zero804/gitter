@@ -1,9 +1,10 @@
-#!/usr/local/bin/node
+#!/usr/bin/env node
 /*jslint node: true */
 "use strict";
 
 var presenceService = require('../../server/services/presence-service');
 var userService = require('../../server/services/user-service');
+var shutdown = require('../../server/utils/shutdown');
 
 var winston = require('../../server/utils/winston');
 /*
@@ -31,6 +32,7 @@ presenceService.listOnlineUsers(function(err, userIds) {
       users.forEach(function(user) {
          console.log(user.displayName);
       });
-      process.exit(0);
+
+      shutdown.shutdownGracefully();
    });
 });

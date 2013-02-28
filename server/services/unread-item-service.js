@@ -9,7 +9,7 @@ var winston = require("winston");
 var redisClient = redis.createClient();
 
 var kue = require('../utils/kue'),
-    jobs = kue.createQueue();
+    jobs;
 
 var DEFAULT_ITEM_TYPES = ['file', 'chat', 'request'];
 
@@ -32,6 +32,7 @@ exports.startWorkers = function() {
     });
   }
 
+  jobs = kue.createQueue();
   jobs.process('republish-unread-item-count-for-user-troupe', 20, function(job, done) {
     republishUnreadItemCountForUserTroupeWorker(job.data, done);
   });
@@ -39,6 +40,8 @@ exports.startWorkers = function() {
 
 // TODO: come up with a way to limit the number of republishes happening per user
 function republishUnreadItemCountForUserTroupe(userId, troupeId, callback) {
+  if(!jobs) jobs = kue.createQueue();
+
   jobs.create('republish-unread-item-count-for-user-troupe', {
     title: 'republishUnreadItemCountForUserTroupe',
     userId: userId,

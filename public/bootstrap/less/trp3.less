@@ -1,5 +1,7 @@
 @import "bootstrap.less";
 
+@import "../../js/libs/fineuploader/3.1.1/fineuploader.less";
+
 @import "trpColours.less";
 //@import "trpWebFonts.less";
 @import "trpFonts.less";
@@ -13,7 +15,6 @@
 @import "trp3Files.less";
 @import "trp3People.less";
 
-@import "../../js/libs/fineuploader/3.1.1/fineuploader.less";
 
 @import "nanoScroller.less";
 
@@ -496,9 +497,27 @@ a:hover {
 }
 
 .qq-upload-list {
-	bottom: 24px;
+	bottom: 75px;
 }
 
+.trpToolbarContent .qq-upload.button {
+	position: absolute;
+	width: 200px;
+	height: 32px;
+}
+
+.trpToolbarContent input {
+  top: 2px;
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+}
+
+.button-choose-avatar input {
+  left: 200px;
+  width: 150px;
+  overflow: hidden;
+}
 
 
 

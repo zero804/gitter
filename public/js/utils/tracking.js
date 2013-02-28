@@ -36,6 +36,27 @@ define([
 
   _gaq.push(['_trackPageview']);
 
+
+  console.log("Clearing the hash");
+  _gaq.push(function() {
+
+    window.setTimeout(function() {
+      console.log("Callback from GAQ");
+      var hash = "" + window.location.hash;
+      console.log("Hash: " + hash);
+      console.log("Hash: " + typeof hash);
+
+      try {
+        hash = hash.replace(/\butm_\w+=(\+|\w+|%\w\w|\-)*&?/g, "");
+      } catch(e) {
+        console.log(e);
+      }
+      console.log("New Hash: " + hash);
+      window.location.hash = hash;
+    }, 10);
+    
+  });
+
   $(document).on('track', function(e, routeName) {
     trackPageView(routeName);
   });

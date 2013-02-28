@@ -10,6 +10,7 @@ var troupeService = require("../services/troupe-service");
 var presenceService = require("../services/presence-service");
 var nconf = require("../utils/config");
 var shutdown = require('../utils/shutdown');
+var RedisClientUserLookupStrategy = require('./bayeux-user-lookup').RedisClientUserLookupStrategy;
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
@@ -67,64 +68,9 @@ function validateUserForGenericUserSubscription(options, callback) {
   return callback(null, true);
 }
 
+var clientUserLookup = new RedisClientUserLookupStrategy();
 
-// Default strategy for matching a clientId to a userId
-// Note that if the redis faye engine is used, this should match
-// TODO: implement redis version
-function InMemoryClientUserLookupStrategy() {
-  this.clientHash = {};
-  this.userHash = {};
-}
-
-InMemoryClientUserLookupStrategy.prototype.associate = function(clientId, userId, callback) {
-  this.clientHash[clientId] = userId;
-  var clientIds = this.userHash[userId];
-  if(clientIds) {
-    clientIds.push(clientId);
-  } else {
-    clientIds = [clientId];
-    this.userHash[userId] = clientIds;
-  }
-
-  return callback();
-};
-
-InMemoryClientUserLookupStrategy.prototype.disassociate = function(clientId, callback) {
-  var userId = this.clientHash[clientId];
-  delete this.clientHash[clientId];
-
-  if(userId) {
-    var clientIds = this.userHash[userId];
-    if(clientIds) {
-      if(clientIds.length > 0) {
-        clientIds = clientIds.filter(function(f) { return f !== clientId; });
-      }
-
-      // Anything left in the array?
-      if(clientIds.length > 0) {
-        this.userHash[userId] = clientIds;
-      } else {
-        delete this.userHash[userId];
-      }
-    }
-
-  }
-
-  return callback(null, userId);
-};
-
-InMemoryClientUserLookupStrategy.prototype.lookupUserIdForClientId = function(clientId, callback) {
-  var userId = this.clientHash[clientId];
-  return callback(null, userId);
-};
-
-
-InMemoryClientUserLookupStrategy.prototype.lookupClientIdsForUserId = function(userId, callback) {
-  var clientIds = this.userHash[userId];
-  return callback(null, clientIds);
-};
-
-var clientUserLookup = new InMemoryClientUserLookupStrategy();
+console.dir(clientUserLookup);
 
 //
 // Auth Extension:authenticate all subscriptions to ensure that the user has access
@@ -206,6 +152,8 @@ var auth = {
 
         self.clientUserLookup.associate(clientId, userId, function onAssociateDone(err) {
           if(err) return callback(err);
+
+          winston.debug("Socket " + clientId + " associated to user " + userId);
 
           // Get the presence service involved around about now
           presenceService.userSocketConnected(userId, clientId);
@@ -294,3 +242,4 @@ module.exports = {
   clientUserLookup: clientUserLookup,
   client: client
 };
+

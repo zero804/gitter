@@ -208,34 +208,6 @@ function removeUserFromTroupe(troupeId, userId, callback) {
    });
 }
 
-function acceptInvite(code, user, callback) {
-  findInviteByCode(code, function(err, invite) {
-    if(err) return callback(err);
-    if(!invite) return callback(new Error("Invite code not found"));
-
-    findById(invite.troupeId, function(err, troupe) {
-      if(err) return callback(err);
-      if(!troupe) return callback(new Error("Cannot find troupe referenced by invite."));
-
-      var originalStatus = invite.status;
-      if(originalStatus != 'UNUSED') {
-        return callback(null, troupe, originalStatus);
-      }
-
-      invite.status = 'USED';
-      invite.save();
-
-      troupe.addUserById(user.id);
-      troupe.save(function(err) {
-        if(err) return callback(err);
-        return callback(null, troupe, originalStatus);
-      });
-
-    });
-
-  });
-}
-
 
 /*
  * callback is function(err, request)
@@ -451,7 +423,6 @@ module.exports = {
   addInvite: addInvite,
   findInviteById: findInviteById,
   findInviteByCode: findInviteByCode,
-  acceptInvite: acceptInvite,
   findMemberEmails: findMemberEmails,
   findAllUnusedInvitesForTroupe: findAllUnusedInvitesForTroupe,
   addRequest: addRequest,

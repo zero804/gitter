@@ -1,9 +1,10 @@
-#!/usr/local/bin/node
+#!/usr/bin/env node
 /*jslint node: true */
 "use strict";
 
 var pushNotificationGateway = require('../../server/gateways/push-notification-gateway');
 var winston = require('../../server/utils/winston');
+var shutdown = require('../../server/utils/shutdown');
 
 var opts = require("nomnom")
    .option('user', {
@@ -24,5 +25,5 @@ var opts = require("nomnom")
    .parse();
 
 pushNotificationGateway.sendUserNotification(opts.user, { message: opts.message, sound: opts.sound, payload: { uri: 'txkw2b', page: 'files' } }, function() {
-  process.exit();
+  shutdown.shutdownGracefully();
 });

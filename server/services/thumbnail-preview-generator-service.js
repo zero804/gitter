@@ -2,13 +2,13 @@
 "use strict";
 
 var kue = require('../utils/kue');
-var jobs = kue.createQueue();
-
+var jobs;
 
 var THUMBNAIL_STRATEGY = 1;
 var PREVIEW_STRATEGY = 1;
 
 exports.startWorkers = function() {
+  jobs = kue.createQueue()
   var persistence = require("./persistence-service");
   var winston = require("winston");
   var image = require("../utils/image");
@@ -231,6 +231,8 @@ exports.startWorkers = function() {
 };
 
 exports.generateThumbnail = function(options, callback) {
+  if(!jobs) jobs = kue.createQueue();
+
   jobs.create(
     'generate-thumbnail',
     {
