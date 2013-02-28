@@ -22,7 +22,7 @@ module.exports = function( grunt ) {
 
           optimize: 'uglify2',
           generateSourceMaps: true,
-          preserveLicenseComments: true,
+          preserveLicenseComments: false,
           useSourceUrl: true,
 
 
