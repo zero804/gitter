@@ -76,6 +76,7 @@ define([
             that.$el.find('.resetpwd-failed').show();
           }
           else {
+            that.$el.find('.resetpwd-content').hide();
             that.$el.find('#resetEmail').text(that.$el.find('#email').val());
             that.$el.find('.resetpwd-confirm').show();
           }
