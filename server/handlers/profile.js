@@ -35,7 +35,7 @@ module.exports = {
           // Form filter and validation middleware
           form(
             filter("displayName").trim(),
-            validate("displayName").required().is(/^[a-zA-Z\. \-\']+$/),
+            validate("displayName").required().is(/^[\w\d\. \-\'\d]+$/),
             filter("password").trim(),
             filter("oldPassword").trim()
           ),
