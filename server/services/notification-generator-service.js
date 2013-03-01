@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false unused:true node:true*/
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var appEvents = require("../app-events");
@@ -323,8 +323,19 @@ exports.startWorkers = function() {
 
     if(!senderUserId) return null;
     var userIds = serilizedTroupe.userIds;
-    var otherUserId = userIds.filter(function(userId) { return userId != senderUserId; })[0];
+    var otherUserIds = userIds.filter(function(userId) { return userId == senderUserId; });
+    if(otherUserIds.length > 1) {
+      winston.warn("Something has gone wrong. There should be a single user left in the one-to-one troupe!", {
+        troupeId: serilizedTroupe.id,
+        senderUserId: senderUserId,
+        otherUserIds: otherUserIds
+      });
+    }
+
+    var otherUserId = otherUserIds[0];
+
     if(otherUserId) return "/one-one/" + otherUserId;
+
     return null;
   }
 
@@ -359,12 +370,13 @@ exports.startWorkers = function() {
             if(data.versions) { data.latestVersion = data.versions[data.versions.length - 1]; }
             data.troupeUrl = getTroupeUrl(data.troupe, senderUserId);
 
-            return {
+            var d = {
               text: template(data),
               title: titleTemplate ? titleTemplate(data) : null,
               sound: "",
               link: linkTemplate ? linkTemplate(data) : null
             };
+            return d;
           });
 
           callback(null, messages);
