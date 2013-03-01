@@ -97,7 +97,7 @@ define([
 
       var validation = {
         rules: {
-          displayName: { required: true, minlength: 4 },
+          displayName: { required: true, minlength: 2 },
           password: { minlength: 6 },
           oldPassword: { required: function() {
               // if this is an existing user and they have set a value for the password field then oldPassword is required as well.
