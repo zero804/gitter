@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true*/
 require([
   'jquery',
   'underscore',
@@ -41,7 +41,7 @@ require([
             troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView,
             createTroupeView, headerViewTemplate, shareTroupeView,
-            troupeSettingsView, webNotifications, unreadItemsClient, logging, FilteredCollection) {
+            troupeSettingsView, webNotifications, unreadItemsClient/*, logging , FilteredCollection */) {
   /*global console:true require:true */
   "use strict";
 
@@ -353,8 +353,6 @@ require([
     userCollection.reset(window.troupePreloads['users'], { parse: true });
     userCollection.listen();
 
-    window.troupePreloads = {};
-
     // update online status of user models
     $(document).on('userLoggedIntoTroupe', updateUserStatus);
     $(document).on('userLoggedOutOfTroupe', updateUserStatus);
@@ -389,6 +387,8 @@ require([
       'users': userCollection
     };
 
+    window.troupePreloads = {};
+
   });
 
   app.on("initialize:after", function(){
@@ -404,6 +404,7 @@ require([
   ], function(tracking) {
     // No need to do anything here
   });
+
 
   app.start();
   window._troupeDebug = {

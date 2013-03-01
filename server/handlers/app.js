@@ -17,15 +17,6 @@ var conversationService = require("../services/conversation-service");
 var appVersion = require("../web/appVersion");
 
 function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data) {
-  if(req.user) {
-    unreadItemService.getUnreadItemsForUser(req.user.id, troupe.id, function(err, unreadItems) {
-      if(err) return next(err);
-      serializeUserAndRenderPage(unreadItems);
-    });
-
-  } else {
-    serializeUserAndRenderPage(null);
-  }
 
   function serializeUserAndRenderPage(unreadItems) {
     if(!req.user) return renderPage(unreadItems, null, null);
@@ -44,6 +35,8 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data)
     });
 
   }
+  serializeUserAndRenderPage(null);
+
 
   function getFayeUrl() {
     var url = nconf.get('ws:fayeUrl');
@@ -86,7 +79,6 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data)
           troupe: troupeData,
           accessToken: accessToken,
           profileNotCompleted: profileNotCompleted,
-          unreadItems: unreadItems,
           accessDenied: accessDenied,
           appVersion: appVersion.getCurrentVersion(),
           baseServer: nconf.get('web:baseserver'),
@@ -197,6 +189,15 @@ function preloadConversations(userId, troupeId, callback) {
   });
 }
 
+function preloadUnreadItems(userId, troupeId, callback) {
+    unreadItemService.getUnreadItemsForUser(userId, troupeId, function(err, unreadItems) {
+      if(err) return callback(err);
+      console.log("getUnreadItemsForUser", userId, troupeId, unreadItems);
+      callback(null, unreadItems);
+    });
+//  unreadItemService.getUnreadItemsForUser(userId, troupeId, callback);
+}
+
 function preloadTroupeMiddleware(req, res, next) {
   var appUri = req.params.appUri;
 
@@ -241,22 +242,23 @@ module.exports = {
 
         function(req, res, next) {
 
-
           var f = new Fiber();
           preloadTroupes(req.user.id, f.waitor());
           preloadFiles(req.user.id, req.troupe.id, f.waitor());
           preloadChats(req.user.id, req.troupe.id, f.waitor());
           preloadUsers(req.user.id, req.troupe, f.waitor());
+          preloadUnreadItems(req.user.id, req.troupe.id, f.waitor());
 
           f.all()
-            .spread(function(troupes, files, chats, users) {
+            .spread(function(troupes, files, chats, users, unreadItems) {
               // Send the information through
               renderAppPageWithTroupe(req, res, next, 'app-integrated', req.troupe, req.otherUser.displayName, {
                 troupes: troupes,
                 files: files,
                 chatMessages: chats,
                 users: users,
-                otherUser: req.otherUser
+                otherUser: req.otherUser,
+                unreadItems: unreadItems
               });
             })
             .fail(function(err) {
@@ -297,7 +299,7 @@ module.exports = {
 
       });
 
-      app.get('/version', function(req, res, next) {
+      app.get('/version', function(req, res/*, next*/) {
         res.json({ appVersion: appVersion.getCurrentVersion() });
       });
 
@@ -319,16 +321,18 @@ module.exports = {
           preloadChats(req.user.id, req.troupe.id, f.waitor());
           preloadUsers(req.user.id, req.troupe, f.waitor());
           preloadConversations(req.user.id, req.troupe, f.waitor());
+          preloadUnreadItems(req.user.id, req.troupe.id, f.waitor());
         }
         f.all()
-          .spread(function(troupes, files, chats, users, conversations) {
+          .spread(function(troupes, files, chats, users, conversations, unreadItems) {
             // Send the information through
             renderAppPageWithTroupe(req, res, next, page, req.troupe, req.troupe.name, {
               troupes: troupes,
               files: files,
               chatMessages: chats,
               users: users,
-              conversations: conversations
+              conversations: conversations,
+              unreadItems: unreadItems
             });
           })
           .fail(function(err) {
