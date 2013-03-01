@@ -24,9 +24,11 @@ define([
 
   /* Use the compact views */
   var compactView = window.navigator.userAgent.indexOf("Mobile/") !== -1;
+  var isIE9 = window.navigator.userAgent.indexOf("MSIE 9.0") !== -1;
 
   /* This value is used by the dialogFragment Handlebars helper */
   window._troupeCompactView = compactView;
+  window._troupeIsIE9 = isIE9;
 
   var cachedWidgets = {};
   TroupeViews.preloadWidgets = function(widgets) {
@@ -133,11 +135,9 @@ define([
     },
 
     render: function() {
-      var data = this.getRenderData();
-      if(data) {
-        data.compactView = compactView;
-      }
-
+      var data = this.getRenderData() || {};
+      data.compactView = compactView;
+      data.isIE9 = isIE9; 
       this.renderInternal(data);
       if(this.afterRender) { this.afterRender(data); }
 

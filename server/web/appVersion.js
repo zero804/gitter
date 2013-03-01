@@ -1,3 +1,6 @@
+/*jshint globalstrict: true, trailing: false, unused: true, node: true */
+"use strict";
+
 // This is actually the cdn prefix, but we're using it as the app version,
 // which only shows whether the version is different, not any ordering of versions.
 var nconf = require('../utils/config');

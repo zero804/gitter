@@ -8,7 +8,8 @@ define([
   'views/base',
   'hbs!./tmpl/chatInputView',
   'collections/chat',
-  '../../utils/momentWrapper'
+  '../../utils/momentWrapper',
+  'jquery_placeholder'
 ], function($, _, Backbone, Marionette, TroupeViews, template, chatModels, moment) {
   "use strict";
 
@@ -27,6 +28,10 @@ define([
       return {
         user: window.troupeContext.user
       };
+    },
+
+    afterRender: function() {
+      $('#chat-input-textarea').placeholder();
     },
 
     onFocusOut: function() {
