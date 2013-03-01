@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true*/
 require([
   'jquery',
   'retina' ],
@@ -14,7 +14,7 @@ require([
 
     $('#panel-signup').css('left', leftPanelSpacing + 'px');
 
-    $('#button-signup').on('click', function(e) {
+    $('#button-signup').on('click', function() {
       $('#panel-signup, #panel-login').animate( {
         left: '-=' + leftPanelSpacing + 'px'
       }, 350);
@@ -22,7 +22,7 @@ require([
       // $('#panel-login').animate({translate3d: '-320px,0,0'}, 0.5, 'swing');
     });
 
-    $('#button-back').on('click', function(e) {
+    $('#button-back').on('click', function() {
       $('#panel-signup, #panel-login').animate( {
         left: '+=' + leftPanelSpacing + 'px'
       }, 350);
@@ -33,7 +33,7 @@ require([
       submitForm();
     });
 
-    $('#password').on('blur', function(e) {
+    $('#password').on('blur', function() {
       console.log("Password blur");
       hideLoginFailure();
     });
@@ -69,7 +69,6 @@ require([
     function submitForm() {
       hideLoginFailure();
       var form = $('#loginform');
-      var that = this;
 
       $.ajax({
         url: "/login",
@@ -77,7 +76,7 @@ require([
         dataType: "json",
         data: form.serialize(),
         type: "POST",
-        error: function(jqXHR, textStatus, errorThrown) {
+        error: function(/*jqXHR, textStatus, errorThrown*/) {
           console.log("Error");
           showLoginFailure();
 

@@ -1,5 +1,4 @@
-/*jshint globalstrict:true, trailing:false unused:true node:true*/
-/*global console:false, require: true, module: true */
+/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
 var form = require("express-form"),
