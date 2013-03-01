@@ -1,28 +1,19 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 define([
   'jquery',
   'underscore',
   './realtime'
 ], function($, _, realtime) {
-  /*global console: false, window: false, document: false */
   "use strict";
 
-  var troupeUnreadCounts = {};
-  var troupeUnreadTotal = -1;
-
-
+  //
+  // The first bit of this module deals with unread items for the current troupe. The
+  // second bit will deal with unread items for other troupes
+  //
   var unreadItemsCountsCache = {};
-  var unreadItems = window.troupeContext.unreadItems;
-  var recentlyMarkedRead = {};
+  var unreadItems = window.troupePreloads['unreadItems'] || {};
 
-  function log(fun) {
-    return function() {
-      //console.log("Calling " + fun.name, arguments);
-      var r = fun.apply(null, arguments);
-      //console.log("Completed " + fun.name, r);
-      return r;
-    };
-  }
+  var recentlyMarkedRead = {};
 
   window.setInterval(function() {
     var now = Date.now();
@@ -41,8 +32,6 @@ define([
       var value = unreadItemsCountsCache[k];
       var newValue = unreadItems[k] ? unreadItems[k].length : 0;
       if(value !== newValue) {
-
-        //console.log("Unread items of type: ", k, newValue, "old value was ", value);
 
         window.setTimeout(function() {
           $(document).trigger('itemUnreadCountChanged', {
@@ -63,16 +52,10 @@ define([
 
     var a = unreadItems[itemType];
     if(a) {
-      var lengthBefore = a.length;
       a = _.without(a, itemId);
       unreadItems[itemType] = a;
-      if(a.length !== lengthBefore - 1) {
-        //console.log("Item " + itemType + "/" + itemId + "marked as read, but not found in unread items.");
-      }
 
       syncCounts();
-    } else {
-      //console.log("No unread items of type " + itemType + " found.");
     }
 
     if(!readNotificationQueue[itemType]) {
@@ -147,18 +130,11 @@ define([
     windowScroll();
   });
 
+  // When the UI changes, rescan
   $(document).on('appNavigation', function() {
     windowScroll();
   });
-/*
-  $(document).on('collectionReset', function() {
-    windowScroll();
-  });
 
-  $(document).on('collectionAdd', function() {
-    windowScroll();
-  });
-*/
 
   function newUnreadItems(items) {
     var itemTypes = _.keys(items);
@@ -166,10 +142,6 @@ define([
       var ids = items[itemType];
 
       var filtered = _.filter(ids, function(itemId) { return !recentlyMarkedRead[itemType + "/" + itemId]; });
-
-      if(filtered.length < ids.length) {
-        //console.log("Some items have been marked as read before they even appeared");
-      }
 
       if(!unreadItems[itemType]) {
         unreadItems[itemType] = filtered;
@@ -195,53 +167,80 @@ define([
     syncCounts();
   }
 
-
-  //windowScrollOnTimeout = log(windowScrollOnTimeout);
-  unreadItemsRemoved = log(unreadItemsRemoved);
-  newUnreadItems = log(newUnreadItems);
-  syncCounts = log(syncCounts);
-  markItemRead = log(markItemRead);
-
-  return {
+  var unreadItemsClient = {
     getValue: function(itemType) {
       var v = unreadItems[itemType];
       return v ? v.length : 0;
     },
 
-    installTroupeListener: function(troupeCollection) {
-      function recount() {
-          var newTroupeUnreadTotal = _(troupeUnreadCounts)
-                .values()
-                .map(function(a) { return a > 0 ? 1: 0; })
-                .reduce(function(a,b) { return a + b; });
+    getTotalUnreadCountForCurrentTroupe: function() {
+      var types = _.keys(unreadItems);
 
-          if(newTroupeUnreadTotal !== troupeUnreadTotal) {
-            troupeUnreadTotal = newTroupeUnreadTotal;
-            $(document).trigger('troupeUnreadTotalChange', newTroupeUnreadTotal);
+      var value = _.reduce(types, function(memo, type) {
+        return memo + unreadItems[type].length;
+      }, 0);
+
+      return value;
+    },
+
+    installTroupeListener: function(troupeCollection) {
+      var troupeUnreadTotal = -1;
+
+      function recount() {
+        var newTroupeUnreadTotal = troupeCollection.reduce(function(memo, troupe) {
+          var count;
+          if(troupe.id == window.troupeContext.troupe.id) {
+            count = unreadItemsClient.getTotalUnreadCountForCurrentTroupe();
+          } else {
+            count = troupe.get('unreadItems');
           }
+
+          return memo + (count > 0 ? 1 : 0);
+        }, 0);
+
+        if(newTroupeUnreadTotal !== troupeUnreadTotal) {
+          troupeUnreadTotal = newTroupeUnreadTotal;
+          $(document).trigger('troupeUnreadTotalChange', newTroupeUnreadTotal);
+        }
       }
 
       if (troupeCollection) {
         troupeCollection.on('reset', function() {
-          troupeCollection.each(function(troupe) {
-            troupeUnreadCounts[troupe.id] = troupe.get('unreadItems');
-          });
           recount();
         });
       }
 
+      $(document).on('itemUnreadCountChanged', function() {
+        if(troupeCollection) {
+          var model = troupeCollection.get(window.troupeContext.troupe.id);
+          if(model) {
+            model.set('unreadItems', unreadItemsClient.getTotalUnreadCountForCurrentTroupe());
+          }
+        }
+        recount();
+      });
+
       realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
         if(message.notification === 'troupe_unread') {
+          console.log("troupe_unread change", message);
+
           var troupeId = message.troupeId;
           var totalUnreadItems = message.totalUnreadItems;
 
-          troupeUnreadCounts[troupeId] = totalUnreadItems;
           var model = (troupeCollection) ? troupeCollection.get(troupeId) : null;
           if(model) {
-            model.set('unreadItems', totalUnreadItems);
+            if(troupeId == window.troupeContext.troupe.id) {
+              var actualValue = unreadItemsClient.getTotalUnreadCountForCurrentTroupe();
+              model.set('unreadItems', actualValue);
+            } else {
+              model.set('unreadItems', totalUnreadItems);
+            }
+
           } else {
+            // TODO: sort this out
             console.log("Cannot find model. Refresh might be required....");
           }
+
           recount();
         } else if(message.notification === 'unread_items') {
           newUnreadItems(message.items);
@@ -249,7 +248,11 @@ define([
           unreadItemsRemoved(message.items);
         }
       });
+
+      recount();
     }
   };
 
+
+  return unreadItemsClient;
 });
