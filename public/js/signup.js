@@ -65,7 +65,7 @@ require([
       modal.show();
     }
 
-    $('.button-signup').on('click', function() {
+    $('#button-signup').on('click', function() {
       if (window.noValidTroupes) {
         new createTroupeView.Modal({existingUser: true, userId: window.userId }).show();
       } else {
@@ -80,8 +80,11 @@ require([
       return false;
     });
 
+    $('#button-appstore').on('click', function () {
+      alert("Coming soon.");
+    });
 
-    $('.button-existing-users-login').on('click', function() {
+    $('#button-existing-users-login').on('click', function() {
       var modal = createLoginModal();
       modal.show();
       return false;
