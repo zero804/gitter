@@ -1,10 +1,9 @@
-/*jshint globalstrict:true, trailing:false unused:true node:true*/
+/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
 var winston = require('winston');
 var appEvents = require("../app-events");
 var bayeux = require('./bayeux');
-var presenceService = require('../services/presence-service');
 
 exports.install = function(server) {
   // Not doing this anymore

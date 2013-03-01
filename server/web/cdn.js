@@ -1,8 +1,7 @@
-/*jshint globalstrict:true, trailing:false unused:true node:true*/
+/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
 var nconf = require('../utils/config');
-var fs = require("fs");
 var appVersion = require('./appVersion');
 
 var cdnId = -1;
