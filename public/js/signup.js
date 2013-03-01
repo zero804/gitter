@@ -86,7 +86,5 @@ require([
       modal.show();
       return false;
     });
-
-    console.log("CompactView:" + window._troupeCompactView);
 });
 
