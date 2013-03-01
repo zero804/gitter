@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false unused:true node:true*/
+/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
 /**
@@ -9,7 +9,7 @@ var oauth2orize = require('oauth2orize'),
     middleware = require('./middleware'),
     oauthService = require('../services/oauth-service'),
     loginUtils = require('./login-utils'),
-    winston = require('winston')
+    winston = require('winston');
 
 // create OAuth 2.0 server
 var server = oauth2orize.createServer();

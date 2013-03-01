@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false unused:true node:true*/
+/*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
 var troupeService = require("../services/troupe-service");
@@ -307,7 +307,7 @@ module.exports = {
         function(req, res, next) {
         var page;
         if(req.headers['user-agent'].indexOf('Mobile') >= 0) {
-          page = 'app-mobile';
+          page = 'app-integrated';
         } else {
           page = 'app-integrated';
         }

@@ -9,20 +9,20 @@ define([
   'hbs!./tmpl/fileAddButton',
   '../base',
   'bootstrap_tooltip'
-], function($, _, Backbone, Marionette, FileItemView, fileHelpView, fileAddButtonView, TroupeViews) {
+], function($, _, Backbone, Marionette, FileItemView, fileHelpTemplate, fileAddButtonView, TroupeViews) {
   "use strict";
 
   var FileView = Marionette.CollectionView.extend({
     itemView: FileItemView,
     emptyView: TroupeViews.Base.extend({
-      template: fileHelpView
+      template: fileHelpTemplate
     }),
 
     events: {
       'click .add-file': 'addFile'
     },
-
-    initialize: function() {
+ 
+     initialize: function() {
       this.initializeSorting();
 
       var self = this;
