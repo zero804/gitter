@@ -20,11 +20,12 @@ exports.install = function() {
       case 'create':
       case 'update':
       case 'remove':
-        winston.debug("Publish to " + url);
-        bayeuxClient.publish(url, {
+        var message = {
           operation: operation,
           model: model
-        });
+        };
+        winston.debug("Publish to " + url, message);
+        bayeuxClient.publish(url, message);
 
         break;
       default:

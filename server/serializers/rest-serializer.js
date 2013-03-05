@@ -450,7 +450,7 @@ function ChatStrategy(options)  {
     return {
       id: item._id,
       text: item.text,
-      sent: item.sent,
+      sent: item.sent ? item.sent.toISOString() : null,
       fromUser: options.user ? options.user : userStategy.map(item.fromUserId),
       unread: options.currentUserId ? unreadItemStategy.map(item._id) : true,
       troupe: troupeStrategy ? troupeStrategy.map(item.toTroupeId) : undefined
