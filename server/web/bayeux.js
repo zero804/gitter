@@ -220,11 +220,7 @@ server.bind('disconnect', function(clientId) {
     if(err) { winston.error("Error disassociating user from client", { exception:  err }); return; }
     if(!userId) return;
 
-    /* Give the user 10 seconds to log back into before reporting that they're disconnected */
-    //winston.debug("User socket disconnected: ", { userId: userId, clientId: clientId });
-    setTimeout(function(){
-      presenceService.userSocketDisconnected(userId, clientId);
-    }, 10000);
+    presenceService.userSocketDisconnected(userId, clientId);
 
   });
 });
