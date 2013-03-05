@@ -105,8 +105,10 @@ define([
         var top = $e.offset().top;
 
         if (top >= scrollTop && top <= scrollBottom) {
-          $e.removeClass('unread');
-          $e.addClass('read');
+          setTimeout(function () {
+            $e.removeClass('unread');
+            $e.addClass('read');
+          }, 2000);
 
           markItemRead(itemType, itemId);
         }
