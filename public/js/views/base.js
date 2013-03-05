@@ -216,7 +216,7 @@ define([
         var menuItems = this.$el.find(".frame-menu-items");
         var all = [];
         _.each(this.options.menuItems, function(item) {
-          var menuItem = $(self.make("a", {"href": "#" }));
+          var menuItem = $(self.make("a", {"href": "#!" }));
           menuItem.text(item.text);
           all.push(menuItem);
 
@@ -302,11 +302,15 @@ define([
       if(e) e.preventDefault();
       if(this.navigable) {
         var hash = window.location.hash;
+        console.log("HASH IS :  " + hash);
         var currentFragment;
         if(!hash) {
-          currentFragment = '#';
+          currentFragment = '#!';
         } else {
           currentFragment = hash.split('|', 1)[0];
+          if (currentFragment == "#") {
+            currentFragment = "#!";
+          }
         }
 
         window.location = currentFragment;
