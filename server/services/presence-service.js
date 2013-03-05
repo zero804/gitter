@@ -193,6 +193,8 @@ module.exports = {
     getTroupeAssociatedToSocket(socketId, function(err, troupeId) {
       disassociateSocketFromTroupe(socketId);
 
+      winston.debug("Disassociating socket with troupe", { socketId: socketId, troupeId: troupeId });
+
       if(err) return winston.error("presence: Redis error: ", { exception: err });
       if(!troupeId) return; /* No associated with a troupe. Fuggitaboutit */
 
