@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Join us</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!--
+    <link href='{{cdn "bootstrap/css/bootstrap.css" }}' rel="stylesheet">
+    -->
+    <link href='{{cdn "bootstrap/css/trpHomePage.css" }}' rel="stylesheet">
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+    <link rel="shortcut icon" href='{{cdn "images/2/favicon8.ico" }}'>
+
+    {{>require_wrapper}}
+
+    <script type="text/javascript">
+    window.noValidTroupes = {{noValidTroupes}};
+    window.userId = {{{userId}}};
+    {{#if trackingId}}
+      window.troupeTrackingId = '{{trackingId}}';
+    {{/if}}
+    </script>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href='{{ cdn "images/favicon.ico"}}'>
+    <link rel="apple-touch-icon" href='{{ cdn "images/apple-touch-icon.png" }}'>
+    <link rel="apple-touch-icon" sizes="72x72" href='{{ cdn "images/apple-touch-icon-72x72.png" }}'>
+    <link rel="apple-touch-icon" sizes="114x114" href='{{ cdn "images/apple-touch-icon-114x114.png" }}'>
+  </head>
+
+  <body>
+
+<!--     <div class="trpHomeTopStripContainer">
+      <div class="trpHomeTopStrip">
+        <div class="trpHomeLogo"><img src='{{ cdn "images/2/home-logo-black.png" }}' height="46" width="170"></div>
+        <div class="trpHomeMenu">
+          <div class="trpHomeMenuItem trpPadV14">Apps</div>
+          <div class="trpHomeMenuItem trpPadV14">Support</div>
+          <div class="trpHomeMenuItem trpPadV14 trpHand button-existing-users-login">Sign in</div>
+      </div>
+    </div> -->
+
+    <div class="trpHomeHeroStripContainer trpJobsHeroStripContainer">
+
+      <div class="trpHomeTopStrip">
+        <div class="trpHomeLogo"><a href="{{homeUrl}}"><img src='{{ cdn "images/2/logo-mark-green-square-white-text.png" }}' height="64" width="215"></a></div>
+    </div>
+
+      <div class="trpHomeHero">
+        <div class="trpHeroText trpHeroMacAppText">
+          We've got a few empty desks to fill.<br>Got talent?<br><br>See below for details.
+          <br><br>
+        </div>
+       <!--  <div class="trpHeroSignup">
+          <a class="trpHomeMenuItem trpButtonBig trpBtnWhite" href="mailto:join-us@troupe.co">Join us </a>
+        </div> -->
+        </div>
+      </div>
+    </div>
+
+    <div class="trpHomeMidStripContainer">
+      <div class="trpJobSpec">
+        <p>We're a small team with great product and technical pedigree, seed funded through Index Ventures.</p>
+
+        <p>Our application is built on node.js, express, backbone, mongo, redis, faye and countless other wonderful pieces of technology. You'll have no shortage of exposure to exciting engineering and the early days of building a product.</p>
+
+        <p>We're looking for true technologists. Not ninjas, not rockstars, but people who like to write beautiful code, solve difficult problems and - most importantly - build great products that people love to use.</p>
+
+        <p>Enough about us, let's talk about you.</p>
+
+        <p>You should…</p>
+
+        <p>If you've got skills, drop us an email with some information and we will get in touch. Along with the usual resume-type stuff, please include examples of your own code, preferably your Github profile.</p>
+      </div>
+    </div>
+
+    <div class="trpHomeFooterStripContainer">
+      <div class="trpFooterStrip">
+        <a href="#top"><img src='{{ cdn "images/2/logo-mark-green-square-white.png" }}' class="trpLine"></a>
+      </div>
+    </div>
+
+  </body>
+</html>
