@@ -24,8 +24,8 @@ RedisClientUserLookupStrategy.prototype.disassociate = function(clientId, callba
     if(err) return callback(err);
 
     if(!userId) {
-      winston.warn("userLookup: Client " + clientId + " not found.");
-      return callback(null, userId);
+      winston.warn("userLookup: Client " + clientId + " not found. Cannot disassociate.");
+      return callback(null, null);
     }
 
     redisClient.srem("pr:user:" + userId, clientId, function(err) {

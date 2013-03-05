@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false unused:true node:true*/
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 /* Listen for SIGUSR1 signals to start/stop profiling */
@@ -45,9 +45,15 @@ require('./web/passport').install();
 
 require('./web/passport').install();
 
+require('./web/bayeux-events-bridge').install();
+
 if(nconf.get('ws:startFayeInPrimaryApp')) {
-  require('./web/bayeux-events-bridge').install(server);
+  var bayeux = require('./web/bayeux');
+  var bayeuxServer = bayeux.server;
+  bayeuxServer.attach(server);
 }
+
+
 
 require('./handlers/').install(app);
 

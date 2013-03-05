@@ -5,16 +5,13 @@ var winston = require('winston');
 var appEvents = require("../app-events");
 var bayeux = require('./bayeux');
 
-exports.install = function(server) {
-  // Not doing this anymore
-  // presenceService.resetClientState();
 
-  var bayeuxServer = bayeux.server;
+
+exports.install = function() {
   var bayeuxClient = bayeux.client;
   var bayeuxEngine = bayeux.engine;
-  bayeuxServer.attach(server);
 
-  appEvents.onDataChange2(function(data) {
+  appEvents.localOnly.onDataChange2(function(data) {
     var operation = data.operation;
     var model = data.model;
     var url = data.url;
@@ -35,7 +32,7 @@ exports.install = function(server) {
     }
   });
 
-  appEvents.onUserRemovedFromTroupe(function(options) {
+  appEvents.localOnly.onUserRemovedFromTroupe(function(options) {
     var userId = options.userId;
     // TODO: disconnect only those subscriptions specific to the troupe
     // var troupeId = options.troupeId;
@@ -55,7 +52,7 @@ exports.install = function(server) {
 
   });
 
-  appEvents.onUserNotification(function(data) {
+  appEvents.localOnly.onUserNotification(function(data) {
       var userId = data.userId;
       var title = data.title;
       var text = data.text;
@@ -63,18 +60,19 @@ exports.install = function(server) {
       var sound = data.sound;
 
       var url = "/user/" + userId;
-      winston.debug("Notification to " + url);
-
-      bayeuxClient.publish(url, {
+      var message = {
          notification: "user_notification",
          title: title,
          text: text,
          link: link,
          sound: sound
-      });
+      };
+      winston.debug("Notification to " + url, message);
+
+      bayeuxClient.publish(url, message);
   });
 
-  appEvents.onUserLoggedIntoTroupe(function(data) {
+  appEvents.localOnly.onUserLoggedIntoTroupe(function(data) {
     var troupeId = data.troupeId;
     var userId = data.userId;
 
@@ -86,7 +84,7 @@ exports.install = function(server) {
 
   });
 
-  appEvents.onUserLoggedOutOfTroupe(function(data) {
+  appEvents.localOnly.onUserLoggedOutOfTroupe(function(data) {
     var troupeId = data.troupeId;
     var userId = data.userId;
 
@@ -100,7 +98,7 @@ exports.install = function(server) {
 
   ////////////////////
 
-  appEvents.onTroupeUnreadCountsChange(function(data) {
+  appEvents.localOnly.onTroupeUnreadCountsChange(function(data) {
     var userId = data.userId;
     var troupeId = data.troupeId;
     var counts = data.counts;
@@ -118,7 +116,7 @@ exports.install = function(server) {
   });
 
 
-  appEvents.onNewUnreadItem(function(data) {
+  appEvents.localOnly.onNewUnreadItem(function(data) {
     var userId = data.userId;
     var items = data.items;
 
@@ -129,7 +127,7 @@ exports.install = function(server) {
 
   });
 
-  appEvents.onUnreadItemsRemoved(function(data) {
+  appEvents.localOnly.onUnreadItemsRemoved(function(data) {
     var userId = data.userId;
     var items = data.items;
 
