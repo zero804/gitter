@@ -186,8 +186,12 @@ exports.startWorkers = function() {
       }
 
       function previewGenerationCallback(err, result) {
-        if(err) return winston.error("Preview generation failed", { exception: err });
-
+        if(err) {
+          // not sure if this is correct here, but for some reason failed preview generation
+          // was resulting in thumbnail permanently set to GENERATING
+          updateVersionThumbnailStatus('NO_THUMBNAIL', err);
+          return winston.error("Preview generation failed", { exception: err });
+        }
         var uploadFileParams = {
           fileName: "preview:" + fileId + ":" + version,
           localFileName: result.fileName,
