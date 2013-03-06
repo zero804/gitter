@@ -7,10 +7,6 @@ var restSerializer = require("../../serializers/rest-serializer");
 
 module.exports = {
   index: function(req, res, next) {
-    if(!req.user) {
-      return res.send(403);
-    }
-
     troupeService.findAllTroupesForUser(req.user.id, function(err, troupes) {
       if (err) return next(err);
 

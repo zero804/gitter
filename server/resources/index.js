@@ -1,4 +1,5 @@
 var middleware = require('../web/middleware');
+var Resource = require('express-resource');
 
 module.exports = {
   install: function(app) {
@@ -14,7 +15,7 @@ module.exports = {
         app.all(path + '/*', auth);
     });
 
-    var troupesResource = app.resource('troupes',  require('./troupes/troupes.js'));
+    var troupesResource = app.resource('troupes',  require('./troupes/troupes'));
 
     function installTroupeSubResource(resourceName, moduleName) {
         var r = app.resource(resourceName,  require('./troupes/' + moduleName));
@@ -34,9 +35,10 @@ module.exports = {
 
     var userResource = app.resource('user',  require('./user/user.js'));
     function installUserSubResource(resourceName, moduleName) {
-        var r = app.resource(resourceName,  require('./user/' + moduleName));
+        var r = new Resource(resourceName, require('./user/' + moduleName), app);
         userResource.add(r);
     }
+
     installUserSubResource('troupes', 'troupes');
 
   }

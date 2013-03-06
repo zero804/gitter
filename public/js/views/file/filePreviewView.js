@@ -67,13 +67,13 @@ define([
     events: {
     },
 
-    initialize: function(options) {
+    initialize: function() {
       var self = this;
       _.bindAll(this, 'onMenuItemClicked');
       this.on('menuItemClicked', this.onMenuItemClicked);
     },
 
-    onMenuItemClicked: function(id) {
+    onMenuItemClicked: function() {
       window.location.href = this.model.get("url");
     },
 
