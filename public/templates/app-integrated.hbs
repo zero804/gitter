@@ -105,7 +105,14 @@
           {{#unless troupeContextData.troupe.oneToOne}}
           <div class="trpToolbarHeader" id="mail-header">Mails</div>
           {{/unless}}
-          <div class="trpToolbarList" id="mail-list"></div>
+          <div class="trpToolbarList" id="mail-list">
+            <div class="trpMailItem">
+              <div class="trpMailItemPicture" style="background-image: url('/images/2/icon-new-mail-black.png')"></div>
+              <div class="trpMailItemSubject"><a href="mailto:{{troupeEmailAddress}}">New Mail</a></div>
+            </div>
+            <div class="frame-conversations">
+            </div>
+          </div>
         </div>
       </div>
     </div>
