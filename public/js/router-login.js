@@ -7,8 +7,9 @@ require([
   'views/base',
   'views/login/loginModalView',
   'views/profile/profileView',
-  'views/login/loginRequestModalView'
-], function($, _, Backbone, BaseRouter, TroupeViews, LoginModalView, profileView, RequestModalView) {
+  'views/login/loginRequestModalView',
+  'collections/troupes'
+], function($, _, Backbone, BaseRouter, TroupeViews, LoginModalView, profileView, RequestModalView, troupeModels) {
   "use strict";
 
   var AppRouter = BaseRouter.extend({
@@ -74,6 +75,18 @@ require([
       }
 
       if(window.troupeContext.accessDenied) {
+        // Listen out for acceptance
+        console.dir(window.troupeContext);
+        var troupeCollection = new troupeModels.TroupeCollection();
+        troupeCollection.listen();
+        troupeCollection.on("add", function(model) {
+
+          if(model.get('uri') == window.troupeContext.troupeUri) {
+            // TODO: tell the person that they've been kicked out of the troupe
+            window.location.reload();
+          }
+        });
+
         view = new RequestModalView({ authenticated: true });
         modal = new TroupeViews.Modal({ view: view, disableClose: true });
         modal.show();

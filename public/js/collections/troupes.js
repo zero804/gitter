@@ -1,29 +1,20 @@
 /*jshint unused:true, browser:true */
 define([
-  'jquery',
-  'underscore',
-  'backbone'
-], function($, _, Backbone) {
+  'backbone',
+  './base'
+], function(Backbone, TroupeCollections) {
   "use strict";
 
   var exports = {};
   exports.TroupeModel = Backbone.Model.extend({
-    idAttribute: "id",
-
-    defaults: {
-    },
-
-    initialize: function() {
-      console.log("TroupeModel initialize");
-    }
+    idAttribute: "id"
   });
 
-  exports.TroupeCollection = Backbone.Collection.extend({
+  exports.TroupeCollection = TroupeCollections.LiveCollection.extend({
     model: exports.TroupeModel,
-    url: "/troupes/",
     initialize: function() {
+      this.url = "/user/" + window.troupeContext.user.id + "/troupes";
     }
-
   });
 
   return exports;

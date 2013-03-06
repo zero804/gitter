@@ -9,6 +9,7 @@ var _ = require("underscore");
 var winston = require("winston");
 var nconf = require("../utils/config");
 var shutdown = require('../utils/shutdown');
+var Fiber = require("../utils/fiber");
 
 var connection = mongoose.connection;
 
@@ -156,8 +157,15 @@ TroupeSchema.methods.addUserById = function(userId) {
   // TODO: disable this methods for one-to-one troupes
   var troupeUser = new TroupeUser({ userId: userId });
   this.post('save', function(postNext) {
+    var f = new Fiber();
+
     var url = "/troupes/" + this.id + "/users";
     serializeEvent(url, "create", troupeUser, postNext);
+
+    var userUrl = "/user/" + userId + "/troupes";
+    serializeEvent(userUrl, "create", this, f.waitor());
+
+    f.all().then(function() { postNext(); }).fail(function(err) { postNext(err); });
   });
 
   return this.users.push(troupeUser);
@@ -169,11 +177,18 @@ TroupeSchema.methods.removeUserById = function(userId) {
   if(troupeUser) {
     // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
     this.post('save', function(postNext) {
+      var f = new Fiber();
+
       var url = "/troupes/" + this.id + "/users";
-      serializeEvent(url, "remove", troupeUser, postNext);
+      serializeEvent(url, "remove", troupeUser, f.waitor());
+
+      var userUrl = "/user/" + userId + "/troupes";
+      serializeEvent(userUrl, "remove", this, f.waitor());
 
       // TODO: move this in a remove listener somewhere else in the codebase
       appEvents.userRemovedFromTroupe({ troupeId: this.id, userId: troupeUser.userId });
+
+      f.all().then(function() { postNext(); }).fail(function(err) { postNext(err); });
     });
 
     troupeUser.remove();
