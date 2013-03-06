@@ -30,7 +30,7 @@ exports.startWorkers = function() {
   }
 
   function imageMagickPreviewGenerationStategy(fileName, mimeType, callback) {
-    image.generateThumbnail(fileName, 400, 400, function(err, thumbnailFile) {
+    image.generateThumbnail(fileName, 700, 700, function(err, thumbnailFile) {
       if(err) return callback(err);
 
       callback(null, { fileName: thumbnailFile, mimeType: 'image/jpeg' });
