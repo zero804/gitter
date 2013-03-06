@@ -26,10 +26,16 @@ exports.install = function(persistenceService) {
     restSerializer.serializeModel(model, function(err, serializedModel) {
       if(err) {
         winston.error("Silently failing model event: ", { exception: err, url: url, operation: operation });
+        return;
+      }
+
+      if(Array.isArray(url)) {
+        url.forEach(function(u) {
+          appEvents.dataChange2(u, operation, serializedModel);
+        });
       } else {
         appEvents.dataChange2(url, operation, serializedModel);
       }
-
       if(callback) callback();
     });
   }
@@ -103,4 +109,23 @@ exports.install = function(persistenceService) {
     return "/troupes/" + model.id;
   });
 
+
+  mongooseUtils.attachNotificationListenersToSchema(schemas.TroupeSchema, {
+    onCreate: function(model, next) {
+      var urls = model.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/troupes'; });
+      serializeEvent(urls, 'create', model);
+      next();
+    },
+
+    onUpdate: function(model, next) {
+      var urls = model.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/troupes'; });
+      serializeEvent(urls, 'update', model);
+      next();
+    },
+
+    onRemove: function(model) {
+      var urls = model.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/troupes'; });
+      serializeEvent(urls, 'remove', model);
+    }
+  });
 };
