@@ -61,6 +61,11 @@ define([
       return '/pdfjs/web/viewer.html?file=' + url + "?embedded=1";
     }
   }
+  var displayDirectMimeTypes = {
+    'image/jpeg': true,
+    'image/gif': true,
+    'image/png': true
+  };
 
   var PreviewView = TroupeViews.Base.extend({
     template: template,
@@ -68,7 +73,6 @@ define([
     },
 
     initialize: function() {
-      var self = this;
       _.bindAll(this, 'onMenuItemClicked');
       this.on('menuItemClicked', this.onMenuItemClicked);
     },
@@ -135,7 +139,8 @@ define([
       var previewMimeType = item.get('previewMimeType');
       var mimeType = item.get('mimeType');
 
-      if(/^image\//.test(mimeType)) {
+      console.log("WHAT AM I: " + mimeType);
+      if(displayDirectMimeTypes[mimeType]) {
         return {
           href: item.get('url') + '?embedded=1',
           photo: true

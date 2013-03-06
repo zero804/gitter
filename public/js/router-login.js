@@ -48,7 +48,7 @@ require([
 
       /* Is a user logged in? */
       if(!window.troupeContext.user) {
-        if (window.localStorage.defaultTroupeEmail || window.troupeContext.troupe.oneToOne) {
+        if (window.localStorage.defaultTroupeEmail || (window.troupeContext.troupe && window.troupeContext.troupe.oneToOne)) {
           // show the login dialog
           getLoginModal(window.localStorage.defaultTroupeEmail);
           loginModal.show();

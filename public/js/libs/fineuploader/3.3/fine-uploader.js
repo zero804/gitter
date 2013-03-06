@@ -597,11 +597,14 @@ qq.UploadButton = function(o){
 
     // make button suitable container for input
     qq(this._element).css({
-        position: 'relative',
+        //position: 'absolute',
+        //width: '32px',
+        //height: '32px',
         overflow: 'hidden',
         // Make sure browse button is in the right side
         // in Internet Explorer
-        direction: 'ltr'
+        direction: 'ltr',
+        cursor: 'pointer'
     });
 
     this._input = this._createInput();
@@ -638,8 +641,8 @@ qq.UploadButton.prototype = {
             // in Opera only 'browse' button
             // is clickable and it is located at
             // the right side of the input
-            right: 0,
-            top: 0,
+            //left: '2px',
+            //top: '2px',
             fontFamily: 'Arial',
             // 4 persons reported this, the max values that worked for them were 243, 236, 236, 118
             fontSize: '118px',
@@ -647,6 +650,8 @@ qq.UploadButton.prototype = {
             padding: 0,
             cursor: 'pointer',
             opacity: 0
+            //width: '32px',
+            //height: '32px'
         });
 
         this._element.appendChild(input);
@@ -3137,7 +3142,7 @@ qq.UploadHandlerForm = function(o, uploadCompleteCallback, logCallback) {
 /*globals qq, File, XMLHttpRequest, FormData, Blob*/
 qq.UploadHandlerXhr = function(o, uploadCompleteCallback, logCallback) {
     "use strict";
-    
+
     var options = o,
         uploadComplete = uploadCompleteCallback,
         log = logCallback,
