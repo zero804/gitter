@@ -26,41 +26,10 @@ shutdown.addHandler('mongo', 1, function(callback) {
 });
 
 if(nconf.get("mongo:profileSlowQueries")) {
-
-  var nativeDb = mongoose.connection.db;
-
-  var profileCollection = nativeDb.collection("system.profile");
-  var MAX = 50;
-
-  // Let the rest of the app start first
-  setTimeout(function() {
-    profileCollection.findOne({}, { sort: [[ "ts",  -1 ]] }, function(err, latest) {
-      var ts = err || !latest ? 0 : latest.ts;
-
-      winston.info("MongoDB profiling enabled");
-      connection.setProfiling(1, MAX, function() {});
-
-      setInterval(function() {
-        profileCollection.find({ ts: { $gt: ts } }, { sort: { ts: 1 }}).toArray(function(err, items) {
-          if(err) return;
-
-          if(items.length === 0)  return;
-          items.forEach(function(item) {
-            if(item.ts < ts) return;
-
-            if(item.millis > MAX) {
-              winston.warn("Mongo operation exceeded max", item);
-            }
-
-            if(item.ts > ts) ts = item.ts;
-          });
-
-        });
-      }, 5000);
-    });
-
-  }, 2000);
-
+  mongoose.connection.on('open', function() {
+    var MAX = 50;
+    connection.setProfiling(1, MAX, function() {});
+  });
 }
 
 connection.on('error', function(err) {

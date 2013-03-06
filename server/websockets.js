@@ -37,9 +37,7 @@ app.get('/', function(req, res) {
   res.send('Nothing to see here. You must be lost.');
 });
 
-// TEMP
-require('./services/notification-generator-service').install();
-require('./web/bayeux-events-bridge').install();
+require('./utils/event-listeners').installLocalEventListeners();
 
 var port = nconf.get("ws:port");
 var bindIp = nconf.get("ws:bindIp");

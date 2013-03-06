@@ -1,6 +1,5 @@
 /*jshint globalstrict:true, trailing:false, unused: true */
 /*global require: true, exports: true, OK: true, CONT: true, DENY: true, SOFTDENY: true */
-
 "use strict";
 
 var userService = require("./../../server/services/user-service.js");
@@ -14,6 +13,9 @@ var mimelib = require('mimelib');
 
 var EMAILDOMAIN = nconf.get("email:domain");
 var BASEPATH = nconf.get('web:basepath');
+
+require('./../../server/utils/event-listeners').installLocalEventListeners();
+
 
 /*
 This plugin verfies that the sender can access the requested troupes, and sends bounce emails if necessary.

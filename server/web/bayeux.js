@@ -19,6 +19,8 @@ var routes = [
   { re: /^\/user$/, validator: validateUserForGenericUserSubscription }
 ];
 
+var superClientPassword = nconf.get('ws:superClientPassword');
+
 // This strategy ensures that a user can access a given troupe URL
 function validateUserForTroupeSubscription(options, callback) {
   options.notifyPresenceService = true;
@@ -69,8 +71,6 @@ function validateUserForGenericUserSubscription(options, callback) {
 
 var clientUserLookup = new RedisClientUserLookupStrategy();
 
-console.dir(clientUserLookup);
-
 //
 // Auth Extension:authenticate all subscriptions to ensure that the user has access
 // to the given url
@@ -96,10 +96,18 @@ var auth = {
 
   },
 
+  isSuperClient: function(message) {
+    return message && message.ext && message.ext.password === superClientPassword;
+  },
+
   // Authorize a sbscription message
   authorized: function(message, callback) {
     var clientId = message.clientId;
     if(!clientId) return callback("Message has no clientId. Will not proceed.");
+
+    if(this.isSuperClient(message)) {
+      return callback(null, true);
+    }
 
     this.lookupClient(message, function onLookupClientDone(err, userId) {
       if(err) return callback("Validation failed: " + err);
@@ -166,11 +174,10 @@ var auth = {
 };
 
 var pushOnlyServer = {
-  password: 'some long and unguessable application-specific string',
   incoming: function(message, callback) {
     if (!message.channel.match(/^\/meta\//)) {
       var password = message.ext && message.ext.password;
-      if (password !== this.password)
+      if (password !== superClientPassword)
         message.error = '403::Password required';
     }
     callback(message);
@@ -183,11 +190,9 @@ var pushOnlyServer = {
 };
 
 var pushOnlyServerClient = {
-  password: 'some long and unguessable application-specific string',
-
   outgoing: function(message, callback) {
     message.ext = message.ext || {};
-    message.ext.password = this.password;
+    message.ext.password = superClientPassword;
     callback(message);
   }
 };
