@@ -1,17 +1,35 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-exports.attachNotificationListenersToSchema = function (schema, listeners) {
+exports.attachNotificationListenersToSchema = function (schema, options) {
+  var ignoredPaths = options.ignoredPaths;
+  var ignoredPathsHash;
+  if(ignoredPaths) {
+    ignoredPathsHash = {};
+    ignoredPaths.forEach(function(path) {
+      ignoredPathsHash[path] = true;
+    });
 
-  if(listeners.onCreate || listeners.onUpdate) {
+  } else {
+    ignoredPathsHash = null;
+  }
+
+  if(options.onCreate || options.onUpdate) {
     schema.pre('save', function (next) {
       var isNewInstance = this.isNew;
 
+      if(ignoredPaths) {
+        var allIgnored = this.modifiedPaths().every(function(path) { return ignoredPathsHash[path]; });
+        if(allIgnored) {
+          return next();
+        }
+      }
+
       this.post('save', function(postNext) {
         if(isNewInstance) {
-          if(listeners.onCreate) listeners.onCreate(this, postNext);
+          if(options.onCreate) options.onCreate(this, postNext);
         } else {
-          if(listeners.onUpdate) listeners.onUpdate(this, postNext);
+          if(options.onUpdate) options.onUpdate(this, postNext);
         }
       });
 
@@ -19,9 +37,9 @@ exports.attachNotificationListenersToSchema = function (schema, listeners) {
     });
   }
 
-  if(listeners.onRemove) {
+  if(options.onRemove) {
     schema.post('remove', function(model, numAffected) {
-      listeners.onRemove(model, numAffected);
+      options.onRemove(model, numAffected);
     });
   }
 
