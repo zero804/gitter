@@ -21,18 +21,23 @@ module.exports = {
         troupesResource.add(r);
     }
 
-    installTroupeSubResource('invites', 'invites.js');
-    installTroupeSubResource('requests', 'requests.js');
-    installTroupeSubResource('users', 'users.js');
-    installTroupeSubResource('conversations', 'conversations.js');
-    installTroupeSubResource('files', 'files.js');
-    installTroupeSubResource('downloads', 'downloads.js');
-    installTroupeSubResource('embedded', 'embedded.js');
-    installTroupeSubResource('thumbnails', 'thumbnails.js');
-    installTroupeSubResource('chatMessages', 'chat-messages.js');
-    installTroupeSubResource('unreadItems', 'unread-items.js');
+    installTroupeSubResource('invites', 'invites');
+    installTroupeSubResource('requests', 'requests');
+    installTroupeSubResource('users', 'users');
+    installTroupeSubResource('conversations', 'conversations');
+    installTroupeSubResource('files', 'files');
+    installTroupeSubResource('downloads', 'downloads');
+    installTroupeSubResource('embedded', 'embedded');
+    installTroupeSubResource('thumbnails', 'thumbnails');
+    installTroupeSubResource('chatMessages', 'chat-messages');
+    installTroupeSubResource('unreadItems', 'unread-items');
 
     var userResource = app.resource('user',  require('./user/user.js'));
+    function installUserSubResource(resourceName, moduleName) {
+        var r = app.resource(resourceName,  require('./user/' + moduleName));
+        userResource.add(r);
+    }
+    installUserSubResource('troupes', 'troupes');
 
   }
 };

@@ -324,7 +324,13 @@ require([
     // Troupe Collections
     troupeCollection = new troupeModels.TroupeCollection();
     troupeCollection.reset(window.troupePreloads['troupes'], { parse: true });
-
+    troupeCollection.listen();
+    troupeCollection.on("remove", function(model) {
+      if(model.id == window.troupeContext.troupe.id) {
+        // TODO: tell the person that they've been kicked out of the troupe
+        window.location.reload();
+      }
+    });
     unreadItemsClient.installTroupeListener(troupeCollection);
 
     var filteredTroupeCollection = new Backbone.FilteredCollection(null, {model: troupeModels.TroupeModel, collection: troupeCollection });
