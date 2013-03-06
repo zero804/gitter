@@ -212,7 +212,12 @@ function preloadTroupeMiddleware(req, res, next) {
 }
 
 function preloadOneToOneTroupeMiddleware(req, res, next) {
- troupeService.findOrCreateOneToOneTroupe(req.user.id, req.params.userId, function(err, troupe, otherUser) {
+  if (req.params.userId === req.user.id) {
+    res.redirect(nconf.get('web:homeurl'));
+    return 1;
+  }
+
+  troupeService.findOrCreateOneToOneTroupe(req.user.id, req.params.userId, function(err, troupe, otherUser) {
     if (err) return next({ errorCode: 500, error: err });
     if(!troupe) return next({ errorCode: 404 });
     req.otherUser = otherUser;
