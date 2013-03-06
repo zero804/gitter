@@ -89,5 +89,14 @@ require([
       modal.show();
       return false;
     });
+
+    require([
+      'utils/tracking'
+    ], function(tracking) {
+      // No need to do anything here
+    });
+
 });
+
+
 
