@@ -92,7 +92,6 @@ define([
       var form = this.$el.find('form#updateprofileform');
 
       // TODO:
-      // alphanumeracy of displayName should match validation on server (no numbers allowed)
       // server validation errors should be displayed nicely
 
       var validation = {
