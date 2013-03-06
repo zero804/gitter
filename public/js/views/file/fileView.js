@@ -18,10 +18,6 @@ define([
       template: fileHelpTemplate
     }),
 
-    events: {
-      'click .add-file': 'addFile'
-    },
- 
      initialize: function() {
       this.initializeSorting();
 
@@ -39,10 +35,6 @@ define([
         }
       });
     },
-
-    addFile: function() {
-      // $('#fineUploader input[type=file]').click();
-    }
 
   });
 
