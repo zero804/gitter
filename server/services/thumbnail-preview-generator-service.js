@@ -186,8 +186,21 @@ exports.startWorkers = function() {
       }
 
       function previewGenerationCallback(err, result) {
-        if(err) return winston.error("Preview generation failed", { exception: err });
+        if(err) {
+<<<<<<< HEAD
+          // if there is an error generating thumbnail, update the thumbnail status to ERROR, otherwise there is no other way for the client to know this.
+          persistence.File.update({ _id: fileId }, { thumbnailStatus: 'ERROR' }, {});
 
+          return winston.error("Preview generation failed", { exception: err });
+        }
+
+=======
+          // not sure if this is correct here, but for some reason failed preview generation
+          // was resulting in thumbnail permanently set to GENERATING
+          updateVersionThumbnailStatus('NO_THUMBNAIL', err);
+          return winston.error("Preview generation failed", { exception: err });
+        }
+>>>>>>> 48687cf61f6b18a32088e6d1eb226fa4f0689f7e
         var uploadFileParams = {
           fileName: "preview:" + fileId + ":" + version,
           localFileName: result.fileName,
