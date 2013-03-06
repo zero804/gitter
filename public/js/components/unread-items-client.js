@@ -11,7 +11,7 @@ define([
   // second bit will deal with unread items for other troupes
   //
   var unreadItemsCountsCache = {};
-  var unreadItems = window.troupePreloads['unreadItems'] || {};
+  var unreadItems = window.troupePreloads && window.troupePreloads['unreadItems'] || {};
 
   var recentlyMarkedRead = {};
 
@@ -251,7 +251,9 @@ define([
         }
       });
 
-      recount();
+      if(troupeCollection) {
+        recount();
+      }
     }
   };
 

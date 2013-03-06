@@ -62,13 +62,6 @@ define([
 
   exports.ConversationModel = Backbone.Model.extend({
     idAttribute: "id",
-
-    defaults: {
-    },
-
-    initialize: function() {
-    },
-
     parse: function(response) {
       response.updated = moment.utc(response.updated);
       return response;
@@ -79,8 +72,20 @@ define([
   exports.ConversationCollection = TroupeCollections.LiveCollection.extend({
     model: exports.ConversationModel,
     modelName: 'conversation',
-    nestedUrl: "conversations"
+    nestedUrl: "conversations",
+    sortByMethods: {
+      'updated': function(conversation) {
+        var updated = conversation.get('updated');
+        if(!updated) return 0;
+        return updated.valueOf();
+      }
+    },
+
+    initialize: function() {
+      this.setSortBy('-updated');
+    }
   });
+  _.extend(exports.ConversationCollection.prototype, TroupeCollections.ReversableCollectionBehaviour);
 
   return exports;
 
