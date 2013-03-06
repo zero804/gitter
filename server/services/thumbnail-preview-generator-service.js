@@ -186,7 +186,12 @@ exports.startWorkers = function() {
       }
 
       function previewGenerationCallback(err, result) {
-        if(err) return winston.error("Preview generation failed", { exception: err });
+        if(err) {
+          // if there is an error generating thumbnail, update the thumbnail status to ERROR, otherwise there is no other way for the client to know this.
+          persistence.File.update({ _id: fileId }, { thumbnailStatus: 'ERROR' }, {});
+
+          return winston.error("Preview generation failed", { exception: err });
+        }
 
         var uploadFileParams = {
           fileName: "preview:" + fileId + ":" + version,
