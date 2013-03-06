@@ -5,6 +5,7 @@ var troupeService = require("../../services/troupe-service");
 var restSerializer = require("../../serializers/rest-serializer");
 
 module.exports = {
+  base: 'troupes',
   index: function(req, res, next) {
     if(!req.user) {
       return res.send(403);
