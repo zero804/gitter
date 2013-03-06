@@ -59,35 +59,37 @@ module.exports = {
         });
 
       });
+
+      return;
     }
-    else {
-      // create a troupe normally
-      var troupe = new persistence.Troupe();
-      troupe.name = name;
-      troupe.uri = troupeService.createUniqueUri();
-      troupe.addUserById(req.user.id);
 
-      troupe.save(function(err) {
-        if(err) return next(403);
+    // create a troupe normally
+    var troupe = new persistence.Troupe();
+    troupe.name = name;
+    troupe.uri = troupeService.createUniqueUri();
+    troupe.addUserById(req.user.id);
 
-        // add invites for each additional person
-        for(var i = 0; i < invites.length; i++) {
-          var displayName = invites[i].displayName;
-          var inviteEmail = invites[i].email;
-          if (displayName && inviteEmail)
-            troupeService.addInvite(troupe, req.user.displayName, displayName, inviteEmail);
-        }
+    troupe.save(function(err) {
+      if(err) return next(403);
 
-        // send the new troupe back
-        var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true });
-        restSerializer.serialize(troupe, strategy, function(err, serialized) {
-          if(err) return next(err);
+      // add invites for each additional person
+      for(var i = 0; i < invites.length; i++) {
+        var displayName = invites[i].displayName;
+        var inviteEmail = invites[i].email;
+        if (displayName && inviteEmail)
+          troupeService.addInvite(troupe, req.user.displayName, displayName, inviteEmail);
+      }
 
-          res.send(serialized);
-        });
+      // send the new troupe back
+      var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true });
+      restSerializer.serialize(troupe, strategy, function(err, serialized) {
+        if(err) return next(err);
 
+        res.send(serialized);
       });
-    }
+
+    });
+
 
   },
 

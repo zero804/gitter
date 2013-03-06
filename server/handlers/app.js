@@ -85,6 +85,7 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data)
           basePort: nconf.get('web:baseport'),
           basePath: nconf.get('web:basepath'),
           homeUrl: nconf.get('web:homeurl'),
+          troupeUri: accessDenied ? troupe.uri : undefined,
           websockets: {
             fayeUrl: getFayeUrl(),
             options: {
