@@ -524,7 +524,9 @@ define([
           if (adjView) {
             itemView.$el.insertBefore(adjView.el);
           } else {
-            itemView.$el.prependTo(collectionView.el);
+            // there are no existing views after the first,
+            // we append (keeping the place of non-view children already present in the container)
+            itemView.$el.appendTo(collectionView.el);
           }
         } else {
           // find the view that comes before this one
