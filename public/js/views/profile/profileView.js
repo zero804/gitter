@@ -133,7 +133,7 @@ define([
       };
 
       if (!this.isExistingUser) {
-        // validation.password.required = true;
+        validation.rules.password.required = true;
       }
 
       form.validate(validation);
