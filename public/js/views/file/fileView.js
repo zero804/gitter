@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 define([
   'jquery',
   'underscore',
@@ -21,7 +21,7 @@ define([
     events: {
       'click .add-file': 'addFile'
     },
- 
+
      initialize: function() {
       this.initializeSorting();
 

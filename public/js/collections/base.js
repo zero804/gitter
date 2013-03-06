@@ -1,12 +1,14 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 define([
   'jquery',
   'underscore',
   'backbone',
-  'components/realtime'
-], function($, _, Backbone, realtime) {
-  /*global console:false */
+  'components/realtime',
+  'utils/logging'
+], function($, _, Backbone, realtime, logging) {
   "use strict";
+
+  var logger = logging.getLogger();
 
   var exports = {};
 
@@ -85,11 +87,11 @@ define([
       });
 
       this.subscription.callback(function() {
-        console.log('Subscription is now active!', arguments);
+        logger.info('Subscription is now active!', arguments);
       });
 
       this.subscription.errback(function(error) {
-        console.log('Subscription error', error);
+        logger.info('Subscription error', error);
       });
     },
 
@@ -111,7 +113,7 @@ define([
       if(existing) return existing;
 
       if(this.findModelForOptimisticMerge) {
-        console.log("Looking for a candidate for ", newModel);
+        logger.debug("Looking for a candidate for ", newModel);
 
         existing = this.findModelForOptimisticMerge(newModel);
       }
@@ -120,6 +122,8 @@ define([
     },
 
     onDataChange: function(data) {
+      logger.debug("onDataChange", data);
+
       var operation = data.operation;
       var newModel = data.model;
       var id = newModel.id;
@@ -127,17 +131,11 @@ define([
 
       var existing = this.findExistingModel(id, parsed);
 
+
       switch(operation) {
         case 'create':
         case 'update':
           if(existing) {
-            /*
-            var l = this.length;
-            this.remove(existing);
-            if(this.length !== l - 1) {
-              console.log("Nothing was deleted. This is a problem.");
-            }
-            */
             existing.set(newModel);
           } else {
             this.add(parsed);
@@ -153,7 +151,7 @@ define([
           break;
 
         default:
-          console.log("Unknown operation " + operation + ", ignoring");
+          logger.warn("Unknown operation " + operation + ", ignoring");
 
       }
     }

@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 define([
   'ga'
 ], function(_gaq) {
@@ -54,7 +54,7 @@ define([
       console.log("New Hash: " + hash);
       window.location.hash = hash;
     }, 10);
-    
+
   });
 
   $(document).on('track', function(e, routeName) {

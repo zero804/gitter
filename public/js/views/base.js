@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 define([
   'jquery',
   'underscore',
@@ -137,7 +137,7 @@ define([
     render: function() {
       var data = this.getRenderData() || {};
       data.compactView = compactView;
-      data.isIE9 = isIE9; 
+      data.isIE9 = isIE9;
       this.renderInternal(data);
       if(this.afterRender) { this.afterRender(data); }
 
