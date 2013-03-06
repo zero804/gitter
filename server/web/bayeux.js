@@ -15,8 +15,8 @@ var RedisClientUserLookupStrategy = require('./bayeux-user-lookup').RedisClientU
 var routes = [
   { re: /^\/troupes\/(\w+)$/, validator: validateUserForTroupeSubscription },
   { re: /^\/troupes\/(\w+)\/(.+)$/, validator: validateUserForSubTroupeSubscription },
-  { re: /^\/user\/(\w+)$/, validator: validateUserForUserSubscription },
-  { re: /^\/user$/, validator: validateUserForGenericUserSubscription }
+  { re: /^\/user\/(\w+)\/(.+)$/, validator: validateUserForUserSubscription },
+  { re: /^\/user\/(\w+)$/, validator: validateUserForUserSubscription }
 ];
 
 var superClientPassword = nconf.get('ws:superClientPassword');
@@ -49,7 +49,7 @@ function validateUserForSubTroupeSubscription(options, callback) {
   });
 }
 
-// This strategy ensures that a user can access a URL under a troupe URL
+// This strategy ensures that a user can access a URL under a /user/ URL
 function validateUserForUserSubscription(options, callback) {
   var userId = options.userId;
   var match = options.match;
@@ -60,14 +60,6 @@ function validateUserForUserSubscription(options, callback) {
   return callback(null, result);
 }
 
-// This strategy ensures that a user can access a URL under a troupe URL
-function validateUserForGenericUserSubscription(options, callback) {
-  var userId = options.userId;
-  var message = options.message;
-
-  message.subscription = "/user/" + userId;
-  return callback(null, true);
-}
 
 var clientUserLookup = new RedisClientUserLookupStrategy();
 
