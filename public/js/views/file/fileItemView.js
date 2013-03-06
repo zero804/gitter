@@ -56,7 +56,7 @@ define([
 
     hasThumbError: function() {
       var versions = this.model.get('versions');
-      return versions.at(versions.length - 1).get('thumbnailStatus') === 'ERROR';
+      return versions.at(versions.length - 1).get('thumbnailStatus') === 'NO_THUMBNAIL';
     }
   });
 
