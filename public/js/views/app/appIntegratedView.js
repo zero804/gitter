@@ -61,7 +61,8 @@ define([
         text: {
           dragZone: '', // text to display
           dropProcessing: '',
-          waitingForResponse: ''
+          waitingForResponse: '',
+          uploadButton: ''
         },
         request: {
           endpoint: '/troupes/' + window.troupeContext.troupe.id + '/downloads/'
