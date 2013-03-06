@@ -25,7 +25,7 @@ define([
         autofocusPassword: this.initialEmail ? 'autofocus' : '',
         troupeUri: this.fromSignup ? null : window.location.pathname.replace(/\//g,''),
         fromSignup: this.fromSignup,
-        isOneToOne: (window.troupeContext) ? !!window.troupeContext.troupe.oneToOne : null
+        isOneToOne: (window.troupeContext && window.troupeContext.troupe) ? !!window.troupeContext.troupe.oneToOne : null
       };
     },
 
