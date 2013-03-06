@@ -45,7 +45,7 @@ require('./web/passport').install();
 
 require('./web/passport').install();
 
-require('./web/bayeux-events-bridge').install();
+require('./utils/event-listeners').installLocalEventListeners();
 
 if(nconf.get('ws:startFayeInPrimaryApp')) {
   var bayeux = require('./web/bayeux');
@@ -57,9 +57,6 @@ if(nconf.get('ws:startFayeInPrimaryApp')) {
 
 require('./handlers/').install(app);
 
-// TEMP
-require('./services/notification-generator-service').install();
-unreadItemService.installListener(); // TODO: make sure this only happens once. Need to move across to a queue at some point
 
 require('./services/kue-workers').startWorkers();
 

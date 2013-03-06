@@ -5,8 +5,6 @@ var winston = require('winston');
 var appEvents = require("../app-events");
 var bayeux = require('./bayeux');
 
-
-
 exports.install = function() {
   var bayeuxClient = bayeux.client;
   var bayeuxEngine = bayeux.engine;
@@ -24,6 +22,7 @@ exports.install = function() {
           operation: operation,
           model: model
         };
+
         winston.debug("Publish to " + url, message);
         bayeuxClient.publish(url, message);
 

@@ -15,6 +15,10 @@ var collections = require("../utils/collections");
 var cdn = require('../web/cdn');
 var predicates = collections.predicates;
 
+function formatDate(d) {
+  return d ? d.toISOString() : null;
+}
+
 function concatArraysOfArrays(a) {
   var result = [];
   for(var i = 0; i < a.length; i++) {
@@ -76,7 +80,7 @@ function UserStrategy(options) {
     if(true /* options.showLocation */ && user.location.timestamp) {
       location = {
         description: getLocationDescription(user.location.named),
-        timestamp: user.location.timestamp,
+        timestamp: formatDate(user.location.timestamp),
         countryCode: user.location.countryCode
       };
     } else {
@@ -153,7 +157,7 @@ function FileStrategy(options) {
       return {
         versionNumber: versionIndex++,
         creatorUser: userStategy.map(item.creatorUserId),
-        createdDate: item.createdDate,
+        createdDate: formatDate(item.createdDate),
         thumbnailStatus: item.thumbnailStatus,
         source: item.source,
         deleted: item.deleted
@@ -279,7 +283,7 @@ function EmailStrategy() {
       id: item.id,
       from: userStategy.map(item.fromUserId),
       subject: item.subject,
-      date: item.date,
+      date: formatDate(item.date),
       preview: item.preview,
       mail: item.mail,
       attachments: _.map(item.attachments, fileStrategy.map)
@@ -303,7 +307,7 @@ function ConversationStrategy()  {
     return {
       id: item.id,
       troupeId: item.troupeId,
-      updated: item.updated,
+      updated: formatDate(item.updated),
       subject: item.subject,
       emails: item.emails.map(emailStrategy.map)
     };
@@ -339,7 +343,7 @@ function ConversationMinStrategy()  {
     return {
       id: item.id,
       troupeId: item.troupeId,
-      updated: item.updated,
+      updated: formatDate(item.updated),
       subject: item.subject,
       emailCount: item.emails.length,
       preview: preview,
@@ -450,7 +454,7 @@ function ChatStrategy(options)  {
     return {
       id: item._id,
       text: item.text,
-      sent: item.sent ? item.sent.toISOString() : null,
+      sent: formatDate(item.sent),
       fromUser: options.user ? options.user : userStategy.map(item.fromUserId),
       unread: options.currentUserId ? unreadItemStategy.map(item._id) : true,
       troupe: troupeStrategy ? troupeStrategy.map(item.toTroupeId) : undefined
