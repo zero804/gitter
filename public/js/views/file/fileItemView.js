@@ -26,7 +26,7 @@ define([
 
       var latestVersion = versions.length;
       data.fileIcon = this.fileIcon(this.model.get('fileName'), latestVersion);
-      data.useSpinner = !this.hasThumb() && !this.hasThumbError();
+      data.useSpinner = !this.hasThumb();
 
       return data;
     },
@@ -52,12 +52,8 @@ define([
     hasThumb: function() {
       var versions = this.model.get('versions');
       return versions.at(versions.length - 1).get('thumbnailStatus') !== 'GENERATING';
-    },
-
-    hasThumbError: function() {
-      var versions = this.model.get('versions');
-      return versions.at(versions.length - 1).get('thumbnailStatus') === 'NO_THUMBNAIL';
     }
+
   });
 
 });
