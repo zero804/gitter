@@ -16,7 +16,6 @@ exports.install = function(persistenceService) {
 
   function serializeEvent(url, operation, model, callback) {
     if(!url) { if(callback) callback(); return; }
-
     winston.debug("Serializing " + operation + " to " + url);
 
     // TODO: consider swapping out the HEAVY WEIGHT restSerializer here for the
@@ -71,7 +70,7 @@ exports.install = function(persistenceService) {
   }
 
   mongooseUtils.attachNotificationListenersToSchema(schemas.UserSchema, {
-
+    ignoredPaths: ['lastTroupe','confirmationCode','status','passwordHash','passwordResetCode'],
     onUpdate: function(model, next) {
       if(!next) next = function() {};
 
@@ -97,7 +96,8 @@ exports.install = function(persistenceService) {
 
   attachNotificationListenersToSchema(schemas.ConversationSchema, 'conversation');
   attachNotificationListenersToSchema(schemas.FileSchema, 'file');
-  attachNotificationListenersToSchema(schemas.InviteSchema, 'invite');
+  // INVITES currently do not have live-collections
+  // attachNotificationListenersToSchema(schemas.InviteSchema, 'invite');
   attachNotificationListenersToSchema(schemas.RequestSchema, 'request');
   attachNotificationListenersToSchema(schemas.ChatMessageSchema, 'chat', function(model) {
     return "/troupes/" + model.toTroupeId + "/chatMessages";
