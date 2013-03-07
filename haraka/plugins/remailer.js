@@ -1,5 +1,5 @@
 /*jshint node:true, unused: true */
-/*global OK:true DENY: true DENYSOFT: true */
+/*global OK:true DENY:true DENYSOFT:true */
 "use strict";
 
 // troupe service to redeliver mails to troupe users
@@ -15,6 +15,8 @@ var statsService = require('./../../server/services/stats-service');
 var emailDomain = nconf.get("email:domain");
 var emailDomainWithAt = "@" + emailDomain;
 var skipRemailer = false;
+
+require('./../../server/utils/event-listeners').installLocalEventListeners();
 
 function continueResponse(next) {
   //return next (DENY, "Debug mode bounce.");

@@ -15,9 +15,11 @@ var RedisClientUserLookupStrategy = require('./bayeux-user-lookup').RedisClientU
 var routes = [
   { re: /^\/troupes\/(\w+)$/, validator: validateUserForTroupeSubscription },
   { re: /^\/troupes\/(\w+)\/(.+)$/, validator: validateUserForSubTroupeSubscription },
-  { re: /^\/user\/(\w+)$/, validator: validateUserForUserSubscription },
-  { re: /^\/user$/, validator: validateUserForGenericUserSubscription }
+  { re: /^\/user\/(\w+)\/(.+)$/, validator: validateUserForUserSubscription },
+  { re: /^\/user\/(\w+)$/, validator: validateUserForUserSubscription }
 ];
+
+var superClientPassword = nconf.get('ws:superClientPassword');
 
 // This strategy ensures that a user can access a given troupe URL
 function validateUserForTroupeSubscription(options, callback) {
@@ -47,7 +49,7 @@ function validateUserForSubTroupeSubscription(options, callback) {
   });
 }
 
-// This strategy ensures that a user can access a URL under a troupe URL
+// This strategy ensures that a user can access a URL under a /user/ URL
 function validateUserForUserSubscription(options, callback) {
   var userId = options.userId;
   var match = options.match;
@@ -58,18 +60,8 @@ function validateUserForUserSubscription(options, callback) {
   return callback(null, result);
 }
 
-// This strategy ensures that a user can access a URL under a troupe URL
-function validateUserForGenericUserSubscription(options, callback) {
-  var userId = options.userId;
-  var message = options.message;
-
-  message.subscription = "/user/" + userId;
-  return callback(null, true);
-}
 
 var clientUserLookup = new RedisClientUserLookupStrategy();
-
-console.dir(clientUserLookup);
 
 //
 // Auth Extension:authenticate all subscriptions to ensure that the user has access
@@ -96,10 +88,18 @@ var auth = {
 
   },
 
+  isSuperClient: function(message) {
+    return message && message.ext && message.ext.password === superClientPassword;
+  },
+
   // Authorize a sbscription message
   authorized: function(message, callback) {
     var clientId = message.clientId;
     if(!clientId) return callback("Message has no clientId. Will not proceed.");
+
+    if(this.isSuperClient(message)) {
+      return callback(null, true);
+    }
 
     this.lookupClient(message, function onLookupClientDone(err, userId) {
       if(err) return callback("Validation failed: " + err);
@@ -166,11 +166,10 @@ var auth = {
 };
 
 var pushOnlyServer = {
-  password: 'some long and unguessable application-specific string',
   incoming: function(message, callback) {
     if (!message.channel.match(/^\/meta\//)) {
       var password = message.ext && message.ext.password;
-      if (password !== this.password)
+      if (password !== superClientPassword)
         message.error = '403::Password required';
     }
     callback(message);
@@ -183,11 +182,9 @@ var pushOnlyServer = {
 };
 
 var pushOnlyServerClient = {
-  password: 'some long and unguessable application-specific string',
-
   outgoing: function(message, callback) {
     message.ext = message.ext || {};
-    message.ext.password = this.password;
+    message.ext.password = superClientPassword;
     callback(message);
   }
 };
@@ -220,11 +217,7 @@ server.bind('disconnect', function(clientId) {
     if(err) { winston.error("Error disassociating user from client", { exception:  err }); return; }
     if(!userId) return;
 
-    /* Give the user 10 seconds to log back into before reporting that they're disconnected */
-    //winston.debug("User socket disconnected: ", { userId: userId, clientId: clientId });
-    setTimeout(function(){
-      presenceService.userSocketDisconnected(userId, clientId);
-    }, 10000);
+    presenceService.userSocketDisconnected(userId, clientId);
 
   });
 });

@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 require([
   'template/helpers/widget',
   'template/helpers/cdn',

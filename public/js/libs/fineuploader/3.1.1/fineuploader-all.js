@@ -1478,7 +1478,7 @@ define(['jquery'], function($) { /*jslint browser: true*/
       template: '<div class="qq-uploader">' + ((!this._options.dragAndDrop || !this._options.dragAndDrop.disableDefaultDropzone) ? '<div class="qq-upload-drop-area"><span>{dragZoneText}</span></div>' : '') + (!this._options.button ? '<div class="qq-upload-button"></div>' : '') + '<span class="qq-drop-processing"><span>{dropProcessingText}</span><span class="qq-drop-processing-spinner"></span></span>' + (!this._options.listElement ? '<ul class="qq-upload-list"></ul>' : '') + '</div>',
 
       // template for one item in file list
-      fileTemplate: '<li>' + '<div class="qq-progress-bar"></div>' + '<span class="qq-upload-spinner"></span>' + '<span class="qq-upload-finished"></span>' + '<span class="qq-upload-file"></span>' + '<span class="qq-upload-size"></span>' + '<a class="qq-upload-cancel" href="#">{cancelButtonText}</a>' + '<a class="qq-upload-retry" href="#">{retryButtonText}</a>' + '<span class="qq-upload-status-text">{statusText}</span>' + '</li>',
+      fileTemplate: '<li>' + '<div class="qq-progress-bar"></div>' + '<span class="qq-upload-spinner"></span>' + '<span class="qq-upload-finished"></span>' + '<span class="qq-upload-file"></span>' + '<span class="qq-upload-size"></span>' + '<a class="qq-upload-cancel" href="#!">{cancelButtonText}</a>' + '<a class="qq-upload-retry" href="#!">{retryButtonText}</a>' + '<span class="qq-upload-status-text">{statusText}</span>' + '</li>',
       classes: {
         button: 'qq-upload-button',
         drop: 'qq-upload-drop-area',

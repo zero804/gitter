@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false unused:true node:true*/
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var chatService = require("../../services/chat-service"),

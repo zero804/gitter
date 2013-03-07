@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 define([
   'jquery',
   'underscore',
@@ -137,7 +137,7 @@ define([
     render: function() {
       var data = this.getRenderData() || {};
       data.compactView = compactView;
-      data.isIE9 = isIE9; 
+      data.isIE9 = isIE9;
       this.renderInternal(data);
       if(this.afterRender) { this.afterRender(data); }
 
@@ -216,7 +216,7 @@ define([
         var menuItems = this.$el.find(".frame-menu-items");
         var all = [];
         _.each(this.options.menuItems, function(item) {
-          var menuItem = $(self.make("a", {"href": "#" }));
+          var menuItem = $(self.make("a", {"href": "#!" }));
           menuItem.text(item.text);
           all.push(menuItem);
 
@@ -302,11 +302,15 @@ define([
       if(e) e.preventDefault();
       if(this.navigable) {
         var hash = window.location.hash;
+        console.log("HASH IS :  " + hash);
         var currentFragment;
         if(!hash) {
-          currentFragment = '#';
+          currentFragment = '#!';
         } else {
           currentFragment = hash.split('|', 1)[0];
+          if (currentFragment == "#") {
+            currentFragment = "#!";
+          }
         }
 
         window.location = currentFragment;
@@ -520,7 +524,9 @@ define([
           if (adjView) {
             itemView.$el.insertBefore(adjView.el);
           } else {
-            itemView.$el.prependTo(collectionView.el);
+            // there are no existing views after the first,
+            // we append (keeping the place of non-view children already present in the container)
+            itemView.$el.appendTo(collectionView.el);
           }
         } else {
           // find the view that comes before this one

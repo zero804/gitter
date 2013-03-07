@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false unused:true node:true*/
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var fileService = require('../../services/file-service'),
@@ -17,11 +17,10 @@ module.exports = {
       for(var k in files) {
         if(files.hasOwnProperty(k)) {
           var file = files[k];
-
           fileService.storeFile({
             troupeId: req.troupe.id,
             creatorUserId: req.user.id,
-            fileName: file.name,
+            fileName: unescape(file.name),
             mimeType: file.type,
             file: file.path
           }, function(err, fileAndVersion) {

@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false unused:true node:true*/
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var redis = require("../utils/redis"),
@@ -179,15 +179,21 @@ module.exports = {
   userSocketDisconnected: function(userId, socketId) {
     winston.debug("presence: userSocketDisconnected: ", { userId: userId, socketId: socketId });
 
-    removeSocketFromUserSockets(socketId, userId, function(err, lastDisconnect) {
-      if(lastDisconnect) {
-        removeUserFromActiveUsers(userId);
-        winston.info("presence: User " + userId + " is now offline");
-      }
-    });
+    // Give the user 10 seconds to re-login before marking them as offline
+    setTimeout(function() {
+      removeSocketFromUserSockets(socketId, userId, function(err, lastDisconnect) {
+        if(lastDisconnect) {
+          removeUserFromActiveUsers(userId);
+          winston.info("presence: User " + userId + " is now offline");
+        }
+      });
+    }, 10000);
 
+    // But disconnect them from the troupe immediately
     getTroupeAssociatedToSocket(socketId, function(err, troupeId) {
       disassociateSocketFromTroupe(socketId);
+
+      winston.debug("Disassociating socket with troupe", { socketId: socketId, troupeId: troupeId });
 
       if(err) return winston.error("presence: Redis error: ", { exception: err });
       if(!troupeId) return; /* No associated with a troupe. Fuggitaboutit */

@@ -47,6 +47,29 @@
 	color: #333;
 }
 
+.view .trpChatBox {
+	-webkit-transition: background-color 0.5s linear;
+  -moz-transition: background-color 0.5s linear;
+  -o-transition: background-color 0.5s linear;
+  transition: background-color 0.5s linear;
+}
+
+.view .trpChatFrom, .trpChatTime {
+	-webkit-transition: color 0.5s linear;
+  -moz-transition: color 0.5s linear;
+  -o-transition: color 0.5s linear;
+  transition: color 0.5s linear;
+}
+
+.view.unread .trpChatBox {
+	background-color: #89e5b6;
+}
+
+.view.unread .trpChatFrom, .view.unread .trpChatTime {
+	color: #6cb697;
+}
+
+
 .trpChatDetails{
   display: block;
   max-width: 400px;

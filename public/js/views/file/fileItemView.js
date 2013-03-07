@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 define([
   'jquery',
   'underscore',
@@ -53,6 +53,7 @@ define([
       var versions = this.model.get('versions');
       return versions.at(versions.length - 1).get('thumbnailStatus') !== 'GENERATING';
     }
+
   });
 
 });

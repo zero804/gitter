@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false unused:true node:true*/
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var troupeService = require("./troupe-service");
@@ -266,8 +266,7 @@ function generateNotificationForUrl(url) {
   return null;
 }
 
-/* TODO: make sure only one of these gets installed for the whole app */
-exports.installListener = function() {
+exports.install = function() {
 
   appEvents.localOnly.onDataChange2(function(data) {
     var url = data.url;

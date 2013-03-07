@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 define([
   'ga'
 ], function(_gaq) {
@@ -20,19 +20,21 @@ define([
     _gaq.push(['_trackEvent', 'Error', message, file, line]);
   }
 
-  _gaq.push(['_setCustomVar',
-      1,
-      'userId',
-      window.troupeContext.user.id,
-      2 // Session level variable
-   ]);
+  if (window.troupeContext) {
+    _gaq.push(['_setCustomVar',
+        1,
+        'userId',
+        window.troupeContext.user.id,
+        2 // Session level variable
+     ]);
 
-  _gaq.push(['_setCustomVar',
-      2,
-      'troupeUri',
-      window.troupeContext.troupe.uri,
-      3 // Page level variable
-   ]);
+    _gaq.push(['_setCustomVar',
+        2,
+        'troupeUri',
+        window.troupeContext.troupe.uri,
+        3 // Page level variable
+     ]);
+  }
 
   _gaq.push(['_trackPageview']);
 
@@ -43,18 +45,15 @@ define([
     window.setTimeout(function() {
       console.log("Callback from GAQ");
       var hash = "" + window.location.hash;
-      console.log("Hash: " + hash);
-      console.log("Hash: " + typeof hash);
-
       try {
         hash = hash.replace(/\butm_\w+=(\+|\w+|%\w\w|\-)*&?/g, "");
       } catch(e) {
         console.log(e);
       }
-      console.log("New Hash: " + hash);
+
       window.location.hash = hash;
     }, 10);
-    
+
   });
 
   $(document).on('track', function(e, routeName) {

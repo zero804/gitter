@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 define([
   'jquery',
   'underscore'
@@ -11,7 +11,7 @@ define([
 
     install: function() {
       if (window.webkitNotifications.checkPermission() !== 0) {
-        window.webkitNotifications.requestPermission(module.listen); 
+        window.webkitNotifications.requestPermission(module.listen);
       } else {
         module.listen();
       }
@@ -38,10 +38,10 @@ define([
           }
 
           notification = nc.createNotification(null, "User has logged in", data.notificationText);
-          notification.onclose = function() { 
+          notification.onclose = function() {
             console.log("Notif onclose");
           };
-          notification.onclick = function() { 
+          notification.onclick = function() {
             console.log("Notif onclick");
           };
           notification.show();

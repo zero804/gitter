@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 
 define([
   'jquery',
@@ -92,7 +92,6 @@ define([
       var form = this.$el.find('form#updateprofileform');
 
       // TODO:
-      // alphanumeracy of displayName should match validation on server (no numbers allowed)
       // server validation errors should be displayed nicely
 
       var validation = {
@@ -133,7 +132,7 @@ define([
       };
 
       if (!this.isExistingUser) {
-        // validation.password.required = true;
+        validation.rules.password.required = true;
       }
 
       form.validate(validation);
