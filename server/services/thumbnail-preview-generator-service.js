@@ -8,7 +8,7 @@ var THUMBNAIL_STRATEGY = 1;
 var PREVIEW_STRATEGY = 1;
 
 exports.startWorkers = function() {
-  jobs = kue.createQueue()
+  jobs = kue.createQueue();
   var persistence = require("./persistence-service");
   var winston = require("winston");
   var image = require("../utils/image");
@@ -30,7 +30,7 @@ exports.startWorkers = function() {
   }
 
   function imageMagickPreviewGenerationStategy(fileName, mimeType, callback) {
-    image.generateThumbnail(fileName, 700, 700, function(err, thumbnailFile) {
+    image.generatePreview(fileName, 700, 400, function(err, thumbnailFile) {
       if(err) return callback(err);
 
       callback(null, { fileName: thumbnailFile, mimeType: 'image/jpeg' });
@@ -205,6 +205,7 @@ exports.startWorkers = function() {
             previewStrategy: PREVIEW_STRATEGY
           }
         };
+
         /* Save the preview to the gridfs */
         gridfs.uploadFile(uploadFileParams, function(err) {
           if(err) return winston.error("Unexpected error uploading file to gridfs", { exception: err });
@@ -214,10 +215,17 @@ exports.startWorkers = function() {
           // delete the newly created local preview file now that it is on grid fs
           fs.unlink(result.fileName);
 
-          persistence.File.update({ _id: fileId }, { previewMimeType: result.mimeType }, {}, function(err, numAffected) {
-            if(err) return winston.error("Error updating previewMimeType", err);
-            if(!numAffected) return winston.error("Update of previewMimeType affected zero rows. Something is wrong.");
+
+          persistence.File.findById(fileId, function(err, file) {
+            if(err) return winston.error("Error updating previewMimeType", { exception: err });
+            if(!file) return winston.error("Update of previewMimeType failed as file cannot be found.", { id: fileId });
+
+            file.previewMimeType = result.mimeType;
+            file.save(function(err) {
+              if(err) return winston.error("Error updating previewMimeType", { exception: err });
+            });
           });
+
         });
 
         /* Sometimes we don't know what out thumbnail generation stategy is going to be until we've generated the preview */
