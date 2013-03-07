@@ -204,10 +204,8 @@ function preloadConversations(userId, troupeId, callback) {
 function preloadUnreadItems(userId, troupeId, callback) {
     unreadItemService.getUnreadItemsForUser(userId, troupeId, function(err, unreadItems) {
       if(err) return callback(err);
-      console.log("getUnreadItemsForUser", userId, troupeId, unreadItems);
       callback(null, unreadItems);
     });
-//  unreadItemService.getUnreadItemsForUser(userId, troupeId, callback);
 }
 
 function preloadTroupeMiddleware(req, res, next) {
