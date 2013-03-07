@@ -89,8 +89,10 @@ exports.startWorkers = function() {
         return;
       }
 
+      var temporaryFile = temp.path({ prefix: 'thumnail-preview-generator-'});
+
       // Temporary file doesn't exist, generate a new name
-      data.temporaryFile = temp.path({ prefix: 'thumnail-preview-generator-'});
+      data.temporaryFile = temporaryFile;
 
       winston.info("Downloading file from grid fs to create thumbnail.");
       gridfs.downloadFile({ fileName: mongoFileName, localFileName: temporaryFile }, function(err) {
