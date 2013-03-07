@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true */
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 define([
   'jquery',
   'underscore',
@@ -46,6 +46,10 @@ define([
         // -- reset the collection
         var currentValue = this.get(attr);
         if(currentValue instanceof Backbone.Collection) {
+          if(val instanceof Backbone.Collection) {
+            val = val.toJSON();
+          }
+
           currentValue.reset(val);
           this.changed[attr] = val;
           changes[attr] = true;
@@ -128,6 +132,7 @@ define([
       var newModel = data.model;
       var id = newModel.id;
 
+      var parsed = new this.model(newModel, { parse: true });
       var existing = this.findExistingModel(id, parsed);
 
       switch(operation) {
@@ -145,13 +150,12 @@ define([
               logger.warn('Ignoring out-of-date update', existing.toJSON(), newModel);
               break;
             }
-
-            existing.set(newModel);
+            var newValues = parsed.toJSON();
+            existing.set(newValues);
             break;
           }
 
           // No existing document exists, simply treat this as an add
-          var parsed = new this.model(newModel, { parse: true });
           this.add(parsed);
           break;
 
