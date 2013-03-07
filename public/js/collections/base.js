@@ -127,20 +127,32 @@ define([
       var operation = data.operation;
       var newModel = data.model;
       var id = newModel.id;
-      var parsed = new this.model(newModel, { parse: true });
 
       var existing = this.findExistingModel(id, parsed);
-
 
       switch(operation) {
         case 'create':
         case 'update':
+          // There can be existing documents for create events if the doc was created on this
+          // client and lazy-inserted into the collection
           if(existing) {
+            var existingVersion = existing.get('v') ? existing.get('v') : 0;
+            var incomingVersion = newModel.v ? newModel.v : 0;
+
+            // If at least one of the docs has a version number ...
+            // And the new document is an older version than the new document...
+            if((incomingVersion || existingVersion) && (incomingVersion <= existingVersion)) {
+              logger.warn('Ignoring out-of-date update', existing.toJSON(), newModel);
+              break;
+            }
+
             existing.set(newModel);
-          } else {
-            this.add(parsed);
+            break;
           }
 
+          // No existing document exists, simply treat this as an add
+          var parsed = new this.model(newModel, { parse: true });
+          this.add(parsed);
           break;
 
         case 'remove':

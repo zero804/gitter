@@ -11,6 +11,9 @@ var nconf = require("../utils/config");
 var shutdown = require('../utils/shutdown');
 var Fiber = require("../utils/fiber");
 
+// Install inc and dec number fields in mongoose
+require('mongoose-number')(mongoose);
+
 var connection = mongoose.connection;
 
 //mongoose.mongo = require('mongodb');
@@ -97,7 +100,8 @@ var UserSchema = new Schema({
       countryCode: String
     }
   },
-  userToken: String // TODO: move to OAuth
+  userToken: String, // TODO: move to OAuth,
+  _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 UserSchema.index({ email: 1 });
 UserSchema.schemaTypeName = 'UserSchema';
@@ -131,7 +135,8 @@ var TroupeSchema = new Schema({
   uri: { type: String },
   status: { type: String, "enum": ['INACTIVE', 'ACTIVE'], "default": 'INACTIVE'},
   oneToOne: { type: Boolean, "default": false },
-  users: [TroupeUserSchema]
+  users: [TroupeUserSchema],
+  _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 TroupeSchema.index({ uri: 1 });
 TroupeSchema.schemaTypeName = 'TroupeSchema';
@@ -205,7 +210,8 @@ var InviteSchema = new Schema({
   displayName: { type: String },
   email: { type: String },
   code: { type: String },
-  status: { type: String, "enum": ['UNUSED', 'USED'], "default": 'UNUSED'}
+  status: { type: String, "enum": ['UNUSED', 'USED'], "default": 'UNUSED'},
+  _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 InviteSchema.schemaTypeName = 'InviteSchema';
 
@@ -215,7 +221,8 @@ InviteSchema.schemaTypeName = 'InviteSchema';
 var RequestSchema = new Schema({
   troupeId: ObjectId,
   userId: ObjectId,
-  status: { type: String, "enum": ['PENDING', 'ACCEPTED', 'REJECTED'], "default": 'PENDING'}
+  status: { type: String, "enum": ['PENDING', 'ACCEPTED', 'REJECTED'], "default": 'PENDING'},
+  _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 RequestSchema.schemaTypeName = 'RequestSchema';
 
@@ -226,7 +233,8 @@ var ChatMessageSchema = new Schema({
   fromUserId: ObjectId,
   toTroupeId: ObjectId,  //TODO: rename to troupeId
   text: String,
-  sent: { type: Date, "default": Date.now }
+  sent: { type: Date, "default": Date.now },
+  _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 ChatMessageSchema.index({ toTroupeId: 1, sent: -1 });
 ChatMessageSchema.schemaTypeName = 'ChatMessageSchema';
@@ -258,7 +266,8 @@ var ConversationSchema = new Schema({
   troupeId: ObjectId,
   updated: { type: Date, "default": Date.now },
   subject: { type: String },
-  emails: [EmailSchema]
+  emails: [EmailSchema],
+  _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 ConversationSchema.index({ troupeId: 1 });
 ConversationSchema.index({ 'emails.messageIds': 1 });
@@ -301,7 +310,8 @@ var FileSchema = new Schema({
   fileName: {type: String},
   mimeType: { type: String},
   previewMimeType: { type: String},
-  versions: [FileVersionSchema]
+  versions: [FileVersionSchema],
+  _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 FileSchema.index({ troupeId: 1 });
 FileSchema.schemaTypeName = 'FileSchema';

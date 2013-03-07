@@ -25,6 +25,8 @@ exports.attachNotificationListenersToSchema = function (schema, options) {
         }
       }
 
+      this.get('_tv').increment();
+
       this.post('save', function(postNext) {
         if(isNewInstance) {
           if(options.onCreate) options.onCreate(this, postNext);
