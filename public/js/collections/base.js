@@ -1,12 +1,14 @@
-/*jshint unused:true browser:true*/
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 define([
   'jquery',
   'underscore',
   'backbone',
-  'components/realtime'
-], function($, _, Backbone, realtime) {
-  /*global console:false */
+  'components/realtime',
+  'utils/logging'
+], function($, _, Backbone, realtime, logging) {
   "use strict";
+
+  var logger = logging.getLogger();
 
   var exports = {};
 
@@ -44,6 +46,10 @@ define([
         // -- reset the collection
         var currentValue = this.get(attr);
         if(currentValue instanceof Backbone.Collection) {
+          if(val instanceof Backbone.Collection) {
+            val = val.toJSON();
+          }
+
           currentValue.reset(val);
           this.changed[attr] = val;
           changes[attr] = true;
@@ -85,11 +91,11 @@ define([
       });
 
       this.subscription.callback(function() {
-        console.log('Subscription is now active!', arguments);
+        logger.info('Subscription is now active!', arguments);
       });
 
       this.subscription.errback(function(error) {
-        console.log('Subscription error', error);
+        logger.info('Subscription error', error);
       });
     },
 
@@ -111,7 +117,7 @@ define([
       if(existing) return existing;
 
       if(this.findModelForOptimisticMerge) {
-        console.log("Looking for a candidate for ", newModel);
+        logger.debug("Looking for a candidate for ", newModel);
 
         existing = this.findModelForOptimisticMerge(newModel);
       }
@@ -120,29 +126,37 @@ define([
     },
 
     onDataChange: function(data) {
+      logger.debug("onDataChange", data);
+
       var operation = data.operation;
       var newModel = data.model;
       var id = newModel.id;
-      var parsed = new this.model(newModel, { parse: true });
 
+      var parsed = new this.model(newModel, { parse: true });
       var existing = this.findExistingModel(id, parsed);
 
       switch(operation) {
         case 'create':
         case 'update':
+          // There can be existing documents for create events if the doc was created on this
+          // client and lazy-inserted into the collection
           if(existing) {
-            /*
-            var l = this.length;
-            this.remove(existing);
-            if(this.length !== l - 1) {
-              console.log("Nothing was deleted. This is a problem.");
+            var existingVersion = existing.get('v') ? existing.get('v') : 0;
+            var incomingVersion = newModel.v ? newModel.v : 0;
+
+            // If at least one of the docs has a version number ...
+            // And the new document is an older version than the new document...
+            if((incomingVersion || existingVersion) && (incomingVersion <= existingVersion)) {
+              logger.warn('Ignoring out-of-date update', existing.toJSON(), newModel);
+              break;
             }
-            */
-            existing.set(newModel);
-          } else {
-            this.add(parsed);
+            var newValues = parsed.toJSON();
+            existing.set(newValues);
+            break;
           }
 
+          // No existing document exists, simply treat this as an add
+          this.add(parsed);
           break;
 
         case 'remove':
@@ -153,7 +167,7 @@ define([
           break;
 
         default:
-          console.log("Unknown operation " + operation + ", ignoring");
+          logger.warn("Unknown operation " + operation + ", ignoring");
 
       }
     }

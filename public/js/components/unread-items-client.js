@@ -11,7 +11,7 @@ define([
   // second bit will deal with unread items for other troupes
   //
   var unreadItemsCountsCache = {};
-  var unreadItems = window.troupePreloads['unreadItems'] || {};
+  var unreadItems = window.troupePreloads && window.troupePreloads['unreadItems'] || {};
 
   var recentlyMarkedRead = {};
 
@@ -105,8 +105,10 @@ define([
         var top = $e.offset().top;
 
         if (top >= scrollTop && top <= scrollBottom) {
-          $e.removeClass('unread');
-          $e.addClass('read');
+          setTimeout(function () {
+            $e.removeClass('unread');
+            $e.addClass('read');
+          }, 2000);
 
           markItemRead(itemType, itemId);
         }
@@ -249,7 +251,9 @@ define([
         }
       });
 
-      recount();
+      if(troupeCollection) {
+        recount();
+      }
     }
   };
 

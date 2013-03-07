@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false unused:true node:true*/
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var userService = require("../services/user-service");
@@ -14,6 +14,17 @@ var winston = require("winston");
 var collections = require("../utils/collections");
 var cdn = require('../web/cdn');
 var predicates = collections.predicates;
+
+function formatDate(d) {
+  return d ? d.toISOString() : null;
+}
+
+function getVersion(item) {
+  if(!item) return undefined;
+  var v = item.get ? item.get('_tv') : item._tv;
+  if(v.valueOf) v = v.valueOf();
+  return v ? v : undefined;
+}
 
 function concatArraysOfArrays(a) {
   var result = [];
@@ -76,7 +87,7 @@ function UserStrategy(options) {
     if(true /* options.showLocation */ && user.location.timestamp) {
       location = {
         description: getLocationDescription(user.location.named),
-        timestamp: user.location.timestamp,
+        timestamp: formatDate(user.location.timestamp),
         countryCode: user.location.countryCode
       };
     } else {
@@ -90,7 +101,8 @@ function UserStrategy(options) {
       avatarUrlSmall: getAvatarUrl('s'),
       avatarUrlMedium: getAvatarUrl('m'),
       location: location,
-      online: onlineUsers ? onlineUsers.indexOf(user.id) >= 0 : undefined
+      online: onlineUsers ? onlineUsers.indexOf(user.id) >= 0 : undefined,
+      v: getVersion(user)
     };
   };
 }
@@ -148,35 +160,33 @@ function FileStrategy(options) {
     if(!item) return null;
     item = item.toObject();
 
-    var versionIndex = 1;
-    function narrowFileVersion(item) {
-      return {
-        versionNumber: versionIndex++,
-        creatorUser: userStategy.map(item.creatorUserId),
-        createdDate: item.createdDate,
-        thumbnailStatus: item.thumbnailStatus,
-        source: item.source,
-        deleted: item.deleted
-      };
-    }
-
     return {
       id: item._id,
       fileName: item.fileName,
       mimeType: item.mimeType,
-      versions: item.versions.map(narrowFileVersion),
+      versions: item.versions.map(function(item, index) {
+        return {
+          versionNumber: index + 1,
+          creatorUser: userStategy.map(item.creatorUserId),
+          createdDate: formatDate(item.createdDate),
+          thumbnailStatus: item.thumbnailStatus,
+          source: item.source,
+          deleted: item.deleted
+        };
+      }),
       url: '/troupes/' + encodeURIComponent(item.troupeId) + '/downloads/' + encodeURIComponent(item.fileName),
       previewMimeType: item.previewMimeType,
       embeddedViewType: item.embeddedViewType,
       embeddedUrl: '/troupes/' + encodeURIComponent(item.troupeId) + '/embedded/' + encodeURIComponent(item.fileName),
       thumbnailUrl: '/troupes/' + encodeURIComponent(item.troupeId) + '/thumbnails/' + encodeURIComponent(item.fileName),
-      unread: options.currentUserId ? unreadItemStategy.map(item._id) : true
+      unread: options.currentUserId ? unreadItemStategy.map(item._id) : true,
+      v: getVersion(item)
     };
   };
 
 }
 
-function FileIdStrategy(options) {
+function FileIdStrategy(/*options*/) {
   var fileStrategy = new FileStrategy();
   var self = this;
 
@@ -279,10 +289,11 @@ function EmailStrategy() {
       id: item.id,
       from: userStategy.map(item.fromUserId),
       subject: item.subject,
-      date: item.date,
+      date: formatDate(item.date),
       preview: item.preview,
       mail: item.mail,
-      attachments: _.map(item.attachments, fileStrategy.map)
+      attachments: _.map(item.attachments, fileStrategy.map),
+      v: getVersion(item)
     };
   };
 }
@@ -303,9 +314,10 @@ function ConversationStrategy()  {
     return {
       id: item.id,
       troupeId: item.troupeId,
-      updated: item.updated,
+      updated: formatDate(item.updated),
       subject: item.subject,
-      emails: item.emails.map(emailStrategy.map)
+      emails: item.emails.map(emailStrategy.map),
+      v: getVersion(item)
     };
   };
 }
@@ -339,12 +351,13 @@ function ConversationMinStrategy()  {
     return {
       id: item.id,
       troupeId: item.troupeId,
-      updated: item.updated,
+      updated: formatDate(item.updated),
       subject: item.subject,
       emailCount: item.emails.length,
       preview: preview,
       lastSender: lastSender,
-      hasAttachments: hasAttachments
+      hasAttachments: hasAttachments,
+      v: getVersion(item)
     };
   };
 }
@@ -450,10 +463,11 @@ function ChatStrategy(options)  {
     return {
       id: item._id,
       text: item.text,
-      sent: item.sent,
+      sent: formatDate(item.sent),
       fromUser: options.user ? options.user : userStategy.map(item.fromUserId),
       unread: options.currentUserId ? unreadItemStategy.map(item._id) : true,
-      troupe: troupeStrategy ? troupeStrategy.map(item.toTroupeId) : undefined
+      troupe: troupeStrategy ? troupeStrategy.map(item.toTroupeId) : undefined,
+      v: getVersion(item)
     };
 
   };
@@ -554,7 +568,8 @@ function InviteStrategy(options) {
       id: item._id,
       displayName: item.displayName,
       email: item.email,
-      avatarUrlSmall: '/images/2/avatar-default.png' // TODO: fix
+      avatarUrlSmall: '/images/2/avatar-default.png', // TODO: fix
+      v: getVersion(item)
     };
   };
 }
@@ -658,7 +673,8 @@ function TroupeStrategy(options) {
       users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
       user: otherUser,
       unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined,
-      url: troupeUrl
+      url: troupeUrl,
+      v: getVersion(item)
     };
   };
 }
@@ -723,7 +739,8 @@ function RequestStrategy(options) {
     return {
       id: item._id,
       user: userStategy.map(item.userId),
-      unread: options.currentUserId ? unreadItemStategy.map(item._id) : true
+      unread: options.currentUserId ? unreadItemStategy.map(item._id) : true,
+      v: getVersion(item)
     };
   };
 }

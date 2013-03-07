@@ -48,10 +48,19 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data)
   function renderPage(unreadItems, serializedUser, accessToken) {
     var profileNotCompleted;
 
-    var troupeStrategy = new restSerializer.TroupeStrategy({ currentUserId: (req.user) ? req.user.id : null, mapUsers: true });
+    if (req.user) {
+      var troupeStrategy = new restSerializer.TroupeStrategy({ currentUserId: (req.user) ? req.user.id : null, mapUsers: true });
+      restSerializer.serialize(troupe, troupeStrategy, function(err, troupeData) {
+        if(err) return next(err);
 
-    restSerializer.serialize(troupe, troupeStrategy, function(err, troupeData) {
-      if(err) return next(err);
+        sendPage(troupeData);
+      });
+    }
+    else {
+      sendPage(troupe);
+    }
+
+    function sendPage(troupeData) {
 
       var accessDenied;
 
@@ -70,6 +79,8 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data)
           return next("Inconsistent state for user: " + status);
         }
 
+      } else if (req.troupe.oneToOne) {
+        troupeData = troupe;
       } else {
         troupeData = null;
       }
@@ -85,6 +96,7 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data)
           basePort: nconf.get('web:baseport'),
           basePath: nconf.get('web:basepath'),
           homeUrl: nconf.get('web:homeurl'),
+          troupeUri: accessDenied ? troupe.uri : undefined,
           websockets: {
             fayeUrl: getFayeUrl(),
             options: {
@@ -126,7 +138,7 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data)
         troupeContextData: troupeContext
       });
 
-    });
+    }
 
   }
 }
@@ -211,7 +223,18 @@ function preloadTroupeMiddleware(req, res, next) {
 }
 
 function preloadOneToOneTroupeMiddleware(req, res, next) {
- troupeService.findOrCreateOneToOneTroupe(req.user.id, req.params.userId, function(err, troupe, otherUser) {
+  if (!req.user) {
+    req.troupe = { oneToOne: true };
+    req.otherUser = { displayName: '' };
+    return next();
+  }
+
+  if (req.params.userId === req.user.id) {
+    res.redirect(nconf.get('web:homeurl'));
+    return 1;
+  }
+
+  troupeService.findOrCreateOneToOneTroupe(req.user.id, req.params.userId, function(err, troupe, otherUser) {
     if (err) return next({ errorCode: 500, error: err });
     if(!troupe) return next({ errorCode: 404 });
     req.otherUser = otherUser;
@@ -237,18 +260,18 @@ module.exports = {
 
       app.get('/one-one/:userId',
         middleware.grantAccessForRememberMeTokenMiddleware,
-        middleware.ensureLoggedIn(),
         preloadOneToOneTroupeMiddleware,
 
         function(req, res, next) {
 
           var f = new Fiber();
-          preloadTroupes(req.user.id, f.waitor());
-          preloadFiles(req.user.id, req.troupe.id, f.waitor());
-          preloadChats(req.user.id, req.troupe.id, f.waitor());
-          preloadUsers(req.user.id, req.troupe, f.waitor());
-          preloadUnreadItems(req.user.id, req.troupe.id, f.waitor());
-
+          if(req.user) {
+            preloadTroupes(req.user.id, f.waitor());
+            preloadFiles(req.user.id, req.troupe.id, f.waitor());
+            preloadChats(req.user.id, req.troupe.id, f.waitor());
+            preloadUsers(req.user.id, req.troupe, f.waitor());
+            preloadUnreadItems(req.user.id, req.troupe.id, f.waitor());
+          }
           f.all()
             .spread(function(troupes, files, chats, users, unreadItems) {
               // Send the information through

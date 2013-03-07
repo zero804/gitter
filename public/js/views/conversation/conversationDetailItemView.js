@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 
 
 // TODO: Better way to show the subject here, right now it will be set multiple times as this is called per conversationDetailItemView

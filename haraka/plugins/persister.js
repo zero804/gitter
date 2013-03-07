@@ -17,6 +17,9 @@ var sanitizer = require("./../../server/utils/sanitizer.js");
 var winston = require('winston');
 var mimelib = require('mimelib');
 
+require('./../../server/utils/event-listeners').installLocalEventListeners();
+
+
 function saveFile(troupeId, creatorUserId, fileName, mimeType, content, callback) {
   temp.open('attachment', function(err, tempFileInfo) {
     var tempFileName = tempFileInfo.path;

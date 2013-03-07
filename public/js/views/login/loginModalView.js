@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 
 define([
   'jquery',
@@ -24,7 +24,8 @@ define([
         autofocusEmail: this.initialEmail ? '': 'autofocus',
         autofocusPassword: this.initialEmail ? 'autofocus' : '',
         troupeUri: this.fromSignup ? null : window.location.pathname.replace(/\//g,''),
-        fromSignup: this.fromSignup
+        fromSignup: this.fromSignup,
+        isOneToOne: (window.troupeContext && window.troupeContext.troupe) ? !!window.troupeContext.troupe.oneToOne : null
       };
     },
 

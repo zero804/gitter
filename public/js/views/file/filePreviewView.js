@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 
 define([
   'jquery',
@@ -61,19 +61,23 @@ define([
       return '/pdfjs/web/viewer.html?file=' + url + "?embedded=1";
     }
   }
+  var displayDirectMimeTypes = {
+    'image/jpeg': true,
+    'image/gif': true,
+    'image/png': true
+  };
 
   var PreviewView = TroupeViews.Base.extend({
     template: template,
     events: {
     },
 
-    initialize: function(options) {
-      var self = this;
+    initialize: function() {
       _.bindAll(this, 'onMenuItemClicked');
       this.on('menuItemClicked', this.onMenuItemClicked);
     },
 
-    onMenuItemClicked: function(id) {
+    onMenuItemClicked: function() {
       window.location.href = this.model.get("url");
     },
 
@@ -135,7 +139,8 @@ define([
       var previewMimeType = item.get('previewMimeType');
       var mimeType = item.get('mimeType');
 
-      if(/^image\//.test(mimeType)) {
+      console.log("WHAT AM I: " + mimeType);
+      if(displayDirectMimeTypes[mimeType]) {
         return {
           href: item.get('url') + '?embedded=1',
           photo: true

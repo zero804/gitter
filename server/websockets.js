@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false unused:true node:true*/
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var express = require('express');
@@ -8,6 +8,7 @@ var http = require('http');
 var nconf = require('./utils/config');
 var winston = require('./utils/winston');
 var shutdown = require('./utils/shutdown');
+var bayeux = require('./web/bayeux');
 
 var app = express();
 var server;
@@ -30,22 +31,24 @@ var sessionStore = new RedisStore();
 
 require('./web/express').installSocket(app, server, sessionStore);
 
-
 require('./web/passport').install();
 
 app.get('/', function(req, res) {
   res.send('Nothing to see here. You must be lost.');
 });
 
-// TEMP
-require('./services/notification-generator-service').install();
-require('./web/bayeux-events-bridge').install(server);
+require('./utils/event-listeners').installLocalEventListeners();
 
 var port = nconf.get("ws:port");
 var bindIp = nconf.get("ws:bindIp");
 
 winston.info("Binding websockets service to " + bindIp + ":" + port);
 
+// This is the faye endpoint handler
+var bayeuxServer = bayeux.server;
+bayeuxServer.attach(server);
+
+// Listen to the port
 server.listen(port, bindIp);
 
 var gracefullyClosing = false;

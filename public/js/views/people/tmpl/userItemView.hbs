@@ -3,12 +3,12 @@
     <div class="trpPersonDetails">
         <div class="trpPersonName">{{user.displayName}}<br><span class="trpPersonEmail">{{#if displayEmail}}{{user.email}}{{/if}}</span></div>
         {{#if displayModeRequest}}
-            <a class="trpPersonAction accept" href="#">Accept</a>
-            <a class="trpPersonAction reject" href="#">Reject</a>
+            <a class="trpPersonAction accept" href="#!">Accept</a>
+            <a class="trpPersonAction reject" href="#!">Reject</a>
         {{/if}}
         {{#if displayModeUser}}
          {{^compactView}}
-            <a class="trpPersonAction remove" href="#">Remove</a>
+            <a class="trpPersonAction remove" href="#!">Remove</a>
         {{/compactView}}
         {{/if}}
     </div>

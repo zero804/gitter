@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false unused:true node:true*/
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 exports.install = function(persistenceService) {
@@ -16,7 +16,6 @@ exports.install = function(persistenceService) {
 
   function serializeEvent(url, operation, model, callback) {
     if(!url) { if(callback) callback(); return; }
-
     winston.debug("Serializing " + operation + " to " + url);
 
     // TODO: consider swapping out the HEAVY WEIGHT restSerializer here for the
@@ -26,10 +25,16 @@ exports.install = function(persistenceService) {
     restSerializer.serializeModel(model, function(err, serializedModel) {
       if(err) {
         winston.error("Silently failing model event: ", { exception: err, url: url, operation: operation });
+        return;
+      }
+
+      if(Array.isArray(url)) {
+        url.forEach(function(u) {
+          appEvents.dataChange2(u, operation, serializedModel);
+        });
       } else {
         appEvents.dataChange2(url, operation, serializedModel);
       }
-
       if(callback) callback();
     });
   }
@@ -65,7 +70,7 @@ exports.install = function(persistenceService) {
   }
 
   mongooseUtils.attachNotificationListenersToSchema(schemas.UserSchema, {
-
+    ignoredPaths: ['lastTroupe','confirmationCode','status','passwordHash','passwordResetCode'],
     onUpdate: function(model, next) {
       if(!next) next = function() {};
 
@@ -91,7 +96,8 @@ exports.install = function(persistenceService) {
 
   attachNotificationListenersToSchema(schemas.ConversationSchema, 'conversation');
   attachNotificationListenersToSchema(schemas.FileSchema, 'file');
-  attachNotificationListenersToSchema(schemas.InviteSchema, 'invite');
+  // INVITES currently do not have live-collections
+  // attachNotificationListenersToSchema(schemas.InviteSchema, 'invite');
   attachNotificationListenersToSchema(schemas.RequestSchema, 'request');
   attachNotificationListenersToSchema(schemas.ChatMessageSchema, 'chat', function(model) {
     return "/troupes/" + model.toTroupeId + "/chatMessages";
@@ -103,4 +109,23 @@ exports.install = function(persistenceService) {
     return "/troupes/" + model.id;
   });
 
+
+  mongooseUtils.attachNotificationListenersToSchema(schemas.TroupeSchema, {
+    onCreate: function(model, next) {
+      var urls = model.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/troupes'; });
+      serializeEvent(urls, 'create', model);
+      next();
+    },
+
+    onUpdate: function(model, next) {
+      var urls = model.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/troupes'; });
+      serializeEvent(urls, 'update', model);
+      next();
+    },
+
+    onRemove: function(model) {
+      var urls = model.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/troupes'; });
+      serializeEvent(urls, 'remove', model);
+    }
+  });
 };

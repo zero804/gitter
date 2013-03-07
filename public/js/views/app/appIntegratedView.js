@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 
 define([
   'jquery',
@@ -61,7 +61,8 @@ define([
         text: {
           dragZone: '', // text to display
           dropProcessing: '',
-          waitingForResponse: ''
+          waitingForResponse: '',
+          uploadButton: ''
         },
         request: {
           endpoint: '/troupes/' + window.troupeContext.troupe.id + '/downloads/'

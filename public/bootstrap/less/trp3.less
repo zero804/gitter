@@ -25,19 +25,6 @@ html {
 	min-height: 100%;
 }
 
-// TEMP TEMP TEMP
-
-.view .trpChatBox {
-	-webkit-transition: background-color 0.5s linear;
-  -moz-transition: background-color 0.5s linear;
-  -o-transition: background-color 0.5s linear;
-  transition: background-color 0.5s linear;
-}
-
-.view.unread .trpChatBox {
-	background-color: lightyellow;
-}
-
 body {
 	min-height: 100%;
 	margin: 0;
@@ -48,6 +35,16 @@ body {
 a {
 	text-decoration: none;
 	color: #333;
+}
+
+
+.trpBlankPage {
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	z-index: -1;
 }
 
 a:hover {

@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 define([
   'jquery',
   'underscore',
@@ -43,7 +43,8 @@ define([
     sortByMethods: {
       "date": function(file) {
         var versions = file.get('versions');
-        return versions.at(versions.length - 1).get('createdDate');
+        var d = versions.at(versions.length - 1).get('createdDate');
+        return d ? d.valueOf() : 0;
       }
     },
 

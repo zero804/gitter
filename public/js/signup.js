@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 require([
   'jquery',
   'views/base',
@@ -89,5 +89,14 @@ require([
       modal.show();
       return false;
     });
+
+    require([
+      'utils/tracking'
+    ], function(tracking) {
+      // No need to do anything here
+    });
+
 });
+
+
 

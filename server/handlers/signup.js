@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false unused:true node:true*/
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var form = require("express-form"),
@@ -172,7 +172,10 @@ module.exports = {
             }
 
             winston.debug("Redirecting newly confirmed user to troupe ", { troupeUri: troupe.uri } );
-            res.relativeRedirect('/' + troupe.uri);
+            if (!req.query.fromRequest)
+              res.relativeRedirect('/' + troupe.uri + '#|shareTroupe');
+            else
+              res.relativeRedirect('/' + troupe.uri);
           });
         }
       );

@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 
 define([
   'jquery',
@@ -6,36 +6,42 @@ define([
   'backbone',
   'marionette',
   'views/base',
-  'hbs!./tmpl/conversationView',
   'collections/conversations',
-  'views/conversation/conversationItemView',
+  'hbs!./tmpl/conversationItemView',
   'hbs!./tmpl/conversationHelpView'
-], function($, _, Backbone, Marionette, TroupeViews, template, conversationModels, ConversationItemView, conversationHelpView){
+], function($, _, Backbone, Marionette, TroupeViews, conversationModels, conversationItemViewTemplate, conversationHelpTemplate){
   "use strict";
 
-  return TroupeViews.Base.extend({
-    template: template,
+  function getData() {
+    var tx = window.troupeContext;
 
-    initialize: function(/*options*/) {
-      var tx = window.troupeContext;
-      this.data = {
-        emailAddress: tx.troupe.uri + '@' + tx.baseServer,
-        troupeName: (tx.troupe.name) ? tx.troupe.name.replace(/\s/g,"%20") : ""
-      };
-    },
+    return {
+      emailAddress: tx.troupe.uri + '@' + tx.baseServer,
+      troupeName: (tx.troupe.name) ? tx.troupe.name.replace(/\s/g,"%20") : ""
+    };
+  }
 
-    afterRender: function() {
-      this.collectionView = new Marionette.CollectionView({
-        itemView: ConversationItemView,
-        collection: this.collection,
-        el: this.$el.find(".frame-conversations"),
-        emptyView: TroupeViews.Base.extend({
-          template: conversationHelpView,
-          data: this.data
-        })
-      }).render();
+
+  var ConversationItemView = TroupeViews.Base.extend({
+    template: conversationItemViewTemplate,
+
+    getRenderData: function() {
+      var data = this.model.toJSON();
+      data.detailUrl = "#mail/" + data.id;
+      data.updated = data.updated ? data.updated.calendar() : null;
+      return data;
     }
 
   });
 
+  var ConversationCollectionView = Marionette.CollectionView.extend({
+    itemView: ConversationItemView,
+    emptyView: TroupeViews.Base.extend({
+      template: conversationHelpTemplate,
+      data: getData()
+    })
+  });
+
+  _.extend(ConversationCollectionView.prototype, TroupeViews.SortableMarionetteView);
+  return ConversationCollectionView;
 });

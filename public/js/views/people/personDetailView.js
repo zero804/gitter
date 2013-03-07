@@ -52,7 +52,7 @@ define([
               if (thisPerson.isSelf)
                 window.location = window.troupeContext.homeUrl;
               else
-                window.location.href = "#";
+                window.location.href = "#!";
             }
           });
       });

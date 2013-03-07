@@ -1,4 +1,4 @@
-/*jshint unused:true browser:true*/
+/*jshint unused:true, browser:true */
 
 define([
   'jquery',
@@ -97,6 +97,7 @@ define([
         }
 
         that.collection.create(serializedForm, {
+          url: '/troupes/',
           wait: true,
           success: function(troupe /*, resp, options*/) {
             console.log('response from upgrading one to one troupe', troupe);

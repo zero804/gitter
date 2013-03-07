@@ -56,7 +56,7 @@ define([
     onReject: function() {
       this.model.destroy({
         success: function(data) {
-          window.location.href = "#";
+          window.location.href = "#!";
         },
         error: function(model, resp, options) {
           console.log("Error rejecting request.");

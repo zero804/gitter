@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false unused:true node:true*/
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 var mongoose = require("mongoose");
@@ -9,6 +9,10 @@ var _ = require("underscore");
 var winston = require("winston");
 var nconf = require("../utils/config");
 var shutdown = require('../utils/shutdown');
+var Fiber = require("../utils/fiber");
+
+// Install inc and dec number fields in mongoose
+require('mongoose-number')(mongoose);
 
 var connection = mongoose.connection;
 
@@ -26,41 +30,10 @@ shutdown.addHandler('mongo', 1, function(callback) {
 });
 
 if(nconf.get("mongo:profileSlowQueries")) {
-
-  var nativeDb = mongoose.connection.db;
-
-  var profileCollection = nativeDb.collection("system.profile");
-  var MAX = 50;
-
-  // Let the rest of the app start first
-  setTimeout(function() {
-    profileCollection.findOne({}, { sort: [[ "ts",  -1 ]] }, function(err, latest) {
-      var ts = err || !latest ? 0 : latest.ts;
-
-      winston.info("MongoDB profiling enabled");
-      connection.setProfiling(1, MAX, function() {});
-
-      setInterval(function() {
-        profileCollection.find({ ts: { $gt: ts } }, { sort: { ts: 1 }}).toArray(function(err, items) {
-          if(err) return;
-
-          if(items.length === 0)  return;
-          items.forEach(function(item) {
-            if(item.ts < ts) return;
-
-            if(item.millis > MAX) {
-              winston.warn("Mongo operation exceeded max", item);
-            }
-
-            if(item.ts > ts) ts = item.ts;
-          });
-
-        });
-      }, 5000);
-    });
-
-  }, 2000);
-
+  mongoose.connection.on('open', function() {
+    var MAX = 50;
+    connection.setProfiling(1, MAX, function() {});
+  });
 }
 
 connection.on('error', function(err) {
@@ -127,7 +100,8 @@ var UserSchema = new Schema({
       countryCode: String
     }
   },
-  userToken: String // TODO: move to OAuth
+  userToken: String, // TODO: move to OAuth,
+  _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 UserSchema.index({ email: 1 });
 UserSchema.schemaTypeName = 'UserSchema';
@@ -161,7 +135,8 @@ var TroupeSchema = new Schema({
   uri: { type: String },
   status: { type: String, "enum": ['INACTIVE', 'ACTIVE'], "default": 'INACTIVE'},
   oneToOne: { type: Boolean, "default": false },
-  users: [TroupeUserSchema]
+  users: [TroupeUserSchema],
+  _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 TroupeSchema.index({ uri: 1 });
 TroupeSchema.schemaTypeName = 'TroupeSchema';
@@ -187,8 +162,15 @@ TroupeSchema.methods.addUserById = function(userId) {
   // TODO: disable this methods for one-to-one troupes
   var troupeUser = new TroupeUser({ userId: userId });
   this.post('save', function(postNext) {
+    var f = new Fiber();
+
     var url = "/troupes/" + this.id + "/users";
     serializeEvent(url, "create", troupeUser, postNext);
+
+    var userUrl = "/user/" + userId + "/troupes";
+    serializeEvent(userUrl, "create", this, f.waitor());
+
+    f.all().then(function() { postNext(); }).fail(function(err) { postNext(err); });
   });
 
   return this.users.push(troupeUser);
@@ -200,11 +182,18 @@ TroupeSchema.methods.removeUserById = function(userId) {
   if(troupeUser) {
     // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
     this.post('save', function(postNext) {
+      var f = new Fiber();
+
       var url = "/troupes/" + this.id + "/users";
-      serializeEvent(url, "remove", troupeUser, postNext);
+      serializeEvent(url, "remove", troupeUser, f.waitor());
+
+      var userUrl = "/user/" + userId + "/troupes";
+      serializeEvent(userUrl, "remove", this, f.waitor());
 
       // TODO: move this in a remove listener somewhere else in the codebase
       appEvents.userRemovedFromTroupe({ troupeId: this.id, userId: troupeUser.userId });
+
+      f.all().then(function() { postNext(); }).fail(function(err) { postNext(err); });
     });
 
     troupeUser.remove();
@@ -221,7 +210,8 @@ var InviteSchema = new Schema({
   displayName: { type: String },
   email: { type: String },
   code: { type: String },
-  status: { type: String, "enum": ['UNUSED', 'USED'], "default": 'UNUSED'}
+  status: { type: String, "enum": ['UNUSED', 'USED'], "default": 'UNUSED'},
+  _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 InviteSchema.schemaTypeName = 'InviteSchema';
 
@@ -231,7 +221,8 @@ InviteSchema.schemaTypeName = 'InviteSchema';
 var RequestSchema = new Schema({
   troupeId: ObjectId,
   userId: ObjectId,
-  status: { type: String, "enum": ['PENDING', 'ACCEPTED', 'REJECTED'], "default": 'PENDING'}
+  status: { type: String, "enum": ['PENDING', 'ACCEPTED', 'REJECTED'], "default": 'PENDING'},
+  _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 RequestSchema.schemaTypeName = 'RequestSchema';
 
@@ -242,7 +233,8 @@ var ChatMessageSchema = new Schema({
   fromUserId: ObjectId,
   toTroupeId: ObjectId,  //TODO: rename to troupeId
   text: String,
-  sent: { type: Date, "default": Date.now }
+  sent: { type: Date, "default": Date.now },
+  _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 ChatMessageSchema.index({ toTroupeId: 1, sent: -1 });
 ChatMessageSchema.schemaTypeName = 'ChatMessageSchema';
@@ -274,7 +266,8 @@ var ConversationSchema = new Schema({
   troupeId: ObjectId,
   updated: { type: Date, "default": Date.now },
   subject: { type: String },
-  emails: [EmailSchema]
+  emails: [EmailSchema],
+  _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 ConversationSchema.index({ troupeId: 1 });
 ConversationSchema.index({ 'emails.messageIds': 1 });
@@ -317,7 +310,8 @@ var FileSchema = new Schema({
   fileName: {type: String},
   mimeType: { type: String},
   previewMimeType: { type: String},
-  versions: [FileVersionSchema]
+  versions: [FileVersionSchema],
+  _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 FileSchema.index({ troupeId: 1 });
 FileSchema.schemaTypeName = 'FileSchema';
