@@ -101,7 +101,7 @@ define([
     },
 
     onBeforeItemAdded: function() {
-      this.isAtBottomOfPage = $(this.scrollOf).scrollTop() === $(this.container).height() - $(this.scrollOf).height();
+      this.isAtBottomOfPage = ($(this.scrollOf).scrollTop() >= ($(this.container).height() - $(this.scrollOf).height()));
       this.containerHeightBeforeAdd = $(this.container).height();
       //this.scrollPosBeforeAdd = $(this.scrollOf).scrollTop();
     },
