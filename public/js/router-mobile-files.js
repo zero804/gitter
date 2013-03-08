@@ -22,12 +22,17 @@ require([
     },
 
     initialize: function() {
+      var self = this;
       this.fileCollection = new fileModels.FileCollection();
       this.fileCollection.reset(window.troupePreloads['files']);
       this.fileCollection.listen();
-      if (window.noupdate) {
-        this.fileCollection.fetch();
-      }
+      $(function() {
+        console.log("Checking if the collection needs to be fetched.", window.applicationCache.status);
+        if (window.applicationCache.status == 1 /* NOUPDATE */) {
+          console.log('Fetching collection.');
+          self.fileCollection.fetch();
+        }
+      });
     },
 
     defaultAction: function(/*actions*/){

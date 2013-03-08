@@ -22,9 +22,14 @@ require([
   var chatCollection = new chatModels.ChatCollection();
   chatCollection.listen();
   chatCollection.reset(window.troupePreloads['chatMessages'], { parse: true });
-  if (window.noupdate) {
-    chatCollection.fetch();
-  }
+
+  $(function() {
+    console.log("Checking if the collection needs to be fetched.", window.applicationCache.status);
+    if (window.applicationCache.status == 1 /* NOUPDATE */) {
+      console.log('Fetching collection.');
+      chatCollection.fetch();
+    }
+  });
 
   new ChatInputView({
     el: $('#chat-input'),
