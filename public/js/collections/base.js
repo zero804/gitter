@@ -91,11 +91,11 @@ define([
       });
 
       this.subscription.callback(function() {
-        logger.info('Subscription is now active!', arguments);
+        logger.info('Listening to ' + self.url);
       });
 
       this.subscription.errback(function(error) {
-        logger.info('Subscription error', error);
+        logger.info('Subscription error for ' + self.url, error);
       });
     },
 

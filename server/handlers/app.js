@@ -361,10 +361,20 @@ module.exports = {
             };
           }
 
-          engine.subscribe(clientId, '/user/' + req.user.id + '/troupes', subscribeComplete());
-          //engine.subscribe(clientId, '/user/' + req.user.id + '/troupes', subscribeComplete());
-          //engine.subscribe(clientId, '/user/' + req.user.id + '/troupes', subscribeComplete());
-          //engine.subscribe(clientId, '/user/' + req.user.id + '/troupes', subscribeComplete());
+          var troupeId = req.troupe.id;
+          var userId = req.user.id;
+
+          // Presubscribe the user
+          [
+            '/user/' + userId + '/troupes',
+            '/troupes/' + troupeId + '/chatMessages',
+            '/troupes/' + troupeId + '/files',
+            '/troupes/' + troupeId + '/conversations',
+            '/troupes/' + troupeId + '/users'
+          ].forEach(function(url) {
+            engine.subscribe(clientId, url, subscribeComplete());
+          });
+
           Q.all(promises)
             .then(function() {
 
