@@ -10,7 +10,8 @@ require([
   'views/widgets/avatar',
   'components/unread-items-client',
   'scrollfix'
-], function($, _, Backbone, TroupeViews, chatModels, ChatInputView, ChatCollectionView, AvatarWidget, unreadItemsClient, scrollfix) {
+], function($, _, Backbone, TroupeViews, chatModels, ChatInputView, ChatCollectionView, AvatarWidget/*, unreadItemsClient, scrollfix*/) {
+  /*jslint browser: true, unused: true */
   "use strict";
 
   TroupeViews.preloadWidgets({
@@ -24,8 +25,6 @@ require([
   if (window.noupdate) {
     chatCollection.fetch();
   }
-
-  unreadItemsClient.installTroupeListener();
 
   new ChatInputView({
     el: $('#chat-input'),

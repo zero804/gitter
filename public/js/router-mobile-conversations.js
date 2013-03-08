@@ -9,9 +9,8 @@ require([
   'views/conversation/conversationDetailView',
   'collections/conversations',
   'components/unread-items-client'
-], function($, _, Backbone, BaseRouter, TroupeViews, ConversationView, conversationDetailView, conversationModels, unreadItemsClient) {
+], function($, _, Backbone, BaseRouter, TroupeViews, ConversationView, conversationDetailView, conversationModels/*, unreadItemsClient*/) {
   /*jslint browser: true, unused: true */
-  /*global console:false, require: true */
   "use strict";
 
   var AppRouter = BaseRouter.extend({
@@ -27,10 +26,9 @@ require([
       if (window.noupdate) {
         this.collection.fetch();
       }
-      unreadItemsClient.installTroupeListener();
     },
 
-    defaultAction: function(actions){
+    defaultAction: function(){
       var view = new ConversationView({ collection: this.collection });
       this.showView("#primary-view", view);
     },
@@ -55,7 +53,7 @@ require([
   // Asynchronously load tracker
   require([
     'utils/tracking'
-  ], function(tracking) {
+  ], function() {
     // No need to do anything here
   });
 
