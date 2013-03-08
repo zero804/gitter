@@ -61,6 +61,8 @@ define([
 
     rerenderOnChange: function() {
       this.removeSubViews(this.$el);
+      if (this.$el.tooltip)
+        this.$el.tooltip('destroy');
       this.render();
     },
 

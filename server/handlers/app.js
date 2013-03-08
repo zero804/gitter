@@ -482,8 +482,16 @@ module.exports = {
       app.get('/:appUri/mails',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
+        preloadTroupeMiddleware,
         function(req, res, next) {
-          renderAppPage(req, res, next, 'mobile/conversation-app');
+          preloadConversations(req.user.id, req.troupe.id, function(err, serializedMails) {
+            if (err) {
+              winston.error("Error in Serializer:", { exception: err });
+              return next(err);
+            }
+
+            renderAppPageWithTroupe(req, res, next, 'mobile/conversation-app', req.troupe, req.troupe.name, { 'conversations': serializedMails });
+          });
         });
 
       app.get('/:appUri/people',
