@@ -44,9 +44,7 @@ var bindIp = nconf.get("ws:bindIp");
 
 winston.info("Binding websockets service to " + bindIp + ":" + port);
 
-// This is the faye endpoint handler
-var bayeuxServer = bayeux.server;
-bayeuxServer.attach(server);
+bayeux.attach(server);
 
 // Listen to the port
 server.listen(port, bindIp);
