@@ -1,4 +1,4 @@
-/*jshint node:true unused:true */
+/*jshint node:true, unused:true */
 "use strict";
 
 var Q = require('q');
