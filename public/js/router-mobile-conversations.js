@@ -22,7 +22,7 @@ require([
     initialize: function() {
       var self = this;
       this.collection = new conversationModels.ConversationCollection();
-      this.collection.fetch();
+      this.collection.reset(window.troupePreloads['conversations'], { parse: true });
       this.collection.listen();
 
       $(function() {
