@@ -20,12 +20,18 @@ require([
     },
 
     initialize: function() {
+      var self = this;
       this.collection = new conversationModels.ConversationCollection();
       this.collection.fetch();
       this.collection.listen();
-      if (window.noupdate) {
-        this.collection.fetch();
-      }
+
+      $(function() {
+        console.log("Checking if the collection needs to be fetched.", window.applicationCache.status);
+        if (window.applicationCache.status == 1 /* NOUPDATE */) {
+          console.log('Fetching collection.');
+          self.collection.fetch();
+        }
+      });
     },
 
     defaultAction: function(){
