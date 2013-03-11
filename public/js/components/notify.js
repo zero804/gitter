@@ -9,23 +9,45 @@ define([
     var content = options.content;
     var timeout = options.timeout ? options.timeout : 6000;
     var className = options.className ? options.className : '';
+    var action = options.action ? options.action : 'show';
     var n, isNew = false;
 
-    // lookup or create the notification element
-    if (options.id) {
-      n = this.find('#'+options.id);
+    function show() {
+      if (n.is(':hidden')) {
+        // style
+        n.show();
+        n.css({ position: 'relative', left: -1 * n.outerWidth() });
+        n.animate({ left: 0 });
+      }
+      // restart hide timeout
+      n.data('notification-hide-timeout').restart();
     }
 
-    if (!options.id || n.length <= 0) {
-      isNew = true;
-      n = $('<div class="notification"'+((options.id) ? ' id="'+options.id+'"':'')+'></div>').hide();
+    function hide() {
+      n.animate({ left: -1 * n.outerWidth()   }, function() {
+        n.hide('slow');
+      });
     }
 
-    // ensure the requested class is on the element
-    n.addClass('notification-container');
-    if (className) {
-      n.addClass(className);
+    function get() {
+      // lookup or create the notification element
+      if (options.id) {
+        n = container.find('#'+options.id);
+      }
+
+      if (!options.id || n.length <= 0) {
+        isNew = true;
+        n = $('<div class="notification"'+((options.id) ? ' id="'+options.id+'"':'')+'></div>').hide();
+        n.prependTo(container);
+        // add the hide timeout for this notification
+        n.data('notification-hide-timeout', new Timeout(function() {
+          hide();
+        }, timeout));
+     }
+
     }
+
+    get();
 
     // attach handlers on the notification-center container
     this.on('mouseenter', /* '.notification',*/ function(e) {
@@ -39,6 +61,7 @@ define([
         });
       }
     });
+
     this.on('mouseleave', /* '.notification',*/ function(e) {
       if (container.data('notification-hide-running') === false && e.currentTarget === container[0]) {
         // console.log('resuming timeouts', e);
@@ -50,36 +73,46 @@ define([
       }
     });
 
-    // replace the content
-    n.html(content);
+    function set() {
+      if (content) {
+        // replace the content
+        n.html(content);
+      }
 
-    // add & animate the element if it is new
-    if (isNew) {
-      n.prependTo(container);
-      // add the hide timeout for this notification
-      n.data('notification-hide-timeout', new Timeout(function() {
-        n.animate({ left: -1 * n.outerWidth()   }, function() {
-          n.hide('slow');
-        });
-      }, timeout));
-    }
-    else {
-      // restart the hide timeout for this existing notification.
-      // console.log('restarting timeout for existing notification');
-      n.data('notification-hide-timeout').restart();
+      // ensure the requested class is on the element
+      n.addClass('notification-container');
+      if (className) {
+        n.addClass(className);
+      }
     }
 
-    if (n.is(':hidden')) {
-      n.show();
-      n.css({ position: 'relative', left: -1 * n.outerWidth() });
-      n.animate({ left: 0 });
+    set();
+
+    function setDisplay() {
+      if (action === 'show') {
+        show(n);
+      }
+      else if (action === 'hide') {
+        hide(n);
+      }
     }
 
+    setDisplay();
+
+    return n;
   };
 
   // Timeout util
   function Timeout(callback, delay) {
     var timerId, start, remaining = delay;
+
+    function timeout() {
+      if (remaining !== Infinity) {
+        return window.setTimeout(callback, remaining);
+      }
+
+      return null;
+    }
 
     this.pause = function() {
       window.clearTimeout(timerId);
@@ -89,14 +122,14 @@ define([
     this.resume = function(add) {
       start = new Date();
       remaining += (add) ? add : 0;
-      timerId = window.setTimeout(callback, remaining);
+      timerId = timeout();
     };
 
     this.restart = function() {
       start = new Date();
       remaining = delay;
       window.clearTimeout(timerId);
-      timerId = window.setTimeout(callback, remaining);
+      timerId = timeout();
     };
 
     this.resume();
