@@ -151,8 +151,7 @@ define([
               break;
             }
 
-            var newValues = parsed.toJSON();
-            existing.set(newValues);
+            existing.set(parsed.attributes);
             break;
           }
 
