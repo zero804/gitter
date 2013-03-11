@@ -22,10 +22,7 @@ define([
     getRenderData: function(){
       var data = this.model.toJSON();
 
-      var versions = this.model.get('versions');
-
-      var latestVersion = versions.length;
-      data.fileIcon = this.fileIcon(this.model.get('fileName'), latestVersion);
+      data.fileIcon = this.model.get('thumbnailUrl');
       data.useSpinner = !this.hasThumb();
 
       return data;
@@ -44,10 +41,6 @@ define([
       }
 
       return r;
-    },
-
-    fileIcon: function(fileName, version) {
-      return '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + fileName + "?version=" + version;
     },
 
     hasThumb: function() {
