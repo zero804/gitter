@@ -39,7 +39,10 @@ function validateUserForSubTroupeSubscription(options, callback) {
     if(err || !troupe) return callback(err, !!troupe);
 
     var result = troupeService.userIdHasAccessToTroupe(userId, troupe);
-    winston.info("Allow user " + userId + " to access troupe " + troupe.uri + ": " + result);
+
+    if(!result) {
+      winston.info("Denied user " + userId + " access to troupe " + troupe.uri);
+    }
 
     if(result && notifyPresenceService) {
       presenceService.userSubscribedToTroupe(userId, troupeId, clientId);

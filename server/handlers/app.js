@@ -155,17 +155,6 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
   }
 }
 
-function renderAppPage(req, res, next, page) {
-  var appUri = req.params.appUri;
-
-  troupeService.findByUri(appUri, function(err, troupe) {
-    if(err) return next(err);
-    if(!troupe) return next("Troupe: " + appUri + " not found.");
-
-    renderAppPageWithTroupe(req, res, next, page, troupe, troupe.name);
-  });
-}
-
 function preloadFiles(userId, troupeId, callback) {
   fileService.findByTroupe(troupeId, function(err, files) {
     if (err) {
