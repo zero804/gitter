@@ -2,6 +2,8 @@
 /*global OK:true DENY:true DENYSOFT:true */
 "use strict";
 
+var winston = require("./../../server/utils/winston");
+
 // troupe service to redeliver mails to troupe users
 var conversationService = require("./../../server/services/conversation-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
