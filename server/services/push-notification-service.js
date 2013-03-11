@@ -2,7 +2,7 @@
 "use strict";
 
 var PushNotificationDevice = require("./persistence-service").PushNotificationDevice;
-var winston = require("winston").prefix("notifications");
+var winston = require("winston");
 var nconf = require('../utils/config');
 var _ = require('underscore');
 var redis = require("../utils/redis"),
