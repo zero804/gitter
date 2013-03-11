@@ -186,10 +186,10 @@ define([
     },
 
     installTroupeListener: function(troupeCollection) {
-      var troupeUnreadTotal = -1;
+      var troupeUnreadTotal = -1, pplTroupeUnreadTotal = -1, normalTroupeUnreadTotal = -1;
 
       function recount() {
-        var newTroupeUnreadTotal = troupeCollection.reduce(function(memo, troupe) {
+        function count(memo, troupe) {
           var count;
           if(troupe.id == window.troupeContext.troupe.id) {
             count = unreadItemsClient.getTotalUnreadCountForCurrentTroupe();
@@ -198,11 +198,17 @@ define([
           }
 
           return memo + (count > 0 ? 1 : 0);
-        }, 0);
+        }
 
-        if(newTroupeUnreadTotal !== troupeUnreadTotal) {
+        var newTroupeUnreadTotal = troupeCollection.reduce(count, 0);
+        var newPplTroupeUnreadTotal = troupeCollection.filter(function(trp) { return trp.get('oneToOne'); }).reduce(count, 0);
+        var newNormalTroupeUnreadTotal = troupeCollection.filter(function(trp) { return !trp.get('oneToOne'); }).reduce(count, 0);
+
+        if(newTroupeUnreadTotal !== troupeUnreadTotal || newPplTroupeUnreadTotal !== pplTroupeUnreadTotal || newNormalTroupeUnreadTotal !== normalTroupeUnreadTotal) {
           troupeUnreadTotal = newTroupeUnreadTotal;
-          $(document).trigger('troupeUnreadTotalChange', newTroupeUnreadTotal);
+          pplTroupeUnreadTotal = newPplTroupeUnreadTotal;
+          normalTroupeUnreadTotal = newNormalTroupeUnreadTotal;
+          $(document).trigger('troupeUnreadTotalChange', { overall: newTroupeUnreadTotal, normal: normalTroupeUnreadTotal, oneToOne: pplTroupeUnreadTotal } );
         }
       }
 
