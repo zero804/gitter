@@ -200,5 +200,17 @@ module.exports = {
 
         }
       );
+
+      if (nconf.get('web:baseserver') === 'localhost') {
+        app.post('/confirmationCodeForEmail', function(req, res/*, next */) {
+          var forEmail = req.body.email;
+
+          userService.findByEmail(forEmail, function(e, user) {
+            if (e || !user) return res.send(404, "No user with that email signed up.");
+
+            res.json({ confirmationCode: user.confirmationCode });
+          });
+        });
+      }
     }
 };

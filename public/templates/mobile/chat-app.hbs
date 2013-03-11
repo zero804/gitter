@@ -29,14 +29,11 @@
       console.log('Received obsolete event');
       //window.location.reload();
     }, false);
-    */
 
     window.applicationCache.addEventListener('noupdate', function() {
-      // console.log('Received noupdate event, we will fetch new collection data');
-      window.noupdate = true;
+      console.log('Received noupdate event, we should fetch new collection data');
     }, false);
-
-
+    */
     </script>
 
 

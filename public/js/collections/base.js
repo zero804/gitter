@@ -91,11 +91,11 @@ define([
       });
 
       this.subscription.callback(function() {
-        logger.info('Subscription is now active!', arguments);
+        logger.info('Listening to ' + self.url);
       });
 
       this.subscription.errback(function(error) {
-        logger.info('Subscription error', error);
+        logger.info('Subscription error for ' + self.url, error);
       });
     },
 
@@ -146,10 +146,11 @@ define([
 
             // If at least one of the docs has a version number ...
             // And the new document is an older version than the new document...
-            if((incomingVersion || existingVersion) && (incomingVersion <= existingVersion)) {
+            if((incomingVersion || existingVersion) && (incomingVersion <= existingVersion) && (operation != 'create')) {
               logger.warn('Ignoring out-of-date update', existing.toJSON(), newModel);
               break;
             }
+
             var newValues = parsed.toJSON();
             existing.set(newValues);
             break;

@@ -14,11 +14,6 @@
   {{#if data}}
   window.troupePreloads = {{{data}}};
   {{/if}}
-
-  window.applicationCache.addEventListener('noupdate', function() {
-    window.noupdate = true;
-  }, false);
-
   </script>
 
   {{>require_wrapper}}

@@ -4,7 +4,6 @@
 var nconf = require('../utils/config');
 var appVersion = require('./appVersion');
 
-var cdnId = -1;
 var hosts, hostLength, cdnPrefix;
 
 function passthrough(url, options) {
@@ -24,17 +23,21 @@ function cdnSingle(url, options) {
 }
 
 function cdnMulti(url, options) {
-  var d = (cdnId + 1) % hostLength;
-  cdnId = d;
+  var x = 0;
+  for(var i = 0; i < url.length; i = i + 3) {
+    x = x + url.charCodeAt(i);
+  }
+
+  var host = hosts[x % hostLength];
 
   var nonrelative = options && options.nonrelative;
   var prefix = nonrelative ? "http://" : "//";
 
   if(options && options.notStatic === true) {
-    return prefix + hosts[d] + "/" + url;
+    return prefix + host + "/" + url;
   }
 
-  return prefix + hosts[d] +cdnPrefix + "/" + url;
+  return prefix + host + cdnPrefix + "/" + url;
 }
 
 var useCdn = nconf.get("cdn:use");
@@ -53,8 +56,8 @@ if(!useCdn) {
   }
 
   if(hostLength > 1) {
-    module.exports = cdnSingle;
-  } else {
     module.exports = cdnMulti;
+  } else {
+    module.exports = cdnSingle;
   }
 }

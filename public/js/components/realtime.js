@@ -6,6 +6,8 @@ define([
   /*global console:true*/
   "use strict";
 
+  Faye.Logging.logLevel = 'debug';
+
   var connected = false;
   var connectionProblemTimeoutHandle;
   var persistentOutage = false;
@@ -38,12 +40,16 @@ define([
   };
 
   var c = window.troupeContext.websockets;
+
   var client = new Faye.Client(c.fayeUrl, c.options);
+
   if(c.disable) {
     for(var i = 0; i < c.length; i++) {
       client.disable(c.disable[i]);
     }
   }
+
+  client.connect(function() {});
 
   client.addExtension(new ClientAuth());
 

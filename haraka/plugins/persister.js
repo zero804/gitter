@@ -3,6 +3,8 @@
 
 "use strict";
 
+var winston = require("./../../server/utils/winston");
+
 // troupe service to deliver mails to mongo database
 var conversationService = require("./../../server/services/conversation-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
