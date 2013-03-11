@@ -9,7 +9,6 @@ define([
 
   var notifications = $('<div id="notification-center" class="notification-center"></div>').appendTo('body');
 
-  // TODO: remove application notifications from this library as it prevents reusability
   // notifications for cross troupe chat messages
   realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
     if (message.notification === 'user_notification') {
@@ -61,15 +60,22 @@ define([
   });
 
   $(document).on('realtime:persistentOutage', function() {
+    console.log('realtime:persistentOutage');
     notifications.notify({
-      id: 'ajax-error',
+      id: 'realtime-error',
       className: 'notification-error',
-      content: "We're having problems with our realtime connection at present. Please stand-by"
+      content: "We're having problems with our realtime connection at present. Please stand-by",
+      timeout: Infinity
       /* TODO: make this persistent and clear it when the persistentOutageCleared event occurs */
     });
   });
 
   $(document).on('realtime:persistentOutageCleared', function() {
+    console.log('realtime:persistentOutageCleared');
+    notifications.notify({
+      id: 'realtime-error',
+      action: 'hide'
+    });
   });
 
 });
