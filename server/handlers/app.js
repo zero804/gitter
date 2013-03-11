@@ -15,8 +15,11 @@ var chatService = require("../services/chat-service");
 var Fiber = require("../utils/fiber");
 var conversationService = require("../services/conversation-service");
 var appVersion = require("../web/appVersion");
+var bayeux = require("../web/bayeux");
+var Q = require('q');
 
-function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data) {
+function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data, options) {
+  if(!options) options = {};
 
   function serializeUserAndRenderPage(unreadItems) {
     if(!req.user) return renderPage(unreadItems, null, null);
@@ -85,6 +88,14 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data)
         troupeData = null;
       }
 
+      var prenegotiatedConnection;
+      if(options.bayeuxClientId) {
+        prenegotiatedConnection = {
+          clientId: options.bayeuxClientId,
+          supportedConnectionTypes: ['long-polling', 'callback-polling', 'websocket', 'eventsource']
+        };
+      }
+
       var troupeContext = {
           user: serializedUser,
           troupe: troupeData,
@@ -100,6 +111,7 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data)
           websockets: {
             fayeUrl: getFayeUrl(),
             options: {
+              prenegotiatedConnection: prenegotiatedConnection,
               timeout: 120,
               retry: 5
             },
@@ -335,30 +347,71 @@ module.exports = {
           page = 'app-integrated';
         }
 
-        var f = new Fiber();
-        if(req.user) {
-          preloadTroupes(req.user.id, f.waitor());
-          preloadFiles(req.user.id, req.troupe.id, f.waitor());
-          preloadChats(req.user.id, req.troupe.id, f.waitor());
-          preloadUsers(req.user.id, req.troupe, f.waitor());
-          preloadConversations(req.user.id, req.troupe, f.waitor());
-          preloadUnreadItems(req.user.id, req.troupe.id, f.waitor());
-        }
-        f.all()
-          .spread(function(troupes, files, chats, users, conversations, unreadItems) {
-            // Send the information through
-            renderAppPageWithTroupe(req, res, next, page, req.troupe, req.troupe.name, {
-              troupes: troupes,
-              files: files,
-              chatMessages: chats,
-              users: users,
-              conversations: conversations,
-              unreadItems: unreadItems
-            });
-          })
-          .fail(function(err) {
-            next(err);
+        var engine = bayeux.engine;
+        engine.createClient(function(clientId) {
+
+          var promises = [];
+
+          // Add a promise to the list
+          function subscribeComplete() {
+            var d = Q.defer();
+            promises.push(d.promise);
+            return function subscribeCompleteCallback() {
+              d.resolve();
+            };
+          }
+
+          var troupeId = req.troupe.id;
+          var userId = req.user.id;
+
+          // Presubscribe the user
+          [
+            '/user/' + userId + '/troupes',
+            '/troupes/' + troupeId + '/chatMessages',
+            '/troupes/' + troupeId + '/files',
+            '/troupes/' + troupeId + '/conversations',
+            '/troupes/' + troupeId + '/users'
+          ].forEach(function(url) {
+            engine.subscribe(clientId, url, subscribeComplete());
           });
+
+          Q.all(promises)
+            .then(function() {
+
+              var f = new Fiber();
+              if(req.user) {
+                preloadTroupes(req.user.id, f.waitor());
+                preloadFiles(req.user.id, req.troupe.id, f.waitor());
+                preloadChats(req.user.id, req.troupe.id, f.waitor());
+                preloadUsers(req.user.id, req.troupe, f.waitor());
+                preloadConversations(req.user.id, req.troupe, f.waitor());
+                preloadUnreadItems(req.user.id, req.troupe.id, f.waitor());
+              }
+              f.all()
+                .spread(function(troupes, files, chats, users, conversations, unreadItems) {
+                  // Send the information through
+                  console.log(">> clientId: " + clientId);
+                  renderAppPageWithTroupe(req, res, next, page, req.troupe, req.troupe.name, {
+                    troupes: troupes,
+                    files: files,
+                    chatMessages: chats,
+                    users: users,
+                    conversations: conversations,
+                    unreadItems: unreadItems
+                  },{
+                    bayeuxClientId: clientId
+                  });
+                })
+                .fail(function(err) {
+                  next(err);
+                });
+
+            })
+            .fail(function(err) {
+              next(err);
+            });
+        });
+
 
       });
 
@@ -429,8 +482,16 @@ module.exports = {
       app.get('/:appUri/mails',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
+        preloadTroupeMiddleware,
         function(req, res, next) {
-          renderAppPage(req, res, next, 'mobile/conversation-app');
+          preloadConversations(req.user.id, req.troupe.id, function(err, serializedMails) {
+            if (err) {
+              winston.error("Error in Serializer:", { exception: err });
+              return next(err);
+            }
+
+            renderAppPageWithTroupe(req, res, next, 'mobile/conversation-app', req.troupe, req.troupe.name, { 'conversations': serializedMails });
+          });
         });
 
       app.get('/:appUri/people',

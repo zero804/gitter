@@ -9,7 +9,7 @@ var troupeService = require("../services/troupe-service");
 var presenceService = require("../services/presence-service");
 var nconf = require("../utils/config");
 var shutdown = require('../utils/shutdown');
-var RedisClientUserLookupStrategy = require('./bayeux-user-lookup').RedisClientUserLookupStrategy;
+//var RedisClientUserLookupStrategy = require('./bayeux-user-lookup').RedisClientUserLookupStrategy;
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
@@ -61,15 +61,13 @@ function validateUserForUserSubscription(options, callback) {
 }
 
 
-var clientUserLookup = new RedisClientUserLookupStrategy();
+//var clientUserLookup = new RedisClientUserLookupStrategy();
 
 //
 // Auth Extension:authenticate all subscriptions to ensure that the user has access
 // to the given url
 //
 var auth = {
-  clientUserLookup: clientUserLookup,
-
   incoming: function(message, callback) {
     if (message.channel === '/meta/subscribe') {
       this.authorized(message, function(err, allowed) {
@@ -133,10 +131,9 @@ var auth = {
     var ext = message.ext;
     if(!ext) return callback("No auth provided");
 
-    var self = this;
     var clientId = message.clientId;
 
-    this.clientUserLookup.lookupUserIdForClientId(clientId, function onLookupUserIdForClientIdDone(err, userId) {
+    presenceService.lookupUserIdForSocket(clientId, function onLookupUserIdForClientIdDone(err, userId) {
       if(err) return callback(err);
       if(userId) return callback(null, userId);
 
@@ -149,18 +146,14 @@ var auth = {
 
         userId = "" + userId;
 
-        self.clientUserLookup.associate(clientId, userId, function onAssociateDone(err) {
+        // Get the presence service involved around about now
+        presenceService.userSocketConnected(userId, clientId, function() {
           if(err) return callback(err);
-
-          winston.debug("Socket " + clientId + " associated to user " + userId);
-
-          // Get the presence service involved around about now
-          presenceService.userSocketConnected(userId, clientId);
-
           return callback(null, userId);
+
         });
 
-      });
+    });
     });
   }
 };
@@ -191,7 +184,7 @@ var pushOnlyServerClient = {
 
 var server = new faye.NodeAdapter({
   mount: '/faye',
-  timeout: 45,
+  timeout: 120,
   engine: {
     type: fayeRedis,
     host: nconf.get("redis:host"),
@@ -203,35 +196,36 @@ var server = new faye.NodeAdapter({
 
 var client = server.getClient();
 
-server.addExtension(auth);
-server.addExtension(pushOnlyServer);
-client.addExtension(pushOnlyServerClient);
-
-server.bind('handshake', function(clientId) {
- winston.debug("Faye handshake: ", { clientId: clientId });
-});
-
-server.bind('disconnect', function(clientId) {
-  winston.info("Client " + clientId + " disconnected");
-  clientUserLookup.disassociate(clientId, function onDisassociateDone(err, userId) {
-    if(err) { winston.error("Error disassociating user from client", { exception:  err }); return; }
-    if(!userId) return;
-
-    presenceService.userSocketDisconnected(userId, clientId);
-
-  });
-});
-
-shutdown.addHandler('bayeux', 15, function(callback) {
-  var engine = server._server._engine;
-  engine.disconnect();
-  setTimeout(callback, 1000);
-});
 
 module.exports = {
   server: server,
   engine: server._server._engine,
-  clientUserLookup: clientUserLookup,
-  client: client
+  client: client,
+  attach: function(httpServer) {
+
+    // Attach event handlers
+    server.addExtension(auth);
+    server.addExtension(pushOnlyServer);
+    client.addExtension(pushOnlyServerClient);
+
+    server.bind('handshake', function(clientId) {
+     winston.debug("Faye handshake: ", { clientId: clientId });
+    });
+
+    server.bind('disconnect', function(clientId) {
+      winston.info("Client " + clientId + " disconnected");
+      presenceService.socketDisconnected(clientId);
+    });
+
+    shutdown.addHandler('bayeux', 15, function(callback) {
+      var engine = server._server._engine;
+      engine.disconnect();
+      setTimeout(callback, 1000);
+    });
+
+
+    presenceService.validateActiveSockets(server._server._engine);
+    server.attach(httpServer);
+  }
 };
 

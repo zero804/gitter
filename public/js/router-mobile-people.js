@@ -10,7 +10,8 @@ require([
   'hbs!./views/people/tmpl/mobilePeopleView',
   'components/unread-items-client',
   'template/helpers/all'
-], function($, _, Backbone, BaseRouter, userModels, Marionette, TroupeViews, PersonViewTemplate, unreadItemsClient) {
+], function($, _, Backbone, BaseRouter, userModels, Marionette, TroupeViews, PersonViewTemplate/*, unreadItemsClient*/) {
+  /*jslint browser: true, unused: true */
   "use strict";
 
   var AppRouter = BaseRouter.extend({
@@ -19,13 +20,17 @@ require([
     },
 
     initialize: function() {
+      var self = this;
       var userCollection = this.collection = new userModels.UserCollection();
       userCollection.reset(window.troupePreloads['people'], { parse: true });
       userCollection.listen();
-      if (window.noupdate) {
-        this.collection.fetch();
-      }
-      unreadItemsClient.installTroupeListener();
+      $(function() {
+        console.log("Checking if the collection needs to be fetched.", window.applicationCache.status);
+        if (window.applicationCache.status == 1 /* NOUPDATE */) {
+          console.log('Fetching collection.');
+          self.collection.fetch();
+        }
+      });
 
       // update online status of user models
       $(document).on('userLoggedIntoTroupe', updateUserStatus);
@@ -72,7 +77,7 @@ require([
   // Asynchronously load tracker
   require([
     'utils/tracking'
-  ], function(tracking) {
+  ], function() {
     // No need to do anything here
   });
 

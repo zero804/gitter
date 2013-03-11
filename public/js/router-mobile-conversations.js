@@ -9,9 +9,8 @@ require([
   'views/conversation/conversationDetailView',
   'collections/conversations',
   'components/unread-items-client'
-], function($, _, Backbone, BaseRouter, TroupeViews, ConversationView, conversationDetailView, conversationModels, unreadItemsClient) {
+], function($, _, Backbone, BaseRouter, TroupeViews, ConversationView, conversationDetailView, conversationModels/*, unreadItemsClient*/) {
   /*jslint browser: true, unused: true */
-  /*global console:false, require: true */
   "use strict";
 
   var AppRouter = BaseRouter.extend({
@@ -21,16 +20,21 @@ require([
     },
 
     initialize: function() {
+      var self = this;
       this.collection = new conversationModels.ConversationCollection();
-      this.collection.fetch();
+      this.collection.reset(window.troupePreloads['conversations'], { parse: true });
       this.collection.listen();
-      if (window.noupdate) {
-        this.collection.fetch();
-      }
-      unreadItemsClient.installTroupeListener();
+
+      $(function() {
+        console.log("Checking if the collection needs to be fetched.", window.applicationCache.status);
+        if (window.applicationCache.status == 1 /* NOUPDATE */) {
+          console.log('Fetching collection.');
+          self.collection.fetch();
+        }
+      });
     },
 
-    defaultAction: function(actions){
+    defaultAction: function(){
       var view = new ConversationView({ collection: this.collection });
       this.showView("#primary-view", view);
     },
@@ -55,7 +59,7 @@ require([
   // Asynchronously load tracker
   require([
     'utils/tracking'
-  ], function(tracking) {
+  ], function() {
     // No need to do anything here
   });
 

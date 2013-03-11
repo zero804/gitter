@@ -3,7 +3,7 @@
 
 var appEvents = require("../app-events");
 
-var winston = require("winston").prefix("notification-gen: ");
+var winston = require("winston");
 var pushNotificationService = require("./push-notification-service");
 var nconf = require('../utils/config');
 var Q = require("q");

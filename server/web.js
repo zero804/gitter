@@ -49,11 +49,8 @@ require('./utils/event-listeners').installLocalEventListeners();
 
 if(nconf.get('ws:startFayeInPrimaryApp')) {
   var bayeux = require('./web/bayeux');
-  var bayeuxServer = bayeux.server;
-  bayeuxServer.attach(server);
+  bayeux.attach(server);
 }
-
-
 
 require('./handlers/').install(app);
 

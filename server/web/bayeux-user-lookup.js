@@ -10,39 +10,6 @@ var redisClient = redis.createClient();
 function RedisClientUserLookupStrategy() {
 }
 
-RedisClientUserLookupStrategy.prototype.associate = function(clientId, userId, callback) {
-  var multi = redisClient.multi();
-  multi.set("pr:socket:" + clientId, userId);
-  multi.sadd("pr:user:" + userId, clientId);
-  multi.exec(function(err) {
-    callback(err);
-  });
-};
-
-RedisClientUserLookupStrategy.prototype.disassociate = function(clientId, callback) {
-  redisClient.get("pr:socket:" + clientId, function(err, userId) {
-    if(err) return callback(err);
-
-    if(!userId) {
-      winston.warn("userLookup: Client " + clientId + " not found. Cannot disassociate.");
-      return callback(null, null);
-    }
-
-    redisClient.srem("pr:user:" + userId, clientId, function(err) {
-      callback(err, userId);
-    });
-
-  });
-};
-
-RedisClientUserLookupStrategy.prototype.lookupUserIdForClientId = function(clientId, callback) {
-  redisClient.get("pr:socket:" + clientId, callback);
-};
-
-
-RedisClientUserLookupStrategy.prototype.lookupClientIdsForUserId = function(userId, callback) {
-  redisClient.smembers("pr:user:" + userId, callback);
-};
 
 
 // Default strategy for matching a clientId to a userId
