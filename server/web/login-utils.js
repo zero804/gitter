@@ -19,14 +19,17 @@ exports.redirectUserToDefaultTroupe = function(req, res, next, options) {
   function findDefaultTroupeForUser() {
     userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
       if (err || !troupe) {
-        if(onNoValidTroupes) {
-          onNoValidTroupes();
-        } else {
-          res.redirect(nconf.get('web:homeurl'));
-        }
-      }
 
-      res.redirect('/' + troupe.uri);
+        if(onNoValidTroupes) {
+          return onNoValidTroupes();
+        } else {
+          return res.redirect(nconf.get('web:homeurl'));
+        }
+
+      }
+      else {
+        return res.redirect('/' + troupe.uri);
+      }
     });
   }
 
