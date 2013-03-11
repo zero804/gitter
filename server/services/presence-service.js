@@ -15,40 +15,81 @@ function removeSocketFromUserSockets(socketId, userId, callback) {
   winston.debug("presence: removeSocketFromUserSockets: ", { userId: userId, socketId: socketId });
 
   var key = "pr:user:" + userId;
-  redisClient.multi()
-    .srem(key, socketId)                           // 0 Remove the socket from user_sockets
-    .scard(key)                                    // 1 Count the items in the user_sockets
-    .zincrby('pr:active_u', -1, userId)            // 2 decrement the score for user in troupe_users zset
-    .zremrangebyscore('pr:active_u', '-inf', '0')  // 3 remove everyone with a score of zero (no longer in the troupe)
-    .exec(function(err, replies) {
-      if(err) return callback(err);
+  redisClient.srem(key, socketId, function(err, sremResult) {
+    if(err) return callback(err);
 
-      var lastDisconnect = replies[1];
-      var userScore = parseInt(replies[2], 10);
+    // If result != 1, it means that this operation has already occurred somewhere else in the system
+    // pr:user acts as an exclusivity-lock
+    if(sremResult != 1) return callback(null, false);
 
-      if(userScore !== lastDisconnect) {
-        winston.warn('Inconsistency between pr:active_u and ' + key + '. Values are ' + userScore + ' and ' + lastDisconnect);
-      }
+    redisClient.multi()
+      .scard(key)                                    // 0 Count the items in the user_sockets
+      .zincrby('pr:active_u', -1, userId)            // 1 decrement the score for user in troupe_users zset
+      .zremrangebyscore('pr:active_u', '-inf', '0')  // 2 remove everyone with a score of zero (no longer in the troupe)
+      .exec(function(err, replies) {
+        if(err) return callback(err);
 
-      callback(null, lastDisconnect <= 0);
-    });
+        var scardResult = replies[0];
+        var zincrbyResult = parseInt(replies[1], 10);
+
+        if(zincrbyResult !== scardResult) {
+          winston.warn('Inconsistency between pr:active_u and ' + key + '. Values are ' + zincrbyResult + ' and ' + scardResult);
+        }
+
+        callback(null, scardResult === 0);
+      });
+
+  });
 }
 
-function removeUserFromTroupe(userId, troupeId, callback) {
-  var key = 'pr:tr_u:' + troupeId;
+function removeUserFromTroupe(socketId, userId) {
   redisClient.multi()
-    .zincrby(key, -1, userId)            // 0 decrement the score for user in troupe_users zset
-    .zremrangebyscore(key, '-inf', '0')  // 1 remove everyone with a score of zero (no longer in the troupe)
-    .zcard(key)                          // 2 count the number of users left in the set
+    .get("pr:socket_troupe:" + socketId)    // 0 Find the troupe associated with the socket
+    .del("pr:socket_troupe:" + socketId)    // 1 Delete the socket troupe association
     .exec(function(err, replies) {
-      if(err) return callback(err);
+      if(err) {
+        winston.error('Error while removing user from troupe', { exception: err });
+        return;
+      }
+      var troupeId = replies[0];
 
-      var userHasLeftTroupe = parseInt(replies[0], 10) <= 0;
-      var troupeIsEmpty = replies[2] === 0;
+      if(!troupeId) {
+        winston.info("Socket did not appear to be associated with a troupe: " + socketId);
+        return;
+      }
 
-      callback(null, userHasLeftTroupe, troupeIsEmpty);
+      var key = 'pr:tr_u:' + troupeId;
+      redisClient.multi()
+        .zincrby(key, -1, userId)            // 0 decrement the score for user in troupe_users zset
+        .zremrangebyscore(key, '-inf', '0')  // 1 remove everyone with a score of zero (no longer in the troupe)
+        .zcard(key)                          // 2 count the number of users left in the set
+        .exec(function(err, replies) {
+          if(err) {
+            winston.error('Error while removing user from troupe', { exception: err });
+            return;
+          }
+
+          var userHasLeftTroupe = parseInt(replies[0], 10) <= 0;
+          var troupeIsEmpty = replies[2] === 0;
+
+          if(troupeIsEmpty && !userHasLeftTroupe) {
+            winston.warn("Troupe is empty, yet user has not left troupe. Something is fishy.", { troupeId: troupeId, socketId: socketId, userId: userId });
+          }
+
+          if(userHasLeftTroupe) {
+            winston.info("presence: User " + userId + " is gone from " + troupeId);
+
+            appEvents.userLoggedOutOfTroupe(userId, troupeId);
+
+            if(troupeIsEmpty) {
+              winston.info("presence: The last user has disconnected from troupe " + troupeId);
+            }
+          }
+
+        });
 
     });
+
 
 }
 
@@ -75,49 +116,66 @@ module.exports = {
     winston.info("presence: Socket connected: " + socketId + ". User=" + userId);
 
     var userKey = "pr:user:" + userId;
-    redisClient.multi()
-      .set("pr:socket:" + socketId, userId)           // 0 Associate user with socket
-      .sadd(userKey, socketId)                        // 1 Associate socket with user
-      .scard(userKey)                                 // 2 Count the number of sockets for this user
-      .zincrby('pr:active_u', 1, userId)              // 3 Add user to active users
-      .sadd("pr:activesockets", socketId, callback)   // 4 Add socket to list of active sockets
-      .exec(function(err, replies) {
-        var saddResult = replies[1];
-        var scardResult = replies[2];
-        var zincrbyResult = parseInt(replies[3], 10);
+    // Associate socket with user
+    redisClient.sadd(userKey, socketId, function(err, saddResult) {
+      if(err) return callback(err);
 
-        if(saddResult != 1) {
-          winston.warn("presence: Socket was already associated with user. Something strange is happening!",
-                        { userId: userId, socketId: socketId });
-        }
+      // If the socket was not added (as it's ready there) then this isn't the first time this
+      // operation is being performed, so don't continue. We're using redis as an exclusivity lock
+      if(saddResult != 1) return callback();
 
-        if(scardResult !== zincrbyResult) {
-          winston.warn("presence: User socket cardinality is " + scardResult +
-                        ", active_u score is " + zincrbyResult +
-                        ". Something strange is happening.", { userId: userId, socketId: socketId });
-        }
+      redisClient.multi()
+        .set("pr:socket:" + socketId, userId)           // 0 Associate user with socket
+        .scard(userKey)                                 // 1 Count the number of sockets for this user
+        .zincrby('pr:active_u', 1, userId)              // 2 Add user to active users
+        .sadd("pr:activesockets", socketId, callback)   // 3 Add socket to list of active sockets
+        .exec(function(err, replies) {
+          var scardResult = replies[1];
+          var zincrbyResult = parseInt(replies[2], 10);
+          var sadd2Result = replies[3];
 
-        if(zincrbyResult == 1) {
-          winston.info("presence: User " + userId + " connected.");
-        }
+          if(scardResult !== zincrbyResult) {
+            winston.warn("presence: User socket cardinality is " + scardResult +
+                          ", active_u score is " + zincrbyResult +
+                          ". Something strange is happening.", { userId: userId, socketId: socketId });
+          }
 
-        callback(err);
+          if(zincrbyResult == 1) {
+            winston.info("presence: User " + userId + " connected.");
+          }
 
-      });
+          if(sadd2Result != 1) {
+           winston.warn("presence: Socket has already been added to the activesockets list " +
+                          ". Something strange is happening.", { userId: userId, socketId: socketId });
+          }
+
+          callback(err);
+
+        });
+    });
+
+
+
   },
 
   userSubscribedToTroupe: function(userId, troupeId, socketId) {
-    redisClient.multi()
-      .zincrby('pr:tr_u:' + troupeId, 1, userId)      // 0 increment the score for user in troupe_users zset
-      .set("pr:socket_troupe:" + socketId, troupeId)  // 2 Associate socket with troupe
-      .exec(function(err, replies) {
-        var userScore = parseInt(replies[0], 10);                   // Score for user
-        if(userScore == 1) {
-          /* User joining this troupe for the first time.... */
-          winston.info("presence: User " + userId + " has just joined " + troupeId);
-          appEvents.userLoggedIntoTroupe(userId, troupeId);
-        }
-      });
+    // Associate socket with troupe
+    redisClient.setnx("pr:socket_troupe:" + socketId, troupeId, function(err, result) {
+      if(err) return;
+      if(!result) return;
+
+      // increment the score for user in troupe_users zset
+      redisClient.zincrby('pr:tr_u:' + troupeId, 1, userId, function(err, reply) {
+          var userScore = parseInt(reply, 10);                   // Score for user
+          if(userScore == 1) {
+            /* User joining this troupe for the first time.... */
+            winston.info("presence: User " + userId + " has just joined " + troupeId);
+            appEvents.userLoggedIntoTroupe(userId, troupeId);
+          }
+        });
+
+    });
+
   },
 
   // Called when a socket is disconnected
@@ -130,14 +188,10 @@ module.exports = {
       .get("pr:socket:" + socketId)           // 0 Find the user for the socket
       .del("pr:socket:" + socketId)           // 1 Remove the socket user association
       .srem("pr:activesockets", socketId)     // 2 remove the socket from active sockets
-      .get("pr:socket_troupe:" + socketId)    // 3 Find the troupe associated with the socket
-      .del("pr:socket_troupe:" + socketId)    // 4 Delete the socket troupe association
       .exec(function(err, replies) {
-
         if(err) { winston.error("presence: Error disconnecting socket", { exception:  err }); return; }
 
         var userId = replies[0];
-        var troupeId = replies[3];
 
         if(!userId) {
           winston.info("presence: Socket did not appear to be associated with a user: " + socketId);
@@ -145,23 +199,7 @@ module.exports = {
         }
 
         userSocketDisconnected(userId, socketId);
-
-        if(!troupeId) {
-          winston.info("Socket did not appear to be associated with a troupe: " + socketId);
-          return;
-        }
-
-        removeUserFromTroupe(userId, troupeId, function(err, userHasLeftTroupe, troupeIsEmpty) {
-          if(userHasLeftTroupe) {
-            winston.info("presence: User " + userId + " is gone from " + troupeId);
-
-            appEvents.userLoggedOutOfTroupe(userId, troupeId);
-
-            if(troupeIsEmpty) {
-              winston.info("presence: The last user has disconnected from troupe " + troupeId);
-            }
-          }
-        });
+        removeUserFromTroupe(socketId, userId);
 
       });
   },
@@ -207,10 +245,9 @@ module.exports = {
         zaddArgs.push(0, id);
       });
 
-      console.log('>>> categorizeUsersByOnlineStatus', zaddArgs);
       redisClient.multi()
         .zadd(zaddArgs)                                 // 0 create zset of users
-        .zaddinterstore(out_key, 2, 'pr:active_u',key)  // 1 intersect with online users
+        .zinterstore(out_key, 2, 'pr:active_u',key)  // 1 intersect with online users
         .zrangebyscore(out_key, 1, '+inf')              // 2 return all online users
         .del(key, out_key)                              // 3 delete the keys
         .exec(function(err, replies) {
