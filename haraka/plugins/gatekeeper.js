@@ -2,6 +2,8 @@
 /*global require: true, exports: true, OK: true, CONT: true, DENY: true, SOFTDENY: true */
 "use strict";
 
+var winston = require("./../../server/utils/winston");
+
 var userService = require("./../../server/services/user-service.js");
 var troupeService = require("./../../server/services/troupe-service.js");
 var mailerService = require('./../../server/services/mailer-service');
