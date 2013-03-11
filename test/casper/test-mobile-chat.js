@@ -13,10 +13,14 @@ var casper = casperJS.Casper({
 
 var baseUrl = "http://localhost:5000/";
 
+casper.userAgent("Casper Mobile");
+
+// navigate to the login page
 casper.start(baseUrl + "login", function() {
 
 });
 
+// send the login form
 casper.then(function() {
   this.fill('form#loginform', {
     email: 'testuser@troupetester.local',
@@ -24,8 +28,18 @@ casper.then(function() {
   }, true);
 });
 
-casper.thenOpen(baseUrl + 'testtroupe1', function() {
-  casper.test.assert(casper.getTitle().indexOf('Test Troupe 1') >= 0);
+casper.then(function() {
+  // wait for non mobile version of the default troupe to load
+  casper.waitForResource('/testtroupe1');
+});
+
+// ERR the chat page is never navigated to, casper waits infinitely on the default troupe page
+
+// navigate to a test troupe chat page
+casper.thenOpen(baseUrl + 'testtroupe1/chat', function() {
+  // ensure the troupe has been loaded
+  casper.waitForSelector('#chat-input-textarea');
+  // will casper fail if the page sends out an uncaught exception?
 });
 
 casper.run();
