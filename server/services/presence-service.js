@@ -74,14 +74,30 @@ module.exports = {
   userSocketConnected: function(userId, socketId, callback) {
     winston.info("presence: Socket connected: " + socketId + ". User=" + userId);
 
+    var userKey = "pr:user:" + userId;
     redisClient.multi()
       .set("pr:socket:" + socketId, userId)           // 0 Associate user with socket
-      .sadd("pr:user:" + userId, socketId)            // 1 Associate socket with user
-      .zincrby('pr:active_u', 1, userId)              // 2 Add user to active users
-      .sadd("pr:activesockets", socketId, callback)   // 3 Add socket to list of active sockets
+      .sadd(userKey, socketId)                        // 1 Associate socket with user
+      .scard(userKey)                                 // 2 Count the number of sockets for this user
+      .zincrby('pr:active_u', 1, userId)              // 3 Add user to active users
+      .sadd("pr:activesockets", socketId, callback)   // 4 Add socket to list of active sockets
       .exec(function(err, replies) {
-        var userScore = parseInt(replies[2], 10);
-        if(userScore == 1) {
+        var saddResult = replies[1];
+        var scardResult = replies[2];
+        var zincrbyResult = parseInt(replies[3], 10);
+
+        if(saddResult != 1) {
+          winston.warn("presence: Socket was already associated with user. Something strange is happening!",
+                        { userId: userId, socketId: socketId });
+        }
+
+        if(scardResult !== zincrbyResult) {
+          winston.warn("presence: User socket cardinality is " + scardResult +
+                        ", active_u score is " + zincrbyResult +
+                        ". Something strange is happening.", { userId: userId, socketId: socketId });
+        }
+
+        if(zincrbyResult == 1) {
           winston.info("presence: User " + userId + " connected.");
         }
 
