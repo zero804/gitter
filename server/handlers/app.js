@@ -362,54 +362,59 @@ module.exports = {
           }
 
           var troupeId = req.troupe.id;
-          var userId = req.user.id;
+          var userId = req.user ? req.user.id : null;
 
-          // Presubscribe the user
-          [
-            '/user/' + userId + '/troupes',
-            '/troupes/' + troupeId + '/chatMessages',
-            '/troupes/' + troupeId + '/files',
-            '/troupes/' + troupeId + '/conversations',
-            '/troupes/' + troupeId + '/users'
-          ].forEach(function(url) {
-            engine.subscribe(clientId, url, subscribeComplete());
-          });
 
-          Q.all(promises)
-            .then(function() {
-
-              var f = new Fiber();
-              if(req.user) {
-                preloadTroupes(req.user.id, f.waitor());
-                preloadFiles(req.user.id, req.troupe.id, f.waitor());
-                preloadChats(req.user.id, req.troupe.id, f.waitor());
-                preloadUsers(req.user.id, req.troupe, f.waitor());
-                preloadConversations(req.user.id, req.troupe, f.waitor());
-                preloadUnreadItems(req.user.id, req.troupe.id, f.waitor());
-              }
-              f.all()
-                .spread(function(troupes, files, chats, users, conversations, unreadItems) {
-                  // Send the information through
-                  console.log(">> clientId: " + clientId);
-                  renderAppPageWithTroupe(req, res, next, page, req.troupe, req.troupe.name, {
-                    troupes: troupes,
-                    files: files,
-                    chatMessages: chats,
-                    users: users,
-                    conversations: conversations,
-                    unreadItems: unreadItems
-                  },{
-                    bayeuxClientId: clientId
-                  });
-                })
-                .fail(function(err) {
-                  next(err);
+          function presubscriptionComplete() {
+            var f = new Fiber();
+            if(req.user) {
+              preloadTroupes(req.user.id, f.waitor());
+              preloadFiles(req.user.id, req.troupe.id, f.waitor());
+              preloadChats(req.user.id, req.troupe.id, f.waitor());
+              preloadUsers(req.user.id, req.troupe, f.waitor());
+              preloadConversations(req.user.id, req.troupe, f.waitor());
+              preloadUnreadItems(req.user.id, req.troupe.id, f.waitor());
+            }
+            f.all()
+              .spread(function(troupes, files, chats, users, conversations, unreadItems) {
+                // Send the information through
+                renderAppPageWithTroupe(req, res, next, page, req.troupe, req.troupe.name, {
+                  troupes: troupes,
+                  files: files,
+                  chatMessages: chats,
+                  users: users,
+                  conversations: conversations,
+                  unreadItems: unreadItems
+                },{
+                  bayeuxClientId: clientId
                 });
+              })
+              .fail(function(err) {
+                next(err);
+              });
+          }
 
-            })
-            .fail(function(err) {
-              next(err);
+          if(userId) {
+            // Presubscribe the user
+            [
+              '/user/' + userId + '/troupes',
+              '/troupes/' + troupeId + '/chatMessages',
+              '/troupes/' + troupeId + '/files',
+              '/troupes/' + troupeId + '/conversations',
+              '/troupes/' + troupeId + '/users'
+            ].forEach(function(url) {
+              engine.subscribe(clientId, url, subscribeComplete());
             });
+
+            Q.all(promises)
+              .then(presubscriptionComplete)
+              .fail(function(err) {
+                next(err);
+              });
+
+          } else {
+            presubscriptionComplete();
+          }
         });
 
 
