@@ -175,11 +175,11 @@ function FileStrategy(options) {
           deleted: item.deleted
         };
       }),
-      url: cdn('troupes/' + encodeURIComponent(item.troupeId) + '/downloads/' + encodeURIComponent(item.fileName)),
+      url: cdn('troupes/' + encodeURIComponent(item.troupeId) + '/downloads/' + encodeURIComponent(item.fileName), { notStatic: true }),
       previewMimeType: item.previewMimeType,
       embeddedViewType: item.embeddedViewType,
-      embeddedUrl: cdn('troupes/' + encodeURIComponent(item.troupeId) + '/embedded/' + encodeURIComponent(item.fileName)),
-      thumbnailUrl: cdn('troupes/' + encodeURIComponent(item.troupeId) + '/thumbnails/' + encodeURIComponent(item.fileName)),
+      embeddedUrl: cdn('troupes/' + encodeURIComponent(item.troupeId) + '/embedded/' + encodeURIComponent(item.fileName), { notStatic: true }),
+      thumbnailUrl: cdn('troupes/' + encodeURIComponent(item.troupeId) + '/thumbnails/' + encodeURIComponent(item.fileName), { notStatic: true }),
       unread: options.currentUserId ? unreadItemStategy.map(item._id) : true,
       v: getVersion(item)
     };
