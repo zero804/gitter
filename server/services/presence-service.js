@@ -12,6 +12,8 @@ redisClient = redis.createClient();
 // This is called after a timeout (about 10 seconds) so that if the user has
 // opened another socket, we don't send out notifications that they're offline
 function removeSocketFromUserSockets(socketId, userId, callback) {
+  winston.debug("presence: removeSocketFromUserSockets: ", { userId: userId, socketId: socketId });
+
   var key = "pr:user:" + userId;
   redisClient.multi()
     .srem(key, socketId)                           // 0 Remove the socket from user_sockets
@@ -81,8 +83,6 @@ module.exports = {
         var userScore = parseInt(replies[2], 10);
         if(userScore == 1) {
           winston.info("presence: User " + userId + " connected.");
-        } else {
-          console.log(">>>>>>>>>>>>>>>>>>> score = " + userScore);
         }
 
         callback(err);
@@ -211,7 +211,7 @@ module.exports = {
   },
 
   listOnlineUsers: function(callback) {
-    redisClient.smembers("pr:activeusers", callback);
+    redisClient.zrange("pr:active_u", 0, -1, callback);
   },
 
   // Returns the online users for the given troupes
