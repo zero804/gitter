@@ -57,7 +57,7 @@ describe('file-service', function() {
 
                     });
 
-                  }, 100);
+                  }, 1000);
 
                 });
               });

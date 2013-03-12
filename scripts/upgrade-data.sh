@@ -18,10 +18,12 @@ BACKUP_DONE=""
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+MD5=`which md5||which md5sum`
+
 
 find $SCRIPT_DIR/dataupgrades -type f -name "*.sh" -print0 | while read -d $'\0' file
 do
-  md5=`md5 -q "$file"`
+  md5=`$MD5 "$file"`
 
   if [ `mongo $MONGO_URL --quiet --eval "print(db.dataUpgrades.find({ \"script\":  \"$file\", \"md5\": \"$md5\"}).length())"` -eq 0 ]; then
     if [ -z "$BACKUP_DONE" ]; then
