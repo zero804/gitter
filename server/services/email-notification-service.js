@@ -89,7 +89,7 @@ module.exports = {
 
     mailerService.sendEmail({
       templateFile: "inviteemail",
-      from: 'signup-robot' + emailDomainWithAt,
+      from: senderDisplayName + '<signup-robot' + emailDomainWithAt + '>',
       to: email,
       subject: "You been invited to join the " + troupe.name + " troupe",
       data: {
