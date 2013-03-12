@@ -14,8 +14,8 @@ var sinon = require("sinon");
 
 describe('haraka-gatekeeper', function() {
 
-  var registeredFromAddress = 'testuser@troupetester.local';
-  var unregisteredFromAddress = 'unregistered-user@troupetester.local';
+  var registeredFromAddress = 'testuser@troupetest.local';
+  var unregisteredFromAddress = 'unregistered-user@troupetest.local';
   var permittedTroupeUri = 'testtroupe1';
   var forbiddenTroupeUri =  'testtroupe2';
   var nonExistantTroupeUri = 'nonexistant1234';

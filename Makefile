@@ -1,4 +1,6 @@
 TESTS = test/integration
+END_TO_END_TESTS = test/end-to-end
+
 REPORTER = dot
 
 test:
@@ -8,6 +10,11 @@ test:
 		--recursive \
 		--ignore-leaks \
 		$(TESTS)
+
+end-to-end-test:
+	@NODE_ENV=test casperjs test \
+		$(END_TO_END_TESTS)/casper \
+		--url=http://localhost:5000
 
 docs: test-docs
 
