@@ -8,7 +8,7 @@ var casper = new casperJS.Casper({
 });
 
 var baseUrl = "http://localhost:5000/";
-var email = "tim@troupe.co";
+var email = "testuser@troupetester.local";
 var troupeName = "New Signup New Troupe";
 
 casper.start(baseUrl + "x", function() {
