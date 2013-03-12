@@ -72,9 +72,22 @@ define([
     events: {
     },
 
+    keys: {
+      'right': 'showNext',
+      'left': 'showPrev'
+    },
+
     initialize: function() {
       _.bindAll(this, 'onMenuItemClicked');
       this.on('menuItemClicked', this.onMenuItemClicked);
+    },
+
+    showNext: function() {
+      this.$el.find('a.link-next').click();
+    },
+
+    showPrev: function() {
+      this.$el.find('a.link-prev').click();
     },
 
     onMenuItemClicked: function() {
