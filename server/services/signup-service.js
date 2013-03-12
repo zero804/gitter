@@ -57,9 +57,8 @@ function newTroupeForExistingUser(options, user, callback) {
 
 function newTroupeForNewUser(options, callback) {
   winston.info("New troupe for new user", options);
-  var confirmationCode = uuid.v4();
 
-  userService.newUser({ email: options.email, confirmationCode: confirmationCode }, function (err, user) {
+  userService.newUser({ email: options.email }, function (err, user) {
     if(err) {
       callback(err); return;
     }
