@@ -59,6 +59,12 @@ TroupeSESTransport.prototype.sendMailString = function(from, recipients, string,
 
     var myParams = _.extend(params);
 
+    // don't really send mails to the troupetester.local domain
+    destinations = _.filter(destinations, function(d) { return (d.indexOf('@troupetester.local') >= 0) === false; });
+    if (destinations.length === 0) {
+      return callback(null, 'noId');
+    }
+
     for(var i = 0; i < destinations.length & i < 50; i++) {
       myParams['Destinations.member.' + (i + 1)] = destinations[i];
     }
