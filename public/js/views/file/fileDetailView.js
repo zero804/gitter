@@ -21,8 +21,7 @@ define([
 
     getRenderData: function () {
       var d = this.model.toJSON();
-      var latestVersionNumber = this.model.get('versions').length - 1;
-      d.fileIcon = '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + d.fileName + "?version=" + latestVersionNumber;
+      d.fileIcon = this.model.get('thumbnailUrl');
       d.previewUrl = '#file/preview/' + d.id;
       d.versionsUrl = '#file/versions/' + d.id;
       d.useSpinner = !this.hasThumb();
