@@ -2,7 +2,7 @@
 /*global require:true */
 "use strict";
 
-// we need to be able to login with a test user (testuser@troupetester.local, password: 654321) that exists
+// we need to be able to login with a test user (testuser@troupetest.local, password: 654321) that exists
 // navigate to the troupe (url: testtroupe1, name: Test Troupe 1)
 // check for errors.
 

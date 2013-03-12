@@ -57,7 +57,7 @@ TroupeSESTransport.prototype.sendMailString = function(from, recipients, string,
 
     var myParams = _.extend(params);
 
-    // don't really send mails to the troupetester.local domain
+    // don't really send mails to the troupetest.local domain
     destinations = _.filter(destinations, function(d) { return (d.indexOf('@troupetest.local') >= 0) === false; });
     if (destinations.length === 0) {
       return callback(null, 'noId');
