@@ -16,7 +16,10 @@ MONGO_URL=$MONGO_HOST/$MONGO_DB
 
 BACKUP_DONE=""
 
-find dataupgrades -type f -name "*.sh" -print0 | while read -d $'\0' file
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+
+find $SCRIPT_DIR/dataupgrades -type f -name "*.sh" -print0 | while read -d $'\0' file
 do
   md5=`md5 -q "$file"`
 
