@@ -222,7 +222,10 @@ exports.getUnreadItemsForUser = function(userId, troupeId, callback) {
 function findCreatingUserIdModel(modelName, model) {
   switch(modelName) {
     case "file":
-      return model.versions[model.versions.length - 1].creatorUser.id;
+      var current = model.versions[model.versions.length - 1];
+      if(!current) return null;
+      if(!current.creatorUser) return null;
+      return current.creatorUser.id;
 
     case "chat":
       return model.fromUser.id;
