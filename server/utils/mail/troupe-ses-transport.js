@@ -20,8 +20,6 @@ function TroupeSESTransport() {
 
 
 TroupeSESTransport.prototype.sendMailString = function(from, recipients, string, callback) {
-
-  var request;
   var self = this;
   var date = new Date();
   var urlparts = url.parse(this.ServiceUrl);
@@ -60,7 +58,7 @@ TroupeSESTransport.prototype.sendMailString = function(from, recipients, string,
     var myParams = _.extend(params);
 
     // don't really send mails to the troupetester.local domain
-    destinations = _.filter(destinations, function(d) { return (d.indexOf('@troupetester.local') >= 0) === false; });
+    destinations = _.filter(destinations, function(d) { return (d.indexOf('@troupetest.local') >= 0) === false; });
     if (destinations.length === 0) {
       return callback(null, 'noId');
     }

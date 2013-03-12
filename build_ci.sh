@@ -8,6 +8,8 @@ npm install || npm install --force
 
 ./node_modules/.bin/grunt -no-color process
 
+./scripts/upgrade-data.sh
+
 make test
 
 if [ -f output ]; then rm -r output; fi

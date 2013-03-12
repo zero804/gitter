@@ -55,6 +55,11 @@ exports.startWorkers = function() {
           winston.info("Sending email", plaintext);
         }
 
+        if(/@troupetest.local/.test(options.from) || /@troupetest.local/.test(options.to)) {
+          winston.info('Skipping send for troupetest.local');
+          return done();
+        }
+
         sesTransport.sendMail({
           from: options.from,
           to: options.to,
