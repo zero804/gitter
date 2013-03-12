@@ -16,5 +16,5 @@ if [ -d output ]; then rm -r output; fi
 
 mkdir -p output
 
-tar -cv !(@(node_modules|output|assets))|gzip -9 - > output/troupe.tgz
+tar -cv !(@(node_modules|output|assets|mongo-backup-*))|gzip -9 - > output/troupe.tgz
 
