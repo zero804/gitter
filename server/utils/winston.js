@@ -48,7 +48,9 @@ function configureTransports() {
   if(nconf.get('logging:logToFile')) {
     winston.add(winston.transports.File, {
       filename: nconf.get('LOG_FILE'),
-      level: nconf.get("logging:level")
+      level: nconf.get("logging:level"),
+      timestamp: true,
+      json: false
     });
 
     var fileTransport = winston['default'].transports.file;
