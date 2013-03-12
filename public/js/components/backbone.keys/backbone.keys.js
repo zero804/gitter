@@ -99,7 +99,9 @@
             oldDelegateEvents.apply(this, (events || []));
 
             // Now delegate keys
-            this.delegateKeys();
+            if (typeof this.delegateKeys === 'function') {
+                this.delegateKeys();
+            }
         },
 
         // Actual delegate keys
