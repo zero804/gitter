@@ -1,12 +1,11 @@
-TESTS = test/
+TESTS = test/integration
 REPORTER = dot
 
 test:
 	@NODE_ENV=test ./node_modules/.bin/mocha \
 		--reporter $(REPORTER) \
-		--timeout 200 \
+		--timeout 2000 \
 		--recursive \
-		--growl \
 		--ignore-leaks \
 		$(TESTS)
 

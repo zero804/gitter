@@ -129,8 +129,8 @@ describe('haraka-gatekeeper', function() {
   // creates a mock of the gatekeeper plugin, bypassing the sending of the bounce mail
   function createGatekeeperPlugin(sendEmailProxy) {
 
-    var gatekeeper = proxyquire("../../haraka/plugins/gatekeeper", {
-      "./../../server/services/mailer-service": {
+    var gatekeeper = proxyquire("../../../haraka/plugins/gatekeeper", {
+      "../../../server/services/mailer-service": {
         sendEmail: sendEmailProxy
       }
     });

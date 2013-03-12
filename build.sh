@@ -3,7 +3,7 @@ set -e
 
 echo build.sh executing as user `whoami`
 npm prune
-npm install || npm install --force
+npm install --production || npm install --force --production
 
 # Don't need all the dev dependencies, so skip some of them
 

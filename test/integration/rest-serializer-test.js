@@ -2,7 +2,7 @@
 /*global describe:true, it: true */
 "use strict";
 
-var restSerializer = require('../server/serializers/rest-serializer');
+var restSerializer = require('../../server/serializers/rest-serializer');
 
 var assert = require("better-assert");
 
