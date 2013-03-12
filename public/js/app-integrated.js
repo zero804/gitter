@@ -45,6 +45,45 @@ require([
   /*global console:true require:true */
   "use strict";
 
+  var preloadedFetch = false;
+  if(!window.troupePreloads) {
+    preloadedFetch = true;
+    $.ajax({
+      url: window.location.pathname + '/preload',
+      dataType: "json",
+      type: "GET",
+      success: function(data) {
+        preloadedFetch = false;
+        window.troupePreloads = data;
+
+        $(document).trigger('preloadComplete', data);
+      }
+    });
+
+  } else {
+    preloadedFetch = false;
+  }
+
+  function instantiateCollection(collection, name) {
+    collection.listen();
+    if(window.troupePreloads && window.troupePreloads[name]) {
+      collection.reset(window.troupePreloads[name], { parse: true });
+    } else {
+
+      if(preloadedFetch) {
+        $(document).one('preloadComplete', function() {
+          collection.reset(window.troupePreloads[name], { parse: true });
+        });
+
+      } else {
+        collection.fetch();
+
+      }
+    }
+  }
+
+
+
   $(document).on("click", "a", function(event) {
     if(this.href) {
       var href = $(this).attr('href');
@@ -260,18 +299,21 @@ require([
   });
 
   app.addInitializer(function(/*options*/){
+    var preloads = window.troupePreloads || {};
+    window.troupePreloads = {};
+
     var headerView = new (TroupeViews.Base.extend({
       template: headerViewTemplate,
       getRenderData: function() {
         return { user: window.troupeContext.user, troupeContext: troupeContext };
       }
     }))();
+
     app.headerRegion.show(headerView);
 
     // Setup the ChatView
     chatCollection = new chatModels.ChatCollection();
-    chatCollection.listen();
-    chatCollection.reset(window.troupePreloads['chatMessages'], { parse: true });
+    instantiateCollection(chatCollection, 'chatMessages');
 
     new ChatInputView({
       el: $('#chat-input'),
@@ -294,11 +336,11 @@ require([
     });
     app.requestRegion.show(requestView);
 
-    // File Collections
 
+
+    // File Collections
     fileCollection = new fileModels.FileCollection();
-    fileCollection.listen();
-    fileCollection.reset(window.troupePreloads['files'], { parse: true });
+    instantiateCollection(fileCollection, 'files');
 
     // File View
     var fileView = new FileView({
@@ -309,8 +351,7 @@ require([
     // Conversation Collections
 
     conversationCollection = new conversationModels.ConversationCollection();
-    conversationCollection.listen();
-    conversationCollection.reset(window.troupePreloads['conversations'], { parse: true });
+    instantiateCollection(conversationCollection, 'conversations');
 
     // Conversation View
     if (!window.troupeContext.troupe.oneToOne) {
@@ -323,8 +364,8 @@ require([
 
     // Troupe Collections
     troupeCollection = new troupeModels.TroupeCollection();
-    troupeCollection.reset(window.troupePreloads['troupes'], { parse: true });
-    troupeCollection.listen();
+    instantiateCollection(troupeCollection, 'troupes');
+
     troupeCollection.on("remove", function(model) {
       if(model.id == window.troupeContext.troupe.id) {
         // TODO: tell the person that they've been kicked out of the troupe
@@ -356,8 +397,7 @@ require([
 
     // User Collections
     userCollection = new userModels.UserCollection();
-    userCollection.reset(window.troupePreloads['users'], { parse: true });
-    userCollection.listen();
+    instantiateCollection(userCollection, 'users');
 
     // update online status of user models
     $(document).on('userLoggedIntoTroupe', updateUserStatus);
@@ -393,7 +433,6 @@ require([
       'users': userCollection
     };
 
-    window.troupePreloads = {};
 
   });
 

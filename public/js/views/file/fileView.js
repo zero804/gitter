@@ -30,11 +30,12 @@ define([
           self.$el.prepend(addFileButton);
           addFileButton.tooltip({
             html : true,
-            placement : "right"
+            placement : "right",
+            container: "body"
           });
         }
       });
-    },
+    }
 
   });
 
