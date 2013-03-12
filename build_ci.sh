@@ -12,7 +12,9 @@ npm install || npm install --force
 
 make test
 
-if [ -f output ]; then rm -r output; fi
-mkdir output
+if [ -d output ]; then rm -r output; fi
+
+mkdir -p output
+
 tar -cv !(@(node_modules|output|assets))|gzip -9 - > output/troupe.tgz
 
