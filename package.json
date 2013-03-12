@@ -61,7 +61,7 @@
     "mongoose-number": "0.0.2"
   },
   "devDependencies": {
-    "better-assert": "0.1.0",
+    "better-assert": "~1.0.0",
     "mocha": "1.7.0",
     "grunt-contrib-manifest": "0.2.0",
     "grunt-handlebars-requirejs": "0.0.3",
