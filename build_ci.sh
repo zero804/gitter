@@ -8,7 +8,9 @@ npm install || npm install --force
 
 ./node_modules/.bin/grunt -no-color process
 
-if [ -f output ]; then rm -r output; done
+make test
+
+if [ -f output ]; then rm -r output; fi
 mkdir output
 tar -cv !(@(node_modules|output|assets))|gzip -9 - > output/troupe.tgz
 
