@@ -8,8 +8,9 @@ var persistence = require("./persistence-service"),
 function findConversation(options, callback) {
   var troupeId = options.troupeId;
   var inReplyTo = options.inReplyTo;
+  var subject = options.subject;
 
-  winston.info("Looking for email with messageId ", inReplyTo);
+  winston.info("Looking for thread with messageId ", inReplyTo);
 
   persistence.Conversation
         .where('troupeId', troupeId)
@@ -18,9 +19,33 @@ function findConversation(options, callback) {
         .sort({ updated: 'desc' })
         .exec(function(err, results) {
           if(err) return callback(err);
-          if(!results) return callback(null, null);
+
+          if(!results || results.length === 0) {
+            winston.info("Can't find conversation with that msg id");
+            return findBySubject();
+          }
+
           return callback(null, results[0]);
         });
+
+  function findBySubject() {
+    winston.info("Looking for thread with subject ", subject);
+
+    persistence.Conversation
+      .where('troupeId', troupeId)
+      .where('emails.subject', subject)
+      .limit(1)
+      .sort({ updated: 'desc' })
+      .exec(function(err, results) {
+        if(err) return callback(err);
+
+        if(!results || results.length === 0) {
+          winston.info("Can't find conversation with that subject");
+          return callback(null, null);
+        }
+        return callback(null, results[0]);
+      });
+  }
 }
 
 exports.storeEmailInConversation = function(options, callback) {
