@@ -4,6 +4,7 @@
 var troupeService = require("../services/troupe-service");
 var winston = require("winston");
 var userService = require("../services/user-service");
+var signupService = require("../services/signup-service");
 var unreadItemService = require("../services/unread-item-service");
 var restSerializer = require("../serializers/rest-serializer");
 var nconf = require('../utils/config');
@@ -344,8 +345,33 @@ module.exports = {
         renderAppPageWithTroupe(req, res, next, page, req.troupe, req.troupe.name);
       });
 
+      app.get('/:troupeUri/accept/:confirmationCode',
+        middleware.authenticate('accept', {}),
+        function(req, res/*, next*/) {
+            /* User has been set passport/accept */
+            signupService.acceptInvite(req.params.confirmationCode, req.user, function(err, troupe) {
+              if (err || !troupe) {
+                res.relativeRedirect("/" + req.params.troupeUri);
+                return;
+              }
 
+              res.relativeRedirect("/" + troupe.uri);
+          });
+      });
 
+      app.get('/:troupeUri/confirm/:confirmationCode',
+        middleware.authenticate('confirm', {}),
+        function(req, res/*, next*/) {
+            /* User has been set passport/accept */
+            signupService.confirm(req.user, function(err, user, troupe) {
+              if (err) {
+                res.relativeRedirect("/" + req.params.troupeUri);
+                return;
+              }
+
+              res.relativeRedirect("/" + troupe.uri);
+          });
+      });
 
       app.get('/last/:page',
         middleware.grantAccessForRememberMeTokenMiddleware,
