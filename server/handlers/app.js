@@ -252,6 +252,10 @@ module.exports = {
         }
       });
 
+      app.get('/s/cdn/*', function(req, res) {
+        res.redirect(req.path.replace('/s/cdn', ''));
+      });
+
       app.get('/one-one/:userId',
         middleware.grantAccessForRememberMeTokenMiddleware,
         preloadOneToOneTroupeMiddleware,

@@ -104,16 +104,31 @@ define([
         }, 100);
       });
 
-      $(document).on('troupeUnreadTotalChange', function(event, value) {
-        var badge = self.$el.find('#unread-badge');
-        badge.text(value);
-        if(value > 0) {
-          badge.show();
-        } else {
-          badge.hide();
-        }
-      });
+      $(document).on('troupeUnreadTotalChange', function(event, values) {
 
+        function updateBadge(selector, count) {
+          var badge = self.$el.find(selector);
+          badge.text(count);
+          if(count > 0) {
+            badge.show();
+          } else {
+            badge.hide();
+          }
+        }
+        // overall count
+        updateBadge('#unread-badge', values.overall);
+        // normal troupe unread count
+        if (values.normal)
+          $('.trpLeftMenuToolbarItems').addClass('unread-normal');
+        else
+          $('.trpLeftMenuToolbarItems').removeClass('unread-normal');
+
+        // one to one unread count
+        if (values.oneToOne)
+          $('.trpLeftMenuToolbarItems').addClass('unread-one2one');
+        else
+          $('.trpLeftMenuToolbarItems').removeClass('unread-one2one');
+      });
     },
 
     toggleRightPanel: function(id) {
