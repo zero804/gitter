@@ -51,10 +51,11 @@ define([
     },
 
     getRenderData: function() {
+      var currentUserId = window.troupeContext.user ? window.troupeContext.user.id : undefined;
+
       var user = this.model ? this.model.toJSON() : this.user;
       var avatarUrl = (this.avatarSize == 'm') ? this.user.avatarUrlMedium : this.user.avatarUrlSmall;
-      var online = !!user.online; // only the people view tries to show avatar status so there is a model object, it won't necessarily work in other cases
-      // console.log("Rending avatar with url " + avatarUrl);
+      var online = user.id === currentUserId || !!user.online; // only the people view tries to show avatar status so there is a model object, it won't necessarily work in other cases
       return {
         id: user.id,
         showBadge: this.showBadge,
