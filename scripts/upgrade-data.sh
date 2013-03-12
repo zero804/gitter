@@ -30,7 +30,7 @@ do
     fi
 
     echo executing $file
-    ./"$file" $MONGO_URL
+    "$file" $MONGO_URL
 
 
     result=$?
