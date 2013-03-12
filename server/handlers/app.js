@@ -15,8 +15,6 @@ var chatService = require("../services/chat-service");
 var Fiber = require("../utils/fiber");
 var conversationService = require("../services/conversation-service");
 var appVersion = require("../web/appVersion");
-var bayeux = require("../web/bayeux");
-var Q = require('q');
 
 function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data, options) {
   if(!options) options = {};
