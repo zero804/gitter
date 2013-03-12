@@ -9,7 +9,7 @@ global.CONT = "CONT";
 
 var assert = require("better-assert");
 var proxyquire = require("proxyquire").noCallThru();
-var Address = require("haraka/address").Address;
+var Address = require("./address").Address;
 var sinon = require("sinon");
 
 describe('haraka-gatekeeper', function() {
