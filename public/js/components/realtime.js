@@ -6,7 +6,7 @@ define([
   /*global console:true*/
   "use strict";
 
-  Faye.Logging.logLevel = 'debug';
+  //Faye.Logging.logLevel = 'debug';
 
   var connected = false;
   var connectionProblemTimeoutHandle;
