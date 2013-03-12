@@ -6,7 +6,7 @@ REPORTER = dot
 test:
 	@NODE_ENV=test ./node_modules/.bin/mocha \
 		--reporter $(REPORTER) \
-		--timeout 2000 \
+		--timeout 10000 \
 		--recursive \
 		--ignore-leaks \
 		$(TESTS)

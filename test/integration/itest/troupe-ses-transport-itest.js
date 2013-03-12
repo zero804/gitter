@@ -27,7 +27,7 @@ describe('ses-transport2', function() {
 
       // generate some recipients to test with
       for (var i = 0; i < 55; i++) {
-        recipients.push('test+recipient-'+i+'@troupetester.local');
+        recipients.push('test+recipient-'+i+'@troupetest.local');
       }
 
       ses.sendMailString(from, recipients, msg, function(errSendingMail, messageIds) {
