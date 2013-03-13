@@ -1,14 +1,20 @@
-TESTS = test/
+TESTS = test/integration
+END_TO_END_TESTS = test/end-to-end
+
 REPORTER = dot
 
 test:
 	@NODE_ENV=test ./node_modules/.bin/mocha \
 		--reporter $(REPORTER) \
-		--timeout 200 \
+		--timeout 10000 \
 		--recursive \
-		--growl \
 		--ignore-leaks \
 		$(TESTS)
+
+end-to-end-test:
+	@NODE_ENV=test casperjs test \
+		$(END_TO_END_TESTS)/casper \
+		--url=http://localhost:5000
 
 docs: test-docs
 

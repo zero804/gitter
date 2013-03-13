@@ -20,8 +20,6 @@ function TroupeSESTransport() {
 
 
 TroupeSESTransport.prototype.sendMailString = function(from, recipients, string, callback) {
-
-  var request;
   var self = this;
   var date = new Date();
   var urlparts = url.parse(this.ServiceUrl);
@@ -58,6 +56,12 @@ TroupeSESTransport.prototype.sendMailString = function(from, recipients, string,
     console.log('sending a SES mail chunk (<= 50 recipients)');
 
     var myParams = _.extend(params);
+
+    // don't really send mails to the troupetest.local domain
+    destinations = _.filter(destinations, function(d) { return (d.indexOf('@troupetest.local') >= 0) === false; });
+    if (destinations.length === 0) {
+      return callback(null, 'noId');
+    }
 
     for(var i = 0; i < destinations.length & i < 50; i++) {
       myParams['Destinations.member.' + (i + 1)] = destinations[i];

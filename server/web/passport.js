@@ -109,6 +109,15 @@ module.exports = {
           statsService.event('confirmation_reused', { userId: user.id });
 
           winston.debug("Confirmation already used", { confirmationCode: confirmationCode });
+
+          // If the confirmation was under an appUri ala /:appUri/confirm/:confirmCode
+          // Then always use that URI
+          if(req.params.appUri) {
+            return self.redirect("/" + req.params.appUri);
+          }
+
+          // If the user doesn't have a last troupe set, we'll need to try figure
+          // out a troupe to which they belong and send them to that
           if(!user.lastTroupe) {
             troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
               if(err) return done(err);
@@ -121,6 +130,8 @@ module.exports = {
             });
           }
 
+          // If the user has logged in in the past,  find that troupe and
+          // redirect them to that URI
           troupeService.findById(user.lastTroupe, function(err, troupe) {
             if(err || !troupe) return self.redirect(nconf.get('web:homeurl'));
 

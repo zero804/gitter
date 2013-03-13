@@ -16,6 +16,7 @@ require.config({
     moment: 'libs/momentjs/1.7.2/moment.min',
     bootstrap_tooltip: '../bootstrap/js/bootstrap-tooltip',
     backbone: 'libs/backbone/0.9.10/backbone',
+    'backbone-keys': 'components/backbone.keys/backbone.keys',
     fineuploader: 'libs/fineuploader/3.3/fine-uploader',
     templates: '../templates',
     zeroClipboard: 'libs/zeroClipboard/ZeroClipboard',
@@ -31,6 +32,7 @@ require.config({
       deps: ['underscore', 'jquery'],
       exports: 'Backbone'
     },
+    'backbone-keys': { deps: ['backbone'], exports: 'Backbone' },
     'fineuploader': { exports: 'qq' },
     'filtered-collection': {
       deps: ['underscore','backbone'],

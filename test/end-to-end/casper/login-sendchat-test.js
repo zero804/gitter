@@ -1,11 +1,22 @@
-var links = [];
-var casper = require('casper').Casper({
-    viewportSize: {width: 1280, height: 800},
-    waitTimeout: 60000,
-    verbose: true,
-    logLevel: 'debug'
+/*jshint unused:true, browser:true, globalstrict:true*/
+/*global require:true, console:true */
+"use strict";
+
+var casperJS = require('casper');
+var casper = new casperJS.Casper({
+  viewportSize: { width: 1280, height: 800 },
+  waitTimeout: 60000,
+  verbose: true,
+  logLevel: 'debug'
 });
-var baseUrl = "http://localhost:5000/";
+
+var baseUrl = casper.cli.get('url');
+if(!baseUrl) {
+  baseUrl = "http://localhost:5000/";
+}
+
+casper.test.comment('Send a chat to a troupe');
+
 
 casper.start(baseUrl + "x", function() {
 });

@@ -5,7 +5,8 @@ define([
   'backbone',
   'hbs!./tmpl/modal',
   '../template/helpers/all',
-  'hbs!./tmpl/confirmationView'
+  'hbs!./tmpl/confirmationView',
+  'backbone-keys' // no ref
 ], function($, _, Backbone, modalTemplate, helpers, confirmationViewTemplate) {
   /*jshint trailing:false */
   /*global require:true console:true setTimeout:true*/

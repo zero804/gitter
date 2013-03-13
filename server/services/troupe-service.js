@@ -265,12 +265,8 @@ function acceptRequest(request, callback) {
       if(err) return callback(err);
       if(!user) { winston.error("Unable to find user", request.userId); return callback("Unable to find user"); }
 
-      if(user.status === 'UNCONFIRMED' && !user.confirmationCode) {
-         var confirmationCode = uuid.v4();
-         user.confirmationCode = confirmationCode;
-         user.save(function() {
-          emailNotificationService.sendConfirmationForNewUserRequest(user, troupe);
-         });
+      if(user.status === 'UNCONFIRMED') {
+        emailNotificationService.sendConfirmationForNewUserRequest(user, troupe);
       }
       else {
         emailNotificationService.sendRequestAcceptanceToUser(user, troupe);

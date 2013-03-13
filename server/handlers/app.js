@@ -4,6 +4,7 @@
 var troupeService = require("../services/troupe-service");
 var winston = require("winston");
 var userService = require("../services/user-service");
+var signupService = require("../services/signup-service");
 var unreadItemService = require("../services/unread-item-service");
 var restSerializer = require("../serializers/rest-serializer");
 var nconf = require('../utils/config');
@@ -15,8 +16,6 @@ var chatService = require("../services/chat-service");
 var Fiber = require("../utils/fiber");
 var conversationService = require("../services/conversation-service");
 var appVersion = require("../web/appVersion");
-var bayeux = require("../web/bayeux");
-var Q = require('q');
 
 function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data, options) {
   if(!options) options = {};
@@ -265,6 +264,37 @@ module.exports = {
         }
       );
 
+
+      app.get('/one-one/:userId/preload',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        preloadOneToOneTroupeMiddleware,
+        function(req, res, next) {
+          var f = new Fiber();
+          if(req.user) {
+            preloadTroupes(req.user.id, f.waitor());
+            preloadFiles(req.user.id, req.troupe.id, f.waitor());
+            preloadChats(req.user.id, req.troupe.id, f.waitor());
+            preloadUsers(req.user.id, req.troupe, f.waitor());
+            preloadUnreadItems(req.user.id, req.troupe.id, f.waitor());
+          }
+          f.all()
+            .spread(function(troupes, files, chats, users, unreadItems) {
+              // Send the information through
+              res.set('Cache-Control', 'no-cache');
+              res.send({
+                troupes: troupes,
+                files: files,
+                chatMessages: chats,
+                users: users,
+                unreadItems: unreadItems
+              });
+            })
+            .fail(function(err) {
+              next(err);
+            });
+        });
+
       app.get('/one-one/:userId/chat',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
@@ -346,8 +376,33 @@ module.exports = {
         renderAppPageWithTroupe(req, res, next, page, req.troupe, req.troupe.name);
       });
 
+      app.get('/:troupeUri/accept/:confirmationCode',
+        middleware.authenticate('accept', {}),
+        function(req, res/*, next*/) {
+            /* User has been set passport/accept */
+            signupService.acceptInvite(req.params.confirmationCode, req.user, function(err, troupe) {
+              if (err || !troupe) {
+                res.relativeRedirect("/" + req.params.troupeUri);
+                return;
+              }
 
+              res.relativeRedirect("/" + troupe.uri);
+          });
+      });
 
+      app.get('/:troupeUri/confirm/:confirmationCode',
+        middleware.authenticate('confirm', {}),
+        function(req, res/*, next*/) {
+            /* User has been set passport/accept */
+            signupService.confirm(req.user, function(err, user, troupe) {
+              if (err) {
+                res.relativeRedirect("/" + req.params.troupeUri);
+                return;
+              }
+
+              res.relativeRedirect("/" + troupe.uri);
+          });
+      });
 
       app.get('/last/:page',
         middleware.grantAccessForRememberMeTokenMiddleware,

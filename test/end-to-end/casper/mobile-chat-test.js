@@ -1,17 +1,26 @@
-// we need to be able to login with a test user (testuser@troupetester.local, password: 654321) that exists
+/*jshint unused:true, browser:true, globalstrict:true*/
+/*global require:true */
+"use strict";
+
+// we need to be able to login with a test user (testuser@troupetest.local, password: 654321) that exists
 // navigate to the troupe (url: testtroupe1, name: Test Troupe 1)
 // check for errors.
 
 var casperJS = require('casper');
-
-var casper = casperJS.Casper({
-    viewportSize: {width: 1280, height: 800},
-    waitTimeout: 60000,
-    verbose: true,
-    logLevel: 'debug'
+var casper = new casperJS.Casper({
+  viewportSize: { width: 1280, height: 800 },
+  waitTimeout: 60000,
+  verbose: true,
+  logLevel: 'debug'
 });
 
-var baseUrl = "http://localhost:5000/";
+var baseUrl = casper.cli.get('url');
+if(!baseUrl) {
+  baseUrl = "http://localhost:5000/";
+}
+
+casper.test.comment('Mobile chat test');
+
 
 casper.userAgent("Casper Mobile");
 
@@ -23,7 +32,7 @@ casper.start(baseUrl + "login", function() {
 // send the login form
 casper.then(function() {
   this.fill('form#loginform', {
-    email: 'testuser@troupetester.local',
+    email: 'testuser@troupetest.local',
     password: '654321'
   }, true);
 });
