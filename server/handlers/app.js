@@ -264,6 +264,37 @@ module.exports = {
         }
       );
 
+
+      app.get('/one-one/:userId/preload',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        preloadOneToOneTroupeMiddleware,
+        function(req, res, next) {
+          var f = new Fiber();
+          if(req.user) {
+            preloadTroupes(req.user.id, f.waitor());
+            preloadFiles(req.user.id, req.troupe.id, f.waitor());
+            preloadChats(req.user.id, req.troupe.id, f.waitor());
+            preloadUsers(req.user.id, req.troupe, f.waitor());
+            preloadUnreadItems(req.user.id, req.troupe.id, f.waitor());
+          }
+          f.all()
+            .spread(function(troupes, files, chats, users, unreadItems) {
+              // Send the information through
+              res.set('Cache-Control', 'no-cache');
+              res.send({
+                troupes: troupes,
+                files: files,
+                chatMessages: chats,
+                users: users,
+                unreadItems: unreadItems
+              });
+            })
+            .fail(function(err) {
+              next(err);
+            });
+        });
+
       app.get('/one-one/:userId/chat',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
