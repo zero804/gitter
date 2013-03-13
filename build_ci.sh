@@ -8,6 +8,9 @@ npm install || npm install --force
 
 ./node_modules/.bin/grunt -no-color process
 
+echo $GIT_COMMIT > GIT_COMMIT
+echo $GIT_BRANCH > VERSION
+
 ./scripts/upgrade-data.sh
 
 make test
