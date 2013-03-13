@@ -24,7 +24,7 @@ module.exports = {
   },
 
   sendRequestAcceptanceToUser: function(user, troupe) {
-    var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri;
+    var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri + "/confirm/" + user.confirmationCode;
 
     mailerService.sendEmail({
       templateFile: "signupemailfromrequest",
@@ -55,7 +55,7 @@ module.exports = {
   },
 
   sendConfirmationForNewUserRequest: function(user, troupe) {
-    var confirmLink = nconf.get("web:basepath") + "/confirm/" + user.confirmationCode + '?fromRequest=1';
+    var confirmLink = nconf.get("web:basepath") + "/" + troupe.uri + "/confirm/" + user.confirmationCode + '?fromRequest=1';
     mailerService.sendEmail({
       templateFile: "signupemailfromrequest",
       to: user.email,
@@ -89,7 +89,7 @@ module.exports = {
 
     mailerService.sendEmail({
       templateFile: "inviteemail",
-      from: 'signup-robot' + emailDomainWithAt,
+      from: senderDisplayName + '<signup-robot' + emailDomainWithAt + '>',
       to: email,
       subject: "You been invited to join the " + troupe.name + " troupe",
       data: {

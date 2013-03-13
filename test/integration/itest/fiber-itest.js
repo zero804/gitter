@@ -2,7 +2,7 @@
 /*global describe: true it: true */
 "use strict";
 
-var Fiber = require("../../server/utils/fiber");
+var Fiber = require("../../../server/utils/fiber");
 
 var assert = require("better-assert");
 

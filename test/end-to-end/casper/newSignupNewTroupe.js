@@ -1,5 +1,8 @@
-var casperJS = require('casper');
+/*jshint unused:true, browser:true, globalstrict:true*/
+/*global require:true, console:true */
+"use strict";
 
+var casperJS = require('casper');
 var casper = new casperJS.Casper({
   viewportSize: { width: 1280, height: 800 },
   waitTimeout: 60000,
@@ -7,8 +10,14 @@ var casper = new casperJS.Casper({
   logLevel: 'debug'
 });
 
-var baseUrl = "http://localhost:5000/";
-var email = "tim@troupe.co";
+var baseUrl = casper.cli.get('url');
+if(!baseUrl) {
+  baseUrl = "http://localhost:5000/";
+}
+
+casper.test.comment('New signup, new troupe');
+
+var email = "testuser@troupetest.local";
 var troupeName = "New Signup New Troupe";
 
 casper.start(baseUrl + "x", function() {

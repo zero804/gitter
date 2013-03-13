@@ -1,13 +1,14 @@
 /*jslint node: true */
-/*global describe: true it: true */
+/*global describe: true, it: true */
 "use strict";
 
-var ses = require("../../server/utils/mail/troupe-ses-transport");
+var ses = require("../../../server/utils/mail/troupe-ses-transport");
 
 var assert = require("better-assert");
 
 // NOTE: on localhost this test will need to run with a larger mocha timeout (10s) which is done on command line with - t 10s
 describe('ses-transport2', function() {
+
   describe('#sendMail()', function() {
     it('should return multiple messageIds for mails with more than 50 recipients', function(done){
 
@@ -26,10 +27,10 @@ describe('ses-transport2', function() {
 
       // generate some recipients to test with
       for (var i = 0; i < 55; i++) {
-        recipients.push('test+recipient-'+i+'@troupe.co');
+        recipients.push('test+recipient-'+i+'@troupetest.local');
       }
 
-      ses.sendMail(from, recipients, msg, function(errSendingMail, messageIds) {
+      ses.sendMailString(from, recipients, msg, function(errSendingMail, messageIds) {
         if(errSendingMail) {
           done(errSendingMail);
         }

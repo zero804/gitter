@@ -1,5 +1,5 @@
-/*jslint node:true unused:true*/
-/*global describe:true it:true*/
+/*jslint node:true, unused:true*/
+/*global describe:true, it:true*/
 "use strict";
 
 var assert = require("better-assert");
@@ -7,8 +7,8 @@ var fs = require("fs");
 var temp = require("temp");
 
 describe('file-service', function() {
-  var fileService = require("../../server/services/file-service");
-  var persistence = require("../../server/services/persistence-service");
+  var fileService = require("../../../server/services/file-service");
+  var persistence = require("../../../server/services/persistence-service");
   var mongoose = require('mongoose');
 
   describe('#deleteFileFromGridStore()', function() {
@@ -57,7 +57,7 @@ describe('file-service', function() {
 
                     });
 
-                  }, 100);
+                  }, 1000);
 
                 });
               });

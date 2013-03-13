@@ -9,13 +9,13 @@ global.CONT = "CONT";
 
 var assert = require("better-assert");
 var proxyquire = require("proxyquire").noCallThru();
-var Address = require("haraka/address").Address;
+var Address = require("./address").Address;
 var sinon = require("sinon");
 
 describe('haraka-gatekeeper', function() {
 
-  var registeredFromAddress = 'test1267@troupe.co';
-  var unregisteredFromAddress = 'unregistered-user@troupe.co';
+  var registeredFromAddress = 'testuser@troupetest.local';
+  var unregisteredFromAddress = 'unregistered-user@troupetest.local';
   var permittedTroupeUri = 'testtroupe1';
   var forbiddenTroupeUri =  'testtroupe2';
   var nonExistantTroupeUri = 'nonexistant1234';
@@ -25,7 +25,7 @@ describe('haraka-gatekeeper', function() {
     /*
     *
     */
-    it('should hard deny if the sending user is not registered on troupe', function(done){
+    it('should accept and send bounce if the sending user is not registered on troupe', function(done){
 
       var sendEmailProxy = createEmailProxy();
       var gatekeeper = createGatekeeperPlugin(sendEmailProxy);
@@ -39,14 +39,10 @@ describe('haraka-gatekeeper', function() {
 
       function nextCallback(code, message) {
 
-        var expectedErrorMessage = "Sorry, your email address is not registered with us, please visit http://trou.pe to register.";
-
-        // check the hard deny
-        assert(code == global.DENY);
-        // check the error message
-        assert (message.indexOf(expectedErrorMessage) >= 0);
-        // check that no bounce mail was sent
-        assert (sendEmailProxy.called === false);
+        // check that the mail was accepted
+        assert(code == global.OK);
+        // check that a bounce mail was sent
+        assert (sendEmailProxy.called);
 
         done();
       }
@@ -108,7 +104,6 @@ describe('haraka-gatekeeper', function() {
       }
 
     });
-
   });
 
   // creates an haraka connection object, accepts in an array of Address objects for toAddresses.
@@ -129,8 +124,8 @@ describe('haraka-gatekeeper', function() {
   // creates a mock of the gatekeeper plugin, bypassing the sending of the bounce mail
   function createGatekeeperPlugin(sendEmailProxy) {
 
-    var gatekeeper = proxyquire("../../haraka/plugins/gatekeeper", {
-      "./../../server/services/mailer-service": {
+    var gatekeeper = proxyquire("../../../haraka/plugins/gatekeeper", {
+      './../../server/services/mailer-service': {
         sendEmail: sendEmailProxy
       }
     });
