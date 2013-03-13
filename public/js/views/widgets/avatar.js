@@ -74,7 +74,7 @@ define([
       var dom = this.template(this.getRenderData());
       this.$el.html(dom);
 
-      if (!window._troupeCompactView) {
+      if (!window._troupeCompactView && (this.model ? this.model.get('displayName') : this.user.displayName)) {
         this.$el.find(':first-child').tooltip({
           html : true,
           placement : "right"
