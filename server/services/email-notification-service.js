@@ -70,7 +70,7 @@ module.exports = {
   },
 
   sendConfirmationForNewUser: function (user, troupe) {
-    var confirmLink = nconf.get("web:basepath") + "/confirm/" + user.confirmationCode;
+    var confirmLink = nconf.get("web:basepath") + "/" + troupe.uri + "/confirm/" + user.confirmationCode;
     mailerService.sendEmail({
       templateFile: "signupemail",
       to: user.email,
