@@ -102,7 +102,15 @@ module.exports = {
     if(!user) return callback(new Error("No user found"));
     winston.debug("Confirming user", { id: user.id, status: user.status });
 
-    user.status = 'PROFILE_NOT_COMPLETED';
+    if (user.status === 'UNCONFIRMED') {
+      // setting the status marks the user as confirmed
+      user.status = 'PROFILE_NOT_COMPLETED';
+    }
+
+    // if there is a newEmail then this confirmation is the change of the address
+    if (user.newEmail) {
+      confirmEmailChange();
+    }
 
     user.save(function(err) {
       if(err) return callback(err);
@@ -115,6 +123,20 @@ module.exports = {
         callback(err, user, troupes[0]);
       });
     });
+
+    function confirmEmailChange() {
+      var origEmail = user.email;
+      var newEmail = user.newEmail;
+
+      // TODO: ensure that the email address being changed to is still available.
+
+      user.oldEmail = user.email;
+      user.email = user.newEmail;
+      delete user.newEmail;
+
+      // send an email to confirm that the confirmation of the email address change...was confirmed.
+      emailNotificationService.sendNoticeOfEmailChange(user, origEmail, newEmail);
+    }
   },
 
   resendConfirmation: function(options, callback) {

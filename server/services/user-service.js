@@ -248,51 +248,92 @@ var userService = {
     var password = options.password;
     var oldPassword = options.oldPassword;
     var displayName = options.displayName;
+    var email = options.email;
 
+    // look up the user
     userService.findById(userId, function(err, user) {
       if(err) return callback(err);
       if(!user) return callback("User not found");
 
+      // generate and save a gravatar image url if they don't already have one
       if (!user.gravatarImageUrl)
         user.gravatarImageUrl = generateGravatarUrl(user.email);
 
-      function generateNewHashSaveUser() {
-        sechash.strongHash('sha512', password, function(err, hash3) {
-          if(err) return callback(err);
-
-          user.passwordHash = hash3;
-          user.displayName = options.displayName;
-          user.save(function(err) {
-            callback(err);
-          });
-        });
-      }
-
       switch(user.status) {
         case 'PROFILE_NOT_COMPLETED':
-          if(user.passwordHash) return callback("User already has a password set");
+          // mark user as active after setting the password
+          if(user.passwordHash) {
+            return callback("User already has a password set");
+          }
+
           user.status = 'ACTIVE';
-          generateNewHashSaveUser();
+          // set password and save
+          generateNewHash(save);
           break;
 
         case 'ACTIVE':
+          // check for password change
           if(password) {
+            // set new password if the old one is correct
             sechash.testHash(oldPassword, user.passwordHash, function(err, match) {
               if(err) return callback(err);
               if(!match) return callback({authFailure: true });
-              generateNewHashSaveUser();
+              generateNewHash(maybeChangeEmailAndSave);
             });
-          } else {
-            user.displayName = options.displayName;
-            user.save(function(err) {
-              callback(err);
-            });
+          }
+          else {
+            // go directly into the change email method
+            maybeChangeEmailAndSave();
           }
           break;
 
         default:
-          callback("Invalid user status");
+          return callback("Invalid user status");
       }
+
+      // set new properties
+      user.displayName = displayName;
+
+      function save() {
+        user.save(callback);
+      }
+
+      // generates and sets the new password hash
+      function generateNewHash() {
+        sechash.strongHash('sha512', password, function(err, hash3) {
+          if(err) return callback(err);
+
+          user.passwordHash = hash3;
+        });
+      }
+
+      // change email address
+      function maybeChangeEmailAndSave() {
+        if (email && user.email !== email) {
+
+          // check if this new email is available for use
+          userService.findByEmail(email, function(e, existingUser) {
+            if (existingUser || e) return callback("The email address you are trying to change to is already registered by someone else."); // shouldn't we still save the other details?
+
+            // save the new email address while it is being confirmed
+            user.newEmail = email;
+            // update the confirmation code, which will be sent to the new email address
+            user.confirmationCode = uuid.v4();
+
+            user.save(function(e) {
+              if (!e) {
+                // send change email confirmation to new address
+                emailNotificationService.sendConfirmationForEmailChange(user);
+              }
+              callback(e);
+            });
+          });
+        }
+        else {
+          save();
+        }
+      }
+
     });
   }
 
