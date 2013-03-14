@@ -121,7 +121,7 @@ require([
     leftMenuSearch: "#left-menu-list-search",
     peopleRosterRegion: "#people-roster",
     fileRegion: "#file-list",
-    mailRegion: "#mail-list",
+    mailRegion: ".frame-conversations",
     requestRegion: "#request-roster",
     rightPanelRegion: "#right-panel",
     headerRegion: "#header-region"
@@ -359,6 +359,9 @@ require([
         collection: conversationCollection
       });
       app.mailRegion.show(conversationView);
+    }
+    else {
+      $('#mail-list').hide();
     }
 
 
