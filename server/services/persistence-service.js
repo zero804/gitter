@@ -79,6 +79,7 @@ function serializeEvent(url, operation, model, callback) {
 var UserSchema = new Schema({
   displayName: { type: String },
   email: { type: String },
+  newEmail: String,
   confirmationCode: {type: String },
   status: { type: String, "enum": ['UNCONFIRMED', 'PROFILE_NOT_COMPLETED', 'ACTIVE'], "default": 'UNCONFIRMED'},
   passwordHash: { type: String },
