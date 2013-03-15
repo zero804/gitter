@@ -179,7 +179,7 @@ function FileStrategy(options) {
       previewMimeType: item.previewMimeType,
       embeddedViewType: item.embeddedViewType,
       embeddedUrl: cdn('troupes/' + encodeURIComponent(item.troupeId) + '/embedded/' + encodeURIComponent(item.fileName), { notStatic: true }),
-      thumbnailUrl: cdn('troupes/' + encodeURIComponent(item.troupeId) + '/thumbnails/' + encodeURIComponent(item.fileName), { notStatic: true }),
+      thumbnailUrl: cdn('troupes/' + encodeURIComponent(item.troupeId) + '/thumbnails/' + encodeURIComponent(item.fileName) + "?version=" + item.versions.length, { notStatic: true }),
       unread: options.currentUserId ? unreadItemStategy.map(item._id) : true,
       v: getVersion(item)
     };
