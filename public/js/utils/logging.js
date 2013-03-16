@@ -4,14 +4,31 @@ define([
 ], function(_) {
   "use strict";
 
+  if(console.error) {
+    return {
+      getLogger: function() {
+        return {
+          error: _.bind(console.error, console),
+          warn: _.bind(console.warn, console),
+          info: _.bind(console.info, console),
+          debug: _.bind(console.debug, console)
+        };
+      }
+    };
+  }
+
+  // No logger exists
+  function noOp() {}
+
   return {
     getLogger: function() {
       return {
-        error: _.bind(console.error, console),
-        warn: _.bind(console.warn, console),
-        info: _.bind(console.info, console),
-        debug: _.bind(console.debug, console)
+        error: noOp,
+        warn: noOp,
+        info: noOp,
+        debug: noOp
       };
     }
   };
+
 });
