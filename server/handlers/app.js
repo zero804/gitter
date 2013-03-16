@@ -17,6 +17,9 @@ var Fiber = require("../utils/fiber");
 var conversationService = require("../services/conversation-service");
 var appVersion = require("../web/appVersion");
 
+var useFirebugInIE = nconf.get('web:useFirebugInIE')
+
+
 function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data, options) {
   if(!options) options = {};
 
@@ -135,13 +138,19 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
         }
       }
 
+      var userAgent =req.headers['user-agent'];
+      userAgent = userAgent ? userAgent : '';
+
+      var useFirebug = useFirebugInIE && userAgent.indexOf('MSIE') >= 0;
+
       res.render(page, {
         useAppCache: !!nconf.get('web:useAppCache'),
         login: login,
         data: login ? null : JSON.stringify(data), // Only push the data through if the user is logged in already
         troupeName: actualTroupeName,
         troupeContext: JSON.stringify(troupeContext),
-        troupeContextData: troupeContext
+        troupeContextData: troupeContext,
+        useFirebug: useFirebug
       });
 
     }
@@ -367,7 +376,10 @@ module.exports = {
         preloadTroupeMiddleware,
         function(req, res, next) {
         var page;
-        if(req.headers['user-agent'].indexOf('Mobile') >= 0) {
+        var userAgent =req.headers['user-agent'];
+        userAgent = userAgent ? userAgent : '';
+
+        if(userAgent.indexOf('Mobile') >= 0) {
           page = 'app-integrated';
         } else {
           page = 'app-integrated';
