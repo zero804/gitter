@@ -4,7 +4,7 @@ define([
 ], function(_) {
   "use strict";
 
-  if(console.error) {
+  if(console && console.error && (typeof console.error == "function")) {
     return {
       getLogger: function() {
         return {
