@@ -70,7 +70,7 @@ module.exports = {
   },
 
   sendConfirmationForNewUser: function (user, troupe) {
-    var confirmLink = nconf.get("web:basepath") + "/confirm/" + user.confirmationCode;
+    var confirmLink = nconf.get("web:basepath") + "/" + troupe.uri + "/confirm/" + user.confirmationCode;
     mailerService.sendEmail({
       templateFile: "signupemail",
       to: user.email,
@@ -80,6 +80,38 @@ module.exports = {
         troupeName: troupe.name,
         confirmLink: confirmLink,
         baseServerPath: nconf.get("web:basepath")
+      }
+    });
+  },
+
+  sendConfirmationForEmailChange: function (user) {
+    var confirmLink = nconf.get("web:basepath") + "/confirm/" + user.confirmationCode;
+    var to = user.newEmail;
+
+    mailerService.sendEmail({
+      templateFile: "change-email-address",
+      to: to,
+      from: 'signup-robot' + emailDomainWithAt,
+      subject: "Confirm new email address",
+      data: {
+        confirmLink: confirmLink,
+        originalEmail: user.email,
+        newEmail: user.newEmail,
+        baseServerPath: nconf.get("web:basepath")
+      }
+    });
+  },
+
+  sendNoticeOfEmailChange: function (user, origEmail, newEmail) {
+    mailerService.sendEmail({
+      templateFile: "change-email-address-complete",
+      to: [origEmail, newEmail],
+      from: 'signup-robot' + emailDomainWithAt,
+      subject: "Your email address has been successfully changed",
+      data: {
+        baseServerPath: nconf.get("web:basepath"),
+        originalEmail: origEmail,
+        newEmail: newEmail
       }
     });
   },

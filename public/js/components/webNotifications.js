@@ -59,6 +59,7 @@ define([
     });
   });
 
+  // websocket notifications
   $(document).on('realtime:persistentOutage', function() {
     console.log('realtime:persistentOutage');
     notifications.notify({
@@ -78,4 +79,8 @@ define([
     });
   });
 
+  // stop notifications when a user navigates away from the page
+  window.onbeforeunload = function() {
+    $('#notification-center').hide();
+  };
 });

@@ -105,7 +105,8 @@ module.exports = {
         if(err) return done(err);
         if(!user) return done(null, false);
 
-        if(user.status !== 'UNCONFIRMED') {
+        // confirmation fails if the user is already confirmed, except when the user is busy confirming their new email address
+        if(user.status !== 'UNCONFIRMED' && !user.newEmail) {
           statsService.event('confirmation_reused', { userId: user.id });
 
           winston.debug("Confirmation already used", { confirmationCode: confirmationCode });
