@@ -17,8 +17,8 @@ var Fiber = require("../utils/fiber");
 var conversationService = require("../services/conversation-service");
 var appVersion = require("../web/appVersion");
 
-var useFirebugInIE = nconf.get('web:useFirebugInIE')
-
+var useFirebugInIE = nconf.get('web:useFirebugInIE');
+console.log("useFirebugInIE" + useFirebugInIE);
 
 function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data, options) {
   if(!options) options = {};
@@ -142,6 +142,7 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
       userAgent = userAgent ? userAgent : '';
 
       var useFirebug = useFirebugInIE && userAgent.indexOf('MSIE') >= 0;
+      console.log("UseFirebug: " + useFirebug);
 
       res.render(page, {
         useAppCache: !!nconf.get('web:useAppCache'),
