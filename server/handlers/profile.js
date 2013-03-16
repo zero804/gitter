@@ -37,7 +37,8 @@ module.exports = {
             filter("displayName").trim(),
             validate("displayName").required().is(/^[\w\d\. \-\'\d]+$/),
             filter("password").trim(),
-            filter("oldPassword").trim()
+            filter("oldPassword").trim(),
+            filter("newEmail").trim()
           ),
 
           // Express request-handler now receives filtered and validated data
@@ -65,7 +66,8 @@ module.exports = {
               userId: req.user.id,
               displayName: req.form.displayName,
               password: req.form.password,
-              oldPassword: req.form.oldPassword
+              oldPassword: req.form.oldPassword,
+              email: req.form.newEmail
             }, function(err) {
               if(err) {
                 if(err.authFailure && req.accepts("application/json")) {

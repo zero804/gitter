@@ -160,22 +160,19 @@ module.exports = {
         });
       });
 
+      // this confirmation handler doesn't redirect to any specific troupe, use /troupeUri/confirm/abc for that instead
       app.get('/confirm/:confirmationCode',
         middleware.authenticate('confirm', { failureRedirect: '/confirm-failed' } ),
         function(req, res, next){
           winston.debug("Confirmation authenticated");
 
-          signupService.confirm(req.user, function(err, user, troupe) {
+          signupService.confirm(req.user, function(err/*, user, troupe */) {
             if (err) {
               winston.error("Signup service confirmation failed", { exception: err } );
               return next(err);
             }
 
-            winston.debug("Redirecting newly confirmed user to troupe ", { troupeUri: troupe.uri } );
-            if (!req.query.fromRequest)
-              res.relativeRedirect('/' + troupe.uri + '#|shareTroupe');
-            else
-              res.relativeRedirect('/' + troupe.uri);
+            res.relativeRedirect(nconf.get('web:homeurl'));
           });
         }
       );

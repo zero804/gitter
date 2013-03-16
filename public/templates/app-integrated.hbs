@@ -14,15 +14,13 @@
   <link rel="stylesheet" href='{{cdn "bootstrap/css/trp3.css" }}'>
   <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/edpmlaohjokcmefhjghaeeikjjcjplmi">
 
-    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href='{{cdn "images/2/favicon8.ico" }}'>
     {{>load_font_css}}
 
+    {{#useFirebug}}
+    <script type="text/javascript" src="https://getfirebug.com/firebug-lite.js"></script>
+    {{/useFirebug}}
 </head>
 <body>
 
@@ -32,8 +30,8 @@
     <div class="trpLeftMenuToolbar">
       <ul class="trpLeftMenuToolbarItems">
         <!--<li><img src='{{cdn "images/2/icon-recent.png"}}' class="left-menu-icon" id="icon-recent" data-list="list-recent" width="24" height="24"></li>-->
-        <li><img src='{{cdn "images/2/icon-troupes.png"}}' class="left-menu-icon selected" id="icon-troupes" data-list="list-troupes" width="24" height="24"></li>
-        <li><img src='{{cdn "images/2/icon-user.png"}}' class="left-menu-icon" id="icon-user" data-list="list-users" width="24" height="24"></li>
+        <li><img src='{{cdn "images/2/icon-troupes.png"}}' class="trpLeftMenuIcon left-menu-icon selected" id="icon-troupes" data-list="list-troupes" width="24" height="24"></li>
+        <li><img src='{{cdn "images/2/icon-user.png"}}' class="trpLeftMenuIcon left-menu-icon" id="icon-user" data-list="list-users" width="24" height="24"></li>
         <!--<li><img src='{{cdn "images/2/icon-search.png"}}' class="left-menu-icon" id="icon-search" data-list="list-search" width="24" height="24"></li>-->
       </ul>
     </div>
