@@ -38,3 +38,4 @@ public/bootstrap/less/*.css
 node_modules_2
 public-processed/
 scripts/dataupgrades/004-reverse-geocoder/data
+output
