@@ -18,7 +18,6 @@ var conversationService = require("../services/conversation-service");
 var appVersion = require("../web/appVersion");
 
 var useFirebugInIE = nconf.get('web:useFirebugInIE');
-console.log("useFirebugInIE" + useFirebugInIE);
 
 function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data, options) {
   if(!options) options = {};
