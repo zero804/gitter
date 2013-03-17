@@ -1,3 +1,7 @@
+#!/bin/bash
+
+set -e
+
 export ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../.." && pwd )"
 
 mkdir -p $ROOT_DIR/output/yslow
