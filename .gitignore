@@ -39,3 +39,4 @@ node_modules_2
 public-processed/
 scripts/dataupgrades/004-reverse-geocoder/data
 output
+test/end-to-end/casper/*.png

@@ -94,9 +94,9 @@
         _keyEventBindings : null,
 
         // Override delegate events
-        delegateEvents : function(events) {
+        delegateEvents : function() {
             // First delegate original events
-            oldDelegateEvents.apply(this, (events || []));
+            oldDelegateEvents.apply(this, Array.prototype.slice.apply(arguments));
 
             // Now delegate keys
             if (typeof this.delegateKeys === 'function') {
