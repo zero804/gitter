@@ -5,6 +5,7 @@ var redis = require("../utils/redis"),
     winston = require('winston'),
     appEvents = require('../app-events.js'),
     _ = require("underscore"),
+    Q = require('q'),
     redisClient;
 
 redisClient = redis.createClient();
@@ -97,15 +98,24 @@ function listOnlineUsersForTroupe(troupeId, callback) {
   redisClient.zrangebyscore("pr:tr_u:" + troupeId, 1, '+inf', callback);
 }
 
-function userSocketDisconnected(userId, socketId) {
+function userSocketDisconnected(userId, socketId, callback) {
   winston.debug("presence: userSocketDisconnected: ", { userId: userId, socketId: socketId });
 
   // Give the user 10 seconds to re-login before marking them as offline
   setTimeout(function() {
     removeSocketFromUserSockets(socketId, userId, function(err, lastDisconnect) {
+      if(err) {
+        winston.info("presence: removeSocketFromUserSockets " + socketId + "," + userId + " failed: ", err);
+        if(callback) callback();
+        return;
+      }
+
       if(lastDisconnect) {
         winston.info("presence: User " + userId + " is now offline");
       }
+
+      if(callback) callback();
+
     });
   }, 10000);
 
@@ -204,17 +214,29 @@ module.exports = {
       });
   },
 
-  validateActiveSockets: function(engine) {
+  validateActiveSockets: function(engine, callback) {
+    if(!callback) callback = function() {};
+    winston.debug('presence: Commencing validation.');
+
     redisClient.smembers("pr:activesockets", function(err, sockets) {
-      if(!sockets.length) return;
+      if(!sockets.length) {
+        winston.debug('presence: Validation: No active sockets.');
+        return callback();
+      }
 
       winston.info('presence: Validating ' + sockets.length + ' active sockets');
-      sockets.forEach(function(socketId) {
-        engine.clientExists(socketId, function(exists) {
 
+      sockets.forEach(function(socketId) {
+        var d = Q.deferred();
+        var promises = [];
+        promises.push(d.promise);
+
+        engine.clientExists(socketId, function(exists) {
           if(!exists) {
             winston.debug('Disconnecting invalid socket ' + socketId);
-            module.exports.socketDisconnected(socketId);
+            module.exports.socketDisconnected(socketId, d.makeNodeResolver());
+          } else {
+            d.resolve();
           }
 
         });
