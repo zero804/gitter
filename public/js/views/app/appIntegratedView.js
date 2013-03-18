@@ -178,7 +178,7 @@ define([
 
       if ($(document).width() < 1250) {
         $("#content-frame, #header-frame, #alert-content, #chat-input").animate({
-          left: '+=110px'
+          left: '+=100px'
         }, 350, function() {
         });
       }
@@ -198,7 +198,7 @@ define([
         if ($(document).width() < 1250) {
 
           $("#content-frame, #header-frame, #alert-content, #chat-input").animate({
-            left: '-=110px'
+            left: '-=100px'
           }, 350, function() {
           });
 
@@ -215,19 +215,36 @@ define([
         this.activateSearchList();
       }
 
+      if ($(window).width() < 1250) {
 
-      $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
-        left: "+=280px"
-      }, 350);
+        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
+          left: "+=280px"
+        }, 350);
 
 
-      $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
-        left: "+=180px"
-      }, 350);
+        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
+          left: "+=280px"
+        }, 350);
 
-      $("#right-panel").animate({
-        right: "-=280px"
-      }, 350);
+        $("#right-panel").animate({
+          right: "-=280px"
+        }, 350);
+      }
+
+      else {
+        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
+          left: "+=280px"
+        }, 350);
+
+
+        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
+          left: "+=180px"
+        }, 350);
+
+        $("#right-panel").animate({
+          right: "-=280px"
+        }, 350);
+      }
 
 
       $("left-menu-hotspot").hide();
@@ -239,21 +256,39 @@ define([
       if (!this.leftmenu) return;
 
       // refocus chat input in case it's lost focus
-      console.log("FOCUS CHAT");
       $("#chat-input-textarea").focus();
 
-      $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
-        left: "-=280px"
-      }, 350);
+
+      if ($(window).width() < 1250) {
+        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
+          left: "-=280px"
+        }, 350);
 
 
-      $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
-        left: "-=180px"
-      }, 350);
+        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
+          left: "-=280px"
+        }, 350);
 
-      $("#right-panel").animate({
-        right: "+=280px"
-      }, 350);
+        $("#right-panel").animate({
+          right: "+=280px"
+        }, 350);
+      }
+
+      else {
+        alert("WIDTH: " + $(document).width());
+        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
+          left: "-=280px"
+        }, 350);
+
+
+        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
+          left: "-=180px"
+        }, 350);
+
+        $("#right-panel").animate({
+          right: "+=280px"
+        }, 350);
+      }
 
       $("left-menu-hotspot").hide();
       this.leftmenu = false;
