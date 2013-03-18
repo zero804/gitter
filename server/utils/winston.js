@@ -8,6 +8,8 @@ var path = require('path');
 
 function reopenTransportOnHupSignal(fileTransport) {
   process.on('SIGHUP', function() {
+    console.log('Caught SIGHUP, attempting logfile rotation');
+
     var fullname = path.join(fileTransport.dirname, fileTransport._getFile(false));
 
     function reopen() {
