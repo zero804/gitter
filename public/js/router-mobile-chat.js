@@ -21,15 +21,7 @@ require([
     // Setup the ChatView
   var chatCollection = new chatModels.ChatCollection();
   chatCollection.listen();
-  chatCollection.reset(window.troupePreloads['chatMessages'], { parse: true });
-
-  $(function() {
-    console.log("Checking if the collection needs to be fetched.", window.applicationCache.status);
-    if (window.applicationCache.status == 1 /* NOUPDATE */) {
-      console.log('Fetching collection.');
-      chatCollection.fetch();
-    }
-  });
+  chatCollection.fetch();
 
   new ChatInputView({
     el: $('#chat-input'),

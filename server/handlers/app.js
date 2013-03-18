@@ -310,14 +310,7 @@ module.exports = {
         middleware.ensureLoggedIn(),
         preloadOneToOneTroupeMiddleware,
         function(req, res, next) {
-          preloadChats(req.user.id, req.troupe.id, function(err, serialized) {
-            if (err) {
-              winston.error("Error in Serializer:", { exception: err });
-              return next(err);
-            }
-
-            renderAppPageWithTroupe(req, res, next, 'mobile/chat-app', req.troupe, req.otherUser.displayName, { 'chatMessages': serialized, otherUser: req.otherUser });
-          });
+          renderAppPageWithTroupe(req, res, next, 'mobile/chat-app', req.troupe, req.otherUser.displayName, { otherUser: req.otherUser });
       });
 
       app.get('/one-one/:userId/files',
@@ -325,15 +318,7 @@ module.exports = {
         middleware.ensureLoggedIn(),
         preloadOneToOneTroupeMiddleware,
         function(req, res, next) {
-          preloadFiles(req.user.id, req.troupe.id, function(err, serializedFiles) {
-            if (err) {
-              winston.error("Error in Serializer:", { exception: err });
-              return next(err);
-            }
-
-            renderAppPageWithTroupe(req, res, next, 'mobile/file-app', req.troupe, req.otherUser.displayName, { 'files': serializedFiles, otherUser: req.otherUser });
-          });
-
+          renderAppPageWithTroupe(req, res, next, 'mobile/file-app', req.troupe, req.otherUser.displayName, { otherUser: req.otherUser });
       });
 
       app.get('/version', function(req, res/*, next*/) {
@@ -451,16 +436,7 @@ module.exports = {
         middleware.ensureLoggedIn(),
         preloadTroupeMiddleware,
         function(req, res, next) {
-
-          preloadChats(req.user.id, req.troupe.id, function(err, serialized) {
-            if (err) {
-              winston.error("Error in Serializer:", { exception: err });
-              return next(err);
-            }
-
-            renderAppPageWithTroupe(req, res, next, 'mobile/chat-app', req.troupe, req.troupe.name, { 'chatMessages': serialized });
-          });
-
+            renderAppPageWithTroupe(req, res, next, 'mobile/chat-app', req.troupe, req.troupe.name);
         });
 
       app.get('/:appUri/files',
@@ -468,16 +444,7 @@ module.exports = {
         middleware.ensureLoggedIn(),
         preloadTroupeMiddleware,
         function(req, res, next) {
-
-          preloadFiles(req.user.id, req.troupe.id, function(err, serializedFiles) {
-            if (err) {
-              winston.error("Error in Serializer:", { exception: err });
-              return next(err);
-            }
-
-            renderAppPageWithTroupe(req, res, next, 'mobile/file-app', req.troupe, req.troupe.name, { 'files': serializedFiles });
-          });
-
+          renderAppPageWithTroupe(req, res, next, 'mobile/file-app', req.troupe, req.troupe.name);
         });
 
       app.get('/:appUri/mails',
@@ -485,14 +452,7 @@ module.exports = {
         middleware.ensureLoggedIn(),
         preloadTroupeMiddleware,
         function(req, res, next) {
-          preloadConversations(req.user.id, req.troupe.id, function(err, serializedMails) {
-            if (err) {
-              winston.error("Error in Serializer:", { exception: err });
-              return next(err);
-            }
-
-            renderAppPageWithTroupe(req, res, next, 'mobile/conversation-app', req.troupe, req.troupe.name, { 'conversations': serializedMails });
-          });
+          renderAppPageWithTroupe(req, res, next, 'mobile/conversation-app', req.troupe, req.troupe.name);
         });
 
       app.get('/:appUri/people',
@@ -500,14 +460,7 @@ module.exports = {
         middleware.ensureLoggedIn(),
         preloadTroupeMiddleware,
         function(req, res, next) {
-         preloadUsers(req.user.id, req.troupe, function(err, serializedPeople) {
-            if (err) {
-              winston.error("Error in Serializer:", { exception: err });
-              return next(err);
-            }
-
-            renderAppPageWithTroupe(req, res, next, 'mobile/people-app', req.troupe, req.troupe.name, { 'people': serializedPeople });
-          });
+          renderAppPageWithTroupe(req, res, next, 'mobile/people-app', req.troupe, req.troupe.name);
         });
 
       app.get('/:appUri/accessdenied', function(req, res) {
