@@ -32,12 +32,14 @@ define([
       var r = TroupeViews.Base.prototype.render.call(this);
 
       var firstChild = this.$el.find(':first-child');
-      if (firstChild.tooltip) {
-        firstChild.tooltip({
-          html : true,
-          placement : "right",
-          container: "body"
-        });
+      if (window._troupeCompactView !== true) {
+        if (firstChild.tooltip) {
+          firstChild.tooltip({
+            html : true,
+            placement : "right",
+            container: "body"
+          });
+        }
       }
 
       return r;
