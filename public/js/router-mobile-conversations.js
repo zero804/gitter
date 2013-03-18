@@ -22,16 +22,8 @@ require([
     initialize: function() {
       var self = this;
       this.collection = new conversationModels.ConversationCollection();
-      this.collection.reset(window.troupePreloads['conversations'], { parse: true });
       this.collection.listen();
-
-      $(function() {
-        console.log("Checking if the collection needs to be fetched.", window.applicationCache.status);
-        if (window.applicationCache.status == 1 /* NOUPDATE */) {
-          console.log('Fetching collection.');
-          self.collection.fetch();
-        }
-      });
+      self.collection.fetch();
     },
 
     defaultAction: function(){

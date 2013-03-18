@@ -22,15 +22,8 @@ require([
     initialize: function() {
       var self = this;
       var userCollection = this.collection = new userModels.UserCollection();
-      userCollection.reset(window.troupePreloads['people'], { parse: true });
       userCollection.listen();
-      $(function() {
-        console.log("Checking if the collection needs to be fetched.", window.applicationCache.status);
-        if (window.applicationCache.status == 1 /* NOUPDATE */) {
-          console.log('Fetching collection.');
-          self.collection.fetch();
-        }
-      });
+      self.collection.fetch();
 
       // update online status of user models
       $(document).on('userLoggedIntoTroupe', updateUserStatus);
