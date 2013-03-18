@@ -9,8 +9,6 @@ casper.on('error', function(e) {
     casper.echo('Fail!' + e);
 });
 
-
-
 casper.on('http.status.500', function(resource) {
   casper.test.fail('500 on ' + resource.url);
 });
