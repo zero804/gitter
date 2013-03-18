@@ -275,7 +275,6 @@ define([
       }
 
       else {
-        alert("WIDTH: " + $(document).width());
         $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
           left: "-=280px"
         }, 350);
