@@ -6,7 +6,7 @@ var assert = require("better-assert");
 
 describe("ChatCollectionView", function() {
 
-  describe("scroll behaviour", function(it) {
+  describe("scroll behaviour", function() {
 
     it("should scroll to the bottom of chats when page is opened");
 

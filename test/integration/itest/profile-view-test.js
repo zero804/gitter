@@ -6,7 +6,7 @@ var assert = require("better-assert");
 
 describe("ProfileView", function() {
 
-  describe("changing email address", function(it) {
+  describe("changing email address", function() {
 
     describe("front end", function() {
 
