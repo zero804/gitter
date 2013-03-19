@@ -5,7 +5,7 @@ define([
 
   if(!window.troupeTrackingId) {
     return {
-      trackError: function() { console.log("Error!", arguments); }
+      trackError: function(message, file, line) { console.log("An unexpected error occurred: '" + message + "' in " + file  + ":" + line, arguments); }
     };
   }
 
