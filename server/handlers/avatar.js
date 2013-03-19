@@ -111,7 +111,7 @@ module.exports = {
         '/avatar',
         middleware.ensureLoggedIn(),
         function(req, res, next) {
-          var file = req.files.file;
+          var file = req.files.qqfile;
           var inPath = file.path;
           var mongoPath = "avatar-" + req.user.id;
 
