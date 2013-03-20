@@ -61,7 +61,7 @@
     "mongoose-number": "0.0.2"
   },
   "devDependencies": {
-    "better-assert": "1.0.0",
+    "better-assert": "git://github.com/timlind/better-assert.git#9cb0aecf8f2cf212858172ade9e8221269822bfa",
     "mocha": "1.8.2",
     "grunt-contrib-manifest": "0.2.0",
     "grunt-handlebars-requirejs": "0.0.3",
