@@ -30,6 +30,10 @@ function errorResponse(next, err) {
   return next(DENYSOFT);
 }
 
+function hardErrorResponse(next, err) {
+  winston.error("DENYHARD due to error", { exception: err });
+  return next(DENY);
+}
 
 function distributeForTroupe(from, to, next, connection) {
   var transaction = connection.transaction;
@@ -82,17 +86,21 @@ function distributeForTroupe(from, to, next, connection) {
       return next(OK);
 
     troupeSESTransport.sendMailStream(sesFrom, sesRecipients, sesStream, function(errorSendingMail, messageIds){
-      if (errorSendingMail) {
-        winston.error("Error sending mail through ses: ", { exception: errorSendingMail, from: from, troupe: troupe });
+      var lookup = conversationAndEmailIdsByTroupe[troupe.id];
 
-        return errorResponse(next, errorSendingMail);
+      if (errorSendingMail) {
+        winston.error("Error sending mail through ses, will delete email (conversation if new) and hard deny: ", { exception: errorSendingMail, from: from, troupe: troupe });
+
+        // delete the mail
+        conversationService.deleteEmailInConversation(lookup.emailId, function() {});
+
+        // send a bounce mail (let the sending smtp server send and ugly bounce?)
+        return hardErrorResponse(next, errorSendingMail);
       }
 
       statsService.event('remailed_email', { recipients: messageIds.length });
 
       winston.debug("All messages have been queued on SES and ids have been returned: ", { messageIds: messageIds });
-
-      var lookup = conversationAndEmailIdsByTroupe[troupe.id];
 
       conversationService.updateEmailWithMessageIds(lookup.conversationId, lookup.emailId, messageIds, function(errorUpdatingMessageIds) {
         if(errorUpdatingMessageIds)
