@@ -16,7 +16,7 @@ describe("User Service", function() {
           // displayName: user.displayName,
           // password: "newPass",
           // oldPassword: "oldPass",
-          email: "testuser@troupetest.local"
+          email: "hopefully-unregistered-user@troupetest.local"
         };
 
         userService.updateProfile(params, function(e, user) {
