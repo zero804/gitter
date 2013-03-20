@@ -1,14 +1,14 @@
 var userService = require('../../../server/services/user-service');
-var assert = require("better-assert");
+var assert = require("../../../server/utils/awesome-assert");
 
 describe("User Service", function() {
   describe("userService#updateProfile", function() {
     it("should update the name, email, password and status of a user", function(done) {
 
       userService.findByEmail("testuser@troupetester.local", function(e, user) {
-        assert.equal(e, null);
-        assert.notEqual(user, null);
-        assert.notEqual(typeof user, 'undefined');
+        assert.strictEqual(e, null);
+        assert.notStrictEqual(user, null);
+        assert.notStrictEqual(typeof user, 'undefined');
 
         var oldUserStatus = user.status;
         var params = {
@@ -20,13 +20,13 @@ describe("User Service", function() {
         };
 
         userService.updateProfile(params, function(e, user) {
-          assert.equal(e, null);
-          assert.notEqual(typeof user, null);
+          assert.strictEqual(e, null);
+          assert.notStrictEqual(user, null);
 
-          // assert.equal(user.displayName, params.displayName);
-          assert.equal(user.newEmail, params.email);
-          assert.notEqual(user.confirmationCode, null);
-          assert.equal(user.status, oldUserStatus);
+          // assert.strictEqual(user.displayName, params.displayName);
+          assert.strictEqual(user.newEmail, params.email);
+          assert.notStrictEqual(user.confirmationCode, null);
+          assert.strictEqual(user.status, oldUserStatus);
 
           done();
         });

@@ -58,10 +58,11 @@
     "faye-redis": "0.1.1",
     "geckoboard-push": "0.0.5",
     "jade": "0.28.1",
-    "mongoose-number": "0.0.2"
+    "mongoose-number": "0.0.2",
+    "callsite": "~1.0.0"
   },
   "devDependencies": {
-    "better-assert": "git://github.com/timlind/better-assert.git#9cb0aecf8f2cf212858172ade9e8221269822bfa",
+    "better-assert": "1.0.0",
     "mocha": "1.8.2",
     "grunt-contrib-manifest": "0.2.0",
     "grunt-handlebars-requirejs": "0.0.3",
