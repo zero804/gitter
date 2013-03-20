@@ -227,7 +227,7 @@ module.exports = {
       winston.info('presence: Validating ' + sockets.length + ' active sockets');
 
       sockets.forEach(function(socketId) {
-        var d = Q.deferred();
+        var d = Q.defer();
         var promises = [];
         promises.push(d.promise);
 
