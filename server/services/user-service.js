@@ -268,7 +268,9 @@ var userService = {
 
           user.status = 'ACTIVE';
           // set password and save
-          generateNewHash(save);
+          generateNewHash(function() {
+            user.save(callback);
+          });
           break;
 
         case 'ACTIVE':
@@ -294,16 +296,14 @@ var userService = {
       // set new properties
       user.displayName = displayName;
 
-      function save() {
-        user.save(callback);
-      }
-
       // generates and sets the new password hash
-      function generateNewHash() {
+      function generateNewHash(callback) {
         sechash.strongHash('sha512', password, function(err, hash3) {
           if(err) return callback(err);
 
           user.passwordHash = hash3;
+
+          callback();
         });
       }
 
@@ -325,12 +325,12 @@ var userService = {
                 // send change email confirmation to new address
                 emailNotificationService.sendConfirmationForEmailChange(user);
               }
-              callback(e);
+              callback(e, user);
             });
           });
         }
         else {
-          save();
+          user.save(callback);
         }
       }
 

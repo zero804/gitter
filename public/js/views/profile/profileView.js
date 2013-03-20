@@ -146,7 +146,7 @@ define([
       var newEmail = form.find('[name=newEmail]').val();
       var that = this;
 
-      if (newEmail !== window.troupeContext.user.email) {
+      if (newEmail && newEmail !== window.troupeContext.user.email) {
         // ask the user if they are sure they want to change their email address
         // if successful show a modal that says they will receive a confirmation email.
         if (!window.confirm("Are you sure you want to change your email?"))
@@ -172,7 +172,7 @@ define([
             else {
               that.dialog.hide();
             }
-            if (newEmail !== window.troupeContext.user.email) {
+            if (newEmail && newEmail !== window.troupeContext.user.email) {
               window.alert("Your address will be updated once you confirm the email sent to your new address.");
             }
 
