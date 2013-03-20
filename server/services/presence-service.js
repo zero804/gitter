@@ -55,7 +55,7 @@ function removeUserFromTroupe(socketId, userId) {
       var troupeId = replies[0];
 
       if(!troupeId) {
-        winston.info("Socket did not appear to be associated with a troupe: " + socketId);
+        // This is the case for TroupeNotifier and iOS app
         return;
       }
 
