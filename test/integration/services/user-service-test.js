@@ -5,10 +5,10 @@ describe("User Service", function() {
   describe("userService#updateProfile", function() {
     it("should update the name, email, password and status of a user", function(done) {
 
-      userService.findByEmail("testuser@troupetest.local", function(e, user) {
-        assert(e === null);
-        assert(user !== null);
-        assert(typeof user !== 'undefined');
+      userService.findByEmail("testuser@troupetester.local", function(e, user) {
+        assert.equal(e, null);
+        assert.notEqual(user, null);
+        assert.notEqual(typeof user, 'undefined');
 
         var oldUserStatus = user.status;
         var params = {
@@ -20,12 +20,13 @@ describe("User Service", function() {
         };
 
         userService.updateProfile(params, function(e, user) {
-          assert(e === null);
+          assert.equal(e, null);
+          assert.notEqual(typeof user, null);
 
-          // assert(user.displayName === params.displayName);
-          assert(user.newEmail === params.email);
-          assert(user.confirmationCode !== null);
-          assert(user.status === oldUserStatus);
+          // assert.equal(user.displayName, params.displayName);
+          assert.equal(user.newEmail, params.email);
+          assert.notEqual(user.confirmationCode, null);
+          assert.equal(user.status, oldUserStatus);
 
           done();
         });
