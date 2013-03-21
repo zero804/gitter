@@ -75,7 +75,8 @@
     "proxyquire": "0.4.0",
     "sinon": "1.5.2",
     "jsonlint": "1.5.1",
-    "grunt-jquerybuilder": "0.1.4"
+    "grunt-jquerybuilder": "0.1.4",
+    "callsite" : "1.0.0."
   },
   "scripts": {
     "test": "make test"
