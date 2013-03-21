@@ -3,8 +3,8 @@ set -e
 shopt -s extglob
 
 echo build.sh executing as user `whoami`
-npm prune
-npm install || npm install --force
+npm prune --dev
+npm install --dev || npm install --force --dev
 
 ./node_modules/.bin/grunt -no-color process
 
