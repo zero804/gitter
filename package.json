@@ -58,8 +58,7 @@
     "faye-redis": "0.1.1",
     "geckoboard-push": "0.0.5",
     "jade": "0.28.1",
-    "mongoose-number": "0.0.2",
-    "callsite": "~1.0.0"
+    "mongoose-number": "0.0.2"
   },
   "devDependencies": {
     "better-assert": "1.0.0",
@@ -76,7 +75,7 @@
     "proxyquire": "0.4.0",
     "sinon": "1.5.2",
     "jsonlint": "1.5.1",
-    "grunt-jquerybuilder": "0.1.3"
+    "grunt-jquerybuilder": "0.1.4"
   },
   "scripts": {
     "test": "make test"
