@@ -103,6 +103,7 @@ exports.storeEmailInConversation = function(options, callback) {
   });
 };
 
+// deprecated by putting the remailer before the persister
 exports.deleteEmailInConversation = function(emailId, callback) {
 
     function findConversationByEmail(emailId, callback) {
@@ -138,6 +139,7 @@ exports.deleteEmailInConversation = function(emailId, callback) {
 
 };
 
+// deprecated by putting the remailer before the persister
 exports.updateEmailWithMessageIds = function(conversationId, emailId, messageIds, callback) {
 
   persistence.Conversation.findById(conversationId, function(err, conversation) {

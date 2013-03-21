@@ -22,7 +22,7 @@ require('./../../server/utils/event-listeners').installLocalEventListeners();
 
 function continueResponse(next) {
   //return next (DENY, "Debug mode bounce.");
-  return next(OK);
+  return next(CONT);
 }
 
 function errorResponse(next, err) {
@@ -38,7 +38,7 @@ function hardErrorResponse(next, err) {
 function distributeForTroupe(from, to, next, connection) {
   var transaction = connection.transaction;
 
-  var conversationAndEmailIdsByTroupe = connection.transaction.notes.conversationAndEmailIdsByTroupe;
+  var messageIdsByTroupe = connection.transaction.notes.messageIdsByTroupe;
 
 
   // looks up the troupe for the mail's TO address
@@ -86,15 +86,11 @@ function distributeForTroupe(from, to, next, connection) {
       return next(OK);
 
     troupeSESTransport.sendMailStream(sesFrom, sesRecipients, sesStream, function(errorSendingMail, messageIds){
-      var lookup = conversationAndEmailIdsByTroupe[troupe.id];
 
       if (errorSendingMail) {
-        winston.error("Error sending mail through ses, will delete email (conversation if new) and hard deny: ", { exception: errorSendingMail, from: from, troupe: troupe });
+        winston.error("Error sending mail through ses, will hard deny: ", { exception: errorSendingMail, from: from, troupe: troupe });
 
-        // delete the mail
-        conversationService.deleteEmailInConversation(lookup.emailId, function() {});
-
-        // send a bounce mail (let the sending smtp server send and ugly bounce?)
+        // send a bounce mail (let the sending smtp server send an ugly bounce?)
         return hardErrorResponse(next, errorSendingMail);
       }
 
@@ -102,14 +98,10 @@ function distributeForTroupe(from, to, next, connection) {
 
       winston.debug("All messages have been queued on SES and ids have been returned: ", { messageIds: messageIds });
 
-      conversationService.updateEmailWithMessageIds(lookup.conversationId, lookup.emailId, messageIds, function(errorUpdatingMessageIds) {
-        if(errorUpdatingMessageIds)
-          return errorResponse(next, errorUpdatingMessageIds);
+      // save the messageIds so that the persister can save them when the email doc is created
+      messageIdsByTroupe[troupe.id] = messageIds;
 
-        // winston.debug("Message ids saved in db successfully.");
-        return continueResponse(next);
-      });
-
+      return continueResponse(next);
     });
 
   });
@@ -121,6 +113,11 @@ function parseAddress(address) {
 
 exports.hook_queue = function(next, connection) {
   winston.debug("Starting remailer (hook_queue)");
+
+  // this has will store the messageIds that need to be saved
+  // by the persister when it creates the email object for this transaction.
+  // the hash is indexed by troupe in the case that multiple troupes are sent the same mail.
+  connection.transaction.notes.messageIdsByTroupe = {};
 
   // we will wait for all mails to be delivered before calling back
   var deliveries = new Fiber();
@@ -136,7 +133,7 @@ exports.hook_queue = function(next, connection) {
   deliveries.sync()
    .then(function() {
       // now that all the mails have been delivered, finish the queue plugin
-      return next(OK);
+      return next(CONT);
     })
    .fail(function(harakaErrorCode, errorMessage) {
       // if any of the mails failed to deliver, return their error directly to haraka
