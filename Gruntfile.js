@@ -258,16 +258,15 @@ module.exports = function( grunt ) {
     }
   });
 
-  grunt.loadNpmTasks('grunt-contrib-manifest');
   grunt.loadNpmTasks('grunt-requirejs');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-exec');
-  grunt.loadNpmTasks('grunt-clean');
+  grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-reload');
 
-  grunt.registerTask('process', 'exec:validateConfig clean less copy requirejs exec:manifest exec:gzip');
-  grunt.registerTask('process-no-min', 'exec:validateConfig clean less copy requirejs exec:manifest exec:gzip');
+  grunt.registerTask('process', ['exec:validateConfig','clean','less','copy','requirejs','exec:manifest','exec:gzip']);
+  grunt.registerTask('process-no-min', ['exec:validateConfig','clean','less','copy','requirejs','exec:manifest','exec:gzip']);
 
   grunt.registerTask('watchr', 'reload watch');
 

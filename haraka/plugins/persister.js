@@ -66,9 +66,6 @@ exports.hook_data = function (next, connection) {
 
 exports.hook_queue = function(next, connection) {
 
-  // This hash is used to associate the conversation/email with a given troupe
-  connection.transaction.notes.conversationAndEmailIdsByTroupe = {};
-
   // parse the mail so we can extract details for saving
   var mail;
   var mailparser = new MailParser({});
@@ -101,8 +98,8 @@ exports.hook_queue = function(next, connection) {
     fiber.sync()
       .then(function() {
         winston.debug("All saves have been synced, continue to next plugin.");
-        // now that all the mails have been saved, return to the next plugin
-        return next();
+        // now that all the mails have been saved, finish transaction processing.
+        return next(OK);
       }).fail(function(err) {
         // if any of the mails failed to save, return their error directly to haraka
         winston.error("One of the saves failed: ", { exception: err });
@@ -217,6 +214,9 @@ function saveMailForTroupe(mail, toAddress, connection, callback) {
           // strip out the name of the troupe if it appears in the subject, we don't want it duplicated
         var newSubject = mail.subject.replace("[" + troupe.name + "] ", "");
 
+        // get the message ids that the remailer save in the transaction notes object
+        var messageIds = notes.messageIdsByTroupe[troupe.id];
+
         conversationService.storeEmailInConversation({
           fromUserId: user.id,
           troupeId: troupe.id,
@@ -226,24 +226,15 @@ function saveMailForTroupe(mail, toAddress, connection, callback) {
           fromName: mail.from,
           preview: preview,
           mailBody: storedMailBody,
-          attachments: savedAttachmentsForPersist
-        }, function(err, conversation, savedMail) {
+          attachments: savedAttachmentsForPersist,
+          messageIds: messageIds
+        }, function(err/*, conversation, savedMail*/) {
           if(err) return callback("Failed to store the email");
 
           connection.logdebug("Stored the email.");
-          connection.transaction.notes.emailId = savedMail.id;
-          connection.transaction.notes.conversationId = conversation.id;
 
-          // Save these values so that the remailer plugin can update the
-          // messageId after the message has been remailer
-          var lookup = {
-            emailId: savedMail.id,
-            conversationId: conversation.id
-          };
-
-          notes.conversationAndEmailIdsByTroupe[troupe.id] = lookup;
           return callback();
-            });
+          });
 
         }).fail(function(err) {
           winston.error("Unable to save attachment: ", { exception: err });
