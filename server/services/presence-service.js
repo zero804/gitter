@@ -21,7 +21,10 @@ function removeSocketFromUserSockets(socketId, userId, callback) {
 
     // If result != 1, it means that this operation has already occurred somewhere else in the system
     // pr:user acts as an exclusivity-lock
-    if(sremResult != 1) return callback(null, false);
+    if(sremResult != 1) {
+      winston.debug('Socket not in list of sockets associated with user', { key: key, userId: userId, socketId: socketId });
+      return callback(null, false);
+    }
 
     redisClient.multi()
       .scard(key)                                    // 0 Count the items in the user_sockets
