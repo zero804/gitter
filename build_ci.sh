@@ -3,10 +3,10 @@ set -e
 shopt -s extglob
 
 echo build.sh executing as user `whoami`
-npm prune --dev
-npm install --dev || npm install --force --dev
+npm prune
+npm install
 
-./node_modules/.bin/grunt -no-color process
+grunt -no-color process
 
 echo $GIT_COMMIT > GIT_COMMIT
 echo $GIT_BRANCH > VERSION
