@@ -99,7 +99,7 @@ define([
       var itemType = $e.data('itemType');
       var itemId = $e.data('itemId');
 
-      //console.log("found an unread item: itemType ", itemType, "itemId", itemId);
+      // console.log("found an unread item: itemType ", itemType, "itemId", itemId);
 
       if(itemType && itemId) {
         var top = $e.offset().top;
@@ -109,7 +109,6 @@ define([
             $e.removeClass('unread');
             $e.addClass('read');
           }, 2000);
-
           markItemRead(itemType, itemId);
         }
       }
@@ -124,6 +123,9 @@ define([
   }
 
   $(window).on('scroll', windowScroll);
+
+  // this is not a live collection so this will not work inside an SPA
+  $('.mobile-scroll-class').on('scroll', windowScroll);
 
   // TODO: don't reference this frame directly!
   $('#toolbar-frame').on('scroll', windowScroll);
