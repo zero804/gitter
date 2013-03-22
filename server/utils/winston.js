@@ -47,7 +47,7 @@ function reopenTransportOnHupSignal(fileTransport) {
 function configureTransports() {
   winston.remove(winston.transports.Console);
 
-  if(nconf.get('logging:logToFile')) {
+  if(nconf.get('logging:logToFile') && nconf.get('LOG_FILE')) {
     winston.add(winston.transports.File, {
       filename: nconf.get('LOG_FILE'),
       level: nconf.get("logging:level"),
@@ -59,12 +59,17 @@ function configureTransports() {
     reopenTransportOnHupSignal(fileTransport);
 
   } else {
+    if(nconf.get('logging:logToFile') && !nconf.get('LOG_FILE')) {
+      console.log('Logging to file is configured by LOG_FILE environment variable has not been set. Logging to console');
+    }
+
     winston.add(winston.transports.Console, {
       colorize: nconf.get("logging:colorize"),
       timestamp: nconf.get("logging:timestamp"),
       level: nconf.get("logging:level"),
       prettyPrint: nconf.get("logging:prettyPrint")
     });
+
   }
 
   if(nconf.get("logging:loggly")) {

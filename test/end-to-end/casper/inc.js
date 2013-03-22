@@ -13,3 +13,12 @@ casper.on('http.status.500', function(resource) {
   casper.test.fail('500 on ' + resource.url);
 });
 
+/*
+casper.test.on("fail", function(failure) {
+  casper.echo('Fail!' + failure);
+});
+
+casper.options.onWaitTimeout = function() {
+  casper.echo('Wait timeout!', this);
+};
+*/

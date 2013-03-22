@@ -103,6 +103,43 @@ exports.storeEmailInConversation = function(options, callback) {
   });
 };
 
+// deprecated by putting the remailer before the persister
+exports.deleteEmailInConversation = function(emailId, callback) {
+
+    function findConversationByEmail(emailId, callback) {
+      persistence.Conversation
+        .where('emails._id', emailId)
+        .limit(1)
+        .sort({ updated: 'desc' })
+        .exec(function(err, results) {
+          if(err) return callback(err);
+
+          if(!results || results.length === 0) {
+            winston.info("Can't find conversation with that email id", { emailId: emailId });
+            return callback(null, null);
+          }
+          return callback(null, results[0]);
+        });
+    }
+
+    findConversationByEmail(emailId, function(e, conversation) {
+      if (e || !conversation) return callback(e);
+
+      if (conversation.emails.length === 1) {
+        // also delete the conversation.
+        conversation.remove();
+      }
+
+      persistence.Email.remove({ id: emailId }, function(e) {
+        if (e) winston.error("Couldn't delete email in conversation");
+
+        callback(e);
+      });
+    });
+
+};
+
+// deprecated by putting the remailer before the persister
 exports.updateEmailWithMessageIds = function(conversationId, emailId, messageIds, callback) {
 
   persistence.Conversation.findById(conversationId, function(err, conversation) {

@@ -472,7 +472,11 @@ exports.startWorkers = function() {
           var notification = notificationsWithMessage.notification;
           var message = notificationsWithMessage.message;
 
-          pushNotificationGateway.sendUserNotification(notification.userId, message.text);
+          pushNotificationGateway.sendUserNotification(notification.userId, {
+            message: message.text,
+            sound: 'chat',
+            payload: 'payload'
+          });
         });
 
         return callback();

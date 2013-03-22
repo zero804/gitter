@@ -45,7 +45,9 @@ define([
     },
 
     goBack : function () {
-      history.back();
+      if (window.troupeContext.homeUrl) {
+        window.location.href= window.troupeContext.homeUrl;
+      }
     },
 
     validateForm : function () {

@@ -21,7 +21,10 @@ function removeSocketFromUserSockets(socketId, userId, callback) {
 
     // If result != 1, it means that this operation has already occurred somewhere else in the system
     // pr:user acts as an exclusivity-lock
-    if(sremResult != 1) return callback(null, false);
+    if(sremResult != 1) {
+      winston.debug('Socket not in list of sockets associated with user', { key: key, userId: userId, socketId: socketId });
+      return callback(null, false);
+    }
 
     redisClient.multi()
       .scard(key)                                    // 0 Count the items in the user_sockets
@@ -55,7 +58,7 @@ function removeUserFromTroupe(socketId, userId) {
       var troupeId = replies[0];
 
       if(!troupeId) {
-        winston.info("Socket did not appear to be associated with a troupe: " + socketId);
+        // This is the case for TroupeNotifier and iOS app
         return;
       }
 
@@ -189,7 +192,9 @@ module.exports = {
   },
 
   // Called when a socket is disconnected
-  socketDisconnected: function(socketId) {
+  socketDisconnected: function(socketId, callback) {
+    if(!callback) callback = function() {};
+
     winston.info("presence: Socket disconnected: " + socketId);
 
     // Disassociates the socket with user, the user with the socket, deletes the socket
@@ -199,7 +204,7 @@ module.exports = {
       .del("pr:socket:" + socketId)           // 1 Remove the socket user association
       .srem("pr:activesockets", socketId)     // 2 remove the socket from active sockets
       .exec(function(err, replies) {
-        if(err) { winston.error("presence: Error disconnecting socket", { exception:  err }); return; }
+        if(err) { winston.error("presence: Error disconnecting socket", { exception:  err }); return callback(err); }
 
         var userId = replies[0];
 
@@ -211,6 +216,7 @@ module.exports = {
         userSocketDisconnected(userId, socketId);
         removeUserFromTroupe(socketId, userId);
 
+        callback();
       });
   },
 
@@ -227,7 +233,7 @@ module.exports = {
       winston.info('presence: Validating ' + sockets.length + ' active sockets');
 
       sockets.forEach(function(socketId) {
-        var d = Q.deferred();
+        var d = Q.defer();
         var promises = [];
         promises.push(d.promise);
 
@@ -236,6 +242,7 @@ module.exports = {
             winston.debug('Disconnecting invalid socket ' + socketId);
             module.exports.socketDisconnected(socketId, d.makeNodeResolver());
           } else {
+            winston.debug('Socket still appears to be valid:' + socketId);
             d.resolve();
           }
 

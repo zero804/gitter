@@ -325,12 +325,12 @@ var userService = {
                 // send change email confirmation to new address
                 emailNotificationService.sendConfirmationForEmailChange(user);
               }
-              callback(e);
+              callback(e, user);
             });
           });
         }
         else {
-          save();
+          user.save(callback);
         }
       }
 
