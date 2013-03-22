@@ -36,14 +36,15 @@ exports.startWorkers = function() {
 
       devices.forEach(function(device) {
         var sent = false;
+
         if(device.deviceType === 'APPLE' && device.appleToken) {
           winston.info("Sending apple push notification", { notification: notification });
           var note = new apns.Notification();
-          note.badge = 0;
-          note.sound = sound;
-          note.alert = message;
+          note.badge = 1;
+          //note.sound = sound;
+          note.setAlertText(message);
+          //note.alert = message;
           note.device = new apns.Device(device.appleToken);
-          note.payload = payload;
 
           apnsConnection.sendNotification(note);
           sent = true;
@@ -82,22 +83,24 @@ exports.startWorkers = function() {
       key: nconf.get('apn:key'),
       gateway: nconf.get('apn:gateway'),
       enhanced: true,
-      errorCallback: errorEventOccurred
+      errorCallback: errorEventOccurred,
+      connectionTimeout: 60000
   });
 
-  function failedDeliveryEventOccurred(timeSinceEpoch, deviceToken) {
+  function failedDeliveryEventOccurred(timeSinceEpoch/*, deviceToken*/) {
     winston.error("Failed delivery. Need to remove device", { time: timeSinceEpoch });
   }
 
-  var feedback = new apns.Feedback({
+  new apns.Feedback({
       cert: nconf.get('apn:cert'),
       key: nconf.get('apn:key'),
       gateway: nconf.get('apn:feedback'),
       feedback: failedDeliveryEventOccurred,
-      interval: nconf.get('feedbackInterval')
+      interval: nconf.get('apn:feedbackInterval')
   });
 
   jobs.process('push-notification', 20, function(job, done) {
+    console.dir(job.data);
     directSendUserNotification(job.data.userIds, job.data.notification, done);
   });
 };

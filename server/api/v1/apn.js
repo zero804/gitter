@@ -6,9 +6,12 @@ var pushNotificationService = require('../../services/push-notification-service'
 
 module.exports = {
   create: function(req, res, next) {
-    winston.info("APN device registration", { deviceId: req.body.deviceId, deviceName: req.body.deviceName });
+    var deviceId = req.body.deviceId;
+    var deviceName = req.body.deviceName;
+    var deviceToken = new Buffer(req.body.deviceToken, 'base64');
 
-    pushNotificationService.registerAppleDevice(req.body.deviceId, new Buffer(req.body.deviceToken, 'base64'), req.body.deviceName, function(err) {
+    winston.info("APN device registration", { deviceId: deviceId, deviceName: deviceName });
+    pushNotificationService.registerDevice(deviceId, 'APPLE', deviceToken, deviceName, function(err) {
       if(err) return next(err);
       res.send({ success: true });
     });
