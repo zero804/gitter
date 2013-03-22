@@ -41,8 +41,6 @@ describe('winston', function() {
 
           }, 1500);
 
-          done();
-
         }, 1500);
   });
 });
