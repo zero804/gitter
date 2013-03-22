@@ -99,21 +99,21 @@
   <div class="email-subject">Catching up</div>
   <div class="email-body">
     <p>Michael</p>
- 
+
     <p>Just a quick note to catch up on your SA visit</p>
-     
+
     <p>How are you progressing with finding accommodation in CT. I ask this as when chatting with Linda Boyce I mentioned that you were coming out late January. They are looking to sell their CT house after they have Christmas/New Year there. They will be back around mid January at the latest. I said that you were looking to pay the equivalent of about R 12-14 000 but that their house would command a rent of over R 20 000 and left it at that.</p>
-     
+
     <p>When we went to see Skyfall with them on saturday Linda asked how you were progressing with accommodation. I said that you were still looking and did not press the issue. I raise this since if their house is standing empty after they leave they may consider making it available to you, but I am not sure. I wanted to sound you out on this. One scenario says you pay the rent you intended and stay there which would give them someone in the house. On the other hand it is out in Camps Bay. I dont know what you are doing for transport. Will you have a car or will Andrew transport you. Let me have your thoughts on this but continue to look around for yourself.</p>
-     
+
     <p>Secondly the money I need to pay you. The Rand has strengthened and I can transfer it to you or would you like me to make a payment of the equivalent of GBP 310 to you while you are here? Let me know.</p>
-     
+
     <p>Finally on the visit, do you have the dates for your arrival and departure for your SA trip?</p>
-     
+
     <p>How are things going with Troupe. I saw your updated LinkedIn page. I also came across Andrews page but have forgotten his surname. He seems to have  impressive credentials. I looks as if you two make a good pairing for your venture.</p>
-     
+
     <p>Love</p>
-     
+
     <p>Dad</p>
   </div>
 </div>
@@ -135,7 +135,7 @@ function hidePanel(whichPanel) {
     $("#content-frame").animate({
       marginRight: '0px'
     }, 350, function() {
-      
+
     });
     rightpanel = false;
 }
@@ -153,7 +153,7 @@ function showPanel(whichPanel) {
 
       $("#content-frame").animate({
         marginRight: '280px'
-      }, 350, function() {  
+      }, 350, function() {
       });
 
       rightpanel = true;
@@ -175,7 +175,7 @@ function hideMenu() {
     $("#content-frame").animate({
       marginLeft: '0px'
     }, 350, function() {
-      
+
     });
     leftmenu = false;
 }
@@ -195,7 +195,7 @@ function showMenu() {
       });
       $("#content-frame").animate({
         marginLeft: '280px'
-      }, 350, function() {  
+      }, 350, function() {
       });
       $("left-menu-hotspot").hide();
       leftmenu = true;
@@ -243,6 +243,25 @@ function togglePanel(whichPanel) {
     showPanel(whichPanel);
   }
 }
+
+function playAudio(track) {
+  var audioElement = document.createElement('audio');
+  audioElement.setAttribute('src', track);
+  audioElement.play();
+}
+
+window.onfocus = function() {
+  playAudio("robot.mp3");
+}
+
+window.onblur = function() {
+  playAudio("yourmom.mp3");
+}
+$(".display-picture").click(function() {
+  playAudio("yourmom.mp3");
+  playAudio("robot.mp3");
+});
+
 
 $("#menu-toggle").click(function() {
   toggleMenu();
