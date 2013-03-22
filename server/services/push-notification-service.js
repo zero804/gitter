@@ -1,9 +1,6 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-// Equals on buffers
-require('buffertools');
-
 var PushNotificationDevice = require("./persistence-service").PushNotificationDevice;
 var winston = require("winston");
 var nconf = require('../utils/config');
@@ -15,6 +12,17 @@ var redis = require("../utils/redis"),
 
 var minimumUserAlertIntervalS = nconf.get("notifications:minimumUserAlertInterval");
 
+function buffersEqual(a,b) {
+  if (!Buffer.isBuffer(a)) return undefined;
+  if (!Buffer.isBuffer(b)) return undefined;
+  if (a.length !== b.length) return false;
+
+  for (var i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) return false;
+  }
+
+  return true;
+}
 exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName, callback) {
   var tokenHash = crypto.createHash('md5').update(deviceToken).digest('hex');
 
@@ -44,7 +52,7 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
 
           // If the hashes are the same, we still need to check that the actual tokens are the same
           if(device.deviceToken && deviceToken) {
-            if(!device.deviceToken.equals(deviceToken)) return;
+            if(!buffersEqual(device.deviceToken, deviceToken)) return;
           }
 
           winston.debug('Removing unused device ' + device.deviceId);
