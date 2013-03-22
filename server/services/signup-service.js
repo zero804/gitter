@@ -110,9 +110,34 @@ module.exports = {
     // if there is a newEmail then this confirmation is the change of the address
     if (user.newEmail) {
       confirmEmailChange();
+    } else {
+      confirmSignup();
     }
 
-    user.save(function(err) {
+    function confirmSignup() {
+      user.save(finish);
+    }
+
+    function confirmEmailChange() {
+      var origEmail = user.email;
+      var newEmail = user.newEmail;
+
+      // ensure that the email address being changed to is still available.
+      userService.findByEmail(newEmail, function(e, u) {
+        if (e || u) return callback("That email address is already registered");
+
+        user.oldEmail = user.email;
+        user.email = user.newEmail;
+        delete user.newEmail;
+
+        // send an email to confirm that the confirmation of the email address change...was confirmed.
+        emailNotificationService.sendNoticeOfEmailChange(user, origEmail, newEmail);
+
+        user.save(finish);
+      });
+    }
+
+    function finish(err) {
       if(err) return callback(err);
 
       winston.debug("User saved, finding troupe to redirect to", { id: user.id, status: user.status });
@@ -122,21 +147,8 @@ module.exports = {
 
         callback(err, user, troupes[0]);
       });
-    });
-
-    function confirmEmailChange() {
-      var origEmail = user.email;
-      var newEmail = user.newEmail;
-
-      // TODO: ensure that the email address being changed to is still available.
-
-      user.oldEmail = user.email;
-      user.email = user.newEmail;
-      delete user.newEmail;
-
-      // send an email to confirm that the confirmation of the email address change...was confirmed.
-      emailNotificationService.sendNoticeOfEmailChange(user, origEmail, newEmail);
     }
+
   },
 
   resendConfirmation: function(options, callback) {

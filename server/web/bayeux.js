@@ -192,13 +192,14 @@ var server = new faye.NodeAdapter({
     type: fayeRedis,
     host: nconf.get("redis:host"),
     port: nconf.get("redis:port"),
-    ping: 60,
+    ping: 30,
     namespace: 'fr:'
   }
 });
 
 var client = server.getClient();
 
+//faye.Logging.logLevel = 'info';
 
 module.exports = {
   server: server,

@@ -23,4 +23,30 @@ test-docs:
 		| cat docs/head.html - docs/tail.html \
 		> docs/test.html
 
+npm:
+	npm prune
+	npm install
+
+grunt:
+	grunt -no-color process
+
+version:
+	echo $GIT_COMMIT > GIT_COMMIT
+	echo $GIT_BRANCH > VERSION
+
+
+upgrade-data:
+	./scripts/upgrade-data.sh
+
+
+tarball:
+	if [ -d output ]; then rm -r output; fi
+	mkdir -p output
+	tar -cv !(@(node_modules|output|assets|mongo-backup-*))|gzip -9 - > output/troupe.tgz
+
+
+continuous-integration: npm grunt version upgrade-data test tarball
+
+build: npm grunt
+
 .PHONY: test-cov test docs test-docs clean
