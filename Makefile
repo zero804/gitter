@@ -42,7 +42,7 @@ upgrade-data:
 tarball:
 	if [ -d output ]; then rm -r output; fi
 	mkdir -p output
-	tar -cv !(@(node_modules|output|assets|mongo-backup-*))|gzip -9 - > output/troupe.tgz
+	find . -type f -not -name ".*"| grep -Ev '^\./(\.|node_modules/|output/|assets/|mongo-backup-|scripts/mongo-backup-).*'|tar -cv --files-from - |gzip -9 - > output/troupe.tgz
 
 
 continuous-integration: npm grunt version upgrade-data test tarball
