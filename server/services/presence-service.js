@@ -192,7 +192,9 @@ module.exports = {
   },
 
   // Called when a socket is disconnected
-  socketDisconnected: function(socketId) {
+  socketDisconnected: function(socketId, callback) {
+    if(!callback) callback = function() {};
+
     winston.info("presence: Socket disconnected: " + socketId);
 
     // Disassociates the socket with user, the user with the socket, deletes the socket
@@ -202,7 +204,7 @@ module.exports = {
       .del("pr:socket:" + socketId)           // 1 Remove the socket user association
       .srem("pr:activesockets", socketId)     // 2 remove the socket from active sockets
       .exec(function(err, replies) {
-        if(err) { winston.error("presence: Error disconnecting socket", { exception:  err }); return; }
+        if(err) { winston.error("presence: Error disconnecting socket", { exception:  err }); return callback(err); }
 
         var userId = replies[0];
 
@@ -214,6 +216,7 @@ module.exports = {
         userSocketDisconnected(userId, socketId);
         removeUserFromTroupe(socketId, userId);
 
+        callback();
       });
   },
 
@@ -239,6 +242,7 @@ module.exports = {
             winston.debug('Disconnecting invalid socket ' + socketId);
             module.exports.socketDisconnected(socketId, d.makeNodeResolver());
           } else {
+            winston.debug('Socket still appears to be valid:' + socketId);
             d.resolve();
           }
 

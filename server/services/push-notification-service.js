@@ -1,29 +1,66 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+// Equals on buffers
+require('buffertools');
+
 var PushNotificationDevice = require("./persistence-service").PushNotificationDevice;
 var winston = require("winston");
 var nconf = require('../utils/config');
+var Fiber = require('../utils/fiber');
+var crypto = require('crypto');
 var _ = require('underscore');
 var redis = require("../utils/redis"),
     redisClient = redis.createClient();
 
-
 var minimumUserAlertIntervalS = nconf.get("notifications:minimumUserAlertInterval");
 
+exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName, callback) {
+  var tokenHash = crypto.createHash('md5').update(deviceToken).digest('hex');
 
-exports.registerAppleDevice = function(deviceId, deviceToken, deviceName, callback) {
   PushNotificationDevice.findOneAndUpdate(
     { deviceId: deviceId },
-    { deviceId: deviceId, appleToken: deviceToken, deviceType: 'APPLE', deviceName: deviceName, timestamp: new Date() },
+    {
+      deviceId: deviceId,
+      appleToken: deviceToken,
+      tokenHash: tokenHash,
+      deviceType: deviceType,
+      deviceName: deviceName,
+      timestamp: new Date()
+    },
     { upsert: true },
-    callback);
+    function(err, device) {
+      // After we've update the device, look for other devices that have given us the same token
+      // these are probably phones that have been reset etc, so we need to prune them
+      PushNotificationDevice.find({
+        tokenHash: tokenHash,
+        deviceType: deviceType
+      }, function(err, results) {
+        var fiber = new Fiber();
+
+        results.forEach(function(device) {
+          // This device? Ski
+          if(device.deviceId == deviceId) return;
+
+          // If the hashes are the same, we still need to check that the actual tokens are the same
+          if(device.deviceToken && deviceToken) {
+            if(!device.deviceToken.equals(deviceToken)) return;
+          }
+
+          winston.debug('Removing unused device ' + device.deviceId);
+          device.remove(fiber.waitor());
+        });
+
+        fiber.all().then(function() { callback(null, device); }).fail(callback);
+      });
+
+    });
 };
 
-exports.registerAppleUser = function(deviceId, userId, callback) {
+exports.registerUser = function(deviceId, userId, callback) {
   PushNotificationDevice.findOneAndUpdate(
     { deviceId: deviceId },
-    { deviceId: deviceId, userId: userId, deviceType: 'APPLE', timestamp: new Date() },
+    { deviceId: deviceId, userId: userId, timestamp: new Date() },
     { upsert: true },
     callback);
 };

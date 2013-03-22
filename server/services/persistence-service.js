@@ -382,11 +382,14 @@ GeoPopulatedPlaceSchema.schemaTypeName = 'GeoPopulatedPlaceSchema';
   deviceId: String,
   deviceName: String,
   appleToken: Buffer,
-  deviceType: { type: String, "enum": ['APPLE', 'ANDROID']},
+  tokenHash: String,
+  deviceType: { type: String, "enum": ['APPLE', 'APPLE-DEV', 'ANDROID', 'TEST']},
   timestamp: Date
 });
 PushNotificationDeviceSchema.index({ deviceId: 1 });
 PushNotificationDeviceSchema.index({ userId: 1 });
+PushNotificationDeviceSchema.index({ tokenHash: 1 });
+
 PushNotificationDeviceSchema.schemaTypeName = 'PushNotificationDeviceSchema';
 
 

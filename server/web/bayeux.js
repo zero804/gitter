@@ -199,6 +199,7 @@ var server = new faye.NodeAdapter({
 
 var client = server.getClient();
 
+//faye.Logging.logLevel = 'info';
 
 module.exports = {
   server: server,
