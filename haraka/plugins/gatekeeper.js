@@ -130,7 +130,7 @@ function sendBounceMail(userIsRegistered, mail, deniedTroupes, nonExistantTroupe
     templateFile: "bounce-email",
     to: mail.from,
     from: 'bouncer' + '@' + EMAILDOMAIN,
-    subject: "Sorry. We can't let you send to one (or more) of those troupes",
+    subject: "Sorry. We couldn't deliver your message.",
     // TODO we probably want to put the actual name of the troupe in here
     data: {
       userIsRegistered: userIsRegistered,
