@@ -27,7 +27,8 @@ exports.startWorkers = function() {
   function directSendUserNotification(userIds, notification, callback) {
     var message = notification.message;
     var sound = notification.sound;
-    var payload = notification.payload;
+    var badge = notification.badge;
+    var link = notification.link;
 
     pushNotificationService.findDevicesForUsers(userIds, function(err, devices) {
       if(err) return callback(err);
@@ -40,9 +41,23 @@ exports.startWorkers = function() {
         if(device.deviceType === 'APPLE' && device.appleToken) {
           winston.info("Sending apple push notification", { notification: notification });
           var note = new apns.Notification();
-          note.badge = 1;
-          //note.sound = sound;
-          note.setAlertText(message);
+
+          if(badge >= 0) {
+            note.badge = badge;
+          }
+
+          if(message) {
+            note.setAlertText(message);
+          }
+
+          if(sound) {
+            note.sound = sound;
+          }
+
+          if(link) {
+            note.payload = { 'l': link };
+          }
+
           //note.alert = message;
           note.device = new apns.Device(device.appleToken);
 
