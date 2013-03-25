@@ -46,20 +46,18 @@ function removeSocketFromUserSockets(socketId, userId, callback) {
   });
 }
 
-function removeUserFromTroupe(socketId, userId) {
+function removeUserFromTroupe(socketId, userId, callback) {
   redisClient.multi()
     .get("pr:socket_troupe:" + socketId)    // 0 Find the troupe associated with the socket
     .del("pr:socket_troupe:" + socketId)    // 1 Delete the socket troupe association
     .exec(function(err, replies) {
-      if(err) {
-        winston.error('Error while removing user from troupe', { exception: err });
-        return;
-      }
+      if(err) return callback(err);
+
       var troupeId = replies[0];
 
       if(!troupeId) {
         // This is the case for TroupeNotifier and iOS app
-        return;
+        return callback();
       }
 
       var key = 'pr:tr_u:' + troupeId;
@@ -68,10 +66,7 @@ function removeUserFromTroupe(socketId, userId) {
         .zremrangebyscore(key, '-inf', '0')  // 1 remove everyone with a score of zero (no longer in the troupe)
         .zcard(key)                          // 2 count the number of users left in the set
         .exec(function(err, replies) {
-          if(err) {
-            winston.error('Error while removing user from troupe', { exception: err });
-            return;
-          }
+          if(err) return callback(err);
 
           var userHasLeftTroupe = parseInt(replies[0], 10) <= 0;
           var troupeIsEmpty = replies[2] === 0;
@@ -90,6 +85,10 @@ function removeUserFromTroupe(socketId, userId) {
             }
           }
 
+          winston.debug("presence: User removed from troupe ", { troupeId: troupeId, userId: userId } );
+
+          return callback();
+
         });
 
     });
@@ -97,30 +96,36 @@ function removeUserFromTroupe(socketId, userId) {
 
 }
 
-function listOnlineUsersForTroupe(troupeId, callback) {
-  redisClient.zrangebyscore("pr:tr_u:" + troupeId, 1, '+inf', callback);
-}
+function userSocketDisconnected(userId, socketId, options, callback) {
+  if(!callback) callback = function(err) {
+    if(err) {
+      winston.error('presence. Error in userSocketDisconnected:' + err, { exception: err });
+    }
+  };
 
-function userSocketDisconnected(userId, socketId, callback) {
+  if(!options) options = {};
+
   winston.debug("presence: userSocketDisconnected: ", { userId: userId, socketId: socketId });
 
-  // Give the user 10 seconds to re-login before marking them as offline
-  setTimeout(function() {
+  if(options.immediate) {
+    process.nextTick(userSocketDisconnectedInternal);
+  } else {
+    // Give the user 10 seconds to re-login before marking them as offline
+    setTimeout(userSocketDisconnectedInternal, 10000);
+  }
+
+  function userSocketDisconnectedInternal() {
     removeSocketFromUserSockets(socketId, userId, function(err, lastDisconnect) {
-      if(err) {
-        winston.info("presence: removeSocketFromUserSockets " + socketId + "," + userId + " failed: ", err);
-        if(callback) callback();
-        return;
-      }
+      if(err) return callback(err);
 
       if(lastDisconnect) {
         winston.info("presence: User " + userId + " is now offline");
       }
 
-      if(callback) callback();
+      return callback();
 
     });
-  }, 10000);
+  }
 
 }
 
@@ -141,8 +146,10 @@ module.exports = {
         .set("pr:socket:" + socketId, userId)           // 0 Associate user with socket
         .scard(userKey)                                 // 1 Count the number of sockets for this user
         .zincrby('pr:active_u', 1, userId)              // 2 Add user to active users
-        .sadd("pr:activesockets", socketId, callback)   // 3 Add socket to list of active sockets
+        .sadd("pr:activesockets", socketId)             // 3 Add socket to list of active sockets
         .exec(function(err, replies) {
+          if(err) return callback(err);
+
           var scardResult = replies[1];
           var zincrbyResult = parseInt(replies[2], 10);
           var sadd2Result = replies[3];
@@ -162,8 +169,7 @@ module.exports = {
                           ". Something strange is happening.", { userId: userId, socketId: socketId });
           }
 
-          callback(err);
-
+          return callback();
         });
     });
 
@@ -171,29 +177,37 @@ module.exports = {
 
   },
 
-  userSubscribedToTroupe: function(userId, troupeId, socketId) {
+  userSubscribedToTroupe: function(userId, troupeId, socketId, callback) {
     // Associate socket with troupe
     redisClient.setnx("pr:socket_troupe:" + socketId, troupeId, function(err, result) {
-      if(err) return;
-      if(!result) return;
+      if(err) return callback(err);
+      if(!result) return callback();
 
       // increment the score for user in troupe_users zset
       redisClient.zincrby('pr:tr_u:' + troupeId, 1, userId, function(err, reply) {
-          var userScore = parseInt(reply, 10);                   // Score for user
-          if(userScore == 1) {
-            /* User joining this troupe for the first time.... */
-            winston.info("presence: User " + userId + " has just joined " + troupeId);
-            appEvents.userLoggedIntoTroupe(userId, troupeId);
-          }
-        });
+        if(err) return callback(err);
+
+        var userScore = parseInt(reply, 10);                   // Score for user is returned as a string
+        if(userScore == 1) {
+          /* User joining this troupe for the first time.... */
+          winston.info("presence: User " + userId + " has just joined " + troupeId);
+          appEvents.userLoggedIntoTroupe(userId, troupeId);
+        }
+
+        return callback();
+      });
 
     });
 
   },
 
   // Called when a socket is disconnected
-  socketDisconnected: function(socketId, callback) {
-    if(!callback) callback = function() {};
+  socketDisconnected: function(socketId, options, callback) {
+    if(!callback) callback = function(err) {
+      if(err) {
+        winston.error('presence. Error in socketDisconnected:' + err, { exception: err });
+      }
+    };
 
     winston.info("presence: Socket disconnected: " + socketId);
 
@@ -204,24 +218,31 @@ module.exports = {
       .del("pr:socket:" + socketId)           // 1 Remove the socket user association
       .srem("pr:activesockets", socketId)     // 2 remove the socket from active sockets
       .exec(function(err, replies) {
-        if(err) { winston.error("presence: Error disconnecting socket", { exception:  err }); return callback(err); }
+        if(err) return callback(err);
 
         var userId = replies[0];
 
         if(!userId) {
           winston.info("presence: Socket did not appear to be associated with a user: " + socketId);
-          return;
+          return callback();
         }
 
-        userSocketDisconnected(userId, socketId);
-        removeUserFromTroupe(socketId, userId);
+        removeUserFromTroupe(socketId, userId, function(err) {
+          if(err) return callback(err);
 
-        callback();
+          userSocketDisconnected(userId, socketId, options, callback);
+        });
+
       });
   },
 
   validateActiveSockets: function(engine, callback) {
-    if(!callback) callback = function() {};
+    if(!callback) callback = function(err) {
+      if(err) {
+        winston.error('presence. Error in validateActiveSockets:' + err, { exception: err });
+      }
+    };
+
     winston.debug('presence: Commencing validation.');
 
     redisClient.smembers("pr:activesockets", function(err, sockets) {
@@ -231,24 +252,25 @@ module.exports = {
       }
 
       winston.info('presence: Validating ' + sockets.length + ' active sockets');
+      var promises = [];
 
       sockets.forEach(function(socketId) {
         var d = Q.defer();
-        var promises = [];
         promises.push(d.promise);
 
         engine.clientExists(socketId, function(exists) {
           if(!exists) {
             winston.debug('Disconnecting invalid socket ' + socketId);
-            module.exports.socketDisconnected(socketId, d.makeNodeResolver());
+            module.exports.socketDisconnected(socketId, { immediate: true }, d.makeNodeResolver());
           } else {
             winston.debug('Socket still appears to be valid:' + socketId);
             d.resolve();
           }
-
         });
 
       });
+
+      Q.all(promises).then(function() { callback(); }, callback);
     });
   },
 
@@ -257,7 +279,7 @@ module.exports = {
   },
 
   findOnlineUsersForTroupe: function(troupeId, callback) {
-    listOnlineUsersForTroupe(troupeId, callback);
+    redisClient.zrangebyscore("pr:tr_u:" + troupeId, 1, '+inf', callback);
   },
 
   // Given an array of usersIds, returns a hash with the status of each user. If the user is no in the hash

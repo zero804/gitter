@@ -45,10 +45,17 @@ function validateUserForSubTroupeSubscription(options, callback) {
     }
 
     if(result && notifyPresenceService) {
-      presenceService.userSubscribedToTroupe(userId, troupeId, clientId);
+      presenceService.userSubscribedToTroupe(userId, troupeId, clientId, function(err) {
+        if(err) return callback(err);
+
+        return callback(null, result);
+      });
+
+    } else {
+      // No need to tell the presence service
+      return callback(null, result);
     }
 
-    return callback(null, result);
   });
 }
 
@@ -218,7 +225,7 @@ module.exports = {
 
     server.bind('disconnect', function(clientId) {
       winston.info("Client " + clientId + " disconnected");
-      presenceService.socketDisconnected(clientId);
+      presenceService.socketDisconnected(clientId, { immediate: false });
     });
 
     shutdown.addHandler('bayeux', 15, function(callback) {
@@ -228,7 +235,14 @@ module.exports = {
     });
 
 
-    presenceService.validateActiveSockets(server._server._engine);
+    presenceService.validateActiveSockets(server._server._engine, function(err) {
+      if(err) {
+        winston.error('Error while validating active sockets:' + err, { exception: err });
+        return;
+      }
+
+      winston.info('Sockets validated');
+    });
     server.attach(httpServer);
   }
 };
