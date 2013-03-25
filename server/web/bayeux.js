@@ -235,7 +235,14 @@ module.exports = {
     });
 
 
-    presenceService.validateActiveSockets(server._server._engine);
+    presenceService.validateActiveSockets(server._server._engine, function(err) {
+      if(err) {
+        winston.error('Error while validating active sockets:' + err, { exception: err });
+        return;
+      }
+
+      winston.info('Sockets validated');
+    });
     server.attach(httpServer);
   }
 };
