@@ -6,10 +6,10 @@ define([
   return {
     getLogger: function() {
       return {
-        error: console.error,
-        warn: console.warn,
-        info: console.info,
-        debug: console.debug
+        error: function(message, args) { console.error(message, args); },
+        warn: function(message, args)  { console.warn(message, args); },
+        info: function(message, args)  { console.info(message, args); },
+        debug: function(message, args) { console.debug(message, args); }
       };
     }
   };
