@@ -3,12 +3,9 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'components/realtime',
-  'utils/logging'
-], function($, _, Backbone, realtime, logging) {
+  'components/realtime'
+], function($, _, Backbone, realtime) {
   "use strict";
-
-  var logger = logging.getLogger();
 
   var exports = {};
 
@@ -91,11 +88,11 @@ define([
       });
 
       this.subscription.callback(function() {
-        logger.info('Listening to ' + self.url);
+        console.info('Listening to ' + self.url);
       });
 
       this.subscription.errback(function(error) {
-        logger.info('Subscription error for ' + self.url, error);
+        console.info('Subscription error for ' + self.url, error);
       });
     },
 
@@ -117,7 +114,7 @@ define([
       if(existing) return existing;
 
       if(this.findModelForOptimisticMerge) {
-        logger.debug("Looking for a candidate for ", newModel);
+        console.debug("Looking for a candidate for ", newModel);
 
         existing = this.findModelForOptimisticMerge(newModel);
       }
@@ -126,7 +123,7 @@ define([
     },
 
     onDataChange: function(data) {
-      logger.debug("onDataChange", data);
+      console.debug("onDataChange", data);
 
       var operation = data.operation;
       var newModel = data.model;
@@ -147,7 +144,7 @@ define([
             // If at least one of the docs has a version number ...
             // And the new document is an older version than the new document...
             if((incomingVersion || existingVersion) && (incomingVersion <= existingVersion) && (operation != 'create')) {
-              logger.warn('Ignoring out-of-date update', existing.toJSON(), newModel);
+              console.warn('Ignoring out-of-date update', existing.toJSON(), newModel);
               break;
             }
 
@@ -167,7 +164,7 @@ define([
           break;
 
         default:
-          logger.warn("Unknown operation " + operation + ", ignoring");
+          console.warn("Unknown operation " + operation + ", ignoring");
 
       }
     }
