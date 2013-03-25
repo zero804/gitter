@@ -131,7 +131,6 @@ function userSocketDisconnected(userId, socketId, options, callback) {
 
 module.exports = {
   userSocketConnected: function(userId, socketId, callback) {
-    winston.info("presence: Socket connected: " + socketId + ". User=" + userId);
 
     var userKey = "pr:user:" + userId;
     // Associate socket with user
@@ -141,6 +140,8 @@ module.exports = {
       // If the socket was not added (as it's ready there) then this isn't the first time this
       // operation is being performed, so don't continue. We're using redis as an exclusivity lock
       if(saddResult != 1) return callback();
+
+      winston.info("presence: Socket connected: " + socketId + ". User=" + userId);
 
       redisClient.multi()
         .set("pr:socket:" + socketId, userId)           // 0 Associate user with socket
