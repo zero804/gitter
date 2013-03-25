@@ -1,5 +1,6 @@
 /*jshint unused:true, browser:true */
 define([
+  'clwrapper',
   'underscore',
   'jquery',
   'backbone',
