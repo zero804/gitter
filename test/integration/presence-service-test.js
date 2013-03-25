@@ -8,7 +8,7 @@ var assert = require("better-assert");
 var winston = require("../../server/utils/winston");
 
 var fakeEngine = {
-  clientExists: function() { return false; }
+  clientExists: function(clientId, callback) { callback(!clientId.match(/^TEST/)); }
 };
 
 describe('presenceService', function() {
