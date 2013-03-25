@@ -5,6 +5,7 @@ var uuid = require('node-uuid'),
     sechash = require('sechash'),
     winston = require('winston'),
     redis = require("../utils/redis"),
+    nconf = require('../utils/config'),
     userService = require('../services/user-service');
 var statsService = require("../services/stats-service");
 
@@ -18,6 +19,7 @@ function generateAuthToken(req, res, userId, options, callback) {
   var key = uuid.v4();
   var token = uuid.v4();
   res.cookie('auth', key + ":" + token, {
+    domain: nconf.get("web:cookieDomain"),
     maxAge: 1000 * 60 * 60 * 24 * timeToLiveDays,
     secure: false,
     httpOnly: true
