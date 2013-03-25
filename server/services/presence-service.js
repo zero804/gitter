@@ -2,7 +2,6 @@
 "use strict";
 
 var redis = require("../utils/redis"),
-    Fiber = require("../utils/fiber"),
     winston = require('winston'),
     appEvents = require('../app-events.js'),
     _ = require("underscore"),
@@ -253,10 +252,10 @@ module.exports = {
       }
 
       winston.info('presence: Validating ' + sockets.length + ' active sockets');
+      var promises = [];
 
       sockets.forEach(function(socketId) {
         var d = Q.defer();
-        var promises = [];
         promises.push(d.promise);
 
         engine.clientExists(socketId, function(exists) {
@@ -267,10 +266,11 @@ module.exports = {
             winston.debug('Socket still appears to be valid:' + socketId);
             d.resolve();
           }
-
         });
 
       });
+
+      Q.all(promises).then(function() { callback(); }, callback);
     });
   },
 
