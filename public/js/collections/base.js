@@ -10,6 +10,30 @@ define([
   var exports = {};
 
   exports.Model = Backbone.Model.extend({
+    constructor: function() {
+      Backbone.Model.prototype.constructor.apply(this, Array.prototype.slice.apply(arguments));
+
+      var t = this;
+      function setStatus(s) {
+        t.syncStatus = s;
+        t.trigger('syncStatusChange', s);
+      }
+
+      this.syncStatus = null;
+
+      this.on('sync', function() {
+        setStatus('synced');
+      });
+
+      this.on('request  ', function() {
+        setStatus('syncing');
+      });
+
+      this.on('error', function() {
+        setStatus('syncerror');
+      });
+    },
+
     convertArrayToCollection: function(attr, Collection) {
       var val = this.get(attr);
       if(_.isArray(val)) {
