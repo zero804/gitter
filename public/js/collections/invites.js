@@ -9,7 +9,7 @@ define([
 
   var exports = {};
 
-  exports.RequestModel = Backbone.Model.extend({
+  exports.RequestModel = TroupeCollections.Model.extend({
     idAttribute: "id",
 
     defaults: {

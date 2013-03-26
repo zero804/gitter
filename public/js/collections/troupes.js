@@ -6,7 +6,7 @@ define([
   "use strict";
 
   var exports = {};
-  exports.TroupeModel = Backbone.Model.extend({
+  exports.TroupeModel = TroupeCollections.Model.extend({
     idAttribute: "id"
   });
 
