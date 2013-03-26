@@ -62,6 +62,10 @@ require([
 
   });
 
+  $('.trpMobileAmuseIcon').click(function() {
+    document.location.reload(true);
+  });
+
   var troupeApp = new AppRouter();
 
   window.troupeApp = troupeApp;

@@ -104,6 +104,11 @@ define([
         $('#' + this.modelName + '-amuse').hide('fast', function() {
           $(this).remove();
         });
+
+        if (this.length===0) {
+          $('#' + this.modelName + '-empty').fadeIn('fast');
+        }
+
       }, this);
 
       this.once('error', function() {
