@@ -71,11 +71,21 @@ define([
     modelName: '',
     constructor: function(options) {
       Backbone.Collection.prototype.constructor.call(this, options);
-
       _.bindAll(this, 'onDataChange');
       if(!this.url) {
         this.url = "/troupes/" + window.troupeContext.troupe.id + "/" + this.nestedUrl;
       }
+
+      this.once('reset', function() {
+        $('#' + this.modelName + '-amuse').hide('fast', function() {
+          $(this).remove();
+        });
+      }, this);
+
+      this.once('error', function() {
+        $('#' + this.modelName + '-fail').show('fast', function() {
+        });
+      }, this);
 
     },
 
