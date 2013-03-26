@@ -18,7 +18,7 @@ require([
     avatar: AvatarWidget
   });
 
-    // Setup the ChatView
+
   var chatCollection = new chatModels.ChatCollection();
   chatCollection.listen();
   chatCollection.fetch();
@@ -33,6 +33,9 @@ require([
     collection: chatCollection
   }).render();
 
+$('.trpMobileAmuseIcon').click(function() {
+  document.location.reload(true);
+});
 
 // Prevent Header & Footer From Showing Browser Chrome
 

@@ -45,11 +45,12 @@ require([
 
   });
 
-  var troupeApp = new AppRouter();
 
-  // THESE TWO LINES WILL NOT REMAIN HERE FOREVER
-  //$('.dp-tooltip').tooltip();
-  //$('.chat-bubble').tooltip();
+  $('.trpMobileAmuseIcon').click(function() {
+    document.location.reload(true);
+  });
+
+  var troupeApp = new AppRouter();
 
   window.troupeApp = troupeApp;
   Backbone.history.start();
