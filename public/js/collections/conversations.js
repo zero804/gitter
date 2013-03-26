@@ -9,7 +9,7 @@ define([
   "use strict";
   var exports = {};
 
-  exports.EmailModel = Backbone.Model.extend({
+  exports.EmailModel = TroupeCollections.Model.extend({
     idAttribute: "id",
 
     defaults: {
@@ -35,7 +35,7 @@ define([
 
   });
 
-  exports.ConversationDetail = Backbone.Model.extend({
+  exports.ConversationDetail = TroupeCollections.Model.extend({
     idAttribute: "id",
 
     defaults: {
@@ -60,7 +60,7 @@ define([
 
   });
 
-  exports.ConversationModel = Backbone.Model.extend({
+  exports.ConversationModel = TroupeCollections.Model.extend({
     idAttribute: "id",
     parse: function(response) {
       response.updated = moment.utc(response.updated);
