@@ -119,7 +119,6 @@ define([
           that.$el.find('.login-failure').show('fast');
         },
         success: function(data) {
-          console.log("Login success");
           if(data.failed) {
             that.$el.find('.login-failure').show('fast');
             return;
