@@ -10,7 +10,7 @@ define([
 
   var exports = {};
 
-  exports.FileVersionModel = Backbone.Model.extend({
+  exports.FileVersionModel = TroupeCollections.Model.extend({
     parse: function(response) {
       response.createdDate = moment.utc(response.createdDate);
       return response;

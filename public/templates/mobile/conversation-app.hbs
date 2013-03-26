@@ -37,22 +37,32 @@
 </head>
 <body>
 
-    <div class="contentBody mobile-scroll" id="conversation-wrapper">
-      <div id="primary-view">
+  <div class="trpMobileAmuse fade-in" id="conversation-amuse">
+    <div class="trpMobileAmuseIcon">
+      <img src='{{cdn "images/2/troupe-ajax-guy-green.gif" }}'><br><br>Loading
+    </div>
+  </div>
 
-        <!-- the chat content below is an ugly ugly hack, will sort it out. Fluid rows have their downside. -->
-        <div class="frame-conversations">
+  <div class="trpMobileEmpty" id="conversation-empty">
+    <div class="trpMobileAmuseIcon">
+      There are no conversations here
+    </div>
+  </div>
 
 
-        </div>
+  <div class="contentBody mobile-scroll" id="conversation-wrapper">
+    <div id="primary-view">
 
-        <div id="loadmoreajaxloader" style="display:none">MOO</div>
-        </div> <!-- box -->
+      <!-- the chat content below is an ugly ugly hack, will sort it out. Fluid rows have their downside. -->
+      <div class="frame-conversations">
+
 
       </div>
+
+      <div id="loadmoreajaxloader" style="display:none">MOO</div>
+      </div> <!-- box -->
+
     </div>
-
-
-
+  </div>
 </body>
 </html>

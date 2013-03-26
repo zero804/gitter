@@ -10,6 +10,30 @@ define([
   var exports = {};
 
   exports.Model = Backbone.Model.extend({
+    constructor: function() {
+      Backbone.Model.prototype.constructor.apply(this, Array.prototype.slice.apply(arguments));
+
+      var t = this;
+      function setStatus(s) {
+        t.syncStatus = s;
+        t.trigger('syncStatusChange', s);
+      }
+
+      this.syncStatus = null;
+
+      this.on('sync', function() {
+        setStatus('synced');
+      });
+
+      this.on('request  ', function() {
+        setStatus('syncing');
+      });
+
+      this.on('error', function() {
+        setStatus('syncerror');
+      });
+    },
+
     convertArrayToCollection: function(attr, Collection) {
       var val = this.get(attr);
       if(_.isArray(val)) {
@@ -71,11 +95,26 @@ define([
     modelName: '',
     constructor: function(options) {
       Backbone.Collection.prototype.constructor.call(this, options);
-
       _.bindAll(this, 'onDataChange');
       if(!this.url) {
         this.url = "/troupes/" + window.troupeContext.troupe.id + "/" + this.nestedUrl;
       }
+
+      this.once('reset', function() {
+        $('#' + this.modelName + '-amuse').hide('fast', function() {
+          $(this).remove();
+        });
+
+        if (this.length===0) {
+          $('#' + this.modelName + '-empty').fadeIn('fast');
+        }
+
+      }, this);
+
+      this.once('error', function() {
+        $('#' + this.modelName + '-fail').show('fast', function() {
+        });
+      }, this);
 
     },
 

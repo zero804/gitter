@@ -51,6 +51,19 @@ define([
       if(options.template) this.template = options.template;
 
       var self = this;
+
+      if(this.model) {
+        this.listenTo(this.model, 'syncStatusChange', function(newState) {
+          var e = self.$el.find('.view').first();
+          if(newState != 'synced')  e.removeClass('synced');
+          if(newState != 'syncing')  e.removeClass('syncing');
+          if(newState != 'syncerror')  e.removeClass('syncerror');
+
+          if(newState) e.addClass(newState);
+
+        });
+      }
+
       this.addCleanup(function() {
         self.stopListening();
       });
@@ -131,6 +144,10 @@ define([
           dom.data('itemType', this.unreadItemType);
           $(document).trigger('unreadItemDisplayed');
         }
+      }
+
+      if(this.model && this.model.syncState) {
+        dom.addClass(this.model.syncState);
       }
 
       this.$el.html(dom);

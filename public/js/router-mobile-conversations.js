@@ -39,11 +39,11 @@ require([
 
   });
 
-  var troupeApp = new AppRouter();
+  $('.trpMobileAmuseIcon').click(function() {
+    document.location.reload(true);
+  });
 
-  // THESE TWO LINES WILL NOT REMAIN HERE FOREVER
-  //$('.dp-tooltip').tooltip();
-  //$('.chat-bubble').tooltip();
+  var troupeApp = new AppRouter();
 
   window.troupeApp = troupeApp;
   Backbone.history.start();
