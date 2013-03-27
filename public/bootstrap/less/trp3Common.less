@@ -32,10 +32,19 @@ a .trpDisplayPicture {
 }
 
 .view.synced {
+  opacity: 1.0;
+  -webkit-transform: translate3d(0,0,0);
+  transition: opacity 1s ease-in-out;
+  -moz-transition: opacity 1s ease-in-out;
+  -webkit-transition: opacity 1s ease-in-out;
 }
 
 .view.syncing {
   opacity: 0.4;
+  -webkit-transform: translate3d(0,0,0);
+  transition: opacity .25s ease-in-out;
+  -moz-transition: opacity .25s ease-in-out;
+  -webkit-transition: opacity .25s ease-in-out;
 }
 
 .view.syncerror .trpChatBox {
