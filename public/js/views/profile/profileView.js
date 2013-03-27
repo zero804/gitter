@@ -153,8 +153,6 @@ define([
           return;
       }
 
-      console.log("Posting form");
-
       $.ajax({
         url: "/profile",
         contentType: "application/x-www-form-urlencoded",
@@ -163,10 +161,8 @@ define([
         type: "POST",
         success: function(data) {
           if(data.success) {
-            console.log("Successfully posted form. CV: " + that.compactView);
             window.troupeContext.user.displayName = data.displayName;
             if (that.compactView) {
-              console.log("Redirect to ios app now");
               window.location.href = "/ios-app";
             }
             else {
@@ -178,7 +174,6 @@ define([
 
           } else {
             if(data.authFailure) {
-              console.log("Failed to post form");
               that.$el.find('#oldPassword').val("");
               window.alert("You old password is incorrect");
             }
