@@ -30,9 +30,11 @@ npm:
 grunt:
 	grunt -no-color process
 
-version:
-	echo $GIT_COMMIT > GIT_COMMIT
-	echo $GIT_BRANCH > VERSION
+version-files:
+	@echo GIT COMMIT: $(GIT_COMMIT)
+	@echo GIT BRANCH: $(GIT_BRANCH)
+	echo $(GIT_COMMIT) > GIT_COMMIT
+	echo $(GIT_BRANCH) > VERSION
 
 
 upgrade-data:
@@ -45,7 +47,7 @@ tarball:
 	find . -type f -not -name ".*"| grep -Ev '^\./(\.|node_modules/|output/|assets/|mongo-backup-|scripts/mongo-backup-).*'|tar -cv --files-from - |gzip -9 - > output/troupe.tgz
 
 
-continuous-integration: npm grunt version upgrade-data test tarball
+continuous-integration: npm grunt version-files upgrade-data test tarball
 
 build: npm grunt
 
