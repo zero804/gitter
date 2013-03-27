@@ -9,7 +9,6 @@ var winston = require('./utils/winston');
 
 var express = require('express'),
   http = require('http'),
-  unreadItemService = require('./services/unread-item-service'),
   nconf = require('./utils/config'),
   redis = require('./utils/redis'),
   shutdown = require('./utils/shutdown'),
