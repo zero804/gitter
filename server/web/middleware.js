@@ -3,6 +3,7 @@
 
 var passport = require("passport"),
     winston = require("winston"),
+    nconf = require('../utils/config'),
     rememberMe = require('../web/rememberme-middleware');
 
 var authCookieName = nconf.get('web:cookiePrefix') + 'auth';
