@@ -5,6 +5,8 @@ var passport = require("passport"),
     winston = require("winston"),
     rememberMe = require('../web/rememberme-middleware');
 
+var authCookieName = nconf.get('web:cookiePrefix') + 'auth';
+
 /* Ensures that the person is logging in. However, if they present a bearer token,
  * we'll try log them in first
  */
@@ -56,7 +58,7 @@ exports.ensureLoggedIn = function(options) {
 exports.logout = function() {
   return function(req, res, next) {
     req.logout();
-    res.clearCookie("auth");
+    res.clearCookie(authCookieName);
     next();
   };
 
