@@ -242,8 +242,7 @@ var userService = {
   },
 
   updateProfile: function(options, callback) {
-    winston.info("User profile update", options);
-
+    winston.info("User profile update", options.userId);
     var userId = options.userId;
     var password = options.password;
     var oldPassword = options.oldPassword;

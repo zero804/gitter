@@ -9,6 +9,7 @@ var uuid = require('node-uuid'),
     userService = require('../services/user-service');
 var statsService = require("../services/stats-service");
 
+var cookieName = nconf.get('web:cookiePrefix') + 'auth';
 
 var redisClient = redis.createClient();
 
@@ -18,7 +19,7 @@ function generateAuthToken(req, res, userId, options, callback) {
 
   var key = uuid.v4();
   var token = uuid.v4();
-  res.cookie('auth', key + ":" + token, {
+  res.cookie(cookieName, key + ":" + token, {
     domain: nconf.get("web:cookieDomain"),
     maxAge: 1000 * 60 * 60 * 24 * timeToLiveDays,
     secure: false,
@@ -43,7 +44,7 @@ module.exports = {
   rememberMeMiddleware: function(options) {
     return function(req, res, next) {
       function fail(err) {
-        res.clearCookie("auth");
+        res.clearCookie(cookieName);
         if(err) return next(err);
 
         return next();
@@ -52,16 +53,17 @@ module.exports = {
       /* If the user is logged in, no problem */
       if (req.user) return next();
 
+      var authCookieValue = req.cookies[cookieName];
+
       /* Auth cookie */
-      if(!req.cookies.auth) return next();
+      if(!authCookieValue) return next();
 
       winston.info('rememberme: Client has presented a rememberme auth cookie, attempting reauthentication');
 
-      var authToken = req.cookies.auth.split(":", 2);
+      var authToken = authCookieValue.split(":", 2);
 
       var key = authToken[0];
       var hash = authToken[1];
-
 
       redisClient.get("rememberme:" + key, function(err, storedValue) {
         if(err) return fail();
