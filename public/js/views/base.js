@@ -28,14 +28,18 @@ define([
 
 
   // Need to do some testing on Android tablets to get this more accurate
-  var compactView = navigator.userAgent.match(/(iPhone|iPod|Android|BlackBerry)/);
+  var userAgentFragment = navigator.userAgent.match(/(iPhone|iPod|Android|BlackBerry)/);
   var isIE9 = window.navigator.userAgent.indexOf("MSIE 9.0") !== -1;
-  var isTablet = navigator.userAgent.match(/(iPad)/);
+  var userAgentTabletFragment = navigator.userAgent.match(/(iPad)/);
 
   /* This value is used by the dialogFragment Handlebars helper */
-  window._troupeCompactView = compactView;
+  if (userAgentFragment) {
+    var compactView = true;
+    window._troupeCompactView = true;
+  }
+
   window._troupeIsIE9 = isIE9;
-  window._troupeIsTablet = isTablet;
+  if (userAgentTabletFragment) window._troupeIsTablet = true;
 
   var cachedWidgets = {};
   TroupeViews.preloadWidgets = function(widgets) {
