@@ -105,6 +105,13 @@ module.exports = {
         if(err) return done(err);
         if(!user) return done(null, false);
 
+        // if the user is unconfirmed, then confirm them
+        // if the user has been confirmed, but hasn't populated their profile, we want to go down the same path
+        if (user.status == 'UNCONFIRMED' || user.status == 'PROFILE_NOT_COMPLETED') {
+          statsService.event('confirmation_completed', { userId: user.id });
+          return done(null, user);
+        }
+
         // confirmation fails if the user is already confirmed, except when the user is busy confirming their new email address
         if(user.status !== 'UNCONFIRMED' && !user.newEmail) {
           statsService.event('confirmation_reused', { userId: user.id });
@@ -142,9 +149,6 @@ module.exports = {
           return;
         }
 
-        statsService.event('confirmation_completed', { userId: user.id });
-
-        return done(null, user);
       });
     })
   );
@@ -161,6 +165,22 @@ module.exports = {
           /* The invite has already been used. We need to fail authentication, but go to the troupe */
           winston.debug("Invite has already been used", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
           statsService.event('invite_reused', { uri: req.params.troupeUri });
+
+          // THIS BIT OF CODE ISNT WORKING MOANS ABOUT HEADERS ALREADY SET
+
+          // There's a chance a user has accepted an invite but hasn't completed their profile
+          // In which case we allow them through
+          // userService.findByEmail(invite.email, function(err, user) {
+          //   if(err) {
+          //     return done(err);
+          //   }
+          //   if(!user) {
+          //     return done(null, false);
+          //   }
+          //   if (user.status == 'PROFILE_NOT_COMPLETED') {
+          //     return done(null, user);
+          //   }
+          // });
 
           return self.redirect("/" + req.params.troupeUri);
         }
