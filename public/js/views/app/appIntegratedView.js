@@ -19,7 +19,7 @@ define([
     alertpanel: false,
     selectedListIcon: "icon-troupes",
     events: {
-      "click #menu-toggle":               "onMenuToggle",
+      "click #menu-toggle-button":               "onMenuToggle",
       "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
       "mouseenter #menu-toggle":          "onLeftMenuHotspot",
       "mouseenter #content-frame":        "onMouseEnterContentFrame",
@@ -255,8 +255,8 @@ define([
 
       if (!this.leftmenu) return;
 
-      // refocus chat input in case it's lost focus
-      $("#chat-input-textarea").focus();
+      // refocus chat input in case it's lost focus but don't do that on tablets
+      if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
 
 
       if ($(window).width() < 1250) {
@@ -408,6 +408,7 @@ define([
     },
 
     activateSearchList: function () {
+
       $("#list-search-input").focus();
     },
 
