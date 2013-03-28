@@ -147,7 +147,6 @@ require([
     currentView: null,
     show: function(view) {
       if(this.currentView) {
-        console.log("Closing view: " + this.currentView);
         this.currentView.fade = false;
         this.currentView.hideInternal();
       }
@@ -157,7 +156,6 @@ require([
     },
     close: function() {
       if(this.currentView) {
-        console.log("Closing view: " + this.currentView);
         this.currentView.navigationalHide();
         this.currentView = null;
       }
