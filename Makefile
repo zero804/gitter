@@ -11,10 +11,14 @@ test:
 		--ignore-leaks \
 		$(TESTS)
 
+prepare-for-end-to-end-testing:
+	curl https://raw.github.com/pypa/pip/master/contrib/get-pip.py > /tmp/get-pip.py
+	sudo python /tmp/get-pip.py
+	test/end-to-end/e2etests/install-libs.sh
+	unzip -o test/end-to-end/chromedriver/chromedriver_mac_26.0.1383.0.zip -d test/end-to-end/chromedriver/
+
 end-to-end-test:
-	@NODE_ENV=test casperjs test \
-		$(END_TO_END_TESTS)/casper \
-		--url=http://localhost:5000
+	nosetests --all-modules test/end-to-end/e2etests/
 
 docs: test-docs
 
