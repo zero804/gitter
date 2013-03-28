@@ -44,3 +44,5 @@ mongo-backup-*/
 GIT_COMMIT
 VERSION
 ghostdriver.log
+finished.png
+chromedriver

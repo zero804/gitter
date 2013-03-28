@@ -1,8 +1,13 @@
 from selenium import webdriver
+import os
+import time
 
 
 def baseUrl(url):
-    return "http://localhost:5000/" + url
+    base = os.getenv('BASE_URL')
+    if(base is None):
+        base = "http://localhost:5000/"
+    return base + url
 
 
 def driver():
@@ -17,6 +22,7 @@ def existingUserlogin(driver, usernameValue, passwordValue):
     driver.get(baseUrl("x"))
     existingButton = driver.find_element_by_css_selector("#button-existing-users-login")
     existingButton.click()
+    time.sleep(1)
 
     name = driver.find_element_by_css_selector('#email')
     name.send_keys(usernameValue)

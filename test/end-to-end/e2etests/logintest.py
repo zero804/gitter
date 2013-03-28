@@ -35,5 +35,6 @@ def testSignInAndNavigateBack():
     driver.find_element_by_css_selector('DIV.trpHeaderTitle')
 
 
-#def teardown_module():
-#    driver.quit()
+def teardown_module():
+    driver.get_screenshot_as_file('finished.png')
+    driver.quit()
