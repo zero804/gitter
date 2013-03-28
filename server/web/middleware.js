@@ -60,9 +60,7 @@ exports.logout = function() {
   return function(req, res, next) {
     req.logout();
     res.clearCookie(authCookieName);
-    req.session.destroy(function() {
-      next();
-    });
+    next();
   };
 
 };
