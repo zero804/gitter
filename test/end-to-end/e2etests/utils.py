@@ -25,8 +25,12 @@ def existingUserlogin(driver, usernameValue, passwordValue):
     print('Navigating to ' + baseUrl("x"))
     driver.get(baseUrl("x"))
 
+    time.sleep(0.5)
+
     existingButton = driver.find_element_by_css_selector("#button-existing-users-login")
     existingButton.click()
+
+    time.sleep(0.5)
 
     name = driver.find_element_by_css_selector('#email')
     name.send_keys(usernameValue)
