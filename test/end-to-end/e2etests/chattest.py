@@ -11,7 +11,7 @@ def setup_module():
     driver = utils.driver()
 
 
-def testSignInAndSignout():
+def testSendingAChatMessage():
     utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
     textArea = driver.find_element_by_id('chat-input-textarea')
 
