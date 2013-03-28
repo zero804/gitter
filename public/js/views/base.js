@@ -332,7 +332,6 @@ define([
       if(e) e.preventDefault();
       if(this.navigable) {
         var hash = window.location.hash;
-        console.log("HASH IS :  " + hash);
         var currentFragment;
         if(!hash) {
           currentFragment = '#!';
