@@ -12,17 +12,21 @@ def baseUrl(url):
 
 def driver():
     #driver = webdriver.Firefox()
-    driver = webdriver.PhantomJS()
+    #driver = webdriver.PhantomJS()
+    e2edir = os.path.dirname(os.path.abspath(__file__))
+
+    driver = webdriver.Chrome(e2edir + '/../chromedriver/chromedriver')
     driver.delete_all_cookies()
     driver.implicitly_wait(30)
     return driver
 
 
 def existingUserlogin(driver, usernameValue, passwordValue):
+    print('Navigating to ' + baseUrl("x"))
     driver.get(baseUrl("x"))
+
     existingButton = driver.find_element_by_css_selector("#button-existing-users-login")
     existingButton.click()
-    time.sleep(1)
 
     name = driver.find_element_by_css_selector('#email')
     name.send_keys(usernameValue)
@@ -32,3 +36,8 @@ def existingUserlogin(driver, usernameValue, passwordValue):
 
     driver.find_element_by_css_selector('#signin-button').click()
     driver.find_element_by_css_selector('DIV.trpHeaderTitle')
+
+
+def screenshot(driver):
+    e2edir = os.path.dirname(os.path.abspath(__file__))
+    driver.get_screenshot_as_file(e2edir + '/../../../output/screenshot-' + time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime()) + '.png')

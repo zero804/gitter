@@ -36,5 +36,5 @@ def testSignInAndNavigateBack():
 
 
 def teardown_module():
-    driver.get_screenshot_as_file('finished.png')
+    utils.screenshot(driver)
     driver.quit()
