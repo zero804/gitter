@@ -1,4 +1,4 @@
 #!/bin/sh
 
 sudo pip install selenium
-sudo pip install nosetest
+sudo pip install nose
