@@ -43,3 +43,4 @@ test/end-to-end/casper/*.png
 mongo-backup-*/
 GIT_COMMIT
 VERSION
+ghostdriver.log
