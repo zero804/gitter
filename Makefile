@@ -18,7 +18,7 @@ prepare-for-end-to-end-testing:
 	unzip -o test/end-to-end/chromedriver/chromedriver_mac_26.0.1383.0.zip -d test/end-to-end/chromedriver/
 
 end-to-end-test:
-	nosetests --all-modules test/end-to-end/e2etests/
+	nosetests -v --all-modules test/end-to-end/e2etests/
 
 docs: test-docs
 
