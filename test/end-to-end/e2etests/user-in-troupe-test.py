@@ -7,7 +7,6 @@ driver2 = None
 
 
 def findUserElement(elements, name):
-    print(elements)
     for i in range(0, len(elements)):
         title = elements[i].get_attribute('data-original-title')
 
