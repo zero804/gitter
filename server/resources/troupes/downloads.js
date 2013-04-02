@@ -35,6 +35,7 @@ module.exports = {
               if(err) return next(err);
 
               /* The AJAX file upload component we use requires an object shaped like this (below) */
+              res.setHeader("Content-Type","text/plain");
               res.send({ success: true, file: serialized });
             });
 

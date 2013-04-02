@@ -162,7 +162,6 @@ define([
     },
 
     onDataChange: function(data) {
-      console.debug("onDataChange", data);
 
       var operation = data.operation;
       var newModel = data.model;
