@@ -234,6 +234,14 @@ module.exports = {
       setTimeout(callback, 1000);
     });
 
+    presenceService.validateActiveUsers(server._server._engine, function(err) {
+      if(err) {
+        winston.error('Error while validating active users:' + err, { exception: err });
+        return;
+      }
+
+      winston.info('Users validated');
+    });
 
     presenceService.validateActiveSockets(server._server._engine, function(err) {
       if(err) {

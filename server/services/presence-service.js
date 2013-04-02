@@ -237,6 +237,49 @@ module.exports = {
       });
   },
 
+  validateActiveUsers: function(engine, callback) {
+    redisClient.zrange("pr:active_u", 0, -1, function(err, users) {
+      if(err) return callback(err);
+
+      if(!users.length) {
+        winston.info("presence: No active users, validation skipped");
+        return callback();
+      } else {
+        winston.info("presence: Validating " + users.length + " active users");
+      }
+
+      var multi = redisClient.multi();
+      users.forEach(function(userId) {
+        multi.smembers('pr:user:' + userId);
+      });
+
+      multi.exec(function(err, userSocketsReply) {
+        if(err) return callback(err);
+
+        var promises = [];
+
+        userSocketsReply.forEach(function(socketId, index) {
+          var d = Q.defer();
+          promises.push(d.promise);
+
+          engine.clientExists(socketId, function(exists) {
+            if(exists) return d.resolve();
+
+            var userId = users[index];
+
+            winston.info("presence: Invalid socket found for user" + userId);
+
+            userSocketDisconnected(userId, socketId, { immediate: true }, d.makeNodeResolver());
+          });
+        });
+
+        Q.all(promises).then(function() { callback(); }, callback);
+
+      });
+    });
+
+  },
+
   validateActiveSockets: function(engine, callback) {
     if(!callback) callback = function(err) {
       if(err) {
@@ -299,7 +342,7 @@ module.exports = {
 
       redisClient.multi()
         .zadd(zaddArgs)                                 // 0 create zset of users
-        .zinterstore(out_key, 2, 'pr:active_u',key)  // 1 intersect with online users
+        .zinterstore(out_key, 2, 'pr:active_u',key)     // 1 intersect with online users
         .zrangebyscore(out_key, 1, '+inf')              // 2 return all online users
         .del(key, out_key)                              // 3 delete the keys
         .exec(function(err, replies) {
