@@ -77,7 +77,13 @@ define([
       if (!window._troupeCompactView && (this.model ? this.model.get('displayName') : this.user.displayName)) {
         this.$el.find(':first-child').tooltip({
           html : true,
-          placement : "right",
+          placement : function(a, element) {
+            var position = $(element).position();
+            if (position.top < 110){
+                return "bottom";
+            }
+            return "top";
+          },
           container: "body"
         });
       }
