@@ -30,7 +30,6 @@ define([
           self.$el.prepend(addFileButton);
           addFileButton.tooltip({
             html : true,
-            placement : "right",
             container: "body"
           });
         }
