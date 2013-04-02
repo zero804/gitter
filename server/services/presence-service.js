@@ -258,18 +258,23 @@ module.exports = {
 
         var promises = [];
 
-        userSocketsReply.forEach(function(socketId, index) {
-          var d = Q.defer();
-          promises.push(d.promise);
+        userSocketsReply.forEach(function(socketIds, index) {
+          var userId = users[index];
 
-          engine.clientExists(socketId, function(exists) {
-            if(exists) return d.resolve();
+          winston.info("presence: Validating " + socketIds.length + " sockets for " + userId);
 
-            var userId = users[index];
+          socketIds.forEach(function(socketId) {
+            var d = Q.defer();
+            promises.push(d.promise);
 
-            winston.info("presence: Invalid socket found for user" + userId);
+            engine.clientExists(socketId, function(exists) {
+              if(exists) return d.resolve();
 
-            userSocketDisconnected(userId, socketId, { immediate: true }, d.makeNodeResolver());
+              winston.info("presence: Invalid socket found for user" + userId);
+
+              userSocketDisconnected(userId, socketId, { immediate: true }, d.makeNodeResolver());
+            });
+
           });
         });
 
