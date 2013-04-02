@@ -5,12 +5,17 @@
 var bayeux = require('../../server/web/bayeux');
 var winston = require('../../server/utils/winston');
 var presenceService = require('../../server/services/presence-service');
+var shutdown = require('../../server/utils/shutdown');
 
-presenceService.validateActiveSockets(bayeux.server._server._engine, function() {
-  winston.info('Done. Waiting a few seconds.........');
+presenceService.validateActiveSockets(bayeux.server._server._engine, function(err) {
+  if(err) winston.error('Error while validating sockets' + err, { exception: err });
 
-  setTimeout(function() {
-    process.exit(0);
-  }, 10000);
+  presenceService.validateActiveUsers(bayeux.server._server._engine, function(err) {
+    if(err) winston.error('Error while validating users' + err, { exception: err });
+
+    shutdown.shutdownGracefully();
+
+  });
 
 });
+
