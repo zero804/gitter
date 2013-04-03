@@ -4,7 +4,7 @@
 var passport = require("passport"),
     winston = require("winston"),
     nconf = require('../utils/config'),
-    rememberMe = require('../web/rememberme-middleware');
+    rememberMe = require('./rememberme-middleware');
 
 var authCookieName = nconf.get('web:cookiePrefix') + 'auth';
 var sessionCookieName = nconf.get('web:cookiePrefix') + 'session';
@@ -60,8 +60,8 @@ exports.ensureLoggedIn = function(options) {
 exports.logout = function() {
   return function(req, res, next) {
     req.logout();
-    res.clearCookie(authCookieName);
-    res.clearCookie(sessionCookieName);
+    res.clearCookie(authCookieName, { domain: nconf.get("web:cookieDomain") });
+    res.clearCookie(sessionCookieName, { domain: nconf.get("web:cookieDomain") });
     req.session.destroy(function(err) {
       req.session = null;
       next(err);
