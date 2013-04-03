@@ -127,11 +127,11 @@ define([
       });
 
       this.subscription.callback(function() {
-        console.log('Listening to ' + self.url);
+        // if (typeof console != "undefined") console.log('Listening to ' + self.url);
       });
 
       this.subscription.errback(function(error) {
-        console.log('Subscription error for ' + self.url, error);
+        if (typeof console != "undefined") console.log('Subscription error for ' + self.url, error);
       });
     },
 
@@ -153,7 +153,7 @@ define([
       if(existing) return existing;
 
       if(this.findModelForOptimisticMerge) {
-        console.log("Looking for a candidate for ", newModel);
+        if (typeof console != "undefined") console.log("Looking for a candidate for ", newModel);
 
         existing = this.findModelForOptimisticMerge(newModel);
       }
@@ -182,7 +182,7 @@ define([
             // If at least one of the docs has a version number ...
             // And the new document is an older version than the new document...
             if((incomingVersion || existingVersion) && (incomingVersion <= existingVersion) && (operation != 'create')) {
-              console.log('Ignoring out-of-date update', existing.toJSON(), newModel);
+              if (typeof console != "undefined") console.log('Ignoring out-of-date update', existing.toJSON(), newModel);
               break;
             }
 
@@ -202,7 +202,7 @@ define([
           break;
 
         default:
-          console.log("Unknown operation " + operation + ", ignoring");
+          if (typeof console != "undefined") console.log("Unknown operation " + operation + ", ignoring");
 
       }
     }

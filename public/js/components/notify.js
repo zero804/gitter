@@ -53,7 +53,7 @@ define([
     this.on('mouseenter', /* '.notification',*/ function(e) {
 
       if (container.data('notification-hide-running') === true && e.currentTarget === container[0]) {
-        // console.log('cancelling timeouts', e);
+        // if (typeof console != "undefined") console.log('cancelling timeouts', e);
         // cancel all hide timeouts
         container.data('notification-hide-running', false);
         container.find('.notification').each(function(n) {
@@ -64,7 +64,7 @@ define([
 
     this.on('mouseleave', /* '.notification',*/ function(e) {
       if (container.data('notification-hide-running') === false && e.currentTarget === container[0]) {
-        // console.log('resuming timeouts', e);
+        // if (typeof console != "undefined") console.log('resuming timeouts', e);
         // restart all the hide timeouts
         container.data('notification-hide-running', true);
         container.find('.notification').each(function(n) {

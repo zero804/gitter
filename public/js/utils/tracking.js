@@ -5,7 +5,7 @@ define([
 
   if(!window.troupeTrackingId) {
     return {
-      trackError: function(message, file, line) { console.log("An unexpected error occurred: '" + message + "' in " + file  + ":" + line, arguments); }
+      trackError: function(message, file, line) { if (typeof console != "undefined") console.log("An unexpected error occurred: '" + message + "' in " + file  + ":" + line, arguments); }
     };
   }
 
@@ -39,16 +39,16 @@ define([
   _gaq.push(['_trackPageview']);
 
 
-  console.log("Clearing the hash");
+  if (typeof console != "undefined") console.log("Clearing the hash");
   _gaq.push(function() {
 
     window.setTimeout(function() {
-      console.log("Callback from GAQ");
+      if (typeof console != "undefined") console.log("Callback from GAQ");
       var hash = "" + window.location.hash;
       try {
         hash = hash.replace(/\butm_\w+=(\+|\w+|%\w\w|\-)*&?/g, "");
       } catch(e) {
-        console.log(e);
+        if (typeof console != "undefined") console.log(e);
       }
 
       window.location.hash = hash;

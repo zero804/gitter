@@ -70,7 +70,7 @@ define([
       var sendQueue = readNotificationQueue;
       readNotificationQueue = {};
 
-      //console.log("Sending read notifications: ", sendQueue);
+      //if (typeof console != "undefined") console.log("Sending read notifications: ", sendQueue);
 
       $.ajax({
         url: "/troupes/" + window.troupeContext.troupe.id + "/unreadItems",
@@ -99,7 +99,7 @@ define([
       var itemType = $e.data('itemType');
       var itemId = $e.data('itemId');
 
-      // console.log("found an unread item: itemType ", itemType, "itemId", itemId);
+      // if (typeof console != "undefined") console.log("found an unread item: itemType ", itemType, "itemId", itemId);
 
       if(itemType && itemId) {
         var top = $e.offset().top;
@@ -232,7 +232,7 @@ define([
 
       realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
         if(message.notification === 'troupe_unread') {
-          console.log("troupe_unread change", message);
+          if (typeof console != "undefined") console.log("troupe_unread change", message);
 
           var troupeId = message.troupeId;
           var totalUnreadItems = message.totalUnreadItems;
@@ -248,7 +248,7 @@ define([
 
           } else {
             // TODO: sort this out
-            console.log("Cannot find model. Refresh might be required....");
+            if (typeof console != "undefined") console.log("Cannot find model. Refresh might be required....");
           }
 
           recount();

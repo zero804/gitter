@@ -59,7 +59,7 @@ define([
           window.location.href = "#!";
         },
         error: function(model, resp, options) {
-          console.log("Error rejecting request.");
+          if (typeof console != "undefined") console.log("Error rejecting request.");
         }
       });
     },
