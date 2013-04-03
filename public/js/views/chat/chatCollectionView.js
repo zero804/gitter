@@ -73,7 +73,7 @@ define([
     },
 
     onRender: function() {
-      // if (console) console.log("scrollOf scroll: " + $(this.scrollOf).scrollTop() + " container height: " + $(this.container).height());
+      // if (typeof console != "undefined") console.log("scrollOf scroll: " + $(this.scrollOf).scrollTop() + " container height: " + $(this.container).height());
       // this is an ugly hack to deal with some weird timing issues
       var self = this;
       setTimeout(function() {
@@ -92,7 +92,7 @@ define([
         // so we readjust the scroll according to how much it's parent has grown,
         // to be more general we could look at the displacement that the growth caused for the element,
         // so that we can figure out how much growth occurred above vs below it.
-        //if (console) console.log("Resetting scroll from ", $(this.scrollOf).scrollTop(), " to ", this.scrollPosBeforeAdd, " + ", $(this.container).height(), " - ", this.containerHeightBeforeAdd, " = ", this.scrollPosBeforeAdd + ($(this.container).height() - this.containerHeightBeforeAdd));
+        //if (typeof console != "undefined") console.log("Resetting scroll from ", $(this.scrollOf).scrollTop(), " to ", this.scrollPosBeforeAdd, " + ", $(this.container).height(), " - ", this.containerHeightBeforeAdd, " = ", this.scrollPosBeforeAdd + ($(this.container).height() - this.containerHeightBeforeAdd));
         $(this.scrollOf).scrollTop(this.scrollPosBeforeAdd + ($(this.container).height() - this.containerHeightBeforeAdd));
         // we store the accumulated scroll position here because safari doesn't update the scroll position immediately, so we can't read it back accurately.
         this.scrollPosBeforeAdd += ($(this.container).height() - this.containerHeightBeforeAdd);

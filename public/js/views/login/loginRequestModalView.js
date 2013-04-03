@@ -62,7 +62,7 @@ define([
         },
         debug: true,
         showErrors: function(errorMap, errorList) {
-          if (console) console.log("errorList: " + errorList.length);
+          if (typeof console != "undefined") console.log("errorList: " + errorList.length);
           if (errorList.length === 0) $('.request-failure').hide();
           if (errorList.length > 0) $('.request-failure').show();
           var errors = "";

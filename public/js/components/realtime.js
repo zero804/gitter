@@ -54,7 +54,7 @@ define([
   client.addExtension(new ClientAuth());
 
   client.bind('transport:down', function() {
-    if (console) console.log('transport:down');
+    if (typeof console != "undefined") console.log('transport:down');
     connected = false;
 
     if(!connectionProblemTimeoutHandle) {
@@ -66,7 +66,7 @@ define([
   });
 
   client.bind('transport:up', function() {
-    if (console) console.log('transport:up');
+    if (typeof console != "undefined") console.log('transport:up');
     connected = true;
 
     if(connectionProblemTimeoutHandle) {
