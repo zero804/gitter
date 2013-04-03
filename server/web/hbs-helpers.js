@@ -15,7 +15,6 @@ exports.cdn = function(url, parameters) {
 
 exports.bootScript = function(url, parameters) {
   var requireScript,
-      scriptLocation,
       cdn = (parameters.hash.skipCdn) ? function(a) { return '/' + a; } : exports.cdn;
 
   var baseUrl = cdn("js/");
@@ -30,8 +29,6 @@ exports.bootScript = function(url, parameters) {
             "<script defer='defer' async='true' data-main='" + url + "' src='" + requireScript + "' type='text/javascript'></script>\n";
 
   }
-
-  //scriptLocation = cdn("js/" + url);
 
   requireScript = cdn("js/libs/require/" + REQUIREJS_VERSION + "/require.js");
 

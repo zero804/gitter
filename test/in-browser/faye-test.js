@@ -8,7 +8,7 @@ require([
 ], function($, _, expect, mocha, Faye) {
   mocha.setup({
     ui: 'bdd',
-    timeout: 2000
+    timeout: 20000
   });
 
   var ClientAuth = function() {};
@@ -40,29 +40,35 @@ require([
 
   }
 
+  function emptyFunc() {}
+
   describe('Faye', function(){
     describe('.connect()', function(){
       it('should be able to connect and disconnect many times', function(done) {
 
         getUserId(function(err, userId) {
           if(err) return done(err);
-
+          var COUNT = 10;
           var total = 0;
-          for(var i = 0; i < 20; i++) {
+
+          function errorCallback(e) {
+            return done(e);
+          }
+
+          function subscriptionCallback(){
+            subscription.cancel();
+            if(++total == COUNT) {
+              done();
+            }
+          }
+
+          for(var i = 0; i < COUNT; i++) {
             var client = new Faye.Client('/faye');
             client.addExtension(new ClientAuth());
 
-            var subscription = client.subscribe('/user/' + userId, function() {});
-            subscription.errback(function(e) {
-              return done(e);
-            });
-
-            subscription.callback(function() {
-              subscription.cancel();
-              if(++total == 20) {
-                done();
-              }
-            });
+            var subscription = client.subscribe('/user/' + userId, emptyFunc);
+            subscription.errback(errorCallback);
+            subscription.callback(subscriptionCallback);
 
           }
 
