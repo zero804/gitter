@@ -30,6 +30,9 @@ function reopenTransportOnHupSignal(fileTransport) {
       });
 
       fileTransport.flush();
+      setTimeout(function() {
+        winston.info("Log rotation completed");
+      }, 100);
     }
 
     console.log('stat ', fullname);
