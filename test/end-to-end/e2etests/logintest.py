@@ -14,15 +14,7 @@ def setup_module():
 def testSignInAndSignout():
     utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
     driver.find_element_by_css_selector('DIV.trpHeaderTitle')
-
-    profile = driver.find_element_by_css_selector('DIV.trpProfileButton DIV.trpDisplayPicture')
-
-    chain = ActionChains(driver)
-    chain.move_to_element(profile)
-
-    signOut = driver.find_element_by_id('link-signout')
-    signOut.click()
-
+    driver.get(utils.baseUrl("signout"))
     driver.find_element_by_css_selector('DIV.trpHomeHeroStripContainer')
 
 
