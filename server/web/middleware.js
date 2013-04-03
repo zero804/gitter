@@ -7,6 +7,7 @@ var passport = require("passport"),
     rememberMe = require('../web/rememberme-middleware');
 
 var authCookieName = nconf.get('web:cookiePrefix') + 'auth';
+var sessionCookieName = nconf.get('web:cookiePrefix') + 'session';
 
 /* Ensures that the person is logging in. However, if they present a bearer token,
  * we'll try log them in first
@@ -60,8 +61,10 @@ exports.logout = function() {
   return function(req, res, next) {
     req.logout();
     res.clearCookie(authCookieName);
-    req.session.destroy(function() {
-      next();
+    res.clearCookie(sessionCookieName);
+    req.session.destroy(function(err) {
+      req.session = null;
+      next(err);
     });
   };
 
