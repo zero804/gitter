@@ -47,3 +47,4 @@ ghostdriver.log
 finished.png
 chromedriver
 chromedriver.log
+test/end-to-end/e2etests/*.pyc
