@@ -60,12 +60,22 @@ exports.ensureLoggedIn = function(options) {
 exports.logout = function() {
   return function(req, res, next) {
     req.logout();
-    res.clearCookie(authCookieName, { domain: nconf.get("web:cookieDomain") });
-    res.clearCookie(sessionCookieName, { domain: nconf.get("web:cookieDomain") });
-    req.session.destroy(function(err) {
-      req.session = null;
-      next(err);
-    });
+    var authCookie = req.cookies[authCookieName];
+    if(authCookie) {
+      rememberMe.deleteRememberMeToken(authCookie, logoutNextStep);
+    } else {
+      logoutNextStep();
+    }
+
+    function logoutNextStep() {
+      res.clearCookie(authCookieName, { domain: nconf.get("web:cookieDomain") });
+      res.clearCookie(sessionCookieName, { domain: nconf.get("web:cookieDomain") });
+      req.session.destroy(function(err) {
+        req.session = null;
+        next(err);
+      });
+
+    }
   };
 
 };
