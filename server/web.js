@@ -65,6 +65,11 @@ app.post('/oauth/authorize/decision', oauth2.decision);
 app.post('/oauth/token', oauth2.token);
 app.post('/oauth/bearerLogin', oauth2.bearerLogin);
 
+
+if(nconf.get('web:exposeInBrowserTests')) {
+  require('./handlers/in-browser-tests').install(app);
+}
+
 /* This should be last */
 require('./handlers/app').install(app);
 
