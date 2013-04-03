@@ -529,7 +529,7 @@ $(document).ready(function() {
        e.stopPropagation();
      } else {
       if ($(e.target).attr('rel') == 'tooltip') {
-        if (console) console.log($(e.target).attr('id'));
+        if (typeof console != "undefined") console.log($(e.target).attr('id'));
          var tooltip = $(e.target).data('tooltip');
          tooltip.toggle(e);
         // $('#andrew-status1').tooltip('toggle');

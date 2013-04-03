@@ -39,10 +39,10 @@ define([
 
           notification = nc.createNotification(null, "User has logged in", data.notificationText);
           notification.onclose = function() {
-            if (console) console.log("Notif onclose");
+            if (typeof console != "undefined") console.log("Notif onclose");
           };
           notification.onclick = function() {
-            if (console) console.log("Notif onclick");
+            if (typeof console != "undefined") console.log("Notif onclick");
           };
           notification.show();
         //}

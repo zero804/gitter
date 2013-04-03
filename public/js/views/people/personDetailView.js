@@ -47,7 +47,7 @@ define([
             data: "",
             type: "DELETE",
             success: function(data) {
-              if (console) console.log("Removed this person");
+              if (typeof console != "undefined") console.log("Removed this person");
               // thisPerson.$el.toggle();
               if (thisPerson.isSelf)
                 window.location = window.troupeContext.homeUrl;

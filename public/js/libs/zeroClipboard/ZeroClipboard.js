@@ -10,7 +10,7 @@ window.ZeroClipboard = {
 
 	$: function(thingy) {
 		// simple DOM lookup utility function
-		if (console) console.log('Thingy: ' + thingy);
+		if (typeof console != "undefined") console.log('Thingy: ' + thingy);
 		if (typeof(thingy) == 'string') thingy = document.getElementById(thingy);
 		if (!thingy.addClass) {
 			// extend element with a few useful methods
