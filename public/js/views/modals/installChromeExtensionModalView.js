@@ -26,7 +26,7 @@ define([
 
     installClicked: function() {
       that = this;
-      console.log("Now install");
+      if (typeof console != "undefined") console.log("Now install");
       chrome.webstore.install(undefined, function() {
         that.$el.find('#installer-frame').attr('src', '/install-chrome-extension');
         that.trigger('install.complete');

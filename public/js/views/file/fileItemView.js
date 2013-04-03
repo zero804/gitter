@@ -36,7 +36,6 @@ define([
         if (firstChild.tooltip) {
           firstChild.tooltip({
             html : true,
-            placement : "right",
             container: "body"
           });
         }

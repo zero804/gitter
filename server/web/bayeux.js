@@ -225,7 +225,9 @@ module.exports = {
 
     server.bind('disconnect', function(clientId) {
       winston.info("Client " + clientId + " disconnected");
-      presenceService.socketDisconnected(clientId, { immediate: false });
+      presenceService.socketDisconnected(clientId, { immediate: false }, function(err) {
+        if(err) { winston.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err,  { exception: err }); }
+      });
     });
 
     shutdown.addHandler('bayeux', 15, function(callback) {
@@ -234,6 +236,14 @@ module.exports = {
       setTimeout(callback, 1000);
     });
 
+    presenceService.validateActiveUsers(server._server._engine, function(err) {
+      if(err) {
+        winston.error('Error while validating active users:' + err, { exception: err });
+        return;
+      }
+
+      winston.info('Users validated');
+    });
 
     presenceService.validateActiveSockets(server._server._engine, function(err) {
       if(err) {

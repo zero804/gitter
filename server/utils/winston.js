@@ -6,39 +6,51 @@ var winston = require("winston");
 var fs = require('fs');
 var path = require('path');
 
-function reopenTransportOnHupSignal(fileTransport) {
-  process.on('SIGHUP', function() {
-    console.log('Caught SIGHUP, attempting logfile rotation');
+function statFile(fileTransport) {
+  var fullname = path.join(fileTransport.dirname, fileTransport._getFile(false));
 
-    var fullname = path.join(fileTransport.dirname, fileTransport._getFile(false));
-
-    function reopen() {
-      if (fileTransport._stream) {
-        fileTransport._stream.end();
-        fileTransport._stream.destroySoon();
-      }
-
-      var stream = fs.createWriteStream(fullname, fileTransport.options);
-      stream.setMaxListeners(Infinity);
-
-      fileTransport._size = 0;
-      fileTransport._stream = stream;
-
-      fileTransport.once('flush', function () {
-        fileTransport.opening = false;
-        fileTransport.emit('open', fullname);
-      });
-
-      fileTransport.flush();
+  function reopen() {
+    if (fileTransport._stream) {
+      fileTransport._stream.end();
+      fileTransport._stream.destroySoon();
     }
 
-    console.log('stat ', fullname);
-    fs.stat(fullname, function (err) {
-      if (err && err.code == 'ENOENT') {
-        console.log('Reopening log file after logrotation');
-        return reopen();
-      }
+    var stream = fs.createWriteStream(fullname, fileTransport.options);
+    stream.setMaxListeners(Infinity);
+
+    fileTransport._size = 0;
+    fileTransport._stream = stream;
+
+    fileTransport.once('flush', function () {
+      fileTransport.opening = false;
+      fileTransport.emit('open', fullname);
     });
+
+    fileTransport.flush();
+    setTimeout(function() {
+      winston.info("Log rotation completed");
+    }, 100);
+  }
+
+  fs.stat(fullname, function (err) {
+    if (err && err.code == 'ENOENT') {
+      console.log('Log file no longer exists. Reopening');
+      return reopen();
+    }
+  });
+}
+
+function periodicallyStatFile(fileTransport) {
+  setInterval(function() {
+    statFile(fileTransport);
+  }, 60000);
+}
+
+function reopenTransportOnHupSignal(fileTransport) {
+  process.on('SIGHUP', function() {
+    winston.info('Caught SIGHUP, attempting logfile rotation');
+
+    statFile(fileTransport);
 
   });
 }
@@ -56,6 +68,7 @@ function configureTransports() {
     });
 
     var fileTransport = winston['default'].transports.file;
+    periodicallyStatFile(fileTransport);
     reopenTransportOnHupSignal(fileTransport);
 
   } else {

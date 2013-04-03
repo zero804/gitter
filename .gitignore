@@ -43,3 +43,8 @@ test/end-to-end/casper/*.png
 mongo-backup-*/
 GIT_COMMIT
 VERSION
+ghostdriver.log
+finished.png
+chromedriver
+chromedriver.log
+test/end-to-end/e2etests/*.pyc

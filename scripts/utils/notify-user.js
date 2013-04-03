@@ -8,6 +8,8 @@ var shutdown = require('../../server/utils/shutdown');
 
 var winston = require('../../server/utils/winston');
 
+require('../../server/utils/event-listeners').installLocalEventListeners();
+
 var opts = require("nomnom")
    .option('user', {
       abbr: 'u',
@@ -51,6 +53,8 @@ if(opts.user) {
     link: opts.link,
     sound: opts.sound
    });
+   shutdown.shutdownGracefully();
+
 
 } else {
    if(!opts.email) { winston.error("Either a userId or email address is requireId"); process.exit(1); }
