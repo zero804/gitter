@@ -44,7 +44,7 @@ module.exports = {
   rememberMeMiddleware: function(options) {
     return function(req, res, next) {
       function fail(err) {
-        res.clearCookie(cookieName);
+        res.clearCookie(cookieName, { domain: nconf.get("web:cookieDomain") });
         if(err) return next(err);
 
         return next();
