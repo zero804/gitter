@@ -128,7 +128,7 @@ require([
   });
 
   /*var subscription = */ realtime.subscribe('/troupes/' + window.troupeContext.troupe.id, function(message) {
-    console.log("Subscription!", message);
+    if (console) console.log("Subscription!", message);
     if(message.notification === 'presence') {
       if(message.status === 'in') {
         $(document).trigger('userLoggedIntoTroupe', message);

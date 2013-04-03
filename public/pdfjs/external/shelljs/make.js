@@ -8,9 +8,9 @@ var args = process.argv.slice(2);
 setTimeout(function() {
 
   if (args.length === 1 && args[0] === '--help') {
-    console.log('Available targets:');
+    if (console) console.log('Available targets:');
     for (t in target)
-      console.log('  ' + t);
+      if (console) console.log('  ' + t);
     return;
   }
 
@@ -32,10 +32,10 @@ setTimeout(function() {
   // Execute desired targets
   if (args.length > 0) {
     args.forEach(function(arg) {
-      if (arg in target) 
+      if (arg in target)
         target[arg]();
       else {
-        console.log('no such target: ' + arg);
+        if (console) console.log('no such target: ' + arg);
         exit(1);
       }
     });

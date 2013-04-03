@@ -20,18 +20,18 @@ client.addExtension(new ClientAuth());
 
 client.bind('transport:down', function() {
   // the client is offline
-  console.log("TRANSPORT DOWN");
+  if (console) console.log("TRANSPORT DOWN");
 });
 
 client.bind('transport:up', function() {
   // the client is online
-  console.log("TRANSPORT UP");
+  if (console) console.log("TRANSPORT UP");
 });
 
 client.publish('/foo', {text: 'Hi there'});
 
 var subscription = client.subscribe('/troupes/4fda5526219fc80000001d21', function(message) {
-  console.log("MESSAGE!", message);
+  if (console) console.log("MESSAGE!", message);
 });
 
 </script>
