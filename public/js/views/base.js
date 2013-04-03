@@ -530,7 +530,7 @@ define([
     },
 
     appendHtml: function(collectionView, itemView, index) {
-      //console.log("Inserting new item ", itemView, " at index ", index);
+      //if (console) console.log("Inserting new item ", itemView, " at index ", index);
 
       function findViewAtPos(i) {
         if (i >= collectionView.collection.length)

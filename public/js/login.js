@@ -7,10 +7,10 @@ require([
       $('#email').val(window.localStorage.defaultTroupeEmail);
     }
 
-    console.log("Document: " + $(document).width());
+    if (console) console.log("Document: " + $(document).width());
     var leftPanelSpacing = (($(document).width() - 320) / 2) + 320;
 
-    console.log("Where am I: " + leftPanelSpacing);
+    if (console) console.log("Where am I: " + leftPanelSpacing);
 
     $('#panel-signup').css('left', leftPanelSpacing + 'px');
 
@@ -34,7 +34,7 @@ require([
     });
 
     $('#password').on('blur', function() {
-      console.log("Password blur");
+      if (console) console.log("Password blur");
       hideLoginFailure();
     });
 
@@ -49,7 +49,7 @@ require([
     var showingFailure = false;
 
     function showLoginFailure() {
-      console.log("UP YOU SLIDE");
+      if (console) console.log("UP YOU SLIDE");
       // $('#panel-failure').slideUp();
       $('#panel-failure').animate( {
         bottom: '0px'
@@ -59,7 +59,7 @@ require([
 
     function hideLoginFailure() {
       if (showingFailure) {
-        console.log("DOWN YOU SLIDE");
+        if (console) console.log("DOWN YOU SLIDE");
          $('#panel-failure').animate( {
             bottom: '-90px'
           }, 350);
@@ -77,13 +77,13 @@ require([
         data: form.serialize(),
         type: "POST",
         error: function(/*jqXHR, textStatus, errorThrown*/) {
-          console.log("Error");
+          if (console) console.log("Error");
           showLoginFailure();
 
         },
         success: function(data) {
           if(data.failed) {
-            console.log("No it actually failed");
+            if (console) console.log("No it actually failed");
             showLoginFailure();
             return;
           }

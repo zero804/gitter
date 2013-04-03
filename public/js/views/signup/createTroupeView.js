@@ -100,14 +100,14 @@ define([
           url: '/troupes/',
           wait: true,
           success: function(troupe /*, resp, options*/) {
-            console.log('response from upgrading one to one troupe', troupe);
+            if (console) console.log('response from upgrading one to one troupe', troupe);
             window.location.href = "/" + troupe.get('uri') + "#|shareTroupe";
           }
         });
       }
       // we are operating from the signup page, without app integrated, so we don't have a collection
       else {
-        console.log("Serialized form: " + serializedForm);
+        if (console) console.log("Serialized form: " + serializedForm);
         $.ajax({
           url: "/signup",
           contentType: "json",
