@@ -97,12 +97,6 @@ function removeUserFromTroupe(socketId, userId, callback) {
 }
 
 function userSocketDisconnected(userId, socketId, options, callback) {
-  if(!callback) callback = function(err) {
-    if(err) {
-      winston.error('presence. Error in userSocketDisconnected:' + err, { exception: err });
-    }
-  };
-
   if(!options) options = {};
 
   winston.debug("presence: userSocketDisconnected: ", { userId: userId, socketId: socketId });
@@ -131,6 +125,7 @@ function userSocketDisconnected(userId, socketId, options, callback) {
 
 module.exports = {
   userSocketConnected: function(userId, socketId, callback) {
+    winston.info("presence: Socket connected: " + socketId + ". User=" + userId);
 
     var userKey = "pr:user:" + userId;
     // Associate socket with user
@@ -140,8 +135,6 @@ module.exports = {
       // If the socket was not added (as it's ready there) then this isn't the first time this
       // operation is being performed, so don't continue. We're using redis as an exclusivity lock
       if(saddResult != 1) return callback();
-
-      winston.info("presence: Socket connected: " + socketId + ". User=" + userId);
 
       redisClient.multi()
         .set("pr:socket:" + socketId, userId)           // 0 Associate user with socket
@@ -204,37 +197,47 @@ module.exports = {
 
   // Called when a socket is disconnected
   socketDisconnected: function(socketId, options, callback) {
-    if(!callback) callback = function(err) {
-      if(err) {
-        winston.error('presence. Error in socketDisconnected:' + err, { exception: err });
-      }
-    };
-
     winston.info("presence: Socket disconnected: " + socketId);
 
-    // Disassociates the socket with user, the user with the socket, deletes the socket
-    // returns the userId in the callback
-    redisClient.multi()
-      .get("pr:socket:" + socketId)           // 0 Find the user for the socket
-      .del("pr:socket:" + socketId)           // 1 Remove the socket user association
-      .srem("pr:activesockets", socketId)     // 2 remove the socket from active sockets
-      .exec(function(err, replies) {
-        if(err) return callback(err);
+    var retryCount = 0;
+    attemptSocketDisconnected();
 
-        var userId = replies[0];
-
-        if(!userId) {
-          winston.info("presence: Socket did not appear to be associated with a user: " + socketId);
-          return callback();
-        }
-
-        removeUserFromTroupe(socketId, userId, function(err) {
+    function attemptSocketDisconnected() {
+      // Disassociates the socket with user, the user with the socket, deletes the socket
+      // returns the userId in the callback
+      redisClient.multi()
+        .get("pr:socket:" + socketId)           // 0 Find the user for the socket
+        .del("pr:socket:" + socketId)           // 1 Remove the socket user association
+        .srem("pr:activesockets", socketId)     // 2 remove the socket from active sockets
+        .exec(function(err, replies) {
           if(err) return callback(err);
 
-          userSocketDisconnected(userId, socketId, options, callback);
-        });
+          var userId = replies[0];
 
-      });
+          // If we have no trace of this socket, give the system a second to finish the
+          // doing things before trying again. The connect/disconnect cycle may be very short
+          // and the connect writes have not yet completed........
+          if(!userId) {
+            if(retryCount <= 0) {
+              retryCount++;
+              setTimeout(attemptSocketDisconnected, 1000);
+              return;
+
+            } else {
+              winston.info("presence: Socket did not appear to be associated with a user: " + socketId);
+              return callback();
+            }
+          }
+
+          removeUserFromTroupe(socketId, userId, function(err) {
+            if(err) return callback(err);
+
+            userSocketDisconnected(userId, socketId, options, callback);
+          });
+
+        });
+    }
+
   },
 
   validateActiveUsers: function(engine, callback) {
