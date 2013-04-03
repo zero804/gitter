@@ -18,12 +18,23 @@ var opts = require("nomnom")
       required: true,
       help: 'Message to send'
    })
+   .option('link', {
+      abbr: 'l',
+      required: false,
+      help: 'Link'
+   })
+
    .option('sound', {
       abbr: 's',
       help: 'Sound to send'
    })
    .parse();
 
-pushNotificationGateway.sendUserNotification(opts.user, { message: opts.message, sound: opts.sound, payload: { uri: 'txkw2b', page: 'files' } }, function() {
-  shutdown.shutdownGracefully();
-});
+pushNotificationGateway.sendUserNotification(opts.user, {
+   message: opts.message,
+   sound: opts.sound,
+   link: opts.link,
+   payload: { uri: 'txkw2b', page: 'files' } },
+   function() {
+     shutdown.shutdownGracefully();
+   });

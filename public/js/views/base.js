@@ -332,7 +332,6 @@ define([
       if(e) e.preventDefault();
       if(this.navigable) {
         var hash = window.location.hash;
-        console.log("HASH IS :  " + hash);
         var currentFragment;
         if(!hash) {
           currentFragment = '#!';
@@ -531,7 +530,7 @@ define([
     },
 
     appendHtml: function(collectionView, itemView, index) {
-      //console.log("Inserting new item ", itemView, " at index ", index);
+      //if (typeof console != "undefined") console.log("Inserting new item ", itemView, " at index ", index);
 
       function findViewAtPos(i) {
         if (i >= collectionView.collection.length)

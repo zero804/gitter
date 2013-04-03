@@ -6,10 +6,25 @@ var presenceService = require('../../server/services/presence-service');
 
 var assert = require("better-assert");
 var winston = require("../../server/utils/winston");
+var Q = require("q");
 
 var fakeEngine = {
   clientExists: function(clientId, callback) { callback(!clientId.match(/^TEST/)); }
 };
+
+
+function cleanup(done, next) {
+  presenceService.validateActiveUsers(fakeEngine, function(err) {
+    if(err) return done(err);
+
+    // Do a pre-test cleanup
+    presenceService.validateActiveSockets(fakeEngine, function(err) {
+      if(err) return done(err);
+
+      return next();
+    });
+  });
+}
 
 describe('presenceService', function() {
   describe('#userSocketConnected()', function() {
@@ -18,11 +33,12 @@ describe('presenceService', function() {
       var socketId = 'TESTSOCKET1';
       var troupeId = 'TESTTROUPE1';
 
-      // Do a pre-test cleanup
-      presenceService.validateActiveSockets(fakeEngine, function(err) {
+      // Make sure things are cleaned up pre-test
+      cleanup(done, function(err) {
 
         // Make sure things are clean
         presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
+          if(err) return done(err);
 
           // User should not exist
           assert(users.every(function(id) { return id !== userId; }), 'Expected user _not_ to be online at beginning of test');
@@ -62,20 +78,52 @@ describe('presenceService', function() {
 
                       done();
                     });
-
                   });
-
                 });
-
               });
             });
-
           });
-
         });
       });
 
     });
 
+    it('should handle very quick connect/disconnect cycles when the user connects to a troupe', function(done) {
+
+      // Make sure things are cleaned up pre-test
+      cleanup(done, function(err) {
+        var socketId = 'FAKE_SOCKET_' + Math.floor(Math.random() * 1000000);
+        var userId = 'TESTUSER1';
+        var troupeId = 'TESTTROUPE2';
+
+        var d1 = Q.defer();
+        var d2 = Q.defer();
+
+        // This simulates three events happening in very quick succession
+        presenceService.socketDisconnected(socketId, { immediate: true }, d2.makeNodeResolver());
+        presenceService.userSocketConnected(userId, socketId, function(err) {
+          if(err) { return d1.reject(); }
+
+          presenceService.userSubscribedToTroupe(userId, troupeId, socketId, d1.makeNodeResolver());
+        });
+
+        Q.all([d1.promise, d2.promise]).then(function() {
+          presenceService.categorizeUsersByOnlineStatus([userId], function(err, statii) {
+            assert(!statii[userId]);
+
+            presenceService.listOnlineUsersForTroupes([troupeId], function(err, troupeOnlineUsers) {
+              assert(troupeOnlineUsers[troupeId].length === 0);
+
+              done();
+            });
+
+          });
+
+        }, done);
+
+      });
+
+    });
   });
 });
+

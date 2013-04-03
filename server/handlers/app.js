@@ -42,13 +42,6 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
   serializeUserAndRenderPage(null);
 
 
-  function getFayeUrl() {
-    var url = nconf.get('ws:fayeUrl');
-    if(url) return url;
-
-    return "/faye";
-  }
-
   function renderPage(unreadItems, serializedUser, accessToken) {
     var profileNotCompleted;
 
@@ -89,8 +82,15 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
         troupeData = null;
       }
 
+      var disabledFayeProtocols = [];
 
-      var prenegotiatedConnection;
+      var userAgent = req.headers['user-agent'];
+      userAgent = userAgent ? userAgent : '';
+
+      // Disable websocket on Mobile due to iOS crash bug
+      if(userAgent.indexOf('Mobile') >= 0) {
+        disabledFayeProtocols.push('websocket');
+      }
 
       var troupeContext = {
           user: serializedUser,
@@ -105,16 +105,13 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
           homeUrl: nconf.get('web:homeurl'),
           troupeUri: accessDenied ? troupe.uri : undefined,
           websockets: {
-            fayeUrl: getFayeUrl(),
+            fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
             options: {
-              prenegotiatedConnection: prenegotiatedConnection,
-              timeout: 120,
-              retry: 5
+              timeout: nconf.get('ws:fayeTimeout'),
+              retry: nconf.get('ws:fayeRetry')
             },
-            disable: ['websocket']
+            disable: disabledFayeProtocols
           }
-
-
       };
 
 
@@ -141,7 +138,6 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
       userAgent = userAgent ? userAgent : '';
 
       var useFirebug = useFirebugInIE && userAgent.indexOf('MSIE') >= 0;
-      console.log("UseFirebug: " + useFirebug);
 
       res.render(page, {
         useAppCache: !!nconf.get('web:useAppCache'),
@@ -361,18 +357,8 @@ module.exports = {
         middleware.grantAccessForRememberMeTokenMiddleware,
         preloadTroupeMiddleware,
         function(req, res, next) {
-        var page;
-        var userAgent =req.headers['user-agent'];
-        userAgent = userAgent ? userAgent : '';
-
-        if(userAgent.indexOf('Mobile') >= 0) {
-          page = 'app-integrated';
-        } else {
-          page = 'app-integrated';
-        }
-
-        renderAppPageWithTroupe(req, res, next, page, req.troupe, req.troupe.name);
-      });
+          renderAppPageWithTroupe(req, res, next, 'app-integrated', req.troupe, req.troupe.name);
+        });
 
       app.get('/:troupeUri/accept/:confirmationCode',
         middleware.authenticate('accept', {}),

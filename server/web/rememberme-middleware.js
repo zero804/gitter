@@ -38,13 +38,67 @@ function generateAuthToken(req, res, userId, options, callback) {
   });
 }
 
+function getAndDeleteRedisKey(key, callback) {
+  redisClient.multi()
+    .get(key)
+    .del(key)
+    .exec(function(err, replies) {
+      if(err) return callback(err);
+      var getResult = replies[0];
+      return callback(null, getResult);
+    });
+}
+
+/* Validate a token and call callback(err, userId) */
+function validateAuthToken(authCookieValue, callback) {
+    /* Auth cookie */
+    if(!authCookieValue) return callback();
+
+    winston.info('rememberme: Client has presented a rememberme auth cookie, attempting reauthentication');
+
+    var authToken = authCookieValue.split(":", 2);
+
+    if(authToken.length != 2) return callback();
+
+    var key = authToken[0];
+    var hash = authToken[1];
+
+    getAndDeleteRedisKey("rememberme:" + key, function(err, storedValue) {
+      if(err) return callback(err);
+
+      if(!storedValue) {
+        statsService.event('user_login_auto_illegal', { });
+
+        winston.info("rememberme: Client presented illegal rememberme token ", { token: key });
+        return callback();
+      }
+
+      var stored = JSON.parse(storedValue);
+
+      sechash.testHash(hash, stored.hash, function(err, match) {
+        if(err || !match) return callback();
+        var userId = stored.userId;
+
+        return callback(null, userId);
+      });
+    });
+}
+
 module.exports = {
   generateAuthToken: generateAuthToken,
+
+  deleteRememberMeToken: function(token, callback) {
+      validateAuthToken(token, function(err) {
+        if(err) { winston.warn('Error validating token, but ignoring error ' + err, { exception: err }); }
+
+        return callback();
+      });
+  },
 
   rememberMeMiddleware: function(options) {
     return function(req, res, next) {
       function fail(err) {
-        res.clearCookie(cookieName);
+        res.clearCookie(cookieName, { domain: nconf.get("web:cookieDomain") });
         if(err) return next(err);
 
         return next();
@@ -53,52 +107,27 @@ module.exports = {
       /* If the user is logged in, no problem */
       if (req.user) return next();
 
-      var authCookieValue = req.cookies[cookieName];
+      if(!req.cookies) return next();
 
-      /* Auth cookie */
-      if(!authCookieValue) return next();
+      validateAuthToken(req.cookies[cookieName], function(err, userId) {
+        if(err || !userId) return fail(err);
 
-      winston.info('rememberme: Client has presented a rememberme auth cookie, attempting reauthentication');
+        userService.findById(userId, function(err, user) {
+          if(err)  return fail(err);
+          if(!user) return fail();
 
-      var authToken = authCookieValue.split(":", 2);
+          req.login(user, options, function(err) {
+            if(err) {
+              winston.info("rememberme: Passport login failed", { exception: err  });
+              return fail(err);
+            }
 
-      var key = authToken[0];
-      var hash = authToken[1];
+            winston.info("rememberme: Passport login succeeded");
 
-      redisClient.get("rememberme:" + key, function(err, storedValue) {
-        if(err) return fail();
-        if(!storedValue) {
-          statsService.event('user_login_auto_illegal', { });
+            statsService.event('user_login_auto', { userId: userId });
 
-          winston.info("rememberme: Client presented illegal rememberme token ", { token: key });
-          return fail();
-        }
-
-        redisClient.del("rememberme:" + key);
-
-        var stored = JSON.parse(storedValue);
-
-        sechash.testHash(hash, stored.hash, function(err, match) {
-          if(err || !match) return fail();
-          var userId = stored.userId;
-          userService.findById(userId, function(err, user) {
-            if(err)  return fail(err);
-            if(!user) return fail();
-
-            req.login(user, options, function(err) {
-              if(err) {
-                winston.info("rememberme: Passport login failed", { exception: err  });
-                return fail(err);
-              }
-
-              winston.info("rememberme: Passport login succeeded");
-
-              statsService.event('user_login_auto', { userId: userId });
-
-              generateAuthToken(req, res, userId, options, function(err) {
-                next(err);
-              });
-
+            generateAuthToken(req, res, userId, options, function(err) {
+              return next(err);
             });
 
           });
@@ -106,6 +135,7 @@ module.exports = {
         });
 
       });
+
 
     };
   }

@@ -91,14 +91,14 @@ define([
       });
 
       this.app.rightPanelRegion.on('show', function() {
-        //console.log("SHOW PANEL");
+        //if (typeof console != "undefined") console.log("SHOW PANEL");
         self.showPanel("#right-panel");
       });
 
       this.app.rightPanelRegion.on('close', function() {
         window.setTimeout(function() {
           if(!self.app.rightPanelRegion.currentView) {
-            //console.log("CLOSE PANEL");
+            //if (typeof console != "undefined") console.log("CLOSE PANEL");
             self.hidePanel("#right-panel");
           }
         }, 100);

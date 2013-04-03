@@ -128,7 +128,7 @@ require([
   });
 
   /*var subscription = */ realtime.subscribe('/troupes/' + window.troupeContext.troupe.id, function(message) {
-    console.log("Subscription!", message);
+    if (typeof console != "undefined") console.log("Subscription!", message);
     if(message.notification === 'presence') {
       if(message.status === 'in') {
         $(document).trigger('userLoggedIntoTroupe', message);
@@ -147,7 +147,6 @@ require([
     currentView: null,
     show: function(view) {
       if(this.currentView) {
-        console.log("Closing view: " + this.currentView);
         this.currentView.fade = false;
         this.currentView.hideInternal();
       }
@@ -157,7 +156,6 @@ require([
     },
     close: function() {
       if(this.currentView) {
-        console.log("Closing view: " + this.currentView);
         this.currentView.navigationalHide();
         this.currentView = null;
       }
