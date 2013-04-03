@@ -13,6 +13,20 @@ def baseUrl(url):
     return base + url
 
 
+def secondDriver():
+    driverName = os.getenv('DRIVER')
+    if driverName == 'IE':
+        secondDriver = webdriver.Firefox()
+    elif driverName == 'REMOTEIE':
+        remote = os.getenv('REMOTE_EXECUTOR')
+        if remote is None:
+            remote = 'http://10.8.0.14:5555/wd/hub'
+        secondDriver = webdriver.Remote(command_executor=remote, desired_capabilities=DesiredCapabilities.FIREFOX)
+    else:
+        secondDriver = driver
+    return secondDriver
+
+
 def driver():
     driverName = os.getenv('DRIVER')
     if driverName is None:
@@ -87,7 +101,10 @@ def existingUserlogin(driver, usernameValue, passwordValue):
     password.send_keys(passwordValue)
 
     driver.find_element_by_css_selector('#signin-button').click()
-    driver.find_element_by_css_selector('DIV.trpHeaderTitle')
+
+    time.sleep(1)
+
+    driver.find_element_by_css_selector('DIV.trpHeaderWrapper')
 
 
 def screenshot(driver):
