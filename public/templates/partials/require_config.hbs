@@ -10,6 +10,9 @@ require.config({
     underscore: 'libs/underscore/1.4.3/underscore-min',
     clwrapper: 'libs/clwrapper/cf9f12b17b/consolelog',
 
+    expect: 'libs/expect/0.1.2/expect',
+    mocha: 'libs/mocha/1.8.2/mocha',
+
     jquery: 'libs/jquery/1.8.3/jquery-min',
     marionette : 'libs/marionette/1.0.0-rc5/backbone.marionette',
     jquery_validate : 'libs/jquery.validate/1.9/jquery.validate.min',
@@ -45,6 +48,13 @@ require.config({
     'underscore': {
       exports: '_'
     },
+    'mocha': {
+      exports: 'mocha'
+    },
+    'expect': {
+      exports: 'expect'
+    },
+
     'nanoScroller': {
       deps: ['jquery']
     },

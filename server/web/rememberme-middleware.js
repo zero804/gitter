@@ -107,6 +107,8 @@ module.exports = {
       /* If the user is logged in, no problem */
       if (req.user) return next();
 
+      if(!req.cookies) return next();
+
       validateAuthToken(req.cookies[cookieName], function(err, userId) {
         if(err || !userId) return fail(err);
 
