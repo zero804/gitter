@@ -22,7 +22,7 @@ def setup_module():
     global driver2
 
     driver1 = utils.driver()
-    driver2 = utils.driver()
+    driver2 = utils.secondDriver()
 
 
 def testUsersComingOnlineAndGoingOffline():
@@ -32,19 +32,22 @@ def testUsersComingOnlineAndGoingOffline():
     utils.existingUserlogin(driver1, 'testuser@troupetest.local', '123456')
     utils.existingUserlogin(driver2, 'testuser2@troupetest.local', '123456')
 
-    time.sleep(0.5)
+    time.sleep(1)
 
-    users1 = driver1.find_elements_by_css_selector('#people-roster .trpPeopleListItem .trpDisplayPicture')
-    users2 = driver1.find_elements_by_css_selector('#people-roster .trpPeopleListItem .trpDisplayPicture')
-
-    user1 = findUserElement(users1, 'Test User 1')
-    user2 = findUserElement(users2, 'Test User 2')
+    user1 = driver1.find_element_by_xpath('//*[@id="people-roster"]/div/span/span/span[1]')
+    user2 = driver1.find_element_by_xpath('//*[@id="people-roster"]/div/span/span/span[2]')
 
     assert user1 is not None
     assert user2 is not None
 
-    assert string.find(user1.get_attribute('class'), 'online') >= 0
-    assert string.find(user2.get_attribute('class'), 'online') >= 0
+    user1Status = driver1.find_element_by_xpath('//*[@id="people-roster"]/div/span/span/span[1]/a/div/span/div')
+    user2Status = driver1.find_element_by_xpath('//*[@id="people-roster"]/div/span/span/span[2]/a/div/span/div')
+
+    assert user1Status is not None
+    assert user2Status is not None
+
+    assert string.find(user1Status.get_attribute('class'), 'online') >= 0
+    assert string.find(user2Status.get_attribute('class'), 'online') >= 0
 
     driver2.quit()
     driver2 = None
@@ -58,7 +61,7 @@ def testUsersComingOnlineAndGoingOffline():
     assert string.find(user2.get_attribute('class'), 'offline') >= 0
 
 
-def teardown_module():
-    driver1.quit()
-    if driver2 is not None:
-        driver2.quit()
+# def teardown_module():
+#     driver1.quit()
+#     if driver2 is not None:
+#         driver2.quit()
