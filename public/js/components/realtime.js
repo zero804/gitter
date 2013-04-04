@@ -6,7 +6,7 @@ define([
 ], function($, Faye, log) {
   "use strict";
 
-  Faye.Logging.logLevel = 'debug';
+  Faye.Logging.logLevel = 'info';
 
   var connected = false;
   var connectionProblemTimeoutHandle;
@@ -34,8 +34,11 @@ define([
 
   var ClientAuth = function() {};
   ClientAuth.prototype.outgoing = function(message, callback) {
-    message.ext = message.ext || {};
-    message.ext.token = window.troupeContext.accessToken;
+    if(message.channel == '/meta/handshake') {
+      message.ext = message.ext || {};
+      message.ext.token = window.troupeContext.accessToken;
+    }
+
     callback(message);
   };
 
@@ -49,9 +52,10 @@ define([
     }
   }
 
+  client.addExtension(new ClientAuth());
+
   client.connect(function() {});
 
-  client.addExtension(new ClientAuth());
 
   client.bind('transport:down', function() {
     log('transport:down');
