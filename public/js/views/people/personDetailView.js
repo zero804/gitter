@@ -28,9 +28,6 @@ define([
       // d.fileIcon = '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + d.fileName + "?version=" + latestVersion;
       // d.previewUrl = '#file/preview/' + d.id;
       // d.versionsUrl = '#file/versions/' + d.id;
-
-      console.dir("D: " + d);
-
       return d;
     },
 
