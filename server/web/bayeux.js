@@ -194,12 +194,12 @@ var pushOnlyServerClient = {
 
 var server = new faye.NodeAdapter({
   mount: '/faye',
-  timeout: 120,
+  timeout: nconf.get('ws:fayeTimeout'),
+  ping: nconf.get('ws:fayePing'),
   engine: {
     type: fayeRedis,
     host: nconf.get("redis:host"),
     port: nconf.get("redis:port"),
-    ping: 30,
     namespace: 'fr:'
   }
 });
