@@ -70,48 +70,134 @@ function validateUserForUserSubscription(options, callback) {
   return callback(null, result);
 }
 
+function messageIsFromSuperClient(message) {
+  return message &&
+         message.ext &&
+         message.ext.password === superClientPassword;
+}
 
-//var clientUserLookup = new RedisClientUserLookupStrategy();
-
-//
-// Auth Extension:authenticate all subscriptions to ensure that the user has access
-// to the given url
-//
-var auth = {
+var authenticator = {
   incoming: function(message, callback) {
-    if (message.channel === '/meta/subscribe') {
-      this.authorized(message, function(err, allowed) {
-        if(err) winston.error("Error authorizing message ", { exception: err });
-        if(!allowed) { winston.warn("Client denied access to channel ", { message: message }); }
-        if(err || !allowed) {
-          //message.subscription = "/invalid";
-          message.error = '403::Access denied';
-        }
-        callback(message);
-      });
-
-    } else {
+    function deny() {
+      message.error = '403::Access denied';
       callback(message);
     }
 
+    if (message.channel != '/meta/handshake') {
+      return callback(message);
+    }
+
+    if(messageIsFromSuperClient(message)) {
+      return callback(message);
+    }
+
+    var ext = message.ext;
+    if(!ext) return deny();
+
+    var accessToken = ext.token;
+    if(!accessToken) return deny();
+
+    oauth.validateToken(accessToken, function(err, userId) {
+      if(err) {
+        winston.error("bayeux: Authentication error" + err, { exception: err, message: message });
+        return deny();
+       }
+
+      if(!userId) {
+        winston.warn("bayeux: Authentication failed", { message: message });
+        return deny();
+      }
+
+      // This is an UGLY UGLY hack, but it's the only
+      // way possible to pass the userId to the outgoing extension
+      // where we have the clientId (but not the userId)
+      message.id = message.id + ':' + userId;
+
+      return callback(message);
+    });
+
   },
 
-  isSuperClient: function(message) {
-    return message && message.ext && message.ext.password === superClientPassword;
+  outgoing: function(message, callback) {
+    if (message.channel != '/meta/handshake') {
+      return callback(message);
+    }
+
+    // Already failed?
+    if(!message.successful)  {
+      return callback(message);
+    }
+
+    // The other half of the UGLY hack,
+    // get the userId out from the message
+    var fakeId = message.id;
+    var parts = fakeId.split(':');
+
+    if(parts.length != 2) {
+      return callback(message);
+    }
+
+    message.id = parts[0];
+    var userId = parts[1];
+    var clientId = message.clientId;
+
+    // Get the presence service involved around about now
+    presenceService.userSocketConnected(userId, clientId, function(err) {
+      if(err) winston.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
+      callback(message);
+    });
+
+  }
+
+};
+
+//
+// Authorisation Extension - decides whether the user
+// is allowed to connect to the subscription channel
+//
+var authorisor = {
+  incoming: function(message, callback) {
+    if(message.channel != '/meta/subscribe') {
+      return callback(message);
+    }
+
+    function deny() {
+      message.error = '403::Access denied';
+      callback(message);
+    }
+
+    // Do we allow this user to connect to the requested channel?
+    this.authorizeSubscribe(message, function(err, allowed) {
+      if(err) {
+        winston.error("bayeux: Authorisation error", { exception: err, message: message });
+        return deny();
+      }
+
+      if(!allowed) {
+        winston.warn("bayeux: Authorisation failed", { message: message });
+        return deny();
+      }
+
+      return callback(message);
+    });
+
   },
 
   // Authorize a sbscription message
-  authorized: function(message, callback) {
-    var clientId = message.clientId;
-    if(!clientId) return callback("Message has no clientId. Will not proceed.");
-
-    if(this.isSuperClient(message)) {
+  // callback(err, allowAccess)
+  authorizeSubscribe: function(message, callback) {
+    if(messageIsFromSuperClient(message)) {
       return callback(null, true);
     }
 
-    this.lookupClient(message, function onLookupClientDone(err, userId) {
-      if(err) return callback("Validation failed: " + err);
-      if(!userId) return callback("Invalid access token");
+    var clientId = message.clientId;
+
+    presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
+      if(err) return callback(err);
+      if(!userId) {
+        winston.warn('bayeux: client not authenticated. Failing authorisation', { clientId: clientId });
+        return callback();
+      }
 
       var match = null;
 
@@ -128,53 +214,24 @@ var auth = {
       var validator = match.route.validator;
       var m = match.match;
 
-      validator({ userId: userId, match: m, message: message, clientId: clientId }, function onValidatorFinished(err, result) {
-        return callback(err, result);
-      });
-
-
+      validator({ userId: userId, match: m, message: message, clientId: clientId }, callback);
     });
-  },
 
-  // Use the message
-  lookupClient: function(message, callback) {
-    var ext = message.ext;
-    if(!ext) return callback("No auth provided");
-
-    var clientId = message.clientId;
-
-    presenceService.lookupUserIdForSocket(clientId, function onLookupUserIdForClientIdDone(err, userId) {
-      if(err) return callback(err);
-      if(userId) return callback(null, userId);
-
-      var accessToken = ext.token;
-      if(!accessToken) return callback("No auth provided");
-
-      oauth.validateToken(accessToken, function(err, userId) {
-        if(err) return callback(err);
-        if(!userId) return callback("Invalid access token");
-
-        userId = "" + userId;
-
-        // Get the presence service involved around about now
-        presenceService.userSocketConnected(userId, clientId, function() {
-          if(err) return callback(err);
-          return callback(null, userId);
-
-        });
-
-    });
-    });
   }
+
 };
 
 var pushOnlyServer = {
   incoming: function(message, callback) {
-    if (!message.channel.match(/^\/meta\//)) {
-      var password = message.ext && message.ext.password;
-      if (password !== superClientPassword)
-        message.error = '403::Password required';
+    if (message.channel.match(/^\/meta\//)) {
+      return callback(message);
     }
+
+    if(messageIsFromSuperClient(message)) {
+      return callback(message);
+    }
+
+    message.error = '403::Push access denied';
     callback(message);
   },
 
@@ -182,9 +239,10 @@ var pushOnlyServer = {
     if (message.ext) delete message.ext.password;
     callback(message);
   }
+
 };
 
-var pushOnlyServerClient = {
+var superClient = {
   outgoing: function(message, callback) {
     message.ext = message.ext || {};
     message.ext.password = superClientPassword;
@@ -196,6 +254,7 @@ var server = new faye.NodeAdapter({
   mount: '/faye',
   timeout: nconf.get('ws:fayeTimeout'),
   ping: nconf.get('ws:fayePing'),
+  retry: nconf.get('ws:fayeRetry'),
   engine: {
     type: fayeRedis,
     host: nconf.get("redis:host"),
@@ -215,15 +274,20 @@ module.exports = {
   attach: function(httpServer) {
 
     // Attach event handlers
-    server.addExtension(auth);
+    server.addExtension(authenticator);
+    server.addExtension(authorisor);
     server.addExtension(pushOnlyServer);
-    client.addExtension(pushOnlyServerClient);
 
-    server.bind('handshake', function(clientId) {
-     winston.debug("Faye handshake: ", { clientId: clientId });
-    });
+    client.addExtension(superClient);
+
+    //server.bind('handshake', function(clientId) {
+    //  winston.debug("Faye handshake: ", { clientId: clientId });
+    //});
 
     server.bind('disconnect', function(clientId) {
+      // Warning, this event is called pretty simulateously on
+      // all the servers that are connected to the same redis/faye
+      // connection
       winston.info("Client " + clientId + " disconnected");
       presenceService.socketDisconnected(clientId, { immediate: false }, function(err) {
         if(err) { winston.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err,  { exception: err }); }
@@ -236,23 +300,7 @@ module.exports = {
       setTimeout(callback, 1000);
     });
 
-    presenceService.validateActiveUsers(server._server._engine, function(err) {
-      if(err) {
-        winston.error('Error while validating active users:' + err, { exception: err });
-        return;
-      }
-
-      winston.info('Users validated');
-    });
-
-    presenceService.validateActiveSockets(server._server._engine, function(err) {
-      if(err) {
-        winston.error('Error while validating active sockets:' + err, { exception: err });
-        return;
-      }
-
-      winston.info('Sockets validated');
-    });
+    presenceService.startPresenceGcService(server._server._engine);
     server.attach(httpServer);
   }
 };
