@@ -19,7 +19,7 @@ define([
     alertpanel: false,
     selectedListIcon: "icon-troupes",
     events: {
-      "click #menu-toggle-button":               "onMenuToggle",
+      "click #menu-toggle-button":        "onMenuToggle",
       "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
       "mouseenter #menu-toggle":          "onLeftMenuHotspot",
       "mouseenter #content-frame":        "onMouseEnterContentFrame",
@@ -39,7 +39,7 @@ define([
 
       "click #file-header":               "onFileHeaderClick",
       "click #mail-header":               "onMailHeaderClick",
-      "keypress":                            "onKeyPress"
+      "keypress":                         "onKeyPress"
     },
 
     initialize: function(options) {
@@ -144,6 +144,7 @@ define([
     },
 
     showProfileMenu: function() {
+      console.log("showProfileMenu");
       if (!this.profilemenu) {
 
         // $(".trpProfileMenu").animate({
@@ -157,8 +158,8 @@ define([
       }
     },
 
-
     hideProfileMenu: function() {
+      console.log("hideProfileMenu");
       if (this.profilemenu) {
         $(".trpProfileMenu").fadeOut('fast');
         // $(".trpProfileMenu").animate({
@@ -341,10 +342,12 @@ define([
     },
 
     onMouseEnterHeader: function() {
+      log("Enter Header");
       this.showProfileMenu();
     },
 
     onMouseLeaveHeader: function() {
+      log("Exist Header");
       this.hideProfileMenu();
     },
 

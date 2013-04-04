@@ -76,7 +76,7 @@ require([
 
       if(window.troupeContext.accessDenied) {
         // Listen out for acceptance
-        console.dir(window.troupeContext);
+        // console.dir(window.troupeContext);
         var troupeCollection = new troupeModels.TroupeCollection();
         troupeCollection.listen();
         troupeCollection.on("add", function(model) {
