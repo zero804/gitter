@@ -1,13 +1,13 @@
 /*jshint unused:true, browser:true */
-
 define([
   'jquery',
   'underscore',
   'backbone',
   'views/app/uiVars',
   'fineuploader',
-  "nanoScroller"
-  ], function($, _, Backbone, uiVars, qq) {
+  "nanoScroller",
+  'utils/log'
+  ], function($, _, Backbone, uiVars, qq, log) {
   "use strict";
 
   return Backbone.View.extend({
@@ -91,14 +91,14 @@ define([
       });
 
       this.app.rightPanelRegion.on('show', function() {
-        //if (typeof console != "undefined") console.log("SHOW PANEL");
+        //log("SHOW PANEL");
         self.showPanel("#right-panel");
       });
 
       this.app.rightPanelRegion.on('close', function() {
         window.setTimeout(function() {
           if(!self.app.rightPanelRegion.currentView) {
-            //if (typeof console != "undefined") console.log("CLOSE PANEL");
+            //log("CLOSE PANEL");
             self.hidePanel("#right-panel");
           }
         }, 100);

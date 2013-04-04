@@ -5,8 +5,9 @@ define([
   'backbone',
   'views/base',
   'hbs!./tmpl/personDetailView',
-  './confirmRemoveModalView'
-], function($, _, Backbone, TroupeViews, template, ConfirmRemoveModalView){
+  './confirmRemoveModalView',
+  'utils/log'
+], function($, _, Backbone, TroupeViews, template, ConfirmRemoveModalView, log){
   return TroupeViews.Base.extend({
     template: template,
     buttonMenu : false,
@@ -47,7 +48,7 @@ define([
             data: "",
             type: "DELETE",
             success: function(data) {
-              if (typeof console != "undefined") console.log("Removed this person");
+              log("Removed this person");
               // thisPerson.$el.toggle();
               if (thisPerson.isSelf)
                 window.location = window.troupeContext.homeUrl;

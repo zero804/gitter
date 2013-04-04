@@ -2,8 +2,9 @@
 define([
   'jquery',
   'underscore',
-  './realtime'
-], function($, _, realtime) {
+  './realtime',
+  'utils/log'
+], function($, _, realtime, log) {
   "use strict";
 
   //
@@ -70,7 +71,7 @@ define([
       var sendQueue = readNotificationQueue;
       readNotificationQueue = {};
 
-      //if (typeof console != "undefined") console.log("Sending read notifications: ", sendQueue);
+      //log("Sending read notifications: ", sendQueue);
 
       $.ajax({
         url: "/troupes/" + window.troupeContext.troupe.id + "/unreadItems",
@@ -99,7 +100,7 @@ define([
       var itemType = $e.data('itemType');
       var itemId = $e.data('itemId');
 
-      // if (typeof console != "undefined") console.log("found an unread item: itemType ", itemType, "itemId", itemId);
+      // log("found an unread item: itemType ", itemType, "itemId", itemId);
 
       if(itemType && itemId) {
         var top = $e.offset().top;
@@ -232,7 +233,7 @@ define([
 
       realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
         if(message.notification === 'troupe_unread') {
-          if (typeof console != "undefined") console.log("troupe_unread change", message);
+          log("troupe_unread change", message);
 
           var troupeId = message.troupeId;
           var totalUnreadItems = message.totalUnreadItems;
@@ -248,7 +249,7 @@ define([
 
           } else {
             // TODO: sort this out
-            if (typeof console != "undefined") console.log("Cannot find model. Refresh might be required....");
+            log("Cannot find model. Refresh might be required....");
           }
 
           recount();

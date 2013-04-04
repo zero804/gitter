@@ -152,7 +152,7 @@ define([
       var previewMimeType = item.get('previewMimeType');
       var mimeType = item.get('mimeType');
 
-      if (typeof console != "undefined") console.log("WHAT AM I: " + mimeType);
+      log("WHAT AM I: " + mimeType);
       if(displayDirectMimeTypes[mimeType]) {
         return {
           href: item.get('url') + '?embedded=1',

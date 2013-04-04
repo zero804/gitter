@@ -1,16 +1,17 @@
 /*jshint unused:true, browser:true*/
 require([
   'jquery',
-  'retina' ],
-  function($) {
+  'utils/log',
+  'retina'],
+  function($, log) {
     if(window.localStorage.defaultTroupeEmail) {
       $('#email').val(window.localStorage.defaultTroupeEmail);
     }
 
-    if (typeof console != "undefined") console.log("Document: " + $(document).width());
+    log("Document: " + $(document).width());
     var leftPanelSpacing = (($(document).width() - 320) / 2) + 320;
 
-    if (typeof console != "undefined") console.log("Where am I: " + leftPanelSpacing);
+    log("Where am I: " + leftPanelSpacing);
 
     $('#panel-signup').css('left', leftPanelSpacing + 'px');
 
@@ -34,7 +35,7 @@ require([
     });
 
     $('#password').on('blur', function() {
-      if (typeof console != "undefined") console.log("Password blur");
+      log("Password blur");
       hideLoginFailure();
     });
 
@@ -49,7 +50,7 @@ require([
     var showingFailure = false;
 
     function showLoginFailure() {
-      if (typeof console != "undefined") console.log("UP YOU SLIDE");
+      log("UP YOU SLIDE");
       // $('#panel-failure').slideUp();
       $('#panel-failure').animate( {
         bottom: '0px'
@@ -59,7 +60,7 @@ require([
 
     function hideLoginFailure() {
       if (showingFailure) {
-        if (typeof console != "undefined") console.log("DOWN YOU SLIDE");
+        log("DOWN YOU SLIDE");
          $('#panel-failure').animate( {
             bottom: '-90px'
           }, 350);
@@ -77,13 +78,13 @@ require([
         data: form.serialize(),
         type: "POST",
         error: function(/*jqXHR, textStatus, errorThrown*/) {
-          if (typeof console != "undefined") console.log("Error");
+          log("Error");
           showLoginFailure();
 
         },
         success: function(data) {
           if(data.failed) {
-            if (typeof console != "undefined") console.log("No it actually failed");
+            log("No it actually failed");
             showLoginFailure();
             return;
           }
