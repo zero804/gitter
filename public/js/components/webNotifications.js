@@ -12,7 +12,7 @@ define([
   // notifications for cross troupe chat messages
   realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
     if (message.notification === 'user_notification') {
-      // if (typeof console != "undefined") console.log("Got a user_notification event");
+      // log("Got a user_notification event");
       var tmpl = handlebars.compile('<a href="{{link}}"><div class="notification-header">{{{title}}}</div><div class="notification-text">{{{text}}}</div></a>');
       notifications.notify({
         content: tmpl({
@@ -61,7 +61,7 @@ define([
 
   // websocket notifications
   $(document).on('realtime:persistentOutage', function() {
-    if (typeof console != "undefined") console.log('realtime:persistentOutage');
+    log('realtime:persistentOutage');
     notifications.notify({
       id: 'realtime-error',
       className: 'notification-error',
@@ -72,7 +72,7 @@ define([
   });
 
   $(document).on('realtime:persistentOutageCleared', function() {
-    if (typeof console != "undefined") console.log('realtime:persistentOutageCleared');
+    log('realtime:persistentOutageCleared');
     notifications.notify({
       id: 'realtime-error',
       action: 'hide'

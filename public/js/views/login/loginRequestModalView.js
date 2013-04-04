@@ -1,15 +1,15 @@
 /*jshint unused:true, browser:true */
 
 // TODO: Better transition to request confirm page
-
 define([
   'jquery',
   'underscore',
   'views/base',
   'hbs!./tmpl/loginRequestModalView',
+  'utils/log',
   'jquery_validate',
   'jquery_placeholder'
-], function($, _, TroupeViews, template) {
+], function($, _, TroupeViews, template, log) {
   return TroupeViews.Base.extend({
     template: template,
 
@@ -62,7 +62,7 @@ define([
         },
         debug: true,
         showErrors: function(errorMap, errorList) {
-          if (typeof console != "undefined") console.log("errorList: " + errorList.length);
+          log("errorList: " + errorList.length);
           if (errorList.length === 0) $('.request-failure').hide();
           if (errorList.length > 0) $('.request-failure').show();
           var errors = "";

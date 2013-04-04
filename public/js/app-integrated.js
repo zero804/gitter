@@ -35,14 +35,15 @@ require([
   'views/app/troupeSettingsView',
   'components/webNotifications',
   'components/unread-items-client',
+  'utils/log',
   'components/errorReporter',
   'filtered-collection'
 ], function($, _, Backbone, Marionette, _Helpers, TroupeViews, realtime, AppIntegratedView, ChatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
             troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView,
             createTroupeView, headerViewTemplate, shareTroupeView,
-            troupeSettingsView, webNotifications, unreadItemsClient/*, errorReporter , FilteredCollection */) {
-  /*global console:true require:true */
+            troupeSettingsView, webNotifications, unreadItemsClient, log /*, errorReporter , FilteredCollection */) {
+  /*global require:true */
   "use strict";
 
   var preloadedFetch = false;
@@ -128,7 +129,7 @@ require([
   });
 
   /*var subscription = */ realtime.subscribe('/troupes/' + window.troupeContext.troupe.id, function(message) {
-    if (typeof console != "undefined") console.log("Subscription!", message);
+    log("Subscription!", message);
     if(message.notification === 'presence') {
       if(message.status === 'in') {
         $(document).trigger('userLoggedIntoTroupe', message);

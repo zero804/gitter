@@ -6,8 +6,9 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!./tmpl/installChromeExtensionModalView'
-], function($, _, TroupeViews, template) {
+  'hbs!./tmpl/installChromeExtensionModalView',
+  'utils/log'
+], function($, _, TroupeViews, template, log) {
 
     return TroupeViews.Base.extend({
     template: template,
@@ -26,7 +27,7 @@ define([
 
     installClicked: function() {
       that = this;
-      if (typeof console != "undefined") console.log("Now install");
+      log("Now install");
       chrome.webstore.install(undefined, function() {
         that.$el.find('#installer-frame').attr('src', '/install-chrome-extension');
         that.trigger('install.complete');
