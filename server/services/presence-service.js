@@ -2,6 +2,7 @@
 "use strict";
 
 var redis = require("../utils/redis"),
+    nconf = require("../utils/config"),
     winston = require('winston'),
     appEvents = require('../app-events.js'),
     _ = require("underscore"),
@@ -16,13 +17,13 @@ function removeSocketFromUserSockets(socketId, userId, callback) {
   winston.debug("presence: removeSocketFromUserSockets: ", { userId: userId, socketId: socketId });
 
   var key = "pr:user:" + userId;
+
   redisClient.srem(key, socketId, function(err, sremResult) {
     if(err) return callback(err);
 
     // If result != 1, it means that this operation has already occurred somewhere else in the system
     // pr:user acts as an exclusivity-lock
     if(sremResult != 1) {
-      winston.debug('SREMRESULT IS ' + sremResult);
       winston.warn('Socket not in list of sockets associated with user', { key: key, userId: userId, socketId: socketId });
       return callback(null, false);
     }
@@ -35,13 +36,13 @@ function removeSocketFromUserSockets(socketId, userId, callback) {
 
         var zincrbyResult = parseInt(replies[0], 10);
 
-        callback(null, zincrbyResult === 0);
+        return callback(null, zincrbyResult === 0);
       });
 
   });
 }
 
-function removeUserFromTroupe(socketId, userId, callback) {
+function disassociateUserSocketFromTroupe(userId, socketId, callback) {
   redisClient.multi()
     .get("pr:socket_troupe:" + socketId)    // 0 Find the troupe associated with the socket
     .del("pr:socket_troupe:" + socketId)    // 1 Delete the socket troupe association
@@ -91,6 +92,18 @@ function removeUserFromTroupe(socketId, userId, callback) {
 
 }
 
+function exclusiveLock(keyName, keyExpiry, callback) {
+  redisClient.multi()
+    .setnx(keyName, "lock")           // 0 - Set the key if it doesn't exist
+    .pexpire(keyName, keyExpiry)      // 1 - Set it to expire
+    .exec(function(err, replies) {
+      if(err) return callback(err);
+      var didNotExist = !!replies[0];   // Doesn't exist means we've obtained the lock
+
+      return callback(null, didNotExist);
+    });
+}
+
 function userSocketDisconnected(userId, socketId, options, callback) {
   if(!options) options = {};
 
@@ -112,7 +125,6 @@ function userSocketDisconnected(userId, socketId, options, callback) {
       }
 
       return callback();
-
     });
   }
 
@@ -131,7 +143,7 @@ module.exports = {
       // If the socket was not added (as it's ready there) then this isn't the first time this
       // operation is being performed, so don't continue. We're using redis as an exclusivity lock
       if(saddResult != 1) {
-        winston.debug("presence: SADD " + userKey + " " + socketId + " -> " + saddResult  + ". Socket already registered.");
+        winston.warn("presence: socket" + socketId + " already registered to user");
         return callback();
       }
 
@@ -166,7 +178,11 @@ module.exports = {
     // Associate socket with troupe
     redisClient.setnx("pr:socket_troupe:" + socketId, troupeId, function(err, result) {
       if(err) return callback(err);
-      if(!result) return callback();
+
+      if(!result) {
+        winston.warn('presence: userSubscribedToTroupe: socket ' + socketId + ' is already associated with a troupe');
+        return callback();
+      }
 
       // increment the score for user in troupe_users zset
       redisClient.zincrby('pr:tr_u:' + troupeId, 1, userId, function(err, reply) {
@@ -186,14 +202,21 @@ module.exports = {
 
   },
 
-  // Called when a socket is disconnected
+  // Warning, because of the way Faye-Redis Engine works, this
+  // method is likely to be called multiple times
+  // so whatever we do, we need to handle that
   socketDisconnected: function(socketId, options, callback) {
-    winston.info("presence: Socket disconnected: " + socketId);
+    // de = disconnection event
+    exclusiveLock('pr:de:' + socketId, 10000, function(err, obtained) {
+      if(err) return callback(err);
+      if(!obtained) return callback();
 
-    var retryCount = 0;
-    attemptSocketDisconnected();
+      winston.info("presence: Socket disconnected: " + socketId);
+      attemptSocketDisconnected(0);
+    });
 
-    function attemptSocketDisconnected() {
+
+    function attemptSocketDisconnected(retryCount) {
       // Disassociates the socket with user, the user with the socket, deletes the socket
       // returns the userId in the callback
       redisClient.multi()
@@ -210,10 +233,9 @@ module.exports = {
           // and the connect writes have not yet completed........
           if(!userId) {
             if(retryCount <= 0) {
-              retryCount++;
               winston.debug("presence: Socket not registered. Giving it 1s and will try again....");
 
-              setTimeout(attemptSocketDisconnected, 1000);
+              setTimeout(function() { attemptSocketDisconnected(++retryCount); }, 1000);
               return;
 
             } else {
@@ -222,7 +244,9 @@ module.exports = {
             }
           }
 
-          removeUserFromTroupe(socketId, userId, function(err) {
+          winston.info("presence: Disassociating socket " + socketId + " from troupe ");
+
+          disassociateUserSocketFromTroupe(userId, socketId, function(err) {
             if(err) return callback(err);
 
             userSocketDisconnected(userId, socketId, options, callback);
@@ -239,7 +263,7 @@ module.exports = {
 
       if(!users.length) {
         winston.info("presence: No active users, validation skipped");
-        return callback();
+        return callback(null, 0);
       } else {
         winston.info("presence: Validating " + users.length + " active users");
       }
@@ -253,6 +277,7 @@ module.exports = {
         if(err) return callback(err);
 
         var promises = [];
+        var invalidCount = 0;
 
         userSocketsReply.forEach(function(socketIds, index) {
           var userId = users[index];
@@ -266,15 +291,15 @@ module.exports = {
             engine.clientExists(socketId, function(exists) {
               if(exists) return d.resolve();
 
+              invalidCount++;
               winston.info("presence: Invalid socket found for user" + userId);
-
               userSocketDisconnected(userId, socketId, { immediate: true }, d.makeNodeResolver());
             });
 
           });
         });
 
-        Q.all(promises).then(function() { callback(); }, callback);
+        Q.all(promises).then(function() { callback(null, invalidCount); }, callback);
 
       });
     });
@@ -288,13 +313,13 @@ module.exports = {
       }
     };
 
-    winston.debug('presence: Commencing validation.');
-
     redisClient.smembers("pr:activesockets", function(err, sockets) {
       if(!sockets.length) {
         winston.debug('presence: Validation: No active sockets.');
-        return callback();
+        return callback(null, 0);
       }
+
+      var invalidCount = 0;
 
       winston.info('presence: Validating ' + sockets.length + ' active sockets');
       var promises = [];
@@ -305,18 +330,42 @@ module.exports = {
 
         engine.clientExists(socketId, function(exists) {
           if(!exists) {
+            invalidCount++;
             winston.debug('Disconnecting invalid socket ' + socketId);
             module.exports.socketDisconnected(socketId, { immediate: true }, d.makeNodeResolver());
           } else {
-            winston.debug('Socket still appears to be valid:' + socketId);
             d.resolve();
           }
         });
 
       });
 
-      Q.all(promises).then(function() { callback(); }, callback);
+      Q.all(promises).then(function() { callback(null, invalidCount); }, callback);
     });
+  },
+
+  startPresenceGcService: function(engine) {
+    setInterval(function() {
+      var start = Date.now();
+
+      module.exports.validateActiveSockets(engine, function(err, invalidSocketCount) {
+        if(err) return winston.error('Error while validating active sockets: ' + err, { exception: err });
+
+        module.exports.validateActiveUsers(engine, function(err, invalidUserCount) {
+          if(err) return winston.error('Error while validating active users: ' + err, { exception: err });
+
+          var total = Date.now() - start;
+          var message = 'Presence GC took ' + total + 'ms and cleared out ' + invalidSocketCount + ' sockets and ' + invalidUserCount + ' invalid users';
+          if(invalidSocketCount || invalidUserCount) {
+            winston.warn(message);
+          } else {
+            winston.info(message);
+          }
+
+        });
+
+      });
+    }, nconf.get('presence:gcInterval'));
   },
 
   lookupUserIdForSocket: function(socketId, callback) {
