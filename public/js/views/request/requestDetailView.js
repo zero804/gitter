@@ -5,8 +5,9 @@ define([
   'backbone',
   'views/base',
   'hbs!./tmpl/requestDetailView',
-  'hbs!./tmpl/rejectConfirmation'
-], function($, _, Backbone, TroupeViews, template, rejectConfirmationTemplate){
+  'hbs!./tmpl/rejectConfirmation',
+  'utils/log'
+], function($, _, Backbone, TroupeViews, template, rejectConfirmationTemplate, log){
   return TroupeViews.Base.extend({
     unreadItemType: 'request',
     template: template,
@@ -59,7 +60,7 @@ define([
           window.location.href = "#!";
         },
         error: function(model, resp, options) {
-          if (typeof console != "undefined") console.log("Error rejecting request.");
+          log("Error rejecting request.");
         }
       });
     },

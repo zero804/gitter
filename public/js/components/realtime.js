@@ -1,9 +1,9 @@
 /*jshint unused:true, browser:true*/
 define([
   'jquery',
-  'faye'
-], function($, Faye) {
-  /*global console:true*/
+  'faye',
+  'utils/log'
+], function($, Faye, log) {
   "use strict";
 
   Faye.Logging.logLevel = 'debug';
@@ -54,7 +54,7 @@ define([
   client.addExtension(new ClientAuth());
 
   client.bind('transport:down', function() {
-    if (typeof console != "undefined") console.log('transport:down');
+    log('transport:down');
     connected = false;
 
     if(!connectionProblemTimeoutHandle) {
@@ -66,7 +66,7 @@ define([
   });
 
   client.bind('transport:up', function() {
-    if (typeof console != "undefined") console.log('transport:up');
+    log('transport:up');
     connected = true;
 
     if(connectionProblemTimeoutHandle) {

@@ -1,8 +1,8 @@
 /*jshint unused:true, browser:true */
 define([
   'jquery',
-  'underscore'
-], function($, _){
+  'utils/log'
+], function($, log){
   /*global console: false document: false window:false*/
   "use strict";
 
@@ -39,10 +39,10 @@ define([
 
           notification = nc.createNotification(null, "User has logged in", data.notificationText);
           notification.onclose = function() {
-            if (typeof console != "undefined") console.log("Notif onclose");
+            log("Notif onclose");
           };
           notification.onclick = function() {
-            if (typeof console != "undefined") console.log("Notif onclick");
+            log("Notif onclick");
           };
           notification.show();
         //}

@@ -1,11 +1,12 @@
 /*jshint unused:true, browser:true */
 define([
-  'ga'
-], function(_gaq) {
+  'ga',
+  'utils/log'
+], function(_gaq, log) {
 
   if(!window.troupeTrackingId) {
     return {
-      trackError: function(message, file, line) { if (typeof console != "undefined") console.log("An unexpected error occurred: '" + message + "' in " + file  + ":" + line, arguments); }
+      trackError: function(message, file, line) { log("An unexpected error occurred: '" + message + "' in " + file  + ":" + line, arguments); }
     };
   }
 
@@ -39,16 +40,16 @@ define([
   _gaq.push(['_trackPageview']);
 
 
-  if (typeof console != "undefined") console.log("Clearing the hash");
+  log("Clearing the hash");
   _gaq.push(function() {
 
     window.setTimeout(function() {
-      if (typeof console != "undefined") console.log("Callback from GAQ");
+      log("Callback from GAQ");
       var hash = "" + window.location.hash;
       try {
         hash = hash.replace(/\butm_\w+=(\+|\w+|%\w\w|\-)*&?/g, "");
       } catch(e) {
-        if (typeof console != "undefined") console.log(e);
+        log(e);
       }
 
       window.location.hash = hash;
