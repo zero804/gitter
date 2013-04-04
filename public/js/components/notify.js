@@ -1,7 +1,8 @@
 /*jshint unused:true, browser:true*/
 define([
-  'jquery'
-], function($){
+  'jquery',
+  'utils/log'
+], function($, log) {
   "use strict";
 
   $.prototype.notify = function(options) {
@@ -53,7 +54,7 @@ define([
     this.on('mouseenter', /* '.notification',*/ function(e) {
 
       if (container.data('notification-hide-running') === true && e.currentTarget === container[0]) {
-        // if (typeof console != "undefined") console.log('cancelling timeouts', e);
+        // log('cancelling timeouts', e);
         // cancel all hide timeouts
         container.data('notification-hide-running', false);
         container.find('.notification').each(function(n) {
@@ -64,7 +65,7 @@ define([
 
     this.on('mouseleave', /* '.notification',*/ function(e) {
       if (container.data('notification-hide-running') === false && e.currentTarget === container[0]) {
-        // if (typeof console != "undefined") console.log('resuming timeouts', e);
+        // log('resuming timeouts', e);
         // restart all the hide timeouts
         container.data('notification-hide-running', true);
         container.find('.notification').each(function(n) {

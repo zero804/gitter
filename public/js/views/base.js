@@ -6,8 +6,9 @@ define([
   'hbs!./tmpl/modal',
   '../template/helpers/all',
   'hbs!./tmpl/confirmationView',
+  'utils/log',
   'backbone-keys' // no ref
-], function($, _, Backbone, modalTemplate, helpers, confirmationViewTemplate) {
+], function($, _, Backbone, modalTemplate, helpers, confirmationViewTemplate, log) {
   /*jshint trailing:false */
   /*global require:true console:true setTimeout:true*/
   "use strict";
@@ -530,7 +531,7 @@ define([
     },
 
     appendHtml: function(collectionView, itemView, index) {
-      //if (typeof console != "undefined") console.log("Inserting new item ", itemView, " at index ", index);
+      //log("Inserting new item ", itemView, " at index ", index);
 
       function findViewAtPos(i) {
         if (i >= collectionView.collection.length)

@@ -6,9 +6,10 @@ define([
   'views/base',
   'hbs!./tmpl/createTroupeView',
   'views/share/shareTableView',
+  'utils/log',
   'jquery_validate', // no ref
   'jquery_placeholder' // no ref
-], function($, _, TroupeViews, template, ShareTableView) {
+], function($, _, TroupeViews, template, ShareTableView, log) {
   var View = TroupeViews.Base.extend({
     template: template,
 
@@ -100,14 +101,14 @@ define([
           url: '/troupes/',
           wait: true,
           success: function(troupe /*, resp, options*/) {
-            if (typeof console != "undefined") console.log('response from upgrading one to one troupe', troupe);
+            log('response from upgrading one to one troupe', troupe);
             window.location.href = "/" + troupe.get('uri') + "#|shareTroupe";
           }
         });
       }
       // we are operating from the signup page, without app integrated, so we don't have a collection
       else {
-        if (typeof console != "undefined") console.log("Serialized form: " + serializedForm);
+        log("Serialized form: " + serializedForm);
         $.ajax({
           url: "/signup",
           contentType: "json",

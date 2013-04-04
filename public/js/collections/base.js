@@ -3,8 +3,9 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'components/realtime'
-], function($, _, Backbone, realtime) {
+  'components/realtime',
+  'utils/log'
+], function($, _, Backbone, realtime, log) {
   "use strict";
 
   var exports = {};
@@ -127,11 +128,11 @@ define([
       });
 
       this.subscription.callback(function() {
-        // if (typeof console != "undefined") console.log('Listening to ' + self.url);
+        // log('Listening to ' + self.url);
       });
 
       this.subscription.errback(function(error) {
-        if (typeof console != "undefined") console.log('Subscription error for ' + self.url, error);
+        log('Subscription error for ' + self.url, error);
       });
     },
 
@@ -153,7 +154,7 @@ define([
       if(existing) return existing;
 
       if(this.findModelForOptimisticMerge) {
-        if (typeof console != "undefined") console.log("Looking for a candidate for ", newModel);
+        log("Looking for a candidate for ", newModel);
 
         existing = this.findModelForOptimisticMerge(newModel);
       }
@@ -182,7 +183,7 @@ define([
             // If at least one of the docs has a version number ...
             // And the new document is an older version than the new document...
             if((incomingVersion || existingVersion) && (incomingVersion <= existingVersion) && (operation != 'create')) {
-              if (typeof console != "undefined") console.log('Ignoring out-of-date update', existing.toJSON(), newModel);
+              log('Ignoring out-of-date update', existing.toJSON(), newModel);
               break;
             }
 
@@ -202,7 +203,7 @@ define([
           break;
 
         default:
-          if (typeof console != "undefined") console.log("Unknown operation " + operation + ", ignoring");
+          log("Unknown operation " + operation + ", ignoring");
 
       }
     }
