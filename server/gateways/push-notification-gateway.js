@@ -38,7 +38,7 @@ exports.startWorkers = function() {
       devices.forEach(function(device) {
         var sent = false;
 
-        if(device.deviceType === 'APPLE' && device.appleToken) {
+        if((device.deviceType === 'APPLE' || device.deviceType === 'APPLE-DEV') && device.appleToken) {
           winston.info("Sending apple push notification", { notification: notification });
           var note = new apns.Notification();
 
@@ -61,7 +61,12 @@ exports.startWorkers = function() {
           //note.alert = message;
           note.device = new apns.Device(device.appleToken);
 
-          apnsConnection.sendNotification(note);
+          if(device.deviceType === 'APPLE') {
+            apnsConnection.sendNotification(note);
+          } else {
+            apnsConnectionDev.sendNotification(note);
+          }
+
           sent = true;
         }
 
@@ -94,22 +99,41 @@ exports.startWorkers = function() {
 
   winston.info("Starting APN");
   var apnsConnection = new apns.Connection({
-      cert: nconf.get('apn:cert'),
-      key: nconf.get('apn:key'),
-      gateway: nconf.get('apn:gateway'),
+      cert: nconf.get('apn:certDev'),
+      key: nconf.get('apn:keyDev'),
+      gateway: nconf.get('apn:gatewayDev'),
       enhanced: true,
       errorCallback: errorEventOccurred,
       connectionTimeout: 60000
   });
+
+  var apnsConnectionDev = new apns.Connection({
+      cert: nconf.get('apn:certProd'),
+      key: nconf.get('apn:keyProd'),
+      gateway: nconf.get('apn:gatewayProd'),
+      enhanced: true,
+      errorCallback: errorEventOccurred,
+      connectionTimeout: 60000
+  });
+
 
   function failedDeliveryEventOccurred(timeSinceEpoch/*, deviceToken*/) {
     winston.error("Failed delivery. Need to remove device", { time: timeSinceEpoch });
   }
 
   new apns.Feedback({
-      cert: nconf.get('apn:cert'),
-      key: nconf.get('apn:key'),
-      gateway: nconf.get('apn:feedback'),
+      cert: nconf.get('apn:certDev'),
+      key: nconf.get('apn:keyDev'),
+      gateway: nconf.get('apn:feedbackDev'),
+      feedback: failedDeliveryEventOccurred,
+      interval: nconf.get('apn:feedbackInterval')
+  });
+
+
+  new apns.Feedback({
+      cert: nconf.get('apn:certProd'),
+      key: nconf.get('apn:keyProd'),
+      gateway: nconf.get('apn:feedbackProd'),
       feedback: failedDeliveryEventOccurred,
       interval: nconf.get('apn:feedbackInterval')
   });
