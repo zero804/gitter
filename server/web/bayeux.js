@@ -76,17 +76,22 @@ function messageIsFromSuperClient(message) {
          message.ext.password === superClientPassword;
 }
 
-var authenticator = {
-  incoming: function(message, callback) {
-    function deny() {
-      message.error = '403::Access denied';
-      callback(message);
+function handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake(message, callback) {
+  var clientId = message.clientId;
+  function deny() {
+    message.error = '403::Access denied';
+    callback(message);
+  }
+
+  presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
+    if(err) {
+      winston.error("bayeux: handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake: lookupUserIdForSocket error" + err, { exception: err, message: message });
+      return deny();
     }
 
-    if (message.channel != '/meta/handshake') {
-      return callback(message);
-    }
+    if(userId) return callback(message);
 
+    // We're not authed, try now
     if(messageIsFromSuperClient(message)) {
       return callback(message);
     }
@@ -98,6 +103,57 @@ var authenticator = {
     if(!accessToken) return deny();
 
     oauth.validateToken(accessToken, function(err, userId) {
+      if(err) {
+        winston.error("bayeux: Authentication error" + err, { exception: err, message: message });
+        return deny();
+       }
+
+      if(!userId) {
+        winston.warn("bayeux: Authentication failed", { message: message });
+        return deny();
+      }
+
+      // Get the presence service involved around about now
+      presenceService.userSocketConnected(userId, clientId, function(err) {
+        if(err) winston.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
+        callback(message);
+      });
+
+    });
+  });
+}
+
+var authenticator = {
+  incoming: function(message, callback) {
+    function deny() {
+      message.error = '403::Access denied';
+      callback(message);
+    }
+
+    // TEMP TEMP TEMP
+    if (message.channel == '/meta/subscribe') {
+      return handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake(message, callback);
+    }
+
+    if (message.channel != '/meta/handshake') {
+      return callback(message);
+    }
+
+    winston.debug('bayeux: Authenticating client', message);
+
+    if(messageIsFromSuperClient(message)) {
+      return callback(message);
+    }
+
+    var ext = message.ext;
+    if(!ext || !ext.token) {
+      winston.debug('bayeux: Allowing temporary access to unauthorised handshake client');
+      // Currently the faye connection code doesn't send the ext in the handshake message
+      // see handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake
+      return callback(message);
+    }
+
+    oauth.validateToken(ext.token, function(err, userId) {
       if(err) {
         winston.error("bayeux: Authentication error" + err, { exception: err, message: message });
         return deny();
@@ -131,6 +187,10 @@ var authenticator = {
     // The other half of the UGLY hack,
     // get the userId out from the message
     var fakeId = message.id;
+    if(!fakeId) {
+      return callback(message);
+    }
+
     var parts = fakeId.split(':');
 
     if(parts.length != 2) {
@@ -144,6 +204,8 @@ var authenticator = {
     // Get the presence service involved around about now
     presenceService.userSocketConnected(userId, clientId, function(err) {
       if(err) winston.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
+
+      // Not possible to throw an error here, so just carry only
       callback(message);
     });
 
