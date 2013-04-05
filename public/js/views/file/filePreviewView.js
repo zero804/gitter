@@ -5,8 +5,9 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'hbs!./tmpl/filePreviewView'
-], function($, _, Backbone, TroupeViews, template) {
+  'hbs!./tmpl/filePreviewView',
+  'utils/log'
+], function($, _, Backbone, TroupeViews, template, log) {
   /*jslint browser: true*/
   "use strict";
 
@@ -211,7 +212,7 @@ define([
       id: "download",
       text: "Download"
     }],
-    initialize: function(options) {
+    initialize: function() {
       TroupeViews.Modal.prototype.initialize.apply(this, arguments);
       this.view = new PreviewView({ model: this.model, collection: this.collection });
     }
