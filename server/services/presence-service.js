@@ -7,9 +7,11 @@ var redis = require("../utils/redis"),
     appEvents = require('../app-events.js'),
     _ = require("underscore"),
     Q = require('q'),
+    redisLock,
     redisClient;
 
 redisClient = redis.createClient();
+redisLock = require("redis-lock")(redis.createClient());
 
 // This is called after a timeout (about 10 seconds) so that if the user has
 // opened another socket, we don't send out notifications that they're offline
@@ -42,6 +44,69 @@ function removeSocketFromUserSockets(socketId, userId, callback) {
   });
 }
 
+function eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
+  redisClient.setnx("pr:s_e:" + socketId, 1, function(err, result) {
+    if(err) return callback(err);
+
+    if(!result) return callback();
+
+    // increment the score for user in troupe_users zset
+    redisClient.zincrby('pr:tr_u:' + troupeId, 1, userId, function(err, reply) {
+      if(err) return callback(err);
+
+      var userScore = parseInt(reply, 10);                   // Score for user is returned as a string
+      if(userScore == 1) {
+        /* User joining this troupe for the first time.... */
+        winston.info("presence: User " + userId + " has just joined " + troupeId);
+        appEvents.userLoggedIntoTroupe(userId, troupeId);
+      }
+
+      return callback();
+    });
+
+  });
+
+}
+
+function eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
+  redisClient.del("pr:s_e:" + socketId, function(err, result) {
+    if(err) return callback(err);
+
+    if(!result) return callback();
+
+    var key = 'pr:tr_u:' + troupeId;
+    redisClient.multi()
+      .zincrby(key, -1, userId)            // 0 decrement the score for user in troupe_users zset
+      .zremrangebyscore(key, '-inf', '0')  // 1 remove everyone with a score of zero (no longer in the troupe)
+      .zcard(key)                          // 2 count the number of users left in the set
+      .exec(function(err, replies) {
+        if(err) return callback(err);
+
+        var userHasLeftTroupe = parseInt(replies[0], 10) <= 0;
+        var troupeIsEmpty = replies[2] === 0;
+
+        if(troupeIsEmpty && !userHasLeftTroupe) {
+          winston.warn("Troupe is empty, yet user has not left troupe. Something is fishy.", { troupeId: troupeId, socketId: socketId, userId: userId });
+        }
+
+        if(userHasLeftTroupe) {
+          winston.info("presence: User " + userId + " is gone from " + troupeId);
+
+          appEvents.userLoggedOutOfTroupe(userId, troupeId);
+
+          if(troupeIsEmpty) {
+            winston.info("presence: The last user has disconnected from troupe " + troupeId);
+          }
+        }
+
+        winston.debug("presence: User removed from troupe ", { troupeId: troupeId, userId: userId } );
+
+        return callback();
+      });
+  });
+
+}
+
 function disassociateUserSocketFromTroupe(userId, socketId, callback) {
   redisClient.multi()
     .get("pr:socket_troupe:" + socketId)    // 0 Find the troupe associated with the socket
@@ -56,40 +121,8 @@ function disassociateUserSocketFromTroupe(userId, socketId, callback) {
         return callback();
       }
 
-      var key = 'pr:tr_u:' + troupeId;
-      redisClient.multi()
-        .zincrby(key, -1, userId)            // 0 decrement the score for user in troupe_users zset
-        .zremrangebyscore(key, '-inf', '0')  // 1 remove everyone with a score of zero (no longer in the troupe)
-        .zcard(key)                          // 2 count the number of users left in the set
-        .exec(function(err, replies) {
-          if(err) return callback(err);
-
-          var userHasLeftTroupe = parseInt(replies[0], 10) <= 0;
-          var troupeIsEmpty = replies[2] === 0;
-
-          if(troupeIsEmpty && !userHasLeftTroupe) {
-            winston.warn("Troupe is empty, yet user has not left troupe. Something is fishy.", { troupeId: troupeId, socketId: socketId, userId: userId });
-          }
-
-          if(userHasLeftTroupe) {
-            winston.info("presence: User " + userId + " is gone from " + troupeId);
-
-            appEvents.userLoggedOutOfTroupe(userId, troupeId);
-
-            if(troupeIsEmpty) {
-              winston.info("presence: The last user has disconnected from troupe " + troupeId);
-            }
-          }
-
-          winston.debug("presence: User removed from troupe ", { troupeId: troupeId, userId: userId } );
-
-          return callback();
-
-        });
-
+      eyeBallsOffTroupe(userId, socketId, troupeId, callback);
     });
-
-
 }
 
 function exclusiveLock(keyName, keyExpiry, callback) {
@@ -184,20 +217,7 @@ module.exports = {
         return callback();
       }
 
-      // increment the score for user in troupe_users zset
-      redisClient.zincrby('pr:tr_u:' + troupeId, 1, userId, function(err, reply) {
-        if(err) return callback(err);
-
-        var userScore = parseInt(reply, 10);                   // Score for user is returned as a string
-        if(userScore == 1) {
-          /* User joining this troupe for the first time.... */
-          winston.info("presence: User " + userId + " has just joined " + troupeId);
-          appEvents.userLoggedIntoTroupe(userId, troupeId);
-        }
-
-        return callback();
-      });
-
+      eyeBallsOnTroupe(userId, socketId, troupeId, callback);
     });
 
   },
@@ -436,6 +456,45 @@ module.exports = {
 
       return callback(null, result);
     });
+
+  },
+
+  clientEyeballSignal: function(userId, socketId, eyeballsOn, callback) {
+    redisClient.multi()
+      .sismember("pr:user:" + userId, socketId)    // 0 Check if this socket is owned by this user
+      .get("pr:socket_troupe:" + socketId)         // 1 Find the troupe associated with the socket
+      .exec(function(err, replies) {
+      if(err) return callback(err);
+
+      var sIsMemberResult = replies[0];
+
+      if(!sIsMemberResult) return callback('Invalid socketId');
+
+      var troupeId = replies[1];
+      if(!troupeId) return callback('Socket is not associated with a troupe');
+
+      // We now trust that this socket belongs to this user, let's do some magic
+      redisLock('pr:l:eb:' + socketId, 1000, function(done) {
+        function unlock(err, result) {
+          done(function() {
+            callback(err, result);
+          });
+        }
+
+        if(eyeballsOn) {
+          winston.debug('presence: Eyeballs on: user ' + userId + ' troupe ' + troupeId);
+          return eyeBallsOnTroupe(userId, socketId, troupeId, unlock);
+
+        } else {
+          winston.debug('presence: Eyeballs off: user ' + userId + ' troupe ' + troupeId);
+          return eyeBallsOffTroupe(userId, socketId, troupeId, unlock);
+        }
+
+      });
+
+    });
+
+
 
   }
 

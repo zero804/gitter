@@ -12,7 +12,6 @@ define([
   var connectionProblemTimeoutHandle;
   var persistentOutage = false;
 
-
   function connectionProblemTimeout() {
     connectionProblemTimeoutHandle = null;
 
