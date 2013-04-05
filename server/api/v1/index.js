@@ -1,7 +1,6 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var passport = require('passport');
 var middleware = require('../../web/middleware');
 
 module.exports = {
@@ -16,6 +15,9 @@ module.exports = {
 
     app.all('/api/v1/userapn', auth);
     app.resource('api/v1/userapn', require('./userapn.js'));
+
+    app.all('/api/v1/eyeballs', auth);
+    app.resource('api/v1/eyeballs', require('./eyeballs.js'));
 
   }
 };
