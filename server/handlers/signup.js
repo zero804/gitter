@@ -163,13 +163,20 @@ module.exports = {
       // this confirmation handler doesn't redirect to any specific troupe, use /troupeUri/confirm/abc for that instead
       app.get('/confirm/:confirmationCode',
         middleware.authenticate('confirm', { failureRedirect: '/confirm-failed' } ),
-        function(req, res, next){
+        function(req, res){
           winston.debug("Confirmation authenticated");
 
           signupService.confirm(req.user, function(err/*, user, troupe */) {
             if (err) {
               winston.error("Signup service confirmation failed", { exception: err } );
-              return next(err);
+
+              middleware.logoutPreserveSession(req, res, function() {
+                res.redirect(nconf.get('web:homeurl') + "#message-confirmation-failed-already-registered");
+                //res.redirect("confirmation-failed");
+              });
+
+              return;
+
             }
 
             res.relativeRedirect(nconf.get('web:homeurl'));
