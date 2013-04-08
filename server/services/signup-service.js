@@ -128,6 +128,7 @@ module.exports = {
 
         user.oldEmail = user.email;
         user.email = user.newEmail;
+        user.newEmail = "";
         delete user.newEmail;
 
         // send an email to confirm that the confirmation of the email address change...was confirmed.
@@ -142,10 +143,21 @@ module.exports = {
 
       winston.debug("User saved, finding troupe to redirect to", { id: user.id, status: user.status });
       troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
-        if(err) return callback(new Error("Error finding troupes for user"));
-        if(troupes.length < 1) return callback(new Error("Could not find troupe for user"));
+        var t = null;
 
-        callback(err, user, troupes[0]);
+        if(err) return callback(new Error("Error finding troupes for user"));
+
+        if(troupes.length < 1) {
+          winston.warn("User has no troupes");
+          t = null;
+          // return callback(new Error("Could not find troupe for user"));
+        }
+        else {
+          t = troupes[0];
+        }
+
+
+        callback(err, user, t);
       });
     }
 
