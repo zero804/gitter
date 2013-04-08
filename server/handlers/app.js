@@ -246,6 +246,11 @@ function preloadOneToOneTroupeMiddleware(req, res, next) {
 module.exports = {
     install: function(app) {
 
+      app.get('/messages', function(req, res) {
+        var msgs = (req.session && req.session.messages) ? req.session.messages : [];
+        res.json(msgs);
+      });
+
       // used for development only
       app.get('/mobile.appcache', function(req, res) {
         if (nconf.get('web:useAppCache')) {
