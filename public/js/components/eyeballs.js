@@ -21,7 +21,6 @@ define([
       },
       type: "POST",
       success: function(/*data*/) {
-        log('sent');
       }
     });
   }
