@@ -74,6 +74,10 @@ module.exports = {
                   res.send({ authFailure: true });
                   return;
                 }
+                else if (err.emailConflict) {
+                  res.send({ success: false, emailConflict: true });
+                  return;
+                }
                 winston.error("Unable to update profile", { exception: err });
                 return next(err);
               }
