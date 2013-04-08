@@ -250,7 +250,6 @@ function socketDisconnected(socketId, options, callback) {
       .del("pr:socket:" + socketId)           // 1 Remove the socket user association
       .srem("pr:activesockets", socketId)     // 2 remove the socket from active sockets
       .exec(function(err, replies) {
-        console.log('attemptSocketDisconnected', arguments);
         if(err) return callback(err);
 
         var userId = replies[0];
