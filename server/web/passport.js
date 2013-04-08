@@ -107,13 +107,12 @@ module.exports = {
 
         // if the user is unconfirmed, then confirm them
         // if the user has been confirmed, but hasn't populated their profile, we want to go down the same path
-        if (user.status == 'UNCONFIRMED' || user.status == 'PROFILE_NOT_COMPLETED') {
+        if (user.status == 'UNCONFIRMED' || user.status == 'PROFILE_NOT_COMPLETED' || user.newEmail) {
           statsService.event('confirmation_completed', { userId: user.id });
           return done(null, user);
         }
-
         // confirmation fails if the user is already confirmed, except when the user is busy confirming their new email address
-        if(user.status !== 'UNCONFIRMED' && !user.newEmail) {
+        else {
           statsService.event('confirmation_reused', { userId: user.id });
 
           winston.debug("Confirmation already used", { confirmationCode: confirmationCode });
