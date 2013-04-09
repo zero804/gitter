@@ -8,7 +8,7 @@ module.exports = function(module) {
     return require(module);
   }
 
-  if(process.env['COVERAGE']) {
+  if(process.env['TROUPE_COVERAGE']) {
     return require(__dirname + '/../../coverage/' + module);
   }
 

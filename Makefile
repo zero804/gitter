@@ -18,7 +18,7 @@ test-coverage:
 	if [ -d ./coverage/ ]; then rm -r ./coverage/; fi
 	./node_modules/visionmedia-jscoverage/jscoverage ./server/ ./coverage/
 	mkdir -p output
-	@NODE_ENV=test ./node_modules/.bin/mocha \
+	@TROUPE_COVERAGE=1 @NODE_ENV=test ./node_modules/.bin/mocha \
 		--reporter html-cov \
 		--timeout 10000 \
 		--recursive \
