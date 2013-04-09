@@ -2,7 +2,9 @@
 /*global describe:true, it:true */
 "use strict";
 
-var geocodingService = require('../../../server/services/geocoding-service');
+var testRequire = require('../test-require');
+
+var geocodingService = testRequire('./services/geocoding-service');
 
 var assert = require("better-assert");
 

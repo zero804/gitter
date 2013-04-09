@@ -11,6 +11,18 @@ test:
 		--ignore-leaks \
 		$(TESTS)
 
+test-coverage:
+	rm -r ./coverage/
+	./node_modules/visionmedia-jscoverage/jscoverage ./server/ ./coverage/
+	mkdir -p output
+	@NODE_ENV=test ./node_modules/.bin/mocha \
+		--reporter html-cov \
+		--timeout 10000 \
+		--recursive \
+		--ignore-leaks \
+		$(TESTS) | awk '/\<\!DOCTYPE/ {show=1; print; next} show {print} ' > output/coverage.html
+
+
 prepare-for-end-to-end-testing:
 	curl https://raw.github.com/pypa/pip/master/contrib/get-pip.py > /tmp/get-pip.py
 	sudo python /tmp/get-pip.py
@@ -51,7 +63,7 @@ tarball:
 	find . -type f -not -name ".*"| grep -Ev '^\./(\.|node_modules/|output/|assets/|mongo-backup-|scripts/mongo-backup-).*'|tar -cv --files-from - |gzip -9 - > output/troupe.tgz
 
 
-continuous-integration: npm grunt version-files upgrade-data test tarball
+continuous-integration: npm grunt version-files upgrade-data test test-coverage tarball
 
 build: npm grunt
 

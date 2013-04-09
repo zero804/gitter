@@ -2,10 +2,12 @@
 /*global describe:true, it: true, beforeEach:true, afterEach:true */
 "use strict";
 
-var presenceService = require('../../server/services/presence-service');
+var testRequire = require('./test-require');
+
+var presenceService = testRequire('./services/presence-service');
 
 var assert = require('assert');
-var winston = require("../../server/utils/winston");
+var winston = testRequire("./utils/winston");
 var Q = require("q");
 
 var fakeEngine = {
