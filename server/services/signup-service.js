@@ -196,9 +196,8 @@ module.exports = {
           return callback("Invalid state");
         }
 
-
         userService.findById(troupeUsers[0], function(err, user) {
-          if(err || !user) return callback(err, user);
+          if(err || !user) return callback(err, null);
           if(user.status != 'UNCONFIRMED') {
             emailNotificationService.sendConfirmationForExistingUser(user, troupe);
           } else {
