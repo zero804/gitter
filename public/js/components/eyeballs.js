@@ -32,7 +32,7 @@ define([
       eyesOnState = false;
       send(0);
 
-      $(window).trigger('eyeballStateChange', false);
+      $(document).trigger('eyeballStateChange', false);
     }
   }
 
@@ -43,7 +43,7 @@ define([
       eyesOnState = true;
       send(1);
 
-      $(window).trigger('eyeballStateChange', true);
+      $(document).trigger('eyeballStateChange', true);
     }
   }
 

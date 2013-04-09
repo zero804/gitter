@@ -89,14 +89,14 @@ define([
   };
 
   var inFocus = true;
-  $(window).on('blur', function() {
-    inFocus = false;
+
+  $(document).on('eyeballStateChange', function(e, newState) {
+    inFocus = newState;
+    if(newState) {
+      windowScroll();
+    }
   });
 
-  $(window).on('focus', function() {
-    inFocus = true;
-    windowScroll();
-  });
 
   var windowTimeout = null;
   var windowScrollOnTimeout = function windowScrollOnTimeout() {
