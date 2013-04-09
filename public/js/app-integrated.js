@@ -44,7 +44,6 @@ require([
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView,
             createTroupeView, headerViewTemplate, shareTroupeView,
             troupeSettingsView, webNotifications, unreadItemsClient, log /*, errorReporter , FilteredCollection */) {
-  /*global require:true */
   "use strict";
 
   var preloadedFetch = false;

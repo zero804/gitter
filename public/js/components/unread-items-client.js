@@ -192,6 +192,35 @@ define([
       return v ? v.length : 0;
     },
 
+    findTopMostVisibleUnreadItem: function(itemType) {
+      var topItem = null;
+      var topItemOffset = 1000000000;
+
+      var $window = $(window);
+      var scrollTop = $window.scrollTop();
+      var scrollBottom = scrollTop + $window.height();
+
+
+      $('.unread').each(function (index, element) {
+        var $e = $(element);
+        var elementItemType = $e.data('itemType');
+        if(elementItemType != itemType) return;
+        var itemId = $e.data('itemId');
+
+        if(itemId) {
+          var top = $e.offset().top;
+          if (top >= scrollTop && top <= scrollBottom) {
+            if(top < topItemOffset)  {
+              topItem = $e;
+              topItemOffset = top;
+            }
+          }
+        }
+      });
+
+      return topItem;
+    },
+
     getTotalUnreadCountForCurrentTroupe: function() {
       var types = _.keys(unreadItems);
 

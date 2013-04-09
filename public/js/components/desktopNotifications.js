@@ -3,7 +3,6 @@ define([
   'jquery',
   'utils/log'
 ], function($, log){
-  /*global console: false document: false window:false*/
   "use strict";
 
   var module = {
