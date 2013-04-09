@@ -12,7 +12,7 @@ test:
 		$(TESTS)
 
 test-coverage:
-	rm -r ./coverage/
+	if [ -d ./coverage/ ]; then rm -r ./coverage/; fi
 	./node_modules/visionmedia-jscoverage/jscoverage ./server/ ./coverage/
 	mkdir -p output
 	@NODE_ENV=test ./node_modules/.bin/mocha \
