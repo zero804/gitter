@@ -4,6 +4,7 @@
 var persistence = require("./persistence-service"),
     troupeService = require("./troupe-service"),
     statsService = require("./stats-service");
+var ObjectID = require('mongodb').ObjectID;
 
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   if(!troupe) return callback("Invalid troupe");
@@ -40,11 +41,18 @@ exports.findById = function(id, callback) {
 };
 
 exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
-  persistence.ChatMessage
-    .where('toTroupeId', troupeId)
-    .sort({ sent: 'desc' })
+  var q = persistence.ChatMessage
+    .where('toTroupeId', troupeId);
+
+  if(options.startId) {
+    var id = new ObjectID(options.startId);
+    q = q.where('_id').gte(id);
+  }
+
+  q.sort({ sent: 'desc' })
     .limit(options.limit)
     .skip(options.skip)
-    .slaveOk()
     .exec(callback);
+
+  console.log(q);
 };
