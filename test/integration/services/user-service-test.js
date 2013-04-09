@@ -1,7 +1,8 @@
-var userService = require('../../../server/services/user-service');
-var signupService = require('../../../server/services/signup-service');
+var testRequire = require('./../test-require');
+var userService = testRequire('./services/user-service');
+var signupService = testRequire('./services/signup-service');
 
-var assert = require("../../../server/utils/awesome-assert");
+var assert = testRequire("./utils/awesome-assert");
 
 describe("User Service", function() {
   describe("userService#updateProfile", function() {

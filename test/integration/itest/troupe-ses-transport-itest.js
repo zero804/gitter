@@ -2,7 +2,9 @@
 /*global describe: true, it: true */
 "use strict";
 
-var ses = require("../../../server/utils/mail/troupe-ses-transport");
+var testRequire = require('../test-require');
+
+var ses = testRequire("./utils/mail/troupe-ses-transport");
 
 var assert = require("better-assert");
 

@@ -128,8 +128,7 @@ module.exports = {
 
         user.oldEmail = user.email;
         user.email = user.newEmail;
-        user.newEmail = "";
-        delete user.newEmail;
+        user.newEmail = null;
 
         // send an email to confirm that the confirmation of the email address change...was confirmed.
         emailNotificationService.sendNoticeOfEmailChange(user, origEmail, newEmail);
