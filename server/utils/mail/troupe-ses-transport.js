@@ -13,7 +13,6 @@ var winston = require('../winston');
 
 function TroupeSESTransport() {
   this.AWSAccessKeyID = nconf.get("amazon:accessKey");
-  console.log('access key ' + this.AWSAccessKeyID);
   this.AWSSecretKey = nconf.get("amazon:secretKey");
   this.ServiceUrl = "https://email.us-east-1.amazonaws.com";
 }
@@ -53,8 +52,6 @@ TroupeSESTransport.prototype.sendMailString = function(from, recipients, string,
   /* Sends the message to up to MAX 50 recipients, returns a callback(err, messageId) */
 
   function sendMessageToRecipients(destinations, callback) {
-    console.log('sending a SES mail chunk (<= 50 recipients)');
-
     var myParams = _.extend(params);
 
     // don't really send mails to the troupetest.local domain

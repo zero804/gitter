@@ -19,7 +19,6 @@ exports.bootScript = function(url, parameters) {
 
   var baseUrl = cdn("js/");
 
-  //console.log("SkipCDN is currently set to ", parameters.hash.skipCdn);
   if(minified) {
 
     // note: when the skipCdn flag was introduced it affected this even though this isn't the file that was requested in this invocation

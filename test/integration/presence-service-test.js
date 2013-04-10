@@ -57,7 +57,6 @@ describe('presenceService', function() {
 
       if(err) return done(err);
 
-      console.dir(users);
       // User should not exist
       assert(users.length === 0 || users.every(function(id) { return id !== userId; }), 'Expected user _not_ to be online at beginning of test: ', users.join(', '));
 

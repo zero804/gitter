@@ -27,7 +27,6 @@ describe('Fiber', function() {
       /* Callbacks */
 
       function firstCallback() {
-        console.log("First callback run");
         assert(firstCallbackHasRun !== true);
         //assert(secondCallback !== true);
         assert(syncCallbackHasRun !== true);
@@ -38,7 +37,6 @@ describe('Fiber', function() {
       }
 
       function secondCallback() {
-        console.log("Second callback run");
         //assert(firstCallbackHasRun === true);
         assert(secondCallbackHasRun !== true);
         assert(syncCallbackHasRun !== true);
@@ -49,7 +47,6 @@ describe('Fiber', function() {
       }
 
       function syncCallback() {
-        console.log("Sync callback run");
         assert(firstCallbackHasRun === true);
         assert(secondCallbackHasRun === true);
         assert(syncCallbackHasRun !== true);

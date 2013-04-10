@@ -46,7 +46,6 @@ describe('winston', function() {
 
       child.on('exit', function(code, signal) {
         if(exitOk) return;
-        console.log('Child process died with Code:' + code  + ' Signal:' + signal);
         done('Child process killed with code: ' + code + ', signal:' + signal);
       });
 
@@ -62,14 +61,13 @@ describe('winston', function() {
 
 
       child.stderr.on('data', function (data) {
-        console.log('stderr: ' + data);
+        console.error('stderr: ' + data);
       });
 
       var count = 0;
 
       child.stdout.on('data', function (data) {
         data = "" + data;
-        console.log('stdout: ' + data);
 
         if(data.indexOf('READY TO GO') >= 0) {
           assert(fs.existsSync(logFile), 'The log file `' + logFile + '` should exist as child process has started');
