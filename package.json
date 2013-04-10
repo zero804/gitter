@@ -56,7 +56,8 @@
     "faye-redis": "0.1.1",
     "geckoboard-push": "0.0.5",
     "mongoose-number": "0.0.2",
-    "redis-lock": "0.0.4"
+    "redis-lock": "0.0.4",
+    "mongodb": "~1.1.11"
   },
   "devDependencies": {
     "proxyquire": "0.4.0",
