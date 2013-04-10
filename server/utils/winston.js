@@ -5,31 +5,20 @@ var nconf = require('./config');
 var winston = require("winston");
 var fs = require('fs');
 var path = require('path');
+var assert = require('assert');
 
 function statFile(fileTransport) {
+  assert(fileTransport, 'fileTransport must exist');
+
   var fullname = path.join(fileTransport.dirname, fileTransport._getFile(false));
 
   function reopen() {
-    if (fileTransport._stream) {
-      fileTransport._stream.end();
-      fileTransport._stream.destroySoon();
-    }
-
-    var stream = fs.createWriteStream(fullname, fileTransport.options);
-    stream.setMaxListeners(Infinity);
-
-    fileTransport._size = 0;
-    fileTransport._stream = stream;
-
-    fileTransport.once('flush', function () {
-      fileTransport.opening = false;
-      fileTransport.emit('open', fullname);
+    fileTransport.close();
+    fileTransport._stream = null;
+    fileTransport.once('open', function() {
+      winston.info('Log rotation completed');
+      console.log('Log rotation completed');
     });
-
-    fileTransport.flush();
-    setTimeout(function() {
-      winston.info("Log rotation completed");
-    }, 100);
   }
 
   fs.stat(fullname, function (err) {
@@ -48,6 +37,7 @@ function periodicallyStatFile(fileTransport) {
 
 function reopenTransportOnHupSignal(fileTransport) {
   process.on('SIGHUP', function() {
+    console.log('Caught SIGHUP, attempting logfile rotation');
     winston.info('Caught SIGHUP, attempting logfile rotation');
 
     statFile(fileTransport);
@@ -64,6 +54,8 @@ function configureTransports() {
       filename: nconf.get('LOG_FILE'),
       level: nconf.get("logging:level"),
       timestamp: true,
+      maxFiles: null,
+      maxsize: null,
       json: false
     });
 
