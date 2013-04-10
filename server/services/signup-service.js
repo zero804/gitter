@@ -162,9 +162,18 @@ module.exports = {
 
   },
 
+  // Resend the confirmation email and returns the ID of the troupe related to the signed
   resendConfirmation: function(options, callback) {
     winston.info("Resending confirmation ", options);
     var email = options.email;
+
+    function send(user, troupe) {
+      if(user.status != 'UNCONFIRMED') {
+        emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
+      } else {
+        emailNotificationService.sendConfirmationForNewUser(user, troupe);
+      }
+    }
 
     // This option occurs if the user has possibly lost their session
     // and is trying to get the confirmation sent at a later stage
@@ -172,16 +181,12 @@ module.exports = {
         userService.findByEmail(email, function(err, user) {
           if(err || !user) return callback(err, null);
 
-          if(user.status != 'UNCONFIRMED') {
-            return callback("User is not unconfirmed...", null);
-          }
-
           troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
             if(err || !troupes.length) return callback(err, null);
 
             // This list should always contain a single value for a new user
             var troupe = troupes[0];
-            emailNotificationService.sendConfirmationForNewUser(user, troupe);
+            send(user, troupe);
             callback(null, troupe.id);
           });
         });
@@ -198,11 +203,8 @@ module.exports = {
 
         userService.findById(troupeUsers[0], function(err, user) {
           if(err || !user) return callback(err, null);
-          if(user.status != 'UNCONFIRMED') {
-            emailNotificationService.sendConfirmationForExistingUser(user, troupe);
-          } else {
-            emailNotificationService.sendConfirmationForNewUser(user, troupe);
-          }
+
+          send(user, troupe);
 
           callback(null, troupe.id);
         });
@@ -219,7 +221,7 @@ module.exports = {
    * - IF the email address does exist and the user account is:
    *    - UNCONFIRMED: don't create a new account, but update the name and add a request for the troupe (if one does not already exist)
    *    - COFIRMED: then throw an error saying that the user needs to login
-   * callback is function(err)
+   * callback is function(err, request)
    */
   newSignupWithAccessRequest: function(options, callback) {
     winston.info("New signup with access request ", options);
@@ -240,19 +242,19 @@ module.exports = {
           displayName: name
         };
 
-        user = userService.newUser(userProperties, function(err, user) {
+        userService.newUser(userProperties, function(err, user) {
           if(err) return callback(err);
 
-          troupeService.addRequest(troupeId, user.id, function(err/*, request */) {
+          troupeService.addRequest(troupeId, user.id, function(err, request) {
             if(err) return callback(err);
-            callback(null);
+            callback(null, request);
           });
         });
 
       } else {
-        troupeService.addRequest(troupeId, user.id, function(err/*, request */) {
+        troupeService.addRequest(troupeId, user.id, function(err, request) {
           if(err) return callback(err);
-          callback(null);
+          callback(null, request);
         });
       }
     });
