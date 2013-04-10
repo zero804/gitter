@@ -107,8 +107,49 @@ describe('signup-service', function() {
       });
     });
 
+    it('should allow an existing ACTIVE user to create a new troupe when not logged in, from the landing page', function(done) {
+      var existingEmail = 'testuser' + Date.now() + '@troupetest.local';
+      var troupeName = 'Test Troupe ' + new Date();
 
+      var emailNotificationService = testRequire('./services/email-notification-service');
+      var signupService = testRequire.withProxies("./services/signup-service", {
+        './services/email-notification-service': emailNotificationService
+      });
+
+      persistence.User.create({
+        email: existingEmail,
+        status: 'ACTIVE'
+      }, function(err, createdUser) {
+          if(err) return done(err);
+
+          var emailNotificationServiceMock = sinon.mock(emailNotificationService);
+          emailNotificationServiceMock.expects('sendNewTroupeForExistingUser').once();
+
+          signupService.newSignup({
+            email: existingEmail,
+            troupeName: troupeName
+          }, function(err, troupeId) {
+            if(err) return done(err);
+
+            emailNotificationServiceMock.verify();
+            assert(troupeId, 'No troupeId returned');
+
+            persistence.Troupe.findById(troupeId, function(err, troupe) {
+              if(err) return done(err);
+
+              assert(troupe, 'Troupe not found');
+              assert(troupe.users.length == 1, 'Expected the new troupe to have a single user');
+              assert(troupe.users[0].userId == createdUser.id, 'Expected the new troupe to have a reference to the existing user');
+
+              done();
+            });
+
+          });
+        });
+
+      });
 
   });
+
 
 });

@@ -50,3 +50,5 @@ chromedriver.log
 test/end-to-end/e2etests/*.pyctest/end-to-end/e2etests/*.pyc
 coverage
 output/coverage.html
+cobertura-coverage.xml
+html-report

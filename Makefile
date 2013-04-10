@@ -1,14 +1,24 @@
 TESTS = test/integration
 END_TO_END_TESTS = test/end-to-end
 
-REPORTER = dot
+MOCHA_REPORTER =
 
 clean:
-	if [ -d output ]; then rm -r output; fi
+	rm -rf output/ coverage/ cobertura-coverage.xml html-report/
+
 
 test:
-	@NODE_ENV=test ./node_modules/.bin/mocha \
-		--reporter $(REPORTER) \
+	NODE_ENV=test ./node_modules/.bin/mocha \
+		--reporter dot \
+		--timeout 10000 \
+		--recursive \
+		--ignore-leaks \
+		$(TESTS)
+
+test-xunit:
+	mkdir -p output
+	NODE_ENV=test XUNIT_FILE=output/xunit.xml ./node_modules/.bin/mocha \
+		--reporter xunit-file \
 		--timeout 10000 \
 		--recursive \
 		--ignore-leaks \
@@ -16,15 +26,14 @@ test:
 
 test-coverage:
 	if [ -d ./coverage/ ]; then rm -r ./coverage/; fi
-	./node_modules/visionmedia-jscoverage/jscoverage ./server/ ./coverage/
+	./node_modules/.bin/istanbul instrument server/ -o coverage/
 	mkdir -p output
-	TROUPE_COVERAGE=1 NODE_ENV=test ./node_modules/.bin/mocha \
-		--reporter html-cov \
+	ISTANBUL_REPORTERS=text-summary,html,cobertura,text TROUPE_COVERAGE=1 NODE_ENV=test ./node_modules/.bin/mocha \
+		--reporter mocha-istanbul \
 		--timeout 10000 \
 		--recursive \
 		--ignore-leaks \
-		$(TESTS) | awk '/\<\!DOCTYPE/ {show=1; print; next} show {print} ' > output/coverage.html
-
+		$(TESTS)
 
 prepare-for-end-to-end-testing:
 	curl https://raw.github.com/pypa/pip/master/contrib/get-pip.py > /tmp/get-pip.py
