@@ -218,7 +218,8 @@ define([
         }
       });
 
-      return topItem;
+      if(!topItem) return null;
+      return topItem[0];
     },
 
     getTotalUnreadCountForCurrentTroupe: function() {
