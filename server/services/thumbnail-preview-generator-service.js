@@ -74,7 +74,7 @@ exports.startWorkers = function() {
    * otherwise it will download it from mongo and then delete the downloaded file
    */
   function directGenerateThumbnail(data, callback) {
-    winston.debug("Generating thumbnails and previews for latest version file", data);
+    winston.verbose("Generating thumbnails and previews for latest version file", data);
 
     var mongoFileName = data.mongoFileName;
     var temporaryFile = data.temporaryFile; // local path to the file, not always on the same server as this is executing on
@@ -272,7 +272,7 @@ exports.startWorkers = function() {
       }
     };
 
-    winston.debug("uploadFileToGridAndDelete",uploadFileParams);
+    winston.verbose("uploadFileToGridAndDelete",uploadFileParams);
 
     var deferred = Q.defer();
 

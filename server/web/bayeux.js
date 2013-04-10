@@ -144,7 +144,7 @@ var authenticator = {
       return callback(message);
     }
 
-    winston.debug('bayeux: Authenticating client', message);
+    winston.verbose('bayeux: Authenticating client', message);
 
     if(messageIsFromSuperClient(message)) {
       return callback(message);
@@ -153,7 +153,7 @@ var authenticator = {
     var ext = message.ext;
     if(!ext || !ext.token) {
       if(HANDLE_TEMPORARY_FAYEOBJ_SITUATION) {
-        winston.debug('bayeux: Allowing temporary access to unauthorised handshake client');
+        winston.verbose('bayeux: Allowing temporary access to unauthorised handshake client');
         // Currently the faye connection code doesn't send the ext in the handshake message
         // see handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake
         return callback(message);
@@ -352,7 +352,7 @@ module.exports = {
     client.addExtension(superClient);
 
     //server.bind('handshake', function(clientId) {
-    //  winston.debug("Faye handshake: ", { clientId: clientId });
+    //  winston.verbose("Faye handshake: ", { clientId: clientId });
     //});
 
     server.bind('disconnect', function(clientId) {

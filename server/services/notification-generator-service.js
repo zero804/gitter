@@ -216,7 +216,7 @@ exports.install = function() {
       if(offlineUsers.length) {
         filterUsersForPushNotificationEligibility(offlineUsers, function(err, userIds) {
           if(err) return winston.error("collectionFinished: filterUsersForPushNotificationEligibility failed", { exception: err });
-          if(!userIds.length) return winston.debug("collectionFinished: Nobody eligible for push notifications");
+          if(!userIds.length) return winston.verbose("collectionFinished: Nobody eligible for push notifications");
 
           var delayedNotifications = dequeueNotifications(userIds);
           queueDelayedNotificationsForSend(delayedNotifications);
@@ -440,7 +440,7 @@ exports.startWorkers = function() {
   }
 
   function spoolQueuedNotifications(notifications, callback) {
-    winston.debug("Spooling queued notifications", { queue: notifications });
+    winston.verbose("Spooling queued notifications", { queue: notifications });
 
     var userIds = notifications.map(function(notification) { return notification.userId; });
     userIds = _.uniq(userIds);
@@ -486,7 +486,7 @@ exports.startWorkers = function() {
   }
 
   function spoolOnlineNotifications(notifications, callback) {
-    winston.debug("Spooling online notifications", { count: notifications.length });
+    winston.verbose("Spooling online notifications", { count: notifications.length });
 
     generateNotificationMessages(notifications, function(err, notificationsWithMessages) {
       if(err) {

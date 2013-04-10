@@ -16,7 +16,7 @@ exports.install = function(persistenceService) {
 
   function serializeEvent(url, operation, model, callback) {
     if(!url) { if(callback) callback(); return; }
-    winston.debug("Serializing " + operation + " to " + url);
+    winston.verbose("Serializing " + operation + " to " + url);
 
     // TODO: consider swapping out the HEAVY WEIGHT restSerializer here for the
     // light weight notification-serializer as it is much more effeicent. Obviously

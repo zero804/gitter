@@ -100,7 +100,7 @@ module.exports = {
 
   confirm: function(user, callback) {
     if(!user) return callback(new Error("No user found"));
-    winston.debug("Confirming user", { id: user.id, status: user.status });
+    winston.verbose("Confirming user", { id: user.id, status: user.status });
 
     if (user.status === 'UNCONFIRMED') {
       // setting the status marks the user as confirmed
@@ -140,7 +140,7 @@ module.exports = {
     function finish(err) {
       if(err) return callback(err);
 
-      winston.debug("User saved, finding troupe to redirect to", { id: user.id, status: user.status });
+      winston.verbose("User saved, finding troupe to redirect to", { id: user.id, status: user.status });
       troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
         var t = null;
 

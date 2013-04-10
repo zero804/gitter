@@ -25,7 +25,7 @@ else {
       data: data
     };
 
-    winston.debug("Stat", event);
+    winston.verbose("Stat", event);
     client.send(event);
   };
 }

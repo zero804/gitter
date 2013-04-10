@@ -33,7 +33,7 @@ exports.startWorkers = function() {
     pushNotificationService.findDevicesForUsers(userIds, function(err, devices) {
       if(err) return callback(err);
 
-      winston.debug("Sending to " + devices.length + " potential devices for " + userIds.length + " users");
+      winston.verbose("Sending to " + devices.length + " potential devices for " + userIds.length + " users");
 
       devices.forEach(function(device) {
         var sent = false;

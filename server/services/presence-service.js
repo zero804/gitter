@@ -76,7 +76,7 @@ function userSubscribedToTroupe(userId, troupeId, socketId, callback) {
 // This is called after a timeout (about 10 seconds) so that if the user has
 // opened another socket, we don't send out notifications that they're offline
 function removeSocketFromUserSockets(socketId, userId, callback) {
-  winston.debug("presence: removeSocketFromUserSockets: ", { userId: userId, socketId: socketId });
+  winston.verbose("presence: removeSocketFromUserSockets: ", { userId: userId, socketId: socketId });
 
   var key = "pr:user:" + userId;
 
@@ -133,7 +133,7 @@ function _eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
     if(err) return callback(err);
 
     if(!result) {
-      winston.debug("presence: Eyeball signalled off, but already marked as off", { socketId: socketId });
+      winston.verbose("presence: Eyeball signalled off, but already marked as off", { socketId: socketId });
       return callback();
     }
 
@@ -162,7 +162,7 @@ function _eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
           }
         }
 
-        winston.debug("presence: User removed from troupe ", { troupeId: troupeId, userId: userId } );
+        winston.verbose("presence: User removed from troupe ", { troupeId: troupeId, userId: userId } );
 
         return callback();
       });
@@ -171,7 +171,7 @@ function _eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
 }
 
 function disassociateUserSocketFromTroupe(userId, socketId, callback) {
-  winston.debug('presence: disassociateUserSocketFromTroupe: ' + socketId);
+  winston.verbose('presence: disassociateUserSocketFromTroupe: ' + socketId);
   redisClient.multi()
     .get("pr:socket_troupe:" + socketId)    // 0 Find the troupe associated with the socket
     .del("pr:socket_troupe:" + socketId)    // 1 Delete the socket troupe association
@@ -211,7 +211,7 @@ function _exclusiveResponder(keyName, keyExpiry, callback) {
 function _userSocketDisconnected(userId, socketId, options, callback) {
   if(!options) options = {};
 
-  winston.debug("presence: userSocketDisconnected: ", { userId: userId, socketId: socketId });
+  winston.verbose("presence: userSocketDisconnected: ", { userId: userId, socketId: socketId });
 
   if(options.immediate) {
     process.nextTick(userSocketDisconnectedInternal);
@@ -240,7 +240,7 @@ function _userSocketDisconnected(userId, socketId, options, callback) {
 // method is likely to be called multiple times
 // so whatever we do, we need to handle that
 function socketDisconnected(socketId, options, callback) {
-  winston.debug("presence: socketDisconnected event received.");
+  winston.verbose("presence: socketDisconnected event received.");
 
   function attemptSocketDisconnected(retryCount) {
     // Disassociates the socket with user, the user with the socket, deletes the socket
@@ -270,7 +270,7 @@ function socketDisconnected(socketId, options, callback) {
         // and the connect writes have not yet completed........
         if(!userId) {
           if(retryCount <= 0) {
-            winston.debug("presence: Socket not registered. Giving it 100ms and will try again....");
+            winston.verbose("presence: Socket not registered. Giving it 100ms and will try again....");
 
             setTimeout(function() { attemptSocketDisconnected(++retryCount); }, 100);
             return; // Callback will be called next attempt (after the timeout)
@@ -295,7 +295,7 @@ function socketDisconnected(socketId, options, callback) {
   _exclusiveResponder('pr:de:' + socketId, 10000, function(err, obtained) {
     if(err) return callback(err);
     if(!obtained) {
-      winston.debug("presence: Socket disconnected. Did not obtain exclusive lock to handle disconnect " + socketId);
+      winston.verbose("presence: Socket disconnected. Did not obtain exclusive lock to handle disconnect " + socketId);
       return callback();
     }
 
@@ -365,7 +365,7 @@ function _validateActiveSockets(engine, callback) {
 
   redisClient.smembers("pr:activesockets", function(err, sockets) {
     if(!sockets.length) {
-      winston.debug('presence: Validation: No active sockets.');
+      winston.verbose('presence: Validation: No active sockets.');
       return callback(null, 0);
     }
 
@@ -382,7 +382,7 @@ function _validateActiveSockets(engine, callback) {
         if(exists) return d.resolve();
 
         invalidCount++;
-        winston.debug('Disconnecting invalid socket ' + socketId);
+        winston.verbose('Disconnecting invalid socket ' + socketId);
         socketDisconnected(socketId, { immediate: true }, d.makeNodeResolver());
       });
 
@@ -524,11 +524,11 @@ function clientEyeballSignal(userId, socketId, eyeballsOn, callback) {
       }
 
       if(eyeballsOn) {
-        winston.debug('presence: Eyeballs on: user ' + userId + ' troupe ' + troupeId);
+        winston.verbose('presence: Eyeballs on: user ' + userId + ' troupe ' + troupeId);
         return _eyeBallsOnTroupe(userId, socketId, troupeId, unlock);
 
       } else {
-        winston.debug('presence: Eyeballs off: user ' + userId + ' troupe ' + troupeId);
+        winston.verbose('presence: Eyeballs off: user ' + userId + ' troupe ' + troupeId);
         return _eyeBallsOffTroupe(userId, socketId, troupeId, unlock);
       }
 

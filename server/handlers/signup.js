@@ -164,7 +164,7 @@ module.exports = {
       app.get('/confirm/:confirmationCode',
         middleware.authenticate('confirm', { failureRedirect: '/confirm-failed' } ),
         function(req, res){
-          winston.debug("Confirmation authenticated");
+          winston.verbose("Confirmation authenticated");
 
           signupService.confirm(req.user, function(err/*, user, troupe */) {
             if (err) {
