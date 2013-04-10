@@ -38,7 +38,6 @@ describe('ses-transport2', function() {
         }
 
         // NOTE: check whether the messages recieved includes recipients for the 49/50/51 mark.
-        console.log('Message IDS:'+messageIds);
 
         assert(messageIds.length == 2);
         for(var i = 0; i < messageIds.length; i++)

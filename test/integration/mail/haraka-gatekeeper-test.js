@@ -97,7 +97,6 @@ describe('haraka-gatekeeper', function() {
 
       function nextCallback(code, message) {
         assert(code == global.CONT);
-        console.log('rcpt_to length is ' + connection.transaction.rcpt_to.length);
         assert(connection.transaction.rcpt_to.length == 1);
         assert(sendEmailProxy.calledOnce);
         done();
