@@ -93,7 +93,7 @@ exports.logout = function() {
 
 exports.authenticate = function(scheme, options) {
   return function(req, res, next) {
-    winston.debug("Attempting authentication", { scheme: scheme });
+    winston.verbose("Attempting authentication", { scheme: scheme });
 
     /* If you're trying to login, you're automatically logged out */
     req.logout();

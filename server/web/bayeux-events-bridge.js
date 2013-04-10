@@ -23,7 +23,7 @@ exports.install = function() {
           model: model
         };
 
-        winston.debug("Publish to " + url, message);
+        winston.verbose("Publish to " + url, message);
         bayeuxClient.publish(url, message);
 
         break;
@@ -67,7 +67,7 @@ exports.install = function() {
          link: link,
          sound: sound
       };
-      winston.debug("Notification to " + url, message);
+      winston.verbose("Notification to " + url, message);
 
       bayeuxClient.publish(url, message);
   });
