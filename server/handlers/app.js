@@ -178,7 +178,18 @@ function preloadChats(userId, troupeId, callback) {
   unreadItemService.getFirstUnreadItem(userId, troupeId, 'chat', function(err, firstId) {
     if(firstId) {
       // No first Id, just return the most recent 20 messages
-      chatService.findChatMessagesForTroupe(troupeId, { startId: firstId }, serializeChats);
+      chatService.findChatMessagesForTroupe(troupeId, { startId: firstId }, function(err, chatMessages) {
+        if(err) return callback(err);
+
+        // Just get the last 20 messages instead
+        if(chatMessages.length < 20) {
+          chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: 20 }, serializeChats);
+          return;
+        }
+
+        return serializeChats(err, chatMessages);
+
+      });
 
       return;
     }
