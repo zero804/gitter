@@ -96,7 +96,7 @@ function distributeForTroupe(from, to, next, connection) {
 
       statsService.event('remailed_email', { recipients: messageIds.length });
 
-      winston.debug("All messages have been queued on SES and ids have been returned: ", { messageIds: messageIds });
+      winston.verbose("All messages have been queued on SES and ids have been returned: ", { messageIds: messageIds });
 
       // save the messageIds so that the persister can save them when the email doc is created
       messageIdsByTroupe[troupe.id] = messageIds;
@@ -112,7 +112,7 @@ function parseAddress(address) {
 }
 
 exports.hook_queue = function(next, connection) {
-  winston.debug("Starting remailer (hook_queue)");
+  winston.verbose("Starting remailer (hook_queue)");
 
   // this has will store the messageIds that need to be saved
   // by the persister when it creates the email object for this transaction.

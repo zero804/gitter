@@ -139,7 +139,6 @@ exports.startWorkers = function() {
   });
 
   jobs.process('push-notification', 20, function(job, done) {
-    console.dir(job.data);
     directSendUserNotification(job.data.userIds, job.data.notification, done);
   });
 };

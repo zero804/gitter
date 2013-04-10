@@ -97,7 +97,7 @@ exports.hook_queue = function(next, connection) {
     // return to haraka once all saves have returned
     fiber.sync()
       .then(function() {
-        winston.debug("All saves have been synced, continue to next plugin.");
+        winston.verbose("All saves have been synced, continue to next plugin.");
         // now that all the mails have been saved, finish transaction processing.
         return next(OK);
       }).fail(function(err) {
@@ -115,7 +115,7 @@ exports.hook_queue = function(next, connection) {
 // should this function exec the callback with the same params as haraka next is given?
 
 function saveMailForTroupe(mail, toAddress, connection, callback) {
-  winston.debug("Saving mail from " + mail.from + " to troupe " + toAddress);
+  winston.verbose("Saving mail from " + mail.from + " to troupe " + toAddress);
   //console.log("From: " + fromName);
   //console.log("To:" + toAddress);
   //console.log("In-Reply-To:" + inReplyTo);

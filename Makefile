@@ -28,12 +28,12 @@ test-coverage:
 	if [ -d ./coverage/ ]; then rm -r ./coverage/; fi
 	./node_modules/.bin/istanbul instrument server/ -o coverage/
 	mkdir -p output
-	ISTANBUL_REPORTERS=text-summary,html,cobertura,text TROUPE_COVERAGE=1 NODE_ENV=test ./node_modules/.bin/mocha \
+	ISTANBUL_REPORTERS=text-summary TROUPE_COVERAGE=1 NODE_ENV=test ./node_modules/.bin/mocha \
 		--reporter mocha-istanbul \
 		--timeout 10000 \
 		--recursive \
 		--ignore-leaks \
-		$(TESTS)
+		$(TESTS) || true
 
 prepare-for-end-to-end-testing:
 	curl https://raw.github.com/pypa/pip/master/contrib/get-pip.py > /tmp/get-pip.py
@@ -74,7 +74,7 @@ tarball:
 	find . -type f -not -name ".*"| grep -Ev '^\./(\.|node_modules/|output/|assets/|mongo-backup-|scripts/mongo-backup-).*'|tar -cv --files-from - |gzip -9 - > output/troupe.tgz
 
 
-continuous-integration: clean npm grunt version-files upgrade-data test test-coverage tarball
+continuous-integration: clean npm grunt version-files upgrade-data test-xunit test-coverage tarball
 
 build: npm grunt
 
