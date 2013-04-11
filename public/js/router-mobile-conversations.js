@@ -8,6 +8,7 @@ require([
   'views/conversation/conversationView',
   'views/conversation/conversationDetailView',
   'collections/conversations',
+  'components/eyeballs',
   'components/unread-items-client'
 ], function($, _, Backbone, BaseRouter, TroupeViews, ConversationView, conversationDetailView, conversationModels/*, unreadItemsClient*/) {
   /*jslint browser: true, unused: true */
