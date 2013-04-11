@@ -1,5 +1,5 @@
 /*jslint node: true */
-/*global describe: true it: true */
+/*global describe:true, it:true */
 "use strict";
 
 var testRequire = require('../test-require');
@@ -17,10 +17,10 @@ describe('Fiber', function() {
       /* Setup synchronization */
 
       var firstWaitor = fiber.waitor();
-      setTimeout(firstCallback, 1000);
+      setTimeout(firstCallback, 12);
 
       var secondWaitor = fiber.waitor();
-      setTimeout(secondCallback, 100);
+      setTimeout(secondCallback, 14);
 
       fiber.sync().then(syncCallback);
 
