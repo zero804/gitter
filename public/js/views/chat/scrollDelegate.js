@@ -2,9 +2,8 @@
 define([
   'jquery',
   'underscore',
-  'utils/log',
-  'components/unread-items-client'
-], function($, _, log, unreadItemsClient) {
+  'utils/log'
+], function($, _, log) {
   "use strict";
 
   /*
@@ -19,7 +18,7 @@ define([
   *   When the window is not in focus, subsequent (unread) messages at the bottom must not cause the top most unread item to be scrolled above the fold.
   */
 
-  var DefaultScrollDelegate = function($scrollOf, $container, itemType) {
+  var DefaultScrollDelegate = function($scrollOf, $container, itemType, findTopMostVisibleUnreadItem) {
     // the container is used to calculate how much space has been added with a new view element,
     // it is effectively the box that is being scrolled, except the scroll bars will actually be on $scrollOf
     this.$container = $container;
@@ -35,6 +34,8 @@ define([
     this.useMax = true;
     // ?
     this.scrollPosBeforeChunkAdd = 0;
+    //
+    this.findTopMostVisibleUnreadItem = findTopMostVisibleUnreadItem;
   };
 
 /*
@@ -51,17 +52,25 @@ define([
 */
 
   DefaultScrollDelegate.prototype.useLimit = function(useMax) {
+    // note: eyeball state makes no difference to the unread item limit behaviour, the behavior should always be switched on, because it only ever comes into play when eyeballs are off anyway.
     this.useMax = useMax;
     if (!this.useMax) {
       this.maxScroll = -1;
     }
   };
 
-  DefaultScrollDelegate.prototype.findTopMostVisibleUnreadItem = function() {
+  DefaultScrollDelegate.prototype.eyeballStateChange = function(state) {
+    // use the state to clear the top unread item (for lack of clearing it immediately when it becomes unread).
+    if (!state) {
+      this.maxScroll = -1;
+    }
+  };
+
+  DefaultScrollDelegate.prototype.calculateScrollLimit = function() {
     // ERR: note that this max limit capping must only look for a new unread item, not be enabled for the page load or when loading older messages.
     if(this.useMax && this.maxScroll == -1) {
       // if there is no max scroll yet, then look for the highest unread item and set the max to it
-      var topUnreadItem = unreadItemsClient.findTopMostVisibleUnreadItem(this.itemType);
+      var topUnreadItem = this.findTopMostVisibleUnreadItem(this.itemType);
 
       if(topUnreadItem) {
         var pos = $(topUnreadItem).offset().top;
@@ -79,7 +88,7 @@ define([
   };
 
   DefaultScrollDelegate.prototype.onAfterItemAdded = function(/* item */) {
-    this.findTopMostVisibleUnreadItem();
+    this.calculateScrollLimit();
 
     // stay at the bottom
     if (this.isAtBottomOfPage) {
