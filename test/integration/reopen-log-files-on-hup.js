@@ -90,4 +90,66 @@ describe('winston', function() {
       });
 
   });
+
+  it('should reobtain log file handles post HUP signal, when a new log file has been generated', function(done) {
+      var logFile = '/tmp/reopen-log-files-on-hup-child.' + Date.now() + '.log';
+
+      if(fs.existsSync(logFile)) fs.unlinkSync(logFile);
+
+      var child = spawn('node', [ __filename, 'log', '--logging:logToFile=true', '--LOG_FILE=' + logFile, '--logging:level=silly']);
+
+      var exitOk = false;
+
+      child.on('exit', function(code, signal) {
+        if(exitOk) return;
+        done('Child process killed with code: ' + code + ', signal:' + signal);
+      });
+
+      child.on('error', function(err) {
+        done(err);
+      });
+
+
+      child.on('close', function(code) {
+        if(exitOk) return;
+        done('Child process killed with code: ' + code);
+      });
+
+
+      child.stderr.on('data', function (data) {
+        console.error('stderr: ' + data);
+      });
+
+      var count = 0;
+      var sizeBefore;
+
+      child.stdout.on('data', function (data) {
+        data = "" + data;
+
+        if(data.indexOf('READY TO GO') >= 0) {
+          assert(fs.existsSync(logFile), 'The log file `' + logFile + '` should exist as child process has started');
+          fs.renameSync(logFile, logFile + '-old');
+          fs.writeFileSync(logFile, "New File\n");
+
+          sizeBefore = fs.statSync(logFile).size;
+
+          child.kill('SIGHUP');
+
+          return;
+        }
+
+        if(data.indexOf('Log rotation completed') >= 0) {
+          exitOk = true;
+          child.kill();
+
+          assert(sizeBefore < fs.statSync(logFile).size, 'The log file ' + logFile + ' should have grown in size');
+          fs.unlinkSync(logFile);
+          fs.unlinkSync(logFile + '-old');
+
+          done();
+        }
+      });
+
+  });
+
 });

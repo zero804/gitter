@@ -7,18 +7,18 @@ var express = require('express');
 module.exports = {
     install: function(app) {
 
+      app.get('/test/in-browser/*', express['static']( __dirname + "/../.."));
 
       app.get(
         '/test/in-browser/test/:name',
         function(req, res) {
           res.render('test/in-browser', {
             homeUrl: nconf.get('web:homeurl'),
-            test: '/test/in-browser/' + req.params.name + '.js'
+            test: 'in-browser/' + req.params.name
           });
         }
       );
 
-      app.get('/test/in-browser/*', express['static']( __dirname + "/../.."));
 
     }
 };

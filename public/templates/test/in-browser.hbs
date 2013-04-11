@@ -3,13 +3,12 @@
 <head>
 	<title>In-Browser Tests</title>
   <link rel="stylesheet" href="/js/libs/mocha/1.8.2/mocha.css" />
+</head>
+<body>
+  <div id="mocha"></div>
 
   {{>require_wrapper}}
 
   {{{bootScript test skipCdn=true}}}
-
-</head>
-<body>
-  <div id="mocha"></div>
 </body>
 </html>

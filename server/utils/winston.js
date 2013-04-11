@@ -21,18 +21,30 @@ function statFile(fileTransport) {
     });
   }
 
-  fs.stat(fullname, function (err) {
+  fs.stat(fullname, function (err, stat) {
     if (err && err.code == 'ENOENT') {
       console.log('Log file no longer exists. Reopening');
       return reopen();
     }
+
+    if(fileTransport._stream && fileTransport._stream.fd) {
+
+      fs.fstat(fileTransport._stream.fd, function(err2, fstat) {
+        if(stat.dev != fstat.dev || stat.ino !== fstat.ino) {
+          console.log('File inode mismatch. Reopening');
+          return reopen();
+        }
+      });
+
+    }
+
   });
 }
 
 function periodicallyStatFile(fileTransport) {
   setInterval(function() {
     statFile(fileTransport);
-  }, 60000);
+  }, 30000);
 }
 
 function reopenTransportOnHupSignal(fileTransport) {
