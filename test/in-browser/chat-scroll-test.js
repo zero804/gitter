@@ -98,7 +98,7 @@ require([
     // what do we need to return as the unread item?
     this.topUnreadPosition = null; var self = this;
     function findTopMostVisibleUnreadItem(/* itemType */) {
-      if (!this.topUnreadPosition)
+      if (!self.topUnreadPosition)
         return null;
 
       return {
