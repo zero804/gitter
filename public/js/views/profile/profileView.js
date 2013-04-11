@@ -188,6 +188,7 @@ define([
 
   var Modal = TroupeViews.Modal.extend({
     initialize: function(options) {
+      options.title = "Edit your profile";
       TroupeViews.Modal.prototype.initialize.apply(this, arguments);
       this.view = new View({ });
     }
