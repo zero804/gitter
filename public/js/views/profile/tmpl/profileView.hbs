@@ -1,17 +1,8 @@
 <div class="trpModalProfile">
-
-  <div class="trpModalTitle">
-    {{#if existingUser}}
-       Edit your profile
-    {{else}}
-      A few details and you're done
-    {{/if}}
-  </div>
-
-
   <div class="trpModalProfilePic">
-  {{ widget "avatar" user=user size='s' }}
-  <div class="button-choose-avatar trpModalSubtext">Change picture</div>
+   {{ widget "avatar" user=user size='s' }}
+    <div class="button-choose-avatar trpModalSubtext">Change picture</div>
+  </div>
   <form action="/updateprofile" method="post" id="updateprofileform">
     <div class="trpProfileForm">
       <input type="text" id="displayName" class="trpInput" name="displayName" value="{{displayName}}" placeholder="Click here and type your name"><br>
