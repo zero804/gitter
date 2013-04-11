@@ -1,3 +1,5 @@
+#!/usr/bin/env mocha --ignore-leaks
+
 /*jslint node:true, unused:true*/
 /*global describe:true, it:true*/
 "use strict";
@@ -6,32 +8,31 @@ var testRequire = require('../test-require');
 
 var assert = require("assert");
 var persistence = testRequire("./services/persistence-service");
-var sinon = require("sinon");
+var mockito = require('jsmockito').JsMockito;
+
+var times = mockito.Verifiers.times;
+var once = times(1);
+var twice = times(2);
+var thrice = times(3);
 
 describe('signup-service', function() {
 
   describe('#newSignup()', function() {
-
     it('should create a new user and new troupe, allow the user to confirm', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
       var troupeName = 'Test Troupe ' + new Date();
 
-      var emailNotificationService = testRequire('./services/email-notification-service');
-
-      var emailNotificationServiceMock = sinon.mock(emailNotificationService);
+      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
       var signupService = testRequire.withProxies("./services/signup-service", {
-        './services/email-notification-service': emailNotificationService
+        './email-notification-service': emailNotificationServiceMock
       });
-
-      emailNotificationServiceMock.expects('sendConfirmationForNewUser').once();
 
       signupService.newSignup({
         email: nonExistingEmail,
         troupeName: troupeName
       }, function(err, troupeId) {
         if(err) return done(err);
-
-        emailNotificationServiceMock.verify();
+        mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
 
         persistence.User.findOne({ email: nonExistingEmail }, function(err, user) {
           if(err) return done(err);
@@ -53,7 +54,7 @@ describe('signup-service', function() {
 
               assert(troupe, 'Expected a troupe');
 
-              emailNotificationServiceMock.verify();
+              mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
 
               done();
 
@@ -68,13 +69,13 @@ describe('signup-service', function() {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
       var troupeName = 'Test Troupe ' + new Date();
 
-      var emailNotificationService = testRequire('./services/email-notification-service');
+      var stub = testRequire('./services/email-notification-service');
 
-      var emailNotificationServiceMock = sinon.mock(emailNotificationService);
-
+      var emailNotificationServiceMock = mockito.spy(stub);
       var signupService = testRequire.withProxies("./services/signup-service", {
-        './services/email-notification-service': emailNotificationService
+        './email-notification-service': emailNotificationServiceMock
       });
+
 
       signupService.newSignup({
         email: nonExistingEmail,
@@ -82,23 +83,20 @@ describe('signup-service', function() {
       }, function(err, troupeId) {
         if(err) return done(err);
 
-        emailNotificationServiceMock.expects('sendConfirmationForNewUser').once();
+        mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
 
         signupService.resendConfirmation({ email: nonExistingEmail }, function(err, troupeId2) {
           if(err) return done(err);
+
           assert(troupeId === troupeId2, 'TroupeID should match');
 
-          emailNotificationServiceMock.verify();
-
-          emailNotificationServiceMock = sinon.mock(emailNotificationService);
-
-          emailNotificationServiceMock.expects('sendConfirmationForNewUser').once();
+          mockito.verify(emailNotificationServiceMock, twice).sendConfirmationForNewUser();
 
           signupService.resendConfirmation({ troupeId: troupeId }, function(err, troupeId3) {
             if(err) return done(err);
             assert(troupeId === troupeId3, 'TroupeIDs should match');
 
-            emailNotificationServiceMock.verify();
+            mockito.verify(emailNotificationServiceMock, thrice).sendConfirmationForNewUser();
 
             done();
           });
@@ -111,9 +109,9 @@ describe('signup-service', function() {
       var existingEmail = 'testuser' + Date.now() + '@troupetest.local';
       var troupeName = 'Test Troupe ' + new Date();
 
-      var emailNotificationService = testRequire('./services/email-notification-service');
+      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
       var signupService = testRequire.withProxies("./services/signup-service", {
-        './services/email-notification-service': emailNotificationService
+        './email-notification-service': emailNotificationServiceMock
       });
 
       persistence.User.create({
@@ -122,16 +120,13 @@ describe('signup-service', function() {
       }, function(err, createdUser) {
           if(err) return done(err);
 
-          var emailNotificationServiceMock = sinon.mock(emailNotificationService);
-          emailNotificationServiceMock.expects('sendNewTroupeForExistingUser').once();
-
           signupService.newSignup({
             email: existingEmail,
             troupeName: troupeName
           }, function(err, troupeId) {
             if(err) return done(err);
 
-            emailNotificationServiceMock.verify();
+            mockito.verify(emailNotificationServiceMock, once).sendNewTroupeForExistingUser();
             assert(troupeId, 'No troupeId returned');
 
             persistence.Troupe.findById(troupeId, function(err, troupe) {
@@ -153,10 +148,11 @@ describe('signup-service', function() {
       var existingEmail = 'testuser' + Date.now() + '@troupetest.local';
       var troupeName = 'Test Troupe ' + new Date();
 
-      var emailNotificationService = testRequire('./services/email-notification-service');
+      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
       var signupService = testRequire.withProxies("./services/signup-service", {
-        './services/email-notification-service': emailNotificationService
+        './email-notification-service': emailNotificationServiceMock
       });
+
 
       persistence.User.create({
         email: existingEmail,
@@ -164,8 +160,6 @@ describe('signup-service', function() {
       }, function(err) {
           if(err) return done(err);
 
-          var emailNotificationServiceMock = sinon.mock(emailNotificationService);
-          emailNotificationServiceMock.expects('sendNewTroupeForExistingUser').once();
 
           signupService.newSignup({
             email: existingEmail,
@@ -173,25 +167,22 @@ describe('signup-service', function() {
           }, function(err, troupeId) {
             if(err) return done(err);
 
-            emailNotificationServiceMock.verify();
+            mockito.verify(emailNotificationServiceMock, once).sendNewTroupeForExistingUser();
             assert(troupeId, 'No troupeId returned');
-
-            emailNotificationServiceMock = sinon.mock(emailNotificationService);
-            emailNotificationServiceMock.expects('sendNewTroupeForExistingUser').once();
 
             signupService.resendConfirmation({ email: existingEmail }, function(err, troupeId) {
               if(err) return done(err);
 
               assert(troupeId, 'No troupe was found for the resend confirmation');
-              emailNotificationServiceMock.verify();
+              mockito.verify(emailNotificationServiceMock, twice).sendNewTroupeForExistingUser();
 
-              emailNotificationServiceMock = sinon.mock(emailNotificationService);
-              emailNotificationServiceMock.expects('sendNewTroupeForExistingUser').once();
               signupService.resendConfirmation({ troupeId: troupeId }, function(err, troupeId2) {
                 if(err) return done(err);
 
                 assert(troupeId2, 'Troupe was not found');
-                emailNotificationServiceMock.verify();
+
+
+                mockito.verify(emailNotificationServiceMock, thrice).sendNewTroupeForExistingUser();
 
                 done();
               });
@@ -207,9 +198,9 @@ describe('signup-service', function() {
       var existingEmail = 'testuser' + Date.now() + '@troupetest.local';
       var troupeName = 'Test Troupe ' + new Date();
 
-      var emailNotificationService = testRequire('./services/email-notification-service');
+      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
       var signupService = testRequire.withProxies("./services/signup-service", {
-        './services/email-notification-service': emailNotificationService
+        './email-notification-service': emailNotificationServiceMock
       });
 
       persistence.User.create({
@@ -218,8 +209,6 @@ describe('signup-service', function() {
       }, function(err, createdUser) {
           if(err) return done(err);
 
-          var emailNotificationServiceMock = sinon.mock(emailNotificationService);
-          emailNotificationServiceMock.expects('sendNewTroupeForExistingUser').once();
 
           signupService.newSignup({
             email: existingEmail,
@@ -227,7 +216,7 @@ describe('signup-service', function() {
           }, function(err, troupeId) {
             if(err) return done(err);
 
-            emailNotificationServiceMock.verify();
+            mockito.verify(emailNotificationServiceMock, once).sendNewTroupeForExistingUser();
             assert(troupeId, 'No troupeId returned');
 
             persistence.Troupe.findById(troupeId, function(err, troupe) {
@@ -251,35 +240,33 @@ describe('signup-service', function() {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
       var existingTroupeUri = 'testtroupe1';
 
+      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+      var signupService = testRequire.withProxies("./services/signup-service", {
+        './email-notification-service': emailNotificationServiceMock
+      });
+
+      var troupeService = testRequire.withProxies('./services/troupe-service', {
+        './email-notification-service': emailNotificationServiceMock
+      });
+
       persistence.Troupe.findOne({ uri: existingTroupeUri }, function(err, troupe) {
         if(err) return done(err);
         if(!troupe) return done('Troupe ' + existingTroupeUri + ' not found');
-
-        var emailNotificationService = testRequire('./services/email-notification-service');
-
-        var signupService = testRequire.withProxies("./services/signup-service", {
-          './services/email-notification-service': emailNotificationService
-        });
-
-        var troupeService = testRequire.withProxies("./services/troupe-service", {
-          './services/email-notification-service': emailNotificationService
-        });
 
         signupService.newSignupWithAccessRequest({ email: nonExistingEmail, name: 'Test McTest', troupeId: troupe.id }, function(err, request) {
           if(err) return done(err);
           if(!request) return done('No request created');
 
-          var emailNotificationServiceMock = sinon.mock(emailNotificationService);
-          emailNotificationServiceMock.expects('sendConfirmationForNewUserRequest').once();
-
           troupeService.acceptRequest(request, function(err) {
-            emailNotificationServiceMock.verify();
             if(err) return done(err);
+
+            mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUserRequest();
 
             persistence.User.findOne({ email: nonExistingEmail }, function(err, user) {
               if(err) return done(err);
 
               assert(user, 'User was not found');
+
               signupService.confirm(user, function(err, user, troupe) {
                 if(err) return done(err);
                 assert(user.status == 'PROFILE_NOT_COMPLETED', 'User status is incorrect');

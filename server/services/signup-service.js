@@ -5,42 +5,36 @@ var persistence = require("./persistence-service"),
     emailNotificationService = require("./email-notification-service"),
     troupeService = require("./troupe-service"),
     userService = require("./user-service"),
-    uuid = require('node-uuid'),
     winston = require('winston');
-
 
 function newTroupe(options, callback) {
   var user = options.user;
+  var invites = options.invites;
+  var troupeName = options.troupeName;
+  var users = options.users;
 
   var troupe = new persistence.Troupe();
-  troupe.name = options.troupeName;
+  troupe.name = troupeName;
   troupe.uri = troupeService.createUniqueUri();
 
   // add the user creating the troupe
   troupe.addUserById(user.id);
 
   // add other users
-  if (options.users) {
-    for (var a = 0; a < options.users; a++) {
-      troupe.addUserById(options.users[a]);
-    }
+  if (users) {
+    users.forEach(function(user) {
+      troupe.addUserById(user);
+    });
   }
 
   // invite users
-  if (options.invites) {
-    for (var b = 0; b < options.invites; b++)
-      troupeService.addInvite(troupe, user.displayName, options.invites[b].displayName, options.invites[b].email);
+  if (invites) {
+    invites.forEach(function(invite) {
+      troupeService.addInvite(troupe, user.displayName, invite.displayName, invite.email);
+    });
   }
 
   troupe.save(function(err) {
-    // send out email notification
-    if (!options.isNewUser) {
-      emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
-    }
-    else {
-      emailNotificationService.sendConfirmationForNewUser(user, troupe);
-    }
-
     callback(err, troupe);
   });
 }
@@ -50,6 +44,7 @@ function newTroupeForExistingUser(options, user, callback) {
 
   options.user = user;
   newTroupe(options, function(err, troupe) {
+    emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
     callback(err, troupe.id);
   });
 
@@ -64,8 +59,8 @@ function newTroupeForNewUser(options, callback) {
     }
 
     options.user = user;
-    options.isNewUser = true;
     newTroupe(options, function(err, troupe) {
+      emailNotificationService.sendConfirmationForNewUser(user, troupe);
       callback(err, troupe.id);
     });
   });
@@ -164,15 +159,17 @@ module.exports = {
 
   // Resend the confirmation email and returns the ID of the troupe related to the signed
   resendConfirmation: function(options, callback) {
-    winston.info("Resending confirmation ", options);
     var email = options.email;
 
-    function send(user, troupe) {
-      if(user.status != 'UNCONFIRMED') {
-        emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
+    function sendNotification(user, troupe) {
+      if (user.status === 'UNCONFIRMED') {
+        winston.verbose('Resending confirmation email to new user', { email: user.email });
+        emailNotificationService.sendConfirmationForNewUser(user, troupe, function() {});
       } else {
-        emailNotificationService.sendConfirmationForNewUser(user, troupe);
+        winston.verbose('Resending confirmation email to existing user', { email: user.email });
+        emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
       }
+      return;
     }
 
     // This option occurs if the user has possibly lost their session
@@ -180,14 +177,13 @@ module.exports = {
     if(options.email) {
         userService.findByEmail(email, function(err, user) {
           if(err || !user) return callback(err, null);
-
           troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
             if(err || !troupes.length) return callback(err, null);
-
             // This list should always contain a single value for a new user
             var troupe = troupes[0];
-            send(user, troupe);
-            callback(null, troupe.id);
+            sendNotification(user, troupe);
+
+            return callback(null, troupe.id);
           });
         });
 
@@ -204,12 +200,12 @@ module.exports = {
         userService.findById(troupeUsers[0], function(err, user) {
           if(err || !user) return callback(err, null);
 
-          send(user, troupe);
+          sendNotification(user, troupe);
 
-          callback(null, troupe.id);
+          return callback(null, troupe.id);
         });
-
       });
+
     }
   },
 
