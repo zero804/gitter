@@ -69,11 +69,15 @@ define([
         this.$container = $(document);
       }
 
-      this.scrollDelegate = new scrollDelegates.DefaultScrollDelegate(this.$scrollOf, this.$container, this.collection.modelName);
-      this.infiniteScrollDelegate = new scrollDelegates.InfiniteScrollDelegate(this.$scrollOf, this.$container, this.collection.modelName);
+      this.scrollDelegate = new scrollDelegates.DefaultScrollDelegate(this.$scrollOf, this.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
+      this.infiniteScrollDelegate = new scrollDelegates.InfiniteScrollDelegate(this.$scrollOf, this.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
       this.$scrollOf.on('scroll', this.chatWindowScroll);
 
       $(document).on('eyeballStateChange', this.eyeballStateChange);
+
+      function findTopMostVisibleUnreadItem(itemType) {
+        return unreadItemsClient.findTopMostVisibleUnreadItem(itemType);
+      }
 
     },
 
@@ -83,7 +87,7 @@ define([
 
     eyeballStateChange: function(e, newState) {
       log('EyesChange: ' + newState);
-      this.scrollDelegate.useLimit(!newState);
+      this.scrollDelegate.eyeballStateChange(newState);
     },
 
     beforeClose: function() {
@@ -95,6 +99,7 @@ define([
       // this is an ugly hack to deal with some weird timing issues
       var self = this;
       setTimeout(function() {
+        // note: on mobile safari this only work when typing in the url, not when pressing refresh, it works well in the mobile app.
         self.scrollDelegate.scrollToBottom();
       }, 500);
     },
