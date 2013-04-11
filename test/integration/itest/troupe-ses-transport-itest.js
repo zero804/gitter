@@ -2,7 +2,9 @@
 /*global describe: true, it: true */
 "use strict";
 
-var ses = require("../../../server/utils/mail/troupe-ses-transport");
+var testRequire = require('../test-require');
+
+var ses = testRequire("./utils/mail/troupe-ses-transport");
 
 var assert = require("better-assert");
 
@@ -36,7 +38,6 @@ describe('ses-transport2', function() {
         }
 
         // NOTE: check whether the messages recieved includes recipients for the 49/50/51 mark.
-        console.log('Message IDS:'+messageIds);
 
         assert(messageIds.length == 2);
         for(var i = 0; i < messageIds.length; i++)

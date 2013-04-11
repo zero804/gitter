@@ -76,6 +76,9 @@ function messageIsFromSuperClient(message) {
          message.ext.password === superClientPassword;
 }
 
+// This needs to be removed once all old FayeObjC clients that don't send ext on handshakre are dead and gone
+var HANDLE_TEMPORARY_FAYEOBJ_SITUATION = true;
+
 function handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake(message, callback) {
   var clientId = message.clientId;
   function deny() {
@@ -131,15 +134,17 @@ var authenticator = {
     }
 
     // TEMP TEMP TEMP
-    if (message.channel == '/meta/subscribe') {
-      return handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake(message, callback);
+    if(HANDLE_TEMPORARY_FAYEOBJ_SITUATION) {
+      if (message.channel == '/meta/subscribe') {
+        return handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake(message, callback);
+      }
     }
 
     if (message.channel != '/meta/handshake') {
       return callback(message);
     }
 
-    winston.debug('bayeux: Authenticating client', message);
+    winston.verbose('bayeux: Authenticating client', message);
 
     if(messageIsFromSuperClient(message)) {
       return callback(message);
@@ -147,10 +152,14 @@ var authenticator = {
 
     var ext = message.ext;
     if(!ext || !ext.token) {
-      winston.debug('bayeux: Allowing temporary access to unauthorised handshake client');
-      // Currently the faye connection code doesn't send the ext in the handshake message
-      // see handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake
-      return callback(message);
+      if(HANDLE_TEMPORARY_FAYEOBJ_SITUATION) {
+        winston.verbose('bayeux: Allowing temporary access to unauthorised handshake client');
+        // Currently the faye connection code doesn't send the ext in the handshake message
+        // see handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake
+        return callback(message);
+      } else {
+        return deny();
+      }
     }
 
     oauth.validateToken(ext.token, function(err, userId) {
@@ -343,7 +352,7 @@ module.exports = {
     client.addExtension(superClient);
 
     //server.bind('handshake', function(clientId) {
-    //  winston.debug("Faye handshake: ", { clientId: clientId });
+    //  winston.verbose("Faye handshake: ", { clientId: clientId });
     //});
 
     server.bind('disconnect', function(clientId) {

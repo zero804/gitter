@@ -1,15 +1,41 @@
 TESTS = test/integration
 END_TO_END_TESTS = test/end-to-end
+MOCHA_REPORTER =
 
-REPORTER = dot
+clean:
+	rm -rf public-processed/ output/ coverage/ cobertura-coverage.xml html-report/
 
 test:
-	@NODE_ENV=test ./node_modules/.bin/mocha \
-		--reporter $(REPORTER) \
+	NODE_ENV=test ./node_modules/.bin/mocha \
+		--reporter dot \
 		--timeout 10000 \
 		--recursive \
 		--ignore-leaks \
 		$(TESTS)
+
+test-xunit:
+	mkdir -p output/test-reports
+	NODE_ENV=test XUNIT_FILE=output/test-reports/integration.xml ./node_modules/.bin/mocha \
+		--reporter xunit-file \
+		--timeout 10000 \
+		--recursive \
+		--ignore-leaks \
+		$(TESTS)
+
+test-in-browser:
+	mkdir -p output/test-reports
+	test/in-browser/run-phantom-tests.sh
+
+test-coverage:
+	if [ -d ./coverage/ ]; then rm -r ./coverage/; fi
+	./node_modules/.bin/istanbul instrument server/ -o coverage/
+	mkdir -p output
+	ISTANBUL_REPORTERS=text-summary,html,cobertura TROUPE_COVERAGE=1 NODE_ENV=test ./node_modules/.bin/mocha \
+		--reporter mocha-istanbul \
+		--timeout 10000 \
+		--recursive \
+		--ignore-leaks \
+		$(TESTS) || true
 
 prepare-for-end-to-end-testing:
 	curl https://raw.github.com/pypa/pip/master/contrib/get-pip.py > /tmp/get-pip.py
@@ -46,12 +72,13 @@ upgrade-data:
 
 
 tarball:
-	if [ -d output ]; then rm -r output; fi
 	mkdir -p output
 	find . -type f -not -name ".*"| grep -Ev '^\./(\.|node_modules/|output/|assets/|mongo-backup-|scripts/mongo-backup-).*'|tar -cv --files-from - |gzip -9 - > output/troupe.tgz
 
 
-continuous-integration: npm grunt version-files upgrade-data test tarball
+continuous-integration: clean npm grunt version-files upgrade-data test-xunit test-coverage tarball
+
+post-deployment-tests: test-in-browser end-to-end-test
 
 build: npm grunt
 

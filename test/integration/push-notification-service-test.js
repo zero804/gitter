@@ -2,8 +2,10 @@
 /*global describe:true, it: true */
 "use strict";
 
-var pushNotificationService = require('../../server/services/push-notification-service');
-var persistenceService = require('../../server/services/persistence-service');
+var testRequire = require('./test-require');
+
+var pushNotificationService = testRequire('./services/push-notification-service');
+var persistenceService = testRequire('./services/persistence-service');
 
 var assert = require("better-assert");
 

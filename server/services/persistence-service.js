@@ -58,7 +58,7 @@ function serializeModelLateBound(model, callback) {
 }
 
 function serializeEvent(url, operation, model, callback) {
-  winston.debug("Serializing " + operation + " to " + url);
+  winston.verbose("Serializing " + operation + " to " + url);
 
   serializeModelLateBound(model, function(err, serializedModel) {
     if(err) {

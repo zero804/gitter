@@ -1,8 +1,10 @@
 /*jslint node: true */
-/*global describe: true it: true */
+/*global describe:true, it:true */
 "use strict";
 
-var Fiber = require("../../../server/utils/fiber");
+var testRequire = require('../test-require');
+
+var Fiber = testRequire("./utils/fiber");
 
 var assert = require("better-assert");
 
@@ -15,17 +17,16 @@ describe('Fiber', function() {
       /* Setup synchronization */
 
       var firstWaitor = fiber.waitor();
-      setTimeout(firstCallback, 1000);
+      setTimeout(firstCallback, 12);
 
       var secondWaitor = fiber.waitor();
-      setTimeout(secondCallback, 100);
+      setTimeout(secondCallback, 14);
 
       fiber.sync().then(syncCallback);
 
       /* Callbacks */
 
       function firstCallback() {
-        console.log("First callback run");
         assert(firstCallbackHasRun !== true);
         //assert(secondCallback !== true);
         assert(syncCallbackHasRun !== true);
@@ -36,7 +37,6 @@ describe('Fiber', function() {
       }
 
       function secondCallback() {
-        console.log("Second callback run");
         //assert(firstCallbackHasRun === true);
         assert(secondCallbackHasRun !== true);
         assert(syncCallbackHasRun !== true);
@@ -47,7 +47,6 @@ describe('Fiber', function() {
       }
 
       function syncCallback() {
-        console.log("Sync callback run");
         assert(firstCallbackHasRun === true);
         assert(secondCallbackHasRun === true);
         assert(syncCallbackHasRun !== true);

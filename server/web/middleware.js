@@ -57,32 +57,43 @@ exports.ensureLoggedIn = function(options) {
 
 };
 
+// This isn't actually a middleware, it's a useful function that
+// should probably be put somewhere else
+exports.logoutPreserveSession = function(req, res, done) {
+  req.logout();
+  var authCookie = req.cookies[authCookieName];
+  if(authCookie) {
+    rememberMe.deleteRememberMeToken(authCookie, logoutNextStep);
+  } else {
+    logoutNextStep();
+  }
+
+  function logoutNextStep(err) {
+    if(err) return done(err);
+
+    res.clearCookie(authCookieName, { domain: nconf.get("web:cookieDomain") });
+    done();
+  }
+};
+
 exports.logout = function() {
   return function(req, res, next) {
-    req.logout();
-    var authCookie = req.cookies[authCookieName];
-    if(authCookie) {
-      rememberMe.deleteRememberMeToken(authCookie, logoutNextStep);
-    } else {
-      logoutNextStep();
-    }
 
-    function logoutNextStep() {
-      res.clearCookie(authCookieName, { domain: nconf.get("web:cookieDomain") });
+    exports.logoutPreserveSession(req, res, function() {
       res.clearCookie(sessionCookieName, { domain: nconf.get("web:cookieDomain") });
+
       req.session.destroy(function(err) {
         req.session = null;
         next(err);
       });
-
-    }
+    });
   };
 
 };
 
 exports.authenticate = function(scheme, options) {
   return function(req, res, next) {
-    winston.debug("Attempting authentication", { scheme: scheme });
+    winston.verbose("Attempting authentication", { scheme: scheme });
 
     /* If you're trying to login, you're automatically logged out */
     req.logout();

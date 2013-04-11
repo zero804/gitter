@@ -5,42 +5,36 @@ var persistence = require("./persistence-service"),
     emailNotificationService = require("./email-notification-service"),
     troupeService = require("./troupe-service"),
     userService = require("./user-service"),
-    uuid = require('node-uuid'),
     winston = require('winston');
-
 
 function newTroupe(options, callback) {
   var user = options.user;
+  var invites = options.invites;
+  var troupeName = options.troupeName;
+  var users = options.users;
 
   var troupe = new persistence.Troupe();
-  troupe.name = options.troupeName;
+  troupe.name = troupeName;
   troupe.uri = troupeService.createUniqueUri();
 
   // add the user creating the troupe
   troupe.addUserById(user.id);
 
   // add other users
-  if (options.users) {
-    for (var a = 0; a < options.users; a++) {
-      troupe.addUserById(options.users[a]);
-    }
+  if (users) {
+    users.forEach(function(user) {
+      troupe.addUserById(user);
+    });
   }
 
   // invite users
-  if (options.invites) {
-    for (var b = 0; b < options.invites; b++)
-      troupeService.addInvite(troupe, user.displayName, options.invites[b].displayName, options.invites[b].email);
+  if (invites) {
+    invites.forEach(function(invite) {
+      troupeService.addInvite(troupe, user.displayName, invite.displayName, invite.email);
+    });
   }
 
   troupe.save(function(err) {
-    // send out email notification
-    if (!options.isNewUser) {
-      emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
-    }
-    else {
-      emailNotificationService.sendConfirmationForNewUser(user, troupe);
-    }
-
     callback(err, troupe);
   });
 }
@@ -50,6 +44,7 @@ function newTroupeForExistingUser(options, user, callback) {
 
   options.user = user;
   newTroupe(options, function(err, troupe) {
+    emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
     callback(err, troupe.id);
   });
 
@@ -64,8 +59,8 @@ function newTroupeForNewUser(options, callback) {
     }
 
     options.user = user;
-    options.isNewUser = true;
     newTroupe(options, function(err, troupe) {
+      emailNotificationService.sendConfirmationForNewUser(user, troupe);
       callback(err, troupe.id);
     });
   });
@@ -100,7 +95,7 @@ module.exports = {
 
   confirm: function(user, callback) {
     if(!user) return callback(new Error("No user found"));
-    winston.debug("Confirming user", { id: user.id, status: user.status });
+    winston.verbose("Confirming user", { id: user.id, status: user.status });
 
     if (user.status === 'UNCONFIRMED') {
       // setting the status marks the user as confirmed
@@ -128,7 +123,7 @@ module.exports = {
 
         user.oldEmail = user.email;
         user.email = user.newEmail;
-        delete user.newEmail;
+        user.newEmail = null;
 
         // send an email to confirm that the confirmation of the email address change...was confirmed.
         emailNotificationService.sendNoticeOfEmailChange(user, origEmail, newEmail);
@@ -140,38 +135,55 @@ module.exports = {
     function finish(err) {
       if(err) return callback(err);
 
-      winston.debug("User saved, finding troupe to redirect to", { id: user.id, status: user.status });
+      winston.verbose("User saved, finding troupe to redirect to", { id: user.id, status: user.status });
       troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
-        if(err) return callback(new Error("Error finding troupes for user"));
-        if(troupes.length < 1) return callback(new Error("Could not find troupe for user"));
+        var t = null;
 
-        callback(err, user, troupes[0]);
+        if(err) return callback(new Error("Error finding troupes for user"));
+
+        if(troupes.length < 1) {
+          winston.warn("User has no troupes");
+          t = null;
+          // return callback(new Error("Could not find troupe for user"));
+        }
+        else {
+          t = troupes[0];
+        }
+
+
+        callback(err, user, t);
       });
     }
 
   },
 
+  // Resend the confirmation email and returns the ID of the troupe related to the signed
   resendConfirmation: function(options, callback) {
-    winston.info("Resending confirmation ", options);
     var email = options.email;
+
+    function sendNotification(user, troupe) {
+      if (user.status === 'UNCONFIRMED') {
+        winston.verbose('Resending confirmation email to new user', { email: user.email });
+        emailNotificationService.sendConfirmationForNewUser(user, troupe, function() {});
+      } else {
+        winston.verbose('Resending confirmation email to existing user', { email: user.email });
+        emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
+      }
+      return;
+    }
 
     // This option occurs if the user has possibly lost their session
     // and is trying to get the confirmation sent at a later stage
     if(options.email) {
         userService.findByEmail(email, function(err, user) {
           if(err || !user) return callback(err, null);
-
-          if(user.status != 'UNCONFIRMED') {
-            return callback("User is not unconfirmed...", null);
-          }
-
           troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
             if(err || !troupes.length) return callback(err, null);
-
             // This list should always contain a single value for a new user
             var troupe = troupes[0];
-            emailNotificationService.sendConfirmationForNewUser(user, troupe);
-            callback(null, troupe.id);
+            sendNotification(user, troupe);
+
+            return callback(null, troupe.id);
           });
         });
 
@@ -185,19 +197,15 @@ module.exports = {
           return callback("Invalid state");
         }
 
-
         userService.findById(troupeUsers[0], function(err, user) {
-          if(err || !user) return callback(err, user);
-          if(user.status != 'UNCONFIRMED') {
-            emailNotificationService.sendConfirmationForExistingUser(user, troupe);
-          } else {
-            emailNotificationService.sendConfirmationForNewUser(user, troupe);
-          }
+          if(err || !user) return callback(err, null);
 
-          callback(null, troupe.id);
+          sendNotification(user, troupe);
+
+          return callback(null, troupe.id);
         });
-
       });
+
     }
   },
 
@@ -209,7 +217,7 @@ module.exports = {
    * - IF the email address does exist and the user account is:
    *    - UNCONFIRMED: don't create a new account, but update the name and add a request for the troupe (if one does not already exist)
    *    - COFIRMED: then throw an error saying that the user needs to login
-   * callback is function(err)
+   * callback is function(err, request)
    */
   newSignupWithAccessRequest: function(options, callback) {
     winston.info("New signup with access request ", options);
@@ -230,19 +238,19 @@ module.exports = {
           displayName: name
         };
 
-        user = userService.newUser(userProperties, function(err, user) {
+        userService.newUser(userProperties, function(err, user) {
           if(err) return callback(err);
 
-          troupeService.addRequest(troupeId, user.id, function(err/*, request */) {
+          troupeService.addRequest(troupeId, user.id, function(err, request) {
             if(err) return callback(err);
-            callback(null);
+            callback(null, request);
           });
         });
 
       } else {
-        troupeService.addRequest(troupeId, user.id, function(err/*, request */) {
+        troupeService.addRequest(troupeId, user.id, function(err, request) {
           if(err) return callback(err);
-          callback(null);
+          callback(null, request);
         });
       }
     });

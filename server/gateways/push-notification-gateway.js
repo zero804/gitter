@@ -33,7 +33,7 @@ exports.startWorkers = function() {
     pushNotificationService.findDevicesForUsers(userIds, function(err, devices) {
       if(err) return callback(err);
 
-      winston.debug("Sending to " + devices.length + " potential devices for " + userIds.length + " users");
+      winston.verbose("Sending to " + devices.length + " potential devices for " + userIds.length + " users");
 
       devices.forEach(function(device) {
         var sent = false;
@@ -139,7 +139,6 @@ exports.startWorkers = function() {
   });
 
   jobs.process('push-notification', 20, function(job, done) {
-    console.dir(job.data);
     directSendUserNotification(job.data.userIds, job.data.notification, done);
   });
 };

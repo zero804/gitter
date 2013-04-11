@@ -207,7 +207,7 @@ function findByFileName(troupeId, fileName, callback) {
  */
 /* public */
 function storeFileVersionInGrid(options, callback) {
-  winston.debug("storeFileVersionInGrid");
+  winston.verbose("storeFileVersionInGrid");
 
   var troupeId = options.troupeId;
   var creatorUserId = options.creatorUserId;
@@ -329,7 +329,7 @@ function deleteFileFromGridStore(fileName, callback) {
     if(err) winston.error("Error while deleting file from gridstore: ", { fileName: fileName, exception: err } );
   };
 
-  winston.debug("Deleting file from gridstore: ", { fileName: fileName } );
+  winston.verbose("Deleting file from gridstore: ", { fileName: fileName } );
 
   var db = mongoose.connection.db;
   var GridStore = mongoose.mongo.GridStore;

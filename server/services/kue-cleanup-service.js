@@ -21,7 +21,7 @@ function completedJobs(callback) {
     var jobs = [],
     count = 0,
     total = ids.length;
-    winston.debug('completedJobs -> ids.length:%s',ids.length);
+    winston.verbose('completedJobs -> ids.length:%s',ids.length);
     _.each(ids, function(id){
       kue.Job.get(id, function(err, job){
         count++;
@@ -42,7 +42,7 @@ function removeJobs(jobs, callback) {
    */
    var count = 0,
    total = jobs.length;
-   winston.debug('removeJobs -> jobs.length:%s',jobs.length);
+   winston.verbose('removeJobs -> jobs.length:%s',jobs.length);
    _.each(jobs, function(job) {
     job.remove(function(err) {
       count++;
@@ -64,7 +64,7 @@ function cleanupJob() {
 
   completedJobs(function(err, jobs) {
     // callback to completedJobs
-    winston.debug('completedJobs -> callback-> jobs.length:%s', jobs.length);
+    winston.verbose('completedJobs -> callback-> jobs.length:%s', jobs.length);
     var jobsToRemove = [],
         now = new Date();
 
@@ -77,21 +77,21 @@ function cleanupJob() {
       }
     });
 
-    winston.debug('completedJobs -> callback -> jobsToRemove.length:%s', jobsToRemove.length);
+    winston.verbose('completedJobs -> callback -> jobsToRemove.length:%s', jobsToRemove.length);
     if (jobsToRemove.length > 0) { // if we have jobsToRemove
       removeJobs(jobsToRemove, function(err, count){
         // callback to removeJobs
-        winston.debug('removeJobs -> callback -> jobs removed:%s',count);
+        winston.verbose('removeJobs -> callback -> jobs removed:%s',count);
       });
     } else {
-      winston.debug('completedJobs -> callback -> no jobs to remove');
+      winston.verbose('completedJobs -> callback -> no jobs to remove');
     }
   });
 }
 
 
 exports.startCleanupJob = function() {
-  winston.debug('Running kue completed job clean-up');
+  winston.verbose('Running kue completed job clean-up');
 
   setInterval(cleanupJob, timer);
   jobs.promote(5000);

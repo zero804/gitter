@@ -26,4 +26,18 @@ describe("ProfileView", function() {
     });
 
   });
+
+  describe("password reset", function() {
+
+  });
+
+  describe("complete profile", function() {
+
+    // how do I get a user that is PROFILE_NOT_COMPLETE?
+
+    it("should update the name and status of the user", function() {
+
+    });
+
+  });
 });

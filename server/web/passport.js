@@ -15,7 +15,7 @@ var statsService = require("../services/stats-service");
 var nconf = require('../utils/config');
 
 function emailPasswordUserStrategy(email, password, done) {
-  winston.debug("Attempting to authenticate ", { email: email });
+  winston.verbose("Attempting to authenticate ", { email: email });
 
   userService.findByEmail(email, function(err, user) {
     if(err) return done(err);
@@ -99,7 +99,7 @@ module.exports = {
     passport.use(new ConfirmStrategy({ name: "confirm" }, function(confirmationCode, req, done) {
       var self = this;
 
-      winston.debug("Confirming user with code", { confirmationCode: confirmationCode });
+      winston.verbose("Confirming user with code", { confirmationCode: confirmationCode });
 
       userService.findByConfirmationCode(confirmationCode, function(err, user) {
         if(err) return done(err);
@@ -107,16 +107,15 @@ module.exports = {
 
         // if the user is unconfirmed, then confirm them
         // if the user has been confirmed, but hasn't populated their profile, we want to go down the same path
-        if (user.status == 'UNCONFIRMED' || user.status == 'PROFILE_NOT_COMPLETED') {
+        if (user.status == 'UNCONFIRMED' || user.status == 'PROFILE_NOT_COMPLETED' || user.newEmail) {
           statsService.event('confirmation_completed', { userId: user.id });
           return done(null, user);
         }
-
         // confirmation fails if the user is already confirmed, except when the user is busy confirming their new email address
-        if(user.status !== 'UNCONFIRMED' && !user.newEmail) {
+        else {
           statsService.event('confirmation_reused', { userId: user.id });
 
-          winston.debug("Confirmation already used", { confirmationCode: confirmationCode });
+          winston.verbose("Confirmation already used", { confirmationCode: confirmationCode });
 
           // If the confirmation was under an appUri ala /:appUri/confirm/:confirmCode
           // Then always use that URI
@@ -155,7 +154,7 @@ module.exports = {
 
   passport.use(new ConfirmStrategy({ name: "accept" }, function(confirmationCode, req, done) {
       var self = this;
-      winston.debug("Invoking accept strategy", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
+      winston.verbose("Invoking accept strategy", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
 
       troupeService.findInviteByCode(confirmationCode, function(err, invite) {
         if(err) return done(err);
@@ -163,7 +162,7 @@ module.exports = {
 
         if(invite.status !== 'UNUSED') {
           /* The invite has already been used. We need to fail authentication, but go to the troupe */
-          winston.debug("Invite has already been used", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
+          winston.verbose("Invite has already been used", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
           statsService.event('invite_reused', { uri: req.params.troupeUri });
 
           // THIS BIT OF CODE ISNT WORKING MOANS ABOUT HEADERS ALREADY SET
@@ -187,7 +186,7 @@ module.exports = {
 
         statsService.event('invite_accepted', { uri: req.params.troupeUri });
 
-        winston.debug("Invite accepted", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
+        winston.verbose("Invite accepted", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
 
         userService.findOrCreateUserForEmail({
           displayName: invite.displayName,

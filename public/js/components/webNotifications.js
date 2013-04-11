@@ -3,8 +3,9 @@ define([
   'jquery',
   './notify',
   './realtime',
-  'handlebars'
-], function($, notify, realtime, handlebars){
+  'handlebars',
+  'utils/log'
+], function($, notify, realtime, handlebars, log){
   "use strict";
 
   var notifications = $('<div id="notification-center" class="notification-center"></div>').appendTo('body');

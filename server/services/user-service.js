@@ -312,7 +312,12 @@ var userService = {
 
           // check if this new email is available for use
           userService.findByEmail(email, function(e, existingUser) {
-            if (existingUser || e) return callback("The email address you are trying to change to is already registered by someone else."); // shouldn't we still save the other details?
+            if (existingUser || e) {
+              // shouldn't we still save the other details?
+              var err = new Error("The email address you are trying to change to is already registered by someone else.");
+              err.emailConflict = true;
+              return callback(err);
+            }
 
             // save the new email address while it is being confirmed
             user.newEmail = email;
