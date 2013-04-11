@@ -3,7 +3,6 @@ define([
   'jquery',
   'underscore'
 ], function($, _){
-  /*global console: false document: false window:false*/
   "use strict";
 
   function play(sound) {

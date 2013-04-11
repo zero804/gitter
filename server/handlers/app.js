@@ -168,11 +168,35 @@ function preloadFiles(userId, troupeId, callback) {
 }
 
 function preloadChats(userId, troupeId, callback) {
-  chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: 20 }, function(err, chatMessages) {
+  function serializeChats(err, chatMessages) {
     if(err) return callback(err);
 
     var strategy = new restSerializer.ChatStrategy({ currentUserId: userId, troupeId: troupeId });
     restSerializer.serialize(chatMessages, strategy, callback);
+  }
+
+  unreadItemService.getFirstUnreadItem(userId, troupeId, 'chat', function(err, firstId) {
+    if(firstId) {
+      // No first Id, just return the most recent 20 messages
+      chatService.findChatMessagesForTroupe(troupeId, { startId: firstId }, function(err, chatMessages) {
+        if(err) return callback(err);
+
+        // Just get the last 20 messages instead
+        if(chatMessages.length < 20) {
+          chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: 20 }, serializeChats);
+          return;
+        }
+
+        return serializeChats(err, chatMessages);
+
+      });
+
+      return;
+    }
+
+    // No first Id, just return the most recent 20 messages
+    chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: 20 }, serializeChats);
+
   });
 
 }
