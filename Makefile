@@ -1,11 +1,9 @@
 TESTS = test/integration
 END_TO_END_TESTS = test/end-to-end
-
 MOCHA_REPORTER =
 
 clean:
 	rm -rf public-processed/ output/ coverage/ cobertura-coverage.xml html-report/
-
 
 test:
 	NODE_ENV=test ./node_modules/.bin/mocha \
@@ -16,13 +14,17 @@ test:
 		$(TESTS)
 
 test-xunit:
-	mkdir -p output
-	NODE_ENV=test XUNIT_FILE=output/xunit.xml ./node_modules/.bin/mocha \
+	mkdir -p output/test-reports
+	NODE_ENV=test XUNIT_FILE=output/test-reports/integration.xml ./node_modules/.bin/mocha \
 		--reporter xunit-file \
 		--timeout 10000 \
 		--recursive \
 		--ignore-leaks \
 		$(TESTS)
+
+test-in-browser:
+	mkdir -p output/test-reports
+	test/in-browser/run-phantom-tests.sh
 
 test-coverage:
 	if [ -d ./coverage/ ]; then rm -r ./coverage/; fi
@@ -75,6 +77,8 @@ tarball:
 
 
 continuous-integration: clean npm grunt version-files upgrade-data test-xunit test-coverage tarball
+
+post-deployment-tests: test-in-browser end-to-end-test
 
 build: npm grunt
 
