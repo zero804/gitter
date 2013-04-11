@@ -76,7 +76,7 @@ define([
       $(document).on('eyeballStateChange', this.eyeballStateChange);
 
       function findTopMostVisibleUnreadItem(itemType) {
-        return unreadItemsClient.findTopMostVisibleUnreadItem(itemType);
+        return unreadItemsClient.findTopMostVisibleUnreadItemPosition(itemType);
       }
 
     },

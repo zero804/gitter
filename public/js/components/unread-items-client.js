@@ -192,7 +192,7 @@ define([
       return v ? v.length : 0;
     },
 
-    findTopMostVisibleUnreadItem: function(itemType) {
+    findTopMostVisibleUnreadItemPosition: function(itemType) {
       var topItem = null;
       var topItemOffset = 1000000000;
 
@@ -219,7 +219,7 @@ define([
       });
 
       if(!topItem) return null;
-      return topItem[0];
+      return topItem.offset();
     },
 
     getTotalUnreadCountForCurrentTroupe: function() {
