@@ -5,49 +5,51 @@ var nconf = require('./config');
 var winston = require("winston");
 var fs = require('fs');
 var path = require('path');
+var assert = require('assert');
 
 function statFile(fileTransport) {
+  assert(fileTransport, 'fileTransport must exist');
+
   var fullname = path.join(fileTransport.dirname, fileTransport._getFile(false));
 
   function reopen() {
-    if (fileTransport._stream) {
-      fileTransport._stream.end();
-      fileTransport._stream.destroySoon();
-    }
-
-    var stream = fs.createWriteStream(fullname, fileTransport.options);
-    stream.setMaxListeners(Infinity);
-
-    fileTransport._size = 0;
-    fileTransport._stream = stream;
-
-    fileTransport.once('flush', function () {
-      fileTransport.opening = false;
-      fileTransport.emit('open', fullname);
+    fileTransport.close();
+    fileTransport._stream = null;
+    fileTransport.once('open', function() {
+      winston.info('Log rotation completed');
+      console.log('Log rotation completed');
     });
-
-    fileTransport.flush();
-    setTimeout(function() {
-      winston.info("Log rotation completed");
-    }, 100);
   }
 
-  fs.stat(fullname, function (err) {
+  fs.stat(fullname, function (err, stat) {
     if (err && err.code == 'ENOENT') {
       console.log('Log file no longer exists. Reopening');
       return reopen();
     }
+
+    if(fileTransport._stream && fileTransport._stream.fd) {
+
+      fs.fstat(fileTransport._stream.fd, function(err2, fstat) {
+        if(stat.dev != fstat.dev || stat.ino !== fstat.ino) {
+          console.log('File inode mismatch. Reopening');
+          return reopen();
+        }
+      });
+
+    }
+
   });
 }
 
 function periodicallyStatFile(fileTransport) {
   setInterval(function() {
     statFile(fileTransport);
-  }, 60000);
+  }, 30000);
 }
 
 function reopenTransportOnHupSignal(fileTransport) {
   process.on('SIGHUP', function() {
+    console.log('Caught SIGHUP, attempting logfile rotation');
     winston.info('Caught SIGHUP, attempting logfile rotation');
 
     statFile(fileTransport);
@@ -64,6 +66,8 @@ function configureTransports() {
       filename: nconf.get('LOG_FILE'),
       level: nconf.get("logging:level"),
       timestamp: true,
+      maxFiles: null,
+      maxsize: null,
       json: false
     });
 

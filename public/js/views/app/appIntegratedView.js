@@ -7,7 +7,7 @@ define([
   'fineuploader',
   "nanoScroller",
   'utils/log'
-  ], function($, _, Backbone, uiVars, qq, log) {
+  ], function($, _, Backbone, uiVars, qq, _nano, log) {
   "use strict";
 
   return Backbone.View.extend({

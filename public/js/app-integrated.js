@@ -7,6 +7,7 @@ require([
   'template/helpers/all',
   'views/base',
   'components/realtime',
+  'components/eyeballs',
   'views/app/appIntegratedView',
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
@@ -38,7 +39,7 @@ require([
   'utils/log',
   'components/errorReporter',
   'filtered-collection'
-], function($, _, Backbone, Marionette, _Helpers, TroupeViews, realtime, AppIntegratedView, ChatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
+], function($, _, Backbone, Marionette, _Helpers, TroupeViews, realtime, eyeballs, AppIntegratedView, ChatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
             troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView,
             createTroupeView, headerViewTemplate, shareTroupeView,

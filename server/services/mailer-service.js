@@ -43,7 +43,6 @@ exports.startWorkers = function() {
     troupeTemplate.compile(htmlTemplateFile, function(err, htmlTemplate) {
       if(err) return winston.error("Unable to load HTML template", err);
       var headerHtml = headerTemplate(options.data);
-      console.dir(options.data);
       var html = htmlTemplate(options.data);
       var footerHtml = footerTemplate(options.data);
 

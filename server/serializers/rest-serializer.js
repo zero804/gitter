@@ -656,7 +656,7 @@ function TroupeStrategy(options) {
         troupeName = otherUser.displayName;
         troupeUrl = "/one-one/" + otherUser.id;
       } else {
-        winston.debug("Unable to map troupe bits as something has gone horribly wrong");
+        winston.verbose("Unable to map troupe bits as something has gone horribly wrong");
         // This should technically never happen......
         troupeName = null;
         troupeUrl = null;

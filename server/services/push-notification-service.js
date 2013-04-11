@@ -55,7 +55,7 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
             if(!buffersEqual(device.deviceToken, deviceToken)) return;
           }
 
-          winston.debug('Removing unused device ' + device.deviceId);
+          winston.verbose('Removing unused device ' + device.deviceId);
           device.remove(fiber.waitor());
         });
 

@@ -88,9 +88,23 @@ define([
     }
   };
 
+  var inFocus = true;
+  $(window).on('blur', function() {
+    inFocus = false;
+  });
+
+  $(window).on('focus', function() {
+    inFocus = true;
+    windowScroll();
+  });
+
   var windowTimeout = null;
   var windowScrollOnTimeout = function windowScrollOnTimeout() {
     windowTimeout = null;
+    if(!inFocus) {
+      return;
+    }
+
     var $window = $(window);
     var scrollTop = $window.scrollTop();
     var scrollBottom = scrollTop + $window.height();

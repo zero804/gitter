@@ -55,7 +55,8 @@
     "faye": "0.8.8",
     "faye-redis": "0.1.1",
     "geckoboard-push": "0.0.5",
-    "mongoose-number": "0.0.2"
+    "mongoose-number": "0.0.2",
+    "redis-lock": "0.0.4"
   },
   "devDependencies": {
     "proxyquire": "0.4.0",
@@ -72,7 +73,13 @@
     "grunt-exec": "0.4.0",
     "grunt-reload": "0.2.0",
     "jsonlint": "1.5.1",
-    "callsite": "1.0.0"
+    "visionmedia-jscoverage": "1.0.0",
+    "callsite": "1.0.0",
+    "xunit-file": "0.0.3",
+    "istanbul": "0.1.34",
+    "mocha-istanbul": "0.2.0",
+    "jsmockito": "~1.0.4",
+    "mocha-phantomjs": "~2.0.1"
   },
   "scripts": {
     "test": "make test"

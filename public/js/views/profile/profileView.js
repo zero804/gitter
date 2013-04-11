@@ -173,7 +173,10 @@ define([
             }
 
           } else {
-            if(data.authFailure) {
+            if (data.emailConflict) {
+              window.alert("That email address is already registered, please choose another.");
+            }
+            else if(data.authFailure) {
               that.$el.find('#oldPassword').val("");
               window.alert("You old password is incorrect");
             }

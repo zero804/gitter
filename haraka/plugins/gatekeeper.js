@@ -32,17 +32,17 @@ exports.hook_queue = function (next, connection) {
     date: connection.transaction.header.get("Date")
   };
 
-  winston.debug("Gateway: Received mail from " + mail.from);
+  winston.verbose("Gateway: Received mail from " + mail.from);
 
   // hard deny (smtp bounce) if there is no from field
   if (!validateAddress(mail.from)) {
-    winston.debug("Gateway: Invalid or no sender address, hard bouncing.");
+    winston.verbose("Gateway: Invalid or no sender address, hard bouncing.");
     return next(DENY, "There was no sender email address specified by your SMTP server");
   }
 
   // ensure that the user is registered
   userService.findByEmail(mail.from, function (err, user) {
-    winston.debug("Gateway: Looked up the user for this mail");
+    winston.verbose("Gateway: Looked up the user for this mail");
 
     // get the troupe ids from the to addresses in the mail transaction
     var troupeUris = [];
@@ -62,7 +62,7 @@ exports.hook_queue = function (next, connection) {
     // fetch the troupes access control hash,
     // which shows whether the sender can post to each troupe or if any don't exist
     troupeService.validateTroupeUrisForUser(user.id, troupeUris, function(err, troupesLookup) {
-      winston.debug("Gateway: Looked up the requested troupe objects" /*, troupesLookup */);
+      winston.verbose("Gateway: Looked up the requested troupe objects" /*, troupesLookup */);
 
       if(err) return next(SOFTDENY, "Error saving this mail, please try again later");
 
@@ -76,18 +76,18 @@ exports.hook_queue = function (next, connection) {
         {
           deniedTroupes.push(troupeId); // user is not allowed to post to this troupe
           addressIndicesToRemove.push(i);
-          winston.debug("Gateway: Denying posting to troupe " + troupeId + " (forbidden)");
+          winston.verbose("Gateway: Denying posting to troupe " + troupeId + " (forbidden)");
         }
         else if(troupe === null)
         {
           nonExistantTroupes.push(troupeId); // this troupe doesn't exist
           addressIndicesToRemove.push(i);
-          winston.debug("Gateway: Denying posting to troupe " + troupeId + " (non-existant)");
+          winston.verbose("Gateway: Denying posting to troupe " + troupeId + " (non-existant)");
         }
         else
         {
           permittedTroupes.push(troupeId);
-          winston.debug("Gateway: Permitting posting to troupe " + troupeId);
+          winston.verbose("Gateway: Permitting posting to troupe " + troupeId);
         }
 
         i++;
@@ -104,12 +104,12 @@ exports.hook_queue = function (next, connection) {
       }
 
       if (permittedTroupes.length) {
-        winston.debug("Gateway: Returning to next plugin, there are " + permittedTroupes.length + " mails to receive.");
+        winston.verbose("Gateway: Returning to next plugin, there are " + permittedTroupes.length + " mails to receive.");
 
         return next(CONT);
       }
       else {
-        winston.debug("Gateway: Cancelling any further plugin execution, there are no mails for them to receive.");
+        winston.verbose("Gateway: Cancelling any further plugin execution, there are no mails for them to receive.");
 
         return next(OK); // no further plugins should run
       }
@@ -119,7 +119,7 @@ exports.hook_queue = function (next, connection) {
 };
 
 function sendBounceMail(userIsRegistered, mail, deniedTroupes, nonExistantTroupes, permittedTroupes) {
-  winston.debug("Gateway#sendBounceMail(): I'm gna bounce this mail from " + mail.from + " that silly user can't send to: ", { deniedTroupes: deniedTroupes, nonExistantTroupes: nonExistantTroupes });
+  winston.verbose("Gateway#sendBounceMail(): I'm gna bounce this mail from " + mail.from + " that silly user can't send to: ", { deniedTroupes: deniedTroupes, nonExistantTroupes: nonExistantTroupes });
 
   statsService.event('mail_bounce', {
     from: mail.from,

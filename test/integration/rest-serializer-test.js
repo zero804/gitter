@@ -2,8 +2,10 @@
 /*global describe:true, it: true */
 "use strict";
 
-var userService = require('../../server/services/user-service');
-var restSerializer = require('../../server/serializers/rest-serializer');
+var testRequire = require('./test-require');
+
+var userService = testRequire('./services/user-service');
+var restSerializer = testRequire('./serializers/rest-serializer');
 
 var assert = require("better-assert");
 

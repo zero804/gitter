@@ -7,10 +7,11 @@ require([
   'views/signup/signupModalConfirmView',
   'views/login/loginModalView',
   'views/signup/createTroupeView',
+  'views/app/messagesView',
   'jquery_validate', // No ref!
   'retina'
  ],
-  function(clwrapper, $, TroupeViews, SignupModalView, SignupModalConfirmView, LoginModalView, createTroupeView) {
+  function(clwrapper, $, TroupeViews, SignupModalView, SignupModalConfirmView, LoginModalView, createTroupeView, MessagesView) {
     //var loginFormVisible = false;
 
     function createLoginModal() {
@@ -64,6 +65,11 @@ require([
       });
 
       modal.show();
+    }
+
+    if (window.location.hash.indexOf("message") >= 0) {
+      var v = new MessagesView({ messageName : window.location.hash });
+      v.show();
     }
 
     $('#button-signup').on('click', function() {
