@@ -6,7 +6,7 @@ define([
 ], function($, realtime, log) {
   "use strict";
 
-
+  var eyesOnState = true;
 
   function send(value) {
     if(!realtime._clientId) {
@@ -25,14 +25,48 @@ define([
     });
   }
 
+  function eyeballsOff() {
+    if(eyesOnState)  {
+      log('eyeballsOff');
+
+      eyesOnState = false;
+      send(0);
+
+      $(document).trigger('eyeballStateChange', false);
+    }
+  }
+
+  function eyeballsOn() {
+    if(!eyesOnState)  {
+      log('eyeballsOn');
+
+      eyesOnState = true;
+      send(1);
+
+      $(document).trigger('eyeballStateChange', true);
+    }
+  }
+
   $(window).on('blur', function() {
     log('blur');
-    send(0);
+
+    eyeballsOff();
   });
 
   $(window).on('focus', function() {
     log('focus');
-    send(1);
+    eyeballsOn();
   });
+
+  $(window).on('pageshow', function() {
+    log('pageshow');
+    eyeballsOn();
+  });
+
+  $(window).on('pagehide', function() {
+    log('pagehide');
+    eyeballsOff();
+  });
+
 
 });
