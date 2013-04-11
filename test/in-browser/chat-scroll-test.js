@@ -31,48 +31,88 @@ require([
   });
 
   describe("Chat scroll behaviour for new messages added at the bottom", function() {
+
     it("should scroll to the new bottom if the viewer was already at the bottom", function() {
 
+      var env = new TestEnvironment();
+
+      for (var a = 0; a < 30; a++) {
+        env.newMessage();
+      }
+
+      expect(env.scrollOf.scrollTop()).eql(Math.max(0, env.container.height() - env.scrollOf.height()));
+    });
+
+    it("should not scroll past the top unread message when a new message comes in at the bottom", function() {
+      var env = new TestEnvironment();
+
+      // take up some space, with read messages
+      for (var a = 0; a < 30; a++)
+        env.newMessage();
+
+      // store this position as the top unread item
+      env.topUnreadPosition = env.scrollOf.scrollTop();
+      // add enough "unread" messages to fill the screen
+      for (var b = 0; b < 20; b++)
+        env.newMessage();
+
+      // ensure the scroll position has not gone past the top unread position previously saved
+      expect(env.scrollOf.scrollTop()).to.be.lessThan(env.topUnreadPosition);
     });
   });
 
-  // mock the scrollOf jquery element
-  var scrollOf = {
-    scroll: 0,
-    scrollTop: function(top) {
-      if (top === 0 || top)
-        this.scroll = top;
+  function TestEnvironment() {
+    // mock the scrollOf jquery element
+    this.scrollOf = {
+      scroll: 0,
+      scrollTop: function(top) {
+        if (top === 0 || top)
+          this.scroll = top;
 
-      return this.scroll;
-    },
-    h: 0,
-    height: function(y) {
-      if (y === 0 || y)
-        this.h = y;
+        return this.scroll;
+      },
+      h: 800,
+      height: function() {
+        //if (y === 0 || y)
+        //  this.h = y;
 
-      return this.h;
+        return this.h;
+      }
+    };
+
+    // mock the container jquery element
+    this.container = {
+      h: 0,
+      height: function(y) {
+        if (y === 0 || y) {
+          this.h = y;
+          //scrollOf.h = y;
+        }
+
+        return this.h;
+      }
+    };
+
+    // setup the scroll delegate
+    this.scrollDelegate = new delegates.DefaultScrollDelegate(this.scrollOf, this.container, 'trpChatItem', findTopMostVisibleUnreadItem);
+    // what do we need to return as the unread item?
+    this.topUnreadPosition = null; var self = this;
+    function findTopMostVisibleUnreadItem(/* itemType */) {
+      if (!this.topUnreadPosition)
+        return null;
+
+      return {
+        top: self.topUnreadPosition
+      };
     }
-  };
 
-  // mock the container jquery element
-  var container = {
-    height: function() {}
-  };
-
-  // setup the scroll delegate
-  var scrollDelegate = new delegates.DefaultScrollDelegate(scrollOf, container, 'trpChatItem', findTopMostVisibleUnreadItem);
-  // what do we need to return as the unread item?
-  function findTopMostVisibleUnreadItem(/* itemType */) {
+    this.newMessage = function() {
+      this.scrollDelegate.onBeforeItemAdded();
+      this.container.height(this.container.height() + 60);
+      this.scrollDelegate.onAfterItemAdded();
+    };
 
   }
-
-  function newMessage() {
-    scrollDelegate.onBeforeItemAdded();
-    container.height(container.height() + 60);
-    scrollOf.scrollTop();
-    scrollDelegate.onAfterItemAdded();
-  }
-
 
   mocha.run();
 

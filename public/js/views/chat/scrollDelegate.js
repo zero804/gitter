@@ -70,11 +70,11 @@ define([
     // ERR: note that this max limit capping must only look for a new unread item, not be enabled for the page load or when loading older messages.
     if(this.useMax && this.maxScroll == -1) {
       // if there is no max scroll yet, then look for the highest unread item and set the max to it
-      var topUnreadItem = this.findTopMostVisibleUnreadItem(this.itemType);
+      var topUnreadItemPosition = this.findTopMostVisibleUnreadItem(this.itemType);
 
-      if(topUnreadItem) {
-        var pos = $(topUnreadItem).offset().top;
-        log('Found our top item at position ', pos, topUnreadItem);
+      if(topUnreadItemPosition) {
+        var pos = topUnreadItemPosition.top;
+        log('Found our top item at position ', pos);
         this.maxScroll = Math.max(0, pos - 140);
       }
     }
@@ -121,7 +121,7 @@ define([
   };
 
   DefaultScrollDelegate.prototype.maxScrollPossible = function() {
-    return this.$container.height() - this.$scrollOf.height();
+    return Math.max(0, this.$container.height() - this.$scrollOf.height());
   };
 
   /*
