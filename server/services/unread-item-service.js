@@ -7,6 +7,7 @@ var _ = require("underscore");
 var redis = require("../utils/redis");
 var winston = require("winston");
 var redisClient = redis.createClient();
+var ObjectID = require('mongodb').ObjectID;
 
 var kue = require('../utils/kue'),
     jobs;
@@ -199,6 +200,22 @@ exports.getUnreadItems = function(userId, troupeId, itemType, callback) {
     });
 };
 
+exports.getFirstUnreadItem = function(userId, troupeId, itemType, callback) {
+    exports.getUnreadItems(userId, troupeId, itemType, function(err, members) {
+      if(err) {
+        winston.warn("unreadItemService.getUnreadItems failed", err);
+
+        // Mask error
+        return callback(null, null);
+      }
+
+      var minId = getOldestId(members);
+
+      return callback(null, minId);
+
+    });
+};
+
 exports.getUnreadItemsForUser = function(userId, troupeId, callback) {
   var multi = redisClient.multi();
 
@@ -269,6 +286,16 @@ function generateNotificationForUrl(url) {
   return null;
 }
 
+function getOldestId(ids) {
+  if(!ids.length) return null;
+
+  return _.min(ids, function(id) {
+    // Create a new ObjectID with a specific timestamp
+    var objectId = new ObjectID(id);
+    return objectId.getTimestamp().getTime();
+  });
+}
+
 exports.install = function() {
 
   appEvents.localOnly.onDataChange2(function(data) {
@@ -290,4 +317,8 @@ exports.install = function() {
     }
 
   });
+};
+
+exports.testOnly = {
+  getOldestId: getOldestId
 };

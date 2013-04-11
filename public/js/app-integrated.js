@@ -44,7 +44,6 @@ require([
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView,
             createTroupeView, headerViewTemplate, shareTroupeView,
             troupeSettingsView, webNotifications, unreadItemsClient, log /*, errorReporter , FilteredCollection */) {
-  /*global require:true */
   "use strict";
 
   var preloadedFetch = false;
@@ -129,19 +128,9 @@ require([
     headerRegion: "#header-region"
   });
 
-  /*var subscription = */ realtime.subscribe('/troupes/' + window.troupeContext.troupe.id, function(message) {
-    log("Subscription!", message);
-    if(message.notification === 'presence') {
-      if(message.status === 'in') {
-        $(document).trigger('userLoggedIntoTroupe', message);
-      } else if(message.status === 'out') {
-        $(document).trigger('userLoggedOutOfTroupe', message);
-      }
-    }
-    if (message.operation === "update")
-      $('.trpHeaderTitle').html(message.model.name);
-  });
-
+  $(document).on('troupeUpdate', function() {
+    $('.trpHeaderTitle').html(message.model.name);
+  })
 
 
   /* This is a special region which acts like a region, but is implemented completely differently */
