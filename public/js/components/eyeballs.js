@@ -47,6 +47,8 @@ define([
     }
   }
 
+  log('Listening for focus events');
+
   $(window).on('blur', function() {
     log('blur');
 
