@@ -20,6 +20,7 @@ define([
       // var previewMimeType = this.model.get('previewMimeType');
       var mimeType = this.model.get('mimeType');
 
+      // TODO this is failing on mobile for zip files. Use the default icon or show a message.
       var data = {
         previewUrl: this.model.get('url') + '?embedded=1'
       };

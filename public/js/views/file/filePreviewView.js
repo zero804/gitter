@@ -156,6 +156,7 @@ define([
       log("WHAT AM I: " + mimeType);
       if(displayDirectMimeTypes[mimeType]) {
         return {
+          url: item.get('url'),
           href: item.get('url') + '?embedded=1',
           photo: true
         };
@@ -163,6 +164,7 @@ define([
 
       if(mimeType == 'application/pdf') {
         return {
+          url: item.get('url'),
           width: "80%",
           height: "80%",
           href:  pdfViewUrl(item.get('url')),
@@ -172,6 +174,7 @@ define([
 
       if(/^image\//.test(previewMimeType)) {
         return {
+          url: item.get('url'),
           href: item.get('embeddedUrl') + '?embedded=1',
           photo: true
         };
@@ -179,6 +182,7 @@ define([
 
       if(previewMimeType == 'application/pdf') {
         return {
+          url: item.get('url'),
           href:  pdfViewUrl(item.get('embeddedUrl')),
           iframe: true,
           width: "80%",
