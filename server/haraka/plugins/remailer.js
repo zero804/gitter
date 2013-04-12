@@ -1,24 +1,24 @@
 /*jshint node:true, unused: true */
-/*global OK:true DENY:true DENYSOFT:true */
+/*global OK:true, DENY:true, DENYSOFT:true, CONT:true */
 "use strict";
 
-var winston = require("./../../server/utils/winston");
+var harakaRequire = require(__dirname + '/haraka-require');
+
+var winston = harakaRequire("./utils/winston");
 
 // troupe service to redeliver mails to troupe users
-var conversationService = require("./../../server/services/conversation-service.js");
-var troupeService = require("./../../server/services/troupe-service.js");
-var troupeSESTransport = require("./../../server/utils/mail/troupe-ses-transport");
-var nconf = require("./../../server/utils/config");
-var winston = require("winston");
-var Fiber = require('./../../server/utils/fiber');
+var troupeService = harakaRequire("./services/troupe-service");
+var troupeSESTransport = harakaRequire("./utils/mail/troupe-ses-transport");
+var nconf = harakaRequire("./utils/config");
+var Fiber = harakaRequire('./utils/fiber');
 var mimelib = require('mimelib');
-var statsService = require('./../../server/services/stats-service');
+var statsService = harakaRequire('./services/stats-service');
 
 var emailDomain = nconf.get("email:domain");
 var emailDomainWithAt = "@" + emailDomain;
 var skipRemailer = false;
 
-require('./../../server/utils/event-listeners').installLocalEventListeners();
+harakaRequire('./utils/event-listeners').installLocalEventListeners();
 
 function continueResponse(next) {
   //return next (DENY, "Debug mode bounce.");
