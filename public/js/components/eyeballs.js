@@ -21,6 +21,9 @@ define([
       },
       type: "POST",
       success: function(/*data*/) {
+      },
+      error: function() {
+        log('An error occurred while communicating eyeballs');
       }
     });
   }
