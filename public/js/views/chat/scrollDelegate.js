@@ -74,7 +74,7 @@ define([
 
       if(topUnreadItemPosition) {
         var pos = topUnreadItemPosition.top;
-        log('Found our top item at position ', pos);
+        // log('Found our top item at position ', pos);
         this.maxScroll = Math.max(0, pos - 140);
       }
     }
@@ -105,18 +105,18 @@ define([
     var scrollToMe = Math.min(top, this.maxScrollPossible());
 
     if (this.maxScroll >= 0 && top > this.maxScroll) {
-      log("Capping the scroll to " + this.maxScroll + "(" + top + " requested)");
+      // log("Capping the scroll to " + this.maxScroll + "(" + top + " requested)");
       scrollToMe = this.maxScroll; // Math.min(this.maxScroll, top);
     }
 
     this.$scrollOf.scrollTop(scrollToMe);
     // we store the accumulated scroll position here because safari doesn't update the scroll position immediately, so we can't read it back accurately.
     this.currentScroll = Math.min(scrollToMe, this.maxScrollPossible());
-    log("Scroll position is now: " + this.$scrollOf.scrollTop() + " (requested " + top + ") of max possible: " + this.maxScrollPossible() + " and max limit: " + this.maxScroll);
+    //log("Scroll position is now: " + this.$scrollOf.scrollTop() + " (requested " + top + ") of max possible: " + this.maxScrollPossible() + " and max limit: " + this.maxScroll);
   };
 
   DefaultScrollDelegate.prototype.scrollToBottom = function() {
-    log("Keeping scroll at the bottom of the page (i.e scrolling to new message).");
+    // log("Keeping scroll at the bottom of the page (i.e scrolling to new message).");
     this.scrollTop(this.$container.height());
   };
 
@@ -147,7 +147,7 @@ define([
     },
 
     scrollToPreviousPosition: function() {
-      log("Scrolling to keep current content in view.", this.scrollPosBeforeChunkAdd, this.currentScroll, (this.$container.height() - this.containerHeightBeforeAdd));
+      // log("Scrolling to keep current content in view.", this.scrollPosBeforeChunkAdd, this.currentScroll, (this.$container.height() - this.containerHeightBeforeAdd));
       // re-adjust the scroll according to how much the container has grown (to be more general we could look at the displacement that the growth caused for the element, so that we can figure out how much growth occurred above vs below it)
       // keep track of how much space has been used since the last call to load new messages
       this.scrollTop(this.scrollPosBeforeChunkAdd += (this.$container.height() - this.containerHeightBeforeAdd));

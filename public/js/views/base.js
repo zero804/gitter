@@ -537,7 +537,8 @@ define([
         if (i >= collectionView.collection.length)
           return;
 
-        return collectionView.children.findByModel(collectionView.collection.at(i));
+        var view = collectionView.children.findByModel(collectionView.collection.at(i));
+        return view;
       }
 
       if (this.isRendering) {
@@ -568,6 +569,7 @@ define([
             // so we try find whatever is at n+1 and insert before
             adjView = findViewAtPos(index + 1);
             if(adjView) {
+              log("Inserting *before* " + (index + 1), adjView);
               itemView.$el.insertBefore(adjView.el);
             } else {
               // We can't find an item before, we can't find an item after,
