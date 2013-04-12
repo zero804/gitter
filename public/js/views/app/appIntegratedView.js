@@ -144,7 +144,6 @@ define([
     },
 
     showProfileMenu: function() {
-      console.log("showProfileMenu");
       if (!this.profilemenu) {
 
         // $(".trpProfileMenu").animate({
@@ -159,7 +158,6 @@ define([
     },
 
     hideProfileMenu: function() {
-      console.log("hideProfileMenu");
       if (this.profilemenu) {
         $(".trpProfileMenu").fadeOut('fast');
         // $(".trpProfileMenu").animate({
@@ -342,12 +340,10 @@ define([
     },
 
     onMouseEnterHeader: function() {
-      log("Enter Header");
       this.showProfileMenu();
     },
 
     onMouseLeaveHeader: function() {
-      log("Exist Header");
       this.hideProfileMenu();
     },
 

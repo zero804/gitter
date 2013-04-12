@@ -120,11 +120,12 @@ define([
         var top = $e.offset().top;
 
         if (top >= scrollTop && top <= scrollBottom) {
+
           setTimeout(function () {
             $e.removeClass('unread');
             $e.addClass('read');
+            markItemRead(itemType, itemId);
           }, 2000);
-          markItemRead(itemType, itemId);
         }
       }
 
@@ -184,6 +185,13 @@ define([
     });
 
     syncCounts();
+
+    // remove the unread item css
+    _.each(items, function(ids) {
+      _.each(ids, function(id) {
+        $('.unread.model-id-'+id).removeClass('unread').addClass('read');
+      });
+    });
   }
 
   var unreadItemsClient = {
