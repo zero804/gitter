@@ -4,7 +4,7 @@
 
 var testRequire = require('./test-require');
 
-var presenceService = testRequire('./services/presence-service-locking');
+var presenceService = testRequire('./services/presence-service');
 
 var assert = require('assert');
 var winston = testRequire("./utils/winston");
