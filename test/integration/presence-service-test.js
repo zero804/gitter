@@ -4,7 +4,7 @@
 
 var testRequire = require('./test-require');
 
-var presenceService = testRequire('./services/presence-service');
+var presenceService = testRequire('./services/presence-service-locking');
 
 var assert = require('assert');
 var winston = testRequire("./utils/winston");
@@ -31,18 +31,14 @@ describe('presenceService', function() {
 
   it('should cleanup invalid sockets correctly', function(done) {
 
-    presenceService.collectGarbage(fakeEngine, function(err) {
+    presenceService.listOnlineUsers(function(err, users) {
       if(err) return done(err);
 
-      presenceService.listOnlineUsers(function(err, users) {
-        if(err) return done(err);
+      var noTestUsersOnline = users.length === 0 || users.every(function(id) { return !id.match(/^TEST/); });
 
-        var noTestUsersOnline = users.length === 0 || users.every(function(id) { return !id.match(/^TEST/); });
+      assert(noTestUsersOnline, 'Garbage collection does not seem to have run correctly ' + users.join(', '));
 
-        assert(noTestUsersOnline, 'Garbage collection does not seem to have run correctly ' + users.join(', '));
-
-        done();
-      });
+      done();
     });
 
   });
@@ -54,7 +50,6 @@ describe('presenceService', function() {
 
     // Make sure things are clean
     presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
-
       if(err) return done(err);
 
       // User should not exist
@@ -81,7 +76,7 @@ describe('presenceService', function() {
               assert(users.some(function(id) { return id === userId; }), 'Expected user to be online');
 
               // Disconnect the socket
-              presenceService.socketDisconnected(socketId, { immediate: true }, function(err) {
+              presenceService.socketDisconnected(socketId, function(err) {
                 if(err) return done(err);
 
                 // Check if the user is still in the troupe
@@ -105,28 +100,6 @@ describe('presenceService', function() {
 
   });
 
-  it('should handle concurrent exclusiveResponder requests correctly', function(done) {
-    var exclusiveResponder = presenceService.testOnly.exclusiveResponder;
-    var keyName = 'pr:test:exclusive_responder_test';
-    var keyExpiry = 100;
-    var totalAllows = 0;
-    var totalHits = 0;
-
-    function callback(err, allowed) {
-      if(err) return done(err);
-      totalHits++;
-      if(allowed) totalAllows++;
-      if(totalHits == 10) {
-        assert(totalAllows == 1, 'exclusiveResponder is not allowing a single event through');
-        done();
-      }
-    }
-
-    for(var i = 0; i < 10; i++) {
-      exclusiveResponder(keyName, keyExpiry, callback);
-    }
-  });
-
   it('should handle very quick connect/disconnect cycles when the user connects to a troupe', function(done) {
     var userId = 'TESTUSER2' + Date.now();
     var socketId = 'TESTSOCKET2' + Date.now();
@@ -136,11 +109,11 @@ describe('presenceService', function() {
     var d2 = Q.defer();
 
     // This simulates three events happening in very quick succession
-    presenceService.socketDisconnected(socketId, { immediate: true }, d2.makeNodeResolver());
     presenceService.userSocketConnected(userId, socketId, function(err) {
       if(err) { return d1.reject(); }
 
       presenceService.userSubscribedToTroupe(userId, troupeId, socketId, d1.makeNodeResolver());
+      presenceService.socketDisconnected(socketId, d2.makeNodeResolver());
     });
 
     Q.all([d1.promise, d2.promise]).then(function() {
@@ -209,7 +182,7 @@ describe('presenceService', function() {
                   assertUserTroupeStatus(true, function() {
 
                     // Disconnect socket
-                    presenceService.socketDisconnected(socketId, { immediate: true }, function(err) {
+                    presenceService.socketDisconnected(socketId, function(err) {
                       if(err) return done(err);
 
                       // USer should not be in troupe
