@@ -1,25 +1,26 @@
-/*jshint globalstrict:true, trailing:false, unused: true */
-/*global require: true, exports: true, DENY: true */
+/*jshint node:true, globalstrict:true, trailing:false, unused: true */
+/*global require: true, exports: true, DENY: true, OK:true */
 
 "use strict";
 
-var winston = require("./../../server/utils/winston");
+var harakaRequire = require(__dirname + '/haraka-require');
+
+var winston = harakaRequire("./utils/winston");
 
 // troupe service to deliver mails to mongo database
-var conversationService = require("./../../server/services/conversation-service.js");
-var troupeService = require("./../../server/services/troupe-service.js");
-var fileService = require("./../../server/services/file-service.js");
-var statsService = require('./../../server/services/stats-service');
+var conversationService = harakaRequire("./services/conversation-service");
+var troupeService = harakaRequire("./services/troupe-service");
+var fileService = harakaRequire("./services/file-service");
+var statsService = harakaRequire('./services/stats-service');
 var MailParser = require("mailparser").MailParser;
 var temp = require('temp');
 var fs   = require('fs');
 var Q = require("q");
-var Fiber = require("./../../server/utils/fiber");
-var sanitizer = require("./../../server/utils/sanitizer.js");
-var winston = require('winston');
+var Fiber = harakaRequire("./utils/fiber");
+var sanitizer = harakaRequire("./utils/sanitizer");
 var mimelib = require('mimelib');
 
-require('./../../server/utils/event-listeners').installLocalEventListeners();
+harakaRequire('./utils/event-listeners').installLocalEventListeners();
 
 
 function saveFile(troupeId, creatorUserId, fileName, mimeType, content, callback) {

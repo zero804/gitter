@@ -2,8 +2,10 @@
 /*global describe:true, it:true*/
 "use strict";
 
+var testRequire = require('../test-require');
+
 var assert = require('assert');
-var unreadItemService = require("../../../server/services/unread-item-service");
+var unreadItemService = testRequire("./services/unread-item-service");
 
 describe('unread-item-service', function() {
 

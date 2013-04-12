@@ -1,5 +1,6 @@
 TESTS = test/integration
 END_TO_END_TESTS = test/end-to-end
+PERF_TESTS = test/performance
 MOCHA_REPORTER =
 
 clean:
@@ -12,6 +13,22 @@ test:
 		--recursive \
 		--ignore-leaks \
 		$(TESTS)
+
+perf-test-xunit:
+	NODE_ENV=test XUNIT_FILE=output/test-reports/performance.xml ./node_modules/.bin/mocha \
+		--reporter xunit-file \
+		--timeout 100000 \
+		--recursive \
+		--ignore-leaks \
+		$(PERF_TESTS)
+
+perf-test:
+	NODE_ENV=test ./node_modules/.bin/mocha \
+		--reporter dot \
+		--timeout 100000 \
+		--recursive \
+		--ignore-leaks \
+		$(PERF_TESTS)
 
 test-xunit:
 	mkdir -p output/test-reports
@@ -36,6 +53,7 @@ test-coverage:
 		--recursive \
 		--ignore-leaks \
 		$(TESTS) || true
+	rm -rf coverage/
 
 prepare-for-end-to-end-testing:
 	curl https://raw.github.com/pypa/pip/master/contrib/get-pip.py > /tmp/get-pip.py
