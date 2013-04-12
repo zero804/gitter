@@ -100,4 +100,4 @@ post-deployment-tests: test-in-browser end-to-end-test
 
 build: npm grunt
 
-.PHONY: test-cov test docs test-docs clean
+.PHONY: test docs test-docs clean
