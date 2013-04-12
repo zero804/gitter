@@ -137,6 +137,7 @@ define([
 
     toggleFiles: function () {
       $("#file-list").slideToggle(350);
+      $("#fineUploader").toggle();
     },
 
     toggleMails: function () {
