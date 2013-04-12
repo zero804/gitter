@@ -392,16 +392,8 @@ module.exports = {
       app.get('/:troupeUri/accept/:confirmationCode',
         middleware.authenticate('accept', {}),
         function(req, res/*, next*/) {
-            /* User has been set passport/accept */
-            signupService.acceptInvite(req.params.confirmationCode, req.user, function(err, troupe) {
-              if (err || !troupe) {
-                res.relativeRedirect("/" + req.params.troupeUri);
-                return;
-              }
-
-              res.relativeRedirect("/" + troupe.uri);
-          });
-      });
+          res.relativeRedirect("/" + req.params.troupeUri);
+        });
 
       app.get('/:troupeUri/confirm/:confirmationCode',
         middleware.authenticate('confirm', {}),
