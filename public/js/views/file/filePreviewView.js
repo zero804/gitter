@@ -166,7 +166,7 @@ define([
         return {
           url: item.get('url'),
           width: "80%",
-          height: "80%",
+          height: "70%",
           href:  pdfViewUrl(item.get('url')),
           iframe: true
         };
@@ -186,7 +186,7 @@ define([
           href:  pdfViewUrl(item.get('embeddedUrl')),
           iframe: true,
           width: "80%",
-          height: "80%"
+          height: "70%"
         };
       }
 
@@ -198,7 +198,7 @@ define([
 
     afterRender: function() {
       var body = this.$el.find('.frame-preview');
-      var h = Math.round($(window).height() * 0.8)  - headerHeight;
+      var h = Math.round($(window).height() * 0.7)  - headerHeight;
       body.height(h);
 
       var w= Math.round($(window).width() * 0.8)  - dialogWidth;
