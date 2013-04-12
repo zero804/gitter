@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var presenceService = require('../../services/presence-service-locking');
+var presenceService = require('../../services/presence-service');
 
 module.exports = {
   create: function(req, res, next) {
