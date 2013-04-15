@@ -55,6 +55,51 @@ function testInviteAcceptance(email, userStatus, emailNotificationConfirmationMe
   });
 }
 
+
+function testInviteRejection(email, userStatus, done) {
+  var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+  var troupeService = testRequire.withProxies("./services/troupe-service", {
+    './email-notification-service': emailNotificationServiceMock
+  });
+
+  persistence.Troupe.findOne({ uri: 'testtroupe1' }, function(err, troupe) {
+    if(err) return done(err);
+
+    persistence.User.create({
+      email: email,
+      displayName: 'Test User ' + new Date(),
+      confirmationCode: null,  // IMPORTANT. This is the point of the test!!!
+      status: userStatus }, function(err, user) {
+        if(err) return done(err);
+
+        troupeService.addRequest(troupe.id, user.id, function(err, request) {
+          if(err) return done(err);
+
+          troupeService.rejectRequest(request, function(err) {
+            if(err) return done(err);
+
+            mockito.verifyZeroInteractions(emailNotificationServiceMock);
+
+            persistence.Troupe.findOne({ uri: 'testtroupe1' }, function(err, troupe2) {
+              if(err) return done(err);
+
+              assert(!troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
+              assert(!troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
+
+              persistence.Request.findOne({ id: request.id }, function(err, r2) {
+                if(err) return done(err);
+
+                assert(!r2, 'Request should have been deleted');
+                return done();
+              });
+            });
+
+          });
+        });
+
+      });
+  });
+}
 describe('troupe-service', function() {
 
   describe('#acceptRequest()', function() {
@@ -79,4 +124,20 @@ describe('troupe-service', function() {
     });
 
   });
+
+  describe('#rejectRequest()', function() {
+    it('should delete a rejected request from an ACTIVE user', function(done) {
+      var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
+      testInviteRejection(nonExistingEmail, 'ACTIVE', done);
+    });
+  });
+
+
+  describe('#rejectRequest()', function() {
+    it('should delete a rejected request from an UNCONFIRMED user', function(done) {
+      var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
+      testInviteRejection(nonExistingEmail, 'UNCONFIRMED', done);
+    });
+  });
+
 });
