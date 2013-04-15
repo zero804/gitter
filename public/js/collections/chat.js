@@ -13,10 +13,19 @@ define([
 
   exports.ChatModel = TroupeCollections.Model.extend({
     idAttribute: "id",
-    parse: function(response) {
-      response.sent = moment(response.sent, moment.defaultFormat);
-      return response;
+    parse: function(message) {
+      message.sent = moment(message.sent, moment.defaultFormat);
+
+      // Check for the special case of messages from the current user
+      if(message.unread && message.fromUser) {
+        if(message.fromUser.id === window.troupeContext.user.id) {
+          message.unread = false;
+        }
+      }
+
+      return message;
     },
+
     toJSON: function() {
       var d = _.clone(this.attributes);
       var sent = this.get('sent');

@@ -58,7 +58,7 @@ define([
     chatMessageLimit: PAGE_SIZE,
 
     initialize: function() {
-      _.bindAll(this, 'chatWindowScroll', 'eyeballStateChange');
+      _.bindAll(this, 'chatWindowScroll');
       this.initializeSorting();
 
       if (window._troupeCompactView) {
@@ -73,8 +73,6 @@ define([
       this.infiniteScrollDelegate = new scrollDelegates.InfiniteScrollDelegate(this.$scrollOf, this.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
       this.$scrollOf.on('scroll', this.chatWindowScroll);
 
-      $(document).on('eyeballStateChange', this.eyeballStateChange);
-
       function findTopMostVisibleUnreadItem(itemType) {
         return unreadItemsClient.findTopMostVisibleUnreadItemPosition(itemType);
       }
@@ -83,11 +81,6 @@ define([
 
     onClose: function(){
       $(document).off('eyeballStateChange', this.eyeballStateChange);
-    },
-
-    eyeballStateChange: function(e, newState) {
-      log('EyesChange: ' + newState);
-      this.scrollDelegate.eyeballStateChange(newState);
     },
 
     beforeClose: function() {
