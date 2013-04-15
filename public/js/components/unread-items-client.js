@@ -89,14 +89,14 @@ define([
   };
 
   var inFocus = true;
-  $(window).on('blur', function() {
-    inFocus = false;
+
+  $(document).on('eyeballStateChange', function(e, newState) {
+    inFocus = newState;
+    if(newState) {
+      windowScroll();
+    }
   });
 
-  $(window).on('focus', function() {
-    inFocus = true;
-    windowScroll();
-  });
 
   var windowTimeout = null;
   var windowScrollOnTimeout = function windowScrollOnTimeout() {
@@ -120,11 +120,12 @@ define([
         var top = $e.offset().top;
 
         if (top >= scrollTop && top <= scrollBottom) {
+
           setTimeout(function () {
             $e.removeClass('unread');
             $e.addClass('read');
+            markItemRead(itemType, itemId);
           }, 2000);
-          markItemRead(itemType, itemId);
         }
       }
 
@@ -184,12 +185,49 @@ define([
     });
 
     syncCounts();
+
+    // remove the unread item css
+    _.each(items, function(ids) {
+      _.each(ids, function(id) {
+        $('.unread.model-id-'+id).removeClass('unread').addClass('read');
+      });
+    });
   }
 
   var unreadItemsClient = {
     getValue: function(itemType) {
       var v = unreadItems[itemType];
       return v ? v.length : 0;
+    },
+
+    findTopMostVisibleUnreadItemPosition: function(itemType) {
+      var topItem = null;
+      var topItemOffset = 1000000000;
+
+      var $window = $(window);
+      var scrollTop = $window.scrollTop();
+      var scrollBottom = scrollTop + $window.height();
+
+
+      $('.unread').each(function (index, element) {
+        var $e = $(element);
+        var elementItemType = $e.data('itemType');
+        if(elementItemType != itemType) return;
+        var itemId = $e.data('itemId');
+
+        if(itemId) {
+          var top = $e.offset().top;
+          if (top >= scrollTop && top <= scrollBottom) {
+            if(top < topItemOffset)  {
+              topItem = $e;
+              topItemOffset = top;
+            }
+          }
+        }
+      });
+
+      if(!topItem) return null;
+      return topItem.offset();
     },
 
     getTotalUnreadCountForCurrentTroupe: function() {

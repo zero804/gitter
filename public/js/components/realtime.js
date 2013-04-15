@@ -6,7 +6,7 @@ define([
 ], function($, Faye, log) {
   "use strict";
 
-  Faye.Logging.logLevel = 'info';
+  //Faye.Logging.logLevel = 'info';
 
   var connected = false;
   var connectionProblemTimeoutHandle;
@@ -105,6 +105,22 @@ define([
 
   // Give the initial load 5 seconds to connect before warning the user that there is a problem
   connectionProblemTimeoutHandle = window.setTimeout(connectionProblemTimeout, 5000);
+
+  if(window.troupeContext && window.troupeContext.troupe) {
+    /*var subscription = */ client.subscribe('/troupes/' + window.troupeContext.troupe.id, function(message) {
+      log("Subscription!", message);
+      if(message.notification === 'presence') {
+        if(message.status === 'in') {
+          $(document).trigger('userLoggedIntoTroupe', message);
+        } else if(message.status === 'out') {
+          $(document).trigger('userLoggedOutOfTroupe', message);
+        }
+      }
+      if (message.operation === "update") {
+        $(document).trigger('troupeUpdate', message);
+      }
+    });
+  }
 
   return client;
 });

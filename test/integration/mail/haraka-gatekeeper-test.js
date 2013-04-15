@@ -7,8 +7,9 @@ global.DENY = "DENY";
 global.OK = "OK";
 global.CONT = "CONT";
 
+var testRequire = require('../test-require');
+
 var assert = require("better-assert");
-var proxyquire = require("proxyquire").noCallThru();
 var Address = require("./address").Address;
 var sinon = require("sinon");
 
@@ -123,11 +124,11 @@ describe('haraka-gatekeeper', function() {
   // creates a mock of the gatekeeper plugin, bypassing the sending of the bounce mail
   function createGatekeeperPlugin(sendEmailProxy) {
 
-    var gatekeeper = proxyquire("../../../haraka/plugins/gatekeeper", {
-      './../../server/services/mailer-service': {
+    var gatekeeper = testRequire.withProxies("./haraka/plugins/gatekeeper", {
+      './services/mailer-service': {
         sendEmail: sendEmailProxy
       }
-    });
+    }, true);
 
     return gatekeeper;
   }
