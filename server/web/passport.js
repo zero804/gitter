@@ -85,8 +85,6 @@ var inviteAcceptStrategy = new ConfirmStrategy({ name: "accept" }, function(conf
       winston.verbose("Invite has already been used", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
       statsService.event('invite_reused', { uri: req.params.troupeUri });
 
-      // THIS BIT OF CODE ISNT WORKING MOANS ABOUT HEADERS ALREADY SET
-
       // There's a chance a user has accepted an invite but hasn't completed their profile
       // In which case we allow them through
       userService.findByEmail(invite.email, function(err, user) {
