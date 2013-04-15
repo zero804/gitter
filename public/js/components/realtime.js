@@ -12,6 +12,8 @@ define([
   var connectionProblemTimeoutHandle;
   var persistentOutage = false;
 
+  var clientId = null;
+
   function connectionProblemTimeout() {
     connectionProblemTimeoutHandle = null;
 
@@ -36,6 +38,20 @@ define([
     if(message.channel == '/meta/handshake') {
       message.ext = message.ext || {};
       message.ext.token = window.troupeContext.accessToken;
+    }
+
+    callback(message);
+  };
+
+  ClientAuth.prototype.incoming = function(message, callback) {
+    if(message.channel == '/meta/handshake') {
+      if(message.successful) {
+        if(clientId !== message.clientId) {
+          clientId = message.clientId;
+          log("Realtime reestablished. New id is " + message.clientId);
+          $(document).trigger('realtime:newConnectionEstablished');
+        }
+      }
     }
 
     callback(message);
