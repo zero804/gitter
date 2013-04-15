@@ -18,7 +18,8 @@ module.exports = {
       subject: "You created a new Troupe",
       data: {
         troupeName: troupe.name,
-        troupeLink: troupeLink
+        troupeLink: troupeLink,
+        baseServerPath: nconf.get("web:basepath")
       }
     });
   },
@@ -53,7 +54,8 @@ module.exports = {
       from: 'admin-robot' + emailDomainWithAt,
       subject: "You requested a password reset",
       data: {
-        resetLink: resetLink
+        resetLink: resetLink,
+        baseServerPath: nconf.get("web:basepath")
       }
     });
   },
@@ -138,7 +140,8 @@ module.exports = {
         displayName: displayName,
         troupeName: troupe.name,
         acceptLink: acceptLink,
-        senderDisplayName: senderDisplayName
+        senderDisplayName: senderDisplayName,
+        baseServerPath: nconf.get("web:basepath")
       }
     });
   }
