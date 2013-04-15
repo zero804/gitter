@@ -37,7 +37,7 @@ define([
   ClientAuth.prototype.outgoing = function(message, callback) {
     if(message.channel == '/meta/handshake') {
       message.ext = message.ext || {};
-      message.ext.token = window.troupeContext.accessToken;
+      if(window.troupeContext) message.ext.token = window.troupeContext.accessToken;
     }
 
     callback(message);
@@ -57,7 +57,15 @@ define([
     callback(message);
   };
 
-  var c = window.troupeContext.websockets;
+  var c;
+  if(window.troupeContext) c = window.troupeContext.websockets;
+  if(!c) {
+    log('Websockets configuration not found, defaulting');
+    c = {
+      fayeUrl: '/faye',
+      options: {}
+    };
+  }
 
   var client = new Faye.Client(c.fayeUrl, c.options);
 
