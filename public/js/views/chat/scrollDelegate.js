@@ -16,6 +16,8 @@ define([
   *   When a subsequent message is added to the bottom, no scrolling is needed (unless the viewer is already at the bottom of the page).
   *   When a chunk of older messages are loaded at the top, the current items in view must stay in view.
   *   When the window is not in focus, subsequent (unread) messages at the bottom must not cause the top most unread item to be scrolled above the fold.
+  *
+  * When testing eyeball related code during dev use a timer on the second window so that eyeballs isn't triggered when switching between windows (var i = setInterval(function() { window._troupeDebug.app.collections.chats.create({ fromUser: window.troupeContext.user, text: new Date() }); }, 5000);)
   */
 
   var DefaultScrollDelegate = function($scrollOf, $container, itemType, findTopMostVisibleUnreadItem) {
@@ -32,24 +34,9 @@ define([
     this.maxScroll = -1;
     // switch the max limit functionality on / off so the top unread message is not searched for
     this.useMax = true;
-    // ?
-    this.scrollPosBeforeChunkAdd = 0;
     //
     this.findTopMostVisibleUnreadItem = findTopMostVisibleUnreadItem;
   };
-
-/*
-  function findPos(obj) {
-    var curleft = 0, curtop = 0;
-    if (obj.offsetParent) {
-      do {
-          curleft += obj.offsetLeft;
-          curtop += obj.offsetTop;
-      } while (obj = obj.offsetParent);
-    }
-    return [curleft,curtop];
-  }
-*/
 
   DefaultScrollDelegate.prototype.useLimit = function(useMax) {
     // note: eyeball state makes no difference to the unread item limit behaviour, the behavior should always be switched on, because it only ever comes into play when eyeballs are off anyway.
@@ -59,17 +46,9 @@ define([
     }
   };
 
-  DefaultScrollDelegate.prototype.eyeballStateChange = function(state) {
-    // use the state to clear the top unread item (for lack of clearing it immediately when it becomes unread).
-    if (!state) {
-      this.maxScroll = -1;
-    }
-  };
-
   DefaultScrollDelegate.prototype.calculateScrollLimit = function() {
-    // ERR: note that this max limit capping must only look for a new unread item, not be enabled for the page load or when loading older messages.
-    if(this.useMax && this.maxScroll == -1) {
-      // if there is no max scroll yet, then look for the highest unread item and set the max to it
+    if(this.useMax) {
+      // look for the highest unread item and set the max to it
       var topUnreadItemPosition = this.findTopMostVisibleUnreadItem(this.itemType);
 
       if(topUnreadItemPosition) {
@@ -78,13 +57,6 @@ define([
         this.maxScroll = Math.max(0, pos - 140);
       }
     }
-
-    // TODO once a message has been read it must no longer act as the limit (the eyeballs off covers most of this situation)
-    /*
-    function removeLimit() {
-      this.maxScroll = -1;
-    }
-    */
   };
 
   DefaultScrollDelegate.prototype.onAfterItemAdded = function(/* item */) {
@@ -129,6 +101,8 @@ define([
   */
   var InfiniteScrollDelegate = function() {
     DefaultScrollDelegate.apply(this, arguments);
+    // ?
+    this.scrollPosBeforeChunkAdd = 0;
   };
 
   _.extend(InfiniteScrollDelegate.prototype, DefaultScrollDelegate.prototype, {
