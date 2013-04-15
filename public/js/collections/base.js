@@ -4,7 +4,7 @@ define([
   'underscore',
   'backbone',
   'components/realtime',
-  'utils/log'
+  'log!collections'
 ], function($, _, Backbone, realtime, log) {
   "use strict";
 
@@ -163,7 +163,7 @@ define([
     },
 
     onDataChange: function(data) {
-
+      log('DataChange', data);
       var operation = data.operation;
       var newModel = data.model;
       var id = newModel.id;

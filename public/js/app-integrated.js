@@ -8,6 +8,7 @@ require([
   'views/base',
   'components/realtime',
   'components/eyeballs',
+  'components/dozy',
   'views/app/appIntegratedView',
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
@@ -39,12 +40,11 @@ require([
   'utils/log',
   'components/errorReporter',
   'filtered-collection'
-], function($, _, Backbone, Marionette, _Helpers, TroupeViews, realtime, eyeballs, AppIntegratedView, ChatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
+], function($, _, Backbone, Marionette, _Helpers, TroupeViews, realtime, eyeballs, dozy, AppIntegratedView, ChatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
             troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView,
             createTroupeView, headerViewTemplate, shareTroupeView,
             troupeSettingsView, webNotifications, unreadItemsClient, log /*, errorReporter , FilteredCollection */) {
-  /*global require:true */
   "use strict";
 
   var preloadedFetch = false;
@@ -55,7 +55,6 @@ require([
       dataType: "json",
       type: "GET",
       success: function(data) {
-        preloadedFetch = false;
         window.troupePreloads = data;
 
         $(document).trigger('preloadComplete', data);
@@ -65,6 +64,24 @@ require([
   } else {
     preloadedFetch = false;
   }
+
+  $(document).on('realtime:newConnectionEstablished', function() {
+    log('Reloading data');
+    $.ajax({
+      url: window.location.pathname + '/preload',
+      dataType: "json",
+      type: "GET",
+      success: function(data) {
+        requestCollection.fetch();
+        fileCollection.reset(data['files'], { parse: true });
+        chatCollection.reset(data['chatMessages'], { parse: true });
+        conversationCollection.reset(data['conversations'], { parse: true });
+        troupeCollection.reset(data['troupes'], { parse: true });
+        userCollection.reset(data['users'], { parse: true });
+      }
+    });
+  });
+
 
   function instantiateCollection(collection, name) {
     collection.listen();
@@ -129,19 +146,9 @@ require([
     headerRegion: "#header-region"
   });
 
-  /*var subscription = */ realtime.subscribe('/troupes/' + window.troupeContext.troupe.id, function(message) {
-    log("Subscription!", message);
-    if(message.notification === 'presence') {
-      if(message.status === 'in') {
-        $(document).trigger('userLoggedIntoTroupe', message);
-      } else if(message.status === 'out') {
-        $(document).trigger('userLoggedOutOfTroupe', message);
-      }
-    }
-    if (message.operation === "update")
-      $('.trpHeaderTitle').html(message.model.name);
-  });
-
+  $(document).on('troupeUpdate', function(message) {
+    $('.trpHeaderTitle').html(message.model.name);
+  })
 
 
   /* This is a special region which acts like a region, but is implemented completely differently */

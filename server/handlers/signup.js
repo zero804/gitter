@@ -205,7 +205,9 @@ module.exports = {
         }
       );
 
-      if (nconf.get('web:baseserver') === 'localhost') {
+      // This would be very insecure in a production environment, but we do it in testing to aid our
+      // testing processes
+      if (nconf.get('test:exposeDataForTestingPurposes')) {
         app.post('/confirmationCodeForEmail', function(req, res/*, next */) {
           var forEmail = req.body.email;
 

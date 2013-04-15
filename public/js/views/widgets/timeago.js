@@ -4,7 +4,6 @@ define([
   'utils/momentWrapper'
 ], function(TroupeViews, moment) {
   /*jslint browser: true*/
-  /*global require */
   "use strict";
 
   var maxDaysBeforeDateDisplay = 3;

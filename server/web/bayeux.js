@@ -360,8 +360,8 @@ module.exports = {
       // all the servers that are connected to the same redis/faye
       // connection
       winston.info("Client " + clientId + " disconnected");
-      presenceService.socketDisconnected(clientId, { immediate: false }, function(err) {
-        if(err) { winston.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err,  { exception: err }); }
+      presenceService.socketDisconnected(clientId, function(err) {
+        if(err && !err.lockFail) { winston.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err,  { exception: err }); }
       });
     });
 
