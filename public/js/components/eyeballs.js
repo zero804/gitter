@@ -19,6 +19,7 @@ define([
         socketId: realtime._clientId,
         on: value
       },
+      global: false,
       type: "POST",
       success: function(/*data*/) {
       },
