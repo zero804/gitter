@@ -56,7 +56,6 @@ require([
       dataType: "json",
       type: "GET",
       success: function(data) {
-        preloadedFetch = false;
         window.troupePreloads = data;
 
         $(document).trigger('preloadComplete', data);
@@ -66,6 +65,24 @@ require([
   } else {
     preloadedFetch = false;
   }
+
+  $(document).on('realtime:newConnectionEstablished', function() {
+    log('Reloading data');
+    $.ajax({
+      url: window.location.pathname + '/preload',
+      dataType: "json",
+      type: "GET",
+      success: function(data) {
+        requestCollection.fetch();
+        fileCollection.reset(data['files'], { parse: true });
+        chatCollection.reset(data['chatMessages'], { parse: true });
+        conversationCollection.reset(data['conversations'], { parse: true });
+        troupeCollection.reset(data['troupes'], { parse: true });
+        userCollection.reset(data['users'], { parse: true });
+      }
+    });
+  });
+
 
   function instantiateCollection(collection, name) {
     collection.listen();
