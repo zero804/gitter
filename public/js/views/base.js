@@ -10,7 +10,6 @@ define([
   'backbone-keys' // no ref
 ], function($, _, Backbone, modalTemplate, helpers, confirmationViewTemplate, log) {
   /*jshint trailing:false */
-  /*global require:true console:true setTimeout:true*/
   "use strict";
 
   /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
@@ -26,6 +25,7 @@ define([
 
   /* Use the compact views */
   // var compactView = window.navigator.userAgent.indexOf("Mobile/") !== -1;
+  var compactView = false;
 
 
   // Need to do some testing on Android tablets to get this more accurate
@@ -35,7 +35,7 @@ define([
 
   /* This value is used by the dialogFragment Handlebars helper */
   if (userAgentFragment) {
-    var compactView = true;
+    compactView = true;
     window._troupeCompactView = true;
   }
 
@@ -95,7 +95,7 @@ define([
       var self = this;
       function t() {
         self.off('cleanup', t);
-        callback();
+        callback.call(self);
       }
       self.on('cleanup', t);
     },
@@ -537,7 +537,8 @@ define([
         if (i >= collectionView.collection.length)
           return;
 
-        return collectionView.children.findByModel(collectionView.collection.at(i));
+        var view = collectionView.children.findByModel(collectionView.collection.at(i));
+        return view;
       }
 
       if (this.isRendering) {
@@ -568,6 +569,7 @@ define([
             // so we try find whatever is at n+1 and insert before
             adjView = findViewAtPos(index + 1);
             if(adjView) {
+              log("Inserting *before* " + (index + 1), adjView);
               itemView.$el.insertBefore(adjView.el);
             } else {
               // We can't find an item before, we can't find an item after,

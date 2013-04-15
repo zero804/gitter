@@ -1,9 +1,9 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
-/*global console:false, require: true, module: true */
 "use strict";
 
 var mailerService = require("./mailer-service");
 var nconf = require('../utils/config');
+var assert = require('assert');
 var emailDomain = nconf.get("email:domain");
 var emailDomainWithAt = "@" + emailDomain;
 
@@ -18,12 +18,15 @@ module.exports = {
       subject: "You created a new Troupe",
       data: {
         troupeName: troupe.name,
-        troupeLink: troupeLink
+        troupeLink: troupeLink,
+        baseServerPath: nconf.get("web:basepath")
       }
     });
   },
 
   sendRequestAcceptanceToUser: function(user, troupe) {
+    assert(user.confirmationCode, 'User does not have a confirmation code');
+
     var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri + "/confirm/" + user.confirmationCode;
 
     mailerService.sendEmail({
@@ -41,6 +44,8 @@ module.exports = {
   },
 
   sendPasswordResetForUser: function (user) {
+    assert(user.passwordResetCode, 'User does not have a password reset code');
+
     var resetLink = nconf.get("web:basepath") + "/reset/" + user.passwordResetCode;
 
     mailerService.sendEmail({
@@ -49,12 +54,15 @@ module.exports = {
       from: 'admin-robot' + emailDomainWithAt,
       subject: "You requested a password reset",
       data: {
-        resetLink: resetLink
+        resetLink: resetLink,
+        baseServerPath: nconf.get("web:basepath")
       }
     });
   },
 
   sendConfirmationForNewUserRequest: function(user, troupe) {
+    assert(user.confirmationCode, 'User does not have a confirmation code');
+
     var confirmLink = nconf.get("web:basepath") + "/" + troupe.uri + "/confirm/" + user.confirmationCode + '?fromRequest=1';
     mailerService.sendEmail({
       templateFile: "signupemailfromrequest",
@@ -70,6 +78,8 @@ module.exports = {
   },
 
   sendConfirmationForNewUser: function (user, troupe) {
+    assert(user.confirmationCode, 'User does not have a confirmation code');
+
     var confirmLink = nconf.get("web:basepath") + "/" + troupe.uri + "/confirm/" + user.confirmationCode;
     mailerService.sendEmail({
       templateFile: "signupemail",
@@ -85,6 +95,8 @@ module.exports = {
   },
 
   sendConfirmationForEmailChange: function (user) {
+    assert(user.confirmationCode, 'User does not have a confirmation code');
+
     var confirmLink = nconf.get("web:basepath") + "/confirm/" + user.confirmationCode;
     var to = user.newEmail;
 
@@ -128,7 +140,8 @@ module.exports = {
         displayName: displayName,
         troupeName: troupe.name,
         acceptLink: acceptLink,
-        senderDisplayName: senderDisplayName
+        senderDisplayName: senderDisplayName,
+        baseServerPath: nconf.get("web:basepath")
       }
     });
   }

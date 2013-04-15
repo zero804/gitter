@@ -9,6 +9,7 @@ require([
   'views/file/fileDetailView',
   'collections/files',
   'views/file/mobileFilePreview',
+  'components/eyeballs',
   'components/unread-items-client'
 ], function($, _, Backbone, BaseRouter, TroupeViews, FileView, FileDetailView, fileModels, MobileFilePreview/*, unreadItemsClient*/) {
   /*jslint browser: true, unused: true */

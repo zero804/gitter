@@ -8,6 +8,7 @@ require([
   'marionette',
   'views/base',
   'hbs!./views/people/tmpl/mobilePeopleView',
+  'components/eyeballs',
   'components/unread-items-client',
   'template/helpers/all'
 ], function($, _, Backbone, BaseRouter, userModels, Marionette, TroupeViews, PersonViewTemplate/*, unreadItemsClient*/) {

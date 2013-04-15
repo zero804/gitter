@@ -9,7 +9,7 @@ module.exports = {
     var on = parseInt(req.body.on, 10);
 
     presenceService.clientEyeballSignal(req.user.id, socketId, on, function(err) {
-      if(err) return next(err);
+      if(err && !err.lockFail) return next(err);
 
       res.send('OK');
     });

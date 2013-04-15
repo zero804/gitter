@@ -6,11 +6,13 @@ define([
 ], function($, Faye, log) {
   "use strict";
 
-  Faye.Logging.logLevel = 'info';
+  //Faye.Logging.logLevel = 'info';
 
   var connected = false;
   var connectionProblemTimeoutHandle;
   var persistentOutage = false;
+
+  var clientId = null;
 
   function connectionProblemTimeout() {
     connectionProblemTimeoutHandle = null;
@@ -36,6 +38,20 @@ define([
     if(message.channel == '/meta/handshake') {
       message.ext = message.ext || {};
       message.ext.token = window.troupeContext.accessToken;
+    }
+
+    callback(message);
+  };
+
+  ClientAuth.prototype.incoming = function(message, callback) {
+    if(message.channel == '/meta/handshake') {
+      if(message.successful) {
+        if(clientId !== message.clientId) {
+          clientId = message.clientId;
+          log("Realtime reestablished. New id is " + message.clientId);
+          $(document).trigger('realtime:newConnectionEstablished');
+        }
+      }
     }
 
     callback(message);
@@ -89,6 +105,22 @@ define([
 
   // Give the initial load 5 seconds to connect before warning the user that there is a problem
   connectionProblemTimeoutHandle = window.setTimeout(connectionProblemTimeout, 5000);
+
+  if(window.troupeContext && window.troupeContext.troupe) {
+    /*var subscription = */ client.subscribe('/troupes/' + window.troupeContext.troupe.id, function(message) {
+      log("Subscription!", message);
+      if(message.notification === 'presence') {
+        if(message.status === 'in') {
+          $(document).trigger('userLoggedIntoTroupe', message);
+        } else if(message.status === 'out') {
+          $(document).trigger('userLoggedOutOfTroupe', message);
+        }
+      }
+      if (message.operation === "update") {
+        $(document).trigger('troupeUpdate', message);
+      }
+    });
+  }
 
   return client;
 });
