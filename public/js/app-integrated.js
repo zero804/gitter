@@ -128,7 +128,7 @@ require([
     headerRegion: "#header-region"
   });
 
-  $(document).on('troupeUpdate', function() {
+  $(document).on('troupeUpdate', function(message) {
     $('.trpHeaderTitle').html(message.model.name);
   })
 

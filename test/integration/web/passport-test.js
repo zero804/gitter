@@ -12,11 +12,13 @@ var assert = require('assert');
 describe('passport', function() {
   describe('acceptClientStrategy', function() {
 
+    var strategy = passport.inviteAcceptStrategy;
+    var confirmationCode = 'TEST-CONFIRM-' + Date.now();
+    var email = 'passport-test-user-' + Date.now() + '@troupetest.local';
+    var troupeUri = 'testtroupe1';
+
+
     it('should allow an invite to a new user to be accepted', function(done) {
-      var strategy = passport.inviteAcceptStrategy;
-      var confirmationCode = 'TEST-CONFIRM-' + Date.now();
-      var email = 'passport-test-user-' + Date.now() + '@troupetest.local';
-      var troupeUri = 'testtroupe1';
 
       persistence.Troupe.findOne({ uri: troupeUri}, function(err, troupe) {
         if(err) return done(err);
@@ -41,13 +43,33 @@ describe('passport', function() {
             });
           });
       });
+
     });
 
-  it('should login the user re-using an invite if their profile is not complete', function() {
+  it('should login the user re-using an invite if their profile is not complete', function(done) {
+
+    strategy.verify(confirmationCode, { params: { troupeUri: troupeUri }}, function(err, user) {
+      if(err) return done(err);
+      assert(user, 'User not created');
+      assert(user.status === 'PROFILE_NOT_COMPLETED');
+      assert(user.displayName === 'Test User from Invite', 'User display name set incorrectly');
+      assert(user.email === email, 'User email set incorrectly');
+
+      user.status = "ACTIVE";
+      user.save(done);
+    });
 
   });
 
-  it('should not login the user (redirect) if their profile is complete and they have already used the invite', function() {
+  it('should not login the user (redirect) if their profile is complete and they have already used the invite', function(done) {
+
+    strategy.redirect = function() {
+      done();
+    };
+
+    strategy.verify(confirmationCode, { params: { troupeUri: troupeUri }}, function(err, user) {
+      if(err) return done(err);
+    });
 
   });
 
