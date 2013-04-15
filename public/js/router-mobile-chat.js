@@ -8,9 +8,10 @@ require([
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
   'views/widgets/avatar',
+  'components/eyeballs',
   'components/unread-items-client',
   'scrollfix'
-], function($, _, Backbone, TroupeViews, chatModels, ChatInputView, ChatCollectionView, AvatarWidget/*, unreadItemsClient, scrollfix*/) {
+], function($, _, Backbone, TroupeViews, chatModels, ChatInputView, ChatCollectionView, AvatarWidget/*, eyeballsClient, unreadItemsClient, scrollfix*/) {
   /*jslint browser: true, unused: true */
   "use strict";
 

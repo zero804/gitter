@@ -1,22 +1,25 @@
-/*jshint globalstrict:true, trailing:false, unused: true */
+/*jshint node:true, globalstrict:true, trailing:false, unused: true */
 /*global require: true, exports: true, OK: true, CONT: true, DENY: true, SOFTDENY: true */
 "use strict";
 
-var winston = require("./../../server/utils/winston");
+var harakaRequire = require(__dirname + '/haraka-require');
 
-var userService = require("./../../server/services/user-service.js");
-var troupeService = require("./../../server/services/troupe-service.js");
-var mailerService = require('./../../server/services/mailer-service');
-var statsService = require('./../../server/services/stats-service');
+var winston = harakaRequire('./utils/winston');
 
-var winston = require('./../../server/utils/winston');
-var nconf = require("./../../server/utils/config");
+var userService = harakaRequire('./services/user-service');
+
+var troupeService = harakaRequire("./services/troupe-service");
+var mailerService = require(harakaRequire.resolveModuleName('./services/mailer-service')); // UNFORTUNATELY NEED TO DO THIS DUE TO THE PROXY
+var statsService = harakaRequire('./services/stats-service');
+
+var winston = harakaRequire('./utils/winston');
+var nconf = harakaRequire("./utils/config");
 var mimelib = require('mimelib');
 
 var EMAILDOMAIN = nconf.get("email:domain");
 var BASEPATH = nconf.get('web:basepath');
 
-require('./../../server/utils/event-listeners').installLocalEventListeners();
+harakaRequire('./utils/event-listeners').installLocalEventListeners();
 
 
 /*
