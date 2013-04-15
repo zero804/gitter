@@ -1,7 +1,7 @@
 /*jshint unused:true, browser:true */
 define([
   'jquery',
-  'utils/log'
+  'log!desktop-notification'
 ], function($, log){
   "use strict";
 

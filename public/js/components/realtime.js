@@ -2,7 +2,7 @@
 define([
   'jquery',
   'faye',
-  'utils/log'
+  'log!realtime'
 ], function($, Faye, log) {
   "use strict";
 

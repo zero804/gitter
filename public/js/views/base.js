@@ -6,7 +6,7 @@ define([
   'hbs!./tmpl/modal',
   '../template/helpers/all',
   'hbs!./tmpl/confirmationView',
-  'utils/log',
+  'log!base-views',
   'backbone-keys' // no ref
 ], function($, _, Backbone, modalTemplate, helpers, confirmationViewTemplate, log) {
   /*jshint trailing:false */

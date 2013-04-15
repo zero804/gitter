@@ -1,7 +1,7 @@
 /*jshint unused:true, browser:true*/
 require([
   'jquery',
-  'utils/log',
+  'log!login',
   'retina'],
   function($, log) {
     if(window.localStorage.defaultTroupeEmail) {
