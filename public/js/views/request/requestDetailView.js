@@ -6,7 +6,7 @@ define([
   'views/base',
   'hbs!./tmpl/requestDetailView',
   'hbs!./tmpl/rejectConfirmation',
-  'utils/log'
+  'log!request-detail-view'
 ], function($, _, Backbone, TroupeViews, template, rejectConfirmationTemplate, log){
   return TroupeViews.Base.extend({
     unreadItemType: 'request',

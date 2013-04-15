@@ -6,7 +6,7 @@ define([
   'views/base',
   'hbs!./tmpl/createTroupeView',
   'views/share/shareTableView',
-  'utils/log',
+  'log!create-troupe-view',
   'jquery_validate', // no ref
   'jquery_placeholder' // no ref
 ], function($, _, TroupeViews, template, ShareTableView, log) {

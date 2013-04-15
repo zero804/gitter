@@ -1,7 +1,7 @@
 /*jshint unused:true, browser:true */
 define([
   'ga',
-  'utils/log'
+  'log!tracking'
 ], function(_gaq, log) {
 
   if(!window.troupeTrackingId) {
