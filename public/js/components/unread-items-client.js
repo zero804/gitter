@@ -3,90 +3,240 @@ define([
   'jquery',
   'underscore',
   './realtime',
-  'utils/log'
+  'log!unread-items-client'
 ], function($, _, realtime, log) {
   "use strict";
 
-  //
-  // The first bit of this module deals with unread items for the current troupe. The
-  // second bit will deal with unread items for other troupes
-  //
-  var unreadItemsCountsCache = {};
-  var unreadItems = window.troupePreloads && window.troupePreloads['unreadItems'] || {};
+  function limit(fn, context, timeout) {
+    return _.debounce(_.bind(fn, context), timeout || 30);
+  }
 
-  var recentlyMarkedRead = {};
-
-  window.setInterval(function() {
-    var now = Date.now();
-
-    _.keys(recentlyMarkedRead, function(key) {
-      if(now - recentlyMarkedRead[key] > 5000) {
-        delete recentlyMarkedRead[key];
-      }
+  function _iteratePreload(items, fn, context) {
+    var keys = _.keys(items);
+    _.each(keys, function(itemType) {
+      _.each(items[itemType], function(itemId) {
+        fn.call(context, itemType, itemId);
+      });
     });
-  }, 5000);
+  }
 
-  var syncCounts = function syncCounts() {
-    var keys = _.union(_.keys(unreadItemsCountsCache), _.keys(unreadItems));
+  var ADD_TIMEOUT = 500;
+  var REMOVE_TIMEOUT = 15000;
 
-    _.each(keys, function(k) {
-      var value = unreadItemsCountsCache[k];
-      var newValue = unreadItems[k] ? unreadItems[k].length : 0;
-      if(value !== newValue) {
-
-        window.setTimeout(function() {
-          $(document).trigger('itemUnreadCountChanged', {
-            itemType: k,
-            count: newValue
-          });
-        }, 200);
-      }
-    });
+  var DoubleHash = function() {
+    this._data = {};
   };
 
-  var readNotificationQueue = {};
-  var timeoutHandle = null;
+  DoubleHash.prototype = {
+    // Add an item, return true if it did not exist before
+    _add: function(itemType, itemId) {
+      var substore = this._data[itemType];
+      if(!substore) {
+        substore = this._data[itemType] = {};
+      }
 
-  var markItemRead = function markItemRead(itemType, itemId) {
+      var exists = substore[itemId];
+      if(exists) return false;
+      substore[itemId] = true;
 
-    recentlyMarkedRead[itemType + "/" + itemId] = Date.now();
+      if(this._onItemAdded) this._onItemAdded(itemType, itemId);
 
-    var a = unreadItems[itemType];
-    if(a) {
-      a = _.without(a, itemId);
-      unreadItems[itemType] = a;
+      return true;
+    },
 
-      syncCounts();
+    // Add an item, return true iff it exists
+    _remove: function(itemType, itemId) {
+       var substore = this._data[itemType];
+      if(!substore) return false;
+      var exists = substore[itemId];
+      if(!exists) return false;
+
+      delete substore[itemId];
+
+      if(_.keys(substore).length === 0) {
+        delete this._data[itemType];
+      }
+
+      if(this._onItemRemoved) this._onItemRemoved(itemType, itemId);
+
+      return true;
+    },
+
+    _contains: function(itemType, itemId) {
+      var substore = this._data[itemType];
+      if(!substore) return false;
+      return substore[itemId];
+    },
+
+    _count: function() {
+      var types = _.keys(this._data);
+
+      return _.reduce(types, function(memo, itemType) {
+        var ids = _.keys(this._data[itemType]);
+        return memo + ids.length;
+      }, 0, this);
+    },
+
+    _marshall: function() {
+      var self = this;
+      var r = {};
+      var types = _.keys(self._data);
+      _.each(types, function(itemType) {
+        var array = [];
+
+        _.each(_.keys(self._data[itemType]), function(itemId) {
+          array.push(itemId);
+        });
+
+        r[itemType] = array;
+      });
+
+      return r;
+    }
+  };
+
+  var Tarpit = function(timeout, onDequeue) {
+    DoubleHash.call(this);
+    this._timeout = timeout;
+    this._onDequeue = onDequeue;
+  };
+
+  _.extend(Tarpit.prototype, DoubleHash.prototype, {
+    _onItemAdded: function(itemType, itemId) {
+      var self = this;
+      window.setTimeout(function() {
+        self._promote(itemType, itemId);
+      }, this._timeout);
+    },
+
+    _promote: function(itemType, itemId) {
+      // Has this item already been deleted?
+      if(!this._contains(itemType, itemId)) return;
+
+      this._remove(itemType, itemId);
+      if(this._onDequeue) this._onDequeue(itemType, itemId);
+    }
+  });
+
+  var UnreadItemStore = function() {
+    DoubleHash.call(this);
+
+    this._addTarpit = new Tarpit(ADD_TIMEOUT, _.bind(this._promote, this));
+    this._deleteTarpit = new Tarpit(REMOVE_TIMEOUT);
+    this._recountLimited = limit(this._recount, this, 30);
+    this._currentCountValue = -1;
+  };
+
+  _.extend(UnreadItemStore.prototype, DoubleHash.prototype, {
+    _unreadItemAdded: function(itemType, itemId) {
+      if(this._deleteTarpit._contains(itemType, itemId)) return;
+      if(this._contains(itemType, itemId)) return;
+
+      this._addTarpit._add(itemType, itemId);
+    },
+
+    _unreadItemRemoved: function(itemType, itemId) {
+      if(this._deleteTarpit._contains(itemType, itemId)) return;
+
+      this._deleteTarpit._add(itemType, itemId);
+      this._addTarpit._remove(itemType, itemId);
+      this._remove(itemType, itemId);
+    },
+
+    _markItemRead: function(itemType, itemId) {
+      this._unreadItemRemoved(itemType, itemId);
+    },
+
+    _onItemRemoved: function() {
+      // Recount soon
+      this._recountLimited();
+    },
+
+    _onItemAdded: function() {
+      // Recount soon
+      this._recountLimited();
+    },
+
+    _promote: function(itemType, itemId) {
+      this._add(itemType, itemId);
+    },
+
+    _recount: function() {
+      var newValue = this._count();
+      if(newValue !== this._currentCountValue) {
+        this._currentCountValue = newValue;
+        if(this.onNewCountValue) {
+          this.onNewCountValue(newValue);
+        }
+      }
+    },
+
+    _currentCount: function() {
+      if(this._currentCountValue < 0) return 0;
+
+      return this._currentCountValue;
+    },
+
+    _unreadItemsAdded: function(items) {
+      _iteratePreload(items, function(itemType, itemId) {
+        this._unreadItemAdded(itemType, itemId);
+      }, this);
+    },
+
+    _unreadItemsRemoved: function(items) {
+      _iteratePreload(items, function(itemType, itemId) {
+        this._unreadItemRemoved(itemType, itemId);
+      }, this);
+    },
+
+    preload: function(items) {
+      _iteratePreload(items, function(itemType, itemId) {
+        if(this._deleteTarpit._contains(itemType, itemId)) return;
+        if(this._contains(itemType, itemId)) return;
+
+        this._promote(itemType, itemId);
+      }, this);
     }
 
-    if(!readNotificationQueue[itemType]) {
-      readNotificationQueue[itemType] = [itemId];
-    } else {
-      readNotificationQueue[itemType].push(itemId);
-    }
+  });
 
-    function send() {
-      timeoutHandle = null;
+  var ReadItemSender = function() {
+    this._buffer = new DoubleHash();
+    this._sendLimited = limit(this._send, this, 5000);
+  };
 
-      var sendQueue = readNotificationQueue;
-      readNotificationQueue = {};
+  ReadItemSender.prototype = {
+    _add: function(itemType, itemId) {
+      this._buffer._add(itemType, itemId);
+      this._sendLimited();
+    },
 
-      //log("Sending read notifications: ", sendQueue);
+    _send: function() {
+      var queue = this._buffer._marshall();
+      this._buffer = new DoubleHash();
 
       $.ajax({
         url: "/troupes/" + window.troupeContext.troupe.id + "/unreadItems",
         contentType: "application/json",
-        data: JSON.stringify(sendQueue),
+        data: JSON.stringify(queue),
         type: "POST",
+        global: false,
         success: function() {
+        },
+        error: function() {
         }
       });
-    }
 
-    if(!timeoutHandle) {
-      timeoutHandle = window.setTimeout(send, 500);
     }
   };
+
+  var sender = new ReadItemSender();
+  var unreadItemStore = new UnreadItemStore();
+
+  function markItemRead(itemType, itemId) {
+    unreadItemStore._markItemRead(itemType, itemId);
+    sender._add(itemType, itemId);
+  }
 
   var inFocus = true;
 
@@ -157,34 +307,11 @@ define([
 
 
   function newUnreadItems(items) {
-    var itemTypes = _.keys(items);
-    _.each(itemTypes, function(itemType) {
-      var ids = items[itemType];
-
-      var filtered = _.filter(ids, function(itemId) { return !recentlyMarkedRead[itemType + "/" + itemId]; });
-
-      if(!unreadItems[itemType]) {
-        unreadItems[itemType] = filtered;
-      } else {
-        unreadItems[itemType] = _.union(unreadItems[itemType], filtered);
-      }
-
-    });
-
-    syncCounts();
+    unreadItemStore._unreadItemsAdded(items);
   }
 
   function unreadItemsRemoved(items) {
-    var itemTypes = _.keys(items);
-    _.each(itemTypes, function(itemType) {
-      var ids = items[itemType];
-
-      if(unreadItems[itemType]) {
-        unreadItems[itemType] = _.without(unreadItems[itemType], ids);
-      }
-    });
-
-    syncCounts();
+    unreadItemStore._unreadItemsRemoved(items);
 
     // remove the unread item css
     _.each(items, function(ids) {
@@ -195,10 +322,6 @@ define([
   }
 
   var unreadItemsClient = {
-    getValue: function(itemType) {
-      var v = unreadItems[itemType];
-      return v ? v.length : 0;
-    },
 
     findTopMostVisibleUnreadItemPosition: function(itemType) {
       var topItem = null;
@@ -231,13 +354,7 @@ define([
     },
 
     getTotalUnreadCountForCurrentTroupe: function() {
-      var types = _.keys(unreadItems);
-
-      var value = _.reduce(types, function(memo, type) {
-        return memo + unreadItems[type].length;
-      }, 0);
-
-      return value;
+      return unreadItemStore._currentCount();
     },
 
     installTroupeListener: function(troupeCollection) {
@@ -245,14 +362,14 @@ define([
 
       function recount() {
         function count(memo, troupe) {
-          var count;
+          var c;
           if(troupe.id == window.troupeContext.troupe.id) {
-            count = unreadItemsClient.getTotalUnreadCountForCurrentTroupe();
+            c = unreadItemsClient.getTotalUnreadCountForCurrentTroupe();
           } else {
-            count = troupe.get('unreadItems');
+            c = troupe.get('unreadItems');
           }
 
-          return memo + (count > 0 ? 1 : 0);
+          return memo + (c > 0 ? 1 : 0);
         }
 
         var newTroupeUnreadTotal = troupeCollection.reduce(count, 0);
@@ -284,6 +401,7 @@ define([
       });
 
       realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
+        log('User message', message);
         if(message.notification === 'troupe_unread') {
           log("troupe_unread change", message);
 
@@ -305,12 +423,17 @@ define([
           }
 
           recount();
-        } else if(message.notification === 'unread_items') {
+        }
+      });
+
+      realtime.subscribe('/user/' + window.troupeContext.user.id + '/troupes/' + window.troupeContext.troupe.id, function(message) {
+        if(message.notification === 'unread_items') {
           newUnreadItems(message.items);
         } else if(message.notification === 'unread_items_removed') {
           unreadItemsRemoved(message.items);
         }
       });
+
 
       if(troupeCollection) {
         recount();
@@ -318,6 +441,9 @@ define([
     }
   };
 
+  // Mainly useful for testing
+  unreadItemsClient.Tarpit = Tarpit;
+  unreadItemsClient.UnreadItemStore = UnreadItemStore;
 
   return unreadItemsClient;
 });
