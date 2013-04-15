@@ -11,9 +11,20 @@ define([
   var exports = {};
 
   exports.FileVersionModel = TroupeCollections.Model.extend({
-    parse: function(response) {
-      response.createdDate = moment.utc(response.createdDate);
-      return response;
+    parse: function(message) {
+      message.createdDate = moment.utc(message.createdDate);
+
+      // Check for the special case of messages from the current user
+      if(message.unread && message.versions) {
+        var latestVersion = message.versions[message.versions.length - 1];
+        if(latestVersion && latestVersion.creatorUser) {
+          if(latestVersion.creatorUser.id === window.troupeContext.user.id) {
+            message.unread = false;
+          }
+        }
+      }
+
+      return message;
     }
   });
 
