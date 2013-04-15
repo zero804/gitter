@@ -15,6 +15,13 @@ var presenceService = new events.EventEmitter();
 var redisClient = redis.createClient();
 var redisLock = require("redis-lock")(redis.createClient());
 
+
+var prefix = nconf.get('presence:prefix') + ':';
+
+var ACTIVE_USERS_KEY = prefix + 'active_u';
+var ACTIVE_SOCKETS_KEY = prefix + 'activesockets';
+
+
 // Public methods are not prefixed
 // Private methods start with an underscore _
 // Private methods that assume locking has already occurred start with a __
@@ -22,25 +29,25 @@ var redisLock = require("redis-lock")(redis.createClient());
 function _lockOnUser(userId, callback) {
   assert(userId, 'userId expected');
 
-  redisLock('pr:l:u:' + userId, 100, function(done) {
+  redisLock(prefix + 'l:u:' + userId, 100, function(done) {
     return callback(done);
   });
 }
 
 function _keySocketUser(socketId) {
-  return "pr:su:" + socketId;
+  return prefix + "su:" + socketId;
 }
 
 function _keySocketTroupe(socketId) {
-  return "pr:st:" + socketId;
+  return prefix + "st:" + socketId;
 }
 
 function _keyTroupeUsers(troupeId) {
-  return "pr:tu:" + troupeId;
+  return prefix + "tu:" + troupeId;
 }
 
 function _keySocketEyeballStatus(socketId) {
-  return "pr:se:" + socketId;
+  return prefix + "se:" + socketId;
 }
 
 // callback(err, userSocketCount)
@@ -62,8 +69,8 @@ function __associateSocketAndActivateUser(userId, socketId, callback) {
     }
 
     redisClient.multi()
-      .zincrby('pr:active_u', 1, userId)              // 0 Add user to active users
-      .sadd("pr:activesockets", socketId)             // 1 Add socket to list of active sockets
+      .zincrby(ACTIVE_USERS_KEY, 1, userId)              // 0 Add user to active users
+      .sadd(ACTIVE_SOCKETS_KEY, socketId)             // 1 Add socket to list of active sockets
       .exec(function(err, replies) {
         if(err) return callback(err);
         var userSocketCount = parseInt(replies[0], 10);
@@ -101,9 +108,9 @@ function __disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callba
     }
 
     redisClient.multi()
-      .zincrby('pr:active_u', -1, userId)              // 0 Add user to active users
-      .zremrangebyscore('pr:active_u', '-inf', '0')    // 1 remove everyone with a score of zero
-      .srem("pr:activesockets", socketId)              // 2 Add socket to list of active sockets
+      .zincrby(ACTIVE_USERS_KEY, -1, userId)              // 0 Add user to active users
+      .zremrangebyscore(ACTIVE_USERS_KEY, '-inf', '0')    // 1 remove everyone with a score of zero
+      .srem(ACTIVE_SOCKETS_KEY, socketId)              // 2 Add socket to list of active sockets
       .get(_keySocketTroupe(socketId))                 // 3 Get the troupe associated with this socket
       .del(_keySocketTroupe(socketId))                 // 4 Delete the troupe socket association
       .exec(function(err, replies) {
@@ -323,8 +330,8 @@ function categorizeUsersByOnlineStatus(userIds, callback) {
   if(!userIds || userIds.length === 0) return callback(null, {});
 
   var t = process.hrtime();
-  var key = "pr:presence_temp_set:" + process.pid + ":" + t[0] + ":" + t[1];
-  var out_key = "pr:presence_temp_set:" + process.pid + ":" + t[0] + ":" + t[1] + '_out';
+  var key = prefix + "presence_temp_set:" + process.pid + ":" + t[0] + ":" + t[1];
+  var out_key = prefix + "presence_temp_set:" + process.pid + ":" + t[0] + ":" + t[1] + '_out';
 
   var zaddArgs = [key];
   userIds.forEach(function(id) {
@@ -333,7 +340,7 @@ function categorizeUsersByOnlineStatus(userIds, callback) {
 
   redisClient.multi()
     .zadd(zaddArgs)                                 // 0 create zset of users
-    .zinterstore(out_key, 2, 'pr:active_u',key)     // 1 intersect with online users
+    .zinterstore(out_key, 2, ACTIVE_USERS_KEY,key)     // 1 intersect with online users
     .zrangebyscore(out_key, 1, '+inf')              // 2 return all online users
     .del(key, out_key)                              // 3 delete the keys
     .exec(function(err, replies) {
@@ -350,7 +357,7 @@ function categorizeUsersByOnlineStatus(userIds, callback) {
 }
 
 function listOnlineUsers(callback) {
-  redisClient.zrange("pr:active_u", 0, -1, callback);
+  redisClient.zrange(ACTIVE_USERS_KEY, 0, -1, callback);
 }
 
 // Returns the online users for the given troupes
@@ -455,7 +462,7 @@ function startPresenceGcService(engine) {
 
 
 function _validateActiveSockets(engine, callback) {
-  redisClient.smembers("pr:activesockets", function(err, sockets) {
+  redisClient.smembers(ACTIVE_SOCKETS_KEY, function(err, sockets) {
     if(!sockets.length) {
       winston.verbose('presence: Validation: No active sockets.');
       return callback(null, 0);
