@@ -12,8 +12,6 @@ var mockito = require('jsmockito').JsMockito;
 
 var times = mockito.Verifiers.times;
 var once = times(1);
-var twice = times(2);
-var thrice = times(3);
 
 function testInviteAcceptance(email, userStatus, emailNotificationConfirmationMethod, done) {
   var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
@@ -100,6 +98,7 @@ function testInviteRejection(email, userStatus, done) {
       });
   });
 }
+
 describe('troupe-service', function() {
 
   describe('#acceptRequest()', function() {
@@ -130,14 +129,54 @@ describe('troupe-service', function() {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
       testInviteRejection(nonExistingEmail, 'ACTIVE', done);
     });
-  });
 
-
-  describe('#rejectRequest()', function() {
     it('should delete a rejected request from an UNCONFIRMED user', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
       testInviteRejection(nonExistingEmail, 'UNCONFIRMED', done);
     });
   });
+
+  describe('#validateTroupeEmail()', function() {
+    it('should validate correctly for a known user', function(done) {
+      var troupeService = testRequire('./services/troupe-service');
+
+      troupeService.validateTroupeEmail({
+        from: 'testuser@troupetest.local',
+        to: 'testtroupe1@troupetest.local'
+      }, function(err, fromUser) {
+        if(err) return done(err);
+
+        assert(fromUser, 'Validation failed but should have succeeded');
+        done();
+      });
+    });
+
+    it('should not validate for an unknown user', function(done) {
+      var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
+
+      var troupeService = testRequire('./services/troupe-service');
+
+      troupeService.validateTroupeEmail({
+        from: nonExistingEmail,
+        to: 'testtroupe1@troupetest.local'
+      }, function(err, fromUser) {
+        if(err) {
+          if(err === "Access denied") {
+            return done();
+          }
+
+          return done(err);
+        }
+        assert(!fromUser, 'Validation succeeded but should have failed');
+        done();
+      });
+    });
+
+    it('should delete a rejected request from an UNCONFIRMED user', function(done) {
+      var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
+      testInviteRejection(nonExistingEmail, 'UNCONFIRMED', done);
+    });
+  });
+
 
 });
