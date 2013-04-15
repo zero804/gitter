@@ -205,6 +205,8 @@ module.exports = {
         }
       );
 
+
+      // TODO: this should be an explicit setting, not this
       if (nconf.get('web:baseserver') === 'localhost') {
         app.post('/confirmationCodeForEmail', function(req, res/*, next */) {
           var forEmail = req.body.email;

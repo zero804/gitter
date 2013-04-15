@@ -256,19 +256,40 @@ function findRequestsByIds(requestIds, callback) {
   }, callback);
 }
 
+function findUserByIdEnsureConfirmationCode(userId, callback) {
+  userService.findById(userId, function(err, user) {
+    if(err) return callback(err);
+    if(!user) return callback();
+
+    // If the user doesn't have a confirmation code, give them one now
+    if(!user.confirmationCode) {
+      winston.info('User ' + userId + ' had no confirmation code, generating one now');
+      user.confirmationCode = uuid.v4();
+      user.save(function(err) {
+        if(err) return callback(err);
+        callback(null, user);
+      });
+
+      return;
+    }
+
+    return callback(null, user);
+  });
+}
+
 function acceptRequest(request, callback) {
   findById(request.troupeId, function(err, troupe) {
     if(err) return callback(err);
     if(!troupe) { winston.error("Unable to find troupe", request.troupeId); return callback("Unable to find troupe"); }
 
-    userService.findById(request.userId, function(err, user) {
+    findUserByIdEnsureConfirmationCode(request.userId, function(err, user) {
       if(err) return callback(err);
       if(!user) { winston.error("Unable to find user", request.userId); return callback("Unable to find user"); }
 
+
       if(user.status === 'UNCONFIRMED') {
         emailNotificationService.sendConfirmationForNewUserRequest(user, troupe);
-      }
-      else {
+      } else {
         emailNotificationService.sendRequestAcceptanceToUser(user, troupe);
       }
 
