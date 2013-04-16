@@ -39,30 +39,17 @@ function downloadFile(options, callback) {
   (new mongoose.mongo.GridStore(mongoose.connection.db, fileName, "r")).open(onOpen);
 
   function onOpen(e, gs) {
-    throws (e, callback, "Couldn't open grid file");
+    if(e) return callback("Couldn't open grid file");
 
     gs.read(gs.length, onRead);
   }
 
   function onRead(e, data) {
-    throws (e, callback, "Couldn't read grid file");
+    if(e) return callback("Couldn't read grid file");
 
     fs.writeFile(localFileName, data, callback);
   }
 
-}
-
-function throws (e, f, m) {
-  if (e) {
-    if (m) {
-      winston.error(m, e);
-    }
-
-    if (f)
-      return f(e);
-    else
-      throw e;
-  }
 }
 
 module.exports = {

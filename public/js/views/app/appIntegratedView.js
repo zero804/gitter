@@ -6,8 +6,9 @@ define([
   'views/app/uiVars',
   'fineuploader',
   "nanoScroller",
-  'log!app-integrated-view'
-  ], function($, _, Backbone, uiVars, qq, _nano, log) {
+  'log!app-integrated-view',
+  'components/unread-items-client'
+  ], function($, _, Backbone, uiVars, qq, _nano, log, unreadItemsClient) {
   "use strict";
 
   return Backbone.View.extend({
@@ -104,7 +105,16 @@ define([
         }, 100);
       });
 
+      $(document).on('troupeUpdate', function(e, message) {
+        // header title
+        $('.trpHeaderTitle').html(message.model.name);
+        // window / title bar
+        self.updateTitlebar();
+      });
+
       $(document).on('troupeUnreadTotalChange', function(event, values) {
+
+        self.updateTitlebar();
 
         function updateBadge(selector, count) {
           var badge = self.$el.find(selector);
@@ -129,6 +139,15 @@ define([
         else
           $('.trpLeftMenuToolbarItems').removeClass('unread-one2one');
       });
+    },
+
+    updateTitlebar: function() {
+      $('title').html(this.getTitlebar());
+    },
+
+    getTitlebar: function() {
+      var count = unreadItemsClient.currentCount();
+      return  ((count) ? '(' + count + ') '  : '') + window.troupeContext.troupe.name + " - Troupe";
     },
 
     toggleRightPanel: function(id) {
