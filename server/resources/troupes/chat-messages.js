@@ -42,15 +42,8 @@ module.exports = {
       });
     },
 
-    show: function(req, res){
-      res.send(500);
-    },
-
-    edit: function(req, res){
-      res.send(500);
-    },
-
     update:  function(req, res){
+      console.log(">>>>>>>>>>>>>>>>>>>>>", this, req.body);
       res.send(500);
     },
 
