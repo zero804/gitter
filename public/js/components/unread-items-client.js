@@ -369,7 +369,17 @@ define([
     this._recountLimited();
   };
 
+  // storing the previous counts here so we can return it to outside callers,
+  // even though we don't always have a reference to TroupeNotifier internally.
+  var counts = {
+    overall: null,
+    normal: null,
+    oneToOne: null,
+    current: null
+  };
+
   TroupeUnreadNotifier.prototype = {
+
     _recount: function() {
 
       function count(memo, troupe) {
@@ -383,20 +393,18 @@ define([
       var newPplTroupeUnreadTotal = c.filter(function(trp) { return trp.get('oneToOne'); }).reduce(count, 0);
       var newNormalTroupeUnreadTotal = c.filter(function(trp) { return !trp.get('oneToOne'); }).reduce(count, 0);
 
-      if(newTroupeUnreadTotal !== this._troupeUnreadTotal ||
-         newPplTroupeUnreadTotal !== this._pplTroupeUnreadTotal ||
-         newNormalTroupeUnreadTotal !== this._normalTroupeUnreadTotal) {
-        this._troupeUnreadTotal = newTroupeUnreadTotal;
-        this._pplTroupeUnreadTotal = newPplTroupeUnreadTotal;
-        this._normalTroupeUnreadTotal = newNormalTroupeUnreadTotal;
+      if(newTroupeUnreadTotal !== counts.overall ||
+         newPplTroupeUnreadTotal !== counts.oneToOne ||
+         newNormalTroupeUnreadTotal !== counts.normal) {
+        counts.overall = newTroupeUnreadTotal;
+        counts.oneToOne = newPplTroupeUnreadTotal;
+        counts.normal = newNormalTroupeUnreadTotal;
+        counts.current = unreadItemStore._currentCount();
 
-        $(document).trigger('troupeUnreadTotalChange', {
-          overall: newTroupeUnreadTotal,
-          normal: newNormalTroupeUnreadTotal,
-          oneToOne: newPplTroupeUnreadTotal
-        });
+        $(document).trigger('troupeUnreadTotalChange', counts);
       }
     }
+
   };
 
 
@@ -489,8 +497,13 @@ define([
 
   var unreadItemsClient = {
 
-    currentCount: function() {
-      return unreadItemStore._currentCount();
+    getCounts: function() {
+      return {
+        overall: counts.overall,
+        normal: counts.normal,
+        oneToOne: counts.oneToOne,
+        current: unreadItemStore._currentCount()
+      };
     },
 
     findTopMostVisibleUnreadItemPosition: function(itemType) {
