@@ -636,6 +636,8 @@ qq.UploadButton.prototype = {
         input.setAttribute("type", "file");
         input.setAttribute("name", this._options.name);
 
+        input.setAttribute("size", "1");
+
         qq(input).css({
             position: 'absolute',
             // in Opera only 'browse' button
@@ -645,7 +647,7 @@ qq.UploadButton.prototype = {
             //top: '2px',
             fontFamily: 'Arial',
             // 4 persons reported this, the max values that worked for them were 243, 236, 236, 118
-            fontSize: '118px',
+            fontSize: '1px',
             margin: 0,
             padding: 0,
             cursor: 'pointer',
