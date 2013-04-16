@@ -36,6 +36,10 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
     return callback("You can no longer edit this message");
   }
 
+  if(chatMessage.toTroupeId != troupe.id) {
+    return callback("Permission to edit this chat message is denied.");
+  }
+
   if(chatMessage.fromUserId != user.id) {
     return callback("Permission to edit this chat message is denied.");
   }
