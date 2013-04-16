@@ -2,7 +2,7 @@
 define([
   'jquery',
   './realtime',
-  'utils/log'
+  'log!eyeballs'
 ], function($, realtime, log) {
   "use strict";
 

@@ -4,7 +4,7 @@ define([
   './notify',
   './realtime',
   'handlebars',
-  'utils/log'
+  'log!web-notifications'
 ], function($, notify, realtime, handlebars, log){
   "use strict";
 

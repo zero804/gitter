@@ -118,9 +118,10 @@ exports.install = function() {
 
   appEvents.localOnly.onNewUnreadItem(function(data) {
     var userId = data.userId;
+    var troupeId = data.troupeId;
     var items = data.items;
 
-    bayeuxClient.publish("/user/" + userId, {
+    bayeuxClient.publish("/user/" + userId + '/troupes/' + troupeId, {
       notification: "unread_items",
       items: items
     });
@@ -129,9 +130,10 @@ exports.install = function() {
 
   appEvents.localOnly.onUnreadItemsRemoved(function(data) {
     var userId = data.userId;
+    var troupeId = data.troupeId;
     var items = data.items;
 
-    bayeuxClient.publish("/user/" + userId, {
+    bayeuxClient.publish("/user/" + userId + '/troupes/' + troupeId, {
       notification: "unread_items_removed",
       items: items
     });

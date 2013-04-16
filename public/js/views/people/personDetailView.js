@@ -6,7 +6,7 @@ define([
   'views/base',
   'hbs!./tmpl/personDetailView',
   './confirmRemoveModalView',
-  'utils/log'
+  'log!person-detail-view'
 ], function($, _, Backbone, TroupeViews, template, ConfirmRemoveModalView, log){
   return TroupeViews.Base.extend({
     template: template,

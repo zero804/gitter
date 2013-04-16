@@ -37,7 +37,7 @@ require([
   'views/app/troupeSettingsView',
   'components/webNotifications',
   'components/unread-items-client',
-  'utils/log',
+  'log!app-integrated',
   'components/errorReporter',
   'filtered-collection'
 ], function($, _, Backbone, Marionette, _Helpers, TroupeViews, realtime, eyeballs, dozy, AppIntegratedView, ChatInputView, ChatCollectionView, FileView, ConversationView, RequestView,

@@ -2,7 +2,7 @@
 define([
   'jquery',
   'underscore',
-  'utils/log',
+  'log!chat-collection-view',
   'components/unread-items-client',
   'marionette',
   'views/base',

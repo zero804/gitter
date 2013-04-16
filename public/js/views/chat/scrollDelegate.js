@@ -2,7 +2,7 @@
 define([
   'jquery',
   'underscore',
-  'utils/log'
+  'log!scroll-delegate'
 ], function($, _, log) {
   "use strict";
 
