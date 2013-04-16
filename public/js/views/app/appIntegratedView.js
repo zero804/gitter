@@ -139,6 +139,8 @@ define([
         else
           $('.trpLeftMenuToolbarItems').removeClass('unread-one2one');
       });
+
+      this.updateTitlebar();
     },
 
     updateTitlebar: function() {
@@ -146,8 +148,10 @@ define([
     },
 
     getTitlebar: function() {
-      var count = unreadItemsClient.currentCount();
-      return  ((count) ? '(' + count + ') '  : '') + window.troupeContext.troupe.name + " - Troupe";
+      var count = unreadItemsClient.getCounts().overall;
+      var uniCount = String.fromCharCode(0x2789 + count);
+
+      return  ((count) ? uniCount + ' ' : '') + window.troupeContext.troupe.name + " - Troupe";
     },
 
     toggleRightPanel: function(id) {
