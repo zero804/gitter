@@ -235,6 +235,7 @@ var ChatMessageSchema = new Schema({
   toTroupeId: ObjectId,  //TODO: rename to troupeId
   text: String,
   sent: { type: Date, "default": Date.now },
+  editedAt: { type: Date, "default": null },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 ChatMessageSchema.index({ toTroupeId: 1, sent: -1 });

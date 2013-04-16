@@ -16,6 +16,10 @@ define([
     parse: function(message) {
       message.sent = moment(message.sent, moment.defaultFormat);
 
+      if(message.editedAt) {
+        message.editedAt = moment(message.editedAt, moment.defaultFormat);
+      }
+
       // Check for the special case of messages from the current user
       if(message.unread && message.fromUser) {
         if(message.fromUser.id === window.troupeContext.user.id) {
