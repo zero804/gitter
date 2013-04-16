@@ -5,7 +5,10 @@ var middleware = require('../../web/middleware');
 
 module.exports = {
   install: function(app) {
-    var auth = middleware.ensureLoggedIn();
+    var auth = [
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn()
+    ];
 
     app.all('/api/v1/location', auth);
     app.resource('api/v1/location', require('./location.js'));
