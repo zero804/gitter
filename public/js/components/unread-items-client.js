@@ -462,7 +462,7 @@ define([
 
     _eyeballStateChange: function(e, newState) {
       this._inFocus = newState;
-      if(this._newState) {
+      if(newState) {
         this._windowScrollLimited();
       }
     }
