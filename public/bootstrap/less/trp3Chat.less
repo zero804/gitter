@@ -79,9 +79,17 @@
   padding: 0;
 }
 
-.trpChatTime {
+.trpChatTime, .trpChatEdit, .trpChatReads {
 	display: inline-block;
 	float: right;
+}
+
+.trpChatEdit, .trpChatReads {
+  visibility: hidden;
+}
+
+:hover > .trpChatEdit, :hover > .trpChatReads {
+  visibility: visible;
 }
 
 .trpChatFrom {
