@@ -42,9 +42,17 @@ module.exports = {
       });
     },
 
-    update:  function(req, res){
-      console.log(">>>>>>>>>>>>>>>>>>>>>", this, req.body);
-      res.send(500);
+    update:  function(req, res, next) {
+      chatService.updateChatMessage(req.troupe, req.chatMessage, req.user, req.body.text, function(err, chatMessage) {
+        if(err) return next(err);
+         var strategy = new restSerializer.ChatStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });
+
+          restSerializer.serialize(chatMessage, strategy, function(err, serialized) {
+            if(err) return next(err);
+            res.send(serialized);
+          });
+      });
+
     },
 
     destroy: function(req, res){
