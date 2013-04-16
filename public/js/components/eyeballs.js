@@ -91,7 +91,7 @@ define([
 
   startInactivityPoller();
 
-  var inactivityTimer = null;
+  var inactivityTimer;
   function startInactivityPoller() {
     if(inactivityTimer) return;
 
