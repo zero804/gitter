@@ -16,8 +16,11 @@ define([
   var ChatViewItem = TroupeViews.Base.extend({
     unreadItemType: 'chat',
     template: chatItemTemplate,
+    isEditing: false,
 
     events: {
+      'click .trpChatEdit': 'toggleEdit',
+      'keydown .trpChatInputBoxTextArea': 'detectReturn'
     },
 
     safe: function(text) {
@@ -46,6 +49,51 @@ define([
       }
 
       return data;
+    },
+
+    detectReturn: function(e) {
+      if(e.keyCode == 13 && !e.ctrlKey) {
+        this.saveChat();
+      }
+    },
+
+    saveChat: function() {
+      var newText = this.$el.find('.trpChatInputBoxTextArea').val();
+      if (this.canEdit() && newText != this.model.get('text')) {
+        this.model.set('text', newText);
+        this.model.save();
+        this.toggleEdit();
+      }
+    },
+
+    isOwnMessage: function() {
+      return this.model.get('fromUser').id === window.troupeContext.user.id;
+    },
+
+    isInEditablePeriod: function() {
+      var age = (Date.now() - this.model.get('sent').valueOf()) / 1000;
+      return age <= 240;
+    },
+
+    canEdit: function() {
+      return this.isOwnMessage() && this.isInEditablePeriod();
+    },
+
+    toggleEdit: function() {
+      if (this.isEditing) {
+        this.isEditing = false;
+        this.$el.find('.trpChatText').html(this.model.get('text'));
+      } else {
+        if (this.canEdit()) {
+          this.isEditing = true;
+          this.$el.find('.trpChatText').html("<textarea class='trpChatInputBoxTextArea'>"+this.model.get('text')+"</textarea>");
+        } else if (!this.isOwnMessage()) {
+          window.alert("You cannot edit a messages that wasn't sent by you.");
+        } else if (!this.isInEditablePeriod()) {
+          window.alert("You cannot edit a message that is older than 5 minutes.");
+        }
+
+      }
     }
 
   });
