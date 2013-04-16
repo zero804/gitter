@@ -449,7 +449,7 @@ function collectGarbage(engine, callback) {
       winston.silly(message);
     }
 
-    return callback();
+    return callback(null, invalidSocketCount);
   });
 
 }
@@ -483,7 +483,14 @@ function _validateActiveSockets(engine, callback) {
         invalidCount++;
         winston.verbose('Disconnecting invalid socket ' + socketId);
         socketDisconnected(socketId, function(err) {
-          if(err && !err.lockFail) d.reject(err);
+          if(err) {
+            if(!err.lockFail) {
+              d.reject(err);
+              return;
+            }
+
+            winston.info('Locking failure while gc-ing invalid socket');
+          }
 
           d.resolve();
         });
