@@ -6,7 +6,7 @@ define([
   'views/app/uiVars',
   'fineuploader',
   "nanoScroller",
-  'utils/log'
+  'log!app-integrated-view'
   ], function($, _, Backbone, uiVars, qq, _nano, log) {
   "use strict";
 

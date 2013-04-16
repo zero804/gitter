@@ -6,7 +6,7 @@ define([
   'backbone',
   'views/base',
   'hbs!./tmpl/filePreviewView',
-  'utils/log'
+  'log!file-preview-view'
 ], function($, _, Backbone, TroupeViews, template, log) {
   /*jslint browser: true*/
   "use strict";

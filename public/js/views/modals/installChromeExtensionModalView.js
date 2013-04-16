@@ -7,7 +7,7 @@ define([
   'underscore',
   'views/base',
   'hbs!./tmpl/installChromeExtensionModalView',
-  'utils/log'
+  'log!install-chrome-extension'
 ], function($, _, TroupeViews, template, log) {
 
     return TroupeViews.Base.extend({
