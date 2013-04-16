@@ -146,11 +146,6 @@ require([
     headerRegion: "#header-region"
   });
 
-  $(document).on('troupeUpdate', function(message) {
-    $('.trpHeaderTitle').html(message.model.name);
-  })
-
-
   /* This is a special region which acts like a region, but is implemented completely differently */
   app.dialogRegion = {
     currentView: null,

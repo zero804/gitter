@@ -489,6 +489,10 @@ define([
 
   var unreadItemsClient = {
 
+    currentCount: function() {
+      return unreadItemStore._currentCount();
+    },
+
     findTopMostVisibleUnreadItemPosition: function(itemType) {
       var topItem = null;
       var topItemOffset = 1000000000;
