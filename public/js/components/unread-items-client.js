@@ -146,6 +146,7 @@ define([
       if(this._contains(itemType, itemId)) return;
 
       this._addTarpit._add(itemType, itemId);
+      this._recountLimited();
     },
 
     _unreadItemRemoved: function(itemType, itemId) {
@@ -156,6 +157,7 @@ define([
       this._remove(itemType, itemId);
 
       this.emit('unreadItemRemoved', itemType, itemId);
+      this._recountLimited();
     },
 
     _markItemRead: function(itemType, itemId) {
@@ -275,6 +277,9 @@ define([
     this._store = unreadItemStore;
     _.bindAll(this, '_onNewCountValue');
     this._store.on('newcountvalue', this._onNewCountValue);
+
+    // Set the initial value
+    this._onNewCountValue(null, this._store._currentCount());
   };
 
   TroupeCollectionSync.prototype = {
