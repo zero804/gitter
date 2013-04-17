@@ -34,8 +34,8 @@ def testUsersComingOnlineAndGoingOffline():
 
     time.sleep(1)
 
-    driver1.get(utils.baseUrl("testtroupe1"))
-    driver2.get(utils.baseUrl("testtroupe1"))
+    driver1.get(utils.baseUrl("/testtroupe1"))
+    driver2.get(utils.baseUrl("/testtroupe1"))
 
     user1 = driver1.find_element_by_xpath('//*[@id="people-roster"]/div/span/span/span[1]')
     user2 = driver1.find_element_by_xpath('//*[@id="people-roster"]/div/span/span/span[2]')
@@ -54,7 +54,7 @@ def testUsersComingOnlineAndGoingOffline():
 
     # driver2.quit()
     # driver2 = None
-    driver2.get(utils.baseUrl("signout"))
+    driver2.get(utils.baseUrl("/signout"))
 
     time.sleep(0.5)
 
