@@ -341,8 +341,6 @@ define([
     },
 
     _handleIncomingMessage: function(message) {
-      log("troupe_unread change", message);
-
       var troupeId = message.troupeId;
       var totalUnreadItems = message.totalUnreadItems;
 
@@ -404,9 +402,9 @@ define([
       var newPplTroupeUnreadTotal = c.filter(function(trp) { return trp.get('oneToOne'); }).reduce(count, 0);
       var newNormalTroupeUnreadTotal = c.filter(function(trp) { return !trp.get('oneToOne'); }).reduce(count, 0);
 
-      if(newTroupeUnreadTotal !== counts.overall ||
-         newPplTroupeUnreadTotal !== counts.oneToOne ||
-         newNormalTroupeUnreadTotal !== counts.normal) {
+      //if(newTroupeUnreadTotal !== counts.overall ||
+      //   newPplTroupeUnreadTotal !== counts.oneToOne ||
+      //   newNormalTroupeUnreadTotal !== counts.normal) {
 
         // TODO: fix this enormous hack!
         counts.overall = newTroupeUnreadTotal;
@@ -415,7 +413,7 @@ define([
         counts.current = unreadItemStore._currentCount();
 
         $(document).trigger('troupeUnreadTotalChange', counts);
-      }
+      //}
     }
 
   };
@@ -526,7 +524,6 @@ define([
 
   ReadItemRemover.prototype = {
     _onUnreadItemRemoved: function(e, itemType, itemId) {
-      log('incomng unread item: ', itemType, itemId);
       $('.unread.model-id-' + itemId).removeClass('unread').addClass('read');
     }
   };
@@ -544,6 +541,9 @@ define([
 
 
   var unreadItemsClient = {
+    preload: function(items) {
+      unreadItemStore.preload(items);
+    },
 
     getCounts: function() {
       return {
