@@ -63,6 +63,7 @@ prepare-for-end-to-end-testing:
 
 end-to-end-test:
 	nosetests -v --with-xunit --all-modules test/end-to-end/e2etests/
+	mv /var/lib/jenkins/jobs/troupe/workspace/*.xml output/test-reports/
 
 docs: test-docs
 
