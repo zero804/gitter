@@ -127,6 +127,7 @@ define([
     },
 
     toggleEdit: function() {
+      var self = this;
       if (this.isEditing) {
         this.isEditing = false;
         this.$el.find('.trpChatText').html(this.model.get('text'));
@@ -135,7 +136,7 @@ define([
           this.isEditing = true;
           var isAtBottom = ChatCollectionView.$scrollOf.scrollTop() >= (ChatCollectionView.$container.height() - ChatCollectionView.$scrollOf.height());
           this.$el.find('.trpChatText').html("<textarea class='trpChatInput'>"+this.model.get('text')+"</textarea>");
-          this.$el.find('.trpChatText textarea').focus();
+          this.$el.find('.trpChatText textarea').focus().on('blur', function() { self.toggleEdit(); });
           if (isAtBottom) {
             ChatCollectionView.$scrollOf.scrollTop(ChatCollectionView.$container.height() - ChatCollectionView.$scrollOf.height());
           }
