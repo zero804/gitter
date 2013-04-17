@@ -44,7 +44,8 @@ define([
   }
 
   function eyeballsOn() {
-    updateLastUserInteraction();
+    lastUserInteraction = Date.now();
+    inactivity = false;
 
     if(!eyesOnState)  {
       log('eyeballsOn');
@@ -81,8 +82,15 @@ define([
   });
 
   var lastUserInteraction = Date.now();
+  var inactivity = false;
+
   function updateLastUserInteraction() {
     lastUserInteraction = Date.now();
+
+    if(inactivity) {
+      // Inactivity has ended.....
+      eyeballsOn();
+    }
   }
 
   $(document).on('keydown', updateLastUserInteraction);
@@ -98,6 +106,7 @@ define([
     inactivityTimer = window.setInterval(function() {
       if(Date.now() - lastUserInteraction > (INACTIVITY - INACTIVITY_POLL)) {
         log('inactivity');
+        inactivity = true;
         stopInactivityPoller();
         eyeballsOff();
       }

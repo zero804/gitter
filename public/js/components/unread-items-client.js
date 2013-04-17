@@ -588,6 +588,7 @@ define([
   };
 
   // Mainly useful for testing
+  unreadItemsClient._store = unreadItemStore;
   unreadItemsClient.DoubleHash = DoubleHash;
   unreadItemsClient.Tarpit = Tarpit;
   unreadItemsClient.UnreadItemStore = UnreadItemStore;
