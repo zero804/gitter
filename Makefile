@@ -62,8 +62,7 @@ prepare-for-end-to-end-testing:
 	unzip -o test/end-to-end/chromedriver/chromedriver_mac_26.0.1383.0.zip -d test/end-to-end/chromedriver/
 
 end-to-end-test:
-	nosetests -v --with-xunit --all-modules test/end-to-end/e2etests/
-	mv /var/lib/jenkins/jobs/troupe/workspace/*.xml output/test-reports/
+	nosetests -v --with-xunit --xunit-file=./output/test-reports --all-modules test/end-to-end/e2etests/
 
 docs: test-docs
 
