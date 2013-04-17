@@ -294,7 +294,6 @@ define([
 
   var TroupeUnreadItemRealtimeSync = function(unreadItemStore) {
     this._store = unreadItemStore;
-    this._subscribe();
   };
 
   _.extend(TroupeUnreadItemRealtimeSync.prototype, EventEmitter, {
@@ -533,7 +532,12 @@ define([
   new TroupeUnreadItemsViewportMonitor(unreadItemStore);
 
   var realtimeSync = new TroupeUnreadItemRealtimeSync(unreadItemStore);
-  new ReadItemRemover(realtimeSync);
+  var c = window.troupeContext;
+  if(c && c.troupe && c.user) {
+    realtimeSync._subscribe();
+    new ReadItemRemover(realtimeSync);
+  }
+
 
   var unreadItemsClient = {
 
