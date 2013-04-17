@@ -321,32 +321,34 @@ define([
 
   var TroupeCollectionRealtimeSync = function(troupeCollection) {
     this._collection = troupeCollection;
-    this._subscribe();
   };
 
   TroupeCollectionRealtimeSync.prototype = {
     _subscribe: function() {
        var self = this;
        realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
-        if(message.notification === 'troupe_unread') {
-          log("troupe_unread change", message);
-
-          var troupeId = message.troupeId;
-          var totalUnreadItems = message.totalUnreadItems;
-
-          var model = self._collection.get(troupeId);
-          if(!model) {
-            log("Cannot find model. Refresh might be required....");
-            return;
-          }
-
-          // TroupeCollectionSync keeps track of the values
-          // for this troupe, so ignore those values
-          if(troupeId !== window.troupeContext.troupe.id) {
-            model.set('unreadItems', totalUnreadItems);
-          }
-        }
+        if(message.notification !== 'troupe_unread') return;
+        self._handleIncomingMessage(message);
       });
+    },
+
+    _handleIncomingMessage: function(message) {
+      log("troupe_unread change", message);
+
+      var troupeId = message.troupeId;
+      var totalUnreadItems = message.totalUnreadItems;
+
+      if(troupeId === window.troupeContext.troupe.id) return;
+
+      var model = this._collection.get(troupeId);
+      if(!model) {
+        log("Cannot find model. Refresh might be required....");
+        return;
+      }
+
+      // TroupeCollectionSync keeps track of the values
+      // for this troupe, so ignore those values
+      model.set('unreadItems', totalUnreadItems);
     }
   };
 
@@ -371,6 +373,7 @@ define([
 
   // storing the previous counts here so we can return it to outside callers,
   // even though we don't always have a reference to TroupeNotifier internally.
+  // TODO: fix this enormous hack!
   var counts = {
     overall: null,
     normal: null,
@@ -396,6 +399,8 @@ define([
       if(newTroupeUnreadTotal !== counts.overall ||
          newPplTroupeUnreadTotal !== counts.oneToOne ||
          newNormalTroupeUnreadTotal !== counts.normal) {
+
+        // TODO: fix this enormous hack!
         counts.overall = newTroupeUnreadTotal;
         counts.oneToOne = newPplTroupeUnreadTotal;
         counts.normal = newNormalTroupeUnreadTotal;
@@ -538,7 +543,7 @@ define([
 
     installTroupeListener: function(troupeCollection) {
       new TroupeCollectionSync(troupeCollection, unreadItemStore);
-      new TroupeCollectionRealtimeSync(troupeCollection);
+      new TroupeCollectionRealtimeSync(troupeCollection)._subscribe();
       new TroupeUnreadNotifier(troupeCollection);
       new TroupeUnreadItemRealtimeSync(unreadItemStore);
     }
@@ -548,6 +553,10 @@ define([
   unreadItemsClient.DoubleHash = DoubleHash;
   unreadItemsClient.Tarpit = Tarpit;
   unreadItemsClient.UnreadItemStore = UnreadItemStore;
+  unreadItemsClient.TroupeCollectionSync = TroupeCollectionSync;
+  unreadItemsClient.TroupeCollectionRealtimeSync = TroupeCollectionRealtimeSync;
+  unreadItemsClient.TroupeUnreadNotifier = TroupeUnreadNotifier;
+
 
   return unreadItemsClient;
 });
