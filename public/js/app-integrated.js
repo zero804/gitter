@@ -434,6 +434,12 @@ require([
     });
     app.peopleRosterRegion.show(peopleCollectionView);
 
+    // Keep the unread items up to date on the model
+    unreadItemsClient.syncCollections({
+      'chat': chatCollection,
+      'request': requestCollection,
+      'file': fileCollection
+    });
 
     app.collections = {
       'chats': chatCollection,
