@@ -426,7 +426,6 @@ define([
 
     this._store = unreadItemStore;
     this._windowScrollLimited = limit(this._windowScroll, this, 150);
-    this._getBoundsLimited = limit(this._getBounds, this, 10);
     this._inFocus = true;
 
     this._scrollTop = 1000000000;
@@ -436,18 +435,18 @@ define([
 
     $(document).on('eyeballStateChange', this._eyeballStateChange);
 
-    this._$window.on('scroll', this._getBoundsLimited);
+    this._$window.on('scroll', this._getBounds);
 
     // this is not a live collection so this will not work inside an SPA
-    $('.mobile-scroll-class').on('scroll', this._getBoundsLimited);
+    $('.mobile-scroll-class').on('scroll', this._getBounds);
 
     // TODO: don't reference this frame directly!
-    $('#toolbar-frame').on('scroll', this._getBoundsLimited);
+    $('#toolbar-frame').on('scroll', this._getBounds);
 
-    $(document).on('unreadItemDisplayed', this._getBoundsLimited);
+    $(document).on('unreadItemDisplayed', this._getBounds);
 
     // When the UI changes, rescan
-    $(document).on('appNavigation', this._getBoundsLimited);
+    $(document).on('appNavigation', this._getBounds);
   };
 
   TroupeUnreadItemsViewportMonitor.prototype = {
@@ -507,7 +506,7 @@ define([
     _eyeballStateChange: function(e, newState) {
       this._inFocus = newState;
       if(newState) {
-        this._getBoundsLimited();
+        this._getBounds();
       }
     }
   };
