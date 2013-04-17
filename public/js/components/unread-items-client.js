@@ -22,7 +22,7 @@ define([
   }
 
   var ADD_TIMEOUT = 500;
-  var REMOVE_TIMEOUT = 15000;
+  var REMOVE_TIMEOUT = 600000;
 
   // -----------------------------------------------------
   // Stores value pairs
@@ -220,7 +220,7 @@ define([
 
   var ReadItemSender = function(unreadItemStore) {
     this._buffer = new DoubleHash();
-    this._sendLimited = limit(this._send, this, 5000);
+    this._sendLimited = limit(this._send, this, 1000);
 
     _.bindAll(this,'_onItemMarkedRead', '_onWindowUnload');
 
@@ -297,9 +297,10 @@ define([
     this._subscribe();
   };
 
-  TroupeUnreadItemRealtimeSync.prototype = {
+  _.extend(TroupeUnreadItemRealtimeSync.prototype, EventEmitter, {
     _subscribe: function() {
       var store = this._store;
+      var self = this;
 
       realtime.subscribe('/user/' + window.troupeContext.user.id + '/troupes/' + window.troupeContext.troupe.id, function(message) {
         if(message.notification === 'unread_items') {
@@ -308,11 +309,14 @@ define([
         } else if(message.notification === 'unread_items_removed') {
           var items = message.items;
           store._unreadItemsRemoved(items);
+          _iteratePreload(items, function(itemType, itemId) {
+            this.emit('unreadItemRemoved', itemType, itemId);
+          }, self);
         }
 
       });
     }
-  };
+  });
 
   // -----------------------------------------------------
   // Sync a troupe collection with unread counts (for other troupes)
@@ -422,7 +426,7 @@ define([
     _.bindAll(this, '_eyeballStateChange');
 
     this._store = unreadItemStore;
-    this._windowScrollLimited = limit(this._windowScroll, this, 90);
+    this._windowScrollLimited = limit(this._windowScroll, this, 50);
     this._inFocus = true;
 
     $(document).on('eyeballStateChange', this._eyeballStateChange);
@@ -461,11 +465,11 @@ define([
           var top = $e.offset().top;
 
           if (top >= scrollTop && top <= scrollBottom) {
-            setTimeout(function () {
-              $e.removeClass('unread');
-              $e.addClass('read');
+            self._store._markItemRead(itemType, itemId);
 
-              self._store._markItemRead(itemType, itemId);
+            $e.removeClass('unread').addClass('reading');
+            setTimeout(function() {
+              $e.removeClass('reading').addClass('read');
             }, 2000);
           }
         }
@@ -485,20 +489,23 @@ define([
   // Monitors the store and removes the css for items that
   // have been read
   // -----------------------------------------------------
-  var ReadItemRemover = function(store) {
-    store.on('unreadItemRemoved', this._onUnreadItemRemoved);
+  var ReadItemRemover = function(realtimeSync) {
+    realtimeSync.on('unreadItemRemoved', this._onUnreadItemRemoved);
   };
 
   ReadItemRemover.prototype = {
     _onUnreadItemRemoved: function(e, itemType, itemId) {
+      log('incomng unread item: ', itemType, itemId);
       $('.unread.model-id-' + itemId).removeClass('unread').addClass('read');
     }
   };
 
   var unreadItemStore = new UnreadItemStore();
   new ReadItemSender(unreadItemStore);
-  new ReadItemRemover(unreadItemStore);
   new TroupeUnreadItemsViewportMonitor(unreadItemStore);
+
+  var realtimeSync = new TroupeUnreadItemRealtimeSync(unreadItemStore);
+  new ReadItemRemover(realtimeSync);
 
   var unreadItemsClient = {
 
@@ -545,7 +552,6 @@ define([
       new TroupeCollectionSync(troupeCollection, unreadItemStore);
       new TroupeCollectionRealtimeSync(troupeCollection)._subscribe();
       new TroupeUnreadNotifier(troupeCollection);
-      new TroupeUnreadItemRealtimeSync(unreadItemStore);
     }
   };
 
