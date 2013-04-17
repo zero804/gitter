@@ -423,38 +423,66 @@ define([
   // -----------------------------------------------------
 
   var TroupeUnreadItemsViewportMonitor = function(unreadItemStore) {
-    _.bindAll(this, '_eyeballStateChange');
+    _.bindAll(this, '_eyeballStateChange', '_getBounds');
 
     this._store = unreadItemStore;
-    this._windowScrollLimited = limit(this._windowScroll, this, 50);
+    this._windowScrollLimited = limit(this._windowScroll, this, 150);
+    this._getBoundsLimited = limit(this._getBounds, this, 10);
     this._inFocus = true;
+
+    this._scrollTop = 1000000000;
+    this._scrollBottom = 0;
+
+    this._$window = $(window);
 
     $(document).on('eyeballStateChange', this._eyeballStateChange);
 
-    $(window).on('scroll', this._windowScrollLimited);
+    this._$window.on('scroll', this._getBoundsLimited);
 
     // this is not a live collection so this will not work inside an SPA
-    $('.mobile-scroll-class').on('scroll', this._windowScrollLimited);
+    $('.mobile-scroll-class').on('scroll', this._getBoundsLimited);
 
     // TODO: don't reference this frame directly!
-    $('#toolbar-frame').on('scroll', this._windowScrollLimited);
+    $('#toolbar-frame').on('scroll', this._getBoundsLimited);
 
-    $(document).on('unreadItemDisplayed', this._windowScrollLimited);
+    $(document).on('unreadItemDisplayed', this._getBoundsLimited);
 
     // When the UI changes, rescan
-    $(document).on('appNavigation', this._windowScrollLimited);
+    $(document).on('appNavigation', this._getBoundsLimited);
   };
 
   TroupeUnreadItemsViewportMonitor.prototype = {
+    _getBounds: function() {
+      if(!this._inFocus) {
+        return;
+      }
+
+      var scrollTop = this._$window.scrollTop();
+      var scrollBottom = scrollTop + this._$window.height();
+
+      if(scrollTop < this._scrollTop) {
+        this._scrollTop = scrollTop;
+      }
+
+      if(scrollBottom > this._scrollBottom) {
+        this._scrollBottom = scrollBottom;
+      }
+
+      this._windowScrollLimited();
+    },
+
     _windowScroll: function() {
       if(!this._inFocus) {
         return;
       }
 
-      var $window = $(window);
-      var scrollTop = $window.scrollTop();
-      var scrollBottom = scrollTop + $window.height();
       var self = this;
+
+      var topBound = this._scrollTop;
+      var bottomBound = this._scrollBottom;
+
+      this._scrollTop = 1000000000;
+      this._scrollBottom = 0;
 
       $('.unread').each(function (index, element) {
         var $e = $(element);
@@ -464,7 +492,7 @@ define([
         if(itemType && itemId) {
           var top = $e.offset().top;
 
-          if (top >= scrollTop && top <= scrollBottom) {
+          if (top >= topBound && top <= bottomBound) {
             self._store._markItemRead(itemType, itemId);
 
             $e.removeClass('unread').addClass('reading');
@@ -480,7 +508,7 @@ define([
     _eyeballStateChange: function(e, newState) {
       this._inFocus = newState;
       if(newState) {
-        this._windowScrollLimited();
+        this._getBoundsLimited();
       }
     }
   };
