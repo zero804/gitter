@@ -112,9 +112,8 @@ define([
         self.updateTitlebar();
       });
 
-      $(document).on('troupeUnreadTotalChange', function(event, values) {
-
-        self.updateTitlebar();
+      function onTroupeUnreadTotalChange(event, values) {
+        self.updateTitlebar(values);
 
         function updateBadge(selector, count) {
           var badge = self.$el.find(selector);
@@ -125,8 +124,10 @@ define([
             badge.hide();
           }
         }
+
         // overall count
         updateBadge('#unread-badge', values.overall);
+
         // normal troupe unread count
         if (values.normal)
           $('.trpLeftMenuToolbarItems').addClass('unread-normal');
@@ -138,20 +139,29 @@ define([
           $('.trpLeftMenuToolbarItems').addClass('unread-one2one');
         else
           $('.trpLeftMenuToolbarItems').removeClass('unread-one2one');
-      });
+      }
 
-      this.updateTitlebar();
+      $(document).on('troupeUnreadTotalChange', onTroupeUnreadTotalChange);
+      onTroupeUnreadTotalChange(null, unreadItemsClient.getCounts());
+
     },
 
-    updateTitlebar: function() {
-      $('title').html(this.getTitlebar());
+    updateTitlebar: function(values) {
+      $('title').html(this.getTitlebar(values));
     },
 
-    getTitlebar: function() {
-      var count = unreadItemsClient.getCounts().overall;
-      var uniCount = String.fromCharCode(0x2789 + count);
+    getTitlebar: function(counts) {
+      var mainTitle = window.troupeContext.troupe.name + " - Troupe";
+      var overall = counts.overall;
+      if(overall <= 0) {
+        return mainTitle;
+      }
 
-      return  ((count) ? uniCount + ' ' : '') + window.troupeContext.troupe.name + " - Troupe";
+      if(overall <= 10) {
+        return String.fromCharCode(0x2789 + overall) + ' ' + mainTitle;
+      }
+
+      return '[' + overall + '] ' + window.troupeContext.troupe.name + " - Troupe";
     },
 
     toggleRightPanel: function(id) {

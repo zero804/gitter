@@ -13,6 +13,11 @@ def baseUrl(url):
     return base + url
 
 
+def whichDriver():
+    driverName = os.getenv('DRIVER')
+    return driverName
+
+
 def secondDriver():
     driverName = os.getenv('DRIVER')
     if driverName == 'IE':

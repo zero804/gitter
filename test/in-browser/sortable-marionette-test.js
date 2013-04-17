@@ -17,10 +17,10 @@ require([
 
   describe("Sortable Marionette Collection View", function() {
 
-    var firstOfJan = moment("2013-1-1Z");
-    var secondOfJan = moment("2013-1-2Z");
-    var thirdOfJan = moment("2013-1-3Z");
-    var fourthOfJan = moment("2013-1-4Z");
+    var firstOfJan = moment("2013-01-01Z");
+    var secondOfJan = moment("2013-01-02Z");
+    var thirdOfJan = moment("2013-01-03Z");
+    var fourthOfJan = moment("2013-01-04Z");
 
     it("add the first view", function() {
       var thirdModel = collection.create({ sent: thirdOfJan, text: thirdOfJan });

@@ -154,8 +154,6 @@ define([
       if(existing) return existing;
 
       if(this.findModelForOptimisticMerge) {
-        log("Looking for a candidate for ", newModel);
-
         existing = this.findModelForOptimisticMerge(newModel);
       }
 
@@ -163,7 +161,6 @@ define([
     },
 
     onDataChange: function(data) {
-      log('DataChange', data);
       var operation = data.operation;
       var newModel = data.model;
       var id = newModel.id;

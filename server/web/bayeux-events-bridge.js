@@ -57,6 +57,7 @@ exports.install = function() {
       var title = data.title;
       var text = data.text;
       var link = data.link;
+      var troupeId = data.troupeId;
       var sound = data.sound;
 
       var url = "/user/" + userId;
@@ -65,6 +66,7 @@ exports.install = function() {
          title: title,
          text: text,
          link: link,
+         troupeId: troupeId,
          sound: sound
       };
       winston.verbose("Notification to " + url, message);

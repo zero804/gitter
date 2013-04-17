@@ -500,6 +500,7 @@ exports.startWorkers = function() {
 
         appEvents.userNotification({
           userId: notification.userId,
+          troupeId: notification.troupeId,
           title: message.title,
           text: message.text,
           link: message.link,

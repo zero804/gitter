@@ -78,10 +78,10 @@ require([
         conversationCollection.reset(data['conversations'], { parse: true });
         troupeCollection.reset(data['troupes'], { parse: true });
         userCollection.reset(data['users'], { parse: true });
+        unreadItemsClient.preload(data['unreadItems']);
       }
     });
   });
-
 
   function instantiateCollection(collection, name) {
     collection.listen();
@@ -304,6 +304,14 @@ require([
     var preloads = window.troupePreloads || {};
     window.troupePreloads = {};
 
+    if(window.troupePreloads && window.troupePreloads.unreadItems) {
+      unreadItemsClient.preload(window.troupePreloads.unreadItems);
+    } else {
+      $(document).one('preloadComplete', function() {
+        unreadItemsClient.preload(window.troupePreloads.unreadItems);
+      });
+    }
+
     var headerView = new (TroupeViews.Base.extend({
       template: headerViewTemplate,
       getRenderData: function() {
@@ -337,8 +345,6 @@ require([
       collection: requestCollection
     });
     app.requestRegion.show(requestView);
-
-
 
     // File Collections
     fileCollection = new fileModels.FileCollection();
@@ -428,6 +434,12 @@ require([
     });
     app.peopleRosterRegion.show(peopleCollectionView);
 
+    // Keep the unread items up to date on the model
+    unreadItemsClient.syncCollections({
+      'chat': chatCollection,
+      'request': requestCollection,
+      'file': fileCollection
+    });
 
     app.collections = {
       'chats': chatCollection,
