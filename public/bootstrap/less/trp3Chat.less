@@ -84,13 +84,46 @@
 	float: right;
 }
 
+// gray out the edit icon by default
+.trpChatEdit, .trpChatReads {
+  opacity: 0.2;
+}
+
+// hide the edit and read buttons by default
 .trpChatEdit, .trpChatReads {
   visibility: hidden;
 }
 
-:hover > .trpChatEdit, :hover > .trpChatReads {
+// don't show the edit button at all unless it is editable or has been edited
+.trpChatEdit {
+  display: none;
+}
+
+.canEdit .trpChatEdit, .hasBeenEdited .trpChatEdit {
+  display: inline-block;
+}
+
+// show the edit and read icons only when hovered over
+:hover > .trpChatEdit, :hover > .trpChatEdit, :hover > .trpChatReads {
   visibility: visible;
 }
+
+// if the viewer can edit the message, dont gray it out
+.canEdit .trpChatEdit {
+  opacity: 1;
+}
+
+// if the message has been edited always show the edit icon (not just on hover)
+.hasBeenEdited .trpChatEdit {
+  visibility: visible;
+}
+
+// hide the timeago when hovered
+/*
+:hover > .trpChatTime {
+  display: none;
+}
+*/
 
 .trpChatFrom {
 	display: inline-block;

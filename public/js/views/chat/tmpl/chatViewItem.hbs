@@ -4,8 +4,8 @@
     <div class="trpChatDetails">
       <div class="trpChatFrom">{{{displayName}}}</div>
       <div class="trpChatTime">{{widget "timeago" time=sent}}</div>
-      <span class="trpChatEdit"><img src="/images/2/edit16x16.png" alt="Edit"/></span>
-      <!-- <span class="trpChatReads"><img src="/images/2/eye16x16.png" alt="Read receipts"/></span> -->
+      <span class="trpChatEdit"><img src="/images/2/edit16x16.png" title="{{editIconTooltip}}"/></span>
+      <span class="trpChatReads"><img src="/images/2/eye16x16.png" title="In future you'll be able to see who has read your message"/></span>
     </div>
     <div class="trpChatText">{{linkify text}}</div>
   </div>

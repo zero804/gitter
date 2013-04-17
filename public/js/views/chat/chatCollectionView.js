@@ -7,7 +7,8 @@ define([
   'marionette',
   'views/base',
   './scrollDelegate',
-  'hbs!./tmpl/chatViewItem'
+  'hbs!./tmpl/chatViewItem',
+  'bootstrap_tooltip'
 ], function($, _, log, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate) {
   "use strict";
 
@@ -23,6 +24,35 @@ define([
       'keydown .trpChatInputBoxTextArea': 'detectReturn'
     },
 
+    initialize: function() {
+      var self = this;
+
+      this.setRerenderOnChange(true);
+
+      if (this.isInEditablePeriod()) {
+        // re-render once the message is not editable
+        var notEditableInMS = (this.model.get('sent').valueOf() + 240000) - Date.now();
+        setTimeout(function() {
+          self.render();
+        }, notEditableInMS + 50);
+      }
+
+      // dblclick / doubletap don't seem to work on mobile even with user-scalable=no
+      /*
+      if (window._troupeCompactView) {
+        this.$el.on('dblclick', function() {
+          self.toggleEdit();
+        });
+      }*/
+    },
+    /*
+    stopListening: function() {
+      if (!arguments.length)
+        this.$el.off('dblclick');
+      else
+        TroupeViews.Base.prototype.stopListening.apply(this, arguments);
+    },
+    */
     safe: function(text) {
       return (''+text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/\n\r?/g, '<br />');
     },
@@ -30,15 +60,20 @@ define([
     getRenderData: function() {
       var data = this.model.toJSON();
 
+      data.isViewers = this.isOwnMessage();
+      data.isInEditablePeriod = this.isInEditablePeriod();
+      data.canEdit = this.canEdit();
+      data.hasBeenEdited = this.hasBeenEdited();
+
+      data.editIconTooltip = (this.hasBeenEdited()) ? "Edited shortly after being sent": ((this.canEdit()) ? "Edit within 4 minutes of sending" : "It's too late to edit this message.");
+
       // We need to parse the text a little to hyperlink known links and escape html to prevent injection
       data.text = this.safe(data.text);
-
-      var current = data.fromUser.id == window.troupeContext.user.id;
 
       data.displayName = data.fromUser.displayName;
 
       /* TODO: css selectors should be able to handle this from a single class on a parent div */
-      if(current) {
+      if(data.isViewers) {
         data.chatRowClass = 'trpChatRow';
         data.chatRowPictureClass = 'trpChatPictureLocal';
         data.chatBubbleAdditional = 'local';
@@ -49,6 +84,14 @@ define([
       }
 
       return data;
+    },
+
+    afterRender: function() {
+      this.$el.toggleClass('isViewers', this.isOwnMessage());
+      this.$el.toggleClass('isEditable', this.isInEditablePeriod());
+      this.$el.toggleClass('canEdit', this.canEdit());
+      this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
+      //this.$el.tooltip();
     },
 
     detectReturn: function(e) {
@@ -79,6 +122,10 @@ define([
       return this.isOwnMessage() && this.isInEditablePeriod();
     },
 
+    hasBeenEdited: function() {
+      return !!this.model.get('editedAt');
+    },
+
     toggleEdit: function() {
       if (this.isEditing) {
         this.isEditing = false;
@@ -88,9 +135,9 @@ define([
           this.isEditing = true;
           this.$el.find('.trpChatText').html("<textarea class='trpChatInputBoxTextArea'>"+this.model.get('text')+"</textarea>");
         } else if (!this.isOwnMessage()) {
-          window.alert("You cannot edit a messages that wasn't sent by you.");
+          // window.alert("You cannot edit a messages that wasn't sent by you.");
         } else if (!this.isInEditablePeriod()) {
-          window.alert("You cannot edit a message that is older than 5 minutes.");
+          // window.alert("You cannot edit a message that is older than 5 minutes.");
         }
 
       }
