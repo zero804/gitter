@@ -89,7 +89,7 @@ def driver():
 
 
 def existingUserlogin(driver, usernameValue, passwordValue):
-    print('Navigating to ' + baseUrl("x"))
+    print('Navigating to ' + baseUrl("/x"))
     driver.get(baseUrl("/x"))
 
     time.sleep(0.5)
