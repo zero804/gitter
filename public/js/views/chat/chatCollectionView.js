@@ -21,7 +21,7 @@ define([
 
     events: {
       'click .trpChatEdit': 'toggleEdit',
-      'keydown .trpChatInputBoxTextArea': 'detectReturn'
+      'keydown .trpChatInput': 'detectReturn'
     },
 
     initialize: function() {
@@ -101,7 +101,7 @@ define([
     },
 
     saveChat: function() {
-      var newText = this.$el.find('.trpChatInputBoxTextArea').val();
+      var newText = this.$el.find('.trpChatInput').val();
       if (this.canEdit() && newText != this.model.get('text')) {
         this.model.set('text', newText);
         this.model.save();
@@ -133,7 +133,7 @@ define([
       } else {
         if (this.canEdit()) {
           this.isEditing = true;
-          this.$el.find('.trpChatText').html("<textarea class='trpChatInputBoxTextArea'>"+this.model.get('text')+"</textarea>");
+          this.$el.find('.trpChatText').html("<textarea class='trpChatInput'>"+this.model.get('text')+"</textarea>");
         } else if (!this.isOwnMessage()) {
           // window.alert("You cannot edit a messages that wasn't sent by you.");
         } else if (!this.isInEditablePeriod()) {
@@ -233,7 +233,6 @@ define([
       this.collection.once('sync', function() {
         this._testLoading = false;
         self.infiniteScrollDelegate.afterLoadNextMessages();
-        console.log('LOAD IS COMPLETE');
       });
       this.collection.fetch({
         update: true,
