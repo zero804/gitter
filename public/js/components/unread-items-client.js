@@ -588,6 +588,16 @@ define([
       new TroupeCollectionSync(troupeCollection, unreadItemStore);
       new TroupeCollectionRealtimeSync(troupeCollection)._subscribe();
       new TroupeUnreadNotifier(troupeCollection);
+    },
+
+    syncCollections: function(collections) {
+      unreadItemStore.on('itemMarkedRead', function(e, itemType, itemId) {
+        var collection = collections[itemType];
+        if(!collection) return;
+
+        var item = collection.get(itemId);
+        if(item) item.set('unread', false, { silent: true });
+      });
     }
   };
 
