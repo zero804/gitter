@@ -79,7 +79,7 @@ def driver():
     driver.delete_all_cookies()
     driver.implicitly_wait(30)
 
-    driver.get(baseUrl("signout"))
+    driver.get(baseUrl("/signout"))
 
     driver.find_element_by_css_selector('DIV.trpHomeHeroStripContainer')
 
@@ -89,8 +89,8 @@ def driver():
 
 
 def existingUserlogin(driver, usernameValue, passwordValue):
-    print('Navigating to ' + baseUrl("x"))
-    driver.get(baseUrl("x"))
+    print('Navigating to ' + baseUrl("/x"))
+    driver.get(baseUrl("/x"))
 
     time.sleep(0.5)
 
