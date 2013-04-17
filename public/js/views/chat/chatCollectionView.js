@@ -133,8 +133,12 @@ define([
       } else {
         if (this.canEdit()) {
           this.isEditing = true;
+          var isAtBottom = ChatCollectionView.$scrollOf.scrollTop() >= (ChatCollectionView.$container.height() - ChatCollectionView.$scrollOf.height());
           this.$el.find('.trpChatText').html("<textarea class='trpChatInput'>"+this.model.get('text')+"</textarea>");
           this.$el.find('.trpChatText textarea').focus();
+          if (isAtBottom) {
+            ChatCollectionView.$scrollOf.scrollTop(ChatCollectionView.$container.height() - ChatCollectionView.$scrollOf.height());
+          }
         } else if (!this.isOwnMessage()) {
           // window.alert("You cannot edit a messages that wasn't sent by you.");
         } else if (!this.isInEditablePeriod()) {
@@ -158,16 +162,16 @@ define([
       this.initializeSorting();
 
       if (window._troupeCompactView) {
-        this.$scrollOf = $('#chat-wrapper');
-        this.$container = $('#chat-frame');
+        ChatCollectionView.$scrollOf = $('#chat-wrapper');
+        ChatCollectionView.$container = $('#chat-frame');
       } else {
-        this.$scrollOf = $(window);
-        this.$container = $(document);
+        ChatCollectionView.$scrollOf = $(window);
+        ChatCollectionView.$container = $(document);
       }
 
-      this.scrollDelegate = new scrollDelegates.DefaultScrollDelegate(this.$scrollOf, this.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
-      this.infiniteScrollDelegate = new scrollDelegates.InfiniteScrollDelegate(this.$scrollOf, this.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
-      this.$scrollOf.on('scroll', this.chatWindowScroll);
+      this.scrollDelegate = new scrollDelegates.DefaultScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
+      this.infiniteScrollDelegate = new scrollDelegates.InfiniteScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
+      ChatCollectionView.$scrollOf.on('scroll', this.chatWindowScroll);
 
       function findTopMostVisibleUnreadItem(itemType) {
         return unreadItemsClient.findTopMostVisibleUnreadItemPosition(itemType);
@@ -180,7 +184,7 @@ define([
     },
 
     beforeClose: function() {
-      this.$scrollOf.off('scroll', this.chatWindowScroll);
+      ChatCollectionView.$scrollOf.off('scroll', this.chatWindowScroll);
     },
 
     onRender: function() {
@@ -206,7 +210,7 @@ define([
     },
 
     chatWindowScroll: function() {
-      if (this.hasScrolled && this.$scrollOf.scrollTop() === 0) {
+      if (this.hasScrolled && ChatCollectionView.$scrollOf.scrollTop() === 0) {
         this.loadNextMessages();
       }
       this.hasScrolled = true;
@@ -222,7 +226,7 @@ define([
       function success(data, resp) {
         self.loading = false;
         if(!resp.length) {
-          $(self.scrollOf).off('scroll', self.chatWindowScroll);
+          $(ChatCollectionView.$scrollOf).off('scroll', self.chatWindowScroll);
         }
       }
 
