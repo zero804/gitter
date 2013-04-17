@@ -134,6 +134,7 @@ define([
         if (this.canEdit()) {
           this.isEditing = true;
           this.$el.find('.trpChatText').html("<textarea class='trpChatInput'>"+this.model.get('text')+"</textarea>");
+          this.$el.find('.trpChatText textarea').focus();
         } else if (!this.isOwnMessage()) {
           // window.alert("You cannot edit a messages that wasn't sent by you.");
         } else if (!this.isInEditablePeriod()) {
