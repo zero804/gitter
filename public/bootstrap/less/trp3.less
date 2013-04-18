@@ -252,6 +252,37 @@ a:hover {
 	overflow: hidden;
 }
 
+.trpHeaderFrame {
+	display: inline-block;
+	position: relative;
+}
+
+.trpHeaderFavourite {
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+	padding: 5px;
+}
+
+.trpHeaderFavourite img {
+	padding-top: 7px;
+}
+
+.trpHeaderFavIcon {
+	opacity: 0.5;
+	transition: opacity .5s ease-in-out;
+   -moz-transition: opacity 5s ease-in-out;
+   -webkit-transition: opacity .5s ease-in-out;
+}
+
+.trpHeaderFavIcon:hover {
+	opacity: 1;
+}
+
+.trpHeaderSpacer {
+	.trpHeaderFavourite;
+}
+
 .trpHeaderTitle {
   display: inline-block;
 	.trpH1;
