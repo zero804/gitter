@@ -23,7 +23,7 @@ module.exports = {
     app.resource('api/v1/eyeballs', require('./eyeballs.js'));
 
     app.all('/api/v1/ping', auth);
-    app.resource('api/v1/ping', require('./ping.js'));
+    app.get('/api/v1/ping', require('./ping.js'));
 
   }
 };
