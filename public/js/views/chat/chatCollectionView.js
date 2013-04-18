@@ -88,9 +88,11 @@ define([
 
     afterRender: function() {
       this.$el.toggleClass('isViewers', this.isOwnMessage());
-      this.$el.toggleClass('isEditable', this.isInEditablePeriod());
+      if (this.isOwnMessage()) this.$el.toggleClass('isEditable', this.isInEditablePeriod());
       this.$el.toggleClass('canEdit', this.canEdit());
       this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
+      if (!this.isOwnMessage() && !this.hasBeenEdited()) this.$el.toggleClass('noEdit');
+
       //this.$el.tooltip();
     },
 
