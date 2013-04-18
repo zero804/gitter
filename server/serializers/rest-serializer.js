@@ -439,6 +439,24 @@ function LastTroupeAccessTimesForUserStrategy(options) {
   };
 }
 
+function FavouriteTroupesForUserStrategy(options) {
+  var self = this;
+  var userId = options.userId;
+
+  this.preload = function(data, callback) {
+    troupeService.findFavouriteTroupesForUser(userId, function(err, favs) {
+      if(err) return callback(err);
+      self.favs = favs;
+      callback();
+    });
+  };
+
+  this.map = function(id) {
+    return self.favs[id] ? true : undefined;
+  };
+}
+
+
 
 function ChatStrategy(options)  {
   if(!options) options = {};
@@ -613,6 +631,8 @@ function TroupeStrategy(options) {
 
   var unreadItemStategy = options.currentUserId ? new AllUnreadItemCountStategy({ userId: options.currentUserId }) : null;
   var lastAccessTimeStategy = options.currentUserId ? new LastTroupeAccessTimesForUserStrategy({ userId: options.currentUserId }) : null;
+  var favouriteStrategy = options.currentUserId ? new FavouriteTroupesForUserStrategy({ userId: options.currentUserId }) : null;
+
   var userIdStategy = options.mapUsers || currentUserId ? new UserIdStrategy() : null;
   this.preload = function(items, callback) {
 
@@ -624,6 +644,13 @@ function TroupeStrategy(options) {
       strategies.push({
         strategy: unreadItemStategy,
         data: troupeIds
+      });
+    }
+
+    if(favouriteStrategy) {
+      strategies.push({
+        strategy: favouriteStrategy,
+        data: null
       });
     }
 
@@ -701,6 +728,7 @@ function TroupeStrategy(options) {
       user: otherUser,
       unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined,
       lastAccessTime: lastAccessTimeStategy ? lastAccessTimeStategy.map(item.id) : undefined,
+      favourite: favouriteStrategy ? favouriteStrategy.map(item.id) : undefined,
       url: troupeUrl,
       v: getVersion(item)
     };
