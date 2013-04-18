@@ -8,6 +8,7 @@ var ObjectID = require('mongodb').ObjectID;
 var assert = require('assert');
 var batcher = new RedisBatcher('readby', 0);
 var winston = require('winston');
+var appEvents = require("../app-events");
 
 function asObjectId(stringId) {
   return new ObjectID(stringId);
@@ -24,14 +25,25 @@ batcher.listen(function(key, userIdStrings, done) {
 
   var userIds = new Array(userIdStrings.map(asObjectId));
 
-  persistence.ChatMessage.update(
+  persistence.ChatMessage.findOneAndUpdate(
     { _id: chatId, toTroupeId: troupeId },
     { $addToSet:  { 'readBy': { $each: userIds } } },
-    function(err, numAffected) {
+    { select: { readBy: 1, _tv: 1 } },
+    function(err, chat) {
       if(err) return done(err);
 
-      if(numAffected !== 1) {
-        winston.info('Weird. Rows affected = ' + numAffected);
+      if(!chat) {
+        winston.info('Weird. No chat message found');
+      } else {
+        var url = "/troupes/" + troupeId + "/chatMessages";
+        debugger;
+        appEvents.dataChange2(url, 'patch', {
+          id: "" + chatId,
+          readBy: chat.readBy.length,
+          v: chat._tv ? 0 + chat._tv : undefined
+        });
+
+
       }
 
       done();
@@ -47,7 +59,6 @@ exports.recordItemsAsRead = function(userId, troupeId, items, callback) {
 
   var itemIds = items.chat;
   itemIds.forEach(function(id) {
-    console.log('spooling ' + id);
     batcher.add('chat:' + troupeId + ':' + id, userId, fiber.waitor());
   });
 
