@@ -487,5 +487,5 @@ module.exports = {
   createUniqueUri: createUniqueUri,
 
   updateFavourite: updateFavourite,
-  findFavouriteTroupesForUser: findFavouriteTroupesForUser,
+  findFavouriteTroupesForUser: findFavouriteTroupesForUser
 };
