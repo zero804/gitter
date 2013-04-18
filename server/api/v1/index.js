@@ -22,5 +22,8 @@ module.exports = {
     app.all('/api/v1/eyeballs', auth);
     app.resource('api/v1/eyeballs', require('./eyeballs.js'));
 
+    app.all('/api/v1/ping', auth);
+    app.resource('api/v1/ping', require('./ping.js'));
+
   }
 };

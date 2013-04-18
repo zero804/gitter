@@ -9,6 +9,7 @@ define([
   var eyesOnState = true;
   var INACTIVITY = 60 * 1000;
   var INACTIVITY_POLL = 10 * 1000;
+  var PING_POLL = 10 * 60 * 1000;
 
   function send(value) {
     if(!realtime._clientId) {
@@ -119,6 +120,18 @@ define([
     inactivityTimer = null;
   }
 
+  window.setInterval(function() {
+    $.ajax({
+      url: '/api/v1/ping',
+      global: false,
+      type: "GET",
+      success: function(/*data*/) {
+      },
+      error: function() {
+        log('An error occurred while communicating eyeballs');
+      }
+    });
+  }, PING_POLL);
 
 
 });

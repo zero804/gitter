@@ -119,6 +119,23 @@ var UserLocationHistorySchema = new Schema({
 UserLocationHistorySchema.index({ userId: 1 });
 UserLocationHistorySchema.schemaTypeName = 'UserLocationHistorySchema';
 
+
+var UserTroupeLastAccessSchema = new Schema({
+  userId: ObjectId,
+  troupes: Schema.Types.Mixed
+});
+UserLocationHistorySchema.index({ userId: 1 });
+UserLocationHistorySchema.schemaTypeName = 'UserLocationHistorySchema';
+
+
+var UserTroupeFavouritesSchema = new Schema({
+  userId: { type: ObjectId },
+  favs: Schema.Types.Mixed
+});
+UserTroupeFavouritesSchema.index({ userId: 1 });
+UserTroupeFavouritesSchema.schemaTypeName = 'UserTroupeFavourites';
+
+
 //
 // User in a Troupe
 //
@@ -203,6 +220,9 @@ TroupeSchema.methods.removeUserById = function(userId) {
   }
 };
 
+
+
+
 //
 // An invitation to a person to join a Troupe
 //
@@ -235,6 +255,7 @@ var ChatMessageSchema = new Schema({
   toTroupeId: ObjectId,  //TODO: rename to troupeId
   text: String,
   sent: { type: Date, "default": Date.now },
+  editedAt: { type: Date, "default": null },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 ChatMessageSchema.index({ toTroupeId: 1, sent: -1 });
@@ -395,6 +416,8 @@ PushNotificationDeviceSchema.schemaTypeName = 'PushNotificationDeviceSchema';
 
 var User = mongoose.model('User', UserSchema);
 var UserLocationHistory = mongoose.model('UserLocationHistory', UserLocationHistorySchema);
+var UserTroupeLastAccess = mongoose.model('UserTroupeLastAccess', UserTroupeLastAccessSchema);
+var UserTroupeFavourites = mongoose.model('UserTroupeFavourites', UserTroupeFavouritesSchema);
 
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var TroupeUser = mongoose.model('TroupeUser', TroupeUserSchema);
@@ -420,6 +443,8 @@ module.exports = {
   schemas: {
     UserSchema: UserSchema,
     UserLocationHistorySchema: UserLocationHistorySchema,
+    UserTroupeLastAccessSchema: UserTroupeLastAccessSchema,
+    UserTroupeFavouritesSchema: UserTroupeFavouritesSchema,
     TroupeSchema: TroupeSchema,
     TroupeUserSchema: TroupeUserSchema,
     EmailSchema: EmailSchema,
@@ -437,6 +462,8 @@ module.exports = {
     PushNotificationDeviceSchema: PushNotificationDeviceSchema
   },
   User: User,
+  UserTroupeLastAccess: UserTroupeLastAccess,
+  UserTroupeFavourites: UserTroupeFavourites,
   Troupe: Troupe,
   TroupeUser: TroupeUser,
 	Email: Email,

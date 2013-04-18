@@ -178,5 +178,48 @@ describe('troupe-service', function() {
     });
   });
 
+  describe('#updateFavourite()', function() {
+    it('should add a troupe to favourites',function(done) {
+
+      var troupeService = testRequire('./services/troupe-service');
+
+
+      persistence.Troupe.findOne({ uri: 'testtroupe1' }, function(err, troupe) {
+        if(err) return done(err);
+        if(!troupe) return done("Cannot find troupe");
+
+        persistence.User.findOne({ email: 'testuser@troupetest.local' }, function(err, user) {
+          if(err) return done(err);
+          if(!user) return done("Cannot find user");
+
+          function fav(val, callback) {
+            troupeService.updateFavourite(user.id, troupe.id, val, function(err) {
+              if(err) return done(err);
+
+              troupeService.findFavouriteTroupesForUser(user.id, function(err, favs) {
+                if(err) return done(err);
+
+                var isInTroupe = !!favs[troupe.id];
+                assert(isInTroupe === val, 'Troupe should ' + (val? '': 'not ') + 'be a favourite');
+                callback();
+              });
+            });
+          }
+
+          fav(true, function() {
+            fav(true, function() {
+              fav(false, function() {
+                fav(false, function() {
+                  done();
+                });
+              });
+            });
+          });
+
+        });
+      });
+
+    });
+  });
 
 });
