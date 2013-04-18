@@ -146,6 +146,7 @@ define([
       if(this._contains(itemType, itemId)) return;
 
       this._addTarpit._add(itemType, itemId);
+      this._recountLimited();
     },
 
     _unreadItemRemoved: function(itemType, itemId) {
@@ -156,6 +157,7 @@ define([
       this._remove(itemType, itemId);
 
       this.emit('unreadItemRemoved', itemType, itemId);
+      this._recountLimited();
     },
 
     _markItemRead: function(itemType, itemId) {
@@ -178,9 +180,13 @@ define([
     },
 
     _recount: function() {
+      log('TroupeUnreadItemRealtimeSync:_recount');
+
       var newValue = this._count();
       if(newValue !== this._currentCountValue) {
         this._currentCountValue = newValue;
+        log('TroupeUnreadItemRealtimeSync:newcountvalue', newValue);
+
         this.emit('newcountvalue', newValue);
       }
     },
@@ -275,11 +281,16 @@ define([
     this._store = unreadItemStore;
     _.bindAll(this, '_onNewCountValue');
     this._store.on('newcountvalue', this._onNewCountValue);
+
+    // Set the initial value
+    this._onNewCountValue(null, this._store._currentCount());
   };
 
   TroupeCollectionSync.prototype = {
     _onNewCountValue: function(event, newValue) {
       if(!window.troupeContext || !window.troupeContext.troupe) return;
+
+      log('TroupeUnreadItemRealtimeSync:_onNewCountValue');
 
       var troupe = this._collection.get(window.troupeContext.troupe.id);
       if(troupe) {
@@ -306,8 +317,11 @@ define([
           store._unreadItemsAdded(message.items);
 
         } else if(message.notification === 'unread_items_removed') {
+         log('TroupeUnreadItemRealtimeSync:unreadItemsRemoved');
+
           var items = message.items;
           store._unreadItemsRemoved(items);
+
           _iteratePreload(items, function(itemType, itemId) {
             this.emit('unreadItemRemoved', itemType, itemId);
           }, self);
@@ -336,8 +350,6 @@ define([
     },
 
     _handleIncomingMessage: function(message) {
-      log("troupe_unread change", message);
-
       var troupeId = message.troupeId;
       var totalUnreadItems = message.totalUnreadItems;
 
@@ -387,6 +399,7 @@ define([
   TroupeUnreadNotifier.prototype = {
 
     _recount: function() {
+      log('TroupeUnreadNotifier:recount');
 
       function count(memo, troupe) {
         var c = troupe.get('unreadItems');
@@ -399,9 +412,9 @@ define([
       var newPplTroupeUnreadTotal = c.filter(function(trp) { return trp.get('oneToOne'); }).reduce(count, 0);
       var newNormalTroupeUnreadTotal = c.filter(function(trp) { return !trp.get('oneToOne'); }).reduce(count, 0);
 
-      if(newTroupeUnreadTotal !== counts.overall ||
-         newPplTroupeUnreadTotal !== counts.oneToOne ||
-         newNormalTroupeUnreadTotal !== counts.normal) {
+      //if(newTroupeUnreadTotal !== counts.overall ||
+      //   newPplTroupeUnreadTotal !== counts.oneToOne ||
+      //   newNormalTroupeUnreadTotal !== counts.normal) {
 
         // TODO: fix this enormous hack!
         counts.overall = newTroupeUnreadTotal;
@@ -410,7 +423,7 @@ define([
         counts.current = unreadItemStore._currentCount();
 
         $(document).trigger('troupeUnreadTotalChange', counts);
-      }
+      //}
     }
 
   };
@@ -521,7 +534,6 @@ define([
 
   ReadItemRemover.prototype = {
     _onUnreadItemRemoved: function(e, itemType, itemId) {
-      log('incomng unread item: ', itemType, itemId);
       $('.unread.model-id-' + itemId).removeClass('unread').addClass('read');
     }
   };
@@ -539,6 +551,9 @@ define([
 
 
   var unreadItemsClient = {
+    preload: function(items) {
+      unreadItemStore.preload(items);
+    },
 
     getCounts: function() {
       return {
@@ -583,6 +598,16 @@ define([
       new TroupeCollectionSync(troupeCollection, unreadItemStore);
       new TroupeCollectionRealtimeSync(troupeCollection)._subscribe();
       new TroupeUnreadNotifier(troupeCollection);
+    },
+
+    syncCollections: function(collections) {
+      unreadItemStore.on('itemMarkedRead', function(e, itemType, itemId) {
+        var collection = collections[itemType];
+        if(!collection) return;
+
+        var item = collection.get(itemId);
+        if(item) item.set('unread', false, { silent: true });
+      });
     }
   };
 

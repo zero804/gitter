@@ -6,6 +6,8 @@ var persistence = require("./persistence-service"),
     statsService = require("./stats-service");
 var ObjectID = require('mongodb').ObjectID;
 
+var MAX_CHAT_EDIT_AGE_SECONDS = 300;
+
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   if(!troupe) return callback("Invalid troupe");
 
@@ -23,6 +25,34 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
       fromUserId: user.id,
       toTroupeId: troupe.id
     });
+
+    return callback(null, chatMessage);
+  });
+};
+
+exports.updateChatMessage = function(troupe, chatMessage, user, newText, callback) {
+  var age = (Date.now() - chatMessage.sent.valueOf()) / 1000;
+  if(age > MAX_CHAT_EDIT_AGE_SECONDS) {
+    return callback("You can no longer edit this message");
+  }
+
+  if(chatMessage.toTroupeId != troupe.id) {
+    return callback("Permission to edit this chat message is denied.");
+  }
+
+  if(chatMessage.fromUserId != user.id) {
+    return callback("Permission to edit this chat message is denied.");
+  }
+
+  // If the user has been kicked out of the troupe...
+  if(!troupeService.userHasAccessToTroupe(user, troupe)) {
+    return callback("Permission to edit this chat message is denied.");
+  }
+
+  chatMessage.text = newText;
+  chatMessage.editedAt = new Date();
+  chatMessage.save(function(err) {
+    if(err) return callback(err);
 
     return callback(null, chatMessage);
   });
@@ -53,6 +83,4 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
     .limit(options.limit)
     .skip(options.skip)
     .exec(callback);
-
-  console.log(q);
 };
