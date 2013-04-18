@@ -422,6 +422,23 @@ function AllUnreadItemCountStategy(options) {
   };
 }
 
+function LastTroupeAccessTimesForUserStrategy(options) {
+  var self = this;
+  var userId = options.userId;
+
+  this.preload = function(data, callback) {
+    userService.getTroupeLastAccessTimesForUser(userId, function(err, times) {
+      if(err) return callback(err);
+      self.times = times;
+      callback();
+    });
+  };
+
+  this.map = function(id) {
+    return self.times[id] ? self.times[id] : undefined;
+  };
+}
+
 
 function ChatStrategy(options)  {
   if(!options) options = {};
@@ -594,6 +611,7 @@ function TroupeStrategy(options) {
   var currentUserId = options.currentUserId;
 
   var unreadItemStategy = options.currentUserId ? new AllUnreadItemCountStategy({ userId: options.currentUserId }) : null;
+  var lastAccessTimeStategy = options.currentUserId ? new LastTroupeAccessTimesForUserStrategy({ userId: options.currentUserId }) : null;
   var userIdStategy = options.mapUsers || currentUserId ? new UserIdStrategy() : null;
   this.preload = function(items, callback) {
 
@@ -605,6 +623,13 @@ function TroupeStrategy(options) {
       strategies.push({
         strategy: unreadItemStategy,
         data: troupeIds
+      });
+    }
+
+    if(lastAccessTimeStategy) {
+      strategies.push({
+        strategy: lastAccessTimeStategy,
+        data: null
       });
     }
 
@@ -674,6 +699,7 @@ function TroupeStrategy(options) {
       users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
       user: otherUser,
       unreadItems: unreadItemStategy ? unreadItemStategy.map(item.id) : undefined,
+      lastAccessTime: lastAccessTimeStategy ? lastAccessTimeStategy.map(item.id) : undefined,
       url: troupeUrl,
       v: getVersion(item)
     };

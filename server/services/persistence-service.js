@@ -119,6 +119,15 @@ var UserLocationHistorySchema = new Schema({
 UserLocationHistorySchema.index({ userId: 1 });
 UserLocationHistorySchema.schemaTypeName = 'UserLocationHistorySchema';
 
+
+var UserTroupeLastAccessSchema = new Schema({
+  userId: ObjectId,
+  troupes: Schema.Types.Mixed
+});
+UserLocationHistorySchema.index({ userId: 1 });
+UserLocationHistorySchema.schemaTypeName = 'UserLocationHistorySchema';
+
+
 //
 // User in a Troupe
 //
@@ -395,7 +404,7 @@ PushNotificationDeviceSchema.schemaTypeName = 'PushNotificationDeviceSchema';
 
 var User = mongoose.model('User', UserSchema);
 var UserLocationHistory = mongoose.model('UserLocationHistory', UserLocationHistorySchema);
-
+var UserTroupeLastAccess = mongoose.model('UserTroupeLastAccess', UserTroupeLastAccessSchema);
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var TroupeUser = mongoose.model('TroupeUser', TroupeUserSchema);
 var Email = mongoose.model('Email', EmailSchema);
@@ -420,6 +429,7 @@ module.exports = {
   schemas: {
     UserSchema: UserSchema,
     UserLocationHistorySchema: UserLocationHistorySchema,
+    UserTroupeLastAccessSchema: UserTroupeLastAccessSchema,
     TroupeSchema: TroupeSchema,
     TroupeUserSchema: TroupeUserSchema,
     EmailSchema: EmailSchema,
@@ -437,6 +447,7 @@ module.exports = {
     PushNotificationDeviceSchema: PushNotificationDeviceSchema
   },
   User: User,
+  UserTroupeLastAccess: UserTroupeLastAccess,
   Troupe: Troupe,
   TroupeUser: TroupeUser,
 	Email: Email,
