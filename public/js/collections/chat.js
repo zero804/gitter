@@ -14,7 +14,9 @@ define([
   exports.ChatModel = TroupeCollections.Model.extend({
     idAttribute: "id",
     parse: function(message) {
-      message.sent = moment(message.sent, moment.defaultFormat);
+      if(message.sent) {
+        message.sent = moment(message.sent, moment.defaultFormat);
+      }
 
       if(message.editedAt) {
         message.editedAt = moment(message.editedAt, moment.defaultFormat);
