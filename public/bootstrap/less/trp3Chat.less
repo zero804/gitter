@@ -45,7 +45,7 @@
 	width: 380px;
 	border-radius: 5px 5px 5px 5px;
   .trpBodyText;
-	padding: 8px 12px;
+	padding: 7px 12px;
 	line-height: 150%;
 	margin-left: 12px;
 	color: #333;
@@ -93,6 +93,7 @@
 // gray out the edit icon by default
 .trpChatEdit, .trpChatReads {
   opacity: 0.2;
+  padding: 2px 4px 0 0;
 }
 
 // hide the edit and read buttons by default
@@ -100,23 +101,31 @@
   visibility: hidden;
 }
 
-// don't show the edit button at all unless it is editable or has been edited
+/*// don't show the edit button at all unless it is editable or has been edited
 .trpChatEdit {
   display: none;
-}
+}*/
 
 .canEdit .trpChatEdit, .hasBeenEdited .trpChatEdit {
   display: inline-block;
 }
 
 // show the edit and read icons only when hovered over
-:hover > .trpChatEdit, :hover > .trpChatEdit, :hover > .trpChatReads {
+.trpChatBox:hover > .trpChatDetails > .trpChatEdit {
+  visibility: visible;
+}
+
+// show the edit and read icons only when hovered over
+.trpChatBox:hover > .trpChatDetails > .trpChatReads {
   visibility: visible;
 }
 
 // if the viewer can edit the message, dont gray it out
-.canEdit .trpChatEdit {
+.canEdit .trpChatEdit:hover {
   opacity: 1;
+  transition: opacity .25s ease-in-out;
+  -moz-transition: opacity .25s ease-in-out;
+  -webkit-transition: opacity .25s ease-in-out;
 }
 
 // if the message has been edited always show the edit icon (not just on hover)
