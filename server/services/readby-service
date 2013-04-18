@@ -1,0 +1,58 @@
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
+"use strict";
+
+var RedisBatcher = require('../utils/redis-batcher').RedisBatcher;
+var Fiber = require('../utils/fiber');
+var persistence = require('./persistence-service');
+var ObjectID = require('mongodb').ObjectID;
+var assert = require('assert');
+var batcher = new RedisBatcher('readby', 0);
+var winston = require('winston');
+
+function asObjectId(stringId) {
+  return new ObjectID(stringId);
+}
+
+batcher.listen(function(key, userIdStrings, done) {
+  var kp = key.split(':', 3);
+
+  // Ignore everything except chats for now
+  if(kp[0] !== 'chat') return done();
+
+  var troupeId = asObjectId(kp[1]);
+  var chatId = asObjectId(kp[2]);
+
+  var userIds = new Array(userIdStrings.map(asObjectId));
+
+  persistence.ChatMessage.update(
+    { _id: chatId, toTroupeId: troupeId },
+    { $addToSet:  { 'readBy': { $each: userIds } } },
+    function(err, numAffected) {
+      if(err) return done(err);
+
+      if(numAffected !== 1) {
+        winston.info('Weird. Rows affected = ' + numAffected);
+      }
+
+      done();
+    });
+
+});
+
+exports.recordItemsAsRead = function(userId, troupeId, items, callback) {
+  assert(userId);
+  if(!items.chat || !items.chat.length) return callback(); // Don't bother with anything other than chats for the moment
+
+  var fiber = new Fiber();
+
+  var itemIds = items.chat;
+  itemIds.forEach(function(id) {
+    console.log('spooling ' + id);
+    batcher.add('chat:' + troupeId + ':' + id, userId, fiber.waitor());
+  });
+
+  fiber.all().then(function() {
+    callback();
+  }, callback);
+
+};
