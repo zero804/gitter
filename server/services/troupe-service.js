@@ -427,6 +427,36 @@ function createUniqueUri() {
   return uri;
 }
 
+function updateFavourite(userId, troupeId, isFavourite, callback) {
+  var setOp = {};
+  setOp['favs.' + troupeId] = '1';
+  var updateStatement;
+  var updateOptions;
+
+  if(isFavourite) {
+    updateStatement = { $set: setOp };
+    updateOptions = { upsert: true };
+  } else {
+    updateStatement = { $unset: setOp };
+    updateOptions = { };
+  }
+
+  persistence.UserTroupeFavourites.update(
+    { userId: userId },
+    updateStatement,
+    updateOptions,
+    callback);
+}
+
+function findFavouriteTroupesForUser(userId, callback) {
+  persistence.UserTroupeFavourites.findOne({ userId: userId}, function(err, userTroupeFavourites) {
+    if(err) return callback(err);
+    if(!userTroupeFavourites || !userTroupeFavourites.favs) return callback(null, {});
+
+    return callback(null, userTroupeFavourites.favs);
+  });
+}
+
 module.exports = {
   findByUri: findByUri,
   findById: findById,
@@ -454,5 +484,8 @@ module.exports = {
   updateTroupeName: updateTroupeName,
   findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
   upgradeOneToOneTroupe: upgradeOneToOneTroupe,
-  createUniqueUri: createUniqueUri
+  createUniqueUri: createUniqueUri,
+
+  updateFavourite: updateFavourite,
+  findFavouriteTroupesForUser: findFavouriteTroupesForUser,
 };

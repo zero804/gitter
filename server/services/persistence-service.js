@@ -128,6 +128,14 @@ UserLocationHistorySchema.index({ userId: 1 });
 UserLocationHistorySchema.schemaTypeName = 'UserLocationHistorySchema';
 
 
+var UserTroupeFavouritesSchema = new Schema({
+  userId: { type: ObjectId },
+  favs: Schema.Types.Mixed
+});
+UserTroupeFavouritesSchema.index({ userId: 1 });
+UserTroupeFavouritesSchema.schemaTypeName = 'UserTroupeFavourites';
+
+
 //
 // User in a Troupe
 //
@@ -211,6 +219,9 @@ TroupeSchema.methods.removeUserById = function(userId) {
     winston.warn("Troupe.removeUserById: User " + userId + " not in troupe " + this.id);
   }
 };
+
+
+
 
 //
 // An invitation to a person to join a Troupe
@@ -406,6 +417,8 @@ PushNotificationDeviceSchema.schemaTypeName = 'PushNotificationDeviceSchema';
 var User = mongoose.model('User', UserSchema);
 var UserLocationHistory = mongoose.model('UserLocationHistory', UserLocationHistorySchema);
 var UserTroupeLastAccess = mongoose.model('UserTroupeLastAccess', UserTroupeLastAccessSchema);
+var UserTroupeFavourites = mongoose.model('UserTroupeFavourites', UserTroupeFavouritesSchema);
+
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var TroupeUser = mongoose.model('TroupeUser', TroupeUserSchema);
 var Email = mongoose.model('Email', EmailSchema);
@@ -431,6 +444,7 @@ module.exports = {
     UserSchema: UserSchema,
     UserLocationHistorySchema: UserLocationHistorySchema,
     UserTroupeLastAccessSchema: UserTroupeLastAccessSchema,
+    UserTroupeFavouritesSchema: UserTroupeFavouritesSchema,
     TroupeSchema: TroupeSchema,
     TroupeUserSchema: TroupeUserSchema,
     EmailSchema: EmailSchema,
@@ -449,6 +463,7 @@ module.exports = {
   },
   User: User,
   UserTroupeLastAccess: UserTroupeLastAccess,
+  UserTroupeFavourites: UserTroupeFavourites,
   Troupe: Troupe,
   TroupeUser: TroupeUser,
 	Email: Email,
