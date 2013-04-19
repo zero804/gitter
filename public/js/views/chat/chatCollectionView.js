@@ -88,6 +88,7 @@ define([
 
     afterRender: function() {
       this.$el.toggleClass('isViewers', this.isOwnMessage());
+
       if (this.isOwnMessage()) this.$el.toggleClass('isEditable', this.isInEditablePeriod());
       this.$el.toggleClass('canEdit', this.canEdit());
       this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
