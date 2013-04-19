@@ -182,7 +182,6 @@ define([
     },
 
     afterRender: function() {
-      console.log(this.$el.find('#frame-users'));
       new Marionette.CollectionView({
          collection: this._collection,
          //itemViewOptions: { chat: this.model },
