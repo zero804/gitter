@@ -119,7 +119,7 @@ define([
 
     },
 
-    listen: function() {
+    listen: function(callback) {
       if(this.subscription) return;
       var self = this;
 
@@ -129,10 +129,12 @@ define([
 
       this.subscription.callback(function() {
         // log('Listening to ' + self.url);
+        if(callback) return callback();
       });
 
       this.subscription.errback(function(error) {
         log('Subscription error for ' + self.url, error);
+        if(callback) return callback(error);
       });
     },
 
@@ -160,36 +162,56 @@ define([
       return existing;
     },
 
+    operationIsUpToDate: function(operation, existing, newModel) {
+      var existingVersion = existing.get('v') ? existing.get('v') : 0;
+      var incomingVersion = newModel.v ? newModel.v : 0;
+
+      // Create operations are always allowed
+      if(operation === 'create') return true;
+
+      // Existing version is unversioned? Allow
+      if(!existingVersion) return true;
+
+      // New operation is unversioned? Dodgy
+      if(!incomingVersion) return false;
+
+      if(operation === 'patch') {
+        return incomingVersion >= existingVersion;
+      }
+
+      return incomingVersion > existingVersion;
+    },
+
     onDataChange: function(data) {
       var operation = data.operation;
       var newModel = data.model;
       var id = newModel.id;
 
+      if(this.transformModel) newModel = this.transformModel(newModel);
       var parsed = new this.model(newModel, { parse: true });
       var existing = this.findExistingModel(id, parsed);
 
       switch(operation) {
         case 'create':
+        case 'patch':
         case 'update':
           // There can be existing documents for create events if the doc was created on this
           // client and lazy-inserted into the collection
           if(existing) {
-            var existingVersion = existing.get('v') ? existing.get('v') : 0;
-            var incomingVersion = newModel.v ? newModel.v : 0;
-
-            // If at least one of the docs has a version number ...
-            // And the new document is an older version than the new document...
-            if((incomingVersion || existingVersion) && (incomingVersion <= existingVersion) && (operation != 'create')) {
+            if(this.operationIsUpToDate(operation, existing, newModel)) {
+              log('Performing ' + operation, newModel);
+              existing.set(parsed.attributes);
+            } else {
               log('Ignoring out-of-date update', existing.toJSON(), newModel);
               break;
             }
-
-            existing.set(parsed.attributes);
-            break;
           }
 
-          // No existing document exists, simply treat this as an add
-          this.add(parsed);
+          if(operation !== 'patch') {
+            // No existing document exists, simply treat this as an add
+            this.add(parsed);
+          }
+
           break;
 
         case 'remove':
