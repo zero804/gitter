@@ -54,7 +54,7 @@ define([
       var currentUserId = window.troupeContext.user ? window.troupeContext.user.id : undefined;
 
       var user = this.model ? this.model.toJSON() : this.user;
-      var avatarUrl = (this.avatarSize == 'm') ? this.user.avatarUrlMedium : this.user.avatarUrlSmall;
+      var avatarUrl = (this.avatarSize == 'm') ? user.avatarUrlMedium : user.avatarUrlSmall;
       var online = user.id === currentUserId || !!user.online; // only the people view tries to show avatar status so there is a model object, it won't necessarily work in other cases
       return {
         id: user.id,
