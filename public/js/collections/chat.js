@@ -70,5 +70,18 @@ define([
   });
   _.extend(exports.ChatCollection.prototype, TroupeCollections.ReversableCollectionBehaviour);
 
+  exports.ReadByModel = TroupeCollections.Model.extend({
+    idAttribute: "id"
+  });
+
+  exports.ReadByCollection = TroupeCollections.LiveCollection.extend({
+    model: exports.ReadByModel,
+    modelName: 'chatReadBy',
+    initialize: function(options) {
+      this.chatMessageId = options.chatMessageId;
+      this.url = "/troupes/" + window.troupeContext.troupe.id + "/chatMessages/" + this.chatMessageId + "/readBy";
+    }
+  });
+
   return exports;
 });
