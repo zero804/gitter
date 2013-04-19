@@ -3,13 +3,16 @@ define([
   'jquery',
   'underscore',
   'log!chat-collection-view',
+  'collections/chat',
+  'views/widgets/avatar',
   'components/unread-items-client',
   'marionette',
   'views/base',
   './scrollDelegate',
   'hbs!./tmpl/chatViewItem',
+  'hbs!./tmpl/readBy',
   'bootstrap_tooltip'
-], function($, _, log, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate) {
+], function($, _, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate, readByTemplate /* tooltip*/) {
   "use strict";
 
   var PAGE_SIZE = 15;
@@ -20,14 +23,16 @@ define([
     isEditing: false,
 
     events: {
-      'click .trpChatEdit': 'toggleEdit',
-      'keydown .trpChatInput': 'detectReturn'
+      'click .trpChatEdit':     'toggleEdit',
+      'keydown .trpChatInput':  'detectReturn',
+      'click .trpChatReads':    'showReadBy'
     },
 
-    initialize: function() {
+    initialize: function(options) {
       var self = this;
 
       this.setRerenderOnChange(true);
+      this.userCollection = options.userCollection;
 
       if (this.isInEditablePeriod()) {
         // re-render once the message is not editable
@@ -150,8 +155,50 @@ define([
         }
 
       }
+    },
+
+    showReadBy: function() {
+      new ReadByModal({ model: this.model, userCollection: this.userCollection }).show();
     }
 
+  });
+
+  var ReadByView = TroupeViews.Base.extend({
+    template: readByTemplate,
+
+    events: {
+    },
+
+    initialize: function(options) {
+      var c = new chatModels.ReadByCollection({ chatMessageId: this.model.id, userCollection: options.userCollection });
+      this._collection = c;
+      c.listen(function() {
+        c.fetch();
+      });
+
+      this.addCleanup(function() {
+        c.unlisten();
+      });
+    },
+
+    afterRender: function() {
+      console.log(this.$el.find('#frame-users'));
+      new Marionette.CollectionView({
+         collection: this._collection,
+         //itemViewOptions: { chat: this.model },
+         itemView: AvatarView,
+         el: this.$el.find('#frame-users')
+      }).render();
+    }
+
+  });
+
+
+  var ReadByModal = TroupeViews.Modal.extend({
+    initialize: function(options) {
+      TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+      this.view = new ReadByView({ model: this.model, userCollection: options.userCollection });
+    }
   });
 
   /*
@@ -159,9 +206,12 @@ define([
   */
   var ChatCollectionView = Marionette.CollectionView.extend({
     itemView: ChatViewItem,
+    itemViewOptions: function() {
+      return { userCollection: this.userCollection };
+    },
     chatMessageLimit: PAGE_SIZE,
 
-    initialize: function() {
+    initialize: function(options) {
       _.bindAll(this, 'chatWindowScroll');
       this.initializeSorting();
 
@@ -176,6 +226,8 @@ define([
       this.scrollDelegate = new scrollDelegates.DefaultScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
       this.infiniteScrollDelegate = new scrollDelegates.InfiniteScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
       ChatCollectionView.$scrollOf.on('scroll', this.chatWindowScroll);
+
+      this.userCollection = options.userCollection;
 
       function findTopMostVisibleUnreadItem(itemType) {
         return unreadItemsClient.findTopMostVisibleUnreadItemPosition(itemType);

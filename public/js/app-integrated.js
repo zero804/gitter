@@ -312,6 +312,55 @@ require([
       });
     }
 
+    // Setup the ChatView
+    chatCollection = new chatModels.ChatCollection();
+    instantiateCollection(chatCollection, 'chatMessages');
+
+
+    // Request Collections
+    requestCollection = new requestModels.RequestCollection();
+    requestCollection.listen();
+    requestCollection.fetch();
+
+
+    // File Collections
+    fileCollection = new fileModels.FileCollection();
+    instantiateCollection(fileCollection, 'files');
+
+    // Conversation Collections
+    conversationCollection = new conversationModels.ConversationCollection();
+    instantiateCollection(conversationCollection, 'conversations');
+
+
+    // Troupe Collections
+    troupeCollection = new troupeModels.TroupeCollection();
+    instantiateCollection(troupeCollection, 'troupes');
+    troupeCollection.on("remove", function(model) {
+      if(model.id == window.troupeContext.troupe.id) {
+        // TODO: tell the person that they've been kicked out of the troupe
+        window.location.reload();
+      }
+    });
+
+    unreadItemsClient.installTroupeListener(troupeCollection);
+
+    var filteredTroupeCollection = new Backbone.FilteredCollection(null, {model: troupeModels.TroupeModel, collection: troupeCollection });
+    filteredTroupeCollection.setFilter(function(m) {
+      return !m.get('oneToOne') /* || m.get('unreadItems') > 0 */;
+    });
+
+    var peopleOnlyTroupeCollection = new Backbone.FilteredCollection(null, {model: troupeModels.TroupeModel, collection: troupeCollection });
+    peopleOnlyTroupeCollection.setFilter(function(m) {
+      return m.get('oneToOne');
+    });
+
+    // User Collections
+    userCollection = new userModels.UserCollection();
+    instantiateCollection(userCollection, 'users');
+
+
+    // Configure the views
+
     var headerView = new (TroupeViews.Base.extend({
       template: headerViewTemplate,
       getRenderData: function() {
@@ -321,9 +370,6 @@ require([
 
     app.headerRegion.show(headerView);
 
-    // Setup the ChatView
-    chatCollection = new chatModels.ChatCollection();
-    instantiateCollection(chatCollection, 'chatMessages');
 
     new ChatInputView({
       el: $('#chat-input'),
@@ -332,13 +378,10 @@ require([
 
     new ChatCollectionView({
       el: $('#frame-chat'),
-      collection: chatCollection
+      collection: chatCollection,
+      userCollection: userCollection
     }).render();
 
-    // Request Collections
-    requestCollection = new requestModels.RequestCollection();
-    requestCollection.listen();
-    requestCollection.fetch();
 
     // Request View
     var requestView = new RequestView({
@@ -346,9 +389,6 @@ require([
     });
     app.requestRegion.show(requestView);
 
-    // File Collections
-    fileCollection = new fileModels.FileCollection();
-    instantiateCollection(fileCollection, 'files');
 
     // File View
     var fileView = new FileView({
@@ -356,10 +396,6 @@ require([
     });
     app.fileRegion.show(fileView);
 
-    // Conversation Collections
-
-    conversationCollection = new conversationModels.ConversationCollection();
-    instantiateCollection(conversationCollection, 'conversations');
 
     // Conversation View
     if (!window.troupeContext.troupe.oneToOne) {
@@ -373,28 +409,6 @@ require([
     }
 
 
-    // Troupe Collections
-    troupeCollection = new troupeModels.TroupeCollection();
-    instantiateCollection(troupeCollection, 'troupes');
-
-    troupeCollection.on("remove", function(model) {
-      if(model.id == window.troupeContext.troupe.id) {
-        // TODO: tell the person that they've been kicked out of the troupe
-        window.location.reload();
-      }
-    });
-    unreadItemsClient.installTroupeListener(troupeCollection);
-
-    var filteredTroupeCollection = new Backbone.FilteredCollection(null, {model: troupeModels.TroupeModel, collection: troupeCollection });
-    filteredTroupeCollection.setFilter(function(m) {
-      return !m.get('oneToOne') /* || m.get('unreadItems') > 0 */;
-    });
-
-    var peopleOnlyTroupeCollection = new Backbone.FilteredCollection(null, {model: troupeModels.TroupeModel, collection: troupeCollection });
-    peopleOnlyTroupeCollection.setFilter(function(m) {
-      return m.get('oneToOne');
-    });
-
     var troupeCollectionView = new TroupeCollectionView({
       collection: filteredTroupeCollection
     });
@@ -406,9 +420,6 @@ require([
     app.leftMenuPeople.show(oneToOneTroupeCollectionView);
 
 
-    // User Collections
-    userCollection = new userModels.UserCollection();
-    instantiateCollection(userCollection, 'users');
 
     // update online status of user models
     $(document).on('userLoggedIntoTroupe', updateUserStatus);

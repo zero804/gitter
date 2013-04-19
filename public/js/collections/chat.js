@@ -78,6 +78,17 @@ define([
     model: exports.ReadByModel,
     modelName: 'chatReadBy',
     initialize: function(options) {
+      var userCollection = options.userCollection;
+      if(userCollection) {
+        this.transformModel = function(model) {
+          console.log("Transforming model");
+          var m = userCollection.get(model.id);
+          if(m) return m.toJSON();
+
+          return model;
+        };
+      }
+
       this.chatMessageId = options.chatMessageId;
       this.url = "/troupes/" + window.troupeContext.troupe.id + "/chatMessages/" + this.chatMessageId + "/readBy";
     }

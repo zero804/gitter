@@ -119,7 +119,7 @@ define([
 
     },
 
-    listen: function() {
+    listen: function(callback) {
       if(this.subscription) return;
       var self = this;
 
@@ -129,10 +129,12 @@ define([
 
       this.subscription.callback(function() {
         // log('Listening to ' + self.url);
+        if(callback) return callback();
       });
 
       this.subscription.errback(function(error) {
         log('Subscription error for ' + self.url, error);
+        if(callback) return callback(error);
       });
     },
 
@@ -185,6 +187,7 @@ define([
       var newModel = data.model;
       var id = newModel.id;
 
+      if(this.transformModel) newModel = this.transformModel(newModel);
       var parsed = new this.model(newModel, { parse: true });
       var existing = this.findExistingModel(id, parsed);
 

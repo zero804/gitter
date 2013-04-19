@@ -23,7 +23,7 @@ batcher.listen(function(key, userIdStrings, done) {
   var troupeId = asObjectId(kp[1]);
   var chatId = asObjectId(kp[2]);
 
-  var userIds = new Array(userIdStrings.map(asObjectId));
+  var userIds = userIdStrings.map(asObjectId);
 
   persistence.ChatMessage.findOneAndUpdate(
     { _id: chatId, toTroupeId: troupeId },
@@ -35,14 +35,19 @@ batcher.listen(function(key, userIdStrings, done) {
       if(!chat) {
         winston.info('Weird. No chat message found');
       } else {
-        var url = "/troupes/" + troupeId + "/chatMessages";
-        debugger;
-        appEvents.dataChange2(url, 'patch', {
+
+        appEvents.dataChange2("/troupes/" + troupeId + "/chatMessages", 'patch', {
           id: "" + chatId,
           readBy: chat.readBy.length,
           v: chat._tv ? 0 + chat._tv : undefined
         });
 
+        // Its too operationally expensive to serialise the full user object
+        userIds.forEach(function(userId) {
+          appEvents.dataChange2("/troupes/" + troupeId + "/chatMessages/" + chatId + '/readBy', 'create', {
+            id: userId
+          });
+        });
 
       }
 
