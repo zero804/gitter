@@ -20,6 +20,7 @@ module.exports = {
     function installTroupeSubResource(resourceName, moduleName) {
         var r = app.resource(resourceName,  require('./troupes/' + moduleName));
         troupesResource.add(r);
+        return r;
     }
 
     installTroupeSubResource('invites', 'invites');
@@ -30,13 +31,20 @@ module.exports = {
     installTroupeSubResource('downloads', 'downloads');
     installTroupeSubResource('embedded', 'embedded');
     installTroupeSubResource('thumbnails', 'thumbnails');
-    installTroupeSubResource('chatMessages', 'chat-messages');
+
+
+    var chatResource = installTroupeSubResource('chatMessages', 'chat-messages');
+    var chatReadBy = new Resource('readBy', require('./troupes/chat-read-by'), app);
+    chatResource.add(chatReadBy);
+
+
     installTroupeSubResource('unreadItems', 'unread-items');
 
     var userResource = app.resource('user',  require('./user/user.js'));
     function installUserSubResource(resourceName, moduleName) {
         var r = new Resource(resourceName, require('./user/' + moduleName), app);
         userResource.add(r);
+        return r;
     }
 
     installUserSubResource('troupes', 'troupes');

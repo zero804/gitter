@@ -22,6 +22,11 @@ function emit(event, data) {
   pubClient.publish(event, JSON.stringify(data));
 }
 
+function logError(e) {
+  //Error.captureStackTrace(e);
+  winston.error("Appevent handler failed with error: " + e, { exception: e });
+}
+
 // Listen for system-wide events
 function onRemote(event, callback) {
   if(!subscriptions[event]) {
@@ -34,8 +39,7 @@ function onRemote(event, callback) {
     try {
       callback(message);
     } catch(e) {
-      winston.error("Appevent handler failed with error", { exception: e });
-      console.error(e.stack);
+      logError(e);
     }
   });
 }
@@ -46,8 +50,7 @@ function onLocalOnly(event, callback) {
     try {
       callback(message);
     } catch(e) {
-      winston.error("Appevent handler failed with error", { exception: e });
-      console.error(e.stack);
+      logError(e);
     }
   });
 }

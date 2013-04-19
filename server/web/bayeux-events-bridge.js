@@ -10,12 +10,14 @@ exports.install = function() {
   var bayeuxEngine = bayeux.engine;
 
   appEvents.localOnly.onDataChange2(function(data) {
+
     var operation = data.operation;
     var model = data.model;
-    var url = data.url;
+    var url = "" + data.url;
 
     switch(operation) {
       case 'create':
+      case 'patch':
       case 'update':
       case 'remove':
         var message = {
@@ -23,7 +25,6 @@ exports.install = function() {
           model: model
         };
 
-        winston.verbose("Publish to " + url, message);
         bayeuxClient.publish(url, message);
 
         break;
