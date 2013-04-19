@@ -81,7 +81,6 @@ define([
       var userCollection = options.userCollection;
       if(userCollection) {
         this.transformModel = function(model) {
-          console.log("Transforming model");
           var m = userCollection.get(model.id);
           if(m) return m.toJSON();
 
