@@ -209,9 +209,10 @@ exports.getFirstUnreadItem = function(userId, troupeId, itemType, callback) {
         return callback(null, null);
       }
 
+      var totalUnreadItems = members.length;
       var minId = getOldestId(members);
 
-      return callback(null, minId);
+      return callback(null, minId, totalUnreadItems);
 
     });
 };
