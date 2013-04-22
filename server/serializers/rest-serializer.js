@@ -98,7 +98,7 @@ function UserStrategy(options) {
     return {
       id: user.id,
       displayName: user.displayName,
-      email: user.email,
+      email: options.includeEmail ? user.email : undefined,
       avatarUrlSmall: getAvatarUrl('s'),
       avatarUrlMedium: getAvatarUrl('m'),
       location: location,
