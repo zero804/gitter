@@ -15,6 +15,7 @@ require([
   'views/file/fileView',
   'views/conversation/conversationView',
   'views/request/requestView',
+  'collections/desktop',
   'collections/troupes',
   'collections/files',
   'collections/conversations',
@@ -41,67 +42,11 @@ require([
   'components/errorReporter',
   'filtered-collection'
 ], function($, _, Backbone, Marionette, _Helpers, TroupeViews, realtime, eyeballs, dozy, AppIntegratedView, ChatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
-            troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
+            collections, troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView,
             createTroupeView, headerViewTemplate, shareTroupeView,
             troupeSettingsView, webNotifications, unreadItemsClient, log /*, errorReporter , FilteredCollection */) {
   "use strict";
-
-  var preloadedFetch = false;
-  if(!window.troupePreloads) {
-    preloadedFetch = true;
-    $.ajax({
-      url: window.location.pathname + '/preload',
-      dataType: "json",
-      type: "GET",
-      success: function(data) {
-        window.troupePreloads = data;
-
-        $(document).trigger('preloadComplete', data);
-      }
-    });
-
-  } else {
-    preloadedFetch = false;
-  }
-
-  $(document).on('realtime:newConnectionEstablished', function() {
-    log('Reloading data');
-    $.ajax({
-      url: window.location.pathname + '/preload',
-      dataType: "json",
-      type: "GET",
-      success: function(data) {
-        requestCollection.fetch();
-        fileCollection.reset(data['files'], { parse: true });
-        chatCollection.reset(data['chatMessages'], { parse: true });
-        conversationCollection.reset(data['conversations'], { parse: true });
-        troupeCollection.reset(data['troupes'], { parse: true });
-        userCollection.reset(data['users'], { parse: true });
-        unreadItemsClient.preload(data['unreadItems']);
-      }
-    });
-  });
-
-  function instantiateCollection(collection, name) {
-    collection.listen();
-    if(window.troupePreloads && window.troupePreloads[name]) {
-      collection.reset(window.troupePreloads[name], { parse: true });
-    } else {
-
-      if(preloadedFetch) {
-        $(document).one('preloadComplete', function() {
-          collection.reset(window.troupePreloads[name], { parse: true });
-        });
-
-      } else {
-        collection.fetch();
-
-      }
-    }
-  }
-
-
 
   $(document).on("click", "a", function(event) {
     if(this.href) {
@@ -133,6 +78,7 @@ require([
   });
 
   var app = new Marionette.Application();
+  app.collections = {};
   app.addRegions({
     leftMenuUnread: "#left-menu-list-unread",
     leftMenuRecent: "#left-menu-list-recent",
@@ -169,7 +115,6 @@ require([
   };
 
   var router;
-  var requestCollection, fileCollection, chatCollection, conversationCollection, troupeCollection, userCollection;
   var appView = new AppIntegratedView({ app: app });
 
   function track(name) {
@@ -190,16 +135,16 @@ require([
     getViewDetails: function(fragment) {
 
       var routes = [
-        { name: "request",        re: /^request\/(\w+)$/,         viewType: RequestDetailView,            collection: requestCollection },
-        { name: "file",           re: /^file\/(\w+)$/,            viewType: FileDetailView,               collection: fileCollection },
-        { name: "filePreview",    re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: fileCollection },
-        { name: "fileVersions",   re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: fileCollection },
-        { name: "mail",           re: /^mail\/(\w+)$/,            viewType: conversationDetailView.Modal, collection: conversationCollection },
-        { name: "person",         re: /^person\/(\w+)$/,          viewType: PersonDetailView,             collection: userCollection },
+        { name: "request",        re: /^request\/(\w+)$/,         viewType: RequestDetailView,            collection: collections.requests },
+        { name: "file",           re: /^file\/(\w+)$/,            viewType: FileDetailView,               collection: collections.files },
+        { name: "filePreview",    re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: collections.files },
+        { name: "fileVersions",   re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: collections.files },
+        { name: "mail",           re: /^mail\/(\w+)$/,            viewType: conversationDetailView.Modal, collection: collections.conversations },
+        { name: "person",         re: /^person\/(\w+)$/,          viewType: PersonDetailView,             collection: collections.users },
 
         { name: "profile",        re: /^profile$/,                viewType: profileView.Modal },
         { name: "share",          re: /^share$/,                  viewType: shareView.Modal },
-        { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal,       collection: troupeCollection,   skipModelLoad: true },
+        { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal,       collection: collections.troupe,   skipModelLoad: true },
         { name: "shareTroupe",    re: /^shareTroupe/,             viewType: shareTroupeView.Modal },
         { name: "troupeSettings", re: /^troupeSettings/,          viewType: troupeSettingsView }
 
@@ -302,17 +247,31 @@ require([
 
   });
 
-  app.addInitializer(function(/*options*/){
-    var preloads = window.troupePreloads || {};
-    window.troupePreloads = {};
+  // reference collections
+  var chatCollection = collections.chats;
+  var requestCollection = collections.requests;
+  var fileCollection = collections.files;
+  var conversationCollection = collections.conversations;
+  // Troupe Collections
+  var userCollection = collections.users;
+  var troupeCollection = collections.troupes;
+  var filteredTroupeCollection = collections.normalTroupes;
+  var peopleOnlyTroupeCollection = collections.peopleTroupes;
+  var unreadTroupeCollection = collections.unreadTroupes;
+  var favouriteTroupesCollection = collections.favouriteTroupes;
+  var recentTroupeCollection = collections.recentTroupes;
+  // TODO is this used by anyone anymore?
+  app.collections['chats'] = collections.chats;
+  app.collections['requests'] = collections.requests;
+  app.collections['files'] = collections.files;
+  app.collections['conversations'] = collections.conversations;
+  app.collections['users'] = collections.users;
+  app.collections['troupes'] = collections.troupes;
+  app.collections['recentTroupes'] = collections.recentTroupes;
+  app.collections['unreadTroupes'] = collections.unreadTroupes;
+  app.collections['favouriteTroupes'] = collections.favouriteTroupes;
 
-    if(window.troupePreloads && window.troupePreloads.unreadItems) {
-      unreadItemsClient.preload(window.troupePreloads.unreadItems);
-    } else {
-      $(document).one('preloadComplete', function() {
-        unreadItemsClient.preload(window.troupePreloads.unreadItems);
-      });
-    }
+  app.addInitializer(function(/*options*/){
 
     var headerView = new (TroupeViews.Base.extend({
       template: headerViewTemplate,
@@ -324,8 +283,6 @@ require([
     app.headerRegion.show(headerView);
 
     // Setup the ChatView
-    chatCollection = new chatModels.ChatCollection();
-    instantiateCollection(chatCollection, 'chatMessages');
 
     new ChatInputView({
       el: $('#chat-input'),
@@ -337,31 +294,17 @@ require([
       collection: chatCollection
     }).render();
 
-    // Request Collections
-    requestCollection = new requestModels.RequestCollection();
-    requestCollection.listen();
-    requestCollection.fetch();
-
     // Request View
     var requestView = new RequestView({
       collection: requestCollection
     });
     app.requestRegion.show(requestView);
 
-    // File Collections
-    fileCollection = new fileModels.FileCollection();
-    instantiateCollection(fileCollection, 'files');
-
     // File View
     var fileView = new FileView({
       collection: fileCollection
     });
     app.fileRegion.show(fileView);
-
-    // Conversation Collections
-
-    conversationCollection = new conversationModels.ConversationCollection();
-    instantiateCollection(conversationCollection, 'conversations');
 
     // Conversation View
     if (!window.troupeContext.troupe.oneToOne) {
@@ -374,58 +317,13 @@ require([
       $('#mail-list').hide();
     }
 
-
-    // Troupe Collections
-    troupeCollection = new troupeModels.TroupeCollection();
-    instantiateCollection(troupeCollection, 'troupes');
-
-    troupeCollection.on("remove", function(model) {
-      if(model.id == window.troupeContext.troupe.id) {
-        // TODO: tell the person that they've been kicked out of the troupe
-        window.location.reload();
-      }
-    });
-    unreadItemsClient.installTroupeListener(troupeCollection);
-
-    // collection of normal troupes only
-    var filteredTroupeCollection = new Backbone.FilteredCollection(null, {model: troupeModels.TroupeModel, collection: troupeCollection });
-    filteredTroupeCollection.setFilter(function(m) {
-      return !m.get('oneToOne') /* || m.get('unreadItems') > 0 */;
-    });
-
-    // collection of one to one troupes only
-    var peopleOnlyTroupeCollection = new Backbone.FilteredCollection(null, {model: troupeModels.TroupeModel, collection: troupeCollection });
-    peopleOnlyTroupeCollection.setFilter(function(m) {
-      return m.get('oneToOne');
-    });
-
-    // collection of unread troupes only
-    // TODO view must hide if there are no unread troupes
-    var unreadTroupeCollection = new Backbone.FilteredCollection(null, {model: troupeModels.TroupeModel, collection: troupeCollection });
-    unreadTroupeCollection.setFilter(function(m) {
-      return m.get('unreadItems') > 0;
-    });
-
-    // collection of recent troupes only
-    troupeCollection.on('reset', function() {
-      var recentTroupeModels = _.sortBy(troupeCollection.models, function(v) {
-        var lastAccess = v.get('lastAccessTime');
-
-        return (lastAccess) ? lastAccess.valueOf() : -1;
-      }).reverse();
-      recentTroupeModels = _.filter(recentTroupeModels, function(v, k) {
-        return k < 5;
-      });
-      var recentTroupeCollection = new Backbone.Collection(recentTroupeModels);
-      // recent troupe view
-      var recentTroupeCollectionView = new TroupeCollectionView({
-        collection: recentTroupeCollection
-      });
-      app.leftMenuRecent.show(recentTroupeCollectionView);
-
-    });
-
     // add the troupe views to the left menu
+
+    // recent troupe view
+    var recentTroupeCollectionView = new TroupeCollectionView({
+      collection: recentTroupeCollection
+    });
+    app.leftMenuRecent.show(recentTroupeCollectionView);
 
     // normal troupe view
     var troupeCollectionView = new TroupeCollectionView({
@@ -445,50 +343,17 @@ require([
     });
     app.leftMenuUnread.show(unreadTroupeCollectionView);
 
-    // User Collections
-    userCollection = new userModels.UserCollection();
-    instantiateCollection(userCollection, 'users');
-
-    // update online status of user models
-    $(document).on('userLoggedIntoTroupe', updateUserStatus);
-    $(document).on('userLoggedOutOfTroupe', updateUserStatus);
-
-    function updateUserStatus(e, data) {
-      var user = userCollection.get(data.userId);
-      if (user) {
-        // the backbone models have not always come through before the presence events,
-        // but they will come with an accurate online status so we can just ignore the presence event
-        user.set('online', (data.status === 'in') ? true : false);
-      }
-    }
-
-    // send out a change event to avatar widgets that are not necessarily connected to a model object.
-    userCollection.on('change', function(model) {
-      $(document).trigger("avatar:change", model.toJSON());
+    // favourite troupe view
+    var favouriteTroupeCollectionView = new TroupeCollectionView({
+      collection: favouriteTroupesCollection
     });
+    app.leftMenuFavourites.show(favouriteTroupeCollectionView);
 
     // People View
     var peopleCollectionView = new PeopleCollectionView({
       collection: userCollection
     });
     app.peopleRosterRegion.show(peopleCollectionView);
-
-    // Keep the unread items up to date on the model
-    unreadItemsClient.syncCollections({
-      'chat': chatCollection,
-      'request': requestCollection,
-      'file': fileCollection
-    });
-
-    app.collections = {
-      'chats': chatCollection,
-      'requests': requestCollection,
-      'files': fileCollection,
-      'conversations': conversationCollection,
-      'troupes': troupeCollection,
-      'users': userCollection
-    };
-
 
   });
 

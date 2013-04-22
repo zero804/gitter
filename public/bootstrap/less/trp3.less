@@ -184,11 +184,14 @@ a:hover {
 }
 
 .trpTroupeBadge {
+  /*
   display: inline-block;
 	margin-left: -11px;
+	*/
 }
 
 .trpTroupeBadge:before {
+	/*
 	content: "";
 	display: inline-block;
 	position: relative;
@@ -200,6 +203,7 @@ a:hover {
 	margin-top: 5px;
 	background-color: @trpPurple;
 	border: 2px solid white;
+	*/
 }
 
 
@@ -262,6 +266,22 @@ a:hover {
 	width: 24px;
 	height: 24px;
 	padding: 5px;
+}
+
+.trpHeaderFavourite img {
+	display: none;
+}
+
+.trpHeaderFavourite img.unfavourited {
+	display: inline-block;
+}
+
+.trpHeaderFavourite.favourited img.unfavourited {
+	display: none;
+}
+
+.trpHeaderFavourite.favourited img.favourited {
+	display: inline-block;
 }
 
 .trpHeaderFavourite img {
