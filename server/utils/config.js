@@ -3,6 +3,8 @@
 "use strict";
 
 var nconf = require('nconf');
+var Fiber = require('./fiber');
+var EventEmitter = require('events').EventEmitter;
 
 /* Load configuration parameters */
 var nodeEnv = process.env['NODE_ENV'];
@@ -24,5 +26,22 @@ nconf.argv()
 nconf.add('user',     { type: 'file', file: configDir + '/config.user-overrides.json'  });
 nconf.add('nodeEnv',  { type: 'file', file: configDir + '/config.' + nodeEnv + '.json'  });
 nconf.add('defaults', { type: 'file', file: configDir + '/config.default.json' });
+
+process.on('SIGHUP', function() {
+  var f = new Fiber();
+  nconf.stores.user.load(f.waitor());
+  nconf.stores.nodeEnv.load(f.waitor());
+  nconf.stores.defaults.load(f.waitor());
+  f.all()
+    .then(function() {
+      nconf.events.emit('reload');
+    })
+    .fail(function(err) {
+      console.log('Reload failed: ' + err, err);
+    });
+});
+
+// Monkey-patch an event-emitter onto nconf (for now)
+nconf.events = new EventEmitter();
 
 module.exports = nconf;

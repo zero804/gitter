@@ -175,8 +175,13 @@ function preloadChats(userId, troupeId, callback) {
     restSerializer.serialize(chatMessages, strategy, callback);
   }
 
-  unreadItemService.getFirstUnreadItem(userId, troupeId, 'chat', function(err, firstId) {
+  unreadItemService.getFirstUnreadItem(userId, troupeId, 'chat', function(err, firstId, totalUnreadItems) {
     if(firstId) {
+      if(totalUnreadItems > 200) {
+        chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: 20 }, serializeChats);
+        return;
+      }
+
       // No first Id, just return the most recent 20 messages
       chatService.findChatMessagesForTroupe(troupeId, { startId: firstId }, function(err, chatMessages) {
         if(err) return callback(err);

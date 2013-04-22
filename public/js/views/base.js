@@ -519,19 +519,70 @@ define([
   TroupeViews.SortableMarionetteView = {
 
     initializeSorting: function() {
+      this.isRendering = false;
       this.on('before:render', this.onBeforeRenderSort, this);
       this.on('render', this.onRenderSort, this);
     },
 
     onBeforeRenderSort: function() {
+      log("Switching to rendering mode");
       this.isRendering = true;
     },
+
     onRenderSort: function() {
+      log("Out of rendering mode");
       this.isRendering = false;
     },
 
     appendHtml: function(collectionView, itemView, index) {
-      //log("Inserting new item ", itemView, " at index ", index);
+      // Shortcut - just place at the end!
+      if (this.isRendering) {
+        // if this is during rendering, then the views always come in sort order, so just append
+        collectionView.$el.append(itemView.el);
+        return;
+      }
+
+      // we are inserting views after rendering, find the adjacent view if there is one already
+      var adjView;
+
+      if (index === 0) {
+        // find the view that comes after the first one (sometimes there will be a non view that is the first child so we can't prepend)
+        adjView = findViewAtPos(1);
+        if (adjView) {
+          itemView.$el.insertBefore(adjView.el);
+        } else {
+          // there are no existing views after the first,
+          // we append (keeping the place of non-view children already present in the container)
+          itemView.$el.appendTo(collectionView.el);
+        }
+
+        return;
+      }
+
+      if(index == collectionView.collection.length - 1) {
+        log("Inserting *at* the bottom of the collection ", adjView);
+        itemView.$el.appendTo(collectionView.el);
+        return;
+      }
+
+      // find the view that comes before this one
+      adjView = findViewAtPos(index - 1);
+      if(adjView) {
+        itemView.$el.insertAfter(adjView.$el);
+      } else {
+        // It could be the case that n-1 has not yet been inserted,
+        // so we try find whatever is at n+1 and insert before
+        adjView = findViewAtPos(index + 1);
+        if(adjView) {
+          itemView.$el.insertBefore(adjView.el);
+        } else {
+          log("Inserting *after* the bottom of the collection ", adjView);
+          debugger;
+          // We can't find an item before, we can't find an item after,
+          // just give up and insert at the end. (hopefully this will never happen eh?)
+          itemView.$el.appendTo(collectionView.el);
+        }
+      }
 
       function findViewAtPos(i) {
         if (i >= collectionView.collection.length)
@@ -541,44 +592,7 @@ define([
         return view;
       }
 
-      if (this.isRendering) {
-        // if this is during rendering, then the views always come in sort order, so just append
-        collectionView.$el.append(itemView.el);
-      }
-      else {
-        // we are inserting views after rendering, find the adjacent view if there is one already
-        var adjView;
 
-        if (index === 0) {
-          // find the view that comes after the first one (sometimes there will be a non view that is the first child so we can't prepend)
-          adjView = findViewAtPos(index + 1);
-          if (adjView) {
-            itemView.$el.insertBefore(adjView.el);
-          } else {
-            // there are no existing views after the first,
-            // we append (keeping the place of non-view children already present in the container)
-            itemView.$el.appendTo(collectionView.el);
-          }
-        } else {
-          // find the view that comes before this one
-          adjView = findViewAtPos(index - 1);
-          if(adjView) {
-            itemView.$el.insertAfter(adjView.$el);
-          } else {
-            // It could be the case that n-1 has not yet been inserted,
-            // so we try find whatever is at n+1 and insert before
-            adjView = findViewAtPos(index + 1);
-            if(adjView) {
-              log("Inserting *before* " + (index + 1), adjView);
-              itemView.$el.insertBefore(adjView.el);
-            } else {
-              // We can't find an item before, we can't find an item after,
-              // just give up and insert at the end. (hopefully this will never happen eh?)
-              itemView.$el.appendTo(collectionView.el);
-            }
-          }
-        }
-      }
     }
 
   };
