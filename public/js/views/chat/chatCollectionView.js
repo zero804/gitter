@@ -99,6 +99,10 @@ define([
     detectReturn: function(e) {
       if(e.keyCode == 13 && !e.ctrlKey) {
         this.saveChat();
+        e.stopPropagation();
+        e.preventDefault();
+
+        return false;
       }
     },
 
@@ -137,7 +141,7 @@ define([
         if (this.canEdit()) {
           this.isEditing = true;
           var isAtBottom = ChatCollectionView.$scrollOf.scrollTop() >= (ChatCollectionView.$container.height() - ChatCollectionView.$scrollOf.height());
-          this.$el.find('.trpChatText').html("<textarea class='trpChatInput'>"+this.model.get('text')+"</textarea>");
+          this.$el.find('.trpChatText').html("<textarea class='trpChatInput'>"+this.model.get('text')+"</textarea>").find('textarea').select();
           this.$el.find('.trpChatText textarea').focus().on('blur', function() { self.toggleEdit(); });
           if (isAtBottom) {
             ChatCollectionView.$scrollOf.scrollTop(ChatCollectionView.$container.height() - ChatCollectionView.$scrollOf.height());
