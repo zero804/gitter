@@ -33,11 +33,22 @@ define([
     }
   }
 
+  var eyeballState = true;
+  $(document).on('eyeballStateChange', function(event, state) {
+    log('Switching eyeball state to ', state);
+    eyeballState = state;
+  });
+
+
   var ClientAuth = function() {};
   ClientAuth.prototype.outgoing = function(message, callback) {
     if(message.channel == '/meta/handshake') {
       message.ext = message.ext || {};
       if(window.troupeContext) message.ext.token = window.troupeContext.accessToken;
+    } else if(message.channel == '/meta/subscribe') {
+      log('Sending subscription with eyeballs: ' + eyeballState);
+      message.ext = message.ext || {};
+      message.ext.eyeballs = eyeballState ? 1 : 0;
     }
 
     callback(message);
