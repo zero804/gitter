@@ -8,9 +8,11 @@ module.exports = {
     index: function(req, res, next) {
       var skip = req.query.skip;
       var limit = req.query.limit;
+      var beforeId = req.query.beforeId;
 
       var options = {
           skip: skip ? skip : 0,
+          beforeId: beforeId ? beforeId : null,
           limit: limit ? limit: 50
       };
 
