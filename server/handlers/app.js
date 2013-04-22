@@ -25,7 +25,7 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
   function serializeUserAndRenderPage(unreadItems) {
     if(!req.user) return renderPage(unreadItems, null, null);
 
-    var strategy = new restSerializer.UserStrategy();
+    var strategy = new restSerializer.UserStrategy({ includeEmail: true });
 
     restSerializer.serialize(req.user, strategy, function(err, serialized) {
       if(err) return next(err);
