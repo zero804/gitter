@@ -5,10 +5,9 @@ var nconf = require('./config');
 var winston = require("winston");
 var fs = require('fs');
 var path = require('path');
-var assert = require('assert');
 
 function statFile(fileTransport) {
-  assert(fileTransport, 'fileTransport must exist');
+  if(!fileTransport) return;
 
   var fullname = path.join(fileTransport.dirname, fileTransport._getFile(false));
 
@@ -41,25 +40,37 @@ function statFile(fileTransport) {
   });
 }
 
-function periodicallyStatFile(fileTransport) {
+var periodicListenerConfigured = false;
+function periodicallyStatFile() {
+  if(periodicListenerConfigured) return;
+  periodicListenerConfigured = true;
+
   setInterval(function() {
-    statFile(fileTransport);
+    statFile(winston['default'].transports.file);
   }, 30000);
 }
 
-function reopenTransportOnHupSignal(fileTransport) {
+var hupListenerConfigured = false;
+function reopenTransportOnHupSignal() {
+  if(hupListenerConfigured) return;
+  hupListenerConfigured = true;
+
   process.on('SIGHUP', function() {
     console.log('Caught SIGHUP, attempting logfile rotation');
     winston.info('Caught SIGHUP, attempting logfile rotation');
 
-    statFile(fileTransport);
+    statFile(winston['default'].transports.file);
 
   });
 }
 
 
 function configureTransports() {
-  winston.remove(winston.transports.Console);
+  var defaultLogger = winston['default'];
+
+  for (var name in defaultLogger.transports) {
+    winston.remove({ name: name });
+  }
 
   if(nconf.get('logging:logToFile') && nconf.get('LOG_FILE')) {
     winston.add(winston.transports.File, {
@@ -124,5 +135,18 @@ winston.error = function(message, data) {
   }
   oldError.apply(winston, arguments);
 };
+
+var logLevel = nconf.get("logging:level");
+
+nconf.events.on('reload', function() {
+  if(logLevel ===  nconf.get("logging:level")) {
+    return;
+  }
+
+  logLevel = nconf.get("logging:level");
+  console.log("Reconfiguring log transports");
+
+  configureTransports();
+});
 
 module.exports = winston;
