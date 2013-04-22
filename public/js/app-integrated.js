@@ -134,7 +134,9 @@ require([
 
   var app = new Marionette.Application();
   app.addRegions({
+    leftMenuUnread: "#left-menu-list-unread",
     leftMenuRecent: "#left-menu-list-recent",
+    leftMenuFavourites: "#left-menu-list-favourites",
     leftMenuTroupes: "#left-menu-list",
     leftMenuPeople: "#left-menu-list-users",
     leftMenuSearch: "#left-menu-list-search",
@@ -385,26 +387,63 @@ require([
     });
     unreadItemsClient.installTroupeListener(troupeCollection);
 
+    // collection of normal troupes only
     var filteredTroupeCollection = new Backbone.FilteredCollection(null, {model: troupeModels.TroupeModel, collection: troupeCollection });
     filteredTroupeCollection.setFilter(function(m) {
       return !m.get('oneToOne') /* || m.get('unreadItems') > 0 */;
     });
 
+    // collection of one to one troupes only
     var peopleOnlyTroupeCollection = new Backbone.FilteredCollection(null, {model: troupeModels.TroupeModel, collection: troupeCollection });
     peopleOnlyTroupeCollection.setFilter(function(m) {
       return m.get('oneToOne');
     });
 
+    // collection of unread troupes only
+    // TODO view must hide if there are no unread troupes
+    var unreadTroupeCollection = new Backbone.FilteredCollection(null, {model: troupeModels.TroupeModel, collection: troupeCollection });
+    unreadTroupeCollection.setFilter(function(m) {
+      return m.get('unreadItems') > 0;
+    });
+
+    // collection of recent troupes only
+    troupeCollection.on('reset', function() {
+      var recentTroupeModels = _.sortBy(troupeCollection.models, function(v) {
+        var lastAccess = v.get('lastAccessTime');
+
+        return (lastAccess) ? lastAccess.valueOf() : -1;
+      }).reverse();
+      recentTroupeModels = _.filter(recentTroupeModels, function(v, k) {
+        return k < 5;
+      });
+      var recentTroupeCollection = new Backbone.Collection(recentTroupeModels);
+      // recent troupe view
+      var recentTroupeCollectionView = new TroupeCollectionView({
+        collection: recentTroupeCollection
+      });
+      app.leftMenuRecent.show(recentTroupeCollectionView);
+
+    });
+
+    // add the troupe views to the left menu
+
+    // normal troupe view
     var troupeCollectionView = new TroupeCollectionView({
       collection: filteredTroupeCollection
     });
     app.leftMenuTroupes.show(troupeCollectionView);
 
+    // one to one troupe view
     var oneToOneTroupeCollectionView = new TroupeCollectionView({
       collection: peopleOnlyTroupeCollection
     });
     app.leftMenuPeople.show(oneToOneTroupeCollectionView);
 
+    // unread troupe view
+    var unreadTroupeCollectionView = new TroupeCollectionView({
+      collection: unreadTroupeCollection
+    });
+    app.leftMenuUnread.show(unreadTroupeCollectionView);
 
     // User Collections
     userCollection = new userModels.UserCollection();
