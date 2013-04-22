@@ -237,17 +237,26 @@ define([
         self.loading = false;
       }
 
-      this._testLoading = true;
       this.collection.once('sync', function() {
-        this._testLoading = false;
         self.infiniteScrollDelegate.afterLoadNextMessages();
       });
+
+      var ids = this.collection.map(function(m) { return m.get('id'); });
+      console.log(ids);
+      var lowestId = _.min(ids, function(a, b) {
+        if(a < b) return -1;
+        if(a > b) return 1;
+        return 0;
+      });
+
+      console.log(lowestId);
+
       this.collection.fetch({
         update: true,
         add: true,
         remove: false, // chat messages are never deleted
         data: {
-          skip: this.collection.length,
+          beforeId: lowestId,
           limit: this.chatMessageLimit
         },
         success: success,
