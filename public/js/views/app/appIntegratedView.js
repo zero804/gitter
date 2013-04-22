@@ -7,8 +7,9 @@ define([
   'fineuploader',
   "nanoScroller",
   'log!app-integrated-view',
-  'components/unread-items-client'
-  ], function($, _, Backbone, uiVars, qq, _nano, log, unreadItemsClient) {
+  'components/unread-items-client',
+  'collections/desktop'
+  ], function($, _, Backbone, uiVars, qq, _nano, log, unreadItemsClient, collections) {
   "use strict";
 
   return Backbone.View.extend({
@@ -18,7 +19,7 @@ define([
     profilemenu: false,
     shifted: false,
     alertpanel: false,
-    selectedListIcon: "icon-troupes",
+    selectedListIcon: "icon-mega",
     events: {
       "click #menu-toggle-button":        "onMenuToggle",
       "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
@@ -40,13 +41,13 @@ define([
 
       "click #file-header":               "onFileHeaderClick",
       "click #mail-header":               "onMailHeaderClick",
+      "click .trpHeaderFavourite":        "toggleFavourite",
       "keypress":                         "onKeyPress"
     },
 
     initialize: function(options) {
       var self = this;
       this.app = options.app;
-
 
       // $('body').append('<span id="fineUploader"></span>');
 
@@ -128,6 +129,7 @@ define([
         // overall count
         updateBadge('#unread-badge', values.overall);
 
+       /*
         // normal troupe unread count
         if (values.normal)
           $('.trpLeftMenuToolbarItems').addClass('unread-normal');
@@ -139,11 +141,22 @@ define([
           $('.trpLeftMenuToolbarItems').addClass('unread-one2one');
         else
           $('.trpLeftMenuToolbarItems').removeClass('unread-one2one');
+        */
       }
 
       $(document).on('troupeUnreadTotalChange', onTroupeUnreadTotalChange);
       onTroupeUnreadTotalChange(null, unreadItemsClient.getCounts());
 
+
+      // show / hide the 'unread troupes header' on the mega list
+      collections['unreadTroupes'].on('all', function() {
+        if (collections['unreadTroupes'].length <= 0) {
+          $('#unreadTroupesHeader').hide();
+        }
+        else {
+         $('#unreadTroupesHeader').show();
+        }
+      });
     },
 
     updateTitlebar: function(values) {
@@ -152,6 +165,7 @@ define([
 
     getTitlebar: function(counts) {
       var mainTitle = window.troupeContext.troupe.name + " - Troupe";
+      // TODO this isn't working properly when updating the troupe name, need to be able to poll unreadItems count not just accept the event
       var overall = counts.overall;
       if(overall <= 0) {
         return mainTitle;
@@ -443,6 +457,30 @@ define([
     activateSearchList: function () {
 
       $("#list-search-input").focus();
+    },
+
+    toggleFavourite: function() {
+      var favHeader = $('.trpHeaderFavourite');
+      favHeader.toggleClass('favourited');
+      var isFavourite = favHeader.hasClass('favourited');
+
+      $.ajax({
+        url: '/troupes/' + window.troupeContext.troupe.id,
+        contentType: "application/json",
+        dataType: "json",
+        type: "PUT",
+        data: JSON.stringify({ favourite: isFavourite }),
+        success: function() {
+
+        },
+        error: function() {
+
+        }
+      });
+
+      window.troupeContext.troupe.favourite = isFavourite;
+      var troupe = collections.troupes.get(window.troupeContext.troupe.id);
+      troupe.set('favourite', isFavourite);
     },
 
     onKeyPress: function(e) {
