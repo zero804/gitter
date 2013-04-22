@@ -57,6 +57,7 @@ exports.install = function() {
       var title = data.title;
       var text = data.text;
       var link = data.link;
+      var troupeId = data.troupeId;
       var sound = data.sound;
 
       var url = "/user/" + userId;
@@ -65,6 +66,7 @@ exports.install = function() {
          title: title,
          text: text,
          link: link,
+         troupeId: troupeId,
          sound: sound
       };
       winston.verbose("Notification to " + url, message);
@@ -118,9 +120,10 @@ exports.install = function() {
 
   appEvents.localOnly.onNewUnreadItem(function(data) {
     var userId = data.userId;
+    var troupeId = data.troupeId;
     var items = data.items;
 
-    bayeuxClient.publish("/user/" + userId, {
+    bayeuxClient.publish("/user/" + userId + '/troupes/' + troupeId, {
       notification: "unread_items",
       items: items
     });
@@ -129,9 +132,10 @@ exports.install = function() {
 
   appEvents.localOnly.onUnreadItemsRemoved(function(data) {
     var userId = data.userId;
+    var troupeId = data.troupeId;
     var items = data.items;
 
-    bayeuxClient.publish("/user/" + userId, {
+    bayeuxClient.publish("/user/" + userId + '/troupes/' + troupeId, {
       notification: "unread_items_removed",
       items: items
     });

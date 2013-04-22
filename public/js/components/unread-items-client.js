@@ -3,201 +3,565 @@ define([
   'jquery',
   'underscore',
   './realtime',
-  'utils/log'
-], function($, _, realtime, log) {
+  'log!unread-items-client',
+  'utils/emitter'
+], function($, _, realtime, log, EventEmitter) {
   "use strict";
 
-  //
-  // The first bit of this module deals with unread items for the current troupe. The
-  // second bit will deal with unread items for other troupes
-  //
-  var unreadItemsCountsCache = {};
-  var unreadItems = window.troupePreloads && window.troupePreloads['unreadItems'] || {};
+  function limit(fn, context, timeout) {
+    return _.debounce(_.bind(fn, context), timeout || 30);
+  }
 
-  var recentlyMarkedRead = {};
-
-  window.setInterval(function() {
-    var now = Date.now();
-
-    _.keys(recentlyMarkedRead, function(key) {
-      if(now - recentlyMarkedRead[key] > 5000) {
-        delete recentlyMarkedRead[key];
-      }
+  function _iteratePreload(items, fn, context) {
+    var keys = _.keys(items);
+    _.each(keys, function(itemType) {
+      _.each(items[itemType], function(itemId) {
+        fn.call(context, itemType, itemId);
+      });
     });
-  }, 5000);
+  }
 
-  var syncCounts = function syncCounts() {
-    var keys = _.union(_.keys(unreadItemsCountsCache), _.keys(unreadItems));
+  var ADD_TIMEOUT = 500;
+  var REMOVE_TIMEOUT = 600000;
 
-    _.each(keys, function(k) {
-      var value = unreadItemsCountsCache[k];
-      var newValue = unreadItems[k] ? unreadItems[k].length : 0;
-      if(value !== newValue) {
+  // -----------------------------------------------------
+  // Stores value pairs
+  // -----------------------------------------------------
 
-        window.setTimeout(function() {
-          $(document).trigger('itemUnreadCountChanged', {
-            itemType: k,
-            count: newValue
-          });
-        }, 200);
-      }
-    });
+  var DoubleHash = function() {
+    this._data = {};
   };
 
-  var readNotificationQueue = {};
-  var timeoutHandle = null;
+  DoubleHash.prototype = {
+    // Add an item, return true if it did not exist before
+    _add: function(itemType, itemId) {
+      var substore = this._data[itemType];
+      if(!substore) {
+        substore = this._data[itemType] = {};
+      }
 
-  var markItemRead = function markItemRead(itemType, itemId) {
+      var exists = substore[itemId];
+      if(exists) return false;
+      substore[itemId] = true;
 
-    recentlyMarkedRead[itemType + "/" + itemId] = Date.now();
+      if(this._onItemAdded) this._onItemAdded(itemType, itemId);
 
-    var a = unreadItems[itemType];
-    if(a) {
-      a = _.without(a, itemId);
-      unreadItems[itemType] = a;
+      return true;
+    },
 
-      syncCounts();
+    // Add an item, return true iff it exists
+    _remove: function(itemType, itemId) {
+       var substore = this._data[itemType];
+      if(!substore) return false;
+      var exists = substore[itemId];
+      if(!exists) return false;
+
+      delete substore[itemId];
+
+      if(_.keys(substore).length === 0) {
+        delete this._data[itemType];
+      }
+
+      if(this._onItemRemoved) this._onItemRemoved(itemType, itemId);
+
+      return true;
+    },
+
+    _contains: function(itemType, itemId) {
+      var substore = this._data[itemType];
+      if(!substore) return false;
+      return !!substore[itemId];
+    },
+
+    _count: function() {
+      var types = _.keys(this._data);
+
+      return _.reduce(types, function(memo, itemType) {
+        var ids = _.keys(this._data[itemType]);
+        return memo + ids.length;
+      }, 0, this);
+    },
+
+    _marshall: function() {
+      var self = this;
+      var r = {};
+      var types = _.keys(self._data);
+      _.each(types, function(itemType) {
+        var array = [];
+
+        _.each(_.keys(self._data[itemType]), function(itemId) {
+          array.push(itemId);
+        });
+
+        r[itemType] = array;
+      });
+
+      return r;
+    }
+  };
+
+  // -----------------------------------------------------
+  // A doublehash which slows things down
+  // -----------------------------------------------------
+
+  var Tarpit = function(timeout, onDequeue) {
+    DoubleHash.call(this);
+    this._timeout = timeout;
+    this._onDequeue = onDequeue;
+  };
+
+  _.extend(Tarpit.prototype, DoubleHash.prototype, {
+    _onItemAdded: function(itemType, itemId) {
+      var self = this;
+      window.setTimeout(function() {
+        self._promote(itemType, itemId);
+      }, this._timeout);
+    },
+
+    _promote: function(itemType, itemId) {
+      // Has this item already been deleted?
+      if(!this._contains(itemType, itemId)) return;
+
+      this._remove(itemType, itemId);
+      if(this._onDequeue) this._onDequeue(itemType, itemId);
+    }
+  });
+
+  // -----------------------------------------------------
+  // The main component of the unread-items-store
+  // -----------------------------------------------------
+
+  var UnreadItemStore = function() {
+    DoubleHash.call(this);
+
+    this._addTarpit = new Tarpit(ADD_TIMEOUT, _.bind(this._promote, this));
+    this._deleteTarpit = new Tarpit(REMOVE_TIMEOUT);
+    this._recountLimited = limit(this._recount, this, 30);
+    this._currentCountValue = -1;
+  };
+
+  _.extend(UnreadItemStore.prototype, EventEmitter, DoubleHash.prototype, {
+    _unreadItemAdded: function(itemType, itemId) {
+      if(this._deleteTarpit._contains(itemType, itemId)) return;
+      if(this._contains(itemType, itemId)) return;
+
+      this._addTarpit._add(itemType, itemId);
+      this._recountLimited();
+    },
+
+    _unreadItemRemoved: function(itemType, itemId) {
+      if(this._deleteTarpit._contains(itemType, itemId)) return;
+
+      this._deleteTarpit._add(itemType, itemId);
+      this._addTarpit._remove(itemType, itemId);
+      this._remove(itemType, itemId);
+
+      this.emit('unreadItemRemoved', itemType, itemId);
+      this._recountLimited();
+    },
+
+    _markItemRead: function(itemType, itemId) {
+      this._unreadItemRemoved(itemType, itemId);
+      this.emit('itemMarkedRead', itemType, itemId);
+    },
+
+    _onItemRemoved: function() {
+      // Recount soon
+      this._recountLimited();
+    },
+
+    _onItemAdded: function() {
+      // Recount soon
+      this._recountLimited();
+    },
+
+    _promote: function(itemType, itemId) {
+      this._add(itemType, itemId);
+    },
+
+    _recount: function() {
+      log('TroupeUnreadItemRealtimeSync:_recount');
+
+      var newValue = this._count();
+      if(newValue !== this._currentCountValue) {
+        this._currentCountValue = newValue;
+        log('TroupeUnreadItemRealtimeSync:newcountvalue', newValue);
+
+        this.emit('newcountvalue', newValue);
+      }
+    },
+
+    _currentCount: function() {
+      if(this._currentCountValue < 0) return 0;
+
+      return this._currentCountValue;
+    },
+
+    _unreadItemsAdded: function(items) {
+      _iteratePreload(items, function(itemType, itemId) {
+        this._unreadItemAdded(itemType, itemId);
+      }, this);
+    },
+
+    _unreadItemsRemoved: function(items) {
+      _iteratePreload(items, function(itemType, itemId) {
+        this._unreadItemRemoved(itemType, itemId);
+      }, this);
+    },
+
+    preload: function(items) {
+      _iteratePreload(items, function(itemType, itemId) {
+        if(this._deleteTarpit._contains(itemType, itemId)) return;
+        if(this._contains(itemType, itemId)) return;
+
+        this._promote(itemType, itemId);
+      }, this);
     }
 
-    if(!readNotificationQueue[itemType]) {
-      readNotificationQueue[itemType] = [itemId];
-    } else {
-      readNotificationQueue[itemType].push(itemId);
-    }
+  });
 
-    function send() {
-      timeoutHandle = null;
+  // -----------------------------------------------------
+  // This component sends read notifications back to the server
+  // -----------------------------------------------------
 
-      var sendQueue = readNotificationQueue;
-      readNotificationQueue = {};
+  var ReadItemSender = function(unreadItemStore) {
+    this._buffer = new DoubleHash();
+    this._sendLimited = limit(this._send, this, 1000);
 
-      //log("Sending read notifications: ", sendQueue);
+    _.bindAll(this,'_onItemMarkedRead', '_onWindowUnload');
+
+    unreadItemStore.on('itemMarkedRead', this._onItemMarkedRead);
+    $(window).on('unload', this._onWindowUnload);
+  };
+
+  ReadItemSender.prototype = {
+    _onItemMarkedRead: function(e, itemType, itemId) {
+      this._add(itemType, itemId);
+    },
+
+    _onWindowUnload: function() {
+      if(this._buffer._count() > 0) {
+        this._send({ sync: true });
+      }
+    },
+
+    _add: function(itemType, itemId) {
+      this._buffer._add(itemType, itemId);
+      this._sendLimited();
+    },
+
+    _send: function(options) {
+      var queue = this._buffer._marshall();
+      this._buffer = new DoubleHash();
+
+      var async = !options || !options.sync;
 
       $.ajax({
         url: "/troupes/" + window.troupeContext.troupe.id + "/unreadItems",
         contentType: "application/json",
-        data: JSON.stringify(sendQueue),
+        data: JSON.stringify(queue),
+        async: async,
         type: "POST",
+        global: false,
         success: function() {
+        },
+        error: function() {
         }
       });
-    }
 
-    if(!timeoutHandle) {
-      timeoutHandle = window.setTimeout(send, 500);
     }
   };
 
-  var inFocus = true;
+  // -----------------------------------------------------
+  // Syncs a troupe collection with the unread items client
+  // -----------------------------------------------------
 
-  $(document).on('eyeballStateChange', function(e, newState) {
-    inFocus = newState;
-    if(newState) {
-      windowScroll();
-    }
-  });
+  var TroupeCollectionSync = function(troupeCollection, unreadItemStore) {
+    this._collection = troupeCollection;
+    this._store = unreadItemStore;
+    _.bindAll(this, '_onNewCountValue');
+    this._store.on('newcountvalue', this._onNewCountValue);
 
-
-  var windowTimeout = null;
-  var windowScrollOnTimeout = function windowScrollOnTimeout() {
-    windowTimeout = null;
-    if(!inFocus) {
-      return;
-    }
-
-    var $window = $(window);
-    var scrollTop = $window.scrollTop();
-    var scrollBottom = scrollTop + $window.height();
-
-    $('.unread').each(function (index, element) {
-      var $e = $(element);
-      var itemType = $e.data('itemType');
-      var itemId = $e.data('itemId');
-
-      // log("found an unread item: itemType ", itemType, "itemId", itemId);
-
-      if(itemType && itemId) {
-        var top = $e.offset().top;
-
-        if (top >= scrollTop && top <= scrollBottom) {
-
-          setTimeout(function () {
-            $e.removeClass('unread');
-            $e.addClass('read');
-            markItemRead(itemType, itemId);
-          }, 2000);
-        }
-      }
-
-    });
+    // Set the initial value
+    this._onNewCountValue(null, this._store._currentCount());
   };
 
-  function windowScroll() {
-    if(!windowTimeout) {
-      windowTimeout = window.setTimeout(windowScrollOnTimeout, 90);
+  TroupeCollectionSync.prototype = {
+    _onNewCountValue: function(event, newValue) {
+      if(!window.troupeContext || !window.troupeContext.troupe) return;
+
+      log('TroupeUnreadItemRealtimeSync:_onNewCountValue');
+
+      var troupe = this._collection.get(window.troupeContext.troupe.id);
+      if(troupe) {
+        troupe.set('unreadItems', newValue);
+      }
     }
-  }
+  };
 
-  $(window).on('scroll', windowScroll);
+  // -----------------------------------------------------
+  // Sync unread items with realtime notifications coming from the server
+  // -----------------------------------------------------
 
-  // this is not a live collection so this will not work inside an SPA
-  $('.mobile-scroll-class').on('scroll', windowScroll);
+  var TroupeUnreadItemRealtimeSync = function(unreadItemStore) {
+    this._store = unreadItemStore;
+  };
 
-  // TODO: don't reference this frame directly!
-  $('#toolbar-frame').on('scroll', windowScroll);
+  _.extend(TroupeUnreadItemRealtimeSync.prototype, EventEmitter, {
+    _subscribe: function() {
+      var store = this._store;
+      var self = this;
 
-  $(document).on('unreadItemDisplayed', function() {
-    windowScroll();
-  });
+      realtime.subscribe('/user/' + window.troupeContext.user.id + '/troupes/' + window.troupeContext.troupe.id, function(message) {
+        if(message.notification === 'unread_items') {
+          store._unreadItemsAdded(message.items);
 
-  // When the UI changes, rescan
-  $(document).on('appNavigation', function() {
-    windowScroll();
-  });
+        } else if(message.notification === 'unread_items_removed') {
+         log('TroupeUnreadItemRealtimeSync:unreadItemsRemoved');
 
+          var items = message.items;
+          store._unreadItemsRemoved(items);
 
-  function newUnreadItems(items) {
-    var itemTypes = _.keys(items);
-    _.each(itemTypes, function(itemType) {
-      var ids = items[itemType];
+          _iteratePreload(items, function(itemType, itemId) {
+            this.emit('unreadItemRemoved', itemType, itemId);
+          }, self);
+        }
 
-      var filtered = _.filter(ids, function(itemId) { return !recentlyMarkedRead[itemType + "/" + itemId]; });
-
-      if(!unreadItems[itemType]) {
-        unreadItems[itemType] = filtered;
-      } else {
-        unreadItems[itemType] = _.union(unreadItems[itemType], filtered);
-      }
-
-    });
-
-    syncCounts();
-  }
-
-  function unreadItemsRemoved(items) {
-    var itemTypes = _.keys(items);
-    _.each(itemTypes, function(itemType) {
-      var ids = items[itemType];
-
-      if(unreadItems[itemType]) {
-        unreadItems[itemType] = _.without(unreadItems[itemType], ids);
-      }
-    });
-
-    syncCounts();
-
-    // remove the unread item css
-    _.each(items, function(ids) {
-      _.each(ids, function(id) {
-        $('.unread.model-id-'+id).removeClass('unread').addClass('read');
       });
-    });
+    }
+  });
+
+  // -----------------------------------------------------
+  // Sync a troupe collection with unread counts (for other troupes)
+  // from the server
+  // -----------------------------------------------------
+
+  var TroupeCollectionRealtimeSync = function(troupeCollection) {
+    this._collection = troupeCollection;
+  };
+
+  TroupeCollectionRealtimeSync.prototype = {
+    _subscribe: function() {
+       var self = this;
+       realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
+        if(message.notification !== 'troupe_unread') return;
+        self._handleIncomingMessage(message);
+      });
+    },
+
+    _handleIncomingMessage: function(message) {
+      var troupeId = message.troupeId;
+      var totalUnreadItems = message.totalUnreadItems;
+
+      if(troupeId === window.troupeContext.troupe.id) return;
+
+      var model = this._collection.get(troupeId);
+      if(!model) {
+        log("Cannot find model. Refresh might be required....");
+        return;
+      }
+
+      // TroupeCollectionSync keeps track of the values
+      // for this troupe, so ignore those values
+      model.set('unreadItems', totalUnreadItems);
+    }
+  };
+
+
+  // -----------------------------------------------------
+  // Counts all the unread items in a troupe collection and
+  // publishes notifications on changes
+  // -----------------------------------------------------
+
+  var TroupeUnreadNotifier = function(troupeCollection) {
+    this._collection = troupeCollection;
+
+    this._recountLimited = limit(this._recount, this, 30);
+    this._collection.on('change:unreadItems', this._recountLimited);
+    this._collection.on('reset', this._recountLimited);
+    this._collection.on('add', this._recountLimited);
+    this._collection.on('remove', this._recountLimited);
+    this._collection.on('destroy', this._recountLimited);
+
+    this._recountLimited();
+  };
+
+  // storing the previous counts here so we can return it to outside callers,
+  // even though we don't always have a reference to TroupeNotifier internally.
+  // TODO: fix this enormous hack!
+  var counts = {
+    overall: null,
+    normal: null,
+    oneToOne: null,
+    current: null
+  };
+
+  TroupeUnreadNotifier.prototype = {
+
+    _recount: function() {
+      log('TroupeUnreadNotifier:recount');
+
+      function count(memo, troupe) {
+        var c = troupe.get('unreadItems');
+        return memo + (c > 0 ? 1 : 0);
+      }
+
+      var c = this._collection;
+
+      var newTroupeUnreadTotal = c.reduce(count, 0);
+      var newPplTroupeUnreadTotal = c.filter(function(trp) { return trp.get('oneToOne'); }).reduce(count, 0);
+      var newNormalTroupeUnreadTotal = c.filter(function(trp) { return !trp.get('oneToOne'); }).reduce(count, 0);
+
+      //if(newTroupeUnreadTotal !== counts.overall ||
+      //   newPplTroupeUnreadTotal !== counts.oneToOne ||
+      //   newNormalTroupeUnreadTotal !== counts.normal) {
+
+        // TODO: fix this enormous hack!
+        counts.overall = newTroupeUnreadTotal;
+        counts.oneToOne = newPplTroupeUnreadTotal;
+        counts.normal = newNormalTroupeUnreadTotal;
+        counts.current = unreadItemStore._currentCount();
+
+        $(document).trigger('troupeUnreadTotalChange', counts);
+      //}
+    }
+
+  };
+
+
+  // -----------------------------------------------------
+  // Monitors the view port and tells the store when things
+  // have been read
+  // -----------------------------------------------------
+
+  var TroupeUnreadItemsViewportMonitor = function(unreadItemStore) {
+    _.bindAll(this, '_eyeballStateChange', '_getBounds');
+
+    this._store = unreadItemStore;
+    this._windowScrollLimited = limit(this._windowScroll, this, 150);
+    this._inFocus = true;
+
+    this._scrollTop = 1000000000;
+    this._scrollBottom = 0;
+
+    this._$window = $(window);
+
+    $(document).on('eyeballStateChange', this._eyeballStateChange);
+
+    this._$window.on('scroll', this._getBounds);
+
+    // this is not a live collection so this will not work inside an SPA
+    $('.mobile-scroll-class').on('scroll', this._getBounds);
+
+    // TODO: don't reference this frame directly!
+    $('#toolbar-frame').on('scroll', this._getBounds);
+
+    $(document).on('unreadItemDisplayed', this._getBounds);
+
+    // When the UI changes, rescan
+    $(document).on('appNavigation', this._getBounds);
+  };
+
+  TroupeUnreadItemsViewportMonitor.prototype = {
+    _getBounds: function() {
+      if(!this._inFocus) {
+        return;
+      }
+
+      var scrollTop = this._$window.scrollTop();
+      var scrollBottom = scrollTop + this._$window.height();
+
+      if(scrollTop < this._scrollTop) {
+        this._scrollTop = scrollTop;
+      }
+
+      if(scrollBottom > this._scrollBottom) {
+        this._scrollBottom = scrollBottom;
+      }
+
+      this._windowScrollLimited();
+    },
+
+    _windowScroll: function() {
+      if(!this._inFocus) {
+        return;
+      }
+
+      var self = this;
+
+      var topBound = this._scrollTop;
+      var bottomBound = this._scrollBottom;
+
+      this._scrollTop = 1000000000;
+      this._scrollBottom = 0;
+
+      $('.unread').each(function (index, element) {
+        var $e = $(element);
+        var itemType = $e.data('itemType');
+        var itemId = $e.data('itemId');
+
+        if(itemType && itemId) {
+          var top = $e.offset().top;
+
+          if (top >= topBound && top <= bottomBound) {
+            self._store._markItemRead(itemType, itemId);
+
+            $e.removeClass('unread').addClass('reading');
+            setTimeout(function() {
+              $e.removeClass('reading').addClass('read');
+            }, 2000);
+          }
+        }
+
+      });
+    },
+
+    _eyeballStateChange: function(e, newState) {
+      this._inFocus = newState;
+      if(newState) {
+        this._getBounds();
+      }
+    }
+  };
+
+  // -----------------------------------------------------
+  // Monitors the store and removes the css for items that
+  // have been read
+  // -----------------------------------------------------
+  var ReadItemRemover = function(realtimeSync) {
+    realtimeSync.on('unreadItemRemoved', this._onUnreadItemRemoved);
+  };
+
+  ReadItemRemover.prototype = {
+    _onUnreadItemRemoved: function(e, itemType, itemId) {
+      $('.unread.model-id-' + itemId).removeClass('unread').addClass('read');
+    }
+  };
+
+  var unreadItemStore = new UnreadItemStore();
+  new ReadItemSender(unreadItemStore);
+  new TroupeUnreadItemsViewportMonitor(unreadItemStore);
+
+  var realtimeSync = new TroupeUnreadItemRealtimeSync(unreadItemStore);
+  var c = window.troupeContext;
+  if(c && c.troupe && c.user) {
+    realtimeSync._subscribe();
+    new ReadItemRemover(realtimeSync);
   }
+
 
   var unreadItemsClient = {
-    getValue: function(itemType) {
-      var v = unreadItems[itemType];
-      return v ? v.length : 0;
+    preload: function(items) {
+      unreadItemStore.preload(items);
+    },
+
+    getCounts: function() {
+      return {
+        overall: counts.overall,
+        normal: counts.normal,
+        oneToOne: counts.oneToOne,
+        current: unreadItemStore._currentCount()
+      };
     },
 
     findTopMostVisibleUnreadItemPosition: function(itemType) {
@@ -230,93 +594,31 @@ define([
       return topItem.offset();
     },
 
-    getTotalUnreadCountForCurrentTroupe: function() {
-      var types = _.keys(unreadItems);
-
-      var value = _.reduce(types, function(memo, type) {
-        return memo + unreadItems[type].length;
-      }, 0);
-
-      return value;
+    installTroupeListener: function(troupeCollection) {
+      new TroupeCollectionSync(troupeCollection, unreadItemStore);
+      new TroupeCollectionRealtimeSync(troupeCollection)._subscribe();
+      new TroupeUnreadNotifier(troupeCollection);
     },
 
-    installTroupeListener: function(troupeCollection) {
-      var troupeUnreadTotal = -1, pplTroupeUnreadTotal = -1, normalTroupeUnreadTotal = -1;
+    syncCollections: function(collections) {
+      unreadItemStore.on('itemMarkedRead', function(e, itemType, itemId) {
+        var collection = collections[itemType];
+        if(!collection) return;
 
-      function recount() {
-        function count(memo, troupe) {
-          var count;
-          if(troupe.id == window.troupeContext.troupe.id) {
-            count = unreadItemsClient.getTotalUnreadCountForCurrentTroupe();
-          } else {
-            count = troupe.get('unreadItems');
-          }
-
-          return memo + (count > 0 ? 1 : 0);
-        }
-
-        var newTroupeUnreadTotal = troupeCollection.reduce(count, 0);
-        var newPplTroupeUnreadTotal = troupeCollection.filter(function(trp) { return trp.get('oneToOne'); }).reduce(count, 0);
-        var newNormalTroupeUnreadTotal = troupeCollection.filter(function(trp) { return !trp.get('oneToOne'); }).reduce(count, 0);
-
-        if(newTroupeUnreadTotal !== troupeUnreadTotal || newPplTroupeUnreadTotal !== pplTroupeUnreadTotal || newNormalTroupeUnreadTotal !== normalTroupeUnreadTotal) {
-          troupeUnreadTotal = newTroupeUnreadTotal;
-          pplTroupeUnreadTotal = newPplTroupeUnreadTotal;
-          normalTroupeUnreadTotal = newNormalTroupeUnreadTotal;
-          $(document).trigger('troupeUnreadTotalChange', { overall: newTroupeUnreadTotal, normal: normalTroupeUnreadTotal, oneToOne: pplTroupeUnreadTotal } );
-        }
-      }
-
-      if (troupeCollection) {
-        troupeCollection.on('reset', function() {
-          recount();
-        });
-      }
-
-      $(document).on('itemUnreadCountChanged', function() {
-        if(troupeCollection) {
-          var model = troupeCollection.get(window.troupeContext.troupe.id);
-          if(model) {
-            model.set('unreadItems', unreadItemsClient.getTotalUnreadCountForCurrentTroupe());
-          }
-        }
-        recount();
+        var item = collection.get(itemId);
+        if(item) item.set('unread', false, { silent: true });
       });
-
-      realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
-        if(message.notification === 'troupe_unread') {
-          log("troupe_unread change", message);
-
-          var troupeId = message.troupeId;
-          var totalUnreadItems = message.totalUnreadItems;
-
-          var model = (troupeCollection) ? troupeCollection.get(troupeId) : null;
-          if(model) {
-            if(troupeId == window.troupeContext.troupe.id) {
-              var actualValue = unreadItemsClient.getTotalUnreadCountForCurrentTroupe();
-              model.set('unreadItems', actualValue);
-            } else {
-              model.set('unreadItems', totalUnreadItems);
-            }
-
-          } else {
-            // TODO: sort this out
-            log("Cannot find model. Refresh might be required....");
-          }
-
-          recount();
-        } else if(message.notification === 'unread_items') {
-          newUnreadItems(message.items);
-        } else if(message.notification === 'unread_items_removed') {
-          unreadItemsRemoved(message.items);
-        }
-      });
-
-      if(troupeCollection) {
-        recount();
-      }
     }
   };
+
+  // Mainly useful for testing
+  unreadItemsClient._store = unreadItemStore;
+  unreadItemsClient.DoubleHash = DoubleHash;
+  unreadItemsClient.Tarpit = Tarpit;
+  unreadItemsClient.UnreadItemStore = UnreadItemStore;
+  unreadItemsClient.TroupeCollectionSync = TroupeCollectionSync;
+  unreadItemsClient.TroupeCollectionRealtimeSync = TroupeCollectionRealtimeSync;
+  unreadItemsClient.TroupeUnreadNotifier = TroupeUnreadNotifier;
 
 
   return unreadItemsClient;
