@@ -242,14 +242,11 @@ define([
       });
 
       var ids = this.collection.map(function(m) { return m.get('id'); });
-      console.log(ids);
       var lowestId = _.min(ids, function(a, b) {
         if(a < b) return -1;
         if(a > b) return 1;
         return 0;
       });
-
-      console.log(lowestId);
 
       this.collection.fetch({
         update: true,
