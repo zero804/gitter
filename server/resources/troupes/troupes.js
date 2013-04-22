@@ -4,6 +4,7 @@
 var troupeService = require("../../services/troupe-service");
 var persistence = require("../../services/persistence-service");
 var restSerializer = require("../../serializers/rest-serializer");
+var Fiber = require("../../utils/fiber");
 
 module.exports = {
   index: function(req, res, next) {
@@ -93,17 +94,32 @@ module.exports = {
     var troupe = req.troupe;
     var updatedTroupe = req.body;
     var name = updatedTroupe.name;
-    troupeService.updateTroupeName(troupe.id, name, function(err, troupe) {
-      if (err) return next(err);
 
-      var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: false });
+    var f = new Fiber();
 
-      restSerializer.serialize(troupe, strategy, function(err, serialized) {
-        if(err) return next(err);
+    if(name) {
+      troupeService.updateTroupeName(troupe.id, name, f.waitor());
+    }
 
-        res.send(serialized);
+    if(updatedTroupe.hasOwnProperty('favourite')) {
+      troupeService.updateFavourite(req.user.id, troupe.id, updatedTroupe.favourite, f.waitor());
+    }
+
+    f.all().then(function() {
+      troupeService.findById(troupe.id, function(err, troupe) {
+
+        var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: false });
+
+        restSerializer.serialize(troupe, strategy, function(err, serialized) {
+          if(err) return next(err);
+
+          res.send(serialized);
+        });
+
       });
-    });
+
+    }, next);
+
   },
 
   load: function(req, id, callback) {

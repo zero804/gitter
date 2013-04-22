@@ -118,10 +118,24 @@ var userService = {
   },
 
   saveLastVisitedTroupeforUser: function(userId, troupeId, callback) {
-    winston.info("Saving last visited Troupe for user: ", userId);
+    winston.verbose("Saving last visited Troupe for user: ", userId);
     userService.findById(userId, function(err, user) {
       if(err) return callback(err);
       if(!user) return callback("User not found");
+
+      var setOp = {};
+      setOp['troupes.' + troupeId] = new Date();
+
+      // Update the model, don't wait for a callback
+      persistence.UserTroupeLastAccess.update(
+        { userId: userId },
+        { $set: setOp },
+        { upsert: true },
+        function(err) {
+          if(err) {
+            winston.error('Error updating usertroupelastaccess: ' + err, { exception: err });
+          }
+        });
 
       if (user.lastTroupe !== troupeId) {
         user.lastTroupe = troupeId;
@@ -133,6 +147,17 @@ var userService = {
         callback();
       }
     });
+  },
+
+  getTroupeLastAccessTimesForUser: function(userId, callback) {
+    persistence.UserTroupeLastAccess.findOne({ userId: userId }, function(err, userTroupeLastAccess) {
+      if(err) return callback(err);
+
+      if(!userTroupeLastAccess || !userTroupeLastAccess.troupes) return callback(null, {});
+
+      callback(null, userTroupeLastAccess.troupes);
+    });
+
   },
 
   findDefaultTroupeForUser: function(id, callback) {

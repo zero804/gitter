@@ -4,7 +4,7 @@ define([
   './notify',
   './realtime',
   'handlebars',
-  'utils/log'
+  'log!web-notifications'
 ], function($, notify, realtime, handlebars, log){
   "use strict";
 
@@ -13,6 +13,11 @@ define([
   // notifications for cross troupe chat messages
   realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
     if (message.notification === 'user_notification') {
+
+      if(message.troupeId === window.troupeContext.troupe.id) {
+        return;
+      }
+
       // log("Got a user_notification event");
       var tmpl = handlebars.compile('<a href="{{link}}"><div class="notification-header">{{{title}}}</div><div class="notification-text">{{{text}}}</div></a>');
       notifications.notify({

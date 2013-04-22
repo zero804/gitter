@@ -251,5 +251,27 @@ describe('presenceService', function() {
     });
 
   });
+
+  it('should garbage collect invalid sockets', function(done) {
+    var userId = 'TESTUSER4' + Date.now();
+    var socketId = 'TESTSOCKET4' + Date.now();
+
+    presenceService.userSocketConnected(userId, socketId, function(err) {
+      if(err) return done(err);
+      presenceService.collectGarbage(fakeEngine, function(err, count) {
+        if(err) return done(err);
+
+        assert(count === 1, 'Expected one invalid socket to be deleted');
+
+        presenceService.listOnlineUsers(function(err, users) {
+          if(err) return done(err);
+          assert(users.indexOf(userId) === -1, 'User should not be online');
+          done();
+        });
+      });
+    });
+
+  });
+
 });
 

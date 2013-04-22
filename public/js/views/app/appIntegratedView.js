@@ -6,8 +6,9 @@ define([
   'views/app/uiVars',
   'fineuploader',
   "nanoScroller",
-  'utils/log'
-  ], function($, _, Backbone, uiVars, qq, _nano, log) {
+  'log!app-integrated-view',
+  'components/unread-items-client'
+  ], function($, _, Backbone, uiVars, qq, _nano, log, unreadItemsClient) {
   "use strict";
 
   return Backbone.View.extend({
@@ -104,7 +105,15 @@ define([
         }, 100);
       });
 
-      $(document).on('troupeUnreadTotalChange', function(event, values) {
+      $(document).on('troupeUpdate', function(e, message) {
+        // header title
+        $('.trpHeaderTitle').html(message.model.name);
+        // window / title bar
+        self.updateTitlebar();
+      });
+
+      function onTroupeUnreadTotalChange(event, values) {
+        self.updateTitlebar(values);
 
         function updateBadge(selector, count) {
           var badge = self.$el.find(selector);
@@ -115,8 +124,10 @@ define([
             badge.hide();
           }
         }
+
         // overall count
         updateBadge('#unread-badge', values.overall);
+
         // normal troupe unread count
         if (values.normal)
           $('.trpLeftMenuToolbarItems').addClass('unread-normal');
@@ -128,7 +139,29 @@ define([
           $('.trpLeftMenuToolbarItems').addClass('unread-one2one');
         else
           $('.trpLeftMenuToolbarItems').removeClass('unread-one2one');
-      });
+      }
+
+      $(document).on('troupeUnreadTotalChange', onTroupeUnreadTotalChange);
+      onTroupeUnreadTotalChange(null, unreadItemsClient.getCounts());
+
+    },
+
+    updateTitlebar: function(values) {
+      $('title').html(this.getTitlebar(values));
+    },
+
+    getTitlebar: function(counts) {
+      var mainTitle = window.troupeContext.troupe.name + " - Troupe";
+      var overall = counts.overall;
+      if(overall <= 0) {
+        return mainTitle;
+      }
+
+      if(overall <= 10) {
+        return String.fromCharCode(0x2789 + overall) + ' ' + mainTitle;
+      }
+
+      return '[' + overall + '] ' + window.troupeContext.troupe.name + " - Troupe";
     },
 
     toggleRightPanel: function(id) {

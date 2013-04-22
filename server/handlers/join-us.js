@@ -1,7 +1,7 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var nconf = require('nconf');
+var nconf = require('../utils/config');
 
 module.exports = {
     install: function(app) {

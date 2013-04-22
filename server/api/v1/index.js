@@ -5,7 +5,10 @@ var middleware = require('../../web/middleware');
 
 module.exports = {
   install: function(app) {
-    var auth = middleware.ensureLoggedIn();
+    var auth = [
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn()
+    ];
 
     app.all('/api/v1/location', auth);
     app.resource('api/v1/location', require('./location.js'));
@@ -18,6 +21,9 @@ module.exports = {
 
     app.all('/api/v1/eyeballs', auth);
     app.resource('api/v1/eyeballs', require('./eyeballs.js'));
+
+    app.all('/api/v1/ping', auth);
+    app.get('/api/v1/ping', require('./ping.js'));
 
   }
 };

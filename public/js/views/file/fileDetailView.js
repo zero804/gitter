@@ -5,8 +5,9 @@ define([
   'underscore',
   'backbone',
   'views/base',
-  'hbs!./tmpl/fileDetailView'
-], function($, _, Backbone, TroupeViews, template) {
+  'hbs!./tmpl/fileDetailView',
+  'hbs!./tmpl/confirmDelete'
+], function($, _, Backbone, TroupeViews, template, confirmDeleteTemplate) {
   return TroupeViews.Base.extend({
     unreadItemType: 'file',
     template: template,
@@ -30,13 +31,28 @@ define([
     },
 
     onDeleteLinkClick: function() {
-      //TODO(AN): replace window.confirm with a nice dialog!
-      if(window.confirm("Delete " + this.model.get('fileName') + "?")) {
-        this.model.destroy({
+      var that = this;
+      var modal = new TroupeViews.ConfirmationModal({
+        title: "Are you sure?",
+        body: confirmDeleteTemplate(this.model.toJSON()),
+        buttons: [
+          { id: "yes", text: "Yes", additionalClasses: "" },
+          { id: "no", text: "No"}
+        ]
+      });
+
+      modal.on('button.click', function(id) {
+        if (id === "yes")
+          that.model.destroy({
           success: function(model, response) {
           }
         });
-      }
+
+        modal.off('button.click');
+        modal.hide();
+      });
+
+      modal.show();
     },
 
     hasThumb: function() {
