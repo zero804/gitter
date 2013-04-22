@@ -180,12 +180,9 @@ define([
     },
 
     _recount: function() {
-      log('TroupeUnreadItemRealtimeSync:_recount');
-
       var newValue = this._count();
       if(newValue !== this._currentCountValue) {
         this._currentCountValue = newValue;
-        log('TroupeUnreadItemRealtimeSync:newcountvalue', newValue);
 
         this.emit('newcountvalue', newValue);
       }
@@ -290,8 +287,6 @@ define([
     _onNewCountValue: function(event, newValue) {
       if(!window.troupeContext || !window.troupeContext.troupe) return;
 
-      log('TroupeUnreadItemRealtimeSync:_onNewCountValue');
-
       var troupe = this._collection.get(window.troupeContext.troupe.id);
       if(troupe) {
         troupe.set('unreadItems', newValue);
@@ -317,7 +312,6 @@ define([
           store._unreadItemsAdded(message.items);
 
         } else if(message.notification === 'unread_items_removed') {
-         log('TroupeUnreadItemRealtimeSync:unreadItemsRemoved');
 
           var items = message.items;
           store._unreadItemsRemoved(items);
@@ -399,8 +393,6 @@ define([
   TroupeUnreadNotifier.prototype = {
 
     _recount: function() {
-      log('TroupeUnreadNotifier:recount');
-
       function count(memo, troupe) {
         var c = troupe.get('unreadItems');
         return memo + (c > 0 ? 1 : 0);

@@ -32,7 +32,7 @@ FakeClient.prototype = {
 
   associateWithTroupe: function(callback) {
     var self = this;
-    presenceService.userSubscribedToTroupe(this.userId, this.troupeId, this.socketId, function(err) {
+    presenceService.userSubscribedToTroupe(this.userId, this.troupeId, this.socketId, true, function(err) {
       if(err) return callback(err);
       self.eyeballSignal = 1;
       callback();

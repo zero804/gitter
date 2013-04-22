@@ -525,12 +525,10 @@ define([
     },
 
     onBeforeRenderSort: function() {
-      log("Switching to rendering mode");
       this.isRendering = true;
     },
 
     onRenderSort: function() {
-      log("Out of rendering mode");
       this.isRendering = false;
     },
 
@@ -560,7 +558,6 @@ define([
       }
 
       if(index == collectionView.collection.length - 1) {
-        log("Inserting *at* the bottom of the collection ", adjView);
         itemView.$el.appendTo(collectionView.el);
         return;
       }
