@@ -161,13 +161,23 @@ define([
     },
 
     showReadBy: function() {
-      new ReadByModal({
+      if(this.readBy) return;
+
+      this.readBy = new ReadByPopover({
         model: this.model,
         userCollection: this.userCollection,
         placement: 'bottom',
         title: 'Read By',
         targetElement: this.$el.find('.trpChatReads')[0]
-      }).show();
+      });
+
+      var s = this;
+      this.readBy.once('hide', function() {
+        s.readBy = null;
+      });
+
+      this.readBy.show();
+
     }
 
   });
@@ -188,7 +198,7 @@ define([
   });
   _.extend(ReadByView.prototype, TroupeViews.LoadingCollectionMixin);
 
-  var ReadByModal = TroupeViews.Popover.extend({
+  var ReadByPopover = TroupeViews.Popover.extend({
     initialize: function(options) {
       TroupeViews.Popover.prototype.initialize.apply(this, arguments);
       this.view = new ReadByView({ model: this.model, userCollection: options.userCollection });
