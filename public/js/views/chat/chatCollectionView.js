@@ -175,7 +175,8 @@ define([
   var ReadByView = Marionette.CollectionView.extend({
     itemView: AvatarView,
     initialize: function(options) {
-      var c = new chatModels.ReadByCollection({ chatMessageId: this.model.id, userCollection: options.userCollection });
+      var c = new chatModels.ReadByCollection([], { chatMessageId: this.model.id, userCollection: options.userCollection });
+      c.loading = true;
       this.collection = c;
       c.listen(function() {
         c.fetch();
@@ -185,7 +186,7 @@ define([
       this.collection.unlisten();
     }
   });
-
+  _.extend(ReadByView.prototype, TroupeViews.LoadingCollectionMixin);
 
   var ReadByModal = TroupeViews.Popover.extend({
     initialize: function(options) {

@@ -94,8 +94,8 @@ define([
   exports.LiveCollection = Backbone.Collection.extend({
     nestedUrl: '',
     modelName: '',
-    constructor: function(options) {
-      Backbone.Collection.prototype.constructor.call(this, options);
+    constructor: function(models, options) {
+      Backbone.Collection.prototype.constructor.call(this, models, options);
       _.bindAll(this, 'onDataChange');
       if(!this.url) {
         this.url = "/troupes/" + window.troupeContext.troupe.id + "/" + this.nestedUrl;

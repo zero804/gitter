@@ -77,7 +77,7 @@ define([
   exports.ReadByCollection = TroupeCollections.LiveCollection.extend({
     model: exports.ReadByModel,
     modelName: 'chatReadBy',
-    initialize: function(options) {
+    initialize: function(models, options) {
       var userCollection = options.userCollection;
       if(userCollection) {
         this.transformModel = function(model) {

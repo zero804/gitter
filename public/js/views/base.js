@@ -5,11 +5,12 @@ define([
   'backbone',
   'hbs!./tmpl/modal',
   'hbs!./tmpl/popover',
+  'hbs!./tmpl/loading',
   '../template/helpers/all',
   'hbs!./tmpl/confirmationView',
   'log!base-views',
   'backbone-keys' // no ref
-], function($, _, Backbone, modalTemplate, popoverTemplate, helpers, confirmationViewTemplate, log) {
+], function($, _, Backbone, modalTemplate, popoverTemplate, loadingTemplate, helpers, confirmationViewTemplate, log) {
   /*jshint trailing:false */
   "use strict";
 
@@ -485,7 +486,7 @@ define([
         animation: true,
         selector: false,
         title: '',
-        delay: 500,
+        delay: 300,
         container: false,
         placement: 'right',
         width: ''
@@ -677,57 +678,6 @@ define([
       return this.$arrow;
     }
   });
-  /*
-
-
-
-  var Popover = function ( element, options ) {
-    this.init('popover', element, options)
-  }
-
-  Popover.prototype = $.extend({}, $.fn.tooltip.Constructor.prototype, {
-
-    constructor: Popover
-
-  , setContent: function () {
-      var $tip = this.tip()
-        , title = this.getTitle()
-        , content = this.getContent()
-
-      $tip.find('.popover-title')[ $.type(title) == 'object' ? 'append' : 'html' ](title)
-      $tip.find('.popover-content > *')[ $.type(content) == 'object' ? 'append' : 'html' ](content)
-       $tip.find('.popover-inner').css('width', this.options.width)
-
-      $tip.removeClass('fade top bottom left right in')
-    }
-
-  , hasContent: function () {
-      return this.getTitle() || this.getContent()
-    }
-
-  , getContent: function () {
-      var content
-        , $e = this.$element
-        , o = this.options
-
-      content = $e.attr('data-content')
-        || (typeof o.content == 'function' ? o.content.call($e[0]) :  o.content)
-
-      content = content.toString().replace(/(^\s*|\s*$)/, "")
-
-      return content
-    }
-
-  , tip: function() {
-      if (!this.$tip) {
-        this.$tip = $(this.options.template)
-      }
-      return this.$tip
-    }
-
-  })
-
-  */
 
   /* This is a mixin for Marionette.CollectionView */
   TroupeViews.SortableMarionetteView = {
@@ -801,11 +751,33 @@ define([
         var view = collectionView.children.findByModel(collectionView.collection.at(i));
         return view;
       }
-
-
     }
-
   };
+
+  TroupeViews.LoadingView =  TroupeViews.Base.extend({
+    template: loadingTemplate
+  });
+
+  // Mixin for Marionette.CollectionView classes
+  TroupeViews.LoadingCollectionMixin = {
+    loadingView: TroupeViews.LoadingView,
+    showEmptyView: function() {
+      if(this.collection.loading) {
+        var LoadingView = Marionette.getOption(this, "loadingView");
+
+        if (LoadingView && !this._showingEmptyView){
+          this._showingEmptyView = true;
+          var model = new Backbone.Model();
+          this.addItemView(model, LoadingView, 0);
+        }
+        return;
+      }
+
+      return Marionette.CollectionView.prototype.showEmptyView.call(this);
+    }
+  };
+
+
 
   TroupeViews.ConfirmationView = TroupeViews.Base.extend({
     template: confirmationViewTemplate,
