@@ -109,7 +109,7 @@ define([
         // header title
         $('.trpHeaderTitle').html(message.model.name);
         // window / title bar
-        self.updateTitlebar();
+        self.updateTitlebar(unreadItemsClient.getCounts());
       });
 
       function onTroupeUnreadTotalChange(event, values) {
