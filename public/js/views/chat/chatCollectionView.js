@@ -93,11 +93,11 @@ define([
 
     afterRender: function() {
       this.$el.toggleClass('isViewers', this.isOwnMessage());
-
-      if (this.isOwnMessage()) this.$el.toggleClass('isEditable', this.isInEditablePeriod());
+      this.$el.toggleClass('isEditable', this.isInEditablePeriod());
       this.$el.toggleClass('canEdit', this.canEdit());
+      this.$el.toggleClass('cantEdit', !this.canEdit());
       this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
-      if (!this.isOwnMessage() && !this.hasBeenEdited()) this.$el.toggleClass('noEdit');
+      this.$el.toggleClass('hasBeenRead', this.hasBeenRead());
 
       //this.$el.tooltip();
     },
@@ -136,6 +136,10 @@ define([
 
     hasBeenEdited: function() {
       return !!this.model.get('editedAt');
+    },
+
+    hasBeenRead: function() {
+      return !!this.model.get('readBy');
     },
 
     toggleEdit: function() {
