@@ -70,15 +70,23 @@ define([
     });
 
     // collection of recent troupes only, will be empty at first.
+    // doesn't need to be connected to events from the main collection,
+    // because this only changes when the page is refreshed
+    // (TODO actually it changes when another window accesses it as well, but this change doesn't get pushed through faye yet)
     var recentTroupeCollection = new Backbone.Collection();
 
     // when the list of troupes come in filter them and put them in recentTroupeCollection
     troupeCollection.on('reset', function() {
+      // filter out troupes that don't have a last access time
+      var recentTroupeModels = _.filter(troupeCollection.models, function(v) {
+        return !!v.get('lastAccessTime');
+      });
+
       // sort the troupes by last accessed
-      var recentTroupeModels = _.sortBy(troupeCollection.models, function(v) {
+      recentTroupeModels = _.sortBy(recentTroupeModels, function(v) {
         var lastAccess = v.get('lastAccessTime');
 
-        return (lastAccess) ? lastAccess.valueOf() : -1;
+        return lastAccess.valueOf();
       }).reverse();
 
       // filter to the most recent 5
