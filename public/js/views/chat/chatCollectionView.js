@@ -99,7 +99,7 @@ define([
       this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
       this.$el.toggleClass('hasBeenRead', this.hasBeenRead());
 
-      this.$el.find('[title]').tooltip({ container: 'body' });
+      this.$el.find('.trpChatEdit [title]').tooltip({ container: 'body' });
     },
 
     detectReturn: function(e) {
@@ -222,6 +222,8 @@ define([
       _.bindAll(this, 'chatWindowScroll');
       this.initializeSorting();
 
+      this.userCollection = options.userCollection;
+
       if (window._troupeCompactView) {
         ChatCollectionView.$scrollOf = $('#chat-wrapper');
         ChatCollectionView.$container = $('#chat-frame');
@@ -232,14 +234,19 @@ define([
 
       this.scrollDelegate = new scrollDelegates.DefaultScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
       this.infiniteScrollDelegate = new scrollDelegates.InfiniteScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
-      ChatCollectionView.$scrollOf.on('scroll', this.chatWindowScroll);
-
-      this.userCollection = options.userCollection;
-
       function findTopMostVisibleUnreadItem(itemType) {
         return unreadItemsClient.findTopMostVisibleUnreadItemPosition(itemType);
       }
 
+      var self = this;
+      // wait for the first reset (preloading) before enabling infinite scroll
+      if (this.collection.length === 0) {
+        this.collection.once('reset', function() {
+          ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
+        });
+      } else {
+        ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
+      }
     },
 
     onClose: function(){
@@ -289,6 +296,7 @@ define([
       function success(data, resp) {
         self.loading = false;
         if(!resp.length) {
+          // turn off infinite scroll if there were no new messages retrieved
           $(ChatCollectionView.$scrollOf).off('scroll', self.chatWindowScroll);
         }
       }
