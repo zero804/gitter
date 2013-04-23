@@ -150,12 +150,13 @@ define([
 
       // show / hide the 'unread troupes header' on the mega list
       collections['unreadTroupes'].on('all', function() {
-        if (collections['unreadTroupes'].length <= 0) {
-          $('#unreadTroupesHeader').hide();
-        }
-        else {
-         $('#unreadTroupesHeader').show();
-        }
+        $('#unreadTroupesList').toggle(collections['unreadTroupes'].length > 0);
+      });
+      collections['favouriteTroupes'].on('all', function() {
+        $('#favTroupesList').toggle(collections['favouriteTroupes'].length > 0);
+      });
+      collections['recentTroupes'].on('all', function() {
+        $('#recentTroupesList').toggle(collections['recentTroupes'].length > 0);
       });
     },
 
