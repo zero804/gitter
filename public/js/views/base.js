@@ -651,6 +651,7 @@ define([
       }
 
       $e.trigger('hidden');
+      this.trigger('hide');
       this.close();
 
       return this;
