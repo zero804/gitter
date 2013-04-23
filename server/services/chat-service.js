@@ -75,8 +75,13 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
     .where('toTroupeId', troupeId);
 
   if(options.startId) {
-    var id = new ObjectID(options.startId);
-    q = q.where('_id').gte(id);
+    var startId = new ObjectID(options.startId);
+    q = q.where('_id').gte(startId);
+  }
+
+  if(options.beforeId) {
+    var beforeId = new ObjectID(options.beforeId);
+    q = q.where('_id').lt(beforeId);
   }
 
   q.sort({ sent: 'desc' })

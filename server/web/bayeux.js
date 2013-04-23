@@ -31,6 +31,7 @@ function validateUserForTroupeSubscription(options, callback) {
 function validateUserForSubTroupeSubscription(options, callback) {
   var userId = options.userId;
   var match = options.match;
+  var message = options.message;
   var clientId = options.clientId;
   var notifyPresenceService = options.notifyPresenceService;
 
@@ -45,7 +46,14 @@ function validateUserForSubTroupeSubscription(options, callback) {
     }
 
     if(result && notifyPresenceService) {
-      presenceService.userSubscribedToTroupe(userId, troupeId, clientId, function(err) {
+      var eyeballState = true;
+      if(message.ext) {
+        if(message.ext.hasOwnProperty('eyeballs')) {
+          eyeballState = !!message.ext.eyeballs;
+        }
+      }
+
+      presenceService.userSubscribedToTroupe(userId, troupeId, clientId, eyeballState, function(err) {
         if(err) return callback(err);
 
         return callback(null, result);
