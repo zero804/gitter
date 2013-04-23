@@ -10,9 +10,8 @@ define([
   'views/base',
   './scrollDelegate',
   'hbs!./tmpl/chatViewItem',
-  'hbs!./tmpl/readBy',
   'bootstrap_tooltip'
-], function($, _, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate, readByTemplate /* tooltip*/) {
+], function($, _, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate /* tooltip*/) {
   "use strict";
 
   var PAGE_SIZE = 15;
