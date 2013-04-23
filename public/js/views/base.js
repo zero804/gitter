@@ -4,11 +4,12 @@ define([
   'underscore',
   'backbone',
   'hbs!./tmpl/modal',
+  'hbs!./tmpl/popover',
   '../template/helpers/all',
   'hbs!./tmpl/confirmationView',
   'log!base-views',
   'backbone-keys' // no ref
-], function($, _, Backbone, modalTemplate, helpers, confirmationViewTemplate, log) {
+], function($, _, Backbone, modalTemplate, popoverTemplate, helpers, confirmationViewTemplate, log) {
   /*jshint trailing:false */
   "use strict";
 
@@ -476,44 +477,257 @@ define([
     }
   });
 
-  TroupeViews.Menu = Backbone.View.extend({
+  TroupeViews.Popover = TroupeViews.Base.extend({
+    template: popoverTemplate,
+    className: "popover",
     initialize: function(options) {
-      _.bindAll(this, 'toggleMenu', 'showMenu', 'hideMenu');
-      $('body, html').on('click', this.hideMenu);
-      $('.trpMenuIcon, .trpNotifyBadge').on('click', this.hideMenu);
-      this.triggerEl = $(options.triggerEl);
-      this.triggerEl.on('click', this.toggleMenu);
+      this.options = {
+        animation: true,
+        selector: false,
+        title: '',
+        delay: 500,
+        container: false,
+        placement: 'right',
+        width: ''
+      };
+      _.bindAll(this, 'leave', 'enter');
+      _.extend(this.options, options);
+      //this.init('popover', element, options);
+      this.view = this.options.view;
+      this.targetElement = this.options.targetElement;
+      this.$targetElement = $(this.targetElement);
+
+      this.$targetElement.on('mouseenter', this.enter);
+      this.$targetElement.on('mouseleave', this.leave);
+    },
+
+    afterRender: function() {
+      var $e = this.$el;
+      var title = this.options.title;
+
+      $e.find('.popover-title').text(title);
+      $e.find('.popover-content > *').append(this.view.render().el);
+      $e.find('.popover-inner').css('width', this.options.width);
+
+      $e.on('mouseenter', this.enter);
+      $e.on('mouseleave', this.leave);
+
+      $e.removeClass('fade top bottom left right in');
+    },
+
+    enter: function (/*e*/) {
+      if (this.timeout) clearTimeout(this.timeout);
+    },
+
+    leave: function (/*e*/) {
+      if (!this.options.delay) {
+        return self.hide();
+      }
+
+      var self = this;
+      this.timeout = setTimeout(function() {
+        self.hide();
+      }, self.options.delay);
     },
 
     onClose: function() {
-      this.triggerEl.off();
+      this.$el.off('mouseenter', this.enter);
+      this.$el.off('mouseleave', this.leave);
+
+      this.$targetElement.off('mouseenter', this.enter);
+      this.$targetElement.off('mouseleave', this.leave);
     },
 
-    toggleMenu: function(){
-      if (this.$el.is(':hidden')) {
-        this.showMenu();
-        return false;
-      } else {
-        this.hideMenu();
+    show: function () {
+
+      var $e = this.render().$el;
+      var e = this.el;
+
+      if (this.options.animation) {
+        $e.addClass('fade');
       }
+
+      $e.detach().css({ top: 0, left: 0, display: 'block' });
+
+      $e.insertAfter(this.targetElement);
+
+      var pos = this.getPosition();
+
+      var actualWidth = e.offsetWidth;
+      var actualHeight = e.offsetHeight;
+
+      var placement = this.options.placement;
+      var tp;
+      switch (placement) {
+        case 'bottom':
+          tp = {top: pos.top + pos.height, left: pos.left + pos.width / 2 - actualWidth / 2};
+          break;
+        case 'top':
+          tp = {top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2};
+          break;
+        case 'left':
+          tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth};
+          break;
+        case 'right':
+          tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width};
+          break;
+      }
+
+      this.applyPlacement(tp, placement);
     },
 
-    showMenu: function() {
-      $(this.triggerEl).css('background-color', 'white');
-      this.$el.slideDown('fast', function() {
-          // Animation complete.
-          $('body').on('click', this.hideMenu);
-      });
+    applyPlacement: function(offset, placement){
+      var $e = this.$el;
+      var e = $e[0];
+
+      var width = e.offsetWidth;
+      var height = e.offsetHeight;
+      var actualWidth;
+      var actualHeight;
+      var delta;
+      var replace;
+
+      $e
+        .offset(offset)
+        .addClass(placement)
+        .addClass('in');
+
+      actualWidth = e.offsetWidth;
+      actualHeight = e.offsetHeight;
+
+      if (placement == 'top' && actualHeight != height) {
+        offset.top = offset.top + height - actualHeight;
+        replace = true;
+      }
+
+      if (placement == 'bottom' || placement == 'top') {
+        delta = 0;
+
+        if (offset.left < 0) {
+          delta = offset.left * -2;
+          offset.left = 0;
+          $e.offset(offset);
+          actualWidth = e.offsetWidth;
+          actualHeight = e.offsetHeight;
+        }
+
+        this.replaceArrow(delta - width + actualWidth, actualWidth, 'left');
+      } else {
+        this.replaceArrow(actualHeight - height, actualHeight, 'top');
+      }
+
+      if (replace) $e.offset(offset);
     },
 
-    hideMenu: function() {
-      $(this.triggerEl).css('background-color', 'transparent');
-      $('body').off('click', this.hideMenu);
-      this.$el.slideUp('fast', function() {
-          // Animation complete.
-      });
+    replaceArrow: function(delta, dimension, position){
+      this
+        .arrow()
+        .css(position, delta ? (50 * (1 - delta / dimension) + "%") : '');
+    },
+
+    hide: function () {
+      if (this.timeout) clearTimeout(this.timeout);
+
+      var $e = this.$el;
+
+      $e.removeClass('in');
+
+      function removeWithAnimation() {
+        var timeout = setTimeout(function() {
+          $e.off($.support.transition.end).detach();
+        }, 500);
+
+        $e.one($.support.transition.end, function () {
+          clearTimeout(timeout);
+          $e.detach();
+        });
+      }
+
+      if($.support.transition && this.$tip.hasClass('fade')) {
+        removeWithAnimation();
+      } else {
+        $e.detach();
+      }
+
+      $e.trigger('hidden');
+      this.close();
+
+      return this;
+    },
+
+    getPosition: function () {
+      var el = this.targetElement;
+
+      return _.extend({}, (typeof el.getBoundingClientRect == 'function') ? el.getBoundingClientRect() : {
+        width: el.offsetWidth,
+        height: el.offsetHeight
+      }, this.$targetElement.offset());
+
+    },
+
+    getTitle: function () {
+      return this.options.title;
+    },
+
+    arrow: function(){
+      if(!this.$arrow) {
+        this.$arrow = this.$el.find(".tooltip-arrow");
+      }
+
+      return this.$arrow;
     }
   });
+  /*
+
+
+
+  var Popover = function ( element, options ) {
+    this.init('popover', element, options)
+  }
+
+  Popover.prototype = $.extend({}, $.fn.tooltip.Constructor.prototype, {
+
+    constructor: Popover
+
+  , setContent: function () {
+      var $tip = this.tip()
+        , title = this.getTitle()
+        , content = this.getContent()
+
+      $tip.find('.popover-title')[ $.type(title) == 'object' ? 'append' : 'html' ](title)
+      $tip.find('.popover-content > *')[ $.type(content) == 'object' ? 'append' : 'html' ](content)
+       $tip.find('.popover-inner').css('width', this.options.width)
+
+      $tip.removeClass('fade top bottom left right in')
+    }
+
+  , hasContent: function () {
+      return this.getTitle() || this.getContent()
+    }
+
+  , getContent: function () {
+      var content
+        , $e = this.$element
+        , o = this.options
+
+      content = $e.attr('data-content')
+        || (typeof o.content == 'function' ? o.content.call($e[0]) :  o.content)
+
+      content = content.toString().replace(/(^\s*|\s*$)/, "")
+
+      return content
+    }
+
+  , tip: function() {
+      if (!this.$tip) {
+        this.$tip = $(this.options.template)
+      }
+      return this.$tip
+    }
+
+  })
+
+  */
 
   /* This is a mixin for Marionette.CollectionView */
   TroupeViews.SortableMarionetteView = {
@@ -574,7 +788,6 @@ define([
           itemView.$el.insertBefore(adjView.el);
         } else {
           log("Inserting *after* the bottom of the collection ", adjView);
-          debugger;
           // We can't find an item before, we can't find an item after,
           // just give up and insert at the end. (hopefully this will never happen eh?)
           itemView.$el.appendTo(collectionView.el);
