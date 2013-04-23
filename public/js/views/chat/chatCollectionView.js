@@ -99,7 +99,7 @@ define([
       this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
       this.$el.toggleClass('hasBeenRead', this.hasBeenRead());
 
-      //this.$el.tooltip();
+      this.$el.find('[title]').tooltip({ container: 'body' });
     },
 
     detectReturn: function(e) {
