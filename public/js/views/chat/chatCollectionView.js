@@ -24,7 +24,7 @@ define([
 
     events: {
       'click .trpChatEdit':     'toggleEdit',
-      'keydown .trpChatInput':  'detectReturn',
+      'keydown .trpChatInput':  'detectKeys',
       'click .trpChatReads':    'showReadBy'
     },
 
@@ -102,21 +102,33 @@ define([
       this.$el.find('.trpChatEdit [title]').tooltip({ container: 'body' });
     },
 
+    detectKeys: function(e) {
+      this.detectReturn(e);
+      this.detectEscape(e);
+    },
+
     detectReturn: function(e) {
-      if(e.keyCode == 13 && !e.ctrlKey) {
+      if(e.keyCode === 13 && !e.ctrlKey) {
         this.saveChat();
         e.stopPropagation();
         e.preventDefault();
+      }
+    },
 
-        return false;
+    detectEscape: function(e) {
+      if (e.keyCode === 27) {
+        this.toggleEdit();
       }
     },
 
     saveChat: function() {
-      var newText = this.$el.find('.trpChatInput').val();
-      if (this.canEdit() && newText != this.model.get('text')) {
-        this.model.set('text', newText);
-        this.model.save();
+      if (this.isEditing) {
+        var newText = this.$el.find('.trpChatInput').val();
+        if (this.canEdit() && newText != this.model.get('text')) {
+          this.model.set('text', newText);
+          this.model.save();
+        }
+
         this.toggleEdit();
       }
     },
