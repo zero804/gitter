@@ -162,44 +162,35 @@ define([
     },
 
     showReadBy: function() {
-      new ReadByModal({ model: this.model, userCollection: this.userCollection }).show();
+      new ReadByModal({
+        model: this.model,
+        userCollection: this.userCollection,
+        placement: 'bottom',
+        title: 'Read By',
+        targetElement: this.$el.find('.trpChatReads')[0]
+      }).show();
     }
 
   });
 
-  var ReadByView = TroupeViews.Base.extend({
-    template: readByTemplate,
-
-    events: {
-    },
-
+  var ReadByView = Marionette.CollectionView.extend({
+    itemView: AvatarView,
     initialize: function(options) {
       var c = new chatModels.ReadByCollection({ chatMessageId: this.model.id, userCollection: options.userCollection });
-      this._collection = c;
+      this.collection = c;
       c.listen(function() {
         c.fetch();
       });
-
-      this.addCleanup(function() {
-        c.unlisten();
-      });
     },
-
-    afterRender: function() {
-      new Marionette.CollectionView({
-         collection: this._collection,
-         //itemViewOptions: { chat: this.model },
-         itemView: AvatarView,
-         el: this.$el.find('#frame-users')
-      }).render();
+    onClose: function(){
+      this.collection.unlisten();
     }
-
   });
 
 
-  var ReadByModal = TroupeViews.Modal.extend({
+  var ReadByModal = TroupeViews.Popover.extend({
     initialize: function(options) {
-      TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+      TroupeViews.Popover.prototype.initialize.apply(this, arguments);
       this.view = new ReadByView({ model: this.model, userCollection: options.userCollection });
     }
   });
