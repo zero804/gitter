@@ -41,6 +41,13 @@ define([
         }, notEditableInMS + 50);
       }
 
+      if (!this.isOld()) {
+        var oldInMS = (this.model.get('sent').valueOf() + 216000000 /*1 hour*/) - Date.now();
+        setTimeout(function() {
+          self.render();
+        }, oldInMS + 50);
+      }
+
       // dblclick / doubletap don't seem to work on mobile even with user-scalable=no
       /*
       if (window._troupeCompactView) {
@@ -97,6 +104,7 @@ define([
       this.$el.toggleClass('cantEdit', !this.canEdit());
       this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
       this.$el.toggleClass('hasBeenRead', this.hasBeenRead());
+      this.$el.toggleClass('isOld', this.isOld());
 
       this.$el.find('.trpChatEdit [title]').tooltip({ container: 'body' });
     },
@@ -139,6 +147,11 @@ define([
     isInEditablePeriod: function() {
       var age = (Date.now() - this.model.get('sent').valueOf()) / 1000;
       return age <= 240;
+    },
+
+    isOld: function() {
+      var age = (Date.now() - this.model.get('sent').valueOf()) / 1000;
+      return age >= 216000;
     },
 
     canEdit: function() {
