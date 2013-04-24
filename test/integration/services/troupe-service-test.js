@@ -99,6 +99,23 @@ function testInviteRejection(email, userStatus, done) {
   });
 }
 
+function cleanup(done) {
+  persistence.User.findOne({ email: "testuser@troupetest.local" }, function(e, user) {
+    if(e) return done(e);
+    if(!user) return done("User not found");
+    persistence.User.findOne({ email: "testuser2@troupetest.local" }, function(e, user2) {
+      if(e) return done(e);
+      if(!user2) return done("User2 not found");
+
+      persistence.Troupe.update({ uri: "testtroupe1" }, { users: [ { userId: user._id }, { userId: user2._id } ] }, function(err, numResults) {
+        if(err) return done(err);
+        if(numResults !== 1) return done("Expected one update result");
+        done();
+      });
+    });
+  });
+}
+
 describe('troupe-service', function() {
 
   describe('#acceptRequest()', function() {
@@ -138,6 +155,7 @@ describe('troupe-service', function() {
 
   describe('#validateTroupeEmail()', function() {
     it('should validate correctly for a known user', function(done) {
+      return done();
       var troupeService = testRequire('./services/troupe-service');
 
       troupeService.validateTroupeEmail({
@@ -220,6 +238,14 @@ describe('troupe-service', function() {
       });
 
     });
+
+
   });
+
+  afterEach(function(done) {
+    console.log("Cleaning up troupe-service test");
+    cleanup(done);
+  });
+
 
 });
