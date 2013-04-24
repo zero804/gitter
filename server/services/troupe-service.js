@@ -457,12 +457,32 @@ function findFavouriteTroupesForUser(userId, callback) {
   });
 }
 
+function findAllUserIdsForTroupes(troupeIds, callback) {
+  if(!troupeIds.length) return callback(null, []);
+
+  persistence.Troupe.aggregate([
+    { $match: { _id: { $in: troupeIds } } },
+    { $project: { _id: 0, 'users.userId': 1 } },
+    { $unwind: '$users' },
+    { $group: { _id: 1, userIds: { $addToSet: '$users.userId' } } } ],
+    function(err, results) {
+      if(err) return callback(err);
+
+      var result = results[0];
+      if(!result || !result.userIds || !result.userIds.length) return callback(null, []);
+
+      return callback(null, result.userIds);
+    });
+}
+
 module.exports = {
   findByUri: findByUri,
   findById: findById,
   findByIds: findByIds,
   findAllTroupesForUser: findAllTroupesForUser,
   findAllTroupesIdsForUser: findAllTroupesIdsForUser,
+  findAllUserIdsForTroupes: findAllUserIdsForTroupes,
+
   validateTroupeEmail: validateTroupeEmail,
   validateTroupeEmailAndReturnDistributionList: validateTroupeEmailAndReturnDistributionList,
   userHasAccessToTroupe: userHasAccessToTroupe,

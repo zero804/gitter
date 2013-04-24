@@ -1,7 +1,7 @@
 #!/usr/bin/env mocha --ignore-leaks
 
 /*jslint node:true, unused:true*/
-/*global describe:true, it:true*/
+/*global describe:true, it:true, after:true */
 "use strict";
 
 var testRequire = require('../test-require');
@@ -238,11 +238,38 @@ describe('troupe-service', function() {
       });
 
     });
+  });
+
+  describe('#findAllUserIdsForTroupes()', function() {
+    it('should find all the users in the requested troupes',function(done) {
+
+      var troupeService = testRequire('./services/troupe-service');
+
+      persistence.Troupe.findOne({ uri: 'testtroupe1' }, function(err, troupe) {
+        if(err) return done(err);
+        if(!troupe) return done("Cannot find troupe");
+        troupeService.findAllUserIdsForTroupes([troupe._id], function(err, userIds) {
+          if(err) return done(err);
+
+          assert(userIds.length, 'No users returned');
+
+          persistence.User.findOne({ email: "testuser@troupetest.local" }, function(err, user) {
+            if(err) return done(err);
+
+            assert(userIds.map(function(i) { return "" + i; }).indexOf(user.id) >= 0, 'Expected to find test user in results');
+
+            done();
+          });
+
+        });
+      });
+
+    });
 
 
   });
 
-  afterEach(function(done) {
+  after(function(done) {
     console.log("Cleaning up troupe-service test");
     cleanup(done);
   });
