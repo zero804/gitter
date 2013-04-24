@@ -3,7 +3,7 @@ var testRequire = require('./../test-require');
 var userService = testRequire('./services/user-service');
 var signupService = testRequire('./services/signup-service');
 var persistence = testRequire("./services/persistence-service");
-var assert = testRequire("./utils/awesome-assert");
+var assert = testRequire("assert");
 
 describe("User Service", function() {
 
@@ -80,19 +80,29 @@ describe("User Service", function() {
           if(err) return done(err);
           if(!user) return done("Cannot find user");
 
-          var after = new Date();
           userService.saveLastVisitedTroupeforUser(user.id, troupe.id, function(err) {
             if(err) return done(err);
 
-            var troupeId = "" + troupe.id;
-
             userService.getTroupeLastAccessTimesForUser(user.id, function(err, times) {
               if(err) return done(err);
-              console.log(times);
-              assert(times[troupeId] > after);
-              done();
+              var troupeId = "" + troupe.id;
+
+              var after = times[troupeId];
+              assert(after, 'Expected a value for last access time');
+
+              userService.saveLastVisitedTroupeforUser(user.id, troupe.id, function(err) {
+                if(err) return done(err);
+
+                userService.getTroupeLastAccessTimesForUser(user.id, function(err, times) {
+                  if(err) return done(err);
+                  assert(times[troupeId] > after, 'The last access time for this troupe has not changed. Before it was ' + after + ' now it is ' + times[troupeId]);
+                  done();
+                });
+              });
             });
+
           });
+
 
       });
 
