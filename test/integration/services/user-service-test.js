@@ -1,3 +1,4 @@
+var persistence = require('./../../../server/services/persistence-service');
 var testRequire = require('./../test-require');
 var userService = testRequire('./services/user-service');
 var signupService = testRequire('./services/signup-service');
@@ -5,6 +6,8 @@ var persistence = testRequire("./services/persistence-service");
 var assert = testRequire("./utils/awesome-assert");
 
 describe("User Service", function() {
+
+  var userId = null;
 
   describe("#updateProfile", function() {
     it("should update the name, email, password and status of a user", function(done) {
@@ -20,6 +23,7 @@ describe("User Service", function() {
         assert.notStrictEqual(user, null);
         assert.notStrictEqual(typeof user, 'undefined');
 
+        userId = user.id; // so we can clean up
         var oldUserStatus = user.status;
         var params = {
           userId: user.id,
@@ -54,6 +58,12 @@ describe("User Service", function() {
 
           });
 
+        });
+      });
+
+      after(function(done) {
+        persistence.User.remove({ id: userId }, function(e, n) {
+          done();
         });
       });
     });
