@@ -58,3 +58,5 @@ test/end-to-end/e2etests/utils.pyc
 *.pyc
 .ackrc
 /deployment/config/roles/geckoconnector/files/opt/geckoconnector/node_modules
+test/end-to-end/ios/ios-driver.log
+test/end-to-end/ios/ios-driver.log.lck
