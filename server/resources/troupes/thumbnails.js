@@ -18,7 +18,7 @@ function getDefaultImage(mimeType) {
 }
 
 module.exports = {
-    index: function(req, res, next) {
+    index: function(req, res) {
       res.relativeRedirect("/troupes/" + req.troupe.id + "/files/");
     },
 
