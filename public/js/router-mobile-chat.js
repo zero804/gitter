@@ -15,6 +15,8 @@ require([
   /*jslint browser: true, unused: true */
   "use strict";
 
+  var PAGE_SIZE = 15;
+
   TroupeViews.preloadWidgets({
     avatar: AvatarWidget
   });
@@ -22,7 +24,11 @@ require([
 
   var chatCollection = new chatModels.ChatCollection();
   chatCollection.listen();
-  chatCollection.fetch();
+  chatCollection.fetch({
+    data: {
+      limit: PAGE_SIZE
+    }
+  });
 
   new ChatInputView({
     el: $('#chat-input'),

@@ -556,16 +556,16 @@ define([
       };
     },
 
-    findTopMostVisibleUnreadItemPosition: function(itemType) {
+    findTopMostVisibleUnreadItemPosition: function(itemType, $container, $scrollOf) {
       var topItem = null;
       var topItemOffset = 1000000000;
 
-      var $window = $(window);
-      var scrollTop = $window.scrollTop();
-      var scrollBottom = scrollTop + $window.height();
+      var scrollTop = $scrollOf.scrollTop();
+      var scrollBottom = scrollTop + $scrollOf.height();
 
+      var unreadElements = $container.find('.unread');
 
-      $('.unread').each(function (index, element) {
+      unreadElements.each(function (index, element) {
         var $e = $(element);
         var elementItemType = $e.data('itemType');
         if(elementItemType != itemType) return;
@@ -582,7 +582,13 @@ define([
         }
       });
 
+      // calculate the offset of the top item relative to container
+
+
       if(!topItem) return null;
+      // note: mobile will never have a scroll limit because eyaballs are never off, so items are marked as read immediately.
+      // technically this offset should be relative to $scrollOf, but relative to the window seems to work for now,
+      // especially seen as there will never really be a top unread item for mobile, because eyeballs are always on.
       return topItem.offset();
     },
 
