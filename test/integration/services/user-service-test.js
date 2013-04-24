@@ -1,5 +1,6 @@
-var persistence = require('./../../../server/services/persistence-service');
 var testRequire = require('./../test-require');
+
+var persistence = testRequire('./services/persistence-service');
 var userService = testRequire('./services/user-service');
 var signupService = testRequire('./services/signup-service');
 var persistence = testRequire("./services/persistence-service");
