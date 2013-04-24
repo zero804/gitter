@@ -15,6 +15,11 @@ var collections = require("../utils/collections");
 var cdn = require('../web/cdn');
 var predicates = collections.predicates;
 
+// TODO: Fix this, use the CDN and code sign URLS
+function privateCdn(url) {
+  return "/" + url;
+}
+
 function formatDate(d) {
   return d ? d.toISOString() : null;
 }
@@ -175,11 +180,11 @@ function FileStrategy(options) {
           deleted: item.deleted
         };
       }),
-      url: cdn('troupes/' + encodeURIComponent(item.troupeId) + '/downloads/' + encodeURIComponent(item.fileName), { notStatic: true }),
+      url: privateCdn('troupes/' + encodeURIComponent(item.troupeId) + '/downloads/' + encodeURIComponent(item.fileName), { notStatic: true }),
       previewMimeType: item.previewMimeType,
       embeddedViewType: item.embeddedViewType,
-      embeddedUrl: cdn('troupes/' + encodeURIComponent(item.troupeId) + '/embedded/' + encodeURIComponent(item.fileName), { notStatic: true }),
-      thumbnailUrl: cdn('troupes/' + encodeURIComponent(item.troupeId) + '/thumbnails/' + encodeURIComponent(item.fileName) + "?version=" + item.versions.length, { notStatic: true }),
+      embeddedUrl: privateCdn('troupes/' + encodeURIComponent(item.troupeId) + '/embedded/' + encodeURIComponent(item.fileName), { notStatic: true }),
+      thumbnailUrl: privateCdn('troupes/' + encodeURIComponent(item.troupeId) + '/thumbnails/' + encodeURIComponent(item.fileName) + "?version=" + item.versions.length, { notStatic: true }),
       unread: options.currentUserId ? unreadItemStategy.map(item._id) : true,
       v: getVersion(item)
     };
