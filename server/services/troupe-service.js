@@ -9,6 +9,8 @@ var persistence = require("./persistence-service"),
     winston = require("winston"),
     collections = require("../utils/collections");
 
+var ObjectID = require('mongodb').ObjectID;
+
 function findByUri(uri, callback) {
   persistence.Troupe.findOne({uri: uri}, function(err, troupe) {
     callback(err, troupe);
@@ -62,7 +64,7 @@ function findAllTroupesIdsForUser(userId, callback) {
     .exec(function(err, result) {
       if(err) return callback(err);
 
-      var troupeIds = result.map(function(troupe) { return troupe.id; } );
+      var troupeIds = result.map(function(troupe) { return troupe._id; } );
       return callback(null, troupeIds);
     });
 }
@@ -460,14 +462,18 @@ function findFavouriteTroupesForUser(userId, callback) {
 function findAllUserIdsForTroupes(troupeIds, callback) {
   if(!troupeIds.length) return callback(null, []);
 
+  var mappedTroupeIds = troupeIds.map(function(d) {
+    if(typeof d === 'string') return new ObjectID('' + d);
+    return d;
+  });
+
   persistence.Troupe.aggregate([
-    { $match: { _id: { $in: troupeIds } } },
+    { $match: { _id: { $in: mappedTroupeIds } } },
     { $project: { _id: 0, 'users.userId': 1 } },
     { $unwind: '$users' },
-    { $group: { _id: 1, userIds: { $addToSet: '$users.userId' } } } ],
-    function(err, results) {
+    { $group: { _id: 1, userIds: { $addToSet: '$users.userId' } } }
+    ], function(err, results) {
       if(err) return callback(err);
-
       var result = results[0];
       if(!result || !result.userIds || !result.userIds.length) return callback(null, []);
 
