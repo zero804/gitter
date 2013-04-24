@@ -315,6 +315,7 @@ define([
 
         if (transition) {
           var o = that.$el[0].offsetWidth; // force reflow
+          o++;
         }
 
         that.$el.addClass('in');
@@ -360,7 +361,6 @@ define([
     hideInternal: function() {
       if (!this.isShown) return;
 
-      var that = this;
       this.isShown = false;
 
       $('body').removeClass('modal-open');
@@ -419,7 +419,6 @@ define([
     },
 
     backdrop: function( callback ) {
-      var that = this;
       var animate = this.options.fade ? 'fade' : '';
 
       if (this.isShown && this.options.backdrop) {
@@ -436,7 +435,7 @@ define([
         }
         this.$backdrop.modal = this;
 
-        if (doAnimate) { var x = this.$backdrop[0].offsetWidth; } // force reflow
+        if (doAnimate) { var x = this.$backdrop[0].offsetWidth; x++; } // force reflow
 
         this.$backdrop.addClass('in');
 
