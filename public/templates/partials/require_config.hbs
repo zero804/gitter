@@ -1,27 +1,30 @@
 require.config({
   waitSeconds: 15,
   paths: {
-    hbs: 'libs/hbs/0.4.0/hbs',
+    hbs: 'libs/hbs/hbs',
     log: 'utils/logrjs',
-    i18nprecompile: 'libs/hbs/0.4.0/hbs/i18nprecompile',
-    json2: 'libs/hbs/0.4.0/hbs/json2',
-    handlebars: 'libs/hbs/0.4.0/Handlebars',
+    i18nprecompile: 'libs/hbs/hbs/i18nprecompile',
+    json2: 'libs/hbs/hbs/json2',
+    handlebars: 'libs/hbs/Handlebars',
 
-    "hbs/underscore" : "libs/underscore/1.4.3/underscore-min",
-    underscore: 'libs/underscore/1.4.3/underscore-min',
-    clwrapper: 'libs/clwrapper/cf9f12b17b/consolelog',
+    "hbs/underscore" : "libs/underscore/underscore-min",
+    underscore: 'libs/underscore/underscore-min',
 
     expect: 'libs/expect/0.1.2/expect',
     mocha: 'libs/mocha/1.8.2/mocha',
 
-    jquery: 'libs/jquery/1.8.3/jquery-min',
-    marionette : 'libs/marionette/1.0.0-rc5/backbone.marionette',
+    jquery: 'libs/jquery/jquery.min',
+    marionette : 'libs/marionette/lib/core/amd/backbone.marionette',
+
+    backbone: 'libs/backbone/backbone',
+    'backbone.keys': 'libs/backbone.keys/backbone.keys',
+    'backbone.wreqr': 'libs/backbone.wreqr/lib/amd/backbone.wreqr',
+    'backbone.babysitter': 'libs/backbone.babysitter/lib/amd/backbone.babysitter',
+
     jquery_validate : 'libs/jquery.validate/1.9/jquery.validate.min',
     jquery_placeholder: 'libs/jquery.placeholder/jquery.placeholder',
-    moment: 'libs/momentjs/1.7.2/moment.min',
+    moment: 'libs/moment/min/moment.min',
     bootstrap_tooltip: '../bootstrap/js/bootstrap-tooltip',
-    backbone: 'libs/backbone/0.9.10/backbone',
-    'backbone-keys': 'components/backbone.keys/backbone.keys',
     fineuploader: 'libs/fineuploader/3.3/fine-uploader',
     templates: '../templates',
     zeroClipboard: 'libs/zeroClipboard/ZeroClipboard',
@@ -38,7 +41,6 @@ require.config({
       deps: ['underscore', 'jquery'],
       exports: 'Backbone'
     },
-    'backbone-keys': { deps: ['backbone'], exports: 'Backbone' },
     'fineuploader': { exports: 'qq' },
     'filtered-collection': {
       deps: ['underscore','backbone'],
@@ -69,10 +71,6 @@ require.config({
     'jquery_validate':  ['jquery'],
     'jquery_placeholder': ['jquery'],
     'bootstrap_tooltip': ['jquery'],
-    marionette : {
-      deps : ['jquery', 'underscore', 'backbone'],
-      exports : 'Marionette'
-    },
     'zeroClipboard': { exports: 'ZeroClipboard' }
   },
   hbs : {
