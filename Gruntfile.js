@@ -35,7 +35,7 @@ module.exports = function( grunt ) {
               {
                 name: "core-libraries",
                 include: [
-                  "../repo/require/require"
+                  "../repo/requirejs/requirejs"
                 ]
               },
               {
