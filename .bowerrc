@@ -1,4 +1,4 @@
 {
-  "directory" : "public/js/libs",
+  "directory" : "output/client-libs",
   "json"      : "component.json"
 }

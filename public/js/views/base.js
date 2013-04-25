@@ -1,6 +1,7 @@
 /*jshint unused:true, browser:true */
 define([
   'jquery',
+  'jquery-migrate',
   'underscore',
   'backbone',
   'marionette',
@@ -11,7 +12,7 @@ define([
   '../template/helpers/all',
   'hbs!./tmpl/confirmationView',
   'log!base-views'
-], function($, _, Backbone, Marionette, _backboneKeys, modalTemplate, popoverTemplate, loadingTemplate, helpers, confirmationViewTemplate, log) {
+], function($, $mig, _, Backbone, Marionette, _backboneKeys, modalTemplate, popoverTemplate, loadingTemplate, helpers, confirmationViewTemplate, log) {
   /*jshint trailing:false */
   "use strict";
 

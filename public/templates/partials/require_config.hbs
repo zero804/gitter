@@ -1,80 +1,48 @@
 require.config({
   waitSeconds: 15,
   paths: {
-    hbs: 'libs/hbs/hbs',
-    log: 'utils/logrjs',
-    i18nprecompile: 'libs/hbs/hbs/i18nprecompile',
-    json2: 'libs/hbs/hbs/json2',
-    handlebars: 'libs/hbs/Handlebars',
+    "log":            "utils/logrjs",
+    "hbs":            "../repo/hbs/hbs",
+    "i18nprecompile": "../repo/hbs/i18nprecompile",
+    "json2":          "../repo/hbs/json2",
+    "handlebars":     "../repo/hbs/Handlebars",
+    "hbs/underscore": "../repo/underscore/underscore",
+    "underscore":     "../repo/underscore/underscore",
 
-    "hbs/underscore" : "libs/underscore/underscore-min",
-    underscore: 'libs/underscore/underscore-min',
+    "expect":         "../repo/expect/expect",
+    "mocha":          "../repo/mocha/mocha",
 
-    expect: 'libs/expect/0.1.2/expect',
-    mocha: 'libs/mocha/1.8.2/mocha',
+    "jquery":         "../repo/jquery/jquery",
+    "jquery-migrate": "../repo/jquery/jquery-migrate",
+    "jquery-validate": "../repo/jquery-validate/jquery-validate",
+    "jquery-placeholder": "../repo/jquery-placeholder/jquery-placeholder",
 
-    jquery: 'libs/jquery/jquery.min',
-    marionette : 'libs/marionette/lib/core/amd/backbone.marionette',
+    "backbone":       "../repo/backbone/backbone",
+    "marionette":     "../repo/marionette/marionette",
+    "backbone.keys":  "../repo/backbone.keys/backbone.keys",
+    "backbone.wreqr": "../repo/backbone.wreqr/backbone.wreqr",
+    "backbone.babysitter": "../repo/backbone.babysitter/backbone.babysitter",
+    "filtered-collection": "../repo/filtered-collection/filtered-collection",
 
-    backbone: 'libs/backbone/backbone',
-    'backbone.keys': 'libs/backbone.keys/backbone.keys',
-    'backbone.wreqr': 'libs/backbone.wreqr/lib/amd/backbone.wreqr',
-    'backbone.babysitter': 'libs/backbone.babysitter/lib/amd/backbone.babysitter',
+    "moment":         "../repo/moment/moment",
+    "bootstrap_tooltip": "../repo/bootstrap/tooltip",
+    "fineuploader":   "../repo/fine-uploader/fine-uploader",
+    "zeroclipboard":  "../repo/zeroclipboard/zeroclipboard",
+    "retina":         "../repo/retina/retina",
+    "typeahead":      "../repo/typeahead/typeahead",
+    "faye":           "../repo/faye/faye",
+    "nanoscroller":   "../repo/nanoscroller/nanoscroller",
 
-    jquery_validate : 'libs/jquery.validate/1.9/jquery.validate.min',
-    jquery_placeholder: 'libs/jquery.placeholder/jquery.placeholder',
-    moment: 'libs/moment/min/moment.min',
-    bootstrap_tooltip: '../bootstrap/js/bootstrap-tooltip',
-    fineuploader: 'libs/fineuploader/3.3/fine-uploader',
-    templates: '../templates',
-    zeroClipboard: 'libs/zeroClipboard/ZeroClipboard',
-    retina: 'libs/retina/retina',
-    ga: '//ssl.google-analytics.com/ga',
-    faye: 'libs/faye/0.8.8/faye-browser',
-    nanoScroller: 'libs/nanoScroller/nanoScroller',
-    'filtered-collection': 'libs/filtered-collection/filtered-collection',
-    'scrollfix': 'libs/scrollfix/0.1/scrollfix',
-    'in-browser': '/test/in-browser/'
+    "ga": "//ssl.google-analytics.com/ga",
+    "in-browser": "/test/in-browser/"
   },
   shim: {
-    'backbone': {
-      deps: ['underscore', 'jquery'],
-      exports: 'Backbone'
-    },
-    'fineuploader': { exports: 'qq' },
-    'filtered-collection': {
-      deps: ['underscore','backbone'],
-      exports: 'Backbone.FilteredCollection'
-    },
-    'faye': {
-      exports: 'Faye'
-    },
-    'underscore': {
-      exports: '_'
-    },
-    'mocha': {
-      exports: 'mocha'
-    },
-    'expect': {
-      exports: 'expect'
-    },
-
-    'nanoScroller': {
-      deps: ['jquery']
-    },
-    'ga': {
-      exports: '_gaq'
-    },
-    'jquery':  {
-      exports: 'jQuery'
-    },
-    'jquery_validate':  ['jquery'],
-    'jquery_placeholder': ['jquery'],
-    'bootstrap_tooltip': ['jquery'],
-    'zeroClipboard': { exports: 'ZeroClipboard' }
+    "ga": {
+      exports: "_gaq"
+    }
   },
   hbs : {
-      templateExtension : 'hbs',
+      templateExtension : "hbs",
       disableI18n : true
   }
 });

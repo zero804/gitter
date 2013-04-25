@@ -9,7 +9,7 @@ define([
   'hbs!./tmpl/chatInputView',
   'collections/chat',
   '../../utils/momentWrapper',
-  'jquery_placeholder'
+  'jquery-placeholder'
 ], function($, _, Backbone, Marionette, TroupeViews, template, chatModels, moment) {
   "use strict";
 
