@@ -7,8 +7,8 @@ define([
   'hbs!./tmpl/createTroupeView',
   'views/share/shareTableView',
   'log!create-troupe-view',
-  'jquery_validate', // no ref
-  'jquery_placeholder' // no ref
+  'jquery-validate', // no ref
+  'jquery-placeholder' // no ref
 ], function($, _, TroupeViews, template, ShareTableView, log) {
   var View = TroupeViews.Base.extend({
     template: template,

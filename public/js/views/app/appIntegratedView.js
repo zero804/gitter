@@ -5,7 +5,7 @@ define([
   'backbone',
   'views/app/uiVars',
   'fineuploader',
-  "nanoScroller",
+  "nanoscroller",
   'log!app-integrated-view',
   'components/unread-items-client',
   'collections/desktop'
