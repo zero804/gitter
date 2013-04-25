@@ -3,14 +3,15 @@ define([
   'jquery',
   'underscore',
   'backbone',
+  'marionette',
+  'backbone.keys', // no ref
   'hbs!./tmpl/modal',
   'hbs!./tmpl/popover',
   'hbs!./tmpl/loading',
   '../template/helpers/all',
   'hbs!./tmpl/confirmationView',
-  'log!base-views',
-  'backbone-keys' // no ref
-], function($, _, Backbone, modalTemplate, popoverTemplate, loadingTemplate, helpers, confirmationViewTemplate, log) {
+  'log!base-views'
+], function($, _, Backbone, Marionette, _backboneKeys, modalTemplate, popoverTemplate, loadingTemplate, helpers, confirmationViewTemplate, log) {
   /*jshint trailing:false */
   "use strict";
 
@@ -127,7 +128,7 @@ define([
       }
 
 
-      var dom = $(this.template(data));
+      var dom = $($.parseHTML(this.template(data)));
       dom.addClass("view");
 
       if(data.renderViews) {
