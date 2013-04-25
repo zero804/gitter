@@ -11,6 +11,23 @@
     "backbone": "~1.0.0",
     "moment": "~2.0.0",
     "backbone.wreqr": "~0.2.0",
-    "backbone.babysitter": "~0.0.5"
+    "backbone.babysitter": "~0.0.5",
+    "jquery-validate": "git://github.com/ffmike/jquery-validate.git",
+    "jquery-placeholder": "~2.0.7",
+    "nanoscroller": "~0.7.2",
+    "zeroclipboard": "~1.1.7",
+    "scrollfix": "git://github.com/joelambert/ScrollFix.git",
+    "retina.js-js": "~1.0.2",
+    "d3": "~3.1.5",
+    "faye": "http://faye.jcoglan.com/assets/faye.0-8-9.zip",
+    "filtered-collection": "git://github.com/dlikhten/filtered-collection.git",
+    "bootstrap": "~2.3.1",
+    "fine-uploader": "~3.5.0",
+    "requirejs": "http://requirejs.org/docs/release/2.1.5/minified/require.js"
+  },
+  "devDependencies": {
+    "assert": "~0.0.1",
+    "expect": "~0.2.0",
+    "mocha": "~1.9.0"
   }
 }

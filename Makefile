@@ -101,3 +101,47 @@ post-deployment-tests: test-in-browser end-to-end-test
 build: npm grunt
 
 .PHONY: test docs test-docs clean
+
+clean-client-libs:
+	rm -rf output/client-libs/ public/repo output/js-temp
+
+fetch-client-libs:
+	bower install
+
+install-client-libs:
+	grunt client-libs
+	ls -d output/client-libs/*|sed -e 's!output/client-libs/!public/repo/!'|sed -e 's!retina.js-js!retina!'|sed -e 's!typeahead.js!typeahead!'|xargs mkdir -p
+	cp output/client-libs/assert/assert.js public/repo/assert/assert.js
+	cp output/client-libs/backbone/backbone-amd.js public/repo/backbone/backbone.js
+	cp output/client-libs/backbone.babysitter/lib/amd/backbone.babysitter.min.js public/repo/backbone.babysitter/backbone.babysitter.js
+	cp output/client-libs/backbone.keys/dist/backbone.keys.min.js public/repo/backbone.keys/backbone.keys.js
+	cp output/client-libs/backbone.wreqr/lib/amd/backbone.wreqr.min.js public/repo/backbone.wreqr/backbone.wreqr.js
+	cp output/client-libs/bootstrap/bootstrap-tooltip.js public/repo/bootstrap/tooltip.js
+	cp output/client-libs/d3/d3.min.js public/repo/d3/d3.js
+	cp output/client-libs/expect/expect.js public/repo/expect/expect.js
+	cp output/client-libs/faye/faye-browser.js public/repo/faye/faye.js
+	cp output/client-libs/filtered-collection/backbone-filtered-collection-amd.js public/repo/filtered-collection/filtered-collection.js
+	cp output/client-libs/marionette/lib/core/amd/backbone.marionette.min.js public/repo/marionette/marionette.js
+	cp output/client-libs/fine-uploader/fine-uploader.js public/repo/fine-uploader/fine-uploader.js
+	cp output/client-libs/fine-uploader/fine-uploader.js public/repo/fine-uploader/fine-uploader.js
+	cp output/client-libs/fine-uploader/client/fineuploader.css public/repo/fine-uploader/fineuploader.less
+	cp output/client-libs/hbs/hbs.js public/repo/hbs/hbs.js
+	cp output/client-libs/hbs/hbs/i18nprecompile.js public/repo/hbs/i18nprecompile.js
+	cp output/client-libs/hbs/Handlebars.js public/repo/hbs/Handlebars.js
+	cp output/client-libs/hbs/hbs/json2.js public/repo/hbs/json2.js
+	cp output/client-libs/jquery/jquery.min.js public/repo/jquery/jquery.js
+	cp output/client-libs/jquery/jquery-migrate-amd.js public/repo/jquery/jquery-migrate.js
+	cp output/client-libs/jquery-placeholder/jquery.placeholder-amd.js public/repo/jquery-placeholder/jquery-placeholder.js
+	cp output/client-libs/jquery-validate/jquery.validate-amd.js public/repo/jquery-validate/jquery-validate.js
+	cp output/client-libs/mocha/lib/mocha.js public/repo/mocha/mocha.js
+	cp output/client-libs/moment/min/moment.min.js public/repo/moment/moment.js
+	cp output/client-libs/nanoscroller/jquery.nanoscroller.js public/repo/nanoscroller/nanoscroller.js
+	cp output/client-libs/requirejs/index.js public/repo/requirejs/requirejs.js
+	cp output/client-libs/retina.js-js/src/retina.js public/repo/retina/retina.js
+	cp output/client-libs/scrollfix/scrollfix.js public/repo/scrollfix/scrollfix.js
+	cp output/client-libs/typeahead.js/typeahead.js public/repo/typeahead/typeahead.js
+	cp output/client-libs/underscore/underscore-amd.js public/repo/underscore/underscore.js
+	cp output/client-libs/zeroclipboard/ZeroClipboard.min.js public/repo/zeroclipboard/zeroclipboard.js
+	cp output/client-libs/zeroclipboard/ZeroClipboard.swf public/repo/zeroclipboard/
+
+client-libs: clean-client-libs fetch-client-libs install-client-libs
