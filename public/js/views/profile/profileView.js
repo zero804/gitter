@@ -6,8 +6,8 @@ define([
   'views/base',
   'hbs!./tmpl/profileView',
   'fineuploader',
-  'jquery_validate', // no ref
-  'jquery_placeholder'
+  'jquery-validate', // no ref
+  'jquery-placeholder'
 ], function($, _, TroupeViews, template, qq) {
 
   var View = TroupeViews.Base.extend({
