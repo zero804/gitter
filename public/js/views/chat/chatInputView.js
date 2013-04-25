@@ -24,6 +24,10 @@ define([
       "focusout textarea": "onFocusOut"
     },
 
+    initialize: function(options) {
+      this.scrollDelegate = options.collectionViewScrollDelegate;
+    },
+
     getRenderData: function() {
       return {
         user: window.troupeContext.user

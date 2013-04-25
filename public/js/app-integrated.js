@@ -284,15 +284,16 @@ require([
 
     // Setup the ChatView
 
-    new ChatInputView({
-      el: $('#chat-input'),
-      collection: chatCollection
-    }).render();
-
-    new ChatCollectionView({
+    var chatCollectionView = new ChatCollectionView({
       el: $('#frame-chat'),
       collection: chatCollection,
       userCollection: userCollection
+    }).render();
+
+    new ChatInputView({
+      el: $('#chat-input'),
+      collection: chatCollection,
+      collectionViewScrollDelegate: chatCollectionView.scrollDelegate
     }).render();
 
     // Request View
