@@ -1,6 +1,5 @@
 /*jshint unused:true, browser:true */
 require([
-  'clwrapper',
   'jquery',
   'views/base',
   'views/signup/signupModalView',
@@ -11,7 +10,7 @@ require([
   'jquery_validate', // No ref!
   'retina'
  ],
-  function(clwrapper, $, TroupeViews, SignupModalView, SignupModalConfirmView, LoginModalView, createTroupeView, MessagesView) {
+  function($, TroupeViews, SignupModalView, SignupModalConfirmView, LoginModalView, createTroupeView, MessagesView) {
     //var loginFormVisible = false;
 
     function createLoginModal() {
