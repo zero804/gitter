@@ -39,6 +39,7 @@ define([
   if (userAgentFragment) {
     compactView = true;
     window._troupeCompactView = true;
+    $('body').addClass('trpCompactView');
   }
 
   window._troupeIsIE9 = isIE9;

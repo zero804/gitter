@@ -106,7 +106,9 @@ define([
       this.$el.toggleClass('hasBeenRead', this.hasBeenRead());
       this.$el.toggleClass('isOld', this.isOld());
 
-      this.$el.find('.trpChatEdit [title]').tooltip({ container: 'body' });
+      if (!window._troupeCompactView) {
+        this.$el.find('.trpChatEdit [title]').tooltip({ container: 'body' });
+      }
     },
 
     detectKeys: function(e) {
