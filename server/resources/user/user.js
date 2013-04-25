@@ -14,7 +14,13 @@ module.exports = {
     }
 
     if(req.query.q) {
-      userSearchService.searchForUsers(req.user.id, req.query.q, { limit: req.query.limit, skip: req.query.skip }, function(err, searchResults) {
+      var options = {
+        limit: req.query.limit,
+        skip: req.query.skip,
+        excludeTroupeId: req.query.excludeTroupeId
+      };
+
+      userSearchService.searchForUsers(req.user.id, req.query.q, options, function(err, searchResults) {
         var strategy = new restSerializer.SearchResultsStrategy({
                               resultItemStrategy: new restSerializer.UserStrategy()
                             });
