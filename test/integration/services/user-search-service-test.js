@@ -52,7 +52,7 @@ describe("User Search Service", function() {
 
   });
 
-  describe("#createRegExpsForQuery", function() {
+  describe("#searchForUsers", function() {
 
     it("should find both test users", function(done) {
       persistence.User.findOne({ email: "testuser@troupetest.local" }, function(err, user) {
@@ -61,9 +61,13 @@ describe("User Search Service", function() {
 
         var userId = user.id;
 
-        userSearchService.searchForUsers(userId, 'tEst', {}, function(err, results) {
+        userSearchService.searchForUsers(userId, 'tEst', {}, function(err, searchResults) {
           if(err) return done(err);
-          assert(results.length === 2, "Expect two user");
+          assert(searchResults.results.length >= 2, "Expect two user");
+
+          assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 1'; } ).length == 1, "Expect test user 1");
+          assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 2'; } ).length == 1, "Expect test user 2");
+
           return done();
         });
       });
@@ -77,10 +81,10 @@ describe("User Search Service", function() {
 
         var userId = user.id;
 
-        userSearchService.searchForUsers(userId, 'tEst user 1', {}, function(err, results) {
+        userSearchService.searchForUsers(userId, 'tEst user 1', {}, function(err, searchResults) {
           if(err) return done(err);
 
-          assert(results.length === 1, "Expect one user");
+          assert(searchResults.results.length === 1, "Expect one user");
           return done();
         });
       });
@@ -94,9 +98,9 @@ describe("User Search Service", function() {
 
         var userId = user.id;
 
-        userSearchService.searchForUsers(userId, 'Noddy Obama McBigbones', {}, function(err, results) {
+        userSearchService.searchForUsers(userId, 'Noddy Obama McBigbones', {}, function(err, searchResults) {
           if(err) return done(err);
-          assert(results.length === 0, "Expect no users");
+          assert(searchResults.results.length === 0, "Expect no users");
           return done();
         });
       });

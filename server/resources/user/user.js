@@ -1,8 +1,9 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var restSerializer = require("../../serializers/rest-serializer"),
-    userService = require("../../services/user-service");
+var restSerializer = require("../../serializers/rest-serializer");
+var userService = require("../../services/user-service");
+var userSearchService = require("../../services/user-search-service");
 
 module.exports = {
   id: 'resourceUser',
@@ -12,14 +13,27 @@ module.exports = {
       return next(403);
     }
 
-    var strategy = new restSerializer.UserStrategy();
+    if(req.query.q) {
+      userSearchService.searchForUsers(req.user.id, req.query.q, { limit: req.query.limit, skip: req.query.skip }, function(err, searchResults) {
+        var strategy = new restSerializer.SearchResultsStrategy({
+                              resultItemStrategy: new restSerializer.UserStrategy()
+                            });
 
+        restSerializer.serialize(searchResults, strategy, function(err, serialized) {
+          if(err) return next(err);
+
+          res.send(serialized);
+        });
+      });
+      return;
+    }
+
+    var strategy = new restSerializer.UserStrategy();
     restSerializer.serialize(req.user, strategy, function(err, serialized) {
       if(err) return next(err);
 
-      res.send([ serialized ]);
+      res.send([serialized]);
     });
-
   },
 
   show: function(req, res, next) {

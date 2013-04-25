@@ -37,8 +37,14 @@ exports.searchForUsers = function(userId, queryText, options, callback) {
 
       q.limit(limit)
         .skip(skip)
+        .select('displayName avatarVersion gravatarImageUrl')
         .exec(function(err, results) {
-          return callback(err, results);
+          return callback(err, {
+            hasMoreResults: undefined,
+            limit: limit,
+            skip: skip,
+            results: results
+          });
         });
 
     });
