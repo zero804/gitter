@@ -53,8 +53,10 @@ define([
 
     resetInput: function() {
       chatLines = 2;
+      chatPadding = originalChatPadding;
       $('#chat-input-textarea').height(originalChatInputHeight);
-      $('#frame-chat').css('padding-bottom', originalChatPadding);
+      $('#frame-chat').css('padding-bottom', chatPadding);
+
     },
 
     resizeInput: function() {
