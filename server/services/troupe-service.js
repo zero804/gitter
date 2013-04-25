@@ -322,10 +322,10 @@ function rejectRequest(request, callback) {
   });
 }
 
-function findUsersForTroupe(troupeId, callback) {
-  persistence.Troupe.findById(troupeId, 'users', function(err, user) {
+function findUserIdsForTroupe(troupeId, callback) {
+  persistence.Troupe.findById(troupeId, 'users', function(err, troupe) {
     if(err) return callback(err);
-    callback(null, user.users);
+    callback(null, troupe.users.map(function(m) { return m.userId; }));
   });
 }
 
@@ -505,7 +505,7 @@ module.exports = {
   acceptRequest: acceptRequest,
   rejectRequest: rejectRequest,
   removeUserFromTroupe: removeUserFromTroupe,
-  findUsersForTroupe: findUsersForTroupe,
+  findUserIdsForTroupe: findUserIdsForTroupe,
   validateTroupeUrisForUser: validateTroupeUrisForUser,
   updateTroupeName: updateTroupeName,
   findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,

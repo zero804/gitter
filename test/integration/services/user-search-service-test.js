@@ -63,9 +63,29 @@ describe("User Search Service", function() {
 
         userSearchService.searchForUsers(userId, 'tEst', {}, function(err, searchResults) {
           if(err) return done(err);
-          assert(searchResults.results.length >= 2, "Expect two user");
+          assert(searchResults.results.length >= 2, "Expect some users");
 
-          assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 1'; } ).length == 1, "Expect test user 1");
+          assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 1'; } ).length === 0, "Expect test user 1 not to be returned");
+          assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 2'; } ).length == 1, "Expect test user 2");
+          assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 3'; } ).length == 1, "Expect test user 3");
+
+          return done();
+        });
+      });
+
+    });
+
+    it("should find one Test Users 2 and 3", function(done) {
+      persistence.User.findOne({ email: "testuser@troupetest.local" }, function(err, user) {
+        if(err) return done(err);
+        if(!user) return done("Cannot find user");
+
+        var userId = user.id;
+
+        userSearchService.searchForUsers(userId, 'tEst user 2', {}, function(err, searchResults) {
+          if(err) return done(err);
+
+          assert(searchResults.results.length === 1, "Expect one user");
           assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 2'; } ).length == 1, "Expect test user 2");
 
           return done();
@@ -74,18 +94,26 @@ describe("User Search Service", function() {
 
     });
 
-    it("should find one Test User 1", function(done) {
-      persistence.User.findOne({ email: "testuser@troupetest.local" }, function(err, user) {
+
+    it("should not find test user three when a testtroupe3 is excluded", function(done) {
+      persistence.Troupe.findOne({ uri: "testtroupe3" }, function(err, troupe) {
         if(err) return done(err);
-        if(!user) return done("Cannot find user");
+        if(!troupe) return done("Cannot find testtroupe3 ");
 
-        var userId = user.id;
-
-        userSearchService.searchForUsers(userId, 'tEst user 1', {}, function(err, searchResults) {
+        persistence.User.findOne({ email: "testuser@troupetest.local" }, function(err, user) {
           if(err) return done(err);
+          if(!user) return done("Cannot find user");
 
-          assert(searchResults.results.length === 1, "Expect one user");
-          return done();
+          var userId = user.id;
+
+          userSearchService.searchForUsers(userId, 'tEst user', { excludeTroupeId: troupe.id }, function(err, searchResults) {
+            if(err) return done(err);
+
+            assert(searchResults.results.length === 1, "Expect one user");
+            assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 3'; } ).length === 0, "Expected to not find test user 3");
+
+            return done();
+          });
         });
       });
 
