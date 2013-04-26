@@ -402,7 +402,18 @@ module.exports = function( grunt ) {
           'jquery': 'jQuery'
         },
         exports: 'jQuery'
+      },
+
+      'bootstrap-typeahead': {
+        files : {
+          'output/client-libs/bootstrap/bootstrap-typeahead.js': ['output/client-libs/bootstrap/js/bootstrap-typeahead.js']
+        },
+        modules: {
+          'jquery': 'jQuery'
+        },
+        exports: 'jQuery'
       }
+
 
     }
   });
