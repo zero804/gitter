@@ -17,5 +17,6 @@ module.exports = {
     require('./token').install(app);
     require('./health-check').install(app);
     require('./installChromeExtension').install(app);
+    require('./test-data').install(app);
   }
 };
