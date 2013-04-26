@@ -47,32 +47,16 @@ module.exports = {
       app.post(
         '/signup',
 
-        // Form filter and validation middleware
-        /*
-        form(
-          filter("troupeName").trim(),
-          validate("troupeName").required(),
-          filter("email").trim(),
-          validate("email").isEmail(),
-          filter("userId").trim()
-        ),
-        */
-
-        function(req, res) {
-
+        function(req, res, next) {
           var email = req.body.email;
-          var userId = req.body.userId;
           var troupeName = req.body.troupeName;
           var invites = req.body.invites;
 
-          /*
-          if (!req.form.isValid) {
-            // TODO: Handle errors
-            winston.info("User form has errors", { errors: req.form.errors });
-            // TODO: make this nice
-            return res.send(500);
+          troupeName = troupeName ? troupeName.trim() : '';
+
+          if(!troupeName) {
+            return next('Troupe name is required');
           }
-          */
 
           // we can either get an email address for a new user
           if (email) {
@@ -83,13 +67,7 @@ module.exports = {
             }, function(err, id) {
               if(err) {
                 winston.error("Error creating new troupe ", { exception: err });
-
-                if(req.accepts('application/json')) {
-                  res.send(500);
-                } else {
-                  res.relativeRedirect("/");
-                }
-                return;
+                return next(err);
               }
 
               req.session.newTroupeId = id;
@@ -100,56 +78,35 @@ module.exports = {
                 res.relativeRedirect("/confirm");
               }
             });
+
+            return;
           }
 
-          // or we can get a user id for an existing user, in which case we need to lookup his email address
-          // there are probably better ways to do this, but i don't them. MB
-          else if (userId) {
-            winston.info("Signing up a user with an email: " + email);
-
-            userService.findById(userId, function(err,user) {
-
+          if (req.user) {
+            signupService.newSignup({
+              troupeName: troupeName,
+              email: req.user.email,
+              invites: invites
+            }, function(err,id) {
               if(err) {
-                winston.error("Error finding user ", { exception: err });
-                res.send(500);
-              } else {
-                winston.info("Got a user, his email is: ", user);
-
-                signupService.newSignup({
-                  troupeName: troupeName,
-                  email: user.email,
-                  invites: invites
-                }, function(err,id) {
-                  if(err) {
-                    winston.error("Error creating new troupe ", { exception: err });
-
-                    if(req.accepts('application/json')) {
-                      res.send(500);
-                    } else {
-                      res.relativeRedirect("/");
-                    }
-                    return;
-                  }
-
-                  troupeService.findById(id, function(err,troupe) {
-
-                    if (err) {
-                      winston.error("Error finding troupe ", { exception: err });
-                      res.send(500);
-                    } else {
-                      res.send({ success: true, redirectTo: troupe.uri});
-                    }
-                  });
-                });
-
+                winston.error("Error creating new troupe ", { exception: err });
+                return next(err);
               }
+
+              troupeService.findById(id, function(err, troupe) {
+                if (err) {
+                  return next(err);
+                }
+
+                res.send({ success: true, redirectTo: troupe.uri});
+              });
             });
+
+            return;
           }
 
-          else {
-            winston.info("Neither a troupe email address or a userId were provided for /signup");
-            res.send(400);
-          }
+          winston.info("Neither a troupe email address or a userId were provided for /signup");
+          res.send(400);
 
         }
       );
@@ -204,19 +161,5 @@ module.exports = {
 
         }
       );
-
-      // This would be very insecure in a production environment, but we do it in testing to aid our
-      // testing processes
-      if (nconf.get('test:exposeDataForTestingPurposes')) {
-        app.post('/confirmationCodeForEmail', function(req, res/*, next */) {
-          var forEmail = req.body.email;
-
-          userService.findByEmail(forEmail, function(e, user) {
-            if (e || !user) return res.send(404, "No user with that email signed up.");
-
-            res.json({ confirmationCode: user.confirmationCode });
-          });
-        });
-      }
     }
 };
