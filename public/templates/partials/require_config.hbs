@@ -1,82 +1,49 @@
 require.config({
   waitSeconds: 15,
   paths: {
-    hbs: 'libs/hbs/0.4.0/hbs',
-    log: 'utils/logrjs',
-    i18nprecompile: 'libs/hbs/0.4.0/hbs/i18nprecompile',
-    json2: 'libs/hbs/0.4.0/hbs/json2',
-    handlebars: 'libs/hbs/0.4.0/Handlebars',
+    "log":            "utils/logrjs",
+    "hbs":            "../repo/hbs/hbs",
+    "i18nprecompile": "../repo/hbs/i18nprecompile",
+    "json2":          "../repo/hbs/json2",
+    "handlebars":     "../repo/hbs/Handlebars",
+    "hbs/underscore": "../repo/underscore/underscore",
+    "underscore":     "../repo/underscore/underscore",
 
-    "hbs/underscore" : "libs/underscore/1.4.3/underscore-min",
-    underscore: 'libs/underscore/1.4.3/underscore-min',
-    clwrapper: 'libs/clwrapper/cf9f12b17b/consolelog',
+    "expect":         "../repo/expect/expect",
+    "mocha":          "../repo/mocha/mocha",
 
-    expect: 'libs/expect/0.1.2/expect',
-    mocha: 'libs/mocha/1.8.2/mocha',
+    "jquery":         "../repo/jquery/jquery",
+    "jquery-migrate": "../repo/jquery/jquery-migrate",
+    "jquery-validate": "../repo/jquery-validate/jquery-validate",
+    "jquery-placeholder": "../repo/jquery-placeholder/jquery-placeholder",
 
-    jquery: 'libs/jquery/1.8.3/jquery-min',
-    marionette : 'libs/marionette/1.0.0-rc5/backbone.marionette',
-    jquery_validate : 'libs/jquery.validate/1.9/jquery.validate.min',
-    jquery_placeholder: 'libs/jquery.placeholder/jquery.placeholder',
-    moment: 'libs/momentjs/1.7.2/moment.min',
-    bootstrap_tooltip: '../bootstrap/js/bootstrap-tooltip',
-    backbone: 'libs/backbone/0.9.10/backbone',
-    'backbone-keys': 'components/backbone.keys/backbone.keys',
-    fineuploader: 'libs/fineuploader/3.3/fine-uploader',
-    templates: '../templates',
-    zeroClipboard: 'libs/zeroClipboard/ZeroClipboard',
-    retina: 'libs/retina/retina',
-    ga: '//ssl.google-analytics.com/ga',
-    faye: 'libs/faye/0.8.8/faye-browser',
-    nanoScroller: 'libs/nanoScroller/nanoScroller',
-    'filtered-collection': 'libs/filtered-collection/filtered-collection',
-    'scrollfix': 'libs/scrollfix/0.1/scrollfix',
-    'in-browser': '/test/in-browser/'
+    "backbone":       "../repo/backbone/backbone",
+    "marionette":     "../repo/marionette/marionette",
+    "backbone.keys":  "../repo/backbone.keys/backbone.keys",
+    "backbone.wreqr": "../repo/backbone.wreqr/backbone.wreqr",
+    "backbone.babysitter": "../repo/backbone.babysitter/backbone.babysitter",
+    "filtered-collection": "../repo/filtered-collection/filtered-collection",
+
+    "moment":         "../repo/moment/moment",
+    "bootstrap_tooltip": "../repo/bootstrap/tooltip",
+    "fineuploader":   "../repo/fine-uploader/fine-uploader",
+    "zeroclipboard":  "../repo/zeroclipboard/zeroclipboard",
+    "retina":         "../repo/retina/retina",
+    "typeahead":      "../repo/typeahead/typeahead",
+    "faye":           "../repo/faye/faye",
+    "nanoscroller":   "../repo/nanoscroller/nanoscroller",
+    "scrollfix":      "../repo/scrollfix/scrollfix",
+
+    "ga": "//ssl.google-analytics.com/ga",
+    "in-browser": "/test/in-browser/"
   },
   shim: {
-    'backbone': {
-      deps: ['underscore', 'jquery'],
-      exports: 'Backbone'
-    },
-    'backbone-keys': { deps: ['backbone'], exports: 'Backbone' },
-    'fineuploader': { exports: 'qq' },
-    'filtered-collection': {
-      deps: ['underscore','backbone'],
-      exports: 'Backbone.FilteredCollection'
-    },
-    'faye': {
-      exports: 'Faye'
-    },
-    'underscore': {
-      exports: '_'
-    },
-    'mocha': {
-      exports: 'mocha'
-    },
-    'expect': {
-      exports: 'expect'
-    },
-
-    'nanoScroller': {
-      deps: ['jquery']
-    },
-    'ga': {
-      exports: '_gaq'
-    },
-    'jquery':  {
-      exports: 'jQuery'
-    },
-    'jquery_validate':  ['jquery'],
-    'jquery_placeholder': ['jquery'],
-    'bootstrap_tooltip': ['jquery'],
-    marionette : {
-      deps : ['jquery', 'underscore', 'backbone'],
-      exports : 'Marionette'
-    },
-    'zeroClipboard': { exports: 'ZeroClipboard' }
+    "ga": {
+      exports: "_gaq"
+    }
   },
   hbs : {
-      templateExtension : 'hbs',
+      templateExtension : "hbs",
       disableI18n : true
   }
 });
