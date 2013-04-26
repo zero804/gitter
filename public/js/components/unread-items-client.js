@@ -137,7 +137,7 @@ define([
     this._addTarpit = new Tarpit(ADD_TIMEOUT, _.bind(this._promote, this));
     this._deleteTarpit = new Tarpit(REMOVE_TIMEOUT);
     this._recountLimited = limit(this._recount, this, 30);
-    this._currentCountValue = -1;
+    this._currentCountValue = undefined;
   };
 
   _.extend(UnreadItemStore.prototype, EventEmitter, DoubleHash.prototype, {
@@ -181,8 +181,11 @@ define([
 
     _recount: function() {
       var newValue = this._count();
-      this._currentCountValue = newValue;
-      this.emit('newcountvalue', newValue);
+
+      if(this._currentCountValue !== newValue) {
+        this._currentCountValue = newValue;
+        this.emit('newcountvalue', newValue);
+      }
     },
 
     _currentCount: function() {
@@ -287,6 +290,8 @@ define([
       var troupe = this._collection.get(window.troupeContext.troupe.id);
       if(troupe) {
         troupe.set('unreadItems', newValue);
+      } else {
+        log('TroupeCollectionSync: unable to locate locate troupe');
       }
     }
   };
