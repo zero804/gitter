@@ -189,9 +189,9 @@ define([
     },
 
     _currentCount: function() {
-      if(this._currentCountValue < 0) return 0;
+      if(this._currentCountValue) return this._currentCountValue;
 
-      return this._currentCountValue;
+      return 0;
     },
 
     _unreadItemsAdded: function(items) {
