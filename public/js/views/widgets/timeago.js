@@ -55,7 +55,9 @@ define([
       }
       var fullTime = this.time.format("LLL");
       this.$el.html("<span title='" + fullTime + "'>" + v + "</span>");
-      this.$el.find('[title]').tooltip({ container: 'body' });
+      if (!window._troupeCompactView) {
+        this.$el.find('[title]').tooltip({ container: 'body' });
+      }
     }
 
   });

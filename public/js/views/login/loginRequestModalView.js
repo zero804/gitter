@@ -7,8 +7,8 @@ define([
   'views/base',
   'hbs!./tmpl/loginRequestModalView',
   'log!login-request-modal-view',
-  'jquery_validate',
-  'jquery_placeholder'
+  'jquery-validate',
+  'jquery-placeholder'
 ], function($, _, TroupeViews, template, log) {
   return TroupeViews.Base.extend({
     template: template,
