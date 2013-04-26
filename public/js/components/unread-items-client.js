@@ -181,11 +181,8 @@ define([
 
     _recount: function() {
       var newValue = this._count();
-      if(newValue !== this._currentCountValue) {
-        this._currentCountValue = newValue;
-
-        this.emit('newcountvalue', newValue);
-      }
+      this._currentCountValue = newValue;
+      this.emit('newcountvalue', newValue);
     },
 
     _currentCount: function() {
