@@ -32,7 +32,7 @@ require([
   'views/toolbar/troupeCollectionView',
   'views/people/peopleCollectionView',
   'views/profile/profileView',
-  'views/share/shareView',
+  'views/shareSearch/shareSearchView',
   'views/signup/createTroupeView',
   'hbs!./views/app/tmpl/appHeader',
   'views/share/shareView',
