@@ -1,5 +1,4 @@
 import utils
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import WebDriverException
 import urllib2
@@ -109,14 +108,26 @@ def testCreateTroupeFromOneToOneTroupe():
     header = driver.find_element_by_css_selector('DIV.trpHeaderTitle')
     assert header.text == troupeName
 
-    # queryurl = utils.baseUrl("/testdata/inviteAcceptLink?email=testuser2@troupetest.local")
-    # response = urllib2.urlopen(queryurl)
-    # acceptLink = response.read()
+    assert len(driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem')) == 2
 
-    # driver.get(utils.baseUrl(acceptLink))
+    queryurl = utils.baseUrl("/testdata/inviteAcceptLink?email=" + emailAddress)
+    response = urllib2.urlopen(queryurl)
+    acceptLink = response.read()
 
-    # header = driver.find_element_by_css_selector('DIV.trpHeaderTitle')
-    # assert header.text == troupeName
+    driver.delete_all_cookies()
+    driver.get(utils.baseUrl("/signout"))
+    driver.get(utils.baseUrl(acceptLink))
+
+    form = driver.find_element_by_css_selector('#updateprofileform')
+    assert form.find_element_by_css_selector('#displayName').get_attribute('value') == 'Piet Pompies'
+    form.find_element_by_css_selector('#password').send_keys('123456')
+
+    form.find_element_by_name('submit').click()
+
+    assert len(driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem')) == 3
+
+    header = driver.find_element_by_css_selector('DIV.trpHeaderTitle')
+    assert header.text == troupeName
 
 
 def teardown_module():

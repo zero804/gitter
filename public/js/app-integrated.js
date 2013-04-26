@@ -144,7 +144,7 @@ require([
 
         { name: "profile",        re: /^profile$/,                viewType: profileView.Modal },
         { name: "share",          re: /^share$/,                  viewType: shareView.Modal },
-        { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal,       collection: collections.troupe,   skipModelLoad: true },
+        { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal,       collection: collections.troupes,   skipModelLoad: true },
         { name: "shareTroupe",    re: /^shareTroupe/,             viewType: shareTroupeView.Modal },
         { name: "troupeSettings", re: /^troupeSettings/,          viewType: troupeSettingsView }
 

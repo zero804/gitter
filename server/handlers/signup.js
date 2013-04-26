@@ -129,7 +129,6 @@ module.exports = {
 
               middleware.logoutPreserveSession(req, res, function() {
                 res.redirect(nconf.get('web:homeurl') + "#message-confirmation-failed-already-registered");
-                //res.redirect("confirmation-failed");
               });
 
               return;

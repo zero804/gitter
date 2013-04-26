@@ -101,7 +101,9 @@ define([
 
     onFormSubmit: function(e) {
       if(e) e.preventDefault();
-      var that = this, form = this.$el.find('form'), serializedForm = {
+      var that = this;
+      var form = this.$el.find('form');
+      var serializedForm = {
         troupeName: form.find('input[name=troupeName]').val(),
         userId: form.find('input[name=userId]').val(),
         invites: this.shareTableView ? this.shareTableView.serialize() : null
