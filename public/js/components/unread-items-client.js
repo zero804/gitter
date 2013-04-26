@@ -291,7 +291,16 @@ define([
       if(troupe) {
         troupe.set('unreadItems', newValue);
       } else {
-        log('TroupeCollectionSync: unable to locate locate troupe');
+        if(this._collection.length === 0) {
+          this._collection.once('reset', function() {
+            var troupe = this._collection.get(window.troupeContext.troupe.id);
+            if(troupe) {
+              troupe.set('unreadItems', newValue);
+            } else {
+              log('TroupeCollectionSync: unable to locate locate troupe');
+            }
+          }, this);
+        }
       }
     }
   };
