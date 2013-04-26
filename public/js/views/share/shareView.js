@@ -5,10 +5,10 @@ define([
   'views/base',
   'hbs!./tmpl/shareView',
   'hbs!./tmpl/shareRow',
-  'zeroClipboard',
+  'zeroclipboard',
   './shareTableView',
-  'jquery_placeholder', // No reference
-  'jquery_validate'  // No reference
+  'jquery-placeholder', // No reference
+  'jquery-validate'  // No reference
 ], function($, _, TroupeViews, template, rowTemplate, ZeroClipboard, ShareTableView) {
   "use strict";
 

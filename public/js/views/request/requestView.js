@@ -1,8 +1,10 @@
 define([
   'views/base',
+  'marionette',
   'hbs!./tmpl/requestView',
   'hbs!./tmpl/requestItemView'
-], function(TroupeViews, requestViewTemplate, requestItemViewTemplate) {
+], function(TroupeViews, Marionette, requestViewTemplate, requestItemViewTemplate) {
+  "use strict";
 
   var RequestItemView = TroupeViews.Base.extend({
     tagName: 'span',
