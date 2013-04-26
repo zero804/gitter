@@ -109,7 +109,7 @@ fetch-client-libs:
 	bower install
 
 install-client-libs:
-	grunt client-libs
+	grunt client-libs # --disableMinifiedSource=true
 	ls -d output/client-libs/*|sed -e 's!output/client-libs/!public/repo/!'|sed -e 's!retina.js-js!retina!'|sed -e 's!typeahead.js!typeahead!'|xargs mkdir -p
 	cp output/client-libs/assert/assert.js public/repo/assert/assert.js
 	cp output/client-libs/backbone/backbone-amd.js public/repo/backbone/backbone.js
@@ -133,7 +133,7 @@ install-client-libs:
 	cp output/client-libs/jquery/jquery.min.js public/repo/jquery/jquery.js
 	cp output/client-libs/jquery/jquery-migrate-amd.js public/repo/jquery/jquery-migrate.js
 	cp output/client-libs/jquery-placeholder/jquery.placeholder-amd.js public/repo/jquery-placeholder/jquery-placeholder.js
-	cp output/client-libs/jquery-validate/jquery.validate-amd.js public/repo/jquery-validate/jquery-validate.js
+	cp output/client-libs/jquery.validation/jquery.validate-amd.js public/repo/jquery.validation/jquery.validation.js
 	cp output/client-libs/mocha/lib/mocha.js public/repo/mocha/mocha.js
 	cp output/client-libs/mocha/mocha.css public/repo/mocha/mocha.css
 	cp output/client-libs/moment/min/moment.min.js public/repo/moment/moment.js
