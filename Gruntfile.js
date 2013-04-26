@@ -35,7 +35,7 @@ module.exports = function( grunt ) {
               {
                 name: "core-libraries",
                 include: [
-                  "libs/require/2.1.4/require-min"
+                  "../repo/requirejs/requirejs"
                 ]
               },
               {
@@ -221,7 +221,6 @@ module.exports = function( grunt ) {
           yuicompress: true
         },
         files: {
-          "public/bootstrap/css/trp2.css" : "public/bootstrap/less/trp2.less",
           "public/bootstrap/css/trp3.css" : "public/bootstrap/less/trp3.less",
           "public/bootstrap/css/mtrp.css": "public/bootstrap/less/mtrp.less",
           "public/bootstrap/css/trpHomePage.css": "public/bootstrap/less/trpHomePage.less",
@@ -255,19 +254,175 @@ module.exports = function( grunt ) {
       validateConfig: {
         command: './node_modules/.bin/jsonlint config/*.json'
       }
+    },
+
+    concat: {
+      options: {
+        separator: '\n'
+      },
+      fineuploader: {
+        src: ['output/client-libs/fine-uploader/client/js/header.js',
+                'output/client-libs/fine-uploader/client/js/util.js',
+                'output/client-libs/fine-uploader/client/js/features.js',
+                'output/client-libs/fine-uploader/client/js/promise.js',
+                'output/client-libs/fine-uploader/client/js/button.js',
+                'output/client-libs/fine-uploader/client/js/paste.js',
+                'output/client-libs/fine-uploader/client/js/uploader.basic.js',
+                "output/client-libs/fine-uploader/client/js/dnd.js",
+                "output/client-libs/fine-uploader/client/js/uploader.js",
+                "output/client-libs/fine-uploader/client/js/ajax.requester.js",
+                "output/client-libs/fine-uploader/client/js/deletefile.ajax.requester.js",
+                "output/client-libs/fine-uploader/client/js/window.receive.message.js",
+                "output/client-libs/fine-uploader/client/js/handler.base.js",
+                "output/client-libs/fine-uploader/client/js/handler.form.js",
+                "output/client-libs/fine-uploader/client/js/handler.xhr.js"],
+        dest: 'output/client-libs/fine-uploader/fine-uploader.js-raw'
+      }
+    },
+    wrap: {
+      faye: {
+        src: 'output/client-libs/faye/browser/faye-browser-min.js',
+        dest: 'output/js-temp/',
+        wrapper: ['var Faye = function(){\n', '\n return Faye; }.call(window);']
+      }
+    },
+
+    bowerRequireWrapper: {
+      underscore: {
+        files : {
+          'output/client-libs/underscore/underscore-amd.js': ['output/client-libs/underscore/underscore-min.js']
+        },
+        modules: {
+        },
+        exports: '_'
+      },
+      backbone: {
+        files : {
+          'output/client-libs/backbone/backbone-amd.js': ['output/client-libs/backbone/backbone-min.js']
+        },
+        modules: {
+          'jquery': 'jQuery',
+          'underscore': '_'
+        },
+        exports: 'Backbone'
+      },
+      fineuploader: {
+        files : {
+          'output/client-libs/fine-uploader/fine-uploader.js': ['output/client-libs/fine-uploader/fine-uploader.js-raw']
+        },
+        modules: {
+        },
+        exports: 'qq'
+      },
+      faye: {
+        files : {
+          'output/client-libs/faye/faye-browser.js': ['output/js-temp/output/client-libs/faye/browser/faye-browser-min.js']
+        },
+        modules: {
+        },
+        exports: 'Faye'
+      },
+      nanoscroller: {
+        files : {
+          'output/client-libs/nanoscroller/jquery.nanoscroller.js': ['output/client-libs/nanoscroller/bin/javascripts/jquery.nanoscroller.min.js']
+        },
+        modules: {
+          'jquery': 'jQuery'
+        },
+        exports: 'jQuery'
+      },
+      filteredCollection: {
+        files : {
+          'output/client-libs/filtered-collection/backbone-filtered-collection-amd.js': ['output/client-libs/filtered-collection/backbone-filtered-collection.js']
+        },
+        modules: {
+          'underscore': '_',
+          'backbone': 'Backbone'
+        },
+        exports: 'Backbone.FilteredCollection'
+      },
+      'mocha': {
+        files : {
+          'output/client-libs/mocha-amd.js': ['output/client-libs/mocha.js']
+        },
+        exports: 'mocha'
+      },
+      'expect': {
+        files : {
+          'output/client-libs/expect-amd.js': ['output/client-libs/expect.js']
+        },
+        exports: 'expect'
+      },
+      'jquery-migrate': {
+        files : {
+          'output/client-libs/jquery/jquery-migrate-amd.js': ['output/client-libs/jquery/jquery-migrate.min.js']
+        },
+        modules: {
+          'jquery': 'jQuery'
+        },
+        exports: 'jQuery'
+      },
+      'jquery-validate':  {
+        files : {
+          'output/client-libs/jquery-validate/jquery.validate-amd.js': ['output/client-libs/jquery-validate/jquery.validate.min.js']
+        },
+        modules: {
+          'jquery': 'jQuery'
+        },
+        exports: 'jQuery'
+      },
+      'jquery-placeholder': {
+        files : {
+          'output/client-libs/jquery-placeholder/jquery.placeholder-amd.js': ['output/client-libs/jquery-placeholder/jquery.placeholder.min.js']
+        },
+        modules: {
+          'jquery': 'jQuery'
+        },
+        exports: 'jQuery'
+      },
+
+      'bootstrap_tooltip': {
+        files : {
+          'output/client-libs/bootstrap/bootstrap-tooltip.js': ['output/client-libs/bootstrap/js/bootstrap-tooltip.js']
+        },
+        modules: {
+          'jquery': 'jQuery'
+        },
+        exports: 'jQuery'
+      },
+
+      'typeahead': {
+        files : {
+          'output/client-libs/typeahead.js/typeahead.js': ['output/client-libs/typeahead.js/dist/typeahead.min.js']
+        },
+        modules: {
+          'jquery': 'jQuery'
+        },
+        exports: 'jQuery'
+      }
+
     }
   });
 
   grunt.loadNpmTasks('grunt-requirejs');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-exec');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-reload');
+  grunt.loadNpmTasks('grunt-bower-require-wrapper');
+  grunt.loadNpmTasks('grunt-wrap');
+
 
   grunt.registerTask('process', ['exec:validateConfig','clean','less','copy','requirejs','exec:manifest','exec:gzip']);
   grunt.registerTask('process-no-min', ['exec:validateConfig','clean','less','copy','requirejs','exec:manifest','exec:gzip']);
 
   grunt.registerTask('watchr', 'reload watch');
+  grunt.registerTask('client-libs', ['concat:fineuploader',
+                              'wrap:faye',
+                              'bowerRequireWrapper'
+                              ]);
+
 
 };

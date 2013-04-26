@@ -3,6 +3,7 @@ require([
   'jquery',
   'underscore',
   'backbone',
+  'backbone.keys', // no ref
   'marionette',
   'template/helpers/all',
   'views/base',
@@ -41,7 +42,7 @@ require([
   'log!app-integrated',
   'components/errorReporter',
   'filtered-collection'
-], function($, _, Backbone, Marionette, _Helpers, TroupeViews, realtime, eyeballs, dozy, AppIntegratedView, ChatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
+], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, realtime, eyeballs, dozy, AppIntegratedView, ChatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
             collections, troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView,
             createTroupeView, headerViewTemplate, shareTroupeView,
@@ -177,7 +178,7 @@ require([
         window.location.hash = h.replace(/%7C/, '|');
         path = path.replace(/%7C/, '|');
       }
-      var parts = path.split("|");
+      var parts = path ? path.split("|") : [];
 
       this.regionFragmentMapping.forEach(function(regionName, index) {
         var fragment = parts[index] ? parts[index] : "";
@@ -284,15 +285,16 @@ require([
 
     // Setup the ChatView
 
-    new ChatInputView({
-      el: $('#chat-input'),
-      collection: chatCollection
-    }).render();
-
-    new ChatCollectionView({
+    var chatCollectionView = new ChatCollectionView({
       el: $('#frame-chat'),
       collection: chatCollection,
       userCollection: userCollection
+    }).render();
+
+    new ChatInputView({
+      el: $('#chat-input'),
+      collection: chatCollection,
+      collectionViewScrollDelegate: chatCollectionView.scrollDelegate
     }).render();
 
     // Request View
