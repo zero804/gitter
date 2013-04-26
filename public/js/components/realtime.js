@@ -46,7 +46,6 @@ define([
       message.ext = message.ext || {};
       if(window.troupeContext) message.ext.token = window.troupeContext.accessToken;
     } else if(message.channel == '/meta/subscribe') {
-      log('Sending subscription with eyeballs: ' + eyeballState);
       message.ext = message.ext || {};
       message.ext.eyeballs = eyeballState ? 1 : 0;
     }
@@ -140,6 +139,34 @@ define([
       }
     });
   }
+
+  function fakeSubscription() {
+    var subscription = client.subscribe('/ping', function() { });
+
+    subscription.callback(function() {
+      if(timeout) window.clearTimeout(timeout);
+      subscription.cancel();
+    });
+
+    subscription.errback(function(error) {
+      log('Error while subscribing to ping channel', error);
+      if(timeout) window.clearTimeout(timeout);
+      subscription.cancel();
+    });
+
+    var timeout = window.setTimeout(function() {
+      log('Timeout while waiting for ping subscription');
+      subscription.cancel();
+    }, 30000);
+
+  }
+
+  // Temporary fix
+  window.setInterval(fakeSubscription, 60000);
+  $(document).on('reawaken', function() {
+    log('Attempting ping subscription after reawaken');
+    fakeSubscription();
+  });
 
   return client;
 });
