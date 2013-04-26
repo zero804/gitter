@@ -2,6 +2,9 @@
 module.exports = function( grunt ) {
   'use strict';
 
+  var min = !grunt.option('disableMinifiedSource');
+
+
   //
   // Grunt configuration:
   //
@@ -281,7 +284,7 @@ module.exports = function( grunt ) {
     },
     wrap: {
       faye: {
-        src: 'output/client-libs/faye/browser/faye-browser-min.js',
+        src: 'output/client-libs/faye/browser/faye-browser' + (min ? '-min' : '') + '.js',
         dest: 'output/js-temp/',
         wrapper: ['var Faye = function(){\n', '\n return Faye; }.call(window);']
       }
@@ -290,7 +293,7 @@ module.exports = function( grunt ) {
     bowerRequireWrapper: {
       underscore: {
         files : {
-          'output/client-libs/underscore/underscore-amd.js': ['output/client-libs/underscore/underscore-min.js']
+          'output/client-libs/underscore/underscore-amd.js': ['output/client-libs/underscore/underscore' + (min ? '-min' : '') + '.js']
         },
         modules: {
         },
@@ -298,7 +301,7 @@ module.exports = function( grunt ) {
       },
       backbone: {
         files : {
-          'output/client-libs/backbone/backbone-amd.js': ['output/client-libs/backbone/backbone-min.js']
+          'output/client-libs/backbone/backbone-amd.js': ['output/client-libs/backbone/backbone' + (min ? '-min' : '') + '.js']
         },
         modules: {
           'jquery': 'jQuery',
@@ -316,7 +319,7 @@ module.exports = function( grunt ) {
       },
       faye: {
         files : {
-          'output/client-libs/faye/faye-browser.js': ['output/js-temp/output/client-libs/faye/browser/faye-browser-min.js']
+          'output/client-libs/faye/faye-browser.js': ['output/js-temp/output/client-libs/faye/browser/faye-browser' + (min ? '-min' : '') + '.js']
         },
         modules: {
         },
@@ -324,7 +327,7 @@ module.exports = function( grunt ) {
       },
       nanoscroller: {
         files : {
-          'output/client-libs/nanoscroller/jquery.nanoscroller.js': ['output/client-libs/nanoscroller/bin/javascripts/jquery.nanoscroller.min.js']
+          'output/client-libs/nanoscroller/jquery.nanoscroller.js': ['output/client-libs/nanoscroller/bin/javascripts/jquery.nanoscroller' + (min ? '.min' : '') + '.js']
         },
         modules: {
           'jquery': 'jQuery'
@@ -355,16 +358,16 @@ module.exports = function( grunt ) {
       },
       'jquery-migrate': {
         files : {
-          'output/client-libs/jquery/jquery-migrate-amd.js': ['output/client-libs/jquery/jquery-migrate.min.js']
+          'output/client-libs/jquery/jquery-migrate-amd.js': ['output/client-libs/jquery/jquery-migrate' + (min ? '.min' : '') + '.js']
         },
         modules: {
           'jquery': 'jQuery'
         },
         exports: 'jQuery'
       },
-      'jquery-validate':  {
+      'jquery.validation':  {
         files : {
-          'output/client-libs/jquery-validate/jquery.validate-amd.js': ['output/client-libs/jquery-validate/jquery.validate.min.js']
+          'output/client-libs/jquery.validation/jquery.validate-amd.js': ['output/client-libs/jquery.validation/jquery.validate.js']
         },
         modules: {
           'jquery': 'jQuery'
@@ -373,7 +376,7 @@ module.exports = function( grunt ) {
       },
       'jquery-placeholder': {
         files : {
-          'output/client-libs/jquery-placeholder/jquery.placeholder-amd.js': ['output/client-libs/jquery-placeholder/jquery.placeholder.min.js']
+          'output/client-libs/jquery-placeholder/jquery.placeholder-amd.js': ['output/client-libs/jquery-placeholder/jquery.placeholder' + (min ? '.min' : '') + '.js']
         },
         modules: {
           'jquery': 'jQuery'
@@ -393,7 +396,7 @@ module.exports = function( grunt ) {
 
       'typeahead': {
         files : {
-          'output/client-libs/typeahead.js/typeahead.js': ['output/client-libs/typeahead.js/dist/typeahead.min.js']
+          'output/client-libs/typeahead.js/typeahead.js': ['output/client-libs/typeahead.js/dist/typeahead' + (min ? '.min' : '') + '.js']
         },
         modules: {
           'jquery': 'jQuery'
