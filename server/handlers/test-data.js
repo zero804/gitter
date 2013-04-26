@@ -29,6 +29,23 @@ module.exports = {
       });
     });
 
+
+    app.get('/testdata/confirmationLink', function(req, res, next) {
+
+      persistence.User.findOne({ email:  req.query.email }, function(err, user) {
+        if(err) return next(err);
+        if(!user) return next(404);
+
+        userService.findDefaultTroupeForUser(user.id, function(err, troupe) {
+          if(err) return next(err);
+          if(!troupe) return next(404);
+
+          res.send("/" + troupe.uri + "/confirm/" + user.confirmationCode);
+        });
+
+      });
+    });
+
     app.get('/testdata/inviteAcceptLink', function(req, res, next) {
 
       persistence.Invite.findOne({ email:  req.query.email }, function(err, invite) {

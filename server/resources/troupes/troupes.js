@@ -33,9 +33,12 @@ module.exports = {
 
   create: function(req, res, next) {
     var newTroupe = req.body;
-    var name = newTroupe.name;
+    var name = newTroupe.troupeName || newTroupe.name;
     var oneToOneTroupeId = newTroupe.oneToOneTroupeId;
     var invites = newTroupe.invites;
+
+    name = name ? name.trim() : '';
+    if(!name) return next('Please provide a troupe name');
 
     if (oneToOneTroupeId) {
       // find this 1-1 troupe and create a new normal troupe with the additional person(s) invited
