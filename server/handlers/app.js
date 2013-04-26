@@ -87,6 +87,8 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
       var userAgent = req.headers['user-agent'];
       userAgent = userAgent ? userAgent : '';
 
+      var useFirebug = useFirebugInIE && userAgent.indexOf('MSIE') >= 0;
+
       // Disable websocket on Mobile due to iOS crash bug
       if(userAgent.indexOf('Mobile') >= 0) {
         disabledFayeProtocols.push('websocket');
@@ -120,11 +122,10 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
         login  = false;
         actualTroupeName = troupeName;
 
-        if (!troupe.oneToOne) {
-          userService.saveLastVisitedTroupeforUser(req.user.id, troupe.id, function(err) {
-            if (err) winston.info("Something went wrong saving the user last troupe visited: ", { exception: err });
-          });
-        }
+        userService.saveLastVisitedTroupeforUser(req.user.id, troupe, function(err) {
+          if (err) winston.info("Something went wrong saving the user last troupe visited: ", { exception: err });
+        });
+
       } else {
         login = true;
         if(profileNotCompleted) {
@@ -133,11 +134,6 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
           actualTroupeName = "Welcome";
         }
       }
-
-      var userAgent =req.headers['user-agent'];
-      userAgent = userAgent ? userAgent : '';
-
-      var useFirebug = useFirebugInIE && userAgent.indexOf('MSIE') >= 0;
 
       res.render(page, {
         useAppCache: !!nconf.get('web:useAppCache'),

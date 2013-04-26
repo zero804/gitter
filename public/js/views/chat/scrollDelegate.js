@@ -47,6 +47,7 @@ define([
   };
 
   DefaultScrollDelegate.prototype.calculateScrollLimit = function() {
+    // note: mobile will never have a scroll limit because eyaballs are never off, so items are marked as read immediately.
     if(this.useMax) {
       // look for the highest unread item and set the max to it
       var topUnreadItemPosition = this.findTopMostVisibleUnreadItem(this.itemType);
