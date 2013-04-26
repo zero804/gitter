@@ -93,11 +93,19 @@ tarball:
 	mkdir -p output
 	find . -type f -not -name ".*"| grep -Ev '^\./(\.|node_modules/|output/|assets/|mongo-backup-|scripts/mongo-backup-).*'|tar -cv --files-from - |gzip -9 - > output/troupe.tgz
 
+search-js-console:
+	if (find public/js -name "*.js" ! -path "*libs*" ! -name log.js |xargs grep -q '\bconsole\b'); then \
+		echo console references in the code; \
+		find public/js -name "*.js" ! -path "*libs*" ! -name log.js |xargs grep '\bconsole\b'; \
+		exit 1; \
+	fi
 
-continuous-integration: clean npm grunt version-files upgrade-data test-xunit test-coverage tarball
+validate-source: search-js-console
+
+continuous-integration: clean validate-source npm grunt version-files upgrade-data test-xunit test-coverage tarball
 
 post-deployment-tests: test-in-browser end-to-end-test
 
-build: npm grunt
+build: clean validate-source npm grunt version-files upgrade-data test-xunit
 
 .PHONY: test docs test-docs clean
