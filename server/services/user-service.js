@@ -117,11 +117,13 @@ var userService = {
       .exec(callback);
   },
 
-  saveLastVisitedTroupeforUser: function(userId, troupeId, callback) {
+  saveLastVisitedTroupeforUser: function(userId, troupe, callback) {
     winston.verbose("Saving last visited Troupe for user: ", userId);
     userService.findById(userId, function(err, user) {
       if(err) return callback(err);
       if(!user) return callback("User not found");
+
+      var troupeId = troupe.id;
 
       var setOp = {};
       setOp['troupes.' + troupeId] = new Date();
@@ -137,9 +139,13 @@ var userService = {
           }
         });
 
+      // Don't save the last troupe for one-to-one troupes
+      if(troupe.oneToOne) {
+        return callback();
+      }
+
       if (user.lastTroupe !== troupeId) {
         user.lastTroupe = troupeId;
-
         user.save(function(err) {
           callback(err);
         });
