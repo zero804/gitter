@@ -117,6 +117,7 @@ install-client-libs:
 	cp output/client-libs/backbone.keys/dist/backbone.keys.min.js public/repo/backbone.keys/backbone.keys.js
 	cp output/client-libs/backbone.wreqr/lib/amd/backbone.wreqr.min.js public/repo/backbone.wreqr/backbone.wreqr.js
 	cp output/client-libs/bootstrap/bootstrap-tooltip.js public/repo/bootstrap/tooltip.js
+	cp output/client-libs/cubism/cubism.v1.min.js public/repo/cubism/cubism.js
 	cp output/client-libs/d3/d3.min.js public/repo/d3/d3.js
 	cp output/client-libs/expect/expect.js public/repo/expect/expect.js
 	cp output/client-libs/faye/faye-browser.js public/repo/faye/faye.js
@@ -134,6 +135,7 @@ install-client-libs:
 	cp output/client-libs/jquery-placeholder/jquery.placeholder-amd.js public/repo/jquery-placeholder/jquery-placeholder.js
 	cp output/client-libs/jquery-validate/jquery.validate-amd.js public/repo/jquery-validate/jquery-validate.js
 	cp output/client-libs/mocha/lib/mocha.js public/repo/mocha/mocha.js
+	cp output/client-libs/mocha/mocha.css public/repo/mocha/mocha.css
 	cp output/client-libs/moment/min/moment.min.js public/repo/moment/moment.js
 	cp output/client-libs/nanoscroller/jquery.nanoscroller.js public/repo/nanoscroller/nanoscroller.js
 	cp output/client-libs/requirejs/index.js public/repo/requirejs/requirejs.js

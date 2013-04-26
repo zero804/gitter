@@ -4,9 +4,6 @@
 var nconf = require('../utils/config');
 var cdn = require("./cdn");
 
-// What version of requirejs should the client be loading?
-var REQUIREJS_VERSION = "2.1.4";
-
 var minified = nconf.get("web:minified");
 
 exports.cdn = function(url, parameters) {
@@ -20,7 +17,6 @@ exports.bootScript = function(url, parameters) {
   var baseUrl = cdn("js/");
 
   if(minified) {
-
     // note: when the skipCdn flag was introduced it affected this even though this isn't the file that was requested in this invocation
     requireScript = cdn("js/core-libraries.js");
 
@@ -29,7 +25,7 @@ exports.bootScript = function(url, parameters) {
 
   }
 
-  requireScript = cdn("js/libs/require/" + REQUIREJS_VERSION + "/require.js");
+  requireScript = cdn("repo/requirejs/requirejs.js");
 
   return "<script type='text/javascript'>window.require_config.baseUrl = '" + baseUrl + "';</script>\n" +
          "<script defer='defer' async='true' data-main='" + url + ".js' src='" + requireScript + "' type='text/javascript'></script>";
