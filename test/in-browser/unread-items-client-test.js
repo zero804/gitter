@@ -160,23 +160,25 @@ require([
     it('should be able to add items, which are then promoted', function(done) {
       var underTest = new unreadItemsClient.UnreadItemStore();
 
-
-      underTest._unreadItemAdded('chat', '1');
       underTest.once('newcountvalue', function(e, newValue) {
         expect(newValue).to.be(0);
 
         underTest.once('newcountvalue', function(e, newValue) {
           expect(newValue).to.be(1);
 
-          underTest._unreadItemAdded('chat', '2');
-          underTest._unreadItemAdded('chat', '3');
-
           underTest.once('newcountvalue', function(e, newValue) {
             expect(newValue).to.be(3);
             done();
           });
+
+          underTest._unreadItemAdded('chat', '2');
+          underTest._unreadItemAdded('chat', '3');
+
         });
       });
+
+      underTest._unreadItemAdded('chat', '1');
+
     });
 
     it('should not add items that have been marked as read', function() {
@@ -258,6 +260,82 @@ require([
         });
 
       });
+    });
+
+    it('it should raise newcountvalue events when the store changes', function(done) {
+      var underTest = new unreadItemsClient.UnreadItemStore();
+
+      function firstNewCountValueEvent(e, newValue) {
+        expect(newValue).to.be(4);
+
+        underTest.once('newcountvalue', secondNewCountValueEvent);
+        underTest._unreadItemRemoved('chat', '1');
+        underTest._markItemRead('chat', '1');
+      }
+
+      function secondNewCountValueEvent(e, newValue) {
+        expect(newValue).to.be(3);
+
+        underTest.once('newcountvalue', thirdNewCountValueEvent);
+        underTest._unreadItemAdded('chat', '1');
+        underTest._unreadItemAdded('chat', '4');
+        underTest._unreadItemAdded('chat', '5'); // <- only this item should be added
+      }
+
+      function thirdNewCountValueEvent(e, newValue) {
+        expect(newValue).to.be(4);
+
+        underTest.once('newcountvalue', forthNewCountValueEvent);
+        underTest._markItemRead('chat', '1');
+        underTest._markItemRead('chat', '2');
+        underTest._markItemRead('chat', '3');
+        underTest._markItemRead('chat', '4');
+        underTest._markItemRead('chat', '5');
+      }
+
+      function forthNewCountValueEvent(e, newValue) {
+        expect(newValue).to.be(0);
+
+        done();
+      }
+
+      underTest.once('newcountvalue', firstNewCountValueEvent);
+      underTest.preload({
+        chat: ['1','2','3','4']
+      });
+
+
+    });
+
+    it('it should handle things that are in the wrong order', function(done) {
+      var underTest = new unreadItemsClient.UnreadItemStore();
+
+      underTest.once('newcountvalue', firstNewCountValueEvent);
+      underTest._markItemRead('chat', '1');
+      underTest._markItemRead('chat', '2');
+      underTest._markItemRead('chat', '3');
+      underTest._markItemRead('chat', '4');
+      underTest._markItemRead('chat', '5');
+
+
+      function firstNewCountValueEvent(e, newValue) {
+        expect(newValue).to.be(0);
+
+        underTest.once('newcountvalue', function() {
+          done("We did not expect event at this time!");
+        });
+
+        underTest._unreadItemAdded('chat', '1');
+        underTest._unreadItemAdded('chat', '2');
+        underTest._unreadItemAdded('chat', '3');
+        underTest._unreadItemRemoved('chat', '4');
+        underTest._unreadItemRemoved('chat', '5');
+
+        window.setTimeout(function() {
+          return done();
+        }, 100);
+      }
+
 
 
     });

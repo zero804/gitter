@@ -81,7 +81,7 @@ describe("User Service", function() {
           if(err) return done(err);
           if(!user) return done("Cannot find user");
 
-          userService.saveLastVisitedTroupeforUser(user.id, troupe.id, function(err) {
+          userService.saveLastVisitedTroupeforUser(user.id, troupe, function(err) {
             if(err) return done(err);
 
             userService.getTroupeLastAccessTimesForUser(user.id, function(err, times) {
@@ -91,7 +91,7 @@ describe("User Service", function() {
               var after = times[troupeId];
               assert(after, 'Expected a value for last access time');
 
-              userService.saveLastVisitedTroupeforUser(user.id, troupe.id, function(err) {
+              userService.saveLastVisitedTroupeforUser(user.id, troupe, function(err) {
                 if(err) return done(err);
 
                 userService.getTroupeLastAccessTimesForUser(user.id, function(err, times) {
