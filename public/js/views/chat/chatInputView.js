@@ -81,7 +81,6 @@ define([
     },
 
     detectReturn: function(e) {
-      console.log("typing");
       if(e.keyCode == 13 && !e.ctrlKey) {
         if (window._troupeCompactView !== true) this.resetInput();
         return this.send();
