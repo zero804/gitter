@@ -7,6 +7,7 @@ var persistence = require("./persistence-service"),
     emailNotificationService = require("./email-notification-service"),
     uuid = require('node-uuid'),
     winston = require("winston"),
+    assert = require('assert'),
     collections = require("../utils/collections");
 
 var ObjectID = require('mongodb').ObjectID;
@@ -169,20 +170,40 @@ function validateTroupeUrisForUser(userId, uris, callback) {
     });
 }
 
-function addInvite(troupe, senderDisplayName, displayName, email) {
-  var code = uuid.v4();
+function addInvite(troupe, senderDisplayName, displayName, email, userId) {
+  assert(email || userId, "Either email address or existing user is required");
 
-  var invite = new persistence.Invite();
-  invite.troupeId = troupe.id;
-  invite.displayName = displayName;
-  invite.email = email;
-  invite.code = code;
-  invite.save();
+  // lookup the email address of an existing user being invited
+  if (!email) {
+    assert(userId, "An existing user is required if no email address is given.");
 
-  // TODO: should we treat registered users differently from unregistered people?
-  // At the moment, we treat them all the same...
+    userService.findById(userId, function(err, user) {
+      assert(!err);
+      assert(user, "No user with that ID was found");
 
-  emailNotificationService.sendInvite(troupe, displayName, email, code, senderDisplayName);
+      email = user.email;
+
+      createInvite();
+
+    });
+  } else {
+    createInvite();
+  }
+
+  function createInvite() {
+    var code = uuid.v4();
+    var invite = new persistence.Invite();
+    invite.troupeId = troupe.id;
+    invite.displayName = displayName;
+    invite.email = email;
+    invite.code = code;
+    invite.save();
+
+    // TODO: should we treat registered users differently from unregistered people?
+    // At the moment, we treat them all the same...
+
+    emailNotificationService.sendInvite(troupe, displayName, email, code, senderDisplayName);
+  }
 }
 
 function findInviteById(id, callback) {
