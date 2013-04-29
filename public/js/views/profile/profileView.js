@@ -36,6 +36,11 @@ define([
       "change #password": "onPasswordChange"
     },
 
+    resizeUploader: function() {
+      $('.button-choose-avatar input').css('margin-left','-40px');
+      $('.button-choose-avatar input').css('font-size','12px');
+    },
+
     afterRender: function() {
       this.$el.find('#displayName').placeholder();
       this.$el.find('#password').placeholder();
@@ -66,6 +71,9 @@ define([
           }
         }
       });
+
+      // This is a horrid hack to get the uploader button working properly in Firefox
+      setTimeout(function(){self.resizeUploader();},1000);
 
       // will bind to submit and change events, will not validate immediately.
       this.validateForm();
