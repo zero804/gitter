@@ -24,7 +24,9 @@
     "filtered-collection": "git://github.com/dlikhten/filtered-collection.git",
     "bootstrap": "https://github.com/timlind/bootstrap/archive/master.zip",
     "fine-uploader": "https://github.com/Troupe/fine-uploader/archive/master.zip",
-    "requirejs": "http://requirejs.org/docs/release/2.1.5/minified/require.js"
+    "almond": "0.2.5",
+    "requirejs": "http://requirejs.org/docs/release/2.1.5/minified/require.js",
+    "zepto": "~1.0.0"
   },
   "devDependencies": {
     "assert": "~0.0.1",

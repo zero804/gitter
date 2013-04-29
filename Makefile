@@ -119,6 +119,7 @@ fetch-client-libs:
 install-client-libs:
 	grunt client-libs
 	ls -d output/client-libs/*|sed -e 's!output/client-libs/!public/repo/!'|sed -e 's!retina.js-js!retina!'|sed -e 's!typeahead.js!typeahead!'|xargs mkdir -p
+	cp output/client-libs/almond/almond.js public/repo/almond/almond.js
 	cp output/client-libs/assert/assert.js public/repo/assert/assert.js
 	cp output/client-libs/backbone/backbone-amd.js public/repo/backbone/backbone.js
 	cp output/client-libs/backbone.babysitter/lib/amd/backbone.babysitter.min.js public/repo/backbone.babysitter/backbone.babysitter.js
@@ -131,7 +132,6 @@ install-client-libs:
 	cp output/client-libs/faye/faye-browser.js public/repo/faye/faye.js
 	cp output/client-libs/filtered-collection/backbone-filtered-collection-amd.js public/repo/filtered-collection/filtered-collection.js
 	cp output/client-libs/marionette/lib/core/amd/backbone.marionette.min.js public/repo/marionette/marionette.js
-	cp output/client-libs/fine-uploader/fine-uploader.js public/repo/fine-uploader/fine-uploader.js
 	cp output/client-libs/fine-uploader/fine-uploader.js public/repo/fine-uploader/fine-uploader.js
 	cp output/client-libs/fine-uploader/client/fineuploader.css public/repo/fine-uploader/fineuploader.less
 	cp output/client-libs/hbs/hbs.js public/repo/hbs/hbs.js
@@ -153,5 +153,6 @@ install-client-libs:
 	cp output/client-libs/underscore/underscore-amd.js public/repo/underscore/underscore.js
 	cp output/client-libs/zeroclipboard/ZeroClipboard.min.js public/repo/zeroclipboard/zeroclipboard.js
 	cp output/client-libs/zeroclipboard/ZeroClipboard.swf public/repo/zeroclipboard/
+	cp output/client-libs/zepto/zepto-amd.js public/repo/zepto/zepto.js
 
 client-libs: clean-client-libs fetch-client-libs install-client-libs
