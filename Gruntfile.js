@@ -21,9 +21,9 @@ module.exports = function( grunt ) {
         options: {
 
           optimize: 'uglify2',
-          generateSourceMaps: true,
-          preserveLicenseComments: false,
-          useSourceUrl: true,
+          //generateSourceMaps: true,
+          preserveLicenseComments: true,
+          //useSourceUrl: true,
 
 
           appDir: "public/",
@@ -35,6 +35,7 @@ module.exports = function( grunt ) {
               {
                 name: "core-libraries",
                 include: [
+                  //"../repo/almond/almond"
                   "../repo/requirejs/requirejs"
                 ]
               },
@@ -93,6 +94,17 @@ module.exports = function( grunt ) {
                     "views/widgets/avatar"
                   ],
                   exclude: ["core-libraries"]
+              },
+              {
+                  name: "login",
+                  include: [
+                    "../repo/almond/almond"
+                  ],
+                  override: {
+                    paths: {
+                        "jquery": "../repo/zepto/zepto"
+                    }
+                  }
               }
           ],
 
@@ -211,7 +223,12 @@ module.exports = function( grunt ) {
       "peopleView": {
         src: ['public-processed/js/views/people/peopleView.js'],
         dest: 'public-processed/js/views/people/peopleView.js'
+      },
+      "login": {
+        src: ['public-processed/js/login.js'],
+        dest: 'public-processed/js/login.js'
       }
+
     },
 
     less: {
@@ -399,6 +416,16 @@ module.exports = function( grunt ) {
           'jquery': 'jQuery'
         },
         exports: 'jQuery'
+      },
+
+      'zepto': {
+        files : {
+          'output/client-libs/zepto/zepto-amd.js': ['output/client-libs/zepto/zepto.min.js']
+        },
+        modules: {
+
+        },
+        exports: 'Zepto'
       }
 
     }

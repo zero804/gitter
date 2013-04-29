@@ -6,7 +6,12 @@ define([
   'handlebars',
   'hbs',
   'bootstrap_tooltip',
-  'marionette'
+  'marionette',
+  'utils/logrjs',
+  'utils/log',
+  'backbone.keys',
+  'backbone.wreqr',
+  'backbone.babysitter'
 ], function() {
   return null;
 });
