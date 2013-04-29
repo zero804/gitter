@@ -75,7 +75,7 @@ define([
   };
 
   DefaultScrollDelegate.prototype.scrollTop = function(top) {
-    var scrollToMe = Math.min(top, this.maxScrollPossible());
+    var scrollToMe = top; // Math.min(top, this.maxScrollPossible()); // disabling usage of maxPossibleScroll because it's not really needed and doesn't yet account for padding or rounding.
 
     if (this.maxScroll >= 0 && top > this.maxScroll) {
       // log("Capping the scroll to " + this.maxScroll + "(" + top + " requested)");
@@ -89,12 +89,14 @@ define([
   };
 
   DefaultScrollDelegate.prototype.scrollToBottom = function() {
-    // log("Keeping scroll at the bottom of the page (i.e scrolling to new message).");
+    // log("Keeping scroll at the bottom of the page (i.e scrolling to new message).", this.$container.height());
     this.scrollTop(this.$container.height());
   };
 
   DefaultScrollDelegate.prototype.maxScrollPossible = function() {
-    return Math.max(0, this.$container.height() - this.$scrollOf.height());
+    // log("Max possible scroll is ", this.$container.height(), this.$scrollOf.height(), (this.$container.height() - this.$scrollOf.height()));
+    // TODO need to add on the padding of scrollOf (not included in height()) and parents of scrollOf until container. Also, it seems the browser uses floats for height but jq rounds down to an int.
+    return Math.max(0, this.$container.height() - this.$scrollOf.height() + 10);
   };
 
   /*
