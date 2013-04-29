@@ -77,8 +77,15 @@ var inviteAcceptStrategy = new ConfirmStrategy({ name: "accept" }, function(conf
   winston.verbose("Invoking accept strategy", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
 
   troupeService.findInviteByCode(confirmationCode, function(err, invite) {
-    if(err) return done(err);
-    if(!invite) return done(null, false);
+    if(err || !invite) {
+      if(err) {
+        winston.error("Error while accepting invite confirmationCode=" + confirmationCode + ": " + err, { exception: err });
+      } else if(!invite) {
+        winston.error("Invite confirmationCode=" + confirmationCode + " not found. Redirecting to troupe. ");
+      }
+
+      return self.redirect('/' + req.params.troupeUri + '#existing');
+    }
 
     if(invite.status !== 'UNUSED') {
       /* The invite has already been used. We need to fail authentication, but go to the troupe */
@@ -99,7 +106,7 @@ var inviteAcceptStrategy = new ConfirmStrategy({ name: "accept" }, function(conf
         // In any other case (for example, we can't find the user or the more likely case the user is already fully registered)
         // then we _do_not_ log the user in (ie, not call done(..., user), instead we redirect to the troupe associated with the
         // invite where the user will be asked for their username and password (since they're not logged in)
-        return self.redirect("/" + req.params.troupeUri);
+        return self.redirect('/' + req.params.troupeUri + '#existing');
 
       });
 
