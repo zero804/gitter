@@ -357,7 +357,7 @@ require([
         unreadItemStore._unreadItemAdded('file', 1);
         unreadItemStore._unreadItemAdded('file', 2);
 
-       troupeCollection.once('change', function(a) {
+        troupeCollection.once('change', function(a) {
           expect(a.get('id')).to.be('1');
           expect(a.get('unreadItems')).to.be(2);
 

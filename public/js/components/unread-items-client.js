@@ -189,9 +189,9 @@ define([
     },
 
     _currentCount: function() {
-      if(this._currentCountValue < 0) return 0;
+      if(this._currentCountValue) return this._currentCountValue;
 
-      return this._currentCountValue;
+      return 0;
     },
 
     _unreadItemsAdded: function(items) {
@@ -291,7 +291,16 @@ define([
       if(troupe) {
         troupe.set('unreadItems', newValue);
       } else {
-        log('TroupeCollectionSync: unable to locate locate troupe');
+        if(this._collection.length === 0) {
+          this._collection.once('reset', function() {
+            var troupe = this._collection.get(window.troupeContext.troupe.id);
+            if(troupe) {
+              troupe.set('unreadItems', newValue);
+            } else {
+              log('TroupeCollectionSync: unable to locate locate troupe');
+            }
+          }, this);
+        }
       }
     }
   };
