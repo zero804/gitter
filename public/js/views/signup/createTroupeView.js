@@ -17,13 +17,19 @@ define([
       _.bindAll(this, 'onFormSubmit');
       if (!options) return;
       this.existingUser = options.existingUser;
-      this.shareTableView = new ShareTableView();
 
+      var isOneToOne;
       if (window.troupeContext) {
-        this.isOneToOne = window.troupeContext.troupe.oneToOne;
+        isOneToOne = window.troupeContext.troupe.oneToOne;
       } else {
-        this.isOneToOne = false;
+        isOneToOne = false;
       }
+
+      if(isOneToOne) {
+        this.shareTableView = new ShareTableView();
+      }
+      this.isOneToOne = isOneToOne;
+
     },
 
     events: {
@@ -47,7 +53,9 @@ define([
     },
 
     afterRender: function() {
-      this.$el.find('#invites-for-create').append(this.shareTableView.el);
+      if(this.shareTableView) {
+        this.$el.find('#invites-for-create').append(this.shareTableView.el);
+      }
 
       this.validateForm();
       this.$el.find('#troupeName').placeholder();
@@ -55,7 +63,16 @@ define([
     },
 
     validateForm : function () {
-      var validationConfig = _.extend(this.shareTableView.getValidationConfig());
+      var validationConfig;
+
+      if(this.shareTableView) {
+        validationConfig = _.extend(this.shareTableView.getValidationConfig());
+      } else {
+        validationConfig = {
+          rules: {  },
+          messages: { }
+        };
+      }
 
       validationConfig.showErrors = function(errorMap, errorList) {
         if (errorList.length > 0) {
@@ -84,10 +101,12 @@ define([
 
     onFormSubmit: function(e) {
       if(e) e.preventDefault();
-      var that = this, form = this.$el.find('form'), serializedForm = {
-        name: form.find('input[name=troupeName]').val(),
+      var that = this;
+      var form = this.$el.find('form');
+      var serializedForm = {
+        troupeName: form.find('input[name=troupeName]').val(),
         userId: form.find('input[name=userId]').val(),
-        invites: this.shareTableView.serialize()
+        invites: this.shareTableView ? this.shareTableView.serialize() : null
       };
 
       // we are sometimes executing from the signup page which excludes all the app integrated goodness
@@ -108,10 +127,10 @@ define([
       }
       // we are operating from the signup page, without app integrated, so we don't have a collection
       else {
-        log("Serialized form: " + serializedForm);
+        log("Serialized form: ", serializedForm);
         $.ajax({
           url: "/signup",
-          contentType: "json",
+          contentType: "application/json",
           dataType: "json",
           data: JSON.stringify(serializedForm),
           type: "POST",
