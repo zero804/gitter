@@ -256,6 +256,7 @@ var ChatMessageSchema = new Schema({
   text: String,
   sent: { type: Date, "default": Date.now },
   editedAt: { type: Date, "default": null },
+  readBy: { type: [ObjectId] },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 ChatMessageSchema.index({ toTroupeId: 1, sent: -1 });

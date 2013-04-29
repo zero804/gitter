@@ -150,7 +150,7 @@ function __disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callba
   });
 }
 
-function __associateSocketAndActivateTroupe(socketId, userId, troupeId, callback) {
+function __associateSocketAndActivateTroupe(socketId, userId, troupeId, eyeballState, callback) {
   assert(userId, 'userId expected');
   assert(socketId, 'socketId expected');
   assert(troupeId, 'troupeId expected');
@@ -169,7 +169,11 @@ function __associateSocketAndActivateTroupe(socketId, userId, troupeId, callback
       return callback({ lockFail: true });
     }
 
-    __eyeBallsOnTroupe(userId, socketId, troupeId, callback);
+    if(eyeballState) {
+      __eyeBallsOnTroupe(userId, socketId, troupeId, callback);
+    } else {
+      return callback();
+    }
   });
 }
 
@@ -216,13 +220,13 @@ function socketDisconnected(socketId, callback) {
 // If the socket subscribes to a troupe, associate the socket with a troupe
 // this will be used for eyeball signals
 //
-function userSubscribedToTroupe(userId, troupeId, socketId, callback) {
+function userSubscribedToTroupe(userId, troupeId, socketId, eyeballState, callback) {
   assert(userId, 'userId expected');
   assert(socketId, 'socketId expected');
   assert(troupeId, 'troupeId expected');
 
   _lockOnUser(userId, function(done) {
-    __associateSocketAndActivateTroupe(socketId, userId, troupeId, function(err) {
+    __associateSocketAndActivateTroupe(socketId, userId, troupeId, eyeballState, function(err) {
       if(err) return done(function() { callback(err); } );
       done(callback);
     });

@@ -30,20 +30,32 @@
   <div class="trpLeftMenu" id="left-menu">
     <div class="trpLeftMenuToolbar">
       <ul class="trpLeftMenuToolbarItems">
-        <!--<li><img src='{{cdn "images/2/icon-recent.png"}}' class="left-menu-icon" id="icon-recent" data-list="list-recent" width="24" height="24"></li>-->
-        <li><img src='{{cdn "images/2/icon-troupes.png"}}' class="trpLeftMenuIcon left-menu-icon selected" id="icon-troupes" data-list="list-troupes" width="24" height="24"></li>
+        <li><img src='{{cdn "images/2/icon-target.png"}}' class="trpLeftMenuIcon left-menu-icon selected" id="icon-mega" data-list="list-mega" width="24" height="24"></li>
+        <li><img src='{{cdn "images/2/icon-troupes.png"}}' class="trpLeftMenuIcon left-menu-icon" id="icon-troupes" data-list="list-troupes" width="24" height="24"></li>
         <li><img src='{{cdn "images/2/icon-user.png"}}' class="trpLeftMenuIcon left-menu-icon" id="icon-user" data-list="list-users" width="24" height="24"></li>
-        <!--<li><img src='{{cdn "images/2/icon-search.png"}}' class="left-menu-icon" id="icon-search" data-list="list-search" width="24" height="24"></li>-->
+<!--         <li><img src='{{cdn "images/2/icon-search.png"}}' class="trpLeftMenuIcon left-menu-icon" id="icon-search" data-list="list-search" width="24" height="24"></li> -->
       </ul>
     </div>
     <div class="nano" id="left-menu-scroll">
       <div class="content trpLeftMenuWrapper">
-        <!--<div class="trpToolbarList" style="display:none" id="list-recent">
-          <div class="trpToolbarHeader">Recent</div>
-          <ul class="trpRecentList" id="left-menu-list-recent">
-          </ul>
-        </div>-->
-        <div class="trpToolbarList" style="" id="list-troupes">
+        <div class="trpToolbarList" style="" id="list-mega">
+          <div id="unreadTroupesList">
+            <div class="trpToolbarHeader" id="unreadTroupesHeader">Unread Messages</div>
+            <ul class="trpTroupeList" id="left-menu-list-unread">
+            </ul>
+          </div>
+          <div id="favTroupesList">
+            <div class="trpToolbarHeader">Favourites</div>
+            <ul class="trpTroupeList" id="left-menu-list-favourites">
+            </ul>
+          </div>
+          <div id="recentTroupesList">
+            <div class="trpToolbarHeader">Recents</div>
+            <ul class="trpTroupeList" id="left-menu-list-recent">
+            </ul>
+          </div>
+        </div>
+        <div class="trpToolbarList" style="display:none" id="list-troupes">
           <div class="trpToolbarHeader">All your Troupes</div>
           <ul class="trpTroupeList" id="left-menu-list">
           </ul>
@@ -70,12 +82,19 @@
 
 
   <div class="trpHeaderWrapper" id="header-wrapper">
-    <div class="trpHeaderContainer" id="header-frame">
-      <div class="trpHeaderTitle">
-        {{troupeName}}
+    <div class="trpHeaderFrame" id="header-frame">
+      <div class="trpHeaderFavourite {{#if troupeContextData.troupe.favourite}}favourited{{/if}}">
+        <img src='{{cdn "images/2/icon-favourite-selected.png" }}' class="trpHeaderFavIcon favourited" width="24" height="24">
+        <img src='{{cdn "images/2/icon-favourite-unselected.png" }}' class="trpHeaderFavIcon unfavourited" width="24" height="24">
       </div>
-      <div class="trpHeaderToolbar" id="header-region">
+      <div class="trpHeaderContainer">
+        <div class="trpHeaderTitle">
+          {{troupeName}}
+        </div>
+        <div class="trpHeaderToolbar" id="header-region">
+        </div>
       </div>
+      <div class="trpHeaderSpacer"></div>
     </div>
   </div>
 

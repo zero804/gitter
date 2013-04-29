@@ -4,11 +4,13 @@ define([
   'underscore',
   'backbone',
   'hbs!./tmpl/modal',
+  'hbs!./tmpl/popover',
+  'hbs!./tmpl/loading',
   '../template/helpers/all',
   'hbs!./tmpl/confirmationView',
   'log!base-views',
   'backbone-keys' // no ref
-], function($, _, Backbone, modalTemplate, helpers, confirmationViewTemplate, log) {
+], function($, _, Backbone, modalTemplate, popoverTemplate, loadingTemplate, helpers, confirmationViewTemplate, log) {
   /*jshint trailing:false */
   "use strict";
 
@@ -37,6 +39,7 @@ define([
   if (userAgentFragment) {
     compactView = true;
     window._troupeCompactView = true;
+    $('body').addClass('trpCompactView');
   }
 
   window._troupeIsIE9 = isIE9;
@@ -313,6 +316,7 @@ define([
 
         if (transition) {
           var o = that.$el[0].offsetWidth; // force reflow
+          o++;
         }
 
         that.$el.addClass('in');
@@ -358,7 +362,6 @@ define([
     hideInternal: function() {
       if (!this.isShown) return;
 
-      var that = this;
       this.isShown = false;
 
       $('body').removeClass('modal-open');
@@ -417,7 +420,6 @@ define([
     },
 
     backdrop: function( callback ) {
-      var that = this;
       var animate = this.options.fade ? 'fade' : '';
 
       if (this.isShown && this.options.backdrop) {
@@ -434,7 +436,7 @@ define([
         }
         this.$backdrop.modal = this;
 
-        if (doAnimate) { var x = this.$backdrop[0].offsetWidth; } // force reflow
+        if (doAnimate) { var x = this.$backdrop[0].offsetWidth; x++; } // force reflow
 
         this.$backdrop.addClass('in');
 
@@ -476,42 +478,205 @@ define([
     }
   });
 
-  TroupeViews.Menu = Backbone.View.extend({
+  TroupeViews.Popover = TroupeViews.Base.extend({
+    template: popoverTemplate,
+    className: "popover",
     initialize: function(options) {
-      _.bindAll(this, 'toggleMenu', 'showMenu', 'hideMenu');
-      $('body, html').on('click', this.hideMenu);
-      $('.trpMenuIcon, .trpNotifyBadge').on('click', this.hideMenu);
-      this.triggerEl = $(options.triggerEl);
-      this.triggerEl.on('click', this.toggleMenu);
+      this.options = {
+        animation: true,
+        selector: false,
+        title: '',
+        delay: 300,
+        container: false,
+        placement: 'right',
+        width: ''
+      };
+      _.bindAll(this, 'leave', 'enter');
+      _.extend(this.options, options);
+      //this.init('popover', element, options);
+      this.view = this.options.view;
+      this.targetElement = this.options.targetElement;
+      this.$targetElement = $(this.targetElement);
+
+      this.$targetElement.on('mouseenter', this.enter);
+      this.$targetElement.on('mouseleave', this.leave);
+    },
+
+    afterRender: function() {
+      var $e = this.$el;
+      var title = this.options.title;
+
+      $e.find('.popover-title').text(title);
+      $e.find('.popover-content > *').append(this.view.render().el);
+      $e.find('.popover-inner').css('width', this.options.width);
+
+      $e.on('mouseenter', this.enter);
+      $e.on('mouseleave', this.leave);
+
+      $e.removeClass('fade top bottom left right in');
+    },
+
+    enter: function (/*e*/) {
+      if (this.timeout) clearTimeout(this.timeout);
+    },
+
+    leave: function (/*e*/) {
+      if (!this.options.delay) {
+        return self.hide();
+      }
+
+      var self = this;
+      this.timeout = setTimeout(function() {
+        self.hide();
+      }, self.options.delay);
     },
 
     onClose: function() {
-      this.triggerEl.off();
+      this.$el.off('mouseenter', this.enter);
+      this.$el.off('mouseleave', this.leave);
+
+      this.$targetElement.off('mouseenter', this.enter);
+      this.$targetElement.off('mouseleave', this.leave);
     },
 
-    toggleMenu: function(){
-      if (this.$el.is(':hidden')) {
-        this.showMenu();
-        return false;
-      } else {
-        this.hideMenu();
+    show: function () {
+
+      var $e = this.render().$el;
+      var e = this.el;
+
+      if (this.options.animation) {
+        $e.addClass('fade');
       }
+
+      $e.detach().css({ top: 0, left: 0, display: 'block' });
+
+      $e.insertAfter(this.targetElement);
+
+      var pos = this.getPosition();
+
+      var actualWidth = e.offsetWidth;
+      var actualHeight = e.offsetHeight;
+
+      var placement = this.options.placement;
+      var tp;
+      switch (placement) {
+        case 'bottom':
+          tp = {top: pos.top + pos.height, left: pos.left + pos.width / 2 - actualWidth / 2};
+          break;
+        case 'top':
+          tp = {top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2};
+          break;
+        case 'left':
+          tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth};
+          break;
+        case 'right':
+          tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width};
+          break;
+      }
+
+      this.applyPlacement(tp, placement);
     },
 
-    showMenu: function() {
-      $(this.triggerEl).css('background-color', 'white');
-      this.$el.slideDown('fast', function() {
-          // Animation complete.
-          $('body').on('click', this.hideMenu);
-      });
+    applyPlacement: function(offset, placement){
+      var $e = this.$el;
+      var e = $e[0];
+
+      var width = e.offsetWidth;
+      var height = e.offsetHeight;
+      var actualWidth;
+      var actualHeight;
+      var delta;
+      var replace;
+
+      $e
+        .offset(offset)
+        .addClass(placement)
+        .addClass('in');
+
+      actualWidth = e.offsetWidth;
+      actualHeight = e.offsetHeight;
+
+      if (placement == 'top' && actualHeight != height) {
+        offset.top = offset.top + height - actualHeight;
+        replace = true;
+      }
+
+      if (placement == 'bottom' || placement == 'top') {
+        delta = 0;
+
+        if (offset.left < 0) {
+          delta = offset.left * -2;
+          offset.left = 0;
+          $e.offset(offset);
+          actualWidth = e.offsetWidth;
+          actualHeight = e.offsetHeight;
+        }
+
+        this.replaceArrow(delta - width + actualWidth, actualWidth, 'left');
+      } else {
+        this.replaceArrow(actualHeight - height, actualHeight, 'top');
+      }
+
+      if (replace) $e.offset(offset);
     },
 
-    hideMenu: function() {
-      $(this.triggerEl).css('background-color', 'transparent');
-      $('body').off('click', this.hideMenu);
-      this.$el.slideUp('fast', function() {
-          // Animation complete.
-      });
+    replaceArrow: function(delta, dimension, position){
+      this
+        .arrow()
+        .css(position, delta ? (50 * (1 - delta / dimension) + "%") : '');
+    },
+
+    hide: function () {
+      if (this.timeout) clearTimeout(this.timeout);
+
+      var $e = this.$el;
+
+      $e.removeClass('in');
+
+      function removeWithAnimation() {
+        var timeout = setTimeout(function() {
+          $e.off($.support.transition.end).detach();
+        }, 500);
+
+        $e.one($.support.transition.end, function () {
+          clearTimeout(timeout);
+          $e.detach();
+        });
+      }
+
+      if($.support.transition && this.$tip.hasClass('fade')) {
+        removeWithAnimation();
+      } else {
+        $e.detach();
+      }
+
+      $e.trigger('hidden');
+      this.trigger('hide');
+      this.close();
+
+      return this;
+    },
+
+    getPosition: function () {
+      var el = this.targetElement;
+
+      return _.extend({}, (typeof el.getBoundingClientRect == 'function') ? el.getBoundingClientRect() : {
+        width: el.offsetWidth,
+        height: el.offsetHeight
+      }, this.$targetElement.offset());
+
+    },
+
+    getTitle: function () {
+      return this.options.title;
+    },
+
+    arrow: function(){
+      if(!this.$arrow) {
+        this.$arrow = this.$el.find(".tooltip-arrow");
+      }
+
+      return this.$arrow;
     }
   });
 
@@ -525,12 +690,10 @@ define([
     },
 
     onBeforeRenderSort: function() {
-      log("Switching to rendering mode");
       this.isRendering = true;
     },
 
     onRenderSort: function() {
-      log("Out of rendering mode");
       this.isRendering = false;
     },
 
@@ -560,7 +723,6 @@ define([
       }
 
       if(index == collectionView.collection.length - 1) {
-        log("Inserting *at* the bottom of the collection ", adjView);
         itemView.$el.appendTo(collectionView.el);
         return;
       }
@@ -577,7 +739,6 @@ define([
           itemView.$el.insertBefore(adjView.el);
         } else {
           log("Inserting *after* the bottom of the collection ", adjView);
-          debugger;
           // We can't find an item before, we can't find an item after,
           // just give up and insert at the end. (hopefully this will never happen eh?)
           itemView.$el.appendTo(collectionView.el);
@@ -591,11 +752,33 @@ define([
         var view = collectionView.children.findByModel(collectionView.collection.at(i));
         return view;
       }
-
-
     }
-
   };
+
+  TroupeViews.LoadingView =  TroupeViews.Base.extend({
+    template: loadingTemplate
+  });
+
+  // Mixin for Marionette.CollectionView classes
+  TroupeViews.LoadingCollectionMixin = {
+    loadingView: TroupeViews.LoadingView,
+    showEmptyView: function() {
+      if(this.collection.loading) {
+        var LoadingView = Marionette.getOption(this, "loadingView");
+
+        if (LoadingView && !this._showingEmptyView){
+          this._showingEmptyView = true;
+          var model = new Backbone.Model();
+          this.addItemView(model, LoadingView, 0);
+        }
+        return;
+      }
+
+      return Marionette.CollectionView.prototype.showEmptyView.call(this);
+    }
+  };
+
+
 
   TroupeViews.ConfirmationView = TroupeViews.Base.extend({
     template: confirmationViewTemplate,

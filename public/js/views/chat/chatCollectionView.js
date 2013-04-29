@@ -3,13 +3,15 @@ define([
   'jquery',
   'underscore',
   'log!chat-collection-view',
+  'collections/chat',
+  'views/widgets/avatar',
   'components/unread-items-client',
   'marionette',
   'views/base',
   './scrollDelegate',
   'hbs!./tmpl/chatViewItem',
   'bootstrap_tooltip'
-], function($, _, log, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate) {
+], function($, _, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate /* tooltip*/) {
   "use strict";
 
   var PAGE_SIZE = 15;
@@ -20,14 +22,16 @@ define([
     isEditing: false,
 
     events: {
-      'click .trpChatEdit': 'toggleEdit',
-      'keydown .trpChatInput': 'detectReturn'
+      'click .trpChatEdit':     'toggleEdit',
+      'keydown .trpChatInput':  'detectKeys',
+      'click .trpChatReads':    'showReadBy'
     },
 
-    initialize: function() {
+    initialize: function(options) {
       var self = this;
 
       this.setRerenderOnChange(true);
+      this.userCollection = options.userCollection;
 
       if (this.isInEditablePeriod()) {
         // re-render once the message is not editable
@@ -35,6 +39,13 @@ define([
         setTimeout(function() {
           self.render();
         }, notEditableInMS + 50);
+      }
+
+      if (!this.isOld()) {
+        var oldInMS = (this.model.get('sent').valueOf() + 3600000 /*1 hour*/) - Date.now();
+        setTimeout(function() {
+          self.render();
+        }, oldInMS + 50);
       }
 
       // dblclick / doubletap don't seem to work on mobile even with user-scalable=no
@@ -88,29 +99,45 @@ define([
 
     afterRender: function() {
       this.$el.toggleClass('isViewers', this.isOwnMessage());
-      if (this.isOwnMessage()) this.$el.toggleClass('isEditable', this.isInEditablePeriod());
+      this.$el.toggleClass('isEditable', this.isInEditablePeriod());
       this.$el.toggleClass('canEdit', this.canEdit());
+      this.$el.toggleClass('cantEdit', !this.canEdit());
       this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
-      if (!this.isOwnMessage() && !this.hasBeenEdited()) this.$el.toggleClass('noEdit');
+      this.$el.toggleClass('hasBeenRead', this.hasBeenRead());
+      this.$el.toggleClass('isOld', this.isOld());
 
-      //this.$el.tooltip();
+      if (!window._troupeCompactView) {
+        this.$el.find('.trpChatEdit [title]').tooltip({ container: 'body' });
+      }
+    },
+
+    detectKeys: function(e) {
+      this.detectReturn(e);
+      this.detectEscape(e);
     },
 
     detectReturn: function(e) {
-      if(e.keyCode == 13 && !e.ctrlKey) {
+      if(e.keyCode === 13 && !e.ctrlKey) {
         this.saveChat();
         e.stopPropagation();
         e.preventDefault();
+      }
+    },
 
-        return false;
+    detectEscape: function(e) {
+      if (e.keyCode === 27) {
+        this.toggleEdit();
       }
     },
 
     saveChat: function() {
-      var newText = this.$el.find('.trpChatInput').val();
-      if (this.canEdit() && newText != this.model.get('text')) {
-        this.model.set('text', newText);
-        this.model.save();
+      if (this.isEditing) {
+        var newText = this.$el.find('.trpChatInput').val();
+        if (this.canEdit() && newText != this.model.get('text')) {
+          this.model.set('text', newText);
+          this.model.save();
+        }
+
         this.toggleEdit();
       }
     },
@@ -124,12 +151,21 @@ define([
       return age <= 240;
     },
 
+    isOld: function() {
+      var age = (Date.now() - this.model.get('sent').valueOf()) / 1000;
+      return age >= 3600;
+    },
+
     canEdit: function() {
       return this.isOwnMessage() && this.isInEditablePeriod();
     },
 
     hasBeenEdited: function() {
       return !!this.model.get('editedAt');
+    },
+
+    hasBeenRead: function() {
+      return !!this.model.get('readBy');
     },
 
     toggleEdit: function() {
@@ -153,8 +189,51 @@ define([
         }
 
       }
+    },
+
+    showReadBy: function() {
+      if(this.readBy) return;
+
+      this.readBy = new ReadByPopover({
+        model: this.model,
+        userCollection: this.userCollection,
+        placement: 'bottom',
+        title: 'Read By',
+        targetElement: this.$el.find('.trpChatReads')[0]
+      });
+
+      var s = this;
+      this.readBy.once('hide', function() {
+        s.readBy = null;
+      });
+
+      this.readBy.show();
+
     }
 
+  });
+
+  var ReadByView = Marionette.CollectionView.extend({
+    itemView: AvatarView,
+    initialize: function(options) {
+      var c = new chatModels.ReadByCollection([], { chatMessageId: this.model.id, userCollection: options.userCollection });
+      c.loading = true;
+      this.collection = c;
+      c.listen(function() {
+        c.fetch();
+      });
+    },
+    onClose: function(){
+      this.collection.unlisten();
+    }
+  });
+  _.extend(ReadByView.prototype, TroupeViews.LoadingCollectionMixin);
+
+  var ReadByPopover = TroupeViews.Popover.extend({
+    initialize: function(options) {
+      TroupeViews.Popover.prototype.initialize.apply(this, arguments);
+      this.view = new ReadByView({ model: this.model, userCollection: options.userCollection });
+    }
   });
 
   /*
@@ -162,11 +241,16 @@ define([
   */
   var ChatCollectionView = Marionette.CollectionView.extend({
     itemView: ChatViewItem,
+    itemViewOptions: function() {
+      return { userCollection: this.userCollection };
+    },
     chatMessageLimit: PAGE_SIZE,
 
-    initialize: function() {
+    initialize: function(options) {
       _.bindAll(this, 'chatWindowScroll');
       this.initializeSorting();
+
+      this.userCollection = options.userCollection;
 
       if (window._troupeCompactView) {
         ChatCollectionView.$scrollOf = $('#chat-wrapper');
@@ -178,12 +262,21 @@ define([
 
       this.scrollDelegate = new scrollDelegates.DefaultScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
       this.infiniteScrollDelegate = new scrollDelegates.InfiniteScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
-      ChatCollectionView.$scrollOf.on('scroll', this.chatWindowScroll);
-
       function findTopMostVisibleUnreadItem(itemType) {
-        return unreadItemsClient.findTopMostVisibleUnreadItemPosition(itemType);
+        return unreadItemsClient.findTopMostVisibleUnreadItemPosition(itemType, ChatCollectionView.$container, ChatCollectionView.$scrollOf);
       }
 
+      var self = this;
+      // wait for the first reset (preloading) before enabling infinite scroll
+      if (this.collection.length === 0) {
+        this.collection.once('reset', function() {
+          // log("Enabling infinite scroll");
+          ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
+        });
+      } else {
+        // log("Enabling infinite scroll");
+        ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
+      }
     },
 
     onClose: function(){
@@ -200,6 +293,7 @@ define([
       var self = this;
       setTimeout(function() {
         // note: on mobile safari this only work when typing in the url, not when pressing refresh, it works well in the mobile app.
+        // log("Initial scroll to bottom on page load");
         self.scrollDelegate.scrollToBottom();
       }, 500);
     },
@@ -226,6 +320,7 @@ define([
     loadNextMessages: function() {
       if(this.loading) return;
 
+      // log("Loading next message chunk.");
       this.infiniteScrollDelegate.beforeLoadNextMessages();
 
       var self = this;
@@ -233,6 +328,7 @@ define([
       function success(data, resp) {
         self.loading = false;
         if(!resp.length) {
+          // turn off infinite scroll if there were no new messages retrieved
           $(ChatCollectionView.$scrollOf).off('scroll', self.chatWindowScroll);
         }
       }

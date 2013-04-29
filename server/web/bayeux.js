@@ -16,7 +16,9 @@ var routes = [
   { re: /^\/troupes\/(\w+)$/, validator: validateUserForTroupeSubscription },
   { re: /^\/troupes\/(\w+)\/(.+)$/, validator: validateUserForSubTroupeSubscription },
   { re: /^\/user\/(\w+)\/(.+)$/, validator: validateUserForUserSubscription },
-  { re: /^\/user\/(\w+)$/, validator: validateUserForUserSubscription }
+  { re: /^\/user\/(\w+)$/, validator: validateUserForUserSubscription },
+  { re: /^\/ping$/, validator: validateUserForPingSubscription }
+
 ];
 
 var superClientPassword = nconf.get('ws:superClientPassword');
@@ -31,6 +33,7 @@ function validateUserForTroupeSubscription(options, callback) {
 function validateUserForSubTroupeSubscription(options, callback) {
   var userId = options.userId;
   var match = options.match;
+  var message = options.message;
   var clientId = options.clientId;
   var notifyPresenceService = options.notifyPresenceService;
 
@@ -45,7 +48,14 @@ function validateUserForSubTroupeSubscription(options, callback) {
     }
 
     if(result && notifyPresenceService) {
-      presenceService.userSubscribedToTroupe(userId, troupeId, clientId, function(err) {
+      var eyeballState = true;
+      if(message.ext) {
+        if(message.ext.hasOwnProperty('eyeballs')) {
+          eyeballState = !!message.ext.eyeballs;
+        }
+      }
+
+      presenceService.userSubscribedToTroupe(userId, troupeId, clientId, eyeballState, function(err) {
         if(err) return callback(err);
 
         return callback(null, result);
@@ -58,6 +68,13 @@ function validateUserForSubTroupeSubscription(options, callback) {
 
   });
 }
+
+
+// This strategy ensures that a user can access a URL under a /user/ URL
+function validateUserForPingSubscription(options, callback) {
+  return callback(null, true);
+}
+
 
 // This strategy ensures that a user can access a URL under a /user/ URL
 function validateUserForUserSubscription(options, callback) {

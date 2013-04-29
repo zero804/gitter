@@ -15,6 +15,11 @@ var collections = require("../utils/collections");
 var cdn = require('../web/cdn');
 var predicates = collections.predicates;
 
+// TODO: Fix this, use the CDN and code sign URLS
+function privateCdn(url) {
+  return "/" + url;
+}
+
 function formatDate(d) {
   return d ? d.toISOString() : null;
 }
@@ -98,7 +103,7 @@ function UserStrategy(options) {
     return {
       id: user.id,
       displayName: user.displayName,
-      email: user.email,
+      email: options.includeEmail ? user.email : undefined,
       avatarUrlSmall: getAvatarUrl('s'),
       avatarUrlMedium: getAvatarUrl('m'),
       location: location,
@@ -175,11 +180,11 @@ function FileStrategy(options) {
           deleted: item.deleted
         };
       }),
-      url: cdn('troupes/' + encodeURIComponent(item.troupeId) + '/downloads/' + encodeURIComponent(item.fileName), { notStatic: true }),
+      url: privateCdn('troupes/' + encodeURIComponent(item.troupeId) + '/downloads/' + encodeURIComponent(item.fileName), { notStatic: true }),
       previewMimeType: item.previewMimeType,
       embeddedViewType: item.embeddedViewType,
-      embeddedUrl: cdn('troupes/' + encodeURIComponent(item.troupeId) + '/embedded/' + encodeURIComponent(item.fileName), { notStatic: true }),
-      thumbnailUrl: cdn('troupes/' + encodeURIComponent(item.troupeId) + '/thumbnails/' + encodeURIComponent(item.fileName) + "?version=" + item.versions.length, { notStatic: true }),
+      embeddedUrl: privateCdn('troupes/' + encodeURIComponent(item.troupeId) + '/embedded/' + encodeURIComponent(item.fileName), { notStatic: true }),
+      thumbnailUrl: privateCdn('troupes/' + encodeURIComponent(item.troupeId) + '/thumbnails/' + encodeURIComponent(item.fileName) + "?version=" + item.versions.length, { notStatic: true }),
       unread: options.currentUserId ? unreadItemStategy.map(item._id) : true,
       v: getVersion(item)
     };
@@ -504,6 +509,7 @@ function ChatStrategy(options)  {
       fromUser: options.user ? options.user : userStategy.map(item.fromUserId),
       unread: options.currentUserId ? unreadItemStategy.map(item._id) : true,
       troupe: troupeStrategy ? troupeStrategy.map(item.toTroupeId) : undefined,
+      readBy: item.readBy ? item.readBy.length : undefined,
       v: getVersion(item)
     };
 

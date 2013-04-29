@@ -14,7 +14,9 @@ define([
   exports.ChatModel = TroupeCollections.Model.extend({
     idAttribute: "id",
     parse: function(message) {
-      message.sent = moment(message.sent, moment.defaultFormat);
+      if(message.sent) {
+        message.sent = moment(message.sent, moment.defaultFormat);
+      }
 
       if(message.editedAt) {
         message.editedAt = moment(message.editedAt, moment.defaultFormat);
@@ -67,6 +69,29 @@ define([
     }
   });
   _.extend(exports.ChatCollection.prototype, TroupeCollections.ReversableCollectionBehaviour);
+
+  exports.ReadByModel = TroupeCollections.Model.extend({
+    idAttribute: "id"
+  });
+
+  exports.ReadByCollection = TroupeCollections.LiveCollection.extend({
+    model: exports.ReadByModel,
+    modelName: 'chatReadBy',
+    initialize: function(models, options) {
+      var userCollection = options.userCollection;
+      if(userCollection) {
+        this.transformModel = function(model) {
+          var m = userCollection.get(model.id);
+          if(m) return m.toJSON();
+
+          return model;
+        };
+      }
+
+      this.chatMessageId = options.chatMessageId;
+      this.url = "/troupes/" + window.troupeContext.troupe.id + "/chatMessages/" + this.chatMessageId + "/readBy";
+    }
+  });
 
   return exports;
 });

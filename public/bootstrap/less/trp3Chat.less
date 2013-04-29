@@ -90,43 +90,55 @@
 	float: right;
 }
 
-// gray out the edit icon by default
-.trpChatEdit, .trpChatReads {
-  opacity: 0.2;
-  padding: 2px 4px 0 0;
-  height: 16px;
-}
-
-// hide the edit and read buttons by default
-.trpChatEdit, .trpChatReads {
-  visibility: hidden;
-}
-
-/*// don't show the edit button at all unless it is editable or has been edited
+// by default, don't show the edit icon
 .trpChatEdit {
   display: none;
-}*/
+}
 
-.canEdit .trpChatEdit, .hasBeenEdited .trpChatEdit {
+// show the edit icon if the viewer canEdit or the message has been edited
+.isViewers .trpChatEdit, .hasBeenEdited .trpChatEdit {
   display: inline-block;
 }
 
-.noEdit .trpChatEdit {
-  display: none;
-}
-
+// if the message has been edited always show the edit icon (not just on hover)
 .hasBeenEdited .trpChatEdit {
   display: inline-block;
 }
 
-// show the edit and read icons only when hovered over
-.trpChatBox:hover > .trpChatDetails > .trpChatEdit {
+// by default, don't show the reads icon
+.trpChatReads {
+  display: none;
+}
+
+// show the reads icon if it has been read
+.hasBeenRead .trpChatReads {
+  display: block;
+}
+
+// show the edit and read icons only when hovered over.
+// hide the edit and read buttons by default, so they can be shown on hover.
+.trpChatEdit, .trpChatReads {
+  visibility: hidden;
+}
+
+.trpChatBox:hover > .trpChatDetails > .trpChatEdit,
+.trpChatBox:hover > .trpChatDetails > .trpChatReads {
   visibility: visible;
 }
 
-// show the edit and read icons only when hovered over
-.trpChatBox:hover > .trpChatDetails > .trpChatReads {
-  visibility: visible;
+.isOld .trpChatEdit {
+  display: none;
+}
+
+.trpCompactView .trpChatReads {
+  display: none;
+}
+
+// gray out the edit and read icons by default
+.trpChatEdit, .trpChatReads {
+  opacity: 0.2;
+  padding: 2px 4px 0 0;
+  height: 16px;
 }
 
 // if the viewer can edit the message, dont gray it out
@@ -137,13 +149,8 @@
   -webkit-transition: opacity .25s ease-in-out;
 }
 
-// if the message has been edited always show the edit icon (not just on hover)
-.hasBeenEdited .trpChatEdit {
-  visibility: visible;
-}
-
-// hide the timeago when hovered
 /*
+// hide the timeago when hovered
 :hover > .trpChatTime {
   display: none;
 }

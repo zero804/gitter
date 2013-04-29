@@ -137,7 +137,7 @@ define([
     this._addTarpit = new Tarpit(ADD_TIMEOUT, _.bind(this._promote, this));
     this._deleteTarpit = new Tarpit(REMOVE_TIMEOUT);
     this._recountLimited = limit(this._recount, this, 30);
-    this._currentCountValue = -1;
+    this._currentCountValue = undefined;
   };
 
   _.extend(UnreadItemStore.prototype, EventEmitter, DoubleHash.prototype, {
@@ -180,21 +180,18 @@ define([
     },
 
     _recount: function() {
-      log('TroupeUnreadItemRealtimeSync:_recount');
-
       var newValue = this._count();
-      if(newValue !== this._currentCountValue) {
-        this._currentCountValue = newValue;
-        log('TroupeUnreadItemRealtimeSync:newcountvalue', newValue);
 
+      if(this._currentCountValue !== newValue) {
+        this._currentCountValue = newValue;
         this.emit('newcountvalue', newValue);
       }
     },
 
     _currentCount: function() {
-      if(this._currentCountValue < 0) return 0;
+      if(this._currentCountValue) return this._currentCountValue;
 
-      return this._currentCountValue;
+      return 0;
     },
 
     _unreadItemsAdded: function(items) {
@@ -290,11 +287,20 @@ define([
     _onNewCountValue: function(event, newValue) {
       if(!window.troupeContext || !window.troupeContext.troupe) return;
 
-      log('TroupeUnreadItemRealtimeSync:_onNewCountValue');
-
       var troupe = this._collection.get(window.troupeContext.troupe.id);
       if(troupe) {
         troupe.set('unreadItems', newValue);
+      } else {
+        if(this._collection.length === 0) {
+          this._collection.once('reset', function() {
+            var troupe = this._collection.get(window.troupeContext.troupe.id);
+            if(troupe) {
+              troupe.set('unreadItems', newValue);
+            } else {
+              log('TroupeCollectionSync: unable to locate locate troupe');
+            }
+          }, this);
+        }
       }
     }
   };
@@ -317,7 +323,6 @@ define([
           store._unreadItemsAdded(message.items);
 
         } else if(message.notification === 'unread_items_removed') {
-         log('TroupeUnreadItemRealtimeSync:unreadItemsRemoved');
 
           var items = message.items;
           store._unreadItemsRemoved(items);
@@ -399,8 +404,6 @@ define([
   TroupeUnreadNotifier.prototype = {
 
     _recount: function() {
-      log('TroupeUnreadNotifier:recount');
-
       function count(memo, troupe) {
         var c = troupe.get('unreadItems');
         return memo + (c > 0 ? 1 : 0);
@@ -564,16 +567,16 @@ define([
       };
     },
 
-    findTopMostVisibleUnreadItemPosition: function(itemType) {
+    findTopMostVisibleUnreadItemPosition: function(itemType, $container, $scrollOf) {
       var topItem = null;
       var topItemOffset = 1000000000;
 
-      var $window = $(window);
-      var scrollTop = $window.scrollTop();
-      var scrollBottom = scrollTop + $window.height();
+      var scrollTop = $scrollOf.scrollTop();
+      var scrollBottom = scrollTop + $scrollOf.height();
 
+      var unreadElements = $container.find('.unread');
 
-      $('.unread').each(function (index, element) {
+      unreadElements.each(function (index, element) {
         var $e = $(element);
         var elementItemType = $e.data('itemType');
         if(elementItemType != itemType) return;
@@ -590,7 +593,13 @@ define([
         }
       });
 
+      // calculate the offset of the top item relative to container
+
+
       if(!topItem) return null;
+      // note: mobile will never have a scroll limit because eyaballs are never off, so items are marked as read immediately.
+      // technically this offset should be relative to $scrollOf, but relative to the window seems to work for now,
+      // especially seen as there will never really be a top unread item for mobile, because eyeballs are always on.
       return topItem.offset();
     },
 

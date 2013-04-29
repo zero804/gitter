@@ -45,6 +45,7 @@ define([
     },
 
     render: function(duration) {
+      this.$el.find('[title]').tooltip('destroy');
       if(!duration) duration = moment.duration(Date.now() - this.time.valueOf());
       var v;
       if(duration.asDays() >= maxDaysBeforeDateDisplay) {
@@ -54,6 +55,9 @@ define([
       }
       var fullTime = this.time.format("LLL");
       this.$el.html("<span title='" + fullTime + "'>" + v + "</span>");
+      if (!window._troupeCompactView) {
+        this.$el.find('[title]').tooltip({ container: 'body' });
+      }
     }
 
   });
