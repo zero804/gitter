@@ -78,7 +78,7 @@ define([
         }),
         type: "POST",
         success: function(data) {
-          log(JSON.stringify(data));
+          // log(JSON.stringify(data));
 
           if (data.redirectTo) {
             window.location.href = "/" + data.redirectTo;
