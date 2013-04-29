@@ -2,6 +2,7 @@
 "use strict";
 
 var troupeService = require("./troupe-service");
+var readByService = require("./readby-service");
 var appEvents = require("../app-events");
 var _ = require("underscore");
 var redis = require("../utils/redis");
@@ -141,7 +142,13 @@ exports.markItemsRead = function(userId, troupeId, items, callback) {
 
     republishUnreadItemCountForUserTroupe(userId, troupeId);
 
-    callback();
+    // For the moment, we're only bothering with chats for this
+    readByService.recordItemsAsRead(userId, troupeId, items, function(err) {
+      if(err) winston.error("Error while recording items as read: " + err, { exception: err });
+      // Silently swallow the error!
+      callback();
+    });
+
   });
 };
 

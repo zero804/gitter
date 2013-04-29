@@ -9,7 +9,7 @@ import json
 def baseUrl(url):
     base = os.getenv('BASE_URL')
     if(base is None):
-        base = "http://localhost:5000/"
+        base = "http://localhost:5000"
     return base + url
 
 
@@ -122,3 +122,9 @@ def screenshot(driver):
 def getJSON(url):
     response = urllib2.urlopen(baseUrl(url)).read()
     return json.loads(response)
+
+
+def shutdown(driver):
+    if(os.getenv('SELENIUM_DEV') is None):
+        screenshot(driver)
+        driver.quit()
