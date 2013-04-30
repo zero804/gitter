@@ -32,6 +32,9 @@ describe('signup-service', function() {
         troupeName: troupeName
       }, function(err, troupeId) {
         if(err) return done(err);
+
+        assert(troupeId, 'Expected a troupeId');
+
         mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
 
         persistence.User.findOne({ email: nonExistingEmail }, function(err, user) {
@@ -82,6 +85,8 @@ describe('signup-service', function() {
         troupeName: troupeName
       }, function(err, troupeId) {
         if(err) return done(err);
+
+        assert(troupeId, 'Expected a troupeId');
 
         mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
 
