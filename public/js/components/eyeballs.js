@@ -12,14 +12,14 @@ define([
   var PING_POLL = 10 * 60 * 1000;
 
   function send(value) {
-    if(!realtime._clientId) {
+    if(!realtime.getClientId()) {
       return;
     }
 
     $.ajax({
       url: '/api/v1/eyeballs',
       data: {
-        socketId: realtime._clientId,
+        socketId: realtime.getClientId(),
         on: value
       },
       global: false,
