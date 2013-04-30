@@ -72,13 +72,16 @@ module.exports = {
     troupe.save(function(err) {
       if(err) return next(403);
 
-      // add invites for each additional person
-      for(var i = 0; i < invites.length; i++) {
-        var displayName = invites[i].displayName;
-        var inviteEmail = invites[i].email;
-        if (displayName && inviteEmail)
-          troupeService.addInvite(troupe, req.user.displayName, displayName, inviteEmail);
-      }
+
+      if (invites) {
+        // add invites for each additional person
+        for(var i = 0; i < invites.length; i++) {
+          var displayName = invites[i].displayName;
+          var inviteEmail = invites[i].email;
+          if (displayName && inviteEmail)
+            troupeService.addInvite(troupe, req.user.displayName, displayName, inviteEmail);
+        }
+     }
 
       // send the new troupe back
       var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true });
