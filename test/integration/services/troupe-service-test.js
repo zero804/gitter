@@ -1,7 +1,7 @@
 #!/usr/bin/env mocha --ignore-leaks
 
 /*jslint node:true, unused:true*/
-/*global describe:true, it:true*/
+/*global describe:true, it:true, afterEach:true */
 "use strict";
 
 var testRequire = require('../test-require');
@@ -103,6 +103,7 @@ function cleanup(done) {
   persistence.User.findOne({ email: "testuser@troupetest.local" }, function(e, user) {
     if(e) return done(e);
     if(!user) return done("User not found");
+
     persistence.User.findOne({ email: "testuser2@troupetest.local" }, function(e, user2) {
       if(e) return done(e);
       if(!user2) return done("User2 not found");
@@ -155,7 +156,6 @@ describe('troupe-service', function() {
 
   describe('#validateTroupeEmail()', function() {
     it('should validate correctly for a known user', function(done) {
-      return done();
       var troupeService = testRequire('./services/troupe-service');
 
       troupeService.validateTroupeEmail({
@@ -201,7 +201,6 @@ describe('troupe-service', function() {
 
       var troupeService = testRequire('./services/troupe-service');
 
-
       persistence.Troupe.findOne({ uri: 'testtroupe1' }, function(err, troupe) {
         if(err) return done(err);
         if(!troupe) return done("Cannot find troupe");
@@ -242,8 +241,96 @@ describe('troupe-service', function() {
 
   });
 
+  describe('#findBestTroupeForUser', function() {
+    it('should return null when a user has no troupes',function(done) {
+
+      var troupeService = testRequire('./services/troupe-service');
+      var userService = testRequire('./services/user-service');
+
+
+      persistence.User.findOne({ email: 'testuserwithnotroupes@troupetest.local' }, function(err, user) {
+        if(err) return done(err);
+        if(!user) return done("Cannot find testuserwithnotroupes@troupetest.local");
+
+        persistence.Troupe.findOne({ uri: 'testtroupe1' }, function(err, troupe) {
+          if(err) return done(err);
+          if(!troupe) return done("Cannot find troupe");
+
+          userService.saveLastVisitedTroupeforUser(user.id, troupe, function(err) {
+            if(err) return done(err);
+
+
+            troupeService.findBestTroupeForUser(user, function(err, troupe) {
+              if(err) return done(err);
+              assert(troupe === null, 'Expected the troupe to be null');
+              done();
+            });
+          });
+
+        });
+
+      });
+
+    });
+
+    it('should return return the users last troupe when they have one',function(done) {
+      var troupeService = testRequire('./services/troupe-service');
+      var userService = testRequire('./services/user-service');
+
+      persistence.User.findOne({ email: 'testuser@troupetest.local' }, function(err, user) {
+        if(err) return done(err);
+        if(!user) return done("Cannot find testuser@troupetest.local");
+
+        persistence.Troupe.findOne({ uri: 'testtroupe1' }, function(err, troupe) {
+          if(err) return done(err);
+          if(!troupe) return done("Cannot find troupe");
+
+          userService.saveLastVisitedTroupeforUser(user.id, troupe, function(err) {
+            if(err) return done(err);
+
+            troupeService.findBestTroupeForUser(user, function(err, troupe) {
+              if(err) return done(err);
+
+              assert(troupe !== null, 'Expected the troupe not to be null');
+              assert(troupe.uri == 'testtroupe1', 'Expected the troupe uri to be testtroupe1');
+              done();
+            });
+
+          });
+        });
+
+      });
+
+    });
+
+
+    it('should return return the users something when the user has troupes, but no last troupe',function(done) {
+      var troupeService = testRequire('./services/troupe-service');
+
+      persistence.User.findOneAndUpdate({ email: 'testuser@troupetest.local' }, { lastTroupe: null }, function(err, user) {
+        if(err) return done(err);
+        if(!user) return done("Cannot find testuser@troupetest.local");
+
+        persistence.Troupe.findOne({ uri: 'testtroupe1' }, function(err, troupe) {
+          if(err) return done(err);
+          if(!troupe) return done("Cannot find troupe");
+
+          troupeService.findBestTroupeForUser(user, function(err, troupe) {
+            if(err) return done(err);
+
+            assert(troupe !== null, 'Expected the troupe not to be null');
+            done();
+          });
+
+        });
+
+      });
+
+    });
+
+  });
+
   afterEach(function(done) {
-    console.log("Cleaning up troupe-service test");
     cleanup(done);
   });
 

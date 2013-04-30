@@ -72,6 +72,7 @@ module.exports = {
     troupe.save(function(err) {
       if(err) return next(403);
 
+      var f = new Fiber();
 
       if (invites) {
         // add invites for each additional person
@@ -79,10 +80,11 @@ module.exports = {
           var displayName = invites[i].displayName;
           var inviteEmail = invites[i].email;
           if (displayName && inviteEmail)
-            troupeService.addInvite(troupe, req.user.displayName, displayName, inviteEmail);
+            troupeService.inviteUserByEmail(troupe, req.user.displayName, displayName, inviteEmail, f.waitor());
         }
      }
 
+     f.all().then(function() {
       // send the new troupe back
       var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true });
       restSerializer.serialize(troupe, strategy, function(err, serialized) {
@@ -91,7 +93,9 @@ module.exports = {
         res.send(serialized);
       });
 
-    });
+     }, next);
+
+  });
 
 
   },

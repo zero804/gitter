@@ -1,3 +1,5 @@
+define([], function (){
+
 // http://wiki.commonjs.org/wiki/Unit_Testing/1.0
 //
 // THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
@@ -368,3 +370,6 @@ assert.ifError = function(err) { if (err) {throw err;}};
 
 })(this);
 
+
+return assert;
+});

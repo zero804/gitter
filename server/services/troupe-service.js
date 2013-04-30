@@ -7,7 +7,9 @@ var persistence = require("./persistence-service"),
     emailNotificationService = require("./email-notification-service"),
     uuid = require('node-uuid'),
     winston = require("winston"),
-    collections = require("../utils/collections");
+    collections = require("../utils/collections"),
+    Fiber = require("../utils/fiber");
+
 
 function findByUri(uri, callback) {
   persistence.Troupe.findOne({uri: uri}, function(err, troupe) {
@@ -167,7 +169,7 @@ function validateTroupeUrisForUser(userId, uris, callback) {
     });
 }
 
-function addInvite(troupe, senderDisplayName, displayName, email) {
+function inviteUserByEmail(troupe, senderDisplayName, displayName, email, callback) {
   var code = uuid.v4();
 
   var invite = new persistence.Invite();
@@ -175,12 +177,17 @@ function addInvite(troupe, senderDisplayName, displayName, email) {
   invite.displayName = displayName;
   invite.email = email;
   invite.code = code;
-  invite.save();
+  invite.save(function(err) {
+    if(err) return callback(err);
 
-  // TODO: should we treat registered users differently from unregistered people?
-  // At the moment, we treat them all the same...
+    // TODO: should we treat registered users differently from unregistered people?
+    // At the moment, we treat them all the same...
 
-  emailNotificationService.sendInvite(troupe, displayName, email, code, senderDisplayName);
+    emailNotificationService.sendInvite(troupe, displayName, email, code, senderDisplayName);
+    callback();
+  });
+
+
 }
 
 function findInviteById(id, callback) {
@@ -278,6 +285,8 @@ function findUserByIdEnsureConfirmationCode(userId, callback) {
 }
 
 function acceptRequest(request, callback) {
+  winston.verbose('Accepting request to join ' + request.troupeId);
+
   findById(request.troupeId, function(err, troupe) {
     if(err) return callback(err);
     if(!troupe) { winston.error("Unable to find troupe", request.troupeId); return callback("Unable to find troupe"); }
@@ -295,6 +304,7 @@ function acceptRequest(request, callback) {
 
       /** Add the user to the troupe */
       troupe.addUserById(user.id);
+
       troupe.save(function(err) {
         if(err) winston.error("Unable to save troupe", err);
 
@@ -403,15 +413,17 @@ function upgradeOneToOneTroupe(options, callback) {
   });
 
   troupe.save(function(err) {
+    var f = new Fiber();
+
     // add invites for each additional person
     for(var i = 0; i < invites.length; i++) {
       var displayName = invites[i].displayName;
       var inviteEmail = invites[i].email;
       if (displayName && inviteEmail)
-        addInvite(troupe, senderName, displayName, inviteEmail);
+        inviteUserByEmail(troupe, senderName, displayName, inviteEmail, f.waitor());
     }
 
-    return callback(err, troupe);
+    f.all().then(function() { callback(null, troupe); }, callback);
   });
 }
 
@@ -457,6 +469,32 @@ function findFavouriteTroupesForUser(userId, callback) {
   });
 }
 
+function findBestTroupeForUser(user, callback) {
+  //
+  // This code is invoked when a user's lastAccessedTroupe is no longer valid (for the user)
+  // or the user doesn't have a last accessed troupe. It looks for all the troupes that the user
+  // DOES have access to (by querying the troupes.users collection in mongo)
+  // If the user has a troupe, it takes them to the first one it finds. If the user doesn't have
+  // any valid troupes, it redirects them to an error message
+  //
+
+  if (user.lastTroupe) {
+    findById(user.lastTroupe, function(err,troupe) {
+      if(err) return callback(err);
+
+      if(!troupe || !userHasAccessToTroupe(user, troupe)) {
+        userService.findDefaultTroupeForUser(user.id, callback);
+        return;
+      }
+
+      callback(null, troupe);
+    });
+    return;
+  }
+
+  userService.findDefaultTroupeForUser(user.id, callback);
+}
+
 module.exports = {
   findByUri: findByUri,
   findById: findById,
@@ -467,7 +505,7 @@ module.exports = {
   validateTroupeEmailAndReturnDistributionList: validateTroupeEmailAndReturnDistributionList,
   userHasAccessToTroupe: userHasAccessToTroupe,
   userIdHasAccessToTroupe: userIdHasAccessToTroupe,
-  addInvite: addInvite,
+  inviteUserByEmail: inviteUserByEmail,
   findInviteById: findInviteById,
   findInviteByCode: findInviteByCode,
   findMemberEmails: findMemberEmails,
@@ -487,5 +525,6 @@ module.exports = {
   createUniqueUri: createUniqueUri,
 
   updateFavourite: updateFavourite,
-  findFavouriteTroupesForUser: findFavouriteTroupesForUser
+  findFavouriteTroupesForUser: findFavouriteTroupesForUser,
+  findBestTroupeForUser: findBestTroupeForUser
 };

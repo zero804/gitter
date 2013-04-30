@@ -44,7 +44,7 @@ test-in-browser:
 	test/in-browser/run-phantom-tests.sh
 
 test-coverage:
-	if [ -d ./coverage/ ]; then rm -r ./coverage/; fi
+	rm -rf ./coverage/ ./html-report/
 	./node_modules/.bin/istanbul instrument server/ -o coverage/
 	mkdir -p output
 	ISTANBUL_REPORTERS=text-summary,html,cobertura TROUPE_COVERAGE=1 NODE_ENV=test ./node_modules/.bin/mocha \
@@ -62,7 +62,8 @@ prepare-for-end-to-end-testing:
 	unzip -o test/end-to-end/chromedriver/chromedriver_mac_26.0.1383.0.zip -d test/end-to-end/chromedriver/
 
 end-to-end-test:
-	nosetests -v --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests/
+	mkdir -p ./output/test-reports/
+	nosetests -s -v --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests/
 
 docs: test-docs
 
@@ -120,7 +121,7 @@ install-client-libs:
 	grunt client-libs
 	ls -d output/client-libs/*|sed -e 's!output/client-libs/!public/repo/!'|sed -e 's!retina.js-js!retina!'|sed -e 's!typeahead.js!typeahead!'|xargs mkdir -p
 	cp output/client-libs/almond/almond.js public/repo/almond/almond.js
-	cp output/client-libs/assert/assert.js public/repo/assert/assert.js
+	cp output/client-libs/assert/assert-amd.js public/repo/assert/assert.js
 	cp output/client-libs/backbone/backbone-amd.js public/repo/backbone/backbone.js
 	cp output/client-libs/backbone.babysitter/lib/amd/backbone.babysitter.min.js public/repo/backbone.babysitter/backbone.babysitter.js
 	cp output/client-libs/backbone.keys/dist/backbone.keys.min.js public/repo/backbone.keys/backbone.keys.js
@@ -128,7 +129,7 @@ install-client-libs:
 	cp output/client-libs/bootstrap/bootstrap-tooltip.js public/repo/bootstrap/tooltip.js
 	cp output/client-libs/cubism/cubism.v1.min.js public/repo/cubism/cubism.js
 	cp output/client-libs/d3/d3.min.js public/repo/d3/d3.js
-	cp output/client-libs/expect/expect.js public/repo/expect/expect.js
+	cp output/client-libs/expect/expect-amd.js public/repo/expect/expect.js
 	cp output/client-libs/faye/faye-browser.js public/repo/faye/faye.js
 	cp output/client-libs/filtered-collection/backbone-filtered-collection-amd.js public/repo/filtered-collection/filtered-collection.js
 	cp output/client-libs/marionette/lib/core/amd/backbone.marionette.min.js public/repo/marionette/marionette.js
@@ -142,7 +143,7 @@ install-client-libs:
 	cp output/client-libs/jquery/jquery-migrate-amd.js public/repo/jquery/jquery-migrate.js
 	cp output/client-libs/jquery-placeholder/jquery.placeholder-amd.js public/repo/jquery-placeholder/jquery-placeholder.js
 	cp output/client-libs/jquery-validate/jquery.validate-amd.js public/repo/jquery-validate/jquery-validate.js
-	cp output/client-libs/mocha/lib/mocha.js public/repo/mocha/mocha.js
+	cp output/client-libs/mocha/mocha-amd.js public/repo/mocha/mocha.js
 	cp output/client-libs/mocha/mocha.css public/repo/mocha/mocha.css
 	cp output/client-libs/moment/min/moment.min.js public/repo/moment/moment.js
 	cp output/client-libs/nanoscroller/jquery.nanoscroller.js public/repo/nanoscroller/nanoscroller.js
