@@ -16,6 +16,7 @@ define([
     initialize: function(options) {
       _.bindAll(this, 'onFormSubmit', 'onPasswordChange');
       if (!options) return;
+      this.originalEmail = window.troupeContext.user.email;
       this.existingUser = options.existingUser;
       this.isExistingUser = !window.troupeContext.profileNotCompleted;
     },
@@ -59,7 +60,8 @@ define([
           // return false to cancel submit
           onComplete: function(id, fileName, response) {
             if(response.success) {
-              window.troupeContext.user = response.user;
+              window.troupeContext.user.avatarUrlSmall = response.user.avatarUrlSmall;
+              window.troupeContext.user.avatarUrlMedium = response.user.avatarUrlMedium;
             } else {
               // TODO: deal with this!
             }
@@ -139,6 +141,10 @@ define([
 
     },
 
+    hasChangedEmail: function(newEmail) {
+      return newEmail && newEmail != this.originalEmail;
+    },
+
     onFormSubmit: function(e) {
       if(e) e.preventDefault();
 
@@ -146,7 +152,7 @@ define([
       var newEmail = form.find('[name=newEmail]').val();
       var that = this;
 
-      if (newEmail && newEmail !== window.troupeContext.user.email) {
+      if (this.hasChangedEmail(newEmail)) {
         // ask the user if they are sure they want to change their email address
         // if successful show a modal that says they will receive a confirmation email.
         if (!window.confirm("Are you sure you want to change your email?"))
@@ -168,7 +174,7 @@ define([
             else {
               that.dialog.hide();
             }
-            if (newEmail && newEmail !== window.troupeContext.user.email) {
+            if (that.hasChangedEmail(newEmail)) {
               window.alert("Your address will be updated once you confirm the email sent to your new address.");
             }
 
