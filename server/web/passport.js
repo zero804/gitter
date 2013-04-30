@@ -2,7 +2,6 @@
 "use strict";
 
 var userService = require('../services/user-service');
-var signupService = require('../services/signup-service');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var ConfirmStrategy = require('./confirm-strategy').Strategy;
@@ -76,65 +75,14 @@ var inviteAcceptStrategy = new ConfirmStrategy({ name: "accept" }, function(conf
   var self = this;
   winston.verbose("Invoking accept strategy", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
 
-  troupeService.findInviteByCode(confirmationCode, function(err, invite) {
-    if(err || !invite) {
-      if(err) {
-        winston.error("Error while accepting invite confirmationCode=" + confirmationCode + ": " + err, { exception: err });
-      } else if(!invite) {
-        winston.error("Invite confirmationCode=" + confirmationCode + " not found. Redirecting to troupe. ");
-      }
-
-      return self.redirect('/' + req.params.troupeUri + '#existing');
+  troupeService.acceptInvite(confirmationCode, function(err, user, alreadyUsed) {
+    if(err || !user) {
+      return self.redirect('/' + req.params.troupeUri + (alreadyUsed ? '#existing' : ''));
     }
 
-    if(invite.status !== 'UNUSED') {
-      /* The invite has already been used. We need to fail authentication, but go to the troupe */
-      winston.verbose("Invite has already been used", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
-      statsService.event('invite_reused', { uri: req.params.troupeUri });
-
-      // There's a chance a user has accepted an invite but hasn't completed their profile
-      // In which case we allow them through
-      userService.findByEmail(invite.email, function(err, user) {
-        if(err) return done(err);
-
-        // If the user has clicked on the invite, but hasn't completed their profile (as in does not have a password)
-        // then we'll give them a special dispensation and allow them to access the site (otherwise they'll never get in)
-        if (user && user.status == 'PROFILE_NOT_COMPLETED') {
-          return done(null, user);
-        }
-
-        // In any other case (for example, we can't find the user or the more likely case the user is already fully registered)
-        // then we _do_not_ log the user in (ie, not call done(..., user), instead we redirect to the troupe associated with the
-        // invite where the user will be asked for their username and password (since they're not logged in)
-        return self.redirect('/' + req.params.troupeUri + '#existing');
-
-      });
-
-    }
-    else /* if (invite.status === 'UNUSED') */ {
-      statsService.event('invite_accepted', { uri: req.params.troupeUri });
-
-      winston.verbose("Invite accepted", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
-
-      userService.findOrCreateUserForEmail(
-        {
-          displayName: invite.displayName,
-          email: invite.email,
-          status: "PROFILE_NOT_COMPLETED"
-        },
-        function(err, user) {
-          /* User has been set passport/accept */
-          signupService.acceptInvite(confirmationCode, user, function(err, troupe) {
-            if(err) return done(err);
-            if(!troupe) return self.redirect("/" + req.params.troupeUri);
-            // log the user in
-            return done(null, user);
-          });
-        }
-      );
-    }
-
+    return done(null, user);
   });
+
 });
 
 module.exports = {

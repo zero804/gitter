@@ -8,7 +8,8 @@ var persistence = require("./persistence-service"),
     uuid = require('node-uuid'),
     winston = require("winston"),
     collections = require("../utils/collections"),
-    Fiber = require("../utils/fiber");
+    Fiber = require("../utils/fiber"),
+    statsService = require("../services/stats-service");
 
 
 function findByUri(uri, callback) {
@@ -413,6 +414,12 @@ function upgradeOneToOneTroupe(options, callback) {
   });
 
   troupe.save(function(err) {
+    if(err) return callback(err);
+
+    if(!invites || invites.length === 0) {
+      return callback(null, troupe);
+    }
+
     var f = new Fiber();
 
     // add invites for each additional person
@@ -495,6 +502,135 @@ function findBestTroupeForUser(user, callback) {
   userService.findDefaultTroupeForUser(user.id, callback);
 }
 
+//
+// Create a new troupe and return callback(err, troupe)
+//
+function createNewTroupeForExistingUser(options, callback) {
+  var name = options.name;
+  var oneToOneTroupeId = options.oneToOneTroupeId;
+  var user = options.user;
+  var invites = options.invites;
+
+  name = name ? name.trim() : '';
+  if(!name) return callback('Please provide a troupe name');
+
+  if (oneToOneTroupeId) {
+    // find this 1-1 troupe and create a new normal troupe with the additional person(s) invited
+    findById(oneToOneTroupeId, function(err, troupe) {
+      if(!userHasAccessToTroupe(user, troupe)) {
+        return callback(403);
+      }
+
+      upgradeOneToOneTroupe({ name: name, oneToOneTroupe: troupe, senderName: user.name, invites: invites }, callback);
+    });
+
+    return;
+  }
+
+  // create a troupe normally
+  var troupe = new persistence.Troupe();
+  troupe.name = name;
+  troupe.uri = createUniqueUri();
+  troupe.addUserById(user.id);
+
+  troupe.save(function(err) {
+    if(err) return callback(err);
+
+    var f = new Fiber();
+
+    if (invites) {
+      // add invites for each additional person
+      for(var i = 0; i < invites.length; i++) {
+        var displayName = invites[i].displayName;
+        var inviteEmail = invites[i].email;
+        if (displayName && inviteEmail)
+          inviteUserByEmail(troupe, user.displayName, displayName, inviteEmail, f.waitor());
+        }
+    }
+
+    f.all().then(function() {
+      callback(null, troupe);
+    }, callback);
+  });
+}
+
+// Accept an invite, returns callback(err, user, alreadyExists)
+// NB NB NB user should only ever be set iff the invite is valid
+function acceptInvite(confirmationCode, troupeUri, callback) {
+  findInviteByCode(confirmationCode, function(err, invite) {
+    if(err) return callback(err);
+
+    if(!invite) {
+      winston.error("Invite confirmationCode=" + confirmationCode + " not found. ");
+      return callback(null, null);
+    }
+
+    if(invite.status !== 'UNUSED') {
+      /* The invite has already been used. We need to fail authentication, but go to the troupe */
+      winston.verbose("Invite has already been used", { confirmationCode: confirmationCode, troupeUri: troupeUri });
+      statsService.event('invite_reused', { uri: troupeUri });
+
+      // There's a chance a user has accepted an invite but hasn't completed their profile
+      // In which case we allow them through
+      userService.findByEmail(invite.email, function(err, user) {
+        if(err) return callback(err);
+
+        // If the user has clicked on the invite, but hasn't completed their profile (as in does not have a password)
+        // then we'll give them a special dispensation and allow them to access the site (otherwise they'll never get in)
+        if (user && user.status == 'PROFILE_NOT_COMPLETED') {
+          return callback(null, user, false);
+        }
+
+        return callback(null, null, true);
+      });
+
+    } else {
+      statsService.event('invite_accepted', { uri: troupeUri });
+
+      winston.verbose("Invite accepted", { confirmationCode: confirmationCode, troupeUri: troupeUri });
+
+      userService.findOrCreateUserForEmail({
+        displayName: invite.displayName,
+        email: invite.email,
+        status: "PROFILE_NOT_COMPLETED"
+      }, function(err, user) {
+        if(err) return callback(err);
+
+        // confirm the user if they are not already.
+        if (user.status == 'UNCONFIRMED') {
+          user.status = 'PROFILE_NOT_COMPLETED';
+          user.save();
+        }
+
+        findById(invite.troupeId, function(err, troupe) {
+          if(err) return callback(err);
+          if(!troupe) return callback(404);
+
+          var originalStatus = invite.status;
+          if(originalStatus != 'UNUSED') {
+            return callback(null, null, true);
+          }
+
+          invite.status = 'USED';
+          invite.save(function(err) {
+            if(err) return callback(err);
+
+            troupe.addUserById(user.id);
+            troupe.save(function(err) {
+              if(err) return callback(err);
+              return callback(null, user, false);
+            });
+          });
+
+
+
+        });
+      });
+    }
+
+  });
+}
+
 module.exports = {
   findByUri: findByUri,
   findById: findById,
@@ -526,5 +662,7 @@ module.exports = {
 
   updateFavourite: updateFavourite,
   findFavouriteTroupesForUser: findFavouriteTroupesForUser,
-  findBestTroupeForUser: findBestTroupeForUser
+  findBestTroupeForUser: findBestTroupeForUser,
+  createNewTroupeForExistingUser: createNewTroupeForExistingUser,
+  acceptInvite: acceptInvite
 };

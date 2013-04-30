@@ -39,11 +39,9 @@ function newTroupe(options, callback) {
     });
   }
 
-  f.all()
-    .spread(function(troupe) {
-      callback(null, troupe);
-    })
-    .fail(callback);
+  f.all().then(function() {
+    callback(null, troupe);
+  }, callback);
 }
 
 function newTroupeForExistingUser(options, user, callback) {
@@ -260,40 +258,7 @@ module.exports = {
         });
       }
     });
-  },
-
-  acceptInvite: function (code, user, callback) {
-    // confirm the user if they are not already.
-    if (user.status == 'UNCONFIRMED') {
-      user.status = 'PROFILE_NOT_COMPLETED';
-      user.save();
-    }
-
-    troupeService.findInviteByCode(code, function(err, invite) {
-      if(err) return callback(err);
-      if(!invite) return callback(new Error("Invite code not found"));
-
-      troupeService.findById(invite.troupeId, function(err, troupe) {
-        if(err) return callback(err);
-        if(!troupe) return callback(new Error("Cannot find troupe referenced by invite."));
-
-        var originalStatus = invite.status;
-        if(originalStatus != 'UNUSED') {
-          return callback(null, troupe, originalStatus);
-        }
-
-        invite.status = 'USED';
-        invite.save();
-
-        troupe.addUserById(user.id);
-        troupe.save(function(err) {
-          if(err) return callback(err);
-          return callback(null, troupe, originalStatus);
-        });
-
-      });
-
-    });
   }
+
 
 };

@@ -330,6 +330,128 @@ describe('troupe-service', function() {
 
   });
 
+  describe('#createNewTroupeForExistingUser', function() {
+    var troupeService = testRequire('./services/troupe-service');
+
+    it('should handle the upgrade of a oneToOneTroupe', function(done) {
+
+      persistence.User.findOne({ email: 'testuser@troupetest.local' }, function(err, user1) {
+        if(err) return done(err);
+        if(!user1) return done('Cannot find user');
+
+        persistence.User.findOne({ email: 'testuser2@troupetest.local' }, function(err, user2) {
+          if(err) return done(err);
+          if(!user2) return done('Cannot find user');
+
+          troupeService.findOrCreateOneToOneTroupe(user1.id, user2.id, function(err, troupe) {
+            if(err) return done(err);
+            if(!troupe) return done('Cannot find troupe');
+
+            var name = 'Upgraded one-to-one ' + new Date();
+            var inviteEmail =  'testinvite' + Date.now() + '@troupetest.local';
+
+            troupeService.createNewTroupeForExistingUser({
+              user: user1,
+              name: name,
+              oneToOneTroupeId: troupe.id,
+              invites: [
+                { displayName: 'John McTestaroo', email: inviteEmail }
+              ]
+            }, function(err, newTroupe) {
+              if(err) return done(err);
+              if(!newTroupe) return done('New troupe not created');
+
+              assert(newTroupe.name === name, 'New Troupe name is wrong');
+
+              assert(troupeService.userIdHasAccessToTroupe(user1.id, newTroupe), 'User1 is supposed to be in the new troupe');
+              assert(troupeService.userIdHasAccessToTroupe(user2.id, newTroupe), 'User2 is supposed to be in the new troupe');
+
+              persistence.Invite.findOne({ email: inviteEmail, troupeId: newTroupe.id }, function(err, invite) {
+                if(err) return done(err);
+                assert(invite, 'Could not find the invite');
+                assert(invite.displayName === 'John McTestaroo', 'Invite has an incorrect displayName');
+
+                troupeService.acceptInvite(invite.code, newTroupe.uri, function(err, user, alreadyUsed) {
+                  if(err) return done(err);
+                  assert(!alreadyUsed, 'Expected alreadyUsed to be falsey');
+                  assert(user, 'Expected the user to be confirmed');
+
+                  // The only reason this should work is that the user should still be PROFILE_NOT_COMPLETED
+                  troupeService.acceptInvite(invite.code, newTroupe.uri, function(err, user, alreadyUsed) {
+                    if(err) return done(err);
+                    assert(!alreadyUsed, 'Expected alreadyUsed to be falsey');
+                    assert(user, 'Expected the user to be returned');
+
+                    persistence.User.update({ _id: user._id }, { status: 'ACTIVE'}, function(err, numResults) {
+                      if(err) return done(err);
+                      if(numResults !== 1) return done("Expected one update result");
+
+                      troupeService.acceptInvite(invite.code, newTroupe.uri, function(err, user, alreadyUsed) {
+                        if(err) return done(err);
+
+                        assert(!user, 'User should not have been returned');
+                        assert(alreadyUsed, 'Expected alreadyUsed to be true');
+                        done();
+                      });
+
+                    });
+
+                  });
+                });
+
+              });
+
+            });
+
+          });
+        });
+
+
+      });
+
+    });
+
+    it('should handle the creation of a new troupe', function(done) {
+
+      persistence.User.findOne({ email: 'testuser@troupetest.local' }, function(err, user1) {
+        if(err) return done(err);
+        if(!user1) return done('Cannot find user');
+
+        var name = 'Test Troupe for Existing user ' + new Date();
+        var inviteEmail =  'testinvite' + Date.now() + '@troupetest.local';
+
+        troupeService.createNewTroupeForExistingUser({
+          user: user1,
+          name: name,
+          invites: [
+            { displayName: 'John McTestaroo', email: inviteEmail }
+          ]
+        }, function(err, newTroupe) {
+          if(err) return done(err);
+          if(!newTroupe) return done('New troupe not created');
+
+          assert(newTroupe.name === name, 'New Troupe name is wrong');
+
+          assert(troupeService.userIdHasAccessToTroupe(user1.id, newTroupe), 'User1 is supposed to be in the new troupe');
+
+          persistence.Invite.findOne({ email: inviteEmail, troupeId: newTroupe.id }, function(err, invite) {
+            if(err) return done(err);
+            assert(invite, 'Could not find the invite');
+            assert(invite.displayName === 'John McTestaroo', 'Invite has an incorrect displayName');
+
+            done();
+
+          });
+
+        });
+
+
+      });
+
+    });
+
+  });
+
   afterEach(function(done) {
     cleanup(done);
   });
