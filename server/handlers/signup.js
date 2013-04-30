@@ -1,11 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var form = require("express-form"),
-    filter = form.filter,
-    validate = form.validate,
-    signupService = require("../services/signup-service"),
-    userService = require("../services/user-service"),
+var signupService = require("../services/signup-service"),
     middleware = require("../web/middleware"),
     troupeService = require("../services/troupe-service"),
     loginUtils = require('../web/login-utils'),
@@ -50,80 +46,47 @@ module.exports = {
         function(req, res, next) {
           var email = req.body.email;
           var troupeName = req.body.troupeName;
-          var invites = req.body.invites;
 
           troupeName = troupeName ? troupeName.trim() : '';
+          email = email ? email.trim() : '';
 
           if(!troupeName) {
             return next('Troupe name is required');
           }
 
-          // we can either get an email address for a new user
-          if (email) {
-            signupService.newSignup({
-              troupeName: troupeName,
-              email: email,
-              invites: invites
-            }, function(err, id) {
-              if(err) {
-                winston.error("Error creating new troupe ", { exception: err });
-                return next(err);
-              }
-
-              req.session.newTroupeId = id;
-              // send back the troupe
-              if(req.accepts('application/json')) {
-                res.send({ success: true, troupeName: troupeName, email: email /*, redirectTo:  in this case we don't return a troupe URI because the user is not yet confirmed (this is poor consistency) */ });
-              } else {
-                res.relativeRedirect("/confirm");
-              }
-            });
-
-            return;
+          if(!email) {
+            return next('Email address is required');
           }
 
-          if (req.user) {
-            signupService.newSignup({
+          signupService.newSignupFromLandingPage({
+            troupeName: troupeName,
+            email: email
+          }, function(err, id) {
+            if(err) {
+              winston.error("Error creating new troupe ", { exception: err });
+              return next(err);
+            }
+
+            req.session.newTroupeId = id;
+            res.send({
+              success: true,
               troupeName: troupeName,
-              email: req.user.email,
-              invites: invites
-            }, function(err,id) {
-              if(err) {
-                winston.error("Error creating new troupe ", { exception: err });
-                return next(err);
-              }
-
-              troupeService.findById(id, function(err, troupe) {
-                if (err) {
-                  return next(err);
-                }
-
-                res.send({ success: true, redirectTo: troupe.uri});
-              });
+              email: email
             });
 
-            return;
-          }
-
-          winston.info("Neither a troupe email address or a userId were provided for /signup");
-          res.send(400);
+          });
 
         }
       );
 
-      app.get('/confirm', function(req, res) {
-        res.render('confirm', {
-          newTroupeId: req.session.newTroupeId
-        });
-      });
-
-      // this confirmation handler doesn't redirect to any specific troupe, use /troupeUri/confirm/abc for that instead
+      // This endpoint is used only when the
+      // user is attempting to change their email address
       app.get('/confirm/:confirmationCode',
         middleware.authenticate('confirm', { failureRedirect: '/confirm-failed' } ),
         function(req, res){
-          winston.verbose("Confirmation authenticated");
+          winston.verbose("Email address confirmation authenticated");
 
-          signupService.confirm(req.user, function(err/*, user, troupe */) {
+          signupService.confirmEmailChange(req.user, function(err/*, user, troupe */) {
             if (err) {
               winston.error("Signup service confirmation failed", { exception: err } );
 
@@ -132,13 +95,28 @@ module.exports = {
               });
 
               return;
-
             }
 
             res.relativeRedirect(nconf.get('web:homeurl'));
           });
-        }
-      );
+        });
+
+
+      app.get('/:troupeUri/confirm/:confirmationCode',
+        middleware.authenticate('confirm', {}),
+        function(req, res/*, next*/) {
+            winston.verbose("Confirmation authenticated");
+
+            /* User has been set passport/accept */
+            signupService.confirmSignup(req.user, function(err, user, troupe) {
+              if (err || !troupe) {
+                res.relativeRedirect("/" + req.params.troupeUri);
+                return;
+              }
+
+              res.relativeRedirect("/" + troupe.uri);
+          });
+      });
 
       app.post('/resendconfirmation',
         function(req, res, next) {
@@ -149,13 +127,7 @@ module.exports = {
             /* TODO: better error xhandling */
             if(err) return next(err);
 
-            if(req.accepts('application/json')) {
-              res.send({ success: true });
-            } else {
-              res.relativeRedirect("/confirm");
-            }
-
-            /* TODO: a proper confirmation screen that the email has been resent */
+            res.send({ success: true });
           });
 
         }

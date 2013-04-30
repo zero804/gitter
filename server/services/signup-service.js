@@ -5,7 +5,8 @@ var persistence = require("./persistence-service"),
     emailNotificationService = require("./email-notification-service"),
     troupeService = require("./troupe-service"),
     userService = require("./user-service"),
-    winston = require('winston');
+    winston = require('winston'),
+    Fiber = require('../utils/fiber');
 
 function newTroupe(options, callback) {
   var user = options.user;
@@ -27,16 +28,22 @@ function newTroupe(options, callback) {
     });
   }
 
+  var f = new Fiber();
+
+  troupe.save(f.waitor());
+
   // invite users
   if (invites) {
     invites.forEach(function(invite) {
-      troupeService.addInvite(troupe, user.displayName, invite.displayName, invite.email);
+      troupeService.inviteUserByEmail(troupe, user.displayName, invite.displayName, invite.email, f.waitor());
     });
   }
 
-  troupe.save(function(err) {
-    callback(err, troupe);
-  });
+  f.all()
+    .spread(function(troupe) {
+      callback(null, troupe);
+    })
+    .fail(callback);
 }
 
 function newTroupeForExistingUser(options, user, callback) {
@@ -68,9 +75,11 @@ function newTroupeForNewUser(options, callback) {
 
 
 module.exports = {
-  newSignup: function(options, callback) {
-    winston.info("New signup ", options);
+  newSignupFromLandingPage: function(options, callback) {
+    if(!options.email) return callback('Email address is required');
+    if(!options.troupeName) return callback('Troupe name is required');
 
+    winston.info("New signup ", options);
 
     // We shouldn't have duplicate users in the system, so we should:
     //     * Check if the user exists
@@ -93,67 +102,64 @@ module.exports = {
     });
   },
 
-  confirm: function(user, callback) {
+  confirmEmailChange: function(user, callback) {
     if(!user) return callback(new Error("No user found"));
-    winston.verbose("Confirming user", { id: user.id, status: user.status });
+    if(!user.newEmail) return callback(new Error("User does not have a newEmail property. Aborting. "));
 
     if (user.status === 'UNCONFIRMED') {
       // setting the status marks the user as confirmed
       user.status = 'PROFILE_NOT_COMPLETED';
     }
 
-    // if there is a newEmail then this confirmation is the change of the address
-    if (user.newEmail) {
-      confirmEmailChange();
-    } else {
-      confirmSignup();
-    }
+    var origEmail = user.email;
+    var newEmail = user.newEmail;
 
-    function confirmSignup() {
-      user.save(finish);
-    }
+    // ensure that the email address being changed to is still available.
+    userService.findByEmail(newEmail, function(e, u) {
+      if (e || u) return callback("That email address is already registered");
 
-    function confirmEmailChange() {
-      var origEmail = user.email;
-      var newEmail = user.newEmail;
+      user.oldEmail = user.email;
+      user.email = user.newEmail;
+      user.newEmail = null;
 
-      // ensure that the email address being changed to is still available.
-      userService.findByEmail(newEmail, function(e, u) {
-        if (e || u) return callback("That email address is already registered");
+      // send an email to confirm that the confirmation of the email address change...was confirmed.
+      emailNotificationService.sendNoticeOfEmailChange(user, origEmail, newEmail);
 
-        user.oldEmail = user.email;
-        user.email = user.newEmail;
-        user.newEmail = null;
+      user.save(function(err) {
+        if(err) return callback(err);
 
-        // send an email to confirm that the confirmation of the email address change...was confirmed.
-        emailNotificationService.sendNoticeOfEmailChange(user, origEmail, newEmail);
+        winston.verbose("User email address change complete, finding troupe to redirect to", { id: user.id, status: user.status });
 
-        user.save(finish);
+        troupeService.findBestTroupeForUser(user, function(err, troupe) {
+          if(err) return callback(new Error("Error finding troupes for user"));
+
+          return callback(err, user, troupe);
+        });
+
       });
+    });
+
+  },
+
+  confirmSignup: function(user, callback) {
+    if(!user) return callback(new Error("No user found"));
+    winston.verbose("Confirming user", { id: user.id, status: user.status });
+
+    if (user.status === 'UNCONFIRMED') {
+      user.status = 'PROFILE_NOT_COMPLETED';
     }
 
-    function finish(err) {
+    user.save(function(err) {
       if(err) return callback(err);
 
       winston.verbose("User saved, finding troupe to redirect to", { id: user.id, status: user.status });
-      troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
-        var t = null;
 
+      troupeService.findBestTroupeForUser(user, function(err, troupe) {
         if(err) return callback(new Error("Error finding troupes for user"));
 
-        if(troupes.length < 1) {
-          winston.warn("User has no troupes");
-          t = null;
-          // return callback(new Error("Could not find troupe for user"));
-        }
-        else {
-          t = troupes[0];
-        }
-
-
-        callback(err, user, t);
+        return callback(err, user, troupe);
       });
-    }
+    });
 
   },
 

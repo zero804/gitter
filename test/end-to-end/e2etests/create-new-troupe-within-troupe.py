@@ -37,7 +37,10 @@ def testCreateTroupeFromGroupTroupe():
             continue
         break
 
-    driver.find_element_by_css_selector('a div.trpNewTroupeButton').click()
+    driver.execute_script('$("a div.trpNewTroupeButton").click()')
+    #startTroupeButton = driver.find_element_by_css_selector('a div.trpNewTroupeButton')
+    #startTroupeButton.location_once_scrolled_into_view()
+    #startTroupeButton.click()
 
     troupeName = 'Troupe for ' + time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime())
 

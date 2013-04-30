@@ -166,29 +166,37 @@ module.exports = {
 
     passport.use(new ConfirmStrategy({ name: "confirm" }, function(confirmationCode, req, done) {
       var self = this;
+      var troupeUri = req.params.appUri || req.params.troupeUri;
 
       winston.verbose("Confirming user with code", { confirmationCode: confirmationCode });
 
       userService.findByConfirmationCode(confirmationCode, function(err, user) {
         if(err) return done(err);
-        if(!user) return done(null, false);
+        if(!user) {
+          // If the confirmation was under an appUri ala /:appUri/confirm/:confirmCode
+          // Then always use that URI
+          if(troupeUri) {
+            return self.redirect("/" + troupeUri);
+          }
+
+          return done(null, false);
+        }
 
         // if the user is unconfirmed, then confirm them
         // if the user has been confirmed, but hasn't populated their profile, we want to go down the same path
         if (user.status == 'UNCONFIRMED' || user.status == 'PROFILE_NOT_COMPLETED' || user.newEmail) {
           statsService.event('confirmation_completed', { userId: user.id });
           return done(null, user);
-        }
-        // confirmation fails if the user is already confirmed, except when the user is busy confirming their new email address
-        else {
+        } else {
+          // confirmation fails if the user is already confirmed, except when the user is busy confirming their new email address
           statsService.event('confirmation_reused', { userId: user.id });
 
           winston.verbose("Confirmation already used", { confirmationCode: confirmationCode });
 
           // If the confirmation was under an appUri ala /:appUri/confirm/:confirmCode
           // Then always use that URI
-          if(req.params.appUri) {
-            return self.redirect("/" + req.params.appUri);
+          if(troupeUri) {
+            return self.redirect("/" + troupeUri);
           }
 
           // If the user doesn't have a last troupe set, we'll need to try figure

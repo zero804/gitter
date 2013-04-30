@@ -396,20 +396,6 @@ module.exports = {
           res.relativeRedirect("/" + req.params.troupeUri);
         });
 
-      app.get('/:troupeUri/confirm/:confirmationCode',
-        middleware.authenticate('confirm', {}),
-        function(req, res/*, next*/) {
-            /* User has been set passport/accept */
-            signupService.confirm(req.user, function(err, user, troupe) {
-              if (err) {
-                res.relativeRedirect("/" + req.params.troupeUri);
-                return;
-              }
-
-              res.relativeRedirect("/" + troupe.uri);
-          });
-      });
-
       app.get('/last/:page',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),

@@ -6,6 +6,7 @@ var persistence = require("./persistence-service"),
     emailNotificationService = require("./email-notification-service"),
     uuid = require('node-uuid'),
     geocodingService = require("./geocoding-service"),
+    assert = require("assert"),
     winston = require("winston"),
     statsService = require("./stats-service"),
     crypto = require('crypto'),
@@ -167,6 +168,9 @@ var userService = {
   },
 
   findDefaultTroupeForUser: function(id, callback) {
+    assert(id, 'Id is required');
+
+    console.log("findDefaultTroupeForUser>>>>>> ", id);
     persistence.Troupe.findOne({ 'users.userId': id }, function(err, troupe) {
       callback(err, troupe);
     });
@@ -182,7 +186,7 @@ var userService = {
       if(!user) return callback(err);
 
       /* Save new history */
-      var history = new persistence.UserLocationHistory({
+      new persistence.UserLocationHistory({
         userId: user.id,
         timestamp: location.timestamp,
         coordinate: {
