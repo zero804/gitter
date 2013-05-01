@@ -73,9 +73,12 @@ function emailPasswordUserStrategy(email, password, done) {
 
 var inviteAcceptStrategy = new ConfirmStrategy({ name: "accept" }, function(confirmationCode, req, done) {
   var self = this;
-  winston.verbose("Invoking accept strategy", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
 
-  troupeService.acceptInvite(confirmationCode, function(err, user, alreadyUsed) {
+  var troupeUri = req.params.troupeUri || req.params.appUri;
+
+  winston.verbose("Invoking accept strategy", { confirmationCode: confirmationCode, troupeUri: troupeUri });
+
+  troupeService.acceptInvite(confirmationCode, troupeUri, function(err, user, alreadyUsed) {
     if(err || !user) {
       return self.redirect('/' + req.params.troupeUri + (alreadyUsed ? '#existing' : ''));
     }
