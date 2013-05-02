@@ -5,8 +5,10 @@ var troupeService = require('./troupe-service');
 var persistence = require("./persistence-service");
 
 function createRegExpsForQuery(queryText) {
-  var normalized = ("" + queryText).toLowerCase().replace(/[^a-z\d\s]/g, ' ');
-  var parts = normalized.split(/\s+/).filter(function(s, index) { return index < 10; } );
+  var normalized = ("" + queryText).trim().toLowerCase().replace(/[^a-z\d\s]/g, ' ');
+  var parts = normalized.split(/\s+/)
+                        .filter(function(s) { return !!s; })
+                        .filter(function(s, index) { return index < 10; } );
   return parts.map(function(i) {
     return new RegExp("\\b" + i, "i");
   });

@@ -5,10 +5,8 @@ define([
   'views/base',
   'hbs!./tmpl/shareView',
   'hbs!./tmpl/shareRow',
-  'bootstrap-typeahead' // No reference
-  // './shareTableView',
-//  'jquery-placeholder', // No reference
-// 'jquery-validate'  // No reference
+  'bootstrap-typeahead', // No reference
+  'jquery-validate'  // No reference
 ], function($, _, TroupeViews, template, rowTemplate) {
   "use strict";
 
@@ -16,6 +14,7 @@ define([
     template: template,
 
     events: {
+      //'keydown input': 'validate',
       'click .removeInvite': 'deselectPerson',
       'click button[type=submit]': 'sendInvites'
     },
@@ -27,6 +26,37 @@ define([
 
     afterRender: function() {
       this.createTypeahead();
+      this.validate();
+    },
+
+    validate: function() {
+      return this.$el.find('#share-form').validate({
+        rules: {
+          inviteSearch: {
+            email: true
+          }
+        },
+        debug: true,
+        messages: {
+          inviteSearch: {
+            email: "Enter a valid email address or invite someone on the list below."
+          }
+        },
+        showErrors: function(errorMap, errorList) {
+          /*
+          if (errorList.length === 0) $('.share-failure').hide();
+          if (errorList.length > 0) $('.share-failure').show();
+          var errors = "";
+          $.each(errorList, function () { errors += this.message + "<br>"; });
+          $('#failure-text').html(errors);
+          */
+        }
+
+      });
+    },
+
+    valid: function() {
+      return this.validate().element($('[name=inviteSearch]'));
     },
 
     createTypeahead: function() {
@@ -71,35 +101,54 @@ define([
         sorter: function(items) {
           return _.sortBy(items, 'displayName');
         },
-        matcher: function(item) {
+        matcher: function(/* item */) {
+          return true;
+          /*
           var query = this.query.trim(), queryWords = query.split(' '), fullname = item.displayName;
           return _.any(fullname.split(' '), function (name) {
             return _.any(queryWords, function(q) {
               return name.toLowerCase().indexOf(q.toLowerCase()) === 0;
             });
           });
+          */
         },
         highlighter: function(item) {
-          // TODO (maybe) include the avatar, but that would not be recommended for email address invites as the avatar url changes at each keystroke
-          return $.fn.typeahead.Constructor.prototype.highlighter.call(this, item.displayName);
+          // modified from bootstrap-typeahead.js
+          var name = item.displayName;
+          var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
+          var str = name.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
+            return '<strong>' + match + '</strong>';
+          });
+
+          var html = ((item.avatarUrlSmall) ? '<img src="'+item.avatarUrlSmall+'" width="30"/>' : '') + str;
+
+          return html;
         },
         updater: function(value) {
           var item = _.find(source, function(u) {
             return u.id === value || u.email === value;
           });
 
-          // TODO VALIDATE EMAIL ADDRESS FIELD!
+          // validate email address or accept existing user
+          if ((item && item.id) || self.valid()) {
+            self.selectPerson(item);
 
-          self.selectPerson(item);
+            return ''; // empty the search box
+          }
 
-          return ''; // empty the search box
+          return this.query;
         },
         minLength: 2
       });
 
       function addEmailOption(source, query) {
-        // add the query as an email address option
-        source.push({ email: query, displayName: query, avatarUrlSmall: '/gravatar/'+query }); // note:  this will provide a diff avatar each key stroke, don't show it in the autocomplete!
+        if (self.valid()) {
+          // add the query as an email address option
+          source.push({ email: query, displayName: query, avatarUrlSmall: '/gravatar/'+query }); // note:  this will provide a diff avatar each key stroke, don't show it in the autocomplete!
+        } else {
+          // add a non-selectable option which says continue typing an email address
+          source.push({ displayName: "Continue typing an email address to invite someone else" });
+        }
       }
 
       function installToString(source) {
