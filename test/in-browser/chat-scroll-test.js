@@ -40,7 +40,7 @@ require([
         env.newMessage();
       }
 
-      expect(env.scrollOf.scrollTop()).eql(Math.max(0, env.container.height() - env.scrollOf.height()));
+      expect(env.scrollOf.scrollTop()).greaterThan(Math.max(0, env.container.height() - env.scrollOf.height()) - 1);
     });
 
     it("should not scroll past the top unread message when a new message comes in at the bottom", function() {
