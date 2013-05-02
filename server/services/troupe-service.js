@@ -171,6 +171,32 @@ function validateTroupeUrisForUser(userId, uris, callback) {
     });
 }
 
+function inviteUserByUserId(troupe, senderDisplayName, userId, callback) {
+  userService.findById(userId, function(err, user) {
+    if(err) return callback(err);
+    if(!user) return callback("User not found");
+
+    var code = uuid.v4();
+
+    var invite = new persistence.Invite();
+    invite.troupeId = troupe.id;
+    invite.displayName = user.displayName;
+    invite.email = user.email;
+    invite.code = code;
+    invite.save(function(err) {
+      if(err) return callback(err);
+
+      // TODO: should we treat registered users differently from unregistered people?
+      // At the moment, we treat them all the same...
+
+      emailNotificationService.sendInvite(troupe, user.displayName, user.email, code, senderDisplayName);
+      callback();
+    });
+
+  });
+
+}
+
 function inviteUserByEmail(troupe, senderDisplayName, displayName, email, callback) {
   var code = uuid.v4();
 
@@ -188,8 +214,19 @@ function inviteUserByEmail(troupe, senderDisplayName, displayName, email, callba
     emailNotificationService.sendInvite(troupe, displayName, email, code, senderDisplayName);
     callback();
   });
+}
 
+function inviteUserToTroupe(troupe, senderDisplayName, invite, callback) {
+  if(invite.email) {
+    return inviteUserByEmail(troupe, senderDisplayName, invite.displayName, invite.email, callback);
+  }
 
+  if(invite.userId) {
+    return inviteUserByUserId(troupe, senderDisplayName, invite.userId, callback);
+  }
+
+  // Otherwise, if neither an email or userId are sent, just quietely ignore
+  return callback();
 }
 
 function findInviteById(id, callback) {
@@ -432,10 +469,7 @@ function upgradeOneToOneTroupe(options, callback) {
 
     // add invites for each additional person
     for(var i = 0; i < invites.length; i++) {
-      var displayName = invites[i].displayName;
-      var inviteEmail = invites[i].email;
-      if (displayName && inviteEmail)
-        inviteUserByEmail(troupe, senderName, displayName, inviteEmail, f.waitor());
+      inviteUserToTroupe(troupe, senderName, invites[i], f.waitor());
     }
 
     f.all().then(function() { callback(null, troupe); }, callback);
@@ -575,7 +609,7 @@ function createNewTroupeForExistingUser(options, callback) {
         var displayName = invites[i].displayName;
         var inviteEmail = invites[i].email;
         if (displayName && inviteEmail)
-          inviteUserByEmail(troupe, user.displayName, displayName, inviteEmail, f.waitor());
+          inviteUserToTroupe(troupe, user.displayName, invites[i], f.waitor());
         }
     }
 
@@ -672,7 +706,7 @@ module.exports = {
   validateTroupeEmailAndReturnDistributionList: validateTroupeEmailAndReturnDistributionList,
   userHasAccessToTroupe: userHasAccessToTroupe,
   userIdHasAccessToTroupe: userIdHasAccessToTroupe,
-  inviteUserByEmail: inviteUserByEmail,
+  inviteUserToTroupe: inviteUserToTroupe,
   findInviteById: findInviteById,
   findInviteByCode: findInviteByCode,
   findMemberEmails: findMemberEmails,
