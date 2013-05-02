@@ -5,11 +5,10 @@ define([
   'underscore',
   'views/base',
   'hbs!./tmpl/createTroupeView',
-  'views/share/shareTableView',
   'log!create-troupe-view',
   'jquery-validate', // no ref
   'jquery-placeholder' // no ref
-], function($, _, TroupeViews, template, ShareTableView, log) {
+], function($, _, TroupeViews, template, shareSearch, log) {
   var View = TroupeViews.Base.extend({
     template: template,
 
@@ -24,12 +23,6 @@ define([
       } else {
         isOneToOne = false;
       }
-
-      if(isOneToOne) {
-        this.shareTableView = new ShareTableView();
-      }
-      this.isOneToOne = isOneToOne;
-
     },
 
     events: {
@@ -53,10 +46,6 @@ define([
     },
 
     afterRender: function() {
-      if(this.shareTableView) {
-        this.$el.find('#invites-for-create').append(this.shareTableView.el);
-      }
-
       this.validateForm();
       this.$el.find('#troupeName').placeholder();
       this.$el.find('#email').placeholder();
@@ -65,14 +54,11 @@ define([
     validateForm : function () {
       var validationConfig;
 
-      if(this.shareTableView) {
-        validationConfig = _.extend(this.shareTableView.getValidationConfig());
-      } else {
-        validationConfig = {
-          rules: {  },
-          messages: { }
-        };
-      }
+
+      validationConfig = {
+        rules: {  },
+        messages: { }
+      };
 
       validationConfig.showErrors = function(errorMap, errorList) {
         if (errorList.length > 0) {
@@ -105,8 +91,7 @@ define([
       var form = this.$el.find('form');
       var serializedForm = {
         troupeName: form.find('input[name=troupeName]').val(),
-        userId: form.find('input[name=userId]').val(),
-        invites: this.shareTableView ? this.shareTableView.serialize() : null
+        userId: form.find('input[name=userId]').val()
       };
 
       if (window.troupeContext.troupe.oneToOne) {
@@ -118,7 +103,7 @@ define([
         wait: true,
         success: function(troupe /*, resp, options*/) {
           log('response from upgrading one to one troupe', troupe);
-          window.location.href = "/" + troupe.get('uri') + "#|shareTroupe";
+          window.location.href = "/" + troupe.get('uri') + "#|share";
         }
       });
     }

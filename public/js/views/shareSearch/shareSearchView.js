@@ -186,6 +186,10 @@ define([
       });
     },
 
+    serialize: function() {
+      return JSON.stringify(this.invites);
+    },
+
     sendInvites: function() {
       // TODO don't let users submit unless there is at least one invite (show error message in .share-failure  )
 
@@ -193,7 +197,7 @@ define([
         url: "/troupes/" + window.troupeContext.troupe.id + "/invites",
         contentType: "application/json",
         dataType: "json",
-        data: JSON.stringify(this.invites),
+        data: this.serialize(),
         type: "POST",
         success: function(data) {
            if(data.failed) {
