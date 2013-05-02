@@ -35,7 +35,7 @@ function newTroupe(options, callback) {
   // invite users
   if (invites) {
     invites.forEach(function(invite) {
-      troupeService.inviteUserByEmail(troupe, user.displayName, invite.displayName, invite.email, f.waitor());
+      troupeService.inviteUserToTroupe(troupe, user.displayName, invite, f.waitor());
     });
   }
 
