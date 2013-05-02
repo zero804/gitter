@@ -191,7 +191,10 @@ define([
     },
 
     sendInvites: function() {
-      // TODO don't let users submit unless there is at least one invite (show error message in .share-failure  )
+      // don't let users submit unless there is at least one invite (show error message in .share-failure  )
+      if (this.invites.length === 0) {
+        return alert("Please select at least one user or email address to send to, or press escape to cancel.");
+      }
 
       $.ajax({
         url: "/troupes/" + window.troupeContext.troupe.id + "/invites",
