@@ -187,6 +187,8 @@ define([
     },
 
     sendInvites: function() {
+      // TODO don't let users submit unless there is at least one invite (show error message in .share-failure  )
+
       $.ajax({
         url: "/troupes/" + window.troupeContext.troupe.id + "/invites",
         contentType: "application/json",
