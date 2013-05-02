@@ -183,8 +183,12 @@ define([
       var newValue = this._count();
 
       if(this._currentCountValue !== newValue) {
+        log('Emitting new count oldValue=', this._currentCountValue, ', newValue=', newValue);
+
         this._currentCountValue = newValue;
         this.emit('newcountvalue', newValue);
+      } else {
+        log('Ignoring count update: oldValue=', this._currentCountValue, ', newValue=', newValue);
       }
     },
 
@@ -380,15 +384,21 @@ define([
   // publishes notifications on changes
   // -----------------------------------------------------
 
-  var TroupeUnreadNotifier = function(troupeCollection) {
+  var TroupeUnreadNotifier = function(troupeCollection, store) {
     this._collection = troupeCollection;
+    this._store = store;
 
-    this._recountLimited = limit(this._recount, this, 30);
+    this._currentStoreValueChanged = _.bind(this._currentStoreValueChanged, this);
+
+    this._recountLimited = limit(this._recount, this, 50);
     this._collection.on('change:unreadItems', this._recountLimited);
     this._collection.on('reset', this._recountLimited);
+    this._collection.on('sync', this._recountLimited);
     this._collection.on('add', this._recountLimited);
     this._collection.on('remove', this._recountLimited);
     this._collection.on('destroy', this._recountLimited);
+
+    this._store.on('newcountvalue', this._currentStoreValueChanged);
 
     this._recountLimited();
   };
@@ -404,6 +414,10 @@ define([
   };
 
   TroupeUnreadNotifier.prototype = {
+    _currentStoreValueChanged: function() {
+      this._recountLimited();
+    },
+
 
     _recount: function() {
       function count(memo, troupe) {
@@ -425,7 +439,7 @@ define([
         counts.overall = newTroupeUnreadTotal;
         counts.oneToOne = newPplTroupeUnreadTotal;
         counts.normal = newNormalTroupeUnreadTotal;
-        counts.current = unreadItemStore._currentCount();
+        counts.current = this._store._currentCount();
 
         $(document).trigger('troupeUnreadTotalChange', counts);
       //}
@@ -561,6 +575,7 @@ define([
       unreadItemStore.preload(items);
     },
 
+    // This method sucks. TODO: make it not suck
     getCounts: function() {
       return {
         overall: counts.overall,
@@ -613,7 +628,7 @@ define([
     installTroupeListener: function(troupeCollection) {
       new TroupeCollectionSync(troupeCollection, unreadItemStore);
       new TroupeCollectionRealtimeSync(troupeCollection)._subscribe();
-      new TroupeUnreadNotifier(troupeCollection);
+      new TroupeUnreadNotifier(troupeCollection, unreadItemStore);
     },
 
     syncCollections: function(collections) {
