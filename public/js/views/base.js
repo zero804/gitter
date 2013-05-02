@@ -5,14 +5,13 @@ define([
   'underscore',
   'backbone',
   'marionette',
-  'backbone.keys', // no ref
   'hbs!./tmpl/modal',
   'hbs!./tmpl/popover',
   'hbs!./tmpl/loading',
   '../template/helpers/all',
   'hbs!./tmpl/confirmationView',
   'log!base-views'
-], function($, $mig, _, Backbone, Marionette, _backboneKeys, modalTemplate, popoverTemplate, loadingTemplate, helpers, confirmationViewTemplate, log) {
+], function($, $mig, _, Backbone, Marionette, modalTemplate, popoverTemplate, loadingTemplate, helpers, confirmationViewTemplate, log) {
   /*jshint trailing:false */
   "use strict";
 

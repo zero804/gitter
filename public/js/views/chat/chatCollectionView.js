@@ -42,7 +42,7 @@ define([
       }
 
       if (!this.isOld()) {
-        var oldInMS = (this.model.get('sent').valueOf() + 216000000 /*1 hour*/) - Date.now();
+        var oldInMS = (this.model.get('sent').valueOf() + 3600000 /*1 hour*/) - Date.now();
         setTimeout(function() {
           self.render();
         }, oldInMS + 50);
@@ -153,7 +153,7 @@ define([
 
     isOld: function() {
       var age = (Date.now() - this.model.get('sent').valueOf()) / 1000;
-      return age >= 216000;
+      return age >= 3600;
     },
 
     canEdit: function() {
@@ -263,16 +263,18 @@ define([
       this.scrollDelegate = new scrollDelegates.DefaultScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
       this.infiniteScrollDelegate = new scrollDelegates.InfiniteScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
       function findTopMostVisibleUnreadItem(itemType) {
-        return unreadItemsClient.findTopMostVisibleUnreadItemPosition(itemType);
+        return unreadItemsClient.findTopMostVisibleUnreadItemPosition(itemType, ChatCollectionView.$container, ChatCollectionView.$scrollOf);
       }
 
       var self = this;
       // wait for the first reset (preloading) before enabling infinite scroll
       if (this.collection.length === 0) {
         this.collection.once('reset', function() {
+          // log("Enabling infinite scroll");
           ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
         });
       } else {
+        // log("Enabling infinite scroll");
         ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
       }
     },
@@ -291,6 +293,7 @@ define([
       var self = this;
       setTimeout(function() {
         // note: on mobile safari this only work when typing in the url, not when pressing refresh, it works well in the mobile app.
+        // log("Initial scroll to bottom on page load");
         self.scrollDelegate.scrollToBottom();
       }, 500);
     },
@@ -317,6 +320,7 @@ define([
     loadNextMessages: function() {
       if(this.loading) return;
 
+      // log("Loading next message chunk.");
       this.infiniteScrollDelegate.beforeLoadNextMessages();
 
       var self = this;
