@@ -93,12 +93,20 @@ tarball:
 	mkdir -p output
 	find . -type f -not -name ".*"| grep -Ev '^\./(\.|node_modules/|output/|assets/|mongo-backup-|scripts/mongo-backup-).*'|tar -cv --files-from - |gzip -9 - > output/troupe.tgz
 
+search-js-console:
+	if (find public/js -name "*.js" ! -path "*libs*" ! -name log.js |xargs grep -q '\bconsole\b'); then \
+		echo console references in the code; \
+		find public/js -name "*.js" ! -path "*libs*" ! -name log.js |xargs grep '\bconsole\b'; \
+		exit 1; \
+	fi
 
-continuous-integration: clean npm grunt version-files upgrade-data test-xunit test-coverage tarball
+validate-source: search-js-console
+
+continuous-integration: clean validate-source npm grunt version-files upgrade-data test-xunit test-coverage tarball
 
 post-deployment-tests: test-in-browser end-to-end-test
 
-build: npm grunt
+build: clean validate-source npm grunt version-files upgrade-data test-xunit
 
 .PHONY: test docs test-docs clean
 
@@ -111,6 +119,7 @@ fetch-client-libs:
 install-client-libs:
 	grunt client-libs # --disableMinifiedSource=true
 	ls -d output/client-libs/*|sed -e 's!output/client-libs/!public/repo/!'|sed -e 's!retina.js-js!retina!'|sed -e 's!typeahead.js!typeahead!'|xargs mkdir -p
+	cp output/client-libs/almond/almond.js public/repo/almond/almond.js
 	cp output/client-libs/assert/assert.js public/repo/assert/assert.js
 	cp output/client-libs/backbone/backbone-amd.js public/repo/backbone/backbone.js
 	cp output/client-libs/backbone.babysitter/lib/amd/backbone.babysitter.min.js public/repo/backbone.babysitter/backbone.babysitter.js
@@ -124,7 +133,6 @@ install-client-libs:
 	cp output/client-libs/faye/faye-browser.js public/repo/faye/faye.js
 	cp output/client-libs/filtered-collection/backbone-filtered-collection-amd.js public/repo/filtered-collection/filtered-collection.js
 	cp output/client-libs/marionette/lib/core/amd/backbone.marionette.min.js public/repo/marionette/marionette.js
-	cp output/client-libs/fine-uploader/fine-uploader.js public/repo/fine-uploader/fine-uploader.js
 	cp output/client-libs/fine-uploader/fine-uploader.js public/repo/fine-uploader/fine-uploader.js
 	cp output/client-libs/fine-uploader/client/fineuploader.css public/repo/fine-uploader/fineuploader.less
 	cp output/client-libs/hbs/hbs.js public/repo/hbs/hbs.js
@@ -146,5 +154,6 @@ install-client-libs:
 	cp output/client-libs/underscore/underscore-amd.js public/repo/underscore/underscore.js
 	cp output/client-libs/zeroclipboard/ZeroClipboard.min.js public/repo/zeroclipboard/zeroclipboard.js
 	cp output/client-libs/zeroclipboard/ZeroClipboard.swf public/repo/zeroclipboard/
+	cp output/client-libs/zepto/zepto-amd.js public/repo/zepto/zepto.js
 
 client-libs: clean-client-libs fetch-client-libs install-client-libs

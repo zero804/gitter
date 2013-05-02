@@ -16,7 +16,9 @@ var routes = [
   { re: /^\/troupes\/(\w+)$/, validator: validateUserForTroupeSubscription },
   { re: /^\/troupes\/(\w+)\/(.+)$/, validator: validateUserForSubTroupeSubscription },
   { re: /^\/user\/(\w+)\/(.+)$/, validator: validateUserForUserSubscription },
-  { re: /^\/user\/(\w+)$/, validator: validateUserForUserSubscription }
+  { re: /^\/user\/(\w+)$/, validator: validateUserForUserSubscription },
+  { re: /^\/ping$/, validator: validateUserForPingSubscription }
+
 ];
 
 var superClientPassword = nconf.get('ws:superClientPassword');
@@ -66,6 +68,13 @@ function validateUserForSubTroupeSubscription(options, callback) {
 
   });
 }
+
+
+// This strategy ensures that a user can access a URL under a /user/ URL
+function validateUserForPingSubscription(options, callback) {
+  return callback(null, true);
+}
+
 
 // This strategy ensures that a user can access a URL under a /user/ URL
 function validateUserForUserSubscription(options, callback) {

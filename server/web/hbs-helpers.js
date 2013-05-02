@@ -12,13 +12,18 @@ exports.cdn = function(url, parameters) {
 
 exports.bootScript = function(url, parameters) {
   var requireScript,
-      cdn = (parameters.hash.skipCdn) ? function(a) { return '/' + a; } : exports.cdn;
+      cdn = (parameters.hash.skipCdn) ? function(a) { return '/' + a; } : exports.cdn,
+      skipCore = parameters.hash.skipCore;
 
   var baseUrl = cdn("js/");
 
   if(minified) {
-    // note: when the skipCdn flag was introduced it affected this even though this isn't the file that was requested in this invocation
-    requireScript = cdn("js/core-libraries.js");
+    if(skipCore) {
+      requireScript = cdn("js/" + url + ".js");
+    } else {
+      // note: when the skipCdn flag was introduced it affected this even though this isn't the file that was requested in this invocation
+      requireScript = cdn("js/core-libraries.js");
+    }
 
     return "<script type='text/javascript'>\nwindow.require_config.baseUrl = '" + baseUrl + "';</script>\n" +
             "<script defer='defer' async='true' data-main='" + url + "' src='" + requireScript + "' type='text/javascript'></script>\n";
