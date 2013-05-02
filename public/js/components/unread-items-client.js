@@ -206,6 +206,10 @@ define([
       }, this);
     },
 
+    _hasItemBeenMarkedAsRead: function(itemType, itemId) {
+      return this._deleteTarpit._contains(itemType, itemId);
+    },
+
     preload: function(items) {
       _iteratePreload(items, function(itemType, itemId) {
         if(this._deleteTarpit._contains(itemType, itemId)) return;
@@ -321,9 +325,7 @@ define([
       realtime.subscribe('/user/' + window.troupeContext.user.id + '/troupes/' + window.troupeContext.troupe.id, function(message) {
         if(message.notification === 'unread_items') {
           store._unreadItemsAdded(message.items);
-
         } else if(message.notification === 'unread_items_removed') {
-
           var items = message.items;
           store._unreadItemsRemoved(items);
 
@@ -537,7 +539,8 @@ define([
 
   ReadItemRemover.prototype = {
     _onUnreadItemRemoved: function(e, itemType, itemId) {
-      $('.unread.model-id-' + itemId).removeClass('unread').addClass('read');
+      var elements = $('.model-id-' + itemId);
+      elements.removeClass('unread').addClass('read');
     }
   };
 
@@ -565,6 +568,10 @@ define([
         oneToOne: counts.oneToOne,
         current: unreadItemStore._currentCount()
       };
+    },
+
+    hasItemBeenMarkedAsRead: function(itemType, itemId) {
+      return unreadItemStore._hasItemBeenMarkedAsRead(itemType, itemId);
     },
 
     findTopMostVisibleUnreadItemPosition: function(itemType, $container, $scrollOf) {

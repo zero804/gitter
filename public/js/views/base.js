@@ -5,13 +5,14 @@ define([
   'underscore',
   'backbone',
   'marionette',
+  'components/unread-items-client',
   'hbs!./tmpl/modal',
   'hbs!./tmpl/popover',
   'hbs!./tmpl/loading',
   '../template/helpers/all',
   'hbs!./tmpl/confirmationView',
   'log!base-views'
-], function($, $mig, _, Backbone, Marionette, modalTemplate, popoverTemplate, loadingTemplate, helpers, confirmationViewTemplate, log) {
+], function($, $mig, _, Backbone, Marionette, unreadItemsClient, modalTemplate, popoverTemplate, loadingTemplate, helpers, confirmationViewTemplate, log) {
   /*jshint trailing:false */
   "use strict";
 
@@ -153,7 +154,15 @@ define([
         if(!id) id = this.model.cid;
 
         dom.addClass('model-id-' + id);
-        if(this.model.get('unread')) {
+
+        var unread = this.model.get('unread');
+        if(unread) {
+          if(unreadItemsClient.hasItemBeenMarkedAsRead(this.unreadItemType, id)) {
+            unread = false;
+          }
+        }
+
+        if(unread) {
           dom.addClass('unread');
           dom.data('itemId', id);
           dom.data('itemType', this.unreadItemType);
