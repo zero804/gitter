@@ -24,6 +24,7 @@ module.exports = function( grunt ) {
         options: {
 
           optimize: 'uglify2',
+          //optimize: 'none',
           //generateSourceMaps: true,
           preserveLicenseComments: true,
           //useSourceUrl: true,
@@ -308,6 +309,14 @@ module.exports = function( grunt ) {
     },
 
     bowerRequireWrapper: {
+      assert: {
+        files : {
+          'output/client-libs/assert/assert-amd.js': ['output/client-libs/assert/assert.js']
+        },
+        modules: { },
+        exports: 'assert'
+      },
+
       underscore: {
         files : {
           'output/client-libs/underscore/underscore-amd.js': ['output/client-libs/underscore/underscore' + (min ? '-min' : '') + '.js']
@@ -363,14 +372,16 @@ module.exports = function( grunt ) {
       },
       'mocha': {
         files : {
-          'output/client-libs/mocha-amd.js': ['output/client-libs/mocha.js']
+          'output/client-libs/mocha/mocha-amd.js': ['output/client-libs/mocha/mocha.js']
         },
+        modules: {},
         exports: 'mocha'
       },
       'expect': {
         files : {
-          'output/client-libs/expect-amd.js': ['output/client-libs/expect.js']
+          'output/client-libs/expect/expect-amd.js': ['output/client-libs/expect/expect.js']
         },
+        modules: {},
         exports: 'expect'
       },
       'jquery-migrate': {

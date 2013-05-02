@@ -44,7 +44,7 @@ describe("User Service", function() {
           assert.strictEqual(user.status, oldUserStatus);
 
           // get the confirmation code and run the confirmation
-          signupService.confirm(user, function(e) {
+          signupService.confirmEmailChange(user, function(e) {
             assert.strictEqual(e, null);
             assert.strictEqual(user.email, params.email);
             // assert.strictEqual(typeof user.newEmail, 'undefined');

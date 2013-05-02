@@ -27,11 +27,14 @@ describe('signup-service', function() {
         './email-notification-service': emailNotificationServiceMock
       });
 
-      signupService.newSignup({
+      signupService.newSignupFromLandingPage({
         email: nonExistingEmail,
         troupeName: troupeName
       }, function(err, troupeId) {
         if(err) return done(err);
+
+        assert(troupeId, 'Expected a troupeId');
+
         mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
 
         persistence.User.findOne({ email: nonExistingEmail }, function(err, user) {
@@ -47,7 +50,7 @@ describe('signup-service', function() {
             assert(troupe.users.length == 1, 'Expected the new troupe to have a single user');
             assert(troupe.users[0].userId == user.id, 'Expected the new troupe to have a reference to the new user');
 
-            signupService.confirm(user, function(err, user, troupe) {
+            signupService.confirmSignup(user, function(err, user, troupe) {
               assert(user, 'Expected user to be created');
               assert(user.confirmationCode, 'Expected the user to still have a confirmation code');
               assert(user.status === 'PROFILE_NOT_COMPLETED', 'Expected the user to be PROFILE_NOT_COMPLETED');
@@ -77,11 +80,13 @@ describe('signup-service', function() {
       });
 
 
-      signupService.newSignup({
+      signupService.newSignupFromLandingPage({
         email: nonExistingEmail,
         troupeName: troupeName
       }, function(err, troupeId) {
         if(err) return done(err);
+
+        assert(troupeId, 'Expected a troupeId');
 
         mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
 
@@ -120,7 +125,7 @@ describe('signup-service', function() {
       }, function(err, createdUser) {
           if(err) return done(err);
 
-          signupService.newSignup({
+          signupService.newSignupFromLandingPage({
             email: existingEmail,
             troupeName: troupeName
           }, function(err, troupeId) {
@@ -161,7 +166,7 @@ describe('signup-service', function() {
           if(err) return done(err);
 
 
-          signupService.newSignup({
+          signupService.newSignupFromLandingPage({
             email: existingEmail,
             troupeName: troupeName
           }, function(err, troupeId) {
@@ -209,8 +214,7 @@ describe('signup-service', function() {
       }, function(err, createdUser) {
           if(err) return done(err);
 
-
-          signupService.newSignup({
+          signupService.newSignupFromLandingPage({
             email: existingEmail,
             troupeName: troupeName
           }, function(err, troupeId) {
@@ -236,6 +240,58 @@ describe('signup-service', function() {
   });
 
   describe('#newSignupWithAccessRequest()', function() {
+    it('should allow an existing user who has accessed the troupe to signup', function(done) {
+
+      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+      var signupService = testRequire.withProxies("./services/signup-service", {
+        './email-notification-service': emailNotificationServiceMock
+      });
+
+      var troupeService = testRequire.withProxies('./services/troupe-service', {
+        './email-notification-service': emailNotificationServiceMock
+      });
+
+      persistence.User.findOne({ email: 'testuser@troupetest.local'}, function(err, user) {
+        if(err) return done(err);
+        if(!user) return done("Could not find user");
+        var userId = user.id;
+
+        var troupe = persistence.Troupe({ status: 'ACTIVE' });
+        troupe.save(function(err, user) {
+          if(err) return done(err);
+          if(!user) return done("User not found");
+
+          signupService.newSignupWithAccessRequest({
+            email: "testuser@troupetest.local",
+            name: "Test Guy",
+            troupeId: troupe.id
+          }, function(err, request) {
+            if(err) return done(err);
+
+            mockito.verifyZeroInteractions(emailNotificationServiceMock);
+
+            troupeService.acceptRequest(request, function(err) {
+              if(err) return done(err);
+
+              mockito.verify(emailNotificationServiceMock, once).sendRequestAcceptanceToUser();
+
+              persistence.Troupe.findById(troupe.id, function(err, troupe) {
+                if(err) return done(err);
+                if(!troupe) return done("Cannot find troupe");
+
+                assert(troupe.users.some(function(troupeUser) { return troupeUser.userId == userId; }), 'Expected user to be in the troupe');
+
+                done();
+              });
+
+            });
+
+          });
+        });
+      });
+
+    });
+
     it('should allow a new user who has accessed a troupe to signup', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
       var existingTroupeUri = 'testtroupe1';
@@ -262,23 +318,28 @@ describe('signup-service', function() {
 
             mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUserRequest();
 
-            persistence.User.findOne({ email: nonExistingEmail }, function(err, user) {
+            persistence.Troupe.findOne({ uri: existingTroupeUri }, function(err, troupe) {
               if(err) return done(err);
+              if(!troupe) return done("Unable to find troupe");
 
-              assert(user, 'User was not found');
-
-              signupService.confirm(user, function(err, user, troupe) {
+              persistence.User.findOne({ email: nonExistingEmail }, function(err, user) {
                 if(err) return done(err);
-                assert(user.status == 'PROFILE_NOT_COMPLETED', 'User status is incorrect');
-                var userInTroupe = troupe.users.some(function(troupeUser) { return troupeUser.userId == user.id; });
 
-                assert(userInTroupe, 'User does not appear to be in the troupe');
-                done();
+                assert(user, 'User was not found');
+
+                signupService.confirmSignup(user, function(err, user, troupeToOpen) {
+                  if(err) return done(err);
+
+                  assert(troupeToOpen, 'Expected a troupe to open');
+                  assert(user.status == 'PROFILE_NOT_COMPLETED', 'User status is incorrect');
+
+                  done();
+
+                });
 
               });
 
             });
-
 
           });
 
