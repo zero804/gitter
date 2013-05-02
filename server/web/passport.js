@@ -89,8 +89,6 @@ var inviteAcceptStrategy = new ConfirmStrategy({ name: "accept" }, function(conf
 });
 
 module.exports = {
-  inviteAcceptStrategy: inviteAcceptStrategy,
-
   install: function() {
 
     passport.serializeUser(function(user, done) {
@@ -181,20 +179,20 @@ module.exports = {
 
   passport.use(inviteAcceptStrategy);
 
-    passport.use(new ConfirmStrategy({ name: "passwordreset" }, function(confirmationCode, req, done) {
-        userService.findAndUsePasswordResetCode(confirmationCode, function(err, user) {
-          if(err) return done(err);
-          if(!user) {
-            statsService.event('password_reset_invalid', { confirmationCode: confirmationCode });
-            return done(null, false);
-          }
+  passport.use(new ConfirmStrategy({ name: "passwordreset" }, function(confirmationCode, req, done) {
+      userService.findAndUsePasswordResetCode(confirmationCode, function(err, user) {
+        if(err) return done(err);
+        if(!user) {
+          statsService.event('password_reset_invalid', { confirmationCode: confirmationCode });
+          return done(null, false);
+        }
 
-          statsService.event('password_reset_completed', { userId: user.id });
+        statsService.event('password_reset_completed', { userId: user.id });
 
-          return done(null, user);
-        });
-      })
-    );
+        return done(null, user);
+      });
+    })
+  );
 
     /* OAuth Strategies */
 
@@ -257,5 +255,10 @@ module.exports = {
         });
       }
     ));
+  },
+
+  testOnly: {
+    inviteAcceptStrategy: inviteAcceptStrategy
   }
+
 };
