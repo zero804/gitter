@@ -147,6 +147,12 @@ define([
       $(document).on('troupeUnreadTotalChange', onTroupeUnreadTotalChange);
       onTroupeUnreadTotalChange(null, unreadItemsClient.getCounts());
 
+      // Temporary fix for #459. Remove this at a later stage:
+      // https://sprint.ly/product/4407/#!/item/459
+      window.setTimeout(function() {
+        log('Executing temporary fix for #459');
+        onTroupeUnreadTotalChange(null, unreadItemsClient.getCounts());
+      }, 2000);
 
       // show / hide the 'unread troupes header' on the mega list
       collections['unreadTroupes'].on('all', function() {
