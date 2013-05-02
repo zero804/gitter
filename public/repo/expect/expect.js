@@ -1,3 +1,5 @@
+define([], function (){
+
 
 (function (global, module) {
 
@@ -1251,3 +1253,6 @@
   , 'undefined' != typeof module ? module : {}
   , 'undefined' != typeof exports ? exports : {}
 );
+
+return expect;
+});

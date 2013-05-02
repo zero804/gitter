@@ -37,62 +37,21 @@ module.exports = {
     var oneToOneTroupeId = newTroupe.oneToOneTroupeId;
     var invites = newTroupe.invites;
 
-    name = name ? name.trim() : '';
-    if(!name) return next('Please provide a troupe name');
+    troupeService.createNewTroupeForExistingUser({
+      user: req.user,
+      name: name,
+      oneToOneTroupeId: oneToOneTroupeId,
+      invites: invites
+    }, function(err, troupe) {
+      if(err) return next(err);
 
-    if (oneToOneTroupeId) {
-      // find this 1-1 troupe and create a new normal troupe with the additional person(s) invited
-      troupeService.findById(oneToOneTroupeId, function(err, troupe) {
-        if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
-          return next(403);
-        }
-
-        troupeService.upgradeOneToOneTroupe({ name: name, oneToOneTroupe: troupe, senderName: req.user.name, invites: invites }, function(err, troupe) {
-          if(err) return next(err);
-
-          var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true });
-          restSerializer.serialize(troupe, strategy, function(err, serialized) {
-            if(err) return next(err);
-
-            res.send(serialized);
-          });
-        });
-
-      });
-
-      return;
-    }
-
-    // create a troupe normally
-    var troupe = new persistence.Troupe();
-    troupe.name = name;
-    troupe.uri = troupeService.createUniqueUri();
-    troupe.addUserById(req.user.id);
-
-    troupe.save(function(err) {
-      if(err) return next(403);
-
-
-      if (invites) {
-        // add invites for each additional person
-        for(var i = 0; i < invites.length; i++) {
-          var displayName = invites[i].displayName;
-          var inviteEmail = invites[i].email;
-          if (displayName && inviteEmail)
-            troupeService.addInvite(troupe, req.user.displayName, displayName, inviteEmail);
-        }
-     }
-
-      // send the new troupe back
       var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: true });
       restSerializer.serialize(troupe, strategy, function(err, serialized) {
         if(err) return next(err);
 
         res.send(serialized);
       });
-
     });
-
 
   },
 

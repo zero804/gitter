@@ -7,8 +7,9 @@ var persistence = require("./persistence-service"),
     emailNotificationService = require("./email-notification-service"),
     uuid = require('node-uuid'),
     winston = require("winston"),
-    assert = require('assert'),
-    collections = require("../utils/collections");
+    collections = require("../utils/collections"),
+    Fiber = require("../utils/fiber"),
+    statsService = require("../services/stats-service");
 
 var ObjectID = require('mongodb').ObjectID;
 
@@ -65,7 +66,7 @@ function findAllTroupesIdsForUser(userId, callback) {
     .exec(function(err, result) {
       if(err) return callback(err);
 
-      var troupeIds = result.map(function(troupe) { return troupe._id; } );
+      var troupeIds = result.map(function(troupe) { return troupe.id; } );
       return callback(null, troupeIds);
     });
 }
@@ -170,40 +171,25 @@ function validateTroupeUrisForUser(userId, uris, callback) {
     });
 }
 
-function addInvite(troupe, senderDisplayName, displayName, email, userId) {
-  assert(email || userId, "Either email address or existing user is required");
+function inviteUserByEmail(troupe, senderDisplayName, displayName, email, callback) {
+  var code = uuid.v4();
 
-  // lookup the email address of an existing user being invited
-  if (!email) {
-    assert(userId, "An existing user is required if no email address is given.");
-
-    userService.findById(userId, function(err, user) {
-      assert(!err);
-      assert(user, "No user with that ID was found");
-
-      email = user.email;
-
-      createInvite();
-
-    });
-  } else {
-    createInvite();
-  }
-
-  function createInvite() {
-    var code = uuid.v4();
-    var invite = new persistence.Invite();
-    invite.troupeId = troupe.id;
-    invite.displayName = displayName;
-    invite.email = email;
-    invite.code = code;
-    invite.save();
+  var invite = new persistence.Invite();
+  invite.troupeId = troupe.id;
+  invite.displayName = displayName;
+  invite.email = email;
+  invite.code = code;
+  invite.save(function(err) {
+    if(err) return callback(err);
 
     // TODO: should we treat registered users differently from unregistered people?
     // At the moment, we treat them all the same...
 
     emailNotificationService.sendInvite(troupe, displayName, email, code, senderDisplayName);
-  }
+    callback();
+  });
+
+
 }
 
 function findInviteById(id, callback) {
@@ -301,6 +287,8 @@ function findUserByIdEnsureConfirmationCode(userId, callback) {
 }
 
 function acceptRequest(request, callback) {
+  winston.verbose('Accepting request to join ' + request.troupeId);
+
   findById(request.troupeId, function(err, troupe) {
     if(err) return callback(err);
     if(!troupe) { winston.error("Unable to find troupe", request.troupeId); return callback("Unable to find troupe"); }
@@ -318,6 +306,7 @@ function acceptRequest(request, callback) {
 
       /** Add the user to the troupe */
       troupe.addUserById(user.id);
+
       troupe.save(function(err) {
         if(err) winston.error("Unable to save troupe", err);
 
@@ -347,6 +336,13 @@ function findUserIdsForTroupe(troupeId, callback) {
   persistence.Troupe.findById(troupeId, 'users', function(err, troupe) {
     if(err) return callback(err);
     callback(null, troupe.users.map(function(m) { return m.userId; }));
+  });
+}
+
+function findUsersForTroupe(troupeId, callback) {
+  persistence.Troupe.findById(troupeId, 'users', function(err, user) {
+    if(err) return callback(err);
+    callback(null, user.users);
   });
 }
 
@@ -426,15 +422,23 @@ function upgradeOneToOneTroupe(options, callback) {
   });
 
   troupe.save(function(err) {
+    if(err) return callback(err);
+
+    if(!invites || invites.length === 0) {
+      return callback(null, troupe);
+    }
+
+    var f = new Fiber();
+
     // add invites for each additional person
     for(var i = 0; i < invites.length; i++) {
       var displayName = invites[i].displayName;
       var inviteEmail = invites[i].email;
       if (displayName && inviteEmail)
-        addInvite(troupe, senderName, displayName, inviteEmail);
+        inviteUserByEmail(troupe, senderName, displayName, inviteEmail, f.waitor());
     }
 
-    return callback(err, troupe);
+    f.all().then(function() { callback(null, troupe); }, callback);
   });
 }
 
@@ -502,19 +506,173 @@ function findAllUserIdsForTroupes(troupeIds, callback) {
     });
 }
 
+
+function findBestTroupeForUser(user, callback) {
+  //
+  // This code is invoked when a user's lastAccessedTroupe is no longer valid (for the user)
+  // or the user doesn't have a last accessed troupe. It looks for all the troupes that the user
+  // DOES have access to (by querying the troupes.users collection in mongo)
+  // If the user has a troupe, it takes them to the first one it finds. If the user doesn't have
+  // any valid troupes, it redirects them to an error message
+  //
+
+  if (user.lastTroupe) {
+    findById(user.lastTroupe, function(err,troupe) {
+      if(err) return callback(err);
+
+      if(!troupe || !userHasAccessToTroupe(user, troupe)) {
+        userService.findDefaultTroupeForUser(user.id, callback);
+        return;
+      }
+
+      callback(null, troupe);
+    });
+    return;
+  }
+
+  userService.findDefaultTroupeForUser(user.id, callback);
+}
+
+//
+// Create a new troupe and return callback(err, troupe)
+//
+function createNewTroupeForExistingUser(options, callback) {
+  var name = options.name;
+  var oneToOneTroupeId = options.oneToOneTroupeId;
+  var user = options.user;
+  var invites = options.invites;
+
+  name = name ? name.trim() : '';
+  if(!name) return callback('Please provide a troupe name');
+
+  if (oneToOneTroupeId) {
+    // find this 1-1 troupe and create a new normal troupe with the additional person(s) invited
+    findById(oneToOneTroupeId, function(err, troupe) {
+      if(!userHasAccessToTroupe(user, troupe)) {
+        return callback(403);
+      }
+
+      upgradeOneToOneTroupe({ name: name, oneToOneTroupe: troupe, senderName: user.name, invites: invites }, callback);
+    });
+
+    return;
+  }
+
+  // create a troupe normally
+  var troupe = new persistence.Troupe();
+  troupe.name = name;
+  troupe.uri = createUniqueUri();
+  troupe.addUserById(user.id);
+
+  troupe.save(function(err) {
+    if(err) return callback(err);
+
+    var f = new Fiber();
+
+    if (invites) {
+      // add invites for each additional person
+      for(var i = 0; i < invites.length; i++) {
+        var displayName = invites[i].displayName;
+        var inviteEmail = invites[i].email;
+        if (displayName && inviteEmail)
+          inviteUserByEmail(troupe, user.displayName, displayName, inviteEmail, f.waitor());
+        }
+    }
+
+    f.all().then(function() {
+      callback(null, troupe);
+    }, callback);
+  });
+}
+
+// Accept an invite, returns callback(err, user, alreadyExists)
+// NB NB NB user should only ever be set iff the invite is valid
+function acceptInvite(confirmationCode, troupeUri, callback) {
+  findInviteByCode(confirmationCode, function(err, invite) {
+    if(err) return callback(err);
+
+    if(!invite) {
+      winston.error("Invite confirmationCode=" + confirmationCode + " not found. ");
+      return callback(null, null);
+    }
+
+    if(invite.status !== 'UNUSED') {
+      /* The invite has already been used. We need to fail authentication, but go to the troupe */
+      winston.verbose("Invite has already been used", { confirmationCode: confirmationCode, troupeUri: troupeUri });
+      statsService.event('invite_reused', { uri: troupeUri });
+
+      // There's a chance a user has accepted an invite but hasn't completed their profile
+      // In which case we allow them through
+      userService.findByEmail(invite.email, function(err, user) {
+        if(err) return callback(err);
+
+        // If the user has clicked on the invite, but hasn't completed their profile (as in does not have a password)
+        // then we'll give them a special dispensation and allow them to access the site (otherwise they'll never get in)
+        if (user && user.status == 'PROFILE_NOT_COMPLETED') {
+          return callback(null, user, false);
+        }
+
+        return callback(null, null, true);
+      });
+
+    } else {
+      statsService.event('invite_accepted', { uri: troupeUri });
+
+      winston.verbose("Invite accepted", { confirmationCode: confirmationCode, troupeUri: troupeUri });
+
+      userService.findOrCreateUserForEmail({
+        displayName: invite.displayName,
+        email: invite.email,
+        status: "PROFILE_NOT_COMPLETED"
+      }, function(err, user) {
+        if(err) return callback(err);
+
+        // confirm the user if they are not already.
+        if (user.status == 'UNCONFIRMED') {
+          user.status = 'PROFILE_NOT_COMPLETED';
+          user.save();
+        }
+
+        findById(invite.troupeId, function(err, troupe) {
+          if(err) return callback(err);
+          if(!troupe) return callback(404);
+
+          var originalStatus = invite.status;
+          if(originalStatus != 'UNUSED') {
+            return callback(null, null, true);
+          }
+
+          invite.status = 'USED';
+          invite.save(function(err) {
+            if(err) return callback(err);
+
+            troupe.addUserById(user.id);
+            troupe.save(function(err) {
+              if(err) return callback(err);
+              return callback(null, user, false);
+            });
+          });
+
+
+
+        });
+      });
+    }
+
+  });
+}
+
 module.exports = {
   findByUri: findByUri,
   findById: findById,
   findByIds: findByIds,
   findAllTroupesForUser: findAllTroupesForUser,
   findAllTroupesIdsForUser: findAllTroupesIdsForUser,
-  findAllUserIdsForTroupes: findAllUserIdsForTroupes,
-
   validateTroupeEmail: validateTroupeEmail,
   validateTroupeEmailAndReturnDistributionList: validateTroupeEmailAndReturnDistributionList,
   userHasAccessToTroupe: userHasAccessToTroupe,
   userIdHasAccessToTroupe: userIdHasAccessToTroupe,
-  addInvite: addInvite,
+  inviteUserByEmail: inviteUserByEmail,
   findInviteById: findInviteById,
   findInviteByCode: findInviteByCode,
   findMemberEmails: findMemberEmails,
@@ -526,7 +684,11 @@ module.exports = {
   acceptRequest: acceptRequest,
   rejectRequest: rejectRequest,
   removeUserFromTroupe: removeUserFromTroupe,
+
+  findAllUserIdsForTroupes: findAllUserIdsForTroupes,
   findUserIdsForTroupe: findUserIdsForTroupe,
+  findUsersForTroupe: findUsersForTroupe,
+
   validateTroupeUrisForUser: validateTroupeUrisForUser,
   updateTroupeName: updateTroupeName,
   findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
@@ -534,5 +696,8 @@ module.exports = {
   createUniqueUri: createUniqueUri,
 
   updateFavourite: updateFavourite,
-  findFavouriteTroupesForUser: findFavouriteTroupesForUser
+  findFavouriteTroupesForUser: findFavouriteTroupesForUser,
+  findBestTroupeForUser: findBestTroupeForUser,
+  createNewTroupeForExistingUser: createNewTroupeForExistingUser,
+  acceptInvite: acceptInvite
 };

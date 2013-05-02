@@ -2,7 +2,8 @@
 "use strict";
 
 var troupeService = require("../../services/troupe-service"),
-    restSerializer = require("../../serializers/rest-serializer");
+    restSerializer = require("../../serializers/rest-serializer"),
+    Fiber = require("../../utils/fiber");
 
 module.exports = {
     index: function(req, res, next) {
@@ -24,14 +25,19 @@ module.exports = {
       res.send('new invites');
     },
 
-    create: function(req, res) {
+    create: function(req, res, next) {
       var invites = req.body;
+      var f = new Fiber();
+
       for(var i = 0; i < invites.length; i++) {
         var share = invites[i];
-        troupeService.addInvite(req.troupe, req.user.displayName, share.displayName, share.email, share.userId);
+        troupeService.inviteUserByEmail(req.troupe, req.user.displayName, share.displayName, share.email, f.waitor());
       }
 
-      res.send(invites);
+      f.all().then(function() {
+        res.send(invites);
+      }, next);
+
     },
 
     show: function(req, res){
