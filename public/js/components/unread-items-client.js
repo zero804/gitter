@@ -293,22 +293,32 @@ define([
 
   TroupeCollectionSync.prototype = {
     _onNewCountValue: function(event, newValue) {
+      log('Syncing store to collection ', newValue);
       if(!window.troupeContext || !window.troupeContext.troupe) return;
+
+      log('TroupeCollectionSync: setting value of ' + window.troupeContext.troupe.id + ' to ' + newValue);
 
       var troupe = this._collection.get(window.troupeContext.troupe.id);
       if(troupe) {
         troupe.set('unreadItems', newValue);
+        log('Completed successfully');
+        return;
+      }
+
+      if(this._collection.length === 0) {
+        this._collection.once('reset sync', function() {
+
+          log('Collection loading, syncing troupe unreadItems');
+
+          var troupe = this._collection.get(window.troupeContext.troupe.id);
+          if(troupe) {
+            troupe.set('unreadItems', newValue);
+          } else {
+            log('TroupeCollectionSync: unable to locate locate troupe');
+          }
+        }, this);
       } else {
-        if(this._collection.length === 0) {
-          this._collection.once('reset', function() {
-            var troupe = this._collection.get(window.troupeContext.troupe.id);
-            if(troupe) {
-              troupe.set('unreadItems', newValue);
-            } else {
-              log('TroupeCollectionSync: unable to locate locate troupe');
-            }
-          }, this);
-        }
+        log('TroupeCollectionSync: unable to locate locate troupe');
       }
     }
   };
@@ -365,6 +375,8 @@ define([
       var totalUnreadItems = message.totalUnreadItems;
 
       if(troupeId === window.troupeContext.troupe.id) return;
+
+      log('Updating troupeId' + troupeId + ' to ' + totalUnreadItems);
 
       var model = this._collection.get(troupeId);
       if(!model) {
