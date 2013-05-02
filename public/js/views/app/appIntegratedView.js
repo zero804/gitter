@@ -168,12 +168,17 @@ define([
       var mainTitle = window.troupeContext.troupe.name + " - Troupe";
       // TODO this isn't working properly when updating the troupe name, need to be able to poll unreadItems count not just accept the event
       var overall = counts.overall;
+      var current = counts.current;
       if(overall <= 0) {
         return mainTitle;
       }
 
       if(overall <= 10) {
-        return String.fromCharCode(0x2789 + overall) + ' ' + mainTitle;
+        if(current > 0) {
+          return String.fromCharCode(0x2789 + overall) + ' ' + mainTitle;
+        }
+
+        return String.fromCharCode(0x277F + overall) + ' ' + mainTitle;
       }
 
       return '[' + overall + '] ' + window.troupeContext.troupe.name + " - Troupe";
