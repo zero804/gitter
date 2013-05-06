@@ -77,9 +77,9 @@ exports.hook_queue = function(next, connection) {
 
 	// Get some stuff from the header to store later
     mail = {
-      subject: connection.transaction.header.get("Subject").replace(/\n/g, ""),
-      date: connection.transaction.header.get("Date"),
-      from: parseAddress(connection.transaction.mail_from),
+      subject: mimelib.decodeMimeWord(connection.transaction.header.get("Subject")).replace(/\n/g, ""),
+      date: mimelib.decodeMimeWord(connection.transaction.header.get("Date")),
+      from: parseAddress(mimelib.decodeMimeWord(connection.transaction.mail_from)),
       inReplyTo: parseAddress(connection.transaction.header.get("In-Reply-To")),
       mail_object: mail_object
     };
