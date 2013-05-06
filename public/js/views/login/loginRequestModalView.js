@@ -102,7 +102,14 @@ define([
             $('.modal-success').show();
             return;
           }
-          alert('Something went wrong. Oppsie daisy.');
+
+          if(data.userExists) {
+            $('#request-form').hide();
+            $('#modal-failure-userExists').show();
+            return;
+          }
+
+          alert('Something went wrong. Oopsie daisy.');
 
         }
       });

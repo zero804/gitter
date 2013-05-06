@@ -221,20 +221,33 @@ function removeUserFromTroupe(troupeId, userId, callback) {
  * callback is function(err, request)
  */
 function addRequest(troupeId, userId, callback) {
+
   persistence.Request.findOne({troupeId: troupeId, userId: userId}, function(err, request) {
     if(err) return callback(err);
+
     if(request) {
-      /* Already exists */
+      // There is already a request for this user
       return callback(null, request);
     }
 
-    request = new persistence.Request();
-    request.troupeId = troupeId;
-    request.userId = userId;
-    request.save(function(err) {
-      if(err) return callback(err);
-      callback(null, request);
+    persistence.Troupe.findOne(troupeId, function(err, troupe) {
+      if (err || !troupe) return callback("Error accessing troupe");
+
+      // This user is already a member of the troupe
+      if (troupe.users.indexOf(userId) !== -1) {
+        return callback({ memberExists: true });
+      }
+
+      request = new persistence.Request();
+      request.troupeId = troupeId;
+      request.userId = userId;
+      request.save(function(err) {
+        if(err) return callback(err);
+        callback(null, request);
+      });
+
     });
+
   });
 }
 
