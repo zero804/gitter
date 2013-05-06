@@ -53,13 +53,13 @@ function distributeForTroupe(from, to, next, connection) {
     }
 
     // normalize headers
-    var newSubject = transaction.header.get("Subject");
+    var newSubject = mimelib.decodeMimeWord(transaction.header.get("Subject"));
     newSubject = newSubject ? newSubject.replace(/\n/g,'') : "";
 
     if(newSubject.indexOf("[" + troupe.name + "]") < 0) {
       newSubject = "[" + troupe.name + "] " + newSubject;
       transaction.remove_header("Subject");
-      transaction.add_header("Subject", newSubject);
+      transaction.add_header("Subject", mimelib.encodeMimeWord(newSubject));
     }
 
     transaction.remove_header("From");
