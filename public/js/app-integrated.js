@@ -370,7 +370,7 @@ require([
   // Asynchronously load tracker
   require([
     'utils/tracking'
-  ], function(tracking) {
+  ], function(/*tracking*/) {
     // No need to do anything here
   });
 
