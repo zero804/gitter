@@ -37,9 +37,6 @@ module.exports = {
             if (err) {
               var e = { success: false };
 
-              if (err.memberExists) {
-                e.memberExists = true;
-              }
               if (err.userExists) {
                 e.userExists = true;
               }
