@@ -516,8 +516,11 @@ a:hover {
 .trpInviteItem {
 	display: inline-block;
 	width: 200px;
-	padding: 8px 14px 8px 14px;
+	padding: 8px 8px 8px 8px;
 	cursor: pointer;
+	margin-right: 4px;
+	margin-bottom: 4px;
+	background-color: @trpBgColor;
 }
 
 .trpRemoveInvite {
@@ -531,10 +534,6 @@ a:hover {
 	display: none;
 }
 
-.trpInviteItem:hover {
-	background-color: @trpBgColor;
-}
-
 .trpInviteItem:hover .trpRemoveInvite {
 	display: inline-block;
 }
@@ -542,6 +541,10 @@ a:hover {
 .trpInviteName {
 	.trpBodyMedium;
 	display: inline-block;
+	max-width: 130px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 .login-content {
