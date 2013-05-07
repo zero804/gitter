@@ -119,10 +119,10 @@ define([
           var name = item.displayName;
           var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
           var str = name.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
-            return '<strong>' + match + '</strong>';
+            return '<span class="trpBodyMedium">' + match + '</strong>';
           });
 
-          var html = ((item.avatarUrlSmall) ? '<img src="'+item.avatarUrlSmall+'" width="30"/>' : '') + str;
+          var html = ((item.avatarUrlSmall) ? '<img src="'+item.avatarUrlSmall+'"  class="trpDisplayPicture avatar-xs trpSearchInviteResult" width="30"/>' : '') + '<span class="trpBodyMedium">' + str + '</span>';
 
           return html;
         },
