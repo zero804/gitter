@@ -99,7 +99,9 @@ define([
           });
         },
         sorter: function(items) {
-          return _.sortBy(items, 'displayName');
+          return _.sortBy(items, function(o) {
+            return (o.nonSelectable || o.email) ? '' : o.displayName;
+          });
         },
         matcher: function(/* item */) {
           return true;
@@ -147,7 +149,7 @@ define([
           source.push({ email: query, displayName: query, avatarUrlSmall: '/gravatar/'+query }); // note:  this will provide a diff avatar each key stroke, don't show it in the autocomplete!
         } else {
           // add a non-selectable option which says continue typing an email address
-          source.push({ displayName: "Continue typing an email address to invite someone else" });
+          source.push({ displayName: "Continue typing an email address to invite someone else", nonSelectable: true });
         }
       }
 
