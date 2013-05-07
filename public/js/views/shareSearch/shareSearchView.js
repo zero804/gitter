@@ -14,7 +14,7 @@ define([
     template: template,
 
     events: {
-      //'keydown input': 'validate',
+      'keydown input': 'preventSubmit',
       'click .removeInvite': 'deselectPerson',
       'click button[type=submit]': 'sendInvites'
     },
@@ -27,6 +27,14 @@ define([
     afterRender: function() {
       this.createTypeahead();
       this.validate();
+    },
+
+    preventSubmit: function(e) {
+      if (e.keyCode == 13) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
     },
 
     validate: function() {
