@@ -145,6 +145,7 @@ require([
         { name: "profile",        re: /^profile$/,                viewType: profileView.Modal },
         { name: "share",          re: /^share$/,                  viewType: shareView.Modal },
         { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal,       collection: collections.troupes,   skipModelLoad: true },
+        { name: "upgradeOneToOne",  re: /^upgradeOneToOne$/,      viewType: createTroupeView.Modal,       collection: collections.troupes,   skipModelLoad: true, viewOptions: { upgradeOneToOne: true } } ,
         { name: "shareTroupe",    re: /^shareTroupe/,             viewType: shareTroupeView.Modal },
         { name: "troupeSettings", re: /^troupeSettings/,          viewType: troupeSettingsView }
 
@@ -165,6 +166,7 @@ require([
       return {
         viewType: match.viewType,
         collection: match.collection,
+        viewOptions: match.viewOptions,
         skipModelLoad: match.skipModelLoad ? match.skipModelLoad : /* If there is no collection, skipModelLoad=true */ !match.collection,
         name: match.name,
         id: result[1]
@@ -204,7 +206,8 @@ require([
           }
 
           /* Default case: load the view from scratch */
-          var view = new viewDetails.viewType({ model: model, collection: viewDetails.collection });
+          var viewOptions = _.extend({ model: model, collection: viewDetails.collection }, viewDetails.viewOptions);
+          var view = new viewDetails.viewType(viewOptions);
           region.show(view);
           $(document).trigger('appNavigation');
         }
