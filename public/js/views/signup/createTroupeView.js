@@ -16,19 +16,18 @@ define([
     initialize: function(options) {
       _.bindAll(this, 'onFormSubmit');
       if (!options) return;
+      this.upgradeOneToOne = options.upgradeOneToOne;
       this.existingUser = options.existingUser;
 
-      var isOneToOne;
       if (window.troupeContext) {
-        isOneToOne = window.troupeContext.troupe.oneToOne;
+        this.isOneToOne = window.troupeContext.troupe.oneToOne;
       } else {
-        isOneToOne = false;
+        this.isOneToOne = false;
       }
 
-      if(isOneToOne) {
+      if(this.isOneToOne) {
         this.shareTableView = new ShareTableView();
       }
-      this.isOneToOne = isOneToOne;
 
     },
 
@@ -39,7 +38,8 @@ define([
     getRenderData: function() {
       var data = {
         existingUser: this.existingUser,
-        isOneToOne: this.isOneToOne
+        isOneToOne: this.isOneToOne,
+        upgradeOneToOne: this.upgradeOneToOne
       };
 
       if (window.userId) {
@@ -112,7 +112,7 @@ define([
       // we are sometimes executing from the signup page which excludes all the app integrated goodness
       if (this.collection && window.troupeContext) {
 
-        if (window.troupeContext.troupe.oneToOne) {
+        if (window.troupeContext.troupe.oneToOne && this.upgradeOneToOne) {
           serializedForm.oneToOneTroupeId = window.troupeContext.troupe.id;
         }
 
