@@ -103,16 +103,15 @@ define([
             return (o.nonSelectable || o.email) ? '' : o.displayName;
           });
         },
-        matcher: function(/* item */) {
-          return true;
-          /*
-          var query = this.query.trim(), queryWords = query.split(' '), fullname = item.displayName;
-          return _.any(fullname.split(' '), function (name) {
-            return _.any(queryWords, function(q) {
-              return name.toLowerCase().indexOf(q.toLowerCase()) === 0;
-            });
+        matcher: function(item) {
+          var already = _.find(self.invites, function(i) {
+            if (i.userId)
+              return i.userId == item.id;
+            else
+             return i.email == item.email;
           });
-          */
+
+          return !already;
         },
         highlighter: function(item) {
           // modified from bootstrap-typeahead.js
