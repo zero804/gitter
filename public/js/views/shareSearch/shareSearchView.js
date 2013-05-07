@@ -86,7 +86,7 @@ define([
           }
 
           // fetch from server
-          $.ajax({ url: '/user?q=' + query, success:
+          $.ajax({ url: '/user?excludeTroupeId='+window.troupeContext.troupe.id+'&q=' + query, success:
             function(data) {
 
               source = data.results;
