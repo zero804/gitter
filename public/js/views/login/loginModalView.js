@@ -5,7 +5,7 @@ define([
   'underscore',
   'views/base',
   'hbs!./tmpl/loginModalView',
-  'jquery_placeholder'
+  'jquery-placeholder'
 ], function($, _, TroupeViews, template) {
   return TroupeViews.Base.extend({
     template: template,
@@ -147,6 +147,10 @@ define([
           that.$el.find('.resend-confirm').show('fast');
         }
       });
+    },
+
+    getEmail: function() {
+      return this.$el.find('input[name=email]').val();
     },
 
     showRequestAccess: function() {

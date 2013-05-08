@@ -2,7 +2,7 @@
 require([
   'jquery',
   'underscore',
-  'libs/assert/assert',
+  'assert',
   'mocha',
   'views/base',
   'marionette',

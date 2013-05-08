@@ -183,8 +183,12 @@ define([
       var newValue = this._count();
 
       if(this._currentCountValue !== newValue) {
+        log('Emitting new count oldValue=', this._currentCountValue, ', newValue=', newValue);
+
         this._currentCountValue = newValue;
         this.emit('newcountvalue', newValue);
+      } else {
+        log('Ignoring count update: oldValue=', this._currentCountValue, ', newValue=', newValue);
       }
     },
 
@@ -204,6 +208,10 @@ define([
       _iteratePreload(items, function(itemType, itemId) {
         this._unreadItemRemoved(itemType, itemId);
       }, this);
+    },
+
+    _hasItemBeenMarkedAsRead: function(itemType, itemId) {
+      return this._deleteTarpit._contains(itemType, itemId);
     },
 
     preload: function(items) {
@@ -285,22 +293,32 @@ define([
 
   TroupeCollectionSync.prototype = {
     _onNewCountValue: function(event, newValue) {
+      log('Syncing store to collection ', newValue);
       if(!window.troupeContext || !window.troupeContext.troupe) return;
+
+      log('TroupeCollectionSync: setting value of ' + window.troupeContext.troupe.id + ' to ' + newValue);
 
       var troupe = this._collection.get(window.troupeContext.troupe.id);
       if(troupe) {
         troupe.set('unreadItems', newValue);
+        log('Completed successfully');
+        return;
+      }
+
+      if(this._collection.length === 0) {
+        this._collection.once('reset sync', function() {
+
+          log('Collection loading, syncing troupe unreadItems');
+
+          var troupe = this._collection.get(window.troupeContext.troupe.id);
+          if(troupe) {
+            troupe.set('unreadItems', newValue);
+          } else {
+            log('TroupeCollectionSync: unable to locate locate troupe');
+          }
+        }, this);
       } else {
-        if(this._collection.length === 0) {
-          this._collection.once('reset', function() {
-            var troupe = this._collection.get(window.troupeContext.troupe.id);
-            if(troupe) {
-              troupe.set('unreadItems', newValue);
-            } else {
-              log('TroupeCollectionSync: unable to locate locate troupe');
-            }
-          }, this);
-        }
+        log('TroupeCollectionSync: unable to locate locate troupe');
       }
     }
   };
@@ -321,9 +339,7 @@ define([
       realtime.subscribe('/user/' + window.troupeContext.user.id + '/troupes/' + window.troupeContext.troupe.id, function(message) {
         if(message.notification === 'unread_items') {
           store._unreadItemsAdded(message.items);
-
         } else if(message.notification === 'unread_items_removed') {
-
           var items = message.items;
           store._unreadItemsRemoved(items);
 
@@ -360,6 +376,8 @@ define([
 
       if(troupeId === window.troupeContext.troupe.id) return;
 
+      log('Updating troupeId' + troupeId + ' to ' + totalUnreadItems);
+
       var model = this._collection.get(troupeId);
       if(!model) {
         log("Cannot find model. Refresh might be required....");
@@ -378,15 +396,21 @@ define([
   // publishes notifications on changes
   // -----------------------------------------------------
 
-  var TroupeUnreadNotifier = function(troupeCollection) {
+  var TroupeUnreadNotifier = function(troupeCollection, store) {
     this._collection = troupeCollection;
+    this._store = store;
 
-    this._recountLimited = limit(this._recount, this, 30);
+    this._currentStoreValueChanged = _.bind(this._currentStoreValueChanged, this);
+
+    this._recountLimited = limit(this._recount, this, 50);
     this._collection.on('change:unreadItems', this._recountLimited);
     this._collection.on('reset', this._recountLimited);
+    this._collection.on('sync', this._recountLimited);
     this._collection.on('add', this._recountLimited);
     this._collection.on('remove', this._recountLimited);
     this._collection.on('destroy', this._recountLimited);
+
+    this._store.on('newcountvalue', this._currentStoreValueChanged);
 
     this._recountLimited();
   };
@@ -402,6 +426,10 @@ define([
   };
 
   TroupeUnreadNotifier.prototype = {
+    _currentStoreValueChanged: function() {
+      this._recountLimited();
+    },
+
 
     _recount: function() {
       function count(memo, troupe) {
@@ -423,7 +451,7 @@ define([
         counts.overall = newTroupeUnreadTotal;
         counts.oneToOne = newPplTroupeUnreadTotal;
         counts.normal = newNormalTroupeUnreadTotal;
-        counts.current = unreadItemStore._currentCount();
+        counts.current = this._store._currentCount();
 
         $(document).trigger('troupeUnreadTotalChange', counts);
       //}
@@ -537,7 +565,8 @@ define([
 
   ReadItemRemover.prototype = {
     _onUnreadItemRemoved: function(e, itemType, itemId) {
-      $('.unread.model-id-' + itemId).removeClass('unread').addClass('read');
+      var elements = $('.model-id-' + itemId);
+      elements.removeClass('unread').addClass('read');
     }
   };
 
@@ -558,6 +587,7 @@ define([
       unreadItemStore.preload(items);
     },
 
+    // This method sucks. TODO: make it not suck
     getCounts: function() {
       return {
         overall: counts.overall,
@@ -565,6 +595,10 @@ define([
         oneToOne: counts.oneToOne,
         current: unreadItemStore._currentCount()
       };
+    },
+
+    hasItemBeenMarkedAsRead: function(itemType, itemId) {
+      return unreadItemStore._hasItemBeenMarkedAsRead(itemType, itemId);
     },
 
     findTopMostVisibleUnreadItemPosition: function(itemType, $container, $scrollOf) {
@@ -606,7 +640,7 @@ define([
     installTroupeListener: function(troupeCollection) {
       new TroupeCollectionSync(troupeCollection, unreadItemStore);
       new TroupeCollectionRealtimeSync(troupeCollection)._subscribe();
-      new TroupeUnreadNotifier(troupeCollection);
+      new TroupeUnreadNotifier(troupeCollection, unreadItemStore);
     },
 
     syncCollections: function(collections) {

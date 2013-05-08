@@ -33,28 +33,19 @@ module.exports = {
             return res.send(500);
           }
 
-          troupeService.findByUri(req.form.troupeUri, function(err, troupe) {
-            if(err) { winston.error("findByUri failed", { exception: err } ); return  res.send(500); }
-            if(!troupe) { winston.error("No troupe with uri", { uri: req.form.troupeUri }); return res.send(404); }
+          signupService.newUnauthenticatedAccessRequest(req.form.troupeUri, req.form.email, req.form.name, function(err) {
+            if (err) {
+              var e = { success: false };
 
-            signupService.newSignupWithAccessRequest({
-              troupeId: troupe.id,
-              name: req.form.name,
-              email: req.form.email
-            }, function(err, userId) {
-              if(err) {
-                winston.error("newSignupWithAccessRequest failed", { exception: err } );
-
-                if(err.userExists) {
-                  return res.send({ success: false, userExists: true });
-                }
-
-                return res.send(500);
+              if (err.userExists) {
+                e.userExists = true;
               }
 
-              res.send({ success: true });
-            });
+              res.send(e);
+              return;
+            }
 
+            res.send({ success: true });
           });
         }
       );

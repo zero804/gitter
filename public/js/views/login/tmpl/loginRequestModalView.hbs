@@ -1,30 +1,37 @@
 <div class="modal-content">
-  <div class="trpModalTitle">Ask to join</div>
-  <div class="trpModalSubtext">You need to request access to this Troupe to join.</div>
-  <div class="trpModalRequestForm">
-   <!-- don't show the input fields if the user is already signed in, but do show the submit button -->
-    <form id="requestAccess">
-      <input type="hidden" name="troupeUri" value="{{troupeUri}}">
-      {{^authenticated}}
-          <input type="text" size="5" name="name" placeholder="Name" id="name" class="trpInput f-name requried">&nbsp;
-          <input type="text" name="email" placeholder="Email address" id="email" class="trpInput f-email required email">
-      {{/authenticated}}
-      <div class="trpRequestSubmit">
-       <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen signin" id="submit-button">Ask to join</button>
-       <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="cancel-button">Cancel</button>
-      </div>
-    </form>
+  <div id="request-form">
+    <div class="trpModalTitle">Ask to join</div>
+    <div class="trpModalSubtext">You need to request access to this Troupe to join.</div>
+    <div class="trpModalRequestForm">
+     <!-- don't show the input fields if the user is already signed in, but do show the submit button -->
+      <form id="requestAccess">
+        <input type="hidden" name="troupeUri" value="{{troupeUri}}">
+        {{^authenticated}}
+            <input type="text" size="5" name="name" placeholder="Name" id="name" class="trpInput f-name requried">&nbsp;
+            <input type="text" name="email" placeholder="Email address" id="email" value="{{email}}" class="trpInput f-email required email">
+        {{/authenticated}}
+        <div class="trpRequestSubmit">
+         <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen signin" id="submit-button">Ask to join</button>
+         <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="cancel-button">Cancel</button>
+        </div>
+      </form>
+    </div>
   </div>
+
+  <div class="modal-content" id="modal-failure-userExists" style="display: none">
+    <div class="trpModalTitle">Sorry</div>
+    <div class="trpModalSubtext">Please login before you can request access. The email address you provided is already registered on troupe.</div>
+  </div>
+
   {{^authenticated}}
-     <!-- don't show this div if the user is already signed in -->
+    <!-- don't show this div if the user is already signed in -->
     <div class="trpModalExistingUsers" id="existing-user">
     Existing user? Click here to login.
     </div>
   {{/authenticated}}
-  <div class="trpModalFailure request-failure" style="display:none">
-    <span class="trpModalTitle"><span class="trpModalFailureText" id="failure-text">Invite failed.</span></span>
-  </div>
+
 </div>
+
 <div class="modal-success">
   <div class="trpModalTitle">Request has been sent</div>
   <div class="trpModalSubtext">The members of the Troupe have been notified about your request. Once you've been accepted, you'll receive an email to let you know.<br><br>
@@ -34,6 +41,4 @@
     {{/authenticated}}
       <a href="javascript:history.back();" class="trpModalButton trpButtonBig trpBtnGrey" id="cancel-button">Close</a>
   </div>
-  <div>
 </div>
-

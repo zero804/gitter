@@ -6,8 +6,8 @@ define([
   'views/base',
   'hbs!./tmpl/profileView',
   'fineuploader',
-  'jquery_validate', // no ref
-  'jquery_placeholder'
+  'jquery-validate', // no ref
+  'jquery-placeholder'
 ], function($, _, TroupeViews, template, qq) {
 
   var View = TroupeViews.Base.extend({
@@ -35,6 +35,11 @@ define([
       "submit form#updateprofileform": "onFormSubmit",
       "keyup #password": "onPasswordChange",
       "change #password": "onPasswordChange"
+    },
+
+    resizeUploader: function() {
+      $('.button-choose-avatar input').css('margin-left','-40px');
+      $('.button-choose-avatar input').css('font-size','12px');
     },
 
     afterRender: function() {
@@ -68,6 +73,9 @@ define([
           }
         }
       });
+
+      // This is a horrid hack to get the uploader button working properly in Firefox
+      setTimeout(function(){self.resizeUploader();},1000);
 
       // will bind to submit and change events, will not validate immediately.
       this.validateForm();

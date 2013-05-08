@@ -12,7 +12,7 @@ var assert = require('assert');
 describe('passport', function() {
   describe('acceptClientStrategy', function() {
 
-    var strategy = passport.inviteAcceptStrategy;
+    var strategy = passport.testOnly.inviteAcceptStrategy;
     var confirmationCode = 'TEST-CONFIRM-' + Date.now();
     var email = 'passport-test-user-' + Date.now() + '@troupetest.local';
     var troupeUri = 'testtroupe1';

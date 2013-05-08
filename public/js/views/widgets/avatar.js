@@ -22,18 +22,22 @@ define([
       // it will listen to changes on the global user collection,
       // so that it knows when to update.
       var avatarChange = _.bind(function avatarChangeUnbound(event, data) {
+
         if(data.id === self.getUserId()) {
           if(self.user) {
             self.user = data;
           }
 
-          self.render();
+          // re-rendering every avatar when the presence changes is excessive, especially for the viewer's own avatars
+          self.updatePresence();
+          self.updateTooltip();
+          self.updateAvatar();
         }
       }, this);
 
       var isModel = !!this.model;
       if (isModel) {
-        this.listenTo(this.model, 'change', avatarChange);
+        this.listenTo(this.model, 'change:displayName', avatarChange);
       } else {
         // Unfortunately we can't use listenTo with jquery events
         $(document).on('avatar:change', avatarChange);
@@ -42,6 +46,21 @@ define([
         });
 
       }
+    },
+
+    updatePresence: function() {
+      if (this.showStatus) {
+        this.$el.find('.trpDisplayPicture').toggleClass('online', this.user.online);
+        this.$el.find('.trpDisplayPicture').toggleClass('offline', !this.user.online);
+      }
+    },
+
+    updateAvatar: function() {
+      this.$el.find('.trpDisplayPicture').css({ 'background-image': "url('" + ((this.avatarSize == 'm') ? this.user.avatarUrlMedium : this.user.avatarUrlSmall) + "')" });
+    },
+
+    updateTooltip: function() {
+      this.$el.find('.trpDisplayPicture').attr('data-original-title', this.user.displayName + "\n" + ((this.user.location) ? this.user.location.description : ""));
     },
 
     getUserId: function() {
@@ -74,6 +93,9 @@ define([
       var dom = this.template(this.getRenderData());
       this.$el.html(dom);
 
+      this.updateAvatar();
+      this.updateTooltip();
+      this.updatePresence();
       if (!window._troupeCompactView && (this.model ? this.model.get('displayName') : this.user.displayName)) {
         this.$el.find(':first-child').tooltip({
           html : true,
