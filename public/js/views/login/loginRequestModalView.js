@@ -15,6 +15,7 @@ define([
 
     initialize: function(options) {
       if(options) {
+        this.initialEmail = options.email;
         this.authenticated = options.authenticated;
       }
 
@@ -23,6 +24,7 @@ define([
 
     getRenderData: function() {
       return {
+        email: this.initialEmail,
         homeUrl: window.troupeContext.homeUrl,
         troupeUri: window.location.pathname.replace(/\//g,''),
         authenticated: this.authenticated
@@ -81,6 +83,10 @@ define([
         });
     },
 
+    getEmail: function() {
+      return this.$el.find('input[name=email]').val();
+    },
+
     showLoginForm: function(e) {
       this.trigger('request.login');
     },
@@ -102,7 +108,14 @@ define([
             $('.modal-success').show();
             return;
           }
-          alert('Something went wrong. Oppsie daisy.');
+
+          if(data.userExists) {
+            $('#request-form').hide();
+            $('#modal-failure-userExists').show();
+            return;
+          }
+
+          alert('Something went wrong. Oopsie daisy.');
 
         }
       });

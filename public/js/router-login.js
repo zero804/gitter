@@ -29,17 +29,17 @@ require([
           window.location.reload();
         });
         loginModal.view.on('request.access', function() {
-          getRequestModal();
+          getRequestModal(loginModal.view.getEmail());
           loginModal.transitionTo(requestModal);
         });
 
         return loginModal;
       }
 
-      function getRequestModal() {
-        requestModal = new TroupeViews.Modal({ view: new RequestModalView({ }), disableClose: true });
+      function getRequestModal(email) {
+        requestModal = new TroupeViews.Modal({ view: new RequestModalView({ email: email }), disableClose: true });
         requestModal.view.on('request.login', function() {
-          getLoginModal("");
+          getLoginModal(requestModal.view.getEmail());
           requestModal.transitionTo(loginModal);
         });
 
