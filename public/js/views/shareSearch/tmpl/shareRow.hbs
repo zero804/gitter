@@ -1,0 +1,7 @@
+<div class="invite trpInviteItem" data-value="{{value}}">
+  <div class="trpDisplayPicture avatar-xs trpSearchInviteResult {{#user.offline}}offline{{/user.offline}} {{#user.online}}online{{/user.online}}" style="background-image: url('{{user.avatarUrlSmall}}');"></div>
+    <div class="trpInviteName">{{user.displayName}}</div>
+    <span class="trpRemoveInvite">
+      <img class="removeInvite" data-value="{{value}}" src='{{cdn "images/2/icon-close-white.png" }}' style="vertical-align: text-top">
+    </span>
+</div>
