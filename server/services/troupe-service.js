@@ -213,9 +213,18 @@ function findAllUnusedInvitesForTroupe(troupeId, callback) {
 function removeUserFromTroupe(troupeId, userId, callback) {
    findById(troupeId, function(err, troupe) {
       // TODO: Add the user to a removeUsers collection
-      // TODO: Let the user know that they've been removed from the troupe
-      troupe.removeUserById(userId);
-      troupe.save(callback);
+      var deleteRecord = new persistence.TroupeDeletedUser({
+        userId: userId,
+        troupeId: troupeId
+      });
+
+      deleteRecord.save(function(err) {
+        if(err) return callback(err);
+
+        // TODO: Let the user know that they've been removed from the troupe (via email or something)
+        troupe.removeUserById(userId);
+        troupe.save(callback);
+      });
    });
 }
 

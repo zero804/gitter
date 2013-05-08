@@ -1,7 +1,7 @@
 #!/usr/bin/env mocha --ignore-leaks
 
 /*jslint node:true, unused:true*/
-/*global describe:true, it:true, afterEach:true */
+/*global describe:true, it:true, afterEach:true, before:true */
 "use strict";
 
 var testRequire = require('../test-require');
@@ -12,6 +12,8 @@ var mockito = require('jsmockito').JsMockito;
 
 var times = mockito.Verifiers.times;
 var once = times(1);
+
+var fixture = {};
 
 function testInviteAcceptance(email, userStatus, emailNotificationConfirmationMethod, done) {
   var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
@@ -450,6 +452,52 @@ describe('troupe-service', function() {
 
     });
 
+  });
+
+  describe('#deleteTroupe()', function() {
+    it('should allow an ACTIVE troupe with a single user to be deleted', function(done) {
+      var troupeService = testRequire('./services/troupe-service');
+
+      var troupe = new persistence.Troupe({ status: 'ACTIVE' });
+      troupe.addUserById(fixture.user1.id);
+      troupe.save(function(err) {
+        if(err) return done(err);
+
+        troupeService.deleteTroupe(troupe, function(err) {
+          if(err) return done(err);
+
+          troupeService.findById(troupe.id, function(err, troupe) {
+            if(err) return done(err);
+
+            var earlier = new Date(Date.now() - 10000);
+
+            persistence.TroupeRemovedUser.find({
+              troupeId: troupe.id,
+              userId: fixture.user1.id,
+              dateDeleted: { $gt: earlier }
+            }, function(err, entry) {
+              if(err) return done(err);
+
+              assert(entry, 'Expected a troupeRemoved entry');
+
+              assert.equal('DELETED', troupe.status);
+              assert.strictEqual(0, troupe.users.length);
+              done();
+
+            });
+
+          });
+        });
+      });
+
+    });
+  });
+
+  before(function(done) {
+    persistence.User.findOne({ email: 'testuser@troupetest.local' }, function(err, user1) {
+      fixture.user1 = user1;
+      done();
+    });
   });
 
   afterEach(function(done) {
