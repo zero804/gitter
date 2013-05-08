@@ -29,15 +29,13 @@ define([
           }
 
           // re-rendering every avatar when the presence changes is excessive, especially for the viewer's own avatars
-          self.updatePresence();
-          self.updateTooltip();
-          self.updateAvatar();
+          self.update();
         }
       }, this);
 
       var isModel = !!this.model;
       if (isModel) {
-        this.listenTo(this.model, 'change:displayName', avatarChange);
+        this.listenTo(this.model, 'change', avatarChange);
       } else {
         // Unfortunately we can't use listenTo with jquery events
         $(document).on('avatar:change', avatarChange);
@@ -48,19 +46,26 @@ define([
       }
     },
 
-    updatePresence: function() {
+    update: function() {
+      var data = this.getRenderData();
+      this.updatePresence(data);
+      this.updateAvatar(data);
+      this.updateTooltip(data);
+    },
+
+    updatePresence: function(data) {
       if (this.showStatus) {
-        this.$el.find('.trpDisplayPicture').toggleClass('online', this.user.online);
-        this.$el.find('.trpDisplayPicture').toggleClass('offline', !this.user.online);
+        this.$el.find('.trpDisplayPicture').toggleClass('online', data.online);
+        this.$el.find('.trpDisplayPicture').toggleClass('offline', !data.online);
       }
     },
 
-    updateAvatar: function() {
-      this.$el.find('.trpDisplayPicture').css({ 'background-image': "url('" + ((this.avatarSize == 'm') ? this.user.avatarUrlMedium : this.user.avatarUrlSmall) + "')" });
+    updateAvatar: function(data) {
+      this.$el.find('.trpDisplayPicture').css({ 'background-image': "url('" + data.avatarUrl + "')" });
     },
 
-    updateTooltip: function() {
-      this.$el.find('.trpDisplayPicture').attr('data-original-title', this.user.displayName + "\n" + ((this.user.location) ? this.user.location.description : ""));
+    updateTooltip: function(data) {
+      this.$el.find('.trpDisplayPicture').attr('data-original-title', data.tooltip);
     },
 
     getUserId: function() {
@@ -83,6 +88,7 @@ define([
         avatarUrl: avatarUrl,
         avatarSize: this.avatarSize,
         userLocation: user.location ? user.location.description : "",
+        tooltip: user.displayName + "\n" + ((user.location) ? user.location.description : ""),
         online: online,
         offline: !online
       };
@@ -90,12 +96,13 @@ define([
 
     // TODO: use base classes render() method
     render: function() {
-      var dom = this.template(this.getRenderData());
+      var data = this.getRenderData();
+      var dom = this.template(data);
       this.$el.html(dom);
 
-      this.updateAvatar();
-      this.updateTooltip();
-      this.updatePresence();
+      this.updateAvatar(data);
+      this.updateTooltip(data);
+      this.updatePresence(data);
       if (!window._troupeCompactView && (this.model ? this.model.get('displayName') : this.user.displayName)) {
         this.$el.find(':first-child').tooltip({
           html : true,
