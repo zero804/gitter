@@ -37,7 +37,6 @@ if(nconf.get("mongo:profileSlowQueries")) {
 }
 
 connection.on('error', function(err) {
-
   winston.info("MongoDB connection error", { exception: err });
   console.error(err);
   if(err.stack) console.log(err.stack);
@@ -151,9 +150,10 @@ TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
 var TroupeSchema = new Schema({
   name: { type: String },
   uri: { type: String },
-  status: { type: String, "enum": ['INACTIVE', 'ACTIVE'], "default": 'INACTIVE'},
+  status: { type: String, "enum": ['ACTIVE', 'DELETED'], "default": 'ACTIVE'},
   oneToOne: { type: Boolean, "default": false },
   users: [TroupeUserSchema],
+  dateDeleted: { type: Date },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 TroupeSchema.index({ uri: 1 });
@@ -438,6 +438,17 @@ var OAuthAccessToken = mongoose.model('OAuthAccessToken', OAuthAccessTokenSchema
 var GeoPopulatedPlace = mongoose.model('GeoPopulatedPlaces', GeoPopulatedPlaceSchema);
 
 var PushNotificationDevice = mongoose.model('PushNotificationDevice', PushNotificationDeviceSchema);
+
+
+//
+//
+//
+Troupe.update({ status: 'INACTIVE' }, { status: 'ACTIVE' }, { multi: true }, function (err, numberAffected) {
+  if (err) return winston.error(err);
+  if(numberAffected > 0) {
+    winston.warn('Updated ' + numberAffected + ' INACTIVE troupes to status ACTIVE');
+  }
+});
 
 
 module.exports = {

@@ -2,7 +2,6 @@
 "use strict";
 
 var troupeService = require("../../services/troupe-service");
-var persistence = require("../../services/persistence-service");
 var restSerializer = require("../../serializers/rest-serializer");
 var Fiber = require("../../utils/fiber");
 
@@ -87,12 +86,21 @@ module.exports = {
 
   },
 
+  destroy: function(req, res, next) {
+    troupeService.deleteTroupe(req.troupe, function(err) {
+      if(err) return next(err);
+
+      res.send(200);
+    });
+  },
+
   load: function(req, id, callback) {
     if(!req.user) return callback(401);
 
     troupeService.findById(id, function(err, troupe) {
       if(err) return callback(500);
       if(!troupe) return callback(404);
+      if(troupe.status != 'ACTIVE') return callback(404);
 
       if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
         return callback(403);
