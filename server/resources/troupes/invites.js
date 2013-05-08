@@ -31,7 +31,7 @@ module.exports = {
 
       for(var i = 0; i < invites.length; i++) {
         var share = invites[i];
-        troupeService.inviteUserByEmail(req.troupe, req.user.displayName, share.displayName, share.email, f.waitor());
+        troupeService.inviteUserToTroupe(req.troupe, req.user.displayName, share, f.waitor());
       }
 
       f.all().then(function() {

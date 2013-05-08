@@ -118,7 +118,7 @@ fetch-client-libs:
 	bower install
 
 install-client-libs:
-	grunt client-libs
+	grunt client-libs # --disableMinifiedSource=true
 	ls -d output/client-libs/*|sed -e 's!output/client-libs/!public/repo/!'|sed -e 's!retina.js-js!retina!'|sed -e 's!typeahead.js!typeahead!'|xargs mkdir -p
 	cp output/client-libs/almond/almond.js public/repo/almond/almond.js
 	cp output/client-libs/assert/assert-amd.js public/repo/assert/assert.js
@@ -127,6 +127,7 @@ install-client-libs:
 	cp output/client-libs/backbone.keys/dist/backbone.keys.min.js public/repo/backbone.keys/backbone.keys.js
 	cp output/client-libs/backbone.wreqr/lib/amd/backbone.wreqr.min.js public/repo/backbone.wreqr/backbone.wreqr.js
 	cp output/client-libs/bootstrap/bootstrap-tooltip.js public/repo/bootstrap/tooltip.js
+	cp output/client-libs/bootstrap/bootstrap-typeahead.js public/repo/bootstrap/typeahead.js
 	cp output/client-libs/cubism/cubism.v1.min.js public/repo/cubism/cubism.js
 	cp output/client-libs/d3/d3.min.js public/repo/d3/d3.js
 	cp output/client-libs/expect/expect-amd.js public/repo/expect/expect.js
@@ -142,7 +143,7 @@ install-client-libs:
 	cp output/client-libs/jquery/jquery.min.js public/repo/jquery/jquery.js
 	cp output/client-libs/jquery/jquery-migrate-amd.js public/repo/jquery/jquery-migrate.js
 	cp output/client-libs/jquery-placeholder/jquery.placeholder-amd.js public/repo/jquery-placeholder/jquery-placeholder.js
-	cp output/client-libs/jquery-validate/jquery.validate-amd.js public/repo/jquery-validate/jquery-validate.js
+	cp output/client-libs/jquery.validation/jquery.validate-amd.js public/repo/jquery.validation/jquery.validation.js
 	cp output/client-libs/mocha/mocha-amd.js public/repo/mocha/mocha.js
 	cp output/client-libs/mocha/mocha.css public/repo/mocha/mocha.css
 	cp output/client-libs/moment/min/moment.min.js public/repo/moment/moment.js
