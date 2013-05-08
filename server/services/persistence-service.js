@@ -159,6 +159,7 @@ var TroupeSchema = new Schema({
 TroupeSchema.index({ uri: 1 });
 TroupeSchema.schemaTypeName = 'TroupeSchema';
 
+
 TroupeSchema.methods.getUserIds = function() {
   return this.users.map(function(troupeUser) { return troupeUser.userId; });
 };
@@ -221,7 +222,13 @@ TroupeSchema.methods.removeUserById = function(userId) {
 };
 
 
-
+var TroupeRemovedUserSchema = new Schema({
+  userId: { type: ObjectId },
+  troupeId: { type: ObjectId },
+  dateDeleted: { type: Date, "default": Date.now }
+});
+TroupeRemovedUserSchema.index({ userId: 1 });
+TroupeRemovedUserSchema.schemaTypeName = 'TroupeRemovedUserSchema';
 
 //
 // An invitation to a person to join a Troupe
@@ -422,6 +429,7 @@ var UserTroupeFavourites = mongoose.model('UserTroupeFavourites', UserTroupeFavo
 
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var TroupeUser = mongoose.model('TroupeUser', TroupeUserSchema);
+var TroupeRemovedUser = mongoose.model('TroupeRemovedUser', TroupeRemovedUserSchema);
 var Email = mongoose.model('Email', EmailSchema);
 var EmailAttachment = mongoose.model('EmailAttachment', EmailAttachmentSchema);
 var Conversation = mongoose.model('Conversation', ConversationSchema);
@@ -441,7 +449,7 @@ var PushNotificationDevice = mongoose.model('PushNotificationDevice', PushNotifi
 
 
 //
-//
+// 8-May-2013: Delete this after it's been rolled into production!
 //
 Troupe.update({ status: 'INACTIVE' }, { status: 'ACTIVE' }, { multi: true }, function (err, numberAffected) {
   if (err) return winston.error(err);
@@ -459,6 +467,7 @@ module.exports = {
     UserTroupeFavouritesSchema: UserTroupeFavouritesSchema,
     TroupeSchema: TroupeSchema,
     TroupeUserSchema: TroupeUserSchema,
+    TroupeRemovedUserSchema: TroupeRemovedUserSchema,
     EmailSchema: EmailSchema,
     EmailAttachmentSchema: EmailAttachmentSchema,
     ConversationSchema: ConversationSchema,
@@ -478,6 +487,7 @@ module.exports = {
   UserTroupeFavourites: UserTroupeFavourites,
   Troupe: Troupe,
   TroupeUser: TroupeUser,
+  TroupeRemovedUser: TroupeRemovedUser,
 	Email: Email,
   EmailAttachment: EmailAttachment,
   Conversation: Conversation,
