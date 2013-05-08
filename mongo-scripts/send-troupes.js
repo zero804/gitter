@@ -13,8 +13,7 @@ var ts = Math.round((new Date()).getTime() / 1000);
 
 var TroupeSchema = new Schema({
   name: { type: String },
-  uri: { type: String },
-  status: { type: String, "enum": ['INACTIVE', 'ACTIVE'], "default": 'INACTIVE'}
+  uri: { type: String }
 });
 
 var Troupes = mongoose.model('troupes', TroupeSchema);
@@ -28,7 +27,7 @@ mongoose.connection.on("open", function(){
       }
       else{
         console.log('OK! Sent Troupes number: ' + count + ' at ' + ts);
-        process.exit(code=0)
+        process.exit(0);
       }
     });
   });

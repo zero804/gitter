@@ -432,7 +432,14 @@ define([
 
 
     _recount: function() {
+      var self = this;
       function count(memo, troupe) {
+        if(window.troupeContext && window.troupeContext.troupe) {
+          if(troupe.get('id') === window.troupeContext.troupe.id) {
+            return memo + (self._store._currentCount() > 0 ? 1 : 0);
+          }
+        }
+
         var c = troupe.get('unreadItems');
         return memo + (c > 0 ? 1 : 0);
       }
