@@ -150,7 +150,8 @@ function validateTroupeEmailAndReturnDistributionList(options, callback) {
  */
 function validateTroupeUrisForUser(userId, uris, callback) {
   persistence.Troupe
-    .where('uri').in(uris)
+    .where('uri')['in'](uris)
+    .where('status', 'ACTIVE')
     .exec(function(err, troupes) {
       if(err) return callback(err);
 
@@ -211,6 +212,8 @@ function findAllUnusedInvitesForTroupe(troupeId, callback) {
 
 function removeUserFromTroupe(troupeId, userId, callback) {
    findById(troupeId, function(err, troupe) {
+      // TODO: Add the user to a removeUsers collection
+      // TODO: Let the user know that they've been removed from the troupe
       troupe.removeUserById(userId);
       troupe.save(callback);
    });
@@ -304,6 +307,8 @@ function acceptRequest(request, callback) {
   findById(request.troupeId, function(err, troupe) {
     if(err) return callback(err);
     if(!troupe) { winston.error("Unable to find troupe", request.troupeId); return callback("Unable to find troupe"); }
+
+    if(troupe.status != 'ACTIVE') callback({ troupeNoLongerActive: true });
 
     findUserByIdEnsureConfirmationCode(request.userId, function(err, user) {
       if(err) return callback(err);
@@ -618,6 +623,7 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
         findById(invite.troupeId, function(err, troupe) {
           if(err) return callback(err);
           if(!troupe) return callback(404);
+          if(troupe.status != 'ACTIVE') return callback({ troupeNoLongerActive: true });
 
           var originalStatus = invite.status;
           if(originalStatus != 'UNUSED') {
@@ -642,6 +648,16 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
     }
 
   });
+}
+
+function deleteTroupe(troupe, callback) {
+  if(troupe.status != 'ACTIVE') return callback("Troupe is not active");
+  if(troupe.users.length !== 1) return callback("Can only delete troupes that have a single user");
+
+  troupe.status = 'DELETED';
+  troupe.dateDeleted = new Date();
+  troupe.removeUserById(troupe.users[0].userId);
+  troupe.save(callback);
 }
 
 module.exports = {
@@ -672,6 +688,7 @@ module.exports = {
   findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
   upgradeOneToOneTroupe: upgradeOneToOneTroupe,
   createUniqueUri: createUniqueUri,
+  deleteTroupe: deleteTroupe,
 
   updateFavourite: updateFavourite,
   findFavouriteTroupesForUser: findFavouriteTroupesForUser,
