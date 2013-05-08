@@ -240,6 +240,7 @@ function preloadTroupeMiddleware(req, res, next) {
   troupeService.findByUri(appUri, function(err, troupe) {
     if (err) return next({ errorCode: 500, error: err });
     if(!troupe) return next({ errorCode: 404 });
+    if(troupe.status != 'ACTIVE') return next({ errorCode: 404 });
     req.troupe = troupe;
     next();
   });
