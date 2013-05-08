@@ -301,6 +301,30 @@ module.exports = {
         }
       );
 
+      app.get('/last',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        function(req, res, next) {
+
+          troupeService.findBestTroupeForUser(req.user, function(err, troupe) {
+            if(err || !troupe) next(err);
+
+            res.relativeRedirect(troupe.getUrl(req.user.id));
+          });
+      });
+
+      app.get('/last/:page',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        function(req, res, next) {
+
+          troupeService.findBestTroupeForUser(req.user, function (err, troupe) {
+            if (err || !troupe) next(err);
+
+            res.relativeRedirect(troupe.getUrl(req.user.id) + "/" + req.params.page);
+          });
+        });
+
 
       app.get('/one-one/:userId/preload',
         middleware.grantAccessForRememberMeTokenMiddleware,
@@ -395,35 +419,6 @@ module.exports = {
         middleware.authenticate('accept', {}),
         function(req, res/*, next*/) {
           res.relativeRedirect("/" + req.params.troupeUri);
-        });
-
-      app.get('/last/:page',
-        middleware.grantAccessForRememberMeTokenMiddleware,
-        middleware.ensureLoggedIn(),
-        function(req, res, next) {
-
-          function findDefaultTroupeForUser() {
-            userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
-              if (err || !troupe) {
-                next(500);
-              }
-
-              res.redirect('/' + troupe.uri + "/" + req.params.page);
-            });
-          }
-
-          if (req.user.lastTroupe) {
-            troupeService.findById(req.user.lastTroupe, function (err,troupe) {
-              if (err || !troupe || !troupeService.userHasAccessToTroupe(req.user, troupe)) {
-                findDefaultTroupeForUser();
-                return;
-              }
-
-              res.redirect('/' + troupe.uri + "/" + req.params.page);
-            });
-          } else {
-            findDefaultTroupeForUser();
-          }
         });
 
       app.get('/:appUri/chat',
