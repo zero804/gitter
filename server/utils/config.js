@@ -4,12 +4,21 @@
 
 var nconf = require('nconf');
 var Fiber = require('./fiber');
+var fs = require('fs');
 var EventEmitter = require('events').EventEmitter;
 
 /* Load configuration parameters */
 var nodeEnv = process.env['NODE_ENV'];
 if(!nodeEnv) {
-  nodeEnv = 'dev';
+  var exists = fs.existsSync('/opt/troupe/etc/environment');
+  if(exists) {
+    nodeEnv = fs.readFileSync('/opt/troupe/etc/environment', { encoding: 'ascii' });
+  }
+
+  if(!nodeEnv) {
+    nodeEnv = 'dev';
+  }
+
   process.env['NODE_ENV'] = nodeEnv;
 }
 

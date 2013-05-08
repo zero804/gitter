@@ -31,18 +31,18 @@ function deleteTroupe(troupeId, callback) {
         file.remove(f.waitor());
       });
 
-      return fileWaitor();
+      return fileWaitor(null, files.length);
     });
+    troupe.remove(f.waitor());
 
-    f.all().then(function(results) {
-      console.log("RESULTS!!!", results);
-      callback();
+    f.all().spread(function(chats, removedUsers, invites, requests, conversations, files) {
+      callback(null, chats, removedUsers, invites, requests, conversations, files);
     }, callback);
   });
 }
 
 function deleteEligibleTroupes(callback) {
-  var roughlyOneWeekAgo = new Date(Date.now() - 0/*7 * 86400 * 1000*/);
+  var roughlyOneWeekAgo = new Date(Date.now() - 7 * 86400 * 1000);
 
   persistence.Troupe
     .where('status').equals('DELETED')
@@ -57,7 +57,21 @@ function deleteEligibleTroupes(callback) {
         deleteTroupe(troupe.id, f.waitor());
       });
 
-      f.all().then(function() { callback(null, troupes.length); }, callback);
+      f.all().then(function(counts) {
+        var totals = counts.reduce(function(memo, count) {
+          memo.chats          = (memo.chats || 0) + count[0];
+          memo.removedUsers   = (memo.removedUsers || 0) + count[1];
+          memo.invites        = (memo.invites || 0) + count[2];
+          memo.requests       = (memo.requests || 0) + count[3];
+          memo.conversations  = (memo.conversations || 0) + count[4];
+          memo.files          = (memo.files || 0) + count[5];
+          return memo;
+        }, {});
+
+        totals.troupes = troupes.length;
+
+        callback(null, totals);
+      }, callback);
     });
 }
 
