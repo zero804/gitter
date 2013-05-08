@@ -207,35 +207,30 @@ describe('troupe-service', function() {
         if(err) return done(err);
         if(!troupe) return done("Cannot find troupe");
 
-        persistence.User.findOne({ email: 'testuser@troupetest.local' }, function(err, user) {
-          if(err) return done(err);
-          if(!user) return done("Cannot find user");
+        function fav(val, callback) {
+          troupeService.updateFavourite(fixture.user1.id, troupe.id, val, function(err) {
+            if(err) return done(err);
 
-          function fav(val, callback) {
-            troupeService.updateFavourite(user.id, troupe.id, val, function(err) {
+            troupeService.findFavouriteTroupesForUser(fixture.user1.id, function(err, favs) {
               if(err) return done(err);
 
-              troupeService.findFavouriteTroupesForUser(user.id, function(err, favs) {
-                if(err) return done(err);
-
-                var isInTroupe = !!favs[troupe.id];
-                assert(isInTroupe === val, 'Troupe should ' + (val? '': 'not ') + 'be a favourite');
-                callback();
-              });
+              var isInTroupe = !!favs[troupe.id];
+              assert(isInTroupe === val, 'Troupe should ' + (val? '': 'not ') + 'be a favourite');
+              callback();
             });
-          }
+          });
+        }
 
+        fav(true, function() {
           fav(true, function() {
-            fav(true, function() {
+            fav(false, function() {
               fav(false, function() {
-                fav(false, function() {
-                  done();
-                });
+                done();
               });
             });
           });
-
         });
+
       });
 
     });
@@ -337,73 +332,62 @@ describe('troupe-service', function() {
 
     it('should handle the upgrade of a oneToOneTroupe', function(done) {
 
-      persistence.User.findOne({ email: 'testuser@troupetest.local' }, function(err, user1) {
+      troupeService.findOrCreateOneToOneTroupe(fixture.user1.id, fixture.user2.id, function(err, troupe) {
         if(err) return done(err);
-        if(!user1) return done('Cannot find user');
+        if(!troupe) return done('Cannot find troupe');
 
-        persistence.User.findOne({ email: 'testuser2@troupetest.local' }, function(err, user2) {
+        var name = 'Upgraded one-to-one ' + new Date();
+        var inviteEmail =  'testinvite' + Date.now() + '@troupetest.local';
+
+        troupeService.createNewTroupeForExistingUser({
+          user: fixture.user1,
+          name: name,
+          oneToOneTroupeId: troupe.id,
+          invites: [
+            { displayName: 'John McTestaroo', email: inviteEmail }
+          ]
+        }, function(err, newTroupe) {
           if(err) return done(err);
-          if(!user2) return done('Cannot find user');
+          if(!newTroupe) return done('New troupe not created');
 
-          troupeService.findOrCreateOneToOneTroupe(user1.id, user2.id, function(err, troupe) {
+          assert(newTroupe.name === name, 'New Troupe name is wrong');
+
+          assert(troupeService.userIdHasAccessToTroupe(fixture.user1.id, newTroupe), 'User1 is supposed to be in the new troupe');
+          assert(troupeService.userIdHasAccessToTroupe(fixture.user2.id, newTroupe), 'User2 is supposed to be in the new troupe');
+
+          persistence.Invite.findOne({ email: inviteEmail, troupeId: newTroupe.id }, function(err, invite) {
             if(err) return done(err);
-            if(!troupe) return done('Cannot find troupe');
+            assert(invite, 'Could not find the invite');
+            assert(invite.displayName === 'John McTestaroo', 'Invite has an incorrect displayName');
 
-            var name = 'Upgraded one-to-one ' + new Date();
-            var inviteEmail =  'testinvite' + Date.now() + '@troupetest.local';
-
-            troupeService.createNewTroupeForExistingUser({
-              user: user1,
-              name: name,
-              oneToOneTroupeId: troupe.id,
-              invites: [
-                { displayName: 'John McTestaroo', email: inviteEmail }
-              ]
-            }, function(err, newTroupe) {
+            troupeService.acceptInvite(invite.code, newTroupe.uri, function(err, user, alreadyUsed) {
               if(err) return done(err);
-              if(!newTroupe) return done('New troupe not created');
+              assert(!alreadyUsed, 'Expected alreadyUsed to be falsey');
+              assert(user, 'Expected the user to be confirmed');
 
-              assert(newTroupe.name === name, 'New Troupe name is wrong');
-
-              assert(troupeService.userIdHasAccessToTroupe(user1.id, newTroupe), 'User1 is supposed to be in the new troupe');
-              assert(troupeService.userIdHasAccessToTroupe(user2.id, newTroupe), 'User2 is supposed to be in the new troupe');
-
-              persistence.Invite.findOne({ email: inviteEmail, troupeId: newTroupe.id }, function(err, invite) {
+              // The only reason this should work is that the user should still be PROFILE_NOT_COMPLETED
+              troupeService.acceptInvite(invite.code, newTroupe.uri, function(err, user, alreadyUsed) {
                 if(err) return done(err);
-                assert(invite, 'Could not find the invite');
-                assert(invite.displayName === 'John McTestaroo', 'Invite has an incorrect displayName');
+                assert(!alreadyUsed, 'Expected alreadyUsed to be falsey');
+                assert(user, 'Expected the user to be returned');
 
-                troupeService.acceptInvite(invite.code, newTroupe.uri, function(err, user, alreadyUsed) {
+                persistence.User.update({ _id: user._id }, { status: 'ACTIVE'}, function(err, numResults) {
                   if(err) return done(err);
-                  assert(!alreadyUsed, 'Expected alreadyUsed to be falsey');
-                  assert(user, 'Expected the user to be confirmed');
+                  if(numResults !== 1) return done("Expected one update result");
 
-                  // The only reason this should work is that the user should still be PROFILE_NOT_COMPLETED
                   troupeService.acceptInvite(invite.code, newTroupe.uri, function(err, user, alreadyUsed) {
                     if(err) return done(err);
-                    assert(!alreadyUsed, 'Expected alreadyUsed to be falsey');
-                    assert(user, 'Expected the user to be returned');
 
-                    persistence.User.update({ _id: user._id }, { status: 'ACTIVE'}, function(err, numResults) {
-                      if(err) return done(err);
-                      if(numResults !== 1) return done("Expected one update result");
-
-                      troupeService.acceptInvite(invite.code, newTroupe.uri, function(err, user, alreadyUsed) {
-                        if(err) return done(err);
-
-                        assert(!user, 'User should not have been returned');
-                        assert(alreadyUsed, 'Expected alreadyUsed to be true');
-                        done();
-                      });
-
-                    });
-
+                    assert(!user, 'User should not have been returned');
+                    assert(alreadyUsed, 'Expected alreadyUsed to be true');
+                    done();
                   });
+
                 });
 
               });
-
             });
+
 
           });
         });
@@ -415,47 +399,105 @@ describe('troupe-service', function() {
 
     it('should handle the creation of a new troupe', function(done) {
 
-      persistence.User.findOne({ email: 'testuser@troupetest.local' }, function(err, user1) {
+      var name = 'Test Troupe for Existing user ' + new Date();
+      var inviteEmail =  'testinvite' + Date.now() + '@troupetest.local';
+
+      troupeService.createNewTroupeForExistingUser({
+        user: fixture.user1,
+        name: name,
+        invites: [
+          { displayName: 'John McTestaroo', email: inviteEmail }
+        ]
+      }, function(err, newTroupe) {
         if(err) return done(err);
-        if(!user1) return done('Cannot find user');
+        if(!newTroupe) return done('New troupe not created');
 
-        var name = 'Test Troupe for Existing user ' + new Date();
-        var inviteEmail =  'testinvite' + Date.now() + '@troupetest.local';
+        assert(newTroupe.name === name, 'New Troupe name is wrong');
 
-        troupeService.createNewTroupeForExistingUser({
-          user: user1,
-          name: name,
-          invites: [
-            { displayName: 'John McTestaroo', email: inviteEmail }
-          ]
-        }, function(err, newTroupe) {
+        assert(troupeService.userIdHasAccessToTroupe(fixture.user1.id, newTroupe), 'User1 is supposed to be in the new troupe');
+
+        persistence.Invite.findOne({ email: inviteEmail, troupeId: newTroupe.id }, function(err, invite) {
           if(err) return done(err);
-          if(!newTroupe) return done('New troupe not created');
+          assert(invite, 'Could not find the invite');
+          assert(invite.displayName === 'John McTestaroo', 'Invite has an incorrect displayName');
 
-          assert(newTroupe.name === name, 'New Troupe name is wrong');
-
-          assert(troupeService.userIdHasAccessToTroupe(user1.id, newTroupe), 'User1 is supposed to be in the new troupe');
-
-          persistence.Invite.findOne({ email: inviteEmail, troupeId: newTroupe.id }, function(err, invite) {
-            if(err) return done(err);
-            assert(invite, 'Could not find the invite');
-            assert(invite.displayName === 'John McTestaroo', 'Invite has an incorrect displayName');
-
+          newTroupe.remove(function() {
             done();
-
           });
 
         });
 
-
       });
+
 
     });
 
   });
 
+
+  describe('#removeUserFromTroupe()', function() {
+    it('#01 should be able to remove a user from a troupe', function(done) {
+      var troupeService = testRequire('./services/troupe-service');
+
+      var troupe = new persistence.Troupe({ status: 'ACTIVE' });
+      troupe.addUserById(fixture.user1.id);
+      troupe.addUserById(fixture.user2.id);
+      troupe.save(function(err) {
+        if(err) return done(err);
+
+        troupeService.removeUserFromTroupe(troupe.id, fixture.user1.id, function(err) {
+          if(err) return done(err);
+
+          troupeService.findById(troupe.id, function(err, troupe) {
+            if(err) return done(err);
+
+            var earlier = new Date(Date.now() - 10000);
+
+            assert.strictEqual(1, troupe.users.length);
+            assert.equal(fixture.user2.id, troupe.users[0].userId);
+
+            persistence.TroupeRemovedUser.find({
+              troupeId: troupe.id,
+              userId: fixture.user1.id,
+              dateDeleted: { $gt: earlier }
+            }, function(err, entry) {
+              if(err) return done(err);
+
+              assert(entry, 'Expected a troupeRemoved entry');
+
+              troupe.remove(function() {
+                done();
+              });
+
+            });
+          });
+        });
+      });
+    });
+
+    it('#02 should not remove a user from a troupe if the user is the last user in the troupe', function(done) {
+      var troupeService = testRequire('./services/troupe-service');
+
+      var troupe = new persistence.Troupe({ status: 'ACTIVE' });
+      troupe.addUserById(fixture.user1.id);
+      troupe.save(function(err) {
+        if(err) return done(err);
+
+        troupeService.removeUserFromTroupe(troupe.id, fixture.user1.id, function(err) {
+          assert(err);
+
+          troupe.remove(function() {
+            done();
+          });
+
+        });
+      });
+    });
+  });
+
+
   describe('#deleteTroupe()', function() {
-    it('should allow an ACTIVE troupe with a single user to be deleted', function(done) {
+    it('#01 should allow an ACTIVE troupe with a single user to be deleted', function(done) {
       var troupeService = testRequire('./services/troupe-service');
 
       var troupe = new persistence.Troupe({ status: 'ACTIVE' });
@@ -482,21 +524,48 @@ describe('troupe-service', function() {
 
               assert.equal('DELETED', troupe.status);
               assert.strictEqual(0, troupe.users.length);
-              done();
+
+              troupe.remove(function() {
+                done();
+              });
 
             });
-
           });
         });
       });
+    });
 
+    it('#02 should NOT allow an ACTIVE troupe with a two users to be deleted', function(done) {
+      var troupeService = testRequire('./services/troupe-service');
+
+      var troupe = new persistence.Troupe({ status: 'ACTIVE' });
+      troupe.addUserById(fixture.user1.id);
+      troupe.addUserById(fixture.user2.id);
+
+      troupe.save(function(err) {
+        if(err) return done(err);
+
+        troupeService.deleteTroupe(troupe, function(err) {
+          assert(err);
+          done();
+        });
+      });
     });
   });
 
   before(function(done) {
     persistence.User.findOne({ email: 'testuser@troupetest.local' }, function(err, user1) {
+      if(err) return done(err);
+
       fixture.user1 = user1;
-      done();
+
+      persistence.User.findOne({ email: 'testuser2@troupetest.local' }, function(err, user2) {
+        if(err) return done(err);
+
+        fixture.user2 = user2;
+        done();
+
+      });
     });
   });
 
