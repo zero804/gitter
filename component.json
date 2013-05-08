@@ -2,7 +2,35 @@
   "name": "troupe",
   "version": "0.0.0",
   "dependencies": {
-    "jquery": "~1.8.3",
-    "bootstrap": "~2.2.1"
+    "jquery": "~1.9.1",
+    "typeahead.js": "~0.9.2",
+    "hbs": "0.4.0",
+    "underscore": "~1.4.4",
+    "backbone.keys": "~0.2.0",
+    "marionette": "~1.0.2",
+    "backbone": "~1.0.0",
+    "moment": "~2.0.0",
+    "backbone.wreqr": "~0.2.0",
+    "backbone.babysitter": "~0.0.5",
+    "jquery-validate": "git://github.com/ffmike/jquery-validate.git",
+    "jquery-placeholder": "~2.0.7",
+    "nanoscroller": "~0.7.2",
+    "zeroclipboard": "~1.1.7",
+    "scrollfix": "git://github.com/joelambert/ScrollFix.git",
+    "retina.js-js": "~1.0.2",
+    "d3": "~3.1.5",
+    "cubism": "git://github.com/square/cubism.git",
+    "faye": "http://faye.jcoglan.com/assets/faye.0-8-9.zip",
+    "filtered-collection": "git://github.com/dlikhten/filtered-collection.git",
+    "bootstrap": "https://github.com/timlind/bootstrap/archive/master.zip",
+    "fine-uploader": "https://github.com/Troupe/fine-uploader/archive/master.zip",
+    "almond": "0.2.5",
+    "requirejs": "http://requirejs.org/docs/release/2.1.5/minified/require.js",
+    "zepto": "~1.0.0"
+  },
+  "devDependencies": {
+    "assert": "~0.0.1",
+    "expect": "~0.2.0",
+    "mocha": "~1.9.0"
   }
 }

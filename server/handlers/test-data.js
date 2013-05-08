@@ -32,7 +32,7 @@ module.exports = {
 
     app.get('/testdata/confirmationLink', function(req, res, next) {
 
-      persistence.User.findOne({ email:  req.query.email }, function(err, user) {
+      persistence.User.findOne({ email:  req.query.email }, null, { sort: { '_id': -1 } }, function(err, user) {
         if(err) return next(err);
         if(!user) return next(404);
 
@@ -48,7 +48,7 @@ module.exports = {
 
     app.get('/testdata/inviteAcceptLink', function(req, res, next) {
 
-      persistence.Invite.findOne({ email:  req.query.email }, function(err, invite) {
+      persistence.Invite.findOne({ email: req.query.email }, null, { sort: { '_id': -1 } }, function(err, invite) {
         if(err) return next(err);
         if(!invite) return next(404);
 
@@ -58,6 +58,18 @@ module.exports = {
 
           res.send("/" + troupe.uri + "/accept/" + invite.code);
         });
+      });
+
+    });
+
+    app.get('/testdata/inviteAcceptLinkByUserId', function(req, res, next) {
+
+      userService.findById(req.query.userId, function(err, user) {
+        if(err) return next(err);
+        if(!user) return next("User not found");
+
+        res.redirect('/testdata/inviteAcceptLink?email='+user.email);
+
       });
     });
 

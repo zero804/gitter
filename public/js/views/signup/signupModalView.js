@@ -5,8 +5,8 @@ define([
   'underscore',
   'views/base',
   'hbs!./tmpl/signupModalView',
-  'jquery_validate',
-  'jquery_placeholder'
+  'jquery-validate',
+  'jquery-placeholder'
 ], function($, _, TroupeViews, template) {
   return TroupeViews.Base.extend({
     template: template,
@@ -78,8 +78,6 @@ define([
         }),
         type: "POST",
         success: function(data) {
-          log(JSON.stringify(data));
-
           if (data.redirectTo) {
             window.location.href = "/" + data.redirectTo;
           }

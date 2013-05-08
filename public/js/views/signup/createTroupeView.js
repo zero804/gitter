@@ -7,8 +7,8 @@ define([
   'hbs!./tmpl/createTroupeView',
   'views/share/shareTableView',
   'log!create-troupe-view',
-  'jquery_validate', // no ref
-  'jquery_placeholder' // no ref
+  'jquery-validate', // no ref
+  'jquery-placeholder' // no ref
 ], function($, _, TroupeViews, template, ShareTableView, log) {
   var View = TroupeViews.Base.extend({
     template: template,
@@ -109,38 +109,18 @@ define([
         invites: this.shareTableView ? this.shareTableView.serialize() : null
       };
 
-      // we are sometimes executing from the signup page which excludes all the app integrated goodness
-      if (this.collection && window.troupeContext) {
+      if (window.troupeContext.troupe.oneToOne && this.upgradeOneToOne) {
+        serializedForm.oneToOneTroupeId = window.troupeContext.troupe.id;
+      }
 
-        if (window.troupeContext.troupe.oneToOne && this.upgradeOneToOne) {
-          serializedForm.oneToOneTroupeId = window.troupeContext.troupe.id;
+      that.collection.create(serializedForm, {
+        url: '/troupes/',
+        wait: true,
+        success: function(troupe /*, resp, options*/) {
+          log('response from upgrading one to one troupe', troupe);
+          window.location.href = "/" + troupe.get('uri') + "#|shareTroupe";
         }
-
-        that.collection.create(serializedForm, {
-          url: '/troupes/',
-          wait: true,
-          success: function(troupe /*, resp, options*/) {
-            log('response from upgrading one to one troupe', troupe);
-            window.location.href = "/" + troupe.get('uri') + "#|shareTroupe";
-          }
-        });
-      }
-      // we are operating from the signup page, without app integrated, so we don't have a collection
-      else {
-        log("Serialized form: ", serializedForm);
-        $.ajax({
-          url: "/signup",
-          contentType: "application/json",
-          dataType: "json",
-          data: JSON.stringify(serializedForm),
-          type: "POST",
-          success: function(data) {
-            if (data.redirectTo) {
-              window.location.href = "/" + data.redirectTo + "#|shareTroupe";
-            }
-          }
-        });
-      }
+      });
     }
 
   });

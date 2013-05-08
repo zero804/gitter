@@ -415,8 +415,9 @@ require([
     it('should broadcast changes to the number of troupes with unread items', function(done) {
       window.troupeContext = { troupe: { id: '1' }, user: { id: 'USER1' } };
 
+      var unreadItemStore = new unreadItemsClient.UnreadItemStore();
       var troupeCollection = new troupeModels.TroupeCollection([{ id: '1' }, { id: '2' } ]);
-      new unreadItemsClient.TroupeUnreadNotifier(troupeCollection);
+      new unreadItemsClient.TroupeUnreadNotifier(troupeCollection, unreadItemStore);
 
       troupeCollection.get('1').set('unreadItems', 1);
       $(document).one('troupeUnreadTotalChange', function(e, counts) {

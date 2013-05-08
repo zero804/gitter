@@ -1,6 +1,5 @@
 /*jshint unused:true, browser:true */
 require([
-  'clwrapper',
   'jquery',
   'views/base',
   'views/signup/signupModalView',
@@ -8,10 +7,10 @@ require([
   'views/login/loginModalView',
   'views/signup/createTroupeView',
   'views/app/messagesView',
-  'jquery_validate', // No ref!
+  'jquery-validate', // No ref!
   'retina'
  ],
-  function(clwrapper, $, TroupeViews, SignupModalView, SignupModalConfirmView, LoginModalView, createTroupeView, MessagesView) {
+  function($, TroupeViews, SignupModalView, SignupModalConfirmView, LoginModalView, createTroupeView, MessagesView) {
     //var loginFormVisible = false;
 
     function createLoginModal() {
@@ -88,7 +87,7 @@ require([
     });
 
     $('#button-appstore').on('click', function () {
-      alert("Coming soon.");
+      window.open('https://itunes.apple.com/app/troupe/id632039322','new');
     });
 
     $('#button-existing-users-login').on('click', function() {

@@ -4,8 +4,8 @@ define([
   'underscore',
   'views/base',
   'hbs!./tmpl/shareRow',
-  'jquery_placeholder', // No reference
-  'jquery_validate'  // No reference
+  'jquery-placeholder', // No reference
+  'jquery-validate'  // No reference
 ], function($, _, TroupeViews, rowTemplate) {
   "use strict";
 

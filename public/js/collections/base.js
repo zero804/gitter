@@ -101,22 +101,27 @@ define([
         this.url = "/troupes/" + window.troupeContext.troupe.id + "/" + this.nestedUrl;
       }
 
-      this.once('reset', function() {
-        $('#' + this.modelName + '-amuse').hide('fast', function() {
-          $(this).remove();
-        });
-
-        if (this.length===0) {
-          $('#' + this.modelName + '-empty').fadeIn('fast');
-        }
-
-      }, this);
+      this.once('reset', this.onInitialLoad, this);
+      this.once('sync', this.onInitialLoad, this);
 
       this.once('error', function() {
         $('#' + this.modelName + '-fail').show('fast', function() {
         });
       }, this);
 
+    },
+
+    onInitialLoad: function() {
+      if(this._initialLoadCalled) return;
+      this._initialLoadCalled = true;
+
+      $('#' + this.modelName + '-amuse').hide('fast', function() {
+        $(this).remove();
+      });
+
+      if (this.length===0) {
+        $('#' + this.modelName + '-empty').fadeIn('fast');
+      }
     },
 
     listen: function(callback) {

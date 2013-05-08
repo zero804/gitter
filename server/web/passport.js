@@ -2,7 +2,6 @@
 "use strict";
 
 var userService = require('../services/user-service');
-var signupService = require('../services/signup-service');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var ConfirmStrategy = require('./confirm-strategy').Strategy;
@@ -74,72 +73,22 @@ function emailPasswordUserStrategy(email, password, done) {
 
 var inviteAcceptStrategy = new ConfirmStrategy({ name: "accept" }, function(confirmationCode, req, done) {
   var self = this;
-  winston.verbose("Invoking accept strategy", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
 
-  troupeService.findInviteByCode(confirmationCode, function(err, invite) {
-    if(err || !invite) {
-      if(err) {
-        winston.error("Error while accepting invite confirmationCode=" + confirmationCode + ": " + err, { exception: err });
-      } else if(!invite) {
-        winston.error("Invite confirmationCode=" + confirmationCode + " not found. Redirecting to troupe. ");
-      }
+  var troupeUri = req.params.troupeUri || req.params.appUri;
 
-      return self.redirect('/' + req.params.troupeUri + '#existing');
+  winston.verbose("Invoking accept strategy", { confirmationCode: confirmationCode, troupeUri: troupeUri });
+
+  troupeService.acceptInvite(confirmationCode, troupeUri, function(err, user, alreadyUsed) {
+    if(err || !user) {
+      return self.redirect('/' + req.params.troupeUri + (alreadyUsed ? '#existing' : ''));
     }
 
-    if(invite.status !== 'UNUSED') {
-      /* The invite has already been used. We need to fail authentication, but go to the troupe */
-      winston.verbose("Invite has already been used", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
-      statsService.event('invite_reused', { uri: req.params.troupeUri });
-
-      // There's a chance a user has accepted an invite but hasn't completed their profile
-      // In which case we allow them through
-      userService.findByEmail(invite.email, function(err, user) {
-        if(err) return done(err);
-
-        // If the user has clicked on the invite, but hasn't completed their profile (as in does not have a password)
-        // then we'll give them a special dispensation and allow them to access the site (otherwise they'll never get in)
-        if (user && user.status == 'PROFILE_NOT_COMPLETED') {
-          return done(null, user);
-        }
-
-        // In any other case (for example, we can't find the user or the more likely case the user is already fully registered)
-        // then we _do_not_ log the user in (ie, not call done(..., user), instead we redirect to the troupe associated with the
-        // invite where the user will be asked for their username and password (since they're not logged in)
-        return self.redirect('/' + req.params.troupeUri + '#existing');
-
-      });
-
-    }
-    else /* if (invite.status === 'UNUSED') */ {
-      statsService.event('invite_accepted', { uri: req.params.troupeUri });
-
-      winston.verbose("Invite accepted", { confirmationCode: confirmationCode, troupeUri: req.params.troupeUri });
-
-      userService.findOrCreateUserForEmail(
-        {
-          displayName: invite.displayName,
-          email: invite.email,
-          status: "PROFILE_NOT_COMPLETED"
-        },
-        function(err, user) {
-          /* User has been set passport/accept */
-          signupService.acceptInvite(confirmationCode, user, function(err, troupe) {
-            if(err) return done(err);
-            if(!troupe) return self.redirect("/" + req.params.troupeUri);
-            // log the user in
-            return done(null, user);
-          });
-        }
-      );
-    }
-
+    return done(null, user);
   });
+
 });
 
 module.exports = {
-  inviteAcceptStrategy: inviteAcceptStrategy,
-
   install: function() {
 
     passport.serializeUser(function(user, done) {
@@ -166,29 +115,37 @@ module.exports = {
 
     passport.use(new ConfirmStrategy({ name: "confirm" }, function(confirmationCode, req, done) {
       var self = this;
+      var troupeUri = req.params.appUri || req.params.troupeUri;
 
       winston.verbose("Confirming user with code", { confirmationCode: confirmationCode });
 
       userService.findByConfirmationCode(confirmationCode, function(err, user) {
         if(err) return done(err);
-        if(!user) return done(null, false);
+        if(!user) {
+          // If the confirmation was under an appUri ala /:appUri/confirm/:confirmCode
+          // Then always use that URI
+          if(troupeUri) {
+            return self.redirect("/" + troupeUri);
+          }
+
+          return done(null, false);
+        }
 
         // if the user is unconfirmed, then confirm them
         // if the user has been confirmed, but hasn't populated their profile, we want to go down the same path
         if (user.status == 'UNCONFIRMED' || user.status == 'PROFILE_NOT_COMPLETED' || user.newEmail) {
           statsService.event('confirmation_completed', { userId: user.id });
           return done(null, user);
-        }
-        // confirmation fails if the user is already confirmed, except when the user is busy confirming their new email address
-        else {
+        } else {
+          // confirmation fails if the user is already confirmed, except when the user is busy confirming their new email address
           statsService.event('confirmation_reused', { userId: user.id });
 
           winston.verbose("Confirmation already used", { confirmationCode: confirmationCode });
 
           // If the confirmation was under an appUri ala /:appUri/confirm/:confirmCode
           // Then always use that URI
-          if(req.params.appUri) {
-            return self.redirect("/" + req.params.appUri);
+          if(troupeUri) {
+            return self.redirect("/" + troupeUri);
           }
 
           // If the user doesn't have a last troupe set, we'll need to try figure
@@ -222,20 +179,20 @@ module.exports = {
 
   passport.use(inviteAcceptStrategy);
 
-    passport.use(new ConfirmStrategy({ name: "passwordreset" }, function(confirmationCode, req, done) {
-        userService.findAndUsePasswordResetCode(confirmationCode, function(err, user) {
-          if(err) return done(err);
-          if(!user) {
-            statsService.event('password_reset_invalid', { confirmationCode: confirmationCode });
-            return done(null, false);
-          }
+  passport.use(new ConfirmStrategy({ name: "passwordreset" }, function(confirmationCode, req, done) {
+      userService.findAndUsePasswordResetCode(confirmationCode, function(err, user) {
+        if(err) return done(err);
+        if(!user) {
+          statsService.event('password_reset_invalid', { confirmationCode: confirmationCode });
+          return done(null, false);
+        }
 
-          statsService.event('password_reset_completed', { userId: user.id });
+        statsService.event('password_reset_completed', { userId: user.id });
 
-          return done(null, user);
-        });
-      })
-    );
+        return done(null, user);
+      });
+    })
+  );
 
     /* OAuth Strategies */
 
@@ -298,5 +255,10 @@ module.exports = {
         });
       }
     ));
+  },
+
+  testOnly: {
+    inviteAcceptStrategy: inviteAcceptStrategy
   }
+
 };
