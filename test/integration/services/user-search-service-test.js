@@ -109,7 +109,7 @@ describe("User Search Service", function() {
           userSearchService.searchForUsers(userId, 'tEst user', { excludeTroupeId: troupe.id }, function(err, searchResults) {
             if(err) return done(err);
 
-            assert(searchResults.results.length === 1, "Expect one user");
+            assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 2'; } ).length === 1, "Expected to find test user 2");
             assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 3'; } ).length === 0, "Expected to not find test user 3");
 
             return done();
