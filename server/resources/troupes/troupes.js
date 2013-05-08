@@ -90,7 +90,7 @@ module.exports = {
     troupeService.deleteTroupe(req.troupe, function(err) {
       if(err) return next(err);
 
-      res.send(200);
+      res.send({ success: true });
     });
   },
 
