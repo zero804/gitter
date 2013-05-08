@@ -181,7 +181,8 @@ define([
 
       this.invites.push(invite);
 
-      this.$el.find("#invites").append(rowTemplate({ user: user, value: user.toString() }));
+      var invitesEl = this.$el.find("#invites");
+      invitesEl.append(rowTemplate({ user: user, value: user.toString() })).scrollTop(invitesEl.height());
     },
 
     deselectPerson: function(e) {
@@ -228,6 +229,7 @@ define([
   var Modal = TroupeViews.Modal.extend({
     initialize: function() {
       TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+      this.$el.addClass('trpInviteModal');
       this.view = new View({ });
     }
   });
