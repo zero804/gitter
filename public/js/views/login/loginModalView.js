@@ -149,6 +149,10 @@ define([
       });
     },
 
+    getEmail: function() {
+      return this.$el.find('input[name=email]').val();
+    },
+
     showRequestAccess: function() {
       this.trigger('request.access');
     }

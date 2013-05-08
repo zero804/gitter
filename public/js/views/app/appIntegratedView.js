@@ -147,6 +147,12 @@ define([
       $(document).on('troupeUnreadTotalChange', onTroupeUnreadTotalChange);
       onTroupeUnreadTotalChange(null, unreadItemsClient.getCounts());
 
+      // Temporary fix for #459. Remove this at a later stage:
+      // https://sprint.ly/product/4407/#!/item/459
+      window.setTimeout(function() {
+        log('Executing temporary fix for #459');
+        onTroupeUnreadTotalChange(null, unreadItemsClient.getCounts());
+      }, 2000);
 
       // show / hide the 'unread troupes header' on the mega list
       collections['unreadTroupes'].on('all', function() {
@@ -168,12 +174,17 @@ define([
       var mainTitle = window.troupeContext.troupe.name + " - Troupe";
       // TODO this isn't working properly when updating the troupe name, need to be able to poll unreadItems count not just accept the event
       var overall = counts.overall;
+      var current = counts.current;
       if(overall <= 0) {
         return mainTitle;
       }
 
       if(overall <= 10) {
-        return String.fromCharCode(0x2789 + overall) + ' ' + mainTitle;
+        if(current > 0) {
+          return String.fromCharCode(0x2789 + overall) + ' ' + mainTitle;
+        }
+
+        return String.fromCharCode(0x277F + overall) + ' ' + mainTitle;
       }
 
       return '[' + overall + '] ' + window.troupeContext.troupe.name + " - Troupe";

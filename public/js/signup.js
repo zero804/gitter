@@ -87,7 +87,7 @@ require([
     });
 
     $('#button-appstore').on('click', function () {
-      alert("Coming soon.");
+      window.open('https://itunes.apple.com/app/troupe/id632039322','new');
     });
 
     $('#button-existing-users-login').on('click', function() {

@@ -240,7 +240,7 @@ describe('signup-service', function() {
   });
 
   describe('#newSignupWithAccessRequest()', function() {
-    it('should allow an existing user who has accessed the troupe to signup', function(done) {
+    it('should tell an existing user that they need to login to request access', function(done) {
 
       var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
       var signupService = testRequire.withProxies("./services/signup-service", {
@@ -255,42 +255,29 @@ describe('signup-service', function() {
         if(err) return done(err);
         if(!user) return done("Could not find user");
         var userId = user.id;
+        var existingTroupeUri = 'testtroupe1';
 
-        var troupe = persistence.Troupe({ status: 'ACTIVE' });
-        troupe.save(function(err, user) {
+        persistence.Troupe.findOne({ uri: existingTroupeUri }, function(err, troupe) {
           if(err) return done(err);
-          if(!user) return done("User not found");
+          if(!troupe) return done('Troupe ' + existingTroupeUri + ' not found');
 
           signupService.newSignupWithAccessRequest({
             email: "testuser@troupetest.local",
             name: "Test Guy",
             troupeId: troupe.id
           }, function(err, request) {
-            if(err) return done(err);
+            if(!err) return done("An error should have been returned");
 
             mockito.verifyZeroInteractions(emailNotificationServiceMock);
 
-            troupeService.acceptRequest(request, function(err) {
-              if(err) return done(err);
-
-              mockito.verify(emailNotificationServiceMock, once).sendRequestAcceptanceToUser();
-
-              persistence.Troupe.findById(troupe.id, function(err, troupe) {
-                if(err) return done(err);
-                if(!troupe) return done("Cannot find troupe");
-
-                assert(troupe.users.some(function(troupeUser) { return troupeUser.userId == userId; }), 'Expected user to be in the troupe');
-
-                done();
-              });
-
-            });
-
+            assert(err.userExists, "The userExists property of the error should be true");
+            done();
           });
         });
       });
 
     });
+
 
     it('should allow a new user who has accessed a troupe to signup', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';

@@ -5,13 +5,14 @@ define([
   'underscore',
   'backbone',
   'marionette',
+  'components/unread-items-client',
   'hbs!./tmpl/modal',
   'hbs!./tmpl/popover',
   'hbs!./tmpl/loading',
   '../template/helpers/all',
   'hbs!./tmpl/confirmationView',
   'log!base-views'
-], function($, $mig, _, Backbone, Marionette, modalTemplate, popoverTemplate, loadingTemplate, helpers, confirmationViewTemplate, log) {
+], function($, $mig, _, Backbone, Marionette, unreadItemsClient, modalTemplate, popoverTemplate, loadingTemplate, helpers, confirmationViewTemplate, log) {
   /*jshint trailing:false */
   "use strict";
 
@@ -153,7 +154,15 @@ define([
         if(!id) id = this.model.cid;
 
         dom.addClass('model-id-' + id);
-        if(this.model.get('unread')) {
+
+        var unread = this.model.get('unread');
+        if(unread) {
+          if(unreadItemsClient.hasItemBeenMarkedAsRead(this.unreadItemType, id)) {
+            unread = false;
+          }
+        }
+
+        if(unread) {
           dom.addClass('unread');
           dom.data('itemId', id);
           dom.data('itemType', this.unreadItemType);
@@ -785,11 +794,22 @@ define([
     template: confirmationViewTemplate,
 
     initialize: function(options) {
-      this.options = options;
+      if(options.buttons) this.buttons = options.buttons;
+      if(options.body) this.body = options.body;
+      if(options.confirmationView) this.confirmationView = options.confirmationView;
     },
 
     getRenderData: function() {
-      return this.options;
+      return {
+        body: this.body,
+        buttons: this.buttons
+      };
+    },
+
+    afterRender: function() {
+      if(this.confirmationView) {
+        this.$el.find('#confirmation').append(this.confirmationView.render().el);
+      }
     },
 
     events: {
@@ -804,6 +824,11 @@ define([
       if(this.dialog) {
         this.dialog.trigger('button.click', id);
       }
+
+      if(this.confirmationView) {
+        this.confirmationView.trigger('button.click', id);
+      }
+
       this.trigger('button.click', id);
     }
   });

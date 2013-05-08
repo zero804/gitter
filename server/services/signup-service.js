@@ -252,11 +252,51 @@ module.exports = {
         });
 
       } else {
-        troupeService.addRequest(troupeId, user.id, function(err, request) {
-          if(err) return callback(err);
-          callback(null, request);
-        });
+        if (user.status === 'UNCONFIRMED') {
+          // try add a request, if there already is a request it will be returned instead of created,
+          // if the user is a member of the troupe it will give an error (memberExists: true)
+          troupeService.addRequest(troupeId, user.id, function(err, request) {
+            if(err) return callback(err);
+            callback(null, request);
+          });
+        }
+        else {
+          // tell the user to login
+          callback({ userExists: true });
+        }
       }
+    });
+  },
+
+  newUnauthenticatedAccessRequest: function(troupeUri, email, name, callback) {
+    troupeService.findByUri(troupeUri, function(err, troupe) {
+      if(err) { winston.error("findByUri failed", { exception: err } ); return callback(500); }
+      if(!troupe) { winston.error("No troupe with uri", { uri: troupeUri }); return callback(404); }
+
+      var signupParams = {
+        troupeId: troupe.id,
+        name: name,
+        email: email
+      };
+
+      module.exports.newSignupWithAccessRequest(signupParams, function(err) {
+        if(err) {
+          winston.error("newSignupWithAccessRequest failed", { exception: err } );
+
+          if(err.userExists) {
+            return callback({ userExists: true });
+          }
+
+          if (err.memberExists) {
+            return callback({ memberExists: true });
+          }
+
+          return callback(500);
+        }
+
+        callback();
+      });
+
     });
   }
 

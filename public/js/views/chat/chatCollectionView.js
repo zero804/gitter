@@ -178,7 +178,7 @@ define([
           this.isEditing = true;
           var isAtBottom = ChatCollectionView.$scrollOf.scrollTop() >= (ChatCollectionView.$container.height() - ChatCollectionView.$scrollOf.height());
           this.$el.find('.trpChatText').html("<textarea class='trpChatInput'>"+this.model.get('text')+"</textarea>").find('textarea').select();
-          this.$el.find('.trpChatText textarea').focus().on('blur', function() { self.toggleEdit(); });
+          // this.$el.find('.trpChatText textarea').focus().on('blur', function() { self.toggleEdit(); });
           if (isAtBottom) {
             ChatCollectionView.$scrollOf.scrollTop(ChatCollectionView.$container.height() - ChatCollectionView.$scrollOf.height());
           }
@@ -262,6 +262,7 @@ define([
 
       this.scrollDelegate = new scrollDelegates.DefaultScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
       this.infiniteScrollDelegate = new scrollDelegates.InfiniteScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
+
       function findTopMostVisibleUnreadItem(itemType) {
         return unreadItemsClient.findTopMostVisibleUnreadItemPosition(itemType, ChatCollectionView.$container, ChatCollectionView.$scrollOf);
       }
@@ -269,8 +270,18 @@ define([
       var self = this;
       // wait for the first reset (preloading) before enabling infinite scroll
       if (this.collection.length === 0) {
+        var eventEnabled = false;
         this.collection.once('reset', function() {
-          // log("Enabling infinite scroll");
+          if(eventEnabled) return;
+          eventEnabled = true;
+
+          ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
+        });
+
+        this.collection.once('sync', function() {
+          if(eventEnabled) return;
+          eventEnabled = true;
+
           ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
         });
       } else {
