@@ -42,7 +42,7 @@ function handleJsonLogin(req, res) {
     return;
   }
 
-  userService.findDefaultTroupeForUser(req.user.id, sendTroupe);
+  troupeService.findBestTroupeForUser(req.user.id, sendTroupe);
 }
 
 module.exports = {

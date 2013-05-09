@@ -12,6 +12,7 @@ if(!nconf.get('test:exposeDataForTestingPurposes')) {
 // testing processes
 
 var userService = require("../services/user-service");
+var troupeService = require("../services/troupe-service");
 var persistence = require('../services/persistence-service');
 var winston = require('winston');
 
@@ -36,7 +37,7 @@ module.exports = {
         if(err) return next(err);
         if(!user) return next(404);
 
-        userService.findDefaultTroupeForUser(user.id, function(err, troupe) {
+        troupeService.findBestTroupeForUser(user.id, function(err, troupe) {
           if(err) return next(err);
           if(!troupe) return next(404);
 

@@ -9,6 +9,7 @@ var persistence = require("./persistence-service"),
     winston = require("winston"),
     collections = require("../utils/collections"),
     Fiber = require("../utils/fiber"),
+    _ = require('underscore'),
     statsService = require("../services/stats-service");
 
 
@@ -511,8 +512,8 @@ function findBestTroupeForUser(user, callback) {
   // This code is invoked when a user's lastAccessedTroupe is no longer valid (for the user)
   // or the user doesn't have a last accessed troupe. It looks for all the troupes that the user
   // DOES have access to (by querying the troupes.users collection in mongo)
-  // If the user has a troupe, it takes them to the first one it finds. If the user doesn't have
-  // any valid troupes, it redirects them to an error message
+  // If the user has a troupe, it takes them to the last one they accessed. If the user doesn't have
+  // any valid troupes, it returns an error.
   //
 
   if (user.lastTroupe) {
@@ -520,8 +521,7 @@ function findBestTroupeForUser(user, callback) {
       if(err) return callback(err);
 
       if(!troupe || troupe.status == 'DELETED' || !userHasAccessToTroupe(user, troupe)) {
-        userService.findDefaultTroupeForUser(user.id, callback);
-        return;
+        return findLastAccessedTroupeForUser(user, callback);
       }
 
       callback(null, troupe);
@@ -529,7 +529,36 @@ function findBestTroupeForUser(user, callback) {
     return;
   }
 
-  userService.findDefaultTroupeForUser(user.id, callback);
+  return findLastAccessedTroupeForUser(user, callback);
+}
+
+function findLastAccessedTroupeForUser(user, callback) {
+  persistence.Troupe.find({ 'users.userId': user.id, 'status': 'ACTIVE' }, function(err, activeTroupes) {
+    if(err) return callback(err);
+    if (!activeTroupes || activeTroupes.length === 0) callback(null, null);
+
+    userService.getTroupeLastAccessTimesForUser(user.id, function(err, troupeAccessTimes) {
+      if(err) return callback(err);
+
+      activeTroupes.forEach(function(troupe) {
+        troupe.lastAccessTime = troupeAccessTimes[troupe._id];
+      });
+
+      var troupes = _.sortBy(activeTroupes, function(t) {
+        return (t.lastAccessTime) ? t.lastAccessTime : 0;
+      }).reverse();
+
+      _.find(troupes, function(troupe) {
+
+        if (userHasAccessToTroupe(user, troupe)) {
+          callback(null, troupe);
+          return true;
+        }
+      });
+    });
+
+  });
+
 }
 
 //
