@@ -61,6 +61,10 @@ exports.startWorkers = function() {
           //note.alert = message;
           note.device = new apns.Device(device.appleToken);
 
+          note.pushDevice = device;
+
+          //winston.debug('Sending notification ', note);
+
           if(device.deviceType === 'APPLE') {
             apnsConnection.sendNotification(note);
           } else {
@@ -90,6 +94,13 @@ exports.startWorkers = function() {
 
   function errorEventOccurred(err, notification) {
     var errorDescription = errorDescriptions[err];
+
+    if(err === 8 && notification.pushDevice) {
+      winston.error("Removing invalid device ");
+      notification.pushDevice.remove();
+      return;
+    }
+
     winston.error("APN error", {
       exception: err,
       errorDescription: errorDescription,
