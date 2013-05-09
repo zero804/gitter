@@ -12,6 +12,7 @@ var persistence = require("./persistence-service"),
     _ = require('underscore'),
     statsService = require("../services/stats-service");
 
+var ObjectID = require('mongodb').ObjectID;
 
 function findByUri(uri, callback) {
   persistence.Troupe.findOne({uri: uri}, function(err, troupe) {
@@ -172,6 +173,32 @@ function validateTroupeUrisForUser(userId, uris, callback) {
     });
 }
 
+function inviteUserByUserId(troupe, senderDisplayName, userId, callback) {
+  userService.findById(userId, function(err, user) {
+    if(err) return callback(err);
+    if(!user) return callback("User not found");
+
+    var code = uuid.v4();
+
+    var invite = new persistence.Invite();
+    invite.troupeId = troupe.id;
+    invite.displayName = user.displayName;
+    invite.email = user.email;
+    invite.code = code;
+    invite.save(function(err) {
+      if(err) return callback(err);
+
+      // TODO: should we treat registered users differently from unregistered people?
+      // At the moment, we treat them all the same...
+
+      emailNotificationService.sendInvite(troupe, user.displayName, user.email, code, senderDisplayName);
+      callback();
+    });
+
+  });
+
+}
+
 function inviteUserByEmail(troupe, senderDisplayName, displayName, email, callback) {
   var code = uuid.v4();
 
@@ -189,8 +216,19 @@ function inviteUserByEmail(troupe, senderDisplayName, displayName, email, callba
     emailNotificationService.sendInvite(troupe, displayName, email, code, senderDisplayName);
     callback();
   });
+}
 
+function inviteUserToTroupe(troupe, senderDisplayName, invite, callback) {
+  if(invite.email) {
+    return inviteUserByEmail(troupe, senderDisplayName, invite.displayName, invite.email, callback);
+  }
 
+  if(invite.userId) {
+    return inviteUserByUserId(troupe, senderDisplayName, invite.userId, callback);
+  }
+
+  // Otherwise, if neither an email or userId are sent, just quietely ignore
+  return callback();
 }
 
 function findInviteById(id, callback) {
@@ -362,6 +400,13 @@ function rejectRequest(request, callback) {
   });
 }
 
+function findUserIdsForTroupe(troupeId, callback) {
+  persistence.Troupe.findById(troupeId, 'users', function(err, troupe) {
+    if(err) return callback(err);
+    callback(null, troupe.users.map(function(m) { return m.userId; }));
+  });
+}
+
 function findUsersForTroupe(troupeId, callback) {
   persistence.Troupe.findById(troupeId, 'users', function(err, user) {
     if(err) return callback(err);
@@ -455,10 +500,7 @@ function upgradeOneToOneTroupe(options, callback) {
 
     // add invites for each additional person
     for(var i = 0; i < invites.length; i++) {
-      var displayName = invites[i].displayName;
-      var inviteEmail = invites[i].email;
-      if (displayName && inviteEmail)
-        inviteUserByEmail(troupe, senderName, displayName, inviteEmail, f.waitor());
+      inviteUserToTroupe(troupe, senderName, invites[i], f.waitor());
     }
 
     f.all().then(function() { callback(null, troupe); }, callback);
@@ -506,6 +548,29 @@ function findFavouriteTroupesForUser(userId, callback) {
     return callback(null, userTroupeFavourites.favs);
   });
 }
+
+function findAllUserIdsForTroupes(troupeIds, callback) {
+  if(!troupeIds.length) return callback(null, []);
+
+  var mappedTroupeIds = troupeIds.map(function(d) {
+    if(typeof d === 'string') return new ObjectID('' + d);
+    return d;
+  });
+
+  persistence.Troupe.aggregate([
+    { $match: { _id: { $in: mappedTroupeIds } } },
+    { $project: { _id: 0, 'users.userId': 1 } },
+    { $unwind: '$users' },
+    { $group: { _id: 1, userIds: { $addToSet: '$users.userId' } } }
+    ], function(err, results) {
+      if(err) return callback(err);
+      var result = results[0];
+      if(!result || !result.userIds || !result.userIds.length) return callback(null, []);
+
+      return callback(null, result.userIds);
+    });
+}
+
 
 function findBestTroupeForUser(user, callback) {
   //
@@ -603,7 +668,7 @@ function createNewTroupeForExistingUser(options, callback) {
         var displayName = invites[i].displayName;
         var inviteEmail = invites[i].email;
         if (displayName && inviteEmail)
-          inviteUserByEmail(troupe, user.displayName, displayName, inviteEmail, f.waitor());
+          inviteUserToTroupe(troupe, user.displayName, invites[i], f.waitor());
         }
     }
 
@@ -711,7 +776,7 @@ module.exports = {
   validateTroupeEmailAndReturnDistributionList: validateTroupeEmailAndReturnDistributionList,
   userHasAccessToTroupe: userHasAccessToTroupe,
   userIdHasAccessToTroupe: userIdHasAccessToTroupe,
-  inviteUserByEmail: inviteUserByEmail,
+  inviteUserToTroupe: inviteUserToTroupe,
   findInviteById: findInviteById,
   findInviteByCode: findInviteByCode,
   findMemberEmails: findMemberEmails,
@@ -723,7 +788,11 @@ module.exports = {
   acceptRequest: acceptRequest,
   rejectRequest: rejectRequest,
   removeUserFromTroupe: removeUserFromTroupe,
+
+  findAllUserIdsForTroupes: findAllUserIdsForTroupes,
+  findUserIdsForTroupe: findUserIdsForTroupe,
   findUsersForTroupe: findUsersForTroupe,
+
   validateTroupeUrisForUser: validateTroupeUrisForUser,
   updateTroupeName: updateTroupeName,
   findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,

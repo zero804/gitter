@@ -1,0 +1,23 @@
+<div class="modal-content trpInviteModal">
+  <div class="trpModalTitle">Invite people to this Troupe</div>
+
+  <form class="form-inline" id="share-form">
+    <div>
+    <input type="text" name="inviteSearch" class="trpInput" placeholder="Search for people to add" autocomplete="off"/>
+    </div>
+    <style>button.sendInvites { display: block; margin-top: 20px; } </style>
+
+  <div id="invites" class="trpSearchInvites">
+  </div>
+
+  <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen sendInvites" id="submit-button">Send Invites</button>
+  </form>
+
+</div>
+<div class="trpModalFailure share-failure" style="display:none">
+  <span class="trpModalTitle"><span class="trpModalFailureText" id="failure-text">Invite failed.</span></span>
+</div>
+
+<div class="modal-success">
+  <div class="trpModalTitle">Your invites were sent successfully<br><br></div>
+</div>
