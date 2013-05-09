@@ -119,12 +119,13 @@ UserLocationHistorySchema.index({ userId: 1 });
 UserLocationHistorySchema.schemaTypeName = 'UserLocationHistorySchema';
 
 
+// troupes: { troupeId: Date }
 var UserTroupeLastAccessSchema = new Schema({
   userId: ObjectId,
   troupes: Schema.Types.Mixed
 });
-UserLocationHistorySchema.index({ userId: 1 });
-UserLocationHistorySchema.schemaTypeName = 'UserLocationHistorySchema';
+UserTroupeLastAccessSchema.index({ userId: 1 });
+UserTroupeLastAccessSchema.schemaTypeName = 'UserTroupeLastAccessSchema';
 
 
 var UserTroupeFavouritesSchema = new Schema({

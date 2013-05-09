@@ -239,7 +239,7 @@ describe('troupe-service', function() {
   });
 
   describe('#findBestTroupeForUser', function() {
-    it('should return null when a user has no troupes',function(done) {
+    it('#01 should return null when a user has no troupes',function(done) {
 
       var troupeService = testRequire('./services/troupe-service');
       var userService = testRequire('./services/user-service');
@@ -270,7 +270,7 @@ describe('troupe-service', function() {
 
     });
 
-    it('should return return the users last troupe when they have one',function(done) {
+    it('#02 should return return the users last troupe when they have one',function(done) {
       var troupeService = testRequire('./services/troupe-service');
       var userService = testRequire('./services/user-service');
 
@@ -301,7 +301,7 @@ describe('troupe-service', function() {
     });
 
 
-    it('should return return the users something when the user has troupes, but no last troupe',function(done) {
+    it('#03 should return the users something when the user has troupes, but no last troupe',function(done) {
       var troupeService = testRequire('./services/troupe-service');
 
       persistence.User.findOneAndUpdate({ email: 'testuser@troupetest.local' }, { lastTroupe: null }, function(err, user) {

@@ -5,6 +5,7 @@ var form = require("express-form"),
     filter = form.filter,
     validate = form.validate,
     userService = require("../services/user-service"),
+    troupeService = require("../services/troupe-service"),
     middleware = require('../web/middleware'),
     winston = require("winston");
 
@@ -70,7 +71,7 @@ module.exports = {
                   displayName: req.form.displayName
                 });
               } else {
-                userService.findDefaultTroupeForUser(req.user.id, function(err, troupe) {
+                troupeService.findBestTroupeForUser(req.user.id, function(err, troupe) {
                   if(err) return next(err);
                   if(!troupe) return next("Unable to determine default troupe for user");
 
