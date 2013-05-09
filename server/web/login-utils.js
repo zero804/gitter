@@ -17,7 +17,7 @@ exports.redirectUserToDefaultTroupe = function(req, res, next, options) {
         }
       }
 
-      return res.redirect('/' + troupe.uri);
+      return res.redirect(troupe.getUrl(req.user.id));
   });
 
 };
