@@ -33,10 +33,12 @@ define([
       });
 
     },
-
+    canDelete: function() {
+      return this.userCollection.length == 1;
+    },
     deleteTroupe: function() {
 
-      if (this.userCollection.length > 1) {
+      if (!this.canDelete()) {
         return alert("You need to be the only person in the troupe to delete it.");
       }
 
@@ -64,11 +66,13 @@ define([
       });
 
     },
-
+    canLeave: function() {
+      return this.userCollection.length > 1;
+    },
     leaveTroupe: function() {
       var errMsg = "You cannot leave a troupe if you are the only member, rather delete it.";
 
-      if (this.userCollection.length == 1) {
+      if (!this.canLeave()) {
         return alert(errMsg);
       }
 
@@ -124,6 +128,7 @@ define([
 
   return TroupeViews.ConfirmationModal.extend({
     initialize: function(options) {
+      this.userCollection = collections.users;
       options.title = "Settings for this Troupe";
       options.buttons = [{
         id: "save-troupe-settings",
@@ -131,18 +136,29 @@ define([
       }, {
         id: "cancel-troupe-settings",
         text: "Cancel"
-      }, {
-        text: "Delete this Troupe",
-        id: "delete-troupe"
-      },
-      {
-        text: "Leave this Troupe",
-        id: "leave-troupe"
       }
       ];
+      if (this.canDelete()) {
+        options.buttons.push({
+          id: "delete-troupe",
+          text: "Delete Troupe"
+        });
+      }
+      if (this.canLeave()) {
+        options.buttons.push({
+          id: "leave-troupe",
+          text: "Leave this Troupe"
+        });
+      }
       options.confirmationView = new View({});
       options.confirmationView.dialog = this;
       TroupeViews.ConfirmationModal.prototype.initialize.apply(this, arguments);
+    },
+    canLeave: function() {
+      return this.userCollection.length > 1;
+    },
+    canDelete: function() {
+      return this.userCollection.length == 1;
     }
   });
 });
