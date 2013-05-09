@@ -33,6 +33,8 @@ exports.install = function() {
     }
   });
 
+/**
+TODO: disconnect clients who've been removed from a troupe
   appEvents.localOnly.onUserRemovedFromTroupe(function(options) {
     var userId = options.userId;
     // TODO: disconnect only those subscriptions specific to the troupe
@@ -52,6 +54,7 @@ exports.install = function() {
     });
 
   });
+**/
 
   appEvents.localOnly.onUserNotification(function(data) {
       var userId = data.userId;
