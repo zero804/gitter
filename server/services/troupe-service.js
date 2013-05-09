@@ -519,7 +519,7 @@ function findBestTroupeForUser(user, callback) {
     findById(user.lastTroupe, function(err,troupe) {
       if(err) return callback(err);
 
-      if(!troupe || !userHasAccessToTroupe(user, troupe)) {
+      if(!troupe || troupe.status == 'DELETED' || !userHasAccessToTroupe(user, troupe)) {
         userService.findDefaultTroupeForUser(user.id, callback);
         return;
       }

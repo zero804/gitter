@@ -170,7 +170,7 @@ var userService = {
   findDefaultTroupeForUser: function(id, callback) {
     assert(id, 'id is required');
 
-    persistence.Troupe.findOne({ 'users.userId': id }, function(err, troupe) {
+    persistence.Troupe.findOne({ 'users.userId': id, 'status': 'ACTIVE' }, function(err, troupe) {
       callback(err, troupe);
     });
   },

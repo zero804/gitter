@@ -255,6 +255,7 @@ function preloadOneToOneTroupeMiddleware(req, res, next) {
   }
 
   if (req.params.userId === req.user.id) {
+    winston.info('Another user is talking to themselves...', { userId: req.user.id });
     res.redirect(nconf.get('web:homeurl'));
     return 1;
   }
