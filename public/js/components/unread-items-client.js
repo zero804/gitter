@@ -216,9 +216,15 @@ define([
 
     preload: function(items) {
       _iteratePreload(items, function(itemType, itemId) {
+        log('Preload of ' + itemType + ':' + itemId);
+
+        // Have we already marked this item as read?
         if(this._deleteTarpit._contains(itemType, itemId)) return;
+
+        // Have we already got this item in our store?
         if(this._contains(itemType, itemId)) return;
 
+        // Instantly promote it...
         this._promote(itemType, itemId);
       }, this);
     }
