@@ -41,7 +41,6 @@ define([
     createClipboard : function() {
       if(this.clip) return;
 
-      console.log("CREATING");
       ZeroClipboard.setMoviePath( 'repo/zeroclipboard/ZeroClipboard.swf' );
       ZeroClipboard.Client.prototype.zIndex = 100000;
       var clip = new ZeroClipboard.Client();
