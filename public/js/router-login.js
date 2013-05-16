@@ -22,8 +22,11 @@ require([
 
       var view, modal, loginModal, requestModal;
 
-      function getLoginModal(email) {
-        var loginView = new LoginModalView( { email: email });
+      function getLoginModal(options) {
+        var email = options.email;
+        var userExists = options.userExists;
+
+        var loginView = new LoginModalView( { email: email, userExists: userExists });
         loginModal = new TroupeViews.Modal({ view: loginView, disableClose: true });
         loginView.once('login.complete', function() {
           window.location.reload();
@@ -38,31 +41,20 @@ require([
 
       function getRequestModal(email) {
         requestModal = new TroupeViews.Modal({ view: new RequestModalView({ email: email }), disableClose: true });
-        requestModal.view.on('request.login', function() {
-          getLoginModal(requestModal.view.getEmail());
+        requestModal.view.on('request.login', function(options) {
+          getLoginModal({ email: requestModal.view.getEmail(), userExists: options && options.userExists });
           requestModal.transitionTo(loginModal);
         });
 
         return requestModal;
       }
 
-      /* Is a user logged in? */
       if(!window.troupeContext.user) {
-        if (window.localStorage.defaultTroupeEmail ||
-            (window.troupeContext.troupe && window.troupeContext.troupe.oneToOne) ||
-            (window.location.hash.indexOf('#existing') === 0)) {
-          // show the login dialog
-          getLoginModal(window.localStorage.defaultTroupeEmail);
-          loginModal.show();
-          return;
-        }
-        else {
-          // show the request access modal
-          getRequestModal();
+        /* This user is NOT logged in */
 
-          requestModal.show();
-          return;
-        }
+        getLoginModal({ email: window.localStorage.defaultTroupeEmail } );
+        loginModal.show();
+        return;
       }
 
       if(window.troupeContext.profileNotCompleted) {
@@ -73,6 +65,7 @@ require([
           window.location.reload(true);
         });
         view.show();
+
         return;
       }
 

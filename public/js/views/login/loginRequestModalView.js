@@ -53,27 +53,45 @@ define([
     },
 
     validateForm : function () {
+      $.validator.addMethod(
+          "legalName",
+          function(value) {
+            var re = /^[^<>]+$/;
+            return re.test(value);
+          },
+          "Your name cannot contain special characters."
+      );
+
       var validateEl = this.$el.find('#requestAccess');
       validateEl.validate({
         rules: {
-          name: "required",
+          name: { required: true,  legalName: true },
           email: {
             required: true,
             email: true
             }
         },
         debug: true,
-        showErrors: function(errorMap, errorList) {
-          log("errorList: " + errorList.length);
-          if (errorList.length === 0) $('.request-failure').hide();
-          if (errorList.length > 0) $('.request-failure').show();
+        showErrors: function(errorMap) {
+          log("Validation errors: ", errorMap);
+
           var errors = "";
-          $.each(errorList, function () { errors += this.message + "<br>"; });
+
+          _.each(_.keys(errorMap), function(key) {
+            var errorMessage = errorMap[key];
+            errors += errorMessage + "<br>";
+          });
+
           $('#failure-text').html(errors);
+          if(errors) {
+            $('#request_validation').show();
+          } else {
+             $('#request_validation').hide();
+          }
         },
         messages: {
           name: {
-            required: "Please tell us your name. "
+            required: "Please tell us your name. No special characters."
           },
         email : {
           required: "We need to know your email address.",
@@ -87,14 +105,16 @@ define([
       return this.$el.find('input[name=email]').val();
     },
 
-    showLoginForm: function(e) {
+    showLoginForm: function() {
       this.trigger('request.login');
     },
 
-    onFormSubmit: function(e) {
+    onFormSubmit: function() {
       var form = this.$el.find('form');
       var that = this;
       var postUri =  this.authenticated ? "/requestAccessExistingUser" : "/requestAccessNewUser";
+
+      $('#request-failed').hide();
 
       $.ajax({
         url: postUri,
@@ -102,6 +122,7 @@ define([
         dataType: "json",
         data: form.serialize(),
         type: "POST",
+        globa: false,
         success: function(data) {
           if(data.success) {
             $('.modal-content').hide();
@@ -110,13 +131,12 @@ define([
           }
 
           if(data.userExists) {
-            $('#request-form').hide();
-            $('#modal-failure-userExists').show();
+            that.trigger('request.login', { userExists: true });
             return;
           }
-
-          alert('Something went wrong. Oopsie daisy.');
-
+        },
+        error: function() {
+          $('#request-failed').show();
         }
       });
 
