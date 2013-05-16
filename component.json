@@ -15,7 +15,7 @@
     "jquery-validate": "git://github.com/ffmike/jquery-validate.git",
     "jquery-placeholder": "~2.0.7",
     "nanoscroller": "~0.7.2",
-    "zeroclipboard": "~1.1.7",
+    "zeroclipboard": "1.0.9",
     "scrollfix": "git://github.com/joelambert/ScrollFix.git",
     "retina.js-js": "~1.0.2",
     "d3": "~3.1.5",
