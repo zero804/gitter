@@ -437,6 +437,15 @@ module.exports = function( grunt ) {
 
         },
         exports: 'Zepto'
+      },
+
+      'zeroclipboard': {
+        files : {
+          'output/client-libs/zeroclipboard/zeroclipboard-amd.js': ['output/client-libs/zeroclipboard/zeroclipboard.js']
+        },
+        modules: {
+        },
+        exports: 'window.ZeroClipboard'
       }
 
     }
