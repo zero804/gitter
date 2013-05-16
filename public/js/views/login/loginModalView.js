@@ -14,12 +14,14 @@ define([
       if (options) {
         this.initialEmail = options.email;
         this.fromSignup = options.fromSignup;
+        this.userExists = options.userExists;
       }
       _.bindAll(this, 'onFormSubmit');
     },
 
     getRenderData: function() {
       return {
+        userExists: this.userExists,
         email: this.initialEmail,
         autofocusEmail: this.initialEmail ? '': 'autofocus',
         autofocusPassword: this.initialEmail ? 'autofocus' : '',
