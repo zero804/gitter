@@ -26,6 +26,9 @@ define([
       this.uri = window.troupeContext.troupe.uri;
       this.basePath = window.troupeContext.basePath;
       this.shareTableView = new ShareTableView({});
+      this.addCleanup(function() {
+        if(this.clip) this.clip.destroy();
+      });
     },
 
     getRenderData: function() {
@@ -36,10 +39,15 @@ define([
     },
 
     createClipboard : function() {
-      ZeroClipboard.setMoviePath( 'swf/ZeroClipboard.swf' );
+      if(this.clip) return;
+
+      console.log("CREATING");
+      ZeroClipboard.setMoviePath( 'repo/zeroclipboard/ZeroClipboard.swf' );
+      ZeroClipboard.Client.prototype.zIndex = 100000;
       var clip = new ZeroClipboard.Client();
       clip.setText( this.basePath + "/" + this.uri );
       clip.glue( 'copy-button');
+      this.clip=clip;
     },
 
     afterRender: function() {
