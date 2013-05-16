@@ -1,13 +1,13 @@
 <div class="modal-content trpInviteModal">
   <div class="trpModalTitle">Invite people to this Troupe</div>
-
   <form class="form-inline" id="share-form">
     <div>
-    <input type="text" name="inviteSearch" class="trpInput" placeholder="Search for people to add" autocomplete="off"/>
+    <input type="text" name="inviteSearch" class="trpInput" placeholder="Search or enter an email address here" autocomplete="off" style="width: 300px"/>
     </div>
     <style>button.sendInvites { display: block; margin-top: 20px; } </style>
 
   <div id="invites" class="trpSearchInvites">
+    <span class="trpModalBody">To add somebody, search for people you are connected to on Troupe. <br>You can also type an email address to invite somebody new.</span>
   </div>
 
   <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen sendInvites" id="submit-button">Send Invites</button>
@@ -16,6 +16,11 @@
 </div>
 <div class="trpModalFailure share-failure" style="display:none">
   <span class="trpModalTitle"><span class="trpModalFailureText" id="failure-text">Invite failed.</span></span>
+</div>
+
+<div class="trpModalInfo">
+  <div class="trpBodyMedium" style="display:inline-block; margin-top: 3px">You can also share this link to invite people: <span class="trpGreen">{{basePath}}/{{uri}}</span></div>
+  <div style="display: inline-block; float: right"><span class="trpButton trpCopyButton" id="copy-button"> copy</span></div>
 </div>
 
 <div class="modal-success">
