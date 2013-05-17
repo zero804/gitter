@@ -1,33 +1,62 @@
 define([
   'views/base',
-  'hbs!./tmpl/troupeSettingsTemplate'
-], function(TroupeViews, troupeSettingsTemplate) {
+  'hbs!./tmpl/troupeSettingsTemplate',
+  'log!troupe-settings-view',
+  'utils/validate-wrapper'
+], function(TroupeViews, troupeSettingsTemplate, log, validation) {
 
   var View = TroupeViews.Base.extend({
     template: troupeSettingsTemplate,
     events: {
-      'submit #troupeSettings': 'saveSettings'
+      'submit #troupeSettings': 'saveSettings',
+      'click #cancel-troupe-settings' : 'closeSettings'
     },
 
     initialize: function(options) {
       var self = this;
-      this.on('button.click', function(id) {
-        switch(id) {
-          case 'save-troupe-settings':
-            self.saveSettings();
-            break;
-          case 'cancel-troupe-settings':
-            self.dialog.hide();
-            self.dialog = null;
-            break;
-        }
-      });
+    },
 
+    closeSettings : function () {
+      this.dialog.hide();
+      this.dialog = null;
+    },
+
+    afterRender: function() {
+      this.validateForm();
     },
 
     getRenderData: function() {
       return window.troupeContext.troupe;
     },
+
+     validateForm : function () {
+      console.log("Validate init");
+      var validateEl = this.$el.find('#troupeSettings');
+      validateEl.validate({
+        rules: {
+          name: validation.rules.troupeName()
+        },
+        messages: {
+          name: validation.messages.troupeName()
+        },
+        showErrors: function(errorMap) {
+          var errors = "";
+
+          _.each(_.keys(errorMap), function(key) {
+            var errorMessage = errorMap[key];
+            errors += errorMessage + "<br>";
+          });
+
+          $('#failure-text').html(errors);
+          if(errors) {
+            $('#request_validation').show();
+          } else {
+             $('#request_validation').hide();
+          }
+        }
+     });
+    },
+
 
     saveSettings: function(e) {
       if(e) e.preventDefault();
@@ -57,19 +86,11 @@ define([
     }
   });
 
-  return TroupeViews.ConfirmationModal.extend({
-    initialize: function(options) {
-      options.title = "Settings for this Troupe";
-      options.buttons = [{
-        id: "save-troupe-settings",
-        text: "Save"
-      }, {
-        id: "cancel-troupe-settings",
-        text: "Cancel"
-      }];
-      options.confirmationView = new View({});
-      options.confirmationView.dialog = this;
-      TroupeViews.ConfirmationModal.prototype.initialize.apply(this, arguments);
-    }
+  return TroupeViews.Modal.extend({
+      initialize: function(options) {
+        options.title = "Settings";
+        TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+        this.view = new View({ });
+      }
+    });
   });
-});
