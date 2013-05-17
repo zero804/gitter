@@ -7,7 +7,7 @@
 # rs.initiate(config);
 
 # Remember to run ./scripts/init-mongo/init-mongo.sh the first time to init your replica set
-
+ulimit -n 1000
 mkdir -p /usr/local/var/mongodb/r0
 mkdir -p /usr/local/var/mongodb/r1
 mongod run -replSet troupeSet --journal --port 27017 --dbpath /usr/local/var/mongodb/r0 --rest &

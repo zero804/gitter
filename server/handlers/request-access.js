@@ -19,7 +19,7 @@ module.exports = {
         form(
           filter("name").trim(),
           validate("troupeUri").required().is(/^[a-zA-Z0-9]+$/),
-          validate("name").required().is(/^[a-zA-Z0-9 ]+$/),
+          validate("name").required().is(/^[^<>]+$/),
           filter("email").trim(),
           validate("email").isEmail()
         ),
@@ -27,10 +27,8 @@ module.exports = {
         function(req, res) {
           if (!req.form.isValid) {
             winston.info("User form has errors", { errors: req.form.errors } );
-            // TODO: Handle errors
 
-            /* TODO: make this nice */
-            return res.send(500);
+            return res.send(400, { validationFailed: true, errors: req.form.errors });
           }
 
           signupService.newUnauthenticatedAccessRequest(req.form.troupeUri, req.form.email, req.form.name, function(err) {

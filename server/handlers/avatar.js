@@ -3,6 +3,8 @@
 
 var middleware = require('../web/middleware'),
     im = require('imagemagick'),
+    crypto = require('crypto'),
+    assert = require('assert'),
     mongoose = require("mongoose"),
     restSerializer = require("../serializers/rest-serializer"),
     Fiber = require("../utils/fiber");
@@ -95,6 +97,12 @@ module.exports = {
           displayAvatarFor('s', userId, req, res);
         }
       );
+
+      app.get('/gravatar/:email', function(req, res) {
+        var email = req.params.email;
+        assert(email, "An email address must be provided in the url");
+        res.redirect("https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon");
+      });
 
       app.get(
         '/avatar/:size/:userId/:version.:type',

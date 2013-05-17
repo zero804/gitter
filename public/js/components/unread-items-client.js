@@ -216,9 +216,15 @@ define([
 
     preload: function(items) {
       _iteratePreload(items, function(itemType, itemId) {
+        log('Preload of ' + itemType + ':' + itemId);
+
+        // Have we already marked this item as read?
         if(this._deleteTarpit._contains(itemType, itemId)) return;
+
+        // Have we already got this item in our store?
         if(this._contains(itemType, itemId)) return;
 
+        // Instantly promote it...
         this._promote(itemType, itemId);
       }, this);
     }
@@ -432,7 +438,14 @@ define([
 
 
     _recount: function() {
+      var self = this;
       function count(memo, troupe) {
+        if(window.troupeContext && window.troupeContext.troupe) {
+          if(troupe.get('id') === window.troupeContext.troupe.id) {
+            return memo + (self._store._currentCount() > 0 ? 1 : 0);
+          }
+        }
+
         var c = troupe.get('unreadItems');
         return memo + (c > 0 ? 1 : 0);
       }
