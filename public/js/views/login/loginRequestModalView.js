@@ -7,9 +7,9 @@ define([
   'views/base',
   'hbs!./tmpl/loginRequestModalView',
   'log!login-request-modal-view',
-  'jquery-validate',
-  'jquery-placeholder'
-], function($, _, TroupeViews, template, log) {
+  'utils/validate-wrapper',
+  'jquery-placeholder' // No reference
+], function($, _, TroupeViews, template, log, validation) {
   return TroupeViews.Base.extend({
     template: template,
 
@@ -53,25 +53,16 @@ define([
     },
 
     validateForm : function () {
-      $.validator.addMethod(
-          "legalName",
-          function(value) {
-            var re = /^[^<>]+$/;
-            return re.test(value);
-          },
-          "Your name cannot contain special characters."
-      );
-
       var validateEl = this.$el.find('#requestAccess');
       validateEl.validate({
         rules: {
-          name: { required: true,  legalName: true },
-          email: {
-            required: true,
-            email: true
-            }
+          name: validation.rules.userDisplayName(),
+          email: validation.rules.userEmail()
         },
-        debug: true,
+        messages: {
+          name: validation.messages.userDisplayName(),
+          email : validation.messages.userEmail()
+        },
         showErrors: function(errorMap) {
           log("Validation errors: ", errorMap);
 
@@ -88,17 +79,8 @@ define([
           } else {
              $('#request_validation').hide();
           }
-        },
-        messages: {
-          name: {
-            required: "Please tell us your name. No special characters."
-          },
-        email : {
-          required: "We need to know your email address.",
-          email: "Hmmm, that doesn't look like an email address."
-          }
         }
-        });
+     });
     },
 
     getEmail: function() {

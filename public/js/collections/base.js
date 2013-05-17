@@ -147,7 +147,7 @@ define([
     _onPreloadComplete: function(data) {
       this._comparePreloadToSubscription();
       var items = data[this.preloadKey];
-      this.add(items, { parse: true, merge: true });
+      this.add(items, { parse: true, merge: true, sort: true });
       this._loading = false;
     },
 

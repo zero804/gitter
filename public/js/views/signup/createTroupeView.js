@@ -6,9 +6,9 @@ define([
   'views/base',
   'hbs!./tmpl/createTroupeView',
   'log!create-troupe-view',
-  'jquery-validate', // no ref
+  'utils/validate-wrapper',
   'jquery-placeholder' // no ref
-], function($, _, TroupeViews, template, shareSearch, log) {
+], function($, _, TroupeViews, template, log, validation) {
   var View = TroupeViews.Base.extend({
     template: template,
 
@@ -53,34 +53,28 @@ define([
     },
 
     validateForm : function () {
-      var validationConfig;
+      var validationConfig = {
+        rules: {
+          troupeName: validation.rules.troupeName(),
+          email: validation.rules.userEmail()
+        },
 
+        messages: {
+          troupeName: validation.messages.troupeName(),
+          email: validation.messages.troupeName()
+        },
 
-      validationConfig = {
-        rules: {  },
-        messages: { }
-      };
-
-      validationConfig.showErrors = function(errorMap, errorList) {
-        if (errorList.length > 0) {
-          $('.signup-failure').show();
+        showErrors: function(errorMap, errorList) {
+          if (errorList.length > 0) {
+            $('.signup-failure').show();
+          }
+          else {
+            $('.signup-failure').hide();
+          }
+          var errors = "";
+          $.each(errorList, function () { errors += this.message + "<br>"; });
+          $('#failure-text').html(errors);
         }
-        else {
-          $('.signup-failure').hide();
-        }
-        var errors = "";
-        $.each(errorList, function () { errors += this.message + "<br>"; });
-        $('#failure-text').html(errors);
-      };
-
-      validationConfig.messages.troupeName = {
-        minlength: "Please choose a longer name for your Troupe, it needs to be at least 4 letters.",
-        required: "Please choose a name for your Troupe. "
-      };
-
-      validationConfig.messages.email = {
-        required: "We need to know your email address",
-        email: "Hmmm, that doesn't look like your email address."
       };
 
       this.$el.find('#signup-form').validate(validationConfig);
