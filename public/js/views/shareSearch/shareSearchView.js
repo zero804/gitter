@@ -134,7 +134,7 @@ define([
         },
         sorter: function(items) {
           return _.sortBy(items, function(o) {
-            return (o.nonSelectable || o.email) ? '' : o.displayName;
+            return o.displayName ? '' : (o.nonSelectable || o.email);
           });
         },
         matcher: function(item) {
