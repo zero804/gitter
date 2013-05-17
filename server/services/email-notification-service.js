@@ -9,7 +9,7 @@ var emailDomainWithAt = "@" + emailDomain;
 
 module.exports = {
   sendNewTroupeForExistingUser: function (user, troupe) {
-    var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri + "#|shareTroupe";
+    var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri + "#|share";
 
     mailerService.sendEmail({
       templateFile: "newtroupe_email",

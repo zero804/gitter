@@ -1,5 +1,10 @@
 <div class="login-content">
   <div class="trpModalTitle">Sign in to Troupe</div>
+  {{#if userExists}}
+  <p class="trpBodyMedium">
+  It appears that you have already signed up to Troupe. Please login to continue.
+  </p>
+  {{/if}}
    <form id="loginForm" class="marginless" method="post" action="/login">
       <input type="hidden" name="troupeUri" value="{{troupeUri}}">
       <input name="email" id="email" type="text" class="trpInput" placeholder="Email address" {{autofocusEmail}} value="{{email}}">

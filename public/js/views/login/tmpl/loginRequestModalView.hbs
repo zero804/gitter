@@ -18,11 +18,6 @@
     </div>
   </div>
 
-  <div class="modal-content" id="modal-failure-userExists" style="display: none">
-    <div class="trpModalTitle">Sorry</div>
-    <div class="trpModalSubtext">Please login before you can request access. The email address you provided is already registered on troupe.</div>
-  </div>
-
   {{^authenticated}}
     <!-- don't show this div if the user is already signed in -->
     <div class="trpModalExistingUsers" id="existing-user">
@@ -42,3 +37,15 @@
       <a href="javascript:history.back();" class="trpModalButton trpButtonBig trpBtnGrey" id="cancel-button">Close</a>
   </div>
 </div>
+
+<div id="request-failed" class="trpModalFailure" style="display:none">
+  <div class="trpModalTitle">Can't request access at the moment</div>
+  <div class="trpModalBody">Something has gone wrong. Please try again in a minute.</div>
+</div>
+
+<div id="request_validation" class="trpModalFailure" style="display:none">
+  <div class="trpModalFailureText" id="failure-text"></div>
+</div>
+
+
+

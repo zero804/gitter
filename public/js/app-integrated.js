@@ -32,10 +32,9 @@ require([
   'views/toolbar/troupeCollectionView',
   'views/people/peopleCollectionView',
   'views/profile/profileView',
-  'views/share/shareView',
+  'views/shareSearch/shareSearchView',
   'views/signup/createTroupeView',
   'hbs!./views/app/tmpl/appHeader',
-  'views/share/shareView',
   'views/app/troupeSettingsView',
   'components/webNotifications',
   'components/unread-items-client',
@@ -45,7 +44,7 @@ require([
 ], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, realtime, eyeballs, dozy, AppIntegratedView, ChatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
             collections, troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView,
-            createTroupeView, headerViewTemplate, shareTroupeView,
+            createTroupeView, headerViewTemplate,
             troupeSettingsView, webNotifications, unreadItemsClient, log /*, errorReporter , FilteredCollection */) {
   "use strict";
 
@@ -147,7 +146,6 @@ require([
         { name: "share",          re: /^share$/,                  viewType: shareView.Modal },
         { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal,       collection: collections.troupes,   skipModelLoad: true },
         { name: "upgradeOneToOne",  re: /^upgradeOneToOne$/,      viewType: createTroupeView.Modal,       collection: collections.troupes,   skipModelLoad: true, viewOptions: { upgradeOneToOne: true } } ,
-        { name: "shareTroupe",    re: /^shareTroupe/,             viewType: shareTroupeView.Modal },
         { name: "troupeSettings", re: /^troupeSettings/,          viewType: troupeSettingsView }
 
       ];

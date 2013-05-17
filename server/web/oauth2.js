@@ -56,6 +56,7 @@ server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, do
   var code = uid(16);
 
   winston.info("Granted access to ", client.name, " for ", user.displayName);
+  winston.info("Granted access to "+ client.name + " for " + user.displayName);
 
   oauthService.saveAuthorizationCode(code, client.id, redirectUri, user.id, function(err) {
     if (err) { return done(err); }
@@ -104,8 +105,10 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, do
 exports.authorization = [
   middleware.ensureLoggedIn(),
   server.authorization(function(clientKey, redirectUri, done) {
+
     oauthService.findClientByClientKey(clientKey, function(err, client) {
       if (err) { return done(err); }
+      if(!client) { return done("Illegal client"); }
 
       if(client.registeredRedirectUri !== redirectUri) {
         winston.warn("Provided redirectUri does not match registered URI for clientKey ", {

@@ -807,6 +807,30 @@ function RequestStrategy(options) {
   };
 }
 
+function SearchResultsStrategy(options) {
+  var resultItemStrategy = options.resultItemStrategy;
+
+  this.preload = function(searchResults, callback) {
+    var items = _.flatten(searchResults.map(function(i) { return i.results; }), true);
+
+    var strategies = [{
+      strategy: resultItemStrategy,
+      data: items
+    }];
+
+    execPreloads(strategies, callback);
+  };
+
+  this.map = function(item) {
+    return {
+      hasMoreResults: item.hasMoreResults,
+      limit: item.limit,
+      skip: item.skip,
+      results: item.results.map(function(i) { return resultItemStrategy.map(i); })
+    };
+  };
+
+}
 
 /* This method should move */
 function serialize(items, strat, callback) {
@@ -930,7 +954,8 @@ module.exports = {
   TroupeStrategy: TroupeStrategy,
   TroupeIdStrategy: TroupeIdStrategy,
   TroupeUserStrategy: TroupeUserStrategy,
+  SearchResultsStrategy: SearchResultsStrategy,
   getStrategy: getStrategy,
   serialize: serialize,
   serializeModel: serializeModel
-}
+};
