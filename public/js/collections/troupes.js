@@ -12,6 +12,7 @@ define([
 
   exports.TroupeCollection = TroupeCollections.LiveCollection.extend({
     model: exports.TroupeModel,
+    preloadKey: "troupes",
     initialize: function() {
       this.url = "/user/" + window.troupeContext.user.id + "/troupes";
     }

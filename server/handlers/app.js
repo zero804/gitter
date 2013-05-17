@@ -306,6 +306,9 @@ module.exports = {
         middleware.ensureLoggedIn(),
         preloadOneToOneTroupeMiddleware,
         function(req, res, next) {
+          // Timestamp aroundabout the time the snapshot was taken....
+          var timestamp = new Date().toISOString();
+
           var f = new Fiber();
           if(req.user) {
             preloadTroupes(req.user.id, f.waitor());
@@ -319,6 +322,7 @@ module.exports = {
               // Send the information through
               res.set('Cache-Control', 'no-cache');
               res.send({
+                timestamp: timestamp,
                 troupes: troupes,
                 files: files,
                 chatMessages: chats,
@@ -354,8 +358,12 @@ module.exports = {
       app.get('/:appUri/preload',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
+        //middleware.simulateDelay(10000),
         preloadTroupeMiddleware,
         function(req, res, next) {
+          // Timestamp aroundabout the time the snapshot was taken....
+          var timestamp = new Date().toISOString();
+
           var f = new Fiber();
           if(req.user) {
             preloadTroupes(req.user.id, f.waitor());
@@ -370,6 +378,7 @@ module.exports = {
               // Send the information through
               res.set('Cache-Control', 'no-cache');
               res.send({
+                timestamp: timestamp,
                 troupes: troupes,
                 files: files,
                 chatMessages: chats,

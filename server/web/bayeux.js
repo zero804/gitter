@@ -9,7 +9,6 @@ var troupeService = require("../services/troupe-service");
 var presenceService = require("../services/presence-service");
 var nconf = require("../utils/config");
 var shutdown = require('../utils/shutdown');
-//var RedisClientUserLookupStrategy = require('./bayeux-user-lookup').RedisClientUserLookupStrategy;
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
@@ -309,6 +308,16 @@ var authorisor = {
 
 };
 
+var subscriptionTimestamp = {
+  outgoing: function(message, callback) {
+    if (message.channel === '/meta/subscribe') {
+      message.timestamp = new Date().toISOString();
+    }
+
+    callback(message);
+  }
+};
+
 var pushOnlyServer = {
   incoming: function(message, callback) {
     if (message.channel.match(/^\/meta\//)) {
@@ -365,6 +374,7 @@ module.exports = {
     server.addExtension(authenticator);
     server.addExtension(authorisor);
     server.addExtension(pushOnlyServer);
+    server.addExtension(subscriptionTimestamp);
 
     client.addExtension(superClient);
 

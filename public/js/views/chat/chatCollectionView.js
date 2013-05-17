@@ -1,4 +1,5 @@
-/*jshint unused:true, browser:true */
+/* jshint unused:true, browser:true,  strict:true */
+/* global define:false */
 define([
   'jquery',
   'underscore',
@@ -12,6 +13,7 @@ define([
   'hbs!./tmpl/chatViewItem',
   'bootstrap_tooltip'
 ], function($, _, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate /* tooltip*/) {
+
   "use strict";
 
   var PAGE_SIZE = 15;
@@ -310,13 +312,13 @@ define([
     },
 
     onAfterItemAdded: function(item) {
-      if (!this.loading) {
+      if (!this.collection.isLoading()) {
         this.scrollDelegate.onAfterItemAdded(item);
       }
     },
 
     onBeforeItemAdded: function() {
-      if (!this.loading) {
+      if (!this.collection.isLoading()) {
         this.scrollDelegate.onBeforeItemAdded();
       }
     },
@@ -329,23 +331,17 @@ define([
     },
 
     loadNextMessages: function() {
-      if(this.loading) return;
+      if(this.collection.isLoading()) return;
 
       // log("Loading next message chunk.");
       this.infiniteScrollDelegate.beforeLoadNextMessages();
 
       var self = this;
-      this.loading = true;
       function success(data, resp) {
-        self.loading = false;
         if(!resp.length) {
           // turn off infinite scroll if there were no new messages retrieved
           $(ChatCollectionView.$scrollOf).off('scroll', self.chatWindowScroll);
         }
-      }
-
-      function error() {
-        self.loading = false;
       }
 
       this.collection.once('sync', function() {
@@ -359,6 +355,11 @@ define([
         return 0;
       });
 
+      if(lowestId === Infinity) {
+        log('No messages loaded, cancelling pagenation (!!)');
+        return;
+      }
+
       this.collection.fetch({
         update: true,
         add: true,
@@ -367,8 +368,7 @@ define([
           beforeId: lowestId,
           limit: this.chatMessageLimit
         },
-        success: success,
-        error: error
+        success: success
       });
 
     }
