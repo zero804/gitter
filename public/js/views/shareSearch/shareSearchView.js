@@ -16,7 +16,7 @@ define([
 
     events: {
       'keydown input': 'preventSubmit',
-      'mousedown #copy-button' : 'createClipboard',
+      'hover #copy-button' : 'createClipboard',
       'click .removeInvite': 'deselectPerson',
       'click button[type=submit]': 'sendInvites'
     },
@@ -44,7 +44,7 @@ define([
     },
 
     createClipboard : function() {
-      // if(this.clip) return;
+      if(this.clip) return;
 
       ZeroClipboard.setMoviePath( 'repo/zeroclipboard/ZeroClipboard.swf' );
       ZeroClipboard.Client.prototype.zIndex = 100000;
