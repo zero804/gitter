@@ -243,6 +243,7 @@ define([
 
     unreadItemStore.on('itemMarkedRead', this._onItemMarkedRead);
     $(window).on('unload', this._onWindowUnload);
+    $(window).on('beforeunload', this._onWindowUnload);
   };
 
   ReadItemSender.prototype = {
@@ -675,7 +676,6 @@ define([
   unreadItemsClient.TroupeCollectionSync = TroupeCollectionSync;
   unreadItemsClient.TroupeCollectionRealtimeSync = TroupeCollectionRealtimeSync;
   unreadItemsClient.TroupeUnreadNotifier = TroupeUnreadNotifier;
-
 
   return unreadItemsClient;
 });

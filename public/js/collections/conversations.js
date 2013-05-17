@@ -73,6 +73,7 @@ define([
     model: exports.ConversationModel,
     modelName: 'conversation',
     nestedUrl: "conversations",
+    preloadKey: 'conversations',
     sortByMethods: {
       'updated': function(conversation) {
         var updated = conversation.get('updated');

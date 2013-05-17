@@ -140,3 +140,11 @@ exports.generateRememberMeTokenMiddleware = function(req, res, next) {
     next();
   }
 };
+
+exports.simulateDelay = function(timeout) {
+  return function(req, res, next) {
+    setTimeout(function() {
+      return next();
+    }, timeout);
+  }
+}

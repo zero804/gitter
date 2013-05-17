@@ -2,8 +2,9 @@
 define([
   'jquery',
   'faye',
-  'log!realtime'
-], function($, Faye, log) {
+  'log!realtime',
+  '../utils/momentWrapper'
+], function($, Faye, log, moment) {
   "use strict";
 
   //Faye.Logging.logLevel = 'info';
@@ -67,6 +68,24 @@ define([
     callback(message);
   };
 
+  var SubscriptionTimestamp = function() {
+    this._timestamps = {};
+  };
+
+  SubscriptionTimestamp.prototype.incoming = function(message, callback) {
+    if(message.channel == '/meta/subscribe' && message.timestamp) {
+      this._timestamps[message.subscription] = moment(message.timestamp).toDate();
+    }
+
+    callback(message);
+  };
+
+  SubscriptionTimestamp.prototype._getTimestamp = function(channel) {
+    return this._timestamps[channel];
+  };
+
+  var subscriptionTimestampExtension = new SubscriptionTimestamp();
+
   var _subscriptions = {};
   var _id = 0;
   function SubscriptionClient(client, channel, callback) {
@@ -84,7 +103,7 @@ define([
       this._subscription = client.subscribe(this._channel, this._callback);
 
       this._subscription.callback(function() {
-        log('Successfully resubscribed to ' + self  ._channel);
+        log('Successfully resubscribed to ' + self._channel);
 
         if(self._subscriptionCalled) return;
         self._subscriptionCalled = true;
@@ -109,7 +128,7 @@ define([
       delete _subscriptions[this._id];
       this._subscription.cancel();
     }
-  }
+  };
 
 
   function createClient() {
@@ -132,6 +151,7 @@ define([
     }
 
     client.addExtension(new ClientAuth());
+    client.addExtension(subscriptionTimestampExtension);
 
     client.connect(function() {});
 
@@ -247,11 +267,17 @@ define([
     getClientId: function() {
       return client.getClientId();
     },
+
     subscribe: function(channel, callback) {
       return new SubscriptionClient(client, channel, callback);
     },
+
     getClient: function() {
       return client;
+    },
+
+    getSubscriptionTimestamp: function(channel) {
+      return subscriptionTimestampExtension._getTimestamp(channel);
     }
   };
 });
