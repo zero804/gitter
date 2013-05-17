@@ -50,7 +50,19 @@ define([
       ZeroClipboard.Client.prototype.zIndex = 100000;
       var clip = new ZeroClipboard.Client();
       clip.setText( this.basePath + "/" + this.uri );
-      clip.glue( 'copy-button');
+      // clip.glue( 'copy-button');
+      // make your own div with your own css property and not use clip.glue()
+      var flash_movie = '<div>'+clip.getHTML(width, height)+'</div>';
+      var width = $("#copy-button").outerWidth()+4;
+      var height =  $("#copy-button").height()+10;
+      flash_movie = $(flash_movie).css({
+          position: 'relative',
+          marginBottom: -height,
+          width: width,
+          height: height,
+          zIndex: 101
+          });
+      $("#copy-button").before(flash_movie);
       this.clip=clip;
     },
 
