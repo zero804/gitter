@@ -153,7 +153,8 @@ install-client-libs:
 	cp output/client-libs/scrollfix/scrollfix.js public/repo/scrollfix/scrollfix.js
 	cp output/client-libs/typeahead.js/typeahead.js public/repo/typeahead/typeahead.js
 	cp output/client-libs/underscore/underscore-amd.js public/repo/underscore/underscore.js
-	cp output/client-libs/zeroclipboard/ZeroClipboard.min.js public/repo/zeroclipboard/zeroclipboard.js
+	# cp output/client-libs/zeroclipboard/ZeroClipboard.js public/repo/zeroclipboard/zeroclipboard.js
+	cp output/client-libs/zeroclipboard/zeroclipboard-amd.js public/repo/zeroclipboard/zeroclipboard.js
 	cp output/client-libs/zeroclipboard/ZeroClipboard.swf public/repo/zeroclipboard/
 	cp output/client-libs/zepto/zepto-amd.js public/repo/zepto/zepto.js
 

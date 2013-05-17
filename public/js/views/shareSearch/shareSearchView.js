@@ -5,9 +5,10 @@ define([
   'views/base',
   'hbs!./tmpl/shareView',
   'hbs!./tmpl/shareRow',
+  'zeroclipboard',
   'bootstrap-typeahead', // No reference
   'jquery-validate'  // No reference
-], function($, _, TroupeViews, template, rowTemplate) {
+], function($, _, TroupeViews, template, rowTemplate, ZeroClipboard) {
   "use strict";
 
   var View = TroupeViews.Base.extend({
@@ -15,6 +16,7 @@ define([
 
     events: {
       'keydown input': 'preventSubmit',
+      'hover #copy-button' : 'createClipboard',
       'click .removeInvite': 'deselectPerson',
       'click button[type=submit]': 'sendInvites'
     },
@@ -22,12 +24,36 @@ define([
     initialize: function() {
       // [ { userId: }, or { email: } ]
       this.invites = [];
+      this.uri = window.troupeContext.troupe.uri;
+      this.basePath = window.troupeContext.basePath;
+      this.addCleanup(function() {
+        if(this.clip) this.clip.destroy();
+      });
+    },
+
+    getRenderData: function() {
+      return {
+        uri: this.uri,
+        basePath: window.troupeContext.basePath
+      };
     },
 
     afterRender: function() {
       this.createTypeahead();
       this.validate();
     },
+
+    createClipboard : function() {
+      if(this.clip) return;
+
+      ZeroClipboard.setMoviePath( 'repo/zeroclipboard/ZeroClipboard.swf' );
+      ZeroClipboard.Client.prototype.zIndex = 100000;
+      var clip = new ZeroClipboard.Client();
+      clip.setText( this.basePath + "/" + this.uri );
+      clip.glue( 'copy-button');
+      this.clip=clip;
+    },
+
 
     preventSubmit: function(e) {
       if (e.keyCode == 13) {
@@ -108,7 +134,7 @@ define([
         },
         sorter: function(items) {
           return _.sortBy(items, function(o) {
-            return (o.nonSelectable || o.email) ? '' : o.displayName;
+            return o.displayName ? '' : (o.nonSelectable || o.email);
           });
         },
         matcher: function(item) {
@@ -156,7 +182,7 @@ define([
           source.push({ email: query, displayName: query, avatarUrlSmall: '/gravatar/'+query }); // note:  this will provide a diff avatar each key stroke, don't show it in the autocomplete!
         } else {
           // add a non-selectable option which says continue typing an email address
-          source.push({ displayName: "Continue typing an email address to invite someone else", nonSelectable: true });
+          source.push({ displayName: "You can also type an email address to invite somebody new.", nonSelectable: true });
         }
       }
 
@@ -174,6 +200,11 @@ define([
     selectPerson: function(user) {
       // TODO don't allow adding the same person more than once (alt: don't show them in the autocomplete results)
       var invite = {};
+
+      if (this.invites.length === 0) {
+        $('.trpSearchInvites').empty();
+      }
+
       if (user.id)
         invite.userId = user.id;
       if (user.email)
