@@ -46,7 +46,8 @@ define([
   exports.FileCollection = TroupeCollections.LiveCollection.extend({
     model: exports.FileModel,
     modelName: 'file',
-    nestedUrl: "files"
+    nestedUrl: "files",
+    preloadKey: "files"
   });
 
   _.extend(exports.FileCollection.prototype, TroupeCollections.ReversableCollectionBehaviour, {

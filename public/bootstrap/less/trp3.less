@@ -512,7 +512,8 @@ a:hover {
 .trpSearchInvites {
 	margin: 15px 0 15px 0;
 	max-height: 110px;
-	overflow: scroll;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
 .trpInviteModal, .trpInviteModal .modal-body {
@@ -551,6 +552,8 @@ a:hover {
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
+	vertical-align: top;
+	padding-top: 4px;
 }
 
 .login-content {
@@ -659,6 +662,19 @@ a:hover {
 	margin-top: 0;
 	border-radius: 0;
 	max-height: 130px;
-	overflow: scroll;
+	min-width: 316px;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
+#delete-troupe, #leave-troupe {
+	display: none;
+}
+
+.canDelete #delete-troupe {
+	display: inline-block;
+}
+
+.canLeave #leave-troupe {
+	display: inline-block;
+}

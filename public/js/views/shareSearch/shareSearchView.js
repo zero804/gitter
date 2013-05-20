@@ -3,11 +3,12 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!./tmpl/shareView',
+  'hbs!./tmpl/shareSearchView',
   'hbs!./tmpl/shareRow',
+  'zeroclipboard',
   'bootstrap-typeahead', // No reference
-  'jquery-validate'  // No reference
-], function($, _, TroupeViews, template, rowTemplate) {
+  'utils/validate-wrapper' // No reference
+], function($, _, TroupeViews, template, rowTemplate, ZeroClipboard) {
   "use strict";
 
   var View = TroupeViews.Base.extend({
@@ -15,19 +16,56 @@ define([
 
     events: {
       'keydown input': 'preventSubmit',
+      'hover #copy-button' : 'createClipboard',
       'click .removeInvite': 'deselectPerson',
-      'click button[type=submit]': 'sendInvites'
+      'submit #share-form': 'sendInvites'
     },
 
     initialize: function() {
       // [ { userId: }, or { email: } ]
       this.invites = [];
+      this.uri = window.troupeContext.troupe.uri;
+      this.basePath = window.troupeContext.basePath;
+      this.addCleanup(function() {
+        if(this.clip) this.clip.destroy();
+      });
+    },
+
+    getRenderData: function() {
+      return {
+        uri: this.uri,
+        basePath: window.troupeContext.basePath
+      };
     },
 
     afterRender: function() {
       this.createTypeahead();
       this.validate();
     },
+
+    createClipboard : function() {
+      if(this.clip) return;
+
+      ZeroClipboard.setMoviePath( 'repo/zeroclipboard/ZeroClipboard.swf' );
+      ZeroClipboard.Client.prototype.zIndex = 100000;
+      var clip = new ZeroClipboard.Client();
+      clip.setText( this.basePath + "/" + this.uri );
+      // clip.glue( 'copy-button');
+      // make your own div with your own css property and not use clip.glue()
+      var flash_movie = '<div>'+clip.getHTML(width, height)+'</div>';
+      var width = $("#copy-button").outerWidth()+4;
+      var height =  $("#copy-button").height()+10;
+      flash_movie = $(flash_movie).css({
+          position: 'relative',
+          marginBottom: -height,
+          width: width,
+          height: height,
+          zIndex: 101
+          });
+      $("#copy-button").before(flash_movie);
+      this.clip=clip;
+    },
+
 
     preventSubmit: function(e) {
       if (e.keyCode == 13) {
@@ -44,20 +82,9 @@ define([
             email: true
           }
         },
-        debug: true,
-        messages: {
-          inviteSearch: {
-            email: "Enter a valid email address or invite someone on the list below."
-          }
-        },
-        showErrors: function(errorMap, errorList) {
-          /*
-          if (errorList.length === 0) $('.share-failure').hide();
-          if (errorList.length > 0) $('.share-failure').show();
-          var errors = "";
-          $.each(errorList, function () { errors += this.message + "<br>"; });
-          $('#failure-text').html(errors);
-          */
+        showErrors: function(/*errorMap, errorList*/) {
+          // don't show errors, just use the .valid() method to tell if
+          // the input is a valid email address
         }
 
       });
@@ -108,7 +135,7 @@ define([
         },
         sorter: function(items) {
           return _.sortBy(items, function(o) {
-            return (o.nonSelectable || o.email) ? '' : o.displayName;
+            return o.displayName ? '' : (o.nonSelectable || o.email);
           });
         },
         matcher: function(item) {
@@ -156,7 +183,7 @@ define([
           source.push({ email: query, displayName: query, avatarUrlSmall: '/gravatar/'+query }); // note:  this will provide a diff avatar each key stroke, don't show it in the autocomplete!
         } else {
           // add a non-selectable option which says continue typing an email address
-          source.push({ displayName: "Continue typing an email address to invite someone else", nonSelectable: true });
+          source.push({ displayName: "You can also type an email address to invite somebody new.", nonSelectable: true });
         }
       }
 
@@ -174,6 +201,11 @@ define([
     selectPerson: function(user) {
       // TODO don't allow adding the same person more than once (alt: don't show them in the autocomplete results)
       var invite = {};
+
+      if (this.invites.length === 0) {
+        $('.trpSearchInvites').empty();
+      }
+
       if (user.id)
         invite.userId = user.id;
       if (user.email)
@@ -200,7 +232,9 @@ define([
       return JSON.stringify(this.invites);
     },
 
-    sendInvites: function() {
+    sendInvites: function(e) {
+      if(e) e.preventDefault();
+
       // don't let users submit unless there is at least one invite (show error message in .share-failure  )
       if (this.invites.length === 0) {
         return alert("Please select at least one user or email address to send to, or press escape to cancel.");

@@ -6,9 +6,9 @@ define([
   'views/base',
   'hbs!./tmpl/profileView',
   'fineuploader',
-  'jquery-validate', // no ref
-  'jquery-placeholder'
-], function($, _, TroupeViews, template, qq) {
+  'utils/validate-wrapper',
+  'jquery-placeholder'  // No reference
+], function($, _, TroupeViews, template, qq, validation) {
 
   var View = TroupeViews.Base.extend({
     template: template,
@@ -47,7 +47,7 @@ define([
       this.$el.find('#password').placeholder();
 
       var self = this;
-      var uploader = new qq.FineUploaderBasic({
+      new qq.FineUploaderBasic({
         button: self.$el.find('.button-choose-avatar')[0],
         multiple: false,
         validation: {
@@ -57,7 +57,7 @@ define([
           endpoint: '/avatar/'
         },
         callbacks: {
-          onSubmit: function(id, fileName) {
+          onSubmit: function(/*id, fileName*/) {
             // display spinner
             // self.$el.find('.trpDisplayPicture').css('background', 'url("/images/2/troupe-ajax-guy.gif") center center no-repeat');
             self.$el.find('.trpDisplayPicture').replaceWith('<img src="/images/2/troupe-ajax-guy-green.gif" class="trpSpinner"/>');
@@ -104,10 +104,10 @@ define([
       // TODO:
       // server validation errors should be displayed nicely
 
-      var validation = {
+      var validationConfig = {
         rules: {
-          displayName: { required: true, minlength: 2 },
-          password: { minlength: 6 },
+          displayName: validation.rules.userDisplayName(),
+          password: validation.rules.password(),
           oldPassword: { required: function() {
               // if this is an existing user and they have set a value for the password field then oldPassword is required as well.
               return (self.isExistingUser === true && !!self.$el.find('[name=password]').val());
@@ -116,13 +116,8 @@ define([
         },
         debug: true,
         messages: {
-          displayName: {
-            required: "Please tell us your name."
-          },
-          password: {
-            minlength: "Password must be at least 6 characters.",
-            required: "You need to set your password for the first time."
-          },
+          displayName: validation.messages.userDisplayName(),
+          password: validation.messages.password(),
           oldPassword: {
             required: "You're trying to change your password. Please enter your old password, or clear the new password field."
           }
@@ -142,10 +137,10 @@ define([
       };
 
       if (!this.isExistingUser) {
-        validation.rules.password.required = true;
+        validationConfig.rules.password.required = true;
       }
 
-      form.validate(validation);
+      form.validate(validationConfig);
 
     },
 

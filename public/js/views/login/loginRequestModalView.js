@@ -7,9 +7,9 @@ define([
   'views/base',
   'hbs!./tmpl/loginRequestModalView',
   'log!login-request-modal-view',
-  'jquery-validate',
-  'jquery-placeholder'
-], function($, _, TroupeViews, template, log) {
+  'utils/validate-wrapper',
+  'jquery-placeholder' // No reference
+], function($, _, TroupeViews, template, log, validation) {
   return TroupeViews.Base.extend({
     template: template,
 
@@ -56,45 +56,47 @@ define([
       var validateEl = this.$el.find('#requestAccess');
       validateEl.validate({
         rules: {
-          name: "required",
-          email: {
-            required: true,
-            email: true
-            }
-        },
-        debug: true,
-        showErrors: function(errorMap, errorList) {
-          log("errorList: " + errorList.length);
-          if (errorList.length === 0) $('.request-failure').hide();
-          if (errorList.length > 0) $('.request-failure').show();
-          var errors = "";
-          $.each(errorList, function () { errors += this.message + "<br>"; });
-          $('#failure-text').html(errors);
+          name: validation.rules.userDisplayName(),
+          email: validation.rules.userEmail()
         },
         messages: {
-          name: {
-            required: "Please tell us your name. "
-          },
-        email : {
-          required: "We need to know your email address.",
-          email: "Hmmm, that doesn't look like an email address."
+          name: validation.messages.userDisplayName(),
+          email : validation.messages.userEmail()
+        },
+        showErrors: function(errorMap) {
+          log("Validation errors: ", errorMap);
+
+          var errors = "";
+
+          _.each(_.keys(errorMap), function(key) {
+            var errorMessage = errorMap[key];
+            errors += errorMessage + "<br>";
+          });
+
+          $('#failure-text').html(errors);
+          if(errors) {
+            $('#request_validation').show();
+          } else {
+             $('#request_validation').hide();
           }
         }
-        });
+     });
     },
 
     getEmail: function() {
       return this.$el.find('input[name=email]').val();
     },
 
-    showLoginForm: function(e) {
+    showLoginForm: function() {
       this.trigger('request.login');
     },
 
-    onFormSubmit: function(e) {
+    onFormSubmit: function() {
       var form = this.$el.find('form');
       var that = this;
       var postUri =  this.authenticated ? "/requestAccessExistingUser" : "/requestAccessNewUser";
+
+      $('#request-failed').hide();
 
       $.ajax({
         url: postUri,
@@ -102,6 +104,7 @@ define([
         dataType: "json",
         data: form.serialize(),
         type: "POST",
+        globa: false,
         success: function(data) {
           if(data.success) {
             $('.modal-content').hide();
@@ -110,13 +113,12 @@ define([
           }
 
           if(data.userExists) {
-            $('#request-form').hide();
-            $('#modal-failure-userExists').show();
+            that.trigger('request.login', { userExists: true });
             return;
           }
-
-          alert('Something went wrong. Oopsie daisy.');
-
+        },
+        error: function() {
+          $('#request-failed').show();
         }
       });
 

@@ -7,7 +7,7 @@ require([
   'views/login/loginModalView',
   'views/signup/createTroupeView',
   'views/app/messagesView',
-  'jquery-validate', // No ref!
+  'utils/validate-wrapper', // No ref!
   'retina'
  ],
   function($, TroupeViews, SignupModalView, SignupModalConfirmView, LoginModalView, createTroupeView, MessagesView) {
