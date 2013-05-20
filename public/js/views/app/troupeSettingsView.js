@@ -1,41 +1,41 @@
 define([
   'views/base',
   'collections/desktop',
-  'hbs!./tmpl/troupeSettingsTemplate'
-], function(TroupeViews, collections, troupeSettingsTemplate) {
+  'hbs!./tmpl/troupeSettingsTemplate',
+  'log!troupe-settings-view',
+  'utils/validate-wrapper'
+], function(TroupeViews, collections, troupeSettingsTemplate, log, validation) {
 
   var View = TroupeViews.Base.extend({
     template: troupeSettingsTemplate,
     events: {
-      'submit #troupeSettings': 'saveSettings'
+      'submit #troupeSettings': 'saveSettings',
+      'click #cancel-troupe-settings' : 'closeSettings',
+      'click #delete-troupe': 'deleteTroupe',
+      'click #leave-troupe': 'leaveTroupe'
     },
 
     initialize: function(options) {
       var self = this;
       this.model = collections.troupes.get(window.troupeContext.troupe.id);
       this.userCollection = collections.users;
-      this.on('button.click', function(id) {
-        switch(id) {
-          case 'save-troupe-settings':
-            self.saveSettings();
-            break;
-          case 'cancel-troupe-settings':
-            self.dialog.hide();
-            self.dialog = null;
-            break;
-          case 'delete-troupe':
-            self.deleteTroupe();
-            break;
-          case 'leave-troupe':
-            self.leaveTroupe();
-            break;
-        }
-      });
-
+      this.$el.toggleClass('canLeave', this.canLeave());
+      this.$el.toggleClass('canDelete', this.canDelete());
     },
+
+    closeSettings : function () {
+      this.dialog.hide();
+      this.dialog = null;
+    },
+
+    afterRender: function() {
+      this.validateForm();
+    },
+
     canDelete: function() {
       return this.userCollection.length == 1;
     },
+
     deleteTroupe: function() {
 
       if (!this.canDelete()) {
@@ -66,9 +66,11 @@ define([
       });
 
     },
+
     canLeave: function() {
       return this.userCollection.length > 1;
     },
+
     leaveTroupe: function() {
       var errMsg = "You cannot leave a troupe if you are the only member, rather delete it.";
 
@@ -98,6 +100,35 @@ define([
       return window.troupeContext.troupe;
     },
 
+    validateForm : function () {
+      console.log("Validate init");
+      var validateEl = this.$el.find('#troupeSettings');
+      validateEl.validate({
+        rules: {
+          name: validation.rules.troupeName()
+        },
+        messages: {
+          name: validation.messages.troupeName()
+        },
+        showErrors: function(errorMap) {
+          var errors = "";
+
+          _.each(_.keys(errorMap), function(key) {
+            var errorMessage = errorMap[key];
+            errors += errorMessage + "<br>";
+          });
+
+          $('#failure-text').html(errors);
+          if(errors) {
+            $('#request_validation').show();
+          } else {
+             $('#request_validation').hide();
+          }
+        }
+     });
+    },
+
+
     saveSettings: function(e) {
       if(e) e.preventDefault();
 
@@ -126,39 +157,11 @@ define([
     }
   });
 
-  return TroupeViews.ConfirmationModal.extend({
-    initialize: function(options) {
-      this.userCollection = collections.users;
-      options.title = "Settings for this Troupe";
-      options.buttons = [{
-        id: "save-troupe-settings",
-        text: "Save"
-      }, {
-        id: "cancel-troupe-settings",
-        text: "Cancel"
+  return TroupeViews.Modal.extend({
+      initialize: function(options) {
+        options.title = "Settings";
+        TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+        this.view = new View({ });
       }
-      ];
-      if (this.canDelete()) {
-        options.buttons.push({
-          id: "delete-troupe",
-          text: "Delete Troupe"
-        });
-      }
-      if (this.canLeave()) {
-        options.buttons.push({
-          id: "leave-troupe",
-          text: "Leave this Troupe"
-        });
-      }
-      options.confirmationView = new View({});
-      options.confirmationView.dialog = this;
-      TroupeViews.ConfirmationModal.prototype.initialize.apply(this, arguments);
-    },
-    canLeave: function() {
-      return this.userCollection.length > 1;
-    },
-    canDelete: function() {
-      return this.userCollection.length == 1;
-    }
+    });
   });
-});

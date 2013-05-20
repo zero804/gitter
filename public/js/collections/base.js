@@ -96,22 +96,62 @@ define([
     modelName: '',
     constructor: function(models, options) {
       Backbone.Collection.prototype.constructor.call(this, models, options);
-      _.bindAll(this, 'onDataChange');
+
       if(!this.url) {
         this.url = "/troupes/" + window.troupeContext.troupe.id + "/" + this.nestedUrl;
       }
 
-      this.once('reset', this.onInitialLoad, this);
-      this.once('sync', this.onInitialLoad, this);
+      this._loading = false;
+
+      this.once('reset sync', this._onInitialLoad, this);
+
+      this.on('sync', this._onSync, this);
+      this.on('request', this._onRequest, this);
 
       this.once('error', function() {
         $('#' + this.modelName + '-fail').show('fast', function() {
         });
       }, this);
 
+      if(options) {
+
+        if(options.preloader) {
+          var preloader = options.preloader;
+          this.preloader = preloader;
+
+          preloader.on('preload:start', this._onPreloadStart, this);
+          preloader.on('preload:complete', this._onPreloadComplete, this);
+        }
+
+        if(options.listen) {
+          this.listen();
+        }
+
+      }
+
     },
 
-    onInitialLoad: function() {
+    _onPreloadStart: function() {
+      this._loading = true;
+      this.reset([]);
+    },
+
+    _onSync: function() {
+      this._loading = false;
+    },
+
+    _onRequest: function() {
+      this._loading = true;
+    },
+
+    _onPreloadComplete: function(data) {
+      this._comparePreloadToSubscription();
+      var items = data[this.preloadKey];
+      this.add(items, { parse: true, merge: true, sort: true });
+      this._loading = false;
+    },
+
+    _onInitialLoad: function() {
       if(this._initialLoadCalled) return;
       this._initialLoadCalled = true;
 
@@ -124,16 +164,30 @@ define([
       }
     },
 
+    _comparePreloadToSubscription: function() {
+      if(this.preloader) {
+        var preloadTimestamp = this.preloader.getTimestamp();
+        var subscriptionTimestamp = realtime.getSubscriptionTimestamp(this.url);
+
+        if(subscriptionTimestamp > preloadTimestamp) {
+          log('WARNING: Difference in timestamps is ', preloadTimestamp - subscriptionTimestamp, preloadTimestamp, subscriptionTimestamp);
+        }
+
+      }
+    },
+
     listen: function(callback) {
       if(this.subscription) return;
       var self = this;
 
       this.subscription = realtime.subscribe(this.url, function(message) {
-        self.onDataChange(message);
+        self._onDataChange(message);
       });
 
       this.subscription.callback(function() {
-        // log('Listening to ' + self.url);
+        log('Listening to ' + self.url);
+        self._comparePreloadToSubscription();
+
         if(callback) return callback();
       });
 
@@ -143,18 +197,15 @@ define([
       });
     },
 
+    isLoading: function() {
+      return this._loading;
+    },
+
     unlisten: function() {
       if(!this.subscription) return;
       this.subscription.cancel();
       this.subscription = null;
     },
-
-    /* TODO: remove when we upgrade to 0.9.9
-    once: function(ev, callback, context) {
-      var onceFn = function() { this.unbind(ev, onceFn); callback.apply(context || this, arguments); };
-      this.bind(ev, onceFn);
-      return this;
-    }, */
 
     findExistingModel: function(id, newModel) {
       var existing = this.get(id);
@@ -187,7 +238,7 @@ define([
       return incomingVersion > existingVersion;
     },
 
-    onDataChange: function(data) {
+    _onDataChange: function(data) {
       var operation = data.operation;
       var newModel = data.model;
       var id = newModel.id;

@@ -18,7 +18,7 @@ module.exports = {
           // Form filter and validation middleware
           form(
             filter("displayName").trim(),
-            validate("displayName").required().is(/^[\w\d\. \-\'\d]+$/),
+            validate("displayName").required().is(/^[^<>]{2,}$/),
             filter("password").trim(),
             filter("oldPassword").trim(),
             filter("newEmail").trim()

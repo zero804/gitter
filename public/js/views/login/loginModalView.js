@@ -14,12 +14,14 @@ define([
       if (options) {
         this.initialEmail = options.email;
         this.fromSignup = options.fromSignup;
+        this.userExists = options.userExists;
       }
       _.bindAll(this, 'onFormSubmit');
     },
 
     getRenderData: function() {
       return {
+        userExists: this.userExists,
         email: this.initialEmail,
         autofocusEmail: this.initialEmail ? '': 'autofocus',
         autofocusPassword: this.initialEmail ? 'autofocus' : '',
@@ -46,23 +48,23 @@ define([
       "click #new-user": "showRequestAccess"
     },
 
-    backClicked: function(e) {
+    backClicked: function() {
       this.$el.find('.login-content').show();
       this.$el.find('.resetpwd-content').hide();
       this.$el.find('.resetpwd-failed').hide();
     },
 
-    resetClicked: function(e) {
+    resetClicked: function() {
       this.$el.find('.login-content').hide();
       this.$el.find('.resetpwd-content').show();
       this.$el.find('#resetEmailAddress').text(this.$el.find('#email').val());
     },
 
-    closeClicked: function(e) {
+    closeClicked: function() {
       this.trigger('login.close');
     },
 
-    sendResetClicked: function(e) {
+    sendResetClicked: function() {
       var that = this;
       var form = this.$el.find('form');
       $.ajax({
