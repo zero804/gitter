@@ -67,11 +67,20 @@ define([
     if (this.isAtBottomOfPage) {
       return this.scrollToBottom();
     }
+    /*
+    else {
+      we could try keep previous scroll position here, but that might be tricky,
+      so we only call onAfterItemAdded for new message (not while loading) and use the collection sync event instead to reset to the bottom after initial load
+    }
+    */
   };
 
   DefaultScrollDelegate.prototype.onBeforeItemAdded = function() {
-    this.isAtBottomOfPage = (this.$scrollOf.scrollTop() >= (this.$container.height() - this.$scrollOf.height()));
-    this.containerHeightBeforeAdd = this.$container.height();
+    var scrollTop = this.$scrollOf.scrollTop();
+    var containerHeight = this.$container.height();
+    var scrollOfHeight = this.$scrollOf.height();
+    this.isAtBottomOfPage = (scrollTop >= ((containerHeight - scrollOfHeight) - 40));
+    this.containerHeightBeforeAdd = containerHeight;
   };
 
   DefaultScrollDelegate.prototype.scrollTop = function(top) {
