@@ -149,6 +149,7 @@ define([
       var items = data[this.preloadKey];
       this.add(items, { parse: true, merge: true, sort: true });
       this._loading = false;
+      this.trigger('sync');
     },
 
     _onInitialLoad: function() {
