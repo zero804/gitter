@@ -101,9 +101,7 @@ require([
       if (!self.topUnreadPosition)
         return null;
 
-      return {
-        top: self.topUnreadPosition
-      };
+      return self.topUnreadPosition;
     }
 
     this.newMessage = function() {

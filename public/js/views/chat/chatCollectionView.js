@@ -262,11 +262,11 @@ define([
         ChatCollectionView.$container = $(document);
       }
 
-      this.scrollDelegate = new scrollDelegates.DefaultScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
-      this.infiniteScrollDelegate = new scrollDelegates.InfiniteScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
+      this.scrollDelegate = new scrollDelegates.DefaultScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostUnreadItem);
+      this.infiniteScrollDelegate = new scrollDelegates.InfiniteScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostUnreadItem);
 
-      function findTopMostVisibleUnreadItem(itemType) {
-        return unreadItemsClient.findTopMostVisibleUnreadItemPosition(itemType, ChatCollectionView.$container, ChatCollectionView.$scrollOf);
+      function findTopMostUnreadItem(itemType) {
+        return unreadItemsClient.findTopMostUnreadItemPosition(itemType, ChatCollectionView.$container, ChatCollectionView.$scrollOf);
       }
 
       var self = this;
