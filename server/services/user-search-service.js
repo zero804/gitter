@@ -6,7 +6,7 @@ var persistence = require("./persistence-service");
 
 function createRegExpsForQuery(queryText) {
   var normalized = ("" + queryText).trim().toLowerCase();
-  var parts = normalized.split(/\s+/)
+  var parts = normalized.split(/[\s\'']+/)
                         .filter(function(s) { return !!s; })
                         .filter(function(s, index) { return index < 10; } );
   return parts.map(function(i) {
