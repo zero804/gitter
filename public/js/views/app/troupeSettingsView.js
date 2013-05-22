@@ -30,7 +30,6 @@ define([
     },
 
      validateForm : function () {
-      console.log("Validate init");
       var validateEl = this.$el.find('#troupeSettings');
       validateEl.validate({
         rules: {
