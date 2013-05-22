@@ -6,8 +6,15 @@
     <div class="trpRequestSubmit">
       <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen" id="save-troupe-settings">Save</button>
       <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="cancel-troupe-settings">Cancel</button>
+
+      {{#if canDelete}}
       <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="delete-troupe">Delete Troupe</button>
+      {{/if}}
+
+      {{#if canLeave}}
       <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="leave-troupe">Leave this Troupe</button>
+      {{/if}}
+
   </div>
   </form>
 </div>

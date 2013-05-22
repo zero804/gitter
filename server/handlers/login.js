@@ -6,29 +6,29 @@ var loginUtils = require("../web/login-utils"),
     nconf = require('../utils/config'),
     troupeService = require("../services/troupe-service"),
     middleware = require('../web/middleware'),
-    userService = require('../services/user-service');
+    userService = require('../services/user-service'),
+    assert = require('assert');
 
 function handleJsonLogin(req, res) {
   var troupeUri = req.body.troupeUri;
-  winston.info("login: Performing json login");
+  winston.info("login: Performing json login", { troupeUri: troupeUri });
 
   function sendUri(uri) {
+    assert(uri, 'Empty URI');
     res.send({
       failed: false,
-      user: req.user,
       redirectTo: uri
     });
   }
 
-  function sendTroupe(err,troupe) {
+  function sendTroupe(err, troupe) {
     if (err) return sendUri("/select-troupe");
 
-    return sendUri(troupe.uri);
+    return sendUri(troupe.getUrl(req.user.id));
   }
 
   if(req.session.returnTo) {
     sendUri(req.session.returnTo);
-
     return;
   }
 
@@ -37,12 +37,7 @@ function handleJsonLogin(req, res) {
     return;
   }
 
-  if (req.user.lastTroupe) {
-    troupeService.findById(req.user.lastTroupe, sendTroupe);
-    return;
-  }
-
-  troupeService.findBestTroupeForUser(req.user.id, sendTroupe);
+  troupeService.findBestTroupeForUser(req.user, sendTroupe);
 }
 
 module.exports = {
