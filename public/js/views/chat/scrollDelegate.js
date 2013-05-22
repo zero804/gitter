@@ -20,7 +20,7 @@ define([
   * When testing eyeball related code during dev use a timer on the second window so that eyeballs isn't triggered when switching between windows (var i = setInterval(function() { window._troupeDebug.app.collections.chats.create({ fromUser: window.troupeContext.user, text: new Date() }); }, 5000);)
   */
 
-  var DefaultScrollDelegate = function($scrollOf, $container, itemType, findTopMostVisibleUnreadItem) {
+  var DefaultScrollDelegate = function($scrollOf, $container, itemType, findTopMostUnreadItem) {
     // the container is used to calculate how much space has been added with a new view element,
     // it is effectively the box that is being scrolled, except the scroll bars will actually be on $scrollOf
     this.$container = $container;
@@ -35,7 +35,7 @@ define([
     // switch the max limit functionality on / off so the top unread message is not searched for
     this.useMax = true;
     //
-    this.findTopMostVisibleUnreadItem = findTopMostVisibleUnreadItem;
+    this.findTopMostUnreadItem = findTopMostUnreadItem;
   };
 
   DefaultScrollDelegate.prototype.useLimit = function(useMax) {
@@ -50,33 +50,41 @@ define([
     // note: mobile will never have a scroll limit because eyaballs are never off, so items are marked as read immediately.
     if(this.useMax) {
       // look for the highest unread item and set the max to it
-      var topUnreadItemPosition = this.findTopMostVisibleUnreadItem(this.itemType);
+      var topUnreadItemPosition = this.findTopMostUnreadItem(this.itemType);
 
       if(topUnreadItemPosition) {
-        var pos = topUnreadItemPosition.top;
-        // log('Found our top item at position ', pos);
-        this.maxScroll = Math.max(0, pos - 140);
+        // log('Found our top item at position ', topUnreadItemPosition);
+        this.maxScroll = Math.max(0, topUnreadItemPosition - 140);
       }
     }
   };
 
   DefaultScrollDelegate.prototype.onAfterItemAdded = function(/* item */) {
-    this.calculateScrollLimit();
 
     // stay at the bottom
     if (this.isAtBottomOfPage) {
       return this.scrollToBottom();
     }
+    /*
+    else {
+      we could try keep previous scroll position here, but that might be tricky,
+      so we only call onAfterItemAdded for new message (not while loading) and use the collection sync event instead to reset to the bottom after initial load
+    }
+    */
   };
 
   DefaultScrollDelegate.prototype.onBeforeItemAdded = function() {
-    this.isAtBottomOfPage = (this.$scrollOf.scrollTop() >= (this.$container.height() - this.$scrollOf.height()));
-    this.containerHeightBeforeAdd = this.$container.height();
+    var scrollTop = this.$scrollOf.scrollTop();
+    var containerHeight = this.$container.height();
+    var scrollOfHeight = this.$scrollOf.height();
+    this.isAtBottomOfPage = (scrollTop >= ((containerHeight - scrollOfHeight) - 40));
+    this.containerHeightBeforeAdd = containerHeight;
   };
 
   DefaultScrollDelegate.prototype.scrollTop = function(top) {
     var scrollToMe = top; // Math.min(top, this.maxScrollPossible()); // disabling usage of maxPossibleScroll because it's not really needed and doesn't yet account for padding or rounding.
 
+    this.calculateScrollLimit();
     if (this.maxScroll >= 0 && top > this.maxScroll) {
       // log("Capping the scroll to " + this.maxScroll + "(" + top + " requested)");
       scrollToMe = this.maxScroll; // Math.min(this.maxScroll, top);
