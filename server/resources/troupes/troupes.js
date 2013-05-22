@@ -100,6 +100,7 @@ module.exports = {
     troupeService.findById(id, function(err, troupe) {
       if(err) return callback(500);
       if(!troupe) return callback(404);
+
       if(troupe.status != 'ACTIVE') return callback(404);
 
       if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {

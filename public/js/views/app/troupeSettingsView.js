@@ -97,7 +97,11 @@ define([
     },
 
     getRenderData: function() {
-      return window.troupeContext.troupe;
+      return _.extend({},
+        window.troupeContext.troupe, {
+        canLeave: this.canLeave(),
+        canDelete: this.canDelete()
+      });
     },
 
     validateForm : function () {

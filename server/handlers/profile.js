@@ -65,20 +65,11 @@ module.exports = {
                 return next(err);
               }
 
-              if(req.accepts("application/json")) {
-                res.send({
-                  success: true,
-                  displayName: req.form.displayName
-                });
-              } else {
-                troupeService.findBestTroupeForUser(req.user.id, function(err, troupe) {
-                  if(err) return next(err);
-                  if(!troupe) return next("Unable to determine default troupe for user");
+              res.send({
+                success: true,
+                displayName: req.form.displayName
+              });
 
-                  res.relativeRedirect("/" + troupe.uri);
-                  return;
-                });
-              }
 
             });
           }

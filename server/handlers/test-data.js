@@ -37,7 +37,7 @@ module.exports = {
         if(err) return next(err);
         if(!user) return next(404);
 
-        troupeService.findBestTroupeForUser(user.id, function(err, troupe) {
+        troupeService.findBestTroupeForUser(user, function(err, troupe) {
           if(err) return next(err);
           if(!troupe) return next(404);
 
