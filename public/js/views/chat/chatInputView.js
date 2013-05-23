@@ -19,7 +19,7 @@ define([
     template: template,
 
     initialize: function(options) {
-      this.scrollDelegate = options.collectionViewScrollDelegate;
+      this.scrollDelegate = options.scrollDelegate;
     },
 
     getRenderData: function() {
@@ -100,6 +100,7 @@ define([
       var lht = parseInt(this.$el.css('lineHeight'),10);
       var height = this.$el.prop('scrollHeight');
       var currentLines = Math.floor(height / lht);
+      var wasAtBottom = this.scrollDelegate.isAtBottom();
 
       if (currentLines != this.chatLines) {
         this.chatLines = currentLines;
@@ -111,7 +112,9 @@ define([
           chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
           $('#frame-chat').css('padding-bottom', chatPadding);
         }
-        this.scrollDelegate.scrollToBottom();
+        if (wasAtBottom) {
+          this.scrollDelegate.scrollToBottom();
+        }
       }
     },
 

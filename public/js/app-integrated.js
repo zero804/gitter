@@ -295,7 +295,7 @@ require([
     new chatInputView.ChatInputView({
       el: $('#chat-input'),
       collection: chatCollection,
-      collectionViewScrollDelegate: chatCollectionView.scrollDelegate
+      scrollDelegate: chatCollectionView.scrollDelegate
     }).render();
 
     // Request View
