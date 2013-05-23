@@ -11,7 +11,7 @@ require([
   'components/eyeballs',
   'components/unread-items-client',
   'scrollfix'
-], function($, _, Backbone, TroupeViews, chatModels, ChatInputView, ChatCollectionView, AvatarWidget/*, eyeballsClient, unreadItemsClient, scrollfix*/) {
+], function($, _, Backbone, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget/*, eyeballsClient, unreadItemsClient, scrollfix*/) {
   /*jslint browser: true, unused: true */
   "use strict";
 
@@ -30,7 +30,7 @@ require([
     }
   });
 
-  new ChatInputView({
+  new chatInputView.ChatInputView({
     el: $('#chat-input'),
     collection: chatCollection
   }).render();
