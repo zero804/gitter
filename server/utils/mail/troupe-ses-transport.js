@@ -81,7 +81,6 @@ TroupeSESTransport.prototype.sendMailString = function(from, recipients, string,
     /* Take the XML response, extract the messageId, then call the callback */
 
     function extractMessageIdFromResponse(errPostingToSES, response) {
-      // console.log('interpreting message id from SES mail');
       if(errPostingToSES) return callback(errPostingToSES);
 
       var parser = new xml2js.Parser();
@@ -112,7 +111,6 @@ TroupeSESTransport.prototype.sendMailStream = function(from, recipients, stream,
   // before we can actually construct the message (due to the signing required).
   io.readStreamIntoString(stream, function(err, string) {
     if(err) { winston.error("Error reeading stream", { exception: err }); return callback(err); }
-    //console.log(string);
     self.sendMailString(from, recipients, string, callback);
   });
 

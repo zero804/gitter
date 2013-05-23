@@ -14,7 +14,7 @@ var sessionCookieName = nconf.get('web:cookiePrefix') + 'session';
  */
 exports.ensureLoggedIn = function(options) {
   if(!options) options = {};
-  var setReturnTo = (options.setReturnTo === undefined) ? true : options.setReturnTo;
+
 
   var bearerLogin = passport.authenticate('bearer', { session: true });
 
@@ -39,19 +39,35 @@ exports.ensureLoggedIn = function(options) {
       next();
     },
     function(req, res, next) {
-      if (!req.isAuthenticated || !req.isAuthenticated()) {
-        if(req.accepts(['json','html']) === 'json') {
-          winston.error("middleware: User is not logged in. Ye shall not pass!");
-          res.send(401, { success: false, loginRequired: true });
-          return;
-        }
+      if (req.isAuthenticated && req.isAuthenticated()) return next();
 
-        if (setReturnTo && req.session) {
-          req.session.returnTo = req.url;
-        }
-        return res.redirect("/login");
+      winston.verbose('Client needs to authenticate', options);
+
+      // Are we dealing with an API client? Tell em in HTTP
+      if(req.accepts(['json','html']) === 'json') {
+        winston.error("middleware: User is not logged in. Ye shall not pass!");
+        res.send(401, { success: false, loginRequired: true });
+        return;
       }
-      next();
+
+      if (options.setReturnTo !== false && req.session) {
+        req.session.returnTo = req.url;
+      }
+
+      if(!options.loginUrl) {
+        return res.relativeRedirect("/login");
+      }
+
+      if(typeof options.loginUrl == "function") {
+        options.loginUrl(req, function(err, url) {
+          if(err) return next(err);
+          res.relativeRedirect(url);
+        });
+        return;
+      }
+
+      res.relativeRedirect(options.loginUrl);
+      return;
     }
   ];
 

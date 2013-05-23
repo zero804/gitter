@@ -98,6 +98,23 @@ def testCreateTroupeFromGroupTroupe():
     assert len(driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem')) == 2
 
 
+# Follows on from last test
+def testRemoveUserFromTroupe():
+    troupeBefore = driver.find_element_by_css_selector('DIV.trpHeaderTitle').text
+
+    for x in driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem'):
+        x.click()
+        if len(driver.find_elements_by_css_selector('#person-remove-button')) > 0:
+            driver.find_element_by_css_selector('#person-remove-button').click()
+            driver.find_element_by_css_selector('#button-yes').click()
+    driver.find_element_by_css_selector('.trpSettingsButton a').click()
+    driver.find_element_by_css_selector('#delete-troupe').click()
+    driver.find_element_by_css_selector('#ok').click()
+
+    troupeAfter = driver.find_element_by_css_selector('DIV.trpHeaderTitle').text
+    assert(troupeBefore != troupeAfter)
+
+
 def testCreateTroupeFromOneToOneTroupe():
     driver.delete_all_cookies()
     utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')

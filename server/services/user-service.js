@@ -167,14 +167,6 @@ var userService = {
 
   },
 
-  findDefaultTroupeForUser: function(id, callback) {
-    assert(id, 'id is required');
-
-    persistence.Troupe.findOne({ 'users.userId': id }, function(err, troupe) {
-      callback(err, troupe);
-    });
-  },
-
   setUserLocation: function(userId, location, callback) {
     statsService.event("location_submission", {
       userId: userId

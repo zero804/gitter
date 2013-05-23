@@ -11,6 +11,7 @@ var statsService = require("./stats-service");
 var fs = require('fs');
 var thumbnailPreviewGeneratorService = require("./thumbnail-preview-generator-service");
 var mongooseUtils = require('../utils/mongoose-utils');
+var Fiber = require('../utils/fiber');
 
 /* private */
 function getMainFileName(fileId, version) {
@@ -337,16 +338,26 @@ function deleteFileFromGridStore(fileName, callback) {
   GridStore.unlink(db, fileName, callback);
 }
 
+function deleteGridstoreFiles(file, callback) {
+  var versions = file.versions;
+  var fileId = file.id;
+
+  var f = new Fiber();
+
+  versions.forEach(function(fileVersion, index) {
+    var version = index + 1;
+    deleteFileFromGridStore(getMainFileName(fileId, version), f.waitor());
+    deleteFileFromGridStore(getEmbeddedFileName(fileId, version), f.waitor());
+    deleteFileFromGridStore(getThumbnailFileName(fileId, version), f.waitor());
+  });
+
+  f.all().then(function() { callback(); }, callback);
+}
+
 mongooseUtils.attachNotificationListenersToSchema(persistence.schemas.FileSchema, {
   onRemove: function(model) {
-    var versions = model.versions;
-    var fileId = model.id;
-
-    versions.forEach(function(fileVersion, index) {
-      var version = index + 1;
-      deleteFileFromGridStore(getMainFileName(fileId, version));
-      deleteFileFromGridStore(getEmbeddedFileName(fileId, version));
-      deleteFileFromGridStore(getThumbnailFileName(fileId, version));
+    deleteGridstoreFiles(model, function(err) {
+      if(err) winston.error("Error while deleting file from gridstore: ", { exception: err } );
     });
   }
 });
@@ -360,6 +371,9 @@ module.exports = {
   getFileStream: getFileStream,
   getFileEmbeddedStream: getFileEmbeddedStream,
   getThumbnailStream: getThumbnailStream,
+
+  /* For the demolition service */
+  deleteGridstoreFiles: deleteGridstoreFiles,
 
   /* For Testing */
   getMainFileName:getMainFileName,
