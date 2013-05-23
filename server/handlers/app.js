@@ -4,7 +4,6 @@
 var troupeService = require("../services/troupe-service");
 var winston = require("winston");
 var userService = require("../services/user-service");
-var signupService = require("../services/signup-service");
 var unreadItemService = require("../services/unread-item-service");
 var restSerializer = require("../serializers/rest-serializer");
 var nconf = require('../utils/config');
@@ -16,6 +15,7 @@ var chatService = require("../services/chat-service");
 var Fiber = require("../utils/fiber");
 var conversationService = require("../services/conversation-service");
 var appVersion = require("../web/appVersion");
+var loginUtils = require('../web/login-utils');
 
 var useFirebugInIE = nconf.get('web:useFirebugInIE');
 
@@ -306,24 +306,20 @@ module.exports = {
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         function(req, res, next) {
-
-          troupeService.findBestTroupeForUser(req.user, function(err, troupe) {
-            if(err || !troupe) next(err);
-
-            res.relativeRedirect(troupe.getUrl(req.user.id));
-          });
-      });
+          loginUtils.redirectUserToDefaultTroupe(req, res, next);
+        });
 
       app.get('/last/:page',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         function(req, res, next) {
 
-          troupeService.findBestTroupeForUser(req.user, function (err, troupe) {
-            if (err || !troupe) next(err);
+          loginUtils.whereToNext(req.user, function(err, url) {
+            if (err || !url) next(err);
 
-            res.relativeRedirect(troupe.getUrl(req.user.id) + "/" + req.params.page);
+            res.relativeRedirect(url + "/" + req.params.page);
           });
+
         });
 
 

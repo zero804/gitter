@@ -13,6 +13,7 @@ var BearerStrategy = require('passport-http-bearer').Strategy;
 var oauthService = require('../services/oauth-service');
 var statsService = require("../services/stats-service");
 var nconf = require('../utils/config');
+var loginUtils = require("../web/login-utils");
 
 function emailPasswordUserStrategy(email, password, done) {
   winston.verbose("Attempting to authenticate ", { email: email });
@@ -148,14 +149,13 @@ module.exports = {
             return self.redirect("/" + troupeUri);
           }
 
-          troupeService.findBestTroupeForUser(user, function(err, troupe) {
-            if(err) return done(err);
-            if(!troupe) return self.redirect(nconf.get('web:homeurl'));
 
-            return self.redirect(troupe.getUrl(user.id));
+          loginUtils.whereToNext(user, function(err, url) {
+            if(err || !url) return self.redirect(nconf.get('web:homeurl'));
+
+            return self.redirect(url);
           });
 
-          return;
         }
 
       });

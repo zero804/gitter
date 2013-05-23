@@ -4,23 +4,39 @@ require([
   'log!login',
   'retina'],
   function($, log) {
-    if(window.localStorage.defaultTroupeEmail) {
-      $('#email').val(window.localStorage.defaultTroupeEmail);
+
+    function getDefaultEmail() {
+      try {
+        if(window.localStorage) {
+          return window.localStorage.defaultTroupeEmail;
+        }
+      } catch(err) {
+        log('Unable to access localStorage', err);
+      }
     }
 
-    log("Document: " + $(document).width());
+    function setDefaultEmail(value) {
+      if(window.localStorage) {
+        try {
+          window.localStorage.defaultTroupeEmail = value;
+        } catch(err) {
+          log('Browser rejected attempted to use localStorage', err);
+        }
+      }
+
+    }
+
+    var defaultEmail = getDefaultEmail();
+    if(defaultEmail) $('#email').val(defaultEmail);
+
     var leftPanelSpacing = (($(document).width() - 320) / 2) + 320;
 
-    log("Where am I: " + leftPanelSpacing);
-
-    $('#panel-signup').css('left', leftPanelSpacing + 'px');
+    $('#panel-signup').css('left', leftPanelSpacing + 'px').show();
 
     $('#button-signup').on('click', function() {
       $('#panel-signup, #panel-login').animate( {
         left: '-=' + leftPanelSpacing + 'px'
       }, 350);
-
-      // $('#panel-login').animate({translate3d: '-320px,0,0'}, 0.5, 'swing');
     });
 
     $('#button-back').on('click', function() {
@@ -41,7 +57,7 @@ require([
 
     $("#loginform").submit(function(e) {
       e.preventDefault();
-      window.localStorage.defaultTroupeEmail = $('#email').val();
+      setDefaultEmail($('#email').val());
 
       $("#password").blur();
       submitForm();
@@ -50,7 +66,6 @@ require([
     var showingFailure = false;
 
     function showLoginFailure() {
-      log("UP YOU SLIDE");
       // $('#panel-failure').slideUp();
       $('#panel-failure').animate( {
         bottom: '0px'
@@ -60,7 +75,6 @@ require([
 
     function hideLoginFailure() {
       if (showingFailure) {
-        log("DOWN YOU SLIDE");
          $('#panel-failure').animate( {
             bottom: '-90px'
           }, 350);

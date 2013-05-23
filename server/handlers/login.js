@@ -4,41 +4,11 @@
 var loginUtils = require("../web/login-utils"),
     winston = require("winston"),
     nconf = require('../utils/config'),
-    troupeService = require("../services/troupe-service"),
     middleware = require('../web/middleware'),
     userService = require('../services/user-service'),
-    assert = require('assert');
-
-function handleJsonLogin(req, res) {
-  var troupeUri = req.body.troupeUri;
-  winston.info("login: Performing json login", { troupeUri: troupeUri });
-
-  function sendUri(uri) {
-    assert(uri, 'Empty URI');
-    res.send({
-      failed: false,
-      redirectTo: uri
-    });
-  }
-
-  function sendTroupe(err, troupe) {
-    if (err) return sendUri("/select-troupe");
-
-    return sendUri(troupe.getUrl(req.user.id));
-  }
-
-  if(req.session.returnTo) {
-    sendUri(req.session.returnTo);
-    return;
-  }
-
-  if(troupeUri) {
-    sendUri("/" + troupeUri);
-    return;
-  }
-
-  troupeService.findBestTroupeForUser(req.user, sendTroupe);
-}
+    assert = require('assert'),
+    url = require('url'),
+    loginUtils = require('../web/login-utils');
 
 module.exports = {
     install: function(app) {
@@ -47,22 +17,65 @@ module.exports = {
         middleware.generateRememberMeTokenMiddleware,
         function(req, res) {
 
-          if(req.accepts(['html', 'json']) === 'json')
-            return handleJsonLogin(req, res);
+          // Either send a JSON message or a browser redirect
+          function sendUrl(uri) {
+            assert(uri, 'Empty URI');
+
+            if(req.accepts(['html', 'json']) === 'json') {
+              res.send({
+                failed: false,
+                redirectTo: uri
+              });
+
+              return;
+            }
+
+            res.relativeRedirect(uri);
+          }
+
+console.log('BODY IS ', req.body);
+
+          var troupeUri = req.body.troupeUri;
+          winston.info("login: Performing json login", { troupeUri: troupeUri });
+
+          if(troupeUri) return sendUrl("/" + troupeUri);
 
           if(req.session.returnTo) {
             winston.info("login: Returning user to original URL ", { url: req.session.returnTo });
-            res.relativeRedirect(req.session.returnTo);
-          } else {
-            winston.info("login: Forwarding to select-troupe", { url: req.session.returnTo });
-
-            res.relativeRedirect('/select-troupe');
+            return sendUrl(req.session.returnTo);
           }
+
+          // Deal with oauth, in the case that the session has been trashed....
+          if(req.body.oauth == 2) {
+            var oauthUrl = url.format({ pathname: '/oauth/authorize', query: {
+              client_id: req.body.client_id,
+              redirect_uri: req.body.redirect_uri,
+              response_type: req.body.response_type,
+              scope: req.body.scope
+            }});
+
+            return sendUrl(oauthUrl);
+          }
+
+          loginUtils.whereToNext(req.user, function(err, url) {
+            if (err || !url) return sendUrl(nconf.get('web:homeurl'));
+
+            return sendUrl(url);
+          });
 
         });
 
       app.get('/login', function(req, res) {
         res.render('m.login.hbs', { });
+      });
+
+      // This is almost xactly the same as login, except that the
+      // form will submit a token to say that this is an oauth login
+      // so that we don't need to rely on req.session.returnTo to
+      // reengage the oauth process post login. This means that if the
+      // session times out for whatever reason we should be safe
+      app.get('/oauth/login', function(req, res) {
+        res.render('m.login.hbs', { oauth: true, query: req.query });
       });
 
       app.post('/reset', function(req, res, next) {
@@ -79,14 +92,6 @@ module.exports = {
 
       app.get('/reset/:confirmationCode',
         middleware.authenticate('passwordreset', { failureRedirect: nconf.get('web:homeurl') + '#passwordResetFailed=true' } ),
-        function(req, res, next) {
-          loginUtils.redirectUserToDefaultTroupe(req, res, next);
-        });
-
-      // Deprecated. Use the loginUtils.redirectUserToDefaultTroupe instead of
-      // redirecting users here. Delete by 28 Feb 2013
-      app.get('/select-troupe',
-        middleware.ensureLoggedIn(),
         function(req, res, next) {
           loginUtils.redirectUserToDefaultTroupe(req, res, next);
         });

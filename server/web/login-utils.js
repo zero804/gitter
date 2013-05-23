@@ -4,20 +4,30 @@
 var troupeService = require("../services/troupe-service");
 var nconf = require('../utils/config');
 
+exports.whereToNext = function(user, callback) {
+
+  troupeService.findBestTroupeForUser(user, function(err, troupe) {
+    if(err) return callback(err);
+    if(!troupe) return callback();
+
+    return callback(null, troupe.getUrl(user.id));
+  });
+
+};
+
 exports.redirectUserToDefaultTroupe = function(req, res, next, options) {
 
-  var onNoValidTroupes = options ? options.onNoValidTroupes : null;
-
-  troupeService.findBestTroupeForUser(req.user, function(err, troupe) {
-    if (err || !troupe) {
-        if(onNoValidTroupes) {
-          return onNoValidTroupes();
-        } else {
-          return res.redirect(nconf.get('web:homeurl'));
-        }
+  exports.whereToNext(req.user, function(err, url) {
+    if (err || !url) {
+      /* All dressed up but nowhere to go? */
+      if(options && options.onNoValidTroupes) {
+        return options.onNoValidTroupes();
       }
 
-      return res.redirect(troupe.getUrl(req.user.id));
+      return res.redirect(nconf.get('web:homeurl'));
+    }
+
+    return res.relativeRedirect(url);
   });
 
 };
