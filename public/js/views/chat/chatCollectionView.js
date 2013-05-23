@@ -11,8 +11,9 @@ define([
   'views/base',
   './scrollDelegate',
   'hbs!./tmpl/chatViewItem',
+  'views/chat/chatInputView',
   'bootstrap_tooltip'
-], function($, _, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate /* tooltip*/) {
+], function($, _, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate, chatInputView /* tooltip*/) {
 
   "use strict";
 
@@ -25,7 +26,7 @@ define([
 
     events: {
       'click .trpChatEdit':     'toggleEdit',
-      'keydown .trpChatInput':  'detectKeys',
+      'keydown textarea':  'detectEscape',
       'click .trpChatReads':    'showReadBy'
     },
 
@@ -34,6 +35,7 @@ define([
 
       this.setRerenderOnChange(true);
       this.userCollection = options.userCollection;
+      this.scrollDelegate = options.scrollDelegate;
 
       if (this.isInEditablePeriod()) {
         // re-render once the message is not editable
@@ -120,6 +122,7 @@ define([
 
     detectReturn: function(e) {
       if(e.keyCode === 13 && !e.ctrlKey) {
+        // found submit
         this.saveChat();
         e.stopPropagation();
         e.preventDefault();
@@ -128,13 +131,13 @@ define([
 
     detectEscape: function(e) {
       if (e.keyCode === 27) {
+        // found escape, cancel edit
         this.toggleEdit();
       }
     },
 
-    saveChat: function() {
+    saveChat: function(newText) {
       if (this.isEditing) {
-        var newText = this.$el.find('.trpChatInput').val();
         if (this.canEdit() && newText != this.model.get('text')) {
           this.model.set('text', newText);
           this.model.save();
@@ -174,22 +177,40 @@ define([
       var self = this;
       if (this.isEditing) {
         this.isEditing = false;
-        this.$el.find('.trpChatText').html(this.model.get('text'));
+        this.showText();
       } else {
         if (this.canEdit()) {
           this.isEditing = true;
-          var isAtBottom = ChatCollectionView.$scrollOf.scrollTop() >= (ChatCollectionView.$container.height() - ChatCollectionView.$scrollOf.height());
-          this.$el.find('.trpChatText').html("<textarea class='trpChatInput'>"+this.model.get('text')+"</textarea>").find('textarea').select();
-          // this.$el.find('.trpChatText textarea').focus().on('blur', function() { self.toggleEdit(); });
-          if (isAtBottom) {
-            ChatCollectionView.$scrollOf.scrollTop(ChatCollectionView.$container.height() - ChatCollectionView.$scrollOf.height());
-          }
+          this.showInput();
         } else if (!this.isOwnMessage()) {
           // window.alert("You cannot edit a messages that wasn't sent by you.");
         } else if (!this.isInEditablePeriod()) {
           // window.alert("You cannot edit a message that is older than 5 minutes.");
         }
+      }
+    },
 
+    showText: function() {
+      this.$el.find('.trpChatText').html(this.model.get('text'));
+
+      if (this.inputBox) {
+        this.stopListening(this.inputBox);
+        delete this.inputBox;
+      }
+
+    },
+
+    showInput: function() {
+      var isAtBottom = ChatCollectionView.$scrollOf.scrollTop() >= (ChatCollectionView.$container.height() - ChatCollectionView.$scrollOf.height());
+
+      // create inputview
+      this.$el.find('.trpChatText').html("<textarea class='trpChatInput'>"+this.model.get('text')+"</textarea>").find('textarea').select();
+      this.inputBox = new chatInputView.ChatInputBoxView({ el: this.$el.find('textarea'), scrollDelegate: this.scrollDelegate });
+      this.listenTo(this.inputBox, 'save', this.saveChat);
+
+      // this.$el.find('.trpChatText textarea').focus().on('blur', function() { self.toggleEdit(); });
+      if (isAtBottom) {
+        ChatCollectionView.$scrollOf.scrollTop(ChatCollectionView.$container.height() - ChatCollectionView.$scrollOf.height());
       }
     },
 
@@ -244,7 +265,7 @@ define([
   var ChatCollectionView = Marionette.CollectionView.extend({
     itemView: ChatViewItem,
     itemViewOptions: function() {
-      return { userCollection: this.userCollection };
+      return { userCollection: this.userCollection, scrollDelegate: this.scrollDelegate };
     },
     chatMessageLimit: PAGE_SIZE,
 

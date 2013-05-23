@@ -41,7 +41,7 @@ require([
   'log!app-integrated',
   'components/errorReporter',
   'filtered-collection'
-], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, realtime, eyeballs, dozy, AppIntegratedView, ChatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
+], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, realtime, eyeballs, dozy, AppIntegratedView, chatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
             collections, troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareSearchView,
             createTroupeView, headerViewTemplate,
@@ -292,7 +292,7 @@ require([
       userCollection: userCollection
     }).render();
 
-    new ChatInputView({
+    new chatInputView.ChatInputView({
       el: $('#chat-input'),
       collection: chatCollection,
       collectionViewScrollDelegate: chatCollectionView.scrollDelegate

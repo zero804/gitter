@@ -15,22 +15,8 @@ define([
 
   var PAGE_SIZE = 50;
 
-  var originalChatInputHeight;
-  var chatLines = 2;
-
-  var chatPadding = parseInt($('#frame-chat').css('padding-bottom'),10);
-  var originalChatPadding = chatPadding;
-
-
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
-    chatMessageLimit: PAGE_SIZE,
-
-    events: {
-      "keyup textarea": "detectNewLine",
-      "keydown textarea":  "detectReturn",
-      "focusout textarea": "onFocusOut"
-    },
 
     initialize: function(options) {
       this.scrollDelegate = options.collectionViewScrollDelegate;
@@ -43,8 +29,59 @@ define([
     },
 
     afterRender: function() {
-      originalChatInputHeight = $('#chat-input-textarea').height();
-      $('#chat-input-textarea').placeholder();
+
+      this.inputBox = new ChatInputBoxView({
+        el: this.$el.find('.trpChatInputBoxTextArea'),
+        scrollDelegate: this.scrollDelegate
+      });
+
+      this.listenTo(this.inputBox, 'save', this.send);
+    },
+
+    send: function(val) {
+      if(val) {
+        this.collection.create({
+          text: val,
+          fromUser: window.troupeContext.user,
+          sent: moment()
+        });
+
+        // go to the bottom of the page when sending a new message
+        if(window._troupeCompactView) {
+          $('#chat-wrapper').scrollTop($('#chat-frame').height());
+        } else {
+          $(window).scrollTop($(document).height());
+        }
+
+      }
+      return false;
+    }
+  });
+
+  var chatPadding = parseInt($('#frame-chat').css('padding-bottom'),10);
+  var originalChatPadding = chatPadding;
+
+  var ChatInputBoxView = TroupeViews.Base.extend({
+    chatMessageLimit: PAGE_SIZE,
+
+    events: {
+      "keyup": "detectNewLine",
+      "keydown":  "detectReturn",
+      "focusout": "onFocusOut"
+    },
+
+    // pass in the textarea as el for ChatInputBoxView
+    // pass in a scroll delegate
+    initialize: function(options) {
+
+      this.chatLines = 2;
+
+      this.scrollDelegate = options.scrollDelegate;
+
+      this.originalChatInputHeight = this.$el.height();
+      this.$el.placeholder();
+
+      this.resizeInput();
     },
 
     onFocusOut: function() {
@@ -52,24 +89,28 @@ define([
     },
 
     resetInput: function() {
-      chatLines = 2;
+      this.chatLines = 2;
       chatPadding = originalChatPadding;
-      $('#chat-input-textarea').height(originalChatInputHeight);
+      this.$el.height(this.originalChatInputHeight);
       $('#frame-chat').css('padding-bottom', chatPadding);
 
     },
 
     resizeInput: function() {
-      var lht = parseInt($('#chat-input-textarea').css('lineHeight'),10);
-      var height = $('#chat-input-textarea').prop('scrollHeight');
+      var lht = parseInt(this.$el.css('lineHeight'),10);
+      var height = this.$el.prop('scrollHeight');
       var currentLines = Math.floor(height / lht);
 
-      if (currentLines > chatLines ) {
-        chatLines++;
-        var newHeight = $('#chat-input-textarea').height() + 22;
-        $('#chat-input-textarea').height(newHeight);
-        chatPadding = chatPadding + 22;
-        $('#frame-chat').css('padding-bottom', chatPadding);
+      if (currentLines != this.chatLines) {
+        this.chatLines = currentLines;
+        var newHeight = currentLines * lht;
+
+        this.$el.height(newHeight);
+        var frameChat = $('#frame-chat'), isChild = frameChat.find(this.el).length;
+        if (!isChild) {
+          chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
+          $('#frame-chat').css('padding-bottom', chatPadding);
+        }
         this.scrollDelegate.scrollToBottom();
       }
     },
@@ -83,35 +124,22 @@ define([
     detectReturn: function(e) {
       if(e.keyCode == 13 && !e.ctrlKey) {
         if (window._troupeCompactView !== true) this.resetInput();
-        return this.send();
+        e.stopPropagation();
+        e.preventDefault();
+
+        this.send();
+        return;
       }
 
       if (window._troupeCompactView !== true) this.resizeInput();
     },
 
     send: function() {
-      var chatBox = this.$el.find("textarea");
-      var val = chatBox.val().trim();
-      if(val) {
-        this.collection.create({
-          text: val,
-          fromUser: window.troupeContext.user,
-          sent: moment()
-        });
+      this.trigger('save', this.$el.val());
 
-        chatBox.val('');
-        // go to the bottom of the page when sending a new message
-        if(window._troupeCompactView) {
-          $('#chat-wrapper').scrollTop($('#chat-frame').height());
-        } else {
-          $(window).scrollTop($(document).height());
-        }
-
-      }
-      return false;
+      this.$el.val('');
     }
-
   });
 
-  return ChatInputView;
+  return { ChatInputView: ChatInputView, ChatInputBoxView: ChatInputBoxView };
 });
