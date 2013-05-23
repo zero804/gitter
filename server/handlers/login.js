@@ -33,8 +33,6 @@ module.exports = {
             res.relativeRedirect(uri);
           }
 
-console.log('BODY IS ', req.body);
-
           var troupeUri = req.body.troupeUri;
           winston.info("login: Performing json login", { troupeUri: troupeUri });
 
