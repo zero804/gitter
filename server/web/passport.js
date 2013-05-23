@@ -13,6 +13,7 @@ var BearerStrategy = require('passport-http-bearer').Strategy;
 var oauthService = require('../services/oauth-service');
 var statsService = require("../services/stats-service");
 var nconf = require('../utils/config');
+var loginUtils = require("../web/login-utils");
 
 function emailPasswordUserStrategy(email, password, done) {
   winston.verbose("Attempting to authenticate ", { email: email });
@@ -148,29 +149,13 @@ module.exports = {
             return self.redirect("/" + troupeUri);
           }
 
-          // If the user doesn't have a last troupe set, we'll need to try figure
-          // out a troupe to which they belong and send them to that
-          if(!user.lastTroupe) {
-            troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
-              if(err) return done(err);
 
-              if(troupes.length) {
-                return self.redirect("/" + troupes[0].uri);
-              } else {
-                return self.redirect(nconf.get('web:homeurl'));
-              }
-            });
-          }
+          loginUtils.whereToNext(user, function(err, url) {
+            if(err || !url) return self.redirect(nconf.get('web:homeurl'));
 
-          // If the user has logged in in the past,  find that troupe and
-          // redirect them to that URI
-          troupeService.findById(user.lastTroupe, function(err, troupe) {
-            if(err || !troupe) return self.redirect(nconf.get('web:homeurl'));
-
-            return self.redirect("/" + troupe.uri);
+            return self.redirect(url);
           });
 
-          return;
         }
 
       });
