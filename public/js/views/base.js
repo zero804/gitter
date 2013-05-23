@@ -833,6 +833,25 @@ define([
     }
   });
 
+
+  TroupeViews.confirm = function (message, handlers) {
+    var events = handlers || {};
+
+    events['click #cancel'] = events['click #cancel'] || function() {
+      modal.hide();
+    };
+
+    var modal = new TroupeViews.Modal({
+      view: new TroupeViews.ConfirmationView({
+        body: message,
+        buttons: [ { id: 'ok', text: 'OK'} , { id: 'cancel', text: 'Cancel' } ],
+        events: events
+      })
+    });
+
+    modal.show();
+  };
+
    TroupeViews.ConfirmationModal = TroupeViews.Modal.extend({
     initialize: function(options) {
       options.view = new TroupeViews.ConfirmationView(options);

@@ -52,5 +52,35 @@ def testTroupeRenameWorks():
     assert header.text == "Test Troupe 1"
 
 
+# TODO this test isn't clicking on confirm (no error message though), and it can't see the url changing
+def leaveTroupe():
+    if(driver.current_url.find("/testtroupe3") == -1):
+        driver.get(utils.baseUrl("/testtroupe3"))
+
+    link = driver.find_element_by_css_selector('.trpSettingsButton A img')
+    while(not link.is_displayed()):
+        time.sleep(0.4)
+    link.click()
+
+    # check for leave button
+    leaveTroupeBtn = driver.find_element_by_css_selector('#leave-troupe')
+    assert(leaveTroupeBtn.is_displayed())
+
+    # check for delete button
+    deleteTroupeBtn = driver.find_element_by_css_selector('#delete-troupe')
+    assert(not deleteTroupeBtn.is_displayed())
+
+    # click delete
+    leaveTroupeBtn.click()
+
+    current_url = driver.current_url
+
+    # click ok on confirm dialog
+    driver.find_element_by_css_selector('#ok').click()
+
+    # we should be redirected to another url
+    assert(current_url != driver.current_url)
+
+
 def teardown_module():
     utils.shutdown(driver)

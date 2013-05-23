@@ -114,7 +114,7 @@ module.exports = {
                 return;
               }
 
-              res.relativeRedirect("/" + troupe.uri);
+              res.relativeRedirect(troupe.getUrl(user.id));
           });
       });
 
