@@ -11,7 +11,7 @@ require([
   'components/eyeballs',
   'components/unread-items-client',
   'scrollfix'
-], function($, _, Backbone, TroupeViews, chatModels, ChatInputView, ChatCollectionView, AvatarWidget/*, eyeballsClient, unreadItemsClient, scrollfix*/) {
+], function($, _, Backbone, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget/*, eyeballsClient, unreadItemsClient, scrollfix*/) {
   /*jslint browser: true, unused: true */
   "use strict";
 
@@ -30,15 +30,19 @@ require([
     }
   });
 
-  new ChatInputView({
-    el: $('#chat-input'),
-    collection: chatCollection
-  }).render();
-
-  new ChatCollectionView({
+  var chatCollectionView = new ChatCollectionView({
     el: $('#frame-chat'),
     collection: chatCollection
+  });
+
+  chatCollectionView.render();
+
+  new chatInputView.ChatInputView({
+    el: $('#chat-input'),
+    collection: chatCollection,
+    scrollDelegate: chatCollectionView.scrollDelegate
   }).render();
+
 
 $('.trpMobileAmuseIcon').click(function() {
   document.location.reload(true);
