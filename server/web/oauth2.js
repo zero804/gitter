@@ -9,7 +9,8 @@ var oauth2orize = require('oauth2orize'),
     middleware = require('./middleware'),
     oauthService = require('../services/oauth-service'),
     loginUtils = require('./login-utils'),
-    winston = require('winston');
+    winston = require('winston'),
+    url = require('url');
 
 // create OAuth 2.0 server
 var server = oauth2orize.createServer();
@@ -103,7 +104,10 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, do
 // first, and rendering the `dialog` view.
 
 exports.authorization = [
-  middleware.ensureLoggedIn(),
+  middleware.ensureLoggedIn({ loginUrl: function(req, done) {
+    // Redirect with all the query parameters intact
+    done(null, '/oauth/login?' + url.parse(req.url).query);
+  }}),
   server.authorization(function(clientKey, redirectUri, done) {
 
     oauthService.findClientByClientKey(clientKey, function(err, client) {
