@@ -74,11 +74,15 @@ define([
   };
 
   DefaultScrollDelegate.prototype.onBeforeItemAdded = function() {
+    this.isAtBottomOfPage = this.isAtBottom();
+    this.containerHeightBeforeAdd = this.$container.height();
+  };
+
+  DefaultScrollDelegate.prototype.isAtBottom = function() {
     var scrollTop = this.$scrollOf.scrollTop();
     var containerHeight = this.$container.height();
     var scrollOfHeight = this.$scrollOf.height();
-    this.isAtBottomOfPage = (scrollTop >= ((containerHeight - scrollOfHeight) - 40));
-    this.containerHeightBeforeAdd = containerHeight;
+    return (scrollTop >= ((containerHeight - scrollOfHeight) - 40));
   };
 
   DefaultScrollDelegate.prototype.scrollTop = function(top) {
