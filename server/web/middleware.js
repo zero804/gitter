@@ -60,7 +60,6 @@ exports.ensureLoggedIn = function(options) {
 
       if(typeof options.loginUrl == "function") {
         options.loginUrl(req, function(err, url) {
-          console.log(">>>>>>>>>>>>>>>>>>>>>>> URL!!! " + url);
           if(err) return next(err);
           res.relativeRedirect(url);
         });
