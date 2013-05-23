@@ -90,7 +90,11 @@ define([
     troupeCollection.on("remove", function(model) {
       if(model.id == window.troupeContext.troupe.id) {
         // TODO: tell the person that they've been kicked out of the troupe
-        window.location.reload();
+        if(window.troupeContext.troupeIsDeleted) {
+          window.location.href = '/last';
+        } else {
+          window.location.reload();
+        }
       }
     });
     unreadItemsClient.installTroupeListener(troupeCollection);
