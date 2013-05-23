@@ -65,6 +65,9 @@ app.post('/oauth/authorize/decision', oauth2.decision);
 app.post('/oauth/token', oauth2.token);
 app.post('/oauth/bearerLogin', oauth2.bearerLogin);
 
+app.get('/OAuthCallback', function(req, res) {
+  res.send(200, 'Can I help you with something?');
+});
 
 if(nconf.get('test:exposeInBrowserTests')) {
   require('./handlers/in-browser-tests').install(app);
