@@ -226,13 +226,15 @@ define([
 
   function recycleConnection() {
     log('Recycling connection');
-    disconnectClient(client);
-    client = createClient();
+    disconnectClient(_client);
+    _client = createClient();
   }
 
 
   function fakeSubscription() {
-    var subscription = client.subscribe('/ping', function() { });
+    if(!_client) return;
+
+    var subscription = _client.subscribe('/ping', function() { });
 
     subscription.callback(function() {
       if(timeout) window.clearTimeout(timeout);
@@ -254,18 +256,14 @@ define([
 
   }
 
-  // Temporary fix
-  var monitoringConnection = false;
-
-  function monitorConnection() {
-    if(monitoringConnection) return;
-    monitoringConnection = true;
+  var monitorConnection = _.once(function() {
     window.setInterval(fakeSubscription, 60000);
+
     $(document).on('reawaken', function() {
       log('Recycling connection after reawaken');
       recycleConnection();
     });
-  }
+  });
 
   var _client;
   function getOrCreateClient() {
