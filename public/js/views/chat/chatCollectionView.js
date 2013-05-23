@@ -262,29 +262,24 @@ define([
         ChatCollectionView.$container = $(document);
       }
 
-      this.scrollDelegate = new scrollDelegates.DefaultScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
-      this.infiniteScrollDelegate = new scrollDelegates.InfiniteScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
+      this.scrollDelegate = new scrollDelegates.DefaultScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostUnreadItem);
+      this.infiniteScrollDelegate = new scrollDelegates.InfiniteScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostUnreadItem);
 
-      function findTopMostVisibleUnreadItem(itemType) {
-        return unreadItemsClient.findTopMostVisibleUnreadItemPosition(itemType, ChatCollectionView.$container, ChatCollectionView.$scrollOf);
+      function findTopMostUnreadItem(itemType) {
+        return unreadItemsClient.findTopMostUnreadItemPosition(itemType, ChatCollectionView.$container, ChatCollectionView.$scrollOf);
       }
 
       var self = this;
       // wait for the first reset (preloading) before enabling infinite scroll
+      // and scroll to bottom once the first rendering is complete
       if (this.collection.length === 0) {
         var eventEnabled = false;
-        this.collection.once('reset', function() {
-          if(eventEnabled) return;
-          eventEnabled = true;
-
-          ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
-        });
-
         this.collection.once('sync', function() {
           if(eventEnabled) return;
           eventEnabled = true;
 
           ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
+          self.scrollDelegate.scrollToBottom();
         });
       } else {
         // log("Enabling infinite scroll");
@@ -301,6 +296,8 @@ define([
     },
 
     onRender: function() {
+      // this is also done in initialize on collection sync event
+
       // log("scrollOf scroll: " + this.$scrollOf.scrollTop() + " container height: " + this.$container.height());
       // this is an ugly hack to deal with some weird timing issues
       var self = this;
@@ -312,6 +309,8 @@ define([
     },
 
     onAfterItemAdded: function(item) {
+      // log("After an item was added");
+      // this must only be called for when new messages are received (at the bottom), not while loading the collection
       if (!this.collection.isLoading()) {
         this.scrollDelegate.onAfterItemAdded(item);
       }

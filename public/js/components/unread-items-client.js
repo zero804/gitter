@@ -546,6 +546,7 @@ define([
         var itemId = $e.data('itemId');
 
         if(itemType && itemId) {
+          // offset() is relative to window, which is used to determine visibility
           var top = $e.offset().top;
 
           if (top >= topBound && top <= bottomBound) {
@@ -615,40 +616,34 @@ define([
       return unreadItemStore._hasItemBeenMarkedAsRead(itemType, itemId);
     },
 
-    findTopMostVisibleUnreadItemPosition: function(itemType, $container, $scrollOf) {
+    findTopMostUnreadItemPosition: function(itemType, $container, $scrollOf) {
       var topItem = null;
       var topItemOffset = 1000000000;
-
-      var scrollTop = $scrollOf.scrollTop();
-      var scrollBottom = scrollTop + $scrollOf.height();
 
       var unreadElements = $container.find('.unread');
 
       unreadElements.each(function (index, element) {
+
         var $e = $(element);
         var elementItemType = $e.data('itemType');
         if(elementItemType != itemType) return;
         var itemId = $e.data('itemId');
 
+        // nb: use the offset of the top item relative to it's parent (which must have position: relative)
         if(itemId) {
-          var top = $e.offset().top;
-          if (top >= scrollTop && top <= scrollBottom) {
-            if(top < topItemOffset)  {
-              topItem = $e;
-              topItemOffset = top;
-            }
+          var top = $e.position().top;
+          if(top < topItemOffset)  {
+            topItem = $e;
+            topItemOffset = top;
           }
         }
       });
 
-      // calculate the offset of the top item relative to container
-
-
       if(!topItem) return null;
-      // note: mobile will never have a scroll limit because eyaballs are never off, so items are marked as read immediately.
-      // technically this offset should be relative to $scrollOf, but relative to the window seems to work for now,
-      // especially seen as there will never really be a top unread item for mobile, because eyeballs are always on.
-      return topItem.offset();
+      // note: mobile will never have a scroll limit because eyaballs are never off, so items are marked as read immediately,
+      // but it does still find an unread item when new messages come in, but it will always be the new item because the rest are marked read immediately.
+
+      return topItemOffset;
     },
 
     installTroupeListener: function(troupeCollection) {

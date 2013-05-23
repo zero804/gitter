@@ -35,7 +35,7 @@ describe("User Search Service", function() {
     it("should handle irish names", function() {
       var res = userSearchService.testOnly.createRegExpsForQuery("Frodo O'Grady");
 
-      assert(res.length === 3, 'Expected a single regular expression');
+      assert(res.length === 3, 'Expected three regular expressions');
       assert.strictEqual(res[0].toString(), "/\\bfrodo/i", 'Expected the search');
       assert.strictEqual(res[1].toString(), "/\\bo/i", 'Expected the search');
       assert.strictEqual(res[2].toString(), "/\\bgrady/i", 'Expected the search');

@@ -6,7 +6,7 @@ var testRequire = require('../test-require');
 
 var geocodingService = testRequire('./services/geocoding-service');
 
-var assert = require("better-assert");
+var assert = require("assert");
 
 describe('geocodingService', function() {
   describe('#reverseGeocode()', function() {
@@ -25,7 +25,11 @@ describe('geocodingService', function() {
         if(err) return done(err);
 
         assert(value !== null);
-        assert('Kew Gardens' == value.name);
+
+
+        // Unfortunately this depends on the version of the data you have
+        // installed
+        assert('Kew Gardens' === value.name || 'Brentford' === value.name);
         done();
       });
     });
