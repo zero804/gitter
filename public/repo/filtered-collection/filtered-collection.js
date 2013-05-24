@@ -50,6 +50,7 @@ SOFTWARE.
       this.collection = data.collection;
       this.setFilter(data.collectionFilter);
 
+      this.collection.on("sync",    this.syncCollection, this)
       this.collection.on("add",     this.addModel, this);
       this.collection.on("remove",  this.removeModel, this);
       this.collection.on("reset",   this.resetCollection, this);
@@ -108,6 +109,12 @@ SOFTWARE.
       this._reset();
       this.setFilter(undefined, {silent: true});
       this.trigger("reset", this);
+    }
+    ,syncCollection: function() {
+      this._mapping = [];
+      this._reset();
+      this.setFilter(undefined, {silent: true});
+      this.trigger("sync", this);
     }
 
     // this is to synchronize where the element exists in the original model
