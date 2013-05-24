@@ -50,8 +50,6 @@ define([
 
           $.ajax({
             url: '/troupes/' + self.model.id,
-            contentType: "application/json",
-            dataType: "json",
             type: "DELETE",
             success: function() {
               self.dialog.hide();
