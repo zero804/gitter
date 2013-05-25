@@ -3,11 +3,11 @@ define([
   'jquery',
   'underscore',
   'views/base',
-  'hbs!./tmpl/shareView',
+  'hbs!./tmpl/shareSearchView',
   'hbs!./tmpl/shareRow',
   'zeroclipboard',
   'bootstrap-typeahead', // No reference
-  'jquery-validate'  // No reference
+  'utils/validate-wrapper' // No reference
 ], function($, _, TroupeViews, template, rowTemplate, ZeroClipboard) {
   "use strict";
 
@@ -18,7 +18,7 @@ define([
       'keydown input': 'preventSubmit',
       'hover #copy-button' : 'createClipboard',
       'click .removeInvite': 'deselectPerson',
-      'click button[type=submit]': 'sendInvites'
+      'submit #share-form': 'sendInvites'
     },
 
     initialize: function() {
@@ -82,20 +82,9 @@ define([
             email: true
           }
         },
-        debug: true,
-        messages: {
-          inviteSearch: {
-            email: "Enter a valid email address or invite someone on the list below."
-          }
-        },
-        showErrors: function(errorMap, errorList) {
-          /*
-          if (errorList.length === 0) $('.share-failure').hide();
-          if (errorList.length > 0) $('.share-failure').show();
-          var errors = "";
-          $.each(errorList, function () { errors += this.message + "<br>"; });
-          $('#failure-text').html(errors);
-          */
+        showErrors: function(/*errorMap, errorList*/) {
+          // don't show errors, just use the .valid() method to tell if
+          // the input is a valid email address
         }
 
       });
@@ -243,7 +232,9 @@ define([
       return JSON.stringify(this.invites);
     },
 
-    sendInvites: function() {
+    sendInvites: function(e) {
+      if(e) e.preventDefault();
+
       // don't let users submit unless there is at least one invite (show error message in .share-failure  )
       if (this.invites.length === 0) {
         return alert("Please select at least one user or email address to send to, or press escape to cancel.");

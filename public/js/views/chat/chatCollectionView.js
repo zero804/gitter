@@ -1,4 +1,5 @@
-/*jshint unused:true, browser:true */
+/* jshint unused:true, browser:true,  strict:true */
+/* global define:false */
 define([
   'jquery',
   'underscore',
@@ -10,8 +11,10 @@ define([
   'views/base',
   './scrollDelegate',
   'hbs!./tmpl/chatViewItem',
+  'views/chat/chatInputView',
   'bootstrap_tooltip'
-], function($, _, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate /* tooltip*/) {
+], function($, _, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate, chatInputView /* tooltip*/) {
+
   "use strict";
 
   var PAGE_SIZE = 15;
@@ -23,7 +26,7 @@ define([
 
     events: {
       'click .trpChatEdit':     'toggleEdit',
-      'keydown .trpChatInput':  'detectKeys',
+      'keydown textarea':  'detectEscape',
       'click .trpChatReads':    'showReadBy'
     },
 
@@ -32,6 +35,7 @@ define([
 
       this.setRerenderOnChange(true);
       this.userCollection = options.userCollection;
+      this.scrollDelegate = options.scrollDelegate;
 
       if (this.isInEditablePeriod()) {
         // re-render once the message is not editable
@@ -118,6 +122,7 @@ define([
 
     detectReturn: function(e) {
       if(e.keyCode === 13 && !e.ctrlKey) {
+        // found submit
         this.saveChat();
         e.stopPropagation();
         e.preventDefault();
@@ -126,13 +131,13 @@ define([
 
     detectEscape: function(e) {
       if (e.keyCode === 27) {
+        // found escape, cancel edit
         this.toggleEdit();
       }
     },
 
-    saveChat: function() {
+    saveChat: function(newText) {
       if (this.isEditing) {
-        var newText = this.$el.find('.trpChatInput').val();
         if (this.canEdit() && newText != this.model.get('text')) {
           this.model.set('text', newText);
           this.model.save();
@@ -172,22 +177,40 @@ define([
       var self = this;
       if (this.isEditing) {
         this.isEditing = false;
-        this.$el.find('.trpChatText').html(this.model.get('text'));
+        this.showText();
       } else {
         if (this.canEdit()) {
           this.isEditing = true;
-          var isAtBottom = ChatCollectionView.$scrollOf.scrollTop() >= (ChatCollectionView.$container.height() - ChatCollectionView.$scrollOf.height());
-          this.$el.find('.trpChatText').html("<textarea class='trpChatInput'>"+this.model.get('text')+"</textarea>").find('textarea').select();
-          // this.$el.find('.trpChatText textarea').focus().on('blur', function() { self.toggleEdit(); });
-          if (isAtBottom) {
-            ChatCollectionView.$scrollOf.scrollTop(ChatCollectionView.$container.height() - ChatCollectionView.$scrollOf.height());
-          }
+          this.showInput();
         } else if (!this.isOwnMessage()) {
           // window.alert("You cannot edit a messages that wasn't sent by you.");
         } else if (!this.isInEditablePeriod()) {
           // window.alert("You cannot edit a message that is older than 5 minutes.");
         }
+      }
+    },
 
+    showText: function() {
+      this.$el.find('.trpChatText').html(this.model.get('text'));
+
+      if (this.inputBox) {
+        this.stopListening(this.inputBox);
+        delete this.inputBox;
+      }
+
+    },
+
+    showInput: function() {
+      var isAtBottom = this.scrollDelegate.isAtBottom();
+
+      // create inputview
+      this.$el.find('.trpChatText').html("<textarea class='trpChatInput'>"+this.model.get('text')+"</textarea>").find('textarea').select();
+      this.inputBox = new chatInputView.ChatInputBoxView({ el: this.$el.find('textarea'), scrollDelegate: this.scrollDelegate });
+      this.listenTo(this.inputBox, 'save', this.saveChat);
+
+      // this.$el.find('.trpChatText textarea').focus().on('blur', function() { self.toggleEdit(); });
+      if (isAtBottom) {
+        this.scrollDelegate.scrollToBottom();
       }
     },
 
@@ -242,7 +265,7 @@ define([
   var ChatCollectionView = Marionette.CollectionView.extend({
     itemView: ChatViewItem,
     itemViewOptions: function() {
-      return { userCollection: this.userCollection };
+      return { userCollection: this.userCollection, scrollDelegate: this.scrollDelegate };
     },
     chatMessageLimit: PAGE_SIZE,
 
@@ -260,29 +283,24 @@ define([
         ChatCollectionView.$container = $(document);
       }
 
-      this.scrollDelegate = new scrollDelegates.DefaultScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
-      this.infiniteScrollDelegate = new scrollDelegates.InfiniteScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostVisibleUnreadItem);
+      this.scrollDelegate = new scrollDelegates.DefaultScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostUnreadItem);
+      this.infiniteScrollDelegate = new scrollDelegates.InfiniteScrollDelegate(ChatCollectionView.$scrollOf, ChatCollectionView.$container, this.collection.modelName, findTopMostUnreadItem);
 
-      function findTopMostVisibleUnreadItem(itemType) {
-        return unreadItemsClient.findTopMostVisibleUnreadItemPosition(itemType, ChatCollectionView.$container, ChatCollectionView.$scrollOf);
+      function findTopMostUnreadItem(itemType) {
+        return unreadItemsClient.findTopMostUnreadItemPosition(itemType, ChatCollectionView.$container, ChatCollectionView.$scrollOf);
       }
 
       var self = this;
       // wait for the first reset (preloading) before enabling infinite scroll
+      // and scroll to bottom once the first rendering is complete
       if (this.collection.length === 0) {
         var eventEnabled = false;
-        this.collection.once('reset', function() {
-          if(eventEnabled) return;
-          eventEnabled = true;
-
-          ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
-        });
-
         this.collection.once('sync', function() {
           if(eventEnabled) return;
           eventEnabled = true;
 
           ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
+          self.scrollDelegate.scrollToBottom();
         });
       } else {
         // log("Enabling infinite scroll");
@@ -299,6 +317,8 @@ define([
     },
 
     onRender: function() {
+      // this is also done in initialize on collection sync event
+
       // log("scrollOf scroll: " + this.$scrollOf.scrollTop() + " container height: " + this.$container.height());
       // this is an ugly hack to deal with some weird timing issues
       var self = this;
@@ -310,13 +330,15 @@ define([
     },
 
     onAfterItemAdded: function(item) {
-      if (!this.loading) {
+      // log("After an item was added");
+      // this must only be called for when new messages are received (at the bottom), not while loading the collection
+      if (!this.collection.isLoading()) {
         this.scrollDelegate.onAfterItemAdded(item);
       }
     },
 
     onBeforeItemAdded: function() {
-      if (!this.loading) {
+      if (!this.collection.isLoading()) {
         this.scrollDelegate.onBeforeItemAdded();
       }
     },
@@ -329,23 +351,17 @@ define([
     },
 
     loadNextMessages: function() {
-      if(this.loading) return;
+      if(this.collection.isLoading()) return;
 
       // log("Loading next message chunk.");
       this.infiniteScrollDelegate.beforeLoadNextMessages();
 
       var self = this;
-      this.loading = true;
       function success(data, resp) {
-        self.loading = false;
         if(!resp.length) {
           // turn off infinite scroll if there were no new messages retrieved
           $(ChatCollectionView.$scrollOf).off('scroll', self.chatWindowScroll);
         }
-      }
-
-      function error() {
-        self.loading = false;
       }
 
       this.collection.once('sync', function() {
@@ -359,6 +375,11 @@ define([
         return 0;
       });
 
+      if(lowestId === Infinity) {
+        log('No messages loaded, cancelling pagenation (!!)');
+        return;
+      }
+
       this.collection.fetch({
         update: true,
         add: true,
@@ -367,8 +388,7 @@ define([
           beforeId: lowestId,
           limit: this.chatMessageLimit
         },
-        success: success,
-        error: error
+        success: success
       });
 
     }

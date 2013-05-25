@@ -56,6 +56,7 @@ exports.storeEmailInConversation = function(options, callback) {
   var preview = options.preview;
   var attachments = options.attachments;
   var fromUserId = options.fromUserId;
+  var messageIds = options.messageIds;
 
   var storeMail = new persistence.Email();
   storeMail.fromUserId = fromUserId;
@@ -66,6 +67,7 @@ exports.storeEmailInConversation = function(options, callback) {
   storeMail.preview = preview;
   storeMail.delivered = false;
   storeMail.attachments = attachments ? attachments.map(function(item) { return new persistence.EmailAttachment(item); }) : [];
+  storeMail.messageIds = messageIds;
 
   findConversation(options, function(err, conversation) {
     if(err) return callback(err);

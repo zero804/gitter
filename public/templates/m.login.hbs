@@ -31,6 +31,14 @@
     <div class="mtrpLoginFormContainer" id="panel-login">
       <div class="mtrpLoginForm">
         <form name="loginform" id="loginform" method="POST">
+          {{#if oauth}}
+          <input type="hidden" name="oauth" value="2">
+          <input type="hidden" name="client_id" value="{{query.client_id}}">
+          <input type="hidden" name="redirect_uri" value="{{query.redirect_uri}}">
+          <input type="hidden" name="response_type" value="{{query.response_type}}">
+          <input type="hidden" name="scope" value="{{query.scope}}">
+          {{/if}}
+
           <div class="mtrpLoginFieldContainer">
             <input name="email" value="" id="email" type="email" class="mtrpLoginFormItem" placeholder="Email address">
             <input name="password" id="password" type="password" class="mtrpLoginFormItem" placeholder="Password">
@@ -46,7 +54,7 @@
       </div>
     </div>
 
-    <div class="mtrpSignupForm" id="panel-signup">
+    <div class="mtrpSignupForm" id="panel-signup" style="display:none">
       Very sorry, Troupe is invite only<br> at the moment<br>
        <a href="#" class="mtrpLoginBack trpButtonBig trpBtnGreen" id="button-back">Back</a>
     </div>

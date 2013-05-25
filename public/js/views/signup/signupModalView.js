@@ -5,8 +5,8 @@ define([
   'underscore',
   'views/base',
   'hbs!./tmpl/signupModalView',
-  'jquery-validate',
-  'jquery-placeholder'
+  'utils/validate-wrapper', // No reference
+  'jquery-placeholder' // No reference
 ], function($, _, TroupeViews, template) {
   return TroupeViews.Base.extend({
     template: template,

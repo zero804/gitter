@@ -1,4 +1,23 @@
-<form id="troupeSettings">
-  <label>Troupe name</label>
-  <input type="text" name="name" value="{{name}}"/ class="trpInput">
-</form>
+<div class="modal-content">
+  <form id="troupeSettings">
+    <div class="trpBodyMedium">Troupe name<br></div>
+    <input type="text" name="name" value="{{name}}"/ class="trpInput" style="margin-top: 8px">
+    <p class="trpBodyMedium">You can delete a troupe once you are the only person left in the troupe</p>
+    <div class="trpRequestSubmit">
+      <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen" id="save-troupe-settings">Save</button>
+      <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="cancel-troupe-settings">Cancel</button>
+
+      {{#if canDelete}}
+      <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="delete-troupe">Delete Troupe</button>
+      {{/if}}
+
+      {{#if canLeave}}
+      <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="leave-troupe">Leave this Troupe</button>
+      {{/if}}
+
+  </div>
+  </form>
+</div>
+<div id="request_validation" class="trpModalFailure" style="display:none">
+  <div class="trpModalFailureText" id="failure-text"></div>
+</div>
