@@ -52,13 +52,11 @@ define([
             url: '/troupes/' + self.model.id,
             type: "DELETE",
             success: function() {
-              self.dialog.hide();
-              self.dialog = null;
+              window.location.href = '/last';
             },
-            error: function() {
-              alert("Unable to delete the troupe, you need to be the only person in the troupe to delete it.");
-            },
-            global: false
+            error: function(jqXHR, textStatus, e) {
+              log('Error attempting to delete troupe', textStatus, e);
+            }
           });
         }
       });
