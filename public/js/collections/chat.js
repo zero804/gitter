@@ -48,6 +48,7 @@ define([
     model: exports.ChatModel,
     modelName: 'chat',
     nestedUrl: "chatMessages",
+    preloadKey: "chatMessages",
     sortByMethods: {
       'sent': function(chat) {
         var sent = chat.get('sent');

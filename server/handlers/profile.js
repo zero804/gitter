@@ -5,6 +5,7 @@ var form = require("express-form"),
     filter = form.filter,
     validate = form.validate,
     userService = require("../services/user-service"),
+    troupeService = require("../services/troupe-service"),
     middleware = require('../web/middleware'),
     winston = require("winston");
 
@@ -17,7 +18,7 @@ module.exports = {
           // Form filter and validation middleware
           form(
             filter("displayName").trim(),
-            validate("displayName").required().is(/^[\w\d\. \-\'\d]+$/),
+            validate("displayName").required().is(/^[^<>]{2,}$/),
             filter("password").trim(),
             filter("oldPassword").trim(),
             filter("newEmail").trim()
@@ -64,20 +65,11 @@ module.exports = {
                 return next(err);
               }
 
-              if(req.accepts("application/json")) {
-                res.send({
-                  success: true,
-                  displayName: req.form.displayName
-                });
-              } else {
-                userService.findDefaultTroupeForUser(req.user.id, function(err, troupe) {
-                  if(err) return next(err);
-                  if(!troupe) return next("Unable to determine default troupe for user");
+              res.send({
+                success: true,
+                displayName: req.form.displayName
+              });
 
-                  res.relativeRedirect("/" + troupe.uri);
-                  return;
-                });
-              }
 
             });
           }

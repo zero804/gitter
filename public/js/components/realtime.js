@@ -2,8 +2,9 @@
 define([
   'jquery',
   'faye',
-  'log!realtime'
-], function($, Faye, log) {
+  'log!realtime',
+  '../utils/momentWrapper'
+], function($, Faye, log, moment) {
   "use strict";
 
   //Faye.Logging.logLevel = 'info';
@@ -67,6 +68,24 @@ define([
     callback(message);
   };
 
+  var SubscriptionTimestamp = function() {
+    this._timestamps = {};
+  };
+
+  SubscriptionTimestamp.prototype.incoming = function(message, callback) {
+    if(message.channel == '/meta/subscribe' && message.timestamp) {
+      this._timestamps[message.subscription] = moment(message.timestamp).toDate();
+    }
+
+    callback(message);
+  };
+
+  SubscriptionTimestamp.prototype._getTimestamp = function(channel) {
+    return this._timestamps[channel];
+  };
+
+  var subscriptionTimestampExtension = new SubscriptionTimestamp();
+
   var _subscriptions = {};
   var _id = 0;
   function SubscriptionClient(client, channel, callback) {
@@ -84,7 +103,7 @@ define([
       this._subscription = client.subscribe(this._channel, this._callback);
 
       this._subscription.callback(function() {
-        log('Successfully resubscribed to ' + self  ._channel);
+        log('Successfully resubscribed to ' + self._channel);
 
         if(self._subscriptionCalled) return;
         self._subscriptionCalled = true;
@@ -109,7 +128,7 @@ define([
       delete _subscriptions[this._id];
       this._subscription.cancel();
     }
-  }
+  };
 
 
   function createClient() {
@@ -132,6 +151,7 @@ define([
     }
 
     client.addExtension(new ClientAuth());
+    client.addExtension(subscriptionTimestampExtension);
 
     client.connect(function() {});
 
@@ -170,6 +190,25 @@ define([
       subscription._connect(client);
     });
 
+    monitorConnection();
+
+    // TODO: this stuff below really should find a better home
+    if(window.troupeContext && window.troupeContext.troupe) {
+      new SubscriptionClient(client, '/troupes/' + window.troupeContext.troupe.id, function(message) {
+        log("Subscription!", message);
+        if(message.notification === 'presence') {
+          if(message.status === 'in') {
+            $(document).trigger('userLoggedIntoTroupe', message);
+          } else if(message.status === 'out') {
+            $(document).trigger('userLoggedOutOfTroupe', message);
+          }
+        }
+        if (message.operation === "update") {
+          $(document).trigger('troupeUpdate', message);
+        }
+      });
+    }
+
     return client;
   }
 
@@ -183,36 +222,19 @@ define([
   // Give the initial load 5 seconds to connect before warning the user that there is a problem
   connectionProblemTimeoutHandle = window.setTimeout(connectionProblemTimeout, 5000);
 
-  var client = createClient();
 
 
   function recycleConnection() {
     log('Recycling connection');
-    disconnectClient(client);
-    client = createClient();
+    disconnectClient(_client);
+    _client = createClient();
   }
 
-  // TODO: this stuff below really should find a better home
-  if(window.troupeContext && window.troupeContext.troupe) {
-
-    new SubscriptionClient(client, '/troupes/' + window.troupeContext.troupe.id, function(message) {
-      log("Subscription!", message);
-      if(message.notification === 'presence') {
-        if(message.status === 'in') {
-          $(document).trigger('userLoggedIntoTroupe', message);
-        } else if(message.status === 'out') {
-          $(document).trigger('userLoggedOutOfTroupe', message);
-        }
-      }
-      if (message.operation === "update") {
-        $(document).trigger('troupeUpdate', message);
-      }
-    });
-
-  }
 
   function fakeSubscription() {
-    var subscription = client.subscribe('/ping', function() { });
+    if(!_client) return;
+
+    var subscription = _client.subscribe('/ping', function() { });
 
     subscription.callback(function() {
       if(timeout) window.clearTimeout(timeout);
@@ -234,24 +256,37 @@ define([
 
   }
 
-  // Temporary fix
-  window.setInterval(fakeSubscription, 60000);
-  $(document).on('reawaken', function() {
-    log('Recycling connection after reawaken');
-    recycleConnection();
+  var monitorConnection = _.once(function() {
+    window.setInterval(fakeSubscription, 60000);
+
+    $(document).on('reawaken', function() {
+      log('Recycling connection after reawaken');
+      recycleConnection();
+    });
   });
 
-
+  var _client;
+  function getOrCreateClient() {
+    if(_client) return _client;
+    _client = createClient();
+    return _client;
+  }
 
   return {
     getClientId: function() {
-      return client.getClientId();
+      return getOrCreateClient().getClientId();
     },
+
     subscribe: function(channel, callback) {
-      return new SubscriptionClient(client, channel, callback);
+      return new SubscriptionClient(getOrCreateClient(), channel, callback);
     },
+
     getClient: function() {
-      return client;
+      return getOrCreateClient();
+    },
+
+    getSubscriptionTimestamp: function(channel) {
+      return subscriptionTimestampExtension._getTimestamp(channel);
     }
   };
 });

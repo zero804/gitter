@@ -20,32 +20,81 @@ define([
   var chatCollection, fileCollection, requestCollection, conversationCollection, troupeCollection, filteredTroupeCollection,
   unreadTroupeCollection, peopleOnlyTroupeCollection, favouriteTroupesCollection, recentTroupeCollection, userCollection;
 
+  var preloader = {
+    init: function() {
+      var that = this;
+      $(document).on('realtime:newConnectionEstablished', function() {
+        if(!that.initialConnectionEstablished) {
+          that.initialConnectionEstablished = true;
+          return;
+        }
+
+        that.fetchData();
+
+      });
+    },
+
+    getTimestamp: function() {
+      return this._timestamp;
+    },
+
+    fetchData: function() {
+      if(this.preloadStarted) return;
+      this.preloadStarted = true;
+
+      log('Reloading data');
+
+      this.trigger('preload:start');
+
+      fileCollection.reset();
+      conversationCollection.reset();
+      troupeCollection.reset();
+      userCollection.reset();
+
+      $.ajax({
+        url: window.location.pathname + '/preload?d=' + Date.now(),
+        dataType: "json",
+        type: "GET",
+        context: this,
+        success: function(data) {
+          log('Preload completed, resetting collections');
+          this.preloadStarted = false;
+
+          this._timestamp = moment(data.timestamp).toDate();
+
+          this.trigger('preload:complete', data);
+          unreadItemsClient.preload(data['unreadItems']);
+        }
+      });
+
+      // Currently we don't have requests in the preloaded collection.
+      requestCollection.fetch();
+    }
+  };
+  _.extend(preloader, Backbone.Events);
+
+  preloader.init();
 
   function instantiate () {
-    chatCollection = new chatModels.ChatCollection();
-    instantiateCollection(chatCollection, 'chatMessages');
 
     requestCollection = new requestModels.RequestCollection();
     requestCollection.listen();
     requestCollection.fetch();
 
-    // File Collections
-    fileCollection = new fileModels.FileCollection();
-    instantiateCollection(fileCollection, 'files');
-
-    // Conversation Collections
-
-    conversationCollection = new conversationModels.ConversationCollection();
-    instantiateCollection(conversationCollection, 'conversations');
-
-    // Troupe Collections
-    troupeCollection = new troupeModels.TroupeCollection();
-    instantiateCollection(troupeCollection, 'troupes');
+    chatCollection         = new chatModels.ChatCollection(null, { preloader: preloader, listen: true });
+    fileCollection         = new fileModels.FileCollection(null, { preloader: preloader, listen: true });
+    conversationCollection = new conversationModels.ConversationCollection(null, { preloader: preloader, listen: true });
+    troupeCollection       = new troupeModels.TroupeCollection(null, { preloader: preloader, listen: true });
+    userCollection         = new userModels.UserCollection(null, { preloader: preloader, listen: true });
 
     troupeCollection.on("remove", function(model) {
       if(model.id == window.troupeContext.troupe.id) {
         // TODO: tell the person that they've been kicked out of the troupe
-        window.location.reload();
+        if(window.troupeContext.troupeIsDeleted) {
+          window.location.href = '/last';
+        } else {
+          window.location.reload();
+        }
       }
     });
     unreadItemsClient.installTroupeListener(troupeCollection);
@@ -81,7 +130,7 @@ define([
     recentTroupeCollection = new Backbone.Collection();
 
     // when the list of troupes come in filter them and put them in recentTroupeCollection
-    troupeCollection.on('reset', function() {
+    troupeCollection.on('reset sync', function() {
       // filter out troupes that don't have a last access time
       var recentTroupeModels = _.filter(troupeCollection.models, function(v) {
         return !!v.get('lastAccessTime');
@@ -102,29 +151,6 @@ define([
       // set these as the models for recentTroupeCollection and send out a reset on that collection
       recentTroupeCollection.reset(recentTroupeModels);
     });
-
-    // User Collections
-    userCollection = new userModels.UserCollection();
-    instantiateCollection(userCollection, 'users');
-
-    function instantiateCollection(collection/*, name*/) {
-      collection.listen();
-      /*if(window.troupePreloads && window.troupePreloads[name]) {
-        collection.reset(window.troupePreloads[name], { parse: true });
-      } else {
-
-        if(preloadedFetch) {
-          $(document).one('preloadComplete', function() {
-            collection.reset(window.troupePreloads[name], { parse: true });
-          });
-
-        } else {
-          collection.fetch();
-
-        }
-      }*/
-    }
-
 
   }
 
@@ -156,46 +182,8 @@ define([
     });
   }
 
-  var preloadStarted = false;
-  var listenerInstalled = false;
-  var initialConnectionEstablished = false;
-  function fetchData() {
-    if(preloadStarted) return;
-    preloadStarted = true;
-    log('Reloading data');
-
-    $.ajax({
-      url: window.location.pathname + '/preload?d=' + Date.now(),
-      dataType: "json",
-      type: "GET",
-      success: function(data) {
-        log('Preload completed, resetting collections');
-        preloadStarted = false;
-
-        fileCollection.reset(data['files'], { parse: true });
-        chatCollection.reset(data['chatMessages'], { parse: true });
-        conversationCollection.reset(data['conversations'], { parse: true });
-        troupeCollection.reset(data['troupes'], { parse: true });
-        userCollection.reset(data['users'], { parse: true });
-        unreadItemsClient.preload(data['unreadItems']);
-
-        if(!listenerInstalled) {
-          listenerInstalled = true;
-          $(document).on('realtime:newConnectionEstablished', function() {
-            if(!initialConnectionEstablished) return;
-            initialConnectionEstablished = true;
-            fetchData();
-          });
-        }
-      }
-    });
-
-    // Currently we don't have requests in the preloaded collection.
-    requestCollection.fetch();
-  }
-
   instantiate();
-  fetchData();
+  preloader.fetchData();
   helpers();
 
   return {

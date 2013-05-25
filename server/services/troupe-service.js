@@ -9,6 +9,7 @@ var persistence = require("./persistence-service"),
     winston = require("winston"),
     collections = require("../utils/collections"),
     Fiber = require("../utils/fiber"),
+    _ = require('underscore'),
     statsService = require("../services/stats-service");
 
 var ObjectID = require('mongodb').ObjectID;
@@ -151,7 +152,8 @@ function validateTroupeEmailAndReturnDistributionList(options, callback) {
  */
 function validateTroupeUrisForUser(userId, uris, callback) {
   persistence.Troupe
-    .where('uri').in(uris)
+    .where('uri')['in'](uris)
+    .where('status', 'ACTIVE')
     .exec(function(err, troupes) {
       if(err) return callback(err);
 
@@ -249,8 +251,22 @@ function findAllUnusedInvitesForTroupe(troupeId, callback) {
 
 function removeUserFromTroupe(troupeId, userId, callback) {
    findById(troupeId, function(err, troupe) {
-      troupe.removeUserById(userId);
-      troupe.save(callback);
+      // TODO: Add the user to a removeUsers collection
+      var deleteRecord = new persistence.TroupeRemovedUser({
+        userId: userId,
+        troupeId: troupeId
+      });
+
+      deleteRecord.save(function(err) {
+        if(err) return callback(err);
+
+        // TODO: Let the user know that they've been removed from the troupe (via email or something)
+        troupe.removeUserById(userId);
+        if(troupe.users.length === 0) {
+          return callback("Cannot remove the last user from a troupe");
+        }
+        troupe.save(callback);
+      });
    });
 }
 
@@ -342,6 +358,8 @@ function acceptRequest(request, callback) {
   findById(request.troupeId, function(err, troupe) {
     if(err) return callback(err);
     if(!troupe) { winston.error("Unable to find troupe", request.troupeId); return callback("Unable to find troupe"); }
+
+    if(troupe.status != 'ACTIVE') callback({ troupeNoLongerActive: true });
 
     findUserByIdEnsureConfirmationCode(request.userId, function(err, user) {
       if(err) return callback(err);
@@ -559,17 +577,16 @@ function findBestTroupeForUser(user, callback) {
   // This code is invoked when a user's lastAccessedTroupe is no longer valid (for the user)
   // or the user doesn't have a last accessed troupe. It looks for all the troupes that the user
   // DOES have access to (by querying the troupes.users collection in mongo)
-  // If the user has a troupe, it takes them to the first one it finds. If the user doesn't have
-  // any valid troupes, it redirects them to an error message
+  // If the user has a troupe, it takes them to the last one they accessed. If the user doesn't have
+  // any valid troupes, it returns an error.
   //
 
   if (user.lastTroupe) {
     findById(user.lastTroupe, function(err,troupe) {
       if(err) return callback(err);
 
-      if(!troupe || !userHasAccessToTroupe(user, troupe)) {
-        userService.findDefaultTroupeForUser(user.id, callback);
-        return;
+      if(!troupe || troupe.status == 'DELETED' || !userHasAccessToTroupe(user, troupe)) {
+        return findLastAccessedTroupeForUser(user, callback);
       }
 
       callback(null, troupe);
@@ -577,7 +594,36 @@ function findBestTroupeForUser(user, callback) {
     return;
   }
 
-  userService.findDefaultTroupeForUser(user.id, callback);
+  return findLastAccessedTroupeForUser(user, callback);
+}
+
+function findLastAccessedTroupeForUser(user, callback) {
+  persistence.Troupe.find({ 'users.userId': user.id, 'status': 'ACTIVE' }, function(err, activeTroupes) {
+    if(err) return callback(err);
+    if (!activeTroupes || activeTroupes.length === 0) callback(null, null);
+
+    userService.getTroupeLastAccessTimesForUser(user.id, function(err, troupeAccessTimes) {
+      if(err) return callback(err);
+
+      activeTroupes.forEach(function(troupe) {
+        troupe.lastAccessTime = troupeAccessTimes[troupe._id];
+      });
+
+      var troupes = _.sortBy(activeTroupes, function(t) {
+        return (t.lastAccessTime) ? t.lastAccessTime : 0;
+      }).reverse();
+
+      _.find(troupes, function(troupe) {
+
+        if (userHasAccessToTroupe(user, troupe)) {
+          callback(null, troupe);
+          return true;
+        }
+      });
+    });
+
+  });
+
 }
 
 //
@@ -683,6 +729,7 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
         findById(invite.troupeId, function(err, troupe) {
           if(err) return callback(err);
           if(!troupe) return callback(404);
+          if(troupe.status != 'ACTIVE') return callback({ troupeNoLongerActive: true });
 
           var originalStatus = invite.status;
           if(originalStatus != 'UNUSED') {
@@ -707,6 +754,16 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
     }
 
   });
+}
+
+function deleteTroupe(troupe, callback) {
+  if(troupe.status != 'ACTIVE') return callback("Troupe is not active");
+  if(troupe.users.length !== 1) return callback("Can only delete troupes that have a single user");
+
+  troupe.status = 'DELETED';
+  troupe.dateDeleted = new Date();
+  troupe.removeUserById(troupe.users[0].userId);
+  troupe.save(callback);
 }
 
 module.exports = {
@@ -741,6 +798,7 @@ module.exports = {
   findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
   upgradeOneToOneTroupe: upgradeOneToOneTroupe,
   createUniqueUri: createUniqueUri,
+  deleteTroupe: deleteTroupe,
 
   updateFavourite: updateFavourite,
   findFavouriteTroupesForUser: findFavouriteTroupesForUser,

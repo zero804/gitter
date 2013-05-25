@@ -37,7 +37,6 @@ if(nconf.get("mongo:profileSlowQueries")) {
 }
 
 connection.on('error', function(err) {
-
   winston.info("MongoDB connection error", { exception: err });
   console.error(err);
   if(err.stack) console.log(err.stack);
@@ -120,12 +119,13 @@ UserLocationHistorySchema.index({ userId: 1 });
 UserLocationHistorySchema.schemaTypeName = 'UserLocationHistorySchema';
 
 
+// troupes: { troupeId: Date }
 var UserTroupeLastAccessSchema = new Schema({
   userId: ObjectId,
   troupes: Schema.Types.Mixed
 });
-UserLocationHistorySchema.index({ userId: 1 });
-UserLocationHistorySchema.schemaTypeName = 'UserLocationHistorySchema';
+UserTroupeLastAccessSchema.index({ userId: 1 });
+UserTroupeLastAccessSchema.schemaTypeName = 'UserTroupeLastAccessSchema';
 
 
 var UserTroupeFavouritesSchema = new Schema({
@@ -151,13 +151,15 @@ TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
 var TroupeSchema = new Schema({
   name: { type: String },
   uri: { type: String },
-  status: { type: String, "enum": ['INACTIVE', 'ACTIVE'], "default": 'INACTIVE'},
+  status: { type: String, "enum": ['ACTIVE', 'DELETED'], "default": 'ACTIVE'},
   oneToOne: { type: Boolean, "default": false },
   users: [TroupeUserSchema],
+  dateDeleted: { type: Date },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 TroupeSchema.index({ uri: 1 });
 TroupeSchema.schemaTypeName = 'TroupeSchema';
+
 
 TroupeSchema.methods.getUserIds = function() {
   return this.users.map(function(troupeUser) { return troupeUser.userId; });
@@ -220,8 +222,23 @@ TroupeSchema.methods.removeUserById = function(userId) {
   }
 };
 
+TroupeSchema.methods.getUrl = function(userId) {
+  if(!this.oneToOne) return "/" + this.uri;
 
+  var otherUser = this.users.filter(function(troupeUser) {
+      return troupeUser.userId != userId;
+    })[0];
 
+  return "/one-one/" + otherUser.userId;
+};
+
+var TroupeRemovedUserSchema = new Schema({
+  userId: { type: ObjectId },
+  troupeId: { type: ObjectId },
+  dateDeleted: { type: Date, "default": Date.now }
+});
+TroupeRemovedUserSchema.index({ userId: 1 });
+TroupeRemovedUserSchema.schemaTypeName = 'TroupeRemovedUserSchema';
 
 //
 // An invitation to a person to join a Troupe
@@ -422,6 +439,7 @@ var UserTroupeFavourites = mongoose.model('UserTroupeFavourites', UserTroupeFavo
 
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var TroupeUser = mongoose.model('TroupeUser', TroupeUserSchema);
+var TroupeRemovedUser = mongoose.model('TroupeRemovedUser', TroupeRemovedUserSchema);
 var Email = mongoose.model('Email', EmailSchema);
 var EmailAttachment = mongoose.model('EmailAttachment', EmailAttachmentSchema);
 var Conversation = mongoose.model('Conversation', ConversationSchema);
@@ -440,6 +458,17 @@ var GeoPopulatedPlace = mongoose.model('GeoPopulatedPlaces', GeoPopulatedPlaceSc
 var PushNotificationDevice = mongoose.model('PushNotificationDevice', PushNotificationDeviceSchema);
 
 
+//
+// 8-May-2013: Delete this after it's been rolled into production!
+//
+Troupe.update({ status: 'INACTIVE' }, { status: 'ACTIVE' }, { multi: true }, function (err, numberAffected) {
+  if (err) return winston.error(err);
+  if(numberAffected > 0) {
+    winston.warn('Updated ' + numberAffected + ' INACTIVE troupes to status ACTIVE');
+  }
+});
+
+
 module.exports = {
   schemas: {
     UserSchema: UserSchema,
@@ -448,6 +477,7 @@ module.exports = {
     UserTroupeFavouritesSchema: UserTroupeFavouritesSchema,
     TroupeSchema: TroupeSchema,
     TroupeUserSchema: TroupeUserSchema,
+    TroupeRemovedUserSchema: TroupeRemovedUserSchema,
     EmailSchema: EmailSchema,
     EmailAttachmentSchema: EmailAttachmentSchema,
     ConversationSchema: ConversationSchema,
@@ -467,6 +497,7 @@ module.exports = {
   UserTroupeFavourites: UserTroupeFavourites,
   Troupe: Troupe,
   TroupeUser: TroupeUser,
+  TroupeRemovedUser: TroupeRemovedUser,
 	Email: Email,
   EmailAttachment: EmailAttachment,
   Conversation: Conversation,

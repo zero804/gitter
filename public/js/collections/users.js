@@ -23,7 +23,8 @@ define([
   exports.UserCollection = TroupeCollections.LiveCollection.extend({
     model: exports.UserModel,
     modelName: 'user',
-    nestedUrl: "users"
+    nestedUrl: "users",
+    preloadKey: "users"
   });
 
   return exports;

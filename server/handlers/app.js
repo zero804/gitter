@@ -4,7 +4,6 @@
 var troupeService = require("../services/troupe-service");
 var winston = require("winston");
 var userService = require("../services/user-service");
-var signupService = require("../services/signup-service");
 var unreadItemService = require("../services/unread-item-service");
 var restSerializer = require("../serializers/rest-serializer");
 var nconf = require('../utils/config');
@@ -16,6 +15,7 @@ var chatService = require("../services/chat-service");
 var Fiber = require("../utils/fiber");
 var conversationService = require("../services/conversation-service");
 var appVersion = require("../web/appVersion");
+var loginUtils = require('../web/login-utils');
 
 var useFirebugInIE = nconf.get('web:useFirebugInIE');
 
@@ -240,6 +240,7 @@ function preloadTroupeMiddleware(req, res, next) {
   troupeService.findByUri(appUri, function(err, troupe) {
     if (err) return next({ errorCode: 500, error: err });
     if(!troupe) return next({ errorCode: 404 });
+    if(troupe.status != 'ACTIVE') return next({ errorCode: 404 });
     req.troupe = troupe;
     next();
   });
@@ -254,6 +255,7 @@ function preloadOneToOneTroupeMiddleware(req, res, next) {
   }
 
   if (req.params.userId === req.user.id) {
+    winston.info('Another user is talking to themselves...', { userId: req.user.id });
     res.redirect(nconf.get('web:homeurl'));
     return 1;
   }
@@ -300,12 +302,35 @@ module.exports = {
         }
       );
 
+      app.get('/last',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        function(req, res, next) {
+          loginUtils.redirectUserToDefaultTroupe(req, res, next);
+        });
+
+      app.get('/last/:page',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        function(req, res, next) {
+
+          loginUtils.whereToNext(req.user, function(err, url) {
+            if (err || !url) next(err);
+
+            res.relativeRedirect(url + "/" + req.params.page);
+          });
+
+        });
+
 
       app.get('/one-one/:userId/preload',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         preloadOneToOneTroupeMiddleware,
         function(req, res, next) {
+          // Timestamp aroundabout the time the snapshot was taken....
+          var timestamp = new Date().toISOString();
+
           var f = new Fiber();
           if(req.user) {
             preloadTroupes(req.user.id, f.waitor());
@@ -319,6 +344,7 @@ module.exports = {
               // Send the information through
               res.set('Cache-Control', 'no-cache');
               res.send({
+                timestamp: timestamp,
                 troupes: troupes,
                 files: files,
                 chatMessages: chats,
@@ -354,8 +380,12 @@ module.exports = {
       app.get('/:appUri/preload',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
+        //middleware.simulateDelay(10000),
         preloadTroupeMiddleware,
         function(req, res, next) {
+          // Timestamp aroundabout the time the snapshot was taken....
+          var timestamp = new Date().toISOString();
+
           var f = new Fiber();
           if(req.user) {
             preloadTroupes(req.user.id, f.waitor());
@@ -370,6 +400,7 @@ module.exports = {
               // Send the information through
               res.set('Cache-Control', 'no-cache');
               res.send({
+                timestamp: timestamp,
                 troupes: troupes,
                 files: files,
                 chatMessages: chats,
@@ -394,35 +425,6 @@ module.exports = {
         middleware.authenticate('accept', {}),
         function(req, res/*, next*/) {
           res.relativeRedirect("/" + req.params.troupeUri);
-        });
-
-      app.get('/last/:page',
-        middleware.grantAccessForRememberMeTokenMiddleware,
-        middleware.ensureLoggedIn(),
-        function(req, res, next) {
-
-          function findDefaultTroupeForUser() {
-            userService.findDefaultTroupeForUser(req.user.id, function (err,troupe) {
-              if (err || !troupe) {
-                next(500);
-              }
-
-              res.redirect('/' + troupe.uri + "/" + req.params.page);
-            });
-          }
-
-          if (req.user.lastTroupe) {
-            troupeService.findById(req.user.lastTroupe, function (err,troupe) {
-              if (err || !troupe || !troupeService.userHasAccessToTroupe(req.user, troupe)) {
-                findDefaultTroupeForUser();
-                return;
-              }
-
-              res.redirect('/' + troupe.uri + "/" + req.params.page);
-            });
-          } else {
-            findDefaultTroupeForUser();
-          }
         });
 
       app.get('/:appUri/chat',

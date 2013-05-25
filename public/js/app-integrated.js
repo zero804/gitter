@@ -41,9 +41,9 @@ require([
   'log!app-integrated',
   'components/errorReporter',
   'filtered-collection'
-], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, realtime, eyeballs, dozy, AppIntegratedView, ChatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
+], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, realtime, eyeballs, dozy, AppIntegratedView, chatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
             collections, troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
-            RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareView,
+            RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareSearchView,
             createTroupeView, headerViewTemplate,
             troupeSettingsView, webNotifications, unreadItemsClient, log /*, errorReporter , FilteredCollection */) {
   "use strict";
@@ -143,7 +143,7 @@ require([
         { name: "person",         re: /^person\/(\w+)$/,          viewType: PersonDetailView,             collection: collections.users },
 
         { name: "profile",        re: /^profile$/,                viewType: profileView.Modal },
-        { name: "share",          re: /^share$/,                  viewType: shareView.Modal },
+        { name: "share",          re: /^share$/,                  viewType: shareSearchView.Modal },
         { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal,       collection: collections.troupes,   skipModelLoad: true },
         { name: "upgradeOneToOne",  re: /^upgradeOneToOne$/,      viewType: createTroupeView.Modal,       collection: collections.troupes,   skipModelLoad: true, viewOptions: { upgradeOneToOne: true } } ,
         { name: "troupeSettings", re: /^troupeSettings/,          viewType: troupeSettingsView }
@@ -292,10 +292,10 @@ require([
       userCollection: userCollection
     }).render();
 
-    new ChatInputView({
+    new chatInputView.ChatInputView({
       el: $('#chat-input'),
       collection: chatCollection,
-      collectionViewScrollDelegate: chatCollectionView.scrollDelegate
+      scrollDelegate: chatCollectionView.scrollDelegate
     }).render();
 
     // Request View

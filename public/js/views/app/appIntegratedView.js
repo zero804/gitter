@@ -155,15 +155,25 @@ define([
       }, 2000);
 
       // show / hide the 'unread troupes header' on the mega list
-      collections['unreadTroupes'].on('all', function() {
+      collections['unreadTroupes'].on('all', toggleUnreads);
+      collections['favouriteTroupes'].on('all', toggleFavs);
+      collections['recentTroupes'].on('all', toggleRecents);
+
+      function toggleUnreads() {
         $('#unreadTroupesList').toggle(collections['unreadTroupes'].length > 0);
-      });
-      collections['favouriteTroupes'].on('all', function() {
+      }
+
+      function toggleFavs() {
         $('#favTroupesList').toggle(collections['favouriteTroupes'].length > 0);
-      });
-      collections['recentTroupes'].on('all', function() {
+      }
+
+      function toggleRecents() {
         $('#recentTroupesList').toggle(collections['recentTroupes'].length > 0);
-      });
+      }
+
+      toggleUnreads();
+      toggleFavs();
+      toggleRecents();
     },
 
     updateTitlebar: function(values) {
