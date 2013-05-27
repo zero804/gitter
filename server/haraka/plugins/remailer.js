@@ -8,7 +8,7 @@ var winston = harakaRequire("./utils/winston");
 
 // troupe service to redeliver mails to troupe users
 var troupeService = harakaRequire("./services/troupe-service");
-var troupeSESTransport = harakaRequire("./utils/mail/troupe-ses-transport");
+var troupeSESTransport = require(harakaRequire.resolveModuleName('./utils/mail/troupe-ses-transport')); // UNFORTUNATELY NEED TO DO THIS DUE TO THE PROXY
 var nconf = harakaRequire("./utils/config");
 var Fiber = harakaRequire('./utils/fiber');
 var mimelib = require('mimelib');
