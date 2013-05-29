@@ -247,6 +247,8 @@ var InviteSchema = new Schema({
   troupeId: ObjectId,
   displayName: { type: String },
   email: { type: String },
+  createdAt: { type: Date, default: Date.now },
+  emailSentAt: { type: Date },
   code: { type: String },
   status: { type: String, "enum": ['UNUSED', 'USED'], "default": 'UNUSED'},
   _tv: { type: 'MongooseNumber', 'default': 0 }

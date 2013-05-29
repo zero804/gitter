@@ -65,6 +65,9 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
         if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
           accessDenied = true;
           troupeData = null;
+
+          // look for an invite
+          // troupeService.findTroupeInviteForUser(req.user, troupe, function() {});
         }
 
         var status = req.user.status;
@@ -100,6 +103,7 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
           accessToken: accessToken,
           profileNotCompleted: profileNotCompleted,
           accessDenied: accessDenied,
+          // inviteId: confirmationCode,
           appVersion: appVersion.getCurrentVersion(),
           baseServer: nconf.get('web:baseserver'),
           basePort: nconf.get('web:baseport'),
@@ -242,10 +246,17 @@ function preloadTroupeMiddleware(req, res, next) {
     if(!troupe) return next({ errorCode: 404 });
     if(troupe.status != 'ACTIVE') return next({ errorCode: 404 });
     req.troupe = troupe;
+
+    // check if the user has access
+    // if not, check if the user has an unused invite
+    // req.invite =
+
     next();
   });
 
 }
+
+// TODO preload invites?
 
 function preloadOneToOneTroupeMiddleware(req, res, next) {
   if (!req.user) {

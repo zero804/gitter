@@ -5,6 +5,7 @@
 var persistence = require("./persistence-service"),
     userService = require("./user-service"),
     emailNotificationService = require("./email-notification-service"),
+    presenceService = require("./presence-service"),
     uuid = require('node-uuid'),
     winston = require("winston"),
     collections = require("../utils/collections"),
@@ -174,24 +175,70 @@ function validateTroupeUrisForUser(userId, uris, callback) {
 }
 
 function inviteUserByUserId(troupe, senderDisplayName, userId, callback) {
+  var userIsOnline = false;
+
   userService.findById(userId, function(err, user) {
     if(err) return callback(err);
     if(!user) return callback("User not found");
 
+    // check if the invited user is currently online
+    presenceService.categorizeUsersByOnlineStatus([userId], function(err, onlineUsers) {
+
+      userIsOnline = onlineUsers && onlineUsers[userId];
+
+      var invite = new persistence.Invite();
+      invite.troupeId = troupe.id;
+      invite.displayName = user.displayName;
+      invite.email = user.email;
+      invite.code = uuid.v4();
+
+      // if user is offline then send mail immediately.
+      if (!userIsOnline) {
+        invite.emailSentAt = Date.now();
+      }
+
+      invite.save(function(err) {
+        if(err) return callback(err);
+
+        if (!userIsOnline) {
+          emailNotificationService.sendInvite(troupe, user.displayName, user.email, invite.code, senderDisplayName);
+        }
+
+        callback();
+      });
+
+    });
+
+    });
+
+}
+
+function inviteUserByEmail(troupe, senderDisplayName, displayName, email, callback) {
+
+  // Only non-registered users should go through this flow.
+  // Check if the email is registered to a user.
+
+  userService.findByEmail(email, function(err, user) {
+    if (user) {
+      // Forward to the invite existing user flow:
+      inviteUserByUserId(troupe, senderDisplayName, user.id, callback);
+
+      return;
+    }
+
+    // create the invite and send mail immediately
     var code = uuid.v4();
 
     var invite = new persistence.Invite();
     invite.troupeId = troupe.id;
-    invite.displayName = user.displayName;
-    invite.email = user.email;
+    invite.displayName = displayName;
+    invite.email = email;
+    invite.emailSentAt = Date.now();
     invite.code = code;
     invite.save(function(err) {
       if(err) return callback(err);
 
-      // TODO: should we treat registered users differently from unregistered people?
-      // At the moment, we treat them all the same...
-
-      emailNotificationService.sendInvite(troupe, user.displayName, user.email, code, senderDisplayName);
+      emailNotificationService.sendInvite(troupe, displayName, email, code, senderDisplayName);
       callback();
     });
 
@@ -199,32 +246,17 @@ function inviteUserByUserId(troupe, senderDisplayName, userId, callback) {
 
 }
 
-function inviteUserByEmail(troupe, senderDisplayName, displayName, email, callback) {
-  var code = uuid.v4();
-
-  var invite = new persistence.Invite();
-  invite.troupeId = troupe.id;
-  invite.displayName = displayName;
-  invite.email = email;
-  invite.code = code;
-  invite.save(function(err) {
-    if(err) return callback(err);
-
-    // TODO: should we treat registered users differently from unregistered people?
-    // At the moment, we treat them all the same...
-
-    emailNotificationService.sendInvite(troupe, displayName, email, code, senderDisplayName);
-    callback();
-  });
-}
-
 function inviteUserToTroupe(troupe, senderDisplayName, invite, callback) {
   if(invite.email) {
-    return inviteUserByEmail(troupe, senderDisplayName, invite.displayName, invite.email, callback);
+    inviteUserByEmail(troupe, senderDisplayName, invite.displayName, invite.email, callback);
+
+    return;
   }
 
   if(invite.userId) {
-    return inviteUserByUserId(troupe, senderDisplayName, invite.userId, callback);
+    inviteUserByUserId(troupe, senderDisplayName, invite.userId, callback);
+
+    return;
   }
 
   // Otherwise, if neither an email or userId are sent, just quietely ignore
@@ -247,6 +279,14 @@ function findAllUnusedInvitesForTroupe(troupeId, callback) {
       .sort({ displayName: 'asc', email: 'asc' } )
       .slaveOk()
       .exec(callback);
+}
+
+function findAllUnusedInvitesForEmail(email, callback) {
+  persistence.Invite.where('email').equals(email)
+    .where('status').equals('UNUSED')
+    .sort({ displayName: 'asc', email: 'asc' } )
+    .slaveOk()
+    .exec(callback);
 }
 
 function removeUserFromTroupe(troupeId, userId, callback) {
@@ -678,6 +718,17 @@ function createNewTroupeForExistingUser(options, callback) {
   });
 }
 
+// so that the invite doesn't show up in the receiver's list of pending invitations
+function rejectInviteForAuthenticatedUser(user, troupe, inviteId, callback) {
+  // check that the logged in user owns this invite
+  // mark as used?
+}
+
+function acceptInviteForAuthenticatedUser(user, troupe, inviteId, callback) {
+  // check that the logged in user owns this invite
+  // mark as used.
+}
+
 // Accept an invite, returns callback(err, user, alreadyExists)
 // NB NB NB user should only ever be set iff the invite is valid
 function acceptInvite(confirmationCode, troupeUri, callback) {
@@ -756,6 +807,10 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
   });
 }
 
+function sendPendingInviteMails(callback) {
+
+}
+
 function deleteTroupe(troupe, callback) {
   if(troupe.status != 'ACTIVE') return callback("Troupe is not active");
   if(troupe.users.length !== 1) return callback("Can only delete troupes that have a single user");
@@ -781,6 +836,7 @@ module.exports = {
   findInviteByCode: findInviteByCode,
   findMemberEmails: findMemberEmails,
   findAllUnusedInvitesForTroupe: findAllUnusedInvitesForTroupe,
+  findAllUnusedInvitesForEmail: findAllUnusedInvitesForEmail,
   addRequest: addRequest,
   findRequestsByIds: findRequestsByIds,
   findAllOutstandingRequestsForTroupe: findAllOutstandingRequestsForTroupe,
@@ -804,5 +860,8 @@ module.exports = {
   findFavouriteTroupesForUser: findFavouriteTroupesForUser,
   findBestTroupeForUser: findBestTroupeForUser,
   createNewTroupeForExistingUser: createNewTroupeForExistingUser,
-  acceptInvite: acceptInvite
+  acceptInvite: acceptInvite,
+  acceptInviteForAuthenticatedUser: acceptInviteForAuthenticatedUser,
+  rejectInviteForAuthenticatedUser: rejectInviteForAuthenticatedUser,
+  sendPendingInviteMails: sendPendingInviteMails
 };

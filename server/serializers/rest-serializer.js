@@ -608,6 +608,7 @@ function InviteStrategy(options) {
 
   this.map = function(item) {
     return {
+      // TODO will need to include the troupe url here
       id: item._id,
       displayName: item.displayName,
       email: item.email,
