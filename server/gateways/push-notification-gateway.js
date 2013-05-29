@@ -33,13 +33,13 @@ exports.startWorkers = function() {
     pushNotificationService.findDevicesForUsers(userIds, function(err, devices) {
       if(err) return callback(err);
 
-      winston.verbose("Sending to " + devices.length + " potential devices for " + userIds.length + " users");
+      winston.verbose("push-gateway: Sending to " + devices.length + " potential devices for " + userIds.length + " users");
 
       devices.forEach(function(device) {
         var sent = false;
 
-        if((device.deviceType === 'APPLE' || device.deviceType === 'APPLE-DEV') && device.appleToken) {
-          winston.info("Sending apple push notification", { notification: notification });
+        if((device.deviceType === 'APPLE' || device.deviceType === 'APPLE-DEV' || device.deviceType === 'APPLE-BETA') && device.appleToken) {
+          winston.info("push-gateway: Sending apple push notification", { notification: notification });
           var note = new apns.Notification();
 
           if(badge >= 0) {
@@ -63,12 +63,20 @@ exports.startWorkers = function() {
 
           note.pushDevice = device;
 
-          //winston.debug('Sending notification ', note);
+          switch(device.deviceType) {
+            case 'APPLE':
+              apnsConnection.sendNotification(note);
+              break;
 
-          if(device.deviceType === 'APPLE') {
-            apnsConnection.sendNotification(note);
-          } else {
-            apnsConnectionDev.sendNotification(note);
+            case 'APPLE-BETA':
+              apnsConnectionBeta.sendNotification(note);
+              break;
+
+            case 'APPLE-DEV':
+              apnsConnectionDev.sendNotification(note);
+              break;
+            default:
+              winston.warn('Unknown device type: ' + device.deviceType);
           }
 
           sent = true;
@@ -109,7 +117,7 @@ exports.startWorkers = function() {
   }
 
   winston.info("Starting APN");
-  var apnsConnection = new apns.Connection({
+  var apnsConnectionDev = new apns.Connection({
       cert: nconf.get('apn:certDev'),
       key: nconf.get('apn:keyDev'),
       gateway: nconf.get('apn:gatewayDev'),
@@ -118,7 +126,16 @@ exports.startWorkers = function() {
       connectionTimeout: 60000
   });
 
-  var apnsConnectionDev = new apns.Connection({
+  var apnsConnectionBeta = new apns.Connection({
+      cert: nconf.get('apn:certBeta'),
+      key: nconf.get('apn:keyBeta'),
+      gateway: nconf.get('apn:gatewayBeta'),
+      enhanced: true,
+      errorCallback: errorEventOccurred,
+      connectionTimeout: 60000
+  });
+
+  var apnsConnection = new apns.Connection({
       cert: nconf.get('apn:certProd'),
       key: nconf.get('apn:keyProd'),
       gateway: nconf.get('apn:gatewayProd'),
@@ -140,6 +157,14 @@ exports.startWorkers = function() {
       interval: nconf.get('apn:feedbackInterval')
   });
 
+
+  new apns.Feedback({
+      cert: nconf.get('apn:certBeta'),
+      key: nconf.get('apn:keyBeta'),
+      gateway: nconf.get('apn:feedbackBeta'),
+      feedback: failedDeliveryEventOccurred,
+      interval: nconf.get('apn:feedbackInterval')
+  });
 
   new apns.Feedback({
       cert: nconf.get('apn:certProd'),

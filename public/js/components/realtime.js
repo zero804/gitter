@@ -234,6 +234,8 @@ define([
   function fakeSubscription() {
     if(!_client) return;
 
+    log('Attempting to subscribe to /ping');
+
     var subscription = _client.subscribe('/ping', function() { });
 
     subscription.callback(function() {
@@ -263,6 +265,13 @@ define([
       log('Recycling connection after reawaken');
       recycleConnection();
     });
+
+    // Cordova events.... doesn't matter if IE8 doesn't handle them
+    if(document.addEventListener) {
+      document.addEventListener("offline", fakeSubscription, false);
+      document.addEventListener("online", fakeSubscription, false);
+    }
+
   });
 
   var _client;

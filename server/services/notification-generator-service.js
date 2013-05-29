@@ -339,16 +339,6 @@ exports.startWorkers = function() {
     return null;
   }
 
-  function getSound(itemType) {
-    switch(itemType) {
-      case 'chat': return 'chat.caf';
-      case 'file': return 'file.caf';
-    default:
-      winston.debug('No sound available for ' + itemType);
-      return null;
-    }
-  }
-
   /* Takes a whole lot of notifications for the same type of message, and turns them into messages */
   function createNotificationMessage(itemType, itemIds, callback) {
     var template = templates[itemType];
@@ -383,7 +373,7 @@ exports.startWorkers = function() {
             var d = {
               text: template(data),
               title: titleTemplate ? titleTemplate(data) : null,
-              sound: getSound(itemType),
+              sound: 'notify.caf',
               link: linkTemplate ? linkTemplate(data) : null
             };
             return d;
@@ -484,8 +474,8 @@ exports.startWorkers = function() {
 
           pushNotificationGateway.sendUserNotification(notification.userId, {
             message: message.text,
-            sound: 'chat',
-            payload: 'payload'
+            sound: message.sound,
+            link: message.link
           });
         });
 

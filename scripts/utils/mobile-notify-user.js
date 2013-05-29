@@ -33,8 +33,8 @@ var opts = require("nomnom")
 pushNotificationGateway.sendUserNotification(opts.user, {
    message: opts.message,
    sound: opts.sound,
-   link: opts.link,
-   payload: { uri: 'txkw2b', page: 'files' } },
+   link: opts.link
+   },
    function() {
      shutdown.shutdownGracefully();
    });
