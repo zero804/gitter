@@ -608,8 +608,8 @@ function InviteStrategy(options) {
 
   this.map = function(item) {
     return {
-      // TODO will need to include the troupe url here
       id: item._id,
+      troupeUrl: item.troupeUrl,
       displayName: item.displayName,
       email: item.email,
       avatarUrlSmall: '/images/2/avatar-default.png', // TODO: fix
