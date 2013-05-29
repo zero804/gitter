@@ -95,7 +95,7 @@ define([
         avatarUrl: avatarUrl,
         avatarSize: this.avatarSize,
         userLocation: user.location ? user.location.description : "",
-        tooltip: user.displayName + "\n" + ((user.location) ? user.location.description : ""),
+        tooltip: user.displayName + "<br>" + ((user.location) ? user.location.description : ""),
         online: online,
         offline: !online
       };

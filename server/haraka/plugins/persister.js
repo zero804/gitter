@@ -8,7 +8,7 @@ var harakaRequire = require(__dirname + '/haraka-require');
 var winston = harakaRequire("./utils/winston");
 
 // troupe service to deliver mails to mongo database
-var conversationService = harakaRequire("./services/conversation-service");
+var conversationService = require(harakaRequire.resolveModuleName('./services/conversation-service')); // UNFORTUNATELY NEED TO DO THIS DUE TO THE PROXY
 var troupeService = harakaRequire("./services/troupe-service");
 var fileService = harakaRequire("./services/file-service");
 var statsService = harakaRequire('./services/stats-service');
