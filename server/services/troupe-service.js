@@ -188,7 +188,9 @@ function inviteUserByUserId(troupe, senderDisplayName, userId, callback) {
 
       var invite = new persistence.Invite();
       invite.troupeId = troupe.id;
+      invite.troupeUrl = troupe.url;
       invite.displayName = user.displayName;
+      invite.userId = user.id;
       invite.email = user.email;
       invite.code = uuid.v4();
 
@@ -231,6 +233,7 @@ function inviteUserByEmail(troupe, senderDisplayName, displayName, email, callba
 
     var invite = new persistence.Invite();
     invite.troupeId = troupe.id;
+    invite.troupeUrl = troupe.url;
     invite.displayName = displayName;
     invite.email = email;
     invite.emailSentAt = Date.now();
