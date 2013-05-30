@@ -159,17 +159,51 @@ a {
   display: inline-block;
   min-width: 960px;
   padding-top: 8px;
-  padding-bottom: 18px;
   width: 100%;
   text-align: center;
 }
 
 .trpFeature {
   display: inline-block;
-  width: 240px;
+  width: 300px;
   vertical-align: top;
   padding: 20px;
   margin: 20px;
+  height: 200px;
+}
+
+
+.trpFeatureImage {
+  width: 48px;
+  height: 48px;
+  vertical-align: center;
+  border-radius: 50em;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.bgPurple {
+  background-color: @trpPurple;
+}
+
+.bgGreen {
+  background-color: @trpGreen;
+}
+
+.bgCyan {
+  background-color: @trpCyan;
+}
+
+.bgGrey {
+  background-color: @trpGrey;
+}
+
+.bgDarkGrey {
+  background-color: @trpDarkGrey;
+}
+
+.bgYellow {
+  background-color: @trpYellow;
 }
 
 .trpFeatureHead {
@@ -216,7 +250,7 @@ a {
 }
 
 .trpHomeAppStripContainer {
-  background-color: white;
+  background-color: @trpPurple;
   width: 100%;
   text-align: center;
   margin-top: -4px;
@@ -226,6 +260,7 @@ a {
 .trpHomeAppStrip {
   .trpMidStrip;
   padding-top: 10px;
+  color: white;
 }
 
 .trpLegalHero {
