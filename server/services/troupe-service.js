@@ -11,6 +11,7 @@ var persistence = require("./persistence-service"),
     collections = require("../utils/collections"),
     Fiber = require("../utils/fiber"),
     _ = require('underscore'),
+    assert = require('assert'),
     statsService = require("../services/stats-service");
 
 var ObjectID = require('mongodb').ObjectID;
@@ -188,7 +189,9 @@ function inviteUserByUserId(troupe, senderDisplayName, userId, callback) {
 
       var invite = new persistence.Invite();
       invite.troupeId = troupe.id;
-      invite.troupeUrl = troupe.url;
+      invite.troupeUrl = troupe.uri;
+      invite.troupeName = troupe.name;
+      invite.senderDisplayName = senderDisplayName;
       invite.displayName = user.displayName;
       invite.userId = user.id;
       invite.email = user.email;
@@ -233,7 +236,9 @@ function inviteUserByEmail(troupe, senderDisplayName, displayName, email, callba
 
     var invite = new persistence.Invite();
     invite.troupeId = troupe.id;
-    invite.troupeUrl = troupe.url;
+    invite.troupeUrl = troupe.uri;
+    invite.troupeName = troupe.name;
+    invite.senderDisplayName = senderDisplayName;
     invite.displayName = displayName;
     invite.email = email;
     invite.emailSentAt = Date.now();
@@ -282,6 +287,10 @@ function findAllUnusedInvitesForTroupe(troupeId, callback) {
       .sort({ displayName: 'asc', email: 'asc' } )
       .slaveOk()
       .exec(callback);
+}
+
+function findUnusedInviteToTroupeForEmail(email, troupeId, callback) {
+  persistence.Invite.findOne({ troupeId: troupeId, email: email, status: 'UNUSED' }, callback);
 }
 
 function findAllUnusedInvitesForEmail(email, callback) {
@@ -722,14 +731,89 @@ function createNewTroupeForExistingUser(options, callback) {
 }
 
 // so that the invite doesn't show up in the receiver's list of pending invitations
-function rejectInviteForAuthenticatedUser(user, troupe, inviteId, callback) {
-  // check that the logged in user owns this invite
-  // mark as used?
+// marks the invite as used
+function rejectInviteForAuthenticatedUser(user, inviteId, callback) {
+  assert(user); assert(inviteId);
+
+  findInviteById(inviteId, function(err, invite) {
+    if(err) return callback(err);
+
+    if(invite.email !== user.email && invite.userId !== user.id) {
+      return callback(401);
+    }
+
+    if(!invite) {
+      winston.error("Invite id=" + inviteId + " not found. ");
+      return callback(null, null);
+    }
+
+    if(invite.status !== 'UNUSED') {
+      /* The invite has already been used. We need to fail authentication, but go to the troupe */
+      winston.verbose("Invite has already been used", { inviteId: inviteId, troupeUri: invite.troupeUrl });
+      statsService.event('invite_reused', { uri: invite.troupeUrl });
+      callback();
+    } else {
+      statsService.event('invite_rejected', { uri: invite.troupeUrl });
+      winston.verbose("Invite rejected", { inviteId: invite.id, troupeUri: invite.troupeUrl });
+
+      invite.status = 'USED';
+      invite.save(function(err) {
+        if(err) return callback(err);
+
+        callback();
+      });
+    }
+  });
+
 }
 
-function acceptInviteForAuthenticatedUser(user, troupe, inviteId, callback) {
+function acceptInviteForAuthenticatedUser(user, inviteId, callback) {
+  assert(user); assert(inviteId);
   // check that the logged in user owns this invite
   // mark as used.
+  findInviteById(inviteId, function(err, invite) {
+    if(err) return callback(err);
+
+    if(invite.email !== user.email && invite.userId !== user.id) {
+      return callback(401);
+    }
+
+    if(!invite) {
+      winston.error("Invite inviteId=" + inviteId + " not found. ");
+      return callback(null, null);
+    }
+
+    if(invite.status !== 'UNUSED') {
+      winston.verbose("Invite has already been used", { inviteId: invite.id, troupeUri: invite.troupeUrl });
+      statsService.event('invite_reused', { uri: invite.troupeUrl });
+    } else {
+      statsService.event('invite_accepted', { uri: invite.troupeUrl });
+      winston.verbose("Invite accepted", { inviteId: invite.id, troupeUri: invite.troupeUrl });
+
+      findById(invite.troupeId, function(err, troupe) {
+        if(err) return callback(err);
+        if(!troupe) return callback(404);
+        if(troupe.status != 'ACTIVE') return callback({ troupeNoLongerActive: true });
+
+        var originalStatus = invite.status;
+        if(originalStatus != 'UNUSED') {
+          return callback(null, null, true);
+        }
+
+        invite.status = 'USED';
+        invite.save(function(err) {
+          if(err) return callback(err);
+
+          troupe.addUserById(user.id);
+          troupe.save(function(err) {
+            if(err) return callback(err);
+            return callback(null, user, false);
+          });
+        });
+      });
+    }
+
+  });
 }
 
 // Accept an invite, returns callback(err, user, alreadyExists)
@@ -866,5 +950,6 @@ module.exports = {
   acceptInvite: acceptInvite,
   acceptInviteForAuthenticatedUser: acceptInviteForAuthenticatedUser,
   rejectInviteForAuthenticatedUser: rejectInviteForAuthenticatedUser,
-  sendPendingInviteMails: sendPendingInviteMails
+  sendPendingInviteMails: sendPendingInviteMails,
+  findUnusedInviteToTroupeForEmail: findUnusedInviteToTroupeForEmail
 };

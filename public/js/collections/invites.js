@@ -21,7 +21,7 @@ define([
   });
 
   exports.InviteCollection = TroupeCollections.LiveCollection.extend({
-    model: exports.RequestModel,
+    model: exports.InviteModel,
     modelName: 'invite',
     nestedUrl: "invites",
 
