@@ -610,9 +610,11 @@ function InviteStrategy(options) {
     return {
       id: item._id,
       troupeUrl: item.troupeUrl,
-      displayName: item.displayName,
-      email: item.email,
-      avatarUrlSmall: '/images/2/avatar-default.png', // TODO: fix
+      troupeName: item.troupeName,
+      senderDisplayName: item.senderDisplayName,
+      // displayName: item.displayName,
+      // email: item.email,
+      // avatarUrlSmall: '/images/2/avatar-default.png', // TODO: fix
       v: getVersion(item)
     };
   };

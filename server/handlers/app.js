@@ -59,15 +59,15 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
 
     function sendPage(troupeData) {
 
-      var accessDenied;
+      var accessDenied, inviteId;
 
       if(req.user) {
         if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
           accessDenied = true;
           troupeData = null;
 
-          // look for an invite
-          // troupeService.findTroupeInviteForUser(req.user, troupe, function() {});
+          // get the invite reference loaded in preload middleware (if any)
+          inviteId = (req.invite) ? req.invite.id : null;
         }
 
         var status = req.user.status;
@@ -103,7 +103,7 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
           accessToken: accessToken,
           profileNotCompleted: profileNotCompleted,
           accessDenied: accessDenied,
-          // inviteId: confirmationCode,
+          inviteId: inviteId,
           appVersion: appVersion.getCurrentVersion(),
           baseServer: nconf.get('web:baseserver'),
           basePort: nconf.get('web:baseport'),
@@ -248,8 +248,20 @@ function preloadTroupeMiddleware(req, res, next) {
     req.troupe = troupe;
 
     // check if the user has access
-    // if not, check if the user has an unused invite
-    // req.invite =
+    if(req.user && !troupeService.userHasAccessToTroupe(req.user, troupe)) {
+      // if not, check if the user has an unused invite
+      troupeService.findUnusedInviteToTroupeForEmail(req.user.email, troupe.id, function(err, invite) {
+        if (err) next(err);
+
+        if (invite) {
+          req.invite = invite;
+        }
+
+        next();
+      });
+
+      return;
+    }
 
     next();
   });

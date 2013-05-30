@@ -39,13 +39,23 @@ module.exports = {
     },
 
     update:  function(req, res){
-      // accept invite here troupeService.acceptInviteForAuthenticatedUser
-      res.send('update forum ' + req.share.title);
+      // accept invite
+      troupeService.acceptInviteForAuthenticatedUser(req.user, req.params.invite, function(err) {
+        if (err)
+          return res.send(400);
+
+        res.send(200);
+      });
     },
 
     destroy: function(req, res) {
-      // troupeService.rejectInvite(req.share.id);
-      res.send(200);
+      // reject invite
+      troupeService.rejectInviteForAuthenticatedUser(req.user, req.params.invite, function(err) {
+        if (err)
+          return res.send(400);
+
+        res.send(200);
+      });
     },
 
     load: function(id, callback) {
