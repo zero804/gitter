@@ -9,7 +9,7 @@ var redis = require("../utils/redis");
 var winston = require("winston");
 var redisClient = redis.createClient();
 var ObjectID = require('mongodb').ObjectID;
-
+var Fiber = require('../utils/fiber');
 var kue = require('../utils/kue'),
     jobs;
 
@@ -205,6 +205,45 @@ exports.getUnreadItems = function(userId, troupeId, itemType, callback) {
 
       callback(null, members);
     });
+};
+
+exports.getUnreadItemsForUserTroupeSince = function(userId, troupeId, since, callback) {
+  var f = new Fiber();
+  exports.getUnreadItems(userId, troupeId, 'chat', f.waitor());
+  exports.getUnreadItems(userId, troupeId, 'file', f.waitor());
+  f.all().then(function(results) {
+    function after(id) {
+      // Create a new ObjectID with a specific timestamp
+      var objectId = new ObjectID(id);
+
+      return objectId.getTimestamp().getTime() >= since;
+    }
+
+    var chatItems = results[0];
+    var fileItems = results[1];
+
+    // winston.verbose('Chat items1: ', chatItems);
+    // winston.verbose('Filering: ' + new Date(since));
+
+    chatItems = chatItems.filter(after);
+    fileItems = fileItems.filter(after);
+
+    // winston.verbose('Chat items2: ', chatItems.map(function(id) {
+    //   var objectId = new ObjectID(id);
+    //   return objectId.getTimestamp();
+    // }));
+
+
+    var response = {};
+    if(chatItems.length) {
+      response.chat = chatItems;
+    }
+    if(fileItems.length) {
+      response.file = fileItems;
+    }
+
+    callback(null,response);
+  }, callback);
 };
 
 exports.getFirstUnreadItem = function(userId, troupeId, itemType, callback) {

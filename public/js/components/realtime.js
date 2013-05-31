@@ -268,8 +268,8 @@ define([
 
     // Cordova events.... doesn't matter if IE8 doesn't handle them
     if(document.addEventListener) {
-      document.addEventListener("offline", fakeSubscription, false);
-      document.addEventListener("online", fakeSubscription, false);
+      document.addEventListener("offline", function() { log('realtime: offline'); }, false);
+      document.addEventListener("online", function() { log('realtime: online'); fakeSubscription(); }, false);
     }
 
   });

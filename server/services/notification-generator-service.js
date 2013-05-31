@@ -5,526 +5,128 @@ var appEvents = require("../app-events");
 
 var winston = require("winston");
 var pushNotificationService = require("./push-notification-service");
-var nconf = require('../utils/config');
-var Q = require("q");
-var handlebars = require('handlebars');
 var _ = require("underscore");
-var unreadItemService = require('./unread-item-service');
-var collections = require("../utils/collections");
-var kue = require('../utils/kue');
 var presenceService = require("./presence-service");
-var jobs;
+var NotificationCollector = require('../utils/notification-collector');
+var onlineNotificationGeneratorService = require('./online-notification-generator-service');
+var pushNotificationGeneratorService = require('./push-notification-generator-service');
 
-var notificationDelayMS = nconf.get("notifications:notificationDelay") * 1000;
+function userCategorisationStrategy(userTroupes, callback) {
+  presenceService.categorizeUserTroupesByOnlineStatus(userTroupes, function(err, categories) {
+    if(err) return callback(err);
 
-function compile(map) {
-  for(var k in map) {
-    if(map.hasOwnProperty(k)) {
-      map[k] = handlebars.compile(map[k]);
+    var onlineUserTroupes = categories.online;
+    var offlineUserTroupes = categories.offline;
+
+    function done(additionalCategories) {
+      var result = _.extend({ online: onlineUserTroupes }, additionalCategories);
+      callback(null, result);
     }
-  }
-  return map;
-}
 
-/* TODO: externalize and internationalise this! */
-var templates = compile({
-  "chat": "{{fromUser.displayName}} chatted\n{{text}}",
-  "file": "New file {{fileName}} uploaded by {{latestVersion.creatorUser.displayName}}",
-  "request": "{{user.displayName}} requested access to the Troupe"
-});
+    if(!offlineUserTroupes || !offlineUserTroupes.length) {
+      // No further categorization of online users
+      return done();
+    }
 
+    var offlineUsers = _.uniq(offlineUserTroupes.map(function(userTroupe) { return userTroupe.userId; } ));
 
-var titleTemplates = compile({
-  "chat": "New chat on {{troupe.name}}",
-  "file": "New file on {{troupe.name}}",
-  "request": "New request on {{troupe.name}}"
-});
-
-var linkTemplates = compile({
-  "chat": "{{troupeUrl}}#",
-  "file": "{{troupeUrl}}#file/{{id}}",
-  "request": "{{troupeUrl}}#request/{{id}}"
-});
-
-var senderStrategies = {
-  "chat": function(data) {
-    return data.fromUser.id;
-  },
-  "file": function(data) {
-    return data.latestVersion.creatorUser.id;
-  },
-  request: null // Never need this for one-to-ones as there are no requests
-};
-
-
-function categorizeUsersByOnlineStatus(userIds, callback) {
-  presenceService.categorizeUsersByOnlineStatus(userIds, function(err, status) {
-    if(err) return callback(err);
-
-    var onlineUsers = [];
-    var offlineUsers = [];
-
-    userIds.forEach(function(userId) {
-      if(status[userId] === 'online') {
-        onlineUsers.push(userId);
-      } else {
-        offlineUsers.push(userId);
-      }
+    var offlineUserTroupeLookup = {};
+    offlineUserTroupes.forEach(function(userTroupe) {
+      offlineUserTroupeLookup[userTroupe.userId + ':' + userTroupe.troupeId] = userTroupe;
     });
 
-    return callback(null, onlineUsers, offlineUsers);
-  });
-}
-
-/*
- * Given a bunch of userIds, filter the list, leaving only those eligible for a
- * push notification. Eligibility requires
- * - A registered mobile device
- * - User has not read anything recently (say 10 seconds)
- * - User has not received a notification in the last X seconds
- */
-function filterUsersForPushNotificationEligibility(userIds, callback) {
-   var deferDevices = Q.defer();
-   var deferUnread = Q.defer();
-   var deferAccepting = Q.defer();
-
-  pushNotificationService.findUsersWithDevices(userIds, deferDevices.makeNodeResolver());
-  pushNotificationService.findUsersAcceptingNotifications(userIds, deferAccepting.makeNodeResolver());
-  unreadItemService.findLastReadTimesForUsers(userIds, deferUnread.makeNodeResolver());
-
-  Q.all([deferDevices.promise, deferAccepting.promise, deferUnread.promise]).spread(function(userIds, userIdsAccepting, lastReadTimes) {
-    var filteredUsers = [];
-    var now = Date.now();
-
-    var userIdsAcceptingHash = collections.hashArray(userIdsAccepting);
-
-    userIds.forEach(function(userId) {
-      var lastReadTime = lastReadTimes[userId];
-      var accepting = userIdsAcceptingHash[userId];
-
-      if(accepting) {
-        if(!lastReadTime || (now - lastReadTime >= notificationDelayMS * 2)) {
-          filteredUsers.push("" + userId);
-        }
-      }
-    });
-
-    callback(null, filteredUsers);
-  }).fail(function(err) {
-    callback(err);
-  });
-}
-
-/*
- * Given a bunch of userIds, filter the list, leaving only those eligible for a
- * push notification. Eligibility requires
- * - User has not read anything recently (say 10 seconds)
- * - User has not received a notification in the last X seconds
- */
-function filterUsersForPushNotificationEligibilityStageTwo(userIds, callback) {
-  unreadItemService.findLastReadTimesForUsers(userIds, function(err, lastReadTimes) {
-    if(err) return callback(err);
-
-    var filteredUsers = [];
-    var now = Date.now();
-
-    Object.keys(lastReadTimes).forEach(function(userId) {
-      var lastReadTime = lastReadTimes[userId];
-      if(!lastReadTime || (now - lastReadTime >= notificationDelayMS * 2)) {
-        filteredUsers.push("" + userId);
-      }
-    });
-
-    // Nobody in the list? then skip the next step
-    if(!filteredUsers) return callback(err, filteredUsers);
-
-    pushNotificationService.findAndUpdateUsersAcceptingNotifications(userIds, function(err, usersAcceptingNotifications) {
+    pushNotificationService.findUsersWithDevices(offlineUsers, function(err, mobileUsers) {
       if(err) return callback(err);
+      if(!mobileUsers || !mobileUsers.length) return done();
 
-      callback(null, usersAcceptingNotifications);
+      // There are mobile users: we need to categorize them users further
+      // using the time they were last notified
+      pushNotificationService.findUsersTroupesAcceptingNotifications(offlineUserTroupes, function(err, userTroupeNotificationTimes) {
+        if(err) return callback(err);
+
+        var mobileCanNotify = [];
+        var mobileFirstNotificationSent = [];
+
+        userTroupeNotificationTimes.forEach(function(userTroupeNotificationTime) {
+          var userId = userTroupeNotificationTime.userId;
+          var troupeId = userTroupeNotificationTime.troupeId;
+          var n1s = userTroupeNotificationTime.n1s;  // notification 1 sent
+          var n2s = userTroupeNotificationTime.n2s;  // notification 2 sent
+
+          var userTroupe = offlineUserTroupeLookup[userId + ':' + troupeId];
+          if(userTroupe) {
+            if(!n1s) {
+              mobileCanNotify.push(userTroupe);
+            } else if(!n2s) {
+              mobileFirstNotificationSent.push(userTroupe);
+            }
+          }
+
+        });
+
+        done({
+          mobile_can_notify: mobileCanNotify,
+          mobile_first_notification_sent: mobileFirstNotificationSent
+        });
+      });
+
     });
 
   });
 }
 
-function filterNotificationsRemoveUsersInTroupe(notifications, callback) {
-  var troupeIds = notifications.map(function(n) { return n.troupeId; });
-
-  presenceService.listOnlineUsersForTroupes(troupeIds, function(err, onlineUsersForTroupes) {
-    if(err) return callback(err);
-
-    var sortedUsersForTroupes = {};
-    Object.keys(onlineUsersForTroupes).forEach(function(troupeId) {
-      sortedUsersForTroupes[troupeId] = onlineUsersForTroupes[troupeId].sort();
-    });
-
-    var filtered = notifications.filter(function(notification) {
-      var troupeId = notification.troupeId;
-      var sortedUsers = sortedUsersForTroupes[troupeId];
-      var userId = notification.userId;
-
-      var isNotInTroupe = _.indexOf(sortedUsers, userId, true /* sorted */) < 0;
-      return isNotInTroupe;
-    });
-
-    return callback(null, filtered);
-  });
-}
 
 //
 // This installs the listeners that will listen to events
 //
 exports.install = function() {
-  var collect = {};
-  var collectTimeout = null;
+  var notificationCollector = new NotificationCollector({ userCategorisationStrategy: userCategorisationStrategy });
 
-  function collectionFinished() {
-    var collected = collect;
-    collect = {};
-    collectTimeout = null;
+  notificationCollector.on('collection:online', function(userTroupes) {
+    var notifications = [];
 
-    var allUserIds = Object.keys(collected);
-    categorizeUsersByOnlineStatus(allUserIds, function(err, onlineUsers, offlineUsers) {
-      if(err) return winston.error("collectionFinished: categorizeUsersByOnlineStatus failed", { exception: err });
+    userTroupes.forEach(function(userTroupe) {
+      var userId = userTroupe.userId;
+      var troupeId = userTroupe.troupeId;
+      var items = userTroupe.items;
 
-      function dequeueNotifications(users) {
-        var result = [];
+      items.forEach(function(item) {
+        notifications.push({ itemId: item.itemId, itemType: item.itemType, userId: userId, troupeId: troupeId });
+      });
 
-        users.forEach(function(userId) {
-          var notification = collected[userId];
-
-          result.push({
-            userId: userId,
-            itemType: notification.type,
-            itemId: notification.id,
-            troupeId: notification.troupeId
-          });
-        });
-        return result;
-      }
-      // If a user is online push the message to them through online channels
-      if(onlineUsers.length) {
-        var immediateNotifications = dequeueNotifications(onlineUsers);
-        filterNotificationsRemoveUsersInTroupe(immediateNotifications, function(err, notifications) {
-          if(err) return winston.error("collectionFinished: filterNotificationsRemoveUsersInTroupe failed", { exception: err });
-          if(notifications.length) {
-            queueOnlineNotificationsForSend(notifications);
-          }
-        });
-      }
-
-      if(offlineUsers.length) {
-        filterUsersForPushNotificationEligibility(offlineUsers, function(err, userIds) {
-          if(err) return winston.error("collectionFinished: filterUsersForPushNotificationEligibility failed", { exception: err });
-          if(!userIds.length) return winston.verbose("collectionFinished: Nobody eligible for push notifications");
-
-          var delayedNotifications = dequeueNotifications(userIds);
-          queueDelayedNotificationsForSend(delayedNotifications);
-        });
-      }
     });
-  }
+
+    onlineNotificationGeneratorService.sendOnlineNotifications(notifications, function(err) {
+      if(err) winston.error('Error while generating online notifications: ' + err, { exception: err });
+    });
+  });
+
+  notificationCollector.on('collection:mobile_can_notify', function(userTroupes) {
+    winston.info('mobile_can_notify notifications: ', userTroupes);
+
+    pushNotificationGeneratorService.queueUserTroupesForFirstNotification(userTroupes);
+  });
+
+  notificationCollector.on('collection:mobile_first_notification_sent', function(userTroupes) {
+    winston.info('mobile_first_notification_sent notifications: ', userTroupes);
+  });
 
   // Listen for onNewUnreadItem events generated locally
   appEvents.localOnly.onNewUnreadItem(function(data) {
-    var troupeId = data.troupeId;
-    var userId = data.userId;
+    var troupeId = '' + data.troupeId;
+    var userId = '' + data.userId;
     var items = data.items;
 
-    // Don't bother if we've already collected something for this user in this cycle
-    if(collect[userId]) return;
+    console.log('UNREAD ITEM: ', data);
 
-    // Pick the item we're going to notify the user about
-    var item = null;
-    ['chat', 'file', 'request'].forEach(function(itemType) {
-      if(!item && items[itemType]) {
-        item = {
-          troupeId: troupeId,
-          type: itemType,
-          id: items[itemType][0] // TODO: possibly notify the user of multiple items (instead of just the first)
-        };
-      }
+    Object.keys(items).forEach(function(itemType) {
+      notificationCollector.incomingNotification(userId, itemType, items[itemType], troupeId);
     });
 
-    /* No item worth picking? Quit */
-    if(!item) return;
-
-    collect[userId] = item;
-
-    if(!collectTimeout) {
-      collectTimeout = setTimeout(collectionFinished, 500);
-    }
   });
 
 };
 
-
-/*
- * Queue a batch of delayed query notifcations.
- * The notifications object has the following shape:
- * [{ userId: '', notificationType: '', itemId: '' }]
- */
-function queueDelayedNotificationsForSend(notifications) {
-  if(!jobs) {
-    jobs = kue.createQueue();
-  }
-
-  jobs.create('delayed-notification', {
-    title: 'Delayed notification',
-    notifications: notifications
-  }).delay(notificationDelayMS)
-    .attempts(5)
-    .save();
-}
-
-/*
- * Queue a batch of immediate notifcations.
- * The notifications object has the following shape:
- * [{ userId: '', notificationType: '', itemId: '' }]
- */
-function queueOnlineNotificationsForSend(notifications) {
-  if(!jobs) {
-    jobs = kue.createQueue();
-  }
-
-  jobs.create('online-notification', {
-    title: 'Online notification',
-    notifications: notifications
-  }).attempts(5)
-    .save();
-}
-
-exports.startWorkers = function() {
-  // NB NB circular reference here! Fix this!
-  var pushNotificationGateway = require("../gateways/push-notification-gateway");
-  var serializer = require("../serializers/notification-serializer");
-
-  /*
-   * Turn notifications into a {hash[notification.itemType] -> [notifications]};
-   */
-  function hashNotificationsByType(notifications) {
-    var result = {};
-    notifications.forEach(function(notification) {
-      var a = result[notification.itemType];
-      if(!a) {
-        a = [];
-        result[notification.itemType] = a;
-      }
-      a.push(notification.itemId);
-    });
-    return result;
-  }
-
-  function getTroupeUrl(serilizedTroupe, senderUserId) {
-    /* The URL for non-oneToOne troupes is the trivial case */
-    if(!serilizedTroupe.oneToOne) {
-      return "/" + serilizedTroupe.uri;
-    }
-
-    if(!senderUserId) return null;
-    var userIds = serilizedTroupe.userIds;
-    var otherUserIds = userIds.filter(function(userId) { return userId == senderUserId; });
-    if(otherUserIds.length > 1) {
-      winston.warn("Something has gone wrong. There should be a single user left in the one-to-one troupe!", {
-        troupeId: serilizedTroupe.id,
-        senderUserId: senderUserId,
-        otherUserIds: otherUserIds
-      });
-    }
-
-    var otherUserId = otherUserIds[0];
-
-    if(otherUserId) return "/one-one/" + otherUserId;
-
-    return null;
-  }
-
-  /* Takes a whole lot of notifications for the same type of message, and turns them into messages */
-  function createNotificationMessage(itemType, itemIds, callback) {
-    var template = templates[itemType];
-    var linkTemplate = linkTemplates[itemType];
-    var titleTemplate = titleTemplates[itemType];
-
-    var senderStrategy = senderStrategies[itemType];
-
-    if(!template) {
-      winston.warn("No template for itemType " + itemType);
-      return callback(null, null);
-    }
-
-    var Strategy = serializer.getStrategy(itemType + "Id");
-    if(Strategy) {
-        var strategy = new Strategy({ includeTroupe: true });
-
-        serializer.serialize(itemIds, strategy, function(err, serialized) {
-          if(err) return callback(err);
-          var senderUserId = null;
-
-          var messages = serialized.map(function(data) {
-            if(senderStrategy) {
-              senderUserId = senderStrategy(data);
-            }
-
-            // TODO: sort this ugly hack out
-            // This will fit nicely into the new serializer stuff
-            if(data.versions) { data.latestVersion = data.versions[data.versions.length - 1]; }
-            data.troupeUrl = getTroupeUrl(data.troupe, senderUserId);
-
-            var d = {
-              text: template(data),
-              title: titleTemplate ? titleTemplate(data) : null,
-              sound: 'notify.caf',
-              link: linkTemplate ? linkTemplate(data) : null
-            };
-            return d;
-          });
-
-          callback(null, messages);
-        });
-    } else {
-      winston.warn("No strategy for itemType " + itemType);
-
-      return callback(null, null);
-    }
-  }
-
-  //
-  // Takes an array of notification items, which looks like
-  // [{ userId / itemType / itemId / troupeId }]
-  // callback returns function(err, notificationsWithMessages), with notificationsWithMessages looking like:
-  // [{ notification / message }]
-  //
-  function generateNotificationMessages(notificationsItems, callback) {
-    var notificationTypeHash = hashNotificationsByType(notificationsItems);
-
-    var hashKeys = Object.keys(notificationTypeHash);
-    var promises = [];
-    hashKeys.forEach(function(itemType) {
-      var itemIds = notificationTypeHash[itemType];
-
-      var d = Q.defer();
-      createNotificationMessage(itemType, itemIds, d.makeNodeResolver());
-      promises.push(d.promise);
-    });
-
-    Q.all(promises)
-      .then(function(concatenatedResults) {
-        var resultHash = {};
-        hashKeys.forEach(function(itemType, i) {
-          var ids = notificationTypeHash[itemType];
-          var results = concatenatedResults[i];
-          results.forEach(function(result, j) {
-            var itemId = ids[j];
-            resultHash[itemType + ":" + itemId] = result;
-          });
-        });
-
-        var results = [];
-
-        notificationsItems.forEach(function(notification) {
-          var itemType = notification.itemType;
-          var itemId = notification.itemId;
-
-          var message = resultHash[itemType + ":" + itemId];
-
-          if(message) {
-            results.push({ notification: notification, message: message });
-          }
-        });
-
-        callback(null, results);
-      })
-      .fail(function(err) {
-        callback(err);
-      });
-  }
-
-  function spoolQueuedNotifications(notifications, callback) {
-    winston.verbose("Spooling queued notifications", { queue: notifications });
-
-    var userIds = notifications.map(function(notification) { return notification.userId; });
-    userIds = _.uniq(userIds);
-
-    filterUsersForPushNotificationEligibilityStageTwo(userIds, function(err, usersForPush) {
-      if(err) return callback(err);
-      if(usersForPush.length === 0) {
-        winston.info("spoolQueuedNotifications: No users are still eligible for notifications");
-        return callback(null);
-      }
-
-      winston.info("spoolQueuedNotifications: sending notifications to ", { userIds: usersForPush });
-      var userIdsHash = collections.hashArray(usersForPush);
-
-      /* Ignore any notifications for users who've received a notification in the last 10 seconds */
-      notifications = notifications.filter(function(notification) { return userIdsHash[notification.userId]; });
-      if(!notifications.length) {
-        winston.info("spoolQueuedNotifications: everyone has been notified already");
-        return callback();
-      }
-
-      generateNotificationMessages(notifications, function(err, notificationsWithMessages) {
-        if(err) {
-          winston.error("Error while generating notification messages: ", { exception: err });
-          return callback(err);
-        }
-
-        notificationsWithMessages.forEach(function(notificationsWithMessage) {
-          var notification = notificationsWithMessage.notification;
-          var message = notificationsWithMessage.message;
-
-          pushNotificationGateway.sendUserNotification(notification.userId, {
-            message: message.text,
-            sound: message.sound,
-            link: message.link
-          });
-        });
-
-        return callback();
-      });
-
-    });
-  }
-
-  function spoolOnlineNotifications(notifications, callback) {
-    winston.verbose("Spooling online notifications", { count: notifications.length });
-
-    generateNotificationMessages(notifications, function(err, notificationsWithMessages) {
-      if(err) {
-        winston.error("Error while generating notification messages: ", { exception: err });
-        return callback(err);
-      }
-
-      notificationsWithMessages.forEach(function(notificationsWithMessage) {
-        var notification = notificationsWithMessage.notification;
-        var message = notificationsWithMessage.message;
-
-        appEvents.userNotification({
-          userId: notification.userId,
-          troupeId: notification.troupeId,
-          title: message.title,
-          text: message.text,
-          link: message.link,
-          sound: message.sound
-        });
-      });
-
-      return callback();
-
-    });
-
-  }
-
-  if(!jobs) {
-    jobs = kue.createQueue();
-  }
-
-  jobs.process('delayed-notification', 20, function(job, done) {
-    spoolQueuedNotifications(job.data.notifications, done);
-  });
-
-
-  jobs.process('online-notification', 20, function(job, done) {
-    spoolOnlineNotifications(job.data.notifications, done);
-  });
-
+exports.testOnly = {
+  userCategorisationStrategy: userCategorisationStrategy
 };
