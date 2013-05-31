@@ -744,22 +744,11 @@ function rejectInviteForAuthenticatedUser(user, inviteId, callback) {
       return callback(null, null);
     }
 
-    if(invite.status !== 'UNUSED') {
-      /* The invite has already been used. We need to fail authentication, but go to the troupe */
-      winston.verbose("Invite has already been used", { inviteId: inviteId });
-      statsService.event('invite_reused', { inviteId: inviteId });
-      callback();
-    } else {
-      statsService.event('invite_rejected', { inviteId: inviteId });
-      winston.verbose("Invite rejected", { inviteId: inviteId });
+    statsService.event('invite_rejected', { inviteId: inviteId });
+    winston.verbose("Invite rejected", { inviteId: inviteId });
 
-      invite.status = 'USED';
-      invite.save(function(err) {
-        if(err) return callback(err);
-
-        callback();
-      });
-    }
+    // delete the invite
+    invite.remove(function(err) { callback(err); });
   });
 
 }
@@ -777,36 +766,43 @@ function acceptInviteForAuthenticatedUser(user, inviteId, callback) {
 
     if(!invite) {
       winston.error("Invite inviteId=" + inviteId + " not found. ");
-      return callback(null, null);
+      return callback("No such invite found");
     }
 
     if(invite.status !== 'UNUSED') {
+      // invite has been used, we can't use it again.
       winston.verbose("Invite has already been used", { inviteId: invite.id });
       statsService.event('invite_reused', { inviteId: inviteId });
+
+      callback("Invite has already been used");
     } else {
+      // use and delete invite
       statsService.event('invite_accepted', { inviteId: inviteId });
       winston.verbose("Invite accepted", { inviteId: inviteId });
 
+      // find the troupe
       findById(invite.troupeId, function(err, troupe) {
         if(err) return callback(err);
         if(!troupe) return callback(404);
         if(troupe.status != 'ACTIVE') return callback({ troupeNoLongerActive: true });
 
+        // check if the invite is still unused
         var originalStatus = invite.status;
         if(originalStatus != 'UNUSED') {
-          return callback(null, null, true);
+          return callback("Invite has already been used");
         }
 
-        invite.status = 'USED';
-        invite.save(function(err) {
+        troupe.addUserById(user.id);
+        troupe.save(function(err) {
           if(err) return callback(err);
 
-          troupe.addUserById(user.id);
-          troupe.save(function(err) {
-            if(err) return callback(err);
-            return callback(null, user, false);
+          // delete the invite
+          invite.remove(function(err) {
+            callback(err);
           });
+
         });
+
       });
     }
 
@@ -825,7 +821,7 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
     }
 
     if(invite.status !== 'UNUSED') {
-      /* The invite has already been used. We need to fail authentication, but go to the troupe */
+      /* The invite has already been used. We need to fail authentication (if they have completed their profile), but go to the troupe */
       winston.verbose("Invite has already been used", { confirmationCode: confirmationCode, troupeUri: troupeUri });
       statsService.event('invite_reused', { uri: troupeUri });
 
@@ -861,6 +857,7 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
           user.save();
         }
 
+        // add the user to the troupe
         findById(invite.troupeId, function(err, troupe) {
           if(err) return callback(err);
           if(!troupe) return callback(404);
@@ -871,8 +868,20 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
             return callback(null, null, true);
           }
 
-          invite.status = 'USED';
-          invite.save(function(err) {
+          // if the user is active, delete the invite
+          if (user.status == "ACTIVE") {
+            invite.remove(saveTroupe);
+          }
+          // if the user has not yet completed their profile,
+          // we keep the invite as 'USED' so that they can login again.
+          // all outstanding used invites will be deleted when they complete their profile.
+          else {
+            invite.status = 'USED';
+
+            invite.save(saveTroupe);
+          }
+
+          function saveTroupe() {
             if(err) return callback(err);
 
             troupe.addUserById(user.id);
@@ -880,10 +889,8 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
               if(err) return callback(err);
               return callback(null, user, false);
             });
-          });
 
-
-
+          }
         });
       });
     }
