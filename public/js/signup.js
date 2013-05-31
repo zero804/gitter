@@ -71,7 +71,7 @@ require([
       v.show();
     }
 
-    $('#button-signup').on('click', function() {
+    $('#button-signup, #button-signup2').on('click', function() {
       if (window.noValidTroupes) {
         new createTroupeView.Modal({existingUser: true, userId: window.userId }).show();
       } else {
