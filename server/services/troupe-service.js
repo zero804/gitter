@@ -892,7 +892,39 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
 }
 
 function sendPendingInviteMails(callback) {
+  var count = 0;
+  var delaySeconds = 10 * 60;
+  var searchParams = {
+    status: "UNUSED",
+    createdAt: { $lt: Date.now() - delaySeconds },
+    emailSentAt: null
+  };
 
+  persistence.Invite.find(searchParams, function(err, invites) {
+    winston.info("Found " + invites.length + " pending invites to email");
+
+    count = invites.length;
+    var troupeIds = invites.map(function(i) { return i.troupeId; });
+    // console.log(troupeIds);
+
+    findByIds(troupeIds, function(err, troupes) {
+      winston.info("Found " + troupes.length + " corresponding troupes for the pending invites");
+
+      var troupesById = troupes.reduce(function(byId, troupe) { byId[troupe.id] = troupe; return byId; }, {});
+      // console.dir(troupesById);
+
+      var invite, troupe;
+      for(var a = 0; a < invites.length; a++) {
+        invite = invites[a];
+        troupe = troupesById[invite.troupeId];
+        assert(troupe);
+
+        emailNotificationService.sendInvite(troupe, invite.displayName, invite.email, invite.confirmationCode, invite.senderDisplayName);
+      }
+
+      callback(null, count);
+    });
+  });
 }
 
 function deleteTroupe(troupe, callback) {
