@@ -6,6 +6,7 @@ var redis = require("../utils/redis"),
     winston = require('winston'),
     events = require('events'),
     assert = require('assert'),
+    Fiber = require('../utils/fiber'),
     appEvents = require('../app-events.js'),
     Q = require('q'),
     _ = require("underscore");
@@ -360,6 +361,49 @@ function categorizeUsersByOnlineStatus(userIds, callback) {
       });
 }
 
+function categorizeUserTroupesByOnlineStatus(userTroupes, callback) {
+  var f = new Fiber();
+
+  var troupeIds = _.uniq(userTroupes.map(function(userTroupe) { return userTroupe.troupeId; }));
+  var userIds = _.uniq(userTroupes.map(function(userTroupe) { return userTroupe.userId; }));
+
+  console.log('troupeIds', troupeIds);
+  console.log('userIds', userIds);
+
+  listOnlineUsersForTroupes(troupeIds, f.waitor());
+  categorizeUsersByOnlineStatus(userIds, f.waitor());
+
+  f.all().spread(function(troupeOnlineUsers, statii) {
+    var inTroupe = [];
+    var online = [];
+    var offline = [];
+
+    console.log('troupeOnlineUsers', troupeOnlineUsers);
+    console.log('statii', statii);
+
+    userTroupes.forEach(function(userTroupe) {
+      var userId = userTroupe.userId;
+      var troupeId = userTroupe.troupeId;
+
+      var onlineForTroupe = troupeOnlineUsers[troupeId];
+      if(onlineForTroupe.indexOf() >= 0) {
+        inTroupe.push(userTroupe);
+      } else if(statii[userId] == 'online') {
+        online.push(userTroupe);
+      } else {
+        offline.push(userTroupe);
+      }
+    });
+
+    callback(null, {
+      inTroupe: inTroupe,
+      online: online,
+      offline: offline
+    });
+
+  }, callback);
+}
+
 function listOnlineUsers(callback) {
   redisClient.zrange(ACTIVE_USERS_KEY, 0, -1, callback);
 }
@@ -518,6 +562,7 @@ presenceService.findOnlineUsersForTroupe =  findOnlineUsersForTroupe;
 presenceService.categorizeUsersByOnlineStatus =  categorizeUsersByOnlineStatus;
 presenceService.listOnlineUsers =  listOnlineUsers;
 presenceService.listOnlineUsersForTroupes =  listOnlineUsersForTroupes;
+presenceService.categorizeUserTroupesByOnlineStatus = categorizeUserTroupesByOnlineStatus;
 
 // Eyeball
 presenceService.clientEyeballSignal =  clientEyeballSignal;

@@ -263,6 +263,8 @@ function serialize(items, strat, callback) {
 // TODO: deprecate this....
 function getStrategy(modelName) {
   switch(modelName) {
+    case 'troupeId':
+      return TroupeIdStrategy;
     case 'file':
       return FileStrategy;
     case 'fileId':
