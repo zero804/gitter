@@ -51,7 +51,7 @@
         <div class="trpHomeLogo"><img src='{{ cdn "images/2/logo-mark-green-square-white-text.png" }}' height="64" width="215"></div>
         {{^compactView}}
         <div class="trpHomeMenu">
-          <div class="trpHomeMenuItem trpPadV14 trpHand" id="button-existing-users-login">Existing user sign in</div>
+          <div class="trpHomeMenuItem trpPadV14 trpHand" id="button-existing-users-login">Existing user login</div>
         </div>
         {{/compactView}}
     </div>
@@ -75,49 +75,106 @@
     </div>
 
     {{^compactView}}
-    <div class="trpHomeMidStripContainer">
-      <div class="trpMidStrip">Why you'll love using Troupe</div>
+    <div class="trpHomeMidStripContainer"><br><br>
+      <div class="trpMidStrip">Why you'll love using Troupe</div><br><br>
       </div>
 
       <div class="trpFeatures">
         <div class="trpFeature">
-          <div class="trpFeatureImage"><img src='{{ cdn "images/2/feature-chat.png" }}' width="64" height="64"></div>
+          <div class="trpFeatureImage bgPurple"><img style="padding-top: 12px" src='{{ cdn "images/2/icon-feature-chat.png" }}' width="24" height="24"></div>
           <div class="trpFeatureText">
-            <div class="trpFeatureHead">Quick and simple chat</div>
-            <div class="trpFeatureBody">Group chat allows you to easily stay in touch with everyone in your Troupe. Need a quick answer or to discuss the latest presentation, just chat with anyone even on their mobiles.</div>
+            <div class="trpFeatureHead">Simple, brilliant chat</div>
+            <div class="trpFeatureBody">Chat individually or in groups. Easily edit or delete mistakes. Know who’s read any message.  Syncronised across devices. <br>The way chat should be.</div>
           </div>
         </div>
 
         <div class="trpFeature">
-          <div class="trpFeatureImage"><img src='{{ cdn "images/2/feature-files.png" }}' width="64" height="64"></div>
+          <div class="trpFeatureImage bgGreen" ><img style="padding-top: 11px" src='{{ cdn "images/2/icon-feature-history.png" }}' width="24" height="24"></div>
            <div class="trpFeatureText">
-            <div class="trpFeatureHead">Share and view files</div>
-            <div class="trpFeatureBody">The simplest shared folder you've ever used. Keep all the files together, view them on your mobile, easy versioning just in case you need to go back to the last one.</div>
+            <div class="trpFeatureHead">Infinite chat history</div>
+            <div class="trpFeatureBody">Your conversations are stored forever. <br>All of them, safely in the cloud. <br>Soon  you’ll be able to search them too.</div>
           </div>
         </div>
 
         <div class="trpFeature">
-          <div class="trpFeatureImage"><img src='{{ cdn "images/2/feature-email.png" }}' width="64" height="64"></div>
+          <div class="trpFeatureImage bgCyan"><img style="padding-top: 11px" src='{{ cdn "images/2/icon-feature-free2.png" }}' width="24" height="24"></div>
            <div class="trpFeatureText">
-            <div class="trpFeatureHead">All the emails in one place</div>
-            <div class="trpFeatureBody">Group emails are a pain. Troupe makes this simple by giving your group an email address and keeping everyone in the loop.</div>
+            <div class="trpFeatureHead">Always free, no ads</div>
+            <div class="trpFeatureBody">There will always be a free version of Troupe. Paid plans with additional features will be launching later.</div>
           </div>
         </div>
       </div>
+
+      <div class="trpFeatures">
+        <div class="trpFeature">
+          <div class="trpFeatureImage bgYellow"><img style="padding-top: 11px" src='{{ cdn "images/2/icon-feature-notifications.png" }}' width="24" height="24"></div>
+           <div class="trpFeatureText">
+            <div class="trpFeatureHead">Smart Notifications</div>
+            <div class="trpFeatureBody">Don't get bombarded with notifications everywhere. Our smart notifications will find you on the right device and won't overwhelm you with too many messages.</div>
+          </div>
+        </div>
+
+        <div class="trpFeature">
+          <div class="trpFeatureImage bgPurple"><img style="padding-top: 11px" src='{{ cdn "images/2/icon-feature-location.png" }}' width="24" height="24"></div>
+           <div class="trpFeatureText">
+            <div class="trpFeatureHead">Location Aware</div>
+            <div class="trpFeatureBody">With intelligent location information, everyone knows who’s where. You won’t bug Frank when he’s on holiday in<br> Cape Town. Lucky Frank.</div>
+          </div>
+        </div>
+
+        <div class="trpFeature">
+          <div class="trpFeatureImage bgGrey"><img style="padding-top: 11px" src='{{ cdn "images/2/icon-feature-calendar.png" }}' width="24" height="24"></div>
+           <div class="trpFeatureText">
+            <div class="trpFeatureHead">Calendar Information</div>
+            <div class="trpFeatureBody">Understanding people’s availability can be critical for effective communication. Coming soon. Also for free.</div>
+          </div>
+        </div>
+
+      <div class="trpFeatures">
+        <div class="trpFeature">
+          <div class="trpFeatureImage bgCyan"><img style="padding-top: 11px" src='{{ cdn "images/2/icon-feature-sharing.png" }}' width="24" height="24"></div>
+           <div class="trpFeatureText">
+            <div class="trpFeatureHead">Made for Sharing</div>
+            <div class="trpFeatureBody">Invite anyone to chat, with just one click they’ll be talking with you. <br>It couldn't get easier than that.</div>
+          </div>
+        </div>
+
+        <div class="trpFeature">
+          <div class="trpFeatureImage bgGreen"><img style="padding-top: 11px" src='{{ cdn "images/2/icon-feature-files.png" }}' width="24" height="24"></div>
+           <div class="trpFeatureText">
+            <div class="trpFeatureHead">Share and View Files</div>
+            <div class="trpFeatureBody">Drag and drop or even email files to share with anyone. We keep them all safe and sound in the cloud.</div>
+          </div>
+        </div>
+
+        <div class="trpFeature">
+          <div class="trpFeatureImage bgYellow"><img style="padding-top: 11px" src='{{ cdn "images/2/icon-feature-email.png" }}' width="24" height="24"></div>
+           <div class="trpFeatureText">
+            <div class="trpFeatureHead">Plays Great with Email</div>
+            <div class="trpFeatureBody">Troupe gives all of your group conversations an email address. No more CC’ing nightmares. Reach everyone with just one address.</div>
+          </div>
+        </div>
+      </div>
+
+
+  <br><br>
+<div class="trpButtonHuge trpHand trpBtnGreen button-signup" href="#!" id="button-signup2"> Get Started<br><span class="trpBodySmall">It's free</span></div>
+<br><br><br><br><br>
+
     </div>
 
-    <div class="trpHomeVideoStripContainer">
+  <!--   <div class="trpHomeVideoStripContainer">
       <div class="trpHomeVideo">
         State of the art work collaboration<br>
         <span class="trpHomeVideoSubtext">Find out more what Troupe can do for your team</span>
         <br><br><br><br><br>
         <a href="javascript:alert('Video coming soon!');"><img src='{{ cdn "images/2/icon-video-play.png" }}'></a>
       </div>
-    </div>
+    </div> -->
 
     <div class="trpHomeAppStripContainer">
       <div class="trpHomeAppStrip">With you anytime, anywhere<br><br></div>
-      <img src='{{ cdn "images/2/home-apps-image.png" }}'>
+      <img src='{{ cdn "images/2/hero-image-iphone5.png" }}'><br><br><br><br><br>
     </div>
 
     <div class="trpHomeFooterStripContainer">
