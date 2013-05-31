@@ -15,7 +15,7 @@ var once = times(1);
 
 var fixture = {};
 
-function testInviteAcceptance(email, userStatus, emailNotificationConfirmationMethod, done) {
+function testRequestAcceptance(email, userStatus, emailNotificationConfirmationMethod, done) {
   var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
   var troupeService = testRequire.withProxies("./services/troupe-service", {
     './email-notification-service': emailNotificationServiceMock
@@ -56,7 +56,7 @@ function testInviteAcceptance(email, userStatus, emailNotificationConfirmationMe
 }
 
 
-function testInviteRejection(email, userStatus, done) {
+function testRequestRejection(email, userStatus, done) {
   var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
   var troupeService = testRequire.withProxies("./services/troupe-service", {
     './email-notification-service': emailNotificationServiceMock
@@ -126,20 +126,20 @@ describe('troupe-service', function() {
 
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
 
-      testInviteAcceptance(nonExistingEmail, 'ACTIVE', 'sendRequestAcceptanceToUser', done);
+      testRequestAcceptance(nonExistingEmail, 'ACTIVE', 'sendRequestAcceptanceToUser', done);
     });
 
     it('should allow an UNCONFIRMED user (without a confirmation code) request to be accepted', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
 
-      testInviteAcceptance(nonExistingEmail, 'UNCONFIRMED', 'sendConfirmationForNewUserRequest', done);
+      testRequestAcceptance(nonExistingEmail, 'UNCONFIRMED', 'sendConfirmationForNewUserRequest', done);
     });
 
 
     it('should allow an PROFILE_NOT_COMPLETED user (without a confirmation code) request to be accepted', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
 
-      testInviteAcceptance(nonExistingEmail, 'PROFILE_NOT_COMPLETED', 'sendRequestAcceptanceToUser', done);
+      testRequestAcceptance(nonExistingEmail, 'PROFILE_NOT_COMPLETED', 'sendRequestAcceptanceToUser', done);
     });
 
   });
@@ -147,12 +147,12 @@ describe('troupe-service', function() {
   describe('#rejectRequest()', function() {
     it('should delete a rejected request from an ACTIVE user', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
-      testInviteRejection(nonExistingEmail, 'ACTIVE', done);
+      testRequestRejection(nonExistingEmail, 'ACTIVE', done);
     });
 
     it('should delete a rejected request from an UNCONFIRMED user', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
-      testInviteRejection(nonExistingEmail, 'UNCONFIRMED', done);
+      testRequestRejection(nonExistingEmail, 'UNCONFIRMED', done);
     });
   });
 
@@ -194,7 +194,7 @@ describe('troupe-service', function() {
 
     it('should delete a rejected request from an UNCONFIRMED user', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
-      testInviteRejection(nonExistingEmail, 'UNCONFIRMED', done);
+      testRequestRejection(nonExistingEmail, 'UNCONFIRMED', done);
     });
   });
 
