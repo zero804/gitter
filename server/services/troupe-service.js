@@ -917,9 +917,15 @@ function sendPendingInviteMails(callback) {
       for(var a = 0; a < invites.length; a++) {
         invite = invites[a];
         troupe = troupesById[invite.troupeId];
-        assert(troupe);
+        if(!troupe) {
+          winston.error('No troupe for this invite');
+          continue;
+        }
 
         emailNotificationService.sendInvite(troupe, invite.displayName, invite.email, invite.confirmationCode, invite.senderDisplayName);
+
+        invite.emailSentAt = Date.now();
+        invite.save();
       }
 
       callback(null, count);
