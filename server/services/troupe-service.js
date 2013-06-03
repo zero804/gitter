@@ -207,7 +207,7 @@ function inviteUserByUserId(troupe, senderDisplayName, userId, callback) {
           emailNotificationService.sendInvite(troupe, user.displayName, user.email, invite.code, senderDisplayName);
         }
 
-        callback();
+        callback(null, invite);
       });
 
     });
@@ -244,7 +244,7 @@ function inviteUserByEmail(troupe, senderDisplayName, displayName, email, callba
       if(err) return callback(err);
 
       emailNotificationService.sendInvite(troupe, displayName, email, code, senderDisplayName);
-      callback();
+      callback(null, invite);
     });
 
   });
@@ -898,9 +898,9 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
   });
 }
 
-function sendPendingInviteMails(callback) {
+function sendPendingInviteMails(delaySeconds, callback) {
   var count = 0;
-  var delaySeconds = 10 * 60;
+  delaySeconds = (delaySeconds == null) ? 10 * 60 : delaySeconds;
   var searchParams = {
     status: "UNUSED",
     createdAt: { $lt: Date.now() - delaySeconds },
@@ -908,6 +908,8 @@ function sendPendingInviteMails(callback) {
   };
 
   persistence.Invite.find(searchParams, function(err, invites) {
+    if(err) return callback(err);
+
     winston.info("Found " + invites.length + " pending invites to email");
 
     count = invites.length;
@@ -915,6 +917,7 @@ function sendPendingInviteMails(callback) {
     // console.log(troupeIds);
 
     findByIds(troupeIds, function(err, troupes) {
+      if(err) return callback(err);
       winston.info("Found " + troupes.length + " corresponding troupes for the pending invites");
 
       var troupesById = troupes.reduce(function(byId, troupe) { byId[troupe.id] = troupe; return byId; }, {});

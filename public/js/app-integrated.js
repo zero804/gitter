@@ -360,6 +360,7 @@ require([
     var invitesCollectionView = new Marionette.CollectionView({
       collection: incomingInvitesCollection,
       itemView: TroupeViews.Base.extend({
+        tagName: 'li',
         template: invitesItemTemplate
       })
     });
