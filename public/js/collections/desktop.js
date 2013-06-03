@@ -87,6 +87,11 @@ define([
     inviteCollection.listen();
     inviteCollection.fetch();
 
+    inviteCollection.on('change reset sync add remove', function() {
+      unreadItemsClient.setOtherCount(inviteCollection.length);
+      troupeCollection.trigger('sync');
+    });
+
     chatCollection         = new chatModels.ChatCollection(null, { preloader: preloader, listen: true });
     fileCollection         = new fileModels.FileCollection(null, { preloader: preloader, listen: true });
     conversationCollection = new conversationModels.ConversationCollection(null, { preloader: preloader, listen: true });
