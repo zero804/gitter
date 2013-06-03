@@ -4,6 +4,7 @@
 
 var persistence = require("./persistence-service"),
     userService = require("./user-service"),
+    appEvents = require("../app-events"),
     emailNotificationService = require("./email-notification-service"),
     presenceService = require("./presence-service"),
     uuid = require('node-uuid'),
@@ -187,33 +188,57 @@ function inviteUserByUserId(troupe, senderDisplayName, userId, callback) {
 
       userIsOnline = onlineUsers && onlineUsers[userId];
 
-      var invite = new persistence.Invite();
-      invite.troupeId = troupe.id;
-      invite.senderDisplayName = senderDisplayName;
-      invite.displayName = user.displayName;
-      invite.userId = user.id;
-      invite.email = user.email;
-      invite.code = uuid.v4();
+      // check if an invite to this troupe already exists for this user
+      persistence.Invite.findOne({ status: "UNUSED", troupeId: troupe.id, email: user.email }, function(err, existingInvite) {
 
-      // if user is offline then send mail immediately.
-      if (!userIsOnline) {
-        invite.emailSentAt = Date.now();
-      }
+        if (existingInvite) {
+          if (!userIsOnline) {
+            emailNotificationService.sendInvite(troupe, user.displayName, user.email, existingInvite.code, senderDisplayName);
+          } else {
+            notifyUser();
+          }
 
-      invite.save(function(err) {
-        if(err) return callback(err);
-
-        if (!userIsOnline) {
-          emailNotificationService.sendInvite(troupe, user.displayName, user.email, invite.code, senderDisplayName);
+          return callback(null, existingInvite);
         }
 
-        callback(null, invite);
+        var invite = new persistence.Invite();
+        invite.troupeId = troupe.id;
+        invite.senderDisplayName = senderDisplayName;
+        invite.displayName = user.displayName;
+        invite.userId = user.id;
+        invite.email = user.email;
+        invite.code = uuid.v4();
+
+        // if user is offline then send mail immediately.
+        if (!userIsOnline) {
+          invite.emailSentAt = Date.now();
+        }
+
+        invite.save(function(err) {
+          if(err) return callback(err);
+
+          if (!userIsOnline) {
+            emailNotificationService.sendInvite(troupe, user.displayName, user.email, invite.code, senderDisplayName);
+          } else {
+            notifyUser();
+          }
+
+          callback(null, invite);
+        });
       });
-
     });
+  });
 
+  function notifyUser() {
+    appEvents.userNotification({
+      userId: userId,
+      troupeId: troupe.id,
+      title: "New Invitation",
+      text: "You've been invited to join the Troupe: " +troupe.name,
+      link: troupe.uri,
+      sound: "invitation"
     });
-
+  }
 }
 
 function inviteUserByEmail(troupe, senderDisplayName, displayName, email, callback) {
@@ -229,22 +254,30 @@ function inviteUserByEmail(troupe, senderDisplayName, displayName, email, callba
       return;
     }
 
-    statsService.event('new_user_invite', { senderDisplayName: senderDisplayName, email: email });
-    // create the invite and send mail immediately
-    var code = uuid.v4();
+    persistence.Invite.findOne({ status: "UNUSED", troupeId: troupe.id, email: email }, function(err, existingInvite) {
+      if (existingInvite) {
+        emailNotificationService.sendInvite(troupe, displayName, email, existingInvite.code, senderDisplayName);
+        return callback(null, existingInvite);
+      }
 
-    var invite = new persistence.Invite();
-    invite.troupeId = troupe.id;
-    invite.senderDisplayName = senderDisplayName;
-    invite.displayName = displayName;
-    invite.email = email;
-    invite.emailSentAt = Date.now();
-    invite.code = code;
-    invite.save(function(err) {
-      if(err) return callback(err);
+      statsService.event('new_user_invite', { senderDisplayName: senderDisplayName, email: email });
+      // create the invite and send mail immediately
+      var code = uuid.v4();
 
-      emailNotificationService.sendInvite(troupe, displayName, email, code, senderDisplayName);
-      callback(null, invite);
+      var invite = new persistence.Invite();
+      invite.troupeId = troupe.id;
+      invite.senderDisplayName = senderDisplayName;
+      invite.displayName = displayName;
+      invite.email = email;
+      invite.emailSentAt = Date.now();
+      invite.code = code;
+      invite.save(function(err) {
+        if(err) return callback(err);
+
+        emailNotificationService.sendInvite(troupe, displayName, email, code, senderDisplayName);
+        callback(null, invite);
+      });
+
     });
 
   });
@@ -748,7 +781,7 @@ function rejectInviteForAuthenticatedUser(user, inviteId, callback) {
     winston.verbose("Invite rejected", { inviteId: inviteId });
 
     // delete the invite
-    invite.remove(function(err) { callback(err); });
+    deleteAllInvitesToTroupeForUser(invite.troupeId, user.email, callback);
   });
 
 }
@@ -786,21 +819,11 @@ function acceptInviteForAuthenticatedUser(user, inviteId, callback) {
         if(!troupe) return callback(404);
         if(troupe.status != 'ACTIVE') return callback({ troupeNoLongerActive: true });
 
-        // check if the invite is still unused
-        var originalStatus = invite.status;
-        if(originalStatus != 'UNUSED') {
-          return callback("Invite has already been used");
-        }
-
         troupe.addUserById(user.id);
         troupe.save(function(err) {
           if(err) return callback(err);
 
-          // delete the invite
-          invite.remove(function(err) {
-            callback(err);
-          });
-
+          deleteAllInvitesToTroupeForUser(invite.troupeId, invite.email, callback);
         });
 
       });
@@ -870,7 +893,7 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
 
           // if the user is active, delete the invite
           if (user.status == "ACTIVE") {
-            invite.remove(saveTroupe);
+            deleteAllInvitesToTroupeForUser(invite.troupeId, invite.email, saveTroupe);
           }
           // if the user has not yet completed their profile,
           // we keep the invite as 'USED' so that they can login again.
@@ -941,6 +964,11 @@ function sendPendingInviteMails(delaySeconds, callback) {
       callback(null, count);
     });
   });
+}
+
+function deleteAllInvitesToTroupeForUser(troupeId, userEmail, callback) {
+  assert(troupeId); assert(userEmail);
+  persistence.Invite.remove({ troupeId: troupeId, email: userEmail }, callback); // whether or not they are used.
 }
 
 function deleteTroupe(troupe, callback) {

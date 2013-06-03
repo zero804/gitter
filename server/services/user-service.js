@@ -374,7 +374,8 @@ var userService = {
 
     // delete all used invites now that the user doesn't need them to login
 
-    troupeService.deleteAllUsedInvitesForUser(user); // note: it would be better if this was only called after the user was saved, but updateProfile async hell at the moment.
+    // note: it would be better if this was only called after the user was saved, but updateProfile async hell at the moment.
+    userService.deleteAllUsedInvitesForUser(user);
   },
 
   deleteAllUsedInvitesForUser: function(user) {
