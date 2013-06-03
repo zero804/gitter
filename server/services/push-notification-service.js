@@ -10,7 +10,13 @@ var _ = require('underscore');
 var redis = require("../utils/redis"),
     redisClient = redis.createClient();
 
+var Scripto = require('redis-scripto');
+var scriptManager = new Scripto(redisClient);
+scriptManager.loadFromDir(__dirname + '/../redis-lua');
+
 var minimumUserAlertIntervalS = nconf.get("notifications:minimumUserAlertInterval");
+
+
 
 function buffersEqual(a,b) {
   if (!Buffer.isBuffer(a)) return undefined;
@@ -95,21 +101,21 @@ exports.findUsersTroupesAcceptingNotifications = function(userTroupes, callback)
   userTroupes.forEach(function(userTroupes) {
     var userId = userTroupes.userId;
     var troupeId = userTroupes.troupeId;
-    multi.exists("ns:" + userId + ':' + troupeId + ':1'); // notification 1 sent
-    multi.exists("ns:" + userId + ':' + troupeId + ':2'); // awaiting timeout before sending note2
-    multi.exists("ns:" + userId + ':' + troupeId + ':3'); // notification 2 sent
+    multi.exists("nl:" + userId + ':' + troupeId); // notification 1 sent
+    multi.exists("nls:" + userId + ':' + troupeId); // awaiting timeout before sending note2
   });
 
   multi.exec(function(err, replies) {
     if(err) return callback(err);
 
     var response = userTroupes.map(function(userTroupe, i) {
+      var globalLock = replies[i * 2];
+      var segmentLock = replies[i * 2 + 1];
+
       return {
         userId: userTroupe.userId,
         troupeId: userTroupe.troupeId,
-        n1s:        replies[i * 3],      // notification 1 sent
-        n2timeout:  replies[i * 3 + 1],  // notification 2 lock
-        n2s:        replies[i * 3 + 2]   // notification 2 sent
+        accepting: !globalLock || !segmentLock // Either the user doesn't have a global notification lock or a segment notification lock
       };
     });
 
@@ -117,96 +123,30 @@ exports.findUsersTroupesAcceptingNotifications = function(userTroupes, callback)
   });
 };
 
-/*
-  Attempts to lock user:troupe pairs for first notification. Set the time that that the first unread event
-  happened that triggered the notification and sets the lock to expire after minimumUserAlertIntervalS seconds.
-  Returns an array of userTroupes that were locked
-*/
-exports.lockUsersTroupesForFirstNotification = function(userTroupesWithStartTime, callback) {
-  var multi = redisClient.multi();
-  userTroupesWithStartTime.forEach(function(userTroupe) {
-    var userId = userTroupe.userId;
-    var troupeId = userTroupe.troupeId;
-    var startTime = userTroupe.startTime;
-    multi.setnx('ns:' + userId + ':' + troupeId + ':1', startTime);
-  });
 
-  multi.exec(function(err, replies) {
+// Returns callback(err, notificationNumber)
+exports.canLockForNotification = function(userId, troupeId, startTime, callback) {
+  var keys = ['nl:' + userId + ':' + troupeId, 'nls:' + userId + ':' + troupeId ];
+  var values = [startTime, minimumUserAlertIntervalS];
+
+  scriptManager.run('notify-lock-user-troupe', keys, values, function(err, result) {
     if(err) return callback(err);
 
-    var response = [];
-    var m2 = redisClient.multi();
-
-
-    userTroupesWithStartTime.forEach(function(userTroupe, i) {
-      var wasSet = !!replies[i];
-
-      if(wasSet) {
-        response.push(userTroupe);
-        m2.expire('ns:' + userTroupe.userId + ':' + userTroupe.troupeId + ':1', minimumUserAlertIntervalS);
-        m2.setex('ns:' + userTroupe.userId + ':' + userTroupe.troupeId + ':2', 1, 300);
-        m2.del('ns:' + userTroupe.userId + ':' + userTroupe.troupeId + ':3');
-      }
-    });
-
-    if(response.length) {
-      m2.exec(function(err) {
-        if(err) return callback(err);
-
-        callback(null, response);
-      });
-
-    } else {
-      callback(null, response);
-
-    }
-
+    return callback(null, result);
   });
 };
 
-exports.lockUsersTroupesForSecondNotification = function(userTroupes, callback) {
+// Returns callback(err, falsey value or { notificationNumber: X, startTime: Y }])
+exports.canUnlockForNotification = function (userId, troupeId, callback) {
+  var keys = ['nl:' + userId + ':' + troupeId, 'nls:' + userId + ':' + troupeId ];
 
-  var multi = redisClient.multi();
-  userTroupes.forEach(function(userTroupes) {
-    var userId = userTroupes.userId;
-    var troupeId = userTroupes.troupeId;
-
-    multi.get('ns:' + userId + ':' + troupeId + ':1', 1);
-    multi.setnx('ns:' + userId + ':' + troupeId + ':3', 1);
-  });
-
-  multi.exec(function(err, replies) {
+  scriptManager.run('notify-unlock-user-troupe', keys, [], function(err, result) {
     if(err) return callback(err);
 
-    var response = [];
-    var m2 = redisClient.multi();
-
-    userTroupes.forEach(function(userTroupe, i) {
-      var startTime = parseInt(replies[i * 2], 10);
-      var wasSet = !!replies[i * 2 + 1];
-
-      if(wasSet) {
-        userTroupe.startTime = startTime;
-        response.push(userTroupe);
-        m2.expire('ns:' + userTroupe.userId + ':' + userTroupe.troupeId + ':3', minimumUserAlertIntervalS);
-      }
+    return callback(null, {
+      notificationNumber: parseInt(result[0], 10),
+      startTime: parseInt(result[1], 10)
     });
-
-    if(response.length) {
-      m2.exec(function(err) {
-        if(err) return callback(err);
-
-        callback(null, response);
-      });
-
-    } else {
-      callback(null, response);
-
-    }
-
   });
 };
-
-
-
 
