@@ -151,6 +151,20 @@ function bind(on) {
       on('dataChange2', callback);
     },
 
+    eyeballSignal: function(userId, troupeId, signal) {
+      emit('eyeballSignal', {
+        userId: userId,
+        troupeId: troupeId,
+        signal: signal
+      });
+    },
+
+    onEyeballSignal: function(callback) {
+      on('eyeballSignal', function(event) {
+        return callback(event.userId, event.troupeId, event.signal);
+      });
+    },
+
     userRemovedFromTroupe: function(options) {
       emit('userRemovedFromTroupe', options);
     },

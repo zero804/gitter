@@ -32,7 +32,8 @@ exports.queueUserTroupesForNotification = function(userTroupes) {
 
       jobs.create('generate-push-notifications', {
         title: 'Push Notification #' + notificationNumber,
-        userTroupe: userTroupe
+        userTroupe: userTroupe,
+        notificationNumber: notificationNumber
       }).delay(delay)
         .save();
 
@@ -111,8 +112,6 @@ exports.startWorkers = function() {
     winston.verbose('getUnreadItemsForUserTroupeSince:', arguments);
 
     unreadItemService.getUnreadItemsForUserTroupeSince(userId, troupeId, since, function(err, unreadItems) {
-      winston.verbose('getUnreadItemsForUserTroupeSince:', unreadItems);
-
       if(err) return callback(err);
       if(!Object.keys(unreadItems).length) return callback();
 
@@ -133,15 +132,13 @@ exports.startWorkers = function() {
   }
 
 
-  function sendUserTroupeNotification(userTroupe, callback) {
-    pushNotificationService.canUnlockForNotification(userTroupe.userId, userTroupe.troupeId, function(err, result) {
+  function sendUserTroupeNotification(userTroupe, notificationNumber, callback) {
+    pushNotificationService.canUnlockForNotification(userTroupe.userId, userTroupe.troupeId, notificationNumber, function(err, startTime) {
       if(err) return callback(err);
-      if(!result) {
+
+      if(!startTime) {
         winston.verbose('Unable to obtain lock to notify userTroupe. Skipping');
       }
-
-      var notificationNumber = result.notificationNumber;
-      var startTime = result.startTime;
 
       notifyUserOfActivitySince(userTroupe.userId, userTroupe.troupeId, startTime, notificationNumber, function(err) {
         winston.error('Failed to send notifications: ' + err + '. Failing silently.', { exception: err });
@@ -150,11 +147,9 @@ exports.startWorkers = function() {
     });
   }
 
-
-
   jobs.process('generate-push-notifications', 20, function(job, done) {
     var d = job.data;
-    sendUserTroupeNotification(d.userTroupe, done);
+    sendUserTroupeNotification(d.userTroupe, d.notificationNumber, done);
   });
 
 
