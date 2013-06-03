@@ -19,8 +19,8 @@ function compile(map) {
 
 /* TODO: externalize and internationalise this! */
 var templates = compile({
-  "chat": "{{{fromUser.displayName}}} on {{{text}}}",
-  "file": "New file {{{fileName}}} uploaded by {{{latestVersion.creatorUser.displayName}}}"
+  "chat": "{{{troupe.name}}}\n{{{fromUser.displayName}}}: {{{text}}}",
+  "file": "{{{troupe.name}}}\nNew file {{{fileName}}} uploaded by {{{latestVersion.creatorUser.displayName}}}"
 });
 
 var titleTemplates = compile({

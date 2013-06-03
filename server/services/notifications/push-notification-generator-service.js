@@ -28,7 +28,7 @@ exports.queueUserTroupesForNotification = function(userTroupes) {
         return;
       }
 
-      winston.verbose('Queuing notification ' + notificationNumber + ' to be send to user in ' + delay + 'ms');
+      winston.verbose('Queuing notification ' + notificationNumber + ' to be send to user ' + userTroupe.userId + ' in ' + delay + 'ms');
 
       jobs.create('generate-push-notifications', {
         title: 'Push Notification #' + notificationNumber,
@@ -113,6 +113,8 @@ exports.startWorkers = function() {
 
     unreadItemService.getUnreadItemsForUserTroupeSince(userId, troupeId, since, function(err, unreadItems) {
       if(err) return callback(err);
+      console.log('Unready items since: ', unreadItems);
+
       if(!Object.keys(unreadItems).length) return callback();
 
 
@@ -123,7 +125,7 @@ exports.startWorkers = function() {
 
         pushNotificationGateway.sendUserNotification(userId, {
           message: text,
-          sound: 'notify.caf',
+          sound: notificationNumber == 1 ? 'notify.caf' : 'notify-2.caf',
           link: getTroupeUrl(troupe, userId) + '/chat'
         });
       });
@@ -138,10 +140,11 @@ exports.startWorkers = function() {
 
       if(!startTime) {
         winston.verbose('Unable to obtain lock to notify userTroupe. Skipping');
+        return;
       }
 
       notifyUserOfActivitySince(userTroupe.userId, userTroupe.troupeId, startTime, notificationNumber, function(err) {
-        winston.error('Failed to send notifications: ' + err + '. Failing silently.', { exception: err });
+        if(err) winston.error('Failed to send notifications: ' + err + '. Failing silently.', { exception: err });
       });
 
     });

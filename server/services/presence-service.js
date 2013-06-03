@@ -260,6 +260,8 @@ function __eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
         presenceService.emit('userJoinedTroupe', userId, troupeId);
       }
 
+      appEvents.eyeballSignal(userId, troupeId, true);
+
       return callback();
     });
 
@@ -304,6 +306,8 @@ function __eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
         if(userHasLeftTroupe) {
           presenceService.emit('userLeftTroupe', userId, troupeId);
         }
+
+        appEvents.eyeballSignal(userId, troupeId, false);
 
         if(troupeIsEmpty) {
           presenceService.emit('troupeEmpty', troupeId);
@@ -456,8 +460,6 @@ function clientEyeballSignal(userId, socketId, eyeballsOn, callback) {
           callback(err, result);
         });
       }
-
-      appEvents.eyeballSignal(userId, troupeId, eyeballsOn);
 
       if(eyeballsOn) {
         winston.verbose('presence: Eyeballs on: user ' + userId + ' troupe ' + troupeId);
