@@ -9,27 +9,36 @@ var kue = require('../../utils/kue');
 var jobs = kue.createQueue();
 var Fiber = require('../../utils/fiber');
 var notificationMessageGenerator = require('../../utils/notification-message-generator');
-var ObjectID = require('mongodb').ObjectID;
-var _ = require('underscore');
-var notificationDelayMS = nconf.get("notifications:notificationDelay") * 1000;
 
-exports.queueUserTroupesForFirstNotification = function(userTroupes) {
-  jobs.create('push-notifications-s1', {
-    title: 'Push Notification #1',
-    userTroupes: userTroupes
-  }).delay(notificationDelayMS)
-    .attempts(5)
-    .save();
-};
+var notificationWindowPeriods = [nconf.get("notifications:notificationDelay") * 1000, nconf.get("notifications:notificationDelay2") * 1000];
 
+exports.queueUserTroupesForNotification = function(userTroupes) {
+  userTroupes.forEach(function(userTroupe) {
+    pushNotificationService.canLockForNotification(userTroupe.userId, userTroupe.troupeId, userTroupe.startTime, function(err, notificationNumber) {
+      if(err) return winston.error('Error while executing canLockForNotification: ' + err, { exception: err });
 
-exports.queueUserTroupesForSecondNotification = function(userTroupes) {
-  jobs.create('push-notifications-s2', {
-    title: 'Push Notification #2',
-    userTroupes: userTroupes
-  }).delay(notificationDelayMS)
-    .attempts(5)
-    .save();
+      if(!notificationNumber) {
+        winston.verbose('User troupe already has notification queued. Skipping');
+        return;
+      }
+
+      var delay = notificationWindowPeriods[notificationNumber - 1];
+      if(!delay) {
+        // User had already gotten two notifications, that's enough
+        return;
+      }
+
+      winston.verbose('Queuing notification ' + notificationNumber + ' to be send to user in ' + delay + 'ms');
+
+      jobs.create('generate-push-notifications', {
+        title: 'Push Notification #' + notificationNumber,
+        userTroupe: userTroupe
+      }).delay(delay)
+        .save();
+
+    });
+
+  });
 };
 
 
@@ -98,7 +107,9 @@ exports.startWorkers = function() {
     }, callback);
   }
 
-  function notifyUserOfActivitySince(userId, troupeId, since, callback) {
+  function notifyUserOfActivitySince(userId, troupeId, since, notificationNumber, callback) {
+    winston.verbose('getUnreadItemsForUserTroupeSince:', arguments);
+
     unreadItemService.getUnreadItemsForUserTroupeSince(userId, troupeId, since, function(err, unreadItems) {
       winston.verbose('getUnreadItemsForUserTroupeSince:', unreadItems);
 
@@ -121,57 +132,18 @@ exports.startWorkers = function() {
     });
   }
 
-  function getStartTimeForItems(items) {
-    if(!items.length) return null;
-    var times = items.map(function(item) {
-      var id = item.itemId;
-      var objectId = new ObjectID(id);
-      return objectId.getTimestamp().getTime();
-    });
 
-    return _.min(times);
-  }
-
-  function sendUserTroupesFirstNotification(userTroupesWithItems, callback) {
-    userTroupesWithItems.forEach(function(userTroupe) {
-      userTroupe.startTime = getStartTimeForItems(userTroupe.items);
-    });
-
-    pushNotificationService.lockUsersTroupesForFirstNotification(userTroupesWithItems, function(err, lockedUserTroupes) {
+  function sendUserTroupeNotification(userTroupe, callback) {
+    pushNotificationService.canUnlockForNotification(userTroupe.userId, userTroupe.troupeId, function(err, result) {
       if(err) return callback(err);
+      if(!result) {
+        winston.verbose('Unable to obtain lock to notify userTroupe. Skipping');
+      }
 
-      if(!lockedUserTroupes.length) return callback();
+      var notificationNumber = result.notificationNumber;
+      var startTime = result.startTime;
 
-      var f = new Fiber();
-
-      lockedUserTroupes.forEach(function(userTroupe) {
-        notifyUserOfActivitySince(userTroupe.userId, userTroupe.troupeId, userTroupe.startTime, f.waitor());
-      });
-
-      f.all().then(function() {
-        callback();
-      }, function(err) {
-        winston.error('Failed to send notifications: ' + err + '. Failing silently.', { exception: err });
-      });
-
-    });
-  }
-
-  function sendUserTroupesSecondNotification(userTroupesWithItems, callback) {
-    pushNotificationService.lockUsersTroupesForSeconrd(userTroupesWithItems, function(err, lockedUserTroupes) {
-      if(err) return callback(err);
-
-      if(!lockedUserTroupes.length) return callback();
-
-      var f = new Fiber();
-
-      lockedUserTroupes.forEach(function(userTroupe) {
-        notifyUserOfActivitySince(userTroupe.userId, userTroupe.troupeId, userTroupe.startTime, f.waitor());
-      });
-
-      f.all().then(function() {
-        callback();
-      }, function(err) {
+      notifyUserOfActivitySince(userTroupe.userId, userTroupe.troupeId, startTime, notificationNumber, function(err) {
         winston.error('Failed to send notifications: ' + err + '. Failing silently.', { exception: err });
       });
 
@@ -179,16 +151,11 @@ exports.startWorkers = function() {
   }
 
 
-  jobs.process('push-notifications-s1', 20, function(job, done) {
-    var d = job.data;
-    sendUserTroupesFirstNotification(d.userTroupes, done);
-  });
 
-  jobs.process('push-notifications-s2', 20, function(job, done) {
+  jobs.process('generate-push-notifications', 20, function(job, done) {
     var d = job.data;
-    sendUserTroupesSecondNotification(d.userTroupes, done);
+    sendUserTroupeNotification(d.userTroupe, done);
   });
-
 
 
 };
