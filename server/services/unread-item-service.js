@@ -86,10 +86,8 @@ exports.newItem = function(troupeId, creatorUserId, itemType, itemId) {
 };
 
 exports.removeItem = function(troupeId, itemType, itemId) {
-  troupeService.findById(troupeId, function(err, troupe) {
+  troupeService.findUserIdsForTroupe(troupeId, function(err, userIds) {
     if(err) return winston.error("Unable to load troupeId " + troupeId, err);
-
-    var userIds = troupe.getUserIds();
 
     var data = {};
     data[itemType] = [itemId];
