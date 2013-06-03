@@ -1,12 +1,12 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var appEvents = require("../app-events");
+var appEvents = require("../../app-events");
 
 var winston = require("winston");
 var Q = require("q");
 var handlebars = require('handlebars');
-var serializer = require("../serializers/notification-serializer");
+var serializer = require("../../serializers/notification-serializer");
 
 function compile(map) {
   for(var k in map) {

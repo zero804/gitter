@@ -367,9 +367,6 @@ function categorizeUserTroupesByOnlineStatus(userTroupes, callback) {
   var troupeIds = _.uniq(userTroupes.map(function(userTroupe) { return userTroupe.troupeId; }));
   var userIds = _.uniq(userTroupes.map(function(userTroupe) { return userTroupe.userId; }));
 
-  console.log('troupeIds', troupeIds);
-  console.log('userIds', userIds);
-
   listOnlineUsersForTroupes(troupeIds, f.waitor());
   categorizeUsersByOnlineStatus(userIds, f.waitor());
 
@@ -377,9 +374,6 @@ function categorizeUserTroupesByOnlineStatus(userTroupes, callback) {
     var inTroupe = [];
     var online = [];
     var offline = [];
-
-    console.log('troupeOnlineUsers', troupeOnlineUsers);
-    console.log('statii', statii);
 
     userTroupes.forEach(function(userTroupe) {
       var userId = userTroupe.userId;
