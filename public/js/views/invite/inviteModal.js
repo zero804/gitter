@@ -37,18 +37,14 @@ define([
       var userId = window.troupeContext.user.id;
       var inviteId = this.inviteId;
 
-      TroupeViews.confirm("Are you sure you want to reject the invitation to this troupe?", {
-        "click #ok": function() {
-          $.ajax({
-            method: "DELETE",
-            url: "/user/" + userId + "/invites/" + inviteId,
-            success: function() {
-              window.location.reload();
-            },
-            error: function() {
-              alert("There was an error rejecting this invite, please try again later or contact support");
-            }
-          });
+      $.ajax({
+        method: "DELETE",
+        url: "/user/" + userId + "/invites/" + inviteId,
+        success: function() {
+          window.history.back();
+        },
+        error: function() {
+          alert("There was an error rejecting this invite, please try again later or contact support");
         }
       });
 
