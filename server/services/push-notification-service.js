@@ -12,7 +12,7 @@ var redis = require("../utils/redis"),
 
 var Scripto = require('redis-scripto');
 var scriptManager = new Scripto(redisClient);
-scriptManager.loadFromDir(__dirname + '/../redis-lua');
+scriptManager.loadFromDir(__dirname + '/../../redis-lua');
 
 var minimumUserAlertIntervalS = nconf.get("notifications:minimumUserAlertInterval");
 
