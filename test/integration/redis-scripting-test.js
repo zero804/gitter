@@ -19,22 +19,16 @@ describe('redis-scripting', function() {
 
     scriptManager.run('notify-lock-user-troupe', keys, values, function(err, result) {
       if(err) return done(err);
-      console.log('first lock: ', result);
 
       scriptManager.run('notify-unlock-user-troupe', keys, [], function(err, result) {
         if(err) return done(err);
 
-        console.log('first unlock: ', result);
-
         scriptManager.run('notify-lock-user-troupe', keys, values, function(err, result) {
           if(err) return done(err);
-
-          console.log('first second: ', result);
 
           scriptManager.run('notify-unlock-user-troupe', keys, [], function(err, result) {
             if(err) return done(err);
 
-            console.log('first second: ', result);
             done();
           });
         });

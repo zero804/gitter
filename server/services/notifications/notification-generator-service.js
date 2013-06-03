@@ -132,7 +132,14 @@ exports.install = function() {
     Object.keys(items).forEach(function(itemType) {
       notificationCollector.incomingNotification(userId, itemType, items[itemType], troupeId);
     });
+  });
 
+  appEvents.localOnly.onEyeballSignal(function(userId, troupeId, eyeballSignal) {
+    if(eyeballSignal) {
+      pushNotificationService.resetNotificationsForUserTroupe(userId, troupeId, function(err) {
+        if(err) winston.error('Error while calling resetNotificationsForUserTroupe. Silently ignoring. ' + err, { exception: err });
+      });
+    }
   });
 
 };

@@ -123,6 +123,10 @@ exports.findUsersTroupesAcceptingNotifications = function(userTroupes, callback)
   });
 };
 
+exports.resetNotificationsForUserTroupe = function(userId, troupeId, callback) {
+  redisClient.del("nl:" + userId + ':' + troupeId, "nls:" + userId + ':' + troupeId, callback);
+};
+
 
 // Returns callback(err, notificationNumber)
 exports.canLockForNotification = function(userId, troupeId, startTime, callback) {
@@ -136,17 +140,15 @@ exports.canLockForNotification = function(userId, troupeId, startTime, callback)
   });
 };
 
-// Returns callback(err, falsey value or { notificationNumber: X, startTime: Y }])
-exports.canUnlockForNotification = function (userId, troupeId, callback) {
+// Returns callback(err, falsey value or { startTime: Y }])
+exports.canUnlockForNotification = function (userId, troupeId, notificationNumber, callback) {
   var keys = ['nl:' + userId + ':' + troupeId, 'nls:' + userId + ':' + troupeId ];
+  var values = [notificationNumber];
 
-  scriptManager.run('notify-unlock-user-troupe', keys, [], function(err, result) {
+  scriptManager.run('notify-unlock-user-troupe', keys, values, function(err, result) {
     if(err) return callback(err);
 
-    return callback(null, {
-      notificationNumber: parseInt(result[0], 10),
-      startTime: parseInt(result[1], 10)
-    });
+    return callback(null, result ? parseInt(result, 10) : 0);
   });
 };
 

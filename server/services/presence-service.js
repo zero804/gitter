@@ -457,6 +457,8 @@ function clientEyeballSignal(userId, socketId, eyeballsOn, callback) {
         });
       }
 
+      appEvents.eyeballSignal(userId, troupeId, eyeballsOn);
+
       if(eyeballsOn) {
         winston.verbose('presence: Eyeballs on: user ' + userId + ' troupe ' + troupeId);
         return __eyeBallsOnTroupe(userId, socketId, troupeId, unlock);
