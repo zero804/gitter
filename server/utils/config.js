@@ -12,7 +12,7 @@ var nodeEnv = process.env['NODE_ENV'];
 if(!nodeEnv) {
   var exists = fs.existsSync('/opt/troupe/etc/environment');
   if(exists) {
-    nodeEnv = fs.readFileSync('/opt/troupe/etc/environment', { encoding: 'ascii' });
+    nodeEnv = fs.readFileSync('/opt/troupe/etc/environment', { encoding: 'utf8' });
   }
 
   if(!nodeEnv) {
