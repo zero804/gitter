@@ -2,13 +2,13 @@
 "use strict";
 
 var winston = require("winston");
-var pushNotificationService = require("./push-notification-service");
-var nconf = require('../utils/config');
-var unreadItemService = require('./unread-item-service');
-var kue = require('../utils/kue');
+var pushNotificationService = require("../push-notification-service");
+var nconf = require('../../utils/config');
+var unreadItemService = require('./../unread-item-service');
+var kue = require('../../utils/kue');
 var jobs = kue.createQueue();
-var Fiber = require('../utils/fiber');
-var notificationMessageGenerator = require('../utils/notification-message-generator');
+var Fiber = require('../../utils/fiber');
+var notificationMessageGenerator = require('../../utils/notification-message-generator');
 var ObjectID = require('mongodb').ObjectID;
 var _ = require('underscore');
 var notificationDelayMS = nconf.get("notifications:notificationDelay") * 1000;
@@ -23,10 +23,20 @@ exports.queueUserTroupesForFirstNotification = function(userTroupes) {
 };
 
 
+exports.queueUserTroupesForSecondNotification = function(userTroupes) {
+  jobs.create('push-notifications-s2', {
+    title: 'Push Notification #2',
+    userTroupes: userTroupes
+  }).delay(notificationDelayMS)
+    .attempts(5)
+    .save();
+};
+
+
 exports.startWorkers = function() {
   // NB NB circular reference here! Fix this!
-  var pushNotificationGateway = require("../gateways/push-notification-gateway");
-  var serializer = require("../serializers/notification-serializer");
+  var pushNotificationGateway = require("../../gateways/push-notification-gateway");
+  var serializer = require("../../serializers/notification-serializer");
 
   function getTroupeUrl(serilizedTroupe, senderUserId) {
     /* The URL for non-oneToOne troupes is the trivial case */
@@ -104,7 +114,7 @@ exports.startWorkers = function() {
         pushNotificationGateway.sendUserNotification(userId, {
           message: text,
           sound: 'notify.caf',
-          link: troupe.url + '/chat'
+          link: getTroupeUrl(troupe, userId) + '/chat'
         });
       });
 
@@ -124,8 +134,6 @@ exports.startWorkers = function() {
 
   function sendUserTroupesFirstNotification(userTroupesWithItems, callback) {
     userTroupesWithItems.forEach(function(userTroupe) {
-      winston.verbose('Items are ', userTroupe.items);
-      winston.verbose('Items are ' + new Date(getStartTimeForItems(userTroupe.items)));
       userTroupe.startTime = getStartTimeForItems(userTroupe.items);
     });
 
@@ -149,10 +157,38 @@ exports.startWorkers = function() {
     });
   }
 
-  jobs.process('push-notifications-s1', 20, function(job, done) {
+  function sendUserTroupesSecondNotification(userTroupesWithItems, callback) {
+    pushNotificationService.lockUsersTroupesForSeconrd(userTroupesWithItems, function(err, lockedUserTroupes) {
+      if(err) return callback(err);
 
+      if(!lockedUserTroupes.length) return callback();
+
+      var f = new Fiber();
+
+      lockedUserTroupes.forEach(function(userTroupe) {
+        notifyUserOfActivitySince(userTroupe.userId, userTroupe.troupeId, userTroupe.startTime, f.waitor());
+      });
+
+      f.all().then(function() {
+        callback();
+      }, function(err) {
+        winston.error('Failed to send notifications: ' + err + '. Failing silently.', { exception: err });
+      });
+
+    });
+  }
+
+
+  jobs.process('push-notifications-s1', 20, function(job, done) {
     var d = job.data;
     sendUserTroupesFirstNotification(d.userTroupes, done);
   });
+
+  jobs.process('push-notifications-s2', 20, function(job, done) {
+    var d = job.data;
+    sendUserTroupesSecondNotification(d.userTroupes, done);
+  });
+
+
 
 };

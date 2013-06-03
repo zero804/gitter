@@ -1,13 +1,13 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var appEvents = require("../app-events");
+var appEvents = require("../../app-events");
 
 var winston = require("winston");
-var pushNotificationService = require("./push-notification-service");
+var pushNotificationService = require("../push-notification-service");
 var _ = require("underscore");
-var presenceService = require("./presence-service");
-var NotificationCollector = require('../utils/notification-collector');
+var presenceService = require("./../presence-service");
+var NotificationCollector = require('../../utils/notification-collector');
 var onlineNotificationGeneratorService = require('./online-notification-generator-service');
 var pushNotificationGeneratorService = require('./push-notification-generator-service');
 
@@ -51,13 +51,14 @@ function userCategorisationStrategy(userTroupes, callback) {
           var userId = userTroupeNotificationTime.userId;
           var troupeId = userTroupeNotificationTime.troupeId;
           var n1s = userTroupeNotificationTime.n1s;  // notification 1 sent
+          var n2timeout = userTroupeNotificationTime.n2timeout;
           var n2s = userTroupeNotificationTime.n2s;  // notification 2 sent
 
           var userTroupe = offlineUserTroupeLookup[userId + ':' + troupeId];
           if(userTroupe) {
             if(!n1s) {
               mobileCanNotify.push(userTroupe);
-            } else if(!n2s) {
+            } else if(!n2timeout && !n2s) {
               mobileFirstNotificationSent.push(userTroupe);
             }
           }
@@ -102,13 +103,12 @@ exports.install = function() {
   });
 
   notificationCollector.on('collection:mobile_can_notify', function(userTroupes) {
-    winston.info('mobile_can_notify notifications: ', userTroupes);
-
     pushNotificationGeneratorService.queueUserTroupesForFirstNotification(userTroupes);
   });
 
   notificationCollector.on('collection:mobile_first_notification_sent', function(userTroupes) {
     winston.info('mobile_first_notification_sent notifications: ', userTroupes);
+    pushNotificationGeneratorService.queueUserTroupesForSecondNotification(userTroupes);
   });
 
   // Listen for onNewUnreadItem events generated locally
@@ -116,8 +116,6 @@ exports.install = function() {
     var troupeId = '' + data.troupeId;
     var userId = '' + data.userId;
     var items = data.items;
-
-    console.log('UNREAD ITEM: ', data);
 
     Object.keys(items).forEach(function(itemType) {
       notificationCollector.incomingNotification(userId, itemType, items[itemType], troupeId);

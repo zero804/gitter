@@ -10,7 +10,7 @@ var _ = require('underscore');
 var redis = require("../utils/redis"),
     redisClient = redis.createClient();
 
-var minimumUserAlertIntervalS = 10; //nconf.get("notifications:minimumUserAlertInterval");
+var minimumUserAlertIntervalS = nconf.get("notifications:minimumUserAlertInterval");
 
 function buffersEqual(a,b) {
   if (!Buffer.isBuffer(a)) return undefined;
@@ -95,8 +95,9 @@ exports.findUsersTroupesAcceptingNotifications = function(userTroupes, callback)
   userTroupes.forEach(function(userTroupes) {
     var userId = userTroupes.userId;
     var troupeId = userTroupes.troupeId;
-    multi.exists("ns:" + userId + ':' + troupeId + ':1');
-    multi.exists("ns:" + userId + ':' + troupeId + ':2');
+    multi.exists("ns:" + userId + ':' + troupeId + ':1'); // notification 1 sent
+    multi.exists("ns:" + userId + ':' + troupeId + ':2'); // awaiting timeout before sending note2
+    multi.exists("ns:" + userId + ':' + troupeId + ':3'); // notification 2 sent
   });
 
   multi.exec(function(err, replies) {
@@ -106,8 +107,9 @@ exports.findUsersTroupesAcceptingNotifications = function(userTroupes, callback)
       return {
         userId: userTroupe.userId,
         troupeId: userTroupe.troupeId,
-        n1s: replies[i * 2],     // notification 1 sent
-        n2s: replies[i * 2 + 1]  // notification 2 sent
+        n1s:        replies[i * 3],      // notification 1 sent
+        n2timeout:  replies[i * 3 + 1],  // notification 2 lock
+        n2s:        replies[i * 3 + 2]   // notification 2 sent
       };
     });
 
@@ -134,21 +136,20 @@ exports.lockUsersTroupesForFirstNotification = function(userTroupesWithStartTime
 
     var response = [];
     var m2 = redisClient.multi();
-    var count = 0;
 
 
     userTroupesWithStartTime.forEach(function(userTroupe, i) {
       var wasSet = !!replies[i];
 
       if(wasSet) {
-        count++;
         response.push(userTroupe);
         m2.expire('ns:' + userTroupe.userId + ':' + userTroupe.troupeId + ':1', minimumUserAlertIntervalS);
+        m2.setex('ns:' + userTroupe.userId + ':' + userTroupe.troupeId + ':2', 1, 300);
+        m2.del('ns:' + userTroupe.userId + ':' + userTroupe.troupeId + ':3');
       }
     });
 
-
-    if(count) {
+    if(response.length) {
       m2.exec(function(err) {
         if(err) return callback(err);
 
@@ -163,33 +164,35 @@ exports.lockUsersTroupesForFirstNotification = function(userTroupesWithStartTime
   });
 };
 
-exports.lockUsersTroupesForSecondNotification = function(userTroupes, startTime, callback) {
+exports.lockUsersTroupesForSecondNotification = function(userTroupes, callback) {
 
   var multi = redisClient.multi();
   userTroupes.forEach(function(userTroupes) {
     var userId = userTroupes.userId;
     var troupeId = userTroupes.troupeId;
-    multi.setnx('ns:' + userId + ':' + troupeId + ':1', 1);
+
+    multi.get('ns:' + userId + ':' + troupeId + ':1', 1);
+    multi.setnx('ns:' + userId + ':' + troupeId + ':3', 1);
   });
 
   multi.exec(function(err, replies) {
     if(err) return callback(err);
 
-    var response = {};
+    var response = [];
     var m2 = redisClient.multi();
-    var count = 0;
 
     userTroupes.forEach(function(userTroupe, i) {
-      var wasSet = !!replies[i];
-      response[userTroupe.userId] = wasSet;
+      var startTime = parseInt(replies[i * 2], 10);
+      var wasSet = !!replies[i * 2 + 1];
 
       if(wasSet) {
-        count++;
-        m2.expire('ns:' + userTroupe.userId + ':' + userTroupe.troupeId + ':1', minimumUserAlertIntervalS);
+        userTroupe.startTime = startTime;
+        response.push(userTroupe);
+        m2.expire('ns:' + userTroupe.userId + ':' + userTroupe.troupeId + ':3', minimumUserAlertIntervalS);
       }
     });
 
-    if(count) {
+    if(response.length) {
       m2.exec(function(err) {
         if(err) return callback(err);
 
@@ -204,66 +207,6 @@ exports.lockUsersTroupesForSecondNotification = function(userTroupes, startTime,
   });
 };
 
-
-
-exports.findUsersAcceptingNotifications = function(userIds, callback) {
-  userIds = _.uniq(userIds);
-
-  var multi = redisClient.multi();
-  userIds.forEach(function(userId) {
-    multi.exists("nb:" + userId);
-  });
-
-  multi.exec(function(err, replies) {
-    if(err) return callback(err);
-
-    var response = [];
-    replies.forEach(function(reply, index) {
-      var userId = userIds[index];
-      if(reply === 0) {
-        response.push(userId);
-      }
-    });
-
-    callback(null, response);
-  });
-};
-
-exports.findAndUpdateUsersAcceptingNotifications = function(userIds, callback) {
-  userIds = _.uniq(userIds);
-
-  winston.info("findAndUpdateUsersAcceptingNotifications", { userIds: userIds });
-
-  var multi = redisClient.multi();
-  userIds.forEach(function(userId) {
-    multi.msetnx("nb:" + userId, "1");
-  });
-
-  multi.exec(function(err, replies) {
-    if(err) return callback(err);
-
-    var m2 = redisClient.multi();
-    var response = [];
-    replies.forEach(function(reply, index) {
-      var userId = userIds[index];
-      if(reply === 1) {
-        response.push(userId);
-        m2.expire("nb:" + userId, minimumUserAlertIntervalS);
-      }
-    });
-
-    if(response) {
-      m2.exec(function(err/*, replies*/) {
-        if(err) return callback(err);
-
-        callback(null, response);
-      });
-    } else {
-      callback(null, response);
-    }
-
-  });
-};
 
 
 
