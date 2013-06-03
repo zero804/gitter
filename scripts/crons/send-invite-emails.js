@@ -6,7 +6,8 @@
 var shutdown = require('../../server/utils/shutdown');
 var troupeService = require('../../server/services/troupe-service');
 
-troupeService.sendPendingInviteMails(function(err, counts) {
+var delaySeconds = 10 * 60;
+troupeService.sendPendingInviteMails(delaySeconds, function(err, counts) {
   if(err) {
     console.error(err);
     process.exit(1);
