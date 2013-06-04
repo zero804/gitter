@@ -175,7 +175,7 @@ exports.startWorkers = function() {
   });
 
   jobs.process('push-notification', 20, function(job, done) {
-    directSendUserNotification(job.data.userIds, job.data.notification, done);
+    directSendUserNotification(job.data.userIds, job.data.notification, kue.wrapCallback(job, done));
   });
 };
 

@@ -8,13 +8,20 @@ var _ = require("underscore");
 var redis = require("../utils/redis");
 var winston = require("winston");
 var redisClient = redis.createClient();
-var ObjectID = require('mongodb').ObjectID;
+var mongoUtils = require('../utils/mongo-utils');
 var Fiber = require('../utils/fiber');
 var kue = require('../utils/kue'),
     jobs;
 
 var DEFAULT_ITEM_TYPES = ['file', 'chat', 'request'];
 
+function sinceFilter(since) {
+  return function(id) {
+    var date = mongoUtils.getDateFromObjectId(id);
+    return date.getTime() >= since;
+  };
+
+}
 exports.startWorkers = function() {
   function republishUnreadItemCountForUserTroupeWorker(data, callback) {
     var userId = data.userId;
@@ -36,7 +43,7 @@ exports.startWorkers = function() {
 
   jobs = kue.createQueue();
   jobs.process('republish-unread-item-count-for-user-troupe', 20, function(job, done) {
-    republishUnreadItemCountForUserTroupeWorker(job.data, done);
+    republishUnreadItemCountForUserTroupeWorker(job.data, kue.wrapCallback(job, done));
   });
 };
 
@@ -210,27 +217,14 @@ exports.getUnreadItemsForUserTroupeSince = function(userId, troupeId, since, cal
   exports.getUnreadItems(userId, troupeId, 'chat', f.waitor());
   exports.getUnreadItems(userId, troupeId, 'file', f.waitor());
   f.all().then(function(results) {
-    function after(id) {
-      // Create a new ObjectID with a specific timestamp
-      var objectId = new ObjectID(id);
+    console.log('RESULTS!', arguments);
 
-      return objectId.getTimestamp().getTime() >= since;
-    }
 
     var chatItems = results[0];
     var fileItems = results[1];
 
-    // winston.verbose('Chat items1: ', chatItems);
-    // winston.verbose('Filering: ' + new Date(since));
-
-    chatItems = chatItems.filter(after);
-    fileItems = fileItems.filter(after);
-
-    // winston.verbose('Chat items2: ', chatItems.map(function(id) {
-    //   var objectId = new ObjectID(id);
-    //   return objectId.getTimestamp();
-    // }));
-
+    chatItems = chatItems.filter(sinceFilter(since));
+    fileItems = fileItems.filter(sinceFilter(since));
 
     var response = {};
     if(chatItems.length) {
@@ -336,8 +330,7 @@ function getOldestId(ids) {
 
   return _.min(ids, function(id) {
     // Create a new ObjectID with a specific timestamp
-    var objectId = new ObjectID(id);
-    return objectId.getTimestamp().getTime();
+    return mongoUtils.getTimestampFromObjectId(id);
   });
 }
 
@@ -365,5 +358,6 @@ exports.install = function() {
 };
 
 exports.testOnly = {
-  getOldestId: getOldestId
+  getOldestId: getOldestId,
+  sinceFilter: sinceFilter
 };
