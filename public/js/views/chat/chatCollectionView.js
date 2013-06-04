@@ -191,7 +191,7 @@ define([
     },
 
     showText: function() {
-      this.$el.find('.trpChatText').html(this.model.get('text'));
+      this.$el.find('.trpChatText').html(this.model.get('text').replace(/\n/g,"<br/>"));
 
       if (this.inputBox) {
         this.stopListening(this.inputBox);
