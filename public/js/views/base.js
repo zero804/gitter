@@ -708,7 +708,7 @@ define([
     },
 
     appendHtml: function(collectionView, itemView, index) {
-      console.log("Inserting view at index ", index, " of ", collectionView.collection.length, " in collection ", collectionView.collection.url, "; itemView ", itemView, ((this.isRendering) ? " with rendering shortcut" : ''));
+      log("Inserting view at index ", index, " of ", collectionView.collection.length, " in collection ", collectionView.collection.url, "; itemView ", itemView, ((this.isRendering) ? " with rendering shortcut" : ''));
 
       if(window.debugSortableMarionette) {
         debugger;
