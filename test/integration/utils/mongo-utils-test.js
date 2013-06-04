@@ -71,4 +71,11 @@ describe('mongo-utils', function() {
     Q.all(promises).then(function() { done(); }, done);
 
   });
+
+  it('should handle ObjectIDs', function() {
+    var id = new ObjectID('51adcd412aefe1576f000005');
+    var t = underTest.getTimestampFromObjectId(id);
+    assert.equal(t, 1370344769000);
+  });
+
 });
