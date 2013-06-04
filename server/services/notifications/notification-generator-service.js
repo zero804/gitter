@@ -10,17 +10,18 @@ var presenceService = require("./../presence-service");
 var NotificationCollector = require('../../utils/notification-collector');
 var onlineNotificationGeneratorService = require('./online-notification-generator-service');
 var pushNotificationGeneratorService = require('./push-notification-generator-service');
-var ObjectID = require('mongodb').ObjectID;
+var mongoUtils = require('../../utils/mongo-utils');
 
 function getStartTimeForItems(items) {
   if(!items.length) return null;
-  var times = items.map(function(item) {
-    var id = item.itemId;
-    var objectId = new ObjectID(id);
-    return objectId.getTimestamp().getTime();
+
+  var times = items.map(function(id) {
+    return mongoUtils.getTimestampFromObjectId(id);
   });
 
-  return _.min(times);
+  var result = _.min(times);
+
+  return result;
 }
 
 
@@ -145,5 +146,6 @@ exports.install = function() {
 };
 
 exports.testOnly = {
-  userCategorisationStrategy: userCategorisationStrategy
+  userCategorisationStrategy: userCategorisationStrategy,
+  getStartTimeForItems: getStartTimeForItems
 };

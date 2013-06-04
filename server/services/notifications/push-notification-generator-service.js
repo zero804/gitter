@@ -109,25 +109,29 @@ exports.startWorkers = function() {
   }
 
   function notifyUserOfActivitySince(userId, troupeId, since, notificationNumber, callback) {
-    winston.verbose('getUnreadItemsForUserTroupeSince:', arguments);
-
     unreadItemService.getUnreadItemsForUserTroupeSince(userId, troupeId, since, function(err, unreadItems) {
       if(err) return callback(err);
-      console.log('Unready items since: ', unreadItems);
 
-      if(!Object.keys(unreadItems).length) return callback();
-
+      if(!Object.keys(unreadItems).length) {
+        winston.verbose('User has no unread items since ', { userId: userId, troupeId: troupeId, since: since, notificationNumber: notificationNumber} );
+        return callback();
+      }
 
       serializeItems(troupeId, unreadItems, function(err, troupe, items) {
-
         if(err) return callback(err);
+
+        var f = new Fiber();
+
         var text = notificationMessageGenerator.generateNotificationMessage(troupe, items);
 
         pushNotificationGateway.sendUserNotification(userId, {
-          message: text,
-          sound: notificationNumber == 1 ? 'notify.caf' : 'notify-2.caf',
-          link: getTroupeUrl(troupe, userId) + '/chat'
-        });
+            message: text,
+            sound: notificationNumber == 1 ? 'notify.caf' : 'notify-2.caf',
+            link: getTroupeUrl(troupe, userId) + '/chat'
+          }, f.waitor());
+
+        f.thenCallback(callback);
+
       });
 
     });
@@ -154,7 +158,7 @@ exports.startWorkers = function() {
 
   jobs.process('generate-push-notifications', 20, function(job, done) {
     var d = job.data;
-    sendUserTroupeNotification(d.userTroupe, d.notificationNumber, done);
+    sendUserTroupeNotification(d.userTroupe, d.notificationNumber, kue.wrapCallback(job, done));
   });
 
 
