@@ -145,6 +145,8 @@ exports.startWorkers = function() {
 
       notifyUserOfActivitySince(userTroupe.userId, userTroupe.troupeId, startTime, notificationNumber, function(err) {
         if(err) winston.error('Failed to send notifications: ' + err + '. Failing silently.', { exception: err });
+
+        return callback();
       });
 
     });
