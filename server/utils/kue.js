@@ -39,7 +39,7 @@ kue.createQueue = function() {
 
 kue.wrapCallback = function(job, callback) {
   return function(err) {
-    if(err) winston.error("kue: job failed: " + err, { exception: err, job: job });
+    if(err) winston.error("kue: job failed: " + err, { exception: err, job: job.data });
     callback(err);
   };
 

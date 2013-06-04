@@ -217,9 +217,6 @@ exports.getUnreadItemsForUserTroupeSince = function(userId, troupeId, since, cal
   exports.getUnreadItems(userId, troupeId, 'chat', f.waitor());
   exports.getUnreadItems(userId, troupeId, 'file', f.waitor());
   f.all().then(function(results) {
-    console.log('RESULTS!', arguments);
-
-
     var chatItems = results[0];
     var fileItems = results[1];
 

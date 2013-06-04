@@ -39,7 +39,7 @@ exports.startWorkers = function() {
         var sent = false;
 
         if((device.deviceType === 'APPLE' || device.deviceType === 'APPLE-DEV' || device.deviceType === 'APPLE-BETA') && device.appleToken) {
-          winston.info("push-gateway: Sending apple push notification", { notification: notification });
+          winston.info("push-gateway: Sending apple push notification", { userId: device.userId, notification: notification });
           var note = new apns.Notification();
 
           if(badge >= 0) {
