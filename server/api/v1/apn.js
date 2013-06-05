@@ -10,8 +10,8 @@ module.exports = {
     var deviceName = req.body.deviceName;
     var deviceType = req.body.deviceType;
     var deviceToken = new Buffer(req.body.deviceToken, 'base64');
-    var appVersion = req.body.version;
-    var appBuild = req.body.build;
+    var appVersion = req.body.version || null;
+    var appBuild = req.body.build || null;
 
     // Backwards compatiblity, remove later
     if(!deviceType) {
