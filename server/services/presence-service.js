@@ -11,7 +11,6 @@ var redis = require("../utils/redis"),
     Q = require('q'),
     _ = require("underscore");
 
-
 var presenceService = new events.EventEmitter();
 
 var redisClient = redis.createClient();
@@ -25,6 +24,8 @@ scriptManager.loadFromDir(__dirname + '/../../redis-lua/presence');
 var prefix = nconf.get('presence:prefix') + ':';
 
 var ACTIVE_USERS_KEY = prefix + 'active_u';
+var MOBILE_USERS_KEY = prefix + 'mobile_u';
+
 var ACTIVE_SOCKETS_KEY = prefix + 'activesockets';
 
 
@@ -41,28 +42,22 @@ function _lockOnUser(userId, callback) {
 }
 
 function _keySocketUser(socketId) {
-  return prefix + "su:" + socketId;
-}
-
-function _keySocketTroupe(socketId) {
-  return prefix + "st:" + socketId;
+  return prefix + "sh:" + socketId;
 }
 
 function _keyTroupeUsers(troupeId) {
   return prefix + "tu:" + troupeId;
 }
 
-function _keySocketEyeballStatus(socketId) {
-  return prefix + "se:" + socketId;
-}
-
 // callback(err, userSocketCount)
-function __associateSocketAndActivateUser(userId, socketId, callback) {
+function __associateSocketAndActivateUser(userId, socketId, connectionType, callback) {
   assert(userId, 'userId expected');
   assert(socketId, 'socketId expected');
 
-  var keys = [_keySocketUser(socketId), ACTIVE_USERS_KEY, ACTIVE_SOCKETS_KEY];
-  var values = [userId, socketId];
+  var isMobileConnection = connectionType == 'mobile';
+
+  var keys = [_keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY];
+  var values = [userId, socketId, Date.now(), isMobileConnection ? 1 : 0];
 
   scriptManager.run('presence-associate', keys, values, function(err, result) {
     if(err) return callback(err);
@@ -70,8 +65,7 @@ function __associateSocketAndActivateUser(userId, socketId, callback) {
     var lockSuccess = result[0];
 
     if(!lockSuccess)  {
-      winston.silly('presence: __associateSocketAndActivateUser rejected. SETNX returned 0', {
-        key: _keySocketUser(socketId),
+      winston.silly('presence: __associateSocketAndActivateUser rejected. Socket already exists.', {
         socketId: socketId,
         userId: userId
       });
@@ -100,54 +94,61 @@ function __disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callba
   assert(userId, 'userId expected');
   assert(socketId, 'socketId expected');
 
-  var keys = [_keySocketUser(socketId), ACTIVE_USERS_KEY, ACTIVE_SOCKETS_KEY, _keySocketTroupe(socketId)];
-  var values = [userId, socketId];
-
-  scriptManager.run('presence-disassociate', keys, values, function(err, result) {
+  lookupTroupeIdForSocket(socketId, function(err, troupeId) {
     if(err) return callback(err);
 
-    var deleteSuccess = result[0];
-    if(!deleteSuccess) {
-      winston.silly('presence: __disassociateSocketAndDeactivateUserAndTroupe rejected. DEL returned 0', {
-        key: _keySocketUser(socketId),
-        socketId: socketId,
-        userId: userId
-      });
+    var keys = [_keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, troupeId ? _keyTroupeUsers(troupeId) : null];
+    var values = [userId, socketId];
 
-      return callback({ lockFail: true });
-    }
+    scriptManager.run('presence-disassociate', keys, values, function(err, result) {
+      if(err) return callback(err);
 
-    var userSocketCount = parseInt(result[1], 10);
-    var sremResult = result[2];
-    var troupeId = result[3];
+      var deleteSuccess = result[0];
+      if(!deleteSuccess) {
+        winston.silly('presence: __disassociateSocketAndDeactivateUserAndTroupe rejected. Socket already deleted.', {
+          socketId: socketId,
+          userId: userId
+        });
 
-    if(sremResult != 1) {
-      winston.warn("presence: Socket has already been removed from active sockets. Something fishy is happening.");
-    }
-
-    // If the socket is not associated with a troupe, this is where it ends
-    if(!troupeId) {
-      if(userSocketCount === 0) {
-        presenceService.emit('userOffline', userId);
+        return callback({ lockFail: true });
       }
 
-      return callback();
-    }
+      var userSocketCount = parseInt(result[1], 10);
+      var sremResult = result[2];
 
-    __eyeBallsOffTroupe(userId, socketId, troupeId, function(err) {
-      if(err && !err.lockFail) {
-        // Don't fail if the eyeballs are already off
-        return callback(err);
+      var userInTroupeCount = parseInt(result[3], 10);
+      var userHasLeftTroupe = userInTroupeCount <= 0;
+      var troupeIsEmpty = result[4] === 0;
+
+      if(sremResult != 1) {
+        winston.warn("presence: Socket has already been removed from active sockets. Something fishy is happening.");
       }
 
       if(userSocketCount === 0) {
         presenceService.emit('userOffline', userId);
+      }
+
+
+      // Warning: similar code exists in __eyeBallsOffTroupe!
+
+      if(troupeIsEmpty && !userHasLeftTroupe) {
+        winston.warn("presence: Troupe is empty, yet user has not left troupe. Something is fishy.", { troupeId: troupeId, socketId: socketId, userId: userId });
+      }
+
+      if(userHasLeftTroupe) {
+        presenceService.emit('userLeftTroupe', userId, troupeId);
+      }
+
+      appEvents.eyeballSignal(userId, troupeId, false);
+
+      if(troupeIsEmpty) {
+        presenceService.emit('troupeEmpty', troupeId);
       }
 
       return callback();
     });
-
   });
+
 
 }
 
@@ -157,12 +158,11 @@ function __associateSocketAndActivateTroupe(socketId, userId, troupeId, eyeballS
   assert(troupeId, 'troupeId expected');
 
     // Associate socket with troupe
-  redisClient.setnx(_keySocketTroupe(socketId), troupeId, function(err, result) {
+  redisClient.hsetnx(_keySocketUser(socketId), "tid", troupeId, function(err, result) {
     if(err) return callback(err);
 
     if(result === 0) {
-      winston.silly('presence: __associateSocketAndActivateTroupe rejected. SETNX returned 0', {
-        key: _keySocketTroupe(socketId),
+      winston.silly('presence: __associateSocketAndActivateTroupe rejected. Socket already appears to be associated with a troupe', {
         socketId: socketId,
         userId: userId
       });
@@ -179,12 +179,12 @@ function __associateSocketAndActivateTroupe(socketId, userId, troupeId, eyeballS
 }
 
 
-function userSocketConnected(userId, socketId, callback) {
+function userSocketConnected(userId, socketId, connectionType, callback) {
   assert(userId, 'userId expected');
   assert(socketId, 'socketId expected');
 
   _lockOnUser(userId, function(done) {
-    __associateSocketAndActivateUser(userId, socketId, function(err) {
+    __associateSocketAndActivateUser(userId, socketId, connectionType, function(err) {
       if(err) return done(function() { callback(err); } );
 
       done(callback);
@@ -239,7 +239,7 @@ function __eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
   assert(socketId, 'socketId expected');
   assert(troupeId, 'troupeId expected');
 
-  var keys = [_keySocketEyeballStatus(socketId), _keyTroupeUsers(troupeId)];
+  var keys = [_keySocketUser(socketId), _keyTroupeUsers(troupeId)];
   var values = [userId];
 
   scriptManager.run('presence-eyeballs-on', keys, values, function(err, result) {
@@ -248,7 +248,6 @@ function __eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
 
     if(!eyeballLock) {
       winston.silly('presence: __eyeBallsOnTroupe rejected. SETNX returned 0', {
-        key: _keySocketEyeballStatus(socketId),
         socketId: socketId,
         userId: userId
       });
@@ -274,7 +273,7 @@ function __eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
   assert(socketId, 'socketId expected');
   assert(troupeId, 'troupeId expected');
 
-  var keys = [_keySocketEyeballStatus(socketId), _keyTroupeUsers(troupeId)];
+  var keys = [_keySocketUser(socketId), _keyTroupeUsers(troupeId)];
   var values = [userId];
 
   scriptManager.run('presence-eyeballs-off', keys, values, function(err, result) {
@@ -283,19 +282,19 @@ function __eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
     var eyeballLock = result[0];
 
     if(!eyeballLock) {
-      winston.silly('presence: __eyeBallsOffTroupe rejected. SETNX returned 0', {
-        key: _keySocketEyeballStatus(socketId),
+      winston.silly('presence: __eyeBallsOffTroupe rejected. Eyeball value is already zero', {
         socketId: socketId,
         userId: userId
       });
 
-      return callback({ lockFail: true });
+      return callback();
     }
 
     var userInTroupeCount = parseInt(result[1], 10);
     var userHasLeftTroupe = userInTroupeCount <= 0;
     var troupeIsEmpty = result[2] === 0;
 
+    // WARNING: __disassociateSocketAndDeactivateUserAndTroupe has similar code!
     if(troupeIsEmpty && !userHasLeftTroupe) {
       winston.warn("presence: Troupe is empty, yet user has not left troupe. Something is fishy.", { troupeId: troupeId, socketId: socketId, userId: userId });
     }
@@ -316,11 +315,30 @@ function __eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
 
 }
 
+// Callback -> (err, { userId: X, troupeId: Y })
+function _lookupSocketOwnerAndTroupe(socketId, callback) {
+  redisClient.hmget(_keySocketUser(socketId), "uid", "tid", function(err, result) {
+    if(err) return callback(err);
+
+    callback(null, {
+      userId: result[0],
+      troupeId: result[1]
+    });
+  });
+}
+
 function lookupUserIdForSocket (socketId, callback) {
   assert(socketId, 'socketId expected');
 
-  redisClient.get(_keySocketUser(socketId), callback);
+  redisClient.hget(_keySocketUser(socketId), "uid", callback);
 }
+
+function lookupTroupeIdForSocket (socketId, callback) {
+  assert(socketId, 'socketId expected');
+
+  redisClient.hget(_keySocketUser(socketId), "tid", callback);
+}
+
 
 function findOnlineUsersForTroupe(troupeId, callback) {
   assert(troupeId, 'troupeId expected');
@@ -427,20 +445,22 @@ function clientEyeballSignal(userId, socketId, eyeballsOn, callback) {
   assert(userId, 'userId expected');
   assert(socketId, 'socketId expected');
 
-  redisClient.multi()
-    .get(_keySocketUser(socketId))        // 0 Check if this socket is owned by this user
-    .get(_keySocketTroupe(socketId))      // 1 Find the troupe associated with the socket
-    .exec(function(err, replies) {
+  _lookupSocketOwnerAndTroupe(socketId, function(err, socketInfo) {
     if(err) return callback(err);
+    if(!socketInfo) {
+      winston.warn("User " + userId + " attempted to eyeball missing socket " + socketId);
+      return callback('Invalid socketId');
+    }
 
-    var userId2 = replies[0];
+    var userId2 = socketInfo.userId;
     if(userId !== userId2) {
       winston.warn("User " + userId + " attempted to eyeball socket " + socketId + " but that socket belongs to " + userId2);
       return callback('Invalid socketId');
     }
 
-    var troupeId = replies[1];
+    var troupeId = socketInfo.troupeId;
     if(!troupeId) return callback('Socket is not associated with a troupe');
+
 
     _lockOnUser(userId, function(done) {
       function unlock(err, result) {
