@@ -6,14 +6,20 @@ var redis = require("../utils/redis"),
     winston = require('winston'),
     events = require('events'),
     assert = require('assert'),
+    Fiber = require('../utils/fiber'),
     appEvents = require('../app-events.js'),
     Q = require('q'),
     _ = require("underscore");
+
 
 var presenceService = new events.EventEmitter();
 
 var redisClient = redis.createClient();
 var redisLock = require("redis-lock")(redis.createClient());
+
+var Scripto = require('redis-scripto');
+var scriptManager = new Scripto(redisClient);
+scriptManager.loadFromDir(__dirname + '/../../redis-lua/presence');
 
 
 var prefix = nconf.get('presence:prefix') + ':';
@@ -55,10 +61,15 @@ function __associateSocketAndActivateUser(userId, socketId, callback) {
   assert(userId, 'userId expected');
   assert(socketId, 'socketId expected');
 
-  redisClient.setnx(_keySocketUser(socketId), userId, function(err, reply) {
+  var keys = [_keySocketUser(socketId), ACTIVE_USERS_KEY, ACTIVE_SOCKETS_KEY];
+  var values = [userId, socketId];
+
+  scriptManager.run('presence-associate', keys, values, function(err, result) {
     if(err) return callback(err);
 
-    if(reply === 0)  {
+    var lockSuccess = result[0];
+
+    if(!lockSuccess)  {
       winston.silly('presence: __associateSocketAndActivateUser rejected. SETNX returned 0', {
         key: _keySocketUser(socketId),
         socketId: socketId,
@@ -68,24 +79,19 @@ function __associateSocketAndActivateUser(userId, socketId, callback) {
       return callback({ lockFail: true });
     }
 
-    redisClient.multi()
-      .zincrby(ACTIVE_USERS_KEY, 1, userId)              // 0 Add user to active users
-      .sadd(ACTIVE_SOCKETS_KEY, socketId)             // 1 Add socket to list of active sockets
-      .exec(function(err, replies) {
-        if(err) return callback(err);
-        var userSocketCount = parseInt(replies[0], 10);
-        var saddResult = replies[1];
+    var userSocketCount = parseInt(result[1], 10);
+    var saddResult = result[2];
 
-        if(saddResult != 1) {
-          winston.warn("presence: Socket has already been added to active sockets. Something fishy is happening.");
-        }
+    if(saddResult != 1) {
+      winston.warn("presence: Socket has already been added to active sockets. Something fishy is happening.");
+    }
 
-        if(userSocketCount === 1) {
-          presenceService.emit('userOnline', userId);
-        }
+    if(userSocketCount === 1) {
+      presenceService.emit('userOnline', userId);
+    }
 
-        return callback(null, userSocketCount);
-      });
+    return callback(null, userSocketCount);
+
   });
 }
 
@@ -94,10 +100,14 @@ function __disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callba
   assert(userId, 'userId expected');
   assert(socketId, 'socketId expected');
 
-  redisClient.del(_keySocketUser(socketId), function(err, reply) {
+  var keys = [_keySocketUser(socketId), ACTIVE_USERS_KEY, ACTIVE_SOCKETS_KEY, _keySocketTroupe(socketId)];
+  var values = [userId, socketId];
+
+  scriptManager.run('presence-disassociate', keys, values, function(err, result) {
     if(err) return callback(err);
 
-    if(reply === 0) {
+    var deleteSuccess = result[0];
+    if(!deleteSuccess) {
       winston.silly('presence: __disassociateSocketAndDeactivateUserAndTroupe rejected. DEL returned 0', {
         key: _keySocketUser(socketId),
         socketId: socketId,
@@ -107,47 +117,38 @@ function __disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callba
       return callback({ lockFail: true });
     }
 
-    redisClient.multi()
-      .zincrby(ACTIVE_USERS_KEY, -1, userId)              // 0 Add user to active users
-      .zremrangebyscore(ACTIVE_USERS_KEY, '-inf', '0')    // 1 remove everyone with a score of zero
-      .srem(ACTIVE_SOCKETS_KEY, socketId)              // 2 Add socket to list of active sockets
-      .get(_keySocketTroupe(socketId))                 // 3 Get the troupe associated with this socket
-      .del(_keySocketTroupe(socketId))                 // 4 Delete the troupe socket association
-      .exec(function(err, replies) {
-        if(err) return callback(err);
+    var userSocketCount = parseInt(result[1], 10);
+    var sremResult = result[2];
+    var troupeId = result[3];
 
-        var userSocketCount = parseInt(replies[0], 10);
-        var sremResult = replies[2];
-        var troupeId = replies[3];
+    if(sremResult != 1) {
+      winston.warn("presence: Socket has already been removed from active sockets. Something fishy is happening.");
+    }
 
-        if(sremResult != 1) {
-          winston.warn("presence: Socket has already been removed from active sockets. Something fishy is happening.");
-        }
+    // If the socket is not associated with a troupe, this is where it ends
+    if(!troupeId) {
+      if(userSocketCount === 0) {
+        presenceService.emit('userOffline', userId);
+      }
 
-        // If the socket is not associated with a troupe, this is where it ends
-        if(!troupeId) {
-          if(userSocketCount === 0) {
-            presenceService.emit('userOffline', userId);
-          }
+      return callback();
+    }
 
-          return callback();
-        }
+    __eyeBallsOffTroupe(userId, socketId, troupeId, function(err) {
+      if(err && !err.lockFail) {
+        // Don't fail if the eyeballs are already off
+        return callback(err);
+      }
 
-        __eyeBallsOffTroupe(userId, socketId, troupeId, function(err) {
-          if(err && !err.lockFail) {
-            // Don't fail if the eyeballs are already off
-            return callback(err);
-          }
+      if(userSocketCount === 0) {
+        presenceService.emit('userOffline', userId);
+      }
 
-          if(userSocketCount === 0) {
-            presenceService.emit('userOffline', userId);
-          }
+      return callback();
+    });
 
-          return callback();
-        });
-
-      });
   });
+
 }
 
 function __associateSocketAndActivateTroupe(socketId, userId, troupeId, eyeballState, callback) {
@@ -238,10 +239,14 @@ function __eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
   assert(socketId, 'socketId expected');
   assert(troupeId, 'troupeId expected');
 
-  redisClient.setnx(_keySocketEyeballStatus(socketId), 1, function(err, result) {
-    if(err) return callback(err);
+  var keys = [_keySocketEyeballStatus(socketId), _keyTroupeUsers(troupeId)];
+  var values = [userId];
 
-    if(!result) {
+  scriptManager.run('presence-eyeballs-on', keys, values, function(err, result) {
+    if(err) return callback(err);
+    var eyeballLock = result[0];
+
+    if(!eyeballLock) {
       winston.silly('presence: __eyeBallsOnTroupe rejected. SETNX returned 0', {
         key: _keySocketEyeballStatus(socketId),
         socketId: socketId,
@@ -250,17 +255,15 @@ function __eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
       return callback({ lockFail: true });
     }
 
-    // increment the score for user in troupe_users zset
-    redisClient.zincrby(_keyTroupeUsers(troupeId), 1, userId, function(err, reply) {
-      if(err) return callback(err);
 
-      var userScore = parseInt(reply, 10);                   // Score for user is returned as a string
-      if(userScore == 1) {
-        presenceService.emit('userJoinedTroupe', userId, troupeId);
-      }
+    var userScore = parseInt(result[1], 10);                   // Score for user is returned as a string
+    if(userScore == 1) {
+      presenceService.emit('userJoinedTroupe', userId, troupeId);
+    }
 
-      return callback();
-    });
+    appEvents.eyeballSignal(userId, troupeId, true);
+
+    return callback();
 
   });
 
@@ -271,10 +274,15 @@ function __eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
   assert(socketId, 'socketId expected');
   assert(troupeId, 'troupeId expected');
 
-  redisClient.del(_keySocketEyeballStatus(socketId), function(err, result) {
+  var keys = [_keySocketEyeballStatus(socketId), _keyTroupeUsers(troupeId)];
+  var values = [userId];
+
+  scriptManager.run('presence-eyeballs-off', keys, values, function(err, result) {
     if(err) return callback(err);
 
-    if(result === 0) {
+    var eyeballLock = result[0];
+
+    if(!eyeballLock) {
       winston.silly('presence: __eyeBallsOffTroupe rejected. SETNX returned 0', {
         key: _keySocketEyeballStatus(socketId),
         socketId: socketId,
@@ -284,32 +292,26 @@ function __eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
       return callback({ lockFail: true });
     }
 
-    var key =  _keyTroupeUsers(troupeId);
-    redisClient.multi()
-      .zincrby(key, -1, userId)            // 0 decrement the score for user in troupe_users zset
-      .zremrangebyscore(key, '-inf', '0')  // 1 remove everyone with a score of zero (no longer in the troupe)
-      .zcard(key)                          // 2 count the number of users left in the set
-      .exec(function(err, replies) {
-        if(err) return callback(err);
+    var userInTroupeCount = parseInt(result[1], 10);
+    var userHasLeftTroupe = userInTroupeCount <= 0;
+    var troupeIsEmpty = result[2] === 0;
 
-        var userInTroupeCount = parseInt(replies[0], 10);
-        var userHasLeftTroupe = userInTroupeCount <= 0;
-        var troupeIsEmpty = replies[2] === 0;
+    if(troupeIsEmpty && !userHasLeftTroupe) {
+      winston.warn("presence: Troupe is empty, yet user has not left troupe. Something is fishy.", { troupeId: troupeId, socketId: socketId, userId: userId });
+    }
 
-        if(troupeIsEmpty && !userHasLeftTroupe) {
-          winston.warn("presence: Troupe is empty, yet user has not left troupe. Something is fishy.", { troupeId: troupeId, socketId: socketId, userId: userId });
-        }
+    if(userHasLeftTroupe) {
+      presenceService.emit('userLeftTroupe', userId, troupeId);
+    }
 
-        if(userHasLeftTroupe) {
-          presenceService.emit('userLeftTroupe', userId, troupeId);
-        }
+    appEvents.eyeballSignal(userId, troupeId, false);
 
-        if(troupeIsEmpty) {
-          presenceService.emit('troupeEmpty', troupeId);
-        }
+    if(troupeIsEmpty) {
+      presenceService.emit('troupeEmpty', troupeId);
+    }
 
-        return callback();
-      });
+    return callback();
+
   });
 
 }
@@ -337,27 +339,55 @@ function categorizeUsersByOnlineStatus(userIds, callback) {
   var key = prefix + "presence_temp_set:" + process.pid + ":" + t[0] + ":" + t[1];
   var out_key = prefix + "presence_temp_set:" + process.pid + ":" + t[0] + ":" + t[1] + '_out';
 
-  var zaddArgs = [key];
-  userIds.forEach(function(id) {
-    zaddArgs.push(0, id);
+  var keys = [key, out_key, ACTIVE_USERS_KEY];
+  var values = userIds;
+
+  scriptManager.run('presence-categorize-users', keys, values, function(err, onlineUsers) {
+    var result = {};
+    if(onlineUsers) onlineUsers.forEach(function(userId) {
+      result[userId] = 'online';
+    });
+
+    return callback(null, result);
   });
 
-  redisClient.multi()
-    .zadd(zaddArgs)                                 // 0 create zset of users
-    .zinterstore(out_key, 2, ACTIVE_USERS_KEY,key)     // 1 intersect with online users
-    .zrangebyscore(out_key, 1, '+inf')              // 2 return all online users
-    .del(key, out_key)                              // 3 delete the keys
-    .exec(function(err, replies) {
-      if(err) return callback(err);
+}
 
-      var onlineUsers = replies[2];
-      var result = {};
-      if(onlineUsers) onlineUsers.forEach(function(userId) {
-        result[userId] = 'online';
-      });
+function categorizeUserTroupesByOnlineStatus(userTroupes, callback) {
+  var f = new Fiber();
 
-      return callback(null, result);
-      });
+  var troupeIds = _.uniq(userTroupes.map(function(userTroupe) { return userTroupe.troupeId; }));
+  var userIds = _.uniq(userTroupes.map(function(userTroupe) { return userTroupe.userId; }));
+
+  listOnlineUsersForTroupes(troupeIds, f.waitor());
+  categorizeUsersByOnlineStatus(userIds, f.waitor());
+
+  f.all().spread(function(troupeOnlineUsers, statii) {
+    var inTroupe = [];
+    var online = [];
+    var offline = [];
+
+    userTroupes.forEach(function(userTroupe) {
+      var userId = userTroupe.userId;
+      var troupeId = userTroupe.troupeId;
+
+      var onlineForTroupe = troupeOnlineUsers[troupeId];
+      if(onlineForTroupe.indexOf() >= 0) {
+        inTroupe.push(userTroupe);
+      } else if(statii[userId] == 'online') {
+        online.push(userTroupe);
+      } else {
+        offline.push(userTroupe);
+      }
+    });
+
+    callback(null, {
+      inTroupe: inTroupe,
+      online: online,
+      offline: offline
+    });
+
+  }, callback);
 }
 
 function listOnlineUsers(callback) {
@@ -518,6 +548,7 @@ presenceService.findOnlineUsersForTroupe =  findOnlineUsersForTroupe;
 presenceService.categorizeUsersByOnlineStatus =  categorizeUsersByOnlineStatus;
 presenceService.listOnlineUsers =  listOnlineUsers;
 presenceService.listOnlineUsersForTroupes =  listOnlineUsersForTroupes;
+presenceService.categorizeUserTroupesByOnlineStatus = categorizeUserTroupesByOnlineStatus;
 
 // Eyeball
 presenceService.clientEyeballSignal =  clientEyeballSignal;

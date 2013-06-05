@@ -25,4 +25,10 @@ Fiber.prototype.all = Fiber.prototype.sync = function() {
   return Q.all(this.waitingFor);
 };
 
+
+// effectively syncs the fiber
+Fiber.prototype.thenCallback = function(callback) {
+  return Q.all(this.waitingFor).then(function() { callback(); }, callback);
+};
+
 module.exports = Fiber;

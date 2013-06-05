@@ -80,7 +80,7 @@ exports.startWorkers = function() {
   }
 
   jobs.process('email', 20, function(job, done) {
-    sendEmailDirect(job.data, done);
+    sendEmailDirect(job.data, kue.wrapCallback(job, done));
   });
 };
 

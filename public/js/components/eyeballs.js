@@ -98,6 +98,20 @@ define([
   $(window).on('scroll', updateLastUserInteraction);
   $(document).on('mousemove', updateLastUserInteraction);
 
+  // Cordova specific events
+  document.addEventListener("pause", function() {
+    window.setTimeout(function() {
+      eyeballsOff();
+    }, 0);
+  }, false);
+
+  document.addEventListener("resume", function() {
+    window.setTimeout(function() {
+      eyeballsOn();
+    }, 0);
+  }, false);
+
+
   startInactivityPoller();
 
   var inactivityTimer;

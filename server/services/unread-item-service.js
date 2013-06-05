@@ -8,13 +8,20 @@ var _ = require("underscore");
 var redis = require("../utils/redis");
 var winston = require("winston");
 var redisClient = redis.createClient();
-var ObjectID = require('mongodb').ObjectID;
-
+var mongoUtils = require('../utils/mongo-utils');
+var Fiber = require('../utils/fiber');
 var kue = require('../utils/kue'),
     jobs;
 
 var DEFAULT_ITEM_TYPES = ['file', 'chat', 'request'];
 
+function sinceFilter(since) {
+  return function(id) {
+    var date = mongoUtils.getDateFromObjectId(id);
+    return date.getTime() >= since;
+  };
+
+}
 exports.startWorkers = function() {
   function republishUnreadItemCountForUserTroupeWorker(data, callback) {
     var userId = data.userId;
@@ -36,7 +43,7 @@ exports.startWorkers = function() {
 
   jobs = kue.createQueue();
   jobs.process('republish-unread-item-count-for-user-troupe', 20, function(job, done) {
-    republishUnreadItemCountForUserTroupeWorker(job.data, done);
+    republishUnreadItemCountForUserTroupeWorker(job.data, kue.wrapCallback(job, done));
   });
 };
 
@@ -86,10 +93,8 @@ exports.newItem = function(troupeId, creatorUserId, itemType, itemId) {
 };
 
 exports.removeItem = function(troupeId, itemType, itemId) {
-  troupeService.findById(troupeId, function(err, troupe) {
+  troupeService.findUserIdsForTroupe(troupeId, function(err, userIds) {
     if(err) return winston.error("Unable to load troupeId " + troupeId, err);
-
-    var userIds = troupe.getUserIds();
 
     var data = {};
     data[itemType] = [itemId];
@@ -207,6 +212,29 @@ exports.getUnreadItems = function(userId, troupeId, itemType, callback) {
     });
 };
 
+exports.getUnreadItemsForUserTroupeSince = function(userId, troupeId, since, callback) {
+  var f = new Fiber();
+  exports.getUnreadItems(userId, troupeId, 'chat', f.waitor());
+  exports.getUnreadItems(userId, troupeId, 'file', f.waitor());
+  f.all().then(function(results) {
+    var chatItems = results[0];
+    var fileItems = results[1];
+
+    chatItems = chatItems.filter(sinceFilter(since));
+    fileItems = fileItems.filter(sinceFilter(since));
+
+    var response = {};
+    if(chatItems.length) {
+      response.chat = chatItems;
+    }
+    if(fileItems.length) {
+      response.file = fileItems;
+    }
+
+    callback(null,response);
+  }, callback);
+};
+
 exports.getFirstUnreadItem = function(userId, troupeId, itemType, callback) {
     exports.getUnreadItems(userId, troupeId, itemType, function(err, members) {
       if(err) {
@@ -299,8 +327,7 @@ function getOldestId(ids) {
 
   return _.min(ids, function(id) {
     // Create a new ObjectID with a specific timestamp
-    var objectId = new ObjectID(id);
-    return objectId.getTimestamp().getTime();
+    return mongoUtils.getTimestampFromObjectId(id);
   });
 }
 
@@ -328,5 +355,6 @@ exports.install = function() {
 };
 
 exports.testOnly = {
-  getOldestId: getOldestId
+  getOldestId: getOldestId,
+  sinceFilter: sinceFilter
 };

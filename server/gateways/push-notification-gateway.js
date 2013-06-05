@@ -33,13 +33,16 @@ exports.startWorkers = function() {
     pushNotificationService.findDevicesForUsers(userIds, function(err, devices) {
       if(err) return callback(err);
 
-      winston.verbose("Sending to " + devices.length + " potential devices for " + userIds.length + " users");
+      winston.verbose("push-gateway: Sending to " + devices.length + " potential devices for " + userIds.length + " users");
 
       devices.forEach(function(device) {
         var sent = false;
 
-        if((device.deviceType === 'APPLE' || device.deviceType === 'APPLE-DEV') && device.appleToken) {
-          winston.info("Sending apple push notification", { notification: notification });
+        if((device.deviceType === 'APPLE' ||
+            device.deviceType === 'APPLE-DEV' ||
+            device.deviceType === 'APPLE-BETA' ||
+            device.deviceType === 'APPLE-BETA-DEV') && device.appleToken) {
+          winston.info("push-gateway: Sending apple push notification", { userId: device.userId, notification: notification });
           var note = new apns.Notification();
 
           if(badge >= 0) {
@@ -63,15 +66,30 @@ exports.startWorkers = function() {
 
           note.pushDevice = device;
 
-          //winston.debug('Sending notification ', note);
+          switch(device.deviceType) {
+            case 'APPLE':
+              apnsConnection.sendNotification(note);
+              break;
 
-          if(device.deviceType === 'APPLE') {
-            apnsConnection.sendNotification(note);
-          } else {
-            apnsConnectionDev.sendNotification(note);
+            case 'APPLE-BETA-DEV':
+              apnsConnectionBetaDev.sendNotification(note);
+              break;
+
+
+            case 'APPLE-BETA':
+              apnsConnectionBeta.sendNotification(note);
+              break;
+
+            case 'APPLE-DEV':
+              apnsConnectionDev.sendNotification(note);
+              break;
+            default:
+              winston.warn('Unknown device type: ' + device.deviceType);
           }
 
           sent = true;
+        } else {
+          winston.warn('Unknown device type: ' + device.deviceType);
         }
 
         // Android/google push notification goes here
@@ -96,7 +114,7 @@ exports.startWorkers = function() {
     var errorDescription = errorDescriptions[err];
 
     if(err === 8 && notification.pushDevice) {
-      winston.error("Removing invalid device ");
+      winston.error("Removing invalid device ", { device: notification.pushDevice });
       notification.pushDevice.remove();
       return;
     }
@@ -109,7 +127,7 @@ exports.startWorkers = function() {
   }
 
   winston.info("Starting APN");
-  var apnsConnection = new apns.Connection({
+  var apnsConnectionDev = new apns.Connection({
       cert: nconf.get('apn:certDev'),
       key: nconf.get('apn:keyDev'),
       gateway: nconf.get('apn:gatewayDev'),
@@ -118,7 +136,25 @@ exports.startWorkers = function() {
       connectionTimeout: 60000
   });
 
-  var apnsConnectionDev = new apns.Connection({
+  var apnsConnectionBetaDev = new apns.Connection({
+      cert: nconf.get('apn:certBetaDev'),
+      key: nconf.get('apn:keyBetaDev'),
+      gateway: nconf.get('apn:gatewayBetaDev'),
+      enhanced: true,
+      errorCallback: errorEventOccurred,
+      connectionTimeout: 60000
+  });
+
+  var apnsConnectionBeta = new apns.Connection({
+      cert: nconf.get('apn:certBeta'),
+      key: nconf.get('apn:keyBeta'),
+      gateway: nconf.get('apn:gatewayBeta'),
+      enhanced: true,
+      errorCallback: errorEventOccurred,
+      connectionTimeout: 60000
+  });
+
+  var apnsConnection = new apns.Connection({
       cert: nconf.get('apn:certProd'),
       key: nconf.get('apn:keyProd'),
       gateway: nconf.get('apn:gatewayProd'),
@@ -142,6 +178,22 @@ exports.startWorkers = function() {
 
 
   new apns.Feedback({
+      cert: nconf.get('apn:certBetaDev'),
+      key: nconf.get('apn:keyBetaDev'),
+      gateway: nconf.get('apn:feedbackBetaDev'),
+      feedback: failedDeliveryEventOccurred,
+      interval: nconf.get('apn:feedbackInterval')
+  });
+
+  new apns.Feedback({
+      cert: nconf.get('apn:certBeta'),
+      key: nconf.get('apn:keyBeta'),
+      gateway: nconf.get('apn:feedbackBeta'),
+      feedback: failedDeliveryEventOccurred,
+      interval: nconf.get('apn:feedbackInterval')
+  });
+
+  new apns.Feedback({
       cert: nconf.get('apn:certProd'),
       key: nconf.get('apn:keyProd'),
       gateway: nconf.get('apn:feedbackProd'),
@@ -150,7 +202,7 @@ exports.startWorkers = function() {
   });
 
   jobs.process('push-notification', 20, function(job, done) {
-    directSendUserNotification(job.data.userIds, job.data.notification, done);
+    directSendUserNotification(job.data.userIds, job.data.notification, kue.wrapCallback(job, done));
   });
 };
 

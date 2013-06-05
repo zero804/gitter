@@ -43,6 +43,30 @@ describe('presenceService', function() {
 
   });
 
+  it('should allow a user to connect', function(done) {
+    var userId = 'TESTUSER1' + Date.now();
+    var socketId = 'TESTSOCKET1' + Date.now();
+    presenceService.userSocketConnected(userId, socketId, function(err) {
+      if(err) return done(err);
+
+      done();
+    });
+  });
+
+  it('should allow a user to connect and then disconnect', function(done) {
+    var userId = 'TESTUSER1' + Date.now();
+    var socketId = 'TESTSOCKET1' + Date.now();
+    presenceService.userSocketConnected(userId, socketId, function(err) {
+      if(err) return done(err);
+
+      presenceService.socketDisconnected(socketId, function(err) {
+        done(err);
+      });
+
+    });
+  });
+
+
   it('users presence should appear and disappear as expected', function(done) {
     var userId = 'TESTUSER1' + Date.now();
     var socketId = 'TESTSOCKET1' + Date.now();

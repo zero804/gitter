@@ -49,7 +49,7 @@ RedisBatcher.prototype = {
     var self = this;
 
     this.jobs.process('redis-batch-' + this.name, 20, function(job, done) {
-      self.dequeue(job.data.key, handler, done);
+      self.dequeue(job.data.key, handler, kue.wrapCallback(job, done));
     });
   },
 
