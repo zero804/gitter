@@ -291,7 +291,7 @@ var userService = {
             return callback("User already has a password set");
           }
 
-          user.status = 'ACTIVE';
+          userService.setStatusActive(user);
           // set password and save
           generateNewHash(function() {
             user.save(callback);
@@ -365,6 +365,21 @@ var userService = {
       }
 
     });
+  },
+
+  // this does not save the user object
+  setStatusActive: function(user) {
+
+    user.status = 'ACTIVE';
+
+    // delete all used invites now that the user doesn't need them to login
+
+    // note: it would be better if this was only called after the user was saved, but updateProfile async hell at the moment.
+    userService.deleteAllUsedInvitesForUser(user);
+  },
+
+  deleteAllUsedInvitesForUser: function(user) {
+    persistence.Invite.remove({ userId: user.id, status: "USED" });
   }
 
 };

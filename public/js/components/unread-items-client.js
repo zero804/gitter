@@ -426,6 +426,7 @@ define([
   // even though we don't always have a reference to TroupeNotifier internally.
   // TODO: fix this enormous hack!
   var counts = {
+    other: 0,
     overall: null,
     normal: null,
     oneToOne: null,
@@ -453,7 +454,7 @@ define([
 
       var c = this._collection;
 
-      var newTroupeUnreadTotal = c.reduce(count, 0);
+      var newTroupeUnreadTotal = c.reduce(count, counts.other);
       var newPplTroupeUnreadTotal = c.filter(function(trp) { return trp.get('oneToOne'); }).reduce(count, 0);
       var newNormalTroupeUnreadTotal = c.filter(function(trp) { return !trp.get('oneToOne'); }).reduce(count, 0);
 
@@ -605,11 +606,17 @@ define([
     // This method sucks. TODO: make it not suck
     getCounts: function() {
       return {
+        others: counts.other,
         overall: counts.overall,
         normal: counts.normal,
         oneToOne: counts.oneToOne,
         current: unreadItemStore._currentCount()
       };
+    },
+
+    setOtherCount: function(count) {
+      counts.other = count;
+      // Note: this should trigger a recount but that is done from the caller because we don't have a reference to the TroupeNotifier instance.
     },
 
     hasItemBeenMarkedAsRead: function(itemType, itemId) {

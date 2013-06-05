@@ -245,8 +245,12 @@ TroupeRemovedUserSchema.schemaTypeName = 'TroupeRemovedUserSchema';
 //
 var InviteSchema = new Schema({
   troupeId: ObjectId,
+  senderDisplayName: { type: String },
   displayName: { type: String },
   email: { type: String },
+  userId: ObjectId,
+  createdAt: { type: Date, default: Date.now },
+  emailSentAt: { type: Date },
   code: { type: String },
   status: { type: String, "enum": ['UNUSED', 'USED'], "default": 'UNUSED'},
   _tv: { type: 'MongooseNumber', 'default': 0 }

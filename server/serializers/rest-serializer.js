@@ -602,16 +602,23 @@ function NotificationStrategy() {
 function InviteStrategy(options) {
   if(!options) options = {};
 
-  this.preload = function(items, callback) {
-    callback(null);
+  var troupeIdStrategy = new TroupeIdStrategy(options);
+
+  this.preload = function(invites, callback) {
+    var troupeIds = invites.map(function(invite) { return invite.troupeId; });
+    troupeIdStrategy.preload(troupeIds, callback);
   };
 
   this.map = function(item) {
+    var troupe = troupeIdStrategy.map(item.troupeId);
     return {
       id: item._id,
-      displayName: item.displayName,
-      email: item.email,
-      avatarUrlSmall: '/images/2/avatar-default.png', // TODO: fix
+      troupeUrl: (troupe) ? '/' + troupe.uri : undefined,
+      troupeName: (troupe) ? troupe.name : undefined,
+      senderDisplayName: item.senderDisplayName,
+      // displayName: item.displayName,
+      // email: item.email,
+      // avatarUrlSmall: '/images/2/avatar-default.png', // TODO: fix
       v: getVersion(item)
     };
   };

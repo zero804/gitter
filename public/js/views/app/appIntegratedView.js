@@ -158,6 +158,7 @@ define([
       collections['unreadTroupes'].on('all', toggleUnreads);
       collections['favouriteTroupes'].on('all', toggleFavs);
       collections['recentTroupes'].on('all', toggleRecents);
+      collections['incomingInvites'].on('all', toggleInvites);
 
       function toggleUnreads() {
         $('#unreadTroupesList').toggle(collections['unreadTroupes'].length > 0);
@@ -171,9 +172,14 @@ define([
         $('#recentTroupesList').toggle(collections['recentTroupes'].length > 0);
       }
 
+      function toggleInvites() {
+        $('#invitesList').toggle(collections['incomingInvites'].length > 0);
+      }
+
       toggleUnreads();
       toggleFavs();
       toggleRecents();
+      toggleInvites();
     },
 
     updateTitlebar: function(values) {

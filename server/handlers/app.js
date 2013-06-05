@@ -59,12 +59,15 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
 
     function sendPage(troupeData) {
 
-      var accessDenied;
+      var accessDenied, inviteId;
 
       if(req.user) {
         if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
           accessDenied = true;
           troupeData = null;
+
+          // get the invite reference loaded in preload middleware (if any)
+          inviteId = (req.invite) ? req.invite.id : null;
         }
 
         var status = req.user.status;
@@ -100,6 +103,7 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
           accessToken: accessToken,
           profileNotCompleted: profileNotCompleted,
           accessDenied: accessDenied,
+          inviteId: inviteId,
           appVersion: appVersion.getCurrentVersion(),
           baseServer: nconf.get('web:baseserver'),
           basePort: nconf.get('web:baseport'),
@@ -242,10 +246,29 @@ function preloadTroupeMiddleware(req, res, next) {
     if(!troupe) return next({ errorCode: 404 });
     if(troupe.status != 'ACTIVE') return next({ errorCode: 404 });
     req.troupe = troupe;
+
+    // check if the user has access
+    if(req.user && !troupeService.userHasAccessToTroupe(req.user, troupe)) {
+      // if not, check if the user has an unused invite
+      troupeService.findUnusedInviteToTroupeForEmail(req.user.email, troupe.id, function(err, invite) {
+        if (err) next(err);
+
+        if (invite) {
+          req.invite = invite;
+        }
+
+        next();
+      });
+
+      return;
+    }
+
     next();
   });
 
 }
+
+// TODO preload invites?
 
 function preloadOneToOneTroupeMiddleware(req, res, next) {
   if (!req.user) {
