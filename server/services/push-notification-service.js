@@ -12,7 +12,7 @@ var redis = require("../utils/redis"),
 
 var Scripto = require('redis-scripto');
 var scriptManager = new Scripto(redisClient);
-scriptManager.loadFromDir(__dirname + '/../../redis-lua');
+scriptManager.loadFromDir(__dirname + '/../../redis-lua/notify');
 
 var minimumUserAlertIntervalS = nconf.get("notifications:minimumUserAlertInterval");
 
@@ -29,7 +29,7 @@ function buffersEqual(a,b) {
 
   return true;
 }
-exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName, callback) {
+exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName, appVersion, appBuild, callback) {
   var tokenHash = crypto.createHash('md5').update(deviceToken).digest('hex');
 
   PushNotificationDevice.findOneAndUpdate(
@@ -40,7 +40,9 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
       tokenHash: tokenHash,
       deviceType: deviceType,
       deviceName: deviceName,
-      timestamp: new Date()
+      timestamp: new Date(),
+      appVersion: appVersion,
+      appBuild: appBuild
     },
     { upsert: true },
     function(err, device) {
@@ -53,7 +55,7 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
         var fiber = new Fiber();
 
         results.forEach(function(device) {
-          // This device? Ski
+          // This device? Skip
           if(device.deviceId == deviceId) return;
 
           // If the hashes are the same, we still need to check that the actual tokens are the same
