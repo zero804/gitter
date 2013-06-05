@@ -6,8 +6,6 @@ var testRequire = require('./test-require');
 
 var presenceService = testRequire('./services/presence-service');
 
-require('longjohn');
-
 var assert = require('assert');
 var winston = testRequire("./utils/winston");
 var Q = require("q");
