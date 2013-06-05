@@ -57,7 +57,8 @@
     "geckoboard-push": "0.0.5",
     "mongoose-number": "0.0.2",
     "redis-lock": "0.0.4",
-    "mongodb": "~1.1.11"
+    "mongodb": "~1.1.11",
+    "redis-scripto": "~0.1.2"
   },
   "devDependencies": {
     "proxyquire": "0.4.0",

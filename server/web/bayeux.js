@@ -160,8 +160,6 @@ var authenticator = {
       return callback(message);
     }
 
-    winston.verbose('bayeux: Authenticating client', message);
-
     if(messageIsFromSuperClient(message)) {
       return callback(message);
     }
