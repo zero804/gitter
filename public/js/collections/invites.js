@@ -9,7 +9,7 @@ define([
 
   var exports = {};
 
-  exports.RequestModel = TroupeCollections.Model.extend({
+  exports.InviteModel = TroupeCollections.Model.extend({
     idAttribute: "id",
 
     defaults: {
@@ -20,10 +20,15 @@ define([
 
   });
 
-  exports.RequestCollection = TroupeCollections.LiveCollection.extend({
-    model: exports.RequestModel,
+  exports.InviteCollection = TroupeCollections.LiveCollection.extend({
+    model: exports.InviteModel,
     modelName: 'invite',
-    nestedUrl: "invites"
+    nestedUrl: "invites",
+
+    initialize: function() {
+      this.url = "/user/" + window.troupeContext.user.id + "/invites";
+    }
+
   });
 
   return exports;
