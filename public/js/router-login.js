@@ -5,11 +5,12 @@ require([
   'backbone',
   './base-router',
   'views/base',
+  'views/invite/inviteModal',
   'views/login/loginModalView',
   'views/profile/profileView',
   'views/login/loginRequestModalView',
   'collections/troupes'
-], function($, _, Backbone, BaseRouter, TroupeViews, LoginModalView, profileView, RequestModalView, troupeModels) {
+], function($, _, Backbone, BaseRouter, TroupeViews, InviteModal, LoginModalView, profileView, RequestModalView, troupeModels) {
   "use strict";
 
   var AppRouter = BaseRouter.extend({
@@ -81,9 +82,17 @@ require([
           }
         });
 
-        view = new RequestModalView({ authenticated: true });
-        modal = new TroupeViews.Modal({ view: view, disableClose: true });
-        modal.show();
+        var inviteId = window.troupeContext.inviteId;
+        if (inviteId) {
+          // if the user has an invite to this troupe show the invite accept / reject modal
+          (new InviteModal({ inviteId: inviteId })).show();
+        }
+        else {
+          view = new RequestModalView({ authenticated: true });
+          modal = new TroupeViews.Modal({ view: view, disableClose: true });
+          modal.show();
+        }
+
         return;
       }
     }
