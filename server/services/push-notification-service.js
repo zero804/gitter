@@ -46,6 +46,8 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
     },
     { upsert: true },
     function(err, device) {
+      if(err) return callback(err);
+
       // After we've update the device, look for other devices that have given us the same token
       // these are probably phones that have been reset etc, so we need to prune them
       PushNotificationDevice.find({

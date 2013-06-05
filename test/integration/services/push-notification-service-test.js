@@ -2,7 +2,7 @@
 /*global describe:true, it: true */
 "use strict";
 
-var testRequire = require('./test-require');
+var testRequire = require('../test-require');
 
 var pushNotificationService = testRequire('./services/push-notification-service');
 var persistenceService = testRequire('./services/persistence-service');
@@ -13,11 +13,12 @@ describe('pushNotificationService', function() {
   describe('#registerDevice()', function() {
     it('should prune unused old devices', function(done) {
       var token = new Buffer('TESTTOKEN');
-      pushNotificationService.registerDevice('DEVICE1', 'TEST', token, 'TESTDEVICE', function(err, device) {
+
+      pushNotificationService.registerDevice('DEVICE1', 'TEST', token, 'TESTDEVICE', '1.0.1', '122', function(err, device) {
         if(err) return done(err);
 
         // Different device, same token
-        pushNotificationService.registerDevice('DEVICE2', 'TEST', token, 'OTHERTESTDEVICE', function(err, device) {
+        pushNotificationService.registerDevice('DEVICE2', 'TEST', token, 'OTHERTESTDEVICE', '1.0.1', '122', function(err, device) {
           if(err) return done(err);
 
           persistenceService.PushNotificationDevice.find({ deviceType: 'TEST', deviceId: 'DEVICE1' }, function(err, devices) {
@@ -25,8 +26,8 @@ describe('pushNotificationService', function() {
 
             assert.equal(devices.length, 0);
 
+            done();
           });
-          done();
         });
 
 
