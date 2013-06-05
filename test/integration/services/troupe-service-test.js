@@ -15,7 +15,144 @@ var once = times(1);
 
 var fixture = {};
 
-function testInviteAcceptance(email, userStatus, emailNotificationConfirmationMethod, done) {
+function testDelayedInvite(email, troupeUri, isOnline, done) {
+  var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+  var troupeService = testRequire.withProxies("./services/troupe-service", {
+    './email-notification-service': emailNotificationServiceMock,
+    './presence-service': {
+      categorizeUsersByOnlineStatus: function(userIds, callback) {
+          var map = {};
+          for (var a = 0; a < userIds.length; a++)
+            map[userIds[a]] = isOnline;
+          callback(null, map);
+        }
+      }
+  });
+
+  persistence.Troupe.findOne({ uri: troupeUri }, function(err, troupe) {
+    if(err) return done(err);
+
+    persistence.User.create({
+      email: email,
+      displayName: 'Test User ' + new Date(),
+      confirmationCode: null,
+      status: "ACTIVE" }, function(err, user) {
+        if(err) return done(err);
+
+        troupeService.inviteUserToTroupe(troupe, "Test User 1", { userId: user.id }, function(err, invite) {
+          if(err) return done(err);
+
+          if (isOnline) {
+            assert(!invite.emailSentAt, "The emailSentAt property should be null");
+            mockito.verifyZeroInteractions(emailNotificationServiceMock);
+          } else {
+            assert(invite.emailSentAt, "The emailSentAt property should not be null");
+            mockito.verify(emailNotificationServiceMock, once);
+          }
+
+          troupeService.sendPendingInviteMails(0, function(err, count) {
+            if (err) return done(err);
+
+            assert(count >= 1);
+
+            done();
+          });
+
+        });
+
+      });
+  });
+}
+
+function testInviteAcceptance(email, done) {
+  var troupeUri = 'testtroupe3';
+  var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+  var troupeService = testRequire.withProxies("./services/troupe-service", {
+    './email-notification-service': emailNotificationServiceMock
+  });
+
+  persistence.Troupe.findOne({ uri: troupeUri }, function(err, troupe) {
+    if(err) return done(err);
+
+    persistence.User.create({
+      email: email,
+      displayName: 'Test User ' + new Date(),
+      confirmationCode: null,
+      status: "ACTIVE" }, function(err, user) {
+        if(err) return done(err);
+
+        troupeService.inviteUserToTroupe(troupe, "Test User 1", { userId: user.id }, function(err, invite) {
+          if(err) return done(err);
+
+          troupeService.acceptInviteForAuthenticatedUser(user, invite.id, function(err) {
+            if(err) return done(err);
+
+            persistence.Troupe.findOne({ uri: troupeUri }, function(err, troupe2) {
+              if(err) return done(err);
+
+              assert(troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
+              assert(troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
+
+              persistence.Invite.findOne({ id: invite.id }, function(err, r2) {
+                if(err) return done(err);
+
+                assert(!r2, 'Invite should be deleted');
+                return done();
+              });
+            });
+
+          });
+        });
+
+      });
+  });
+}
+
+function testInviteRejection(email, done) {
+  var troupeUri = 'testtroupe3';
+  var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+  var troupeService = testRequire.withProxies("./services/troupe-service", {
+    './email-notification-service': emailNotificationServiceMock
+  });
+
+  persistence.Troupe.findOne({ uri: troupeUri }, function(err, troupe) {
+    if(err) return done(err);
+
+    persistence.User.create({
+      email: email,
+      displayName: 'Test User ' + new Date(),
+      confirmationCode: null,
+      status: "ACTIVE" }, function(err, user) {
+        if(err) return done(err);
+
+        troupeService.inviteUserToTroupe(troupe, "Test User 1", { userId: user.id }, function(err, invite) {
+          if(err) return done(err);
+
+          troupeService.rejectInviteForAuthenticatedUser(user, invite.id, function(err) {
+            if(err) return done(err);
+
+            persistence.Troupe.findOne({ uri: troupeUri }, function(err, troupe2) {
+              if(err) return done(err);
+
+              assert(!troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
+              assert(!troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
+
+              persistence.Invite.findOne({ id: invite.id }, function(err, r2) {
+                if(err) return done(err);
+
+                assert(!r2, 'Invite should be deleted');
+                return done();
+              });
+            });
+
+          });
+        });
+
+      });
+  });
+}
+
+function testRequestAcceptance(email, userStatus, emailNotificationConfirmationMethod, done) {
   var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
   var troupeService = testRequire.withProxies("./services/troupe-service", {
     './email-notification-service': emailNotificationServiceMock
@@ -56,7 +193,7 @@ function testInviteAcceptance(email, userStatus, emailNotificationConfirmationMe
 }
 
 
-function testInviteRejection(email, userStatus, done) {
+function testRequestRejection(email, userStatus, done) {
   var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
   var troupeService = testRequire.withProxies("./services/troupe-service", {
     './email-notification-service': emailNotificationServiceMock
@@ -126,20 +263,20 @@ describe('troupe-service', function() {
 
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
 
-      testInviteAcceptance(nonExistingEmail, 'ACTIVE', 'sendRequestAcceptanceToUser', done);
+      testRequestAcceptance(nonExistingEmail, 'ACTIVE', 'sendRequestAcceptanceToUser', done);
     });
 
     it('should allow an UNCONFIRMED user (without a confirmation code) request to be accepted', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
 
-      testInviteAcceptance(nonExistingEmail, 'UNCONFIRMED', 'sendConfirmationForNewUserRequest', done);
+      testRequestAcceptance(nonExistingEmail, 'UNCONFIRMED', 'sendConfirmationForNewUserRequest', done);
     });
 
 
     it('should allow an PROFILE_NOT_COMPLETED user (without a confirmation code) request to be accepted', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
 
-      testInviteAcceptance(nonExistingEmail, 'PROFILE_NOT_COMPLETED', 'sendRequestAcceptanceToUser', done);
+      testRequestAcceptance(nonExistingEmail, 'PROFILE_NOT_COMPLETED', 'sendRequestAcceptanceToUser', done);
     });
 
   });
@@ -147,12 +284,33 @@ describe('troupe-service', function() {
   describe('#rejectRequest()', function() {
     it('should delete a rejected request from an ACTIVE user', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
-      testInviteRejection(nonExistingEmail, 'ACTIVE', done);
+      testRequestRejection(nonExistingEmail, 'ACTIVE', done);
     });
 
     it('should delete a rejected request from an UNCONFIRMED user', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
-      testInviteRejection(nonExistingEmail, 'UNCONFIRMED', done);
+      testRequestRejection(nonExistingEmail, 'UNCONFIRMED', done);
+    });
+  });
+
+  describe('#acceptInviteForAuthenticatedUser', function() {
+    it('should delete an invite and add user to the troupe', function(done) {
+      var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
+      testInviteAcceptance(nonExistingEmail, done);
+    });
+  });
+
+  describe('#rejectInviteForAuthenticatedUser', function() {
+    it('should delete and invite without changing the troupe', function(done) {
+      var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
+      testInviteRejection(nonExistingEmail, done);
+    });
+  });
+
+  describe('#sendPendingInviteMails', function() {
+    it('should send mails for all new invites that were created more than 10 minutes ago, and have not been emailed yet.', function(done) {
+      var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
+      testDelayedInvite(nonExistingEmail, "testtroupe3", true, done);
     });
   });
 
@@ -194,7 +352,7 @@ describe('troupe-service', function() {
 
     it('should delete a rejected request from an UNCONFIRMED user', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
-      testInviteRejection(nonExistingEmail, 'UNCONFIRMED', done);
+      testRequestRejection(nonExistingEmail, 'UNCONFIRMED', done);
     });
   });
 
