@@ -3,7 +3,10 @@
 "use strict";
 
 var testRequire = require('./test-require');
-
+/*
+var logAccess = require('./log-access');
+var presenceService = logAccess(testRequire('./services/presence-service'));
+*/
 var presenceService = testRequire('./services/presence-service');
 
 var assert = require('assert');
@@ -46,7 +49,7 @@ describe('presenceService', function() {
   it('should allow a user to connect', function(done) {
     var userId = 'TESTUSER1' + Date.now();
     var socketId = 'TESTSOCKET1' + Date.now();
-    presenceService.userSocketConnected(userId, socketId, function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
       if(err) return done(err);
 
       done();
@@ -56,7 +59,7 @@ describe('presenceService', function() {
   it('should allow a user to connect and then disconnect', function(done) {
     var userId = 'TESTUSER1' + Date.now();
     var socketId = 'TESTSOCKET1' + Date.now();
-    presenceService.userSocketConnected(userId, socketId, function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
       if(err) return done(err);
 
       presenceService.socketDisconnected(socketId, function(err) {
@@ -80,7 +83,7 @@ describe('presenceService', function() {
       assert(users.length === 0 || users.every(function(id) { return id !== userId; }), 'Expected user _not_ to be online at beginning of test: ', users.join(', '));
 
       // Connect the socket
-      presenceService.userSocketConnected(userId, socketId, function(err) {
+      presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
         if(err) return done(err);
 
         // Check that the lookup code is working as expected
@@ -130,6 +133,8 @@ describe('presenceService', function() {
     var socketId = 'TESTSOCKET1' + Date.now();
     var troupeId = 'TESTTROUPE1' + Date.now();
 
+    console.log('1');
+
     // Make sure things are clean
     presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
       if(err) return done(err);
@@ -138,7 +143,7 @@ describe('presenceService', function() {
       assert(users.length === 0 || users.every(function(id) { return id !== userId; }), 'Expected user _not_ to be online at beginning of test: ', users.join(', '));
 
       // Connect the socket
-      presenceService.userSocketConnected(userId, socketId, function(err) {
+      presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
         if(err) return done(err);
 
         // Subscribe to a troupe
@@ -179,7 +184,7 @@ describe('presenceService', function() {
     var d2 = Q.defer();
 
     // This simulates three events happening in very quick succession
-    presenceService.userSocketConnected(userId, socketId, function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
       if(err) { return d1.reject(); }
 
       presenceService.userSubscribedToTroupe(userId, troupeId, socketId, true, d1.makeNodeResolver());
@@ -228,7 +233,7 @@ describe('presenceService', function() {
     assertUserTroupeStatus(false, function() {
 
       // Connect socket
-      presenceService.userSocketConnected(userId, socketId, function(err) {
+      presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
         if(err) return done(err);
 
         // Associate socket with troupe
@@ -295,7 +300,7 @@ describe('presenceService', function() {
     var troupeId = 'TESTTROUPE4' + Date.now();
 
     // Connect socket
-    presenceService.userSocketConnected(userId, socketId, function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
       if(err) return done(err);
 
       // Associate socket with troupe
@@ -326,7 +331,7 @@ describe('presenceService', function() {
     var userId = 'TESTUSER4' + Date.now();
     var socketId = 'TESTSOCKET4' + Date.now();
 
-    presenceService.userSocketConnected(userId, socketId, function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
       if(err) return done(err);
       presenceService.collectGarbage(fakeEngine, function(err, count) {
         if(err) return done(err);
@@ -342,6 +347,110 @@ describe('presenceService', function() {
     });
 
   });
+
+  it('should not show mobile users as online', function(done) {
+    var userId = 'TESTUSER4' + Date.now();
+    var socketId = 'TESTSOCKET4' + Date.now();
+
+    presenceService.userSocketConnected(userId, socketId, 'mobile', function(err) {
+      if(err) return done(err);
+
+      presenceService.listOnlineUsers(function(err, users) {
+        if(err) return done(err);
+        assert(users.indexOf(userId) === -1, 'User should not be online');
+
+        done();
+      });
+    });
+
+  });
+
+  it('should not show mobile users in a troupe as in the troupe', function(done) {
+    var userId = 'TESTUSER4' + Date.now();
+    var socketId = 'TESTSOCKET4' + Date.now();
+    var troupeId = 'TESTTROUPE4' + Date.now();
+
+    presenceService.userSocketConnected(userId, socketId, 'mobile', function(err) {
+      if(err) return done(err);
+
+      presenceService.userSubscribedToTroupe(userId, troupeId, socketId, true, function(err) {
+        if(err) return done(err);
+
+        presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
+          if(err) return done(err);
+
+          assert(users.some(function(id) { return id === userId; }), 'Expected user to be online');
+
+          presenceService.clientEyeballSignal(userId, socketId, 0, function(err) {
+            if(err) return done(err);
+
+            presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
+              if(err) return done(err);
+
+              assert(users.every(function(id) { return id !== userId; }), 'Expected user not to be online (OFFLINE)');
+
+              done();
+            });
+
+          });
+
+        });
+
+
+      });
+    });
+
+  });
+
+
+  it('should handle users who are online and mobile concurrently correctly', function(done) {
+    var userId = 'TESTUSER4' + Date.now();
+    var socketId1 = 'TESTSOCKET4' + Date.now();
+    var socketId2 = 'TESTSOCKET5' + Date.now();
+    var troupeId = 'TESTTROUPE4' + Date.now();
+
+    presenceService.userSocketConnected(userId, socketId1, 'mobile', function(err) {
+      if(err) return done(err);
+
+      presenceService.userSubscribedToTroupe(userId, troupeId, socketId1, true, function(err) {
+      if(err) return done(err);
+
+        presenceService.userSocketConnected(userId, socketId2, 'online', function(err) {
+          if(err) return done(err);
+
+          presenceService.userSubscribedToTroupe(userId, troupeId, socketId2, true, function(err) {
+            if(err) return done(err);
+
+            presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
+              if(err) return done(err);
+
+              assert(users.some(function(id) { return id === userId; }), 'Expected user to be online');
+
+              presenceService.clientEyeballSignal(userId, socketId2, 0, function(err) {
+                if(err) return done(err);
+
+                presenceService.listOnlineUsers(function(err, users) {
+                  if(err) return done(err);
+
+                  assert(users.every(function(id) { return id !== userId; }), 'Expected user not to be online (OFFLINE)');
+
+                  done();
+                });
+
+              });
+            });
+
+          });
+
+
+        });
+      });
+
+    });
+
+  });
+
+
 
 });
 

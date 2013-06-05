@@ -93,7 +93,8 @@ function messageIsFromSuperClient(message) {
 }
 
 // This needs to be removed once all old FayeObjC clients that don't send ext on handshakre are dead and gone
-var HANDLE_TEMPORARY_FAYEOBJ_SITUATION = true;
+// DELETE THIS CODE
+var HANDLE_TEMPORARY_FAYEOBJ_SITUATION = false;
 
 function handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake(message, callback) {
   var clientId = message.clientId;
@@ -133,13 +134,25 @@ function handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake(message, 
       }
 
       // Get the presence service involved around about now
-      presenceService.userSocketConnected(userId, clientId, function(err) {
+      presenceService.userSocketConnected(userId, clientId, 'online', function(err) {
         if(err) winston.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
         callback(message);
       });
 
     });
   });
+}
+
+function getConnectionType(incoming) {
+  if(!incoming) return 'online';
+
+  switch(incoming) {
+    case 'web': return 'online';
+    case 'mobile': return 'mobile';
+
+    default:
+      return 'online';
+  }
 }
 
 var authenticator = {
@@ -155,6 +168,7 @@ var authenticator = {
         return handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake(message, callback);
       }
     }
+    // END TEMP TEMP TEMP
 
     if (message.channel != '/meta/handshake') {
       return callback(message);
@@ -165,6 +179,7 @@ var authenticator = {
     }
 
     var ext = message.ext;
+
     if(!ext || !ext.token) {
       if(HANDLE_TEMPORARY_FAYEOBJ_SITUATION) {
         winston.verbose('bayeux: Allowing temporary access to unauthorised handshake client');
@@ -187,10 +202,12 @@ var authenticator = {
         return deny();
       }
 
+      var connectionType = getConnectionType(ext.connType);
+
       // This is an UGLY UGLY hack, but it's the only
       // way possible to pass the userId to the outgoing extension
       // where we have the clientId (but not the userId)
-      message.id = message.id + ':' + userId;
+      message.id = message.id + ':' + userId + ':' + connectionType;
 
       return callback(message);
     });
@@ -216,16 +233,17 @@ var authenticator = {
 
     var parts = fakeId.split(':');
 
-    if(parts.length != 2) {
+    if(parts.length != 3) {
       return callback(message);
     }
 
     message.id = parts[0];
     var userId = parts[1];
+    var connectionType = parts[3];
     var clientId = message.clientId;
 
     // Get the presence service involved around about now
-    presenceService.userSocketConnected(userId, clientId, function(err) {
+    presenceService.userSocketConnected(userId, clientId, connectionType, function(err) {
       if(err) winston.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
 
       // Not possible to throw an error here, so just carry only
