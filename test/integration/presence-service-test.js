@@ -133,8 +133,6 @@ describe('presenceService', function() {
     var socketId = 'TESTSOCKET1' + Date.now();
     var troupeId = 'TESTTROUPE1' + Date.now();
 
-    console.log('1');
-
     // Make sure things are clean
     presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
       if(err) return done(err);
@@ -409,41 +407,95 @@ describe('presenceService', function() {
     var socketId2 = 'TESTSOCKET5' + Date.now();
     var troupeId = 'TESTTROUPE4' + Date.now();
 
+    function ensureUserOnlineStatus(online, cb) {
+      presenceService.listOnlineUsers(function(err, users) {
+        if(err) return done(err);
+
+        if(online) {
+          assert(users.some(function(id) { return id === userId; }), 'Expected user to be online');
+        } else {
+          assert(users.every(function(id) { return id !== userId; }), 'Expected user not to be online (OFFLINE)');
+        }
+
+        cb();
+      });
+    }
+
+    function ensureUserTroupeStatus(inTroupe, callback) {
+      // Make sure that the user appears online
+      presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
+        if(err) return done(err);
+
+        if(inTroupe) {
+          assert(users.some(function(id) { return id === userId; }), 'Expected user to be in the troupe' + users.join(', '));
+        } else {
+          assert(users.every(function(id) { return id !== userId; }), 'Expected user not to be in the troupe: ' + users.join(', '));
+        }
+
+        callback();
+      });
+    }
+
     presenceService.userSocketConnected(userId, socketId1, 'mobile', function(err) {
       if(err) return done(err);
 
-      presenceService.userSubscribedToTroupe(userId, troupeId, socketId1, true, function(err) {
-      if(err) return done(err);
+      ensureUserOnlineStatus(false, function() {
 
-        presenceService.userSocketConnected(userId, socketId2, 'online', function(err) {
-          if(err) return done(err);
+        presenceService.userSubscribedToTroupe(userId, troupeId, socketId1, true, function(err) {
+        if(err) return done(err);
 
-          presenceService.userSubscribedToTroupe(userId, troupeId, socketId2, true, function(err) {
-            if(err) return done(err);
+          ensureUserOnlineStatus(false, function() {
 
-            presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
-              if(err) return done(err);
+            ensureUserTroupeStatus(true, function() {
 
-              assert(users.some(function(id) { return id === userId; }), 'Expected user to be online');
-
-              presenceService.clientEyeballSignal(userId, socketId2, 0, function(err) {
+              presenceService.userSocketConnected(userId, socketId2, 'online', function(err) {
                 if(err) return done(err);
 
-                presenceService.listOnlineUsers(function(err, users) {
-                  if(err) return done(err);
+                ensureUserOnlineStatus(true, function() {
 
-                  assert(users.every(function(id) { return id !== userId; }), 'Expected user not to be online (OFFLINE)');
+                  ensureUserTroupeStatus(true, function() {
 
-                  done();
+                    presenceService.userSubscribedToTroupe(userId, troupeId, socketId2, true, function(err) {
+                      if(err) return done(err);
+
+                      presenceService.clientEyeballSignal(userId, socketId2, 0, function(err) {
+                        if(err) return done(err);
+
+                        // User is still online, but not in the troupe
+
+                        ensureUserOnlineStatus(true, function() {
+
+                          // At this moment, the mobile eyeball is still on,
+                          ensureUserTroupeStatus(true, function() {
+
+                            // Turn mobile eyeball off
+                            presenceService.clientEyeballSignal(userId, socketId1, 0, function(err) {
+                              if(err) return done(err);
+
+                              ensureUserTroupeStatus(false, function() {
+
+                                done();
+
+                              });
+                            });
+                          });
+                        });
+
+                      });
+
+                    });
+
+                  });
+
                 });
 
               });
-            });
 
+            });
           });
 
-
         });
+
       });
 
     });
