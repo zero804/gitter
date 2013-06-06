@@ -92,62 +92,11 @@ function messageIsFromSuperClient(message) {
          message.ext.password === superClientPassword;
 }
 
-// This needs to be removed once all old FayeObjC clients that don't send ext on handshakre are dead and gone
-// DELETE THIS CODE
-var HANDLE_TEMPORARY_FAYEOBJ_SITUATION = false;
-
-function handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake(message, callback) {
-  var clientId = message.clientId;
-  function deny() {
-    message.error = '403::Access denied';
-    callback(message);
-  }
-
-  presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
-    if(err) {
-      winston.error("bayeux: handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake: lookupUserIdForSocket error" + err, { exception: err, message: message });
-      return deny();
-    }
-
-    if(userId) return callback(message);
-
-    // We're not authed, try now
-    if(messageIsFromSuperClient(message)) {
-      return callback(message);
-    }
-
-    var ext = message.ext;
-    if(!ext) return deny();
-
-    var accessToken = ext.token;
-    if(!accessToken) return deny();
-
-    oauth.validateToken(accessToken, function(err, userId) {
-      if(err) {
-        winston.error("bayeux: Authentication error" + err, { exception: err, message: message });
-        return deny();
-       }
-
-      if(!userId) {
-        winston.warn("bayeux: Authentication failed", { message: message });
-        return deny();
-      }
-
-      // Get the presence service involved around about now
-      presenceService.userSocketConnected(userId, clientId, 'online', function(err) {
-        if(err) winston.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
-        callback(message);
-      });
-
-    });
-  });
-}
-
 function getConnectionType(incoming) {
   if(!incoming) return 'online';
 
   switch(incoming) {
-    case 'web': return 'online';
+    case 'online': return 'online';
     case 'mobile': return 'mobile';
 
     default:
@@ -162,14 +111,6 @@ var authenticator = {
       callback(message);
     }
 
-    // TEMP TEMP TEMP
-    if(HANDLE_TEMPORARY_FAYEOBJ_SITUATION) {
-      if (message.channel == '/meta/subscribe') {
-        return handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake(message, callback);
-      }
-    }
-    // END TEMP TEMP TEMP
-
     if (message.channel != '/meta/handshake') {
       return callback(message);
     }
@@ -181,14 +122,7 @@ var authenticator = {
     var ext = message.ext;
 
     if(!ext || !ext.token) {
-      if(HANDLE_TEMPORARY_FAYEOBJ_SITUATION) {
-        winston.verbose('bayeux: Allowing temporary access to unauthorised handshake client');
-        // Currently the faye connection code doesn't send the ext in the handshake message
-        // see handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake
-        return callback(message);
-      } else {
-        return deny();
-      }
+      return deny();
     }
 
     oauth.validateToken(ext.token, function(err, userId) {
@@ -203,6 +137,8 @@ var authenticator = {
       }
 
       var connectionType = getConnectionType(ext.connType);
+      console.log('CONTYPE: ', connectionType);
+      console.log(message);
 
       // This is an UGLY UGLY hack, but it's the only
       // way possible to pass the userId to the outgoing extension
@@ -239,7 +175,7 @@ var authenticator = {
 
     message.id = parts[0];
     var userId = parts[1];
-    var connectionType = parts[3];
+    var connectionType = parts[2];
     var clientId = message.clientId;
 
     // Get the presence service involved around about now

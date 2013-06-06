@@ -117,7 +117,7 @@ function __disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callba
       var sremResult = result[2];
 
       var userInTroupeCount = parseInt(result[3], 10);
-      var userHasLeftTroupe = userInTroupeCount <= 0;
+      var userHasLeftTroupe = userInTroupeCount === 0;
       var troupeIsEmpty = result[4] === 0;
 
       if(sremResult != 1) {
@@ -291,7 +291,7 @@ function __eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
     }
 
     var userInTroupeCount = parseInt(result[1], 10);
-    var userHasLeftTroupe = userInTroupeCount <= 0;
+    var userHasLeftTroupe = userInTroupeCount === 0;
     var troupeIsEmpty = result[2] === 0;
 
     // WARNING: __disassociateSocketAndDeactivateUserAndTroupe has similar code!
