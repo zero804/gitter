@@ -73,7 +73,7 @@
                 rows: data.map(function(row) {
                     return merge(
                         prefix('user_', mapUserRows(row.user)),
-                        prefix('troupe_', mapTroupeRows(row.troupe)),
+                        prefix('troupe_', row.troupe && mapTroupeRows(row.troupe)),
                         row
                     );
                 }),

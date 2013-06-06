@@ -3,6 +3,11 @@
 
 var presenceService = require('../../services/presence-service');
 var restSerializer = require("../../serializers/rest-serializer");
+var _ = require('underscore');
+
+function notNull(n) {
+  return !!n;
+}
 
 // Only used here, no point in adding this to rest serializer
 function SocketStrategy() {
@@ -11,8 +16,8 @@ function SocketStrategy() {
 
   this.preload =  function(sockets, callback) {
         restSerializer.execPreloads([
-          { strategy: userStrategy, data: sockets.map(function(s) { return s.userId; })},
-          { strategy: troupeStrategy, data: sockets.map(function(s) { return s.troupeId; })}
+          { strategy: userStrategy,   data: _.uniq(sockets.map(function(s) { return s.userId; }).filter(notNull))},
+          { strategy: troupeStrategy, data: _.uniq(sockets.map(function(s) { return s.troupeId; }).filter(notNull))}
         ], callback);
       };
 
