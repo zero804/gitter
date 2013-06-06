@@ -198,11 +198,6 @@ function socketDisconnected(socketId, callback) {
   lookupUserIdForSocket(socketId, function(err, userId) {
     if(err) return callback(err);
     if(!userId) {
-      winston.silly('presence: socketDisconnected rejected. lookupUserIdForSocket did not find socket', {
-        socketId: socketId,
-        userId: userId
-      });
-
       return callback({ lockFail: true });
     }
 
@@ -214,6 +209,24 @@ function socketDisconnected(socketId, callback) {
       });
 
     });
+  });
+}
+
+function _socketGarbageCollected(socketId, callback) {
+  socketDisconnected(socketId, function(err) {
+    if(err) {
+      // Force socket disconnect
+
+      var keys = [_keySocketUser(socketId), ACTIVE_SOCKETS_KEY];
+      var values = [socketId];
+
+      scriptManager.run('presence-force-disassociate', keys, values, function(err) {
+        if(err) return callback(err);
+
+        callback();
+      });
+
+    }
   });
 }
 
@@ -540,6 +553,7 @@ function collectGarbage(engine, callback) {
 
 }
 
+
 function startPresenceGcService(engine) {
   setInterval(function() {
     collectGarbage(engine, function() {});
@@ -568,14 +582,9 @@ function _validateActiveSockets(engine, callback) {
 
         invalidCount++;
         winston.verbose('Disconnecting invalid socket ' + socketId);
-        socketDisconnected(socketId, function(err) {
-          if(err) {
-            if(!err.lockFail) {
-              d.reject(err);
-              return;
-            }
-
-            winston.info('Locking failure while gc-ing invalid socket');
+        _socketGarbageCollected(socketId, function(err) {
+          if(err && !err.lockFail) {
+            winston.info('Failure while gc-ing invalid socket', { exception: err });
           }
 
           d.resolve();
