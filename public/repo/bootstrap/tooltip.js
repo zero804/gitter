@@ -135,8 +135,8 @@ define(["jquery"], function (jQuery){
         , placement
         , tp
         , e = $.Event('show')
-      
-      if (Tooltip.prev && Tooltip.prev !== this) Tooltip.prev.leave();
+
+      if (Tooltip.prev && Tooltip.prev !== this) Tooltip.prev.hide();
       Tooltip.prev = this
 
       if (this.hasContent() && this.enabled) {
