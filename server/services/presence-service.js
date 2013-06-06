@@ -412,6 +412,38 @@ function listOnlineUsers(callback) {
   redisClient.zrange(ACTIVE_USERS_KEY, 0, -1, callback);
 }
 
+function listMobileUsers(callback) {
+  redisClient.zrange(MOBILE_USERS_KEY, 0, -1, callback);
+}
+
+function listActiveSockets(callback) {
+  // This can't be done in a lua script as we don't know the keys in advance
+  redisClient.smembers(ACTIVE_SOCKETS_KEY, function(err, socketIds) {
+    if(err) return callback(err);
+    if(socketIds.length === 0) return callback(err, []);
+
+    var multi = redisClient.multi();
+    socketIds.forEach(function(socketId) {
+      multi.hmget(_keySocketUser(socketId), 'uid', 'tid', 'eb', 'mob', 'ctime');
+    });
+    multi.exec(function(err, replies) {
+      if(err) return callback(err);
+
+      var result = replies.map(function(reply) {
+        return {
+          userId: reply[0],
+          troupeId: reply[1],
+          eyeballs: !!reply[2],
+          mobile: !!reply[3],
+          createdTime: parseInt(reply[4], 10)
+        };
+      });
+
+      return callback(null, result);
+    });
+  });
+}
+
 // Returns the online users for the given troupes
 // The callback function returns a hash
 // result[troupeId] = [userIds]
@@ -566,7 +598,9 @@ presenceService.socketDisconnected =  socketDisconnected;
 presenceService.lookupUserIdForSocket =  lookupUserIdForSocket;
 presenceService.findOnlineUsersForTroupe =  findOnlineUsersForTroupe;
 presenceService.categorizeUsersByOnlineStatus =  categorizeUsersByOnlineStatus;
-presenceService.listOnlineUsers =  listOnlineUsers;
+presenceService.listOnlineUsers = listOnlineUsers;
+presenceService.listActiveSockets = listActiveSockets;
+presenceService.listMobileUsers =  listMobileUsers;
 presenceService.listOnlineUsersForTroupes =  listOnlineUsersForTroupes;
 presenceService.categorizeUserTroupesByOnlineStatus = categorizeUserTroupesByOnlineStatus;
 

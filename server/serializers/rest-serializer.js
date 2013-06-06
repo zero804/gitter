@@ -963,6 +963,7 @@ module.exports = {
   TroupeUserStrategy: TroupeUserStrategy,
   SearchResultsStrategy: SearchResultsStrategy,
   getStrategy: getStrategy,
+  execPreloads: execPreloads,
   serialize: serialize,
   serializeModel: serializeModel
 };
