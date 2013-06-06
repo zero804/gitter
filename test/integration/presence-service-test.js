@@ -365,7 +365,7 @@ describe('presenceService', function() {
 
   });
 
-  it('should not show mobile users in a troupe as in the troupe', function(done) {
+  it('should show mobile users in a troupe as in the troupe', function(done) {
     var userId = 'TESTUSER4' + Date.now();
     var socketId = 'TESTSOCKET4' + Date.now();
     var troupeId = 'TESTTROUPE4' + Date.now();
