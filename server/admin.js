@@ -9,7 +9,6 @@ var app = express();
 var server = http.createServer(app);
 
 
-console.log( __dirname + "/../public-admin");
 app.use(express['static']( __dirname + "/../public-admin"));
 
 
@@ -17,7 +16,7 @@ require('./admin/api/index').install(app);
 
 
 // Listen to the port
-server.listen(4100);
+server.listen(process.env.PORT || 4100);
 
 var gracefullyClosing = false;
 app.use(function(req, res, next) {
