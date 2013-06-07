@@ -634,5 +634,78 @@ describe('presenceService', function() {
 
   });
 
+
+  it('should correctly categorize users who are online and offline', function(done) {
+    var userId1 = 'TESTUSER1' + Date.now();
+    var socketId1 = 'TESTSOCKET1' + Date.now();
+    var userId2 = 'TESTUSER2' + Date.now();
+    var socketId2 = 'TESTSOCKET2' + Date.now();
+
+    presenceService.userSocketConnected(userId1, socketId1, 'online', function(err) {
+      if(err) return done(err);
+
+      presenceService.userSocketConnected(userId2, socketId2, 'online', function(err) {
+        if(err) return done(err);
+        presenceService.categorizeUsersByOnlineStatus([userId1, userId2], function(err, c) {
+          if(err) return done(err);
+
+          assert.equal(c[userId1], 'online');
+          assert.equal(c[userId2], 'online');
+          done();
+        });
+      });
+    });
+  });
+
+
+  it('should correctly categorize userstroupe who are introupe, online and offline', function(done) {
+    var userId1 = 'TESTUSER1' + Date.now();
+    var socketId1 = 'TESTSOCKET1' + Date.now();
+    var userId2 = 'TESTUSER2' + Date.now();
+    var socketId2 = 'TESTSOCKET2' + Date.now();
+    var troupeId = 'TESTTROUPE1' + Date.now();
+    var userId3 = 'TESTUSER3' + Date.now();
+
+    presenceService.userSocketConnected(userId1, socketId1, 'online', function(err) {
+      if(err) return done(err);
+
+      presenceService.userSocketConnected(userId2, socketId2, 'online', function(err) {
+        if(err) return done(err);
+
+        presenceService.userSubscribedToTroupe(userId1, troupeId, socketId1, true, function(err) {
+          if(err) return done(err);
+
+
+          presenceService.categorizeUserTroupesByOnlineStatus([
+              {userId: userId1, troupeId: troupeId },
+              {userId: userId2, troupeId: troupeId },
+              {userId: userId3, troupeId: troupeId }
+              ], function(err, c) {
+
+            if(err) return done(err);
+
+            assert.equal(c.inTroupe.length, 1);
+            assert.equal(c.inTroupe[0].userId, userId1);
+            assert.equal(c.inTroupe[0].troupeId, troupeId);
+
+            assert.equal(c.online.length, 1);
+            assert.equal(c.online[0].userId, userId2);
+            assert.equal(c.online[0].troupeId, troupeId);
+
+
+            assert.equal(c.offline.length, 1);
+            assert.equal(c.offline[0].userId, userId3);
+            assert.equal(c.offline[0].troupeId, troupeId);
+
+
+            done();
+          });
+        });
+
+
+      });
+    });
+  });
+
 });
 

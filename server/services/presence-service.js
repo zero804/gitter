@@ -43,45 +43,6 @@ function _keyTroupeUsers(troupeId) {
   return prefix + "tu:" + troupeId;
 }
 
-// callback(err, userSocketCount)
-function __associateSocketAndActivateUser(userId, socketId, connectionType, callback) {
-  assert(userId, 'userId expected');
-  assert(socketId, 'socketId expected');
-
-  var isMobileConnection = connectionType == 'mobile';
-
-  var keys = [_keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, _keyUserLock(userId)];
-  var values = [userId, socketId, Date.now(), isMobileConnection ? 1 : 0];
-
-  scriptManager.run('presence-associate', keys, values, function(err, result) {
-    if(err) return callback(err);
-
-    var lockSuccess = result[0];
-
-    if(!lockSuccess)  {
-      winston.silly('presence: __associateSocketAndActivateUser rejected. Socket already exists.', {
-        socketId: socketId,
-        userId: userId
-      });
-
-      return callback({ lockFail: true });
-    }
-
-    var userSocketCount = parseInt(result[1], 10);
-    var saddResult = result[2];
-
-    if(saddResult != 1) {
-      winston.warn("presence: Socket has already been added to active sockets. Something fishy is happening.");
-    }
-
-    if(userSocketCount === 1) {
-      presenceService.emit('userOnline', userId);
-    }
-
-    return callback(null, userSocketCount);
-
-  });
-}
 
 // Callback(err);
 function __disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback) {
@@ -182,7 +143,40 @@ function userSocketConnected(userId, socketId, connectionType, callback) {
   assert(userId, 'userId expected');
   assert(socketId, 'socketId expected');
 
-  __associateSocketAndActivateUser(userId, socketId, connectionType, callback);
+  var isMobileConnection = connectionType == 'mobile';
+
+  var keys = [_keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, _keyUserLock(userId)];
+  var values = [userId, socketId, Date.now(), isMobileConnection ? 1 : 0];
+
+  scriptManager.run('presence-associate', keys, values, function(err, result) {
+    if(err) return callback(err);
+
+    var lockSuccess = result[0];
+
+    if(!lockSuccess)  {
+      winston.silly('presence: __associateSocketAndActivateUser rejected. Socket already exists.', {
+        socketId: socketId,
+        userId: userId
+      });
+
+      return callback({ lockFail: true });
+    }
+
+    var userSocketCount = parseInt(result[1], 10);
+    var saddResult = result[2];
+
+    if(saddResult != 1) {
+      winston.warn("presence: Socket has already been added to active sockets. Something fishy is happening.");
+    }
+
+    if(userSocketCount === 1) {
+      presenceService.emit('userOnline', userId);
+    }
+
+    return callback(null, userSocketCount);
+
+  });
+
 }
 
 function socketDisconnected(socketId, callback) {
@@ -386,7 +380,7 @@ function categorizeUserTroupesByOnlineStatus(userTroupes, callback) {
       var troupeId = userTroupe.troupeId;
 
       var onlineForTroupe = troupeOnlineUsers[troupeId];
-      if(onlineForTroupe.indexOf() >= 0) {
+      if(onlineForTroupe.indexOf(userId) >= 0) {
         inTroupe.push(userTroupe);
       } else if(statii[userId] == 'online') {
         online.push(userTroupe);
