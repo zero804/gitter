@@ -9,7 +9,12 @@ def setup_module():
     global driver
     driver = utils.driver()
 
+    resetData()
     login()
+
+
+def resetData():
+    utils.resetData(driver)
 
 
 def login():
