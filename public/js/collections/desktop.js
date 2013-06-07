@@ -10,15 +10,16 @@ define([
   'collections/users',
   'collections/chat',
   'collections/requests',
+  'collections/invites',
   'components/webNotifications',
   'components/unread-items-client',
   'log!collections/desktop',
   'filtered-collection' /* no ref */
-], function($, _, Backbone, realtime, troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, webNotifications, unreadItemsClient, log) {
+], function($, _, Backbone, realtime, troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, inviteModels, webNotifications, unreadItemsClient, log) {
   "use strict";
 
   var chatCollection, fileCollection, requestCollection, conversationCollection, troupeCollection, filteredTroupeCollection,
-  unreadTroupeCollection, peopleOnlyTroupeCollection, favouriteTroupesCollection, recentTroupeCollection, userCollection;
+  unreadTroupeCollection, peopleOnlyTroupeCollection, favouriteTroupesCollection, recentTroupeCollection, userCollection, inviteCollection;
 
   var preloader = {
     init: function() {
@@ -69,6 +70,7 @@ define([
 
       // Currently we don't have requests in the preloaded collection.
       requestCollection.fetch();
+      inviteCollection.fetch();
     }
   };
   _.extend(preloader, Backbone.Events);
@@ -80,6 +82,15 @@ define([
     requestCollection = new requestModels.RequestCollection();
     requestCollection.listen();
     requestCollection.fetch();
+
+    inviteCollection = new inviteModels.InviteCollection();
+    inviteCollection.listen();
+    inviteCollection.fetch();
+
+    inviteCollection.on('change reset sync add remove', function() {
+      unreadItemsClient.setOtherCount(inviteCollection.length);
+      troupeCollection.trigger('sync');
+    });
 
     chatCollection         = new chatModels.ChatCollection(null, { preloader: preloader, listen: true });
     fileCollection         = new fileModels.FileCollection(null, { preloader: preloader, listen: true });
@@ -193,6 +204,7 @@ define([
     conversations: conversationCollection,
     troupes: troupeCollection,
     users: userCollection,
+    incomingInvites: inviteCollection,
     peopleTroupes: peopleOnlyTroupeCollection,
     normalTroupes: filteredTroupeCollection,
     recentTroupes: recentTroupeCollection,

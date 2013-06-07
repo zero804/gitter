@@ -11,7 +11,7 @@ define([
   var INACTIVITY_POLL = 10 * 1000;
   var PING_POLL = 10 * 60 * 1000;
 
-  function send(value) {
+  function send(value, synchronous) {
     if(!realtime.getClientId()) {
       return;
     }
@@ -22,6 +22,7 @@ define([
         socketId: realtime.getClientId(),
         on: value
       },
+      async: !synchronous,
       global: false,
       type: "POST",
       success: function(/*data*/) {
@@ -38,7 +39,7 @@ define([
       stopInactivityPoller();
 
       eyesOnState = false;
-      send(0);
+      send(0, true);
 
       $(document).trigger('eyeballStateChange', false);
     }

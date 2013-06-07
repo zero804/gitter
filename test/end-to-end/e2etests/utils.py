@@ -88,6 +88,10 @@ def driver():
     return driver
 
 
+def resetData(driver):
+    driver.get(baseUrl('/testdata/reset'))
+
+
 def existingUserlogin(driver, usernameValue, passwordValue):
     print('Navigating to ' + baseUrl("/x"))
     driver.get(baseUrl("/x"))

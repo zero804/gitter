@@ -20,7 +20,7 @@ exports.startWorkers = function() {
   jobs = kue.createQueue();
 
   jobs.process('generate-thumbnail', 20, function(job, done) {
-    directGenerateThumbnail(job.data.options, done);
+    directGenerateThumbnail(job.data.options, kue.wrapCallback(job, done));
   });
 
   function getPreviewGenerationStrategy(mimeType) {
