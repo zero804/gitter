@@ -44,7 +44,7 @@ module.exports = {
         if (err)
           return res.send(400);
 
-        res.send(200);
+        res.send({ success: true });
       });
     },
 
@@ -54,7 +54,7 @@ module.exports = {
         if (err)
           return res.send(400);
 
-        res.send(200);
+        res.send({ success: true });
       });
     },
 

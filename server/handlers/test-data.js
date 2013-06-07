@@ -15,11 +15,18 @@ var userService = require("../services/user-service");
 var troupeService = require("../services/troupe-service");
 var persistence = require('../services/persistence-service');
 var winston = require('winston');
+var child_process = require('child_process');
 
 winston.warn('Warning: confidential data is being exposed for testing purposes!');
 
 module.exports = {
   install: function(app) {
+
+    app.get('/testdata/reset', function(req, res) {
+      child_process.execFile('scripts/dataupgrades/005-test-users/001-update.sh');
+      res.send(200);
+    });
+
     app.get('/testdata/confirmationCodeForEmail', function(req, res/*, next */) {
       var forEmail = req.body.email || req.query.email;
 
