@@ -523,8 +523,20 @@ function collectGarbage(engine, callback) {
 
 
 function startPresenceGcService(engine) {
+  var i = 0;
   setInterval(function() {
-    collectGarbage(engine, function() {});
+    collectGarbage(engine, function(err) {
+      if(err) return;
+
+      if(++i % 10 === 0) {
+        winston.verbose('Performing user validation');
+        validateUsers(function(err) {
+          winston.verbose('User validation complete');
+
+          if(err) return;
+        });
+      }
+    });
   }, nconf.get('presence:gcInterval'));
 }
 
