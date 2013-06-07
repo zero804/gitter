@@ -112,4 +112,5 @@ def testInviteRegisteredUser():
 
 
 def teardown_module():
+    utils.resetData(driver)
     utils.shutdown(driver)
