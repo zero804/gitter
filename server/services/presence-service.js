@@ -14,7 +14,6 @@ var redis = require("../utils/redis"),
 var presenceService = new events.EventEmitter();
 
 var redisClient = redis.createClient();
-var redisLock = require("redis-lock")(redis.createClient());
 
 var Scripto = require('redis-scripto');
 var scriptManager = new Scripto(redisClient);
@@ -32,13 +31,8 @@ var ACTIVE_SOCKETS_KEY = prefix + 'activesockets';
 // Public methods are not prefixed
 // Private methods start with an underscore _
 // Private methods that assume locking has already occurred start with a __
-
-function _lockOnUser(userId, callback) {
-  assert(userId, 'userId expected');
-
-  redisLock(prefix + 'l:u:' + userId, 100, function(done) {
-    return callback(done);
-  });
+function _keyUserLock(userId) {
+  return prefix + "ul:" + userId;
 }
 
 function _keySocketUser(socketId) {
@@ -56,7 +50,7 @@ function __associateSocketAndActivateUser(userId, socketId, connectionType, call
 
   var isMobileConnection = connectionType == 'mobile';
 
-  var keys = [_keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY];
+  var keys = [_keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, _keyUserLock(userId)];
   var values = [userId, socketId, Date.now(), isMobileConnection ? 1 : 0];
 
   scriptManager.run('presence-associate', keys, values, function(err, result) {
@@ -97,7 +91,7 @@ function __disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callba
   lookupTroupeIdForSocket(socketId, function(err, troupeId) {
     if(err) return callback(err);
 
-    var keys = [_keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, troupeId ? _keyTroupeUsers(troupeId) : null];
+    var keys = [_keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, _keyUserLock(userId), troupeId ? _keyTroupeUsers(troupeId) : null];
     var values = [userId, socketId];
 
     scriptManager.run('presence-disassociate', keys, values, function(err, result) {
@@ -157,8 +151,12 @@ function __associateSocketAndActivateTroupe(socketId, userId, troupeId, eyeballS
   assert(socketId, 'socketId expected');
   assert(troupeId, 'troupeId expected');
 
-    // Associate socket with troupe
-  redisClient.hsetnx(_keySocketUser(socketId), "tid", troupeId, function(err, result) {
+
+//TODO here!
+  var keys = [_keySocketUser(socketId), _keyUserLock(userId)];
+  var values = [troupeId];
+
+  scriptManager.run('presence-associate-troupe', keys, values, function(err, result) {
     if(err) return callback(err);
 
     if(result === 0) {
@@ -176,6 +174,7 @@ function __associateSocketAndActivateTroupe(socketId, userId, troupeId, eyeballS
       return callback();
     }
   });
+
 }
 
 
@@ -183,13 +182,7 @@ function userSocketConnected(userId, socketId, connectionType, callback) {
   assert(userId, 'userId expected');
   assert(socketId, 'socketId expected');
 
-  _lockOnUser(userId, function(done) {
-    __associateSocketAndActivateUser(userId, socketId, connectionType, function(err) {
-      if(err) return done(function() { callback(err); } );
-
-      done(callback);
-    });
-  });
+  __associateSocketAndActivateUser(userId, socketId, connectionType, callback);
 }
 
 function socketDisconnected(socketId, callback) {
@@ -201,32 +194,26 @@ function socketDisconnected(socketId, callback) {
       return callback({ lockFail: true });
     }
 
-    _lockOnUser(userId, function(done) {
-      __disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, function(err) {
-        if(err) return done(function() { callback(err); } );
-
-        done(callback);
-      });
-
+    __disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, function(err) {
+      callback(err);
     });
+
   });
 }
 
 function _socketGarbageCollected(socketId, callback) {
   socketDisconnected(socketId, function(err) {
-    if(err) {
+    if(err && !err.lockFail) {
       // Force socket disconnect
 
       var keys = [_keySocketUser(socketId), ACTIVE_SOCKETS_KEY];
       var values = [socketId];
 
-      scriptManager.run('presence-force-disassociate', keys, values, function(err) {
-        if(err) return callback(err);
-
-        callback();
-      });
-
+      scriptManager.run('presence-force-disassociate', keys, values, callback);
+      return;
     }
+
+    callback();
   });
 }
 
@@ -239,12 +226,7 @@ function userSubscribedToTroupe(userId, troupeId, socketId, eyeballState, callba
   assert(socketId, 'socketId expected');
   assert(troupeId, 'troupeId expected');
 
-  _lockOnUser(userId, function(done) {
-    __associateSocketAndActivateTroupe(socketId, userId, troupeId, eyeballState, function(err) {
-      if(err) return done(function() { callback(err); } );
-      done(callback);
-    });
-  });
+  __associateSocketAndActivateTroupe(socketId, userId, troupeId, eyeballState, callback);
 }
 
 function __eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
@@ -252,7 +234,7 @@ function __eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
   assert(socketId, 'socketId expected');
   assert(troupeId, 'troupeId expected');
 
-  var keys = [_keySocketUser(socketId), _keyTroupeUsers(troupeId)];
+  var keys = [_keySocketUser(socketId), _keyTroupeUsers(troupeId), _keyUserLock(userId)];
   var values = [userId];
 
   scriptManager.run('presence-eyeballs-on', keys, values, function(err, result) {
@@ -264,6 +246,7 @@ function __eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
         socketId: socketId,
         userId: userId
       });
+
       return callback({ lockFail: true });
     }
 
@@ -286,7 +269,7 @@ function __eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
   assert(socketId, 'socketId expected');
   assert(troupeId, 'troupeId expected');
 
-  var keys = [_keySocketUser(socketId), _keyTroupeUsers(troupeId)];
+  var keys = [_keySocketUser(socketId), _keyTroupeUsers(troupeId), _keyUserLock(userId)];
   var values = [userId];
 
   scriptManager.run('presence-eyeballs-off', keys, values, function(err, result) {
@@ -506,24 +489,15 @@ function clientEyeballSignal(userId, socketId, eyeballsOn, callback) {
     var troupeId = socketInfo.troupeId;
     if(!troupeId) return callback('Socket is not associated with a troupe');
 
+    if(eyeballsOn) {
+      winston.verbose('presence: Eyeballs on: user ' + userId + ' troupe ' + troupeId);
+      return __eyeBallsOnTroupe(userId, socketId, troupeId, callback);
 
-    _lockOnUser(userId, function(done) {
-      function unlock(err, result) {
-        done(function() {
-          callback(err, result);
-        });
-      }
+    } else {
+      winston.verbose('presence: Eyeballs off: user ' + userId + ' troupe ' + troupeId);
+      return __eyeBallsOffTroupe(userId, socketId, troupeId, callback);
+    }
 
-      if(eyeballsOn) {
-        winston.verbose('presence: Eyeballs on: user ' + userId + ' troupe ' + troupeId);
-        return __eyeBallsOnTroupe(userId, socketId, troupeId, unlock);
-
-      } else {
-        winston.verbose('presence: Eyeballs off: user ' + userId + ' troupe ' + troupeId);
-        return __eyeBallsOffTroupe(userId, socketId, troupeId, unlock);
-      }
-
-    });
 
   });
 
@@ -582,7 +556,9 @@ function _validateActiveSockets(engine, callback) {
 
         invalidCount++;
         winston.verbose('Disconnecting invalid socket ' + socketId);
+
         _socketGarbageCollected(socketId, function(err) {
+
           if(err && !err.lockFail) {
             winston.info('Failure while gc-ing invalid socket', { exception: err });
           }
@@ -594,6 +570,204 @@ function _validateActiveSockets(engine, callback) {
     });
 
     Q.all(promises).then(function() { callback(null, invalidCount); }, callback);
+  });
+}
+
+function _hashZset(scoresArray) {
+  var hash = {};
+  for(var i = 0; i < scoresArray.length; i = i + 2) {
+    hash[scoresArray[i]] = parseInt(scoresArray[i + 1], 10);
+  }
+  return hash;
+}
+
+function introduceDelayForTesting(cb) {
+  if(presenceService.testOnly.forceDelay) {
+    setTimeout(cb, 30);
+  } else {
+    cb();
+  }
+}
+
+function _validateUsers(userIds, callback) {
+  winston.debug('Validating users', { userIds: userIds });
+  // Use a new client due to the WATCH semantics
+  var redisClient = redis.createClient();
+
+  function done(err) {
+    redisClient.quit();
+    return callback(err);
+  }
+
+  redisClient.watch(userIds.map(_keyUserLock), introduceDelayForTesting(function(err) {
+    if(err) return done(err);
+
+    listActiveSockets(function(err, sockets) {
+      if(err) return done(err);
+
+      var onlineCounts = {};
+      var mobileCounts = {};
+      var troupeCounts = {};
+      var troupeIdsHash = {};
+
+      // This can't be done in the script manager
+      // as that is using a different redis connection
+      // and besides we don't know the semanitcs of WATCH
+      // in Lua :)
+
+      sockets.forEach(function(socket) {
+        var userId = socket.userId;
+        var troupeId = socket.troupeId;
+
+        if(userIds.indexOf(userId) >= 0) {
+          if(troupeId) {
+            troupeIdsHash[troupeId] = true;
+            if(socket.eyeballs) {
+              if(!troupeCounts[userId]) {
+                troupeCounts[userId] = { troupeId: 1 };
+              } else {
+                troupeCounts[userId][troupeId] = troupeCounts[userId][troupeId] ? troupeCounts[userId][troupeId] + 1 : 1;
+              }
+            }
+          }
+
+          if(socket.mobile) {
+            mobileCounts[userId] = mobileCounts[userId] ? mobileCounts[userId] + 1 : 1;
+          } else {
+            onlineCounts[userId] = onlineCounts[userId] ? onlineCounts[userId] + 1 : 1;
+          }
+        }
+      });
+
+      var f = new Fiber();
+      var troupeIds = Object.keys(troupeIdsHash);
+
+      redisClient.zrangebyscore(ACTIVE_USERS_KEY, 1, '+inf', 'WITHSCORES', f.waitor());
+      redisClient.zrangebyscore(MOBILE_USERS_KEY, 1, '+inf', 'WITHSCORES', f.waitor());
+
+      troupeIds.forEach(function(troupeId) {
+        redisClient.zrangebyscore(_keyTroupeUsers(troupeId), 1, '+inf', 'WITHSCORES', f.waitor());
+      });
+
+      f.all().then(function(results) {
+        var needsUpdate = false;
+        var multi = redisClient.multi();
+
+        var currentActiveUserHash = _hashZset(results[0]);
+        var currentMobileUserHash = _hashZset(results[1]);
+
+        userIds.forEach(function(userId) {
+          var currentActiveScore = currentActiveUserHash[userId] || 0;
+          var currentMobileScore = currentMobileUserHash[userId] || 0;
+
+          var calculatedActiveScore = onlineCounts[userId] || 0;
+          var calculatedMobileScore = mobileCounts[userId] || 0;
+
+          if(calculatedActiveScore !== currentActiveScore) {
+            winston.info('Inconsistency in active score in presence service for user ', {
+              a: typeof calculatedActiveScore,
+              b: typeof currentActiveScore
+            });
+            winston.info('Inconsistency in active score in presence service for user ' + userId + '. ' + calculatedActiveScore + ' vs ' + currentActiveScore);
+
+            needsUpdate = true;
+            multi.zrem(ACTIVE_USERS_KEY, userId);
+            if(calculatedActiveScore > 0) {
+              multi.zincrby(ACTIVE_USERS_KEY, calculatedActiveScore, userId);
+            }
+          }
+
+          if(calculatedMobileScore !== currentMobileScore) {
+            winston.info('Inconsistency in mobile score in presence service for user ' + userId + '. ' + currentMobileScore + ' vs ' + calculatedMobileScore);
+
+            needsUpdate = true;
+            multi.zrem(MOBILE_USERS_KEY, userId);
+            if(calculatedActiveScore > 0) {
+              multi.zincrby(MOBILE_USERS_KEY, calculatedMobileScore, userId);
+            }
+          }
+        });
+
+        // Now check each troupeId for each userId
+        troupeIds.forEach(function(troupeId, index) {
+          var userTroupeScores = _hashZset(results[2 + index]);
+
+          userIds.forEach(function(userId) {
+            var currentTroupeScore = userTroupeScores[userId] || 0;
+
+            var calculatedTroupeScore = troupeCounts[userId] && troupeCounts[userId][troupeId] || 0;
+
+            if(calculatedTroupeScore !== currentTroupeScore) {
+              winston.info('Inconsistency in troupe score in presence service for user ' + userId + ' in troupe ' + troupeId + '. ' + calculatedTroupeScore + ' vs ' + currentTroupeScore);
+
+              needsUpdate = true;
+              var key = _keyTroupeUsers(troupeId);
+              multi.zrem(key, userId);
+              if(calculatedTroupeScore > 0) {
+                multi.zincrby(key, calculatedTroupeScore, userId);
+              }
+            }
+
+          });
+        });
+
+        // Nothing to do? Finish
+        if(!needsUpdate) return done();
+
+        multi.exec(function(err, replies) {
+          if(err) return done(err);
+
+          if(!replies) {
+            winston.info('Transaction rolled back.');
+            return done({ rollback: true });
+          }
+
+          return done();
+        });
+
+
+      }, done);
+
+
+    });
+
+  }));
+
+
+}
+
+function validateUsers(callback) {
+  var start = Date.now();
+
+  listOnlineUsers(function(err, userIds) {
+    if(err) return callback(err);
+
+    if(userIds.length === 0) return callback();
+
+    var userId = null;
+    function recurseUserIds(err) {
+      if(err && !err.rollback) {
+        return callback(err);
+      }
+
+      if(!err || !err.rollback) {
+        userId = null;
+      }
+
+      if(!userId) {
+        if(userIds.length === 0) {
+          var total = Date.now() - start;
+          winston.info('Presence.validateUsers GC took ' + total + 'ms');
+          return callback();
+        }
+
+        userId = userIds.shift();
+      }
+
+      _validateUsers([userId], recurseUserIds);
+    }
+
+    recurseUserIds();
   });
 }
 
@@ -620,7 +794,7 @@ presenceService.clientEyeballSignal =  clientEyeballSignal;
 presenceService.collectGarbage =  collectGarbage;
 presenceService.startPresenceGcService =  startPresenceGcService;
 
-
+presenceService.validateUsers = validateUsers;
 
 // -------------------------------------------------------------------
 // Default Events
@@ -649,6 +823,14 @@ presenceService.on('userLeftTroupe', function(userId, troupeId) {
 presenceService.on('troupeEmpty', function(troupeId) {
   winston.info("presence: The last user has disconnected from troupe " + troupeId);
 });
+
+presenceService.testOnly = {
+  ACTIVE_USERS_KEY: ACTIVE_USERS_KEY,
+  _validateUsers: _validateUsers,
+  forceDelay: false
+
+};
+
 
 module.exports = presenceService;
 

@@ -2,7 +2,8 @@ local key_socket = KEYS[1];
 local key_active_users = KEYS[2];
 local key_mobile_users = KEYS[3];
 local key_active_sockets = KEYS[4];
-local key_troupe_users = KEYS[5];
+local key_user_lock = KEYS[5];
+local key_troupe_users = KEYS[6];
 
 local user_id = ARGV[1];
 local socket_id = ARGV[2];
@@ -12,6 +13,9 @@ local socket_id = ARGV[2];
 if redis.call("EXISTS", key_socket) == 0 then
 	return { 0 }
 end
+
+redis.call("INCR", key_user_lock);
+redis.call("EXPIRE", key_user_lock, 10);
 
 local user_socket_count
 
