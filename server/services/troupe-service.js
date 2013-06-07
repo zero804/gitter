@@ -30,9 +30,7 @@ function findByIds(ids, callback) {
 }
 
 function findById(id, callback) {
-  persistence.Troupe.findById(id, function(err, troupe) {
-    callback(err, troupe);
-  });
+  persistence.Troupe.findById(id, callback);
 }
 
 function findMemberEmails(id, callback) {
@@ -332,24 +330,27 @@ function findAllUnusedInvitesForEmail(email, callback) {
 }
 
 function removeUserFromTroupe(troupeId, userId, callback) {
-   findById(troupeId, function(err, troupe) {
-      // TODO: Add the user to a removeUsers collection
-      var deleteRecord = new persistence.TroupeRemovedUser({
-        userId: userId,
-        troupeId: troupeId
-      });
+  findById(troupeId, function(err, troupe) {
+    if(err) return callback(err);
+    if(!troupe) return callback('Troupe ' + troupeId + ' does not exist.');
 
-      deleteRecord.save(function(err) {
-        if(err) return callback(err);
+    // TODO: Add the user to a removeUsers collection
+    var deleteRecord = new persistence.TroupeRemovedUser({
+      userId: userId,
+      troupeId: troupeId
+    });
 
-        // TODO: Let the user know that they've been removed from the troupe (via email or something)
-        troupe.removeUserById(userId);
-        if(troupe.users.length === 0) {
-          return callback("Cannot remove the last user from a troupe");
-        }
-        troupe.save(callback);
-      });
-   });
+    deleteRecord.save(function(err) {
+      if(err) return callback(err);
+
+      // TODO: Let the user know that they've been removed from the troupe (via email or something)
+      troupe.removeUserById(userId);
+      if(troupe.users.length === 0) {
+        return callback("Cannot remove the last user from a troupe");
+      }
+      troupe.save(callback);
+    });
+  });
 }
 
 
