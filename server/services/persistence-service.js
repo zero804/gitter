@@ -10,6 +10,7 @@ var winston = require("winston");
 var nconf = require("../utils/config");
 var shutdown = require('../utils/shutdown');
 var Fiber = require("../utils/fiber");
+var assert = require("assert");
 
 // Install inc and dec number fields in mongoose
 require('mongoose-number')(mongoose);
@@ -197,6 +198,7 @@ TroupeSchema.methods.addUserById = function(userId) {
 };
 
 TroupeSchema.methods.removeUserById = function(userId) {
+  assert(userId);
   // TODO: disable this methods for one-to-one troupes
   var troupeUser = _.find(this.users, function(troupeUser){ return troupeUser.userId == userId; });
   if(troupeUser) {
@@ -245,11 +247,15 @@ TroupeRemovedUserSchema.schemaTypeName = 'TroupeRemovedUserSchema';
 //
 var InviteSchema = new Schema({
   troupeId: ObjectId,
-  displayName: { type: String },
-  email: { type: String },
-  code: { type: String },
-  status: { type: String, "enum": ['UNUSED', 'USED'], "default": 'UNUSED'},
-  _tv: { type: 'MongooseNumber', 'default': 0 }
+  senderDisplayName:  { type: String },
+  displayName:        { type: String },
+  email:              { type: String },
+  userId:             { type: ObjectId },
+  createdAt:          { type: Date, "default": Date.now },
+  emailSentAt:        { type: Date },
+  code:               { type: String },
+  status:             { type: String, "enum": ['UNUSED', 'USED'], "default": 'UNUSED'},
+  _tv:                { type: 'MongooseNumber', 'default': 0 }
 });
 InviteSchema.schemaTypeName = 'InviteSchema';
 
@@ -423,6 +429,8 @@ GeoPopulatedPlaceSchema.schemaTypeName = 'GeoPopulatedPlaceSchema';
   appleToken: Buffer,
   tokenHash: String,
   deviceType: { type: String, "enum": ['APPLE', 'APPLE-DEV', 'ANDROID', 'TEST']},
+  appVersion: String,
+  appBuild: String,
   timestamp: Date
 });
 PushNotificationDeviceSchema.index({ deviceId: 1 });

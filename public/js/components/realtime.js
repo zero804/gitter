@@ -15,6 +15,10 @@ define([
 
   var clientId = null;
 
+  function isMobile() {
+    return navigator.userAgent.indexOf('Mobile/') >= 0;
+  }
+
   function connectionProblemTimeout() {
     connectionProblemTimeoutHandle = null;
 
@@ -46,6 +50,8 @@ define([
     if(message.channel == '/meta/handshake') {
       message.ext = message.ext || {};
       if(window.troupeContext) message.ext.token = window.troupeContext.accessToken;
+      message.ext.connType = isMobile() ? 'mobile' : 'online';
+
     } else if(message.channel == '/meta/subscribe') {
       message.ext = message.ext || {};
       message.ext.eyeballs = eyeballState ? 1 : 0;
@@ -268,8 +274,8 @@ define([
 
     // Cordova events.... doesn't matter if IE8 doesn't handle them
     if(document.addEventListener) {
-      document.addEventListener("offline", fakeSubscription, false);
-      document.addEventListener("online", fakeSubscription, false);
+      document.addEventListener("offline", function() { log('realtime: offline'); }, false);
+      document.addEventListener("online", function() { log('realtime: online'); fakeSubscription(); }, false);
     }
 
   });

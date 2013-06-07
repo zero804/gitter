@@ -10,7 +10,13 @@ var _ = require('underscore');
 var redis = require("../utils/redis"),
     redisClient = redis.createClient();
 
+var Scripto = require('redis-scripto');
+var scriptManager = new Scripto(redisClient);
+scriptManager.loadFromDir(__dirname + '/../../redis-lua/notify');
+
 var minimumUserAlertIntervalS = nconf.get("notifications:minimumUserAlertInterval");
+
+
 
 function buffersEqual(a,b) {
   if (!Buffer.isBuffer(a)) return undefined;
@@ -23,7 +29,7 @@ function buffersEqual(a,b) {
 
   return true;
 }
-exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName, callback) {
+exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName, appVersion, appBuild, callback) {
   var tokenHash = crypto.createHash('md5').update(deviceToken).digest('hex');
 
   PushNotificationDevice.findOneAndUpdate(
@@ -34,10 +40,14 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
       tokenHash: tokenHash,
       deviceType: deviceType,
       deviceName: deviceName,
-      timestamp: new Date()
+      timestamp: new Date(),
+      appVersion: appVersion,
+      appBuild: appBuild
     },
     { upsert: true },
     function(err, device) {
+      if(err) return callback(err);
+
       // After we've update the device, look for other devices that have given us the same token
       // these are probably phones that have been reset etc, so we need to prune them
       PushNotificationDevice.find({
@@ -47,7 +57,7 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
         var fiber = new Fiber();
 
         results.forEach(function(device) {
-          // This device? Ski
+          // This device? Skip
           if(device.deviceId == deviceId) return;
 
           // If the hashes are the same, we still need to check that the actual tokens are the same
@@ -85,68 +95,64 @@ exports.findUsersWithDevices = function(userIds, callback) {
 exports.findDevicesForUsers = function(userIds, callback) {
   userIds = _.uniq(userIds);
   PushNotificationDevice
-    .where('userId').in(userIds)
+    .where('userId')['in'](userIds)
     .exec(callback);
 };
 
-
-exports.findUsersAcceptingNotifications = function(userIds, callback) {
-  userIds = _.uniq(userIds);
+exports.findUsersTroupesAcceptingNotifications = function(userTroupes, callback) {
 
   var multi = redisClient.multi();
-  userIds.forEach(function(userId) {
-    multi.exists("nb:" + userId);
+  userTroupes.forEach(function(userTroupes) {
+    var userId = userTroupes.userId;
+    var troupeId = userTroupes.troupeId;
+    multi.exists("nl:" + userId + ':' + troupeId); // notification 1 sent
+    multi.exists("nls:" + userId + ':' + troupeId); // awaiting timeout before sending note2
   });
 
   multi.exec(function(err, replies) {
     if(err) return callback(err);
 
-    var response = [];
-    replies.forEach(function(reply, index) {
-      var userId = userIds[index];
-      if(reply === 0) {
-        response.push(userId);
-      }
+    var response = userTroupes.map(function(userTroupe, i) {
+      var globalLock = replies[i * 2];
+      var segmentLock = replies[i * 2 + 1];
+
+      return {
+        userId: userTroupe.userId,
+        troupeId: userTroupe.troupeId,
+        accepting: !globalLock || !segmentLock // Either the user doesn't have a global notification lock or a segment notification lock
+      };
     });
 
     callback(null, response);
   });
 };
 
-exports.findAndUpdateUsersAcceptingNotifications = function(userIds, callback) {
-  userIds = _.uniq(userIds);
+exports.resetNotificationsForUserTroupe = function(userId, troupeId, callback) {
+  redisClient.del("nl:" + userId + ':' + troupeId, "nls:" + userId + ':' + troupeId, callback);
+};
 
-  winston.info("findAndUpdateUsersAcceptingNotifications", { userIds: userIds });
 
-  var multi = redisClient.multi();
-  userIds.forEach(function(userId) {
-    multi.msetnx("nb:" + userId, "1");
-  });
+// Returns callback(err, notificationNumber)
+exports.canLockForNotification = function(userId, troupeId, startTime, callback) {
+  var keys = ['nl:' + userId + ':' + troupeId, 'nls:' + userId + ':' + troupeId ];
+  var values = [startTime, minimumUserAlertIntervalS];
 
-  multi.exec(function(err, replies) {
+  scriptManager.run('notify-lock-user-troupe', keys, values, function(err, result) {
     if(err) return callback(err);
 
-    var m2 = redisClient.multi();
-    var response = [];
-    replies.forEach(function(reply, index) {
-      var userId = userIds[index];
-      if(reply === 1) {
-        response.push(userId);
-        m2.expire("nb:" + userId, minimumUserAlertIntervalS);
-      }
-    });
-
-    if(response) {
-      m2.exec(function(err/*, replies*/) {
-        if(err) return callback(err);
-
-        callback(null, response);
-      });
-    } else {
-      callback(null, response);
-    }
-
+    return callback(null, result);
   });
 };
 
+// Returns callback(err, falsey value or { startTime: Y }])
+exports.canUnlockForNotification = function (userId, troupeId, notificationNumber, callback) {
+  var keys = ['nl:' + userId + ':' + troupeId, 'nls:' + userId + ':' + troupeId ];
+  var values = [notificationNumber];
+
+  scriptManager.run('notify-unlock-user-troupe', keys, values, function(err, result) {
+    if(err) return callback(err);
+
+    return callback(null, result ? parseInt(result, 10) : 0);
+  });
+};
 

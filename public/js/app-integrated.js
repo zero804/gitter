@@ -34,6 +34,7 @@ require([
   'views/profile/profileView',
   'views/shareSearch/shareSearchView',
   'views/signup/createTroupeView',
+  'hbs!./views/invite/tmpl/invitesItemTemplate',
   'hbs!./views/app/tmpl/appHeader',
   'views/app/troupeSettingsView',
   'components/webNotifications',
@@ -44,7 +45,7 @@ require([
 ], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, realtime, eyeballs, dozy, AppIntegratedView, chatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
             collections, troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareSearchView,
-            createTroupeView, headerViewTemplate,
+            createTroupeView, invitesItemTemplate, headerViewTemplate,
             troupeSettingsView, webNotifications, unreadItemsClient, log /*, errorReporter , FilteredCollection */) {
   "use strict";
 
@@ -81,6 +82,7 @@ require([
   app.collections = {};
   app.addRegions({
     leftMenuUnread: "#left-menu-list-unread",
+    leftMenuInvites: "#left-menu-list-invites",
     leftMenuRecent: "#left-menu-list-recent",
     leftMenuFavourites: "#left-menu-list-favourites",
     leftMenuTroupes: "#left-menu-list",
@@ -262,6 +264,7 @@ require([
   var unreadTroupeCollection = collections.unreadTroupes;
   var favouriteTroupesCollection = collections.favouriteTroupes;
   var recentTroupeCollection = collections.recentTroupes;
+  var incomingInvitesCollection = collections.incomingInvites;
   // TODO is this used by anyone anymore?
   app.collections['chats'] = collections.chats;
   app.collections['requests'] = collections.requests;
@@ -352,6 +355,16 @@ require([
       collection: favouriteTroupesCollection
     });
     app.leftMenuFavourites.show(favouriteTroupeCollectionView);
+
+    // incoming invites collection view
+    var invitesCollectionView = new Marionette.CollectionView({
+      collection: incomingInvitesCollection,
+      itemView: TroupeViews.Base.extend({
+        tagName: 'li',
+        template: invitesItemTemplate
+      })
+    });
+    app.leftMenuInvites.show(invitesCollectionView);
 
     // People View
     var peopleCollectionView = new PeopleCollectionView({

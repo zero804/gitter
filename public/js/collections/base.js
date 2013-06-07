@@ -150,6 +150,7 @@ define([
       this.add(items, { parse: true, merge: true, sort: true });
       this._loading = false;
       this.trigger('sync');
+      this.trigger('reset', this.models);
     },
 
     _onInitialLoad: function() {

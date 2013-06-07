@@ -52,18 +52,24 @@ exports.install = function(persistenceService) {
     mongooseUtils.attachNotificationListenersToSchema(schema, {
       onCreate: function(model, next) {
         var url = extractor(model);
+        if(!url) return;
+
         serializeEvent(url, 'create', model);
         next();
       },
 
       onUpdate: function(model, next) {
         var url = extractor(model);
+        if(!url) return;
+
         serializeEvent(url, 'update', model);
         next();
       },
 
       onRemove: function(model) {
         var url = extractor(model);
+        if(!url) return;
+
         serializeEvent(url, 'remove', model);
       }
     });
@@ -97,7 +103,14 @@ exports.install = function(persistenceService) {
   attachNotificationListenersToSchema(schemas.ConversationSchema, 'conversation');
   attachNotificationListenersToSchema(schemas.FileSchema, 'file');
   // INVITES currently do not have live-collections
-  // attachNotificationListenersToSchema(schemas.InviteSchema, 'invite');
+  attachNotificationListenersToSchema(schemas.InviteSchema, 'invite', function(model) {
+    if(model.userId) {
+      return "/user/" + model.userId + "/invites";
+    }
+
+    return null;
+  });
+
   attachNotificationListenersToSchema(schemas.RequestSchema, 'request');
   attachNotificationListenersToSchema(schemas.ChatMessageSchema, 'chat', function(model) {
     return "/troupes/" + model.toTroupeId + "/chatMessages";

@@ -48,6 +48,7 @@ module.exports = {
     }
 
     installUserSubResource('troupes', 'troupes');
+    installUserSubResource('invites', 'invites');
 
   }
 };

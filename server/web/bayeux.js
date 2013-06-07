@@ -92,54 +92,16 @@ function messageIsFromSuperClient(message) {
          message.ext.password === superClientPassword;
 }
 
-// This needs to be removed once all old FayeObjC clients that don't send ext on handshakre are dead and gone
-var HANDLE_TEMPORARY_FAYEOBJ_SITUATION = true;
+function getConnectionType(incoming) {
+  if(!incoming) return 'online';
 
-function handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake(message, callback) {
-  var clientId = message.clientId;
-  function deny() {
-    message.error = '403::Access denied';
-    callback(message);
+  switch(incoming) {
+    case 'online': return 'online';
+    case 'mobile': return 'mobile';
+
+    default:
+      return 'online';
   }
-
-  presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
-    if(err) {
-      winston.error("bayeux: handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake: lookupUserIdForSocket error" + err, { exception: err, message: message });
-      return deny();
-    }
-
-    if(userId) return callback(message);
-
-    // We're not authed, try now
-    if(messageIsFromSuperClient(message)) {
-      return callback(message);
-    }
-
-    var ext = message.ext;
-    if(!ext) return deny();
-
-    var accessToken = ext.token;
-    if(!accessToken) return deny();
-
-    oauth.validateToken(accessToken, function(err, userId) {
-      if(err) {
-        winston.error("bayeux: Authentication error" + err, { exception: err, message: message });
-        return deny();
-       }
-
-      if(!userId) {
-        winston.warn("bayeux: Authentication failed", { message: message });
-        return deny();
-      }
-
-      // Get the presence service involved around about now
-      presenceService.userSocketConnected(userId, clientId, function(err) {
-        if(err) winston.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
-        callback(message);
-      });
-
-    });
-  });
 }
 
 var authenticator = {
@@ -149,33 +111,18 @@ var authenticator = {
       callback(message);
     }
 
-    // TEMP TEMP TEMP
-    if(HANDLE_TEMPORARY_FAYEOBJ_SITUATION) {
-      if (message.channel == '/meta/subscribe') {
-        return handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake(message, callback);
-      }
-    }
-
     if (message.channel != '/meta/handshake') {
       return callback(message);
     }
-
-    winston.verbose('bayeux: Authenticating client', message);
 
     if(messageIsFromSuperClient(message)) {
       return callback(message);
     }
 
     var ext = message.ext;
+
     if(!ext || !ext.token) {
-      if(HANDLE_TEMPORARY_FAYEOBJ_SITUATION) {
-        winston.verbose('bayeux: Allowing temporary access to unauthorised handshake client');
-        // Currently the faye connection code doesn't send the ext in the handshake message
-        // see handleTemporarySituationWhereFayeObjCDoesntSendExtOnHandshake
-        return callback(message);
-      } else {
-        return deny();
-      }
+      return deny();
     }
 
     oauth.validateToken(ext.token, function(err, userId) {
@@ -189,10 +136,12 @@ var authenticator = {
         return deny();
       }
 
+      var connectionType = getConnectionType(ext.connType);
+
       // This is an UGLY UGLY hack, but it's the only
       // way possible to pass the userId to the outgoing extension
       // where we have the clientId (but not the userId)
-      message.id = message.id + ':' + userId;
+      message.id = message.id + ':' + userId + ':' + connectionType;
 
       return callback(message);
     });
@@ -218,16 +167,17 @@ var authenticator = {
 
     var parts = fakeId.split(':');
 
-    if(parts.length != 2) {
+    if(parts.length != 3) {
       return callback(message);
     }
 
     message.id = parts[0];
     var userId = parts[1];
+    var connectionType = parts[2];
     var clientId = message.clientId;
 
     // Get the presence service involved around about now
-    presenceService.userSocketConnected(userId, clientId, function(err) {
+    presenceService.userSocketConnected(userId, clientId, connectionType, function(err) {
       if(err) winston.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
 
       // Not possible to throw an error here, so just carry only

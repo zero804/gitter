@@ -117,9 +117,6 @@ exports.hook_queue = function(next, connection) {
 
 function saveMailForTroupe(mail, toAddress, connection, callback) {
   winston.verbose("Saving mail from " + mail.from + " to troupe " + toAddress);
-  //console.log("From: " + fromName);
-  //console.log("To:" + toAddress);
-  //console.log("In-Reply-To:" + inReplyTo);
 
   var fromAddress = mail.from;
   var notes = connection.transaction.notes;

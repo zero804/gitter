@@ -708,6 +708,12 @@ define([
     },
 
     appendHtml: function(collectionView, itemView, index) {
+      log("Inserting view at index ", index, " of ", collectionView.collection.length, " in collection ", collectionView.collection.url, "; itemView ", itemView.model.attributes, ((this.isRendering) ? " with rendering shortcut" : ''));
+
+      if(window.debugSortableMarionette) {
+        debugger;
+      }
+
       // Shortcut - just place at the end!
       if (this.isRendering) {
         // if this is during rendering, then the views always come in sort order, so just append
@@ -748,7 +754,8 @@ define([
         if(adjView) {
           itemView.$el.insertBefore(adjView.el);
         } else {
-          log("Inserting *after* the bottom of the collection ", adjView);
+          log("Inserting *after* the bottom for collection ", collectionView.collection.url, adjView, itemView);
+          /* in this case, the itemViews are not coming in any sequential order  */
           // We can't find an item before, we can't find an item after,
           // just give up and insert at the end. (hopefully this will never happen eh?)
           itemView.$el.appendTo(collectionView.el);
