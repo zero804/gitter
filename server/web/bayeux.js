@@ -137,8 +137,6 @@ var authenticator = {
       }
 
       var connectionType = getConnectionType(ext.connType);
-      console.log('CONTYPE: ', connectionType);
-      console.log(message);
 
       // This is an UGLY UGLY hack, but it's the only
       // way possible to pass the userId to the outgoing extension
