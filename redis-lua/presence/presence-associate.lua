@@ -2,6 +2,7 @@ local key_socket_user = KEYS[1];
 local key_active_users = KEYS[2];
 local key_mobile_users = KEYS[3];
 local key_active_sockets = KEYS[4];
+local key_user_lock = KEYS[5];
 
 local user_id = ARGV[1];
 local socket_id = ARGV[2];
@@ -11,6 +12,9 @@ local mobile_connection = tonumber(ARGV[4]);
 if redis.call("EXISTS", key_socket_user) == 1 then
 	return { 0 }
 end
+
+redis.call("INCR", key_user_lock);
+redis.call("EXPIRE", key_user_lock, 10);
 
 redis.call("HSET", key_socket_user, "uid", user_id)
 redis.call("HSET", key_socket_user, "ctime", create_time)

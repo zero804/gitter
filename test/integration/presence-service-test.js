@@ -8,9 +8,12 @@ var logAccess = require('./log-access');
 var presenceService = logAccess(testRequire('./services/presence-service'));
 */
 var presenceService = testRequire('./services/presence-service');
+var redis = testRequire("./utils/redis");
 
 var assert = require('assert');
 var winston = testRequire("./utils/winston");
+var Fiber = testRequire("./utils/fiber");
+
 var Q = require("q");
 
 var fakeEngine = {
@@ -25,7 +28,10 @@ describe('presenceService', function() {
     presenceService.collectGarbage(fakeEngine, function(err) {
       if(err) return done(err);
 
-      return done();
+      presenceService.validateUsers(function() {
+        return done();
+      });
+
     });
   }
 
@@ -502,7 +508,131 @@ describe('presenceService', function() {
 
   });
 
+  it('should validate sockets', function(done) {
+    presenceService.validateUsers(done);
+  });
 
+  it('should correct sockets', function(done) {
+    var userId = 'TESTUSER4' + Date.now();
+    var socketId = 'TESTSOCKET5' + Date.now();
+    var troupeId = 'TESTTROUPE4' + Date.now();
+    presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
+      if(err) return done(err);
+
+      var redisClient = redis.createClient();
+
+      // Now mess things up intentionally
+      redisClient.zincrby(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId, function(err) {
+        if(err) return done(err);
+        presenceService.validateUsers(function(err) {
+          if(err) done(err);
+
+          presenceService.socketDisconnected(socketId, function(err) {
+            if(err) return done(err);
+
+            presenceService.listOnlineUsers(function(err, users) {
+              if(err) return done(err);
+
+              assert(users.every(function(id) { return id !== userId; }), 'Expected user not to be in the troupe: ' + users.join(', '));
+
+              done();
+            });
+          });
+        });
+
+      });
+    });
+
+  });
+
+  it('should correct sockets for multiple users', function(done) {
+    var userId1 = 'TESTUSER1' + Date.now();
+    var userId2 = 'TESTUSER2' + Date.now();
+    var socketId1 = 'TESTSOCKET1' + Date.now();
+    var socketId2 = 'TESTSOCKET2' + Date.now();
+    var troupeId = 'TESTTROUPE1' + Date.now();
+
+    presenceService.userSocketConnected(userId1, socketId1, 'online', function(err) {
+      presenceService.userSocketConnected(userId2, socketId2, 'mobile', function(err) {
+        if(err) return done(err);
+
+        var redisClient = redis.createClient();
+
+        // Now mess things up intentionally
+        redisClient.zincrby(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId2, function(err) {
+          if(err) return done(err);
+
+          redisClient.zincrby(presenceService.testOnly.MOBILE_USERS_KEY, 1, userId1, function(err) {
+            if(err) return done(err);
+
+            presenceService.validateUsers(function(err) {
+              if(err) done(err);
+
+              presenceService.socketDisconnected(socketId1, function(err) {
+                if(err) return done(err);
+
+                presenceService.socketDisconnected(socketId2, function(err) {
+                  if(err) return done(err);
+
+                  presenceService.listOnlineUsers(function(err, users) {
+                    if(err) return done(err);
+
+                    assert(users.every(function(id) { return id !== userId1; }), 'Expected user not to be in the troupe: ' + users.join(', '));
+                    assert(users.every(function(id) { return id !== userId2; }), 'Expected user not to be in the troupe: ' + users.join(', '));
+
+                    done();
+                  });
+                });
+
+
+              });
+            });
+
+          });
+
+        });
+
+      });
+    });
+
+  });
+
+  it('should abort the transaction when correcting the socket and an event occurs for the user', function(done) {
+    var userId = 'TESTUSER4' + Date.now();
+    var socketId = 'TESTSOCKET5' + Date.now();
+    var troupeId = 'TESTTROUPE4' + Date.now();
+
+    presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
+      if(err) return done(err);
+
+      var redisClient = redis.createClient();
+
+      // Now mess things up intentionally
+      redisClient.zincrby(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId, function(err) {
+        if(err) return done(err);
+
+
+        presenceService.testOnly.forceDelay = true;
+        presenceService.testOnly._validateUsers([userId], function(err) {
+          presenceService.testOnly.forceDelay = false;
+
+          assert(err, 'Expected an error');
+          assert(err.rollback, 'Expected a transaction rollback');
+          done();
+        });
+
+        setTimeout(function() {
+
+          presenceService.socketDisconnected(socketId, function(err) {
+            if(err) return done(err);
+          });
+
+        }, 10);
+
+      });
+    });
+
+  });
 
 });
 
