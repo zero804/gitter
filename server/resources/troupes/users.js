@@ -20,7 +20,7 @@ module.exports = {
       var user = req.user; // NB NB NB, not the usual req.user, but the req.RESOURCEish user. Capish?
       troupeService.removeUserFromTroupe(req.troupe._id, user.id, function (err) {
       if(err) return next(err);
-        res.send(200);
+        res.send({ success: true });
       });
     },
 
