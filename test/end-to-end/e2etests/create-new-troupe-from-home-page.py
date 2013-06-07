@@ -30,6 +30,8 @@ def testCreateTroupeForNewUser():
     form.find_element_by_name('email').send_keys(emailAddress)
     form.find_element_by_name('submit').click()
 
+    driver.find_element_by_css_selector('.label-signupsuccess')
+
     queryurl = utils.baseUrl("/testdata/confirmationLink?email=" + emailAddress)
     response = urllib2.urlopen(queryurl)
     confirmLink = response.read()
