@@ -89,6 +89,8 @@ version-files:
 upgrade-data:
 	./scripts/upgrade-data.sh
 
+init-test-data:
+	./scripts/dataupgrades/005-test-users/001-update.sh
 
 tarball:
 	mkdir -p output
@@ -103,7 +105,7 @@ search-js-console:
 
 validate-source: search-js-console
 
-continuous-integration: clean validate-source npm grunt version-files upgrade-data test-xunit test-coverage tarball
+continuous-integration: clean validate-source npm grunt version-files upgrade-data init-test-data test-xunit test-coverage tarball
 
 post-deployment-tests: test-in-browser end-to-end-test
 
