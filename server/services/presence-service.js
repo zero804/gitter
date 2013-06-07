@@ -589,7 +589,7 @@ function _hashZset(scoresArray) {
 
 function introduceDelayForTesting(cb) {
   if(presenceService.testOnly.forceDelay) {
-    setTimeout(cb, 30);
+    setTimeout(cb, 120);
   } else {
     cb();
   }
