@@ -289,7 +289,8 @@ define([
 
   return {
     getClientId: function() {
-      return getOrCreateClient().getClientId();
+      var client = getOrCreateClient();
+      return client.getClientId();
     },
 
     subscribe: function(channel, callback) {

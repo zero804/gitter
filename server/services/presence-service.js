@@ -179,6 +179,24 @@ function userSocketConnected(userId, socketId, connectionType, callback) {
 
 }
 
+function socketDisconnectionRequested(userId, socketId, callback) {
+  assert(socketId, 'socketId expected');
+  assert(userId, 'userId expected');
+
+  lookupUserIdForSocket(socketId, function(err, userId2) {
+    if(err) return callback(err);
+    if(userId !== userId2) {
+      return callback(401);
+    }
+
+    __disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, function(err) {
+      callback(err);
+    });
+
+  });
+}
+
+
 function socketDisconnected(socketId, callback) {
   assert(socketId, 'socketId expected');
 
@@ -781,7 +799,7 @@ function validateUsers(callback) {
 presenceService.userSocketConnected = userSocketConnected,
 presenceService.userSubscribedToTroupe =  userSubscribedToTroupe;
 presenceService.socketDisconnected =  socketDisconnected;
-
+presenceService.socketDisconnectionRequested = socketDisconnectionRequested;
 
 // Query Status
 presenceService.lookupUserIdForSocket =  lookupUserIdForSocket;

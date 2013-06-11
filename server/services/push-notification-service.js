@@ -30,6 +30,7 @@ function buffersEqual(a,b) {
   return true;
 }
 exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName, appVersion, appBuild, callback) {
+  winston.verbose("Registering device ", { deviceId: deviceId });
   var tokenHash = crypto.createHash('md5').update(deviceToken).digest('hex');
 
   PushNotificationDevice.findOneAndUpdate(

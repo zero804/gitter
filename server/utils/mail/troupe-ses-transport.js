@@ -177,6 +177,7 @@ TroupeSESTransport.prototype.buildKeyValPairs = function(config) {
  * @param {String} AWSSecretKey ASW secret key
  */
 TroupeSESTransport.prototype.buildSignature = function(date, AWSSecretKey) {
+  winston.silly('Signing SES request');
   var sha256 = crypto.createHmac('sha256', AWSSecretKey);
   sha256.update(date);
   return sha256.digest('base64');
