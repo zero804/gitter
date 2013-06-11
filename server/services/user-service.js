@@ -6,14 +6,17 @@ var persistence = require("./persistence-service"),
     emailNotificationService = require("./email-notification-service"),
     uuid = require('node-uuid'),
     geocodingService = require("./geocoding-service"),
-    assert = require("assert"),
     winston = require("winston"),
     statsService = require("./stats-service"),
     crypto = require('crypto'),
     _ = require('underscore');
 
 function generateGravatarUrl(email) {
-  return  "https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon";
+  var url =  "https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon";
+
+  winston.verbose('Gravatar URL ' + url);
+
+  return url;
 }
 
 var userService = {

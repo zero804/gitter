@@ -39,8 +39,8 @@ module.exports = function( grunt ) {
               {
                 name: "core-libraries",
                 include: [
-                  //"../repo/almond/almond"
-                  "../repo/requirejs/requirejs"
+                  "../repo/requirejs/requirejs",
+                  "utils/logrjs"
                 ]
               },
               {

@@ -25,5 +25,8 @@ module.exports = {
     app.all('/api/v1/ping', auth);
     app.get('/api/v1/ping', require('./ping.js'));
 
+    app.all('/api/v1/sockets', auth);
+    app.resource('api/v1/sockets', require('./sockets.js'));
+
   }
 };
