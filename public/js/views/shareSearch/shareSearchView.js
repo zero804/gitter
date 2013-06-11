@@ -124,7 +124,7 @@ define([
           $.ajax({ url: '/user?excludeTroupeId='+window.troupeContext.troupe.id+'&q=' + query, success:
             function(data) {
 
-              source = data.results;
+              source = data.results || [];
               sources[query] = source;
 
               addEmailOption(source, query);
