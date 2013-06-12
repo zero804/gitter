@@ -1,13 +1,11 @@
 /*jshint unused:true, browser:true*/
 define([
   'jquery',
-  'faye',
+  './fayeWrapper',
   'log!realtime',
   '../utils/momentWrapper'
-], function($, Faye, log, moment) {
+], function($, FayeWrapper, log, moment) {
   "use strict";
-
-  //Faye.Logging.logLevel = 'info';
 
   var connected = false;
   var connectionProblemTimeoutHandle;
@@ -92,51 +90,6 @@ define([
 
   var subscriptionTimestampExtension = new SubscriptionTimestamp();
 
-  var _subscriptions = {};
-  var _id = 0;
-  function SubscriptionClient(client, channel, callback) {
-    this._id = _id++;
-    this._callback = callback;
-    this._channel = channel;
-    _subscriptions[this._id] = this;
-    this._connect(client);
-  }
-
-  SubscriptionClient.prototype = {
-    _connect: function(client) {
-      log('Resubscribing to ' + this._channel);
-      var self = this;
-      this._subscription = client.subscribe(this._channel, this._callback);
-
-      this._subscription.callback(function() {
-        log('Successfully resubscribed to ' + self._channel);
-
-        if(self._subscriptionCalled) return;
-        self._subscriptionCalled = true;
-
-        if(self._subscribeCallback) self._subscribeCallback();
-      });
-
-      this._subscription.errback(function(error) {
-        if(self._errorCallback) self._errorCallback(error);
-      });
-    },
-
-    callback: function(subscribeCallback) {
-      this._subscribeCallback = subscribeCallback;
-    },
-
-    errback: function(errorCallback) {
-      this._errorCallback = errorCallback;
-    },
-
-    cancel: function() {
-      delete _subscriptions[this._id];
-      this._subscription.cancel();
-    }
-  };
-
-
   function createClient() {
     var c;
     if(window.troupeContext) c = window.troupeContext.websockets;
@@ -148,7 +101,7 @@ define([
       };
     }
 
-    var client = new Faye.Client(c.fayeUrl, c.options);
+    var client = new FayeWrapper(c.fayeUrl, c.options);
 
     if(c.disable) {
       for(var i = 0; i < c.length; i++) {
@@ -158,8 +111,6 @@ define([
 
     client.addExtension(new ClientAuth());
     client.addExtension(subscriptionTimestampExtension);
-
-    client.connect(function() {});
 
     client.bind('transport:down', function() {
       log('transport:down');
@@ -192,16 +143,11 @@ define([
       }
     });
 
-    _.each(_.values(_subscriptions), function(subscription){
-      subscription._connect(client);
-    });
-
-    monitorConnection();
-
     // TODO: this stuff below really should find a better home
     if(window.troupeContext && window.troupeContext.troupe) {
-      new SubscriptionClient(client, '/troupes/' + window.troupeContext.troupe.id, function(message) {
-        log("Subscription!", message);
+      client.subscribe('/troupes/' + window.troupeContext.troupe.id, function(message) {
+        log("Troupe Subscription!", message);
+
         if(message.notification === 'presence') {
           if(message.status === 'in') {
             $(document).trigger('userLoggedIntoTroupe', message);
@@ -209,19 +155,19 @@ define([
             $(document).trigger('userLoggedOutOfTroupe', message);
           }
         }
+
         if (message.operation === "update") {
           $(document).trigger('troupeUpdate', message);
         }
+
       });
     }
 
-    return client;
-  }
 
-  function disconnectClient(client) {
-    client.unbind('transport:up');
-    client.unbind('transport:down');
-    client.disconnect();
+    client.connect(function() {});
+
+
+    return client;
   }
 
 
@@ -230,76 +176,29 @@ define([
 
 
 
-  function recycleConnection() {
-    log('Recycling connection');
-    disconnectClient(_client);
-    _client = createClient();
+  var client;
+  function getOrCreateClient() {
+    if(client) return client;
+    client = createClient();
+    return client;
   }
 
-
-  function fakeSubscription() {
-    if(!_client) return;
-    var startTime = Date.now();
-    var connectionTimeoutPeriod = 30000;
-
-    log('Attempting to subscribe to /ping');
-
-    var subscription = _client.subscribe('/ping', function() { });
-
-    subscription.callback(function() {
-      if(timeout) window.clearTimeout(timeout);
-      subscription.cancel();
-    });
-
-    subscription.errback(function(error) {
-      log('Error while subscribing to ping channel', error);
-      if(timeout) window.clearTimeout(timeout);
-
-      if((Date.now() - startTime) > (connectionTimeoutPeriod * 1.1)) {
-        log('Ping subscription interrupted', error);
-      } else {
-        recycleConnection();
-      }
-
-      subscription.cancel();
-    });
-
-    var timeout = window.setTimeout(function() {
-      log('Timeout while waiting for ping subscription');
-
-      if((Date.now() - startTime) > (connectionTimeoutPeriod * 1.1)) {
-        log('Ping subscription interrupted', error);
-      } else {
-        recycleConnection();
-      }
-
-      subscription.cancel();
-    }, timeout);
-
-  }
-
-  var monitorConnection = _.once(function() {
-    window.setInterval(fakeSubscription, 60000);
-
-    $(document).on('reawaken', function() {
-      log('Recycling connection after reawaken');
-      recycleConnection();
-    });
-
-    // Cordova events.... doesn't matter if IE8 doesn't handle them
-    if(document.addEventListener) {
-      document.addEventListener("offline", function() { log('realtime: offline'); }, false);
-      document.addEventListener("online", function() { log('realtime: online'); fakeSubscription(); }, false);
-    }
-
+  $(document).on('reawaken', function() {
+    log('Recycling connection after reawaken');
+    if(client) client.recycle();
   });
 
-  var _client;
-  function getOrCreateClient() {
-    if(_client) return _client;
-    _client = createClient();
-    return _client;
+  // Cordova events.... doesn't matter if IE8 doesn't handle them
+  if(document.addEventListener) {
+    document.addEventListener("deviceReady", function() {
+      document.addEventListener("online", function() {
+        log('realtime: online');
+        if(client) client.ping();
+      }, false);
+    }, false);
   }
+
+
 
   return {
     getClientId: function() {
@@ -307,10 +206,14 @@ define([
       return client.getClientId();
     },
 
-    recycleConnection: recycleConnection,
+    recycleConnection: function() {
+      log('Recycling connection');
+      getOrCreateClient().recycle();
 
-    subscribe: function(channel, callback) {
-      return new SubscriptionClient(getOrCreateClient(), channel, callback);
+    },
+
+    subscribe: function(channel, callback, context) {
+      return getOrCreateClient().subscribe(channel, callback, context);
     },
 
     getClient: function() {
