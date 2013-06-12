@@ -33,8 +33,6 @@ require([
   chatCollection.newConnectionCount = 0;
   $(document).on('realtime:newConnectionEstablished', function() {
     if(chatCollection.newConnectionCount++) {
-      console.log('Refetching!');
-
       chatCollection.fetch({
         data: {
           limit: PAGE_SIZE
