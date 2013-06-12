@@ -8,6 +8,7 @@ local user_id = ARGV[1];
 local socket_id = ARGV[2];
 local create_time = ARGV[3];
 local mobile_connection = tonumber(ARGV[4]);
+local client = ARGV[5];
 
 if redis.call("EXISTS", key_socket_user) == 1 then
 	return { 0 }
@@ -18,6 +19,7 @@ redis.call("EXPIRE", key_user_lock, 10);
 
 redis.call("HSET", key_socket_user, "uid", user_id)
 redis.call("HSET", key_socket_user, "ctime", create_time)
+redis.call("HSET", key_socket_user, "ct", client)
 
 
 local user_socket_count = -1

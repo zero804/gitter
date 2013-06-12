@@ -137,11 +137,12 @@ var authenticator = {
       }
 
       var connectionType = getConnectionType(ext.connType);
+      var client = ext.client || '';
 
       // This is an UGLY UGLY hack, but it's the only
       // way possible to pass the userId to the outgoing extension
       // where we have the clientId (but not the userId)
-      message.id = message.id + ':' + userId + ':' + connectionType;
+      message.id = message.id + ':' + userId + ':' + connectionType + ':' + client;
 
       return callback(message);
     });
@@ -167,7 +168,7 @@ var authenticator = {
 
     var parts = fakeId.split(':');
 
-    if(parts.length != 3) {
+    if(parts.length != 4) {
       return callback(message);
     }
 
@@ -175,9 +176,11 @@ var authenticator = {
     var userId = parts[1];
     var connectionType = parts[2];
     var clientId = message.clientId;
+    var client = parts[3];
+
 
     // Get the presence service involved around about now
-    presenceService.userSocketConnected(userId, clientId, connectionType, function(err) {
+    presenceService.userSocketConnected(userId, clientId, connectionType, client, function(err) {
       if(err) winston.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
 
       // Not possible to throw an error here, so just carry only

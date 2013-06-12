@@ -49,6 +49,7 @@ define([
       message.ext = message.ext || {};
       if(window.troupeContext) message.ext.token = window.troupeContext.accessToken;
       message.ext.connType = isMobile() ? 'mobile' : 'online';
+      message.ext.client = isMobile() ? 'mobweb' : 'web';
 
     } else if(message.channel == '/meta/subscribe') {
       message.ext = message.ext || {};
