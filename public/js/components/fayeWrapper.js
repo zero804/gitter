@@ -1,13 +1,14 @@
 /*jshint unused:true, browser:true*/
 define([
   'faye',
+  'underscore',
   'log!fayeWrapper'
-], function(Faye, log) {
+], function(Faye, _, log) {
   "use strict";
 
   Faye.Logging.logLevel = 'info';
 
-  function SubscriptionClient(wrapper, channel, onMessage, context) {
+  function SubscriptionWrapper(wrapper, channel, onMessage, context) {
     this._wrapper = wrapper;
     this._channel = channel;
     this._onMessage = onMessage;
@@ -15,7 +16,7 @@ define([
     this._underlyingSubscription = null;
   }
 
-  SubscriptionClient.prototype = {
+  SubscriptionWrapper.prototype = {
     _setUnderlyingSubscription: function(underlyingSubscription) {
       this._underlyingSubscription = underlyingSubscription;
 
@@ -74,6 +75,8 @@ define([
       if(this._client) return this._client;
 
       var c = this._fayeFactory(this._endpoint, this._options);
+      this._bindClient(c);
+
       for(var i = 0; i < this._disabled.length; i++) c.disable(this._disabled[i]);
       for(var j in this._headers) {
         if(this._headers.hasOwnProperty(j)) {
@@ -86,6 +89,9 @@ define([
       }
 
       this._client = c;
+
+      this._startConnectionMonitor();
+
       return c;
     },
 
@@ -95,6 +101,7 @@ define([
       }
 
       if(this._client) {
+        this._unbindClient(this._client);
         this._client.disconnect();
       }
 
@@ -138,11 +145,14 @@ define([
     },
 
     disconnect: function() {
-      this._getClient().disconnect();
+      if(this._client) {
+        this._stopConnectionMonitor();
+        this._client.disconnect();
+      }
     },
 
     subscribe: function(channel, callback, context) {
-      var subscription = new SubscriptionClient(this, channel, callback, context);
+      var subscription = new SubscriptionWrapper(this, channel, callback, context);
       this._subscriptions.push(subscription);
 
       if(this._client) {
@@ -187,8 +197,149 @@ define([
       }
 
       if(this._client) this._client.removeExtension(extension);
+    },
 
+    bind: function(eventType, listener, context) {
+      this._subscribers = this._subscribers || {};
+      var list = this._subscribers[eventType] = this._subscribers[eventType] || [];
+      list.push([listener, context]);
+
+      if(this._client) this._client.bind(eventType, listener, context);
+    },
+
+    unbind: function(eventType, listener, context) {
+      if(this._subscribers && this._subscribers[eventType]) {
+
+        if (!listener) {
+          delete this._subscribers[eventType];
+        } else {
+          var list = this._subscribers[eventType],
+              i    = list.length;
+
+          while (i--) {
+            if (listener !== list[i][0]) continue;
+            if (context && list[i][1] !== context) continue;
+            list.splice(i,1);
+          }
+        }
+      }
+
+      if(this._client) this._client.unbind(eventType, listener, context);
+    },
+
+    trigger: function() {
+      var args = Array.prototype.slice.call(arguments),
+          eventType = args.shift();
+
+      if (!this._subscribers || !this._subscribers[eventType]) return;
+
+      var listeners = this._subscribers[eventType].slice(),
+          listener;
+
+      for (var i = 0, n = listeners.length; i < n; i++) {
+        listener = listeners[i];
+        listener[0].apply(listener[1], args);
+      }
+    },
+
+    _unbindClient: function(client) {
+      if(!this._subscribers) return;
+      for(var key in this._subscribers) {
+        if(!this._subscribers.hasOwnProperty(key)) continue;
+        client.unbind(key);
+      }
+    },
+
+    _bindClient: function(client) {
+      if(!this._subscribers) return;
+      for(var key in this._subscribers) {
+        if(!this._subscribers.hasOwnProperty(key)) continue;
+
+        var events = this._subscribers[key];
+        for(var i = 0; i < events.length; i++) {
+          client.bind(key, events[i][0], events[i][1]);
+        }
+      }
+    },
+
+    _ping: function() {
+      if(!this._client) return;
+
+      var startTime = Date.now();
+      var connectionTimeoutPeriod = 30000;
+      var timeout;
+
+      var clientId = this._client.getClientId();
+
+      log('Attempting to subscribe to /ping');
+
+      var subscription = this._client.subscribe('/ping', function() { });
+
+      subscription.callback(function() {
+        if(timeout) clearTimeout(timeout);
+        subscription.cancel();
+      });
+
+      subscription.errback(function(error) {
+        log('Error while subscribing to ping channel', error);
+        if(timeout) window.clearTimeout(timeout);
+        subscription.cancel();
+
+        var clientId2 = this._client.getClientId();
+
+        if(clientId2 !== clientId) {
+          log('Faye client recycled during ping');
+          return;
+        }
+
+        if((Date.now() - startTime) > (connectionTimeoutPeriod * 1.1)) {
+          log('Ping subscription interrupted');
+          return;
+        }
+
+        this.recycle();
+
+      }.bind(this));
+
+      timeout = window.setTimeout(function() {
+        log('Timeout while waiting for ping subscription');
+        subscription.cancel();
+
+        var clientId2 = this._client.getClientId();
+
+        if(clientId2 !== clientId) {
+          log('Faye client recycled during ping');
+          return;
+        }
+
+        if((Date.now() - startTime) > (connectionTimeoutPeriod * 1.1)) {
+          log('Ping subscription interrupted');
+          return;
+        }
+
+        this.recycle();
+
+      }.bind(this), connectionTimeoutPeriod);
+    },
+
+    _startConnectionMonitor: function() {
+      // Reset the time on the pinger if it already exists
+      if(this._monitorTimeout) {
+        clearTimeout(this._monitorTimeout);
+      }
+
+      this._monitorTimeout = setInterval(function() {
+        this._ping();
+      }.bind(this), 60000);
+    },
+
+    _stopConnectionMonitor: function() {
+      if(!this._monitorTimeout) return;
+      clearTimeout(this._monitorTimeout);
+      this._monitorTimeout = null;
     }
+
+
   };
 
   return FayeWrapper;

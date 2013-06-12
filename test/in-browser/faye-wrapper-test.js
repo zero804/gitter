@@ -224,7 +224,7 @@ require([
         var args = Array.prototype.slice.call(arguments);
         this.events.push(args);
 
-        console.log.apply(console, ["Event: "].concat(args));
+        console.log.apply(console, ["Event: "].concat(args[0]));
       }, this);
     };
 
@@ -262,10 +262,11 @@ require([
 
           var count = 0;
           subscription.callback(function() {
+            var mock;
             count++;
             if(count == 1) {
               assert(recorders.length == 1, 'Expected a single mock to be created, got ' + recorders.length);
-              var mock = recorders[0];
+              mock = recorders[0];
               assert.equal(mock.findEvents('addExtension').length, 1, 'Expected a single connect event');
               assert.equal(mock.findEvents('connected').length, 1, 'Expected a single connect event');
               assert.equal(mock.findEvents('subscription:callback').length, 1, 'Expected a single subscribe event');
@@ -275,6 +276,13 @@ require([
             }
 
             if(count == 2) {
+              assert(recorders.length == 2, 'Expected a second mock to be created, got ' + recorders.length);
+              assert.equal(recorders[0].findEvents('disconnect').length, 1, 'Expected the first mock to have been disconnected');
+              mock = recorders[1];
+              assert.equal(mock.findEvents('addExtension').length, 1, 'Expected a single connect event');
+              assert.equal(mock.findEvents('connected').length, 1, 'Expected a single connect event');
+              assert.equal(mock.findEvents('subscription:callback').length, 1, 'Expected a single subscribe event');
+
               return done();
             }
 
