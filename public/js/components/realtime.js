@@ -239,6 +239,8 @@ define([
 
   function fakeSubscription() {
     if(!_client) return;
+    var startTime = Date.now();
+    var connectionTimeoutPeriod = 30000;
 
     log('Attempting to subscribe to /ping');
 
@@ -252,15 +254,27 @@ define([
     subscription.errback(function(error) {
       log('Error while subscribing to ping channel', error);
       if(timeout) window.clearTimeout(timeout);
-      recycleConnection();
+
+      if((Date.now() - startTime) > (connectionTimeoutPeriod * 1.1)) {
+        log('Ping subscription interrupted', error);
+      } else {
+        recycleConnection();
+      }
+
       subscription.cancel();
     });
 
     var timeout = window.setTimeout(function() {
       log('Timeout while waiting for ping subscription');
-      recycleConnection();
+
+      if((Date.now() - startTime) > (connectionTimeoutPeriod * 1.1)) {
+        log('Ping subscription interrupted', error);
+      } else {
+        recycleConnection();
+      }
+
       subscription.cancel();
-    }, 30000);
+    }, timeout);
 
   }
 
@@ -292,6 +306,8 @@ define([
       var client = getOrCreateClient();
       return client.getClientId();
     },
+
+    recycleConnection: recycleConnection,
 
     subscribe: function(channel, callback) {
       return new SubscriptionClient(getOrCreateClient(), channel, callback);

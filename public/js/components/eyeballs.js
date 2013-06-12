@@ -27,6 +27,13 @@ define([
       type: "POST",
       success: function(/*data*/) {
       },
+      statusCode: {
+        400: function() {
+          // The connection is gone...
+          log('Eyeballs returned 400. Recycling realtime connection.');
+          realtime.recycleConnection();
+        }
+      },
       error: function() {
         log('An error occurred while communicating eyeballs');
       }
