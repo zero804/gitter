@@ -23,6 +23,7 @@ function SocketStrategy() {
 
   this.map =  function(socket) {
     return {
+      id: socket.id,
       user: userStrategy.map(socket.userId),
       troupe: troupeStrategy.map(socket.troupeId),
       eyeballs: socket.eyeballs,

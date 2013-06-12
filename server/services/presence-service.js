@@ -453,8 +453,9 @@ function listActiveSockets(callback) {
     multi.exec(function(err, replies) {
       if(err) return callback(err);
 
-      var result = replies.map(function(reply) {
+      var result = replies.map(function(reply, index) {
         return {
+          id: socketIds[index],
           userId: reply[0],
           troupeId: reply[1],
           eyeballs: !!reply[2],
