@@ -155,14 +155,14 @@ function __associateSocketAndActivateTroupe(socketId, userId, troupeId, eyeballS
 }
 
 
-function userSocketConnected(userId, socketId, connectionType, callback) {
+function userSocketConnected(userId, socketId, connectionType, client, callback) {
   assert(userId, 'userId expected');
   assert(socketId, 'socketId expected');
 
   var isMobileConnection = connectionType == 'mobile';
 
   var keys = [_keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, _keyUserLock(userId)];
-  var values = [userId, socketId, Date.now(), isMobileConnection ? 1 : 0];
+  var values = [userId, socketId, Date.now(), isMobileConnection ? 1 : 0, client];
 
   scriptManager.run('presence-associate', keys, values, function(err, result) {
     if(err) return callback(err);
@@ -448,7 +448,7 @@ function listActiveSockets(callback) {
 
     var multi = redisClient.multi();
     socketIds.forEach(function(socketId) {
-      multi.hmget(_keySocketUser(socketId), 'uid', 'tid', 'eb', 'mob', 'ctime');
+      multi.hmget(_keySocketUser(socketId), 'uid', 'tid', 'eb', 'mob', 'ctime', 'ct');
     });
     multi.exec(function(err, replies) {
       if(err) return callback(err);
@@ -460,7 +460,8 @@ function listActiveSockets(callback) {
           troupeId: reply[1],
           eyeballs: !!reply[2],
           mobile: !!reply[3],
-          createdTime: parseInt(reply[4], 10)
+          createdTime: parseInt(reply[4], 10),
+          client: reply[5]
         };
       });
 

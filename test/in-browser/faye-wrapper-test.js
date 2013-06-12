@@ -95,7 +95,6 @@ require([
               assert(clientId2, '2 Expected clientId to be non-falsey after second connection');
 
               assert.notEqual(clientId1, clientId2);
-              console.log(client._getClient());
               return done();
 
             }, 0);

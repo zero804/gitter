@@ -28,7 +28,8 @@ function SocketStrategy() {
       troupe: troupeStrategy.map(socket.troupeId),
       eyeballs: socket.eyeballs,
       mobile: socket.mobile,
-      createdTime: socket.createdTime
+      createdTime: socket.createdTime,
+      client: socket.client
     };
   };
 
