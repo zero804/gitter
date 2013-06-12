@@ -12,11 +12,11 @@ var shutdown = require('../utils/shutdown');
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
-  { re: /^\/troupes\/(\w+)$/, validator: validateUserForTroupeSubscription },
+  { re: /^\/troupes\/(\w+)$/,       validator: validateUserForTroupeSubscription },
   { re: /^\/troupes\/(\w+)\/(.+)$/, validator: validateUserForSubTroupeSubscription },
-  { re: /^\/user\/(\w+)\/(.+)$/, validator: validateUserForUserSubscription },
-  { re: /^\/user\/(\w+)$/, validator: validateUserForUserSubscription },
-  { re: /^\/ping$/, validator: validateUserForPingSubscription }
+  { re: /^\/user\/(\w+)\/(.+)$/,    validator: validateUserForUserSubscription },
+  { re: /^\/user\/(\w+)$/,          validator: validateUserForUserSubscription },
+  { re: /^\/ping$/,                 validator: validateUserForPingSubscription }
 
 ];
 
@@ -237,6 +237,10 @@ var authorisor = {
       }
 
       var match = null;
+
+      winston.silly('Authorising', {
+        channel: message.subscription
+      });
 
       var hasMatch = routes.some(function(route) {
         var m = route.re.exec(message.subscription);

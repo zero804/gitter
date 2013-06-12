@@ -112,8 +112,13 @@ function __associateSocketAndActivateTroupe(socketId, userId, troupeId, eyeballS
   assert(socketId, 'socketId expected');
   assert(troupeId, 'troupeId expected');
 
+  winston.verbose('Associate socket and activate troupe', {
+    userId: userId,
+    socketId: socketId,
+    troupeId: troupeId,
+    eyeballState: eyeballState
+  });
 
-//TODO here!
   var keys = [_keySocketUser(socketId), _keyUserLock(userId)];
   var values = [troupeId];
 
@@ -130,7 +135,18 @@ function __associateSocketAndActivateTroupe(socketId, userId, troupeId, eyeballS
     }
 
     if(eyeballState) {
-      __eyeBallsOnTroupe(userId, socketId, troupeId, callback);
+      __eyeBallsOnTroupe(userId, socketId, troupeId, function(err) {
+        if(err) {
+          winston.error('Unable to signal eyeballs on: ' + err, {
+            userId: userId,
+            socketId: socketId,
+            exception: err
+          });
+        }
+
+        // Ignore the error
+        return callback();
+      });
     } else {
       return callback();
     }
@@ -489,13 +505,13 @@ function clientEyeballSignal(userId, socketId, eyeballsOn, callback) {
     if(err) return callback(err);
     if(!socketInfo) {
       winston.warn("User " + userId + " attempted to eyeball missing socket " + socketId);
-      return callback('Invalid socketId');
+      return callback({ invalidSocketId: true });
     }
 
     var userId2 = socketInfo.userId;
     if(userId !== userId2) {
       winston.warn("User " + userId + " attempted to eyeball socket " + socketId + " but that socket belongs to " + userId2);
-      return callback('Invalid socketId');
+      return callback({ invalidSocketId: true });
     }
 
     var troupeId = socketInfo.troupeId;
