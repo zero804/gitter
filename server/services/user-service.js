@@ -370,6 +370,31 @@ var userService = {
     });
   },
 
+  /* UNCONFIRMED -> PROFILE_NOT_COMPLETE (fails isProfilePassworded or isProfileUsernamed) -> ACTIVE */
+  isProfileConfirmed: function(user) {
+    return user.status !== "UNCONFIRMED";
+  },
+
+  isProfileNotComplete: function(user) {
+    return user.status === "PROFILE_NOT_COMPLETE";
+  },
+
+  isProfilePassworded: function(user) {
+    return !!user.passwordHash;
+  },
+
+  isProfileUsernamed: function(user) {
+    return !!user.username;
+  },
+
+  isProfileComplete: function(user) {
+    return user.status === "ACTIVE" && userService.isProfileUsernamed(user);
+  },
+
+  isProfileActive: function(user) {
+    return userService.isProfileComplete(user); // alias for now, but deleting an account might introduce "complete but not active"
+  },
+
   // this does not save the user object
   setStatusActive: function(user) {
 
