@@ -137,6 +137,14 @@ var signupService = module.exports = {
 
   },
 
+  confirm: function(user, callback) {
+    if (user.newEmail) {
+      return signupService.confirmEmailChange(user, callback);
+    } else {
+      return signupService.confirmSignup(user, callback);
+    }
+  },
+
   confirmSignup: function(user, callback) {
     if(!user) return callback(new Error("No user found"));
     winston.verbose("Confirming user", { id: user.id, status: user.status });
@@ -233,7 +241,7 @@ var signupService = module.exports = {
 
       if(!user) {
         // Create a new user and add the request. The users confirmation code will not be set until the first time one one of
-        // their requests is accepted
+        // their requests is accepted...does this change now that there is a user homepage?
         var userProperties = {
           status: 'UNCONFIRMED',
           email: email,

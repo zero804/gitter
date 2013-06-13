@@ -77,10 +77,10 @@ module.exports = {
     });
   },
 
-  sendConfirmationForNewUser: function (user, troupe) {
+  sendConfirmationForNewUser: function (user) {
     assert(user.confirmationCode, 'User does not have a confirmation code');
 
-    var confirmLink = nconf.get("web:basepath") + "/" + troupe.uri + "/confirm/" + user.confirmationCode;
+    var confirmLink = nconf.get("web:basepath") + "/confirm/" + user.confirmationCode;
     mailerService.sendEmail({
       templateFile: "signupemail",
       to: user.email,
