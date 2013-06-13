@@ -45,33 +45,26 @@ module.exports = {
 
         function(req, res, next) {
           var email = req.body.email;
-          var troupeName = req.body.troupeName;
 
-          troupeName = troupeName ? troupeName.trim() : '';
           email = email ? email.trim() : '';
-
-          if(!troupeName) {
-            return next('Troupe name is required');
-          }
 
           if(!email) {
             return next('Email address is required');
           }
 
           signupService.newSignupFromLandingPage({
-            troupeName: troupeName,
             email: email
-          }, function(err, id) {
+          }, function(err, user) {
             if(err) {
               winston.error("Error creating new troupe ", { exception: err });
               return next(err);
             }
 
-            req.session.newTroupeId = id;
             res.send({
               success: true,
-              troupeName: troupeName,
-              email: email
+              email: email,
+              userStatus: user.status,
+              username: user.username
             });
 
           });
