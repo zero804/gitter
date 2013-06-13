@@ -55,8 +55,8 @@ function newTroupeForExistingUser(options, user, callback) {
 
 }
 
-function newTroupeForNewUser(options, callback) {
-  winston.info("New troupe for new user", options);
+function newUser(options, callback) {
+  winston.info("New user", options);
 
   userService.newUser({ email: options.email }, function (err, user) {
     if(err) {
@@ -64,27 +64,23 @@ function newTroupeForNewUser(options, callback) {
     }
 
     options.user = user;
-    newTroupe(options, function(err, troupe) {
-      emailNotificationService.sendConfirmationForNewUser(user, troupe);
-      callback(err, troupe.id);
-    });
+    emailNotificationService.sendConfirmationForNewUser(user);
+    callback(err, user);
   });
 }
 
 
-module.exports = {
+var signupService = module.exports = {
   newSignupFromLandingPage: function(options, callback) {
     if(!options.email) return callback('Email address is required');
-    if(!options.troupeName) return callback('Troupe name is required');
 
     winston.info("New signup ", options);
 
     // We shouldn't have duplicate users in the system, so we should:
     //     * Check if the user exists
     //     * If the user exists, have they previously confirmed their email address
-    //     * If the user exists AND has a confirmed email address, create the Troupe and send a New Troupe email rather than a Welcome to Troupe email and redirect them straight to the Troupe not the confirm page.
-    //     * If the user exists but hasn't previously confirmed their email - then we need to figure out something... should we resend the same confirmation code that was previously sent out or should we send a new one. Say someone creates 3 Troupes in a row, each one will generate a different confirmation code. It's the email address you are confirming not the Troupe.
-    //
+    //     * If the user exists AND has a confirmed email address...
+    //     * If the user exists but hasn't previously confirmed their email...
 
     userService.findByEmail(options.email, function(err, user) {
       if(err) {
@@ -93,10 +89,12 @@ module.exports = {
       }
 
       if(user) {
-        newTroupeForExistingUser(options, user, callback);
+        // do we send the confirm email again?
+        callback(err, user);
       } else {
-        newTroupeForNewUser(options, callback);
+        newUser(options, callback);
       }
+
     });
   },
 
