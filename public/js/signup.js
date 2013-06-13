@@ -2,6 +2,7 @@
 require([
   'jquery',
   'views/base',
+  'views/signup/usernameView',
   'views/signup/signupModalView',
   'views/signup/signupModalConfirmView',
   'views/login/loginModalView',
@@ -10,7 +11,7 @@ require([
   'utils/validate-wrapper', // No ref!
   'retina'
  ],
-  function($, TroupeViews, SignupModalView, SignupModalConfirmView, LoginModalView, createTroupeView, MessagesView) {
+  function($, TroupeViews, UsernameView, SignupModalView, SignupModalConfirmView, LoginModalView, createTroupeView, MessagesView) {
     //var loginFormVisible = false;
 
     function createLoginModal() {
@@ -28,7 +29,7 @@ require([
       return modal;
     }
 
-    if (window.location.href.indexOf("passwordResetFailed") >= 0) {
+    function passwordResetFailed() {
       var modal = new TroupeViews.ConfirmationModal({
         confirmationTitle: "Reset Failed",
         body: "That password reset link is invalid.",
@@ -49,41 +50,46 @@ require([
       });
 
       modal.show();
-    } else if(window.noValidTroupes) {
-      var modal = new TroupeViews.ConfirmationModal({
-        title: "No Troupes yet...",
-        body: "Click 'Get Started' to create your first Troupe",
-        buttons: [{
-          id: 'no-troupes-ok', text: 'OK'
-        }]
-      });
-
-      modal.on('button.click', function(id) {
-        if (id == 'no-troupes-ok')
-          modal.hide();
-      });
-
-      modal.show();
     }
 
-    if (window.location.hash.indexOf("message") >= 0) {
+    function showMessage() {
       var v = new MessagesView({ messageName : window.location.hash });
       v.show();
     }
 
-    $('#button-signup, #button-signup2').on('click', function() {
-      if (window.noValidTroupes) {
-        new createTroupeView.Modal({existingUser: true, userId: window.userId }).show();
-      } else {
-        var view = new SignupModalView({existingUser: false});
-        var modal = new TroupeViews.Modal({ view: view });
-        view.once('signup.complete', function(data) {
-          modal.transitionTo(new TroupeViews.Modal({ view: new SignupModalConfirmView({ data: data }) }));
-        });
+    function chooseUsername() {
+      (new TroupeViews.Modal({ view: new UsernameView() })).show();
+    }
 
-        modal.show();
+    function signup() {
+
+      if (window.profileHasNoUsername) {
+        return chooseUsername();
       }
+
+      var view = new SignupModalView();
+      var modal = new TroupeViews.Modal({ view: view });
+
+      view.once('signup.complete', function() {
+        modal.hide();
+        chooseUsername();
+      });
+
+      modal.show();
+
       return false;
+    }
+
+    if (window.location.href.indexOf("passwordResetFailed") >= 0) {
+      passwordResetFailed();
+    }
+
+    if (window.location.hash.indexOf("message") >= 0) {
+      showMessage();
+    }
+
+    $('#button-signup, #button-signup2').on('click', function() {
+      return signup();
     });
 
     $('#button-appstore').on('click', function () {
