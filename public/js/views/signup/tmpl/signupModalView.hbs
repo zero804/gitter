@@ -1,16 +1,10 @@
-<div class="trpModalTitle">Create a Troupe</div>
+<div class="trpModalTitle">Get Started</div>
 <div class="trpCreateForm">
-	<form id="signup-form">
-		<input placeholder="Choose a name for your Troupe" class="trpInput required" minlength="4" name="troupeName" id="troupeName" autofocus><br>
-		{{#unless existingUser}}
-   		<input placeholder="Enter your email address" class="trpInput required email" name="email" id="email">
-   		<div class="trpModalSubtext">We will send you a confirmation email</div>
-    {{/unless}}
-    {{#if userId}}
-      <input type="hidden" name="userId" value="{{userId}}">
-    {{/if}}
-		<input type="submit" name="submit" value="Create" class="trpModalButton trpButtonBig trpBtnGreen" />
-	</form>
+  <form id="signup-form">
+      <input placeholder="Enter your email address" class="trpInput required email" name="email" id="email">
+      <div class="trpModalSubtext">We find it's best to use your work email address to help you connect with colleagues.</div>
+    <input type="submit" name="submit" value="Next" class="trpModalButton trpButtonBig trpBtnGreen" />
+  </form>
 </div>
 <div class="trpModalFailure signup-failure" style="display:none">
   <span class="trpModalTitle"><span class="trpModalFailureText" id="failure-text">Signup failed.</span></span>
