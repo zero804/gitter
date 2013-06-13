@@ -72,14 +72,12 @@ module.exports = {
         }
       );
 
-      // This endpoint is used only when the
-      // user is attempting to change their email address
       app.get('/confirm/:confirmationCode',
         middleware.authenticate('confirm', { failureRedirect: '/confirm-failed' } ),
         function(req, res){
-          winston.verbose("Email address confirmation authenticated");
+          winston.verbose("Confirmation authenticated");
 
-          signupService.confirmEmailChange(req.user, function(err/*, user, troupe */) {
+          signupService.confirm(req.user, function(err, user) {
             if (err) {
               winston.error("Signup service confirmation failed", { exception: err } );
 
@@ -90,7 +88,7 @@ module.exports = {
               return;
             }
 
-            res.relativeRedirect(nconf.get('web:homeurl'));
+            res.relativeRedirect(nconf.get('web:homeurl'));            
           });
         });
 
