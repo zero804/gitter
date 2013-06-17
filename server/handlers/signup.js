@@ -4,6 +4,7 @@
 var signupService = require("../services/signup-service"),
     middleware = require("../web/middleware"),
     troupeService = require("../services/troupe-service"),
+    userService = require('../services/user-service'),
     loginUtils = require('../web/login-utils'),
     winston = require('winston'),
     nconf = require('../utils/config');
@@ -22,16 +23,16 @@ module.exports = {
         middleware.grantAccessForRememberMeTokenMiddleware,
         function(req, res, next) {
           if(req.user) {
-            loginUtils.redirectUserToDefaultTroupe(req, res, next, {
-              onNoValidTroupes: function() {
-
-                res.render('signup', { compactView: self.isMobile(req), noValidTroupes: JSON.stringify(true), userId: JSON.stringify(req.user.id) });
-              }
-            });
+            if (userService.isProfileUsernamed(req.user)) {
+              res.relativeRedirect(req.user.username);
+            }
+            else {
+              res.render('signup', { compactView: self.isMobile(req), profileHasNoUsername: JSON.stringify(true), userId: JSON.stringify(req.user.id) });
+            }
 
             return;
           }
-          res.render('signup', { compactView: self.isMobile(req), noValidTroupes: JSON.stringify(false), userId: JSON.stringify(null) });
+          res.render('signup', { compactView: self.isMobile(req), profileHasNoUsername: JSON.stringify(false), userId: JSON.stringify(null) });
         }
       );
 
