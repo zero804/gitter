@@ -70,14 +70,17 @@ require([
       var view = new SignupModalView();
       var modal = new TroupeViews.Modal({ view: view });
 
-      view.once('signup.complete', function() {
-        modal.hide();
-        chooseUsername();
+      view.once('signup.complete', function(data) {
+        modal.transitionTo(new TroupeViews.Modal({ view: new SignupModalConfirmView({ data: data }) }));
       });
 
       modal.show();
 
       return false;
+    }
+
+    if (window.profileHasNoUsername) {
+      chooseUsername();
     }
 
     if (window.location.href.indexOf("passwordResetFailed") >= 0) {

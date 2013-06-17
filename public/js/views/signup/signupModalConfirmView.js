@@ -29,6 +29,9 @@ define([
        $.ajax({
         url: "/resendconfirmation",
         dataType: "json",
+        data: {
+          email: this.data.email
+        },
         type: "POST",
         success: function(data) {
           self.$el.find(".label-resendsuccess").show();
