@@ -60,7 +60,8 @@
     "mongodb": "~1.1.11",
     "redis-scripto": "~0.1.2",
     "byline": "~2.0.3",
-    "request": "~2.21.0"
+    "request": "~2.21.0",
+    "latinize": "~0.1.0"
   },
   "devDependencies": {
     "proxyquire": "0.4.0",

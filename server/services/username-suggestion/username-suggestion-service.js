@@ -11,6 +11,8 @@ var byline = require('byline');
 var fs = require('fs');
 var winston = require('winston');
 var monq = require('../../utils/mongoose-utils').monq;
+var latinize = require('latinize');
+
 
 var userInfoServices = [
   require('./gravatar-user-info-service.js'),
@@ -24,28 +26,66 @@ var SERVICE_RANKINGS = [
   'email'
 ];
 
-function suggestUsernames(email, callback) {
-	var promises = userInfoServices.map(function(service) {
-    // If the service returns a promise and the promise fails, simply return an empty array
-    return Q.resolve(service.lookupUsernameForEmail(email)).fail(function(err) {
-      winston.info('User info lookup failed: ' + err, { exception: err });
-      return [];
-    });
-	});
-
-	return Q.all(promises)
+function suggestUsernamesForEmail(email, callback) {
+	return lookupPotentialUsernamesForEmail(email)
 		.then(createUniqueRankedListOfUsernames)
     .then(filterUsernamesByReservedWords)
     .then(filterUsernamesByAvailability)
     .then(generateSuggestionsForUnavailableUsernames)
     .nodeify(callback);
+}
 
+function suggestUsernames(seed, callback) {
+  return Q.resolve(filterUsernamesByReservedWords([seed]))
+    .then(function(usernames) {
+      // If no usernames were returned, then the seed was filtered. Don't even bother with suggestions
+      if(!usernames.length) return [ { username: seed, available: false, disallowed: true }];
+
+      return filterUsernamesByAvailability(usernames)
+        .then(generateSuggestionsForUnavailableUsernames)
+        .nodeify(callback);
+
+    }, callback);
+}
+
+function suggestUsernamesForUser(user, callback) {
+  return lookupPotentialUsernamesForUser(user)
+    .then(createUniqueRankedListOfUsernames)
+    .then(filterUsernamesByReservedWords)
+    .then(filterUsernamesByAvailability)
+    .then(generateSuggestionsForUnavailableUsernames)
+    .nodeify(callback);
+}
+
+function lookupPotentialUsernamesForEmail(email) {
+  var promises = userInfoServices.map(function(service) {
+    // If the service returns a promise and the promise fails, simply return an empty array
+    return Q.resolve(service.lookupUsernameForEmail(email)).fail(function(err) {
+      winston.info('User info lookup failed: ' + err, { exception: err });
+      return [];
+    });
+  });
+
+  return Q.all(promises);
+}
+
+
+function lookupPotentialUsernamesForUser(user) {
+  var promises = [lookupPotentialUsernamesForEmail(user.email)]
+                    .concat(lookupPotentialUsernamesForDisplayName(user.displayName));
+  return Q.all(promises);
+}
+
+function lookupPotentialUsernamesForDisplayName(displayName) {
+  var words = displayName.split(/\s+/);
+  return [words.join(''), words.join('.'), words.join('_')].map(function(n) { return { service: 'name_guess', username: n }; });
 }
 
 function createUniqueRankedListOfUsernames(results) {
   // Results look like this:
   // [ { service: 'twitter', username: 'suprememoocow' }, { service: 'facebook', username: 'andrewnewdigate' } ]
-  results = _.flatten(results, true);
+  results = _.flatten(results);
+
   results.sort(function(a,b) {
     function score(serviceName) {
       var i = SERVICE_RANKINGS.indexOf(serviceName);
@@ -61,8 +101,9 @@ function createUniqueRankedListOfUsernames(results) {
 
   // Unique usernames, but keep the order (only keep the first instance of each)
   var unique = usernames.filter(function(username) {
-    if(!this[username]) {
-      this[username] = true;
+    var un = username.toLowerCase();
+    if(!this[un]) {
+      this[un] = true;
       return true;
     }
 
@@ -105,9 +146,20 @@ function filterUsernamesByReservedWords(usernames) {
   return filterValues();
 
   function filterValues() {
-    return usernames.filter(function(u) {
-      return !disallowedWordHash[u];
+    usernames = usernames.map(function(u) {
+      u = latinize(u);
+      u = u.replace(/[^a-zA-Z0-9\.\-\_]/g,'');
+      u = u.toLowerCase();
+      return u;
     });
+
+    usernames = usernames.filter(function(u) {
+      return !disallowedWordHash[u] &&
+              u.length >=3;
+    });
+
+    return usernames;
+
   }
 }
 
@@ -126,6 +178,8 @@ function filterUsernamesByAvailability(usernames) {
 }
 
 // Suggestions takes the form [ { username: x, available: false }]
+// TODO: in the future, this function may be a bit of a cpu hog.
+// and perhaps will need to have some yields happening internally
 function generateSuggestionsForUnavailableUsernames(suggestions) {
   var unavailable = suggestions.filter(function(s) { return !s.available; });
 
@@ -143,6 +197,8 @@ function generateSuggestionsForUnavailableUsernames(suggestions) {
     var usernames = users.map(function(u) { return u.username; });
     unavailable.forEach(function(u) {
       var currentUsername = u.username;
+
+      // Build a hash of all the usernames taken
       var taken = usernames
                     .filter(function(username) { return username.indexOf(currentUsername) === 0; })
                     .map(function(username) { return username.substring(currentUsername.length); });
@@ -164,4 +220,7 @@ function generateSuggestionsForUnavailableUsernames(suggestions) {
   });
 }
 
+exports.suggestUsernamesForEmail = suggestUsernamesForEmail;
 exports.suggestUsernames = suggestUsernames;
+exports.suggestUsernamesForUser = suggestUsernamesForUser;
+
