@@ -87,7 +87,6 @@ module.exports = {
       from: 'signup-robot' + emailDomainWithAt,
       subject: "Welcome to Troupe",
       data: {
-        troupeName: troupe.name,
         confirmLink: confirmLink,
         baseServerPath: nconf.get("web:basepath")
       }
