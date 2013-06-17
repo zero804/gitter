@@ -15,6 +15,7 @@ var latinize = require('latinize');
 
 
 var userInfoServices = [
+  require('./fullcontact-user-info-service.js'),
   require('./gravatar-user-info-service.js'),
   require('./email-user-info-service.js')
 ];
