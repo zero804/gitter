@@ -25,6 +25,9 @@ module.exports = {
     app.all('/api/v1/ping', auth);
     app.get('/api/v1/ping', require('./ping.js'));
 
+    // No auth for username suggestions yet
+    app.get('/api/v1/usernamesuggestions', require('./username-suggestions.js'));
+
     app.all('/api/v1/sockets', auth);
     app.resource('api/v1/sockets', require('./sockets.js'));
 
