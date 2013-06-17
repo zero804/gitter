@@ -79,6 +79,7 @@ function serializeEvent(url, operation, model, callback) {
 var UserSchema = new Schema({
   displayName: { type: String },
   email: { type: String },
+  username: { type: String },
   newEmail: String,
   confirmationCode: {type: String },
   status: { type: String, "enum": ['UNCONFIRMED', 'PROFILE_NOT_COMPLETED', 'ACTIVE'], "default": 'UNCONFIRMED'},
@@ -105,6 +106,7 @@ var UserSchema = new Schema({
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 UserSchema.index({ email: 1 });
+UserSchema.index({ username: 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
 
 var UserLocationHistorySchema = new Schema({

@@ -1,5 +1,6 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
+var Q = require('q');
 
 exports.attachNotificationListenersToSchema = function (schema, options) {
   var ignoredPaths = options.ignoredPaths;
@@ -46,3 +47,15 @@ exports.attachNotificationListenersToSchema = function (schema, options) {
   }
 
 };
+
+// Adapts a mongoose promise to q
+exports.monq = function(promise) {
+  var deferred = Q.defer();
+
+  promise.addCallback(deferred.resolve);
+  promise.addErrback(deferred.reject);
+
+  return deferred.promise;
+
+};
+

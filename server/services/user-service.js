@@ -408,6 +408,21 @@ var userService = {
 
   deleteAllUsedInvitesForUser: function(user) {
     persistence.Invite.remove({ userId: user.id, status: "USED" });
+  },
+
+  findTakenUsernames: function(usernames, callback) {
+    persistence.User
+      .where('username')['in'](usernames)
+      .select('username')
+      .exec(function(err, users) {
+        var result = {};
+        users.forEach(function(user) {
+          this[user.username] = true;
+        }, result);
+
+        return callback(null, result);
+      });
+
   }
 
 };

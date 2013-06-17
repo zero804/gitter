@@ -115,8 +115,7 @@ TODO: disconnect clients who've been removed from a troupe
     bayeuxClient.publish("/user/" + userId, {
       notification: "troupe_unread",
       troupeId: troupeId,
-      totalUnreadItems: total,
-      counts: counts
+      totalUnreadItems: total
     });
 
   });
