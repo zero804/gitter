@@ -69,6 +69,17 @@ function newUser(options, callback) {
   });
 }
 
+function sendNotification(user, troupe) {
+  if (user.status === 'UNCONFIRMED') {
+    winston.verbose('Resending confirmation email to new user', { email: user.email });
+    emailNotificationService.sendConfirmationForNewUser(user);
+  } else {
+    winston.verbose('Resending confirmation email to existing user', { email: user.email });
+    emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
+  }
+  return;
+}
+
 
 var signupService = module.exports = {
   newSignupFromLandingPage: function(options, callback) {
@@ -156,66 +167,52 @@ var signupService = module.exports = {
     user.save(function(err) {
       if(err) return callback(err);
 
-      winston.verbose("User saved, finding troupe to redirect to", { id: user.id, status: user.status });
+      winston.verbose("User saved.", { id: user.id, status: user.status });
 
-      troupeService.findBestTroupeForUser(user, function(err, troupe) {
-        if(err) return callback(new Error("Error finding troupes for user"));
-
-        return callback(err, user, troupe);
-      });
+      return callback(err, user);
     });
 
   },
 
   // Resend the confirmation email and returns the ID of the troupe related to the signed
-  resendConfirmation: function(options, callback) {
-    var email = options.email;
+  resendConfirmationForTroupe: function(troupeId, callback) {
+    troupeService.findById(troupeId, function(err, troupe) {
+      if(err) return callback(err);
 
-    function sendNotification(user, troupe) {
-      if (user.status === 'UNCONFIRMED') {
-        winston.verbose('Resending confirmation email to new user', { email: user.email });
-        emailNotificationService.sendConfirmationForNewUser(user, troupe, function() {});
-      } else {
-        winston.verbose('Resending confirmation email to existing user', { email: user.email });
-        emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
+      var troupeUsers = troupe.getUserIds();
+      if(troupeUsers.length != 1) {
+        winston.error("A confirmation resent cannot be performed as the troupe has multiple users");
+        return callback("Invalid state");
       }
-      return;
-    }
 
+      userService.findById(troupeUsers[0], function(err, user) {
+        if(err || !user) return callback(err, null);
+
+        sendNotification(user, troupe);
+
+        return callback(null, troupe.id);
+      });
+    });
+  },
+
+  // Resend the confirmation email and returns the related user
+  resendConfirmationForUser: function(email, callback) {
+    userService.findByEmail(email, function(err, user) {
+      if(err || !user) return callback(err, null);
+      
+      sendNotification(user);
+
+      callback(null, user);
+    });
+  },
+
+  resendConfirmation: function(options, callback) {
     // This option occurs if the user has possibly lost their session
     // and is trying to get the confirmation sent at a later stage
     if(options.email) {
-        userService.findByEmail(email, function(err, user) {
-          if(err || !user) return callback(err, null);
-          troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
-            if(err || !troupes.length) return callback(err, null);
-            // This list should always contain a single value for a new user
-            var troupe = troupes[0];
-            sendNotification(user, troupe);
-
-            return callback(null, troupe.id);
-          });
-        });
-
+      signupService.resendConfirmationForUser(options.email, callback);
     } else {
-      troupeService.findById(options.troupeId, function(err, troupe) {
-        if(err) return callback(err);
-
-        var troupeUsers = troupe.getUserIds();
-        if(troupeUsers.length != 1) {
-          winston.error("A confirmation resent cannot be performed as the troupe has multiple users");
-          return callback("Invalid state");
-        }
-
-        userService.findById(troupeUsers[0], function(err, user) {
-          if(err || !user) return callback(err, null);
-
-          sendNotification(user, troupe);
-
-          return callback(null, troupe.id);
-        });
-      });
-
+      signupService.resendConfirmationForTroupe(options.troupeId, callback);
     }
   },
 
