@@ -61,7 +61,8 @@
     "redis-scripto": "~0.1.2",
     "byline": "~2.0.3",
     "request": "~2.21.0",
-    "latinize": "~0.1.0"
+    "latinize": "~0.1.0",
+    "fullcontact.js": "~0.1.1"
   },
   "devDependencies": {
     "proxyquire": "0.4.0",
