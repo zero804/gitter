@@ -18,9 +18,9 @@ var thrice = times(3);
 describe('signup-service', function() {
 
   describe('#newSignup()', function() {
-    it('should create a new user and new troupe, allow the user to confirm', function(done) {
+    it('should create a new user, allow the user to confirm', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
-      var troupeName = 'Test Troupe ' + new Date();
+      //var troupeName = 'Test Troupe ' + new Date();
 
       var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
       var signupService = testRequire.withProxies("./services/signup-service", {
@@ -28,12 +28,11 @@ describe('signup-service', function() {
       });
 
       signupService.newSignupFromLandingPage({
-        email: nonExistingEmail,
-        troupeName: troupeName
-      }, function(err, troupeId) {
+        email: nonExistingEmail
+      }, function(err, user) {
         if(err) return done(err);
 
-        assert(troupeId, 'Expected a troupeId');
+        assert(user, 'Expected a user');
 
         mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
 
@@ -43,32 +42,21 @@ describe('signup-service', function() {
           assert(user.confirmationCode, 'Expected a confirmation code for a new user');
           assert(user.status === 'UNCONFIRMED', 'Expected the user to be unconfirmed');
 
-          persistence.Troupe.findById(troupeId, function(err, troupe) {
-            if(err) return done(err);
+          signupService.confirm(user, function(err, user) {
+            assert(user, 'Expected user to be created');
+            assert(user.confirmationCode, 'Expected the user to still have a confirmation code');
+            assert(user.status === 'PROFILE_NOT_COMPLETED', 'Expected the user to be PROFILE_NOT_COMPLETED');
 
-            assert(troupe, 'Expected a new troupe to have been created');
-            assert(troupe.users.length == 1, 'Expected the new troupe to have a single user');
-            assert(troupe.users[0].userId == user.id, 'Expected the new troupe to have a reference to the new user');
+            mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
 
-            signupService.confirmSignup(user, function(err, user, troupe) {
-              assert(user, 'Expected user to be created');
-              assert(user.confirmationCode, 'Expected the user to still have a confirmation code');
-              assert(user.status === 'PROFILE_NOT_COMPLETED', 'Expected the user to be PROFILE_NOT_COMPLETED');
-
-              assert(troupe, 'Expected a troupe');
-
-              mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
-
-              done();
-
-            });
+            done();
 
           });
         });
       });
     });
 
-    it('should create a new user and new troupe, and allow a user to resend the confirmation email', function(done) {
+    it('should create a new user, and allow a user to resend the confirmation email', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
       var troupeName = 'Test Troupe ' + new Date();
 
@@ -81,162 +69,26 @@ describe('signup-service', function() {
 
 
       signupService.newSignupFromLandingPage({
-        email: nonExistingEmail,
-        troupeName: troupeName
-      }, function(err, troupeId) {
+        email: nonExistingEmail
+      }, function(err, user) {
         if(err) return done(err);
 
-        assert(troupeId, 'Expected a troupeId');
+        assert(user, 'Expected a user');
 
         mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
 
-        signupService.resendConfirmation({ email: nonExistingEmail }, function(err, troupeId2) {
+        signupService.resendConfirmation({ email: nonExistingEmail }, function(err, user2) {
           if(err) return done(err);
 
-          assert(troupeId === troupeId2, 'TroupeID should match');
+          assert(user2.id === user.id, "Expected users to match for confirmation");
 
           mockito.verify(emailNotificationServiceMock, twice).sendConfirmationForNewUser();
 
-          signupService.resendConfirmation({ troupeId: troupeId }, function(err, troupeId3) {
-            if(err) return done(err);
-            assert(troupeId === troupeId3, 'TroupeIDs should match');
-
-            mockito.verify(emailNotificationServiceMock, thrice).sendConfirmationForNewUser();
-
-            done();
-          });
-
+          done();
         });
       });
     });
 
-    it('should allow an existing ACTIVE user to create a new troupe when not logged in, from the landing page', function(done) {
-      var existingEmail = 'testuser' + Date.now() + '@troupetest.local';
-      var troupeName = 'Test Troupe ' + new Date();
-
-      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-      var signupService = testRequire.withProxies("./services/signup-service", {
-        './email-notification-service': emailNotificationServiceMock
-      });
-
-      persistence.User.create({
-        email: existingEmail,
-        status: 'ACTIVE'
-      }, function(err, createdUser) {
-          if(err) return done(err);
-
-          signupService.newSignupFromLandingPage({
-            email: existingEmail,
-            troupeName: troupeName
-          }, function(err, troupeId) {
-            if(err) return done(err);
-
-            mockito.verify(emailNotificationServiceMock, once).sendNewTroupeForExistingUser();
-            assert(troupeId, 'No troupeId returned');
-
-            persistence.Troupe.findById(troupeId, function(err, troupe) {
-              if(err) return done(err);
-
-              assert(troupe, 'Troupe not found');
-              assert(troupe.users.length == 1, 'Expected the new troupe to have a single user');
-              assert(troupe.users[0].userId == createdUser.id, 'Expected the new troupe to have a reference to the existing user');
-
-              done();
-            });
-
-          });
-        });
-
-      });
-
-    it('should allow an existing ACTIVE user to create a new troupe when not logged in, from the landing page, then attempt to resend the confirmation email', function(done) {
-      var existingEmail = 'testuser' + Date.now() + '@troupetest.local';
-      var troupeName = 'Test Troupe ' + new Date();
-
-      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-      var signupService = testRequire.withProxies("./services/signup-service", {
-        './email-notification-service': emailNotificationServiceMock
-      });
-
-
-      persistence.User.create({
-        email: existingEmail,
-        status: 'ACTIVE'
-      }, function(err) {
-          if(err) return done(err);
-
-
-          signupService.newSignupFromLandingPage({
-            email: existingEmail,
-            troupeName: troupeName
-          }, function(err, troupeId) {
-            if(err) return done(err);
-
-            mockito.verify(emailNotificationServiceMock, once).sendNewTroupeForExistingUser();
-            assert(troupeId, 'No troupeId returned');
-
-            signupService.resendConfirmation({ email: existingEmail }, function(err, troupeId) {
-              if(err) return done(err);
-
-              assert(troupeId, 'No troupe was found for the resend confirmation');
-              mockito.verify(emailNotificationServiceMock, twice).sendNewTroupeForExistingUser();
-
-              signupService.resendConfirmation({ troupeId: troupeId }, function(err, troupeId2) {
-                if(err) return done(err);
-
-                assert(troupeId2, 'Troupe was not found');
-
-
-                mockito.verify(emailNotificationServiceMock, thrice).sendNewTroupeForExistingUser();
-
-                done();
-              });
-
-            });
-
-          });
-        });
-
-      });
-
-    it('should allow an existing UNCONFIRMED user to create a new troupe when not logged in, from the landing page', function(done) {
-      var existingEmail = 'testuser' + Date.now() + '@troupetest.local';
-      var troupeName = 'Test Troupe ' + new Date();
-
-      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-      var signupService = testRequire.withProxies("./services/signup-service", {
-        './email-notification-service': emailNotificationServiceMock
-      });
-
-      persistence.User.create({
-        email: existingEmail,
-        status: 'UNCONFIRMED'
-      }, function(err, createdUser) {
-          if(err) return done(err);
-
-          signupService.newSignupFromLandingPage({
-            email: existingEmail,
-            troupeName: troupeName
-          }, function(err, troupeId) {
-            if(err) return done(err);
-
-            mockito.verify(emailNotificationServiceMock, once).sendNewTroupeForExistingUser();
-            assert(troupeId, 'No troupeId returned');
-
-            persistence.Troupe.findById(troupeId, function(err, troupe) {
-              if(err) return done(err);
-
-              assert(troupe, 'Troupe not found');
-              assert(troupe.users.length == 1, 'Expected the new troupe to have a single user');
-              assert(troupe.users[0].userId == createdUser.id, 'Expected the new troupe to have a reference to the existing user');
-
-              done();
-            });
-
-          });
-        });
-
-      });
   });
 
   describe('#newSignupWithAccessRequest()', function() {
@@ -314,10 +166,9 @@ describe('signup-service', function() {
 
                 assert(user, 'User was not found');
 
-                signupService.confirmSignup(user, function(err, user, troupeToOpen) {
+                signupService.confirmSignup(user, function(err, user) {
                   if(err) return done(err);
 
-                  assert(troupeToOpen, 'Expected a troupe to open');
                   assert(user.status == 'PROFILE_NOT_COMPLETED', 'User status is incorrect');
 
                   done();
