@@ -61,10 +61,12 @@ function suggestUsernamesForUser(user, callback) {
 function lookupPotentialUsernamesForEmail(email) {
   var promises = userInfoServices.map(function(service) {
     // If the service returns a promise and the promise fails, simply return an empty array
-    return Q.resolve(service.lookupUsernameForEmail(email)).fail(function(err) {
-      winston.info('User info lookup failed: ' + err, { exception: err });
-      return [];
-    });
+    return Q.resolve(service.lookupUsernameForEmail(email))
+          .timeout(2000) // Maximum response time of 2000ms
+          .fail(function(err) {
+            winston.info('User info lookup failed: ' + err, { exception: err });
+            return [];
+          });
   });
 
   return Q.all(promises);
