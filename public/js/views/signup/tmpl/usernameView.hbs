@@ -2,8 +2,21 @@
 <div class="trpCreateForm">
 	<form id="signup-form">
    		<input placeholder="Type your username here" class="trpInput required username" name="username" id="username">
-   		<div class="valid-message">That username is available.</div>
-   		<div class="trpModalSubtext">Your page on Troupe will be www.trou.pe/username</div>
+   		<div class="valid-message trpUsername trpVTop" style="display: none">
+        <div class="trpIB trpVTop"><img src="{{cdn 'images/2/icon-round-green-tick.png'}}" width="14" height="14">&nbsp;</div>
+        <div class="trpIB trpVTop trpGreen" style="height:19px; margin-top: -1px;">That username is available.</div>
+      </div>
+      <div class="not-valid-message trpUsername trpVTop" style="display:none">
+        <div class="trpIB trpVTop"><img src="{{cdn 'images/2/icon-round-red-cross.png'}}" width="14" height="14">&nbsp;</div>
+        <div class="trpIB trpVTop trpRed" style="height:19px; margin-top: -1px;">Sorry, that username is taken.</div>
+      </div>
+   		<div class="valid-message trpModalSubtext" style="display:none">Your page on Troupe will be <span class="trpGreen">www.trou.pe/username</span></div>
+      <div class="trpSuggestions name-suggestions">
+        <div class="trpBodySmall">Why not try one of the following:</div>
+        <div class="trpSuggestion">suprememoocow</div>
+        <div class="trpSuggestion">andrewn</div>
+        <div class="trpSuggestion">andrew.newdigate1243</div>
+      </div>
 		<input type="submit" name="submit" value="Next" class="trpModalButton trpButtonBig trpBtnGreen" />
 	</form>
 </div>
