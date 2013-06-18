@@ -62,26 +62,26 @@ exports.startWorkers = function() {
           }
 
           //note.alert = message;
-          note.device = new apns.Device(device.appleToken);
+          var deviceToken = new apns.Device(device.appleToken);
 
           note.pushDevice = device;
 
           switch(device.deviceType) {
             case 'APPLE':
-              apnsConnection.sendNotification(note);
+              apnsConnection.sendNotification(note, deviceToken);
               break;
 
             case 'APPLE-BETA-DEV':
-              apnsConnectionBetaDev.sendNotification(note);
+              apnsConnectionBetaDev.sendNotification(note, deviceToken);
               break;
 
 
             case 'APPLE-BETA':
-              apnsConnectionBeta.sendNotification(note);
+              apnsConnectionBeta.sendNotification(note, deviceToken);
               break;
 
             case 'APPLE-DEV':
-              apnsConnectionDev.sendNotification(note);
+              apnsConnectionDev.sendNotification(note, deviceToken);
               break;
             default:
               winston.warn('Unknown device type: ' + device.deviceType);
@@ -136,6 +136,10 @@ exports.startWorkers = function() {
       connectionTimeout: 60000
   });
 
+  apnsConnectionDev.on("error", function(err) {
+      winston.error("APN service (dev) experienced an error", { error: err.message });
+  });
+
   var apnsConnectionBetaDev = new apns.Connection({
       cert: nconf.get('apn:certBetaDev'),
       key: nconf.get('apn:keyBetaDev'),
@@ -143,6 +147,10 @@ exports.startWorkers = function() {
       enhanced: true,
       errorCallback: errorEventOccurred,
       connectionTimeout: 60000
+  });
+
+  apnsConnectionBetaDev.on("error", function(err) {
+      winston.error("APN service (beta dev) experienced an error", { error: err.message });
   });
 
   var apnsConnectionBeta = new apns.Connection({
@@ -154,6 +162,10 @@ exports.startWorkers = function() {
       connectionTimeout: 60000
   });
 
+  apnsConnectionBeta.on("error", function(err) {
+      winston.error("APN service (beta) experienced an error", { error: err.message });
+  });
+
   var apnsConnection = new apns.Connection({
       cert: nconf.get('apn:certProd'),
       key: nconf.get('apn:keyProd'),
@@ -163,6 +175,9 @@ exports.startWorkers = function() {
       connectionTimeout: 60000
   });
 
+  apnsConnection.on("error", function(err) {
+      winston.error("APN service (prod) experienced an error", { error: err.message });
+  });
 
   ['Dev', 'BetaDev', 'Beta', 'Prod'].forEach(function(suffix) {
     try {
@@ -177,6 +192,10 @@ exports.startWorkers = function() {
 
       feedback.on("feedback", function(devices) {
           winston.error("Failed delivery. Need to remove the following devices", { devices: devices });
+      });
+
+      feedback.on("error", function(err) {
+          winston.error("Feedback service experienced an error", { error: err.message });
       });
 
     } catch(e) {
