@@ -164,41 +164,24 @@ exports.startWorkers = function() {
   });
 
 
-  function failedDeliveryEventOccurred(timeSinceEpoch/*, deviceToken*/) {
-    winston.error("Failed delivery. Need to remove device", { time: timeSinceEpoch });
-  }
+  ['Dev', 'BetaDev', 'Beta', 'Prod'].forEach(function(suffix) {
+    try {
 
-  new apns.Feedback({
-      cert: nconf.get('apn:certDev'),
-      key: nconf.get('apn:keyDev'),
-      gateway: nconf.get('apn:feedbackDev'),
-      feedback: failedDeliveryEventOccurred,
-      interval: nconf.get('apn:feedbackInterval')
-  });
+      var feedback = new apns.Feedback({
+          cert: nconf.get('apn:cert' + suffix),
+          key: nconf.get('apn:key' + suffix),
+          gateway: nconf.get('apn:feedback' + suffix),
+          interval: nconf.get('apn:feedbackInterval' + suffix),
+          batchFeedback: true
+      });
 
+      feedback.on("feedback", function(devices) {
+          winston.error("Failed delivery. Need to remove the following devices", { devices: devices });
+      });
 
-  new apns.Feedback({
-      cert: nconf.get('apn:certBetaDev'),
-      key: nconf.get('apn:keyBetaDev'),
-      gateway: nconf.get('apn:feedbackBetaDev'),
-      feedback: failedDeliveryEventOccurred,
-      interval: nconf.get('apn:feedbackInterval')
-  });
-
-  new apns.Feedback({
-      cert: nconf.get('apn:certBeta'),
-      key: nconf.get('apn:keyBeta'),
-      gateway: nconf.get('apn:feedbackBeta'),
-      feedback: failedDeliveryEventOccurred,
-      interval: nconf.get('apn:feedbackInterval')
-  });
-
-  new apns.Feedback({
-      cert: nconf.get('apn:certProd'),
-      key: nconf.get('apn:keyProd'),
-      gateway: nconf.get('apn:feedbackProd'),
-      feedback: failedDeliveryEventOccurred,
-      interval: nconf.get('apn:feedbackInterval')
+    } catch(e) {
+      winston.error('Unable to start feedback service ', { exception: e });
+    }
   });
 
   jobs.process('push-notification', 20, function(job, done) {
