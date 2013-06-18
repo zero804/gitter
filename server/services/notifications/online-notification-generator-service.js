@@ -82,22 +82,12 @@ function getTroupeUrl(serilizedTroupe, senderUserId) {
     return "/" + serilizedTroupe.uri;
   }
 
-  if(!senderUserId) return null;
-  var userIds = serilizedTroupe.userIds;
-  var otherUserIds = userIds.filter(function(userId) { return userId != senderUserId; });
-  if(otherUserIds.length > 1) {
-    winston.warn("Something has gone wrong. There should be a single user left in the one-to-one troupe!", {
-      troupeId: serilizedTroupe.id,
-      senderUserId: senderUserId,
-      otherUserIds: otherUserIds
-    });
+  if(!senderUserId) {
+    winston.warn("Something has gone wrong. A message to a one-to-one troupe, yet we don't know who the sender is");
+    return null;
   }
 
-  var otherUserId = otherUserIds[0];
-
-  if(otherUserId) return "/one-one/" + otherUserId;
-
-  return null;
+  return "/one-one/" + senderUserId;
 }
 
 /* Takes a whole lot of notifications for the same type of message, and turns them into messages */
