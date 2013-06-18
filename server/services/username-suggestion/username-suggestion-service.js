@@ -80,6 +80,8 @@ function lookupPotentialUsernamesForUser(user) {
 }
 
 function lookupPotentialUsernamesForDisplayName(displayName) {
+  if (!displayName) return [];
+
   var words = displayName.split(/\s+/);
   var combinations = [words];
   if(words.length === 2) {
