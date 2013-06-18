@@ -28,34 +28,35 @@ var SERVICE_RANKINGS = [
 ];
 
 function suggestUsernamesForEmail(email, callback) {
-	return lookupPotentialUsernamesForEmail(email)
+	return loadWordLists()
+    .then(function() { return lookupPotentialUsernamesForEmail(email); })
 		.then(createUniqueRankedListOfUsernames)
-    .then(filterUsernamesByReservedWords)
+    .then(filterUsernamesByDisallowedWords)
     .then(filterUsernamesByAvailability)
     .then(generateSuggestionsForUnavailableUsernames)
     .nodeify(callback);
 }
 
 function suggestUsernames(seed, callback) {
-  return Q.resolve(filterUsernamesByReservedWords([seed]))
-    .then(function(usernames) {
-      // If no usernames were returned, then the seed was filtered. Don't even bother with suggestions
-      if(!usernames.length) return [ { username: seed, available: false, disallowed: true }];
-
-      return filterUsernamesByAvailability(usernames)
-        .then(generateSuggestionsForUnavailableUsernames)
-        .nodeify(callback);
-
-    }, callback);
-}
-
-function suggestUsernamesForUser(user, callback) {
-  return lookupPotentialUsernamesForUser(user)
-    .then(createUniqueRankedListOfUsernames)
-    .then(filterUsernamesByReservedWords)
+  return loadWordLists()
+    .then(function() { return filterUsernamesByDisallowedWords([seed]); })
     .then(filterUsernamesByAvailability)
     .then(generateSuggestionsForUnavailableUsernames)
     .nodeify(callback);
+}
+
+function suggestUsernamesForUser(user, callback) {
+  return loadWordLists()
+    .then(function() { return lookupPotentialUsernamesForUser(user); })
+    .then(createUniqueRankedListOfUsernames)
+    .then(filterUsernamesByDisallowedWords)
+    .then(filterUsernamesByAvailability)
+    .then(generateSuggestionsForUnavailableUsernames)
+    .nodeify(callback);
+}
+
+function loadWordLists() {
+  return Q.all([loadDisallowedWordsHash(), loadReservedWordsHash()]);
 }
 
 function lookupPotentialUsernamesForEmail(email) {
@@ -134,69 +135,94 @@ function loadDisallowedWordsHash() {
 
   var d = Q.defer();
 
-  var count = 0;
-  ['disallowed-usernames.txt', 'reserved-usernames.txt'].forEach(function(fileName, index, collection) {
-    var stream = fs.createReadStream(__dirname + '/../../../config/' + fileName);
-    stream = byline.createLineStream(stream);
+  var stream = fs.createReadStream(__dirname + '/../../../config/disallowed-usernames.txt');
+  stream = byline.createLineStream(stream);
 
-    stream.on('data', function(data) {
-      disallowedWordHash[data] = true;
-    });
-
-    stream.on('end', function() {
-      if(++count === collection.length) d.resolve();
-    });
-
+  stream.on('data', function(data) {
+    disallowedWordHash[data] = true;
   });
 
+  stream.on('end', function() {
+    d.resolve();
+  });
 
   return d.promise;
 }
 
-function filterUsernamesByReservedWords(usernames) {
-  if(!disallowedWordHash) {
-    return loadDisallowedWordsHash().then(filterValues);
-  }
 
-  return filterValues();
+// Lazy load the words
+var reservedWordsHash = null;
+function loadReservedWordsHash() {
+  reservedWordsHash = {};
 
-  function filterValues() {
-    usernames = usernames.map(function(u) {
-      u = latinize(u);
-      u = u.replace(/[^a-zA-Z0-9\.\-\_]/g,'');
-      u = u.toLowerCase();
-      return u;
-    });
+  var d = Q.defer();
 
-    usernames = usernames.filter(function(u) {
-      return !disallowedWordHash[u] &&
-              u.length >=3;
-    });
+  var stream = fs.createReadStream(__dirname + '/../../../config/reserved-usernames.txt');
+  stream = byline.createLineStream(stream);
 
-    return usernames;
+  stream.on('data', function(data) {
+    reservedWordsHash[data] = true;
+  });
 
-  }
+  stream.on('end', function() {
+    d.resolve();
+  });
+
+  return d.promise;
 }
 
-function filterUsernamesByAvailability(usernames) {
+function filterUsernamesByDisallowedWords(usernames) {
+  usernames = usernames.map(function(u) {
+    u = latinize(u);
+    u = u.replace(/[^a-zA-Z0-9\.\-\_]/g,'');
+    u = u.toLowerCase();
+    return u;
+  });
+
+  return usernames.map(function(u) {
+    return {
+      username: u,
+      disallowed: disallowedWordHash[u] || u.length < 3
+    };
+  });
+
+}
+
+function filterUsernamesByAvailability(usernameSuggestions) {
+  // Firstly filter the reserved words
+  usernameSuggestions.forEach(function(s) {
+    if(!s.disallowed) {
+      if(reservedWordsHash[s.username]) {
+        s.available = false;
+      }
+    }
+  });
+
   var d = Q.defer();
+
+  var usernames = usernameSuggestions.filter(function(s) { return !s.disallowed; }).map(function(s) { return s.username; });
+
   userService.findTakenUsernames(usernames, d.makeNodeResolver());
 
   return d.promise.then(function(takenUsernames) {
-    return usernames.map(function(u) {
-      return {
-        username: u,
-        available: !takenUsernames[u]
-      };
+
+    usernameSuggestions.forEach(function(s) {
+      if(!s.disallowed && s.available !== false) {
+        s.available = !takenUsernames[s.username];
+      }
     });
+
+    return usernameSuggestions;
   });
+
+
 }
 
 // Suggestions takes the form [ { username: x, available: false }]
 // TODO: in the future, this function may be a bit of a cpu hog.
 // and perhaps will need to have some yields happening internally
 function generateSuggestionsForUnavailableUsernames(suggestions) {
-  var unavailable = suggestions.filter(function(s) { return !s.available; });
+  var unavailable = suggestions.filter(function(s) { return !s.available && !s.disallowed; });
 
   // If all the suggestions are available, don't bother trying to generate any new ones
   if(!unavailable.length) return suggestions;
