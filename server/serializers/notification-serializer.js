@@ -49,23 +49,29 @@ function FileStrategy(options) {
   if(!options) options = {};
 
   var userStategy = new UserIdStrategy();
-  var troupeStrategy = new TroupeIdStrategy(options);
+  var troupeStrategy = options.includeTroupe && new TroupeIdStrategy(options);
 
   this.preload = function(items, callback) {
     var users = items.map(function(i) { return i.versions[i.versions.length - 1].creatorUserId; });
     users = _.flatten(users, true);
     users = _.uniq(users);
 
-    var troupeIds = items.map(function(i) { return i.troupeId; });
-    troupeIds = _.uniq(troupeIds);
+
 
     var strategies = [{
       strategy: userStategy,
       data: users
-    }, {
-      strategy: troupeStrategy,
-      data: troupeIds
     }];
+
+    if(troupeStrategy) {
+      var troupeIds = items.map(function(i) { return i.troupeId; });
+      troupeIds = _.uniq(troupeIds);
+
+      strategies.push({
+        strategy: troupeStrategy,
+        data: troupeIds
+      });
+    }
 
     execPreloads(strategies, callback);
   };
@@ -90,7 +96,7 @@ function FileStrategy(options) {
       mimeType: item.mimeType,
       latestVersion: narrowFileVersion(item.versions[item.versions.length - 1]),
       url: '/troupes/' + encodeURIComponent(item.troupeId) + '/downloads/' + encodeURIComponent(item.fileName),
-      troupe: troupeStrategy.map(item.troupeId)
+      troupe: troupeStrategy && troupeStrategy.map(item.troupeId)
     };
   };
 
@@ -101,6 +107,7 @@ function ChatStrategy(options)  {
   if(!options) options = {};
 
   var userStategy = new UserIdStrategy(options);
+  var troupeStrategy = options.includeTroupe && new TroupeIdStrategy(options);
 
   this.preload = function(items, callback) {
     var users = items.map(function(i) { return i.fromUserId; });
@@ -111,6 +118,14 @@ function ChatStrategy(options)  {
       data: _.uniq(users)
     });
 
+    if(troupeStrategy) {
+      var troupeIds = items.map(function(i) { return i.toTroupeId; });
+      strategies.push({
+        strategy: troupeStrategy,
+        data: troupeIds
+      });
+    }
+
     execPreloads(strategies, callback);
   };
 
@@ -119,7 +134,8 @@ function ChatStrategy(options)  {
       id: item._id,
       text: item.text,
       sent: item.sent,
-      fromUser: options.user ? options.user : userStategy.map(item.fromUserId)
+      fromUser: options.user ? options.user : userStategy.map(item.fromUserId),
+      troupe: troupeStrategy && troupeStrategy.map(item.toTroupeId)
     };
 
   };
@@ -189,6 +205,7 @@ function RequestStrategy(options) {
   if(!options) options = {};
 
   var userStategy = new UserIdStrategy();
+  var troupeStrategy = options.includeTroupe && new TroupeIdStrategy(options);
 
   this.preload = function(requests, callback) {
     var userIds =  requests.map(function(item) { return item.userId; });
@@ -198,6 +215,14 @@ function RequestStrategy(options) {
       data: _.uniq(userIds)
     }];
 
+    if(troupeStrategy) {
+      var troupeIds = requests.map(function(i) { return i.troupeId; });
+      strategies.push({
+        strategy: troupeStrategy,
+        data: troupeIds
+      });
+    }
+
     execPreloads(strategies, callback);
 
   };
@@ -205,7 +230,8 @@ function RequestStrategy(options) {
   this.map = function(item) {
     return {
       id: item._id,
-      user: userStategy.map(item.userId)
+      user: userStategy.map(item.userId),
+      troupe: troupeStrategy && troupeStrategy.map(item.troupeId)
     };
   };
 }
