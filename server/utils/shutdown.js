@@ -9,7 +9,7 @@ var _ = require('underscore');
 
 function shutdownGracefully() {
   winston.info("Starting graceful shutdown procedure");
-  setTimeout(function(err) {
+  var timer = setTimeout(function(err) {
       winston.info("Timeout awaiting graceful shutdown. Forcing shutdown.");
       process.exit(11);
   }, 100000);
@@ -77,6 +77,13 @@ exports.addHandler = function addHandler(stageName, stageNumber, shutdownHandler
     o.push(shutdownHandler);
   }
 };
+
+process.on('uncaughtException', function(err) {
+  winston.error('Uncaught exception' + err + ' forcing shutdown');
+  shutdownGracefully();
+
+});
+
 
 exports.shutdownGracefully = shutdownGracefully;
 
