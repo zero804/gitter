@@ -182,7 +182,7 @@ function filterUsernamesByDisallowedWords(usernames) {
   return usernames.map(function(u) {
     return {
       username: u,
-      disallowed: disallowedWordHash[u] || u.length < 3
+      disallowed: disallowedWordHash[u] || u.length < 3 ? true : undefined
     };
   });
 
