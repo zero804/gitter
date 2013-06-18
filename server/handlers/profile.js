@@ -5,7 +5,6 @@ var form = require("express-form"),
     filter = form.filter,
     validate = form.validate,
     userService = require("../services/user-service"),
-    troupeService = require("../services/troupe-service"),
     middleware = require('../web/middleware'),
     winston = require("winston");
 
@@ -33,7 +32,7 @@ module.exports = {
             if (!req.form.isValid) {
               if(req.accepts("application/json")) {
                 winston.info("Form is not valid");
-                 res.send(500);
+                 res.send(400);
               } else {
                 res.render('profile', {
                   flash: req.flash,

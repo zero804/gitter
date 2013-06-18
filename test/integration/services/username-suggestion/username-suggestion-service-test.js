@@ -20,7 +20,7 @@ describe('username-suggestion-service', function() {
   it('should suggest usernames for Mikes email address', function(done) {
     underTest.suggestUsernamesForEmail('mike@hipgeeks.net')
       .then(function(usernameSuggestions) {
-        assert(usernameSuggestions.length == 1);
+        assert(usernameSuggestions.length >= 1);
       })
       .nodeify(done);
   });
@@ -41,7 +41,7 @@ describe('username-suggestion-service', function() {
       .then(function(usernameSuggestions) {
         assert(usernameSuggestions.length == 1);
         var s = usernameSuggestions[0];
-        assert.strictEqual(s.available, false);
+        assert.strictEqual(s.disallowed, true);
       })
       .nodeify(done);
   });
