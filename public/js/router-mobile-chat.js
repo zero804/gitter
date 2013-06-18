@@ -11,7 +11,7 @@ require([
   'components/eyeballs',
   'components/unread-items-client',
   'scrollfix'
-], function($, _, Backbone, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget/*, eyeballsClient, unreadItemsClient, scrollfix*/) {
+], function($, _, Backbone, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget  /*, eyeballsClient, unreadItemsClient, scrollfix*/) {
   /*jslint browser: true, unused: true */
   "use strict";
 
@@ -30,6 +30,18 @@ require([
     }
   });
 
+  chatCollection.newConnectionCount = 0;
+  $(document).on('realtime:newConnectionEstablished', function() {
+    if(chatCollection.newConnectionCount++) {
+      chatCollection.fetch({
+        data: {
+          limit: PAGE_SIZE
+        }
+      });
+    }
+  });
+
+
   var chatCollectionView = new ChatCollectionView({
     el: $('#frame-chat'),
     collection: chatCollection
@@ -44,20 +56,20 @@ require([
   }).render();
 
 
-$('.trpMobileAmuseIcon').click(function() {
-  document.location.reload(true);
-});
+  $('.trpMobileAmuseIcon').click(function() {
+    document.location.reload(true);
+  });
 
-// Prevent Header & Footer From Showing Browser Chrome
+  // Prevent Header & Footer From Showing Browser Chrome
 
-document.addEventListener('touchmove', function(event) {
-   if(event.target.parentNode.className.indexOf('noBounce') != -1 || event.target.className.indexOf('noBounce') != -1 ) {
-  event.preventDefault(); }
-}, false);
+  document.addEventListener('touchmove', function(event) {
+     if(event.target.parentNode.className.indexOf('noBounce') != -1 || event.target.className.indexOf('noBounce') != -1 ) {
+    event.preventDefault(); }
+  }, false);
 
-// Add ScrollFix
-var scrollingContent = document.getElementById("chat-wrapper");
-new ScrollFix(scrollingContent);
+  // Add ScrollFix
+  var scrollingContent = document.getElementById("chat-wrapper");
+  new ScrollFix(scrollingContent);
 
   // Asynchronously load tracker
   require([

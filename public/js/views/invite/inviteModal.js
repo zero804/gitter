@@ -21,6 +21,7 @@ define([
       var inviteId = this.inviteId;
 
       $.ajax({
+        async: false,
         method: "PUT",
         url: "/user/" + userId + "/invites/" + inviteId,
         success: function() {
@@ -38,6 +39,7 @@ define([
       var inviteId = this.inviteId;
 
       $.ajax({
+        async: false,
         method: "DELETE",
         url: "/user/" + userId + "/invites/" + inviteId,
         success: function() {

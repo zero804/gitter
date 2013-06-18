@@ -73,7 +73,7 @@ function getTroupeUrl(serilizedTroupe, senderUserId) {
 
   if(!senderUserId) return null;
   var userIds = serilizedTroupe.userIds;
-  var otherUserIds = userIds.filter(function(userId) { return userId == senderUserId; });
+  var otherUserIds = userIds.filter(function(userId) { return userId != senderUserId; });
   if(otherUserIds.length > 1) {
     winston.warn("Something has gone wrong. There should be a single user left in the one-to-one troupe!", {
       troupeId: serilizedTroupe.id,

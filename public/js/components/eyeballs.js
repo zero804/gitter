@@ -27,6 +27,13 @@ define([
       type: "POST",
       success: function(/*data*/) {
       },
+      statusCode: {
+        400: function() {
+          // The connection is gone...
+          log('Eyeballs returned 400. Recycling realtime connection.');
+          realtime.recycleConnection();
+        }
+      },
       error: function() {
         log('An error occurred while communicating eyeballs');
       }
@@ -73,15 +80,61 @@ define([
     eyeballsOn();
   });
 
-  $(window).on('pageshow', function() {
-    log('pageshow');
-    eyeballsOn();
-  });
+  var cordova = window.cordova;
 
-  $(window).on('pagehide', function() {
-    log('pagehide');
-    eyeballsOff();
-  });
+  if(cordova) {
+    document.addEventListener("deviceready", function() {
+
+      $(document).on('realtime:newConnectionEstablished', registerSocket);
+      registerSocket();
+
+      function registerSocket() {
+        window.setTimeout(function() {
+          var socketId = realtime.getClientId();
+          if(socketId) {
+            cordova.exec(function() {}, function() {}, "EyeballsOff",
+                     "registerSocket", [socketId]);
+          }
+        }, 0);
+      }
+
+      document.addEventListener("resume", function() {
+        log('resume: eyeballs set to ' + eyesOnState);
+
+        updateLastUserInteraction();
+        window.setTimeout(function() {
+          eyeballsOn();
+        }, 0);
+      }, false);
+
+      // Cordova specific events
+      document.addEventListener("pause", function() {
+        eyesOnState = false;
+        log('pause');
+
+      }, false);
+
+    }, false);
+
+
+
+  } else {
+    // Use this technique only as a failover if the cordova plugin isn't available
+    // Unfortunately it's not too good as Safari cuts the request off before it
+    // goes back to the server
+    $(window).on('pageshow', function() {
+      log('pageshow');
+      updateLastUserInteraction();
+
+      eyeballsOn();
+    });
+
+    $(window).on('pagehide', function() {
+      log('pagehide');
+      eyeballsOff();
+    });
+
+  }
 
   var lastUserInteraction = Date.now();
   var inactivity = false;
@@ -99,19 +152,6 @@ define([
   $(window).on('scroll', updateLastUserInteraction);
   $(document).on('mousemove', updateLastUserInteraction);
 
-  // Cordova specific events
-  document.addEventListener("pause", function() {
-    window.setTimeout(function() {
-      eyeballsOff();
-    }, 0);
-  }, false);
-
-  document.addEventListener("resume", function() {
-    window.setTimeout(function() {
-      eyeballsOn();
-    }, 0);
-  }, false);
-
 
   startInactivityPoller();
 
@@ -120,12 +160,20 @@ define([
     if(inactivityTimer) return;
 
     inactivityTimer = window.setInterval(function() {
-      if(Date.now() - lastUserInteraction > (INACTIVITY - INACTIVITY_POLL)) {
-        log('inactivity');
-        inactivity = true;
-        stopInactivityPoller();
-        eyeballsOff();
-      }
+
+      // This is a long timeout, so it could possibly be delayed by
+      // the user pausing the application. Therefore just wait for one
+      // more period for activity to start again...
+
+      window.setTimeout(function() {
+        if(Date.now() - lastUserInteraction > (INACTIVITY - INACTIVITY_POLL)) {
+          log('inactivity');
+          inactivity = true;
+          stopInactivityPoller();
+          eyeballsOff();
+        }
+      }, 5);
+
     }, INACTIVITY_POLL);
   }
 
