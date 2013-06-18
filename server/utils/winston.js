@@ -5,6 +5,7 @@ var nconf = require('./config');
 var winston = require("winston");
 var fs = require('fs');
 var path = require('path');
+var Q = require('q');
 
 function statFile(fileTransport) {
   if(!fileTransport) return;
@@ -148,5 +149,11 @@ nconf.events.on('reload', function() {
 
   configureTransports();
 });
+
+
+
+// This really doens't have a home, but logging shows stack
+// traces, so it'll go here for now
+Q.longStackSupport = !!nconf.get("logging:longStackSupport");
 
 module.exports = winston;

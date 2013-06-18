@@ -81,7 +81,19 @@ function lookupPotentialUsernamesForUser(user) {
 
 function lookupPotentialUsernamesForDisplayName(displayName) {
   var words = displayName.split(/\s+/);
-  return [words.join(''), words.join('.'), words.join('_')].map(function(n) { return { service: 'name_guess', username: n }; });
+  var combinations = [words];
+  if(words.length === 2) {
+    combinations.push([words[0].substring(0, 1), words[1]]);
+    combinations.push([words[0], words[1].substring(0, 1)]);
+  }
+
+  var names = _.flatten(combinations.map(function(combination) {
+    return [combination.join(''), combination.join('.'), combination.join('_')];
+  }));
+
+  var suggestions = names.map(function(n) { return { service: 'name_guess', username: n }; });
+
+  return suggestions;
 }
 
 function createUniqueRankedListOfUsernames(results) {
