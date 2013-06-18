@@ -23,11 +23,13 @@ function SocketStrategy() {
 
   this.map =  function(socket) {
     return {
+      id: socket.id,
       user: userStrategy.map(socket.userId),
       troupe: troupeStrategy.map(socket.troupeId),
       eyeballs: socket.eyeballs,
       mobile: socket.mobile,
-      createdTime: socket.createdTime
+      createdTime: socket.createdTime,
+      client: socket.client
     };
   };
 

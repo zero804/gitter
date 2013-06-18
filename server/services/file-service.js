@@ -75,6 +75,8 @@ function uploadFileToGrid(file /* mongo file object */, version, temporaryFile, 
 }
 
 function calculateMd5ForFile(temporaryFile, callback) {
+  winston.verbose('Calculating MD5 for file', { file: temporaryFile });
+
   var md5sum = crypto.createHash('md5');
   var s = fs.ReadStream(temporaryFile);
 
