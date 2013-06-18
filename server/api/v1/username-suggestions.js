@@ -5,10 +5,33 @@ var usernameSuggestionService = require('../../services/username-suggestion/user
 
 module.exports = function(req, res, next) {
   var email = req.query.email;
-  if(!email) return next('Suggestion API requires email parameter');
 
-  usernameSuggestionService.suggestUsernamesForEmail(email, function(err, suggestions) {
-    if(err) return next(err);
-    res.send(suggestions);
-  });
+  var text = req.query.text;
+  if(text) text = text.trim();
+
+  var user = req.user;
+
+  if(text) {
+    usernameSuggestionService.suggestUsernames(text, function(err, suggestions) {
+      if(err) return next(err);
+      res.send(suggestions);
+    });
+
+  } else if(email) {
+    usernameSuggestionService.suggestUsernamesForEmail(email, function(err, suggestions) {
+      if(err) return next(err);
+      res.send(suggestions);
+    });
+
+  } else if(user) {
+    usernameSuggestionService.suggestUsernamesForUser(user, function(err, suggestions) {
+      if(err) return next(err);
+      res.send(suggestions);
+    });
+
+  } else {
+    next(400);
+  }
+
+
 };

@@ -4,5 +4,12 @@
 exports.lookupUsernameForEmail = function(email) {
   var username = email.split('@',1)[0];
 
-  return { service: 'email', username: username };
+  return [{
+    service: 'email',
+    username: username
+  }, {
+    service: 'email',
+    username: username.replace(/[^a-zA-Z]/g,'')
+  }];
+
 };
