@@ -58,7 +58,7 @@ require([
     }
 
     function chooseUsername() {
-      (new TroupeViews.Modal({ view: new UsernameView() })).show();
+      (new TroupeViews.Modal({ view: new UsernameView(), disableClose: true })).show();
     }
 
     function signup() {
