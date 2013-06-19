@@ -21,6 +21,7 @@ define([
 
 		initialize: function() {
 			this.getSuggestions();
+			this.suggestions = [];
 		},
 
 		getSuggestions: function() {
@@ -30,15 +31,30 @@ define([
 				url: '/api/v1/usernamesuggestions',
 				success: function(suggestions) {
 					if (suggestions && suggestions.length) {
-						self.renderSuggestions(suggestions);
+						self.addSuggestions(suggestions);
 					}
 				}
 			});
 		},
 
+		addSuggestions: function(suggestions) {
+			var prevSuggestions = this.suggestions;
+			this.suggestions = _.uniq(_.union(suggestions, prevSuggestions), false, function(suggestion) {
+				return suggestion.username;
+			});
+
+			var newSuggestions = _.filter(suggestions, function(suggestion) {
+				var existed = _.find(prevSuggestions, function(prevSuggestion) {
+					return prevSuggestion.username == suggestion.username;
+				});
+
+				return !existed;
+			});
+
+			this.renderSuggestions(newSuggestions);
+		},
+
 		renderSuggestions: function(suggestions) {
-			console.log("Render suggestions");
-			this.suggestions = suggestions;
 			var suggestionsContainer = this.$el.find('.trpSuggestions');
 
 			for (var a = 0; a < suggestions.length; a++) {
@@ -57,7 +73,10 @@ define([
 		checkAvailability: function() {
 
 			var self = this;
+
+			/* On key press, hide previous error message */
 			$('.trpModalFailure').hide();
+
 			/* Cancel the availability message until it is checked again */
 			unknownAvailability();
 
@@ -73,18 +92,24 @@ define([
 
 				var username = self.$el.find('input[name=username]').val();
 
+				// don't check availability of empty username
+				if (!username) return;
+
 				$.ajax({
 					url: '/api/v1/usernamesuggestions',
 					data: {
 						text: username
 					},
 					success: function(suggestions) {
-						if (suggestions[0].available) {
+						var username = self.$el.find('input[name=username]').val();
+						var requested = _.findWhere(suggestions, { username: username });
+						if (requested && requested.available) {
 							isAvailable();
 						}
 						else {
 							isUnavailable();
 						}
+						self.addSuggestions(suggestions);
 					}
 				});
 
