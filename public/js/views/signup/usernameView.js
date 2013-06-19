@@ -26,6 +26,7 @@ define([
 		initialize: function() {
 			this.getSuggestions();
 			this.suggestions = [];
+			this.valid = false;
 		},
 
 		getSuggestions: function() {
@@ -123,16 +124,19 @@ define([
 		},
 
 		isAvailable: function () {
+			this.valid = true;
 			this.$el.find('.not-valid-message').hide();
 			this.$el.find('.valid-message').show();
 		},
 
 		isUnavailable: function () {
+			this.valid = false;
 			this.$el.find('.not-valid-message').show();
 			this.$el.find('.valid-message').hide();
 		},
 
 		unknownAvailability: function () {
+			this.valid = false;
 			this.$el.find('.not-valid-message').hide();
 			this.$el.find('.valid-message').hide();
 		},
@@ -152,7 +156,7 @@ define([
 			var self = this;
 			var username = this.$el.find('input[name=username]').val();
 
-			if (!username) {
+			if (!username || !this.valid) {
 				error();
 				return;
 			}
@@ -164,8 +168,8 @@ define([
 					username: username
 				},
 				success: function(result) {
-					if (!results.success) {
-						error();
+					if (!result.success) {
+						self.isUnavailable();
 					} else {
 						window.location = "/" + username;
 					}
