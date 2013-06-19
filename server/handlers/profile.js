@@ -1,12 +1,10 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var form = require("express-form"),
-    filter = form.filter,
-    validate = form.validate,
-    userService = require("../services/user-service"),
+var userService = require("../services/user-service"),
     middleware = require('../web/middleware'),
-    winston = require("winston");
+    winston = require("winston"),
+    expressValidator = require('express-validator');
 
 module.exports = {
     install: function(app) {
@@ -14,61 +12,49 @@ module.exports = {
           '/profile',
           middleware.grantAccessForRememberMeTokenMiddleware,
           middleware.ensureLoggedIn(),
-          // Form filter and validation middleware
-          form(
-            filter("displayName").trim(),
-            validate("displayName").required().is(/^[^<>]{2,}$/),
-            filter("password").trim(),
-            filter("oldPassword").trim(),
-            filter("newEmail").trim()
-          ),
+          expressValidator({}),
 
           // Express request-handler now receives filtered and validated data
           function(req, res, next) {
-            if(!req.user) {
-              return next("Not signed in");
-            }
+            req.sanitize('displayName').trim();
+            req.sanitize('displayName').xss();
 
-            if (!req.form.isValid) {
-              if(req.accepts("application/json")) {
-                winston.info("Form is not valid");
-                 res.send(400);
-              } else {
-                res.render('profile', {
-                  flash: req.flash,
-                  errors: req.form.errors,
-                  displayName: req.form.displayName
-                });
-              }
+            if(req.body.displayName) req.checkBody('displayName', 'Invalid name').notEmpty().is(/^[^<>]{2,}$/);
+            if(req.body.newEmail) req.checkBody('newEmail', 'Invalid email address').notEmpty().isEmail();
+            if(req.body.username) req.checkBody('username', 'Invalid username').notEmpty().is(/^[a-zA-Z0-9\.\-\_]{3,}$/);
 
+            var mappedErrors = req.validationErrors(true);
+
+            if (mappedErrors) {
+              res.send({ success: false, validationFailure: true, errors: mappedErrors}, 400);
               return;
             }
 
             userService.updateProfile({
               userId: req.user.id,
-              displayName: req.form.displayName,
-              password: req.form.password,
-              oldPassword: req.form.oldPassword,
-              email: req.form.newEmail
+              displayName: req.body.displayName,
+              password: req.body.password,
+              oldPassword: req.body.oldPassword,
+              email: req.body.newEmail,
+              username: req.body.username
             }, function(err) {
               if(err) {
-                if(err.authFailure && req.accepts("application/json")) {
-                  res.send({ authFailure: true });
+                if(err.authFailure) {
+                  res.send({ authFailure: true }, 400);
+                  return;
+                } else if (err.emailConflict) {
+                  res.send({ success: false, emailConflict: true }, 400);
                   return;
                 }
-                else if (err.emailConflict) {
-                  res.send({ success: false, emailConflict: true });
-                  return;
-                }
+
                 winston.error("Unable to update profile", { exception: err });
                 return next(err);
               }
 
               res.send({
                 success: true,
-                displayName: req.form.displayName
+                displayName: req.body.displayName
               });
-
 
             });
           }

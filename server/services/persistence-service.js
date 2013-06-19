@@ -1,7 +1,8 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var mongoose = require("mongoose");
+var mongoose = require('mongoose-q')(require('mongoose'), {spread:true});
+
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 var appEvents = require("../app-events");
