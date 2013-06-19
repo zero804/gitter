@@ -37,6 +37,7 @@ define([
 		},
 
 		renderSuggestions: function(suggestions) {
+			console.log("Render suggestions");
 			this.suggestions = suggestions;
 			var suggestionsContainer = this.$el.find('.trpSuggestions');
 
@@ -49,12 +50,14 @@ define([
 
 				suggestionsContainer.append(suggestionTemplate(data));
 			}
+			$(".name-suggestions").slideDown();
+
 		},
 
 		checkAvailability: function() {
 
 			var self = this;
-
+			$('.trpModalFailure').hide();
 			/* Cancel the availability message until it is checked again */
 			unknownAvailability();
 
