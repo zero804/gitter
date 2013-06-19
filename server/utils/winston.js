@@ -122,7 +122,6 @@ configureTransports();
 
 var oldError = winston.error;
 winston.error = function(message, data) {
-
   function formatStackTrace(stack) {
     if(stack.join) {
       return stack.join('\n');
@@ -131,10 +130,21 @@ winston.error = function(message, data) {
     return '' + stack;
   }
 
-  if(data && data.exception && data.exception.stack) {
-    data.stack = formatStackTrace(data.exception.stack);
+
+  if(data && data.exception) {
+    console.error(data.exception);
+
+    if(data.exception.stack) {
+        data.stack = formatStackTrace(data.exception.stack);
+    }
+
+    if(data.exception.message) {
+      data.errorMessage = data.exception.message;
+      delete data.exception;
+    }
   }
   oldError.apply(winston, arguments);
+
 };
 
 var logLevel = nconf.get("logging:level");
@@ -155,5 +165,6 @@ nconf.events.on('reload', function() {
 // This really doens't have a home, but logging shows stack
 // traces, so it'll go here for now
 Q.longStackSupport = !!nconf.get("logging:longStackSupport");
+Error.stackTraceLimit = 100;
 
 module.exports = winston;
