@@ -13,6 +13,10 @@ define([
 	return TroupeViews.Base.extend({
 		template: template,
 
+		/* TODO 
+		 * Handle race conditions when saving, i.e it is no longer available
+		*/
+
 		events: {
 			"submit form": "onFormSubmit",
 			'keydown input[name=username]': "checkAvailability",
@@ -78,7 +82,7 @@ define([
 			$('.trpModalFailure').hide();
 
 			/* Cancel the availability message until it is checked again */
-			unknownAvailability();
+			self.unknownAvailability();
 
 			/* Buffer the key presses */
 			if (self.timer) {
@@ -104,10 +108,10 @@ define([
 						var username = self.$el.find('input[name=username]').val();
 						var requested = _.findWhere(suggestions, { username: username });
 						if (requested && requested.available) {
-							isAvailable();
+							self.isAvailable();
 						}
 						else {
-							isUnavailable();
+							self.isUnavailable();
 						}
 						self.addSuggestions(suggestions);
 					}
@@ -115,22 +119,22 @@ define([
 
 			}
 
-			function isAvailable() {
-				self.$el.find('.not-valid-message').hide();
-				self.$el.find('.valid-message').show();
-			}
-
-			function isUnavailable() {
-				self.$el.find('.not-valid-message').show();
-				self.$el.find('.valid-message').hide();
-			}
-
-			function unknownAvailability() {
-				self.$el.find('.not-valid-message').hide();
-				self.$el.find('.valid-message').hide();
-			}
-
 			return true;
+		},
+
+		isAvailable: function () {
+			this.$el.find('.not-valid-message').hide();
+			this.$el.find('.valid-message').show();
+		},
+
+		isUnavailable: function () {
+			this.$el.find('.not-valid-message').show();
+			this.$el.find('.valid-message').hide();
+		},
+
+		unknownAvailability: function () {
+			this.$el.find('.not-valid-message').hide();
+			this.$el.find('.valid-message').hide();
 		},
 
 		chooseSuggestion: function(e) {
@@ -154,11 +158,17 @@ define([
 			}
 
 			$.ajax({
-				url: '/api/v1/usernamesuggestions',
+				method: "POST",
+				url: '/profile',
 				data: {
-					save: username
+					username: username
 				},
 				success: function(result) {
+					if (!results.success) {
+						error();
+					} else {
+						window.location = "/" + username;
+					}
 				},
 				error: error
 			});
