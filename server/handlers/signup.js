@@ -27,7 +27,7 @@ module.exports = {
               res.relativeRedirect(req.user.username);
             }
             else {
-              res.render('signup', { compactView: self.isMobile(req), profileHasNoUsername: JSON.stringify(true), userId: JSON.stringify(req.user.id) });
+              res.render('signup', { compactView: self.isMobile(req), profileHasNoUsername: JSON.stringify(false), userId: JSON.stringify(req.user.id) });
             }
 
             return;
@@ -89,7 +89,7 @@ module.exports = {
               return;
             }
 
-            res.relativeRedirect(nconf.get('web:homeurl'));            
+            res.render('signup', { profileHasNoUsername: true, userId: JSON.stringify(req.user.id) });
           });
         });
 
