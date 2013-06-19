@@ -380,21 +380,30 @@ a {
 }
 
 .trpSuggestion {
-  background-color: @trpBgColor;
+  background-color: @trpBgColor2;
   display: inline-block;
   .trpBodySmall;
-  padding: 4px 8px;
+  padding: 4px 12px 3px 10px;
   border-radius: 2px;
+  margin-top: 8px;
+  margin-right: 4px;
+}
+
+.trpSuggestionAvailable:hover {
+  background-color: @trpGreen;
+}
+
+.trpSuggestionAvailable {
   .trpHand;
 }
 
-.trpSuggestion:hover {
-  background-color: @trpBgColor2;
-}
-
 .trpSuggestions {
-  padding-top: 12px;
-  padding-bottom: 28px;
+  overflow: hidden;
+  background-color: @trpBgColor;
+  margin-left: -24px;
+  margin-right: -24px;
+  margin-top: 8px;
+  padding: 12px 24px 20px 24px;
 }
 
 @media screen and (device-width: 320px) and (orientation: portrait) {
