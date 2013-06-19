@@ -89,7 +89,12 @@ module.exports = {
               return;
             }
 
-            res.render('signup', { profileHasNoUsername: true, userId: JSON.stringify(req.user.id) });
+            if (userService.isProfileUsernamed(user)) {
+              res.relativeRedirect('/' + user.username);
+            }
+            else {
+              res.render('signup', { profileHasNoUsername: !user.username, userId: JSON.stringify(req.user.id) });
+            }
           });
         });
 
