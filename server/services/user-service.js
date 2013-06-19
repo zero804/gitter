@@ -285,7 +285,7 @@ var userService = {
     var postSave = [];
 
     var seq = userService.findById(userId)
-      .then(updateUserStatus);
+      .then(queueDeleteInvites);
 
     if(displayName) seq = seq.then(updateDisplayName);
     if(password) seq = seq.then(updatePassword);
@@ -296,24 +296,10 @@ var userService = {
             .then(performPostSaveActions)
             .nodeify(callback);
 
-    function updateUserStatus(user) {
-      if(user.status === 'PROFILE_NOT_COMPLETED') {
-        // mark user as active after setting the password
-        if(user.passwordHash) {
-          throw new Error("User already has a password set");
-        }
-
-        if(!password) {
-          throw new Error("Password required");
-        }
-
-        user.status = 'ACTIVE';
-      }
-
+    function queueDeleteInvites(user) {
       postSave.push(function() {
         userService.deleteAllUsedInvitesForUser(user);
       });
-
 
       return user;
     }
@@ -343,6 +329,10 @@ var userService = {
         return Q.nfcall(sechash.strongHash, 'sha512', password)
           .then(function(hash3) {
             user.passwordHash = hash3;
+            // mark user as active after setting the password
+            if (user.status === 'PROFILE_NOT_COMPLETED' || user.status === 'UNCONFIRMED') {
+              user.status = "ACTIVE";              
+            }
             return user;
           });
       }
@@ -428,7 +418,7 @@ var userService = {
   },
 
   isProfileNotComplete: function(user) {
-    return user.status === "PROFILE_NOT_COMPLETE";
+    return user.status === "PROFILE_NOT_COMPLETED";
   },
 
   isProfilePassworded: function(user) {
