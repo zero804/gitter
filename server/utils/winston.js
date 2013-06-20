@@ -149,16 +149,4 @@ nconf.events.on('reload', function() {
   configureTransports();
 });
 
-process.on('uncaughtException', function(err) {
-  winston.error('----------------------------------------------------------------');
-  winston.error('-- OH DEAR A VeryBadThing has happened.');
-  winston.error('----------------------------------------------------------------');
-  winston.error('Uncaught exception' + err, { message: err.message, name: err.name });
-
-  if(err.stack) {
-    winston.error('' + err.stack);
-  }
-
-});
-
 module.exports = winston;
