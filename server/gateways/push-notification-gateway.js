@@ -1,10 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var kue = require('../utils/kue'),
-    jobs = kue.createQueue(),
-    winston = require("winston"),
-    statsService = require("../services/stats-service");
+var winston = require("winston");
 
 var errorDescriptions = {
   0: 'No errors encountered',
@@ -19,10 +16,13 @@ var errorDescriptions = {
   255: 'None (unknown)'
 };
 
-exports.startWorkers = function() {
+var workerQueue = require('../utils/worker-queue');
+
+var queue = workerQueue.queue('push-notification', {}, function() {
   var pushNotificationService = require("../services/push-notification-service");
   var nconf = require('../utils/config');
   var apns = require('apn');
+  var statsService = require("../services/stats-service");
 
   function directSendUserNotification(userIds, notification, callback) {
     var message = notification.message;
@@ -203,18 +203,13 @@ exports.startWorkers = function() {
     }
   });
 
-  jobs.process('push-notification', 20, function(job, done) {
-    directSendUserNotification(job.data.userIds, job.data.notification, kue.wrapCallback(job, done));
-  });
-};
+  return function(data, done) {
+    directSendUserNotification(data.userIds, data.notification, done);
+  };
+});
 
 exports.sendUserNotification = function(userIds, notification, callback) {
   if(!Array.isArray(userIds)) userIds = [userIds];
 
-  jobs.create('push-notification', {
-    title: notification.message,
-    userIds: userIds,
-    notification: notification
-  }).attempts(5)
-    .save(callback);
+  queue.invoke({ userIds: userIds, notification: notification },callback);
 };

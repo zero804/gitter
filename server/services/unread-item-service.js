@@ -10,8 +10,6 @@ var winston = require("winston");
 var redisClient = redis.createClient();
 var mongoUtils = require('../utils/mongo-utils');
 var Fiber = require('../utils/fiber');
-var kue = require('../utils/kue'),
-    jobs;
 
 var DEFAULT_ITEM_TYPES = ['file', 'chat', 'request'];
 
@@ -22,8 +20,11 @@ function sinceFilter(since) {
   };
 
 }
-exports.startWorkers = function() {
-  function republishUnreadItemCountForUserTroupeWorker(data, callback) {
+
+var workerQueue = require('../utils/worker-queue');
+
+var queue = workerQueue.queue('republish-unread-item-count-for-user-troupe', {}, function() {
+  return function republishUnreadItemCountForUserTroupeWorker(data, callback) {
     var userId = data.userId;
     var troupeId = data.troupeId;
 
@@ -39,24 +40,15 @@ exports.startWorkers = function() {
 
       return callback();
     });
-  }
-
-  jobs = kue.createQueue();
-  jobs.process('republish-unread-item-count-for-user-troupe', 20, function(job, done) {
-    republishUnreadItemCountForUserTroupeWorker(job.data, kue.wrapCallback(job, done));
-  });
-};
+  };
+});
 
 // TODO: come up with a way to limit the number of republishes happening per user
 function republishUnreadItemCountForUserTroupe(userId, troupeId, callback) {
-  if(!jobs) jobs = kue.createQueue();
-
-  jobs.create('republish-unread-item-count-for-user-troupe', {
-    title: 'republishUnreadItemCountForUserTroupe',
+  queue.invoke({
     userId: userId,
     troupeId: troupeId
-  }).attempts(1)
-    .save(callback);
+  }, callback);
 }
 
 exports.newItem = function(troupeId, creatorUserId, itemType, itemId) {
