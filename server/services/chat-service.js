@@ -2,9 +2,11 @@
 "use strict";
 
 var persistence = require("./persistence-service"),
+    collections = require("../utils/collections"),
     troupeService = require("./troupe-service"),
     statsService = require("./stats-service");
 var ObjectID = require('mongodb').ObjectID;
+
 
 var MAX_CHAT_EDIT_AGE_SECONDS = 300;
 
@@ -66,7 +68,7 @@ exports.findById = function(id, callback) {
 
  exports.findByIds = function(ids, callback) {
   persistence.ChatMessage
-    .where('_id').in(ids)
+    .where('_id')['in'](collections.idsIn(ids))
     .exec(callback);
 };
 

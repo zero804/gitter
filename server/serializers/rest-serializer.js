@@ -120,11 +120,12 @@ function UserIdStrategy(options) {
   var userStategy = new UserStrategy(options);
 
   this.preload = function(ids, callback) {
-    userService.findByIds(_.uniq(ids), function(err, users) {
+    userService.findByIds(ids, function(err, users) {
       if(err) {
         winston.error("Error loading users", { exception: err });
         return callback(err);
       }
+
       self.users = collections.indexById(users);
       userStategy.preload(users, callback);
     });
@@ -145,7 +146,6 @@ function FileStrategy(options) {
   this.preload = function(items, callback) {
     var users = items.map(function(i) { return i.versions.map(function(j) { return j.creatorUserId; }); });
     users = _.flatten(users, true);
-    users = _.uniq(users);
 
     var strategies = [{
       strategy: userStategy,
@@ -231,7 +231,6 @@ function FileIdAndVersionStrategy() {
   this.preload = function(fileAndVersions, callback) {
     var fileIds = _(fileAndVersions).chain()
                     .map(function(e) { return e.fileId; })
-                    .uniq()
                     .value();
 
     execPreloads([{
@@ -270,7 +269,6 @@ function EmailStrategy() {
 
     var allUserIds = _(items).chain()
       .map(function(i) { return i.fromUserId; })
-      .uniq()
       .value();
 
     var allFileAndVersionIds = _(items).chain()
@@ -278,7 +276,6 @@ function EmailStrategy() {
       .filter(predicates.notNull)
       .flatten()
       .map(function(f) { return { fileId: f.fileId, version: f.version }; })
-      .uniq()
       .value();
 
     execPreloads([{
@@ -337,7 +334,7 @@ function ConversationMinStrategy()  {
 
     execPreloads([{
       strategy: userStategy,
-      data: _.uniq(lastUsers)
+      data: lastUsers
     }], callback);
   };
 
@@ -480,7 +477,7 @@ function ChatStrategy(options)  {
     if(userStategy) {
       strategies.push({
         strategy: userStategy,
-        data: _.uniq(users)
+        data: users
       });
     }
 
@@ -494,7 +491,7 @@ function ChatStrategy(options)  {
     if(troupeStrategy) {
       strategies.push({
         strategy: troupeStrategy,
-        data: _.uniq(items.map(function(i) { return i.toTroupeId; }))
+        data: items.map(function(i) { return i.toTroupeId; })
       });
     }
 
@@ -694,8 +691,6 @@ function TroupeStrategy(options) {
         });
       }
 
-      userIds = _.uniq(userIds);
-
       strategies.push({
         strategy: userIdStategy,
         data: userIds
@@ -792,7 +787,7 @@ function RequestStrategy(options) {
 
     var strategies = [{
       strategy: userStategy,
-      data: _.uniq(userIds)
+      data: userIds
     }];
 
     if(options.currentUserId) {

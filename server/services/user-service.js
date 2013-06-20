@@ -9,7 +9,7 @@ var persistence = require("./persistence-service"),
     winston = require("winston"),
     statsService = require("./stats-service"),
     crypto = require('crypto'),
-    _ = require('underscore'),
+    collections = require("../utils/collections"),
     Q = require('q');
 
 function generateGravatarUrl(email) {
@@ -119,9 +119,7 @@ var userService = {
   },
 
   findByIds: function(ids, callback) {
-    ids = _.uniq(ids);
-    persistence.User.where('_id').in(ids)
-      .slaveOk()
+    persistence.User.where('_id')['in'](collections.idsIn(ids))
       .exec(callback);
   },
 
