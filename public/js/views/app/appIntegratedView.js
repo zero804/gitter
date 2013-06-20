@@ -6,11 +6,12 @@ define([
   'views/app/uiVars',
   'fineuploader',
   "nanoscroller",
+  "views/base",
   "views/signup/usernameView",
   'log!app-integrated-view',
   'components/unread-items-client',
   'collections/desktop'
-  ], function($, _, Backbone, uiVars, qq, _nano, UsernameView, log, unreadItemsClient, collections) {
+  ], function($, _, Backbone, uiVars, qq, _nano, TroupeViews, UsernameView, log, unreadItemsClient, collections) {
   "use strict";
 
   return Backbone.View.extend({
