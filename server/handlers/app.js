@@ -243,8 +243,7 @@ function preloadTroupeMiddleware(req, res, next) {
 
   troupeService.findByUri(appUri, function(err, troupe) {
     if (err) return next({ errorCode: 500, error: err });
-    if(!troupe) return next({ errorCode: 404 });
-    if(troupe.status != 'ACTIVE') return next({ errorCode: 404 });
+
     req.troupe = troupe;
 
     // check if the user has access
@@ -266,6 +265,20 @@ function preloadTroupeMiddleware(req, res, next) {
     next();
   });
 
+}
+
+function preloadUserMiddleware(req, res, next) {
+  var username = req.params.appUri;
+  userService.findByUsername(username, function(err, user) {
+    if (err) return next({ errorCode: 500, error: err });
+
+    req.userpage = user;
+  });
+}
+
+function preloadAppUriMiddleware(req, res, next) {
+  preloadUserMiddleware(req, res, next);
+  preloadTroupeMiddleware(req, res, next);
 }
 
 // TODO preload invites?
@@ -439,9 +452,30 @@ module.exports = {
 
       app.get('/:appUri',
         middleware.grantAccessForRememberMeTokenMiddleware,
-        preloadTroupeMiddleware,
+        preloadAppUriMiddleware,
         function(req, res, next) {
-          renderAppPageWithTroupe(req, res, next, 'app-integrated', req.troupe, req.troupe.name);
+          var isActiveTroupe = req.troupe && req.troupe.status === 'ACTIVE';
+          var isUserpage = req.userpage;
+          var isHomepage = isUserpage && req.userpage === req.user;
+
+          if (isActiveTroupe) {
+            winston.verbose("Serving troupe page");
+            renderAppPageWithTroupe(req, res, next, 'app-integrated', req.troupe, req.troupe.name);
+          }
+          else if (isHomepage) {
+            winston.verbose("Serving viewer's home page");
+            //res.send('userhome');
+            res.send(200);
+          }
+          else if (isUserpage) {
+            winston.verbose("Serving another user's profile page");
+            //res.render('userhome');
+            res.send(200);
+          }
+          else {
+            winston.verbose("No troupe or user found for this appUri");
+            next({ errorCode: 404 });
+          }
         });
 
       app.get('/:troupeUri/accept/:confirmationCode',
