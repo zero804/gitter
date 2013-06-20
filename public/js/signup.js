@@ -14,8 +14,10 @@ require([
   function($, TroupeViews, UsernameView, SignupModalView, SignupModalConfirmView, LoginModalView, createTroupeView, MessagesView) {
     //var loginFormVisible = false;
 
-    function createLoginModal() {
-      var view = new LoginModalView({ fromSignup:true });
+    function createLoginModal(options) {
+      if (!options) options = {};
+      options.fromSignup = true;
+      var view = new LoginModalView(options);
       var modal = new TroupeViews.Modal({ view: view });
       view.on('login.complete', function(data) {
         modal.off('login.complete');
@@ -79,6 +81,7 @@ require([
       return false;
     }
 
+
     if (window.profileHasNoUsername) {
       chooseUsername();
     }
@@ -100,9 +103,12 @@ require([
     });
 
     $('#button-existing-users-login').on('click', function() {
-      var modal = createLoginModal();
-      modal.show();
+      $(document).trigger('login-prompt');
       return false;
+    });
+
+    $(document).on('login-prompt', function(ev, credentials) {
+      createLoginModal({ email: credentials.email }).show();
     });
 
     require([
