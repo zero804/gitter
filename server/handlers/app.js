@@ -478,7 +478,7 @@ module.exports = {
       app.get('/:appUri/chat',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
-        preloadTroupeMiddleware,
+        uriContextResolverMiddleware,
         function(req, res, next) {
             renderAppPageWithTroupe(req, res, next, 'mobile/chat-app', req.troupe, req.troupe.name);
         });
@@ -486,7 +486,7 @@ module.exports = {
       app.get('/:appUri/files',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
-        preloadTroupeMiddleware,
+        uriContextResolverMiddleware,
         function(req, res, next) {
           renderAppPageWithTroupe(req, res, next, 'mobile/file-app', req.troupe, req.troupe.name);
         });
@@ -494,7 +494,7 @@ module.exports = {
       app.get('/:appUri/mails',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
-        preloadTroupeMiddleware,
+        uriContextResolverMiddleware,
         function(req, res, next) {
           renderAppPageWithTroupe(req, res, next, 'mobile/conversation-app', req.troupe, req.troupe.name);
         });
@@ -502,7 +502,7 @@ module.exports = {
       app.get('/:appUri/people',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
-        preloadTroupeMiddleware,
+        uriContextResolverMiddleware,
         function(req, res, next) {
           renderAppPageWithTroupe(req, res, next, 'mobile/people-app', req.troupe, req.troupe.name);
         });

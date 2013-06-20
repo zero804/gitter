@@ -1,6 +1,12 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var _ = require('underscore');
+
+exports.idsIn = function(ids) {
+  return _.uniq(ids).filter(function(id) { return !!id; });
+};
+
 exports.keys = function(object) {
     var k = [];
     for (var i in object) if (object.hasOwnProperty(i)) {

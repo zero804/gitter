@@ -12,6 +12,7 @@ var fs = require('fs');
 var thumbnailPreviewGeneratorService = require("./thumbnail-preview-generator-service");
 var mongooseUtils = require('../utils/mongoose-utils');
 var Fiber = require('../utils/fiber');
+var collections = require("../utils/collections");
 
 /* private */
 function getMainFileName(fileId, version) {
@@ -322,8 +323,7 @@ function storeFile(options, callback) {
 
 
 function findByIds(ids, callback) {
-  persistence.File.where('_id').in(ids)
-    .slaveOk()
+  persistence.File.where('_id')['in'](collections.idsIn(ids))
     .exec(callback);
 }
 

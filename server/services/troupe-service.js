@@ -24,7 +24,7 @@ function findByUri(uri, callback) {
 
 function findByIds(ids, callback) {
   persistence.Troupe
-    .where('_id').in(ids)
+    .where('_id')['in'](collections.idsIn(ids))
     .exec(callback);
 }
 
