@@ -108,7 +108,7 @@ require([
     });
 
     $(document).on('login-prompt', function(ev, credentials) {
-      createLoginModal({ email: credentials.email }).show();
+      createLoginModal({ email: (credentials) ? credentials.email : '' }).show();
     });
 
     require([
