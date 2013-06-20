@@ -4,49 +4,15 @@
 var winston = require("winston");
 var pushNotificationService = require("../push-notification-service");
 var nconf = require('../../utils/config');
-var unreadItemService = require('./../unread-item-service');
-var kue = require('../../utils/kue');
-var jobs = kue.createQueue();
-var Fiber = require('../../utils/fiber');
-var notificationMessageGenerator = require('../../utils/notification-message-generator');
-
 var notificationWindowPeriods = [nconf.get("notifications:notificationDelay") * 1000, nconf.get("notifications:notificationDelay2") * 1000];
 
-exports.queueUserTroupesForNotification = function(userTroupes) {
-  userTroupes.forEach(function(userTroupe) {
-    pushNotificationService.canLockForNotification(userTroupe.userId, userTroupe.troupeId, userTroupe.startTime, function(err, notificationNumber) {
-      if(err) return winston.error('Error while executing canLockForNotification: ' + err, { exception: err });
-
-      if(!notificationNumber) {
-        winston.verbose('User troupe already has notification queued. Skipping');
-        return;
-      }
-
-      var delay = notificationWindowPeriods[notificationNumber - 1];
-      if(!delay) {
-        // User had already gotten two notifications, that's enough
-        return;
-      }
-
-      winston.verbose('Queuing notification ' + notificationNumber + ' to be send to user ' + userTroupe.userId + ' in ' + delay + 'ms');
-
-      jobs.create('generate-push-notifications', {
-        title: 'Push Notification #' + notificationNumber,
-        userTroupe: userTroupe,
-        notificationNumber: notificationNumber
-      }).delay(delay)
-        .save();
-
-    });
-
-  });
-};
-
-
-exports.startWorkers = function() {
-  // NB NB circular reference here! Fix this!
+var workerQueue = require('../../utils/worker-queue');
+var queue = workerQueue.queue('generate-push-notifications', {}, function() {
   var pushNotificationGateway = require("../../gateways/push-notification-gateway");
   var serializer = require("../../serializers/notification-serializer");
+  var notificationMessageGenerator = require('../../utils/notification-message-generator');
+  var unreadItemService = require('./../unread-item-service');
+  var Fiber = require('../../utils/fiber');
 
   function getTroupeUrl(serilizedTroupe, senderUserId) {
     /* The URL for non-oneToOne troupes is the trivial case */
@@ -156,10 +122,38 @@ exports.startWorkers = function() {
     });
   }
 
-  jobs.process('generate-push-notifications', 20, function(job, done) {
-    var d = job.data;
-    sendUserTroupeNotification(d.userTroupe, d.notificationNumber, kue.wrapCallback(job, done));
+  return function(data, done) {
+    sendUserTroupeNotification(data.userTroupe, data.notificationNumber, done);
+  };
+
+});
+
+
+exports.queueUserTroupesForNotification = function(userTroupes) {
+  userTroupes.forEach(function(userTroupe) {
+    pushNotificationService.canLockForNotification(userTroupe.userId, userTroupe.troupeId, userTroupe.startTime, function(err, notificationNumber) {
+      if(err) return winston.error('Error while executing canLockForNotification: ' + err, { exception: err });
+
+      if(!notificationNumber) {
+        winston.verbose('User troupe already has notification queued. Skipping');
+        return;
+      }
+
+      var delay = notificationWindowPeriods[notificationNumber - 1];
+      if(!delay) {
+        // User had already gotten two notifications, that's enough
+        return;
+      }
+
+      winston.verbose('Queuing notification ' + notificationNumber + ' to be send to user ' + userTroupe.userId + ' in ' + delay + 'ms');
+
+      queue.invoke({
+        userTroupe: userTroupe,
+        notificationNumber: notificationNumber
+      }, { delay: delay });
+
+    });
+
   });
-
-
 };
+
