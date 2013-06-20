@@ -10,8 +10,8 @@ define([
   "views/signup/usernameView",
   'log!app-integrated-view',
   'components/unread-items-client',
-  'collections/desktop'
-  ], function($, _, Backbone, uiVars, qq, _nano, TroupeViews, UsernameView, log, unreadItemsClient, collections) {
+  'collections/instances/troupes'
+  ], function($, _, Backbone, uiVars, qq, _nano, TroupeViews, UsernameView, log, unreadItemsClient, troupeCollections) {
   "use strict";
 
   return Backbone.View.extend({
@@ -55,6 +55,7 @@ define([
 
       $(".nano").nanoScroller({ preventPageScrolling: true });
 
+/*
       this.uploader = new qq.FineUploader({
         element: $('#fineUploader')[0],
         dragAndDrop: {
@@ -93,6 +94,7 @@ define([
           }
         }
       });
+*/
 
       this.app.rightPanelRegion.on('show', function() {
         //log("SHOW PANEL");
@@ -130,75 +132,42 @@ define([
 
         // overall count
         updateBadge('#unread-badge', values.overall);
-
-       /*
-        // normal troupe unread count
-        if (values.normal)
-          $('.trpLeftMenuToolbarItems').addClass('unread-normal');
-        else
-          $('.trpLeftMenuToolbarItems').removeClass('unread-normal');
-
-        // one to one unread count
-        if (values.oneToOne)
-          $('.trpLeftMenuToolbarItems').addClass('unread-one2one');
-        else
-          $('.trpLeftMenuToolbarItems').removeClass('unread-one2one');
-        */
       }
 
       $(document).on('troupeUnreadTotalChange', onTroupeUnreadTotalChange);
       onTroupeUnreadTotalChange(null, unreadItemsClient.getCounts());
 
-      // Temporary fix for #459. Remove this at a later stage:
-      // https://sprint.ly/product/4407/#!/item/459
-      window.setTimeout(function() {
-        log('Executing temporary fix for #459');
-        onTroupeUnreadTotalChange(null, unreadItemsClient.getCounts());
-      }, 2000);
 
-      // show / hide the 'unread troupes header' on the mega list
-      collections['unreadTroupes'].on('all', toggleUnreads);
-      collections['favouriteTroupes'].on('all', toggleFavs);
-      collections['recentTroupes'].on('all', toggleRecents);
-      collections['incomingInvites'].on('all', toggleInvites);
+      toggler('#unreadTroupesList', troupeCollections.unreadTroupes);
+      toggler('#favTroupesList', troupeCollections.favouriteTroupes);
+      toggler('#recentTroupesList', troupeCollections.recentTroupes);
+      toggler('#invitesList', troupeCollections.incomingInvites);
 
-      function toggleUnreads() {
-        $('#unreadTroupesList').toggle(collections['unreadTroupes'].length > 0);
+      function toggler(element, collection) {
+        function toggle() {
+          $(element).toggle(collection.length > 0);
+        }
+
+        collection.on('all', toggle);
+        toggle();
       }
 
-      function toggleFavs() {
-        $('#favTroupesList').toggle(collections['favouriteTroupes'].length > 0);
-      }
-
-      function toggleRecents() {
-        $('#recentTroupesList').toggle(collections['recentTroupes'].length > 0);
-      }
-
-      function toggleInvites() {
-        $('#invitesList').toggle(collections['incomingInvites'].length > 0);
-      }
-
-      toggleUnreads();
-      toggleFavs();
-      toggleRecents();
-      toggleInvites();
-
-      this.ensureProfileIsUsernamed();
+      //this.ensureProfileIsUsernamed();
     },
-
+/*
     ensureProfileIsUsernamed: function() {
       var user = window.troupeContext.user;
       if (!user.username) {
         new TroupeViews.Modal({ view: new UsernameView() }).show();
       }
     },
-
+*/
     updateTitlebar: function(values) {
       $('title').html(this.getTitlebar(values));
     },
 
     getTitlebar: function(counts) {
-      var mainTitle = window.troupeContext.troupe.name + " - Troupe";
+      var mainTitle = window.troupeContext.title + " - Troupe";
       // TODO this isn't working properly when updating the troupe name, need to be able to poll unreadItems count not just accept the event
       var overall = counts.overall;
       var current = counts.current;
@@ -214,7 +183,7 @@ define([
         return String.fromCharCode(0x277F + overall) + ' ' + mainTitle;
       }
 
-      return '[' + overall + '] ' + window.troupeContext.troupe.name + " - Troupe";
+      return '[' + overall + '] ' + window.troupeContext.title + " - Troupe";
     },
 
     toggleRightPanel: function(id) {
@@ -498,6 +467,7 @@ define([
       $("#list-search-input").focus();
     },
 
+    // THIS NEEDS A NEW HOME
     toggleFavourite: function() {
       var favHeader = $('.trpHeaderFavourite');
       favHeader.toggleClass('favourited');

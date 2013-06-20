@@ -351,5 +351,50 @@ define([
     };
   }
 
+  var Preloader = function() {
+    var that = this;
+
+    $(document).on('realtime:newConnectionEstablished', function() {
+      if(!that.initialConnectionEstablished) {
+        that.initialConnectionEstablished = true;
+        return;
+      }
+
+      that.fetchData();
+    });
+  };
+
+  _.extend(Preloader.prototype, Backbone.Events, {
+    getTimestamp: function() {
+      return this._timestamp;
+    },
+
+    fetchData: function() {
+      if(this.preloadStarted) return;
+      this.preloadStarted = true;
+
+      log('Reloading data');
+
+      this.trigger('preload:start');
+
+      $.ajax({
+        url: window.location.pathname + '/preload?d=' + Date.now(),
+        dataType: "json",
+        type: "GET",
+        context: this,
+        success: function(data) {
+          log('Preload completed, resetting collections');
+          this.preloadStarted = false;
+
+          this._timestamp = moment(data.timestamp).toDate();
+
+          this.trigger('preload:complete', data);
+        }
+      });
+    }
+  });
+
+  exports.preloader = new Preloader();
+
   return exports;
 });

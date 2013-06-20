@@ -317,7 +317,7 @@ function preloadTroupeMiddleware(req, res, next) {
     req.troupe = troupe;
 
     // check if the user has access
-    if(req.user && !troupeService.userHasAccessToTroupe(req.user, troupe)) {
+    if(req.user && troupe && !troupeService.userHasAccessToTroupe(req.user, troupe)) {
       // if not, check if the user has an unused invite
       troupeService.findUnusedInviteToTroupeForEmail(req.user.email, troupe.id, function(err, invite) {
         if (err) next(err);
@@ -495,11 +495,13 @@ module.exports = {
           var f = new Fiber();
           if(req.user) {
             preloadTroupes(req.user.id, f.waitor());
-            preloadFiles(req.user.id, req.troupe.id, f.waitor());
-            preloadChats(req.user.id, req.troupe.id, f.waitor());
-            preloadUsers(req.user.id, req.troupe, f.waitor());
-            preloadConversations(req.user.id, req.troupe, f.waitor());
-            preloadUnreadItems(req.user.id, req.troupe.id, f.waitor());
+            if(req.troupe) {
+              preloadFiles(req.user.id, req.troupe.id, f.waitor());
+              preloadChats(req.user.id, req.troupe.id, f.waitor());
+              preloadUsers(req.user.id, req.troupe, f.waitor());
+              preloadConversations(req.user.id, req.troupe, f.waitor());
+              preloadUnreadItems(req.user.id, req.troupe.id, f.waitor());
+            }
           }
           f.all()
             .spread(function(troupes, files, chats, users, conversations, unreadItems) {

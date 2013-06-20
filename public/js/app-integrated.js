@@ -16,13 +16,8 @@ require([
   'views/file/fileView',
   'views/conversation/conversationView',
   'views/request/requestView',
-  'collections/desktop',
-  'collections/troupes',
-  'collections/files',
-  'collections/conversations',
-  'collections/users',
-  'collections/chat',
-  'collections/requests',
+  'collections/instances/integrated-items',
+  'collections/instances/troupes',
   'views/file/fileDetailView',
   'views/file/filePreviewView',
   'views/file/fileVersionsView',
@@ -37,16 +32,13 @@ require([
   'hbs!./views/invite/tmpl/invitesItemTemplate',
   'hbs!./views/app/tmpl/appHeader',
   'views/app/troupeSettingsView',
-  'components/webNotifications',
-  'components/unread-items-client',
-  'log!app-integrated',
   'components/errorReporter',
   'filtered-collection'
 ], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, realtime, eyeballs, dozy, AppIntegratedView, chatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
-            collections, troupeModels, fileModels, conversationModels, userModels, chatModels, requestModels, FileDetailView, filePreviewView, fileVersionsView,
+            itemCollections, troupeCollections, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareSearchView,
             createTroupeView, invitesItemTemplate, headerViewTemplate,
-            troupeSettingsView, webNotifications, unreadItemsClient, log /*, errorReporter , FilteredCollection */) {
+            troupeSettingsView /*, errorReporter , FilteredCollection */) {
   "use strict";
 
   $(document).on("click", "a", function(event) {
@@ -77,6 +69,20 @@ require([
   $(document).on("click", ".trpButtonDropdown .trpButtonMenu", function(/*event*/) {
     $(this).parent().next().toggle();
   });
+
+  var troupeCollection = troupeCollections.troupes;
+
+  troupeCollection.on("remove", function(model) {
+    if(model.id == window.troupeContext.troupe.id) {
+      // TODO: tell the person that they've been kicked out of the troupe
+      if(window.troupeContext.troupeIsDeleted) {
+        window.location.href = '/last';
+      } else {
+        window.location.reload();
+      }
+    }
+  });
+
 
   var app = new Marionette.Application();
   app.collections = {};
@@ -137,17 +143,17 @@ require([
     getViewDetails: function(fragment) {
 
       var routes = [
-        { name: "request",        re: /^request\/(\w+)$/,         viewType: RequestDetailView,            collection: collections.requests },
-        { name: "file",           re: /^file\/(\w+)$/,            viewType: FileDetailView,               collection: collections.files },
-        { name: "filePreview",    re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: collections.files },
-        { name: "fileVersions",   re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: collections.files },
-        { name: "mail",           re: /^mail\/(\w+)$/,            viewType: conversationDetailView.Modal, collection: collections.conversations },
-        { name: "person",         re: /^person\/(\w+)$/,          viewType: PersonDetailView,             collection: collections.users },
+        { name: "request",        re: /^request\/(\w+)$/,         viewType: RequestDetailView,            collection: itemCollections.requests },
+        { name: "file",           re: /^file\/(\w+)$/,            viewType: FileDetailView,               collection: itemCollections.files },
+        { name: "filePreview",    re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: itemCollections.files },
+        { name: "fileVersions",   re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: itemCollections.files },
+        { name: "mail",           re: /^mail\/(\w+)$/,            viewType: conversationDetailView.Modal, collection: itemCollections.conversations },
+        { name: "person",         re: /^person\/(\w+)$/,          viewType: PersonDetailView,             collection: itemCollections.users },
 
         { name: "profile",        re: /^profile$/,                viewType: profileView.Modal },
         { name: "share",          re: /^share$/,                  viewType: shareSearchView.Modal },
-        { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal,       collection: collections.troupes,   skipModelLoad: true },
-        { name: "upgradeOneToOne",  re: /^upgradeOneToOne$/,      viewType: createTroupeView.Modal,       collection: collections.troupes,   skipModelLoad: true, viewOptions: { upgradeOneToOne: true } } ,
+        { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true },
+        { name: "upgradeOneToOne",  re: /^upgradeOneToOne$/,      viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true, viewOptions: { upgradeOneToOne: true } } ,
         { name: "troupeSettings", re: /^troupeSettings/,          viewType: troupeSettingsView }
 
       ];
@@ -252,29 +258,19 @@ require([
   });
 
   // reference collections
-  var chatCollection = collections.chats;
-  var requestCollection = collections.requests;
-  var fileCollection = collections.files;
-  var conversationCollection = collections.conversations;
+  var chatCollection = itemCollections.chats;
+  var requestCollection = itemCollections.requests;
+  var fileCollection = itemCollections.files;
+  var conversationCollection = itemCollections.conversations;
+  var userCollection = itemCollections.users;
+
   // Troupe Collections
-  var userCollection = collections.users;
-  var troupeCollection = collections.troupes;
-  var filteredTroupeCollection = collections.normalTroupes;
-  var peopleOnlyTroupeCollection = collections.peopleTroupes;
-  var unreadTroupeCollection = collections.unreadTroupes;
-  var favouriteTroupesCollection = collections.favouriteTroupes;
-  var recentTroupeCollection = collections.recentTroupes;
-  var incomingInvitesCollection = collections.incomingInvites;
-  // TODO is this used by anyone anymore?
-  app.collections['chats'] = collections.chats;
-  app.collections['requests'] = collections.requests;
-  app.collections['files'] = collections.files;
-  app.collections['conversations'] = collections.conversations;
-  app.collections['users'] = collections.users;
-  app.collections['troupes'] = collections.troupes;
-  app.collections['recentTroupes'] = collections.recentTroupes;
-  app.collections['unreadTroupes'] = collections.unreadTroupes;
-  app.collections['favouriteTroupes'] = collections.favouriteTroupes;
+  var filteredTroupeCollection = troupeCollections.normalTroupes;
+  var peopleOnlyTroupeCollection = troupeCollections.peopleTroupes;
+  var unreadTroupeCollection = troupeCollections.unreadTroupes;
+  var favouriteTroupesCollection = troupeCollections.favouriteTroupes;
+  var recentTroupeCollection = troupeCollections.recentTroupes;
+  var incomingInvitesCollection = troupeCollections.incomingInvites;
 
   app.addInitializer(function(/*options*/){
 

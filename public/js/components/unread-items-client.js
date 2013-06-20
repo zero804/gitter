@@ -417,7 +417,9 @@ define([
     this._collection.on('remove', this._recountLimited);
     this._collection.on('destroy', this._recountLimited);
 
-    this._store.on('newcountvalue', this._currentStoreValueChanged);
+    if(store) {
+      this._store.on('newcountvalue', this._currentStoreValueChanged);
+    }
 
     this._recountLimited();
   };
@@ -466,7 +468,7 @@ define([
         counts.overall = newTroupeUnreadTotal;
         counts.oneToOne = newPplTroupeUnreadTotal;
         counts.normal = newNormalTroupeUnreadTotal;
-        counts.current = this._store._currentCount();
+        counts.current = this._store && this._store._currentCount();
 
         $(document).trigger('troupeUnreadTotalChange', counts);
       //}
@@ -586,17 +588,27 @@ define([
     }
   };
 
-  var unreadItemStore = new UnreadItemStore();
-  new ReadItemSender(unreadItemStore);
-  new TroupeUnreadItemsViewportMonitor(unreadItemStore);
-
-  var realtimeSync = new TroupeUnreadItemRealtimeSync(unreadItemStore);
   var c = window.troupeContext;
-  if(c && c.troupe && c.user) {
-    realtimeSync._subscribe();
-    new ReadItemRemover(realtimeSync);
-  }
 
+  var unreadItemStore;
+  var realtimeSync;
+
+  if(c) {
+    if(c.troupe) {
+      unreadItemStore = new UnreadItemStore();
+      new ReadItemSender(unreadItemStore);
+      new TroupeUnreadItemsViewportMonitor(unreadItemStore);
+
+      realtimeSync = new TroupeUnreadItemRealtimeSync(unreadItemStore);
+
+      if(c.user) {
+        realtimeSync._subscribe();
+        new ReadItemRemover(realtimeSync);
+      }
+
+    }
+
+  }
 
   var unreadItemsClient = {
     preload: function(items) {
@@ -610,7 +622,7 @@ define([
         overall: counts.overall,
         normal: counts.normal,
         oneToOne: counts.oneToOne,
-        current: unreadItemStore._currentCount()
+        current: unreadItemStore ? unreadItemStore._currentCount() : undefined
       };
     },
 
@@ -620,10 +632,14 @@ define([
     },
 
     hasItemBeenMarkedAsRead: function(itemType, itemId) {
+      if(!unreadItemStore) {
+        return false;
+      }
+
       return unreadItemStore._hasItemBeenMarkedAsRead(itemType, itemId);
     },
 
-    findTopMostUnreadItemPosition: function(itemType, $container, $scrollOf) {
+    findTopMostUnreadItemPosition: function(itemType, $container/*, $scrollOf*/) {
       var topItem = null;
       var topItemOffset = 1000000000;
 
@@ -654,7 +670,10 @@ define([
     },
 
     installTroupeListener: function(troupeCollection) {
-      new TroupeCollectionSync(troupeCollection, unreadItemStore);
+      if(unreadItemStore) {
+        new TroupeCollectionSync(troupeCollection, unreadItemStore);
+      }
+
       new TroupeCollectionRealtimeSync(troupeCollection)._subscribe();
       new TroupeUnreadNotifier(troupeCollection, unreadItemStore);
     },

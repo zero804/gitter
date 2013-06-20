@@ -1,10 +1,13 @@
+/*jshint unused:true, browser:true */
 define([
   'views/base',
-  'collections/desktop',
+  'collections/instances/troupes',
+  'collections/instances/integrated-items',
   'hbs!./tmpl/troupeSettingsTemplate',
   'log!troupe-settings-view',
   'utils/validate-wrapper'
-], function(TroupeViews, collections, troupeSettingsTemplate, log, validation) {
+], function(TroupeViews, troupeCollections, itemCollections, troupeSettingsTemplate, log, validation) {
+  "use strict";
 
   var View = TroupeViews.Base.extend({
     template: troupeSettingsTemplate,
@@ -15,10 +18,9 @@ define([
       'click #leave-troupe': 'leaveTroupe'
     },
 
-    initialize: function(options) {
-      var self = this;
-      this.model = collections.troupes.get(window.troupeContext.troupe.id);
-      this.userCollection = collections.users;
+    initialize: function() {
+      this.model = troupeCollections.troupes.get(window.troupeContext.troupe.id);
+      this.userCollection = itemCollections.users;
       this.$el.toggleClass('canLeave', this.canLeave());
       this.$el.toggleClass('canDelete', this.canDelete());
     },
@@ -79,7 +81,7 @@ define([
             url: "/troupes/" + window.troupeContext.troupe.id + "/users/" + window.troupeContext.user.id,
             data: "",
             type: "DELETE",
-            success: function(data) {
+            success: function() {
               window.location = window.troupeContext.homeUrl;
             },
             error: function() {
