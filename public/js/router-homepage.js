@@ -10,22 +10,19 @@ require([
   'components/realtime',
   'components/dozy',
   'views/app/appIntegratedView',
-  'collections/troupe-collections',
+  'collections/instances/troupes',
   'views/toolbar/troupeCollectionView',
   'views/profile/profileView',
   'views/signup/createTroupeView',
   'hbs!./views/invite/tmpl/invitesItemTemplate',
   'hbs!./views/app/tmpl/appHeader',
-  'views/app/troupeSettingsView',
   'components/webNotifications',
-  'components/unread-items-client',
-  'log!router-homepage',
   'components/errorReporter',
   'filtered-collection'
 ], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, realtime, dozy, AppIntegratedView,
             troupeCollections, TroupeCollectionView, profileView,
             createTroupeView, invitesItemTemplate, headerViewTemplate,
-            troupeSettingsView, webNotifications, unreadItemsClient, log /*, errorReporter , FilteredCollection */) {
+            webNotifications /*, errorReporter , FilteredCollection */) {
   "use strict";
 
   $(document).on("click", "a", function(event) {
@@ -86,9 +83,6 @@ require([
     }
   };
 
-  var collections = troupeCollections.instantiateWithPreloader(null);
-
-
   var router;
   var appView = new AppIntegratedView({ app: app });
 
@@ -112,7 +106,7 @@ require([
       var routes = [
 
         { name: "profile",        re: /^profile$/,                viewType: profileView.Modal },
-        { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal, collection: collections.troupes,   skipModelLoad: true },
+        { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal, collection: troupeCollections.troupes,   skipModelLoad: true },
         { name: "troupeSettings", re: /^troupeSettings/,          viewType: troupeSettingsView }
 
       ];
@@ -217,16 +211,12 @@ require([
   });
 
   // Troupe Collections
-  var troupeCollection = collections.troupes;
-  var filteredTroupeCollection = collections.normalTroupes;
-  var peopleOnlyTroupeCollection = collections.peopleTroupes;
-  var unreadTroupeCollection = collections.unreadTroupes;
-  var favouriteTroupesCollection = collections.favouriteTroupes;
-  var recentTroupeCollection = collections.recentTroupes;
-
-  var incomingInvitesCollection = new inviteModels.InviteCollection();
-  incomingInvitesCollection.listen();
-  incomingInvitesCollection.fetch();
+  var filteredTroupeCollection = troupeCollections.normalTroupes;
+  var peopleOnlyTroupeCollection = troupeCollections.peopleTroupes;
+  var unreadTroupeCollection = troupeCollections.unreadTroupes;
+  var favouriteTroupesCollection = troupeCollections.favouriteTroupes;
+  var recentTroupeCollection = troupeCollections.recentTroupes;
+  var incomingInvitesCollection = troupeCollections.incomingInvites;
 
   app.addInitializer(function(/*options*/){
 
