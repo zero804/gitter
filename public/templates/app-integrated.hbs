@@ -171,14 +171,7 @@
 
 {{>require_wrapper}}
 
-{{#login}}
-  {{{bootScript "router-login" }}}
-{{/login}}
-
-{{^login}}
-  {{{bootScript "app-integrated" }}}
-{{/login}}
-
+{{{bootScript bootScriptName }}}
 
 <script type="text/javascript">
   var uvOptions = {};

@@ -20,6 +20,71 @@ var uriService = require('../services/uri-service');
 
 var useFirebugInIE = nconf.get('web:useFirebugInIE');
 
+function createTroupeContext(req, options) {
+
+  var disabledFayeProtocols = [];
+
+  var userAgent = req.headers['user-agent'];
+  userAgent = userAgent ? userAgent : '';
+
+  var useFirebug = useFirebugInIE && userAgent.indexOf('MSIE') >= 0;
+
+  // Disable websocket on Mobile due to iOS crash bug
+  if(userAgent.indexOf('Mobile') >= 0) {
+    disabledFayeProtocols.push('websocket');
+  }
+
+  return {
+      user: options.user,
+      troupe: options.troupe,
+      accessToken: options.accessToken,
+      profileNotCompleted: options.profileNotCompleted,
+      accessDenied: options.accessDenied,
+      inviteId: options.inviteId,
+      appVersion: appVersion.getCurrentVersion(),
+      baseServer: nconf.get('web:baseserver'),
+      basePort: nconf.get('web:baseport'),
+      basePath: nconf.get('web:basepath'),
+      homeUrl: nconf.get('web:homeurl'),
+      troupeUri: options.accessDenied ? options.troupe.uri : undefined,
+      websockets: {
+        fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
+        options: {
+          timeout: nconf.get('ws:fayeTimeout'),
+          retry: nconf.get('ws:fayeRetry')
+        },
+        disable: disabledFayeProtocols
+      }
+  };
+}
+
+
+function renderHomePage(req, res, next) {
+
+  var strategy = new restSerializer.UserStrategy({ includeEmail: true });
+
+  restSerializer.serialize(req.user, strategy, function(err, serialized) {
+    if(err) return next(err);
+
+    oauthService.findOrGenerateWebToken(req.user.id, function(err, token) {
+      if(err) return next(err);
+      var profileNotCompleted = req.user.status == 'PROFILE_NOT_COMPLETED';
+      var troupeContext = createTroupeContext(req, { user: serialized, accessToken: token, profileNotCompleted: profileNotCompleted });
+      var data = {};
+      res.render('app-integrated', {
+        useAppCache: !!nconf.get('web:useAppCache'),
+        bootScriptName: 'router-homepage',
+        data: JSON.stringify(data), // Only push the data through if the user is logged in already
+        troupeName: req.user.displayName,
+        troupeContext: JSON.stringify(troupeContext),
+        troupeContextData: troupeContext
+      });
+    });
+  });
+
+
+}
+
 function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data, options) {
   if(!options) options = {};
 
@@ -122,17 +187,20 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
       };
 
 
-      var login, actualTroupeName;
+      var login, actualTroupeName, bootScriptName;
       if(req.user && !profileNotCompleted && troupeData) {
         login  = false;
         actualTroupeName = troupeName;
 
+
+        bootScriptName = "app-integrated";
         userService.saveLastVisitedTroupeforUser(req.user.id, troupe, function(err) {
           if (err) winston.info("Something went wrong saving the user last troupe visited: ", { exception: err });
         });
 
       } else {
         login = true;
+        bootScriptName = "router-login";
         if(profileNotCompleted) {
           actualTroupeName = troupeName;
         } else {
@@ -143,6 +211,7 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
       res.render(page, {
         useAppCache: !!nconf.get('web:useAppCache'),
         login: login,
+        bootScriptName: bootScriptName,
         data: login ? null : JSON.stringify(data), // Only push the data through if the user is logged in already
         troupeName: actualTroupeName,
         troupeEmailAddress: troupe.uri + '@' + troupeContext.baseServer,
@@ -461,8 +530,7 @@ module.exports = {
             renderAppPageWithTroupe(req, res, next, 'app-integrated', req.troupe, req.troupe.name);
           } else if (req.uriContext.ownUrl) {
             winston.verbose("Serving viewer's home page");
-            //res.send('userhome');
-            res.send(200);
+            renderHomePage(req, res, next);
           } else {
             winston.verbose("No troupe or user found for this appUri");
             next(404);
