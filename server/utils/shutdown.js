@@ -78,12 +78,24 @@ exports.addHandler = function addHandler(stageName, stageNumber, shutdownHandler
   }
 };
 
-process.on('uncaughtException', function(err) {
-  winston.error('Uncaught exception' + err + ' forcing shutdown');
-  shutdownGracefully();
+exports.installUnhandledExceptionHandler = function() {
 
-});
+  process.on('uncaughtException', function(err) {
+    winston.error('----------------------------------------------------------------');
+    winston.error('-- A VeryBadThing has happened.');
+    winston.error('----------------------------------------------------------------');
+    winston.error('Uncaught exception' + err, { message: err.message, name: err.name });
 
+    if(err.stack) {
+      winston.error('' + err.stack);
+    }
+
+    winston.error('Uncaught exception' + err + ' forcing shutdown');
+    shutdownGracefully();
+
+  });
+
+};
 
 exports.shutdownGracefully = shutdownGracefully;
 
