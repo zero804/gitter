@@ -56,8 +56,13 @@ define([
         }),
         type: "POST",
         success: function(data) {
+          // data = { email, success, userStatus, username }
           if (data.redirectTo) {
             window.location.href = "/" + data.redirectTo;
+          }
+          else if (data.userStatus === 'ACTIVE') {
+            // forward to a login prompt
+            $(document).trigger('login-prompt', { email: data.email });
           }
           else {
              that.trigger('signup.complete', data);
