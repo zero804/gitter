@@ -13,10 +13,6 @@ define([
 	return TroupeViews.Base.extend({
 		template: template,
 
-		/* TODO 
-		 * Handle race conditions when saving, i.e it is no longer available
-		*/
-
 		events: {
 			"submit form": "onFormSubmit",
 			'keydown input[name=username]': "checkAvailability",
@@ -156,7 +152,7 @@ define([
 			var self = this;
 			var username = this.$el.find('input[name=username]').val();
 
-			if (!username || !this.valid) {
+			if (!username) {
 				error();
 				return;
 			}
