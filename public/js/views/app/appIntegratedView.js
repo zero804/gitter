@@ -6,10 +6,11 @@ define([
   'views/app/uiVars',
   'fineuploader',
   "nanoscroller",
+  "views/signup/usernameView",
   'log!app-integrated-view',
   'components/unread-items-client',
   'collections/desktop'
-  ], function($, _, Backbone, uiVars, qq, _nano, log, unreadItemsClient, collections) {
+  ], function($, _, Backbone, uiVars, qq, _nano, UsernameView, log, unreadItemsClient, collections) {
   "use strict";
 
   return Backbone.View.extend({
@@ -180,6 +181,15 @@ define([
       toggleFavs();
       toggleRecents();
       toggleInvites();
+
+      this.ensureProfileIsUsernamed();
+    },
+
+    ensureProfileIsUsernamed: function() {
+      var user = window.troupeContext.user;
+      if (!user.username) {
+        new TroupeViews.Modal({ view: new UsernameView() }).show();
+      }
     },
 
     updateTitlebar: function(values) {
