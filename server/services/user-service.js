@@ -114,7 +114,8 @@ var userService = {
   },
 
   findByUsername: function(username, callback) {
-    return persistence.User.findOneQ({username: username.toLowerCase()}).nodeify(callback);
+    return persistence.User.findOneQ({username: username.toLowerCase()})
+            .nodeify(callback);
   },
 
   findByIds: function(ids, callback) {
@@ -331,7 +332,7 @@ var userService = {
             user.passwordHash = hash3;
             // mark user as active after setting the password
             if (user.status === 'PROFILE_NOT_COMPLETED' || user.status === 'UNCONFIRMED') {
-              user.status = "ACTIVE";              
+              user.status = "ACTIVE";
             }
             return user;
           });

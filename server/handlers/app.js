@@ -16,6 +16,7 @@ var Fiber = require("../utils/fiber");
 var conversationService = require("../services/conversation-service");
 var appVersion = require("../web/appVersion");
 var loginUtils = require('../web/login-utils');
+var uriService = require('../services/uri-service');
 
 var useFirebugInIE = nconf.get('web:useFirebugInIE');
 
@@ -267,18 +268,18 @@ function preloadTroupeMiddleware(req, res, next) {
 
 }
 
-function preloadUserMiddleware(req, res, next) {
-  var username = req.params.appUri;
-  userService.findByUsername(username, function(err, user) {
-    if (err) return next({ errorCode: 500, error: err });
+function uriContextResolverMiddleware(req, res, next) {
+  var appUri = req.params.appUri;
+  uriService.findUri(appUri, req.user && req.user.id)
+    .then(function(result) {
+      if(result.notFound) return next(404);
 
-    req.userpage = user;
-  });
-}
+      req.troupe = result.troupe;
+      req.uriContext = result;
 
-function preloadAppUriMiddleware(req, res, next) {
-  preloadUserMiddleware(req, res, next);
-  preloadTroupeMiddleware(req, res, next);
+      next();
+    })
+    .fail(next);
 }
 
 // TODO preload invites?
@@ -452,29 +453,19 @@ module.exports = {
 
       app.get('/:appUri',
         middleware.grantAccessForRememberMeTokenMiddleware,
-        preloadAppUriMiddleware,
+        uriContextResolverMiddleware,
         function(req, res, next) {
-          var isActiveTroupe = req.troupe && req.troupe.status === 'ACTIVE';
-          var isUserpage = req.userpage;
-          var isHomepage = isUserpage && req.userpage === req.user;
 
-          if (isActiveTroupe) {
+          if (req.troupe) {
             winston.verbose("Serving troupe page");
             renderAppPageWithTroupe(req, res, next, 'app-integrated', req.troupe, req.troupe.name);
-          }
-          else if (isHomepage) {
+          } else if (req.uriContext.ownUrl) {
             winston.verbose("Serving viewer's home page");
             //res.send('userhome');
             res.send(200);
-          }
-          else if (isUserpage) {
-            winston.verbose("Serving another user's profile page");
-            //res.render('userhome');
-            res.send(200);
-          }
-          else {
+          } else {
             winston.verbose("No troupe or user found for this appUri");
-            next({ errorCode: 404 });
+            next(404);
           }
         });
 

@@ -18,9 +18,8 @@ var persistence = require("./persistence-service"),
 var ObjectID = require('mongodb').ObjectID;
 
 function findByUri(uri, callback) {
-  persistence.Troupe.findOne({uri: uri}, function(err, troupe) {
-    callback(err, troupe);
-  });
+  return persistence.Troupe.findOneQ({uri: uri})
+    .nodeify(callback);
 }
 
 function findByIds(ids, callback) {
@@ -510,52 +509,46 @@ function updateTroupeName(troupeId, troupeName, callback) {
 }
 
 function createOneToOneTroupe(userId1, userId2, callback) {
-
-  var troupe = new persistence.Troupe({
-    uri: null,
-    name: '',
-    oneToOne: true,
-    status: 'ACTIVE',
-    users: [
-      { userId: userId1 },
-      { userId: userId2 }
-    ]
-  });
-
-  troupe.save(function(err) {
-    return callback(err, troupe);
-  });
+  return persistence.Troupe.createQ({
+      uri: null,
+      name: '',
+      oneToOne: true,
+      status: 'ACTIVE',
+      users: [
+        { userId: userId1 },
+        { userId: userId2 }
+      ]
+    }).nodeify(callback);
 }
 
 function findOrCreateOneToOneTroupe(currentUserId, userId2, callback) {
   if(currentUserId == userId2) return callback("You cannot be in a troupe with yourself.");
 
-  userService.findById(userId2, function(err, user2) {
-    if(err) return callback(err);
-    if(!user2) return callback("User does not exist.");
+  return userService.findById(userId2)
+    .then(function(user2) {
+      if(!user2) throw "User does not exist";
 
-    persistence.Troupe.findOne({
-      //users: { $all: [ { userId: currentUserId }, { userId: userId2 } ]}
-      $and: [
-        { oneToOne: true },
-        { 'users.userId': currentUserId },
-        { 'users.userId': userId2 }
-      ]
-    }, function(err, troupe) {
-      if(err) return callback(err);
+      return [user2, persistence.Troupe.findOneQ({
+        $and: [
+          { oneToOne: true },
+          { 'users.userId': currentUserId },
+          { 'users.userId': userId2 }
+        ]
+      })];
+    })
+    .spread(function(user2, troupe) {
 
-      // If the troupe can't be found, then we need to create it....
-      if(!troupe) {
-        winston.info('Could not find one to one troupe for ' + currentUserId + ' and ' + userId2);
-        return createOneToOneTroupe(currentUserId, userId2, function(err, troupe) {
-          return callback(err, troupe, user2);
+      // Found the troupe? Perfect!
+      if(troupe) return [ troupe, user2 ];
+
+      // Otherwise, create it
+      return createOneToOneTroupe(currentUserId, userId2)
+        .then(function(troupe) {
+          return [ troupe, user2 ];
         });
-      }
+    })
+    .nodeify(callback);
 
-      return callback(null, troupe, user2);
-    });
-
-  });
 }
 
 function upgradeOneToOneTroupe(options, callback) {
