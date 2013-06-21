@@ -53,6 +53,12 @@
         $.get('/api/v1/sockets', function(data) {
             var data ={
                 cols: merge(
+                        {
+                            id: {
+                                type: "string",
+                                friendly: "SocketID"
+                            }
+                        },
                         prefix('user_', getUserColumns()),
                         prefix('troupe_', getTroupeColumns()),
                         {
@@ -67,6 +73,10 @@
                             createdTime: {
                                 type: "date",
                                 friendly: "Created"
+                            },
+                            client: {
+                                type: "string",
+                                friendly: "Client Type"
                             }
                         }
                       ),

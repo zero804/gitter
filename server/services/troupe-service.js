@@ -408,9 +408,11 @@ function findPendingRequestForTroupe(troupeId, id, callback) {
 
 
 function findRequestsByIds(requestIds, callback) {
-  persistence.Request.find( {
-    _id: requestIds
-  }, callback);
+
+  persistence.Request
+    .where('_id')['in'](requestIds)
+    .exec(callback);
+
 }
 
 function findUserByIdEnsureConfirmationCode(userId, callback) {

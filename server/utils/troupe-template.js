@@ -1,12 +1,12 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
-/*global console:false, require: true, module: true, process: false */
 "use strict";
 
 var fs = require("fs");
-var path = require("path");
 var handlebars = require('handlebars');
 
 // TODO: add caching!
+handlebars.registerHelper('cdn', require('../web/hbs-helpers').cdn);
+
 
 module.exports = {
   compile : function(sourceFile, callback) {

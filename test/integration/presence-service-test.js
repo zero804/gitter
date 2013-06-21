@@ -55,7 +55,7 @@ describe('presenceService', function() {
   it('should allow a user to connect', function(done) {
     var userId = 'TESTUSER1' + Date.now();
     var socketId = 'TESTSOCKET1' + Date.now();
-    presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
       if(err) return done(err);
 
       done();
@@ -65,7 +65,7 @@ describe('presenceService', function() {
   it('should allow a user to connect and then disconnect', function(done) {
     var userId = 'TESTUSER1' + Date.now();
     var socketId = 'TESTSOCKET1' + Date.now();
-    presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
       if(err) return done(err);
 
       presenceService.socketDisconnected(socketId, function(err) {
@@ -89,7 +89,7 @@ describe('presenceService', function() {
       assert(users.length === 0 || users.every(function(id) { return id !== userId; }), 'Expected user _not_ to be online at beginning of test: ', users.join(', '));
 
       // Connect the socket
-      presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
+      presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
         if(err) return done(err);
 
         // Check that the lookup code is working as expected
@@ -147,7 +147,7 @@ describe('presenceService', function() {
       assert(users.length === 0 || users.every(function(id) { return id !== userId; }), 'Expected user _not_ to be online at beginning of test: ', users.join(', '));
 
       // Connect the socket
-      presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
+      presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
         if(err) return done(err);
 
         // Subscribe to a troupe
@@ -188,7 +188,7 @@ describe('presenceService', function() {
     var d2 = Q.defer();
 
     // This simulates three events happening in very quick succession
-    presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
       if(err) { return d1.reject(); }
 
       presenceService.userSubscribedToTroupe(userId, troupeId, socketId, true, d1.makeNodeResolver());
@@ -237,7 +237,7 @@ describe('presenceService', function() {
     assertUserTroupeStatus(false, function() {
 
       // Connect socket
-      presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
+      presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
         if(err) return done(err);
 
         // Associate socket with troupe
@@ -304,7 +304,7 @@ describe('presenceService', function() {
     var troupeId = 'TESTTROUPE4' + Date.now();
 
     // Connect socket
-    presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
       if(err) return done(err);
 
       // Associate socket with troupe
@@ -335,7 +335,7 @@ describe('presenceService', function() {
     var userId = 'TESTUSER4' + Date.now();
     var socketId = 'TESTSOCKET4' + Date.now();
 
-    presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
       if(err) return done(err);
       presenceService.collectGarbage(fakeEngine, function(err, count) {
         if(err) return done(err);
@@ -356,7 +356,7 @@ describe('presenceService', function() {
     var userId = 'TESTUSER4' + Date.now();
     var socketId = 'TESTSOCKET4' + Date.now();
 
-    presenceService.userSocketConnected(userId, socketId, 'mobile', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'mobile', 'test', function(err) {
       if(err) return done(err);
 
       presenceService.listOnlineUsers(function(err, users) {
@@ -374,7 +374,7 @@ describe('presenceService', function() {
     var socketId = 'TESTSOCKET4' + Date.now();
     var troupeId = 'TESTTROUPE4' + Date.now();
 
-    presenceService.userSocketConnected(userId, socketId, 'mobile', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'mobile', 'test', function(err) {
       if(err) return done(err);
 
       presenceService.userSubscribedToTroupe(userId, troupeId, socketId, true, function(err) {
@@ -442,7 +442,7 @@ describe('presenceService', function() {
       });
     }
 
-    presenceService.userSocketConnected(userId, socketId1, 'mobile', function(err) {
+    presenceService.userSocketConnected(userId, socketId1, 'mobile', 'test', function(err) {
       if(err) return done(err);
 
       ensureUserOnlineStatus(false, function() {
@@ -454,7 +454,7 @@ describe('presenceService', function() {
 
             ensureUserTroupeStatus(true, function() {
 
-              presenceService.userSocketConnected(userId, socketId2, 'online', function(err) {
+              presenceService.userSocketConnected(userId, socketId2, 'online', 'test', function(err) {
                 if(err) return done(err);
 
                 ensureUserOnlineStatus(true, function() {
@@ -516,7 +516,7 @@ describe('presenceService', function() {
     var userId = 'TESTUSER4' + Date.now();
     var socketId = 'TESTSOCKET5' + Date.now();
     var troupeId = 'TESTTROUPE4' + Date.now();
-    presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
       if(err) return done(err);
 
       var redisClient = redis.createClient();
@@ -552,8 +552,8 @@ describe('presenceService', function() {
     var socketId2 = 'TESTSOCKET2' + Date.now();
     var troupeId = 'TESTTROUPE1' + Date.now();
 
-    presenceService.userSocketConnected(userId1, socketId1, 'online', function(err) {
-      presenceService.userSocketConnected(userId2, socketId2, 'mobile', function(err) {
+    presenceService.userSocketConnected(userId1, socketId1, 'online', 'test', function(err) {
+      presenceService.userSocketConnected(userId2, socketId2, 'mobile', 'test', function(err) {
         if(err) return done(err);
 
         var redisClient = redis.createClient();
@@ -602,7 +602,7 @@ describe('presenceService', function() {
     var socketId = 'TESTSOCKET5' + Date.now();
     var troupeId = 'TESTTROUPE4' + Date.now();
 
-    presenceService.userSocketConnected(userId, socketId, 'online', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
       if(err) return done(err);
 
       var redisClient = redis.createClient();
@@ -641,10 +641,10 @@ describe('presenceService', function() {
     var userId2 = 'TESTUSER2' + Date.now();
     var socketId2 = 'TESTSOCKET2' + Date.now();
 
-    presenceService.userSocketConnected(userId1, socketId1, 'online', function(err) {
+    presenceService.userSocketConnected(userId1, socketId1, 'online', 'test', function(err) {
       if(err) return done(err);
 
-      presenceService.userSocketConnected(userId2, socketId2, 'online', function(err) {
+      presenceService.userSocketConnected(userId2, socketId2, 'online', 'test', function(err) {
         if(err) return done(err);
         presenceService.categorizeUsersByOnlineStatus([userId1, userId2], function(err, c) {
           if(err) return done(err);
@@ -666,10 +666,10 @@ describe('presenceService', function() {
     var troupeId = 'TESTTROUPE1' + Date.now();
     var userId3 = 'TESTUSER3' + Date.now();
 
-    presenceService.userSocketConnected(userId1, socketId1, 'online', function(err) {
+    presenceService.userSocketConnected(userId1, socketId1, 'online', 'test', function(err) {
       if(err) return done(err);
 
-      presenceService.userSocketConnected(userId2, socketId2, 'online', function(err) {
+      presenceService.userSocketConnected(userId2, socketId2, 'online', 'test', function(err) {
         if(err) return done(err);
 
         presenceService.userSubscribedToTroupe(userId1, troupeId, socketId1, true, function(err) {

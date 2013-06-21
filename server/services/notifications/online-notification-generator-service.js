@@ -20,7 +20,8 @@ function compile(map) {
 /* TODO: externalize and internationalise this! */
 var templates = compile({
   "chat": "{{{troupe.name}}}\n{{{fromUser.displayName}}}: {{{text}}}",
-  "file": "{{{troupe.name}}}\nNew file {{{fileName}}} uploaded by {{{latestVersion.creatorUser.displayName}}}"
+  "file": "{{{troupe.name}}}\nNew file {{{fileName}}} uploaded by {{{latestVersion.creatorUser.displayName}}}",
+  "request": "{{{user.displayName}}} requested access to join {{{troupe.name}}}"
 });
 
 var titleTemplates = compile({
@@ -32,7 +33,7 @@ var titleTemplates = compile({
 var linkTemplates = compile({
   "chat": "{{{troupeUrl}}}",
   "file": "{{{troupeUrl}}}#file/{{{id}}}",
-  "request": "{{{troupeUrl}}}"
+  "request": "{{{troupeUrl}}}#request/{{{id}}}"
 });
 
 var senderStrategies = {
@@ -53,40 +54,40 @@ var senderStrategies = {
  * Turn notifications into a {hash[notification.itemType] -> [notifications]};
  */
 function hashNotificationsByType(notifications) {
-  var result = {};
+  var uniq = {};
   notifications.forEach(function(notification) {
-    var a = result[notification.itemType];
+    var a = uniq[notification.itemType];
     if(!a) {
-      a = [];
-      result[notification.itemType] = a;
+      a = { };
+      uniq[notification.itemType] = a;
     }
-    a.push(notification.itemId);
+
+    a[notification.itemId] = 1;
   });
+
+  var result = {};
+
+  Object.keys(uniq).forEach(function(key) {
+    result[key] = Object.keys(uniq[key]);
+  });
+
   return result;
 }
 
 function getTroupeUrl(serilizedTroupe, senderUserId) {
+  if(!serilizedTroupe) return null;
+
   /* The URL for non-oneToOne troupes is the trivial case */
   if(!serilizedTroupe.oneToOne) {
     return "/" + serilizedTroupe.uri;
   }
 
-  if(!senderUserId) return null;
-  var userIds = serilizedTroupe.userIds;
-  var otherUserIds = userIds.filter(function(userId) { return userId == senderUserId; });
-  if(otherUserIds.length > 1) {
-    winston.warn("Something has gone wrong. There should be a single user left in the one-to-one troupe!", {
-      troupeId: serilizedTroupe.id,
-      senderUserId: senderUserId,
-      otherUserIds: otherUserIds
-    });
+  if(!senderUserId) {
+    winston.warn("Something has gone wrong. A message to a one-to-one troupe, yet we don't know who the sender is");
+    return null;
   }
 
-  var otherUserId = otherUserIds[0];
-
-  if(otherUserId) return "/one-one/" + otherUserId;
-
-  return null;
+  return "/one-one/" + senderUserId;
 }
 
 /* Takes a whole lot of notifications for the same type of message, and turns them into messages */
@@ -204,14 +205,17 @@ exports.sendOnlineNotifications = function(notifications, callback) {
       var notification = notificationsWithMessage.notification;
       var message = notificationsWithMessage.message;
 
-      appEvents.userNotification({
+      var n = {
         userId: notification.userId,
         troupeId: notification.troupeId,
         title: message.title,
         text: message.text,
         link: message.link,
         sound: message.sound
-      });
+      };
+
+      winston.silly("Online notifications: ", n);
+      appEvents.userNotification(n);
     });
 
     return callback();

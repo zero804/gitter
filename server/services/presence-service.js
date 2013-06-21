@@ -112,8 +112,13 @@ function __associateSocketAndActivateTroupe(socketId, userId, troupeId, eyeballS
   assert(socketId, 'socketId expected');
   assert(troupeId, 'troupeId expected');
 
+  winston.verbose('Associate socket and activate troupe', {
+    userId: userId,
+    socketId: socketId,
+    troupeId: troupeId,
+    eyeballState: eyeballState
+  });
 
-//TODO here!
   var keys = [_keySocketUser(socketId), _keyUserLock(userId)];
   var values = [troupeId];
 
@@ -130,7 +135,18 @@ function __associateSocketAndActivateTroupe(socketId, userId, troupeId, eyeballS
     }
 
     if(eyeballState) {
-      __eyeBallsOnTroupe(userId, socketId, troupeId, callback);
+      __eyeBallsOnTroupe(userId, socketId, troupeId, function(err) {
+        if(err) {
+          winston.error('Unable to signal eyeballs on: ' + err, {
+            userId: userId,
+            socketId: socketId,
+            exception: err
+          });
+        }
+
+        // Ignore the error
+        return callback();
+      });
     } else {
       return callback();
     }
@@ -139,14 +155,14 @@ function __associateSocketAndActivateTroupe(socketId, userId, troupeId, eyeballS
 }
 
 
-function userSocketConnected(userId, socketId, connectionType, callback) {
+function userSocketConnected(userId, socketId, connectionType, client, callback) {
   assert(userId, 'userId expected');
   assert(socketId, 'socketId expected');
 
   var isMobileConnection = connectionType == 'mobile';
 
   var keys = [_keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, _keyUserLock(userId)];
-  var values = [userId, socketId, Date.now(), isMobileConnection ? 1 : 0];
+  var values = [userId, socketId, Date.now(), isMobileConnection ? 1 : 0, client];
 
   scriptManager.run('presence-associate', keys, values, function(err, result) {
     if(err) return callback(err);
@@ -432,18 +448,20 @@ function listActiveSockets(callback) {
 
     var multi = redisClient.multi();
     socketIds.forEach(function(socketId) {
-      multi.hmget(_keySocketUser(socketId), 'uid', 'tid', 'eb', 'mob', 'ctime');
+      multi.hmget(_keySocketUser(socketId), 'uid', 'tid', 'eb', 'mob', 'ctime', 'ct');
     });
     multi.exec(function(err, replies) {
       if(err) return callback(err);
 
-      var result = replies.map(function(reply) {
+      var result = replies.map(function(reply, index) {
         return {
+          id: socketIds[index],
           userId: reply[0],
           troupeId: reply[1],
           eyeballs: !!reply[2],
           mobile: !!reply[3],
-          createdTime: parseInt(reply[4], 10)
+          createdTime: parseInt(reply[4], 10),
+          client: reply[5]
         };
       });
 
@@ -489,13 +507,13 @@ function clientEyeballSignal(userId, socketId, eyeballsOn, callback) {
     if(err) return callback(err);
     if(!socketInfo) {
       winston.warn("User " + userId + " attempted to eyeball missing socket " + socketId);
-      return callback('Invalid socketId');
+      return callback({ invalidSocketId: true });
     }
 
     var userId2 = socketInfo.userId;
     if(userId !== userId2) {
       winston.warn("User " + userId + " attempted to eyeball socket " + socketId + " but that socket belongs to " + userId2);
-      return callback('Invalid socketId');
+      return callback({ invalidSocketId: true });
     }
 
     var troupeId = socketInfo.troupeId;
