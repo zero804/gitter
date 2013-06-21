@@ -28,9 +28,10 @@ exports.findUri = function(uri, userId, callback) {
           return { ownUrl: true };
         }
 
-        return troupeService.findOrCreateOneToOneTroupe(userId, user.id).then(function(oneToOneTroupe) {
-          return { oneToOne: true, troupe: oneToOneTroupe, otherUser: user };
-        });
+        return troupeService.findOrCreateOneToOneTroupe(userId, user.id)
+          .spread(function(troupe, otherUser) {
+            return { oneToOne: true, troupe: troupe, otherUser: otherUser };
+          });
 
       }),
     troupeService.findByUri(uri)

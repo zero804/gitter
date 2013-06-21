@@ -93,13 +93,13 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
 
     var strategy = new restSerializer.UserStrategy({ includeEmail: true });
 
-    restSerializer.serialize(req.user, strategy, function(err, serialized) {
+    restSerializer.serialize(req.user, strategy, function(err, serializedUser) {
       if(err) return next(err);
 
       oauthService.findOrGenerateWebToken(req.user.id, function(err, token) {
         if(err) return next(err);
 
-        renderPage(unreadItems, serialized, token);
+        renderPage(unreadItems, serializedUser, token);
       });
 
     });
