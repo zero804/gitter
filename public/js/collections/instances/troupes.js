@@ -68,6 +68,8 @@ define([
 
     // set these as the models for recentTroupeCollection and send out a reset on that collection
     recentTroupeCollection.reset(recentTroupeModels);
+    recentTroupeCollection.trigger('sync');
+
   });
 
 
