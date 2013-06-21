@@ -62,7 +62,7 @@ define([
 
       // $('body').append('<span id="fineUploader"></span>');
 
-      $(".nano").nanoScroller({ preventPageScrolling: true });
+      //$(".nano").nanoScroller({ preventPageScrolling: true });
 
 /*
       this.uploader = new qq.FineUploader({
