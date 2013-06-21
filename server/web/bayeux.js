@@ -142,18 +142,14 @@ function populateSubTroupeCollection(options, callback) {
 }
 
 function populateUserUnreadItemsCollection(options, callback) {
-  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
   var userId = options.userId;
   var match = options.match;
   var subscriptionUserId = match[1];
   var troupeId = match[2];
 
-  console.log('info', userId, subscriptionUserId, troupeId);
-
   if(userId !== subscriptionUserId) {
     return callback(null, [ ]);
   }
-  console.log('>aasdasdasdsdasda>>>>>>>asdasdasdasd>>>>>>>asdasdasd>>>>>>>>>>>>>>>>>>>>>>>>>>');
 
   return restful.serializeUnreadItemsForTroupe(troupeId, userId, callback);
 }
@@ -336,7 +332,6 @@ var authorisor = {
             message.ext = e;
           }
           e.snapshot = data;
-          console.log(e);
           return callback(message);
         });
 
