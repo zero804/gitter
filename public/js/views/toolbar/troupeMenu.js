@@ -11,41 +11,33 @@ define([
     el: '#left-menu',
 
     regions: {
-      leftMenuUnread: "#left-menu-list-unread",
-      leftMenuInvites: "#left-menu-list-invites",
-      leftMenuRecent: "#left-menu-list-recent",
-      leftMenuFavourites: "#left-menu-list-favourites",
-      leftMenuTroupes: "#left-menu-list",
-      leftMenuPeople: "#left-menu-list-users",
-      leftMenuSearch: "#left-menu-list-search"
+      unread: "#left-menu-list-unread",
+      invites: "#left-menu-list-invites",
+      recent: "#left-menu-list-recent",
+      favs: "#left-menu-list-favourites",
+      troupes: "#left-menu-list",
+      people: "#left-menu-list-users",
+      search: "#left-menu-list-search"
     },
 
     initialize: function() {
-      // Troupe Collections
-      var filteredTroupeCollection = troupeCollections.normalTroupes;
-      var peopleOnlyTroupeCollection = troupeCollections.peopleTroupes;
-      var unreadTroupeCollection = troupeCollections.unreadTroupes;
-      var favouriteTroupesCollection = troupeCollections.favouriteTroupes;
-      var recentTroupeCollection = troupeCollections.recentTroupes;
-      var incomingInvitesCollection = troupeCollections.incomingInvites;
-
       // recent troupe view
-      this.leftMenuRecent.show(new TroupeCollectionView({ collection: recentTroupeCollection }));
+      this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentTroupes }));
 
       // normal troupe view
-      this.leftMenuTroupes.show(new TroupeCollectionView({collection: filteredTroupeCollection }));
+      this.troupes.show(new TroupeCollectionView({collection: troupeCollections.normalTroupes }));
 
       // one to one troupe view
-      this.leftMenuPeople.show(new TroupeCollectionView({collection: peopleOnlyTroupeCollection }));
+      this.people.show(new TroupeCollectionView({collection: troupeCollections.peopleTroupes }));
 
       // unread troupe view
-      this.leftMenuUnread.show(new TroupeCollectionView({collection: unreadTroupeCollection }));
+      this.unread.show(new TroupeCollectionView({collection: troupeCollections.unreadTroupes }));
 
       // favourite troupe view
-      this.leftMenuFavourites.show(new TroupeCollectionView({ collection: favouriteTroupesCollection }));
+      this.favs.show(new TroupeCollectionView({ collection: troupeCollections.favouriteTroupes }));
 
       // incoming invites collection view
-      this.leftMenuInvites.show(new InvitesView({ collection: incomingInvitesCollection }));
+      this.invites.show(new InvitesView({ collection: troupeCollections.incomingInvites }));
     }
   });
 
