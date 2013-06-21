@@ -66,6 +66,8 @@ require([
   appView.leftMenuRegion.show(new TroupeMenuView({ }));
   appView.headerRegion.show(new TroupeHeaderView  ());
 
+  $('.nano').nanoScroller({ preventPageScrolling: true });
+
   // Setup the ChatView
 
   var chatCollectionView = new ChatCollectionView({

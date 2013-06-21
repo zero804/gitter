@@ -2,11 +2,12 @@
 define([
   'underscore',
   'marionette',
+  "nanoscroller",
   'collections/instances/troupes',
   'views/toolbar/troupeCollectionView',
   'views/app/invitesView',
   'hbs!./tmpl/troupeMenu'
-], function(_, Marionette, troupeCollections, TroupeCollectionView, InvitesView, template) {
+], function(_, Marionette, _nano, troupeCollections, TroupeCollectionView, InvitesView, template) {
   "use strict";
 
   return Backbone.Marionette.Layout.extend({
@@ -32,6 +33,7 @@ define([
     },
 
     onRender: function() {
+
       // recent troupe view
       this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentTroupes }));
 

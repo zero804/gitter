@@ -13,10 +13,7 @@ define([
 ], function($, _, Backbone, base, fileModels, conversationModels, userModels, chatModels, requestModels, unreadItemsClient) {
   "use strict";
 
-  var requestCollection = new requestModels.RequestCollection();
-  requestCollection.listen();
-  requestCollection.fetch();
-
+  var requestCollection      = new requestModels.RequestCollection(null, { listen: true });
   var chatCollection         = new chatModels.ChatCollection(null, { listen: true });
   var fileCollection         = new fileModels.FileCollection(null, { listen: true });
   var conversationCollection = new conversationModels.ConversationCollection(null, { listen: true });

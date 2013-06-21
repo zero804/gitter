@@ -71,9 +71,7 @@ define([
   });
 
 
-  var inviteCollection = new inviteModels.InviteCollection();
-  inviteCollection.listen();
-  inviteCollection.fetch();
+  var inviteCollection = new inviteModels.InviteCollection(null, { listen: true });
 
   inviteCollection.on('change reset sync add remove', function() {
     unreadItemsClient.setOtherCount(inviteCollection.length);
