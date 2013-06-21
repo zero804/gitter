@@ -64,6 +64,26 @@ define([
 
       //$(".nano").nanoScroller({ preventPageScrolling: true });
 
+      /* This is a special region which acts like a region, but is implemented completely differently */
+      this.dialogRegion = {
+        currentView: null,
+        show: function(view) {
+          if(this.currentView) {
+            this.currentView.fade = false;
+            this.currentView.hideInternal();
+          }
+          this.currentView = view;
+          view.navigable = true;
+          view.show();
+        },
+        close: function() {
+          if(this.currentView) {
+            this.currentView.navigationalHide();
+            this.currentView = null;
+          }
+        }
+      };
+
 /*
       this.uploader = new qq.FineUploader({
         element: $('#fineUploader')[0],
