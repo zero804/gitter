@@ -13,20 +13,22 @@ require([
   'collections/instances/troupes',
   'views/profile/profileView',
   'views/signup/createTroupeView',
+  'views/app/userHeaderView',
   'hbs!./views/app/tmpl/appHeader',
   'components/webNotifications',
   'views/toolbar/troupeMenu',
   'utils/router',
   'components/errorReporter'
 ], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, dozy, AppIntegratedView, UserHomeView, troupeCollections,
-  profileView, createTroupeView, headerViewTemplate, webNotifications, TroupeMenuView, Router /*, errorReporter , FilteredCollection */) {
+  profileView, createTroupeView, UserHeaderView, headerViewTemplate, webNotifications, TroupeMenuView, Router /*, errorReporter , FilteredCollection */) {
+
   "use strict";
 
   var app = new Marionette.Application();
   app.collections = {};
   app.addRegions({
     rightPanelRegion: "#right-panel",
-    headerRegion: "#header-region",
+    headerRegion: "#header-wrapper",
     homeRegion: "#frame-chat"
   });
 
@@ -57,15 +59,7 @@ require([
   app.addInitializer(function(/*options*/){
 
     new UserHomeView({ el: '#chat-frame' }).render();
-
-    var headerView = new (TroupeViews.Base.extend({
-      template: headerViewTemplate,
-      getRenderData: function() {
-        return { user: window.troupeContext.user, troupeContext: troupeContext };
-      }
-    }))();
-
-
+    var headerView = new UserHeaderView();
 
     app.headerRegion.show(headerView);
 

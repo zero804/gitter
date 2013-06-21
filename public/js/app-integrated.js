@@ -30,7 +30,7 @@ require([
   'views/shareSearch/shareSearchView',
   'views/signup/createTroupeView',
   'views/app/invitesView',
-  'hbs!./views/app/tmpl/appHeader',
+  'views/app/troupeHeaderView',
   'views/app/troupeSettingsView',
   'views/toolbar/troupeMenu',
   'utils/router',
@@ -39,7 +39,7 @@ require([
 ], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, realtime, eyeballs, dozy, AppIntegratedView, chatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
             itemCollections, troupeCollections, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareSearchView,
-            createTroupeView, InvitesView, headerViewTemplate,
+            createTroupeView, InvitesView, TroupeHeaderView,
             troupeSettingsView, TroupeMenuView, Router /*, errorReporter , FilteredCollection */) {
   "use strict";
 
@@ -70,7 +70,7 @@ require([
     mailRegion: ".frame-conversations",
     requestRegion: "#request-roster",
     rightPanelRegion: "#right-panel",
-    headerRegion: "#header-region"
+    headerRegion: "#header-wrapper"
   });
 
   /* This is a special region which acts like a region, but is implemented completely differently */
@@ -106,12 +106,7 @@ require([
 
   app.addInitializer(function(/*options*/){
 
-    var headerView = new (TroupeViews.Base.extend({
-      template: headerViewTemplate,
-      getRenderData: function() {
-        return { user: window.troupeContext.user, troupeContext: troupeContext };
-      }
-    }))();
+    var headerView = new TroupeHeaderView();
 
     app.headerRegion.show(headerView);
 
