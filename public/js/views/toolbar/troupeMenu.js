@@ -33,6 +33,7 @@ define([
     },
 
     onRender: function() {
+      this.$el.find('.nano').nanoScroller({ preventPageScrolling: true });
 
       // recent troupe view
       this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentTroupes }));
@@ -66,15 +67,20 @@ define([
 
       function toggler(element, collection) {
         function toggle() {
+          console.log('Toggle ', collection, element,collection.length > 0);
           self.$el.find(element).toggle(collection.length > 0);
+          self.$el.find('.nano').nanoScroller({ preventPageScrolling: true });
         }
 
-        collection.on('change', toggle);
+        collection.on('all', toggle);
         toggle();
       }
     },
 
     onLeftMenuListIconClick: function(e) {
+      var selected = $(e.target).attr('id');
+      if(selected === this.selectedListIcon) return;
+
       // Turn off the old selected list
       var currentSelection = $("#"+this.selectedListIcon);
       currentSelection.removeClass('selected').fadeTo(100, 0.6);
@@ -85,11 +91,11 @@ define([
       // TODO: We probably want to destroy the list to remove the dom elements
 
       // enable the new selected list
-      this.selectedListIcon = $(e.target).attr('id');
+      this.selectedListIcon = selected;
       var newSelection = $("#" + this.selectedListIcon);
 
       newSelection.addClass('selected');
-      listElement = currentSelection.data('list');
+      listElement = newSelection.data('list');
 
       $("#" + listElement).show();
 
@@ -98,6 +104,9 @@ define([
       if (this.selectedListIcon == 'icon-search') {
         this.activateSearchList();
       }
+
+      this.$el.find('.nano').nanoScroller({ preventPageScrolling: true });
+
     }
 
 

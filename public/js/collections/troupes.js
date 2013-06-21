@@ -1,13 +1,21 @@
 /*jshint unused:true, browser:true */
 define([
   'backbone',
-  './base'
-], function(Backbone, TroupeCollections) {
+  './base',
+  '../utils/momentWrapper'
+], function(Backbone, TroupeCollections, moment) {
   "use strict";
 
   var exports = {};
   exports.TroupeModel = TroupeCollections.Model.extend({
-    idAttribute: "id"
+    idAttribute: "id",
+    parse: function(message) {
+      if(message.lastAccessTime) {
+        message.lastAccessTime = moment(message.lastAccessTime, moment.defaultFormat);
+      }
+
+      return message;
+    }
   });
 
   exports.TroupeCollection = TroupeCollections.LiveCollection.extend({
