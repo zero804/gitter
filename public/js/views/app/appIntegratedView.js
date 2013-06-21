@@ -29,7 +29,7 @@ define([
       mailRegion: ".frame-conversations",
       requestRegion: "#request-roster",
       rightPanelRegion: "#right-panel",
-      headerRegion: "#header-region"
+      headerRegion: "#header-wrapper"
     },
 
     events: {
