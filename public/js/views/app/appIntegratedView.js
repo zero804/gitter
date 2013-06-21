@@ -64,26 +64,6 @@ define([
 
       $(".nano").nanoScroller({ preventPageScrolling: true });
 
-      /* This is a special region which acts like a region, but is implemented completely differently */
-      this.dialogRegion = {
-        currentView: null,
-        show: function(view) {
-          if(this.currentView) {
-            this.currentView.fade = false;
-            this.currentView.hideInternal();
-          }
-          this.currentView = view;
-          view.navigable = true;
-          view.show();
-        },
-        close: function() {
-          if(this.currentView) {
-            this.currentView.navigationalHide();
-            this.currentView = null;
-          }
-        }
-      };
-
 /*
       this.uploader = new qq.FineUploader({
         element: $('#fineUploader')[0],
@@ -139,33 +119,6 @@ define([
         }, 100);
       });
 
-      $(document).on('troupeUpdate', function(e, message) {
-        // header title
-        $('.trpHeaderTitle').html(message.model.name);
-        // window / title bar
-        self.updateTitlebar(unreadItemsClient.getCounts());
-      });
-
-      function onTroupeUnreadTotalChange(event, values) {
-        self.updateTitlebar(values);
-
-        function updateBadge(selector, count) {
-          var badge = self.$el.find(selector);
-          badge.text(count);
-          if(count > 0) {
-            badge.show();
-          } else {
-            badge.hide();
-          }
-        }
-
-        // overall count
-        updateBadge('#unread-badge', values.overall);
-      }
-
-      $(document).on('troupeUnreadTotalChange', onTroupeUnreadTotalChange);
-      onTroupeUnreadTotalChange(null, unreadItemsClient.getCounts());
-
       //this.ensureProfileIsUsernamed();
     },
 /*
@@ -176,37 +129,6 @@ define([
       }
     },
 */
-    updateTitlebar: function(values) {
-      $('title').html(this.getTitlebar(values));
-    },
-
-    getTitlebar: function(counts) {
-      var mainTitle;
-      if (window.troupeContext.title) {
-        mainTitle = window.troupeContext.title + " - Troupe";
-      } else
-      {
-        mainTitle = "Troupe";
-      }
-
-      // TODO this isn't working properly when updating the troupe name, need to be able to poll unreadItems count not just accept the event
-      var overall = counts.overall;
-      var current = counts.current;
-      if(overall <= 0) {
-        return mainTitle;
-      }
-
-      if(overall <= 10) {
-        if(current > 0) {
-          return String.fromCharCode(0x2789 + overall) + ' ' + mainTitle;
-        }
-
-        return String.fromCharCode(0x277F + overall) + ' ' + mainTitle;
-      }
-
-      return '[' + overall + '] ' + window.troupeContext.title + " - Troupe";
-    },
-
     toggleRightPanel: function(id) {
       $('#'+id).slideToggle(350);
     },
@@ -218,30 +140,6 @@ define([
 
     toggleMails: function () {
       $("#mail-list").slideToggle(350);
-    },
-
-    showProfileMenu: function() {
-      if (!this.profilemenu) {
-
-        // $(".trpProfileMenu").animate({
-        //     width: '132px'
-        // }, 250, function () {
-
-        // });
-
-        $(".trpProfileMenu").fadeIn('fast');
-        this.profilemenu = true;
-      }
-    },
-
-    hideProfileMenu: function() {
-      if (this.profilemenu) {
-        $(".trpProfileMenu").fadeOut('fast');
-        // $(".trpProfileMenu").animate({
-        //     width: '0px'
-        // }, 250);
-        this.profilemenu = false;
-      }
     },
 
     hidePanel: function (whichPanel) {
@@ -416,14 +314,6 @@ define([
       }
     },
 
-    onMouseEnterHeader: function() {
-      this.showProfileMenu();
-    },
-
-    onMouseLeaveHeader: function() {
-      this.hideProfileMenu();
-    },
-
     onMailHeaderClick: function() {
       this.toggleMails();
     },
@@ -469,31 +359,6 @@ define([
     activateSearchList: function () {
 
       $("#list-search-input").focus();
-    },
-
-    // THIS NEEDS A NEW HOME
-    toggleFavourite: function() {
-      var favHeader = $('.trpHeaderFavourite');
-      favHeader.toggleClass('favourited');
-      var isFavourite = favHeader.hasClass('favourited');
-
-      $.ajax({
-        url: '/troupes/' + window.troupeContext.troupe.id,
-        contentType: "application/json",
-        dataType: "json",
-        type: "PUT",
-        data: JSON.stringify({ favourite: isFavourite }),
-        success: function() {
-
-        },
-        error: function() {
-
-        }
-      });
-
-      window.troupeContext.troupe.favourite = isFavourite;
-      var troupe = collections.troupes.get(window.troupeContext.troupe.id);
-      troupe.set('favourite', isFavourite);
     },
 
     onKeyPress: function(e) {
