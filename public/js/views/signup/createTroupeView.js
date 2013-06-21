@@ -91,8 +91,10 @@ define([
         userId: form.find('input[name=userId]').val()
       };
 
-      if (window.troupeContext.troupe.oneToOne && this.upgradeOneToOne) {
-        serializedForm.oneToOneTroupeId = window.troupeContext.troupe.id;
+      if (window.troupeContext.troupe) {
+        if (window.troupeContext.troupe.oneToOne && this.upgradeOneToOne) {
+          serializedForm.oneToOneTroupeId = window.troupeContext.troupe.id;
+        }
       }
 
       that.collection.create(serializedForm, {
