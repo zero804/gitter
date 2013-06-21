@@ -167,7 +167,14 @@ define([
     },
 
     getTitlebar: function(counts) {
-      var mainTitle = window.troupeContext.title + " - Troupe";
+      var mainTitle;
+      if (window.troupeContext.title) {
+        mainTitle = window.troupeContext.title + " - Troupe";
+      } else
+      {
+        mainTitle = "Troupe";
+      }
+
       // TODO this isn't working properly when updating the troupe name, need to be able to poll unreadItems count not just accept the event
       var overall = counts.overall;
       var current = counts.current;
