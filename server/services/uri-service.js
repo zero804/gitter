@@ -43,7 +43,15 @@ exports.findUri = function(uri, userId, callback) {
 
       // Troupe URL?
       if(troupe) {
-        return { troupe: troupe };
+        if(troupeService.userIdHasAccessToTroupe(userId, troupe)) {
+
+          return { troupe: troupe, group: true, access: true };
+        }
+
+        return troupeService.findUnusedInviteToTroupeForUserId(userId, troupe.id)
+          .then(function(invite) {
+            return { troupe: troupe, group: true, access: false, invite: invite };
+          });
       }
 
       // Otherwise, nothing
