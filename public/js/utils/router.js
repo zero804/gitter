@@ -45,7 +45,7 @@ define([
   _.extend(Router.prototype, Backbone.Router.prototype, {
     initialize: function(options) {
       installClickTrigger();
-      this.app = options.app;
+      this.appView = options.appView;
       this.regionsFragments = {};
       this.route(/^(.*?)$/, "handle");
       this.routes = options.routes;
@@ -122,7 +122,7 @@ define([
         if(this.regionsFragments[regionName] !== fragment) {
           this.regionsFragments[regionName] = fragment;
 
-          region = this.app[regionName];
+          region = this.appView[regionName];
 
           if(fragment) {
             // lookup handler:

@@ -1,13 +1,10 @@
 /*jshint unused:true, browser:true */
 
 define([
-  'jquery',
-  'underscore',
-  'backbone',
   'marionette',
   'views/base',
   'hbs!./tmpl/troupeListItem'
-], function($, _, Backbone, Marionette, TroupeViews, troupeListItemTemplate) {
+], function(Marionette, TroupeViews, troupeListItemTemplate) {
   "use strict";
 
   var TroupeItemView = TroupeViews.Base.extend({
@@ -18,7 +15,9 @@ define([
     }
   });
 
-  return Backbone.Marionette.CollectionView.extend({
+  return Marionette.CollectionView.extend({
+    tagName: 'ul',
+    className: 'trpTroupeList',
     itemView: TroupeItemView
   });
 

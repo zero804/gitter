@@ -343,7 +343,8 @@ define([
       var store = this._store;
       var self = this;
 
-      realtime.subscribe('/user/' + window.troupeContext.user.id + '/troupes/' + window.troupeContext.troupe.id, function(message) {
+      var url = '/user/' + window.troupeContext.user.id + '/troupes/' + window.troupeContext.troupe.id + '/unreadItems';
+      var s = realtime.subscribe(url, function(message) {
         if(message.notification === 'unread_items') {
           store._unreadItemsAdded(message.items);
         } else if(message.notification === 'unread_items_removed') {
@@ -354,7 +355,13 @@ define([
             this.emit('unreadItemRemoved', itemType, itemId);
           }, self);
         }
+      });
 
+      s.callback(function() {
+        var snapshot = realtime.getSnapshotFor(url);
+        if(snapshot) {
+          store.preload(snapshot);
+        }
       });
     }
   });

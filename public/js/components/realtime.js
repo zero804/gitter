@@ -73,23 +73,26 @@ define([
     callback(message);
   };
 
-  var SubscriptionTimestamp = function() {
-    this._timestamps = {};
+  var SnapshotExtension = function() {
+    this._data = {};
   };
 
-  SubscriptionTimestamp.prototype.incoming = function(message, callback) {
-    if(message.channel == '/meta/subscribe' && message.timestamp) {
-      this._timestamps[message.subscription] = moment(message.timestamp).toDate();
+  SnapshotExtension.prototype.incoming = function(message, callback) {
+    if(message.channel == '/meta/subscribe' && message.ext && message.ext.snapshot) {
+      this._data[message.subscription] = message.ext.snapshot;
     }
 
     callback(message);
   };
 
-  SubscriptionTimestamp.prototype._getTimestamp = function(channel) {
-    return this._timestamps[channel];
+  SnapshotExtension.prototype._snapshot = function(channel) {
+    var data = this._data[channel];
+    delete this._data[channel];
+    return data;
   };
 
-  var subscriptionTimestampExtension = new SubscriptionTimestamp();
+  var snapshotExtension = new SnapshotExtension();
+
 
   function createClient() {
     var c;
@@ -111,7 +114,7 @@ define([
     }
 
     client.addExtension(new ClientAuth());
-    client.addExtension(subscriptionTimestampExtension);
+    client.addExtension(snapshotExtension);
 
     client.bind('transport:down', function() {
       log('transport:down');
@@ -221,8 +224,8 @@ define([
       return getOrCreateClient();
     },
 
-    getSubscriptionTimestamp: function(channel) {
-      return subscriptionTimestampExtension._getTimestamp(channel);
+    getSnapshotFor: function(channel) {
+      return snapshotExtension._snapshot(channel);
     }
   };
 });

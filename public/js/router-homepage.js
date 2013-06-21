@@ -24,72 +24,42 @@ require([
 
   "use strict";
 
-  var app = new Marionette.Application();
-  app.collections = {};
-  app.addRegions({
-    rightPanelRegion: "#right-panel",
-    headerRegion: "#header-wrapper",
-    homeRegion: "#frame-chat"
+  var appView = new AppIntegratedView();
+  appView.leftMenuRegion.show(new TroupeMenuView());
+
+
+  troupeCollections.recentTroupes.on('sync', function() {
+    console.log('RESET HERE!!!!', troupeCollections.recentTroupes.length);
   });
 
-  /* This is a special region which acts like a region, but is implemented completely differently */
-  app.dialogRegion = {
-    currentView: null,
-    show: function(view) {
-      if(this.currentView) {
-        this.currentView.fade = false;
-        this.currentView.hideInternal();
-      }
-      this.currentView = view;
-      view.navigable = true;
-      view.show();
-    },
-    close: function() {
-      if(this.currentView) {
-        this.currentView.navigationalHide();
-        this.currentView = null;
-      }
+  troupeCollections.troupes.on('sync', function() {
+    console.log('RESET HERE!!!!', troupeCollections.troupes.length);
+  });
+
+  var headerView = new (TroupeViews.Base.extend({
+    template: headerViewTemplate,
+    getRenderData: function() {
+      return { user: window.troupeContext.user, troupeContext: troupeContext };
     }
-  };
+  }))();
 
-  var router;
-  new AppIntegratedView({ app: app });
-  new TroupeMenuView({ app: app });
+  appView.headerRegion.show(headerView);
+  new UserHomeView({ el: '#chat-frame' }).render();
 
-  app.addInitializer(function(/*options*/){
+  $('#mail-list').hide();
 
-    new UserHomeView({ el: '#chat-frame' }).render();
-    var headerView = new UserHeaderView();
-
-    app.headerRegion.show(headerView);
-
-    $('#mail-list').hide();
-  });
-
-  app.on("initialize:after", function(){
-    router = new Router({
+  new Router({
       routes: [
         { name: "profile",        re: /^profile$/,                viewType: profileView.Modal },
         { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal, collection: troupeCollections.troupes,   skipModelLoad: true }
       ],
-      app: app
+      appView: appView
     });
 
-    Backbone.history.start();
-  });
+  Backbone.history.start();
+
 
   // Asynchronously load tracker
-  require([
-    'utils/tracking'
-  ], function(/*tracking*/) {
-    // No need to do anything here
-  });
+  require(['utils/tracking'], function() { });
 
-
-  app.start();
-  window._troupeDebug = {
-    app: app
-  };
-
-  return app;
 });

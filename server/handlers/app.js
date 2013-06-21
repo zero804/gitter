@@ -225,89 +225,6 @@ function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data,
   }
 }
 
-function preloadFiles(userId, troupeId, callback) {
-  fileService.findByTroupe(troupeId, function(err, files) {
-    if (err) {
-      winston.error("Error in findByTroupe: ", { exception: err });
-      return callback(err);
-    }
-
-    var strategy = new restSerializer.FileStrategy({ currentUserId: userId, troupeId: troupeId });
-    restSerializer.serialize(files, strategy, callback);
-  });
-}
-
-function preloadChats(userId, troupeId, callback) {
-  function serializeChats(err, chatMessages) {
-    if(err) return callback(err);
-
-    var strategy = new restSerializer.ChatStrategy({ currentUserId: userId, troupeId: troupeId });
-    restSerializer.serialize(chatMessages, strategy, callback);
-  }
-
-  unreadItemService.getFirstUnreadItem(userId, troupeId, 'chat', function(err, firstId, totalUnreadItems) {
-    if(firstId) {
-      if(totalUnreadItems > 200) {
-        chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: 20 }, serializeChats);
-        return;
-      }
-
-      // No first Id, just return the most recent 20 messages
-      chatService.findChatMessagesForTroupe(troupeId, { startId: firstId }, function(err, chatMessages) {
-        if(err) return callback(err);
-
-        // Just get the last 20 messages instead
-        if(chatMessages.length < 20) {
-          chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: 20 }, serializeChats);
-          return;
-        }
-
-        return serializeChats(err, chatMessages);
-
-      });
-
-      return;
-    }
-
-    // No first Id, just return the most recent 20 messages
-    chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: 20 }, serializeChats);
-
-  });
-
-}
-
-
-function preloadTroupes(userId, callback) {
-  troupeService.findAllTroupesForUser(userId, function(err, troupes) {
-    if (err) return callback(err);
-
-    var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
-    restSerializer.serialize(troupes, strategy, callback);
-  });
-}
-
-
-function preloadUsers(userId, troupe, callback) {
-  var strategy = new restSerializer.UserIdStrategy( { showPresenceForTroupeId: troupe.id });
-  restSerializer.serialize(troupe.getUserIds(), strategy, callback);
-}
-
-
-function preloadConversations(userId, troupeId, callback) {
-  conversationService.findByTroupe(troupeId, function(err, conversations) {
-    if(err) return callback(err);
-
-    restSerializer.serialize(conversations, new restSerializer.ConversationMinStrategy(), callback);
-  });
-}
-
-function preloadUnreadItems(userId, troupeId, callback) {
-    unreadItemService.getUnreadItemsForUser(userId, troupeId, function(err, unreadItems) {
-      if(err) return callback(err);
-      callback(null, unreadItems);
-    });
-}
-
 function preloadTroupeMiddleware(req, res, next) {
   var appUri = req.params.appUri;
 
@@ -429,40 +346,6 @@ module.exports = {
         });
 
 
-      app.get('/one-one/:userId/preload',
-        middleware.grantAccessForRememberMeTokenMiddleware,
-        middleware.ensureLoggedIn(),
-        preloadOneToOneTroupeMiddleware,
-        function(req, res, next) {
-          // Timestamp aroundabout the time the snapshot was taken....
-          var timestamp = new Date().toISOString();
-
-          var f = new Fiber();
-          if(req.user) {
-            preloadTroupes(req.user.id, f.waitor());
-            preloadFiles(req.user.id, req.troupe.id, f.waitor());
-            preloadChats(req.user.id, req.troupe.id, f.waitor());
-            preloadUsers(req.user.id, req.troupe, f.waitor());
-            preloadUnreadItems(req.user.id, req.troupe.id, f.waitor());
-          }
-          f.all()
-            .spread(function(troupes, files, chats, users, unreadItems) {
-              // Send the information through
-              res.set('Cache-Control', 'no-cache');
-              res.send({
-                timestamp: timestamp,
-                troupes: troupes,
-                files: files,
-                chatMessages: chats,
-                users: users,
-                unreadItems: unreadItems
-              });
-            })
-            .fail(function(err) {
-              next(err);
-            });
-        });
-
       app.get('/one-one/:userId/chat',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
@@ -482,45 +365,6 @@ module.exports = {
       app.get('/version', function(req, res/*, next*/) {
         res.json({ appVersion: appVersion.getCurrentVersion() });
       });
-
-      app.get('/:appUri/preload',
-        middleware.grantAccessForRememberMeTokenMiddleware,
-        middleware.ensureLoggedIn(),
-        //middleware.simulateDelay(10000),
-        preloadTroupeMiddleware,
-        function(req, res, next) {
-          // Timestamp aroundabout the time the snapshot was taken....
-          var timestamp = new Date().toISOString();
-
-          var f = new Fiber();
-          if(req.user) {
-            preloadTroupes(req.user.id, f.waitor());
-            if(req.troupe) {
-              preloadFiles(req.user.id, req.troupe.id, f.waitor());
-              preloadChats(req.user.id, req.troupe.id, f.waitor());
-              preloadUsers(req.user.id, req.troupe, f.waitor());
-              preloadConversations(req.user.id, req.troupe, f.waitor());
-              preloadUnreadItems(req.user.id, req.troupe.id, f.waitor());
-            }
-          }
-          f.all()
-            .spread(function(troupes, files, chats, users, conversations, unreadItems) {
-              // Send the information through
-              res.set('Cache-Control', 'no-cache');
-              res.send({
-                timestamp: timestamp,
-                troupes: troupes,
-                files: files,
-                chatMessages: chats,
-                users: users,
-                conversations: conversations,
-                unreadItems: unreadItems
-              });
-            })
-            .fail(function(err) {
-              next(err);
-            });
-        });
 
       app.get('/:appUri',
         middleware.grantAccessForRememberMeTokenMiddleware,
