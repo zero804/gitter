@@ -62,111 +62,62 @@ require([
   });
 
 
-  var app = new Marionette.Application();
-  app.collections = {};
-  app.addRegions({
-    peopleRosterRegion: "#people-roster",
-    fileRegion: "#file-list",
-    mailRegion: ".frame-conversations",
-    requestRegion: "#request-roster",
-    rightPanelRegion: "#right-panel",
-    headerRegion: "#header-wrapper"
-  });
+  var appView = new AppIntegratedView({ });
+  appView.leftMenuRegion.show(new TroupeMenuView({ }));
+  appView.headerRegion.show(new TroupeHeaderView  ());
 
-  /* This is a special region which acts like a region, but is implemented completely differently */
-  app.dialogRegion = {
-    currentView: null,
-    show: function(view) {
-      if(this.currentView) {
-        this.currentView.fade = false;
-        this.currentView.hideInternal();
-      }
-      this.currentView = view;
-      view.navigable = true;
-      view.show();
-    },
-    close: function() {
-      if(this.currentView) {
-        this.currentView.navigationalHide();
-        this.currentView = null;
-      }
-    }
-  };
+  // Setup the ChatView
 
-  var router;
-  new AppIntegratedView({ app: app });
-  new TroupeMenuView({ app: app });
+  var chatCollectionView = new ChatCollectionView({
+    el: $('#frame-chat'),
+    collection: itemCollections.chats,
+    userCollection: itemCollections.users
+  }).render();
 
-  // reference collections
-  var chatCollection = itemCollections.chats;
-  var requestCollection = itemCollections.requests;
-  var fileCollection = itemCollections.files;
-  var conversationCollection = itemCollections.conversations;
-  var userCollection = itemCollections.users;
+  new chatInputView.ChatInputView({
+    el: $('#chat-input'),
+    collection: itemCollections.chats,
+    scrollDelegate: chatCollectionView.scrollDelegate
+  }).render();
 
-  app.addInitializer(function(/*options*/){
+  // Request View
+  appView.requestRegion.show(new RequestView({ collection: itemCollections.requests }));
 
-    var headerView = new TroupeHeaderView();
+  // File View
+  appView.fileRegion.show(new FileView({ collection: itemCollections.files }));
 
-    app.headerRegion.show(headerView);
-
-    // Setup the ChatView
-
-    var chatCollectionView = new ChatCollectionView({
-      el: $('#frame-chat'),
-      collection: chatCollection,
-      userCollection: userCollection
-    }).render();
-
-    new chatInputView.ChatInputView({
-      el: $('#chat-input'),
-      collection: chatCollection,
-      scrollDelegate: chatCollectionView.scrollDelegate
-    }).render();
-
-    // Request View
-    app.requestRegion.show(new RequestView({ collection: requestCollection }));
-
-    // File View
-    app.fileRegion.show(new FileView({ collection: fileCollection }));
-
-    // Conversation View
-    if (!window.troupeContext.troupe.oneToOne) {
-      var conversationView = new ConversationView({
-        collection: conversationCollection
-      });
-      app.mailRegion.show(conversationView);
-    }
-    else {
-      $('#mail-list').hide();
-    }
-
-    // People View
-    app.peopleRosterRegion.show(new PeopleCollectionView({ collection: userCollection }));
-
-  });
-
-  app.on("initialize:after", function(){
-    router = new Router({
-      routes: [
-        { name: "request",        re: /^request\/(\w+)$/,         viewType: RequestDetailView,            collection: itemCollections.requests },
-        { name: "file",           re: /^file\/(\w+)$/,            viewType: FileDetailView,               collection: itemCollections.files },
-        { name: "filePreview",    re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: itemCollections.files },
-        { name: "fileVersions",   re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: itemCollections.files },
-        { name: "mail",           re: /^mail\/(\w+)$/,            viewType: conversationDetailView.Modal, collection: itemCollections.conversations },
-        { name: "person",         re: /^person\/(\w+)$/,          viewType: PersonDetailView,             collection: itemCollections.users },
-
-        { name: "profile",        re: /^profile$/,                viewType: profileView.Modal },
-        { name: "share",          re: /^share$/,                  viewType: shareSearchView.Modal },
-        { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true },
-        { name: "upgradeOneToOne",  re: /^upgradeOneToOne$/,      viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true, viewOptions: { upgradeOneToOne: true } } ,
-        { name: "troupeSettings", re: /^troupeSettings/,          viewType: troupeSettingsView }
-      ],
-      app: app
+  // Conversation View
+  if (!window.troupeContext.troupe.oneToOne) {
+    var conversationView = new ConversationView({
+      collection: itemCollections.conversations
     });
+    appView.mailRegion.show(conversationView);
+  } else {
+    $('#mail-list').hide();
+  }
 
-    Backbone.history.start();
+  // People View
+  appView.peopleRosterRegion.show(new PeopleCollectionView({ collection: itemCollections.users }));
+
+  new Router({
+    routes: [
+      { name: "request",        re: /^request\/(\w+)$/,         viewType: RequestDetailView,            collection: itemCollections.requests },
+      { name: "file",           re: /^file\/(\w+)$/,            viewType: FileDetailView,               collection: itemCollections.files },
+      { name: "filePreview",    re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: itemCollections.files },
+      { name: "fileVersions",   re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: itemCollections.files },
+      { name: "mail",           re: /^mail\/(\w+)$/,            viewType: conversationDetailView.Modal, collection: itemCollections.conversations },
+      { name: "person",         re: /^person\/(\w+)$/,          viewType: PersonDetailView,             collection: itemCollections.users },
+
+      { name: "profile",        re: /^profile$/,                viewType: profileView.Modal },
+      { name: "share",          re: /^share$/,                  viewType: shareSearchView.Modal },
+      { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true },
+      { name: "upgradeOneToOne",  re: /^upgradeOneToOne$/,      viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true, viewOptions: { upgradeOneToOne: true } } ,
+      { name: "troupeSettings", re: /^troupeSettings/,          viewType: troupeSettingsView }
+    ],
+    appView: appView
   });
+
+  Backbone.history.start();
 
   // Asynchronously load tracker
   require([
@@ -174,11 +125,4 @@ require([
   ], function(/*tracking*/) {
     // No need to do anything here
   });
-
-
-  app.start();
-  window._troupeDebug = {
-    app: app
-  };
-  return app;
 });

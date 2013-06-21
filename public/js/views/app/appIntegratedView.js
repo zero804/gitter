@@ -14,14 +14,24 @@ define([
   ], function($, _, Backbone, uiVars, qq, _nano, TroupeViews, UsernameView, log, unreadItemsClient, troupeCollections) {
   "use strict";
 
-  return Backbone.View.extend({
+  return Backbone.Marionette.Layout.extend({
     el: 'body',
     leftmenu: false,
     rightpanel: false,
     profilemenu: false,
     shifted: false,
     alertpanel: false,
-    selectedListIcon: "icon-mega",
+
+    regions: {
+      peopleRosterRegion: "#people-roster",
+      fileRegion: "#file-list",
+      leftMenuRegion: "#left-menu",
+      mailRegion: ".frame-conversations",
+      requestRegion: "#request-roster",
+      rightPanelRegion: "#right-panel",
+      headerRegion: "#header-region"
+    },
+
     events: {
       "click #menu-toggle-button":        "onMenuToggle",
       "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
@@ -47,13 +57,32 @@ define([
       "keypress":                         "onKeyPress"
     },
 
-    initialize: function(options) {
+    initialize: function() {
       var self = this;
-      this.app = options.app;
 
       // $('body').append('<span id="fineUploader"></span>');
 
       $(".nano").nanoScroller({ preventPageScrolling: true });
+
+      /* This is a special region which acts like a region, but is implemented completely differently */
+      this.dialogRegion = {
+        currentView: null,
+        show: function(view) {
+          if(this.currentView) {
+            this.currentView.fade = false;
+            this.currentView.hideInternal();
+          }
+          this.currentView = view;
+          view.navigable = true;
+          view.show();
+        },
+        close: function() {
+          if(this.currentView) {
+            this.currentView.navigationalHide();
+            this.currentView = null;
+          }
+        }
+      };
 
 /*
       this.uploader = new qq.FineUploader({
@@ -96,14 +125,14 @@ define([
       });
 */
 
-      this.app.rightPanelRegion.on('show', function() {
+      this.rightPanelRegion.on('show', function() {
         //log("SHOW PANEL");
         self.showPanel("#right-panel");
       });
 
-      this.app.rightPanelRegion.on('close', function() {
+      this.rightPanelRegion.on('close', function() {
         window.setTimeout(function() {
-          if(!self.app.rightPanelRegion.currentView) {
+          if(!self.rightPanelRegion.currentView) {
             //log("CLOSE PANEL");
             self.hidePanel("#right-panel");
           }
@@ -136,21 +165,6 @@ define([
 
       $(document).on('troupeUnreadTotalChange', onTroupeUnreadTotalChange);
       onTroupeUnreadTotalChange(null, unreadItemsClient.getCounts());
-
-
-      toggler('#unreadTroupesList', troupeCollections.unreadTroupes);
-      toggler('#favTroupesList', troupeCollections.favouriteTroupes);
-      toggler('#recentTroupesList', troupeCollections.recentTroupes);
-      toggler('#invitesList', troupeCollections.incomingInvites);
-
-      function toggler(element, collection) {
-        function toggle() {
-          $(element).toggle(collection.length > 0);
-        }
-
-        collection.on('all', toggle);
-        toggle();
-      }
 
       //this.ensureProfileIsUsernamed();
     },
@@ -451,23 +465,6 @@ define([
       $(e.target).fadeTo(100, 0.6);
     },
 
-    onLeftMenuListIconClick: function(e) {
-      // Turn off the old selected list
-      $("#"+this.selectedListIcon).removeClass('selected');
-      $("#"+this.selectedListIcon).fadeTo(100, 0.6);
-      $("#" + $("#"+this.selectedListIcon).data('list')).hide();
-      // TODO: We probably want to destroy the list to remove the dom elements
-
-      // enable the new selected list
-      this.selectedListIcon = $(e.target).attr('id');
-      $("#"+this.selectedListIcon).addClass('selected');
-      $("#" + $("#"+this.selectedListIcon).data('list')).show();
-      // TODO: Related to the above TODO, we probably only want to populate the list now
-
-      if (this.selectedListIcon == 'icon-search') {
-        this.activateSearchList();
-      }
-    },
 
     activateSearchList: function () {
 

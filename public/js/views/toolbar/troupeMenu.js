@@ -1,14 +1,17 @@
 /*jshint unused:true, browser:true */
 define([
+  'underscore',
   'marionette',
   'collections/instances/troupes',
   'views/toolbar/troupeCollectionView',
-  'views/app/invitesView'
-], function(Marionette, troupeCollections, TroupeCollectionView, InvitesView) {
+  'views/app/invitesView',
+  'hbs!./tmpl/troupeMenu'
+], function(_, Marionette, troupeCollections, TroupeCollectionView, InvitesView, template) {
   "use strict";
 
   return Backbone.Marionette.Layout.extend({
-    el: '#left-menu',
+    template: template,
+    selectedListIcon: "icon-mega",
 
     regions: {
       unread: "#left-menu-list-unread",
@@ -20,7 +23,15 @@ define([
       search: "#left-menu-list-search"
     },
 
+    events: {
+     "click .left-menu-icon":            "onLeftMenuListIconClick"
+    },
+
     initialize: function() {
+      this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
+    },
+
+    onRender: function() {
       // recent troupe view
       this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentTroupes }));
 
@@ -38,7 +49,56 @@ define([
 
       // incoming invites collection view
       this.invites.show(new InvitesView({ collection: troupeCollections.incomingInvites }));
+
+      this.initHideListeners();
+
+    },
+
+    initHideListeners: function() {
+      var self = this;
+
+      toggler('#unreadTroupesList', troupeCollections.unreadTroupes);
+      toggler('#favTroupesList', troupeCollections.favouriteTroupes);
+      toggler('#recentTroupesList', troupeCollections.recentTroupes);
+      toggler('#invitesList', troupeCollections.incomingInvites);
+
+      function toggler(element, collection) {
+        function toggle() {
+          self.$el.find(element).toggle(collection.length > 0);
+        }
+
+        collection.on('change', toggle);
+        toggle();
+      }
+    },
+
+    onLeftMenuListIconClick: function(e) {
+      // Turn off the old selected list
+      var currentSelection = $("#"+this.selectedListIcon);
+      currentSelection.removeClass('selected').fadeTo(100, 0.6);
+      var listElement = currentSelection.data('list');
+
+      $("#" + listElement).hide();
+
+      // TODO: We probably want to destroy the list to remove the dom elements
+
+      // enable the new selected list
+      this.selectedListIcon = $(e.target).attr('id');
+      var newSelection = $("#" + this.selectedListIcon);
+
+      newSelection.addClass('selected');
+      listElement = currentSelection.data('list');
+
+      $("#" + listElement).show();
+
+      // TODO: Related to the above TODO, we probably only want to populate the list now
+
+      if (this.selectedListIcon == 'icon-search') {
+        this.activateSearchList();
+      }
     }
+
+
   });
 
 

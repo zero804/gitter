@@ -7,17 +7,20 @@ var oauth = require("../services/oauth-service");
 var winston = require("winston");
 var troupeService = require("../services/troupe-service");
 var presenceService = require("../services/presence-service");
+var restful = require("../services/restful");
 var nconf = require("../utils/config");
 var shutdown = require('../utils/shutdown');
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
-  { re: /^\/troupes\/(\w+)$/,       validator: validateUserForTroupeSubscription },
-  { re: /^\/troupes\/(\w+)\/(.+)$/, validator: validateUserForSubTroupeSubscription },
-  { re: /^\/user\/(\w+)\/(.+)$/,    validator: validateUserForUserSubscription },
-  { re: /^\/user\/(\w+)$/,          validator: validateUserForUserSubscription },
-  { re: /^\/ping$/,                 validator: validateUserForPingSubscription }
+  { re: /^\/troupes\/(\w+)$/,         validator: validateUserForTroupeSubscription },
+  { re: /^\/troupes\/(\w+)\/(\w+)$/,  validator: validateUserForSubTroupeSubscription,  populator: populateSubTroupeCollection},
+  { re: /^\/user\/(\w+)\/(\w+)$/,                           validator: validateUserForUserSubscription,       populator: populateSubUserCollection },
 
+  { re: /^\/user\/(\w+)\/troupes\/(\w+)\/unreadItems$/,     validator: validateUserForUserSubscription,       populator: populateUserUnreadItemsCollection },
+
+  { re: /^\/user\/(\w+)$/,            validator: validateUserForUserSubscription },
+  { re: /^\/ping$/,                   validator: validateUserForPingSubscription }
 ];
 
 var superClientPassword = nconf.get('ws:superClientPassword');
@@ -68,12 +71,10 @@ function validateUserForSubTroupeSubscription(options, callback) {
   });
 }
 
-
 // This strategy ensures that a user can access a URL under a /user/ URL
 function validateUserForPingSubscription(options, callback) {
   return callback(null, true);
 }
-
 
 // This strategy ensures that a user can access a URL under a /user/ URL
 function validateUserForUserSubscription(options, callback) {
@@ -84,6 +85,77 @@ function validateUserForUserSubscription(options, callback) {
   var result = userId == subscribeUserId;
 
   return callback(null, result);
+}
+
+function populateSubUserCollection(options, callback) {
+  var userId = options.userId;
+  var match = options.match;
+  var subscribeUserId = match[1];
+  var collection = match[2];
+
+  if(userId != subscribeUserId) {
+    return callback(null, [ ]);
+  }
+
+  switch(collection) {
+    case "troupes":
+      return restful.serializeTroupesForUser(userId, callback);
+
+    case "invites":
+      return restful.serializeInvitesForUser(userId, callback);
+
+    default:
+      winston.error('Unable to provide snapshot for ' + collection);
+  }
+
+  callback(null, [ ]);
+}
+
+
+function populateSubTroupeCollection(options, callback) {
+  var userId = options.userId;
+  var match = options.match;
+  var troupeId = match[1];
+  var collection = match[2];
+
+  switch(collection) {
+    case "requests":
+      return restful.serializeRequestsForTroupe(troupeId, userId, callback);
+
+    case "chatMessages":
+      return restful.serializeChatsForTroupe(troupeId, userId, callback);
+
+    case "files":
+      return restful.serializeFilesForTroupe(troupeId, userId, callback);
+
+    case "conversations":
+      return restful.serializeConversationsForTroupe(troupeId, userId, callback);
+
+    case "users":
+      return restful.serializeUsersForTroupe(troupeId, userId, callback);
+
+    default:
+      winston.error('Unable to provide snapshot for ' + collection);
+  }
+
+  callback(null, [ ]);
+}
+
+function populateUserUnreadItemsCollection(options, callback) {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+  var userId = options.userId;
+  var match = options.match;
+  var subscriptionUserId = match[1];
+  var troupeId = match[2];
+
+  console.log('info', userId, subscriptionUserId, troupeId);
+
+  if(userId !== subscriptionUserId) {
+    return callback(null, [ ]);
+  }
+  console.log('>aasdasdasdsdasda>>>>>>>asdasdasdasd>>>>>>>asdasdasd>>>>>>>>>>>>>>>>>>>>>>>>>>');
+
+  return restful.serializeUnreadItemsForTroupe(troupeId, userId, callback);
 }
 
 function messageIsFromSuperClient(message) {
@@ -221,6 +293,57 @@ var authorisor = {
       return callback(message);
     });
 
+  },
+
+  outgoing: function(message, callback) {
+    if(message.channel != '/meta/subscribe') {
+      return callback(message);
+    }
+
+    if(message.error) {
+      return callback(message);
+    }
+
+    var match = null;
+
+    var hasMatch = routes.some(function(route) {
+      var m = route.re.exec(message.subscription);
+      if(m) {
+        match = { route: route, match: m };
+      }
+      return m;
+    });
+
+    if(!hasMatch) {
+      return callback(message);
+    }
+
+    var populator = match.route.populator;
+    var m = match.match;
+    var clientId = message.clientId;
+
+    if(clientId && populator) {
+      presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
+        if(err) {
+          winston.error('Error for lookupUserIdForSocket', { exception: err });
+          return callback(message);
+        }
+
+        populator({ userId: userId, match: m }, function(err, data) {
+          var e = message.ext;
+          if(!e) {
+            e = {};
+            message.ext = e;
+          }
+          e.snapshot = data;
+          console.log(e);
+          return callback(message);
+        });
+
+      });
+    } else {
+      return callback(message);
+    }
   },
 
   // Authorize a sbscription message

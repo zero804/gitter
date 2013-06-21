@@ -1,0 +1,45 @@
+<div class="trpLeftMenuToolbar">
+  <ul class="trpLeftMenuToolbarItems">
+    <li><img src='{{cdn "images/2/icon-target.png"}}' class="trpLeftMenuIcon left-menu-icon selected" id="icon-mega" data-list="list-mega" width="24" height="24"></li>
+    <li><img src='{{cdn "images/2/icon-troupes.png"}}' class="trpLeftMenuIcon left-menu-icon" id="icon-troupes" data-list="list-troupes" width="24" height="24"></li>
+    <li><img src='{{cdn "images/2/icon-user.png"}}' class="trpLeftMenuIcon left-menu-icon" id="icon-user" data-list="list-users" width="24" height="24"></li>
+<!--         <li><img src='{{cdn "images/2/icon-search.png"}}' class="trpLeftMenuIcon left-menu-icon" id="icon-search" data-list="list-search" width="24" height="24"></li> -->
+  </ul>
+</div>
+<div class="nano" id="left-menu-scroll">
+  <div class="content trpLeftMenuWrapper">
+    <div class="trpToolbarList" style="" id="list-mega">
+      <div id="invitesList">
+        <div class="trpToolbarHeader" id="invitesHeader">Incoming Invites</div>
+        <div id="left-menu-list-invites"></div>
+      </div>
+      <div id="unreadTroupesList">
+        <div class="trpToolbarHeader" id="unreadTroupesHeader">Unread Messages</div>
+        <div id="left-menu-list-unread"></div>
+      </div>
+      <div id="favTroupesList">
+        <div class="trpToolbarHeader">Favourites</div>
+        <div id="left-menu-list-favourites"></div>
+      </div>
+      <div id="recentTroupesList">
+        <div class="trpToolbarHeader">Recents</div>
+        <div id="left-menu-list-recent"></div>
+      </div>
+    </div>
+    <div class="trpToolbarList" style="display:none" id="list-troupes">
+      <div class="trpToolbarHeader">All your Troupes</div>
+      <div id="left-menu-list"></div>
+      <a href="#|create"><div class="trpNewTroupeButton">Start a new Troupe</div><div class="trpLeftMenuSpacer"></div></a>
+    </div>
+    <div class="trpToolbarList" style="display:none" id="list-users">
+      <div class="trpToolbarHeader">Private Chats</div>
+      <div id="left-menu-list-users"></div>
+    </div>
+    <!--<div class="trpToolbarList" style="display:none" id="list-search">
+      <div class="trpToolbarHeader">Search</div>
+      <div class="trpTroupeListSearch"><input type="text" class="trpInputSmall" id="list-search-input"></div>
+      <ul class="trpTroupeList" id="left-menu-list-search">
+      </ul>
+    </div>-->
+  </div>
+</div>

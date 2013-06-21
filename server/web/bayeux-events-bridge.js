@@ -126,7 +126,7 @@ TODO: disconnect clients who've been removed from a troupe
     var troupeId = data.troupeId;
     var items = data.items;
 
-    bayeuxClient.publish("/user/" + userId + '/troupes/' + troupeId, {
+    bayeuxClient.publish("/user/" + userId + '/troupes/' + troupeId + '/unreadItems', {
       notification: "unread_items",
       items: items
     });
@@ -138,7 +138,7 @@ TODO: disconnect clients who've been removed from a troupe
     var troupeId = data.troupeId;
     var items = data.items;
 
-    bayeuxClient.publish("/user/" + userId + '/troupes/' + troupeId, {
+    bayeuxClient.publish("/user/" + userId + '/troupes/' + troupeId + '/unreadItems', {
       notification: "unread_items_removed",
       items: items
     });

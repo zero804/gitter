@@ -12,10 +12,7 @@ define([
 ], function($, _, Backbone, base, realtime, troupeModels, inviteModels, unreadItemsClient) {
   "use strict";
 
-  var preloader = base.preloader;
-  preloader.fetchData();
-
-  var troupeCollection = new troupeModels.TroupeCollection(null, { preloader: preloader, listen: true });
+  var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
   unreadItemsClient.installTroupeListener(troupeCollection);
 
   function filterTroupeCollection(filter) {

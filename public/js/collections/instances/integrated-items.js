@@ -13,17 +13,14 @@ define([
 ], function($, _, Backbone, base, fileModels, conversationModels, userModels, chatModels, requestModels, unreadItemsClient) {
   "use strict";
 
-  var preloader = base.preloader;
-  preloader.fetchData();
-
   var requestCollection = new requestModels.RequestCollection();
   requestCollection.listen();
   requestCollection.fetch();
 
-  var chatCollection         = new chatModels.ChatCollection(null, { preloader: preloader, listen: true });
-  var fileCollection         = new fileModels.FileCollection(null, { preloader: preloader, listen: true });
-  var conversationCollection = new conversationModels.ConversationCollection(null, { preloader: preloader, listen: true });
-  var userCollection         = new userModels.UserCollection(null, { preloader: preloader, listen: true });
+  var chatCollection         = new chatModels.ChatCollection(null, { listen: true });
+  var fileCollection         = new fileModels.FileCollection(null, { listen: true });
+  var conversationCollection = new conversationModels.ConversationCollection(null, { listen: true });
+  var userCollection         = new userModels.UserCollection(null, { listen: true });
 
   function helpers() {
     // update online status of user models

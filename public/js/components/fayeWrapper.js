@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true*/
+  /*jshint unused:true, browser:true*/
 define([
   'faye',
   'underscore',
@@ -85,7 +85,7 @@ define([
       }
 
       for (var l = 0; this._extensions && l < this._extensions.length; l++) {
-        c.addExtension(this._extensions[i]);
+        c.addExtension(this._extensions[l]);
       }
 
       this._client = c;

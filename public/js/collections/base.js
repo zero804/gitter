@@ -115,14 +115,6 @@ define([
 
       if(options) {
 
-        if(options.preloader) {
-          var preloader = options.preloader;
-          this.preloader = preloader;
-
-          preloader.on('preload:start', this._onPreloadStart, this);
-          preloader.on('preload:complete', this._onPreloadComplete, this);
-        }
-
         if(options.listen) {
           this.listen();
         }
@@ -131,26 +123,12 @@ define([
 
     },
 
-    _onPreloadStart: function() {
-      this._loading = true;
-      this.reset([]);
-    },
-
     _onSync: function() {
       this._loading = false;
     },
 
     _onRequest: function() {
       this._loading = true;
-    },
-
-    _onPreloadComplete: function(data) {
-      this._comparePreloadToSubscription();
-      var items = data[this.preloadKey];
-      this.add(items, { parse: true, merge: true, sort: true });
-      this._loading = false;
-      this.trigger('sync');
-      this.trigger('reset', this.models);
     },
 
     _onInitialLoad: function() {
@@ -166,18 +144,6 @@ define([
       }
     },
 
-    _comparePreloadToSubscription: function() {
-      if(this.preloader) {
-        var preloadTimestamp = this.preloader.getTimestamp();
-        var subscriptionTimestamp = realtime.getSubscriptionTimestamp(this.url);
-
-        if(subscriptionTimestamp > preloadTimestamp) {
-          log('WARNING: Difference in timestamps is ', preloadTimestamp - subscriptionTimestamp, preloadTimestamp, subscriptionTimestamp);
-        }
-
-      }
-    },
-
     listen: function(callback) {
       if(this.subscription) return;
       var self = this;
@@ -187,8 +153,10 @@ define([
       });
 
       this.subscription.callback(function() {
-        log('Listening to ' + self.url);
-        self._comparePreloadToSubscription();
+
+        var snapshot = realtime.getSnapshotFor(self.url);
+        log('SNAPSHOT!!', snapshot);
+        self.reset(snapshot, { parse: true });
 
         if(callback) return callback();
       });
@@ -350,51 +318,6 @@ define([
       return -1 * comparatorFunction(left, right);
     };
   }
-
-  var Preloader = function() {
-    var that = this;
-
-    $(document).on('realtime:newConnectionEstablished', function() {
-      if(!that.initialConnectionEstablished) {
-        that.initialConnectionEstablished = true;
-        return;
-      }
-
-      that.fetchData();
-    });
-  };
-
-  _.extend(Preloader.prototype, Backbone.Events, {
-    getTimestamp: function() {
-      return this._timestamp;
-    },
-
-    fetchData: function() {
-      if(this.preloadStarted) return;
-      this.preloadStarted = true;
-
-      log('Reloading data');
-
-      this.trigger('preload:start');
-
-      $.ajax({
-        url: window.location.pathname + '/preload?d=' + Date.now(),
-        dataType: "json",
-        type: "GET",
-        context: this,
-        success: function(data) {
-          log('Preload completed, resetting collections');
-          this.preloadStarted = false;
-
-          this._timestamp = moment(data.timestamp).toDate();
-
-          this.trigger('preload:complete', data);
-        }
-      });
-    }
-  });
-
-  exports.preloader = new Preloader();
 
   return exports;
 });
