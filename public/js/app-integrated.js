@@ -32,6 +32,7 @@ require([
   'views/app/invitesView',
   'hbs!./views/app/tmpl/appHeader',
   'views/app/troupeSettingsView',
+  'views/toolbar/troupeMenu',
   'utils/router',
   'components/errorReporter',
   'filtered-collection'
@@ -39,7 +40,7 @@ require([
             itemCollections, troupeCollections, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareSearchView,
             createTroupeView, InvitesView, headerViewTemplate,
-            troupeSettingsView, Router /*, errorReporter , FilteredCollection */) {
+            troupeSettingsView, TroupeMenuView, Router /*, errorReporter , FilteredCollection */) {
   "use strict";
 
   // Make drop down menus drop down
@@ -64,13 +65,6 @@ require([
   var app = new Marionette.Application();
   app.collections = {};
   app.addRegions({
-    leftMenuUnread: "#left-menu-list-unread",
-    leftMenuInvites: "#left-menu-list-invites",
-    leftMenuRecent: "#left-menu-list-recent",
-    leftMenuFavourites: "#left-menu-list-favourites",
-    leftMenuTroupes: "#left-menu-list",
-    leftMenuPeople: "#left-menu-list-users",
-    leftMenuSearch: "#left-menu-list-search",
     peopleRosterRegion: "#people-roster",
     fileRegion: "#file-list",
     mailRegion: ".frame-conversations",
@@ -101,6 +95,7 @@ require([
 
   var router;
   new AppIntegratedView({ app: app });
+  new TroupeMenuView({ app: app });
 
   // reference collections
   var chatCollection = itemCollections.chats;
@@ -108,14 +103,6 @@ require([
   var fileCollection = itemCollections.files;
   var conversationCollection = itemCollections.conversations;
   var userCollection = itemCollections.users;
-
-  // Troupe Collections
-  var filteredTroupeCollection = troupeCollections.normalTroupes;
-  var peopleOnlyTroupeCollection = troupeCollections.peopleTroupes;
-  var unreadTroupeCollection = troupeCollections.unreadTroupes;
-  var favouriteTroupesCollection = troupeCollections.favouriteTroupes;
-  var recentTroupeCollection = troupeCollections.recentTroupes;
-  var incomingInvitesCollection = troupeCollections.incomingInvites;
 
   app.addInitializer(function(/*options*/){
 
@@ -158,26 +145,6 @@ require([
     else {
       $('#mail-list').hide();
     }
-
-    // add the troupe views to the left menu
-
-    // recent troupe view
-    app.leftMenuRecent.show(new TroupeCollectionView({ collection: recentTroupeCollection }));
-
-    // normal troupe view
-    app.leftMenuTroupes.show(new TroupeCollectionView({collection: filteredTroupeCollection }));
-
-    // one to one troupe view
-    app.leftMenuPeople.show(new TroupeCollectionView({collection: peopleOnlyTroupeCollection }));
-
-    // unread troupe view
-    app.leftMenuUnread.show(new TroupeCollectionView({collection: unreadTroupeCollection }));
-
-    // favourite troupe view
-    app.leftMenuFavourites.show(new TroupeCollectionView({ collection: favouriteTroupesCollection }));
-
-    // incoming invites collection view
-    app.leftMenuInvites.show(new InvitesView({ collection: incomingInvitesCollection }));
 
     // People View
     app.peopleRosterRegion.show(new PeopleCollectionView({ collection: userCollection }));
