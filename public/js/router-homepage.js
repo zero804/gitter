@@ -14,36 +14,19 @@ require([
   'views/profile/profileView',
   'views/signup/createTroupeView',
   'views/app/userHeaderView',
-  'hbs!./views/app/tmpl/appHeader',
   'components/webNotifications',
   'views/toolbar/troupeMenu',
   'utils/router',
   'components/errorReporter'
 ], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, dozy, AppIntegratedView, UserHomeView, troupeCollections,
-  profileView, createTroupeView, UserHeaderView, headerViewTemplate, webNotifications, TroupeMenuView, Router /*, errorReporter , FilteredCollection */) {
+  profileView, createTroupeView, UserHeaderView, webNotifications, TroupeMenuView, Router /*, errorReporter , FilteredCollection */) {
 
   "use strict";
 
   var appView = new AppIntegratedView();
   appView.leftMenuRegion.show(new TroupeMenuView());
+  appView.headerRegion.show( new UserHeaderView());
 
-
-  troupeCollections.recentTroupes.on('sync', function() {
-    console.log('RESET HERE!!!!', troupeCollections.recentTroupes.length);
-  });
-
-  troupeCollections.troupes.on('sync', function() {
-    console.log('RESET HERE!!!!', troupeCollections.troupes.length);
-  });
-
-  var headerView = new (TroupeViews.Base.extend({
-    template: headerViewTemplate,
-    getRenderData: function() {
-      return { user: window.troupeContext.user, troupeContext: troupeContext };
-    }
-  }))();
-
-  appView.headerRegion.show(headerView);
   new UserHomeView({ el: '#chat-frame' }).render();
 
   $('#mail-list').hide();
