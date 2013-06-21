@@ -30,6 +30,18 @@ require([
     }
   });
 
+  chatCollection.newConnectionCount = 0;
+  $(document).on('realtime:newConnectionEstablished', function() {
+    if(chatCollection.newConnectionCount++) {
+      chatCollection.fetch({
+        data: {
+          limit: PAGE_SIZE
+        }
+      });
+    }
+  });
+
+
   var chatCollectionView = new ChatCollectionView({
     el: $('#frame-chat'),
     collection: chatCollection

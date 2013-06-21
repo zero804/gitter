@@ -1,10 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var kue = require('../utils/kue'),
-    jobs = kue.createQueue(),
-    winston = require("winston"),
-    statsService = require("../services/stats-service");
+var winston = require("winston");
 
 var errorDescriptions = {
   0: 'No errors encountered',
@@ -19,10 +16,13 @@ var errorDescriptions = {
   255: 'None (unknown)'
 };
 
-exports.startWorkers = function() {
+var workerQueue = require('../utils/worker-queue');
+
+var queue = workerQueue.queue('push-notification', {}, function() {
   var pushNotificationService = require("../services/push-notification-service");
   var nconf = require('../utils/config');
   var apns = require('apn');
+  var statsService = require("../services/stats-service");
 
   function directSendUserNotification(userIds, notification, callback) {
     var message = notification.message;
@@ -62,26 +62,26 @@ exports.startWorkers = function() {
           }
 
           //note.alert = message;
-          note.device = new apns.Device(device.appleToken);
+          var deviceToken = new apns.Device(device.appleToken);
 
           note.pushDevice = device;
 
           switch(device.deviceType) {
             case 'APPLE':
-              apnsConnection.sendNotification(note);
+              apnsConnection.sendNotification(note, deviceToken);
               break;
 
             case 'APPLE-BETA-DEV':
-              apnsConnectionBetaDev.sendNotification(note);
+              apnsConnectionBetaDev.sendNotification(note, deviceToken);
               break;
 
 
             case 'APPLE-BETA':
-              apnsConnectionBeta.sendNotification(note);
+              apnsConnectionBeta.sendNotification(note, deviceToken);
               break;
 
             case 'APPLE-DEV':
-              apnsConnectionDev.sendNotification(note);
+              apnsConnectionDev.sendNotification(note, deviceToken);
               break;
             default:
               winston.warn('Unknown device type: ' + device.deviceType);
@@ -136,6 +136,10 @@ exports.startWorkers = function() {
       connectionTimeout: 60000
   });
 
+  apnsConnectionDev.on("error", function(err) {
+      winston.error("APN service (dev) experienced an error", { error: err.message });
+  });
+
   var apnsConnectionBetaDev = new apns.Connection({
       cert: nconf.get('apn:certBetaDev'),
       key: nconf.get('apn:keyBetaDev'),
@@ -143,6 +147,10 @@ exports.startWorkers = function() {
       enhanced: true,
       errorCallback: errorEventOccurred,
       connectionTimeout: 60000
+  });
+
+  apnsConnectionBetaDev.on("error", function(err) {
+      winston.error("APN service (beta dev) experienced an error", { error: err.message });
   });
 
   var apnsConnectionBeta = new apns.Connection({
@@ -154,6 +162,10 @@ exports.startWorkers = function() {
       connectionTimeout: 60000
   });
 
+  apnsConnectionBeta.on("error", function(err) {
+      winston.error("APN service (beta) experienced an error", { error: err.message });
+  });
+
   var apnsConnection = new apns.Connection({
       cert: nconf.get('apn:certProd'),
       key: nconf.get('apn:keyProd'),
@@ -163,56 +175,41 @@ exports.startWorkers = function() {
       connectionTimeout: 60000
   });
 
-
-  function failedDeliveryEventOccurred(timeSinceEpoch/*, deviceToken*/) {
-    winston.error("Failed delivery. Need to remove device", { time: timeSinceEpoch });
-  }
-
-  new apns.Feedback({
-      cert: nconf.get('apn:certDev'),
-      key: nconf.get('apn:keyDev'),
-      gateway: nconf.get('apn:feedbackDev'),
-      feedback: failedDeliveryEventOccurred,
-      interval: nconf.get('apn:feedbackInterval')
+  apnsConnection.on("error", function(err) {
+      winston.error("APN service (prod) experienced an error", { error: err.message });
   });
 
+  ['Dev', 'BetaDev', 'Beta', 'Prod'].forEach(function(suffix) {
+    try {
 
-  new apns.Feedback({
-      cert: nconf.get('apn:certBetaDev'),
-      key: nconf.get('apn:keyBetaDev'),
-      gateway: nconf.get('apn:feedbackBetaDev'),
-      feedback: failedDeliveryEventOccurred,
-      interval: nconf.get('apn:feedbackInterval')
+      var feedback = new apns.Feedback({
+          cert: nconf.get('apn:cert' + suffix),
+          key: nconf.get('apn:key' + suffix),
+          gateway: nconf.get('apn:feedback' + suffix),
+          interval: nconf.get('apn:feedbackInterval' + suffix),
+          batchFeedback: true
+      });
+
+      feedback.on("feedback", function(devices) {
+          winston.error("Failed delivery. Need to remove the following devices", { devices: devices });
+      });
+
+      feedback.on("error", function(err) {
+          winston.error("Feedback service experienced an error", { error: err.message });
+      });
+
+    } catch(e) {
+      winston.error('Unable to start feedback service ', { exception: e });
+    }
   });
 
-  new apns.Feedback({
-      cert: nconf.get('apn:certBeta'),
-      key: nconf.get('apn:keyBeta'),
-      gateway: nconf.get('apn:feedbackBeta'),
-      feedback: failedDeliveryEventOccurred,
-      interval: nconf.get('apn:feedbackInterval')
-  });
-
-  new apns.Feedback({
-      cert: nconf.get('apn:certProd'),
-      key: nconf.get('apn:keyProd'),
-      gateway: nconf.get('apn:feedbackProd'),
-      feedback: failedDeliveryEventOccurred,
-      interval: nconf.get('apn:feedbackInterval')
-  });
-
-  jobs.process('push-notification', 20, function(job, done) {
-    directSendUserNotification(job.data.userIds, job.data.notification, kue.wrapCallback(job, done));
-  });
-};
+  return function(data, done) {
+    directSendUserNotification(data.userIds, data.notification, done);
+  };
+});
 
 exports.sendUserNotification = function(userIds, notification, callback) {
   if(!Array.isArray(userIds)) userIds = [userIds];
 
-  jobs.create('push-notification', {
-    title: notification.message,
-    userIds: userIds,
-    notification: notification
-  }).attempts(5)
-    .save(callback);
+  queue.invoke({ userIds: userIds, notification: notification },callback);
 };

@@ -50,23 +50,29 @@ function FileStrategy(options) {
   if(!options) options = {};
 
   var userStategy = new UserIdStrategy();
-  var troupeStrategy = new TroupeIdStrategy(options);
+  var troupeStrategy = options.includeTroupe && new TroupeIdStrategy(options);
 
   this.preload = function(items, callback) {
     var users = items.map(function(i) { return i.versions[i.versions.length - 1].creatorUserId; });
     users = _.flatten(users, true);
     users = _.uniq(users);
 
-    var troupeIds = items.map(function(i) { return i.troupeId; });
-    troupeIds = _.uniq(troupeIds);
+
 
     var strategies = [{
       strategy: userStategy,
       data: users
-    }, {
-      strategy: troupeStrategy,
-      data: troupeIds
     }];
+
+    if(troupeStrategy) {
+      var troupeIds = items.map(function(i) { return i.troupeId; });
+      troupeIds = _.uniq(troupeIds);
+
+      strategies.push({
+        strategy: troupeStrategy,
+        data: troupeIds
+      });
+    }
 
     execPreloads(strategies, callback);
   };
@@ -91,7 +97,7 @@ function FileStrategy(options) {
       mimeType: item.mimeType,
       latestVersion: narrowFileVersion(item.versions[item.versions.length - 1]),
       url: '/troupes/' + encodeURIComponent(item.troupeId) + '/downloads/' + encodeURIComponent(item.fileName),
-      troupe: troupeStrategy.map(item.troupeId)
+      troupe: troupeStrategy && troupeStrategy.map(item.troupeId)
     };
   };
 
@@ -102,7 +108,7 @@ function ChatStrategy(options)  {
   if(!options) options = {};
 
   var userStategy = new UserIdStrategy(options);
-  var troupeStrategy = new TroupeIdStrategy(options);
+  var troupeStrategy = options.includeTroupe && new TroupeIdStrategy(options);
 
   this.preload = function(items, callback) {
     var users = items.map(function(i) { return i.fromUserId; });
@@ -113,10 +119,13 @@ function ChatStrategy(options)  {
       data: _.uniq(users)
     });
 
-    strategies.push({
-      strategy: troupeStrategy,
-      data: _.uniq(items.map(function(i) { return i.toTroupeId; }))
-    });
+    if(troupeStrategy) {
+      var troupeIds = items.map(function(i) { return i.toTroupeId; });
+      strategies.push({
+        strategy: troupeStrategy,
+        data: troupeIds
+      });
+    }
 
     execPreloads(strategies, callback);
   };
@@ -127,7 +136,7 @@ function ChatStrategy(options)  {
       text: item.text,
       sent: item.sent,
       fromUser: options.user ? options.user : userStategy.map(item.fromUserId),
-      troupe: troupeStrategy ? troupeStrategy.map(item.toTroupeId) : undefined
+      troupe: troupeStrategy && troupeStrategy.map(item.toTroupeId)
     };
 
   };
@@ -137,29 +146,59 @@ function ChatStrategy(options)  {
 function TroupeStrategy(options) {
   if(!options) options = {};
 
-  var senderUserId = options.senderUserId;
+  var userStategy = new UserIdStrategy(options);
+
+  var recipientUserId = options.recipientUserId;
 
   this.preload = function(items, callback) {
-    callback();
+    var userIds =  items.map(function(t) { if(t.oneToOne) { return getOtherUserId(t); } } )
+                        .filter(function(f) { return !!f; });
+
+    if(userIds.length) {
+      execPreloads([{
+        strategy: userStategy,
+        data: _.uniq(userIds)
+      }], callback);
+
+    } else {
+      callback();
+    }
   };
 
-  function getOtherUserUrl(item) {
-    if(!senderUserId) return null;
+
+  function getOtherUserId(item) {
+    if(!recipientUserId) return null;
     var userIds = item.getUserIds();
-    var otherUserId = userIds.filter(function(userId) { return userId != senderUserId; })[0];
-    if(otherUserId) return "/one-one/" + otherUserId;
+    var userId = userIds.filter(function(userId) { return userId != recipientUserId; })[0];
+    return userId;
+  }
+
+  function getOtherUserUrl(item) {
+    var userId = getOtherUserId(item);
+    if(userId) {
+      return "/one-one/" + userId;
+    }
+
     return null;
   }
 
   this.map = function(item) {
-    return {
+    var user = null;
+    if(item.oneToOne) {
+      var otherUserId = getOtherUserId(item);
+      user = otherUserId && userStategy.map(otherUserId);
+    }
+
+    var t = {
       id: item.id,
-      name: item.name,
+      name: user ? user.displayName : item.name,
       uri: item.uri,
       oneToOne: item.oneToOne,
       userIds: item.getUserIds(),
       url: item.oneToOne ? getOtherUserUrl(item) : "/" + item.uri
     };
+
+    return t;
   };
 }
 
@@ -167,19 +206,23 @@ function RequestStrategy(options) {
   if(!options) options = {};
 
   var userStategy = new UserIdStrategy();
-  var troupeStrategy = new TroupeIdStrategy(options);
+  var troupeStrategy = options.includeTroupe && new TroupeIdStrategy(options);
 
   this.preload = function(requests, callback) {
     var userIds =  requests.map(function(item) { return item.userId; });
-    var troupeIds = requests.map(function(item) { return item.troupeId; });
 
     var strategies = [{
       strategy: userStategy,
       data: _.uniq(userIds)
-    },{
-      strategy: troupeStrategy,
-      data: _.uniq(troupeIds)
     }];
+
+    if(troupeStrategy) {
+      var troupeIds = requests.map(function(i) { return i.troupeId; });
+      strategies.push({
+        strategy: troupeStrategy,
+        data: troupeIds
+      });
+    }
 
     execPreloads(strategies, callback);
 
@@ -189,7 +232,7 @@ function RequestStrategy(options) {
     return {
       id: item._id,
       user: userStategy.map(item.userId),
-      troupe: troupeStrategy.map(item.troupeId)
+      troupe: troupeStrategy && troupeStrategy.map(item.troupeId)
     };
   };
 }
@@ -219,6 +262,7 @@ function idStrategyGenerator(FullObjectStrategy, loaderFunction) {
 
     this.map = function(id) {
       var fullObject = self.objectHash[id];
+
       if(!fullObject) {
         winston.warn("Unable to locate object ", { id: id });
         return null;

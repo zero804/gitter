@@ -305,6 +305,7 @@ define([
       } else {
         // log("Enabling infinite scroll");
         ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
+        self.scrollDelegate.scrollToBottom();
       }
     },
 
