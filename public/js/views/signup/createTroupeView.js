@@ -19,7 +19,9 @@ define([
       this.existingUser = options.existingUser;
 
       if (window.troupeContext) {
-        this.isOneToOne = window.troupeContext.troupe.oneToOne;
+        if (window.troupeContext.troupe) {
+          this.isOneToOne = window.troupeContext.troupe.oneToOne;
+        }
       } else {
         this.isOneToOne = false;
       }

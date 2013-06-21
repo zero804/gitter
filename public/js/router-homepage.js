@@ -9,6 +9,7 @@ require([
   'views/base',
   'components/dozy',
   'views/app/appIntegratedView',
+  'views/userHome/userHomeView',
   'collections/instances/troupes',
   'views/profile/profileView',
   'views/signup/createTroupeView',
@@ -17,7 +18,7 @@ require([
   'views/toolbar/troupeMenu',
   'utils/router',
   'components/errorReporter'
-], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, dozy, AppIntegratedView, troupeCollections,
+], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, dozy, AppIntegratedView, UserHomeView, troupeCollections,
   profileView, createTroupeView, headerViewTemplate, webNotifications, TroupeMenuView, Router /*, errorReporter , FilteredCollection */) {
   "use strict";
 
@@ -25,7 +26,8 @@ require([
   app.collections = {};
   app.addRegions({
     rightPanelRegion: "#right-panel",
-    headerRegion: "#header-region"
+    headerRegion: "#header-region",
+    homeRegion: "#frame-chat"
   });
 
   /* This is a special region which acts like a region, but is implemented completely differently */
@@ -54,12 +56,16 @@ require([
 
   app.addInitializer(function(/*options*/){
 
+    new UserHomeView({ el: '#chat-frame' }).render();
+
     var headerView = new (TroupeViews.Base.extend({
       template: headerViewTemplate,
       getRenderData: function() {
         return { user: window.troupeContext.user, troupeContext: troupeContext };
       }
     }))();
+
+
 
     app.headerRegion.show(headerView);
 
