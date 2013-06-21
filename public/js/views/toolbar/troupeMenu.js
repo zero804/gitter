@@ -12,6 +12,7 @@ define([
 
   return Backbone.Marionette.Layout.extend({
     template: template,
+    tagName: 'span',
     selectedListIcon: "icon-mega",
 
     regions: {
