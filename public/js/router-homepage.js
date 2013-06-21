@@ -7,35 +7,23 @@ require([
   'marionette',
   'template/helpers/all',
   'views/base',
-  'components/realtime',
   'components/dozy',
   'views/app/appIntegratedView',
   'collections/instances/troupes',
-  'views/toolbar/troupeCollectionView',
   'views/profile/profileView',
   'views/signup/createTroupeView',
-  'views/app/invitesView',
   'hbs!./views/app/tmpl/appHeader',
   'components/webNotifications',
+  'views/toolbar/troupeMenu',
   'utils/router',
-  'components/errorReporter',
-  'filtered-collection'
-], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, realtime, dozy, AppIntegratedView,
-            troupeCollections, TroupeCollectionView, profileView,
-            createTroupeView, InvitesView, headerViewTemplate,
-            webNotifications, Router /*, errorReporter , FilteredCollection */) {
+  'components/errorReporter'
+], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, dozy, AppIntegratedView, troupeCollections,
+  profileView, createTroupeView, headerViewTemplate, webNotifications, TroupeMenuView, Router /*, errorReporter , FilteredCollection */) {
   "use strict";
 
   var app = new Marionette.Application();
   app.collections = {};
   app.addRegions({
-    leftMenuUnread: "#left-menu-list-unread",
-    leftMenuInvites: "#left-menu-list-invites",
-    leftMenuRecent: "#left-menu-list-recent",
-    leftMenuFavourites: "#left-menu-list-favourites",
-    leftMenuTroupes: "#left-menu-list",
-    leftMenuPeople: "#left-menu-list-users",
-    leftMenuSearch: "#left-menu-list-search",
     rightPanelRegion: "#right-panel",
     headerRegion: "#header-region"
   });
@@ -62,14 +50,7 @@ require([
 
   var router;
   new AppIntegratedView({ app: app });
-
-  // Troupe Collections
-  var filteredTroupeCollection = troupeCollections.normalTroupes;
-  var peopleOnlyTroupeCollection = troupeCollections.peopleTroupes;
-  var unreadTroupeCollection = troupeCollections.unreadTroupes;
-  var favouriteTroupesCollection = troupeCollections.favouriteTroupes;
-  var recentTroupeCollection = troupeCollections.recentTroupes;
-  var incomingInvitesCollection = troupeCollections.incomingInvites;
+  new TroupeMenuView({ app: app });
 
   app.addInitializer(function(/*options*/){
 
@@ -83,27 +64,6 @@ require([
     app.headerRegion.show(headerView);
 
     $('#mail-list').hide();
-
-    // add the troupe views to the left menu
-
-    // recent troupe view
-    app.leftMenuRecent.show(new TroupeCollectionView({ collection: recentTroupeCollection }));
-
-    // normal troupe view
-    app.leftMenuTroupes.show(new TroupeCollectionView({collection: filteredTroupeCollection }));
-
-    // one to one troupe view
-    app.leftMenuPeople.show(new TroupeCollectionView({collection: peopleOnlyTroupeCollection }));
-
-    // unread troupe view
-    app.leftMenuUnread.show(new TroupeCollectionView({collection: unreadTroupeCollection }));
-
-    // favourite troupe view
-    app.leftMenuFavourites.show(new TroupeCollectionView({ collection: favouriteTroupesCollection }));
-
-    // incoming invites collection view
-    app.leftMenuInvites.show(new InvitesView({ collection: incomingInvitesCollection }));
-
   });
 
   app.on("initialize:after", function(){
