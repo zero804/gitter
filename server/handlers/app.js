@@ -235,9 +235,15 @@ function preloadTroupeMiddleware(req, res, next) {
 
     // check if the user has access
     if(req.user && troupe && !troupeService.userHasAccessToTroupe(req.user, troupe)) {
+
+      console.log('INVITE????? ');
+
       // if not, check if the user has an unused invite
       troupeService.findUnusedInviteToTroupeForEmail(req.user.email, troupe.id, function(err, invite) {
         if (err) next(err);
+
+
+        console.log('INVITE????? ', invite);
 
         if (invite) {
           req.invite = invite;
@@ -259,6 +265,8 @@ function uriContextResolverMiddleware(req, res, next) {
   uriService.findUri(appUri, req.user && req.user.id)
     .then(function(result) {
       if(result.notFound) return next(404);
+
+      console.log('URI info for you ', result);
 
       req.troupe = result.troupe;
       req.uriContext = result;
@@ -283,13 +291,16 @@ function preloadOneToOneTroupeMiddleware(req, res, next) {
     return 1;
   }
 
-  troupeService.findOrCreateOneToOneTroupe(req.user.id, req.params.userId, function(err, troupe, otherUser) {
-    if (err) return next({ errorCode: 500, error: err });
-    if(!troupe) return next({ errorCode: 404 });
-    req.otherUser = otherUser;
-    req.troupe = troupe;
-    next();
-  });
+  troupeService.findOrCreateOneToOneTroupe(req.user.id, req.params.userId)
+    .spread(function(troupe, otherUser) {
+      if(!troupe) return next({ errorCode: 404 });
+      req.otherUser = otherUser;
+      req.troupe = troupe;
+      next();
+    })
+    .fail(function(err) {
+      return next({ errorCode: 500, error: err });
+    });
 
 }
 
@@ -321,6 +332,12 @@ module.exports = {
         preloadOneToOneTroupeMiddleware,
 
         function(req, res, next) {
+          // If the user has a username, use that instead
+          if(req.otherUser.username) {
+            res.relativeRedirect('/' + req.otherUser.username);
+            return;
+          }
+
           renderAppPageWithTroupe(req, res, next, 'app-integrated', req.troupe, req.otherUser.displayName);
         }
       );

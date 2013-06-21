@@ -1,20 +1,13 @@
 /*jshint unused:true, browser:true */
 define([
   'jquery',
-  'underscore',
-  'backbone',
+  'marionette',
   'views/app/uiVars',
-  'fineuploader',
-  "nanoscroller",
-  "views/base",
-  "views/signup/usernameView",
-  'log!app-integrated-view',
-  'components/unread-items-client',
-  'collections/instances/troupes'
-  ], function($, _, Backbone, uiVars, qq, _nano, TroupeViews, UsernameView, log, unreadItemsClient, troupeCollections) {
+  "nanoscroller" // no ref
+  ], function($, Marionette, uiVars) {
   "use strict";
 
-  return Backbone.Marionette.Layout.extend({
+  return Marionette.Layout.extend({
     el: 'body',
     leftmenu: false,
     rightpanel: false,

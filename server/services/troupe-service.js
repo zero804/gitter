@@ -321,11 +321,17 @@ function findUnusedInviteToTroupeForEmail(email, troupeId, callback) {
 }
 
 
+function findUnusedInviteToTroupeForUserId(userId, troupeId, callback) {
+  return persistence.Invite.findOneQ({ troupeId: troupeId, userId: userId, status: 'UNUSED' }).nodeify(callback);
+}
+
+
 function findAllUnusedInvitesForUserId(userId, callback) {
-  persistence.Invite.where('userId').equals(userId)
+  return persistence.Invite.where('userId').equals(userId)
     .where('status').equals('UNUSED')
     .sort({ displayName: 'asc', email: 'asc' } )
-    .exec(callback);
+    .execQ()
+    .nodeify(callback);
 }
 
 function findAllUnusedInvitesForEmail(email, callback) {
@@ -1001,6 +1007,7 @@ module.exports = {
   findAllUnusedInvitesForTroupe: findAllUnusedInvitesForTroupe,
   findAllUnusedInvitesForEmail: findAllUnusedInvitesForEmail,
   findAllUnusedInvitesForUserId: findAllUnusedInvitesForUserId,
+  findUnusedInviteToTroupeForUserId: findUnusedInviteToTroupeForUserId,
 
   addRequest: addRequest,
   findRequestsByIds: findRequestsByIds,
