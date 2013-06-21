@@ -1,21 +1,39 @@
-<div>
-  {{#if troupeContext.troupe.oneToOne}}
-  {{else}}
-  <div class="trpSettingsButton">
-    <a href="#|troupeSettings">
-      <img src='{{cdn "images/2/icon-settings-black.png" }}' style="opacity: 0.6" width="24" height="24">
-    </a>
+<div class="trpHeaderFrame" id="header-frame">
+  {{#if isTroupe}}
+  <div class="trpHeaderFavourite {{#if troupeContextData.troupe.favourite}}favourited{{/if}}">
+    <img src='{{cdn "images/2/icon-favourite-selected.png" }}' class="trpHeaderFavIcon favourited" width="24" height="24">
+    <img src='{{cdn "images/2/icon-favourite-unselected.png" }}' class="trpHeaderFavIcon unfavourited" width="24" height="24">
   </div>
   {{/if}}
-  <div class="trpProfileButton">
-   {{ widget "avatar" user=user size='xs' }}
+  <div class="trpHeaderContainer">
+    <div class="trpHeaderTitle">
+      {{headerTitle}}
+    </div>
+    <div class="trpHeaderToolbar" id="header-region">
+      <div>
+        {{#if isTroupe}}
+        {{#if troupeContext.troupe.oneToOne}}
+        {{else}}
+        <div class="trpSettingsButton">
+          <a href="#|troupeSettings">
+            <img src='{{cdn "images/2/icon-settings-black.png" }}' style="opacity: 0.6" width="24" height="24">
+          </a>
+        </div>
+        {{/if}}
+        {{/if}}
+        <div class="trpProfileButton">
+         {{ widget "avatar" user=user size='xs' }}
+        </div>
+        <div class="trpProfileMenu">
+          <span class="trpProfileItem">
+            <a href="#|profile" id="link-profile">Profile</a>
+          </span>
+          <span class="trpProfileItem">
+            <a href="/signout" id="link-signout">Sign Out</a>
+          </span>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="trpProfileMenu">
-    <span class="trpProfileItem">
-      <a href="#|profile" id="link-profile">Profile</a>
-    </span>
-    <span class="trpProfileItem">
-      <a href="/signout" id="link-signout">Sign Out</a>
-    </span>
-  </div>
+  <div class="trpHeaderSpacer"></div>
 </div>
