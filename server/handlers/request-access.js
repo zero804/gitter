@@ -1,37 +1,40 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var form = require("express-form"),
-    filter = form.filter,
-    validate = form.validate,
-    signupService = require("../services/signup-service"),
+var middleware = require('../web/middleware');
+var signupService = require("../services/signup-service"),
     troupeService = require("../services/troupe-service"),
-    passport = require('passport'),
+    uriService = require("../services/uri-service"),
     winston = require('winston');
+var expressValidator = require('express-validator');
 
 module.exports = {
     install: function(app) {
 
       app.post(
         '/requestAccessNewUser',
-
-        // Form filter and validation middleware
-        form(
-          filter("name").trim(),
-          validate("troupeUri").required().is(/^[a-zA-Z0-9]+$/),
-          validate("name").required().is(/^[^<>]+$/),
-          filter("email").trim(),
-          validate("email").isEmail()
-        ),
+        expressValidator({}),
 
         function(req, res) {
-          if (!req.form.isValid) {
-            winston.info("User form has errors", { errors: req.form.errors } );
+          req.sanitize('name').trim();
+          req.sanitize('name').xss();
 
-            return res.send(400, { validationFailed: true, errors: req.form.errors });
+          req.sanitize('email').trim();
+          req.sanitize('email').xss();
+
+          req.checkBody('name', 'Invalid name').notEmpty().is(/^[^<>]{2,}$/);
+          req.checkBody('email', 'Invalid email address').notEmpty().isEmail();
+          req.checkBody('troupeUri', 'Invalid troupeUri').notEmpty();
+
+
+          var mappedErrors = req.validationErrors(true);
+
+          if (mappedErrors) {
+            res.send({ success: false, validationFailed: true, errors: mappedErrors}, 400);
+            return;
           }
 
-          signupService.newUnauthenticatedAccessRequest(req.form.troupeUri, req.form.email, req.form.name, function(err) {
+          signupService.newUnauthenticatedAccessRequest(req.body.troupeUri, req.body.email, req.body.name, function(err) {
             if (err) {
               var e = { success: false };
 
@@ -39,7 +42,7 @@ module.exports = {
                 e.userExists = true;
               }
 
-              res.send(e);
+              res.send(e, 400);
               return;
             }
 
@@ -50,32 +53,45 @@ module.exports = {
 
       app.post(
         '/requestAccessExistingUser',
+        middleware.ensureLoggedIn(),
+        expressValidator({}),
 
-        // Form filter and validation middleware
-        form(
-          validate("troupeUri").required().is(/^[a-zA-Z0-9]+$/)
-        ),
+        function(req, res, next) {
+          req.checkBody('troupeUri', 'Invalid troupeUri').notEmpty();
 
-        function(req, res) {
-          winston.info("Form", req.form);
-          if (!req.form.isValid) {
-            // TODO: Handle errors
-            winston.info("User form has errors", req.form.errors);
-            /* TODO: make this nice */
-            return res.send(500);
+          var mappedErrors = req.validationErrors(true);
+
+          if (mappedErrors) {
+            res.send({ success: false, validationFailed: true, errors: mappedErrors}, 400);
+            return;
           }
 
-          troupeService.findByUri(req.form.troupeUri, function(err, troupe) {
-            if(err) { winston.error("findByUri failed", err); return  res.send(500); }
-            if(!troupe) { winston.error("No troupe with uri", req.form.troupeUri); return res.send(404); }
+          var uri = req.body.troupeUri;
+          var fromUserId = req.user.id;
 
+          uriService.findUri(uri)
+              .then(function(result) {
+                if(!result) { winston.error("No troupe with uri: " + uri); return next(404); }
 
-            troupeService.addRequest(troupe.id, req.user.id, function(err, request) {
-              if(err) return res.send(500);
-              res.send({ success: true });
-            });
+                var toTroupe = result.troupe;
+                var toUser = result.user;
 
-          });
+                if(toUser) {
+                  // Invite the user to connect
+                  return troupeService.findOrCreateOneToOneInvite(fromUserId, toUser.id);
+                }
+
+                if(toTroupe) {
+                  // Request access to a troupe
+                  return troupeService.addRequest(toTroupe.id, fromUserId);
+                }
+
+                throw new Error('Expected either a troupe or user attribute');
+              })
+              .then(function() {
+                res.send({ success: true });
+              })
+              .fail(next);
         }
       );
     }
