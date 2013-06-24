@@ -8,7 +8,7 @@ exports.whereToNext = function(user, callback) {
 
   troupeService.findBestTroupeForUser(user, function(err, troupe) {
     if(err) return callback(err);
-    if(!troupe) return callback();
+    if(!troupe) return callback(null, user.username);
 
     return callback(null, troupe.getUrl(user.id));
   });
