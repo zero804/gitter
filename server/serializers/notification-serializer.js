@@ -173,13 +173,9 @@ function TroupeStrategy(options) {
     return userId;
   }
 
-  function getOtherUserUrl(item) {
-    var userId = getOtherUserId(item);
-    if(userId) {
-      return "/one-one/" + userId;
-    }
-
-    return null;
+  function getOtherUserUrl(user) {
+    if(!user) return undefined;
+    return user.username ? "/" + user.username : "/one-one/" + user.id;
   }
 
   this.map = function(item) {
@@ -195,7 +191,7 @@ function TroupeStrategy(options) {
       uri: item.uri,
       oneToOne: item.oneToOne,
       userIds: item.getUserIds(),
-      url: item.oneToOne ? getOtherUserUrl(item) : "/" + item.uri
+      url: item.oneToOne ? getOtherUserUrl(user) : "/" + item.uri
     };
 
     return t;

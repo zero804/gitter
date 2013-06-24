@@ -716,7 +716,7 @@ function TroupeStrategy(options) {
     if(item.oneToOne) {
       if(otherUser) {
         troupeName = otherUser.displayName;
-        troupeUrl = "/one-one/" + otherUser.id;
+        troupeUrl = otherUser.username ? "/" + otherUser.username : "/one-one/" + otherUser.id;
       } else {
         winston.verbose("Unable to map troupe bits as something has gone horribly wrong");
         // This should technically never happen......
