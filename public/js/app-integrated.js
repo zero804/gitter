@@ -18,6 +18,7 @@ require([
   'views/request/requestView',
   'collections/instances/integrated-items',
   'collections/instances/troupes',
+  'views/righttoolbar/rightToolbarView',
   'views/file/fileDetailView',
   'views/file/filePreviewView',
   'views/file/fileVersionsView',
@@ -37,7 +38,7 @@ require([
   'components/errorReporter',
   'filtered-collection'
 ], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, realtime, eyeballs, dozy, AppIntegratedView, chatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
-            itemCollections, troupeCollections, FileDetailView, filePreviewView, fileVersionsView,
+            itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareSearchView,
             createTroupeView, InvitesView, TroupeHeaderView,
             troupeSettingsView, TroupeMenuView, Router /*, errorReporter , FilteredCollection */) {
@@ -65,6 +66,7 @@ require([
   var appView = new AppIntegratedView({ });
   appView.leftMenuRegion.show(new TroupeMenuView({ }));
   appView.headerRegion.show(new TroupeHeaderView  ());
+  appView.rightToolbarRegion.show(new RightToolbarView());
 
   $('.nano').nanoScroller({ preventPageScrolling: true });
 
@@ -81,25 +83,6 @@ require([
     collection: itemCollections.chats,
     scrollDelegate: chatCollectionView.scrollDelegate
   }).render();
-
-  // Request View
-  appView.requestRegion.show(new RequestView({ collection: itemCollections.requests }));
-
-  // File View
-  appView.fileRegion.show(new FileView({ collection: itemCollections.files }));
-
-  // Conversation View
-  if (!window.troupeContext.troupe.oneToOne) {
-    var conversationView = new ConversationView({
-      collection: itemCollections.conversations
-    });
-    appView.mailRegion.show(conversationView);
-  } else {
-    $('#mail-list').hide();
-  }
-
-  // People View
-  appView.peopleRosterRegion.show(new PeopleCollectionView({ collection: itemCollections.users }));
 
   new Router({
     routes: [

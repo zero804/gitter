@@ -22,6 +22,7 @@ define([
       mailRegion: ".frame-conversations",
       requestRegion: "#request-roster",
       rightPanelRegion: "#right-panel",
+      rightToolbarRegion: "#right-toolbar",
       headerRegion: "#header-wrapper"
     },
 
