@@ -325,6 +325,16 @@ function findUnusedInviteToTroupeForUserId(userId, troupeId, callback) {
   return persistence.Invite.findOneQ({ troupeId: troupeId, userId: userId, status: 'UNUSED' }).nodeify(callback);
 }
 
+function updateInvitesForEmailToUserId(email, userId, callback) {
+  return persistence.Invite.updateQ(
+    { email: email },
+    { userId: userId },
+    { multi: true })
+    .then(function() {
+      return true;
+    })
+    .nodeify(callback);
+}
 
 function findAllUnusedInvitesForUserId(userId, callback) {
   return persistence.Invite.where('userId').equals(userId)
@@ -1008,6 +1018,8 @@ module.exports = {
   findAllUnusedInvitesForEmail: findAllUnusedInvitesForEmail,
   findAllUnusedInvitesForUserId: findAllUnusedInvitesForUserId,
   findUnusedInviteToTroupeForUserId: findUnusedInviteToTroupeForUserId,
+
+  updateInvitesForEmailToUserId: updateInvitesForEmailToUserId,
 
   addRequest: addRequest,
   findRequestsByIds: findRequestsByIds,
