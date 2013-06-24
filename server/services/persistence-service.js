@@ -249,7 +249,8 @@ TroupeRemovedUserSchema.schemaTypeName = 'TroupeRemovedUserSchema';
 // An invitation to a person to join a Troupe
 //
 var InviteSchema = new Schema({
-  troupeId: ObjectId,
+  troupeId:           { type: ObjectId },
+  oneToOneUserId:     { type: ObjectId },
   senderDisplayName:  { type: String },
   displayName:        { type: String },
   email:              { type: String },
@@ -261,6 +262,8 @@ var InviteSchema = new Schema({
   _tv:                { type: 'MongooseNumber', 'default': 0 }
 });
 InviteSchema.schemaTypeName = 'InviteSchema';
+InviteSchema.index({ userId: 1 });
+InviteSchema.index({ email: 1 });
 
 //
 // A request by a user to join a Troupe

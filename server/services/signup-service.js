@@ -137,10 +137,15 @@ var signupService = module.exports = {
 
         winston.verbose("User email address change complete, finding troupe to redirect to", { id: user.id, status: user.status });
 
-        troupeService.findBestTroupeForUser(user, function(err, troupe) {
-          if(err) return callback(new Error("Error finding troupes for user"));
+        troupeService.updateInvitesForEmailToUserId(newEmail, user.id, function(err) {
+          if(err) return callback(err);
 
-          return callback(err, user, troupe);
+          troupeService.findBestTroupeForUser(user, function(err, troupe) {
+            if(err) return callback(new Error("Error finding troupes for user"));
+
+            return callback(err, user, troupe);
+          });
+
         });
 
       });
@@ -167,9 +172,15 @@ var signupService = module.exports = {
     user.save(function(err) {
       if(err) return callback(err);
 
-      winston.verbose("User saved.", { id: user.id, status: user.status });
+      troupeService.updateInvitesForEmailToUserId(user.email, user.id, function(err) {
+        if(err) return callback(err);
 
-      return callback(err, user);
+        winston.verbose("User saved.", { id: user.id, status: user.status });
+
+        return callback(err, user);
+      });
+
+
     });
 
   },
@@ -199,7 +210,7 @@ var signupService = module.exports = {
   resendConfirmationForUser: function(email, callback) {
     userService.findByEmail(email, function(err, user) {
       if(err || !user) return callback(err, null);
-      
+
       sendNotification(user);
 
       callback(null, user);
