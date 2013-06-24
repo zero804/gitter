@@ -325,6 +325,13 @@ function findUnusedInviteToTroupeForUserId(userId, troupeId, callback) {
   return persistence.Invite.findOneQ({ troupeId: troupeId, userId: userId, status: 'UNUSED' }).nodeify(callback);
 }
 
+function findUnusedOneToOneInviteFromUserIdToUserId(fromUserId, toUserId, callback) {
+  return persistence.Invite.findOneQ({
+      fromOneToOneUserId: fromUserId,
+      userId: toUserId,
+      status: 'UNUSED'
+    }).nodeify(callback);
+}
 function updateInvitesForEmailToUserId(email, userId, callback) {
   return persistence.Invite.updateQ(
     { email: email },
@@ -546,6 +553,27 @@ function createOneToOneTroupe(userId1, userId2, callback) {
     }).nodeify(callback);
 }
 
+// Returns true if the two users share a common troupe
+// In future, will also return true if the users share an organisation
+function findImplicitConnectionBetweenUsers(userId1, userId2, callback) {
+  return persistence.Troupe.findOneQ({
+          $and: [
+            { 'users.userId': userId1 },
+            { 'users.userId': userId2 }
+          ]
+        }, "_id")
+    .then(function(troupe) {
+      return !!troupe;
+    })
+    .nodeify(callback);
+}
+
+/**
+ * Find a one-to-one troupe, otherwise create it if possible (if there is an implicit connection),
+ * otherwise return the existing invite if possible
+ *
+ * @return {[ troupe, other-user, invite ]}
+ */
 function findOrCreateOneToOneTroupe(currentUserId, userId2, callback) {
   if(currentUserId == userId2) return callback("You cannot be in a troupe with yourself.");
 
@@ -553,6 +581,7 @@ function findOrCreateOneToOneTroupe(currentUserId, userId2, callback) {
     .then(function(user2) {
       if(!user2) throw "User does not exist";
 
+      /* Find the existing one-to-one.... */
       return [user2, persistence.Troupe.findOneQ({
         $and: [
           { oneToOne: true },
@@ -564,13 +593,33 @@ function findOrCreateOneToOneTroupe(currentUserId, userId2, callback) {
     .spread(function(user2, troupe) {
 
       // Found the troupe? Perfect!
-      if(troupe) return [ troupe, user2 ];
+      if(troupe) return [ troupe, user2, null ];
 
-      // Otherwise, create it
-      return createOneToOneTroupe(currentUserId, userId2)
-        .then(function(troupe) {
-          return [ troupe, user2 ];
-        });
+      return findImplicitConnectionBetweenUsers(currentUserId, userId2)
+          .then(function(implicitConnection) {
+            if(implicitConnection) {
+              // There is an implicit connection between these two users,
+              // automatically create the troupe
+              return createOneToOneTroupe(currentUserId, userId2)
+                .then(function(troupe) {
+                  return [ troupe, user2, null ];
+                });
+            }
+
+            // There is no implicit connection between the users, don't create the troupe
+            // However, do tell the caller whether or not this user already has an invite to the
+            // other user to connect
+
+            // Otherwise the users cannot onnect the and the user will need to invite the other user
+            // to connect explicitly.
+            // Check if the user has already invited the other user to connect
+            return findUnusedOneToOneInviteFromUserIdToUserId(currentUserId, userId2)
+              .then(function(invite) {
+                return [ null, user2, invite ];
+              });
+
+          });
+
     })
     .nodeify(callback);
 
