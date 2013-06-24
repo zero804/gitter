@@ -250,7 +250,7 @@ TroupeRemovedUserSchema.schemaTypeName = 'TroupeRemovedUserSchema';
 //
 var InviteSchema = new Schema({
   troupeId:           { type: ObjectId },
-  oneToOneUserId:     { type: ObjectId },
+  fromOneToOneUserId: { type: ObjectId },
   senderDisplayName:  { type: String },
   displayName:        { type: String },
   email:              { type: String },
