@@ -21,7 +21,7 @@ define([
       // once this widget has the id of the user,
       // it will listen to changes on the global user collection,
       // so that it knows when to update.
-      var avatarChange = _.bind(function avatarChangeUnbound(event, data) {
+      var avatarChange = _.bind(function(event, data) {
 
         if(data.id === self.getUserId()) {
           if(self.user) {
@@ -123,6 +123,7 @@ define([
           container: "body"
         });
       }
+      return this;
     }
 
   });

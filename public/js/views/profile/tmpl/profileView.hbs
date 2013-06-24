@@ -1,6 +1,6 @@
 <div class="trpModalProfile">
   <div class="trpModalProfilePic">
-   {{ widget "avatar" user=user size='s' }}
+    <div id="frame-profile">{{ widget "avatar" user=user size='s' }}</div>
     <div class="button-choose-avatar trpModalSubtext">Change picture</div>
   </div>
   <form action="/updateprofile" method="post" id="updateprofileform">

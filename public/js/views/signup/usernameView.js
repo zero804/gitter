@@ -105,7 +105,7 @@ define([
 						var username = self.$el.find('input[name=username]').val();
 						var requested = _.findWhere(suggestions, { username: username });
 						if (requested && requested.available) {
-							self.isAvailable();
+							self.isAvailable(username);
 						}
 						else {
 							self.isUnavailable();
@@ -119,10 +119,11 @@ define([
 			return true;
 		},
 
-		isAvailable: function () {
+		isAvailable: function (username) {
 			this.valid = true;
 			this.$el.find('.not-valid-message').hide();
 			this.$el.find('.valid-message').show();
+			$("#show-user-name").text(username);
 		},
 
 		isUnavailable: function () {
