@@ -17,10 +17,12 @@ define([
         this.view = new View({ });
       },
       getRenderData: function() {
-        var data = {
-          username: window.troupeContext.user.username
+        var c = window.troupeContext;
+        return {
+          username: c.user.username,
+          basePath: c.basePath,
+          baseServer: c.baseServer
         };
-        return data;
       }
     });
   });

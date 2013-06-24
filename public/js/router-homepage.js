@@ -29,7 +29,19 @@ require([
 
   new UserHomeView({ el: '#chat-frame' }).render();
 
-  $('#mail-list').hide();
+  // Asynchronously load tracker
+  require(['utils/tracking'], function() { });
+
+  if(window.troupeContext.profileNotCompleted) {
+   var view = new profileView.Modal({ disableClose: true  });
+
+   view.once('close', function() {
+     window.location.reload(true);
+   });
+   view.show();
+
+   return;
+  }
 
   new Router({
       routes: [
@@ -40,9 +52,5 @@ require([
     });
 
   Backbone.history.start();
-
-
-  // Asynchronously load tracker
-  require(['utils/tracking'], function() { });
 
 });

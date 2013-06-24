@@ -263,7 +263,7 @@ var userService = {
   checkPassword: function(user, password, callback) {
     if(!user.passwordHash) {
       /* User has not yet set their password */
-      callback(false);
+      return callback(false);
     }
 
     sechash.testHash(password, user.passwordHash, function(err, match) {
