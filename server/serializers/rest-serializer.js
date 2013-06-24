@@ -720,8 +720,7 @@ function TroupeStrategy(options) {
       } else {
         winston.verbose("Unable to map troupe bits as something has gone horribly wrong");
         // This should technically never happen......
-        troupeName = null;
-        troupeUrl = null;
+        return undefined;
       }
     } else {
         troupeName = item.name;
@@ -854,7 +853,7 @@ function serialize(items, strat, callback) {
       return callback(err);
     }
 
-    callback(null, pkg(items.map(strat.map)));
+    callback(null, pkg(items.map(strat.map).filter(function(f) { return f !== undefined; })));
   });
 
 }
