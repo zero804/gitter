@@ -118,7 +118,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
         profileNotCompleted = (status == 'PROFILE_NOT_COMPLETED') || (status == 'UNCONFIRMED');
       }
 
-      var login = !user || profileNotCompleted;
+      var login = !user || profileNotCompleted || accessDenied;
 
       var troupeContext = createTroupeContext(req, {
         user: serializedUser,
