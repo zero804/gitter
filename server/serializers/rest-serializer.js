@@ -858,6 +858,13 @@ function serialize(items, strat, callback) {
 
 }
 
+function serializeQ(items, strat) {
+  var d = Q.defer();
+  serialize(items, strat, d.makeNodeResolver());
+  return d.promise;
+}
+
+
 // TODO: deprecate this....
 function getStrategy(modelName, toCollection) {
   switch(modelName) {
@@ -942,6 +949,7 @@ function serializeModel(model, callback) {
   serialize(model, strategy, callback);
 }
 
+
 module.exports = {
   UserStrategy: UserStrategy,
   UserIdStrategy: UserIdStrategy,
@@ -960,5 +968,6 @@ module.exports = {
   getStrategy: getStrategy,
   execPreloads: execPreloads,
   serialize: serialize,
+  serializeQ: serializeQ,
   serializeModel: serializeModel
 };

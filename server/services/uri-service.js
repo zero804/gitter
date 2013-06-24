@@ -10,7 +10,11 @@ var Q = require('q');
  * @param  {String}   uri
  * @param  {String or ObjectId}   userId
  * @param  {Function} callback
- * @return {promise}  one of the following values: { ownUrl: true },  { oneToOne: true, troupe: x, otherUser: y }, { troupe: troupe }, { notFound: true }
+ * @return {promise}  one of the following values:
+ *  { ownUrl: true },
+ *  { oneToOne: true, troupe: x, otherUser: y },
+ *  { troupe: troupe, group: true, access: true/false, invite: invite },
+ *  { notFound: true }
  */
 exports.findUri = function(uri, userId, callback) {
   uri = uri.toLowerCase();
@@ -29,8 +33,9 @@ exports.findUri = function(uri, userId, callback) {
         }
 
         return troupeService.findOrCreateOneToOneTroupe(userId, user.id)
-          .spread(function(troupe, otherUser) {
-            return { oneToOne: true, troupe: troupe, otherUser: otherUser };
+          .spread(function(troupe, otherUser, invite) {
+            return { oneToOne: true, troupe: troupe, otherUser: otherUser, access: !!troupe, invite: invite };
+
           });
 
       }),
@@ -41,21 +46,20 @@ exports.findUri = function(uri, userId, callback) {
         return oneToOneTroupeContext;
       }
 
-      // Troupe URL?
-      if(troupe) {
-        if(troupeService.userIdHasAccessToTroupe(userId, troupe)) {
-
-          return { troupe: troupe, group: true, access: true };
-        }
-
-        return troupeService.findUnusedInviteToTroupeForUserId(userId, troupe.id)
-          .then(function(invite) {
-            return { troupe: troupe, group: true, access: false, invite: invite };
-          });
+      if(!troupe) {
+        // Otherwise, nothing
+        return { notFound: true };
       }
 
-      // Otherwise, nothing
-      return { notFound: true };
+      if(troupeService.userIdHasAccessToTroupe(userId, troupe)) {
+        return { troupe: troupe, group: true, access: true };
+      }
+
+      return troupeService.findUnusedInviteToTroupeForUserId(userId, troupe.id)
+        .then(function(invite) {
+          return { troupe: troupe, group: true, access: false, invite: invite };
+        });
+
 
     }).nodeify(callback);
 
