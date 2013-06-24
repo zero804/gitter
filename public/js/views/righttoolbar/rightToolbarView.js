@@ -12,6 +12,7 @@ define([
   "use strict";
 
   return Backbone.Marionette.Layout.extend({
+    tagName: "span",
     template: rightToolbarTemplate,
 
     regions: {
@@ -22,13 +23,9 @@ define([
       sidebar: "#right-panel"
     },
 
-    afterRender: function() {
+    onRender: function() {
       var self = this;
 
-      //this.requests.show();
-      //this.people.show();
-      //this.files.show();
-      //this.conversations.show();
       //this.sidebar.show();
 
       // reference collections
