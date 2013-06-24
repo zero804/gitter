@@ -26,9 +26,27 @@ function getWebToken(user) {
 }
 
 function serializeTroupe(troupe, user) {
-  var strategy = new restSerializer.TroupeStrategy({ currentUserId: user ? user.id : null, mapUsers: true });
+  var strategy = new restSerializer.TroupeStrategy({ currentUserId: user ? user.id : null });
 
   return restSerializer.serializeQ(troupe, strategy);
+}
+
+function fakeSerializedTroupe(uriContext) {
+  var oneToOne = uriContext.oneToOne;
+  var otherUser = uriContext.otherUser;
+  var troupe = uriContext.troupe;
+
+  var uri = (oneToOne ?  (otherUser.username || "one-one/" + otherUser.id ) : troupe.uri);
+
+  var url = "/" + uri;
+
+  return {
+    oneToOne: oneToOne,
+    uri: uri,
+    url: url,
+    name: otherUser && otherUser.username ? otherUser.username : 'Welcome'
+  };
+
 }
 
 
@@ -108,9 +126,8 @@ function renderAppPageWithTroupe(req, res, next, page) {
   Q.all([
     user ? serializeUser(user) : null,
     user ? getWebToken(user) : null,
-    troupe && user ? serializeTroupe(troupe, user) : null ])
+    troupe && user ? serializeTroupe(troupe, user) : fakeSerializedTroupe(req.uriContext) ])
     .spread(function(serializedUser, token, serializedTroupe) {
-
 
       var status, profileNotCompleted;
       if(user) {
@@ -133,7 +150,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
         useAppCache: !!nconf.get('web:useAppCache'),
         login: login,
         bootScriptName: login ? "router-login" : "app-integrated",
-        troupeName: serializedTroupe ? serializedTroupe.name : "Welcome",
+        troupeName: serializedTroupe.name,
         troupeContext: JSON.stringify(troupeContext),
         troupeContextData: troupeContext
       });
@@ -145,7 +162,8 @@ function renderAppPageWithTroupe(req, res, next, page) {
 
 function uriContextResolverMiddleware(req, res, next) {
   var appUri = req.params.appUri;
-  uriService.findUri(appUri, req.user && req.user.id)
+
+  uriService.findUriForUser(appUri, req.user && req.user.id)
     .then(function(result) {
       if(result.notFound) return next(404);
 
@@ -317,20 +335,11 @@ module.exports = {
         uriContextResolverMiddleware,
         saveLastTroupeMiddleware,
         function(req, res, next) {
-
-          if (req.troupe) {
-            winston.verbose("Serving troupe page");
-            renderAppPageWithTroupe(req, res, next, 'app-integrated');
-          } else if (req.uriContext.ownUrl) {
-            winston.verbose("Serving viewer's home page");
-            renderHomePage(req, res, next);
-          } else {
-
-            console.log(req.uriContext);
-            winston.verbose("No troupe or user found for this appUri");
-
-            renderAppPageWithTroupe(req, res, next, 'app-integrated');
+          if (req.uriContext.ownUrl) {
+            return renderHomePage(req, res, next);
           }
+
+          renderAppPageWithTroupe(req, res, next, 'app-integrated');
         });
 
       app.get('/:troupeUri/accept/:confirmationCode',
