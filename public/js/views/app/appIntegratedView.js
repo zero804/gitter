@@ -16,13 +16,9 @@ define([
     alertpanel: false,
 
     regions: {
-      peopleRosterRegion: "#people-roster",
-      fileRegion: "#file-list",
       leftMenuRegion: "#left-menu",
-      mailRegion: ".frame-conversations",
-      requestRegion: "#request-roster",
       rightPanelRegion: "#right-panel",
-      rightToolbarRegion: "#right-toolbar",
+      rightToolbarRegion: "#toolbar-frame",
       headerRegion: "#header-wrapper"
     },
 
