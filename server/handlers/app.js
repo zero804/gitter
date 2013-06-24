@@ -74,10 +74,18 @@ function createTroupeContext(req, options) {
 
 
 function renderHomePage(req, res, next) {
-  Q.all([ serializeUser(req.user), getWebToken(req.user) ])
+  var user = req.user;
+
+
+  Q.all([ serializeUser(user), getWebToken(user) ])
     .spread(function(serializedUser, token) {
-      var profileNotCompleted = req.user.status == 'PROFILE_NOT_COMPLETED';
-      var troupeContext = createTroupeContext(req, { user: serializedUser, accessToken: token, profileNotCompleted: profileNotCompleted });
+      var profileNotCompleted = user.status == 'PROFILE_NOT_COMPLETED';
+      var troupeContext = createTroupeContext(req, {
+        user: serializedUser,
+        accessToken: token,
+        profileNotCompleted: profileNotCompleted
+      });
+
       res.render('app-integrated', {
         useAppCache: !!nconf.get('web:useAppCache'),
         bootScriptName: 'router-homepage',
@@ -218,6 +226,11 @@ module.exports = {
         res.redirect(req.path.replace('/s/cdn', ''));
       });
 
+      app.get('/version', function(req, res/*, next*/) {
+        res.json({ appVersion: appVersion.getCurrentVersion() });
+      });
+
+
       app.get('/last',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
@@ -319,11 +332,6 @@ module.exports = {
             renderAppPageWithTroupe(req, res, next, 'app-integrated');
           }
         });
-
-      app.get('/version', function(req, res/*, next*/) {
-        res.json({ appVersion: appVersion.getCurrentVersion() });
-      });
-
 
       app.get('/:troupeUri/accept/:confirmationCode',
         middleware.authenticate('accept', {}),
