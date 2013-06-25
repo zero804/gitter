@@ -1,4 +1,4 @@
-/*jshint unused:strict, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 // TODO: Better transition to request confirm page
 define([

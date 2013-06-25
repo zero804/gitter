@@ -1,4 +1,4 @@
-/*jshint unused:strict, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 require([
   'template/helpers/widget',
   'template/helpers/cdn',
