@@ -68,20 +68,20 @@ var queue = workerQueue.queue('push-notification', {}, function() {
 
           switch(device.deviceType) {
             case 'APPLE':
-              apnsConnection.sendNotification(note, deviceToken);
+              apnsConnection.pushNotification(note, deviceToken);
               break;
 
             case 'APPLE-BETA-DEV':
-              apnsConnectionBetaDev.sendNotification(note, deviceToken);
+              apnsConnectionBetaDev.pushNotification(note, deviceToken);
               break;
 
 
             case 'APPLE-BETA':
-              apnsConnectionBeta.sendNotification(note, deviceToken);
+              apnsConnectionBeta.pushNotification(note, deviceToken);
               break;
 
             case 'APPLE-DEV':
-              apnsConnectionDev.sendNotification(note, deviceToken);
+              apnsConnectionDev.pushNotification(note, deviceToken);
               break;
             default:
               winston.warn('Unknown device type: ' + device.deviceType);
