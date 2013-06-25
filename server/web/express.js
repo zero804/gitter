@@ -153,8 +153,10 @@ module.exports = {
 
       console.error(err);
 
+      var status = err.status;
+
       winston.error("An unexpected error occurred", meta);
-      if (err && err.errorCode === 404) {
+      if (status === 404) {
         res.status(404);
         res.render('404' , {
           homeUrl : nconf.get('web:homeurl')

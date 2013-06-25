@@ -1,7 +1,6 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var troupeService = require("../services/troupe-service");
 var winston = require("winston");
 var userService = require("../services/user-service");
 var restSerializer = require("../serializers/rest-serializer");
