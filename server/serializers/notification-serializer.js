@@ -301,6 +301,14 @@ function serialize(items, strat, callback) {
 
 }
 
+
+function serializeQ(items, strat) {
+  var d = Q.defer();
+  serialize(items, strat, d.makeNodeResolver());
+  return d.promise;
+}
+
+
 // TODO: deprecate this....
 function getStrategy(modelName) {
   switch(modelName) {
@@ -368,5 +376,6 @@ module.exports = {
   TroupeIdStrategy: TroupeIdStrategy,
   getStrategy: getStrategy,
   serialize: serialize,
+  serializeQ: serializeQ,
   serializeModel: serializeModel
 };

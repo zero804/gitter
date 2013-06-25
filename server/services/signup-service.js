@@ -58,15 +58,11 @@ function newTroupeForExistingUser(options, user, callback) {
 function newUser(options, callback) {
   winston.info("New user", options);
 
-  userService.newUser({ email: options.email }, function (err, user) {
-    if(err) {
-      callback(err); return;
-    }
-
-    options.user = user;
-    emailNotificationService.sendConfirmationForNewUser(user);
-    callback(err, user);
-  });
+  return userService.newUser({ displayName: options.displayName, email: options.email })
+      .then(function(user) {
+        emailNotificationService.sendConfirmationForNewUser(user);
+        return user;
+      }).nodeify(callback);
 }
 
 function sendNotification(user, troupe) {
@@ -163,25 +159,24 @@ var signupService = module.exports = {
 
   confirmSignup: function(user, callback) {
     if(!user) return callback(new Error("No user found"));
+
     winston.verbose("Confirming user", { id: user.id, status: user.status });
 
     if (user.status === 'UNCONFIRMED') {
       user.status = 'PROFILE_NOT_COMPLETED';
     }
 
-    user.save(function(err) {
-      if(err) return callback(err);
-
-      troupeService.updateInvitesForEmailToUserId(user.email, user.id, function(err) {
-        if(err) return callback(err);
-
-        winston.verbose("User saved.", { id: user.id, status: user.status });
-
-        return callback(err, user);
-      });
-
-
-    });
+    return user.saveQ()
+        .then(function() {
+          return troupeService.updateInvitesForEmailToUserId(user.email, user.id)
+            .then(function() {
+              return troupeService.updateUnconfirmedInvitesForUserId(user.id);
+            })
+            .then(function() {
+              return user;
+            });
+        })
+        .nodeify(callback);
 
   },
 
@@ -282,7 +277,43 @@ var signupService = module.exports = {
     });
   },
 
-  newUnauthenticatedAccessRequest: function(troupeUri, email, name, callback) {
+  /**
+   * Unauthenticated user requesting an invite with an authenticated user.
+   * @param  {[type]} toUser
+   * @param  {[type]} email
+   * @param  {[type]} name
+   * @return {[type]}
+   */
+  newUnauthenticatedConnectionInvite: function(toUser, email, name) {
+    return userService.findByEmail(email)
+        .then(function(fromUser) {
+
+          // This person is already a user
+          if(fromUser) {
+            return troupeService.findImplicitConnectionBetweenUsers(fromUser.id, toUser.id)
+                .then(function(implicitConnection) {
+                  // Check if fromUser has an implicit connection to toUser, no need for am invite...
+                  if(!implicitConnection) {
+                    return troupeService.inviteUserByUserId(null, fromUser.id, toUser.id);
+                  }
+                })
+                .then(function() {
+                  throw { userExists: true, hasPassword: !!fromUser.passordHash };
+                });
+          }
+
+          // The person is not already a user, create an unconfirmed account for them
+          newUser({ email: email, displayName: name })
+            .then(function(newUser) {
+
+              return troupeService.inviteUserByUserId(null, newUser.id, toUser.id, true /* UNCONFIRMED */);
+            });
+
+        });
+
+  },
+
+  newUnauthenticatedAccessRequest: function(troupe, email, name) {
     troupeService.findByUri(troupeUri, function(err, troupe) {
       if(err) { winston.error("findByUri failed", { exception: err } ); return callback(500); }
       if(!troupe) { winston.error("No troupe with uri", { uri: troupeUri }); return callback(404); }

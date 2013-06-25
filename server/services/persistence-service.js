@@ -265,7 +265,7 @@ var InviteSchema = new Schema({
   createdAt:          { type: Date, "default": Date.now },
   emailSentAt:        { type: Date },
   code:               { type: String },
-  status:             { type: String, "enum": ['UNUSED', 'USED'], "default": 'UNUSED'},
+  status:             { type: String, "enum": ['UNCONFIRMED', 'UNUSED', 'USED'], "default": 'UNUSED'},
   _tv:                { type: 'MongooseNumber', 'default': 0 }
 });
 InviteSchema.schemaTypeName = 'InviteSchema';

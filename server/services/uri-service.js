@@ -11,7 +11,7 @@ function findUri(uri, callback) {
   // Special case for backwards compatibility for
   // users without usernames
   if(uri.indexOf('one-one/') === 0) {
-    var id = uri.split('/')[2];
+    var id = uri.split('/')[1];
 
     return userService.findById(id)
       .then(function(user) {

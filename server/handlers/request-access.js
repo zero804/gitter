@@ -13,6 +13,7 @@ module.exports = {
 
       app.post(
         '/requestAccessNewUser',
+        middleware.grantAccessForRememberMeTokenMiddleware,
         expressValidator({}),
 
         function(req, res) {
@@ -34,25 +35,45 @@ module.exports = {
             return;
           }
 
-          signupService.newUnauthenticatedAccessRequest(req.body.troupeUri, req.body.email, req.body.name, function(err) {
-            if (err) {
-              var e = { success: false };
+          // This is only for unauthenticated users
+          if(req.user) {
+            res.send({ success: false, message: "Cannot use this service if you are authenticated" }, 400);
+            return;
+          }
 
-              if (err.userExists) {
-                e.userExists = true;
+
+          var uri = req.body.troupeUri;
+
+          uriService.findUri(uri)
+            .then(function(result) {
+              if(!result) { winston.error("No troupe with uri: " + uri); throw 404; }
+
+              var toTroupe = result.troupe;
+              var toUser = result.user;
+
+              if(toUser) {
+                return signupService.newUnauthenticatedConnectionInvite(toUser, req.body.email, req.body.name);
               }
 
-              res.send(e, 400);
-              return;
-            }
+              if(toTroupe) {
+                // Request access to a troupe
+                return signupService.newUnauthenticatedRequest(toTroupe, req.body.email, req.body.name);
+              }
 
-            res.send({ success: true });
-          });
+              throw new Error('Expected either a troupe or user attribute');
+            }).then(function() {
+              res.send({ success: true });
+            }).fail(function(err) {
+              winston.error("Request access failed: ", { exception: err });
+              res.send({ success: false, userExists: err.userExists, hasPassword: err.hasPassword }, 400);
+            });
+
         }
       );
 
       app.post(
         '/requestAccessExistingUser',
+        middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         expressValidator({}),
 
@@ -71,7 +92,7 @@ module.exports = {
 
           uriService.findUri(uri)
               .then(function(result) {
-                if(!result) { winston.error("No troupe with uri: " + uri); return next(404); }
+                if(!result) { winston.error("No troupe with uri: " + uri); throw 404; }
 
                 var toTroupe = result.troupe;
                 var toUser = result.user;
