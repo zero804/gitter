@@ -328,6 +328,39 @@ define([
       // }
 
       // esc returns to the mail view
+    },
+
+    /* Header */
+    onMouseEnterHeader: function() {
+      this.showProfileMenu();
+    },
+
+    onMouseLeaveHeader: function() {
+      this.hideProfileMenu();
+    },
+
+    showProfileMenu: function() {
+      if (!this.profilemenu) {
+
+        // $(".trpProfileMenu").animate({
+        //     width: '132px'
+        // }, 250, function () {
+
+        // });
+
+        $(".trpProfileMenu").fadeIn('fast');
+        this.profilemenu = true;
+      }
+    },
+
+    hideProfileMenu: function() {
+      if (this.profilemenu) {
+        $(".trpProfileMenu").fadeOut('fast');
+        // $(".trpProfileMenu").animate({
+        //     width: '0px'
+        // }, 250);
+        this.profilemenu = false;
+      }
     }
 
   });
