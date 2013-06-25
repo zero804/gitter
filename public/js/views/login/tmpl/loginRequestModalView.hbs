@@ -23,7 +23,12 @@
             <input type="text" name="email" placeholder="Email address" id="email" value="{{email}}" class="trpInput f-email required email">
         {{/authenticated}}
         <div class="trpRequestSubmit">
-         <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen signin" id="submit-button">Ask to join</button>
+         <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen signin" id="submit-button">     {{#if isOneToOne}}
+              Connect
+              {{else}}
+              Ask to join
+              {{/if}}
+        </button>
          <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="cancel-button">Cancel</button>
         </div>
       </form>
