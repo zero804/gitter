@@ -17,7 +17,7 @@ define([
     return c.user && c.user.id;
   };
 
-  context.getAuthenticated = function() {
+  context.isAuthed = function() {
     return !!context().user;
   };
 
