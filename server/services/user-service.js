@@ -9,6 +9,7 @@ var persistence = require("./persistence-service"),
     winston = require("winston"),
     statsService = require("./stats-service"),
     crypto = require('crypto'),
+    assert = require('assert'),
     collections = require("../utils/collections"),
     Q = require('q');
 
@@ -22,19 +23,15 @@ function generateGravatarUrl(email) {
 
 var userService = {
   newUser: function(options, callback) {
-    var user = new persistence.User(options);
-    user.displayName = options.displayName;
-    user.email = options.email;
-    user.confirmationCode = uuid.v4();
+    assert(options.email, 'Email atttribute required');
 
-    user.gravatarImageUrl = generateGravatarUrl(user.email);
-    user.status = options.status ? options.status : "UNCONFIRMED";
-
-    user.save(function (err) {
-      if(err) { winston.error("User save failed: ", err); }
-
-      return callback(null, user);
-    });
+    return persistence.User.createQ({
+      displayName:      options.displayName,
+      email:            options.email,
+      confirmationCode: uuid.v4(),
+      gravatarImageUrl: generateGravatarUrl(options.email),
+      status:           options.status || "UNCONFIRMED"
+    }).nodeify(callback);
   },
 
   findOrCreateUserForEmail: function(options, callback) {

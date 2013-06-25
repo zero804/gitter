@@ -24,7 +24,7 @@ exports.extract = function(propertyName) {
 exports.indexById = function(array) {
   var a = {};
   array.forEach(function(item) {
-    a[item._id] = item;
+    a[item.id || item._id] = item;
   });
 
   return a;

@@ -1,14 +1,11 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
-  'underscore',
   'utils/context',
-  'backbone',
-  'views/base',
   'views/app/userHeaderView',
   'components/unread-items-client',
   'collections/instances/troupes'
-  ], function($, _, context, Backbone, TroupeViews, UserHeaderView, unreadItemsClient, collections)  {
+  ], function($, context, UserHeaderView, unreadItemsClient, collections)  {
   "use strict";
 
   return UserHeaderView.extend({
@@ -49,13 +46,11 @@ define([
     },
 
     getRenderData: function() {
-      var tx = window.troupeContext;
-      var user = window.troupeContext.user;
       return {
-        headerTitle: tx.troupe.name,
+        headerTitle: context.getTroupe().name,
         isTroupe: true,
-        troupeContext: tx,
-        user: user
+        troupeContext: context(),
+        user: context.getUser()
       };
     },
 
@@ -65,7 +60,7 @@ define([
       var isFavourite = favHeader.hasClass('favourited');
 
       $.ajax({
-        url: '/troupes/' + window.troupeContext.troupe.id,
+        url: '/troupes/' + context.getTroupeId(),
         contentType: "application/json",
         dataType: "json",
         type: "PUT",
