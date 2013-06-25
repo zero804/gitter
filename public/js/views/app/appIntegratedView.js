@@ -68,6 +68,21 @@ define([
         }
       };
 
+      this.rightPanelRegion.on('show', function() {
+        //log("SHOW PANEL");
+        self.showPanel("#right-panel");
+      });
+
+      this.rightPanelRegion.on('close', function() {
+        window.setTimeout(function() {
+          if(!self.rightPanelRegion.currentView) {
+            //log("CLOSE PANEL");
+            self.hidePanel("#right-panel");
+          }
+        }, 100);
+      });
+
+
 
       //this.ensureProfileIsUsernamed();
     },
