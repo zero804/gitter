@@ -104,7 +104,7 @@ function renderHomePage(req, res, next) {
         profileNotCompleted: profileNotCompleted
       });
 
-      res.render('app-integrated', {
+      res.render('app-template', {
         useAppCache: !!nconf.get('web:useAppCache'),
         bootScriptName: 'router-homepage',
         troupeName: req.user.displayName,
@@ -149,7 +149,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
       res.render(page, {
         useAppCache: !!nconf.get('web:useAppCache'),
         login: login,
-        bootScriptName: login ? "router-login" : "app-integrated",
+        bootScriptName: login ? "router-login" : "router-app",
         troupeName: serializedTroupe.name,
         troupeContext: JSON.stringify(troupeContext),
         troupeContextData: troupeContext
@@ -274,7 +274,7 @@ module.exports = {
 
           next();
         },
-        renderMiddleware('app-integrated')
+        renderMiddleware('app-template')
       );
 
       app.get('/one-one/:userId/chat',
@@ -329,7 +329,7 @@ module.exports = {
             return renderHomePage(req, res, next);
           }
 
-          renderAppPageWithTroupe(req, res, next, 'app-integrated');
+          renderAppPageWithTroupe(req, res, next, 'app-template');
         });
 
       app.get('/:troupeUri/accept/:confirmationCode',
