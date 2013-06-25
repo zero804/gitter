@@ -29,6 +29,9 @@ define([
     return context().user;
   };
 
+  context.getTroupe = function() {
+    return context().troupe;
+  };
 
   return context;
 
