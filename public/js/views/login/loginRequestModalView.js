@@ -26,12 +26,15 @@ define([
     },
 
     getRenderData: function() {
-      var c = window.troupeContext;
+      var c = context();
+      var troupe = context.getTroupe();
+
       return {
         email: this.initialEmail,
         homeUrl: c.homeUrl,
-        troupeUri: c.troupe.uri,
-        authenticated: this.authenticated
+        troupeUri: troupe.uri,
+        authenticated: this.authenticated,
+        isOneToOne: troupe && troupe.oneToOne
       };
     },
 
@@ -51,9 +54,7 @@ define([
     },
 
     goBack : function () {
-      if (window.troupeContext.homeUrl) {
-        window.location.href= window.troupeContext.homeUrl;
-      }
+      window.location.href = context().homeUrl;
     },
 
     validateForm : function () {

@@ -1,7 +1,19 @@
 <div class="modal-content">
   <div id="request-form">
-    <div class="trpModalTitle">Ask to join</div>
-    <div class="trpModalSubtext">You need to request access to this Troupe to join.</div>
+    <div class="trpModalTitle">
+      {{#if isOneToOne}}
+      Signup to connect
+      {{else}}
+      Ask to join
+      {{/if}}
+    </div>
+    <div class="trpModalSubtext">
+    {{#if isOneToOne}}
+    You need an account to connect with this user.
+    {{else}}
+    You need to request access to this Troupe to join.
+    {{/if}}
+    </div>
     <div class="trpModalRequestForm">
      <!-- don't show the input fields if the user is already signed in, but do show the submit button -->
       <form id="requestAccess">
