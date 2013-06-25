@@ -110,6 +110,11 @@ UserSchema.index({ email: 1 });
 UserSchema.index({ username: 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
 
+
+UserSchema.methods.getHomeUrl = function() {
+  return this.username ? "/" + this.username : "/one-one/" + this.id;
+};
+
 var UserLocationHistorySchema = new Schema({
   userId: ObjectId,
   timestamp: Date,

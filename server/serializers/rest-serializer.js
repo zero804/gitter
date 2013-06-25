@@ -104,6 +104,7 @@ function UserStrategy(options) {
       id: user.id,
       username: user.username,
       displayName: user.displayName,
+      url: user.getHomeUrl(),
       email: options.includeEmail ? user.email : undefined,
       avatarUrlSmall: getAvatarUrl('s'),
       avatarUrlMedium: getAvatarUrl('m'),
@@ -601,18 +602,28 @@ function InviteStrategy(options) {
   if(!options) options = {};
 
   var troupeIdStrategy = new TroupeIdStrategy(options);
+  var userIdStrategy = new UserIdStrategy(options);
 
   this.preload = function(invites, callback) {
-    var troupeIds = invites.map(function(invite) { return invite.troupeId; });
-    troupeIdStrategy.preload(troupeIds, callback);
+    execPreloads([{
+      strategy: troupeIdStrategy,
+      data: invites.map(function(invite) { return invite.troupeId; })
+    },{
+      strategy: userIdStrategy,
+      data: invites.filter(function(invite) { return !!invite.fromOneToOneUserId; }).map(function(invite) { return invite.fromOneToOneUserId; })
+    }], callback);
+
   };
 
   this.map = function(item) {
     var troupe = troupeIdStrategy.map(item.troupeId);
+    var oneToOneUser = item.fromOneToOneUserId && userIdStrategy.map(item.fromOneToOneUserId);
     return {
       id: item._id,
-      troupeUrl: (troupe) ? '/' + troupe.uri : undefined,
-      troupeName: (troupe) ? troupe.name : undefined,
+      oneToOneUser: oneToOneUser,
+      acceptUrl: troupe ? '/' + troupe.uri : oneToOneUser.url,
+      //troupeUrl: troupe ? '/' + troupe.uri : undefined,
+      name: troupe ? troupe.name : oneToOneUser.displayName,
       senderDisplayName: item.senderDisplayName,
       // displayName: item.displayName,
       // email: item.email,
