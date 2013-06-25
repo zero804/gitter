@@ -1,6 +1,7 @@
 /*jshint unused:true, browser:true */
 define([
   'marionette',
+  'fineuploader',
   'hbs!./tmpl/rightToolbar',
   'collections/instances/integrated-items',
   'collections/instances/troupes',
@@ -8,27 +9,76 @@ define([
   'views/file/fileView',
   'views/conversation/conversationView',
   'views/people/peopleCollectionView'
-], function(Marionette, rightToolbarTemplate, itemCollections, troupeCollections, RequestView, FileView, ConversationView, PeopleCollectionView) {
+], function(Marionette, qq, rightToolbarTemplate, itemCollections, troupeCollections, RequestView, FileView, ConversationView, PeopleCollectionView) {
   "use strict";
 
   return Backbone.Marionette.Layout.extend({
+    tagName: "span",
     template: rightToolbarTemplate,
 
     regions: {
       requests: "#request-roster",
       people: "#people-roster",
       files: "#file-list",
-      conversations: "#frame-conversations",
-      sidebar: "#right-panel"
+      conversations: "#frame-conversations"
     },
 
-    afterRender: function() {
+    events: {
+      "click #people-header": "onPeopleHeaderClick",
+      "click #request-header": "onRequestHeaderClick",
+      "click #file-header": "onFileHeaderClick",
+      "click #mail-header": "onMailHeaderClick"
+    },
+
+    initialize: function() {
+
+    },
+
+    onRender: function() {
       var self = this;
 
-      //this.requests.show();
-      //this.people.show();
-      //this.files.show();
-      //this.conversations.show();
+      $('#toolbar-frame').show();
+      $('#right-panel').show();
+
+      this.uploader = new qq.FineUploader({
+        element: this.$el.find('#fineUploader')[0],
+        dragAndDrop: {
+          extraDropzones: [$('body')[0]],
+          hideDropzones: false,
+          disableDefaultDropzone: false
+        },
+        text: {
+          dragZone: '', // text to display
+          dropProcessing: '',
+          waitingForResponse: '',
+          uploadButton: ''
+        },
+        request: {
+          endpoint: '/troupes/' + window.troupeContext.troupe.id + '/downloads/'
+        },
+        callbacks: {
+          onComplete: function(id, fileName, response) {
+            var model;
+
+            if(response.success) {
+              self.app.collections['files'].add(response.file, { merge: true });
+
+              model = self.app.collections['files'].get(response.file.id);
+              model.on('change', onChange);
+            }
+
+            function onChange() {
+              var versions = model.get('versions');
+              var hasThumb = versions.at(versions.length - 1).get('thumbnailStatus') !== 'GENERATING';
+              if (hasThumb) {
+                window.location.href = "#file/" + response.file.id;
+                model.off('change', onChange);
+              }
+            }
+          }
+        }
+      });
+
       //this.sidebar.show();
 
       // reference collections
@@ -57,7 +107,40 @@ define([
       // People View
       this.people.show(new PeopleCollectionView({ collection: userCollection }));
 
+    },
+
+    onMailHeaderClick: function() {
+      this.toggleMails();
+    },
+
+    onFileHeaderClick: function() {
+      this.toggleFiles();
+    },
+
+    onRequestHeaderClick: function() {
+      this.toggleRightPanel('request-list');
+    },
+
+    onPeopleHeaderClick: function() {
+      this.toggleRightPanel('people-roster');
+    },
+
+    onAddPeopleClick: function() {
+    },
+
+    toggleRightPanel: function(id) {
+      $('#'+id).slideToggle(350);
+    },
+
+    toggleFiles: function () {
+      $("#file-list").slideToggle(350);
+      $("#fineUploader").toggle();
+    },
+
+    toggleMails: function () {
+      $("#mail-list").slideToggle(350);
     }
+
   });
 
 

@@ -6,11 +6,16 @@ define([
   'views/base',
   'views/app/userHeaderView',
   'components/unread-items-client',
+  'collections/instances/troupes',
   'log!troupe-header-view'
-  ], function($, _, Backbone, TroupeViews, UserHeaderView, unreadItemsClient, log) {
+  ], function($, _, Backbone, TroupeViews, UserHeaderView, unreadItemsClient, collections, log)  {
   "use strict";
 
   return UserHeaderView.extend({
+
+    events: {
+      "click .trpHeaderFavourite":        "toggleFavourite"
+    },
 
     initialize: function() {
       var self = this;
