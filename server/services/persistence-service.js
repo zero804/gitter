@@ -254,12 +254,14 @@ TroupeRemovedUserSchema.schemaTypeName = 'TroupeRemovedUserSchema';
 // An invitation to a person to join a Troupe
 //
 var InviteSchema = new Schema({
-  troupeId:           { type: ObjectId },
-  fromOneToOneUserId: { type: ObjectId },
-  senderDisplayName:  { type: String },
-  displayName:        { type: String },
-  email:              { type: String },
-  userId:             { type: ObjectId },
+  troupeId:           { type: ObjectId }, // If this is null, the invite is to connect as a person
+  fromUserId:         { type: ObjectId }, // The user who initiated the invite
+
+  userId:             { type: ObjectId }, // The userId of the recipient, if they are already a troupe user
+
+  displayName:        { type: String },   // If !userId, the name of the recipient
+  email:              { type: String },   // If !userId, the email address of the recipient
+
   createdAt:          { type: Date, "default": Date.now },
   emailSentAt:        { type: Date },
   code:               { type: String },

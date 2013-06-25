@@ -5,6 +5,7 @@
 var persistence = require("./persistence-service"),
     userService = require("./user-service"),
     appEvents = require("../app-events"),
+    assert = require("assert"),
     emailNotificationService = require("./email-notification-service"),
     presenceService = require("./presence-service"),
     uuid = require('node-uuid'),
@@ -174,24 +175,39 @@ function validateTroupeUrisForUser(userId, uris, callback) {
     });
 }
 
-function inviteUserByUserId(troupe, oneToOneUserId, senderDisplayName, userId, callback) {
+/**
+ * Invite an existing user to join a troupe or connect with another user
+ * @param  {[ObjectId]} troupe optional
+ * @param  {[ObjectId]} fromUserId the user initiating the connection
+ * @param  {[ObjectId]} toUserId the recipient
+ * @return {[type]} promise with invite
+ */
+function inviteUserByUserId(troupe, fromUserId, toUserId) {
+  assert(fromUserId, "fromUserId expected");
+  assert(toUserId, "toUserId expected");
 
   // Find the user
-  return userService.findById(userId)
-      .then(function(user) {
-        if(!user) throw "User not found";
+  return userService.findByIds([toUserId, fromUserId])
+      .then(function(users) {
+        users = collections.indexById(users);
+
+        var toUser = users[toUserId];
+        var fromUser = users[fromUserId];
+
+        if(!toUser) throw "toUserId " + toUser + " not found";
+        if(!fromUser) throw "fromUserId " + fromUser + " not found";
 
         // Check if the user is online
         var d = Q.defer();
-        presenceService.categorizeUsersByOnlineStatus([userId], d.makeNodeResolver());
+        presenceService.categorizeUsersByOnlineStatus([toUserId], d.makeNodeResolver());
 
         return d.promise.then(function(onlineUsers) {
-          var userIsOnline = onlineUsers && onlineUsers[userId];
+          var userIsOnline = onlineUsers && onlineUsers[toUserId];
 
           // Look for an existing invite
-          var query = { status: "UNUSED", $or: [ { userId: userId } , { email: user.email } ] };
-          if(oneToOneUserId) {
-            query.fromOneToOneUserId = oneToOneUserId;
+          var query = { status: "UNUSED", userId: toUserId };
+          if(!troupe) {
+            query.fromUserId = fromUserId;
           } else {
             query.troupeId = troupe.id;
           }
@@ -206,12 +222,11 @@ function inviteUserByUserId(troupe, oneToOneUserId, senderDisplayName, userId, c
 
               // No exiting invite, create a new invite
               return persistence.Invite.createQ({
-                troupeId: troupe ? troupe.id : undefined,
-                fromOneToOneUserId: oneToOneUserId,
-                senderDisplayName: senderDisplayName,
-                displayName: user.displayName,
-                userId: user.id,
-                email: user.email,
+                troupeId: troupe ? troupe.id : null,
+                fromUserId: fromUserId,
+                userId: toUserId,
+                displayName: null, // Don't set this if we're using a userId
+                email: null,       // Don't set this if we're using a userId
                 code: uuid.v4(),
                 emailSentAt: userIsOnline ? undefined: Date.now()
               });
@@ -219,19 +234,19 @@ function inviteUserByUserId(troupe, oneToOneUserId, senderDisplayName, userId, c
             }).then(function(invite) {
               // Notify the user of the invite.
               if (!userIsOnline) {
-                emailNotificationService.sendInvite(troupe, user.displayName, user.email, invite.code, senderDisplayName);
+                emailNotificationService.sendInvite(troupe, toUser.displayName, toUser.email, invite.code, fromUser.displayName);
               } else {
                 var text, uri;
                 if(troupe) {
                   text = "You've been invited to join the Troupe: " + troupe.name;
                   uri = troupe.uri;
                 } else {
-                  text = "You've been invited to chat with XXXXXXX";
-                  uri = "YYYYYYY";
+                  text = fromUser.displayName + " has invited you to connect";
+                  uri = fromUser.getHomeUrl();
                 }
 
                 appEvents.userNotification({
-                  userId: userId,
+                  userId: toUserId,
                   troupeId: troupe ? troupe.id : undefined,
                   // TODO: add onetoone bits in to this invite
                   title: "New Invitation",
@@ -244,11 +259,21 @@ function inviteUserByUserId(troupe, oneToOneUserId, senderDisplayName, userId, c
               return invite;
             });
           });
-    })
-    .nodeify(callback);
+    });
 }
 
-function inviteUserByEmail(troupe, fromOneToOneUserId, senderDisplayName, displayName, email, callback) {
+/**
+ * Invite by email
+ * @param  {[type]} troupe optional
+ * @param  {[type]} fromUserId the user making the request
+ * @param  {[type]} displayName the name of the recipient
+ * @param  {[type]} email the email address of the recipient
+ * @return {[type]} promise with invite
+ */
+function inviteUserByEmail(troupe, fromUserId, displayName, email) {
+  assert(fromUserId, "fromUserId expected");
+  assert(displayName, "displayName expected");
+  assert(email, "email expected");
 
   // Only non-registered users should go through this flow.
   // Check if the email is registered to a user.
@@ -256,54 +281,55 @@ function inviteUserByEmail(troupe, fromOneToOneUserId, senderDisplayName, displa
       .then(function(user) {
 
         if(user) {
-          return inviteUserByUserId(troupe, fromOneToOneUserId, senderDisplayName, user.id);
+          return inviteUserByUserId(troupe, fromUserId, user.id);
         }
 
-        return persistence.Invite.findOneQ({ status: "UNUSED", troupeId: troupe.id, email: email })
-            .then(function(existingInvite) {
-              if(existingInvite) {
-                emailNotificationService.sendInvite(troupe, displayName, email, existingInvite.code, senderDisplayName);
+        return userService.findById(fromUserId)
+            .then(function(fromUser) {
+              if(!fromUser) throw "Unknown fromUser " + fromUserId;
 
-                return existingInvite;
-              }
+              return persistence.Invite.findOneQ({ status: "UNUSED", troupeId: troupe.id, email: email })
+                  .then(function(existingInvite) {
+                    // Found an existing invite? Don't create a new one then
+                    if(existingInvite) return existingInvite;
 
-              statsService.event('new_user_invite', { senderDisplayName: senderDisplayName, email: email });
+                    statsService.event('new_user_invite', { fromUserId: fromUserId, email: email });
 
+                    // create the invite and send mail immediately
+                    var code = uuid.v4();
 
-              // create the invite and send mail immediately
-              var code = uuid.v4();
+                    return persistence.Invite.createQ({
+                      troupeId: troupe.id,
+                      fromUser: fromUserId,
+                      displayName: displayName,
+                      email: email,
+                      emailSentAt: Date.now(),
+                      code: code
+                    });
 
-              return persistence.Invite.createQ({
-                troupeId: troupe.id,
-                senderDisplayName: senderDisplayName,
-                displayName: displayName,
-                email: email,
-                emailSentAt: Date.now(),
-                code: code
-              }).then(function(invite) {
-                emailNotificationService.sendInvite(troupe, displayName, email, code, senderDisplayName);
-                return invite;
-              });
+                  }).then(function(invite) {
+                    // For new or existing invites, send the user an email
+                    emailNotificationService.sendInvite(troupe, displayName, email, invite.code, fromUser.displayName);
+
+                    return invite;
+                  });
             });
-      })
-      .nodeify(callback);
+
+      });
 }
 
-function inviteUserToTroupe(troupe, senderDisplayName, invite, callback) {
+function inviteUserToTroupe(troupe, invite, callback) {
   if(invite.email) {
-    inviteUserByEmail(troupe, null, senderDisplayName, invite.displayName, invite.email, callback);
-
-    return;
+    return inviteUserByEmail(troupe, invite.fromUserId, invite.displayName, invite.email).nodeify(callback);
   }
 
   if(invite.userId) {
-    inviteUserByUserId(troupe, null, senderDisplayName, invite.userId, callback);
-
-    return;
+    return inviteUserByUserId(troupe, invite.fromUserId, invite.userId).nodeify(callback);
   }
 
   // Otherwise, if neither an email or userId are sent, just quietely ignore
-  return callback();
+  // TODO: why why why?
+  return Q.resolve(null).nodeify(callback);
 }
 
 function findInviteById(id, callback) {
@@ -333,12 +359,20 @@ function findUnusedInviteToTroupeForUserId(userId, troupeId, callback) {
   return persistence.Invite.findOneQ({ troupeId: troupeId, userId: userId, status: 'UNUSED' }).nodeify(callback);
 }
 
-function findUnusedOneToOneInviteFromUserIdToUserId(fromUserId, toUserId, callback) {
+/**
+ * Find an unused invite from fromUserId to toUserId for toUserId to connect with fromUserId
+ * @param  {[type]} fromUserId
+ * @param  {[type]} toUserId
+ * @return {[type]} promise with invite
+ */
+function findUnusedOneToOneInviteFromUserIdToUserId(fromUserId, toUserId) {
+  console.log('findUnusedOneToOneInviteFromUserIdToUserId', fromUserId, toUserId);
   return persistence.Invite.findOneQ({
-      fromOneToOneUserId: fromUserId,
+      troupeId: null, // This indicates that it's a one-to-one invite
+      fromUserId: fromUserId,
       userId: toUserId,
       status: 'UNUSED'
-    }).nodeify(callback);
+    });
 }
 function updateInvitesForEmailToUserId(email, userId, callback) {
   return persistence.Invite.updateQ(
@@ -354,7 +388,7 @@ function updateInvitesForEmailToUserId(email, userId, callback) {
 function findAllUnusedInvitesForUserId(userId, callback) {
   return persistence.Invite.where('userId').equals(userId)
     .where('status').equals('UNUSED')
-    .sort({ displayName: 'asc', email: 'asc' } )
+    .sort({ createdAt: 'asc' } )
     .execQ()
     .nodeify(callback);
 }
@@ -573,66 +607,40 @@ function findImplicitConnectionBetweenUsers(userId1, userId2, callback) {
 }
 
 /**
- * Find an existing invite or create a new invite for one user to connect to another user
- * @param  {[type]} fromUserId
- * @param  {[type]} toUserId
- * @return {promise}
- */
-function findOrCreateOneToOneInvite(fromUserId, toUserId) {
-
-  /* Find an existing one-to-one.... */
-  return Q.all([
-      persistence.Troupe.findOneQ({
-        $and: [
-          { oneToOne: true },
-          { 'users.userId': fromUserId },
-          { 'users.userId': toUserId }
-        ]
-      }),
-      userService.findById(fromUserId)
-    ]).spread(function(existingTroupe, fromUser) {
-        if(existingTroupe) throw new Error('A connection already exists between these users');
-        if(!fromUser) throw new Error('User ' + fromUserId + ' not found');
-
-        return inviteUserByUserId(null, fromUserId, fromUser.displayName, toUserId);
-      });
-}
-
-/**
  * Find a one-to-one troupe, otherwise create it if possible (if there is an implicit connection),
  * otherwise return the existing invite if possible
  *
  * @return {[ troupe, other-user, invite ]}
  */
-function findOrCreateOneToOneTroupe(currentUserId, userId2, callback) {
-  if(currentUserId == userId2) return callback("You cannot be in a troupe with yourself.");
+function findOrCreateOneToOneTroupe(fromUserId, toUserId, callback) {
+  if(fromUserId == toUserId) return callback("You cannot be in a troupe with yourself.");
 
-  return userService.findById(userId2)
-    .then(function(user2) {
-      if(!user2) throw "User does not exist";
+  return userService.findById(toUserId)
+    .then(function(toUser) {
+      if(!toUser) throw "User does not exist";
 
       /* Find the existing one-to-one.... */
-      return [user2, persistence.Troupe.findOneQ({
+      return [toUser, persistence.Troupe.findOneQ({
         $and: [
           { oneToOne: true },
-          { 'users.userId': currentUserId },
-          { 'users.userId': userId2 }
+          { 'users.userId': fromUserId },
+          { 'users.userId': toUserId }
         ]
       })];
     })
-    .spread(function(user2, troupe) {
+    .spread(function(toUser, troupe) {
 
       // Found the troupe? Perfect!
-      if(troupe) return [ troupe, user2, null ];
+      if(troupe) return [ troupe, toUser, null ];
 
-      return findImplicitConnectionBetweenUsers(currentUserId, userId2)
+      return findImplicitConnectionBetweenUsers(fromUserId, toUserId)
           .then(function(implicitConnection) {
             if(implicitConnection) {
               // There is an implicit connection between these two users,
               // automatically create the troupe
-              return createOneToOneTroupe(currentUserId, userId2)
+              return createOneToOneTroupe(fromUserId, toUserId)
                 .then(function(troupe) {
-                  return [ troupe, user2, null ];
+                  return [ troupe, toUser, null ];
                 });
             }
 
@@ -643,9 +651,12 @@ function findOrCreateOneToOneTroupe(currentUserId, userId2, callback) {
             // Otherwise the users cannot onnect the and the user will need to invite the other user
             // to connect explicitly.
             // Check if the user has already invited the other user to connect
-            return findUnusedOneToOneInviteFromUserIdToUserId(currentUserId, userId2)
+
+            // Look to see if the other user has invited this user to connect....
+            // NB from and to users are swapped around here as we are looking for the correlorary (sp)
+            return findUnusedOneToOneInviteFromUserIdToUserId(toUserId, fromUserId)
               .then(function(invite) {
-                return [ null, user2, invite ];
+                return [ null, toUser, invite ];
               });
 
           });
@@ -885,19 +896,20 @@ function rejectInviteForAuthenticatedUser(user, inviteId, callback) {
 }
 
 function acceptInviteForAuthenticatedUser(user, inviteId, callback) {
-  assert(user); assert(inviteId);
+  assert(user, 'User parameter required');
+  assert(inviteId, 'inviteId parameter required');
+
   // check that the logged in user owns this invite
   // mark as used.
   findInviteById(inviteId, function(err, invite) {
     if(err) return callback(err);
 
-    if(invite.email !== user.email && invite.userId !== user.id) {
-      return callback(401);
+    if(!invite) {
+      return callback("No such invite found");
     }
 
-    if(!invite) {
-      winston.error("Invite inviteId=" + inviteId + " not found. ");
-      return callback("No such invite found");
+    if(invite.email !== user.email && invite.userId != user.id) {
+      return callback(401);
     }
 
     if(invite.status !== 'UNUSED') {
@@ -911,20 +923,33 @@ function acceptInviteForAuthenticatedUser(user, inviteId, callback) {
       statsService.event('invite_accepted', { inviteId: inviteId });
       winston.verbose("Invite accepted", { inviteId: inviteId });
 
-      // find the troupe
-      findById(invite.troupeId, function(err, troupe) {
-        if(err) return callback(err);
-        if(!troupe) return callback(404);
-        if(troupe.status != 'ACTIVE') return callback({ troupeNoLongerActive: true });
 
-        troupe.addUserById(user.id);
-        troupe.save(function(err) {
+      // IF this is an invite to join a troupe...
+      if(invite.troupeId) {
+        // find the troupe
+        findById(invite.troupeId, function(err, troupe) {
           if(err) return callback(err);
+          if(!troupe) return callback(404);
+          if(troupe.status != 'ACTIVE') return callback({ troupeNoLongerActive: true });
 
-          deleteAllInvitesToTroupeForUser(invite.troupeId, invite.email, callback);
+          troupe.addUserById(user.id);
+          troupe.save(function(err) {
+            if(err) return callback(err);
+
+            markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite, callback);
+          });
+
         });
+        return;
+      }
 
+      // Otherwise, this is an invite to connect with a user
+      createOneToOneTroupe(invite.fromUserId, invite.userId, function(err) {
+        if(err) return callback(err);
+
+        markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite, callback);
       });
+
     }
 
   });
@@ -1064,9 +1089,27 @@ function sendPendingInviteMails(delaySeconds, callback) {
   });
 }
 
-function deleteAllInvitesToTroupeForUser(troupeId, userEmail, callback) {
-  assert(troupeId); assert(userEmail);
-  persistence.Invite.remove({ troupeId: troupeId, email: userEmail }, callback); // whether or not they are used.
+function markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite, callback) {
+  assert(invite);
+
+  invite.status = 'USED';
+  return invite.saveQ()
+      .then(function() {
+
+        var similarityQuery = { status: 'UNUSED', userId: invite.userId };
+        if(invite.troupeId) {
+          similarityQuery.troupeId = invite.troupeId;
+        } else {
+          similarityQuery.fromUserId = invite.fromUserId;
+          similarityQuery.troupeId = null; // Important to signify that its a one-to-one invite
+        }
+
+        return persistence.Invite.updateQ(similarityQuery, { status: 'INVALID' }, { multi: true })
+            .then(function() {
+              return invite;
+            });
+
+      }).nodeify(callback);
 }
 
 function deleteTroupe(troupe, callback) {
@@ -1098,7 +1141,7 @@ module.exports = {
   findAllUnusedInvitesForUserId: findAllUnusedInvitesForUserId,
   findUnusedInviteToTroupeForUserId: findUnusedInviteToTroupeForUserId,
 
-  findOrCreateOneToOneInvite: findOrCreateOneToOneInvite,
+  inviteUserByUserId: inviteUserByUserId,
 
   updateInvitesForEmailToUserId: updateInvitesForEmailToUserId,
 
