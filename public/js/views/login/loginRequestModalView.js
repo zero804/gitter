@@ -23,10 +23,11 @@ define([
     },
 
     getRenderData: function() {
+      var c = window.troupeContext;
       return {
         email: this.initialEmail,
-        homeUrl: window.troupeContext.homeUrl,
-        troupeUri: window.location.pathname.replace(/\//g,''),
+        homeUrl: c.homeUrl,
+        troupeUri: c.troupe.uri,
         authenticated: this.authenticated
       };
     },
