@@ -14,8 +14,6 @@ define([
   return UserHeaderView.extend({
 
     events: {
-      "mouseenter #header-wrapper":       "onMouseEnterHeader",
-      "mouseleave #header-wrapper":       "onMouseLeaveHeader",
       "click .trpHeaderFavourite":        "toggleFavourite"
     },
 
