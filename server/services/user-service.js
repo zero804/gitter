@@ -119,8 +119,9 @@ var userService = {
   },
 
   findByIds: function(ids, callback) {
-    persistence.User.where('_id')['in'](collections.idsIn(ids))
-      .exec(callback);
+    return persistence.User.where('_id')['in'](collections.idsIn(ids))
+      .execQ()
+      .nodeify(callback);
   },
 
   saveLastVisitedTroupeforUser: function(userId, troupe, callback) {

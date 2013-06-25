@@ -607,27 +607,24 @@ function InviteStrategy(options) {
   this.preload = function(invites, callback) {
     execPreloads([{
       strategy: troupeIdStrategy,
-      data: invites.map(function(invite) { return invite.troupeId; })
+      data: invites.map(function(invite) { return invite.troupeId; }).filter(predicates.notNull)
     },{
       strategy: userIdStrategy,
-      data: invites.filter(function(invite) { return !!invite.fromOneToOneUserId; }).map(function(invite) { return invite.fromOneToOneUserId; })
+      data: invites.map(function(invite) { return invite.fromUserId; }).filter(predicates.notNull)
     }], callback);
 
   };
 
   this.map = function(item) {
-    var troupe = troupeIdStrategy.map(item.troupeId);
-    var oneToOneUser = item.fromOneToOneUserId && userIdStrategy.map(item.fromOneToOneUserId);
+    var troupe = item.troupeId && troupeIdStrategy.map(item.troupeId);
+    var fromUser = item.fromUserId && userIdStrategy.map(item.fromUserId); // In future, all invites will have a fromUserId
+
     return {
       id: item._id,
-      oneToOneUser: oneToOneUser,
-      acceptUrl: troupe ? '/' + troupe.uri : oneToOneUser.url,
-      //troupeUrl: troupe ? '/' + troupe.uri : undefined,
-      name: troupe ? troupe.name : oneToOneUser.displayName,
-      senderDisplayName: item.senderDisplayName,
-      // displayName: item.displayName,
-      // email: item.email,
-      // avatarUrlSmall: '/images/2/avatar-default.png', // TODO: fix
+      oneToOneInvite: !!fromUser,
+      fromUser: fromUser,
+      acceptUrl: troupe ? '/' + troupe.uri : fromUser.url,
+      name: troupe ? troupe.name : fromUser.displayName,
       v: getVersion(item)
     };
   };

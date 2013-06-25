@@ -78,7 +78,7 @@ module.exports = {
 
                 if(toUser) {
                   // Invite the user to connect
-                  return troupeService.findOrCreateOneToOneInvite(fromUserId, toUser.id);
+                  return troupeService.inviteUserByUserId(null, fromUserId, toUser.id);
                 }
 
                 if(toTroupe) {
