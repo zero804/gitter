@@ -22,16 +22,29 @@ module.exports = {
       app.get(nconf.get('web:homeurl'),
         middleware.grantAccessForRememberMeTokenMiddleware,
         function(req, res, next) {
+
           if(req.user) {
-            if (userService.isProfileUsernamed(req.user)) {
-              res.relativeRedirect(req.user.username);
-            }
-            else {
-              res.render('signup', { compactView: self.isMobile(req), profileHasNoUsername: JSON.stringify(false), userId: JSON.stringify(req.user.id) });
-            }
+
+            loginUtils.redirectUserToDefaultTroupe(req, res, next, {
+
+              onNoValidTroupes: function() {
+
+                // try go to the user's home page
+                if (userService.isProfileUsernamed(req.user)) {
+                  res.relativeRedirect(req.user.username);
+                }
+                // get the user to choose a username on the signup page
+                else {
+                  res.render('signup', { compactView: self.isMobile(req), profileHasNoUsername: JSON.stringify(true), userId: JSON.stringify(req.user.id) });
+                }
+
+              }
+            });
 
             return;
           }
+
+          // when the viewer is not logged in:
           res.render('signup', { compactView: self.isMobile(req), profileHasNoUsername: JSON.stringify(false), userId: JSON.stringify(null) });
         }
       );

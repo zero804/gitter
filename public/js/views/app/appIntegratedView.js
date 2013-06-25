@@ -2,9 +2,11 @@
 define([
   'jquery',
   'marionette',
+  'views/base',
+  'views/signup/usernameView',
   'views/app/uiVars',
   "nanoscroller" // no ref
-  ], function($, Marionette, uiVars) {
+  ], function($, Marionette, TroupeViews, UsernameView, uiVars) {
   "use strict";
 
   return Marionette.Layout.extend({
@@ -84,16 +86,15 @@ define([
 
 
 
-      //this.ensureProfileIsUsernamed();
+      this.ensureProfileIsUsernamed();
     },
-/*
+
     ensureProfileIsUsernamed: function() {
       var user = window.troupeContext.user;
       if (!user.username) {
         new TroupeViews.Modal({ view: new UsernameView() }).show();
       }
     },
-*/
 
     hidePanel: function (whichPanel) {
 
