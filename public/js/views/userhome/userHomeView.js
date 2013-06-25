@@ -1,4 +1,4 @@
-/*jshint unused:strict, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'views/base',
   'hbs!./tmpl/userHomeTemplate',

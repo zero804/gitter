@@ -1,4 +1,4 @@
-/*jshint unused:strict, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
   'underscore',
@@ -7,6 +7,7 @@ define([
   'hbs!./tmpl/avatar',
   'bootstrap_tooltip'
 ], function($, _, context, TroupeViews, template) {
+
   "use strict";
 
   return TroupeViews.Base.extend({

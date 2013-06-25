@@ -1,10 +1,10 @@
-/*jshint unused:strict, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'handlebars'
 ], function ( Handlebars ) {
   "use strict";
 
-  function widget ( widgetName, model ) {
+  function Widget( widgetName, model ) {
     if(!this.renderViews) {
       this.renderViews = [];
     }
@@ -17,7 +17,7 @@ require([
     return new Handlebars.SafeString("<view data-id='" + (this.renderViews.length - 1) + "'></view>");
   }
 
-  Handlebars.registerHelper( 'widget', widget );
-  return widget;
+  Handlebars.registerHelper( 'widget', Widget );
+  return Widget;
 
 });
