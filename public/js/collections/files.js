@@ -1,11 +1,12 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'backbone',
   './base',
   '../utils/momentWrapper'
-], function($, _, Backbone, TroupeCollections, moment) {
+], function($, _, context, Backbone, TroupeCollections, moment) {
   "use strict";
 
   var exports = {};

@@ -1,12 +1,15 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'views/base',
   'hbs!./tmpl/loginModalView',
   'jquery-placeholder'
-], function($, _, TroupeViews, template) {
+], function($, _, context, TroupeViews, template) {
+  "use strict";
+
   return TroupeViews.Base.extend({
     template: template,
 

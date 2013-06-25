@@ -1,9 +1,10 @@
-/*jshint unused:true, browser:true*/
+/*jshint unused:strict, browser:true */
 require([
   'jquery',
   'log!login',
   'retina'],
   function($, log) {
+    "use strict";
 
     function getDefaultEmail() {
       try {

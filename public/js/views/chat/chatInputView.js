@@ -1,8 +1,8 @@
-/*jshint unused:true, browser:true */
-
+/*jshint unused:strict, browser:true */
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'backbone',
   'marionette',
   'views/base',
@@ -10,7 +10,7 @@ define([
   'collections/chat',
   '../../utils/momentWrapper',
   'jquery-placeholder'
-], function($, _, Backbone, Marionette, TroupeViews, template, chatModels, moment) {
+], function($, _, context, Backbone, Marionette, TroupeViews, template, chatModels, moment) {
   "use strict";
 
   var PAGE_SIZE = 50;

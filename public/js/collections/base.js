@@ -1,11 +1,12 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
+/*jshint unused:strict, browser:true */
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'backbone',
   'components/realtime',
   'log!collections'
-], function($, _, Backbone, realtime, log) {
+], function($, _, context, Backbone, realtime, log) {
   "use strict";
 
   var exports = {};

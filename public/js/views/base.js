@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
   'jquery',
   'jquery-migrate',
@@ -13,7 +13,6 @@ define([
   'hbs!./tmpl/confirmationView',
   'log!base-views'
 ], function($, $mig, _, Backbone, Marionette, unreadItemsClient, modalTemplate, popoverTemplate, loadingTemplate, helpers, confirmationViewTemplate, log) {
-  /*jshint trailing:false */
   "use strict";
 
   /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */

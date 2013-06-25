@@ -1,14 +1,17 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'views/base',
   'hbs!./tmpl/createTroupeView',
   'log!create-troupe-view',
   'utils/validate-wrapper',
   'jquery-placeholder' // no ref
-], function($, _, TroupeViews, template, log, validation) {
+], function($, _, context, TroupeViews, template, log, validation) {
+  "use strict";
+
   var View = TroupeViews.Base.extend({
     template: template,
 

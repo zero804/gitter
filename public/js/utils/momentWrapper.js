@@ -1,8 +1,7 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
   'moment'
 ], function(moment) {
-  /*jshint trailing:false */
   "use strict";
 
   moment.calendar = {

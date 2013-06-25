@@ -1,5 +1,6 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
 ], function() {
+  "use strict";
   return null;
 });

@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 
 define([
   'jquery',
@@ -9,6 +9,8 @@ define([
   'hbs!./tmpl/fileVersionsView',
   './versionView'
 ], function($, _, Backbone, TroupeViews, Marionette, template, VersionView){
+  "use strict";
+
   var View = TroupeViews.Base.extend({
     template: template,
 

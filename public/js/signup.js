@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 require([
   'jquery',
   'views/base',
@@ -12,6 +12,8 @@ require([
   'retina'
  ],
   function($, TroupeViews, UsernameView, SignupModalView, SignupModalConfirmView, LoginModalView, createTroupeView, MessagesView) {
+    "use strict";
+
     //var loginFormVisible = false;
 
     function createLoginModal(options) {

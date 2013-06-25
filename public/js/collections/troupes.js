@@ -1,9 +1,10 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
   'backbone',
+  'utils/context',
   './base',
   '../utils/momentWrapper'
-], function(Backbone, TroupeCollections, moment) {
+], function(Backbone, context, TroupeCollections, moment) {
   "use strict";
 
   var exports = {};

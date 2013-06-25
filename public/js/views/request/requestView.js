@@ -1,3 +1,4 @@
+/*jshint unused:strict, browser:true */
 define([
   'views/base',
   'marionette',

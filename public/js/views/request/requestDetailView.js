@@ -1,4 +1,4 @@
-
+/*jshint unused:strict, browser:true */
 define([
   'jquery',
   'underscore',
@@ -8,6 +8,8 @@ define([
   'hbs!./tmpl/rejectConfirmation',
   'log!request-detail-view'
 ], function($, _, Backbone, TroupeViews, template, rejectConfirmationTemplate, log){
+  "use strict";
+
   return TroupeViews.Base.extend({
     unreadItemType: 'request',
     template: template,

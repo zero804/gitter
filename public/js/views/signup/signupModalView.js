@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 
 define([
   'jquery',
@@ -8,6 +8,8 @@ define([
   'utils/validate-wrapper', // No reference
   'jquery-placeholder' // No reference
 ], function($, _, TroupeViews, template) {
+  "use strict";
+
   return TroupeViews.Base.extend({
     template: template,
 

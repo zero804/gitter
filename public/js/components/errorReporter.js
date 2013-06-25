@@ -1,6 +1,7 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
 ], function() {
+  "use strict";
 
   var _super = window.onerror;
   window.onerror = function(message, file, line) {

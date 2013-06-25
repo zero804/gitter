@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 
 
 // TODO: Better way to show the subject here, right now it will be set multiple times as this is called per conversationDetailItemView
@@ -12,6 +12,8 @@ define([
   'views/widgets/avatar',
   '../../utils/momentWrapper'
 ], function($, _, Backbone, TroupeViews, template, bodyTemplate, AvatarView, moment) {
+  "use strict";
+
   return TroupeViews.Base.extend({
     template: template,
 

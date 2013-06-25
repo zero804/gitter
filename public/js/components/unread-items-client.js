@@ -1,11 +1,12 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
   'jquery',
   'underscore',
+  'utils/context',
   './realtime',
   'log!unread-items-client',
   'utils/emitter'
-], function($, _, realtime, log, EventEmitter) {
+], function($, _, context, realtime, log, EventEmitter) {
   "use strict";
 
   function limit(fn, context, timeout) {

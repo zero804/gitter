@@ -1,7 +1,8 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
   'underscore'
 ], function(_) {
+  "use strict";
 
   return {
     /* Index an array into a hash */

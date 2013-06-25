@@ -1,6 +1,7 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
   'marionette',
+  'utils/context',
   'fineuploader',
   'hbs!./tmpl/rightToolbar',
   'collections/instances/integrated-items',
@@ -9,7 +10,7 @@ define([
   'views/file/fileView',
   'views/conversation/conversationView',
   'views/people/peopleCollectionView'
-], function(Marionette, qq, rightToolbarTemplate, itemCollections, troupeCollections, RequestView, FileView, ConversationView, PeopleCollectionView) {
+], function(Marionette, context, qq, rightToolbarTemplate, itemCollections, troupeCollections, RequestView, FileView, ConversationView, PeopleCollectionView) {
   "use strict";
 
   return Backbone.Marionette.Layout.extend({

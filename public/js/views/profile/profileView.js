@@ -1,15 +1,17 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'views/base',
   'hbs!./tmpl/profileView',
   'fineuploader',
   'views/widgets/avatar',
   'utils/validate-wrapper',
   'jquery-placeholder'  // No reference
-], function($, _, TroupeViews, template, qq, AvatarView, validation) {
+], function($, _, context, TroupeViews, template, qq, AvatarView, validation) {
+  "use strict";
 
   var View = TroupeViews.Base.extend({
     template: template,

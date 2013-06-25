@@ -1,9 +1,10 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'log!scroll-delegate'
-], function($, _, log) {
+], function($, _, context, log) {
   "use strict";
 
   /*

@@ -1,8 +1,10 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
   'ga',
+  'utils/context',
   'log!tracking'
-], function(_gaq, log) {
+], function(_gaq, context, log) {
+  "use strict";
 
   if(!window.troupeTrackingId) {
     return {

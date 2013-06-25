@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 
 // TODO: Confirmation after invite sent
 
@@ -9,8 +9,8 @@ define([
   'hbs!./tmpl/installChromeExtensionModalView',
   'log!install-chrome-extension'
 ], function($, _, TroupeViews, template, log) {
-
-    return TroupeViews.Base.extend({
+  "use strict";
+  return TroupeViews.Base.extend({
     template: template,
 
     initialize: function(options) {

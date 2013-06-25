@@ -1,7 +1,8 @@
-/*jshint unused:true, browser:true*/
+/*jshint unused:strict, browser:true */
 require([
   'jquery',
   'underscore',
+  'utils/context',
   'backbone',
   'backbone.keys', // no ref
   'marionette',
@@ -18,7 +19,7 @@ require([
   'views/toolbar/troupeMenu',
   'utils/router',
   'components/errorReporter'
-], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, dozy, AppIntegratedView, UserHomeView, troupeCollections,
+], function($, _, context, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, dozy, AppIntegratedView, UserHomeView, troupeCollections,
   profileView, createTroupeView, UserHeaderView, webNotifications, TroupeMenuView, Router /*, errorReporter , FilteredCollection */) {
 
   "use strict";
