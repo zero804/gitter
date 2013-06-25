@@ -11,6 +11,11 @@ module.exports = {
           '/',
           middleware.grantAccessForRememberMeTokenMiddleware,
           function(req, res) {
+            if(req.user) {
+              res.relativeRedirect(nconf.get('web:homeurl'));
+              return;
+            }
+
             res.render('landing');
           }
         );
