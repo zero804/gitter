@@ -28,9 +28,6 @@ define([
       "mouseenter #menu-toggle":          "onLeftMenuHotspot",
       "mouseenter #content-frame":        "onMouseEnterContentFrame",
       "mouseenter #header-wrapper":       "onMouseEnterHeader",
-      "click #people-header":             "onPeopleHeaderClick",
-      "click #request-header":            "onRequestHeaderClick",
-
       "mouseenter #left-menu":            "onMouseEnterLeftMenu",
       "mouseenter #toolbar-frame":        "onMouseEnterToolbar",
       "mouseleave #toolbar-frame":        "onMouseLeaveToolbar",
@@ -41,9 +38,6 @@ define([
 
       "click .left-menu-icon":            "onLeftMenuListIconClick",
 
-      "click #file-header":               "onFileHeaderClick",
-      "click #mail-header":               "onMailHeaderClick",
-      "click .trpHeaderFavourite":        "toggleFavourite",
       "keypress":                         "onKeyPress"
     },
 
@@ -74,60 +68,6 @@ define([
         }
       };
 
-/*
-      this.uploader = new qq.FineUploader({
-        element: $('#fineUploader')[0],
-        dragAndDrop: {
-          extraDropzones: [$('body')[0]],
-          hideDropzones: false,
-          disableDefaultDropzone: false
-        },
-        text: {
-          dragZone: '', // text to display
-          dropProcessing: '',
-          waitingForResponse: '',
-          uploadButton: ''
-        },
-        request: {
-          endpoint: '/troupes/' + window.troupeContext.troupe.id + '/downloads/'
-        },
-        callbacks: {
-          onComplete: function(id, fileName, response) {
-            var model;
-
-            if(response.success) {
-              self.app.collections['files'].add(response.file, { merge: true });
-
-              model = self.app.collections['files'].get(response.file.id);
-              model.on('change', onChange);
-            }
-
-            function onChange() {
-              var versions = model.get('versions');
-              var hasThumb = versions.at(versions.length - 1).get('thumbnailStatus') !== 'GENERATING';
-              if (hasThumb) {
-                window.location.href = "#file/" + response.file.id;
-                model.off('change', onChange);
-              }
-            }
-          }
-        }
-      });
-*/
-
-      this.rightPanelRegion.on('show', function() {
-        //log("SHOW PANEL");
-        self.showPanel("#right-panel");
-      });
-
-      this.rightPanelRegion.on('close', function() {
-        window.setTimeout(function() {
-          if(!self.rightPanelRegion.currentView) {
-            //log("CLOSE PANEL");
-            self.hidePanel("#right-panel");
-          }
-        }, 100);
-      });
 
       //this.ensureProfileIsUsernamed();
     },
@@ -139,18 +79,6 @@ define([
       }
     },
 */
-    toggleRightPanel: function(id) {
-      $('#'+id).slideToggle(350);
-    },
-
-    toggleFiles: function () {
-      $("#file-list").slideToggle(350);
-      $("#fineUploader").toggle();
-    },
-
-    toggleMails: function () {
-      $("#mail-list").slideToggle(350);
-    },
 
     hidePanel: function (whichPanel) {
 
@@ -322,25 +250,6 @@ define([
       if (this.leftmenu) {
         this.hideMenu();
       }
-    },
-
-    onMailHeaderClick: function() {
-      this.toggleMails();
-    },
-
-    onFileHeaderClick: function() {
-      this.toggleFiles();
-    },
-
-    onRequestHeaderClick: function() {
-      this.toggleRightPanel('request-list');
-    },
-
-    onPeopleHeaderClick: function() {
-      this.toggleRightPanel('people-roster');
-    },
-
-    onAddPeopleClick: function() {
     },
 
     onMouseEnterLeftMenu: function() {
