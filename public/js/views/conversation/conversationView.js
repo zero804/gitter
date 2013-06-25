@@ -1,15 +1,16 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'backbone',
   'marionette',
   'views/base',
   'collections/conversations',
   'hbs!./tmpl/conversationItemView',
   'hbs!./tmpl/conversationHelpView'
-], function($, _, Backbone, Marionette, TroupeViews, conversationModels, conversationItemViewTemplate, conversationHelpTemplate){
+], function($, _, context, Backbone, Marionette, TroupeViews, conversationModels, conversationItemViewTemplate, conversationHelpTemplate){
   "use strict";
 
   function getData() {

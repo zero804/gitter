@@ -1,11 +1,13 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'views/base',
   'hbs!./tmpl/avatar',
   'bootstrap_tooltip'
-], function($, _, TroupeViews, template) {
+], function($, _, context, TroupeViews, template) {
+  "use strict";
 
   return TroupeViews.Base.extend({
     tagName: 'span',

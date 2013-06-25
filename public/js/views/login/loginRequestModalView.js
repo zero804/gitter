@@ -1,15 +1,18 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 
 // TODO: Better transition to request confirm page
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'views/base',
   'hbs!./tmpl/loginRequestModalView',
   'log!login-request-modal-view',
   'utils/validate-wrapper',
   'jquery-placeholder' // No reference
-], function($, _, TroupeViews, template, log, validation) {
+], function($, _, context, TroupeViews, template, log, validation) {
+  "use strict";
+
   return TroupeViews.Base.extend({
     template: template,
 

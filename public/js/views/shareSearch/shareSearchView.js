@@ -1,14 +1,15 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'views/base',
   'hbs!./tmpl/shareSearchView',
   'hbs!./tmpl/shareRow',
   'zeroclipboard',
   'bootstrap-typeahead', // No reference
   'utils/validate-wrapper' // No reference
-], function($, _, TroupeViews, template, rowTemplate, ZeroClipboard) {
+], function($, _, context, TroupeViews, template, rowTemplate, ZeroClipboard) {
   "use strict";
 
   var View = TroupeViews.Base.extend({

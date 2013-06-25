@@ -1,12 +1,13 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
+  'utils/context',
   'views/base',
   'collections/instances/troupes',
   'collections/instances/integrated-items',
   'hbs!./tmpl/troupeSettingsTemplate',
   'log!troupe-settings-view',
   'utils/validate-wrapper'
-], function(TroupeViews, troupeCollections, itemCollections, troupeSettingsTemplate, log, validation) {
+], function(context, TroupeViews, troupeCollections, itemCollections, troupeSettingsTemplate, log, validation) {
   "use strict";
 
   var View = TroupeViews.Base.extend({

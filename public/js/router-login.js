@@ -1,7 +1,8 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 require([
   'jquery',
   'underscore',
+  'utils/context',
   'backbone',
   './base-router',
   'views/base',
@@ -10,7 +11,7 @@ require([
   'views/profile/profileView',
   'views/login/loginRequestModalView',
   'collections/troupes'
-], function($, _, Backbone, BaseRouter, TroupeViews, InviteModal, LoginModalView, profileView, RequestModalView, troupeModels) {
+], function($, _, context, Backbone, BaseRouter, TroupeViews, InviteModal, LoginModalView, profileView, RequestModalView, troupeModels) {
   "use strict";
 
   var AppRouter = BaseRouter.extend({

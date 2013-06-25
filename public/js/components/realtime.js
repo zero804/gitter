@@ -1,10 +1,10 @@
-/*jshint unused:true, browser:true*/
+/*jshint unused:strict, browser:true */
 define([
   'jquery',
+  'utils/context',
   './fayeWrapper',
-  'log!realtime',
-  '../utils/momentWrapper'
-], function($, FayeWrapper, log, moment) {
+  'log!realtime'
+], function($, context, FayeWrapper, log) {
   "use strict";
 
   var connected = false;

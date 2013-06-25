@@ -1,7 +1,9 @@
+/*jshint unused:strict, browser:true */
 define([
   'views/base',
+  'utils/context',
   'hbs!./tmpl/inviteModal'
-], function(TroupeViews, inviteModalTemplate) {
+], function(TroupeViews, context, inviteModalTemplate) {
   "use strict";
 
   var InviteView = TroupeViews.ConfirmationView.extend({

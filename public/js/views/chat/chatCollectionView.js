@@ -3,6 +3,7 @@
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'log!chat-collection-view',
   'collections/chat',
   'views/widgets/avatar',
@@ -13,7 +14,7 @@ define([
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'bootstrap_tooltip'
-], function($, _, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate, chatInputView /* tooltip*/) {
+], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate, chatInputView /* tooltip*/) {
 
   "use strict";
 

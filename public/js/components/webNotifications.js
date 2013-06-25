@@ -1,11 +1,12 @@
-/*jshint unused:true, browser:true*/
+/*jshint unused:strict, browser:true */
 define([
   'jquery',
+  'utils/context',
   './notify',
   './realtime',
   'handlebars',
   'log!web-notifications'
-], function($, notify, realtime, handlebars, log){
+], function($, context, notify, realtime, handlebars, log){
   "use strict";
 
   var notifications = $('<div id="notification-center" class="notification-center"></div>').appendTo('body');

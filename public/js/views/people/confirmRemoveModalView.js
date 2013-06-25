@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 
 // TODO: Confirmation after invite sent
 
@@ -8,8 +8,9 @@ define([
   'views/base',
   'hbs!./tmpl/confirmRemoveModalView'
 ], function($, _, TroupeViews, template) {
+  "use strict";
 
-    return TroupeViews.Base.extend({
+  return TroupeViews.Base.extend({
     template: template,
 
     initialize: function(options) {

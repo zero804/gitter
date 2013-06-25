@@ -1,13 +1,16 @@
-
+/*jshint unused:strict, browser:true */
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'backbone',
   'views/base',
   'hbs!./tmpl/personDetailView',
   './confirmRemoveModalView',
   'log!person-detail-view'
-], function($, _, Backbone, TroupeViews, template, ConfirmRemoveModalView, log){
+], function($, _, context, Backbone, TroupeViews, template, ConfirmRemoveModalView, log){
+  "use strict";
+
   return TroupeViews.Base.extend({
     template: template,
     buttonMenu : false,

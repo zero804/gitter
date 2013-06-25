@@ -1,22 +1,38 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
 ], function() {
+  "use strict";
+
+  function context() {
+    return window.troupeContext || {};
+  }
 
   return {
     getTroupeId: function() {
-      return window.troupeContext.troupe && window.troupeContext.troupe.id;
+      var c = context();
+      return c.troupe && c.troupe.id;
     },
 
     getUserId: function() {
-      return window.troupeContext.user && window.troupeContext.user.id;
+      var c = context();
+      return c.user && c.user.id;
+    },
+
+    getAuthenticated: function() {
+      return !!context().user;
     },
 
     inTroupeContext: function() {
-      return !!window.troupeContext.troupe;
+      return !!context().troupe;
     },
 
     getUser: function() {
-      return window.troupeContext.user;
+      return context().user;
+    },
+
+    getContext: function() {
+      return context();
     }
+  };
 
 });

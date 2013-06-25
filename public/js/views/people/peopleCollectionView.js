@@ -1,10 +1,11 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
   'marionette',
+  'utils/context',
   'views/base',
   'hbs!./tmpl/peopleItemView',
   'hbs!./tmpl/peopleCollectionView'
-], function(Marionette, TroupeViews, peopleItemViewTemplate, peopleCollectionViewTemplate) {
+], function(Marionette, context, TroupeViews, peopleItemViewTemplate, peopleCollectionViewTemplate) {
   "use strict";
 
   var PeopleItemView = TroupeViews.Base.extend({

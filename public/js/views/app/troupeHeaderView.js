@@ -1,14 +1,14 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'backbone',
   'views/base',
   'views/app/userHeaderView',
   'components/unread-items-client',
-  'collections/instances/troupes',
-  'log!troupe-header-view'
-  ], function($, _, Backbone, TroupeViews, UserHeaderView, unreadItemsClient, collections, log)  {
+  'collections/instances/troupes'
+  ], function($, _, context, Backbone, TroupeViews, UserHeaderView, unreadItemsClient, collections)  {
   "use strict";
 
   return UserHeaderView.extend({

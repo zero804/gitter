@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 
 define([
   'jquery',
@@ -6,6 +6,8 @@ define([
   'views/base',
   'hbs!./tmpl/signupModalConfirmView'
 ], function($, _, TroupeViews, template) {
+  "use strict";
+
   return TroupeViews.Base.extend({
     template: template,
 

@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 
 define([
   'jquery',
@@ -8,6 +8,8 @@ define([
   'hbs!./tmpl/fileDetailView',
   'hbs!./tmpl/confirmDelete'
 ], function($, _, Backbone, TroupeViews, template, confirmDeleteTemplate) {
+  "use strict";
+
   return TroupeViews.Base.extend({
     unreadItemType: 'file',
     template: template,

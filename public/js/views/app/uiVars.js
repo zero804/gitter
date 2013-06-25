@@ -1,5 +1,7 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([], function() {
+  "use strict";
+
 	return {
 		panelWidthValue: '280px',
 		menuSlideValue: '320px',

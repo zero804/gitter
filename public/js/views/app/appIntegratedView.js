@@ -1,12 +1,13 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
   'jquery',
+  'utils/context',
   'marionette',
   'views/base',
   'views/signup/usernameView',
   'views/app/uiVars',
   "nanoscroller" // no ref
-  ], function($, Marionette, TroupeViews, UsernameView, uiVars) {
+  ], function($, context, Marionette, TroupeViews, UsernameView, uiVars) {
   "use strict";
 
   return Marionette.Layout.extend({

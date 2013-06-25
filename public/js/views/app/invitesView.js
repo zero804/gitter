@@ -1,8 +1,9 @@
-/*jshint unused:true, browser:true */
+/*jshint unused:strict, browser:true */
 define([
   'marionette',
   'hbs!./tmpl/invitesItemTemplate'
 ], function(Marionette, itemTemplate) {
+  "use strict";
 
   return Marionette.CollectionView.extend({
     tagName: 'ul',
