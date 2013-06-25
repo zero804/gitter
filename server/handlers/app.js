@@ -178,31 +178,16 @@ function uriContextResolverMiddleware(req, res, next) {
 // TODO preload invites?
 
 function preloadOneToOneTroupeMiddleware(req, res, next) {
-  if (!req.user) {
-    req.uriContext = { oneToOne: true, troupe: null, otherUser: null, invite: null, access: false };
-    return next();
-  }
+  uriService.findUriForUser("one-one/" + req.params.userId, req.user && req.user.id)
+    .then(function(result) {
+      if(result.notFound) return next(404);
 
-  if (req.params.userId === req.user.id) {
-    winston.info('Another user is talking to themselves...', { userId: req.user.id });
+      req.troupe = result.troupe;
+      req.uriContext = result;
 
-    res.relativeRedirect(req.user.username ? "/" + req.user.username : nconf.get('web:homeurl'));
-
-    return;
-  }
-
-  troupeService.findOrCreateOneToOneTroupe(req.user.id, req.params.userId)
-    .spread(function(troupe, otherUser, invite) {
-      if(!otherUser) return next(404);
-      if(!troupe) return next(403);
-
-      req.troupe = troupe;
-      req.uriContext = { oneToOne: true, troupe: troupe, otherUser: otherUser, invite: invite, access: !!troupe };
       next();
     })
-    .fail(function(err) {
-      return next(err);
-    });
+    .fail(next);
 
 }
 
@@ -275,6 +260,11 @@ module.exports = {
         saveLastTroupeMiddleware,
         function(req, res, next) {
           var uriContext = req.uriContext;
+
+          if (req.user && req.params.userId === req.user.id) {
+            res.relativeRedirect(req.user.username ? "/" + req.user.username : nconf.get('web:homeurl'));
+            return;
+          }
 
           // If the user has a username, use that instead
           if(uriContext && uriContext.otherUser && uriContext.otherUser.username) {
