@@ -193,8 +193,6 @@ function notifyRecipientsOfInvites(invites) {
       troupes = collections.indexById(troupes);
       users = collections.indexById(users);
 
-      console.log('GOT THIS FAR: ', users, troupes, onlineUsers);
-
       var promises = invites.map(function(invite) {
         var toUserId = invite.userId;
         var userIsOnline = onlineUsers[toUserId];
@@ -255,7 +253,7 @@ function inviteUserByUserId(troupe, fromUserId, toUserId) {
         var fromUser = users[fromUserId];
 
         var fromUserIsUnconfirmed = fromUser.status == 'UNCONFIRMED';
-        console.log('USER IS UNconfirmed?', fromUserIsUnconfirmed);
+
         if(!toUser) throw "toUserId " + toUser + " not found";
         if(!fromUser) throw "fromUserId " + fromUser + " not found";
 
@@ -1108,7 +1106,6 @@ function sendPendingInviteMails(delaySeconds, callback) {
 
     count = invites.length;
     var troupeIds = invites.map(function(i) { return i.troupeId; });
-    // console.log(troupeIds);
 
     findByIds(troupeIds, function(err, troupes) {
       if(err) return callback(err);
