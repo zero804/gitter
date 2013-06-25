@@ -270,7 +270,7 @@ define([
       var async = !options || !options.sync;
 
       $.ajax({
-        url: "/troupes/" + window.troupeContext.troupe.id + "/unreadItems",
+        url: "/troupes/" + context.getTroupeId() + "/unreadItems",
         contentType: "application/json",
         data: JSON.stringify(queue),
         async: async,
@@ -304,9 +304,9 @@ define([
       log('Syncing store to collection ', newValue);
       if(!window.troupeContext || !window.troupeContext.troupe) return;
 
-      log('TroupeCollectionSync: setting value of ' + window.troupeContext.troupe.id + ' to ' + newValue);
+      log('TroupeCollectionSync: setting value of ' + context.getTroupeId() + ' to ' + newValue);
 
-      var troupe = this._collection.get(window.troupeContext.troupe.id);
+      var troupe = this._collection.get(context.getTroupeId());
       if(troupe) {
         troupe.set('unreadItems', newValue);
         log('Completed successfully');
@@ -318,7 +318,7 @@ define([
 
           log('Collection loading, syncing troupe unreadItems');
 
-          var troupe = this._collection.get(window.troupeContext.troupe.id);
+          var troupe = this._collection.get(context.getTroupeId());
           if(troupe) {
             troupe.set('unreadItems', newValue);
           } else {
@@ -344,7 +344,7 @@ define([
       var store = this._store;
       var self = this;
 
-      var url = '/user/' + window.troupeContext.user.id + '/troupes/' + window.troupeContext.troupe.id + '/unreadItems';
+      var url = '/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/unreadItems';
       var s = realtime.subscribe(url, function(message) {
         if(message.notification === 'unread_items') {
           store._unreadItemsAdded(message.items);
@@ -379,7 +379,7 @@ define([
   TroupeCollectionRealtimeSync.prototype = {
     _subscribe: function() {
        var self = this;
-       realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
+       realtime.subscribe('/user/' + context.getUserId(), function(message) {
         if(message.notification !== 'troupe_unread') return;
         self._handleIncomingMessage(message);
       });
@@ -389,7 +389,7 @@ define([
       var troupeId = message.troupeId;
       var totalUnreadItems = message.totalUnreadItems;
 
-      if(troupeId === window.troupeContext.troupe.id) return;
+      if(troupeId === context.getTroupeId()) return;
 
       log('Updating troupeId' + troupeId + ' to ' + totalUnreadItems);
 
@@ -453,7 +453,7 @@ define([
       var self = this;
       function count(memo, troupe) {
         if(window.troupeContext && window.troupeContext.troupe) {
-          if(troupe.get('id') === window.troupeContext.troupe.id) {
+          if(troupe.get('id') === context.getTroupeId()) {
             return memo + (self._store._currentCount() > 0 ? 1 : 0);
           }
         }

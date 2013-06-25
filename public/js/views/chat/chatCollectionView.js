@@ -149,7 +149,7 @@ define([
     },
 
     isOwnMessage: function() {
-      return this.model.get('fromUser').id === window.troupeContext.user.id;
+      return this.model.get('fromUser').id === context.getUserId();
     },
 
     isInEditablePeriod: function() {

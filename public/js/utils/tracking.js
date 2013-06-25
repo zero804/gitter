@@ -4,6 +4,7 @@ define([
   'utils/context',
   'log!tracking'
 ], function(_gaq, context, log) {
+  /*jshint unused:true */
   "use strict";
 
   if(!window.troupeTrackingId) {
@@ -27,15 +28,8 @@ define([
     _gaq.push(['_setCustomVar',
         1,
         'userId',
-        window.troupeContext.user.id,
+        context.getUserId(),
         2 // Session level variable
-     ]);
-
-    _gaq.push(['_setCustomVar',
-        2,
-        'troupeUri',
-        window.troupeContext.troupe.uri,
-        3 // Page level variable
      ]);
   }
 

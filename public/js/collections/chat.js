@@ -1,13 +1,10 @@
 /*jshint unused:strict, browser:true */
 define([
-  'jquery',
   'underscore',
   'utils/context',
-  'backbone',
   './base',
   '../utils/momentWrapper'
-], function($, _, context, Backbone, TroupeCollections, moment) {
-  /*jslint browser: true*/
+], function(_, context, TroupeCollections, moment) {
   "use strict";
 
   var exports = {};
@@ -25,7 +22,7 @@ define([
 
       // Check for the special case of messages from the current user
       if(message.unread && message.fromUser) {
-        if(message.fromUser.id === window.troupeContext.user.id) {
+        if(message.fromUser.id === context.getUserId()) {
           message.unread = false;
         }
       }

@@ -41,11 +41,11 @@ define([
         upgradeOneToOne: this.upgradeOneToOne
       };
 
+      // TODO: What is window.userId????
       if (window.userId) {
         data.userId = window.userId;
-      }
-      else if (window.troupeContext) {
-        data.userId = window.troupeContext.user.id;
+      } else {
+        data.userId = context.getUserId();
       }
 
       return data;
@@ -96,7 +96,7 @@ define([
 
       if (window.troupeContext.troupe) {
         if (window.troupeContext.troupe.oneToOne && this.upgradeOneToOne) {
-          serializedForm.oneToOneTroupeId = window.troupeContext.troupe.id;
+          serializedForm.oneToOneTroupeId = context.getTroupeId();
         }
       }
 
