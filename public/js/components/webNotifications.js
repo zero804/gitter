@@ -12,10 +12,10 @@ define([
   var notifications = $('<div id="notification-center" class="notification-center"></div>').appendTo('body');
 
   // notifications for cross troupe chat messages
-  realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
+  realtime.subscribe('/user/' + context.getUserId(), function(message) {
     if (message.notification === 'user_notification') {
 
-      if(message.troupeId === window.troupeContext.troupe.id) {
+      if(message.troupeId === context.getTroupeId()) {
         return;
       }
 

@@ -77,7 +77,7 @@ define([
     },
 
     getRenderData: function() {
-      var currentUserId = window.troupeContext.user ? window.troupeContext.user.id : undefined;
+      var currentUserId = context.getUserId();
 
       var user = this.model ? this.model.toJSON() : this.user;
 

@@ -122,7 +122,7 @@ define([
           }
 
           // fetch from server
-          $.ajax({ url: '/user?excludeTroupeId='+window.troupeContext.troupe.id+'&q=' + query, success:
+          $.ajax({ url: '/user?excludeTroupeId=' + context.getTroupeId() + '&q=' + query, success:
             function(data) {
 
               source = data.results || [];
@@ -242,7 +242,7 @@ define([
       }
 
       $.ajax({
-        url: "/troupes/" + window.troupeContext.troupe.id + "/invites",
+        url: "/troupes/" + context.getTroupeId() + "/invites",
         contentType: "application/json",
         dataType: "json",
         data: this.serialize(),

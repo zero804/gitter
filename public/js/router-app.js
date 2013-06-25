@@ -52,7 +52,7 @@ require([
   var troupeCollection = troupeCollections.troupes;
 
   troupeCollection.on("remove", function(model) {
-    if(model.id == window.troupeContext.troupe.id) {
+    if(model.id == context.getTroupeId()) {
       // TODO: tell the person that they've been kicked out of the troupe
       if(window.troupeContext.troupeIsDeleted) {
         window.location.href = '/last';

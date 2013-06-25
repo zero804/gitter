@@ -31,7 +31,7 @@ define([
     model: exports.EmailModel,
     modelName: 'email',
     initialize: function(options) {
-      this.url = "/troupes/" + window.troupeContext.troupe.id + "/conversations/" + options.id;
+      this.url = "/troupes/" + context.getTroupeId() + "/conversations/" + options.id;
     }
 
   });

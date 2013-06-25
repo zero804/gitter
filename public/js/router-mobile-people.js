@@ -52,7 +52,7 @@ require([
           template: PersonViewTemplate,
           getRenderData: function() {
             var d = this.model.toJSON();
-            if (window.troupeContext.user.id === this.model.id) {
+            if (context.getUserId() === this.model.id) {
               d.isSelf = true;
             }
             return d;

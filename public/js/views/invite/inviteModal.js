@@ -18,8 +18,7 @@ define([
     },
 
     accept: function() {
-      var self = this;
-      var userId = window.troupeContext.user.id;
+      var userId = context.getUserId();
       var inviteId = this.inviteId;
 
       $.ajax({
@@ -36,8 +35,7 @@ define([
     },
 
     reject: function() {
-      var self = this;
-      var userId = window.troupeContext.user.id;
+      var userId = context.getUserId();
       var inviteId = this.inviteId;
 
       $.ajax({
@@ -59,7 +57,7 @@ define([
     initialize: function(options) {
 
       options.view = new InviteView({
-        inviteId: options.inviteId,
+        inviteId: options.inviteId
       });
 
       TroupeViews.Modal.prototype.initialize.call(this, options);

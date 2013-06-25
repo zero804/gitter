@@ -55,7 +55,7 @@ define([
           uploadButton: ''
         },
         request: {
-          endpoint: '/troupes/' + window.troupeContext.troupe.id + '/downloads/'
+          endpoint: '/troupes/' + context.getTroupeId() + '/downloads/'
         },
         callbacks: {
           onComplete: function(id, fileName, response) {

@@ -149,7 +149,7 @@ define([
 
     // TODO: this stuff below really should find a better home
     if(window.troupeContext && window.troupeContext.troupe) {
-      client.subscribe('/troupes/' + window.troupeContext.troupe.id, function(message) {
+      client.subscribe('/troupes/' + context.getTroupeId(), function(message) {
         log("Troupe Subscription!", message);
 
         if(message.notification === 'presence') {

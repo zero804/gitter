@@ -23,7 +23,7 @@ define([
     model: exports.TroupeModel,
     preloadKey: "troupes",
     initialize: function() {
-      this.url = "/user/" + window.troupeContext.user.id + "/troupes";
+      this.url = "/user/" + context.getUserId() + "/troupes";
     }
   });
 

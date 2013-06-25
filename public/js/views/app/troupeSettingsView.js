@@ -20,7 +20,7 @@ define([
     },
 
     initialize: function() {
-      this.model = troupeCollections.troupes.get(window.troupeContext.troupe.id);
+      this.model = troupeCollections.troupes.get(context.getTroupeId());
       this.userCollection = itemCollections.users;
       this.$el.toggleClass('canLeave', this.canLeave());
       this.$el.toggleClass('canDelete', this.canDelete());
@@ -79,11 +79,11 @@ define([
       TroupeViews.confirm("Are you sure you want to remove yourself from this troupe?", {
         'click #ok': function() {
           $.ajax({
-            url: "/troupes/" + window.troupeContext.troupe.id + "/users/" + window.troupeContext.user.id,
+            url: "/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
             data: "",
             type: "DELETE",
             success: function() {
-              window.location = window.troupeContext.homeUrl;
+              window.location = context().homeUrl;
             },
             error: function() {
               alert(errMsg);
@@ -146,7 +146,7 @@ define([
       window.troupeContext.troupe.name = troupeName;
 
       $.ajax({
-        url: '/troupes/' + window.troupeContext.troupe.id,
+        url: '/troupes/' + context.getTroupeId(),
         contentType: "application/json",
         dataType: "json",
         type: "PUT",

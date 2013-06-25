@@ -1,12 +1,11 @@
 /*jshint unused:strict, browser:true */
 define([
-  'jquery',
   'underscore',
   'utils/context',
   'backbone',
   './base',
   '../utils/momentWrapper'
-], function($, _, context, Backbone, TroupeCollections, moment) {
+], function(_, context, Backbone, TroupeCollections, moment) {
   "use strict";
 
   var exports = {};
@@ -19,7 +18,7 @@ define([
       if(message.unread && message.versions) {
         var latestVersion = message.versions[message.versions.length - 1];
         if(latestVersion && latestVersion.creatorUser) {
-          if(latestVersion.creatorUser.id === window.troupeContext.user.id) {
+          if(latestVersion.creatorUser.id === context.getUserId()) {
             message.unread = false;
           }
         }
