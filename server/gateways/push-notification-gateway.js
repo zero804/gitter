@@ -75,7 +75,6 @@ var queue = workerQueue.queue('push-notification', {}, function() {
               apnsConnectionBetaDev.pushNotification(note, deviceToken);
               break;
 
-
             case 'APPLE-BETA':
               apnsConnectionBeta.pushNotification(note, deviceToken);
               break;
@@ -111,19 +110,24 @@ var queue = workerQueue.queue('push-notification', {}, function() {
   }
 
   function errorEventOccurred(err, notification) {
-    var errorDescription = errorDescriptions[err];
 
-    if(err === 8 && notification.pushDevice) {
-      winston.error("Removing invalid device ", { device: notification.pushDevice });
-      notification.pushDevice.remove();
-      return;
+    try {
+      var errorDescription = errorDescriptions[err];
+
+      if(err === 8 && notification.pushDevice) {
+        winston.error("Removing invalid device ", { deviceName: notification.pushDevice.deviceName, deviceId: notification.pushDevice.deviceId });
+        notification.pushDevice.remove();
+        return;
+      }
+
+      winston.error("APN error", {
+        exception: err,
+        errorDescription: errorDescription,
+        notification: notification ? notification.payload : null
+      });
+    } catch (e) {
+      winston.error("Error while handling APN error:" + e, {exception: e});
     }
-
-    winston.error("APN error", {
-      exception: err,
-      errorDescription: errorDescription,
-      notification: notification ? notification.payload : null
-    });
   }
 
   winston.info("Starting APN");
