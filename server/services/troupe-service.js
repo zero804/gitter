@@ -258,9 +258,20 @@ function notifyRecipientsOfInvites(invites) {
           });
           return;
         } else {
-          emailNotificationService.sendInvite(troupe, toUser.displayName, toUser.email, invite.code, fromUser.displayName);
           invite.emailSentAt = Date.now();
-          return invite.saveQ();
+          return invite.saveQ()
+            .then(function() {
+              // The user is not online, send them an email
+              if(troupe) {
+                emailNotificationService.sendInvite(troupe, toUser.displayName, toUser.email, invite.code, fromUser.displayName);
+              } else if(!invite.troupeId) {
+                // One to one
+                emailNotificationService.sendConnectInvite(fromUser.getHomeUrl(), toUser.displayName, toUser.email, invite.code, fromUser.displayName);
+              }
+
+            });
+
+
         }
 
       });
@@ -281,17 +292,15 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
   assert(toUserId, "toUserId expected");
 
   // Find the user
-  return userService.findByIds([toUserId])
-      .then(function(users) {
-        users = collections.indexById(users);
+  return userService.findById(toUserId)
+      .then(function(toUser) {
 
         var fromUserId = fromUser.id;
-        var toUser = users[toUserId];
+
+        assert(toUser, "toUserId " + toUser + " not found");
 
         var fromUserIsUnconfirmed = fromUser.status == 'UNCONFIRMED';
-
-        if(!toUser) throw "toUserId " + toUser + " not found";
-        if(!fromUser) throw "fromUserId " + fromUser + " not found";
+        var toUserIsUnconfirmed = toUser.status == 'UNCONFIRMED';
 
         // Look for an existing invite
         var query = { status: fromUserIsUnconfirmed ? "UNCONFIRMED" : "UNUSED", userId: toUserId };
@@ -316,7 +325,7 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
               userId: toUserId,
               displayName: null, // Don't set this if we're using a userId
               email: null,       // Don't set this if we're using a userId
-              code: uuid.v4(),
+              code: toUserIsUnconfirmed ? uuid.v4() : null,
               status: fromUserIsUnconfirmed ? "UNCONFIRMED" : "UNUSED"
             });
 
@@ -335,15 +344,14 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
 
 /**
  * Invite by email
- * @param  {[type]} troupe optional
+ * @param  {[type]} troupe optional - not supplied for one to one invitations
  * @param  {[type]} fromUserId the user making the request
- * @param  {[type]} displayName the name of the recipient
+ * @param  {[type]} displayName (optional) the name of the recipient
  * @param  {[type]} email the email address of the recipient
  * @return {[type]} promise with invite
  */
 function inviteUserByEmail(troupe, fromUser, displayName, email) {
   assert(fromUser, "fromUser expected");
-  assert(displayName, "displayName expected");
   assert(email, "email expected");
 
   // Only non-registered users should go through this flow.
@@ -365,7 +373,6 @@ function inviteUserByEmail(troupe, fromUser, displayName, email) {
             statsService.event('new_user_invite', { fromUserId: fromUserId, email: email });
 
             // create the invite and send mail immediately
-            var code = uuid.v4();
 
             return persistence.Invite.createQ({
               troupeId: troupe.id,
@@ -373,12 +380,18 @@ function inviteUserByEmail(troupe, fromUser, displayName, email) {
               displayName: displayName,
               email: email,
               emailSentAt: Date.now(),
-              code: code
+              code: uuid.v4()
             });
 
           }).then(function(invite) {
-            // For new or existing invites, send the user an email
-            emailNotificationService.sendInvite(troupe, displayName, email, invite.code, fromUser.displayName);
+
+            if(troupe) {
+              // For new or existing invites, send the user an email
+              emailNotificationService.sendInvite(troupe, displayName, email, invite.code, fromUser.displayName);
+            } else {
+              // For new or existing invites, send the user an email
+              emailNotificationService.sendConnectInvite(fromUser.getHomeUrl(), displayName, email, invite.code, fromUser.displayName);
+            }
 
             return invite;
           });
@@ -386,11 +399,16 @@ function inviteUserByEmail(troupe, fromUser, displayName, email) {
     });
 }
 
-function inviteUserToTroupe(troupe, invite, callback) {
+/**
+ * Invite a user to either join a troupe or connect for one-to-one chats
+ * @param  {[type]}   troupe (optional)
+ * @param  {[type]}   invite ({ fromUser / userId / displayName / email  })
+ * @return {[type]}   promise of an invite
+ */
+function createInvite(troupe, invite, callback) {
   return Q.resolve(null)
     .then(function() {
 
-      assert(troupe, 'troupe required');
       assert(invite.fromUser, 'fromUser required');
 
       if(invite.userId) {
@@ -775,7 +793,7 @@ function upgradeOneToOneTroupe(options, callback) {
       if(!invites || invites.length === 0) return troupe;
 
       var promises = invites.map(function(invite) {
-          return inviteUserToTroupe(troupe, {
+          return createInvite(troupe, {
             fromUser: fromUser,
             email: invite.email,
             displayName: invite.displayName,
@@ -958,7 +976,7 @@ function createNewTroupeForExistingUser(options, callback) {
           var toUserId = invite.userId;
 
           if (displayName && inviteEmail || toUserId) {
-            return inviteUserToTroupe(troupe, {
+            return createInvite(troupe, {
                 fromUser: user,
                 displayName: displayName,
                 email: inviteEmail,
@@ -1170,38 +1188,72 @@ function sendPendingInviteMails(delaySeconds, callback) {
     emailSentAt: null
   };
 
-  persistence.Invite.find(searchParams, function(err, invites) {
-    if(err) return callback(err);
+  return persistence.Invite.findQ(searchParams)
+    .then(function(invites) {
+      winston.info("Found " + invites.length + " pending invites to email");
 
-    winston.info("Found " + invites.length + " pending invites to email");
+      var troupeIds   = invites.map(function(i) { return i.troupeId; });
+      var fromUserIds = invites.map(function(i) { return i.fromUserId; });
+      var toUserIds   = invites.map(function(i) { return i.toUserId; });
 
-    count = invites.length;
-    var troupeIds = invites.map(function(i) { return i.troupeId; });
+      return Q.all([
+        findByIds(troupeIds),
+        userService.findByIds(fromUserIds.concat(toUserIds))
+        ])
+        .spread(function(troupes, users) {
+          troupes = collections.indexById(troupes);
+          users = collections.indexById(users);
 
-    findByIds(troupeIds, function(err, troupes) {
-      if(err) return callback(err);
-      winston.info("Found " + troupes.length + " corresponding troupes for the pending invites");
+          var promises = invites.map(function(invite) {
+            var email, displayName;
 
-      var troupesById = troupes.reduce(function(byId, troupe) { byId[troupe.id] = troupe; return byId; }, {});
+            // Do the save first so that we dont' retry dodgy invites
+            invite.emailSentAt = Date.now();
+            return invite.saveQ().then(function() {
 
-      var invite, troupe;
-      for(var a = 0; a < invites.length; a++) {
-        invite = invites[a];
-        troupe = troupesById[invite.troupeId];
-        if(!troupe) {
-          winston.error('No troupe for this invite');
-          continue;
-        }
+              if(invite.userId) {
+                var user = users[invite.userId];
+                if(!user) {
+                  winston.error('Unable to find recipient user ' + invite.userId + '. Will not send out invite');
+                  return;
+                }
+                email = user.email;
+                displayName = user.displayName;
+              } else {
+                email = invite.email;
+                displayName = invite.displayName;
+              }
 
-        emailNotificationService.sendInvite(troupe, invite.displayName, invite.email, invite.confirmationCode, invite.senderDisplayName);
+              var fromUser = users[invite.fromUserId];
+              if(!fromUser) {
+                winston.error('Unable to find from user ' + invite.fromUserId + '. Will not send out invite');
+                return;
+              }
 
-        invite.emailSentAt = Date.now();
-        invite.save();
-      }
+              if(invite.troupeId) {
+                var troupe = troupes[invite.troupeId];
+                if(!troupe) {
+                  winston.error('Unable to find troupe ' + invite.troupeId+ '. Will not send out invite');
+                  return;
+                }
 
-      callback(null, count);
-    });
-  });
+                emailNotificationService.sendInvite(troupe, displayName, email, invite.confirmationCode, fromUser.displayName);
+              } else {
+                // One-to-one type invite
+                emailNotificationService.sendConnectInvite(fromUser.getHomeUrl(), displayName, email, invite.confirmationCode, fromUser.displayName);
+              }
+
+            });
+
+          });
+
+          return Q.all(promises).then(function() {
+            return invites.length;
+          });
+        });
+
+    })
+    .nodeify(callback);
 }
 
 function markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite, callback) {
@@ -1247,7 +1299,7 @@ module.exports = {
   validateTroupeEmailAndReturnDistributionList: validateTroupeEmailAndReturnDistributionList,
   userHasAccessToTroupe: userHasAccessToTroupe,
   userIdHasAccessToTroupe: userIdHasAccessToTroupe,
-  inviteUserToTroupe: inviteUserToTroupe,
+  createInvite: createInvite,
   findInviteById: findInviteById,
   findMemberEmails: findMemberEmails,
   findAllUnusedInvitesForTroupe: findAllUnusedInvitesForTroupe,

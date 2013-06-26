@@ -3,7 +3,7 @@
 
 var troupeService = require("../../services/troupe-service"),
     restSerializer = require("../../serializers/rest-serializer"),
-    Fiber = require("../../utils/fiber");
+    Q = require("q");
 
 module.exports = {
     index: function(req, res, next) {
@@ -23,21 +23,17 @@ module.exports = {
 
     create: function(req, res, next) {
       var invites = req.body;
-      var f = new Fiber();
 
-      for(var i = 0; i < invites.length; i++) {
-        var invite = invites[i];
-
-        troupeService.inviteUserToTroupe(req.troupe, {
+      var promises = invites.map(function(invite) {
+        return troupeService.createInvite(req.troupe, {
             fromUser: req.user,
             email: invite.email,
             displayName: invite.displayName,
             userId: invite.userId
-          }, f.waitor());
+          });
+      });
 
-      }
-
-      f.all().then(function() {
+      Q.all(promises).then(function() {
         res.send(invites);
       }, next);
 

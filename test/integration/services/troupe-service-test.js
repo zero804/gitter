@@ -47,7 +47,7 @@ function testDelayedInvite(email, troupeUri, isOnline, done) {
       status: "ACTIVE" }, function(err, user) {
         if(err) return done(err);
 
-        troupeService.inviteUserToTroupe(troupe, { fromUser: fixture.user1, userId: user.id }, function(err, invite) {
+        troupeService.createInvite(troupe, { fromUser: fixture.user1, userId: user.id }, function(err, invite) {
           if(err) return done(err);
 
           if (isOnline) {
@@ -61,7 +61,7 @@ function testDelayedInvite(email, troupeUri, isOnline, done) {
           troupeService.sendPendingInviteMails(0, function(err, count) {
             if (err) return done(err);
 
-            assert(count >= 1);
+            assert(count >= 1, 'Send pending invite emails returned ' + count);
 
             done();
           });
@@ -89,7 +89,7 @@ function testInviteAcceptance(email, done) {
       status: "ACTIVE" }, function(err, user) {
         if(err) return done(err);
 
-        troupeService.inviteUserToTroupe(troupe, { fromUser: fixture.user1, userId: user.id }, function(err, invite) {
+        troupeService.createInvite(troupe, { fromUser: fixture.user1, userId: user.id }, function(err, invite) {
           if(err) return done(err);
 
           troupeService.acceptInviteForAuthenticatedUser(user, invite.id, function(err) {
@@ -133,7 +133,7 @@ function testInviteRejection(email, done) {
       status: "ACTIVE" }, function(err, user) {
         if(err) return done(err);
 
-        troupeService.inviteUserToTroupe(troupe, { fromUser: fixture.user1, userId: user.id }, function(err, invite) {
+        troupeService.createInvite(troupe, { fromUser: fixture.user1, userId: user.id }, function(err, invite) {
           if(err) return done(err);
 
           troupeService.rejectInviteForAuthenticatedUser(user, invite.id, function(err) {

@@ -119,6 +119,9 @@ module.exports = {
   },
 
   sendNoticeOfEmailChange: function (user, origEmail, newEmail) {
+    assert(origEmail, 'origEmail parameter required');
+    assert(newEmail, 'newEmail parameter required');
+
     mailerService.sendEmail({
       templateFile: "change-email-address-complete",
       to: [origEmail, newEmail],
@@ -133,7 +136,15 @@ module.exports = {
   },
 
   sendInvite: function(troupe, displayName, email, code, senderDisplayName) {
-    var acceptLink = nconf.get("web:basepath") + "/" + troupe.uri + "/accept/" + code;
+    assert(email, 'email parameter required');
+    assert(senderDisplayName, 'senderDisplayName parameter required');
+
+    var acceptLink;
+    if(code) {
+      acceptLink = nconf.get("web:basepath") + "/" + troupe.uri + "/accept/" + code;
+    } else {
+      acceptLink = nconf.get("web:basepath") + "/" + troupe.uri;
+    }
 
     mailerService.sendEmail({
       templateFile: "inviteemail",
@@ -143,6 +154,33 @@ module.exports = {
       data: {
         displayName: displayName,
         troupeName: troupe.name,
+        acceptLink: acceptLink,
+        senderDisplayName: senderDisplayName,
+        baseServerPath: nconf.get("web:basepath")
+      }
+    });
+  },
+
+
+  sendConnectInvite: function(uri, displayName, email, code, senderDisplayName) {
+    assert(uri, 'uri parameter required');
+    assert(email, 'email parameter required');
+    assert(senderDisplayName, 'senderDisplayName parameter required');
+
+    var acceptLink;
+    if(code) {
+      acceptLink = nconf.get("web:basepath") + "/" + uri + "/accept/" + code;
+    } else {
+      acceptLink = nconf.get("web:basepath") + "/" + uri;
+    }
+
+    mailerService.sendEmail({
+      templateFile: "invite_connect_email",
+      from: senderDisplayName + '<signup-robot' + emailDomainWithAt + '>',
+      to: email,
+      subject: senderDisplayName + " has invited you to connect on Troupe",
+      data: {
+        displayName: displayName,
         acceptLink: acceptLink,
         senderDisplayName: senderDisplayName,
         baseServerPath: nconf.get("web:basepath")
