@@ -67,10 +67,10 @@ var userService = {
     });
   },
 
-  requestPasswordReset: function(email, callback) {
-    winston.info("Requesting password reset", email);
+  requestPasswordReset: function(login, callback) {
+    winston.info("Requesting password reset for ", login);
 
-    persistence.User.findOne({email: email}, function(err, user) {
+    userService.findByLogin(login, function(err, user) {
       if(err || !user) return callback(err, user);
 
       if(user.passwordResetCode) {
@@ -119,6 +119,18 @@ var userService = {
     return persistence.User.where('_id')['in'](collections.idsIn(ids))
       .execQ()
       .nodeify(callback);
+  },
+
+  findByLogin: function(login, callback) {
+
+    if (login.indexOf('@') >= 0) { // login is an email
+      statsService.event("login_by_username");
+      return userService.findByEmail(login, callback);
+    } else { // login is a username
+      statsService.event("login_by_email");
+      return userService.findByUsername(login, callback);
+    }
+
   },
 
   saveLastVisitedTroupeforUser: function(userId, troupe, callback) {

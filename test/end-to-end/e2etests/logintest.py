@@ -18,6 +18,13 @@ def testSignInAndSignout():
     driver.find_element_by_css_selector('DIV.trpHomeHeroStripContainer')
 
 
+def testSignInWithUsername():
+    utils.existingUserlogin(driver, 'testuser1', '123456')
+    driver.find_element_by_css_selector('DIV.trpHeaderTitle')
+    driver.get(utils.baseUrl("/signout"))
+    driver.find_element_by_css_selector('DIV.trpHomeHeroStripContainer')
+
+
 def testSignInAndNavigateBack():
     driver.delete_all_cookies()
 
