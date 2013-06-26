@@ -239,7 +239,9 @@ TroupeSchema.methods.getUrl = function(userId) {
       return troupeUser.userId != userId;
     })[0];
 
-  return "/one-one/" + otherUser.userId;
+  return otherUser.username ?
+            "/" + otherUser.username :
+            "/one-one/" + otherUser.userId;
 };
 
 var TroupeRemovedUserSchema = new Schema({
