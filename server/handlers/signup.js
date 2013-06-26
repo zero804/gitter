@@ -104,8 +104,7 @@ module.exports = {
 
             if (userService.isProfileUsernamed(user)) {
               res.relativeRedirect('/' + user.username);
-            }
-            else {
+            } else {
               res.render('signup', { profileHasNoUsername: !user.username, userId: JSON.stringify(req.user.id) });
             }
           });

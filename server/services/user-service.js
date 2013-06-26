@@ -37,26 +37,16 @@ var userService = {
   findOrCreateUserForEmail: function(options, callback) {
     winston.info("Locating or creating user", options);
 
-    var displayName = options.displayName;
     var email = options.email;
-    var status = options.status;
 
-    persistence.User.findOne({email: email}, function(err, user) {
-      if(err) return callback(err);
-      if(user) return callback(err, user);
+    return persistence.User.findOneQ({email: email})
+      .then(function(user) {
+        if(user) return user;
 
-      userService.newUser({
-        displayName: displayName,
-        email: email,
-        status: status
-      }, function(err, user) {
-        if(err) return callback(err);
+        return userService.newUser(options);
 
-        return callback(null, user);
-      });
-
-    });
-
+      })
+      .nodeify(callback);
   },
 
 

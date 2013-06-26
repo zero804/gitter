@@ -35,7 +35,14 @@ function newTroupe(options, callback) {
   // invite users
   if (invites) {
     invites.forEach(function(invite) {
-      troupeService.inviteUserToTroupe(troupe, user.displayName, invite, f.waitor());
+
+      troupeService.inviteUserToTroupe(troupe, {
+          fromUser: user,
+          email: invite.email,
+          displayName: invite.displayName,
+          userId: invite.userId
+        }, f.waitor());
+
     });
   }
 
