@@ -7,7 +7,7 @@
   {{/if}}
    <form id="loginForm" class="marginless" method="post" action="/login">
       <input type="hidden" name="troupeUri" value="{{troupeUri}}">
-      <input name="email" id="email" type="text" class="trpInput" placeholder="Email address" {{autofocusEmail}} value="{{email}}">
+      <input name="email" id="email" type="text" class="trpInput" placeholder="Email address or username" {{autofocusEmail}} value="{{email}}">
 
       <input name="password" id="password" type="password" class="trpInput" {{autofocusPassword}}  placeholder="Password">
 
@@ -39,13 +39,13 @@
   </div>
 <div class="resetpwd-content" style="display:none">
   <div class="trpModalTitle">Reset Password</div>
-  <div class="trpModalBody">To reset your password, we will send you an email to <span class="trpGreen" id="resetEmailAddress">. </span></div>
+  <div class="trpModalBody">To reset your password, we will send you an email <!-- to <span class="trpGreen" id="resetEmailAddress"> --> if you click below.</span></div>
   <button type="button" class="trpModalButton trpButtonBig trpBtnGreen" id="send-reset">Send reset Email</button>
   <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="go-back">Back</button><br><br>
 </div>
 <div class="resetpwd-confirm" style="display:none">
   <div class="trpModalTitle">On it's way!</div>
-  <div class="trpModalBody">We just sent you an email to <span class="trpGreen" id="resetEmail"></span>.<br><br>This will contain a link that you can click on to reset your password.</div>
+  <div class="trpModalBody">We just sent you an email to you. <!-- <span class="trpGreen" id="resetEmail"></span> --><br><br>This will contain a link that you can click on to reset your password.</div>
   <button type="button" class="trpModalButton trpButtonBig trpBtnGreen" id="button-close">Close</button><br><Br>
 </div>
 <div class="resetpwd-failed" style="display:none">
