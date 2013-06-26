@@ -786,7 +786,7 @@ function TroupeIdStrategy(options) {
 function RequestStrategy(options) {
   if(!options) options = {};
 
-  var userStategy = new UserIdStrategy();
+  var userStategy = new UserIdStrategy({includeEmail: true});
   var unreadItemStategy = new UnreadItemStategy({ itemType: 'request' });
 
   this.preload = function(requests, callback) {
