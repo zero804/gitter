@@ -31,5 +31,8 @@ module.exports = {
     app.all('/api/v1/sockets', auth);
     app.resource('api/v1/sockets', require('./sockets.js'));
 
+    app.all('/api/v1/inviteconnections', auth);
+    app.post('api/v1/inviteconnections', require('./invite-connections.js'));
+
   }
 };
