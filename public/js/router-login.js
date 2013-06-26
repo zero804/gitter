@@ -10,8 +10,9 @@ require([
   'views/login/loginModalView',
   'views/profile/profileView',
   'views/login/loginRequestModalView',
+  'views/signup/signupModalConfirmView',
   'collections/troupes'
-], function($, _, context, Backbone, BaseRouter, TroupeViews, InviteModal, LoginModalView, profileView, RequestModalView, troupeModels) {
+], function($, _, context, Backbone, BaseRouter, TroupeViews, InviteModal, LoginModalView, profileView, RequestModalView, SignupModalConfirmView, troupeModels) {
   "use strict";
 
   var AppRouter = BaseRouter.extend({
@@ -46,6 +47,12 @@ require([
         requestModal.view.on('request.login', function(options) {
           getLoginModal({ email: requestModal.view.getEmail(), userExists: options && options.userExists });
           requestModal.transitionTo(loginModal);
+        });
+
+        requestModal.view.on('confirm.signup', function(options) {
+          var data = {};
+          data.email = options.userEmail;
+          requestModal.transitionTo(new TroupeViews.Modal({ disableClose: true, view: new SignupModalConfirmView({ data: data }) }));
         });
 
         return requestModal;

@@ -98,8 +98,9 @@ define([
 
     onFormSubmit: function() {
       var form = this.$el.find('form');
-      var that = this;
       var postUri =  this.authenticated ? "/requestAccessExistingUser" : "/requestAccessNewUser";
+      var email = this.getEmail();
+      var that = this;
 
       $('#request-failed').hide();
 
@@ -109,11 +110,10 @@ define([
         dataType: "json",
         data: form.serialize(),
         type: "POST",
-        globa: false,
+        global: false,
         success: function(data) {
           if(data.success) {
-            $('.modal-content').hide();
-            $('.modal-success').show();
+            that.trigger('confirm.signup', {userEmail: email});
             return;
           }
 

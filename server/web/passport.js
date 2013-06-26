@@ -15,13 +15,16 @@ var statsService = require("../services/stats-service");
 var nconf = require('../utils/config');
 var loginUtils = require("../web/login-utils");
 
-function emailPasswordUserStrategy(email, password, done) {
+function loginAndPasswordUserStrategy(login, password, done) {
   winston.verbose("Attempting to authenticate ", { email: email });
 
-  userService.findByEmail(email, function(err, user) {
+  var email = login;
+  // var username = login;
+
+  userService.findByLogin(login, function(err, user) {
     if(err) return done(err);
     if(!user) {
-      winston.warn("Unable to login as email address not found", { email: email });
+      winston.warn("Unable to login as email address or username not found", { login: login });
 
       statsService.event("login_failed", {
         email: email,
@@ -111,7 +114,7 @@ module.exports = {
           usernameField: 'email',
           passwordField: 'password'
         },
-        emailPasswordUserStrategy
+        loginAndPasswordUserStrategy
     ));
 
     passport.use(new ConfirmStrategy({ name: "confirm" }, function(confirmationCode, req, done) {
@@ -193,7 +196,7 @@ module.exports = {
      * to the `Authorization` header).  While this approach is not recommended by
      * the specification, in practice it is quite common.
      */
-    passport.use(new BasicStrategy(emailPasswordUserStrategy));
+    passport.use(new BasicStrategy(loginAndPasswordUserStrategy));
 
     passport.use(new ClientPasswordStrategy(
       function(clientKey, clientSecret, done) {
