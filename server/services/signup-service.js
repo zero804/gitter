@@ -241,13 +241,14 @@ var signupService = module.exports = {
    * callback is function(err, request)
    */
   newSignupWithAccessRequest: function(options, callback) {
-    winston.info("New signup with access request ", options);
+    winston.info("New signup with access request ");
 
     var email = options.email;
     var displayName = options.displayName; // Optional
     var troupe = options.troupe;
 
-    assert(email, 'Email address is required');
+    assert(email, 'email parameter is required');
+    assert(troupe, 'troupe parameter is required');
 
     userService.findByEmail(email)
       .then(function(user) {
@@ -260,7 +261,7 @@ var signupService = module.exports = {
               displayName: displayName
             })
             .then(function(newUser) {
-              emailNotificationService.sendConfirmationForNewUserRequest(newUser);
+              emailNotificationService.sendConfirmationForNewUser(newUser);
               return troupeService.addRequest(troupe, newUser.id);
             });
         }

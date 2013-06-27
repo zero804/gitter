@@ -1,10 +1,15 @@
-var testRequire = require('./../test-require');
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
+/*global describe:true, it:true, before:true */
+"use strict";
 
-var persistence = testRequire('./services/persistence-service');
+var testRequire = require('./../test-require');
+var fixtureLoader = require('../test-fixtures');
+
 var userService = testRequire('./services/user-service');
 var signupService = testRequire('./services/signup-service');
-var persistence = testRequire("./services/persistence-service");
 var assert = testRequire("assert");
+
+var fixture = {};
 
 describe("User Service", function() {
 
@@ -62,55 +67,39 @@ describe("User Service", function() {
         });
       });
 
-      after(function(done) {
-        persistence.User.remove({ id: userId }, function(e, n) {
-          done();
-        });
-      });
     });
   });
 
   describe("#saveLastVisitedTroupeforUser", function() {
     it('should record the time each troupe was last accessed by a user', function(done) {
 
-      persistence.Troupe.findOne({ uri: 'testtroupe1' }, function(err, troupe) {
+      userService.saveLastVisitedTroupeforUser(fixture.user1.id, fixture.troupe1, function(err) {
         if(err) return done(err);
-        if(!troupe) return done("Cannot find troupe");
 
-        userService.findByEmail('testuser@troupetest.local', function(err, user) {
+        userService.getTroupeLastAccessTimesForUser(fixture.user1.id, function(err, times) {
           if(err) return done(err);
-          if(!user) return done("Cannot find user");
+          var troupeId = "" + fixture.troupe1.id;
 
-          userService.saveLastVisitedTroupeforUser(user.id, troupe, function(err) {
+          var after = times[troupeId];
+          assert(after, 'Expected a value for last access time');
+
+          userService.saveLastVisitedTroupeforUser(fixture.user1.id, fixture.troupe1, function(err) {
             if(err) return done(err);
 
-            userService.getTroupeLastAccessTimesForUser(user.id, function(err, times) {
+            userService.getTroupeLastAccessTimesForUser(fixture.user1.id, function(err, times) {
               if(err) return done(err);
-              var troupeId = "" + troupe.id;
-
-              var after = times[troupeId];
-              assert(after, 'Expected a value for last access time');
-
-              userService.saveLastVisitedTroupeforUser(user.id, troupe, function(err) {
-                if(err) return done(err);
-
-                userService.getTroupeLastAccessTimesForUser(user.id, function(err, times) {
-                  if(err) return done(err);
-                  assert(times[troupeId] > after, 'The last access time for this troupe has not changed. Before it was ' + after + ' now it is ' + times[troupeId]);
-                  done();
-                });
-              });
+              assert(times[troupeId] > after, 'The last access time for this troupe has not changed. Before it was ' + after + ' now it is ' + times[troupeId]);
+              done();
             });
-
           });
-
-
-      });
-
-
+        });
 
       });
+
 
     });
   });
+
+  before(fixtureLoader(fixture));
+
 });
