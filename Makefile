@@ -12,7 +12,6 @@ test:
 		--reporter dot \
 		--timeout 10000 \
 		--recursive \
-		--ignore-leaks \
 		$(TESTS)
 
 perf-test-xunit:
@@ -20,7 +19,6 @@ perf-test-xunit:
 		--reporter xunit-file \
 		--timeout 100000 \
 		--recursive \
-		--ignore-leaks \
 		$(PERF_TESTS)
 
 perf-test:
@@ -28,7 +26,6 @@ perf-test:
 		--reporter dot \
 		--timeout 100000 \
 		--recursive \
-		--ignore-leaks \
 		$(PERF_TESTS)
 
 test-xunit:
@@ -37,7 +34,6 @@ test-xunit:
 		--reporter xunit-file \
 		--timeout 10000 \
 		--recursive \
-		--ignore-leaks \
 		$(TESTS)
 
 test-in-browser:
@@ -45,16 +41,10 @@ test-in-browser:
 	test/in-browser/run-phantom-tests.sh
 
 test-coverage:
-	rm -rf ./coverage/ ./html-report/
-	./node_modules/.bin/istanbul instrument server/ -o coverage/
+	rm -rf ./coverage/ cobertura-coverage.xml
 	mkdir -p output
-	ISTANBUL_REPORTERS=text-summary,html,cobertura TROUPE_COVERAGE=1 NODE_ENV=test ./node_modules/.bin/mocha \
-		--reporter mocha-istanbul \
-		--timeout 10000 \
-		--recursive \
-		--ignore-leaks \
-		$(TESTS) || true
-	rm -rf coverage/
+	find $(TESTS) -iname "*test.js" | NODE_ENV=test xargs ./node_modules/.bin/istanbul cover _mocha
+	./node_modules/.bin/istanbul report cobertura
 
 prepare-for-end-to-end-testing:
 	curl https://raw.github.com/pypa/pip/master/contrib/get-pip.py > /tmp/get-pip.py

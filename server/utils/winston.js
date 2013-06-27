@@ -73,6 +73,7 @@ function configureTransports() {
     winston.remove({ name: name });
   }
 
+
   if(nconf.get('logging:logToFile') && nconf.get('LOG_FILE')) {
     winston.add(winston.transports.File, {
       filename: nconf.get('LOG_FILE'),
@@ -92,13 +93,16 @@ function configureTransports() {
       console.log('Logging to file is configured by LOG_FILE environment variable has not been set. Logging to console');
     }
 
-    winston.add(winston.transports.Console, {
-      colorize: nconf.get("logging:colorize"),
-      timestamp: nconf.get("logging:timestamp"),
-      level: nconf.get("logging:level"),
-      prettyPrint: nconf.get("logging:prettyPrint")
-    });
 
+    if(!nconf.get("logging:disableConsole")) {
+
+      winston.add(winston.transports.Console, {
+        colorize: nconf.get("logging:colorize"),
+        timestamp: nconf.get("logging:timestamp"),
+        level: nconf.get("logging:level"),
+        prettyPrint: nconf.get("logging:prettyPrint")
+      });
+    }
   }
 
   if(nconf.get("logging:loggly")) {

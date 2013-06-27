@@ -234,8 +234,8 @@ function testRequestRejection(email, userStatus, done) {
 describe('troupe-service', function() {
 
   describe('#acceptRequest()', function() {
-    it('should allow an ACTIVE user (without a confirmation code) request to be accepted', function(done) {
 
+    it('should allow an ACTIVE user (without a confirmation code) request to be accepted', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
 
       testRequestAcceptance(nonExistingEmail, 'ACTIVE', 'sendRequestAcceptanceToUser', done);
