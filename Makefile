@@ -2,6 +2,7 @@ TESTS = test/integration
 END_TO_END_TESTS = test/end-to-end
 PERF_TESTS = test/performance
 MOCHA_REPORTER =
+DATA_MAINT_SCRIPTS = $(shell find ./scripts/datamaintenance -name '*.sh')
 
 clean:
 	rm -rf public-processed/ output/ coverage/ cobertura-coverage.xml html-report/
@@ -85,9 +86,18 @@ version-files:
 	echo $(GIT_COMMIT) > GIT_COMMIT
 	echo $(GIT_BRANCH) > VERSION
 
+test-reinit-data: maintain-data init-test-data test post-test-maintain-data
 
 upgrade-data:
 	./scripts/upgrade-data.sh
+
+maintain-data:
+	$(foreach var,$(DATA_MAINT_SCRIPTS),$(var);)
+
+# Make a second target
+post-test-maintain-data:
+	$(foreach var,$(DATA_MAINT_SCRIPTS),$(var);)
+
 
 init-test-data:
 	./scripts/dataupgrades/005-test-users/001-update.sh

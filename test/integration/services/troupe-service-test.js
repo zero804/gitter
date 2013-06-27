@@ -513,7 +513,6 @@ describe('troupe-service', function() {
 
                           return persistence.User.updateQ({ _id: user._id }, { status: 'ACTIVE'})
                             .spread(function(numResults) {
-                              console.log(numResults);
                               if(numResults !== 1) throw "Expected one update result, got " + numResults;
 
                               return troupeService.acceptInvite(invite.code, newTroupe.uri)
