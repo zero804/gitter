@@ -25,6 +25,14 @@ define([
     return !!context().troupe;
   };
 
+  context.inOneToOneTroupeContext = function() {
+    return context.inTroupeContext() && context.getTroupe().oneToOne;
+  };
+
+  context.inUserhomeContext = function() {
+    return context().inUserhome;
+  };
+
   context.getUser = function() {
     return context().user;
   };

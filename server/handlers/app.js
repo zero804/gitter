@@ -67,6 +67,7 @@ function createTroupeContext(req, options) {
   return {
       user: options.user,
       troupe: options.troupe,
+      inUserhome: options.inUserhome,
       accessToken: options.accessToken,
       profileNotCompleted: options.profileNotCompleted,
       accessDenied: options.accessDenied,
@@ -100,7 +101,8 @@ function renderHomePage(req, res, next) {
       var troupeContext = createTroupeContext(req, {
         user: serializedUser,
         accessToken: token,
-        profileNotCompleted: profileNotCompleted
+        profileNotCompleted: profileNotCompleted,
+        inUserhome: true
       });
 
       res.render('app-template', {
