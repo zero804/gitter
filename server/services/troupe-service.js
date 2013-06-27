@@ -234,7 +234,7 @@ function notifyRecipientsOfInvites(invites) {
         var toUser = users[toUserId];
         var fromUser = users[invite.fromUserId];
 
-        assert(fromUser, 'Could not find fromUser');
+        assert(fromUser, 'Could not find fromUser: ' + invite.fromUserId);
         assert(toUser, 'Could not find toUser. notifyRecipientsOfInvites only deals with existing user recipients, not email recipients');
 
         if(userIsOnline) {
@@ -294,10 +294,10 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
   // Find the user
   return userService.findById(toUserId)
       .then(function(toUser) {
+        assert(toUser, "toUserId " + toUser + " not found");
 
         var fromUserId = fromUser.id;
-
-        assert(toUser, "toUserId " + toUser + " not found");
+        assert(fromUserId, 'fromUser.id is missing');
 
         var fromUserIsUnconfirmed = fromUser.status == 'UNCONFIRMED';
         var toUserIsUnconfirmed = toUser.status == 'UNCONFIRMED';
@@ -405,18 +405,20 @@ function inviteUserByEmail(troupe, fromUser, displayName, email) {
  * @param  {[type]}   invite ({ fromUser / userId / displayName / email  })
  * @return {[type]}   promise of an invite
  */
-function createInvite(troupe, invite, callback) {
+function createInvite(troupe, options, callback) {
+
   return Q.resolve(null)
     .then(function() {
 
-      assert(invite.fromUser, 'fromUser required');
+      assert(options.fromUser, 'fromUser required');
+      assert(options.fromUser.id, 'fromUser.id required');
 
-      if(invite.userId) {
-        return inviteUserByUserId(troupe, invite.fromUser, invite.userId);
+      if(options.userId) {
+        return inviteUserByUserId(troupe, options.fromUser, options.userId);
       }
 
-      if(invite.email) {
-        return inviteUserByEmail(troupe, invite.fromUser, invite.displayName, invite.email);
+      if(options.email) {
+        return inviteUserByEmail(troupe, options.fromUser, options.displayName, options.email);
       }
 
       throw "Invite needs an email or userId";

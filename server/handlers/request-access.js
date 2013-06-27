@@ -91,7 +91,6 @@ module.exports = {
           }
 
           var uri = req.body.troupeUri;
-          var fromUserId = req.user.id;
 
           uriService.findUri(uri)
               .then(function(result) {
@@ -102,12 +101,12 @@ module.exports = {
 
                 if(toUser) {
                   // Invite the user to connect
-                  return troupeService.inviteUserByUserId(null, fromUserId, toUser.id);
+                  return troupeService.inviteUserByUserId(null, req.user, toUser.id);
                 }
 
                 if(toTroupe) {
                   // Request access to a troupe
-                  return troupeService.addRequest(toTroupe, fromUserId);
+                  return troupeService.addRequest(toTroupe, req.user.id);
                 }
 
                 throw new Error('Expected either a troupe or user attribute');
