@@ -256,6 +256,7 @@ describe('troupe-service', function() {
 
   });
 
+
   describe('#rejectRequest()', function() {
     it('should delete a rejected request from an ACTIVE user', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
@@ -272,6 +273,47 @@ describe('troupe-service', function() {
     it('should delete an invite and add user to the troupe', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
       testInviteAcceptance(nonExistingEmail, done);
+    });
+  });
+
+
+  describe('#acceptInvite', function() {
+    it('should make an UNCONFIRMED user PROFILE_NOT_COMPLETED on accepting an invite and should update any unconfirmed invites to that user', function(done) {
+      var troupeService = testRequire('./services/troupe-service');
+
+      // Create a new UNCONFIRMED user
+      persistence.User.createQ({
+          email: 'test' + Date.now() + '@troupetest.local',
+          displayName: 'Test User ' + new Date(),
+          confirmationCode: null,
+          status: 'UNCONFIRMED' })
+        .then(function(user) {
+
+          // Have another user invite them to a one to one chat
+          return troupeService.createInvite(null, {
+            fromUser: fixture.user1,
+            userId: user.id
+          }).then(function(invite) {
+
+            // Have user one accept the INVITE
+            return troupeService.acceptInvite(invite.code, fixture.user1.getHomeUrl())
+              .then(function(result) {
+
+                var user2 = result.user;
+                assert(!result.alreadyUsed, 'Invite has not already been used');
+                assert.equal(user2.id, user.id);
+                assert.equal(user2.status, 'PROFILE_NOT_COMPLETED');
+
+                return troupeService.findOneToOneTroupe(fixture.user1.id, user2.id)
+                  .then(function(newTroupe) {
+                    assert(newTroupe, 'A troupe should exist for the users');
+                  });
+
+              });
+          });
+
+        })
+        .nodeify(done);
     });
   });
 

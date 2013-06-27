@@ -435,9 +435,6 @@ function findAllUnusedInvitesForTroupe(troupeId, callback) {
       .exec(callback);
 }
 
-function findUnusedInviteToTroupeForEmail(email, troupeId, callback) {
-  persistence.Invite.findOne({ troupeId: troupeId, email: email, status: 'UNUSED' }, callback);
-}
 
 
 function findUnusedInviteToTroupeForUserId(userId, troupeId, callback) {
@@ -663,13 +660,6 @@ function findUserIdsForTroupe(troupeId, callback) {
   });
 }
 
-function findUsersForTroupe(troupeId, callback) {
-  persistence.Troupe.findById(troupeId, 'users', function(err, user) {
-    if(err) return callback(err);
-    callback(null, user.users);
-  });
-}
-
 function updateTroupeName(troupeId, troupeName, callback) {
   findById(troupeId, function(err, troupe) {
     if (err) return callback(err);
@@ -710,6 +700,21 @@ function findImplicitConnectionBetweenUsers(userId1, userId2, callback) {
     .nodeify(callback);
 }
 
+function findOneToOneTroupe(fromUserId, toUserId) {
+  if(fromUserId == toUserId) throw "You cannot be in a troupe with yourself.";
+  assert(fromUserId, 'fromUserId parameter required');
+  assert(toUserId, 'fromUserId parameter required');
+
+  /* Find the existing one-to-one.... */
+  return persistence.Troupe.findOneQ({
+        $and: [
+          { oneToOne: true },
+          { 'users.userId': fromUserId },
+          { 'users.userId': toUserId }
+        ]
+    });
+
+}
 /**
  * Find a one-to-one troupe, otherwise create it if possible (if there is an implicit connection),
  * otherwise return the existing invite if possible
@@ -1163,9 +1168,10 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
           return Q.all([
               confirmOperation,
               invite.troupeId  ? addUserIdToTroupe(user.id, invite.troupeId) :
-                                 findOrCreateOneToOneTroupe(user.id, invite.fromUserId)
+                                 createOneToOneTroupe(user.id, invite.fromUserId)
             ])
             .spread(function(userSaveResult, troupe) {
+
               return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite).then(function() {
                 return { user: user, url: troupe.getUrl(user.id) };
               });
@@ -1321,10 +1327,10 @@ module.exports = {
 
   findAllUserIdsForTroupes: findAllUserIdsForTroupes,
   findUserIdsForTroupe: findUserIdsForTroupe,
-  findUsersForTroupe: findUsersForTroupe,
 
   validateTroupeUrisForUser: validateTroupeUrisForUser,
   updateTroupeName: updateTroupeName,
+  findOneToOneTroupe: findOneToOneTroupe,
   findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
   createUniqueUri: createUniqueUri,
   deleteTroupe: deleteTroupe,
@@ -1336,6 +1342,5 @@ module.exports = {
   acceptInvite: acceptInvite,
   acceptInviteForAuthenticatedUser: acceptInviteForAuthenticatedUser,
   rejectInviteForAuthenticatedUser: rejectInviteForAuthenticatedUser,
-  sendPendingInviteMails: sendPendingInviteMails,
-  findUnusedInviteToTroupeForEmail: findUnusedInviteToTroupeForEmail
+  sendPendingInviteMails: sendPendingInviteMails
 };
