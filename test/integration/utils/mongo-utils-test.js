@@ -22,7 +22,6 @@ describe('mongo-utils', function() {
           assert.equal(t.getTime(), 1370344769000);
           d.resolve();
         } catch(e) {
-          console.log("ERROR!", e);
           d.reject(e);
         }
 
@@ -54,7 +53,6 @@ describe('mongo-utils', function() {
           assert.equal(id.getTimestamp().getTime(), t);
           d.resolve();
         } catch(e) {
-          console.log("ERROR!", e);
           d.reject(e);
         }
 

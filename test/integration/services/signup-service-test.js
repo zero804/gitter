@@ -150,24 +150,19 @@ describe('signup-service', function() {
       var troupeService = testRequire.withProxies('./services/troupe-service', {
         './email-notification-service': emailNotificationServiceMock
       });
-      console.log('0');
+
       persistence.Troupe.findOne({ uri: existingTroupeUri }, function(err, troupe) {
         if(err) return done(err);
         if(!troupe) return done('Troupe ' + existingTroupeUri + ' not found');
-      console.log('a');
 
         signupService.newSignupWithAccessRequest({ email: nonExistingEmail, name: 'Test McTest', troupe: troupe }, function(err, request) {
           if(err) return done(err);
           if(!request) return done('No request created');
 
-          console.log('1');
-
           mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
-          console.log('2');
 
           troupeService.acceptRequest(request, function(err) {
             if(err) return done(err);
-          console.log('3');
 
             persistence.Troupe.findOne({ uri: existingTroupeUri }, function(err, troupe) {
               if(err) return done(err);
