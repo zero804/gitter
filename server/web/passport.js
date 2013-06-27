@@ -82,8 +82,16 @@ var inviteAcceptStrategy = new ConfirmStrategy({ name: "accept" }, function(conf
 
   winston.verbose("Invoking accept strategy", { confirmationCode: confirmationCode, troupeUri: troupeUri });
 
-  troupeService.acceptInvite(confirmationCode, troupeUri, function(err, user, alreadyUsed) {
-    if(err || !user) {
+  troupeService.acceptInvite(confirmationCode, troupeUri, function(err, result) {
+    if(err) {
+      winston.error('acceptInvite failed', { exception: err });
+      return self.redirect('/' + req.params.troupeUri);
+    }
+
+    var user = result.user;
+    var alreadyUsed = result.alreadyUsed;
+
+    if(!user) {
       return self.redirect('/' + req.params.troupeUri + (alreadyUsed ? '#existing' : ''));
     }
 

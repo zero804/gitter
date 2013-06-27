@@ -5,6 +5,7 @@
 "use strict";
 
 var testRequire = require('../test-require');
+var fixtureLoader = require('../test-fixtures');
 
 var assert = require("assert");
 var persistence = testRequire("./services/persistence-service");
@@ -14,6 +15,9 @@ var times = mockito.Verifiers.times;
 var once = times(1);
 var twice = times(2);
 var thrice = times(3);
+
+var fixture = {};
+
 
 describe('signup-service', function() {
 
@@ -95,18 +99,21 @@ describe('signup-service', function() {
     it('should tell an existing user that they need to login to request access', function(done) {
 
       var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-      var signupService = testRequire.withProxies("./services/signup-service", {
-        './email-notification-service': emailNotificationServiceMock
-      });
 
       var troupeService = testRequire.withProxies('./services/troupe-service', {
         './email-notification-service': emailNotificationServiceMock
       });
 
+      var signupService = testRequire.withProxies("./services/signup-service", {
+        './email-notification-service': emailNotificationServiceMock,
+        './troupe-service': troupeService
+      });
+
+
       persistence.User.findOne({ email: 'testuser@troupetest.local'}, function(err, user) {
         if(err) return done(err);
         if(!user) return done("Could not find user");
-        var userId = user.id;
+
         var existingTroupeUri = 'testtroupe1';
 
         persistence.Troupe.findOne({ uri: existingTroupeUri }, function(err, troupe) {
@@ -116,8 +123,8 @@ describe('signup-service', function() {
           signupService.newSignupWithAccessRequest({
             email: "testuser@troupetest.local",
             name: "Test Guy",
-            troupeId: troupe.id
-          }, function(err, request) {
+            troupe: troupe
+          }, function(err) {
             if(!err) return done("An error should have been returned");
 
             mockito.verifyZeroInteractions(emailNotificationServiceMock);
@@ -148,11 +155,11 @@ describe('signup-service', function() {
         if(err) return done(err);
         if(!troupe) return done('Troupe ' + existingTroupeUri + ' not found');
 
-        signupService.newSignupWithAccessRequest({ email: nonExistingEmail, name: 'Test McTest', troupeId: troupe.id }, function(err, request) {
+        signupService.newSignupWithAccessRequest({ email: nonExistingEmail, name: 'Test McTest', troupe: troupe }, function(err, request) {
           if(err) return done(err);
           if(!request) return done('No request created');
 
-          mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUserRequest();
+          mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
 
           troupeService.acceptRequest(request, function(err) {
             if(err) return done(err);

@@ -30,7 +30,7 @@ describe('username-suggestion-service', function() {
   it('should suggest usernames for seed andrewn', function(done) {
     underTest.suggestUsernames('andrewn')
       .then(function(usernameSuggestions) {
-        assert(usernameSuggestions.length == 2);
+        assert(usernameSuggestions.length >= 1, 'Expected at least one suggestion for andrewn');
       })
       .nodeify(done);
   });
