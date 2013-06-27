@@ -12,7 +12,12 @@ db.requests.find().forEach(function(f) {
   if(f.userId && !db.users.findOne({ _id: f.userId})) {
     print('Deleting ', f);
     db.requests.remove({userId: f.userId});
-   }
+  }
+
+  if(!db.troupes.findOne({ _id: f.troupeId })) {
+    print('Deleting ', f);
+    db.requests.remove({troupeId: f.troupeId});
+  }
 });
 
 DELIM
