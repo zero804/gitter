@@ -13,7 +13,7 @@ var express = require('express'),
 
 if(nconf.get('express:showStack')) {
   try {
-    require("longjohn");
+    //require("longjohn");
   } catch(e) {
     winston.info("Install longjohn using npm install longjohn if you would like better stacktraces.");
   }

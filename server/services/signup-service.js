@@ -6,6 +6,7 @@ var persistence = require("./persistence-service"),
     troupeService = require("./troupe-service"),
     userService = require("./user-service"),
     winston = require('winston'),
+    assert = require('assert'),
     Fiber = require('../utils/fiber');
 
 function newTroupe(options, callback) {
@@ -243,45 +244,41 @@ var signupService = module.exports = {
     winston.info("New signup with access request ", options);
 
     var email = options.email;
-    var name = options.name;
-    var troupeId = options.troupeId;
+    var displayName = options.displayName; // Optional
+    var troupe = options.troupe;
 
-    userService.findByEmail(email, function(err, user) {
-      if(err) return callback(err);
+    assert(email, 'Email address is required');
 
-      if(!user) {
-        // Create a new user and add the request. The users confirmation code will not be set until the first time one one of
-        // their requests is accepted...does this change now that there is a user homepage?
-        var userProperties = {
-          status: 'UNCONFIRMED',
-          email: email,
-          displayName: name
-        };
+    userService.findByEmail(email)
+      .then(function(user) {
 
-        userService.newUser(userProperties, function(err, user) {
-          if(err) return callback(err);
+        if(!user) {
+          // Create a new user and add the request. The users confirmation code will not be set until the first time one one of
+          // their requests is accepted...does this change now that there is a user homepage?
+          return userService.newUser({
+              email: email,
+              displayName: displayName
+            })
+            .then(function(newUser) {
+              emailNotificationService.sendConfirmationForNewUserRequest(newUser);
+              return troupeService.addRequest(troupe, newUser.id);
+            });
+        }
 
-          troupeService.addRequest(troupeId, user.id, function(err, request) {
-            if(err) return callback(err);
-            callback(null, request);
-          });
-        });
-
-      } else {
+        // The user exists. Are they confirmed?
         if (user.status === 'UNCONFIRMED') {
+          // TODO: Do we want to send the user another email ?
+
           // try add a request, if there already is a request it will be returned instead of created,
           // if the user is a member of the troupe it will give an error (memberExists: true)
-          troupeService.addRequest(troupeId, user.id, function(err, request) {
-            if(err) return callback(err);
-            callback(null, request);
-          });
+          return troupeService.addRequest(troupe, user.id);
         }
-        else {
-          // tell the user to login
-          callback({ userExists: true });
-        }
-      }
-    });
+
+        // tell the user to login
+        throw { userExists: true };
+      })
+      .nodeify(callback);
+
   },
 
   /**
@@ -318,39 +315,6 @@ var signupService = module.exports = {
 
         });
 
-  },
-
-  newUnauthenticatedAccessRequest: function(troupe, email, name) {
-    troupeService.findByUri(troupeUri, function(err, troupe) {
-      if(err) { winston.error("findByUri failed", { exception: err } ); return callback(500); }
-      if(!troupe) { winston.error("No troupe with uri", { uri: troupeUri }); return callback(404); }
-
-      var signupParams = {
-        troupeId: troupe.id,
-        name: name,
-        email: email
-      };
-
-      module.exports.newSignupWithAccessRequest(signupParams, function(err) {
-        if(err) {
-          winston.error("newSignupWithAccessRequest failed", { exception: err } );
-
-          if(err.userExists) {
-            return callback({ userExists: true });
-          }
-
-          if (err.memberExists) {
-            return callback({ memberExists: true });
-          }
-
-          return callback(500);
-        }
-
-        callback();
-      });
-
-    });
   }
-
 
 };

@@ -619,6 +619,10 @@ function InviteStrategy(options) {
     var troupe = item.troupeId && troupeIdStrategy.map(item.troupeId);
     var fromUser = item.fromUserId && userIdStrategy.map(item.fromUserId); // In future, all invites will have a fromUserId
 
+    if(!troupe && !fromUser) {
+      return; // This invite is broken.... Data maintenance to remove
+    }
+
     return {
       id: item._id,
       oneToOneInvite: !!fromUser,

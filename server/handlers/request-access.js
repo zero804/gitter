@@ -56,8 +56,11 @@ module.exports = {
               }
 
               if(toTroupe) {
-                // Request access to a troupe
-                return signupService.newUnauthenticatedRequest(toTroupe, req.body.email, req.body.name);
+                return signupService.newSignupWithAccessRequest({
+                    troupe: toTroupe,
+                    displayName: req.body.name,
+                    email: req.body.email
+                  });
               }
 
               throw new Error('Expected either a troupe or user attribute');
@@ -65,7 +68,7 @@ module.exports = {
               res.send({ success: true });
             }).fail(function(err) {
               winston.error("Request access failed: ", { exception: err });
-              res.send({ success: false, userExists: err.userExists, hasPassword: err.hasPassword }, 400);
+              res.send({ success: false, userExists: err.userExists, hasPassword: err.hasPassword, memberExists: err.memberExists }, 400);
             });
 
         }
@@ -104,7 +107,7 @@ module.exports = {
 
                 if(toTroupe) {
                   // Request access to a troupe
-                  return troupeService.addRequest(toTroupe.id, fromUserId);
+                  return troupeService.addRequest(toTroupe, fromUserId);
                 }
 
                 throw new Error('Expected either a troupe or user attribute');

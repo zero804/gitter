@@ -537,34 +537,32 @@ function removeUserFromTroupe(troupeId, userId, callback) {
 }
 
 
-/*
- * callback is function(err, request)
+/**
+ * Create a request or simply return an existing one
+ * returns a promise of a request
  */
-function addRequest(troupeId, userId, callback) {
+function addRequest(troupe, userId) {
+  assert(troupe, 'Troupe parameter is required');
 
   return persistence.Request.findOneQ({
-    troupeId: troupeId,
+    troupeId: troupe.id,
     userId: userId,
     status: 'PENDING'})
     .then(function(request) {
       // Request already made....
       if(request) return request;
 
-      return persistence.Troupe.findOneQ(troupeId)
-          .then(function(troupe) {
-            if(!troupe) return "Unable to find troupe";
-            if(userIdHasAccessToTroupe(userId, troupe)) {
-              throw { memberExists: true };
-            }
+      if(userIdHasAccessToTroupe(userId, troupe)) {
+        throw { memberExists: true };
+      }
 
-            return  persistence.Request.createQ({
-              troupeId: troupeId,
-              userId: userId
-            });
+      return  persistence.Request.createQ({
+        troupeId: troupe.id,
+        userId: userId
+      });
 
-          });
 
-    }).nodeify(callback);
+    });
 }
 
 /*

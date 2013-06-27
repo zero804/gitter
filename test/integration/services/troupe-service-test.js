@@ -15,9 +15,7 @@ var mockito = require('jsmockito').JsMockito;
 var times = mockito.Verifiers.times;
 var once = times(1);
 
-try {
-  require('longjohn');
-} catch(e) {}
+
 Q.longStackSupport = true;
 
 
@@ -175,7 +173,7 @@ function testRequestAcceptance(email, userStatus, emailNotificationConfirmationM
       status: userStatus })
     .then(function(user) {
 
-      return troupeService.addRequest(troupe.id, user.id)
+      return troupeService.addRequest(troupe, user.id)
         .then(function(request) {
           return troupeService.acceptRequest(request);
         })
@@ -212,7 +210,7 @@ function testRequestRejection(email, userStatus, done) {
       status: userStatus }, function(err, user) {
         if(err) return done(err);
 
-        troupeService.addRequest(troupe.id, user.id, function(err, request) {
+        troupeService.addRequest(troupe, user.id, function(err, request) {
           if(err) return done(err);
 
           troupeService.rejectRequest(request, function(err) {

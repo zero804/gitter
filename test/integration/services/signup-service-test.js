@@ -152,10 +152,10 @@ describe('signup-service', function() {
           if(err) return done(err);
           if(!request) return done('No request created');
 
+          mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUserRequest();
+
           troupeService.acceptRequest(request, function(err) {
             if(err) return done(err);
-
-            mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUserRequest();
 
             persistence.Troupe.findOne({ uri: existingTroupeUri }, function(err, troupe) {
               if(err) return done(err);
