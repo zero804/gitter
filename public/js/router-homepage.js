@@ -8,6 +8,7 @@ require([
   'marionette',
   'template/helpers/all',
   'views/base',
+  'views/shareSearch/shareSearchView',
   'components/dozy',
   'views/app/appIntegratedView',
   'views/userHome/userHomeView',
@@ -19,7 +20,7 @@ require([
   'views/toolbar/troupeMenu',
   'utils/router',
   'components/errorReporter'
-], function($, _, context, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, dozy, AppIntegratedView, UserHomeView, troupeCollections,
+], function($, _, context, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, shareSearchView, dozy, AppIntegratedView, UserHomeView, troupeCollections,
   profileView, createTroupeView, UserHeaderView, webNotifications, TroupeMenuView, Router /*, errorReporter , FilteredCollection */) {
 
   "use strict";
@@ -47,7 +48,8 @@ require([
   new Router({
       routes: [
         { name: "profile",        re: /^profile$/,                viewType: profileView.Modal },
-        { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal, collection: troupeCollections.troupes,   skipModelLoad: true }
+        { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal, collection: troupeCollections.troupes,   skipModelLoad: true },
+        { name: "share",          re: /^share$/,                  viewType: shareSearchView.Modal }
       ],
       appView: appView
     });
