@@ -12,7 +12,7 @@ define([
   "use strict";
 
 
-	return TroupeViews.Base.extend({
+	var UsernameView = TroupeViews.Base.extend({
 		template: template,
 
 		events: {
@@ -185,4 +185,11 @@ define([
 
 	});
 
+	UsernameView.Modal = TroupeViews.Modal.extend({
+		initialize: function() {
+			TroupeViews.Modal.prototype.initialize.call(this, { view: new UsernameView() });
+		}
+	});
+
+	return UsernameView;
  });

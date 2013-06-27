@@ -30,6 +30,7 @@ require([
   'views/profile/profileView',
   'views/shareSearch/shareSearchView',
   'views/signup/createTroupeView',
+  'views/signup/usernameView',
   'views/app/invitesView',
   'views/app/troupeHeaderView',
   'views/app/troupeSettingsView',
@@ -40,7 +41,7 @@ require([
 ], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, realtime, eyeballs, dozy, AppIntegratedView, chatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
             itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareSearchView,
-            createTroupeView, InvitesView, TroupeHeaderView,
+            createTroupeView, UsernameView, InvitesView, TroupeHeaderView,
             troupeSettingsView, TroupeMenuView, Router /*, errorReporter , FilteredCollection */) {
   "use strict";
 
@@ -97,6 +98,7 @@ require([
       { name: "share",          re: /^share$/,                  viewType: shareSearchView.Modal },
       { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true },
       { name: "upgradeOneToOne",  re: /^upgradeOneToOne$/,      viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true, viewOptions: { upgradeOneToOne: true } } ,
+      { name: "chooseUsername",   re: /^chooseUsername/,        viewType: UsernameView.Modal },
       { name: "troupeSettings", re: /^troupeSettings/,          viewType: troupeSettingsView }
     ],
     appView: appView
