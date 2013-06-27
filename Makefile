@@ -43,7 +43,7 @@ test-in-browser:
 test-coverage:
 	rm -rf ./coverage/ cobertura-coverage.xml
 	mkdir -p output
-	find $(TESTS) -iname "*test.js" | NODE_ENV=test xargs ./node_modules/.bin/istanbul cover _mocha
+	find $(TESTS) -iname "*test.js" | NODE_ENV=test xargs ./node_modules/.bin/istanbul cover _mocha --timeout 10000
 	./node_modules/.bin/istanbul report cobertura
 
 prepare-for-end-to-end-testing:

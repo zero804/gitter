@@ -20,6 +20,13 @@ function serializeUser(user) {
   return restSerializer.serializeQ(user, strategy);
 }
 
+function serializeHomeUser(user) {
+  var strategy = new restSerializer.UserStrategy({ includeEmail: false, hideLocation: true });
+
+  return restSerializer.serializeQ(user, strategy);
+}
+
+
 function getWebToken(user) {
   return oauthService.findOrGenerateWebToken(user.id);
 }
@@ -67,6 +74,7 @@ function createTroupeContext(req, options) {
   return {
       user: options.user,
       troupe: options.troupe,
+      homeUser: options.homeUser,
       inUserhome: options.inUserhome,
       accessToken: options.accessToken,
       profileNotCompleted: options.profileNotCompleted,
@@ -77,6 +85,7 @@ function createTroupeContext(req, options) {
       basePort: nconf.get('web:baseport'),
       basePath: nconf.get('web:basepath'),
       homeUrl: nconf.get('web:homeurl'),
+
       troupeUri: options.troupe ? options.troupe.uri : undefined,
       websockets: {
         fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
@@ -122,13 +131,15 @@ function renderAppPageWithTroupe(req, res, next, page) {
   var user = req.user;
   var troupe = req.uriContext.troupe;
   var invite = req.uriContext.invite;
+  var homeUser = req.uriContext.oneToOne && req.uriContext.otherUser; // The users page being looked at
   var accessDenied = !req.uriContext.access;
 
   Q.all([
     user ? serializeUser(user) : null,
+    homeUser ? serializeHomeUser(homeUser) : undefined,
     user ? getWebToken(user) : null,
     troupe && user ? serializeTroupe(troupe, user) : fakeSerializedTroupe(req.uriContext) ])
-    .spread(function(serializedUser, token, serializedTroupe) {
+    .spread(function(serializedUser, serializedHomeUser, token, serializedTroupe) {
 
       var status, profileNotCompleted;
       if(user) {
@@ -140,6 +151,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
 
       var troupeContext = createTroupeContext(req, {
         user: serializedUser,
+        homeUser: serializedHomeUser,
         troupe: serializedTroupe,
         accessToken: token,
         profileNotCompleted: profileNotCompleted,
