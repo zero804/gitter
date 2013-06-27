@@ -35,8 +35,9 @@ describe('passport', function() {
 
             strategy.verify(confirmationCode, { params: { troupeUri: troupeUri }}, function(err, user) {
               if(err) return done(err);
+
               assert(user, 'User not created');
-              assert(user.displayName == 'Test User from Invite', 'User display name set incorrectly');
+              assert.equal(user.displayName, 'Test User from Invite');
               assert(user.email == email, 'User email set incorrectly');
 
               done();

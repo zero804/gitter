@@ -79,7 +79,11 @@ exports.addHandler = function addHandler(stageName, stageNumber, shutdownHandler
 };
 
 exports.installUnhandledExceptionHandler = function() {
+  //
+  // Do nothing
+  return;
 
+  //
   process.on('uncaughtException', function(err) {
     winston.error('----------------------------------------------------------------');
     winston.error('-- A VeryBadThing has happened.');

@@ -6,6 +6,7 @@
 
 
 var testRequire = require('../test-require');
+var fixtureLoader = require('../test-fixtures');
 
 var Q = require("Q");
 var assert = require("assert");
@@ -200,50 +201,41 @@ function testRequestRejection(email, userStatus, done) {
     './email-notification-service': emailNotificationServiceMock
   });
 
-  persistence.Troupe.findOne({ uri: 'testtroupe1' }, function(err, troupe) {
-    if(err) return done(err);
+  persistence.User.create({
+    email: email,
+    displayName: 'Test User ' + new Date(),
+    confirmationCode: null,  // IMPORTANT. This is the point of the test!!!
+    status: userStatus }, function(err, user) {
+      if(err) return done(err);
 
-    persistence.User.create({
-      email: email,
-      displayName: 'Test User ' + new Date(),
-      confirmationCode: null,  // IMPORTANT. This is the point of the test!!!
-      status: userStatus }, function(err, user) {
-        if(err) return done(err);
+      troupeService.addRequest(fixture.troupe1, user.id)
+        .then(function(request) {
 
-        troupeService.addRequest(troupe, user.id, function(err, request) {
-          if(err) return done(err);
-
-          troupeService.rejectRequest(request, function(err) {
-            if(err) return done(err);
-
+        troupeService.rejectRequest(request)
+          .then(function() {
             mockito.verifyZeroInteractions(emailNotificationServiceMock);
 
-            persistence.Troupe.findOne({ uri: 'testtroupe1' }, function(err, troupe2) {
+            assert(!troupeService.userHasAccessToTroupe(user, fixture.troupe2), 'User has not been granted access to the troupe');
+            assert(!troupeService.userIdHasAccessToTroupe(user.id, fixture.troupe2), 'User has not been granted access to the troupe');
+
+            persistence.Request.findOne({ id: request.id }, function(err, r2) {
               if(err) return done(err);
 
-              assert(!troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
-              assert(!troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
-
-              persistence.Request.findOne({ id: request.id }, function(err, r2) {
-                if(err) return done(err);
-
-                assert(!r2, 'Request should have been deleted');
-                return done();
-              });
+              assert(!r2, 'Request should have been deleted');
+              return done();
             });
 
-          });
         });
-
       });
-  });
+
+    });
 }
 
 describe('troupe-service', function() {
 
   describe('#acceptRequest()', function() {
-    it('should allow an ACTIVE user (without a confirmation code) request to be accepted', function(done) {
 
+    it('should allow an ACTIVE user (without a confirmation code) request to be accepted', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
 
       testRequestAcceptance(nonExistingEmail, 'ACTIVE', 'sendRequestAcceptanceToUser', done);
@@ -521,7 +513,6 @@ describe('troupe-service', function() {
 
                           return persistence.User.updateQ({ _id: user._id }, { status: 'ACTIVE'})
                             .spread(function(numResults) {
-                              console.log(numResults);
                               if(numResults !== 1) throw "Expected one update result, got " + numResults;
 
                               return troupeService.acceptInvite(invite.code, newTroupe.uri)
@@ -703,19 +694,7 @@ describe('troupe-service', function() {
     });
   });
 
-  before(function(done) {
-    function checkNotNull(a) {
-      if(!a) throw "Fixture data is missing";
-      return a;
-    }
-
-    Q.all([
-      persistence.User.findOneQ({ email: 'testuser@troupetest.local' }).then(checkNotNull).then(function(user) { fixture.user1 = user; }),
-      persistence.User.findOneQ({ email: 'testuser2@troupetest.local' }).then(checkNotNull).then(function(user) { fixture.user2 = user; }),
-      persistence.Troupe.findOneQ({ uri: 'testtroupe1' }).then(checkNotNull).then(function(troupe) { fixture.troupe1 = troupe; })
-    ]).nodeify(done);
-
-  });
+  before(fixtureLoader(fixture));
 
 
 });
