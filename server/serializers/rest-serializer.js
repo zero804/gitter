@@ -90,7 +90,7 @@ function UserStrategy(options) {
     }
 
     var location;
-    if(true /* options.showLocation */ && user.location.timestamp) {
+    if(!options.hideLocation && user.location.timestamp) {
       location = {
         description: getLocationDescription(user.location.named),
         timestamp: formatDate(user.location.timestamp),
