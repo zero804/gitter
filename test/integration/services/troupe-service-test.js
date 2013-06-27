@@ -1,7 +1,6 @@
 #!/usr/bin/env mocha --ignore-leaks
-
 /*jslint node:true, unused:true*/
-/*global describe:true, it:true, afterEach:true, before:true */
+/*global describe:true, it:true, before:true */
 "use strict";
 
 
@@ -20,8 +19,6 @@ Q.longStackSupport = true;
 
 var times = mockito.Verifiers.times;
 var once = times(1);
-var twice = times(2);
-var thrice = times(3);
 
 var fixture = {};
 
@@ -281,7 +278,7 @@ describe('troupe-service', function() {
 
 
   describe('#acceptInvite', function() {
-    it('should make an UNCONFIRMED user PROFILE_NOT_COMPLETED on accepting an invite and should update any unconfirmed invites to that user', function(done) {
+    it('should make an UNCONFIRMED user PROFILE_NOT_COMPLETED on accepting a one-to-one invite and should update any unconfirmed invites to that user', function(done) {
       var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
 
       var troupeService = testRequire.withProxies("./services/troupe-service", {
@@ -342,6 +339,65 @@ describe('troupe-service', function() {
 
         })
         .nodeify(done);
+    });
+
+    it('should make an UNCONFIRMED user PROFILE_NOT_COMPLETED on accepting a troupe invite and should update any unconfirmed invites to that user', function(done) {
+      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+
+      var troupeService = testRequire.withProxies("./services/troupe-service", {
+        './email-notification-service': emailNotificationServiceMock
+      });
+
+      var email = 'test' + Date.now() + '@troupetest.local';
+      var displayName =  'Test User ' + new Date();
+
+      // Have another user invite them to a one to one chat
+      return troupeService.createInvite(fixture.troupe1, {
+        fromUser: fixture.user1,
+        email: email,
+        displayName: displayName
+      }).then(function(invite) {
+        assert.equal(invite.status, 'UNUSED');
+
+        mockito.verify(emailNotificationServiceMock).sendInvite();
+
+        // Now have the new UNCONFIRMED USER invite someone to connect
+        return troupeService.createInvite(fixture.troupe2, {
+          fromUser: fixture.user2,
+          email: email,
+          displayName: displayName
+        }).then(function(secondInvite) {
+          assert.equal(secondInvite.status, 'UNUSED');
+
+          // Have user one accept the INVITE
+          return troupeService.acceptInvite(invite.code, fixture.troupe1.uri)
+            .then(function(result) {
+
+              var newUser = result.user;
+              assert(!result.alreadyUsed, 'Invite has not already been used');
+              assert.equal(newUser.status, 'PROFILE_NOT_COMPLETED');
+              assert.equal(newUser.displayName, displayName);
+              assert.equal(newUser.email, email);
+
+              return troupeService.findById(fixture.troupe1.id)
+                .then(function(troupe1Reloaded) {
+                  assert(troupe1Reloaded.containsUserId(newUser.id) ,'New user should have access to troupe');
+
+                  // Now we should also check that the invites that we UNCONFIRMED have been sent out
+                  // and are now set to UNUSED
+                  return persistence.Invite.findByIdQ(secondInvite)
+                    .then(function(secondInviteReloaded) {
+                      assert.equal(secondInviteReloaded.status, 'UNUSED');
+                      assert.equal(secondInviteReloaded.userId, newUser.id);
+                    });
+                });
+
+            });
+        });
+
+
+      })
+      .nodeify(done);
     });
   });
 

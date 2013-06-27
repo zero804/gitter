@@ -1131,6 +1131,11 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
               displayName: invite.displayName,
               email: invite.email,
               status: "PROFILE_NOT_COMPLETED"
+            }).then(function(user) {
+              return updateInvitesForEmailToUserId(invite.email, user.id)
+                .then(function() {
+                  return user;
+                });
             });
           }
 
@@ -1186,7 +1191,6 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
 }
 
 function sendPendingInviteMails(delaySeconds, callback) {
-  var count = 0;
   delaySeconds = (delaySeconds === null) ? 10 * 60 : delaySeconds;
   var searchParams = {
     status: "UNUSED",
