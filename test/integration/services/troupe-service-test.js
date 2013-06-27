@@ -16,9 +16,12 @@ var mockito = require('jsmockito').JsMockito;
 var times = mockito.Verifiers.times;
 var once = times(1);
 
-
 Q.longStackSupport = true;
 
+var times = mockito.Verifiers.times;
+var once = times(1);
+var twice = times(2);
+var thrice = times(3);
 
 var fixture = {};
 
@@ -279,7 +282,11 @@ describe('troupe-service', function() {
 
   describe('#acceptInvite', function() {
     it('should make an UNCONFIRMED user PROFILE_NOT_COMPLETED on accepting an invite and should update any unconfirmed invites to that user', function(done) {
-      var troupeService = testRequire('./services/troupe-service');
+      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+
+      var troupeService = testRequire.withProxies("./services/troupe-service", {
+        './email-notification-service': emailNotificationServiceMock
+      });
 
       // Create a new UNCONFIRMED user
       persistence.User.createQ({
@@ -294,22 +301,43 @@ describe('troupe-service', function() {
             fromUser: fixture.user1,
             userId: user.id
           }).then(function(invite) {
+            mockito.verify(emailNotificationServiceMock).sendConnectInvite();
 
-            // Have user one accept the INVITE
-            return troupeService.acceptInvite(invite.code, fixture.user1.getHomeUrl())
-              .then(function(result) {
+            // Now have the new UNCONFIRMED USER invite someone to connect
+            return troupeService.createInvite(null, {
+              fromUser: user,
+              userId: fixture.user2.id
+            }).then(function(secondInvite) {
 
-                var user2 = result.user;
-                assert(!result.alreadyUsed, 'Invite has not already been used');
-                assert.equal(user2.id, user.id);
-                assert.equal(user2.status, 'PROFILE_NOT_COMPLETED');
+              assert.equal(secondInvite.status, 'UNCONFIRMED');
 
-                return troupeService.findOneToOneTroupe(fixture.user1.id, user2.id)
-                  .then(function(newTroupe) {
-                    assert(newTroupe, 'A troupe should exist for the users');
-                  });
+              // Have user one accept the INVITE
+              return troupeService.acceptInvite(invite.code, fixture.user1.getHomeUrl())
+                .then(function(result) {
 
-              });
+                  var user2 = result.user;
+                  assert(!result.alreadyUsed, 'Invite has not already been used');
+                  assert.equal(user2.id, user.id);
+                  assert.equal(user2.status, 'PROFILE_NOT_COMPLETED');
+
+                  return troupeService.findOneToOneTroupe(fixture.user1.id, user2.id)
+                    .then(function(newTroupe) {
+                      assert(newTroupe, 'A troupe should exist for the users');
+
+
+                      // Now we should also check that the invites that we UNCONFIRMED have been sent out
+                      // and are now set to UNUSED
+                      return persistence.Invite.findQ({ fromUserId: user.id })
+                        .then(function(invites) {
+                          assert(invites.length == 1);
+                          assert.equal(invites[0].status, 'UNUSED');
+                        });
+                    });
+
+                });
+            });
+
+
           });
 
         })

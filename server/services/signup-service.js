@@ -299,7 +299,7 @@ var signupService = module.exports = {
                 .then(function(implicitConnection) {
                   // Check if fromUser has an implicit connection to toUser, no need for am invite...
                   if(!implicitConnection) {
-                    return troupeService.inviteUserByUserId(null, fromUser.id, toUser.id);
+                    return troupeService.inviteUserByUserId(null, fromUser, toUser.id);
                   }
                 })
                 .then(function() {
@@ -311,7 +311,7 @@ var signupService = module.exports = {
           newUser({ email: email, displayName: name })
             .then(function(newUser) {
 
-              return troupeService.inviteUserByUserId(null, newUser.id, toUser.id, true /* UNCONFIRMED */);
+              return troupeService.inviteUserByUserId(null, newUser, toUser.id);
             });
 
         });
