@@ -22,21 +22,40 @@ define([
       'submit #share-form': 'sendInvites'
     },
 
-    initialize: function() {
+    // when instantiated by default (through the controller) this will reflect on troupeContext to determine what the invite is for.
+    //
+    initialize: function(options) {
       // [ { userId: }, or { email: } ]
       this.invites = [];
-      this.uri = window.troupeContext.troupe.uri;
-      this.basePath = window.troupeContext.basePath;
+
+      if (options.overrideContext === true) {
+        this.data = {
+          inviteToTroupe: options.inviteToTroupe,
+          inviteToConnect: options.inviteToConnect,
+
+          troupe: options.troupe,
+          user: options.user
+          // , inviteUser: options.inviteUser
+        };
+      }
+      else {
+        this.data = {
+          inviteToTroupe: context.inTroupeContext() || context.inOneToOneTroupeContext(),
+          inviteToConnect: context.inUserhomeContext(),
+
+          troupe: context.getTroupe(),
+          user: context.getUser()
+        };
+      }
+
+      if (this.data.inviteToTroupe && !this.data.troupe) throw new Error("Need a troupe");
+      if (this.data.inviteToConnect && !this.data.user) throw new Error("Need a viewer");
+
+      this.data.uri = (this.data.inTroupeContext) ? this.data.troupe.uri : this.data.user.username;
+      this.data.basePath = context().basePath;
       this.addCleanup(function() {
         if(this.clip) this.clip.destroy();
       });
-    },
-
-    getRenderData: function() {
-      return {
-        uri: this.uri,
-        basePath: window.troupeContext.basePath
-      };
     },
 
     afterRender: function() {
@@ -50,7 +69,7 @@ define([
       ZeroClipboard.setMoviePath( 'repo/zeroclipboard/ZeroClipboard.swf' );
       ZeroClipboard.Client.prototype.zIndex = 100000;
       var clip = new ZeroClipboard.Client();
-      clip.setText( this.basePath + "/" + this.uri );
+      clip.setText( this.data.basePath + "/" + this.data.uri );
       // clip.glue( 'copy-button');
       // make your own div with your own css property and not use clip.glue()
       var flash_movie = '<div>'+clip.getHTML(width, height)+'</div>';
@@ -241,8 +260,10 @@ define([
         return alert("Please select at least one user or email address to send to, or press escape to cancel.");
       }
 
+      var ajaxEndpoint = (this.data.inviteToTroupe) ? "/troupes/" + context.getTroupeId() + "/invites" : "/api/v1/inviteconnections";
+
       $.ajax({
-        url: "/troupes/" + context.getTroupeId() + "/invites",
+        url: ajaxEndpoint,
         contentType: "application/json",
         dataType: "json",
         data: this.serialize(),
