@@ -45,11 +45,11 @@ module.exports = {
 
     app.post('/api/v1/requestaccessexisting',
         auth,
-        expressValidator,
+        expressValidator(),
         require('./request-access-existing.js'));
 
     app.post('/api/v1/requestaccess',
-        expressValidator,
+        expressValidator(),
         require('./request-access-new.js'));
 
   }
