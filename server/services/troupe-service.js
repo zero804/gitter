@@ -356,8 +356,9 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
  * @return {[type]} promise with invite
  */
 function inviteUserByEmail(troupe, fromUser, displayName, email) {
-  assert(fromUser, "fromUser expected");
+  assert(fromUser && fromUser.id, "fromUser expected");
   assert(email, "email expected");
+  assert(!troupe || troupe.id, "troupe must have an id");
 
   // Only non-registered users should go through this flow.
   // Check if the email is registered to a user.
@@ -370,7 +371,10 @@ function inviteUserByEmail(troupe, fromUser, displayName, email) {
 
       var fromUserId = fromUser.id;
 
-      return persistence.Invite.findOneQ({ status: "UNUSED", troupeId: troupe.id, email: email })
+      var query = troupe ? { status: "UNUSED", troupeId: troupe.id, email: email }
+                         : { status: "UNUSED", fromUserId: fromUser.id, email: email };
+
+      return persistence.Invite.findOneQ(query)
           .then(function(existingInvite) {
             // Found an existing invite? Don't create a new one then
             if(existingInvite) return existingInvite;
@@ -380,8 +384,8 @@ function inviteUserByEmail(troupe, fromUser, displayName, email) {
             // create the invite and send mail immediately
 
             return persistence.Invite.createQ({
-              troupeId: troupe.id,
-              fromUser: fromUserId,
+              troupeId: troupe && troupe.id,
+              fromUserId: fromUserId,
               displayName: displayName,
               email: email,
               emailSentAt: Date.now(),
@@ -389,7 +393,6 @@ function inviteUserByEmail(troupe, fromUser, displayName, email) {
             });
 
           }).then(function(invite) {
-
             if(troupe) {
               // For new or existing invites, send the user an email
               emailNotificationService.sendInvite(troupe, displayName, email, invite.code, fromUser.displayName);
