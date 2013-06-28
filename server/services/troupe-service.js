@@ -18,6 +18,12 @@ var persistence = require("./persistence-service"),
 
 var ObjectID = require('mongodb').ObjectID;
 
+
+function ensureExists(value) {
+  if(!value) throw 404;
+  return value;
+}
+
 function findByUri(uri, callback) {
   return persistence.Troupe.findOneQ({uri: uri})
     .nodeify(callback);
@@ -36,10 +42,8 @@ function findById(id, callback) {
 }
 
 function findByIdRequired(id) {
-  return persistence.Troupe.findByIdQ(id).then(function(t) {
-    if(!t) throw 404;
-    return t;
-  });
+  return persistence.Troupe.findByIdQ(id)
+    .then(ensureExists);
 }
 
 
@@ -431,6 +435,11 @@ function findInviteById(id, callback) {
     .nodeify(callback);
 }
 
+function findInviteByConfirmationCode(confirmationCode) {
+  return persistence.Invite.findOneQ({ code: confirmationCode });
+}
+
+
 function findAllUnusedInvitesForTroupe(troupeId, callback) {
    persistence.Invite.where('troupeId').equals(troupeId)
       .where('status').equals('UNUSED')
@@ -591,29 +600,6 @@ function findRequestsByIds(requestIds, callback) {
     .exec(callback);
 
 }
-
-/*
-function findUserByIdEnsureConfirmationCode(userId, callback) {
-  userService.findById(userId, function(err, user) {
-    if(err) return callback(err);
-    if(!user) return callback();
-
-    // If the user doesn't have a confirmation code, give them one now
-    if(!user.confirmationCode) {
-      winston.info('User ' + userId + ' had no confirmation code, generating one now');
-      user.confirmationCode = uuid.v4();
-      user.save(function(err) {
-        if(err) return callback(err);
-        callback(null, user);
-      });
-
-      return;
-    }
-
-    return callback(null, user);
-  });
-}
-*/
 
 /**
  * Accept a request: add the user to the troupe and delete the request
@@ -1040,23 +1026,16 @@ function acceptInviteForAuthenticatedUser(user, invite) {
     statsService.event('invite_accepted', { inviteId: invite.id});
     winston.verbose("Invite accepted", { inviteId: invite.id });
 
-
-    // IF this is an invite to join a troupe...
-    if(invite.troupeId) {
-      return addUserIdToTroupe(user.id, invite.troupeId)
-        .then(function(/*troupe*/) {
-          return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite);
-        });
-    }
-
-    // Otherwise, this is an invite to connect with a user
-    return createOneToOneTroupe(invite.fromUserId, invite.userId)
+    // Either add the user or create a one to one troupe. depending on whether this
+    // is a one to one invite or a troupe invite
+    return (invite.troupeId ? addUserIdToTroupe(user.id, invite.troupeId)
+                            : createOneToOneTroupe(invite.fromUserId, invite.userId))
       .then(function() {
+        // Regardless of the type, mark things as done
         return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite);
       });
+
   });
-
-
 }
 
 /**
@@ -1278,6 +1257,7 @@ module.exports = {
   userIdHasAccessToTroupe: userIdHasAccessToTroupe,
   createInvite: createInvite,
   findInviteById: findInviteById,
+  findInviteByConfirmationCode: findInviteByConfirmationCode,
   findMemberEmails: findMemberEmails,
   findAllUnusedInvitesForTroupe: findAllUnusedInvitesForTroupe,
   findAllUnusedInvitesForEmail: findAllUnusedInvitesForEmail,

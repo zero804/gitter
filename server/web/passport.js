@@ -75,31 +75,6 @@ function loginAndPasswordUserStrategy(login, password, done) {
   });
 }
 
-var inviteAcceptStrategy = new ConfirmStrategy({ name: "accept" }, function(confirmationCode, req, done) {
-  var self = this;
-
-  var appUri = req.params.appUri;
-
-  winston.verbose("Invoking accept strategy", { confirmationCode: confirmationCode, appUri: appUri });
-
-  troupeService.acceptInvite(confirmationCode, appUri, function(err, result) {
-    if(err) {
-      winston.error('acceptInvite failed', { exception: err });
-      return self.redirect('/' + appUri);
-    }
-
-    var user = result.user;
-    var alreadyUsed = result.alreadyUsed;
-
-    if(!user) {
-      return self.redirect('/' + appUri + (alreadyUsed ? '#existing' : ''));
-    }
-
-    return done(null, user);
-  });
-
-});
-
 module.exports = {
   install: function() {
 
@@ -158,8 +133,6 @@ module.exports = {
       });
     })
   );
-
-  passport.use(inviteAcceptStrategy);
 
   passport.use(new ConfirmStrategy({ name: "passwordreset" }, function(confirmationCode, req, done) {
       userService.findAndUsePasswordResetCode(confirmationCode, function(err, user) {
@@ -237,10 +210,6 @@ module.exports = {
         });
       }
     ));
-  },
-
-  testOnly: {
-    inviteAcceptStrategy: inviteAcceptStrategy
   }
 
 };
