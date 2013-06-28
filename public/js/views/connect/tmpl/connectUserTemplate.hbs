@@ -19,7 +19,6 @@
     <div class="trpModalRequestForm" style="text-align: center">
      <!-- don't show the input fields if the user is already signed in, but do show the submit button -->
       <form id="requestAccess">
-
         <div class="trpRequestSubmit">
           {{#if authenticated}}
           <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen" id="submit-button" style="min-width: 110px">Connect</button>
@@ -34,6 +33,16 @@
   </div>
 </div>
 
+<div class="modal-success">
+  <div class="trpModalTitle">Invite has been sent</div>
+  <div class="trpModalSubtext">We've sent the invite, once it's accepted you'll be able to chat with {{firstName}}.<br><br>
+    {{^authenticated}}
+    In the mean-time, why not learn more about Troupe?<br><br>
+      <a href="{{homeUrl}}" class="trpButtonBig trpBtnGreen">Show me more</a>
+    {{/authenticated}}
+      <a href="javascript:history.back();" class="trpModalButton trpButtonBig trpBtnGrey" id="cancel-button">Close</a>
+  </div>
+</div>
 
 
 

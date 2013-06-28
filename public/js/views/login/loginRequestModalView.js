@@ -58,6 +58,7 @@ define([
     },
 
     validateForm : function () {
+      if (this.authenticated) return;
       var validateEl = this.$el.find('#requestAccess');
       validateEl.validate({
         rules: {
@@ -113,7 +114,8 @@ define([
         global: false,
         success: function(data) {
           if(data.success) {
-            that.trigger('confirm.signup', {userEmail: email});
+            $('.modal-content').hide();
+            $('.modal-success').show();
             return;
           }
 
