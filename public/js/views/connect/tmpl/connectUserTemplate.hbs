@@ -1,0 +1,39 @@
+<div class="modal-content">
+  <div id="request-form">
+    <div class="trpModalTitle">
+        <div style="text-align: center">
+          {{widget "avatar" user=homeUser}}
+        </div>
+        <div style="text-align: center">
+          {{homeUser.displayName}}
+        </div>
+    </div>
+    <div class="trpModalSubtext" style="text-align: center"><br>
+      {{#if authenticated}}
+      You are not conneted to this user. <br><br>Click on Connect below and we'll send an invite to {{firstName}}.
+      {{else}}
+      You currently aren't signed in. <br><br>Please sign in or create an account so that you can connect with {{firstName}}
+      {{/if}}
+    <br><br>
+    </div>
+    <div class="trpModalRequestForm" style="text-align: center">
+     <!-- don't show the input fields if the user is already signed in, but do show the submit button -->
+      <form id="requestAccess">
+
+        <div class="trpRequestSubmit">
+          {{#if authenticated}}
+          <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen" id="submit-button" style="min-width: 110px">Connect</button>
+          <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="cancel-button" style="min-width: 110px">Cancel</button>
+          {{else}}
+          <button type="button" class="trpModalButton trpButtonBig trpBtnGreen signin" id="sigin-button" style="min-width: 110px">Sign in</button>
+          <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="create-account-button" style="min-width: 110px">Create account</button>
+         {{/if}}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+

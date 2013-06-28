@@ -21,6 +21,10 @@ define([
     return !!context().user;
   };
 
+  context.getHomeUser = function() {
+    return context().homeUser;
+  };
+
   context.inTroupeContext = function() {
     return !!context().troupe;
   };
