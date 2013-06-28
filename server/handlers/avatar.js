@@ -7,6 +7,7 @@ var middleware = require('../web/middleware'),
     assert = require('assert'),
     mongoose = require("mongoose"),
     restSerializer = require("../serializers/rest-serializer"),
+    userService = require('../services/user-service'),
     Fiber = require("../utils/fiber");
 
 function redirectToDefault(size, user, res) {
@@ -82,6 +83,19 @@ function saveAvatarToGridFS(localPath, gridFSFilename, callback) {
 
 module.exports = {
     install: function(app) {
+      app.get('/avatarForEmail/:email', function(req, res, next) {
+        var email = req.params.email;
+        assert(email, "An email address must be provided in the url");
+        userService.findByEmail(email, function(err, user) {
+          if (err) return next(err);
+          if (!user) {
+            return res.redirect("https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon");
+          }
+
+          displayAvatarFor('s', user.id, req, res);
+        });
+      });
+
       app.get(
         '/avatar',
         middleware.ensureLoggedIn(),
