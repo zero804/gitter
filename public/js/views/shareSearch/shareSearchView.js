@@ -141,7 +141,9 @@ define([
           }
 
           // fetch from server
-          $.ajax({ url: '/user?excludeTroupeId=' + context.getTroupeId() + '&q=' + query, success:
+          var url = '/user';
+          var urlData = { excludeTroupeId: context.getTroupeId(), q: query };
+          $.ajax({ url: '/user', data: urlData, success:
             function(data) {
 
               source = data.results || [];
