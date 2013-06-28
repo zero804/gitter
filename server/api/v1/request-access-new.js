@@ -14,7 +14,7 @@ module.exports = function(req, res) {
 
   req.checkBody('name', 'Invalid name').notEmpty().is(/^[^<>]{2,}$/);
   req.checkBody('email', 'Invalid email address').notEmpty().isEmail();
-  req.checkBody('troupeUri', 'Invalid troupeUri').notEmpty();
+  req.checkBody('appUri', 'Invalid appUri').notEmpty();
 
 
   var mappedErrors = req.validationErrors(true);
@@ -31,7 +31,7 @@ module.exports = function(req, res) {
   }
 
 
-  var uri = req.body.troupeUri;
+  var uri = req.body.appUri;
 
   uriService.findUri(uri)
     .then(function(result) {

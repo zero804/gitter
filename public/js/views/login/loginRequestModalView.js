@@ -32,7 +32,7 @@ define([
       return {
         email: this.initialEmail,
         homeUrl: c.homeUrl,
-        troupeUri: troupe.uri,
+        appUri: troupe.uri,
         authenticated: this.authenticated,
         isOneToOne: troupe && troupe.oneToOne
       };
