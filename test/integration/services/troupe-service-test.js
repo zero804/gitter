@@ -280,6 +280,34 @@ describe('troupe-service', function() {
 
 
   describe('#acceptInvite', function() {
+    it('should handle users inviting non-registered users to connect multiple times, while only creating a single invite', function(done) {
+      var troupeService = testRequire("./services/troupe-service");
+
+      var email =  'test' + Date.now() + '@troupetest.local';
+
+      // Have another user invite them to a one to one chat
+      return troupeService.createInvite(null, {
+          fromUser: fixture.user1,
+          email: email
+        }).then(function(invite1) {
+          return troupeService.createInvite(null, {
+              fromUser: fixture.user1,
+              email: email
+            }).then(function(invite2) {
+              // Don't create a second invite - should return the same one
+              assert.equal(invite1.id, invite2.id);
+
+              return troupeService.createInvite(null, {
+                  fromUser: fixture.user2,
+                  email: email
+                }).then(function(invite3) {
+                  assert.notEqual(invite1.id, invite3.id);
+                });
+
+            });
+        }).nodeify(done);
+    });
+
     it('should make an UNCONFIRMED user PROFILE_NOT_COMPLETED on accepting a one-to-one invite and should update any unconfirmed invites to that user', function(done) {
       var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
 
