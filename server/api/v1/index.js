@@ -2,6 +2,7 @@
 "use strict";
 
 var middleware = require('../../web/middleware');
+var expressValidator = require('express-validator');
 
 module.exports = {
   install: function(app) {
@@ -10,29 +11,46 @@ module.exports = {
         middleware.ensureLoggedIn()
     ];
 
-    app.all('/api/v1/location', auth);
-    app.resource('api/v1/location', require('./location.js'));
+    app.resource('api/v1/location',
+        auth,
+        require('./location.js'));
 
     /* APN has no auth requirement as user may not have authenticated */
-    app.resource('api/v1/apn', require('./apn.js'));
+    app.resource('api/v1/apn',
+        require('./apn.js'));
 
-    app.all('/api/v1/userapn', auth);
-    app.resource('api/v1/userapn', require('./userapn.js'));
+    app.resource('api/v1/userapn',
+        auth,
+        require('./userapn.js'));
 
-    app.all('/api/v1/eyeballs', auth);
-    app.resource('api/v1/eyeballs', require('./eyeballs.js'));
+    app.resource('api/v1/eyeballs',
+        auth,
+        require('./eyeballs.js'));
 
-    app.all('/api/v1/ping', auth);
-    app.get('/api/v1/ping', require('./ping.js'));
+    app.get('/api/v1/ping',
+        auth,
+        require('./ping.js'));
 
     // No auth for username suggestions yet
-    app.get('/api/v1/usernamesuggestions', require('./username-suggestions.js'));
+    app.get('/api/v1/usernamesuggestions',
+        require('./username-suggestions.js'));
 
-    app.all('/api/v1/sockets', auth);
-    app.resource('api/v1/sockets', require('./sockets.js'));
+    app.resource('api/v1/sockets',
+        auth,
+        require('./sockets.js'));
 
-    app.all('/api/v1/inviteconnections', auth);
-    app.post('/api/v1/inviteconnections', require('./invite-connections.js'));
+    app.post('/api/v1/inviteconnections',
+        auth,
+        require('./invite-connections.js'));
+
+    app.post('/api/v1/requestaccessexisting',
+        auth,
+        expressValidator,
+        require('./request-access-existing.js'));
+
+    app.post('/api/v1/requestaccess',
+        expressValidator,
+        require('./request-access-new.js'));
 
   }
 };

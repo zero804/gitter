@@ -191,6 +191,7 @@ function validateTroupeUrisForUser(userId, uris, callback) {
 function addUserIdToTroupe(userId, troupeId) {
   return findByIdRequired(troupeId)
       .then(function(troupe) {
+        if(troupe.status != 'ACTIVE') throw { troupeNoLongerActive: true };
 
         if(troupe.containsUserId(userId)) {
           return troupe;
@@ -1001,95 +1002,61 @@ function createNewTroupeForExistingUser(options, callback) {
 
 // so that the invite doesn't show up in the receiver's list of pending invitations
 // marks the invite as used
-function rejectInviteForAuthenticatedUser(user, inviteId, callback) {
-  assert(user); assert(inviteId);
+function rejectInviteForAuthenticatedUser(user, invite) {
+  return Q.resolve(null).then(function() {
+    assert(user, 'User parameter required');
+    assert(invite, 'invite parameter required');
 
-  findInviteById(inviteId, function(err, invite) {
-    if(err) return callback(err);
 
     if(invite.email !== user.email && invite.userId != user.id) {
-      winston.error('User attempted to reject an invite that doesnt belong to them', {
-        userId: user.id,
-        userEmail: user.email,
-        inviteId: invite.id,
-        inviteUserId: "" + invite.userId,
-        inviteEmail: invite.email
-      });
-
-      return callback(401);
+      throw 401;
     }
 
-    if(!invite) {
-      winston.error("Invite id=" + inviteId + " not found. ");
-      return callback(null, null);
-    }
+    statsService.event('invite_rejected', { inviteId: invite.id });
+    winston.verbose("Invite rejected", { inviteId: invite.id });
 
-    statsService.event('invite_rejected', { inviteId: inviteId });
-    winston.verbose("Invite rejected", { inviteId: inviteId });
-
-    markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite, callback);
+    return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite);
   });
-
 }
 
-function acceptInviteForAuthenticatedUser(user, inviteId, callback) {
-  assert(user, 'User parameter required');
-  assert(inviteId, 'inviteId parameter required');
-
-  // check that the logged in user owns this invite
-  // mark as used.
-  findInviteById(inviteId, function(err, invite) {
-    if(err) return callback(err);
-
-    if(!invite) {
-      return callback("No such invite found");
-    }
+function acceptInviteForAuthenticatedUser(user, invite) {
+  return Q.resolve(null).then(function() {
+    assert(user, 'User parameter required');
+    assert(invite, 'invite parameter required');
 
     if(invite.email !== user.email && invite.userId != user.id) {
-      return callback(401);
+      throw 401;
     }
 
     if(invite.status !== 'UNUSED') {
       // invite has been used, we can't use it again.
       winston.verbose("Invite has already been used", { inviteId: invite.id });
-      statsService.event('invite_reused', { inviteId: inviteId });
+      statsService.event('invite_reused', { inviteId: invite.id });
 
-      callback("Invite has already been used");
-    } else {
-      // use and delete invite
-      statsService.event('invite_accepted', { inviteId: inviteId });
-      winston.verbose("Invite accepted", { inviteId: inviteId });
-
-
-      // IF this is an invite to join a troupe...
-      if(invite.troupeId) {
-        // find the troupe
-        findById(invite.troupeId, function(err, troupe) {
-          if(err) return callback(err);
-          if(!troupe) return callback(404);
-          if(troupe.status != 'ACTIVE') return callback({ troupeNoLongerActive: true });
-
-          troupe.addUserById(user.id);
-          troupe.save(function(err) {
-            if(err) return callback(err);
-
-            markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite, callback);
-          });
-
-        });
-        return;
-      }
-
-      // Otherwise, this is an invite to connect with a user
-      createOneToOneTroupe(invite.fromUserId, invite.userId, function(err) {
-        if(err) return callback(err);
-
-        markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite, callback);
-      });
-
+      throw { alreadyUsed: true };
     }
 
+    // use and delete invite
+    statsService.event('invite_accepted', { inviteId: invite.id});
+    winston.verbose("Invite accepted", { inviteId: invite.id });
+
+
+    // IF this is an invite to join a troupe...
+    if(invite.troupeId) {
+      return addUserIdToTroupe(user.id, invite.troupeId)
+        .then(function(/*troupe*/) {
+          return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite);
+        });
+    }
+
+    // Otherwise, this is an invite to connect with a user
+    return createOneToOneTroupe(invite.fromUserId, invite.userId)
+      .then(function() {
+        return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite);
+      });
   });
+
+
 }
 
 /**

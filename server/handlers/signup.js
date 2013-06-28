@@ -3,7 +3,6 @@
 
 var signupService = require("../services/signup-service"),
     middleware = require("../web/middleware"),
-    troupeService = require("../services/troupe-service"),
     userService = require('../services/user-service'),
     loginUtils = require('../web/login-utils'),
     winston = require('winston'),
@@ -110,8 +109,9 @@ module.exports = {
           });
         });
 
-
-      app.get('/:troupeUri/confirm/:confirmationCode',
+      // This can probably go
+      // TODO: remove
+      app.get('/:appUri/confirm/:confirmationCode',
         middleware.authenticate('confirm', {}),
         function(req, res/*, next*/) {
             winston.verbose("Confirmation authenticated");
@@ -119,7 +119,7 @@ module.exports = {
             /* User has been set passport/accept */
             signupService.confirmSignup(req.user, function(err, user, troupe) {
               if (err || !troupe) {
-                res.relativeRedirect("/" + req.params.troupeUri);
+                res.relativeRedirect("/" + req.params.appUri);
                 return;
               }
 

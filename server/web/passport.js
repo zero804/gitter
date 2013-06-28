@@ -78,21 +78,21 @@ function loginAndPasswordUserStrategy(login, password, done) {
 var inviteAcceptStrategy = new ConfirmStrategy({ name: "accept" }, function(confirmationCode, req, done) {
   var self = this;
 
-  var troupeUri = req.params.troupeUri || req.params.appUri;
+  var appUri = req.params.appUri;
 
-  winston.verbose("Invoking accept strategy", { confirmationCode: confirmationCode, troupeUri: troupeUri });
+  winston.verbose("Invoking accept strategy", { confirmationCode: confirmationCode, appUri: appUri });
 
-  troupeService.acceptInvite(confirmationCode, troupeUri, function(err, result) {
+  troupeService.acceptInvite(confirmationCode, appUri, function(err, result) {
     if(err) {
       winston.error('acceptInvite failed', { exception: err });
-      return self.redirect('/' + req.params.troupeUri);
+      return self.redirect('/' + appUri);
     }
 
     var user = result.user;
     var alreadyUsed = result.alreadyUsed;
 
     if(!user) {
-      return self.redirect('/' + req.params.troupeUri + (alreadyUsed ? '#existing' : ''));
+      return self.redirect('/' + appUri + (alreadyUsed ? '#existing' : ''));
     }
 
     return done(null, user);
@@ -127,19 +127,12 @@ module.exports = {
 
     passport.use(new ConfirmStrategy({ name: "confirm" }, function(confirmationCode, req, done) {
       var self = this;
-      var troupeUri = req.params.appUri || req.params.troupeUri;
 
       winston.verbose("Confirming user with code", { confirmationCode: confirmationCode });
 
       userService.findByConfirmationCode(confirmationCode, function(err, user) {
         if(err) return done(err);
         if(!user) {
-          // If the confirmation was under an appUri ala /:appUri/confirm/:confirmCode
-          // Then always use that URI
-          if(troupeUri) {
-            return self.redirect("/" + troupeUri);
-          }
-
           return done(null, false);
         }
 
@@ -153,13 +146,6 @@ module.exports = {
           statsService.event('confirmation_reused', { userId: user.id });
 
           winston.verbose("Confirmation already used", { confirmationCode: confirmationCode });
-
-          // If the confirmation was under an appUri ala /:appUri/confirm/:confirmCode
-          // Then always use that URI
-          if(troupeUri) {
-            return self.redirect("/" + troupeUri);
-          }
-
 
           loginUtils.whereToNext(user, function(err, url) {
             if(err || !url) return self.redirect(nconf.get('web:homeurl'));

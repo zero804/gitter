@@ -91,24 +91,25 @@ function testInviteAcceptance(email, done) {
         troupeService.createInvite(troupe, { fromUser: fixture.user1, userId: user.id }, function(err, invite) {
           if(err) return done(err);
 
-          troupeService.acceptInviteForAuthenticatedUser(user, invite.id, function(err) {
-            if(err) return done(err);
+          troupeService.acceptInviteForAuthenticatedUser(user, invite)
+            .then(function() {
 
-            persistence.Troupe.findOne({ uri: troupeUri }, function(err, troupe2) {
-              if(err) return done(err);
-
-              assert(troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
-              assert(troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
-
-              persistence.Invite.findOne({ id: invite.id }, function(err, r2) {
+              persistence.Troupe.findOne({ uri: troupeUri }, function(err, troupe2) {
                 if(err) return done(err);
 
-                assert(!r2, 'Invite should be deleted');
-                return done();
-              });
-            });
+                assert(troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
+                assert(troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
 
-          });
+                persistence.Invite.findOne({ id: invite.id }, function(err, r2) {
+                  if(err) return done(err);
+
+                  assert(!r2, 'Invite should be deleted');
+                  return done();
+                });
+              });
+            })
+            .fail(done);
+
         });
 
       });
@@ -135,24 +136,25 @@ function testInviteRejection(email, done) {
         troupeService.createInvite(troupe, { fromUser: fixture.user1, userId: user.id }, function(err, invite) {
           if(err) return done(err);
 
-          troupeService.rejectInviteForAuthenticatedUser(user, invite.id, function(err) {
-            if(err) return done(err);
-
-            persistence.Troupe.findOne({ uri: troupeUri }, function(err, troupe2) {
-              if(err) return done(err);
-
-              assert(!troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
-              assert(!troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
-
-              persistence.Invite.findOne({ id: invite.id }, function(err, r2) {
+          troupeService.rejectInviteForAuthenticatedUser(user, invite)
+            .then(function() {
+              persistence.Troupe.findOne({ uri: troupeUri }, function(err, troupe2) {
                 if(err) return done(err);
 
-                assert(!r2, 'Invite should be deleted');
-                return done();
-              });
-            });
+                assert(!troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
+                assert(!troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
 
-          });
+                persistence.Invite.findOne({ id: invite.id }, function(err, r2) {
+                  if(err) return done(err);
+
+                  assert(!r2, 'Invite should be deleted');
+                  return done();
+                });
+              });
+
+            })
+            .fail(done);
+
         });
 
       });
