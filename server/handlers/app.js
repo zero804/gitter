@@ -348,6 +348,7 @@ module.exports = {
 
       app.get('/:appUri/accept/',
         middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         function(req, res, next) {
           var uriContext = req.uriContext;
@@ -373,9 +374,44 @@ module.exports = {
         });
 
       app.get('/:appUri/accept/:confirmationCode',
-        middleware.authenticate('accept', {}),
-        function(req, res/*, next*/) {
-          res.relativeRedirect("/" + req.params.appUri);
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        function(req, res) {
+
+          var appUri = req.params.appUri;
+          var confirmationCode = req.params.confirmationCode;
+          var login = Q.nbind(req.login, req);
+
+          troupeService.findInviteByConfirmationCode(confirmationCode)
+            .then(function(invite) {
+              if(!invite) throw 404;
+
+
+              if(req.user) {
+                if(invite.userId == req.user.id) {
+                  return troupeService.acceptInviteForAuthenticatedUser(req.user, invite);
+                }
+                // This invite is for somebody else, log the current user out
+                req.logout();
+              }
+
+
+              return troupeService.acceptInvite(confirmationCode, appUri)
+                .then(function(result) {
+                  var user = result.user;
+
+                  // Now that we've accept the invite, log the new user in
+                  if(user) return login(user);
+                });
+
+            })
+            .fail(function(err) {
+              winston.error('acceptInvite failed', { exception: err });
+              return null;
+            })
+            .then(function() {
+              res.relativeRedirect("/" + req.params.appUri);
+            });
+
         });
 
     }
