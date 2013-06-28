@@ -3,6 +3,7 @@
 
 var winston = require("winston");
 var userService = require("../services/user-service");
+var troupeService = require("../services/troupe-service");
 var restSerializer = require("../serializers/rest-serializer");
 var nconf = require('../utils/config');
 var middleware = require('../web/middleware');
@@ -345,15 +346,37 @@ module.exports = {
           renderAppPageWithTroupe(req, res, next, 'app-template');
         });
 
-      app.get('/:troupeUri/accept/:confirmationCode',
-        middleware.authenticate('accept', {}),
-        function(req, res/*, next*/) {
-          res.relativeRedirect("/" + req.params.troupeUri);
+      app.get('/:appUri/accept/',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        uriContextResolverMiddleware,
+        function(req, res, next) {
+          var uriContext = req.uriContext;
+
+          // If theres a troupe, theres nothing to accept
+          if(uriContext.troupe) {
+            var url = uriContext.troupe.getUrl(req.user.id);
+            res.relativeRedirect(url);
+            return;
+          }
+
+          // If there's an invite, accept it
+          if(uriContext.invite) {
+            return troupeService.acceptInviteForAuthenticatedUser(req.user, req.invite)
+              .then(function() {
+                res.relativeRedirect("/" + req.params.appUri);
+              })
+              .fail(next);
+          }
+
+          // Otherwise just go there
+          res.relativeRedirect("/" + req.params.appUri);
         });
 
-      app.get('/:appUri/accessdenied', function(req, res) {
-        res.render('app-accessdenied', {
+      app.get('/:appUri/accept/:confirmationCode',
+        middleware.authenticate('accept', {}),
+        function(req, res/*, next*/) {
+          res.relativeRedirect("/" + req.params.appUri);
         });
-      });
+
     }
 };

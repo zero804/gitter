@@ -24,24 +24,27 @@ module.exports = {
 
     update:  function(req, res){
       // accept invite
-      troupeService.acceptInviteForAuthenticatedUser(req.user, req.params.invite, function(err) {
-        if (err) {
+      troupeService.acceptInviteForAuthenticatedUser(req.user, req.invite)
+        .then(function() {
+          res.send({ success: true });
+        })
+        .fail(function(err){
           winston.error('Unable to accept invite: ', { exception: err });
-          return res.send(400);
-        }
-
-        res.send({ success: true });
-      });
+          res.send(400);
+        });
     },
 
     destroy: function(req, res) {
       // reject invite
-      troupeService.rejectInviteForAuthenticatedUser(req.user, req.params.invite, function(err) {
-        if (err)
-          return res.send(400);
+      troupeService.rejectInviteForAuthenticatedUser(req.user, req.invite)
+        .then(function() {
+          res.send({ success: true });
+        })
+        .fail(function(err){
+          winston.error('Unable to reject invite: ', { exception: err });
 
-        res.send({ success: true });
-      });
+          res.send(400);
+        });
     },
 
     load: function(id, callback) {

@@ -43,12 +43,7 @@ if(!nconf.get('test:exposeDataForTestingPurposes')) {
           if(err) return next(err);
           if(!user) return next(404);
 
-          troupeService.findBestTroupeForUser(user, function(err, troupe) {
-            if(err) return next(err);
-            if(!troupe) return next(404);
-
-            res.send("/" + troupe.uri + "/confirm/" + user.confirmationCode);
-          });
+          res.send("/confirm/" + user.confirmationCode);
 
         });
       });

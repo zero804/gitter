@@ -25,14 +25,7 @@ module.exports = {
   },
 
   sendRequestAcceptanceToUser: function(user, troupe) {
-    var troupeLink;
-
-    if(user.confirmationCode) {
-      troupeLink = nconf.get("web:basepath") + "/" + troupe.uri + "/confirm/" + user.confirmationCode;
-    } else {
-      troupeLink = nconf.get("web:basepath") + "/" + troupe.uri;
-    }
-
+    var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri;
 
     mailerService.sendEmail({
       templateFile: "signupemailfromrequest",
@@ -60,23 +53,6 @@ module.exports = {
       subject: "You requested a password reset",
       data: {
         resetLink: resetLink,
-        baseServerPath: nconf.get("web:basepath")
-      }
-    });
-  },
-
-  sendConfirmationForNewUserRequest: function(user, troupe) {
-    assert(user.confirmationCode, 'User does not have a confirmation code');
-
-    var confirmLink = nconf.get("web:basepath") + "/" + troupe.uri + "/confirm/" + user.confirmationCode + '?fromRequest=1';
-    mailerService.sendEmail({
-      templateFile: "signupemailfromrequest",
-      to: user.email,
-      from: 'signup-robot' + emailDomainWithAt,
-      subject: "Welcome to Troupe",
-      data: {
-        troupeName: troupe.name,
-        confirmLink: confirmLink,
         baseServerPath: nconf.get("web:basepath")
       }
     });

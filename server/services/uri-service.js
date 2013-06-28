@@ -47,7 +47,7 @@ exports.findUri = findUri;
  * @param  {Function} callback
  * @return {promise}  one of the following values:
  *  { ownUrl: true },
- *  { oneToOne: true, troupe: x, otherUser: y },
+ *  { oneToOne: true, troupe: x, otherUser: y, invite: invite  },
  *  { troupe: troupe, group: true, access: true/false, invite: invite },
  *  { notFound: true }
  */

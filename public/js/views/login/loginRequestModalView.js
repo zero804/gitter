@@ -98,7 +98,7 @@ define([
 
     onFormSubmit: function() {
       var form = this.$el.find('form');
-      var postUri =  this.authenticated ? "/requestAccessExistingUser" : "/requestAccessNewUser";
+      var postUri =  this.authenticated ? "/api/v1/requestaccessexisting" : "/api/v1/requestaccess";
       var email = this.getEmail();
       var that = this;
 
