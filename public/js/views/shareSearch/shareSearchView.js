@@ -51,7 +51,7 @@ define([
       if (this.data.inviteToTroupe && !this.data.troupe) throw new Error("Need a troupe");
       if (this.data.inviteToConnect && !this.data.user) throw new Error("Need a viewer");
 
-      this.data.uri = (this.data.inTroupeContext) ? this.data.troupe.uri : this.data.user.username;
+      this.data.uri = (this.data.inviteToTroupe) ? this.data.troupe.uri : this.data.user.username;
       this.data.basePath = context().basePath;
       this.addCleanup(function() {
         if(this.clip) this.clip.destroy();
