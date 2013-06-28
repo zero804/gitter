@@ -17,7 +17,7 @@
     <div class="trpModalRequestForm">
      <!-- don't show the input fields if the user is already signed in, but do show the submit button -->
       <form id="requestAccess">
-        <input type="hidden" name="troupeUri" value="{{troupeUri}}">
+        <input type="hidden" name="appUri" value="{{appUri}}">
         {{^authenticated}}
             <input type="text" size="5" name="name" placeholder="Name" id="name" class="trpInput f-name requried">&nbsp;
             <input type="text" name="email" placeholder="Email address" id="email" value="{{email}}" class="trpInput f-email required email">
