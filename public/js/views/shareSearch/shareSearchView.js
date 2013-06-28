@@ -202,7 +202,7 @@ define([
       function addEmailOption(source, query) {
         if (self.valid()) {
           // add the query as an email address option
-          source.push({ email: query, displayName: query, avatarUrlSmall: '/gravatar/'+query }); // note:  this will provide a diff avatar each key stroke, don't show it in the autocomplete!
+          source.push({ email: query, displayName: query, avatarUrlSmall: '/avatarForEmail/'+query }); // note:  this will provide a diff avatar each key stroke, don't show it in the autocomplete!
         } else {
           // add a non-selectable option which says continue typing an email address
           source.push({ displayName: "You can also type an email address to invite somebody new.", nonSelectable: true });
