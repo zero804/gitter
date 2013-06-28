@@ -298,17 +298,45 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
 
   // Find the user
   return userService.findById(toUserId)
-      .then(function(toUser) {
-        assert(toUser, "toUserId " + toUser + " not found");
+    .then(function(toUser) {
+      assert(toUser, "toUserId " + toUser + " not found");
 
-        var fromUserId = fromUser.id;
-        assert(fromUserId, 'fromUser.id is missing');
+      var fromUserId = fromUser.id;
+      assert(fromUserId, 'fromUser.id is missing');
 
-        var fromUserIsUnconfirmed = fromUser.status == 'UNCONFIRMED';
-        var toUserIsUnconfirmed = toUser.status == 'UNCONFIRMED';
+      var fromUserIsUnconfirmed = fromUser.status == 'UNCONFIRMED';
+      var toUserIsUnconfirmed = toUser.status == 'UNCONFIRMED';
+
+      var chain = null;
+
+      if(troupe) {
+        // Never any chance of an implicit connection for troupe invites, just return false
+        chain = Q.resolve(false);
+      } else {
+        // If this invite is for a onetoone and the users have an implicit connection
+        // then simply connect them up and be done with it
+
+        chain = findImplicitConnectionBetweenUsers(fromUserId, toUserId)
+          .then(function(hasImplicitConnection) {
+            if(hasImplicitConnection) {
+              return findOrCreateOneToOneTroupe(fromUserId, toUserId)
+                .then(function() {
+                  // Can't really think we should return here, this will have to do
+                  return true;
+                });
+            }
+
+            return false;
+          });
+      }
+
+      return chain.then(function(hasImplicitConnection) {
+        if(hasImplicitConnection) return null; // No invite needed
+
+        var inviteStatus = fromUserIsUnconfirmed ? "UNCONFIRMED" : "UNUSED";
 
         // Look for an existing invite
-        var query = { status: fromUserIsUnconfirmed ? "UNCONFIRMED" : "UNUSED", userId: toUserId };
+        var query = { status: inviteStatus, userId: toUserId };
         if(!troupe) {
           query.fromUserId = fromUserId;
         } else {
@@ -331,7 +359,7 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
               displayName: null, // Don't set this if we're using a userId
               email: null,       // Don't set this if we're using a userId
               code: toUserIsUnconfirmed ? uuid.v4() : null,
-              status: fromUserIsUnconfirmed ? "UNCONFIRMED" : "UNUSED"
+              status: inviteStatus
             });
 
           }).then(function(invite) {
@@ -343,8 +371,12 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
                       return invite;
                     });
           });
+      });
 
-    });
+
+
+
+  });
 }
 
 /**
