@@ -336,8 +336,6 @@ describe('troupe-service', function() {
                     }).then(function(invite4) {
                       // Should reuse the first invite
                       assert.equal(invite1.id, invite4.id);
-
-
                     });
 
                 });
@@ -346,6 +344,23 @@ describe('troupe-service', function() {
         }).nodeify(done);
     });
 
+    it('When two users with implicit connections invite, it should simply create a troupe for them and return null', function(done) {
+      var troupeService = testRequire("./services/troupe-service");
+
+      // Have another user invite them to a one to one chat
+      return troupeService.createInvite(null, {
+          fromUser: fixture.user1,
+          userId: fixture.user2.id
+        }).then(function(invite1) {
+          assert.strictEqual(invite1, null);
+
+          return troupeService.findOneToOneTroupe(fixture.user1.id, fixture.user2.id)
+            .then(function(troupe) {
+              assert(troupe);
+            });
+
+        }).nodeify(done);
+    });
 
     it('should make an UNCONFIRMED user PROFILE_NOT_COMPLETED on accepting a one-to-one invite and should update any unconfirmed invites to that user', function(done) {
       var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
