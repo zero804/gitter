@@ -25,7 +25,7 @@ require([
     defaultAction: function(/*actions*/) {
       $('#primary-view').html('');
 
-      var view, modal, loginModal, requestModal;
+      var view, modal, loginModal, requestModal, inviteId;
 
       function getLoginModal(options) {
         var email = options.email;
@@ -45,13 +45,15 @@ require([
       }
 
       function getRequestModal(email) {
+        console.log("Showing request Modal");
         requestModal = new TroupeViews.Modal({ view: new RequestModalView({ email: email }), disableClose: true });
         requestModal.view.on('request.login', function(options) {
           getLoginModal({ email: requestModal.view.getEmail(), userExists: options && options.userExists });
           requestModal.transitionTo(loginModal);
         });
 
-        requestModal.view.on('confirm.signup', function(options) {
+        requestModal.view.on('confirm.request', function(options) {
+          console.log("confirm request");
           var data = {};
           data.email = options.userEmail;
           requestModal.transitionTo(new TroupeViews.Modal({ disableClose: true, view: new SignupModalConfirmView({ data: data }) }));
@@ -64,16 +66,20 @@ require([
       if(window.troupeContext.homeUser) {
         // If the user doesn't have permission to talk to this user, show the Connect modal
         if(window.troupeContext.accessDenied) {
-          log("Show user connect modal");
-          view = new ConnectUserModalView({ authenticated: !!window.troupeContext.user });
-          var connectUserModal = new TroupeViews.Modal({ view: view, disableClose: true });
-          connectUserModal.show();
+          inviteId = window.troupeContext.inviteId;
+          if (inviteId) {
+            // if the user has an invite to this troupe show the invite accept / reject modal
+            (new InviteModal({ inviteId: inviteId })).show();
+          } else {
+              view = new ConnectUserModalView({ authenticated: !!window.troupeContext.user });
+              var connectUserModal = new TroupeViews.Modal({ view: view, disableClose: true });
+              connectUserModal.show();
 
-          connectUserModal.view.on('request.login', function() {
-            var loginModal = getLoginModal({email: window.localStorage.defaultTroupeEmail});
-            connectUserModal.transitionTo(loginModal);
-          });
-
+              connectUserModal.view.on('request.login', function() {
+                var loginModal = getLoginModal({email: window.localStorage.defaultTroupeEmail});
+                connectUserModal.transitionTo(loginModal);
+              });
+            }
         } else {
           return;
         }
@@ -108,6 +114,7 @@ require([
               // if the user is trying to access another use profile (e.g. trou.pe/user) and is not connected
               // show the user connect modal
               log("Show request modal");
+
               view = new RequestModalView({ authenticated: true });
               modal = new TroupeViews.Modal({ view: view, disableClose: true });
               modal.show();
