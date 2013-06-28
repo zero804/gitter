@@ -69,12 +69,13 @@ define([
         url: postUri,
         contentType: "application/x-www-form-urlencoded",
         dataType: "json",
-        data: form.serialize(),
+        data: { appUri : context.getHomeUser().username},
         type: "POST",
         global: false,
         success: function(data) {
           if(data.success) {
-            that.trigger('confirm.connect', {});
+            $('.modal-content').hide();
+            $('.modal-success').show();
             return;
           }
         },

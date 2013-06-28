@@ -17,6 +17,21 @@ define([
       this.inviteId = options.inviteId;
     },
 
+    getRenderData: function() {
+      var isOneToOne;
+      var firstName;
+      console.log("HomeUser" + context.getHomeUser());
+      if (context.getHomeUser()) {
+        isOneToOne = true;
+        firstName = context.getHomeUser().displayName.split(" ").shift();
+      }
+      return {
+        isOneToOne: isOneToOne,
+        homeUser: context.getHomeUser(),
+        firstName: firstName
+      };
+    },
+
     accept: function() {
       var userId = context.getUserId();
       var inviteId = this.inviteId;
@@ -63,5 +78,6 @@ define([
       TroupeViews.Modal.prototype.initialize.call(this, options);
 
     }
+
   });
 });

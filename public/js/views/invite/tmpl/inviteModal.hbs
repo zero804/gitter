@@ -1,10 +1,25 @@
 <div class="modal-content">
  <div class="trpModalBody" id="confirmation">
+  {{#if isOneToOne}}<div style="text-align: center">
+  <div style="text-align: center">
+    {{widget "avatar" user=homeUser}}
+  </div>
+  <div style="text-align: center">
+    {{homeUser.displayName}}
+  </div>
+  <div class="trpModalSubtext" style="text-align: center"><br><br>
+      {{firstName}} has invited you to connect.<br>Click Accept below to add {{firstName}} to your contact list and start chatting.
+    <br><br>
+  </div>
+  {{else}}
   You have been invited to this Troupe. <br><br>
- </div>
+  {{/if}}
 
 
  <button type="button" class="trpModalButton trpButtonBig trpBtnGreen button" id="accept-invite">Accept</button>
  <button type="button" class="trpModalButton trpButtonBig trpBtnGreen button" id="reject-invite">Reject</button>
  <br><br>
+ {{#if isOneToOne}}
+  </div>
+  {{/if}}
 </div>
