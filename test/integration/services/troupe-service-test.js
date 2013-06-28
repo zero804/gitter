@@ -308,6 +308,45 @@ describe('troupe-service', function() {
         }).nodeify(done);
     });
 
+    it('should handle users inviting registered users to connect multiple times, and deal with troupe and onetoone invites correctly', function(done) {
+      var troupeService = testRequire("./services/troupe-service");
+
+      // Have another user invite them to a one to one chat
+      return troupeService.createInvite(null, {
+          fromUser: fixture.user1,
+          userId: fixture.userNoTroupes.id
+        }).then(function(invite1) {
+          return troupeService.createInvite(fixture.troupe1, {
+              fromUser: fixture.user1,
+              userId: fixture.userNoTroupes.id
+            }).then(function(invite2) {
+              // Make sure there are now two invites
+              assert.notEqual(invite1.id, invite2.id);
+
+              return troupeService.createInvite(fixture.troupe1, {
+                  fromUser: fixture.user1,
+                  userId: fixture.userNoTroupes.id
+                }).then(function(invite3) {
+                  // Should reuse the last invite
+                  assert.equal(invite2.id, invite3.id);
+
+                  return troupeService.createInvite(null, {
+                      fromUser: fixture.user1,
+                      userId: fixture.userNoTroupes.id
+                    }).then(function(invite4) {
+                      // Should reuse the first invite
+                      assert.equal(invite1.id, invite4.id);
+
+
+                    });
+
+                });
+
+            });
+        }).nodeify(done);
+    });
+
+
     it('should make an UNCONFIRMED user PROFILE_NOT_COMPLETED on accepting a one-to-one invite and should update any unconfirmed invites to that user', function(done) {
       var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
 
