@@ -339,6 +339,7 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
         var query = { status: inviteStatus, userId: toUserId };
         if(!troupe) {
           query.fromUserId = fromUserId;
+          query.troupeId = null;
         } else {
           query.troupeId = troupe.id;
         }

@@ -18,6 +18,7 @@ function load(done) {
   Q.all([
       persistence.User.findOneQ({ email: 'testuser@troupetest.local' }).then(checkNotNull).then(function(user) { fixture.user1 = user; }),
       persistence.User.findOneQ({ email: 'testuser2@troupetest.local' }).then(checkNotNull).then(function(user) { fixture.user2 = user; }),
+      persistence.User.findOneQ({ email: 'testuserwithnotroupes@troupetest.local' }).then(checkNotNull).then(function(user) { fixture.userNoTroupes = user; }),
       persistence.Troupe.findOneQ({ uri: 'testtroupe1' }).then(checkNotNull).then(function(troupe) { fixture.troupe1 = troupe; }),
       persistence.Troupe.findOneQ({ uri: 'testtroupe2' }).then(checkNotNull).then(function(troupe) { fixture.troupe2 = troupe; })
     ])
