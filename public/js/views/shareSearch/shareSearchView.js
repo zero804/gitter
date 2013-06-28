@@ -33,8 +33,8 @@ define([
           inviteToTroupe: options.inviteToTroupe,
           inviteToConnect: options.inviteToConnect,
 
-          troupe: options.troupe,
-          user: options.user
+          troupe: options.troupe ? options.troupe : context.getTroupe(),
+          user: options.user ? options.user : context.getUser()
           // , inviteUser: options.inviteUser
         };
       }
@@ -285,10 +285,10 @@ define([
 
 
   var Modal = TroupeViews.Modal.extend({
-    initialize: function() {
+    initialize: function(options) {
       TroupeViews.Modal.prototype.initialize.apply(this, arguments);
       this.$el.addClass('trpInviteModal');
-      this.view = new View({ });
+      this.view = new View(options);
     }
   });
 

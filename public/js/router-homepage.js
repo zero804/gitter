@@ -49,7 +49,8 @@ require([
       routes: [
         { name: "profile",        re: /^profile$/,                viewType: profileView.Modal },
         { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal, collection: troupeCollections.troupes,   skipModelLoad: true },
-        { name: "share",          re: /^share$/,                  viewType: shareSearchView.Modal }
+        { name: "share",          re: /^share$/,                  viewType: shareSearchView.Modal },
+        { name: "connect",          re: /^connect$/,              viewType: shareSearchView.Modal, viewOptions: { overrideContext: true, inviteToConnect: true } }
       ],
       appView: appView
     });
