@@ -41,8 +41,6 @@ define([
     return m.get('favourite');
   });
 
-  var searchResults = new Backbone.Collection();
-
   // collection of recent troupes only, will be empty at first.
   // doesn't need to be connected to events from the main collection,
   // because this only changes when the page is refreshed
@@ -89,7 +87,6 @@ define([
     recentTroupes: recentTroupeCollection,
     unreadTroupes: unreadTroupeCollection,
     favouriteTroupes: favouriteTroupesCollection,
-    searchResults: searchResults,
     incomingInvites: inviteCollection
   };
 

@@ -6,8 +6,9 @@ define([
   'collections/instances/troupes',
   'views/toolbar/troupeCollectionView',
   'views/app/invitesView',
-  'hbs!./tmpl/troupeMenu'
-], function(_, Marionette, _nano, troupeCollections, TroupeCollectionView, InvitesView, template) {
+  'hbs!./tmpl/troupeMenu',
+  './searchView'
+], function(_, Marionette, _nano, troupeCollections, TroupeCollectionView, InvitesView, template, SearchView) {
   "use strict";
 
   return Backbone.Marionette.Layout.extend({
@@ -56,7 +57,8 @@ define([
       this.invites.show(new InvitesView({ collection: troupeCollections.incomingInvites }));
 
       // search results collection view
-      this.search.show(new TroupeCollectionView({ collection: troupeCollections.searchResults }));
+      this.searchView = new SearchView({ troupes: troupeCollections.troupes });
+      this.search.show(this.searchView);
 
       this.initHideListeners();
     },
@@ -118,20 +120,7 @@ define([
     },
 
     research: function() {
-      var query = this.$el.find('#list-search-input').val().toLowerCase().trim();
-      var terms = query.split(' ');
-
-      var troupes = troupeCollections.troupes;
-
-      var results = troupes.filter(function(trp) {
-        var name = trp.get('name').toLowerCase().trim();
-        var names = name.split(' ');
-        return name.indexOf(query) === 0 || _.all(terms, function(t) {
-          return _.any(names, function(n) { return n.indexOf(t) === 0; });
-        });
-      });
-
-      troupeCollections.searchResults.reset(results);
+      this.searchView.search(this.$el.find('#list-search-input').val());
     }
 
   });
