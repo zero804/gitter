@@ -45,7 +45,6 @@ require([
       }
 
       function getRequestModal(email) {
-        console.log("Showing request Modal");
         requestModal = new TroupeViews.Modal({ view: new RequestModalView({ email: email }), disableClose: true });
         requestModal.view.on('request.login', function(options) {
           getLoginModal({ email: requestModal.view.getEmail(), userExists: options && options.userExists });
@@ -53,7 +52,6 @@ require([
         });
 
         requestModal.view.on('confirm.request', function(options) {
-          console.log("confirm request");
           var data = {};
           data.email = options.userEmail;
           requestModal.transitionTo(new TroupeViews.Modal({ disableClose: true, view: new SignupModalConfirmView({ data: data }) }));
@@ -62,15 +60,32 @@ require([
         return requestModal;
       }
 
+      if(window.troupeContext.profileNotCompleted) {
+        view = new profileView.Modal({ disableClose: true  });
+
+        view.once('close', function() {
+          //modal.close();
+          window.location.reload(true);
+        });
+        view.show();
+
+        return;
+      }
+
+
       // If the user is accessing another user's home url (trou.pe/user)
       if(window.troupeContext.homeUser) {
+        log("Ok, going 1:1");
         // If the user doesn't have permission to talk to this user, show the Connect modal
         if(window.troupeContext.accessDenied) {
+          log("User doesn't have permission");
           inviteId = window.troupeContext.inviteId;
           if (inviteId) {
+            log("User has an invite, let's show the accept modal");
             // if the user has an invite to this troupe show the invite accept / reject modal
-            (new InviteModal({ inviteId: inviteId })).show();
+            new InviteModal({ inviteId: inviteId }).show();
           } else {
+              log("User needs to request access");
               view = new ConnectUserModalView({ authenticated: !!window.troupeContext.user });
               var connectUserModal = new TroupeViews.Modal({ view: view, disableClose: true });
               connectUserModal.show();
@@ -81,6 +96,7 @@ require([
               });
             }
         } else {
+          log("Everything looks good, let's load the Troupe");
           return;
         }
       // The user must be accessing a Troupe
@@ -122,19 +138,6 @@ require([
             return;
           }
         }
-
-      }
-
-      if(window.troupeContext.profileNotCompleted) {
-        view = new profileView.Modal({ disableClose: true  });
-
-        view.once('close', function() {
-          //modal.close();
-          window.location.reload(true);
-        });
-        view.show();
-
-        return;
       }
     }
 

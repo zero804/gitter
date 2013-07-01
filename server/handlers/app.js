@@ -362,7 +362,8 @@ module.exports = {
 
           // If there's an invite, accept it
           if(uriContext.invite) {
-            return troupeService.acceptInviteForAuthenticatedUser(req.user, req.invite)
+            console.log("Accepting invite");
+            return troupeService.acceptInviteForAuthenticatedUser(req.user, uriContext.invite)
               .then(function() {
                 res.relativeRedirect("/" + req.params.appUri);
               })

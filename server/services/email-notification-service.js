@@ -147,7 +147,7 @@ module.exports = {
     if(code) {
       acceptLink = nconf.get("web:basepath") + uri + "/accept/" + code;
     } else {
-      acceptLink = nconf.get("web:basepath") + uri;
+      acceptLink = nconf.get("web:basepath") + uri + "/accept/";
     }
 
     mailerService.sendEmail({
