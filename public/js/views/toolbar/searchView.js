@@ -28,6 +28,8 @@ define([
       var results = troupes.filter(isMatch);
 
       function isMatch(trp) {
+        if (!query) return false;
+
         var name = (trp.get) ? trp.get('name') || trp.get('displayName') : trp.name || trp.displayName;
         name = name.toLowerCase().trim();
         var names = name.split(' ');
