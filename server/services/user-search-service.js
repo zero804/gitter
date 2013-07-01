@@ -3,18 +3,20 @@
 
 var troupeService = require('./troupe-service');
 var persistence = require("./persistence-service");
+var Q = require('q');
 
 function createRegExpsForQuery(queryText) {
   var normalized = ("" + queryText).trim().toLowerCase();
   var parts = normalized.split(/[\s\'']+/)
                         .filter(function(s) { return !!s; })
                         .filter(function(s, index) { return index < 10; } );
-  return parts.map(function(i) {
+
+  return Q.resolve(parts.map(function(i) {
     return new RegExp("\\b" + i, "i");
-  });
+  }));
 }
 
-function searchForRegularExpressionsWithinUserIds(userIds, res, options, callback) {
+function searchForRegularExpressionsWithinUserIds(userIds, res, options) {
   var limit = options.limit || 20;
   var skip = options.skip || 0;
 
@@ -28,16 +30,17 @@ function searchForRegularExpressionsWithinUserIds(userIds, res, options, callbac
     q.find({ displayName: r });
   });
 
-  q.limit(limit)
+  return q.limit(limit)
     .skip(skip)
     .select('displayName avatarVersion gravatarImageUrl')
-    .exec(function(err, results) {
-      return callback(err, {
+    .execQ()
+    .then(function(results) {
+      return {
         hasMoreResults: undefined,
         limit: limit,
         skip: skip,
         results: results
-      });
+      };
     });
 }
 
@@ -51,40 +54,63 @@ function difference(ids, excludeIds) {
 }
 
 exports.searchForUsers = function(userId, queryText, options, callback) {
-  var res = createRegExpsForQuery(queryText);
-  if(!res.length) return callback(null, []);
+  return createRegExpsForQuery(queryText)
+    .then(function(res) {
+      if(!res.length) return [];
 
-  troupeService.findAllTroupesIdsForUser(userId, function(err, troupeIds) {
-    if(err) return callback(err);
+      return troupeService.findAllTroupesIdsForUser(userId)
+        .then(function(troupeIds) {
+          // No point in including a troupe if it's to be excluded
+          if(options.excludeTroupeId) {
+            troupeIds = troupeIds.filter(function(t) { return t != options.excludeTroupeId; } );
+          }
 
-    // No point in including a troupe if it's to be excluded
-    if(options.excludeTroupeId) {
-      troupeIds = troupeIds.filter(function(t) { return t != options.excludeTroupeId; } );
-    }
+          if(!troupeIds.length) return [];
 
-    if(!troupeIds.length) return callback(null, []);
+          return troupeService.findAllUserIdsForTroupes(troupeIds)
+            .then(function(userIds) {
 
-    troupeService.findAllUserIdsForTroupes(troupeIds, function(err, userIds) {
-      if(err) return callback(err);
+              // Remove the user doing the search
+              userIds = userIds.filter(function(t) { return t != userId; } );
 
-      // Remove the user doing the search
-      userIds = userIds.filter(function(t) { return t != userId; } );
+              if(!userIds.length) return [];
 
-      if(!userIds.length) return callback(err, []);
+              if(!options.excludeTroupeId) {
+                return searchForRegularExpressionsWithinUserIds(userIds, res, options);
+              }
 
-      if(!options.excludeTroupeId) {
-        searchForRegularExpressionsWithinUserIds(userIds, res, options, callback);
-        return;
-      }
+              return troupeService.findUserIdsForTroupe(options.excludeTroupeId)
+                .then(function(excludedTroupeUserIds) {
+                  // Remove the user doing the search
+                  userIds = difference(userIds, excludedTroupeUserIds);
+                  return searchForRegularExpressionsWithinUserIds(userIds, res, options);
+                });
+            });
+        });
+    })
+    .nodeify(callback);
 
-      troupeService.findUserIdsForTroupe(options.excludeTroupeId, function(err, excludedTroupeUserIds) {
-        if(err) return callback(err);
-        // Remove the user doing the search
-        userIds = difference(userIds, excludedTroupeUserIds);
-        searchForRegularExpressionsWithinUserIds(userIds, res, options, callback);
-      });
-    });
-  });
+
+};
+
+/**
+ * Search for implicit connections with whom the user does not have an explicit one-to-one connection
+ * @return callback of search results
+ */
+exports.searchUnconnectedUsers = function(userId, queryText, options, callback) {
+  return createRegExpsForQuery(queryText)
+    .then(function(regExps) {
+
+      if(!regExps.length) return [];
+
+      return troupeService.findAllUserIdsForUnconnectedImplicitContacts(userId)
+        .then(function(userIds) {
+          return searchForRegularExpressionsWithinUserIds(userIds, regExps, options);
+        });
+
+    })
+    .nodeify(callback);
+
 };
 
 exports.testOnly = {

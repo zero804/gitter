@@ -1,11 +1,11 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 define([
+  'jquery',
   'underscore',
-  'marionette',
-  'views/base',
+  'backbone',
   './troupeCollectionView'
-], function(_, Marionette, TroupeViews, TroupeCollectionView) {
+], function($, _, Backbone, TroupeCollectionView) {
   "use strict";
 
   return TroupeCollectionView.extend({
@@ -84,7 +84,7 @@ define([
       }
 
       var url = '/user';
-      $.ajax({ url: url, data : { q: query }, success: function(data) {
+      $.ajax({ url: url, data : { q: query, unconnected:1 }, success: function(data) {
         if (data.results) {
           if (!self.searchSuggestions) self.searchSuggestions = [];
 
