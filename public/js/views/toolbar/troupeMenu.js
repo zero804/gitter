@@ -27,6 +27,7 @@ define([
 
     events: {
      "click .left-menu-icon":            "onLeftMenuListIconClick"
+     , 'keyup #list-search-input': 'research'
     },
 
     initialize: function() {
@@ -54,8 +55,10 @@ define([
       // incoming invites collection view
       this.invites.show(new InvitesView({ collection: troupeCollections.incomingInvites }));
 
-      this.initHideListeners();
+      // search results collection view
+      this.search.show(new TroupeCollectionView({ collection: troupeCollections.searchResults }));
 
+      this.initHideListeners();
     },
 
     initHideListeners: function() {
@@ -108,8 +111,28 @@ define([
 
       this.$el.find('.nano').nanoScroller({ preventPageScrolling: true });
 
-    }
+    },
 
+    activateSearchList: function() {
+      this.$el.find('#list-search-input').focus();
+    },
+
+    research: function() {
+      var query = this.$el.find('#list-search-input').val().toLowerCase().trim();
+      var terms = query.split(' ');
+
+      var troupes = troupeCollections.troupes;
+
+      var results = troupes.filter(function(trp) {
+        var name = trp.get('name').toLowerCase().trim();
+        var names = name.split(' ');
+        return name.indexOf(query) === 0 || _.all(terms, function(t) {
+          return _.any(names, function(n) { return n.indexOf(t) === 0; });
+        });
+      });
+
+      troupeCollections.searchResults.reset(results);
+    }
 
   });
 
