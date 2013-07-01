@@ -904,6 +904,48 @@ describe('troupe-service', function() {
     });
   });
 
+  describe('#findAllUserIdsForUnconnectedImplicitContacts', function() {
+    it('should find users who are implicitly connected to one another', function(done) {
+      var troupeService = testRequire('./services/troupe-service');
+
+      persistence.Troupe.createQ({ displayName: 'Test User 2', email:  'testuser-b' + Date.now() + '@troupetest.local', status: 'ACTIVE' })
+        .then(function(otherUser) {
+
+          return persistence.Troupe.createQ({ displayName: 'Test User', email:  'testuser' + Date.now() + '@troupetest.local', status: 'ACTIVE' })
+            .then(function(user) {
+
+              return troupeService.createOneToOneTroupe(otherUser.id, user.id)
+                .then(function() {
+
+                  var troupe = new persistence.Troupe({ status: 'ACTIVE' });
+                  troupe.addUserById(fixture.user1.id);
+                  troupe.addUserById(user.id);
+                  troupe.addUserById(otherUser.id);
+                  return troupe.saveQ()
+                    .then(function() {
+
+                      return troupeService.findAllUserIdsForUnconnectedImplicitContacts(user.id)
+                        .then(function(userIds) {
+                          // The fixture.user1 user should be included as both users share a troupe
+                          // but don't have a explicit connection
+                          // The otherUser user should not be included as they share a troupe but DO
+                          // have an explicit connection (see the createOneToOneTroupe call!)
+                          assert.equal(userIds.length, 1);
+                          assert.equal(userIds[0], fixture.user1.id);
+                        });
+                    });
+
+                });
+
+
+            });
+        })
+        .nodeify(done);
+
+    });
+
+  });
+
   before(fixtureLoader(fixture));
 
 
