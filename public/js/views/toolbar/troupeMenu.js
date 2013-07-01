@@ -29,6 +29,7 @@ define([
     events: {
      "click .left-menu-icon":            "onLeftMenuListIconClick"
      , 'keyup #list-search-input': 'research'
+     , 'keypress': 'showSearch'
     },
 
     initialize: function() {
@@ -85,6 +86,10 @@ define([
 
     onLeftMenuListIconClick: function(e) {
       var selected = $(e.target).attr('id');
+      this.showTab(selected);
+    },
+
+    showTab: function(selected) {
       if(selected === this.selectedListIcon) return;
 
       // Turn off the old selected list
@@ -121,6 +126,10 @@ define([
 
     research: function() {
       this.searchView.search(this.$el.find('#list-search-input').val());
+    },
+
+    showSearch: function() {
+      this.showTab('icon-search');
     }
 
   });
