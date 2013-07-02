@@ -28,7 +28,6 @@ define([
       var c = context();
       var troupe = context.getTroupe();
       var homeUser = context.getHomeUser();
-      console.log("HomeUser: " + homeUser.displayName);
       var firstName = homeUser.displayName.split(" ").shift();
       return {
         homeUser: homeUser,
@@ -49,7 +48,7 @@ define([
       "submit form": "onFormSubmit",
       "click #cancel-button" : "goBack",
       "click #sigin-button" : "showLoginForm",
-      "click #create-account-button" : "createAccountClicked"
+      "click #unauthenticated-continue" : "onUnauthenticatedContinue"
     },
 
     goBack : function () {
@@ -60,6 +59,35 @@ define([
     showLoginForm: function() {
       this.trigger('request.login');
     },
+
+    onUnauthenticatedContinue: function() {
+      var form = this.$el.find('form');
+      var that = this;
+      log("Ok, going to send through to /signup with: " + $("#email").val());
+      $.ajax({
+        url: "/signup",
+        contentType: "application/json",
+        dataType: "json",
+        data: JSON.stringify({
+          email: $("#email").val()
+        }),
+        type: "POST",
+        success: function(data) {
+          // data = { email, success, userStatus, username }
+          if (data.redirectTo) {
+            window.location.href = "/" + data.redirectTo;
+          }
+          else if (data.userStatus === 'ACTIVE') {
+            // forward to a login prompt
+            that.trigger('request.login', { email: data.email });
+          }
+          else {
+             that.trigger('signup.complete', { email: data.email});
+           }
+        }
+      });
+    },
+
 
     onFormSubmit: function() {
       var form = this.$el.find('form');

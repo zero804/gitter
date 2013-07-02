@@ -75,28 +75,53 @@ require([
 
       // If the user is accessing another user's home url (trou.pe/user)
       if(window.troupeContext.homeUser) {
-        log("Ok, going 1:1");
         // If the user doesn't have permission to talk to this user, show the Connect modal
         if(window.troupeContext.accessDenied) {
-          log("User doesn't have permission");
+
+          // if the user is signed in, listen for an accept
+          if (window.troupeContext.user) {
+            log("******* LISTENING FOR ACCEPT *********")
+            var troupeCollection = new troupeModels.TroupeCollection();
+            troupeCollection.listen();
+            // this is never fired
+            troupeCollection.on("add", function(model) {
+              log("**** Got an ADD ****" + model.get(uri));
+              if(model.get('uri') == window.troupeContext.troupeUri) {
+                // TODO: tell the person that they've been kicked out of the troupe
+                window.location.reload();
+              }
+            });
+          }
+
           inviteId = window.troupeContext.inviteId;
           if (inviteId) {
-            log("User has an invite, let's show the accept modal");
-            // if the user has an invite to this troupe show the invite accept / reject modal
+            // if the user has an invite from this user show the invite accept / reject modal
             new InviteModal({ inviteId: inviteId }).show();
           } else {
-              log("User needs to request access");
               view = new ConnectUserModalView({ authenticated: !!window.troupeContext.user });
               var connectUserModal = new TroupeViews.Modal({ view: view, disableClose: true });
               connectUserModal.show();
 
-              connectUserModal.view.on('request.login', function() {
-                var loginModal = getLoginModal({email: window.localStorage.defaultTroupeEmail});
+              connectUserModal.view.on('signup.complete', function(options) {
+                var data = {};
+                data.email = options.email;
+                connectUserModal.transitionTo(new TroupeViews.Modal({ disableClose: true, view: new SignupModalConfirmView({ data: data }) }));
+              });
+
+              connectUserModal.view.on('request.login', function(options) {
+                var defaultEmail;
+                if (options.email) {
+                  defaultEmail = options.email;
+                } else
+                {
+                  defaultEmail = window.localStorage.defaultTroupeEmail;
+                }
+                var loginModal = getLoginModal({email: defaultEmail});
                 connectUserModal.transitionTo(loginModal);
               });
             }
         } else {
-          log("Everything looks good, let's load the Troupe");
+          // we shouldn't get here I don't think...
           return;
         }
       // The user must be accessing a Troupe
@@ -108,7 +133,6 @@ require([
           return;
         }
         else {
-          log("Accessing a Troupe");
           /* This user is NOT logged in and is visiting a Troupe */
           if(window.troupeContext.accessDenied) {
             // Listen out for acceptance
@@ -129,8 +153,6 @@ require([
             } else {
               // if the user is trying to access another use profile (e.g. trou.pe/user) and is not connected
               // show the user connect modal
-              log("Show request modal");
-
               view = new RequestModalView({ authenticated: true });
               modal = new TroupeViews.Modal({ view: view, disableClose: true });
               modal.show();
