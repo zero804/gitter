@@ -14,12 +14,28 @@ define([
       this.queries = {}; // { query: results }
       this.troupes = options.troupes;
       this.collection = new Backbone.Collection();
+      this.selectedIndex = 0;
+      this.query = '';
+      this.$input = options.$input;
+
+      // listen for keypresses on the input
+      var self = this;
+      this.$input.on('keyup', function(e) {
+        return self.keyPress(e);
+      });
     },
 
     search: function(query) {
       var self = this;
 
       query = query.toLowerCase().trim();
+
+      // don't do anything if the search term hasn't changed
+      if (query === this.query)
+        return;
+      else
+        this.query = query;
+
       var terms = query.split(' ');
 
       var troupes = this.troupes;
@@ -65,6 +81,7 @@ define([
 
       // set the initial local search results
       self.collection.reset(results);
+      self.select(0);
     },
 
     getSuggestions: function(query, callback) {
@@ -101,7 +118,55 @@ define([
           callback(self.queries[query]);
         }
       }});
-    }
+    },
+
+    keyPress: function(e) {
+      this.keyNavigation(e);
+      this.keySearch(e);
+    },
+
+    keyNavigation: function(e) {
+      // select one of the search results
+      // enter follows link
+      switch(e.keyCode) {
+        case 38: // up
+          this.selectPrev();
+          break;
+        case 40: // down
+          this.selectNext();
+          break;
+        case 13: // enter
+        case 39: // right
+          this.navigateToCurrent();
+          break;
+      }
+    },
+
+    selectPrev: function() {
+      this.select(this.selectedIndex - 1);
+    },
+
+    selectNext: function() {
+      this.select(this.selectedIndex + 1);
+    },
+
+    navigateToCurrent: function() {
+      window.location = this.collection.at(this.selectedIndex).get('url');
+    },
+
+    select: function(i) {
+      var itemElements = this.$el.find('.trpTroupeName');
+
+      if (i >= 0 && i < itemElements.length) {
+        this.selectedIndex = i;
+        itemElements.removeClass('selected');
+        $(itemElements[this.selectedIndex]).addClass('selected');
+      }
+    },
+
+    keySearch: _.debounce(function(e) {
+      this.search(this.$input.val());
+    }, 500)
 
   });
 
