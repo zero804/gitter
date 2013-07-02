@@ -2,6 +2,7 @@
 "use strict";
 
 var signupService = require("../../services/signup-service"),
+    userService = require("../../services/user-service"),
     uriService = require("../../services/uri-service"),
     winston = require('winston');
 
@@ -33,26 +34,33 @@ module.exports = function(req, res) {
 
   var uri = req.body.appUri;
 
-  uriService.findUri(uri)
-    .then(function(result) {
-      if(!result) { winston.error("No troupe with uri: " + uri); throw 404; }
+  userService.findByEmail(req.body.email)
+    .then(function(fromUser) {
+      // If we found the user, they already exist, so send them a message letting them know
+      if(fromUser) throw { userExists: true };
 
-      var toTroupe = result.troupe;
-      var toUser = result.user;
+      return uriService.findUri(uri)
+        .then(function(result) {
+          if(!result) { winston.error("No troupe with uri: " + uri); throw 404; }
 
-      if(toUser) {
-        return signupService.newUnauthenticatedConnectionInvite(toUser, req.body.email, req.body.name);
-      }
+          var toTroupe = result.troupe;
+          var toUser = result.user;
 
-      if(toTroupe) {
-        return signupService.newSignupWithAccessRequest({
-            troupe: toTroupe,
-            displayName: req.body.name,
-            email: req.body.email
-          });
-      }
+          if(toUser) {
+            return signupService.newUnauthenticatedConnectionInvite(toUser, req.body.email, req.body.name);
+          }
 
-      throw new Error('Expected either a troupe or user attribute');
+          if(toTroupe) {
+            return signupService.newSignupWithAccessRequest({
+                troupe: toTroupe,
+                displayName: req.body.name,
+                email: req.body.email
+              });
+          }
+
+          throw new Error('Expected either a troupe or user attribute');
+        });
+
     }).then(function() {
       res.send({ success: true });
     }).fail(function(err) {
