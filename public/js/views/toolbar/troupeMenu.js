@@ -1,17 +1,18 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'jquery',
   'underscore',
   'marionette',
-  "nanoscroller",
   'collections/instances/troupes',
   'views/toolbar/troupeCollectionView',
   'views/app/invitesView',
   'hbs!./tmpl/troupeMenu',
-  './searchView'
-], function(_, Marionette, _nano, troupeCollections, TroupeCollectionView, InvitesView, template, SearchView) {
+  './searchView',
+  "nanoscroller" // No ref!
+], function($, _, Marionette, troupeCollections, TroupeCollectionView, InvitesView, template, SearchView) {
   "use strict";
 
-  return Backbone.Marionette.Layout.extend({
+  return Marionette.Layout.extend({
     template: template,
     tagName: 'span',
     selectedListIcon: "icon-mega",
@@ -27,8 +28,9 @@ define([
     },
 
     events: {
-     "click .left-menu-icon":            "onLeftMenuListIconClick"
-     , 'keyup #list-search-input': 'research'
+     "click .left-menu-icon":    "onLeftMenuListIconClick",
+     'keyup #list-search-input': 'research',
+     'keypress':                 'showSearch'
     },
 
     initialize: function() {
@@ -73,7 +75,6 @@ define([
 
       function toggler(element, collection) {
         function toggle() {
-          console.log('Toggle ', collection, element,collection.length > 0);
           self.$el.find(element).toggle(collection.length > 0);
           self.$el.find('.nano').nanoScroller({ preventPageScrolling: true });
         }
@@ -85,6 +86,10 @@ define([
 
     onLeftMenuListIconClick: function(e) {
       var selected = $(e.target).attr('id');
+      this.showTab(selected);
+    },
+
+    showTab: function(selected) {
       if(selected === this.selectedListIcon) return;
 
       // Turn off the old selected list
@@ -121,6 +126,10 @@ define([
 
     research: function() {
       this.searchView.search(this.$el.find('#list-search-input').val());
+    },
+
+    showSearch: function() {
+      this.showTab('icon-search');
     }
 
   });

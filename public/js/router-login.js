@@ -1,7 +1,6 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'jquery',
-  'underscore',
   'utils/context',
   'backbone',
   'log!router-login',
@@ -14,7 +13,7 @@ require([
   'views/signup/signupModalConfirmView',
   'views/connect/connectUserView',
   'collections/troupes'
-], function($, _, context, Backbone, log, BaseRouter, TroupeViews, InviteModal, LoginModalView, profileView, RequestModalView, SignupModalConfirmView, ConnectUserModalView, troupeModels) {
+], function($, context, Backbone, log, BaseRouter, TroupeViews, InviteModal, LoginModalView, profileView, RequestModalView, SignupModalConfirmView, ConnectUserModalView, troupeModels) {
   "use strict";
 
   var AppRouter = BaseRouter.extend({
@@ -146,7 +145,7 @@ require([
               }
             });
 
-            var inviteId = window.troupeContext.inviteId;
+            inviteId = context().inviteId;
             if (inviteId) {
               // if the user has an invite to this troupe show the invite accept / reject modal
               (new InviteModal({ inviteId: inviteId })).show();
