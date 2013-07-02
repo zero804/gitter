@@ -8,13 +8,12 @@
           {{homeUser.displayName}}
         </div>
     </div>
-    <div class="trpModalSubtext" style="text-align: center"><br>
+    <div class="trpModalBody" style="text-align: center"><br>
       {{#if authenticated}}
-      You are not conneted to this user. <br><br>Click on Connect below and we'll send an invite to {{firstName}}.
+      You are not conneted to this user. <br><span class="trpModalSubtext">Click on Connect below and we'll send an invite to {{firstName}}.</span>
       {{else}}
-      You currently aren't signed in. <br><br>Please sign in or create an account so that you can connect with {{firstName}}
+      You currently aren't signed in. <br><span class="trpModalSubtext">Please enter your email address to continue.</span>
       {{/if}}
-    <br><br>
     </div>
     <div class="trpModalRequestForm" style="text-align: center">
      <!-- don't show the input fields if the user is already signed in, but do show the submit button -->
@@ -24,8 +23,9 @@
           <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen" id="submit-button" style="min-width: 110px">Connect</button>
           <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="cancel-button" style="min-width: 110px">Cancel</button>
           {{else}}
-          <button type="button" class="trpModalButton trpButtonBig trpBtnGreen signin" id="sigin-button" style="min-width: 110px">Sign in</button>
-          <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="create-account-button" style="min-width: 110px">Create account</button>
+<!--           <button type="button" class="trpModalButton trpButtonBig trpBtnGreen signin" id="sigin-button" style="min-width: 110px">Sign in</button>
+          <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="create-account-button" style="min-width: 110px">Create account</button> -->
+          <input type="text" class="trpInput" id="email"><button type="button" class="trpModalButton trpButtonMedium trpBtnGreen" id="unauthenticated-continue" style="min-width: 110px">Continue</button>
          {{/if}}
         </div>
       </form>
