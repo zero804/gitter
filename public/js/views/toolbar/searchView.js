@@ -70,9 +70,14 @@ define([
     getSuggestions: function(query, callback) {
       var self = this;
 
+      if (!query)
+        return;
+
       // if we have done this query already, don't fetch it again (this could be problematic).
-      if (this.queries[query])
-        return callback(this.queries[query]);
+      if (this.queries[query]) {
+        setTimeout(function() { callback(self.queries[query]); }, 0); // simulate async callback
+        return;
+      }
 
       // if a superset of this query was empty, so is this one
       var emptyPreviously = _.some(this.queries, function(v,k) {
@@ -80,7 +85,8 @@ define([
       });
 
       if (emptyPreviously) {
-        return callback([]);
+        setTimeout(function() { callback([]); }, 0);
+        return;
       }
 
       var url = '/user';
