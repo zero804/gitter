@@ -13,6 +13,7 @@ exports.lookupUsernameForEmail = function(email) {
 
   request.get({ url: url, json: true }, function (error, response, body) {
     if(error) return d.reject(error);
+
     if(response.statusCode == 404) return d.resolve([]);
     if(response.statusCode >= 400) return d.reject('Unexpected status code ' + response.statusCode);
 

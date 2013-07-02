@@ -12,11 +12,10 @@ var persistence = require("./persistence-service"),
     winston = require("winston"),
     collections = require("../utils/collections"),
     Q = require("q"),
+    ObjectID = require('mongodb').ObjectID,
     _ = require('underscore'),
     assert = require('assert'),
     statsService = require("../services/stats-service");
-
-var ObjectID = require('mongodb').ObjectID;
 
 
 function ensureExists(value) {
@@ -67,22 +66,23 @@ function findMemberEmails(id, callback) {
 }
 
 function findAllTroupesForUser(userId, callback) {
-  persistence.Troupe
+  return persistence.Troupe
     .where('users.userId', userId)
     .sort({ name: 'asc' })
-    .exec(callback);
+    .execQ()
+    .nodeify(callback);
 }
 
 function findAllTroupesIdsForUser(userId, callback) {
-  persistence.Troupe
+  return persistence.Troupe
     .where('users.userId', userId)
     .select('id')
-    .exec(function(err, result) {
-      if(err) return callback(err);
-
+    .execQ()
+    .then(function(result) {
       var troupeIds = result.map(function(troupe) { return troupe.id; } );
-      return callback(null, troupeIds);
-    });
+      return troupeIds;
+    })
+    .nodeify(callback);
 }
 
 function userHasAccessToTroupe(user, troupe) {
@@ -679,22 +679,24 @@ function rejectRequest(request, callback) {
 }
 
 function findUserIdsForTroupe(troupeId, callback) {
-  persistence.Troupe.findById(troupeId, 'users', function(err, troupe) {
-    if(err) return callback(err);
-    callback(null, troupe.users.map(function(m) { return m.userId; }));
-  });
+  return persistence.Troupe.findByIdQ(troupeId, 'users')
+    .then(function(troupe) {
+      return troupe.users.map(function(m) { return m.userId; });
+    })
+    .nodeify(callback);
 }
 
 function updateTroupeName(troupeId, troupeName, callback) {
-  findById(troupeId, function(err, troupe) {
-    if (err) return callback(err);
-    if (!troupe) return callback("Troupe not found");
+  return findByIdRequired(troupeId)
+    .then(function(troupe) {
+      troupe.name = troupeName;
 
-    troupe.name = troupeName;
-    troupe.save(function(err) {
-      callback(err, troupe);
-    });
-  });
+      return troupe.saveQ()
+        .then(function() {
+          return troupe;
+        });
+    })
+    .nodeify(callback);
 }
 
 function createOneToOneTroupe(userId1, userId2, callback) {
@@ -866,20 +868,21 @@ function updateFavourite(userId, troupeId, isFavourite, callback) {
     updateOptions = { };
   }
 
-  persistence.UserTroupeFavourites.update(
+  return persistence.UserTroupeFavourites.updateQ(
     { userId: userId },
     updateStatement,
-    updateOptions,
-    callback);
+    updateOptions)
+    .nodeify(callback);
 }
 
 function findFavouriteTroupesForUser(userId, callback) {
-  persistence.UserTroupeFavourites.findOne({ userId: userId}, function(err, userTroupeFavourites) {
-    if(err) return callback(err);
-    if(!userTroupeFavourites || !userTroupeFavourites.favs) return callback(null, {});
+  return persistence.UserTroupeFavourites.findOneQ({ userId: userId})
+    .then(function(userTroupeFavourites) {
+      if(!userTroupeFavourites || !userTroupeFavourites.favs) return {};
 
-    return callback(null, userTroupeFavourites.favs);
-  });
+      return userTroupeFavourites.favs;
+    })
+    .nodeify(callback);
 }
 
 function findAllUserIdsForTroupes(troupeIds, callback) {
@@ -890,18 +893,51 @@ function findAllUserIdsForTroupes(troupeIds, callback) {
     return d;
   });
 
-  persistence.Troupe.aggregate([
+  return persistence.Troupe.aggregateQ([
     { $match: { _id: { $in: mappedTroupeIds } } },
     { $project: { _id: 0, 'users.userId': 1 } },
     { $unwind: '$users' },
     { $group: { _id: 1, userIds: { $addToSet: '$users.userId' } } }
-    ], function(err, results) {
-      if(err) return callback(err);
+    ])
+    .then(function(results) {
       var result = results[0];
-      if(!result || !result.userIds || !result.userIds.length) return callback(null, []);
+      if(!result || !result.userIds || !result.userIds.length) return [];
 
-      return callback(null, result.userIds);
+      return result.userIds;
+    })
+    .nodeify(callback);
+}
+
+function findAllUserIdsForUnconnectedImplicitContacts(userId, callback) {
+  userId = new ObjectID(userId);
+
+  return persistence.Troupe.aggregateQ([
+    { $match: { 'users.userId': userId, oneToOne: false } },
+    { $project: { 'users.userId': 1, _id: 0 } },
+    { $unwind: "$users" },
+    { $group: { _id: '$users.userId', number: { $sum: 1 } } },
+    { $project: { _id: 1 } }
+  ]).then(function(results) {
+    var implicitConnectionUserIds = results
+          .map(function(item) { return "" + item._id; })
+          .filter(function(item) { return item != userId; });
+
+    return persistence.Troupe.aggregateQ([
+      { $match: { 'users.userId': userId, oneToOne: true } },
+      { $project: { 'users.userId': 1, _id: 0 } },
+      { $unwind: "$users" },
+      { $group: { _id: '$users.userId', number: { $sum: 1 } } },
+      { $project: { _id: 1 } }
+    ]).then(function(results) {
+
+      var alreadyConnectedUserIds = results
+        .map(function(item) { return "" + item._id; });
+
+      return _.difference(implicitConnectionUserIds, alreadyConnectedUserIds);
     });
+  }).nodeify(callback);
+
+
 }
 
 
@@ -1300,6 +1336,7 @@ module.exports = {
   findAllUnusedInvitesForUserId: findAllUnusedInvitesForUserId,
   findUnusedInviteToTroupeForUserId: findUnusedInviteToTroupeForUserId,
   findImplicitConnectionBetweenUsers: findImplicitConnectionBetweenUsers,
+  findAllUserIdsForUnconnectedImplicitContacts: findAllUserIdsForUnconnectedImplicitContacts,
   updateUnconfirmedInvitesForUserId: updateUnconfirmedInvitesForUserId,
 
   inviteUserByUserId: inviteUserByUserId,
@@ -1321,6 +1358,7 @@ module.exports = {
   updateTroupeName: updateTroupeName,
   findOneToOneTroupe: findOneToOneTroupe,
   findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
+  createOneToOneTroupe: createOneToOneTroupe,
   createUniqueUri: createUniqueUri,
   deleteTroupe: deleteTroupe,
 

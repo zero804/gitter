@@ -17,40 +17,56 @@ describe("User Search Service", function() {
   describe("#createRegExpsForQuery", function() {
     it("should create a single regexp for a single word search", function() {
 
-      var res = userSearchService.testOnly.createRegExpsForQuery("Frodo");
+      userSearchService.testOnly.createRegExpsForQuery("Frodo")
+        .then(function(res) {
 
-      assert(res.length === 1, 'Expected a single regular expression');
-      assert.strictEqual(res[0].toString(), "/\\bfrodo/i", 'Expected the search');
+          assert(res.length === 1, 'Expected a single regular expression');
+          assert.strictEqual(res[0].toString(), "/\\bfrodo/i", 'Expected the search');
+
+        });
 
     });
 
     it("should create a double regexp for a double word search", function() {
 
-      var res = userSearchService.testOnly.createRegExpsForQuery("Frodo Baggins");
+      userSearchService.testOnly.createRegExpsForQuery("Frodo Baggins")
+        .then(function(res) {
 
-      assert(res.length === 2, 'Expected a single regular expression');
-      assert.strictEqual(res[0].toString(), "/\\bfrodo/i", 'Expected the search');
-      assert.strictEqual(res[1].toString(), "/\\bbaggins/i", 'Expected the search');
+          assert(res.length === 2, 'Expected a single regular expression');
+          assert.strictEqual(res[0].toString(), "/\\bfrodo/i", 'Expected the search');
+          assert.strictEqual(res[1].toString(), "/\\bbaggins/i", 'Expected the search');
+
+        });
+
 
     });
 
 
     it("should handle irish names", function() {
-      var res = userSearchService.testOnly.createRegExpsForQuery("Frodo O'Grady");
+      userSearchService.testOnly.createRegExpsForQuery("Frodo O'Grady")
+        .then(function(res) {
 
-      assert(res.length === 3, 'Expected three regular expressions');
-      assert.strictEqual(res[0].toString(), "/\\bfrodo/i", 'Expected the search');
-      assert.strictEqual(res[1].toString(), "/\\bo/i", 'Expected the search');
-      assert.strictEqual(res[2].toString(), "/\\bgrady/i", 'Expected the search');
+          assert(res.length === 3, 'Expected three regular expressions');
+          assert.strictEqual(res[0].toString(), "/\\bfrodo/i", 'Expected the search');
+          assert.strictEqual(res[1].toString(), "/\\bo/i", 'Expected the search');
+          assert.strictEqual(res[2].toString(), "/\\bgrady/i", 'Expected the search');
+
+        });
+
     });
 
 
     it("should handle numbers", function() {
-      var res = userSearchService.testOnly.createRegExpsForQuery("Test User 1");
-      assert(res.length === 3, 'Expected a three regular expression');
-      assert.strictEqual(res[0].toString(), "/\\btest/i", 'Expected the search');
-      assert.strictEqual(res[1].toString(), "/\\buser/i", 'Expected the search');
-      assert.strictEqual(res[2].toString(), "/\\b1/i", 'Expected the search');
+      userSearchService.testOnly.createRegExpsForQuery("Test User 1")
+        .then(function(res) {
+
+          assert(res.length === 3, 'Expected a three regular expression');
+          assert.strictEqual(res[0].toString(), "/\\btest/i", 'Expected the search');
+          assert.strictEqual(res[1].toString(), "/\\buser/i", 'Expected the search');
+          assert.strictEqual(res[2].toString(), "/\\b1/i", 'Expected the search');
+
+        });
+
     });
 
   });
