@@ -22,9 +22,9 @@ var connection = mongoose.connection;
 mongoose.set('debug', nconf.get("mongo:logQueries"));
 
 mongoose.connect(nconf.get("mongo:url"), {
-  server: { readPreference: "primaryPreferred" },
+  server: { readPreference: "primaryPreferred", socketOptions: { keepAlive: 1 } },
   db: { readPreference: "primaryPreferred" },
-  replset: { readPreference: "primaryPreferred" }
+  replset: { readPreference: "primaryPreferred", socketOptions: { keepAlive: 1 } }
 });
 
 shutdown.addHandler('mongo', 1, function(callback) {
