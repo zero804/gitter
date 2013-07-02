@@ -77,6 +77,7 @@ define([
       var c = this._fayeFactory(this._endpoint, this._options);
       this._bindClient(c);
 
+
       for(var i = 0; i < this._disabled.length; i++) c.disable(this._disabled[i]);
       for(var j in this._headers) {
         if(this._headers.hasOwnProperty(j)) {
@@ -89,6 +90,7 @@ define([
       }
 
       this._client = c;
+      this._resubscribe();
 
       this._startConnectionMonitor();
 
@@ -138,8 +140,6 @@ define([
 
     connect: function(callback, context) {
       this._getClient().connect(function() {
-        this._resubscribe();
-
         if(callback) callback.apply(context, arguments);
       }, this);
     },

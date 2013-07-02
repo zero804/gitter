@@ -253,7 +253,6 @@ require([
 
         var client = new FayeWrapper('/faye', { fayeFactory: recorders.mockFayeFactory });
         client.addExtension(new ClientAuth());
-
         client.connect(function() {
 
           var subscription = client.subscribe('/ping', function() {
