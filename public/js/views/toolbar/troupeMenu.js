@@ -29,7 +29,6 @@ define([
 
     events: {
      "click .left-menu-icon":    "onLeftMenuListIconClick",
-     'keyup #list-search-input': 'research'
     },
 
     initialize: function() {
@@ -63,7 +62,7 @@ define([
       this.invites.show(new InvitesView({ collection: troupeCollections.incomingInvites }));
 
       // search results collection view
-      this.searchView = new SearchView({ troupes: troupeCollections.troupes });
+      this.searchView = new SearchView({ troupes: troupeCollections.troupes, $input: this.$el.find('#list-search-input') });
       this.search.show(this.searchView);
 
       this.initHideListeners();
@@ -127,10 +126,6 @@ define([
     activateSearchList: function() {
       this.$el.find('#list-search-input').focus();
     },
-
-    research: _.debounce(function() {
-      this.searchView.search(this.$el.find('#list-search-input').val());
-    }, 500),
 
     showSearch: function() {
       this.showTab('icon-search');
