@@ -307,6 +307,8 @@ define([
       if (!this.leftmenu) {
         $("#chat-input-textarea").focus();
         return true;
+      } else {
+        $(window).trigger('showSearch');
       }
 
       // t shows Troupe menu

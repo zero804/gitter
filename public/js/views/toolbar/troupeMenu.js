@@ -29,12 +29,16 @@ define([
 
     events: {
      "click .left-menu-icon":    "onLeftMenuListIconClick",
-     'keyup #list-search-input': 'research',
-     'keypress':                 'showSearch'
+     'keyup #list-search-input': 'research'
     },
 
     initialize: function() {
       this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
+
+      var self = this;
+      $(window).on('showSearch', function() {
+        self.showSearch();
+      });
     },
 
     onRender: function() {
@@ -124,9 +128,9 @@ define([
       this.$el.find('#list-search-input').focus();
     },
 
-    research: function() {
+    research: _.debounce(function() {
       this.searchView.search(this.$el.find('#list-search-input').val());
-    },
+    }, 500),
 
     showSearch: function() {
       this.showTab('icon-search');
