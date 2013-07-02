@@ -1,21 +1,11 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'jquery',
-  'underscore',
   'backbone',
-  'backbone.keys', // no ref
-  'marionette',
-  'template/helpers/all',
-  'views/base',
-  'components/realtime',
-  'components/eyeballs',
-  'components/dozy',
+  'utils/context',
   'views/app/appIntegratedView',
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
-  'views/file/fileView',
-  'views/conversation/conversationView',
-  'views/request/requestView',
   'collections/instances/integrated-items',
   'collections/instances/troupes',
   'views/righttoolbar/rightToolbarView',
@@ -25,23 +15,25 @@ require([
   'views/request/requestDetailView',
   'views/people/personDetailView',
   'views/conversation/conversationDetailView',
-  'views/toolbar/troupeCollectionView',
-  'views/people/peopleCollectionView',
   'views/profile/profileView',
   'views/shareSearch/shareSearchView',
   'views/signup/createTroupeView',
   'views/signup/usernameView',
-  'views/app/invitesView',
   'views/app/troupeHeaderView',
   'views/app/troupeSettingsView',
   'views/toolbar/troupeMenu',
   'utils/router',
-  'components/errorReporter',
-  'filtered-collection'
-], function($, _, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, realtime, eyeballs, dozy, AppIntegratedView, chatInputView, ChatCollectionView, FileView, ConversationView, RequestView,
+  'components/webNotifications', // No ref
+  'components/errorReporter',  // No ref
+  'filtered-collection', // No ref
+  'backbone.keys', // no ref,
+  'components/dozy', // Sleep detection No ref
+  'template/helpers/all' // No ref
+
+], function($, Backbone, context, AppIntegratedView, chatInputView, ChatCollectionView,
             itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
-            RequestDetailView, PersonDetailView, conversationDetailView, TroupeCollectionView, PeopleCollectionView, profileView, shareSearchView,
-            createTroupeView, UsernameView, InvitesView, TroupeHeaderView,
+            RequestDetailView, PersonDetailView, conversationDetailView, profileView, shareSearchView,
+            createTroupeView, UsernameView, TroupeHeaderView,
             troupeSettingsView, TroupeMenuView, Router /*, errorReporter , FilteredCollection */) {
   "use strict";
 
