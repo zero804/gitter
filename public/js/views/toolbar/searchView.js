@@ -74,9 +74,9 @@ define([
       if (this.queries[query])
         return callback(this.queries[query]);
 
-      // if a subset of this query was empty, so is this one
+      // if a superset of this query was empty, so is this one
       var emptyPreviously = _.some(this.queries, function(v,k) {
-        return query.toLowerCase().indexOf(k.toLowerCase()) === 0 && v.length <= 1;
+        return query.toLowerCase().indexOf(k.toLowerCase()) === 0 && v.length === 0;
       });
 
       if (emptyPreviously) {
@@ -86,13 +86,13 @@ define([
       var url = '/user';
       $.ajax({ url: url, data : { q: query, unconnected:1 }, success: function(data) {
         if (data.results) {
-          if (!self.searchSuggestions) self.searchSuggestions = [];
+          if (!self.queries[query]) self.queries[query] = [];
 
-          self.searchSuggestions = _.uniq(self.searchSuggestions.concat(data.results), function(s) {
+          self.queries[query] = _.uniq(self.queries[query].concat(data.results), function(s) {
             return s.displayName;
           });
 
-          callback(self.searchSuggestions);
+          callback(self.queries[query]);
         }
       }});
     }
