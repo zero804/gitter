@@ -32,7 +32,7 @@ function searchForRegularExpressionsWithinUserIds(userIds, res, options) {
 
   return q.limit(limit)
     .skip(skip)
-    .select('displayName avatarVersion gravatarImageUrl')
+    .select('displayName avatarVersion gravatarImageUrl username')
     .execQ()
     .then(function(results) {
       return {
