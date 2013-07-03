@@ -2,8 +2,6 @@
 "use strict";
 
 var signupService = require("../../services/signup-service"),
-    userService = require("../../services/user-service"),
-    uriService = require("../../services/uri-service"),
     winston = require('winston');
 
 module.exports = function(req, res) {
@@ -16,7 +14,6 @@ module.exports = function(req, res) {
   req.checkBody('name', 'Invalid name').notEmpty().is(/^[^<>]{2,}$/);
   req.checkBody('email', 'Invalid email address').notEmpty().isEmail();
   req.checkBody('appUri', 'Invalid appUri').notEmpty();
-
 
   var mappedErrors = req.validationErrors(true);
 
@@ -31,37 +28,10 @@ module.exports = function(req, res) {
     return;
   }
 
-
   var uri = req.body.appUri;
 
-  userService.findByEmail(req.body.email)
-    .then(function(fromUser) {
-      // If we found the user, they already exist, so send them a message letting them know
-      if(fromUser) throw { userExists: true };
-
-      return uriService.findUri(uri)
-        .then(function(result) {
-          if(!result) { winston.error("No troupe with uri: " + uri); throw 404; }
-
-          var toTroupe = result.troupe;
-          var toUser = result.user;
-
-          if(toUser) {
-            return signupService.newSignupWithConnectionInvite(toUser, req.body.email, req.body.name);
-          }
-
-          if(toTroupe) {
-            return signupService.newSignupWithAccessRequest({
-                troupe: toTroupe,
-                displayName: req.body.name,
-                email: req.body.email
-              });
-          }
-
-          throw new Error('Expected either a troupe or user attribute');
-        });
-
-    }).then(function() {
+  signupService.signupWithAccessRequestToUri(uri, req.body.email, req.body.name)
+    .then(function() {
       res.send({ success: true });
     }).fail(function(err) {
       winston.error("Request access failed: ", { exception: err });
