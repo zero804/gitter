@@ -48,7 +48,8 @@ define([
       "submit form": "onFormSubmit",
       "click #cancel-button" : "goBack",
       "click #sigin-button" : "showLoginForm",
-      "click #unauthenticated-continue" : "onUnauthenticatedContinue"
+      "click #unauthenticated-continue" : "onUnauthenticatedContinue",
+      "click #existing-user" : "showLoginForm",
     },
 
     goBack : function () {
@@ -57,32 +58,37 @@ define([
     },
 
     showLoginForm: function() {
-      this.trigger('request.login');
+      this.trigger('request.login', { email: this.$el.find("#email").val() });
     },
 
     onUnauthenticatedContinue: function() {
-      var form = this.$el.find('form');
       var that = this;
-      log("Ok, going to send through to /signup with: " + $("#email").val());
+      log("Ok, going to send through to /requestaccess with: " + $("#email").val());
       $.ajax({
-        url: "/signup",
-        contentType: "application/json",
+        url: "/api/v1/requestaccess",
         dataType: "json",
-        data: JSON.stringify({
-          email: $("#email").val()
-        }),
+        data: {
+          email: this.$el.find("#email").val(),
+          name: this.$el.find("#displayName").val(),
+          appUri : context.getHomeUser().username
+        },
+        statusCode: {
+          400: function(data) {
+            log("Got 400. Data lookslike: " + data.userExists);
+            if ($.parseJSON(data.responseText).userExists) {
+              log("Triggering login yo");
+              that.trigger('request.login', { email: that.$el.find("#email").val() });
+            }
+          }
+        },
         type: "POST",
         success: function(data) {
           // data = { email, success, userStatus, username }
           if (data.redirectTo) {
             window.location.href = "/" + data.redirectTo;
           }
-          else if (data.userStatus === 'ACTIVE') {
-            // forward to a login prompt
-            that.trigger('request.login', { email: data.email });
-          }
           else {
-             that.trigger('signup.complete', { email: data.email});
+             that.trigger('signup.complete', { email: $("#email").val()});
            }
         }
       });

@@ -28,4 +28,23 @@ else {
     winston.verbose("Stat", event);
     client.send(event);
   };
+
+  // Mixpanel tracking
+
+  if (nconf.get("stats:mixpanel")) {
+  
+    var Mixpanel  = require('mixpanel');
+    var token     = nconf.get("stats:mixpanel:token");
+    var mixpanel  = Mixpanel.init(token);
+  
+    exports.event = function(eventName, properties) {
+      properties.distinct_id = properties.userId;
+  
+      winston.verbose("[mixpanel]", {event: eventName, properties: properties});
+      mixpanel.track(eventName, properties);
+    };
+  }
+
 }
+
+
