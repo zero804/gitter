@@ -5,6 +5,7 @@ var mongoose = require('mongoose-q')(require('mongoose'), {spread:true});
 
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
+var mongooseUtils = require('../utils/mongoose-utils');
 var appEvents = require("../app-events");
 var _ = require("underscore");
 var winston = require("winston");
@@ -110,10 +111,19 @@ UserSchema.index({ email: 1 });
 UserSchema.index({ username: 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
 
-
 UserSchema.methods.getHomeUrl = function() {
   return this.username ? "/" + this.username : "/one-one/" + this.id;
 };
+
+UserSchema.methods.isConfirmed = function() {
+  assert(this.status, 'User object does not have a status attribute. Did you select this field?');
+  return this.status !== 'UNCONFIRMED';
+};
+
+UserSchema.methods.hasUsername = function() {
+  return !!this.username;
+};
+
 
 var UserLocationHistorySchema = new Schema({
   userId: ObjectId,
@@ -267,15 +277,22 @@ var InviteSchema = new Schema({
   createdAt:          { type: Date, "default": Date.now },
   emailSentAt:        { type: Date },
   code:               { type: String },
-  status:             { type: String, "enum": ['UNCONFIRMED', 'UNUSED', 'USED'], "default": 'UNUSED'},
+  status:             { type: String, "enum": ['UNUSED', 'USED'], "default": 'UNUSED'},
   _tv:                { type: 'MongooseNumber', 'default': 0 }
 });
 InviteSchema.schemaTypeName = 'InviteSchema';
 InviteSchema.index({ userId: 1 });
 InviteSchema.index({ email: 1 });
 
+
+var InviteUnconfirmedSchema = mongooseUtils.cloneSchema(InviteSchema);
+InviteUnconfirmedSchema.schemaTypeName = 'InviteUnconfirmedSchema';
+InviteUnconfirmedSchema.index({ userId: 1 });
+InviteUnconfirmedSchema.index({ email: 1 });
+
 //
 // A request by a user to join a Troupe
+// When a request is unconfirmed, the user who made the request is unconfirmed
 //
 var RequestSchema = new Schema({
   troupeId: ObjectId,
@@ -284,6 +301,13 @@ var RequestSchema = new Schema({
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 RequestSchema.schemaTypeName = 'RequestSchema';
+RequestSchema.index({ userId: 1 });
+RequestSchema.index({ troupeId: 1, status: 1 });
+
+var RequestUnconfirmedSchema = mongooseUtils.cloneSchema(RequestSchema);
+RequestUnconfirmedSchema.schemaTypeName = 'RequestUnconfirmedSchema';
+RequestUnconfirmedSchema.index({ userId: 1 });
+RequestUnconfirmedSchema.index({ troupeId: 1, status: 1 });
 
 //
 // A single chat
@@ -467,7 +491,11 @@ var Email = mongoose.model('Email', EmailSchema);
 var EmailAttachment = mongoose.model('EmailAttachment', EmailAttachmentSchema);
 var Conversation = mongoose.model('Conversation', ConversationSchema);
 var Invite = mongoose.model('Invite', InviteSchema);
+var InviteUnconfirmed = mongoose.model('InviteUnconfirmed', InviteUnconfirmedSchema);
+
 var Request = mongoose.model('Request', RequestSchema);
+var RequestUnconfirmed = mongoose.model('RequestUnconfirmed', RequestUnconfirmedSchema);
+
 var ChatMessage = mongoose.model('ChatMessage', ChatMessageSchema);
 var File = mongoose.model('File', FileSchema);
 var FileVersion = mongoose.model('FileVersion', FileVersionSchema);
@@ -525,7 +553,9 @@ module.exports = {
   EmailAttachment: EmailAttachment,
   Conversation: Conversation,
 	Invite: Invite,
+  InviteUnconfirmed: InviteUnconfirmed,
   Request: Request,
+  RequestUnconfirmed: RequestUnconfirmed,
 	ChatMessage: ChatMessage,
   File: File,
   FileVersion: FileVersion,

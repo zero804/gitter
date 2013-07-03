@@ -49,21 +49,27 @@ function testDelayedInvite(email, troupeUri, isOnline, done) {
         troupeService.createInvite(troupe, { fromUser: fixture.user1, userId: user.id }, function(err, invite) {
           if(err) return done(err);
 
-          if (isOnline) {
-            assert(!invite.emailSentAt, "The emailSentAt property should be null");
-            mockito.verifyZeroInteractions(emailNotificationServiceMock);
-          } else {
-            assert(invite.emailSentAt, "The emailSentAt property should not be null");
-            mockito.verify(emailNotificationServiceMock, once);
-          }
+          return persistence.Invite.findByIdQ(invite.id)
+            .then(function(invite) {
 
-          troupeService.sendPendingInviteMails(0, function(err, count) {
-            if (err) return done(err);
+              if (isOnline) {
+                assert(!invite.emailSentAt, "The emailSentAt property should be null");
+                mockito.verifyZeroInteractions(emailNotificationServiceMock);
+              } else {
+                assert(invite.emailSentAt, "The emailSentAt property should not be null");
+                mockito.verify(emailNotificationServiceMock, once);
+              }
 
-            assert(count >= 1, 'Send pending invite emails returned ' + count);
+              return troupeService.sendPendingInviteMails(0, function(err, count) {
+                if (err) return done(err);
 
-            done();
-          });
+                assert(count >= 1, 'Send pending invite emails returned ' + count);
+
+                done();
+              });
+
+            });
+
 
         });
 
@@ -91,24 +97,32 @@ function testInviteAcceptance(email, done) {
         troupeService.createInvite(troupe, { fromUser: fixture.user1, userId: user.id }, function(err, invite) {
           if(err) return done(err);
 
-          troupeService.acceptInviteForAuthenticatedUser(user, invite)
-            .then(function() {
 
-              persistence.Troupe.findOne({ uri: troupeUri }, function(err, troupe2) {
-                if(err) return done(err);
+          return persistence.Invite.findByIdQ(invite.id)
+            .then(function(invite) {
+              assert(invite, 'Invite does not exist');
 
-                assert(troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
-                assert(troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
+              return troupeService.acceptInviteForAuthenticatedUser(user, invite)
+                .then(function() {
 
-                persistence.Invite.findOne({ id: invite.id }, function(err, r2) {
-                  if(err) return done(err);
+                  persistence.Troupe.findOne({ uri: troupeUri }, function(err, troupe2) {
+                    if(err) return done(err);
 
-                  assert(!r2, 'Invite should be deleted');
-                  return done();
-                });
-              });
-            })
-            .fail(done);
+                    assert(troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
+                    assert(troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
+
+                    persistence.Invite.findOne({ id: invite.id }, function(err, r2) {
+                      if(err) return done(err);
+
+                      assert(!r2, 'Invite should be deleted');
+                      return done();
+                    });
+                  });
+                })
+                .fail(done);
+
+            });
+
 
         });
 
@@ -136,24 +150,30 @@ function testInviteRejection(email, done) {
         troupeService.createInvite(troupe, { fromUser: fixture.user1, userId: user.id }, function(err, invite) {
           if(err) return done(err);
 
-          troupeService.rejectInviteForAuthenticatedUser(user, invite)
-            .then(function() {
-              persistence.Troupe.findOne({ uri: troupeUri }, function(err, troupe2) {
-                if(err) return done(err);
+          return persistence.Invite.findByIdQ(invite.id)
+            .then(function(invite) {
+              assert(invite, 'Invite does not exist');
 
-                assert(!troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
-                assert(!troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
+              return troupeService.rejectInviteForAuthenticatedUser(user, invite)
+                .then(function() {
+                  persistence.Troupe.findOne({ uri: troupeUri }, function(err, troupe2) {
+                    if(err) return done(err);
 
-                persistence.Invite.findOne({ id: invite.id }, function(err, r2) {
-                  if(err) return done(err);
+                    assert(!troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
+                    assert(!troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
 
-                  assert(!r2, 'Invite should be deleted');
-                  return done();
-                });
-              });
+                    persistence.Invite.findOne({ id: invite.id }, function(err, r2) {
+                      if(err) return done(err);
 
-            })
-            .fail(done);
+                      assert(!r2, 'Invite should be deleted');
+                      return done();
+                    });
+                  });
+
+                })
+                .fail(done);
+
+            });
 
         });
 
@@ -176,9 +196,39 @@ function testRequestAcceptance(email, userStatus, emailNotificationConfirmationM
       status: userStatus })
     .then(function(user) {
 
-      return troupeService.addRequest(troupe, user.id)
+      return troupeService.addRequest(troupe, user)
         .then(function(request) {
-          return troupeService.acceptRequest(request);
+
+
+          return persistence.Request.findByIdQ(request.id)
+            .then(function(request) {
+
+              if(user.status !== 'UNCONFIRMED')
+                return;
+
+              assert(!request, 'request should not exist as user is not confirmed');
+              user.status = 'ACTIVE';
+              return user.saveQ()
+                .then(function() {
+                  return Q.all([
+                      troupeService.updateUnconfirmedRequestsForUserId(user.id)
+                    ]);
+                });
+
+
+            })
+            .then(function() {
+              // The requests should exist at this point
+              return persistence.Request.findByIdQ(request.id)
+                .then(function(request) {
+                  assert(request, 'request does not exist');
+
+                  return troupeService.acceptRequest(request);
+
+                });
+              });
+
+
         })
         .then(function() {
 
@@ -210,7 +260,7 @@ function testRequestRejection(email, userStatus, done) {
     status: userStatus }, function(err, user) {
       if(err) return done(err);
 
-      troupeService.addRequest(fixture.troupe1, user.id)
+      troupeService.addRequest(fixture.troupe1, user)
         .then(function(request) {
 
         troupeService.rejectRequest(request)
@@ -390,32 +440,41 @@ describe('troupe-service', function() {
               userId: fixture.user2.id
             }).then(function(secondInvite) {
 
-              assert.equal(secondInvite.status, 'UNCONFIRMED');
+              assert.equal(secondInvite.status, 'UNUSED');
 
-              // Have user one accept the INVITE
-              return troupeService.acceptInvite(invite.code, fixture.user1.getHomeUrl())
-                .then(function(result) {
+              // Make sure that the invite is in the InviteUnconfirmed collection
+              return persistence.InviteUnconfirmed.findByIdQ(secondInvite._id)
+                .then(function(invite) {
+                  assert(invite);
+                })
+                .then(function() {
 
-                  var user2 = result.user;
-                  assert(!result.alreadyUsed, 'Invite has not already been used');
-                  assert.equal(user2.id, user.id);
-                  assert.equal(user2.status, 'PROFILE_NOT_COMPLETED');
+                  // Have user one accept the INVITE
+                  return troupeService.acceptInvite(invite.code, fixture.user1.getHomeUrl())
+                    .then(function(result) {
 
-                  return troupeService.findOneToOneTroupe(fixture.user1.id, user2.id)
-                    .then(function(newTroupe) {
-                      assert(newTroupe, 'A troupe should exist for the users');
+                      var user2 = result.user;
+                      assert(!result.alreadyUsed, 'Invite has not already been used');
+                      assert.equal(user2.id, user.id);
+                      assert.equal(user2.status, 'PROFILE_NOT_COMPLETED');
+
+                      return troupeService.findOneToOneTroupe(fixture.user1.id, user2.id)
+                        .then(function(newTroupe) {
+                          assert(newTroupe, 'A troupe should exist for the users');
 
 
-                      // Now we should also check that the invites that we UNCONFIRMED have been sent out
-                      // and are now set to UNUSED
-                      return persistence.Invite.findQ({ fromUserId: user.id })
-                        .then(function(invites) {
-                          assert(invites.length == 1);
-                          assert.equal(invites[0].status, 'UNUSED');
+                          // Now we should also check that the invites that we UNCONFIRMED have been sent out
+                          // and are now set to UNUSED
+                          return persistence.Invite.findQ({ fromUserId: user.id })
+                            .then(function(invites) {
+                              assert(invites.length == 1);
+                              assert.equal(invites[0].status, 'UNUSED');
+                            });
                         });
-                    });
 
+                    });
                 });
+
             });
 
 

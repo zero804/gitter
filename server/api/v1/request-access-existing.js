@@ -31,7 +31,7 @@ module.exports = function(req, res, next) {
 
         if(toTroupe) {
           // Request access to a troupe
-          return troupeService.addRequest(toTroupe, req.user.id);
+          return troupeService.addRequest(toTroupe, req.user);
         }
 
         throw new Error('Expected either a troupe or user attribute');

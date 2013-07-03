@@ -1,67 +1,12 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var persistence = require("./persistence-service"),
-    emailNotificationService = require("./email-notification-service"),
+var emailNotificationService = require("./email-notification-service"),
     troupeService = require("./troupe-service"),
     userService = require("./user-service"),
     winston = require('winston'),
     assert = require('assert'),
-    Fiber = require('../utils/fiber');
-
-function newTroupe(options, callback) {
-  var user = options.user;
-  var invites = options.invites;
-  var troupeName = options.troupeName;
-  var users = options.users;
-
-  var troupe = new persistence.Troupe();
-  troupe.name = troupeName;
-  troupe.uri = troupeService.createUniqueUri();
-
-  // add the user creating the troupe
-  troupe.addUserById(user.id);
-
-  // add other users
-  if (users) {
-    users.forEach(function(user) {
-      troupe.addUserById(user);
-    });
-  }
-
-  var f = new Fiber();
-
-  troupe.save(f.waitor());
-
-  // invite users
-  if (invites) {
-    invites.forEach(function(invite) {
-
-      troupeService.createInvite(troupe, {
-          fromUser: user,
-          email: invite.email,
-          displayName: invite.displayName,
-          userId: invite.userId
-        }, f.waitor());
-
-    });
-  }
-
-  f.all().then(function() {
-    callback(null, troupe);
-  }, callback);
-}
-
-function newTroupeForExistingUser(options, user, callback) {
-  winston.info("New troupe for existing user", options);
-
-  options.user = user;
-  newTroupe(options, function(err, troupe) {
-    emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
-    callback(err, troupe.id);
-  });
-
-}
+    Q = require('q');
 
 function newUser(options, callback) {
   winston.info("New user", options);
@@ -178,7 +123,10 @@ var signupService = module.exports = {
         .then(function() {
           return troupeService.updateInvitesForEmailToUserId(user.email, user.id)
             .then(function() {
-              return troupeService.updateUnconfirmedInvitesForUserId(user.id);
+              return Q.all([
+                troupeService.updateUnconfirmedInvitesForUserId(user.id),
+                troupeService.updateUnconfirmedRequestsForUserId(user.id)
+                ]);
             })
             .then(function() {
               return user;
@@ -262,17 +210,17 @@ var signupService = module.exports = {
             })
             .then(function(newUser) {
               emailNotificationService.sendConfirmationForNewUser(newUser);
-              return troupeService.addRequest(troupe, newUser.id);
+              return troupeService.addRequest(troupe, newUser);
             });
         }
 
         // The user exists. Are they confirmed?
-        if (user.status === 'UNCONFIRMED') {
+        if (!user.isConfirmed()) {
           // TODO: Do we want to send the user another email ?
 
           // try add a request, if there already is a request it will be returned instead of created,
           // if the user is a member of the troupe it will give an error (memberExists: true)
-          return troupeService.addRequest(troupe, user.id);
+          return troupeService.addRequest(troupe, user);
         }
 
         // tell the user to login
@@ -287,32 +235,26 @@ var signupService = module.exports = {
    * @param  {[type]} toUser
    * @param  {[type]} email
    * @param  {[type]} name
-   * @return {[type]}
+   * @return promise of [user, invite]
    */
-  newUnauthenticatedConnectionInvite: function(toUser, email, name) {
+  newSignupWithConnectionInvite: function(toUser, email, name) {
     return userService.findByEmail(email)
         .then(function(fromUser) {
 
           // This person is already a user
-          if(fromUser) {
-            return troupeService.findImplicitConnectionBetweenUsers(fromUser.id, toUser.id)
-                .then(function(implicitConnection) {
-                  // Check if fromUser has an implicit connection to toUser, no need for am invite...
-                  if(!implicitConnection) {
-                    return troupeService.inviteUserByUserId(null, fromUser, toUser.id);
-                  }
-                })
-                .then(function() {
-                  throw { userExists: true, hasPassword: !!fromUser.passordHash };
-                });
-          }
+          if(fromUser) throw { alreadyExists: true };
 
           // The person is not already a user, create an unconfirmed account for them
-          newUser({ email: email, displayName: name })
+          return newUser({ email: email, displayName: name })
             .then(function(newUser) {
 
-              return troupeService.inviteUserByUserId(null, newUser, toUser.id);
+              return troupeService.inviteUserByUserId(null, newUser, toUser.id)
+                .then(function(invite) {
+                  return [newUser, invite];
+                });
+
             });
+
 
         });
 

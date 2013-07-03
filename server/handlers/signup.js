@@ -3,7 +3,6 @@
 
 var signupService = require("../services/signup-service"),
     middleware = require("../web/middleware"),
-    userService = require('../services/user-service'),
     loginUtils = require('../web/login-utils'),
     winston = require('winston'),
     nconf = require('../utils/config');
@@ -29,7 +28,7 @@ module.exports = {
               onNoValidTroupes: function() {
 
                 // try go to the user's home page
-                if (userService.isProfileUsernamed(req.user)) {
+                if (req.user.hasUsername()) {
                   res.relativeRedirect(req.user.username);
                 }
                 // get the user to choose a username on the signup page
@@ -101,7 +100,7 @@ module.exports = {
               return;
             }
 
-            if (userService.isProfileUsernamed(user)) {
+            if (user.hasUsername()) {
               res.relativeRedirect('/' + user.username);
             } else {
               res.render('signup', { profileHasNoUsername: !user.username, userId: JSON.stringify(req.user.id) });
