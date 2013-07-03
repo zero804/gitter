@@ -25,13 +25,15 @@ var userService = {
   newUser: function(options, callback) {
     assert(options.email, 'Email atttribute required');
 
-    return persistence.User.createQ({
+    var user = new persistence.User({
       displayName:      options.displayName,
       email:            options.email,
       confirmationCode: uuid.v4(),
       gravatarImageUrl: generateGravatarUrl(options.email),
       status:           options.status || "UNCONFIRMED"
-    }).nodeify(callback);
+    });
+
+    return user.saveQ().then(function() { return user; }).nodeify(callback);
   },
 
   findOrCreateUserForEmail: function(options, callback) {
