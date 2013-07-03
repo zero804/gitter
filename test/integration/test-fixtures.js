@@ -5,6 +5,7 @@ var testRequire = require('./test-require');
 var Q = require("Q");
 var assert = require("assert");
 var persistence = testRequire("./services/persistence-service");
+var _ = require('underscore');
 
 function load(done) {
 
@@ -23,11 +24,20 @@ function load(done) {
       persistence.Troupe.findOneQ({ uri: 'testtroupe2' }).then(checkNotNull).then(function(troupe) { fixture.troupe2 = troupe; })
     ])
     .then(function() {
-      return fixture;
+      var counter = 0;
+      return _.extend(fixture, {
+          generateEmail: function() {
+            return 'testuser' + (++counter) + Date.now() + '@troupetest.local';
+          },
+          generateName: function() {
+            return 'Test ' + (++counter) + ' ' + Date.now();
+          }
+        });
     })
     .nodeify(done);
 
 }
+
 
 module.exports = function(fixture) {
   return function(done) {

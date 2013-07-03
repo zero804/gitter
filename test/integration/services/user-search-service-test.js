@@ -1,16 +1,16 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
-/*global describe:true, it:true*/
+/*global describe:true, it:true, before:false */
 "use strict";
 
 var testRequire = require('./../test-require');
-//var logAccess = require("../log-access");
-//var userSearchService = logAccess(testRequire('./services/user-search-service'));
-
+var fixtureLoader = require('../test-fixtures');
+var fixture = {};
 
 var userSearchService = testRequire('./services/user-search-service');
 var persistence = testRequire('./services/persistence-service');
 
 var assert = require('assert');
+var Q = require('q');
 
 describe("User Search Service", function() {
 
@@ -160,25 +160,34 @@ describe("User Search Service", function() {
   describe("#searchUnconnectedUsers", function() {
 
     it("should find both test users", function(done) {
-      persistence.User.findOne({ email: "testuser@troupetest.local" }, function(err, user) {
-        if(err) return done(err);
-        if(!user) return done("Cannot find user");
+      var troupe = fixture.troupe1;
 
-        var userId = user.id;
+      assert(troupe.containsUserId(fixture.user1.id), 'Test troupe 1 should contain test user 1');
 
-        userSearchService.searchUnconnectedUsers(userId, 'tEst', {}, function(err, searchResults) {
-          if(err) return done(err);
-          assert(searchResults.results.length >= 2, "Expect some users");
-
-          assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 1'; } ).length === 0, "Expect test user 1 not to be returned");
-          assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 2'; } ).length == 1, "Expect test user 2");
-          assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 3'; } ).length == 1, "Expect test user 3");
-
-          return done();
+      Q.all([
+        persistence.User.createQ({ displayName: fixture.generateName(), email: fixture.generateEmail()}),
+        persistence.User.createQ({ displayName: fixture.generateName(), email: fixture.generateEmail()})
+      ]).spread(function(user1, user2) {
+        troupe.addUserById(user1.id);
+        troupe.addUserById(user2.id);
+        return troupe.saveQ().then(function() {
+          return [user1, user2];
         });
-      });
-    });
+      }).spread(function(user1, user2) {
+        return userSearchService.searchUnconnectedUsers(fixture.user1.id, 'tEst', {})
+          .then(function(searchResults) {
+            assert(searchResults.results.length >= 2, "Expect some users, got " + JSON.stringify(searchResults.results));
 
+            assert(searchResults.results.filter(function(f) { return f.id == fixture.user1.id; } ).length === 0, "Expect test user 1 not to be returned");
+            assert(searchResults.results.filter(function(f) { return f.id == user1.id; } ).length == 1, "Expect test user 2");
+            assert(searchResults.results.filter(function(f) { return f.id == user2.id; } ).length == 1, "Expect test user 3");
+
+          });
+      }).nodeify(done);
+
+    });
   });
+
+  before(fixtureLoader(fixture));
 
 });

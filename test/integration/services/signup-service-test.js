@@ -106,30 +106,17 @@ describe('signup-service', function() {
         './troupe-service': troupeService
       });
 
+      signupService.testOnly.newSignupWithAccessRequest({
+        email: "testuser@troupetest.local",
+        name: "Test Guy",
+        troupe: fixture.troupe1
+      }, function(err) {
+        if(!err) return done("An error should have been returned");
 
-      persistence.User.findOne({ email: 'testuser@troupetest.local'}, function(err, user) {
-        if(err) return done(err);
-        if(!user) return done("Could not find user");
+        mockito.verifyZeroInteractions(emailNotificationServiceMock);
 
-        var existingTroupeUri = 'testtroupe1';
-
-        persistence.Troupe.findOne({ uri: existingTroupeUri }, function(err, troupe) {
-          if(err) return done(err);
-          if(!troupe) return done('Troupe ' + existingTroupeUri + ' not found');
-
-          signupService.newSignupWithAccessRequest({
-            email: "testuser@troupetest.local",
-            name: "Test Guy",
-            troupe: troupe
-          }, function(err) {
-            if(!err) return done("An error should have been returned");
-
-            mockito.verifyZeroInteractions(emailNotificationServiceMock);
-
-            assert(err.userExists, "The userExists property of the error should be true");
-            done();
-          });
-        });
+        assert(err.userExists, "The userExists property of the error should be true");
+        done();
       });
 
     });
@@ -150,7 +137,7 @@ describe('signup-service', function() {
 
       var troupe = fixture.troupe1;
 
-      signupService.newSignupWithAccessRequest({ email: nonExistingEmail, name: 'Test McTest', troupe: troupe }, function(err, request) {
+      signupService.testOnly.newSignupWithAccessRequest({ email: nonExistingEmail, name: 'Test McTest', troupe: troupe }, function(err, request) {
         if(err) return done(err);
         if(!request) return done('No request created');
 
@@ -198,7 +185,7 @@ describe('signup-service', function() {
         './email-notification-service': emailNotificationServiceMock
       });
 
-      return signupService.newSignupWithConnectionInvite(fixture.user1, nonExistingEmail, 'Test User')
+      return signupService.testOnly.newSignupWithConnectionInvite(fixture.user1, nonExistingEmail, 'Test User')
         .spread(function(user, invite) {
           assert(user, 'Expected a user to be created');
           assert(invite, 'Expected an invite to be created');
