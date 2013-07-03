@@ -28,7 +28,7 @@ define([
     },
 
     events: {
-     "click .left-menu-icon":    "onLeftMenuListIconClick",
+     "click .left-menu-icon":    "onLeftMenuListIconClick"
     },
 
     initialize: function() {
