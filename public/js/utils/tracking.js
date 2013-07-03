@@ -2,10 +2,18 @@
 define([
   'ga',
   'utils/context',
-  'log!tracking'
-], function(_gaq, context, log) {
+  'log!tracking',
+  'mixpanel'
+], function(_gaq, context, log, mixpanel) {
   /*jshint unused:true */
   "use strict";
+
+  // FIXME Get this from the current server env
+  mixpanel.init(context().mixpanelToken);
+  if (context.isAuthed()) {
+    mixpanel.identify(context.getUserId());
+    mixpanel.name_tag(context.getUser().username);
+  }
 
   if(!window.troupeTrackingId) {
     return {

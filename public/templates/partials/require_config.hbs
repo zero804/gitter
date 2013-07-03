@@ -35,6 +35,7 @@ require.config({
     "faye":           "../repo/faye/faye",
     "nanoscroller":   "../repo/nanoscroller/nanoscroller",
     "scrollfix":      "../repo/scrollfix/scrollfix",
+    "mixpanel":       "../repo/mixpanel/mixpanel",
 
     "ga": "//ssl.google-analytics.com/ga",
     "in-browser": "/test/in-browser/"
@@ -42,6 +43,9 @@ require.config({
   shim: {
     "ga": {
       exports: "_gaq"
+    },
+    "mixpanel": {
+      exports: "mixpanel"
     }
   },
   hbs : {

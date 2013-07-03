@@ -114,11 +114,13 @@ var userService = {
   findByLogin: function(login, callback) {
 
     if (login.indexOf('@') >= 0) { // login is an email
-      statsService.event("login_by_username");
-      return userService.findByEmail(login, callback);
+      var user = userService.findByEmail(login, callback);
+      if (user) statsService.event("login_by_email", { userId: user.id });
+      return user;
     } else { // login is a username
-      statsService.event("login_by_email");
-      return userService.findByUsername(login, callback);
+      var user = userService.findByUsername(login, callback);
+      if (user) statsService.event("login_by_username", { userId: user.id });
+      return user;
     }
 
   },

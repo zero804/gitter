@@ -245,7 +245,7 @@ function storeFileVersionInGrid(options, callback) {
           uploadFileToGrid(file, 1, temporaryFile, function(err, file) {
             if(err) return callback(err);
 
-            statsService.event('new_file', { troupeId: troupeId });
+            statsService.event('new_file', { userId: creatorUserId, troupeId: troupeId });
 
             callback(err, {
               file: file,
@@ -284,7 +284,7 @@ function storeFileVersionInGrid(options, callback) {
         var versionNumber = file.versions.length;
         uploadFileToGrid(file, versionNumber, temporaryFile, function(err, file) {
           if(err) return callback(err);
-          statsService.event('new_file_version', { troupeId: troupeId });
+          statsService.event('new_file_version', { userId: creatorUserId, troupeId: troupeId });
           callback(err, {
             file: file,
             version: file.versions.length,

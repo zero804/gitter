@@ -86,6 +86,7 @@ function createTroupeContext(req, options) {
       basePort: nconf.get('web:baseport'),
       basePath: nconf.get('web:basepath'),
       homeUrl: nconf.get('web:homeurl'),
+      mixpanelToken: nconf.get("stats:mixpanel:token"),
 
       troupeUri: options.troupe ? options.troupe.uri : undefined,
       websockets: {

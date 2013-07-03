@@ -412,7 +412,7 @@ function inviteUserByEmail(troupe, fromUser, displayName, email) {
             // Found an existing invite? Don't create a new one then
             if(existingInvite) return existingInvite;
 
-            statsService.event('new_user_invite', { fromUserId: fromUserId, email: email });
+            statsService.event('new_user_invite', { userId: fromUserId, email: email });
 
             // create the invite and send mail immediately
 
@@ -1070,7 +1070,7 @@ function rejectInviteForAuthenticatedUser(user, invite) {
       throw 401;
     }
 
-    statsService.event('invite_rejected', { inviteId: invite.id });
+    statsService.event('invite_rejected', { userId: user.id, inviteId: invite.id });
     winston.verbose("Invite rejected", { inviteId: invite.id });
 
     return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite);
@@ -1089,13 +1089,13 @@ function acceptInviteForAuthenticatedUser(user, invite) {
     if(invite.status !== 'UNUSED') {
       // invite has been used, we can't use it again.
       winston.verbose("Invite has already been used", { inviteId: invite.id });
-      statsService.event('invite_reused', { inviteId: invite.id });
+      statsService.event('invite_reused', { userId: user.id, inviteId: invite.id });
 
       throw { alreadyUsed: true };
     }
 
     // use and delete invite
-    statsService.event('invite_accepted', { inviteId: invite.id});
+    statsService.event('invite_accepted', { userId: user.id, inviteId: invite.id});
     winston.verbose("Invite accepted", { inviteId: invite.id });
 
     // Either add the user or create a one to one troupe. depending on whether this
@@ -1164,7 +1164,7 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
           if(invite.status === 'USED') {
             /* The invite has already been used. We need to fail authentication (if they have completed their profile), but go to the troupe */
             winston.verbose("Invite has already been used", { confirmationCode: confirmationCode, troupeUri: troupeUri });
-            statsService.event('invite_reused', { uri: troupeUri });
+            statsService.event('invite_reused', { userId: user.id, uri: troupeUri });
 
             // If the user has clicked on the invite, but hasn't completed their profile (as in does not have a password)
             // then we'll give them a special dispensation and allow them to access the site (otherwise they'll never get in)
@@ -1177,7 +1177,7 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
 
           // Invite is good to accept
 
-          statsService.event('invite_accepted', { uri: troupeUri });
+          statsService.event('invite_accepted', { userId: user.id, uri: troupeUri });
           winston.verbose("Invite accepted", { confirmationCode: confirmationCode, troupeUri: troupeUri });
 
           var confirmOperation = null;
