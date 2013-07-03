@@ -83,8 +83,8 @@ exports.storeEmailInConversation = function(options, callback) {
 
       conversation.save(function(err) {
           if (err) return callback(err);
-          statsService.event('new_conversation', { troupeId: troupeId });
-          statsService.event('new_email', { troupeId: troupeId });
+          statsService.event('new_conversation', { userId: fromUserId, troupeId: troupeId });
+          statsService.event('new_email', { userId: fromUserId, troupeId: troupeId });
 
           callback(null, conversation, storeMail);
       });
@@ -98,7 +98,7 @@ exports.storeEmailInConversation = function(options, callback) {
     conversation.pushEmail(storeMail);
     conversation.save(function(err) {
         if (err) return callback(err);
-        statsService.event('new_email', { troupeId: troupeId });
+        statsService.event('new_email', { userId: fromUserId, troupeId: troupeId });
 
         callback(null, conversation, storeMail);
     });

@@ -102,7 +102,7 @@ define([
       var postUri =  this.authenticated ? "/api/v1/requestaccessexisting" : "/api/v1/requestaccess";
       var email = this.getEmail();
       var that = this;
-
+      log("PostUri: " + postUri);
       $('#request-failed').hide();
 
       $.ajax({
@@ -112,20 +112,34 @@ define([
         data: form.serialize(),
         type: "POST",
         global: false,
+        statusCode: {
+          400: function(data) {
+            if ($.parseJSON(data.responseText).userExists) {
+              $('#user-exists').show();
+            }
+          }
+        },
         success: function(data) {
           if(data.success) {
-            $('.modal-content').hide();
-            $('.modal-success').show();
-            return;
+            if (that.authenticated) {
+              $('.modal-content').hide();
+              $('.modal-success').show();
+            }
+            else {
+              that.trigger('confirm.request', { userEmail: email});
+              return;
+            }
           }
 
           if(data.userExists) {
+            log('** HEY THAT USER EXISTS');
             that.trigger('request.login', { userExists: true });
             return;
           }
         },
         error: function() {
-          $('#request-failed').show();
+          log("Error with request");
+          // $('#request-failed').show();
         }
       });
 

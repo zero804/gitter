@@ -157,4 +157,28 @@ describe("User Search Service", function() {
   });
 
 
+  describe("#searchUnconnectedUsers", function() {
+
+    it("should find both test users", function(done) {
+      persistence.User.findOne({ email: "testuser@troupetest.local" }, function(err, user) {
+        if(err) return done(err);
+        if(!user) return done("Cannot find user");
+
+        var userId = user.id;
+
+        userSearchService.searchUnconnectedUsers(userId, 'tEst', {}, function(err, searchResults) {
+          if(err) return done(err);
+          assert(searchResults.results.length >= 2, "Expect some users");
+
+          assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 1'; } ).length === 0, "Expect test user 1 not to be returned");
+          assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 2'; } ).length == 1, "Expect test user 2");
+          assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 3'; } ).length == 1, "Expect test user 3");
+
+          return done();
+        });
+      });
+    });
+
+  });
+
 });

@@ -47,17 +47,17 @@
 <div class="modal-success">
   <div class="trpModalTitle">Request has been sent</div>
   <div class="trpModalSubtext">The members of the Troupe have been notified about your request. Once you've been accepted, you'll receive an email to let you know.<br><br>
-    {{^authenticated}}
-    In the mean-time, why not learn more about Troupe?<br><br>
-      <a href="{{homeUrl}}" class="trpButtonBig trpBtnGreen">Show me more</a>
-    {{/authenticated}}
-      <a href="javascript:history.back();" class="trpModalButton trpButtonBig trpBtnGrey" id="cancel-button">Close</a>
+    <a href="/last" class="trpModalButton trpButtonBig trpBtnGrey" id="cancel-button">Close</a>
   </div>
 </div>
 
 <div id="request-failed" class="trpModalFailure" style="display:none">
   <div class="trpModalTitle">Can't request access at the moment</div>
   <div class="trpModalBody">Something has gone wrong. Please try again in a minute.</div>
+</div>
+
+<div id="user-exists" class="trpModalFailure" style="display:none">
+  <div class="trpModalFailureText">You already have an account with Troupe.<br>Please login, if you have forgotten your password, enter a blank password<br>and you will be prompted to change it.</div>
 </div>
 
 <div id="request_validation" class="trpModalFailure" style="display:none">

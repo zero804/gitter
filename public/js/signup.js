@@ -49,7 +49,7 @@ require([
         modal.transitionTo(createLoginModal());
       });
 
-      modal.on('close', function() {
+      modal.on('hide', function() {
         window.location.href = window.location.href.replace("passwordResetFailed","");
       });
 
@@ -62,7 +62,13 @@ require([
     }
 
     function chooseUsername() {
-      (new TroupeViews.Modal({ view: new UsernameView(), disableClose: true })).show();
+      var modal = new UsernameView.Modal({ disableClose: true });
+
+      modal.show();
+
+      modal.on('chose', function(username) {
+        window.location = '/' + username;
+      });
     }
 
     function signup() {
