@@ -191,6 +191,7 @@ define([
       }
 
       return {
+        url: item.get('url'),
         noPreviewAvailable: true
       };
 
