@@ -47,7 +47,7 @@ module.exports = function(req, res) {
           var toUser = result.user;
 
           if(toUser) {
-            return signupService.newUnauthenticatedConnectionInvite(toUser, req.body.email, req.body.name);
+            return signupService.newSignupWithConnectionInvite(toUser, req.body.email, req.body.name);
           }
 
           if(toTroupe) {

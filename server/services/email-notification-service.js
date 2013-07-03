@@ -28,7 +28,7 @@ module.exports = {
     var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri;
 
     mailerService.sendEmail({
-      templateFile: "signupemailfromrequest",
+      templateFile: "requestacceptance",
       to: user.email,
       from: 'signup-robot' + emailDomainWithAt,
       subject: "You've been accepted into a troupe",

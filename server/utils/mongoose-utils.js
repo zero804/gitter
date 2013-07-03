@@ -1,6 +1,10 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 var Q = require('q');
+var _ = require('underscore');
+
+var mongoose = require('mongoose-q')(require('mongoose'), {spread:true});
+var Schema = mongoose.Schema;
 
 exports.attachNotificationListenersToSchema = function (schema, options) {
   var ignoredPaths = options.ignoredPaths;
@@ -58,4 +62,11 @@ exports.monq = function(promise) {
   return deferred.promise;
 
 };
+
+exports.cloneSchema = function(schema) {
+  var tree = _.extend({}, schema.tree);
+  delete tree.id;
+  delete tree._id;
+  return new Schema(tree);
+}
 

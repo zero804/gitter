@@ -304,9 +304,6 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
       var fromUserId = fromUser.id;
       assert(fromUserId, 'fromUser.id is missing');
 
-      var fromUserIsUnconfirmed = fromUser.status == 'UNCONFIRMED';
-      var toUserIsUnconfirmed = toUser.status == 'UNCONFIRMED';
-
       var chain = null;
 
       if(troupe) {
@@ -333,10 +330,10 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
       return chain.then(function(hasImplicitConnection) {
         if(hasImplicitConnection) return null; // No invite needed
 
-        var inviteStatus = fromUserIsUnconfirmed ? "UNCONFIRMED" : "UNUSED";
+        var collection = fromUser.isConfirmed() ? persistence.Invite : persistence.InviteUnconfirmed;
 
         // Look for an existing invite
-        var query = { status: inviteStatus, userId: toUserId };
+        var query = { status: 'UNUSED', userId: toUserId };
         if(!troupe) {
           query.fromUserId = fromUserId;
           query.troupeId = null;
@@ -344,7 +341,7 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
           query.troupeId = troupe.id;
         }
 
-        return persistence.Invite.findOneQ(query)
+        return collection.findOneQ(query)
           .then(function(existingInvite) {
 
             // Existing invite? Use it
@@ -353,19 +350,19 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
             }
 
             // No exiting invite, create a new invite
-            return persistence.Invite.createQ({
+            return collection.createQ({
               troupeId: troupe ? troupe.id : null,
               fromUserId: fromUserId,
               userId: toUserId,
               displayName: null, // Don't set this if we're using a userId
               email: null,       // Don't set this if we're using a userId
-              code: toUserIsUnconfirmed ? uuid.v4() : null,
-              status: inviteStatus
+              code: toUser.isConfirmed() ? null : uuid.v4(),
+              status: 'UNUSED'
             });
 
           }).then(function(invite) {
-            // Notify the recipient
-            if(fromUserIsUnconfirmed) return invite;
+            // Notify the recipient, if the user is confirmed
+            if(!fromUser.isConfirmed()) return invite;
 
             return notifyRecipientsOfInvites([invite])
                     .then(function() {
@@ -510,14 +507,19 @@ function findUnusedOneToOneInviteFromUserIdToUserId(fromUserId, toUserId) {
  * @return {promise} no value
  */
 function updateUnconfirmedInvitesForUserId(userId) {
-  return persistence.Invite.findQ({ fromUserId: userId, status: 'UNCONFIRMED' })
+  return persistence.InviteUnconfirmed.findQ({ fromUserId: userId })
       .then(function(invites) {
+        winston.info('Creating ' + invites.length + ' invites for recently confirmed user ' + userId);
         var promises = invites.map(function(invite) {
-          invite.status = 'UNUSED';
-          return invite.saveQ().then(function() {
-            return invite;
-          });
+          return persistence.Invite.createQ(invite)
+            .then(function(newInvite) {
+              return invite.removeQ()
+                .then(function() {
+                  return newInvite;
+                });
+              });
         });
+
         return Q.all(promises)
           .then(function(invites) {
             return notifyRecipientsOfInvites(invites);
@@ -525,6 +527,26 @@ function updateUnconfirmedInvitesForUserId(userId) {
       });
 }
 
+/**
+ * Finds all unconfirmed requests for a recently confirmed user,
+ * notifies recipients
+ * @return {promise} no value
+ */
+function updateUnconfirmedRequestsForUserId(userId) {
+  return persistence.RequestUnconfirmed.findQ({ userId: userId })
+      .then(function(requests) {
+        winston.info('Creating ' + requests.length + ' requests for recently confirmed user ' + userId);
+
+        var promises = requests.map(function(request) {
+          return persistence.Request.createQ(request)
+            .then(function() {
+              return request.removeQ();
+            });
+        });
+
+        return Q.all(promises);
+      });
+}
 
 function updateInvitesForEmailToUserId(email, userId, callback) {
   return persistence.Invite.updateQ(
@@ -586,24 +608,31 @@ function removeUserFromTroupe(troupeId, userId, callback) {
  * Create a request or simply return an existing one
  * returns a promise of a request
  */
-function addRequest(troupe, userId) {
+function addRequest(troupe, user) {
   assert(troupe, 'Troupe parameter is required');
+  assert(user, 'User parameter is required');
 
-  return persistence.Request.findOneQ({
+  var userId = user.id;
+  assert(user.id, 'User.id parameter is required');
+
+  var collection = user.isConfirmed() ? persistence.Request : persistence.RequestUnconfirmed;
+
+  if(userIdHasAccessToTroupe(userId, troupe)) {
+    throw { memberExists: true };
+  }
+
+  return collection.findOneQ({
     troupeId: troupe.id,
     userId: userId,
-    status: 'PENDING'})
+    status: 'PENDING' })
     .then(function(request) {
       // Request already made....
       if(request) return request;
 
-      if(userIdHasAccessToTroupe(userId, troupe)) {
-        throw { memberExists: true };
-      }
-
-      return  persistence.Request.createQ({
+      return  collection.createQ({
         troupeId: troupe.id,
-        userId: userId
+        userId: userId,
+        status: 'PENDING'
       });
 
 
@@ -642,6 +671,8 @@ function findRequestsByIds(requestIds, callback) {
  * @return promise of undefined
  */
 function acceptRequest(request, callback) {
+  assert(request, 'Request parameter required');
+
   winston.verbose('Accepting request to join ' + request.troupeId);
 
   var userId = request.userId;
@@ -1186,7 +1217,12 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
             user.status = 'PROFILE_NOT_COMPLETED';
             confirmOperation = user.saveQ()
                 .then(function() {
-                  return updateUnconfirmedInvitesForUserId(user.id);
+                  // Find all the unconfirmed requests and invites for this user and mark them
+                  return Q.all([
+                      updateUnconfirmedInvitesForUserId(user.id),
+                      updateUnconfirmedRequestsForUserId(user.id)
+                    ]);
+
                 });
           }
 
@@ -1338,6 +1374,7 @@ module.exports = {
   findImplicitConnectionBetweenUsers: findImplicitConnectionBetweenUsers,
   findAllUserIdsForUnconnectedImplicitContacts: findAllUserIdsForUnconnectedImplicitContacts,
   updateUnconfirmedInvitesForUserId: updateUnconfirmedInvitesForUserId,
+  updateUnconfirmedRequestsForUserId: updateUnconfirmedRequestsForUserId,
 
   inviteUserByUserId: inviteUserByUserId,
 
