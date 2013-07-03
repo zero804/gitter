@@ -170,7 +170,8 @@ define([
 					if (!result.success) {
 						self.isUnavailable();
 					} else {
-						window.location = "/" + username;
+						self.trigger('chose', username);
+						self.close();
 					}
 				},
 				error: error
@@ -186,8 +187,18 @@ define([
 	});
 
 	UsernameView.Modal = TroupeViews.Modal.extend({
-		initialize: function() {
-			TroupeViews.Modal.prototype.initialize.call(this, { view: new UsernameView() });
+		initialize: function(options) {
+			var view = new UsernameView(), self = this;
+
+			view.on('close', function() {
+				self.hide();
+			});
+
+			view.on('chose', function(username) {
+				self.trigger('chose', username);
+			});
+
+			TroupeViews.Modal.prototype.initialize.call(this, { view: view, disableClose: (options && options.disableClose) ? true : false });
 		}
 	});
 

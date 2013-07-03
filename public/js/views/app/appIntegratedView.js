@@ -93,7 +93,7 @@ define([
     ensureProfileIsUsernamed: function() {
       var user = window.troupeContext.user;
       if (!user.username) {
-        new TroupeViews.Modal({ view: new UsernameView() }).show();
+        (new UsernameView.Modal()).show();
       }
     },
 
