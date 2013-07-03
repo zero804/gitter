@@ -9,42 +9,59 @@ if(!nconf.get("stats:sendStats")) {
   exports.event = function() {};
 }
 else {
-  var cube = require("cube");
-  var statsEnvName = nconf.get("stats:envName");
-  var statsUrl = nconf.get("stats:cubeUrl");
 
-  // TODO: conf this
-  var client = cube.emitter(statsUrl);
+  if (nconf.get("stats:cube:enabled")) {
+    var Cube = require("cube");
+    var statsEnvName = nconf.get("stats:envName");
+    var statsUrl = nconf.get("stats:cubeUrl");
+    var cube = Cube.emitter(statsUrl);
+  }
 
-  exports.event = function(eventName, data) {
-    if(!data) data = {};
-    data.env = statsEnvName;
-    var event = {
-      type: "troupe_" + eventName,
-      time: new Date(),
-      data: data
-    };
-
-    winston.verbose("Stat", event);
-    client.send(event);
-  };
-
-  // Mixpanel tracking
-
-  if (nconf.get("stats:mixpanel")) {
-  
+  if (nconf.get("stats:mixpanel:enabled")) {
     var Mixpanel  = require('mixpanel');
     var token     = nconf.get("stats:mixpanel:token");
     var mixpanel  = Mixpanel.init(token);
-  
-    exports.event = function(eventName, properties) {
-      properties.distinct_id = properties.userId;
-  
-      winston.verbose("[mixpanel]", {event: eventName, properties: properties});
-      mixpanel.track(eventName, properties);
-    };
   }
 
+  // FIXME too many IFs find a nicer way
+  exports.event = function(eventName, properties) {
+    if(!properties) properties = {};
+    properties.env = statsEnvName;
+
+    // MixPanel
+    if (nconf.get("stats:mixpanel:enabled")) {
+      properties.distinct_id = properties.userId;
+      mixpanel.track(eventName, properties, function(err) { if (err) throw err; });
+    }
+
+    // Cube
+    if (nconf.get("stats:cube:enabled")) {
+      var event = {
+        type: "troupe_" + eventName,
+        time: new Date(),
+        data: properties
+      };
+      cube.send(event);
+    }
+
+    winston.verbose("[stats]", {event: eventName, properties: properties});
+  };
+
+  exports.userUpdate = function(user) {
+    var createdAt = new Date(user._id.getTimestamp().getTime());
+    var firstName = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
+
+    mixpanel.people.set(user.id, {
+      $first_name: firstName,
+      $created_at: createdAt.toISOString(),
+      $email: user.email,
+      $name: user.displayName,
+      $username: user.username,
+      status: user.status
+    });
+  };
+
+  exports.user = function(user, key, value) {
+    mixpanel.people.set(user.id, key, value);
+  };
 }
-
-

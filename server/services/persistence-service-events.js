@@ -9,6 +9,8 @@ exports.install = function(persistenceService) {
   var winston = require("winston");
   var troupeService = require("./troupe-service");
   var restSerializer =  require("../serializers/rest-serializer");
+  var statsService = require("./stats-service");
+
 
   // --------------------------------------------------------------------
   // Utility serialization stuff
@@ -78,7 +80,6 @@ exports.install = function(persistenceService) {
   mongooseUtils.attachNotificationListenersToSchema(schemas.UserSchema, {
     ignoredPaths: ['lastTroupe','confirmationCode','status','passwordHash','passwordResetCode'],
     onUpdate: function(model, next) {
-      if(!next) next = function() {};
 
       troupeService.findAllTroupesIdsForUser(model.id, function(err, troupeIds) {
         if(err) { winston.error("Silently ignoring error in user update ", { exception: err }); return next(); }
@@ -98,6 +99,12 @@ exports.install = function(persistenceService) {
     }
 
     // TODO: deal with user deletion!
+  });
+
+
+  // MixPanel tracking
+  schemas.UserSchema.post('save', function(model) {
+    statsService.userUpdate(model);
   });
 
   attachNotificationListenersToSchema(schemas.ConversationSchema, 'conversation');

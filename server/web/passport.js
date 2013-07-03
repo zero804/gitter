@@ -38,6 +38,7 @@ function loginAndPasswordUserStrategy(login, password, done) {
       winston.warn("User attempted to login but account not yet activated", { email: email, status: user.status });
 
       statsService.event("login_failed", {
+        userId: user.id,
         email: email,
         reason: 'account_not_activated'
       });
@@ -50,6 +51,7 @@ function loginAndPasswordUserStrategy(login, password, done) {
         winston.warn("Login failed. Passwords did not match", { email: email });
 
         statsService.event("login_failed", {
+          userId: user.id,
           email: email,
           reason: 'password_mismatch'
         });
