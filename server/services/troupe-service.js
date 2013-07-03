@@ -942,17 +942,6 @@ function findAllUserIdsForTroupes(troupeIds, callback) {
 function findAllUserIdsForUnconnectedImplicitContacts(userId, callback) {
   userId = new ObjectID(userId);
 
-  persistence.Troupe.find({ 'users.userId': userId, oneToOne: false }, console.log)
-
-  persistence.Troupe.aggregate([
-      { $match: { 'users.userId': userId, oneToOne: false } },
-//      { $project: { 'users.userId': 1, _id: 0 } },
-//      { $unwind: "$users" },
-//      { $group: { _id: '$users.userId', number: { $sum: 1 } } },
-//      { $project: { _id: 1 } }
-    ], console.log);
-
-
   return persistence.Troupe.aggregateQ([
     { $match: { 'users.userId': userId, oneToOne: false } },
     { $project: { 'users.userId': 1, _id: 0 } },
@@ -960,14 +949,9 @@ function findAllUserIdsForUnconnectedImplicitContacts(userId, callback) {
     { $group: { _id: '$users.userId', number: { $sum: 1 } } },
     { $project: { _id: 1 } }
   ]).then(function(results) {
-    console.log('results', results);
-    console.log('results', results.length);
-
-
     var implicitConnectionUserIds = results
           .map(function(item) { return "" + item._id; })
           .filter(function(item) { return item != userId; });
-    console.log('IMPLICIT', implicitConnectionUserIds);
 
     return persistence.Troupe.aggregateQ([
       { $match: { 'users.userId': userId, oneToOne: true } },
