@@ -66,6 +66,7 @@ define([
       this.search.show(this.searchView);
 
       this.initHideListeners();
+
     },
 
     initHideListeners: function() {
@@ -80,10 +81,28 @@ define([
         function toggle() {
           self.$el.find(element).toggle(collection.length > 0);
           self.$el.find('.nano').nanoScroller({ preventPageScrolling: true });
+          self.toggleMegaList();
         }
 
         collection.on('all', toggle);
         toggle();
+      }
+    },
+
+    toggleMegaList: function() {
+      var c = troupeCollections;
+      var invisibile = (c.unreadTroupes.length === 0 && c.favouriteTroupes.length === 0 && c.recentTroupes.length === 0 && c.incomingInvites.length === 0);
+
+      var icon = this.$el.find('ul li:first-child');
+      if (invisibile) {
+        icon.hide();
+        if (!this.selectedListIcon || this.selectedListIcon === 'icon-mega') {
+          this.showTab('icon-troupes');
+        }
+      }
+      else {
+        icon.show();
+        this.showTab('icon-mega');
       }
     },
 
@@ -96,22 +115,22 @@ define([
       if(selected === this.selectedListIcon) return;
 
       // Turn off the old selected list
-      var currentSelection = $("#"+this.selectedListIcon);
+      var currentSelection = this.$el.find("#"+this.selectedListIcon);
       currentSelection.removeClass('selected').fadeTo(100, 0.6);
       var listElement = currentSelection.data('list');
 
-      $("#" + listElement).hide();
+      this.$el.find("#" + listElement).hide();
 
       // TODO: We probably want to destroy the list to remove the dom elements
 
       // enable the new selected list
       this.selectedListIcon = selected;
-      var newSelection = $("#" + this.selectedListIcon);
+      var newSelection = this.$el.find("#" + this.selectedListIcon);
 
       newSelection.addClass('selected');
       listElement = newSelection.data('list');
 
-      $("#" + listElement).show();
+      this.$el.find("#" + listElement).show();
 
       // TODO: Related to the above TODO, we probably only want to populate the list now
 
