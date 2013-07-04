@@ -22,6 +22,7 @@ if(!nconf.get('test:exposeDataForTestingPurposes')) {
     install: function(app) {
 
       app.get('/testdata/reset', function(req, res) {
+        child_process.exec('make reset-test-data');
         child_process.execFile('scripts/dataupgrades/005-test-users/001-update.sh');
         res.send(200);
       });
