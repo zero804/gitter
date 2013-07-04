@@ -714,6 +714,7 @@ describe('troupe-service', function() {
           if(err) return done(err);
           if(!troupe) return done("Cannot find troupe");
 
+          assert(troupe.containsUserId(user.id),'Expected user1 to be in the testtroupe1');
           troupeService.findBestTroupeForUser(user, function(err, troupe) {
             if(err) return done(err);
 
@@ -736,7 +737,7 @@ describe('troupe-service', function() {
 
       troupeService.findOrCreateOneToOneTroupe(fixture.user1.id, fixture.user2.id)
         .spread(function(troupe) {
-          if(!troupe) return done('Cannot findOrCreateOneToOneTroupe troupe');
+          if(!troupe) throw 'Cannot findOrCreateOneToOneTroupe troupe';
 
           var name = 'Upgraded one-to-one ' + new Date();
           var inviteEmail =  'testinvite' + Date.now() + '@troupetest.local';
