@@ -6,7 +6,10 @@ var winston = require('../utils/winston');
 
 if(!nconf.get("stats:sendStats")) {
   /* No-op */
-  exports.event = function() {};
+  var noop = function() {};
+  exports.event = noop;
+  exports.userUpdate = noop;
+  exports.user = noop;
 }
 else {
 

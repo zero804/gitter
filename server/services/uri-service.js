@@ -8,12 +8,21 @@ var Q = require('q');
 function findUri(uri, callback) {
   uri = uri.toLowerCase();
 
+  var userId;
+  // Special case for backwards compatibility for
+  // users without usernames
+  if(uri.indexOf('/one-one/') === 0) {
+    userId = uri.split('/')[2];
+  }
+
   // Special case for backwards compatibility for
   // users without usernames
   if(uri.indexOf('one-one/') === 0) {
-    var id = uri.split('/')[1];
+    userId = uri.split('/')[1];
+  }
 
-    return userService.findById(id)
+  if(userId) {
+    return userService.findById(userId)
       .then(function(user) {
         if(user) return { user: user };
 

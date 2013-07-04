@@ -12,6 +12,7 @@ var persistence = testRequire("./services/persistence-service");
 var mockito = require('jsmockito').JsMockito;
 
 var times = mockito.Verifiers.times;
+var never = mockito.Verifiers.never();
 var once = times(1);
 var twice = times(2);
 
@@ -92,122 +93,183 @@ describe('signup-service', function() {
 
   });
 
-  describe('#newSignupWithAccessRequest()', function() {
-    it('should tell an existing user that they need to login to request access', function(done) {
+  describe('#signupWithAccessRequestToUri', function() {
 
+    it('should throw an error if an existing CONFIRMED user attempts to signup', function(done) {
       var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
 
-      var troupeService = testRequire.withProxies('./services/troupe-service', {
+      var troupeService = mockito.spy(testRequire.withProxies('./services/troupe-service', {
         './email-notification-service': emailNotificationServiceMock
-      });
+      }));
+
+      var userService = mockito.spy(testRequire('./services/user-service'));
 
       var signupService = testRequire.withProxies("./services/signup-service", {
         './email-notification-service': emailNotificationServiceMock,
-        './troupe-service': troupeService
+        './troupe-service': troupeService,
+        './user-service': userService
       });
 
-      signupService.testOnly.newSignupWithAccessRequest({
-        email: "testuser@troupetest.local",
-        name: "Test Guy",
-        troupe: fixture.troupe1
-      }, function(err) {
-        if(!err) return done("An error should have been returned");
+      var uri = fixture.troupe1.uri;
+      var email = fixture.generateEmail();
+      var displayName = fixture.generateName();
 
-        mockito.verifyZeroInteractions(emailNotificationServiceMock);
+      return persistence.User.createQ({
+          email: email,
+          displayName: displayName,
+          confirmationCode: email,
+          status: 'ACTIVE'
+        }).then(function() {
+          return signupService.signupWithAccessRequestToUri(uri, email, displayName)
+            .then(function() {
+              assert(false, 'Expected an exception');
+            })
+            .fail(function(err) {
+              assert(err.userExists, 'Expected err.userExists, got ' + JSON.stringify(err));
+            });
+        })
+        .nodeify(done);
 
-        assert(err.userExists, "The userExists property of the error should be true");
-        done();
+
+
+    });
+
+    it('should allow an existing UNCONFIRMED user to request access to a troupe and resend their confirmation email', function(done) {
+
+      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+
+      var troupeService = mockito.spy(testRequire.withProxies('./services/troupe-service', {
+        './email-notification-service': emailNotificationServiceMock
+      }));
+
+      var userService = mockito.spy(testRequire('./services/user-service'));
+
+      var signupService = testRequire.withProxies("./services/signup-service", {
+        './email-notification-service': emailNotificationServiceMock,
+        './troupe-service': troupeService,
+        './user-service': userService
+      });
+
+      var uri = fixture.troupe1.uri;
+      var email = fixture.generateEmail();
+      var displayName = fixture.generateName();
+
+      persistence.User.createQ({
+        email: email,
+        displayName: displayName,
+        confirmationCode: email,
+        status: 'UNCONFIRMED'
+      }).then(function() {
+
+        signupService.signupWithAccessRequestToUri(uri, email, displayName)
+          .then(function() {
+
+            mockito.verify(userService, never).newUser();
+            mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
+            mockito.verify(troupeService, once).addRequest();
+
+          })
+
+          .nodeify(done);
       });
 
     });
 
-
-    it('should allow a new user who has accessed a troupe to signup', function(done) {
-      var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
-      var existingTroupeUri = 'testtroupe1';
-
+    it('should allow an existing UNCONFIRMED user to invite connection to a user and resend their confirmation email', function(done) {
       var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+
+      var troupeService = mockito.spy(testRequire.withProxies('./services/troupe-service', {
+        './email-notification-service': emailNotificationServiceMock
+      }));
+
+      var userService = mockito.spy(testRequire('./services/user-service'));
+
       var signupService = testRequire.withProxies("./services/signup-service", {
-        './email-notification-service': emailNotificationServiceMock
+        './email-notification-service': emailNotificationServiceMock,
+        './troupe-service': troupeService,
+        './user-service': userService
       });
 
-      var troupeService = testRequire.withProxies('./services/troupe-service', {
-        './email-notification-service': emailNotificationServiceMock
+      var email = fixture.user1.email;
+      var displayName = fixture.user1.displayName;
+
+      persistence.User.createQ({
+        email: email,
+        displayName: displayName,
+        confirmationCode: email,
+        status: 'UNCONFIRMED'
+      }).then(function(user) {
+        var uri = user.getHomeUrl();
+
+        signupService.signupWithAccessRequestToUri(uri, email, displayName)
+          .then(function() {
+
+            mockito.verify(userService, never).newUser();
+            mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
+            mockito.verify(troupeService, once).inviteUserByUserId();
+          })
+          .nodeify(done);
+
       });
 
-      var troupe = fixture.troupe1;
+    });
 
-      signupService.testOnly.newSignupWithAccessRequest({ email: nonExistingEmail, name: 'Test McTest', troupe: troupe }, function(err, request) {
-        if(err) return done(err);
-        if(!request) return done('No request created');
+    it('should allow an new unregistered user to invite connection to a user', function(done) {
+      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
 
+      var troupeService = mockito.spy(testRequire.withProxies('./services/troupe-service', {
+        './email-notification-service': emailNotificationServiceMock
+      }));
+
+      var userService = mockito.spy(testRequire('./services/user-service'));
+
+      var signupService = testRequire.withProxies("./services/signup-service", {
+        './email-notification-service': emailNotificationServiceMock,
+        './troupe-service': troupeService,
+        './user-service': userService
+      });
+
+     var uri = fixture.user1.getHomeUrl();
+     var email = fixture.generateEmail();
+     var displayName = fixture.generateName();
+
+     signupService.signupWithAccessRequestToUri(uri, email, displayName)
+       .then(function() {
+
+        mockito.verify(userService, once).newUser();
         mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
-
-        troupeService.acceptRequest(request, function(err) {
-          if(err) return done(err);
-
-          persistence.Troupe.findOne({ uri: existingTroupeUri }, function(err, troupe) {
-            if(err) return done(err);
-            if(!troupe) return done("Unable to find troupe");
-
-            persistence.User.findOne({ email: nonExistingEmail }, function(err, user) {
-              if(err) return done(err);
-
-              assert(user, 'User was not found');
-
-              signupService.confirmSignup(user, function(err, user) {
-                if(err) return done(err);
-
-                assert(user.status == 'PROFILE_NOT_COMPLETED', 'User status is incorrect');
-
-                done();
-
-              });
-
-            });
-
-          });
-
-        });
-
-      });
-
+        mockito.verify(troupeService, once).inviteUserByUserId();
+       })
+       .nodeify(done);
 
     });
-  });
 
-  describe('#newSignupWithConnectionInvite()', function() {
-    it('should allow a new user to signup with an invite to connect to another user', function(done) {
-      var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
-
+    it('should allow an new unregistered user to request access to a troupe', function(done) {
       var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-      var signupService = testRequire.withProxies("./services/signup-service", {
+
+      var troupeService = mockito.spy(testRequire.withProxies('./services/troupe-service', {
         './email-notification-service': emailNotificationServiceMock
+      }));
+
+      var userService = mockito.spy(testRequire('./services/user-service'));
+
+      var signupService = testRequire.withProxies("./services/signup-service", {
+        './email-notification-service': emailNotificationServiceMock,
+        './troupe-service': troupeService,
+        './user-service': userService
       });
 
-      return signupService.testOnly.newSignupWithConnectionInvite(fixture.user1, nonExistingEmail, 'Test User')
-        .spread(function(user, invite) {
-          assert(user, 'Expected a user to be created');
-          assert(invite, 'Expected an invite to be created');
+      var uri = fixture.troupe1.uri;
+      var email = fixture.generateEmail();
+      var displayName = fixture.generateName();
 
+      signupService.signupWithAccessRequestToUri(uri, email, displayName)
+        .then(function() {
+
+          mockito.verify(userService, once).newUser();
           mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
+          mockito.verify(troupeService, once).addRequest();
 
-          assert.equal(user.status, 'UNCONFIRMED');
-          return persistence.InviteUnconfirmed.findByIdQ(invite.id)
-            .then(function(invite) {
-              assert(invite, 'Expected invite to existing in unconfirmed collection');
-
-              return signupService.confirm(user)
-                .then(function(user) {
-                  assert.notEqual(user.status, 'UNCONFIRMED');
-
-                  return persistence.Invite.findOneQ({ fromUserId: user._id, userId: fixture.user1.id })
-                    .then(function(invite) {
-                      assert(invite,'Expected invite to have been created');
-                    });
-
-                });
-            });
         })
         .nodeify(done);
 
