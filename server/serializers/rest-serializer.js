@@ -650,13 +650,24 @@ function TroupeUserStrategy(options) {
 function TroupeStrategy(options) {
   if(!options) options = {};
 
-  var currentUserId = options.currentUserId;
+  if(!options.userId) {
+    options.userId = options.currentUserId; // TODO: rename currentUserId;
+  }
 
-  var unreadItemStategy = options.currentUserId ? new AllUnreadItemCountStategy({ userId: options.currentUserId }) : null;
-  var lastAccessTimeStategy = options.currentUserId ? new LastTroupeAccessTimesForUserStrategy({ userId: options.currentUserId }) : null;
-  var favouriteStrategy = options.currentUserId ? new FavouriteTroupesForUserStrategy({ userId: options.currentUserId }) : null;
+  if(!options.userId) {
+    winston.warn('TroupeStrategy invoked without currentUserId option. This is problematic.');
+    console.trace();
+  }
 
-  var userIdStategy = options.mapUsers || currentUserId ? new UserIdStrategy() : null;
+  var currentUserId = options.userId;
+
+
+  var unreadItemStategy = currentUserId ? new AllUnreadItemCountStategy(options) : null;
+  var lastAccessTimeStategy = currentUserId ? new LastTroupeAccessTimesForUserStrategy(options) : null;
+  var favouriteStrategy = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
+
+  var userIdStategy = new UserIdStrategy(options);
+
   this.preload = function(items, callback) {
 
     var strategies = [];
@@ -684,41 +695,38 @@ function TroupeStrategy(options) {
       });
     }
 
-    if(userIdStategy) {
-
-      var userIds;
-      if(options.mapUsers) {
-        userIds = _.flatten(items.map(function(troupe) { return troupe.getUserIds(); }));
-      } else {
-        userIds = [];
-      }
-
-      // If the currentUserOption has been set, then we will output
-      // a user node on the serialized troupe.
-      if(options.currentUserId) {
-        items.forEach(function(troupe) {
-          if(troupe.oneToOne) {
-            userIds = userIds.concat(troupe.getUserIds());
-          }
+    var userIds;
+    if(options.mapUsers) {
+      userIds = _.flatten(items.map(function(troupe) { return troupe.getUserIds(); }));
+    } else {
+      userIds = _.flatten(items.map(function(troupe) {
+          if(troupe.oneToOne) return troupe.getUserIds();
+        })).filter(function(f) {
+          return !!f;
         });
-      }
-
-      strategies.push({
-        strategy: userIdStategy,
-        data: userIds
-      });
 
     }
+
+    strategies.push({
+      strategy: userIdStategy,
+      data: userIds
+    });
+
 
     execPreloads(strategies, callback);
   };
 
   function mapOtherUser(users) {
+
     var otherUser = users.filter(function(troupeUser) {
-      return troupeUser.userId != currentUserId;
+      return '' + troupeUser.userId !== '' + currentUserId;
     })[0];
+
     if(otherUser) {
-      return userIdStategy.map(otherUser.userId);
+      var user = userIdStategy.map(otherUser.userId);
+      if(user) {
+        return user;
+      }
     }
   }
 
@@ -730,7 +738,7 @@ function TroupeStrategy(options) {
         troupeName = otherUser.displayName;
         troupeUrl = otherUser.username ? "/" + otherUser.username : "/one-one/" + otherUser.id;
       } else {
-        winston.verbose("Unable to map troupe bits as something has gone horribly wrong");
+        winston.verbose("Troupe " + item.id + " appears to contain bad users", { users: item.toObject().users });
         // This should technically never happen......
         return undefined;
       }

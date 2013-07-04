@@ -18,4 +18,9 @@ db.requests.find().forEach(function(f) {
   }
 });
 
+var troupe3 = db.troupes.findOne({ uri: 'testtroupe3' });
+if(troupe3) {
+  db.requests.remove({ troupeId: troupe3._id });
+}
+
 DELIM

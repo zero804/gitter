@@ -292,6 +292,8 @@ module.exports = {
         renderMiddleware('app-template')
       );
 
+      // Chat -----------------------
+
       app.get('/one-one/:userId/chat',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
@@ -306,6 +308,7 @@ module.exports = {
         saveLastTroupeMiddleware,
         renderMiddleware('mobile/chat-app'));
 
+      // Files -----------------------
       app.get('/one-one/:userId/files',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
