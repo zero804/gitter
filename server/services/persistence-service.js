@@ -23,9 +23,21 @@ var connection = mongoose.connection;
 mongoose.set('debug', nconf.get("mongo:logQueries"));
 
 mongoose.connect(nconf.get("mongo:url"), {
-  server: { readPreference: "primaryPreferred", socketOptions: { keepAlive: 1 } },
-  db: { readPreference: "primaryPreferred" },
-  replset: { readPreference: "primaryPreferred", socketOptions: { keepAlive: 1 } }
+  server: {
+    readPreference: "primaryPreferred",
+    socketOptions: { keepAlive: 1, connectTimeoutMS: 3000 },
+    auto_reconnect: true,
+    autoReconnect: true
+  },
+  db: {
+    readPreference: "primaryPreferred"
+  },
+  replset: {
+    readPreference: "primaryPreferred",
+    socketOptions: { keepAlive: 1, connectTimeoutMS: 2000 },
+    auto_reconnect: true,
+    autoReconnect: true
+  }
 });
 
 shutdown.addHandler('mongo', 1, function(callback) {
