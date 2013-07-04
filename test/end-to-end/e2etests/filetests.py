@@ -8,6 +8,7 @@ driver = None
 def setup_module():
     global driver
     driver = utils.driver()
+    utils.resetData(driver)
 
 
 def testFileAreaExists():
