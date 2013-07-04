@@ -11,19 +11,19 @@ module.exports = {
         middleware.ensureLoggedIn()
     ];
 
-    app.resource('api/v1/location',
+    app.post('/api/v1/location',
         auth,
         require('./location.js'));
 
     /* APN has no auth requirement as user may not have authenticated */
-    app.resource('api/v1/apn',
+    app.resource('/api/v1/apn',
         require('./apn.js'));
 
-    app.resource('api/v1/userapn',
+    app.post('/api/v1/userapn',
         auth,
         require('./userapn.js'));
 
-    app.resource('api/v1/eyeballs',
+    app.post('/api/v1/eyeballs',
         auth,
         require('./eyeballs.js'));
 
@@ -35,8 +35,8 @@ module.exports = {
     app.get('/api/v1/usernamesuggestions',
         require('./username-suggestions.js'));
 
+    app.all('/api/v1/sockets', auth);
     app.resource('api/v1/sockets',
-        auth,
         require('./sockets.js'));
 
     app.post('/api/v1/inviteconnections',
