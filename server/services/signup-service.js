@@ -31,89 +31,6 @@ function sendNotification(user, troupe) {
 }
 
 
-/**
- * Unauthenticated user requesting an invite with an authenticated user.
- * @param  {[type]} toUser
- * @param  {[type]} email
- * @param  {[type]} name
- * @return promise of [user, invite]
- */
-function newSignupWithConnectionInvite(toUser, email, name) {
-  return userService.findByEmail(email)
-    .then(function(fromUser) {
-
-      // This person is already a user
-      if(fromUser) throw { alreadyExists: true };
-
-      // The person is not already a user, create an unconfirmed account for them
-      return newUser({ email: email, displayName: name })
-        .then(function(newUser) {
-
-          return troupeService.inviteUserByUserId(null, newUser, toUser.id)
-            .then(function(invite) {
-              return [newUser, invite];
-            });
-
-        });
-
-
-    });
-
-}
-
-/*
- * Logic for this bad boy:
- * This will get called when a user has not logged in but is attempted to access a troupe
- * What we do is:
- * - If the email address does not exist, create a new UNCONFIRMED user and add a request for the troupe
- * - IF the email address does exist and the user account is:
- *    - UNCONFIRMED: don't create a new account, but update the name and add a request for the troupe (if one does not already exist)
- *    - COFIRMED: then throw an error saying that the user needs to login
- * callback is function(err, request)
- */
-function newSignupWithAccessRequest(options, callback) {
-  winston.info("New signup with access request ");
-
-  var email = options.email;
-  var displayName = options.displayName; // Optional
-  var troupe = options.troupe;
-
-  assert(email, 'email parameter is required');
-  assert(troupe, 'troupe parameter is required');
-
-  userService.findByEmail(email)
-    .then(function(user) {
-
-      if(!user) {
-        // Create a new user and add the request. The users confirmation code will not be set until the first time one one of
-        // their requests is accepted...does this change now that there is a user homepage?
-        return userService.newUser({
-            email: email,
-            displayName: displayName
-          })
-          .then(function(newUser) {
-            emailNotificationService.sendConfirmationForNewUser(newUser);
-            return troupeService.addRequest(troupe, newUser);
-          });
-      }
-
-      // The user exists. Are they confirmed?
-      if (!user.isConfirmed()) {
-        // TODO: Do we want to send the user another email ?
-
-        // try add a request, if there already is a request it will be returned instead of created,
-        // if the user is a member of the troupe it will give an error (memberExists: true)
-        return troupeService.addRequest(troupe, user);
-      }
-
-      // tell the user to login
-      throw { userExists: true };
-    })
-    .nodeify(callback);
-
-}
-
-
 var signupService = module.exports = {
   newSignupFromLandingPage: function(options, callback) {
     if(!options.email) return callback('Email address is required');
@@ -280,56 +197,48 @@ var signupService = module.exports = {
     assert(uri, 'uri parameter required');
     assert(email, 'email parameter required');
 
-    return userService.findByEmail(email)
-      .then(function(fromUser) {
-        if(fromUser && fromUser.isConfirmed()) {
-            // If we found the user, they already exist, so send them a message letting them know
-            throw { userExists: true };
-        }
+    return uriService.findUri(uri)
+      .then(function(result) {
+        if(!result) { winston.error("No troupe with uri: " + uri); throw 404; }
 
-        return uriService.findUri(uri)
-          .then(function(result) {
-            if(!result) { winston.error("No troupe with uri: " + uri); throw 404; }
+        var toTroupe = result.troupe;
+        var toUser = result.user;
 
-            var toTroupe = result.troupe;
-            var toUser = result.user;
+        return userService.findByEmail(email)
+          .then(function(fromUser) {
 
-            if(toUser) {
-              if(fromUser) {
-                return troupeService.inviteUserByUserId(null, fromUser, toUser.id);
-              } else {
-                return newSignupWithConnectionInvite(toUser, email, displayName);
-              }
+            if(fromUser) {
+              // If we found the user, they already exist, so send them a message letting them know
+              if(fromUser.isConfirmed()) throw { userExists: true };
+
+              // If the user is attempting to access a troupe, but isn't confirmed,
+              // resend the confirmation
+              signupService.resendConfirmationForUser(fromUser.email);
+
+              // Proceed to the next step with this user
+              return fromUser;
             }
 
-            if(toTroupe) {
-              if(fromUser) {
-                return troupeService.addRequest(toTroupe, fromUser);
-              } else {
-                return newSignupWithAccessRequest({
-                    troupe: toTroupe,
-                    displayName: displayName,
-                    email: email
-                  });
-              }
-            }
+            // Otherwise the user doesn't exist: create them first
+            return userService.newUser({
+                email: email,
+                displayName: displayName
+              })
+              .then(function(newUser) {
+                emailNotificationService.sendConfirmationForNewUser(newUser);
 
-            throw new Error('Expected either a troupe or user attribute');
-          }).then(function() {
-            // If the user is attempting to access a troupe, but isn't confirmed,
-            // resend the confirmation
-            if(fromUser && !fromUser.isConfirmed()) {
-              return signupService.resendConfirmationForUser(fromUser.email);
-            }
+                // Proceed to the next step with this user
+                return newUser;
+              });
+          })
+          .then(function(user) {
+            var step =  toTroupe ? troupeService.addRequest(toTroupe, user)
+                                 : troupeService.inviteUserByUserId(null, user, toUser.id);
+
+            return step.then(function() {return user; });
           });
         });
 
-  },
-
-
-  testOnly: {
-    newSignupWithConnectionInvite: newSignupWithConnectionInvite,
-    newSignupWithAccessRequest: newSignupWithAccessRequest
   }
 
 };
