@@ -392,7 +392,7 @@ function UnreadItemStategy(options) {
 
 function AllUnreadItemCountStategy(options) {
   var self = this;
-  var userId = options.userId;
+  var userId = options.userId || options.currentUserId;
 
   this.preload = function(troupeIds, callback) {
     var promises = troupeIds.map(function(i) {
@@ -428,7 +428,7 @@ function AllUnreadItemCountStategy(options) {
 
 function LastTroupeAccessTimesForUserStrategy(options) {
   var self = this;
-  var userId = options.userId;
+  var userId = options.userId || options.currentUserId;
 
   this.preload = function(data, callback) {
     userService.getTroupeLastAccessTimesForUser(userId, function(err, times) {
@@ -445,7 +445,7 @@ function LastTroupeAccessTimesForUserStrategy(options) {
 
 function FavouriteTroupesForUserStrategy(options) {
   var self = this;
-  var userId = options.userId;
+  var userId = options.userId || options.currentUserId;
 
   this.preload = function(data, callback) {
     troupeService.findFavouriteTroupesForUser(userId, function(err, favs) {
@@ -650,16 +650,13 @@ function TroupeUserStrategy(options) {
 function TroupeStrategy(options) {
   if(!options) options = {};
 
-  if(!options.userId) {
-    options.userId = options.currentUserId; // TODO: rename currentUserId;
-  }
 
-  if(!options.userId) {
+  if(!options.currentUserId) {
     winston.warn('TroupeStrategy invoked without currentUserId option. This is problematic.');
     console.trace();
   }
 
-  var currentUserId = options.userId;
+  var currentUserId = options.currentUserId;
 
 
   var unreadItemStategy = currentUserId ? new AllUnreadItemCountStategy(options) : null;
