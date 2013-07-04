@@ -34,7 +34,7 @@ exports.serializeInvitesForUser = function(userId, callback) {
   troupeService.findAllUnusedInvitesForUserId(userId, function(err, invites) {
     if(err) return callback(err);
 
-    var strategy = new restSerializer.InviteStrategy({});
+    var strategy = new restSerializer.InviteStrategy({ currentUserId: userId });
 
     restSerializer.serialize(invites, strategy, callback);
 
