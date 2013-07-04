@@ -119,7 +119,8 @@ def existingUserlogin(driver, usernameValue, passwordValue):
 def signup(driver):
     driver.get(baseUrl("/signout"))
     driver.get(baseUrl("/x"))
-    emailAddress = 'testuser.' + time.strftime("%Y%m%d%H%M%S", time.gmtime()) + '@troupetest.local'
+    thisTime = time.strftime("%Y%m%d%H%M%S", time.gmtime())
+    emailAddress = 'testuser' + thisTime + '@troupetest.local'
     driver.find_element_by_css_selector('#button-signup').click()
     form = driver.find_element_by_css_selector('#signup-form')
     form.find_element_by_name('email').send_keys(emailAddress)
@@ -134,7 +135,7 @@ def signup(driver):
     driver.get(baseUrl('/confirm/'+confirmCode))
 
     # choose a username
-    username = 'testuser' + time.strftime("%Y%m%d%H%M%S", time.gmtime())
+    username = 'testuser' + thisTime
     inputUser = driver.find_element_by_css_selector('input[name=username]')
     inputUser.send_keys(username)
     driver.find_element_by_css_selector('#username-form [type=submit]').click()

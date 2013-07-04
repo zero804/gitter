@@ -19,7 +19,7 @@ def testSendingAChatMessage():
     textArea = driver.find_element_by_id('chat-input-textarea')
 
     textArea.send_keys(chatMessage)
-    textArea.send_keys(Keys.ENTER)
+    textArea.send_keys(Keys.RETURN)
 
     time.sleep(0.5)
 
@@ -49,7 +49,7 @@ def testEditingAChatMessage():
     editInput = lastChat.find_element_by_css_selector('.trpChatInput')
 
     editInput.send_keys("...an alteration")
-    editInput.send_keys(Keys.ENTER)
+    editInput.send_keys(Keys.RETURN)
 
     time.sleep(0.5)
 
