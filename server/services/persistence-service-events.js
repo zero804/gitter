@@ -52,7 +52,7 @@ exports.install = function(persistenceService) {
     }
 
     mongooseUtils.attachNotificationListenersToSchema(schema, {
-      onCreate: function(model, next) {
+      onCreate: function onGenericCreate(model, next) {
         var url = extractor(model);
         if(!url) return;
 
@@ -60,7 +60,7 @@ exports.install = function(persistenceService) {
         next();
       },
 
-      onUpdate: function(model, next) {
+      onUpdate: function onGenericUpdate(model, next) {
         var url = extractor(model);
         if(!url) return;
 
@@ -68,7 +68,7 @@ exports.install = function(persistenceService) {
         next();
       },
 
-      onRemove: function(model) {
+      onRemove: function onGenericRemove(model) {
         var url = extractor(model);
         if(!url) return;
 
@@ -79,7 +79,7 @@ exports.install = function(persistenceService) {
 
   mongooseUtils.attachNotificationListenersToSchema(schemas.UserSchema, {
     ignoredPaths: ['lastTroupe','confirmationCode','status','passwordHash','passwordResetCode'],
-    onUpdate: function(model, next) {
+    onUpdate: function onUserUpdate(model, next) {
 
       troupeService.findAllTroupesIdsForUser(model.id, function(err, troupeIds) {
         if(err) { winston.error("Silently ignoring error in user update ", { exception: err }); return next(); }
@@ -122,30 +122,77 @@ exports.install = function(persistenceService) {
   attachNotificationListenersToSchema(schemas.ChatMessageSchema, 'chat', function(model) {
     return "/troupes/" + model.toTroupeId + "/chatMessages";
   });
+  /*
   attachNotificationListenersToSchema(schemas.TroupeSchema, 'troupe', function(model) {
     // Never serialize any one-to-one troupe events as that's just silly
     if(model.oneToOne) return null;
 
     return "/troupes/" + model.id;
   });
+  */
+
+  function serializeOneToOneTroupe(operation, troupe) {
+    troupe.users.forEach(function(troupeUser) {
+      var currentUserId = troupeUser.userId;
+      var url = '/user/' + troupeUser.userId + '/troupes';
+
+      var strategy = new restSerializer.TroupeStrategy({ currentUserId: currentUserId });
+
+
+
+      restSerializer.serialize(troupe, strategy, function(err, serializedModel) {
+        if(err) return winston.error('Error while serializing oneToOne troupe: ' + err, { exception: err });
+
+        appEvents.dataChange2(url, operation, serializedModel);
+      });
+
+    });
+  }
 
 
   mongooseUtils.attachNotificationListenersToSchema(schemas.TroupeSchema, {
-    onCreate: function(model, next) {
+    onCreate: function onTroupeCreate(model, next) {
+
+
+      if(model.oneToOne) {
+
+        // Because the troupe needs the currentUserId to be set!
+        serializeOneToOneTroupe('create', model);
+        return next();
+      }
+
       var urls = model.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/troupes'; });
       serializeEvent(urls, 'create', model);
       next();
     },
 
-    onUpdate: function(model, next) {
+    onUpdate: function onTroupeUpdate(model, next) {
+
+
+
+      if(model.oneToOne) {
+        // Because the troupe needs the
+        serializeOneToOneTroupe('update', model);
+        return next();
+      }
+
       var urls = model.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/troupes'; });
       serializeEvent(urls, 'update', model);
       next();
     },
 
-    onRemove: function(model) {
+    onRemove: function onTroupeRemove(model) {
+      if(model.oneToOne) {
+        // Because the troupe needs the
+        serializeOneToOneTroupe('remove', model);
+        return;
+      }
+
       var urls = model.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/troupes'; });
       serializeEvent(urls, 'remove', model);
     }
   });
+
+
 };
+

@@ -650,10 +650,13 @@ function TroupeUserStrategy(options) {
 function TroupeStrategy(options) {
   if(!options) options = {};
 
-
+  var stack;
   if(!options.currentUserId) {
-    winston.warn('TroupeStrategy invoked without currentUserId option. This is problematic.');
-    console.trace();
+    try {
+      throw new Error();
+    } catch(e) {
+      stack = e.stack;
+    }
   }
 
   var currentUserId = options.currentUserId;
@@ -726,11 +729,23 @@ function TroupeStrategy(options) {
       }
     }
   }
-
+  var shownWarning = false;
   this.map = function(item) {
-    var otherUser = item.oneToOne && currentUserId ? mapOtherUser(item.users) : undefined;
-    var troupeName, troupeUrl;
+
+    var troupeName, troupeUrl, otherUser;
     if(item.oneToOne) {
+      if(currentUserId) {
+        otherUser =  mapOtherUser(item.users);
+      } else {
+        console.log('');
+        if(!shownWarning) {
+          console.log('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
+          console.log(stack.join('\n'));
+          shownWarning = true;
+        }
+      }
+
+
       if(otherUser) {
         troupeName = otherUser.displayName;
         troupeUrl = otherUser.username ? "/" + otherUser.username : "/one-one/" + otherUser.id;

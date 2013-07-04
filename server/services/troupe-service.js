@@ -45,6 +45,40 @@ function findByIdRequired(id) {
     .then(ensureExists);
 }
 
+/**
+ * Like model.createQ, but invokes mongoose middleware
+ */
+function createQ(ModelType, options) {
+  var m = new ModelType(options);
+  return m.saveQ()
+    .then(function() {
+      return m;
+    });
+}
+
+/**
+ * Use this instead of createQ as it invokes Mongoose Middleware
+ */
+function createTroupeQ(options) {
+  return createQ(persistence.Troupe, options);
+}
+
+function createInviteQ(options) {
+  return createQ(persistence.Invite, options);
+}
+
+function createInviteUnconfirmedQ(options) {
+  return createQ(persistence.InviteUnconfirmed, options);
+}
+
+function createRequestQ(options) {
+  return createQ(persistence.Request, options);
+}
+
+function createRequestUnconfirmedQ(options) {
+  return createQ(persistence.RequestUnconfirmed, options);
+}
+
 
 function findMemberEmails(id, callback) {
   findById(id, function(err,troupe) {
@@ -349,16 +383,17 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
               return existingInvite;
             }
 
-            // No exiting invite, create a new invite
-            return collection.createQ({
-              troupeId: troupe ? troupe.id : null,
-              fromUserId: fromUserId,
-              userId: toUserId,
-              displayName: null, // Don't set this if we're using a userId
-              email: null,       // Don't set this if we're using a userId
-              code: toUser.isConfirmed() ? null : uuid.v4(),
-              status: 'UNUSED'
-            });
+            var inviteData = {
+                troupeId: troupe ? troupe.id : null,
+                fromUserId: fromUserId,
+                userId: toUserId,
+                displayName: null, // Don't set this if we're using a userId
+                email: null,       // Don't set this if we're using a userId
+                code: toUser.isConfirmed() ? null : uuid.v4(),
+                status: 'UNUSED'
+              };
+
+            return  fromUser.isConfirmed() ? createInviteQ(inviteData) : createInviteUnconfirmedQ(inviteData);
 
           }).then(function(invite) {
             // Notify the recipient, if the user is confirmed
@@ -413,7 +448,7 @@ function inviteUserByEmail(troupe, fromUser, displayName, email) {
 
             // create the invite and send mail immediately
 
-            return persistence.Invite.createQ({
+            return createInviteQ({
               troupeId: troupe && troupe.id,
               fromUserId: fromUserId,
               displayName: displayName,
@@ -511,7 +546,7 @@ function updateUnconfirmedInvitesForUserId(userId) {
       .then(function(invites) {
         winston.info('Creating ' + invites.length + ' invites for recently confirmed user ' + userId);
         var promises = invites.map(function(invite) {
-          return persistence.Invite.createQ(invite)
+          return createInviteQ(invite)
             .then(function(newInvite) {
               return invite.removeQ()
                 .then(function() {
@@ -538,7 +573,7 @@ function updateUnconfirmedRequestsForUserId(userId) {
         winston.info('Creating ' + requests.length + ' requests for recently confirmed user ' + userId);
 
         var promises = requests.map(function(request) {
-          return persistence.Request.createQ(request)
+          return createRequestQ(request)
             .then(function() {
               return request.removeQ();
             });
@@ -629,13 +664,13 @@ function addRequest(troupe, user) {
       // Request already made....
       if(request) return request;
 
-      return  collection.createQ({
+      var requestData = {
         troupeId: troupe.id,
         userId: userId,
         status: 'PENDING'
-      });
+      };
 
-
+      return user.isConfirmed() ? createRequestQ(requestData) : createRequestUnconfirmedQ(requestData);
     });
 }
 
@@ -731,7 +766,7 @@ function updateTroupeName(troupeId, troupeName, callback) {
 }
 
 function createOneToOneTroupe(userId1, userId2, callback) {
-  return persistence.Troupe.createQ({
+  return createTroupeQ({
       uri: null,
       name: '',
       oneToOne: true,
@@ -844,7 +879,7 @@ function upgradeOneToOneTroupe(options, callback) {
   var origTroupe = options.oneToOneTroupe.toObject();
 
   // create a new, normal troupe, with the current users from the one to one troupe
-  return persistence.Troupe.createQ({
+  return createTroupeQ({
       uri: createUniqueUri(),
       name: name,
       status: 'ACTIVE',
@@ -854,7 +889,7 @@ function upgradeOneToOneTroupe(options, callback) {
       if(!invites || invites.length === 0) return troupe;
 
       var promises = invites.map(function(invite) {
-          return createInvite(troupe, {
+          return createInviteQ(troupe, {
             fromUser: fromUser,
             email: invite.email,
             displayName: invite.displayName,
