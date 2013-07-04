@@ -21,6 +21,7 @@ exports.attachNotificationListenersToSchema = function (schema, options) {
 
   if(options.onCreate || options.onUpdate) {
     schema.pre('save', function (next) {
+
       var isNewInstance = this.isNew;
 
       if(ignoredPaths) {
@@ -33,6 +34,7 @@ exports.attachNotificationListenersToSchema = function (schema, options) {
       this.get('_tv').increment();
 
       this.post('save', function(postNext) {
+
         if(isNewInstance) {
           if(options.onCreate) options.onCreate(this, postNext);
         } else {
