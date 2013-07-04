@@ -39,7 +39,7 @@ describe('geocodingService', function() {
         if(err) return done(err);
 
         assert(value !== null);
-        assert('Cricklewood' == value.name);
+        assert('Queens Park' == value.name, value.name + " should be Queens Park");
         done();
       });
     });
@@ -59,7 +59,7 @@ describe('geocodingService', function() {
         if(err) return done(err);
 
         assert(value !== null);
-        assert('Canary Wharf' == value.name);
+        assert('Poplar' == value.name, value.name + " should be Poplar");
         done();
       });
     });
