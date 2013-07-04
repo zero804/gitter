@@ -12,6 +12,7 @@ chatMessage = 'The date and time are now ' + time.strftime("%Y-%m-%d-%H-%M-%S", 
 def setup_module():
     global driver
     driver = utils.driver()
+    utils.resetData(driver)
 
 
 def testSendingAChatMessage():
@@ -30,20 +31,11 @@ def testSendingAChatMessage():
 
 
 def testEditingAChatMessage():
-    # textArea = driver.find_element_by_id('chat-input-textarea')
-
-    # chatMessage = 'The date and time are now ' + time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime())
-    # textArea.send_keys(chatMessage)
-    # textArea.send_keys(Keys.ENTER)
-
-    # time.sleep(0.5)
-
-    lastChat = getLastElement('.trpChatItem')
-    editButton = lastChat.find_element_by_css_selector('.trpChatEdit')
+    lastChat = driver.find_element_by_css_selector('.trpChatItem')
 
     actionChain = ActionChains(driver)
-    actionChain.move_to_element(lastChat.find_element_by_css_selector('.trpChatDetails'))
-    actionChain.click(editButton)
+    actionChain.move_to_element(driver.find_element_by_css_selector('.trpChatDetails'))
+    actionChain.move_to_element(driver.find_element_by_css_selector('.trpChatEdit')).click()
     actionChain.perform()
 
     editInput = lastChat.find_element_by_css_selector('.trpChatInput')
@@ -52,9 +44,6 @@ def testEditingAChatMessage():
     editInput.send_keys(Keys.RETURN)
 
     time.sleep(0.5)
-
-    # editInput = lastChat.find_element_by_css_selector('.trpChatInput')
-    # assert not editInput
 
     chatElText = getLastElement('.trpChatItem').find_element_by_css_selector('.trpChatText')
     assert chatElText.text.find("...an alteration") != -1
