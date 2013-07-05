@@ -20,6 +20,8 @@ define([
       this.showBadge = options.showBadge;
       this.showStatus = options.showStatus;
       this.avatarSize = options.size ? options.size : 's';
+      this.showTooltip = options.showTooltip !== false;
+      console.log('OPTIONS===', options, this.showTooltip);
 
       // once this widget has the id of the user,
       // it will listen to changes on the global user collection,
@@ -68,7 +70,9 @@ define([
     },
 
     updateTooltip: function(data) {
-      this.$el.find('.trpDisplayPicture').attr('data-original-title', data.tooltip);
+      if(this.showTooltip) {
+        this.$el.find('.trpDisplayPicture').attr('data-original-title', data.tooltip);
+      }
     },
 
     getUserId: function() {
@@ -98,7 +102,7 @@ define([
         avatarUrl: avatarUrl,
         avatarSize: this.avatarSize,
         userLocation: user.location ? user.location.description : "",
-        tooltip: user.displayName + "<br>" + ((user.location) ? user.location.description : ""),
+        tooltip: this.showTooltip && user.displayName + "<br>" + ((user.location) ? user.location.description : ""),
         online: online,
         offline: !online
       };
@@ -113,7 +117,7 @@ define([
       this.updateAvatar(data);
       this.updateTooltip(data);
       this.updatePresence(data);
-      if (!window._troupeCompactView && (this.model ? this.model.get('displayName') : this.user.displayName)) {
+      if (this.showTooltip && !window._troupeCompactView && (this.model ? this.model.get('displayName') : this.user.displayName)) {
         this.$el.find(':first-child').tooltip({
           html : true,
           placement : function(a, element) {
