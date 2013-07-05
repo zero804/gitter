@@ -67,7 +67,8 @@ def testCreateTroupeFromGroupTroupe():
     assert len(suggestions) >= 2
 
     # finish typing in a full email address and send invite
-    email = 'testuser.' + time.strftime("%Y%m%d%H%M%S", time.gmtime()) + '@troupetest.local'
+    emailuser = 'testuser.' + time.strftime("%Y%m%d%H%M%S", time.gmtime())
+    email = emailuser + '@troupetest.local'
     inputBox.send_keys(email[2:])
     inputBox.send_keys(Keys.ENTER)
     form.find_element_by_css_selector('button[type=submit]').click()
@@ -97,11 +98,17 @@ def testCreateTroupeFromGroupTroupe():
 
     # assert len(driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem')) == 2
 
+    # choose username for this new user
+    usernameInput = driver.find_element_by_css_selector('#username-form input[name=username]')
+    usernameInput.send_keys(emailuser)
+    driver.find_element_by_css_selector('#username-form [type=submit]').click()
+
 
 # Follows on from last test
 def testRemoveUserFromTroupe():
     #troupeBefore = driver.find_element_by_css_selector('DIV.trpHeaderTitle').text
 
+    time.sleep(1)
     for x in driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem'):
         x.click()
         time.sleep(1)
@@ -159,14 +166,14 @@ def testCreateTroupeFromOneToOneTroupe():
 
     # select an existing user
 
-    inputBox.send_keys(Keys.ARROW_DOWN)
+    time.sleep(1)
     inputBox.send_keys(Keys.ENTER)
 
     time.sleep(2)
 
     # check that there is one invite ready to go
     invitesEl = driver.find_element_by_css_selector("#invites")
-    invitesEl.size == 1
+    # assert(invitesEl.size == 1)
 
     # find the userId of the selected person
     userId = invitesEl.find_element_by_css_selector('.invite').get_attribute('data-value')
