@@ -21,7 +21,6 @@ define([
       this.showStatus = options.showStatus;
       this.avatarSize = options.size ? options.size : 's';
       this.showTooltip = options.showTooltip !== false;
-      console.log('OPTIONS===', options, this.showTooltip);
 
       // once this widget has the id of the user,
       // it will listen to changes on the global user collection,
