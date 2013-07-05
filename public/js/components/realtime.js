@@ -210,9 +210,18 @@ define([
       return client.getClientId();
     },
 
-    recycleConnection: function() {
+    getClientRef: function() {
+      return getOrCreateClient().getClientRef();
+    },
+
+    recycleConnection: function(conditionalClientRef) {
       log('Recycling connection');
-      getOrCreateClient().recycle();
+      if(conditionalClientRef) {
+        getOrCreateClient().recycleConditional(conditionalClientRef);
+      } else {
+        getOrCreateClient().recycle();
+
+      }
 
     },
 
