@@ -190,8 +190,8 @@ describe('signup-service', function() {
         './user-service': userService
       });
 
-      var email = fixture.user1.email;
-      var displayName = fixture.user1.displayName;
+      var email = fixture.generateEmail();
+      var displayName = fixture.generateName();
 
       persistence.User.createQ({
         email: email,

@@ -17,6 +17,10 @@ db.invites.find().forEach(function(d) {
     db.invites.remove({ userId: d.userId });
   }
 
+  if(d.fromUserId && !db.users.findOne({ _id: d.fromUserId})) {
+    db.invites.remove({ fromUserId: d.fromUserId });
+  }
+
   if(d.troupeId && !db.troupes.findOne({ _id: d.troupeId})) {
      db.invites.remove({ troupeId: d.troupeId });
   }

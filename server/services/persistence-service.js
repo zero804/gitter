@@ -119,7 +119,7 @@ var UserSchema = new Schema({
   userToken: String, // TODO: move to OAuth,
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
-UserSchema.index({ email: 1 });
+UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ username: 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
 
@@ -188,7 +188,7 @@ var TroupeSchema = new Schema({
   dateDeleted: { type: Date },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
-TroupeSchema.index({ uri: 1 });
+TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });
 TroupeSchema.schemaTypeName = 'TroupeSchema';
 
 
