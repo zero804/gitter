@@ -74,12 +74,20 @@ require([
 
       // If the user is accessing another user's home url (trou.pe/user)
       if(window.troupeContext.homeUser) {
+
         // If the user doesn't have permission to talk to this user, show the Connect modal
         if(window.troupeContext.accessDenied) {
 
+          // We might need to show the login modal, if the user is an existing user.
+          if (window.troupeContext.loginToAccept) {
+            getLoginModal({ email: window.localStorage.defaultTroupeEmail });
+            loginModal.show();
+            return;
+          }
+
           // if the user is signed in, listen for an accept
           if (window.troupeContext.user) {
-            log("******* LISTENING FOR ACCEPT *********")
+            log("******* LISTENING FOR ACCEPT *********");
             var troupeCollection = new troupeModels.TroupeCollection();
             troupeCollection.listen();
             // this is never fired
