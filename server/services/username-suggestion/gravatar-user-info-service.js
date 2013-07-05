@@ -7,7 +7,7 @@ var request = require('request');
 
 exports.lookupUsernameForEmail = function(email) {
   var hash = crypto.createHash('md5').update(email.toLowerCase()).digest('hex');
-  var url = 'https://www.gravatar.com/' + hash + '.json';
+  var url = 'https://en.gravatar.com/' + hash + '.json';
 
   var d = Q.defer();
 
