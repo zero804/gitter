@@ -22,6 +22,7 @@ define([
       this.originalEmail = window.troupeContext.user.email;
       this.existingUser = options.existingUser;
       this.isExistingUser = !window.troupeContext.profileNotCompleted;
+      if (this.compactView) $("#uvTab").hide();
     },
 
     getRenderData: function() {

@@ -25,6 +25,11 @@ define([
 			this.getSuggestions();
 			this.suggestions = [];
 			this.valid = false;
+			if (this.compactView) $(".trpBodyWrapper").hide();
+		},
+
+		afterRender: function() {
+
 		},
 
 		getSuggestions: function() {
