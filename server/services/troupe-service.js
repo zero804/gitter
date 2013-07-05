@@ -886,10 +886,11 @@ function upgradeOneToOneTroupe(options, callback) {
       users: origTroupe.users
     })
     .then(function(troupe) {
+
       if(!invites || invites.length === 0) return troupe;
 
       var promises = invites.map(function(invite) {
-          return createInviteQ(troupe, {
+          return createInvite(troupe, {
             fromUser: fromUser,
             email: invite.email,
             displayName: invite.displayName,
@@ -1062,8 +1063,12 @@ function findLastAccessedTroupeForUser(user, callback) {
 }
 
 //
-// Create a new troupe and return callback(err, troupe)
 //
+//
+/**
+ * Create a new troupe from a one-to-one troupe and auto-invite users
+ * @return promise of a troupe
+ */
 function createNewTroupeForExistingUser(options, callback) {
   return Q.resolve(null).then(function() {
     var name = options.name;
@@ -1094,7 +1099,6 @@ function createNewTroupeForExistingUser(options, callback) {
       uri: createUniqueUri()
     });
     troupe.addUserById(user.id);
-
     return troupe.saveQ()
       .then(function() {
 
