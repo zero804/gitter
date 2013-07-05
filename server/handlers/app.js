@@ -351,79 +351,92 @@ module.exports = {
           renderAppPageWithTroupe(req, res, next, 'app-template');
         });
 
+
+      function acceptInviteWithoutConfirmation(req, res, next) {
+
+        var appUri = req.params.appUri || 'one-one/' + req.params.userId;
+
+        if(!req.user) {
+          req.loginToAccept = true;
+          return renderAppPageWithTroupe(req, res, next, 'app-template');
+        }
+
+        var uriContext = req.uriContext;
+
+        // If theres a troupe, theres nothing to accept
+        if(uriContext.troupe) {
+          var url = uriContext.troupe.getUrl(req.user.id);
+          res.relativeRedirect(url);
+          return;
+        }
+
+        // If there's an invite, accept it
+        if(uriContext.invite) {
+          return troupeService.acceptInviteForAuthenticatedUser(req.user, uriContext.invite)
+            .then(function() {
+              res.relativeRedirect("/" + appUri);
+            })
+            .fail(next);
+        }
+
+        // Otherwise just go there
+        res.relativeRedirect("/" + appUri);
+      }
+
       app.get('/:appUri/accept/',
         middleware.grantAccessForRememberMeTokenMiddleware,
         uriContextResolverMiddleware,
-        function(req, res, next) {
+        acceptInviteWithoutConfirmation);
 
-          if(!req.user) {
+      app.get('/one-one/:userId/accept/',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        preloadOneToOneTroupeMiddleware,
+        acceptInviteWithoutConfirmation);
 
-            req.loginToAccept = true;
-            return renderAppPageWithTroupe(req, res, next, 'app-template');
-          }
+      function acceptInviteWithConfirmation(req, res) {
 
-          var uriContext = req.uriContext;
+        var appUri = req.params.appUri || 'one-one/' + req.params.userId;
+        var confirmationCode = req.params.confirmationCode;
+        var login = Q.nbind(req.login, req);
 
-          // If theres a troupe, theres nothing to accept
-          if(uriContext.troupe) {
-            var url = uriContext.troupe.getUrl(req.user.id);
-            res.relativeRedirect(url);
-            return;
-          }
+        troupeService.findInviteByConfirmationCode(confirmationCode)
+          .then(function(invite) {
+            if(!invite) throw 404;
 
-          // If there's an invite, accept it
-          if(uriContext.invite) {
-            return troupeService.acceptInviteForAuthenticatedUser(req.user, uriContext.invite)
-              .then(function() {
-                res.relativeRedirect("/" + req.params.appUri);
-              })
-              .fail(next);
-          }
 
-          // Otherwise just go there
-          res.relativeRedirect("/" + req.params.appUri);
-        });
+            if(req.user) {
+              if(invite.userId == req.user.id) {
+                return troupeService.acceptInviteForAuthenticatedUser(req.user, invite);
+              }
+              // This invite is for somebody else, log the current user out
+              req.logout();
+            }
+
+
+            return troupeService.acceptInvite(confirmationCode, appUri)
+              .then(function(result) {
+                var user = result.user;
+
+                // Now that we've accept the invite, log the new user in
+                if(user) return login(user);
+              });
+
+          })
+          .fail(function(err) {
+            winston.error('acceptInvite failed', { exception: err });
+            return null;
+          })
+          .then(function() {
+            res.relativeRedirect("/" + appUri);
+          });
+      }
 
       app.get('/:appUri/accept/:confirmationCode',
         middleware.grantAccessForRememberMeTokenMiddleware,
-        function(req, res) {
+        acceptInviteWithConfirmation);
 
-          var appUri = req.params.appUri;
-          var confirmationCode = req.params.confirmationCode;
-          var login = Q.nbind(req.login, req);
-
-          troupeService.findInviteByConfirmationCode(confirmationCode)
-            .then(function(invite) {
-              if(!invite) throw 404;
-
-
-              if(req.user) {
-                if(invite.userId == req.user.id) {
-                  return troupeService.acceptInviteForAuthenticatedUser(req.user, invite);
-                }
-                // This invite is for somebody else, log the current user out
-                req.logout();
-              }
-
-
-              return troupeService.acceptInvite(confirmationCode, appUri)
-                .then(function(result) {
-                  var user = result.user;
-
-                  // Now that we've accept the invite, log the new user in
-                  if(user) return login(user);
-                });
-
-            })
-            .fail(function(err) {
-              winston.error('acceptInvite failed', { exception: err });
-              return null;
-            })
-            .then(function() {
-              res.relativeRedirect("/" + req.params.appUri);
-            });
-
-        });
-
+      app.get('/one-one/:userId/accept/:confirmationCode',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        acceptInviteWithConfirmation);
     }
 };
