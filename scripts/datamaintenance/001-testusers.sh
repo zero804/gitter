@@ -9,6 +9,6 @@ mongo $MONGO_URL --quiet <<"DELIM"
 
 var q = { email: /@troupetest.local$/ };
 print('Deleting test users: ' + db.users.count(q));
-db.users.remove();
+db.users.remove(q);
 
 DELIM
