@@ -13,7 +13,7 @@ var MAX_CHAT_EDIT_AGE_SECONDS = 300;
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   if(!troupe) return callback("Invalid troupe");
 
-  if(!troupeService.userHasAccessToTroupe(user, troupe)) return callback("Access denied");
+  if(!troupeService.userHasAccessToTroupe(user, troupe)) return callback(403);
 
   var chatMessage = new persistence.ChatMessage();
   chatMessage.fromUserId = user.id;
