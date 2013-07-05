@@ -260,12 +260,23 @@ module.exports = {
       app.get('/last/:page',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
-        function(req, res, next) {
+        function(req, res) {
+          troupeService.findBestTroupeForUser(req.user, function(err, troupe) {
+            var url;
 
-          loginUtils.whereToNext(req.user, function(err, url) {
-            if (err || !url) next(err);
+            if(troupe) {
+              url = troupe.getUrl(req.user.id);
+              res.relativeRedirect(url + "/" + req.params.page);
+              return;
+            }
 
-            res.relativeRedirect(url + "/" + req.params.page);
+            if(req.user.hasUsername()) {
+              url = req.user.getHomeUrl();
+            } else {
+              url = "/home";
+            }
+
+            res.relativeRedirect(url);
           });
 
         });
@@ -292,6 +303,19 @@ module.exports = {
         },
         renderMiddleware('app-template')
       );
+
+      /* Special homepage for users without usernames */
+      app.get('/home',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        function(req, res, next) {
+          if(req.user && req.user.username) {
+            res.relativeRedirect(req.user.getHomeUrl());
+            return;
+          }
+
+          return renderHomePage(req, res, next);
+        });
 
       // Chat -----------------------
 
@@ -350,6 +374,9 @@ module.exports = {
 
           renderAppPageWithTroupe(req, res, next, 'app-template');
         });
+
+
+
 
 
       function acceptInviteWithoutConfirmation(req, res, next) {
