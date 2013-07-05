@@ -28,7 +28,7 @@ define([
         self.updateTitlebar(values);
 
         function updateBadge(selector, count) {
-          var badge = self.$el.find(selector);
+          var badge = $(selector);
           badge.text(count);
           if(count > 0) {
             badge.show();
