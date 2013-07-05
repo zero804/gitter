@@ -187,6 +187,8 @@ var authenticator = {
       return callback(message);
     }
 
+    winston.info('bayeux: Handshake: ', message);
+
     var ext = message.ext;
 
     if(!ext || !ext.token) {
