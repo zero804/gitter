@@ -43,7 +43,7 @@ define([
     afterRender: function() {
       setTimeout(function(){
         $('#existing-user').slideDown();
-      },1500);
+      },750);
 
     },
 
