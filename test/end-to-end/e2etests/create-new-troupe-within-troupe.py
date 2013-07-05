@@ -38,7 +38,7 @@ def testCreateTroupeFromGroupTroupe():
             continue
         break
 
-    driver.execute_script('$("a div.trpNewTroupeButton").click()')
+    driver.execute_script('$("a #left-menu-new-troupe-button").click()')
     #startTroupeButton = driver.find_element_by_css_selector('a div.trpNewTroupeButton')
     #startTroupeButton.location_once_scrolled_into_view()
     #startTroupeButton.click()
