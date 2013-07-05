@@ -11,7 +11,6 @@ var count = 0;
 
 db.troupes.update( { _id: { $exists: true } }, { $pull: { users: { userId: { $exists: false } } } }, false, true);
 
-
 db.troupes.find().forEach(function(f) {
   f.users.forEach(function(user) {
     if(user.userId) {
@@ -24,14 +23,28 @@ db.troupes.find().forEach(function(f) {
   });
 });
 
+print('Removed missing users from troupes: ' + count);
 
-print('Removed ' + count + ' users from troupes');
+var q = { oneToOne: false, uri: null };
+print('Marking group troupes without a URI as DELETED: ' + db.troupes.count(q));
+db.troupes.update(q, { $set: { status: 'DELETED' } }, false, true)
 
-db.troupes.update({ oneToOne:true, status: 'ACTIVE', users: { $size: 1 } }, { $set: { status: 'DELETED', users: [] } }, false, true)
-db.troupes.update({ oneToOne:true, status: 'DELETED', users: { $size: 1 } }, { $set: { users: [] } }, false, true)
 
+var q = { oneToOne:true, status: 'ACTIVE', users: { $size: 1 } };
+print('Marking oneToOne troupes with one user as DELETED: ' + db.troupes.count(q));
+db.troupes.update(q, { $set: { status: 'DELETED', users: [] } }, false, true)
 
-db.troupes.update({ status: 'ACTIVE', users: { $size: 0 } }, { $set: { status: 'DELETED' } }, false, true)
+var q = { status: 'ACTIVE', users: { $size: 0 } };
+print('Marking active troupes with no users as DELETED: ' + db.troupes.count(q));
+db.troupes.update(q, { $set: { status: 'DELETED' } }, false, true)
+
+var q = { oneToOne:true, status: 'DELETED', users: { $size: { $gt: 0} } }
+print('Removing users from deleted troupes: ' + db.troupes.count(q));
+db.troupes.update(q, { $set: { users: [] } }, false, true)
+
+var q = { status: 'DELETED', dateDeleted: { $exists: false } };
+print('Removing DELETED troupes without a dateDeleted: ' + db.troupes.count(q));
+db.troupes.remove(q);
 
 print('completed successfully');
 
