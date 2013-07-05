@@ -78,6 +78,7 @@ function createTroupeContext(req, options) {
       homeUser: options.homeUser,
       inUserhome: options.inUserhome,
       accessToken: options.accessToken,
+      loginToAccept: req.loginToAccept,
       profileNotCompleted: options.profileNotCompleted,
       accessDenied: options.accessDenied,
       inviteId: options.inviteId,
@@ -352,9 +353,15 @@ module.exports = {
 
       app.get('/:appUri/accept/',
         middleware.grantAccessForRememberMeTokenMiddleware,
-        middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         function(req, res, next) {
+
+          if(!req.user) {
+
+            req.loginToAccept = true;
+            return renderAppPageWithTroupe(req, res, next, 'app-template');
+          }
+
           var uriContext = req.uriContext;
 
           // If theres a troupe, theres nothing to accept
