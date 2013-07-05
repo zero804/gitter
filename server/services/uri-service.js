@@ -7,21 +7,14 @@ var Q = require('q');
 
 function findUri(uri, callback) {
   uri = uri.toLowerCase();
-
-  var userId;
-  // Special case for backwards compatibility for
-  // users without usernames
-  if(uri.indexOf('/one-one/') === 0) {
-    userId = uri.split('/')[2];
+  if(uri.charAt(0) === '/') {
+    uri = uri.substring(1);
   }
 
   // Special case for backwards compatibility for
   // users without usernames
   if(uri.indexOf('one-one/') === 0) {
-    userId = uri.split('/')[1];
-  }
-
-  if(userId) {
+    var userId = uri.split('/')[1];
     return userService.findById(userId)
       .then(function(user) {
         if(user) return { user: user };
@@ -29,6 +22,7 @@ function findUri(uri, callback) {
         return null;
       });
   }
+
 
   // TODO add some caching
   return Q.all([

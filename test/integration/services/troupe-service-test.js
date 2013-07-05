@@ -734,7 +734,6 @@ describe('troupe-service', function() {
     var troupeService = testRequire('./services/troupe-service');
 
     it('should handle the upgrade of a oneToOneTroupe', function(done) {
-
       troupeService.findOrCreateOneToOneTroupe(fixture.user1.id, fixture.user2.id)
         .spread(function(troupe) {
           if(!troupe) throw 'Cannot findOrCreateOneToOneTroupe troupe';
