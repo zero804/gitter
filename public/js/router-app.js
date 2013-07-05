@@ -28,8 +28,8 @@ require([
   'filtered-collection', // No ref
   'backbone.keys', // no ref,
   'components/dozy', // Sleep detection No ref
-  'template/helpers/all' // No ref
-
+  'template/helpers/all', // No ref
+  'components/eyeballs' // No ref
 ], function($, Backbone, context, AppIntegratedView, chatInputView, ChatCollectionView,
             itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, PersonDetailView, conversationDetailView, profileView, shareSearchView,
