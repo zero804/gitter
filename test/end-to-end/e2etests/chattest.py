@@ -1,8 +1,8 @@
-
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 import utils
 import time
+import os
 
 driver = None
 
@@ -31,22 +31,34 @@ def testSendingAChatMessage():
 
 
 def testEditingAChatMessage():
-    lastChat = driver.find_element_by_css_selector('.trpChatItem')
+    driverName = os.getenv('DRIVER')
+    if driverName != 'FIREFOX':
+        lastChat = driver.find_element_by_css_selector('.trpChatItem')
 
-    actionChain = ActionChains(driver)
-    actionChain.move_to_element(driver.find_element_by_css_selector('.trpChatDetails'))
-    actionChain.move_to_element(driver.find_element_by_css_selector('.trpChatEdit')).click()
-    actionChain.perform()
+        actionChain = ActionChains(driver)
+        actionChain.move_to_element(driver.find_element_by_css_selector('.frame-people'))
+        actionChain.perform()
 
-    editInput = lastChat.find_element_by_css_selector('.trpChatInput')
+        time.sleep(0.5)
 
-    editInput.send_keys("...an alteration")
-    editInput.send_keys(Keys.RETURN)
+        actionChain = ActionChains(driver)
+        actionChain.move_to_element(driver.find_element_by_css_selector('.trpChatBox'))
+        editButton = driver.find_element_by_css_selector('.trpChatEdit')
+        actionChain.move_to_element(editButton)
+        actionChain.click()
+        actionChain.perform()
 
-    time.sleep(0.5)
+        # driver.find_element_by_css_selector('.trpChatEdit').click()
 
-    chatElText = getLastElement('.trpChatItem').find_element_by_css_selector('.trpChatText')
-    assert chatElText.text.find("...an alteration") != -1
+        editInput = lastChat.find_element_by_css_selector('.trpChatInput')
+
+        editInput.send_keys("...an alteration")
+        editInput.send_keys(Keys.RETURN)
+
+        time.sleep(0.5)
+
+        chatElText = getLastElement('.trpChatItem').find_element_by_css_selector('.trpChatText')
+        assert chatElText.text.find("...an alteration") != -1
 
 
 def getLastElement(selector):
