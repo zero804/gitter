@@ -103,7 +103,7 @@ module.exports = {
             if (user.hasUsername()) {
               res.relativeRedirect('/' + user.username);
             } else {
-              res.render('signup', { profileHasNoUsername: !user.username, userId: JSON.stringify(req.user.id) });
+              res.render('signup', { compactView: self.isMobile(req), profileHasNoUsername: !user.username, userId: JSON.stringify(req.user.id) });
             }
           });
         });
