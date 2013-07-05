@@ -160,26 +160,27 @@ describe("User Search Service", function() {
   describe("#searchUnconnectedUsers", function() {
 
     it("should find both test users", function(done) {
-      var troupe = fixture.troupe1;
-
-      assert(troupe.containsUserId(fixture.user1.id), 'Test troupe 1 should contain test user 1');
 
       Q.all([
+        persistence.Troupe.createQ({ uri: '/testtroupe' + Date.now() }),
+        persistence.User.createQ({ displayName: fixture.generateName(), email: fixture.generateEmail()}),
         persistence.User.createQ({ displayName: fixture.generateName(), email: fixture.generateEmail()}),
         persistence.User.createQ({ displayName: fixture.generateName(), email: fixture.generateEmail()})
-      ]).spread(function(user1, user2) {
+      ]).spread(function(troupe, user1, user2, user3) {
         troupe.addUserById(user1.id);
         troupe.addUserById(user2.id);
+        troupe.addUserById(user3.id);
         return troupe.saveQ().then(function() {
-          return [user1, user2];
+          return [user1, user2, user3];
         });
-      }).spread(function(user1, user2) {
-        return userSearchService.searchUnconnectedUsers(fixture.user1.id, 'tEst', {})
+      }).spread(function(user1, user2, user3) {
+        return userSearchService.searchUnconnectedUsers(user3.id, 'tEst', {})
           .then(function(searchResults) {
             assert(searchResults.results.length >= 2, "Expect some users, got " + JSON.stringify(searchResults.results));
 
-            assert(searchResults.results.filter(function(f) { return f.id == fixture.user1.id; } ).length === 0, "Expect test user 1 not to be returned");
-            assert(searchResults.results.filter(function(f) { return f.id == user1.id; } ).length == 1, "Expect test user 2");
+            assert(searchResults.results.filter(function(f) { return f.id == user3.id; } ).length === 0, "Expect user3 not to be returned" + JSON.stringify(searchResults.results));
+            assert(searchResults.results.filter(function(f) { return f.id == fixture.user1.id; } ).length === 0, "Expect fixture user 1 not to be returned" + JSON.stringify(searchResults.results));
+            assert(searchResults.results.filter(function(f) { return f.id == user1.id; } ).length == 1, "Expect test user 2" + JSON.stringify(searchResults.results));
             assert(searchResults.results.filter(function(f) { return f.id == user2.id; } ).length == 1, "Expect test user 3");
 
           });
