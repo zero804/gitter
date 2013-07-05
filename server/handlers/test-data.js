@@ -51,16 +51,23 @@ if(!nconf.get('test:exposeDataForTestingPurposes')) {
 
       app.get('/testdata/inviteAcceptLink', function(req, res, next) {
 
-        persistence.Invite.findOne({ email: req.query.email }, null, { sort: { '_id': -1 } }, function(err, invite) {
-          if(err) return next(err);
-          if(!invite) return next(404);
+        userService.findByEmail(req.query.email, function(err, user) {
+          if (user) {
+            res.redirect('/testdata/inviteAcceptLinkByUserId?userId=' + user.id);
+          }
+          else {
+            persistence.Invite.findOne({ email: req.query.email }, null, { sort: { '_id': -1 } }, function(err, invite) {
+              if(err) return next(err);
+              if(!invite) return next(404);
 
-          persistence.Troupe.findById(invite.troupeId, function(err, troupe) {
-            if(err) return next(err);
-            if(!invite) return next(404);
+              persistence.Troupe.findById(invite.troupeId, function(err, troupe) {
+                if(err) return next(err);
+                if(!troupe) return next(404);
 
-            res.send("/" + troupe.uri + "/accept/" + invite.code);
-          });
+                res.send("/" + troupe.uri + "/accept/" + invite.code);
+              });
+            });
+          }
         });
 
       });
@@ -71,9 +78,19 @@ if(!nconf.get('test:exposeDataForTestingPurposes')) {
           if(err) return next(err);
           if(!user) return next("User not found");
 
-          res.redirect('/testdata/inviteAcceptLink?email='+user.email);
+          persistence.Invite.findOne({ userId: req.query.userId }, null, { sort: { '_id': -1 } }, function(err, invite) {
+            if(err) return next(err);
+            if(!invite) return next("Invite not found");
 
+            persistence.Troupe.findById(invite.troupeId, function(err, troupe) {
+              if(err) return next(err);
+              if(!troupe) return next("Troupe not found");
+
+              res.send("/" + troupe.uri + "/accept/" + ((invite.code) ? invite.code : ''));
+            });
+          });
         });
+
       });
 
       app.get('/testdata/oneToOneLink', function(req, res, next) {
