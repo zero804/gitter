@@ -1,4 +1,4 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//*global require:false */
 require([
   'jquery',
   'views/base',
@@ -6,12 +6,11 @@ require([
   'views/signup/signupModalView',
   'views/signup/signupModalConfirmView',
   'views/login/loginModalView',
-  'views/signup/createTroupeView',
   'views/app/messagesView',
   'utils/validate-wrapper', // No ref!
   'retina'
  ],
-  function($, TroupeViews, UsernameView, SignupModalView, SignupModalConfirmView, LoginModalView, createTroupeView, MessagesView) {
+  function($, TroupeViews, UsernameView, SignupModalView, SignupModalConfirmView, LoginModalView, MessagesView) {
     "use strict";
 
     //var loginFormVisible = false;
@@ -102,6 +101,10 @@ require([
       showMessage();
     }
 
+    if (window.location.hash.indexOf("login") >= 0) {
+      createLoginModal().show();
+    }
+
     $('#button-signup, #button-signup2').on('click', function() {
       return signup();
     });
@@ -121,7 +124,7 @@ require([
 
     require([
       'utils/tracking'
-    ], function(tracking) {
+    ], function() {
       // No need to do anything here
     });
 
