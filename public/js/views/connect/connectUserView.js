@@ -41,6 +41,9 @@ define([
     },
 
     afterRender: function() {
+      setTimeout(function(){
+        $('#existing-user').slideDown();
+      },750);
 
     },
 
