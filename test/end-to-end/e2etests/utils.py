@@ -139,7 +139,6 @@ def signup(driver):
     inputUser = driver.find_element_by_css_selector('input[name=username]')
     inputUser.send_keys(username)
     driver.find_element_by_css_selector('#username-form [type=submit]').click()
-    assert(driver.current_url == baseUrl('/'+username))
 
     # complete profile
     form = driver.find_element_by_css_selector('#updateprofileform')
