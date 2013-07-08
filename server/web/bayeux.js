@@ -361,10 +361,6 @@ var authorisor = {
 
       var match = null;
 
-      winston.silly('Authorising', {
-        channel: message.subscription
-      });
-
       var hasMatch = routes.some(function(route) {
         var m = route.re.exec(message.subscription);
         if(m) {

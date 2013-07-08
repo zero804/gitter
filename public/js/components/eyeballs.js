@@ -185,6 +185,7 @@ define([
     inactivityTimer = null;
   }
 
+  // We use this to ensure that the users session does not time out
   window.setInterval(function() {
     $.ajax({
       url: '/api/v1/ping',

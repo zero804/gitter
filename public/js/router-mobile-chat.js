@@ -1,8 +1,6 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'jquery',
-  'underscore',
-  'backbone',
   'views/base',
   'collections/chat',
   'views/chat/chatInputView',
@@ -11,8 +9,7 @@ require([
   'components/eyeballs',
   'components/unread-items-client',
   'scrollfix'
-], function($, _, Backbone, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget  /*, eyeballsClient, unreadItemsClient, scrollfix*/) {
-  /*jslint browser: true, unused: true */
+], function($, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget  /*, eyeballsClient, unreadItemsClient, scrollfix*/) {
   "use strict";
 
   var PAGE_SIZE = 15;
