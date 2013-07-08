@@ -28,7 +28,7 @@ def secondDriver():
             remote = 'http://10.8.0.14:5555/wd/hub'
         secondDriver = webdriver.Remote(command_executor=remote, desired_capabilities=DesiredCapabilities.FIREFOX)
     else:
-        secondDriver = driver
+        secondDriver = driver()
     return secondDriver
 
 
