@@ -1,4 +1,13 @@
 <span>
+{{#if compactView}}
+<div style="position: fixed; top: 0; bottom: 0; left: 0; right: 0; background-color: white; z-index: 10000; border-top: 2px solid #1dce73" >
+  <div class="trpH1" style="padding: 12px">
+  Welcome to Troupe
+  </div>
+  <div class="trpBodyText" style="padding: 12px">Troupe is still in Beta right now, please visit Troupe in a web browser to get started. <br><br>Once you've added some contacts or created some groups, you can start using Troupe on your mobile.
+  </div>
+</div>
+{{else}}
 <div class="trpHelpBox" style="width: 656px; padding: 20px">
   <p class="trpH1"><span class="trpGreen">Hi there and thank you for trying out Troupe.</span></p><br>
   <p class="trpBodyMedium">With Troupe you can chat invidiually with your colleagues and others.<br>You can also create group conversations and chat with many people together.</p>
@@ -32,6 +41,7 @@
   </div><br>
   <p class="trpBodySmall" style="text-align: center"><span class="trpGreen">Windows and Android apps are coming soon.</span></p>
 </div>
+{{/if}}
 </span>
 {{!--
 <div class="trpHelpBox" style="width: 656px; padding: 20px">
