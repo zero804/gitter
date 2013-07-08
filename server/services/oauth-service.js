@@ -2,6 +2,8 @@
 "use strict";
 
 var persistenceService = require("./persistence-service");
+var statsService = require("./stats-service");
+
 var uuid = require('node-uuid');
 
 var WEB_INTERNAL_CLIENT_KEY = 'web-internal';
@@ -20,10 +22,13 @@ exports.findClientById = function(id, callback) {
   persistenceService.OAuthClient.findById(id, callback);
 };
 
-exports.saveAuthorizationCode = function(code, clientId, redirectUri, userId, callback) {
+exports.saveAuthorizationCode = function(code, client, redirectUri, userId, callback) {
+
+  statsService.setUserProperty(userId, 'Last login from ' + client.tag, (new Date()).toISOString());
+
   var authCode = new persistenceService.OAuthCode({
       code: code,
-      clientId: clientId,
+      clientId: client.id,
       redirectUri: redirectUri,
       userId: userId
   });
@@ -39,6 +44,7 @@ exports.findAccessToken = function(token, callback) {
 };
 
 exports.saveAccessToken = function(token, userId, clientId, callback) {
+
   var accessToken = new persistenceService.OAuthAccessToken({
     token: token,
     userId: userId,
