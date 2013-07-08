@@ -5,11 +5,13 @@ define([
   'marionette',
   'collections/instances/troupes',
   'views/toolbar/troupeCollectionView',
+  'hbs!views/toolbar/tmpl/troupeListItemEmpty',
+  'hbs!views/toolbar/tmpl/privateTroupeListItemEmpty',
   'views/app/invitesView',
   'hbs!./tmpl/troupeMenu',
   './searchView',
   "nanoscroller" // No ref!
-], function($, _, Marionette, troupeCollections, TroupeCollectionView, InvitesView, template, SearchView) {
+], function($, _, Marionette, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView) {
   "use strict";
 
   return Marionette.Layout.extend({
@@ -47,10 +49,10 @@ define([
       this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentTroupes }));
 
       // normal troupe view
-      this.troupes.show(new TroupeCollectionView({collection: troupeCollections.normalTroupes }));
+      this.troupes.show(new TroupeCollectionView({collection: troupeCollections.normalTroupes, emptyView: Marionette.ItemView.extend({ template: troupeListItemEmpty })}));
 
       // one to one troupe view
-      this.people.show(new TroupeCollectionView({collection: troupeCollections.peopleTroupes }));
+      this.people.show(new TroupeCollectionView({collection: troupeCollections.peopleTroupes, emptyView: Marionette.ItemView.extend({ template: privateTroupeListItemEmpty })}));
 
       // unread troupe view
       this.unread.show(new TroupeCollectionView({collection: troupeCollections.unreadTroupes }));
