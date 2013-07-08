@@ -419,6 +419,7 @@ FileSchema.schemaTypeName = 'FileSchema';
  */
 var OAuthClientSchema = new Schema({
   name: String,
+  tag: String,
   clientKey: String,
   clientSecret: String,
   registeredRedirectUri: String,

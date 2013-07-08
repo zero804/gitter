@@ -60,11 +60,11 @@ else {
       $email: user.email,
       $name: user.displayName,
       $username: user.username,
-      status: user.status
+      Status: user.status
     });
   };
 
-  exports.user = function(user, key, value) {
-    mixpanel.people.set(user.id, key, value);
+  exports.setUserProperty = function(userId, key, value) {
+    mixpanel.people.set(userId, key, value);
   };
 }
