@@ -20,7 +20,7 @@ define([
     getRenderData: function() {
       var isOneToOne;
       var firstName;
-      console.log("HomeUser" + context.getHomeUser());
+
       if (context.getHomeUser()) {
         isOneToOne = true;
         firstName = context.getHomeUser().displayName.split(" ").shift();
