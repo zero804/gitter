@@ -41,7 +41,6 @@ def testNewUserUnauthenticatedTroupeRequest():
     inputUser = driver.find_element_by_css_selector('input[name=username]')
     inputUser.send_keys(username)
     driver.find_element_by_css_selector('#username-form [type=submit]').click()
-    assert(driver.current_url == utils.baseUrl('/'+username))
 
     # complete profile
     form = driver.find_element_by_css_selector('#updateprofileform')
@@ -55,7 +54,9 @@ def testNewUserUnauthenticatedTroupeRequest():
     driver.get(utils.baseUrl("/signout"))
     utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
     driver.get(utils.baseUrl("/testtroupe3"))
+    time.sleep(1)
     driver.find_element_by_css_selector(".frame-request .trpPeopleListItem").click()
+    time.sleep(1)
     driver.find_element_by_id('request-accept-button').click()
 
 
@@ -74,8 +75,11 @@ def testExistingUnauthenticatedRequest():
     driver.get(utils.baseUrl("/signout"))
     utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
     driver.get(utils.baseUrl("/testtroupe3"))
+    time.sleep(1)
     driver.find_element_by_css_selector(".frame-request .trpPeopleListItem").click()
+    time.sleep(1)
     driver.find_element_by_id('request-reject-button').click()
+    time.sleep(1)
     driver.find_element_by_id('yes').click()
 
 
@@ -89,8 +93,11 @@ def testExistingAuthenticatedRequest():
     driver.get(utils.baseUrl("/signout"))
     utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
     driver.get(utils.baseUrl("/testtroupe3"))
+    time.sleep(1)
     driver.find_element_by_css_selector(".frame-request .trpPeopleListItem").click()
+    time.sleep(1)
     driver.find_element_by_id('request-reject-button').click()
+    time.sleep(1)
     driver.find_element_by_id('yes').click()
 
 
