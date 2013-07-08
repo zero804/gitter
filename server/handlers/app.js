@@ -82,6 +82,7 @@ function createTroupeContext(req, options) {
       profileNotCompleted: options.profileNotCompleted,
       accessDenied: options.accessDenied,
       inviteId: options.inviteId,
+      mobilePage: req.params && req.params.page,
       appVersion: appVersion.getCurrentVersion(),
       baseServer: nconf.get('web:baseserver'),
       basePort: nconf.get('web:baseport'),
@@ -219,7 +220,6 @@ function saveLastTroupeMiddleware(req, res, next) {
 
   next();
 }
-
 
 function renderMiddleware(page) {
   return function(req, res, next) {

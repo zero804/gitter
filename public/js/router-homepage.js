@@ -1,27 +1,22 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
-  'jquery',
-  'underscore',
-  'utils/context',
   'backbone',
-  'backbone.keys', // no ref
-  'marionette',
-  'template/helpers/all',
-  'views/base',
   'views/shareSearch/shareSearchView',
-  'components/dozy',
   'views/app/appIntegratedView',
   'views/userHome/userHomeView',
   'collections/instances/troupes',
   'views/profile/profileView',
   'views/signup/createTroupeView',
   'views/app/userHeaderView',
-  'components/webNotifications',
   'views/toolbar/troupeMenu',
   'utils/router',
-  'components/errorReporter'
-], function($, _, context, Backbone, _backboneKeys, Marionette, _Helpers, TroupeViews, shareSearchView, dozy, AppIntegratedView, UserHomeView, troupeCollections,
-  profileView, createTroupeView, UserHeaderView, webNotifications, TroupeMenuView, Router /*, errorReporter , FilteredCollection */) {
+  'components/errorReporter',
+  'components/dozy',
+  'components/webNotifications',
+  'template/helpers/all',
+  'backbone.keys' // no ref
+], function(Backbone, shareSearchView, AppIntegratedView, UserHomeView, troupeCollections,
+  profileView, createTroupeView, UserHeaderView, TroupeMenuView, Router /*, errorReporter , dozy, webNotifications,_Helpers,  _backboneKeys*/) {
 
   "use strict";
 
