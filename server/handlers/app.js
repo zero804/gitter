@@ -21,8 +21,8 @@ function serializeUser(user) {
   return restSerializer.serializeQ(user, strategy);
 }
 
-function serializeHomeUser(user) {
-  var strategy = new restSerializer.UserStrategy({ includeEmail: false, hideLocation: true });
+function serializeHomeUser(user, includeEmail) {
+  var strategy = new restSerializer.UserStrategy({ includeEmail: includeEmail, hideLocation: true });
 
   return restSerializer.serializeQ(user, strategy);
 }
@@ -140,7 +140,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
 
   Q.all([
     user ? serializeUser(user) : null,
-    homeUser ? serializeHomeUser(homeUser) : undefined,
+    homeUser ? serializeHomeUser(homeUser, !!invite) : undefined, //include email if the user has an invite
     user ? getWebToken(user) : null,
     troupe && user ? serializeTroupe(troupe, user) : fakeSerializedTroupe(req.uriContext) ])
     .spread(function(serializedUser, serializedHomeUser, token, serializedTroupe) {
