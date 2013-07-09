@@ -211,7 +211,7 @@ define([
 
       // this.$el.find('.trpChatText textarea').focus().on('blur', function() { self.toggleEdit(); });
       if (isAtBottom) {
-        this.scrollDelegate.scrollToBottom();
+        this.scrollDelegate.$scrollOf.scrollTop(this.scrollDelegate.$container.height());
       }
     },
 
