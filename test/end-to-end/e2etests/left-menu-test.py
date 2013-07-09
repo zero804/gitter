@@ -93,3 +93,8 @@ def leftMenuSearch():
     time.sleep(2)
     results = driver.find_element_by_css_selector('#left-menu-list-search ul')
     results.size > 2
+
+
+def teardown_module():
+    utils.screenshot(driver)
+    driver.quit()
