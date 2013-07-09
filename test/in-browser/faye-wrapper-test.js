@@ -121,7 +121,7 @@ require([
   });
 
 
-  describe('FayeWrapper (mock endpoint)', function() {
+  xdescribe('FayeWrapper (mock endpoint)', function() {
     var clientCount = 0;
 
     var MockSubscription = function(fayeMock, channel, message, context) {
@@ -131,16 +131,16 @@ require([
     };
 
     MockSubscription.prototype = {
-      callback: function(callback, context) {
+      callback: function callbackFn(callback, context) {
         this.callback = callback.bind(context);
         this.fayeMock.trigger('subscription:callback', this.channel, callback, context);
       },
 
-      errback: function(callback, context) {
+      errback: function errbackFn(callback, context) {
         this.fayeMock.trigger('subscription:errback', this.channel, callback, context);
       },
 
-      cancel: function() {
+      cancel: function cancelFn() {
         this.fayeMock.trigger('subscription:cancel', this.channel);
       },
 
@@ -153,6 +153,7 @@ require([
 
 
     var FayeMock = function() {
+      this.subscriptions = [];
     };
 
     _.extend(FayeMock.prototype, Backbone.Events, {
@@ -176,13 +177,20 @@ require([
       connect: function(callback, context) {
         this.trigger('connect', callback, context);
 
-        setTimeout(function() {
+        setTimeout(_.bind(function() {
           this.trigger('connected');
           this.clientId = ++clientCount;
           this.state = 'CONNECTED';
 
+          // Mark all the subscriptions as connected
+          setTimeout(_.bind(function() {
+            _.each(this.subscriptions, function(subscription) {
+              subscription.triggerCallback();
+            });
+          }, this), 0);
+
           callback.apply(context);
-        }.bind(this), 1);
+        }, this), 0);
       },
 
       disconnect: function() {
@@ -196,6 +204,8 @@ require([
         if(this.state == 'CONNECTED') {
           subscription.triggerCallback();
         }
+        this.subscriptions.push(subscription);
+
         return subscription;
       },
 
