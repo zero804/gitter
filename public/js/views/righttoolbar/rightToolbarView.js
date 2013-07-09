@@ -62,9 +62,9 @@ define([
             var model;
 
             if(response.success) {
-              self.app.collections['files'].add(response.file, { merge: true });
+              fileCollection.add(response.file, { merge: true });
 
-              model = self.app.collections['files'].get(response.file.id);
+              model = fileCollection.get(response.file.id);
               model.on('change', onChange);
             }
 
