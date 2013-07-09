@@ -2,12 +2,13 @@
 define([
   'jquery',
   'utils/context',
+  'log!appIntegratedView',
   'marionette',
   'views/base',
   'views/signup/usernameView',
   'views/app/uiVars',
   "nanoscroller" // no ref
-  ], function($, context, Marionette, TroupeViews, UsernameView, uiVars) {
+  ], function($, context, log, Marionette, TroupeViews, UsernameView, uiVars) {
   "use strict";
 
   return Marionette.Layout.extend({
@@ -138,7 +139,11 @@ define([
     },
 
     showMenu: function() {
+      log("*********** Showing left menu");
       if (this.leftmenu) return;
+
+
+      if (!window._troupeIsTablet) $("#chat-input-textarea").blur();
 
       if (this.selectedListIcon == "icon-search") {
         this.activateSearchList();
