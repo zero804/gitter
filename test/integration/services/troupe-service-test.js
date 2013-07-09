@@ -7,7 +7,7 @@
 var testRequire = require('../test-require');
 var fixtureLoader = require('../test-fixtures');
 
-var Q = require("Q");
+var Q = require("q");
 var assert = require("assert");
 var persistence = testRequire("./services/persistence-service");
 var mockito = require('jsmockito').JsMockito;
