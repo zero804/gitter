@@ -119,18 +119,21 @@ def testRemoveUserFromTroupe():
 
     time.sleep(1)
 
-    a = 1
+    a = 0
     while len(driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem')) > 1:
-        time.sleep(0.1)
-        person = driver.find_element_by_css_selector('#people-roster div.trpPeopleListItem :nth-child('+str(a)+')')
+        time.sleep(1)
+        persons = driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem')
+        person = persons[a]
         person.click()
-        time.sleep(0.1)
+        time.sleep(1)
         thisUsersDisplayName = driver.find_element_by_css_selector('.trpRightPanel .trpDisplayName')
+        assert(thisUsersDisplayName.is_displayed())
         if not thisUsersDisplayName.text.find("Another Test User") >= 0:
             print "trying to remove this person " + thisUsersDisplayName.text
             driver.find_element_by_css_selector('#person-remove-button').click()
-            time.sleep(0.1)
+            time.sleep(1)
             driver.find_element_by_css_selector('#button-yes').click()
+            time.sleep(1)   # give enough time for the right bar to hide, before click a person again
         else:
             a += 1
             print "not trying to remove this person " + thisUsersDisplayName.text
