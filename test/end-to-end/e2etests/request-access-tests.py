@@ -3,6 +3,7 @@ import time
 import urllib2
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
+from nose.tools import nottest
 
 driver = None
 
@@ -13,6 +14,7 @@ def setup_module():
     utils.resetData(driver)
 
 
+@nottest
 def testNewUserUnauthenticatedTroupeRequest():
     driver.get(utils.baseUrl("/signout"))
     driver.get(utils.baseUrl("/testtroupe3"))
