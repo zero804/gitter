@@ -3,11 +3,11 @@
 define([
   'jquery',
   'underscore',
-  'backbone',
   'views/base',
   'hbs!./tmpl/filePreviewView',
+  'backbone.keys',
   'log!file-preview-view'
-], function($, _, Backbone, TroupeViews, template, log) {
+], function($, _, TroupeViews, template, backboneKeys, log) {
   /*jslint browser: true*/
   "use strict";
 
@@ -210,6 +210,7 @@ define([
       return this;
     }
   });
+  PreviewView = backboneKeys.mixInto(PreviewView);
 
   var Modal = TroupeViews.Modal.extend({
     className: 'modal trpFilePreview',
@@ -222,6 +223,7 @@ define([
       this.view = new PreviewView({ model: this.model, collection: this.collection });
     }
   });
+
 
   return {
     Modal: Modal,

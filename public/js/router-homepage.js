@@ -13,8 +13,7 @@ require([
   'components/errorReporter',
   'components/dozy',
   'components/webNotifications',
-  'template/helpers/all',
-  'backbone.keys' // no ref
+  'template/helpers/all'
 ], function(Backbone, shareSearchView, AppIntegratedView, UserHomeView, troupeCollections,
   profileView, createTroupeView, UserHeaderView, TroupeMenuView, Router /*, errorReporter , dozy, webNotifications,_Helpers,  _backboneKeys*/) {
 
