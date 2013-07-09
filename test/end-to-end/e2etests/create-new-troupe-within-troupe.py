@@ -69,9 +69,7 @@ def testCreateTroupeFromGroupTroupe():
     # finish typing in a full email address and send invite
     emailuser = 'testuser.' + time.strftime("%Y%m%d%H%M%S", time.gmtime())
     email = emailuser + '@troupetest.local'
-    inputBox.send_keys(email[2:-1])
-    time.sleep(0.1)
-    inputBox.send_keys('l')
+    utils.send_keys(inputBox, email[2:])
     time.sleep(0.1)
     suggestion = driver.find_element_by_css_selector('.typeahead li.active')
     assert suggestion.text.find(email) >= 0, "Expected the suggestion to be the full email address given"
@@ -176,7 +174,8 @@ def testCreateTroupeFromOneToOneTroupe():
     form = driver.find_element_by_css_selector('form#share-form')
     # type and wait for autocomplete
     inputBox = form.find_element_by_name('inviteSearch')
-    inputBox.send_keys('testuser3@troupetest.local')
+    email = 'testuser3@troupetest.local'
+    utils.send_keys(inputBox, email)
     # select an existing user
     time.sleep(0.5)
     driver.find_element_by_css_selector('.typeahead li.active').click()
