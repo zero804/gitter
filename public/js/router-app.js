@@ -26,7 +26,6 @@ require([
   'components/webNotifications', // No ref
   'components/errorReporter',  // No ref
   'filtered-collection', // No ref
-  'backbone.keys', // no ref,
   'components/dozy', // Sleep detection No ref
   'template/helpers/all', // No ref
   'components/eyeballs' // No ref
