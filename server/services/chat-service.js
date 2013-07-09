@@ -23,7 +23,7 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   chatMessage.save(function (err) {
     if(err) return callback(err);
 
-    statsService.event("chat_message", {
+    statsService.event("new_chat", {
       userId: user.id,
       troupeId: troupe.id
     });
