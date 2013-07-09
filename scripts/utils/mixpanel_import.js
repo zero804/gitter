@@ -35,7 +35,7 @@ getAllUsers(function(err, users) {
         $email: user.email,
         $name: user.displayName,
         $username: user.username,
-        status: user.status
+        Status: user.status
       });
     });
   }
