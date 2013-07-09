@@ -32,6 +32,9 @@ def testSignupFromHomePage():
     inputUser = driver.find_element_by_css_selector('input[name=username]')
     inputUser.send_keys(username)
     driver.find_element_by_css_selector('#username-form [type=submit]').click()
+
+    time.sleep(1)
+
     assert(driver.current_url == utils.baseUrl('/'+username))
 
     # complete profile
