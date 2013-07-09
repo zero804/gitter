@@ -7,7 +7,6 @@ define([
   'hbs',
   'bootstrap_tooltip',
   'marionette',
-  'utils/logrjs',
   'utils/log',
   'backbone.wreqr',
   'backbone.babysitter'
