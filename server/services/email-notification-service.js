@@ -25,12 +25,10 @@ module.exports = {
   },
 
   sendRequestAcceptanceToUser: function(user, troupe) {
-    assert(user.confirmationCode, 'User does not have a confirmation code');
-
-    var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri + "/confirm/" + user.confirmationCode;
+    var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri;
 
     mailerService.sendEmail({
-      templateFile: "signupemailfromrequest",
+      templateFile: "requestacceptance",
       to: user.email,
       from: 'signup-robot' + emailDomainWithAt,
       subject: "You've been accepted into a troupe",
@@ -60,34 +58,16 @@ module.exports = {
     });
   },
 
-  sendConfirmationForNewUserRequest: function(user, troupe) {
+  sendConfirmationForNewUser: function (user) {
     assert(user.confirmationCode, 'User does not have a confirmation code');
 
-    var confirmLink = nconf.get("web:basepath") + "/" + troupe.uri + "/confirm/" + user.confirmationCode + '?fromRequest=1';
-    mailerService.sendEmail({
-      templateFile: "signupemailfromrequest",
-      to: user.email,
-      from: 'signup-robot' + emailDomainWithAt,
-      subject: "Welcome to Troupe",
-      data: {
-        troupeName: troupe.name,
-        confirmLink: confirmLink,
-        baseServerPath: nconf.get("web:basepath")
-      }
-    });
-  },
-
-  sendConfirmationForNewUser: function (user, troupe) {
-    assert(user.confirmationCode, 'User does not have a confirmation code');
-
-    var confirmLink = nconf.get("web:basepath") + "/" + troupe.uri + "/confirm/" + user.confirmationCode;
+    var confirmLink = nconf.get("web:basepath") + "/confirm/" + user.confirmationCode;
     mailerService.sendEmail({
       templateFile: "signupemail",
       to: user.email,
       from: 'signup-robot' + emailDomainWithAt,
       subject: "Welcome to Troupe",
       data: {
-        troupeName: troupe.name,
         confirmLink: confirmLink,
         baseServerPath: nconf.get("web:basepath")
       }
@@ -115,6 +95,9 @@ module.exports = {
   },
 
   sendNoticeOfEmailChange: function (user, origEmail, newEmail) {
+    assert(origEmail, 'origEmail parameter required');
+    assert(newEmail, 'newEmail parameter required');
+
     mailerService.sendEmail({
       templateFile: "change-email-address-complete",
       to: [origEmail, newEmail],
@@ -129,7 +112,15 @@ module.exports = {
   },
 
   sendInvite: function(troupe, displayName, email, code, senderDisplayName) {
-    var acceptLink = nconf.get("web:basepath") + "/" + troupe.uri + "/accept/" + code;
+    assert(email, 'email parameter required');
+    assert(senderDisplayName, 'senderDisplayName parameter required');
+
+    var acceptLink;
+    if(code) {
+      acceptLink = nconf.get("web:basepath") + "/" + troupe.uri + "/accept/" + code;
+    } else {
+      acceptLink = nconf.get("web:basepath") + "/" + troupe.uri;
+    }
 
     mailerService.sendEmail({
       templateFile: "inviteemail",
@@ -139,6 +130,33 @@ module.exports = {
       data: {
         displayName: displayName,
         troupeName: troupe.name,
+        acceptLink: acceptLink,
+        senderDisplayName: senderDisplayName,
+        baseServerPath: nconf.get("web:basepath")
+      }
+    });
+  },
+
+
+  sendConnectInvite: function(uri, displayName, email, code, senderDisplayName) {
+    assert(uri, 'uri parameter required');
+    assert(email, 'email parameter required');
+    assert(senderDisplayName, 'senderDisplayName parameter required');
+
+    var acceptLink;
+    if(code) {
+      acceptLink = nconf.get("web:basepath") + uri + "/accept/" + code;
+    } else {
+      acceptLink = nconf.get("web:basepath") + uri + "/accept/";
+    }
+
+    mailerService.sendEmail({
+      templateFile: "invite_connect_email",
+      from: senderDisplayName + '<signup-robot' + emailDomainWithAt + '>',
+      to: email,
+      subject: senderDisplayName + " has invited you to connect on Troupe",
+      data: {
+        displayName: displayName,
         acceptLink: acceptLink,
         senderDisplayName: senderDisplayName,
         baseServerPath: nconf.get("web:basepath")

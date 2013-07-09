@@ -2,16 +2,18 @@
 "use strict";
 
 var persistence = require("./persistence-service"),
+    collections = require("../utils/collections"),
     troupeService = require("./troupe-service"),
     statsService = require("./stats-service");
 var ObjectID = require('mongodb').ObjectID;
+
 
 var MAX_CHAT_EDIT_AGE_SECONDS = 300;
 
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   if(!troupe) return callback("Invalid troupe");
 
-  if(!troupeService.userHasAccessToTroupe(user, troupe)) return callback("Access denied");
+  if(!troupeService.userHasAccessToTroupe(user, troupe)) return callback(403);
 
   var chatMessage = new persistence.ChatMessage();
   chatMessage.fromUserId = user.id;
@@ -21,9 +23,9 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   chatMessage.save(function (err) {
     if(err) return callback(err);
 
-    statsService.event("new_chat", {
-      fromUserId: user.id,
-      toTroupeId: troupe.id
+    statsService.event("chat_message", {
+      userId: user.id,
+      troupeId: troupe.id
     });
 
     return callback(null, chatMessage);
@@ -66,7 +68,7 @@ exports.findById = function(id, callback) {
 
  exports.findByIds = function(ids, callback) {
   persistence.ChatMessage
-    .where('_id').in(ids)
+    .where('_id')['in'](collections.idsIn(ids))
     .exec(callback);
 };
 

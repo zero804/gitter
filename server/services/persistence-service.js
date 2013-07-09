@@ -1,9 +1,11 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var mongoose = require("mongoose");
+var mongoose = require('mongoose-q')(require('mongoose'), {spread:true});
+
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
+var mongooseUtils = require('../utils/mongoose-utils');
 var appEvents = require("../app-events");
 var _ = require("underscore");
 var winston = require("winston");
@@ -21,9 +23,21 @@ var connection = mongoose.connection;
 mongoose.set('debug', nconf.get("mongo:logQueries"));
 
 mongoose.connect(nconf.get("mongo:url"), {
-  server: { readPreference: "primaryPreferred" },
-  db: { readPreference: "primaryPreferred" },
-  replset: { readPreference: "primaryPreferred" }
+  server: {
+    readPreference: "primaryPreferred",
+    socketOptions: { keepAlive: 1, connectTimeoutMS: 3000 },
+    auto_reconnect: true,
+    autoReconnect: true
+  },
+  db: {
+    readPreference: "primaryPreferred"
+  },
+  replset: {
+    readPreference: "primaryPreferred",
+    socketOptions: { keepAlive: 1, connectTimeoutMS: 2000 },
+    auto_reconnect: true,
+    autoReconnect: true
+  }
 });
 
 shutdown.addHandler('mongo', 1, function(callback) {
@@ -79,6 +93,7 @@ function serializeEvent(url, operation, model, callback) {
 var UserSchema = new Schema({
   displayName: { type: String },
   email: { type: String },
+  username: { type: String },
   newEmail: String,
   confirmationCode: {type: String },
   status: { type: String, "enum": ['UNCONFIRMED', 'PROFILE_NOT_COMPLETED', 'ACTIVE'], "default": 'UNCONFIRMED'},
@@ -104,8 +119,23 @@ var UserSchema = new Schema({
   userToken: String, // TODO: move to OAuth,
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
-UserSchema.index({ email: 1 });
+UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ username: 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
+
+UserSchema.methods.getHomeUrl = function() {
+  return this.username ? "/" + this.username : "/one-one/" + this.id;
+};
+
+UserSchema.methods.isConfirmed = function() {
+  assert(this.status, 'User object does not have a status attribute. Did you select this field?');
+  return this.status !== 'UNCONFIRMED';
+};
+
+UserSchema.methods.hasUsername = function() {
+  return !!this.username;
+};
+
 
 var UserLocationHistorySchema = new Schema({
   userId: ObjectId,
@@ -158,7 +188,7 @@ var TroupeSchema = new Schema({
   dateDeleted: { type: Date },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
-TroupeSchema.index({ uri: 1 });
+TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });
 TroupeSchema.schemaTypeName = 'TroupeSchema';
 
 
@@ -231,7 +261,9 @@ TroupeSchema.methods.getUrl = function(userId) {
       return troupeUser.userId != userId;
     })[0];
 
-  return "/one-one/" + otherUser.userId;
+  return otherUser.username ?
+            "/" + otherUser.username :
+            "/one-one/" + otherUser.userId;
 };
 
 var TroupeRemovedUserSchema = new Schema({
@@ -246,11 +278,14 @@ TroupeRemovedUserSchema.schemaTypeName = 'TroupeRemovedUserSchema';
 // An invitation to a person to join a Troupe
 //
 var InviteSchema = new Schema({
-  troupeId: ObjectId,
-  senderDisplayName:  { type: String },
-  displayName:        { type: String },
-  email:              { type: String },
-  userId:             { type: ObjectId },
+  troupeId:           { type: ObjectId, "default": null  }, // If this is null, the invite is to connect as a person
+  fromUserId:         { type: ObjectId }, // The user who initiated the invite
+
+  userId:             { type: ObjectId }, // The userId of the recipient, if they are already a troupe user
+
+  displayName:        { type: String },   // If !userId, the name of the recipient
+  email:              { type: String },   // If !userId, the email address of the recipient
+
   createdAt:          { type: Date, "default": Date.now },
   emailSentAt:        { type: Date },
   code:               { type: String },
@@ -258,9 +293,18 @@ var InviteSchema = new Schema({
   _tv:                { type: 'MongooseNumber', 'default': 0 }
 });
 InviteSchema.schemaTypeName = 'InviteSchema';
+InviteSchema.index({ userId: 1 });
+InviteSchema.index({ email: 1 });
+
+
+var InviteUnconfirmedSchema = mongooseUtils.cloneSchema(InviteSchema);
+InviteUnconfirmedSchema.schemaTypeName = 'InviteUnconfirmedSchema';
+InviteUnconfirmedSchema.index({ userId: 1 });
+InviteUnconfirmedSchema.index({ email: 1 });
 
 //
 // A request by a user to join a Troupe
+// When a request is unconfirmed, the user who made the request is unconfirmed
 //
 var RequestSchema = new Schema({
   troupeId: ObjectId,
@@ -269,6 +313,13 @@ var RequestSchema = new Schema({
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 RequestSchema.schemaTypeName = 'RequestSchema';
+RequestSchema.index({ userId: 1 });
+RequestSchema.index({ troupeId: 1, status: 1 });
+
+var RequestUnconfirmedSchema = mongooseUtils.cloneSchema(RequestSchema);
+RequestUnconfirmedSchema.schemaTypeName = 'RequestUnconfirmedSchema';
+RequestUnconfirmedSchema.index({ userId: 1 });
+RequestUnconfirmedSchema.index({ troupeId: 1, status: 1 });
 
 //
 // A single chat
@@ -368,6 +419,7 @@ FileSchema.schemaTypeName = 'FileSchema';
  */
 var OAuthClientSchema = new Schema({
   name: String,
+  tag: String,
   clientKey: String,
   clientSecret: String,
   registeredRedirectUri: String,
@@ -452,7 +504,11 @@ var Email = mongoose.model('Email', EmailSchema);
 var EmailAttachment = mongoose.model('EmailAttachment', EmailAttachmentSchema);
 var Conversation = mongoose.model('Conversation', ConversationSchema);
 var Invite = mongoose.model('Invite', InviteSchema);
+var InviteUnconfirmed = mongoose.model('InviteUnconfirmed', InviteUnconfirmedSchema);
+
 var Request = mongoose.model('Request', RequestSchema);
+var RequestUnconfirmed = mongoose.model('RequestUnconfirmed', RequestUnconfirmedSchema);
+
 var ChatMessage = mongoose.model('ChatMessage', ChatMessageSchema);
 var File = mongoose.model('File', FileSchema);
 var FileVersion = mongoose.model('FileVersion', FileVersionSchema);
@@ -510,7 +566,9 @@ module.exports = {
   EmailAttachment: EmailAttachment,
   Conversation: Conversation,
 	Invite: Invite,
+  InviteUnconfirmed: InviteUnconfirmed,
   Request: Request,
+  RequestUnconfirmed: RequestUnconfirmed,
 	ChatMessage: ChatMessage,
   File: File,
   FileVersion: FileVersion,

@@ -61,3 +61,5 @@ test/end-to-end/e2etests/utils.pyc
 test/end-to-end/ios/ios-driver.log
 test/end-to-end/ios/ios-driver.log.lck
 v8.log
+*.swp
+*.swo

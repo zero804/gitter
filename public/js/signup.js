@@ -1,20 +1,24 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//*global require:false */
 require([
   'jquery',
   'views/base',
+  'views/signup/usernameView',
   'views/signup/signupModalView',
   'views/signup/signupModalConfirmView',
   'views/login/loginModalView',
-  'views/signup/createTroupeView',
   'views/app/messagesView',
   'utils/validate-wrapper', // No ref!
   'retina'
  ],
-  function($, TroupeViews, SignupModalView, SignupModalConfirmView, LoginModalView, createTroupeView, MessagesView) {
+  function($, TroupeViews, UsernameView, SignupModalView, SignupModalConfirmView, LoginModalView, MessagesView) {
+    "use strict";
+
     //var loginFormVisible = false;
 
-    function createLoginModal() {
-      var view = new LoginModalView({ fromSignup:true });
+    function createLoginModal(options) {
+      if (!options) options = {};
+      options.fromSignup = true;
+      var view = new LoginModalView(options);
       var modal = new TroupeViews.Modal({ view: view });
       view.on('login.complete', function(data) {
         modal.off('login.complete');
@@ -28,7 +32,7 @@ require([
       return modal;
     }
 
-    if (window.location.href.indexOf("passwordResetFailed") >= 0) {
+    function passwordResetFailed() {
       var modal = new TroupeViews.ConfirmationModal({
         confirmationTitle: "Reset Failed",
         body: "That password reset link is invalid.",
@@ -44,46 +48,65 @@ require([
         modal.transitionTo(createLoginModal());
       });
 
-      modal.on('close', function() {
+      modal.on('hide', function() {
         window.location.href = window.location.href.replace("passwordResetFailed","");
       });
 
       modal.show();
-    } else if(window.noValidTroupes) {
-      var modal = new TroupeViews.ConfirmationModal({
-        title: "No Troupes yet...",
-        body: "Click 'Get Started' to create your first Troupe",
-        buttons: [{
-          id: 'no-troupes-ok', text: 'OK'
-        }]
-      });
-
-      modal.on('button.click', function(id) {
-        if (id == 'no-troupes-ok')
-          modal.hide();
-      });
-
-      modal.show();
     }
 
-    if (window.location.hash.indexOf("message") >= 0) {
+    function showMessage() {
       var v = new MessagesView({ messageName : window.location.hash });
       v.show();
     }
 
-    $('#button-signup, #button-signup2').on('click', function() {
-      if (window.noValidTroupes) {
-        new createTroupeView.Modal({existingUser: true, userId: window.userId }).show();
-      } else {
-        var view = new SignupModalView({existingUser: false});
-        var modal = new TroupeViews.Modal({ view: view });
-        view.once('signup.complete', function(data) {
-          modal.transitionTo(new TroupeViews.Modal({ view: new SignupModalConfirmView({ data: data }) }));
-        });
+    function chooseUsername() {
+      var modal = new UsernameView.Modal({ disableClose: true });
 
-        modal.show();
+      modal.show();
+
+      modal.on('chose', function(username) {
+        window.location = '/' + username;
+      });
+    }
+
+    function signup() {
+
+      if (window.profileHasNoUsername) {
+        return chooseUsername();
       }
+
+      var view = new SignupModalView();
+      var modal = new TroupeViews.Modal({ view: view });
+
+      view.once('signup.complete', function(data) {
+        modal.transitionTo(new TroupeViews.Modal({ view: new SignupModalConfirmView({ data: data }) }));
+      });
+
+      modal.show();
+
       return false;
+    }
+
+
+    if (window.profileHasNoUsername) {
+      chooseUsername();
+    }
+
+    if (window.location.href.indexOf("passwordResetFailed") >= 0) {
+      passwordResetFailed();
+    }
+
+    if (window.location.hash.indexOf("message") >= 0) {
+      showMessage();
+    }
+
+    if (window.location.hash.indexOf("login") >= 0) {
+      createLoginModal().show();
+    }
+
+    $('#button-signup, #button-signup2').on('click', function() {
+      return signup();
     });
 
     $('#button-appstore').on('click', function () {
@@ -91,14 +114,17 @@ require([
     });
 
     $('#button-existing-users-login').on('click', function() {
-      var modal = createLoginModal();
-      modal.show();
+      $(document).trigger('login-prompt');
       return false;
+    });
+
+    $(document).on('login-prompt', function(ev, credentials) {
+      createLoginModal({ email: (credentials) ? credentials.email : '' }).show();
     });
 
     require([
       'utils/tracking'
-    ], function(tracking) {
+    ], function() {
       // No need to do anything here
     });
 

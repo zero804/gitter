@@ -1,8 +1,7 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery-validate'
 ], function() {
-  /*jshint trailing:false */
   "use strict";
 
   $.validator.addMethod(

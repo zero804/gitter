@@ -15,13 +15,16 @@ var statsService = require("../services/stats-service");
 var nconf = require('../utils/config');
 var loginUtils = require("../web/login-utils");
 
-function emailPasswordUserStrategy(email, password, done) {
+function loginAndPasswordUserStrategy(login, password, done) {
   winston.verbose("Attempting to authenticate ", { email: email });
 
-  userService.findByEmail(email, function(err, user) {
+  var email = login;
+  // var username = login;
+
+  userService.findByLogin(login, function(err, user) {
     if(err) return done(err);
     if(!user) {
-      winston.warn("Unable to login as email address not found", { email: email });
+      winston.warn("Unable to login as email address or username not found", { login: login });
 
       statsService.event("login_failed", {
         email: email,
@@ -35,6 +38,7 @@ function emailPasswordUserStrategy(email, password, done) {
       winston.warn("User attempted to login but account not yet activated", { email: email, status: user.status });
 
       statsService.event("login_failed", {
+        userId: user.id,
         email: email,
         reason: 'account_not_activated'
       });
@@ -47,6 +51,7 @@ function emailPasswordUserStrategy(email, password, done) {
         winston.warn("Login failed. Passwords did not match", { email: email });
 
         statsService.event("login_failed", {
+          userId: user.id,
           email: email,
           reason: 'password_mismatch'
         });
@@ -72,23 +77,6 @@ function emailPasswordUserStrategy(email, password, done) {
   });
 }
 
-var inviteAcceptStrategy = new ConfirmStrategy({ name: "accept" }, function(confirmationCode, req, done) {
-  var self = this;
-
-  var troupeUri = req.params.troupeUri || req.params.appUri;
-
-  winston.verbose("Invoking accept strategy", { confirmationCode: confirmationCode, troupeUri: troupeUri });
-
-  troupeService.acceptInvite(confirmationCode, troupeUri, function(err, user, alreadyUsed) {
-    if(err || !user) {
-      return self.redirect('/' + req.params.troupeUri + (alreadyUsed ? '#existing' : ''));
-    }
-
-    return done(null, user);
-  });
-
-});
-
 module.exports = {
   install: function() {
 
@@ -111,24 +99,17 @@ module.exports = {
           usernameField: 'email',
           passwordField: 'password'
         },
-        emailPasswordUserStrategy
+        loginAndPasswordUserStrategy
     ));
 
     passport.use(new ConfirmStrategy({ name: "confirm" }, function(confirmationCode, req, done) {
       var self = this;
-      var troupeUri = req.params.appUri || req.params.troupeUri;
 
       winston.verbose("Confirming user with code", { confirmationCode: confirmationCode });
 
       userService.findByConfirmationCode(confirmationCode, function(err, user) {
         if(err) return done(err);
         if(!user) {
-          // If the confirmation was under an appUri ala /:appUri/confirm/:confirmCode
-          // Then always use that URI
-          if(troupeUri) {
-            return self.redirect("/" + troupeUri);
-          }
-
           return done(null, false);
         }
 
@@ -143,13 +124,6 @@ module.exports = {
 
           winston.verbose("Confirmation already used", { confirmationCode: confirmationCode });
 
-          // If the confirmation was under an appUri ala /:appUri/confirm/:confirmCode
-          // Then always use that URI
-          if(troupeUri) {
-            return self.redirect("/" + troupeUri);
-          }
-
-
           loginUtils.whereToNext(user, function(err, url) {
             if(err || !url) return self.redirect(nconf.get('web:homeurl'));
 
@@ -161,8 +135,6 @@ module.exports = {
       });
     })
   );
-
-  passport.use(inviteAcceptStrategy);
 
   passport.use(new ConfirmStrategy({ name: "passwordreset" }, function(confirmationCode, req, done) {
       userService.findAndUsePasswordResetCode(confirmationCode, function(err, user) {
@@ -193,7 +165,7 @@ module.exports = {
      * to the `Authorization` header).  While this approach is not recommended by
      * the specification, in practice it is quite common.
      */
-    passport.use(new BasicStrategy(emailPasswordUserStrategy));
+    passport.use(new BasicStrategy(loginAndPasswordUserStrategy));
 
     passport.use(new ClientPasswordStrategy(
       function(clientKey, clientSecret, done) {
@@ -240,10 +212,6 @@ module.exports = {
         });
       }
     ));
-  },
-
-  testOnly: {
-    inviteAcceptStrategy: inviteAcceptStrategy
   }
 
 };

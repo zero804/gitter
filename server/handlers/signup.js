@@ -3,7 +3,6 @@
 
 var signupService = require("../services/signup-service"),
     middleware = require("../web/middleware"),
-    troupeService = require("../services/troupe-service"),
     loginUtils = require('../web/login-utils'),
     winston = require('winston'),
     nconf = require('../utils/config');
@@ -21,17 +20,30 @@ module.exports = {
       app.get(nconf.get('web:homeurl'),
         middleware.grantAccessForRememberMeTokenMiddleware,
         function(req, res, next) {
+
           if(req.user) {
+
             loginUtils.redirectUserToDefaultTroupe(req, res, next, {
+
               onNoValidTroupes: function() {
 
-                res.render('signup', { compactView: self.isMobile(req), noValidTroupes: JSON.stringify(true), userId: JSON.stringify(req.user.id) });
+                // try go to the user's home page
+                if (req.user.hasUsername()) {
+                  res.relativeRedirect(req.user.username);
+                }
+                // get the user to choose a username on the signup page
+                else {
+                  res.render('signup', { compactView: self.isMobile(req), profileHasNoUsername: JSON.stringify(true), userId: JSON.stringify(req.user.id) });
+                }
+
               }
             });
 
             return;
           }
-          res.render('signup', { compactView: self.isMobile(req), noValidTroupes: JSON.stringify(false), userId: JSON.stringify(null) });
+
+          // when the viewer is not logged in:
+          res.render('signup', { compactView: self.isMobile(req), profileHasNoUsername: JSON.stringify(false), userId: JSON.stringify(null) });
         }
       );
 
@@ -45,33 +57,26 @@ module.exports = {
 
         function(req, res, next) {
           var email = req.body.email;
-          var troupeName = req.body.troupeName;
 
-          troupeName = troupeName ? troupeName.trim() : '';
           email = email ? email.trim() : '';
-
-          if(!troupeName) {
-            return next('Troupe name is required');
-          }
 
           if(!email) {
             return next('Email address is required');
           }
 
           signupService.newSignupFromLandingPage({
-            troupeName: troupeName,
             email: email
-          }, function(err, id) {
+          }, function(err, user) {
             if(err) {
               winston.error("Error creating new troupe ", { exception: err });
               return next(err);
             }
 
-            req.session.newTroupeId = id;
             res.send({
               success: true,
-              troupeName: troupeName,
-              email: email
+              email: email,
+              userStatus: user.status,
+              username: user.username
             });
 
           });
@@ -79,14 +84,12 @@ module.exports = {
         }
       );
 
-      // This endpoint is used only when the
-      // user is attempting to change their email address
       app.get('/confirm/:confirmationCode',
         middleware.authenticate('confirm', { failureRedirect: '/confirm-failed' } ),
         function(req, res){
-          winston.verbose("Email address confirmation authenticated");
+          winston.verbose("Confirmation authenticated");
 
-          signupService.confirmEmailChange(req.user, function(err/*, user, troupe */) {
+          signupService.confirm(req.user, function(err, user) {
             if (err) {
               winston.error("Signup service confirmation failed", { exception: err } );
 
@@ -97,12 +100,17 @@ module.exports = {
               return;
             }
 
-            res.relativeRedirect(nconf.get('web:homeurl'));
+            if (user.hasUsername()) {
+              res.relativeRedirect('/' + user.username);
+            } else {
+              res.render('signup', { compactView: self.isMobile(req), profileHasNoUsername: !user.username, userId: JSON.stringify(req.user.id) });
+            }
           });
         });
 
-
-      app.get('/:troupeUri/confirm/:confirmationCode',
+      // This can probably go
+      // TODO: remove
+      app.get('/:appUri/confirm/:confirmationCode',
         middleware.authenticate('confirm', {}),
         function(req, res/*, next*/) {
             winston.verbose("Confirmation authenticated");
@@ -110,7 +118,7 @@ module.exports = {
             /* User has been set passport/accept */
             signupService.confirmSignup(req.user, function(err, user, troupe) {
               if (err || !troupe) {
-                res.relativeRedirect("/" + req.params.troupeUri);
+                res.relativeRedirect("/" + req.params.appUri);
                 return;
               }
 

@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>Start a Troupe</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
     <meta name="description" content="">
     <meta name="author" content="">
     <meta property="og:title" content="Troupe - Work smarter">
@@ -20,7 +20,7 @@
     {{{bootScript "signup" }}}
 
     <script type="text/javascript">
-    window.noValidTroupes = {{noValidTroupes}};
+    window.profileHasNoUsername = {{ profileHasNoUsername }};
     window.userId = {{{userId}}};
     {{#if trackingId}}
       window.troupeTrackingId = '{{trackingId}}';
@@ -34,6 +34,7 @@
   </head>
 
   <body>
+  <div class="trpBodyWrapper">
 
 <!--     <div class="trpHomeTopStripContainer">
       <div class="trpHomeTopStrip">
@@ -44,7 +45,6 @@
           <div class="trpHomeMenuItem trpPadV14 trpHand button-existing-users-login">Sign in</div>
       </div>
     </div> -->
-
     <div class="trpHomeHeroStripContainer">
 
       <div class="trpHomeTopStrip">
@@ -183,5 +183,6 @@
       </div>
     </div>
     {{/compactView}}
+  </div>
   </body>
 </html>

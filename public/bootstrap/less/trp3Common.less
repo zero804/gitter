@@ -1,3 +1,5 @@
+@import "trpCommon.less";
+
 .trpDisplayPicture {
 	display: inline-block;
 }
@@ -152,4 +154,50 @@ a .trpDisplayPicture {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.trpHelpBox {
+  background-color: white;
+  display: inline-block;
+  min-height: 24px;
+  vertical-align: top;
+  border-radius: 0px;
+  .trpBodyMedium;
+  padding: 12px 12px;
+  line-height: 150%;
+  color: #333;
+}
+
+.trpUsername {
+  display: inline-block;
+  .trpBodySmall;
+  margin-left: 20px;
+  padding-top: 14px;
+}
+
+.trpSuggestion {
+  background-color: @trpBgColor2;
+  display: inline-block;
+  .trpBodySmall;
+  padding: 4px 12px 3px 10px;
+  border-radius: 2px;
+  margin-top: 8px;
+  margin-right: 4px;
+}
+
+.trpSuggestionAvailable:hover {
+  background-color: @trpGreen;
+}
+
+.trpSuggestionAvailable {
+  .trpHand;
+}
+
+.trpSuggestions {
+  overflow: hidden;
+  background-color: @trpBgColor;
+  margin-left: -24px;
+  margin-right: -24px;
+  margin-top: 8px;
+  padding: 12px 24px 20px 24px;
 }

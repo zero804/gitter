@@ -56,7 +56,7 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "app-integrated",
+                  name: "router-app",
                   include: [
                     "utils/tracking",
                     "views/widgets/avatar",
@@ -192,9 +192,9 @@ module.exports = function( grunt ) {
         src: ['public-processed/js/core-libraries.js'],
         dest: 'public-processed/js/core-libraries.js'
       },
-      "app-integrated": {
-        src: ['public-processed/js/app-integrated.js'],
-        dest: 'public-processed/js/app-integrated.js'
+      "router-app": {
+        src: ['public-processed/js/router-app.js'],
+        dest: 'public-processed/js/router-app.js'
       },
       "router-mobile-chat": {
         src: ['public-processed/js/router-mobile-chat.js'],

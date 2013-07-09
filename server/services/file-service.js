@@ -12,6 +12,7 @@ var fs = require('fs');
 var thumbnailPreviewGeneratorService = require("./thumbnail-preview-generator-service");
 var mongooseUtils = require('../utils/mongoose-utils');
 var Fiber = require('../utils/fiber');
+var collections = require("../utils/collections");
 
 /* private */
 function getMainFileName(fileId, version) {
@@ -244,7 +245,7 @@ function storeFileVersionInGrid(options, callback) {
           uploadFileToGrid(file, 1, temporaryFile, function(err, file) {
             if(err) return callback(err);
 
-            statsService.event('new_file', { troupeId: troupeId });
+            statsService.event('new_file', { userId: creatorUserId, troupeId: troupeId });
 
             callback(err, {
               file: file,
@@ -283,7 +284,7 @@ function storeFileVersionInGrid(options, callback) {
         var versionNumber = file.versions.length;
         uploadFileToGrid(file, versionNumber, temporaryFile, function(err, file) {
           if(err) return callback(err);
-          statsService.event('new_file_version', { troupeId: troupeId });
+          statsService.event('new_file_version', { userId: creatorUserId, troupeId: troupeId });
           callback(err, {
             file: file,
             version: file.versions.length,
@@ -322,8 +323,7 @@ function storeFile(options, callback) {
 
 
 function findByIds(ids, callback) {
-  persistence.File.where('_id').in(ids)
-    .slaveOk()
+  persistence.File.where('_id')['in'](collections.idsIn(ids))
     .exec(callback);
 }
 

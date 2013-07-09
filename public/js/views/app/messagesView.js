@@ -1,7 +1,9 @@
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'views/base',
   'hbs!./tmpl/messages'
 ], function(TroupeViews, messagesTemplate) {
+  "use strict";
 
   var View = TroupeViews.Base.extend({
     template: messagesTemplate,

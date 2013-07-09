@@ -1,16 +1,19 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'jquery',
-  'underscore',
+  'utils/context',
   'backbone',
+  'log!router-login',
   './base-router',
   'views/base',
   'views/invite/inviteModal',
   'views/login/loginModalView',
   'views/profile/profileView',
   'views/login/loginRequestModalView',
+  'views/signup/signupModalConfirmView',
+  'views/connect/connectUserView',
   'collections/troupes'
-], function($, _, Backbone, BaseRouter, TroupeViews, InviteModal, LoginModalView, profileView, RequestModalView, troupeModels) {
+], function($, context, Backbone, log, BaseRouter, TroupeViews, InviteModal, LoginModalView, profileView, RequestModalView, SignupModalConfirmView, ConnectUserModalView, troupeModels) {
   "use strict";
 
   var AppRouter = BaseRouter.extend({
@@ -21,7 +24,7 @@ require([
     defaultAction: function(/*actions*/) {
       $('#primary-view').html('');
 
-      var view, modal, loginModal, requestModal;
+      var view, modal, loginModal, requestModal, inviteId;
 
       function getLoginModal(options) {
         var email = options.email;
@@ -47,15 +50,13 @@ require([
           requestModal.transitionTo(loginModal);
         });
 
+        requestModal.view.on('confirm.request', function(options) {
+          var data = {};
+          data.email = options.userEmail;
+          requestModal.transitionTo(new TroupeViews.Modal({ disableClose: true, view: new SignupModalConfirmView({ data: data }) }));
+        });
+
         return requestModal;
-      }
-
-      if(!window.troupeContext.user) {
-        /* This user is NOT logged in */
-
-        getLoginModal({ email: window.localStorage.defaultTroupeEmail } );
-        loginModal.show();
-        return;
       }
 
       if(window.troupeContext.profileNotCompleted) {
@@ -70,30 +71,102 @@ require([
         return;
       }
 
-      if(window.troupeContext.accessDenied) {
-        // Listen out for acceptance
-        var troupeCollection = new troupeModels.TroupeCollection();
-        troupeCollection.listen();
-        troupeCollection.on("add", function(model) {
 
-          if(model.get('uri') == window.troupeContext.troupeUri) {
-            // TODO: tell the person that they've been kicked out of the troupe
-            window.location.reload();
+      // If the user is accessing another user's home url (trou.pe/user)
+      if(window.troupeContext.homeUser) {
+
+        // If the user doesn't have permission to talk to this user, show the Connect modal
+        if(window.troupeContext.accessDenied) {
+
+          // We might need to show the login modal, if the user is an existing user.
+          if (window.troupeContext.loginToAccept) {
+            getLoginModal({ email: window.localStorage.defaultTroupeEmail });
+            loginModal.show();
+            return;
           }
-        });
 
-        var inviteId = window.troupeContext.inviteId;
-        if (inviteId) {
-          // if the user has an invite to this troupe show the invite accept / reject modal
-          (new InviteModal({ inviteId: inviteId })).show();
+          // if the user is signed in, listen for an accept
+          if (window.troupeContext.user) {
+            log("******* LISTENING FOR ACCEPT *********");
+            var troupeCollection = new troupeModels.TroupeCollection();
+            troupeCollection.listen();
+            // this is never fired
+            troupeCollection.on("add", function(model) {
+              log("**** Got an ADD ****" + model.get(uri));
+              if(model.get('uri') == window.troupeContext.troupeUri) {
+                // TODO: tell the person that they've been kicked out of the troupe
+                window.location.reload();
+              }
+            });
+          }
+
+          inviteId = window.troupeContext.inviteId;
+          if (inviteId) {
+            // if the user has an invite from this user show the invite accept / reject modal
+            new InviteModal({ inviteId: inviteId }).show();
+          } else {
+              view = new ConnectUserModalView({ authenticated: !!window.troupeContext.user });
+              var connectUserModal = new TroupeViews.Modal({ view: view, disableClose: true });
+              connectUserModal.show();
+
+              connectUserModal.view.on('signup.complete', function(options) {
+                var data = {};
+                data.email = options.email;
+                connectUserModal.transitionTo(new TroupeViews.Modal({ disableClose: true, view: new SignupModalConfirmView({ data: data }) }));
+              });
+
+              connectUserModal.view.on('request.login', function(options) {
+                var defaultEmail;
+                if (options.email) {
+                  defaultEmail = options.email;
+                } else
+                {
+                  defaultEmail = window.localStorage.defaultTroupeEmail;
+                }
+                var loginModal = getLoginModal({email: defaultEmail});
+                connectUserModal.transitionTo(loginModal);
+              });
+            }
+        } else {
+          // we shouldn't get here I don't think...
+          return;
+        }
+      // The user must be accessing a Troupe
+      } else {
+        // If the user isn't signed in, show the login modal
+        if (!window.troupeContext.user) {
+          getLoginModal({ email: window.localStorage.defaultTroupeEmail } );
+          loginModal.show();
+          return;
         }
         else {
-          view = new RequestModalView({ authenticated: true });
-          modal = new TroupeViews.Modal({ view: view, disableClose: true });
-          modal.show();
-        }
+          /* This user is NOT logged in and is visiting a Troupe */
+          if(window.troupeContext.accessDenied) {
+            // Listen out for acceptance
+            var troupeCollection = new troupeModels.TroupeCollection();
+            troupeCollection.listen();
+            troupeCollection.on("add", function(model) {
 
-        return;
+              if(model.get('uri') == window.troupeContext.troupeUri) {
+                // TODO: tell the person that they've been kicked out of the troupe
+                window.location.reload();
+              }
+            });
+
+            inviteId = context().inviteId;
+            if (inviteId) {
+              // if the user has an invite to this troupe show the invite accept / reject modal
+              (new InviteModal({ inviteId: inviteId })).show();
+            } else {
+              // if the user is trying to access another use profile (e.g. trou.pe/user) and is not connected
+              // show the user connect modal
+              view = new RequestModalView({ authenticated: true });
+              modal = new TroupeViews.Modal({ view: view, disableClose: true });
+              modal.show();
+            }
+            return;
+          }
+        }
       }
     }
 

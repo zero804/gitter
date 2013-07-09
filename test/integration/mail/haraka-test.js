@@ -80,7 +80,6 @@ describe('haraka', function() {
       // check that the mail processing was completed and accepted
       assert(code == global.OK);
       // check that the message stored
-      console.log("store email proxy called: ", storeEmailInConversationCalled);
       assert(storeEmailInConversationCalled >= 1);
 
       done();
@@ -107,7 +106,7 @@ describe('haraka', function() {
           "Subject": subject,
           "Date": (new Date()).toString(),
           "In-Reply-To": '',
-          get: function(name) { return this[name]; },
+          get: function(name) { return this[name]; }
         },
         remove_header: function(name) { delete this.header[name]; },
         add_header: function(name, value) { this.header[name] = value; }

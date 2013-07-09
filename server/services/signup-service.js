@@ -1,90 +1,47 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var persistence = require("./persistence-service"),
-    emailNotificationService = require("./email-notification-service"),
+var emailNotificationService = require("./email-notification-service"),
     troupeService = require("./troupe-service"),
     userService = require("./user-service"),
+    uriService = require("./uri-service"),
     winston = require('winston'),
-    Fiber = require('../utils/fiber');
+    assert = require('assert'),
+    Q = require('q');
 
-function newTroupe(options, callback) {
-  var user = options.user;
-  var invites = options.invites;
-  var troupeName = options.troupeName;
-  var users = options.users;
+function newUser(options, callback) {
+  winston.info("New user", options);
 
-  var troupe = new persistence.Troupe();
-  troupe.name = troupeName;
-  troupe.uri = troupeService.createUniqueUri();
-
-  // add the user creating the troupe
-  troupe.addUserById(user.id);
-
-  // add other users
-  if (users) {
-    users.forEach(function(user) {
-      troupe.addUserById(user);
-    });
-  }
-
-  var f = new Fiber();
-
-  troupe.save(f.waitor());
-
-  // invite users
-  if (invites) {
-    invites.forEach(function(invite) {
-      troupeService.inviteUserToTroupe(troupe, user.displayName, invite, f.waitor());
-    });
-  }
-
-  f.all().then(function() {
-    callback(null, troupe);
-  }, callback);
+  return userService.newUser({ displayName: options.displayName, email: options.email })
+      .then(function(user) {
+        emailNotificationService.sendConfirmationForNewUser(user);
+        return user;
+      }).nodeify(callback);
 }
 
-function newTroupeForExistingUser(options, user, callback) {
-  winston.info("New troupe for existing user", options);
-
-  options.user = user;
-  newTroupe(options, function(err, troupe) {
+function sendNotification(user, troupe) {
+  if (user.status === 'UNCONFIRMED') {
+    winston.verbose('Resending confirmation email to new user', { email: user.email });
+    emailNotificationService.sendConfirmationForNewUser(user);
+  } else {
+    winston.verbose('Resending confirmation email to existing user', { email: user.email });
     emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
-    callback(err, troupe.id);
-  });
-
-}
-
-function newTroupeForNewUser(options, callback) {
-  winston.info("New troupe for new user", options);
-
-  userService.newUser({ email: options.email }, function (err, user) {
-    if(err) {
-      callback(err); return;
-    }
-
-    options.user = user;
-    newTroupe(options, function(err, troupe) {
-      emailNotificationService.sendConfirmationForNewUser(user, troupe);
-      callback(err, troupe.id);
-    });
-  });
+  }
+  return;
 }
 
 
-module.exports = {
+var signupService = module.exports = {
   newSignupFromLandingPage: function(options, callback) {
     if(!options.email) return callback('Email address is required');
-    if(!options.troupeName) return callback('Troupe name is required');
 
     winston.info("New signup ", options);
 
     // We shouldn't have duplicate users in the system, so we should:
     //     * Check if the user exists
     //     * If the user exists, have they previously confirmed their email address
-    //     * If the user exists AND has a confirmed email address, create the Troupe and send a New Troupe email rather than a Welcome to Troupe email and redirect them straight to the Troupe not the confirm page.
-    //     * If the user exists but hasn't previously confirmed their email - then we need to figure out something... should we resend the same confirmation code that was previously sent out or should we send a new one. Say someone creates 3 Troupes in a row, each one will generate a different confirmation code. It's the email address you are confirming not the Troupe.
-    //
+    //     * If the user exists AND has a confirmed email address...
+    //     * If the user exists but hasn't previously confirmed their email...
 
     userService.findByEmail(options.email, function(err, user) {
       if(err) {
@@ -93,10 +50,12 @@ module.exports = {
       }
 
       if(user) {
-        newTroupeForExistingUser(options, user, callback);
+        // do we send the confirm email again?
+        callback(err, user);
       } else {
-        newTroupeForNewUser(options, callback);
+        newUser(options, callback);
       }
+
     });
   },
 
@@ -128,10 +87,15 @@ module.exports = {
 
         winston.verbose("User email address change complete, finding troupe to redirect to", { id: user.id, status: user.status });
 
-        troupeService.findBestTroupeForUser(user, function(err, troupe) {
-          if(err) return callback(new Error("Error finding troupes for user"));
+        troupeService.updateInvitesForEmailToUserId(newEmail, user.id, function(err) {
+          if(err) return callback(err);
 
-          return callback(err, user, troupe);
+          troupeService.findBestTroupeForUser(user, function(err, troupe) {
+            if(err) return callback(new Error("Error finding troupes for user"));
+
+            return callback(err, user, troupe);
+          });
+
         });
 
       });
@@ -139,166 +103,142 @@ module.exports = {
 
   },
 
+  confirm: function(user, callback) {
+    if (user.newEmail) {
+      return signupService.confirmEmailChange(user, callback);
+    } else {
+      return signupService.confirmSignup(user, callback);
+    }
+  },
+
   confirmSignup: function(user, callback) {
     if(!user) return callback(new Error("No user found"));
+
     winston.verbose("Confirming user", { id: user.id, status: user.status });
 
     if (user.status === 'UNCONFIRMED') {
       user.status = 'PROFILE_NOT_COMPLETED';
     }
 
-    user.save(function(err) {
-      if(err) return callback(err);
-
-      winston.verbose("User saved, finding troupe to redirect to", { id: user.id, status: user.status });
-
-      troupeService.findBestTroupeForUser(user, function(err, troupe) {
-        if(err) return callback(new Error("Error finding troupes for user"));
-
-        return callback(err, user, troupe);
-      });
-    });
+    return user.saveQ()
+        .then(function() {
+          return troupeService.updateInvitesForEmailToUserId(user.email, user.id)
+            .then(function() {
+              return Q.all([
+                troupeService.updateUnconfirmedInvitesForUserId(user.id),
+                troupeService.updateUnconfirmedRequestsForUserId(user.id)
+                ]);
+            })
+            .then(function() {
+              return user;
+            });
+        })
+        .nodeify(callback);
 
   },
 
   // Resend the confirmation email and returns the ID of the troupe related to the signed
-  resendConfirmation: function(options, callback) {
-    var email = options.email;
+  // THIS PROBABLY ISN'T USED ANY MORE
+  // DELETEME
+  resendConfirmationForTroupe: function(troupeId, callback) {
+    troupeService.findById(troupeId, function(err, troupe) {
+      if(err) return callback(err);
 
-    function sendNotification(user, troupe) {
-      if (user.status === 'UNCONFIRMED') {
-        winston.verbose('Resending confirmation email to new user', { email: user.email });
-        emailNotificationService.sendConfirmationForNewUser(user, troupe, function() {});
-      } else {
-        winston.verbose('Resending confirmation email to existing user', { email: user.email });
-        emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
+      var troupeUsers = troupe.getUserIds();
+      if(troupeUsers.length != 1) {
+        winston.error("A confirmation resent cannot be performed as the troupe has multiple users");
+        return callback("Invalid state");
       }
-      return;
-    }
 
+      userService.findById(troupeUsers[0], function(err, user) {
+        if(err || !user) return callback(err, null);
+
+        sendNotification(user, troupe);
+
+        return callback(null, troupe.id);
+      });
+    });
+  },
+
+  /**
+   * Resend the confirmation email and returns the related user
+   * @return the promise of a user
+   */
+  resendConfirmationForUser: function(email, callback) {
+    return userService.findByEmail(email)
+      .then(function(user) {
+        if(!user) return;
+
+        sendNotification(user);
+        return user;
+      })
+      .nodeify(callback);
+  },
+
+  resendConfirmation: function(options, callback) {
     // This option occurs if the user has possibly lost their session
     // and is trying to get the confirmation sent at a later stage
     if(options.email) {
-        userService.findByEmail(email, function(err, user) {
-          if(err || !user) return callback(err, null);
-          troupeService.findAllTroupesForUser(user.id, function(err, troupes) {
-            if(err || !troupes.length) return callback(err, null);
-            // This list should always contain a single value for a new user
-            var troupe = troupes[0];
-            sendNotification(user, troupe);
-
-            return callback(null, troupe.id);
-          });
-        });
-
+      signupService.resendConfirmationForUser(options.email, callback);
     } else {
-      troupeService.findById(options.troupeId, function(err, troupe) {
-        if(err) return callback(err);
-
-        var troupeUsers = troupe.getUserIds();
-        if(troupeUsers.length != 1) {
-          winston.error("A confirmation resent cannot be performed as the troupe has multiple users");
-          return callback("Invalid state");
-        }
-
-        userService.findById(troupeUsers[0], function(err, user) {
-          if(err || !user) return callback(err, null);
-
-          sendNotification(user, troupe);
-
-          return callback(null, troupe.id);
-        });
-      });
-
+      signupService.resendConfirmationForTroupe(options.troupeId, callback);
     }
   },
 
-  /*
-   * Logic for this bad boy:
-   * This will get called when a user has not logged in but is attempted to access a troupe
-   * What we do is:
-   * - If the email address does not exist, create a new UNCONFIRMED user and add a request for the troupe
-   * - IF the email address does exist and the user account is:
-   *    - UNCONFIRMED: don't create a new account, but update the name and add a request for the troupe (if one does not already exist)
-   *    - COFIRMED: then throw an error saying that the user needs to login
-   * callback is function(err, request)
+  /**
+   * Signup with an access request for a uri
+   *
+   * The uri could either be a one-to-one troupe, in which case we'll create a signup with connection invite
+   * or the uri could be a troupe in which case it'll be a signup with request. In either case, the unconfirmed
+   * users invites and requests will only be processed once the user is confirmed
+   * @return promise of nothing
    */
-  newSignupWithAccessRequest: function(options, callback) {
-    winston.info("New signup with access request ", options);
+  signupWithAccessRequestToUri: function(uri, email, displayName) {
+    assert(uri, 'uri parameter required');
+    assert(email, 'email parameter required');
 
-    var email = options.email;
-    var name = options.name;
-    var troupeId = options.troupeId;
+    return uriService.findUri(uri)
+      .then(function(result) {
+        if(!result) { winston.error("No troupe with uri: " + uri); throw 404; }
 
-    userService.findByEmail(email, function(err, user) {
-      if(err) return callback(err);
+        var toTroupe = result.troupe;
+        var toUser = result.user;
 
-      if(!user) {
-        // Create a new user and add the request. The users confirmation code will not be set until the first time one one of
-        // their requests is accepted
-        var userProperties = {
-          status: 'UNCONFIRMED',
-          email: email,
-          displayName: name
-        };
+        return userService.findByEmail(email)
+          .then(function(fromUser) {
 
-        userService.newUser(userProperties, function(err, user) {
-          if(err) return callback(err);
+            if(fromUser) {
+              // If we found the user, they already exist, so send them a message letting them know
+              if(fromUser.isConfirmed()) throw { userExists: true };
 
-          troupeService.addRequest(troupeId, user.id, function(err, request) {
-            if(err) return callback(err);
-            callback(null, request);
+              // If the user is attempting to access a troupe, but isn't confirmed,
+              // resend the confirmation
+              signupService.resendConfirmationForUser(fromUser.email);
+
+              // Proceed to the next step with this user
+              return fromUser;
+            }
+
+            // Otherwise the user doesn't exist: create them first
+            return userService.newUser({
+                email: email,
+                displayName: displayName
+              })
+              .then(function(newUser) {
+                emailNotificationService.sendConfirmationForNewUser(newUser);
+
+                // Proceed to the next step with this user
+                return newUser;
+              });
+          })
+          .then(function(user) {
+            var step =  toTroupe ? troupeService.addRequest(toTroupe, user)
+                                 : troupeService.inviteUserByUserId(null, user, toUser.id);
+
+            return step.then(function() {return user; });
           });
         });
 
-      } else {
-        if (user.status === 'UNCONFIRMED') {
-          // try add a request, if there already is a request it will be returned instead of created,
-          // if the user is a member of the troupe it will give an error (memberExists: true)
-          troupeService.addRequest(troupeId, user.id, function(err, request) {
-            if(err) return callback(err);
-            callback(null, request);
-          });
-        }
-        else {
-          // tell the user to login
-          callback({ userExists: true });
-        }
-      }
-    });
-  },
-
-  newUnauthenticatedAccessRequest: function(troupeUri, email, name, callback) {
-    troupeService.findByUri(troupeUri, function(err, troupe) {
-      if(err) { winston.error("findByUri failed", { exception: err } ); return callback(500); }
-      if(!troupe) { winston.error("No troupe with uri", { uri: troupeUri }); return callback(404); }
-
-      var signupParams = {
-        troupeId: troupe.id,
-        name: name,
-        email: email
-      };
-
-      module.exports.newSignupWithAccessRequest(signupParams, function(err) {
-        if(err) {
-          winston.error("newSignupWithAccessRequest failed", { exception: err } );
-
-          if(err.userExists) {
-            return callback({ userExists: true });
-          }
-
-          if (err.memberExists) {
-            return callback({ memberExists: true });
-          }
-
-          return callback(500);
-        }
-
-        callback();
-      });
-
-    });
   }
-
 
 };

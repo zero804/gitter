@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'underscore',
   'jquery',
@@ -12,5 +12,6 @@ define([
   'backbone.wreqr',
   'backbone.babysitter'
 ], function() {
+  "use strict";
   return null;
 });

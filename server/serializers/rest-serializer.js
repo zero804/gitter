@@ -90,7 +90,7 @@ function UserStrategy(options) {
     }
 
     var location;
-    if(true /* options.showLocation */ && user.location.timestamp) {
+    if(!options.hideLocation && user.location.timestamp) {
       location = {
         description: getLocationDescription(user.location.named),
         timestamp: formatDate(user.location.timestamp),
@@ -102,7 +102,9 @@ function UserStrategy(options) {
 
     return {
       id: user.id,
+      username: user.username,
       displayName: user.displayName,
+      url: user.getHomeUrl(),
       email: options.includeEmail ? user.email : undefined,
       avatarUrlSmall: getAvatarUrl('s'),
       avatarUrlMedium: getAvatarUrl('m'),
@@ -119,11 +121,12 @@ function UserIdStrategy(options) {
   var userStategy = new UserStrategy(options);
 
   this.preload = function(ids, callback) {
-    userService.findByIds(_.uniq(ids), function(err, users) {
+    userService.findByIds(ids, function(err, users) {
       if(err) {
         winston.error("Error loading users", { exception: err });
         return callback(err);
       }
+
       self.users = collections.indexById(users);
       userStategy.preload(users, callback);
     });
@@ -144,7 +147,6 @@ function FileStrategy(options) {
   this.preload = function(items, callback) {
     var users = items.map(function(i) { return i.versions.map(function(j) { return j.creatorUserId; }); });
     users = _.flatten(users, true);
-    users = _.uniq(users);
 
     var strategies = [{
       strategy: userStategy,
@@ -230,7 +232,6 @@ function FileIdAndVersionStrategy() {
   this.preload = function(fileAndVersions, callback) {
     var fileIds = _(fileAndVersions).chain()
                     .map(function(e) { return e.fileId; })
-                    .uniq()
                     .value();
 
     execPreloads([{
@@ -269,7 +270,6 @@ function EmailStrategy() {
 
     var allUserIds = _(items).chain()
       .map(function(i) { return i.fromUserId; })
-      .uniq()
       .value();
 
     var allFileAndVersionIds = _(items).chain()
@@ -277,7 +277,6 @@ function EmailStrategy() {
       .filter(predicates.notNull)
       .flatten()
       .map(function(f) { return { fileId: f.fileId, version: f.version }; })
-      .uniq()
       .value();
 
     execPreloads([{
@@ -336,7 +335,7 @@ function ConversationMinStrategy()  {
 
     execPreloads([{
       strategy: userStategy,
-      data: _.uniq(lastUsers)
+      data: lastUsers
     }], callback);
   };
 
@@ -393,7 +392,7 @@ function UnreadItemStategy(options) {
 
 function AllUnreadItemCountStategy(options) {
   var self = this;
-  var userId = options.userId;
+  var userId = options.userId || options.currentUserId;
 
   this.preload = function(troupeIds, callback) {
     var promises = troupeIds.map(function(i) {
@@ -429,7 +428,7 @@ function AllUnreadItemCountStategy(options) {
 
 function LastTroupeAccessTimesForUserStrategy(options) {
   var self = this;
-  var userId = options.userId;
+  var userId = options.userId || options.currentUserId;
 
   this.preload = function(data, callback) {
     userService.getTroupeLastAccessTimesForUser(userId, function(err, times) {
@@ -446,7 +445,7 @@ function LastTroupeAccessTimesForUserStrategy(options) {
 
 function FavouriteTroupesForUserStrategy(options) {
   var self = this;
-  var userId = options.userId;
+  var userId = options.userId || options.currentUserId;
 
   this.preload = function(data, callback) {
     troupeService.findFavouriteTroupesForUser(userId, function(err, favs) {
@@ -479,7 +478,7 @@ function ChatStrategy(options)  {
     if(userStategy) {
       strategies.push({
         strategy: userStategy,
-        data: _.uniq(users)
+        data: users
       });
     }
 
@@ -493,7 +492,7 @@ function ChatStrategy(options)  {
     if(troupeStrategy) {
       strategies.push({
         strategy: troupeStrategy,
-        data: _.uniq(items.map(function(i) { return i.toTroupeId; }))
+        data: items.map(function(i) { return i.toTroupeId; })
       });
     }
 
@@ -603,22 +602,33 @@ function InviteStrategy(options) {
   if(!options) options = {};
 
   var troupeIdStrategy = new TroupeIdStrategy(options);
+  var userIdStrategy = new UserIdStrategy(options);
 
   this.preload = function(invites, callback) {
-    var troupeIds = invites.map(function(invite) { return invite.troupeId; });
-    troupeIdStrategy.preload(troupeIds, callback);
+    execPreloads([{
+      strategy: troupeIdStrategy,
+      data: invites.map(function(invite) { return invite.troupeId; }).filter(predicates.notNull)
+    },{
+      strategy: userIdStrategy,
+      data: invites.map(function(invite) { return invite.fromUserId; }).filter(predicates.notNull)
+    }], callback);
+
   };
 
   this.map = function(item) {
-    var troupe = troupeIdStrategy.map(item.troupeId);
+    var troupe = item.troupeId && troupeIdStrategy.map(item.troupeId);
+    var fromUser = item.fromUserId && userIdStrategy.map(item.fromUserId); // In future, all invites will have a fromUserId
+
+    if(!troupe && !fromUser) {
+      return; // This invite is broken.... Data maintenance to remove
+    }
+
     return {
       id: item._id,
-      troupeUrl: (troupe) ? '/' + troupe.uri : undefined,
-      troupeName: (troupe) ? troupe.name : undefined,
-      senderDisplayName: item.senderDisplayName,
-      // displayName: item.displayName,
-      // email: item.email,
-      // avatarUrlSmall: '/images/2/avatar-default.png', // TODO: fix
+      oneToOneInvite: !!fromUser,
+      fromUser: fromUser,
+      acceptUrl: troupe ? '/' + troupe.uri : fromUser.url,
+      name: troupe ? troupe.name : fromUser.displayName,
       v: getVersion(item)
     };
   };
@@ -640,13 +650,24 @@ function TroupeUserStrategy(options) {
 function TroupeStrategy(options) {
   if(!options) options = {};
 
+  var stack;
+  if(!options.currentUserId) {
+    try {
+      throw new Error();
+    } catch(e) {
+      stack = e.stack;
+    }
+  }
+
   var currentUserId = options.currentUserId;
 
-  var unreadItemStategy = options.currentUserId ? new AllUnreadItemCountStategy({ userId: options.currentUserId }) : null;
-  var lastAccessTimeStategy = options.currentUserId ? new LastTroupeAccessTimesForUserStrategy({ userId: options.currentUserId }) : null;
-  var favouriteStrategy = options.currentUserId ? new FavouriteTroupesForUserStrategy({ userId: options.currentUserId }) : null;
 
-  var userIdStategy = options.mapUsers || currentUserId ? new UserIdStrategy() : null;
+  var unreadItemStategy = currentUserId ? new AllUnreadItemCountStategy(options) : null;
+  var lastAccessTimeStategy = currentUserId ? new LastTroupeAccessTimesForUserStrategy(options) : null;
+  var favouriteStrategy = currentUserId ? new FavouriteTroupesForUserStrategy(options) : null;
+
+  var userIdStategy = new UserIdStrategy(options);
+
   this.preload = function(items, callback) {
 
     var strategies = [];
@@ -674,58 +695,64 @@ function TroupeStrategy(options) {
       });
     }
 
-    if(userIdStategy) {
-
-      var userIds;
-      if(options.mapUsers) {
-        userIds = _.flatten(items.map(function(troupe) { return troupe.getUserIds(); }));
-      } else {
-        userIds = [];
-      }
-
-      // If the currentUserOption has been set, then we will output
-      // a user node on the serialized troupe.
-      if(options.currentUserId) {
-        items.forEach(function(troupe) {
-          if(troupe.oneToOne) {
-            userIds = userIds.concat(troupe.getUserIds());
-          }
+    var userIds;
+    if(options.mapUsers) {
+      userIds = _.flatten(items.map(function(troupe) { return troupe.getUserIds(); }));
+    } else {
+      userIds = _.flatten(items.map(function(troupe) {
+          if(troupe.oneToOne) return troupe.getUserIds();
+        })).filter(function(f) {
+          return !!f;
         });
-      }
-
-      userIds = _.uniq(userIds);
-
-      strategies.push({
-        strategy: userIdStategy,
-        data: userIds
-      });
 
     }
+
+    strategies.push({
+      strategy: userIdStategy,
+      data: userIds
+    });
+
 
     execPreloads(strategies, callback);
   };
 
   function mapOtherUser(users) {
+
     var otherUser = users.filter(function(troupeUser) {
-      return troupeUser.userId != currentUserId;
+      return '' + troupeUser.userId !== '' + currentUserId;
     })[0];
+
     if(otherUser) {
-      return userIdStategy.map(otherUser.userId);
+      var user = userIdStategy.map(otherUser.userId);
+      if(user) {
+        return user;
+      }
     }
   }
-
+  var shownWarning = false;
   this.map = function(item) {
-    var otherUser = item.oneToOne && currentUserId ? mapOtherUser(item.users) : undefined;
-    var troupeName, troupeUrl;
+
+    var troupeName, troupeUrl, otherUser;
     if(item.oneToOne) {
+      if(currentUserId) {
+        otherUser =  mapOtherUser(item.users);
+      } else {
+        console.log('');
+        if(!shownWarning) {
+          console.log('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
+          console.log(stack.join('\n'));
+          shownWarning = true;
+        }
+      }
+
+
       if(otherUser) {
         troupeName = otherUser.displayName;
-        troupeUrl = "/one-one/" + otherUser.id;
+        troupeUrl = otherUser.username ? "/" + otherUser.username : "/one-one/" + otherUser.id;
       } else {
-        winston.verbose("Unable to map troupe bits as something has gone horribly wrong");
+        winston.verbose("Troupe " + item.id + " appears to contain bad users", { users: item.toObject().users });
         // This should technically never happen......
-        troupeName = null;
-        troupeUrl = null;
+        return undefined;
       }
     } else {
         troupeName = item.name;
@@ -783,7 +810,7 @@ function TroupeIdStrategy(options) {
 function RequestStrategy(options) {
   if(!options) options = {};
 
-  var userStategy = new UserIdStrategy();
+  var userStategy = new UserIdStrategy({includeEmail: true});
   var unreadItemStategy = new UnreadItemStategy({ itemType: 'request' });
 
   this.preload = function(requests, callback) {
@@ -791,7 +818,7 @@ function RequestStrategy(options) {
 
     var strategies = [{
       strategy: userStategy,
-      data: _.uniq(userIds)
+      data: userIds
     }];
 
     if(options.currentUserId) {
@@ -858,10 +885,17 @@ function serialize(items, strat, callback) {
       return callback(err);
     }
 
-    callback(null, pkg(items.map(strat.map)));
+    callback(null, pkg(items.map(strat.map).filter(function(f) { return f !== undefined; })));
   });
 
 }
+
+function serializeQ(items, strat) {
+  var d = Q.defer();
+  serialize(items, strat, d.makeNodeResolver());
+  return d.promise;
+}
+
 
 // TODO: deprecate this....
 function getStrategy(modelName, toCollection) {
@@ -947,6 +981,7 @@ function serializeModel(model, callback) {
   serialize(model, strategy, callback);
 }
 
+
 module.exports = {
   UserStrategy: UserStrategy,
   UserIdStrategy: UserIdStrategy,
@@ -965,5 +1000,6 @@ module.exports = {
   getStrategy: getStrategy,
   execPreloads: execPreloads,
   serialize: serialize,
+  serializeQ: serializeQ,
   serializeModel: serializeModel
 };
