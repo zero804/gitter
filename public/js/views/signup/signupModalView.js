@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 define([
   'jquery',
@@ -8,36 +8,21 @@ define([
   'utils/validate-wrapper', // No reference
   'jquery-placeholder' // No reference
 ], function($, _, TroupeViews, template) {
+  "use strict";
+
   return TroupeViews.Base.extend({
     template: template,
 
     initialize: function(options) {
       _.bindAll(this, 'onFormSubmit');
-      if (!options) return;
-      this.existingUser = options.existingUser;
     },
 
     events: {
       "submit form": "onFormSubmit"
     },
 
-    getRenderData: function() {
-      if (window.troupeContext) {
-        userId = window.troupeContext.user.id;
-        return {
-          existingUser: this.existingUser,
-          userId: userId
-        };
-      } else {
-        return {
-          existingUser: this.existingUser
-        };
-     }
-    },
-
     afterRender : function() {
       this.validateForm();
-      this.$el.find('#troupeName').placeholder();
       this.$el.find('#email').placeholder();
     },
 
@@ -51,13 +36,9 @@ define([
           $('#failure-text').html(errors);
         },
         messages: {
-          troupeName: {
-            minlength: "Please choose a longer name for your Troupe, it needs to be at least 4 letters.",
-            required: "Please choose a name for your Troupe. "
-          },
-        email : {
-          required: "We need to know your email address",
-          email: "Hmmm, that doesn't look like your email address."
+          email : {
+            required: "We need to know your email address",
+            email: "Hmmm, that doesn't look like your email address."
           }
         }
         });
@@ -73,20 +54,25 @@ define([
         contentType: "application/json",
         dataType: "json",
         data: JSON.stringify({
-          troupeName: form.find("input[name=troupeName]").val(),
           email: form.find("input[name=email]").val()
         }),
         type: "POST",
         success: function(data) {
+          // data = { email, success, userStatus, username }
           if (data.redirectTo) {
             window.location.href = "/" + data.redirectTo;
+          }
+          else if (data.userStatus === 'ACTIVE') {
+            // forward to a login prompt
+            $(document).trigger('login-prompt', { email: data.email });
           }
           else {
              that.trigger('signup.complete', data);
            }
         }
       });
-    }
+    },
+
 
   });
 

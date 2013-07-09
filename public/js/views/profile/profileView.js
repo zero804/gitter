@@ -1,14 +1,17 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'views/base',
   'hbs!./tmpl/profileView',
   'fineuploader',
+  'views/widgets/avatar',
   'utils/validate-wrapper',
   'jquery-placeholder'  // No reference
-], function($, _, TroupeViews, template, qq, validation) {
+], function($, _, context, TroupeViews, template, qq, AvatarView, validation) {
+  "use strict";
 
   var View = TroupeViews.Base.extend({
     template: template,
@@ -19,6 +22,7 @@ define([
       this.originalEmail = window.troupeContext.user.email;
       this.existingUser = options.existingUser;
       this.isExistingUser = !window.troupeContext.profileNotCompleted;
+      if (this.compactView) $("#uvTab").hide();
     },
 
     getRenderData: function() {
@@ -58,18 +62,23 @@ define([
         },
         callbacks: {
           onSubmit: function(/*id, fileName*/) {
-            // display spinner
-            // self.$el.find('.trpDisplayPicture').css('background', 'url("/images/2/troupe-ajax-guy.gif") center center no-repeat');
-            self.$el.find('.trpDisplayPicture').replaceWith('<img src="/images/2/troupe-ajax-guy-green.gif" class="trpSpinner"/>');
+
+            var $el = self.$el.find('#frame-profile');
+            self.removeSubViews($el);
+            $el.empty().html('<img src="/images/2/troupe-ajax-guy-green.gif" class="trpSpinner"/>');
           },
           // return false to cancel submit
           onComplete: function(id, fileName, response) {
             if(response.success) {
               window.troupeContext.user.avatarUrlSmall = response.user.avatarUrlSmall;
               window.troupeContext.user.avatarUrlMedium = response.user.avatarUrlMedium;
+              $(document).trigger('avatar:change', window.troupeContext.user);
             } else {
               // TODO: deal with this!
             }
+
+            self.$el.find('#frame-profile').empty().append(new AvatarView({ user: window.troupeContext.user }).render().el);
+
           }
         }
       });

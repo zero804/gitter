@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true*/
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
   './realtime',
@@ -16,6 +16,8 @@ define([
       return;
     }
 
+    var clientRef = realtime.getClientRef();
+
     $.ajax({
       url: '/api/v1/eyeballs',
       data: {
@@ -31,7 +33,7 @@ define([
         400: function() {
           // The connection is gone...
           log('Eyeballs returned 400. Recycling realtime connection.');
-          realtime.recycleConnection();
+          realtime.recycleConnection(clientRef);
         }
       },
       error: function() {
@@ -183,6 +185,7 @@ define([
     inactivityTimer = null;
   }
 
+  // We use this to ensure that the users session does not time out
   window.setInterval(function() {
     $.ajax({
       url: '/api/v1/ping',

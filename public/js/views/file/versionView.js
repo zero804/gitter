@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 define([
   'jquery',
@@ -7,6 +7,8 @@ define([
   'views/base',
   'hbs!./tmpl/versionView'
 ], function($, _, Backbone, TroupeViews, template){
+  "use strict";
+
   return TroupeViews.Base.extend({
     template: template,
 

@@ -1,14 +1,21 @@
 #!/usr/bin/env mocha --ignore-leaks
-
 /*jslint node:true, unused:true*/
-/*global describe:true, it:true, afterEach:true, before:true */
+/*global describe:true, it:true, before:true */
 "use strict";
 
-var testRequire = require('../test-require');
 
+var testRequire = require('../test-require');
+var fixtureLoader = require('../test-fixtures');
+
+var Q = require("Q");
 var assert = require("assert");
 var persistence = testRequire("./services/persistence-service");
 var mockito = require('jsmockito').JsMockito;
+
+var times = mockito.Verifiers.times;
+var once = times(1);
+
+Q.longStackSupport = true;
 
 var times = mockito.Verifiers.times;
 var once = times(1);
@@ -39,24 +46,30 @@ function testDelayedInvite(email, troupeUri, isOnline, done) {
       status: "ACTIVE" }, function(err, user) {
         if(err) return done(err);
 
-        troupeService.inviteUserToTroupe(troupe, "Test User 1", { userId: user.id }, function(err, invite) {
+        troupeService.createInvite(troupe, { fromUser: fixture.user1, userId: user.id }, function(err, invite) {
           if(err) return done(err);
 
-          if (isOnline) {
-            assert(!invite.emailSentAt, "The emailSentAt property should be null");
-            mockito.verifyZeroInteractions(emailNotificationServiceMock);
-          } else {
-            assert(invite.emailSentAt, "The emailSentAt property should not be null");
-            mockito.verify(emailNotificationServiceMock, once);
-          }
+          return persistence.Invite.findByIdQ(invite.id)
+            .then(function(invite) {
 
-          troupeService.sendPendingInviteMails(0, function(err, count) {
-            if (err) return done(err);
+              if (isOnline) {
+                assert(!invite.emailSentAt, "The emailSentAt property should be null");
+                mockito.verifyZeroInteractions(emailNotificationServiceMock);
+              } else {
+                assert(invite.emailSentAt, "The emailSentAt property should not be null");
+                mockito.verify(emailNotificationServiceMock, once);
+              }
 
-            assert(count >= 1);
+              return troupeService.sendPendingInviteMails(0, function(err, count) {
+                if (err) return done(err);
 
-            done();
-          });
+                assert(count >= 1, 'Send pending invite emails returned ' + count);
+
+                done();
+              });
+
+            });
+
 
         });
 
@@ -81,27 +94,36 @@ function testInviteAcceptance(email, done) {
       status: "ACTIVE" }, function(err, user) {
         if(err) return done(err);
 
-        troupeService.inviteUserToTroupe(troupe, "Test User 1", { userId: user.id }, function(err, invite) {
+        troupeService.createInvite(troupe, { fromUser: fixture.user1, userId: user.id }, function(err, invite) {
           if(err) return done(err);
 
-          troupeService.acceptInviteForAuthenticatedUser(user, invite.id, function(err) {
-            if(err) return done(err);
 
-            persistence.Troupe.findOne({ uri: troupeUri }, function(err, troupe2) {
-              if(err) return done(err);
+          return persistence.Invite.findByIdQ(invite.id)
+            .then(function(invite) {
+              assert(invite, 'Invite does not exist');
 
-              assert(troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
-              assert(troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
+              return troupeService.acceptInviteForAuthenticatedUser(user, invite)
+                .then(function() {
 
-              persistence.Invite.findOne({ id: invite.id }, function(err, r2) {
-                if(err) return done(err);
+                  persistence.Troupe.findOne({ uri: troupeUri }, function(err, troupe2) {
+                    if(err) return done(err);
 
-                assert(!r2, 'Invite should be deleted');
-                return done();
-              });
+                    assert(troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
+                    assert(troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
+
+                    persistence.Invite.findOne({ id: invite.id }, function(err, r2) {
+                      if(err) return done(err);
+
+                      assert(!r2, 'Invite should be deleted');
+                      return done();
+                    });
+                  });
+                })
+                .fail(done);
+
             });
 
-          });
+
         });
 
       });
@@ -125,27 +147,34 @@ function testInviteRejection(email, done) {
       status: "ACTIVE" }, function(err, user) {
         if(err) return done(err);
 
-        troupeService.inviteUserToTroupe(troupe, "Test User 1", { userId: user.id }, function(err, invite) {
+        troupeService.createInvite(troupe, { fromUser: fixture.user1, userId: user.id }, function(err, invite) {
           if(err) return done(err);
 
-          troupeService.rejectInviteForAuthenticatedUser(user, invite.id, function(err) {
-            if(err) return done(err);
+          return persistence.Invite.findByIdQ(invite.id)
+            .then(function(invite) {
+              assert(invite, 'Invite does not exist');
 
-            persistence.Troupe.findOne({ uri: troupeUri }, function(err, troupe2) {
-              if(err) return done(err);
+              return troupeService.rejectInviteForAuthenticatedUser(user, invite)
+                .then(function() {
+                  persistence.Troupe.findOne({ uri: troupeUri }, function(err, troupe2) {
+                    if(err) return done(err);
 
-              assert(!troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
-              assert(!troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
+                    assert(!troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
+                    assert(!troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
 
-              persistence.Invite.findOne({ id: invite.id }, function(err, r2) {
-                if(err) return done(err);
+                    persistence.Invite.findOne({ id: invite.id }, function(err, r2) {
+                      if(err) return done(err);
 
-                assert(!r2, 'Invite should be deleted');
-                return done();
-              });
+                      assert(!r2, 'Invite should be deleted');
+                      return done();
+                    });
+                  });
+
+                })
+                .fail(done);
+
             });
 
-          });
         });
 
       });
@@ -158,38 +187,63 @@ function testRequestAcceptance(email, userStatus, emailNotificationConfirmationM
     './email-notification-service': emailNotificationServiceMock
   });
 
-  persistence.Troupe.findOne({ uri: 'testtroupe1' }, function(err, troupe) {
-    if(err) return done(err);
+  var troupe = fixture.troupe1;
 
-    persistence.User.create({
+  persistence.User.createQ({
       email: email,
       displayName: 'Test User ' + new Date(),
       confirmationCode: null,  // IMPORTANT. This is the point of the test!!!
-      status: userStatus }, function(err, user) {
-        if(err) return done(err);
+      status: userStatus })
+    .then(function(user) {
 
-        troupeService.addRequest(troupe.id, user.id, function(err, request) {
-          if(err) return done(err);
+      return troupeService.addRequest(troupe, user)
+        .then(function(request) {
 
-          troupeService.acceptRequest(request, function(err) {
-            if(err) return done(err);
 
-            mockito.verify(emailNotificationServiceMock, once)[emailNotificationConfirmationMethod]();
+          return persistence.Request.findByIdQ(request.id)
+            .then(function(request) {
 
-            persistence.Troupe.findOne({ uri: 'testtroupe1' }, function(err, troupe2) {
-              if(err) return done(err);
+              if(user.status !== 'UNCONFIRMED')
+                return;
+
+              assert(!request, 'request should not exist as user is not confirmed');
+              user.status = 'ACTIVE';
+              return user.saveQ()
+                .then(function() {
+                  return Q.all([
+                      troupeService.updateUnconfirmedRequestsForUserId(user.id)
+                    ]);
+                });
+
+
+            })
+            .then(function() {
+              // The requests should exist at this point
+              return persistence.Request.findByIdQ(request.id)
+                .then(function(request) {
+                  assert(request, 'request does not exist');
+
+                  return troupeService.acceptRequest(request);
+
+                });
+              });
+
+
+        })
+        .then(function() {
+
+          mockito.verify(emailNotificationServiceMock, once)[emailNotificationConfirmationMethod]();
+
+          return persistence.Troupe.findOneQ({ uri: 'testtroupe1' })
+            .then(function(troupe2) {
 
               assert(troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
               assert(troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
 
-              done();
             });
-
-          });
         });
-
-      });
-  });
+    })
+    .nodeify(done);
 }
 
 
@@ -199,68 +253,41 @@ function testRequestRejection(email, userStatus, done) {
     './email-notification-service': emailNotificationServiceMock
   });
 
-  persistence.Troupe.findOne({ uri: 'testtroupe1' }, function(err, troupe) {
-    if(err) return done(err);
+  persistence.User.create({
+    email: email,
+    displayName: 'Test User ' + new Date(),
+    confirmationCode: null,  // IMPORTANT. This is the point of the test!!!
+    status: userStatus }, function(err, user) {
+      if(err) return done(err);
 
-    persistence.User.create({
-      email: email,
-      displayName: 'Test User ' + new Date(),
-      confirmationCode: null,  // IMPORTANT. This is the point of the test!!!
-      status: userStatus }, function(err, user) {
-        if(err) return done(err);
+      troupeService.addRequest(fixture.troupe1, user)
+        .then(function(request) {
 
-        troupeService.addRequest(troupe.id, user.id, function(err, request) {
-          if(err) return done(err);
-
-          troupeService.rejectRequest(request, function(err) {
-            if(err) return done(err);
-
+        troupeService.rejectRequest(request)
+          .then(function() {
             mockito.verifyZeroInteractions(emailNotificationServiceMock);
 
-            persistence.Troupe.findOne({ uri: 'testtroupe1' }, function(err, troupe2) {
+            assert(!troupeService.userHasAccessToTroupe(user, fixture.troupe2), 'User has not been granted access to the troupe');
+            assert(!troupeService.userIdHasAccessToTroupe(user.id, fixture.troupe2), 'User has not been granted access to the troupe');
+
+            persistence.Request.findOne({ id: request.id }, function(err, r2) {
               if(err) return done(err);
 
-              assert(!troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
-              assert(!troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
-
-              persistence.Request.findOne({ id: request.id }, function(err, r2) {
-                if(err) return done(err);
-
-                assert(!r2, 'Request should have been deleted');
-                return done();
-              });
+              assert(!r2, 'Request should have been deleted');
+              return done();
             });
 
-          });
         });
-
       });
-  });
-}
 
-function cleanup(done) {
-  persistence.User.findOne({ email: "testuser@troupetest.local" }, function(e, user) {
-    if(e) return done(e);
-    if(!user) return done("User not found");
-
-    persistence.User.findOne({ email: "testuser2@troupetest.local" }, function(e, user2) {
-      if(e) return done(e);
-      if(!user2) return done("User2 not found");
-
-      persistence.Troupe.update({ uri: "testtroupe1" }, { users: [ { userId: user._id }, { userId: user2._id } ] }, function(err, numResults) {
-        if(err) return done(err);
-        if(numResults !== 1) return done("Expected one update result");
-        done();
-      });
     });
-  });
 }
 
 describe('troupe-service', function() {
 
   describe('#acceptRequest()', function() {
-    it('should allow an ACTIVE user (without a confirmation code) request to be accepted', function(done) {
 
+    it('should allow an ACTIVE user (without a confirmation code) request to be accepted', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
 
       testRequestAcceptance(nonExistingEmail, 'ACTIVE', 'sendRequestAcceptanceToUser', done);
@@ -269,7 +296,7 @@ describe('troupe-service', function() {
     it('should allow an UNCONFIRMED user (without a confirmation code) request to be accepted', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
 
-      testRequestAcceptance(nonExistingEmail, 'UNCONFIRMED', 'sendConfirmationForNewUserRequest', done);
+      testRequestAcceptance(nonExistingEmail, 'UNCONFIRMED', 'sendRequestAcceptanceToUser', done);
     });
 
 
@@ -280,6 +307,7 @@ describe('troupe-service', function() {
     });
 
   });
+
 
   describe('#rejectRequest()', function() {
     it('should delete a rejected request from an ACTIVE user', function(done) {
@@ -297,6 +325,222 @@ describe('troupe-service', function() {
     it('should delete an invite and add user to the troupe', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
       testInviteAcceptance(nonExistingEmail, done);
+    });
+  });
+
+
+  describe('#acceptInvite', function() {
+    it('should handle users inviting non-registered users to connect multiple times, while only creating a single invite', function(done) {
+      var troupeService = testRequire("./services/troupe-service");
+
+      var email =  'test' + Date.now() + '@troupetest.local';
+
+      // Have another user invite them to a one to one chat
+      return troupeService.createInvite(null, {
+          fromUser: fixture.user1,
+          email: email
+        }).then(function(invite1) {
+          return troupeService.createInvite(null, {
+              fromUser: fixture.user1,
+              email: email
+            }).then(function(invite2) {
+              // Don't create a second invite - should return the same one
+              assert.equal(invite1.id, invite2.id);
+
+              return troupeService.createInvite(null, {
+                  fromUser: fixture.user2,
+                  email: email
+                }).then(function(invite3) {
+                  assert.notEqual(invite1.id, invite3.id);
+                });
+
+            });
+        }).nodeify(done);
+    });
+
+    it('should handle users inviting registered users to connect multiple times, and deal with troupe and onetoone invites correctly', function(done) {
+      var troupeService = testRequire("./services/troupe-service");
+
+      // Have another user invite them to a one to one chat
+      return troupeService.createInvite(null, {
+          fromUser: fixture.user1,
+          userId: fixture.userNoTroupes.id
+        }).then(function(invite1) {
+          return troupeService.createInvite(fixture.troupe1, {
+              fromUser: fixture.user1,
+              userId: fixture.userNoTroupes.id
+            }).then(function(invite2) {
+              // Make sure there are now two invites
+              assert.notEqual(invite1.id, invite2.id);
+
+              return troupeService.createInvite(fixture.troupe1, {
+                  fromUser: fixture.user1,
+                  userId: fixture.userNoTroupes.id
+                }).then(function(invite3) {
+                  // Should reuse the last invite
+                  assert.equal(invite2.id, invite3.id);
+
+                  return troupeService.createInvite(null, {
+                      fromUser: fixture.user1,
+                      userId: fixture.userNoTroupes.id
+                    }).then(function(invite4) {
+                      // Should reuse the first invite
+                      assert.equal(invite1.id, invite4.id);
+                    });
+
+                });
+
+            });
+        }).nodeify(done);
+    });
+
+    it('When two users with implicit connections invite, it should simply create a troupe for them and return null', function(done) {
+      var troupeService = testRequire("./services/troupe-service");
+
+      // Have another user invite them to a one to one chat
+      return troupeService.createInvite(null, {
+          fromUser: fixture.user1,
+          userId: fixture.user2.id
+        }).then(function(invite1) {
+          assert.strictEqual(invite1, null);
+
+          return troupeService.findOneToOneTroupe(fixture.user1.id, fixture.user2.id)
+            .then(function(troupe) {
+              assert(troupe);
+            });
+
+        }).nodeify(done);
+    });
+
+    it('should make an UNCONFIRMED user PROFILE_NOT_COMPLETED on accepting a one-to-one invite and should update any unconfirmed invites to that user', function(done) {
+      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+
+      var troupeService = testRequire.withProxies("./services/troupe-service", {
+        './email-notification-service': emailNotificationServiceMock
+      });
+
+      // Create a new UNCONFIRMED user
+      persistence.User.createQ({
+          email: 'test' + Date.now() + '@troupetest.local',
+          displayName: 'Test User ' + new Date(),
+          confirmationCode: null,
+          status: 'UNCONFIRMED' })
+        .then(function(user) {
+
+          // Have another user invite them to a one to one chat
+          return troupeService.createInvite(null, {
+            fromUser: fixture.user1,
+            userId: user.id
+          }).then(function(invite) {
+            mockito.verify(emailNotificationServiceMock).sendConnectInvite();
+
+            // Now have the new UNCONFIRMED USER invite someone to connect
+            return troupeService.createInvite(null, {
+              fromUser: user,
+              userId: fixture.user2.id
+            }).then(function(secondInvite) {
+
+              assert.equal(secondInvite.status, 'UNUSED');
+
+              // Make sure that the invite is in the InviteUnconfirmed collection
+              return persistence.InviteUnconfirmed.findByIdQ(secondInvite._id)
+                .then(function(invite) {
+                  assert(invite);
+                })
+                .then(function() {
+
+                  // Have user one accept the INVITE
+                  return troupeService.acceptInvite(invite.code, fixture.user1.getHomeUrl())
+                    .then(function(result) {
+
+                      var user2 = result.user;
+                      assert(!result.alreadyUsed, 'Invite has not already been used');
+                      assert.equal(user2.id, user.id);
+                      assert.equal(user2.status, 'PROFILE_NOT_COMPLETED');
+
+                      return troupeService.findOneToOneTroupe(fixture.user1.id, user2.id)
+                        .then(function(newTroupe) {
+                          assert(newTroupe, 'A troupe should exist for the users');
+
+
+                          // Now we should also check that the invites that we UNCONFIRMED have been sent out
+                          // and are now set to UNUSED
+                          return persistence.Invite.findQ({ fromUserId: user.id })
+                            .then(function(invites) {
+                              assert(invites.length == 1);
+                              assert.equal(invites[0].status, 'UNUSED');
+                            });
+                        });
+
+                    });
+                });
+
+            });
+
+
+          });
+
+        })
+        .nodeify(done);
+    });
+
+    it('should make an UNCONFIRMED user PROFILE_NOT_COMPLETED on accepting a troupe invite and should update any unconfirmed invites to that user', function(done) {
+      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+
+      var troupeService = testRequire.withProxies("./services/troupe-service", {
+        './email-notification-service': emailNotificationServiceMock
+      });
+
+      var email = 'test' + Date.now() + '@troupetest.local';
+      var displayName =  'Test User ' + new Date();
+
+      // Have another user invite them to a one to one chat
+      return troupeService.createInvite(fixture.troupe1, {
+        fromUser: fixture.user1,
+        email: email,
+        displayName: displayName
+      }).then(function(invite) {
+        assert.equal(invite.status, 'UNUSED');
+
+        mockito.verify(emailNotificationServiceMock).sendInvite();
+
+        // Now have the new UNCONFIRMED USER invite someone to connect
+        return troupeService.createInvite(fixture.troupe2, {
+          fromUser: fixture.user2,
+          email: email,
+          displayName: displayName
+        }).then(function(secondInvite) {
+          assert.equal(secondInvite.status, 'UNUSED');
+
+          // Have user one accept the INVITE
+          return troupeService.acceptInvite(invite.code, fixture.troupe1.uri)
+            .then(function(result) {
+
+              var newUser = result.user;
+              assert(!result.alreadyUsed, 'Invite has not already been used');
+              assert.equal(newUser.status, 'PROFILE_NOT_COMPLETED');
+              assert.equal(newUser.displayName, displayName);
+              assert.equal(newUser.email, email);
+
+              return troupeService.findById(fixture.troupe1.id)
+                .then(function(troupe1Reloaded) {
+                  assert(troupe1Reloaded.containsUserId(newUser.id) ,'New user should have access to troupe');
+
+                  // Now we should also check that the invites that we UNCONFIRMED have been sent out
+                  // and are now set to UNUSED
+                  return persistence.Invite.findByIdQ(secondInvite)
+                    .then(function(secondInviteReloaded) {
+                      assert.equal(secondInviteReloaded.status, 'UNUSED');
+                      assert.equal(secondInviteReloaded.userId, newUser.id);
+                    });
+                });
+
+            });
+        });
+
+
+      })
+      .nodeify(done);
     });
   });
 
@@ -470,6 +714,7 @@ describe('troupe-service', function() {
           if(err) return done(err);
           if(!troupe) return done("Cannot find troupe");
 
+          assert(troupe.containsUserId(user.id),'Expected user1 to be in the testtroupe1');
           troupeService.findBestTroupeForUser(user, function(err, troupe) {
             if(err) return done(err);
 
@@ -489,69 +734,76 @@ describe('troupe-service', function() {
     var troupeService = testRequire('./services/troupe-service');
 
     it('should handle the upgrade of a oneToOneTroupe', function(done) {
+      troupeService.findOrCreateOneToOneTroupe(fixture.user1.id, fixture.user2.id)
+        .spread(function(troupe) {
+          if(!troupe) throw 'Cannot findOrCreateOneToOneTroupe troupe';
 
-      troupeService.findOrCreateOneToOneTroupe(fixture.user1.id, fixture.user2.id, function(err, troupe) {
-        if(err) return done(err);
-        if(!troupe) return done('Cannot find troupe');
+          var name = 'Upgraded one-to-one ' + new Date();
+          var inviteEmail =  'testinvite' + Date.now() + '@troupetest.local';
 
-        var name = 'Upgraded one-to-one ' + new Date();
-        var inviteEmail =  'testinvite' + Date.now() + '@troupetest.local';
+          // Now test the upgrade......
+          return troupeService.createNewTroupeForExistingUser({
+              user: fixture.user1,
+              name: name,
+              oneToOneTroupeId: troupe._id,
+              invites: [
+                { displayName: 'John McTestaroo', email: inviteEmail }
+              ]
+            })
+            .then(function(newTroupe) {
+              assert(newTroupe, 'New Troupe not created');
+              assert(newTroupe.name === name, 'New Troupe name is wrong');
 
-        troupeService.createNewTroupeForExistingUser({
-          user: fixture.user1,
-          name: name,
-          oneToOneTroupeId: troupe.id,
-          invites: [
-            { displayName: 'John McTestaroo', email: inviteEmail }
-          ]
-        }, function(err, newTroupe) {
-          if(err) return done(err);
-          if(!newTroupe) return done('New troupe not created');
+              assert(troupeService.userIdHasAccessToTroupe(fixture.user1.id, newTroupe), 'User1 is supposed to be in the new troupe');
+              assert(troupeService.userIdHasAccessToTroupe(fixture.user2.id, newTroupe), 'User2 is supposed to be in the new troupe');
 
-          assert(newTroupe.name === name, 'New Troupe name is wrong');
+              return persistence.Invite.findOneQ({ email: inviteEmail, troupeId: newTroupe.id })
+                .then(function(invite) {
 
-          assert(troupeService.userIdHasAccessToTroupe(fixture.user1.id, newTroupe), 'User1 is supposed to be in the new troupe');
-          assert(troupeService.userIdHasAccessToTroupe(fixture.user2.id, newTroupe), 'User2 is supposed to be in the new troupe');
+                  assert(invite, 'Could not find the invite');
+                  assert(invite.displayName === 'John McTestaroo', 'Invite has an incorrect displayName');
 
-          persistence.Invite.findOne({ email: inviteEmail, troupeId: newTroupe.id }, function(err, invite) {
-            if(err) return done(err);
-            assert(invite, 'Could not find the invite');
-            assert(invite.displayName === 'John McTestaroo', 'Invite has an incorrect displayName');
+                  return troupeService.acceptInvite(invite.code, newTroupe.uri)
+                    .then(function(result) {
+                      var user = result.user;
+                      var alreadyUsed = result.alreadyUsed;
 
-            troupeService.acceptInvite(invite.code, newTroupe.uri, function(err, user, alreadyUsed) {
-              if(err) return done(err);
-              assert(!alreadyUsed, 'Expected alreadyUsed to be falsey');
-              assert(user, 'Expected the user to be confirmed');
+                      assert(!alreadyUsed, 'Expected alreadyUsed to be falsey');
+                      assert(user, 'Expected the user to be confirmed');
 
-              // The only reason this should work is that the user should still be PROFILE_NOT_COMPLETED
-              troupeService.acceptInvite(invite.code, newTroupe.uri, function(err, user, alreadyUsed) {
-                if(err) return done(err);
-                assert(!alreadyUsed, 'Expected alreadyUsed to be falsey');
-                assert(user, 'Expected the user to be returned');
+                      // The only reason this should work is that the user should still be PROFILE_NOT_COMPLETED
+                      return troupeService.acceptInvite(invite.code, newTroupe.uri)
+                        .then(function(result) {
+                          var alreadyUsed = result.alreadyUsed;
+                          var user = result.user;
 
-                persistence.User.update({ _id: user._id }, { status: 'ACTIVE'}, function(err, numResults) {
-                  if(err) return done(err);
-                  if(numResults !== 1) return done("Expected one update result");
+                          assert(!alreadyUsed, 'Expected alreadyUsed to be falsey');
+                          assert(user, 'Expected the user to be returned');
 
-                  troupeService.acceptInvite(invite.code, newTroupe.uri, function(err, user, alreadyUsed) {
-                    if(err) return done(err);
+                          return persistence.User.updateQ({ _id: user._id }, { status: 'ACTIVE'})
+                            .spread(function(numResults) {
+                              if(numResults !== 1) throw "Expected one update result, got " + numResults;
 
-                    assert(!user, 'User should not have been returned');
-                    assert(alreadyUsed, 'Expected alreadyUsed to be true');
-                    done();
-                  });
+                              return troupeService.acceptInvite(invite.code, newTroupe.uri)
+                                .then(function(result) {
+                                  var alreadyUsed = result.alreadyUsed;
+                                  var user = result.user;
 
+                                  assert(!user, 'User should not have been returned');
+                                  assert(alreadyUsed, 'Expected alreadyUsed to be true');
+                                });
+
+                            });
+
+                      });
+
+                    });
                 });
 
-              });
             });
+        })
+        .nodeify(done);
 
-
-          });
-        });
-
-
-      });
 
     });
 
@@ -711,25 +963,49 @@ describe('troupe-service', function() {
     });
   });
 
-  before(function(done) {
-    persistence.User.findOne({ email: 'testuser@troupetest.local' }, function(err, user1) {
-      if(err) return done(err);
+  describe('#findAllUserIdsForUnconnectedImplicitContacts', function() {
+    it('should find users who are implicitly connected to one another', function(done) {
+      var troupeService = testRequire('./services/troupe-service');
 
-      fixture.user1 = user1;
+      persistence.Troupe.createQ({ displayName: 'Test User 2', email:  'testuser-b' + Date.now() + '@troupetest.local', status: 'ACTIVE' })
+        .then(function(otherUser) {
 
-      persistence.User.findOne({ email: 'testuser2@troupetest.local' }, function(err, user2) {
-        if(err) return done(err);
+          return persistence.Troupe.createQ({ displayName: 'Test User', email:  'testuser' + Date.now() + '@troupetest.local', status: 'ACTIVE' })
+            .then(function(user) {
 
-        fixture.user2 = user2;
-        done();
+              return troupeService.createOneToOneTroupe(otherUser.id, user.id)
+                .then(function() {
 
-      });
+                  var troupe = new persistence.Troupe({ status: 'ACTIVE' });
+                  troupe.addUserById(fixture.user1.id);
+                  troupe.addUserById(user.id);
+                  troupe.addUserById(otherUser.id);
+                  return troupe.saveQ()
+                    .then(function() {
+
+                      return troupeService.findAllUserIdsForUnconnectedImplicitContacts(user.id)
+                        .then(function(userIds) {
+                          // The fixture.user1 user should be included as both users share a troupe
+                          // but don't have a explicit connection
+                          // The otherUser user should not be included as they share a troupe but DO
+                          // have an explicit connection (see the createOneToOneTroupe call!)
+                          assert.equal(userIds.length, 1);
+                          assert.equal(userIds[0], fixture.user1.id);
+                        });
+                    });
+
+                });
+
+
+            });
+        })
+        .nodeify(done);
+
     });
+
   });
 
-  afterEach(function(done) {
-    cleanup(done);
-  });
+  before(fixtureLoader(fixture));
 
 
 });

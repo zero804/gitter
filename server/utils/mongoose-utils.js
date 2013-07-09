@@ -1,5 +1,10 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
+var Q = require('q');
+var _ = require('underscore');
+
+var mongoose = require('mongoose-q')(require('mongoose'), {spread:true});
+var Schema = mongoose.Schema;
 
 exports.attachNotificationListenersToSchema = function (schema, options) {
   var ignoredPaths = options.ignoredPaths;
@@ -16,6 +21,7 @@ exports.attachNotificationListenersToSchema = function (schema, options) {
 
   if(options.onCreate || options.onUpdate) {
     schema.pre('save', function (next) {
+
       var isNewInstance = this.isNew;
 
       if(ignoredPaths) {
@@ -28,6 +34,7 @@ exports.attachNotificationListenersToSchema = function (schema, options) {
       this.get('_tv').increment();
 
       this.post('save', function(postNext) {
+
         if(isNewInstance) {
           if(options.onCreate) options.onCreate(this, postNext);
         } else {
@@ -46,3 +53,22 @@ exports.attachNotificationListenersToSchema = function (schema, options) {
   }
 
 };
+
+// Adapts a mongoose promise to q
+exports.monq = function(promise) {
+  var deferred = Q.defer();
+
+  promise.addCallback(deferred.resolve);
+  promise.addErrback(deferred.reject);
+
+  return deferred.promise;
+
+};
+
+exports.cloneSchema = function(schema) {
+  var tree = _.extend({}, schema.tree);
+  delete tree.id;
+  delete tree._id;
+  return new Schema(tree);
+}
+

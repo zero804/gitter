@@ -1,306 +1,234 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var troupeService = require("../services/troupe-service");
 var winston = require("winston");
 var userService = require("../services/user-service");
-var unreadItemService = require("../services/unread-item-service");
+var troupeService = require("../services/troupe-service");
 var restSerializer = require("../serializers/rest-serializer");
 var nconf = require('../utils/config');
 var middleware = require('../web/middleware');
 var oauthService = require("../services/oauth-service");
 var middleware = require('../web/middleware');
-var fileService = require("../services/file-service");
-var chatService = require("../services/chat-service");
-var Fiber = require("../utils/fiber");
-var conversationService = require("../services/conversation-service");
 var appVersion = require("../web/appVersion");
 var loginUtils = require('../web/login-utils');
-
+var uriService = require('../services/uri-service');
+var Q = require('q');
 var useFirebugInIE = nconf.get('web:useFirebugInIE');
 
-function renderAppPageWithTroupe(req, res, next, page, troupe, troupeName, data, options) {
-  if(!options) options = {};
+function serializeUser(user) {
+  var strategy = new restSerializer.UserStrategy({ includeEmail: true });
 
-  function serializeUserAndRenderPage(unreadItems) {
-    if(!req.user) return renderPage(unreadItems, null, null);
+  return restSerializer.serializeQ(user, strategy);
+}
 
-    var strategy = new restSerializer.UserStrategy({ includeEmail: true });
+function serializeHomeUser(user, includeEmail) {
+  var strategy = new restSerializer.UserStrategy({ includeEmail: includeEmail, hideLocation: true });
 
-    restSerializer.serialize(req.user, strategy, function(err, serialized) {
-      if(err) return next(err);
+  return restSerializer.serializeQ(user, strategy);
+}
 
-      oauthService.findOrGenerateWebToken(req.user.id, function(err, token) {
-        if(err) return next(err);
 
-        renderPage(unreadItems, serialized, token);
-      });
+function getWebToken(user) {
+  return oauthService.findOrGenerateWebToken(user.id);
+}
 
-    });
+function serializeTroupe(troupe, user) {
+  var strategy = new restSerializer.TroupeStrategy({ currentUserId: user ? user.id : null });
 
+  return restSerializer.serializeQ(troupe, strategy);
+}
+
+function fakeSerializedTroupe(uriContext) {
+  var oneToOne = uriContext.oneToOne;
+  var otherUser = uriContext.otherUser;
+  var troupe = uriContext.troupe;
+
+  var uri = (oneToOne ?  (otherUser.username || "one-one/" + otherUser.id ) : troupe.uri);
+
+  var url = "/" + uri;
+
+  return {
+    oneToOne: oneToOne,
+    uri: uri,
+    url: url,
+    name: otherUser && otherUser.username ? otherUser.username : 'Welcome'
+  };
+
+}
+
+
+
+function createTroupeContext(req, options) {
+
+  var disabledFayeProtocols = [];
+
+  var userAgent = req.headers['user-agent'];
+  userAgent = userAgent ? userAgent : '';
+
+  // Disable websocket on Mobile due to iOS crash bug
+  if(userAgent.indexOf('Mobile') >= 0) {
+    disabledFayeProtocols.push('websocket');
   }
-  serializeUserAndRenderPage(null);
+
+  var useFirebug = useFirebugInIE && userAgent.indexOf('MSIE') >= 0;
+
+  return {
+      user: options.user,
+      troupe: options.troupe,
+      homeUser: options.homeUser,
+      inUserhome: options.inUserhome,
+      accessToken: options.accessToken,
+      loginToAccept: req.loginToAccept,
+      profileNotCompleted: options.profileNotCompleted,
+      accessDenied: options.accessDenied,
+      inviteId: options.inviteId,
+      mobilePage: req.params && req.params.page,
+      appVersion: appVersion.getCurrentVersion(),
+      baseServer: nconf.get('web:baseserver'),
+      basePort: nconf.get('web:baseport'),
+      basePath: nconf.get('web:basepath'),
+      homeUrl: nconf.get('web:homeurl'),
+      mixpanelToken: nconf.get("stats:mixpanel:token"),
+
+      troupeUri: options.troupe ? options.troupe.uri : undefined,
+      websockets: {
+        fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
+        options: {
+          timeout: nconf.get('ws:fayeTimeout'),
+          retry: nconf.get('ws:fayeRetry')
+        },
+        disable: disabledFayeProtocols
+      },
+      useFirebug: useFirebug
+  };
+}
 
 
-  function renderPage(unreadItems, serializedUser, accessToken) {
-    var profileNotCompleted;
+function renderHomePage(req, res, next) {
+  var user = req.user;
 
-    if (req.user) {
-      var troupeStrategy = new restSerializer.TroupeStrategy({ currentUserId: (req.user) ? req.user.id : null, mapUsers: true });
-      restSerializer.serialize(troupe, troupeStrategy, function(err, troupeData) {
-        if(err) return next(err);
 
-        sendPage(troupeData);
+  Q.all([ serializeUser(user), getWebToken(user) ])
+    .spread(function(serializedUser, token) {
+      var profileNotCompleted = user.status == 'PROFILE_NOT_COMPLETED';
+      var troupeContext = createTroupeContext(req, {
+        user: serializedUser,
+        accessToken: token,
+        profileNotCompleted: profileNotCompleted,
+        inUserhome: true
       });
-    }
-    else {
-      sendPage(troupe);
-    }
 
-    function sendPage(troupeData) {
+      res.render('app-template', {
+        useAppCache: !!nconf.get('web:useAppCache'),
+        bootScriptName: 'router-homepage',
+        troupeName: req.user.displayName,
+        troupeContext: JSON.stringify(troupeContext),
+        troupeContextData: troupeContext
+      });
+    })
+    .fail(next);
 
-      var accessDenied, inviteId;
 
-      if(req.user) {
-        if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
-          accessDenied = true;
-          troupeData = null;
+}
 
-          // get the invite reference loaded in preload middleware (if any)
-          inviteId = (req.invite) ? req.invite.id : null;
-        }
+function renderAppPageWithTroupe(req, res, next, page) {
+  var user = req.user;
+  var troupe = req.uriContext.troupe;
+  var invite = req.uriContext.invite;
+  var homeUser = req.uriContext.oneToOne && req.uriContext.otherUser; // The users page being looked at
+  var accessDenied = !req.uriContext.access;
 
-        var status = req.user.status;
+  Q.all([
+    user ? serializeUser(user) : null,
+    homeUser ? serializeHomeUser(homeUser, !!invite) : undefined, //include email if the user has an invite
+    user ? getWebToken(user) : null,
+    troupe && user ? serializeTroupe(troupe, user) : fakeSerializedTroupe(req.uriContext) ])
+    .spread(function(serializedUser, serializedHomeUser, token, serializedTroupe) {
+
+      var status, profileNotCompleted;
+      if(user) {
+        status = user.status;
         profileNotCompleted = (status == 'PROFILE_NOT_COMPLETED') || (status == 'UNCONFIRMED');
-
-        if(status != 'UNCONFIRMED' && status != 'PROFILE_NOT_COMPLETED' && status != 'ACTIVE') {
-          // Oh dear, something has gone horribly wrong
-          winston.error("Rejecting user. Something has gone wrong! ", { user: req.user });
-          return next("Inconsistent state for user: " + status);
-        }
-
-      } else if (req.troupe.oneToOne) {
-        troupeData = troupe;
-      } else {
-        troupeData = null;
       }
 
-      var disabledFayeProtocols = [];
+      var login = !user || profileNotCompleted || accessDenied;
 
-      var userAgent = req.headers['user-agent'];
-      userAgent = userAgent ? userAgent : '';
-
-      var useFirebug = useFirebugInIE && userAgent.indexOf('MSIE') >= 0;
-
-      // Disable websocket on Mobile due to iOS crash bug
-      if(userAgent.indexOf('Mobile') >= 0) {
-        disabledFayeProtocols.push('websocket');
-      }
-
-      var troupeContext = {
-          user: serializedUser,
-          troupe: troupeData,
-          accessToken: accessToken,
-          profileNotCompleted: profileNotCompleted,
-          accessDenied: accessDenied,
-          inviteId: inviteId,
-          appVersion: appVersion.getCurrentVersion(),
-          baseServer: nconf.get('web:baseserver'),
-          basePort: nconf.get('web:baseport'),
-          basePath: nconf.get('web:basepath'),
-          homeUrl: nconf.get('web:homeurl'),
-          troupeUri: accessDenied ? troupe.uri : undefined,
-          websockets: {
-            fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
-            options: {
-              timeout: nconf.get('ws:fayeTimeout'),
-              retry: nconf.get('ws:fayeRetry')
-            },
-            disable: disabledFayeProtocols
-          }
-      };
-
-
-      var login, actualTroupeName;
-      if(req.user && !profileNotCompleted && troupeData) {
-        login  = false;
-        actualTroupeName = troupeName;
-
-        userService.saveLastVisitedTroupeforUser(req.user.id, troupe, function(err) {
-          if (err) winston.info("Something went wrong saving the user last troupe visited: ", { exception: err });
-        });
-
-      } else {
-        login = true;
-        if(profileNotCompleted) {
-          actualTroupeName = troupeName;
-        } else {
-          actualTroupeName = "Welcome";
-        }
-      }
+      var troupeContext = createTroupeContext(req, {
+        user: serializedUser,
+        homeUser: serializedHomeUser,
+        troupe: serializedTroupe,
+        accessToken: token,
+        profileNotCompleted: profileNotCompleted,
+        inviteId: invite && invite.id,
+        accessDenied: accessDenied
+      });
 
       res.render(page, {
         useAppCache: !!nconf.get('web:useAppCache'),
         login: login,
-        data: login ? null : JSON.stringify(data), // Only push the data through if the user is logged in already
-        troupeName: actualTroupeName,
-        troupeEmailAddress: troupe.uri + '@' + troupeContext.baseServer,
+        bootScriptName: login ? "router-login" : "router-app",
+        troupeName: serializedTroupe.name,
         troupeContext: JSON.stringify(troupeContext),
-        troupeContextData: troupeContext,
-        useFirebug: useFirebug
+        troupeContextData: troupeContext
       });
 
-    }
-
-  }
-}
-
-function preloadFiles(userId, troupeId, callback) {
-  fileService.findByTroupe(troupeId, function(err, files) {
-    if (err) {
-      winston.error("Error in findByTroupe: ", { exception: err });
-      return callback(err);
-    }
-
-    var strategy = new restSerializer.FileStrategy({ currentUserId: userId, troupeId: troupeId });
-    restSerializer.serialize(files, strategy, callback);
-  });
-}
-
-function preloadChats(userId, troupeId, callback) {
-  function serializeChats(err, chatMessages) {
-    if(err) return callback(err);
-
-    var strategy = new restSerializer.ChatStrategy({ currentUserId: userId, troupeId: troupeId });
-    restSerializer.serialize(chatMessages, strategy, callback);
-  }
-
-  unreadItemService.getFirstUnreadItem(userId, troupeId, 'chat', function(err, firstId, totalUnreadItems) {
-    if(firstId) {
-      if(totalUnreadItems > 200) {
-        chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: 20 }, serializeChats);
-        return;
-      }
-
-      // No first Id, just return the most recent 20 messages
-      chatService.findChatMessagesForTroupe(troupeId, { startId: firstId }, function(err, chatMessages) {
-        if(err) return callback(err);
-
-        // Just get the last 20 messages instead
-        if(chatMessages.length < 20) {
-          chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: 20 }, serializeChats);
-          return;
-        }
-
-        return serializeChats(err, chatMessages);
-
-      });
-
-      return;
-    }
-
-    // No first Id, just return the most recent 20 messages
-    chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: 20 }, serializeChats);
-
-  });
+    })
+    .fail(next);
 
 }
 
-
-function preloadTroupes(userId, callback) {
-  troupeService.findAllTroupesForUser(userId, function(err, troupes) {
-    if (err) return callback(err);
-
-    var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
-    restSerializer.serialize(troupes, strategy, callback);
-  });
-}
-
-
-function preloadUsers(userId, troupe, callback) {
-  var strategy = new restSerializer.UserIdStrategy( { showPresenceForTroupeId: troupe.id });
-  restSerializer.serialize(troupe.getUserIds(), strategy, callback);
-}
-
-
-function preloadConversations(userId, troupeId, callback) {
-  conversationService.findByTroupe(troupeId, function(err, conversations) {
-    if(err) return callback(err);
-
-    restSerializer.serialize(conversations, new restSerializer.ConversationMinStrategy(), callback);
-  });
-}
-
-function preloadUnreadItems(userId, troupeId, callback) {
-    unreadItemService.getUnreadItemsForUser(userId, troupeId, function(err, unreadItems) {
-      if(err) return callback(err);
-      callback(null, unreadItems);
-    });
-}
-
-function preloadTroupeMiddleware(req, res, next) {
+function uriContextResolverMiddleware(req, res, next) {
   var appUri = req.params.appUri;
 
-  troupeService.findByUri(appUri, function(err, troupe) {
-    if (err) return next({ errorCode: 500, error: err });
-    if(!troupe) return next({ errorCode: 404 });
-    if(troupe.status != 'ACTIVE') return next({ errorCode: 404 });
-    req.troupe = troupe;
+  uriService.findUriForUser(appUri, req.user && req.user.id)
+    .then(function(result) {
+      if(result.notFound) return next(404);
 
-    // check if the user has access
-    if(req.user && !troupeService.userHasAccessToTroupe(req.user, troupe)) {
-      // if not, check if the user has an unused invite
-      troupeService.findUnusedInviteToTroupeForEmail(req.user.email, troupe.id, function(err, invite) {
-        if (err) next(err);
+      req.troupe = result.troupe;
+      req.uriContext = result;
 
-        if (invite) {
-          req.invite = invite;
-        }
-
-        next();
-      });
-
-      return;
-    }
-
-    next();
-  });
-
+      next();
+    })
+    .fail(next);
 }
 
 // TODO preload invites?
 
 function preloadOneToOneTroupeMiddleware(req, res, next) {
-  if (!req.user) {
-    req.troupe = { oneToOne: true };
-    req.otherUser = { displayName: '' };
-    return next();
+  uriService.findUriForUser("one-one/" + req.params.userId, req.user && req.user.id)
+    .then(function(result) {
+      if(result.notFound) return next(404);
+
+      req.troupe = result.troupe;
+      req.uriContext = result;
+
+      next();
+    })
+    .fail(next);
+
+}
+
+function saveLastTroupeMiddleware(req, res, next) {
+  if(req.user && req.troupe) {
+    userService.saveLastVisitedTroupeforUser(req.user.id, req.troupe, function(err) {
+      if (err) winston.info("Something went wrong saving the user last troupe visited: ", { exception: err });
+      next();
+
+    });
+    return;
   }
 
-  if (req.params.userId === req.user.id) {
-    winston.info('Another user is talking to themselves...', { userId: req.user.id });
-    res.redirect(nconf.get('web:homeurl'));
-    return 1;
-  }
+  next();
+}
 
-  troupeService.findOrCreateOneToOneTroupe(req.user.id, req.params.userId, function(err, troupe, otherUser) {
-    if (err) return next({ errorCode: 500, error: err });
-    if(!troupe) return next({ errorCode: 404 });
-    req.otherUser = otherUser;
-    req.troupe = troupe;
-    next();
-  });
-
+function renderMiddleware(page) {
+  return function(req, res, next) {
+    renderAppPageWithTroupe(req, res, next, page);
+  };
 }
 
 module.exports = {
     install: function(app) {
-
-      app.get('/messages', function(req, res) {
-        var msgs = (req.session && req.session.messages) ? req.session.messages : [];
-        res.json(msgs);
-      });
-
       // used for development only
       app.get('/mobile.appcache', function(req, res) {
         if (nconf.get('web:useAppCache')) {
@@ -312,18 +240,15 @@ module.exports = {
         }
       });
 
+      // This really doesn't seem like the right place for this?
       app.get('/s/cdn/*', function(req, res) {
         res.redirect(req.path.replace('/s/cdn', ''));
       });
 
-      app.get('/one-one/:userId',
-        middleware.grantAccessForRememberMeTokenMiddleware,
-        preloadOneToOneTroupeMiddleware,
+      app.get('/version', function(req, res/*, next*/) {
+        res.json({ appVersion: appVersion.getCurrentVersion() });
+      });
 
-        function(req, res, next) {
-          renderAppPageWithTroupe(req, res, next, 'app-integrated', req.troupe, req.otherUser.displayName);
-        }
-      );
 
       app.get('/last',
         middleware.grantAccessForRememberMeTokenMiddleware,
@@ -335,156 +260,210 @@ module.exports = {
       app.get('/last/:page',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
-        function(req, res, next) {
+        function(req, res) {
+          troupeService.findBestTroupeForUser(req.user, function(err, troupe) {
+            var url;
 
-          loginUtils.whereToNext(req.user, function(err, url) {
-            if (err || !url) next(err);
+            if(troupe) {
+              url = troupe.getUrl(req.user.id);
+              res.relativeRedirect(url + "/" + req.params.page);
+              return;
+            }
 
-            res.relativeRedirect(url + "/" + req.params.page);
+            if(req.user.hasUsername()) {
+              url = req.user.getHomeUrl();
+            } else {
+              url = "/home";
+            }
+
+            res.relativeRedirect(url);
           });
 
         });
 
+      app.get('/one-one/:userId',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        preloadOneToOneTroupeMiddleware,
+        saveLastTroupeMiddleware,
+        function(req, res, next) {
+          var uriContext = req.uriContext;
 
-      app.get('/one-one/:userId/preload',
+          if (req.user && req.params.userId === req.user.id) {
+            res.relativeRedirect(req.user.username ? "/" + req.user.username : nconf.get('web:homeurl'));
+            return;
+          }
+
+          // If the user has a username, use that instead
+          if(uriContext && uriContext.otherUser && uriContext.otherUser.username) {
+            res.relativeRedirect('/' + uriContext.otherUser.username);
+            return;
+          }
+
+          next();
+        },
+        renderMiddleware('app-template')
+      );
+
+      /* Special homepage for users without usernames */
+      app.get('/home',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
-        preloadOneToOneTroupeMiddleware,
         function(req, res, next) {
-          // Timestamp aroundabout the time the snapshot was taken....
-          var timestamp = new Date().toISOString();
-
-          var f = new Fiber();
-          if(req.user) {
-            preloadTroupes(req.user.id, f.waitor());
-            preloadFiles(req.user.id, req.troupe.id, f.waitor());
-            preloadChats(req.user.id, req.troupe.id, f.waitor());
-            preloadUsers(req.user.id, req.troupe, f.waitor());
-            preloadUnreadItems(req.user.id, req.troupe.id, f.waitor());
+          if(req.user && req.user.username) {
+            res.relativeRedirect(req.user.getHomeUrl());
+            return;
           }
-          f.all()
-            .spread(function(troupes, files, chats, users, unreadItems) {
-              // Send the information through
-              res.set('Cache-Control', 'no-cache');
-              res.send({
-                timestamp: timestamp,
-                troupes: troupes,
-                files: files,
-                chatMessages: chats,
-                users: users,
-                unreadItems: unreadItems
-              });
-            })
-            .fail(function(err) {
-              next(err);
-            });
+
+          return renderHomePage(req, res, next);
         });
+
+      // Chat -----------------------
 
       app.get('/one-one/:userId/chat',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         preloadOneToOneTroupeMiddleware,
-        function(req, res, next) {
-          renderAppPageWithTroupe(req, res, next, 'mobile/chat-app', req.troupe, req.otherUser.displayName, { otherUser: req.otherUser });
-      });
-
-      app.get('/one-one/:userId/files',
-        middleware.grantAccessForRememberMeTokenMiddleware,
-        middleware.ensureLoggedIn(),
-        preloadOneToOneTroupeMiddleware,
-        function(req, res, next) {
-          renderAppPageWithTroupe(req, res, next, 'mobile/file-app', req.troupe, req.otherUser.displayName, { otherUser: req.otherUser });
-      });
-
-      app.get('/version', function(req, res/*, next*/) {
-        res.json({ appVersion: appVersion.getCurrentVersion() });
-      });
-
-      app.get('/:appUri/preload',
-        middleware.grantAccessForRememberMeTokenMiddleware,
-        middleware.ensureLoggedIn(),
-        //middleware.simulateDelay(10000),
-        preloadTroupeMiddleware,
-        function(req, res, next) {
-          // Timestamp aroundabout the time the snapshot was taken....
-          var timestamp = new Date().toISOString();
-
-          var f = new Fiber();
-          if(req.user) {
-            preloadTroupes(req.user.id, f.waitor());
-            preloadFiles(req.user.id, req.troupe.id, f.waitor());
-            preloadChats(req.user.id, req.troupe.id, f.waitor());
-            preloadUsers(req.user.id, req.troupe, f.waitor());
-            preloadConversations(req.user.id, req.troupe, f.waitor());
-            preloadUnreadItems(req.user.id, req.troupe.id, f.waitor());
-          }
-          f.all()
-            .spread(function(troupes, files, chats, users, conversations, unreadItems) {
-              // Send the information through
-              res.set('Cache-Control', 'no-cache');
-              res.send({
-                timestamp: timestamp,
-                troupes: troupes,
-                files: files,
-                chatMessages: chats,
-                users: users,
-                conversations: conversations,
-                unreadItems: unreadItems
-              });
-            })
-            .fail(function(err) {
-              next(err);
-            });
-        });
-
-      app.get('/:appUri',
-        middleware.grantAccessForRememberMeTokenMiddleware,
-        preloadTroupeMiddleware,
-        function(req, res, next) {
-          renderAppPageWithTroupe(req, res, next, 'app-integrated', req.troupe, req.troupe.name);
-        });
-
-      app.get('/:troupeUri/accept/:confirmationCode',
-        middleware.authenticate('accept', {}),
-        function(req, res/*, next*/) {
-          res.relativeRedirect("/" + req.params.troupeUri);
-        });
+        saveLastTroupeMiddleware,
+        renderMiddleware('mobile/chat-app'));
 
       app.get('/:appUri/chat',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
-        preloadTroupeMiddleware,
-        function(req, res, next) {
-            renderAppPageWithTroupe(req, res, next, 'mobile/chat-app', req.troupe, req.troupe.name);
-        });
+        uriContextResolverMiddleware,
+        saveLastTroupeMiddleware,
+        renderMiddleware('mobile/chat-app'));
+
+      // Files -----------------------
+      app.get('/one-one/:userId/files',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        preloadOneToOneTroupeMiddleware,
+        saveLastTroupeMiddleware,
+        renderMiddleware('mobile/file-app'));
 
       app.get('/:appUri/files',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
-        preloadTroupeMiddleware,
-        function(req, res, next) {
-          renderAppPageWithTroupe(req, res, next, 'mobile/file-app', req.troupe, req.troupe.name);
-        });
+        uriContextResolverMiddleware,
+        saveLastTroupeMiddleware,
+        renderMiddleware('mobile/file-app'));
+
 
       app.get('/:appUri/mails',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
-        preloadTroupeMiddleware,
-        function(req, res, next) {
-          renderAppPageWithTroupe(req, res, next, 'mobile/conversation-app', req.troupe, req.troupe.name);
-        });
+        uriContextResolverMiddleware,
+        saveLastTroupeMiddleware,
+        renderMiddleware('mobile/conversation-app'));
 
       app.get('/:appUri/people',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
-        preloadTroupeMiddleware,
+        uriContextResolverMiddleware,
+        saveLastTroupeMiddleware,
+        renderMiddleware('mobile/people-app'));
+
+      app.get('/:appUri',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        uriContextResolverMiddleware,
+        saveLastTroupeMiddleware,
         function(req, res, next) {
-          renderAppPageWithTroupe(req, res, next, 'mobile/people-app', req.troupe, req.troupe.name);
+          if (req.uriContext.ownUrl) {
+            return renderHomePage(req, res, next);
+          }
+
+          renderAppPageWithTroupe(req, res, next, 'app-template');
         });
 
-      app.get('/:appUri/accessdenied', function(req, res) {
-        res.render('app-accessdenied', {
-        });
-      });
+
+
+
+
+      function acceptInviteWithoutConfirmation(req, res, next) {
+
+        var appUri = req.params.appUri || 'one-one/' + req.params.userId;
+
+        if(!req.user) {
+          req.loginToAccept = true;
+          return renderAppPageWithTroupe(req, res, next, 'app-template');
+        }
+
+        var uriContext = req.uriContext;
+
+        // If theres a troupe, theres nothing to accept
+        if(uriContext.troupe) {
+          var url = uriContext.troupe.getUrl(req.user.id);
+          res.relativeRedirect(url);
+          return;
+        }
+
+        // If there's an invite, accept it
+        if(uriContext.invite) {
+          return troupeService.acceptInviteForAuthenticatedUser(req.user, uriContext.invite)
+            .then(function() {
+              res.relativeRedirect("/" + appUri);
+            })
+            .fail(next);
+        }
+
+        // Otherwise just go there
+        res.relativeRedirect("/" + appUri);
+      }
+
+      app.get('/:appUri/accept/',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        uriContextResolverMiddleware,
+        acceptInviteWithoutConfirmation);
+
+      app.get('/one-one/:userId/accept/',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        preloadOneToOneTroupeMiddleware,
+        acceptInviteWithoutConfirmation);
+
+      function acceptInviteWithConfirmation(req, res) {
+
+        var appUri = req.params.appUri || 'one-one/' + req.params.userId;
+        var confirmationCode = req.params.confirmationCode;
+        var login = Q.nbind(req.login, req);
+
+        troupeService.findInviteByConfirmationCode(confirmationCode)
+          .then(function(invite) {
+            if(!invite) throw 404;
+
+
+            if(req.user) {
+              if(invite.userId == req.user.id) {
+                return troupeService.acceptInviteForAuthenticatedUser(req.user, invite);
+              }
+              // This invite is for somebody else, log the current user out
+              req.logout();
+            }
+
+
+            return troupeService.acceptInvite(confirmationCode, appUri)
+              .then(function(result) {
+                var user = result.user;
+
+                // Now that we've accept the invite, log the new user in
+                if(user) return login(user);
+              });
+
+          })
+          .fail(function(err) {
+            winston.error('acceptInvite failed', { exception: err });
+            return null;
+          })
+          .then(function() {
+            res.relativeRedirect("/" + appUri);
+          });
+      }
+
+      app.get('/:appUri/accept/:confirmationCode',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        acceptInviteWithConfirmation);
+
+      app.get('/one-one/:userId/accept/:confirmationCode',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        acceptInviteWithConfirmation);
     }
 };

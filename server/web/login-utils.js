@@ -2,13 +2,12 @@
 "use strict";
 
 var troupeService = require("../services/troupe-service");
-var nconf = require('../utils/config');
 
 exports.whereToNext = function(user, callback) {
 
   troupeService.findBestTroupeForUser(user, function(err, troupe) {
     if(err) return callback(err);
-    if(!troupe) return callback();
+    if(!troupe) return callback(null, user.getHomeUrl());
 
     return callback(null, troupe.getUrl(user.id));
   });
@@ -24,7 +23,7 @@ exports.redirectUserToDefaultTroupe = function(req, res, next, options) {
         return options.onNoValidTroupes();
       }
 
-      return res.redirect(nconf.get('web:homeurl'));
+      return res.redirect("/home");
     }
 
     return res.relativeRedirect(url);

@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 define([
   'jquery',
@@ -191,6 +191,7 @@ define([
       }
 
       return {
+        url: item.get('url'),
         noPreviewAvailable: true
       };
 

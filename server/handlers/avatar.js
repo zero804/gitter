@@ -7,14 +7,20 @@ var middleware = require('../web/middleware'),
     assert = require('assert'),
     mongoose = require("mongoose"),
     restSerializer = require("../serializers/rest-serializer"),
+    userService = require('../services/user-service'),
     Fiber = require("../utils/fiber");
 
-function redirectToDefault(size, user, res) {
+function redirectToDefault(size, userId, res) {
   // only used as a safety catch when accessing the version urls,
   // which should never be accessed when a default image is required.
   var s = (size == 'm') ? '-m' : '-s';
 
-  res.redirect(301, "/images/2/avatar-default"+s+".png");
+  userService.findById(userId, function(err, user) {
+    if (user)
+      res.redirect(301, "https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(user.email).digest('hex') + "?d=identicon");
+    else
+      res.redirect(301, "/images/2/avatar-default"+s+".png");
+  });
 }
 
 // size is either 's' or 'm'
@@ -82,6 +88,19 @@ function saveAvatarToGridFS(localPath, gridFSFilename, callback) {
 
 module.exports = {
     install: function(app) {
+      app.get('/avatarForEmail/:email', function(req, res, next) {
+        var email = req.params.email;
+        assert(email, "An email address must be provided in the url");
+        userService.findByEmail(email, function(err, user) {
+          if (err) return next(err);
+          if (!user) {
+            return res.redirect("https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon");
+          }
+
+          displayAvatarFor('s', user.id, req, res);
+        });
+      });
+
       app.get(
         '/avatar',
         middleware.ensureLoggedIn(),

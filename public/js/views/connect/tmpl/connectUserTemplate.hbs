@@ -1,0 +1,54 @@
+<div class="modal-content">
+  <div id="request-form">
+    <div class="trpModalTitle">
+        <div style="text-align: center">
+          {{widget "avatar" user=homeUser}}
+        </div>
+        <div style="text-align: center">
+          {{homeUser.displayName}}
+        </div>
+    </div>
+    <div class="trpModalBody" style="text-align: center"><br>
+      {{#if authenticated}}
+      You are not conneted to this user. <br><span class="trpModalSubtext">Click on Connect below and we'll send an invite to {{firstName}}.</span>
+      {{else}}
+      You currently aren't signed in. <br><span class="trpModalSubtext" id="email-text">Please enter your name and email address to continue.</span>
+      {{/if}}
+    </div>
+    <div class="trpModalRequestForm" style="text-align: center">
+     <!-- don't show the input fields if the user is already signed in, but do show the submit button -->
+      <form id="requestAccess">
+        <div class="trpRequestSubmit">
+          {{#if authenticated}}
+          <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen" id="submit-button" style="min-width: 110px">Connect</button>
+          <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="cancel-button" style="min-width: 110px">Cancel</button>
+          {{else}}
+<!--           <button type="button" class="trpModalButton trpButtonBig trpBtnGreen signin" id="sigin-button" style="min-width: 110px">Sign in</button>
+          <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="create-account-button" style="min-width: 110px">Create account</button> -->
+          <input type="text" class="trpInput" id="displayName" name="name" placeholder="Your full name"><br><input type="text" class="trpInput" id="email" placeholder="Your email address" name="email"><br><button type="button" class="trpModalButton trpButtonMedium trpBtnGreen" id="unauthenticated-continue" style="min-width: 110px">Continue</button>
+         {{/if}}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{{^authenticated}}
+<div class="trpModalExistingUsers" id="existing-user" style="display:none">
+  Existing user? Click here to login.
+</div>
+{{/authenticated}}
+
+<div class="modal-success">
+  <div class="trpModalTitle">Invite has been sent</div>
+  <div class="trpModalSubtext">We've sent the invite, once it's accepted you'll be able to chat with {{firstName}}.<br><br>
+    {{^authenticated}}
+    In the mean-time, why not learn more about Troupe?<br><br>
+      <a href="{{homeUrl}}" class="trpButtonBig trpBtnGreen">Show me more</a>
+    {{/authenticated}}
+      <a href="/last" class="trpModalButton trpButtonBig trpBtnGrey" id="cancel-button">Close</a>
+  </div>
+</div>
+
+
+

@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 define([
   'jquery',
@@ -6,6 +6,8 @@ define([
   'backbone',
   'hbs!templates/status/status'
 ], function($, _, Backbone, template){
+  "use strict";
+
   var StatusView = Backbone.View.extend({
     render: function() {
       var compiledTemplate = template({ });

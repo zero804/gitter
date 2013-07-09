@@ -1,15 +1,18 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 // TODO: Better transition to request confirm page
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'views/base',
   'hbs!./tmpl/loginRequestModalView',
   'log!login-request-modal-view',
   'utils/validate-wrapper',
   'jquery-placeholder' // No reference
-], function($, _, TroupeViews, template, log, validation) {
+], function($, _, context, TroupeViews, template, log, validation) {
+  "use strict";
+
   return TroupeViews.Base.extend({
     template: template,
 
@@ -23,11 +26,15 @@ define([
     },
 
     getRenderData: function() {
+      var c = context();
+      var troupe = context.getTroupe();
+
       return {
         email: this.initialEmail,
-        homeUrl: window.troupeContext.homeUrl,
-        troupeUri: window.location.pathname.replace(/\//g,''),
-        authenticated: this.authenticated
+        homeUrl: c.homeUrl,
+        appUri: troupe.uri,
+        authenticated: this.authenticated,
+        isOneToOne: troupe && troupe.oneToOne
       };
     },
 
@@ -47,12 +54,11 @@ define([
     },
 
     goBack : function () {
-      if (window.troupeContext.homeUrl) {
-        window.location.href= window.troupeContext.homeUrl;
-      }
+      window.location.href = context().homeUrl;
     },
 
     validateForm : function () {
+      if (this.authenticated) return;
       var validateEl = this.$el.find('#requestAccess');
       validateEl.validate({
         rules: {
@@ -93,9 +99,10 @@ define([
 
     onFormSubmit: function() {
       var form = this.$el.find('form');
+      var postUri =  this.authenticated ? "/api/v1/requestaccessexisting" : "/api/v1/requestaccess";
+      var email = this.getEmail();
       var that = this;
-      var postUri =  this.authenticated ? "/requestAccessExistingUser" : "/requestAccessNewUser";
-
+      log("PostUri: " + postUri);
       $('#request-failed').hide();
 
       $.ajax({
@@ -104,21 +111,35 @@ define([
         dataType: "json",
         data: form.serialize(),
         type: "POST",
-        globa: false,
+        global: false,
+        statusCode: {
+          400: function(data) {
+            if ($.parseJSON(data.responseText).userExists) {
+              $('#user-exists').show();
+            }
+          }
+        },
         success: function(data) {
           if(data.success) {
-            $('.modal-content').hide();
-            $('.modal-success').show();
-            return;
+            if (that.authenticated) {
+              $('.modal-content').hide();
+              $('.modal-success').show();
+            }
+            else {
+              that.trigger('confirm.request', { userEmail: email});
+              return;
+            }
           }
 
           if(data.userExists) {
+            log('** HEY THAT USER EXISTS');
             that.trigger('request.login', { userExists: true });
             return;
           }
         },
         error: function() {
-          $('#request-failed').show();
+          log("Error with request");
+          // $('#request-failed').show();
         }
       });
 

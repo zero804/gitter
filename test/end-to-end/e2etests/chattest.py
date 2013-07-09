@@ -1,8 +1,8 @@
-
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 import utils
 import time
+import os
 
 driver = None
 
@@ -12,6 +12,7 @@ chatMessage = 'The date and time are now ' + time.strftime("%Y-%m-%d-%H-%M-%S", 
 def setup_module():
     global driver
     driver = utils.driver()
+    utils.resetData(driver)
 
 
 def testSendingAChatMessage():
@@ -19,7 +20,7 @@ def testSendingAChatMessage():
     textArea = driver.find_element_by_id('chat-input-textarea')
 
     textArea.send_keys(chatMessage)
-    textArea.send_keys(Keys.ENTER)
+    textArea.send_keys(Keys.RETURN)
 
     time.sleep(0.5)
 
@@ -30,34 +31,34 @@ def testSendingAChatMessage():
 
 
 def testEditingAChatMessage():
-    # textArea = driver.find_element_by_id('chat-input-textarea')
+    driverName = os.getenv('DRIVER')
+    if driverName != 'FIREFOX':
+        lastChat = driver.find_element_by_css_selector('.trpChatItem')
 
-    # chatMessage = 'The date and time are now ' + time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime())
-    # textArea.send_keys(chatMessage)
-    # textArea.send_keys(Keys.ENTER)
+        actionChain = ActionChains(driver)
+        actionChain.move_to_element(driver.find_element_by_css_selector('.frame-people'))
+        actionChain.perform()
 
-    # time.sleep(0.5)
+        time.sleep(0.5)
 
-    lastChat = getLastElement('.trpChatItem')
-    editButton = lastChat.find_element_by_css_selector('.trpChatEdit')
+        actionChain = ActionChains(driver)
+        actionChain.move_to_element(driver.find_element_by_css_selector('.trpChatBox'))
+        editButton = driver.find_element_by_css_selector('.trpChatEdit')
+        actionChain.move_to_element(editButton)
+        actionChain.click()
+        actionChain.perform()
 
-    actionChain = ActionChains(driver)
-    actionChain.move_to_element(lastChat.find_element_by_css_selector('.trpChatDetails'))
-    actionChain.click(editButton)
-    actionChain.perform()
+        # driver.find_element_by_css_selector('.trpChatEdit').click()
 
-    editInput = lastChat.find_element_by_css_selector('.trpChatInput')
+        editInput = lastChat.find_element_by_css_selector('.trpChatInput')
 
-    editInput.send_keys("...an alteration")
-    editInput.send_keys(Keys.ENTER)
+        editInput.send_keys("...an alteration")
+        editInput.send_keys(Keys.RETURN)
 
-    time.sleep(0.5)
+        time.sleep(0.5)
 
-    # editInput = lastChat.find_element_by_css_selector('.trpChatInput')
-    # assert not editInput
-
-    chatElText = getLastElement('.trpChatItem').find_element_by_css_selector('.trpChatText')
-    assert chatElText.text.find("...an alteration") != -1
+        chatElText = getLastElement('.trpChatItem').find_element_by_css_selector('.trpChatText')
+        assert chatElText.text.find("...an alteration") != -1
 
 
 def getLastElement(selector):

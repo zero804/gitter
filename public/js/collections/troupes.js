@@ -1,20 +1,29 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'backbone',
-  './base'
-], function(Backbone, TroupeCollections) {
+  'utils/context',
+  './base',
+  '../utils/momentWrapper'
+], function(Backbone, context, TroupeCollections, moment) {
   "use strict";
 
   var exports = {};
   exports.TroupeModel = TroupeCollections.Model.extend({
-    idAttribute: "id"
+    idAttribute: "id",
+    parse: function(message) {
+      if(message.lastAccessTime) {
+        message.lastAccessTime = moment(message.lastAccessTime, moment.defaultFormat);
+      }
+
+      return message;
+    }
   });
 
   exports.TroupeCollection = TroupeCollections.LiveCollection.extend({
     model: exports.TroupeModel,
     preloadKey: "troupes",
     initialize: function() {
-      this.url = "/user/" + window.troupeContext.user.id + "/troupes";
+      this.url = "/user/" + context.getUserId() + "/troupes";
     }
   });
 

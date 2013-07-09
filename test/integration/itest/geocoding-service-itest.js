@@ -39,7 +39,7 @@ describe('geocodingService', function() {
         if(err) return done(err);
 
         assert(value !== null);
-        assert('Cricklewood' == value.name);
+        assert(['Queens Park', 'Cricklewood'].indexOf(value.name) >= 0, value.name + " should be Poplar or Canary Wharf");
         done();
       });
     });
@@ -59,7 +59,7 @@ describe('geocodingService', function() {
         if(err) return done(err);
 
         assert(value !== null);
-        assert('Canary Wharf' == value.name);
+        assert(['Poplar', 'Canary Wharf'].indexOf(value.name) >= 0, value.name + " should be Poplar or Canary Wharf");
         done();
       });
     });
