@@ -114,6 +114,10 @@ define([
     },
 
     showTab: function(selected) {
+      if (this.selectedListIcon == 'icon-search') {
+        this.activateSearchList();
+      }
+
       if(selected === this.selectedListIcon) return;
 
       // Turn off the old selected list
@@ -136,9 +140,6 @@ define([
 
       // TODO: Related to the above TODO, we probably only want to populate the list now
 
-      if (this.selectedListIcon == 'icon-search') {
-        this.activateSearchList();
-      }
 
       this.$el.find('.nano').nanoScroller({ preventPageScrolling: true });
 
