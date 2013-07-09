@@ -3,7 +3,7 @@ define([
   'ga',
   'utils/context',
   'log!tracking',
-  'mixpanel'
+  './mixpanel'
 ], function(_gaq, context, log, mixpanel) {
   /*jshint unused:true */
   "use strict";
@@ -24,10 +24,12 @@ define([
   _gaq.push(['_setAllowAnchor',true]);
 
   function trackPageView(routeName) {
+    mixpanel.track('pageView', { pageName: routeName });
     _gaq.push(['_trackEvent', 'Route', routeName]);
   }
 
   function trackError(message, file, line) {
+    mixpanel.track('jserror', { message: message, file: file, line: line } );
     _gaq.push(['_trackEvent', 'Error', message, file, line]);
   }
 
