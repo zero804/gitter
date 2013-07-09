@@ -160,6 +160,13 @@ def getJSON(url):
     return json.loads(response)
 
 
+# Keys sometimes need to be sent one at a time (firefox),
+# especially when the page is responding to the event, otherwise the full string will not go through
+def send_keys(element, str):
+    for c in str:
+        element.send_keys(c)
+
+
 def shutdown(driver):
     if(os.getenv('SELENIUM_DEV') is None):
         screenshot(driver)
