@@ -8,7 +8,6 @@ define([
   /*jshint unused:true */
   "use strict";
 
-  // FIXME Get this from the current server env
   mixpanel.init(context().mixpanelToken);
   if (context.isAuthed()) {
     mixpanel.identify(context.getUserId());
