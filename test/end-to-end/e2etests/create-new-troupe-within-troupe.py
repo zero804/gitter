@@ -60,7 +60,7 @@ def testCreateTroupeFromGroupTroupe():
     # type and wait for autocomplete
     inputBox = form.find_element_by_name('inviteSearch')
     inputBox.send_keys('te')
-    time.sleep(1)
+    time.sleep(0.1)
 
     # expect two elements in the suggestions list
     suggestions = form.find_elements_by_css_selector('ul.typeahead li')
@@ -69,8 +69,14 @@ def testCreateTroupeFromGroupTroupe():
     # finish typing in a full email address and send invite
     emailuser = 'testuser.' + time.strftime("%Y%m%d%H%M%S", time.gmtime())
     email = emailuser + '@troupetest.local'
-    inputBox.send_keys(email[2:])
-    inputBox.send_keys(Keys.ENTER)
+    inputBox.send_keys(email[2:-1])
+    time.sleep(0.1)
+    inputBox.send_keys('l')
+    time.sleep(0.1)
+    suggestion = driver.find_element_by_css_selector('.typeahead li.active')
+    assert suggestion.text.find(email) >= 0, "Expected the suggestion to be the full email address given"
+    suggestion.click()
+    time.sleep(0.1)
     form.find_element_by_css_selector('button[type=submit]').click()
 
     success = driver.find_element_by_css_selector('div.modal-success.view')
@@ -82,7 +88,9 @@ def testCreateTroupeFromGroupTroupe():
     queryurl = utils.baseUrl("/testdata/inviteAcceptLink?email=" + email)
     response = urllib2.urlopen(queryurl)
     acceptLink = response.read()
+    assert acceptLink, "Accept link should not be falsy"
 
+    driver.get(utils.baseUrl('/signout'))
     driver.delete_all_cookies()
     driver.get(utils.baseUrl(acceptLink))
 
@@ -91,7 +99,7 @@ def testCreateTroupeFromGroupTroupe():
     form.find_element_by_css_selector('#password').send_keys('123456')
 
     form.find_element_by_name('submit').click()
-
+    time.sleep(2)
     # ensure the troupe name is the same as the one the invite was for
     # header = driver.find_element_by_css_selector('DIV.trpHeaderTitle')
     # assert header.text.find(troupeName) >= 0
@@ -107,16 +115,25 @@ def testCreateTroupeFromGroupTroupe():
 # Follows on from last test
 def testRemoveUserFromTroupe():
     #troupeBefore = driver.find_element_by_css_selector('DIV.trpHeaderTitle').text
+    # this test should ensure it is in the new troupe, in case the previous test failed
 
     time.sleep(1)
-    for x in driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem'):
-        x.click()
-        time.sleep(1)
+
+    a = 1
+    while len(driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem')) > 1:
+        time.sleep(0.1)
+        person = driver.find_element_by_css_selector('#people-roster div.trpPeopleListItem :nth-child('+str(a)+')')
+        person.click()
+        time.sleep(0.1)
         thisUsersDisplayName = driver.find_element_by_css_selector('.trpRightPanel .trpDisplayName')
         if not thisUsersDisplayName.text.find("Another Test User") >= 0:
+            print "trying to remove this person " + thisUsersDisplayName.text
             driver.find_element_by_css_selector('#person-remove-button').click()
-            time.sleep(1)
+            time.sleep(0.1)
             driver.find_element_by_css_selector('#button-yes').click()
+        else:
+            a += 1
+            print "not trying to remove this person " + thisUsersDisplayName.text
     driver.find_element_by_css_selector('.trpSettingsButton a').click()
     driver.find_element_by_css_selector('#delete-troupe').click()
     driver.find_element_by_css_selector('#ok').click()
@@ -158,9 +175,9 @@ def testCreateTroupeFromOneToOneTroupe():
     inputBox = form.find_element_by_name('inviteSearch')
     inputBox.send_keys('testuser3@troupetest.local')
     # select an existing user
-    time.sleep(1)
-    inputBox.send_keys(Keys.ENTER)
-    time.sleep(2)
+    time.sleep(0.5)
+    driver.find_element_by_css_selector('.typeahead li.active').click()
+    time.sleep(0.5)
 
     # check that there is one invite ready to go
     invitesEl = driver.find_element_by_css_selector("#invites")
