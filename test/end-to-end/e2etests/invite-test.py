@@ -1,5 +1,6 @@
 import utils
 from selenium.webdriver.common.keys import Keys
+from nose.tools import nottest
 import time
 
 driver = None
@@ -58,6 +59,7 @@ def testInvite():
     # check for the inviteEmail
 
 
+@nottest
 def testInviteRegisteredUser():
 
     # Login as Test User 1

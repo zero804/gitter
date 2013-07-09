@@ -63,6 +63,11 @@ end-to-end-test-saucelabs:
 	BASE_URL=http://beta.trou.pe \
 	nosetests -s -v --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
 
+end-to-end-test-beta:
+	mkdir -p ./output/test-reports
+	BASE_URL=http://beta.trou.pe \
+	nosetests -s -v --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
+
 docs: test-docs
 
 test-docs:

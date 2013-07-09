@@ -1,6 +1,7 @@
 import utils
 import time
 import urllib2
+from nose.tools import nottest
 
 driver = None
 
@@ -10,6 +11,7 @@ def setup_module():
     driver = utils.driver()
 
 
+@nottest
 def testSignupFromHomePage():
     driver.get(utils.baseUrl("/signout"))
     driver.get(utils.baseUrl("/x"))

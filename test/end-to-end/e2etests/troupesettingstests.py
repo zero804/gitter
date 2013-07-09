@@ -1,5 +1,6 @@
 import utils
 from selenium.webdriver.common.keys import Keys
+from nose.tools import nottest
 import time
 
 driver = None
@@ -10,6 +11,7 @@ def setup_module():
     driver = utils.driver()
 
 
+@nottest
 def testTroupeRenameWorks():
     utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
     time.sleep(0.4)
