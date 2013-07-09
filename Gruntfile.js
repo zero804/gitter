@@ -48,14 +48,6 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "router-core",
-                  include: [
-                    "utils/tracking",
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
-              {
                   name: "router-app",
                   include: [
                     "utils/tracking",

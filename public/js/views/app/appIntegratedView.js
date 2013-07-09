@@ -4,11 +4,10 @@ define([
   'utils/context',
   'log!appIntegratedView',
   'marionette',
-  'views/base',
   'views/signup/usernameView',
   'views/app/uiVars',
   "nanoscroller" // no ref
-  ], function($, context, log, Marionette, TroupeViews, UsernameView, uiVars) {
+  ], function($, context, log, Marionette, UsernameView, uiVars) {
   "use strict";
 
   return Marionette.Layout.extend({
