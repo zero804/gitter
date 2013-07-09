@@ -57,6 +57,15 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
+                  name: "router-homepage",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
                   name: "router-mobile-chat",
                   include: [
                     "utils/tracking",
