@@ -2,7 +2,7 @@
 
 var testRequire = require('./test-require');
 
-var Q = require("Q");
+var Q = require("q");
 var assert = require("assert");
 var persistence = testRequire("./services/persistence-service");
 var _ = require('underscore');
