@@ -3,7 +3,7 @@ require([
   'backbone',
   'views/shareSearch/shareSearchView',
   'views/app/appIntegratedView',
-  'views/userHome/userHomeView',
+  'views/userhome/userHomeView',
   'collections/instances/troupes',
   'views/profile/profileView',
   'views/signup/createTroupeView',

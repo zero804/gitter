@@ -8,7 +8,9 @@
 
 # Remember to run ./scripts/init-mongo/init-mongo.sh the first time to init your replica set
 ulimit -n 1000
-mkdir -p /usr/local/var/mongodb/r0
-mkdir -p /usr/local/var/mongodb/r1
-mongod run -replSet troupeSet --journal --port 27017 --dbpath /usr/local/var/mongodb/r0 --rest &
-mongod run -replSet troupeSet --journal --port 27018 --dbpath /usr/local/var/mongodb/r1 --rest &
+#mkdir -p /usr/local/var/mongodb/r0
+#mkdir -p /usr/local/var/mongodb/r1
+mkdir -p /usr/local/var/mongodb/s
+#mongod run -replSet troupeSet --journal --port 27017 --dbpath /usr/local/var/mongodb/r0 --rest &
+#mongod run -replSet troupeSet --journal --port 27018 --dbpath /usr/local/var/mongodb/r1 --rest &
+mongod run --journal --port 27017 --dbpath /usr/local/var/mongodb/s --rest &
