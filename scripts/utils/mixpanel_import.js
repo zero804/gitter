@@ -18,7 +18,7 @@ function getAllUsers(callback) {
 getAllUsers(function(err, users) {
 
   if (nconf.get("stats:mixpanel")) {
-  
+
     var Mixpanel  = require('mixpanel');
     var token     = nconf.get("stats:mixpanel:token");
     var mixpanel  = Mixpanel.init(token);
@@ -26,7 +26,7 @@ getAllUsers(function(err, users) {
     winston.verbose("[mixpanel] Importing users: ", users.length);
 
     users.forEach(function(user) {
-      var first_name = user.displayName.split(' ')[0];
+      var first_name = user.displayName ? user.displayName.split(' ')[0] : 'User';
       var created_at = new Date(user._id.getTimestamp().getTime());
 
       mixpanel.people.set(user.id, {
@@ -35,7 +35,7 @@ getAllUsers(function(err, users) {
         $email: user.email,
         $name: user.displayName,
         $username: user.username,
-        status: user.status
+        Status: user.status
       });
     });
   }
