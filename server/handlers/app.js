@@ -260,24 +260,28 @@ module.exports = {
       app.get('/last/:page',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
-        function(req, res) {
-          troupeService.findBestTroupeForUser(req.user, function(err, troupe) {
-            var url;
+        function(req, res, next) {
 
-            if(troupe) {
-              url = troupe.getUrl(req.user.id);
-              res.relativeRedirect(url + "/" + req.params.page);
-              return;
-            }
+          return troupeService.findBestTroupeForUser(req.user)
+            .then(function(troupe) {
+              if(troupe) {
+                return troupeService.getUrlForTroupeForUserId(troupe, req.user.id)
+                  .then(function(url) {
+                    return url + "/" + req.params.page;
+                  });
+              }
 
-            if(req.user.hasUsername()) {
-              url = req.user.getHomeUrl();
-            } else {
-              url = "/home";
-            }
+              if(req.user.hasUsername()) {
+                return req.user.getHomeUrl();
+              } else {
+                return "/home";
+              }
 
-            res.relativeRedirect(url);
-          });
+            })
+            .then(function(url) {
+              res.relativeRedirect(url);
+            })
+            .fail(next);
 
         });
 
@@ -392,9 +396,12 @@ module.exports = {
 
         // If theres a troupe, theres nothing to accept
         if(uriContext.troupe) {
-          var url = uriContext.troupe.getUrl(req.user.id);
-          res.relativeRedirect(url);
-          return;
+          return troupeService.getUrlForTroupeForUserId(uriContext.troupe, req.user.id)
+            .then(function(url) {
+              if(!url) throw 404;
+              res.relativeRedirect(url);
+            })
+            .fail(next);
         }
 
         // If there's an invite, accept it

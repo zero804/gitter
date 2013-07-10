@@ -1312,7 +1312,9 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
             .spread(function(userSaveResult, troupe) {
 
               return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite).then(function() {
-                return { user: user, url: troupe.getUrl(user.id) };
+                return getUrlForTroupeForUserId(troupe, user.id).then(function(url) {
+                  return { user: user, url: url };
+                });
               });
             });
 

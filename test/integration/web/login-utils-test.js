@@ -37,7 +37,7 @@ describe('login-utils', function() {
     it('should return a troupe if the user is a member', function() {
       return loginUtils.whereToNext(fixture.user1)
         .then(function(url) {
-          assert.equal(url, fixture.troupe1.getUrl());
+          assert.equal(url, '/' + fixture.troupe1.uri);
         })
         .nodeify(done);
     });
@@ -46,7 +46,7 @@ describe('login-utils', function() {
   before(fixtureLoader(fixture, {
     troupe1: { users: 'user1' },
     user2: { },
-    user3: { username: true },
+    user3: { username: true }
 
   }));
 

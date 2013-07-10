@@ -11,10 +11,16 @@ exports.whereToNext = function(user, callback) {
 
   return troupeService.findBestTroupeForUser(user)
     .then(function(troupe) {
-    if(!troupe) return user.getHomeUrl();
+      if(!troupe) return user.getHomeUrl();
 
-    return troupe.getUrl(user.id);
-  }).nodeify(callback);
+      troupeService.getUrlForTroupeForUserId(troupe, user.id, function(err, url) {
+        if(url) return url;
+
+        return user.getHomeUrl();
+      });
+
+
+    }).nodeify(callback);
 
 };
 
