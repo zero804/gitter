@@ -17,6 +17,7 @@ var once = times(1);
 var twice = times(2);
 
 var fixture = {};
+var fixture2 = {};
 
 describe('signup-service', function() {
 
@@ -96,41 +97,42 @@ describe('signup-service', function() {
   describe('#signupWithAccessRequestToUri', function() {
 
     it('should throw an error if an existing CONFIRMED user attempts to signup', function(done) {
-      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+      fixtureLoader.use({
+        'user1': {},
+        'troupe1': { }
+      })
+      .then(function(fixture) {
 
-      var troupeService = mockito.spy(testRequire.withProxies('./services/troupe-service', {
-        './email-notification-service': emailNotificationServiceMock
-      }));
+        var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
 
-      var userService = mockito.spy(testRequire('./services/user-service'));
+        var troupeService = mockito.spy(testRequire.withProxies('./services/troupe-service', {
+          './email-notification-service': emailNotificationServiceMock
+        }));
 
-      var signupService = testRequire.withProxies("./services/signup-service", {
-        './email-notification-service': emailNotificationServiceMock,
-        './troupe-service': troupeService,
-        './user-service': userService
-      });
+        var userService = mockito.spy(testRequire('./services/user-service'));
 
-      var uri = fixture.troupe1.uri;
-      var email = fixture.generateEmail();
-      var displayName = fixture.generateName();
+        var signupService = testRequire.withProxies("./services/signup-service", {
+          './email-notification-service': emailNotificationServiceMock,
+          './troupe-service': troupeService,
+          './user-service': userService
+        });
 
-      return persistence.User.createQ({
-          email: email,
-          displayName: displayName,
-          confirmationCode: email,
-          status: 'ACTIVE'
-        }).then(function() {
-          return signupService.signupWithAccessRequestToUri(uri, email, displayName)
-            .then(function() {
-              assert(false, 'Expected an exception');
-            })
-            .fail(function(err) {
-              assert(err.userExists, 'Expected err.userExists, got ' + JSON.stringify(err));
-            });
-        })
-        .nodeify(done);
+        var uri = fixture.troupe1.uri;
+        var email = fixture.user1.email;
+        var displayName = fixture.user1.displayName;
 
-
+        return signupService.signupWithAccessRequestToUri(uri, email, displayName)
+          .then(function() {
+            assert(false, 'Expected an exception');
+          })
+          .fail(function(err) {
+            assert(err.userExists, 'Expected err.userExists, got ' + JSON.stringify(err));
+          })
+          .fin(function() {
+            fixture.cleanup();
+          });
+      })
+      .nodeify(done);
 
     });
 
@@ -245,38 +247,49 @@ describe('signup-service', function() {
     });
 
     it('should allow an new unregistered user to request access to a troupe', function(done) {
-      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+      fixtureLoader.use({
+        'troupe1': { }
+      }).then(function(fixture) {
 
-      var troupeService = mockito.spy(testRequire.withProxies('./services/troupe-service', {
-        './email-notification-service': emailNotificationServiceMock
-      }));
+        var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
 
-      var userService = mockito.spy(testRequire('./services/user-service'));
+        var troupeService = mockito.spy(testRequire.withProxies('./services/troupe-service', {
+          './email-notification-service': emailNotificationServiceMock
+        }));
 
-      var signupService = testRequire.withProxies("./services/signup-service", {
-        './email-notification-service': emailNotificationServiceMock,
-        './troupe-service': troupeService,
-        './user-service': userService
-      });
+        var userService = mockito.spy(testRequire('./services/user-service'));
 
-      var uri = fixture.troupe1.uri;
-      var email = fixture.generateEmail();
-      var displayName = fixture.generateName();
+        var signupService = testRequire.withProxies("./services/signup-service", {
+          './email-notification-service': emailNotificationServiceMock,
+          './troupe-service': troupeService,
+          './user-service': userService
+        });
 
-      signupService.signupWithAccessRequestToUri(uri, email, displayName)
-        .then(function() {
+        var uri = fixture.troupe1.uri;
+        var email = fixture.generateEmail();
+        var displayName = fixture.generateName();
 
-          mockito.verify(userService, once).newUser();
-          mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
-          mockito.verify(troupeService, once).addRequest();
+        return signupService.signupWithAccessRequestToUri(uri, email, displayName)
+          .then(function() {
 
-        })
-        .nodeify(done);
+            mockito.verify(userService, once).newUser();
+            mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
+            mockito.verify(troupeService, once).addRequest();
+
+          })
+          .fin(function() {
+            fixture.cleanup();
+            // CLEANUP FIXTURE
+          });
+
+      })
+      .nodeify(done);
 
     });
   });
 
   before(fixtureLoader(fixture));
+
 
 
 });
