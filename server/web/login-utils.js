@@ -3,14 +3,18 @@
 
 var troupeService = require("../services/troupe-service");
 
+/**
+ * For a user who has nowhere to go? Where to Next?
+ * @return promise of a relative URL
+ */
 exports.whereToNext = function(user, callback) {
 
-  troupeService.findBestTroupeForUser(user, function(err, troupe) {
-    if(err) return callback(err);
-    if(!troupe) return callback(null, user.getHomeUrl());
+  return troupeService.findBestTroupeForUser(user)
+    .then(function(troupe) {
+    if(!troupe) return user.getHomeUrl();
 
-    return callback(null, troupe.getUrl(user.id));
-  });
+    return troupe.getUrl(user.id);
+  }).nodeify(callback);
 
 };
 

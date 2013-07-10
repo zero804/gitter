@@ -329,7 +329,11 @@ exports.install = function() {
     var url = data.url;
     var operation = data.operation;
     var model = data.model;
-    var modelId = data.model.id;
+    if(!model) {
+      winston.warn('No data model in onDataChangeEvent', { data: data});
+      return;
+    }
+    var modelId = model.id;
 
     var info = generateNotificationForUrl(url);
     if(!info) {

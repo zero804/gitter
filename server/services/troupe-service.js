@@ -242,6 +242,38 @@ function addUserIdToTroupe(userId, troupeId) {
 }
 
 /**
+ * Returns the URL a particular user would see if they wish to view a URL.
+ * NB: this call has to query the db to get a user's username. Don't call it
+ * inside a loop!
+ *
+ * @return promise of a URL string
+ */
+function getUrlForTroupeForUserId(troupe, userId, callback) {
+
+  var step1;
+  if(!troupe.oneToOne) {
+    step1 = Q.resolve("/" + troupe.uri);
+  } else {
+    step1 = Q.when(function() {
+      var otherTroupeUser = troupe.users.filter(function(troupeUser) {
+        return troupeUser.userId != userId;
+      })[0];
+
+      if(!otherTroupeUser) throw "Unable to determine other user for troupe#" + troupe.id;
+
+      return userService.findUsernameForUserId(otherTroupeUser.userId)
+        .then(function(username) {
+          return username ? "/" + username
+                          : "/one-one/" + otherTroupeUser.userId.userId;
+        });
+
+    });
+  }
+
+  return step1.nodeify(callback);
+
+}
+/**
  * Notify existing users of invites. This method does not handle email-only invites for non-registered email addresses
  * @param  {[type]} invites
  * @return promise of undefined
@@ -766,8 +798,8 @@ function updateTroupeName(troupeId, troupeName, callback) {
 }
 
 function createOneToOneTroupe(userId1, userId2, callback) {
+  winston.verbose('Creating a oneToOne troupe for ', { userId1: userId1, userId2: userId2 });
   return createTroupeQ({
-      uri: null,
       name: '',
       oneToOne: true,
       status: 'ACTIVE',
@@ -1008,6 +1040,10 @@ function findAllUserIdsForUnconnectedImplicitContacts(userId, callback) {
 }
 
 
+/**
+ * Find the best troupe for a user to access
+ * @return promise of a troupe or null
+ */
 function findBestTroupeForUser(user, callback) {
   //
   // This code is invoked when a user's lastAccessedTroupe is no longer valid (for the user)
@@ -1017,30 +1053,35 @@ function findBestTroupeForUser(user, callback) {
   // any valid troupes, it returns an error.
   //
 
+  var op;
   if (user.lastTroupe) {
-    findById(user.lastTroupe, function(err,troupe) {
-      if(err) return callback(err);
+     op = findById(user.lastTroupe)
+      .then(function(troupe) {
 
-      if(!troupe || troupe.status == 'DELETED' || !userHasAccessToTroupe(user, troupe)) {
-        return findLastAccessedTroupeForUser(user, callback);
-      }
+        if(!troupe || troupe.status == 'DELETED' || !userHasAccessToTroupe(user, troupe)) {
+          return findLastAccessedTroupeForUser(user);
+        }
 
-      callback(null, troupe);
-    });
-    return;
+        return troupe;
+      });
+
+  } else {
+    op = findLastAccessedTroupeForUser(user);
   }
 
-  return findLastAccessedTroupeForUser(user, callback);
+  return op.nodeify(callback);
 }
 
+/**
+ * Find the last troupe that a user accessed that the user still has access to
+ * that hasn't been deleted
+ * @return promise of a troupe (or null)
+ */
 function findLastAccessedTroupeForUser(user, callback) {
-  persistence.Troupe.find({ 'users.userId': user.id, 'status': 'ACTIVE' }, function(err, activeTroupes) {
-    if(err) return callback(err);
-    if (!activeTroupes || activeTroupes.length === 0) callback(null, null);
+  return persistence.Troupe.findQ({ 'users.userId': user.id, 'status': 'ACTIVE' }).then(function(activeTroupes) {
+    if (!activeTroupes || activeTroupes.length === 0) return null;
 
-    userService.getTroupeLastAccessTimesForUser(user.id, function(err, troupeAccessTimes) {
-      if(err) return callback(err);
-
+    return userService.getTroupeLastAccessTimesForUser(user.id).then(function(troupeAccessTimes) {
       activeTroupes.forEach(function(troupe) {
         troupe.lastAccessTime = troupeAccessTimes[troupe._id];
       });
@@ -1049,16 +1090,14 @@ function findLastAccessedTroupeForUser(user, callback) {
         return (t.lastAccessTime) ? t.lastAccessTime : 0;
       }).reverse();
 
-      _.find(troupes, function(troupe) {
-
-        if (userHasAccessToTroupe(user, troupe)) {
-          callback(null, troupe);
-          return true;
-        }
+      var troupe = _.find(troupes, function(troupe) {
+        return userHasAccessToTroupe(user, troupe);
       });
+
+      return troupe;
     });
 
-  });
+  }).nodeify(callback);
 
 }
 
@@ -1414,7 +1453,7 @@ module.exports = {
   findAllUserIdsForUnconnectedImplicitContacts: findAllUserIdsForUnconnectedImplicitContacts,
   updateUnconfirmedInvitesForUserId: updateUnconfirmedInvitesForUserId,
   updateUnconfirmedRequestsForUserId: updateUnconfirmedRequestsForUserId,
-
+  getUrlForTroupeForUserId: getUrlForTroupeForUserId,
   inviteUserByUserId: inviteUserByUserId,
 
   updateInvitesForEmailToUserId: updateInvitesForEmailToUserId,

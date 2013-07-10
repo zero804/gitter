@@ -114,17 +114,28 @@ var userService = {
   },
 
   findByLogin: function(login, callback) {
-
+    var user;
     if (login.indexOf('@') >= 0) { // login is an email
-      var user = userService.findByEmail(login, callback);
+      user = userService.findByEmail(login, callback);
       if (user) statsService.event("login_by_email", { userId: user.id });
       return user;
     } else { // login is a username
-      var user = userService.findByUsername(login, callback);
+      user = userService.findByUsername(login, callback);
       if (user) statsService.event("login_by_username", { userId: user.id });
       return user;
     }
 
+  },
+
+  /**
+   * Find the username of a single user
+   * @return promise of a username or undefined if user or username does not exist
+   */
+  findUsernameForUserId: function(userId) {
+    return persistence.User.findQ({ _id: userId }, 'username')
+      .then(function(user) {
+        return user && user.username;
+      });
   },
 
   saveLastVisitedTroupeforUser: function(userId, troupe, callback) {
@@ -165,15 +176,16 @@ var userService = {
     });
   },
 
+  /**
+   * Get the last access times for a user
+   * @return promise of a hash of { troupeId1: accessDate, troupeId2: accessDate ... }
+   */
   getTroupeLastAccessTimesForUser: function(userId, callback) {
-    persistence.UserTroupeLastAccess.findOne({ userId: userId }, function(err, userTroupeLastAccess) {
-      if(err) return callback(err);
+    return persistence.UserTroupeLastAccess.findOneQ({ userId: userId }).then(function(userTroupeLastAccess) {
+      if(!userTroupeLastAccess || !userTroupeLastAccess.troupes) return {};
 
-      if(!userTroupeLastAccess || !userTroupeLastAccess.troupes) return callback(null, {});
-
-      callback(null, userTroupeLastAccess.troupes);
-    });
-
+      return userTroupeLastAccess.troupes;
+    }).nodeify(callback);
   },
 
   setUserLocation: function(userId, location, callback) {
