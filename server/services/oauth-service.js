@@ -22,15 +22,17 @@ exports.findClientById = function(id, callback) {
   persistenceService.OAuthClient.findById(id, callback);
 };
 
-exports.saveAuthorizationCode = function(code, client, redirectUri, userId, callback) {
+exports.saveAuthorizationCode = function(code, client, redirectUri, user, callback) {
 
-  statsService.setUserProperty(userId, 'Last login from ' + client.tag, (new Date()).toISOString());
+  var properties = {};
+  properties['Last login from ' + client.tag] = (new Date()).toISOString();
+  statsService.userUpdate(user, properties);
 
   var authCode = new persistenceService.OAuthCode({
       code: code,
       clientId: client.id,
       redirectUri: redirectUri,
-      userId: userId
+      userId: user.id
   });
   authCode.save(callback);
 };
