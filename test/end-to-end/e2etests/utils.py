@@ -155,6 +155,14 @@ def getJSON(url):
     return json.loads(response)
 
 
+# cannot run during setup/teardown as stdout is ignored
+def printJobInfo(driver):
+    remote = os.getenv('REMOTE_EXECUTOR')
+    if remote is not None:
+        if 'saucelabs' in remote:
+            print("Link to your job: https://saucelabs.com/jobs/%s" % driver.session_id)
+
+
 def shutdown(driver):
     if(os.getenv('SELENIUM_DEV') is None):
         screenshot(driver)
