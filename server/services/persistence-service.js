@@ -254,18 +254,6 @@ TroupeSchema.methods.removeUserById = function(userId) {
   }
 };
 
-TroupeSchema.methods.getUrl = function(userId) {
-  if(!this.oneToOne) return "/" + this.uri;
-
-  var otherUser = this.users.filter(function(troupeUser) {
-      return troupeUser.userId != userId;
-    })[0];
-
-  return otherUser.username ?
-            "/" + otherUser.username :
-            "/one-one/" + otherUser.userId;
-};
-
 var TroupeRemovedUserSchema = new Schema({
   userId: { type: ObjectId },
   troupeId: { type: ObjectId },

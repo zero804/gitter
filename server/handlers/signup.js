@@ -2,6 +2,7 @@
 "use strict";
 
 var signupService = require("../services/signup-service"),
+    troupeService = require('../services/troupe-service'),
     middleware = require("../web/middleware"),
     loginUtils = require('../web/login-utils'),
     winston = require('winston'),
@@ -122,7 +123,15 @@ module.exports = {
                 return;
               }
 
-              res.relativeRedirect(troupe.getUrl(user.id));
+              troupeService.getUrlForTroupeForUserId(troupe, user.id, function(err, url) {
+                if (err || !url) {
+                  res.relativeRedirect("/" + req.params.appUri);
+                  return;
+                }
+
+                res.relativeRedirect(url);
+              });
+
           });
       });
 
