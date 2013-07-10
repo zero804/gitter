@@ -2,7 +2,7 @@ import utils
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import WebDriverException
-from nose.tools import nottest
+from nose.plugins.attrib import attr
 import urllib2
 import time
 
@@ -13,7 +13,8 @@ def setup_module():
     global driver
     driver = utils.driver()
 
-@nottest
+
+@attr('unreliable')
 def testCreateTroupeFromGroupTroupe():
     utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
 
@@ -106,7 +107,7 @@ def testCreateTroupeFromGroupTroupe():
 
 
 # Follows on from last test
-@nottest
+@attr('unreliable')
 def testRemoveUserFromTroupe():
     #troupeBefore = driver.find_element_by_css_selector('DIV.trpHeaderTitle').text
 

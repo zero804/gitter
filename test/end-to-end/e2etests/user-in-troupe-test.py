@@ -1,7 +1,7 @@
 import utils
 import string
 import time
-from nose.tools import nottest
+from nose.plugins.attrib import attr
 
 driver1 = None
 driver2 = None
@@ -26,7 +26,7 @@ def setup_module():
     driver2 = utils.secondDriver()
 
 
-@nottest
+@attr('unreliable')
 def testUsersComingOnlineAndGoingOffline():
     global driver1
     global driver2
