@@ -1,71 +1,93 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var nconf = require('../utils/config');
+var nconf   = require('../utils/config');
 var winston = require('../utils/winston');
 
-if(!nconf.get("stats:sendStats")) {
-  /* No-op */
-  var noop = function() {};
-  exports.event = noop;
-  exports.userUpdate = noop;
-  exports.user = noop;
-}
-else {
+var cube_enabled        = nconf.get("stats:cube:enabled")       || false;
+var mixpanel_enabled    = nconf.get("stats:mixpanel:enabled")   || false;
+var customerio_enabled  = nconf.get("stats:customerio:enabled") || false;
 
-  if (nconf.get("stats:cube:enabled")) {
-    var Cube = require("cube");
-    var statsEnvName = nconf.get("stats:envName");
-    var statsUrl = nconf.get("stats:cubeUrl");
-    var cube = Cube.emitter(statsUrl);
+if (cube_enabled) {
+  var Cube = require("cube");
+  var statsUrl = nconf.get("stats:cube:cubeUrl");
+  var cube = Cube.emitter(statsUrl);
+}
+
+if (mixpanel_enabled) {
+  var Mixpanel  = require('mixpanel');
+  var token     = nconf.get("stats:mixpanel:token");
+  var mixpanel  = Mixpanel.init(token);
+  var blacklist = ['location_submission'];
+}
+
+if (customerio_enabled) {
+  var CustomerIO = require('customer.io');
+  var cio = CustomerIO.init(nconf.get("stats:customerio:siteId"), nconf.get("stats:customerio:key"));
+}
+
+exports.event = function(eventName, properties) {
+  if(!properties) properties = {};
+
+  // Cube
+  if (cube_enabled) {
+    properties.env = nconf.get("stats:envName");
+
+    var event = {
+      type: "troupe_" + eventName,
+      time: new Date(),
+      data: properties
+    };
+    cube.send(event);
   }
 
-  if (nconf.get("stats:mixpanel:enabled")) {
-    var Mixpanel  = require('mixpanel');
-    var token     = nconf.get("stats:mixpanel:token");
-    var mixpanel  = Mixpanel.init(token);
-    var blacklist = ['location_submission'];
+  // MixPanel
+  if (mixpanel_enabled && blacklist.indexOf(eventName) == -1) {
+    properties.distinct_id = properties.userId;
+    mixpanel.track(eventName, properties, function(err) { if (err) throw err; });
   }
 
-  // FIXME too many IFs find a nicer way
-  exports.event = function(eventName, properties) {
-    if(!properties) properties = {};
-    properties.env = statsEnvName;
+  // CustomerIO
+  if (customerio_enabled) {
+    cio.track(properties.userId, eventName, properties);
+  }
 
-    // MixPanel
-    if (nconf.get("stats:mixpanel:enabled") && blacklist.indexOf(eventName) == -1) {
-      properties.distinct_id = properties.userId;
-      mixpanel.track(eventName, properties, function(err) { if (err) throw err; });
-    }
+  winston.verbose("[stats]", {event: eventName, properties: properties});
+};
 
-    // Cube
-    if (nconf.get("stats:cube:enabled")) {
-      var event = {
-        type: "troupe_" + eventName,
-        time: new Date(),
-        data: properties
-      };
-      cube.send(event);
-    }
+exports.userUpdate = function(user, properties) {
+  if(!properties) properties = {};
 
-    winston.verbose("[stats]", {event: eventName, properties: properties});
-  };
+  var createdAt = new Date(user._id.getTimestamp().getTime());
+  var firstName = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
 
-  exports.userUpdate = function(user) {
-    var createdAt = new Date(user._id.getTimestamp().getTime());
-    var firstName = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
+  if (mixpanel_enabled) {
+    var mp_properties = {
+      $first_name:  firstName,
+      $created_at:  createdAt.toISOString(),
+      $email:       user.email,
+      $name:        user.displayName,
+      $username:    user.username,
+      Status:       user.status
+    };
 
-    mixpanel.people.set(user.id, {
-      $first_name: firstName,
-      $created_at: createdAt.toISOString(),
-      $email: user.email,
-      $name: user.displayName,
-      $username: user.username,
-      Status: user.status
-    });
-  };
+    for (var attr in properties) { mp_properties[attr] = properties[attr]; }
 
-  exports.setUserProperty = function(userId, key, value) {
-    mixpanel.people.set(userId, key, value);
-  };
-}
+    mixpanel.people.set(user.id, mp_properties);
+  }
+
+  if (customerio_enabled) {
+    var cio_properties = {
+      first_name: firstName,
+      created_at: createdAt.toISOString(),
+      email:      user.email,
+      name:       user.displayName,
+      username:   user.username,
+      status:     user.status
+    };
+
+    for (var attr in properties) { cio_properties[attr] = properties[attr]; }
+
+    cio.identify(user.id, user.email, cio_properties);
+  }
+};
