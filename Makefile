@@ -57,9 +57,15 @@ end-to-end-test:
 	nosetests -s -v --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests/
 
 end-to-end-test-saucelabs:
-	mkdir -p ./output/test-reports
-	REMOTE_EXECUTOR=http://trevorah:d6b21af1-7ae7-4bed-9c56-c5f9d290712b@ondemand.saucelabs.com:80/wd/hub \
+	@mkdir -p ./output/test-reports
+	@echo Testing chrome at saucelabs.com
+	@REMOTE_EXECUTOR=http://trevorah:d6b21af1-7ae7-4bed-9c56-c5f9d290712b@ondemand.saucelabs.com:80/wd/hub \
 	DRIVER=REMOTECHROME \
+	BASE_URL=http://beta.trou.pe \
+	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
+	@echo Testing ie9 at saucelabs.com
+	@REMOTE_EXECUTOR=http://trevorah:d6b21af1-7ae7-4bed-9c56-c5f9d290712b@ondemand.saucelabs.com:80/wd/hub \
+	DRIVER=REMOTEIE \
 	BASE_URL=http://beta.trou.pe \
 	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
 

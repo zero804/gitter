@@ -1,5 +1,6 @@
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
+from nose.plugins.attrib import attr
 import utils
 import time
 import os
@@ -15,6 +16,7 @@ def setup_module():
     utils.resetData(driver)
 
 
+@attr('unreliable')
 def testSendingAChatMessage():
     utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
     textArea = driver.find_element_by_id('chat-input-textarea')
@@ -30,6 +32,7 @@ def testSendingAChatMessage():
     assert text == chatMessage
 
 
+@attr('unreliable')
 def testEditingAChatMessage():
     driverName = os.getenv('DRIVER')
     if driverName != 'FIREFOX':

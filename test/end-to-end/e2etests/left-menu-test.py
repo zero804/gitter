@@ -2,6 +2,7 @@ import utils
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import WebDriverException
+from nose.plugins.attrib import attr
 import urllib2
 import time
 
@@ -13,6 +14,7 @@ def setup_module():
     driver = utils.driver()
 
 
+@attr('unreliable')
 def testLeftMenu():
 
     # login as user 1

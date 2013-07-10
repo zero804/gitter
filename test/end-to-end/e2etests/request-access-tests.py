@@ -62,6 +62,7 @@ def testNewUserUnauthenticatedTroupeRequest():
     driver.find_element_by_id('request-accept-button').click()
 
 
+@attr('unreliable')
 def testExistingUnauthenticatedRequest():
     driver.get(utils.baseUrl("/signout"))
     driver.get(utils.baseUrl("/testtroupe3"))
@@ -85,6 +86,7 @@ def testExistingUnauthenticatedRequest():
     driver.find_element_by_id('yes').click()
 
 
+@attr('unreliable')
 def testExistingAuthenticatedRequest():
     driver.get(utils.baseUrl("/signout"))
     utils.existingUserlogin(driver, 'testuser2@troupetest.local', '123456')

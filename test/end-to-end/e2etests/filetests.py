@@ -1,6 +1,7 @@
 import utils
 import os
 import time
+from nose.plugins.attrib import attr
 
 driver = None
 
@@ -24,11 +25,12 @@ def testFileUpload():
     if driverName == 'REMOTEIE':
         utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
         driver.get(utils.baseUrl("/filetesttroupe"))
-        driver.find_element_by_name("file").send_keys('c:\\test\image.jpg')
+        driver.find_element_by_name("file").send_keys('c:\\ProgramData\Microsoft\User Account Pictures\user.bmp')
         driver.find_elements_by_class_name('trpFileVersionThumbnail')
         driver.get(utils.baseUrl("/signout"))
 
 
+@attr('unreliable')
 def testPreviewFile():
     driverName = os.getenv('DRIVER')
     if driverName == 'REMOTEIE':
@@ -42,6 +44,7 @@ def testPreviewFile():
         driver.get(utils.baseUrl("/signout"))
 
 
+@attr('unreliable')
 def testDeleteFile():
     driverName = os.getenv('DRIVER')
     if driverName == 'REMOTEIE':
