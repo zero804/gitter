@@ -38,7 +38,10 @@ function load(expected, done) {
     return a[0];
   }
 
-  var fixture = {};
+  var fixture = {
+    generateEmail: generateEmail,
+    generateName: generateName
+  };
 
   Q.all([
       persistence.User.findQ({ email: 'testuser@troupetest.local' }).then(only).then(function(user) { fixture.user1 = user; }),
@@ -56,10 +59,7 @@ function load(expected, done) {
 
       assert(fixture.troupe2.users.length === 0, 'Fixture error: troupe2 should not contain any users');
 
-      return _.extend(fixture, {
-          generateEmail: generateEmail,
-          generateName: generateName
-        });
+      return fixture;
     })
     .nodeify(done);
 
@@ -77,6 +77,7 @@ function createExpectedFixtures(expected, done) {
     return persistence.User.createQ({
       email:        f.email || generateEmail(),
       displayName:  f.displayName || generateName(),
+      username:     username,
       status:       f.status || 'ACTIVE'
     });
   }
@@ -179,12 +180,22 @@ function createExpectedFixtures(expected, done) {
     return Q.all(promises).then(function() { return fixture; });
   }
 
-  return createUsers({})
+  return createUsers({
+      generateEmail: generateEmail,
+      generateName: generateName,
+      cleanup: function() {
+        var self = this;
+        Object.keys(this).forEach(function(key) {
+          var o = self[key];
+          if(o.remove) o.remove();
+        });
+      }
+    })
     .then(createTroupes)
     .nodeify(done);
 }
 
-module.exports = function(fixture, expected) {
+function fixtureLoader(fixture, expected) {
   return function(done) {
      load(expected, function(err, data) {
        if(err) return done(err);
@@ -197,4 +208,10 @@ module.exports = function(fixture, expected) {
      });
 
    };
+}
+
+fixtureLoader.use = function(expected) {
+  return createExpectedFixtures(expected);
 };
+
+module.exports = fixtureLoader;
