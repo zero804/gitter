@@ -426,7 +426,6 @@ describe('troupe-service', function() {
           confirmationCode: null,
           status: 'UNCONFIRMED' })
         .then(function(user) {
-
           // Have another user invite them to a one to one chat
           return troupeService.createInvite(null, {
             fromUser: fixture.user1,
@@ -448,7 +447,6 @@ describe('troupe-service', function() {
                   assert(invite);
                 })
                 .then(function() {
-
                   // Have user one accept the INVITE
                   return troupeService.acceptInvite(invite.code, fixture.user1.getHomeUrl())
                     .then(function(result) {
@@ -460,8 +458,8 @@ describe('troupe-service', function() {
 
                       return troupeService.findOneToOneTroupe(fixture.user1.id, user2.id)
                         .then(function(newTroupe) {
-                          assert(newTroupe, 'A troupe should exist for the users');
 
+                          assert(newTroupe, 'A troupe should exist for the users');
 
                           // Now we should also check that the invites that we UNCONFIRMED have been sent out
                           // and are now set to UNUSED
