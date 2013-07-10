@@ -24,6 +24,7 @@ else {
     var Mixpanel  = require('mixpanel');
     var token     = nconf.get("stats:mixpanel:token");
     var mixpanel  = Mixpanel.init(token);
+    var blacklist = ['location_submission'];
   }
 
   // FIXME too many IFs find a nicer way
@@ -32,7 +33,7 @@ else {
     properties.env = statsEnvName;
 
     // MixPanel
-    if (nconf.get("stats:mixpanel:enabled")) {
+    if (nconf.get("stats:mixpanel:enabled") && blacklist.indexOf(eventName) == -1) {
       properties.distinct_id = properties.userId;
       mixpanel.track(eventName, properties, function(err) { if (err) throw err; });
     }
