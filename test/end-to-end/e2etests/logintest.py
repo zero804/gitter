@@ -31,11 +31,11 @@ def testSignInAndNavigateBack():
     utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
     driver.find_element_by_css_selector('DIV.trpHeaderTitle')
 
-    print('Logged in, now attempting to visit /x again')
+    # Logged in, now attempting to visit /x again
     driver.get(utils.baseUrl("/x"))
     time.sleep(1)
 
-    print('We should navigate back to the last troupe')
+    # We should navigate back to the last troupe
     driver.find_element_by_css_selector('DIV.trpHeaderTitle')
 
 
