@@ -58,9 +58,12 @@
 
       <div class="trpHomeHero">
         <div class="trpHeroText">
+          {{#if compactView}}
+          We're still a work in progress. <br><br>Please visit Troupe in a full browser to continue.<br><br><br><br><br><br><br>
+          {{else}}
           The quick and simple way to chat, share and<br>work together.<br><br>Anytime, anywhere.
           <br><br>
-          {{#compactView}}Coming soon.{{/compactView}}
+          {{/if}}
         </div>
         {{^compactView}}
         <div class="trpHeroSignup">
