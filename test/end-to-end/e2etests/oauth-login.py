@@ -1,6 +1,7 @@
 
 import utils
 import time
+from nose.plugins.attrib import attr
 
 driver = None
 
@@ -10,6 +11,7 @@ def setup_module():
     driver = utils.driver()
 
 
+@attr('unreliable')
 def testSignin():
     driver.delete_all_cookies()
     driver.get(utils.baseUrl("/oauth/authorize?client_id=1&redirect_uri=http%3A%2F%2Ftrou.pe%2FOAuthCallback&response_type=code&scope=read"))
@@ -27,6 +29,7 @@ def testSignin():
     driver.get(utils.baseUrl("/signout"))
 
 
+@attr('unreliable')
 def testSigninWithoutCookies():
     driver.delete_all_cookies()
     driver.get(utils.baseUrl("/oauth/authorize?client_id=1&redirect_uri=http%3A%2F%2Ftrou.pe%2FOAuthCallback&response_type=code&scope=read"))

@@ -129,6 +129,7 @@ def testRemoveUserFromTroupe():
     #assert(troupeBefore != troupeAfter)
 
 
+@attr('unreliable')
 def testCreateTroupeFromOneToOneTroupe():
     # Login as Test User 1
     driver.delete_all_cookies()

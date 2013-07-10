@@ -26,6 +26,7 @@ def login():
         driver.get(utils.baseUrl("/testtroupe1"))
 
 
+@attr('unreliable')
 def testInvite():
 
     # link = driver.find_element_by_css_selector('#people-share-troupe-button')

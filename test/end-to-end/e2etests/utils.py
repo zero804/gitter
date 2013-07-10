@@ -62,9 +62,9 @@ def driver():
 
     elif driverName == 'REMOTEIE':
         print('Using remote IE')
-        ie = {'platform': 'WINDOWS',
+        ie = {'platform': 'WINDOWS 7',
               'browserName': 'internet explorer',
-              'version': '',
+              'version': '9',
               'javascriptEnabled': True,
               'ignoreZoomSetting': True}
         driver = webdriver.Remote(command_executor=remote, desired_capabilities=ie)
