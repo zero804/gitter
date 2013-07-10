@@ -54,13 +54,10 @@ def driver():
         driver = webdriver.PhantomJS()
 
     elif driverName == 'CHROME':
-        print('Using local Chrome')
-
         e2edir = os.path.dirname(os.path.abspath(__file__))
         driver = webdriver.Chrome(e2edir + '/../chromedriver/chromedriver')
 
     elif driverName == 'REMOTECHROME':
-        print('Using remote chrome')
         driver = webdriver.Remote(command_executor=remote, desired_capabilities=DesiredCapabilities.CHROME)
 
     elif driverName == 'REMOTEIE':
@@ -93,7 +90,6 @@ def resetData(driver):
 
 
 def existingUserlogin(driver, usernameValue, passwordValue):
-    print('Navigating to ' + baseUrl("/x"))
     driver.get(baseUrl("/x"))
 
     time.sleep(0.5)
@@ -151,7 +147,6 @@ def signup(driver):
 def screenshot(driver):
     e2edir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.abspath(e2edir + '/../../../output/screenshot-' + time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime()) + '.png')
-    print('Screenshot saved at ' + filename)
     driver.get_screenshot_as_file(filename)
 
 
