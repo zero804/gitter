@@ -14,8 +14,9 @@ var oauthService = require('../services/oauth-service');
 var statsService = require("../services/stats-service");
 var nconf = require('../utils/config');
 var loginUtils = require("../web/login-utils");
+var useragent = require('useragent');
 
-function loginAndPasswordUserStrategy(login, password, done) {
+function loginAndPasswordUserStrategy(req, login, password, done) {
   winston.verbose("Attempting to authenticate ", { email: email });
 
   var email = login;
@@ -66,9 +67,21 @@ function loginAndPasswordUserStrategy(login, password, done) {
         user.save();
       }
 
+      // Tracking
+
       statsService.event("user_login", {
-        userId: user.id
+        userId: user.id,
+        login: (login.indexOf('@') == -1 ? 'username' : 'email')
       });
+
+      var ua = useragent.parse(req.headers['user-agent']);
+      var prefix = ua.os.family.match(/ios|android/i) ? 'mobile' : 'desktop';
+
+      var properties = {};
+      properties[prefix + "_os"]      = ua.os.family;
+      properties[prefix + "_browser"] = ua.family;
+
+      statsService.userUpdate(user, properties);
 
       /* Todo: consider using a seperate object for the security user */
       return done(null, user);
@@ -97,7 +110,8 @@ module.exports = {
 
     passport.use(new LocalStrategy({
           usernameField: 'email',
-          passwordField: 'password'
+          passwordField: 'password',
+          passReqToCallback: true
         },
         loginAndPasswordUserStrategy
     ));
@@ -140,7 +154,7 @@ module.exports = {
       userService.findAndUsePasswordResetCode(confirmationCode, function(err, user) {
         if(err) return done(err);
         if(!user) {
-          statsService.event('password_reset_invalid', { confirmationCode: confirmationCode });
+          //statsService.event('password_reset_invalid', { confirmationCode: confirmationCode });
           return done(null, false);
         }
 
@@ -165,7 +179,7 @@ module.exports = {
      * to the `Authorization` header).  While this approach is not recommended by
      * the specification, in practice it is quite common.
      */
-    passport.use(new BasicStrategy(loginAndPasswordUserStrategy));
+    passport.use(new BasicStrategy({passReqToCallback: true}, loginAndPasswordUserStrategy));
 
     passport.use(new ClientPasswordStrategy(
       function(clientKey, clientSecret, done) {

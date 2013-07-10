@@ -67,7 +67,8 @@
     "express-validator": "~0.6.0",
     "mongoose-q": "0.0.4",
     "mixpanel": "0.0.16",
-    "customer.io": "0.0.2"
+    "customer.io": "0.0.2",
+    "useragent": "2.0.6"
   },
   "devDependencies": {
     "proxyquire": "0.4.0",
