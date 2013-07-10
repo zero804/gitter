@@ -3,7 +3,7 @@ import time
 import urllib2
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-from nose.tools import nottest
+from nose.plugins.attrib import attr
 
 driver = None
 
@@ -14,7 +14,7 @@ def setup_module():
     utils.resetData(driver)
 
 
-@nottest
+@attr('unreliable')
 def testUnathenticatedOnetoOneInviteFlow():
     driver.get(utils.baseUrl("/signout"))
     driver.get(utils.baseUrl("/testuser1"))
@@ -63,7 +63,7 @@ def testUnathenticatedOnetoOneInviteFlow():
     textArea.send_keys(Keys.RETURN)
     driver.find_element_by_css_selector(".trpChatText")
 
-@nottest
+@attr('unreliable')
 def testAuthenticatedOnetoOneInviteFlow():
     newUser = utils.signup(driver)
     time.sleep(1)
@@ -85,7 +85,7 @@ def testAuthenticatedOnetoOneInviteFlow():
     driver.find_element_by_css_selector(".trpChatText")
 
 
-@nottest
+@attr('unreliable')
 def testExistingUnauthenticatedOnetoOneInviteFlow():
     newUser = utils.signup(driver)
     driver.get(utils.baseUrl("/signout"))
