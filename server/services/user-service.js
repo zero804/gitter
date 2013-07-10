@@ -120,6 +120,9 @@ var userService = {
 
     return find
       .then(function(user) {
+
+        // TODO: this is a bad place for this statsservice call. Look at the method name. Does it mention anything about
+        // sending an event to the stats service regarding a user login? No.
         if(user)
           statsService.event(byEmail ? "login_by_email" : "login_by_username", { userId: user.id });
 
