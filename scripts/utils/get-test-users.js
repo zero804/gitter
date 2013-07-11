@@ -9,7 +9,7 @@ var shutdown    = require('../../server/utils/shutdown');
 
 
 function getAllUsers(callback) {
-  persistence.User.find({email:/local/}, function (err, users) {
+  persistence.User.find({email:/troupetest.local/}, function (err, users) {
     if (err) console.log(err);
     callback("",users);
   });
