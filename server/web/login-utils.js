@@ -13,7 +13,6 @@ exports.whereToNext = function(user, callback) {
   return troupeService.findBestTroupeForUser(user)
     .then(promiseUtils.required)
     .then(function(troupe) {
-      console.log('TROUPE', troupe);
       return troupeService.getUrlForTroupeForUserId(troupe, user.id)
         .then(promiseUtils.required);
     })

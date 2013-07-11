@@ -739,8 +739,8 @@ function TroupeStrategy(options) {
       } else {
         console.log('');
         if(!shownWarning) {
-          console.log('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
-          console.log(stack.join('\n'));
+          winston.warn('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
+          winston.warn(stack.join('\n'));
           shownWarning = true;
         }
       }
