@@ -95,7 +95,8 @@ function createTroupeContext(req, options) {
         fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
         options: {
           timeout: nconf.get('ws:fayeTimeout'),
-          retry: nconf.get('ws:fayeRetry')
+          retry: nconf.get('ws:fayeRetry'),
+          interval: nconf.get('ws:fayeInterval')
         },
         disable: disabledFayeProtocols
       },
