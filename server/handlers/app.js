@@ -14,6 +14,7 @@ var loginUtils = require('../web/login-utils');
 var uriService = require('../services/uri-service');
 var Q = require('q');
 var useFirebugInIE = nconf.get('web:useFirebugInIE');
+var isPhone = require('../web/is-phone');
 
 function serializeUser(user) {
   var strategy = new restSerializer.UserStrategy({ includeEmail: true });
@@ -377,8 +378,11 @@ module.exports = {
           if (req.uriContext.ownUrl) {
             return renderHomePage(req, res, next);
           }
-
-          renderAppPageWithTroupe(req, res, next, 'app-template');
+          if(isPhone(req.headers['user-agent'])) {
+            renderAppPageWithTroupe(req, res, next, 'mobile/chat-app');
+          } else {
+            renderAppPageWithTroupe(req, res, next, 'app-template');
+          }
         });
 
 
