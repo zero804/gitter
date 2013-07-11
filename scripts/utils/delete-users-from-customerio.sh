@@ -1,4 +1,4 @@
-for i in `cat test-users`
+for i in `mongo --quiet troupe get-test-users.js`
 do
   curl -i https://track.customer.io/api/v1/customers/$i \
      -X DELETE \
