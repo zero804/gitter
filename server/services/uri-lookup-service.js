@@ -11,6 +11,7 @@ var persistence = require("./persistence-service");
 var assert = require('assert');
 var Q = require('q');
 var _ = require('underscore');
+var collections = require('../utils/collections');
 
 /**
  * Lookup the owner of a URI
@@ -101,6 +102,8 @@ function removeUriForTroupeId(troupeId) {
  * @return promise of a hash of taken uris: { uri1: true, uri2: true }
  */
 function findTakenUris(uris) {
+  uris = collections.idsIn(uris);
+
   var taken = {};
 
   return persistence.UriLookup.findQ({ uri: { $in: uris } }, 'uri')
