@@ -480,6 +480,18 @@ PushNotificationDeviceSchema.index({ tokenHash: 1 });
 PushNotificationDeviceSchema.schemaTypeName = 'PushNotificationDeviceSchema';
 
 
+
+/*
+ * Push Notifications
+ */
+ var UriLookupSchema = new Schema({
+  uri:      { type: String, unique: true },
+  userId:   { type: ObjectId, unique: true, sparse: true },
+  troupeId: { type: ObjectId, unique: true, sparse: true }
+});
+UriLookupSchema.schemaTypeName = 'UriLookupSchema';
+
+
 var User = mongoose.model('User', UserSchema);
 var UserLocationHistory = mongoose.model('UserLocationHistory', UserLocationHistorySchema);
 var UserTroupeLastAccess = mongoose.model('UserTroupeLastAccess', UserTroupeLastAccessSchema);
@@ -508,6 +520,7 @@ var OAuthAccessToken = mongoose.model('OAuthAccessToken', OAuthAccessTokenSchema
 var GeoPopulatedPlace = mongoose.model('GeoPopulatedPlaces', GeoPopulatedPlaceSchema);
 
 var PushNotificationDevice = mongoose.model('PushNotificationDevice', PushNotificationDeviceSchema);
+var UriLookup = mongoose.model('UriLookup', UriLookupSchema);
 
 
 //
@@ -542,7 +555,8 @@ module.exports = {
     OAuthCodeSchema: OAuthCodeSchema,
     OAuthAccessTokenSchema: OAuthAccessTokenSchema,
     GeoPopulatedPlaceSchema: GeoPopulatedPlaceSchema,
-    PushNotificationDeviceSchema: PushNotificationDeviceSchema
+    PushNotificationDeviceSchema: PushNotificationDeviceSchema,
+    UriLookupSchema: UriLookupSchema
   },
   User: User,
   UserTroupeLastAccess: UserTroupeLastAccess,
@@ -565,7 +579,8 @@ module.exports = {
   OAuthAccessToken: OAuthAccessToken,
   GeoPopulatedPlace: GeoPopulatedPlace,
   UserLocationHistory: UserLocationHistory,
-  PushNotificationDevice: PushNotificationDevice
+  PushNotificationDevice: PushNotificationDevice,
+  UriLookup: UriLookup
 };
 
 process.nextTick(function() {
