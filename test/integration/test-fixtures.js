@@ -27,6 +27,23 @@ function generateUsername() {
   return '_testuser_' + (++counter) + Date.now();
 }
 
+function createBaseFixture() {
+  return {
+    generateEmail: generateEmail,
+    generateName: generateName,
+    generateUri: generateUri,
+    generateUsername: generateUsername,
+
+    cleanup: function() {
+      var self = this;
+      Object.keys(this).forEach(function(key) {
+        var o = self[key];
+        if(o.remove) o.remove();
+      });
+    }
+  };
+}
+
 function load(expected, done) {
   if(expected) {
     return createExpectedFixtures(expected, done);
@@ -38,10 +55,7 @@ function load(expected, done) {
     return a[0];
   }
 
-  var fixture = {
-    generateEmail: generateEmail,
-    generateName: generateName
-  };
+  var fixture = createBaseFixture();
 
   Q.all([
       persistence.User.findQ({ email: 'testuser@troupetest.local' }).then(only).then(function(user) { fixture.user1 = user; }),
@@ -59,6 +73,8 @@ function load(expected, done) {
 
       assert(fixture.troupe2.users.length === 0, 'Fixture error: troupe2 should not contain any users');
 
+      // For now, keep it safe
+      delete fixture.cleanup;
       return fixture;
     })
     .nodeify(done);
@@ -180,17 +196,7 @@ function createExpectedFixtures(expected, done) {
     return Q.all(promises).then(function() { return fixture; });
   }
 
-  return createUsers({
-      generateEmail: generateEmail,
-      generateName: generateName,
-      cleanup: function() {
-        var self = this;
-        Object.keys(this).forEach(function(key) {
-          var o = self[key];
-          if(o.remove) o.remove();
-        });
-      }
-    })
+  return createUsers(createBaseFixture())
     .then(createTroupes)
     .nodeify(done);
 }
