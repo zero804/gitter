@@ -6,10 +6,12 @@ require([
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
   'views/widgets/avatar',
-  'components/eyeballs',
-  'components/unread-items-client',
-  'scrollfix'
-], function($, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget  /*, eyeballsClient, unreadItemsClient, scrollfix*/) {
+  'scrollfix',
+  'components/mobile-context',        // No ref
+  'components/eyeballs',              // No ref
+  'components/unread-items-client',   // No ref
+  'template/helpers/all'              // No ref
+], function($, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget, ScrollFix  /*, mobileContext, eyeballsClient, unreadItemsClient */) {
   "use strict";
 
   var PAGE_SIZE = 15;

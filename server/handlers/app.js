@@ -82,7 +82,7 @@ function createTroupeContext(req, options) {
       profileNotCompleted: options.profileNotCompleted,
       accessDenied: options.accessDenied,
       inviteId: options.inviteId,
-      mobilePage: req.params && req.params.page,
+      mobilePage: req.params && req.params.mobilePage,
       appVersion: appVersion.getCurrentVersion(),
       baseServer: nconf.get('web:baseserver'),
       basePort: nconf.get('web:baseport'),
@@ -222,9 +222,10 @@ function saveLastTroupeMiddleware(req, res, next) {
   next();
 }
 
-function renderMiddleware(page) {
+function renderMiddleware(template, mobilePage) {
   return function(req, res, next) {
-    renderAppPageWithTroupe(req, res, next, page);
+    if(mobilePage) req.params.mobilePage = mobilePage;
+    renderAppPageWithTroupe(req, res, next, template);
   };
 }
 
@@ -329,14 +330,14 @@ module.exports = {
         middleware.ensureLoggedIn(),
         preloadOneToOneTroupeMiddleware,
         saveLastTroupeMiddleware,
-        renderMiddleware('mobile/chat-app'));
+        renderMiddleware('mobile/chat-app', 'chat'));
 
       app.get('/:appUri/chat',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         saveLastTroupeMiddleware,
-        renderMiddleware('mobile/chat-app'));
+        renderMiddleware('mobile/chat-app', 'chat'));
 
       // Files -----------------------
       app.get('/one-one/:userId/files',
@@ -344,14 +345,14 @@ module.exports = {
         middleware.ensureLoggedIn(),
         preloadOneToOneTroupeMiddleware,
         saveLastTroupeMiddleware,
-        renderMiddleware('mobile/file-app'));
+        renderMiddleware('mobile/file-app', 'files'));
 
       app.get('/:appUri/files',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         saveLastTroupeMiddleware,
-        renderMiddleware('mobile/file-app'));
+        renderMiddleware('mobile/file-app', 'files'));
 
 
       app.get('/:appUri/mails',
@@ -359,14 +360,14 @@ module.exports = {
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         saveLastTroupeMiddleware,
-        renderMiddleware('mobile/conversation-app'));
+        renderMiddleware('mobile/conversation-app', 'mails'));
 
       app.get('/:appUri/people',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         saveLastTroupeMiddleware,
-        renderMiddleware('mobile/people-app'));
+        renderMiddleware('mobile/people-app', 'people'));
 
       app.get('/:appUri',
         middleware.grantAccessForRememberMeTokenMiddleware,
