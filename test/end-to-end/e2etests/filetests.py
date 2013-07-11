@@ -2,66 +2,61 @@ import utils
 import os
 import time
 from nose.plugins.attrib import attr
-
-driver = None
-
-
-def setup_module():
-    global driver
-    driver = utils.driver()
-    utils.resetData(driver)
+import unittest
 
 
-def testFileAreaExists():
-    utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
-    driver.get(utils.baseUrl("/filetesttroupe"))
-    driver.find_elements_by_class_name('trpFileSmallThumbnail')
-    driver.get(utils.baseUrl("/signout"))
+class FileTests(unittest.TestCase):
 
+    def setUp(self):
+        self.driver = utils.driver()
+        utils.printJobInfo(self.driver)
+        utils.resetData(self.driver)
 
-# This test only runs in IE
-def testFileUpload():
-    driverName = os.getenv('DRIVER')
-    if driverName == 'REMOTEIE':
-        utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
-        driver.get(utils.baseUrl("/filetesttroupe"))
-        driver.find_element_by_name("file").send_keys('c:\\ProgramData\Microsoft\User Account Pictures\user.bmp')
-        driver.find_elements_by_class_name('trpFileVersionThumbnail')
-        driver.get(utils.baseUrl("/signout"))
+    def tearDown(self):
+        self.driver.quit()
 
+    def testFileAreaExists(self):
+        utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
+        self.driver.get(utils.baseUrl("/filetesttroupe"))
+        self.driver.find_elements_by_class_name('trpFileSmallThumbnail')
+        self.driver.get(utils.baseUrl("/signout"))
 
-@attr('unreliable')
-def testPreviewFile():
-    driverName = os.getenv('DRIVER')
-    if driverName == 'REMOTEIE':
-        utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
-        driver.get(utils.baseUrl("/filetesttroupe"))
-        # driver.find_element_by_xpath('//*[@id="file-list"]/div/span/div/a').click()
-        driver.find_element_by_class_name("trpFileSmallThumbnailImage").click()
-        driver.find_element_by_class_name("link-preview").click()
-        time.sleep(1)
-        driver.find_element_by_class_name("close").click()
-        driver.get(utils.baseUrl("/signout"))
+    # This test only runs in IE
+    def testFileUpload(self):
+        driverName = os.getenv('driver')
+        if driverName == 'REMOTEIE':
+            utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
+            self.driver.get(utils.baseUrl("/filetesttroupe"))
+            self.driver.find_element_by_name("file").send_keys('c:\\ProgramData\Microsoft\User Account Pictures\user.bmp')
+            self.driver.find_elements_by_class_name('trpFileVersionThumbnail')
+            self.driver.get(utils.baseUrl("/signout"))
 
+    @attr('unreliable')
+    def testPreviewFile(self):
+        driverName = os.getenv('driver')
+        if driverName == 'REMOTEIE':
+            utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
+            self.driver.get(utils.baseUrl("/filetesttroupe"))
+            # self.driver.find_element_by_xpath('//*[@id="file-list"]/div/span/div/a').click()
+            self.driver.find_element_by_class_name("trpFileSmallThumbnailImage").click()
+            self.driver.find_element_by_class_name("link-preview").click()
+            time.sleep(1)
+            self.driver.find_element_by_class_name("close").click()
+            self.driver.get(utils.baseUrl("/signout"))
 
-@attr('unreliable')
-def testDeleteFile():
-    driverName = os.getenv('DRIVER')
-    if driverName == 'REMOTEIE':
-        utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
-        driver.get(utils.baseUrl("/filetesttroupe"))
-        numberOfImages = driver.find_elements_by_class_name("trpFileSmallThumbnailImage")
-        # driver.find_element_by_xpath('//*[@id="file-list"]/div/span/div/a').click()
-        driver.find_element_by_class_name("trpFileSmallThumbnailImage").click()
-        driver.find_element_by_class_name("trpButtonMenu").click()
-        driver.find_element_by_class_name("link-delete").click()
-        driver.find_element_by_id("yes").click()
-        newNumberOfImages = driver.find_elements_by_class_name("trpFileSmallThumbnailImage")
-        if numberOfImages == newNumberOfImages:
-            assert(False)
-        driver.get(utils.baseUrl("/signout"))
-
-
-def teardown_module():
-    utils.screenshot(driver)
-    driver.quit()
+    @attr('unreliable')
+    def testDeleteFile(self):
+        driverName = os.getenv('driver')
+        if driverName == 'REMOTEIE':
+            utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
+            self.driver.get(utils.baseUrl("/filetesttroupe"))
+            numberOfImages = self.driver.find_elements_by_class_name("trpFileSmallThumbnailImage")
+            # self.driver.find_element_by_xpath('//*[@id="file-list"]/div/span/div/a').click()
+            self.driver.find_element_by_class_name("trpFileSmallThumbnailImage").click()
+            self.driver.find_element_by_class_name("trpButtonMenu").click()
+            self.driver.find_element_by_class_name("link-delete").click()
+            self.driver.find_element_by_id("yes").click()
+            newNumberOfImages = self.driver.find_elements_by_class_name("trpFileSmallThumbnailImage")
+            if numberOfImages == newNumberOfImages:
+                assert(False)
+            self.driver.get(utils.baseUrl("/signout"))
