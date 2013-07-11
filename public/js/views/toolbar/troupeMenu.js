@@ -95,7 +95,7 @@ define([
       var c = troupeCollections;
       var invisibile = (c.unreadTroupes.length === 0 && c.favouriteTroupes.length === 0 && c.recentTroupes.length === 0 && c.incomingInvites.length === 0);
 
-      var icon = this.$el.find('ul li:first-child');
+      var icon = this.$el.find('#icon-mega');
       if (invisibile) {
         icon.hide();
         if (!this.selectedListIcon || this.selectedListIcon === 'icon-mega') {
