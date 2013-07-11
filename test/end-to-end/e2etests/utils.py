@@ -54,20 +54,17 @@ def driver():
         driver = webdriver.PhantomJS()
 
     elif driverName == 'CHROME':
-        print('Using local Chrome')
-
         e2edir = os.path.dirname(os.path.abspath(__file__))
         driver = webdriver.Chrome(e2edir + '/../chromedriver/chromedriver')
 
     elif driverName == 'REMOTECHROME':
-        print('Using remote chrome')
         driver = webdriver.Remote(command_executor=remote, desired_capabilities=DesiredCapabilities.CHROME)
 
     elif driverName == 'REMOTEIE':
         print('Using remote IE')
-        ie = {'platform': 'WINDOWS',
+        ie = {'platform': 'WINDOWS 7',
               'browserName': 'internet explorer',
-              'version': '',
+              'version': '9',
               'javascriptEnabled': True,
               'ignoreZoomSetting': True}
         driver = webdriver.Remote(command_executor=remote, desired_capabilities=ie)
@@ -93,7 +90,6 @@ def resetData(driver):
 
 
 def existingUserlogin(driver, usernameValue, passwordValue):
-    print('Navigating to ' + baseUrl("/x"))
     driver.get(baseUrl("/x"))
 
     time.sleep(0.5)
@@ -151,7 +147,6 @@ def signup(driver):
 def screenshot(driver):
     e2edir = os.path.dirname(os.path.abspath(__file__))
     filename = os.path.abspath(e2edir + '/../../../output/screenshot-' + time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime()) + '.png')
-    print('Screenshot saved at ' + filename)
     driver.get_screenshot_as_file(filename)
 
 
@@ -159,12 +154,18 @@ def getJSON(url):
     response = urllib2.urlopen(baseUrl(url)).read()
     return json.loads(response)
 
-
 # Keys sometimes need to be sent one at a time (firefox),
 # especially when the page is responding to the event, otherwise the full string will not go through
 def send_keys(element, str):
     for c in str:
         element.send_keys(c)
+
+# cannot run during setup/teardown as stdout is ignored
+def printJobInfo(driver):
+    remote = os.getenv('REMOTE_EXECUTOR')
+    if remote is not None:
+        if 'saucelabs' in remote:
+            print("Link to your job: https://saucelabs.com/jobs/%s" % driver.session_id)
 
 
 def shutdown(driver):

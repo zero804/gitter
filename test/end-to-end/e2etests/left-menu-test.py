@@ -2,94 +2,93 @@ import utils
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import WebDriverException
+from nose.plugins.attrib import attr
 import urllib2
 import time
-
-driver = None
-
-
-def setup_module():
-    global driver
-    driver = utils.driver()
+import unittest
 
 
-def testLeftMenu():
+class LeftMenuTests(unittest.TestCase):
 
-    # login as user 1
-    utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
+    def setUp(self):
+        self.driver = utils.driver()
+        utils.printJobInfo(self.driver)
 
-    preLeftMenuRecents()
+    def tearDown(self):
+        self.driver.quit()
 
-    showLeftMenu()
+    @attr('unreliable')
+    def testLeftMenu(self):
 
-    postLeftMenuRecents()
+        # login as user 1
+        utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
 
-    leftMenuUnreads()
+        self.preLeftMenuRecents()
 
-    leftMenuFavourites()
+        self.showLeftMenu()
 
-    leftMenuSearch()
+        self.postLeftMenuRecents()
 
+        self.leftMenuUnreads()
 
-def preLeftMenuRecents():
-    # visit the troupes in a certain order
+        self.leftMenuFavourites()
 
-    if(driver.current_url.find("/testtroupe3") == -1):
-        driver.get(utils.baseUrl("/testtroupe3"))
+        self.leftMenuSearch()
 
-    time.sleep(0.5)
+    def preLeftMenuRecents(self):
+        # visit the troupes in a certain order
 
-    if(driver.current_url.find("/testtroupe1") == -1):
-        driver.get(utils.baseUrl("/testtroupe1"))
+        if(self.driver.current_url.find("/testtroupe3") == -1):
+            self.driver.get(utils.baseUrl("/testtroupe3"))
 
+        time.sleep(0.5)
 
-def showLeftMenu():
-    # show left menu
-    action = ActionChains(driver)
-    action.move_to_element(driver.find_element_by_css_selector('#left-menu-hotspot'))
-    action.click(driver.find_element_by_css_selector('#left-menu-hotspot'))
-    action.perform()
+        if(self.driver.current_url.find("/testtroupe1") == -1):
+            self.driver.get(utils.baseUrl("/testtroupe1"))
 
-    assert(driver.find_element_by_css_selector(".trpLeftMenuToolbar").is_displayed())
+    def showLeftMenu(self):
+        # show left menu
+        action = ActionChains(self.driver)
+        action.move_to_element(self.driver.find_element_by_css_selector('#left-menu-hotspot'))
+        action.click(self.driver.find_element_by_css_selector('#left-menu-hotspot'))
+        action.perform()
 
-    time.sleep(1)
+        assert(self.driver.find_element_by_css_selector(".trpLeftMenuToolbar").is_displayed())
 
+        time.sleep(1)
 
-def postLeftMenuRecents():
-    # ensure that order is reflected in the recents list
-    recentList = driver.find_element_by_css_selector("#left-menu-list-recent")
-    assert(recentList.is_displayed())
-    assert(recentList.size >= 2)
-    assert(recentList.find_element_by_css_selector('li:nth-child(1)').text.find('Test Troupe 1') == 0)
-    assert(recentList.find_element_by_css_selector('li:nth-child(2)').text.find('Test Troupe 3') == 0)
+    def postLeftMenuRecents(self):
+        # ensure that order is reflected in the recents list
+        recentList = self.driver.find_element_by_css_selector("#left-menu-list-recent")
+        assert(recentList.is_displayed())
+        assert(recentList.size >= 2)
+        assert(recentList.find_element_by_css_selector('li:nth-child(1)').text.find('Test Troupe 1') == 0)
+        assert(recentList.find_element_by_css_selector('li:nth-child(2)').text.find('Test Troupe 3') == 0)
 
+    def leftMenuUnreads(self):
+        time.sleep(0.5)
 
-def leftMenuUnreads():
-    time.sleep(0.5)
+        # ensure the unread header is not visible
+        unreadList = self.driver.find_element_by_css_selector("#left-menu-list-unread")
+        assert(not unreadList.is_displayed())
 
-    # ensure the unread header is not visible
-    unreadList = driver.find_element_by_css_selector("#left-menu-list-unread")
-    assert(not unreadList.is_displayed())
+    def leftMenuFavourites(self):
+        # ensure the favorites header is not visible
 
+        unreadList = self.driver.find_element_by_css_selector("#left-menu-list-favourites")
+        assert(not unreadList.is_displayed())
 
-def leftMenuFavourites():
-    # ensure the favorites header is not visible
+    def leftMenuSearch(self):
 
-    unreadList = driver.find_element_by_css_selector("#left-menu-list-favourites")
-    assert(not unreadList.is_displayed())
+        # typing should show the search box if the left menu is open
+        self.driver.find_element_by_css_selector('body').click()
 
+        self.driver.find_element_by_css_selector('body').send_keys('te')
 
-def leftMenuSearch():
+        input = self.driver.find_element_by_css_selector('#list-search-input')
+        assert(input.is_displayed())
 
-    # typing should show the search box if the left menu is open
-    driver.find_element_by_css_selector('body').click()
-
-    driver.find_element_by_css_selector('body').send_keys('te')
-
-    input = driver.find_element_by_css_selector('#list-search-input')
-    assert(input.is_displayed())
-
-    # search troupes and connected users.
-    time.sleep(2)
-    results = driver.find_element_by_css_selector('#left-menu-list-search ul')
-    results.size > 2
+        # search troupes and connected users.
+        time.sleep(2)
+        results = self.driver.find_element_by_css_selector('#left-menu-list-search ul')
+        results.size > 2
