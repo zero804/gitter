@@ -3,6 +3,8 @@ END_TO_END_TESTS = test/end-to-end
 PERF_TESTS = test/performance
 MOCHA_REPORTER =
 DATA_MAINT_SCRIPTS = $(shell find ./scripts/datamaintenance -name '*.sh')
+SAUCELABS_REMOTE = http://trevorah:d6b21af1-7ae7-4bed-9c56-c5f9d290712b@ondemand.saucelabs.com:80/wd/hub
+BETA_SITE = http://beta.trou.pe
 
 clean:
 	rm -rf public-processed/ output/ coverage/ cobertura-coverage.xml html-report/
@@ -56,22 +58,19 @@ end-to-end-test:
 	mkdir -p ./output/test-reports/
 	nosetests -s -v --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests/
 
-end-to-end-test-saucelabs:
+end-to-end-test-saucelabs-chrome:
 	@mkdir -p ./output/test-reports
-	@echo Testing chrome at saucelabs.com
-	@REMOTE_EXECUTOR=http://trevorah:d6b21af1-7ae7-4bed-9c56-c5f9d290712b@ondemand.saucelabs.com:80/wd/hub \
+	@echo Testing $(BETA_SITE) with chrome at saucelabs.com
+	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTECHROME \
-	BASE_URL=http://beta.trou.pe \
-	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
-	@echo Testing ie9 at saucelabs.com
-	@REMOTE_EXECUTOR=http://trevorah:d6b21af1-7ae7-4bed-9c56-c5f9d290712b@ondemand.saucelabs.com:80/wd/hub \
-	DRIVER=REMOTEIE \
-	BASE_URL=http://beta.trou.pe \
+	BASE_URL=$(BETA_SITE) \
 	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
 
-end-to-end-test-beta:
-	mkdir -p ./output/test-reports
-	BASE_URL=http://beta.trou.pe \
+end-to-end-test-saucelabs-ie9:
+	@echo Testing $(BETA_SITE) with ie9 at saucelabs.com
+	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
+	DRIVER=REMOTEIE \
+	BASE_URL=$(BETA_SITE) \
 	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
 
 docs: test-docs
@@ -127,7 +126,7 @@ validate-source: search-js-console
 
 continuous-integration: clean validate-source npm grunt version-files upgrade-data init-test-data test-xunit test-coverage tarball
 
-post-deployment-tests: test-in-browser end-to-end-test
+post-deployment-tests: test-in-browser end-to-end-test-saucelabs-chrome end-to-end-test-saucelabs-ie9
 
 build: clean validate-source npm grunt version-files upgrade-data test-xunit
 
