@@ -6,6 +6,8 @@
 var Q = require('q');
 var _ = require('underscore');
 var userService = require('../user-service');
+var uriLookupService = require('../uri-lookup-service');
+
 var persistence = require('../persistence-service');
 var byline = require('byline');
 var fs = require('fs');
@@ -200,22 +202,19 @@ function filterUsernamesByAvailability(usernameSuggestions) {
     }
   });
 
-  var d = Q.defer();
-
   var usernames = usernameSuggestions.filter(function(s) { return !s.disallowed; }).map(function(s) { return s.username; });
 
-  userService.findTakenUsernames(usernames, d.makeNodeResolver());
+  return uriLookupService.findTakenUris(usernames)
+    .then(function(takenUsernames) {
 
-  return d.promise.then(function(takenUsernames) {
+      usernameSuggestions.forEach(function(s) {
+        if(!s.disallowed && s.available !== false) {
+          s.available = !takenUsernames[s.username];
+        }
+      });
 
-    usernameSuggestions.forEach(function(s) {
-      if(!s.disallowed && s.available !== false) {
-        s.available = !takenUsernames[s.username];
-      }
+      return usernameSuggestions;
     });
-
-    return usernameSuggestions;
-  });
 
 
 }
