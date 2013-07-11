@@ -148,6 +148,20 @@ describe('uri-lookup-service', function() {
   });
 
 
+  it('06. it should check for taken uris', function(done) {
+    var notTaken = fixture.generateUri();
+
+    return uriLookupService.findTakenUris([ fixture.user2.username, fixture.user3.username, notTaken, fixture.troupe2.uri  ])
+      .then(function(result) {
+        assert(result[fixture.user2.username], 'Expected username to be taken');
+        assert(result[fixture.user3.username], 'Expected username to be taken');
+        assert(result[fixture.troupe2.uri], 'Expected uri to be taken');
+        assert(!result[notTaken], 'Expected username to be not taken');
+      })
+      .nodeify(done);
+  });
+
+
 
 
   after(function() {
