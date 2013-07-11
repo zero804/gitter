@@ -10,7 +10,7 @@
 var persistence = require("./persistence-service");
 var assert = require('assert');
 var Q = require('q');
-var promiseUtils = require('../utils/promise-utils');
+var _ = require('underscore');
 
 /**
  * Lookup the owner of a URI
@@ -96,8 +96,47 @@ function removeUriForTroupeId(troupeId) {
   return persistence.UriLookup.findOneAndRemoveQ({ troupeId: troupeId });
 }
 
+/**
+ * Given a bunch of potential uris find those that have been taken
+ * @return promise of a hash of taken uris: { uri1: true, uri2: true }
+ */
+function findTakenUris(uris) {
+  var taken = {};
+
+  return persistence.UriLookup.findQ({ uri: { $in: uris } }, 'uri')
+    .then(function(takenUriLookups) {
+
+      takenUriLookups.forEach(function(uriLookup) {
+        taken[uriLookup.uri] = true; // Mark as taken
+      });
+
+    })
+    .then(function() {
+      var stillAvailable = _.difference(uris, Object.keys(taken));
+
+      if(!stillAvailable.length) return;
+
+      return Q.all([
+        persistence.User.findQ({ username: { $in: stillAvailable } }, 'username'),
+        persistence.Troupe.findQ({ uri: { $in: stillAvailable } }, 'uri')
+      ]).spread(function(users, troupes) {
+
+        users.forEach(function(user) {
+          taken[user.username] = true; // Mark as taken
+        });
+
+        troupes.forEach(function(troupe) {
+          taken[troupe.uri] = true; // Mark as taken
+        });
+
+      });
+    })
+    .thenResolve(taken);
+}
+
 exports.lookupUri = lookupUri;
 exports.updateUsernameForUserId = updateUsernameForUserId;
 exports.removeUsernameForUserId = removeUsernameForUserId;
 exports.reserveUriForTroupeId = reserveUriForTroupeId;
 exports.removeUriForTroupeId = removeUriForTroupeId;
+exports.findTakenUris = findTakenUris;
