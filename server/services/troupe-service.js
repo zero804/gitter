@@ -248,8 +248,6 @@ function addUserIdToTroupe(userId, troupeId) {
  * @return promise of a URL string
  */
 function getUrlForTroupeForUserId(troupe, userId) {
-
-
   if(!troupe.oneToOne) {
     return Q.resolve("/" + troupe.uri);
   }

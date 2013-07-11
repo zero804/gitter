@@ -1,4 +1,4 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'jquery',
   'underscore',
@@ -9,8 +9,10 @@ require([
   'views/file/fileDetailView',
   'collections/files',
   'views/file/mobileFilePreview',
-  'components/eyeballs',
-  'components/unread-items-client'
+  'components/mobile-context',        // No ref
+  'components/eyeballs',              // No ref
+  'components/unread-items-client',   // No ref
+  'template/helpers/all'              // No ref
 ], function($, _, Backbone, BaseRouter, TroupeViews, FileView, FileDetailView, fileModels, MobileFilePreview/*, unreadItemsClient*/) {
   /*jslint browser: true, unused: true */
   "use strict";

@@ -8,25 +8,22 @@ define([
   var cordova = window.cordova;
 
   if(cordova) {
+    log('Cordova detected, calling TroupeContext.updateContext');
+
     document.addEventListener("deviceready", function() {
       var c = context();
       var params = [window.location.href];
 
       if(c.inUserhome) {
-        params.push("home");
-        params.push(null);
-        params.push(null);
+        params.push("home", null, null);
 
       } else if(c.troupe) {
         var t = c.troupe;
-        params.push(t.oneToOne ? "oneToOne": "troupe");
-        params.push(context.troupeId());
-        params.push(c.mobilePage);
+        params.push(t.oneToOne ? "oneToOne": "troupe", context.getTroupeId(), c.mobilePage);
       }
 
       try {
-        cordova.exec(function() {}, function() {}, "TroupeContext",
-                 "updateContext", params);
+        cordova.exec(function() {}, function() {}, "TroupeContext", "updateContext", params);
       } catch(e) {
         log('Plugin failure', e);
       }
@@ -34,5 +31,7 @@ define([
     }, false);
 
   }
+
+
 
 });
