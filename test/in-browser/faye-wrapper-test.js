@@ -26,6 +26,7 @@ require([
   describe('FayeWrapper (real endpoint)', function(){
     describe('.connect()', function(){
       it('should be able to connect and subscribe', function(done) {
+        this.timeout(10000);
 
         var clientId1 = null;
 
