@@ -17,7 +17,6 @@ var persistence = require("./persistence-service"),
     assert = require('assert'),
     statsService = require("../services/stats-service");
 
-
 function ensureExists(value) {
   if(!value) throw 404;
   return value;
@@ -1052,7 +1051,6 @@ function findBestTroupeForUser(user, callback) {
   // If the user has a troupe, it takes them to the last one they accessed. If the user doesn't have
   // any valid troupes, it returns an error.
   //
-
   var op;
   if (user.lastTroupe) {
      op = findById(user.lastTroupe)

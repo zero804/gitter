@@ -23,23 +23,7 @@ module.exports = {
         function(req, res, next) {
 
           if(req.user) {
-
-            loginUtils.redirectUserToDefaultTroupe(req, res, next, {
-
-              onNoValidTroupes: function() {
-
-                // try go to the user's home page
-                if (req.user.hasUsername()) {
-                  res.relativeRedirect(req.user.username);
-                }
-                // get the user to choose a username on the signup page
-                else {
-                  res.render('signup', { compactView: self.isMobile(req), profileHasNoUsername: JSON.stringify(true), userId: JSON.stringify(req.user.id) });
-                }
-
-              }
-            });
-
+            loginUtils.redirectUserToDefaultTroupe(req, res, next);
             return;
           }
 
