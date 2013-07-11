@@ -55,37 +55,41 @@ function lookupUri(uri) {
 function updateUsernameForUserId(userId, oldUsername, newUsername) {
   assert(userId,'UserId parameter expected');
 
-  if(oldUsername == newUsername) return; // Nothing to do
-  if(oldUsername) {
-    if(newUsername) {
-      // Update an existing URI entry
-      return persistence.UriLookup.findOneAndUpdateQ(
-          { userId: userId },
-          { $set: { uri: newUsername, userId: userId }, $unset: { troupeId: '' } },
-          { upsert: true })
-        .then(promiseUtils.required);
-    } else {
-      // Remove an existing URI entry
-      return persistence.UriLookup.findOneAndRemoveQ({ userId: userId })
-        .then(promiseUtils.required);
-    }
+  var op;
 
-    // TODO: in future, deal with the possiblity of corrupt data
+  if(newUsername) {
+    // Update an existing URI entry
+    op = persistence.UriLookup.findOneAndUpdateQ(
+        { userId: userId },
+        { $set: { uri: newUsername, userId: userId }, $unset: { troupeId: '' } },
+        { upsert: true });
+  } else {
+    // Remove an existing URI entry
+    op = persistence.UriLookup.findOneAndRemoveQ({ userId: userId });
   }
 
-  return persistence.UriLookup.createQ({ uri: newUsername, userId: userId });
+  return op.fail(function(err) {
+      if(err.name === 'MongoError' && err.lastErrorObject && err.lastErrorObject.code === 11000) {
+        throw 409; // CONFLICT - uri already used
+      }
+
+      throw err;
+    });
 }
 
 /**
  * Remove the username for a user
  * @return promise of nothing
  */
-function removeUsernameForUserId(userId, oldUsername) {
-  return updateUsernameForUserId(userId, oldUsername, null);
+function removeUsernameForUserId(userId) {
+  return persistence.UriLookup.findOneAndRemoveQ({ userId: userId });
 }
 
 function reserveUriForTroupeId(troupeId, uri) {
-  return persistence.UriLookup.createQ({ uri: uri, troupeId: troupeId });
+  return persistence.UriLookup.findOneAndUpdateQ(
+          { troupeId: troupeId },
+          { $set: { uri: uri, troupeId: troupeId }, $unset: { userId: '' } },
+          { upsert: true });
 }
 
 function removeUriForTroupeId(troupeId) {

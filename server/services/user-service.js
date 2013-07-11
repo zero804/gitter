@@ -1,17 +1,18 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var persistence = require("./persistence-service"),
-    sechash = require('sechash'),
-    emailNotificationService = require("./email-notification-service"),
-    uuid = require('node-uuid'),
-    geocodingService = require("./geocoding-service"),
-    winston = require("winston"),
-    statsService = require("./stats-service"),
-    crypto = require('crypto'),
-    assert = require('assert'),
-    collections = require("../utils/collections"),
-    Q = require('q');
+var persistence = require("./persistence-service");
+var sechash = require('sechash');
+var emailNotificationService = require("./email-notification-service");
+var uuid = require('node-uuid');
+var geocodingService = require("./geocoding-service");
+var winston = require("winston");
+var statsService = require("./stats-service");
+var uriLookupService = require("./uri-lookup-service");
+var crypto = require('crypto');
+var assert = require('assert');
+var collections = require("../utils/collections");
+var Q = require('q');
 
 function generateGravatarUrl(email) {
   var url =  "https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon";
@@ -135,7 +136,7 @@ var userService = {
    * @return promise of a username or undefined if user or username does not exist
    */
   findUsernameForUserId: function(userId) {
-    return persistence.User.findQ({ _id: userId }, 'username')
+    return persistence.User.findOneQ({ _id: userId }, 'username')
       .then(function(user) {
         return user && user.username;
       });
@@ -404,17 +405,19 @@ var userService = {
         return user;
       }
 
-      return userService.findByUsername(username)
-        .then(function(existingUser) {
-          if(existingUser) {
-            throw { usernameConflict: true };
-          }
-
+      return uriLookupService.updateUsernameForUserId(user.id, user.username, username)
+        .then(function() {
           // save the new email address while it is being confirmed
           user.username = username;
 
           return user;
+        })
+        .fail(function(err) {
+          if(err === 409) throw { usernameConflict: true };
+
+          throw err;
         });
+
     }
 
     function saveUser(user) {

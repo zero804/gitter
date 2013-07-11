@@ -3,7 +3,7 @@
 
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
-var Q = require('q');
+var uriLookupService = require("./uri-lookup-service");
 
 function findUri(uri, callback) {
   uri = uri.toLowerCase();
@@ -23,22 +23,25 @@ function findUri(uri, callback) {
       });
   }
 
+  return uriLookupService.lookupUri(uri)
+    .then(function(uriLookup) {
+      if(uriLookup.userId) {
+        return userService.findById(uriLookup.userId)
+          .then(function(user) {
+            if(user) return { user: user };
+          });
+      }
 
-  // TODO add some caching
-  return Q.all([
-    userService.findByUsername(uri),
-    troupeService.findByUri(uri)
-  ]).spread(function(user, troupe) {
-    if(user) {
-      return { user: user };
-    }
+      if(uriLookup.troupeId) {
+        return troupeService.findById(uriLookup.troupeId)
+          .then(function(troupe) {
+            if(troupe) return { troupe: troupe };
+          });
+      }
 
-    if(troupe) {
-      return { troupe: troupe };
-    }
-
-    return null;
-  }).nodeify(callback);
+      return null;
+    })
+    .nodeify(callback);
 }
 
 exports.findUri = findUri;

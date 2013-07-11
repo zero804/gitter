@@ -1,5 +1,5 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
-/*global describe:true, it:true, before:true */
+/*global describe:true, it:true, before:true, after:true */
 "use strict";
 
 var testRequire = require('./../test-require');
@@ -14,8 +14,15 @@ var times = mockito.Verifiers.times;
 var once = times(1);
 
 var fixture = {};
+var fixture2 = {};
 
 describe("User Service", function() {
+
+  before(fixtureLoader(fixture2, {
+    user1: { username: true }
+  }));
+
+  before(fixtureLoader(fixture));
 
   var userId = null;
 
@@ -143,6 +150,20 @@ describe("User Service", function() {
     });
   });
 
-  before(fixtureLoader(fixture));
 
+  describe('#findUsernameForUserId', function() {
+    it('should findUsernameForUserId correctly', function(done) {
+      var userService = testRequire("./services/user-service");
+      userService.findUsernameForUserId(fixture2.user1.id)
+        .then(function(username) {
+          assert.equal(username, fixture2.user1.username);
+        })
+        .nodeify(done);
+    });
+
+  });
+
+  after(function() {
+    fixture2.cleanup();
+  });
 });

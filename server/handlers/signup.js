@@ -1,12 +1,13 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var signupService = require("../services/signup-service"),
-    troupeService = require('../services/troupe-service'),
-    middleware = require("../web/middleware"),
-    loginUtils = require('../web/login-utils'),
-    winston = require('winston'),
-    nconf = require('../utils/config');
+var signupService = require("../services/signup-service");
+var troupeService = require('../services/troupe-service');
+var middleware = require("../web/middleware");
+var loginUtils = require('../web/login-utils');
+var winston = require('winston');
+var nconf = require('../utils/config');
+var promiseUtils = require('../utils/promise-utils');
 
 module.exports = {
 
@@ -98,25 +99,17 @@ module.exports = {
       app.get('/:appUri/confirm/:confirmationCode',
         middleware.authenticate('confirm', {}),
         function(req, res/*, next*/) {
-            winston.verbose("Confirmation authenticated");
+          winston.verbose("Confirmation authenticated");
 
-            /* User has been set passport/accept */
-            signupService.confirmSignup(req.user, function(err, user, troupe) {
-              if (err || !troupe) {
-                res.relativeRedirect("/" + req.params.appUri);
-                return;
-              }
+          /* User has been set passport/accept */
+          signupService.confirmSignup(req.user)
+            .fail(function(err) {
+              winston.info('[signup] confirmation failed: ' + err, { exception: err });
+            })
+            .fin(function() {
+              res.relativeRedirect("/" + req.params.appUri);
+            });
 
-              troupeService.getUrlForTroupeForUserId(troupe, user.id, function(err, url) {
-                if (err || !url) {
-                  res.relativeRedirect("/" + req.params.appUri);
-                  return;
-                }
-
-                res.relativeRedirect(url);
-              });
-
-          });
       });
 
       app.post('/resendconfirmation',

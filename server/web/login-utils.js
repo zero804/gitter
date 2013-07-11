@@ -2,7 +2,6 @@
 "use strict";
 
 var troupeService = require("../services/troupe-service");
-var winston = require('winston');
 var promiseUtils = require("../utils/promise-utils");
 
 /**
@@ -12,43 +11,25 @@ var promiseUtils = require("../utils/promise-utils");
 exports.whereToNext = function(user, callback) {
 
   return troupeService.findBestTroupeForUser(user)
+    .then(promiseUtils.required)
     .then(function(troupe) {
-
-
-      if(!troupe) return user.getHomeUrl();
-
-      return troupeService.getUrlForTroupeForUserId(troupe, user.id, function(err, url) {
-        if(url) return url;
-
-        return user.getHomeUrl();
-      });
-
-
-    }).nodeify(callback);
+      console.log('TROUPE', troupe);
+      return troupeService.getUrlForTroupeForUserId(troupe, user.id)
+        .then(promiseUtils.required);
+    })
+    .fail(function() {
+      return user.hasUsername() ? user.getHomeUrl() : '/home';
+    })
+    .nodeify(callback);
 
 };
 
-exports.redirectUserToDefaultTroupe = function(req, res, next, options) {
+exports.redirectUserToDefaultTroupe = function(req, res, next) {
 
   return exports.whereToNext(req.user)
-    .then(promiseUtils.required)
     .then(function(url) {
       return res.relativeRedirect(url);
     })
-    .fail(function(err) {
-      /* All dressed up but nowhere to go? */
-      if(options && options.onNoValidTroupes) {
-        return options.onNoValidTroupes();
-      }
-
-      winston.verbose('[login-utils] redirectUserToDefaultTroupe failed ' + err, { exception: err });
-
-      if (req.user.hasUsername()) {
-        res.relativeRedirect(req.user.getHomeUrl());
-      } else {
-        res.relativeRedirect('/home');
-      }
-    });
-
+    .fail(next);
 
 };
