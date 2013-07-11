@@ -41,6 +41,25 @@ module.exports = {
     });
   },
 
+  sendConnectAcceptanceToUser: function(fromUser, toUser, troupe) {
+    console.log("Sending notice of connect invite accepted");
+
+    var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri;
+
+    mailerService.sendEmail({
+      templateFile: "connectacceptance",
+      to: fromUser.email,
+      from: 'signup-robot' + emailDomainWithAt,
+      subject: "Your connection invite has been accepted",
+      data: {
+        fromUser: fromUser,
+        toUser: toUser,
+        troupeLink: troupeLink,
+        baseServerPath: nconf.get("web:basepath")
+      }
+    });
+  },
+
   sendPasswordResetForUser: function (user) {
     assert(user.passwordResetCode, 'User does not have a password reset code');
 
