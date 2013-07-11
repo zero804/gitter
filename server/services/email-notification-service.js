@@ -4,6 +4,7 @@
 var mailerService = require("./mailer-service");
 var nconf = require('../utils/config');
 var assert = require('assert');
+var url = require('url');
 var emailDomain = nconf.get("email:domain");
 var emailDomainWithAt = "@" + emailDomain;
 
@@ -42,9 +43,7 @@ module.exports = {
   },
 
   sendConnectAcceptanceToUser: function(fromUser, toUser, troupe) {
-    console.log("Sending notice of connect invite accepted");
-
-    var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri;
+    var troupeLink = url.resolve(nconf.get("web:basepath"), troupe.uri);
 
     mailerService.sendEmail({
       templateFile: "connectacceptance",

@@ -1171,9 +1171,6 @@ function sendInviteAcceptedNotice(invite, troupe, isNormalTroupe) {
   var findToUser = userService.findById(invite.userId);
 
   Q.spread([findFromUser, findToUser, findTroupe], function(fromUser, toUser, troupeUri) {
-    console.log("fromUser: ", fromUser);
-    console.log("troupe: ", troupe);
-    console.log("troupeUri: ", troupeUri);
 
     if (fromUser && troupeUri) {
       emailNotificationService.sendConnectAcceptanceToUser(fromUser, toUser, {
