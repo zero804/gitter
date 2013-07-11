@@ -429,6 +429,7 @@ var server = new faye.NodeAdapter({
     type: fayeRedis,
     host: nconf.get("redis:host"),
     port: nconf.get("redis:port"),
+    interval: 10,
     namespace: 'fr:'
   }
 });

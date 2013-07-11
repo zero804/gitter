@@ -156,7 +156,6 @@ define([
       this.subscription.callback(function() {
 
         var snapshot = realtime.getSnapshotFor(self.url);
-        log('SNAPSHOT!!', snapshot);
         self.reset(snapshot, { parse: true });
 
         if(callback) return callback();

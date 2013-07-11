@@ -93,6 +93,20 @@ define([
 
   var snapshotExtension = new SnapshotExtension();
 
+  var AccessTokenFailureExtension = function() {
+  };
+
+  AccessTokenFailureExtension.prototype.incoming = function(message, callback) {
+    if(message.channel == '/meta/handshake' && !message.successful && message.error) {
+      var error = message.error.split('::')[0];
+      if(error === '403') {
+        log('Access denied. Will not retry');
+        window.location.reload();
+      }
+    }
+
+    callback(message);
+  };
 
   function createClient() {
     var c;
@@ -101,7 +115,9 @@ define([
       log('Websockets configuration not found, defaulting');
       c = {
         fayeUrl: '/faye',
-        options: {}
+        options: {
+          interval: 10
+        }
       };
     }
 
@@ -115,6 +131,7 @@ define([
 
     client.addExtension(new ClientAuth());
     client.addExtension(snapshotExtension);
+    client.addExtension(new AccessTokenFailureExtension());
 
     client.bind('transport:down', function() {
       log('transport:down');
