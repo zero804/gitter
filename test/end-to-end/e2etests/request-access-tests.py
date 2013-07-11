@@ -3,104 +3,104 @@ import time
 import urllib2
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-
-driver = None
-
-
-def setup_module():
-    global driver
-    driver = utils.driver()
-    utils.resetData(driver)
+from nose.plugins.attrib import attr
+import unittest
 
 
-def testNewUserUnauthenticatedTroupeRequest():
-    driver.get(utils.baseUrl("/signout"))
-    driver.get(utils.baseUrl("/testtroupe3"))
-    thisTime = time.strftime("%Y%m%d%H%M%S", time.gmtime())
+class RequestAccessTests(unittest.TestCase):
 
-    driver.find_element_by_id("new-user").click()
+    def setUp(self):
+        self.driver = utils.driver()
+        utils.printJobInfo(self.driver)
+        utils.resetData(self.driver)
 
-    name = 'testuser.' + thisTime
-    emailAddress = 'testuser.' + thisTime + '@troupetest.local'
+    def tearDown(self):
+        self.driver.quit()
 
-    form = driver.find_element_by_css_selector('#requestAccess')
-    form.find_element_by_name('name').send_keys(name)
-    form.find_element_by_name('email').send_keys(emailAddress)
-    form.find_element_by_id('submit-button').click()
-    driver.find_element_by_css_selector('.label-signupsuccess')
+    @attr('unreliable')
+    def testNewUserUnauthenticatedTroupeRequest(self):
+        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/testtroupe3"))
+        thisTime = time.strftime("%Y%m%d%H%M%S", time.gmtime())
 
-    queryurl = utils.baseUrl("/testdata/confirmationCodeForEmail?email=" + emailAddress)
-    response = urllib2.urlopen(queryurl)
-    confirmCode = response.read()
+        self.driver.find_element_by_id("new-user").click()
 
-    # visit confirm link
-    driver.get(utils.baseUrl('/confirm/'+confirmCode))
+        name = 'testuser.' + thisTime
+        emailAddress = 'testuser.' + thisTime + '@troupetest.local'
 
-    # choose a username
-    username = 'testuser' + thisTime
-    inputUser = driver.find_element_by_css_selector('input[name=username]')
-    inputUser.send_keys(username)
-    driver.find_element_by_css_selector('#username-form [type=submit]').click()
+        form = self.driver.find_element_by_css_selector('#requestAccess')
+        form.find_element_by_name('name').send_keys(name)
+        form.find_element_by_name('email').send_keys(emailAddress)
+        form.find_element_by_id('submit-button').click()
+        self.driver.find_element_by_css_selector('.label-signupsuccess')
 
-    # complete profile
-    form = driver.find_element_by_css_selector('#updateprofileform')
-    form.find_element_by_name('password').send_keys('123456')
-    form.find_element_by_name('submit').click()
+        queryurl = utils.baseUrl("/testdata/confirmationCodeForEmail?email=" + emailAddress)
+        response = urllib2.urlopen(queryurl)
+        confirmCode = response.read()
 
-    driver.find_element_by_css_selector('.trpHelpBox')
+        # visit confirm link
+        self.driver.get(utils.baseUrl('/confirm/'+confirmCode))
 
-    # TODO: Login as testuser and check invite exists
+        # choose a username
+        username = 'testuser' + thisTime
+        inputUser = self.driver.find_element_by_css_selector('input[name=username]')
+        inputUser.send_keys(username)
+        self.driver.find_element_by_css_selector('#username-form [type=submit]').click()
 
-    driver.get(utils.baseUrl("/signout"))
-    utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
-    driver.get(utils.baseUrl("/testtroupe3"))
-    time.sleep(1)
-    driver.find_element_by_css_selector(".frame-request .trpPeopleListItem").click()
-    time.sleep(1)
-    driver.find_element_by_id('request-accept-button').click()
+        # complete profile
+        form = self.driver.find_element_by_css_selector('#updateprofileform')
+        form.find_element_by_name('password').send_keys('123456')
+        form.find_element_by_name('submit').click()
 
+        self.driver.find_element_by_css_selector('.trpHelpBox')
 
-def testExistingUnauthenticatedRequest():
-    driver.get(utils.baseUrl("/signout"))
-    driver.get(utils.baseUrl("/testtroupe3"))
-    name = driver.find_element_by_css_selector('#email')
-    name.clear()
-    name.send_keys("testuser2")
-    password = driver.find_element_by_css_selector('#password')
-    password.send_keys("123456")
-    driver.find_element_by_css_selector('#signin-button').click()
-    form = driver.find_element_by_css_selector('#requestAccess')
-    driver.find_element_by_id('submit-button').click()
+        # TODO: Login as testuser and check invite exists
 
-    driver.get(utils.baseUrl("/signout"))
-    utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
-    driver.get(utils.baseUrl("/testtroupe3"))
-    time.sleep(1)
-    driver.find_element_by_css_selector(".frame-request .trpPeopleListItem").click()
-    time.sleep(1)
-    driver.find_element_by_id('request-reject-button').click()
-    time.sleep(1)
-    driver.find_element_by_id('yes').click()
+        self.driver.get(utils.baseUrl("/signout"))
+        utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
+        self.driver.get(utils.baseUrl("/testtroupe3"))
+        time.sleep(1)
+        self.driver.find_element_by_css_selector(".frame-request .trpPeopleListItem").click()
+        time.sleep(1)
+        self.driver.find_element_by_id('request-accept-button').click()
 
+    @attr('unreliable')
+    def testExistingUnauthenticatedRequest(self):
+        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl("/testtroupe3"))
+        name = self.driver.find_element_by_css_selector('#email')
+        name.clear()
+        name.send_keys("testuser2")
+        password = self.driver.find_element_by_css_selector('#password')
+        password.send_keys("123456")
+        self.driver.find_element_by_css_selector('#signin-button').click()
+        form = self.driver.find_element_by_css_selector('#requestAccess')
+        self.driver.find_element_by_id('submit-button').click()
 
-def testExistingAuthenticatedRequest():
-    driver.get(utils.baseUrl("/signout"))
-    utils.existingUserlogin(driver, 'testuser2@troupetest.local', '123456')
-    driver.get(utils.baseUrl("/testtroupe3"))
-    form = driver.find_element_by_css_selector('#requestAccess')
-    driver.find_element_by_id('submit-button').click()
+        self.driver.get(utils.baseUrl("/signout"))
+        utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
+        self.driver.get(utils.baseUrl("/testtroupe3"))
+        time.sleep(1)
+        self.driver.find_element_by_css_selector(".frame-request .trpPeopleListItem").click()
+        time.sleep(1)
+        self.driver.find_element_by_id('request-reject-button').click()
+        time.sleep(1)
+        self.driver.find_element_by_id('yes').click()
 
-    driver.get(utils.baseUrl("/signout"))
-    utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
-    driver.get(utils.baseUrl("/testtroupe3"))
-    time.sleep(1)
-    driver.find_element_by_css_selector(".frame-request .trpPeopleListItem").click()
-    time.sleep(1)
-    driver.find_element_by_id('request-reject-button').click()
-    time.sleep(1)
-    driver.find_element_by_id('yes').click()
+    @attr('unreliable')
+    def testExistingAuthenticatedRequest(self):
+        self.driver.get(utils.baseUrl("/signout"))
+        utils.existingUserlogin(self.driver, 'testuser2@troupetest.local', '123456')
+        self.driver.get(utils.baseUrl("/testtroupe3"))
+        form = self.driver.find_element_by_css_selector('#requestAccess')
+        self.driver.find_element_by_id('submit-button').click()
 
-
-def teardown_module():
-    utils.screenshot(driver)
-    driver.quit()
+        self.driver.get(utils.baseUrl("/signout"))
+        utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
+        self.driver.get(utils.baseUrl("/testtroupe3"))
+        time.sleep(1)
+        self.driver.find_element_by_css_selector(".frame-request .trpPeopleListItem").click()
+        time.sleep(1)
+        self.driver.find_element_by_id('request-reject-button').click()
+        time.sleep(1)
+        self.driver.find_element_by_id('yes').click()

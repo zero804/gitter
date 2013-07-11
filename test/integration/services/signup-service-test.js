@@ -21,6 +21,14 @@ var fixture2 = {};
 
 describe('signup-service', function() {
 
+  before(fixtureLoader(fixture));
+  before(fixtureLoader(fixture2, {
+    troupe1: { },
+    userUnconfirmed1: { status: 'UNCONFIRMED' },
+    userConfirmed1: { username: true }
+  }));
+
+
   describe('#newSignup()', function() {
     it('should create a new user, allow the user to confirm', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
@@ -152,28 +160,20 @@ describe('signup-service', function() {
         './user-service': userService
       });
 
-      var uri = fixture.troupe1.uri;
-      var email = fixture.generateEmail();
-      var displayName = fixture.generateName();
+      var uri = fixture2.troupe1.uri;
+      var email = fixture2.userUnconfirmed1.email;
+      var displayName = fixture2.userUnconfirmed1.displayName;
 
-      persistence.User.createQ({
-        email: email,
-        displayName: displayName,
-        confirmationCode: email,
-        status: 'UNCONFIRMED'
-      }).then(function() {
+      signupService.signupWithAccessRequestToUri(uri, email, displayName)
+        .then(function() {
 
-        signupService.signupWithAccessRequestToUri(uri, email, displayName)
-          .then(function() {
+          mockito.verify(userService, never).newUser();
+          mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
+          mockito.verify(troupeService, once).addRequest();
 
-            mockito.verify(userService, never).newUser();
-            mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
-            mockito.verify(troupeService, once).addRequest();
+        })
 
-          })
-
-          .nodeify(done);
-      });
+        .nodeify(done);
 
     });
 
@@ -231,7 +231,7 @@ describe('signup-service', function() {
         './user-service': userService
       });
 
-     var uri = fixture.user1.getHomeUrl();
+     var uri = fixture2.userConfirmed1.getHomeUrl();
      var email = fixture.generateEmail();
      var displayName = fixture.generateName();
 
@@ -288,7 +288,10 @@ describe('signup-service', function() {
     });
   });
 
-  before(fixtureLoader(fixture));
+
+  after(function() {
+    fixture2.cleanup();
+  });
 
 
 
