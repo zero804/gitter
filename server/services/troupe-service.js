@@ -2,20 +2,20 @@
 /*global require: true, module: true */
 "use strict";
 
-var persistence = require("./persistence-service"),
-    userService = require("./user-service"),
-    appEvents = require("../app-events"),
-    assert = require("assert"),
-    emailNotificationService = require("./email-notification-service"),
-    presenceService = require("./presence-service"),
-    uuid = require('node-uuid'),
-    winston = require("winston"),
-    collections = require("../utils/collections"),
-    Q = require("q"),
-    ObjectID = require('mongodb').ObjectID,
-    _ = require('underscore'),
-    assert = require('assert'),
-    statsService = require("../services/stats-service");
+var persistence = require("./persistence-service");
+var userService = require("./user-service");
+var appEvents = require("../app-events");
+var assert = require("assert");
+var emailNotificationService = require("./email-notification-service");
+var presenceService = require("./presence-service");
+var uuid = require('node-uuid');
+var winston = require("winston");
+var collections = require("../utils/collections");
+var Q = require("q");
+var ObjectID = require('mongodb').ObjectID;
+var _ = require('underscore');
+var assert = require('assert');
+var statsService = require("../services/stats-service");
 
 function ensureExists(value) {
   if(!value) throw 404;
@@ -247,29 +247,24 @@ function addUserIdToTroupe(userId, troupeId) {
  *
  * @return promise of a URL string
  */
-function getUrlForTroupeForUserId(troupe, userId, callback) {
+function getUrlForTroupeForUserId(troupe, userId) {
 
-  var step1;
+
   if(!troupe.oneToOne) {
-    step1 = Q.resolve("/" + troupe.uri);
-  } else {
-    step1 = Q.when(function() {
-      var otherTroupeUser = troupe.users.filter(function(troupeUser) {
-        return troupeUser.userId != userId;
-      })[0];
-
-      if(!otherTroupeUser) throw "Unable to determine other user for troupe#" + troupe.id;
-
-      return userService.findUsernameForUserId(otherTroupeUser.userId)
-        .then(function(username) {
-          return username ? "/" + username
-                          : "/one-one/" + otherTroupeUser.userId.userId;
-        });
-
-    });
+    return Q.resolve("/" + troupe.uri);
   }
 
-  return step1.nodeify(callback);
+  var otherTroupeUser = troupe.users.filter(function(troupeUser) {
+    return troupeUser.userId != userId;
+  })[0];
+
+  if(!otherTroupeUser) throw "Unable to determine other user for troupe#" + troupe.id;
+
+  return userService.findUsernameForUserId(otherTroupeUser.userId)
+    .then(function(username) {
+      return username ? "/" + username
+                      : "/one-one/" + otherTroupeUser.userId;
+    });
 
 }
 /**

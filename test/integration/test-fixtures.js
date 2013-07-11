@@ -6,7 +6,6 @@ var testRequire = require('./test-require');
 var Q = require("q");
 var assert = require("assert");
 var persistence = testRequire("./services/persistence-service");
-var _ = require('underscore');
 var assert = require('assert');
 var winston = testRequire("./utils/winston");
 var counter = 0;

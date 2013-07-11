@@ -111,8 +111,12 @@ var signupService = module.exports = {
     }
   },
 
+  /**
+   * Mark a user as confirmed
+   * @return promise of a troupe
+   */
   confirmSignup: function(user, callback) {
-    if(!user) return callback(new Error("No user found"));
+    if(!user) return Q.reject(404).nodeify(callback);
 
     winston.verbose("Confirming user", { id: user.id, status: user.status });
 
