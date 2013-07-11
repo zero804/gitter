@@ -1160,6 +1160,32 @@ function createNewTroupeForExistingUser(options, callback) {
 
 }
 
+function sendInviteAcceptedNotice(invite, troupe, isNormalTroupe) {
+  assert(invite); assert(troupe);
+
+  if (isNormalTroupe)
+    return; // we don't send notices for invite acceptances to normal troupes
+
+  var findTroupe = getUrlForTroupeForUserId(troupe, invite.userId);
+  var findFromUser = userService.findById(invite.fromUserId);
+  var findToUser = userService.findById(invite.userId);
+
+  Q.spread([findFromUser, findToUser, findTroupe], function(fromUser, toUser, troupeUri) {
+    console.log("fromUser: ", fromUser);
+    console.log("troupe: ", troupe);
+    console.log("troupeUri: ", troupeUri);
+
+    if (fromUser && troupeUri) {
+      emailNotificationService.sendConnectAcceptanceToUser(fromUser, toUser, {
+        uri: troupeUri
+      });
+    }
+    else {
+      winston.info("Couldn't lookup invite sender to send acceptance notice to");
+    }
+  });
+}
+
 // so that the invite doesn't show up in the receiver's list of pending invitations
 // marks the invite as used
 function rejectInviteForAuthenticatedUser(user, invite) {
@@ -1202,9 +1228,14 @@ function acceptInviteForAuthenticatedUser(user, invite) {
 
     // Either add the user or create a one to one troupe. depending on whether this
     // is a one to one invite or a troupe invite
-    return (invite.troupeId ? addUserIdToTroupe(user.id, invite.troupeId)
+    var isNormalTroupe = !!invite.troupeId;
+    return (isNormalTroupe ? addUserIdToTroupe(user.id, invite.troupeId)
                             : createOneToOneTroupe(invite.fromUserId, invite.userId))
-      .then(function() {
+      .then(function(troupe) {
+
+        // once user is added / troupe is created, send email notice
+        sendInviteAcceptedNotice(invite, troupe, isNormalTroupe);
+
         // Regardless of the type, mark things as done
         return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite);
       });
@@ -1297,12 +1328,15 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
                 });
           }
 
+          var isNormalTroupe = !!invite.troupeId;
           return Q.all([
               confirmOperation,
-              invite.troupeId  ? addUserIdToTroupe(user.id, invite.troupeId) :
+                isNormalTroupe ? addUserIdToTroupe(user.id, invite.troupeId) :
                                  createOneToOneTroupe(user.id, invite.fromUserId)
             ])
             .spread(function(userSaveResult, troupe) {
+              // once user is added / troupe is created, send email notice
+              sendInviteAcceptedNotice(invite, troupe, isNormalTroupe);
 
               return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite).then(function() {
                 return getUrlForTroupeForUserId(troupe, user.id).then(function(url) {
