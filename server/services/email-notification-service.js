@@ -4,6 +4,7 @@
 var mailerService = require("./mailer-service");
 var nconf = require('../utils/config');
 var assert = require('assert');
+var url = require('url');
 var emailDomain = nconf.get("email:domain");
 var emailDomainWithAt = "@" + emailDomain;
 
@@ -36,6 +37,23 @@ module.exports = {
         troupeName: troupe.name,
         // note: this is not really a confirm link, just a link to the troupe
         confirmLink: troupeLink,
+        baseServerPath: nconf.get("web:basepath")
+      }
+    });
+  },
+
+  sendConnectAcceptanceToUser: function(fromUser, toUser, troupe) {
+    var troupeLink = url.resolve(nconf.get("web:basepath"), troupe.uri);
+
+    mailerService.sendEmail({
+      templateFile: "connectacceptance",
+      to: fromUser.email,
+      from: 'signup-robot' + emailDomainWithAt,
+      subject: "Your connection invite has been accepted",
+      data: {
+        fromUser: fromUser,
+        toUser: toUser,
+        troupeLink: troupeLink,
         baseServerPath: nconf.get("web:basepath")
       }
     });
