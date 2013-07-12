@@ -8,7 +8,7 @@ var cube_enabled        = nconf.get("stats:cube:enabled")       || false;
 var mixpanel_enabled    = nconf.get("stats:mixpanel:enabled")   || false;
 var customerio_enabled  = nconf.get("stats:customerio:enabled") || false;
 
-var blacklist = ['location_submission','push_notification','mail_bounce','new_mail_attachment','remailed_email','new_file_version','new_file'];
+var blacklist = ['location_submission','push_notification','mail_bounce','new_mail_attachment','remailed_email','new_file_version','new_file','login_failed'];
 
 if (cube_enabled) {
   var Cube = require("cube");
@@ -30,7 +30,7 @@ if (customerio_enabled) {
 function isTestUser(email) {
   if (!email) {
     winston.debug("[stats] Didn't receive an email for isTestUser");
-    // return true;
+    return true;
   }
   if (email.indexOf("troupetest.local") !== -1) return true; else return false;
 }
@@ -77,6 +77,8 @@ exports.userUpdate = function(user, properties) {
   if (isTestUser(user.email)) return;
 
   winston.verbose("[stats] Updating user stat");
+
+
 
   if(!properties) properties = {};
 
