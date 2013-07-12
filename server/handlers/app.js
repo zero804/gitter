@@ -210,6 +210,19 @@ function preloadOneToOneTroupeMiddleware(req, res, next) {
 
 }
 
+function isPhoneMiddleware(req, res, next) {
+  req.isPhone = isPhone(req.headers['user-agent']);
+  next();
+}
+
+function unauthenticatedPhoneRedirectMiddleware(req, res, next) {
+  if(req.isPhone && !req.user) {
+    res.redirect('/login');
+  } else {
+    next();
+  }
+}
+
 function saveLastTroupeMiddleware(req, res, next) {
   if(req.user && req.troupe) {
     userService.saveLastVisitedTroupeforUser(req.user.id, req.troupe, function(err) {
@@ -373,17 +386,8 @@ module.exports = {
       app.get('/:appUri',
         middleware.grantAccessForRememberMeTokenMiddleware,
         uriContextResolverMiddleware,
-        function(req, res, next) {
-          req.isPhone = isPhone(req.headers['user-agent']);
-          next();
-        },
-        function(req, res, next) {
-          if(req.isPhone && !req.user) {
-            res.redirect('/login');
-          } else {
-            next();
-          }
-        },
+        isPhoneMiddleware,
+        unauthenticatedPhoneRedirectMiddleware,
         saveLastTroupeMiddleware,
         function(req, res, next) {
           if (req.uriContext.ownUrl) {
