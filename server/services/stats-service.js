@@ -8,7 +8,7 @@ var cube_enabled        = nconf.get("stats:cube:enabled")       || false;
 var mixpanel_enabled    = nconf.get("stats:mixpanel:enabled")   || false;
 var customerio_enabled  = nconf.get("stats:customerio:enabled") || false;
 
-var blacklist = ['location_submission','push_notification','mail_bounce','new_mail_attachment','remailed_email','new_file_version','new_file','login_failed','password_reset_invalid','password_reset_completed'];
+var blacklist = ['location_submission','push_notification','mail_bounce','new_mail_attachment','remailed_email','new_file_version','new_file','login_failed','password_reset_invalid','password_reset_completed','invite_rejected','invite_reused','invite_accpted','confirmation_reused'];
 
 if (cube_enabled) {
   var Cube = require("cube");
@@ -37,8 +37,6 @@ function isTestUser(email) {
 
 exports.event = function(eventName, properties) {
 
-  console.log("EVENT: " + eventName + "thing");
-
   if(!properties) properties = {};
 
   // Cube
@@ -64,7 +62,6 @@ exports.event = function(eventName, properties) {
 
       // CustomerIO
       if (customerio_enabled) {
-        if (!properties.email) console.log("OY OY OY OY OY OY OY OY OY OY DIDNT GET AN EMAIL");
         cio.track(properties.userId, eventName, properties);
       }
     }
