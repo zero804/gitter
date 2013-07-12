@@ -468,7 +468,7 @@ function inviteUserByEmail(troupe, fromUser, displayName, email) {
             // Found an existing invite? Don't create a new one then
             if(existingInvite) return existingInvite;
 
-            statsService.event('new_user_invite', { userId: fromUserId, email: email });
+            statsService.event('new_user_invite', { userId: fromUserId, invitedEmail: email, email: fromUser.email });
 
             // create the invite and send mail immediately
 
