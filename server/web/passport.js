@@ -71,7 +71,8 @@ function loginAndPasswordUserStrategy(req, login, password, done) {
 
       statsService.event("user_login", {
         userId: user.id,
-        login: (login.indexOf('@') == -1 ? 'username' : 'email')
+        method: (login.indexOf('@') == -1 ? 'username' : 'email'),
+        email: user.email
       });
 
       var ua = useragent.parse(req.headers['user-agent']);
