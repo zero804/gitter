@@ -373,12 +373,23 @@ module.exports = {
       app.get('/:appUri',
         middleware.grantAccessForRememberMeTokenMiddleware,
         uriContextResolverMiddleware,
+        function(req, res, next) {
+          req.isPhone = isPhone(req.headers['user-agent']);
+          next();
+        },
+        function(req, res, next) {
+          if(req.isPhone && !req.user) {
+            res.redirect('/login');
+          } else {
+            next();
+          }
+        },
         saveLastTroupeMiddleware,
         function(req, res, next) {
           if (req.uriContext.ownUrl) {
             return renderHomePage(req, res, next);
           }
-          if(isPhone(req.headers['user-agent'])) {
+          if(req.isPhone) {
             renderAppPageWithTroupe(req, res, next, 'mobile/chat-app');
           } else {
             renderAppPageWithTroupe(req, res, next, 'app-template');
