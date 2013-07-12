@@ -12,8 +12,8 @@ require([
   'views/login/loginRequestModalView',
   'views/signup/signupModalConfirmView',
   'views/connect/connectUserView',
-  'collections/troupes'
-], function($, context, Backbone, log, BaseRouter, TroupeViews, InviteModal, LoginModalView, profileView, RequestModalView, SignupModalConfirmView, ConnectUserModalView, troupeModels) {
+  'collections/instances/troupes'
+], function($, context, Backbone, log, BaseRouter, TroupeViews, InviteModal, LoginModalView, profileView, RequestModalView, SignupModalConfirmView, ConnectUserModalView, troupes) {
   "use strict";
 
   var AppRouter = BaseRouter.extend({
@@ -87,13 +87,9 @@ require([
 
           // if the user is signed in, listen for an accept
           if (window.troupeContext.user) {
-            log("******* LISTENING FOR ACCEPT *********");
-            var troupeCollection = new troupeModels.TroupeCollection();
-            troupeCollection.listen();
-            // this is never fired
-            troupeCollection.on("add", function(model) {
-              log("**** Got an ADD ****" + model.get(uri));
-              if(model.get('uri') == window.troupeContext.troupeUri) {
+            troupes.troupes.on("add", function(model) {
+              var url = model.get('url') || model.get('uri');
+              if(window.troupeContext.troupeUri.indexOf(url) >= 0 || url.indexOf(window.troupeContext.troupeUri) >= 0) {
                 // TODO: tell the person that they've been kicked out of the troupe
                 window.location.reload();
               }
@@ -143,9 +139,7 @@ require([
           /* This user is NOT logged in and is visiting a Troupe */
           if(window.troupeContext.accessDenied) {
             // Listen out for acceptance
-            var troupeCollection = new troupeModels.TroupeCollection();
-            troupeCollection.listen();
-            troupeCollection.on("add", function(model) {
+            troupes.troupes.on("add", function(model) {
 
               if(model.get('uri') == window.troupeContext.troupeUri) {
                 // TODO: tell the person that they've been kicked out of the troupe
