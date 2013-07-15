@@ -8,12 +8,14 @@ var loginUtils = require('../web/login-utils');
 var winston = require('winston');
 var nconf = require('../utils/config');
 var promiseUtils = require('../utils/promise-utils');
+var isPhone = require('../web/is-phone');
 
 module.exports = {
 
     isMobile: function(req) {
       var userAgent = req.headers['user-agent'] || '';
-      var compactView = userAgent.indexOf("Mobile/") >= 0;
+      console.log("userAgent: " + userAgent);
+      var compactView = userAgent.indexOf("Mobile") >= 0;
       return compactView;
     },
 
@@ -29,7 +31,7 @@ module.exports = {
           }
 
           // when the viewer is not logged in:
-          res.render('signup', { compactView: self.isMobile(req), profileHasNoUsername: JSON.stringify(false), userId: JSON.stringify(null) });
+          res.render('signup', { compactView: isPhone(req.headers['user-agent']) , profileHasNoUsername: JSON.stringify(false), userId: JSON.stringify(null) });
         }
       );
 
@@ -89,7 +91,7 @@ module.exports = {
             if (user.hasUsername()) {
               res.relativeRedirect('/' + user.username);
             } else {
-              res.render('signup', { compactView: self.isMobile(req), profileHasNoUsername: !user.username, userId: JSON.stringify(req.user.id) });
+              res.render('signup', { compactView: isPhone(req.headers['user-agent']), profileHasNoUsername: !user.username, userId: JSON.stringify(req.user.id) });
             }
           });
         });
