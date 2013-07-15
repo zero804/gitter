@@ -14,6 +14,7 @@ var loginUtils = require('../web/login-utils');
 var uriService = require('../services/uri-service');
 var Q = require('q');
 var useFirebugInIE = nconf.get('web:useFirebugInIE');
+var isPhone = require('../web/is-phone');
 
 function serializeUser(user) {
   var strategy = new restSerializer.UserStrategy({ includeEmail: true });
@@ -209,6 +210,19 @@ function preloadOneToOneTroupeMiddleware(req, res, next) {
 
 }
 
+function isPhoneMiddleware(req, res, next) {
+  req.isPhone = isPhone(req.headers['user-agent']);
+  next();
+}
+
+function unauthenticatedPhoneRedirectMiddleware(req, res, next) {
+  if(req.isPhone && !req.user) {
+    res.redirect('/login');
+  } else {
+    next();
+  }
+}
+
 function saveLastTroupeMiddleware(req, res, next) {
   if(req.user && req.troupe) {
     userService.saveLastVisitedTroupeforUser(req.user.id, req.troupe, function(err) {
@@ -372,13 +386,18 @@ module.exports = {
       app.get('/:appUri',
         middleware.grantAccessForRememberMeTokenMiddleware,
         uriContextResolverMiddleware,
+        isPhoneMiddleware,
+        unauthenticatedPhoneRedirectMiddleware,
         saveLastTroupeMiddleware,
         function(req, res, next) {
           if (req.uriContext.ownUrl) {
             return renderHomePage(req, res, next);
           }
-
-          renderAppPageWithTroupe(req, res, next, 'app-template');
+          if(req.isPhone) {
+            renderAppPageWithTroupe(req, res, next, 'mobile/chat-app');
+          } else {
+            renderAppPageWithTroupe(req, res, next, 'app-template');
+          }
         });
 
 
