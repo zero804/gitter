@@ -91,8 +91,7 @@ require([
             troupeCollection.listen();
 
             troupeCollection.on("add", function(model) {
-              var url = model.get('url') || model.get('uri');
-              if(window.troupeContext.troupeUri === url) {
+              if(window.location.pathname === model.get('url')) {
                 // TODO: tell the person that they've been kicked out of the troupe
                 window.location.reload();
               }
@@ -147,7 +146,7 @@ require([
             // Listen out for acceptance
             troupeCollection.on("add", function(model) {
 
-              if(model.get('uri') == window.troupeContext.troupeUri) {
+              if(model.get('url') === window.location.pathname) {
                 // TODO: tell the person that they've been kicked out of the troupe
                 window.location.reload();
               }
