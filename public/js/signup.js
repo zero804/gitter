@@ -88,7 +88,6 @@ require([
       return false;
     }
 
-
     if (window.profileHasNoUsername) {
       chooseUsername();
     }
