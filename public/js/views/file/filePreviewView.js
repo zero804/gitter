@@ -1,13 +1,13 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 define([
   'jquery',
   'underscore',
-  'backbone',
   'views/base',
   'hbs!./tmpl/filePreviewView',
+  'backbone.keys',
   'log!file-preview-view'
-], function($, _, Backbone, TroupeViews, template, log) {
+], function($, _, TroupeViews, template, backboneKeys, log) {
   /*jslint browser: true*/
   "use strict";
 
@@ -191,6 +191,7 @@ define([
       }
 
       return {
+        url: item.get('url'),
         noPreviewAvailable: true
       };
 
@@ -209,6 +210,7 @@ define([
       return this;
     }
   });
+  PreviewView = backboneKeys.mixInto(PreviewView);
 
   var Modal = TroupeViews.Modal.extend({
     className: 'modal trpFilePreview',
@@ -221,6 +223,7 @@ define([
       this.view = new PreviewView({ model: this.model, collection: this.collection });
     }
   });
+
 
   return {
     Modal: Modal,

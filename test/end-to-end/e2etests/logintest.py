@@ -2,36 +2,39 @@
 from selenium.webdriver.common.action_chains import ActionChains
 import utils
 import time
-
-driver = None
-
-
-def setup_module():
-    global driver
-    driver = utils.driver()
+import unittest
 
 
-def testSignInAndSignout():
-    utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
-    driver.find_element_by_css_selector('DIV.trpHeaderTitle')
-    driver.get(utils.baseUrl("/signout"))
-    driver.find_element_by_css_selector('DIV.trpHomeHeroStripContainer')
+class LoginTests(unittest.TestCase):
 
+    def setUp(self):
+        self.driver = utils.driver()
+        utils.printJobInfo(self.driver)
 
-def testSignInAndNavigateBack():
-    driver.delete_all_cookies()
+    def tearDown(self):
+        self.driver.quit()
 
-    utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
-    driver.find_element_by_css_selector('DIV.trpHeaderTitle')
+    def testSignInAndSignout(self):
+        utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
+        self.driver.find_element_by_css_selector('DIV.trpHeaderTitle')
+        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.find_element_by_css_selector('DIV.trpHomeHeroStripContainer')
 
-    print('Logged in, now attempting to visit /x again')
-    driver.get(utils.baseUrl("/x"))
-    time.sleep(1)
+    def testSignInWithUsername(self):
+        utils.existingUserlogin(self.driver, 'testuser1', '123456')
+        self.driver.find_element_by_css_selector('DIV.trpHeaderTitle')
+        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.find_element_by_css_selector('DIV.trpHomeHeroStripContainer')
 
-    print('We should navigate back to the last troupe')
-    driver.find_element_by_css_selector('DIV.trpHeaderTitle')
+    def testSignInAndNavigateBack(self):
+        self.driver.delete_all_cookies()
 
+        utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
+        self.driver.find_element_by_css_selector('DIV.trpHeaderTitle')
 
-def teardown_module():
-    utils.screenshot(driver)
-    driver.quit()
+        # Logged in, now attempting to visit /x again
+        self.driver.get(utils.baseUrl("/x"))
+        time.sleep(1)
+
+        # We should navigate back to the last troupe
+        self.driver.find_element_by_css_selector('DIV.trpHeaderTitle')

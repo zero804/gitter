@@ -1,10 +1,10 @@
-/*jshint unused:true, browser:true*/
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
+  'utils/context',
   './fayeWrapper',
-  'log!realtime',
-  '../utils/momentWrapper'
-], function($, FayeWrapper, log, moment) {
+  'log!realtime'
+], function($, context, FayeWrapper, log) {
   "use strict";
 
   var connected = false;
@@ -73,23 +73,40 @@ define([
     callback(message);
   };
 
-  var SubscriptionTimestamp = function() {
-    this._timestamps = {};
+  var SnapshotExtension = function() {
+    this._data = {};
   };
 
-  SubscriptionTimestamp.prototype.incoming = function(message, callback) {
-    if(message.channel == '/meta/subscribe' && message.timestamp) {
-      this._timestamps[message.subscription] = moment(message.timestamp).toDate();
+  SnapshotExtension.prototype.incoming = function(message, callback) {
+    if(message.channel == '/meta/subscribe' && message.ext && message.ext.snapshot) {
+      this._data[message.subscription] = message.ext.snapshot;
     }
 
     callback(message);
   };
 
-  SubscriptionTimestamp.prototype._getTimestamp = function(channel) {
-    return this._timestamps[channel];
+  SnapshotExtension.prototype._snapshot = function(channel) {
+    var data = this._data[channel];
+    delete this._data[channel];
+    return data;
   };
 
-  var subscriptionTimestampExtension = new SubscriptionTimestamp();
+  var snapshotExtension = new SnapshotExtension();
+
+  var AccessTokenFailureExtension = function() {
+  };
+
+  AccessTokenFailureExtension.prototype.incoming = function(message, callback) {
+    if(message.channel == '/meta/handshake' && !message.successful && message.error) {
+      var error = message.error.split('::')[0];
+      if(error === '403') {
+        log('Access denied. Will not retry');
+        window.location.reload();
+      }
+    }
+
+    callback(message);
+  };
 
   function createClient() {
     var c;
@@ -98,7 +115,9 @@ define([
       log('Websockets configuration not found, defaulting');
       c = {
         fayeUrl: '/faye',
-        options: {}
+        options: {
+          interval: 10
+        }
       };
     }
 
@@ -111,7 +130,8 @@ define([
     }
 
     client.addExtension(new ClientAuth());
-    client.addExtension(subscriptionTimestampExtension);
+    client.addExtension(snapshotExtension);
+    client.addExtension(new AccessTokenFailureExtension());
 
     client.bind('transport:down', function() {
       log('transport:down');
@@ -145,8 +165,8 @@ define([
     });
 
     // TODO: this stuff below really should find a better home
-    if(window.troupeContext && window.troupeContext.troupe) {
-      client.subscribe('/troupes/' + window.troupeContext.troupe.id, function(message) {
+    if(context.getTroupeId()) {
+      client.subscribe('/troupes/' + context.getTroupeId(), function(message) {
         log("Troupe Subscription!", message);
 
         if(message.notification === 'presence') {
@@ -155,10 +175,6 @@ define([
           } else if(message.status === 'out') {
             $(document).trigger('userLoggedOutOfTroupe', message);
           }
-        }
-
-        if (message.operation === "update") {
-          $(document).trigger('troupeUpdate', message);
         }
 
       });
@@ -207,9 +223,18 @@ define([
       return client.getClientId();
     },
 
-    recycleConnection: function() {
+    getClientRef: function() {
+      return getOrCreateClient().getClientRef();
+    },
+
+    recycleConnection: function(conditionalClientRef) {
       log('Recycling connection');
-      getOrCreateClient().recycle();
+      if(conditionalClientRef) {
+        getOrCreateClient().recycleConditional(conditionalClientRef);
+      } else {
+        getOrCreateClient().recycle();
+
+      }
 
     },
 
@@ -221,8 +246,8 @@ define([
       return getOrCreateClient();
     },
 
-    getSubscriptionTimestamp: function(channel) {
-      return subscriptionTimestampExtension._getTimestamp(channel);
+    getSnapshotFor: function(channel) {
+      return snapshotExtension._snapshot(channel);
     }
   };
 });

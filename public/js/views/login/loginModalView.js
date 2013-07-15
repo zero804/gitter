@@ -1,12 +1,15 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'views/base',
   'hbs!./tmpl/loginModalView',
   'jquery-placeholder'
-], function($, _, TroupeViews, template) {
+], function($, _, context, TroupeViews, template) {
+  "use strict";
+
   return TroupeViews.Base.extend({
     template: template,
 
@@ -20,6 +23,7 @@ define([
     },
 
     getRenderData: function() {
+      var troupe = context.getTroupe();
       return {
         userExists: this.userExists,
         email: this.initialEmail,
@@ -27,7 +31,7 @@ define([
         autofocusPassword: this.initialEmail ? 'autofocus' : '',
         troupeUri: this.fromSignup ? null : window.location.pathname.replace(/\//g,''),
         fromSignup: this.fromSignup,
-        isOneToOne: (window.troupeContext && window.troupeContext.troupe) ? !!window.troupeContext.troupe.oneToOne : null
+        isOneToOne: troupe && troupe.oneToOne
       };
     },
 

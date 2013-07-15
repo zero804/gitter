@@ -59,7 +59,7 @@ server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, do
   winston.info("Granted access to ", client.name, " for ", user.displayName);
   winston.info("Granted access to "+ client.name + " for " + user.displayName);
 
-  oauthService.saveAuthorizationCode(code, client.id, redirectUri, user.id, function(err) {
+  oauthService.saveAuthorizationCode(code, client, redirectUri, user, function(err) {
     if (err) { return done(err); }
     done(null, code);
   });

@@ -1,11 +1,12 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'backbone',
   './base',
   '../utils/momentWrapper'
-], function($, _, Backbone, TroupeCollections, moment) {
+], function($, _, context, Backbone, TroupeCollections, moment) {
   "use strict";
   var exports = {};
 
@@ -30,7 +31,7 @@ define([
     model: exports.EmailModel,
     modelName: 'email',
     initialize: function(options) {
-      this.url = "/troupes/" + window.troupeContext.troupe.id + "/conversations/" + options.id;
+      this.url = "/troupes/" + context.getTroupeId() + "/conversations/" + options.id;
     }
 
   });

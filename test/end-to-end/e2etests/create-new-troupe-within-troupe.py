@@ -1,198 +1,230 @@
 import utils
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import WebDriverException
+from nose.plugins.attrib import attr
 import urllib2
 import time
-
-driver = None
-
-
-def setup_module():
-    global driver
-    driver = utils.driver()
+import unittest
 
 
-def testCreateTroupeFromGroupTroupe():
-    utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
+class NewTroupeTests(unittest.TestCase):
 
-    if(driver.current_url.find("/testtroupe1") == -1):
-        driver.get(utils.baseUrl("/testtroupe1"))
+    def setUp(self):
+        self.driver = utils.driver()
 
-    while True:
-        actionChain = ActionChains(driver)
-        actionChain.move_to_element(driver.find_element_by_css_selector('#menu-toggle'))
-        actionChain.perform()
+    def tearDown(self):
+        utils.resetData(self.driver)
+        self.driver.quit()
 
-        try:
-            driver.find_element_by_css_selector('#icon-troupes').click()
-        except WebDriverException as e:
-            print(e)
-            print("Click failed, retrying: ")
+    @attr('unreliable')
+    def testCreateTroupeFromGroupTroupe(self):
+        utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
 
-            actionChain = ActionChains(driver)
-            actionChain.move_to_element(driver.find_element_by_css_selector('DIV.trpHeaderTitle'))
+        if(self.driver.current_url.find("/testtroupe1") == -1):
+            self.driver.get(utils.baseUrl("/testtroupe1"))
+
+        while True:
+            actionChain = ActionChains(self.driver)
+            actionChain.move_to_element(self.driver.find_element_by_css_selector('#menu-toggle'))
             actionChain.perform()
 
-            time.sleep(0.5)
-            continue
-        break
+            try:
+                self.driver.find_element_by_css_selector('#icon-troupes').click()
+            except WebDriverException as e:
+                print(e)
+                print("Click failed, retrying: ")
 
-    driver.execute_script('$("a div.trpNewTroupeButton").click()')
-    #startTroupeButton = driver.find_element_by_css_selector('a div.trpNewTroupeButton')
-    #startTroupeButton.location_once_scrolled_into_view()
-    #startTroupeButton.click()
+                actionChain = ActionChains(self.driver)
+                actionChain.move_to_element(self.driver.find_element_by_css_selector('DIV.trpHeaderTitle'))
+                actionChain.perform()
 
-    troupeName = 'Troupe for ' + time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime())
+                time.sleep(0.5)
+                continue
+            break
 
-    form = driver.find_element_by_css_selector('form#signup-form')
-    inputBox = form.find_element_by_css_selector('input#troupeName')
-    inputBox.send_keys(troupeName)
-    driver.find_element_by_name('submit').click()
-    time.sleep(1)
+        self.driver.execute_script('$("a #left-menu-new-troupe-button").click()')
+        #startTroupeButton = self.driver.find_element_by_css_selector('a div.trpNewTroupeButton')
+        #startTroupeButton.location_once_scrolled_into_view()
+        #startTroupeButton.click()
 
-    header = driver.find_element_by_css_selector('DIV.trpHeaderTitle')
-    assert header.text.find(troupeName) >= 0
+        troupeName = 'Troupe for ' + time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime())
 
-    # share dialog pops up because there is no one else in the troupe, invite someone
-    form = driver.find_element_by_css_selector('form#share-form')
-
-    # type and wait for autocomplete
-    inputBox = form.find_element_by_name('inviteSearch')
-    inputBox.send_keys('te')
-    time.sleep(1)
-
-    # expect two elements in the suggestions list
-    suggestions = form.find_elements_by_css_selector('ul.typeahead li')
-    assert len(suggestions) >= 2
-
-    # finish typing in a full email address and send invite
-    email = 'testuser.' + time.strftime("%Y%m%d%H%M%S", time.gmtime()) + '@troupetest.local'
-    inputBox.send_keys(email[2:])
-    inputBox.send_keys(Keys.ENTER)
-    form.find_element_by_css_selector('button[type=submit]').click()
-
-    success = driver.find_element_by_css_selector('div.modal-success.view')
-    assert success.is_displayed()
-
-    time.sleep(1)
-
-    # login as invited user by accepting invite link
-    queryurl = utils.baseUrl("/testdata/inviteAcceptLink?email=" + email)
-    response = urllib2.urlopen(queryurl)
-    acceptLink = response.read()
-
-    driver.delete_all_cookies()
-    driver.get(utils.baseUrl(acceptLink))
-
-    form = driver.find_element_by_css_selector('#updateprofileform')
-    form.find_element_by_css_selector('#displayName').send_keys('Another Test User')
-    form.find_element_by_css_selector('#password').send_keys('123456')
-
-    form.find_element_by_name('submit').click()
-
-    # ensure the troupe name is the same as the one the invite was for
-    # header = driver.find_element_by_css_selector('DIV.trpHeaderTitle')
-    # assert header.text.find(troupeName) >= 0
-
-    # assert len(driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem')) == 2
-
-
-# Follows on from last test
-def testRemoveUserFromTroupe():
-    #troupeBefore = driver.find_element_by_css_selector('DIV.trpHeaderTitle').text
-
-    for x in driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem'):
-        x.click()
+        form = self.driver.find_element_by_css_selector('form#signup-form')
+        inputBox = form.find_element_by_css_selector('input#troupeName')
+        inputBox.send_keys(troupeName)
+        self.driver.find_element_by_name('submit').click()
         time.sleep(1)
-        thisUsersDisplayName = driver.find_element_by_css_selector('.trpRightPanel .trpDisplayName')
-        if not thisUsersDisplayName.text.find("Another Test User") >= 0:
-            driver.find_element_by_css_selector('#person-remove-button').click()
+
+        header = self.driver.find_element_by_css_selector('DIV.trpHeaderTitle')
+        assert header.text.find(troupeName) >= 0
+
+        # share dialog pops up because there is no one else in the troupe, invite someone
+        form = self.driver.find_element_by_css_selector('form#share-form')
+
+        # type and wait for autocomplete
+        inputBox = form.find_element_by_name('inviteSearch')
+        inputBox.send_keys('te')
+        time.sleep(0.1)
+
+        # expect two elements in the suggestions list
+        suggestions = form.find_elements_by_css_selector('ul.typeahead li')
+        assert len(suggestions) >= 2
+
+        # finish typing in a full email address and send invite
+        emailuser = 'testuser.' + time.strftime("%Y%m%d%H%M%S", time.gmtime())
+        email = emailuser + '@troupetest.local'
+        utils.send_keys(inputBox, email[2:])
+        time.sleep(0.1)
+        suggestion = self.driver.find_element_by_css_selector('.typeahead li.active')
+        assert suggestion.text.find(email) >= 0, "Expected the suggestion to be the full email address given"
+        suggestion.click()
+        time.sleep(0.1)
+        form.find_element_by_css_selector('button[type=submit]').click()
+
+        success = self.driver.find_element_by_css_selector('div.modal-success.view')
+        assert success.is_displayed()
+
+        time.sleep(1)
+
+        # login as invited user by accepting invite link
+        queryurl = utils.baseUrl("/testdata/inviteAcceptLink?email=" + email)
+        response = urllib2.urlopen(queryurl)
+        acceptLink = response.read()
+        assert acceptLink, "Accept link should not be falsy"
+
+        self.driver.get(utils.baseUrl('/signout'))
+        self.driver.delete_all_cookies()
+        self.driver.get(utils.baseUrl(acceptLink))
+
+        form = self.driver.find_element_by_css_selector('#updateprofileform')
+        form.find_element_by_css_selector('#displayName').send_keys('Another Test User')
+        form.find_element_by_css_selector('#password').send_keys('123456')
+
+        form.find_element_by_name('submit').click()
+        time.sleep(2)
+        # ensure the troupe name is the same as the one the invite was for
+        # header = self.driver.find_element_by_css_selector('DIV.trpHeaderTitle')
+        # assert header.text.find(troupeName) >= 0
+
+        # assert len(self.driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem')) == 2
+
+        # choose username for this new user
+        usernameInput = self.driver.find_element_by_css_selector('#username-form input[name=username]')
+        usernameInput.send_keys(emailuser)
+        self.driver.find_element_by_css_selector('#username-form [type=submit]').click()
+
+    # Follows on from last test
+    @attr('unreliable')
+    def testRemoveUserFromTroupe(self):
+        #troupeBefore = self.driver.find_element_by_css_selector('DIV.trpHeaderTitle').text
+        # this test should ensure it is in the new troupe, in case the previous test failed
+
+        time.sleep(1)
+
+        a = 0
+        while len(self.driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem')) > 1:
             time.sleep(1)
-            driver.find_element_by_css_selector('#button-yes').click()
-    driver.find_element_by_css_selector('.trpSettingsButton a').click()
-    driver.find_element_by_css_selector('#delete-troupe').click()
-    driver.find_element_by_css_selector('#ok').click()
+            persons = self.driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem')
+            person = persons[a]
+            person.click()
+            time.sleep(1)
+            thisUsersDisplayName = self.driver.find_element_by_css_selector('.trpRightPanel .trpDisplayName')
+            assert(thisUsersDisplayName.is_displayed())
+            if not thisUsersDisplayName.text.find("Another Test User") >= 0:
+                print "trying to remove this person " + thisUsersDisplayName.text
+                self.driver.find_element_by_css_selector('#person-remove-button').click()
+                time.sleep(1)
+                self.driver.find_element_by_css_selector('#button-yes').click()
+                time.sleep(1)   # give enough time for the right bar to hide, before click a person again
+            else:
+                a += 1
+                print "not trying to remove this person " + thisUsersDisplayName.text
+        self.driver.find_element_by_css_selector('.trpSettingsButton a').click()
+        self.driver.find_element_by_css_selector('#delete-troupe').click()
+        self.driver.find_element_by_css_selector('#ok').click()
 
-    #time.sleep(1)
-    #troupeAfter = driver.find_element_by_css_selector('DIV.trpHeaderTitle').text
-    #assert(troupeBefore != troupeAfter)
+        #time.sleep(1)
+        #troupeAfter = self.driver.find_element_by_css_selector('DIV.trpHeaderTitle').text
+        #assert(troupeBefore != troupeAfter)
 
+    @attr('unreliable')
+    def testCreateTroupeFromOneToOneTroupe(self):
+        # Login as Test User 1
+        self.driver.delete_all_cookies()
+        utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
 
-def testCreateTroupeFromOneToOneTroupe():
-    driver.delete_all_cookies()
-    utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
+        # Visit a one to one with Test User 2
+        queryurl = utils.baseUrl("/testdata/oneToOneLink?email=testuser2@troupetest.local")
+        response = urllib2.urlopen(queryurl)
+        oneToOneLink = response.read()
+        self.driver.get(utils.baseUrl(oneToOneLink))
 
-    queryurl = utils.baseUrl("/testdata/oneToOneLink?email=testuser2@troupetest.local")
-    response = urllib2.urlopen(queryurl)
-    oneToOneLink = response.read()
+        # Upgrade this one to one to a proper troupe
+        self.driver.find_element_by_css_selector('#people-create-troupe-button div').click()
 
-    driver.get(utils.baseUrl(oneToOneLink))
+        troupeName = 'Troupe for ' + time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime())
+        form = self.driver.find_element_by_css_selector('#signup-form')
+        form.find_element_by_css_selector('#troupeName').send_keys(troupeName)
+        form.find_element_by_name('submit').click()
 
-    # create troupe
-    driver.find_element_by_css_selector('#people-create-troupe-button div').click()
+        time.sleep(0.5)
 
-    troupeName = 'Troupe for ' + time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime())
+        # Ensure we are in the new troupe, with the Test User 2 as well
+        header = self.driver.find_element_by_css_selector('DIV.trpHeaderTitle')
+        assert header.text.find(troupeName) >= 0
+        assert len(self.driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem')) == 2
 
-    form = driver.find_element_by_css_selector('#signup-form')
-    form.find_element_by_css_selector('#troupeName').send_keys(troupeName)
-    form.find_element_by_name('submit').click()
+        # Invite the third person
+        form = self.driver.find_element_by_css_selector('form#share-form')
+        # type and wait for autocomplete
+        inputBox = form.find_element_by_name('inviteSearch')
+        email = 'testuser3@troupetest.local'
+        utils.send_keys(inputBox, email)
+        # select an existing user
+        time.sleep(0.5)
+        self.driver.find_element_by_css_selector('.typeahead li.active').click()
+        time.sleep(0.5)
 
-    time.sleep(0.5)
+        # check that there is one invite ready to go
+        invitesEl = self.driver.find_element_by_css_selector("#invites")
+        # find the userId of the selected person
+        userId = invitesEl.find_element_by_css_selector('.invite').get_attribute('data-value')
+        # Submit the form, adding the new user
+        form.find_element_by_css_selector('button[type=submit]').click()
+        time.sleep(1)
+        # the success message shows
+        success = self.driver.find_element_by_css_selector('div.modal-success.view')
+        assert success.is_displayed()
 
-    header = driver.find_element_by_css_selector('DIV.trpHeaderTitle')
-    assert header.text.find(troupeName) >= 0
+        # There should be an invite for the user that we invited to this normal troupe
+        # Get the invite code and accept it
+        queryurl = utils.baseUrl("/testdata/inviteAcceptLink?email=testuser3@troupetest.local")
+        response = urllib2.urlopen(queryurl)
+        acceptLink = response.read()
 
-    assert len(driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem')) == 2
+        self.driver.delete_all_cookies()
+        self.driver.get(utils.baseUrl("/signout"))
+        self.driver.get(utils.baseUrl(acceptLink))
 
-    # invite the third person
-    form = driver.find_element_by_css_selector('form#share-form')
+        # login as Test User 3 to accept the invite
+        name = self.driver.find_element_by_css_selector('#email')
+        name.clear()
+        name.send_keys("testuser3@troupetest.local")
 
-    # type and wait for autocomplete
-    inputBox = form.find_element_by_name('inviteSearch')
-    inputBox.send_keys('Te')
-    time.sleep(1)
+        password = self.driver.find_element_by_css_selector('#password')
+        password.send_keys("123456")
 
-    # expect at least two elements in the suggestions list
-    suggestions = form.find_elements_by_css_selector('ul.typeahead li')
-    assert len(suggestions) >= 2
+        self.driver.find_element_by_css_selector('#signin-button').click()
 
-    # select an existing user
+        time.sleep(1)
 
-    inputBox.send_keys(Keys.ARROW_DOWN)
-    inputBox.send_keys(Keys.ENTER)
+        self.driver.find_element_by_css_selector('DIV.trpHeaderWrapper')
 
-    time.sleep(2)
+        # Accept the invite
+        self.driver.find_element_by_css_selector("#accept-invite").click()
 
-    # check that there is one invite ready to go
-    invitesEl = driver.find_element_by_css_selector("#invites")
-    invitesEl.size == 1
+        # ensure there are now 3 people in the same troupe
+        assert len(self.driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem')) == 3
 
-    # find the userId of the selected person
-    userId = invitesEl.find_element_by_css_selector('.invite').get_attribute('data-value')
-
-    form.find_element_by_css_selector('button[type=submit]').click()
-
-    time.sleep(1)
-
-    success = driver.find_element_by_css_selector('div.modal-success.view')
-    assert success.is_displayed()
-
-    queryurl = utils.baseUrl("/testdata/inviteAcceptLinkByUserId?userId=" + userId)
-    response = urllib2.urlopen(queryurl)
-    acceptLink = response.read()
-
-    driver.delete_all_cookies()
-    driver.get(utils.baseUrl("/signout"))
-    driver.get(utils.baseUrl(acceptLink))
-
-    # ensure there are now 3 people in the same troupe
-    assert len(driver.find_elements_by_css_selector('#people-roster div.trpPeopleListItem')) == 3
-
-    # header = driver.find_element_by_css_selector('DIV.trpHeaderTitle')
-    # assert header.text.find(troupeName) >= 0
-
-
-def teardown_module():
-    utils.resetData(driver)
-    utils.shutdown(driver)
+        # header = self.driver.find_element_by_css_selector('DIV.trpHeaderTitle')
+        # assert header.text.find(troupeName) >= 0

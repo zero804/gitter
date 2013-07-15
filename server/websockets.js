@@ -57,6 +57,7 @@ app.use(function(req, res, next) {
   res.send(502, "Server is in the process of restarting");
 });
 
+shutdown.installUnhandledExceptionHandler();
 shutdown.addHandler('websockets', 10, function(callback) {
   server.close(function() {
     callback();

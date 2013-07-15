@@ -1,0 +1,98 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+<!--<![endif]-->
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=IE9" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+	<meta charset="utf-8">
+  <meta name="apple-itunes-app" content="app-id=632039322"/>
+
+	<title>{{troupeName}} - Troupe</title>
+
+  <link rel="stylesheet" href='{{cdn "bootstrap/css/trp3.css" }}'>
+  <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/edpmlaohjokcmefhjghaeeikjjcjplmi">
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href='{{cdn "images/2/favicon8.ico" }}'>
+    {{>load_font_css}}
+
+    {{#useFirebug}}
+    <script type="text/javascript" src="https://getfirebug.com/firebug-lite.js"></script>
+    {{/useFirebug}}
+</head>
+<body>
+
+  <div class="trpLeftMenuHotspot" id="left-menu-hotspot"></div>
+
+  <div class="trpLeftMenu" id="left-menu"></div>
+
+  <div class="trpMenuTab" id="menu-toggle-button"><img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle">
+    <div class="trpUnreadBadge" id="unread-badge"><div class="trpUnreadBadgeCount"></div></div>
+  </div>
+
+
+  <div class="trpHeaderWrapper" id="header-wrapper">
+  </div>
+
+  <div class="trpAlertWrapper" id="alert-panel">
+    <div class="trpAlertContainer">
+      <div class="trpAlertContent" id="alert-content">
+      </div>
+    </div>
+  </div>
+
+<div class="trpContentPanel" id="content-frame">
+  <div class="trpChatPanel" id="chat-frame">
+    <div class="trpChatContainer" id="frame-chat">
+    </div>
+  </div>
+  <div class="trpToolbar" id="toolbar-frame" style="display: none">
+  </div>
+</div>
+
+<div class="trpRightPanel" id="right-panel" style="display: none">
+  <div class="trpImageBigThumbnail" id="image-preview">
+  </div>
+  <div class="trpFileDetails">
+    <div class="trpButtonGreen">Download</div>
+  </div>
+</div>
+
+<div class="trpChatInputWrapper" id="chat-input-wrapper">
+  <div class="trpChatInputArea" id="chat-input">
+  </div>
+</div>
+
+<div class="trpBlankPage"> </div>
+
+<script type="text/javascript">
+  window.troupeContext = {{{troupeContext}}};
+  {{#if data}}
+  window.troupePreloads = {{{data}}};
+  {{/if}}
+  {{#if trackingId}}
+    window.troupeTrackingId = '{{trackingId}}';
+  {{/if}}
+</script>
+
+{{>require_wrapper}}
+
+{{{bootScript bootScriptName }}}
+
+
+<script type="text/javascript">
+  var uvOptions = {};
+  (function() {
+    var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+    uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/BYBA0YJRpGVi5zrb99UoHQ.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+  })();
+</script>
+
+
+</body>
+</html>

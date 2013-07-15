@@ -1,48 +1,49 @@
 
 import utils
 import time
-
-driver = None
-
-
-def setup_module():
-    global driver
-    driver = utils.driver()
+from nose.plugins.attrib import attr
+import unittest
 
 
-def testSignin():
-    driver.delete_all_cookies()
-    driver.get(utils.baseUrl("/oauth/authorize?client_id=1&redirect_uri=http%3A%2F%2Ftrou.pe%2FOAuthCallback&response_type=code&scope=read"))
+class OauthLoginTests(unittest.TestCase):
 
-    driver.find_element_by_css_selector('#email').send_keys('testuser@troupetest.local')
-    driver.find_element_by_css_selector('#password').send_keys('123456')
-    url = driver.current_url
-    driver.find_element_by_css_selector('#submit').click()
+    def setUp(self):
+        self.driver = utils.driver()
+        utils.printJobInfo(self.driver)
 
-    while driver.current_url == url:
-        time.sleep(0.1)
+    def tearDown(self):
+        self.driver.quit()
 
-    assert("/OAuthCallback" in driver.current_url)
+    @attr('unreliable')
+    def testSignin(self):
+        self.driver.delete_all_cookies()
+        self.driver.get(utils.baseUrl("/oauth/authorize?client_id=1&redirect_uri=http%3A%2F%2Ftrou.pe%2FOAuthCallback&response_type=code&scope=read"))
 
-    driver.get(utils.baseUrl("/signout"))
+        self.driver.find_element_by_css_selector('#email').send_keys('testuser@troupetest.local')
+        self.driver.find_element_by_css_selector('#password').send_keys('123456')
+        url = self.driver.current_url
+        self.driver.find_element_by_css_selector('#submit').click()
 
+        while self.driver.current_url == url:
+            time.sleep(0.1)
 
-def testSigninWithoutCookies():
-    driver.delete_all_cookies()
-    driver.get(utils.baseUrl("/oauth/authorize?client_id=1&redirect_uri=http%3A%2F%2Ftrou.pe%2FOAuthCallback&response_type=code&scope=read"))
-    driver.delete_all_cookies()
+        assert("/OAuthCallback" in self.driver.current_url)
 
-    driver.find_element_by_css_selector('#email').send_keys('testuser@troupetest.local')
-    driver.find_element_by_css_selector('#password').send_keys('123456')
+        self.driver.get(utils.baseUrl("/signout"))
 
-    url = driver.current_url
-    driver.find_element_by_css_selector('#submit').click()
+    @attr('unreliable')
+    def testSigninWithoutCookies(self):
+        self.driver.delete_all_cookies()
+        self.driver.get(utils.baseUrl("/oauth/authorize?client_id=1&redirect_uri=http%3A%2F%2Ftrou.pe%2FOAuthCallback&response_type=code&scope=read"))
+        self.driver.delete_all_cookies()
 
-    while driver.current_url == url:
-        time.sleep(0.1)
+        self.driver.find_element_by_css_selector('#email').send_keys('testuser@troupetest.local')
+        self.driver.find_element_by_css_selector('#password').send_keys('123456')
 
-    assert("/OAuthCallback" in driver.current_url)
+        url = self.driver.current_url
+        self.driver.find_element_by_css_selector('#submit').click()
 
+        while self.driver.current_url == url:
+            time.sleep(0.1)
 
-def teardown_module():
-    driver.quit()
+        assert("/OAuthCallback" in self.driver.current_url)

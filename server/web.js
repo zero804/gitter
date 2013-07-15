@@ -28,6 +28,7 @@ app.use(function(req, res, next) {
   res.send(502, "Server is in the process of restarting");
 });
 
+shutdown.installUnhandledExceptionHandler();
 shutdown.addHandler('web', 10, function(callback) {
   gracefullyClosing = true;
   server.close(callback);

@@ -1,34 +1,37 @@
-/*jshint unused:true, browser:true*/
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
-  './notify',
+  'utils/context',
   './realtime',
   'handlebars',
-  'log!web-notifications'
-], function($, notify, realtime, handlebars, log){
+  'log!web-notifications',
+  './notify' // No ref
+], function($, context, realtime, handlebars, log){
   "use strict";
 
   var notifications = $('<div id="notification-center" class="notification-center"></div>').appendTo('body');
 
-  // notifications for cross troupe chat messages
-  realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
-    if (message.notification === 'user_notification') {
+  if(context.isAuthed()) {
+    // notifications for cross troupe chat messages
+    realtime.subscribe('/user/' + context.getUserId(), function(message) {
+      if (message.notification === 'user_notification') {
 
-      if(message.troupeId === window.troupeContext.troupe.id) {
-        return;
+        if(message.troupeId === context.getTroupeId()) {
+          return;
+        }
+
+        // log("Got a user_notification event");
+        var tmpl = handlebars.compile('<a href="{{link}}"><div class="notification-header">{{{title}}}</div><div class="notification-text">{{{text}}}</div></a>');
+        notifications.notify({
+          content: tmpl({
+            link: message.link,
+            title: message.title,
+            text: message.text
+          })
+        });
       }
-
-      // log("Got a user_notification event");
-      var tmpl = handlebars.compile('<a href="{{link}}"><div class="notification-header">{{{title}}}</div><div class="notification-text">{{{text}}}</div></a>');
-      notifications.notify({
-        content: tmpl({
-          link: message.link,
-          title: message.title,
-          text: message.text
-        })
-      });
-    }
-  });
+    });
+  }
 
 
   // notify for a reload when new versions of the front end are deployed

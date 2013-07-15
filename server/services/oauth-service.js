@@ -2,6 +2,8 @@
 "use strict";
 
 var persistenceService = require("./persistence-service");
+var statsService = require("./stats-service");
+
 var uuid = require('node-uuid');
 
 var WEB_INTERNAL_CLIENT_KEY = 'web-internal';
@@ -20,12 +22,17 @@ exports.findClientById = function(id, callback) {
   persistenceService.OAuthClient.findById(id, callback);
 };
 
-exports.saveAuthorizationCode = function(code, clientId, redirectUri, userId, callback) {
+exports.saveAuthorizationCode = function(code, client, redirectUri, user, callback) {
+
+  var properties = {};
+  properties['Last login from ' + client.tag] = (new Date()).toISOString();
+  statsService.userUpdate(user, properties);
+
   var authCode = new persistenceService.OAuthCode({
       code: code,
-      clientId: clientId,
+      clientId: client.id,
       redirectUri: redirectUri,
-      userId: userId
+      userId: user.id
   });
   authCode.save(callback);
 };
@@ -39,6 +46,7 @@ exports.findAccessToken = function(token, callback) {
 };
 
 exports.saveAccessToken = function(token, userId, clientId, callback) {
+
   var accessToken = new persistenceService.OAuthAccessToken({
     token: token,
     userId: userId,
@@ -54,17 +62,17 @@ exports.findClientByClientKey = function(clientKey, callback) {
 // TODO: move some of this functionality into redis for speed
 // TODO: make the web tokens expire
 exports.findOrGenerateWebToken = function(userId, callback) {
-  persistenceService.OAuthAccessToken.findOne({ userId: userId, clientId: webInternalClientId }, function(err, oauthAccessToken) {
-    if(err) return callback(err);
-    if(oauthAccessToken) return callback(null, oauthAccessToken.token);
+  return persistenceService.OAuthAccessToken.findOneQ({ userId: userId, clientId: webInternalClientId })
+      .then(function(oauthAccessToken) {
+        if(oauthAccessToken) return oauthAccessToken.token;
 
-    oauthAccessToken = new persistenceService.OAuthAccessToken({ token: uuid.v4(), userId: userId, clientId: webInternalClientId });
-    oauthAccessToken.save(function(err) {
-      if(err) return callback(err);
-
-      callback(null, oauthAccessToken.token);
-    });
-  });
+        var token = uuid.v4();
+        return persistenceService.OAuthAccessToken.createQ({ token: token, userId: userId, clientId: webInternalClientId })
+            .then(function() {
+              return token;
+            });
+      })
+      .nodeify(callback);
 
 };
 
@@ -72,6 +80,17 @@ exports.validateToken = function(token, callback) {
   persistenceService.OAuthAccessToken.findOne({ token: token }, function(err, accessToken) {
     if(err) return callback(err);
     if(!accessToken) return callback("Access token not found");
+
+    persistenceService.OAuthClient.findOne({_id: accessToken.clientId}, function(err, client) {
+      return;
+      //if (err || !client) return;
+      persistenceService.User.findOne({_id: accessToken.userId}, function(err, user) {
+        if (err || !client) return;
+        var properties = {};
+        properties['Last login from ' + client.tag] = (new Date()).toISOString();
+        statsService.userUpdate(user, properties);
+      });
+    });
 
     return callback(null, accessToken.userId);
   });

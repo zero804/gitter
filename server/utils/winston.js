@@ -5,6 +5,7 @@ var nconf = require('./config');
 var winston = require("winston");
 var fs = require('fs');
 var path = require('path');
+var Q = require('q');
 
 function statFile(fileTransport) {
   if(!fileTransport) return;
@@ -72,6 +73,7 @@ function configureTransports() {
     winston.remove({ name: name });
   }
 
+
   if(nconf.get('logging:logToFile') && nconf.get('LOG_FILE')) {
     winston.add(winston.transports.File, {
       filename: nconf.get('LOG_FILE'),
@@ -91,13 +93,16 @@ function configureTransports() {
       console.log('Logging to file is configured by LOG_FILE environment variable has not been set. Logging to console');
     }
 
-    winston.add(winston.transports.Console, {
-      colorize: nconf.get("logging:colorize"),
-      timestamp: nconf.get("logging:timestamp"),
-      level: nconf.get("logging:level"),
-      prettyPrint: nconf.get("logging:prettyPrint")
-    });
 
+    if(!nconf.get("logging:disableConsole")) {
+
+      winston.add(winston.transports.Console, {
+        colorize: nconf.get("logging:colorize"),
+        timestamp: nconf.get("logging:timestamp"),
+        level: nconf.get("logging:level"),
+        prettyPrint: nconf.get("logging:prettyPrint")
+      });
+    }
   }
 
   if(nconf.get("logging:loggly")) {
@@ -121,7 +126,6 @@ configureTransports();
 
 var oldError = winston.error;
 winston.error = function(message, data) {
-
   function formatStackTrace(stack) {
     if(stack.join) {
       return stack.join('\n');
@@ -130,10 +134,21 @@ winston.error = function(message, data) {
     return '' + stack;
   }
 
-  if(data && data.exception && data.exception.stack) {
-    data.stack = formatStackTrace(data.exception.stack);
+
+  if(data && data.exception) {
+    console.error(data.exception);
+
+    if(data.exception.stack) {
+        data.stack = formatStackTrace(data.exception.stack);
+    }
+
+    if(data.exception.message) {
+      data.errorMessage = data.exception.message;
+      delete data.exception;
+    }
   }
   oldError.apply(winston, arguments);
+
 };
 
 var logLevel = nconf.get("logging:level");
@@ -148,5 +163,12 @@ nconf.events.on('reload', function() {
 
   configureTransports();
 });
+
+
+
+// This really doens't have a home, but logging shows stack
+// traces, so it'll go here for now
+Q.longStackSupport = !!nconf.get("logging:longStackSupport");
+Error.stackTraceLimit = 100;
 
 module.exports = winston;

@@ -1,17 +1,19 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'jquery',
   'underscore',
   'backbone',
+  'utils/context',
   './base-router',
   'collections/users',
   'marionette',
   'views/base',
   'hbs!./views/people/tmpl/mobilePeopleView',
-  'components/eyeballs',
-  'components/unread-items-client',
-  'template/helpers/all'
-], function($, _, Backbone, BaseRouter, userModels, Marionette, TroupeViews, PersonViewTemplate/*, unreadItemsClient*/) {
+  'components/mobile-context',        // No ref
+  'components/eyeballs',              // No ref
+  'components/unread-items-client',   // No ref
+  'template/helpers/all'              // No ref
+], function($, _, Backbone, context, BaseRouter, userModels, Marionette, TroupeViews, PersonViewTemplate/*, unreadItemsClient*/) {
   /*jslint browser: true, unused: true */
   "use strict";
 
@@ -52,7 +54,7 @@ require([
           template: PersonViewTemplate,
           getRenderData: function() {
             var d = this.model.toJSON();
-            if (window.troupeContext.user.id === this.model.id) {
+            if (context.getUserId() === this.model.id) {
               d.isSelf = true;
             }
             return d;

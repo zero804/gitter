@@ -1,13 +1,12 @@
-/*jshint unused:true, browser:true*/
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
   'log!dozy'
 ], function($, log) {
   "use strict";
 
-  // 10 second timeout, 20 seconds to respond
-  var TIMEOUT = 10000;
-  var THRESHOLD = TIMEOUT * 2;
+  var TIMEOUT = 120000;
+  var THRESHOLD = TIMEOUT * 1.5;
 
   var last = Date.now();
   window.setInterval(function() {

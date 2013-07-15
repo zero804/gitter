@@ -140,7 +140,7 @@ a:hover {
 	padding-left: 8px;
 }
 
-.trpNewTroupeButton {
+.trpLeftMenuButton, .trpNewTroupeButton {
   display: inline-block;
 	width: 210px;
 	.trpBodyMedium;
@@ -216,6 +216,9 @@ a:hover {
 	white-space: nowrap;
 }
 
+.trpTroupeName.selected a {
+	text-decoration: underline;
+}
 
 .trpContentPanel {
 /*  display: inline-block;*/
@@ -228,6 +231,10 @@ a:hover {
 /*	padding-top: 40px;*/
 	top: 60px;
   right: 0px;
+  /* this min height isn't the best solution*/
+  /* we need the content panel to take up the entire middle of the screen*/
+  /* so that the mouseover event to close the left menu on it gets triggered */
+  min-height: 400px;
 }
 
 .trpContentSpacer {

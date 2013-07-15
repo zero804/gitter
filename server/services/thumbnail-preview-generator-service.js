@@ -1,13 +1,12 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var kue = require('../utils/kue');
-var jobs;
-
 var THUMBNAIL_STRATEGY = 1;
 var PREVIEW_STRATEGY = 1;
 
-exports.startWorkers = function() {
+var workerQueue = require('../utils/worker-queue');
+
+var queue = workerQueue.queue('generate-thumbnail', {}, function() {
   var persistence = require("./persistence-service");
   var winston = require("winston");
   var image = require("../utils/image");
@@ -16,12 +15,6 @@ exports.startWorkers = function() {
   var fs = require("fs");
   var temp = require("temp");
   var Q = require('q');
-
-  jobs = kue.createQueue();
-
-  jobs.process('generate-thumbnail', 20, function(job, done) {
-    directGenerateThumbnail(job.data.options, kue.wrapCallback(job, done));
-  });
 
   function getPreviewGenerationStrategy(mimeType) {
     if([
@@ -359,19 +352,13 @@ exports.startWorkers = function() {
     return deferred.promise;
   }
 
-};
+
+  return function(data, done) {
+    directGenerateThumbnail(data, done);
+  };
+});
 
 exports.generateThumbnail = function(options, callback) {
-  if(!jobs) jobs = kue.createQueue();
-
-  jobs.create(
-    'generate-thumbnail',
-    {
-      title: 'Thumbnail generation',
-      options: options
-    }
-  )
-  .attempts(5)
-  .save(callback);
+  queue.invoke(options, {}, callback);
 };
 

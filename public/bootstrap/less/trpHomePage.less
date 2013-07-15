@@ -4,7 +4,7 @@
 /*@import "trpWebFonts.less";*/
 @import "trpFonts.less";
 @import "trpButtons.less";
-@import "trpCommon.less";
+@import "trp3Common.less";
 @import "trpModals.less";
 
 body {
@@ -372,14 +372,49 @@ a {
   padding-top: 10px;
 }
 
-@media screen and (device-width: 320px) and (orientation: portrait) {
+@media screen and (device-width: 360px), (device-width: 720px), (device-width:320px) and (orientation: portrait) {
 
   body {
     height: 100%;
+    overflow: hidden;
   }
 
   html {
     height: 100%;
+    overflow: hidden;
+  }
+
+  .trpBodyWrapper {
+    height: 100%;
+  }
+
+  .modal {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    margin-left: 0;
+    max-height: 100%;
+  }
+
+  .modal-body {
+    padding-top: 12px;
+  }
+
+  .trpSuggestions {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 2px 24px 12px 24px;
+  }
+
+  .trpUsername {
+    margin-left: 0;
+    padding-top: 0;
   }
 
   .trpHomeHeroStripContainer {

@@ -1,71 +1,71 @@
-
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
+from nose.plugins.attrib import attr
 import utils
 import time
-
-driver = None
+import os
+import unittest
 
 chatMessage = 'The date and time are now ' + time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime())
 
 
-def setup_module():
-    global driver
-    driver = utils.driver()
+class ChatTests(unittest.TestCase):
 
+    def setUp(self):
+        self.driver = utils.driver()
+        utils.printJobInfo(self.driver)
+        utils.resetData(self.driver)
 
-def testSendingAChatMessage():
-    utils.existingUserlogin(driver, 'testuser@troupetest.local', '123456')
-    textArea = driver.find_element_by_id('chat-input-textarea')
+    def tearDown(self):
+        self.driver.quit()
 
-    textArea.send_keys(chatMessage)
-    textArea.send_keys(Keys.ENTER)
+    @attr('unreliable')
+    def testSendingAChatMessage(self):
+        utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
+        textArea = self.driver.find_element_by_id('chat-input-textarea')
 
-    time.sleep(0.5)
+        textArea.send_keys(chatMessage)
+        textArea.send_keys(Keys.RETURN)
 
-    links = [i.text for i in driver.find_elements_by_css_selector('.trpChatItem .trpChatText')]
-    text = links[len(links) - 1]
+        time.sleep(0.5)
 
-    assert text == chatMessage
+        links = [i.text for i in self.driver.find_elements_by_css_selector('.trpChatItem .trpChatText')]
+        text = links[len(links) - 1]
 
+        assert text == chatMessage
 
-def testEditingAChatMessage():
-    # textArea = driver.find_element_by_id('chat-input-textarea')
+    @attr('unreliable')
+    def testEditingAChatMessage(self):
+        self.driverName = os.getenv('driver')
+        if self.driverName != 'FIREFOX':
+            lastChat = self.driver.find_element_by_css_selector('.trpChatItem')
 
-    # chatMessage = 'The date and time are now ' + time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime())
-    # textArea.send_keys(chatMessage)
-    # textArea.send_keys(Keys.ENTER)
+            actionChain = ActionChains(self.driver)
+            actionChain.move_to_element(self.driver.find_element_by_css_selector('.frame-people'))
+            actionChain.perform()
 
-    # time.sleep(0.5)
+            time.sleep(0.5)
 
-    lastChat = getLastElement('.trpChatItem')
-    editButton = lastChat.find_element_by_css_selector('.trpChatEdit')
+            actionChain = ActionChains(self.driver)
+            actionChain.move_to_element(self.driver.find_element_by_css_selector('.trpChatBox'))
+            editButton = self.driver.find_element_by_css_selector('.trpChatEdit')
+            actionChain.move_to_element(editButton)
+            actionChain.click()
+            actionChain.perform()
 
-    actionChain = ActionChains(driver)
-    actionChain.move_to_element(lastChat.find_element_by_css_selector('.trpChatDetails'))
-    actionChain.click(editButton)
-    actionChain.perform()
+            # self.driver.find_element_by_css_selector('.trpChatEdit').click()
 
-    editInput = lastChat.find_element_by_css_selector('.trpChatInput')
+            editInput = lastChat.find_element_by_css_selector('.trpChatInput')
 
-    editInput.send_keys("...an alteration")
-    editInput.send_keys(Keys.ENTER)
+            editInput.send_keys("...an alteration")
+            editInput.send_keys(Keys.RETURN)
 
-    time.sleep(0.5)
+            time.sleep(0.5)
 
-    # editInput = lastChat.find_element_by_css_selector('.trpChatInput')
-    # assert not editInput
+            chatElText = self.getLastElement('.trpChatItem').find_element_by_css_selector('.trpChatText')
+            assert chatElText.text.find("...an alteration") != -1
 
-    chatElText = getLastElement('.trpChatItem').find_element_by_css_selector('.trpChatText')
-    assert chatElText.text.find("...an alteration") != -1
+    def getLastElement(self, selector):
+        els = self.driver.find_elements_by_css_selector(selector)
 
-
-def getLastElement(selector):
-    els = driver.find_elements_by_css_selector(selector)
-
-    return els[len(els) - 1]
-
-
-def teardown_module():
-    utils.screenshot(driver)
-    driver.quit()
+        return els[len(els) - 1]

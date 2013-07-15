@@ -57,6 +57,7 @@ exports.storeEmailInConversation = function(options, callback) {
   var attachments = options.attachments;
   var fromUserId = options.fromUserId;
   var messageIds = options.messageIds;
+  var fromUserEmail = options.fromUserEmail;
 
   var storeMail = new persistence.Email();
   storeMail.fromUserId = fromUserId;
@@ -83,8 +84,8 @@ exports.storeEmailInConversation = function(options, callback) {
 
       conversation.save(function(err) {
           if (err) return callback(err);
-          statsService.event('new_conversation', { troupeId: troupeId });
-          statsService.event('new_email', { troupeId: troupeId });
+          statsService.event('new_conversation', { userId: fromUserId, troupeId: troupeId, email: fromUserEmail });
+          statsService.event('new_email', { userId: fromUserId, troupeId: troupeId, email: fromUserEmail });
 
           callback(null, conversation, storeMail);
       });
@@ -98,7 +99,7 @@ exports.storeEmailInConversation = function(options, callback) {
     conversation.pushEmail(storeMail);
     conversation.save(function(err) {
         if (err) return callback(err);
-        statsService.event('new_email', { troupeId: troupeId });
+        statsService.event('new_email', { userId: fromUserId, troupeId: troupeId, email: fromUserEmail });
 
         callback(null, conversation, storeMail);
     });

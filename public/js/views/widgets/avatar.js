@@ -1,11 +1,14 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'views/base',
   'hbs!./tmpl/avatar',
   'bootstrap_tooltip'
-], function($, _, TroupeViews, template) {
+], function($, _, context, TroupeViews, template) {
+
+  "use strict";
 
   return TroupeViews.Base.extend({
     tagName: 'span',
@@ -17,11 +20,12 @@ define([
       this.showBadge = options.showBadge;
       this.showStatus = options.showStatus;
       this.avatarSize = options.size ? options.size : 's';
+      this.showTooltip = options.showTooltip !== false;
 
       // once this widget has the id of the user,
       // it will listen to changes on the global user collection,
       // so that it knows when to update.
-      var avatarChange = _.bind(function avatarChangeUnbound(event, data) {
+      var avatarChange = _.bind(function(event, data) {
 
         if(data.id === self.getUserId()) {
           if(self.user) {
@@ -65,7 +69,9 @@ define([
     },
 
     updateTooltip: function(data) {
-      this.$el.find('.trpDisplayPicture').attr('data-original-title', data.tooltip);
+      if(this.showTooltip) {
+        this.$el.find('.trpDisplayPicture').attr('data-original-title', data.tooltip);
+      }
     },
 
     getUserId: function() {
@@ -75,7 +81,7 @@ define([
     },
 
     getRenderData: function() {
-      var currentUserId = window.troupeContext.user ? window.troupeContext.user.id : undefined;
+      var currentUserId = context.getUserId();
 
       var user = this.model ? this.model.toJSON() : this.user;
 
@@ -95,7 +101,7 @@ define([
         avatarUrl: avatarUrl,
         avatarSize: this.avatarSize,
         userLocation: user.location ? user.location.description : "",
-        tooltip: user.displayName + "<br>" + ((user.location) ? user.location.description : ""),
+        tooltip: this.showTooltip && user.displayName + "<br>" + ((user.location) ? user.location.description : ""),
         online: online,
         offline: !online
       };
@@ -110,7 +116,7 @@ define([
       this.updateAvatar(data);
       this.updateTooltip(data);
       this.updatePresence(data);
-      if (!window._troupeCompactView && (this.model ? this.model.get('displayName') : this.user.displayName)) {
+      if (this.showTooltip && !window._troupeCompactView && (this.model ? this.model.get('displayName') : this.user.displayName)) {
         this.$el.find(':first-child').tooltip({
           html : true,
           placement : function(a, element) {
@@ -123,6 +129,7 @@ define([
           container: "body"
         });
       }
+      return this;
     }
 
   });

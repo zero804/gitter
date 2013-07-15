@@ -1,11 +1,12 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'backbone',
   'components/realtime',
   'log!collections'
-], function($, _, Backbone, realtime, log) {
+], function($, _, context, Backbone, realtime, log) {
   "use strict";
 
   var exports = {};
@@ -98,7 +99,7 @@ define([
       Backbone.Collection.prototype.constructor.call(this, models, options);
 
       if(!this.url) {
-        this.url = "/troupes/" + window.troupeContext.troupe.id + "/" + this.nestedUrl;
+        this.url = "/troupes/" + context.getTroupeId() + "/" + this.nestedUrl;
       }
 
       this._loading = false;
@@ -115,14 +116,6 @@ define([
 
       if(options) {
 
-        if(options.preloader) {
-          var preloader = options.preloader;
-          this.preloader = preloader;
-
-          preloader.on('preload:start', this._onPreloadStart, this);
-          preloader.on('preload:complete', this._onPreloadComplete, this);
-        }
-
         if(options.listen) {
           this.listen();
         }
@@ -131,26 +124,12 @@ define([
 
     },
 
-    _onPreloadStart: function() {
-      this._loading = true;
-      this.reset([]);
-    },
-
     _onSync: function() {
       this._loading = false;
     },
 
     _onRequest: function() {
       this._loading = true;
-    },
-
-    _onPreloadComplete: function(data) {
-      this._comparePreloadToSubscription();
-      var items = data[this.preloadKey];
-      this.add(items, { parse: true, merge: true, sort: true });
-      this._loading = false;
-      this.trigger('sync');
-      this.trigger('reset', this.models);
     },
 
     _onInitialLoad: function() {
@@ -166,18 +145,6 @@ define([
       }
     },
 
-    _comparePreloadToSubscription: function() {
-      if(this.preloader) {
-        var preloadTimestamp = this.preloader.getTimestamp();
-        var subscriptionTimestamp = realtime.getSubscriptionTimestamp(this.url);
-
-        if(subscriptionTimestamp > preloadTimestamp) {
-          log('WARNING: Difference in timestamps is ', preloadTimestamp - subscriptionTimestamp, preloadTimestamp, subscriptionTimestamp);
-        }
-
-      }
-    },
-
     listen: function(callback) {
       if(this.subscription) return;
       var self = this;
@@ -187,8 +154,9 @@ define([
       });
 
       this.subscription.callback(function() {
-        log('Listening to ' + self.url);
-        self._comparePreloadToSubscription();
+
+        var snapshot = realtime.getSnapshotFor(self.url);
+        self.reset(snapshot, { parse: true });
 
         if(callback) return callback();
       });
