@@ -77,32 +77,27 @@ require([
       });
     });
 
-    var showingFailure = false;
-
     function showLoginFailure() {
       // $('#login-failure').slideUp();
-      $('#login-failure').animate( {
+      $('#login-failure').animate({
         bottom: '0px'
       }, 350);
-      showingFailure = true;
     }
 
     function hideLoginFailure() {
-      if (showingFailure) {
-         $('.mtrpLoginFailure').animate( {
-            bottom: '-90px'
-          }, 350);
-      }
+      $('.mtrpLoginFailure').animate( {
+        bottom: '-200px'
+      }, 350);
     }
 
     function showResetFailure() {
-      $('#resetpwd-failure').animate( {
+      $('#resetpwd-failure').animate({
         bottom: '0px'
       }, 350);
     }
 
     function showResetSuccess() {
-      $('#resetpwd-confirm').animate( {
+      $('#resetpwd-confirm').animate({
         bottom: '0px'
       }, 350);
     }
