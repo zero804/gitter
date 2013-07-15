@@ -37,7 +37,7 @@ getAllUsers(function(err, users) {
         status:     user.status
       };
 
-      cio.identify(user.id, user.email, cio_properties);
+      if (user.email.indexOf("troupetest.local") == -1) cio.identify(user.id, user.email, cio_properties);
     });
   }
 

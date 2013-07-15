@@ -116,16 +116,12 @@ describe("User Service", function() {
     it('should find testuser by username', function(done) {
 
       var statsServiceMock = mockito.spy(testRequire('./services/stats-service'));
-      var userService = testRequire.withProxies("./services/user-service", {
-        './stats-service': statsServiceMock
-      });
+      var userService = testRequire("./services/user-service");
 
       var username = 'testuser1';
       userService.findByLogin(username, function(err, user) {
         assert(user, "A user should have been found");
         assert(user.username === username,  "Incorrect user found");
-
-        mockito.verify(statsServiceMock, once).event();
         done();
       });
 
@@ -134,16 +130,12 @@ describe("User Service", function() {
 
     it('should find testuser@troupetest.local by email', function(done) {
       var statsServiceMock = mockito.spy(testRequire('./services/stats-service'));
-      var userService = testRequire.withProxies("./services/user-service", {
-        './stats-service': statsServiceMock
-      });
+      var userService = testRequire("./services/user-service");
 
       var email = 'testuser@troupetest.local';
       userService.findByLogin(email, function(err, user) {
         assert(user, "A user should have been found");
         assert(user.email === email, "Incorrect user found");
-
-        mockito.verify(statsServiceMock, once).event();
         done();
       });
 

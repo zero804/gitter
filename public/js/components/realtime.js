@@ -177,10 +177,6 @@ define([
           }
         }
 
-        if (message.operation === "update") {
-          $(document).trigger('troupeUpdate', message);
-        }
-
       });
     }
 

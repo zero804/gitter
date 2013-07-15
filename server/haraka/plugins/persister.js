@@ -217,6 +217,7 @@ function saveMailForTroupe(mail, toAddress, connection, callback) {
 
         conversationService.storeEmailInConversation({
           fromUserId: user.id,
+          fromUserEmail: user.email,
           troupeId: troupe.id,
           subject: newSubject,
           inReplyTo: mail.inReplyTo,
