@@ -39,6 +39,7 @@ define([
 				url: '/api/v1/usernamesuggestions',
 				success: function(suggestions) {
 					if (suggestions && suggestions.length) {
+						suggestions = (window._troupeCompactView) ? suggestions.slice(0, 2) : suggestions.slice(0, 4);
 						self.addSuggestions(suggestions);
 					}
 				}
