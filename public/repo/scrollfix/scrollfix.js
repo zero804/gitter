@@ -1,3 +1,5 @@
+define([], function (){
+
 /**
  * ScrollFix v0.1
  * http://www.joelambert.co.uk
@@ -29,3 +31,5 @@ var ScrollFix = function(elem) {
 			elem.scrollTop = elem.scrollHeight - elem.offsetHeight - 1;
 	}, false);
 };
+return ScrollFix;
+});
