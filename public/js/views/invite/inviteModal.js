@@ -1,7 +1,9 @@
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'views/base',
+  'utils/context',
   'hbs!./tmpl/inviteModal'
-], function(TroupeViews, inviteModalTemplate) {
+], function(TroupeViews, context, inviteModalTemplate) {
   "use strict";
 
   var InviteView = TroupeViews.ConfirmationView.extend({
@@ -15,9 +17,23 @@ define([
       this.inviteId = options.inviteId;
     },
 
+    getRenderData: function() {
+      var isOneToOne;
+      var firstName;
+
+      if (context.getHomeUser()) {
+        isOneToOne = true;
+        firstName = context.getHomeUser().displayName.split(" ").shift();
+      }
+      return {
+        isOneToOne: isOneToOne,
+        homeUser: context.getHomeUser(),
+        firstName: firstName
+      };
+    },
+
     accept: function() {
-      var self = this;
-      var userId = window.troupeContext.user.id;
+      var userId = context.getUserId();
       var inviteId = this.inviteId;
 
       $.ajax({
@@ -34,8 +50,7 @@ define([
     },
 
     reject: function() {
-      var self = this;
-      var userId = window.troupeContext.user.id;
+      var userId = context.getUserId();
       var inviteId = this.inviteId;
 
       $.ajax({
@@ -57,11 +72,12 @@ define([
     initialize: function(options) {
 
       options.view = new InviteView({
-        inviteId: options.inviteId,
+        inviteId: options.inviteId
       });
 
       TroupeViews.Modal.prototype.initialize.call(this, options);
 
     }
+
   });
 });

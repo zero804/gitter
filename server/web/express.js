@@ -144,8 +144,19 @@ module.exports = {
     }
 
     app.use(function(err, req, res, next) {
-      winston.error("An unexpected error occurred", { error: err, path: req.path } );
-      if (err && err.errorCode === 404) {
+      var meta = {
+        path: req.path
+      };
+      if(err && err.message) {
+        meta.err = err.message;
+      }
+
+      console.error(err);
+
+      var status = err.status;
+
+      winston.error("An unexpected error occurred", meta);
+      if (status === 404) {
         res.status(404);
         res.render('404' , {
           homeUrl : nconf.get('web:homeurl')

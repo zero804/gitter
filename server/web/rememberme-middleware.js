@@ -8,6 +8,7 @@ var uuid = require('node-uuid'),
     nconf = require('../utils/config'),
     userService = require('../services/user-service');
 var statsService = require("../services/stats-service");
+var useragent = require('useragent');
 
 var cookieName = nconf.get('web:cookiePrefix') + 'auth';
 
@@ -124,7 +125,16 @@ module.exports = {
 
             winston.info("rememberme: Passport login succeeded");
 
-            statsService.event('user_login_auto', { userId: userId });
+            statsService.event('user_login', { userId: userId, method: "auto", email: req.user.email});
+
+            var ua = useragent.parse(req.headers['user-agent']);
+            var prefix = ua.os.family.match(/ios|android/i) ? 'mobile' : 'desktop';
+
+            var properties = {};
+            properties[prefix + "_os"]      = ua.os.family;
+            properties[prefix + "_browser"] = ua.family;
+
+            statsService.userUpdate(user, properties);
 
             generateAuthToken(req, res, userId, options, function(err) {
               return next(err);

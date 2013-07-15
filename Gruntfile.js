@@ -48,15 +48,16 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "router-core",
+                  name: "router-app",
                   include: [
                     "utils/tracking",
-                    "views/widgets/avatar"
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
                   ],
                   exclude: ["core-libraries"]
               },
               {
-                  name: "app-integrated",
+                  name: "router-homepage",
                   include: [
                     "utils/tracking",
                     "views/widgets/avatar",
@@ -192,9 +193,9 @@ module.exports = function( grunt ) {
         src: ['public-processed/js/core-libraries.js'],
         dest: 'public-processed/js/core-libraries.js'
       },
-      "app-integrated": {
-        src: ['public-processed/js/app-integrated.js'],
-        dest: 'public-processed/js/app-integrated.js'
+      "router-app": {
+        src: ['public-processed/js/router-app.js'],
+        dest: 'public-processed/js/router-app.js'
       },
       "router-mobile-chat": {
         src: ['public-processed/js/router-mobile-chat.js'],
@@ -362,7 +363,7 @@ module.exports = function( grunt ) {
       },
       filteredCollection: {
         files : {
-          'output/client-libs/filtered-collection/backbone-filtered-collection-amd.js': ['output/client-libs/filtered-collection/backbone-filtered-collection.js']
+          'output/client-libs/filtered-collection/backbone-filtered-collection-amd.js': ['output/client-libs/filtered-collection/vendor/assets/javascripts/backbone-filtered-collection.js']
         },
         modules: {
           'underscore': '_',
@@ -410,6 +411,15 @@ module.exports = function( grunt ) {
           'jquery': 'jQuery'
         },
         exports: 'jQuery'
+      },
+
+      'scrollfix': {
+        files : {
+          'output/client-libs/scrollfix/scrollfix-amd.js': ['output/client-libs/scrollfix/scrollfix.js']
+        },
+        modules: {
+        },
+        exports: 'ScrollFix'
       },
 
       'bootstrap_tooltip': {

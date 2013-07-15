@@ -2,9 +2,9 @@
 "use strict";
 
 
-var kue = require('./kue');
 var redis = require('./redis');
 var winston = require('./winston');
+var workerQueue = require('./worker-queue');
 
 var PREFIX = "rb:";
 
@@ -15,10 +15,11 @@ function emptyFn (err) {
 // Name of batcher and the delay in milliseconds
 var RedisBatcher = function(name, delay) {
   this.name = name;
-  this.jobs = kue.createQueue();
   this.redisClient = redis.createClient();
   this.prefix = PREFIX;
   this.delay = delay;
+
+
 };
 
 RedisBatcher.prototype = {
@@ -48,8 +49,10 @@ RedisBatcher.prototype = {
   listen: function(handler) {
     var self = this;
 
-    this.jobs.process('redis-batch-' + this.name, 20, function(job, done) {
-      self.dequeue(job.data.key, handler, kue.wrapCallback(job, done));
+    this.queue = workerQueue.queue('redis-batch-' + this.name, {}, function() {
+      return function(data, done) {
+        self.dequeue(data.key, handler, done);
+      };
     });
   },
 
@@ -68,15 +71,7 @@ RedisBatcher.prototype = {
   },
 
   addToQueue: function(key, callback) {
-    var j = this.jobs.create('redis-batch-' + this.name, {
-        key: key
-      }).attempts(5);
-
-    if(this.delay > 0) {
-      j.delay(this.delay);
-    }
-
-    j.save(callback);
+    this.queue.invoke({ key: key }, { delay: this.delay }, callback);
   }
 
 };

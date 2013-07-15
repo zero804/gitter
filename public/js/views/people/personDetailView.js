@@ -1,13 +1,16 @@
-
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'backbone',
   'views/base',
   'hbs!./tmpl/personDetailView',
   './confirmRemoveModalView',
   'log!person-detail-view'
-], function($, _, Backbone, TroupeViews, template, ConfirmRemoveModalView, log){
+], function($, _, context, Backbone, TroupeViews, template, ConfirmRemoveModalView, log){
+  "use strict";
+
   return TroupeViews.Base.extend({
     template: template,
     buttonMenu : false,
@@ -16,7 +19,7 @@ define([
     },
 
     initialize: function(options) {
-      this.isSelf = (window.troupeContext.user.id === this.model.id)  ? true : false;
+      this.isSelf = (context.getUserId() === this.model.id)  ? true : false;
       this.setRerenderOnChange();
     },
 
@@ -25,7 +28,7 @@ define([
       d.isSelf = this.isSelf;
       d.troupe = window.troupeContext.troupe;
       // var latestVersion = this.model.get('versions').length - 1;
-      // d.fileIcon = '/troupes/' + window.troupeContext.troupe.id + '/thumbnails/' + d.fileName + "?version=" + latestVersion;
+      // d.fileIcon = '/troupes/' + context.getTroupeId() + '/thumbnails/' + d.fileName + "?version=" + latestVersion;
       // d.previewUrl = '#file/preview/' + d.id;
       // d.versionsUrl = '#file/versions/' + d.id;
       return d;
@@ -41,7 +44,7 @@ define([
           modal.off('confirm.yes');
           modal.hide();
          $.ajax({
-            url: "/troupes/" + window.troupeContext.troupe.id + "/users/" + this.model.get('id'),
+            url: "/troupes/" + context.getTroupeId() + "/users/" + this.model.get('id'),
             data: "",
             type: "DELETE",
             success: function(data) {

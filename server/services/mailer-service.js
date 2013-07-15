@@ -1,17 +1,14 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var kue = require('../utils/kue'),
-    _ = require('underscore'),
-    jobs;
+var workerQueue = require('../utils/worker-queue');
+var queue = workerQueue.queue('email', {}, function() {
 
-exports.startWorkers = function() {
   var nodemailer = require('nodemailer'),
       troupeTemplate = require('../utils/troupe-template'),
       nconf = require('../utils/config'),
       winston = require("winston");
 
-  jobs = kue.createQueue();
   var logEmailToLogger = nconf.get('logging:logEmailContents');
 
   var sesTransport = nodemailer.createTransport("SES", {
@@ -37,8 +34,7 @@ exports.startWorkers = function() {
     headerTemplate = t;
   });
 
-
-  function sendEmailDirect(options, done) {
+  return function sendEmailDirect(options, done) {
     var htmlTemplateFile = "emails/" + options.templateFile + "_html";
     troupeTemplate.compile(htmlTemplateFile, function(err, htmlTemplate) {
       if(err) return winston.error("Unable to load HTML template", err);
@@ -77,18 +73,11 @@ exports.startWorkers = function() {
         });
       });
     });
-  }
+  };
 
-  jobs.process('email', 20, function(job, done) {
-    sendEmailDirect(job.data, kue.wrapCallback(job, done));
-  });
-};
+});
 
 exports.sendEmail = function(options) {
-  if(!jobs) jobs = kue.createQueue();
-
-  jobs.create('email', _.extend(options, { title: "Email to " + options.to }))
-    .attempts(5)
-    .save();
+  queue.invoke(options);
 };
 

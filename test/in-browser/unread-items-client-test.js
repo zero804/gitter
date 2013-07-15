@@ -420,7 +420,17 @@ require([
       new unreadItemsClient.TroupeUnreadNotifier(troupeCollection, unreadItemStore);
 
       troupeCollection.get('1').set('unreadItems', 1);
-      $(document).one('troupeUnreadTotalChange', function(e, counts) {
+
+      var count = 0;
+      function step1(e, counts) {
+        // Watch out for a stray 'zero' event that we get (in phantomjs mostly)
+        // If we get it, give the test one more chance before checking that
+        // the values in the events are correct
+        if(counts.overall === 0 && count++ === 0) {
+          $(document).one('troupeUnreadTotalChange', step1);
+          return;
+        }
+
         expect(counts.overall).to.be(1);
 
         troupeCollection.get('2').set('unreadItems', 1);
@@ -446,7 +456,9 @@ require([
 
 
         });
-      });
+
+      }
+      $(document).one('troupeUnreadTotalChange', step1);
 
       done();
     });

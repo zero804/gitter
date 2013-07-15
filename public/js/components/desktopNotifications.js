@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
   'log!desktop-notification'

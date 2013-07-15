@@ -2,32 +2,33 @@
 "use strict";
 
 var troupeService = require("../services/troupe-service");
-var nconf = require('../utils/config');
+var promiseUtils = require("../utils/promise-utils");
 
+/**
+ * For a user who has nowhere to go? Where to Next?
+ * @return promise of a relative URL
+ */
 exports.whereToNext = function(user, callback) {
 
-  troupeService.findBestTroupeForUser(user, function(err, troupe) {
-    if(err) return callback(err);
-    if(!troupe) return callback();
-
-    return callback(null, troupe.getUrl(user.id));
-  });
+  return troupeService.findBestTroupeForUser(user)
+    .then(promiseUtils.required)
+    .then(function(troupe) {
+      return troupeService.getUrlForTroupeForUserId(troupe, user.id)
+        .then(promiseUtils.required);
+    })
+    .fail(function() {
+      return user.hasUsername() ? user.getHomeUrl() : '/home';
+    })
+    .nodeify(callback);
 
 };
 
-exports.redirectUserToDefaultTroupe = function(req, res, next, options) {
+exports.redirectUserToDefaultTroupe = function(req, res, next) {
 
-  exports.whereToNext(req.user, function(err, url) {
-    if (err || !url) {
-      /* All dressed up but nowhere to go? */
-      if(options && options.onNoValidTroupes) {
-        return options.onNoValidTroupes();
-      }
-
-      return res.redirect(nconf.get('web:homeurl'));
-    }
-
-    return res.relativeRedirect(url);
-  });
+  return exports.whereToNext(req.user)
+    .then(function(url) {
+      return res.relativeRedirect(url);
+    })
+    .fail(next);
 
 };

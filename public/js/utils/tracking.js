@@ -1,8 +1,18 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'ga',
-  'log!tracking'
-], function(_gaq, log) {
+  'utils/context',
+  'log!tracking',
+  './mixpanel'
+], function(_gaq, context, log, mixpanel) {
+  /*jshint unused:true */
+  "use strict";
+
+  mixpanel.init(context().mixpanelToken);
+  if (context.isAuthed()) {
+    mixpanel.identify(context.getUserId());
+    mixpanel.name_tag(context.getUser().username);
+  }
 
   if(!window.troupeTrackingId) {
     return {
@@ -14,10 +24,12 @@ define([
   _gaq.push(['_setAllowAnchor',true]);
 
   function trackPageView(routeName) {
+    mixpanel.track('pageView', { pageName: routeName });
     _gaq.push(['_trackEvent', 'Route', routeName]);
   }
 
   function trackError(message, file, line) {
+    mixpanel.track('jserror', { message: message, file: file, line: line } );
     _gaq.push(['_trackEvent', 'Error', message, file, line]);
   }
 
@@ -25,15 +37,8 @@ define([
     _gaq.push(['_setCustomVar',
         1,
         'userId',
-        window.troupeContext.user.id,
+        context.getUserId(),
         2 // Session level variable
-     ]);
-
-    _gaq.push(['_setCustomVar',
-        2,
-        'troupeUri',
-        window.troupeContext.troupe.uri,
-        3 // Page level variable
      ]);
   }
 

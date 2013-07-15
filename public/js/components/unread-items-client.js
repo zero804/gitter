@@ -1,11 +1,12 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
   'underscore',
+  'utils/context',
   './realtime',
   'log!unread-items-client',
   'utils/emitter'
-], function($, _, realtime, log, EventEmitter) {
+], function($, _, context, realtime, log, EventEmitter) {
   "use strict";
 
   function limit(fn, context, timeout) {
@@ -269,7 +270,7 @@ define([
       var async = !options || !options.sync;
 
       $.ajax({
-        url: "/troupes/" + window.troupeContext.troupe.id + "/unreadItems",
+        url: "/troupes/" + context.getTroupeId() + "/unreadItems",
         contentType: "application/json",
         data: JSON.stringify(queue),
         async: async,
@@ -303,9 +304,9 @@ define([
       log('Syncing store to collection ', newValue);
       if(!window.troupeContext || !window.troupeContext.troupe) return;
 
-      log('TroupeCollectionSync: setting value of ' + window.troupeContext.troupe.id + ' to ' + newValue);
+      log('TroupeCollectionSync: setting value of ' + context.getTroupeId() + ' to ' + newValue);
 
-      var troupe = this._collection.get(window.troupeContext.troupe.id);
+      var troupe = this._collection.get(context.getTroupeId());
       if(troupe) {
         troupe.set('unreadItems', newValue);
         log('Completed successfully');
@@ -317,7 +318,7 @@ define([
 
           log('Collection loading, syncing troupe unreadItems');
 
-          var troupe = this._collection.get(window.troupeContext.troupe.id);
+          var troupe = this._collection.get(context.getTroupeId());
           if(troupe) {
             troupe.set('unreadItems', newValue);
           } else {
@@ -343,7 +344,8 @@ define([
       var store = this._store;
       var self = this;
 
-      realtime.subscribe('/user/' + window.troupeContext.user.id + '/troupes/' + window.troupeContext.troupe.id, function(message) {
+      var url = '/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/unreadItems';
+      var s = realtime.subscribe(url, function(message) {
         if(message.notification === 'unread_items') {
           store._unreadItemsAdded(message.items);
         } else if(message.notification === 'unread_items_removed') {
@@ -354,7 +356,13 @@ define([
             this.emit('unreadItemRemoved', itemType, itemId);
           }, self);
         }
+      });
 
+      s.callback(function() {
+        var snapshot = realtime.getSnapshotFor(url);
+        if(snapshot) {
+          store.preload(snapshot);
+        }
       });
     }
   });
@@ -371,7 +379,7 @@ define([
   TroupeCollectionRealtimeSync.prototype = {
     _subscribe: function() {
        var self = this;
-       realtime.subscribe('/user/' + window.troupeContext.user.id, function(message) {
+       realtime.subscribe('/user/' + context.getUserId(), function(message) {
         if(message.notification !== 'troupe_unread') return;
         self._handleIncomingMessage(message);
       });
@@ -381,7 +389,7 @@ define([
       var troupeId = message.troupeId;
       var totalUnreadItems = message.totalUnreadItems;
 
-      if(troupeId === window.troupeContext.troupe.id) return;
+      if(troupeId === context.getTroupeId()) return;
 
       log('Updating troupeId' + troupeId + ' to ' + totalUnreadItems);
 
@@ -417,7 +425,9 @@ define([
     this._collection.on('remove', this._recountLimited);
     this._collection.on('destroy', this._recountLimited);
 
-    this._store.on('newcountvalue', this._currentStoreValueChanged);
+    if(store) {
+      this._store.on('newcountvalue', this._currentStoreValueChanged);
+    }
 
     this._recountLimited();
   };
@@ -443,7 +453,7 @@ define([
       var self = this;
       function count(memo, troupe) {
         if(window.troupeContext && window.troupeContext.troupe) {
-          if(troupe.get('id') === window.troupeContext.troupe.id) {
+          if(troupe.get('id') === context.getTroupeId()) {
             return memo + (self._store._currentCount() > 0 ? 1 : 0);
           }
         }
@@ -466,7 +476,7 @@ define([
         counts.overall = newTroupeUnreadTotal;
         counts.oneToOne = newPplTroupeUnreadTotal;
         counts.normal = newNormalTroupeUnreadTotal;
-        counts.current = this._store._currentCount();
+        counts.current = this._store && this._store._currentCount();
 
         $(document).trigger('troupeUnreadTotalChange', counts);
       //}
@@ -586,17 +596,27 @@ define([
     }
   };
 
-  var unreadItemStore = new UnreadItemStore();
-  new ReadItemSender(unreadItemStore);
-  new TroupeUnreadItemsViewportMonitor(unreadItemStore);
-
-  var realtimeSync = new TroupeUnreadItemRealtimeSync(unreadItemStore);
   var c = window.troupeContext;
-  if(c && c.troupe && c.user) {
-    realtimeSync._subscribe();
-    new ReadItemRemover(realtimeSync);
-  }
 
+  var unreadItemStore;
+  var realtimeSync;
+
+  if(c) {
+    if(c.troupe) {
+      unreadItemStore = new UnreadItemStore();
+      new ReadItemSender(unreadItemStore);
+      new TroupeUnreadItemsViewportMonitor(unreadItemStore);
+
+      realtimeSync = new TroupeUnreadItemRealtimeSync(unreadItemStore);
+
+      if(c.user) {
+        realtimeSync._subscribe();
+        new ReadItemRemover(realtimeSync);
+      }
+
+    }
+
+  }
 
   var unreadItemsClient = {
     preload: function(items) {
@@ -610,7 +630,7 @@ define([
         overall: counts.overall,
         normal: counts.normal,
         oneToOne: counts.oneToOne,
-        current: unreadItemStore._currentCount()
+        current: unreadItemStore ? unreadItemStore._currentCount() : undefined
       };
     },
 
@@ -620,10 +640,14 @@ define([
     },
 
     hasItemBeenMarkedAsRead: function(itemType, itemId) {
+      if(!unreadItemStore) {
+        return false;
+      }
+
       return unreadItemStore._hasItemBeenMarkedAsRead(itemType, itemId);
     },
 
-    findTopMostUnreadItemPosition: function(itemType, $container, $scrollOf) {
+    findTopMostUnreadItemPosition: function(itemType, $container/*, $scrollOf*/) {
       var topItem = null;
       var topItemOffset = 1000000000;
 
@@ -654,7 +678,10 @@ define([
     },
 
     installTroupeListener: function(troupeCollection) {
-      new TroupeCollectionSync(troupeCollection, unreadItemStore);
+      if(unreadItemStore) {
+        new TroupeCollectionSync(troupeCollection, unreadItemStore);
+      }
+
       new TroupeCollectionRealtimeSync(troupeCollection)._subscribe();
       new TroupeUnreadNotifier(troupeCollection, unreadItemStore);
     },

@@ -1,15 +1,18 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var persistence = require("./persistence-service"),
-    sechash = require('sechash'),
-    emailNotificationService = require("./email-notification-service"),
-    uuid = require('node-uuid'),
-    geocodingService = require("./geocoding-service"),
-    winston = require("winston"),
-    statsService = require("./stats-service"),
-    crypto = require('crypto'),
-    _ = require('underscore');
+var persistence = require("./persistence-service");
+var sechash = require('sechash');
+var emailNotificationService = require("./email-notification-service");
+var uuid = require('node-uuid');
+var geocodingService = require("./geocoding-service");
+var winston = require("winston");
+var statsService = require("./stats-service");
+var uriLookupService = require("./uri-lookup-service");
+var crypto = require('crypto');
+var assert = require('assert');
+var collections = require("../utils/collections");
+var Q = require('q');
 
 function generateGravatarUrl(email) {
   var url =  "https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon";
@@ -21,51 +24,34 @@ function generateGravatarUrl(email) {
 
 var userService = {
   newUser: function(options, callback) {
-    var user = new persistence.User(options);
-    user.displayName = options.displayName;
-    user.email = options.email;
-    user.confirmationCode = uuid.v4();
+    assert(options.email, 'Email atttribute required');
 
-    user.gravatarImageUrl = generateGravatarUrl(user.email);
-    user.status = options.status ? options.status : "UNCONFIRMED";
-
-    user.save(function (err) {
-      if(err) { winston.error("User save failed: ", err); }
-
-      return callback(null, user);
+    var user = new persistence.User({
+      displayName:      options.displayName,
+      email:            options.email,
+      confirmationCode: uuid.v4(),
+      gravatarImageUrl: generateGravatarUrl(options.email),
+      status:           options.status || "UNCONFIRMED"
     });
+
+    return user.saveQ().then(function() { return user; }).nodeify(callback);
   },
 
   findOrCreateUserForEmail: function(options, callback) {
     winston.info("Locating or creating user", options);
 
-    var displayName = options.displayName;
     var email = options.email;
-    var status = options.status;
 
-    persistence.User.findOne({email: email}, function(err, user) {
-      if(err) return callback(err);
-      if(user) return callback(err, user);
+    return persistence.User.findOneQ({email: email})
+      .then(function(user) {
+        if(user) return user;
 
-      userService.newUser({
-        displayName: displayName,
-        email: email,
-        status: status
-      }, function(err, user) {
-        if(err) return callback(err);
+        return userService.newUser(options);
 
-        return callback(null, user);
-      });
-
-    });
-
+      })
+      .nodeify(callback);
   },
 
-  findByEmail: function(email, callback) {
-    persistence.User.findOne({email: email.toLowerCase()}, function(err, user) {
-      callback(err, user);
-    });
-  },
 
   findByConfirmationCode: function(confirmationCode, callback) {
 
@@ -74,10 +60,10 @@ var userService = {
     });
   },
 
-  requestPasswordReset: function(email, callback) {
-    winston.info("Requesting password reset", email);
+  requestPasswordReset: function(login, callback) {
+    winston.info("Requesting password reset for ", login);
 
-    persistence.User.findOne({email: email}, function(err, user) {
+    userService.findByLogin(login, function(err, user) {
       if(err || !user) return callback(err, user);
 
       if(user.passwordResetCode) {
@@ -109,16 +95,45 @@ var userService = {
   },
 
   findById: function(id, callback) {
-    persistence.User.findById(id, function(err, user) {
-      callback(err, user);
-    });
+    return persistence.User.findByIdQ(id).nodeify(callback);
+  },
+
+  findByEmail: function(email, callback) {
+    return persistence.User.findOneQ({email: email.toLowerCase()})
+            .nodeify(callback);
+  },
+
+  findByUsername: function(username, callback) {
+    return persistence.User.findOneQ({username: username.toLowerCase()})
+            .nodeify(callback);
   },
 
   findByIds: function(ids, callback) {
-    ids = _.uniq(ids);
-    persistence.User.where('_id').in(ids)
-      .slaveOk()
-      .exec(callback);
+    return persistence.User.where('_id')['in'](collections.idsIn(ids))
+      .execQ()
+      .nodeify(callback);
+  },
+
+  findByLogin: function(login, callback) {
+    var byEmail = login.indexOf('@') >= 0;
+    var find = byEmail ? userService.findByEmail(login)
+                       : userService.findByUsername(login);
+
+    return find
+      .then(function(user) {
+        return user;
+      }).nodeify(callback);
+  },
+
+  /**
+   * Find the username of a single user
+   * @return promise of a username or undefined if user or username does not exist
+   */
+  findUsernameForUserId: function(userId) {
+    return persistence.User.findOneQ({ _id: userId }, 'username')
+      .then(function(user) {
+        return user && user.username;
+      });
   },
 
   saveLastVisitedTroupeforUser: function(userId, troupe, callback) {
@@ -159,15 +174,16 @@ var userService = {
     });
   },
 
+  /**
+   * Get the last access times for a user
+   * @return promise of a hash of { troupeId1: accessDate, troupeId2: accessDate ... }
+   */
   getTroupeLastAccessTimesForUser: function(userId, callback) {
-    persistence.UserTroupeLastAccess.findOne({ userId: userId }, function(err, userTroupeLastAccess) {
-      if(err) return callback(err);
+    return persistence.UserTroupeLastAccess.findOneQ({ userId: userId }).then(function(userTroupeLastAccess) {
+      if(!userTroupeLastAccess || !userTroupeLastAccess.troupes) return {};
 
-      if(!userTroupeLastAccess || !userTroupeLastAccess.troupes) return callback(null, {});
-
-      callback(null, userTroupeLastAccess.troupes);
-    });
-
+      return userTroupeLastAccess.troupes;
+    }).nodeify(callback);
   },
 
   setUserLocation: function(userId, location, callback) {
@@ -261,7 +277,7 @@ var userService = {
   checkPassword: function(user, password, callback) {
     if(!user.passwordHash) {
       /* User has not yet set their password */
-      callback(false);
+      return callback(false);
     }
 
     sechash.testHash(password, user.passwordHash, function(err, match) {
@@ -277,108 +293,138 @@ var userService = {
     var oldPassword = options.oldPassword;
     var displayName = options.displayName;
     var email = options.email;
+    var username = options.username;
 
-    // look up the user
-    userService.findById(userId, function(err, user) {
-      if(err) return callback(err);
-      if(!user) return callback("User not found");
+    var postSave = [];
 
-      // generate and save a gravatar image url if they don't already have one
-      if (!user.gravatarImageUrl)
-        user.gravatarImageUrl = generateGravatarUrl(user.email);
+    var seq = userService.findById(userId)
+      .then(queueDeleteInvites);
 
-      switch(user.status) {
-        case 'PROFILE_NOT_COMPLETED':
-          // mark user as active after setting the password
-          if(user.passwordHash) {
-            return callback("User already has a password set");
-          }
+    if(displayName) seq = seq.then(updateDisplayName);
+    if(password) seq = seq.then(updatePassword);
+    if(email) seq = seq.then(updateEmail);
+    if(username) seq = seq.then(updateUsername);
 
-          userService.setStatusActive(user);
-          // set password and save
-          generateNewHash(function() {
-            user.save(callback);
-          });
-          break;
+    return seq.then(saveUser)
+            .then(performPostSaveActions)
+            .nodeify(callback);
 
-        case 'ACTIVE':
-          // check for password change
-          if(password) {
-            // set new password if the old one is correct
-            sechash.testHash(oldPassword, user.passwordHash, function(err, match) {
-              if(err) return callback(err);
-              if(!match) return callback({authFailure: true });
-              generateNewHash(maybeChangeEmailAndSave);
-            });
-          }
-          else {
-            // go directly into the change email method
-            maybeChangeEmailAndSave();
-          }
-          break;
+    function queueDeleteInvites(user) {
+      postSave.push(function() {
+        userService.deleteAllUsedInvitesForUser(user);
+      });
 
-        default:
-          return callback("Invalid user status");
-      }
+      return user;
+    }
 
+    function updateDisplayName(user) {
       // set new properties
       user.displayName = displayName;
+      return user;
+    }
+
+    function updatePassword(user) {
+      switch(user.status) {
+        case 'PROFILE_NOT_COMPLETED':
+          return hashAndUpdatePassword(password);
+
+        case 'ACTIVE':
+          return testExistingPassword()
+              .then(hashAndUpdatePassword);
+
+        default:
+          throw "Invalid user status";
+      }
+
 
       // generates and sets the new password hash
-      function generateNewHash(callback) {
-        sechash.strongHash('sha512', password, function(err, hash3) {
-          if(err) return callback(err);
-
-          user.passwordHash = hash3;
-
-          callback();
-        });
-      }
-
-      // change email address
-      function maybeChangeEmailAndSave() {
-        if (email && user.email !== email) {
-
-          // check if this new email is available for use
-          userService.findByEmail(email, function(e, existingUser) {
-            if (existingUser || e) {
-              // shouldn't we still save the other details?
-              var err = new Error("The email address you are trying to change to is already registered by someone else.");
-              err.emailConflict = true;
-              return callback(err);
+      function hashAndUpdatePassword(password) {
+        return Q.nfcall(sechash.strongHash, 'sha512', password)
+          .then(function(hash3) {
+            user.passwordHash = hash3;
+            // mark user as active after setting the password
+            if (user.status === 'PROFILE_NOT_COMPLETED' || user.status === 'UNCONFIRMED') {
+              user.status = "ACTIVE";
             }
-
-            // save the new email address while it is being confirmed
-            user.newEmail = email;
-            // update the confirmation code, which will be sent to the new email address
-            user.confirmationCode = uuid.v4();
-
-            user.save(function(e) {
-              if (!e) {
-                // send change email confirmation to new address
-                emailNotificationService.sendConfirmationForEmailChange(user);
-              }
-              callback(e, user);
-            });
+            return user;
           });
-        }
-        else {
-          user.save(callback);
-        }
       }
 
-    });
-  },
+      // generates and sets the new password hash
+      function testExistingPassword() {
+        return Q.nfcall(sechash.testHash, oldPassword, user.passwordHash)
+          .then(function(match) {
+            if(!match) throw {authFailure: true };
+            return user;
+          });
+      }
 
-  // this does not save the user object
-  setStatusActive: function(user) {
+    }
 
-    user.status = 'ACTIVE';
+    function updateEmail(user) {
+      email = email.toLowerCase();
 
-    // delete all used invites now that the user doesn't need them to login
+      if(user.email === email) {
+        // Nothing to do, the user has not changed their email address
+        return user;
+      }
 
-    // note: it would be better if this was only called after the user was saved, but updateProfile async hell at the moment.
-    userService.deleteAllUsedInvitesForUser(user);
+      user.gravatarImageUrl = generateGravatarUrl(email);
+
+
+      return userService.findByEmail(email)
+        .then(function(existingUser) {
+          if(existingUser) {
+            throw { emailConflict: true };
+          }
+
+          // save the new email address while it is being confirmed
+          user.newEmail = email;
+
+          // update the confirmation code, which will be sent to the new email address
+          user.confirmationCode = uuid.v4();
+
+          postSave.push(function() {
+            emailNotificationService.sendConfirmationForEmailChange(user);
+          });
+          return user;
+        });
+    }
+
+    function updateUsername(user) {
+      username = username.toLowerCase();
+
+      if(user.username === username) {
+        // Nothing to do, the user has not changed their email username
+        return user;
+      }
+
+      return uriLookupService.updateUsernameForUserId(user.id, user.username, username)
+        .then(function() {
+          // save the new email address while it is being confirmed
+          user.username = username;
+
+          return user;
+        })
+        .fail(function(err) {
+          if(err === 409) throw { usernameConflict: true };
+
+          throw err;
+        });
+
+    }
+
+    function saveUser(user) {
+      return user.saveQ().then(function() {
+        return user;
+      });
+    }
+
+    function performPostSaveActions(user) {
+      postSave.forEach(function(f) { f(); });
+      return user;
+    }
+
   },
 
   deleteAllUsedInvitesForUser: function(user) {

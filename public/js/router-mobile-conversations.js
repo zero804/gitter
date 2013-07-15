@@ -1,4 +1,4 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'jquery',
   'underscore',
@@ -8,8 +8,10 @@ require([
   'views/conversation/conversationView',
   'views/conversation/conversationDetailView',
   'collections/conversations',
-  'components/eyeballs',
-  'components/unread-items-client'
+  'components/mobile-context',        // No ref
+  'components/eyeballs',              // No ref
+  'components/unread-items-client',   // No ref
+  'template/helpers/all'              // No ref
 ], function($, _, Backbone, BaseRouter, TroupeViews, ConversationView, conversationDetailView, conversationModels/*, unreadItemsClient*/) {
   /*jslint browser: true, unused: true */
   "use strict";

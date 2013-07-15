@@ -2,6 +2,9 @@ TESTS = test/integration
 END_TO_END_TESTS = test/end-to-end
 PERF_TESTS = test/performance
 MOCHA_REPORTER =
+DATA_MAINT_SCRIPTS = $(shell find ./scripts/datamaintenance -name '*.sh')
+SAUCELABS_REMOTE = http://trevorah:d6b21af1-7ae7-4bed-9c56-c5f9d290712b@ondemand.saucelabs.com:80/wd/hub
+BETA_SITE = http://beta.trou.pe
 
 clean:
 	rm -rf public-processed/ output/ coverage/ cobertura-coverage.xml html-report/
@@ -11,7 +14,6 @@ test:
 		--reporter dot \
 		--timeout 10000 \
 		--recursive \
-		--ignore-leaks \
 		$(TESTS)
 
 perf-test-xunit:
@@ -19,7 +21,6 @@ perf-test-xunit:
 		--reporter xunit-file \
 		--timeout 100000 \
 		--recursive \
-		--ignore-leaks \
 		$(PERF_TESTS)
 
 perf-test:
@@ -27,7 +28,6 @@ perf-test:
 		--reporter dot \
 		--timeout 100000 \
 		--recursive \
-		--ignore-leaks \
 		$(PERF_TESTS)
 
 test-xunit:
@@ -36,7 +36,6 @@ test-xunit:
 		--reporter xunit-file \
 		--timeout 10000 \
 		--recursive \
-		--ignore-leaks \
 		$(TESTS)
 
 test-in-browser:
@@ -44,16 +43,10 @@ test-in-browser:
 	test/in-browser/run-phantom-tests.sh
 
 test-coverage:
-	rm -rf ./coverage/ ./html-report/
-	./node_modules/.bin/istanbul instrument server/ -o coverage/
+	rm -rf ./coverage/ cobertura-coverage.xml
 	mkdir -p output
-	ISTANBUL_REPORTERS=text-summary,html,cobertura TROUPE_COVERAGE=1 NODE_ENV=test ./node_modules/.bin/mocha \
-		--reporter mocha-istanbul \
-		--timeout 10000 \
-		--recursive \
-		--ignore-leaks \
-		$(TESTS) || true
-	rm -rf coverage/
+	find $(TESTS) -iname "*test.js" | NODE_ENV=test xargs ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- --timeout 10000
+	./node_modules/.bin/istanbul report cobertura
 
 prepare-for-end-to-end-testing:
 	curl https://raw.github.com/pypa/pip/master/contrib/get-pip.py > /tmp/get-pip.py
@@ -64,6 +57,21 @@ prepare-for-end-to-end-testing:
 end-to-end-test:
 	mkdir -p ./output/test-reports/
 	nosetests -s -v --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests/
+
+end-to-end-test-saucelabs-chrome:
+	@mkdir -p ./output/test-reports
+	@echo Testing $(BETA_SITE) with chrome at saucelabs.com
+	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
+	DRIVER=REMOTECHROME \
+	BASE_URL=$(BETA_SITE) \
+	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
+
+end-to-end-test-saucelabs-ie9:
+	@echo Testing $(BETA_SITE) with ie9 at saucelabs.com
+	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
+	DRIVER=REMOTEIE \
+	BASE_URL=$(BETA_SITE) \
+	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
 
 docs: test-docs
 
@@ -85,9 +93,20 @@ version-files:
 	echo $(GIT_COMMIT) > GIT_COMMIT
 	echo $(GIT_BRANCH) > VERSION
 
+test-reinit-data: maintain-data init-test-data test post-test-maintain-data
+
+reset-test-data: maintain-data init-test-data
 
 upgrade-data:
 	./scripts/upgrade-data.sh
+
+maintain-data:
+	$(foreach var,$(DATA_MAINT_SCRIPTS),$(var);)
+
+# Make a second target
+post-test-maintain-data:
+	$(foreach var,$(DATA_MAINT_SCRIPTS),$(var);)
+
 
 init-test-data:
 	./scripts/dataupgrades/005-test-users/001-update.sh
@@ -107,20 +126,26 @@ validate-source: search-js-console
 
 continuous-integration: clean validate-source npm grunt version-files upgrade-data init-test-data test-xunit test-coverage tarball
 
-post-deployment-tests: test-in-browser end-to-end-test
+post-deployment-tests: test-in-browser end-to-end-test-saucelabs-chrome end-to-end-test-saucelabs-ie9
 
 build: clean validate-source npm grunt version-files upgrade-data test-xunit
 
 .PHONY: test docs test-docs clean
 
 clean-client-libs:
-	rm -rf output/client-libs/ public/repo output/js-temp
+	rm -rf public/repo
+
+clean-temp-client-libs:
+	rm -rf output/client-libs/ output/js-temp
+
 
 fetch-client-libs:
 	bower install
 
-install-client-libs:
+make-client-libs:
 	grunt client-libs # --disableMinifiedSource=true
+
+install-client-libs:
 	ls -d output/client-libs/*|sed -e 's!output/client-libs/!public/repo/!'|sed -e 's!retina.js-js!retina!'|sed -e 's!typeahead.js!typeahead!'|xargs mkdir -p
 	cp output/client-libs/almond/almond.js public/repo/almond/almond.js
 	cp output/client-libs/assert/assert-amd.js public/repo/assert/assert.js
@@ -152,7 +177,7 @@ install-client-libs:
 	cp output/client-libs/nanoscroller/jquery.nanoscroller.js public/repo/nanoscroller/nanoscroller.js
 	cp output/client-libs/requirejs/index.js public/repo/requirejs/requirejs.js
 	cp output/client-libs/retina.js-js/src/retina.js public/repo/retina/retina.js
-	cp output/client-libs/scrollfix/scrollfix.js public/repo/scrollfix/scrollfix.js
+	cp output/client-libs/scrollfix/scrollfix-amd.js public/repo/scrollfix/scrollfix.js
 	cp output/client-libs/typeahead.js/typeahead.js public/repo/typeahead/typeahead.js
 	cp output/client-libs/underscore/underscore-amd.js public/repo/underscore/underscore.js
 	# cp output/client-libs/zeroclipboard/ZeroClipboard.js public/repo/zeroclipboard/zeroclipboard.js
@@ -160,4 +185,4 @@ install-client-libs:
 	cp output/client-libs/zeroclipboard/ZeroClipboard.swf public/repo/zeroclipboard/
 	cp output/client-libs/zepto/zepto-amd.js public/repo/zepto/zepto.js
 
-client-libs: clean-client-libs fetch-client-libs install-client-libs
+client-libs: clean-temp-client-libs fetch-client-libs make-client-libs clean-client-libs install-client-libs

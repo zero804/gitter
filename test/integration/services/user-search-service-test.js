@@ -1,56 +1,72 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
-/*global describe:true, it:true*/
+/*global describe:true, it:true, before:false */
 "use strict";
 
 var testRequire = require('./../test-require');
-//var logAccess = require("../log-access");
-//var userSearchService = logAccess(testRequire('./services/user-search-service'));
-
+var fixtureLoader = require('../test-fixtures');
+var fixture = {};
 
 var userSearchService = testRequire('./services/user-search-service');
 var persistence = testRequire('./services/persistence-service');
 
 var assert = require('assert');
+var Q = require('q');
 
 describe("User Search Service", function() {
 
   describe("#createRegExpsForQuery", function() {
     it("should create a single regexp for a single word search", function() {
 
-      var res = userSearchService.testOnly.createRegExpsForQuery("Frodo");
+      userSearchService.testOnly.createRegExpsForQuery("Frodo")
+        .then(function(res) {
 
-      assert(res.length === 1, 'Expected a single regular expression');
-      assert.strictEqual(res[0].toString(), "/\\bfrodo/i", 'Expected the search');
+          assert(res.length === 1, 'Expected a single regular expression');
+          assert.strictEqual(res[0].toString(), "/\\bfrodo/i", 'Expected the search');
+
+        });
 
     });
 
     it("should create a double regexp for a double word search", function() {
 
-      var res = userSearchService.testOnly.createRegExpsForQuery("Frodo Baggins");
+      userSearchService.testOnly.createRegExpsForQuery("Frodo Baggins")
+        .then(function(res) {
 
-      assert(res.length === 2, 'Expected a single regular expression');
-      assert.strictEqual(res[0].toString(), "/\\bfrodo/i", 'Expected the search');
-      assert.strictEqual(res[1].toString(), "/\\bbaggins/i", 'Expected the search');
+          assert(res.length === 2, 'Expected a single regular expression');
+          assert.strictEqual(res[0].toString(), "/\\bfrodo/i", 'Expected the search');
+          assert.strictEqual(res[1].toString(), "/\\bbaggins/i", 'Expected the search');
+
+        });
+
 
     });
 
 
     it("should handle irish names", function() {
-      var res = userSearchService.testOnly.createRegExpsForQuery("Frodo O'Grady");
+      userSearchService.testOnly.createRegExpsForQuery("Frodo O'Grady")
+        .then(function(res) {
 
-      assert(res.length === 3, 'Expected three regular expressions');
-      assert.strictEqual(res[0].toString(), "/\\bfrodo/i", 'Expected the search');
-      assert.strictEqual(res[1].toString(), "/\\bo/i", 'Expected the search');
-      assert.strictEqual(res[2].toString(), "/\\bgrady/i", 'Expected the search');
+          assert(res.length === 3, 'Expected three regular expressions');
+          assert.strictEqual(res[0].toString(), "/\\bfrodo/i", 'Expected the search');
+          assert.strictEqual(res[1].toString(), "/\\bo/i", 'Expected the search');
+          assert.strictEqual(res[2].toString(), "/\\bgrady/i", 'Expected the search');
+
+        });
+
     });
 
 
     it("should handle numbers", function() {
-      var res = userSearchService.testOnly.createRegExpsForQuery("Test User 1");
-      assert(res.length === 3, 'Expected a three regular expression');
-      assert.strictEqual(res[0].toString(), "/\\btest/i", 'Expected the search');
-      assert.strictEqual(res[1].toString(), "/\\buser/i", 'Expected the search');
-      assert.strictEqual(res[2].toString(), "/\\b1/i", 'Expected the search');
+      userSearchService.testOnly.createRegExpsForQuery("Test User 1")
+        .then(function(res) {
+
+          assert(res.length === 3, 'Expected a three regular expression');
+          assert.strictEqual(res[0].toString(), "/\\btest/i", 'Expected the search');
+          assert.strictEqual(res[1].toString(), "/\\buser/i", 'Expected the search');
+          assert.strictEqual(res[2].toString(), "/\\b1/i", 'Expected the search');
+
+        });
+
     });
 
   });
@@ -140,5 +156,39 @@ describe("User Search Service", function() {
 
   });
 
+
+  describe("#searchUnconnectedUsers", function() {
+
+    it("should find both test users", function(done) {
+
+      Q.all([
+        persistence.Troupe.createQ({ uri: '/testtroupe' + Date.now() }),
+        persistence.User.createQ({ displayName: fixture.generateName(), email: fixture.generateEmail()}),
+        persistence.User.createQ({ displayName: fixture.generateName(), email: fixture.generateEmail()}),
+        persistence.User.createQ({ displayName: fixture.generateName(), email: fixture.generateEmail()})
+      ]).spread(function(troupe, user1, user2, user3) {
+        troupe.addUserById(user1.id);
+        troupe.addUserById(user2.id);
+        troupe.addUserById(user3.id);
+        return troupe.saveQ().then(function() {
+          return [user1, user2, user3];
+        });
+      }).spread(function(user1, user2, user3) {
+        return userSearchService.searchUnconnectedUsers(user3.id, 'tEst', {})
+          .then(function(searchResults) {
+            assert(searchResults.results.length >= 2, "Expect some users, got " + JSON.stringify(searchResults.results));
+
+            assert(searchResults.results.filter(function(f) { return f.id == user3.id; } ).length === 0, "Expect user3 not to be returned" + JSON.stringify(searchResults.results));
+            assert(searchResults.results.filter(function(f) { return f.id == fixture.user1.id; } ).length === 0, "Expect fixture user 1 not to be returned" + JSON.stringify(searchResults.results));
+            assert(searchResults.results.filter(function(f) { return f.id == user1.id; } ).length == 1, "Expect test user 2" + JSON.stringify(searchResults.results));
+            assert(searchResults.results.filter(function(f) { return f.id == user2.id; } ).length == 1, "Expect test user 3");
+
+          });
+      }).nodeify(done);
+
+    });
+  });
+
+  before(fixtureLoader(fixture));
 
 });

@@ -1,14 +1,17 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'views/base',
   'hbs!./tmpl/createTroupeView',
   'log!create-troupe-view',
   'utils/validate-wrapper',
   'jquery-placeholder' // no ref
-], function($, _, TroupeViews, template, log, validation) {
+], function($, _, context, TroupeViews, template, log, validation) {
+  "use strict";
+
   var View = TroupeViews.Base.extend({
     template: template,
 
@@ -19,7 +22,9 @@ define([
       this.existingUser = options.existingUser;
 
       if (window.troupeContext) {
-        this.isOneToOne = window.troupeContext.troupe.oneToOne;
+        if (window.troupeContext.troupe) {
+          this.isOneToOne = window.troupeContext.troupe.oneToOne;
+        }
       } else {
         this.isOneToOne = false;
       }
@@ -36,11 +41,11 @@ define([
         upgradeOneToOne: this.upgradeOneToOne
       };
 
+      // TODO: What is window.userId????
       if (window.userId) {
         data.userId = window.userId;
-      }
-      else if (window.troupeContext) {
-        data.userId = window.troupeContext.user.id;
+      } else {
+        data.userId = context.getUserId();
       }
 
       return data;
@@ -89,8 +94,10 @@ define([
         userId: form.find('input[name=userId]').val()
       };
 
-      if (window.troupeContext.troupe.oneToOne && this.upgradeOneToOne) {
-        serializedForm.oneToOneTroupeId = window.troupeContext.troupe.id;
+      if (window.troupeContext.troupe) {
+        if (window.troupeContext.troupe.oneToOne && this.upgradeOneToOne) {
+          serializedForm.oneToOneTroupeId = context.getTroupeId();
+        }
       }
 
       that.collection.create(serializedForm, {

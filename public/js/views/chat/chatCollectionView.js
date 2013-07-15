@@ -3,6 +3,7 @@
 define([
   'jquery',
   'underscore',
+  'utils/context',
   'log!chat-collection-view',
   'collections/chat',
   'views/widgets/avatar',
@@ -13,7 +14,7 @@ define([
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'bootstrap_tooltip'
-], function($, _, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate, chatInputView /* tooltip*/) {
+], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate, chatInputView /* tooltip*/) {
 
   "use strict";
 
@@ -148,7 +149,7 @@ define([
     },
 
     isOwnMessage: function() {
-      return this.model.get('fromUser').id === window.troupeContext.user.id;
+      return this.model.get('fromUser').id === context.getUserId();
     },
 
     isInEditablePeriod: function() {
@@ -210,7 +211,7 @@ define([
 
       // this.$el.find('.trpChatText textarea').focus().on('blur', function() { self.toggleEdit(); });
       if (isAtBottom) {
-        this.scrollDelegate.scrollToBottom();
+        this.scrollDelegate.$scrollOf.scrollTop(this.scrollDelegate.$container.height());
       }
     },
 
@@ -305,6 +306,7 @@ define([
       } else {
         // log("Enabling infinite scroll");
         ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
+        self.scrollDelegate.scrollToBottom();
       }
     },
 

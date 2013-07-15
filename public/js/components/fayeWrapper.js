@@ -1,12 +1,14 @@
-/*jshint unused:true, browser:true*/
+  /*jshint unused:strict, browser:true */
 define([
   'faye',
-  'underscore',
   'log!fayeWrapper'
-], function(Faye, _, log) {
+], function(Faye, log) {
   "use strict";
 
-  Faye.Logging.logLevel = 'info';
+  var PING_INTERVAL = 60000;
+  var PING_TIMEOUT = 20000;
+
+  //Faye.Logging.logLevel = 'info';
 
   function SubscriptionWrapper(wrapper, channel, onMessage, context) {
     this._wrapper = wrapper;
@@ -63,6 +65,7 @@ define([
     this._disabled = [];
     this._headers = {};
     this._subscriptions = [];
+    this._clientCount = 0;
     this._fayeFactory = options && options.fayeFactory || this._fayeFactory.bind(this);
   };
 
@@ -74,8 +77,11 @@ define([
     _getClient: function() {
       if(this._client) return this._client;
 
+      this._clientCount++;
+
       var c = this._fayeFactory(this._endpoint, this._options);
       this._bindClient(c);
+
 
       for(var i = 0; i < this._disabled.length; i++) c.disable(this._disabled[i]);
       for(var j in this._headers) {
@@ -85,10 +91,11 @@ define([
       }
 
       for (var l = 0; this._extensions && l < this._extensions.length; l++) {
-        c.addExtension(this._extensions[i]);
+        c.addExtension(this._extensions[l]);
       }
 
       this._client = c;
+      this._resubscribe();
 
       this._startConnectionMonitor();
 
@@ -96,6 +103,7 @@ define([
     },
 
     recycle: function(callback, context) {
+      log('Recycling connection');
       for(var i = 0; i < this._subscriptions.length; i++) {
         this._subscriptions[i]._clearUnderlyingSubscription();
       }
@@ -107,6 +115,19 @@ define([
 
       this._client = null;
       this.connect(callback, context);
+    },
+
+    /**
+     * Recycle the connection if it hasn't already been recycled
+     */
+    recycleConditional: function(clientRef, callback, context) {
+      if(clientRef === this._clientCount) {
+        this.recycle(callback, context);
+      }
+    },
+
+    getClientRef: function() {
+      return this._clientCount;
     },
 
     _resubscribe: function() {
@@ -138,8 +159,6 @@ define([
 
     connect: function(callback, context) {
       this._getClient().connect(function() {
-        this._resubscribe();
-
         if(callback) callback.apply(context, arguments);
       }, this);
     },
@@ -262,14 +281,12 @@ define([
       }
     },
 
-    _ping: function() {
+    _ping: function(callback) {
       if(!this._client) return;
 
-      var startTime = Date.now();
-      var connectionTimeoutPeriod = 30000;
       var timeout;
-
-      var clientId = this._client.getClientId();
+      var clientRef = this.getClientRef();
+      var self = this;
 
       log('Attempting to subscribe to /ping');
 
@@ -278,6 +295,9 @@ define([
       subscription.callback(function() {
         if(timeout) clearTimeout(timeout);
         subscription.cancel();
+
+        if(callback) { return callback(); }
+
       });
 
       subscription.errback(function(error) {
@@ -285,55 +305,45 @@ define([
         if(timeout) window.clearTimeout(timeout);
         subscription.cancel();
 
-        var clientId2 = this._client.getClientId();
+        self.recycleConditional(clientRef);
 
-        if(clientId2 !== clientId) {
-          log('Faye client recycled during ping');
-          return;
-        }
-
-        if((Date.now() - startTime) > (connectionTimeoutPeriod * 1.1)) {
-          log('Ping subscription interrupted');
-          return;
-        }
-
-        this.recycle();
-
-      }.bind(this));
+        if(callback) { return callback(error); }
+      });
 
       timeout = window.setTimeout(function() {
         log('Timeout while waiting for ping subscription');
         subscription.cancel();
 
-        var clientId2 = this._client.getClientId();
+        self.recycleConditional(clientRef);
+        if(callback) { return callback('Timeout'); }
+      }, PING_TIMEOUT);
+    },
 
-        if(clientId2 !== clientId) {
-          log('Faye client recycled during ping');
-          return;
-        }
+    _schedulePing: function() {
+      var self = this;
+      if(!this._monitoringConnection) return;
+      if(this._monitorTimeout) return;
 
-        if((Date.now() - startTime) > (connectionTimeoutPeriod * 1.1)) {
-          log('Ping subscription interrupted');
-          return;
-        }
-
-        this.recycle();
-
-      }.bind(this), connectionTimeoutPeriod);
+      this._monitorTimeout = setTimeout(function() {
+        self._monitorTimeout = null;
+        self._ping(function() {
+          self._schedulePing();
+        });
+      }, PING_INTERVAL);
     },
 
     _startConnectionMonitor: function() {
-      // Reset the time on the pinger if it already exists
-      if(this._monitorTimeout) {
-        clearTimeout(this._monitorTimeout);
-      }
 
-      this._monitorTimeout = setInterval(function() {
-        this._ping();
-      }.bind(this), 60000);
+      if(this._monitoringConnection) return;
+
+      this._monitoringConnection = true;
+
+      this._schedulePing();
     },
 
     _stopConnectionMonitor: function() {
+      this._monitoringConnection = false;
+
       if(!this._monitorTimeout) return;
       clearTimeout(this._monitorTimeout);
       this._monitorTimeout = null;

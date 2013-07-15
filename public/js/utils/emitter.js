@@ -1,7 +1,10 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery'
 ], function($) {
+  "use strict";
+
+  // TODO: replace this with backbone events!!!!
 
   return {
     _JQInit: function() {

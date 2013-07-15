@@ -1,10 +1,8 @@
-/*jshint unused:true, browser:true */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'jquery',
-  'underscore',
-  'backbone',
-  './base'
-], function($, _, Backbone, TroupeCollections) {
+  './base',
+  'utils/context'
+], function(TroupeCollections, context) {
   "use strict";
 
   var exports = {};
@@ -26,7 +24,7 @@ define([
     nestedUrl: "invites",
 
     initialize: function() {
-      this.url = "/user/" + window.troupeContext.user.id + "/invites";
+      this.url = "/user/" + context.getUserId() + "/invites";
     }
 
   });
