@@ -60,9 +60,20 @@
        <a href="#" class="mtrpLoginBack trpButtonBig trpBtnGreen" id="button-back">Back</a>
     </div>
 
-   <div class="mtrpLoginFailure" id="panel-failure">
-     Login failed.
+   <div class="mtrpLoginFailure" id="login-failure">
+      <span class="trpModalTitle"><span class="trpWhite">Login failed.</span></span>
+      <a href="#" class="trpModalFailureText button-request-new-password">Forgot password?</a>
    </div>
+
+   <div class="mtrpLoginFailure" id="resetpwd-failure">
+      <span class="trpModalTitle"><span class="trpWhite">Can't reset password.</span></span>
+      <span class="trpModalBody">Was that the right email address?</span>
+   </div>
+
+  <div class="mtrpLoginFailure" id="resetpwd-confirm">
+    <div class="trpModalTitle">On it's way!</div
+    <div class="trpModalBody">We just sent you an email for resetting your password.</div>
+  </div>
 
   </div>
 </div class="mtrpLoginOuterContainer">

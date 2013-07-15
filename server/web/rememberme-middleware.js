@@ -125,7 +125,7 @@ module.exports = {
 
             winston.info("rememberme: Passport login succeeded");
 
-            statsService.event('user_login_auto', { userId: userId });
+            statsService.event('user_login', { userId: userId, method: "auto", email: req.user.email});
 
             var ua = useragent.parse(req.headers['user-agent']);
             var prefix = ua.os.family.match(/ios|android/i) ? 'mobile' : 'desktop';
