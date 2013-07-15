@@ -82,8 +82,7 @@ exports.validateToken = function(token, callback) {
     if(!accessToken) return callback("Access token not found");
 
     persistenceService.OAuthClient.findOne({_id: accessToken.clientId}, function(err, client) {
-      return;
-      //if (err || !client) return;
+      if (err || !client) return;
       persistenceService.User.findOne({_id: accessToken.userId}, function(err, user) {
         if (err || !client) return;
         var properties = {};
