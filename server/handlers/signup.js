@@ -12,13 +12,6 @@ var isPhone = require('../web/is-phone');
 
 module.exports = {
 
-    isMobile: function(req) {
-      var userAgent = req.headers['user-agent'] || '';
-      console.log("userAgent: " + userAgent);
-      var compactView = userAgent.indexOf("Mobile") >= 0;
-      return compactView;
-    },
-
     install: function(app) {
       var self = this;
       app.get(nconf.get('web:homeurl'),
