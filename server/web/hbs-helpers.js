@@ -36,3 +36,7 @@ exports.bootScript = function(url, parameters) {
          "<script defer='defer' async='true' data-main='" + url + ".js' src='" + requireScript + "' type='text/javascript'></script>";
 
 };
+
+exports.isMobile = function(agent, options) {
+  return ((agent.match(/ipad/i)) ? options.fn(this) : null);
+};
