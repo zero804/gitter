@@ -296,7 +296,7 @@ define([
       // and scroll to bottom once the first rendering is complete
       if (this.collection.length === 0) {
         var eventEnabled = false;
-        this.collection.once('sync', function() {
+        this.collection.once('sync reset', function() {
           if(eventEnabled) return;
           eventEnabled = true;
 
@@ -366,7 +366,7 @@ define([
         }
       }
 
-      this.collection.once('sync', function() {
+      this.collection.once('sync reset', function() {
         self.infiniteScrollDelegate.afterLoadNextMessages();
       });
 
