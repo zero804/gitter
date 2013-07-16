@@ -49,6 +49,7 @@ module.exports = {
 
     handlebars.registerHelper('cdn', require('./hbs-helpers').cdn);
     handlebars.registerHelper('bootScript', require('./hbs-helpers').bootScript);
+    handlebars.registerHelper('isMobile', require('./hbs-helpers').isMobile);
 
     app.locals({
       trackingId: nconf.get("web:trackingId")
