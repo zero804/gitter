@@ -1,18 +1,13 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'jquery',
   'ga',
   'utils/context',
   'log!tracking',
-  './mixpanel'
-], function(_gaq, context, log, mixpanel) {
+  './mixpanel' // No ref
+], function($, _gaq, context, log) {
   /*jshint unused:true */
   "use strict";
-
-  mixpanel.init(context().mixpanelToken);
-  if (context.isAuthed()) {
-    mixpanel.identify(context.getUserId());
-    mixpanel.name_tag(context.getUser().username);
-  }
 
   if(!window.troupeTrackingId) {
     return {
@@ -24,12 +19,12 @@ define([
   _gaq.push(['_setAllowAnchor',true]);
 
   function trackPageView(routeName) {
-    mixpanel.track('pageView', { pageName: routeName });
+    window.mixpanel.track('pageView', { pageName: routeName });
     _gaq.push(['_trackEvent', 'Route', routeName]);
   }
 
   function trackError(message, file, line) {
-    mixpanel.track('jserror', { message: message, file: file, line: line } );
+    window.mixpanel.track('jserror', { message: message, file: file, line: line } );
     _gaq.push(['_trackEvent', 'Error', message, file, line]);
   }
 
