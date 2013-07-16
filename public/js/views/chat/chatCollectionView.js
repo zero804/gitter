@@ -292,10 +292,10 @@ define([
       }
 
       var self = this;
+      var eventEnabled = false;
       // wait for the first reset (preloading) before enabling infinite scroll
       // and scroll to bottom once the first rendering is complete
       if (this.collection.length === 0) {
-        var eventEnabled = false;
         this.collection.once('sync reset', function() {
           if(eventEnabled) return;
           eventEnabled = true;
@@ -305,6 +305,9 @@ define([
         });
       } else {
         // log("Enabling infinite scroll");
+        if(eventEnabled) return;
+        eventEnabled = true;
+
         ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
         self.scrollDelegate.scrollToBottom();
       }
