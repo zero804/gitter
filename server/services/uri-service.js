@@ -4,6 +4,7 @@
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
 var uriLookupService = require("./uri-lookup-service");
+var promiseUtils = require("../utils/promise-utils");
 
 function findUri(uri, callback) {
   uri = uri.toLowerCase();
@@ -24,6 +25,7 @@ function findUri(uri, callback) {
   }
 
   return uriLookupService.lookupUri(uri)
+    .then(promiseUtils.required)
     .then(function(uriLookup) {
       if(uriLookup.userId) {
         return userService.findById(uriLookup.userId)
