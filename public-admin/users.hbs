@@ -1,0 +1,52 @@
+<h1>Users</h1>
+
+<form class="form-search" id="search-form">
+  <input type="text" name="q" class="input-medium search-query">
+  <button type="submit" class="btn">Search</button>
+</form>
+
+<br>
+
+<div id="users" style="width:400px"></div>
+
+<script type="text/javascript">
+  $(document).ready( function() {
+      var usersTable = $('#users').WATable({}).data('WATable');
+
+      $('#search-form').on('submit', function(e) {
+        e.preventDefault();
+
+        $.get('/api/v1/users', $(this).serialize(), function(data) {
+            var data ={
+                cols: {
+                  id: {
+                      type: "string",
+                      friendly: "UserID"
+                  },
+                  name: {
+                      type: "string",
+                      friendly: "User Name"
+                  },
+                  location: {
+                      type: "string",
+                      friendly: "Location"
+                  }
+                },
+                rows: data.results.map(mapUserRows),
+            };
+
+            usersTable.setData(data);  //Sets the data.
+        });
+
+
+      function mapUserRows(row) {
+          return {
+              id: row.id,
+              name: row.displayName,
+              location: row.location && row.location.description
+          };
+      }
+    });
+
+  });
+</script>
