@@ -4,13 +4,14 @@ require([
 ], function ( Handlebars ) {
   "use strict";
 
-  var urlRegex    = /(https?:\/\/\S+)/gi;
   var emailRegex  = /(\S+@\S+\.\S+)/gi;
+  var urlRegex    = /\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.-]+[.][a-z]{2,4}\/)(?:(?:[^\s()<>.]+[.]?)+|((?:[^\s()<>]+|(?:([^\s()<>]+)))))+(?:((?:[^\s()<>]+|(?:([^\s()<>]+))))|[^\s`!()[]{};:'".,<>?«»“”‘’]))/gi;
+
 
   function embedUrl(url) {
     var m = url.match(/https?:\/\/([\w\.\/]+)([\:\?\#].+)?/);
 
-    if (m[1] && m[1].match(/(\.jpe?g|\.png|\.gif)$/)) {
+    if (m && m[1] && m[1].match(/(\.jpe?g|\.png|\.gif)$/)) {
       return '<a target="_blank" href="' + url + '"><img class="embed" src="' + url + '"></a>';
     } else if (url.match(/youtube/)) {
       var video_id = url.match(/https?:\/\/(www.)?youtube.com\/(embed\/|watch\?v=)(\w+)/)[3];
