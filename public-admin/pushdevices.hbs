@@ -1,0 +1,68 @@
+<h1>Push Devices</h1>
+
+<form class="form-search" id="search-form">
+  <input type="text" name="q" class="input-medium search-query">
+  <button type="submit" class="btn">Search</button>
+</form>
+
+<br>
+
+<div id="devices"></div>
+
+<script type="text/javascript">
+  $(document).ready( function() {
+      var usersTable = $('#devices').WATable({}).data('WATable');
+
+      $('#search-form').on('submit', function(e) {
+        e.preventDefault();
+
+        $.get('/api/v1/pushdevices', $(this).serialize(), function(data) {
+            var tableData ={
+                cols: {
+                  userId: {
+                      type: "string",
+                      friendly: "UserID"
+                  },
+                  displayName: {
+                      type: "string",
+                      friendly: "User Name"
+                  },
+                  deviceId: {
+                    type: "string",
+                    friendly: "Device ID"
+                  },
+                  appBuild: {
+                    type: "string",
+                    friendly: "App Build"
+                  },
+                  appVersion: {
+                    type: "string",
+                    friendly: "App Version"
+                  },
+                  deviceName: {
+                    type: "string",
+                    friendly: "Device Name"
+                  },
+                  deviceType: {
+                    type: "string",
+                    friendly: "Device Type"
+                  },
+                },
+                rows: data,
+            };
+
+            usersTable.setData(tableData);  //Sets the data.
+        });
+
+
+      function mapUserRows(row) {
+          return {
+              id: row.id,
+              name: row.displayName,
+              location: row.location && row.location.description
+          };
+      }
+    });
+
+  });
+</script>
