@@ -20,6 +20,9 @@ app.engine('hbs', exphbs({
 app.set('view engine', 'hbs');
 app.set('views', __dirname + "/../public-admin/");
 
+app.use(express.bodyParser());
+app.use(express.methodOverride());
+
 require('./admin/api/index').install(app);
 
 app.get('/', function (req, res) {

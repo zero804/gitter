@@ -100,6 +100,12 @@ exports.findDevicesForUsers = function(userIds, callback) {
     .execQ(callback);
 };
 
+exports.findDeviceForDeviceId = function(deviceId, callback) {
+  return PushNotificationDevice
+    .findOneQ({ deviceId: deviceId })
+    .nodeify(callback);
+};
+
 exports.findUsersTroupesAcceptingNotifications = function(userTroupes, callback) {
 
   var multi = redisClient.multi();
