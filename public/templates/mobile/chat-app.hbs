@@ -44,6 +44,20 @@
 
   <div class="trpChatInputArea" id="chat-input">
   </div>
+<script type="text/javascript">
 
+
+function hideAddressBar()
+{
+  // timeout because ios cannot scroll immmediately on pageload
+  setTimeout( function() {
+    // scroll 1px for android and ios
+    window.scrollTo(0, 1);
+  }, 500 );
+}
+
+window.addEventListener("load", function(){ if(!window.pageYOffset){ hideAddressBar(); } } );
+window.addEventListener("orientationchange", hideAddressBar );
+</script>
 </body>
 </html>
