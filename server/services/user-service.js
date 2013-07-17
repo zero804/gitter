@@ -13,6 +13,8 @@ var crypto = require('crypto');
 var assert = require('assert');
 var collections = require("../utils/collections");
 var Q = require('q');
+var appEvents = require("../app-events");
+var moment = require('moment');
 
 function generateGravatarUrl(email) {
   var url =  "https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon";
@@ -144,8 +146,9 @@ var userService = {
 
       var troupeId = troupe.id;
 
+      var lastAccessTime = new Date();
       var setOp = {};
-      setOp['troupes.' + troupeId] = new Date();
+      setOp['troupes.' + troupeId] = lastAccessTime;
 
       // Update the model, don't wait for a callback
       persistence.UserTroupeLastAccess.update(
@@ -157,6 +160,10 @@ var userService = {
             winston.error('Error updating usertroupelastaccess: ' + err, { exception: err });
           }
         });
+
+      // XXX: lastAccessTime should be a date but for some bizarre reason it's not
+      // serializing properly
+      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
 
       // Don't save the last troupe for one-to-one troupes
       if(troupe.oneToOne) {

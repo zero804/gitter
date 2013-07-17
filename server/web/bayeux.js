@@ -212,8 +212,6 @@ var authenticator = {
       // This is an UGLY UGLY hack, but it's the only
       // way possible to pass the userId to the outgoing extension
       // where we have the clientId (but not the userId)
-      message.test = 1;
-
       var id = message.id || '';
       message.id = id + ':' + userId + ':' + connectionType + ':' + client;
 
@@ -300,6 +298,7 @@ var authorisor = {
   },
 
   outgoing: function(message, callback) {
+
     if(message.channel != '/meta/subscribe') {
       return callback(message);
     }

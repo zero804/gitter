@@ -36,8 +36,6 @@ a {
 }
 
 .trpHomeTopStrip {
-  max-width: 960px;
-  min-width: 960px;
   margin: 0px auto;
   text-align: left;
   padding-top: 40px;
@@ -55,12 +53,14 @@ a {
 
 .trpHomeLogo {
   display:inline-block;
+  margin-left: 20px;
 }
 
 .trpHomeMenu {
   float: right;
   color: white;
   display: inline-block;
+  margin-right: 20px;
 }
 
 .trpHomeMenuItem {
@@ -102,9 +102,10 @@ a {
 .trpHomeHero {
   display: inline-block;
   padding-top: 20px;
-  width: 960px;
+  padding-left: 100px;
   text-align: left;
   min-height: 540px;
+  width: 100%;
 }
 
 .trpHeroText {
@@ -157,7 +158,6 @@ a {
 
 .trpFeatures {
   display: inline-block;
-  min-width: 960px;
   padding-top: 8px;
   width: 100%;
   text-align: center;
@@ -372,6 +372,12 @@ a {
   padding-top: 10px;
 }
 
+@media (max-width: 768px) {
+  .trpHeroImage {
+    display: none;
+  }
+}
+
 @media screen and (device-width: 360px), (device-width: 720px), (device-width:320px) and (orientation: portrait) {
 
   body {
@@ -424,7 +430,6 @@ a {
   .trpHomeTopStrip {
     min-width: 320px;
     width: 300px;
-    padding-left: 20px
   }
 
   .trpHomeHero {
@@ -434,6 +439,7 @@ a {
     text-align: left;
     min-height: 100%;
     height: 100%;
+    padding-left: 0px;
   }
 
   .trpHeroText {

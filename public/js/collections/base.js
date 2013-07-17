@@ -198,8 +198,8 @@ define([
       // Existing version is unversioned? Allow
       if(!existingVersion) return true;
 
-      // New operation is unversioned? Dodgy
-      if(!incomingVersion) return false;
+      // New operation is unversioned? Dodgy. Only allow if the operation is a patch
+      if(!incomingVersion) return operation === 'patch';
 
       if(operation === 'patch') {
         return incomingVersion >= existingVersion;
