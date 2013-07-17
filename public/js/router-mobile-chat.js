@@ -6,12 +6,11 @@ require([
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
   'views/widgets/avatar',
-  'scrollfix',
   'components/mobile-context',        // No ref
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
   'template/helpers/all'              // No ref
-], function($, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget, ScrollFix  /*, mobileContext, eyeballsClient, unreadItemsClient */) {
+], function($, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget /*, mobileContext, eyeballsClient, unreadItemsClient */) {
   "use strict";
 
   var PAGE_SIZE = 15;
@@ -48,10 +47,6 @@ require([
      if(event.target.parentNode.className.indexOf('noBounce') != -1 || event.target.className.indexOf('noBounce') != -1 ) {
     event.preventDefault(); }
   }, false);
-
-  // Add ScrollFix
-  var scrollingContent = document.getElementById("chat-wrapper");
-  new ScrollFix(scrollingContent);
 
   // Asynchronously load tracker
   require([
