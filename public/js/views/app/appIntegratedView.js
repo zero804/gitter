@@ -10,6 +10,33 @@ define([
   ], function($, context, log, Marionette, UsernameView, uiVars) {
   "use strict";
 
+  var touchEvents = {
+    "click #menu-toggle-button":        "onMenuToggle",
+    "click .left-menu-icon":            "onLeftMenuListIconClick",
+    "keypress":                         "onKeyPress"
+  };
+
+  var mouseEvents = {
+    "click #menu-toggle-button":        "onMenuToggle",
+    "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
+    "mouseenter #menu-toggle":          "onLeftMenuHotspot",
+    "mouseenter #content-frame":        "onMouseEnterContentFrame",
+    "mouseenter #header-wrapper":       "onMouseEnterHeader",
+    "mouseenter #left-menu":            "onMouseEnterLeftMenu",
+    "mouseenter #toolbar-frame":        "onMouseEnterToolbar",
+    "mouseleave #toolbar-frame":        "onMouseLeaveToolbar",
+    "mouseleave #header-wrapper":       "onMouseLeaveHeader",
+
+    "mouseenter .left-menu-icon":       "onMouseEnterToolbarItem",
+    "mouseleave .left-menu-icon":       "onMouseLeaveToolbarItem",
+
+    "click .left-menu-icon":            "onLeftMenuListIconClick",
+
+    "keypress":                         "onKeyPress"
+  };
+
+  $('.trpDisplayPicture').tooltip('destroy');
+
   return Marionette.Layout.extend({
     el: 'body',
     leftmenu: false,
@@ -25,24 +52,7 @@ define([
       headerRegion: "#header-wrapper"
     },
 
-    events: {
-      "click #menu-toggle-button":        "onMenuToggle",
-      "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
-      "mouseenter #menu-toggle":          "onLeftMenuHotspot",
-      "mouseenter #content-frame":        "onMouseEnterContentFrame",
-      "mouseenter #header-wrapper":       "onMouseEnterHeader",
-      "mouseenter #left-menu":            "onMouseEnterLeftMenu",
-      "mouseenter #toolbar-frame":        "onMouseEnterToolbar",
-      "mouseleave #toolbar-frame":        "onMouseLeaveToolbar",
-      "mouseleave #header-wrapper":       "onMouseLeaveHeader",
-
-      "mouseenter .left-menu-icon":       "onMouseEnterToolbarItem",
-      "mouseleave .left-menu-icon":       "onMouseLeaveToolbarItem",
-
-      "click .left-menu-icon":            "onLeftMenuListIconClick",
-
-      "keypress":                         "onKeyPress"
-    },
+    events: uiVars.isMobile ? touchEvents : mouseEvents,
 
     initialize: function() {
       var self = this;

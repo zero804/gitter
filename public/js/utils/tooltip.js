@@ -1,4 +1,7 @@
-define(["jquery"], function (jQuery){
+define([
+  'jquery',
+  'views/app/uiVars'
+], function (jQuery, uiVars){
 
 /* ===========================================================
  * bootstrap-tooltip.js v2.3.1
@@ -20,6 +23,12 @@ define(["jquery"], function (jQuery){
  * limitations under the License.
  * ========================================================== */
 
+/*
+
+  HEY TROUPER! This is an exact copy of the original Bootstrap tooltip but
+  is disabled by default if you're on a mobile device. Check uiVars.
+
+*/
 
 !function ($) {
 
@@ -47,7 +56,7 @@ define(["jquery"], function (jQuery){
       this.type = type
       this.$element = $(element)
       this.options = this.getOptions(options)
-      this.enabled = true
+      this.enabled = !uiVars.isMobile
 
       triggers = this.options.trigger.split(' ')
 
