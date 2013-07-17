@@ -652,11 +652,7 @@ function TroupeStrategy(options) {
 
   var stack;
   if(!options.currentUserId) {
-    try {
-      throw new Error();
-    } catch(e) {
-      stack = e.stack;
-    }
+    stack = new Error().stack;
   }
 
   var currentUserId = options.currentUserId;
