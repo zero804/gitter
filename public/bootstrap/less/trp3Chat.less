@@ -174,8 +174,7 @@
   position: relative; // required for scroll calculations
 }
 
-@media screen and (device-width: 360px), (device-width: 720px), (device-width:320px) and (orientation: portrait) {
-
+@media screen and (device-width: 360px), (device-width: 720px), (device-width:320px) {
 
   .trpChatBox {
     padding: 6px 8px;
@@ -215,6 +214,24 @@
 
 }
 
+@media screen and (device-width: 360px), (device-width: 720px), (device-width:320px) and (orientation: landscape) {
+
+  .trpChatBox {
+    max-width: 500px;
+  }
+  .trpChatText {
+    max-width: 480px;
+
+  }
+
+  .trpChatInputBoxTextArea {
+    width: 450px;
+  }
+
+    .trpChatInputBox {
+    margin-left: 4px;
+    width: 450px;
+  }
 
 
-
+}
