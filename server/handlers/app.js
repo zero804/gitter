@@ -125,7 +125,8 @@ function renderHomePage(req, res, next) {
         bootScriptName: 'router-homepage',
         troupeName: req.user.displayName,
         troupeContext: JSON.stringify(troupeContext),
-        troupeContextData: troupeContext
+        troupeContextData: troupeContext,
+        agent: req.headers['user-agent']
       });
     })
     .fail(next);
@@ -171,7 +172,8 @@ function renderAppPageWithTroupe(req, res, next, page) {
         bootScriptName: login ? "router-login" : "router-app",
         troupeName: serializedTroupe.name,
         troupeContext: JSON.stringify(troupeContext),
-        troupeContextData: troupeContext
+        troupeContextData: troupeContext,
+        agent: req.headers['user-agent']
       });
 
     })
