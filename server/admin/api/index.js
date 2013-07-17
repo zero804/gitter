@@ -9,5 +9,7 @@ module.exports = {
 
     app.resource('api/v1/users', require('./users.js'));
     app.resource('api/v1/pushdevices', require('./pushdevices.js'));
+    app.post('/api/v1/sendmessage', require('./sendmessage.js'));
+
   }
 };
