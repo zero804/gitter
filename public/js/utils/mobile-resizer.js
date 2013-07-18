@@ -13,10 +13,10 @@ define([], function() {
   };
 
   var shrinkChatWrapperToFit = function() {
-    var inputSize = document.getElementById('chat-input').clientHeight;
-    var newHeight = window.innerHeight - inputSize;
     var chatWrapper = document.getElementById('chat-wrapper');
-    chatWrapper.style.height = newHeight + 'px';
+    var everythingButWrapperSize = document.height - chatWrapper.clientHeight;
+    var spaceForWrapper = window.innerHeight - everythingButWrapperSize;
+    chatWrapper.style.height = spaceForWrapper + 'px';
   };
 
   var resizeChatWrapperToFit = function() {
