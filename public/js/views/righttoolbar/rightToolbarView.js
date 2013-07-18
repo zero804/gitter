@@ -34,7 +34,8 @@ define([
 
     initialize: function() {
       this.model = new Backbone.Model({
-        troupeEmailAddress: context().troupeUri + '@' + context().baseServer
+        troupeEmailAddress: context().troupeUri + '@' + context().baseServer,
+        isOneToOne: context.getTroupe().oneToOne
       });
     },
 
