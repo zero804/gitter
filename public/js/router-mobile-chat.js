@@ -52,8 +52,7 @@ require([
   }, false);
 
   window.addEventListener("orientationchange", function() {
-    mobileResizer.hideAddessBar();
-    mobileResizer.resizeChatWrapperToFit();
+    mobileResizer.reset();
   });
 
   // Asynchronously load tracker

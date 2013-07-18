@@ -20,7 +20,6 @@ define([], function() {
   };
 
   var resizeChatWrapperToFit = function() {
-    resetChatWrapperSize();
     if(isPageTooBig()) {
       shrinkChatWrapperToFit();
     }
@@ -31,8 +30,15 @@ define([], function() {
     chatWrapper.style.height = '100%';
   };
 
+  var reset = function() {
+    resetChatWrapperSize();
+    hideAddessBar();
+    resizeChatWrapperToFit();
+  };
+
   return {
     'hideAddessBar': hideAddessBar,
-    'resizeChatWrapperToFit': resizeChatWrapperToFit
+    'resizeChatWrapperToFit': resizeChatWrapperToFit,
+    'reset': reset
   };
 });
