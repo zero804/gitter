@@ -154,7 +154,7 @@ define([
 
     showSearch: function() {
       this.showTab('icon-search');
-    }
+    },
 
     onMouseEnterToolbarItem: function(e) {
       $(e.target).fadeTo(100, 1.0);
