@@ -6,11 +6,12 @@ require([
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
   'views/widgets/avatar',
+  'utils/mobile-resizer',
   'components/mobile-context',        // No ref
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
   'template/helpers/all'              // No ref
-], function($, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget /*, mobileContext, eyeballsClient, unreadItemsClient */) {
+], function($, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget, mobileResizer /*, mobileContext, eyeballsClient, unreadItemsClient */) {
   "use strict";
 
   var PAGE_SIZE = 15;
@@ -36,6 +37,8 @@ require([
     scrollDelegate: chatCollectionView.scrollDelegate
   }).render();
 
+  mobileResizer.hideAddessBar();
+  mobileResizer.resizeChatWrapperToFit();
 
   $('.trpMobileAmuseIcon').click(function() {
     document.location.reload(true);
@@ -47,6 +50,11 @@ require([
      if(event.target.parentNode.className.indexOf('noBounce') != -1 || event.target.className.indexOf('noBounce') != -1 ) {
     event.preventDefault(); }
   }, false);
+
+  window.addEventListener("orientationchange", function() {
+    mobileResizer.hideAddessBar();
+    mobileResizer.resizeChatWrapperToFit();
+  });
 
   // Asynchronously load tracker
   require([
