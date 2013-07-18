@@ -28,7 +28,6 @@ require([
       var self = this;
       this.fileCollection = new fileModels.FileCollection();
       this.fileCollection.listen();
-      self.fileCollection.fetch();
     },
 
     defaultAction: function(/*actions*/){
