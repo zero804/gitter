@@ -12,7 +12,6 @@ define([
 
   var touchEvents = {
     "click #menu-toggle-button":        "onMenuToggle",
-    "click .left-menu-icon":            "onLeftMenuListIconClick",
     "keypress":                         "onKeyPress"
   };
 
@@ -26,11 +25,6 @@ define([
     "mouseenter #toolbar-frame":        "onMouseEnterToolbar",
     "mouseleave #toolbar-frame":        "onMouseLeaveToolbar",
     "mouseleave #header-wrapper":       "onMouseLeaveHeader",
-
-    "mouseenter .left-menu-icon":       "onMouseEnterToolbarItem",
-    "mouseleave .left-menu-icon":       "onMouseLeaveToolbarItem",
-
-    "click .left-menu-icon":            "onLeftMenuListIconClick",
 
     "keypress":                         "onKeyPress"
   };
@@ -294,17 +288,6 @@ define([
     onMouseLeaveToolbar: function() {
 
     },
-
-    onMouseEnterToolbarItem: function(e) {
-      $(e.target).fadeTo(100, 1.0);
-    },
-
-    onMouseLeaveToolbarItem: function(e) {
-      if ($(e.target).hasClass('selected')) return true;
-
-      $(e.target).fadeTo(100, 0.6);
-    },
-
 
     activateSearchList: function () {
 

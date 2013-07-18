@@ -30,7 +30,9 @@ define([
     },
 
     events: {
-     "click .left-menu-icon":    "onLeftMenuListIconClick"
+      "click .left-menu-icon":    "onLeftMenuListIconClick",
+      "mouseenter .left-menu-icon":       "onMouseEnterToolbarItem",
+      "mouseleave .left-menu-icon":       "onMouseLeaveToolbarItem"
     },
 
     initialize: function() {
@@ -118,6 +120,7 @@ define([
         this.activateSearchList();
       }
 
+      this.onMouseEnterToolbarItem({ target: this.$el.find('#' + selected) });
       if(selected === this.selectedListIcon) return;
 
       // Turn off the old selected list
@@ -152,6 +155,17 @@ define([
     showSearch: function() {
       this.showTab('icon-search');
     }
+
+    onMouseEnterToolbarItem: function(e) {
+      $(e.target).fadeTo(100, 1.0);
+    },
+
+    onMouseLeaveToolbarItem: function(e) {
+      if ($(e.target).hasClass('selected')) return true;
+
+      $(e.target).fadeTo(100, 0.6);
+    }
+
 
   });
 
