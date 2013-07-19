@@ -212,7 +212,8 @@ var authenticator = {
       // This is an UGLY UGLY hack, but it's the only
       // way possible to pass the userId to the outgoing extension
       // where we have the clientId (but not the userId)
-      message.id = message.id + ':' + userId + ':' + connectionType + ':' + client;
+      var id = message.id || '';
+      message.id = id + ':' + userId + ':' + connectionType + ':' + client;
 
       return callback(message);
     });
@@ -242,7 +243,7 @@ var authenticator = {
       return callback(message);
     }
 
-    message.id = parts[0];
+    message.id = parts[0] || undefined; // id not required for an incoming message
     var userId = parts[1];
     var connectionType = parts[2];
     var clientId = message.clientId;
@@ -252,6 +253,9 @@ var authenticator = {
     // Get the presence service involved around about now
     presenceService.userSocketConnected(userId, clientId, connectionType, client, function(err) {
       if(err) winston.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
+
+      if(!message.ext) message.ext = {};
+      message.ext.userId = userId;
 
       // Not possible to throw an error here, so just carry only
       callback(message);
@@ -294,6 +298,7 @@ var authorisor = {
   },
 
   outgoing: function(message, callback) {
+
     if(message.channel != '/meta/subscribe') {
       return callback(message);
     }

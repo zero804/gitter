@@ -8,6 +8,8 @@ var cube_enabled        = nconf.get("stats:cube:enabled")       || false;
 var mixpanel_enabled    = nconf.get("stats:mixpanel:enabled")   || false;
 var customerio_enabled  = nconf.get("stats:customerio:enabled") || false;
 
+var blacklist = ['location_submission','push_notification','mail_bounce','new_mail_attachment','remailed_email','new_file_version','new_file','login_failed','password_reset_invalid','password_reset_completed','invite_rejected','invite_reused','invite_accpted','confirmation_reused'];
+
 if (cube_enabled) {
   var Cube = require("cube");
   var statsUrl = nconf.get("stats:cube:cubeUrl");
@@ -18,7 +20,6 @@ if (mixpanel_enabled) {
   var Mixpanel  = require('mixpanel');
   var token     = nconf.get("stats:mixpanel:token");
   var mixpanel  = Mixpanel.init(token);
-  var blacklist = ['location_submission'];
 }
 
 if (customerio_enabled) {
@@ -26,7 +27,16 @@ if (customerio_enabled) {
   var cio = CustomerIO.init(nconf.get("stats:customerio:siteId"), nconf.get("stats:customerio:key"));
 }
 
+function isTestUser(email) {
+  if (!email) {
+    winston.debug("[stats] Didn't receive an email for isTestUser");
+    return true;
+  }
+  if (email.indexOf("troupetest.local") !== -1) return true; else return false;
+}
+
 exports.event = function(eventName, properties) {
+
   if(!properties) properties = {};
 
   // Cube
@@ -41,21 +51,32 @@ exports.event = function(eventName, properties) {
     cube.send(event);
   }
 
-  // MixPanel
-  if (mixpanel_enabled && blacklist.indexOf(eventName) == -1) {
-    properties.distinct_id = properties.userId;
-    mixpanel.track(eventName, properties, function(err) { if (err) throw err; });
-  }
+  if (blacklist.indexOf(eventName) == -1) {
+    if (!isTestUser(properties.email)) {
+      winston.verbose("[stats]" , "Logging user to Customer Actions: " + properties.email);
+      // MixPanel
+      if (mixpanel_enabled) {
+        properties.distinct_id = properties.userId;
+        mixpanel.track(eventName, properties, function(err) { if (err) throw err; });
+      }
 
-  // CustomerIO
-  if (customerio_enabled) {
-    cio.track(properties.userId, eventName, properties);
+      // CustomerIO
+      if (customerio_enabled) {
+        cio.track(properties.userId, eventName, properties);
+      }
+    }
   }
 
   winston.verbose("[stats]", {event: eventName, properties: properties});
 };
 
 exports.userUpdate = function(user, properties) {
+  if (isTestUser(user.email)) return;
+
+  winston.verbose("[stats] Updating user stat");
+
+
+
   if(!properties) properties = {};
 
   var createdAt = new Date(user._id.getTimestamp().getTime());

@@ -1,5 +1,6 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'backbone',
   'marionette',
   'utils/context',
   'fineuploader',
@@ -10,7 +11,7 @@ define([
   'views/file/fileView',
   'views/conversation/conversationView',
   'views/people/peopleCollectionView'
-], function(Marionette, context, qq, rightToolbarTemplate, itemCollections, troupeCollections, RequestView, FileView, ConversationView, PeopleCollectionView) {
+], function(Backbone, Marionette, context, qq, rightToolbarTemplate, itemCollections, troupeCollections, RequestView, FileView, ConversationView, PeopleCollectionView) {
   "use strict";
 
   return Backbone.Marionette.Layout.extend({
@@ -32,7 +33,9 @@ define([
     },
 
     initialize: function() {
-
+      this.model = new Backbone.Model({
+        troupeEmailAddress: context().troupeUri + '@' + context().baseServer
+      });
     },
 
     onRender: function() {

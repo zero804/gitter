@@ -3,8 +3,10 @@ define([
   'jquery',
   "views/base",
   "hbs!./tmpl/appHeader",
+  'collections/instances/troupes',
+  'utils/context',
   'components/unread-items-client'
-  ], function($, TroupeViews, appHeaderTemplate, unreadItemsClient) {
+  ], function($, TroupeViews, appHeaderTemplate, trpCollections, context, unreadItemsClient) {
   "use strict";
 
   return TroupeViews.Base.extend({
@@ -13,11 +15,13 @@ define([
     initialize: function() {
       var self = this;
 
-      $(document).on('troupeUpdate', function(e, message) {
-        // header title
-        $('.trpHeaderTitle').html(message.model.name);
-        // window / title bar
-        self.updateTitlebar(unreadItemsClient.getCounts());
+      trpCollections.troupes.on('change', function(model) {
+        if (model.id == context.getTroupeId()) {
+          // header title
+          $('.trpHeaderTitle').html(model.get('name'));
+          // window / title bar
+          self.updateTitlebar(unreadItemsClient.getCounts());
+        }
       });
 
       function onTroupeUnreadTotalChange(event, values) {

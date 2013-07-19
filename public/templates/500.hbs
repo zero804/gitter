@@ -3,8 +3,10 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Troupe - coming soon</title>
+    <title>Troupe - Error</title>
     <meta name="google-site-verification" content="nnoWjW8hKT4umkqn1UrCdVHtLs8Q2pDi5ek0x5PUHug" />
+    <meta name="apple-itunes-app" content="app-id=632039322"/>
+
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
     <link rel="shortcut icon" href='{{cdn "images/2/favicon8.ico" }}'>
     <style type="text/css">
@@ -36,6 +38,10 @@
         font-size: 18px;
       }
 
+      a {
+        color: #1dce73;
+      }
+
     </style>
 
   </head>
@@ -50,7 +56,8 @@
 
     <div class="error">
       SOMETHING BROKE<br><br>
-      <span class="error-text">You're seeing this error because something has broken on our side. That's entirely unacceptable and we apoligise. Someone has been notified and we will look into it immediately.<br><br>Apologies for the inconvenience.</span>
+      <span class="error-text">You're seeing this error because something has broken on our side. That's entirely unacceptable and we apologise. Someone has been notified and we will look into it immediately.<br><br>Apologies for the inconvenience.</span><br><br>
+      <a href="/last">BACK TO TROUPE</a>
       {{#if stack}}
       <pre style="font-size:small">{{{stack}}}</pre>
       {{/if}}

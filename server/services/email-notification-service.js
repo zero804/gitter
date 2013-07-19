@@ -43,7 +43,7 @@ module.exports = {
   },
 
   sendConnectAcceptanceToUser: function(fromUser, toUser, troupe) {
-    var troupeLink = url.resolve(nconf.get("web:basepath"), troupe.uri);
+    var troupeLink = url.resolve(nconf.get("web:basepath"), troupe.url);
 
     mailerService.sendEmail({
       templateFile: "connectacceptance",

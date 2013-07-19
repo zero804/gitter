@@ -1,6 +1,7 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-], function() {
+  'utils/context'
+], function(context) {
   "use strict";
 
   var mixpanel = [];
@@ -33,6 +34,12 @@ define([
     })(document,mixpanel);
 
     window.mixpanel = mixpanel;
+
+    mixpanel.init(context().mixpanelToken);
+    if (context.isAuthed()) {
+      mixpanel.identify(context.getUserId());
+      mixpanel.name_tag(context.getUser().username);
+    }
 
     return mixpanel;
 

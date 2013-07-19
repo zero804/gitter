@@ -29,14 +29,16 @@ getAllUsers(function(err, users) {
       var first_name = user.displayName ? user.displayName.split(' ')[0] : 'User';
       var created_at = new Date(user._id.getTimestamp().getTime());
 
-      mixpanel.people.set(user.id, {
-        $first_name: first_name,
-        $created_at: created_at.toISOString(),
-        $email: user.email,
-        $name: user.displayName,
-        $username: user.username,
-        Status: user.status
-      });
+      if (user.email.indexOf("troupetest.local") == -1) {
+        mixpanel.people.set(user.id, {
+          $first_name: first_name,
+          $created_at: created_at.toISOString(),
+          $email: user.email,
+          $name: user.displayName,
+          $username: user.username,
+          Status: user.status
+        });
+      }
     });
   }
 

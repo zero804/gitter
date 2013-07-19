@@ -363,7 +363,7 @@ module.exports = function( grunt ) {
       },
       filteredCollection: {
         files : {
-          'output/client-libs/filtered-collection/backbone-filtered-collection-amd.js': ['output/client-libs/filtered-collection/backbone-filtered-collection.js']
+          'output/client-libs/filtered-collection/backbone-filtered-collection-amd.js': ['output/client-libs/filtered-collection/vendor/assets/javascripts/backbone-filtered-collection.js']
         },
         modules: {
           'underscore': '_',
@@ -411,6 +411,15 @@ module.exports = function( grunt ) {
           'jquery': 'jQuery'
         },
         exports: 'jQuery'
+      },
+
+      'scrollfix': {
+        files : {
+          'output/client-libs/scrollfix/scrollfix-amd.js': ['output/client-libs/scrollfix/scrollfix.js']
+        },
+        modules: {
+        },
+        exports: 'ScrollFix'
       },
 
       'bootstrap_tooltip': {

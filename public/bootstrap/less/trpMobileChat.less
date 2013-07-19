@@ -5,16 +5,16 @@
 @import "trp3Chat.less";
 @import "trp3MobileCommon.less";
 
+html {
+	height: 100%;
+}
+
 body {
-	margin-left: 0px;
-	margin-top: 20px;
+	height: 100%;
+	margin: 0px;
 	background-color: #ecf1ec;
   -webkit-user-select: none;
   -moz-user-select: none;
-}
-
-div {
-	display: inline-block;
 }
 
 a {
@@ -26,17 +26,15 @@ a {
 /*Mobile Overrides*/
 
 .contentBody {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 60px;
-	width: 320px;
-	max-width: 320px;
+	height: 100%;
+	width: 100%;
 	overflow: scroll;
 	-webkit-overflow-scrolling: touch;
 }
 
+.trpChatInputArea {
+	position: relative;
+}
 
 .avatar-s {
 	position: relative;
@@ -47,47 +45,3 @@ a {
   background-size: contain;
 }
 
-.trpChatBox {
-	padding: 6px 8px;
-	margin-left: 4px;
-  width: 254px;
-}
-
-.trpChatInputArea {
-	position: fixed;
-	bottom: 0px;
-  width: 320px;
-	z-index: 5;
-	background-color: white;
-  padding-top: 5px;
-	padding-bottom: 5px;
-  padding-left: 5px;
-}
-
-.trpChatInputBox {
-  margin-left: 4px;
-  width: 270px;
-}
-
-.trpChatPanel {
-	padding: 5px;
-}
-
-@media screen and (device-width: 320px) and (orientation: portrait) {
-
-  .trpChatInputBoxTextArea {
-    width: 220px;
-
-  }
-
-  .trpChatText {
-  	max-width: 255px;
-    line-height: 20px;
-  }
-
-  .trpChatInputBox {
-
-  }
-
-
-}
