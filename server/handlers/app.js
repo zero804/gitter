@@ -169,6 +169,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
       res.render(page, {
         useAppCache: !!nconf.get('web:useAppCache'),
         login: login,
+        isWebApp: !req.params.mobilePage,
         bootScriptName: login ? "router-login" : "router-app",
         troupeName: serializedTroupe.name,
         troupeContext: JSON.stringify(troupeContext),
