@@ -22,7 +22,7 @@ define([
       requests: "#request-roster",
       people: "#people-roster",
       files: "#file-list",
-      conversations: "#frame-conversations"
+      conversations: ".frame-conversations"
     },
 
     events: {
