@@ -9,6 +9,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=IE9" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
 	<meta charset="utf-8">
+  <meta name="apple-itunes-app" content="app-id=632039322"/>
 
 	<title>{{troupeName}} - Troupe</title>
 
@@ -24,6 +25,16 @@
     {{/useFirebug}}
 </head>
 <body>
+
+  {{#isMobile agent}}
+    <div class="trpPortraitAlert" id='portrait-alert'>
+      <div class="message">
+        <img class="ipad-icon" src='{{cdn "images/2/icon-rotate-ipad.png"}}'>
+        <p>Rotate iPad for better experience.</p>
+        <img class="logo" src='{{cdn "images/2/menu-toggle.png" }}'>
+      </div>
+    </div>
+  {{/isMobile}}
 
   <div class="trpLeftMenuHotspot" id="left-menu-hotspot"></div>
 

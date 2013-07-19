@@ -51,7 +51,7 @@ require([
       submitForm();
     });
 
-    $('#password').on('blur', function() {
+    $('#password, #email').on('change', function() {
       log("Password blur");
       hideLoginFailure();
     });
@@ -64,22 +64,42 @@ require([
       submitForm();
     });
 
-    var showingFailure = false;
+    $(".button-request-new-password").on('click', function() {
+      sendReset({
+        success: function() {
+          hideLoginFailure();
+          showResetSuccess();
+        },
+        error: function() {
+          hideLoginFailure();
+          showResetFailure();
+        }
+      });
+    });
 
     function showLoginFailure() {
-      // $('#panel-failure').slideUp();
-      $('#panel-failure').animate( {
+      // $('#login-failure').slideUp();
+      $('#login-failure').animate({
         bottom: '0px'
       }, 350);
-      showingFailure = true;
     }
 
     function hideLoginFailure() {
-      if (showingFailure) {
-         $('#panel-failure').animate( {
-            bottom: '-90px'
-          }, 350);
-      }
+      $('.mtrpLoginFailure').animate( {
+        bottom: '-200px'
+      }, 350);
+    }
+
+    function showResetFailure() {
+      $('#resetpwd-failure').animate({
+        bottom: '0px'
+      }, 350);
+    }
+
+    function showResetSuccess() {
+      $('#resetpwd-confirm').animate({
+        bottom: '0px'
+      }, 350);
     }
 
     function submitForm() {
@@ -108,5 +128,28 @@ require([
         }
       });
     }
+
+    function sendReset(options) {
+      var that = this;
+      var form = $('form#loginform');
+      $.ajax({
+        url: "/reset",
+        contentType: "application/x-www-form-urlencoded",
+        dataType: "json",
+        data: form.serialize(),
+        type: "POST",
+        success: function(data) {
+          if(data.failed) {
+            options.error();
+          }
+          else {
+            options.success();
+          }
+        }
+      });
+
+    }
+
+
 });
 

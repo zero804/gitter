@@ -3,6 +3,7 @@
 
 var fileService = require('../../services/file-service'),
     winston = require('winston'),
+    statsService = require("../../services/stats-service"),
     restSerializer = require("../../serializers/rest-serializer");
 
 module.exports = {
@@ -34,6 +35,7 @@ module.exports = {
             restSerializer.serialize(fileAndVersion.file, strategy, function(err, serialized) {
               if(err) return next(err);
 
+              statsService.event('new_file_upload', { userId: req.user.id, troupeId: req.troupe.id, email: req.user.email });
               /* The AJAX file upload component we use requires an object shaped like this (below) */
               res.setHeader("Content-Type","text/plain");
               res.send({ success: true, file: serialized });

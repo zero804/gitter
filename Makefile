@@ -133,13 +133,19 @@ build: clean validate-source npm grunt version-files upgrade-data test-xunit
 .PHONY: test docs test-docs clean
 
 clean-client-libs:
-	rm -rf output/client-libs/ public/repo output/js-temp
+	rm -rf public/repo
+
+clean-temp-client-libs:
+	rm -rf output/client-libs/ output/js-temp
+
 
 fetch-client-libs:
 	bower install
 
-install-client-libs:
+make-client-libs:
 	grunt client-libs # --disableMinifiedSource=true
+
+install-client-libs:
 	ls -d output/client-libs/*|sed -e 's!output/client-libs/!public/repo/!'|sed -e 's!retina.js-js!retina!'|sed -e 's!typeahead.js!typeahead!'|xargs mkdir -p
 	cp output/client-libs/almond/almond.js public/repo/almond/almond.js
 	cp output/client-libs/assert/assert-amd.js public/repo/assert/assert.js
@@ -171,7 +177,7 @@ install-client-libs:
 	cp output/client-libs/nanoscroller/jquery.nanoscroller.js public/repo/nanoscroller/nanoscroller.js
 	cp output/client-libs/requirejs/index.js public/repo/requirejs/requirejs.js
 	cp output/client-libs/retina.js-js/src/retina.js public/repo/retina/retina.js
-	cp output/client-libs/scrollfix/scrollfix.js public/repo/scrollfix/scrollfix.js
+	cp output/client-libs/scrollfix/scrollfix-amd.js public/repo/scrollfix/scrollfix.js
 	cp output/client-libs/typeahead.js/typeahead.js public/repo/typeahead/typeahead.js
 	cp output/client-libs/underscore/underscore-amd.js public/repo/underscore/underscore.js
 	# cp output/client-libs/zeroclipboard/ZeroClipboard.js public/repo/zeroclipboard/zeroclipboard.js
@@ -179,4 +185,4 @@ install-client-libs:
 	cp output/client-libs/zeroclipboard/ZeroClipboard.swf public/repo/zeroclipboard/
 	cp output/client-libs/zepto/zepto-amd.js public/repo/zepto/zepto.js
 
-client-libs: clean-client-libs fetch-client-libs install-client-libs
+client-libs: clean-temp-client-libs fetch-client-libs make-client-libs clean-client-libs install-client-libs

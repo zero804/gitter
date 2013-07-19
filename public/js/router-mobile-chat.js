@@ -6,12 +6,12 @@ require([
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
   'views/widgets/avatar',
-  'scrollfix',
+  'utils/mobile-resizer',
   'components/mobile-context',        // No ref
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
   'template/helpers/all'              // No ref
-], function($, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget, ScrollFix  /*, mobileContext, eyeballsClient, unreadItemsClient */) {
+], function($, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget, mobileResizer /*, mobileContext, eyeballsClient, unreadItemsClient */) {
   "use strict";
 
   var PAGE_SIZE = 15;
@@ -23,23 +23,6 @@ require([
 
   var chatCollection = new chatModels.ChatCollection();
   chatCollection.listen();
-  chatCollection.fetch({
-    data: {
-      limit: PAGE_SIZE
-    }
-  });
-
-  chatCollection.newConnectionCount = 0;
-  $(document).on('realtime:newConnectionEstablished', function() {
-    if(chatCollection.newConnectionCount++) {
-      chatCollection.fetch({
-        data: {
-          limit: PAGE_SIZE
-        }
-      });
-    }
-  });
-
 
   var chatCollectionView = new ChatCollectionView({
     el: $('#frame-chat'),
@@ -54,6 +37,8 @@ require([
     scrollDelegate: chatCollectionView.scrollDelegate
   }).render();
 
+  mobileResizer.hideAddessBar();
+  mobileResizer.resizeChatWrapperToFit();
 
   $('.trpMobileAmuseIcon').click(function() {
     document.location.reload(true);
@@ -66,9 +51,10 @@ require([
     event.preventDefault(); }
   }, false);
 
-  // Add ScrollFix
-  var scrollingContent = document.getElementById("chat-wrapper");
-  new ScrollFix(scrollingContent);
+  window.addEventListener("orientationchange", function() {
+    mobileResizer.hideAddessBar();
+    mobileResizer.resizeChatWrapperToFit();
+  });
 
   // Asynchronously load tracker
   require([

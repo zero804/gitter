@@ -87,13 +87,11 @@ require([
 
           // if the user is signed in, listen for an accept
           if (window.troupeContext.user) {
-            log("******* LISTENING FOR ACCEPT *********");
             var troupeCollection = new troupeModels.TroupeCollection();
             troupeCollection.listen();
-            // this is never fired
+
             troupeCollection.on("add", function(model) {
-              log("**** Got an ADD ****" + model.get(uri));
-              if(model.get('uri') == window.troupeContext.troupeUri) {
+              if(window.location.pathname === model.get('url')) {
                 // TODO: tell the person that they've been kicked out of the troupe
                 window.location.reload();
               }
@@ -142,12 +140,13 @@ require([
         else {
           /* This user is NOT logged in and is visiting a Troupe */
           if(window.troupeContext.accessDenied) {
-            // Listen out for acceptance
             var troupeCollection = new troupeModels.TroupeCollection();
             troupeCollection.listen();
+
+            // Listen out for acceptance
             troupeCollection.on("add", function(model) {
 
-              if(model.get('uri') == window.troupeContext.troupeUri) {
+              if(model.get('url') === window.location.pathname) {
                 // TODO: tell the person that they've been kicked out of the troupe
                 window.location.reload();
               }

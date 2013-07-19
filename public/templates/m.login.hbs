@@ -9,6 +9,7 @@
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta charset="utf-8">
+  <meta name="apple-itunes-app" content="app-id=632039322"/>
 
   <title>Troupe Login</title>
 
@@ -59,9 +60,20 @@
        <a href="#" class="mtrpLoginBack trpButtonBig trpBtnGreen" id="button-back">Back</a>
     </div>
 
-   <div class="mtrpLoginFailure" id="panel-failure">
-     Login failed.
+   <div class="mtrpLoginFailure" id="login-failure">
+      <span class="trpModalTitle"><span class="trpWhite">Login failed.</span></span>
+      <a href="#" class="trpWhite trpModalFailureText button-request-new-password">Forgot password?</a>
    </div>
+
+   <div class="mtrpLoginFailure" id="resetpwd-failure">
+      <span class="trpModalTitle"><span class="trpWhite">Can't reset password.</span></span>
+      <span class="trpModalBody">Was that the right email address?</span>
+   </div>
+
+  <div class="mtrpLoginFailure" id="resetpwd-confirm">
+    <div class="trpModalTitle"></div>
+    <div class="trpModalBody">We've just sent you an email.</div>
+  </div>
 
   </div>
 </div class="mtrpLoginOuterContainer">
