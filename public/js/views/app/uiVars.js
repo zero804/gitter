@@ -7,7 +7,8 @@ define([], function() {
 		menuSlideValue: '320px',
 		hidePanelValue: '-280px',
 		shiftedPanelValue: '-200px',
-		shiftedMarginValue: '200px'
+		shiftedMarginValue: '200px',
+    isMobile: navigator.userAgent.match(/mobile/i) ? true : false
 	};
 }
 );

@@ -1,0 +1,118 @@
+<h1>Push Devices</h1>
+
+<form class="form-search" id="search-form">
+  <input type="text" name="q" class="input-medium search-query">
+  <button type="submit" class="btn">Search</button>
+</form>
+
+<br>
+
+<div id="devices"></div>
+
+
+<!-- Modal -->
+<form id="send-message-form">
+<input id="deviceId" name="deviceId" type="hidden">
+
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Modal header</h3>
+  </div>
+  <div class="modal-body">
+    <fieldset>
+        <label>Message</label>
+        <input name="message" type="text" placeholder="Type something…">
+
+        <label>Link</label>
+        <input name="link" type="text" placeholder="Type something…">
+
+      </fieldset>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <input type="submit" class="btn btn-primary" value="Send"/>
+  </div>
+</div>
+</form>
+
+<script type="text/javascript">
+  function sendMessage(deviceId) {
+    $('#deviceId').val(deviceId);
+    $('#myModal').modal('show');
+  }
+
+  $(document).ready( function() {
+
+      var usersTable = $('#devices').WATable({}).data('WATable');
+      $('#devices').on('rowClicked', function() { alert('Clicked') } )
+      $('#send-message-form').on('submit', function(e) {
+        e.preventDefault();
+
+        var submitData = $(this).serialize();
+        console.log(submitData);
+
+        $.post('/api/v1/sendmessage', submitData, function(data) {
+          $('#myModal').modal('hide');
+        });
+
+      });
+
+      $('#search-form').on('submit', function(e) {
+        e.preventDefault();
+
+        $.get('/api/v1/pushdevices', $(this).serialize(), function(data) {
+            var tableData ={
+                cols: {
+                  userId: {
+                      type: "string",
+                      friendly: "UserID"
+                  },
+                  displayName: {
+                      type: "string",
+                      friendly: "User Name"
+                  },
+                  timestamp: {
+                      type: "date",
+                      friendly: "Registered"
+                  },
+                  deviceId: {
+                    type: "string",
+                    friendly: "Device ID",
+                    format: '<a href="javascript:sendMessage(\'{0}\')">{0}</a>',
+                  },
+                  appBuild: {
+                    type: "string",
+                    friendly: "App Build"
+                  },
+                  appVersion: {
+                    type: "string",
+                    friendly: "App Version"
+                  },
+                  deviceName: {
+                    type: "string",
+                    friendly: "Device Name"
+                  },
+                  deviceType: {
+                    type: "string",
+                    friendly: "Device Type"
+                  },
+                },
+                rows: data,
+            };
+
+            usersTable.setData(tableData);  //Sets the data.
+        });
+
+
+      function mapUserRows(row) {
+          return {
+              id: row.id,
+              name: row.displayName,
+              location: row.location && row.location.description
+          };
+      }
+    });
+
+  });
+</script>

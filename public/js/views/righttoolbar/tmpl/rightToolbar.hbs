@@ -7,9 +7,8 @@
       <div class="trpToolbarHeader" id="file-header">Files</div>
       <div id="fineUploader"></div>
       <div class="trpToolbarList" id="file-list"></div>
-      {{#unless troupeContextData.troupe.oneToOne}}
+      {{#unless isOneToOne}}
       <div class="trpToolbarHeader" id="mail-header">Mails</div>
-      {{/unless}}
       <div class="trpToolbarList" id="mail-list">
         <div class="trpMailItem">
           <div class="trpMailItemPicture" style="background-image: url('/images/2/icon-new-mail-black.png')"></div>
@@ -18,6 +17,7 @@
         <div class="frame-conversations">
         </div>
       </div>
+      {{/unless}}
     </div>
   </div>
 </div>

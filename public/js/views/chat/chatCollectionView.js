@@ -122,7 +122,7 @@ define([
     },
 
     detectReturn: function(e) {
-      if(e.keyCode === 13 && !e.ctrlKey) {
+      if(e.keyCode === 13 && (!e.ctrlKey && !e.shiftKey)) {
         // found submit
         this.saveChat();
         e.stopPropagation();
@@ -271,6 +271,7 @@ define([
     chatMessageLimit: PAGE_SIZE,
 
     initialize: function(options) {
+      this.hasLoaded = false;
       _.bindAll(this, 'chatWindowScroll');
       this.initializeSorting();
 
@@ -292,21 +293,19 @@ define([
       }
 
       var self = this;
-      var eventEnabled = false;
       // wait for the first reset (preloading) before enabling infinite scroll
       // and scroll to bottom once the first rendering is complete
       if (this.collection.length === 0) {
         this.collection.once('sync reset', function() {
-          if(eventEnabled) return;
-          eventEnabled = true;
+          if(self.hasLoaded) return;
+          self.hasLoaded = true;
 
           ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
           self.scrollDelegate.scrollToBottom();
         });
       } else {
-        // log("Enabling infinite scroll");
-        if(eventEnabled) return;
-        eventEnabled = true;
+        if(self.hasLoaded) return;
+        self.hasLoaded = true;
 
         ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
         self.scrollDelegate.scrollToBottom();
@@ -321,29 +320,34 @@ define([
       ChatCollectionView.$scrollOf.off('scroll', this.chatWindowScroll);
     },
 
+    // onRender runs after the collection view has been rendered
     onRender: function() {
+      if (this.hasLoaded) this.hasRendered = true; // the render only counts if the collection has received a reset / sync event (ie it has been populated before trying to render)
+
       // this is also done in initialize on collection sync event
 
       // log("scrollOf scroll: " + this.$scrollOf.scrollTop() + " container height: " + this.$container.height());
       // this is an ugly hack to deal with some weird timing issues
       var self = this;
-      setTimeout(function() {
-        // note: on mobile safari this only work when typing in the url, not when pressing refresh, it works well in the mobile app.
-        // log("Initial scroll to bottom on page load");
-        self.scrollDelegate.scrollToBottom();
-      }, 500);
+      if (this.collection.length > 0) {
+        setTimeout(function() {
+          // note: on mobile safari this only work when typing in the url, not when pressing refresh, it works well in the mobile app.
+          log("onRender + 500ms: Initial scroll to bottom on page load");
+          self.scrollDelegate.scrollToBottom();
+        }, 500);
+      }
     },
 
     onAfterItemAdded: function(item) {
       // log("After an item was added");
-      // this must only be called for when new messages are received (at the bottom), not while loading the collection
-      if (!this.collection.isLoading()) {
+      // this must only be called for when new messages are received (at the bottom), not while loading the collection (for new messages at the top)
+      if (this.hasRendered && !this.loadingOlder) {
         this.scrollDelegate.onAfterItemAdded(item);
       }
     },
 
     onBeforeItemAdded: function() {
-      if (!this.collection.isLoading()) {
+      if (this.hasRendered && !this.loadingOlder) {
         this.scrollDelegate.onBeforeItemAdded();
       }
     },
@@ -356,7 +360,8 @@ define([
     },
 
     loadNextMessages: function() {
-      if(this.collection.isLoading()) return;
+      if(this.loadingOlder || this.collection.isLoading()) return;
+      this.loadingOlder = true;
 
       // log("Loading next message chunk.");
       this.infiniteScrollDelegate.beforeLoadNextMessages();
@@ -366,10 +371,12 @@ define([
         if(!resp.length) {
           // turn off infinite scroll if there were no new messages retrieved
           $(ChatCollectionView.$scrollOf).off('scroll', self.chatWindowScroll);
+          self.loadingOlder = false;
         }
       }
 
       this.collection.once('sync reset', function() {
+        self.loadingOlder = false;
         self.infiniteScrollDelegate.afterLoadNextMessages();
       });
 

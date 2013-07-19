@@ -1,3 +1,9 @@
+.embed {
+  border: 0px;
+  width: 100%;
+  margin-top: 5px;
+}
+
 .trpChatContainer {
 	padding-bottom: 75px;
 }
@@ -167,15 +173,14 @@
 	margin: 0;
 	padding: 0;
   word-wrap: break-word;
-  max-width: 370px;
+  max-width: 380px;
 }
 
 .frame-chat {
   position: relative; // required for scroll calculations
 }
 
-@media screen and (device-width: 360px), (device-width: 720px), (device-width:320px) and (orientation: portrait) {
-
+@media screen and (device-width: 360px), (device-width: 720px), (device-width:320px) {
 
   .trpChatBox {
     padding: 6px 8px;
@@ -215,6 +220,24 @@
 
 }
 
+@media screen and (device-width: 360px), (device-width: 720px), (device-width:320px) and (orientation: landscape) {
+
+  .trpChatBox {
+    max-width: 500px;
+  }
+  .trpChatText {
+    max-width: 480px;
+
+  }
+
+  .trpChatInputBoxTextArea {
+    width: 450px;
+  }
+
+    .trpChatInputBox {
+    margin-left: 4px;
+    width: 450px;
+  }
 
 
-
+}

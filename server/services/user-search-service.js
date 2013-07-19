@@ -16,19 +16,13 @@ function createRegExpsForQuery(queryText) {
   }));
 }
 
-function searchForRegularExpressionsWithinUserIds(userIds, res, options) {
+function executeSearch(q, options) {
   var limit = options.limit || 20;
   var skip = options.skip || 0;
 
   if(limit > 100) {
     limit = 100;
   }
-
-  var q = persistence.User.where('_id')['in'](userIds);
-
-  res.forEach(function(r) {
-    q.find({ displayName: r });
-  });
 
   return q.limit(limit)
     .skip(skip)
@@ -44,6 +38,27 @@ function searchForRegularExpressionsWithinUserIds(userIds, res, options) {
     });
 }
 
+function searchForRegularExpressionsWithinUserIds(userIds, res, options) {
+  var q = persistence.User.where('_id')['in'](userIds);
+
+  res.forEach(function(r) {
+    q.find({ displayName: r });
+  });
+
+  return executeSearch(q, options);
+}
+
+
+function searchForRegularExpressionsForAllUsers(res, options) {
+  var q;
+
+  res.forEach(function(r) {
+    q = (q ? q : persistence.User).where('displayName', r);
+  });
+
+  return executeSearch(q, options);
+}
+
 function difference(ids, excludeIds) {
   if(!excludeIds || !excludeIds.length) return ids;
   var o = {};
@@ -52,6 +67,15 @@ function difference(ids, excludeIds) {
   });
   return ids.filter(function(i) { return !o[i]; });
 }
+
+exports.globalUserSearch = function(queryText, options, callback) {
+  return createRegExpsForQuery(queryText)
+    .then(function(res) {
+      if(!res.length) return [];
+      return searchForRegularExpressionsForAllUsers(res, options);
+    })
+    .nodeify(callback);
+};
 
 exports.searchForUsers = function(userId, queryText, options, callback) {
   return createRegExpsForQuery(queryText)
@@ -89,8 +113,6 @@ exports.searchForUsers = function(userId, queryText, options, callback) {
         });
     })
     .nodeify(callback);
-
-
 };
 
 /**

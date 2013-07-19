@@ -26,7 +26,6 @@ require([
       var self = this;
       this.collection = new conversationModels.ConversationCollection();
       this.collection.listen();
-      self.collection.fetch();
     },
 
     defaultAction: function(){

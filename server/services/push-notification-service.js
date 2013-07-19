@@ -95,9 +95,15 @@ exports.findUsersWithDevices = function(userIds, callback) {
 
 exports.findDevicesForUsers = function(userIds, callback) {
   userIds = _.uniq(userIds);
-  PushNotificationDevice
+  return PushNotificationDevice
     .where('userId')['in'](userIds)
-    .exec(callback);
+    .execQ(callback);
+};
+
+exports.findDeviceForDeviceId = function(deviceId, callback) {
+  return PushNotificationDevice
+    .findOneQ({ deviceId: deviceId })
+    .nodeify(callback);
 };
 
 exports.findUsersTroupesAcceptingNotifications = function(userTroupes, callback) {

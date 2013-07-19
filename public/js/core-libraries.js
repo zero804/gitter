@@ -5,7 +5,6 @@ define([
   'backbone',
   'handlebars',
   'hbs',
-  'bootstrap_tooltip',
   'marionette',
   'utils/log',
   'backbone.wreqr',
