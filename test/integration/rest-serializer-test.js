@@ -13,12 +13,14 @@ var fixtureLoader = require('./test-fixtures');
 var fixture = {};
 
 describe('restSerializer', function() {
-  describe('#UserIdStrategy()', function() {
+  describe('#UserStrategy()', function() {
+
+    var userStrategy = new restSerializer.UserStrategy();
+
     it('should serialize a user ', function(done) {
 
-      var strategy = new restSerializer.UserStrategy();
       var users = [fixture.user1];
-      restSerializer.serialize(users, strategy, function(err, serialized) {
+      restSerializer.serialize(users, userStrategy, function(err, serialized) {
         if(err) return done(err);
         assert(serialized);
         done();
@@ -26,9 +28,6 @@ describe('restSerializer', function() {
 
     });
 
-  });
-
-  describe('#UserStrategy()', function() {
     it('should return the correct display name', function() {
 
       var user = {
@@ -38,8 +37,7 @@ describe('restSerializer', function() {
         getHomeUrl: function(){}
       };
 
-      var strategy = new restSerializer.UserStrategy();
-      var mappedUser = strategy.map(user);
+      var mappedUser = userStrategy.map(user);
 
       assert.equal(mappedUser.displayName, 'Test Testerson');
     });
@@ -53,8 +51,7 @@ describe('restSerializer', function() {
         getHomeUrl: function(){}
       };
 
-      var strategy = new restSerializer.UserStrategy();
-      var mappedUser = strategy.map(user);
+      var mappedUser = userStrategy.map(user);
 
       assert.equal(mappedUser.displayName, 't.testerson');
     });
@@ -68,8 +65,7 @@ describe('restSerializer', function() {
         getHomeUrl: function(){}
       };
 
-      var strategy = new restSerializer.UserStrategy();
-      var mappedUser = strategy.map(user);
+      var mappedUser = userStrategy.map(user);
 
       assert.equal(mappedUser.displayName, 'whatisthisdotcom');
     });
