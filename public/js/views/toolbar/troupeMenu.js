@@ -116,11 +116,15 @@ define([
     },
 
     showTab: function(selected) {
+      // make sure focus is on the search box (even if the tab was already open)
       if (this.selectedListIcon == 'icon-search') {
         this.activateSearchList();
       }
 
+      // just in case the on mouse over event wasn't run
       this.onMouseEnterToolbarItem({ target: this.$el.find('#' + selected) });
+
+      // if the tab was already open do nothing
       if(selected === this.selectedListIcon) return;
 
       // Turn off the old selected list
@@ -143,6 +147,10 @@ define([
 
       // TODO: Related to the above TODO, we probably only want to populate the list now
 
+      // make sure focus is on the search box (must be done now as well, after the elements are actually displayed)
+      if (this.selectedListIcon == 'icon-search') {
+        this.activateSearchList();
+      }
 
       this.$el.find('.nano').nanoScroller({ preventPageScrolling: true });
 
