@@ -99,11 +99,10 @@ function UserStrategy(options) {
     } else {
       location = undefined;
     }
-
     return {
       id: user.id,
       username: user.username,
-      displayName: user.displayName,
+      displayName: user.displayName || user.email.replace(/@.*/, ""),
       url: user.getHomeUrl(),
       email: options.includeEmail ? user.email : undefined,
       avatarUrlSmall: getAvatarUrl('s'),
@@ -652,11 +651,7 @@ function TroupeStrategy(options) {
 
   var stack;
   if(!options.currentUserId) {
-    try {
-      throw new Error();
-    } catch(e) {
-      stack = e.stack;
-    }
+    stack = new Error().stack;
   }
 
   var currentUserId = options.currentUserId;
