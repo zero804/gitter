@@ -301,11 +301,19 @@ define([
       // return in a modal is open
       if ( $("body").hasClass('modal-open') ) return true;
 
+      // unless the left menu is open,
       if (!this.leftmenu) {
+        // put focus on the chat input box
         $("#chat-input-textarea").focus();
+        // the first key press will propogate to the input box
         return true;
-      } else {
+      }
+      // if the left menu is open,
+      else {
+        // show and focus the search box
         $(window).trigger('showSearch');
+        // the first key press should be propogated if the box is displayed before focussed
+        return true;
       }
 
       // t shows Troupe menu
@@ -317,16 +325,6 @@ define([
       if(e.keyCode == 27) {
         window.location.href = '#';
       }
-
-      if (!this.leftmenu) {
-        $("#chat-input-textarea").focus();
-        return true;
-    }
-
-      // t shows Troupe menu
-      // if(e.keyCode == 84) {
-      //   this.toggleMenu();
-      // }
 
       // esc returns to the mail view
     },
