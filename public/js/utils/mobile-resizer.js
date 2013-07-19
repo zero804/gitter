@@ -13,14 +13,13 @@ define([], function() {
   };
 
   var shrinkChatWrapperToFit = function() {
-    var inputSize = document.getElementById('chat-input').clientHeight;
-    var newHeight = window.innerHeight - inputSize;
     var chatWrapper = document.getElementById('chat-wrapper');
-    chatWrapper.style.height = newHeight + 'px';
+    var everythingButWrapperSize = document.height - chatWrapper.clientHeight;
+    var spaceForWrapper = window.innerHeight - everythingButWrapperSize;
+    chatWrapper.style.height = spaceForWrapper + 'px';
   };
 
   var resizeChatWrapperToFit = function() {
-    resetChatWrapperSize();
     if(isPageTooBig()) {
       shrinkChatWrapperToFit();
     }
@@ -31,8 +30,15 @@ define([], function() {
     chatWrapper.style.height = '100%';
   };
 
+  var reset = function() {
+    resetChatWrapperSize();
+    hideAddessBar();
+    resizeChatWrapperToFit();
+  };
+
   return {
     'hideAddessBar': hideAddessBar,
-    'resizeChatWrapperToFit': resizeChatWrapperToFit
+    'resizeChatWrapperToFit': resizeChatWrapperToFit,
+    'reset': reset
   };
 });
