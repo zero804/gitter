@@ -13,7 +13,6 @@ var isPhone = require('../web/is-phone');
 module.exports = {
 
     install: function(app) {
-      var self = this;
       app.get(nconf.get('web:homeurl'),
         middleware.grantAccessForRememberMeTokenMiddleware,
         function(req, res, next) {
@@ -39,7 +38,7 @@ module.exports = {
         function(req, res, next) {
           var email = req.body.email;
 
-          email = email ? email.trim() : '';
+          email = email ? email.trim().toLowerCase() : '';
 
           if(!email) {
             return next('Email address is required');
