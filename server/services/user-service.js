@@ -30,7 +30,7 @@ var userService = {
 
     var user = new persistence.User({
       displayName:      options.displayName,
-      email:            options.email,
+      email:            options.email.toLowerCase(),
       confirmationCode: uuid.v4(),
       gravatarImageUrl: generateGravatarUrl(options.email),
       status:           options.status || "UNCONFIRMED"
@@ -42,7 +42,7 @@ var userService = {
   findOrCreateUserForEmail: function(options, callback) {
     winston.info("Locating or creating user", options);
 
-    var email = options.email;
+    var email = options.email.toLowerCase();
 
     return persistence.User.findOneQ({email: email})
       .then(function(user) {
