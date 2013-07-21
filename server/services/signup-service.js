@@ -35,6 +35,8 @@ var signupService = module.exports = {
   newSignupFromLandingPage: function(options, callback) {
     if(!options.email) return callback('Email address is required');
 
+    options.email = options.email.trim().toLowerCase();
+
     winston.info("New signup ", options);
 
     // We shouldn't have duplicate users in the system, so we should:
