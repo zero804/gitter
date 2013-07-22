@@ -118,12 +118,19 @@ describe("User Service", function() {
       var statsServiceMock = mockito.spy(testRequire('./services/stats-service'));
       var userService = testRequire("./services/user-service");
 
+      var count = 0;
       var username = 'testuser1';
-      userService.findByLogin(username, function(err, user) {
+      userService.findByLogin(username, assertions);
+      userService.findByLogin(username.toUpperCase(), assertions);
+
+
+      function assertions(err, user) {
         assert(user, "A user should have been found");
         assert(user.username === username,  "Incorrect user found");
-        done();
-      });
+        count += 1;
+        if (count == 2)
+          done();
+      }
 
     });
 
