@@ -333,7 +333,7 @@ var userService = {
     function updatePassword(user) {
       switch(user.status) {
         case 'PROFILE_NOT_COMPLETED':
-          return hashAndUpdatePassword(password);
+          return hashAndUpdatePassword();
 
         case 'ACTIVE':
           return testExistingPassword()
@@ -345,7 +345,7 @@ var userService = {
 
 
       // generates and sets the new password hash
-      function hashAndUpdatePassword(password) {
+      function hashAndUpdatePassword() {
         return Q.nfcall(sechash.strongHash, 'sha512', password)
           .then(function(hash3) {
             user.passwordHash = hash3;
