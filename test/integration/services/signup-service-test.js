@@ -40,7 +40,7 @@ describe('signup-service', function() {
       });
 
       signupService.newSignupFromLandingPage({
-        email: nonExistingEmail
+        email: nonExistingEmail.toUpperCase()
       }, function(err, user) {
         if(err) return done(err);
 
@@ -129,7 +129,7 @@ describe('signup-service', function() {
         var email = fixture.user1.email;
         var displayName = fixture.user1.displayName;
 
-        return signupService.signupWithAccessRequestToUri(uri, email, displayName)
+        return signupService.signupWithAccessRequestToUri(uri, email.toUpperCase(), displayName)
           .then(function() {
             assert(false, 'Expected an exception');
           })
