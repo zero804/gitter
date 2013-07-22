@@ -25,7 +25,7 @@ exports.findClientById = function(id, callback) {
 exports.saveAuthorizationCode = function(code, client, redirectUri, user, callback) {
 
   var properties = {};
-  properties['Last login from ' + client.tag] = (new Date()).toISOString();
+  properties['Last login from ' + client.tag] = new Date();
   statsService.userUpdate(user, properties);
 
   var authCode = new persistenceService.OAuthCode({
@@ -86,7 +86,7 @@ exports.validateToken = function(token, callback) {
       persistenceService.User.findOne({_id: accessToken.userId}, function(err, user) {
         if (err || !client) return;
         var properties = {};
-        properties['Last login from ' + client.tag] = (new Date()).toISOString();
+        properties['Last login from ' + client.tag] = new Date();
         statsService.userUpdate(user, properties);
       });
     });
