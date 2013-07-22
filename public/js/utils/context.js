@@ -42,7 +42,7 @@ define([
   };
 
   context.getTroupe = function() {
-    return context().troupe;
+    return context().troupe || {};
   };
 
   return context;
