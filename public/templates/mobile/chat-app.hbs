@@ -33,6 +33,12 @@
     </div>
   </div>
 
+  <div id="troupeListPanel" style="width: 200px; position: absolute; margin-left: -200px;" class="sideMenu">
+    <ul id="troupeList" class="trpTroupeList">
+      <li>i am a troupe!</li>
+    </ul>
+  </div>
+<div id="mainPage" style="height: 100%;">
   {{#if isWebApp}}
   <header id="nav-bar">
     <a href="#"style="
@@ -40,7 +46,7 @@
     left: 0;
     top: 0;
     padding: 7px 5px;
-"><img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle"></a>
+" onclick="window.list();"><img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle"></a>
     <span class="title">{{troupeName}}</span>
   </header>
   {{/if}}
@@ -56,5 +62,30 @@
 
   <div class="trpChatInputArea" id="chat-input">
   </div>
+  </div>
+  <script type="text/javascript">
+  var isTroupeListShowing = false;
+  window.list = function() {
+  var mainpage = document.getElementById('mainPage');
+  var troupeList = document.getElementById('troupeListPanel');
+    if(!isTroupeListShowing) {
+      $.get('/troupes', function(data) {
+        var $list = $('#troupeList');
+        $list.empty();
+        data.forEach(function (troupe) {
+          $list.append('<li><a href="'+troupe.url+'">'+troupe.name+'</a></li>');
+        });
+      }, 'json');
+      mainpage.style.marginLeft = "200px";
+      troupeList.style.marginLeft = "0px";
+      isTroupeListShowing = true;
+    } else {
+      mainpage.style.marginLeft = "0px";
+      troupeList.style.marginLeft = "-200px";
+      isTroupeListShowing = false;
+    }
+
+  }
+  </script>
 </body>
 </html>
