@@ -40,6 +40,26 @@ require([
   mobileResizer.hideAddessBar();
   mobileResizer.resizeChatWrapperToFit();
 
+  var isTroupeListShowing = false;
+  window.list = function() {
+    document.getElementById('mainPage').style.width = window.innerWidth+"px";
+    var pageContainer = document.getElementById('pageContainer');
+    if(!isTroupeListShowing) {
+      $.get('/troupes', function(data) {
+        var $list = $('#troupeList');
+        $list.empty();
+        data.forEach(function (troupe) {
+          $list.append('<li><a href="'+troupe.url+'">'+troupe.name+'</a></li>');
+        });
+      }, 'json');
+      $(pageContainer).addClass("partiallyOffScreen");
+      isTroupeListShowing = true;
+    } else {
+      $(pageContainer).removeClass("partiallyOffScreen");
+      isTroupeListShowing = false;
+    }
+  };
+
   $('.trpMobileAmuseIcon').click(function() {
     document.location.reload(true);
   });
