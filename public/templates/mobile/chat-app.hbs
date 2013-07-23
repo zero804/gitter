@@ -36,8 +36,8 @@
   <div id="troupeListPanel" style="width: 200px; position: absolute; margin-left: -200px; top: 0;" class="sideMenu">
     <ul id="troupeList" class="trpTroupeList"></ul>
   </div>
-  <div id="pageContainer" style="height: 100%; overflow-x: hidden;">
-<div id="mainPage" style="height: 100%;">
+  <div id="pageContainer" style="height: 100%; overflow-x: hidden; box-shadow: 0 0 15px black; position: relative; z-index: 1;">
+<div id="mainPage" style="height: 100%; background-color: #ecf1ec;">
   {{#if isWebApp}}
   <header id="nav-bar">
     <a href="#"style="
@@ -59,7 +59,7 @@
     </div>
   </div>
 
-  <div class="trpChatInputArea" id="chat-input" style="display:none;">
+  <div class="trpChatInputArea" id="chat-input">
   </div>
   </div>
 </div>
