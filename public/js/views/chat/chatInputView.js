@@ -119,13 +119,13 @@ define([
     },
 
     detectNewLine: function(e) {
-      if (e.keyCode ==13 && e.ctrlKey) {
+      if (e.keyCode ==13 && (e.ctrlKey || e.shiftKey)) {
         if (window._troupeCompactView !== true) this.resizeInput();
       }
     },
 
     detectReturn: function(e) {
-      if(e.keyCode == 13 && !e.ctrlKey) {
+      if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey)) {
         if (window._troupeCompactView !== true) this.resetInput();
         e.stopPropagation();
         e.preventDefault();

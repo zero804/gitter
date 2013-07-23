@@ -5,12 +5,31 @@
 @import "trp3Chat.less";
 @import "trp3MobileCommon.less";
 
+html {
+	height: 100%;
+}
+
 body {
-	margin-left: 0px;
-	margin-top: 20px;
+	height: 100%;
+	margin: 0px;
 	background-color: #ecf1ec;
   -webkit-user-select: none;
   -moz-user-select: none;
+}
+
+header {
+	background-color: @trpGreen;
+	line-height: 50px;
+	text-align: center;
+	height: 50px;
+}
+
+.title {
+	display: inline-block;
+	vertical-align: middle;
+	line-height: normal;
+	color: white;
+	.trpH2;
 }
 
 a {
@@ -22,16 +41,15 @@ a {
 /*Mobile Overrides*/
 
 .contentBody {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 60px;
+	height: 100%;
 	width: 100%;
 	overflow: scroll;
 	-webkit-overflow-scrolling: touch;
 }
 
+.trpChatInputArea {
+	position: relative;
+}
 
 .avatar-s {
 	position: relative;

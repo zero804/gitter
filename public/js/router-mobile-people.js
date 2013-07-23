@@ -26,7 +26,6 @@ require([
       var self = this;
       var userCollection = this.collection = new userModels.UserCollection();
       userCollection.listen();
-      self.collection.fetch();
 
       // update online status of user models
       $(document).on('userLoggedIntoTroupe', updateUserStatus);

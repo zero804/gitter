@@ -122,7 +122,7 @@ define([
     },
 
     detectReturn: function(e) {
-      if(e.keyCode === 13 && !e.ctrlKey) {
+      if(e.keyCode === 13 && (!e.ctrlKey && !e.shiftKey)) {
         // found submit
         this.saveChat();
         e.stopPropagation();

@@ -5,6 +5,7 @@
 var testRequire = require('./../test-require');
 var fixtureLoader = require('../test-fixtures');
 
+var sec = require('sechash');
 var userService = testRequire('./services/user-service');
 var signupService = testRequire('./services/signup-service');
 var assert = testRequire("assert");
@@ -24,40 +25,49 @@ describe("User Service", function() {
 
   before(fixtureLoader(fixture));
 
-  var userId = null;
-
   describe("#updateProfile", function() {
     it("should update the name, email, password and status of a user", function(done) {
 
-      var userParams = {
-        email: "user-service@troupetest.local",
-        displayName: "Tester",
-        status: "ACTIVE"
-      };
+      var user1 = fixture.user1;
+      var params = {};
+      params.userId = user1.id;
+      params.displayName = 'Tested User';
+      params.oldEmail = user1.email;
+      params.email = "hopefully-unregistered-user-service-test" + Date.now() + "@troupetest.local";
+      params.password = '654321';
+      params.oldPassword = '123456';
 
-      userService.newUser(userParams, function(e, user) {
+      var oldUserStatus = user1.status;
+
+      userService.updateProfile(params, function(e, user) {
+        assertions(e, user, function() {
+          // reset test user values, keeping this test atomic
+          params.displayName = user1.displayName;
+          params.oldEmail = params.email;
+          params.email = user1.email;
+          params.oldPassword = params.password;
+          params.password = '123456';
+
+          userService.updateProfile(params, function(e, user) {
+            assertions(e, user, done);
+          });
+
+        });
+
+      });
+
+      function assertions(e, user, callback) {
         assert.strictEqual(e, null);
         assert.notStrictEqual(user, null);
-        assert.notStrictEqual(typeof user, 'undefined');
 
-        userId = user.id; // so we can clean up
-        var oldUserStatus = user.status;
-        var params = {
-          userId: user.id,
-          // displayName: user.displayName,
-          // password: "newPass",
-          // oldPassword: "oldPass",
-          email: "hopefully-unregistered-user-service-test" + Date.now() + "@troupetest.local"
-        };
+        assert.strictEqual(user.displayName, params.displayName);
+        assert.strictEqual(user.email, params.oldEmail);
+        assert.strictEqual(user.newEmail, params.email);
+        assert.notStrictEqual(user.confirmationCode, null);
+        assert.strictEqual(user.status, oldUserStatus);
 
-        userService.updateProfile(params, function(e, user) {
-          assert.strictEqual(e, null);
-          assert.notStrictEqual(user, null);
-
-          // assert.strictEqual(user.displayName, params.displayName);
-          assert.strictEqual(user.newEmail, params.email);
-          assert.notStrictEqual(user.confirmationCode, null);
-          assert.strictEqual(user.status, oldUserStatus);
+        userService.checkPassword(user, params.password, function(matches) {
+          assert.equal(matches, true);
 
           // get the confirmation code and run the confirmation
           signupService.confirmEmailChange(user, function(e) {
@@ -66,17 +76,10 @@ describe("User Service", function() {
             // assert.strictEqual(typeof user.newEmail, 'undefined');
             assert.strictEqual(!user.newEmail, true);
 
-            // delete the user so that the test is atomic
-            user.remove(function(e) {
-              assert.strictEqual(e, null);
-
-              done();
-            });
-
+            callback();
           });
-
         });
-      });
+      }
 
     });
   });
@@ -118,12 +121,19 @@ describe("User Service", function() {
       var statsServiceMock = mockito.spy(testRequire('./services/stats-service'));
       var userService = testRequire("./services/user-service");
 
+      var count = 0;
       var username = 'testuser1';
-      userService.findByLogin(username, function(err, user) {
+      userService.findByLogin(username, assertions);
+      userService.findByLogin(username.toUpperCase(), assertions);
+
+
+      function assertions(err, user) {
         assert(user, "A user should have been found");
         assert(user.username === username,  "Incorrect user found");
-        done();
-      });
+        count += 1;
+        if (count == 2)
+          done();
+      }
 
     });
 

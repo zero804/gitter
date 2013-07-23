@@ -79,20 +79,24 @@ exports.userUpdate = function(user, properties) {
 
   if(!properties) properties = {};
 
-  var createdAt = new Date(user._id.getTimestamp().getTime());
+  var createdAt = Math.round(user._id.getTimestamp().getTime() / 1000);
   var firstName = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
 
   if (mixpanel_enabled) {
     var mp_properties = {
       $first_name:  firstName,
-      $created_at:  createdAt.toISOString(),
+      $created_at:  new Date(createdAt).toISOString(),
       $email:       user.email,
       $name:        user.displayName,
       $username:    user.username,
       Status:       user.status
     };
 
-    for (var attr in properties) { mp_properties[attr] = properties[attr]; }
+    for (var attr in properties) { 
+      var value = properties[attr] instanceof Date ? properties[attr].toISOString() : properties[attr];
+      mp_properties[attr] = value; 
+    }
+
 
     mixpanel.people.set(user.id, mp_properties);
   }
@@ -100,14 +104,17 @@ exports.userUpdate = function(user, properties) {
   if (customerio_enabled) {
     var cio_properties = {
       first_name: firstName,
-      created_at: createdAt.toISOString(),
+      created_at: createdAt,
       email:      user.email,
       name:       user.displayName,
       username:   user.username,
       status:     user.status
     };
 
-    for (var attr in properties) { cio_properties[attr] = properties[attr]; }
+    for (var attr in properties) { 
+      var value = properties[attr] instanceof Date ? Math.round(properties[attr].getTime() / 1000) : properties[attr];
+      cio_properties[attr] = value; 
+    }
 
     cio.identify(user.id, user.email, cio_properties);
   }

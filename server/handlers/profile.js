@@ -26,7 +26,7 @@ module.exports = {
             var mappedErrors = req.validationErrors(true);
 
             if (mappedErrors) {
-              res.send({ success: false, validationFailure: true, errors: mappedErrors}, 400);
+              res.send({ success: false, validationFailure: true, errors: mappedErrors});
               return;
             }
 
@@ -40,10 +40,10 @@ module.exports = {
             }, function(err) {
               if(err) {
                 if(err.authFailure) {
-                  res.send({ authFailure: true }, 400);
+                  res.send({ authFailure: true });
                   return;
                 } else if (err.emailConflict) {
-                  res.send({ success: false, emailConflict: true }, 400);
+                  res.send({ success: false, emailConflict: true });
                   return;
                 }
 

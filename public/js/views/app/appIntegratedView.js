@@ -10,6 +10,27 @@ define([
   ], function($, context, log, Marionette, UsernameView, uiVars) {
   "use strict";
 
+  var touchEvents = {
+    "click #menu-toggle-button":        "onMenuToggle",
+    "keypress":                         "onKeyPress"
+  };
+
+  var mouseEvents = {
+    "click #menu-toggle-button":        "onMenuToggle",
+    "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
+    "mouseenter #menu-toggle":          "onLeftMenuHotspot",
+    "mouseenter #content-frame":        "onMouseEnterContentFrame",
+    "mouseenter #header-wrapper":       "onMouseEnterHeader",
+    "mouseenter #left-menu":            "onMouseEnterLeftMenu",
+    "mouseenter #toolbar-frame":        "onMouseEnterToolbar",
+    "mouseleave #toolbar-frame":        "onMouseLeaveToolbar",
+    "mouseleave #header-wrapper":       "onMouseLeaveHeader",
+
+    "keypress":                         "onKeyPress"
+  };
+
+  $('.trpDisplayPicture').tooltip('destroy');
+
   return Marionette.Layout.extend({
     el: 'body',
     leftmenu: false,
@@ -25,24 +46,7 @@ define([
       headerRegion: "#header-wrapper"
     },
 
-    events: {
-      "click #menu-toggle-button":        "onMenuToggle",
-      "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
-      "mouseenter #menu-toggle":          "onLeftMenuHotspot",
-      "mouseenter #content-frame":        "onMouseEnterContentFrame",
-      "mouseenter #header-wrapper":       "onMouseEnterHeader",
-      "mouseenter #left-menu":            "onMouseEnterLeftMenu",
-      "mouseenter #toolbar-frame":        "onMouseEnterToolbar",
-      "mouseleave #toolbar-frame":        "onMouseLeaveToolbar",
-      "mouseleave #header-wrapper":       "onMouseLeaveHeader",
-
-      "mouseenter .left-menu-icon":       "onMouseEnterToolbarItem",
-      "mouseleave .left-menu-icon":       "onMouseLeaveToolbarItem",
-
-      "click .left-menu-icon":            "onLeftMenuListIconClick",
-
-      "keypress":                         "onKeyPress"
-    },
+    events: uiVars.isMobile ? touchEvents : mouseEvents,
 
     initialize: function() {
       var self = this;
@@ -285,17 +289,6 @@ define([
 
     },
 
-    onMouseEnterToolbarItem: function(e) {
-      $(e.target).fadeTo(100, 1.0);
-    },
-
-    onMouseLeaveToolbarItem: function(e) {
-      if ($(e.target).hasClass('selected')) return true;
-
-      $(e.target).fadeTo(100, 0.6);
-    },
-
-
     activateSearchList: function () {
 
       $("#list-search-input").focus();
@@ -308,11 +301,19 @@ define([
       // return in a modal is open
       if ( $("body").hasClass('modal-open') ) return true;
 
+      // unless the left menu is open,
       if (!this.leftmenu) {
+        // put focus on the chat input box
         $("#chat-input-textarea").focus();
+        // the first key press will propogate to the input box
         return true;
-      } else {
+      }
+      // if the left menu is open,
+      else {
+        // show and focus the search box
         $(window).trigger('showSearch');
+        // the first key press should be propogated if the box is displayed before focussed
+        return true;
       }
 
       // t shows Troupe menu
@@ -324,16 +325,6 @@ define([
       if(e.keyCode == 27) {
         window.location.href = '#';
       }
-
-      if (!this.leftmenu) {
-        $("#chat-input-textarea").focus();
-        return true;
-    }
-
-      // t shows Troupe menu
-      // if(e.keyCode == 84) {
-      //   this.toggleMenu();
-      // }
 
       // esc returns to the mail view
     },
