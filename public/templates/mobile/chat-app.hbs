@@ -33,24 +33,21 @@
     </div>
   </div>
 
-  <div id="troupeListPanel" style="width: 200px; position: absolute; margin-left: -200px; top: 0;" class="sideMenu">
+  <div id="troupeListPanel" class="sideMenu">
     <ul id="troupeList" class="trpTroupeList"></ul>
   </div>
-  <div id="pageContainer" style="height: 100%; overflow-x: hidden; box-shadow: 0 0 15px black; position: relative; z-index: 1;">
-<div id="mainPage" style="height: 100%; background-color: #ecf1ec;">
+  <div id="pageContainer" class="platform">
+<div id="mainPage">
   {{#if isWebApp}}
   <header id="nav-bar">
-    <a href="#"style="
-    position: absolute;
-    left: 0;
-    top: 0;
-    padding: 7px 5px;
-" onclick="window.list();"><img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle"></a>
+    <div id="showTroupesButton" onclick="window.list();">
+      <img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle">
+    </div>
     <span class="title">{{troupeName}}</span>
   </header>
   {{/if}}
 
-  <div class="contentBody mobile-scroll-class" id="chat-wrapper" style="height: 1000px;">
+  <div class="contentBody mobile-scroll-class" id="chat-wrapper">
     <div class="frame-chat">
      <div class="trpChatPanel" id="chat-frame">
         <div class="chatPanel" id="frame-chat">
@@ -67,6 +64,7 @@
   var isTroupeListShowing = false;
   var menuWidth = 200;
   window.list = function() {
+    document.getElementById('mainPage').style.width = window.innerWidth+"px";
   var pageContainer = document.getElementById('pageContainer');
   var troupeList = document.getElementById('troupeListPanel');
     if(!isTroupeListShowing) {
@@ -77,15 +75,10 @@
           $list.append('<li><a href="'+troupe.url+'">'+troupe.name+'</a></li>');
         });
       }, 'json');
-      document.getElementById('mainPage').style.width = window.innerWidth+"px";
-      pageContainer.style.marginLeft = menuWidth + "px";
-      pageContainer.style.width = (window.innerWidth - menuWidth) + "px";
-      troupeList.style.marginLeft = "0px";
+      $(pageContainer).addClass("partiallyOffScreen");
       isTroupeListShowing = true;
     } else {
-      pageContainer.style.marginLeft = "0px";
-      pageContainer.style.width = "100%";
-      troupeList.style.marginLeft = "-200px";
+      $(pageContainer).removeClass("partiallyOffScreen");
       isTroupeListShowing = false;
     }
 
