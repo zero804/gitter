@@ -62,8 +62,8 @@ define([
 
     getTitlebar: function(counts) {
       var mainTitle;
-      if (window.troupeContext.title) {
-        mainTitle = window.troupeContext.title + " - Troupe";
+      if (context.getTroupe().name) {
+        mainTitle = context.getTroupe().name + " - Troupe";
       } else
       {
         mainTitle = "Troupe";
@@ -84,7 +84,7 @@ define([
         return String.fromCharCode(0x277F + overall) + ' ' + mainTitle;
       }
 
-      return '[' + overall + '] ' + window.troupeContext.title + " - Troupe";
+      return '[' + overall + '] ' + mainTitle;
     }
 
   });
