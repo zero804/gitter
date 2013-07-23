@@ -60,29 +60,5 @@
   </div>
   </div>
 </div>
-  <script type="text/javascript">
-  var isTroupeListShowing = false;
-  var menuWidth = 200;
-  window.list = function() {
-    document.getElementById('mainPage').style.width = window.innerWidth+"px";
-  var pageContainer = document.getElementById('pageContainer');
-  var troupeList = document.getElementById('troupeListPanel');
-    if(!isTroupeListShowing) {
-      $.get('/troupes', function(data) {
-        var $list = $('#troupeList');
-        $list.empty();
-        data.forEach(function (troupe) {
-          $list.append('<li><a href="'+troupe.url+'">'+troupe.name+'</a></li>');
-        });
-      }, 'json');
-      $(pageContainer).addClass("partiallyOffScreen");
-      isTroupeListShowing = true;
-    } else {
-      $(pageContainer).removeClass("partiallyOffScreen");
-      isTroupeListShowing = false;
-    }
-
-  }
-  </script>
 </body>
 </html>
