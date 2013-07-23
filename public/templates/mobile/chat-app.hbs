@@ -33,11 +33,10 @@
     </div>
   </div>
 
-  <div id="troupeListPanel" style="width: 200px; position: absolute; margin-left: -200px;" class="sideMenu">
-    <ul id="troupeList" class="trpTroupeList">
-      <li>i am a troupe!</li>
-    </ul>
+  <div id="troupeListPanel" style="width: 200px; position: absolute; margin-left: -200px; top: 0;" class="sideMenu">
+    <ul id="troupeList" class="trpTroupeList"></ul>
   </div>
+  <div id="pageContainer" style="height: 100%; overflow-x: hidden;">
 <div id="mainPage" style="height: 100%;">
   {{#if isWebApp}}
   <header id="nav-bar">
@@ -51,7 +50,7 @@
   </header>
   {{/if}}
 
-  <div class="contentBody mobile-scroll-class" id="chat-wrapper">
+  <div class="contentBody mobile-scroll-class" id="chat-wrapper" style="height: 1000px;">
     <div class="frame-chat">
      <div class="trpChatPanel" id="chat-frame">
         <div class="chatPanel" id="frame-chat">
@@ -60,13 +59,15 @@
     </div>
   </div>
 
-  <div class="trpChatInputArea" id="chat-input">
+  <div class="trpChatInputArea" id="chat-input" style="display:none;">
   </div>
   </div>
+</div>
   <script type="text/javascript">
   var isTroupeListShowing = false;
+  var menuWidth = 200;
   window.list = function() {
-  var mainpage = document.getElementById('mainPage');
+  var pageContainer = document.getElementById('pageContainer');
   var troupeList = document.getElementById('troupeListPanel');
     if(!isTroupeListShowing) {
       $.get('/troupes', function(data) {
@@ -76,11 +77,14 @@
           $list.append('<li><a href="'+troupe.url+'">'+troupe.name+'</a></li>');
         });
       }, 'json');
-      mainpage.style.marginLeft = "200px";
+      document.getElementById('mainPage').style.width = window.innerWidth+"px";
+      pageContainer.style.marginLeft = menuWidth + "px";
+      pageContainer.style.width = (window.innerWidth - menuWidth) + "px";
       troupeList.style.marginLeft = "0px";
       isTroupeListShowing = true;
     } else {
-      mainpage.style.marginLeft = "0px";
+      pageContainer.style.marginLeft = "0px";
+      pageContainer.style.width = "100%";
       troupeList.style.marginLeft = "-200px";
       isTroupeListShowing = false;
     }
