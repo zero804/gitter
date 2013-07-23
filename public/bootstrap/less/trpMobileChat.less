@@ -29,8 +29,24 @@ header {
 	.trpH2;
 }
 
+#showTroupesButton {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 7px 5px;
+}
+
 .trpTroupeList a {
 	.trpH3;
+}
+
+.platform {
+	height: 100%;
+	overflow-x:
+	hidden;
+	box-shadow: 0 0 15px black;
+	position: relative;
+	z-index: 1;
 }
 
 a {
@@ -38,11 +54,30 @@ a {
 	color: #333;
 }
 
+#pageContainer {
+	margin-left: 0%;
+	width: 100%;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
+}
+
+#pageContainer.partiallyOffScreen {
+	margin-left: 70%;
+	width: 30%;
+
+}
+
+#mainPage {
+	height: 100%;
+	background-color: #ecf1ec;
+}
 
 /*Mobile Overrides*/
 
 .contentBody {
-	height: 120%;
+	height: 1000px;
 	width: 100%;
 	overflow: scroll;
 	-webkit-overflow-scrolling: touch;
