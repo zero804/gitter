@@ -623,7 +623,8 @@ function updateInvitesForEmailToUserId(email, userId, callback) {
 }
 
 function findAllUnusedInvitesForUserId(userId, callback) {
-  return persistence.Invite.where('userId').equals(userId)
+  // note: this finds invites for the user and from the user, unlike the ForEmail version which still only finds for the user
+  return persistence.Invite.where().or([{ 'userId': userId }, { 'fromUserId': userId }])
     .where('status').equals('UNUSED')
     .sort({ createdAt: 'asc' } )
     .execQ()
