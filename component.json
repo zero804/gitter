@@ -14,6 +14,7 @@
     "backbone.babysitter": "~0.0.5",
     "jquery.validation": "~1.11.1",
     "jquery-placeholder": "~2.0.7",
+    "hammerjs": "1.0.5",
     "nanoscroller": "~0.7.2",
     "zeroclipboard": "1.0.9",
     "scrollfix": "git://github.com/joelambert/ScrollFix.git",
