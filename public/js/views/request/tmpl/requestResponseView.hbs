@@ -1,0 +1,23 @@
+<div style="text-align:center">
+
+<div style="text-align:center">{{ widget "avatar" user=user size='s'}}</div>
+
+<div class="trpBodyMedium" style="text-align: center;">
+	<div>{{user.displayName}}</div>
+    <div>{{user.email}}</div>
+</div>
+
+<div class="trpBodyMedium" style="padding-top: 20px;padding-bottom:20px">
+{{user.displayName}} has requested access to this Troupe.
+</div>
+
+
+<div class="trpModalButton trpButtonBig trpButtonGreen button">
+<a href="#!" id="request-accept-button">Accept Request</a>
+</div>
+
+<div class="trpModalButton trpButtonBig trpButtonGreen button">
+<a href="#!" id="request-reject-button">Reject Request</a>
+</div>
+
+</div>

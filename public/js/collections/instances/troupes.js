@@ -3,13 +3,14 @@ define([
   'jquery',
   'underscore',
   'backbone',
+  'utils/context',
   'collections/base',
   'components/realtime',
   'collections/troupes',
   'collections/invites',
   'components/unread-items-client',
   'filtered-collection' /* no ref */
-], function($, _, Backbone, base, realtime, troupeModels, inviteModels, unreadItemsClient) {
+], function($, _, Backbone, context, base, realtime, troupeModels, inviteModels, unreadItemsClient) {
   "use strict";
 
   var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
@@ -72,11 +73,24 @@ define([
 
   });
 
+  function filterInviteCollection(collection, filter) {
+    var c = new Backbone.FilteredCollection(null, { model: inviteModels.InviteModel, collection: collection });
+    c.setFilter(filter);
+    return c;
+  }
 
   var inviteCollection = new inviteModels.InviteCollection(null, { listen: true });
 
+  var incomingInvites = filterInviteCollection(inviteCollection, function(m) {
+    return m.get('fromUser').id !== context.getUserId();
+  });
+
+  var outgoingInvites = filterInviteCollection(inviteCollection, function(m) {
+    return m.get('fromUser').id === context.getUserId();
+  });
+
   inviteCollection.on('change reset sync add remove', function() {
-    unreadItemsClient.setOtherCount(inviteCollection.length);
+    unreadItemsClient.setOtherCount(incomingInvites.length);
     troupeCollection.trigger('sync');
   });
 
@@ -87,7 +101,9 @@ define([
     recentTroupes: recentTroupeCollection,
     unreadTroupes: unreadTroupeCollection,
     favouriteTroupes: favouriteTroupesCollection,
-    incomingInvites: inviteCollection
+    inviteCollection: inviteCollection,
+    incomingInvites: incomingInvites,
+    outgoingInvites: outgoingInvites
   };
 
 });
