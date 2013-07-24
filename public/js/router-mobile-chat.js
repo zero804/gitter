@@ -38,13 +38,11 @@ require([
     scrollDelegate: chatCollectionView.scrollDelegate
   }).render();
 
-  mobileResizer.hideAddessBar();
-  mobileResizer.resizeChatWrapperToFit();
+  mobileResizer.reset();
 
   var isTroupeListShowing = false;
   var button = document.getElementById('showTroupesButton');
   hammer(button).on('tap', function() {
-    document.getElementById('mainPage').style.width = window.innerWidth+"px";
     var pageContainer = document.getElementById('pageContainer');
     if(!isTroupeListShowing) {
       $.get('/troupes', function(data) {
