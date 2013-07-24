@@ -17,6 +17,7 @@
 
 
 @import "nanoScroller.less";
+@import "troupe-menu/troupe-menu.less";
 
 
 @import "trpMobileOverride.less";
@@ -163,6 +164,21 @@ a:hover {
 
 .trpLeftMenuSpacer {
 	height: 100px;
+}
+
+.trpTroupeList {
+	display: inline-block;
+	list-style-type: none;
+	margin: 0 0 18px 0;
+}
+
+.trpTroupeList a {
+	display: inline-block;
+	color: white;
+	white-space: nowrap;
+	max-width: 220px;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .trpTroupeListSearch {
