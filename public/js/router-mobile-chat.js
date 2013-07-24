@@ -41,24 +41,26 @@ require([
   mobileResizer.reset();
 
   var isTroupeListShowing = false;
-  var button = document.getElementById('showTroupesButton');
-  hammer(button).on('tap', function() {
-    var pageContainer = document.getElementById('pageContainer');
-    if(!isTroupeListShowing) {
-      $.get('/troupes', function(data) {
-        var $list = $('#troupeList');
-        $list.empty();
-        data.forEach(function (troupe) {
-          $list.append('<li><a href="'+troupe.url+'">'+troupe.name+'</a></li>');
-        });
-      }, 'json');
-      $(pageContainer).addClass("partiallyOffScreen");
-      isTroupeListShowing = true;
-    } else {
-      $(pageContainer).removeClass("partiallyOffScreen");
-      isTroupeListShowing = false;
+  var showTroupesButton = document.getElementById('showTroupesButton');
+  var $pageContainer = $('#pageContainer');
+
+  hammer(showTroupesButton).on('tap', function() {
+    $pageContainer.toggleClass('partiallyOffScreen');
+    isTroupeListShowing = !isTroupeListShowing;
+    if(isTroupeListShowing) {
+      populateTroupeList();
     }
   });
+
+  var populateTroupeList = function() {
+    $.get('/troupes', function(data) {
+      var $list = $('#troupeList');
+      $list.empty();
+      data.forEach(function (troupe) {
+        $list.append('<li><a href="'+troupe.url+'">'+troupe.name+'</a></li>');
+      });
+    }, 'json');
+  };
 
   $('.trpMobileAmuseIcon').click(function() {
     document.location.reload(true);
