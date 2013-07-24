@@ -7,12 +7,13 @@ require([
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
   'views/widgets/avatar',
+  'views/toolbar/troupeMenu',
   'utils/mobile-resizer',
   'components/mobile-context',        // No ref
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
   'template/helpers/all'              // No ref
-], function($, hammer, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget, mobileResizer /*, mobileContext, eyeballsClient, unreadItemsClient */) {
+], function($, hammer, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget, TroupeMenu, mobileResizer /*, mobileContext, eyeballsClient, unreadItemsClient */) {
   "use strict";
 
   var PAGE_SIZE = 15;
@@ -40,6 +41,10 @@ require([
 
   mobileResizer.reset();
 
+  new TroupeMenu({
+    el: $('#troupeList')
+  }).render();
+
   var isTroupeListShowing = false;
   var showTroupesButton = document.getElementById('showTroupesButton');
   var $pageContainer = $('#pageContainer');
@@ -47,20 +52,7 @@ require([
   hammer(showTroupesButton).on('tap', function() {
     $pageContainer.toggleClass('partiallyOffScreen');
     isTroupeListShowing = !isTroupeListShowing;
-    if(isTroupeListShowing) {
-      populateTroupeList();
-    }
   });
-
-  var populateTroupeList = function() {
-    $.get('/troupes', function(data) {
-      var $list = $('#troupeList');
-      $list.empty();
-      data.forEach(function (troupe) {
-        $list.append('<li><a href="'+troupe.url+'">'+troupe.name+'</a></li>');
-      });
-    }, 'json');
-  };
 
   $('.trpMobileAmuseIcon').click(function() {
     document.location.reload(true);
