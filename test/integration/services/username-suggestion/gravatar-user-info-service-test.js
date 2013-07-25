@@ -6,7 +6,7 @@ var testRequire = require('../../test-require');
 
 var assert = require('assert');
 
-describe('gravatar-user-info-service', function() {
+xdescribe('gravatar-user-info-service', function() {
 	it('lookup user information', function(done) {
     var underTest = testRequire('./services/username-suggestion/gravatar-user-info-service');
 
