@@ -1,6 +1,8 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'backbone',
+  'views/base',
+  'hbs!views/login/tmpl/loginRequestModalView',
   'views/shareSearch/shareSearchView',
   'views/app/appIntegratedView',
   'views/userhome/userHomeView',
@@ -14,7 +16,7 @@ require([
   'components/dozy',
   'components/webNotifications',
   'template/helpers/all'
-], function(Backbone, shareSearchView, AppIntegratedView, UserHomeView, troupeCollections,
+], function(Backbone, TroupeViews, loginRequestTemplate, shareSearchView, AppIntegratedView, UserHomeView, troupeCollections,
   profileView, createTroupeView, UserHeaderView, TroupeMenuView, Router /*, errorReporter , dozy, webNotifications,_Helpers,  _backboneKeys*/) {
 
   "use strict";
@@ -38,6 +40,36 @@ require([
 
    return;
   }
+
+  // Show a popup to confirm access requests through signup.
+  try {
+    if (window.localStorage && window.localStorage.pendingRequestConfirmation) {
+      var data = window.localStorage.pendingRequestConfirmation;
+      //alert("Your access request has been sent. We will notify you once it is accepted.");
+      var RequestSuccessView = TroupeViews.Base.extend({
+        template: loginRequestTemplate,
+        getRenderData: function() {
+          return data;
+        },
+        afterRender: function() {
+          this.$el.find('.modal-content').hide();
+          this.$el.find('.modal-success').show();
+        },
+        events: {
+          'click #cancel-button': function(e) {
+            this.remove();
+            if (this.dialog) this.dialog.hide();
+            e.preventDefault();
+          }
+        }
+      });
+      delete window.localStorage.pendingRequestConfirmation;
+      (new TroupeViews.Modal({
+        view: new RequestSuccessView()
+      })).show();
+    }
+  }
+  catch (e) {}
 
   new Router({
       routes: [
