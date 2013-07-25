@@ -1,3 +1,6 @@
+define([], function (){
+var exports = {};
+
 (function() {
 
   var root = (typeof exports == 'undefined' ? window : exports);
@@ -116,8 +119,8 @@
       if (! that.el.complete) {
         setTimeout(load, 5);
       } else {
-        that.el.setAttribute('width', that.el.offsetWidth);
-        that.el.setAttribute('height', that.el.offsetHeight);
+        that.el.setAttribute('width', that.el.width || that.el.offsetWidth);
+        that.el.setAttribute('height', that.el.height || that.el.offsetHeight);
         that.el.setAttribute('src', path);
       }
     }
@@ -133,3 +136,5 @@
 
 })();
 
+return exports.Retina;
+});

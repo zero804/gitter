@@ -2,6 +2,7 @@
 require([
   'jquery',
   'hammer',
+  'retina',
   'views/base',
   'collections/chat',
   'views/chat/chatInputView',
@@ -13,7 +14,7 @@ require([
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
   'template/helpers/all'              // No ref
-], function($, hammer, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget, TroupeMenu, mobileResizer /*, mobileContext, eyeballsClient, unreadItemsClient */) {
+], function($, hammer, retina, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget, TroupeMenu, mobileResizer /*, mobileContext, eyeballsClient, unreadItemsClient */) {
   "use strict";
 
   var PAGE_SIZE = 15;
@@ -53,6 +54,10 @@ require([
     $pageContainer.toggleClass('partiallyOffScreen');
     isTroupeListShowing = !isTroupeListShowing;
   });
+
+  var fakeWindow = {};
+  retina.init(fakeWindow);
+  fakeWindow.onload();
 
   $('.trpMobileAmuseIcon').click(function() {
     document.location.reload(true);
