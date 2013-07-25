@@ -7,7 +7,7 @@ var testRequire = require('../../test-require');
 var assert = require('assert');
 var underTest = testRequire('./services/username-suggestion/username-suggestion-service');
 
-describe('username-suggestion-service', function() {
+xdescribe('username-suggestion-service', function() {
   it('should suggest usernames for Andrews email address', function(done) {
 
     underTest.suggestUsernamesForEmail('andrewn@datatribe.net')
