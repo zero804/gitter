@@ -624,7 +624,7 @@ function InviteStrategy(options) {
 
     return {
       id: item._id,
-      oneToOneInvite: !!fromUser,
+      oneToOneInvite: troupe ? false : true,
       fromUser: fromUser,
       acceptUrl: troupe ? '/' + troupe.uri : fromUser.url,
       name: troupe ? troupe.name : fromUser.displayName,
