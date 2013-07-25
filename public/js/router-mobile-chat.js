@@ -50,9 +50,29 @@ require([
   var showTroupesButton = document.getElementById('showTroupesButton');
   var $pageContainer = $('#pageContainer');
 
-  hammer(showTroupesButton).on('tap', function() {
+  hammer(showTroupesButton).on('tap', function(event) {
     $pageContainer.toggleClass('partiallyOffScreen');
     isTroupeListShowing = !isTroupeListShowing;
+    event.stopPropagation();
+    if(isTroupeListShowing) {
+      hammer($pageContainer[0]).on('tap', onPageTap);
+    } else {
+      hammer($pageContainer[0]).off('tap', onPageTap);
+    }
+  });
+
+  var onPageTap = function(event) {
+    showPage();
+    event.stopPropagation();
+  };
+
+  var showPage = function() {
+    isTroupeListShowing = false;
+    $pageContainer.removeClass('partiallyOffScreen');
+  };
+
+  hammer($pageContainer[0]).on('tap', function() {
+    $('html, body').scrollTop($(document).height());
   });
 
   var fakeWindow = {};
