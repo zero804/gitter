@@ -86,6 +86,15 @@ define([
         },
         type: "POST",
         success: function(data) {
+          // store the details of this invite in local storage to show success after confirmation
+          try {
+            if (window.localStorage) {
+              var rd = _.extend(that.getRenderData(), { time: Date.now() });
+              window.localStorage.pendingConnectConfirmation = JSON.stringify(rd);
+            }
+          }
+          catch(e) {}
+
           // data = { email, success, userStatus, username }
           if (data.redirectTo) {
             window.location.href = "/" + data.redirectTo;
