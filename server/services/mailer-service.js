@@ -11,9 +11,13 @@ var queue = workerQueue.queue('email', {}, function() {
 
   var logEmailToLogger = nconf.get('logging:logEmailContents');
 
-  var sesTransport = nodemailer.createTransport("SES", {
-      AWSAccessKeyID: nconf.get("amazon:accessKey"),
-      AWSSecretKey: nconf.get("amazon:secretKey")
+  var smtpTransport = nodemailer.createTransport("SMTP", {
+      host: 'smtp.mandrillapp.com',
+      port: 587,
+      auth : {
+        user: nconf.get("mandrill:username"),
+        pass: nconf.get("mandrill:apiKey")
+      }
   });
 
   var footerTemplate = null;
@@ -56,7 +60,7 @@ var queue = workerQueue.queue('email', {}, function() {
           return done();
         }
 
-        sesTransport.sendMail({
+        smtpTransport.sendMail({
           from: options.from,
           to: options.to,
           subject: options.subject,
@@ -64,11 +68,11 @@ var queue = workerQueue.queue('email', {}, function() {
           text: plaintext
         }, function(error, response){
           if(error) {
-            winston.error("SES Email Error", { exception: error });
+            winston.error("SMTP Email Error", { exception: error });
             return done(error);
           }
 
-          winston.info("Email sent successfully through SES", { message: response.message });
+          winston.info("Email sent successfully through SMTP", { message: response.message });
           done();
         });
       });
