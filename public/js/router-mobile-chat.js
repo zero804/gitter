@@ -1,7 +1,6 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
-  'jquery',
-  'hammer',
+  'jquery-hammer',
   'retina',
   'views/base',
   'collections/chat',
@@ -14,7 +13,7 @@ require([
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
   'template/helpers/all'              // No ref
-], function($, hammer, retina, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget, TroupeMenu, mobileResizer /*, mobileContext, eyeballsClient, unreadItemsClient */) {
+], function($, retina, TroupeViews, chatModels, chatInputView, ChatCollectionView, AvatarWidget, TroupeMenu, mobileResizer /*, mobileContext, eyeballsClient, unreadItemsClient */) {
   "use strict";
 
   var PAGE_SIZE = 15;
@@ -22,7 +21,6 @@ require([
   TroupeViews.preloadWidgets({
     avatar: AvatarWidget
   });
-
 
   var chatCollection = new chatModels.ChatCollection();
   chatCollection.listen();
@@ -47,17 +45,16 @@ require([
   }).render();
 
   var isTroupeListShowing = false;
-  var showTroupesButton = document.getElementById('showTroupesButton');
-  var $pageContainer = $('#pageContainer');
+  var $pageContainer = $('#pageContainer').hammer();
 
-  hammer(showTroupesButton).on('tap', function(event) {
+  $('#showTroupesButton').hammer().on('tap', function(event) {
     $pageContainer.toggleClass('partiallyOffScreen');
     isTroupeListShowing = !isTroupeListShowing;
     event.stopPropagation();
     if(isTroupeListShowing) {
-      hammer($pageContainer[0]).on('tap', onPageTap);
+      $pageContainer.on('tap', onPageTap);
     } else {
-      hammer($pageContainer[0]).off('tap', onPageTap);
+      $pageContainer.off('tap', onPageTap);
     }
   });
 
@@ -71,7 +68,7 @@ require([
     $pageContainer.removeClass('partiallyOffScreen');
   };
 
-  hammer($pageContainer[0]).on('tap', function() {
+  $pageContainer.on('tap', function() {
     $('html, body').scrollTop($(document).height());
   });
 
