@@ -144,7 +144,7 @@ module.exports = {
       templateFile: "inviteemail",
       from: senderDisplayName + '<hello' + emailDomainWithAt + '>',
       to: email,
-      subject: "You been invited to join the " + troupe.name + " troupe",
+      subject: "You've been invited to join the " + troupe.name + " troupe",
       data: {
         displayName: displayName,
         troupeName: troupe.name,
