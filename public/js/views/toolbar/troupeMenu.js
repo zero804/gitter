@@ -75,8 +75,7 @@ define([
       this.incomingConnectionInvites.show(new InvitesView({ collection: troupeCollections.incomingConnectionInvites }));
 
       // outgoing one-one invites view
-      // TODO outgoings need to invert the user's link / name. This should probably be done server side.
-      // this.outgoingConnectionInvites.show(new InvitesView({ collection: troupeCollections.outgoingConnectionInvites }));
+      this.outgoingConnectionInvites.show(new InvitesView({ collection: troupeCollections.outgoingConnectionInvites, fromViewer: true }));
 
       // search results collection view
       this.searchView = new SearchView({ troupes: troupeCollections.troupes, $input: this.$el.find('#list-search-input') });
