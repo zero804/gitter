@@ -142,7 +142,7 @@ module.exports = {
 
     mailerService.sendEmail({
       templateFile: "inviteemail",
-      from: senderDisplayName + '<hello' + emailDomainWithAt + '>',
+      from: senderDisplayName + '<hello@troupe.co>',
       to: email,
       subject: "You've been invited to join the " + troupe.name + " troupe",
       data: {
@@ -170,7 +170,7 @@ module.exports = {
 
     mailerService.sendEmail({
       templateFile: "invite_connect_email",
-      from: senderDisplayName + '<hello' + emailDomainWithAt + '>',
+      from: senderDisplayName + '<hello@troupe.co>',
       to: email,
       subject: senderDisplayName + " has invited you to connect on Troupe",
       data: {
