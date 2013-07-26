@@ -12,12 +12,13 @@ require([
   'views/app/userHeaderView',
   'views/toolbar/troupeMenu',
   'utils/router',
+  'hbs!views/connect/tmpl/connectUserTemplate',
   'components/errorReporter',
   'components/dozy',
   'components/webNotifications',
   'template/helpers/all'
 ], function(Backbone, TroupeViews, loginRequestTemplate, shareSearchView, AppIntegratedView, UserHomeView, troupeCollections,
-  profileView, createTroupeView, UserHeaderView, TroupeMenuView, Router /*, errorReporter , dozy, webNotifications,_Helpers,  _backboneKeys*/) {
+  profileView, createTroupeView, UserHeaderView, TroupeMenuView, Router, connectUserTemplate /*, errorReporter , dozy, webNotifications,_Helpers,  _backboneKeys*/) {
 
   "use strict";
 
@@ -41,32 +42,65 @@ require([
    return;
   }
 
-  // Show a popup to confirm access requests through signup.
   try {
-    if (window.localStorage && window.localStorage.pendingRequestConfirmation) {
-      var data = window.localStorage.pendingRequestConfirmation;
-      //alert("Your access request has been sent. We will notify you once it is accepted.");
-      var RequestSuccessView = TroupeViews.Base.extend({
-        template: loginRequestTemplate,
-        getRenderData: function() {
-          return data;
-        },
-        afterRender: function() {
-          this.$el.find('.modal-content').hide();
-          this.$el.find('.modal-success').show();
-        },
-        events: {
-          'click #cancel-button': function(e) {
-            this.remove();
-            if (this.dialog) this.dialog.hide();
-            e.preventDefault();
+    var ls = window.localStorage;
+    if (ls) {
+      var data;
+
+      // Show a popup to confirm access requests through signup.
+      if(ls.pendingRequestConfirmation) {
+        data = ls.pendingRequestConfirmation;
+        var RequestSuccessView = TroupeViews.Base.extend({
+          template: loginRequestTemplate,
+          getRenderData: function() {
+            return data;
+          },
+          afterRender: function() {
+            this.$el.find('.modal-content').hide();
+            this.$el.find('.modal-success').show();
+          },
+          events: {
+            'click #cancel-button': function(e) {
+              this.remove();
+              if (this.dialog) this.dialog.hide();
+              e.preventDefault();
+            }
           }
-        }
-      });
-      delete window.localStorage.pendingRequestConfirmation;
-      (new TroupeViews.Modal({
-        view: new RequestSuccessView()
-      })).show();
+        });
+        delete ls.pendingRequestConfirmation;
+        (new TroupeViews.Modal({
+          view: new RequestSuccessView()
+        })).show();
+      }
+
+      // Show a popup to confirm connection invite through signup.
+      if (ls.pendingConnectConfirmation) {
+        data = JSON.parse(ls.pendingConnectConfirmation);
+
+        var InviteSuccessView = TroupeViews.Base.extend({
+          template: connectUserTemplate,
+          getRenderData: function() {
+            return data;
+          },
+          afterRender: function() {
+            this.$el.find('.modal-content').hide();
+            this.$el.find('.modal-success').show();
+            this.$el.find('#learn-more-btn').hide();
+          },
+          events: {
+            'click #cancel-button': function(e) {
+              this.remove();
+              if (this.dialog) this.dialog.hide();
+              e.preventDefault();
+            }
+          }
+        });
+        delete ls.pendingConnectConfirmation;
+        (new TroupeViews.Modal({
+          view: new InviteSuccessView()
+        })).show();
+
+      }
     }
   }
   catch (e) {}
