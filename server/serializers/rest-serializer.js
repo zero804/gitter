@@ -602,21 +602,30 @@ function InviteStrategy(options) {
 
   var troupeIdStrategy = new TroupeIdStrategy(options);
   var userIdStrategy = new UserIdStrategy(options);
+  var user2IdStrategy = new UserIdStrategy(options);
 
   this.preload = function(invites, callback) {
-    execPreloads([{
-      strategy: troupeIdStrategy,
-      data: invites.map(function(invite) { return invite.troupeId; }).filter(predicates.notNull)
-    },{
-      strategy: userIdStrategy,
-      data: invites.map(function(invite) { return invite.fromUserId; }).filter(predicates.notNull)
-    }], callback);
+    execPreloads([
+      {
+        strategy: troupeIdStrategy,
+        data: invites.map(function(invite) { return invite.troupeId; }).filter(predicates.notNull)
+      },
+
+      {
+        strategy: user2IdStrategy,
+        data: invites.filter(function(invite) { return !!invite.userId; }).map(function(invite) { return invite.userId; }).filter(predicates.notNull)
+      },{
+        strategy: userIdStrategy,
+        data: invites.map(function(invite) { return invite.fromUserId; }).filter(predicates.notNull)
+      }
+    ], callback);
 
   };
 
   this.map = function(item) {
     var troupe = item.troupeId && troupeIdStrategy.map(item.troupeId);
     var fromUser = item.fromUserId && userIdStrategy.map(item.fromUserId); // In future, all invites will have a fromUserId
+    var user = item.userId && user2IdStrategy.map(item.userId);
 
     if(!troupe && !fromUser) {
       return; // This invite is broken.... Data maintenance to remove
@@ -626,6 +635,7 @@ function InviteStrategy(options) {
       id: item._id,
       oneToOneInvite: troupe ? false : true,
       fromUser: fromUser,
+      user: user,
       acceptUrl: troupe ? '/' + troupe.uri : fromUser.url,
       name: troupe ? troupe.name : fromUser.displayName,
       v: getVersion(item)
