@@ -8,12 +8,24 @@ var hosts, hostLength, cdnPrefix;
 
 function passthrough(url, options) {
   var nonrelative = options && options.nonrelative;
-  var prefix = nonrelative ? nconf.get('web:basepath') + "/" : "/";
+  var email = options && options.email;
+  var prefix;
+  if (email) {
+    prefix = nconf.get('email:emailBasePath') + "/";
+  } else {
+    prefix = nonrelative ? nconf.get('web:basepath') + "/" : "/";
+  }
   return prefix + url;
 }
 
 function cdnSingle(url, options) {
   var nonrelative = options && options.nonrelative;
+  var email = options && options.email;
+
+  if (email) {
+    return nconf.get('email:emailBasePath') + cdnPrefix + "/" + url;
+  }
+
   var prefix = nonrelative ? "https://" : "//";
   if(options && options.notStatic === true) {
     return prefix + hosts[0] + "/" + url;
@@ -23,6 +35,11 @@ function cdnSingle(url, options) {
 }
 
 function cdnMulti(url, options) {
+  var email = options && options.email;
+
+  if (email) {
+    return nconf.get('email:emailBasePath') + cdnPrefix + "/" + url;
+  }
   var x = 0;
   for(var i = 0; i < url.length; i = i + 3) {
     x = x + url.charCodeAt(i);

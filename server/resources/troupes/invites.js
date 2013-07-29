@@ -39,6 +39,12 @@ module.exports = {
 
     },
 
+    destroy: function(req, res, next) {
+      req.invite.remove(function() {
+        res.send({ success: true });
+      });
+    },
+
     load: function(id, callback){
       troupeService.findInviteById(id, callback);
     }

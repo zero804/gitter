@@ -134,6 +134,9 @@ function populateSubTroupeCollection(options, callback) {
     case "users":
       return restful.serializeUsersForTroupe(troupeId, userId, callback);
 
+    case "invites":
+      return restful.serializeInvitesForTroupe(troupeId, userId, callback);
+
     default:
       winston.error('Unable to provide snapshot for ' + collection);
   }

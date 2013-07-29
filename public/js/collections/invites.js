@@ -29,6 +29,18 @@ define([
 
   });
 
+  exports.TroupeInviteCollection = TroupeCollections.LiveCollection.extend({
+    model: exports.InviteModel,
+    modelName: 'invite',
+    nestedUrl: "invites",
+
+    initialize: function() {
+      this.url = "/troupes/" + context.getTroupeId() + "/invites";
+    }
+
+  });
+
+
   return exports;
 
 });
