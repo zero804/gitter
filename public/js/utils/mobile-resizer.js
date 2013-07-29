@@ -19,6 +19,10 @@ define([], function() {
     chatWrapper.style.height = spaceForWrapper + 'px';
   };
 
+  var setPageWidth = function() {
+    document.getElementById('mainPage').style.width = window.innerWidth+"px";
+  };
+
   var resizeChatWrapperToFit = function() {
     if(isPageTooBig()) {
       shrinkChatWrapperToFit();
@@ -27,18 +31,17 @@ define([], function() {
 
   var resetChatWrapperSize = function() {
     var chatWrapper = document.getElementById('chat-wrapper');
-    chatWrapper.style.height = '100%';
+    chatWrapper.style.height = '1000px';
   };
 
   var reset = function() {
     resetChatWrapperSize();
+    setPageWidth();
     hideAddessBar();
     resizeChatWrapperToFit();
   };
 
   return {
-    'hideAddessBar': hideAddessBar,
-    'resizeChatWrapperToFit': resizeChatWrapperToFit,
     'reset': reset
   };
 });
