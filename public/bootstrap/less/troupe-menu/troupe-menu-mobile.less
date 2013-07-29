@@ -1,0 +1,41 @@
+@import "troupe-menu.less";
+
+// do not show the toolbar buttons (invite, etc) as mobile cant handle it yet
+.trpToolbarList > a {
+	display: none;
+}
+
+.trpLeftMenuActions {
+	display: none;
+}
+
+.sideMenu {
+	position: absolute;
+	color: white;
+	width: 85%;
+	padding-top: 12px;
+}
+
+.trpToolbarHeader {
+	font-size: 12px;
+	text-transform: uppercase;
+	padding-bottom: 4px;
+}
+
+.trpTroupeList {
+	padding-left: 0px;
+}
+
+.trpLeftMenuWrapper {
+	padding-left: 21px;
+	width: 90%;
+}
+
+.trpLeftMenuToolbar {
+	padding-left: 12px;
+}
+
+#left-menu-scroll {
+	height: 350px;
+	-webkit-overflow-scrolling: touch;
+}

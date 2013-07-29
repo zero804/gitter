@@ -1,6 +1,7 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'jquery',
+  'retina',
   'views/base',
   'utils/context',
   'collections/chat',
@@ -9,12 +10,14 @@ require([
   'views/chat/chatCollectionView',
   'views/widgets/avatar',
   'views/request/requestDialog',
+  'views/toolbar/troupeMenu',
+  'views/app/mobileAppView',
   'utils/mobile-resizer',
   'components/mobile-context',        // No ref
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
   'template/helpers/all'              // No ref
-], function($, TroupeViews, context, chatModels, requestModels, chatInputView, ChatCollectionView, AvatarWidget, RequestResponseModal, mobileResizer /*, mobileContext, eyeballsClient, unreadItemsClient */) {
+], function($, retina, TroupeViews, context, chatModels, requestModels, chatInputView, ChatCollectionView, AvatarWidget, RequestResponseModal, TroupeMenu, MobileAppView, mobileResizer /*, mobileContext, eyeballsClient, unreadItemsClient */) {
   "use strict";
 
   var PAGE_SIZE = 15;
@@ -22,7 +25,6 @@ require([
   TroupeViews.preloadWidgets({
     avatar: AvatarWidget
   });
-
 
   var chatCollection = new chatModels.ChatCollection();
   chatCollection.listen();
@@ -40,8 +42,19 @@ require([
     scrollDelegate: chatCollectionView.scrollDelegate
   }).render();
 
-  mobileResizer.hideAddessBar();
-  mobileResizer.resizeChatWrapperToFit();
+  mobileResizer.reset();
+
+  new TroupeMenu({
+    el: $('#troupeList')
+  }).render();
+
+  new MobileAppView({
+    el: $('#pageContainer')
+  });
+
+  var fakeWindow = {};
+  retina.init(fakeWindow);
+  fakeWindow.onload();
 
   $('.trpMobileAmuseIcon').click(function() {
     document.location.reload(true);
