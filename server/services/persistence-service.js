@@ -136,6 +136,9 @@ UserSchema.methods.hasUsername = function() {
   return !!this.username;
 };
 
+UserSchema.methods.hasPassword = function() {
+  return !!this.passwordHash;
+};
 
 var UserLocationHistorySchema = new Schema({
   userId: ObjectId,
