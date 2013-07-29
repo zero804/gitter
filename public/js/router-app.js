@@ -13,6 +13,7 @@ require([
   'views/file/filePreviewView',
   'views/file/fileVersionsView',
   'views/request/requestDetailView',
+  'views/invite/inviteDetailView',
   'views/people/personDetailView',
   'views/conversation/conversationDetailView',
   'views/profile/profileView',
@@ -31,7 +32,7 @@ require([
   'components/eyeballs' // No ref
 ], function($, Backbone, context, AppIntegratedView, chatInputView, ChatCollectionView,
             itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
-            RequestDetailView, PersonDetailView, conversationDetailView, profileView, shareSearchView,
+            RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, shareSearchView,
             createTroupeView, UsernameView, TroupeHeaderView,
             troupeSettingsView, TroupeMenuView, Router /*, errorReporter , FilteredCollection */) {
   "use strict";
@@ -79,6 +80,7 @@ require([
   new Router({
     routes: [
       { name: "request",          re: /^request\/(\w+)$/,         viewType: RequestDetailView,            collection: itemCollections.requests },
+      { name: "invite",          re: /^invite\/(\w+)$/,           viewType: InviteDetailView,             collection: itemCollections.invites },
       { name: "file",             re: /^file\/(\w+)$/,            viewType: FileDetailView,               collection: itemCollections.files },
       { name: "filePreview",      re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: itemCollections.files },
       { name: "fileVersions",     re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: itemCollections.files },
