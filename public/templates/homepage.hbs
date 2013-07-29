@@ -64,7 +64,12 @@
           <br><br>
         </div>
         {{#if compactView}}
-        <a class="trpHomeMenuItem trpPadV14 trpHand" href="/login">Existing user login</a>
+        <div class="trpHomeMenu">
+          <a class="trpHomeMenuItem trpPadV14 trpHand" href="/login">Login</a>
+        </div>
+        <div class="trpHomeMenu">
+          <a class="trpHomeMenuItem trpPadV14 trpHand" href="/signup">Sign up</a>
+        </div>
         {{else}}
         <div class="trpHeroSignup">
           <div class="trpButtonHuge trpHand trpBtnWhite button-signup" href="#!" id="button-signup"> Get Started<br><span class="trpBodySmall">It's free</span></div>
