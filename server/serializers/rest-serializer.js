@@ -636,6 +636,7 @@ function InviteStrategy(options) {
       oneToOneInvite: troupe ? false : true,
       fromUser: fromUser,
       user: user,
+      email: item.email,
       acceptUrl: troupe ? '/' + troupe.uri : fromUser.url,
       name: troupe ? troupe.name : fromUser.displayName,
       v: getVersion(item)
