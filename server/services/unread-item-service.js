@@ -10,6 +10,12 @@ var winston = require("winston");
 var redisClient = redis.createClient();
 var mongoUtils = require('../utils/mongo-utils');
 var Fiber = require('../utils/fiber');
+var RedisBatcher = require('../utils/redis-batcher').RedisBatcher;
+var badgeBatcher = new RedisBatcher('badge', 1000);
+var Scripto = require('redis-scripto');
+var scriptManager = new Scripto(redisClient);
+scriptManager.loadFromDir(__dirname + '/../../redis-lua/unread');
+
 
 var DEFAULT_ITEM_TYPES = ['file', 'chat', 'request'];
 
@@ -51,33 +57,71 @@ function republishUnreadItemCountForUserTroupe(userId, troupeId, callback) {
   }, callback);
 }
 
+badgeBatcher.listen(function(key, userIds, done) {
+  // Remove duplicates
+  userIds = _.uniq(userIds);
+
+  // Get responders to respond
+  appEvents.batchUserBadgeCountUpdate({
+    userIds: userIds
+  });
+
+  done();
+});
+
+function republishBadgeForUser(userId) {
+  badgeBatcher.add('queue', userId);
+}
+
+/**
+ * Returns the key array used by the redis scripts
+ */
+function getScriptKeysForUserIds(userIds, itemType, troupeId) {
+  var unreadKeys = userIds.map(function(userId) {
+    return "unread:" + itemType + ":" + userId + ":" + troupeId;
+  });
+
+  var badgeKeys = userIds.map(function(userId) {
+    return "ub:" + userId;
+  });
+
+  return unreadKeys.concat(badgeKeys);
+}
+
 exports.newItem = function(troupeId, creatorUserId, itemType, itemId) {
   if(!troupeId) { winston.error("newitem failed. Troupe cannot be null"); return; }
   if(!itemType) { winston.error("newitem failed. itemType cannot be null"); return; }
   if(!itemId) { winston.error("newitem failed. itemId cannot be null"); return; }
 
-  troupeService.findById(troupeId, function(err, troupe) {
-    if(err) return winston.error("Unable to load troupeId " + troupeId, err);
-    var userIds = troupe.getUserIds();
 
+  troupeService.findUserIdsForTroupe(troupeId, function(err, userIds) {
+    if(err) return winston.error("Unable to load troupeId " + troupeId, err);
+
+    if(creatorUserId) {
+      userIds = userIds.filter(function(userId) {
+        return ("" + userId) != ("" + creatorUserId);
+      });
+    }
+
+    // Publish out an new item event
     var data = {};
     data[itemType] = [itemId];
-
-      // multi chain with an individual callback
-    var multi = redisClient.multi();
     userIds.forEach(function(userId) {
-      if(!creatorUserId || (("" + userId) != ("" + creatorUserId))) {
-        appEvents.newUnreadItem(userId, troupeId, data);
-
-        multi.sadd("unread:" + itemType + ":" + userId + ":" + troupeId, itemId);
-      }
+      appEvents.newUnreadItem(userId, troupeId, data);
     });
 
-    multi.exec(function(err/*, replies*/) {
-      if(err) winston.error("unreadItemService.newItem failed", err);
+    // Now talk to redis and do the update
+    var keys = getScriptKeysForUserIds(userIds, itemType, troupeId);
+    scriptManager.run('unread-add-item', keys, [troupeId, itemId], function(err, updates) {
+      if(err) return winston.error("unread-add-item failed" + err, { exception: err });
 
       userIds.forEach(function(userId) {
         republishUnreadItemCountForUserTroupe(userId, troupeId);
+      });
+
+      updates.forEach(function(update) {
+        var userId = userIds[update];
+        republishBadgeForUser(userId);
       });
     });
 
@@ -85,59 +129,73 @@ exports.newItem = function(troupeId, creatorUserId, itemType, itemId) {
 };
 
 exports.removeItem = function(troupeId, itemType, itemId) {
+  if(!troupeId) { winston.error("newitem failed. Troupe cannot be null"); return; }
+  if(!itemType) { winston.error("newitem failed. itemType cannot be null"); return; }
+  if(!itemId) { winston.error("newitem failed. itemId cannot be null"); return; }
+
+
   troupeService.findUserIdsForTroupe(troupeId, function(err, userIds) {
     if(err) return winston.error("Unable to load troupeId " + troupeId, err);
 
+    // Publish out an unread item removed event
+    // TODO: we could actually check whether this user thinks this item is UNREAD
     var data = {};
     data[itemType] = [itemId];
-
-    var multi = redisClient.multi();
-    var m2 = redisClient.multi();
-
     userIds.forEach(function(userId) {
       appEvents.unreadItemsRemoved(userId, troupeId, data);
-
-      multi.srem("unread:" + itemType + ":" + userId + ":" + troupeId, itemId);
     });
 
-    multi.exec(function(err/*, replies*/) {
-      if(err) return winston.error("unreadItemService.removeItem failed", err);
+    // Now talk to redis and do the update
+    var keys = getScriptKeysForUserIds(userIds, itemType, troupeId);
+    scriptManager.run('unread-remove-item', keys, [troupeId, itemId], function(err, updates) {
+      if(err) return winston.error("unread-remove-item failed" + err, { exception: err });
 
-      m2.exec(function(err/*, replies*/) {
-        if(err) return winston.error(err);
+      userIds.forEach(function(userId) {
+        republishUnreadItemCountForUserTroupe(userId, troupeId);
+      });
 
-        userIds.forEach(function(userId) {
-          republishUnreadItemCountForUserTroupe(userId, troupeId);
-        });
-
+      updates.forEach(function(update) {
+        var userId = userIds[update];
+        republishBadgeForUser(userId);
       });
     });
 
   });
 };
 
+function markItemsOfTypeRead(userId, troupeId, lrt, itemType, ids, callback) {
+  var keys = [
+      "lrt:" + userId,
+      "ub:" + userId,
+      "unread:" + itemType + ":" + userId + ":" + troupeId
+    ];
+
+  var values = [lrt, troupeId].concat(ids);
+
+  scriptManager.run('unread-mark-items-read', keys, values, callback);
+}
+
+/**
+ * Mark many items as read, for a single user and troupe
+ */
 exports.markItemsRead = function(userId, troupeId, items, callback) {
+  var now = Date.now();
 
   appEvents.unreadItemsRemoved(userId, troupeId, items);
 
-  var multi = redisClient.multi();
+  var f = new Fiber();
 
-  // lrt stands for "last read time" - it's the last time a user read something
-  multi.set("lrt:" + userId, Date.now());
-
-  var keys = _.keys(items);
-  keys.forEach(function(itemType) {
+  Object.keys(items).forEach(function(itemType) {
     var ids = items[itemType];
-
-    ids.forEach(function(id) {
-      multi.srem("unread:" + itemType + ":" + userId + ":" + troupeId, id);
-    });
+    markItemsOfTypeRead(userId, troupeId, now, itemType, ids, f.waitor());
   });
 
-  multi.exec(function(err/*, replies*/) {
-    if(err) return callback(err);
-
+  f.all().then(function(results) {
     republishUnreadItemCountForUserTroupe(userId, troupeId);
+
+    if(results.filter(function(i) { return i > 0; }).length > 0) {
+      republishBadgeForUser(userId);
+    }
 
     // For the moment, we're only bothering with chats for this
     readByService.recordItemsAsRead(userId, troupeId, items, function(err) {
@@ -146,7 +204,8 @@ exports.markItemsRead = function(userId, troupeId, items, callback) {
       callback();
     });
 
-  });
+  }, callback);
+
 };
 
 exports.getUserUnreadCounts = function(userId, troupeId, callback) {
@@ -252,11 +311,34 @@ exports.getUnreadItemsForUser = function(userId, troupeId, callback) {
   });
 
   multi.exec(function(err, replies) {
+    if(err) return callback(err);
+
     var result = {};
 
     DEFAULT_ITEM_TYPES.forEach(function(itemType, index) {
       var reply = replies[index];
       result[itemType] = reply;
+    });
+
+    callback(null, result);
+  });
+};
+
+exports.getBadgeCountsForUserIds = function(userIds, callback) {
+  var multi = redisClient.multi();
+
+  userIds.forEach(function(userId) {
+    multi.zcard("ub:" + userId);
+  });
+
+  multi.exec(function(err, replies) {
+    if(err) return callback(err);
+
+    var result = {};
+
+    userIds.forEach(function(userId, index) {
+      var reply = replies[index];
+      result[userId] = reply;
     });
 
     callback(null, result);
