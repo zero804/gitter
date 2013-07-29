@@ -14,7 +14,7 @@ function passthrough(url, options) {
 
 function cdnSingle(url, options) {
   var nonrelative = options && options.nonrelative;
-  var prefix = nonrelative ? "http://" : "//";
+  var prefix = nonrelative ? "https://" : "//";
   if(options && options.notStatic === true) {
     return prefix + hosts[0] + "/" + url;
   }
@@ -31,7 +31,7 @@ function cdnMulti(url, options) {
   var host = hosts[x % hostLength];
 
   var nonrelative = options && options.nonrelative;
-  var prefix = nonrelative ? "http://" : "//";
+  var prefix = nonrelative ? "https://" : "//";
 
   if(options && options.notStatic === true) {
     return prefix + host + "/" + url;
