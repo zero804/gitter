@@ -52,6 +52,10 @@ var signupService = module.exports = {
       }
 
       if(user) {
+        if(!user.isConfirmed() || !user.hasPassword()) {
+          emailNotificationService.sendConfirmationForNewUser(user);
+        }
+
         // do we send the confirm email again?
         callback(err, user);
       } else {
