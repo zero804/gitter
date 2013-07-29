@@ -23,7 +23,7 @@ module.exports = {
           }
 
           // when the viewer is not logged in:
-          res.render('signup', { compactView: isPhone(req.headers['user-agent']) , profileHasNoUsername: JSON.stringify(false), userId: JSON.stringify(null) });
+          res.render('homepage', { compactView: isPhone(req.headers['user-agent']) , profileHasNoUsername: JSON.stringify(false), userId: JSON.stringify(null) });
         }
       );
 
@@ -83,7 +83,7 @@ module.exports = {
             if (user.hasUsername()) {
               res.relativeRedirect('/' + user.username);
             } else {
-              res.render('signup', { compactView: isPhone(req.headers['user-agent']), profileHasNoUsername: !user.username, userId: JSON.stringify(req.user.id) });
+              res.render('homepage', { compactView: isPhone(req.headers['user-agent']), profileHasNoUsername: !user.username, userId: JSON.stringify(req.user.id) });
             }
           });
         });
