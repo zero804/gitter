@@ -15,7 +15,7 @@ module.exports = {
     mailerService.sendEmail({
       templateFile: "newtroupe_email",
       to: user.email,
-      from: 'Troupe <hello@troupe.co>',
+      from: 'Troupe <support@troupe.co>',
       subject: "You created a new Troupe",
       data: {
         troupeName: troupe.name,
@@ -31,7 +31,7 @@ module.exports = {
     mailerService.sendEmail({
       templateFile: "requestacceptance",
       to: user.email,
-      from: 'Troupe <hello@troupe.co>',
+      from: 'Troupe <support@troupe.co>',
       subject: "You've been accepted into a Troupe",
       data: {
         troupeName: troupe.name,
@@ -48,7 +48,7 @@ module.exports = {
     mailerService.sendEmail({
       templateFile: "connectacceptance",
       to: fromUser.email,
-      from: 'Troupe <hello@troupe.co>',
+      from: 'Troupe <support@troupe.co>',
       subject: "Your invite has been accepted",
       data: {
         fromUser: fromUser,
@@ -67,7 +67,7 @@ module.exports = {
     mailerService.sendEmail({
       templateFile: "resetemail",
       to: user.email,
-      from: 'Troupe <hello@troupe.co>',
+      from: 'Troupe <support@troupe.co>',
       subject: "You requested a password reset",
       data: {
         resetLink: resetLink,
@@ -83,7 +83,7 @@ module.exports = {
     mailerService.sendEmail({
       templateFile: "signupemail",
       to: user.email,
-      from: 'Troupe <hello@troupe.co>',
+      from: 'Troupe <support@troupe.co>',
       subject: "Welcome to Troupe, please confirm your email address",
       data: {
         confirmLink: confirmLink,
@@ -101,7 +101,7 @@ module.exports = {
     mailerService.sendEmail({
       templateFile: "change-email-address",
       to: to,
-      from: 'Troupe <hello@troupe.co>',
+      from: 'Troupe <support@troupe.co>',
       subject: "Confirm new email address",
       data: {
         confirmLink: confirmLink,
@@ -119,7 +119,7 @@ module.exports = {
     mailerService.sendEmail({
       templateFile: "change-email-address-complete",
       to: [origEmail, newEmail],
-      from: 'Troupe <hello@troupe.co>',
+      from: 'Troupe <support@troupe.co>',
       subject: "Your email address has been successfully changed",
       data: {
         baseServerPath: nconf.get("web:basepath"),
@@ -142,7 +142,7 @@ module.exports = {
 
     mailerService.sendEmail({
       templateFile: "inviteemail",
-      from: senderDisplayName + '<hello@troupe.co>',
+      from: senderDisplayName + '<support@troupe.co>',
       to: email,
       subject: "You've been invited to join the " + troupe.name + " troupe",
       data: {
@@ -170,7 +170,7 @@ module.exports = {
 
     mailerService.sendEmail({
       templateFile: "invite_connect_email",
-      from: senderDisplayName + '<hello@troupe.co>',
+      from: senderDisplayName + '<support@troupe.co>',
       to: email,
       subject: senderDisplayName + " has invited you to connect on Troupe",
       data: {
