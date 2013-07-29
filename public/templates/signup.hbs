@@ -60,14 +60,12 @@
 
       <div class="trpHomeHero">
         <div class="trpHeroText">
-          {{#if compactView}}
-          We're still a work in progress. <br><br>Please visit Troupe in a full browser to continue.<br><br><br><br><br><br><br>
-          {{else}}
           The quick and simple way to chat, share and<br>work together.<br><br>Anytime, anywhere.
           <br><br>
-          {{/if}}
         </div>
-        {{^compactView}}
+        {{#if compactView}}
+        <a class="trpHomeMenuItem trpPadV14 trpHand" href="/login">Existing user login</a>
+        {{else}}
         <div class="trpHeroSignup">
           <div class="trpButtonHuge trpHand trpBtnWhite button-signup" href="#!" id="button-signup"> Get Started<br><span class="trpBodySmall">It's free</span></div>
         </div>
@@ -75,7 +73,7 @@
         <div class="trpHeroImage">
           <img src='{{ cdn "images/2/home-hero-laptop2.png" }}'>
         </div>
-        {{/compactView}}
+        {{/if}}
       </div>
     </div>
 
