@@ -20,7 +20,11 @@
 
     {{>require_wrapper}}
 
+    {{#if isWebApp}}
+    {{{bootScript "routers/mobile/web/router-mobile-chat" skipCdn=true }}}
+    {{else}}
     {{{bootScript "routers/mobile/native/router-mobile-chat" skipCdn=true }}}
+    {{/if}}
 
     <link rel="shortcut icon" href="images/favicon.ico">
 
