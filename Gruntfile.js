@@ -66,7 +66,7 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "router-mobile-chat",
+                  name: "routers/mobile/native/router-mobile-chat",
                   include: [
                     "utils/tracking",
                     "views/widgets/avatar",
@@ -198,8 +198,8 @@ module.exports = function( grunt ) {
         dest: 'public-processed/js/router-app.js'
       },
       "router-mobile-chat": {
-        src: ['public-processed/js/router-mobile-chat.js'],
-        dest: 'public-processed/js/router-mobile-chat.js'
+        src: ['public-processed/js/routers/mobile/native/router-mobile-chat.js'],
+        dest: 'public-processed/js/routers/mobile/native/router-mobile-chat.js'
       },
       "router": {
         src: ['public-processed/js/router.js'],
