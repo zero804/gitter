@@ -196,11 +196,13 @@ function markItemsOfTypeRead(userId, troupeId, itemType, ids) {
  * Mark an item in a troupe as having been read by a user
  * @return {promise} promise of nothing
  */
-function setLastReadTimeForUser(userId, lastReadTimestamp) {
+function setLastReadTimeForUser(userId, troupeId, lastReadTimestamp) {
   assert(userId, 'Expected userId');
   assert(lastReadTimestamp, 'Expected lastReadTimestamp');
 
-  return Q.ninvoke(redisClient, "set", "lrt:" + userId, lastReadTimestamp);
+  return Q.ninvoke(redisClient, "mset",
+    "lrt:" + userId, lastReadTimestamp,
+    "lrtt:" + userId + ":" + troupeId, lastReadTimestamp);
 }
 
 
@@ -218,7 +220,7 @@ exports.markItemsRead = function(userId, troupeId, items, callback) {
     });
 
   // Also set the timestamp for the user
-  ops.push(setLastReadTimeForUser(userId, now));
+  ops.push(setLastReadTimeForUser(userId, troupeId, now));
 
   return Q.all(ops)
     .then(function(results) {
@@ -280,6 +282,24 @@ exports.findLastReadTimesForUsers = function(userIds, callback) {
     callback(null, result);
   });
 };
+
+/** Returns hash[userId] = unixTime for each of the queried users */
+exports.findLastReadTimesForUsersForTroupe = function(userIds, troupeId, callback) {
+  var keysToQuery = userIds.map(function(userId) { return "lrtt:" + userId + ":" + troupeId;});
+  redisClient.mget(keysToQuery, function(err, times) {
+    if(err) return callback(err);
+    var result = {};
+    times.forEach(function(time, index) {
+      if(time) {
+        var userId = userIds[index];
+        result[userId] = time;
+      }
+    });
+
+    callback(null, result);
+  });
+};
+
 
 exports.getUnreadItems = function(userId, troupeId, itemType, callback) {
   return redisClient_smembers("unread:" + itemType + ":" + userId + ":" + troupeId)
