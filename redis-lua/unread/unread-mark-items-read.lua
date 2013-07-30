@@ -1,9 +1,7 @@
-local lrt_key = KEYS[1]
-local user_badge_key = KEYS[2]
-local user_troupe_key = KEYS[3]
+local user_badge_key = KEYS[1]
+local user_troupe_key = KEYS[2]
 
 -- Values are lrt timestamp, troupeId followed by itemIds,
-local lrt_value = table.remove(ARGV, 1)
 local troupe_id = table.remove(ARGV, 1)
 local itemIds = ARGV
 

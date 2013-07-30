@@ -25,5 +25,11 @@ function getTimestampFromObjectId(id) {
   return null;
 }
 
+function getNewObjectIdString() {
+  var objectId = new ObjectID();
+  return objectId.valueOf();
+}
+
 exports.getDateFromObjectId = getDateFromObjectId;
 exports.getTimestampFromObjectId = getTimestampFromObjectId;
+exports.getNewObjectIdString = getNewObjectIdString;
