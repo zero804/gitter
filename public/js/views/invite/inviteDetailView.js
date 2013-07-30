@@ -7,8 +7,9 @@ define([
   'utils/context',
   'views/shareSearch/shareSearchView',
   'hbs!./tmpl/inviteDetailView',
+  'hbs!./tmpl/deleteConfirmation',
   'log!request-detail-view'
-], function($, _, Backbone, TroupeViews, context, shareSearchView, template, log){
+], function($, _, Backbone, TroupeViews, context, shareSearchView, template, deleteConfirmationTemplate, log){
   "use strict";
 
   return TroupeViews.Base.extend({
@@ -28,9 +29,11 @@ define([
       return this.model.toJSON();
     },
 
+    /*
     onDeleteClicked: function() {
       return this.onDelete.apply(this, arguments);
     },
+    */
 
     onResendClicked: function() {
       // open up share dialog populated with the email address.
@@ -50,20 +53,20 @@ define([
       m.show();
     },
 
-    /*onDeleteClicked: function() {
+    onDeleteClicked: function() {
       var that = this;
       var modal = new TroupeViews.ConfirmationModal({
-        title: "Reject Request?",
-        body: rejectConfirmationTemplate(this.model.toJSON()),
+        title: "Delete Invite?",
+        body: deleteConfirmationTemplate(this.model.toJSON()),
         buttons: [
-          { id: "yes", text: "Reject", additionalClasses: "" },
+          { id: "yes", text: "Delete", additionalClasses: "" },
           { id: "no", text: "Cancel"}
         ]
       });
 
       modal.on('button.click', function(id) {
         if (id === "yes")
-          that.onReject();
+          that.onDelete();
 
         modal.off('button.click');
         modal.hide();
@@ -72,7 +75,7 @@ define([
       modal.show();
 
       return false;
-    },*/
+    },
 
     onDelete: function() {
       this.model.destroy({
