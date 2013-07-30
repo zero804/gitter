@@ -68,18 +68,18 @@ describe('unread-item-service', function() {
       });
 
       mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId1, userId2, userId3]));
-      unreadItemService.newItem(troupeId, creatorUserId, itemType, itemId)
+      unreadItemService.testOnly.newItem(troupeId, creatorUserId, itemType, itemId)
         .then(function() {
           // Two calls here, not three
           mockito.verify(appEventsMock, once).newUnreadItem(userId1, troupeId);
-          // mockito.verify(appEventsMock, once).newUnreadItem(userId1, troupeId, anything());
-          // mockito.verify(appEventsMock, once).newUnreadItem(userId2, troupeId, anything());
+          mockito.verify(appEventsMock, once).newUnreadItem(userId2, troupeId);
 
-          return Q.delay(500).then(function() {
-            return unreadItemService.getUnreadItems(userId1, troupeId, itemType)
-              .then(function(items) {
-                assert.equal(items.length, 1);
-                assert.equal(items[0], itemId);
+          return unreadItemService.getUnreadItems(userId1, troupeId, itemType)
+            .then(function(items) {
+              assert.equal(items.length, 1);
+              assert.equal(items[0], itemId);
+
+              return Q.delay(500).then(function() {
 
                 return unreadItemService.getBadgeCountsForUserIds([userId1, userId2, userId3])
                   .then(function(result) {
@@ -115,7 +115,7 @@ describe('removeItem', function() {
 
     mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId1, userId2, userId3]));
 
-    unreadItemService.removeItem(troupeId, itemType, itemId)
+    unreadItemService.testOnly.removeItem(troupeId, itemType, itemId)
       .then(function() {
         // Two calls here, not three
         mockito.verify(appEventsMock, once).unreadItemsRemoved(userId1, troupeId);
@@ -160,9 +160,9 @@ describe('markItemsRead', function() {
     mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId]));
 
     return Q.all([
-        unreadItemService.newItem(troupeId, null, itemType, itemId1),
-        unreadItemService.newItem(troupeId, null, itemType, itemId2),
-        unreadItemService.newItem(troupeId, null, itemType, itemId3)
+        unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),
+        unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId2),
+        unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId3)
       ])
       .then(function() {
         unreadItemService.markItemsRead(userId, troupeId, items)
@@ -171,12 +171,20 @@ describe('markItemsRead', function() {
             mockito.verify(appEventsMock).unreadItemsRemoved(userId, troupeId, items);
             mockito.verify(readByService).recordItemsAsRead(userId, troupeId, items);
 
-            return Q.delay(500)
-              .then(function() {
-                return unreadItemService.getBadgeCountsForUserIds([userId])
-                  .then(function(result) {
-                    assert.equal(result[userId], 1);
+            return unreadItemService.getUnreadItems(userId, troupeId, itemType)
+              .then(function(items) {
+                assert.equal(items.length, 1);
+                assert.equal(items[0], itemId3);
+
+                return Q.delay(500)
+                  .then(function() {
+
+                    return unreadItemService.getBadgeCountsForUserIds([userId])
+                      .then(function(result) {
+                        assert.equal(result[userId], 1);
+                      });
                   });
+
               });
           })
           .nodeify(done);
