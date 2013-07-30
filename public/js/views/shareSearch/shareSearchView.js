@@ -28,7 +28,7 @@ define([
       // [ { userId: }, or { email: } ]
       this.invites = [];
 
-      if (options.overrideContext === true) {
+      if (options && options.overrideContext === true) {
         this.data = {
           inviteToTroupe: options.inviteToTroupe,
           inviteToConnect: options.inviteToConnect,
@@ -61,6 +61,13 @@ define([
     afterRender: function() {
       this.createTypeahead();
       this.validate();
+      var invites = this.options.invites;
+      if (invites) {
+        for (var a = 0; a < invites.length; a++) {
+          invites[a].toString = this.itemToString;
+          this.selectPerson(invites[a]);
+        }
+      }
     },
 
     createClipboard : function() {
@@ -212,12 +219,14 @@ define([
       function installToString(source) {
         // install a toString function on each data item so it stores the id in the data-value element attribute
         _.each(source, function(item) {
-          item.toString = function() {
-            return this.id || this.email;
-          };
+          item.toString = self.itemToString;
         });
       }
 
+    },
+
+    itemToString: function() {
+      return this.id || this.email;
     },
 
     selectPerson: function(user) {

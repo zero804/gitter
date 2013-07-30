@@ -4,9 +4,11 @@ define([
   'underscore',
   'backbone',
   'views/base',
+  'utils/context',
+  'views/shareSearch/shareSearchView',
   'hbs!./tmpl/inviteDetailView',
   'log!request-detail-view'
-], function($, _, Backbone, TroupeViews, template, log){
+], function($, _, Backbone, TroupeViews, context, shareSearchView, template, log){
   "use strict";
 
   return TroupeViews.Base.extend({
@@ -14,7 +16,8 @@ define([
     template: template,
     buttonMenu : false,
     events: {
-      "click #invite-delete-button": "onDeleteClicked"
+      "click #invite-delete-button": "onDeleteClicked",
+      "click #invite-resend-button": "onResendClicked"
     },
 
     initialize: function(options) {
@@ -27,6 +30,24 @@ define([
 
     onDeleteClicked: function() {
       return this.onDelete.apply(this, arguments);
+    },
+
+    onResendClicked: function() {
+      // open up share dialog populated with the email address.
+      var email = this.model.get('email');
+      var user = this.model.get('user');
+      var invites = [];
+
+      if (email) {
+        invites.push({ email: email });
+      } else if (user && user.id) {
+        invites.push(user);
+      } else {
+        log("Error resending invite");
+      }
+
+      var m = new shareSearchView.Modal({ invites: invites });
+      m.show();
     },
 
     /*onDeleteClicked: function() {

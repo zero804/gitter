@@ -1,6 +1,6 @@
 <div class="invite trpInviteItem" data-value="{{value}}">
-  <div class="trpDisplayPicture avatar-xs trpSearchInviteResult {{#user.offline}}offline{{/user.offline}} {{#user.online}}online{{/user.online}}" style="background-image: url('{{user.avatarUrlSmall}}');"></div>
-    <div class="trpInviteName">{{user.displayName}}</div>
+  <div class="trpDisplayPicture avatar-xs trpSearchInviteResult {{#user.offline}}offline{{/user.offline}} {{#user.online}}online{{/user.online}}" style="background-image: url('{{#if user.avatarUrlSmall}}{{user.avatarUrlSmall}}{{else}}/avatarForEmail/{{user.email}}{{/if}}');"></div>
+    <div class="trpInviteName">{{#if user.displayName}}{{user.displayName}}{{else}}{{user.email}}{{/if}}</div>
     <span class="trpRemoveInvite">
       <img class="removeInvite" data-value="{{value}}" src='{{cdn "images/2/icon-close-white.png" }}' style="vertical-align: top; padding-top: 0px">
     </span>
