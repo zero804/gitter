@@ -293,6 +293,11 @@ InviteUnconfirmedSchema.schemaTypeName = 'InviteUnconfirmedSchema';
 InviteUnconfirmedSchema.index({ userId: 1 });
 InviteUnconfirmedSchema.index({ email: 1 });
 
+var InviteUsedSchema = mongooseUtils.cloneSchema(InviteSchema);
+InviteUsedSchema.schemaTypeName = 'InviteUsedSchema';
+InviteUsedSchema.index({ userId: 1 });
+InviteUsedSchema.index({ email: 1 });
+
 //
 // A request by a user to join a Troupe
 // When a request is unconfirmed, the user who made the request is unconfirmed
@@ -508,6 +513,7 @@ var EmailAttachment = mongoose.model('EmailAttachment', EmailAttachmentSchema);
 var Conversation = mongoose.model('Conversation', ConversationSchema);
 var Invite = mongoose.model('Invite', InviteSchema);
 var InviteUnconfirmed = mongoose.model('InviteUnconfirmed', InviteUnconfirmedSchema);
+var InviteUsed = mongoose.model('InviteUsed', InviteUsedSchema);
 
 var Request = mongoose.model('Request', RequestSchema);
 var RequestUnconfirmed = mongoose.model('RequestUnconfirmed', RequestUnconfirmedSchema);
@@ -572,6 +578,7 @@ module.exports = {
   Conversation: Conversation,
 	Invite: Invite,
   InviteUnconfirmed: InviteUnconfirmed,
+  InviteUsed: InviteUsed,
   Request: Request,
   RequestUnconfirmed: RequestUnconfirmed,
 	ChatMessage: ChatMessage,
