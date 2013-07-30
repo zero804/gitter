@@ -51,6 +51,7 @@ define([
 
       var m = new shareSearchView.Modal({ invites: invites });
       m.show();
+      m.view.sendInvites();
     },
 
     onDeleteClicked: function() {
