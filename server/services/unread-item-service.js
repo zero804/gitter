@@ -97,7 +97,7 @@ var redisClient_smembers = Q.nbind(redisClient.smembers, redisClient);
  * New item added
  * @return {promise} promise of nothing
  */
-exports.newItem = function(troupeId, creatorUserId, itemType, itemId) {
+function newItem(troupeId, creatorUserId, itemType, itemId) {
   if(!troupeId) { winston.error("newitem failed. Troupe cannot be null"); return; }
   if(!itemType) { winston.error("newitem failed. itemType cannot be null"); return; }
   if(!itemId) { winston.error("newitem failed. itemId cannot be null"); return; }
@@ -132,13 +132,13 @@ exports.newItem = function(troupeId, creatorUserId, itemType, itemId) {
         });
 
     });
-};
+}
 
 /**
  * Item removed
  * @return {promise} promise of nothing
  */
-exports.removeItem = function(troupeId, itemType, itemId) {
+function removeItem(troupeId, itemType, itemId) {
   if(!troupeId) { winston.error("newitem failed. Troupe cannot be null"); return; }
   if(!itemType) { winston.error("newitem failed. itemType cannot be null"); return; }
   if(!itemId) { winston.error("newitem failed. itemId cannot be null"); return; }
@@ -214,7 +214,7 @@ exports.markItemsRead = function(userId, troupeId, items, callback) {
 
   var ops = Object.keys(items).map(function(itemType) {
       var ids = items[itemType];
-      return markItemsOfTypeRead(userId, troupeId, now, itemType, ids);
+      return markItemsOfTypeRead(userId, troupeId, itemType, ids);
     });
 
   // Also set the timestamp for the user
@@ -224,7 +224,11 @@ exports.markItemsRead = function(userId, troupeId, items, callback) {
     .then(function(results) {
       republishUnreadItemCountForUserTroupe(userId, troupeId);
 
-      if(results.filter(function(i) { return i > 0; }).length > 0) {
+      var resultsRequiringBadgeCounts = results.filter(function(result, i) {
+        return result > 0 && i != results.length - 1;
+      });
+
+      if(resultsRequiringBadgeCounts.length > 0) {
         republishBadgeForUser(userId);
       }
 
@@ -454,11 +458,20 @@ exports.install = function() {
       return;
     }
 
+    var promise;
+
     if(operation === 'create') {
       var creatingUserId = findCreatingUserIdModel(info.modelName, model);
-      exports.newItem(info.troupeId, creatingUserId, info.modelName, modelId);
+      promise = newItem(info.troupeId, creatingUserId, info.modelName, modelId);
     } else if(operation === 'remove') {
-      exports.removeItem(info.troupeId, info.modelName, modelId);
+      promise = removeItem(info.troupeId, info.modelName, modelId);
+    }
+
+    if(promise) {
+      promise.fail(function(err) {
+        winston.error('unreadItemService failure: ' + err, { exception: err });
+        throw err;
+      });
     }
 
   });
@@ -466,5 +479,7 @@ exports.install = function() {
 
 exports.testOnly = {
   getOldestId: getOldestId,
-  sinceFilter: sinceFilter
+  sinceFilter: sinceFilter,
+  newItem: newItem,
+  removeItem: removeItem
 };
