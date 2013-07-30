@@ -1436,7 +1436,7 @@ function markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite, callback) {
     winston.error("Error saving used invite");
   });
 
-  return invite.removeQ()
+  return invite.saveQ()
       .then(function() {
 
         var similarityQuery = { status: 'UNUSED', userId: invite.userId };
