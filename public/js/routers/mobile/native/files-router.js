@@ -3,7 +3,7 @@ require([
   'jquery',
   'underscore',
   'backbone',
-  './base-router',
+  'routers/mobile/mobile-router',
   'views/base',
   'views/file/fileView',
   'views/file/fileDetailView',
@@ -13,11 +13,11 @@ require([
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
   'template/helpers/all'              // No ref
-], function($, _, Backbone, BaseRouter, TroupeViews, FileView, FileDetailView, fileModels, MobileFilePreview/*, unreadItemsClient*/) {
+], function($, _, Backbone, MobileRouter, TroupeViews, FileView, FileDetailView, fileModels, MobileFilePreview/*, unreadItemsClient*/) {
   /*jslint browser: true, unused: true */
   "use strict";
 
-  var AppRouter = BaseRouter.extend({
+  var AppRouter = MobileRouter.extend({
     routes: {
       'file/:id':     'showFile',
       'preview/:id':  'previewFile',
@@ -25,7 +25,8 @@ require([
     },
 
     initialize: function() {
-      var self = this;
+      this.constructor.__super__.initialize.apply(this);
+
       this.fileCollection = new fileModels.FileCollection();
       this.fileCollection.listen();
     },
@@ -47,22 +48,10 @@ require([
 
   });
 
-
-  $('.trpMobileAmuseIcon').click(function() {
-    document.location.reload(true);
-  });
-
   var troupeApp = new AppRouter();
 
   window.troupeApp = troupeApp;
   Backbone.history.start();
-
-  // Asynchronously load tracker
-  require([
-    'utils/tracking'
-  ], function() {
-    // No need to do anything here
-  });
 
   return troupeApp;
 });

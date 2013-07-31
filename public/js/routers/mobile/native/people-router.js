@@ -4,26 +4,27 @@ require([
   'underscore',
   'backbone',
   'utils/context',
-  './base-router',
+  'routers/mobile/mobile-router',
   'collections/users',
   'marionette',
   'views/base',
-  'hbs!./views/people/tmpl/mobilePeopleView',
+  'hbs!views/people/tmpl/mobilePeopleView',
   'components/mobile-context',        // No ref
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
   'template/helpers/all'              // No ref
-], function($, _, Backbone, context, BaseRouter, userModels, Marionette, TroupeViews, PersonViewTemplate/*, unreadItemsClient*/) {
+], function($, _, Backbone, context, MobileRouter, userModels, Marionette, TroupeViews, PersonViewTemplate/*, unreadItemsClient*/) {
   /*jslint browser: true, unused: true */
   "use strict";
 
-  var AppRouter = BaseRouter.extend({
+  var AppRouter = MobileRouter.extend({
     routes: {
       '*actions':     'defaultAction'
     },
 
     initialize: function() {
-      var self = this;
+      this.constructor.__super__.initialize.apply(this);
+
       var userCollection = this.collection = new userModels.UserCollection();
       userCollection.listen();
 
@@ -64,21 +65,10 @@ require([
 
   });
 
-  $('.trpMobileAmuseIcon').click(function() {
-    document.location.reload(true);
-  });
-
   var troupeApp = new AppRouter();
 
   window.troupeApp = troupeApp;
   Backbone.history.start();
-
-  // Asynchronously load tracker
-  require([
-    'utils/tracking'
-  ], function() {
-    // No need to do anything here
-  });
 
   return troupeApp;
 });

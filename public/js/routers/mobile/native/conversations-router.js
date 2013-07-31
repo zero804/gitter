@@ -3,7 +3,7 @@ require([
   'jquery',
   'underscore',
   'backbone',
-  './base-router',
+  'routers/mobile/mobile-router',
   'views/base',
   'views/conversation/conversationView',
   'views/conversation/conversationDetailView',
@@ -12,18 +12,19 @@ require([
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
   'template/helpers/all'              // No ref
-], function($, _, Backbone, BaseRouter, TroupeViews, ConversationView, conversationDetailView, conversationModels/*, unreadItemsClient*/) {
+], function($, _, Backbone, MobileRouter, TroupeViews, ConversationView, conversationDetailView, conversationModels/*, unreadItemsClient*/) {
   /*jslint browser: true, unused: true */
   "use strict";
 
-  var AppRouter = BaseRouter.extend({
+  var AppRouter = MobileRouter.extend({
     routes: {
       'mail/:id':     'showConversation',
       '*actions':     'defaultAction'
     },
 
     initialize: function() {
-      var self = this;
+      this.constructor.__super__.initialize.apply(this);
+
       this.collection = new conversationModels.ConversationCollection();
       this.collection.listen();
     },
@@ -41,21 +42,10 @@ require([
 
   });
 
-  $('.trpMobileAmuseIcon').click(function() {
-    document.location.reload(true);
-  });
-
   var troupeApp = new AppRouter();
 
   window.troupeApp = troupeApp;
   Backbone.history.start();
-
-  // Asynchronously load tracker
-  require([
-    'utils/tracking'
-  ], function() {
-    // No need to do anything here
-  });
 
   return troupeApp;
 });
