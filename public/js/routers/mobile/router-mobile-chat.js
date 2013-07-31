@@ -1,7 +1,6 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false, require:false */
 define([
   'jquery',
-  'retina',
   'views/base',
   'utils/context',
   'collections/chat',
@@ -10,19 +9,16 @@ define([
   'views/chat/chatCollectionView',
   'views/widgets/avatar',
   'views/request/requestDialog',
-  'views/toolbar/troupeMenu',
-  'views/app/mobileAppView',
   'utils/mobile-resizer',
   'components/mobile-context',        // No ref
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
   'template/helpers/all'              // No ref
-], function($, retina, TroupeViews, context, chatModels, requestModels, chatInputView, ChatCollectionView, AvatarWidget, RequestResponseModal, TroupeMenu, MobileAppView, mobileResizer /*, mobileContext, eyeballsClient, unreadItemsClient */) {
+], function($, TroupeViews, context, chatModels, requestModels, chatInputView, ChatCollectionView, AvatarWidget, RequestResponseModal, mobileResizer /*, mobileContext, eyeballsClient, unreadItemsClient */) {
   "use strict";
 
   return {
     start: function() {
-      var PAGE_SIZE = 15;
 
       TroupeViews.preloadWidgets({
         avatar: AvatarWidget
@@ -46,18 +42,6 @@ define([
 
       mobileResizer.reset();
 
-      new TroupeMenu({
-        el: $('#troupeList')
-      }).render();
-
-      new MobileAppView({
-        el: $('#pageContainer')
-      });
-
-      var fakeWindow = {};
-      retina.init(fakeWindow);
-      fakeWindow.onload();
-
       $('.trpMobileAmuseIcon').click(function() {
         document.location.reload(true);
       });
@@ -76,17 +60,6 @@ define([
           (new RequestResponseModal({ model: requests.at(0) })).show();
         }
       }
-
-      // Prevent Header & Footer From Showing Browser Chrome
-
-      document.addEventListener('touchmove', function(event) {
-         if(event.target.parentNode.className.indexOf('noBounce') != -1 || event.target.className.indexOf('noBounce') != -1 ) {
-        event.preventDefault(); }
-      }, false);
-
-      window.addEventListener("orientationchange", function() {
-        mobileResizer.reset();
-      });
 
       // Asynchronously load tracker
       require([

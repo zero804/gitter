@@ -4,4 +4,11 @@ require(['routers/mobile/router-mobile-chat'], function(router) {
 
   router.start();
 
+  // Prevent Header & Footer From Showing Browser Chrome
+
+  document.addEventListener('touchmove', function(event) {
+     if(event.target.parentNode.className.indexOf('noBounce') != -1 || event.target.className.indexOf('noBounce') != -1 ) {
+    event.preventDefault(); }
+  }, false);
+
 });
