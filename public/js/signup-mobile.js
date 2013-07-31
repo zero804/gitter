@@ -1,17 +1,30 @@
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'jquery-hammer',
   'backbone',
   'views/signup/signupModalView',
-  'views/signup/signupModalConfirmView'
-  ], function($, BackBone, SignupModalView, SignupModalConfirmView) {
+  'views/signup/signupModalConfirmView',
+  'views/login/loginModalView'
+  ], function($, Backbone, SignupModalView, SignupModalConfirmView, LoginModalView) {
+    "use strict";
 
     var Router = Backbone.Router.extend({
       routes: {
         'signup': 'showSignup',
+        'login': 'showLogin',
         '*path':  'defaultRoute'
       },
 
       showSignup: function() {
+        $('#login-panel').hide();
+        $('#signup-panel').show();
+        $('#panelList').addClass('showingSecondPanel');
+      },
+
+      showLogin: function() {
+        $('#login-panel').show();
+        $('#signup-panel').hide();
+              view.render();
         $('#panelList').addClass('showingSecondPanel');
       },
 
@@ -22,21 +35,37 @@ require([
 
     var app = new Router();
 
-    $('#signup').hammer().on('tap', function(event) {
+    $('#signup-button').hammer().on('tap', function(event) {
       app.navigate('signup', {trigger: true});
       event.stopPropagation();
     });
 
-    Backbone.history.start();
+    $('#login-button').hammer().on('tap', function(event) {
+      app.navigate('login', {trigger: true});
+      event.stopPropagation();
+    });
 
-    var view = new SignupModalView({el: $('#signup-form')});
-    view.once('signup.complete', function(data) {
-      view.remove();
+
+    var signupView = new SignupModalView({el: $('#signup-form')});
+    signupView.once('signup.complete', function(data) {
+      signupView.remove();
       new SignupModalConfirmView({
         el: $('#signup-confirmation'),
         data: data
       }).render();
     });
 
-    view.render();
+      var view = new LoginModalView({
+        el: $('#login-form'),
+        fromSignup: true
+      });
+      view.once('login.complete', function(data) {
+        window.location.href= data.redirectTo;
+      });
+
+
+    signupView.render();
+
+    Backbone.history.start();
+
 });

@@ -53,18 +53,23 @@
               <br><br>
             </div>
             <div class="trpHomeMenu">
-              <a class="trpHomeMenuItem trpPadV14 trpHand" href="/login">Login</a>
+              <button id="login-button" class="trpHomeMenuItem trpPadV14 trpHand">Login</button>
             </div>
             <div class="trpHomeMenu">
-              <button id="signup" class="trpHomeMenuItem trpPadV14 trpHand" >Sign up</button>
+              <button id="signup-button" class="trpHomeMenuItem trpPadV14 trpHand" >Sign up</button>
             </div>
           </div>
         </div>
       </div>
       <div class="slidingPanel">
-        <div class="mtrpLoginLogo"><img src="{{cdn "images/2/logo-mark-green-square-black-text.png"}}" width="171" height="64"></div>
-        <div id="signup-form" class="signupStep"></div>
-        <div id="signup-confirmation" class="signupStep"></div>
+        <div id="signup-panel">
+          <div class="mtrpLoginLogo"><img src='{{cdn "images/2/logo-mark-green-square-black-text.png"}}' width="171" height="64"></div>
+          <div id="signup-form" class="signupStep"></div>
+          <div id="signup-confirmation" class="signupStep"></div>
+        </div>
+        <div id="login-panel">
+          <div id="login-form"></div>
+        </div>
       </div>
     </div>
   </body>
