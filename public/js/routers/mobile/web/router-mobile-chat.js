@@ -6,25 +6,31 @@ require([
   'routers/mobile/router-mobile-chat',
   'views/toolbar/troupeMenu',
   'views/app/mobileAppView'
-  ], function($, retina, mobileResizer, router, TroupeMenu, MobileAppView) {
+  ], function($, retina, mobileResizer, MobileRouter, TroupeMenu, MobileAppView) {
   "use strict";
 
-  router.start();
+  var MobileAppRouter = MobileRouter.extend({
+    initialize: function() {
+      this.constructor.__super__.initialize.apply(this);
 
-  new TroupeMenu({
-    el: $('#troupeList')
-  }).render();
+      new TroupeMenu({
+        el: $('#troupeList')
+      }).render();
 
-  new MobileAppView({
-    el: $('#pageContainer')
+      new MobileAppView({
+        el: $('#pageContainer')
+      });
+
+      var fakeWindow = {};
+      retina.init(fakeWindow);
+      fakeWindow.onload();
+
+      window.addEventListener("orientationchange", function() {
+        mobileResizer.reset();
+      });
+    }
   });
 
-  var fakeWindow = {};
-  retina.init(fakeWindow);
-  fakeWindow.onload();
-
-  window.addEventListener("orientationchange", function() {
-    mobileResizer.reset();
-  });
+  new MobileAppRouter();
 
 });

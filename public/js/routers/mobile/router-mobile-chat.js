@@ -1,6 +1,7 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false, require:false */
 define([
   'jquery',
+  'backbone',
   'views/base',
   'utils/context',
   'collections/chat',
@@ -14,11 +15,11 @@ define([
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
   'template/helpers/all'              // No ref
-], function($, TroupeViews, context, chatModels, requestModels, chatInputView, ChatCollectionView, AvatarWidget, RequestResponseModal, mobileResizer /*, mobileContext, eyeballsClient, unreadItemsClient */) {
+], function($, Backbone, TroupeViews, context, chatModels, requestModels, chatInputView, ChatCollectionView, AvatarWidget, RequestResponseModal, mobileResizer /*, mobileContext, eyeballsClient, unreadItemsClient */) {
   "use strict";
 
-  return {
-    start: function() {
+  return Backbone.Router.extend({
+    initialize: function() {
 
       TroupeViews.preloadWidgets({
         avatar: AvatarWidget
@@ -68,5 +69,5 @@ define([
         // No need to do anything here
       });
     }
-  };
+  });
 });
