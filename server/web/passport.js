@@ -15,6 +15,7 @@ var statsService = require("../services/stats-service");
 var nconf = require('../utils/config');
 var loginUtils = require("../web/login-utils");
 var useragent = require('useragent');
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 function loginAndPasswordUserStrategy(req, login, password, done) {
   winston.verbose("Attempting to authenticate ", { email: email });
@@ -227,6 +228,23 @@ module.exports = {
         });
       }
     ));
+
+    passport.use(new GoogleStrategy({
+        clientID:     nconf.get('googleoauth2:client_id'),
+        clientSecret: nconf.get('googleoauth2:client_secret'),
+        callbackURL:  nconf.get('web:basepath') + '/oauth2callback',
+        passReqToCallback: true
+      },
+
+      function(req, accessToken, refreshToken, profile, done) {
+        if (refreshToken) {
+          req.user.googleRefreshToken = refreshToken;
+          req.user.save();
+        }
+        return done(null, req.user);
+      }
+    ));
+
   }
 
 };

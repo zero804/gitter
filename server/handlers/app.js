@@ -90,6 +90,7 @@ function createTroupeContext(req, options) {
       basePath: nconf.get('web:basepath'),
       homeUrl: nconf.get('web:homeurl'),
       mixpanelToken: nconf.get("stats:mixpanel:token"),
+      importedGoogleContacts: req.user.googleRefreshToken ? true : false,
 
       troupeUri: options.troupe ? options.troupe.uri : undefined,
       websockets: {

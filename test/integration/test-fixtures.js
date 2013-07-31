@@ -97,6 +97,19 @@ function createExpectedFixtures(expected, done) {
     });
   }
 
+  function createContact(fixtureName, f) {
+
+    winston.verbose('Creating ' + fixtureName);
+
+    return persistence.Contact.createQ({
+      name:         f.name    || 'John Doe',
+      emails:       f.emails  || ['john@doe.com'],
+      source:       f.source  || 'google',
+      userId:       f.userId  || null
+    });
+  }
+
+
   function createTroupe(fixtureName, f) {
     var users;
 
@@ -195,8 +208,28 @@ function createExpectedFixtures(expected, done) {
     return Q.all(promises).then(function() { return fixture; });
   }
 
+  function createContacts(fixture) {
+    var promises = Object.keys(expected).map(function(key) {
+ 
+        if(key.match(/^contact/)) {
+          var expectedContact = expected[key];
+ 
+          expectedContact.userId = fixture[expectedContact.user]._id;
+
+          return createContact(key, expectedContact)
+            .then(function(contact) {
+              fixture[key] = contact;
+            });
+        }
+ 
+        return null;
+      });
+    return Q.all(promises).then(function() { return fixture; });
+  } 
+
   return createUsers(createBaseFixture())
     .then(createTroupes)
+    .then(createContacts)
     .nodeify(done);
 }
 

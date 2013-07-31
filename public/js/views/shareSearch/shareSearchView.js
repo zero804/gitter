@@ -34,7 +34,9 @@ define([
           inviteToConnect: options.inviteToConnect,
 
           troupe: options.troupe ? options.troupe : context.getTroupe(),
-          user: options.user ? options.user : context.getUser()
+          user: options.user ? options.user : context.getUser(),
+          importedGoogleContacts: context().importedGoogleContacts
+
           // , inviteUser: options.inviteUser
         };
       }
@@ -44,9 +46,11 @@ define([
           inviteToConnect: context.inUserhomeContext(),
 
           troupe: context.getTroupe(),
-          user: context.getUser()
+          user: context.getUser(),
+          importedGoogleContacts: context().importedGoogleContacts
         };
       }
+
 
       if (this.data.inviteToTroupe && !this.data.troupe) throw new Error("Need a troupe");
       if (this.data.inviteToConnect && !this.data.user) throw new Error("Need a viewer");
@@ -127,25 +131,28 @@ define([
 
       this.$el.find('input[name=inviteSearch]').typeahead({
         source: function(query, process) {
-          if(sources[query]) {
+
+          sources[query] = sources[query] || [];
+
+          if(sources[query].length !== 0) {
             source = sources[query];
-            // process(source); not needed
-            return sources[query];
+            return source;
           }
 
-          var emptyPreviously = _.some(sources, function(v,k) {
-            return query.toLowerCase().indexOf(k.toLowerCase()) === 0 && v.length <= 1;
-          });
+          //var emptyPreviously = _.some(sources, function(v,k) {
+          //  return query.toLowerCase().indexOf(k.toLowerCase()) === 0 && v.length != 0;
+          //});
 
-          if(emptyPreviously) {
-            // a previous search with a shorter matching query has returned no results.
-            // don't fetch.
-            source = sources[query] = [];
-            addEmailOption(source, query);
-            installToString(source);
-            process(source);
-            return;
-          }
+          //if(emptyPreviously) {
+          //  console.log('empty')
+          //  // a previous search with a shorter matching query has returned no results.
+          //  // don't fetch.
+          //  source = sources[query] || [];
+          //  addEmailOption(source, query);
+          //  installToString(source);
+          //  process(source);
+          //  return;
+          //}
 
           // fetch from server
           var url = '/user';
@@ -153,14 +160,24 @@ define([
           $.ajax({ url: '/user', data: urlData, success:
             function(data) {
 
-              source = data.results || [];
-              sources[query] = source;
+              var results = data.results || [];
+              source = sources[query] = sources[query].concat(results);
 
-              addEmailOption(source, query);
+              //addEmailOption(options, query);
               installToString(source);
               process(source);
             }
           });
+          $.ajax({ url: '/contacts', data: {q: query}, success:
+            function(data) {
+              source = sources[query] = sources[query].concat(data.results);
+
+              //addEmailOption(options, query);
+              installToString(source);
+              process(source);
+            }
+          });
+
         },
         sorter: function(items) {
           return _.sortBy(items, function(o) {
@@ -185,7 +202,8 @@ define([
             return '<span class="trpBodyMedium">' + match + '</strong>';
           });
 
-          var html = ((item.avatarUrlSmall) ? '<img src="'+item.avatarUrlSmall+'"  class="trpDisplayPicture avatar-xs trpSearchInviteResult" width="30"/>' : '') + '<span class="trpBodyMedium">' + str + '</span>';
+          var body = (item.email && item.displayName.indexOf('@') == -1) ? str + ' (' + item.email + ')' : str;
+          var html = ((item.avatarUrlSmall) ? '<img src="'+item.avatarUrlSmall+'"  class="trpDisplayPicture avatar-xs trpSearchInviteResult" width="30"/>' : '') + '<span class="trpBodyMedium">' + body + '</span>';
 
           return html;
         },
@@ -195,7 +213,7 @@ define([
           });
 
           // validate email address or accept existing user
-          if ((item && item.id) || self.valid()) {
+          if ((item && item.id) || (item && item.imported) || self.valid()) {
             self.selectPerson(item);
 
             return ''; // empty the search box
@@ -209,10 +227,12 @@ define([
       function addEmailOption(source, query) {
         if (self.valid()) {
           // add the query as an email address option
-          source.push({ email: query, displayName: query, avatarUrlSmall: '/avatarForEmail/'+query }); // note:  this will provide a diff avatar each key stroke, don't show it in the autocomplete!
+          // note:  this will provide a diff avatar each key stroke, don't show it in the autocomplete!
+          source.push({ email: query, displayName: query, avatarUrlSmall: '/avatarForEmail/'+query });
         } else {
           // add a non-selectable option which says continue typing an email address
           source.push({ displayName: "You can also type an email address to invite somebody new.", nonSelectable: true });
+          self.emailOptionPresent = true;
         }
       }
 
