@@ -25,7 +25,7 @@ perf-test-xunit:
 
 perf-test:
 	NODE_ENV=test ./node_modules/.bin/mocha \
-		--reporter dot \
+		--reporter spec \
 		--timeout 100000 \
 		--recursive \
 		$(PERF_TESTS)
