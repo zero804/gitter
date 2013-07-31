@@ -66,7 +66,7 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "routers/mobile/native/router-mobile-chat",
+                  name: "routers/mobile/native/native-chat-router",
                   include: [
                     "utils/tracking",
                     "views/widgets/avatar",
@@ -75,7 +75,7 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "routers/mobile/web/router-mobile-chat",
+                  name: "routers/mobile/web/mobile-app-router",
                   include: [
                     "utils/tracking",
                     "views/widgets/avatar",
@@ -206,13 +206,13 @@ module.exports = function( grunt ) {
         src: ['public-processed/js/router-app.js'],
         dest: 'public-processed/js/router-app.js'
       },
-      "router-mobile-native-chat": {
-        src: ['public-processed/js/routers/mobile/native/router-mobile-chat.js'],
-        dest: 'public-processed/js/routers/mobile/native/router-mobile-chat.js'
+      "native-chat-router": {
+        src: ['public-processed/js/routers/mobile/native/native-chat-router.js'],
+        dest: 'public-processed/js/routers/mobile/native/native-chat-router.js'
       },
-      "router-mobile-web-chat": {
-        src: ['public-processed/js/routers/mobile/web/router-mobile-chat.js'],
-        dest: 'public-processed/js/routers/mobile/web/router-mobile-chat.js'
+      "rmobile-app-router": {
+        src: ['public-processed/js/routers/mobile/web/mobile-app-router'],
+        dest: 'public-processed/js/routers/mobile/web/mobile-app-router'
       },
       "router": {
         src: ['public-processed/js/router.js'],
