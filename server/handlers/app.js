@@ -403,12 +403,7 @@ module.exports = {
           }
         });
 
-
-
-
-
       function acceptInviteWithoutConfirmation(req, res, next) {
-
         var appUri = req.params.appUri || 'one-one/' + req.params.userId;
 
         if(!req.user) {
