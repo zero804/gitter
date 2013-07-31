@@ -109,14 +109,24 @@ exports.install = function(persistenceService) {
 
   attachNotificationListenersToSchema(schemas.ConversationSchema, 'conversation');
   attachNotificationListenersToSchema(schemas.FileSchema, 'file');
-  // INVITES currently do not have live-collections
-  attachNotificationListenersToSchema(schemas.InviteSchema, 'invite');
+
   attachNotificationListenersToSchema(schemas.InviteSchema, 'invite', function(model) {
+    var urls = [];
+
     if(model.userId) {
-      return "/user/" + model.userId + "/invites";
+      urls.push("/user/" + model.userId + "/invites");
     }
 
-    return null;
+    // One to one connection invite
+    if(model.fromUserId && !model.troupe) {
+      urls.push("/user/" + model.fromUserId + "/connectioninvites");
+    }
+
+    if(model.troupeId) {
+      urls.push("/troupes/" + model.troupeId + "/invites");
+    }
+
+    return urls.length ? urls : null;
   });
 
   attachNotificationListenersToSchema(schemas.RequestSchema, 'request');
