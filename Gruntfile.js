@@ -66,7 +66,7 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "router-mobile-chat",
+                  name: "routers/mobile/native/chat-router",
                   include: [
                     "utils/tracking",
                     "views/widgets/avatar",
@@ -75,7 +75,7 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "router-mobile-files",
+                  name: "routers/mobile/web/mobile-app-router",
                   include: [
                     "utils/tracking",
                     "views/widgets/avatar",
@@ -84,7 +84,16 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "router-mobile-conversations",
+                  name: "routers/mobile/native/files-router",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "routers/mobile/native/conversations-router",
                   include: [
                     "utils/tracking",
                     "views/widgets/avatar",
@@ -197,9 +206,13 @@ module.exports = function( grunt ) {
         src: ['public-processed/js/router-app.js'],
         dest: 'public-processed/js/router-app.js'
       },
-      "router-mobile-chat": {
-        src: ['public-processed/js/router-mobile-chat.js'],
-        dest: 'public-processed/js/router-mobile-chat.js'
+      "chat-router": {
+        src: ['public-processed/js/routers/mobile/native/chat-router.js'],
+        dest: 'public-processed/js/routers/mobile/native/chat-router.js'
+      },
+      "rmobile-app-router": {
+        src: ['public-processed/js/routers/mobile/web/mobile-app-router'],
+        dest: 'public-processed/js/routers/mobile/web/mobile-app-router'
       },
       "router": {
         src: ['public-processed/js/router.js'],

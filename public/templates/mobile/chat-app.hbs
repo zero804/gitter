@@ -20,7 +20,11 @@
 
     {{>require_wrapper}}
 
-    {{{bootScript "router-mobile-chat" skipCdn=true }}}
+    {{#if isWebApp}}
+    {{{bootScript "routers/mobile/web/mobile-app-router" skipCdn=true }}}
+    {{else}}
+    {{{bootScript "routers/mobile/native/chat-router" skipCdn=true }}}
+    {{/if}}
 
     <link rel="shortcut icon" href="images/favicon.ico">
 
@@ -33,9 +37,11 @@
       </div>
     </div>
 
+    {{#if isWebApp}}
     <div id="troupeListPanel" class="sideMenu">
       <div id="troupeList"></div>
     </div>
+    {{/if}}
 
     <div id="pageContainer" class="platform">
       <div id="mainPage">
