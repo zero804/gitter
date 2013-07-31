@@ -15,10 +15,12 @@ define([
       tagName: 'li',
       template: itemTemplate,
       serializeData: function() {
+        var toUser = this.model.get('user');
+
         if (this.options.fromViewer) {
           return {
-            url: this.model.get('user').url,
-            name: this.model.get('user').displayName
+            url: (toUser) ? toUser.url : '#', // there's no page to go to for connect invites to non-users
+            name: (toUser) ? toUser.displayName : this.model.get('email')
           };
         }
         else {
