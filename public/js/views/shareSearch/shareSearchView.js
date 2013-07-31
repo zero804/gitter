@@ -144,7 +144,6 @@ define([
           //});
 
           //if(emptyPreviously) {
-          //  console.log('empty')
           //  // a previous search with a shorter matching query has returned no results.
           //  // don't fetch.
           //  source = sources[query] || [];
