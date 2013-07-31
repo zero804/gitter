@@ -179,6 +179,7 @@ var authenticator = {
   incoming: function(message, callback) {
     function deny() {
       message.error = '403::Access denied';
+      winston.error('Denying client access', message);
       callback(message);
     }
 
@@ -280,6 +281,7 @@ var authorisor = {
 
     function deny() {
       message.error = '403::Access denied';
+      winston.error('Socket authorisation failed', message);
       callback(message);
     }
 
