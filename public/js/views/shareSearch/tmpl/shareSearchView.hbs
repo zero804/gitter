@@ -2,14 +2,24 @@
   <div class="trpModalTitle">Invite people to {{#if inviteToTroupe}} this Troupe{{else}} connect{{/if}}</div>
   <form class="form-inline" id="share-form">
     <div>
-    <input type="text" name="inviteSearch" class="trpInput" placeholder="Search your contacts or enter an email address here" autocomplete="off" style="width: 300px"/>
+    <input type="text" name="inviteSearch" class="trpInput" placeholder="Search your contacts or enter an email address here" autocomplete="off" style="width: 300px"/><br>
     </div>
-    <style>button.sendInvites { display: block; margin-top: 20px; } </style>
+    <style>button.sendInvites { display: inline-block; } </style>
 
   <div id="invites" class="trpSearchInvites">
   </div>
 
+  <div style="margin-top: 20px">
   <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen sendInvites" id="submit-button">Send Invites</button>
+  <!-- don't display this <a> bit at all if the account has been connected to Google -->
+  {{#unless importedGoogleContacts}}
+    <a href='/google/contacts' style="float: right; text-decoration: none">
+      <div class="trpModalButton trpButtonBig trpBtnLightGrey trpHand" style="display:inline-block; float: right">
+        <img src='{{cdn "images/2/icon-gmail.png"}}' style="vertical-align: middle; margin-right: 4px">
+        <span style="vertical-align: middle">Add Gmail Contacts</a>
+      </div>
+    </a>
+  {{/unless}}
   </form>
 
 </div>
