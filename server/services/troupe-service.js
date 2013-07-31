@@ -621,8 +621,16 @@ function updateInvitesForEmailToUserId(email, userId, callback) {
 }
 
 function findAllUnusedInvitesForUserId(userId, callback) {
-  // note: this finds invites for the user and from the user, unlike the ForEmail version which still only finds for the user
-  return persistence.Invite.where().or([{ 'userId': userId }, { 'fromUserId': userId }])
+  return persistence.Invite.where('userId').equals(userId)
+    .where('status').equals('UNUSED')
+    .sort({ createdAt: 'asc' } )
+    .execQ()
+    .nodeify(callback);
+}
+
+function findAllUnusedConnectionInvitesFromUserId(userId, callback) {
+  return persistence.Invite.where('fromUserId').equals(userId)
+    .where('troupeId').equals(null)
     .where('status').equals('UNUSED')
     .sort({ createdAt: 'asc' } )
     .execQ()
@@ -1509,6 +1517,7 @@ module.exports = {
   findAllUnusedInvitesForTroupe: findAllUnusedInvitesForTroupe,
   findAllUnusedInvitesForEmail: findAllUnusedInvitesForEmail,
   findAllUnusedInvitesForUserId: findAllUnusedInvitesForUserId,
+  findAllUnusedConnectionInvitesFromUserId: findAllUnusedConnectionInvitesFromUserId,
   findUnusedInviteToTroupeForUserId: findUnusedInviteToTroupeForUserId,
   findImplicitConnectionBetweenUsers: findImplicitConnectionBetweenUsers,
   findAllUserIdsForUnconnectedImplicitContacts: findAllUserIdsForUnconnectedImplicitContacts,

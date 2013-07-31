@@ -104,6 +104,9 @@ function populateSubUserCollection(options, callback) {
     case "invites":
       return restful.serializeInvitesForUser(userId, callback);
 
+    case "connectioninvites":
+      return restful.serializeInvitesFromUser(userId, callback);
+
     default:
       winston.error('Unable to provide snapshot for ' + collection);
   }

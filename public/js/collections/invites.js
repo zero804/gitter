@@ -29,6 +29,17 @@ define([
 
   });
 
+  exports.ConnectionInviteCollection = TroupeCollections.LiveCollection.extend({
+    model: exports.InviteModel,
+    modelName: 'connectioninvites',
+    nestedUrl: "connectioninvites",
+
+    initialize: function() {
+      this.url = "/user/" + context.getUserId() + "/connectioninvites";
+    }
+
+  });
+
   exports.TroupeInviteCollection = TroupeCollections.LiveCollection.extend({
     model: exports.InviteModel,
     modelName: 'invite',
