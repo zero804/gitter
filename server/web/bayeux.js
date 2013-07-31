@@ -470,12 +470,12 @@ module.exports = {
     //});
 
     server.bind('disconnect', function(clientId) {
-      // Warning, this event is called pretty simulateously on
+      // Warning, this event is called simulateously on
       // all the servers that are connected to the same redis/faye
       // connection
       winston.info("Client " + clientId + " disconnected");
       presenceService.socketDisconnected(clientId, function(err) {
-        if(err && !err.lockFail) { winston.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err,  { exception: err }); }
+        if(err && err !== 404) { winston.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err,  { exception: err }); }
       });
     });
 
