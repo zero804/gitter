@@ -3,7 +3,7 @@ require([
   'jquery',
   'retina',
   'utils/mobile-resizer',
-  'routers/mobile/router-mobile-chat',
+  'routers/mobile/mobile-router',
   'views/toolbar/troupeMenu',
   'views/app/mobileAppView'
   ], function($, retina, mobileResizer, MobileRouter, TroupeMenu, MobileAppView) {
