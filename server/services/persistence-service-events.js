@@ -118,7 +118,7 @@ exports.install = function(persistenceService) {
     }
 
     // One to one connection invite
-    if(model.fromUserId && !model.troupe) {
+    if(model.fromUserId && !model.troupeId) {
       urls.push("/user/" + model.fromUserId + "/connectioninvites");
     }
 
