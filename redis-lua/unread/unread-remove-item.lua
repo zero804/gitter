@@ -1,6 +1,6 @@
 -- Keys are user:troupe keys follows by user:count keys
 -- Values are [troupeId, itemId]
-local troupeId = ARGV[1]
+local troupe_id = ARGV[1]
 local item_id = ARGV[2];
 
 local key_count = #KEYS/2
