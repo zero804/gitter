@@ -11,6 +11,7 @@ var restful = require("../services/restful");
 var nconf = require("../utils/config");
 var shutdown = require('../utils/shutdown');
 
+
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
   { re: /^\/troupes\/(\w+)$/,         validator: validateUserForTroupeSubscription },
@@ -449,7 +450,7 @@ var server = new faye.NodeAdapter({
 
 var client = server.getClient();
 
-//faye.Logging.logLevel = 'info';
+faye.Logging.logLevel = 'debug';
 
 module.exports = {
   server: server,
@@ -465,9 +466,9 @@ module.exports = {
 
     client.addExtension(superClient);
 
-    //server.bind('handshake', function(clientId) {
-    //  winston.verbose("Faye handshake: ", { clientId: clientId });
-    //});
+    server.bind('handshake', function(clientId) {
+      winston.info("Faye handshake: ", { clientId: clientId });
+    });
 
     server.bind('disconnect', function(clientId) {
       // Warning, this event is called simulateously on
@@ -485,7 +486,7 @@ module.exports = {
       setTimeout(callback, 1000);
     });
 
-    presenceService.startPresenceGcService(server._server._engine);
+    //presenceService.startPresenceGcService(server._server._engine);
     server.attach(httpServer);
   }
 };
