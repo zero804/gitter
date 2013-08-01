@@ -128,30 +128,29 @@ define([
     createTypeahead: function() {
       var self = this;
       var sources = {}, source;
-
       this.$el.find('input[name=inviteSearch]').typeahead({
         source: function(query, process) {
 
           sources[query] = sources[query] || [];
 
-          if(sources[query].length !== 0) {
+          if(sources[query].length) {
             source = sources[query];
             return source;
           }
 
-          //var emptyPreviously = _.some(sources, function(v,k) {
-          //  return query.toLowerCase().indexOf(k.toLowerCase()) === 0 && v.length != 0;
-          //});
+          var emptyPreviously = _.some(sources, function(v,k) {
+           return query.toLowerCase().indexOf(k.toLowerCase()) === 0 && v.length != 0;
+          });
 
-          //if(emptyPreviously) {
-          //  // a previous search with a shorter matching query has returned no results.
-          //  // don't fetch.
-          //  source = sources[query] || [];
-          //  addEmailOption(source, query);
-          //  installToString(source);
-          //  process(source);
-          //  return;
-          //}
+          if(emptyPreviously) {
+           // a previous search with a shorter matching query has returned no results.
+           // don't fetch.
+           source = sources[query] || [];
+           addEmailOption(source, query);
+           installToString(source);
+           process(source);
+           return;
+          }
 
           // fetch from server
           var url = '/user';
@@ -314,6 +313,11 @@ define([
 
   var Modal = TroupeViews.Modal.extend({
     initialize: function(options) {
+      if (options.inviteToConnect) {
+        options.title = "Connect with people on Troupe";
+      } else {
+        options.title = "Invite people to " + context.getTroupe().name;
+      }
       TroupeViews.Modal.prototype.initialize.apply(this, arguments);
       this.$el.addClass('trpInviteModal');
       this.view = new View(options);
