@@ -38,47 +38,39 @@
   box-align: center;
 }
 
-html {
+@numberOfPanels: 2;
+
+html, body, #platform, #panelList, .slidingPanel {
   height: 100%;
+}
+
+html, body, #platform {
   width: 100%;
+}
 
-  body {
-    height: 100%;
-    width: 100%;
-
-    #platform {
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-
-      #panelList {
-        height: 100%;
-        width: 200%;
-
-        .slidingPanel {
-          height: 100%;
-          width: 50%;
-          float:left;
-        }
-      }
-    }
-  }
+#platform {
+  overflow: hidden;
 }
 
 #panelList {
+  width: ( 100% * @numberOfPanels );
   background-image: url('../../images/2/home-hero-image4.jpg');
   background-size: cover;
   margin-left: 0%;
-  transform: translate3d(0,0,0);
-  -webkit-transform: translate3d(0,0,0);
-  -webkit-transition: all 200ms linear;
-  -moz-transition: all 200ms linear;
-  -o-transition: all 200ms linear;
-  transition: all 200ms linear;
+  .simpleSlideAnimation
 }
 
 #panelList.showingSecondPanel {
   margin-left: -100%;
+  .simpleSlideAnimation
+}
+
+.slidingPanel {
+  width: ( 100% / @numberOfPanels );
+  float: left;
+}
+
+.simpleSlideAnimation {
   transform: translate3d(0,0,0);
   -webkit-transform: translate3d(0,0,0);
   -webkit-transition: all 200ms linear;
