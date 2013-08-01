@@ -15,6 +15,7 @@ define([
 
     initialize: function(options) {
       if (options) {
+        this.noAutofocus = options.noAutofocus;
         this.initialEmail = options.email;
         this.fromSignup = options.fromSignup;
         this.userExists = options.userExists;
@@ -27,8 +28,8 @@ define([
       return {
         userExists: this.userExists,
         email: this.initialEmail,
-        autofocusEmail: this.initialEmail ? '': 'autofocus',
-        autofocusPassword: this.initialEmail ? 'autofocus' : '',
+        autofocusEmail: !this.initialEmail && !this.noAutofocus ? 'autofocus' : '',
+        autofocusPassword: this.initialEmail && !this.noAutofocus ? 'autofocus' : '',
         troupeUri: this.fromSignup ? null : window.location.pathname.replace(/\//g,''),
         fromSignup: this.fromSignup,
         isOneToOne: troupe && troupe.oneToOne
