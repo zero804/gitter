@@ -24,7 +24,6 @@ require([
       showLogin: function() {
         $('#login-panel').show();
         $('#signup-panel').hide();
-              view.render();
         $('#panelList').addClass('showingSecondPanel');
       },
 
@@ -65,6 +64,8 @@ require([
 
 
     signupView.render();
+    view.render();
+
 
     Backbone.history.start();
 
