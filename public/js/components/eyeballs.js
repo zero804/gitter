@@ -33,7 +33,8 @@ define([
         400: function() {
           // The connection is gone...
           log('Eyeballs returned 400. Recycling realtime connection.');
-          realtime.recycleConnection(clientRef);
+          //realtime.recycleConnection(clientRef);
+          //OFF!
         }
       },
       error: function() {
