@@ -36,39 +36,41 @@
   </head>
 
   <body>
-    <div id="panelList">
-      <div id="landing-page" class="trpBodyWrapper slidingPanel">
+    <div id="platform">
+      <div id="panelList">
+        <div id="landing-page" class="trpBodyWrapper slidingPanel">
 
-        <div class="trpHomeHeroStripContainer">
+          <div class="trpHomeHeroStripContainer">
 
-          <div class="trpHomeTopStrip">
-            <div class="trpHomeLogo">
-              <img src='{{ cdn "images/2/logo-mark-green-square-white-text.png" }}' height="64" width="215">
+            <div class="trpHomeTopStrip">
+              <div class="trpHomeLogo">
+                <img src='{{ cdn "images/2/logo-mark-green-square-white-text.png" }}' height="64" width="215">
+              </div>
             </div>
-          </div>
 
-          <div class="trpHomeHero">
-            <div class="trpHeroText">
-              The quick and simple way to chat, share and<br>work together.<br><br>Anytime, anywhere.
-              <br><br>
-            </div>
-            <div class="trpHomeMenu">
-              <button id="login-button" class="trpHomeMenuItem trpPadV14 trpHand">Login</button>
-            </div>
-            <div class="trpHomeMenu">
-              <button id="signup-button" class="trpHomeMenuItem trpPadV14 trpHand" >Sign up</button>
+            <div class="trpHomeHero">
+              <div class="trpHeroText">
+                The quick and simple way to chat, share and<br>work together.<br><br>Anytime, anywhere.
+                <br><br>
+              </div>
+              <div class="trpHomeMenu">
+                <button id="login-button" class="trpHomeMenuItem trpPadV14 trpHand">Login</button>
+              </div>
+              <div class="trpHomeMenu">
+                <button id="signup-button" class="trpHomeMenuItem trpPadV14 trpHand" >Sign up</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="slidingPanel">
-        <div id="signup-panel">
-          <div class="mtrpLoginLogo"><img src='{{cdn "images/2/logo-mark-green-square-black-text.png"}}' width="171" height="64"></div>
-          <div id="signup-form" class="signupStep"></div>
-          <div id="signup-confirmation" class="signupStep"></div>
-        </div>
-        <div id="login-panel">
-          <div id="login-form"></div>
+        <div class="slidingPanel">
+          <div id="signup-panel" style="display: none;">
+            <div class="mtrpLoginLogo"><img src='{{cdn "images/2/logo-mark-green-square-black-text.png"}}' width="171" height="64"></div>
+            <div id="signup-form" class="signupStep"></div>
+            <div id="signup-confirmation" class="signupStep"></div>
+          </div>
+          <div id="login-panel" style="display: none;">
+            <div id="login-form"></div>
+          </div>
         </div>
       </div>
     </div>
