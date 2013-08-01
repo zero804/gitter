@@ -7,20 +7,56 @@
 @import "trp3Common.less";
 @import "trpModals.less";
 
-.slidingPanel {
-  width: 50%;
-  height: 100%;
-  display: inline;
-  float:left;
+
+.form {
+  width: 230px;
+  margin: 0 auto;
 }
 
-#platform {
-  overflow: hidden;
+#formPanel {
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: center;
+
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: center;
+
+  display: box;
+  box-orient: horizontal;
+  box-align: center;
+}
+
+html {
+  height: 100%;
+  width: 100%;
+
+  body {
+    height: 100%;
+    width: 100%;
+
+    #platform {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+
+      #panelList {
+        height: 100%;
+        width: 200%;
+
+        .slidingPanel {
+          height: 100%;
+          width: 50%;
+          float:left;
+        }
+      }
+    }
+  }
 }
 
 #panelList {
-  width: 200%;
-  height: 100%;
+  background-image: url('../../images/2/home-hero-image4.jpg');
+  background-size: cover;
   margin-left: 0%;
   transform: translate3d(0,0,0);
   -webkit-transform: translate3d(0,0,0);
@@ -41,8 +77,6 @@
 }
 
 body {
-  width: 100%;
-  height: 100%;
   margin: 0;
 }
 

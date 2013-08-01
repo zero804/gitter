@@ -16,14 +16,14 @@ require([
       },
 
       showSignup: function() {
-        $('#login-panel').hide();
-        $('#signup-panel').show();
+        $('.form').hide();
+        $('#signup-form').show();
         $('#panelList').addClass('showingSecondPanel');
       },
 
       showLogin: function() {
-        $('#login-panel').show();
-        $('#signup-panel').hide();
+        $('.form').hide();
+        $('#login-form').show();
         $('#panelList').addClass('showingSecondPanel');
       },
 
