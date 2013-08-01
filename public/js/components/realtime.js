@@ -225,22 +225,6 @@ define([
       return clientId;
     },
 
-    getClientRef: function() {
-      return 0;
-      //return getOrCreateClient().getClientRef();
-    },
-/*
-    recycleConnection: function(conditionalClientRef) {
-      log('Recycling connection');
-      if(conditionalClientRef) {
-        getOrCreateClient().recycleConditional(conditionalClientRef);
-      } else {
-        getOrCreateClient().recycle();
-
-      }
-
-    },
-*/
     subscribe: function(channel, callback, context) {
       return getOrCreateClient().subscribe(channel, callback, context);
     },

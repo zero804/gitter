@@ -16,8 +16,6 @@ define([
       return;
     }
 
-    var clientRef = realtime.getClientRef();
-
     $.ajax({
       url: '/api/v1/eyeballs',
       data: {
@@ -32,9 +30,8 @@ define([
       statusCode: {
         400: function() {
           // The connection is gone...
-          log('Eyeballs returned 400. Recycling realtime connection.');
-          //realtime.recycleConnection(clientRef);
-          //OFF!
+          log('Eyeballs returned 400. Realtime connection.');
+          // TODO: something here please
         }
       },
       error: function() {
