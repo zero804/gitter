@@ -1,7 +1,8 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var faye = require('faye');
+//var faye = require('faye');
+var faye = require('./faye-temp/faye-node');
 var fayeRedis = require('faye-redis');
 var oauth = require("../services/oauth-service");
 var winston = require("winston");
