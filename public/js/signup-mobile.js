@@ -56,7 +56,8 @@ require([
 
       var view = new LoginModalView({
         el: $('#login-form'),
-        fromSignup: true
+        fromSignup: true,
+        noAutofocus: true
       });
       view.once('login.complete', function(data) {
         window.location.href= data.redirectTo;
