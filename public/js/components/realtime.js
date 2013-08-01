@@ -2,13 +2,10 @@
 define([
   'jquery',
   'utils/context',
-  'faye',
+  './fayeWrapper',
   'log!realtime'
-], function($, context, Faye, log) {
+], function($, context, FayeWrapper, log) {
   "use strict";
-
-  Faye.Logging.logLevel = 'debug';
-  Faye.logger = log;
 
   var connected = false;
   var connectionProblemTimeoutHandle;
@@ -124,7 +121,7 @@ define([
       };
     }
 
-    var client = new Faye.Client(c.fayeUrl, c.options);
+    var client = new FayeWrapper(c.fayeUrl, c.options);
 
     if(c.disable) {
       for(var i = 0; i < c.length; i++) {
@@ -205,7 +202,7 @@ define([
 
   $(document).on('reawaken', function() {
     log('Recycling connection after reawaken');
-    //if(client) client.recycle();
+    if(client) client.recycle();
   });
 
   // Cordova events.... doesn't matter if IE8 doesn't handle them
@@ -222,14 +219,14 @@ define([
 
   return {
     getClientId: function() {
-      return clientId;
+      var client = getOrCreateClient();
+      return client.getClientId();
     },
 
     getClientRef: function() {
-      return 0;
-      //return getOrCreateClient().getClientRef();
+      return getOrCreateClient().getClientRef();
     },
-/*
+
     recycleConnection: function(conditionalClientRef) {
       log('Recycling connection');
       if(conditionalClientRef) {
@@ -240,7 +237,7 @@ define([
       }
 
     },
-*/
+
     subscribe: function(channel, callback, context) {
       return getOrCreateClient().subscribe(channel, callback, context);
     },
