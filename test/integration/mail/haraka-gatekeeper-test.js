@@ -125,9 +125,8 @@ describe('haraka-gatekeeper', function() {
   function createGatekeeperPlugin(sendEmailProxy) {
 
     var gatekeeper = testRequire.withProxies("./haraka/plugins/gatekeeper", {
-      './services/mailer-service': {
-        sendEmail: sendEmailProxy
-      }
+      './services/mailer-service': { sendEmail: sendEmailProxy },
+      './utils/event-listeners': { installLocalEventListeners: function() {} }
     }, true);
 
     return gatekeeper;
