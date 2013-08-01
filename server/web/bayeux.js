@@ -450,7 +450,7 @@ var server = new faye.NodeAdapter({
 
 var client = server.getClient();
 
-faye.Logging.logLevel = 'debug';
+//faye.Logging.logLevel = 'info';
 
 module.exports = {
   server: server,
@@ -466,9 +466,9 @@ module.exports = {
 
     client.addExtension(superClient);
 
-    server.bind('handshake', function(clientId) {
-      winston.info("Faye handshake: ", { clientId: clientId });
-    });
+    //server.bind('handshake', function(clientId) {
+    //  winston.verbose("Faye handshake: ", { clientId: clientId });
+    //});
 
     server.bind('disconnect', function(clientId) {
       // Warning, this event is called simulateously on
@@ -486,7 +486,7 @@ module.exports = {
       setTimeout(callback, 1000);
     });
 
-    //presenceService.startPresenceGcService(server._server._engine);
+    presenceService.startPresenceGcService(server._server._engine);
     server.attach(httpServer);
   }
 };
