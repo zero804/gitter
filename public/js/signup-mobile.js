@@ -11,6 +11,7 @@ require([
     var Router = Backbone.Router.extend({
       routes: {
         'signup': 'showSignup',
+        'signup/:email/please-confirm': 'showSignupPleaseConfirm',
         'login': 'showLogin',
         '*path':  'defaultRoute'
       },
@@ -18,6 +19,14 @@ require([
       showSignup: function() {
         $('.form').hide();
         $('#signup-form').show();
+        $('#panelList').addClass('showingSecondPanel');
+      },
+
+      showSignupPleaseConfirm: function(email) {
+        $('.form').hide();
+        confirmView.email = email;
+        confirmView.render();
+        $('#signup-confirmation').show();
         $('#panelList').addClass('showingSecondPanel');
       },
 
@@ -44,14 +53,13 @@ require([
       event.stopPropagation();
     });
 
-
     var signupView = new SignupModalView({el: $('#signup-form')});
-    signupView.once('signup.complete', function(data) {
-      signupView.remove();
-      new SignupModalConfirmView({
-        el: $('#signup-confirmation'),
-        data: data
-      }).render();
+    signupView.on('signup.complete', function(data) {
+      app.navigate('signup/'+data.email+'/please-confirm', {trigger: true});
+    });
+
+    var confirmView = new SignupModalConfirmView({
+      el: $('#signup-confirmation')
     });
 
     var view = new LoginModalView({
@@ -59,6 +67,7 @@ require([
       fromSignup: true,
       noAutofocus: true
     });
+
     view.once('login.complete', function(data) {
       window.location.href= data.redirectTo;
     });
