@@ -186,8 +186,10 @@ var signupService = module.exports = {
     // and is trying to get the confirmation sent at a later stage
     if(options.email) {
       signupService.resendConfirmationForUser(options.email, callback);
-    } else {
+    } else if(options.troupeId) {
       signupService.resendConfirmationForTroupe(options.troupeId, callback);
+    } else {
+      callback('No email or troupeId sent, nothing to reconfirm');
     }
   },
 

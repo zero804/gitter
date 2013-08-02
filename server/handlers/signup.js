@@ -113,15 +113,17 @@ module.exports = {
       });
 
       app.post('/resendconfirmation',
-        function(req, res, next) {
+        function(req, res) {
           signupService.resendConfirmation({
             email: req.body.email,
             troupeId: req.session.newTroupeId
           }, function(err) {
-            /* TODO: better error xhandling */
-            if(err) return next(err);
-
-            res.send({ success: true });
+            if(err) {
+              winston.error("Nothing to resend", { exception: err });
+              res.send(404);
+            } else {
+              res.send({ success: true });
+            }
           });
 
         }
