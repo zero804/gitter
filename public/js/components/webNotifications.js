@@ -33,7 +33,7 @@ define([
     });
   }
 
-
+/*
   // notify for a reload when new versions of the front end are deployed
   setTimeout(function() {
     // start in a timeout so that the first load of the page doesn't cause a check
@@ -42,7 +42,8 @@ define([
       // make the appcache check whether a reload is necessary.
       $.getJSON('/version',
         function(data) {
-          if (window.troupeContext.appVersion !== data.appVersion) {
+          if(!data) return;
+          if (context().appVersion !== data.appVersion) {
             notifications.notify({
               id: 'app-update',
               className: 'notification',
@@ -53,6 +54,7 @@ define([
       );
     });
   }, 6000);
+*/
 
   // one notification when the connection to server is down
   // todo: this might also show when an invalid user operation is attempted.

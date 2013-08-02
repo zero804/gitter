@@ -30,8 +30,8 @@ define([
       statusCode: {
         400: function() {
           // The connection is gone...
-          log('Eyeballs returned 400. Realtime connection.');
-          // TODO: something here please
+          log('Eyeballs returned 400. Realtime connection may be dead.');
+          realtime.testConnection();
         }
       },
       error: function() {
