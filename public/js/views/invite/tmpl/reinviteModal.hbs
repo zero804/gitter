@@ -9,7 +9,7 @@
         </div>
     </div>
     <div class="trpModalBody" style="text-align: center"><br>
-      Connect <br><br><span class="trpModalSubtext">This invite to {{toUser.email}} is still pending.</span>
+      <br><br><span class="trpModalSubtext">This invite to {{#if toUser.displayName}}{{toUser.displayName}}{{else}}{{toUser.email}}{{/if}} is still pending.</span>
     </div>
     <div class="" style="text-align: center">
       <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen" id="invite-resend-button" style="min-width: 110px">Resend Invite</button>
