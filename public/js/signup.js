@@ -80,7 +80,7 @@ require([
       var modal = new TroupeViews.Modal({ view: view });
 
       view.once('signup.complete', function(data) {
-        modal.transitionTo(new TroupeViews.Modal({ view: new SignupModalConfirmView({ data: data }) }));
+        modal.transitionTo(new TroupeViews.Modal({ view: new SignupModalConfirmView({ email: data.email }) }));
       });
 
       modal.show();

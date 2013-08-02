@@ -24,7 +24,7 @@ require([
 
       showSignupPleaseConfirm: function(email) {
         $('.form').hide();
-        confirmView.email = email;
+        confirmView.options.email = email;
         confirmView.render();
         $('#signup-confirmation').show();
         $('#panelList').removeClass('showingSecondPanel').addClass('showingThirdPanel');
