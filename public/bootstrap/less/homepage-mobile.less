@@ -25,7 +25,7 @@
   margin: 0 auto;
 }
 
-#formPanel {
+.slidingPanel {
   display: -webkit-box;
   -webkit-box-orient: horizontal;
   -webkit-box-align: center;
@@ -39,7 +39,7 @@
   box-align: center;
 }
 
-@numberOfPanels: 2;
+@numberOfPanels: 3;
 
 html, body, #platform, #panelList, .slidingPanel {
   height: 100%;
@@ -63,6 +63,11 @@ html, body, #platform {
 
 #panelList.showingSecondPanel {
   margin-left: -100%;
+  .simpleSlideAnimation
+}
+
+#panelList.showingThirdPanel {
+  margin-left: -200%;
   .simpleSlideAnimation
 }
 
