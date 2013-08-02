@@ -19,12 +19,19 @@ define([
     },
 
     getRenderData: function() {
-      var toUser = this.model.get('user');
+      var toUser = this.model.get('user') || {};
+
+      if (toUser.id) {
+        if (!toUser.avatarUrlSmall) {
+          toUser.avatarUrlSmall = '/avatar/' + toUser.id;
+        }
+      } else {
+        toUser.email = this.model.get('email');
+        toUser.avatarUrlSmall = '/avatarForEmail/' + toUser.email;
+      }
 
       return {
-        toUser: (toUser) ? toUser : {
-          email: this.model.get('email')
-        }
+        toUser: toUser
       };
     },
 
