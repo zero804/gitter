@@ -23,6 +23,7 @@ require([
   'views/app/troupeHeaderView',
   'views/app/troupeSettingsView',
   'views/toolbar/troupeMenu',
+  'views/invite/reinviteModal',
   'utils/router',
   'components/webNotifications', // No ref
   'components/errorReporter',  // No ref
@@ -34,7 +35,7 @@ require([
             itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, shareSearchView,
             createTroupeView, UsernameView, TroupeHeaderView,
-            troupeSettingsView, TroupeMenuView, Router /*, errorReporter , FilteredCollection */) {
+            troupeSettingsView, TroupeMenuView, InviteModal, Router /*, errorReporter , FilteredCollection */) {
   "use strict";
 
   // Make drop down menus drop down
@@ -93,6 +94,7 @@ require([
       { name: "create",           re: /^create$/,                 viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true },
       { name: "upgradeOneToOne",  re: /^upgradeOneToOne$/,        viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true, viewOptions: { upgradeOneToOne: true } } ,
       { name: "chooseUsername",   re: /^chooseUsername/,          viewType: UsernameView.Modal },
+      { name: "reinvite",         re: /^reinvite\/(\w+)$/,        viewType: InviteModal,                  collection: troupeCollections.outgoingConnectionInvites, viewOptions: { overrideContext: true, inviteToConnect: true } },
       { name: "troupeSettings",   re: /^troupeSettings/,          viewType: troupeSettingsView }
     ],
     appView: appView

@@ -49,7 +49,16 @@ define([
         log("Error resending invite");
       }
 
-      var m = new shareSearchView.Modal({ invites: invites });
+
+      var viewOptions = { invites: invites };
+
+      // check whether the invite is to a troupe or to the user.
+      if (!this.model.isForTroupe()) {
+        viewOptions.overrideContext = true;
+        viewOptions.inviteToConnect = true;
+      }
+
+      var m = new shareSearchView.Modal(viewOptions);
       m.show();
       m.view.sendInvites();
     },

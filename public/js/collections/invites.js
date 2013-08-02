@@ -14,6 +14,10 @@ define([
     },
 
     initialize: function() {
+    },
+
+    isForTroupe: function() {
+      return !this.get('oneToOneInvite') || this.get('troupeId');
     }
 
   });
