@@ -19,7 +19,7 @@ define([
 
         if (this.options.fromViewer) {
           return {
-            url: (toUser) ? toUser.url : '#', // there's no page to go to for connect invites to non-users
+            url: '#|reinvite/' + this.model.get('id'),
             name: (toUser) ? toUser.displayName : this.model.get('email')
           };
         }

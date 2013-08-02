@@ -290,6 +290,7 @@ define([
       }
 
       var ajaxEndpoint = (this.data.inviteToTroupe) ? "/troupes/" + context.getTroupeId() + "/invites" : "/api/v1/inviteconnections";
+      var self = this;
 
       $.ajax({
         url: ajaxEndpoint,
@@ -301,8 +302,8 @@ define([
            if(data.failed) {
             return;
           }
-          $('.modal-content').hide();
-          $('.modal-success').show();
+          self.$el.find('.modal-content').hide();
+          self.$el.find('.modal-success').show();
           // self.trigger('share.complete', data);
         }
       });
