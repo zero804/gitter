@@ -54,19 +54,17 @@ require([
       }).render();
     });
 
-      var view = new LoginModalView({
-        el: $('#login-form'),
-        fromSignup: true,
-        noAutofocus: true
-      });
-      view.once('login.complete', function(data) {
-        window.location.href= data.redirectTo;
-      });
-
+    var view = new LoginModalView({
+      el: $('#login-form'),
+      fromSignup: true,
+      noAutofocus: true
+    });
+    view.once('login.complete', function(data) {
+      window.location.href= data.redirectTo;
+    });
 
     signupView.render();
     view.render();
-
 
     Backbone.history.start();
 
