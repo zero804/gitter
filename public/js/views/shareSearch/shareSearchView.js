@@ -161,7 +161,7 @@ define([
               var results = data.results || [];
               source = sources[query] = sources[query].concat(results);
 
-              //addEmailOption(options, query);
+              addEmailOption(source, query);
               installToString(source);
               process(source);
             }
@@ -170,7 +170,7 @@ define([
             function(data) {
               source = sources[query] = sources[query].concat(data.results);
 
-              //addEmailOption(options, query);
+              addEmailOption(source, query);
               installToString(source);
               process(source);
             }
