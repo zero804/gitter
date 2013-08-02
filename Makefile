@@ -85,6 +85,7 @@ npm:
 	npm install
 
 grunt:
+	mkdir output
 	grunt -no-color process
 
 version-files:
