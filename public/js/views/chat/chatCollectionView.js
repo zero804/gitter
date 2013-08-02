@@ -13,8 +13,9 @@ define([
   './scrollDelegate',
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
+  'views/unread-item-view-mixin',
   'bootstrap_tooltip'
-], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate, chatInputView /* tooltip*/) {
+], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate, chatInputView, UnreadItemViewMixin /* tooltip*/) {
 
   "use strict";
 
@@ -236,6 +237,8 @@ define([
     }
 
   });
+  _.extend(ChatViewItem.prototype, UnreadItemViewMixin);
+
 
   var ReadByView = Marionette.CollectionView.extend({
     itemView: AvatarView,
