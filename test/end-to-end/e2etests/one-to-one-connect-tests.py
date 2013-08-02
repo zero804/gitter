@@ -52,6 +52,14 @@ class OneToOneConnectTests(unittest.TestCase):
         form.find_element_by_name('submit').click()
 
         self.driver.find_element_by_css_selector('.trpHelpBox')
+        self.driver.find_element_by_css_selector('#cancel-button').click()
+
+        # look for the outgoing invite and resend
+        utils.showLeftMenu(self.driver)
+        self.driver.find_element_by_id("icon-user").click()
+        self.driver.find_element_by_link_text('Test User 1').click()
+        self.driver.find_element_by_css_selector('#invite-resend-button').click()
+        self.driver.find_element_by_css_selector('.modal-success')
 
         # TODO: Login as testuser and check invite exists
 
@@ -65,6 +73,7 @@ class OneToOneConnectTests(unittest.TestCase):
         textArea.send_keys("hello")
         textArea.send_keys(Keys.RETURN)
         self.driver.find_element_by_css_selector(".trpChatText")
+
 
     @attr('unreliable')
     def testAuthenticatedOnetoOneInviteFlow(self):
@@ -90,6 +99,7 @@ class OneToOneConnectTests(unittest.TestCase):
         textArea.send_keys("hello")
         textArea.send_keys(Keys.RETURN)
         self.driver.find_element_by_css_selector(".trpChatText")
+
 
     @attr('unreliable')
     def testExistingUnauthenticatedOnetoOneInviteFlow(self):
