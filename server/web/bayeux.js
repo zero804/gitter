@@ -444,7 +444,7 @@ var server = new faye.NodeAdapter({
     type: fayeRedis,
     host: nconf.get("redis:host"),
     port: nconf.get("redis:port"),
-    interval: 10,
+    interval: nconf.get('ws:fayeInterval'),
     namespace: 'fr:'
   }
 });
