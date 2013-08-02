@@ -8,7 +8,6 @@ define([
   "use strict";
 
   return Backbone.View.extend({
-    email: '',
 
     template: template,
 
@@ -17,7 +16,7 @@ define([
     },
 
     render: function() {
-      this.$el.html(this.template({email: this.email}));
+      this.$el.html(this.template({email: this.options.email}));
       return this;
     },
 
@@ -28,7 +27,7 @@ define([
         url: "/resendconfirmation",
         dataType: "json",
         data: {
-          email: this.email
+          email: this.options.email
         },
         type: "POST",
         success: function() {
