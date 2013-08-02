@@ -63,6 +63,7 @@ define([
       this.$el.find('.login-content').hide();
       this.$el.find('.resetpwd-content').show();
       this.$el.find('#resetEmailAddress').text(this.$el.find('#email').val());
+      return false;
     },
 
     closeClicked: function() {
