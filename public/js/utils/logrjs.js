@@ -29,7 +29,6 @@ define({
   }
   /*,
   write: function (pluginName, moduleName, write) {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>')
     //jsEscape is an internal method for the text plugin
     //that is used to make the string safe
     //for embedding in a JS string.
