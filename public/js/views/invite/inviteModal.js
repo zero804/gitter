@@ -2,8 +2,9 @@
 define([
   'views/base',
   'utils/context',
+  'log!invite-modal-view',
   'hbs!./tmpl/inviteModal'
-], function(TroupeViews, context, inviteModalTemplate) {
+], function(TroupeViews, context, log, inviteModalTemplate) {
   "use strict";
 
   var InviteView = TroupeViews.ConfirmationView.extend({
@@ -44,7 +45,7 @@ define([
           window.location.reload();
         },
         error: function() {
-          alert("There was an error accepting this invite, please try again later or contact support");
+          log("There was an error accepting this invite, please try again later or contact support");
         }
       });
     },
@@ -61,7 +62,7 @@ define([
           window.history.back();
         },
         error: function() {
-          alert("There was an error rejecting this invite, please try again later or contact support");
+          log("There was an error rejecting this invite, please try again later or contact support");
         }
       });
 
