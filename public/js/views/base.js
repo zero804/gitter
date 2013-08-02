@@ -5,14 +5,13 @@ define([
   'underscore',
   'backbone',
   'marionette',
-  'components/unread-items-client',
   'hbs!./tmpl/modal',
   'hbs!./tmpl/popover',
   'hbs!./tmpl/loading',
   '../template/helpers/all',
   'hbs!./tmpl/confirmationView',
   'log!base-views'
-], function($, $mig, _, Backbone, Marionette, unreadItemsClient, modalTemplate, popoverTemplate, loadingTemplate, helpers, confirmationViewTemplate, log) {
+], function($, $mig, _, Backbone, Marionette, modalTemplate, popoverTemplate, loadingTemplate, helpers, confirmationViewTemplate, log) {
   "use strict";
 
   /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
@@ -148,30 +147,13 @@ define([
         });
       }
 
-      if(this.model && this.unreadItemType) {
-        var id = this.model.get('id');
-        if(!id) id = this.model.cid;
-
-        dom.addClass('model-id-' + id);
-
-        var unread = this.model.get('unread');
-        if(unread) {
-          if(unreadItemsClient.hasItemBeenMarkedAsRead(this.unreadItemType, id)) {
-            unread = false;
-          }
-        }
-
-        if(unread) {
-          dom.addClass('unread');
-          dom.data('itemId', id);
-          dom.data('itemType', this.unreadItemType);
-          $(document).trigger('unreadItemDisplayed');
-        }
-      }
+      if(this.onDomRender) this.onDomRender(dom);
 
       if(this.model && this.model.syncState) {
         dom.addClass(this.model.syncState);
       }
+
+
 
       this.$el.html(dom);
       return dom;

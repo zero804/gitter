@@ -8,11 +8,12 @@ define([
   'views/shareSearch/shareSearchView',
   'hbs!./tmpl/inviteDetailView',
   'hbs!./tmpl/deleteConfirmation',
+  'views/unread-item-view-mixin',
   'log!request-detail-view'
-], function($, _, Backbone, TroupeViews, context, shareSearchView, template, deleteConfirmationTemplate, log){
+], function($, _, Backbone, TroupeViews, context, shareSearchView, template, deleteConfirmationTemplate, UnreadItemViewMixin, log){
   "use strict";
 
-  return TroupeViews.Base.extend({
+  var View = TroupeViews.Base.extend({
     unreadItemType: 'invite',
     template: template,
     buttonMenu : false,
@@ -104,7 +105,8 @@ define([
         }
       });
     }*/
-
-
   });
+
+  _.extend(View.prototype, UnreadItemViewMixin);
+  return View;
 });

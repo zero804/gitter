@@ -6,11 +6,12 @@ define([
   'views/base',
   'hbs!./tmpl/requestDetailView',
   'hbs!./tmpl/rejectConfirmation',
+  'views/unread-item-view-mixin',
   'log!request-detail-view'
-], function($, _, Backbone, TroupeViews, template, rejectConfirmationTemplate, log){
+], function($, _, Backbone, TroupeViews, template, rejectConfirmationTemplate, UnreadItemViewMixin, log){
   "use strict";
 
-  return TroupeViews.Base.extend({
+  var View = TroupeViews.Base.extend({
     unreadItemType: 'request',
     template: template,
     buttonMenu : false,
@@ -76,4 +77,7 @@ define([
 
 
   });
+
+  _.extend(View.prototype, UnreadItemViewMixin);
+  return View;
 });

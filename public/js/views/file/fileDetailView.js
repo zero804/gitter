@@ -1,16 +1,16 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-
 define([
   'jquery',
   'underscore',
   'backbone',
   'views/base',
   'hbs!./tmpl/fileDetailView',
-  'hbs!./tmpl/confirmDelete'
-], function($, _, Backbone, TroupeViews, template, confirmDeleteTemplate) {
+  'hbs!./tmpl/confirmDelete',
+  'views/unread-item-view-mixin'
+], function($, _, Backbone, TroupeViews, template, confirmDeleteTemplate, UnreadItemViewMixin) {
   "use strict";
 
-  return TroupeViews.Base.extend({
+  var FileDetailView = TroupeViews.Base.extend({
     unreadItemType: 'file',
     template: template,
     buttonMenu : false,
@@ -63,4 +63,7 @@ define([
     }
 
   });
+
+  _.extend(FileDetailView.prototype, UnreadItemViewMixin);
+  return FileDetailView;
 });

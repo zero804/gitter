@@ -3,8 +3,9 @@ define([
   'views/base',
   'marionette',
   'hbs!./tmpl/inviteView',
-  'hbs!./tmpl/inviteItemView'
-], function(TroupeViews, Marionette, invitesViewTemplate, invitesItemViewTemplate) {
+  'hbs!./tmpl/inviteItemView',
+  'views/unread-item-view-mixin'
+], function(TroupeViews, Marionette, invitesViewTemplate, invitesItemViewTemplate, UnreadItemViewMixin) {
   "use strict";
 
   var InvitesItemView = TroupeViews.Base.extend({
@@ -16,6 +17,7 @@ define([
       this.setRerenderOnChange();
     }
   });
+  _.extend(InvitesItemView.prototype, UnreadItemViewMixin);
 
   return TroupeViews.Base.extend({
     template: invitesViewTemplate,
