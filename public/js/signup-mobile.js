@@ -19,7 +19,7 @@ require([
       showSignup: function() {
         $('.form').hide();
         $('#signup-form').show();
-        $('#panelList').addClass('showingSecondPanel');
+        $('#panelList').removeClass('showingThirdPanel').addClass('showingSecondPanel');
       },
 
       showSignupPleaseConfirm: function(email) {
@@ -27,17 +27,17 @@ require([
         confirmView.email = email;
         confirmView.render();
         $('#signup-confirmation').show();
-        $('#panelList').addClass('showingSecondPanel');
+        $('#panelList').removeClass('showingSecondPanel').addClass('showingThirdPanel');
       },
 
       showLogin: function() {
         $('.form').hide();
         $('#login-form').show();
-        $('#panelList').addClass('showingSecondPanel');
+        $('#panelList').removeClass('showingThirdPanel').addClass('showingSecondPanel');
       },
 
       defaultRoute: function() {
-        $('#panelList').removeClass('showingSecondPanel');
+        $('#panelList').removeClass('showingSecondPanel showingThirdPanel');
       }
     });
 
