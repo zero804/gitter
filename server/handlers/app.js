@@ -397,7 +397,9 @@ module.exports = {
           if (req.uriContext.ownUrl) {
             return renderHomePage(req, res, next);
           }
+
           if(req.isPhone) {
+            // TODO: this should change from chat-app to a seperate mobile app
             renderAppPageWithTroupe(req, res, next, 'mobile/chat-app');
           } else {
             renderAppPageWithTroupe(req, res, next, 'app-template');
