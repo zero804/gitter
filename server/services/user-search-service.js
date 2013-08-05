@@ -38,23 +38,25 @@ function executeSearch(q, options) {
     });
 }
 
-function searchForRegularExpressionsWithinUserIds(userIds, res, options) {
-  var q = persistence.User.where('_id')['in'](userIds);
+function getSearchConjunction(res) {
+  var displayNameSearch = { displayName: { $in: res } } ;
+  var usernameSearch    = { username:    { $in: res } } ;
 
-  res.forEach(function(r) {
-    q.find({ displayName: r });
-  });
+  return [displayNameSearch, usernameSearch];
+}
+
+function searchForRegularExpressionsWithinUserIds(userIds, res, options) {
+  var q = persistence.User.where('_id')['in'](userIds)
+            .or(getSearchConjunction(res));
+
 
   return executeSearch(q, options);
 }
 
 
 function searchForRegularExpressionsForAllUsers(res, options) {
-  var q;
-
-  res.forEach(function(r) {
-    q = (q ? q : persistence.User).where('displayName', r);
-  });
+  var q = persistence.User.find()
+            .or(getSearchConjunction(res));
 
   return executeSearch(q, options);
 }
