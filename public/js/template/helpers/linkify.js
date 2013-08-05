@@ -4,12 +4,20 @@ require([
 ], function ( Handlebars ) {
   "use strict";
 
-  var emailRegex  = /(\S+@\S+\.\S+)/gi;
+  var emailRegex  = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/gi;
   var urlRegex    = /\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.-]+[.][a-z]{2,4}\/)(?:(?:[^\s()<>.]+[.]?)+|((?:[^\s()<>]+|(?:([^\s()<>]+)))))+(?:((?:[^\s()<>]+|(?:([^\s()<>]+))))|[^\s`!()[]{};:'".,<>?«»“”‘’]))/gi;
-
 
   function embedUrl(url) {
     var m = url.match(/https?:\/\/([\w\.\/]+)([\:\?\#].+)?/);
+
+    function defaultLink() {
+      var displayUrl = url;
+      if(url.indexOf('http') != 0) {
+        url = 'http://' + url;
+      }
+
+      return "<a target='_blank' href='" + url + "'>" + displayUrl + "</a>";
+    }
 
     // Rexexp are delicate so better wrap them...
     try {
@@ -22,10 +30,10 @@ require([
         var video_id = url.match(/https?:\/\/(www.)?vimeo.com\/(\w+)/)[2];
         return '<iframe class="embed" src="http://player.vimeo.com/video/' + video_id + '" width="380" height="280" frameborder="0">';
       } else {
-        return "<a target='_blank' href='" + url + "'>" + url + "</a>";
+        return defaultLink(url);
       }
     } catch(err) {
-      return "<a target='_blank' href='" + url + "'>" + url + "</a>";
+      return defaultLink(url);
     }
   }
 
@@ -34,7 +42,7 @@ require([
   }
 
   function linkify(message) {
-    message = message || ""; 
+    message = message || "";
     message = message.replace(urlRegex,   embedUrl);
     message = message.replace(emailRegex, embedMailto);
 
