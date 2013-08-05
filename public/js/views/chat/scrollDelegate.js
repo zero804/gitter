@@ -54,7 +54,7 @@ define([
       var topUnreadItemPosition = this.findTopMostUnreadItem(this.itemType);
 
       if(topUnreadItemPosition) {
-        // log('Found our top item at position ', topUnreadItemPosition);
+        log('Found our top item at position ' + topUnreadItemPosition);
         this.maxScroll = Math.max(0, topUnreadItemPosition - 140);
       }
     }
@@ -95,19 +95,20 @@ define([
       scrollToMe = this.maxScroll; // Math.min(this.maxScroll, top);
     }
 
+    var maxPossible = this.maxScrollPossible();
     this.$scrollOf.scrollTop(scrollToMe);
     // we store the accumulated scroll position here because safari doesn't update the scroll position immediately, so we can't read it back accurately.
-    this.currentScroll = Math.min(scrollToMe, this.maxScrollPossible());
-    //log("Scroll position is now: " + this.$scrollOf.scrollTop() + " (requested " + top + ") of max possible: " + this.maxScrollPossible() + " and max limit: " + this.maxScroll);
+    this.currentScroll = Math.min(scrollToMe, maxPossible);
+    log("Scroll position is now: " + this.$scrollOf.scrollTop() + " (requested " + top + ", used "+this.currentScroll+") of max possible: " + maxPossible + " and unread limit: " + this.maxScroll);
   };
 
   DefaultScrollDelegate.prototype.scrollToBottom = function() {
-    // log("Keeping scroll at the bottom of the page (i.e scrolling to new message).", this.$container.height());
+    log("Keeping scroll at the bottom of the page (i.e scrolling to new message)." + this.$container.height());
     this.scrollTop(this.$container.height());
   };
 
   DefaultScrollDelegate.prototype.maxScrollPossible = function() {
-    // log("Max possible scroll is ", this.$container.height(), this.$scrollOf.height(), (this.$container.height() - this.$scrollOf.height()));
+    log("Max possible scroll is " + this.$container.height() + ' - ' + this.$scrollOf.height() + ' + 10 = ' + (this.$container.height() - this.$scrollOf.height() + 10));
     // TODO need to add on the padding of scrollOf (not included in height()) and parents of scrollOf until container. Also, it seems the browser uses floats for height but jq rounds down to an int.
     return Math.max(0, this.$container.height() - this.$scrollOf.height() + 10);
   };
@@ -137,7 +138,7 @@ define([
     },
 
     scrollToPreviousPosition: function() {
-      // log("Scrolling to keep current content in view.", this.scrollPosBeforeChunkAdd, this.currentScroll, (this.$container.height() - this.containerHeightBeforeAdd));
+      log("Scrolling to keep current content in view.", this.scrollPosBeforeChunkAdd, this.currentScroll, (this.$container.height() - this.containerHeightBeforeAdd));
       // re-adjust the scroll according to how much the container has grown (to be more general we could look at the displacement that the growth caused for the element, so that we can figure out how much growth occurred above vs below it)
       // keep track of how much space has been used since the last call to load new messages
       this.scrollTop(this.scrollPosBeforeChunkAdd += (this.$container.height() - this.containerHeightBeforeAdd));

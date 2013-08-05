@@ -11,7 +11,7 @@ define(function() {
   }
 
   function consoleLog(msg) {
-    history.push(msg);
+    history.push(Array.prototype.join.call(arguments, ', '));
     if(history.length > 500)
       history.shift();
 
