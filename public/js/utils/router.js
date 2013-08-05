@@ -98,7 +98,17 @@ define([
         var region, viewDetails;
 
         function loadItemIntoView() {
-          var model = viewDetails.skipModelLoad ? null : viewDetails.collection.get(viewDetails.id);
+          var model;
+
+          if(viewDetails.skipModelLoad) {
+            model = null;
+          } else {
+            model = viewDetails.collection.get(viewDetails.id);
+            if(!model) {
+              // The model doesn't exist. Exit.
+              return;
+            }
+          }
           var cv = region.currentView;
 
           if(viewDetails.collection) {

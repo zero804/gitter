@@ -102,7 +102,7 @@ function UserStrategy(options) {
     return {
       id: user.id,
       username: user.username,
-      displayName: user.displayName || user.email.replace(/@.*/, ""),
+      displayName: user.displayName,
       url: user.getHomeUrl(),
       email: options.includeEmail ? user.email : undefined,
       avatarUrlSmall: getAvatarUrl('s'),

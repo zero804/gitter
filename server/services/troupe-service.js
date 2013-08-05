@@ -845,8 +845,10 @@ function findOneToOneTroupe(fromUserId, toUserId) {
  *
  * @return {[ troupe, other-user, invite ]}
  */
-function findOrCreateOneToOneTroupe(fromUserId, toUserId, callback) {
-  if(fromUserId == toUserId) return callback("You cannot be in a troupe with yourself.");
+function findOrCreateOneToOneTroupe(fromUserId, toUserId) {
+  assert(fromUserId, 'fromUserId parameter required');
+  assert(toUserId, 'toUserId parameter required');
+  assert(fromUserId != toUserId, 'You cannot be in a troupe with yourself.');
 
   return userService.findById(toUserId)
     .then(function(toUser) {
@@ -893,9 +895,7 @@ function findOrCreateOneToOneTroupe(fromUserId, toUserId, callback) {
               });
 
           });
-
-    })
-    .nodeify(callback);
+    });
 
 }
 
@@ -1312,7 +1312,7 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
           // status term in the if below can be removed
           if(!user) {
             return userService.findOrCreateUserForEmail({
-              displayName: invite.displayName,
+              displayName: invite.displayName || invite.email.replace(/@.*/, ""),
               email: invite.email,
               status: "PROFILE_NOT_COMPLETED"
             }).then(function(user) {
