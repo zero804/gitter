@@ -505,6 +505,7 @@ UriLookupSchema.schemaTypeName = 'UriLookupSchema';
 var ContactSchema = new Schema({
   userId: {type: ObjectId, ref: 'User'},
   source: String,
+  sourceId: String,
   name: String,
   emails: Array
 });
