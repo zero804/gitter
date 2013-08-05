@@ -60,7 +60,6 @@ function fakeSerializedTroupe(uriContext) {
 
 
 function createTroupeContext(req, options) {
-
   var disabledFayeProtocols = [];
 
   var userAgent = req.headers['user-agent'];
@@ -72,6 +71,8 @@ function createTroupeContext(req, options) {
   }
 
   var useFirebug = useFirebugInIE && userAgent.indexOf('MSIE') >= 0;
+  var events = req.session.events;
+  if(events) { delete req.session.events; }
 
   return {
       user: options.user,
@@ -91,7 +92,7 @@ function createTroupeContext(req, options) {
       homeUrl: nconf.get('web:homeurl'),
       mixpanelToken: nconf.get("stats:mixpanel:token"),
       importedGoogleContacts: req.user && req.user.googleRefreshToken ? true : false,
-
+      events: events,
       troupeUri: options.troupe ? options.troupe.uri : undefined,
       websockets: {
         fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
