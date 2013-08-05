@@ -65,10 +65,6 @@ module.exports = {
         }
       );
 
-      app.get('/signup', function(req, res) {
-        res.render('m.signup.hbs', {});
-      });
-
       app.get('/confirm/:confirmationCode',
         middleware.authenticate('confirm', { failureRedirect: '/confirm-failed' } ),
         function(req, res){
