@@ -8,7 +8,7 @@ require([
   ], function($, Backbone, SignupModalView, SignupModalConfirmView, LoginModalView) {
     "use strict";
 
-    var Router = Backbone.Router.extend({
+    var HomepageRouter = Backbone.Router.extend({
       routes: {
         'signup': 'showSignup',
         'signup/:email/please-confirm': 'showSignupPleaseConfirm',
@@ -41,39 +41,39 @@ require([
       }
     });
 
-    var app = new Router();
+    var homepage = new HomepageRouter();
 
     $('#signup-button').hammer().on('tap', function(event) {
-      app.navigate('signup', {trigger: true});
+      homepage.navigate('signup', {trigger: true});
       event.stopPropagation();
     });
 
     $('#login-button').hammer().on('tap', function(event) {
-      app.navigate('login', {trigger: true});
+      homepage.navigate('login', {trigger: true});
       event.stopPropagation();
     });
 
     var signupView = new SignupModalView({el: $('#signup-form')});
     signupView.on('signup.complete', function(data) {
-      app.navigate('signup/'+data.email+'/please-confirm', {trigger: true});
+      homepage.navigate('signup/'+data.email+'/please-confirm', {trigger: true});
     });
 
     var confirmView = new SignupModalConfirmView({
       el: $('#signup-confirmation')
     });
 
-    var view = new LoginModalView({
+    var loginView = new LoginModalView({
       el: $('#login-form'),
       fromSignup: true,
       noAutofocus: true
     });
 
-    view.once('login.complete', function(data) {
+    loginView.once('login.complete', function(data) {
       window.location.href= data.redirectTo;
     });
 
     signupView.render();
-    view.render();
+    loginView.render();
 
     Backbone.history.start();
 
