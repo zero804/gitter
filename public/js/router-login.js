@@ -155,7 +155,12 @@ require([
             inviteId = context().inviteId;
             if (inviteId) {
               // if the user has an invite to this troupe show the invite accept / reject modal
-              (new InviteModal({ inviteId: inviteId })).show();
+              modal = new InviteModal({ inviteId: inviteId });
+              modal.show();
+              modal.on('hide', function() {
+                window.location = '/last';
+              });
+
             } else {
               // if the user is trying to access another use profile (e.g. trou.pe/user) and is not connected
               // show the user connect modal
