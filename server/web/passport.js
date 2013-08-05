@@ -237,11 +237,20 @@ module.exports = {
       },
 
       function(req, accessToken, refreshToken, profile, done) {
-        if (refreshToken) {
-          req.user.googleRefreshToken = refreshToken;
-          req.user.save();
+        if (!refreshToken) {
+          winston.info('passport: Refresh token not available');
+          return done(null, req.user);
         }
-        return done(null, req.user);
+
+        req.user.googleRefreshToken = refreshToken;
+        req.user.save(function(err) {
+          winston.info('passport: User updated with token');
+
+          if(err) done(err);
+
+          return done(null, req.user);
+        });
+
       }
     ));
 

@@ -45,6 +45,17 @@ define([
     return context().troupe || {};
   };
 
+  context.popEvent = function(name) {
+    var events = context().events;
+    if(events) {
+      var i = events.indexOf(name);
+      if(i >= 0) {
+        events.splice(i, 1);
+        return true;
+      }
+    }
+  }
+
   return context;
 
 });

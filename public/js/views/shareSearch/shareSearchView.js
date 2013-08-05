@@ -57,6 +57,8 @@ define([
 
       this.data.uri = (this.data.inviteToTroupe) ? this.data.troupe.uri : this.data.user.username;
       this.data.basePath = context().basePath;
+      this.data.returnToUrl = encodeURIComponent(window.location.pathname + window.location.hash);
+
       this.addCleanup(function() {
         if(this.clip) this.clip.destroy();
       });
@@ -71,6 +73,13 @@ define([
           invites[a].toString = this.itemToString;
           this.selectPerson(invites[a]);
         }
+      }
+
+      if(context.popEvent('google_import_complete')) {
+        var that = this;
+        setTimeout(function(){
+          that.$el.find('#import-success').slideDown();
+        },750);
       }
     },
 
