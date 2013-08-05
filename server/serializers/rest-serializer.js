@@ -660,11 +660,6 @@ function TroupeUserStrategy(options) {
 function TroupeStrategy(options) {
   if(!options) options = {};
 
-  var stack;
-  if(!options.currentUserId) {
-    stack = new Error().stack;
-  }
-
   var currentUserId = options.currentUserId;
 
 
@@ -743,10 +738,8 @@ function TroupeStrategy(options) {
       if(currentUserId) {
         otherUser =  mapOtherUser(item.users);
       } else {
-        console.log('');
         if(!shownWarning) {
           winston.warn('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
-          winston.warn(stack.join('\n'));
           shownWarning = true;
         }
       }
