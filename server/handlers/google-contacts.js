@@ -6,6 +6,7 @@ var request     = require('request');
 var _           = require('underscore');
 var passport    = require('passport');
 var contactService = require("../services/contact-service");
+var middleware  = require("../web/middleware");
 
 
 var auth_endpoint     = "https://accounts.google.com/o/oauth2/auth";
@@ -59,28 +60,55 @@ module.exports = {
 
     // Redirect user to Google OAuth authorization page.
     //
-    app.get('/google/contacts', 
-    passport.authorize('google', contactOptions),
-    function(req, res) {});
+    app.get('/google/contacts',
+      middleware.ensureLoggedIn(),
+      function(req, res, next) {
+        var returnTo = req.query.returnTo;
+
+        // No http:// https:// or //hostname url
+        // to prevent a possible attack
+        //
+        if(returnTo && returnTo.indexOf('//') < 0) {
+          req.session.returnOnGoogleAuthComplete = returnTo;
+        }
+
+        next();
+      },
+      passport.authorize('google', contactOptions),
+      function(req, res) { });
 
     // OAuth callback. Fetch access token and contacts, and store them.
     //
-    app.get('/oauth2callback', 
-    passport.authorize('google', { failureRedirect: '/' }),
-    function(req, res) {
-      getAccessToken(req.user.googleRefreshToken, function(access_token) {
-        fetchContacts(access_token, req.user, function() {
-          res.redirect('/#|share');
+    app.get('/oauth2callback',
+      middleware.ensureLoggedIn(),
+      passport.authorize('google', { failureRedirect: '/' }),
+      function(req, res) {
+        getAccessToken(req.user.googleRefreshToken, function(access_token) {
+          fetchContacts(access_token, req.user, function() {
+
+            if(req.session.events) {
+              req.session.events.push('google_import_complete');
+            } else {
+              req.session.events = ['google_import_complete'];
+            }
+
+            if(req.session.returnOnGoogleAuthComplete) {
+              res.relativeRedirect(req.session.returnOnGoogleAuthComplete);
+            } else {
+              res.relativeRedirect('/#|share');
+            }
+          });
         });
       });
-    });
 
     // Search contacts
     //
-    app.get('/contacts', function(req, res) {
-      contactService.find(req.user, req.query.q, function(err, matches) {
-        res.send({results: matches});
+    app.get('/contacts',
+      middleware.ensureLoggedIn(),
+      function(req, res) {
+        contactService.find(req.user, req.query.q, function(err, matches) {
+          res.send({results: matches});
+        });
       });
-    });
   }
 };
