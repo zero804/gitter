@@ -11,7 +11,9 @@ module.exports = function( grunt ) {
       closurePath: 'build-scripts/closure-v20130722',
       reportFile: 'output/' + name.replace(/\//g, '-') + '.report.txt',
       options: {
-        compilation_level: 'ADVANCED_OPTIMIZATIONS',
+        //compilation_level: 'ADVANCED_OPTIMIZATIONS',
+        //compilation_level: 'WHITESPACE_ONLY',
+        compilation_level: 'SIMPLE_OPTIMIZATIONS',
         language_in: 'ECMASCRIPT5_STRICT',
         create_source_map: 'public-processed/js/' + name + '.min.js.map',
 //        define: [
@@ -167,7 +169,8 @@ module.exports = function( grunt ) {
             closurePath: 'build-scripts/closure-v20130722',
             reportFile: 'output/core-libraries.report.txt',
             options: {
-              compilation_level: 'WHITESPACE_ONLY',
+              //compilation_level: 'WHITESPACE_ONLY',
+              compilation_level: 'SIMPLE_OPTIMIZATIONS',
               language_in: 'ECMASCRIPT3',
               create_source_map: 'public-processed/js/core-libraries.min.js.map',
             }
