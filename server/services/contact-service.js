@@ -16,26 +16,31 @@ exports.ingestGoogleContacts = function(user, data, cb) {
         return accum;
       }, []);
 
+      var id   = entry.id.$t;
       var name = entry.title.$t || emails[0];
 
-      if (emails.length > 0) contacts.push({name: name, emails: emails});
+      if (emails.length > 0) contacts.push({id: id, name: name, emails: emails});
     });
   }
 
   winston.verbose('[contact] Importing contacts: ', contacts.length);
-  
+
   var imported = _.inject(contacts, function(accum, contact) {
-    var newContact = new persistence.Contact({
-      userId : user.id,
-      name   : contact.name,
-      emails : contact.emails,
-      source : 'google'
-    });
-    newContact.save();
+    var newContact = {
+      userId  : user.id,
+      source  : 'google',
+      sourceId: contact.id,
+      name    : contact.name,
+      emails  : contact.emails
+    };
+
+    persistence.Contact.findOneAndUpdate({sourceId: newContact.sourceId}, {$set: newContact}, {upsert: true}, function(err, contact) {});
+
     accum.push(newContact);
     return accum;
   }, []);
 
+  
   cb(null, imported);
 };
 

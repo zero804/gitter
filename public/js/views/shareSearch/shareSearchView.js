@@ -131,29 +131,13 @@ define([
       this.$el.find('input[name=inviteSearch]').typeahead({
         source: function(query, process) {
 
-          sources[query] = sources[query] || [];
+          source = sources[query] = sources[query] || [];
 
-          if(sources[query].length) {
-            source = sources[query];
-            return source;
-          }
+          if(sources[query].length > 0) return source;
 
-          var emptyPreviously = _.some(sources, function(v,k) {
-           return query.toLowerCase().indexOf(k.toLowerCase()) === 0 && v.length != 0;
-          });
+          addEmailOption(source, query);
 
-          if(emptyPreviously) {
-           // a previous search with a shorter matching query has returned no results.
-           // don't fetch.
-           source = sources[query] || [];
-           addEmailOption(source, query);
-           installToString(source);
-           process(source);
-           return;
-          }
-
-          // fetch from server
-          var url = '/user';
+          // Search users
           var urlData = { excludeTroupeId: context.getTroupeId(), q: query };
           $.ajax({ url: '/user', data: urlData, success:
             function(data) {
@@ -161,16 +145,16 @@ define([
               var results = data.results || [];
               source = sources[query] = sources[query].concat(results);
 
-              addEmailOption(source, query);
               installToString(source);
               process(source);
             }
           });
+
+          // Search contacts
           $.ajax({ url: '/contacts', data: {q: query}, success:
             function(data) {
               source = sources[query] = sources[query].concat(data.results);
 
-              addEmailOption(source, query);
               installToString(source);
               process(source);
             }
@@ -230,7 +214,6 @@ define([
         } else {
           // add a non-selectable option which says continue typing an email address
           source.push({ displayName: "You can also type an email address to invite somebody new.", nonSelectable: true });
-          self.emailOptionPresent = true;
         }
       }
 
