@@ -25,8 +25,8 @@ var templates = compile({
 });
 
 var titleTemplates = compile({
-  "chat": "New chat on {{{troupe.name}}}",
-  "file": "New file on {{{troupe.name}}}",
+  "chat": "{{#if troupe.oneToOne}}New one-to-one chat{{else}}New chat on {{{troupe.name}}}{{/if}}",
+  "file": "{{#if troupe.oneToOne}}New one-to-one file{{else}}New file on {{{troupe.name}}}{{/if}}",
   "request": "New request on {{{troupe.name}}}"
 });
 
