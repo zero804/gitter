@@ -2,9 +2,13 @@
   <form class="form-inline" id="share-form">
     <div>
       {{#if inviteToTroupe}}
-        <input type="text" name="inviteSearch" class="trpInput" placeholder="Search your contacts or enter an email address here" autocomplete="off" style="width: 300px"/><br>
+        <input type="text" name="inviteSearch" class="trpInput" placeholder="Search your contacts or type an email address to invite" autocomplete="off" style="width: 400px"/><br>
       {{else}}
-        <input type="text" name="inviteSearch" class="trpInput" placeholder="Enter an email address to invite" autocomplete="off" style="width: 300px"/><br>
+        {{#if importedGoogleContacts}}
+        <input type="text" name="inviteSearch" class="trpInput" placeholder="Search your Gmail contacts or type an email address to invite" autocomplete="off" style="width: 400px"/><br>
+        {{else}}
+        <input type="text" name="inviteSearch" class="trpInput" placeholder="Enter an email address to invite" autocomplete="off" style="width: 400px"/><br>
+        {{/if}}
       {{/if}}
     </div>
     {{#inviteToTroupe}}
@@ -47,5 +51,6 @@
 {{/inviteToConnect}}
 
 <div class="trpModalSuccess" id="import-success" style="display:none">
-  Your contacts were imported successfully.
+  <div class="trpModalTitle"><span class="trpWhite">Successfully connected to Gmail</span></div>
+  <div class="trpModalBody"><span class="trpWhite">You can now search and invite your Gmail contacts in the above field.</span></div>
 </div>
