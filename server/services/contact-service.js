@@ -2,6 +2,7 @@
 "use strict";
 
 var persistence   = require("./persistence-service");
+var statsService  = require("./stats-service");
 var _             = require('underscore');
 var winston       = require('winston');
 
@@ -39,6 +40,10 @@ exports.ingestGoogleContacts = function(user, data, cb) {
     accum.push(newContact);
     return accum;
   }, []);
+
+  if (imported.length > 0) {
+    statsService.userUpdate(user, {'import_contacts': 'Google'});
+  }
 
   
   cb(null, imported);
