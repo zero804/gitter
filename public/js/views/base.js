@@ -1,17 +1,17 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'require',
   'jquery',
-  'jquery-migrate',
   'underscore',
   'backbone',
   'marionette',
   'hbs!./tmpl/modal',
   'hbs!./tmpl/popover',
   'hbs!./tmpl/loading',
-  '../template/helpers/all',
   'hbs!./tmpl/confirmationView',
-  'log!base-views'
-], function($, $mig, _, Backbone, Marionette, modalTemplate, popoverTemplate, loadingTemplate, helpers, confirmationViewTemplate, log) {
+  'log!base-views',
+  '../template/helpers/all' // No ref
+], function(require, $, _, Backbone, Marionette, modalTemplate, popoverTemplate, loadingTemplate, confirmationViewTemplate, log) {
   "use strict";
 
   /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
@@ -690,10 +690,6 @@ define([
 
     appendHtml: function(collectionView, itemView, index) {
       log("Inserting view at index ", index, " of ", collectionView.collection.length, " in collection ", collectionView.collection.url, "; itemView ", itemView.model.attributes, ((this.isRendering) ? " with rendering shortcut" : ''));
-
-      if(window.debugSortableMarionette) {
-        debugger;
-      }
 
       // Shortcut - just place at the end!
       if (this.isRendering) {
