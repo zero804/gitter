@@ -3,12 +3,16 @@ define([
   'underscore',
   'jquery',
   'backbone',
-  'handlebars',
-  'hbs',
   'marionette',
   'utils/log',
+  'utils/tracking',
+  'log!core',
   'backbone.wreqr',
-  'backbone.babysitter'
+  'backbone.babysitter',
+  // The following libraries need to be removed once we've figured out how
+  'handlebars',
+  'hbs',
+  'views/base'
 ], function() {
   "use strict";
   return null;

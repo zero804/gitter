@@ -13,8 +13,9 @@ define([
   './scrollDelegate',
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
+  'views/unread-item-view-mixin',
   'bootstrap_tooltip'
-], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate, chatInputView /* tooltip*/) {
+], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate, chatInputView, UnreadItemViewMixin /* tooltip*/) {
 
   "use strict";
 
@@ -236,6 +237,8 @@ define([
     }
 
   });
+  _.extend(ChatViewItem.prototype, UnreadItemViewMixin);
+
 
   var ReadByView = Marionette.CollectionView.extend({
     itemView: AvatarView,
@@ -320,6 +323,11 @@ define([
       ChatCollectionView.$scrollOf.off('scroll', this.chatWindowScroll);
     },
 
+    onBeforeRender: function() {
+      // disable infinite scroll until render is complete
+      this.hasRendered = false;
+    },
+
     // onRender runs after the collection view has been rendered
     onRender: function() {
       if (this.hasLoaded) this.hasRendered = true; // the render only counts if the collection has received a reset / sync event (ie it has been populated before trying to render)
@@ -347,6 +355,7 @@ define([
     },
 
     onBeforeItemAdded: function() {
+      // we need to skip the scroll delegate while we are rendering (ie hasRendered) to avoid mobile being overloaded with scroll requests
       if (this.hasRendered && !this.loadingOlder) {
         this.scrollDelegate.onBeforeItemAdded();
       }

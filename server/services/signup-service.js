@@ -56,7 +56,6 @@ var signupService = module.exports = {
           emailNotificationService.sendConfirmationForNewUser(user);
         }
 
-        // do we send the confirm email again?
         callback(err, user);
       } else {
         newUser(options, callback);

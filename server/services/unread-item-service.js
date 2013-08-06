@@ -10,6 +10,14 @@ var winston = require("winston");
 var redisClient = redis.createClient();
 var mongoUtils = require('../utils/mongo-utils');
 var Fiber = require('../utils/fiber');
+var RedisBatcher = require('../utils/redis-batcher').RedisBatcher;
+var badgeBatcher = new RedisBatcher('badge', 300);
+var Scripto = require('redis-scripto');
+var scriptManager = new Scripto(redisClient);
+var Q = require('q');
+var assert = require('assert');
+scriptManager.loadFromDir(__dirname + '/../../redis-lua/unread');
+
 
 var DEFAULT_ITEM_TYPES = ['file', 'chat', 'request'];
 
@@ -51,102 +59,186 @@ function republishUnreadItemCountForUserTroupe(userId, troupeId, callback) {
   }, callback);
 }
 
-exports.newItem = function(troupeId, creatorUserId, itemType, itemId) {
+badgeBatcher.listen(function(key, userIds, done) {
+  // Remove duplicates
+  userIds = _.uniq(userIds);
+
+  // Get responders to respond
+  appEvents.batchUserBadgeCountUpdate({
+    userIds: userIds
+  });
+
+  done();
+});
+
+function republishBadgeForUser(userId) {
+  badgeBatcher.add('queue', userId);
+}
+
+/**
+ * Returns the key array used by the redis scripts
+ */
+function getScriptKeysForUserIds(userIds, itemType, troupeId) {
+  var unreadKeys = userIds.map(function(userId) {
+    return "unread:" + itemType + ":" + userId + ":" + troupeId;
+  });
+
+  var badgeKeys = userIds.map(function(userId) {
+    return "ub:" + userId;
+  });
+
+  return unreadKeys.concat(badgeKeys);
+}
+
+var runScript = Q.nbind(scriptManager.run, scriptManager);
+var redisClient_smembers = Q.nbind(redisClient.smembers, redisClient);
+
+/**
+ * New item added
+ * @return {promise} promise of nothing
+ */
+function newItem(troupeId, creatorUserId, itemType, itemId) {
   if(!troupeId) { winston.error("newitem failed. Troupe cannot be null"); return; }
   if(!itemType) { winston.error("newitem failed. itemType cannot be null"); return; }
   if(!itemId) { winston.error("newitem failed. itemId cannot be null"); return; }
 
-  troupeService.findById(troupeId, function(err, troupe) {
-    if(err) return winston.error("Unable to load troupeId " + troupeId, err);
-    var userIds = troupe.getUserIds();
-
-    var data = {};
-    data[itemType] = [itemId];
-
-      // multi chain with an individual callback
-    var multi = redisClient.multi();
-    userIds.forEach(function(userId) {
-      if(!creatorUserId || (("" + userId) != ("" + creatorUserId))) {
-        appEvents.newUnreadItem(userId, troupeId, data);
-
-        multi.sadd("unread:" + itemType + ":" + userId + ":" + troupeId, itemId);
+  return troupeService.findUserIdsForTroupe(troupeId)
+    .then(function(userIds) {
+      if(creatorUserId) {
+        userIds = userIds.filter(function(userId) {
+          return ("" + userId) != ("" + creatorUserId);
+        });
       }
-    });
 
-    multi.exec(function(err/*, replies*/) {
-      if(err) winston.error("unreadItemService.newItem failed", err);
-
+      // Publish out an new item event
+      var data = {};
+      data[itemType] = [itemId];
       userIds.forEach(function(userId) {
-        republishUnreadItemCountForUserTroupe(userId, troupeId);
+        appEvents.newUnreadItem(userId, troupeId, data);
       });
-    });
 
-  });
-};
+      // Now talk to redis and do the update
+      var keys = getScriptKeysForUserIds(userIds, itemType, troupeId);
+      return runScript('unread-add-item', keys, [troupeId, itemId])
+        .then(function(updates) {
+          userIds.forEach(function(userId) {
+            republishUnreadItemCountForUserTroupe(userId, troupeId);
+          });
 
-exports.removeItem = function(troupeId, itemType, itemId) {
-  troupeService.findUserIdsForTroupe(troupeId, function(err, userIds) {
-    if(err) return winston.error("Unable to load troupeId " + troupeId, err);
-
-    var data = {};
-    data[itemType] = [itemId];
-
-    var multi = redisClient.multi();
-    var m2 = redisClient.multi();
-
-    userIds.forEach(function(userId) {
-      appEvents.unreadItemsRemoved(userId, troupeId, data);
-
-      multi.srem("unread:" + itemType + ":" + userId + ":" + troupeId, itemId);
-    });
-
-    multi.exec(function(err/*, replies*/) {
-      if(err) return winston.error("unreadItemService.removeItem failed", err);
-
-      m2.exec(function(err/*, replies*/) {
-        if(err) return winston.error(err);
-
-        userIds.forEach(function(userId) {
-          republishUnreadItemCountForUserTroupe(userId, troupeId);
+          updates.forEach(function(update) {
+            var userId = userIds[update];
+            republishBadgeForUser(userId);
+          });
         });
 
-      });
     });
+}
+
+/**
+ * Item removed
+ * @return {promise} promise of nothing
+ */
+function removeItem(troupeId, itemType, itemId) {
+  if(!troupeId) { winston.error("newitem failed. Troupe cannot be null"); return; }
+  if(!itemType) { winston.error("newitem failed. itemType cannot be null"); return; }
+  if(!itemId) { winston.error("newitem failed. itemId cannot be null"); return; }
+
+  return troupeService.findUserIdsForTroupe(troupeId)
+    .then(function(userIds) {
+
+      // Publish out an unread item removed event
+      // TODO: we could actually check whether this user thinks this item is UNREAD
+      var data = {};
+      data[itemType] = [itemId];
+      userIds.forEach(function(userId) {
+        appEvents.unreadItemsRemoved(userId, troupeId, data);
+      });
+
+      // Now talk to redis and do the update
+      var keys = getScriptKeysForUserIds(userIds, itemType, troupeId);
+      return runScript('unread-remove-item', keys, [troupeId, itemId])
+        .then(function(updates) {
+          userIds.forEach(function(userId) {
+            republishUnreadItemCountForUserTroupe(userId, troupeId);
+          });
+
+          updates.forEach(function(update) {
+            var userId = userIds[update];
+            republishBadgeForUser(userId);
+          });
+        });
 
   });
 };
 
+/**
+ * Mark an item in a troupe as having been read by a user
+ * @return {promise} promise of nothing
+ */
+function markItemsOfTypeRead(userId, troupeId, itemType, ids) {
+  assert(userId, 'Expected userId');
+  assert(troupeId, 'Expected troupeId');
+  assert(itemType, 'Expected itemType');
+
+  if(!ids.length) return; // Nothing to do
+
+  var keys = [
+      "ub:" + userId,
+      "unread:" + itemType + ":" + userId + ":" + troupeId
+    ];
+
+  var values = [troupeId].concat(ids);
+
+  return runScript('unread-mark-items-read', keys, values);
+}
+
+/**
+ * Mark an item in a troupe as having been read by a user
+ * @return {promise} promise of nothing
+ */
+function setLastReadTimeForUser(userId, troupeId, lastReadTimestamp) {
+  assert(userId, 'Expected userId');
+  assert(lastReadTimestamp, 'Expected lastReadTimestamp');
+
+  return Q.ninvoke(redisClient, "mset",
+    "lrt:" + userId, lastReadTimestamp,
+    "lrtt:" + userId + ":" + troupeId, lastReadTimestamp);
+}
+
+
+/**
+ * Mark many items as read, for a single user and troupe
+ */
 exports.markItemsRead = function(userId, troupeId, items, callback) {
+  var now = Date.now();
 
   appEvents.unreadItemsRemoved(userId, troupeId, items);
 
-  var multi = redisClient.multi();
-
-  // lrt stands for "last read time" - it's the last time a user read something
-  multi.set("lrt:" + userId, Date.now());
-
-  var keys = _.keys(items);
-  keys.forEach(function(itemType) {
-    var ids = items[itemType];
-
-    ids.forEach(function(id) {
-      multi.srem("unread:" + itemType + ":" + userId + ":" + troupeId, id);
-    });
-  });
-
-  multi.exec(function(err/*, replies*/) {
-    if(err) return callback(err);
-
-    republishUnreadItemCountForUserTroupe(userId, troupeId);
-
-    // For the moment, we're only bothering with chats for this
-    readByService.recordItemsAsRead(userId, troupeId, items, function(err) {
-      if(err) winston.error("Error while recording items as read: " + err, { exception: err });
-      // Silently swallow the error!
-      callback();
+  var ops = Object.keys(items).map(function(itemType) {
+      var ids = items[itemType];
+      return markItemsOfTypeRead(userId, troupeId, itemType, ids);
     });
 
-  });
+  // Also set the timestamp for the user
+  ops.push(setLastReadTimeForUser(userId, troupeId, now));
+
+  return Q.all(ops)
+    .then(function(results) {
+      republishUnreadItemCountForUserTroupe(userId, troupeId);
+
+      var resultsRequiringBadgeCounts = results.filter(function(result, i) {
+        return result > 0 && i != results.length - 1;
+      });
+
+      if(resultsRequiringBadgeCounts.length > 0) {
+        republishBadgeForUser(userId);
+      }
+
+      // For the moment, we're only bothering with chats for this
+      return readByService.recordItemsAsRead(userId, troupeId, items);
+    })
+    .nodeify(callback);
+
 };
 
 exports.getUserUnreadCounts = function(userId, troupeId, callback) {
@@ -191,17 +283,32 @@ exports.findLastReadTimesForUsers = function(userIds, callback) {
   });
 };
 
-exports.getUnreadItems = function(userId, troupeId, itemType, callback) {
-    redisClient.smembers("unread:" + itemType + ":" + userId + ":" + troupeId, function(err, members) {
-      if(err) {
-        winston.warn("unreadItemService.getUnreadItems failed", err);
-
-        // Mask error
-        return callback(null, []);
+/** Returns hash[userId] = unixTime for each of the queried users */
+exports.findLastReadTimesForUsersForTroupe = function(userIds, troupeId, callback) {
+  var keysToQuery = userIds.map(function(userId) { return "lrtt:" + userId + ":" + troupeId;});
+  redisClient.mget(keysToQuery, function(err, times) {
+    if(err) return callback(err);
+    var result = {};
+    times.forEach(function(time, index) {
+      if(time) {
+        var userId = userIds[index];
+        result[userId] = time;
       }
-
-      callback(null, members);
     });
+
+    callback(null, result);
+  });
+};
+
+
+exports.getUnreadItems = function(userId, troupeId, itemType, callback) {
+  return redisClient_smembers("unread:" + itemType + ":" + userId + ":" + troupeId)
+    .fail(function(err) {
+      winston.warn("unreadItemService.getUnreadItems failed", err);
+      // Mask error
+      return [];
+    })
+    .nodeify(callback);
 };
 
 exports.getUnreadItemsForUserTroupeSince = function(userId, troupeId, since, callback) {
@@ -252,6 +359,8 @@ exports.getUnreadItemsForUser = function(userId, troupeId, callback) {
   });
 
   multi.exec(function(err, replies) {
+    if(err) return callback(err);
+
     var result = {};
 
     DEFAULT_ITEM_TYPES.forEach(function(itemType, index) {
@@ -261,6 +370,35 @@ exports.getUnreadItemsForUser = function(userId, troupeId, callback) {
 
     callback(null, result);
   });
+};
+
+/**
+ * Get the badge counts for userIds
+ * @return promise of a hash { userId1: 1, userId: 2, etc }
+ */
+exports.getBadgeCountsForUserIds = function(userIds, callback) {
+  var multi = redisClient.multi();
+
+  userIds.forEach(function(userId) {
+    multi.zcard("ub:" + userId);
+  });
+
+  var d = Q.defer();
+
+  multi.exec(function(err, replies) {
+    if(err) return d.reject(err);
+
+    var result = {};
+
+    userIds.forEach(function(userId, index) {
+      var reply = replies[index];
+      result[userId] = reply;
+    });
+
+    d.resolve(result);
+  });
+
+  return d.promise.nodeify(callback);
 };
 
 /* TODO: make this better, more OO-ey */
@@ -340,11 +478,20 @@ exports.install = function() {
       return;
     }
 
+    var promise;
+
     if(operation === 'create') {
       var creatingUserId = findCreatingUserIdModel(info.modelName, model);
-      exports.newItem(info.troupeId, creatingUserId, info.modelName, modelId);
+      promise = newItem(info.troupeId, creatingUserId, info.modelName, modelId);
     } else if(operation === 'remove') {
-      exports.removeItem(info.troupeId, info.modelName, modelId);
+      promise = removeItem(info.troupeId, info.modelName, modelId);
+    }
+
+    if(promise) {
+      promise.fail(function(err) {
+        winston.error('unreadItemService failure: ' + err, { exception: err });
+        throw err;
+      });
     }
 
   });
@@ -352,5 +499,7 @@ exports.install = function() {
 
 exports.testOnly = {
   getOldestId: getOldestId,
-  sinceFilter: sinceFilter
+  sinceFilter: sinceFilter,
+  newItem: newItem,
+  removeItem: removeItem
 };

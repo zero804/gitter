@@ -539,8 +539,6 @@ function findAllUnusedInvitesForTroupe(troupeId, callback) {
       .exec(callback);
 }
 
-
-
 function findUnusedInviteToTroupeForUserId(userId, troupeId, callback) {
   return persistence.Invite.findOneQ({ troupeId: troupeId, userId: userId, status: 'UNUSED' }).nodeify(callback);
 }
@@ -623,8 +621,16 @@ function updateInvitesForEmailToUserId(email, userId, callback) {
 }
 
 function findAllUnusedInvitesForUserId(userId, callback) {
-  // note: this finds invites for the user and from the user, unlike the ForEmail version which still only finds for the user
-  return persistence.Invite.where().or([{ 'userId': userId }, { 'fromUserId': userId }])
+  return persistence.Invite.where('userId').equals(userId)
+    .where('status').equals('UNUSED')
+    .sort({ createdAt: 'asc' } )
+    .execQ()
+    .nodeify(callback);
+}
+
+function findAllUnusedConnectionInvitesFromUserId(userId, callback) {
+  return persistence.Invite.where('fromUserId').equals(userId)
+    .where('troupeId').equals(null)
     .where('status').equals('UNUSED')
     .sort({ createdAt: 'asc' } )
     .execQ()
@@ -839,8 +845,10 @@ function findOneToOneTroupe(fromUserId, toUserId) {
  *
  * @return {[ troupe, other-user, invite ]}
  */
-function findOrCreateOneToOneTroupe(fromUserId, toUserId, callback) {
-  if(fromUserId == toUserId) return callback("You cannot be in a troupe with yourself.");
+function findOrCreateOneToOneTroupe(fromUserId, toUserId) {
+  assert(fromUserId, 'fromUserId parameter required');
+  assert(toUserId, 'toUserId parameter required');
+  assert(fromUserId != toUserId, 'You cannot be in a troupe with yourself.');
 
   return userService.findById(toUserId)
     .then(function(toUser) {
@@ -887,9 +895,7 @@ function findOrCreateOneToOneTroupe(fromUserId, toUserId, callback) {
               });
 
           });
-
-    })
-    .nodeify(callback);
+    });
 
 }
 
@@ -1214,6 +1220,7 @@ function acceptInviteForAuthenticatedUser(user, invite) {
       throw 401;
     }
 
+    // TODO: this will not be used in future once invites are all delete
     if(invite.status !== 'UNUSED') {
       // invite has been used, we can't use it again.
       winston.verbose("Invite has already been used", { inviteId: invite.id });
@@ -1229,6 +1236,7 @@ function acceptInviteForAuthenticatedUser(user, invite) {
     // Either add the user or create a one to one troupe. depending on whether this
     // is a one to one invite or a troupe invite
     var isNormalTroupe = !!invite.troupeId;
+
     return (isNormalTroupe ? addUserIdToTroupe(user.id, invite.troupeId)
                             : createOneToOneTroupe(invite.fromUserId, invite.userId))
       .then(function(troupe) {
@@ -1268,18 +1276,43 @@ function findRecipientForInvite(invite) {
 function acceptInvite(confirmationCode, troupeUri, callback) {
   return persistence.Invite.findOneQ({ code: confirmationCode })
     .then(function(invite) {
-      if(!invite) {
-        winston.error("Invite confirmationCode=" + confirmationCode + " not found. ");
-        return { user: null };
+      if(!invite || invite.status !== 'UNUSED' /* TODO remove this term later */) {
+        return persistence.InviteUsed.findOneQ({ code: confirmationCode })
+          .then(function(usedInvite) {
+            if(!usedInvite) {
+              winston.error("Invite confirmationCode=" + confirmationCode + " not found. ");
+              return { user: null };
+            }
+
+            return findRecipientForInvite(usedInvite)
+              .then(function(user) {
+                /* The invite has already been used. We need to fail authentication (if they have completed their profile), but go to the troupe */
+                winston.verbose("Invite has already been used", { confirmationCode: confirmationCode, troupeUri: troupeUri });
+                statsService.event('invite_reused', { userId: user.id, uri: troupeUri });
+
+                // If the user has clicked on the invite, but hasn't completed their profile (as in does not have a password)
+                // then we'll give them a special dispensation and allow them to access the site (otherwise they'll never get in)
+                if (user && user.status == 'PROFILE_NOT_COMPLETED') {
+                  return { user: user };
+                }
+
+                return { user: null, alreadyUsed: true };
+              });
+
+          });
       }
 
       return findRecipientForInvite(invite)
         .then(function(user) {
+
           // If the user doesn't exist and the invite is not used,
           // create the user
-          if(!user && invite.status !== 'USED') {
+          //
+          // TODO: in future, once the USED invites are out of the collection the
+          // status term in the if below can be removed
+          if(!user) {
             return userService.findOrCreateUserForEmail({
-              displayName: invite.displayName,
+              displayName: invite.displayName || invite.email.replace(/@.*/, ""),
               email: invite.email,
               status: "PROFILE_NOT_COMPLETED"
             }).then(function(user) {
@@ -1293,21 +1326,6 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
           return user;
         })
         .then(function(user) {
-
-          if(invite.status === 'USED') {
-            /* The invite has already been used. We need to fail authentication (if they have completed their profile), but go to the troupe */
-            winston.verbose("Invite has already been used", { confirmationCode: confirmationCode, troupeUri: troupeUri });
-            statsService.event('invite_reused', { userId: user.id, uri: troupeUri });
-
-            // If the user has clicked on the invite, but hasn't completed their profile (as in does not have a password)
-            // then we'll give them a special dispensation and allow them to access the site (otherwise they'll never get in)
-            if (user && user.status == 'PROFILE_NOT_COMPLETED') {
-              return { user: user };
-            }
-
-            return { user: null, alreadyUsed: true };
-          }
-
           // Invite is good to accept
 
           statsService.event('invite_accepted', { userId: user.id, uri: troupeUri });
@@ -1331,18 +1349,19 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
           var isNormalTroupe = !!invite.troupeId;
           return Q.all([
               confirmOperation,
-                isNormalTroupe ? addUserIdToTroupe(user.id, invite.troupeId) :
-                                 createOneToOneTroupe(user.id, invite.fromUserId)
+              isNormalTroupe ? addUserIdToTroupe(user.id, invite.troupeId) :
+                               createOneToOneTroupe(user.id, invite.fromUserId)
             ])
             .spread(function(userSaveResult, troupe) {
               // once user is added / troupe is created, send email notice
               sendInviteAcceptedNotice(invite, troupe, isNormalTroupe);
 
-              return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite).then(function() {
-                return getUrlForTroupeForUserId(troupe, user.id).then(function(url) {
-                  return { user: user, url: url };
+              return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite)
+                .then(function() {
+                  return getUrlForTroupeForUserId(troupe, user.id).then(function(url) {
+                    return { user: user, url: url };
+                  });
                 });
-              });
             });
 
         });
@@ -1427,27 +1446,48 @@ function sendPendingInviteMails(delaySeconds, callback) {
     .nodeify(callback);
 }
 
-function markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite, callback) {
+/**
+ * markInviteUsedAndDeleteAllSimilarOutstandingInvites: pretty self explainatory I think
+ * @return promise of nothign
+ */
+function markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite) {
   assert(invite);
 
   invite.status = 'USED';
-  return invite.saveQ()
-      .then(function() {
 
-        var similarityQuery = { status: 'UNUSED', userId: invite.userId };
-        if(invite.troupeId) {
-          similarityQuery.troupeId = invite.troupeId;
-        } else {
-          similarityQuery.fromUserId = invite.fromUserId;
-          similarityQuery.troupeId = null; // Important to signify that its a one-to-one invite
-        }
+  return createQ(persistence.InviteUsed, invite)
+    .then(function() {
+      return invite.removeQ()
+          .then(function() {
 
-        return persistence.Invite.updateQ(similarityQuery, { status: 'INVALID' }, { multi: true })
-            .then(function() {
-              return invite;
-            });
+            var similarityQuery = { status: 'UNUSED', userId: invite.userId };
+            if(invite.troupeId) {
+              similarityQuery.troupeId = invite.troupeId;
+            } else {
+              similarityQuery.fromUserId = invite.fromUserId;
+              similarityQuery.troupeId = null; // Important to signify that its a one-to-one invite
+            }
 
-      }).nodeify(callback);
+            return persistence.Invite.findQ(similarityQuery)
+              .then(function(invalidInvites) {
+                if(!invalidInvites.length) return;
+
+                // Delete the invalid invites
+                var promises = invalidInvites.map(function(invalidInvite) {
+                  invalidInvite.status = 'INVALID';
+
+                  return createQ(persistence.InviteUsed, invalidInvite)
+                          .then(function() {
+                            return invalidInvite.remove();
+                          });
+
+                });
+
+                return Q.all(promises);
+              });
+
+          });
+    });
 }
 
 function deleteTroupe(troupe, callback) {
@@ -1477,6 +1517,7 @@ module.exports = {
   findAllUnusedInvitesForTroupe: findAllUnusedInvitesForTroupe,
   findAllUnusedInvitesForEmail: findAllUnusedInvitesForEmail,
   findAllUnusedInvitesForUserId: findAllUnusedInvitesForUserId,
+  findAllUnusedConnectionInvitesFromUserId: findAllUnusedConnectionInvitesFromUserId,
   findUnusedInviteToTroupeForUserId: findUnusedInviteToTroupeForUserId,
   findImplicitConnectionBetweenUsers: findImplicitConnectionBetweenUsers,
   findAllUserIdsForUnconnectedImplicitContacts: findAllUserIdsForUnconnectedImplicitContacts,

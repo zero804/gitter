@@ -15,7 +15,7 @@ var opts = require("nomnom")
    })
    .option('message', {
       abbr: 'm',
-      required: true,
+      required: false,
       help: 'Message to send'
    })
    .option('link', {
@@ -30,11 +30,16 @@ var opts = require("nomnom")
    })
    .parse();
 
-pushNotificationGateway.sendUserNotification(opts.user, {
-   message: opts.message,
-   sound: opts.sound,
-   link: opts.link
-   },
+var data = null;
+if(opts.message || opts.sound || opts.link) {
+   data = {
+      message: opts.message,
+      sound: opts.sound,
+      link: opts.link
+   };
+}
+
+pushNotificationGateway.sendUserNotification(opts.user, data,
    function() {
      shutdown.shutdownGracefully();
    });

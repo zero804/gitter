@@ -1,0 +1,25 @@
+<div id="invite-modal" class="modal-content" style="padding-bottom: 30px">
+  <div>
+    <div class="trpModalTitle">
+        <div style="text-align: center">
+          <div class="trpDisplayPicture avatar-s {{#toUser.offline}}offline{{/toUser.offline}} {{#toUser.online}}online{{/toUser.online}}" style="background-image: url('{{#if toUser.avatarUrlSmall}}{{toUser.avatarUrlSmall}}{{else}}/avatarForEmail/{{toUser.email}}{{/if}}');"></div>
+        </div>
+        <div style="text-align: center">
+          {{#if toUser.displayName}}{{toUser.displayName}}{{/if}}
+        </div>
+    </div>
+    <div class="trpModalBody" style="text-align: center"><br>
+      <br><br><span class="trpModalSubtext">This invite to {{#if toUser.displayName}}{{toUser.displayName}}{{else}}{{toUser.email}}{{/if}} is still pending.</span>
+    </div>
+    <div class="" style="text-align: center">
+      <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen" id="invite-resend-button" style="min-width: 110px">Resend Invite</button>
+      <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen" id="invite-delete-button" style="min-width: 110px">Delete Invite</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-success">
+  <div class="trpModalTitle">Invite has been sent</div>
+  <div class="trpModalSubtext">We've sent the invite, once it's accepted you'll be able to chat with {{#if toUser.displayName}}{{toUser.displayName}}{{/if}}.<br><br>
+  </div>
+</div>

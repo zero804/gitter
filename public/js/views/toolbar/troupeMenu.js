@@ -22,6 +22,9 @@ define([
     regions: {
       unread: "#left-menu-list-unread",
       invites: "#left-menu-list-invites",
+      outgoingConnectionInvites: "#left-menu-list-outgoing-connection-invites",
+      incomingConnectionInvites: "#left-menu-list-incoming-connection-invites",
+      incomingTroupeInvites: "#left-menu-list-incoming-troupe-invites",
       recent: "#left-menu-list-recent",
       favs: "#left-menu-list-favourites",
       troupes: "#left-menu-list",
@@ -65,6 +68,15 @@ define([
       // incoming invites collection view
       this.invites.show(new InvitesView({ collection: troupeCollections.incomingInvites }));
 
+      // incoming troupe invites view
+      this.incomingTroupeInvites.show(new InvitesView({ collection: troupeCollections.incomingTroupeInvites }));
+
+      // incoming connection invites view
+      this.incomingConnectionInvites.show(new InvitesView({ collection: troupeCollections.incomingConnectionInvites }));
+
+      // outgoing one-one invites view
+      this.outgoingConnectionInvites.show(new InvitesView({ collection: troupeCollections.outgoingConnectionInvites, fromViewer: true }));
+
       // search results collection view
       this.searchView = new SearchView({ troupes: troupeCollections.troupes, $input: this.$el.find('#list-search-input') });
       this.search.show(this.searchView);
@@ -80,6 +92,9 @@ define([
       toggler('#favTroupesList', troupeCollections.favouriteTroupes);
       toggler('#recentTroupesList', troupeCollections.recentTroupes);
       toggler('#invitesList', troupeCollections.incomingInvites);
+      toggler('#incomingTroupeInvites', troupeCollections.incomingTroupeInvites);
+      toggler('#outgoingConnectionInvites', troupeCollections.outgoingConnectionInvites);
+      toggler('#incomingConnectionInvites', troupeCollections.incomingConnectionInvites);
 
       function toggler(element, collection) {
         function toggle() {

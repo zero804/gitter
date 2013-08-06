@@ -6,12 +6,13 @@ define([
   'marionette',
   'views/base',
   'hbs!./tmpl/fileItemView',
+  'views/unread-item-view-mixin',
   'bootstrap_tooltip'
-], function($, _, Backbone, Marionette, TroupeViews, template/*, Bootstrap*/) {
+], function($, _, Backbone, Marionette, TroupeViews, template, UnreadItemViewMixin /*, Bootstrap*/) {
   /*jslint browser: true*/
   "use strict";
 
-  return TroupeViews.Base.extend({
+  var View = TroupeViews.Base.extend({
     unreadItemType: 'file',
     tagName: 'span',
     template: template,
@@ -50,5 +51,7 @@ define([
     }
 
   });
+  _.extend(View.prototype, UnreadItemViewMixin);
 
+  return View;
 });

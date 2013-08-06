@@ -6,6 +6,13 @@ var troupeService = require('./troupe-service');
 var uriLookupService = require("./uri-lookup-service");
 var promiseUtils = require("../utils/promise-utils");
 
+/**
+ * Finds who owns a URI
+ * @return promise of one of:
+ *   { troupe: troupe }
+ *   or { user: user }
+ *   or null if the uri doesn't exist
+ */
 function findUri(uri, callback) {
   uri = uri.toLowerCase();
   if(uri.charAt(0) === '/') {
@@ -51,7 +58,7 @@ exports.findUri = findUri;
 /**
  * findUri - find what the URL belongs to
  * @param  {String}   uri
- * @param  {String or ObjectId}   userId
+ * @param  {String or ObjectId}   userId can be null
  * @param  {Function} callback
  * @return {promise}  one of the following values:
  *  { ownUrl: true },
@@ -70,6 +77,10 @@ exports.findUriForUser = function(uri, userId, callback) {
         var troupe = result.troupe;
 
         if(user) {
+          if(!userId) {
+            return { oneToOne: true, troupe: null, otherUser: user, access: false, invite: null };
+          }
+
           // Is this the users own site?
           if(user.id == userId) {
             return { ownUrl: true };
@@ -83,6 +94,10 @@ exports.findUriForUser = function(uri, userId, callback) {
         }
 
         if(troupe) {
+          if(!userId) {
+            return { troupe: troupe, group: true, access: false };
+          }
+
           if(troupeService.userIdHasAccessToTroupe(userId, troupe)) {
             return { troupe: troupe, group: true, access: true };
           }

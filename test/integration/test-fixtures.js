@@ -90,10 +90,21 @@ function createExpectedFixtures(expected, done) {
     var username = f.username === true ? generateUsername() : f.username;
 
     return persistence.User.createQ({
-      email:        f.email || generateEmail(),
+      email:        f.email       || generateEmail(),
       displayName:  f.displayName || generateName(),
       username:     username,
-      status:       f.status || 'ACTIVE'
+      status:       f.status      || 'ACTIVE'
+    });
+  }
+
+  function createContact(fixtureName, f) {
+    winston.verbose('Creating ' + fixtureName);
+
+    return persistence.Contact.createQ({
+      name:         f.name    || 'John Doe',
+      emails:       f.emails  || ['john@doe.com'],
+      source:       f.source  || 'google',
+      userId:       f.userId  || null
     });
   }
 
@@ -123,6 +134,18 @@ function createExpectedFixtures(expected, done) {
       users: users,
       dateDeleted: f.dateDeleted
     });
+  }
+
+  function createInvite(fixtureName, f) {
+    winston.verbose('Creating ' + fixtureName);
+
+    return persistence.Invite.createQ({
+      fromUserId:   f.fromUserId,
+      userId:       f.userId,
+      troupeId:     f.troupeId,
+      status:       f.status    || 'UNUSED'
+    });
+
   }
 
   function createUsers(fixture) {
@@ -195,8 +218,50 @@ function createExpectedFixtures(expected, done) {
     return Q.all(promises).then(function() { return fixture; });
   }
 
+  function createContacts(fixture) {
+    var promises = Object.keys(expected).map(function(key) {
+
+        if(key.match(/^contact/)) {
+          var expectedContact = expected[key];
+
+          expectedContact.userId = fixture[expectedContact.user]._id;
+
+          return createContact(key, expectedContact)
+            .then(function(contact) {
+              fixture[key] = contact;
+            });
+        }
+
+        return null;
+      });
+    return Q.all(promises).then(function() { return fixture; });
+  }
+
+  function createInvites(fixture) {
+    var promises = Object.keys(expected).map(function(key) {
+
+        if(key.match(/^invite/)) {
+          var expectedInvite = expected[key];
+
+          expectedInvite.fromUserId = fixture[expectedInvite.fromUser]._id;
+          expectedInvite.userId = fixture[expectedInvite.user]._id;
+          expectedInvite.troupeId = expectedInvite.troupe && fixture[expectedInvite.troupe]._id;
+
+          return createInvite(key, expectedInvite)
+            .then(function(invite) {
+              fixture[key] = invite;
+            });
+        }
+
+        return null;
+      });
+    return Q.all(promises).thenResolve(fixture);
+  }
+
   return createUsers(createBaseFixture())
     .then(createTroupes)
+    .then(createContacts)
+    .then(createInvites)
     .nodeify(done);
 }
 

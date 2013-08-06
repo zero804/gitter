@@ -131,9 +131,8 @@ describe('haraka', function() {
   function createPersisterPlugin(storeEmailInConversation) {
 
     var plugin = testRequire.withProxies("./haraka/plugins/persister", {
-      './services/conversation-service': {
-        storeEmailInConversation: storeEmailInConversation
-      },
+      './services/conversation-service': { storeEmailInConversation: storeEmailInConversation },
+      './utils/event-listeners': { installLocalEventListeners: function() {} },
       'mailparser': {
         MailParser: function() {
           this.on = function(ev, callback) {

@@ -89,6 +89,16 @@ define([
     return m.get('fromUser').id === context.getUserId();
   });
 
+  var outgoingConnectionInvites = new inviteModels.ConnectionInviteCollection(null, { listen: true });
+
+  var incomingConnectionInvites = filterInviteCollection(incomingInvites, function(m) {
+    return !!m.get('oneToOneInvite');
+  });
+
+  var incomingTroupeInvites = filterInviteCollection(incomingInvites, function(m) {
+    return !m.get('oneToOneInvite');
+  });
+
   inviteCollection.on('change reset sync add remove', function() {
     unreadItemsClient.setOtherCount(incomingInvites.length);
     troupeCollection.trigger('sync');
@@ -103,7 +113,10 @@ define([
     favouriteTroupes: favouriteTroupesCollection,
     inviteCollection: inviteCollection,
     incomingInvites: incomingInvites,
-    outgoingInvites: outgoingInvites
+    incomingConnectionInvites: incomingConnectionInvites,
+    incomingTroupeInvites: incomingTroupeInvites,
+    outgoingInvites: outgoingInvites,
+    outgoingConnectionInvites: outgoingConnectionInvites
   };
 
 });

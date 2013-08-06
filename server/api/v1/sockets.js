@@ -13,10 +13,6 @@ module.exports = {
           return res.send(400);
         }
 
-        if(err.lockFail) {
-          return res.send(200, 'OK');
-        }
-
         return next(err);
       }
 

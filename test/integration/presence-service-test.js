@@ -613,7 +613,7 @@ describe('presenceService', function() {
 
 
         presenceService.testOnly.forceDelay = true;
-        presenceService.testOnly._validateUsers([userId], function(err) {
+        presenceService.testOnly.validateUsersSubset([userId], function(err) {
           presenceService.testOnly.forceDelay = false;
 
           assert(err, 'Expected an error');
