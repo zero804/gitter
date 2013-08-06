@@ -327,7 +327,7 @@ define([
     hide: function ( e ) {
       if(e) e.preventDefault();
       if(this.navigable) {
-        var hash = window.location.hash;
+        var hash = window.location.hash.replace(/\%7C/g, '|');
         var currentFragment;
         if(!hash) {
           currentFragment = '#!';
