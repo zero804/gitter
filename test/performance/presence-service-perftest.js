@@ -27,7 +27,7 @@ function FakeClient(socketId, userId, troupeId, script, done) {
 
 FakeClient.prototype = {
   connect: function(callback) {
-    presenceService.userSocketConnected(this.userId, this.socketId, callback);
+    presenceService.userSocketConnected(this.userId, this.socketId, 'test', 'test', callback);
   },
 
   associateWithTroupe: function(callback) {
@@ -60,8 +60,10 @@ FakeClient.prototype = {
       return this.done(err);
     }
 
+
     var nextAction = this.script.shift();
     this.lastAction = nextAction;
+
     switch(nextAction) {
       case 0:
         return this.connect(this.next);
@@ -142,7 +144,6 @@ describe('presenceService', function() {
     var userId = 'TESTUSER1' + Date.now();
     var socketId = 'TESTSOCKET1' + Date.now();
     var troupeId = 'TESTTROUPE1' + Date.now();
-
     var c = new FakeClient(socketId, userId, troupeId, [0,1,2,2,2,2,2,2,2,3], done);
     c.next();
   });

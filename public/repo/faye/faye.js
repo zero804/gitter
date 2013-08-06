@@ -1,8 +1,1818 @@
 define([], function (){
+	(function() {
+	'use strict';
 
-var Faye = function(){
-'use strict';var Faye={VERSION:'0.8.9',BAYEUX_VERSION:'1.0',ID_LENGTH:160,JSONP_CALLBACK:'jsonpcallback',CONNECTION_TYPES:['long-polling','cross-origin-long-polling','callback-polling','websocket','eventsource','in-process'],MANDATORY_CONNECTION_TYPES:['long-polling','callback-polling','in-process'],ENV:(typeof global==='undefined')?window:global,extend:function(a,b,d){if(!b)return a;for(var f in b){if(!b.hasOwnProperty(f))continue;if(a.hasOwnProperty(f)&&d===false)continue;if(a[f]!==b[f])a[f]=b[f]}return a},random:function(a){a=a||this.ID_LENGTH;if(a>32){var b=Math.ceil(a/32),d='';while(b--)d+=this.random(32);var f=d.split(''),g='';while(f.length>0)g+=f.pop();return g}var h=Math.pow(2,a)-1,i=h.toString(36).length,d=Math.floor(Math.random()*h).toString(36);while(d.length<i)d='0'+d;return d},clientIdFromMessages:function(a){var b=[].concat(a)[0];return b&&b.clientId},copyObject:function(a){var b,d,f;if(a instanceof Array){b=[];d=a.length;while(d--)b[d]=Faye.copyObject(a[d]);return b}else if(typeof a==='object'){b=(a===null)?null:{};for(f in a)b[f]=Faye.copyObject(a[f]);return b}else{return a}},commonElement:function(a,b){for(var d=0,f=a.length;d<f;d++){if(this.indexOf(b,a[d])!==-1)return a[d]}return null},indexOf:function(a,b){if(a.indexOf)return a.indexOf(b);for(var d=0,f=a.length;d<f;d++){if(a[d]===b)return d}return-1},map:function(a,b,d){if(a.map)return a.map(b,d);var f=[];if(a instanceof Array){for(var g=0,h=a.length;g<h;g++){f.push(b.call(d||null,a[g],g))}}else{for(var i in a){if(!a.hasOwnProperty(i))continue;f.push(b.call(d||null,i,a[i]))}}return f},filter:function(a,b,d){var f=[];for(var g=0,h=a.length;g<h;g++){if(b.call(d||null,a[g],g))f.push(a[g])}return f},asyncEach:function(a,b,d,f){var g=a.length,h=-1,i=0,k=false;var j=function(){i-=1;h+=1;if(h===g)return d&&d.call(f);b(a[h],n)};var m=function(){if(k)return;k=true;while(i>0)j();k=false};var n=function(){i+=1;m()};n()},toJSON:function(a){if(this.stringify)return this.stringify(a,function(key,value){return(this[key]instanceof Array)?this[key]:value});return JSON.stringify(a)},logger:function(a){if(typeof console!=='undefined')console.log(a)},timestamp:function(){var b=new Date(),d=b.getFullYear(),f=b.getMonth()+1,g=b.getDate(),h=b.getHours(),i=b.getMinutes(),k=b.getSeconds();var j=function(a){return a<10?'0'+a:String(a)};return j(d)+'-'+j(f)+'-'+j(g)+' '+j(h)+':'+j(i)+':'+j(k)}};if(typeof window!=='undefined')window.Faye=Faye;Faye.Class=function(a,b){if(typeof a!=='function'){b=a;a=Object}var d=function(){if(!this.initialize)return this;return this.initialize.apply(this,arguments)||this};var f=function(){};f.prototype=a.prototype;d.prototype=new f();Faye.extend(d.prototype,b);return d};Faye.Namespace=Faye.Class({initialize:function(){this._e={}},exists:function(a){return this._e.hasOwnProperty(a)},generate:function(){var a=Faye.random();while(this._e.hasOwnProperty(a))a=Faye.random();return this._e[a]=a},release:function(a){delete this._e[a]}});Faye.Error=Faye.Class({initialize:function(a,b,d){this.code=a;this.params=Array.prototype.slice.call(b);this.message=d},toString:function(){return this.code+':'+this.params.join(',')+':'+this.message}});Faye.Error.parse=function(a){a=a||'';if(!Faye.Grammar.ERROR.test(a))return new this(null,[],a);var b=a.split(':'),d=parseInt(b[0]),f=b[1].split(','),a=b[2];return new this(d,f,a)};Faye.Error.versionMismatch=function(){return new this(300,arguments,"Version mismatch").toString()};Faye.Error.conntypeMismatch=function(){return new this(301,arguments,"Connection types not supported").toString()};Faye.Error.extMismatch=function(){return new this(302,arguments,"Extension mismatch").toString()};Faye.Error.badRequest=function(){return new this(400,arguments,"Bad request").toString()};Faye.Error.clientUnknown=function(){return new this(401,arguments,"Unknown client").toString()};Faye.Error.parameterMissing=function(){return new this(402,arguments,"Missing required parameter").toString()};Faye.Error.channelForbidden=function(){return new this(403,arguments,"Forbidden channel").toString()};Faye.Error.channelUnknown=function(){return new this(404,arguments,"Unknown channel").toString()};Faye.Error.channelInvalid=function(){return new this(405,arguments,"Invalid channel").toString()};Faye.Error.extUnknown=function(){return new this(406,arguments,"Unknown extension").toString()};Faye.Error.publishFailed=function(){return new this(407,arguments,"Failed to publish").toString()};Faye.Error.serverError=function(){return new this(500,arguments,"Internal server error").toString()};Faye.Deferrable={callback:function(a,b){if(!a)return;if(this._v==='succeeded')return a.apply(b,this._j);this._k=this._k||[];this._k.push([a,b])},timeout:function(a,b){var d=this;var f=Faye.ENV.setTimeout(function(){d.setDeferredStatus('failed',b)},a*1000);this._w=f},errback:function(a,b){if(!a)return;if(this._v==='failed')return a.apply(b,this._j);this._l=this._l||[];this._l.push([a,b])},setDeferredStatus:function(){if(this._w)Faye.ENV.clearTimeout(this._w);var a=Array.prototype.slice.call(arguments),b=a.shift(),d;this._v=b;this._j=a;if(b==='succeeded')d=this._k;else if(b==='failed')d=this._l;if(!d)return;var f;while(f=d.shift())f[0].apply(f[1],this._j)}};Faye.Publisher={countListeners:function(a){if(!this._4||!this._4[a])return 0;return this._4[a].length},bind:function(a,b,d){this._4=this._4||{};var f=this._4[a]=this._4[a]||[];f.push([b,d])},unbind:function(a,b,d){if(!this._4||!this._4[a])return;if(!b){delete this._4[a];return}var f=this._4[a],g=f.length;while(g--){if(b!==f[g][0])continue;if(d&&f[g][1]!==d)continue;f.splice(g,1)}},trigger:function(){var a=Array.prototype.slice.call(arguments),b=a.shift();if(!this._4||!this._4[b])return;var d=this._4[b].slice(),f;for(var g=0,h=d.length;g<h;g++){f=d[g];f[0].apply(f[1],a)}}};Faye.Timeouts={addTimeout:function(a,b,d,f){this._6=this._6||{};if(this._6.hasOwnProperty(a))return;var g=this;this._6[a]=Faye.ENV.setTimeout(function(){delete g._6[a];d.call(f)},1000*b)},removeTimeout:function(a){this._6=this._6||{};var b=this._6[a];if(!b)return;clearTimeout(b);delete this._6[a]}};Faye.Logging={LOG_LEVELS:{error:3,warn:2,info:1,debug:0},logLevel:'error',log:function(a,b){if(!Faye.logger)return;var d=Faye.Logging.LOG_LEVELS;if(d[Faye.Logging.logLevel]>d[b])return;var a=Array.prototype.slice.apply(a),f=' ['+b.toUpperCase()+'] [Faye',g=this.className,h=a.shift().replace(/\?/g,function(){try{return Faye.toJSON(a.shift())}catch(e){return'[Object]'}});for(var i in Faye){if(g)continue;if(typeof Faye[i]!=='function')continue;if(this instanceof Faye[i])g=i}if(g)f+='.'+g;f+='] ';Faye.logger(Faye.timestamp()+f+h)}};(function(){for(var d in Faye.Logging.LOG_LEVELS)(function(a,b){Faye.Logging[a]=function(){this.log(arguments,a)}})(d,Faye.Logging.LOG_LEVELS[d])})();Faye.Grammar={LOWALPHA:/^[a-z]$/,UPALPHA:/^[A-Z]$/,ALPHA:/^([a-z]|[A-Z])$/,DIGIT:/^[0-9]$/,ALPHANUM:/^(([a-z]|[A-Z])|[0-9])$/,MARK:/^(\-|\_|\!|\~|\(|\)|\$|\@)$/,STRING:/^(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)| |\/|\*|\.))*$/,TOKEN:/^(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)))+$/,INTEGER:/^([0-9])+$/,CHANNEL_SEGMENT:/^(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)))+$/,CHANNEL_SEGMENTS:/^(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)))+(\/(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)))+)*$/,CHANNEL_NAME:/^\/(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)))+(\/(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)))+)*$/,WILD_CARD:/^\*{1,2}$/,CHANNEL_PATTERN:/^(\/(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)))+)*\/\*{1,2}$/,VERSION_ELEMENT:/^(([a-z]|[A-Z])|[0-9])(((([a-z]|[A-Z])|[0-9])|\-|\_))*$/,VERSION:/^([0-9])+(\.(([a-z]|[A-Z])|[0-9])(((([a-z]|[A-Z])|[0-9])|\-|\_))*)*$/,CLIENT_ID:/^((([a-z]|[A-Z])|[0-9]))+$/,ID:/^((([a-z]|[A-Z])|[0-9]))+$/,ERROR_MESSAGE:/^(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)| |\/|\*|\.))*$/,ERROR_ARGS:/^(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)| |\/|\*|\.))*(,(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)| |\/|\*|\.))*)*$/,ERROR_CODE:/^[0-9][0-9][0-9]$/,ERROR:/^([0-9][0-9][0-9]:(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)| |\/|\*|\.))*(,(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)| |\/|\*|\.))*)*:(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)| |\/|\*|\.))*|[0-9][0-9][0-9]::(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)| |\/|\*|\.))*)$/};Faye.Extensible={addExtension:function(a){this._7=this._7||[];this._7.push(a);if(a.added)a.added(this)},removeExtension:function(a){if(!this._7)return;var b=this._7.length;while(b--){if(this._7[b]!==a)continue;this._7.splice(b,1);if(a.removed)a.removed(this)}},pipeThroughExtensions:function(d,f,g,h){this.debug('Passing through ? extensions: ?',d,f);if(!this._7)return g.call(h,f);var i=this._7.slice();var k=function(a){if(!a)return g.call(h,a);var b=i.shift();if(!b)return g.call(h,a);if(b[d])b[d](a,k);else k(a)};k(f)}};Faye.extend(Faye.Extensible,Faye.Logging);Faye.Channel=Faye.Class({initialize:function(a){this.id=this.name=a},push:function(a){this.trigger('message',a)},isUnused:function(){return this.countListeners('message')===0}});Faye.extend(Faye.Channel.prototype,Faye.Publisher);Faye.extend(Faye.Channel,{HANDSHAKE:'/meta/handshake',CONNECT:'/meta/connect',SUBSCRIBE:'/meta/subscribe',UNSUBSCRIBE:'/meta/unsubscribe',DISCONNECT:'/meta/disconnect',META:'meta',SERVICE:'service',expand:function(a){var b=this.parse(a),d=['/**',a];var f=b.slice();f[f.length-1]='*';d.push(this.unparse(f));for(var g=1,h=b.length;g<h;g++){f=b.slice(0,g);f.push('**');d.push(this.unparse(f))}return d},isValid:function(a){return Faye.Grammar.CHANNEL_NAME.test(a)||Faye.Grammar.CHANNEL_PATTERN.test(a)},parse:function(a){if(!this.isValid(a))return null;return a.split('/').slice(1)},unparse:function(a){return'/'+a.join('/')},isMeta:function(a){var b=this.parse(a);return b?(b[0]===this.META):null},isService:function(a){var b=this.parse(a);return b?(b[0]===this.SERVICE):null},isSubscribable:function(a){if(!this.isValid(a))return null;return!this.isMeta(a)&&!this.isService(a)},Set:Faye.Class({initialize:function(){this._2={}},getKeys:function(){var a=[];for(var b in this._2)a.push(b);return a},remove:function(a){delete this._2[a]},hasSubscription:function(a){return this._2.hasOwnProperty(a)},subscribe:function(a,b,d){if(!b)return;var f;for(var g=0,h=a.length;g<h;g++){f=a[g];var i=this._2[f]=this._2[f]||new Faye.Channel(f);i.bind('message',b,d)}},unsubscribe:function(a,b,d){var f=this._2[a];if(!f)return false;f.unbind('message',b,d);if(f.isUnused()){this.remove(a);return true}else{return false}},distributeMessage:function(a){var b=Faye.Channel.expand(a.channel);for(var d=0,f=b.length;d<f;d++){var g=this._2[b[d]];if(g)g.trigger('message',a.data)}}})});Faye.Publication=Faye.Class(Faye.Deferrable);Faye.Subscription=Faye.Class({initialize:function(a,b,d,f){this._8=a;this._2=b;this._m=d;this._n=f;this._x=false},cancel:function(){if(this._x)return;this._8.unsubscribe(this._2,this._m,this._n);this._x=true},unsubscribe:function(){this.cancel()}});Faye.extend(Faye.Subscription.prototype,Faye.Deferrable);Faye.Client=Faye.Class({UNCONNECTED:1,CONNECTING:2,CONNECTED:3,DISCONNECTED:4,HANDSHAKE:'handshake',RETRY:'retry',NONE:'none',CONNECTION_TIMEOUT:60.0,DEFAULT_RETRY:5.0,DEFAULT_ENDPOINT:'/bayeux',INTERVAL:0.0,initialize:function(a,b){this.info('New client created for ?',a);this._f=b||{};this.endpoint=a||this.DEFAULT_ENDPOINT;this.endpoints=this._f.endpoints||{};this.transports={};this._D=Faye.CookieJar&&new Faye.CookieJar();this._y={};this._o=[];this.retry=this._f.retry||this.DEFAULT_RETRY;this._1=this.UNCONNECTED;this._2=new Faye.Channel.Set();this._g=0;this._p={};this._9={reconnect:this.RETRY,interval:1000*(this._f.interval||this.INTERVAL),timeout:1000*(this._f.timeout||this.CONNECTION_TIMEOUT)};if(Faye.Event)Faye.Event.on(Faye.ENV,'beforeunload',function(){if(Faye.indexOf(this._o,'autodisconnect')<0)this.disconnect()},this)},disable:function(a){this._o.push(a)},setHeader:function(a,b){this._y[a]=b},getClientId:function(){return this._0},getState:function(){switch(this._1){case this.UNCONNECTED:return'UNCONNECTED';case this.CONNECTING:return'CONNECTING';case this.CONNECTED:return'CONNECTED';case this.DISCONNECTED:return'DISCONNECTED'}},handshake:function(b,d){if(this._9.reconnect===this.NONE)return;if(this._1!==this.UNCONNECTED)return;this._1=this.CONNECTING;var f=this;this.info('Initiating handshake with ?',this.endpoint);this._z(Faye.MANDATORY_CONNECTION_TYPES);this._a({channel:Faye.Channel.HANDSHAKE,version:Faye.BAYEUX_VERSION,supportedConnectionTypes:[this._5.connectionType]},function(a){if(a.successful){this._1=this.CONNECTED;this._0=a.clientId;this._z(a.supportedConnectionTypes);this.info('Handshake successful: ?',this._0);this.subscribe(this._2.getKeys(),true);if(b)b.call(d)}else{this.info('Handshake unsuccessful');Faye.ENV.setTimeout(function(){f.handshake(b,d)},this._9.interval);this._1=this.UNCONNECTED}},this)},connect:function(a,b){if(this._9.reconnect===this.NONE)return;if(this._1===this.DISCONNECTED)return;if(this._1===this.UNCONNECTED)return this.handshake(function(){this.connect(a,b)},this);this.callback(a,b);if(this._1!==this.CONNECTED)return;this.info('Calling deferred actions for ?',this._0);this.setDeferredStatus('succeeded');this.setDeferredStatus('deferred');if(this._q)return;this._q=true;this.info('Initiating connection for ?',this._0);this._a({channel:Faye.Channel.CONNECT,clientId:this._0,connectionType:this._5.connectionType},this._A,this)},disconnect:function(){if(this._1!==this.CONNECTED)return;this._1=this.DISCONNECTED;this.info('Disconnecting ?',this._0);this._a({channel:Faye.Channel.DISCONNECT,clientId:this._0},function(a){if(a.successful)this._5.close()},this);this.info('Clearing channel listeners for ?',this._0);this._2=new Faye.Channel.Set()},subscribe:function(d,f,g){if(d instanceof Array)return Faye.map(d,function(c){return this.subscribe(c,f,g)},this);var h=new Faye.Subscription(this,d,f,g),i=(f===true),k=this._2.hasSubscription(d);if(k&&!i){this._2.subscribe([d],f,g);h.setDeferredStatus('succeeded');return h}this.connect(function(){this.info('Client ? attempting to subscribe to ?',this._0,d);if(!i)this._2.subscribe([d],f,g);this._a({channel:Faye.Channel.SUBSCRIBE,clientId:this._0,subscription:d},function(a){if(!a.successful){h.setDeferredStatus('failed',Faye.Error.parse(a.error));return this._2.unsubscribe(d,f,g)}var b=[].concat(a.subscription);this.info('Subscription acknowledged for ? to ?',this._0,b);h.setDeferredStatus('succeeded')},this)},this);return h},unsubscribe:function(d,f,g){if(d instanceof Array)return Faye.map(d,function(c){return this.unsubscribe(c,f,g)},this);var h=this._2.unsubscribe(d,f,g);if(!h)return;this.connect(function(){this.info('Client ? attempting to unsubscribe from ?',this._0,d);this._a({channel:Faye.Channel.UNSUBSCRIBE,clientId:this._0,subscription:d},function(a){if(!a.successful)return;var b=[].concat(a.subscription);this.info('Unsubscription acknowledged for ? from ?',this._0,b)},this)},this)},publish:function(b,d){var f=new Faye.Publication();this.connect(function(){this.info('Client ? queueing published message to ?: ?',this._0,b,d);this._a({channel:b,data:d,clientId:this._0},function(a){if(a.successful)f.setDeferredStatus('succeeded');else f.setDeferredStatus('failed',Faye.Error.parse(a.error))},this)},this);return f},receiveMessage:function(d){this.pipeThroughExtensions('incoming',d,function(a){if(!a)return;if(a.advice)this._E(a.advice);this._F(a);if(a.successful===undefined)return;var b=this._p[a.id];if(!b)return;delete this._p[a.id];b[0].call(b[1],a)},this)},_z:function(b){Faye.Transport.get(this,b,this._o,function(a){this.debug('Selected ? transport for ?',a.connectionType,a.endpoint);if(a===this._5)return;if(this._5)this._5.close();this._5=a;this._5.cookies=this._D;this._5.headers=this._y;a.bind('down',function(){if(this._b!==undefined&&!this._b)return;this._b=false;this.trigger('transport:down')},this);a.bind('up',function(){if(this._b!==undefined&&this._b)return;this._b=true;this.trigger('transport:up')},this)},this)},_a:function(b,d,f){b.id=this._G();if(d)this._p[b.id]=[d,f];this.pipeThroughExtensions('outgoing',b,function(a){if(!a)return;this._5.send(a,this._9.timeout/1000)},this)},_G:function(){this._g+=1;if(this._g>=Math.pow(2,32))this._g=0;return this._g.toString(36)},_E:function(a){Faye.extend(this._9,a);if(this._9.reconnect===this.HANDSHAKE&&this._1!==this.DISCONNECTED){this._1=this.UNCONNECTED;this._0=null;this._A()}},_F:function(a){if(!a.channel||a.data===undefined)return;this.info('Client ? calling listeners for ? with ?',this._0,a.channel,a.data);this._2.distributeMessage(a)},_H:function(){if(!this._q)return;this._q=null;this.info('Closed connection for ?',this._0)},_A:function(){this._H();var a=this;Faye.ENV.setTimeout(function(){a.connect()},this._9.interval)}});Faye.extend(Faye.Client.prototype,Faye.Deferrable);Faye.extend(Faye.Client.prototype,Faye.Publisher);Faye.extend(Faye.Client.prototype,Faye.Logging);Faye.extend(Faye.Client.prototype,Faye.Extensible);Faye.Transport=Faye.extend(Faye.Class({MAX_DELAY:0.0,batching:true,initialize:function(a,b){this._8=a;this.endpoint=b;this._c=[]},close:function(){},send:function(a,b){this.debug('Client ? sending message to ?: ?',this._8._0,this.endpoint,a);if(!this.batching)return this.request([a],b);this._c.push(a);this._I=b;if(a.channel===Faye.Channel.HANDSHAKE)return this.addTimeout('publish',0.01,this.flush,this);if(a.channel===Faye.Channel.CONNECT)this._r=a;if(this.shouldFlush&&this.shouldFlush(this._c))return this.flush();this.addTimeout('publish',this.MAX_DELAY,this.flush,this)},flush:function(){this.removeTimeout('publish');if(this._c.length>1&&this._r)this._r.advice={timeout:0};this.request(this._c,this._I);this._r=null;this._c=[]},receive:function(a){this.debug('Client ? received from ?: ?',this._8._0,this.endpoint,a);for(var b=0,d=a.length;b<d;b++){this._8.receiveMessage(a[b])}},retry:function(a,b){var d=false,f=this._8.retry*1000,g=this;return function(){if(d)return;d=true;Faye.ENV.setTimeout(function(){g.request(a,b)},f)}}}),{MAX_URL_LENGTH:2048,get:function(k,j,m,n,o){var l=k.endpoint;Faye.asyncEach(this._B,function(d,f){var g=d[0],h=d[1],i=k.endpoints[g]||l;if(Faye.indexOf(m,g)>=0)return f();if(Faye.indexOf(j,g)<0){h.isUsable(k,i,function(){});return f()}h.isUsable(k,i,function(a){if(!a)return f();var b=h.hasOwnProperty('create')?h.create(k,i):new h(k,i);n.call(o,b)})},function(){throw new Error('Could not find a usable connection type for '+l);})},register:function(a,b){this._B.push([a,b]);b.prototype.connectionType=a},_B:[]});Faye.extend(Faye.Transport.prototype,Faye.Logging);Faye.extend(Faye.Transport.prototype,Faye.Publisher);Faye.extend(Faye.Transport.prototype,Faye.Timeouts);Faye.Event={_h:[],on:function(a,b,d,f){var g=function(){d.call(f)};if(a.addEventListener)a.addEventListener(b,g,false);else a.attachEvent('on'+b,g);this._h.push({_i:a,_s:b,_m:d,_n:f,_C:g})},detach:function(a,b,d,f){var g=this._h.length,h;while(g--){h=this._h[g];if((a&&a!==h._i)||(b&&b!==h._s)||(d&&d!==h._m)||(f&&f!==h._n))continue;if(h._i.removeEventListener)h._i.removeEventListener(h._s,h._C,false);else h._i.detachEvent('on'+h._s,h._C);this._h.splice(g,1);h=null}}};Faye.Event.on(Faye.ENV,'unload',Faye.Event.detach,Faye.Event);Faye.URI=Faye.extend(Faye.Class({queryString:function(){var a=[];for(var b in this.params){if(!this.params.hasOwnProperty(b))continue;a.push(encodeURIComponent(b)+'='+encodeURIComponent(this.params[b]))}return a.join('&')},isSameOrigin:function(){var a=Faye.URI.parse(Faye.ENV.location.href,false);var b=(a.hostname!==this.hostname)||(a.port!==this.port)||(a.protocol!==this.protocol);return!b},toURL:function(){var a=this.queryString();return this.protocol+'//'+this.hostname+(this.port?':'+this.port:'')+this.pathname+(a?'?'+a:'')+this.hash}}),{parse:function(g,h){if(typeof g!=='string')return g;var i=new this(),k;var j=function(b,d,f){g=g.replace(d,function(a){i[b]=a;return''});if(i[b]===undefined)i[b]=f?Faye.ENV.location[b]:''};j('protocol',/^https?\:/,true);j('host',/^\/\/[^\/]+/,true);if(!/^\//.test(g))g=Faye.ENV.location.pathname.replace(/[^\/]*$/,'')+g;j('pathname',/^\/[^\?#]*/);j('search',/^\?[^#]*/);j('hash',/^#.*/);if(/^\/\//.test(i.host)){i.host=i.host.substr(2);k=i.host.split(':');i.hostname=k[0];i.port=k[1]||''}else{i.hostname=Faye.ENV.location.hostname;i.port=Faye.ENV.location.port}if(h===false){i.params={}}else{var m=i.search.replace(/^\?/,''),n=m?m.split('&'):[],o=n.length,l={};while(o--){k=n[o].split('=');l[decodeURIComponent(k[0]||'')]=decodeURIComponent(k[1]||'')}if(typeof h==='object')Faye.extend(l,h);i.params=l}return i}});if(!this.JSON){JSON={}}(function(){function m(a){return a<10?'0'+a:a}if(typeof Date.prototype.toJSON!=='function'){Date.prototype.toJSON=function(a){return this.getUTCFullYear()+'-'+m(this.getUTCMonth()+1)+'-'+m(this.getUTCDate())+'T'+m(this.getUTCHours())+':'+m(this.getUTCMinutes())+':'+m(this.getUTCSeconds())+'Z'};String.prototype.toJSON=Number.prototype.toJSON=Boolean.prototype.toJSON=function(a){return this.valueOf()}}var n=/[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,o=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,l,q,t={'\b':'\\b','\t':'\\t','\n':'\\n','\f':'\\f','\r':'\\r','"':'\\"','\\':'\\\\'},p;function s(d){o.lastIndex=0;return o.test(d)?'"'+d.replace(o,function(a){var b=t[a];return typeof b==='string'?b:'\\u'+('0000'+a.charCodeAt(0).toString(16)).slice(-4)})+'"':'"'+d+'"'}function r(a,b){var d,f,g,h,i=l,k,j=b[a];if(j&&typeof j==='object'&&typeof j.toJSON==='function'){j=j.toJSON(a)}if(typeof p==='function'){j=p.call(b,a,j)}switch(typeof j){case'string':return s(j);case'number':return isFinite(j)?String(j):'null';case'boolean':case'null':return String(j);case'object':if(!j){return'null'}l+=q;k=[];if(Object.prototype.toString.apply(j)==='[object Array]'){h=j.length;for(d=0;d<h;d+=1){k[d]=r(d,j)||'null'}g=k.length===0?'[]':l?'[\n'+l+k.join(',\n'+l)+'\n'+i+']':'['+k.join(',')+']';l=i;return g}if(p&&typeof p==='object'){h=p.length;for(d=0;d<h;d+=1){f=p[d];if(typeof f==='string'){g=r(f,j);if(g){k.push(s(f)+(l?': ':':')+g)}}}}else{for(f in j){if(Object.hasOwnProperty.call(j,f)){g=r(f,j);if(g){k.push(s(f)+(l?': ':':')+g)}}}}g=k.length===0?'{}':l?'{\n'+l+k.join(',\n'+l)+'\n'+i+'}':'{'+k.join(',')+'}';l=i;return g}}Faye.stringify=function(a,b,d){var f;l='';q='';if(typeof d==='number'){for(f=0;f<d;f+=1){q+=' '}}else if(typeof d==='string'){q=d}p=b;if(b&&typeof b!=='function'&&(typeof b!=='object'||typeof b.length!=='number')){throw new Error('JSON.stringify');}return r('',{'':a})};if(typeof JSON.stringify!=='function'){JSON.stringify=Faye.stringify}if(typeof JSON.parse!=='function'){JSON.parse=function(h,i){var k;function j(a,b){var d,f,g=a[b];if(g&&typeof g==='object'){for(d in g){if(Object.hasOwnProperty.call(g,d)){f=j(g,d);if(f!==undefined){g[d]=f}else{delete g[d]}}}}return i.call(a,b,g)}n.lastIndex=0;if(n.test(h)){h=h.replace(n,function(a){return'\\u'+('0000'+a.charCodeAt(0).toString(16)).slice(-4)})}if(/^[\],:{}\s]*$/.test(h.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,'@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,']').replace(/(?:^|:|,)(?:\s*\[)+/g,''))){k=eval('('+h+')');return typeof i==='function'?j({'':k},''):k}throw new SyntaxError('JSON.parse');}}}());Faye.Transport.WebSocket=Faye.extend(Faye.Class(Faye.Transport,{UNCONNECTED:1,CONNECTING:2,CONNECTED:3,batching:false,isUsable:function(a,b){this.callback(function(){a.call(b,true)});this.errback(function(){a.call(b,false)});this.connect()},request:function(b,d){if(b.length===0)return;this._d=this._d||{};for(var f=0,g=b.length;f<g;f++){this._d[b[f].id]=b[f]}this.callback(function(a){a.send(Faye.toJSON(b))});this.connect()},close:function(){if(!this._3)return;this._3.onclose=this._3.onerror=null;this._3.close();delete this._3;this.setDeferredStatus('deferred');this._1=this.UNCONNECTED},connect:function(){if(Faye.Transport.WebSocket._J)return;this._1=this._1||this.UNCONNECTED;if(this._1!==this.UNCONNECTED)return;this._1=this.CONNECTING;var g=Faye.Transport.WebSocket.getClass();if(!g)return this.setDeferredStatus('failed');this._3=new g(Faye.Transport.WebSocket.getSocketUrl(this.endpoint));var h=this;this._3.onopen=function(){h._1=h.CONNECTED;h._t=true;h.setDeferredStatus('succeeded',h._3);h.trigger('up')};this._3.onmessage=function(a){var b=JSON.parse(a.data);if(!b)return;b=[].concat(b);for(var d=0,f=b.length;d<f;d++){delete h._d[b[d].id]}h.receive(b)};this._3.onclose=this._3.onerror=function(){var a=(h._1===h.CONNECTED);h.setDeferredStatus('deferred');h._1=h.UNCONNECTED;h.close();if(a)return h.resend();if(!h._t)return h.setDeferredStatus('failed');var b=h._8.retry*1000;Faye.ENV.setTimeout(function(){h.connect()},b);h.trigger('down')}},resend:function(){if(!this._d)return;var d=Faye.map(this._d,function(a,b){return b});this.request(d)}}),{getSocketUrl:function(a){if(Faye.URI)a=Faye.URI.parse(a).toURL();return a.replace(/^http(s?):/ig,'ws$1:')},getClass:function(){return(Faye.WebSocket&&Faye.WebSocket.Client)||Faye.ENV.WebSocket||Faye.ENV.MozWebSocket},isUsable:function(a,b,d,f){this.create(a,b).isUsable(d,f)},create:function(a,b){var d=a.transports.websocket=a.transports.websocket||{};d[b]=d[b]||new this(a,b);return d[b]}});Faye.extend(Faye.Transport.WebSocket.prototype,Faye.Deferrable);Faye.Transport.register('websocket',Faye.Transport.WebSocket);if(Faye.Event)Faye.Event.on(Faye.ENV,'beforeunload',function(){Faye.Transport.WebSocket._J=true});Faye.Transport.EventSource=Faye.extend(Faye.Class(Faye.Transport,{initialize:function(b,d){Faye.Transport.prototype.initialize.call(this,b,d);if(!Faye.ENV.EventSource)return this.setDeferredStatus('failed');this._K=new Faye.Transport.XHR(b,d);var f=new EventSource(d+'/'+b.getClientId()),g=this;f.onopen=function(){g._t=true;g.setDeferredStatus('succeeded');g.trigger('up')};f.onerror=function(){if(g._t){g.trigger('down')}else{g.setDeferredStatus('failed');f.close()}};f.onmessage=function(a){g.receive(JSON.parse(a.data));g.trigger('up')};this._3=f},isUsable:function(a,b){this.callback(function(){a.call(b,true)});this.errback(function(){a.call(b,false)})},request:function(a,b){this._K.request(a,b)},close:function(){if(!this._3)return;this._3.onerror=null;this._3.close();delete this._3}}),{isUsable:function(b,d,f,g){var h=b.getClientId();if(!h)return f.call(g,false);Faye.Transport.XHR.isUsable(b,d,function(a){if(!a)return f.call(g,false);this.create(b,d).isUsable(f,g)},this)},create:function(a,b){var d=a.transports.eventsource=a.transports.eventsource||{},f=a.getClientId(),b=b+'/'+(f||'');d[b]=d[b]||new this(a,b);return d[b]}});Faye.extend(Faye.Transport.EventSource.prototype,Faye.Deferrable);Faye.Transport.register('eventsource',Faye.Transport.EventSource);Faye.Transport.XHR=Faye.extend(Faye.Class(Faye.Transport,{request:function(f,g){var h=this.retry(f,g),i=Faye.URI.parse(this.endpoint).pathname,k=this,j=Faye.ENV.ActiveXObject?new ActiveXObject("Microsoft.XMLHTTP"):new XMLHttpRequest();j.open('POST',i,true);j.setRequestHeader('Content-Type','application/json');j.setRequestHeader('Pragma','no-cache');j.setRequestHeader('X-Requested-With','XMLHttpRequest');var m=this.headers;for(var n in m){if(!m.hasOwnProperty(n))continue;j.setRequestHeader(n,m[n])}var o=function(){j.abort()};Faye.Event.on(Faye.ENV,'beforeunload',o);var l=function(){Faye.Event.detach(Faye.ENV,'beforeunload',o);j.onreadystatechange=function(){};j=null};j.onreadystatechange=function(){if(j.readyState!==4)return;var a=null,b=j.status,d=((b>=200&&b<300)||b===304||b===1223);if(!d){l();h();return k.trigger('down')}try{a=JSON.parse(j.responseText)}catch(e){}l();if(a){k.receive(a);k.trigger('up')}else{h();k.trigger('down')}};j.send(Faye.toJSON(f))}}),{isUsable:function(a,b,d,f){d.call(f,Faye.URI.parse(b).isSameOrigin())}});Faye.Transport.register('long-polling',Faye.Transport.XHR);Faye.Transport.CORS=Faye.extend(Faye.Class(Faye.Transport,{request:function(b,d){var f=Faye.ENV.XDomainRequest?XDomainRequest:XMLHttpRequest,g=new f(),h=this.retry(b,d),i=this;g.open('POST',this.endpoint,true);if(g.setRequestHeader)g.setRequestHeader('Pragma','no-cache');var k=function(){if(!g)return false;g.onload=g.onerror=g.ontimeout=g.onprogress=null;g=null;Faye.ENV.clearTimeout(m);return true};g.onload=function(){var a=null;try{a=JSON.parse(g.responseText)}catch(e){}k();if(a){i.receive(a);i.trigger('up')}else{h();i.trigger('down')}};var j=function(){k();h();i.trigger('down')};var m=Faye.ENV.setTimeout(j,1.5*1000*d);g.onerror=j;g.ontimeout=j;g.onprogress=function(){};g.send('message='+encodeURIComponent(Faye.toJSON(b)))}}),{isUsable:function(a,b,d,f){if(Faye.URI.parse(b).isSameOrigin())return d.call(f,false);if(Faye.ENV.XDomainRequest)return d.call(f,Faye.URI.parse(b).protocol===Faye.URI.parse(Faye.ENV.location).protocol);if(Faye.ENV.XMLHttpRequest){var g=new Faye.ENV.XMLHttpRequest();return d.call(f,g.withCredentials!==undefined)}return d.call(f,false)}});Faye.Transport.register('cross-origin-long-polling',Faye.Transport.CORS);Faye.Transport.JSONP=Faye.extend(Faye.Class(Faye.Transport,{shouldFlush:function(a){var b={message:Faye.toJSON(a),jsonp:'__jsonp'+Faye.Transport.JSONP._u+'__'};var d=Faye.URI.parse(this.endpoint,b).toURL();return d.length>=Faye.Transport.MAX_URL_LENGTH},request:function(b,d){var f={message:Faye.toJSON(b)},g=document.getElementsByTagName('head')[0],h=document.createElement('script'),i=Faye.Transport.JSONP.getCallbackName(),k=Faye.URI.parse(this.endpoint,f),j=this.retry(b,d),m=this;Faye.ENV[i]=function(a){o();m.receive(a);m.trigger('up')};var n=Faye.ENV.setTimeout(function(){o();j();m.trigger('down')},1.5*1000*d);var o=function(){if(!Faye.ENV[i])return false;Faye.ENV[i]=undefined;try{delete Faye.ENV[i]}catch(e){}Faye.ENV.clearTimeout(n);h.parentNode.removeChild(h);return true};k.params.jsonp=i;h.type='text/javascript';h.src=k.toURL();g.appendChild(h)}}),{_u:0,getCallbackName:function(){this._u+=1;return'__jsonp'+this._u+'__'},isUsable:function(a,b,d,f){d.call(f,true)}});Faye.Transport.register('callback-polling',Faye.Transport.JSONP);
-//@ sourceMappingURL=faye-browser-min.js.map
- return Faye; }.call(window);
+	var Faye = {
+	  VERSION:          '0.8.9',
+
+	  BAYEUX_VERSION:   '1.0',
+	  ID_LENGTH:        160,
+	  JSONP_CALLBACK:   'jsonpcallback',
+	  CONNECTION_TYPES: ['long-polling', 'cross-origin-long-polling', 'callback-polling', 'websocket', 'eventsource', 'in-process'],
+
+	  MANDATORY_CONNECTION_TYPES: ['long-polling', 'callback-polling', 'in-process'],
+
+	  ENV: (typeof window !== 'undefined') ? window : global,
+
+	  extend: function(dest, source, overwrite) {
+	    if (!source) return dest;
+	    for (var key in source) {
+	      if (!source.hasOwnProperty(key)) continue;
+	      if (dest.hasOwnProperty(key) && overwrite === false) continue;
+	      if (dest[key] !== source[key])
+	        dest[key] = source[key];
+	    }
+	    return dest;
+	  },
+
+	  random: function(bitlength) {
+	    bitlength = bitlength || this.ID_LENGTH;
+	    if (bitlength > 32) {
+	      var parts  = Math.ceil(bitlength / 32),
+	          string = '';
+	      while (parts--) string += this.random(32);
+	      var chars = string.split(''), result = '';
+	      while (chars.length > 0) result += chars.pop();
+	      return result;
+	    }
+	    var limit   = Math.pow(2, bitlength) - 1,
+	        maxSize = limit.toString(36).length,
+	        string  = Math.floor(Math.random() * limit).toString(36);
+
+	    while (string.length < maxSize) string = '0' + string;
+	    return string;
+	  },
+
+	  clientIdFromMessages: function(messages) {
+	    var first = [].concat(messages)[0];
+	    return first && first.clientId;
+	  },
+
+	  copyObject: function(object) {
+	    var clone, i, key;
+	    if (object instanceof Array) {
+	      clone = [];
+	      i = object.length;
+	      while (i--) clone[i] = Faye.copyObject(object[i]);
+	      return clone;
+	    } else if (typeof object === 'object') {
+	      clone = (object === null) ? null : {};
+	      for (key in object) clone[key] = Faye.copyObject(object[key]);
+	      return clone;
+	    } else {
+	      return object;
+	    }
+	  },
+
+	  commonElement: function(lista, listb) {
+	    for (var i = 0, n = lista.length; i < n; i++) {
+	      if (this.indexOf(listb, lista[i]) !== -1)
+	        return lista[i];
+	    }
+	    return null;
+	  },
+
+	  indexOf: function(list, needle) {
+	    if (list.indexOf) return list.indexOf(needle);
+
+	    for (var i = 0, n = list.length; i < n; i++) {
+	      if (list[i] === needle) return i;
+	    }
+	    return -1;
+	  },
+
+	  map: function(object, callback, context) {
+	    if (object.map) return object.map(callback, context);
+	    var result = [];
+
+	    if (object instanceof Array) {
+	      for (var i = 0, n = object.length; i < n; i++) {
+	        result.push(callback.call(context || null, object[i], i));
+	      }
+	    } else {
+	      for (var key in object) {
+	        if (!object.hasOwnProperty(key)) continue;
+	        result.push(callback.call(context || null, key, object[key]));
+	      }
+	    }
+	    return result;
+	  },
+
+	  filter: function(array, callback, context) {
+	    var result = [];
+	    for (var i = 0, n = array.length; i < n; i++) {
+	      if (callback.call(context || null, array[i], i))
+	        result.push(array[i]);
+	    }
+	    return result;
+	  },
+
+	  asyncEach: function(list, iterator, callback, context) {
+	    var n       = list.length,
+	        i       = -1,
+	        calls   = 0,
+	        looping = false;
+
+	    var iterate = function() {
+	      calls -= 1;
+	      i += 1;
+	      if (i === n) return callback && callback.call(context);
+	      iterator(list[i], resume);
+	    };
+
+	    var loop = function() {
+	      if (looping) return;
+	      looping = true;
+	      while (calls > 0) iterate();
+	      looping = false;
+	    };
+
+	    var resume = function() {
+	      calls += 1;
+	      loop();
+	    };
+	    resume();
+	  },
+
+	  // http://assanka.net/content/tech/2009/09/02/json2-js-vs-prototype/
+	  toJSON: function(object) {
+	    return JSON.stringify(object, function(key, value) {
+	      return (this[key] instanceof Array) ? this[key] : value;
+	    });
+	  }
+	};
+
+	if (typeof module !== 'undefined')
+	  module.exports = Faye;
+	else if (typeof window !== 'undefined')
+	  window.Faye = Faye;
+
+	Faye.Class = function(parent, methods) {
+	  if (typeof parent !== 'function') {
+	    methods = parent;
+	    parent  = Object;
+	  }
+
+	  var klass = function() {
+	    if (!this.initialize) return this;
+	    return this.initialize.apply(this, arguments) || this;
+	  };
+
+	  var bridge = function() {};
+	  bridge.prototype = parent.prototype;
+
+	  klass.prototype = new bridge();
+	  Faye.extend(klass.prototype, methods);
+
+	  return klass;
+	};
+
+	Faye.Namespace = Faye.Class({
+	  initialize: function() {
+	    this._used = {};
+	  },
+
+	  exists: function(id) {
+	    return this._used.hasOwnProperty(id);
+	  },
+
+	  generate: function() {
+	    var name = Faye.random();
+	    while (this._used.hasOwnProperty(name))
+	      name = Faye.random();
+	    return this._used[name] = name;
+	  },
+
+	  release: function(id) {
+	    delete this._used[id];
+	  }
+	});
+
+	(function() {
+	'use strict';
+
+	var timeout = setTimeout;
+
+	var defer;
+	if (typeof setImmediate === 'function')
+	  defer = setImmediate;
+	else if (typeof process === 'object' && process.nextTick)
+	  defer = process.nextTick;
+	else
+	  defer = function(fn) { timeout(fn, 0) };
+
+	var PENDING   = 0,
+	    FULFILLED = 1,
+	    REJECTED  = 2;
+
+	var FORWARD = function(x) { return x },
+	    BREAK   = function(x) { throw x  };
+
+	var Promise = function(task) {
+	  this._state     = PENDING;
+	  this._callbacks = [];
+	  this._errbacks  = [];
+
+	  if (typeof task !== 'function') return;
+	  var self = this;
+
+	  task(function(value)  { fulfill(self, value) },
+	       function(reason) { reject(self, reason) });
+	};
+
+	Promise.prototype.then = function(callback, errback) {
+	  var self = this;
+	  return new Promise(function(fulfill, reject) {
+	    var next = {fulfill: fulfill, reject: reject};
+	    registerCallback(self, callback, next);
+	    registerErrback(self, errback, next);
+	  });
+	};
+
+	var registerCallback = function(promise, callback, next) {
+	  if (typeof callback !== 'function') callback = FORWARD;
+	  var handler = function(value) { invoke(callback, value, next) };
+	  if (promise._state === PENDING) {
+	    promise._callbacks.push(handler);
+	  } else if (promise._state === FULFILLED) {
+	    handler(promise._value);
+	  }
+	};
+
+	var registerErrback = function(promise, errback, next) {
+	  if (typeof errback !== 'function') errback = BREAK;
+	  var handler = function(reason) { invoke(errback, reason, next) };
+	  if (promise._state === PENDING) {
+	    promise._errbacks.push(handler);
+	  } else if (promise._state === REJECTED) {
+	    handler(promise._reason);
+	  }
+	};
+
+	var invoke = function(fn, value, next) {
+	  defer(function() {
+	    try {
+	      var outcome = fn(value);
+	      if (outcome && typeof outcome.then === 'function') {
+	        outcome.then(next.fulfill, next.reject);
+	      } else {
+	        next.fulfill(outcome);
+	      }
+	    } catch (error) {
+	      next.reject(error);
+	    }
+	  });
+	};
+
+	var fulfill = Promise.fulfill = function(promise, value) {
+	  if (promise._state !== PENDING) return;
+
+	  promise._state    = FULFILLED;
+	  promise._value    = value;
+	  promise._errbacks = [];
+
+	  var callbacks = promise._callbacks, cb;
+	  while (cb = callbacks.shift()) cb(value);
+	};
+
+	var reject = Promise.reject = function(promise, reason) {
+	  if (promise._state !== PENDING) return;
+
+	  promise._state     = REJECTED;
+	  promise._reason    = reason;
+	  promise._callbacks = [];
+
+	  var errbacks = promise._errbacks, eb;
+	  while (eb = errbacks.shift()) eb(reason);
+	};
+
+	Promise.pending = function() {
+	  var tuple = {};
+
+	  tuple.promise = new Promise(function(fulfill, reject) {
+	    tuple.fulfill = fulfill;
+	    tuple.reject  = reject;
+	  });
+	  return tuple;
+	};
+
+	Promise.fulfilled = function(value) {
+	  return new Promise(function(fulfill, reject) { fulfill(value) });
+	};
+
+	Promise.rejected = function(reason) {
+	  return new Promise(function(fulfill, reject) { reject(reason) });
+	};
+
+	if (typeof Faye === 'undefined')
+	  module.exports = Promise;
+	else
+	  Faye.Promise = Promise;
+
+	})();
+
+	Faye.Set = Faye.Class({
+	  initialize: function() {
+	    this._index = {};
+	  },
+
+	  add: function(item) {
+	    var key = (item.id !== undefined) ? item.id : item;
+	    if (this._index.hasOwnProperty(key)) return false;
+	    this._index[key] = item;
+	    return true;
+	  },
+
+	  forEach: function(block, context) {
+	    for (var key in this._index) {
+	      if (this._index.hasOwnProperty(key))
+	        block.call(context, this._index[key]);
+	    }
+	  },
+
+	  isEmpty: function() {
+	    for (var key in this._index) {
+	      if (this._index.hasOwnProperty(key)) return false;
+	    }
+	    return true;
+	  },
+
+	  member: function(item) {
+	    for (var key in this._index) {
+	      if (this._index[key] === item) return true;
+	    }
+	    return false;
+	  },
+
+	  remove: function(item) {
+	    var key = (item.id !== undefined) ? item.id : item;
+	    var removed = this._index.hasOwnProperty(key);
+	    delete this._index[key];
+	    return removed;
+	  },
+
+	  toArray: function() {
+	    var array = [];
+	    this.forEach(function(item) { array.push(item) });
+	    return array;
+	  }
+	});
+
+	Faye.URI = {
+	  isURI: function(uri) {
+	    return uri && uri.protocol && uri.host && uri.path;
+	  },
+
+	  isSameOrigin: function(uri) {
+	    var location = Faye.ENV.location;
+	    return uri.protocol === location.protocol &&
+	           uri.hostname === location.hostname &&
+	           uri.port     === location.port;
+	  },
+
+	  parse: function(url) {
+	    if (typeof url !== 'string') return url;
+	    var uri = {}, parts, query, pairs, i, n, data;
+
+	    var consume = function(name, pattern) {
+	      url = url.replace(pattern, function(match) {
+	        uri[name] = match;
+	        return '';
+	      });
+	      uri[name] = uri[name] || '';
+	    };
+
+	    consume('protocol', /^[a-z]+\:/i);
+	    consume('host',     /^\/\/[^\/\?#]+/);
+
+	    if (!/^\//.test(url) && !uri.host)
+	      url = Faye.ENV.location.pathname.replace(/[^\/]*$/, '') + url;
+
+	    consume('pathname', /^[^\?#]*/);
+	    consume('search',   /^\?[^#]*/);
+	    consume('hash',     /^#.*/);
+
+	    uri.protocol = uri.protocol || Faye.ENV.location.protocol;
+
+	    if (uri.host) {
+	      uri.host     = uri.host.substr(2);
+	      parts        = uri.host.split(':');
+	      uri.hostname = parts[0];
+	      uri.port     = parts[1] || '';
+	    } else {
+	      uri.host     = Faye.ENV.location.host;
+	      uri.hostname = Faye.ENV.location.hostname;
+	      uri.port     = Faye.ENV.location.port;
+	    }
+
+	    uri.pathname = uri.pathname || '/';
+	    uri.path = uri.pathname + uri.search;
+
+	    query = uri.search.replace(/^\?/, '');
+	    pairs = query ? query.split('&') : [];
+	    data  = {};
+
+	    for (i = 0, n = pairs.length; i < n; i++) {
+	      parts = pairs[i].split('=');
+	      data[decodeURIComponent(parts[0] || '')] = decodeURIComponent(parts[1] || '');
+	    }
+
+	    uri.query = data;
+
+	    uri.href = this.stringify(uri);
+	    return uri;
+	  },
+
+	  stringify: function(uri) {
+	    var string = uri.protocol + '//' + uri.hostname;
+	    if (uri.port) string += ':' + uri.port;
+	    string += uri.pathname + this.queryString(uri.query) + (uri.hash || '');
+	    return string;
+	  },
+
+	  queryString: function(query) {
+	    var pairs = [];
+	    for (var key in query) {
+	      if (!query.hasOwnProperty(key)) continue;
+	      pairs.push(encodeURIComponent(key) + '=' + encodeURIComponent(query[key]));
+	    }
+	    if (pairs.length === 0) return '';
+	    return '?' + pairs.join('&');
+	  }
+	};
+
+	Faye.Error = Faye.Class({
+	  initialize: function(code, params, message) {
+	    this.code    = code;
+	    this.params  = Array.prototype.slice.call(params);
+	    this.message = message;
+	  },
+
+	  toString: function() {
+	    return this.code + ':' +
+	           this.params.join(',') + ':' +
+	           this.message;
+	  }
+	});
+
+	Faye.Error.parse = function(message) {
+	  message = message || '';
+	  if (!Faye.Grammar.ERROR.test(message)) return new this(null, [], message);
+
+	  var parts   = message.split(':'),
+	      code    = parseInt(parts[0]),
+	      params  = parts[1].split(','),
+	      message = parts[2];
+
+	  return new this(code, params, message);
+	};
+
+
+
+
+	Faye.Error.versionMismatch = function() {
+	  return new this(300, arguments, 'Version mismatch').toString();
+	};
+
+	Faye.Error.conntypeMismatch = function() {
+	  return new this(301, arguments, 'Connection types not supported').toString();
+	};
+
+	Faye.Error.extMismatch = function() {
+	  return new this(302, arguments, 'Extension mismatch').toString();
+	};
+
+	Faye.Error.badRequest = function() {
+	  return new this(400, arguments, 'Bad request').toString();
+	};
+
+	Faye.Error.clientUnknown = function() {
+	  return new this(401, arguments, 'Unknown client').toString();
+	};
+
+	Faye.Error.parameterMissing = function() {
+	  return new this(402, arguments, 'Missing required parameter').toString();
+	};
+
+	Faye.Error.channelForbidden = function() {
+	  return new this(403, arguments, 'Forbidden channel').toString();
+	};
+
+	Faye.Error.channelUnknown = function() {
+	  return new this(404, arguments, 'Unknown channel').toString();
+	};
+
+	Faye.Error.channelInvalid = function() {
+	  return new this(405, arguments, 'Invalid channel').toString();
+	};
+
+	Faye.Error.extUnknown = function() {
+	  return new this(406, arguments, 'Unknown extension').toString();
+	};
+
+	Faye.Error.publishFailed = function() {
+	  return new this(407, arguments, 'Failed to publish').toString();
+	};
+
+	Faye.Error.serverError = function() {
+	  return new this(500, arguments, 'Internal server error').toString();
+	};
+
+
+	Faye.Deferrable = {
+	  then: function(callback, errback) {
+	    var self = this;
+	    if (!this._promise)
+	      this._promise = new Faye.Promise(function(fulfill, reject) {
+	        self._fulfill = fulfill;
+	        self._reject  = reject;
+	      });
+
+	    if (arguments.length === 0)
+	      return this._promise;
+	    else
+	      return this._promise.then(callback, errback);
+	  },
+
+	  callback: function(callback, context) {
+	    return this.then(function(value) { callback.call(context, value) });
+	  },
+
+	  errback: function(callback, context) {
+	    return this.then(null, function(reason) { callback.call(context, reason) });
+	  },
+
+	  timeout: function(seconds, message) {
+	    this.then();
+	    var self = this;
+	    this._timer = Faye.ENV.setTimeout(function() {
+	      self._reject(message);
+	    }, seconds * 1000);
+	  },
+
+	  setDeferredStatus: function(status, value) {
+	    if (this._timer) Faye.ENV.clearTimeout(this._timer);
+
+	    var promise = this.then();
+
+	    if (status === 'succeeded')
+	      this._fulfill(value);
+	    else if (status === 'failed')
+	      this._reject(value);
+	    else if (promise._state !== 0)
+	      delete this._promise;
+	  }
+	};
+
+	Faye.Publisher = {
+	  countListeners: function(eventType) {
+	    if (!this._subscribers || !this._subscribers[eventType]) return 0;
+	    return this._subscribers[eventType].length;
+	  },
+
+	  bind: function(eventType, listener, context) {
+	    this._subscribers = this._subscribers || {};
+	    var list = this._subscribers[eventType] = this._subscribers[eventType] || [];
+	    list.push([listener, context]);
+	  },
+
+	  unbind: function(eventType, listener, context) {
+	    if (!this._subscribers || !this._subscribers[eventType]) return;
+
+	    if (!listener) {
+	      delete this._subscribers[eventType];
+	      return;
+	    }
+	    var list = this._subscribers[eventType],
+	        i    = list.length;
+
+	    while (i--) {
+	      if (listener !== list[i][0]) continue;
+	      if (context && list[i][1] !== context) continue;
+	      list.splice(i,1);
+	    }
+	  },
+
+	  trigger: function() {
+	    var args = Array.prototype.slice.call(arguments),
+	        eventType = args.shift();
+
+	    if (!this._subscribers || !this._subscribers[eventType]) return;
+
+	    var listeners = this._subscribers[eventType].slice(),
+	        listener;
+
+	    for (var i = 0, n = listeners.length; i < n; i++) {
+	      listener = listeners[i];
+	      listener[0].apply(listener[1], args);
+	    }
+	  }
+	};
+
+	Faye.Timeouts = {
+	  addTimeout: function(name, delay, callback, context) {
+	    this._timeouts = this._timeouts || {};
+	    if (this._timeouts.hasOwnProperty(name)) return;
+	    var self = this;
+	    this._timeouts[name] = Faye.ENV.setTimeout(function() {
+	      delete self._timeouts[name];
+	      callback.call(context);
+	    }, 1000 * delay);
+	  },
+
+	  removeTimeout: function(name) {
+	    this._timeouts = this._timeouts || {};
+	    var timeout = this._timeouts[name];
+	    if (!timeout) return;
+	    clearTimeout(timeout);
+	    delete this._timeouts[name];
+	  }
+	};
+
+	Faye.Logging = {
+	  LOG_LEVELS: {
+	    fatal:  4,
+	    error:  3,
+	    warn:   2,
+	    info:   1,
+	    debug:  0
+	  },
+
+	  writeLog: function(messageArgs, level) {
+	    if (!Faye.logger) return;
+
+	    var messageArgs = Array.prototype.slice.apply(messageArgs),
+	        banner      = '[Faye',
+	        klass       = this.className,
+
+	        message = messageArgs.shift().replace(/\?/g, function() {
+	          try {
+	            return Faye.toJSON(messageArgs.shift());
+	          } catch (e) {
+	            return '[Object]';
+	          }
+	        });
+
+	    for (var key in Faye) {
+	      if (klass) continue;
+	      if (typeof Faye[key] !== 'function') continue;
+	      if (this instanceof Faye[key]) klass = key;
+	    }
+	    if (klass) banner += '.' + klass;
+	    banner += '] ';
+
+	    if (typeof Faye.logger[level] === 'function')
+	      Faye.logger[level](banner + message);
+	    else if (typeof Faye.logger === 'function')
+	      Faye.logger(banner + message);
+	  }
+	};
+
+	(function() {
+	  for (var key in Faye.Logging.LOG_LEVELS)
+	    (function(level, value) {
+	      Faye.Logging[level] = function() {
+	        this.writeLog(arguments, level);
+	      };
+	    })(key, Faye.Logging.LOG_LEVELS[key]);
+	})();
+
+	Faye.Grammar = {
+	  CHANNEL_NAME:     /^\/(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)))+(\/(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)))+)*$/,
+	  CHANNEL_PATTERN:  /^(\/(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)))+)*\/\*{1,2}$/,
+	  ERROR:            /^([0-9][0-9][0-9]:(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)| |\/|\*|\.))*(,(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)| |\/|\*|\.))*)*:(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)| |\/|\*|\.))*|[0-9][0-9][0-9]::(((([a-z]|[A-Z])|[0-9])|(\-|\_|\!|\~|\(|\)|\$|\@)| |\/|\*|\.))*)$/,
+	  VERSION:          /^([0-9])+(\.(([a-z]|[A-Z])|[0-9])(((([a-z]|[A-Z])|[0-9])|\-|\_))*)*$/
+	};
+
+	Faye.Extensible = {
+	  addExtension: function(extension) {
+	    this._extensions = this._extensions || [];
+	    this._extensions.push(extension);
+	    if (extension.added) extension.added(this);
+	  },
+
+	  removeExtension: function(extension) {
+	    if (!this._extensions) return;
+	    var i = this._extensions.length;
+	    while (i--) {
+	      if (this._extensions[i] !== extension) continue;
+	      this._extensions.splice(i,1);
+	      if (extension.removed) extension.removed(this);
+	    }
+	  },
+
+	  pipeThroughExtensions: function(stage, message, callback, context) {
+	    this.debug('Passing through ? extensions: ?', stage, message);
+
+	    if (!this._extensions) return callback.call(context, message);
+	    var extensions = this._extensions.slice();
+
+	    var pipe = function(message) {
+	      if (!message) return callback.call(context, message);
+
+	      var extension = extensions.shift();
+	      if (!extension) return callback.call(context, message);
+
+	      if (extension[stage]) extension[stage](message, pipe);
+	      else pipe(message);
+	    };
+	    pipe(message);
+	  }
+	};
+
+	Faye.extend(Faye.Extensible, Faye.Logging);
+
+	Faye.Channel = Faye.Class({
+	  initialize: function(name) {
+	    this.id = this.name = name;
+	  },
+
+	  push: function(message) {
+	    this.trigger('message', message);
+	  },
+
+	  isUnused: function() {
+	    return this.countListeners('message') === 0;
+	  }
+	});
+
+	Faye.extend(Faye.Channel.prototype, Faye.Publisher);
+
+	Faye.extend(Faye.Channel, {
+	  HANDSHAKE:    '/meta/handshake',
+	  CONNECT:      '/meta/connect',
+	  SUBSCRIBE:    '/meta/subscribe',
+	  UNSUBSCRIBE:  '/meta/unsubscribe',
+	  DISCONNECT:   '/meta/disconnect',
+
+	  META:         'meta',
+	  SERVICE:      'service',
+
+	  expand: function(name) {
+	    var segments = this.parse(name),
+	        channels = ['/**', name];
+
+	    var copy = segments.slice();
+	    copy[copy.length - 1] = '*';
+	    channels.push(this.unparse(copy));
+
+	    for (var i = 1, n = segments.length; i < n; i++) {
+	      copy = segments.slice(0, i);
+	      copy.push('**');
+	      channels.push(this.unparse(copy));
+	    }
+
+	    return channels;
+	  },
+
+	  isValid: function(name) {
+	    return Faye.Grammar.CHANNEL_NAME.test(name) ||
+	           Faye.Grammar.CHANNEL_PATTERN.test(name);
+	  },
+
+	  parse: function(name) {
+	    if (!this.isValid(name)) return null;
+	    return name.split('/').slice(1);
+	  },
+
+	  unparse: function(segments) {
+	    return '/' + segments.join('/');
+	  },
+
+	  isMeta: function(name) {
+	    var segments = this.parse(name);
+	    return segments ? (segments[0] === this.META) : null;
+	  },
+
+	  isService: function(name) {
+	    var segments = this.parse(name);
+	    return segments ? (segments[0] === this.SERVICE) : null;
+	  },
+
+	  isSubscribable: function(name) {
+	    if (!this.isValid(name)) return null;
+	    return !this.isMeta(name) && !this.isService(name);
+	  },
+
+	  Set: Faye.Class({
+	    initialize: function() {
+	      this._channels = {};
+	    },
+
+	    getKeys: function() {
+	      var keys = [];
+	      for (var key in this._channels) keys.push(key);
+	      return keys;
+	    },
+
+	    remove: function(name) {
+	      delete this._channels[name];
+	    },
+
+	    hasSubscription: function(name) {
+	      return this._channels.hasOwnProperty(name);
+	    },
+
+	    subscribe: function(names, callback, context) {
+	      if (!callback) return;
+	      var name;
+	      for (var i = 0, n = names.length; i < n; i++) {
+	        name = names[i];
+	        var channel = this._channels[name] = this._channels[name] || new Faye.Channel(name);
+	        channel.bind('message', callback, context);
+	      }
+	    },
+
+	    unsubscribe: function(name, callback, context) {
+	      var channel = this._channels[name];
+	      if (!channel) return false;
+	      channel.unbind('message', callback, context);
+
+	      if (channel.isUnused()) {
+	        this.remove(name);
+	        return true;
+	      } else {
+	        return false;
+	      }
+	    },
+
+	    distributeMessage: function(message) {
+	      var channels = Faye.Channel.expand(message.channel);
+
+	      for (var i = 0, n = channels.length; i < n; i++) {
+	        var channel = this._channels[channels[i]];
+	        if (channel) channel.trigger('message', message.data);
+	      }
+	    }
+	  })
+	});
+
+	Faye.Publication = Faye.Class(Faye.Deferrable);
+
+	Faye.Subscription = Faye.Class({
+	  initialize: function(client, channels, callback, context) {
+	    this._client    = client;
+	    this._channels  = channels;
+	    this._callback  = callback;
+	    this._context     = context;
+	    this._cancelled = false;
+	  },
+
+	  cancel: function() {
+	    if (this._cancelled) return;
+	    this._client.unsubscribe(this._channels, this._callback, this._context);
+	    this._cancelled = true;
+	  },
+
+	  unsubscribe: function() {
+	    this.cancel();
+	  }
+	});
+
+	Faye.extend(Faye.Subscription.prototype, Faye.Deferrable);
+
+	Faye.Client = Faye.Class({
+	  UNCONNECTED:          1,
+	  CONNECTING:           2,
+	  CONNECTED:            3,
+	  DISCONNECTED:         4,
+
+	  HANDSHAKE:            'handshake',
+	  RETRY:                'retry',
+	  NONE:                 'none',
+
+	  CONNECTION_TIMEOUT:   60,
+	  DEFAULT_RETRY:        5,
+	  MAX_REQUEST_SIZE:     2048,
+
+	  DEFAULT_ENDPOINT:     '/bayeux',
+	  INTERVAL:             0,
+
+	  initialize: function(endpoint, options) {
+	    this.info('New client created for ?', endpoint);
+
+	    this._options   = options || {};
+	    this.endpoint   = Faye.URI.parse(endpoint || this.DEFAULT_ENDPOINT);
+	    this.endpoints  = this._options.endpoints || {};
+	    this.transports = {};
+	    this.cookies    = Faye.CookieJar && new Faye.CookieJar();
+	    this.headers    = {};
+	    this.ca         = this._options.ca;
+	    this._disabled  = [];
+	    this._retry     = this._options.retry || this.DEFAULT_RETRY;
+
+	    for (var key in this.endpoints)
+	      this.endpoints[key] = Faye.URI.parse(this.endpoints[key]);
+
+	    this.maxRequestSize = this.MAX_REQUEST_SIZE;
+
+	    this._state     = this.UNCONNECTED;
+	    this._channels  = new Faye.Channel.Set();
+	    this._messageId = 0;
+
+	    this._messageTimeouts   = {};
+	    this._responseCallbacks = {};
+
+	    this._advice = {
+	      reconnect: this.RETRY,
+	      interval:  1000 * (this._options.interval || this.INTERVAL),
+	      timeout:   1000 * (this._options.timeout  || this.CONNECTION_TIMEOUT)
+	    };
+
+	    if (Faye.Event)
+	      Faye.Event.on(Faye.ENV, 'beforeunload', function() {
+	        if (Faye.indexOf(this._disabled, 'autodisconnect') < 0)
+	          this.disconnect();
+	      }, this);
+	  },
+
+	  disable: function(feature) {
+	    this._disabled.push(feature);
+	  },
+
+	  setHeader: function(name, value) {
+	    this.headers[name] = value;
+	  },
+
+	  // Request
+	  // MUST include:  * channel
+	  //                * version
+	  //                * supportedConnectionTypes
+	  // MAY include:   * minimumVersion
+	  //                * ext
+	  //                * id
+	  //
+	  // Success Response                             Failed Response
+	  // MUST include:  * channel                     MUST include:  * channel
+	  //                * version                                    * successful
+	  //                * supportedConnectionTypes                   * error
+	  //                * clientId                    MAY include:   * supportedConnectionTypes
+	  //                * successful                                 * advice
+	  // MAY include:   * minimumVersion                             * version
+	  //                * advice                                     * minimumVersion
+	  //                * ext                                        * ext
+	  //                * id                                         * id
+	  //                * authSuccessful
+	  handshake: function(callback, context) {
+	    if (this._advice.reconnect === this.NONE) return;
+	    if (this._state !== this.UNCONNECTED) return;
+
+	    this._state = this.CONNECTING;
+	    var self = this;
+
+	    this.info('Initiating handshake with ?', Faye.URI.stringify(this.endpoint));
+	    this._selectTransport(Faye.MANDATORY_CONNECTION_TYPES);
+
+	    this._send({
+	      channel:                  Faye.Channel.HANDSHAKE,
+	      version:                  Faye.BAYEUX_VERSION,
+	      supportedConnectionTypes: [this._transport.connectionType]
+
+	    }, function(response) {
+
+	      if (response.successful) {
+	        this._state     = this.CONNECTED;
+	        this._clientId  = response.clientId;
+
+	        this._selectTransport(response.supportedConnectionTypes);
+
+	        this.info('Handshake successful: ?', this._clientId);
+
+	        this.subscribe(this._channels.getKeys(), true);
+	        if (callback) callback.call(context);
+
+	      } else {
+	        this.info('Handshake unsuccessful');
+	        Faye.ENV.setTimeout(function() { self.handshake(callback, context) }, this._advice.interval);
+	        this._state = this.UNCONNECTED;
+	      }
+	    }, this);
+	  },
+
+	  // Request                              Response
+	  // MUST include:  * channel             MUST include:  * channel
+	  //                * clientId                           * successful
+	  //                * connectionType                     * clientId
+	  // MAY include:   * ext                 MAY include:   * error
+	  //                * id                                 * advice
+	  //                                                     * ext
+	  //                                                     * id
+	  //                                                     * timestamp
+	  connect: function(callback, context) {
+	    if (this._advice.reconnect === this.NONE) return;
+	    if (this._state === this.DISCONNECTED) return;
+
+	    if (this._state === this.UNCONNECTED)
+	      return this.handshake(function() { this.connect(callback, context) }, this);
+
+	    this.callback(callback, context);
+	    if (this._state !== this.CONNECTED) return;
+
+	    this.info('Calling deferred actions for ?', this._clientId);
+	    this.setDeferredStatus('succeeded');
+	    this.setDeferredStatus('deferred');
+
+	    if (this._connectRequest) return;
+	    this._connectRequest = true;
+
+	    this.info('Initiating connection for ?', this._clientId);
+
+	    this._send({
+	      channel:        Faye.Channel.CONNECT,
+	      clientId:       this._clientId,
+	      connectionType: this._transport.connectionType
+
+	    }, this._cycleConnection, this);
+	  },
+
+	  // Request                              Response
+	  // MUST include:  * channel             MUST include:  * channel
+	  //                * clientId                           * successful
+	  // MAY include:   * ext                                * clientId
+	  //                * id                  MAY include:   * error
+	  //                                                     * ext
+	  //                                                     * id
+	  disconnect: function() {
+	    if (this._state !== this.CONNECTED) return;
+	    this._state = this.DISCONNECTED;
+
+	    this.info('Disconnecting ?', this._clientId);
+
+	    this._send({
+	      channel:  Faye.Channel.DISCONNECT,
+	      clientId: this._clientId
+
+	    }, function(response) {
+	      if (!response.successful) return;
+	      this._transport.close();
+	      delete this._transport;
+	    }, this);
+
+	    this.info('Clearing channel listeners for ?', this._clientId);
+	    this._channels = new Faye.Channel.Set();
+	  },
+
+	  // Request                              Response
+	  // MUST include:  * channel             MUST include:  * channel
+	  //                * clientId                           * successful
+	  //                * subscription                       * clientId
+	  // MAY include:   * ext                                * subscription
+	  //                * id                  MAY include:   * error
+	  //                                                     * advice
+	  //                                                     * ext
+	  //                                                     * id
+	  //                                                     * timestamp
+	  subscribe: function(channel, callback, context) {
+	    if (channel instanceof Array)
+	      return Faye.map(channel, function(c) {
+	        return this.subscribe(c, callback, context);
+	      }, this);
+
+	    var subscription = new Faye.Subscription(this, channel, callback, context),
+	        force        = (callback === true),
+	        hasSubscribe = this._channels.hasSubscription(channel);
+
+	    if (hasSubscribe && !force) {
+	      this._channels.subscribe([channel], callback, context);
+	      subscription.setDeferredStatus('succeeded');
+	      return subscription;
+	    }
+
+	    this.connect(function() {
+	      this.info('Client ? attempting to subscribe to ?', this._clientId, channel);
+	      if (!force) this._channels.subscribe([channel], callback, context);
+
+	      this._send({
+	        channel:      Faye.Channel.SUBSCRIBE,
+	        clientId:     this._clientId,
+	        subscription: channel
+
+	      }, function(response) {
+	        if (!response.successful) {
+	          subscription.setDeferredStatus('failed', Faye.Error.parse(response.error));
+	          return this._channels.unsubscribe(channel, callback, context);
+	        }
+
+	        var channels = [].concat(response.subscription);
+	        this.info('Subscription acknowledged for ? to ?', this._clientId, channels);
+	        subscription.setDeferredStatus('succeeded');
+	      }, this);
+	    }, this);
+
+	    return subscription;
+	  },
+
+	  // Request                              Response
+	  // MUST include:  * channel             MUST include:  * channel
+	  //                * clientId                           * successful
+	  //                * subscription                       * clientId
+	  // MAY include:   * ext                                * subscription
+	  //                * id                  MAY include:   * error
+	  //                                                     * advice
+	  //                                                     * ext
+	  //                                                     * id
+	  //                                                     * timestamp
+	  unsubscribe: function(channel, callback, context) {
+	    if (channel instanceof Array)
+	      return Faye.map(channel, function(c) {
+	        return this.unsubscribe(c, callback, context);
+	      }, this);
+
+	    var dead = this._channels.unsubscribe(channel, callback, context);
+	    if (!dead) return;
+
+	    this.connect(function() {
+	      this.info('Client ? attempting to unsubscribe from ?', this._clientId, channel);
+
+	      this._send({
+	        channel:      Faye.Channel.UNSUBSCRIBE,
+	        clientId:     this._clientId,
+	        subscription: channel
+
+	      }, function(response) {
+	        if (!response.successful) return;
+
+	        var channels = [].concat(response.subscription);
+	        this.info('Unsubscription acknowledged for ? from ?', this._clientId, channels);
+	      }, this);
+	    }, this);
+	  },
+
+	  // Request                              Response
+	  // MUST include:  * channel             MUST include:  * channel
+	  //                * data                               * successful
+	  // MAY include:   * clientId            MAY include:   * id
+	  //                * id                                 * error
+	  //                * ext                                * ext
+	  publish: function(channel, data) {
+	    var publication = new Faye.Publication();
+
+	    this.connect(function() {
+	      this.info('Client ? queueing published message to ?: ?', this._clientId, channel, data);
+
+	      this._send({
+	        channel:  channel,
+	        data:     data,
+	        clientId: this._clientId
+
+	      }, function(response) {
+	        if (response.successful)
+	          publication.setDeferredStatus('succeeded');
+	        else
+	          publication.setDeferredStatus('failed', Faye.Error.parse(response.error));
+	      }, this);
+	    }, this);
+
+	    return publication;
+	  },
+
+	  receiveMessage: function(message) {
+	    var id = message.id, timeout, callback;
+
+	    if (message.successful !== undefined) {
+	      timeout = this._messageTimeouts[id];
+	      if (timeout) Faye.ENV.clearTimeout(timeout);
+	      delete this._messageTimeouts[id];
+
+	      callback = this._responseCallbacks[id];
+	      delete this._responseCallbacks[id];
+	    }
+
+	    this.pipeThroughExtensions('incoming', message, function(message) {
+	      if (!message) return;
+
+	      if (message.advice) this._handleAdvice(message.advice);
+	      this._deliverMessage(message);
+
+	      if (callback) callback[0].call(callback[1], message);
+	    }, this);
+
+	    if (this._transportUp === true) return;
+	    this._transportUp = true;
+	    this.trigger('transport:up');
+	  },
+
+	  messageError: function(messages, immediate) {
+	    var retry = this._retry,
+	        self  = this,
+	        id, message, timeout;
+
+	    for (var i = 0, n = messages.length; i < n; i++) {
+	      message = messages[i];
+	      id      = message.id;
+
+	      timeout = this._messageTimeouts[id];
+	      if (timeout) Faye.ENV.clearTimeout(timeout);
+	      delete this._messageTimeouts[id];
+
+	      if (immediate)
+	        this._transportSend(message);
+	      else
+	        Faye.ENV.setTimeout(function() { self._transportSend(message) }, retry * 1000);
+	    }
+
+	    if (immediate || this._transportUp === false) return;
+	    this._transportUp = false;
+	    this.trigger('transport:down');
+	  },
+
+	  _selectTransport: function(transportTypes) {
+	    Faye.Transport.get(this, transportTypes, this._disabled, function(transport) {
+	      this.debug('Selected ? transport for ?', transport.connectionType, Faye.URI.stringify(transport.endpoint));
+
+	      if (transport === this._transport) return;
+	      if (this._transport) this._transport.close();
+
+	      this._transport = transport;
+	    }, this);
+	  },
+
+	  _send: function(message, callback, context) {
+	    if (!this._transport) return;
+	    message.id = message.id || this._generateMessageId();
+
+	    this.pipeThroughExtensions('outgoing', message, function(message) {
+	      if (!message) return;
+	      if (callback) this._responseCallbacks[message.id] = [callback, context];
+	      this._transportSend(message);
+	    }, this);
+	  },
+
+	  _transportSend: function(message) {
+	    if (!this._transport) return;
+
+	    var timeout = 1.2 * (this._advice.timeout || this._retry * 1000),
+	        self    = this;
+
+	    this._messageTimeouts[message.id] = Faye.ENV.setTimeout(function() {
+	      self.messageError([message], false);
+	    }, timeout);
+
+	    this._transport.send(message);
+	  },
+
+	  _generateMessageId: function() {
+	    this._messageId += 1;
+	    if (this._messageId >= Math.pow(2,32)) this._messageId = 0;
+	    return this._messageId.toString(36);
+	  },
+
+	  _handleAdvice: function(advice) {
+	    Faye.extend(this._advice, advice);
+
+	    if (this._advice.reconnect === this.HANDSHAKE && this._state !== this.DISCONNECTED) {
+	      this._state    = this.UNCONNECTED;
+	      this._clientId = null;
+	      this._cycleConnection();
+	    }
+	  },
+
+	  _deliverMessage: function(message) {
+	    if (!message.channel || message.data === undefined) return;
+	    this.info('Client ? calling listeners for ? with ?', this._clientId, message.channel, message.data);
+	    this._channels.distributeMessage(message);
+	  },
+
+	  _cycleConnection: function() {
+	    if (this._connectRequest) {
+	      this._connectRequest = null;
+	      this.info('Closed connection for ?', this._clientId);
+	    }
+	    var self = this;
+	    Faye.ENV.setTimeout(function() { self.connect() }, this._advice.interval);
+	  }
+	});
+
+	Faye.extend(Faye.Client.prototype, Faye.Deferrable);
+	Faye.extend(Faye.Client.prototype, Faye.Publisher);
+	Faye.extend(Faye.Client.prototype, Faye.Logging);
+	Faye.extend(Faye.Client.prototype, Faye.Extensible);
+
+	Faye.Transport = Faye.extend(Faye.Class({
+	  MAX_DELAY: 0,
+	  batching:  true,
+
+	  initialize: function(client, endpoint) {
+	    this._client  = client;
+	    this.endpoint = endpoint;
+	    this._outbox  = [];
+	  },
+
+	  close: function() {},
+
+	  encode: function(messages) {
+	    return '';
+	  },
+
+	  send: function(message) {
+	    this.debug('Client ? sending message to ?: ?',
+	               this._client._clientId, Faye.URI.stringify(this.endpoint), message);
+
+	    if (!this.batching) return this.request([message]);
+
+	    this._outbox.push(message);
+
+	    if (message.channel === Faye.Channel.HANDSHAKE)
+	      return this.addTimeout('publish', 0.01, this.flush, this);
+
+	    if (message.channel === Faye.Channel.CONNECT)
+	      this._connectMessage = message;
+
+	    this.flushLargeBatch();
+	    this.addTimeout('publish', this.MAX_DELAY, this.flush, this);
+	  },
+
+	  flush: function() {
+	    this.removeTimeout('publish');
+
+	    if (this._outbox.length > 1 && this._connectMessage)
+	      this._connectMessage.advice = {timeout: 0};
+
+	    this.request(this._outbox);
+
+	    this._connectMessage = null;
+	    this._outbox = [];
+	  },
+
+	  flushLargeBatch: function() {
+	    var string = this.encode(this._outbox);
+	    if (string.length < this._client.maxRequestSize) return;
+	    var last = this._outbox.pop();
+	    this.flush();
+	    if (last) this._outbox.push(last);
+	  },
+
+	  receive: function(responses) {
+	    responses = [].concat(responses);
+
+	    this.debug('Client ? received from ?: ?',
+	               this._client._clientId, Faye.URI.stringify(this.endpoint), responses);
+
+	    for (var i = 0, n = responses.length; i < n; i++)
+	      this._client.receiveMessage(responses[i]);
+	  }
+
+	}), {
+	  get: function(client, allowed, disabled, callback, context) {
+	    var endpoint = client.endpoint;
+
+	    Faye.asyncEach(this._transports, function(pair, resume) {
+	      var connType     = pair[0], klass = pair[1],
+	          connEndpoint = client.endpoints[connType] || endpoint;
+
+	      if (Faye.indexOf(disabled, connType) >= 0)
+	        return resume();
+
+	      if (Faye.indexOf(allowed, connType) < 0) {
+	        klass.isUsable(client, connEndpoint, function() {});
+	        return resume();
+	      }
+
+	      klass.isUsable(client, connEndpoint, function(isUsable) {
+	        if (!isUsable) return resume();
+	        var transport = klass.hasOwnProperty('create') ? klass.create(client, connEndpoint) : new klass(client, connEndpoint);
+	        callback.call(context, transport);
+	      });
+	    }, function() {
+	      throw new Error('Could not find a usable connection type for ' + Faye.URI.stringify(endpoint));
+	    });
+	  },
+
+	  register: function(type, klass) {
+	    this._transports.push([type, klass]);
+	    klass.prototype.connectionType = type;
+	  },
+
+	  _transports: []
+	});
+
+	Faye.extend(Faye.Transport.prototype, Faye.Logging);
+	Faye.extend(Faye.Transport.prototype, Faye.Timeouts);
+
+	Faye.Event = {
+	  _registry: [],
+
+	  on: function(element, eventName, callback, context) {
+	    var wrapped = function() { callback.call(context) };
+
+	    if (element.addEventListener)
+	      element.addEventListener(eventName, wrapped, false);
+	    else
+	      element.attachEvent('on' + eventName, wrapped);
+
+	    this._registry.push({
+	      _element:   element,
+	      _type:      eventName,
+	      _callback:  callback,
+	      _context:     context,
+	      _handler:   wrapped
+	    });
+	  },
+
+	  detach: function(element, eventName, callback, context) {
+	    var i = this._registry.length, register;
+	    while (i--) {
+	      register = this._registry[i];
+
+	      if ((element    && element    !== register._element)   ||
+	          (eventName  && eventName  !== register._type)      ||
+	          (callback   && callback   !== register._callback)  ||
+	          (context      && context      !== register._context))
+	        continue;
+
+	      if (register._element.removeEventListener)
+	        register._element.removeEventListener(register._type, register._handler, false);
+	      else
+	        register._element.detachEvent('on' + register._type, register._handler);
+
+	      this._registry.splice(i,1);
+	      register = null;
+	    }
+	  }
+	};
+
+	Faye.Event.on(Faye.ENV, 'unload', Faye.Event.detach, Faye.Event);
+
+	Faye.Transport.WebSocket = Faye.extend(Faye.Class(Faye.Transport, {
+	  UNCONNECTED:  1,
+	  CONNECTING:   2,
+	  CONNECTED:    3,
+
+	  batching:     false,
+
+	  isUsable: function(callback, context) {
+	    this.callback(function() { callback.call(context, true) });
+	    this.errback(function() { callback.call(context, false) });
+	    this.connect();
+	  },
+
+	  request: function(messages) {
+	    this.callback(function() {
+	      if (!this._socket) return;
+	      for (var i = 0, n = messages.length; i < n; i++) this._pending.add(messages[i]);
+	      this._socket.send(Faye.toJSON(messages));
+	    }, this);
+	    this.connect();
+	  },
+
+	  connect: function() {
+	    if (Faye.Transport.WebSocket._unloaded) return;
+
+	    this._state = this._state || this.UNCONNECTED;
+	    if (this._state !== this.UNCONNECTED) return;
+	    this._state = this.CONNECTING;
+
+	    var socket = this._createSocket();
+	    if (!socket) return this.setDeferredStatus('failed');
+
+	    var self = this;
+
+	    socket.onopen = function() {
+	      self._socket = socket;
+	      self._pending = new Faye.Set();
+	      self._state = self.CONNECTED;
+	      self._everConnected = true;
+	      self._ping();
+	      self.setDeferredStatus('succeeded', socket);
+	    };
+
+	    socket.onclose = socket.onerror = function() {
+	      if (!socket.onclose) return;
+
+	      var wasConnected = (self._state === self.CONNECTED);
+	      socket.onopen = socket.onclose = socket.onerror = socket.onmessage = null;
+
+	      delete self._socket;
+	      self._state = self.UNCONNECTED;
+	      self.removeTimeout('ping');
+	      self.setDeferredStatus('deferred');
+
+	      if (wasConnected) {
+	        if (self._pending) self._client.messageError(self._pending.toArray(), true);
+	      } else if (self._everConnected) {
+	        if (self._pending) self._client.messageError(self._pending.toArray());
+	      } else {
+	        self.setDeferredStatus('failed');
+	      }
+	      delete self._pending;
+	    };
+
+	    socket.onmessage = function(event) {
+	      var messages = JSON.parse(event.data);
+	      if (!messages) return;
+	      messages = [].concat(messages);
+	      for (var i = 0, n = messages.length; i < n; i++) {
+	        if (messages[i].successful !== undefined) self._pending.remove(messages[i]);
+	      }
+	      self.receive(messages);
+	    };
+	  },
+
+	  close: function() {
+	    if (!this._socket) return;
+	    this._socket.close();
+	  },
+
+	  _createSocket: function() {
+	    var url     = Faye.Transport.WebSocket.getSocketUrl(this.endpoint),
+	        options = {headers: this._client.headers, ca: this._client.ca};
+
+	    if (Faye.WebSocket)        return new Faye.WebSocket.Client(url, [], options);
+	    if (Faye.ENV.MozWebSocket) return new MozWebSocket(url);
+	    if (Faye.ENV.WebSocket)    return new WebSocket(url);
+	  },
+
+	  _ping: function() {
+	    if (!this._socket) return;
+	    this._socket.send('[]');
+	    this.addTimeout('ping', this._client._advice.timeout/2000, this._ping, this);
+	  }
+
+	}), {
+	  PROTOCOLS: {
+	    'http:':  'ws:',
+	    'https:': 'wss:'
+	  },
+
+	  create: function(client, endpoint) {
+	    var sockets = client.transports.websocket = client.transports.websocket || {};
+	    sockets[endpoint.href] = sockets[endpoint.href] || new this(client, endpoint);
+	    return sockets[endpoint.href];
+	  },
+
+	  getSocketUrl: function(endpoint) {
+	    endpoint = Faye.copyObject(endpoint);
+	    endpoint.protocol = this.PROTOCOLS[endpoint.protocol];
+	    return Faye.URI.stringify(endpoint);
+	  },
+
+	  isUsable: function(client, endpoint, callback, context) {
+	    this.create(client, endpoint).isUsable(callback, context);
+	  }
+	});
+
+	Faye.extend(Faye.Transport.WebSocket.prototype, Faye.Deferrable);
+	Faye.Transport.register('websocket', Faye.Transport.WebSocket);
+
+	if (Faye.Event)
+	  Faye.Event.on(Faye.ENV, 'beforeunload', function() {
+	    Faye.Transport.WebSocket._unloaded = true;
+	  });
+
+	Faye.Transport.EventSource = Faye.extend(Faye.Class(Faye.Transport, {
+	  initialize: function(client, endpoint) {
+	    Faye.Transport.prototype.initialize.call(this, client, endpoint);
+	    if (!Faye.ENV.EventSource) return this.setDeferredStatus('failed');
+
+	    this._xhr = new Faye.Transport.XHR(client, endpoint);
+
+	    endpoint = Faye.copyObject(endpoint);
+	    endpoint.pathname += '/' + client._clientId;
+
+	    var socket = new EventSource(Faye.URI.stringify(endpoint)),
+	        self   = this;
+
+	    socket.onopen = function() {
+	      self._everConnected = true;
+	      self.setDeferredStatus('succeeded');
+	    };
+
+	    socket.onerror = function() {
+	      if (self._everConnected) {
+	        self._client.messageError([]);
+	      } else {
+	        self.setDeferredStatus('failed');
+	        socket.close();
+	      }
+	    };
+
+	    socket.onmessage = function(event) {
+	      self.receive(JSON.parse(event.data));
+	    };
+
+	    this._socket = socket;
+	  },
+
+	  close: function() {
+	    if (!this._socket) return;
+	    this._socket.onopen = this._socket.onerror = this._socket.onmessage = null;
+	    this._socket.close();
+	    delete this._socket;
+	  },
+
+	  isUsable: function(callback, context) {
+	    this.callback(function() { callback.call(context, true) });
+	    this.errback(function() { callback.call(context, false) });
+	  },
+
+	  encode: function(messages) {
+	    return this._xhr.encode(messages);
+	  },
+
+	  request: function(messages) {
+	    this._xhr.request(messages);
+	  }
+
+	}), {
+	  isUsable: function(client, endpoint, callback, context) {
+	    var id = client._clientId;
+	    if (!id) return callback.call(context, false);
+
+	    Faye.Transport.XHR.isUsable(client, endpoint, function(usable) {
+	      if (!usable) return callback.call(context, false);
+	      this.create(client, endpoint).isUsable(callback, context);
+	    }, this);
+	  },
+
+	  create: function(client, endpoint) {
+	    var sockets = client.transports.eventsource = client.transports.eventsource || {},
+	        id      = client._clientId;
+
+	    endpoint = Faye.copyObject(endpoint);
+	    endpoint.pathname += '/' + (id || '');
+	    var url = Faye.URI.stringify(endpoint);
+
+	    sockets[url] = sockets[url] || new this(client, endpoint);
+	    return sockets[url];
+	  }
+	});
+
+	Faye.extend(Faye.Transport.EventSource.prototype, Faye.Deferrable);
+	Faye.Transport.register('eventsource', Faye.Transport.EventSource);
+
+	Faye.Transport.XHR = Faye.extend(Faye.Class(Faye.Transport, {
+	  encode: function(messages) {
+	    return Faye.toJSON(messages);
+	  },
+
+	  request: function(messages) {
+	    var path = this.endpoint.path,
+	        xhr  = Faye.ENV.ActiveXObject ? new ActiveXObject('Microsoft.XMLHTTP') : new XMLHttpRequest(),
+	        self = this;
+
+	    xhr.open('POST', path, true);
+	    xhr.setRequestHeader('Content-Type', 'application/json');
+	    xhr.setRequestHeader('Pragma', 'no-cache');
+	    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+	    var headers = this._client.headers;
+	    for (var key in headers) {
+	      if (!headers.hasOwnProperty(key)) continue;
+	      xhr.setRequestHeader(key, headers[key]);
+	    }
+
+	    var abort = function() { xhr.abort() };
+	    Faye.Event.on(Faye.ENV, 'beforeunload', abort);
+
+	    xhr.onreadystatechange = function() {
+	      if (!xhr || xhr.readyState !== 4) return;
+
+	      var parsedMessage = null,
+	          status        = xhr.status,
+	          text          = xhr.responseText,
+	          successful    = (status >= 200 && status < 300) || status === 304 || status === 1223;
+
+	      Faye.Event.detach(Faye.ENV, 'beforeunload', abort);
+	      xhr.onreadystatechange = function() {};
+	      xhr = null;
+
+	      if (!successful) return self._client.messageError(messages);
+
+	      try {
+	        parsedMessage = JSON.parse(text);
+	      } catch (e) {}
+
+	      if (parsedMessage)
+	        self.receive(parsedMessage);
+	      else
+	        self._client.messageError(messages);
+	    };
+
+	    xhr.send(this.encode(messages));
+	  }
+	}), {
+	  isUsable: function(client, endpoint, callback, context) {
+	    callback.call(context, Faye.URI.isSameOrigin(endpoint));
+	  }
+	});
+
+	Faye.Transport.register('long-polling', Faye.Transport.XHR);
+
+	Faye.Transport.CORS = Faye.extend(Faye.Class(Faye.Transport, {
+	  encode: function(messages) {
+	    return 'message=' + encodeURIComponent(Faye.toJSON(messages));
+	  },
+
+	  request: function(messages) {
+	    var xhrClass = Faye.ENV.XDomainRequest ? XDomainRequest : XMLHttpRequest,
+	        xhr      = new xhrClass(),
+	        headers  = this._client.headers,
+	        self     = this,
+	        key;
+
+	    xhr.open('POST', Faye.URI.stringify(this.endpoint), true);
+
+	    if (xhr.setRequestHeader) {
+	      xhr.setRequestHeader('Pragma', 'no-cache');
+	      for (key in headers) {
+	        if (!headers.hasOwnProperty(key)) continue;
+	        xhr.setRequestHeader(key, headers[key]);
+	      }
+	    }
+
+	    var cleanUp = function() {
+	      if (!xhr) return false;
+	      xhr.onload = xhr.onerror = xhr.ontimeout = xhr.onprogress = null;
+	      xhr = null;
+	    };
+
+	    xhr.onload = function() {
+	      var parsedMessage = null;
+	      try {
+	        parsedMessage = JSON.parse(xhr.responseText);
+	      } catch (e) {}
+
+	      cleanUp();
+
+	      if (parsedMessage)
+	        self.receive(parsedMessage);
+	      else
+	        self._client.messageError(messages);
+	    };
+
+	    xhr.onerror = xhr.ontimeout = function() {
+	      cleanUp();
+	      self._client.messageError(messages);
+	    };
+
+	    xhr.onprogress = function() {};
+	    xhr.send(this.encode(messages));
+	  }
+	}), {
+	  isUsable: function(client, endpoint, callback, context) {
+	    if (Faye.URI.isSameOrigin(endpoint))
+	      return callback.call(context, false);
+
+	    if (Faye.ENV.XDomainRequest)
+	      return callback.call(context, endpoint.protocol === Faye.ENV.location.protocol);
+
+	    if (Faye.ENV.XMLHttpRequest) {
+	      var xhr = new Faye.ENV.XMLHttpRequest();
+	      return callback.call(context, xhr.withCredentials !== undefined);
+	    }
+	    return callback.call(context, false);
+	  }
+	});
+
+	Faye.Transport.register('cross-origin-long-polling', Faye.Transport.CORS);
+
+	Faye.Transport.JSONP = Faye.extend(Faye.Class(Faye.Transport, {
+	 encode: function(messages) {
+	    var url = Faye.copyObject(this.endpoint);
+	    url.query.message = Faye.toJSON(messages);
+	    url.query.jsonp   = '__jsonp' + Faye.Transport.JSONP._cbCount + '__';
+	    return Faye.URI.stringify(url);
+	  },
+
+	  request: function(messages) {
+	    var head         = document.getElementsByTagName('head')[0],
+	        script       = document.createElement('script'),
+	        callbackName = Faye.Transport.JSONP.getCallbackName(),
+	        endpoint     = Faye.copyObject(this.endpoint),
+	        self         = this;
+
+	    endpoint.query.message = Faye.toJSON(messages);
+	    endpoint.query.jsonp   = callbackName;
+
+	    Faye.ENV[callbackName] = function(data) {
+	      if (!Faye.ENV[callbackName]) return false;
+	      Faye.ENV[callbackName] = undefined;
+	      try { delete Faye.ENV[callbackName] } catch (e) {}
+	      script.parentNode.removeChild(script);
+	      self.receive(data);
+	    };
+
+	    script.type = 'text/javascript';
+	    script.src  = Faye.URI.stringify(endpoint);
+	    head.appendChild(script);
+	  }
+	}), {
+	  _cbCount: 0,
+
+	  getCallbackName: function() {
+	    this._cbCount += 1;
+	    return '__jsonp' + this._cbCount + '__';
+	  },
+
+	  isUsable: function(client, endpoint, callback, context) {
+	    callback.call(context, true);
+	  }
+	});
+
+	Faye.Transport.register('callback-polling', Faye.Transport.JSONP);
+
+	})();
+
 return Faye;
 });
+

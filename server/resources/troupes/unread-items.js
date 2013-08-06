@@ -14,10 +14,6 @@ module.exports = {
       });
     },
 
-    'new': function(req, res){
-      res.send(500);
-    },
-
     create: function(req, res, next) {
       var unreadItems = req.body;
       unreadItemService.markItemsRead(req.user.id, req.troupe.id, unreadItems, function(err) {
@@ -26,22 +22,6 @@ module.exports = {
         res.send(200);
 
       });
-    },
-
-    show: function(req, res){
-      res.send(500);
-    },
-
-    edit: function(req, res){
-      res.send(500);
-    },
-
-    update:  function(req, res){
-      res.send(500);
-    },
-
-    destroy: function(req, res){
-      res.send(500);
     },
 
     load: function(id, callback) {

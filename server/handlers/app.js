@@ -60,7 +60,6 @@ function fakeSerializedTroupe(uriContext) {
 
 
 function createTroupeContext(req, options) {
-
   var disabledFayeProtocols = [];
 
   var userAgent = req.headers['user-agent'];
@@ -72,6 +71,8 @@ function createTroupeContext(req, options) {
   }
 
   var useFirebug = useFirebugInIE && userAgent.indexOf('MSIE') >= 0;
+  var events = req.session.events;
+  if(events) { delete req.session.events; }
 
   return {
       user: options.user,
@@ -90,7 +91,8 @@ function createTroupeContext(req, options) {
       basePath: nconf.get('web:basepath'),
       homeUrl: nconf.get('web:homeurl'),
       mixpanelToken: nconf.get("stats:mixpanel:token"),
-
+      importedGoogleContacts: req.user && req.user.googleRefreshToken ? true : false,
+      events: events,
       troupeUri: options.troupe ? options.troupe.uri : undefined,
       websockets: {
         fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
@@ -396,19 +398,16 @@ module.exports = {
           if (req.uriContext.ownUrl) {
             return renderHomePage(req, res, next);
           }
+
           if(req.isPhone) {
+            // TODO: this should change from chat-app to a seperate mobile app
             renderAppPageWithTroupe(req, res, next, 'mobile/chat-app');
           } else {
             renderAppPageWithTroupe(req, res, next, 'app-template');
           }
         });
 
-
-
-
-
       function acceptInviteWithoutConfirmation(req, res, next) {
-
         var appUri = req.params.appUri || 'one-one/' + req.params.userId;
 
         if(!req.user) {
@@ -442,11 +441,13 @@ module.exports = {
       }
 
       app.get('/:appUri/accept/',
+        middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
         uriContextResolverMiddleware,
         acceptInviteWithoutConfirmation);
 
       app.get('/one-one/:userId/accept/',
+        middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
         preloadOneToOneTroupeMiddleware,
         acceptInviteWithoutConfirmation);
@@ -490,10 +491,12 @@ module.exports = {
       }
 
       app.get('/:appUri/accept/:confirmationCode',
+        middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
         acceptInviteWithConfirmation);
 
       app.get('/one-one/:userId/accept/:confirmationCode',
+        middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
         acceptInviteWithConfirmation);
     }

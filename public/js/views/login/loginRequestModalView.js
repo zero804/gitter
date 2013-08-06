@@ -127,6 +127,14 @@ define([
             }
             else {
               that.trigger('confirm.request', { userEmail: email});
+              // store the details of this request in local storage to show success after confirmation
+              try {
+                  if (window.localStorage) {
+                  window.localStorage.pendingRequestConfirmation = _.extend(that.getRenderData(), { time: Date.now() });
+                }
+              }
+              catch(e) {}
+
               return;
             }
           }

@@ -1,7 +1,8 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var faye = require('faye');
+//var faye = require('faye');
+var faye = require('./faye-temp/faye-node');
 var fayeRedis = require('faye-redis');
 var oauth = require("../services/oauth-service");
 var winston = require("winston");
@@ -10,6 +11,7 @@ var presenceService = require("../services/presence-service");
 var restful = require("../services/restful");
 var nconf = require("../utils/config");
 var shutdown = require('../utils/shutdown');
+
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
@@ -104,6 +106,9 @@ function populateSubUserCollection(options, callback) {
     case "invites":
       return restful.serializeInvitesForUser(userId, callback);
 
+    case "connectioninvites":
+      return restful.serializeInvitesFromUser(userId, callback);
+
     default:
       winston.error('Unable to provide snapshot for ' + collection);
   }
@@ -133,6 +138,9 @@ function populateSubTroupeCollection(options, callback) {
 
     case "users":
       return restful.serializeUsersForTroupe(troupeId, userId, callback);
+
+    case "invites":
+      return restful.serializeInvitesForTroupe(troupeId, userId, callback);
 
     default:
       winston.error('Unable to provide snapshot for ' + collection);
@@ -176,6 +184,7 @@ var authenticator = {
   incoming: function(message, callback) {
     function deny() {
       message.error = '403::Access denied';
+      winston.error('Denying client access', message);
       callback(message);
     }
 
@@ -277,6 +286,7 @@ var authorisor = {
 
     function deny() {
       message.error = '403::Access denied';
+      winston.error('Socket authorisation failed', message);
       callback(message);
     }
 
@@ -434,7 +444,7 @@ var server = new faye.NodeAdapter({
     type: fayeRedis,
     host: nconf.get("redis:host"),
     port: nconf.get("redis:port"),
-    interval: 10,
+    interval: nconf.get('ws:fayeInterval'),
     namespace: 'fr:'
   }
 });
@@ -462,12 +472,12 @@ module.exports = {
     //});
 
     server.bind('disconnect', function(clientId) {
-      // Warning, this event is called pretty simulateously on
+      // Warning, this event is called simulateously on
       // all the servers that are connected to the same redis/faye
       // connection
       winston.info("Client " + clientId + " disconnected");
       presenceService.socketDisconnected(clientId, function(err) {
-        if(err && !err.lockFail) { winston.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err,  { exception: err }); }
+        if(err && err !== 404) { winston.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err,  { exception: err }); }
       });
     });
 

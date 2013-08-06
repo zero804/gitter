@@ -19,10 +19,11 @@ exports.bootScript = function(url, parameters) {
 
   if(minified) {
     if(skipCore) {
-      requireScript = cdn("js/" + url + ".js");
+      requireScript = cdn("js/" + url + ".min.js");
     } else {
+      url = url + ".min";
       // note: when the skipCdn flag was introduced it affected this even though this isn't the file that was requested in this invocation
-      requireScript = cdn("js/core-libraries.js");
+      requireScript = cdn("js/core-libraries.min.js");
     }
 
     return "<script type='text/javascript'>\nwindow.require_config.baseUrl = '" + baseUrl + "';</script>\n" +

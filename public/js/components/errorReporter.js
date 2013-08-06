@@ -5,10 +5,17 @@ define([
 
   var _super = window.onerror;
   window.onerror = function(message, file, line) {
-
-    require(['utils/tracking'], function(tracking) {
-      tracking.trackError(message, file, line);
-    });
+  	try {
+	    require(['utils/tracking'], function(tracking) {
+	      try {
+	      	tracking.trackError(message, file, line);
+	      } catch(e) {
+	      	//
+	      }
+	    });
+    } catch(e) {
+    	//
+    }
 
     if (_super)
       return _super();

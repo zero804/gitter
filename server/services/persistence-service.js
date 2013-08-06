@@ -117,6 +117,7 @@ var UserSchema = new Schema({
     }
   },
   userToken: String, // TODO: move to OAuth,
+  googleRefreshToken: String,
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 UserSchema.index({ email: 1 }, { unique: true });
@@ -292,6 +293,11 @@ var InviteUnconfirmedSchema = mongooseUtils.cloneSchema(InviteSchema);
 InviteUnconfirmedSchema.schemaTypeName = 'InviteUnconfirmedSchema';
 InviteUnconfirmedSchema.index({ userId: 1 });
 InviteUnconfirmedSchema.index({ email: 1 });
+
+var InviteUsedSchema = mongooseUtils.cloneSchema(InviteSchema);
+InviteUsedSchema.schemaTypeName = 'InviteUsedSchema';
+InviteUsedSchema.index({ userId: 1 });
+InviteUsedSchema.index({ email: 1 });
 
 //
 // A request by a user to join a Troupe
@@ -483,7 +489,6 @@ PushNotificationDeviceSchema.index({ tokenHash: 1 });
 PushNotificationDeviceSchema.schemaTypeName = 'PushNotificationDeviceSchema';
 
 
-
 /*
  * Push Notifications
  */
@@ -493,6 +498,20 @@ PushNotificationDeviceSchema.schemaTypeName = 'PushNotificationDeviceSchema';
   troupeId: { type: ObjectId, unique: true, sparse: true }
 });
 UriLookupSchema.schemaTypeName = 'UriLookupSchema';
+
+/*
+ * User contacts
+ */
+var ContactSchema = new Schema({
+  userId: {type: ObjectId, ref: 'User'},
+  source: String,
+  sourceId: String,
+  name: String,
+  emails: Array
+});
+ContactSchema.index({ userId: 1 });
+ContactSchema.schemaTypeName = 'ContactSchema';
+
 
 
 var User = mongoose.model('User', UserSchema);
@@ -508,6 +527,7 @@ var EmailAttachment = mongoose.model('EmailAttachment', EmailAttachmentSchema);
 var Conversation = mongoose.model('Conversation', ConversationSchema);
 var Invite = mongoose.model('Invite', InviteSchema);
 var InviteUnconfirmed = mongoose.model('InviteUnconfirmed', InviteUnconfirmedSchema);
+var InviteUsed = mongoose.model('InviteUsed', InviteUsedSchema);
 
 var Request = mongoose.model('Request', RequestSchema);
 var RequestUnconfirmed = mongoose.model('RequestUnconfirmed', RequestUnconfirmedSchema);
@@ -524,6 +544,8 @@ var GeoPopulatedPlace = mongoose.model('GeoPopulatedPlaces', GeoPopulatedPlaceSc
 
 var PushNotificationDevice = mongoose.model('PushNotificationDevice', PushNotificationDeviceSchema);
 var UriLookup = mongoose.model('UriLookup', UriLookupSchema);
+
+var Contact = mongoose.model('Contact', ContactSchema);
 
 
 //
@@ -559,7 +581,8 @@ module.exports = {
     OAuthAccessTokenSchema: OAuthAccessTokenSchema,
     GeoPopulatedPlaceSchema: GeoPopulatedPlaceSchema,
     PushNotificationDeviceSchema: PushNotificationDeviceSchema,
-    UriLookupSchema: UriLookupSchema
+    UriLookupSchema: UriLookupSchema,
+    ContactSchema: ContactSchema
   },
   User: User,
   UserTroupeLastAccess: UserTroupeLastAccess,
@@ -572,6 +595,7 @@ module.exports = {
   Conversation: Conversation,
 	Invite: Invite,
   InviteUnconfirmed: InviteUnconfirmed,
+  InviteUsed: InviteUsed,
   Request: Request,
   RequestUnconfirmed: RequestUnconfirmed,
 	ChatMessage: ChatMessage,
@@ -583,7 +607,8 @@ module.exports = {
   GeoPopulatedPlace: GeoPopulatedPlace,
   UserLocationHistory: UserLocationHistory,
   PushNotificationDevice: PushNotificationDevice,
-  UriLookup: UriLookup
+  UriLookup: UriLookup,
+  Contact: Contact
 };
 
 process.nextTick(function() {

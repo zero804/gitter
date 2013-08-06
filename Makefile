@@ -25,7 +25,7 @@ perf-test-xunit:
 
 perf-test:
 	NODE_ENV=test ./node_modules/.bin/mocha \
-		--reporter dot \
+		--reporter spec \
 		--timeout 100000 \
 		--recursive \
 		$(PERF_TESTS)
@@ -85,6 +85,7 @@ npm:
 	npm install
 
 grunt:
+	mkdir output
 	grunt -no-color process
 
 version-files:
@@ -171,6 +172,7 @@ install-client-libs:
 	cp output/client-libs/jquery/jquery-migrate-amd.js public/repo/jquery/jquery-migrate.js
 	cp output/client-libs/jquery-placeholder/jquery.placeholder-amd.js public/repo/jquery-placeholder/jquery-placeholder.js
 	cp output/client-libs/jquery.validation/jquery.validate-amd.js public/repo/jquery.validation/jquery.validation.js
+	cp output/client-libs/hammerjs/dist/jquery.hammer.min.js public/repo/hammerjs/jquery.hammer.js
 	cp output/client-libs/mocha/mocha-amd.js public/repo/mocha/mocha.js
 	cp output/client-libs/mocha/mocha.css public/repo/mocha/mocha.css
 	cp output/client-libs/moment/min/moment.min.js public/repo/moment/moment.js

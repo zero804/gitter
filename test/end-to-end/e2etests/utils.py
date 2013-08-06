@@ -1,4 +1,6 @@
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import urllib2
 import os
@@ -138,7 +140,7 @@ def signup(driver):
 
     # complete profile
     form = driver.find_element_by_css_selector('#updateprofileform')
-    form.find_element_by_name('displayName').send_keys('Willey Waley')
+    set_text(form.find_element_by_name('displayName'), 'Willey Waley')
     form.find_element_by_name('password').send_keys('123456')
     form.find_element_by_name('submit').click()
     return username
@@ -154,11 +156,30 @@ def getJSON(url):
     response = urllib2.urlopen(baseUrl(url)).read()
     return json.loads(response)
 
+
 # Keys sometimes need to be sent one at a time (firefox),
 # especially when the page is responding to the event, otherwise the full string will not go through
 def send_keys(element, str):
     for c in str:
         element.send_keys(c)
+
+
+# first delete what text is there,
+# then use send_keys
+def set_text(element, str):
+    element.clear()
+    send_keys(element, str)
+
+
+def showLeftMenu(driver):
+    # show left menu
+    action = ActionChains(driver)
+    action.move_to_element(driver.find_element_by_css_selector('#left-menu-hotspot'))
+    action.click(driver.find_element_by_css_selector('#left-menu-hotspot'))
+    action.perform()
+    #assert(driver.find_element_by_css_selector(".trpLeftMenuToolbar").is_displayed())
+    #time.sleep(1)
+
 
 # cannot run during setup/teardown as stdout is ignored
 def printJobInfo(driver):

@@ -83,6 +83,19 @@ require([
         modal.transitionTo(new TroupeViews.Modal({ view: new SignupModalConfirmView({ data: data }) }));
       });
 
+      view.on('login.prompt', function(options) {
+        options.fromSignup = true;
+        var loginView = new LoginModalView(options);
+        loginView.on('login.complete', function(data) {
+          window.location.href= data.redirectTo;
+        });
+
+        loginView.once('login.close', function(/*data*/) {
+          modal.hide();
+        });
+        modal.transitionTo(new TroupeViews.Modal({ view: loginView }));
+
+      });
       modal.show();
 
       return false;
@@ -113,12 +126,8 @@ require([
     });
 
     $('#button-existing-users-login').on('click', function() {
-      $(document).trigger('login-prompt');
+      createLoginModal().show();
       return false;
-    });
-
-    $(document).on('login-prompt', function(ev, credentials) {
-      createLoginModal({ email: (credentials) ? credentials.email : '' }).show();
     });
 
     require([

@@ -17,5 +17,7 @@ module.exports = {
     require('./health-check').install(app);
     require('./installChromeExtension').install(app);
     require('./test-data').install(app);
+    require('./google-contacts').install(app);
+    require('./unawesome-browser').install(app);
   }
 };

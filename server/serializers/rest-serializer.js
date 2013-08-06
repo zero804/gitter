@@ -102,7 +102,7 @@ function UserStrategy(options) {
     return {
       id: user.id,
       username: user.username,
-      displayName: user.displayName || user.email.replace(/@.*/, ""),
+      displayName: user.displayName,
       url: user.getHomeUrl(),
       email: options.includeEmail ? user.email : undefined,
       avatarUrlSmall: getAvatarUrl('s'),
@@ -602,21 +602,30 @@ function InviteStrategy(options) {
 
   var troupeIdStrategy = new TroupeIdStrategy(options);
   var userIdStrategy = new UserIdStrategy(options);
+  var user2IdStrategy = new UserIdStrategy(options);
 
   this.preload = function(invites, callback) {
-    execPreloads([{
-      strategy: troupeIdStrategy,
-      data: invites.map(function(invite) { return invite.troupeId; }).filter(predicates.notNull)
-    },{
-      strategy: userIdStrategy,
-      data: invites.map(function(invite) { return invite.fromUserId; }).filter(predicates.notNull)
-    }], callback);
+    execPreloads([
+      {
+        strategy: troupeIdStrategy,
+        data: invites.map(function(invite) { return invite.troupeId; }).filter(predicates.notNull)
+      },
+
+      {
+        strategy: user2IdStrategy,
+        data: invites.filter(function(invite) { return !!invite.userId; }).map(function(invite) { return invite.userId; }).filter(predicates.notNull)
+      },{
+        strategy: userIdStrategy,
+        data: invites.map(function(invite) { return invite.fromUserId; }).filter(predicates.notNull)
+      }
+    ], callback);
 
   };
 
   this.map = function(item) {
     var troupe = item.troupeId && troupeIdStrategy.map(item.troupeId);
     var fromUser = item.fromUserId && userIdStrategy.map(item.fromUserId); // In future, all invites will have a fromUserId
+    var user = item.userId && user2IdStrategy.map(item.userId);
 
     if(!troupe && !fromUser) {
       return; // This invite is broken.... Data maintenance to remove
@@ -624,8 +633,10 @@ function InviteStrategy(options) {
 
     return {
       id: item._id,
-      oneToOneInvite: !!fromUser,
+      oneToOneInvite: troupe ? false : true,
       fromUser: fromUser,
+      user: user,
+      email: item.email,
       acceptUrl: troupe ? '/' + troupe.uri : fromUser.url,
       name: troupe ? troupe.name : fromUser.displayName,
       v: getVersion(item)
@@ -648,11 +659,6 @@ function TroupeUserStrategy(options) {
 
 function TroupeStrategy(options) {
   if(!options) options = {};
-
-  var stack;
-  if(!options.currentUserId) {
-    stack = new Error().stack;
-  }
 
   var currentUserId = options.currentUserId;
 
@@ -732,10 +738,8 @@ function TroupeStrategy(options) {
       if(currentUserId) {
         otherUser =  mapOtherUser(item.users);
       } else {
-        console.log('');
         if(!shownWarning) {
           winston.warn('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
-          winston.warn(stack.join('\n'));
           shownWarning = true;
         }
       }

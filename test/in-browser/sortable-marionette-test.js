@@ -126,6 +126,55 @@ require([
         }
       }
     });
+
+    it("should accept the add events in an order that does not match the collection order", function() {
+      var collection = createCollection();
+      var view = createView(collection);
+
+      // create 5 models and views
+      for (var a = 9; a > 5; a--) {
+        collection.create({ sent: tendays[a], text: a});
+      }
+
+      checkOrder(view);
+
+      // create three models at the beginning without sending out the events
+      var m1 = collection.create({ sent: tendays[1], text: 1 }, { silent: true });
+      var m2 = collection.create({ sent: tendays[2], text: 2 }, { silent: true });
+      var m3 = collection.create({ sent: tendays[3], text: 3 }, { silent: true });
+      var m4 = collection.create({ sent: tendays[4], text: 4 }, { silent: true });
+
+      // send through the events such that the new view for position 0 doesn't have a view immediately after it
+      m1.trigger('add', m1, collection);
+      checkOrder(view, "Incorrect after inserting a new top view that doesn't have a view immediately after it (should be at position 1 now and eventually)");
+      // send through the events such that the new view doesn't have a view immediately before it or after it
+      m3.trigger('add', m3, collection);
+      checkOrder(view, "Incorrect after inserting a new view that doesn't have a view immediately before it or after it (should be at position 2 now and 3 eventually");
+      // and it all magically falls into place
+      m4.trigger('add', m4, collection);
+      checkOrder(view, "Incorrect after inserting a new view that should be at position 3 now and 4 eventually");
+      m2.trigger('add', m2, collection);
+      checkOrder(view, "Incorrect after inserting a new view that should be at position 2 now and eventually");
+
+    });
+
+    function checkOrder(view, msg) {
+      var el = view.$el[0];
+
+      for (var b = 0; b < view.$el[0].childNodes.length; b++) {
+        var curInnerHTML = el.childNodes[b].innerHTML;
+        // it is less than the view after it
+        if (b > 0 && b < view.$el[0].childNodes.length - 1) {
+          var nextInnerHTML = view.$el[0].childNodes[b + 1].innerHTML;
+          assert(curInnerHTML <= nextInnerHTML, msg || "The view at position "+b+" with value "+curInnerHTML+" is not less than the view after it with value " + nextInnerHTML);
+        }
+        // it is greater than the view before it
+        else if (b > 0) {
+          var prevInnerHTML = view.$el[0].childNodes[b - 1].innerHTML;
+          assert(curInnerHTML >= prevInnerHTML, msg || "The view at position "+b+" with value "+curInnerHTML+" is not greater than the view before it with value " + prevInnerHTML);
+        }
+      }
+    }
   });
 
   if (window.mochaPhantomJS) {
