@@ -36,22 +36,33 @@ define([
       else
         this.query = query;
 
+      function escapeRegExp(str) {
+        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+      }
+
       var terms = query.split(' ');
+      var termsRe = new RegExp("\\b(" + _.map(terms, escapeRegExp).join("|") + ")", "i");
 
       var troupes = this.troupes;
 
       // filter the local troupes collection
       var results = troupes.filter(isMatch);
 
-      function isMatch(trp) {
-        if (!query) return false;
+      function isMatch(t) {
 
-        var name = (trp.get) ? trp.get('name') || trp.get('displayName') : trp.name || trp.displayName;
-        name = name.toLowerCase().trim();
-        var names = name.split(' ');
-        return name.indexOf(query) === 0 || _.all(terms, function(t) {
-          return _.any(names, function(n) { return n.indexOf(t) === 0; });
-        });
+        function match(string) {
+          return string && string.match(termsRe);
+        }
+
+        if (!query) return false;
+        if(match(t.get ? t.get('name') : t.name)) return true;
+
+        // Matching directly against a username
+        if(match(t.get ? t.get('username') : t.username)) return true;
+        if(match(t.get ? t.get('displayName') : t.displayName)) return true;
+        if(match(t.get ? t.get('url') : t.url)) return true;
+
+        return false;
       }
 
       // filter the suggestions from the user search service
@@ -166,7 +177,7 @@ define([
 
     keySearch: _.debounce(function(e) {
       this.search(this.$input.val());
-    }, 500)
+    }, 250)
 
   });
 
