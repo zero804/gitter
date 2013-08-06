@@ -95,7 +95,7 @@ require([
         });
         modal.transitionTo(new TroupeViews.Modal({ view: loginView }));
 
-      })
+      });
       modal.show();
 
       return false;

@@ -441,11 +441,13 @@ module.exports = {
       }
 
       app.get('/:appUri/accept/',
+        middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
         uriContextResolverMiddleware,
         acceptInviteWithoutConfirmation);
 
       app.get('/one-one/:userId/accept/',
+        middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
         preloadOneToOneTroupeMiddleware,
         acceptInviteWithoutConfirmation);
@@ -489,10 +491,12 @@ module.exports = {
       }
 
       app.get('/:appUri/accept/:confirmationCode',
+        middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
         acceptInviteWithConfirmation);
 
       app.get('/one-one/:userId/accept/:confirmationCode',
+        middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
         acceptInviteWithConfirmation);
     }
