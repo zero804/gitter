@@ -294,6 +294,8 @@ define([
            if(data.failed) {
             return;
           }
+          self.$el.find('#gmail-connect').hide();
+          self.$el.find('#import-success').hide();
           self.$el.find('.modal-content').hide();
           self.$el.find('.modal-success').show();
           // self.trigger('share.complete', data);

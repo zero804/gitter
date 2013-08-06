@@ -45,12 +45,12 @@
 {{/inviteToTroupe}}
 
 {{#inviteToConnect}}
-<div class="trpModalInfo">
+<div class="trpModalInfo" id="gmail-connect">
   <a href='/google/contacts?returnTo={{returnToUrl}}' style="text-decoration: none"><div style="display: inline-block;"><div class="trpButton trpCopyButton" style="margin-left: 0px"><img src='{{cdn "images/2/icon-gmail.png"}}' style="vertical-align: middle; margin-right: 4px" width="16"> <span style="vertical-align: middle">Add Gmail contacts</span></div></div></a>
 </div>
 {{/inviteToConnect}}
 
 <div class="trpModalSuccess" id="import-success" style="display:none">
-  <div class="trpModalTitle"><span class="trpWhite">Successfully connected to Gmail</span></div>
-  <div class="trpModalBody"><span class="trpWhite">You can now search and invite your Gmail contacts in the above field.</span></div>
+  <div class="trpModalBody" style="padding-bottom: 0"><span class="trpWhite">Successfully connected to Gmail</span></div>
+  <div class="trpModalSubtext" style="padding-bottom: 0"><span class="trpWhite">You can now search and invite your Gmail contacts in the  search box above.</span></div>
 </div>
