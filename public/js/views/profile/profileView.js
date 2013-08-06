@@ -180,12 +180,9 @@ define([
         success: function(data) {
           if(data.success) {
             window.troupeContext.user.displayName = data.displayName;
-            if (that.compactView) {
-              window.location.href = "/ios-app";
-            }
-            else {
-              that.dialog.hide();
-            }
+            that.trigger('submit.success');
+            that.dialog.hide();
+
             if (that.hasChangedEmail(newEmail)) {
               window.alert("Your address will be updated once you confirm the email sent to your new address.");
             }
@@ -196,7 +193,7 @@ define([
             }
             else if(data.authFailure) {
               that.$el.find('#oldPassword').val("");
-              window.alert("You old password is incorrect");
+              window.alert("Your old password is incorrect");
             }
           }
         }
@@ -206,9 +203,14 @@ define([
 
   var Modal = TroupeViews.Modal.extend({
     initialize: function(options) {
-      options.title = "Edit your profile";
+      options.title = window.troupeContext.profileNotCompleted ? "Complete your profile" : "Edit your profile";
       TroupeViews.Modal.prototype.initialize.apply(this, arguments);
       this.view = new View({ });
+
+      var self = this;
+      this.view.on('submit.success', function(username) {
+        self.trigger('submit.success', username);
+      });
     }
   });
 
