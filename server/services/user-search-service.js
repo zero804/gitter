@@ -45,10 +45,20 @@ function getSearchConjunction(res) {
   return [displayNameSearch, usernameSearch];
 }
 
-function searchForRegularExpressionsWithinUserIds(userIds, res, options) {
-  var q = persistence.User.where('_id')['in'](userIds)
-            .or(getSearchConjunction(res));
+function searchForRegularExpressionsWithinUserIds(userIds, res, fullSearchTerm, options) {
+  var searchTerms = [ {
+      $and: [
+        { _id: { $in: userIds } },
+        { $or: getSearchConjunction(res) }
+      ]}
+    ];
 
+  if(fullSearchTerm.match(/^[\w\.]{3,}$/)) {
+    searchTerms.push({ username: fullSearchTerm.toLowerCase() });
+  }
+
+  var q = persistence.User.find()
+            .or(searchTerms);
 
   return executeSearch(q, options);
 }
@@ -102,14 +112,14 @@ exports.searchForUsers = function(userId, queryText, options, callback) {
               if(!userIds.length) return [];
 
               if(!options.excludeTroupeId) {
-                return searchForRegularExpressionsWithinUserIds(userIds, res, options);
+                return searchForRegularExpressionsWithinUserIds(userIds, res, queryText, options);
               }
 
               return troupeService.findUserIdsForTroupe(options.excludeTroupeId)
                 .then(function(excludedTroupeUserIds) {
                   // Remove the user doing the search
                   userIds = difference(userIds, excludedTroupeUserIds);
-                  return searchForRegularExpressionsWithinUserIds(userIds, res, options);
+                  return searchForRegularExpressionsWithinUserIds(userIds, res, queryText, options);
                 });
             });
         });
@@ -129,7 +139,7 @@ exports.searchUnconnectedUsers = function(userId, queryText, options, callback) 
 
       return troupeService.findAllUserIdsForUnconnectedImplicitContacts(userId)
         .then(function(userIds) {
-          return searchForRegularExpressionsWithinUserIds(userIds, regExps, options);
+          return searchForRegularExpressionsWithinUserIds(userIds, regExps, queryText, options);
         });
 
     })
