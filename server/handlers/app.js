@@ -33,7 +33,7 @@ function renderHomePage(req, res, next) {
 
 function getAppCache(req) {
   if(!nconf.get('web:useAppCache')) return;
-  return req.url.substring(1) + '.appcache';
+  return req.url + '.appcache';
 }
 
 function renderAppPageWithTroupe(req, res, next, page) {
