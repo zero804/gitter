@@ -342,7 +342,6 @@ a:hover {
 }
 
 .trpHeaderWrapper {
-  display: inline-block;
 	width: 100%;
 	height: 60px;
 	background-color: white;
@@ -355,16 +354,19 @@ a:hover {
 }
 
 .trpHeaderContainer {
-  display: inline-block;
-  position: relative;
 	background-color: white;
 	text-align: center;
 	overflow: hidden;
 }
 
 .trpHeaderFrame {
-	display: inline-block;
-	position: relative;
+  margin-left: 160px;
+  margin-right: 300px;
+  transform: translate3d(0, 0, 0);
+  transition:all .3s ease-in-out; 
+  -o-transition:all .3s ease-in-out; 
+  -moz-transition:all .3s ease-in-out; 
+  -webkit-transition:all .3s ease-in-out;
 }
 
 .trpHeaderFavourite {
@@ -373,6 +375,8 @@ a:hover {
 	height: 24px;
 	padding: 5px;
 	vertical-align: top;
+  float: left;
+  padding-left: 32px
 }
 
 .trpHeaderFavourite img {
@@ -411,9 +415,9 @@ a:hover {
 }
 
 .trpHeaderTitle {
-  display: inline-block;
+  display: block;
 	.trpH1;
-	min-width: 500px;
+  padding-left: 62px;
 	text-align: left;
 	color: #333;
 	padding-top: 12px;
@@ -421,8 +425,8 @@ a:hover {
 }
 
 .trpHeaderToolbar {
+  float: right;
   display: inline-block;
-	min-width: 200px;
 	height: 60px;
 	vertical-align: top;
 	text-align: left;
@@ -806,7 +810,21 @@ a:hover {
 @media screen and (max-width: 1200px) {
 	.trpChatPanel {
 		margin-right: 280px;
+    transform: translate3d(0, 0, 0);
+    transition:all .3s ease-in-out; 
+    -o-transition:all .3s ease-in-out; 
+    -moz-transition:all .3s ease-in-out; 
+    -webkit-transition:all .3s ease-in-out;
 	}
+
+  .trpHeaderFrame {
+    margin-right: 280px;
+    transform: translate3d(0, 0, 0);
+    transition:all .3s ease-in-out; 
+    -o-transition:all .3s ease-in-out; 
+    -moz-transition:all .3s ease-in-out; 
+    -webkit-transition:all .3s ease-in-out;
+  }
 }
 
 @media screen and (max-width:1024px) { 
@@ -820,6 +838,11 @@ a:hover {
 		margin-left: 110px;
 		margin-right: 120px;
 	}
+
+  .trpHeaderFrame {
+    margin-left: 110px;
+    margin-right: 120px;
+  }
 
 	.trpChatItem .avatar-s {
 		width: 24px;

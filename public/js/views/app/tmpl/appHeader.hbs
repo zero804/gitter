@@ -7,36 +7,34 @@
   {{else}}
   <div style="width: 34px; visibility: hidden; display:inline-block"></div>
   {{/if}}
-  <div class="trpHeaderContainer">
-    <div class="trpHeaderTitle">
-      {{headerTitle}}
-    </div>
-    <div class="trpHeaderToolbar" id="header-region">
-      <div>
-        {{#if isTroupe}}
-        {{#if troupeContext.troupe.oneToOne}}
-        <div class="trpSettingsButton" style="visibility:hidden"></div>
-        {{else}}
-        <div class="trpSettingsButton">
-          <a href="#|troupeSettings">
-            <img src='{{cdn "images/2/icon-settings-black.png" }}' style="opacity: 0.6" width="24" height="24">
-          </a>
-        </div>
-        {{/if}}
-        {{/if}}
-        <div class="trpProfileButton">
-          {{#if user.username}}<a href="/{{user.username}}">{{else}}<a href="/home">{{/if}}{{ widget "avatar" user=user size='xs' }}</a>
-        </div>
-        <div class="trpProfileMenu">
-          <span class="trpProfileItem">
-            <a href="#|profile" id="link-profile">Profile</a>
-          </span>
-          <span class="trpProfileItem">
-            <a href="/signout" id="link-signout">Sign Out</a>
-          </span>
-        </div>
+  <div class="trpHeaderToolbar" id="header-region">
+    <div>
+      {{#if isTroupe}}
+      {{#if troupeContext.troupe.oneToOne}}
+      <div class="trpSettingsButton" style="visibility:hidden"></div>
+      {{else}}
+      <div class="trpSettingsButton">
+        <a href="#|troupeSettings">
+          <img src='{{cdn "images/2/icon-settings-black.png" }}' style="opacity: 0.6" width="24" height="24">
+        </a>
+      </div>
+      {{/if}}
+      {{/if}}
+      <div class="trpProfileButton">
+        {{#if user.username}}<a href="/{{user.username}}">{{else}}<a href="/home">{{/if}}{{ widget "avatar" user=user size='xs' }}</a>
+      </div>
+      <div class="trpProfileMenu">
+        <span class="trpProfileItem">
+          <a href="#|profile" id="link-profile">Profile</a>
+        </span>
+        <span class="trpProfileItem">
+          <a href="/signout" id="link-signout">Sign Out</a>
+        </span>
       </div>
     </div>
   </div>
-  <div class="trpHeaderSpacer"></div>
+  <div class="trpHeaderTitle">
+    {{headerTitle}}
+  </div>
+  
 </div>
