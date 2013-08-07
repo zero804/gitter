@@ -56,15 +56,16 @@ define([
       // and scroll to bottom once the first rendering is complete
       if (this.collection.length === 0) {
         this.collection.once('sync reset', function() {
-          if(self.hasLoaded) return;
-          self.hasLoaded = true;
-
-          ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
-          self.scrollDelegate.scrollToBottom();
+          onInitialLoad();
         });
       } else {
+        onInitialLoad();
+      }
+
+      function onInitialLoad() {
         if(self.hasLoaded) return;
         self.hasLoaded = true;
+        self.hasRendered = true; // the initial set of chats have been rendered
 
         ChatCollectionView.$scrollOf.on('scroll', self.chatWindowScroll);
         self.scrollDelegate.scrollToBottom();
