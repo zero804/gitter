@@ -84,7 +84,7 @@ module.exports = {
               res.relativeRedirect('/' + user.username);
             } else {
               contextGenerator.generateMiniContext(req, function(err, troupeContext) {
-                res.render('complete-profile', { troupeContext: JSON.stringify(troupeContext) });
+                res.render('complete-profile', { troupeContext: troupeContext });
               });
             }
           });

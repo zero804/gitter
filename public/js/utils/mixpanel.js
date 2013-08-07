@@ -35,7 +35,7 @@ define([
 
     window.mixpanel = mixpanel;
 
-    mixpanel.init(context().mixpanelToken);
+    mixpanel.init(context.env('mixpanelToken'));
     if (context.isAuthed()) {
       mixpanel.identify(context.getUserId());
       mixpanel.name_tag(context.getUser().username);

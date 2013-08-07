@@ -146,7 +146,7 @@ define([
               // hasn't, wait until it has
               if(!viewDetails.skipModelLoad) {
                 if(viewDetails.collection.length === 0) {
-                  viewDetails.collection.once('reset', loadItemIntoView, this);
+                  viewDetails.collection.once('reset sync', loadItemIntoView, this);
                   return;
                 }
               }

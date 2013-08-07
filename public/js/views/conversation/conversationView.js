@@ -1,24 +1,20 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-
 define([
-  'jquery',
   'underscore',
   'utils/context',
-  'backbone',
   'marionette',
   'views/base',
-  'collections/conversations',
   'hbs!./tmpl/conversationItemView',
   'hbs!./tmpl/conversationHelpView'
-], function($, _, context, Backbone, Marionette, TroupeViews, conversationModels, conversationItemViewTemplate, conversationHelpTemplate){
+], function(_, context, Marionette, TroupeViews, conversationItemViewTemplate, conversationHelpTemplate){
   "use strict";
 
   function getData() {
-    var tx = window.troupeContext;
+    var troupe = context.getTroupe();
 
     return {
-      emailAddress: tx.troupe.uri + '@' + tx.baseServer,
-      troupeName: (tx.troupe.name) ? tx.troupe.name.replace(/\s/g,"%20") : ""
+      emailAddress: troupe.uri + '@' + context.env('baseServer'),
+      troupeName: (troupe.name) ? troupe.name.replace(/\s/g,"%20") : ""
     };
   }
 

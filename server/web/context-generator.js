@@ -100,17 +100,6 @@ function fakeSerializedTroupe(uriContext) {
 }
 
 function createTroupeContext(req, options) {
-  var disabledFayeProtocols = [];
-
-  var userAgent = req.headers['user-agent'];
-  userAgent = userAgent ? userAgent : '';
-
-  // Disable websocket on Mobile due to iOS crash bug
-  if(userAgent.indexOf('Mobile') >= 0) {
-    disabledFayeProtocols.push('websocket');
-  }
-
-  var useFirebug = useFirebugInIE && userAgent.indexOf('MSIE') >= 0;
   var events = req.session.events;
   if(events) { delete req.session.events; }
 
@@ -126,23 +115,8 @@ function createTroupeContext(req, options) {
       inviteId: options.inviteId,
       mobilePage: req.params && req.params.mobilePage,
       appVersion: appVersion.getCurrentVersion(),
-      baseServer: nconf.get('web:baseserver'),
-      basePort: nconf.get('web:baseport'),
-      basePath: nconf.get('web:basepath'),
-      homeUrl: nconf.get('web:homeurl'),
-      mixpanelToken: nconf.get("stats:mixpanel:token"),
       importedGoogleContacts: req.user && req.user.googleRefreshToken ? true : false,
       events: events,
       troupeUri: options.troupe ? options.troupe.uri : undefined,
-      websockets: {
-        fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
-        options: {
-          timeout: nconf.get('ws:fayeTimeout'),
-          retry: nconf.get('ws:fayeRetry'),
-          interval: nconf.get('ws:fayeInterval')
-        },
-        disable: disabledFayeProtocols
-      },
-      useFirebug: useFirebug
     };
   }

@@ -57,7 +57,16 @@ define([
         return true;
       }
     }
-  }
+  };
+
+  /**
+   * The difference between troupeContext and env.
+   * Env is static and will never change.
+   * TroupeContext depends on the user and troupe
+   */
+  context.env = function(envName) {
+    return window.troupeEnv && window.troupeEnv[envName];
+  };
 
   return context;
 

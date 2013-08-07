@@ -23,8 +23,7 @@ function renderHomePage(req, res, next) {
         useAppCache: !!nconf.get('web:useAppCache'),
         bootScriptName: 'router-homepage',
         troupeName: req.user.displayName,
-        troupeContext: JSON.stringify(troupeContext),
-        troupeContextData: troupeContext,
+        troupeContext: troupeContext,
         agent: req.headers['user-agent']
       });
     }
@@ -52,8 +51,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
         isWebApp: !req.params.mobilePage,
         bootScriptName: login ? "router-login" : "router-app",
         troupeName: troupeContext.troupe.name,
-        troupeContext: JSON.stringify(troupeContext),
-        troupeContextData: troupeContext,
+        troupeContext: troupeContext,
         agent: req.headers['user-agent']
       });
     }
