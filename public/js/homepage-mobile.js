@@ -43,14 +43,18 @@ require([
 
     var homepage = new HomepageRouter();
 
-    $('#signup-button').hammer().on('tap', function(event) {
-      homepage.navigate('signup', {trigger: true});
+    $('#signup-button, #login-button').hammer().on('touch', function(event) {
+      // stop click events
+      event.gesture.preventDefault();
       event.stopPropagation();
     });
 
-    $('#login-button').hammer().on('tap', function(event) {
+    $('#signup-button').on('tap', function() {
+      homepage.navigate('signup', {trigger: true});
+    });
+
+    $('#login-button').on('tap', function() {
       homepage.navigate('login', {trigger: true});
-      event.stopPropagation();
     });
 
     var signupView = new SignupModalView({el: $('#signup-form')});
