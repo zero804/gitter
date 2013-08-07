@@ -4,8 +4,10 @@ require([
   'underscore',
   'expect',
   'mocha',
+  'collections/chat',
+  'views/chat/chatCollectionView',
   'views/chat/scrollDelegate'
-], function($, _, expect, mocha, delegates) {
+], function($, _, expect, mocha, chatModel, ChatCollectionView, delegates) {
   mocha.setup({
     ui: 'bdd',
     timeout: 20000
@@ -59,11 +61,52 @@ require([
       // ensure the scroll position has not gone past the top unread position previously saved
       expect(env.scrollOf.scrollTop()).to.be.lessThan(env.topUnreadPosition);
     });
+
   });
+
+  describe("ChatCollection", function() {
+
+    /*
+    it("should send a reset / sync event after the initial models come in through live collection listening", function(done) {
+      var env = new TestEnvironment();
+      env.collection.listen();
+      env.collection.on('reset sync', function() {
+        done();
+      });
+    });
+    */
+
+  });
+
+  describe("ChatCollectionView", function() {
+
+    it("should wait for a collection sync / reset before enabling the scroll delegate", function(done) {
+      var env = new TestEnvironment();
+
+      expect(env.view.hasRendered).not.to.be(true);
+      env.collection.on('reset sync', function() {
+        expect(env.view.hasRendered).equal(true);
+        done();
+      });
+      env.collection.trigger('sync');
+    });
+
+  });
+
 
   function TestEnvironment() {
     // mock the scrollOf jquery element
-    this.scrollOf = {
+
+    $('#chat-wrapper').remove();
+    $('#chat-frame').remove();
+    $('<div id="chat-wrapper"></div>').appendTo('body');
+    $('<div id="chat-frame"></div>').appendTo('#chat-wrapper');
+
+    this.scrollOf = $('#chat-wrapper');
+    this.scrollOf.height(800);
+    this.scrollOf.css({ 'overflow': 'scroll' });
+
+    /*{
       scroll: 0,
       scrollTop: function(top) {
         if (top === 0 || top)
@@ -78,10 +121,13 @@ require([
 
         return this.h;
       }
-    };
+    };*/
 
     // mock the container jquery element
-    this.container = {
+    this.container = $('#chat-frame');
+
+    /*
+    {
       h: 0,
       height: function(y) {
         if (y === 0 || y) {
@@ -92,6 +138,11 @@ require([
         return this.h;
       }
     };
+    */
+
+    // setup the collection view
+    this.collection = new chatModel.ChatCollection();
+    this.view = new ChatCollectionView({ collection: this.collection });
 
     // setup the scroll delegate
     this.scrollDelegate = new delegates.DefaultScrollDelegate(this.scrollOf, this.container, 'trpChatItem', findTopMostVisibleUnreadItem);
