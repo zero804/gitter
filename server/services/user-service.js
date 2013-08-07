@@ -164,9 +164,8 @@ var userService = {
 
     // XXX: lastAccessTime should be a date but for some bizarre reason it's not
     // serializing properly
-
     appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
-    console.log('/user/' + userId + '/troupes', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
+
     persistence.User.update({ id: userId }, { $set: { lastTroupe: troupeId }}, callback);
   },
 

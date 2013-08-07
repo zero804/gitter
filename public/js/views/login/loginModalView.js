@@ -93,7 +93,10 @@ define([
     },
 
     markUserAsExisting: function(email) {
-      window.localStorage.defaultTroupeEmail = email;
+      try {
+        window.localStorage.defaultTroupeEmail = email;
+      } catch(e) {
+      }
     },
 
     onFormSubmit: function(e) {
