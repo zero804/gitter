@@ -1,10 +1,11 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var passport = require("passport"),
-    winston = require("winston"),
-    nconf = require('../utils/config'),
-    rememberMe = require('./rememberme-middleware');
+var passport   = require("passport");
+var winston    = require("winston");
+var nconf      = require('../utils/config');
+var rememberMe = require('./rememberme-middleware');
+var useragent  = require('useragent');
 
 var authCookieName = nconf.get('web:cookiePrefix') + 'auth';
 var sessionCookieName = nconf.get('web:cookiePrefix') + 'session';
@@ -162,5 +163,15 @@ exports.simulateDelay = function(timeout) {
     setTimeout(function() {
       return next();
     }, timeout);
+  };
+};
+
+exports.ensureValidBrowser = function(req, res, next) {
+  var agent = useragent.parse(req.headers['user-agent']);
+  if(agent.family === 'IE' && agent.major <= 8) {
+    res.relativeRedirect('/unawesome-browser');
+  } else {
+    next();
   }
-}
+
+};
