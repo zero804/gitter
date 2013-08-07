@@ -4,16 +4,19 @@
 var nconf = require('../utils/config');
 var cdn = require("./cdn");
 
-var minified = nconf.get("web:minified");
+var minifiedDefault = nconf.get("web:minified");
 
 exports.cdn = function(url, parameters) {
   return cdn(url, parameters ? parameters.hash:null);
 };
 
 exports.bootScript = function(url, parameters) {
-  var requireScript,
-      cdn = (parameters.hash.skipCdn) ? function(a) { return '/' + a; } : exports.cdn,
-      skipCore = parameters.hash.skipCore;
+  var options = parameters.hash;
+
+  var requireScript;
+  var cdn      = (options.skipCdn) ? function(a) { return '/' + a; } : exports.cdn;
+  var skipCore = options.skipCore;
+  var minified = minified in options ? options.minified : minifiedDefault;
 
   var baseUrl = cdn("js/");
 
