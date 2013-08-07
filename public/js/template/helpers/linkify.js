@@ -1,5 +1,5 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-require([
+define([
   'handlebars'
 ], function ( Handlebars ) {
   "use strict";
