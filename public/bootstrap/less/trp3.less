@@ -116,8 +116,8 @@ a:hover {
 .trpLeftMenu {
 	display: inline-block;
 	position: fixed;
-	width: 280px;
-	left: -196px;
+	width: 0px;
+	left: 84px;
 	top: 0px;
 	background-color: @trpGreen;
 	height: 100%;
@@ -126,6 +126,7 @@ a:hover {
 	border-right: 2px solid @trpGreen;
 	padding-top: 18px;
 	margin-top: 0px;
+	overflow: hidden;
 /*	transition:all .5s linear; 
 	-o-transition:all .5s linear; 
 	-moz-transition:all .5s linear; 
@@ -141,6 +142,20 @@ a:hover {
 	top: 0;
 	bottom: 0;
 	z-index: 1013;
+	opacity: 0.8;
+		transition:all .2s linear; 
+	-o-transition:all .2s linear; 
+	-moz-transition:all .2s linear; 
+	-webkit-transition:all .2s linear;
+}
+
+.trpMiniLeftMenu:hover { 
+	opacity: 1;
+}
+
+.trpLeftMenu:hover + .trpMiniLeftMenu {
+	opacity: 1;
+
 }
 
 .trpLeftMenu .nano {
@@ -153,6 +168,8 @@ a:hover {
 	position: absolute;
 	bottom: 40px;
 	left: 20px;
+	width: 280px;
+	overflow: hidden;
 }
 
 .trpLeftMenuWrapper {
@@ -166,6 +183,7 @@ a:hover {
 .trpLeftMenuToolbar {
 	padding-left: 26px;
 	padding-bottom: 12px;
+	width: 280px;
 }
 
 .trpLeftMenuToolbarItems {
