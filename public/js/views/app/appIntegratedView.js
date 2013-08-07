@@ -171,44 +171,32 @@ define([
         this.activateSearchList();
       }
 
-      if ($(window).width() < 1250) {
+      $("#left-menu").animate({
+        width: "280px"
+      }, 300);
 
-        $("#left-menu, #content-frame").animate({
-          left: "+=280px"
-        }, 300);
-
-      }
-
-      else {
-        $("#left-menu, #content-frame").animate({
-          left: "+=280px"
-        }, 300);
-
-      }
+      $("#content-frame").animate({
+        left: "280px"
+      }, 300);
 
       this.leftmenu = true;
     },
 
     hideMenu: function() {
-
+      log("------  hiding left menu ------")
       if (!this.leftmenu) return;
 
       // refocus chat input in case it's lost focus but don't do that on tablets
       if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
 
+      $("#left-menu").animate({
+        width: "-=280px"
+      }, 300);
 
-      if ($(window).width() < 1250) {
-        $("#left-menu, #content-frame").animate({
-          left: "-=280px"
-        }, 100);
-      }
+      $("#content-frame").animate({
+        left: "0px"
+      }, 300);
 
-      else {
-        $("#left-menu, #content-frame").animate({
-          left: "-=280px"
-        }, 100);
-
-      }
 
       this.leftmenu = false;
     },
