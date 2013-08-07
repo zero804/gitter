@@ -1,10 +1,5 @@
 <!doctype html>
-<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
-<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
-<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!-->
-<html class="no-js" lang="en" {{#useAppCache}}manifest="/mobile.appcache"{{/useAppCache}}>
-<!--<![endif]-->
+<html lang="en" {{#if appCache}}manifest="{{cdn appCache notStatic=true }}"{{/if}}>
 <head>
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>

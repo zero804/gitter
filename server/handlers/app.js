@@ -136,6 +136,11 @@ function renderHomePage(req, res, next) {
 
 }
 
+function getAppCache(req) {
+  if(!nconf.get('web:useAppCache')) return;
+  return req.url.substring(1) + '.appcache';
+}
+
 function renderAppPageWithTroupe(req, res, next, page) {
   var user = req.user;
   var troupe = req.uriContext.troupe;
@@ -169,7 +174,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
       });
 
       res.render(page, {
-        useAppCache: !!nconf.get('web:useAppCache'),
+        appCache: getAppCache(req),
         login: login,
         isWebApp: !req.params.mobilePage,
         bootScriptName: login ? "router-login" : "router-app",
@@ -250,17 +255,6 @@ function renderMiddleware(template, mobilePage) {
 
 module.exports = {
     install: function(app) {
-      // used for development only
-      app.get('/mobile.appcache', function(req, res) {
-        if (nconf.get('web:useAppCache')) {
-          res.type('text/cache-manifest');
-          res.sendfile('public/templates/mobile.appcache');
-        }
-        else {
-          res.send(404);
-        }
-      });
-
       // This really doesn't seem like the right place for this?
       app.get('/s/cdn/*', function(req, res) {
         res.redirect(req.path.replace('/s/cdn', ''));
@@ -401,7 +395,7 @@ module.exports = {
 
           if(req.isPhone) {
             // TODO: this should change from chat-app to a seperate mobile app
-            renderAppPageWithTroupe(req, res, next, 'mobile/chat-app');
+            renderAppPageWithTroupe(req, res, next, 'mobile/mobile-app');
           } else {
             renderAppPageWithTroupe(req, res, next, 'app-template');
           }

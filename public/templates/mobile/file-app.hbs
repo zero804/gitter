@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="en" {{#useAppCache}}manifest="/mobile.appcache"{{/useAppCache}}>
+<html lang="en" {{#if appCache}}manifest="{{cdn appCache notStatic=true }}"{{/if}}>
 <head>
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
