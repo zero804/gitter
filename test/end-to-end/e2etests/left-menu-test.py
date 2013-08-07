@@ -47,11 +47,7 @@ class LeftMenuTests(unittest.TestCase):
             self.driver.get(utils.baseUrl("/testtroupe1"))
 
     def showLeftMenu(self):
-        # show left menu
-        action = ActionChains(self.driver)
-        action.move_to_element(self.driver.find_element_by_css_selector('#left-menu-hotspot'))
-        action.click(self.driver.find_element_by_css_selector('#left-menu-hotspot'))
-        action.perform()
+        utils.showLeftMenu(self.driver)
 
         assert(self.driver.find_element_by_css_selector(".trpLeftMenuToolbar").is_displayed())
 

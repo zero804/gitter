@@ -19,9 +19,11 @@ class OneToOneConnectTests(unittest.TestCase):
 
     @attr('unreliable')
     def testUnathenticatedOnetoOneInviteFlow(self):
+        # signout and visit Test User 1's homepage
         self.driver.get(utils.baseUrl("/signout"))
         self.driver.get(utils.baseUrl("/testuser1"))
 
+        # signup as a new user through the connect modal
         name = 'testuser.' + time.strftime("%Y%m%d%H%M%S", time.gmtime())
         emailAddress = 'testuser.' + time.strftime("%Y%m%d%H%M%S", time.gmtime()) + '@troupetest.local'
 
@@ -50,14 +52,20 @@ class OneToOneConnectTests(unittest.TestCase):
         form.find_element_by_name('submit').click()
 
         self.driver.find_element_by_css_selector('.trpHelpBox')
+        self.driver.find_element_by_css_selector('#cancel-button').click()
+
+        # look for the outgoing invite and resend
+        utils.showLeftMenu(self.driver)
+        self.driver.find_element_by_id("icon-user").click()
+        self.driver.find_element_by_link_text('Test User 1').click()
+        self.driver.find_element_by_css_selector('#invite-resend-button').click()
+        self.driver.find_element_by_css_selector('.modal-success')
 
         # TODO: Login as testuser and check invite exists
 
         self.driver.get(utils.baseUrl("/signout"))
         utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
-        actionChain = ActionChains(self.driver)
-        actionChain.move_to_element(self.driver.find_element_by_id('left-menu-hotspot'))
-        actionChain.perform()
+        utils.showLeftMenu(self.driver)
         self.driver.find_element_by_link_text(name).click()
         self.driver.find_element_by_id('accept-invite').click()
 
@@ -66,19 +74,24 @@ class OneToOneConnectTests(unittest.TestCase):
         textArea.send_keys(Keys.RETURN)
         self.driver.find_element_by_css_selector(".trpChatText")
 
+
     @attr('unreliable')
     def testAuthenticatedOnetoOneInviteFlow(self):
+        # signup as a new user through the landing page
         newUser = utils.signup(self.driver)
         time.sleep(1)
+
+        # visit Test User 1's homepage and send connect invite
         self.driver.get(utils.baseUrl("/testuser1"))
         self.driver.find_element_by_id('submit-button').click()
         self.driver.find_element_by_css_selector('.modal-success').is_displayed()
 
+        # login as Test User 1
         self.driver.get(utils.baseUrl("/signout"))
         utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
-        actionChain = ActionChains(self.driver)
-        actionChain.move_to_element(self.driver.find_element_by_id('left-menu-hotspot'))
-        actionChain.perform()
+
+        # open the left menu and ensure the invite is there
+        utils.showLeftMenu(self.driver)
         self.driver.find_element_by_link_text('Willey Waley').click()
         self.driver.find_element_by_id('accept-invite').click()
 
@@ -86,6 +99,7 @@ class OneToOneConnectTests(unittest.TestCase):
         textArea.send_keys("hello")
         textArea.send_keys(Keys.RETURN)
         self.driver.find_element_by_css_selector(".trpChatText")
+
 
     @attr('unreliable')
     def testExistingUnauthenticatedOnetoOneInviteFlow(self):

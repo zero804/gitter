@@ -43,6 +43,32 @@ exports.serializeInvitesForUser = function(userId, callback) {
 
 };
 
+exports.serializeInvitesFromUser = function(userId, callback) {
+
+  troupeService.findAllUnusedConnectionInvitesFromUserId(userId, function(err, invites) {
+    if(err) return callback(err);
+
+    var strategy = new restSerializer.InviteStrategy({ currentUserId: userId });
+
+    restSerializer.serialize(invites, strategy, callback);
+
+  });
+
+};
+
+exports.serializeInvitesForTroupe = function(troupeId, userId, callback) {
+
+  troupeService.findAllUnusedInvitesForTroupe(troupeId, function(err, invites) {
+    if(err) return callback(err);
+
+    var strategy = new restSerializer.InviteStrategy({ currentUserId: userId });
+
+    restSerializer.serialize(invites, strategy, callback);
+
+  });
+
+};
+
 exports.serializeRequestsForTroupe = function(troupeId, userId, callback) {
 
   troupeService.findAllOutstandingRequestsForTroupe(troupeId, function(err, requests) {

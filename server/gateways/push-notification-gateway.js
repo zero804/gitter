@@ -3,6 +3,7 @@
 
 var winston = require("winston");
 var pushNotificationService = require("../services/push-notification-service");
+var unreadItemService = require("../services/unread-item-service");
 var nconf = require('../utils/config');
 var apns = require('apn');
 var statsService = require("../services/stats-service");
@@ -120,12 +121,11 @@ apnsConnection.on("error", function(err) {
 });
 
 
-function sendNotificationToDevice(notification, device) {
+function sendNotificationToDevice(notification, badge, device) {
   var sent = false;
-  var message = notification.message;
-  var sound = notification.sound;
-  var badge = notification.badge;
-  var link = notification.link;
+  var message = notification && notification.message;
+  var sound = notification && notification.sound;
+  var link = notification && notification.link;
 
   if((device.deviceType === 'APPLE' ||
       device.deviceType === 'APPLE-DEV' ||
@@ -199,15 +199,22 @@ var queue = workerQueue.queue('push-notification', {}, function() {
   function directSendUserNotification(userIds, notification, callback) {
     pushNotificationService.findDevicesForUsers(userIds, function(err, devices) {
       if(err) return callback(err);
+      if(!devices.length) return callback();
 
-      winston.verbose("push-gateway: Sending to " + devices.length + " potential devices for " + userIds.length + " users");
+      var usersWithDevices = devices.map(function(device) { return device.userId; });
 
-      devices.forEach(function(device) {
-        sendNotificationToDevice(notification, device);
+      unreadItemService.getBadgeCountsForUserIds(usersWithDevices, function(err, counts) {
+        winston.verbose("push-gateway: Sending to " + devices.length + " potential devices for " + userIds.length + " users");
+
+        devices.forEach(function(device) {
+          var badge = counts[device.userId];
+          sendNotificationToDevice(notification, badge, device);
+        });
+
+        callback();
 
       });
 
-      callback();
     });
   }
 
@@ -222,12 +229,19 @@ exports.sendUserNotification = function(userIds, notification, callback) {
   queue.invoke({ userIds: userIds, notification: notification },callback);
 };
 
+exports.sendUsersBadgeUpdates = function(userIds, callback) {
+  if(!Array.isArray(userIds)) userIds = [userIds];
+
+  queue.invoke({ userIds: userIds },callback);
+};
+
+
 exports.sendDeviceNotification = function(deviceId, notification, callback) {
   pushNotificationService.findDeviceForDeviceId(deviceId, function(err, device) {
     if(err) return callback(err);
     if(!device) return callback(404);
 
-    sendNotificationToDevice(notification, device);
+    sendNotificationToDevice(notification, undefined, device);
 
     callback();
   });

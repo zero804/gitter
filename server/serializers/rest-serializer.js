@@ -102,7 +102,7 @@ function UserStrategy(options) {
     return {
       id: user.id,
       username: user.username,
-      displayName: user.displayName || user.email.replace(/@.*/, ""),
+      displayName: user.displayName,
       url: user.getHomeUrl(),
       email: options.includeEmail ? user.email : undefined,
       avatarUrlSmall: getAvatarUrl('s'),
@@ -636,6 +636,7 @@ function InviteStrategy(options) {
       oneToOneInvite: troupe ? false : true,
       fromUser: fromUser,
       user: user,
+      email: item.email,
       acceptUrl: troupe ? '/' + troupe.uri : fromUser.url,
       name: troupe ? troupe.name : fromUser.displayName,
       v: getVersion(item)
@@ -658,11 +659,6 @@ function TroupeUserStrategy(options) {
 
 function TroupeStrategy(options) {
   if(!options) options = {};
-
-  var stack;
-  if(!options.currentUserId) {
-    stack = new Error().stack;
-  }
 
   var currentUserId = options.currentUserId;
 
@@ -742,10 +738,8 @@ function TroupeStrategy(options) {
       if(currentUserId) {
         otherUser =  mapOtherUser(item.users);
       } else {
-        console.log('');
         if(!shownWarning) {
           winston.warn('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
-          winston.warn(stack.join('\n'));
           shownWarning = true;
         }
       }

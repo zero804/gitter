@@ -4,7 +4,10 @@ define([
   "use strict";
 
   var context = function() {
-    return window.troupeContext || {};
+    if(!window.troupeContext) {
+      window.troupeContext = {};
+    }
+    return window.troupeContext;
   };
 
   context.getTroupeId = function() {
@@ -44,6 +47,17 @@ define([
   context.getTroupe = function() {
     return context().troupe || {};
   };
+
+  context.popEvent = function(name) {
+    var events = context().events;
+    if(events) {
+      var i = events.indexOf(name);
+      if(i >= 0) {
+        events.splice(i, 1);
+        return true;
+      }
+    }
+  }
 
   return context;
 

@@ -2,18 +2,18 @@
 "use strict";
 
 var signupService = require("../services/signup-service");
-var troupeService = require('../services/troupe-service');
 var middleware = require("../web/middleware");
 var loginUtils = require('../web/login-utils');
 var winston = require('winston');
 var nconf = require('../utils/config');
-var promiseUtils = require('../utils/promise-utils');
 var isPhone = require('../web/is-phone');
+var contextGenerator = require('../web/context-generator');
 
 module.exports = {
 
     install: function(app) {
       app.get(nconf.get('web:homeurl'),
+        middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
         function(req, res, next) {
 
@@ -81,11 +81,12 @@ module.exports = {
               return;
             }
 
-            if (user.hasUsername()) {
+            if (user.hasPassword()) {
               res.relativeRedirect('/' + user.username);
             } else {
-              var template = isPhone(req.headers['user-agent']) ? 'mobile/homepage' : 'homepage';
-              res.render(template, { profileHasNoUsername: !user.username, userId: JSON.stringify(req.user.id) });
+              contextGenerator.generateMiniContext(req, function(err, troupeContext) {
+                res.render('complete-profile', { troupeContext: JSON.stringify(troupeContext) });
+              });
             }
           });
         });

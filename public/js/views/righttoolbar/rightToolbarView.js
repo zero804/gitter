@@ -8,10 +8,11 @@ define([
   'collections/instances/integrated-items',
   'collections/instances/troupes',
   'views/request/requestView',
+  'views/invite/inviteView',
   'views/file/fileView',
   'views/conversation/conversationView',
   'views/people/peopleCollectionView'
-], function(Backbone, Marionette, context, qq, rightToolbarTemplate, itemCollections, troupeCollections, RequestView, FileView, ConversationView, PeopleCollectionView) {
+], function(Backbone, Marionette, context, qq, rightToolbarTemplate, itemCollections, troupeCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView) {
   "use strict";
 
   return Backbone.Marionette.Layout.extend({
@@ -20,6 +21,7 @@ define([
 
     regions: {
       requests: "#request-roster",
+      invites: "#invite-roster",
       people: "#people-roster",
       files: "#file-list",
       conversations: ".frame-conversations"
@@ -28,6 +30,7 @@ define([
     events: {
       "click #people-header": "onPeopleHeaderClick",
       "click #request-header": "onRequestHeaderClick",
+      "click #invites-header": "onInvitesHeaderClick",
       "click #file-header": "onFileHeaderClick",
       "click #mail-header": "onMailHeaderClick"
     },
@@ -88,12 +91,16 @@ define([
 
       // reference collections
       var requestCollection = itemCollections.requests;
+      var invitesCollection = itemCollections.invites;
       var fileCollection = itemCollections.files;
       var conversationCollection = itemCollections.conversations;
       var userCollection = itemCollections.users;
 
       // Request View
       this.requests.show(new RequestView({ collection: requestCollection }));
+
+      // Invites View
+      this.invites.show(new InviteView({ collection: invitesCollection }));
 
       // File View
       this.files.show(new FileView({ collection: fileCollection }));
@@ -124,6 +131,10 @@ define([
 
     onRequestHeaderClick: function() {
       this.toggleRightPanel('request-list');
+    },
+
+    onInvitesHeaderClick: function() {
+      this.toggleRightPanel('invites-list');
     },
 
     onPeopleHeaderClick: function() {

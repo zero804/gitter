@@ -4,6 +4,25 @@ module.exports = function( grunt ) {
 
   var min = !grunt.option('disableMinifiedSource');
 
+  function createClosureConfig(name) {
+    return {
+      js: 'public-processed/js/' + name + '.js',
+      jsOutputFile: 'public-processed/js/' + name + '.min.js',
+      closurePath: 'build-scripts/closure-v20130722',
+      reportFile: 'output/' + name.replace(/\//g, '-') + '.report.txt',
+      options: {
+        //compilation_level: 'ADVANCED_OPTIMIZATIONS',
+        //compilation_level: 'WHITESPACE_ONLY',
+        compilation_level: 'SIMPLE_OPTIMIZATIONS',
+        language_in: 'ECMASCRIPT5_STRICT',
+        create_source_map: 'public-processed/js/' + name + '.min.js.map',
+//        define: [
+//        '"DEBUG=false"',
+//        '"UI_DELAY=500"'
+//        ],
+      }
+    };
+  }
 
   //
   // Grunt configuration:
@@ -23,24 +42,32 @@ module.exports = function( grunt ) {
       compile: {
         options: {
 
-          optimize: 'uglify2',
-          //optimize: 'none',
+          //optimize: 'uglify2',
+          optimize: 'none',
           //generateSourceMaps: true,
           preserveLicenseComments: true,
           //useSourceUrl: true,
-
 
           appDir: "public/",
           baseUrl: "js",
           dir: "public-processed/",
           mainConfigFile: 'public/templates/partials/require_config.hbs',
-
+          optimizeCss: "none",
+          inlineText: true,
+          pragmasOnSave: {
+              //removes Handlebars.Parser code (used to compile template strings) set
+              //it to `false` if you need to parse template strings even after build
+              //excludeHbsParser : true,
+              // kills the entire plugin set once it's built.
+              //excludeHbs: true,
+              // removes i18n precompiler, handlebars and json2
+              //excludeAfterBuild: true
+          },
           modules: [
               {
                 name: "core-libraries",
                 include: [
-                  "../repo/requirejs/requirejs",
-                  "utils/logrjs"
+                  "../repo/requirejs/requirejs"
                 ]
               },
               {
@@ -66,7 +93,7 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "router-mobile-chat",
+                  name: "routers/mobile/native/chat-router",
                   include: [
                     "utils/tracking",
                     "views/widgets/avatar",
@@ -75,7 +102,7 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "router-mobile-files",
+                  name: "routers/mobile/web/mobile-app-router",
                   include: [
                     "utils/tracking",
                     "views/widgets/avatar",
@@ -84,7 +111,25 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "router-mobile-conversations",
+                  name: "routers/mobile/native/files-router",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "routers/mobile/native/conversations-router",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "routers/mobile/native/people-router",
                   include: [
                     "utils/tracking",
                     "views/widgets/avatar",
@@ -111,16 +156,35 @@ module.exports = function( grunt ) {
                     }
                   }
               }
-          ],
+          ]
 
-          optimizeCss: "none",
-
-          // inlining ftw
-          inlineText: true,
-
-          logLevel: 1
         }
       }
+    },
+
+    'closure-compiler': {
+      'core-libraries': {
+            js: 'public-processed/js/core-libraries.js',
+            jsOutputFile: 'public-processed/js/core-libraries.min.js',
+            closurePath: 'build-scripts/closure-v20130722',
+            reportFile: 'output/core-libraries.report.txt',
+            options: {
+              //compilation_level: 'WHITESPACE_ONLY',
+              compilation_level: 'SIMPLE_OPTIMIZATIONS',
+              language_in: 'ECMASCRIPT3',
+              create_source_map: 'public-processed/js/core-libraries.min.js.map',
+            }
+          },
+      'signup': createClosureConfig('signup'),
+      'router-app': createClosureConfig('router-app'),
+      "router-homepage": createClosureConfig('router-homepage'),
+      "native-chat-router": createClosureConfig('routers/mobile/native/chat-router'),
+      "mobile-app-router": createClosureConfig('routers/mobile/web/mobile-app-router'),
+      "native-files-router": createClosureConfig('routers/mobile/native/files-router'),
+      "native-conversations-router": createClosureConfig('routers/mobile/native/conversations-router'),
+      "native-people-router": createClosureConfig('routers/mobile/native/people-router'),
+      "router-login": createClosureConfig('router-login'),
+      "login": createClosureConfig('login')
     },
 
     // headless testing through PhantomJS
@@ -197,9 +261,13 @@ module.exports = function( grunt ) {
         src: ['public-processed/js/router-app.js'],
         dest: 'public-processed/js/router-app.js'
       },
-      "router-mobile-chat": {
-        src: ['public-processed/js/router-mobile-chat.js'],
-        dest: 'public-processed/js/router-mobile-chat.js'
+      "chat-router": {
+        src: ['public-processed/js/routers/mobile/native/chat-router.js'],
+        dest: 'public-processed/js/routers/mobile/native/chat-router.js'
+      },
+      "mobile-app-router": {
+        src: ['public-processed/js/routers/mobile/web/mobile-app-router'],
+        dest: 'public-processed/js/routers/mobile/web/mobile-app-router'
       },
       "router": {
         src: ['public-processed/js/router.js'],
@@ -486,9 +554,9 @@ module.exports = function( grunt ) {
   grunt.loadNpmTasks('grunt-reload');
   grunt.loadNpmTasks('grunt-bower-require-wrapper');
   grunt.loadNpmTasks('grunt-wrap');
+  grunt.loadNpmTasks('grunt-closure-compiler');
 
-
-  grunt.registerTask('process', ['exec:validateConfig','clean','less','copy','requirejs','exec:manifest','exec:gzip']);
+  grunt.registerTask('process', ['exec:validateConfig','clean','less','copy','requirejs', 'closure-compiler', 'exec:manifest','exec:gzip']);
   grunt.registerTask('process-no-min', ['exec:validateConfig','clean','less','copy','requirejs','exec:manifest','exec:gzip']);
 
   grunt.registerTask('watchr', 'reload watch');

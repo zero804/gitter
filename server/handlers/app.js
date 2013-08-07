@@ -4,122 +4,21 @@
 var winston = require("winston");
 var userService = require("../services/user-service");
 var troupeService = require("../services/troupe-service");
-var restSerializer = require("../serializers/rest-serializer");
 var nconf = require('../utils/config');
 var middleware = require('../web/middleware');
-var oauthService = require("../services/oauth-service");
 var middleware = require('../web/middleware');
 var appVersion = require("../web/appVersion");
 var loginUtils = require('../web/login-utils');
 var uriService = require('../services/uri-service');
 var Q = require('q');
-var useFirebugInIE = nconf.get('web:useFirebugInIE');
 var isPhone = require('../web/is-phone');
-
-function serializeUser(user) {
-  var strategy = new restSerializer.UserStrategy({ includeEmail: true });
-
-  return restSerializer.serializeQ(user, strategy);
-}
-
-function serializeHomeUser(user, includeEmail) {
-  var strategy = new restSerializer.UserStrategy({ includeEmail: includeEmail, hideLocation: true });
-
-  return restSerializer.serializeQ(user, strategy);
-}
-
-
-function getWebToken(user) {
-  return oauthService.findOrGenerateWebToken(user.id);
-}
-
-function serializeTroupe(troupe, user) {
-  var strategy = new restSerializer.TroupeStrategy({ currentUserId: user ? user.id : null });
-
-  return restSerializer.serializeQ(troupe, strategy);
-}
-
-function fakeSerializedTroupe(uriContext) {
-  var oneToOne = uriContext.oneToOne;
-  var otherUser = uriContext.otherUser;
-  var troupe = uriContext.troupe;
-
-  var uri = (oneToOne ?  (otherUser.username || "one-one/" + otherUser.id ) : troupe.uri);
-
-  var url = "/" + uri;
-
-  return {
-    oneToOne: oneToOne,
-    uri: uri,
-    url: url,
-    name: otherUser && otherUser.username ? otherUser.username : 'Welcome'
-  };
-
-}
-
-
-
-function createTroupeContext(req, options) {
-
-  var disabledFayeProtocols = [];
-
-  var userAgent = req.headers['user-agent'];
-  userAgent = userAgent ? userAgent : '';
-
-  // Disable websocket on Mobile due to iOS crash bug
-  if(userAgent.indexOf('Mobile') >= 0) {
-    disabledFayeProtocols.push('websocket');
-  }
-
-  var useFirebug = useFirebugInIE && userAgent.indexOf('MSIE') >= 0;
-
-  return {
-      user: options.user,
-      troupe: options.troupe,
-      homeUser: options.homeUser,
-      inUserhome: options.inUserhome,
-      accessToken: options.accessToken,
-      loginToAccept: req.loginToAccept,
-      profileNotCompleted: options.profileNotCompleted,
-      accessDenied: options.accessDenied,
-      inviteId: options.inviteId,
-      mobilePage: req.params && req.params.mobilePage,
-      appVersion: appVersion.getCurrentVersion(),
-      baseServer: nconf.get('web:baseserver'),
-      basePort: nconf.get('web:baseport'),
-      basePath: nconf.get('web:basepath'),
-      homeUrl: nconf.get('web:homeurl'),
-      mixpanelToken: nconf.get("stats:mixpanel:token"),
-
-      troupeUri: options.troupe ? options.troupe.uri : undefined,
-      websockets: {
-        fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
-        options: {
-          timeout: nconf.get('ws:fayeTimeout'),
-          retry: nconf.get('ws:fayeRetry'),
-          interval: nconf.get('ws:fayeInterval')
-        },
-        disable: disabledFayeProtocols
-      },
-      useFirebug: useFirebug
-  };
-}
-
+var contextGenerator = require('../web/context-generator');
 
 function renderHomePage(req, res, next) {
-  var user = req.user;
-
-
-  Q.all([ serializeUser(user), getWebToken(user) ])
-    .spread(function(serializedUser, token) {
-      var profileNotCompleted = user.status == 'PROFILE_NOT_COMPLETED';
-      var troupeContext = createTroupeContext(req, {
-        user: serializedUser,
-        accessToken: token,
-        profileNotCompleted: profileNotCompleted,
-        inUserhome: true
-      });
-
+  contextGenerator.generateMiniContext(req, function(err, troupeContext) {
+    if(err) {
+      next(err);
+    } else {
       res.render('app-template', {
         useAppCache: !!nconf.get('web:useAppCache'),
         bootScriptName: 'router-homepage',
@@ -128,58 +27,32 @@ function renderHomePage(req, res, next) {
         troupeContextData: troupeContext,
         agent: req.headers['user-agent']
       });
-    })
-    .fail(next);
-
-
+    }
+  });
 }
 
 function renderAppPageWithTroupe(req, res, next, page) {
   var user = req.user;
-  var troupe = req.uriContext.troupe;
-  var invite = req.uriContext.invite;
-  var homeUser = req.uriContext.oneToOne && req.uriContext.otherUser; // The users page being looked at
   var accessDenied = !req.uriContext.access;
 
-  Q.all([
-    user ? serializeUser(user) : null,
-    homeUser ? serializeHomeUser(homeUser, !!invite) : undefined, //include email if the user has an invite
-    user ? getWebToken(user) : null,
-    troupe && user ? serializeTroupe(troupe, user) : fakeSerializedTroupe(req.uriContext) ])
-    .spread(function(serializedUser, serializedHomeUser, token, serializedTroupe) {
-
-      var status, profileNotCompleted;
-      if(user) {
-        status = user.status;
-        profileNotCompleted = (status == 'PROFILE_NOT_COMPLETED') || (status == 'UNCONFIRMED');
-      }
-
-      var login = !user || profileNotCompleted || accessDenied;
-
-      var troupeContext = createTroupeContext(req, {
-        user: serializedUser,
-        homeUser: serializedHomeUser,
-        troupe: serializedTroupe,
-        accessToken: token,
-        profileNotCompleted: profileNotCompleted,
-        inviteId: invite && invite.id,
-        accessDenied: accessDenied
-      });
+  contextGenerator.generateTroupeContext(req, function(err, troupeContext) {
+    if(err) {
+      next(err);
+    } else {
+      var login = !user || troupeContext.profileNotCompleted || accessDenied;
 
       res.render(page, {
         useAppCache: !!nconf.get('web:useAppCache'),
         login: login,
         isWebApp: !req.params.mobilePage,
         bootScriptName: login ? "router-login" : "router-app",
-        troupeName: serializedTroupe.name,
+        troupeName: troupeContext.troupe.name,
         troupeContext: JSON.stringify(troupeContext),
         troupeContextData: troupeContext,
         agent: req.headers['user-agent']
       });
-
-    })
-    .fail(next);
-
+    }
+  });
 }
 
 function uriContextResolverMiddleware(req, res, next) {
@@ -396,19 +269,16 @@ module.exports = {
           if (req.uriContext.ownUrl) {
             return renderHomePage(req, res, next);
           }
+
           if(req.isPhone) {
+            // TODO: this should change from chat-app to a seperate mobile app
             renderAppPageWithTroupe(req, res, next, 'mobile/chat-app');
           } else {
             renderAppPageWithTroupe(req, res, next, 'app-template');
           }
         });
 
-
-
-
-
       function acceptInviteWithoutConfirmation(req, res, next) {
-
         var appUri = req.params.appUri || 'one-one/' + req.params.userId;
 
         if(!req.user) {
@@ -442,11 +312,13 @@ module.exports = {
       }
 
       app.get('/:appUri/accept/',
+        middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
         uriContextResolverMiddleware,
         acceptInviteWithoutConfirmation);
 
       app.get('/one-one/:userId/accept/',
+        middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
         preloadOneToOneTroupeMiddleware,
         acceptInviteWithoutConfirmation);
@@ -490,10 +362,12 @@ module.exports = {
       }
 
       app.get('/:appUri/accept/:confirmationCode',
+        middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
         acceptInviteWithConfirmation);
 
       app.get('/one-one/:userId/accept/:confirmationCode',
+        middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
         acceptInviteWithConfirmation);
     }

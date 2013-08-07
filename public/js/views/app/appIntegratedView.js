@@ -6,7 +6,8 @@ define([
   'marionette',
   'views/signup/usernameView',
   'views/app/uiVars',
-  "nanoscroller" // no ref
+  'bootstrap_tooltip',  // no ref
+  "nanoscroller"        // no ref
   ], function($, context, log, Marionette, UsernameView, uiVars) {
   "use strict";
 
