@@ -5,14 +5,9 @@
 var testRequire = require('./../test-require');
 var fixtureLoader = require('../test-fixtures');
 
-var sec = require('sechash');
 var userService = testRequire('./services/user-service');
 var signupService = testRequire('./services/signup-service');
 var assert = testRequire("assert");
-
-var mockito = require('jsmockito').JsMockito;
-var times = mockito.Verifiers.times;
-var once = times(1);
 
 var fixture = {};
 var fixture2 = {};
@@ -87,7 +82,7 @@ describe("User Service", function() {
   describe("#saveLastVisitedTroupeforUser", function() {
     it('should record the time each troupe was last accessed by a user', function(done) {
 
-      userService.saveLastVisitedTroupeforUser(fixture.user1.id, fixture.troupe1, function(err) {
+      userService.saveLastVisitedTroupeforUser(fixture.user1, fixture.troupe1, function(err) {
         if(err) return done(err);
 
         userService.getTroupeLastAccessTimesForUser(fixture.user1.id, function(err, times) {
@@ -97,7 +92,7 @@ describe("User Service", function() {
           var after = times[troupeId];
           assert(after, 'Expected a value for last access time');
 
-          userService.saveLastVisitedTroupeforUser(fixture.user1.id, fixture.troupe1, function(err) {
+          userService.saveLastVisitedTroupeforUser(fixture.user1, fixture.troupe1, function(err) {
             if(err) return done(err);
 
             userService.getTroupeLastAccessTimesForUser(fixture.user1.id, function(err, times) {
@@ -118,7 +113,6 @@ describe("User Service", function() {
 
     it('should find testuser by username', function(done) {
 
-      var statsServiceMock = mockito.spy(testRequire('./services/stats-service'));
       var userService = testRequire("./services/user-service");
 
       var count = 0;
@@ -139,7 +133,6 @@ describe("User Service", function() {
 
 
     it('should find testuser@troupetest.local by email', function(done) {
-      var statsServiceMock = mockito.spy(testRequire('./services/stats-service'));
       var userService = testRequire("./services/user-service");
 
       var email = 'testuser@troupetest.local';
