@@ -1,8 +1,9 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-define([
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
+require([
+  'utils/context',
   'views/profile/profileView',
   'views/signup/usernameView'
-  ], function(ProfileView, UsernameView) {
+  ], function(context, ProfileView, UsernameView) {
   "use strict";
 
   var getDisplayNamePasswordModal = function(username) {
@@ -13,9 +14,11 @@ define([
     return modal;
   };
 
-  if(window.troupeContext.user.username) {
+  var existingUsername = context.getUser().username;
 
-    var namePasswordModal = getDisplayNamePasswordModal(window.troupeContext.user.username);
+  if(existingUsername) {
+
+    var namePasswordModal = getDisplayNamePasswordModal(existingUsername);
     namePasswordModal.show();
 
   } else {
