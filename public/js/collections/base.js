@@ -156,6 +156,7 @@ define([
       realtime.registerForSnapsnots(this.url, function(snapshot) {
         self.set(snapshot, { parse: true, remove: true, add: true, merge: true });
         self._onInitialLoad();
+        self.trigger('sync');
       });
 
       this.subscription.errback(function(error) {
