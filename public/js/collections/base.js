@@ -154,7 +154,8 @@ define([
       });
 
       realtime.registerForSnapsnots(this.url, function(snapshot) {
-        self.reset(snapshot, { parse: true });
+        self.set(snapshot, { parse: true, remove: true, add: true, merge: true });
+        self._onInitialLoad();
       });
 
       this.subscription.errback(function(error) {
