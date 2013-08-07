@@ -6,6 +6,7 @@
 
 .trpChatContainer {
 	padding-bottom: 75px;
+  text-align: center;
 }
 
 .trpChatInputBox {
@@ -43,12 +44,14 @@
 .trpChatItem {
 	display: inline-block;
 	margin-bottom: 16px;
-	display: block;
 	clear: left;
+  width: 100%;
+  max-width: 66em;
+  text-align: left;
 }
 
 .trpChatBox {
-	background-color: white;
+	background-color: @trpBgColor;
 	min-height: 24px;
 	vertical-align: top;
 	border-radius: 5px 5px 5px 5px;
@@ -57,7 +60,6 @@
 	line-height: 150%;
 	margin-left: 64px;
 	color: #333;
-  max-width: 380px;
 }
 
 .view .trpChatBox {
@@ -87,7 +89,6 @@
 
 .trpChatDetails{
   display: block;
-  max-width: 400px;
   color: #D6D6D6;
   font-size: 12px;
   margin: 0;
@@ -173,7 +174,6 @@
 	margin: 0;
 	padding: 0;
   word-wrap: break-word;
-  max-width: 380px;
 }
 
 .frame-chat {

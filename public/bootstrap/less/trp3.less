@@ -28,13 +28,21 @@ html {
 body {
 	min-height: 100%;
 	margin: 0;
-	background-color: #ecf1ec;
+	background-color: white;
 	overflow-x: hidden;
 }
 
 a {
 	text-decoration: none;
 	color: #333;
+}
+
+div {
+/*	transform: translate3d(0, 0, 0);
+	transition:all .1s ease-in-out; 
+    -o-transition:all .1s ease-in-out; 
+    -moz-transition:all .1s ease-in-out; 
+    -webkit-transition:all .1s ease-in-out;*/
 }
 
 
@@ -109,7 +117,7 @@ a:hover {
 	display: inline-block;
 	position: fixed;
 	width: 280px;
-	left: -280px;
+	left: -196px;
 	top: 0px;
 	background-color: @trpGreen;
 	height: 100%;
@@ -118,6 +126,21 @@ a:hover {
 	border-right: 2px solid @trpGreen;
 	padding-top: 18px;
 	margin-top: 0px;
+/*	transition:all .5s linear; 
+	-o-transition:all .5s linear; 
+	-moz-transition:all .5s linear; 
+	-webkit-transition:all .5s linear;*/
+}
+
+.trpMiniLeftMenu {
+	padding-top: 20px;
+	background-color: #373435;
+	width: 84px;
+	position: fixed;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	z-index: 1013;
 }
 
 .trpLeftMenu .nano {
@@ -464,9 +487,9 @@ a:hover {
 }
 
 .trpChatPanel {
-  display: inline-block;
-	min-width: 700px;
-	max-width: 700px;
+  display: block;
+	margin-left: 160px;
+	margin-right: 300px;
 /*	min-height: 600px;
 	height: 100%;*/
 	text-align: left;
@@ -477,14 +500,15 @@ a:hover {
 .trpToolbar {
   position: fixed;
   display: inline-block;
-  min-width: 200px;
-  max-width: 200px;
+  width: 240px;
   text-align: left;
-  margin-top: 40px;
+  padding-top: 60px;
   vertical-align: top;
-  margin-left: -200px;
-  top: 55px;
-  bottom: 85px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: @trpBgColor;
+  z-index: 1600;
 }
 
 .trpToolbar .nano {
@@ -498,8 +522,9 @@ a:hover {
 
 .trpToolbarContent {
   display: inline-block;
-	width: 200px;
-	vertical-align: top;
+  width: 100%;
+  vertical-align: top;
+  padding-left: 20px;
 }
 
 .trpToolbarHeader {
@@ -524,15 +549,17 @@ a:hover {
 	position: fixed;
 	width: 240px;
 	right: -240px;
-	top: 60px;
+	top: 0px;
+	bottom: 0px;
 	overflow: hidden;
 	color: white;
 	font-size: 20px;
 	z-index: 12;
 	background-color: #ecf1ec;
-	padding-top: 40px;
+	padding-top: 80px;
 	display: none;
 	text-align: left;
+	z-index: 1400;
 }
 
 .trpItemDetails {
@@ -747,3 +774,36 @@ a:hover {
 .canLeave #leave-troupe {
 	display: inline-block;
 }
+
+@media screen and (max-width: 1200px) {
+	.trpChatPanel {
+		margin-right: 280px;
+	}
+}
+
+@media screen and (max-width:1024px) { 
+
+
+	.trpToolbar {
+		width: 88px;
+	}
+
+	.trpChatPanel {
+		margin-left: 110px;
+		margin-right: 120px;
+	}
+
+	.trpChatItem .avatar-s {
+		width: 24px;
+		height: 24px;
+	}
+
+	.trpChatBox {
+		margin-left: 40px;
+	}
+
+	#request-roster, #invite-roster, #file-list, #mail-list, #people-share-troupe-button {
+		display: none;
+	}
+
+	}
