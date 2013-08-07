@@ -2,18 +2,17 @@
 "use strict";
 
 var signupService = require("../services/signup-service");
-var troupeService = require('../services/troupe-service');
 var middleware = require("../web/middleware");
 var loginUtils = require('../web/login-utils');
 var winston = require('winston');
 var nconf = require('../utils/config');
-var promiseUtils = require('../utils/promise-utils');
 var isPhone = require('../web/is-phone');
 
 module.exports = {
 
     install: function(app) {
       app.get(nconf.get('web:homeurl'),
+        middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
         function(req, res, next) {
 

@@ -1,17 +1,17 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'require',
   'jquery',
-  'jquery-migrate',
   'underscore',
   'backbone',
   'marionette',
   'hbs!./tmpl/modal',
   'hbs!./tmpl/popover',
   'hbs!./tmpl/loading',
-  '../template/helpers/all',
   'hbs!./tmpl/confirmationView',
-  'log!base-views'
-], function($, $mig, _, Backbone, Marionette, modalTemplate, popoverTemplate, loadingTemplate, helpers, confirmationViewTemplate, log) {
+  'log!base-views',
+  '../template/helpers/all' // No ref
+], function(require, $, _, Backbone, Marionette, modalTemplate, popoverTemplate, loadingTemplate, confirmationViewTemplate, log) {
   "use strict";
 
   /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
@@ -691,10 +691,6 @@ define([
     appendHtml: function(collectionView, itemView, index) {
       log("Inserting view at index ", index, " of ", collectionView.collection.length, " in collection ", collectionView.collection.url, "; itemView ", itemView.model.attributes, ((this.isRendering) ? " with rendering shortcut" : ''));
 
-      if(window.debugSortableMarionette) {
-        debugger;
-      }
-
       // Shortcut - just place at the end!
       if (this.isRendering) {
         // if this is during rendering, then the views always come in sort order, so just append
@@ -707,7 +703,8 @@ define([
 
       if (index === 0) {
         // find the view that comes after the first one (sometimes there will be a non view that is the first child so we can't prepend)
-        adjView = findViewAtPos(1);
+        adjView = findViewAfter(0);
+
         if (adjView) {
           itemView.$el.insertBefore(adjView.el);
         } else {
@@ -731,7 +728,8 @@ define([
       } else {
         // It could be the case that n-1 has not yet been inserted,
         // so we try find whatever is at n+1 and insert before
-        adjView = findViewAtPos(index + 1);
+        adjView = findViewAfter(index);
+
         if(adjView) {
           itemView.$el.insertBefore(adjView.el);
         } else {
@@ -741,6 +739,19 @@ define([
           // just give up and insert at the end. (hopefully this will never happen eh?)
           itemView.$el.appendTo(collectionView.el);
         }
+      }
+
+      function findViewAfter(i) {
+        var nearestI = 1;
+        var adjView = findViewAtPos(i + 1);
+
+        // find the nearest view that comes after this view
+        while (!adjView && ((i + nearestI + 1) < collectionView.collection.length - 1)) {
+          nearestI += 1;
+          adjView = findViewAtPos(i + nearestI);
+        }
+
+        return adjView;
       }
 
       function findViewAtPos(i) {
