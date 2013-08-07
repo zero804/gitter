@@ -14,8 +14,9 @@ define([
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
+  'oEmbed',
   'bootstrap_tooltip'
-], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate, chatInputView, UnreadItemViewMixin /* tooltip*/) {
+], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate, chatInputView, UnreadItemViewMixin, oEmbed /* tooltip*/) {
 
   "use strict";
 
@@ -113,6 +114,18 @@ define([
       if (!window._troupeCompactView) {
         this.$el.find('.trpChatEdit [title]').tooltip({ container: 'body' });
       }
+
+      // TODO: send the URL's from the server? twitter-text etc
+      oEmbed.defaults.maxwidth = 370;
+      var self = this;
+      this.$el.find('.link').each(function(index, el) {
+        oEmbed.parse(el.href, function(embed) {
+          if (embed) {
+            $(el).append('<div class="embed">' + embed.html + '</div>');
+            self.scrollDelegate.scrollToBottom();
+          }
+        });
+      });
     },
 
     detectKeys: function(e) {
