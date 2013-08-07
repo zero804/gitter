@@ -11,11 +11,11 @@ define(function() {
   }
 
   function consoleLog(msg) {
+    console.log.apply(console, Array.prototype.slice.apply(arguments));
+
     history.push(Array.prototype.join.call(arguments, ', '));
     if(history.length > 500)
       history.shift();
-
-    console.log.apply(console, Array.prototype.slice.apply(arguments));
   }
 
   if (typeof console == "undefined") return nullLog;
