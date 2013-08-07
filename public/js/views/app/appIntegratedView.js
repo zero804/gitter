@@ -26,8 +26,10 @@ define([
     "mouseenter #toolbar-frame":        "onMouseEnterToolbar",
     "mouseleave #toolbar-frame":        "onMouseLeaveToolbar",
     "mouseleave #header-wrapper":       "onMouseLeaveHeader",
-
-    "keypress":                         "onKeyPress"
+    "keypress":                         "onKeyPress",
+    "click #user-icon":                 "toggleMenu",
+    "click #search-icon":                 "toggleMenu",
+    "click #troupe-icon":                 "toggleMenu"
   };
 
   $('.trpDisplayPicture').tooltip('destroy');
@@ -105,9 +107,17 @@ define([
     hidePanel: function (whichPanel) {
 
       $(whichPanel).animate({
-        right: uiVars.hidePanelValue
+        right: '-240px'
       }, 350, function() {
-        $(whichPanel).hide();
+
+      });
+      $("#toolbar-frame").animate({
+        right: '0px'
+        }, 350, function() {
+      });
+      $("#chat-frame").animate({
+        marginRight: '320px'
+        }, 350, function() {
       });
 
       if ($(document).width() < 1250) {
@@ -123,6 +133,14 @@ define([
     showPanel: function(whichPanel) {
       if (!this.rightpanel) {
         $(whichPanel).show();
+        $("#toolbar-frame").animate({
+          right: '240px'
+          }, 350, function() {
+        });
+        $("#chat-frame").animate({
+          marginRight: '560px'
+          }, 350, function() {
+        });
         $(whichPanel).animate({
           right: '0px'
         }, 350, function() {
@@ -155,37 +173,19 @@ define([
 
       if ($(window).width() < 1250) {
 
-        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
+        $("#left-menu, #content-frame").animate({
           left: "+=280px"
-        }, 350);
+        }, 300);
 
-
-        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
-          left: "+=280px"
-        }, 350);
-
-        $("#right-panel").animate({
-          right: "-=280px"
-        }, 350);
       }
 
       else {
-        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
+        $("#left-menu, #content-frame").animate({
           left: "+=280px"
-        }, 350);
+        }, 300);
 
-
-        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
-          left: "+=180px"
-        }, 350);
-
-        $("#right-panel").animate({
-          right: "-=280px"
-        }, 350);
       }
 
-
-      $("left-menu-hotspot").hide();
       this.leftmenu = true;
     },
 
@@ -198,36 +198,18 @@ define([
 
 
       if ($(window).width() < 1250) {
-        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
+        $("#left-menu, #content-frame").animate({
           left: "-=280px"
-        }, 350);
-
-
-        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
-          left: "-=280px"
-        }, 350);
-
-        $("#right-panel").animate({
-          right: "+=280px"
-        }, 350);
+        }, 100);
       }
 
       else {
-        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
+        $("#left-menu, #content-frame").animate({
           left: "-=280px"
-        }, 350);
+        }, 100);
 
-
-        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
-          left: "-=180px"
-        }, 350);
-
-        $("#right-panel").animate({
-          right: "+=280px"
-        }, 350);
       }
 
-      $("left-menu-hotspot").hide();
       this.leftmenu = false;
     },
 
