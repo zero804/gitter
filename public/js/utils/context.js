@@ -4,7 +4,10 @@ define([
   "use strict";
 
   var context = function() {
-    return window.troupeContext || {};
+    if(!window.troupeContext) {
+      window.troupeContext = {};
+    }
+    return window.troupeContext;
   };
 
   context.getTroupeId = function() {
