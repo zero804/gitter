@@ -16,7 +16,7 @@ exports.bootScript = function(url, parameters) {
   var requireScript;
   var cdn      = (options.skipCdn) ? function(a) { return '/' + a; } : exports.cdn;
   var skipCore = options.skipCore;
-  var minified = minified in options ? options.minified : minifiedDefault;
+  var minified = 'minified' in options ? options.minified : minifiedDefault;
 
   var baseUrl = cdn("js/");
 
