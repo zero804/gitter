@@ -4,7 +4,7 @@ define([
   'jquery',
   'underscore',
   'utils/context',
-  'log!chat-collection-view',
+  'log!chat-item-view',
   'collections/chat',
   'views/widgets/avatar',
   'components/unread-items-client',
