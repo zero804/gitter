@@ -513,6 +513,11 @@ a:hover {
 	text-align: left;
 	padding-top: 40px;
 	border-radius: 5px;
+  transform: translate3d(0, 0, 0);
+  transition:all .3s ease-in-out; 
+  -o-transition:all .3s ease-in-out; 
+  -moz-transition:all .3s ease-in-out; 
+  -webkit-transition:all .3s ease-in-out;
 }
 
 .trpToolbar {
@@ -527,6 +532,11 @@ a:hover {
   bottom: 0;
   background-color: @trpBgColor;
   z-index: 1600;
+  transform: translate3d(0, 0, 0);
+  transition:all .3s ease-in-out; 
+  -o-transition:all .3s ease-in-out; 
+  -moz-transition:all .3s ease-in-out; 
+  -webkit-transition:all .3s ease-in-out;
 }
 
 .trpToolbar .nano {
@@ -824,4 +834,75 @@ a:hover {
 		display: none;
 	}
 
+}
+
+@media screen and (max-width:550px) { 
+
+
+	.trpToolbar {
+		width: 0;
+    transform: translate3d(0, 0, 0);
+    transition:all .3s ease-in-out; 
+    -o-transition:all .3s ease-in-out; 
+    -moz-transition:all .3s ease-in-out; 
+    -webkit-transition:all .3s ease-in-out;
 	}
+
+  .trpChatAvatar {
+    margin-left: 10px;
+    margin-top: 8px;
+    margin-bottom: -8px;
+    transform: translate3d(0, 0, 0);
+    transition:all .3s ease-in-out; 
+    -o-transition:all .3s ease-in-out; 
+    -moz-transition:all .3s ease-in-out; 
+    -webkit-transition:all .3s ease-in-out;
+  }
+
+	.trpChatPanel {
+		margin-left: 100px;
+		margin-right: 10px;
+    transform: translate3d(0, 0, 0);
+    transition:all .3s ease-in-out; 
+    -o-transition:all .3s ease-in-out; 
+    -moz-transition:all .3s ease-in-out; 
+    -webkit-transition:all .3s ease-in-out;
+	}
+
+  .trpChatDetails {
+    margin-left: 24px;
+    transform: translate3d(0, 0, 0);
+    transition:all .3s ease-in-out; 
+    -o-transition:all .3s ease-in-out; 
+    -moz-transition:all .3s ease-in-out; 
+    -webkit-transition:all .3s ease-in-out;
+  }
+
+  .trpChatFrom {
+    color: #AAA;
+    transform: translate3d(0, 0, 0);
+    transition:all .3s ease-in-out; 
+    -o-transition:all .3s ease-in-out; 
+    -moz-transition:all .3s ease-in-out; 
+    -webkit-transition:all .3s ease-in-out;
+  }
+
+	.trpChatItem .avatar-s {
+		width: 16px;
+		height: 16px;
+    transform: translate3d(0, 0, 0);
+    transition:all .3s ease-in-out; 
+    -o-transition:all .3s ease-in-out; 
+    -moz-transition:all .3s ease-in-out; 
+    -webkit-transition:all .3s ease-in-out;
+	}
+
+	.trpChatBox {
+		margin-left: 0px;
+	}
+
+	#request-roster, #invite-roster, #file-list, #mail-list, #people-share-troupe-button {
+		display: none;
+	}
+
+}
