@@ -28,13 +28,15 @@ define([
       // [ { userId: }, or { email: } ]
       this.invites = [];
 
-      if (options.overrideContext === true) {
+      if (options && options.overrideContext === true) {
         this.data = {
           inviteToTroupe: options.inviteToTroupe,
           inviteToConnect: options.inviteToConnect,
 
           troupe: options.troupe ? options.troupe : context.getTroupe(),
-          user: options.user ? options.user : context.getUser()
+          user: options.user ? options.user : context.getUser(),
+          importedGoogleContacts: context().importedGoogleContacts
+
           // , inviteUser: options.inviteUser
         };
       }
@@ -44,15 +46,19 @@ define([
           inviteToConnect: context.inUserhomeContext(),
 
           troupe: context.getTroupe(),
-          user: context.getUser()
+          user: context.getUser(),
+          importedGoogleContacts: context().importedGoogleContacts
         };
       }
+
 
       if (this.data.inviteToTroupe && !this.data.troupe) throw new Error("Need a troupe");
       if (this.data.inviteToConnect && !this.data.user) throw new Error("Need a viewer");
 
       this.data.uri = (this.data.inviteToTroupe) ? this.data.troupe.uri : this.data.user.username;
       this.data.basePath = context().basePath;
+      this.data.returnToUrl = encodeURIComponent(window.location.pathname + window.location.hash);
+
       this.addCleanup(function() {
         if(this.clip) this.clip.destroy();
       });
@@ -61,6 +67,20 @@ define([
     afterRender: function() {
       this.createTypeahead();
       this.validate();
+      var invites = this.options.invites;
+      if (invites) {
+        for (var a = 0; a < invites.length; a++) {
+          invites[a].toString = this.itemToString;
+          this.selectPerson(invites[a]);
+        }
+      }
+
+      if(context.popEvent('google_import_complete')) {
+        var that = this;
+        setTimeout(function(){
+          that.$el.find('#import-success').slideDown();
+        },750);
+      }
     },
 
     createClipboard : function() {
@@ -117,43 +137,38 @@ define([
     createTypeahead: function() {
       var self = this;
       var sources = {}, source;
-
       this.$el.find('input[name=inviteSearch]').typeahead({
         source: function(query, process) {
-          if(sources[query]) {
-            source = sources[query];
-            // process(source); not needed
-            return sources[query];
-          }
 
-          var emptyPreviously = _.some(sources, function(v,k) {
-            return query.toLowerCase().indexOf(k.toLowerCase()) === 0 && v.length <= 1;
-          });
+          source = sources[query] = sources[query] || [];
 
-          if(emptyPreviously) {
-            // a previous search with a shorter matching query has returned no results.
-            // don't fetch.
-            source = sources[query] = [];
-            addEmailOption(source, query);
-            installToString(source);
-            process(source);
-            return;
-          }
+          if(sources[query].length > 0) return source;
 
-          // fetch from server
-          var url = '/user';
+          addEmailOption(source, query);
+
+          // Search users
           var urlData = { excludeTroupeId: context.getTroupeId(), q: query };
           $.ajax({ url: '/user', data: urlData, success:
             function(data) {
 
-              source = data.results || [];
-              sources[query] = source;
+              var results = data.results || [];
+              source = sources[query] = sources[query].concat(results);
 
-              addEmailOption(source, query);
               installToString(source);
               process(source);
             }
           });
+
+          // Search contacts
+          $.ajax({ url: '/contacts', data: {q: query}, success:
+            function(data) {
+              source = sources[query] = sources[query].concat(data.results);
+
+              installToString(source);
+              process(source);
+            }
+          });
+
         },
         sorter: function(items) {
           return _.sortBy(items, function(o) {
@@ -178,7 +193,8 @@ define([
             return '<span class="trpBodyMedium">' + match + '</strong>';
           });
 
-          var html = ((item.avatarUrlSmall) ? '<img src="'+item.avatarUrlSmall+'"  class="trpDisplayPicture avatar-xs trpSearchInviteResult" width="30"/>' : '') + '<span class="trpBodyMedium">' + str + '</span>';
+          var body = (item.email && item.displayName.indexOf('@') == -1) ? str + ' (' + item.email + ')' : str;
+          var html = ((item.avatarUrlSmall) ? '<img src="'+item.avatarUrlSmall+'"  class="trpDisplayPicture avatar-xs trpSearchInviteResult" width="30"/>' : '') + '<span class="trpBodyMedium">' + body + '</span>';
 
           return html;
         },
@@ -188,7 +204,7 @@ define([
           });
 
           // validate email address or accept existing user
-          if ((item && item.id) || self.valid()) {
+          if ((item && item.id) || (item && item.imported) || self.valid()) {
             self.selectPerson(item);
 
             return ''; // empty the search box
@@ -202,7 +218,8 @@ define([
       function addEmailOption(source, query) {
         if (self.valid()) {
           // add the query as an email address option
-          source.push({ email: query, displayName: query, avatarUrlSmall: '/avatarForEmail/'+query }); // note:  this will provide a diff avatar each key stroke, don't show it in the autocomplete!
+          // note:  this will provide a diff avatar each key stroke, don't show it in the autocomplete!
+          source.push({ email: query, displayName: query, avatarUrlSmall: '/avatarForEmail/'+query });
         } else {
           // add a non-selectable option which says continue typing an email address
           source.push({ displayName: "You can also type an email address to invite somebody new.", nonSelectable: true });
@@ -212,12 +229,14 @@ define([
       function installToString(source) {
         // install a toString function on each data item so it stores the id in the data-value element attribute
         _.each(source, function(item) {
-          item.toString = function() {
-            return this.id || this.email;
-          };
+          item.toString = self.itemToString;
         });
       }
 
+    },
+
+    itemToString: function() {
+      return this.id || this.email;
     },
 
     selectPerson: function(user) {
@@ -263,6 +282,7 @@ define([
       }
 
       var ajaxEndpoint = (this.data.inviteToTroupe) ? "/troupes/" + context.getTroupeId() + "/invites" : "/api/v1/inviteconnections";
+      var self = this;
 
       $.ajax({
         url: ajaxEndpoint,
@@ -274,8 +294,10 @@ define([
            if(data.failed) {
             return;
           }
-          $('.modal-content').hide();
-          $('.modal-success').show();
+          self.$el.find('#gmail-connect').hide();
+          self.$el.find('#import-success').hide();
+          self.$el.find('.modal-content').hide();
+          self.$el.find('.modal-success').show();
           // self.trigger('share.complete', data);
         }
       });
@@ -286,6 +308,11 @@ define([
 
   var Modal = TroupeViews.Modal.extend({
     initialize: function(options) {
+      if (options.inviteToConnect) {
+        options.title = "Connect with people on Troupe";
+      } else {
+        options.title = "Invite people to " + context.getTroupe().name;
+      }
       TroupeViews.Modal.prototype.initialize.apply(this, arguments);
       this.$el.addClass('trpInviteModal');
       this.view = new View(options);

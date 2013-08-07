@@ -9,11 +9,13 @@ define([
   'collections/users',
   'collections/chat',
   'collections/requests',
+  'collections/invites',
   'components/unread-items-client'
-], function($, _, Backbone, base, fileModels, conversationModels, userModels, chatModels, requestModels, unreadItemsClient) {
+], function($, _, Backbone, base, fileModels, conversationModels, userModels, chatModels, requestModels, inviteModels, unreadItemsClient) {
   "use strict";
 
   var requestCollection      = new requestModels.RequestCollection(null, { listen: true });
+  var troupeInvitesCollection= new inviteModels.TroupeInviteCollection(null, { listen: true });
   var chatCollection         = new chatModels.ChatCollection(null, { listen: true });
   var fileCollection         = new fileModels.FileCollection(null, { listen: true });
   var conversationCollection = new conversationModels.ConversationCollection(null, { listen: true });
@@ -52,6 +54,7 @@ define([
   return {
     chats: chatCollection,
     requests: requestCollection,
+    invites: troupeInvitesCollection,
     files: fileCollection,
     conversations: conversationCollection,
     users: userCollection

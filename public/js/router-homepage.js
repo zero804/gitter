@@ -11,6 +11,7 @@ require([
   'views/signup/createTroupeView',
   'views/app/userHeaderView',
   'views/toolbar/troupeMenu',
+  'views/invite/reinviteModal',
   'utils/router',
   'hbs!views/connect/tmpl/connectUserTemplate',
   'components/errorReporter',
@@ -18,7 +19,7 @@ require([
   'components/webNotifications',
   'template/helpers/all'
 ], function(Backbone, TroupeViews, loginRequestTemplate, shareSearchView, AppIntegratedView, UserHomeView, troupeCollections,
-  profileView, createTroupeView, UserHeaderView, TroupeMenuView, Router, connectUserTemplate /*, errorReporter , dozy, webNotifications,_Helpers,  _backboneKeys*/) {
+  profileView, createTroupeView, UserHeaderView, TroupeMenuView, InviteModal, Router, connectUserTemplate /*, errorReporter , dozy, webNotifications,_Helpers,  _backboneKeys*/) {
 
   "use strict";
 
@@ -110,6 +111,7 @@ require([
         { name: "profile",        re: /^profile$/,                viewType: profileView.Modal },
         { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal, collection: troupeCollections.troupes,   skipModelLoad: true },
         { name: "share",          re: /^share$/,                  viewType: shareSearchView.Modal },
+        { name: "reinvite",       re: /^reinvite\/(\w+)$/,        viewType: InviteModal,                  collection: troupeCollections.outgoingConnectionInvites, viewOptions: { overrideContext: true, inviteToConnect: true } },
         { name: "connect",          re: /^connect$/,              viewType: shareSearchView.Modal, viewOptions: { overrideContext: true, inviteToConnect: true } }
       ],
       appView: appView

@@ -89,9 +89,7 @@ define([
     return m.get('fromUser').id === context.getUserId();
   });
 
-  var outgoingConnectionInvites = filterInviteCollection(outgoingInvites, function(m) {
-    return !!m.get('oneToOneInvite');
-  });
+  var outgoingConnectionInvites = new inviteModels.ConnectionInviteCollection(null, { listen: true });
 
   var incomingConnectionInvites = filterInviteCollection(incomingInvites, function(m) {
     return !!m.get('oneToOneInvite');

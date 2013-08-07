@@ -10,51 +10,51 @@ var emailDomainWithAt = "@" + emailDomain;
 
 module.exports = {
   sendNewTroupeForExistingUser: function (user, troupe) {
-    var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri + "#|share";
+    var troupeLink = nconf.get("email:emailBasePath") + "/" + troupe.uri + "#|share";
 
     mailerService.sendEmail({
       templateFile: "newtroupe_email",
       to: user.email,
-      from: 'Troupe <hello@troupe.co>',
+      from: 'Troupe <support@troupe.co>',
       subject: "You created a new Troupe",
       data: {
         troupeName: troupe.name,
         troupeLink: troupeLink,
-        baseServerPath: nconf.get("web:basepath")
+        baseServerPath: nconf.get("email:emailBasePath")
       }
     });
   },
 
   sendRequestAcceptanceToUser: function(user, troupe) {
-    var troupeLink = nconf.get("web:basepath") + "/" + troupe.uri;
+    var troupeLink = nconf.get("email:emailBasePath") + "/" + troupe.uri;
 
     mailerService.sendEmail({
       templateFile: "requestacceptance",
       to: user.email,
-      from: 'Troupe <hello@troupe.co>',
+      from: 'Troupe <support@troupe.co>',
       subject: "You've been accepted into a Troupe",
       data: {
         troupeName: troupe.name,
         // note: this is not really a confirm link, just a link to the troupe
         confirmLink: troupeLink,
-        baseServerPath: nconf.get("web:basepath")
+        baseServerPath: nconf.get("email:emailBasePath")
       }
     });
   },
 
   sendConnectAcceptanceToUser: function(fromUser, toUser, troupe) {
-    var troupeLink = url.resolve(nconf.get("web:basepath"), troupe.url);
+    var troupeLink = url.resolve(nconf.get("email:emailBasePath"), troupe.url);
 
     mailerService.sendEmail({
       templateFile: "connectacceptance",
       to: fromUser.email,
-      from: 'Troupe <hello@troupe.co>',
+      from: 'Troupe <support@troupe.co>',
       subject: "Your invite has been accepted",
       data: {
         fromUser: fromUser,
         toUser: toUser,
         troupeLink: troupeLink,
-        baseServerPath: nconf.get("web:basepath")
+        baseServerPath: nconf.get("email:emailBasePath")
       }
     });
   },
@@ -62,16 +62,16 @@ module.exports = {
   sendPasswordResetForUser: function (user) {
     assert(user.passwordResetCode, 'User does not have a password reset code');
 
-    var resetLink = nconf.get("web:basepath") + "/reset/" + user.passwordResetCode;
+    var resetLink = nconf.get("email:emailBasePath") + "/reset/" + user.passwordResetCode;
 
     mailerService.sendEmail({
       templateFile: "resetemail",
       to: user.email,
-      from: 'Troupe <hello@troupe.co>',
+      from: 'Troupe <support@troupe.co>',
       subject: "You requested a password reset",
       data: {
         resetLink: resetLink,
-        baseServerPath: nconf.get("web:basepath")
+        baseServerPath: nconf.get("email:emailBasePath")
       }
     });
   },
@@ -79,15 +79,15 @@ module.exports = {
   sendConfirmationForNewUser: function (user) {
     assert(user.confirmationCode, 'User does not have a confirmation code');
 
-    var confirmLink = nconf.get("web:basepath") + "/confirm/" + user.confirmationCode;
+    var confirmLink = nconf.get("email:emailBasePath") + "/confirm/" + user.confirmationCode;
     mailerService.sendEmail({
       templateFile: "signupemail",
       to: user.email,
-      from: 'Troupe <hello@troupe.co>',
+      from: 'Troupe <support@troupe.co>',
       subject: "Welcome to Troupe, please confirm your email address",
       data: {
         confirmLink: confirmLink,
-        baseServerPath: nconf.get("web:basepath")
+        baseServerPath: nconf.get("email:emailBasePath")
       }
     });
   },
@@ -95,19 +95,19 @@ module.exports = {
   sendConfirmationForEmailChange: function (user) {
     assert(user.confirmationCode, 'User does not have a confirmation code');
 
-    var confirmLink = nconf.get("web:basepath") + "/confirm/" + user.confirmationCode;
+    var confirmLink = nconf.get("email:emailBasePath") + "/confirm/" + user.confirmationCode;
     var to = user.newEmail;
 
     mailerService.sendEmail({
       templateFile: "change-email-address",
       to: to,
-      from: 'Troupe <hello@troupe.co>',
+      from: 'Troupe <support@troupe.co>',
       subject: "Confirm new email address",
       data: {
         confirmLink: confirmLink,
         originalEmail: user.email,
         newEmail: user.newEmail,
-        baseServerPath: nconf.get("web:basepath")
+        baseServerPath: nconf.get("email:emailBasePath")
       }
     });
   },
@@ -119,10 +119,10 @@ module.exports = {
     mailerService.sendEmail({
       templateFile: "change-email-address-complete",
       to: [origEmail, newEmail],
-      from: 'Troupe <hello@troupe.co>',
+      from: 'Troupe <support@troupe.co>',
       subject: "Your email address has been successfully changed",
       data: {
-        baseServerPath: nconf.get("web:basepath"),
+        baseServerPath: nconf.get("email:emailBasePath"),
         originalEmail: origEmail,
         newEmail: newEmail
       }
@@ -135,14 +135,14 @@ module.exports = {
 
     var acceptLink;
     if(code) {
-      acceptLink = nconf.get("web:basepath") + "/" + troupe.uri + "/accept/" + code;
+      acceptLink = nconf.get("email:emailBasePath") + "/" + troupe.uri + "/accept/" + code;
     } else {
-      acceptLink = nconf.get("web:basepath") + "/" + troupe.uri;
+      acceptLink = nconf.get("email:emailBasePath") + "/" + troupe.uri;
     }
 
     mailerService.sendEmail({
       templateFile: "inviteemail",
-      from: senderDisplayName + '<hello@troupe.co>',
+      from: senderDisplayName + '<support@troupe.co>',
       to: email,
       subject: "You've been invited to join the " + troupe.name + " troupe",
       data: {
@@ -150,7 +150,7 @@ module.exports = {
         troupeName: troupe.name,
         acceptLink: acceptLink,
         senderDisplayName: senderDisplayName,
-        baseServerPath: nconf.get("web:basepath")
+        baseServerPath: nconf.get("email:emailBasePath")
       }
     });
   },
@@ -163,21 +163,21 @@ module.exports = {
 
     var acceptLink;
     if(code) {
-      acceptLink = nconf.get("web:basepath") + uri + "/accept/" + code;
+      acceptLink = nconf.get("email:emailBasePath") + uri + "/accept/" + code;
     } else {
-      acceptLink = nconf.get("web:basepath") + uri + "/accept/";
+      acceptLink = nconf.get("email:emailBasePath") + uri + "/accept/";
     }
 
     mailerService.sendEmail({
       templateFile: "invite_connect_email",
-      from: senderDisplayName + '<hello@troupe.co>',
+      from: senderDisplayName + '<support@troupe.co>',
       to: email,
       subject: senderDisplayName + " has invited you to connect on Troupe",
       data: {
         displayName: displayName,
         acceptLink: acceptLink,
         senderDisplayName: senderDisplayName,
-        baseServerPath: nconf.get("web:basepath")
+        baseServerPath: nconf.get("email:emailBasePath")
       }
     });
   }

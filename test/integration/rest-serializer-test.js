@@ -42,34 +42,6 @@ describe('restSerializer', function() {
       assert.equal(mappedUser.displayName, 'Test Testerson');
     });
 
-    it('should return the email username if the displyname hasnt been set', function() {
-
-      var user = {
-        displayName: '',
-        email: 't.testerson@testcorp.com',
-        location: {},
-        getHomeUrl: function(){}
-      };
-
-      var mappedUser = userStrategy.map(user);
-
-      assert.equal(mappedUser.displayName, 't.testerson');
-    });
-
-    it('should return the full email address if the displyname hasnt been set and the address is weird', function() {
-
-      var user = {
-        displayName: '',
-        email: 'whatisthisdotcom',
-        location: {},
-        getHomeUrl: function(){}
-      };
-
-      var mappedUser = userStrategy.map(user);
-
-      assert.equal(mappedUser.displayName, 'whatisthisdotcom');
-    });
-
   });
 
   before(fixtureLoader(fixture));

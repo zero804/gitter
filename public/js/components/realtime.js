@@ -2,10 +2,13 @@
 define([
   'jquery',
   'utils/context',
-  './fayeWrapper',
+  'faye',
   'log!realtime'
-], function($, context, FayeWrapper, log) {
+], function($, context, Faye, log) {
   "use strict";
+
+  Faye.Logging.logLevel = 'debug';
+  Faye.logger = log;
 
   var connected = false;
   var connectionProblemTimeoutHandle;
@@ -74,21 +77,30 @@ define([
   };
 
   var SnapshotExtension = function() {
-    this._data = {};
+    this._listeners = {};
   };
 
   SnapshotExtension.prototype.incoming = function(message, callback) {
     if(message.channel == '/meta/subscribe' && message.ext && message.ext.snapshot) {
-      this._data[message.subscription] = message.ext.snapshot;
+      var listeners = this._listeners[message.subscription];
+      var snapshot = message.ext.snapshot;
+
+      if(listeners) {
+        for(var i = 0; i < listeners.length; i++) { listeners[i](snapshot); };
+      }
     }
 
     callback(message);
   };
 
-  SnapshotExtension.prototype._snapshot = function(channel) {
-    var data = this._data[channel];
-    delete this._data[channel];
-    return data;
+  SnapshotExtension.prototype.registerForSnapshots = function(channel, listener) {
+    var list = this._listeners[channel];
+    if(list) {
+      list.push(listener);
+    } else {
+      list = [listener];
+      this._listeners[channel] = list;
+    }
   };
 
   var snapshotExtension = new SnapshotExtension();
@@ -109,8 +121,9 @@ define([
   };
 
   function createClient() {
-    var c;
-    if(window.troupeContext) c = window.troupeContext.websockets;
+    var c = context().websockets;
+    /*
+    if you find this, remove?
     if(!c) {
       log('Websockets configuration not found, defaulting');
       c = {
@@ -120,8 +133,9 @@ define([
         }
       };
     }
+    */
 
-    var client = new FayeWrapper(c.fayeUrl, c.options);
+    var client = new Faye.Client(c.fayeUrl, c.options);
 
     if(c.disable) {
       for(var i = 0; i < c.length; i++) {
@@ -191,8 +205,6 @@ define([
   // Give the initial load 5 seconds to connect before warning the user that there is a problem
   connectionProblemTimeoutHandle = window.setTimeout(connectionProblemTimeout, 5000);
 
-
-
   var client;
   function getOrCreateClient() {
     if(client) return client;
@@ -202,7 +214,8 @@ define([
 
   $(document).on('reawaken', function() {
     log('Recycling connection after reawaken');
-    if(client) client.recycle();
+
+    testConnection();
   });
 
   // Cordova events.... doesn't matter if IE8 doesn't handle them
@@ -210,44 +223,42 @@ define([
     document.addEventListener("deviceReady", function() {
       document.addEventListener("online", function() {
         log('realtime: online');
-        if(client) client.ping();
+        testConnection();
       }, false);
     }, false);
   }
 
+  function testConnection() {
+    /* Only test the connection if one has already been established */
+    if(!client) return;
+
+    client.publish('/ping', { });
+  }
 
 
   return {
     getClientId: function() {
-      var client = getOrCreateClient();
-      return client.getClientId();
-    },
-
-    getClientRef: function() {
-      return getOrCreateClient().getClientRef();
-    },
-
-    recycleConnection: function(conditionalClientRef) {
-      log('Recycling connection');
-      if(conditionalClientRef) {
-        getOrCreateClient().recycleConditional(conditionalClientRef);
-      } else {
-        getOrCreateClient().recycle();
-
-      }
-
+      return clientId;
     },
 
     subscribe: function(channel, callback, context) {
       return getOrCreateClient().subscribe(channel, callback, context);
     },
 
+    /**
+     * Gets Faye to do something that will invoke the connection
+     * Useful when we think the connection may be down, but Faye
+     * may not have realised it yet.
+     */
+    testConnection: testConnection,
+
     getClient: function() {
       return getOrCreateClient();
     },
 
-    getSnapshotFor: function(channel) {
-      return snapshotExtension._snapshot(channel);
+    registerForSnapsnots: function(channel, listener) {
+      return snapshotExtension.registerForSnapshots(channel, listener);
     }
+
   };
 });

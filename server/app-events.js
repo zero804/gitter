@@ -171,7 +171,17 @@ function bind(on) {
 
     onUserRemovedFromTroupe: function(callback) {
       on('userRemovedFromTroupe', callback);
+    },
+
+    batchUserBadgeCountUpdate: function(data) {
+      emit('batchUserBadgeCountUpdate', data);
+    },
+
+    onBatchUserBadgeCountUpdate: function(callback) {
+      on('batchUserBadgeCountUpdate', callback);
     }
+
+
   };
 }
 

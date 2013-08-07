@@ -153,12 +153,11 @@ define([
         self._onDataChange(message);
       });
 
-      this.subscription.callback(function() {
-
-        var snapshot = realtime.getSnapshotFor(self.url);
-        self.reset(snapshot, { parse: true });
-
-        if(callback) return callback();
+      realtime.registerForSnapsnots(this.url, function(snapshot) {
+        self.trigger('request');
+        self.set(snapshot, { parse: true, remove: true, add: true, merge: true });
+        self._onInitialLoad();
+        self.trigger('sync');
       });
 
       this.subscription.errback(function(error) {

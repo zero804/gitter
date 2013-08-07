@@ -56,9 +56,14 @@ batcher.listen(function(key, userIdStrings, done) {
 
 });
 
+/**
+ * Record items as having been read
+ * @return promise of nothing
+ */
 exports.recordItemsAsRead = function(userId, troupeId, items, callback) {
-  assert(userId);
-  if(!items.chat || !items.chat.length) return callback(); // Don't bother with anything other than chats for the moment
+  assert(userId, 'userId expected');
+  assert(items, 'items expected');
+  if(!items.chat || !items.chat.length) return callback && callback(); // Don't bother with anything other than chats for the moment
 
   var fiber = new Fiber();
 
@@ -67,8 +72,6 @@ exports.recordItemsAsRead = function(userId, troupeId, items, callback) {
     batcher.add('chat:' + troupeId + ':' + id, userId, fiber.waitor());
   });
 
-  fiber.all().then(function() {
-    callback();
-  }, callback);
+  return fiber.all().nodeify(callback);
 
 };

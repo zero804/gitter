@@ -15,6 +15,7 @@ var times = mockito.Verifiers.times;
 var never = mockito.Verifiers.never();
 var once = times(1);
 var twice = times(2);
+var thrice = times(3);
 
 var fixture = {};
 var fixture2 = {};
@@ -88,14 +89,24 @@ describe('signup-service', function() {
 
         mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
 
-        signupService.resendConfirmation({ email: nonExistingEmail }, function(err, user2) {
+
+        signupService.newSignupFromLandingPage({
+          email: nonExistingEmail
+        }, function(err, sameUser) {
           if(err) return done(err);
 
-          assert(user2.id === user.id, "Expected users to match for confirmation");
-
+          assert(user.id === sameUser.id, 'Expected a user');
           mockito.verify(emailNotificationServiceMock, twice).sendConfirmationForNewUser();
 
-          done();
+          signupService.resendConfirmation({ email: nonExistingEmail }, function(err, user2) {
+            if(err) return done(err);
+
+            assert(user2.id === user.id, "Expected users to match for confirmation");
+
+            mockito.verify(emailNotificationServiceMock, thrice).sendConfirmationForNewUser();
+
+            done();
+          });
         });
       });
     });

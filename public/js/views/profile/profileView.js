@@ -19,18 +19,17 @@ define([
     initialize: function(options) {
       _.bindAll(this, 'onFormSubmit', 'onPasswordChange');
       if (!options) return;
-      this.originalEmail = window.troupeContext.user.email;
+      this.originalEmail = context.getUser().email;
       this.existingUser = options.existingUser;
-      this.isExistingUser = !window.troupeContext.profileNotCompleted;
+      this.isExistingUser = !context().profileNotCompleted;
       if (this.compactView) $("#uvTab").hide();
     },
 
     getRenderData: function() {
       var d = {
-        user: window.troupeContext.user,
+        user: context.getUser(),
         existingUser: this.isExistingUser,
-        // displayName: this.existingUser ? window.troupeContext.user.displayName : ""
-        displayName: window.troupeContext.user.displayName
+        displayName: context.getUser().displayName
       };
       return d;
     },
@@ -70,14 +69,14 @@ define([
           // return false to cancel submit
           onComplete: function(id, fileName, response) {
             if(response.success) {
-              window.troupeContext.user.avatarUrlSmall = response.user.avatarUrlSmall;
-              window.troupeContext.user.avatarUrlMedium = response.user.avatarUrlMedium;
-              $(document).trigger('avatar:change', window.troupeContext.user);
+              context.getUser().avatarUrlSmall = response.user.avatarUrlSmall;
+              context.getUser().avatarUrlMedium = response.user.avatarUrlMedium;
+              $(document).trigger('avatar:change', context.getUser());
             } else {
               // TODO: deal with this!
             }
 
-            self.$el.find('#frame-profile').empty().append(new AvatarView({ user: window.troupeContext.user }).render().el);
+            self.$el.find('#frame-profile').empty().append(new AvatarView({ user: context.getUser() }).render().el);
 
           }
         }
@@ -179,13 +178,10 @@ define([
         type: "POST",
         success: function(data) {
           if(data.success) {
-            window.troupeContext.user.displayName = data.displayName;
-            if (that.compactView) {
-              window.location.href = "/ios-app";
-            }
-            else {
-              that.dialog.hide();
-            }
+            context.getUser().displayName = data.displayName;
+            that.trigger('submit.success');
+            that.dialog.hide();
+
             if (that.hasChangedEmail(newEmail)) {
               window.alert("Your address will be updated once you confirm the email sent to your new address.");
             }
@@ -196,7 +192,7 @@ define([
             }
             else if(data.authFailure) {
               that.$el.find('#oldPassword').val("");
-              window.alert("You old password is incorrect");
+              window.alert("Your old password is incorrect");
             }
           }
         }
@@ -206,9 +202,14 @@ define([
 
   var Modal = TroupeViews.Modal.extend({
     initialize: function(options) {
-      options.title = "Edit your profile";
+      options.title = context().profileNotCompleted ? "Complete your profile" : "Edit your profile";
       TroupeViews.Modal.prototype.initialize.apply(this, arguments);
       this.view = new View({ });
+
+      var self = this;
+      this.view.on('submit.success', function(username) {
+        self.trigger('submit.success', username);
+      });
     }
   });
 
