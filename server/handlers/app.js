@@ -230,7 +230,7 @@ function unauthenticatedPhoneRedirectMiddleware(req, res, next) {
 
 function saveLastTroupeMiddleware(req, res, next) {
   if(req.user && req.troupe) {
-    userService.saveLastVisitedTroupeforUser(req.user.id, req.troupe, function(err) {
+    userService.saveLastVisitedTroupeforUser(req.user, req.troupe, function(err) {
       if (err) winston.info("Something went wrong saving the user last troupe visited: ", { exception: err });
       next();
 
