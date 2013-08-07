@@ -51,3 +51,4 @@ test/end-to-end/ios/ios-driver.log.lck
 v8.log
 *.swp
 *.swo
+.idea

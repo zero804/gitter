@@ -8,17 +8,13 @@ var fs = require("fs");
 
 var cdnPrefix, cdnPrefixFile = nconf.get("cdn:prefixFile");
 
+if(cdnPrefixFile) {
+  cdnPrefix = "/s/" + ("" + fs.readFileSync(cdnPrefixFile)).substring(0,6).trim();
+} else {
+  cdnPrefix = "";
+}
+
 function getCurrentVersion() {
-
-  if (!cdnPrefix) {
-    if(cdnPrefixFile) {
-      cdnPrefix = "/s/" + ("" + fs.readFileSync(cdnPrefixFile)).trim();
-    }
-    else {
-      cdnPrefix = "";
-    }
-  }
-
   return cdnPrefix;
 }
 
