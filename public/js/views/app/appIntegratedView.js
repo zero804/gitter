@@ -94,7 +94,7 @@ define([
     },
 
     ensureProfileIsUsernamed: function() {
-      var user = context.getUser().username;
+      var user = context.getUser();
       if (user.username === null /* not undefined, in which case the user has not yet loaded */) {
         new UsernameView.Modal().show();
       }
