@@ -57,7 +57,7 @@ define([
       return {
         headerTitle: troupe && troupe.name || user.name,
         isTroupe: !!troupe,
-        troupeContext: troupe,
+        oneToOne: context.inOneToOneTroupeContext(),
         user: user
       };
 
@@ -69,7 +69,7 @@ define([
 
     getTitlebar: function(counts) {
       var mainTitle;
-      if (context.getTroupe().name) {
+      if (context.getTroupe()) {
         mainTitle = context.getTroupe().name + " - Troupe";
       } else {
         mainTitle = "Troupe";
