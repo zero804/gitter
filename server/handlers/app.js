@@ -48,7 +48,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
       res.render(page, {
         appCache: getAppCache(req),
         login: login,
-        isWebApp: !req.params.mobilePage,
+        isWebApp: !req.params.mobilePage, // TODO: fix this!
         bootScriptName: login ? "router-login" : "router-app",
         troupeName: troupeContext.troupe.name,
         troupeContext: troupeContext,
@@ -124,7 +124,6 @@ function renderMiddleware(template, mobilePage) {
 
 function redirectToNativeApp(page) {
   return function(req, res) {
-    console.log('REDIRECTING TO ' + '/mobile/' + page + '#' + req.troupe.id);
     res.relativeRedirect('/mobile/' + page + '#' + req.troupe.id);
   };
 }

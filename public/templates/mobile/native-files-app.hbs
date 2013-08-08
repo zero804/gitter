@@ -6,11 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
 	<meta charset="utf-8">
 
-	<title>{{troupeName}} - Troupe</title>
+	<title>Loading...</title>
 
   <link rel="stylesheet" href='/bootstrap/css/trpMobileFiles.css'>
 
-  {{{ generateTroupeContext troupeContext }}}
+  {{{ generateTroupeContext troupeContext accessToken=accessToken page='files' }}}
 
   {{>require_wrapper}}
   {{{bootScript "routers/mobile/native/files-router" }}}

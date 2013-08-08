@@ -10,7 +10,6 @@ require([
   'views/file/fileDetailView',
   'collections/files',
   'views/file/mobileFilePreview',
-  'components/mobile-context',        // No ref
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
   'template/helpers/all',             // No ref
@@ -18,11 +17,19 @@ require([
 ], function($, _, Backbone, context, MobileRouter, TroupeViews, FileView, FileDetailView, fileModels, MobileFilePreview) {
   /*jslint browser: true, unused: true */
   "use strict";
-
+  console.log(window.location);
   // TODO: normalise this
   var troupeId = window.location.hash.substring(1);
   context.setTroupeId(troupeId);
   window.location.hash = '';
+
+  console.log('TROUPE ID ', troupeId);
+
+  var troupe = context.troupe();
+  troupe.on('change:name', function() {
+    console.log('NAME CHANGE!')
+    document.title = troupe.get('name');
+  });
 
   var AppRouter = MobileRouter.extend({
     routes: {
@@ -62,3 +69,5 @@ require([
 
   return troupeApp;
 });
+
+

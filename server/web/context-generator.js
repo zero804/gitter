@@ -138,7 +138,6 @@ function createTroupeContext(req, options) {
       profileNotCompleted: options.profileNotCompleted,
       accessDenied: options.accessDenied,
       inviteId: options.inviteId,
-      mobilePage: req.params && req.params.mobilePage,
       appVersion: appVersion.getCurrentVersion(),
       importedGoogleContacts: req.user && req.user.googleRefreshToken ? true : false,
       events: events,

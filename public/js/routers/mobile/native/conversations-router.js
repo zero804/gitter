@@ -9,7 +9,6 @@ require([
   'views/conversation/conversationView',
   'views/conversation/conversationDetailView',
   'collections/conversations',
-  'components/mobile-context',        // No ref
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
   'template/helpers/all',             // No ref
@@ -22,6 +21,7 @@ require([
   var troupeId = window.location.hash.substring(1);
   context.setTroupeId(troupeId);
   window.location.hash = '';
+
 
   var AppRouter = MobileRouter.extend({
     routes: {

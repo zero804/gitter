@@ -55,7 +55,7 @@ define([
       var troupe = context.getTroupe();
 
       return {
-        headerTitle: troupe.name || user.name,
+        headerTitle: troupe && troupe.name || user.name,
         isTroupe: !!troupe,
         troupeContext: troupe,
         user: user
