@@ -122,6 +122,13 @@ function renderMiddleware(template, mobilePage) {
   };
 }
 
+function redirectToNativeApp(page) {
+  return function(req, res) {
+    console.log('REDIRECTING TO ' + '/mobile/' + page + '#' + req.troupe.id);
+    res.relativeRedirect('/mobile/' + page + '#' + req.troupe.id);
+  };
+}
+
 module.exports = {
     install: function(app) {
       // This really doesn't seem like the right place for this?
@@ -212,14 +219,14 @@ module.exports = {
         middleware.ensureLoggedIn(),
         preloadOneToOneTroupeMiddleware,
         saveLastTroupeMiddleware,
-        renderMiddleware('mobile/chat-app', 'chat'));
+        redirectToNativeApp('chat'));
 
       app.get('/:appUri/chat',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         saveLastTroupeMiddleware,
-        renderMiddleware('mobile/chat-app', 'chat'));
+        redirectToNativeApp('chat'));
 
       // Files -----------------------
       app.get('/one-one/:userId/files',
@@ -227,14 +234,14 @@ module.exports = {
         middleware.ensureLoggedIn(),
         preloadOneToOneTroupeMiddleware,
         saveLastTroupeMiddleware,
-        renderMiddleware('mobile/file-app', 'files'));
+        redirectToNativeApp('files'));
 
       app.get('/:appUri/files',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         saveLastTroupeMiddleware,
-        renderMiddleware('mobile/file-app', 'files'));
+        redirectToNativeApp('files'));
 
 
       app.get('/:appUri/mails',
@@ -242,14 +249,14 @@ module.exports = {
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         saveLastTroupeMiddleware,
-        renderMiddleware('mobile/conversation-app', 'mails'));
+        redirectToNativeApp('mails'));
 
       app.get('/:appUri/people',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         saveLastTroupeMiddleware,
-        renderMiddleware('mobile/people-app', 'people'));
+        redirectToNativeApp('people'));
 
       app.get('/:appUri',
         middleware.grantAccessForRememberMeTokenMiddleware,

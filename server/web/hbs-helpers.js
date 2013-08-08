@@ -3,6 +3,7 @@
 
 var nconf = require('../utils/config');
 var cdn = require("./cdn");
+var _ = require('underscore');
 
 var minifiedDefault = nconf.get("web:minified");
 
@@ -22,7 +23,6 @@ var troupeEnv = {
     }
   },
 };
-var troupeEnvStringified = JSON.stringify(troupeEnv);
 
 exports.cdn = function(url, parameters) {
   return cdn(url, parameters ? parameters.hash:null);
@@ -63,15 +63,19 @@ exports.isMobile = function(agent, options) {
   return ((agent.match(/ipad/i)) ? options.fn(this) : null);
 };
 
-exports.generateEnv = function() {
+exports.generateEnv = function(parameters) {
+  var options = parameters.hash;
+
+  var env = options ? _.extend({}, troupeEnv, options) : troupeEnv;
+
   return '<script type="text/javascript">' +
-          'window.troupeEnv = ' + troupeEnvStringified + ';' +
+          'window.troupeEnv = ' + JSON.stringify(env) + ';' +
           '</script>';
 };
 
 exports.generateTroupeContext = function(troupeContext) {
   return '<script type="text/javascript">' +
-          'window.troupeEnv = ' + troupeEnvStringified + ';' +
+          'window.troupeEnv = ' + JSON.stringify(troupeEnv) + ';' +
           'window.troupeContext = ' + JSON.stringify(troupeContext) + ';' +
           '</script>';
 };

@@ -12,16 +12,33 @@ define([
 
   context.getTroupeId = function() {
     var c = context();
-    return c.troupe && c.troupe.id;
+    return c.troupe && c.troupe.id || c.troupeId;
+  };
+
+  /** TEMP - lets think of a better way to do this... */
+  context.setTroupeId = function(value) {
+    var c = context();
+    c.troupeId = value;
+  };
+
+  context.setTroupe = function(value) {
+    var c = context();
+    c.troupe = value;
   };
 
   context.getUserId = function() {
     var c = context();
-    return c.user && c.user.id;
+    return c.user && c.user.id || c.userId;
+  };
+
+  context.setUser = function(value) {
+    var c = context();
+    c.user = value;
   };
 
   context.isAuthed = function() {
-    return !!context().user;
+    var c = context();
+    return !c.user && !c.userId;
   };
 
   context.getHomeUser = function() {
