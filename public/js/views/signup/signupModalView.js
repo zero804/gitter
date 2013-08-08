@@ -31,6 +31,7 @@ define([
         debug: true,
         showErrors: function(errorMap, errorList) {
           if (errorList.length > 0) $('.signup-failure').show();
+          if (errorList.length === 0) $('.signup-failure').hide();
           var errors = "";
           $.each(errorList, function () { errors += this.message + "<br>"; });
           $('#failure-text').html(errors);
@@ -45,6 +46,7 @@ define([
     },
 
     onFormSubmit: function(e) {
+      $('.signup-failure').hide();
       if(e) e.preventDefault();
       var form = this.$el.find('form');
       var that = this;
@@ -65,6 +67,7 @@ define([
             // forward to a login prompt
             that.trigger('login.prompt', { email: data.email });
           } else {
+            $('#email').blur();
             that.trigger('signup.complete', data);
           }
         }
