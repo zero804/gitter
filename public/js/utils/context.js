@@ -1,13 +1,21 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-], function() {
+  'backbone'
+], function(Backbone) {
   "use strict";
+
+  var ctx;
 
   var context = function() {
     if(!window.troupeContext) {
       window.troupeContext = {};
     }
+
     return window.troupeContext;
+  };
+
+  context.troupe = function() {
+
   };
 
   context.getTroupeId = function() {
@@ -46,7 +54,7 @@ define([
   };
 
   context.inTroupeContext = function() {
-    return !!context().troupe;
+    return !!(context().troupe || context.getTroupeId());
   };
 
   context.inOneToOneTroupeContext = function() {

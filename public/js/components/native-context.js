@@ -6,17 +6,17 @@ define([
   "use strict";
 
   var cordova = window.cordova;
-
-  if(cordova) {
-    log('Cordova detected, calling TroupeContext.updateContext');
-
-    document.addEventListener("deviceready", function() {
-      sendContext();
-      // TODO: listen for context change events!
-      // context.on('troupe:change', sendContext);
-    }, false);
-
+  if(!cordova) {
+    log('Cordova not detected. Quietly ignoring native-context updates');
   }
+
+  log('Cordova detected, calling TroupeContext.updateContext');
+
+  document.addEventListener("deviceready", function() {
+    sendContext();
+    // TODO: listen for context change events!
+    // context.on('troupe:change', sendContext);
+  }, false);
 
   // Communicates with the native app, giving it context
   function sendContext() {
@@ -36,12 +36,14 @@ define([
       params.push(null, null, null);
     }
 
+    log('Pushing context: ' + params.join(','));
+
     try {
       cordova.exec(function() {}, function() {}, "TroupeContext", "updateContext", params);
     } catch(e) {
       log('Plugin failure', e);
     }
-  }
 
+  }
 
 });

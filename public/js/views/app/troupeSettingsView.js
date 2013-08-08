@@ -12,6 +12,13 @@ define([
 ], function($, _, context, TroupeViews, troupeCollections, itemCollections, troupeSettingsTemplate, log, validation) {
   "use strict";
 
+
+  // Stop the app router from reloading on troupe 'remove' event
+  function removeTroupeCollectionRemoveListeners() {
+    var troupeCollection = troupeCollections.troupes;
+    troupeCollection.off("remove");
+  }
+
   var View = TroupeViews.Base.extend({
     template: troupeSettingsTemplate,
     events: {
@@ -50,9 +57,7 @@ define([
 
       TroupeViews.confirm("Are you sure you want to delete this troupe?", {
         'click #ok': function() {
-
-          window.troupeContext.troupeIsDeleted = true;
-
+          removeTroupeCollectionRemoveListeners();
           $.ajax({
             url: '/troupes/' + self.model.id,
             type: "DELETE",
@@ -80,15 +85,16 @@ define([
 
       TroupeViews.confirm("Are you sure you want to remove yourself from this troupe?", {
         'click #ok': function() {
+          removeTroupeCollectionRemoveListeners();
           $.ajax({
             url: "/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
             data: "",
             type: "DELETE",
             success: function() {
-              window.location = context.env('homeUrl');
+              window.location = '/last';
             },
             error: function() {
-              window.alert(errMsg);
+              window.location = '/last';
             },
             global: false
           });
@@ -99,7 +105,7 @@ define([
 
     getRenderData: function() {
       return _.extend({},
-        window.troupeContext.troupe, {
+        context.getTroupe(), {
         canLeave: this.canLeave(),
         canDelete: this.canDelete()
       });
@@ -139,7 +145,7 @@ define([
       var troupeName = this.$el.find('input[name=name]').val().trim();
       var self = this;
 
-      if(window.troupeContext.troupe.name === troupeName) {
+      if(context.getTroupe().name === troupeName) {
         self.dialog.hide();
         self.dialog = null;
         return;

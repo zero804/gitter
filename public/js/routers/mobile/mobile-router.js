@@ -7,7 +7,6 @@ define([
   'collections/requests',
   'views/widgets/avatar',
   'views/request/requestDialog',
-  'components/mobile-context',        // No ref
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
   'template/helpers/all'              // No ref

@@ -3,6 +3,7 @@ require([
   'jquery',
   'underscore',
   'backbone',
+  'utils/context',
   'routers/mobile/mobile-router',
   'views/base',
   'views/file/fileView',
@@ -12,10 +13,16 @@ require([
   'components/mobile-context',        // No ref
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
-  'template/helpers/all'              // No ref
-], function($, _, Backbone, MobileRouter, TroupeViews, FileView, FileDetailView, fileModels, MobileFilePreview/*, unreadItemsClient*/) {
+  'template/helpers/all',             // No ref
+  'components/native-context'         // No ref
+], function($, _, Backbone, context, MobileRouter, TroupeViews, FileView, FileDetailView, fileModels, MobileFilePreview) {
   /*jslint browser: true, unused: true */
   "use strict";
+
+  // TODO: normalise this
+  var troupeId = window.location.hash.substring(1);
+  context.setTroupeId(troupeId);
+  window.location.hash = '';
 
   var AppRouter = MobileRouter.extend({
     routes: {

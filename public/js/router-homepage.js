@@ -2,6 +2,7 @@
 require([
   'backbone',
   'views/base',
+  'utils/context',
   'hbs!views/login/tmpl/loginRequestModalView',
   'views/shareSearch/shareSearchView',
   'views/app/appIntegratedView',
@@ -9,7 +10,7 @@ require([
   'collections/instances/troupes',
   'views/profile/profileView',
   'views/signup/createTroupeView',
-  'views/app/userHeaderView',
+  'views/app/headerView',
   'views/toolbar/troupeMenu',
   'views/invite/reinviteModal',
   'utils/router',
@@ -18,31 +19,33 @@ require([
   'components/dozy',
   'components/webNotifications',
   'template/helpers/all'
-], function(Backbone, TroupeViews, loginRequestTemplate, shareSearchView, AppIntegratedView, UserHomeView, troupeCollections,
-  profileView, createTroupeView, UserHeaderView, TroupeMenuView, InviteModal, Router, connectUserTemplate /*, errorReporter , dozy, webNotifications,_Helpers,  _backboneKeys*/) {
+], function(Backbone, TroupeViews, context, loginRequestTemplate, shareSearchView, AppIntegratedView, UserHomeView, troupeCollections,
+  profileView, createTroupeView, HeaderView, TroupeMenuView, InviteModal, Router, connectUserTemplate /*, errorReporter , dozy, webNotifications,_Helpers,  _backboneKeys*/) {
 
   "use strict";
 
   var appView = new AppIntegratedView();
   appView.leftMenuRegion.show(new TroupeMenuView());
-  appView.headerRegion.show( new UserHeaderView());
+  appView.headerRegion.show( new HeaderView());
 
   new UserHomeView({ el: '#chat-frame' }).render();
 
   // Asynchronously load tracker
   require(['utils/tracking'], function() { });
 
-  if(window.troupeContext.profileNotCompleted) {
-   var view = new profileView.Modal({ disableClose: true  });
+  // TODO: remove this and use the confirm stuffs
+  if(context().profileNotCompleted) {
+    var view = new profileView.Modal({ disableClose: true  });
 
-   view.once('close', function() {
-     window.location.reload(true);
-   });
-   view.show();
+    view.once('close', function() {
+       window.location.reload(true);
+    });
+    view.show();
 
-   return;
+    return;
   }
 
+  // TODO: stop using localstorage for this, move to context events
   try {
     var ls = window.localStorage;
     if (ls) {
@@ -69,9 +72,8 @@ require([
           }
         });
         delete ls.pendingRequestConfirmation;
-        (new TroupeViews.Modal({
-          view: new RequestSuccessView()
-        })).show();
+
+        new TroupeViews.Modal({view: new RequestSuccessView() }).show();
       }
 
       // Show a popup to confirm connection invite through signup.

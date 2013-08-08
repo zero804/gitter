@@ -7,8 +7,8 @@ define([
 ], function($, context, Faye, log) {
   "use strict";
 
-  Faye.Logging.logLevel = 'debug';
-  Faye.logger = log;
+  //Faye.Logging.logLevel = 'debug';
+  //Faye.logger = log;
 
   var connected = false;
   var connectionProblemTimeoutHandle;

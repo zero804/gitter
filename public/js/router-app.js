@@ -20,7 +20,7 @@ require([
   'views/shareSearch/shareSearchView',
   'views/signup/createTroupeView',
   'views/signup/usernameView',
-  'views/app/troupeHeaderView',
+  'views/app/headerView',
   'views/app/troupeSettingsView',
   'views/toolbar/troupeMenu',
   'views/invite/reinviteModal',
@@ -34,7 +34,7 @@ require([
 ], function($, Backbone, context, AppIntegratedView, chatInputView, ChatCollectionView,
             itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, shareSearchView,
-            createTroupeView, UsernameView, TroupeHeaderView,
+            createTroupeView, UsernameView, HeaderView,
             troupeSettingsView, TroupeMenuView, InviteModal, Router /*, errorReporter , FilteredCollection */) {
   "use strict";
 
@@ -48,18 +48,14 @@ require([
   troupeCollection.on("remove", function(model) {
     if(model.id == context.getTroupeId()) {
       // TODO: tell the person that they've been kicked out of the troupe
-      if(window.troupeContext.troupeIsDeleted) {
-        window.location.href = '/last';
-      } else {
-        window.location.reload();
-      }
+      window.location.reload();
     }
   });
 
 
   var appView = new AppIntegratedView({ });
   appView.leftMenuRegion.show(new TroupeMenuView({ }));
-  appView.headerRegion.show(new TroupeHeaderView  ());
+  appView.headerRegion.show(new HeaderView());
   appView.rightToolbarRegion.show(new RightToolbarView());
 
   $('.nano').nanoScroller({ preventPageScrolling: true });
