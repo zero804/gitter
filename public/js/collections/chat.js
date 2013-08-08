@@ -88,7 +88,7 @@ define([
       }
 
       this.chatMessageId = options.chatMessageId;
-      this.url = "/troupes/" + window.troupeContext.troupe.id + "/chatMessages/" + this.chatMessageId + "/readBy";
+      this.url = "/troupes/" + context.getTroupeId() + "/chatMessages/" + this.chatMessageId + "/readBy";
     }
   });
 

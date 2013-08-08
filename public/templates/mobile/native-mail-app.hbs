@@ -4,18 +4,14 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
-	<meta charset="utf-8">
-
-	<title>{{troupeName}}</title>
+  <meta charset="utf-8">
+  <title>Troupe</title>
 
   <link rel="stylesheet" href='/bootstrap/css/trpMobileConversations.css'>
 
-  {{{ generateTroupeContext troupeContext }}}
+  {{{ generateTroupeContext troupeContext accessToken=accessToken page='mails' }}}
 
-  {{>require_wrapper}}
-  {{{bootScript "routers/mobile/native/conversations-router" }}}
-
-    <link rel="shortcut icon" href='{{ cdn "images/2/favicon8.ico"}}'>
+  <link rel="shortcut icon" href='{{ cdn "images/2/favicon8.ico"}}'>
 </head>
 <body>
 
@@ -42,9 +38,13 @@
       </div>
 
       <div id="loadmoreajaxloader" style="display:none">MOO</div>
-      </div> <!-- box -->
+    </div> <!-- box -->
 
-    </div>
   </div>
+</div>
+
+{{>require_wrapper}}
+{{{bootScript "routers/mobile/native/conversations-router" }}}
+
 </body>
 </html>

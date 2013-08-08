@@ -302,7 +302,6 @@ define([
   TroupeCollectionSync.prototype = {
     _onNewCountValue: function(event, newValue) {
       log('Syncing store to collection ', newValue);
-      if(!window.troupeContext || !window.troupeContext.troupe) return;
 
       log('TroupeCollectionSync: setting value of ' + context.getTroupeId() + ' to ' + newValue);
 
@@ -313,6 +312,7 @@ define([
         return;
       }
 
+      // Not found, are there any items? If not await a sync-reset
       if(this._collection.length === 0) {
         this._collection.once('reset sync', function() {
 
@@ -326,8 +326,10 @@ define([
           }
         }, this);
       } else {
+        // There are items, just not the ones we want
         log('TroupeCollectionSync: unable to locate locate troupe');
       }
+
     }
   };
 
@@ -452,10 +454,8 @@ define([
     _recount: function() {
       var self = this;
       function count(memo, troupe) {
-        if(window.troupeContext && window.troupeContext.troupe) {
-          if(troupe.get('id') === context.getTroupeId()) {
-            return memo + (self._store._currentCount() > 0 ? 1 : 0);
-          }
+        if(context.getTroupeId() && troupe.get('id') === context.getTroupeId()) {
+          return memo + (self._store._currentCount() > 0 ? 1 : 0);
         }
 
         var c = troupe.get('unreadItems');
@@ -596,26 +596,17 @@ define([
     }
   };
 
-  var c = window.troupeContext;
-
   var unreadItemStore;
   var realtimeSync;
 
-  if(c) {
-    if(c.troupe) {
-      unreadItemStore = new UnreadItemStore();
-      new ReadItemSender(unreadItemStore);
-      new TroupeUnreadItemsViewportMonitor(unreadItemStore);
+  if(context.getTroupeId() && context.getUserId()) {
+    unreadItemStore = new UnreadItemStore();
+    new ReadItemSender(unreadItemStore);
+    new TroupeUnreadItemsViewportMonitor(unreadItemStore);
 
-      realtimeSync = new TroupeUnreadItemRealtimeSync(unreadItemStore);
-
-      if(c.user) {
-        realtimeSync._subscribe();
-        new ReadItemRemover(realtimeSync);
-      }
-
-    }
-
+    realtimeSync = new TroupeUnreadItemRealtimeSync(unreadItemStore);
+    realtimeSync._subscribe();
+    new ReadItemRemover(realtimeSync);
   }
 
   var unreadItemsClient = {

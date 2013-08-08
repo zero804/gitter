@@ -48,7 +48,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
       res.render(page, {
         appCache: getAppCache(req),
         login: login,
-        isWebApp: !req.params.mobilePage,
+        isWebApp: !req.params.mobilePage, // TODO: fix this!
         bootScriptName: login ? "router-login" : "router-app",
         troupeName: troupeContext.troupe.name,
         troupeContext: troupeContext,
@@ -122,6 +122,12 @@ function renderMiddleware(template, mobilePage) {
   };
 }
 
+function redirectToNativeApp(page) {
+  return function(req, res) {
+    res.relativeRedirect('/mobile/' + page + '#' + req.troupe.id);
+  };
+}
+
 module.exports = {
     install: function(app) {
       // This really doesn't seem like the right place for this?
@@ -149,10 +155,11 @@ module.exports = {
           return troupeService.findBestTroupeForUser(req.user)
             .then(function(troupe) {
               if(troupe) {
-                return troupeService.getUrlForTroupeForUserId(troupe, req.user.id)
-                  .then(function(url) {
-                    return url + "/" + req.params.page;
-                  });
+                return '/mobile/' + req.params.page + '#' + troupe.id;
+                // return troupeService.getUrlForTroupeForUserId(troupe, req.user.id)
+                //   .then(function(url) {
+                //     return url + "/" + req.params.page;
+                //   });
               }
 
               if(req.user.hasUsername()) {
@@ -212,14 +219,14 @@ module.exports = {
         middleware.ensureLoggedIn(),
         preloadOneToOneTroupeMiddleware,
         saveLastTroupeMiddleware,
-        renderMiddleware('mobile/chat-app', 'chat'));
+        redirectToNativeApp('chat'));
 
       app.get('/:appUri/chat',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         saveLastTroupeMiddleware,
-        renderMiddleware('mobile/chat-app', 'chat'));
+        redirectToNativeApp('chat'));
 
       // Files -----------------------
       app.get('/one-one/:userId/files',
@@ -227,14 +234,14 @@ module.exports = {
         middleware.ensureLoggedIn(),
         preloadOneToOneTroupeMiddleware,
         saveLastTroupeMiddleware,
-        renderMiddleware('mobile/file-app', 'files'));
+        redirectToNativeApp('files'));
 
       app.get('/:appUri/files',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         saveLastTroupeMiddleware,
-        renderMiddleware('mobile/file-app', 'files'));
+        redirectToNativeApp('files'));
 
 
       app.get('/:appUri/mails',
@@ -242,14 +249,14 @@ module.exports = {
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         saveLastTroupeMiddleware,
-        renderMiddleware('mobile/conversation-app', 'mails'));
+        redirectToNativeApp('mails'));
 
       app.get('/:appUri/people',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         saveLastTroupeMiddleware,
-        renderMiddleware('mobile/people-app', 'people'));
+        redirectToNativeApp('people'));
 
       app.get('/:appUri',
         middleware.grantAccessForRememberMeTokenMiddleware,
