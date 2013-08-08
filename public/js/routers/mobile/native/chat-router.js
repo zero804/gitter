@@ -13,8 +13,17 @@ require([
 
   // TODO: normalise this
   var troupeId = window.location.hash.substring(1);
-  context.setTroupeId(troupeId);
-  window.location.hash = '';
+  if(troupeId) {
+    window.location.hash = '';
+  } else {
+    troupeId = window.localStorage.lastTroupeId;
+  }
+
+  if(troupeId) {
+    context.setTroupeId(troupeId);
+    window.localStorage.lastTroupeId = troupeId;
+  }
+
 
   var NativeChatRouter = MobileRouter.extend({
     initialize: function() {

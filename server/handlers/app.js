@@ -155,10 +155,11 @@ module.exports = {
           return troupeService.findBestTroupeForUser(req.user)
             .then(function(troupe) {
               if(troupe) {
-                return troupeService.getUrlForTroupeForUserId(troupe, req.user.id)
-                  .then(function(url) {
-                    return url + "/" + req.params.page;
-                  });
+                return '/mobile/' + req.params.page + '#' + troupe.id;
+                // return troupeService.getUrlForTroupeForUserId(troupe, req.user.id)
+                //   .then(function(url) {
+                //     return url + "/" + req.params.page;
+                //   });
               }
 
               if(req.user.hasUsername()) {

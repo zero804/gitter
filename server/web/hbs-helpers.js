@@ -35,8 +35,10 @@ exports.bootScript = function(url, parameters) {
   var cdn      = (options.skipCdn) ? function(a) { return '/' + a; } : exports.cdn;
   var skipCore = options.skipCore;
   var minified = 'minified' in options ? options.minified : minifiedDefault;
+  var async    = 'async' in options ? options.async : true;
 
   var baseUrl = cdn("js/");
+  var asyncScript = async ? "defer='defer' async='true' " : '';
 
   if(minified) {
     if(skipCore) {
@@ -48,14 +50,14 @@ exports.bootScript = function(url, parameters) {
     }
 
     return "<script type='text/javascript'>\nwindow.require_config.baseUrl = '" + baseUrl + "';</script>\n" +
-            "<script defer='defer' async='true' data-main='" + url + "' src='" + requireScript + "' type='text/javascript'></script>\n";
+            "<script " + asyncScript + "data-main='" + url + "' src='" + requireScript + "' type='text/javascript'></script>\n";
 
   }
 
   requireScript = cdn("repo/requirejs/requirejs.js");
 
   return "<script type='text/javascript'>window.require_config.baseUrl = '" + baseUrl + "';</script>\n" +
-         "<script defer='defer' async='true' data-main='" + url + ".js' src='" + requireScript + "' type='text/javascript'></script>";
+         "<script " + asyncScript + "data-main='" + url + ".js' src='" + requireScript + "' type='text/javascript'></script>";
 
 };
 
