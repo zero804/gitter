@@ -2,15 +2,19 @@
 define([
   'jquery',
   "views/base",
-  "hbs!./tmpl/appHeader",
+  "hbs!./tmpl/headerView",
   'collections/instances/troupes',
   'utils/context',
   'components/unread-items-client'
-  ], function($, TroupeViews, appHeaderTemplate, trpCollections, context, unreadItemsClient) {
+  ], function($, TroupeViews, template, trpCollections, context, unreadItemsClient) {
   "use strict";
 
   return TroupeViews.Base.extend({
-    template: appHeaderTemplate,
+    template: template,
+
+    events: {
+      "click .trpHeaderFavourite":        "toggleFavourite"
+    },
 
     initialize: function() {
       var self = this;
@@ -47,13 +51,16 @@ define([
     },
 
     getRenderData: function() {
-      var user = window.troupeContext.user;
+      var user = context.getUser();
+      var troupe = context.getTroupe();
+
       return {
-        headerTitle: user.displayName,
-        isTroupe: false,
-        troupeContext: window.troupeContext,
+        headerTitle: troupe && troupe.name || user.name,
+        isTroupe: !!troupe,
+        troupeContext: troupe,
         user: user
       };
+
     },
 
     updateTitlebar: function(values) {
@@ -64,8 +71,7 @@ define([
       var mainTitle;
       if (context.getTroupe().name) {
         mainTitle = context.getTroupe().name + " - Troupe";
-      } else
-      {
+      } else {
         mainTitle = "Troupe";
       }
 
@@ -85,6 +91,25 @@ define([
       }
 
       return '[' + overall + '] ' + mainTitle;
+    },
+
+    toggleFavourite: function() {
+      var favHeader = $('.trpHeaderFavourite');
+      favHeader.toggleClass('favourited');
+      var isFavourite = favHeader.hasClass('favourited');
+
+      $.ajax({
+        url: '/troupes/' + context.getTroupeId(),
+        contentType: "application/json",
+        dataType: "json",
+        type: "PUT",
+        data: JSON.stringify({ favourite: isFavourite })
+      });
+
+      // The update should happen automatically via a patch operation....
+      //window.troupeContext.troupe.favourite = isFavourite;
+      //var troupe = collections.troupes.get(window.troupeContext.troupe.id);
+      //troupe.set('favourite', isFavourite);
     }
 
   });

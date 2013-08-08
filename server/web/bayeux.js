@@ -11,6 +11,7 @@ var presenceService = require("../services/presence-service");
 var restful = require("../services/restful");
 var nconf = require("../utils/config");
 var shutdown = require('../utils/shutdown');
+var contextGenerator = require('./context-generator');
 
 
 // Strategies for authenticating that a user can subscribe to the given URL
@@ -217,12 +218,13 @@ var authenticator = {
 
       var connectionType = getConnectionType(ext.connType);
       var client = ext.client || '';
+      var troupeId = ext.troupeId || '';
 
       // This is an UGLY UGLY hack, but it's the only
       // way possible to pass the userId to the outgoing extension
       // where we have the clientId (but not the userId)
       var id = message.id || '';
-      message.id = id + ':' + userId + ':' + connectionType + ':' + client;
+      message.id = id + ':' + userId + ':' + connectionType + ':' + client + ':' + troupeId;
 
       return callback(message);
     });
@@ -248,7 +250,7 @@ var authenticator = {
 
     var parts = fakeId.split(':');
 
-    if(parts.length != 4) {
+    if(parts.length != 5) {
       return callback(message);
     }
 
@@ -257,7 +259,7 @@ var authenticator = {
     var connectionType = parts[2];
     var clientId = message.clientId;
     var client = parts[3];
-
+    var troupeId = parts[4];
 
     // Get the presence service involved around about now
     presenceService.userSocketConnected(userId, clientId, connectionType, client, function(err) {
@@ -266,8 +268,19 @@ var authenticator = {
       if(!message.ext) message.ext = {};
       message.ext.userId = userId;
 
-      // Not possible to throw an error here, so just carry only
-      callback(message);
+      if(!troupeId) return callback(message);
+
+      // If the troupeId was included, it means we've got a native
+      // client and they'll be looking for a snapshot:
+      contextGenerator.generateSocketContext(userId, troupeId, function(err, context) {
+        if(err) winston.error("bayeux: Unable to generate context: " + err, { exception: err });
+
+        message.ext.context = context;
+
+        // Not possible to throw an error here, so just carry only
+        callback(message);
+      });
+
     });
 
   }

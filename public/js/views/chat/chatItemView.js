@@ -76,7 +76,7 @@ define([
     getRenderData: function() {
       var data = this.model.toJSON();
 
-      data.isViewers = this.isOwnMessage();
+      //data.isViewers = this.isOwnMessage();
       data.isInEditablePeriod = this.isInEditablePeriod();
       data.canEdit = this.canEdit();
       data.hasBeenEdited = this.hasBeenEdited();
@@ -89,15 +89,15 @@ define([
       data.displayName = data.fromUser.displayName;
 
       /* TODO: css selectors should be able to handle this from a single class on a parent div */
-      if(data.isViewers) {
+      //if(data.isViewers) {
         data.chatRowClass = 'trpChatRow';
         data.chatRowPictureClass = 'trpChatPictureLocal';
         data.chatBubbleAdditional = 'local';
-      } else {
-        data.chatRowClass = 'trpChatRowRemote';
-        data.chatRowPictureClass = 'trpChatPictureRemote';
-        data.chatBubbleAdditional = 'remote';
-      }
+      //} else {
+      //  data.chatRowClass = 'trpChatRowRemote';
+      //  data.chatRowPictureClass = 'trpChatPictureRemote';
+      //  data.chatBubbleAdditional = 'remote';
+      //}
 
       return data;
     },

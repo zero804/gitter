@@ -97,9 +97,9 @@ define([
     modelName: '',
     constructor: function(models, options) {
       Backbone.Collection.prototype.constructor.call(this, models, options);
-
       if(!this.url) {
-        this.url = "/troupes/" + context.getTroupeId() + "/" + this.nestedUrl;
+        var troupeId = options && options.troupeId || context.getTroupeId();
+        this.url = "/troupes/" + troupeId + "/" + this.nestedUrl;
       }
 
       this._loading = false;

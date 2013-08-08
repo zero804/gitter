@@ -24,12 +24,11 @@ define([
 
     getRenderData: function() {
       return {
-        user: window.troupeContext.user
+        user: context.getUser()
       };
     },
 
     afterRender: function() {
-
       this.inputBox = new ChatInputBoxView({
         el: this.$el.find('.trpChatInputBoxTextArea'),
         scrollDelegate: this.scrollDelegate
@@ -42,7 +41,7 @@ define([
       if(val) {
         this.collection.create({
           text: val,
-          fromUser: window.troupeContext.user,
+          fromUser: context.getUser(),
           sent: moment()
         });
 

@@ -7,8 +7,8 @@ define([
 ], function($, context, Faye, log) {
   "use strict";
 
-  Faye.Logging.logLevel = 'debug';
-  Faye.logger = log;
+  //Faye.Logging.logLevel = 'debug';
+  //Faye.logger = log;
 
   var connected = false;
   var connectionProblemTimeoutHandle;
@@ -49,13 +49,17 @@ define([
   var ClientAuth = function() {};
   ClientAuth.prototype.outgoing = function(message, callback) {
     if(message.channel == '/meta/handshake') {
-      message.ext = message.ext || {};
-      if(window.troupeContext) message.ext.token = window.troupeContext.accessToken;
-      message.ext.connType = isMobile() ? 'mobile' : 'online';
-      message.ext.client = isMobile() ? 'mobweb' : 'web';
+      if(!message.ext) { message.ext = {}; }
+      var ext = message.ext;
+      var accessToken = context.env('accessToken') || context().accessToken; // THIS SECOND METHOD WILL BE DEPRECATED!
+
+      ext.token = accessToken;
+      ext.troupeId = context.getTroupeId();
+      ext.connType = isMobile() ? 'mobile' : 'online';
+      ext.client = isMobile() ? 'mobweb' : 'web';
 
     } else if(message.channel == '/meta/subscribe') {
-      message.ext = message.ext || {};
+      if(!message.ext) { message.ext = {}; }
       message.ext.eyeballs = eyeballState ? 1 : 0;
     }
 
@@ -65,6 +69,11 @@ define([
   ClientAuth.prototype.incoming = function(message, callback) {
     if(message.channel == '/meta/handshake') {
       if(message.successful) {
+        if(message.ext && message.ext.context) {
+          var c = message.ext.context;
+          if(c.troupe) context.setTroupe(c.troupe);
+          if(c.user) context.setUser(c.user);
+        }
         if(clientId !== message.clientId) {
           clientId = message.clientId;
           log("Realtime reestablished. New id is " + message.clientId);
@@ -86,7 +95,7 @@ define([
       var snapshot = message.ext.snapshot;
 
       if(listeners) {
-        for(var i = 0; i < listeners.length; i++) { listeners[i](snapshot); };
+        for(var i = 0; i < listeners.length; i++) { listeners[i](snapshot); }
       }
     }
 
