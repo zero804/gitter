@@ -309,7 +309,7 @@ define([
   var Modal = TroupeViews.Modal.extend({
     initialize: function(options) {
       if (options.inviteToConnect) {
-        options.title = "Connect with people on Troupe";
+        options.title = "Connect with people";
       } else {
         options.title = "Invite people to " + context.getTroupe().name;
       }
