@@ -3,17 +3,22 @@ require([
   'jquery',
   'routers/mobile/mobile-router',
   'collections/chat',
+  'utils/context',
   'views/chat/chatCollectionView',
   'views/chat/chatInputView',
   'utils/mobile-resizer'
-  ], function($, MobileRouter, chatModels, ChatCollectionView, chatInputView, mobileResizer) {
+  ], function($, MobileRouter, chatModels, context, ChatCollectionView, chatInputView, mobileResizer) {
   "use strict";
+
+  var troupeId = window.location.hash.substring(1);
+  context.setTroupeId(troupeId);
+  window.location.hash = '';
 
   var NativeChatRouter = MobileRouter.extend({
     initialize: function() {
       this.constructor.__super__.initialize.apply(this);
 
-      var chatCollection = new chatModels.ChatCollection();
+      var chatCollection = new chatModels.ChatCollection([], { troupeId: troupeId });
       chatCollection.listen();
 
       var chatCollectionView = new ChatCollectionView({
