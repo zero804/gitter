@@ -10,7 +10,7 @@ define([
    *
    * TODO: complete the transition!
    */
-  var ctx = window.troupeContext || null;
+  var ctx = window.troupeContext || {};
   var troupe;
 
   var context = function() {
