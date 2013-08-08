@@ -96,7 +96,6 @@ define([
     nestedUrl: '',
     modelName: '',
     constructor: function(models, options) {
-      console.log(arguments);
       Backbone.Collection.prototype.constructor.call(this, models, options);
       if(!this.url) {
         var troupeId = options && options.troupeId || context.getTroupeId();

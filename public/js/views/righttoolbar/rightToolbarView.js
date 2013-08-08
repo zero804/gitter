@@ -105,13 +105,12 @@ define([
       this.files.show(new FileView({ collection: fileCollection }));
 
       // Conversation View
-      if (!window.troupeContext.troupe.oneToOne) {
+      if (context.inOneToOneTroupeContext()) {
         var conversationView = new ConversationView({
           collection: conversationCollection
         });
         self.conversations.show(conversationView);
-      }
-      else {
+      } else {
         $('#mail-list').hide();
       }
 

@@ -12,10 +12,16 @@ require([
   'components/mobile-context',        // No ref
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
-  'template/helpers/all'              // No ref
-], function($, _, Backbone, context, MobileRouter, userModels, Marionette, TroupeViews, PersonViewTemplate/*, unreadItemsClient*/) {
+  'template/helpers/all',             // No ref
+  'components/native-context'         // No ref
+], function($, _, Backbone, context, MobileRouter, userModels, Marionette, TroupeViews, PersonViewTemplate) {
   /*jslint browser: true, unused: true */
   "use strict";
+
+  // TODO: normalise this
+  var troupeId = window.location.hash.substring(1);
+  context.setTroupeId(troupeId);
+  window.location.hash = '';
 
   var AppRouter = MobileRouter.extend({
     routes: {

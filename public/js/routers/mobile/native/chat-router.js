@@ -6,10 +6,12 @@ require([
   'utils/context',
   'views/chat/chatCollectionView',
   'views/chat/chatInputView',
-  'utils/mobile-resizer'
+  'utils/mobile-resizer',
+  'components/native-context' // No ref
   ], function($, MobileRouter, chatModels, context, ChatCollectionView, chatInputView, mobileResizer) {
   "use strict";
 
+  // TODO: normalise this
   var troupeId = window.location.hash.substring(1);
   context.setTroupeId(troupeId);
   window.location.hash = '';
