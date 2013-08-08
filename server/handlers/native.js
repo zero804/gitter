@@ -9,13 +9,14 @@ function serveNativeApp(page) {
     middleware.grantAccessForRememberMeTokenMiddleware,
     middleware.ensureLoggedIn(),
     function(req, res) {
+      // TODO: pass forward the existing Bearer token if it exists
       oauthService.findOrGenerateWebToken(req.user.id)
         .then(function(accessToken) {
           res.render('mobile/' + page + '.hbs', {
             troupeContext: {
-              userId: req.user.id,
-              accessToken: accessToken
-            }
+              userId: req.user.id
+            },
+            accessToken: accessToken
           });
         });
     }];

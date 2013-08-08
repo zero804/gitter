@@ -9,7 +9,6 @@ require([
   'marionette',
   'views/base',
   'hbs!views/people/tmpl/mobilePeopleView',
-  'components/mobile-context',        // No ref
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
   'template/helpers/all',             // No ref

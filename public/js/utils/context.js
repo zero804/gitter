@@ -1,35 +1,73 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'underscore',
   'backbone'
-], function(Backbone) {
+], function(_, Backbone) {
   "use strict";
 
-  var ctx;
+  /**
+   * This file is VERY MUCH in a state of transition.
+   *
+   * TODO: complete the transition!
+   */
+  var ctx = window.troupeContext || null;
+  var troupe;
 
   var context = function() {
-    if(!window.troupeContext) {
-      window.troupeContext = {};
-    }
-
-    return window.troupeContext;
+    return ctx;
   };
 
+  /* Unlike getTroupe() this returns a Backbone Model, upon which events can be placed, etc */
   context.troupe = function() {
+    if(!troupe) {
+      var attributes;
+      if(ctx.troupe) {
+        attributes = ctx.troupe;
+      } else {
+        attributes = { id: ctx.troupeId };
+      }
+      troupe = new Backbone.Model(attributes);
+    }
 
+    return troupe;
   };
 
   context.getTroupeId = function() {
-    var c = context();
-    return c.troupe && c.troupe.id || c.troupeId;
+    if(troupe) return troupe.id;
+
+    return ctx.troupe && ctx.troupe.id || ctx.troupeId;
   };
+
+  function clearOtherAttributes(s) {
+    _.each(_.keys(troupe.attributes), function(key) {
+      if(!s.hasOwnProperty(key)) {
+        s[key] = null;
+      }
+    });
+
+    return s;
+  }
 
   /** TEMP - lets think of a better way to do this... */
   context.setTroupeId = function(value) {
-    var c = context();
-    c.troupeId = value;
+    if(troupe) {
+      // Clear all attributes
+      troupe.set(clearOtherAttributes({ id: value }));
+      return;
+    }
+
+    ctx.troupeId = value;
+    if(ctx.troupe && ctx.troupe.id !== value) {
+      ctx.troupe = null;
+    }
   };
 
   context.setTroupe = function(value) {
+    if(troupe) {
+      troupe.set(clearOtherAttributes(value));
+      return;
+    }
+
     var c = context();
     c.troupe = value;
   };
@@ -54,27 +92,46 @@ define([
   };
 
   context.inTroupeContext = function() {
-    return !!(context().troupe || context.getTroupeId());
+    return troupe || ctx.troupe || ctx.troupeId;
   };
 
   context.inOneToOneTroupeContext = function() {
-    return context.inTroupeContext() && context.getTroupe().oneToOne;
+    if(!context.inTroupeContext()) return false;
+    if(troupe) {
+      return troupe.get('oneToOne');
+    }
+
+    var t = ctx.troupe;
+    return t && t.oneToOne;
   };
 
   context.inUserhomeContext = function() {
-    return context().inUserhome;
+    // TODO: deal with this? Probably env rather than context?
+    return ctx.inUserhome;
   };
 
   context.getUser = function() {
-    return context().user;
+    return ctx.user;
   };
 
   context.getTroupe = function() {
-    return context().troupe || {};
+    if(troupe) {
+      return troupe.toJSON();
+    }
+
+    if(ctx.troupe) {
+      return ctx.troupe;
+    }
+
+    if(ctx.troupeId) {
+      return { id: ctx.troupeId };
+    }
+
+    return null;
   };
 
   context.popEvent = function(name) {
-    var events = context().events;
+    var events = ctx.events;
     if(events) {
       var i = events.indexOf(name);
       if(i >= 0) {

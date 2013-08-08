@@ -73,9 +73,13 @@ exports.generateEnv = function(parameters) {
           '</script>';
 };
 
-exports.generateTroupeContext = function(troupeContext) {
+exports.generateTroupeContext = function(troupeContext, parameters) {
+  var options = parameters.hash;
+
+  var env = options ? _.extend({}, troupeEnv, options) : troupeEnv;
+
   return '<script type="text/javascript">' +
-          'window.troupeEnv = ' + JSON.stringify(troupeEnv) + ';' +
+          'window.troupeEnv = ' + JSON.stringify(env) + ';' +
           'window.troupeContext = ' + JSON.stringify(troupeContext) + ';' +
           '</script>';
 };
