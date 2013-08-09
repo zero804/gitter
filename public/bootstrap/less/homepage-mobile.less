@@ -21,22 +21,11 @@
 .form {
   background-color: rgba(0, 0, 0, 0.4);
   box-shadow: 0 0 4em 3em rgba(0, 0, 0, 0.4);
-  width: 230px;
-  margin: 0 auto;
+  margin: 10px;
 }
 
 .slidingPanel {
-  display: -webkit-box;
-  -webkit-box-orient: horizontal;
-  -webkit-box-align: center;
 
-  display: -moz-box;
-  -moz-box-orient: horizontal;
-  -moz-box-align: center;
-
-  display: box;
-  box-orient: horizontal;
-  box-align: center;
 }
 
 @numberOfPanels: 3;
@@ -55,10 +44,11 @@ html, body, #staticWindow {
 
 #panelList {
   width: ( 100% * @numberOfPanels );
-  background-image: url('../../images/2/home-hero-image4.jpg');
-  background-size: cover;
   margin-left: 0%;
-  .simpleSlideAnimation
+  background-image: url('../../images/2/home-hero-image4-mobile.jpg');
+  background-size: cover;
+  .simpleSlideAnimation;
+  height: 100%;
 }
 
 #panelList.showingSecondPanel {
@@ -103,10 +93,9 @@ a {
 }
 
 .trpHomeMenu {
-  float: right;
   color: white;
+  margin-left: 10px;
   display: inline-block;
-  margin-right: 20px;
 }
 
 .trpHomeMenuItem {
@@ -114,21 +103,21 @@ a {
   float: left;
   padding-right: 26px;
   padding-left: 26px;
-  .trpBodyEm;
+  .trpBodyText;
   font-weight: lighter;
   color: @trpDarkGrey;
   background-color: white;
   text-decoration: none;
+  width: 120px;
 }
 
 .trpHeroText {
   padding-left: 10px;
   padding-top: 0px;
-  font-size: 24px;
+  .trpH2;
   display: inline-block;
   max-width: 380px;
   padding-right: 20px;
-  font-family: @fontSans;
   color: white;
   text-align: left;
   line-height: 1.3em;
@@ -144,4 +133,20 @@ a {
   min-height: 100%;
   height: 100%;
   padding-left: 0px;
+}
+
+.trpModalSubtext {
+  padding-top: 10px;
+  padding-bottom: 0px;
+}
+
+
+.trpModalFailure {
+  margin: 0 -12px 0 -9px;
+}
+
+.trpButtonBig {
+  margin-top: 20px;
+  min-width: 100px;
+  .trpBodyText;
 }
