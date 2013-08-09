@@ -84,9 +84,14 @@ npm:
 	npm prune
 	npm install
 
-grunt:
+lint-configs: config/*.json
+	set -e && for i in $?; do (./node_modules/.bin/jsonlint $$i > /dev/null); done
+
+grunt: clean lint-configs
 	mkdir output
+	cp -R public/ public-processed/
 	grunt -no-color process
+	./build-scripts/gzip-processed.sh
 
 version-files:
 	@echo GIT COMMIT: $(GIT_COMMIT)
