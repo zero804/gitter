@@ -8,6 +8,12 @@ var _ = require('underscore');
 var minifiedDefault = nconf.get("web:minified");
 var appTag = require('./appVersion').getAppTag();
 
+
+var cdns;
+if(nconf.get("cdn:use")) {
+  cdns = nconf.get("cdn:hosts");
+}
+
 // This stuff never changes
 var troupeEnv = {
   baseServer: nconf.get('web:baseserver'),
@@ -15,6 +21,7 @@ var troupeEnv = {
   homeUrl: nconf.get('web:homeurl'),
   mixpanelToken: nconf.get("stats:mixpanel:token"),
   googleTrackingId: nconf.get("web:trackingId"),
+  cdns: cdns,
   appVersion: appTag,
   websockets: {
     fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
