@@ -354,12 +354,10 @@ a:hover {
 }
 
 .trpHeaderContainer {
-	background-color: white;
-	text-align: center;
-	overflow: hidden;
-}
-
-.trpHeaderFrame {
+  max-width: 66em;
+  width: 100%;
+  display: inline-block;
+  text-align: center;
   margin-left: 160px;
   margin-right: 300px;
   transform: translate3d(0, 0, 0);
@@ -367,6 +365,11 @@ a:hover {
   -o-transition:all .3s ease-in-out; 
   -moz-transition:all .3s ease-in-out; 
   -webkit-transition:all .3s ease-in-out;
+}
+
+.trpHeaderFrame {
+
+
 }
 
 .trpHeaderFavourite {
@@ -517,6 +520,7 @@ a:hover {
 	text-align: left;
 	padding-top: 40px;
 	border-radius: 5px;
+	text-align: center;
   transform: translate3d(0, 0, 0);
   transition:all .3s ease-in-out; 
   -o-transition:all .3s ease-in-out; 
@@ -817,7 +821,7 @@ a:hover {
     -webkit-transition:all .3s ease-in-out;
 	}
 
-  .trpHeaderFrame {
+  .trpHeaderWrapper {
     margin-right: 280px;
     transform: translate3d(0, 0, 0);
     transition:all .3s ease-in-out; 
@@ -839,7 +843,7 @@ a:hover {
 		margin-right: 120px;
 	}
 
-  .trpHeaderFrame {
+  .trpHeaderWrapper {
     margin-left: 110px;
     margin-right: 120px;
   }
@@ -892,7 +896,7 @@ a:hover {
     -webkit-transition:all .3s ease-in-out;
 	}
 
-  .trpHeaderFrame {
+  .trpHeaderWrapper {
     margin-left: 100px;
     margin-right: 14px;
   }
