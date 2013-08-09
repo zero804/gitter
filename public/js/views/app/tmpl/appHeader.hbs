@@ -1,11 +1,11 @@
 <div class="trpHeaderFrame" id="header-frame" style="width:100%; max-width: 700px;">
-  {{#if isTroupe}}
-  <div class="trpHeaderFavourite {{#if troupeContext.troupe.favourite}}favourited{{/if}}">
-    <img src='{{cdn "images/2/icon-favourite-selected.png" }}' class="trpHeaderFavIcon favourited" width="24" height="24">
-    <img src='{{cdn "images/2/icon-favourite-unselected.png" }}' class="trpHeaderFavIcon unfavourited" width="24" height="24">
-  </div>
-  {{/if}}
   <div class="trpHeaderContainer" style="width: 100%;">
+    {{#if isTroupe}}
+    <div class="trpHeaderFavourite {{#if troupeContext.troupe.favourite}}favourited{{/if}}" style="float: left;">
+      <img src='{{cdn "images/2/icon-favourite-selected.png" }}' class="trpHeaderFavIcon favourited" width="24" height="24">
+      <img src='{{cdn "images/2/icon-favourite-unselected.png" }}' class="trpHeaderFavIcon unfavourited" width="24" height="24">
+    </div>
+    {{/if}}
     <div class="trpHeaderTitle" style="float: left;">
       {{headerTitle}}
     </div>
