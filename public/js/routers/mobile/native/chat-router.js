@@ -1,5 +1,6 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
+  'underscore',
   'jquery',
   'routers/mobile/mobile-router',
   'collections/chat',
@@ -7,8 +8,9 @@ require([
   'views/chat/chatCollectionView',
   'views/chat/chatInputView',
   'utils/mobile-resizer',
+  'log!chat-router',
   'components/native-context' // No ref
-  ], function($, MobileRouter, chatModels, context, ChatCollectionView, chatInputView, mobileResizer) {
+  ], function(_, $, MobileRouter, chatModels, context, ChatCollectionView, chatInputView, mobileResizer, log) {
   "use strict";
 
   // TODO: normalise this
@@ -29,8 +31,21 @@ require([
     initialize: function() {
       this.constructor.__super__.initialize.apply(this);
 
-      var chatCollection = new chatModels.ChatCollection([], { troupeId: troupeId });
+      var chatCollection = new chatModels.ChatCollection([], { troupeId: troupeId, parse: true });
+      var cache = window.localStorage['cache_chat_' + troupeId];
+      if(cache) {
+        cache = JSON.parse(cache);
+        chatCollection.reset(cache, { parse: true });
+        log('Loaded ' + cache.length + ' items from cache');
+        $('#chat-amuse').hide('fast', function() {
+          $(this).remove();
+        });
+      }
+
       chatCollection.listen();
+      chatCollection.on('change reset sync add remove', _.debounce(function() {
+        window.localStorage['cache_chat_' + troupeId] = JSON.stringify(chatCollection.toJSON());
+      }, 500));
 
       var chatCollectionView = new ChatCollectionView({
         el: $('#frame-chat'),
