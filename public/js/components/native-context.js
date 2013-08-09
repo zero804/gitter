@@ -25,11 +25,12 @@ define([
   // Communicates with the native app, giving it context
   function sendContext() {
     var params = [window.location.href];
-
-    switch(context.env('page')) {
+    var page = context.env('page');
+    switch(page) {
       case 'home':
         params.push("home", null, null);
         break;
+
       case 'chat':
       case 'files':
       case 'mails':
@@ -39,13 +40,12 @@ define([
         /* If the full troupe has not yet been loaded, wait for another update */
         if(!troupe.get('name')) return;
         var oneToOne = troupe.get('oneToOne');
-        params.push(oneToOne ? "oneToOne": "troupe", troupe.id, context.env('mobilePage'));
+        params.push(oneToOne ? "oneToOne": "troupe", troupe.id, page, troupe.get('name'));
         break;
 
       default:
         log('Unknown context');
-        // Unfortunately older clients will crash without the correct
-        // number of parameters
+        // Unfortunately older clients will crash without four parameters
         params.push(null, null, null);
     }
     log('Pushing context: ' + params.join(','));
