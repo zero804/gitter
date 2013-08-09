@@ -30,10 +30,6 @@ module.exports = function( grunt ) {
   // https://github.com/cowboy/grunt/blob/master/docs/getting_started.md
   //
   grunt.initConfig({
-    clean: {
-        folder: "public-processed/"
-    },
-
     htmllint: {
       all: ["public/**/*.hbs"]
     },
@@ -327,25 +323,6 @@ module.exports = function( grunt ) {
       }
     },
 
-    copy: {
-      dist: {
-        files: {
-          "public-processed/": "public/**"
-        }
-      }
-    },
-    exec: {
-      gzip: {
-        command: './build-scripts/gzip-processed.sh'
-      },
-      manifest: {
-        command: './build-scripts/update-manifest.sh'
-      },
-      validateConfig: {
-        command: './node_modules/.bin/jsonlint config/*.json'
-      }
-    },
-
     concat: {
       options: {
         separator: '\n'
@@ -545,17 +522,14 @@ module.exports = function( grunt ) {
 
   grunt.loadNpmTasks('grunt-requirejs');
   grunt.loadNpmTasks('grunt-contrib-less');
-  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-exec');
-  grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-reload');
   grunt.loadNpmTasks('grunt-bower-require-wrapper');
   grunt.loadNpmTasks('grunt-wrap');
   grunt.loadNpmTasks('grunt-closure-compiler');
 
-  grunt.registerTask('process', ['exec:validateConfig','clean','less','copy','requirejs', 'closure-compiler', 'exec:manifest','exec:gzip']);
-  grunt.registerTask('process-no-min', ['exec:validateConfig','clean','less','copy','requirejs','exec:manifest','exec:gzip']);
+  grunt.registerTask('process', ['less', 'requirejs', 'closure-compiler']);
+  grunt.registerTask('process-no-min', ['less', 'requirejs']);
 
   grunt.registerTask('watchr', 'reload watch');
   grunt.registerTask('client-libs', ['concat:fineuploader',
