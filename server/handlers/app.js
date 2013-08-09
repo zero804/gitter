@@ -136,7 +136,7 @@ module.exports = {
       });
 
       app.get('/version', function(req, res/*, next*/) {
-        res.json({ appVersion: appVersion.getCurrentVersion() });
+        res.json({ appVersion: appVersion.getAppTag() });
       });
 
 

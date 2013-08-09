@@ -6,6 +6,7 @@ var cdn = require("./cdn");
 var _ = require('underscore');
 
 var minifiedDefault = nconf.get("web:minified");
+var appTag = require('./appVersion').getAppTag();
 
 // This stuff never changes
 var troupeEnv = {
@@ -14,6 +15,7 @@ var troupeEnv = {
   homeUrl: nconf.get('web:homeurl'),
   mixpanelToken: nconf.get("stats:mixpanel:token"),
   googleTrackingId: nconf.get("web:trackingId"),
+  appVersion: appTag,
   websockets: {
     fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
     options: {

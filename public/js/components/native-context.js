@@ -1,9 +1,22 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'jquery',
   '../utils/context',
   'log!native-context'
-], function(context, log) {
+], function($, context, log) {
   "use strict";
+
+
+  $(document).on('app.version.mismatch', function() {
+    try {
+      if(window.applicationCache.status == 1) {
+        log('Attempting to update application cache');
+        window.applicationCache.update();
+      }
+    } catch(e) {
+      log('Unable to update application cache: ' + e, e);
+    }
+  });
 
   var cordova = window.cordova;
   if(!cordova) {
@@ -12,6 +25,8 @@ define([
   }
 
   log('Cordova detected, calling TroupeContext.updateContext');
+
+
 
   document.addEventListener("deviceready", function() {
     var troupe = context.troupe();
