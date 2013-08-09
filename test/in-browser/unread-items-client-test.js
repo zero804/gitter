@@ -1,18 +1,12 @@
 /*jshint unused:true, browser:true*/
-require([
+define([
   'jquery',
   'underscore',
   'collections/troupes',
   'expect',
-  'mocha',
   'components/unread-items-client'
-], function($, _, troupeModels, expect, mocha, unreadItemsClient) {
+], function($, _, troupeModels, expect, unreadItemsClient) {
   "use strict";
-
-  mocha.setup({
-    ui: 'bdd',
-    globals: ['troupeContext']
-  });
 
   describe('DoubleHash', function() {
     it('should be able to add items', function(done) {
@@ -463,11 +457,5 @@ require([
       done();
     });
   });
-
-  if (window.mochaPhantomJS) {
-    mochaPhantomJS.run();
-  } else {
-    mocha.run();
-  }
 
 });
