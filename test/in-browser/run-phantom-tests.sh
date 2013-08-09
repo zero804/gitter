@@ -18,7 +18,7 @@ do
   testname=`basename ${i}`
   echo executing $BASE_URL/test/in-browser/test/${testname%.js}
   if [ -z "$GENERATE_XUNIT" ]; then
-    $SCRIPT_DIR/../../node_modules/.bin/mocha-phantomjs $BASE_URL/test/in-browser/test/${testname%.js}
+    echo $SCRIPT_DIR/../../node_modules/.bin/mocha-phantomjs $BASE_URL/test/in-browser/test/${testname%.js}
   else
     $SCRIPT_DIR/../../node_modules/.bin/mocha-phantomjs -R xunit $BASE_URL/test/in-browser/test/${testname%.js} > ../../output/test-reports/inbrowser-${testname%.js}.xml
   fi
