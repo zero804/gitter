@@ -12,16 +12,17 @@ var restful = require("../services/restful");
 var nconf = require("../utils/config");
 var shutdown = require('../utils/shutdown');
 var contextGenerator = require('./context-generator');
+var appVersion = require('./appVersion');
 
+var appTag = appVersion.getAppTag();
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
   { re: /^\/troupes\/(\w+)$/,         validator: validateUserForTroupeSubscription },
   { re: /^\/troupes\/(\w+)\/(\w+)$/,  validator: validateUserForSubTroupeSubscription,  populator: populateSubTroupeCollection},
-  { re: /^\/user\/(\w+)\/(\w+)$/,                           validator: validateUserForUserSubscription,       populator: populateSubUserCollection },
-
-  { re: /^\/user\/(\w+)\/troupes\/(\w+)\/unreadItems$/,     validator: validateUserForUserSubscription,       populator: populateUserUnreadItemsCollection },
-
+  { re: /^\/user\/(\w+)\/(\w+)$/,     validator: validateUserForUserSubscription,       populator: populateSubUserCollection },
+  { re: /^\/user\/(\w+)\/troupes\/(\w+)\/unreadItems$/,
+                                      validator: validateUserForUserSubscription,       populator: populateUserUnreadItemsCollection },
   { re: /^\/user\/(\w+)$/,            validator: validateUserForUserSubscription },
   { re: /^\/ping$/,                   validator: validateUserForPingSubscription }
 ];
@@ -241,6 +242,9 @@ var authenticator = {
       return callback(message);
     }
 
+    if(!message.ext) message.ext = {};
+    message.ext.appVersion = appTag;
+
     // The other half of the UGLY hack,
     // get the userId out from the message
     var fakeId = message.id;
@@ -265,7 +269,6 @@ var authenticator = {
     presenceService.userSocketConnected(userId, clientId, connectionType, client, function(err) {
       if(err) winston.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
 
-      if(!message.ext) message.ext = {};
       message.ext.userId = userId;
 
       if(!troupeId) return callback(message);

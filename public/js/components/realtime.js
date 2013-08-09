@@ -69,10 +69,18 @@ define([
   ClientAuth.prototype.incoming = function(message, callback) {
     if(message.channel == '/meta/handshake') {
       if(message.successful) {
-        if(message.ext && message.ext.context) {
-          var c = message.ext.context;
-          if(c.troupe) context.setTroupe(c.troupe);
-          if(c.user) context.setUser(c.user);
+        var ext = message.ext;
+        if(ext) {
+          if(ext.appVersion && ext.appVersion !== context.env('appVersion')) {
+            log('Application version mismatch');
+            $(document).trigger('app.version.mismatch');
+          }
+
+          if(ext.context) {
+            var c = ext.context;
+            if(c.troupe) context.setTroupe(c.troupe);
+            if(c.user) context.setUser(c.user);
+          }
         }
         if(clientId !== message.clientId) {
           clientId = message.clientId;
