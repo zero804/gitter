@@ -100,6 +100,7 @@ define([
 
     onFormSubmit: function(e) {
       $('.login-failure').hide();
+      this.$el.find('#email, #password').blur();
       if(e) e.preventDefault();
       var form = this.$el.find('form');
       var that = this;
@@ -114,6 +115,7 @@ define([
         type: "POST",
         error: function(jqXHR, textStatus, errorThrown) {
           if(jqXHR.status == 401) {
+
             try {
               var data = jQuery.parseJSON(jqXHR.responseText);
 
