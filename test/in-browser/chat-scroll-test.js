@@ -1,17 +1,12 @@
 /*jshint unused:true, browser:true*/
-require([
+define([
   'jquery',
   'underscore',
   'expect',
-  'mocha',
   'collections/chat',
   'views/chat/chatCollectionView',
   'views/chat/scrollDelegate'
-], function($, _, expect, mocha, chatModel, ChatCollectionView, delegates) {
-  mocha.setup({
-    ui: 'bdd',
-    timeout: 20000
-  });
+], function($, _, expect, chatModel, ChatCollectionView, delegates) {
 
   /*
   * Default browser scroll behaviour:
@@ -28,6 +23,7 @@ require([
   // to ensure that our test environment is working properly
   describe("Mimmick default browser scroll behaviour", function() {
     it("should keep the current scroll position as the height of the container grows", function(done) {
+      console.log('woo')
       done();
     });
   });
@@ -161,12 +157,6 @@ require([
       this.scrollDelegate.onAfterItemAdded();
     };
 
-  }
-
-  if (window.mochaPhantomJS) {
-    mochaPhantomJS.run();
-  } else {
-    mocha.run();
   }
 
 });
