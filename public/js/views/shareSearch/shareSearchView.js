@@ -222,7 +222,7 @@ define([
           source.push({ email: query, displayName: query, avatarUrlSmall: '/avatarForEmail/'+query });
         } else {
           // add a non-selectable option which says continue typing an email address
-          source.push({ displayName: "You can also type an email address to invite somebody new.", nonSelectable: true });
+          source.push({ displayName: "Try typing an email address as well.", nonSelectable: true });
         }
       }
 
