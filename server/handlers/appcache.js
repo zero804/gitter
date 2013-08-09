@@ -17,7 +17,11 @@ module.exports = {
       if(!useAppCache) return next(404);
 
       var page = req.params[0]; // chat / people / mails / files
-      res.set('Content-Type', 'text/cache-manifest');
+
+      res.setHeader("Cache-Control", "public, max-age=0");
+      res.setHeader("Expires", new Date().toUTCString());
+      res.setHeader('Content-Type', 'text/cache-manifest');
+
       res.render('appcache/' + page, {
         version: currentVersion,
         minified: minified
