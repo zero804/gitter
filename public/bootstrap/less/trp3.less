@@ -354,9 +354,7 @@ a:hover {
 }
 
 .trpHeaderContainer {
-  max-width: 66em;
-  width: 100%;
-  display: inline-block;
+  display: block;
   text-align: center;
   margin-left: 160px;
   margin-right: 300px;
@@ -368,8 +366,9 @@ a:hover {
 }
 
 .trpHeaderFrame {
-
-
+  max-width: 66em;
+  width: 100%;
+  display: inline-block;
 }
 
 .trpHeaderFavourite {
@@ -420,11 +419,13 @@ a:hover {
 .trpHeaderTitle {
   display: block;
 	.trpH1;
-  padding-left: 62px;
 	text-align: left;
 	color: #333;
-	padding-top: 12px;
+	padding-top: 10px;
 	height: 60px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden
 }
 
 .trpHeaderToolbar {
@@ -821,7 +822,7 @@ a:hover {
     -webkit-transition:all .3s ease-in-out;
 	}
 
-  .trpHeaderWrapper {
+  .trpHeaderContainer {
     margin-right: 280px;
     transform: translate3d(0, 0, 0);
     transition:all .3s ease-in-out; 
@@ -843,7 +844,7 @@ a:hover {
 		margin-right: 120px;
 	}
 
-  .trpHeaderWrapper {
+  .trpHeaderContainer {
     margin-left: 110px;
     margin-right: 120px;
   }
@@ -896,9 +897,17 @@ a:hover {
     -webkit-transition:all .3s ease-in-out;
 	}
 
-  .trpHeaderWrapper {
+  .trpHeaderContainer {
     margin-left: 100px;
     margin-right: 14px;
+  }
+
+  .trpHeaderFavourite {
+    padding-left: 0px;
+  }
+
+  .trpHeaderTitle {
+    padding-left: 0px;
   }
 
   .trpChatDetails {
