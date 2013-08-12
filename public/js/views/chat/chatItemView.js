@@ -14,8 +14,9 @@ define([
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
   'oEmbed',
+  'template/helpers/linkify',
   'bootstrap_tooltip'
-], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, chatItemTemplate, chatInputView, UnreadItemViewMixin, oEmbed /* tooltip*/) {
+], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, chatItemTemplate, chatInputView, UnreadItemViewMixin, oEmbed, linkify /* tooltip*/) {
 
   "use strict";
 
@@ -33,41 +34,30 @@ define([
     initialize: function(options) {
       var self = this;
 
-      this.setRerenderOnChange(true);
       this.userCollection = options.userCollection;
       //this.scrollDelegate = options.scrollDelegate;
 
+      this.model.on('change', function() {
+        self.onChange();
+      });
+
       if (this.isInEditablePeriod()) {
-        // re-render once the message is not editable
+        // update once the message is not editable
         var notEditableInMS = (this.model.get('sent').valueOf() + 240000) - Date.now();
         setTimeout(function() {
-          self.render();
+          self.onChange();
         }, notEditableInMS + 50);
       }
 
       if (!this.isOld()) {
         var oldInMS = (this.model.get('sent').valueOf() + 3600000 /*1 hour*/) - Date.now();
         setTimeout(function() {
-          self.render();
+          self.onChange();
         }, oldInMS + 50);
       }
 
-      // dblclick / doubletap don't seem to work on mobile even with user-scalable=no
-      /*
-      if (window._troupeCompactView) {
-        this.$el.on('dblclick', function() {
-          self.toggleEdit();
-        });
-      }*/
     },
-    /*
-    stopListening: function() {
-      if (!arguments.length)
-        this.$el.off('dblclick');
-      else
-        TroupeViews.Base.prototype.stopListening.apply(this, arguments);
-    },
-    */
+
     safe: function(text) {
       return (''+text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/\n\r?/g, '<br />');
     },
@@ -75,33 +65,44 @@ define([
     getRenderData: function() {
       var data = this.model.toJSON();
 
-      //data.isViewers = this.isOwnMessage();
-      data.isInEditablePeriod = this.isInEditablePeriod();
-      data.canEdit = this.canEdit();
-      data.hasBeenEdited = this.hasBeenEdited();
-
-      data.editIconTooltip = (this.hasBeenEdited()) ? "Edited shortly after being sent": ((this.canEdit()) ? "Edit within 4 minutes of sending" : "It's too late to edit this message.");
-
-      // We need to parse the text a little to hyperlink known links and escape html to prevent injection
-      data.text = this.safe(data.text);
-
       data.displayName = data.fromUser.displayName;
-
-      /* TODO: css selectors should be able to handle this from a single class on a parent div */
-      //if(data.isViewers) {
-        data.chatRowClass = 'trpChatRow';
-        data.chatRowPictureClass = 'trpChatPictureLocal';
-        data.chatBubbleAdditional = 'local';
-      //} else {
-      //  data.chatRowClass = 'trpChatRowRemote';
-      //  data.chatRowPictureClass = 'trpChatPictureRemote';
-      //  data.chatBubbleAdditional = 'remote';
-      //}
 
       return data;
     },
 
+    onChange: function() {
+      if (this.model.changed.text) {
+        this.renderText();
+      }
+
+      this.updateRender();
+    },
+
+    renderText: function() {
+      // We need to parse the text a little to hyperlink known links and escape html to prevent injection
+      this.$el.find('.trpChatText').html(String(linkify(this.safe(this.model.get('text')))));
+      this.oEmbed();
+    },
+
     afterRender: function() {
+      this.renderText();
+      this.updateRender();
+    },
+
+    updateRender: function() {
+      this.setState();
+
+      var editIconTooltip = (this.hasBeenEdited()) ? "Edited shortly after being sent": ((this.canEdit()) ? "Edit within 4 minutes of sending" : "It's too late to edit this message.");
+      var editIcon = this.$el.find('.trpChatEdit [title]');
+
+      if (!window._troupeCompactView) {
+        editIcon.tooltip('destroy');
+        editIcon.attr('title', editIconTooltip);
+        editIcon.tooltip({ container: 'body' });
+      }
+    },
+
+    setState: function() {
       this.$el.toggleClass('isViewers', this.isOwnMessage());
       this.$el.toggleClass('isEditable', this.isInEditablePeriod());
       this.$el.toggleClass('canEdit', this.canEdit());
@@ -109,11 +110,10 @@ define([
       this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
       this.$el.toggleClass('hasBeenRead', this.hasBeenRead());
       this.$el.toggleClass('isOld', this.isOld());
+    },
 
-      if (!window._troupeCompactView) {
-        this.$el.find('.trpChatEdit [title]').tooltip({ container: 'body' });
-      }
-
+    // Note: This must only be called *once* after the element content is set from the model
+    oEmbed: function() {
       // TODO: send the URL's from the server? twitter-text etc
       oEmbed.defaults.maxwidth = 370;
       var self = this;
@@ -203,7 +203,7 @@ define([
     },
 
     showText: function() {
-      this.$el.find('.trpChatText').html(this.model.get('text').replace(/\n/g,"<br/>"));
+      this.renderText();
 
       if (this.inputBox) {
         this.stopListening(this.inputBox);

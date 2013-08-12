@@ -1,13 +1,8 @@
 /*jshint unused:true, browser:true*/
 require([
   'assert',
-  'mocha',
   'utils/mixpanel'
-], function(assert, mocha, mixpanel) {
-  mocha.setup({
-    ui: 'bdd',
-    timeout: 20000
-  });
+], function(assert, mixpanel) {
 
   describe("Mixpanel should load correctly", function() {
 
@@ -20,11 +15,5 @@ require([
     });
 
   });
-
-  if (window.mochaPhantomJS) {
-    mochaPhantomJS.run();
-  } else {
-    mocha.run();
-  }
 
 });
