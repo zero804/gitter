@@ -109,7 +109,7 @@ define([
       $("#toolbar-frame, #content-frame, #header-wrapper, #chat-input-wrapper").css({"right" : "0px"});
 
       $(whichPanel).css({
-        "right": '-240px'
+        "right": '-260px'
       });
 
       this.rightpanel = false;
@@ -119,7 +119,7 @@ define([
       if (!this.rightpanel) {
 
 
-        $("#toolbar-frame, #content-frame, #header-wrapper, #chat-input-wrapper").css({"right" :"240px"});
+        $("#toolbar-frame, #content-frame, #header-wrapper, #chat-input-wrapper").css({"right" :"260px"});
 
         $(whichPanel).css({
           "right": '0px'
