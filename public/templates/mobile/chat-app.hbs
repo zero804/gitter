@@ -21,7 +21,7 @@
     {{>require_wrapper}}
 
     {{#if isWebApp}}
-    {{{bootScript "routers/mobile/web/mobile-app-router" skipCdn=true }}}
+    {{{bootScript "mobile-app" skipCdn=true }}}
     {{else}}
     {{{bootScript "routers/mobile/native/chat-router" skipCdn=true }}}
     {{/if}}
