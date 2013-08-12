@@ -106,55 +106,25 @@ define([
 
     hidePanel: function (whichPanel) {
 
-      $(whichPanel).animate({
-        right: '-240px'
-      }, 350, function() {
+      $("#toolbar-frame, #content-frame, #header-wrapper, #chat-input-wrapper").css({"right" : "0px"});
 
+      $(whichPanel).css({
+        "right": '-240px'
       });
-      $("#toolbar-frame").animate({
-        right: '0px'
-        }, 350, function() {
-      });
-      $("#chat-frame").animate({
-        marginRight: '320px'
-        }, 350, function() {
-      });
-
-      if ($(document).width() < 1250) {
-        $("#content-frame, #header-frame, #alert-content, #chat-input").animate({
-          left: '+=100px'
-        }, 350, function() {
-        });
-      }
 
       this.rightpanel = false;
     },
 
     showPanel: function(whichPanel) {
       if (!this.rightpanel) {
+
+
+        $("#toolbar-frame, #content-frame, #header-wrapper, #chat-input-wrapper").css({"right" :"240px"});
+
+        $(whichPanel).css({
+          "right": '0px'
+        }, 350);
         $(whichPanel).show();
-        $("#toolbar-frame").animate({
-          right: '240px'
-          }, 350, function() {
-        });
-        $("#chat-frame").animate({
-          marginRight: '560px'
-          }, 350, function() {
-        });
-        $(whichPanel).animate({
-          right: '0px'
-        }, 350, function() {
-      // $("#left-menu").show();
-        });
-
-        if ($(document).width() < 1250) {
-
-          $("#content-frame, #header-frame, #alert-content, #chat-input").animate({
-            left: '-=100px'
-          }, 350, function() {
-          });
-
-        }
 
         this.rightpanel = true;
       }
@@ -171,13 +141,11 @@ define([
         this.activateSearchList();
       }
 
-      $("#left-menu").animate({
-        width: "280px"
-      }, 300);
+      $("#left-menu").css({
+        "width": "280px"
+      });
 
-      $("#content-frame").animate({
-        left: "280px"
-      }, 300);
+      $("#content-frame, #header-wrapper, #chat-input-wrapper").css({"left" : "280px"});
 
       this.leftmenu = true;
     },
@@ -189,14 +157,11 @@ define([
       // refocus chat input in case it's lost focus but don't do that on tablets
       if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
 
-      $("#left-menu").animate({
-        width: "-=280px"
-      }, 300);
+      $("#content-frame, #header-wrapper, #chat-input-wrapper").css({"left" : "0px"});
 
-      $("#content-frame").animate({
-        left: "0px"
-      }, 300);
-
+      $("#left-menu").css({
+        "width": "0px"
+      });
 
       this.leftmenu = false;
     },

@@ -127,10 +127,10 @@ a:hover {
 	padding-top: 18px;
 	margin-top: 0px;
 	overflow: hidden;
-/*	transition:all .5s linear; 
-	-o-transition:all .5s linear; 
-	-moz-transition:all .5s linear; 
-	-webkit-transition:all .5s linear;*/
+	transition:all .3s ease-in-out; 
+	-o-transition:all .3s ease-in-out;; 
+	-moz-transition:all .3s ease-in-out;; 
+	-webkit-transition:all .3s ease-in-out;;
 }
 
 .trpMiniLeftMenu {
@@ -143,10 +143,10 @@ a:hover {
 	bottom: 0;
 	z-index: 1013;
 	opacity: 0.8;
-		transition:all .2s linear; 
-	-o-transition:all .2s linear; 
-	-moz-transition:all .2s linear; 
-	-webkit-transition:all .2s linear;
+		transition:all .2s ease-in-out;; 
+	-o-transition:all .2s ease-in-out;; 
+	-moz-transition:all .2s ease-in-out;; 
+	-webkit-transition:all .2s ease-in-out;;
 }
 
 .trpMiniLeftMenu:hover { 
@@ -333,6 +333,11 @@ a:hover {
   /* we need the content panel to take up the entire middle of the screen*/
   /* so that the mouseover event to close the left menu on it gets triggered */
   min-height: 400px;
+  transform: translate3d(0, 0, 0);
+  transition:all .3s ease-in-out; 
+  -o-transition:all .3s ease-in-out; 
+  -moz-transition:all .3s ease-in-out; 
+  -webkit-transition:all .3s ease-in-out;
 }
 
 .trpContentSpacer {
@@ -350,7 +355,11 @@ a:hover {
 	z-index: 1000;
 	overflow: hidden;
 	opacity: 0.92;
-/*	border-top: 2px solid @trpGreen;*/
+  transform: translate3d(0, 0, 0);
+  transition:all .3s ease-in-out; 
+  -o-transition:all .3s ease-in-out; 
+  -moz-transition:all .3s ease-in-out; 
+  -webkit-transition:all .3s ease-in-out;
 }
 
 .trpHeaderContainer {
@@ -530,6 +539,7 @@ a:hover {
 }
 
 .trpToolbar {
+  border-left: 2px solid white;
   position: fixed;
   display: inline-block;
   width: 240px;
@@ -628,6 +638,12 @@ a:hover {
   z-index: 1000;
   overflow: hidden;
   bottom: 0px;
+  transform: translate3d(0, 0, 0);
+  transition:all .3s ease-in-out; 
+  -o-transition:all .3s ease-in-out; 
+  -moz-transition:all .3s ease-in-out; 
+  -webkit-transition:all .3s ease-in-out;
+  padding-top: 8px;
 }
 
 .trpChatInputArea {
@@ -983,7 +999,7 @@ a:hover {
 	}
 
 	#request-roster, #invite-roster, #file-list, #mail-list, #people-share-troupe-button {
-		display: none;
+
 	}
 
 }
