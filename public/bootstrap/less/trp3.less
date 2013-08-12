@@ -620,22 +620,26 @@ a:hover {
 }
 
 .trpChatInputWrapper {
-  display: inline-block;
-	width: 100%;
-	background-color: white;
-	text-align: center;
-	position: fixed;
-	z-index: 1000;
-	overflow: hidden;
-	bottom: 0px;
-	padding: 10px 0px;
+  width: 100%;
+  height: 60px;
+  background-color: white;
+  text-align: center;
+  position: fixed;
+  z-index: 1000;
+  overflow: hidden;
+  bottom: 0px;
 }
 
 .trpChatInputArea {
-	display: inline-block;
-	position: relative;
-	width: 700px;
-	text-align: left;
+  display: block;
+  text-align: center;
+  margin-left: 160px;
+  margin-right: 300px;
+  transform: translate3d(0, 0, 0);
+  transition:all .3s ease-in-out; 
+  -o-transition:all .3s ease-in-out; 
+  -moz-transition:all .3s ease-in-out; 
+  -webkit-transition:all .3s ease-in-out;
 }
 
 .trpSearchInviteResult {
@@ -830,6 +834,15 @@ a:hover {
     -moz-transition:all .3s ease-in-out; 
     -webkit-transition:all .3s ease-in-out;
   }
+
+  .trpChatInputArea {
+    margin-right: 280px;
+    transform: translate3d(0, 0, 0);
+    transition:all .3s ease-in-out; 
+    -o-transition:all .3s ease-in-out; 
+    -moz-transition:all .3s ease-in-out; 
+    -webkit-transition:all .3s ease-in-out;
+  }
 }
 
 @media screen and (max-width:1024px) { 
@@ -849,6 +862,16 @@ a:hover {
     margin-right: 120px;
   }
 
+  .trpChatInputArea {
+    margin-left: 110px;
+    margin-right: 120px;
+  }
+
+  .trpChatInputArea .avatar-s {
+    width: 24px;
+    height: 24px;
+  }
+
 	.trpChatItem .avatar-s {
 		width: 24px;
 		height: 24px;
@@ -857,6 +880,10 @@ a:hover {
 	.trpChatBox {
 		margin-left: 40px;
 	}
+
+  .trpChatInputBox {
+    margin-left: 40px;
+  }
 
 	#request-roster, #invite-roster, #file-list, #mail-list, #people-share-troupe-button {
 		display: none;
@@ -900,6 +927,19 @@ a:hover {
   .trpHeaderContainer {
     margin-left: 100px;
     margin-right: 14px;
+  }
+
+  .trpChatInputArea {
+    margin-left: 100px;
+    margin-right: 14px;
+  }
+
+  .trpChatInputArea .avatar-s {
+    display: none;
+  }
+
+  .trpChatInputBox {
+    margin-left: 0;
   }
 
   .trpHeaderFavourite {

@@ -12,14 +12,25 @@
   width: 100%;
 }
 
+.trpChatInputContainer {
+  padding-bottom: 75px;
+  text-align: center;
+  max-width: 66em;
+  display: inline-block;
+  width: 100%;
+}
+
+.trpChatInputAvatar {
+  float: left;
+}
+
 .trpChatInputBox {
-	display: inline-block;
+	display: block;
 	background-color: white;
 /*	height: 58px;*/
 	vertical-align: top;
-	width: 404px;
 	border-radius: 5px 5px 5px 5px;
-	margin-left: 12px;
+	margin-left: 64px;
 }
 
 .trpChatAvatar {
@@ -27,7 +38,7 @@
 }
 
 .trpChatInput, .trpChatInputBoxTextArea {
-	display: inline-block;
+	display: block;
 	width: 100%;
 	outline: none;
 	.trpBodyMedium;
@@ -40,8 +51,9 @@
 }
 
 .trpChatInputBoxTextArea {
-  width: 394px;
   overflow: hidden;
+  padding: 0;
+  margin: 0;
 }
 
 .trpChatItem {
@@ -190,29 +202,10 @@
     display: block;
   }
 
-  .trpChatInputArea {
-    position: fixed;
-    bottom: 0px;
-    width: 100%;
-    z-index: 5;
-    background-color: white;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-left: 5px;
-  }
-
-  .trpChatInputBox {
-    margin-left: 4px;
-    width: 270px;
-  }
-
   .trpChatPanel {
     padding: 5px;
   }
 
-  .trpChatInputBoxTextArea {
-    width: 220px;
-  }
 
   .trpChatText {
     max-width: 255px;
@@ -230,15 +223,6 @@
   .trpChatText {
     max-width: 480px;
 
-  }
-
-  .trpChatInputBoxTextArea {
-    width: 420px;
-  }
-
-    .trpChatInputBox {
-    margin-left: 4px;
-    width: 420px;
   }
 
 
