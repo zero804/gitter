@@ -1,10 +1,12 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
+  'jquery',
   'mobile-app-container',
   'collections/chat',
   'views/chat/chatCollectionView',
   'views/chat/chatInputView'
-  ], function(app, chatModels, ChatCollectionView, chatInputView) {
+  ], function($, app, chatModels, ChatCollectionView, chatInputView) {
+  "use strict";
 
   var chatCollection = new chatModels.ChatCollection();
   chatCollection.listen();

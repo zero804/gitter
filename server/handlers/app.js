@@ -19,9 +19,10 @@ function renderHomePage(req, res, next) {
     if(err) {
       next(err);
     } else {
-      res.render('app-template', {
+      res.render(req.isPhone ? 'mobile/chat-app' : 'app-template', {
         useAppCache: !!nconf.get('web:useAppCache'),
-        bootScriptName: 'router-homepage',
+        bootScriptName: req.isPhone ? 'mobile-userhome' : 'router-homepage',
+        isWebApp: true,
         troupeName: req.user.displayName,
         troupeContext: JSON.stringify(troupeContext),
         troupeContextData: troupeContext,
@@ -41,11 +42,20 @@ function renderAppPageWithTroupe(req, res, next, page) {
     } else {
       var login = !user || troupeContext.profileNotCompleted || accessDenied;
 
+      var bootScript;
+      if(req.isPhone) {
+        bootScript = 'mobile-app';
+      } else if(login) {
+        bootScript = 'router-login';
+      } else {
+        bootScript = 'router-app';
+      }
+
       res.render(page, {
         useAppCache: !!nconf.get('web:useAppCache'),
         login: login,
         isWebApp: !req.params.mobilePage,
-        bootScriptName: login ? "router-login" : "router-app",
+        bootScriptName: bootScript,
         troupeName: troupeContext.troupe.name,
         troupeContext: JSON.stringify(troupeContext),
         troupeContextData: troupeContext,
@@ -204,6 +214,7 @@ module.exports = {
       app.get('/home',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
+        isPhoneMiddleware,
         function(req, res, next) {
           if(req.user && req.user.username) {
             res.relativeRedirect(req.user.getHomeUrl());
