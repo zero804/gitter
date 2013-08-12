@@ -1,26 +1,18 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
-  'underscore',
   'utils/context',
-  'backbone',
-  'marionette',
   'views/base',
   'hbs!./tmpl/chatInputView',
-  'collections/chat',
   '../../utils/momentWrapper',
-  'jquery-placeholder'
-], function($, _, context, Backbone, Marionette, TroupeViews, template, chatModels, moment) {
+  'jquery-placeholder' // No ref
+], function($, context, TroupeViews, template,  moment) {
   "use strict";
 
   var PAGE_SIZE = 50;
 
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
-
-    initialize: function(options) {
-      this.scrollDelegate = options.scrollDelegate;
-    },
 
     getRenderData: function() {
       return {
@@ -31,7 +23,6 @@ define([
     afterRender: function() {
       this.inputBox = new ChatInputBoxView({
         el: this.$el.find('.trpChatInputBoxTextArea'),
-        scrollDelegate: this.scrollDelegate
       });
 
       this.listenTo(this.inputBox, 'save', this.send);
@@ -75,7 +66,7 @@ define([
 
       this.chatLines = 2;
 
-      this.scrollDelegate = options.scrollDelegate;
+      //this.scrollDelegate = options.scrollDelegate;
 
       this.originalChatInputHeight = this.$el.height();
       this.$el.placeholder();
@@ -91,7 +82,7 @@ define([
       this.chatLines = 2;
       chatPadding = originalChatPadding;
       this.$el.height(this.originalChatInputHeight);
-      $('#frame-chat').css('padding-bottom', chatPadding);
+      //$('#content-frame').css('bottom', chatPadding);
 
     },
 
@@ -99,21 +90,21 @@ define([
       var lht = parseInt(this.$el.css('lineHeight'),10);
       var height = this.$el.prop('scrollHeight');
       var currentLines = Math.floor(height / lht);
-      var wasAtBottom = this.scrollDelegate.isAtBottom();
+      //var wasAtBottom = this.scrollDelegate.isAtBottom();
 
       if (currentLines != this.chatLines) {
         this.chatLines = currentLines;
         var newHeight = currentLines * lht;
 
         this.$el.height(newHeight);
-        var frameChat = $('#frame-chat'), isChild = frameChat.find(this.el).length;
-        if (!isChild) {
+        //var frameChat = $('#frame-chat'), isChild = frameChat.find(this.el).length;
+        //if (!isChild) {
           chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
-          $('#frame-chat').css('padding-bottom', chatPadding);
-        }
-        if (wasAtBottom) {
-          this.scrollDelegate.scrollToBottom();
-        }
+          //$('#content-frame').css('bottom', chatPadding);
+        //}
+        //if (wasAtBottom) {
+        //  this.scrollDelegate.scrollToBottom();
+        //}
       }
     },
 

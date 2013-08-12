@@ -10,13 +10,12 @@ define([
   'components/unread-items-client',
   'marionette',
   'views/base',
-  './scrollDelegate',
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
   'oEmbed',
   'bootstrap_tooltip'
-], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate, chatInputView, UnreadItemViewMixin, oEmbed /* tooltip*/) {
+], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, chatItemTemplate, chatInputView, UnreadItemViewMixin, oEmbed /* tooltip*/) {
 
   "use strict";
 
@@ -36,7 +35,7 @@ define([
 
       this.setRerenderOnChange(true);
       this.userCollection = options.userCollection;
-      this.scrollDelegate = options.scrollDelegate;
+      //this.scrollDelegate = options.scrollDelegate;
 
       if (this.isInEditablePeriod()) {
         // re-render once the message is not editable
@@ -122,7 +121,7 @@ define([
         oEmbed.parse(el.href, function(embed) {
           if (embed) {
             $(el).append('<div class="embed">' + embed.html + '</div>');
-            self.scrollDelegate.scrollToBottom();
+            //self.scrollDelegate.scrollToBottom();
           }
         });
       });
@@ -214,7 +213,7 @@ define([
     },
 
     showInput: function() {
-      var isAtBottom = this.scrollDelegate.isAtBottom();
+      //var isAtBottom = this.scrollDelegate.isAtBottom();
 
       // create inputview
       this.$el.find('.trpChatText').html("<textarea class='trpChatInput'>"+this.model.get('text')+"</textarea>").find('textarea').select();
@@ -222,9 +221,9 @@ define([
       this.listenTo(this.inputBox, 'save', this.saveChat);
 
       // this.$el.find('.trpChatText textarea').focus().on('blur', function() { self.toggleEdit(); });
-      if (isAtBottom) {
-        this.scrollDelegate.$scrollOf.scrollTop(this.scrollDelegate.$container.height());
-      }
+      //if (isAtBottom) {
+      //  this.scrollDelegate.$scrollOf.scrollTop(this.scrollDelegate.$container.height());
+      //}
     },
 
     showReadBy: function() {
