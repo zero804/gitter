@@ -689,7 +689,7 @@ define([
     },
 
     appendHtml: function(collectionView, itemView, index) {
-      log("Inserting view at index ", index, " of ", collectionView.collection.length, " in collection ", collectionView.collection.url, "; itemView ", itemView.model.attributes, ((this.isRendering) ? " with rendering shortcut" : ''));
+      //log("Inserting view at index ", index, " of ", collectionView.collection.length, " in collection ", collectionView.collection.url, "; itemView ", itemView.model.attributes, ((this.isRendering) ? " with rendering shortcut" : ''));
 
       // Shortcut - just place at the end!
       if (this.isRendering) {
