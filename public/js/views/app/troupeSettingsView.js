@@ -139,14 +139,14 @@ define([
       var troupeName = this.$el.find('input[name=name]').val().trim();
       var self = this;
 
-      if(window.troupeContext.troupe.name === troupeName) {
+      if(context.getTroupe().name === troupeName) {
         self.dialog.hide();
         self.dialog = null;
         return;
       }
 
       // Why are we doing this again?
-      context.geTroupe().name = troupeName;
+      context.getTroupe().name = troupeName;
 
       $.ajax({
         url: '/troupes/' + context.getTroupeId(),
