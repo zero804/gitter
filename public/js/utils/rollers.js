@@ -47,8 +47,6 @@ define(['log!rollers'], function(log) {
 
       var target = this._target;
 
-      this.scrollBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
-
       if(this.isScrolledToBottom()) {
         this._mode = TRACK_BOTTOM;
       } else {
@@ -65,12 +63,6 @@ define(['log!rollers'], function(log) {
 
       }
 
-
-      //setTimeout(function() {
-      //  this.trackLocation();
-      //}, 0);
-
-      //this.trackLocation();
     },
 
     isScrolledToBottom: function() {
@@ -81,15 +73,26 @@ define(['log!rollers'], function(log) {
 
     updateTrackBottom: function() {
       var target = this._target;
-      var scrollTop = target.scrollHeight - target.clientHeight;// - this.scrollBottom;
+      var scrollTop = target.scrollHeight - target.clientHeight;
       target.scrollTop = scrollTop;
+    },
+
+    scrollToBottom: function() {
+      var target = this._target;
+      var scrollTop = target.scrollHeight - target.clientHeight;
+      target.scrollTop = scrollTop;
+
+      delete this._nopass;
+      delete this._stableElement;
+      delete this._stableElementFromBottom;
+      this._mode = TRACK_BOTTOM;
+      this._postMutateTop = scrollTop;
     },
 
     updateTrackNoPass: function() {
       var target = this._target;
 
-      var scrollTop = target.scrollHeight - target.clientHeight;// - this.scrollBottom;
-      //var scrollTop = target.scrollHeight - target.clientHeight - this.scrollBottom;
+      var scrollTop = target.scrollHeight - target.clientHeight;
       var nopassOffset = this._nopass.offsetTop - target.offsetTop;
       if(scrollTop < nopassOffset) {
         target.scrollTop = scrollTop;
@@ -98,7 +101,6 @@ define(['log!rollers'], function(log) {
         this._nopass = null;
         this._mode = STABLE;
 
-        this.scrollBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
         this._stableElement = this.getBottomMostVisibleElement();
 
         // TODO: check that the element is within the targets DOM heirachy
@@ -110,6 +112,7 @@ define(['log!rollers'], function(log) {
         //this.trackLocation();
       }
     },
+
 
     updateStableTracking: function() {
       if(!this._stableElement) return;
@@ -148,7 +151,6 @@ define(['log!rollers'], function(log) {
         }
       }
 
-      this.scrollBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
       if(this._mode === STABLE) {
         this._stableElement = this.getBottomMostVisibleElement();
 

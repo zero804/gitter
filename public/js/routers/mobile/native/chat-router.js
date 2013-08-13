@@ -59,8 +59,7 @@ require([
 
       new chatInputView.ChatInputView({
         el: $('#chat-input'),
-        collection: chatCollection,
-        scrollDelegate: chatCollectionView.scrollDelegate
+        collection: chatCollection
       }).render();
 
       mobileResizer.reset();
