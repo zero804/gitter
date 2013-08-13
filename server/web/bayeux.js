@@ -356,6 +356,7 @@ var authorisor = {
     var m = match.match;
     var clientId = message.clientId;
 
+    /* The populator is all about generating the snapshot for the client */
     if(clientId && populator) {
       presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
         if(err) {

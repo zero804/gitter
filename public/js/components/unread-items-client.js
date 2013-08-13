@@ -610,29 +610,38 @@ define([
   };
 
   var _unreadItemStore;
-  var _realtimeSync;
+
+  /**
+   * Returns an instance of the unread items store,
+   * or throws an error if it's not obtainable
+   */
+  function getUnreadItemStore() {
+    if(_unreadItemStore) return _unreadItemStore;
+
+    if(context.getUserId() && context.getTroupe()) {
+      _unreadItemStore = new UnreadItemStore();
+      new ReadItemSender(_unreadItemStore);
+      var realtimeSync = new TroupeUnreadItemRealtimeSync(_unreadItemStore);
+      realtimeSync._subscribe();
+      new ReadItemRemover(realtimeSync);
+
+      return _unreadItemStore;
+    }
+
+    return null;
+
+  }
 
   /**
    * Returns an instance of the unread items store,
    * or throws an error if it's not obtainable
    */
   function getUnreadItemStoreReq() {
-    if(!_unreadItemStore) {
-      if(context.getTroupeId() && context.getUserId()) {
-        _unreadItemStore = new UnreadItemStore();
-        new ReadItemSender(_unreadItemStore);
+    var store = getUnreadItemStore();
+    if(store) return store;
 
-        _realtimeSync = new TroupeUnreadItemRealtimeSync(_unreadItemStore);
-        _realtimeSync._subscribe();
-        new ReadItemRemover(_realtimeSync);
-      } else {
-        throw new Error("Unable to create an unread items store without troupe and user");
-      }
-    }
-    return _unreadItemStore;
+    throw new Error("Unable to create an unread items store without a user");
   }
-
-
 
   var unreadItemsClient = {
 
@@ -663,11 +672,17 @@ define([
     },
 
     installTroupeListener: function(troupeCollection) {
-      var unreadItemStore = getUnreadItemStoreReq();
+      var unreadItemStore = getUnreadItemStore();
 
-      new TroupeCollectionSync(troupeCollection, unreadItemStore);
       new TroupeCollectionRealtimeSync(troupeCollection)._subscribe();
+
+      if(unreadItemStore) {
+        new TroupeCollectionSync(troupeCollection, unreadItemStore);
+      }
+
+      /* Store can be optional below */
       new TroupeUnreadNotifier(troupeCollection, unreadItemStore);
+
     },
 
     syncCollections: function(collections) {

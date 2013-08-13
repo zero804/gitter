@@ -100,20 +100,6 @@ function unauthenticatedPhoneRedirectMiddleware(req, res, next) {
     next();
   }
 }
-/*
-function saveLastTroupeMiddleware(req, res, next) {
-  if(req.user && req.troupe) {
-    userService.saveLastVisitedTroupeforUser(req.user, req.troupe, function(err) {
-      if (err) winston.info("Something went wrong saving the user last troupe visited: ", { exception: err });
-      next();
-
-    });
-    return;
-  }
-
-  next();
-}
-*/
 
 function renderMiddleware(template, mobilePage) {
   return function(req, res, next) {
