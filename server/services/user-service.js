@@ -158,7 +158,7 @@ var userService = {
            { $set: setOp },
            { upsert: true }),
         // Update User
-        persistence.User.updateQ({ id: userId }, { $set: { lastTroupe: troupeId }})
+        persistence.User.updateQ({ _id: userId }, { $set: { lastTroupe: troupeId }})
       ])
       .then(function() {
         // XXX: lastAccessTime should be a date but for some bizarre reason it's not
