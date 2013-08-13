@@ -229,7 +229,7 @@ define([
       this.readBy = new ReadByPopover({
         model: this.model,
         userCollection: this.userCollection,
-        placement: 'bottom',
+        placement: 'vertical',
         title: 'Read By',
         targetElement: this.$el.find('.trpChatReads')[0]
       });
