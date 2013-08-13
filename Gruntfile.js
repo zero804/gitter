@@ -141,6 +141,14 @@ module.exports = function( grunt ) {
                   ],
                   exclude: ["core-libraries"]
               },
+               {
+                  name: "complete-profile",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar"
+                  ],
+                  exclude: ["core-libraries"]
+              },
               {
                   name: "login",
                   include: [
@@ -180,6 +188,7 @@ module.exports = function( grunt ) {
       "native-conversations-router": createClosureConfig('routers/mobile/native/conversations-router'),
       "native-people-router": createClosureConfig('routers/mobile/native/people-router'),
       "router-login": createClosureConfig('router-login'),
+      "complete-profile": createClosureConfig('complete-profile'),
       "login": createClosureConfig('login')
     },
 
@@ -246,58 +255,6 @@ module.exports = function( grunt ) {
       mangle: {toplevel: true},
       squeeze: {dead_code: false},
       codegen: {quote_keys: true}
-    },
-
-    min: {
-      "core-libraries": {
-        src: ['public-processed/js/core-libraries.js'],
-        dest: 'public-processed/js/core-libraries.js'
-      },
-      "router-app": {
-        src: ['public-processed/js/router-app.js'],
-        dest: 'public-processed/js/router-app.js'
-      },
-      "chat-router": {
-        src: ['public-processed/js/routers/mobile/native/chat-router.js'],
-        dest: 'public-processed/js/routers/mobile/native/chat-router.js'
-      },
-      "mobile-app-router": {
-        src: ['public-processed/js/routers/mobile/web/mobile-app-router'],
-        dest: 'public-processed/js/routers/mobile/web/mobile-app-router'
-      },
-      "router": {
-        src: ['public-processed/js/router.js'],
-        dest: 'public-processed/js/router.js'
-      },
-      "router-login": {
-        src: ['public-processed/js/router-login.js'],
-        dest: 'public-processed/js/router-login.js'
-      },
-      "signup": {
-        src: ['public-processed/js/signup.js'],
-        dest: 'public-processed/js/signup.js'
-      },
-      "chatView": {
-        src: ['public-processed/js/views/chat/chatView.js'],
-        dest: 'public-processed/js/views/chat/chatView.js'
-      },
-      "fileView": {
-        src: ['public-processed/js/views/file/fileView.js'],
-        dest: 'public-processed/js/views/file/fileView.js'
-      },
-      "conversationView": {
-        src: ['public-processed/js/views/conversation/conversationView.js'],
-        dest: 'public-processed/js/views/conversation/conversationView.js'
-      },
-      "peopleView": {
-        src: ['public-processed/js/views/people/peopleView.js'],
-        dest: 'public-processed/js/views/people/peopleView.js'
-      },
-      "login": {
-        src: ['public-processed/js/login.js'],
-        dest: 'public-processed/js/login.js'
-      }
-
     },
 
     less: {
