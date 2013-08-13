@@ -3,10 +3,11 @@ define([
   'jquery',
   'utils/context',
   'views/base',
+  'utils/appevents',
   'hbs!./tmpl/chatInputView',
-  '../../utils/momentWrapper',
+  'utils/momentWrapper',
   'jquery-placeholder' // No ref
-], function($, context, TroupeViews, template,  moment) {
+], function($, context, TroupeViews, appEvents, template, moment) {
   "use strict";
 
   var PAGE_SIZE = 50;
@@ -30,20 +31,12 @@ define([
 
     send: function(val) {
       if(val) {
-        this.collection.create({
+        var model = this.collection.create({
           text: val,
           fromUser: context.getUser(),
           sent: moment()
         });
-
-        // go to the bottom of the page when sending a new message
-        // NB NB NB: review this
-        //if(window._troupeCompactView) {
-        //  $('#content-frame').scrollTop($('#content-frame').height());
-        //} else {
-        //  $(window).scrollTop($(document).height());
-        //}
-
+        appEvents.trigger('chat.send', model);
       }
       return false;
     }
@@ -63,11 +56,8 @@ define([
 
     // pass in the textarea as el for ChatInputBoxView
     // pass in a scroll delegate
-    initialize: function(options) {
-
+    initialize: function() {
       this.chatLines = 2;
-
-      //this.scrollDelegate = options.scrollDelegate;
 
       this.originalChatInputHeight = this.$el.height();
       this.$el.placeholder();
@@ -91,7 +81,6 @@ define([
       var lht = parseInt(this.$el.css('lineHeight'),10);
       var height = this.$el.prop('scrollHeight');
       var currentLines = Math.floor(height / lht);
-      //var wasAtBottom = this.scrollDelegate.isAtBottom();
 
       if (currentLines != this.chatLines) {
         this.chatLines = currentLines;
@@ -130,6 +119,7 @@ define([
 
     send: function() {
       this.trigger('save', this.$el.val());
+
 
       this.$el.val('');
     }
