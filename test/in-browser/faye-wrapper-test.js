@@ -1,16 +1,12 @@
 /*jshint unused:true, browser:true*/
-require([
+define([
   'jquery',
   'underscore',
   'expect',
   'assert',
   'backbone',
-  'mocha',
   'components/fayeWrapper'
-], function($, _, expect, assert, Backbone, mocha, FayeWrapper) {
-  mocha.setup({
-    ui: 'bdd'
-  });
+], function($, _, expect, assert, Backbone, FayeWrapper) {
 
   var ClientAuth = function() {};
   ClientAuth.prototype.outgoing = function(message, callback) {
@@ -310,11 +306,5 @@ require([
     });
 
   });
-
-  if (window.mochaPhantomJS) {
-    mochaPhantomJS.run();
-  } else {
-    mocha.run();
-  }
 
 });

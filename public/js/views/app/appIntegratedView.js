@@ -90,15 +90,13 @@ define([
         }, 100);
       });
 
-
-
       this.ensureProfileIsUsernamed();
     },
 
     ensureProfileIsUsernamed: function() {
-      var user = window.troupeContext.user;
-      if (!user.username) {
-        (new UsernameView.Modal()).show();
+      var user = context.getUser();
+      if (user.username === null /* not undefined, in which case the user has not yet loaded */) {
+        new UsernameView.Modal().show();
       }
     },
 

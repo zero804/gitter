@@ -1,27 +1,21 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'handlebars'
-], function ( Handlebars ) {
+  'handlebars',
+  'twitter-text'
+], function ( Handlebars, TwitterText ) {
   "use strict";
 
-  var emailRegex  = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/gi;
-  var urlRegex    = /\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.-]+[.][a-z]{2,4}\/)(?:(?:[^\s()<>.]+[.]?)+|((?:[^\s()<>]+|(?:([^\s()<>]+)))))+(?:((?:[^\s()<>]+|(?:([^\s()<>]+))))|[^\s`!()[]{};:'".,<>?«»“”‘’]))/gi;
-
-  function embedUrl(url) {
-    var displayUrl = url;
-    if (url.indexOf('http') !== 0) url = 'http://' + url;
-    return "<a class='link' target='_blank' href='" + url + "'>" + displayUrl + "</a>";
-  }
+  var emailRegex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/gi;
 
   function embedMailto(email) {
     return '<a href="mailto:' + email + '">' + email + '</a>';
   }
 
-  function linkify(message) {
-    message = message || "";
-    message = message.replace(urlRegex,   embedUrl);
+  function linkify(message, urls) {
     message = message.replace(emailRegex, embedMailto);
-
+    if (urls && urls.length) {
+      message = TwitterText.txt.autoLinkEntities(message, urls, {targetBlank: true, urlClass: 'link'});
+    }
     return new Handlebars.SafeString(message);
   }
 

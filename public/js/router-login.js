@@ -3,7 +3,6 @@ require([
   'jquery',
   'utils/context',
   'backbone',
-  './base-router',
   'views/base',
   'views/invite/inviteModal',
   'views/login/loginModalView',
@@ -12,7 +11,7 @@ require([
   'views/signup/signupModalConfirmView',
   'views/connect/connectUserView',
   'collections/troupes'
-], function($, context, Backbone, BaseRouter, TroupeViews, InviteModal, LoginModalView, profileView, RequestModalView, SignupModalConfirmView, ConnectUserModalView, troupeModels) {
+], function($, context, Backbone, TroupeViews, InviteModal, LoginModalView, profileView, RequestModalView, SignupModalConfirmView, ConnectUserModalView, troupeModels) {
   "use strict";
 
   function getDefaultEmail() {
@@ -24,7 +23,7 @@ require([
     return '';
   }
 
-  var AppRouter = BaseRouter.extend({
+  var AppRouter = Backbone.Router.extend({
     routes: {
       '*actions': 'defaultAction'
     },

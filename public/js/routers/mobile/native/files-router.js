@@ -1,21 +1,48 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'jquery',
+  'marionette',
   'underscore',
   'backbone',
+  'utils/context',
   'routers/mobile/mobile-router',
   'views/base',
   'views/file/fileView',
   'views/file/fileDetailView',
   'collections/files',
   'views/file/mobileFilePreview',
-  'components/mobile-context',        // No ref
+  'components/unread-items-client',
   'components/eyeballs',              // No ref
-  'components/unread-items-client',   // No ref
-  'template/helpers/all'              // No ref
-], function($, _, Backbone, MobileRouter, TroupeViews, FileView, FileDetailView, fileModels, MobileFilePreview/*, unreadItemsClient*/) {
+  'template/helpers/all',             // No ref
+  'components/native-context'         // No ref
+], function($, Marionette, _, Backbone, context, MobileRouter, TroupeViews, FileView, FileDetailView, fileModels, MobileFilePreview, unreadItemsClient) {
   /*jslint browser: true, unused: true */
   "use strict";
+
+  // TODO: normalise this
+  var troupeId = window.location.hash.substring(1);
+  if(troupeId) {
+    window.location.hash = '';
+  } else {
+    troupeId = window.localStorage.lastTroupeId;
+  }
+  if(troupeId) {
+    context.setTroupeId(troupeId);
+    window.localStorage.lastTroupeId = troupeId;
+  }
+
+  var troupe = context.troupe();
+  troupe.on('change:name', function() {
+    document.title = troupe.get('name');
+  });
+
+  var MobileLayout = Marionette.Layout.extend({
+    el: 'body',
+    regions: {
+      primary: "#primary-view",
+    }
+  });
+  var layoutManager = new MobileLayout();
 
   var AppRouter = MobileRouter.extend({
     routes: {
@@ -26,24 +53,21 @@ require([
 
     initialize: function() {
       this.constructor.__super__.initialize.apply(this);
-
       this.fileCollection = new fileModels.FileCollection();
       this.fileCollection.listen();
     },
 
     defaultAction: function(/*actions*/){
-      var fileView = new FileView({ collection: this.fileCollection });
-      this.showView("#primary-view", fileView);
+      layoutManager.primary.show(new FileView({ collection: this.fileCollection }));
     },
 
     showFile: function(id) {
       var model = this.fileCollection.get(id);
-      var fileDetailView = new FileDetailView({ model: model });
-      this.showView("#primary-view", fileDetailView);
+      layoutManager.primary.show(new FileDetailView({ model: model }));
     },
 
     previewFile: function(id) {
-      this.showView("#primary-view", new MobileFilePreview({ model: this.fileCollection.get(id) }));
+      layoutManager.primary.show(new MobileFilePreview({ model: this.fileCollection.get(id) }));
     }
 
   });
@@ -55,3 +79,5 @@ require([
 
   return troupeApp;
 });
+
+
