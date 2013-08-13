@@ -1,5 +1,5 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-define(['log!rollers'], function(log) {
+define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
   "use strict";
 
   /** @const */ var TRACK_BOTTOM = 1;
@@ -20,7 +20,7 @@ define(['log!rollers'], function(log) {
 
     var self = this;
     // create an observer instance
-    var MutationObserver = window.MutationObserver || window.MozMutationObserver || window.WebKitMutationObserver;
+    var MutationObserver = window.MutationObserver || window.MozMutationObserver || window.WebKitMutationObserver || LegacyMutations;
     var observer = new MutationObserver(function(/*mutations*/) {
       self._mutationHandlers[self._mode]();
       self._postMutateTop = self._target.scrollTop;
