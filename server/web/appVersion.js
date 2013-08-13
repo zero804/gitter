@@ -3,25 +3,27 @@
 
 // This is actually the cdn prefix, but we're using it as the app version,
 // which only shows whether the version is different, not any ordering of versions.
-var nconf = require('../utils/config');
 var fs = require("fs");
 var winston = require('winston');
 
-var cdnPrefix, cdnPrefixFile = nconf.get("cdn:prefixFile");
-
-if(cdnPrefixFile) {
-  try {
-    cdnPrefix = "/s/" + ("" + fs.readFileSync(cdnPrefixFile)).substring(0,6).trim();
-  } catch(e) {
-    winston.error('Unable to load cdnPrefixFile' + cdnPrefixFile + ': ' + e, { exception: e });
-    cdnPrefix = "";
-  }
-} else {
-  cdnPrefix = "";
+var commit;
+try {
+	commit = ('' + fs.readFileSync(__dirname + '/../../GIT_COMMIT')).trim();
+} catch(e) {
+	winston.error('Unable to read GIT_COMMIT: ' + e);
 }
+
+var appTag = commit ? commit.substring(0, 6) : 'dev' + Math.floor(Date.now() / 10000);
+var cdnPrefix = commit ? "/s/" + appTag : '';
+
 
 function getCurrentVersion() {
   return cdnPrefix;
 }
 
+function getAppTag() {
+	return appTag;
+}
+
 exports.getCurrentVersion = getCurrentVersion;
+exports.getAppTag = getAppTag;

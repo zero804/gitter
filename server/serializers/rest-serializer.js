@@ -508,6 +508,8 @@ function ChatStrategy(options)  {
       unread: options.currentUserId ? unreadItemStategy.map(item._id) : true,
       troupe: troupeStrategy ? troupeStrategy.map(item.toTroupeId) : undefined,
       readBy: item.readBy ? item.readBy.length : undefined,
+      urls: item.urls || [],
+      mentions: item.mentions || [],
       v: getVersion(item)
     };
 

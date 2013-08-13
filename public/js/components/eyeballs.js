@@ -42,7 +42,6 @@ define([
 
   function eyeballsOff() {
     if(eyesOnState)  {
-      log('eyeballsOff');
       stopInactivityPoller();
 
       eyesOnState = false;
@@ -57,7 +56,7 @@ define([
     inactivity = false;
 
     if(!eyesOnState)  {
-      log('eyeballsOn');
+      //log('eyeballsOn');
       startInactivityPoller();
 
       eyesOnState = true;
@@ -67,16 +66,11 @@ define([
     }
   }
 
-  log('Listening for focus events');
-
   $(window).on('blur', function() {
-    log('blur');
-
     eyeballsOff();
   });
 
   $(window).on('focus', function() {
-    log('focus');
     eyeballsOn();
   });
 

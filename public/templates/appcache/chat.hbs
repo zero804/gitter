@@ -1,9 +1,14 @@
 CACHE MANIFEST
+# Generated for version {{version}}
 
 CACHE:
 {{ cdn 'bootstrap/css/trpMobileChat.css' }}
-{{ cdn 'js/core-libraries.min.js' }}
+{{#if minified}}{{ cdn 'js/core-libraries.min.js' }}
 {{ cdn 'js/routers/mobile/native/chat-router.min.js' }}
+{{else}}{{ cdn 'js/core-libraries.js' }}
+{{ cdn 'js/routers/mobile/native/chat-router.js' }}
+{{/if}}{{ cdn 'images/2/icon-edit.png' }}
+{{ cdn 'images/2/troupe-ajax-guy-green.gif' }}
 
 NETWORK:
 *
@@ -11,6 +16,3 @@ NETWORK:
 //*
 http://*
 https://*
-
-
-# Generated for version {{version}}
