@@ -114,7 +114,7 @@ require([
         { name: "reinvite",       re: /^reinvite\/(\w+)$/,        viewType: InviteModal,                  collection: troupeCollections.outgoingConnectionInvites, viewOptions: { overrideContext: true, inviteToConnect: true } },
         { name: "connect",          re: /^connect$/,              viewType: shareSearchView.Modal, viewOptions: { overrideContext: true, inviteToConnect: true } }
       ],
-      appView: appView
+      regions: appView
     });
 
   Backbone.history.start();
