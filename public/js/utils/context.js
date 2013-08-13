@@ -4,7 +4,10 @@ define([
   "use strict";
 
   var context = function() {
-    return window.troupeContext || {};
+    if(!window.troupeContext) {
+      window.troupeContext = {};
+    }
+    return window.troupeContext;
   };
 
   context.getTroupeId = function() {
@@ -54,7 +57,16 @@ define([
         return true;
       }
     }
-  }
+  };
+
+  /**
+   * The difference between troupeContext and env.
+   * Env is static and will never change.
+   * TroupeContext depends on the user and troupe
+   */
+  context.env = function(envName) {
+    return window.troupeEnv && window.troupeEnv[envName];
+  };
 
   return context;
 

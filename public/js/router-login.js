@@ -3,7 +3,6 @@ require([
   'jquery',
   'utils/context',
   'backbone',
-  'log!router-login',
   './base-router',
   'views/base',
   'views/invite/inviteModal',
@@ -13,8 +12,17 @@ require([
   'views/signup/signupModalConfirmView',
   'views/connect/connectUserView',
   'collections/troupes'
-], function($, context, Backbone, log, BaseRouter, TroupeViews, InviteModal, LoginModalView, profileView, RequestModalView, SignupModalConfirmView, ConnectUserModalView, troupeModels) {
+], function($, context, Backbone, BaseRouter, TroupeViews, InviteModal, LoginModalView, profileView, RequestModalView, SignupModalConfirmView, ConnectUserModalView, troupeModels) {
   "use strict";
+
+  function getDefaultEmail() {
+    try {
+      return window.localStorage.defaultTroupeEmail;
+    } catch(e) {
+    }
+
+    return '';
+  }
 
   var AppRouter = BaseRouter.extend({
     routes: {
@@ -80,7 +88,9 @@ require([
 
           // We might need to show the login modal, if the user is an existing user.
           if (window.troupeContext.loginToAccept) {
-            getLoginModal({ email: window.localStorage.defaultTroupeEmail });
+
+
+            getLoginModal({ email: getDefaultEmail() });
             loginModal.show();
             return;
           }
@@ -115,12 +125,13 @@ require([
 
               connectUserModal.view.on('request.login', function(options) {
                 var defaultEmail;
+
                 if (options.email) {
                   defaultEmail = options.email;
-                } else
-                {
-                  defaultEmail = window.localStorage.defaultTroupeEmail;
+                } else {
+                  defaultEmail = getDefaultEmail();
                 }
+
                 var loginModal = getLoginModal({email: defaultEmail});
                 connectUserModal.transitionTo(loginModal);
               });
@@ -133,7 +144,7 @@ require([
       } else {
         // If the user isn't signed in, show the login modal
         if (!window.troupeContext.user) {
-          getLoginModal({ email: window.localStorage.defaultTroupeEmail } );
+          getLoginModal({ email: getDefaultEmail() } );
           loginModal.show();
           return;
         }

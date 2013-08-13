@@ -1,18 +1,17 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'jquery',
   'backbone',
-  'marionette',
   'utils/context',
   'fineuploader',
   'hbs!./tmpl/rightToolbar',
   'collections/instances/integrated-items',
-  'collections/instances/troupes',
   'views/request/requestView',
   'views/invite/inviteView',
   'views/file/fileView',
   'views/conversation/conversationView',
   'views/people/peopleCollectionView'
-], function(Backbone, Marionette, context, qq, rightToolbarTemplate, itemCollections, troupeCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView) {
+], function($, Backbone, context, qq, rightToolbarTemplate, itemCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView) {
   "use strict";
 
   return Backbone.Marionette.Layout.extend({
@@ -37,7 +36,7 @@ define([
 
     initialize: function() {
       this.model = new Backbone.Model({
-        troupeEmailAddress: context().troupeUri + '@' + context().baseServer,
+        troupeEmailAddress: context().troupeUri + '@' + context.env('baseServer'),
         isOneToOne: context.getTroupe().oneToOne
       });
     },

@@ -1,10 +1,5 @@
 <!doctype html>
-<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
-<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
-<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!-->
 <html class="no-js" lang="en">
-<!--<![endif]-->
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=IE9" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
@@ -18,10 +13,6 @@
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href='{{cdn "images/2/favicon8.ico" }}'>
     {{>load_font_css}}
-
-    {{#useFirebug}}
-    <script type="text/javascript" src="https://getfirebug.com/firebug-lite.js"></script>
-    {{/useFirebug}}
 </head>
 <body>
 
@@ -128,18 +119,9 @@
 
 <div class="trpBlankPage"> </div>
 
-<script type="text/javascript">
-  window.troupeContext = {{{troupeContext}}};
-  {{#if data}}
-  window.troupePreloads = {{{data}}};
-  {{/if}}
-  {{#if trackingId}}
-    window.troupeTrackingId = '{{trackingId}}';
-  {{/if}}
-</script>
+{{{ generateTroupeContext troupeContext }}}
 
 {{>require_wrapper}}
-
 {{{bootScript bootScriptName }}}
 
 
