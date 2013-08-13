@@ -536,7 +536,7 @@ a:hover {
 }
 
 .trpToolbar {
-/*  color: white;*/
+  color: white;
 /*  border-left: 2px solid @trpGreen;*/
   position: fixed;
   display: inline-block;
@@ -548,8 +548,8 @@ a:hover {
   right: 0;
   top: 0;
   bottom: 0;
-/*  background-color: #373435;*/
-  background-color: @trpBgColor;
+  background-color: #373435;
+  /*background-color: @trpBgColor;*/
   opacity: 0.95;
   z-index: 1600;
   transform: translate3d(0, 0, 0);
@@ -599,6 +599,10 @@ a:hover {
   display: inline-block;
 	vertical-align: top;
 	padding-bottom: 12px;
+}
+
+.trpToolbar .trpMiniActions {
+  display: none;
 }
 
 .trpRightPanel {
@@ -885,6 +889,12 @@ a:hover {
     -moz-transition:all .3s ease-in-out; 
     -webkit-transition:all .3s ease-in-out;
   }
+
+
+  #file-list {
+    width: 180px;
+    padding-left: 0;
+  }
 }
 
 @media screen and (max-width:1024px) { 
@@ -892,7 +902,13 @@ a:hover {
 
 	.trpToolbar {
 		width: 88px;
+    padding-right: 0px;  
 	}
+
+  .trpToolbar .trpMiniActions {
+    display: block;
+  }
+
 
 	.trpChatPanel {
 		margin-left: 110px;
@@ -931,9 +947,29 @@ a:hover {
     margin-left: 0px; 
   }
 
-	#request-roster, #invite-roster, #file-list, #mail-list, #people-share-troupe-button {
+  #mail-list, #people-share-troupe-button, #file-header, #mail-header {
 		display: none;
 	}
+
+  #file-list {
+    position: fixed;
+    right: 88px;
+    width: 0px;
+    top: 0;
+    bottom: 0;
+    background-color: @trpGreen;
+    padding-top: 70px;
+    transform: translate3d(0, 0, 0);
+    transition:all .3s ease-in-out; 
+    -o-transition:all .3s ease-in-out; 
+    -moz-transition:all .3s ease-in-out; 
+    -webkit-transition:all .3s ease-in-out;
+    overflow: hidden;
+  }
+
+  .uv-tab {
+    right: 100px;
+  }
 
 }
 

@@ -29,7 +29,8 @@ define([
     "keypress":                         "onKeyPress",
     "click #user-icon":                 "toggleMenu",
     "click #search-icon":                 "toggleMenu",
-    "click #troupe-icon":                 "toggleMenu"
+    "click #troupe-icon":                 "toggleMenu",
+    "click #folder-icon":               "toggleFiles"
   };
 
   $('.trpDisplayPicture').tooltip('destroy');
@@ -41,6 +42,7 @@ define([
     profilemenu: false,
     shifted: false,
     alertpanel: false,
+    files: false,
 
     regions: {
       leftMenuRegion: "#left-menu",
@@ -145,19 +147,22 @@ define([
         "width": "280px"
       });
 
-      $("#content-frame, #header-wrapper, #chat-input-wrapper").css({"left" : "280px"});
+      // $("#content-frame, #header-wrapper, #chat-input-wrapper").css({"left" : "280px"});
+
+      $("#chat-frame, #header-container, #chat-input").css({"marginLeft" : "+=280px"});
 
       this.leftmenu = true;
     },
 
     hideMenu: function() {
-      log("------  hiding left menu ------")
       if (!this.leftmenu) return;
 
       // refocus chat input in case it's lost focus but don't do that on tablets
       if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
 
-      $("#content-frame, #header-wrapper, #chat-input-wrapper").css({"left" : "0px"});
+      // $("#content-frame, #header-wrapper, #chat-input-wrapper").css({"left" : "0px"});
+
+      $("#chat-frame, #header-container, #chat-input").css({"marginLeft" : "-=280px"});
 
       $("#left-menu").css({
         "width": "0px"
@@ -171,6 +176,26 @@ define([
         this.hidePanel(whichPanel);
       } else {
         this.showPanel(whichPanel);
+      }
+    },
+
+    showFiles: function() {
+      log("*** SHOWING FILES ***");
+      $("#file-list").css({"width" : "200px" , "padding-left" : "20px"});
+      this.files = true;
+    },
+
+    hideFiles: function() {
+      $("#file-list").css({"width": "0px", "padding-left" : "0"});
+      this.files = false;
+    },
+
+    toggleFiles: function() {
+      if (this.files) {
+        this.hideFiles();
+      }
+      else {
+        this.showFiles();
       }
     },
 
