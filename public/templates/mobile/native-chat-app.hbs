@@ -1,18 +1,15 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html lang="en" {{#if appCache}}manifest="{{appCache}}"{{/if}}>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"/>
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
   <meta charset="utf-8">
 
-  <title>{{troupeName}}</title>
+  <title>Troupe</title>
 
-  <link rel="stylesheet" href='/bootstrap/css/trpMobileApp.css'>
+  <link rel="stylesheet" href='/bootstrap/css/trpMobileChat.css'>
 
-  {{{ generateTroupeContext troupeContext }}}
-
-  {{>require_wrapper}}
-  {{{bootScript "routers/mobile/web/mobile-app-router" }}}
+  {{{ generateTroupeContext troupeContext accessToken=accessToken page='chat' }}}
 
   <link rel="shortcut icon" href='{{ cdn "images/2/favicon8.ico"}}'>
 
@@ -25,19 +22,9 @@
     </div>
   </div>
 
-  <div id="troupeListPanel" class="sideMenu">
-    <div id="troupeList"></div>
-  </div>
 
   <div id="pageContainer" class="platform">
     <div id="mainPage">
-
-      <header id="nav-bar">
-        <div id="showTroupesButton">
-          <img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle">
-        </div>
-        <span class="title">{{troupeName}}</span>
-      </header>
 
       <div class="contentBody mobile-scroll-class" id="content-frame">
         <div class="frame-chat">
@@ -51,6 +38,9 @@
 
     </div>
   </div>
+
+  {{>require_wrapper}}
+  {{{bootScript "routers/mobile/native/chat-router" }}}
 
 </body>
 </html>

@@ -2,7 +2,6 @@
 "use strict";
 
 var winston = require("winston");
-var userService = require("../services/user-service");
 var troupeService = require("../services/troupe-service");
 var nconf = require('../utils/config');
 var middleware = require('../web/middleware');
@@ -48,7 +47,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
       res.render(page, {
         appCache: getAppCache(req),
         login: login,
-        isWebApp: !req.params.mobilePage,
+        isWebApp: !req.params.mobilePage, // TODO: fix this!
         bootScriptName: login ? "router-login" : "router-app",
         troupeName: troupeContext.troupe.name,
         troupeContext: troupeContext,
@@ -102,23 +101,16 @@ function unauthenticatedPhoneRedirectMiddleware(req, res, next) {
   }
 }
 
-function saveLastTroupeMiddleware(req, res, next) {
-  if(req.user && req.troupe) {
-    userService.saveLastVisitedTroupeforUser(req.user, req.troupe, function(err) {
-      if (err) winston.info("Something went wrong saving the user last troupe visited: ", { exception: err });
-      next();
-
-    });
-    return;
-  }
-
-  next();
-}
-
 function renderMiddleware(template, mobilePage) {
   return function(req, res, next) {
     if(mobilePage) req.params.mobilePage = mobilePage;
     renderAppPageWithTroupe(req, res, next, template);
+  };
+}
+
+function redirectToNativeApp(page) {
+  return function(req, res) {
+    res.relativeRedirect('/mobile/' + page + '#' + req.troupe.id);
   };
 }
 
@@ -130,7 +122,7 @@ module.exports = {
       });
 
       app.get('/version', function(req, res/*, next*/) {
-        res.json({ appVersion: appVersion.getCurrentVersion() });
+        res.json({ appVersion: appVersion.getAppTag() });
       });
 
 
@@ -149,10 +141,11 @@ module.exports = {
           return troupeService.findBestTroupeForUser(req.user)
             .then(function(troupe) {
               if(troupe) {
-                return troupeService.getUrlForTroupeForUserId(troupe, req.user.id)
-                  .then(function(url) {
-                    return url + "/" + req.params.page;
-                  });
+                return '/mobile/' + req.params.page + '#' + troupe.id;
+                // return troupeService.getUrlForTroupeForUserId(troupe, req.user.id)
+                //   .then(function(url) {
+                //     return url + "/" + req.params.page;
+                //   });
               }
 
               if(req.user.hasUsername()) {
@@ -172,7 +165,6 @@ module.exports = {
       app.get('/one-one/:userId',
         middleware.grantAccessForRememberMeTokenMiddleware,
         preloadOneToOneTroupeMiddleware,
-        saveLastTroupeMiddleware,
         function(req, res, next) {
           var uriContext = req.uriContext;
 
@@ -211,52 +203,45 @@ module.exports = {
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         preloadOneToOneTroupeMiddleware,
-        saveLastTroupeMiddleware,
-        renderMiddleware('mobile/chat-app', 'chat'));
+        redirectToNativeApp('chat'));
 
       app.get('/:appUri/chat',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
-        saveLastTroupeMiddleware,
-        renderMiddleware('mobile/chat-app', 'chat'));
+        redirectToNativeApp('chat'));
 
       // Files -----------------------
       app.get('/one-one/:userId/files',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         preloadOneToOneTroupeMiddleware,
-        saveLastTroupeMiddleware,
-        renderMiddleware('mobile/file-app', 'files'));
+        redirectToNativeApp('files'));
 
       app.get('/:appUri/files',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
-        saveLastTroupeMiddleware,
-        renderMiddleware('mobile/file-app', 'files'));
+        redirectToNativeApp('files'));
 
 
       app.get('/:appUri/mails',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
-        saveLastTroupeMiddleware,
-        renderMiddleware('mobile/conversation-app', 'mails'));
+        redirectToNativeApp('mails'));
 
       app.get('/:appUri/people',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
-        saveLastTroupeMiddleware,
-        renderMiddleware('mobile/people-app', 'people'));
+        redirectToNativeApp('people'));
 
       app.get('/:appUri',
         middleware.grantAccessForRememberMeTokenMiddleware,
         uriContextResolverMiddleware,
         isPhoneMiddleware,
         unauthenticatedPhoneRedirectMiddleware,
-        saveLastTroupeMiddleware,
         function(req, res, next) {
           if (req.uriContext.ownUrl) {
             return renderHomePage(req, res, next);
