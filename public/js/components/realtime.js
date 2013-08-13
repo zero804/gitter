@@ -121,26 +121,13 @@ define([
   };
 
   function createClient() {
-    var c = context().websockets;
-    /*
-    if you find this, remove?
-    if(!c) {
-      log('Websockets configuration not found, defaulting');
-      c = {
-        fayeUrl: '/faye',
-        options: {
-          interval: 10
-        }
-      };
-    }
-    */
-
+    var c = context.env('websockets');
     var client = new Faye.Client(c.fayeUrl, c.options);
 
-    if(c.disable) {
-      for(var i = 0; i < c.length; i++) {
-        client.disable(c.disable[i]);
-      }
+    // Disable websocket on Mobile due to iOS crash bug
+    var userAgent = window.navigator.userAgent;
+    if(userAgent.indexOf('Mobile') >= 0) {
+      client.disable('websocket');
     }
 
     client.addExtension(new ClientAuth());

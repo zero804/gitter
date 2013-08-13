@@ -1,5 +1,7 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'jquery',
+  'underscore',
   'utils/context',
   'views/base',
   'collections/instances/troupes',
@@ -7,7 +9,7 @@ define([
   'hbs!./tmpl/troupeSettingsTemplate',
   'log!troupe-settings-view',
   'utils/validate-wrapper'
-], function(context, TroupeViews, troupeCollections, itemCollections, troupeSettingsTemplate, log, validation) {
+], function($, _, context, TroupeViews, troupeCollections, itemCollections, troupeSettingsTemplate, log, validation) {
   "use strict";
 
   var View = TroupeViews.Base.extend({
@@ -43,7 +45,7 @@ define([
       var self = this;
 
       if (!this.canDelete()) {
-        return alert("You need to be the only person in the troupe to delete it.");
+        return window.alert("You need to be the only person in the troupe to delete it.");
       }
 
       TroupeViews.confirm("Are you sure you want to delete this troupe?", {
@@ -73,7 +75,7 @@ define([
       var errMsg = "You cannot leave a troupe if you are the only member, rather delete it.";
 
       if (!this.canLeave()) {
-        return alert(errMsg);
+        return window.alert(errMsg);
       }
 
       TroupeViews.confirm("Are you sure you want to remove yourself from this troupe?", {
@@ -83,10 +85,10 @@ define([
             data: "",
             type: "DELETE",
             success: function() {
-              window.location = context().homeUrl;
+              window.location = context.env('homeUrl');
             },
             error: function() {
-              alert(errMsg);
+              window.alert(errMsg);
             },
             global: false
           });
@@ -143,7 +145,8 @@ define([
         return;
       }
 
-      window.troupeContext.troupe.name = troupeName;
+      // Why are we doing this again?
+      context.geTroupe().name = troupeName;
 
       $.ajax({
         url: '/troupes/' + context.getTroupeId(),

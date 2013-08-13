@@ -3,6 +3,7 @@
 
 module.exports = {
   install: function(app) {
+    require('./appcache').install(app);
     require('./signup').install(app);
     require('./signout').install(app);
     require('./profile').install(app);

@@ -7,6 +7,7 @@ var loginUtils = require('../web/login-utils');
 var winston = require('winston');
 var nconf = require('../utils/config');
 var isPhone = require('../web/is-phone');
+var contextGenerator = require('../web/context-generator');
 
 module.exports = {
 
@@ -79,10 +80,12 @@ module.exports = {
               return;
             }
 
-            if (user.hasUsername()) {
+            if (user.hasPassword()) {
               res.relativeRedirect('/' + user.username);
             } else {
-              res.render('signup', { compactView: isPhone(req.headers['user-agent']), profileHasNoUsername: !user.username, userId: JSON.stringify(req.user.id) });
+              contextGenerator.generateMiniContext(req, function(err, troupeContext) {
+                res.render('complete-profile', { troupeContext: troupeContext });
+              });
             }
           });
         });

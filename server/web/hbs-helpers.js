@@ -6,6 +6,24 @@ var cdn = require("./cdn");
 
 var minifiedDefault = nconf.get("web:minified");
 
+// This stuff never changes
+var troupeEnv = {
+  baseServer: nconf.get('web:baseserver'),
+  basePath: nconf.get('web:basepath'),
+  homeUrl: nconf.get('web:homeurl'),
+  mixpanelToken: nconf.get("stats:mixpanel:token"),
+  googleTrackingId: nconf.get("web:trackingId"),
+  websockets: {
+    fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
+    options: {
+      timeout: nconf.get('ws:fayeTimeout'),
+      retry: nconf.get('ws:fayeRetry'),
+      interval: nconf.get('ws:fayeInterval')
+    }
+  },
+};
+var troupeEnvStringified = JSON.stringify(troupeEnv);
+
 exports.cdn = function(url, parameters) {
   return cdn(url, parameters ? parameters.hash:null);
 };
@@ -43,4 +61,17 @@ exports.bootScript = function(url, parameters) {
 
 exports.isMobile = function(agent, options) {
   return ((agent.match(/ipad/i)) ? options.fn(this) : null);
+};
+
+exports.generateEnv = function() {
+  return '<script type="text/javascript">' +
+          'window.troupeEnv = ' + troupeEnvStringified + ';' +
+          '</script>';
+};
+
+exports.generateTroupeContext = function(troupeContext) {
+  return '<script type="text/javascript">' +
+          'window.troupeEnv = ' + troupeEnvStringified + ';' +
+          'window.troupeContext = ' + JSON.stringify(troupeContext) + ';' +
+          '</script>';
 };
