@@ -79,10 +79,10 @@ describe("User Service", function() {
     });
   });
 
-  describe("#saveLastVisitedTroupeforUser", function() {
+  describe("#saveLastVisitedTroupeforUserId", function() {
     it('should record the time each troupe was last accessed by a user', function(done) {
 
-      userService.saveLastVisitedTroupeforUser(fixture.user1, fixture.troupe1, function(err) {
+      userService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1, function(err) {
         if(err) return done(err);
 
         userService.getTroupeLastAccessTimesForUser(fixture.user1.id, function(err, times) {
@@ -92,7 +92,7 @@ describe("User Service", function() {
           var after = times[troupeId];
           assert(after, 'Expected a value for last access time');
 
-          userService.saveLastVisitedTroupeforUser(fixture.user1, fixture.troupe1, function(err) {
+          userService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1, function(err) {
             if(err) return done(err);
 
             userService.getTroupeLastAccessTimesForUser(fixture.user1.id, function(err, times) {

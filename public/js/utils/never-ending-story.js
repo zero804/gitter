@@ -30,7 +30,7 @@ define(['underscore', 'backbone'], function(_, Backbone) {
       }
 
 
-      if(timeToTop && timeToTop < 300 || st < 20) {
+      if(timeToTop && timeToTop < 300 || (st < 20 && delta > 0)) {
         this.loading = true;
         this.trigger('approaching.end');
       }

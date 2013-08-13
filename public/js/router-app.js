@@ -25,6 +25,7 @@ require([
   'views/toolbar/troupeMenu',
   'views/invite/reinviteModal',
   'utils/router',
+  'components/unread-items-client',
   'components/webNotifications', // No ref
   'components/errorReporter',  // No ref
   'filtered-collection', // No ref
@@ -35,7 +36,7 @@ require([
             itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, shareSearchView,
             createTroupeView, UsernameView, HeaderView,
-            troupeSettingsView, TroupeMenuView, InviteModal, Router /*, errorReporter , FilteredCollection */) {
+            troupeSettingsView, TroupeMenuView, InviteModal, Router, unreadItemsClient /*, errorReporter , FilteredCollection */) {
   "use strict";
 
   // Make drop down menus drop down
@@ -67,6 +68,10 @@ require([
     collection: itemCollections.chats,
     userCollection: itemCollections.users
   }).render();
+
+  unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
+  unreadItemsClient.monitorViewForUnreadItems($('#toolbar-frame .nano'));
+
 
   new chatInputView.ChatInputView({
     el: $('#chat-input'),

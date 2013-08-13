@@ -116,12 +116,10 @@ define([
     oEmbed: function() {
       // TODO: send the URL's from the server? twitter-text etc
       oEmbed.defaults.maxwidth = 370;
-      var self = this;
       this.$el.find('.link').each(function(index, el) {
         oEmbed.parse(el.href, function(embed) {
           if (embed) {
             $(el).append('<div class="embed">' + embed.html + '</div>');
-            //self.scrollDelegate.scrollToBottom();
           }
         });
       });
@@ -186,7 +184,6 @@ define([
     },
 
     toggleEdit: function() {
-      var self = this;
       if (this.isEditing) {
         this.isEditing = false;
         this.showText();

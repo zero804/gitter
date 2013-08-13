@@ -140,33 +140,33 @@ var userService = {
 
   /**
    * Update the last visited troupe for the user, sending out appropriate events
+   * Returns a promise of nothing
    */
-  saveLastVisitedTroupeforUser: function(user, troupe, callback) {
-    winston.verbose("Saving last visited Troupe for user: " + user.id + " to " + troupe.id);
+  saveLastVisitedTroupeforUserId: function(userId, troupe, callback) {
+    winston.verbose("Saving last visited Troupe for user: " + userId+ " to troupe " + troupe.id);
 
-    var userId = user.id;
     var troupeId = troupe.id;
     var lastAccessTime = new Date();
 
     var setOp = {};
     setOp['troupes.' + troupeId] = lastAccessTime;
 
-    // Update the model, don't wait for a callback
-    persistence.UserTroupeLastAccess.update(
-      { userId: userId },
-      { $set: setOp },
-      { upsert: true },
-      function(err) {
-        if(err) {
-          winston.error('Error updating usertroupelastaccess: ' + err, { exception: err });
-        }
-      });
+    return Q.all([
+        // Update UserTroupeLastAccess
+        persistence.UserTroupeLastAccess.updateQ(
+           { userId: userId },
+           { $set: setOp },
+           { upsert: true }),
+        // Update User
+        persistence.User.updateQ({ id: userId }, { $set: { lastTroupe: troupeId }})
+      ])
+      .then(function() {
+        // XXX: lastAccessTime should be a date but for some bizarre reason it's not
+        // serializing properly
+        appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
+      })
+      .nodeify(callback);
 
-    // XXX: lastAccessTime should be a date but for some bizarre reason it's not
-    // serializing properly
-    appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
-
-    persistence.User.update({ id: userId }, { $set: { lastTroupe: troupeId }}, callback);
   },
 
   /**
