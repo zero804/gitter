@@ -48,7 +48,7 @@ define([
     },
 
     onRender: function() {
-      this.$el.find('.nano').nanoScroller({ preventPageScrolling: true });
+      this.$el.find('.nano').nanoScroller(/*{ preventPageScrolling: true }*/);
 
       // recent troupe view
       this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentTroupes }));
@@ -99,7 +99,7 @@ define([
       function toggler(element, collection) {
         function toggle() {
           self.$el.find(element).toggle(collection.length > 0);
-          self.$el.find('.nano').nanoScroller({ preventPageScrolling: true });
+          self.$el.find('.nano').nanoScroller(/*{ preventPageScrolling: true }*/);
           self.toggleMegaList();
         }
 
@@ -167,8 +167,7 @@ define([
         this.activateSearchList();
       }
 
-      this.$el.find('.nano').nanoScroller({ preventPageScrolling: true });
-
+      this.$el.find('.nano').nanoScroller(/*{ preventPageScrolling: true }*/);
     },
 
     activateSearchList: function() {

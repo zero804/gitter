@@ -1,18 +1,13 @@
 /*jshint unused:true, browser:true*/
-require([
+define([
   'jquery',
   'underscore',
   'collections/troupes',
+  'utils/context',
   'expect',
-  'mocha',
   'components/unread-items-client'
-], function($, _, troupeModels, expect, mocha, unreadItemsClient) {
+], function($, _, troupeModels, context, expect, unreadItemsClient) {
   "use strict";
-
-  mocha.setup({
-    ui: 'bdd',
-    globals: ['troupeContext']
-  });
 
   describe('DoubleHash', function() {
     it('should be able to add items', function(done) {
@@ -160,13 +155,13 @@ require([
     it('should be able to add items, which are then promoted', function(done) {
       var underTest = new unreadItemsClient.UnreadItemStore();
 
-      underTest.once('newcountvalue', function(e, newValue) {
+      underTest.once('newcountvalue', function(newValue) {
         expect(newValue).to.be(0);
 
-        underTest.once('newcountvalue', function(e, newValue) {
+        underTest.once('newcountvalue', function(newValue) {
           expect(newValue).to.be(1);
 
-          underTest.once('newcountvalue', function(e, newValue) {
+          underTest.once('newcountvalue', function(newValue) {
             expect(newValue).to.be(3);
             done();
           });
@@ -193,7 +188,7 @@ require([
       var underTest = new unreadItemsClient.UnreadItemStore();
 
       var count = 1;
-      underTest.on('newcountvalue', function(e, newValue) {
+      underTest.on('newcountvalue', function(newValue) {
         count--;
         switch(count) {
           case 0:
@@ -216,7 +211,7 @@ require([
     it('should raise unreadItemRemoved events at the appropriate times', function(done) {
       var underTest = new unreadItemsClient.UnreadItemStore();
 
-      underTest.on('unreadItemRemoved', function(e, itemType, itemId) {
+      underTest.on('unreadItemRemoved', function(itemType, itemId) {
         expect(itemType).to.be('file');
         expect(itemId).to.be('1');
         done();
@@ -230,7 +225,7 @@ require([
     it('should raise itemMarkedRead events at the appropriate times', function(done) {
       var underTest = new unreadItemsClient.UnreadItemStore();
 
-      underTest.on('itemMarkedRead', function(e, itemType, itemId) {
+      underTest.on('itemMarkedRead', function(itemType, itemId) {
         expect(itemType).to.be('file');
         expect(itemId).to.be('1');
         done();
@@ -247,13 +242,13 @@ require([
         chat: ['1','2','3','4']
       });
 
-      underTest.once('newcountvalue', function(e, newValue) {
+      underTest.once('newcountvalue', function(newValue) {
         expect(newValue).to.be(4);
 
         underTest._unreadItemRemoved('chat', '1');
         underTest._markItemRead('chat', '1');
 
-        underTest.once('newcountvalue', function(e, newValue) {
+        underTest.once('newcountvalue', function(newValue) {
           expect(newValue).to.be(3);
 
           done();
@@ -265,7 +260,7 @@ require([
     it('it should raise newcountvalue events when the store changes', function(done) {
       var underTest = new unreadItemsClient.UnreadItemStore();
 
-      function firstNewCountValueEvent(e, newValue) {
+      function firstNewCountValueEvent(newValue) {
         expect(newValue).to.be(4);
 
         underTest.once('newcountvalue', secondNewCountValueEvent);
@@ -273,7 +268,7 @@ require([
         underTest._markItemRead('chat', '1');
       }
 
-      function secondNewCountValueEvent(e, newValue) {
+      function secondNewCountValueEvent(newValue) {
         expect(newValue).to.be(3);
 
         underTest.once('newcountvalue', thirdNewCountValueEvent);
@@ -282,7 +277,7 @@ require([
         underTest._unreadItemAdded('chat', '5'); // <- only this item should be added
       }
 
-      function thirdNewCountValueEvent(e, newValue) {
+      function thirdNewCountValueEvent(newValue) {
         expect(newValue).to.be(4);
 
         underTest.once('newcountvalue', forthNewCountValueEvent);
@@ -293,7 +288,7 @@ require([
         underTest._markItemRead('chat', '5');
       }
 
-      function forthNewCountValueEvent(e, newValue) {
+      function forthNewCountValueEvent(newValue) {
         expect(newValue).to.be(0);
 
         done();
@@ -318,7 +313,7 @@ require([
       underTest._markItemRead('chat', '5');
 
 
-      function firstNewCountValueEvent(e, newValue) {
+      function firstNewCountValueEvent(newValue) {
         expect(newValue).to.be(0);
 
         underTest.once('newcountvalue', function() {
@@ -344,13 +339,15 @@ require([
 
   describe('TroupeCollectionSync', function() {
     it('should sync changes from the store to the troupe collection', function(done) {
+      context.setTroupeId('1');
+      context.testOnly.resetTroupeContext({ troupe: { id: '1' }, user: { id: 'USER1' } } );
 
-      window.troupeContext = { troupe: { id: '1' }, user: { id: 'USER1' } };
       var troupeCollection = new troupeModels.TroupeCollection([{ id: '1' }, { id: '2' } ]);
 
       var unreadItemStore;
 
       troupeCollection.once('change', function(a) {
+        console.log('A is ', a);
         expect(a.get('id')).to.be('1');
         expect(a.get('unreadItems')).to.be(0);
 
@@ -463,11 +460,5 @@ require([
       done();
     });
   });
-
-  if (window.mochaPhantomJS) {
-    mochaPhantomJS.run();
-  } else {
-    mocha.run();
-  }
 
 });
