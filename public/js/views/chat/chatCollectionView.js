@@ -11,11 +11,10 @@ define([
   'marionette',
   'views/base',
   './chatItemView',
-  './scrollDelegate',
   'utils/rollers',
   'utils/never-ending-story',
   'bootstrap_tooltip'
-], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, chatItemView, scrollDelegates, Rollers, NeverEndingStory /* tooltip*/) {
+], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, chatItemView, Rollers, NeverEndingStory /* tooltip*/) {
 
   "use strict";
 
@@ -36,22 +35,43 @@ define([
 
       var contentFrame = document.querySelector('#content-frame');
 
-      //this.rollers = new Rollers(this.el);
       this.rollers = new Rollers(contentFrame);
 
       var scroll = new NeverEndingStory(contentFrame);
       scroll.on('approaching.end', function() {
-        console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
         this.loadNextMessages();
       }, this);
       this.scroll = scroll;
+
+      //this.updateUnreadItemTracking();
 
       //_.bindAll(this, 'chatWindowScroll');
       this.initializeSorting();
       this.userCollection = options.userCollection;
 
+      this.findChatToTrack();
+
+      this.collection.on('add', function() {
+        if(this.unreadItemToTrack) return;
+        this.findChatToTrack();
+      }, this);
+
+      this.collection.on('remove', function(e, model) {
+        if(this.unreadItemToTrack && model === this.unreadItemToTrack) {
+          this.findChatToTrack();
+        }
+      }, this);
+
+      this.collection.on('change', function() {
+
+        if(!this.unreadItemToTrack) return;
+        if(this.unreadItemToTrack.get('unread')) return;
+
+        this.findChatToTrack();
+      }, this);
+
       // if (window._troupeCompactView) {
-      //   ChatCollectionView.$scrollOf = $('#chat-wrapper');
+      //   ChatCollectionView.$scrollOf = $('#content-frame');
       //   ChatCollectionView.$container = $('#chat-frame');
       // } else {
       //   ChatCollectionView.$scrollOf = $(window);
@@ -84,6 +104,47 @@ define([
       //   //self.scrollDelegate.scrollToBottom();
       // }
     },
+
+    findChatToTrack: function() {
+      if(this._findingNextUnread) return;
+
+      var nextUnread = this.collection.findWhere({ unread: true });
+
+      this.unreadItemToTrack = nextUnread;
+
+      if(!nextUnread) {
+        this.rollers.cancelTrackUntil();
+      } else {
+        var view = this.children.findByModel(nextUnread);
+
+        /* Can't find the view, it may not have been generated yet */
+        if(view) {
+          this.rollers.trackUntil(view.el);
+        } else {
+          this._findingNextUnread = true;
+       }
+      }
+    },
+
+    onAfterItemAdded: function() {
+      if(!this._findingNextUnread) return;
+
+      var view = this.children.findByModel(this.unreadItemToTrack);
+      if(view) {
+        this._findingNextUnread = false;
+        this.rollers.trackUntil(view.el);
+      }
+    },
+
+    // updateUnreadItemTracking: function() {
+    //   this.unreadItemToTrack = this.firstUnreadView();
+    //   if(this.unreadItemToTrack) {
+    //     scroll.trackUntil(this.unreadItemToTrack);
+    //   } else {
+    //     scroll.cancelTrackUntil();
+    //   }
+
+    // },
 
     // onClose: function(){
     //   $(document).off('eyeballStateChange', this.eyeballStateChange);

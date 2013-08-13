@@ -37,11 +37,12 @@ define([
         });
 
         // go to the bottom of the page when sending a new message
-        if(window._troupeCompactView) {
-          $('#chat-wrapper').scrollTop($('#chat-frame').height());
-        } else {
-          $(window).scrollTop($(document).height());
-        }
+        // NB NB NB: review this
+        //if(window._troupeCompactView) {
+        //  $('#content-frame').scrollTop($('#content-frame').height());
+        //} else {
+        //  $(window).scrollTop($(document).height());
+        //}
 
       }
       return false;

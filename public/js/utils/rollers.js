@@ -1,5 +1,5 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-define([], function() {
+define(['log!rollers'], function(log) {
   "use strict";
 
   /** @const */ var TRACK_BOTTOM = 1;
@@ -14,7 +14,6 @@ define([], function() {
     this._mutationHandlers[TRACK_NO_PASS] = this.updateTrackNoPass.bind(this);
     this._mutationHandlers[STABLE] = this.updateStableTracking.bind(this);
 
-    this.trackLocation();
     this._nopass = null;
     this._stableElement = null;
     this._mode = TRACK_BOTTOM;
@@ -24,6 +23,7 @@ define([], function() {
     var MutationObserver = window.MutationObserver || window.MozMutationObserver || window.WebKitMutationObserver;
     var observer = new MutationObserver(function(/*mutations*/) {
       self._mutationHandlers[self._mode]();
+      self._postMutateTop = self._target.scrollTop;
     });
 
     target.addEventListener('scroll', this.trackLocation.bind(this));
@@ -33,16 +33,63 @@ define([], function() {
   }
 
   Rollers.prototype = {
+    trackUntil: function(element) {
+      if(this._mode != STABLE) {
+        this._nopass = element;
+        this._mode = TRACK_NO_PASS;
+      }
+    },
+
+    cancelTrackUntil: function() {
+      if(!this._nopass) return;
+
+      this._nopass = null;
+
+      var target = this._target;
+
+      this.scrollBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
+
+      if(this.isScrolledToBottom()) {
+        this._mode = TRACK_BOTTOM;
+      } else {
+        this._mode = STABLE;
+
+        this._stableElement = this.getBottomMostVisibleElement();
+
+        // TODO: check that the element is within the targets DOM heirachy
+        var scrollBottom = target.scrollTop + target.clientHeight;
+        var stableElementTop = this._stableElement.offsetTop - target.offsetTop;
+
+        // Calculate an record the distance of the stable element to the bottom of the view
+        this._stableElementFromBottom = scrollBottom - stableElementTop;
+
+      }
+
+
+      //setTimeout(function() {
+      //  this.trackLocation();
+      //}, 0);
+
+      //this.trackLocation();
+    },
+
+    isScrolledToBottom: function() {
+      var target = this._target;
+      var atBottom = target.scrollTop >= target.scrollHeight - target.clientHeight - 15;
+      return atBottom;
+    },
+
     updateTrackBottom: function() {
       var target = this._target;
-      var scrollTop = target.scrollHeight - target.clientHeight - this.scrollBottom;
+      var scrollTop = target.scrollHeight - target.clientHeight;// - this.scrollBottom;
       target.scrollTop = scrollTop;
     },
 
     updateTrackNoPass: function() {
       var target = this._target;
 
-      var scrollTop = target.scrollHeight - target.clientHeight - this.scrollBottom;
+      var scrollTop = target.scrollHeight - target.clientHeight;// - this.scrollBottom;
+      //var scrollTop = target.scrollHeight - target.clientHeight - this.scrollBottom;
       var nopassOffset = this._nopass.offsetTop - target.offsetTop;
       if(scrollTop < nopassOffset) {
         target.scrollTop = scrollTop;
@@ -50,7 +97,17 @@ define([], function() {
         target.scrollTop = nopassOffset;
         this._nopass = null;
         this._mode = STABLE;
-        this.trackLocation();
+
+        this.scrollBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
+        this._stableElement = this.getBottomMostVisibleElement();
+
+        // TODO: check that the element is within the targets DOM heirachy
+        var scrollBottom = target.scrollTop + target.clientHeight;
+        var stableElementTop = this._stableElement.offsetTop - target.offsetTop;
+
+        // Calculate an record the distance of the stable element to the bottom of the view
+        this._stableElementFromBottom = scrollBottom - stableElementTop;
+        //this.trackLocation();
       }
     },
 
@@ -65,16 +122,30 @@ define([], function() {
 
     trackLocation: function() {
       var target = this._target;
+      if(this._postMutateTop === target.scrollTop) {
+        return true;
+      }
 
-      var atBottom = target.scrollTop >= target.scrollHeight - target.clientHeight - 5;
+      var atBottom = target.scrollTop >= target.scrollHeight - target.clientHeight - 15;
+
       if(atBottom) {
         if(this._nopass) {
-          this._mode = TRACK_NO_PASS;
+          if(this._mode != TRACK_NO_PASS) {
+            log('Switching to TRACK_NO_PASS');
+            this._mode = TRACK_NO_PASS;
+
+          }
         } else {
-          this._mode = TRACK_BOTTOM;
+          if(this._mode != TRACK_BOTTOM) {
+            log('Switching to TRACK_BOTTOM');
+            this._mode = TRACK_BOTTOM;
+          }
         }
       } else {
-        this._mode = STABLE;
+        if(this._mode != STABLE) {
+          log('Switching to STABLE');
+          this._mode = STABLE;
+        }
       }
 
       this.scrollBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
@@ -89,13 +160,25 @@ define([], function() {
         this._stableElementFromBottom = scrollBottom - stableElementTop;
       }
 
+      return true;
     },
 
+
+
     getBottomMostVisibleElement: function() {
-      var rect = this._target.getBoundingClientRect();
-      var x = rect.left + 5;
-      var y = rect.bottom - 5;
-      return document.elementFromPoint(x,y);
+      var scrollTop = this._target.scrollTop;
+      var clientHeight = this._target.clientHeight;
+      var max = scrollTop + clientHeight;
+      var t = document.querySelector('#frame-chat');
+      var children = t.children;
+      for(var i = children.length - 1; i >= 0; i--) {
+        var child = children[i];
+        if(child.offsetTop < max) {
+          return child;
+        }
+      }
+
+      return;
     }
   };
 

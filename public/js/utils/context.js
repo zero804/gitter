@@ -72,6 +72,7 @@ define([
     c.troupe = value;
   };
 
+
   context.getUserId = function() {
     var c = context();
     return c.user && c.user.id || c.userId;
@@ -148,6 +149,13 @@ define([
    */
   context.env = function(envName) {
     return window.troupeEnv && window.troupeEnv[envName];
+  };
+
+  context.testOnly = {
+    resetTroupeContext: function(newContext) {
+      troupe = null;
+      ctx = newContext;
+    }
   };
 
   return context;
