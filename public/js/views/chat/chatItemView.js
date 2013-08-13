@@ -71,7 +71,8 @@ define([
     },
 
     onChange: function() {
-      if (this.model.changed.text) {
+      var changed = this.model.changed;
+      if ('text' in changed || 'urls' in changed || 'mentions' in changed) {
         this.renderText();
       }
 
@@ -80,8 +81,10 @@ define([
 
     renderText: function() {
       // We need to parse the text a little to hyperlink known links and escape html to prevent injection
-      this.$el.find('.trpChatText').html(String(linkify(this.safe(this.model.get('text')))));
+      var richText = String(linkify(this.safe(this.model.get('text')), this.model.get('urls')));
+      this.$el.find('.trpChatText').html(richText);
       this.oEmbed();
+      this.highlightMention();
     },
 
     afterRender: function() {
@@ -114,7 +117,6 @@ define([
 
     // Note: This must only be called *once* after the element content is set from the model
     oEmbed: function() {
-      // TODO: send the URL's from the server? twitter-text etc
       oEmbed.defaults.maxwidth = 370;
       this.$el.find('.link').each(function(index, el) {
         oEmbed.parse(el.href, function(embed) {
@@ -122,6 +124,17 @@ define([
             $(el).append('<div class="embed">' + embed.html + '</div>');
           }
         });
+      });
+    },
+
+    highlightMention: function() {
+      var self = this;
+      _.each(this.model.get('mentions'), function(mention) {
+        var re    = new RegExp(mention.screenName, 'i');
+        var user  = context().user;
+        if (user.username.match(re) || user.displayName.match(re)) {
+          $(self.$el).find('.trpChatBox').addClass('mention');
+        }
       });
     },
 
