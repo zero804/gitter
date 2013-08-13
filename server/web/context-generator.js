@@ -9,9 +9,9 @@ var Q = require('q');
 exports.generateMiniContext = function(req, callback) {
   var user = req.user;
 
-  Q.all([ serializeUser(user), getWebToken(user) ])
+  Q.all([ user ? serializeUser(user) : null, user ? getWebToken(user) : null ])
     .spread(function(serializedUser, token) {
-      var profileNotCompleted = user.status == 'PROFILE_NOT_COMPLETED';
+      var profileNotCompleted = user ? user.status == 'PROFILE_NOT_COMPLETED' : null;
       var troupeContext = createTroupeContext(req, {
         user: serializedUser,
         accessToken: token,
