@@ -116,7 +116,7 @@ define([
       }
 
       // TODO: send the URL's from the server? twitter-text etc
-      oEmbed.defaults.maxwidth = 370;
+      oEmbed.defaults.maxheight = 250;
       var self = this;
       this.$el.find('.link').each(function(index, el) {
         oEmbed.parse(el.href, function(embed) {
