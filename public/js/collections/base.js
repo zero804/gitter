@@ -170,6 +170,10 @@ define([
       return this._loading;
     },
 
+    hasLoaded: function() {
+      return this._initialLoadCalled;
+    },
+
     unlisten: function() {
       if(!this.subscription) return;
       this.subscription.cancel();
