@@ -12,12 +12,12 @@ var Q = require('q');
 exports.generateMiniContext = function(req, callback) {
   var user = req.user;
 
-  return Q.all([
-      serializeUser(user),
-      getWebToken(user)
+  return Q.all([ 
+      user ? serializeUser(user) : null,
+      user ? getWebToken(user) : null
     ])
     .spread(function(serializedUser, token) {
-      var profileNotCompleted = user.status == 'PROFILE_NOT_COMPLETED';
+      var profileNotCompleted = user ? user.status == 'PROFILE_NOT_COMPLETED' : null;
       return createTroupeContext(req, {
         user: serializedUser,
         accessToken: token,
@@ -53,7 +53,8 @@ exports.generateTroupeContext = function(req, callback) {
     user ? serializeUser(user) : null,
     homeUser ? serializeHomeUser(homeUser, !!invite) : undefined, //include email if the user has an invite
     user ? getWebToken(user) : null,
-    troupe && user ? serializeTroupe(troupe, user) : fakeSerializedTroupe(req.uriContext) ])
+    troupe && user ? serializeTroupe(troupe, user) : fakeSerializedTroupe(req.uriContext) 
+  ])
   .spread(function(serializedUser, serializedHomeUser, token, serializedTroupe) {
 
     var status, profileNotCompleted;

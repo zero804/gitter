@@ -16,14 +16,19 @@ var isPhone = require('../web/is-phone');
 var contextGenerator = require('../web/context-generator');
 
 function renderHomePage(req, res, next) {
+  var user = req.user;
+  var accessDenied = !req.user;
+
   contextGenerator.generateMiniContext(req, function(err, troupeContext) {
     if(err) {
       next(err);
     } else {
+      var login = !user || troupeContext.profileNotCompleted || accessDenied;
+
       res.render('app-template', {
         useAppCache: !!nconf.get('web:useAppCache'),
-        bootScriptName: 'router-homepage',
-        troupeName: req.user.displayName,
+        bootScriptName: login ? "router-login" : 'router-homepage',
+        troupeName: (req.user && req.user.displayName) || '',
         troupeContext: troupeContext,
         agent: req.headers['user-agent']
       });
@@ -41,7 +46,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
   var accessDenied = !req.uriContext.access;
 
   Q.all([
-      req.user.id ? unreadItemService.getBadgeCountsForUserIds([req.user.id]) : null,
+      req.user ? unreadItemService.getBadgeCountsForUserIds([req.user.id]) : null,
       contextGenerator.generateTroupeContext(req)
     ])
     .spread(function(unreadCount, troupeContext) {
@@ -187,7 +192,6 @@ module.exports = {
       /* Special homepage for users without usernames */
       app.get('/home',
         middleware.grantAccessForRememberMeTokenMiddleware,
-        middleware.ensureLoggedIn(),
         function(req, res, next) {
           if(req.user && req.user.username) {
             res.relativeRedirect(req.user.getHomeUrl());
