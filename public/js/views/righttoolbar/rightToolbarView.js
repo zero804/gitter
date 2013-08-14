@@ -105,7 +105,7 @@ define([
       this.files.show(new FileView({ collection: fileCollection }));
 
       // Conversation View
-      if (context.inOneToOneTroupeContext()) {
+      if (!context.inOneToOneTroupeContext()) {
         var conversationView = new ConversationView({
           collection: conversationCollection
         });
