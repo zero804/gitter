@@ -35,7 +35,9 @@ define([
     itemView: ConversationItemView,
     emptyView: TroupeViews.Base.extend({
       template: conversationHelpTemplate,
-      data: getData()
+      initialize: function() {
+        this.data = getData();
+      }
     })
   });
 
