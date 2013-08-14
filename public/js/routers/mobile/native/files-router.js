@@ -11,11 +11,11 @@ require([
   'views/file/fileDetailView',
   'collections/files',
   'views/file/mobileFilePreview',
+  'components/unread-items-client',
   'components/eyeballs',              // No ref
-  'components/unread-items-client',   // No ref
   'template/helpers/all',             // No ref
   'components/native-context'         // No ref
-], function($, Marionette, _, Backbone, context, MobileRouter, TroupeViews, FileView, FileDetailView, fileModels, MobileFilePreview) {
+], function($, Marionette, _, Backbone, context, MobileRouter, TroupeViews, FileView, FileDetailView, fileModels, MobileFilePreview, unreadItemsClient) {
   /*jslint browser: true, unused: true */
   "use strict";
 
@@ -26,7 +26,6 @@ require([
   } else {
     troupeId = window.localStorage.lastTroupeId;
   }
-
   if(troupeId) {
     context.setTroupeId(troupeId);
     window.localStorage.lastTroupeId = troupeId;

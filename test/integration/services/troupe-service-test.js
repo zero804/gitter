@@ -653,7 +653,7 @@ describe('troupe-service', function() {
           if(err) return done(err);
           if(!troupe) return done("Cannot find troupe");
 
-          userService.saveLastVisitedTroupeforUser(user, troupe, function(err) {
+          userService.saveLastVisitedTroupeforUserId(user.id, troupe, function(err) {
             if(err) return done(err);
 
 
@@ -682,7 +682,7 @@ describe('troupe-service', function() {
           if(err) return done(err);
           if(!troupe) return done("Cannot find troupe");
 
-          userService.saveLastVisitedTroupeforUser(user, troupe, function(err) {
+          userService.saveLastVisitedTroupeforUserId(user.id, troupe, function(err) {
             if(err) return done(err);
 
             troupeService.findBestTroupeForUser(user, function(err, troupe) {

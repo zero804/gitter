@@ -152,7 +152,7 @@ define([
       }
 
       // Why are we doing this again?
-      context.geTroupe().name = troupeName;
+      context.getTroupe().name = troupeName;
 
       $.ajax({
         url: '/troupes/' + context.getTroupeId(),

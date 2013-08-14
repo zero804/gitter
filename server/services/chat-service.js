@@ -1,10 +1,11 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var persistence = require("./persistence-service"),
-    collections = require("../utils/collections"),
+var persistence   = require("./persistence-service"),
+    collections   = require("../utils/collections"),
     troupeService = require("./troupe-service"),
-    statsService = require("./stats-service");
+    statsService  = require("./stats-service"),
+    TwitterText   =  require('../utils/twitter-text');
 var ObjectID = require('mongodb').ObjectID;
 
 
@@ -20,6 +21,12 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   chatMessage.toTroupeId = troupe.id;
   chatMessage.sent = new Date();
   chatMessage.text = text;
+
+  // Metadata
+  chatMessage.urls            = TwitterText.extractUrlsWithIndices(text);
+  chatMessage.mentions        = TwitterText.extractMentionsWithIndices(text);
+  chatMessage.metadataVersion = TwitterText.version;
+
   chatMessage.save(function (err) {
     if(err) return callback(err);
 

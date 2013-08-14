@@ -10,14 +10,13 @@ define([
   'components/unread-items-client',
   'marionette',
   'views/base',
-  './scrollDelegate',
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
   'oEmbed',
   'template/helpers/linkify',
   'bootstrap_tooltip'
-], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, scrollDelegates, chatItemTemplate, chatInputView, UnreadItemViewMixin, oEmbed, linkify /* tooltip*/) {
+], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, chatItemTemplate, chatInputView, UnreadItemViewMixin, oEmbed, linkify /* tooltip*/) {
 
   "use strict";
 
@@ -36,7 +35,7 @@ define([
       var self = this;
 
       this.userCollection = options.userCollection;
-      this.scrollDelegate = options.scrollDelegate;
+      //this.scrollDelegate = options.scrollDelegate;
 
       this.model.on('change', function() {
         self.onChange();
@@ -72,7 +71,8 @@ define([
     },
 
     onChange: function() {
-      if (this.model.changed.text) {
+      var changed = this.model.changed;
+      if ('text' in changed || 'urls' in changed || 'mentions' in changed) {
         this.renderText();
       }
 
@@ -81,8 +81,10 @@ define([
 
     renderText: function() {
       // We need to parse the text a little to hyperlink known links and escape html to prevent injection
-      this.$el.find('.trpChatText').html(String(linkify(this.safe(this.model.get('text')))));
+      var richText = String(linkify(this.safe(this.model.get('text')), this.model.get('urls')));
+      this.$el.find('.trpChatText').html(richText);
       this.oEmbed();
+      this.highlightMention();
     },
 
     afterRender: function() {
@@ -115,16 +117,24 @@ define([
 
     // Note: This must only be called *once* after the element content is set from the model
     oEmbed: function() {
-      // TODO: send the URL's from the server? twitter-text etc
       oEmbed.defaults.maxwidth = 370;
-      var self = this;
       this.$el.find('.link').each(function(index, el) {
         oEmbed.parse(el.href, function(embed) {
           if (embed) {
             $(el).append('<div class="embed">' + embed.html + '</div>');
-            self.scrollDelegate.scrollToBottom();
           }
         });
+      });
+    },
+
+    highlightMention: function() {
+      var self = this;
+      _.each(this.model.get('mentions'), function(mention) {
+        var re    = new RegExp(mention.screenName, 'i');
+        var user  = context().user;
+        if (user.username.match(re) || user.displayName.match(re)) {
+          $(self.$el).find('.trpChatBox').addClass('mention');
+        }
       });
     },
 
@@ -187,7 +197,6 @@ define([
     },
 
     toggleEdit: function() {
-      var self = this;
       if (this.isEditing) {
         this.isEditing = false;
         this.showText();
@@ -214,7 +223,7 @@ define([
     },
 
     showInput: function() {
-      var isAtBottom = this.scrollDelegate.isAtBottom();
+      //var isAtBottom = this.scrollDelegate.isAtBottom();
 
       // create inputview
       this.$el.find('.trpChatText').html("<textarea class='trpChatInput'>"+this.model.get('text')+"</textarea>").find('textarea').select();
@@ -222,9 +231,9 @@ define([
       this.listenTo(this.inputBox, 'save', this.saveChat);
 
       // this.$el.find('.trpChatText textarea').focus().on('blur', function() { self.toggleEdit(); });
-      if (isAtBottom) {
-        this.scrollDelegate.$scrollOf.scrollTop(this.scrollDelegate.$container.height());
-      }
+      //if (isAtBottom) {
+      //  this.scrollDelegate.$scrollOf.scrollTop(this.scrollDelegate.$container.height());
+      //}
     },
 
     showReadBy: function() {
@@ -233,7 +242,7 @@ define([
       this.readBy = new ReadByPopover({
         model: this.model,
         userCollection: this.userCollection,
-        placement: 'bottom',
+        placement: 'vertical',
         title: 'Read By',
         targetElement: this.$el.find('.trpChatReads')[0]
       });

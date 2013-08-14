@@ -9,11 +9,11 @@ require([
   'views/conversation/conversationView',
   'views/conversation/conversationDetailView',
   'collections/conversations',
+  'components/unread-items-client',
   'components/eyeballs',              // No ref
-  'components/unread-items-client',   // No ref
   'template/helpers/all',             // No ref
   'components/native-context'         // No ref
-], function($, _, Backbone, context, MobileRouter, TroupeViews, ConversationView, conversationDetailView, conversationModels/*, unreadItemsClient*/) {
+], function($, _, Backbone, context, MobileRouter, TroupeViews, ConversationView, conversationDetailView, conversationModels, unreadItemsClient) {
   /*jslint browser: true, unused: true */
   "use strict";
 
@@ -24,13 +24,10 @@ require([
   } else {
     troupeId = window.localStorage.lastTroupeId;
   }
-
   if(troupeId) {
     context.setTroupeId(troupeId);
     window.localStorage.lastTroupeId = troupeId;
   }
-
-
 
   var AppRouter = MobileRouter.extend({
     routes: {

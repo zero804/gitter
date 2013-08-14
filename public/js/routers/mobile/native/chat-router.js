@@ -8,9 +8,10 @@ require([
   'views/chat/chatCollectionView',
   'views/chat/chatInputView',
   'utils/mobile-resizer',
+  'components/unread-items-client',
   'log!chat-router',
   'components/native-context' // No ref
-  ], function(_, $, MobileRouter, chatModels, context, ChatCollectionView, chatInputView, mobileResizer, log) {
+  ], function(_, $, MobileRouter, chatModels, context, ChatCollectionView, chatInputView, mobileResizer, unreadItemsClient, log) {
   "use strict";
 
   // TODO: normalise this
@@ -52,12 +53,13 @@ require([
         collection: chatCollection
       });
 
+      unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
+
       chatCollectionView.render();
 
       new chatInputView.ChatInputView({
         el: $('#chat-input'),
-        collection: chatCollection,
-        scrollDelegate: chatCollectionView.scrollDelegate
+        collection: chatCollection
       }).render();
 
       mobileResizer.reset();

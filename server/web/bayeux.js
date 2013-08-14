@@ -13,6 +13,8 @@ var nconf = require("../utils/config");
 var shutdown = require('../utils/shutdown');
 var contextGenerator = require('./context-generator');
 var appVersion = require('./appVersion');
+var userService = require("../services/user-service");
+var Q = require('q');
 
 var appTag = appVersion.getAppTag();
 
@@ -32,6 +34,7 @@ var superClientPassword = nconf.get('ws:superClientPassword');
 // This strategy ensures that a user can access a given troupe URL
 function validateUserForTroupeSubscription(options, callback) {
   options.notifyPresenceService = true;
+  options.updateLastVisitedTroupe = true;
   validateUserForSubTroupeSubscription(options, callback);
 }
 
@@ -42,37 +45,39 @@ function validateUserForSubTroupeSubscription(options, callback) {
   var message = options.message;
   var clientId = options.clientId;
   var notifyPresenceService = options.notifyPresenceService;
+  var updateLastVisitedTroupe = options.updateLastVisitedTroupe;
 
   var troupeId = match[1];
-  troupeService.findById(troupeId, function onTroupeFindByIdComplete(err, troupe) {
-    if(err || !troupe) return callback(err, !!troupe);
+  return troupeService.findById(troupeId)
+    .then(function(troupe) {
+      if(!troupe) return false;
+      var result = troupeService.userIdHasAccessToTroupe(userId, troupe);
 
-    var result = troupeService.userIdHasAccessToTroupe(userId, troupe);
-
-    if(!result) {
-      winston.info("Denied user " + userId + " access to troupe " + troupe.uri);
-    }
-
-    if(result && notifyPresenceService) {
-      var eyeballState = true;
-      if(message.ext) {
-        if(message.ext.hasOwnProperty('eyeballs')) {
-          eyeballState = !!message.ext.eyeballs;
-        }
+      if(!result) {
+        winston.info("Denied user " + userId + " access to troupe " + troupe.uri);
+        return false;
       }
 
-      presenceService.userSubscribedToTroupe(userId, troupeId, clientId, eyeballState, function(err) {
-        if(err) return callback(err);
+      if(!notifyPresenceService && !updateLastVisitedTroupe) return result;
 
-        return callback(null, result);
-      });
+      var ops = [];
+      if(notifyPresenceService) {
+        var eyeballState = true;
+        if(message.ext && 'eyeballs' in message.ext) {
+          eyeballState = !!message.ext.eyeballs;
+        }
 
-    } else {
-      // No need to tell the presence service
-      return callback(null, result);
-    }
+        var userSubscribedToTroupe = Q.denodeify(presenceService.userSubscribedToTroupe);
+        ops.push(userSubscribedToTroupe(userId, troupeId, clientId, eyeballState));
+      }
 
-  });
+      if(updateLastVisitedTroupe) {
+        ops.push(userService.saveLastVisitedTroupeforUserId(userId, troupe));
+      }
+
+      return Q.all(ops).thenResolve(result);
+    })
+    .nodeify(callback);
 }
 
 // This strategy ensures that a user can access a URL under a /user/ URL
@@ -351,6 +356,7 @@ var authorisor = {
     var m = match.match;
     var clientId = message.clientId;
 
+    /* The populator is all about generating the snapshot for the client */
     if(clientId && populator) {
       presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
         if(err) {
