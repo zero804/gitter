@@ -16,7 +16,7 @@ define([
     realtime.subscribe('/user/' + context.getUserId(), function(message) {
       if (message.notification === 'user_notification') {
 
-        if(message.troupeId === context.getTroupeId()) {
+        if(message.troupeId && message.troupeId === context.getTroupeId()) {
           return;
         }
 

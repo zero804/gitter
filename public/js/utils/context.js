@@ -85,7 +85,7 @@ define([
 
   context.isAuthed = function() {
     var c = context();
-    return !c.user && !c.userId;
+    return c.user && c.user.id || c.userId;
   };
 
   context.getHomeUser = function() {
