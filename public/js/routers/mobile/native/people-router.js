@@ -62,7 +62,7 @@ require([
     },
 
     defaultAction: function(/* actions */){
-      this.showView("#primary-view", new Marionette.CollectionView({
+      this.show('primary', new Marionette.CollectionView({
         collection: this.collection,
         itemView: TroupeViews.Base.extend({
           template: PersonViewTemplate,
