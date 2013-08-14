@@ -2,10 +2,13 @@
 define([
   'jquery',
   'backbone',
+  'retina',
+  'utils/mobile-resizer',
+  'views/toolbar/troupeMenu',
   'marionette',
   'views/app/mobileAppView',
   'routers/mobile/web/mobile-app-router'
-  ], function($, Backbone, Marionette, MobileAppView, AppRouter) {
+  ], function($, Backbone, retina, mobileResizer, TroupeMenu, Marionette, MobileAppView, AppRouter) {
   "use strict";
 
   new MobileAppView({
@@ -18,8 +21,23 @@ define([
     content: '#frame-chat'
   });
 
+  app.addInitializer(function() {
+      new TroupeMenu({
+        el: $('#troupeList')
+      }).render();
+
+      mobileResizer.reset();
+
+      var fakeWindow = {};
+      retina.init(fakeWindow);
+      fakeWindow.onload();
+
+      window.addEventListener("orientationchange", function() {
+        mobileResizer.reset();
+      });
+  });
+
   app.on('start', function(){
-    new AppRouter();
     Backbone.history.start();
   });
 
