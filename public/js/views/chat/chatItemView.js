@@ -132,7 +132,10 @@ define([
       _.each(this.model.get('mentions'), function(mention) {
         var re    = new RegExp(mention.screenName, 'i');
         var user  = context().user;
-        if (user.username.match(re) || user.displayName.match(re)) {
+
+        // Note: The context in mobile doesn't have a user,
+        // it's actually populated at a later time over Faye.
+        if (user && (user.username.match(re) || user.displayName.match(re))) {
           $(self.$el).find('.trpChatBox').addClass('mention');
         }
       });
