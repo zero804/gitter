@@ -9,6 +9,8 @@ var middleware = require('../web/middleware');
 var appVersion = require("../web/appVersion");
 var loginUtils = require('../web/login-utils');
 var uriService = require('../services/uri-service');
+var unreadItemService = require('../services/unread-item-service');
+
 var Q = require('q');
 var isPhone = require('../web/is-phone');
 var contextGenerator = require('../web/context-generator');
@@ -38,10 +40,11 @@ function renderAppPageWithTroupe(req, res, next, page) {
   var user = req.user;
   var accessDenied = !req.uriContext.access;
 
-  contextGenerator.generateTroupeContext(req, function(err, troupeContext) {
-    if(err) {
-      next(err);
-    } else {
+  Q.all([
+      req.user.id ? unreadItemService.getBadgeCountsForUserIds([req.user.id]) : null,
+      contextGenerator.generateTroupeContext(req)
+    ])
+    .spread(function(unreadCount, troupeContext) {
       var login = !user || troupeContext.profileNotCompleted || accessDenied;
 
       res.render(page, {
@@ -49,12 +52,13 @@ function renderAppPageWithTroupe(req, res, next, page) {
         login: login,
         isWebApp: !req.params.mobilePage, // TODO: fix this!
         bootScriptName: login ? "router-login" : "router-app",
+        unreadCount: unreadCount && unreadCount[req.user.id],
         troupeName: troupeContext.troupe.name,
         troupeContext: troupeContext,
         agent: req.headers['user-agent']
       });
-    }
-  });
+    })
+    .fail(next);
 }
 
 function uriContextResolverMiddleware(req, res, next) {
@@ -142,10 +146,6 @@ module.exports = {
             .then(function(troupe) {
               if(troupe) {
                 return '/mobile/' + req.params.page + '#' + troupe.id;
-                // return troupeService.getUrlForTroupeForUserId(troupe, req.user.id)
-                //   .then(function(url) {
-                //     return url + "/" + req.params.page;
-                //   });
               }
 
               if(req.user.hasUsername()) {

@@ -141,6 +141,7 @@ UserSchema.methods.hasPassword = function() {
   return !!this.passwordHash;
 };
 
+
 var UserLocationHistorySchema = new Schema({
   userId: ObjectId,
   timestamp: Date,
