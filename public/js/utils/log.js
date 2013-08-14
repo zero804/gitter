@@ -1,4 +1,4 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false, console:false */
 define(function() {
   "use strict";
 
@@ -10,7 +10,7 @@ define(function() {
     console.log(a0);
   }
 
-  function consoleLog(msg) {
+  function consoleLog() {
     console.log.apply(console, Array.prototype.slice.apply(arguments));
 
     history.push(Array.prototype.join.call(arguments, ', '));
