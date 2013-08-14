@@ -44,13 +44,13 @@ require([
 
     defaultAction: function(){
       var view = new ConversationView({ collection: this.collection });
-      this.showView("#primary-view", view);
+      this.show('primary', view);
     },
 
     showConversation: function(id) {
       // why is this not showing anything?
       var view = new conversationDetailView.View({ id: id });
-      this.showView("#primary-view", view);
+      this.show('primary', view);
     }
 
   });

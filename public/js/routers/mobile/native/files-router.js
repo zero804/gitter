@@ -36,14 +36,6 @@ require([
     document.title = troupe.get('name');
   });
 
-  var MobileLayout = Marionette.Layout.extend({
-    el: 'body',
-    regions: {
-      primary: "#primary-view",
-    }
-  });
-  var layoutManager = new MobileLayout();
-
   var AppRouter = MobileRouter.extend({
     routes: {
       'file/:id':     'showFile',
@@ -58,16 +50,16 @@ require([
     },
 
     defaultAction: function(/*actions*/){
-      layoutManager.primary.show(new FileView({ collection: this.fileCollection }));
+      this.show('primary', new FileView({ collection: this.fileCollection }));
     },
 
     showFile: function(id) {
       var model = this.fileCollection.get(id);
-      layoutManager.primary.show(new FileDetailView({ model: model }));
+      this.show('primary', new FileDetailView({ model: model }));
     },
 
     previewFile: function(id) {
-      layoutManager.primary.show(new MobileFilePreview({ model: this.fileCollection.get(id) }));
+      this.show('primary', new MobileFilePreview({ model: this.fileCollection.get(id) }));
     }
 
   });
