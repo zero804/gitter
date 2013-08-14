@@ -1,26 +1,19 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
-  'underscore',
   'utils/context',
-  'backbone',
-  'marionette',
   'views/base',
+  'utils/appevents',
   'hbs!./tmpl/chatInputView',
-  'collections/chat',
-  '../../utils/momentWrapper',
-  'jquery-placeholder'
-], function($, _, context, Backbone, Marionette, TroupeViews, template, chatModels, moment) {
+  'utils/momentWrapper',
+  'jquery-placeholder' // No ref
+], function($, context, TroupeViews, appEvents, template, moment) {
   "use strict";
 
   var PAGE_SIZE = 50;
 
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
-
-    initialize: function(options) {
-      this.scrollDelegate = options.scrollDelegate;
-    },
 
     getRenderData: function() {
       return {
@@ -31,7 +24,6 @@ define([
     afterRender: function() {
       this.inputBox = new ChatInputBoxView({
         el: this.$el.find('.trpChatInputBoxTextArea'),
-        scrollDelegate: this.scrollDelegate
       });
 
       this.listenTo(this.inputBox, 'save', this.send);
@@ -39,19 +31,12 @@ define([
 
     send: function(val) {
       if(val) {
-        this.collection.create({
+        var model = this.collection.create({
           text: val,
           fromUser: context.getUser(),
           sent: moment()
         });
-
-        // go to the bottom of the page when sending a new message
-        if(window._troupeCompactView) {
-          $('#chat-wrapper').scrollTop($('#chat-frame').height());
-        } else {
-          $(window).scrollTop($(document).height());
-        }
-
+        appEvents.trigger('chat.send', model);
       }
       return false;
     }
@@ -71,11 +56,8 @@ define([
 
     // pass in the textarea as el for ChatInputBoxView
     // pass in a scroll delegate
-    initialize: function(options) {
-
+    initialize: function() {
       this.chatLines = 2;
-
-      this.scrollDelegate = options.scrollDelegate;
 
       this.originalChatInputHeight = this.$el.height();
       this.$el.placeholder();
@@ -91,7 +73,7 @@ define([
       this.chatLines = 2;
       chatPadding = originalChatPadding;
       this.$el.height(this.originalChatInputHeight);
-      $('#frame-chat').css('padding-bottom', chatPadding);
+      //$('#content-frame').css('bottom', chatPadding);
 
     },
 
@@ -99,21 +81,20 @@ define([
       var lht = parseInt(this.$el.css('lineHeight'),10);
       var height = this.$el.prop('scrollHeight');
       var currentLines = Math.floor(height / lht);
-      var wasAtBottom = this.scrollDelegate.isAtBottom();
 
       if (currentLines != this.chatLines) {
         this.chatLines = currentLines;
         var newHeight = currentLines * lht;
 
         this.$el.height(newHeight);
-        var frameChat = $('#frame-chat'), isChild = frameChat.find(this.el).length;
-        if (!isChild) {
+        //var frameChat = $('#frame-chat'), isChild = frameChat.find(this.el).length;
+        //if (!isChild) {
           chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
-          $('#frame-chat').css('padding-bottom', chatPadding);
-        }
-        if (wasAtBottom) {
-          this.scrollDelegate.scrollToBottom();
-        }
+          //$('#content-frame').css('bottom', chatPadding);
+        //}
+        //if (wasAtBottom) {
+        //  this.scrollDelegate.scrollToBottom();
+        //}
       }
     },
 
@@ -138,6 +119,7 @@ define([
 
     send: function() {
       this.trigger('save', this.$el.val());
+
 
       this.$el.val('');
     }

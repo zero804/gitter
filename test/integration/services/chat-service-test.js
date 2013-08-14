@@ -13,6 +13,7 @@ var fixture = {};
 
 
 describe('chatService', function() {
+  
   describe('updateChatMessage', function() {
 
     it('should update a recent chat message sent by the same user', function(done) {
@@ -38,6 +39,26 @@ describe('chatService', function() {
 
     });
 
+  });
+
+  describe('Rich messages', function() {
+    it('should collect metadata from the message text', function(done) {
+
+      chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, 'hey @mauro check https://trou.pe', function(err, chatMessage) {
+        if(err) return done(err);
+
+        assert(Array.isArray(chatMessage.urls), 'urls should be an array');
+        assert(chatMessage.urls[0].url === 'https://trou.pe', 'url should be a valid TwitterText url entity');
+
+        assert(Array.isArray(chatMessage.mentions), 'mentions should be an array');
+        assert(chatMessage.mentions[0].screenName === 'mauro', 'mention should be a valid TwitterText mention entity');
+
+        assert(chatMessage.metadataVersion !== 'undefined', 'there should be a metadataVersion');
+  
+        done();
+      });
+
+    });
   });
 
   before(fixtureLoader(fixture));
