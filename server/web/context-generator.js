@@ -6,35 +6,40 @@ var oauthService = require("../services/oauth-service");
 var appVersion = require("./appVersion");
 var Q = require('q');
 
+/**
+ * Returns the promise of a mini-context
+ */
 exports.generateMiniContext = function(req, callback) {
   var user = req.user;
 
-  Q.all([ serializeUser(user), getWebToken(user) ])
+  return Q.all([ 
+      user ? serializeUser(user) : null,
+      user ? getWebToken(user) : null
+    ])
     .spread(function(serializedUser, token) {
-      var profileNotCompleted = user.status == 'PROFILE_NOT_COMPLETED';
-      var troupeContext = createTroupeContext(req, {
+      var profileNotCompleted = user ? user.status == 'PROFILE_NOT_COMPLETED' : null;
+      return createTroupeContext(req, {
         user: serializedUser,
         accessToken: token,
         profileNotCompleted: profileNotCompleted,
         inUserhome: true
       });
-      callback(null, troupeContext);
     })
-    .fail(callback);
+    .nodeify(callback);
 };
 
 exports.generateSocketContext = function(userId, troupeId, callback) {
-
-  Q.all([ serializeUserId(userId), serializeTroupeId(troupeId, userId) ])
+  return Q.all([
+      serializeUserId(userId),
+      serializeTroupeId(troupeId, userId)
+    ])
     .spread(function(serializedUser, serializedTroupe) {
-      var troupeContext = {
+      return {
         user: serializedUser,
         troupe: serializedTroupe
       };
-
-      callback(null, troupeContext);
     })
-    .fail(callback);
+    .nodeify(callback);
 };
 
 exports.generateTroupeContext = function(req, callback) {
@@ -44,11 +49,12 @@ exports.generateTroupeContext = function(req, callback) {
   var homeUser = req.uriContext.oneToOne && req.uriContext.otherUser; // The users page being looked at
   var accessDenied = !req.uriContext.access;
 
-  Q.all([
+  return Q.all([
     user ? serializeUser(user) : null,
     homeUser ? serializeHomeUser(homeUser, !!invite) : undefined, //include email if the user has an invite
     user ? getWebToken(user) : null,
-    troupe && user ? serializeTroupe(troupe, user) : fakeSerializedTroupe(req.uriContext) ])
+    troupe && user ? serializeTroupe(troupe, user) : fakeSerializedTroupe(req.uriContext) 
+  ])
   .spread(function(serializedUser, serializedHomeUser, token, serializedTroupe) {
 
     var status, profileNotCompleted;
@@ -57,7 +63,7 @@ exports.generateTroupeContext = function(req, callback) {
       profileNotCompleted = (status == 'PROFILE_NOT_COMPLETED') || (status == 'UNCONFIRMED');
     }
 
-    var troupeContext = createTroupeContext(req, {
+    return createTroupeContext(req, {
       user: serializedUser,
       homeUser: serializedHomeUser,
       troupe: serializedTroupe,
@@ -66,9 +72,8 @@ exports.generateTroupeContext = function(req, callback) {
       inviteId: invite && invite.id,
       accessDenied: accessDenied
     });
-    callback(null, troupeContext);
   })
-  .fail(callback);
+  .nodeify(callback);
 };
 
 function serializeUser(user) {

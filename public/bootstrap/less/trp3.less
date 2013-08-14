@@ -323,7 +323,7 @@ a:hover {
 
 .trpContentPanel {
 /*  display: inline-block;*/
-  position: absolute;
+  position: fixed;
 /*	background-color: #ecf1ec;*/
 	margin-left: 0px;
 /*	height: 100%;*/
@@ -331,13 +331,13 @@ a:hover {
 	text-align: center;
 /*	padding-top: 40px;*/
 	top: 60px;
+  bottom: 68px;
   right: 0px;
   /* this min height isn't the best solution*/
   /* we need the content panel to take up the entire middle of the screen*/
   /* so that the mouseover event to close the left menu on it gets triggered */
   min-height: 400px;
-  overflow: scroll;
-  bottom: 64px;
+  overflow: none;
   transform: translate3d(0, 0, 0);
   transition:all .3s ease-in-out; 
   -o-transition:all .3s ease-in-out; 
@@ -364,6 +364,7 @@ a:hover {
   -o-transition:all .3s ease-in-out; 
   -moz-transition:all .3s ease-in-out; 
   -webkit-transition:all .3s ease-in-out;
+  top: 0;
 }
 
 .trpHeaderContainer {
@@ -540,6 +541,7 @@ a:hover {
   -o-transition:all .3s ease-in-out; 
   -moz-transition:all .3s ease-in-out; 
   -webkit-transition:all .3s ease-in-out;
+  height: 100%;
 }
 
 .trpToolbar {
