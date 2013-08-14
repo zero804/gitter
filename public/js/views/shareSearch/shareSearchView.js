@@ -17,7 +17,7 @@ define([
 
     events: {
       'keydown input': 'preventSubmit',
-      'hover #copy-button' : 'createClipboard',
+      'mouseover #copy-button' : 'createClipboard',
       'click .removeInvite': 'deselectPerson',
       'submit #share-form': 'sendInvites'
     },
@@ -56,7 +56,7 @@ define([
       if (this.data.inviteToConnect && !this.data.user) throw new Error("Need a viewer");
 
       this.data.uri = (this.data.inviteToTroupe) ? this.data.troupe.uri : this.data.user.username;
-      this.data.basePath = context().basePath;
+      this.data.basePath = context.env('basePath');
       this.data.returnToUrl = encodeURIComponent(window.location.pathname + window.location.hash);
 
       this.addCleanup(function() {
