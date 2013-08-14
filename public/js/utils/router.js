@@ -120,11 +120,6 @@ define([
       this.routes = options.routes;
     },
 
-    regionFragmentMapping: [
-      'rightPanelRegion',
-      'dialogRegion'
-    ],
-
     getViewDetails: function(fragment) {
       var match = null;
 
@@ -156,18 +151,18 @@ define([
         {
           regionName: 'rightPanelRegion',
           fragment : fragments[0] || '',
-          region: this.regions.rightPanelRegion
+          region: this.regions[0]
         },
         {
           regionName: 'dialogRegion',
           fragment : fragments[1] || '',
-          region: this.regions.dialogRegion
+          region: this.regions[1]
         }
       ];
 
       regionUpdateList.forEach(function(update) {
 
-        if(this.previousFragments[update.regionName] === update.fragment) {
+        if(!update.region || this.previousFragments[update.regionName] === update.fragment) {
           // nothing to update
           return;
         }
@@ -189,7 +184,7 @@ define([
           return;
         }
 
-        track(viewDetails.regionName);
+        track(viewDetails.name);
         triggerRegionUpdate(update.region, viewDetails);
 
       }, this);
