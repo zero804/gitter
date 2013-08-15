@@ -41,9 +41,11 @@ define([
 
     setVisibility: function(animate) {
       if (this.collection.length > 0) {
+        $('#invite-header').show();
         return (animate) ? this.$el.parent().slideDown() : this.$el.parent().show();
       }
       else {
+        $('#invite-header').hide();
         return (animate) ? this.$el.parent().slideUp() : this.$el.parent().hide();
       }
     },

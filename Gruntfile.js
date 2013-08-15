@@ -30,10 +30,6 @@ module.exports = function( grunt ) {
   // https://github.com/cowboy/grunt/blob/master/docs/getting_started.md
   //
   grunt.initConfig({
-    clean: {
-        folder: "public-processed/"
-    },
-
     htmllint: {
       all: ["public/**/*.hbs"]
     },
@@ -145,6 +141,14 @@ module.exports = function( grunt ) {
                   ],
                   exclude: ["core-libraries"]
               },
+               {
+                  name: "complete-profile",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar"
+                  ],
+                  exclude: ["core-libraries"]
+              },
               {
                   name: "login",
                   include: [
@@ -184,6 +188,7 @@ module.exports = function( grunt ) {
       "native-conversations-router": createClosureConfig('routers/mobile/native/conversations-router'),
       "native-people-router": createClosureConfig('routers/mobile/native/people-router'),
       "router-login": createClosureConfig('router-login'),
+      "complete-profile": createClosureConfig('complete-profile'),
       "login": createClosureConfig('login')
     },
 
@@ -252,58 +257,6 @@ module.exports = function( grunt ) {
       codegen: {quote_keys: true}
     },
 
-    min: {
-      "core-libraries": {
-        src: ['public-processed/js/core-libraries.js'],
-        dest: 'public-processed/js/core-libraries.js'
-      },
-      "router-app": {
-        src: ['public-processed/js/router-app.js'],
-        dest: 'public-processed/js/router-app.js'
-      },
-      "chat-router": {
-        src: ['public-processed/js/routers/mobile/native/chat-router.js'],
-        dest: 'public-processed/js/routers/mobile/native/chat-router.js'
-      },
-      "mobile-app-router": {
-        src: ['public-processed/js/routers/mobile/web/mobile-app-router'],
-        dest: 'public-processed/js/routers/mobile/web/mobile-app-router'
-      },
-      "router": {
-        src: ['public-processed/js/router.js'],
-        dest: 'public-processed/js/router.js'
-      },
-      "router-login": {
-        src: ['public-processed/js/router-login.js'],
-        dest: 'public-processed/js/router-login.js'
-      },
-      "signup": {
-        src: ['public-processed/js/signup.js'],
-        dest: 'public-processed/js/signup.js'
-      },
-      "chatView": {
-        src: ['public-processed/js/views/chat/chatView.js'],
-        dest: 'public-processed/js/views/chat/chatView.js'
-      },
-      "fileView": {
-        src: ['public-processed/js/views/file/fileView.js'],
-        dest: 'public-processed/js/views/file/fileView.js'
-      },
-      "conversationView": {
-        src: ['public-processed/js/views/conversation/conversationView.js'],
-        dest: 'public-processed/js/views/conversation/conversationView.js'
-      },
-      "peopleView": {
-        src: ['public-processed/js/views/people/peopleView.js'],
-        dest: 'public-processed/js/views/people/peopleView.js'
-      },
-      "login": {
-        src: ['public-processed/js/login.js'],
-        dest: 'public-processed/js/login.js'
-      }
-
-    },
-
     less: {
       production: {
         options: {
@@ -320,31 +273,13 @@ module.exports = function( grunt ) {
           "public/bootstrap/css/trpFiles.css": "public/bootstrap/less/trpFiles.less",
           "public/bootstrap/css/trpMails.css": "public/bootstrap/less/trpMails.less",
           "public/bootstrap/css/trpPeople.css": "public/bootstrap/less/trpPeople.less",
+          "public/bootstrap/css/trpMobileApp.css": "public/bootstrap/less/trpMobileApp.less",
           "public/bootstrap/css/trpMobileChat.css": "public/bootstrap/less/trpMobileChat.less",
           "public/bootstrap/css/trpMobileFiles.css": "public/bootstrap/less/trpMobileFiles.less",
           "public/bootstrap/css/trpMobileConversations.css": "public/bootstrap/less/trpMobileConversations.less",
           "public/bootstrap/css/trpMobilePeople.css": "public/bootstrap/less/trpMobilePeople.less"
 
         }
-      }
-    },
-
-    copy: {
-      dist: {
-        files: {
-          "public-processed/": "public/**"
-        }
-      }
-    },
-    exec: {
-      gzip: {
-        command: './build-scripts/gzip-processed.sh'
-      },
-      manifest: {
-        command: './build-scripts/update-manifest.sh'
-      },
-      validateConfig: {
-        command: './node_modules/.bin/jsonlint config/*.json'
       }
     },
 
@@ -547,17 +482,14 @@ module.exports = function( grunt ) {
 
   grunt.loadNpmTasks('grunt-requirejs');
   grunt.loadNpmTasks('grunt-contrib-less');
-  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-exec');
-  grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-reload');
   grunt.loadNpmTasks('grunt-bower-require-wrapper');
   grunt.loadNpmTasks('grunt-wrap');
   grunt.loadNpmTasks('grunt-closure-compiler');
 
-  grunt.registerTask('process', ['exec:validateConfig','clean','less','copy','requirejs', 'closure-compiler', 'exec:manifest','exec:gzip']);
-  grunt.registerTask('process-no-min', ['exec:validateConfig','clean','less','copy','requirejs','exec:manifest','exec:gzip']);
+  grunt.registerTask('process', ['less', 'requirejs', 'closure-compiler']);
+  grunt.registerTask('process-no-min', ['less', 'requirejs']);
 
   grunt.registerTask('watchr', 'reload watch');
   grunt.registerTask('client-libs', ['concat:fineuploader',

@@ -1,19 +1,14 @@
 /*jshint unused:true, browser:true*/
-require([
+define([
   'jquery',
   'underscore',
   'assert',
-  'mocha',
   'views/base',
   'marionette',
   'collections/base',
   'backbone',
   'utils/momentWrapper'
-], function($, _, assert, mocha, TroupeViews, marionette, TroupeCollections, backbone, moment) {
-  mocha.setup({
-    ui: 'bdd',
-    timeout: 20000
-  });
+], function($, _, assert, TroupeViews, marionette, TroupeCollections, backbone, moment) {
 
   /* Sorted Collection */
   var Collection = backbone.Collection.extend({
@@ -176,11 +171,5 @@ require([
       }
     }
   });
-
-  if (window.mochaPhantomJS) {
-    mochaPhantomJS.run();
-  } else {
-    mocha.run();
-  }
 
 });
