@@ -7,3 +7,12 @@
 body {
 	background-color: @trpGreen;
 }
+
+.typeahead {
+  max-width: 280px;
+  overflow: hidden;
+
+  li[data-value="undefined"] {
+    display: none;
+  }
+}
