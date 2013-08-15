@@ -13,7 +13,7 @@ define([], function() {
   };
 
   var shrinkChatWrapperToFit = function() {
-    var chatWrapper = document.getElementById('chat-wrapper');
+    var chatWrapper = document.getElementById('content-frame');
     var everythingButWrapperSize = document.height - chatWrapper.clientHeight;
     var spaceForWrapper = window.innerHeight - everythingButWrapperSize;
     chatWrapper.style.height = spaceForWrapper + 'px';
@@ -30,7 +30,7 @@ define([], function() {
   };
 
   var resetChatWrapperSize = function() {
-    var chatWrapper = document.getElementById('chat-wrapper');
+    var chatWrapper = document.getElementById('content-frame');
     chatWrapper.style.height = '1000px';
   };
 

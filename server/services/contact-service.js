@@ -43,6 +43,7 @@ exports.ingestGoogleContacts = function(user, data, cb) {
 
   if (imported.length > 0) {
     statsService.userUpdate(user, {'import_contacts': 'Google'});
+    statsService.event('import_contacts', {'userId': user.id});
   }
 
   

@@ -1,18 +1,18 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'views/base',
+  'utils/context',
   'hbs!./tmpl/userHomeTemplate'
-], function(TroupeViews, userHomeTemplate) {
+], function(TroupeViews, context, userHomeTemplate) {
   "use strict";
 
   return TroupeViews.Base.extend({
     template: userHomeTemplate,
     getRenderData: function() {
-      var c = window.troupeContext;
       return {
-        username: c.user.username,
-        basePath: c.basePath,
-        baseServer: c.baseServer
+        username: context.getUser().username,
+        basePath: context.env('basePath'),
+        baseServer: context.env('baseServer')
       };
     }
   });

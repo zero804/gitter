@@ -1,10 +1,5 @@
 <!doctype html>
-<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
-<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
-<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!-->
-<html class="no-js" lang="en">
-<!--<![endif]-->
+<html class="no-js loading" lang="en">
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=IE9" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
@@ -13,15 +8,16 @@
 
 	<title>{{troupeName}} - Troupe</title>
 
+  <style>
+  html.loading { background: url("images/2/troupe-ajax-guy-green.gif") center no-repeat; }
+  .loading body { display: none; }
+  </style>
+
   <link rel="stylesheet" href='{{cdn "bootstrap/css/trp3.css" }}'>
 
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href='{{cdn "images/2/favicon8.ico" }}'>
     {{>load_font_css}}
-
-    {{#useFirebug}}
-    <script type="text/javascript" src="https://getfirebug.com/firebug-lite.js"></script>
-    {{/useFirebug}}
 </head>
 <body>
 
@@ -40,7 +36,11 @@
   <div class="trpLeftMenu" id="left-menu"></div>
 
   <div class="trpMenuTab" id="menu-toggle-button"><img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle">
-    <div class="trpUnreadBadge" id="unread-badge"><div class="trpUnreadBadgeCount"></div></div>
+    {{#if unreadCount}}
+    <div class="trpUnreadBadge" id="unread-badge" style="display: block;">{{unreadCount}}</div>
+    {{else}}
+    <div class="trpUnreadBadge" id="unread-badge"></div>
+    {{/if}}
   </div>
 
 
@@ -54,7 +54,7 @@
     </div>
   </div>
 
-<div class="trpContentPanel" id="content-frame">
+<div class="trpContentPanel primary-scroll" id="content-frame">
   <div class="trpChatPanel" id="chat-frame" style="width: 100%; min-width: 0;">
     <div class="trpChatContainer" id="frame-chat">
     </div>
@@ -78,15 +78,9 @@
 
 <div class="trpBlankPage"> </div>
 
-<script type="text/javascript">
-  window.troupeContext = {{{troupeContext}}};
-  {{#if trackingId}}
-    window.troupeTrackingId = '{{trackingId}}';
-  {{/if}}
-</script>
+{{{ generateTroupeContext troupeContext }}}
 
 {{>require_wrapper}}
-
 {{{bootScript bootScriptName }}}
 
 

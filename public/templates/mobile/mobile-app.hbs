@@ -1,0 +1,59 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"/>
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta charset="utf-8">
+
+  <title>{{troupeName}}</title>
+
+  <link rel="stylesheet" href='/bootstrap/css/trpMobileApp.css'>
+
+  {{{ generateTroupeContext troupeContext }}}
+
+  {{>require_wrapper}}
+  {{{bootScript bootScriptName }}}
+
+  <link rel="shortcut icon" href='{{ cdn "images/2/favicon8.ico"}}'>
+
+</head>
+<body>
+
+  <div class="trpMobileAmuse fade-in" id="chat-amuse">
+    <div class="trpMobileAmuseIcon">
+      <img src='{{cdn "images/2/troupe-ajax-guy-green.gif" }}'><br><br>Loading
+    </div>
+  </div>
+
+  <div id="troupeListPanel" class="sideMenu">
+    <div id="troupeList"></div>
+  </div>
+
+  <div id="pageContainer" class="platform">
+    <div id="mainPage">
+
+      <header id="nav-bar">
+        <div id="showTroupesButton">
+          <img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle">
+        </div>
+        <span class="title">{{troupeName}}</span>
+        <a href="/home" style="position: absolute; right: 0; padding-right: 12px; padding-top: 5px;">
+          <img src='{{cdn "images/2/icon-user.png"}}' width="24" height="24">
+        </a>
+      </header>
+
+      <div class="contentBody mobile-scroll-class" id="content-frame">
+        <div class="frame-chat">
+          <div class="trpChatPanel" id="chat-frame">
+            <div class="chatPanel" id="frame-chat"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="trpChatInputArea" id="chat-input"></div>
+
+    </div>
+  </div>
+
+</body>
+</html>

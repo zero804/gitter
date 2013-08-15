@@ -28,6 +28,7 @@ Mike: ?
 */
 
 var MAX_LINE_LENGTH = 30;
+var MAX_TOTAL_LENGTH = 120;
 
 var util = require('util');
 var _ = require('underscore');
@@ -63,7 +64,19 @@ NotificationMessageGenerator.prototype.generateNotificationMessage = function(tr
     lines.push(byIdHash[id]);
   });
 
-  return lines.join('  \n');
+  var line = '';
+  for(var i = 0; i < lines.length; i++) {
+    var nextLine = lines[i];
+    // We add extra spaces so that when they're removed on an iphone the line still makes sense
+    var lineWithNext = line ? line + '  \n' + nextLine : nextLine;
+    if(lineWithNext.length <= MAX_TOTAL_LENGTH) {
+      line = lineWithNext;
+    } else {
+      break;
+    }
+  }
+
+  return line;
 };
 
 

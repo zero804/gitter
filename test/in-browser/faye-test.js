@@ -1,15 +1,10 @@
 /*jshint unused:true, browser:true*/
-require([
+define([
   'jquery',
   'underscore',
   'expect',
-  'mocha',
   'faye'
-], function($, _, expect, mocha, Faye) {
-  mocha.setup({
-    ui: 'bdd',
-    timeout: 20000
-  });
+], function($, _, expect, Faye) {
 
   var ClientAuth = function() {};
   ClientAuth.prototype.outgoing = function(message, callback) {
@@ -78,11 +73,5 @@ require([
     });
 
   });
-
-  if (window.mochaPhantomJS) {
-    mochaPhantomJS.run();
-  } else {
-    mocha.run();
-  }
 
 });
