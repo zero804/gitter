@@ -1,16 +1,10 @@
 /*jshint unused:true, browser:true*/
-require([
+define([
   'jquery',
   'underscore',
   'expect',
-  'mocha',
   'components/realtime'
-], function($, _, expect, mocha, realtime) {
-  mocha.setup({
-    ui: 'bdd',
-    timeout: 20000
-  });
-
+], function($, _, expect, realtime) {
 
   describe('realtime', function(){
     describe('.connect()', function(){
@@ -26,11 +20,5 @@ require([
     });
 
   });
-
-  if (window.mochaPhantomJS) {
-    mochaPhantomJS.run();
-  } else {
-    mocha.run();
-  }
 
 });

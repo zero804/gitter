@@ -74,4 +74,31 @@ describe('notification-message-generator', function() {
     assert.equal(text, 'Souper Troupers  \nMike: Yo  \nMike uploaded accounts.xls  \nAndrew: Hey how are you?  \nAndrew uploaded ads.xls');
   });
 
+  it('should handle really long content', function() {
+    var text = underTest.generateNotificationMessage({ name: 'Souper Troupers' }, {
+      'chat': [
+                { id: '00001', text: 'Yo', fromUser: { displayName: 'Mike Bartlett '} },
+                { id: '00003', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
+                { id: '00005', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
+                { id: '00006', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
+                { id: '00007', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
+                { id: '00008', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
+                { id: '00009', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
+                { id: '00010', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
+                { id: '00011', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
+                { id: '00012', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
+                { id: '00013', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
+                { id: '00014', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } } ,
+                { id: '00015', text: 'Hey how are you?', fromUser: { displayName: 'Andrew Newdigate' } }
+              ],
+      'file': [
+                { id: '00002', fileName: 'accounts.xls', latestVersion : { creatorUser: { displayName: 'Mike Bartlett '} } },
+                { id: '00004', fileName: 'ads.xls', latestVersion : { creatorUser: { displayName: 'Andrew Newdigate'} } }
+              ]
+    });
+
+    assert.equal(text, 'Souper Troupers  \nMike: Yo  \nMike uploaded accounts.xls  \nAndrew: Hey how are you?  \nAndrew uploaded ads.xls');
+  });
+
+
 });

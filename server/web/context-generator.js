@@ -1,42 +1,60 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var nconf = require('../utils/config');
 var restSerializer = require("../serializers/rest-serializer");
 var oauthService = require("../services/oauth-service");
 var appVersion = require("./appVersion");
 var Q = require('q');
-var useFirebugInIE = nconf.get('web:useFirebugInIE');
 
-module.exports.generateMiniContext = function(req, callback) {
+/**
+ * Returns the promise of a mini-context
+ */
+exports.generateMiniContext = function(req, callback) {
   var user = req.user;
 
-  Q.all([ serializeUser(user), getWebToken(user) ])
+  return Q.all([ 
+      user ? serializeUser(user) : null,
+      user ? getWebToken(user) : null
+    ])
     .spread(function(serializedUser, token) {
-      var profileNotCompleted = user.status == 'PROFILE_NOT_COMPLETED';
-      var troupeContext = createTroupeContext(req, {
+      var profileNotCompleted = user ? user.status == 'PROFILE_NOT_COMPLETED' : null;
+      return createTroupeContext(req, {
         user: serializedUser,
         accessToken: token,
         profileNotCompleted: profileNotCompleted,
         inUserhome: true
       });
-      callback(null, troupeContext);
     })
-    .fail(callback);
+    .nodeify(callback);
 };
 
-module.exports.generateTroupeContext = function(req, callback) {
+exports.generateSocketContext = function(userId, troupeId, callback) {
+  return Q.all([
+      serializeUserId(userId),
+      serializeTroupeId(troupeId, userId)
+    ])
+    .spread(function(serializedUser, serializedTroupe) {
+      return {
+        user: serializedUser,
+        troupe: serializedTroupe
+      };
+    })
+    .nodeify(callback);
+};
+
+exports.generateTroupeContext = function(req, callback) {
   var user = req.user;
   var troupe = req.uriContext.troupe;
   var invite = req.uriContext.invite;
   var homeUser = req.uriContext.oneToOne && req.uriContext.otherUser; // The users page being looked at
   var accessDenied = !req.uriContext.access;
 
-  Q.all([
-  user ? serializeUser(user) : null,
-  homeUser ? serializeHomeUser(homeUser, !!invite) : undefined, //include email if the user has an invite
-  user ? getWebToken(user) : null,
-  troupe && user ? serializeTroupe(troupe, user) : fakeSerializedTroupe(req.uriContext) ])
+  return Q.all([
+    user ? serializeUser(user) : null,
+    homeUser ? serializeHomeUser(homeUser, !!invite) : undefined, //include email if the user has an invite
+    user ? getWebToken(user) : null,
+    troupe && user ? serializeTroupe(troupe, user) : fakeSerializedTroupe(req.uriContext) 
+  ])
   .spread(function(serializedUser, serializedHomeUser, token, serializedTroupe) {
 
     var status, profileNotCompleted;
@@ -45,7 +63,7 @@ module.exports.generateTroupeContext = function(req, callback) {
       profileNotCompleted = (status == 'PROFILE_NOT_COMPLETED') || (status == 'UNCONFIRMED');
     }
 
-    var troupeContext = createTroupeContext(req, {
+    return createTroupeContext(req, {
       user: serializedUser,
       homeUser: serializedHomeUser,
       troupe: serializedTroupe,
@@ -54,15 +72,20 @@ module.exports.generateTroupeContext = function(req, callback) {
       inviteId: invite && invite.id,
       accessDenied: accessDenied
     });
-    callback(null, troupeContext);
   })
-  .fail(callback);
+  .nodeify(callback);
 };
 
 function serializeUser(user) {
   var strategy = new restSerializer.UserStrategy({ includeEmail: true });
 
   return restSerializer.serializeQ(user, strategy);
+}
+
+function serializeUserId(userId) {
+  var strategy = new restSerializer.UserIdStrategy({ includeEmail: true });
+
+  return restSerializer.serializeQ(userId, strategy);
 }
 
 function serializeHomeUser(user, includeEmail) {
@@ -74,6 +97,13 @@ function serializeHomeUser(user, includeEmail) {
 function getWebToken(user) {
   return oauthService.findOrGenerateWebToken(user.id);
 }
+
+function serializeTroupeId(troupeId, userId) {
+  var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
+
+  return restSerializer.serializeQ(troupeId, strategy);
+}
+
 
 function serializeTroupe(troupe, user) {
   var strategy = new restSerializer.TroupeStrategy({ currentUserId: user ? user.id : null });
@@ -100,17 +130,6 @@ function fakeSerializedTroupe(uriContext) {
 }
 
 function createTroupeContext(req, options) {
-  var disabledFayeProtocols = [];
-
-  var userAgent = req.headers['user-agent'];
-  userAgent = userAgent ? userAgent : '';
-
-  // Disable websocket on Mobile due to iOS crash bug
-  if(userAgent.indexOf('Mobile') >= 0) {
-    disabledFayeProtocols.push('websocket');
-  }
-
-  var useFirebug = useFirebugInIE && userAgent.indexOf('MSIE') >= 0;
   var events = req.session.events;
   if(events) { delete req.session.events; }
 
@@ -124,25 +143,9 @@ function createTroupeContext(req, options) {
       profileNotCompleted: options.profileNotCompleted,
       accessDenied: options.accessDenied,
       inviteId: options.inviteId,
-      mobilePage: req.params && req.params.mobilePage,
       appVersion: appVersion.getCurrentVersion(),
-      baseServer: nconf.get('web:baseserver'),
-      basePort: nconf.get('web:baseport'),
-      basePath: nconf.get('web:basepath'),
-      homeUrl: nconf.get('web:homeurl'),
-      mixpanelToken: nconf.get("stats:mixpanel:token"),
       importedGoogleContacts: req.user && req.user.googleRefreshToken ? true : false,
       events: events,
       troupeUri: options.troupe ? options.troupe.uri : undefined,
-      websockets: {
-        fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
-        options: {
-          timeout: nconf.get('ws:fayeTimeout'),
-          retry: nconf.get('ws:fayeRetry'),
-          interval: nconf.get('ws:fayeInterval')
-        },
-        disable: disabledFayeProtocols
-      },
-      useFirebug: useFirebug
     };
   }

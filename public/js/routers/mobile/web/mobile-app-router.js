@@ -10,8 +10,12 @@ define([
 
   var MobileAppRouter = MobileRouter.extend({
     initialize: function() {
-
       this.constructor.__super__.initialize.apply(this);
+
+      new chatInputView.ChatInputView({
+        el: $('#chat-input'),
+        collection: chatCollection
+      }).render();
 
       new TroupeMenu({
         el: $('#troupeList')

@@ -1,5 +1,5 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-require([
+define([
   'template/helpers/widget',
   'template/helpers/cdn',
   'template/helpers/dialogFragment',
