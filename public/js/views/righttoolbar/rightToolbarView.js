@@ -1,7 +1,9 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
+  'underscore',
   'backbone',
+  'views/base',
   'utils/context',
   'fineuploader',
   'hbs!./tmpl/rightToolbar',
@@ -11,10 +13,10 @@ define([
   'views/file/fileView',
   'views/conversation/conversationView',
   'views/people/peopleCollectionView'
-], function($, Backbone, context, qq, rightToolbarTemplate, itemCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView) {
+], function($, _, Backbone, TroupeViews, context, qq, rightToolbarTemplate, itemCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView) {
   "use strict";
 
-  return Backbone.Marionette.Layout.extend({
+  var RightToolbarLayout = Backbone.Marionette.Layout.extend({
     tagName: "span",
     template: rightToolbarTemplate,
 
@@ -96,26 +98,26 @@ define([
       var userCollection = itemCollections.users;
 
       // Request View
-      this.requests.show(new RequestView({ collection: requestCollection }));
+      this.show('requests', new RequestView({ collection: requestCollection }));
 
       // Invites View
-      this.invites.show(new InviteView({ collection: invitesCollection }));
+      this.show('invites', new InviteView({ collection: invitesCollection }));
 
       // File View
-      this.files.show(new FileView({ collection: fileCollection }));
+      this.show('files', new FileView({ collection: fileCollection }));
 
       // Conversation View
       if (!context.inOneToOneTroupeContext()) {
         var conversationView = new ConversationView({
           collection: conversationCollection
         });
-        self.conversations.show(conversationView);
+        self.show('conversations', conversationView);
       } else {
         $('#mail-list').hide();
       }
 
       // People View
-      this.people.show(new PeopleCollectionView({ collection: userCollection }));
+      this.show('people', new PeopleCollectionView({ collection: userCollection }));
 
     },
 
@@ -157,5 +159,8 @@ define([
 
   });
 
+  _.extend(RightToolbarLayout.prototype, TroupeViews.DelayedShowLayoutMixin);
+
+  return RightToolbarLayout;
 
 });
