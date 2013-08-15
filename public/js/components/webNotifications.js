@@ -74,5 +74,10 @@ define([
     $('#notification-center').hide();
   });
 
+  return {
+    notify: function(options) {
+      notifications.notify(options);
+    }
+  };
 
 });

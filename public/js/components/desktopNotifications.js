@@ -1,27 +1,32 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'utils/appevents'
-], function(appEvents){
+  'jquery',
+  'utils/appevents',
+  './webNotifications',
+  'hbs!./tmpl/request'
+], function($, appEvents, webNotifications, template){
   "use strict";
 
   var webkitNotifications = window.webkitNotifications;
   var Notification = window.Notification;
 
-  function listenNotifications() {
+
+  function listen() {
     appEvents.on('user_notification', function(message) {
       var link = message.link;
       var title = message.title;
       var text = message.text;
-      
+      var notification;
+
       if(Notification) {
-        var notification = new Notification(title, { body: text, tag: link, icon: '/images/2/logo-mark-green-square.png' });
+        notification = new Notification(title, { body: text, tag: link, icon: '/images/2/logo-mark-green-square.png' });
         notification.onclick = function() {
           if(link) {
             window.location.href = link;
           }
-        };        
+        };
       } else {
-        var notification = webkitNotifications.createNotification('/images/2/logo-mark-green-square.png', title, text);
+        notification = webkitNotifications.createNotification('/images/2/logo-mark-green-square.png', title, text);
         notification.onclick = function() {
           if(link) {
             window.location.href = link;
@@ -33,35 +38,59 @@ define([
     });
   }
 
-  if(Notification) {
-    switch(Notification.permission) {
-      case 0:
-        window.setTimeout(function() {
-          Notification.requestPermission();     
-          listenNotifications()
-        }, 100);
-        return;
-      case 2:
-        listenNotifications();
-        return;
+  function checkPermission() {
+
+    if(Notification && Notification.permission) {
+      return Notification.permission;
     }
-  }
 
-  if(webkitNotifications) {
-    if (webkitNotifications.checkPermission() !== 0) {
-      window.setTimeout(function() {
-        window.webkitNotifications.requestPermission();
-        listenNotifications();
-
-      }, 100);
-      
-    } else {
-      listenNotifications();
+    if(webkitNotifications) {
+      switch(webkitNotifications.checkPermission()) {
+        case 0: return "default";
+        case 1: return "denied";
+        case 2: return "granted";
+      }
     }
 
     return;
   }
 
+
+  function request() {
+    try {
+      window.localStorage.notificationsPrompted = true;
+    } catch(e) {
+    }
+
+    if(webkitNotifications && webkitNotifications.requestPermission) {
+      webkitNotifications.requestPermission(listen);
+    } else if(Notification && Notification.requestPermission) {
+      Notification.requestPermission(listen);
+    }
+  }
+
+  function prompt() {
+    var e = $(template());
+
+    e.find('#enable').on('click', function() {
+      request();
+    });
+
+    webNotifications.notify({
+      content: e
+    });
+  }
+
+  switch(checkPermission()) {
+    case "granted": return listen();
+    case "denied":
+      if(!window.localStorage.notificationsPrompted) {
+        prompt();
+      }
+      return;
+
+    case "default": return listen();
+  }
 
 
 });
