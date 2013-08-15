@@ -1,6 +1,8 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
+  'underscore',
+  'views/base',
   'utils/context',
   'log!appIntegratedView',
   'marionette',
@@ -8,7 +10,7 @@ define([
   'views/app/uiVars',
   'bootstrap_tooltip',  // no ref
   "nanoscroller"        // no ref
-  ], function($, context, log, Marionette, UsernameView, uiVars) {
+  ], function($, _, TroupeViews, context, log, Marionette, UsernameView, uiVars) {
   "use strict";
 
   var touchEvents = {
@@ -32,7 +34,7 @@ define([
 
   $('.trpDisplayPicture').tooltip('destroy');
 
-  return Marionette.Layout.extend({
+  var AppIntegratedLayout = Marionette.Layout.extend({
     el: 'body',
     leftmenu: false,
     rightpanel: false,
@@ -362,4 +364,8 @@ define([
     }
 
   });
+
+  _.extend(AppIntegratedLayout.prototype, TroupeViews.DelayedShowLayoutMixin);
+
+  return AppIntegratedLayout;
 });
