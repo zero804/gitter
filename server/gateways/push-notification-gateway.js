@@ -9,6 +9,8 @@ var apns = require('apn');
 var statsService = require("../services/stats-service");
 var workerQueue = require('../utils/worker-queue');
 
+var nexmo = require('easynexmo/lib/nexmo');
+nexmo.initialize('0b93c6bc', '483931e4');
 
 var errorDescriptions = {
   0: 'No errors encountered',
@@ -97,9 +99,6 @@ var apnsConnection = new apns.Connection({
 apnsConnection.on("error", function(err) {
     winston.error("APN service (prod) experienced an error", { error: err.message });
 });
-
-var nexmo = require('easynexmo/lib/nexmo');
-nexmo.initialize('0b93c6bc', '483931e4');
 
 
 ['Dev', 'BetaDev', 'Beta', 'Prod'].forEach(function(suffix) {
