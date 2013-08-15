@@ -111,8 +111,7 @@ module.exports = {
       app.post('/resendconfirmation',
         function(req, res, next) {
           signupService.resendConfirmation({
-            email: req.body.email,
-            troupeId: req.session.newTroupeId
+            email: req.body.email
           }, function(err) {
             /* TODO: better error xhandling */
             if(err) return next(err);

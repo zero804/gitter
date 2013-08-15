@@ -27,6 +27,7 @@ require([
   'utils/router',
   'components/unread-items-client',
   'components/webNotifications', // No ref
+  'components/desktopNotifications', // No ref
   'components/errorReporter',  // No ref
   'filtered-collection', // No ref
   'components/dozy', // Sleep detection No ref
