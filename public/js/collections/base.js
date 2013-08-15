@@ -4,12 +4,15 @@ define([
   'underscore',
   'utils/context',
   'backbone',
+  'utils/appevents',
   'components/realtime',
   'log!collections'
-], function($, _, context, Backbone, realtime, log) {
+], function($, _, context, Backbone, appEvents, realtime, log) {
   "use strict";
 
-  var exports = {};
+  var exports = {
+    firstLoad: false
+  };
 
   exports.Model = Backbone.Model.extend({
     constructor: function() {
@@ -105,6 +108,10 @@ define([
       this._loading = false;
 
       this.once('reset sync', this._onInitialLoad, this);
+      if (this.length > 0) {
+        triggerFirstLoad();
+      }
+
 
       this.on('sync', this._onSync, this);
       this.on('request', this._onRequest, this);
@@ -135,6 +142,7 @@ define([
     _onInitialLoad: function() {
       if(this._initialLoadCalled) return;
       this._initialLoadCalled = true;
+      triggerFirstLoad();
 
       $('#' + this.modelName + '-amuse').hide('fast', function() {
         $(this).remove();
@@ -320,6 +328,14 @@ define([
     return function(left, right) {
       return -1 * comparatorFunction(left, right);
     };
+  }
+
+  // used to indicate that the first collection has been loaded, ie loading screen can be hidden
+  function triggerFirstLoad() {
+    if(!exports.firstLoad) {
+      exports.firstLoad = true;
+      appEvents.trigger('firstCollectionLoaded');
+    }
   }
 
   return exports;
