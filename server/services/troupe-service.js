@@ -319,6 +319,7 @@ function notifyRecipientsOfInvites(invites) {
             link: uri,
             sound: "invitation"
           });
+
           return;
         } else {
           invite.emailSentAt = Date.now();
@@ -1182,11 +1183,8 @@ function sendInviteAcceptedNotice(invite, troupe, isNormalTroupe) {
   Q.spread([findFromUser, findToUser, findTroupe], function(fromUser, toUser, troupeUri) {
 
     if (fromUser && troupeUri) {
-      emailNotificationService.sendConnectAcceptanceToUser(fromUser, toUser, {
-        uri: troupeUri
-      });
-    }
-    else {
+      emailNotificationService.sendConnectAcceptanceToUser(fromUser, toUser, troupeUri);
+    } else {
       winston.info("Couldn't lookup invite sender to send acceptance notice to");
     }
   });
