@@ -91,7 +91,6 @@ define([
       });
 
       this.ensureProfileIsUsernamed();
-      this.hideLoadingAmusement();
     },
 
     ensureProfileIsUsernamed: function() {
@@ -99,10 +98,6 @@ define([
       if (user.username === null /* not undefined, in which case the user has not yet loaded */) {
         new UsernameView.Modal().show();
       }
-    },
-
-    hideLoadingAmusement: function() {
-      $('html').removeClass('loading');
     },
 
     hidePanel: function (whichPanel) {
