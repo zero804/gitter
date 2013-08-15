@@ -872,5 +872,13 @@ define([
 
    });
 
+
+  (function hideLoadingAmusement() {
+    var h = $('html'), b = $('body');
+    b.hide();
+    h.removeClass('loading');
+    b.fadeIn('slow');
+  }());
+
   return TroupeViews;
 });
