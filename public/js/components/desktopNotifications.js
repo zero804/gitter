@@ -1,62 +1,67 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'jquery',
-  'log!desktop-notification'
-], function($, log){
+  'utils/appevents'
+], function(appEvents){
   "use strict";
 
-  var module = {
-    enabled: !!window.webkitNotifications,
+  var webkitNotifications = window.webkitNotifications;
+  var Notification = window.Notification;
 
-    install: function() {
-      if (window.webkitNotifications.checkPermission() !== 0) {
-        window.webkitNotifications.requestPermission(module.listen);
-      } else {
-        module.listen();
-      }
-    },
-
-    listen: function() {
-      var notification = null;
-      var focus = true;
-      var unacknowledgedNotificationCount = 0;
-
-      $(window).focus(function() {
-        focus = true;
-      });
-
-      $(window).focus(function() {
-        focus = false;
-      });
-
-      function notificationHandler(event, data) {
-        //if(!focus) {
-          var nc = window.webkitNotifications;
-          if(notification) {
-            notification.cancel();
+  function listenNotifications() {
+    appEvents.on('user_notification', function(message) {
+      var link = message.link;
+      var title = message.title;
+      var text = message.text;
+      
+      if(Notification) {
+        var notification = new Notification(title, { body: text, tag: link, icon: '/images/2/logo-mark-green-square.png' });
+        notification.onclick = function() {
+          if(link) {
+            window.location.href = link;
           }
-
-          notification = nc.createNotification(null, "User has logged in", data.notificationText);
-          notification.onclose = function() {
-            log("Notif onclose");
-          };
-          notification.onclick = function() {
-            log("Notif onclick");
-          };
-          notification.show();
-        //}
+        };        
+      } else {
+        var notification = webkitNotifications.createNotification('/images/2/logo-mark-green-square.png', title, text);
+        notification.onclick = function() {
+          if(link) {
+            window.location.href = link;
+          }
+        };
+        notification.show();
       }
 
-      //$(document).on('userLoggedIntoTroupe', notificationHandler);
-      //$(document).on('userLoggedOutOfTroupe', notificationHandler);
-      //$(document).on('chat', notificationHandler);
-      $(document).on('notification', notificationHandler);
-    }
-  };
-
-  if(module.enabled) {
-    module.install();
+    });
   }
 
-  return module;
+  if(Notification) {
+    switch(Notification.permission) {
+      case 0:
+        window.setTimeout(function() {
+          Notification.requestPermission();     
+          listenNotifications()
+        }, 100);
+        return;
+      case 2:
+        listenNotifications();
+        return;
+    }
+  }
+
+  if(webkitNotifications) {
+    if (webkitNotifications.checkPermission() !== 0) {
+      window.setTimeout(function() {
+        window.webkitNotifications.requestPermission();
+        listenNotifications();
+
+      }, 100);
+      
+    } else {
+      listenNotifications();
+    }
+
+    return;
+  }
+
+
+
 });

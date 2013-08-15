@@ -19,16 +19,7 @@ function newUser(options, callback) {
       }).nodeify(callback);
 }
 
-function sendNotification(user, troupe) {
-  if (user.status === 'UNCONFIRMED') {
-    winston.verbose('Resending confirmation email to new user', { email: user.email });
-    emailNotificationService.sendConfirmationForNewUser(user);
-  } else {
-    winston.verbose('Resending confirmation email to existing user', { email: user.email });
-    emailNotificationService.sendNewTroupeForExistingUser(user, troupe);
-  }
-  return;
-}
+
 
 
 var signupService = module.exports = {
@@ -146,29 +137,6 @@ var signupService = module.exports = {
 
   },
 
-  // Resend the confirmation email and returns the ID of the troupe related to the signed
-  // THIS PROBABLY ISN'T USED ANY MORE
-  // DELETEME
-  resendConfirmationForTroupe: function(troupeId, callback) {
-    troupeService.findById(troupeId, function(err, troupe) {
-      if(err) return callback(err);
-
-      var troupeUsers = troupe.getUserIds();
-      if(troupeUsers.length != 1) {
-        winston.error("A confirmation resent cannot be performed as the troupe has multiple users");
-        return callback("Invalid state");
-      }
-
-      userService.findById(troupeUsers[0], function(err, user) {
-        if(err || !user) return callback(err, null);
-
-        sendNotification(user, troupe);
-
-        return callback(null, troupe.id);
-      });
-    });
-  },
-
   /**
    * Resend the confirmation email and returns the related user
    * @return the promise of a user
@@ -176,9 +144,11 @@ var signupService = module.exports = {
   resendConfirmationForUser: function(email, callback) {
     return userService.findByEmail(email)
       .then(function(user) {
-        if(!user) return;
+        if(!user) throw 404;
+        if (user.status !== 'UNCONFIRMED') throw 404;
 
-        sendNotification(user);
+        winston.verbose('Resending confirmation email to new user', { email: user.email });
+        emailNotificationService.sendConfirmationForNewUser(user);
         return user;
       })
       .nodeify(callback);
@@ -187,11 +157,7 @@ var signupService = module.exports = {
   resendConfirmation: function(options, callback) {
     // This option occurs if the user has possibly lost their session
     // and is trying to get the confirmation sent at a later stage
-    if(options.email) {
-      signupService.resendConfirmationForUser(options.email, callback);
-    } else {
-      signupService.resendConfirmationForTroupe(options.troupeId, callback);
-    }
+    signupService.resendConfirmationForUser(options.email, callback);
   },
 
   /**
