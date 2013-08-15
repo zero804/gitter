@@ -874,10 +874,10 @@ define([
 
 
   (function hideLoadingAmusement() {
-    var h = $('html'), b = $('body');
+    var h = $('html'), b = $('.trpContentPanel');
     b.hide();
     h.removeClass('loading');
-    b.fadeIn('slow');
+    b.fadeIn(2000);
   }());
 
   return TroupeViews;
