@@ -73,7 +73,8 @@
     "customer.io": "0.0.2",
     "useragent": "2.0.6",
     "express3-handlebars": "~0.4.1",
-    "passport-google-oauth": "~0.1.5"
+    "passport-google-oauth": "~0.1.5",
+    "easynexmo": "~0.3.1"
   },
   "devDependencies": {
     "proxyquire": "0.4.0",
