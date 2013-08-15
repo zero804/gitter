@@ -23,6 +23,8 @@ var errorDescriptions = {
   255: 'None (unknown)'
 };
 
+var basePath = nconf.get('web:basepath');
+
 function errorEventOccurred(err, notification) {
   try {
     var errorDescription = errorDescriptions[err];
@@ -95,6 +97,10 @@ var apnsConnection = new apns.Connection({
 apnsConnection.on("error", function(err) {
     winston.error("APN service (prod) experienced an error", { error: err.message });
 });
+
+var nexmo = require('easynexmo/lib/nexmo');
+nexmo.initialize('0b93c6bc', '483931e4');
+
 
 ['Dev', 'BetaDev', 'Beta', 'Prod'].forEach(function(suffix) {
   try {
@@ -176,6 +182,9 @@ function sendNotificationToDevice(notification, badge, device) {
     }
 
     sent = true;
+  } else if(device.deviceType === 'SMS') {
+    sendSMSMessage(device.mobileNumber, notification.message + '\n' + basePath + notification.link);
+    sent = true;
   } else {
     winston.warn('Unknown device type: ' + device.deviceType);
   }
@@ -192,6 +201,12 @@ function sendNotificationToDevice(notification, badge, device) {
     });
   }
 
+}
+
+function sendSMSMessage(mobileNumber, message) {
+  nexmo.sendTextMessage('Troupe',mobileNumber,message, function() {
+    console.log('NEXMO', arguments);
+  });
 }
 
 var queue = workerQueue.queue('push-notification', {}, function() {
