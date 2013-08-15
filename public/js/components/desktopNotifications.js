@@ -2,9 +2,10 @@
 define([
   'jquery',
   'utils/appevents',
+  './eyeballs',
   './webNotifications',
   'hbs!./tmpl/request'
-], function($, appEvents, webNotifications, template){
+], function($, appEvents, eyeballs, webNotifications, template){
   "use strict";
 
   var webkitNotifications = window.webkitNotifications;
@@ -13,6 +14,9 @@ define([
 
   function listen() {
     appEvents.on('user_notification', function(message) {
+      // No notifications while eyeballs on
+      if(eyeballs.getEyeBalls()) return;
+
       var link = message.link;
       var title = message.title;
       var text = message.text;
@@ -74,9 +78,14 @@ define([
 
     e.find('#enable').on('click', function() {
       request();
+      webNotifications.notify({
+        id: 'request-notifications',
+        action: 'hide'
+      });
     });
 
     webNotifications.notify({
+      id: 'request-notifications',
       content: e
     });
   }
