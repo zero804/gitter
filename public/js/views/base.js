@@ -95,12 +95,7 @@ define([
     },
 
     addCleanup: function(callback) {
-      var self = this;
-      function t() {
-        self.off('cleanup', t);
-        callback.call(self);
-      }
-      self.on('cleanup', t);
+      this.once('cleanup', callback);
     },
 
     getRenderData: function() {
@@ -542,20 +537,25 @@ define([
       $e.detach().css({ top: 0, left: 0, display: 'block' });
 
       $e.insertAfter(this.targetElement);
-
       var pos = this.getPosition();
 
       var actualWidth = e.offsetWidth;
       var actualHeight = e.offsetHeight;
 
       var placement = this.options.placement;
+      switch (placement) {
+        case 'vertical':
+          placement = this.selectBestVerticalPlacement($e, this.targetElement);
+          break;
+      }
+
       var tp;
       switch (placement) {
         case 'bottom':
           tp = {top: pos.top + pos.height, left: pos.left + pos.width / 2 - actualWidth / 2};
           break;
         case 'top':
-          tp = {top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2};
+          tp = {top: pos.top - actualHeight - this.$targetElement.height(), left: pos.left + pos.width / 2 - actualWidth / 2 - 2};
           break;
         case 'left':
           tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth};
@@ -566,6 +566,19 @@ define([
       }
 
       this.applyPlacement(tp, placement);
+    },
+
+    selectBestVerticalPlacement: function(div, target) {
+      var $target = $(target);
+
+      var panel = $target.offsetParent();
+      if(!panel) return 'bottom';
+
+      if($target.offset().top + div.height() + 20 >= panel[0].clientHeight) {
+        return 'top';
+      }
+
+      return 'bottom';
     },
 
     applyPlacement: function(offset, placement){
@@ -689,7 +702,7 @@ define([
     },
 
     appendHtml: function(collectionView, itemView, index) {
-      log("Inserting view at index ", index, " of ", collectionView.collection.length, " in collection ", collectionView.collection.url, "; itemView ", itemView.model.attributes, ((this.isRendering) ? " with rendering shortcut" : ''));
+      //log("Inserting view at index ", index, " of ", collectionView.collection.length, " in collection ", collectionView.collection.url, "; itemView ", itemView.model.attributes, ((this.isRendering) ? " with rendering shortcut" : ''));
 
       // Shortcut - just place at the end!
       if (this.isRendering) {

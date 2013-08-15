@@ -6,10 +6,34 @@ define([
   './mixpanel' // No ref
 ], function($, _gaq, context) {
   "use strict";
-  var trackGoogle = !!window.troupeTrackingId;
-  if(window.troupeTrackingId) {
-    _gaq.push(['_setAccount', window.troupeTrackingId]);
+  var trackingId = context.env('googleTrackingId');
+  if(trackingId) {
+    _gaq.push(['_setAccount', trackingId]);
     _gaq.push(['_setAllowAnchor',true]);
+
+    var userId = context.getUserId();
+    if (userId) {
+      _gaq.push(['_setCustomVar',
+          1,
+          'userId',
+          userId,
+          2 // Session level variable
+       ]);
+    }
+
+    _gaq.push(['_trackPageview']);
+    _gaq.push(function() {
+      window.setTimeout(function() {
+        var hash = "" + window.location.hash;
+        try {
+          hash = hash.replace(/\butm_\w+=(\+|\w+|%\w\w|\-)*&?/g, "");
+        } catch(e) {
+        }
+
+        window.location.hash = hash;
+      }, 10);
+    });
+
   }
 
   function trackPageView(routeName) {
@@ -17,7 +41,10 @@ define([
       window.mixpanel.track('pageView', { pageName: routeName });
     }
 
-    _gaq.push(['_trackEvent', 'Route', routeName]);
+    if(trackingId) {
+      _gaq.push(['_trackEvent', 'Route', routeName]);
+    }
+
   }
 
   function trackError(message, file, line) {
@@ -25,31 +52,10 @@ define([
       window.mixpanel.track('jserror', { message: message, file: file, line: line } );
     }
 
-    _gaq.push(['_trackEvent', 'Error', message, file, line]);
+    if(trackingId) {
+      _gaq.push(['_trackEvent', 'Error', message, file, line]);
+    }
   }
-
-  var userId = context.getUserId()
-  if (userId) {
-    _gaq.push(['_setCustomVar',
-        1,
-        'userId',
-        context.getUserId(),
-        2 // Session level variable
-     ]);
-  }
-
-  _gaq.push(['_trackPageview']);
-  _gaq.push(function() {
-    window.setTimeout(function() {
-      var hash = "" + window.location.hash;
-      try {
-        hash = hash.replace(/\butm_\w+=(\+|\w+|%\w\w|\-)*&?/g, "");
-      } catch(e) {
-      }
-
-      window.location.hash = hash;
-    }, 10);
-  });
 
   $(document).on('track', function(e, routeName) {
     trackPageView(routeName);

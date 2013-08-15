@@ -1,18 +1,20 @@
 <div class="trpHeaderFrame" id="header-frame" style="width:100%; max-width: 700px;">
   <div class="trpHeaderContainer" style="width: 100%;">
-    {{#if isTroupe}}
-    <div class="trpHeaderFavourite {{#if troupeContext.troupe.favourite}}favourited{{/if}}" style="float: left;">
-      <img src='{{cdn "images/2/icon-favourite-selected.png" }}' class="trpHeaderFavIcon favourited" width="24" height="24">
-      <img src='{{cdn "images/2/icon-favourite-unselected.png" }}' class="trpHeaderFavIcon unfavourited" width="24" height="24">
-    </div>
-    {{/if}}
+      {{#if isTroupe}}
+  <div class="trpHeaderFavourite {{#if favourite}}favourited{{/if}}" style="float: left;">
+    <img src='{{cdn "images/2/icon-favourite-selected.png" }}' class="trpHeaderFavIcon favourited" width="24" height="24">
+    <img src='{{cdn "images/2/icon-favourite-unselected.png" }}' class="trpHeaderFavIcon unfavourited" width="24" height="24">
+  </div>
+  {{else}}
+  <div style="width: 34px; visibility: hidden; display:inline-block"></div>
+  {{/if}}
     <div class="trpHeaderTitle" style="float: left;">
       {{headerTitle}}
     </div>
     <div class="trpHeaderToolbar" id="header-region" style="float: right;">
       <div>
         {{#if isTroupe}}
-        {{#if troupeContext.troupe.oneToOne}}
+        {{#if oneToOne}}
         <div class="trpSettingsButton" style="visibility:hidden"></div>
         {{else}}
         <div class="trpSettingsButton">
@@ -23,7 +25,7 @@
         {{/if}}
         {{/if}}
         <div class="trpProfileButton">
-          {{#if user.username}}<a href="/{{user.username}}">{{else}}<a href="/home">{{/if}}{{ widget "avatar" user=user size='xs' }}</a>
+          <a href="{{#if user.username}}/{{user.username}}{{else}}/home{{/if}}">{{ widget "avatar" user=user size='xs' }}</a>
         </div>
         <div class="trpProfileMenu">
           <span class="trpProfileItem">

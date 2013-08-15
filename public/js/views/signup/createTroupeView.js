@@ -20,14 +20,7 @@ define([
       if (!options) return;
       this.upgradeOneToOne = options.upgradeOneToOne;
       this.existingUser = options.existingUser;
-
-      if (window.troupeContext) {
-        if (window.troupeContext.troupe) {
-          this.isOneToOne = window.troupeContext.troupe.oneToOne;
-        }
-      } else {
-        this.isOneToOne = false;
-      }
+      this.isOneToOne = context.inOneToOneTroupeContext();
     },
 
     events: {
@@ -94,10 +87,8 @@ define([
         userId: form.find('input[name=userId]').val()
       };
 
-      if (window.troupeContext.troupe) {
-        if (window.troupeContext.troupe.oneToOne && this.upgradeOneToOne) {
-          serializedForm.oneToOneTroupeId = context.getTroupeId();
-        }
+      if(context.inOneToOneTroupeContext() && this.upgradeOneToOne) {
+        serializedForm.oneToOneTroupeId = context.getTroupeId();
       }
 
       that.collection.create(serializedForm, {

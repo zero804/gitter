@@ -120,7 +120,6 @@ function createNotificationMessage(itemType, itemIds, callback) {
           // This will fit nicely into the new serializer stuff
           if(data.versions) { data.latestVersion = data.versions[data.versions.length - 1]; }
           data.troupeUrl = getTroupeUrl(data.troupe, senderUserId);
-          console.log(data);
           var d = {
             text: template(data),
             sound: 'notify.caf',

@@ -1,5 +1,5 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
-require([
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
+define([
   'handlebars'
 ], function ( Handlebars ) {
   "use strict";
@@ -7,7 +7,7 @@ require([
   function isMobile(options) {
     //if (navigator.userAgent.indexOf('Mobile') >= 0) {
     //  return options.fn(this);
-    //} 
+    //}
     return options.fn(this);
   }
 

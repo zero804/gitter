@@ -3,18 +3,31 @@ require([
   'jquery',
   'underscore',
   'backbone',
+  'utils/context',
   'routers/mobile/mobile-router',
   'views/base',
   'views/conversation/conversationView',
   'views/conversation/conversationDetailView',
   'collections/conversations',
-  'components/mobile-context',        // No ref
+  'components/unread-items-client',
   'components/eyeballs',              // No ref
-  'components/unread-items-client',   // No ref
-  'template/helpers/all'              // No ref
-], function($, _, Backbone, MobileRouter, TroupeViews, ConversationView, conversationDetailView, conversationModels/*, unreadItemsClient*/) {
+  'template/helpers/all',             // No ref
+  'components/native-context'         // No ref
+], function($, _, Backbone, context, MobileRouter, TroupeViews, ConversationView, conversationDetailView, conversationModels, unreadItemsClient) {
   /*jslint browser: true, unused: true */
   "use strict";
+
+  // TODO: normalise this
+  var troupeId = window.location.hash.substring(1);
+  if(troupeId) {
+    window.location.hash = '';
+  } else {
+    troupeId = window.localStorage.lastTroupeId;
+  }
+  if(troupeId) {
+    context.setTroupeId(troupeId);
+    window.localStorage.lastTroupeId = troupeId;
+  }
 
   var AppRouter = MobileRouter.extend({
     routes: {
@@ -31,13 +44,13 @@ require([
 
     defaultAction: function(){
       var view = new ConversationView({ collection: this.collection });
-      this.showView("#primary-view", view);
+      this.show('primary', view);
     },
 
     showConversation: function(id) {
       // why is this not showing anything?
       var view = new conversationDetailView.View({ id: id });
-      this.showView("#primary-view", view);
+      this.show('primary', view);
     }
 
   });
