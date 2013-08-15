@@ -6,8 +6,9 @@ require([
   'views/chat/chatCollectionView',
   'views/chat/chatInputView',
   'utils/router',
-  'views/shareSearch/shareSearchView'
-  ], function($, app, chatModels, ChatCollectionView, chatInputView, Router, shareSearchView) {
+  'views/shareSearch/shareSearchView',
+  'components/modal-region'
+  ], function($, app, chatModels, ChatCollectionView, chatInputView, Router, shareSearchView, modalRegion) {
   "use strict";
 
   var chatCollection = new chatModels.ChatCollection();
@@ -24,30 +25,12 @@ require([
   }).render();
 
   app.addInitializer(function() {
-    var dialogRegion = {
-      currentView: null,
-      show: function(view) {
-        if(this.currentView) {
-          this.currentView.fade = false;
-          this.currentView.hideInternal();
-        }
-        this.currentView = view;
-        view.navigable = true;
-        view.show();
-      },
-      close: function() {
-        if(this.currentView) {
-          this.currentView.navigationalHide();
-          this.currentView = null;
-        }
-      }
-    };
 
     new Router({
       routes: [
         { name: "share",            re: /^share$/,                  viewType: shareSearchView.Modal },
       ],
-      regions: [null, dialogRegion]
+      regions: [null, modalRegion]
     });
   });
 

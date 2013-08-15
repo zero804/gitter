@@ -6,9 +6,10 @@ define([
   'marionette',
   'views/signup/usernameView',
   'views/app/uiVars',
+  'components/modal-region',
   'bootstrap_tooltip',  // no ref
   "nanoscroller"        // no ref
-  ], function($, context, log, Marionette, UsernameView, uiVars) {
+  ], function($, context, log, Marionette, UsernameView, uiVars, modalRegion) {
   "use strict";
 
   var touchEvents = {
@@ -56,25 +57,7 @@ define([
 
       //$(".nano").nanoScroller({ preventPageScrolling: true });
 
-      /* This is a special region which acts like a region, but is implemented completely differently */
-      this.dialogRegion = {
-        currentView: null,
-        show: function(view) {
-          if(this.currentView) {
-            this.currentView.fade = false;
-            this.currentView.hideInternal();
-          }
-          this.currentView = view;
-          view.navigable = true;
-          view.show();
-        },
-        close: function() {
-          if(this.currentView) {
-            this.currentView.navigationalHide();
-            this.currentView = null;
-          }
-        }
-      };
+      this.dialogRegion = modalRegion;
 
       this.rightPanelRegion.on('show', function() {
         //log("SHOW PANEL");
