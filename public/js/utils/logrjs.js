@@ -19,7 +19,7 @@ define({
     }
 
     req(['utils/log', 'utils/context'], function (logger, context) {
-      var logging = context.env('logging');
+      var logging = context && context.env('logging');
       if(!logging) {
         try {
           logging = !!window.localStorage['_log_all'];
