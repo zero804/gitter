@@ -18,21 +18,24 @@ define({
       return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())  + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
     }
 
-    req(['utils/log'], function (logger) {
-      onload(function() {
+    req(['utils/log', 'utils/context'], function (logger, context) {
+      var logging = context.env('logging');
+      if(!logging) {
+        try {
+          logging = !!window.localStorage['_log_all'];
+          if(!logging) logging = !!window.localStorage['_log_' + name];
+        } catch(e) {
+        }
+      }
+
+      function passthrough() {
         var a = Array.prototype.slice.apply(arguments);
         a[0] = dateString() + ' ' + name + " " + a[0];
 
         logger.apply(null, a);
-      });
+      }
+
+      onload(logging ? passthrough : function() {});
     });
-  },
-  write: function (pluginName, moduleName, write) {
-    //jsEscape is an internal method for the text plugin
-    //that is used to make the string safe
-    //for embedding in a JS string.
-    write("define('" + pluginName + "!" + moduleName  +
-          "', ['utils/log']" +
-          ", function (logger) { return function(a) { logger('" + moduleName + ": ' + a); }; });");
   }
 });
