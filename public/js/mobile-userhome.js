@@ -1,29 +1,19 @@
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
-  'backbone',
   './mobile-app-container',
-  'utils/router',
-  'views/shareSearch/shareSearchView',
-  'views/app/appIntegratedView',
+  'routers/userhome-router',
   'views/userhome/userHomeView',
-  'collections/instances/troupes',
-  'views/profile/profileView',
-  'views/signup/createTroupeView',
-  'views/invite/reinviteModal',
   'components/modal-region'
-  ], function(Backbone, app, Router, shareSearchView, AppIntegratedView, UserHomeView, troupeCollections, profileView, createTroupeView, InviteModal, modalRegion) {
+  ], function(app, UserhomeRouter, UserHomeView, modalRegion) {
+  "use strict";
+
   app.addInitializer(function() {
     document.getElementById('chat-amuse').style.display = 'none';
 
-    new Router({
-      routes: [
-        { name: "profile",  re: /^profile$/,         viewType: profileView.Modal },
-        { name: "create",   re: /^create$/,          viewType: createTroupeView.Modal, collection: troupeCollections.troupes,   skipModelLoad: true },
-        { name: "share",    re: /^share$/,           viewType: shareSearchView.Modal },
-        { name: "reinvite", re: /^reinvite\/(\w+)$/, viewType: InviteModal,                  collection: troupeCollections.outgoingConnectionInvites, viewOptions: { overrideContext: true, inviteToConnect: true } },
-        { name: "connect",  re: /^connect$/,         viewType: shareSearchView.Modal, viewOptions: { overrideContext: true, inviteToConnect: true } }
-      ],
+    new UserhomeRouter({
       regions: [null, modalRegion]
     });
+
   });
   app.content.show(new UserHomeView());
   app.start();
