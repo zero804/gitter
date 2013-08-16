@@ -483,6 +483,7 @@ GeoPopulatedPlaceSchema.schemaTypeName = 'GeoPopulatedPlaceSchema';
   tokenHash: String,
   deviceType: { type: String, "enum": ['APPLE', 'APPLE-DEV', 'ANDROID', 'TEST', 'SMS']},
   mobileNumber: { type: String },
+  enabled: { type: Boolean, default: true },
   appVersion: String,
   appBuild: String,
   timestamp: Date
