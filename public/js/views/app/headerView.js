@@ -55,7 +55,7 @@ define([
       var troupe = context.getTroupe();
 
       return {
-        headerTitle: troupe && troupe.name || user.name,
+        headerTitle: troupe && troupe.name || user.displayName,
         isTroupe: !!troupe,
         oneToOne: context.inOneToOneTroupeContext(),
         user: user

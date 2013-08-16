@@ -18,6 +18,7 @@ require([
   'components/errorReporter',
   'components/dozy',
   'components/webNotifications',
+  'components/desktopNotifications',
   'template/helpers/all'
 ], function(Backbone, TroupeViews, context, loginRequestTemplate, shareSearchView, AppIntegratedView, UserHomeView, troupeCollections,
   profileView, createTroupeView, HeaderView, TroupeMenuView, InviteModal, Router, connectUserTemplate /*, errorReporter , dozy, webNotifications,_Helpers,  _backboneKeys*/) {
