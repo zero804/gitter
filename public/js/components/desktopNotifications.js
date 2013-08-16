@@ -22,22 +22,27 @@ define([
       var text = message.text;
       var notification;
 
+      function handleClick() {
+        window.focus();
+        if(link) {
+          if(link == window.location.pathname) return;
+
+          if(link.split('#')[0] == window.location.pathname) {
+            window.location.replace('#' + link.split('#',2)[1]);
+            return;
+          }
+
+          window.location.replace(link);
+
+        }
+      }
+
       if(Notification) {
         notification = new Notification(title, { body: text, tag: link, icon: '/images/2/logo-mark-green-square.png' });
-        notification.onclick = function() {
-          window.focus();
-          if(link) {
-            window.location.href = link;
-          }
-        };
+        notification.onclick = handleClick;
       } else {
         notification = webkitNotifications.createNotification('/images/2/logo-mark-green-square.png', title, text);
-        notification.onclick = function() {
-          window.focus();
-          if(link) {
-            window.location.href = link;
-          }
-        };
+        notification.onclick = handleClick;
         notification.show();
       }
 
