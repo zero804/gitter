@@ -38,23 +38,85 @@ define([
 
   });
 
-  var Router = function() {
-    Backbone.Router.apply(this, arguments);
-  };
+  function getFragmentsFromPath(path) {
+    var hash = window.location.hash;
+    if (hash.indexOf('#%7C') === 0) {
+      window.location.hash = hash.replace(/%7C/, '|');
+      path = path.replace(/%7C/, '|');
+    }
 
-  _.extend(Router.prototype, Backbone.Router.prototype, {
+    var rawFragments = path ? path.split("|") : [];
+
+    var fragments = rawFragments.map(function(fragment) {
+
+      if(fragment.substring(0, 2) === '#!') {
+        fragment = fragment.substring(2);
+      } else if(fragment.substring(0, 1) === '#') {
+        fragment = fragment.substring(1);
+      }
+
+      return fragment;
+
+    });
+
+    return fragments;
+  }
+
+  function triggerRegionUpdate(region, viewDetails) {
+    if(!viewDetails.skipModelLoad && viewDetails.collection.length === 0) {
+      // we need to wait for models in the collection before render
+      viewDetails.collection.once('reset sync', function() {
+        renderViewInRegion(region, viewDetails);
+      });
+
+    } else {
+      renderViewInRegion(region, viewDetails);
+    }
+  }
+
+  function renderViewInRegion(region, viewDetails) {
+    var model;
+
+    if(viewDetails.skipModelLoad) {
+      model = null;
+    } else {
+      model = viewDetails.collection.get(viewDetails.id);
+      if(!model) {
+        // The model doesn't exist. Exit.
+        return;
+      }
+    }
+
+    var cv = region.currentView;
+
+    if(viewDetails.collection) {
+      if(cv instanceof viewDetails.viewType &&
+        cv.supportsModelReplacement &&
+        cv.supportsModelReplacement()) {
+        cv.replaceModel(model);
+        $(document).trigger('appNavigation');
+
+        return;
+      }
+    }
+
+    /* Default case: load the view from scratch */
+    var viewOptions = _.extend({ model: model, collection: viewDetails.collection }, viewDetails.viewOptions);
+    var view = new viewDetails.viewType(viewOptions);
+    region.show(view);
+    $(document).trigger('appNavigation');
+  }
+
+  var Router = Backbone.Router.extend({
     initialize: function(options) {
       installClickTrigger();
-      this.appView = options.appView;
-      this.regionsFragments = {};
+      if(options) {
+        this.regions = options.regions || this.regions;
+        this.routes = options.routes || this.routes;
+      }
+      this.previousFragments = {};
       this.route(/^(.*?)$/, "handle");
-      this.routes = options.routes;
     },
-
-    regionFragmentMapping: [
-      'rightPanelRegion',
-      'dialogRegion'
-    ],
 
     getViewDetails: function(fragment) {
       var match = null;
@@ -81,87 +143,48 @@ define([
     },
 
     handle: function(path) {
-      var h = window.location.hash;
-      if (h.indexOf('#%7C') === 0) {
-        window.location.hash = h.replace(/%7C/, '|');
-        path = path.replace(/%7C/, '|');
-      }
-      var parts = path ? path.split("|") : [];
+      var fragments = getFragmentsFromPath(path);
 
-      this.regionFragmentMapping.forEach(function(regionName, index) {
-        var fragment = parts[index] ? parts[index] : "";
+      var regionUpdateList = [
+        {
+          regionName: 'rightPanelRegion',
+          fragment : fragments[0] || '',
+          region: this.regions[0]
+        },
+        {
+          regionName: 'dialogRegion',
+          fragment : fragments[1] || '',
+          region: this.regions[1]
+        }
+      ];
 
-        if(fragment.substring(0, 1) === '#') {
-          fragment = fragment.substring(1);
+      regionUpdateList.forEach(function(update) {
+
+        if(!update.region || this.previousFragments[update.regionName] === update.fragment) {
+          // nothing to update
+          return;
         }
 
-        var region, viewDetails;
+        this.previousFragments[update.regionName] = update.fragment;
 
-        function loadItemIntoView() {
-          var model;
-
-          if(viewDetails.skipModelLoad) {
-            model = null;
-          } else {
-            model = viewDetails.collection.get(viewDetails.id);
-            if(!model) {
-              // The model doesn't exist. Exit.
-              return;
-            }
-          }
-          var cv = region.currentView;
-
-          if(viewDetails.collection) {
-            if(cv instanceof viewDetails.viewType &&
-              cv.supportsModelReplacement &&
-              cv.supportsModelReplacement()) {
-              cv.replaceModel(model);
-              $(document).trigger('appNavigation');
-
-              return;
-            }
-          }
-
-          /* Default case: load the view from scratch */
-          var viewOptions = _.extend({ model: model, collection: viewDetails.collection }, viewDetails.viewOptions);
-          var view = new viewDetails.viewType(viewOptions);
-          region.show(view);
-          $(document).trigger('appNavigation');
+        if(!update.fragment) {
+          // user has navigated away from region
+          update.region.close();
+          return;
         }
 
-        if(this.regionsFragments[regionName] !== fragment) {
-          this.regionsFragments[regionName] = fragment;
+        var viewDetails = this.getViewDetails(update.fragment);
 
-          region = this.appView[regionName];
-
-          if(fragment) {
-            // lookup handler:
-            viewDetails = this.getViewDetails(fragment);
-
-            if(viewDetails) {
-              track(viewDetails.name);
-
-              // If we have a collection and we need to load a model item,
-              // ensure that the collection has already been populated. If it
-              // hasn't, wait until it has
-              if(!viewDetails.skipModelLoad) {
-                if(viewDetails.collection.length === 0) {
-                  viewDetails.collection.once('reset sync', loadItemIntoView, this);
-                  return;
-                }
-              }
-
-              loadItemIntoView();
-              return;
-            } else {
-              track('unknown');
-            }
-          }
-
-          region.close();
-        } else {
-          // This hasn't changed....
+        if(!viewDetails) {
+          // no match, so we clean up region
+          track('unknown');
+          update.region.close();
+          return;
         }
+
+        track(viewDetails.name);
+        triggerRegionUpdate(update.region, viewDetails);
+
       }, this);
     }
 

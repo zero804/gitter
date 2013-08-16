@@ -23,7 +23,8 @@ module.exports = {
           }
 
           // when the viewer is not logged in:
-          res.render('signup', { compactView: isPhone(req.headers['user-agent']) , profileHasNoUsername: JSON.stringify(false), userId: JSON.stringify(null) });
+          var template = isPhone(req.headers['user-agent']) ? 'mobile/homepage' : 'homepage';
+          res.render(template, { profileHasNoUsername: JSON.stringify(false), userId: JSON.stringify(null) });
         }
       );
 
@@ -109,14 +110,16 @@ module.exports = {
       });
 
       app.post('/resendconfirmation',
-        function(req, res, next) {
+        function(req, res) {
           signupService.resendConfirmation({
             email: req.body.email
           }, function(err) {
-            /* TODO: better error xhandling */
-            if(err) return next(err);
-
-            res.send({ success: true });
+            if(err) {
+              winston.error("Nothing to resend", { exception: err });
+              res.send(404);
+            } else {
+              res.send({ success: true });
+            }
           });
 
         }

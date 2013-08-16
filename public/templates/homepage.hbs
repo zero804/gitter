@@ -48,23 +48,16 @@
 
       <div class="trpHomeTopStrip">
         <div class="trpHomeLogo"><img src='{{ cdn "images/2/logo-mark-green-square-white-text.png" }}' height="64" width="215"></div>
-        {{^compactView}}
         <div class="trpHomeMenu">
           <div class="trpHomeMenuItem trpPadV14 trpHand" id="button-existing-users-login">Existing user login</div>
         </div>
-        {{/compactView}}
     </div>
 
       <div class="trpHomeHero">
         <div class="trpHeroText">
-          {{#if compactView}}
-          We're still a work in progress. <br><br>Please visit Troupe in a full browser to continue.<br><br><br><br><br><br><br>
-          {{else}}
           The quick and simple way to chat, share and<br>work together.<br><br>Anytime, anywhere.
           <br><br>
-          {{/if}}
         </div>
-        {{^compactView}}
         <div class="trpHeroSignup">
           <div class="trpButtonHuge trpHand trpBtnWhite button-signup" href="#!" id="button-signup"> Get Started<br><span class="trpBodySmall">It's free</span></div>
         </div>
@@ -72,11 +65,9 @@
         <div class="trpHeroImage">
           <img src='{{ cdn "images/2/home-hero-laptop2.png" }}'>
         </div>
-        {{/compactView}}
       </div>
     </div>
 
-    {{^compactView}}
     <div class="trpHomeMidStripContainer"><br><br>
       <div class="trpMidStrip">Why you'll love using Troupe</div><br><br>
       </div>
@@ -184,7 +175,6 @@
         <a href="#top"><img src='{{ cdn "images/2/logo-mark-green-square-white.png" }}' class="trpLine"></a>
       </div>
     </div>
-    {{/compactView}}
   </div>
   </body>
 </html>

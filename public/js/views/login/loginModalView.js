@@ -15,6 +15,7 @@ define([
 
     initialize: function(options) {
       if (options) {
+        this.noAutofocus = options.noAutofocus;
         this.initialEmail = options.email;
         this.fromSignup = options.fromSignup;
         this.userExists = options.userExists;
@@ -27,8 +28,8 @@ define([
       return {
         userExists: this.userExists,
         email: this.initialEmail,
-        autofocusEmail: this.initialEmail ? '': 'autofocus',
-        autofocusPassword: this.initialEmail ? 'autofocus' : '',
+        autofocusEmail: !this.initialEmail && !this.noAutofocus ? 'autofocus' : '',
+        autofocusPassword: this.initialEmail && !this.noAutofocus ? 'autofocus' : '',
         troupeUri: this.fromSignup ? null : window.location.pathname.replace(/\//g,''),
         fromSignup: this.fromSignup,
         isOneToOne: troupe && troupe.oneToOne
@@ -62,6 +63,7 @@ define([
       this.$el.find('.login-content').hide();
       this.$el.find('.resetpwd-content').show();
       this.$el.find('#resetEmailAddress').text(this.$el.find('#email').val());
+      return false;
     },
 
     closeClicked: function() {
@@ -101,6 +103,7 @@ define([
 
     onFormSubmit: function(e) {
       $('.login-failure').hide();
+      this.$el.find('#email, #password').blur();
       if(e) e.preventDefault();
       var form = this.$el.find('form');
       var that = this;
@@ -115,6 +118,7 @@ define([
         type: "POST",
         error: function(jqXHR, textStatus, errorThrown) {
           if(jqXHR.status == 401) {
+
             try {
               var data = jQuery.parseJSON(jqXHR.responseText);
 
