@@ -23,6 +23,7 @@ var troupeEnv = {
   googleTrackingId: nconf.get("web:trackingId"),
   cdns: cdns,
   appVersion: appTag,
+  logging: nconf.get("web:consoleLogging"),
   websockets: {
     fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
     options: {

@@ -1,6 +1,8 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
+  'underscore',
+  'views/base',
   'utils/context',
   'log!appIntegratedView',
   'marionette',
@@ -9,7 +11,7 @@ define([
   'components/modal-region',
   'bootstrap_tooltip',  // no ref
   "nanoscroller"        // no ref
-  ], function($, context, log, Marionette, UsernameView, uiVars, modalRegion) {
+  ], function($, _, TroupeViews, context, log, Marionette, UsernameView, uiVars, modalRegion) {
   "use strict";
 
   var touchEvents = {
@@ -33,7 +35,7 @@ define([
 
   $('.trpDisplayPicture').tooltip('destroy');
 
-  return Marionette.Layout.extend({
+  var AppIntegratedLayout = Marionette.Layout.extend({
     el: 'body',
     leftmenu: false,
     rightpanel: false,
@@ -74,7 +76,6 @@ define([
       });
 
       this.ensureProfileIsUsernamed();
-      this.hideLoadingAmusement();
     },
 
     ensureProfileIsUsernamed: function() {
@@ -82,10 +83,6 @@ define([
       if (user.username === null /* not undefined, in which case the user has not yet loaded */) {
         new UsernameView.Modal().show();
       }
-    },
-
-    hideLoadingAmusement: function() {
-      $('html').removeClass('loading');
     },
 
     hidePanel: function (whichPanel) {
@@ -350,4 +347,8 @@ define([
     }
 
   });
+
+  _.extend(AppIntegratedLayout.prototype, TroupeViews.DelayedShowLayoutMixin);
+
+  return AppIntegratedLayout;
 });

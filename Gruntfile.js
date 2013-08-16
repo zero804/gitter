@@ -151,15 +151,8 @@ module.exports = function( grunt ) {
               },
               {
                   name: "login",
-                  include: [
-                    "../repo/almond/almond"
-                  ],
-                  override: {
-                    paths: {
-                        "jquery": "../repo/zepto/zepto"
-                    }
-                  }
-              }
+                  exclude: ["core-libraries"]
+             }
           ]
 
         }

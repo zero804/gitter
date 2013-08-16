@@ -112,8 +112,7 @@ module.exports = {
       app.post('/resendconfirmation',
         function(req, res) {
           signupService.resendConfirmation({
-            email: req.body.email,
-            troupeId: req.session.newTroupeId
+            email: req.body.email
           }, function(err) {
             if(err) {
               winston.error("Nothing to resend", { exception: err });

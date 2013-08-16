@@ -9,6 +9,8 @@ var apns = require('apn');
 var statsService = require("../services/stats-service");
 var workerQueue = require('../utils/worker-queue');
 
+var nexmo = require('easynexmo/lib/nexmo');
+nexmo.initialize('0b93c6bc', '483931e4');
 
 var errorDescriptions = {
   0: 'No errors encountered',
@@ -22,6 +24,8 @@ var errorDescriptions = {
   8: 'Invalid token',
   255: 'None (unknown)'
 };
+
+var basePath = nconf.get('web:basepath');
 
 function errorEventOccurred(err, notification) {
   try {
@@ -95,6 +99,7 @@ var apnsConnection = new apns.Connection({
 apnsConnection.on("error", function(err) {
     winston.error("APN service (prod) experienced an error", { error: err.message });
 });
+
 
 ['Dev', 'BetaDev', 'Beta', 'Prod'].forEach(function(suffix) {
   try {
@@ -176,6 +181,9 @@ function sendNotificationToDevice(notification, badge, device) {
     }
 
     sent = true;
+  } else if(device.deviceType === 'SMS') {
+    sendSMSMessage(device.mobileNumber, notification.smsText);
+    sent = true;
   } else {
     winston.warn('Unknown device type: ' + device.deviceType);
   }
@@ -194,10 +202,16 @@ function sendNotificationToDevice(notification, badge, device) {
 
 }
 
+function sendSMSMessage(mobileNumber, message) {
+  nexmo.sendTextMessage('Troupe',mobileNumber,message, function(err) {
+    if(err) winston.error('Unable to send SMS message: ' + err, { exception: err });
+  });
+}
+
 var queue = workerQueue.queue('push-notification', {}, function() {
 
   function directSendUserNotification(userIds, notification, callback) {
-    pushNotificationService.findDevicesForUsers(userIds, function(err, devices) {
+    pushNotificationService.findEnabledDevicesForUsers(userIds, function(err, devices) {
       if(err) return callback(err);
       if(!devices.length) return callback();
 

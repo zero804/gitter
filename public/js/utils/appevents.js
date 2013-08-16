@@ -4,6 +4,7 @@ define(['underscore', 'backbone'], function(_, Backbone) {
 
 
   /*
+   * 
    * This is the new application-wide message bus. Use it instead of jquery $(document).on(...)
    * As we can use Backbone style listenTo() event listening with it
    */

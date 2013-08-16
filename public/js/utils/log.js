@@ -2,7 +2,11 @@
 define(function() {
   "use strict";
 
-  var history = window.logHistory = [];
+  /** @define {boolean}  DEBUG */
+  var DEBUG = true;
+  if (DEBUG) {
+    var history = window.logHistory = [];
+  }
 
   function nullLog() {}
 
@@ -13,9 +17,11 @@ define(function() {
   function consoleLog() {
     console.log.apply(console, Array.prototype.slice.apply(arguments));
 
-    history.push(Array.prototype.join.call(arguments, ', '));
-    if(history.length > 500)
-      history.shift();
+    if (DEBUG) {
+      history.push(Array.prototype.join.call(arguments, ', '));
+      if(history.length > 500)
+        history.shift();
+    }
   }
 
   if (typeof console == "undefined") return nullLog;

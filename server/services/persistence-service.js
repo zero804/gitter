@@ -481,7 +481,9 @@ GeoPopulatedPlaceSchema.schemaTypeName = 'GeoPopulatedPlaceSchema';
   deviceName: String,
   appleToken: Buffer,
   tokenHash: String,
-  deviceType: { type: String, "enum": ['APPLE', 'APPLE-DEV', 'ANDROID', 'TEST']},
+  deviceType: { type: String, "enum": ['APPLE', 'APPLE-DEV', 'ANDROID', 'TEST', 'SMS']},
+  mobileNumber: { type: String },
+  enabled: { type: Boolean, default: true },
   appVersion: String,
   appBuild: String,
   timestamp: Date
@@ -489,6 +491,7 @@ GeoPopulatedPlaceSchema.schemaTypeName = 'GeoPopulatedPlaceSchema';
 PushNotificationDeviceSchema.index({ deviceId: 1 });
 PushNotificationDeviceSchema.index({ userId: 1 });
 PushNotificationDeviceSchema.index({ tokenHash: 1 });
+PushNotificationDeviceSchema.index({ mobileNumber: 1 });
 
 PushNotificationDeviceSchema.schemaTypeName = 'PushNotificationDeviceSchema';
 

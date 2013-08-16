@@ -9,8 +9,8 @@
 	<title>{{troupeName}} - Troupe</title>
 
   <style>
-  html.loading { background: url("images/2/troupe-ajax-guy-green.gif") center no-repeat; }
-  .loading body { display: none; }
+  html.loading .trpContentPanel { background: url("{{ cdn 'images/2/troupe-ajax-guy-green.gif' }}") center no-repeat; height: 90%; }
+  html.loading .trpContentPanel > * { visibility: hidden; }
   </style>
 
   <link rel="stylesheet" href='{{cdn "bootstrap/css/trp3.css" }}'>
@@ -71,7 +71,7 @@
   </div>
 </div>
 
-<div class="trpChatInputWrapper" id="chat-input-wrapper">
+<div class="trpChatInputWrapper" id="chat-input-wrapper" style="min-height: 60px">
   <div class="trpChatInputArea" id="chat-input">
   </div>
 </div>
