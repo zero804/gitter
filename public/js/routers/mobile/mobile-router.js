@@ -60,7 +60,7 @@ define([
 
     show: function(regionName, view) {
       var c = view.collection, self = this;
-      if (c.hasLoaded && !c.hasLoaded()) {
+      if (c && c.hasLoaded && !c.hasLoaded()) {
         // delay showing the view until the collection is loaded.
         c.once('sync reset', function() {
           self.layout[regionName].show(view);
