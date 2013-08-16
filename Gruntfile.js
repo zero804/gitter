@@ -134,25 +134,25 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "router-login",
-                  include: [
+                  name: "router-login",
+                  include: [
                     "utils/tracking",
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
+                    "views/widgets/avatar"
+                  ],
+                  exclude: ["core-libraries"]
+              },
                {
-                  name: "complete-profile",
-                  include: [
+                  name: "complete-profile",
+                  include: [
                     "utils/tracking",
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
+                    "views/widgets/avatar"
+                  ],
+                  exclude: ["core-libraries"]
+              },
               {
-                  name: "login",
-                  exclude: ["core-libraries"]
-             }
+                  name: "login",
+                  exclude: ["core-libraries"]
+             }
           ]
 
         }
@@ -180,7 +180,7 @@ module.exports = function( grunt ) {
       "native-files-router": createClosureConfig('routers/mobile/native/files-router'),
       "native-conversations-router": createClosureConfig('routers/mobile/native/conversations-router'),
       "native-people-router": createClosureConfig('routers/mobile/native/people-router'),
-      "router-login": createClosureConfig('router-login'),
+      "router-login": createClosureConfig('router-login'),
       "complete-profile": createClosureConfig('complete-profile'),
       "login": createClosureConfig('login')
     },
