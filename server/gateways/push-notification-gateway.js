@@ -182,7 +182,7 @@ function sendNotificationToDevice(notification, badge, device) {
 
     sent = true;
   } else if(device.deviceType === 'SMS') {
-    sendSMSMessage(device.mobileNumber, notification.message + '\n' + basePath + notification.link);
+    sendSMSMessage(device.mobileNumber, notification.smsText);
     sent = true;
   } else {
     winston.warn('Unknown device type: ' + device.deviceType);
@@ -203,15 +203,15 @@ function sendNotificationToDevice(notification, badge, device) {
 }
 
 function sendSMSMessage(mobileNumber, message) {
-  nexmo.sendTextMessage('Troupe',mobileNumber,message, function() {
-    console.log('NEXMO', arguments);
+  nexmo.sendTextMessage('Troupe',mobileNumber,message, function(err) {
+    if(err) winston.error('Unable to send SMS message: ' + err, { exception: err });
   });
 }
 
 var queue = workerQueue.queue('push-notification', {}, function() {
 
   function directSendUserNotification(userIds, notification, callback) {
-    pushNotificationService.findDevicesForUsers(userIds, function(err, devices) {
+    pushNotificationService.findEnabledDevicesForUsers(userIds, function(err, devices) {
       if(err) return callback(err);
       if(!devices.length) return callback();
 
