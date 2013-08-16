@@ -28,7 +28,8 @@ Mike: ?
 */
 
 var MAX_LINE_LENGTH = 30;
-var MAX_TOTAL_LENGTH = 120;
+var MAX_NOTIFICATION_TEXT = 120;
+var MAX_SMS_LENGTH = 160;
 
 var util = require('util');
 var _ = require('underscore');
@@ -37,7 +38,7 @@ var NotificationMessageGenerator = function(options) {
   this.strategies = options.strategies;
 };
 
-NotificationMessageGenerator.prototype.generateNotificationMessage = function(troupe, items) {
+NotificationMessageGenerator.prototype.generateNotificationMessage = function(troupe, items, smsLink) {
   var lines = [this.getTroupeDescription(troupe)];
 
   var itemTypes = Object.keys(items);
@@ -64,19 +65,49 @@ NotificationMessageGenerator.prototype.generateNotificationMessage = function(tr
     lines.push(byIdHash[id]);
   });
 
-  var line = '';
-  for(var i = 0; i < lines.length; i++) {
-    var nextLine = lines[i];
-    // We add extra spaces so that when they're removed on an iphone the line still makes sense
-    var lineWithNext = line ? line + '  \n' + nextLine : nextLine;
-    if(lineWithNext.length <= MAX_TOTAL_LENGTH) {
-      line = lineWithNext;
+  var i, nextLine, lineWithNext;
+
+  //
+  // Generate notification text
+  //
+  var notificationText = '';
+  for(i = 0; i < lines.length; i++) {
+    nextLine = lines[i];
+    // We add extra spaces so that when they're removed on an iphone the notificationText still makes sense
+    lineWithNext = notificationText ? notificationText + '  \n' + nextLine : nextLine;
+    if(lineWithNext.length <= MAX_NOTIFICATION_TEXT
+    ) {
+      notificationText = lineWithNext;
     } else {
       break;
     }
   }
 
-  return line;
+  var smsLinkLength = smsLink ? smsLink.length + 1 : 0;
+  //
+  // Generate sms text
+  //
+  var smsText = '';
+  for(i = 0; i < lines.length; i++) {
+    nextLine = lines[i];
+    // We add extra spaces so that when they're removed on an iphone the smsText still makes sense
+    lineWithNext = smsText ? smsText + '\n' + nextLine : nextLine;
+
+    if(lineWithNext.length + smsLinkLength <= MAX_SMS_LENGTH) {
+      smsText = lineWithNext;
+    } else {
+      break;
+    }
+  }
+
+  if(smsLink) {
+    smsText = smsText + '\n' + smsLink;
+  }
+
+  return {
+    notificationText: notificationText,
+    smsText: smsText
+  };
 };
 
 

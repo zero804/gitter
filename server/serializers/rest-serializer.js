@@ -86,7 +86,9 @@ function UserStrategy(options) {
     }
 
     function getLocationDescription(named) {
-      return named.place + ", " + named.region;
+      var desc = (named.place) ? named.place : '';
+      desc += (named.region) ? ", " + named.region : '';
+      return desc;
     }
 
     var location;

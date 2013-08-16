@@ -191,5 +191,9 @@ define([
     });
   }, PING_POLL);
 
-
+  return {
+    getEyeBalls: function() {
+      return eyesOnState;
+    }
+  };
 });
