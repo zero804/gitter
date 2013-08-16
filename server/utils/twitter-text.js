@@ -1,20 +1,11 @@
 (function() {
+
   if (typeof twttr === "undefined" || twttr === null) {
-    var twttr = {};
+    twttr = {};
   }
 
   twttr.txt = {};
   twttr.txt.regexen = {};
-
-  /* 
-   * Hey Trouper! 
-   *
-   * Bump the version if you modify the behaviour of TwitterText.
-   *
-   */
-
-  twttr.txt.version = 'v1';
-
 
   var HTML_ENTITIES = {
     '&': '&amp;',
