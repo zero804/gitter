@@ -60,7 +60,7 @@ require([
         requestModal.view.on('confirm.request', function(options) {
           var data = {};
           data.email = options.userEmail;
-          requestModal.transitionTo(new TroupeViews.Modal({ disableClose: true, view: new SignupModalConfirmView({ data: data }) }));
+          requestModal.transitionTo(new TroupeViews.Modal({ disableClose: true, view: new SignupModalConfirmView({ email: data.email }) }));
         });
 
         return requestModal;
@@ -119,7 +119,7 @@ require([
               connectUserModal.view.on('signup.complete', function(options) {
                 var data = {};
                 data.email = options.email;
-                connectUserModal.transitionTo(new TroupeViews.Modal({ disableClose: true, view: new SignupModalConfirmView({ data: data }) }));
+                connectUserModal.transitionTo(new TroupeViews.Modal({ disableClose: true, view: new SignupModalConfirmView({ email: data.email }) }));
               });
 
               connectUserModal.view.on('request.login', function(options) {

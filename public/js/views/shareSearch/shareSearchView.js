@@ -12,6 +12,11 @@ define([
 ], function($, _, context, TroupeViews, template, rowTemplate, ZeroClipboard) {
   "use strict";
 
+  function isMobile() {
+    return navigator.userAgent.indexOf('Mobile/') >= 0;
+  }
+
+
   var View = TroupeViews.Base.extend({
     template: template,
 
@@ -212,7 +217,8 @@ define([
 
           return this.query;
         },
-        minLength: 2
+        minLength: 2,
+        items: isMobile() ? 3 : 8
       });
 
       function addEmailOption(source, query) {
@@ -222,7 +228,7 @@ define([
           source.push({ email: query, displayName: query, avatarUrlSmall: '/avatarForEmail/'+query });
         } else {
           // add a non-selectable option which says continue typing an email address
-          source.push({ displayName: "You can also type an email address to invite somebody new.", nonSelectable: true });
+          source.push({ displayName: "Try typing an email address as well.", nonSelectable: true });
         }
       }
 
@@ -309,7 +315,7 @@ define([
   var Modal = TroupeViews.Modal.extend({
     initialize: function(options) {
       if (options.inviteToConnect) {
-        options.title = "Connect with people on Troupe";
+        options.title = "Connect with people";
       } else {
         options.title = "Invite people to " + context.getTroupe().name;
       }

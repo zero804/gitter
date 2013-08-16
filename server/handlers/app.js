@@ -25,9 +25,19 @@ function renderHomePage(req, res, next) {
     } else {
       var login = !user || troupeContext.profileNotCompleted || accessDenied;
 
-      res.render('app-template', {
+      var bootScript;
+      if(req.isPhone) {
+        bootScript = 'mobile-userhome';
+      } else if(login) {
+        bootScript = 'router-login';
+      } else {
+        bootScript = 'router-homepage';
+      }
+
+      res.render(req.isPhone ? 'mobile/mobile-app' : 'app-template', {
         useAppCache: !!nconf.get('web:useAppCache'),
-        bootScriptName: login ? "router-login" : 'router-homepage',
+        bootScriptName: bootScript,
+        isWebApp: true,
         troupeName: (req.user && req.user.displayName) || '',
         troupeContext: troupeContext,
         agent: req.headers['user-agent']
@@ -52,11 +62,20 @@ function renderAppPageWithTroupe(req, res, next, page) {
     .spread(function(unreadCount, troupeContext) {
       var login = !user || troupeContext.profileNotCompleted || accessDenied;
 
+      var bootScript;
+      if(req.isPhone) {
+        bootScript = 'mobile-app';
+      } else if(login) {
+        bootScript = 'router-login';
+      } else {
+        bootScript = 'router-app';
+      }
+
       res.render(page, {
         appCache: getAppCache(req),
         login: login,
         isWebApp: !req.params.mobilePage, // TODO: fix this!
-        bootScriptName: login ? "router-login" : "router-app",
+        bootScriptName: bootScript,
         unreadCount: unreadCount && unreadCount[req.user.id],
         troupeName: troupeContext.troupe.name,
         troupeContext: troupeContext,
@@ -192,6 +211,7 @@ module.exports = {
       /* Special homepage for users without usernames */
       app.get('/home',
         middleware.grantAccessForRememberMeTokenMiddleware,
+        isPhoneMiddleware,
         function(req, res, next) {
           if(req.user && req.user.username) {
             res.relativeRedirect(req.user.getHomeUrl());
