@@ -2,10 +2,10 @@
 define(function() {
   "use strict";
 
-  /** @define {boolean}  DEBUG */
-  var DEBUG = true;
+  var history;
+  var DEBUG = false;
   if (DEBUG) {
-    var history = window.logHistory = [];
+    history = window.logHistory = [];
   }
 
   function nullLog() {}
