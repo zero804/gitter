@@ -107,17 +107,15 @@ define([
     $(document).trigger('appNavigation');
   }
 
-  var Router = function() {
-    Backbone.Router.apply(this, arguments);
-  };
-
-  _.extend(Router.prototype, Backbone.Router.prototype, {
+  var Router = Backbone.Router.extend({
     initialize: function(options) {
       installClickTrigger();
-      this.regions = options.regions;
+      if(options) {
+        this.regions = options.regions || this.regions;
+        this.routes = options.routes || this.routes;
+      }
       this.previousFragments = {};
       this.route(/^(.*?)$/, "handle");
-      this.routes = options.routes;
     },
 
     getViewDetails: function(fragment) {
