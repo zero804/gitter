@@ -7,6 +7,7 @@ define(['backbone', 'jquery-hammer'], function(Backbone, $hammer) {
 
     events: {
       'tap': 'tap',
+      'touch #showTroupesButton': 'stopClickEvents',
       'tap #showTroupesButton': 'showHideTroupes'
     },
 
@@ -17,6 +18,11 @@ define(['backbone', 'jquery-hammer'], function(Backbone, $hammer) {
 
     makeAppFullScreen: function() {
       Backbone.$('html, body').scrollTop(Backbone.$(document).height());
+    },
+
+    stopClickEvents: function(event) {
+      event.gesture.preventDefault();
+      event.stopPropagation();
     },
 
     showHideTroupes: function(event) {
