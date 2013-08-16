@@ -12,6 +12,11 @@ define([
 ], function($, _, context, TroupeViews, template, rowTemplate, ZeroClipboard) {
   "use strict";
 
+  function isMobile() {
+    return navigator.userAgent.indexOf('Mobile/') >= 0;
+  }
+
+
   var View = TroupeViews.Base.extend({
     template: template,
 
@@ -212,7 +217,8 @@ define([
 
           return this.query;
         },
-        minLength: 2
+        minLength: 2,
+        items: isMobile() ? 3 : 8
       });
 
       function addEmailOption(source, query) {
