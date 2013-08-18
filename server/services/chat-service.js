@@ -5,32 +5,15 @@ var persistence   = require("./persistence-service"),
     collections   = require("../utils/collections"),
     troupeService = require("./troupe-service"),
     statsService  = require("./stats-service"),
-    TwitterText   =  require('../utils/twitter-text'),
-    urlExtractor  = require('../utils/url-extractor');
-
-var ObjectID = require('mongodb').ObjectID;
-
+    TwitterText   = require('../utils/twitter-text'),
+    urlExtractor  = require('../utils/url-extractor'),
+    safeHtml      = require('../utils/safe-html'),
+    ent           = require('ent');
 
 /* @const */
 var MAX_CHAT_EDIT_AGE_SECONDS = 300;
 
-/* @const */
-var HTML_ENTITIES = {
-  '&': '&amp;',
-  '>': '&gt;',
-  '<': '&lt;',
-  '"': '&quot;',
-  "'": '&#39;'
-};
-
-var SAFE_HTML_RE = /[&"'><]/g;
-
-// HTML escaping
-function safe(text) {
-  return text && text.replace(SAFE_HTML_RE, function(character) {
-    return HTML_ENTITIES[character];
-  });
-}
+var ObjectID = require('mongodb').ObjectID;
 
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   if(!troupe) return callback("Invalid troupe");
@@ -42,13 +25,18 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   chatMessage.toTroupeId = troupe.id;
   chatMessage.sent = new Date();
 
-  text = safe(text);
-  chatMessage.text = safe(text);
+  // Very important that we decode and re-encode!
+  text = ent.decode(text);
+  text = safeHtml(text); // NB don't use ent for encoding as it's a bit overzealous!
+
+  console.log(text);
+
+  chatMessage.text = text;
 
   // Metadata
   chatMessage.urls            = urlExtractor.extractUrlsWithIndices(text);
   chatMessage.mentions        = TwitterText.extractMentionsWithIndices(text);
-  chatMessage.metadataVersion = urlExtractor.version;
+  chatMessage._md             = urlExtractor.version;
 
   chatMessage.save(function (err) {
     if(err) return callback(err);
@@ -82,8 +70,19 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
     return callback("Permission to edit this chat message is denied.");
   }
 
+
+  // Very important that we decode and re-encode!
+  newText = ent.decode(newText);
+  newText = safeHtml(newText); // NB don't use ent for encoding as it's a bit overzealous!
+
   chatMessage.text = newText;
   chatMessage.editedAt = new Date();
+
+  // Metadata
+  chatMessage.urls            = urlExtractor.extractUrlsWithIndices(newText);
+  chatMessage.mentions        = TwitterText.extractMentionsWithIndices(newText);
+  chatMessage._md             = urlExtractor.version;
+
   chatMessage.save(function(err) {
     if(err) return callback(err);
 

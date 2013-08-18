@@ -15,8 +15,9 @@ define([
   'views/unread-item-view-mixin',
   'oEmbed',
   'template/helpers/linkify',
+  'utils/safe-html',
   'bootstrap_tooltip'
-], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, chatItemTemplate, chatInputView, UnreadItemViewMixin, oEmbed, linkify /* tooltip*/) {
+], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, chatItemTemplate, chatInputView, UnreadItemViewMixin, oEmbed, linkify, safeHtml /* tooltip*/) {
 
   "use strict";
 
@@ -27,7 +28,7 @@ define([
 
     events: {
       'click .trpChatEdit':     'toggleEdit',
-      'keydown textarea':  'detectEscape',
+      'keydown textarea':       'detectEscape',
       'click .trpChatReads':    'showReadBy'
     },
 
@@ -58,10 +59,6 @@ define([
 
     },
 
-    safe: function(text) {
-      return (''+text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/\n\r?/g, '<br />');
-    },
-
     getRenderData: function() {
       var data = this.model.toJSON();
 
@@ -81,8 +78,11 @@ define([
 
     renderText: function() {
       // We need to parse the text a little to hyperlink known links and escape html to prevent injection
-      var richText = String(linkify(this.safe(this.model.get('text')), this.model.get('urls')));
+      var richText = linkify(this.model.get('text'), this.model.get('urls')).toString();
+      richText = richText.replace(/\n\r?/g, '<br>');
       this.$el.find('.trpChatText').html(richText);
+      console.log(richText);
+
       this.oEmbed();
       this.highlightMention();
     },
@@ -227,16 +227,16 @@ define([
 
     showInput: function() {
       //var isAtBottom = this.scrollDelegate.isAtBottom();
+      var chatInputText = this.$el.find('.trpChatText');
 
       // create inputview
-      this.$el.find('.trpChatText').html("<textarea class='trpChatInput'>"+this.model.get('text')+"</textarea>").find('textarea').select();
-      this.inputBox = new chatInputView.ChatInputBoxView({ el: this.$el.find('textarea'), scrollDelegate: this.scrollDelegate });
-      this.listenTo(this.inputBox, 'save', this.saveChat);
+      chatInputText.html("<textarea class='trpChatInput'></textarea>");
 
-      // this.$el.find('.trpChatText textarea').focus().on('blur', function() { self.toggleEdit(); });
-      //if (isAtBottom) {
-      //  this.scrollDelegate.$scrollOf.scrollTop(this.scrollDelegate.$container.height());
-      //}
+      var unsafeText = safeHtml.unsafe(this.model.get('text'));
+      var textarea = chatInputText.find('textarea').val(unsafeText).select();
+
+      this.inputBox = new chatInputView.ChatInputBoxView({ el: textarea });
+      this.listenTo(this.inputBox, 'save', this.saveChat);
     },
 
     showReadBy: function() {

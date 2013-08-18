@@ -2,7 +2,7 @@
 "use strict";
 
 exports.startWorkers = function() {
-  var nconf = require("../utils/config");
+  //var nconf = require("../utils/config");
 
   require('./mailer-service');
   require('../gateways/push-notification-gateway');
@@ -12,10 +12,10 @@ exports.startWorkers = function() {
 
   require('../utils/worker-queue').startWorkers();
 
-  require('./kue-cleanup-service').startCleanupJob();
+  //require('./kue-cleanup-service').startCleanupJob();
 
-  if(nconf.get("kue:startAdminApp")) {
-    var kue = require('../utils/kue');
-    kue.app.listen(nconf.get("kue:adminAppPort"));
-  }
+  //if(nconf.get("kue:startAdminApp")) {
+  //  var kue = require('../utils/kue');
+  //  kue.app.listen(nconf.get("kue:adminAppPort"));
+  //}
 };
