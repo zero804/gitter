@@ -81,7 +81,6 @@ define([
       var richText = linkify(this.model.get('text'), this.model.get('urls')).toString();
       richText = richText.replace(/\n\r?/g, '<br>');
       this.$el.find('.trpChatText').html(richText);
-      console.log(richText);
 
       this.oEmbed();
       this.highlightMention();
