@@ -328,11 +328,11 @@ var ChatMessageSchema = new Schema({
   text: String,
   urls: Array,
   mentions: Array,
-  metadataVersion: Number,
   sent: { type: Date, "default": Date.now },
   editedAt: { type: Date, "default": null },
   readBy: { type: [ObjectId] },
-  _tv: { type: 'MongooseNumber', 'default': 0 }
+  _tv: { type: 'MongooseNumber', 'default': 0 },
+  _md: Number,          // Meta parse version
 });
 ChatMessageSchema.index({ toTroupeId: 1, sent: -1 });
 ChatMessageSchema.schemaTypeName = 'ChatMessageSchema';

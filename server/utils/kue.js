@@ -19,7 +19,7 @@ kue.createQueue = function() {
   if(singletonQueue) return singletonQueue;
 
   singletonQueue = kue._originalCreateQueue();
-
+/*
   shutdown.addHandler('kue', 10, function(callback) {
     winston.info('Attempting to shutdown kue handlers');
 
@@ -33,6 +33,7 @@ kue.createQueue = function() {
       callback();
     }, 25000);
   });
+*/
 
   return singletonQueue;
 };

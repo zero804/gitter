@@ -1,6 +1,14 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+/*
+ * Hey Trouper!
+ *
+ * Bump the version if you modify the behaviour of TwitterText.
+ *
+ */
+exports.metaDataVersion = 2;
+
 
 var TwitterText   =  require('./twitter-text');
 
@@ -48,10 +56,8 @@ exports.extractUrlsWithIndices = function(text) {
 
 };
 
-/*
- * Hey Trouper!
- *
- * Bump the version if you modify the behaviour of TwitterText.
- *
- */
-exports.version = 2;
+/** For the moment, just pass this on to twitter */
+exports.extractMentionsWithIndices = function(text) {
+  return TwitterText.extractMentionsWithIndices(text);
+};
+
