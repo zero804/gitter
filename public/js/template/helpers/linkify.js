@@ -12,10 +12,13 @@ define([
   }
 
   function linkify(message, urls) {
-    message = message.replace(emailRegex, embedMailto);
     if (urls && urls.length) {
       message = TwitterText.txt.autoLinkEntities(message, urls, {targetBlank: true, urlClass: 'link'});
     }
+
+    // TODO: these should be linked in the same way by the server
+    message = message.replace(emailRegex, embedMailto);
+
     return new Handlebars.SafeString(message);
   }
 

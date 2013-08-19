@@ -20,6 +20,7 @@
 
 
 @import "trpMobileOverride.less";
+@import "trpInvites.less";
 
 
 
@@ -378,10 +379,10 @@ a:hover {
 .trpHeaderTitle {
   display: inline-block;
 	.trpH1;
-	min-width: 500px;
 	text-align: left;
 	color: #333;
 	padding-top: 12px;
+	padding-left: 20px;
 	height: 60px;
 }
 
@@ -581,58 +582,6 @@ a:hover {
   padding: 10px 0px;
 }
 
-.trpSearchInviteResult {
-	margin-right: 12px;
-	vertical-align: middle;
-}
-
-.trpSearchInvites {
-	margin: 15px 0 15px 0;
-	max-height: 110px;
-	overflow-x: hidden;
-	overflow-y: auto;
-}
-
-.trpInviteModal, .trpInviteModal .modal-body {
-	overflow: visible;
-}
-
-.trpInviteItem {
-	display: inline-block;
-	width: 200px;
-	padding: 8px 8px 8px 8px;
-	cursor: pointer;
-	margin-right: 4px;
-	margin-bottom: 4px;
-	background-color: @trpBgColor;
-}
-
-.trpRemoveInvite {
-	float: right;
-	background-color: @trpRed;
-	width: 12px;
-	height: 12px;
-	border-radius: 50em;
-	color: white;
-	margin-top: 7px;
-	display: none;
-}
-
-.trpInviteItem:hover .trpRemoveInvite {
-	display: inline-block;
-}
-
-.trpInviteName {
-	.trpBodyMedium;
-	display: inline-block;
-	max-width: 130px;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	vertical-align: top;
-	padding-top: 4px;
-}
-
 .login-content {
 	width: 100%;
 }
@@ -746,7 +695,6 @@ a:hover {
 .typeahead {
 	margin-top: 0;
 	border-radius: 0;
-	min-width: 316px;
 	overflow-x: hidden;
 	overflow-y: auto;
 }
