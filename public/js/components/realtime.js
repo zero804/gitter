@@ -3,12 +3,13 @@ define([
   'jquery',
   'utils/context',
   'faye',
+  'utils/appevents',
   'log!realtime'
-], function($, context, Faye, log) {
+], function($, context, Faye, appEvents, log) {
   "use strict";
 
-  Faye.Logging.logLevel = 'debug';
-  Faye.logger = log;
+  //Faye.Logging.logLevel = 'debug';
+  //Faye.logger = log;
 
   var connected = false;
   var connectionProblemTimeoutHandle;
@@ -49,13 +50,17 @@ define([
   var ClientAuth = function() {};
   ClientAuth.prototype.outgoing = function(message, callback) {
     if(message.channel == '/meta/handshake') {
-      message.ext = message.ext || {};
-      if(window.troupeContext) message.ext.token = window.troupeContext.accessToken;
-      message.ext.connType = isMobile() ? 'mobile' : 'online';
-      message.ext.client = isMobile() ? 'mobweb' : 'web';
+      if(!message.ext) { message.ext = {}; }
+      var ext = message.ext;
+      var accessToken = context.env('accessToken') || context().accessToken; // THIS SECOND METHOD WILL BE DEPRECATED!
+
+      ext.token = accessToken;
+      ext.troupeId = context.getTroupeId();
+      ext.connType = isMobile() ? 'mobile' : 'online';
+      ext.client = isMobile() ? 'mobweb' : 'web';
 
     } else if(message.channel == '/meta/subscribe') {
-      message.ext = message.ext || {};
+      if(!message.ext) { message.ext = {}; }
       message.ext.eyeballs = eyeballState ? 1 : 0;
     }
 
@@ -65,6 +70,19 @@ define([
   ClientAuth.prototype.incoming = function(message, callback) {
     if(message.channel == '/meta/handshake') {
       if(message.successful) {
+        var ext = message.ext;
+        if(ext) {
+          if(ext.appVersion && ext.appVersion !== context.env('appVersion')) {
+            log('Application version mismatch');
+            $(document).trigger('app.version.mismatch');
+          }
+
+          if(ext.context) {
+            var c = ext.context;
+            if(c.troupe) context.setTroupe(c.troupe);
+            if(c.user) context.setUser(c.user);
+          }
+        }
         if(clientId !== message.clientId) {
           clientId = message.clientId;
           log("Realtime reestablished. New id is " + message.clientId);
@@ -86,7 +104,7 @@ define([
       var snapshot = message.ext.snapshot;
 
       if(listeners) {
-        for(var i = 0; i < listeners.length; i++) { listeners[i](snapshot); };
+        for(var i = 0; i < listeners.length; i++) { listeners[i](snapshot); }
       }
     }
 
@@ -121,26 +139,13 @@ define([
   };
 
   function createClient() {
-    var c = context().websockets;
-    /*
-    if you find this, remove?
-    if(!c) {
-      log('Websockets configuration not found, defaulting');
-      c = {
-        fayeUrl: '/faye',
-        options: {
-          interval: 10
-        }
-      };
-    }
-    */
-
+    var c = context.env('websockets');
     var client = new Faye.Client(c.fayeUrl, c.options);
 
-    if(c.disable) {
-      for(var i = 0; i < c.length; i++) {
-        client.disable(c.disable[i]);
-      }
+    // Disable websocket on Mobile due to iOS crash bug
+    var userAgent = window.navigator.userAgent;
+    if(userAgent.indexOf('Mobile') >= 0) {
+      client.disable('websocket');
     }
 
     client.addExtension(new ClientAuth());
@@ -181,8 +186,6 @@ define([
     // TODO: this stuff below really should find a better home
     if(context.getTroupeId()) {
       client.subscribe('/troupes/' + context.getTroupeId(), function(message) {
-        log("Troupe Subscription!", message);
-
         if(message.notification === 'presence') {
           if(message.status === 'in') {
             $(document).trigger('userLoggedIntoTroupe', message);
@@ -194,9 +197,13 @@ define([
       });
     }
 
-
-    client.connect(function() {});
-
+    if(context.getUserId()) {
+      client.subscribe('/user/' + context.getUserId(), function(message) {
+        if (message.notification === 'user_notification') {
+          appEvents.trigger('user_notification', message);
+        }
+      });
+    }
 
     return client;
   }

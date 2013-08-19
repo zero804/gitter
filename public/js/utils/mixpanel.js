@@ -28,17 +28,24 @@ define([
       h=['disable','track','track_pageview','track_links', 'track_forms','register','register_once','unregister','identify','alias','name_tag','set_config', 'people.set','people.set_once','people.increment','people.track_charge','people.append'];
 
       for(e=0;e<h.length;e++)
-        d(g,h[e]);a._i.push([b,c,f])
+        d(g,h[e]);a._i.push([b,c,f]);
       };
     a.__SV=1.2;
     })(document,mixpanel);
 
     window.mixpanel = mixpanel;
 
-    mixpanel.init(context().mixpanelToken);
+    mixpanel.init(context.env('mixpanelToken'));
     if (context.isAuthed()) {
-      mixpanel.identify(context.getUserId());
-      mixpanel.name_tag(context.getUser().username);
+      var userId = context.getUserId();
+      if(userId) {
+        mixpanel.identify(userId);
+      }
+
+      var user = context.getUser();
+      if(user) {
+        mixpanel.name_tag(user.username);
+      }
     }
 
     return mixpanel;

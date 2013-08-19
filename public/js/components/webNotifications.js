@@ -2,68 +2,42 @@
 define([
   'jquery',
   'utils/context',
-  './realtime',
-  'handlebars',
+  'hbs!./tmpl/notification',
+  'utils/appevents',
   'log!web-notifications',
+  'require',
   './notify' // No ref
-], function($, context, realtime, handlebars, log){
+], function($, context, template, appEvents, log, require){
   "use strict";
 
   var notifications = $('<div id="notification-center" class="notification-center"></div>').appendTo('body');
 
-  if(context.isAuthed()) {
-    // notifications for cross troupe chat messages
-    realtime.subscribe('/user/' + context.getUserId(), function(message) {
-      if (message.notification === 'user_notification') {
+  appEvents.on('user_notification', function(message) {
+    if(message.troupeId && message.troupeId === context.getTroupeId()) {
+      return;
+    }
 
-        if(message.troupeId === context.getTroupeId()) {
-          return;
-        }
-
-        // log("Got a user_notification event");
-        var tmpl = handlebars.compile('<a href="{{link}}"><div class="notification-header">{{{title}}}</div><div class="notification-text">{{{text}}}</div></a>');
-        notifications.notify({
-          content: tmpl({
-            link: message.link,
-            title: message.title,
-            text: message.text
-          })
-        });
-      }
+    notifications.notify({
+      content: template({
+        link: message.link,
+        title: message.title,
+        text: message.text
+      })
     });
-  }
+  });
 
-/*
-  // notify for a reload when new versions of the front end are deployed
-  setTimeout(function() {
-    // start in a timeout so that the first load of the page doesn't cause a check
-    $(document).on('realtime:up', function() {
-      // when the web socket goes down and comes back up, it means there was potentially a new version deployment.
-      // make the appcache check whether a reload is necessary.
-      $.getJSON('/version',
-        function(data) {
-          if(!data) return;
-          if (context().appVersion !== data.appVersion) {
-            notifications.notify({
-              id: 'app-update',
-              className: 'notification',
-              content: "<a href=\"javascript:window.location.reload()\">There is a new version of the application. Please click here to refresh.</a>"
-            });
-          }
-        }
-      );
+  $(document).on('app.version.mismatch', function() {
+    notifications.notify({
+      id: 'app-update',
+      className: 'notification',
+      content: "<a href=\"javascript:window.location.reload()\">There is a new version of the application. Please click here to refresh.</a>"
     });
-  }, 6000);
-*/
+  });
 
   // one notification when the connection to server is down
   // todo: this might also show when an invalid user operation is attempted.
   $(document).ajaxError(function(ev, jqxhr, settings /*, exception*/) {
     // for 401 unauthorized, refresh the page to log user's back in.
-
-    if (jqxhr.status === 401) {
-      return window.location.reload();
-    }
 
     require(['utils/tracking'], function(tracking) {
       tracking.trackError("Ajax Error", settings.url, jqxhr.status);
@@ -96,8 +70,14 @@ define([
     });
   });
 
-  // stop notifications when a user navigates away from the page
-  window.onbeforeunload = function() {
+  $(window).on('beforeunload', function(){
     $('#notification-center').hide();
+  });
+
+  return {
+    notify: function(options) {
+      notifications.notify(options);
+    }
   };
+
 });

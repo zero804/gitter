@@ -141,6 +141,7 @@ UserSchema.methods.hasPassword = function() {
   return !!this.passwordHash;
 };
 
+
 var UserLocationHistorySchema = new Schema({
   userId: ObjectId,
   timestamp: Date,
@@ -325,10 +326,13 @@ var ChatMessageSchema = new Schema({
   fromUserId: ObjectId,
   toTroupeId: ObjectId,  //TODO: rename to troupeId
   text: String,
+  urls: Array,
+  mentions: Array,
   sent: { type: Date, "default": Date.now },
   editedAt: { type: Date, "default": null },
   readBy: { type: [ObjectId] },
-  _tv: { type: 'MongooseNumber', 'default': 0 }
+  _tv: { type: 'MongooseNumber', 'default': 0 },
+  _md: Number,          // Meta parse version
 });
 ChatMessageSchema.index({ toTroupeId: 1, sent: -1 });
 ChatMessageSchema.schemaTypeName = 'ChatMessageSchema';
@@ -477,7 +481,9 @@ GeoPopulatedPlaceSchema.schemaTypeName = 'GeoPopulatedPlaceSchema';
   deviceName: String,
   appleToken: Buffer,
   tokenHash: String,
-  deviceType: { type: String, "enum": ['APPLE', 'APPLE-DEV', 'ANDROID', 'TEST']},
+  deviceType: { type: String, "enum": ['APPLE', 'APPLE-DEV', 'ANDROID', 'TEST', 'SMS']},
+  mobileNumber: { type: String },
+  enabled: { type: Boolean, default: true },
   appVersion: String,
   appBuild: String,
   timestamp: Date
@@ -485,6 +491,7 @@ GeoPopulatedPlaceSchema.schemaTypeName = 'GeoPopulatedPlaceSchema';
 PushNotificationDeviceSchema.index({ deviceId: 1 });
 PushNotificationDeviceSchema.index({ userId: 1 });
 PushNotificationDeviceSchema.index({ tokenHash: 1 });
+PushNotificationDeviceSchema.index({ mobileNumber: 1 });
 
 PushNotificationDeviceSchema.schemaTypeName = 'PushNotificationDeviceSchema';
 

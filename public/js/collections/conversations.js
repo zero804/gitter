@@ -1,12 +1,10 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'jquery',
   'underscore',
   'utils/context',
-  'backbone',
   './base',
   '../utils/momentWrapper'
-], function($, _, context, Backbone, TroupeCollections, moment) {
+], function(_, context, TroupeCollections, moment) {
   "use strict";
   var exports = {};
 
@@ -46,7 +44,7 @@ define([
       this.emailCollection = new exports.EmailCollection({ id: options.id });
       this.on('change:emails', this.resetEmails, this);
 
-      this.url = "/troupes/" + window.troupeContext.troupe.id + "/conversations/" + options.id;
+      this.url = "/troupes/" + context.getTroupeId() + "/conversations/" + options.id;
     },
 
     resetEmails: function() {

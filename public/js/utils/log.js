@@ -1,8 +1,12 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false, console:false */
 define(function() {
   "use strict";
 
-  var history = window.logHistory = [];
+  var history;
+  var DEBUG = false;
+  if (DEBUG) {
+    history = window.logHistory = [];
+  }
 
   function nullLog() {}
 
@@ -10,12 +14,14 @@ define(function() {
     console.log(a0);
   }
 
-  function consoleLog(msg) {
-    history.push(Array.prototype.join.call(arguments, ', '));
-    if(history.length > 500)
-      history.shift();
-
+  function consoleLog() {
     console.log.apply(console, Array.prototype.slice.apply(arguments));
+
+    if (DEBUG) {
+      history.push(Array.prototype.join.call(arguments, ', '));
+      if(history.length > 500)
+        history.shift();
+    }
   }
 
   if (typeof console == "undefined") return nullLog;

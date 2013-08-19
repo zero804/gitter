@@ -86,7 +86,9 @@ function UserStrategy(options) {
     }
 
     function getLocationDescription(named) {
-      return named.place + ", " + named.region;
+      var desc = (named.place) ? named.place : '';
+      desc += (named.region) ? ", " + named.region : '';
+      return desc;
     }
 
     var location;
@@ -508,6 +510,8 @@ function ChatStrategy(options)  {
       unread: options.currentUserId ? unreadItemStategy.map(item._id) : true,
       troupe: troupeStrategy ? troupeStrategy.map(item.toTroupeId) : undefined,
       readBy: item.readBy ? item.readBy.length : undefined,
+      urls: item.urls || [],
+      mentions: item.mentions || [],
       v: getVersion(item)
     };
 

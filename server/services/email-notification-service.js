@@ -5,8 +5,7 @@ var mailerService = require("./mailer-service");
 var nconf = require('../utils/config');
 var assert = require('assert');
 var url = require('url');
-var emailDomain = nconf.get("email:domain");
-var emailDomainWithAt = "@" + emailDomain;
+var appEvents = require('../app-events');
 
 module.exports = {
   sendNewTroupeForExistingUser: function (user, troupe) {
@@ -28,6 +27,14 @@ module.exports = {
   sendRequestAcceptanceToUser: function(user, troupe) {
     var troupeLink = nconf.get("email:emailBasePath") + "/" + troupe.uri;
 
+    appEvents.userNotification({
+      userId: user.id,
+      troupeId: troupe.id,
+      title: "Request accepted",
+      text: "You've been accepted into a Troupe",
+      link:  "/" + troupe.uri
+    });
+
     mailerService.sendEmail({
       templateFile: "requestacceptance",
       to: user.email,
@@ -42,8 +49,15 @@ module.exports = {
     });
   },
 
-  sendConnectAcceptanceToUser: function(fromUser, toUser, troupe) {
-    var troupeLink = url.resolve(nconf.get("email:emailBasePath"), troupe.url);
+  sendConnectAcceptanceToUser: function(fromUser, toUser, troupeUrl) {
+    var troupeLink = url.resolve(nconf.get("email:emailBasePath"), troupeUrl);
+
+    appEvents.userNotification({
+      userId: fromUser.id,
+      title: "Invite accepted",
+      text: "You are now connected to " + toUser.displayName,
+      link:  troupeUrl
+    });
 
     mailerService.sendEmail({
       templateFile: "connectacceptance",

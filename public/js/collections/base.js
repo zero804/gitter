@@ -4,12 +4,15 @@ define([
   'underscore',
   'utils/context',
   'backbone',
+  'utils/appevents',
   'components/realtime',
   'log!collections'
-], function($, _, context, Backbone, realtime, log) {
+], function($, _, context, Backbone, appEvents, realtime, log) {
   "use strict";
 
-  var exports = {};
+  var exports = {
+    firstLoad: false
+  };
 
   exports.Model = Backbone.Model.extend({
     constructor: function() {
@@ -97,14 +100,18 @@ define([
     modelName: '',
     constructor: function(models, options) {
       Backbone.Collection.prototype.constructor.call(this, models, options);
-
       if(!this.url) {
-        this.url = "/troupes/" + context.getTroupeId() + "/" + this.nestedUrl;
+        var troupeId = options && options.troupeId || context.getTroupeId();
+        this.url = "/troupes/" + troupeId + "/" + this.nestedUrl;
       }
 
       this._loading = false;
 
       this.once('reset sync', this._onInitialLoad, this);
+      if (this.length > 0) {
+        triggerFirstLoad();
+      }
+
 
       this.on('sync', this._onSync, this);
       this.on('request', this._onRequest, this);
@@ -135,6 +142,7 @@ define([
     _onInitialLoad: function() {
       if(this._initialLoadCalled) return;
       this._initialLoadCalled = true;
+      triggerFirstLoad();
 
       $('#' + this.modelName + '-amuse').hide('fast', function() {
         $(this).remove();
@@ -154,7 +162,10 @@ define([
       });
 
       realtime.registerForSnapsnots(this.url, function(snapshot) {
-        self.reset(snapshot, { parse: true });
+        self.trigger('request');
+        self.set(snapshot, { parse: true, remove: true, add: true, merge: true });
+        self._onInitialLoad();
+        self.trigger('sync');
       });
 
       this.subscription.errback(function(error) {
@@ -165,6 +176,10 @@ define([
 
     isLoading: function() {
       return this._loading;
+    },
+
+    hasLoaded: function() {
+      return this._initialLoadCalled;
     },
 
     unlisten: function() {
@@ -313,6 +328,14 @@ define([
     return function(left, right) {
       return -1 * comparatorFunction(left, right);
     };
+  }
+
+  // used to indicate that the first collection has been loaded, ie loading screen can be hidden
+  function triggerFirstLoad() {
+    if(!exports.firstLoad) {
+      exports.firstLoad = true;
+      appEvents.trigger('firstCollectionLoaded');
+    }
   }
 
   return exports;

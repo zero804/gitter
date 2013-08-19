@@ -1,6 +1,4 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-
-// TODO: Better transition to request confirm page
 define([
   'jquery',
   'underscore',
@@ -10,8 +8,10 @@ define([
   'log!connect-user-modal-view',
   'utils/validate-wrapper',
   'jquery-placeholder' // No reference
-], function($, _, context, TroupeViews, template, log, validation) {
+], function($, _, context, TroupeViews, template, log) {
   "use strict";
+
+  // TODO: Better transition to request confirm page
 
   return TroupeViews.Base.extend({
     template: template,
@@ -25,7 +25,6 @@ define([
     },
 
     getRenderData: function() {
-      var c = context();
       var troupe = context.getTroupe();
       var homeUser = context.getHomeUser();
       var displayName = homeUser.displayName || '';
@@ -34,7 +33,7 @@ define([
         homeUser: homeUser,
         firstName: firstName,
         email: this.initialEmail,
-        homeUrl: c.homeUrl,
+        homeUrl: context.env('homeUrl'),
         troupeUri: troupe.uri,
         authenticated: this.authenticated,
         isOneToOne: troupe && troupe.oneToOne
@@ -59,7 +58,7 @@ define([
 
     goBack : function () {
       // this is probably not correct should be close modal
-      window.location.href = context().homeUrl;
+      window.location.href = context.env('homeUrl');
     },
 
     showLoginForm: function() {

@@ -299,10 +299,9 @@ function eyeBallsOffTroupe(userId, socketId, troupeId, callback) {
     }
 
     var userInTroupeCount = parseInt(result[1], 10);
-    var userHasLeftTroupe = userInTroupeCount === 0;
     var totalUsersInTroupe = result[2];
 
-    sendAppEventsForUserEyeballsOffTroupe(userInTroupeCount, totalUsersInTroupe, userId, troupeId, socketId)
+    sendAppEventsForUserEyeballsOffTroupe(userInTroupeCount, totalUsersInTroupe, userId, troupeId, socketId);
 
     return callback();
 

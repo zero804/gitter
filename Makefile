@@ -5,6 +5,7 @@ MOCHA_REPORTER =
 DATA_MAINT_SCRIPTS = $(shell find ./scripts/datamaintenance -name '*.sh')
 SAUCELABS_REMOTE = http://trevorah:d6b21af1-7ae7-4bed-9c56-c5f9d290712b@ondemand.saucelabs.com:80/wd/hub
 BETA_SITE = http://beta.trou.pe
+BASE_URL = http://localhost:5000
 
 clean:
 	rm -rf public-processed/ output/ coverage/ cobertura-coverage.xml html-report/
@@ -39,8 +40,11 @@ test-xunit:
 		$(TESTS)
 
 test-in-browser:
+	node_modules/.bin/mocha-phantomjs $(BASE_URL)/test/in-browser/test
+
+test-in-browser-xunit:
 	mkdir -p output/test-reports
-	test/in-browser/run-phantom-tests.sh
+	node_modules/.bin/mocha-phantomjs -R xunit $(BASE_URL)/test/in-browser/test > ../../output/test-reports/in-browser.xml
 
 test-coverage:
 	rm -rf ./coverage/ cobertura-coverage.xml
@@ -84,9 +88,14 @@ npm:
 	npm prune
 	npm install
 
-grunt:
+lint-configs: config/*.json
+	set -e && for i in $?; do (./node_modules/.bin/jsonlint $$i > /dev/null); done
+
+grunt: clean lint-configs
 	mkdir output
+	cp -R public/ public-processed/
 	grunt -no-color process
+	./build-scripts/gzip-processed.sh
 
 version-files:
 	@echo GIT COMMIT: $(GIT_COMMIT)
@@ -127,7 +136,7 @@ validate-source: search-js-console
 
 continuous-integration: clean validate-source npm grunt version-files upgrade-data init-test-data test-xunit test-coverage tarball
 
-post-deployment-tests: test-in-browser end-to-end-test-saucelabs-chrome end-to-end-test-saucelabs-ie9
+post-deployment-tests: test-in-browser-xunit end-to-end-test-saucelabs-chrome end-to-end-test-saucelabs-ie9
 
 build: clean validate-source npm grunt version-files upgrade-data test-xunit
 

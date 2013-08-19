@@ -26,12 +26,11 @@ define([
     },
 
     getRenderData: function() {
-      var c = context();
       var troupe = context.getTroupe();
 
       return {
         email: this.initialEmail,
-        homeUrl: c.homeUrl,
+        homeUrl: context.env('homeUrl'),
         appUri: troupe.uri,
         authenticated: this.authenticated,
         isOneToOne: troupe && troupe.oneToOne
@@ -54,7 +53,7 @@ define([
     },
 
     goBack : function () {
-      window.location.href = context().homeUrl;
+      window.location.href = context.env('homeUrl');
     },
 
     validateForm : function () {
