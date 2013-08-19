@@ -1,21 +1,22 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'jquery',
+  'underscore',
   'backbone',
-  'marionette',
+  'views/base',
   'utils/context',
   'fineuploader',
   'hbs!./tmpl/rightToolbar',
   'collections/instances/integrated-items',
-  'collections/instances/troupes',
   'views/request/requestView',
   'views/invite/inviteView',
   'views/file/fileView',
   'views/conversation/conversationView',
   'views/people/peopleCollectionView'
-], function(Backbone, Marionette, context, qq, rightToolbarTemplate, itemCollections, troupeCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView) {
+], function($, _, Backbone, TroupeViews, context, qq, rightToolbarTemplate, itemCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView) {
   "use strict";
 
-  return Backbone.Marionette.Layout.extend({
+  var RightToolbarLayout = Backbone.Marionette.Layout.extend({
     tagName: "span",
     template: rightToolbarTemplate,
 
@@ -37,7 +38,7 @@ define([
 
     initialize: function() {
       this.model = new Backbone.Model({
-        troupeEmailAddress: context().troupeUri + '@' + context().baseServer,
+        troupeEmailAddress: context().troupeUri + '@' + context.env('baseServer'),
         isOneToOne: context.getTroupe().oneToOne
       });
     },
@@ -97,27 +98,26 @@ define([
       var userCollection = itemCollections.users;
 
       // Request View
-      this.requests.show(new RequestView({ collection: requestCollection }));
+      this.show('requests', new RequestView({ collection: requestCollection }));
 
       // Invites View
-      this.invites.show(new InviteView({ collection: invitesCollection }));
+      this.show('invites', new InviteView({ collection: invitesCollection }));
 
       // File View
-      this.files.show(new FileView({ collection: fileCollection }));
+      this.show('files', new FileView({ collection: fileCollection }));
 
       // Conversation View
-      if (!window.troupeContext.troupe.oneToOne) {
+      if (!context.inOneToOneTroupeContext()) {
         var conversationView = new ConversationView({
           collection: conversationCollection
         });
-        self.conversations.show(conversationView);
-      }
-      else {
+        self.show('conversations', conversationView);
+      } else {
         $('#mail-list').hide();
       }
 
       // People View
-      this.people.show(new PeopleCollectionView({ collection: userCollection }));
+      this.show('people', new PeopleCollectionView({ collection: userCollection }));
 
     },
 
@@ -159,5 +159,8 @@ define([
 
   });
 
+  _.extend(RightToolbarLayout.prototype, TroupeViews.DelayedShowLayoutMixin);
+
+  return RightToolbarLayout;
 
 });

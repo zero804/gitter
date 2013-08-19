@@ -138,47 +138,35 @@ var userService = {
       });
   },
 
-  saveLastVisitedTroupeforUser: function(userId, troupe, callback) {
-    winston.verbose("Saving last visited Troupe for user: ", userId);
-    userService.findById(userId, function(err, user) {
-      if(err) return callback(err);
-      if(!user) return callback("User not found");
+  /**
+   * Update the last visited troupe for the user, sending out appropriate events
+   * Returns a promise of nothing
+   */
+  saveLastVisitedTroupeforUserId: function(userId, troupe, callback) {
+    winston.verbose("Saving last visited Troupe for user: " + userId+ " to troupe " + troupe.id);
 
-      var troupeId = troupe.id;
+    var troupeId = troupe.id;
+    var lastAccessTime = new Date();
 
-      var lastAccessTime = new Date();
-      var setOp = {};
-      setOp['troupes.' + troupeId] = lastAccessTime;
+    var setOp = {};
+    setOp['troupes.' + troupeId] = lastAccessTime;
 
-      // Update the model, don't wait for a callback
-      persistence.UserTroupeLastAccess.update(
-        { userId: userId },
-        { $set: setOp },
-        { upsert: true },
-        function(err) {
-          if(err) {
-            winston.error('Error updating usertroupelastaccess: ' + err, { exception: err });
-          }
-        });
+    return Q.all([
+        // Update UserTroupeLastAccess
+        persistence.UserTroupeLastAccess.updateQ(
+           { userId: userId },
+           { $set: setOp },
+           { upsert: true }),
+        // Update User
+        persistence.User.updateQ({ _id: userId }, { $set: { lastTroupe: troupeId }})
+      ])
+      .then(function() {
+        // XXX: lastAccessTime should be a date but for some bizarre reason it's not
+        // serializing properly
+        appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
+      })
+      .nodeify(callback);
 
-      // XXX: lastAccessTime should be a date but for some bizarre reason it's not
-      // serializing properly
-      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
-
-      // Don't save the last troupe for one-to-one troupes
-      if(troupe.oneToOne) {
-        return callback();
-      }
-
-      if (user.lastTroupe !== troupeId) {
-        user.lastTroupe = troupeId;
-        user.save(function(err) {
-          callback(err);
-        });
-      } else {
-        callback();
-      }
-    });
   },
 
   /**

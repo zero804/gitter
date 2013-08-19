@@ -1,13 +1,13 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var winston = require('winston');
+var winston   = require('winston');
 var appEvents = require("../app-events");
-var bayeux = require('./bayeux');
+var bayeux    = require('./bayeux');
+var ent       = require('ent');
 
 exports.install = function() {
   var bayeuxClient = bayeux.client;
-  var bayeuxEngine = bayeux.engine;
 
   appEvents.localOnly.onDataChange2(function(data) {
 
@@ -68,7 +68,7 @@ TODO: disconnect clients who've been removed from a troupe
       var message = {
          notification: "user_notification",
          title: title,
-         text: text,
+         text: ent.decode(text),
          link: link,
          troupeId: troupeId,
          sound: sound

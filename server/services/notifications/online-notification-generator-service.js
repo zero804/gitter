@@ -19,8 +19,8 @@ function compile(map) {
 
 /* TODO: externalize and internationalise this! */
 var templates = compile({
-  "chat": "{{{troupe.name}}}\n{{{fromUser.displayName}}}: {{{text}}}",
-  "file": "{{{troupe.name}}}\nNew file {{{fileName}}} uploaded by {{{latestVersion.creatorUser.displayName}}}",
+  "chat": "{{#if troupe.oneToOne}}{{{text}}}{{else}}{{{fromUser.displayName}}}: {{{text}}}{{/if}}",
+  "file": "{{#if troupe.oneToOne}}New file {{{fileName}}} uploaded{{else}}New file {{{fileName}}} uploaded by {{{latestVersion.creatorUser.displayName}}}{{/if}}",
   "request": "{{{user.displayName}}} requested access to join {{{troupe.name}}}"
 });
 
@@ -74,21 +74,6 @@ function hashNotificationsByType(notifications) {
   return result;
 }
 
-function getTroupeUrl(serilizedTroupe, senderUserId) {
-  if(!serilizedTroupe) return null;
-
-  /* The URL for non-oneToOne troupes is the trivial case */
-  if(!serilizedTroupe.oneToOne) {
-    return "/" + serilizedTroupe.uri;
-  }
-
-  if(!senderUserId) {
-    winston.warn("Something has gone wrong. A message to a one-to-one troupe, yet we don't know who the sender is");
-    return null;
-  }
-
-  return "/one-one/" + senderUserId;
-}
 
 /* Takes a whole lot of notifications for the same type of message, and turns them into messages */
 function createNotificationMessage(itemType, itemIds, callback) {
@@ -116,11 +101,26 @@ function createNotificationMessage(itemType, itemIds, callback) {
             senderUserId = senderStrategy(data);
           }
 
+          // Catch-22, we can't figure out the sender until we've done serialization
+          // but we can't calculate the troupeUrl (needed _for_ serialization)
+          // until we've got the sender. This is only a problem for one to one troupes
+          var url = data.troupe.url;
+          if(!url) {
+            url = data.troupe.urlUserMap && data.troupe.urlUserMap[senderUserId];
+            data.troupe.url = url;
+          }
+
+          var name = data.troupe.name;
+          if(!name) {
+            name = data.troupe.nameUserMap && data.troupe.nameUserMap[senderUserId];
+            data.troupe.name = name;
+          }
+
           // TODO: sort this ugly hack out
           // This will fit nicely into the new serializer stuff
           if(data.versions) { data.latestVersion = data.versions[data.versions.length - 1]; }
-          data.troupeUrl = getTroupeUrl(data.troupe, senderUserId);
-          console.log(data);
+          data.troupeUrl = url;
+
           var d = {
             text: template(data),
             sound: 'notify.caf',

@@ -1,5 +1,5 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
-/*global describe:true, it:true, before:false */
+/*global describe:true, it:true, before:false, after:false */
 'use strict';
 
 var testRequire = require('./../test-require');
@@ -72,6 +72,7 @@ describe('Contact Service', function() {
       contactService.ingestGoogleContacts(user, googleJSON, function() {
         persistence.Contact.find({'userId': user.id}).exec(function(err, contacts) {
           if(err) return done(err);
+          assert(contacts.length == 1);
           assert(contacts[0].emails[0] == 'hackers.are.rockstars@gmail.com', 'Failed to import.');
           done();
         });

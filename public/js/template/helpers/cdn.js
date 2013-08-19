@@ -1,14 +1,9 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
-require([
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
+define([
+  'utils/cdn',
   'handlebars'
-], function ( Handlebars ) {
+], function (cdn, Handlebars ) {
   "use strict";
 
-  function cdn (url) {
-    return "/" + url;
-  }
-
-  Handlebars.registerHelper( 'cdn', cdn );
-  return cdn;
-
+  Handlebars.registerHelper( 'cdn', cdn);
 });

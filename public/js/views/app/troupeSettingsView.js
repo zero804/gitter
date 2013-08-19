@@ -1,5 +1,7 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'jquery',
+  'underscore',
   'utils/context',
   'views/base',
   'collections/instances/troupes',
@@ -7,8 +9,15 @@ define([
   'hbs!./tmpl/troupeSettingsTemplate',
   'log!troupe-settings-view',
   'utils/validate-wrapper'
-], function(context, TroupeViews, troupeCollections, itemCollections, troupeSettingsTemplate, log, validation) {
+], function($, _, context, TroupeViews, troupeCollections, itemCollections, troupeSettingsTemplate, log, validation) {
   "use strict";
+
+
+  // Stop the app router from reloading on troupe 'remove' event
+  function removeTroupeCollectionRemoveListeners() {
+    var troupeCollection = troupeCollections.troupes;
+    troupeCollection.off("remove");
+  }
 
   var View = TroupeViews.Base.extend({
     template: troupeSettingsTemplate,
@@ -43,14 +52,12 @@ define([
       var self = this;
 
       if (!this.canDelete()) {
-        return alert("You need to be the only person in the troupe to delete it.");
+        return window.alert("You need to be the only person in the troupe to delete it.");
       }
 
       TroupeViews.confirm("Are you sure you want to delete this troupe?", {
         'click #ok': function() {
-
-          window.troupeContext.troupeIsDeleted = true;
-
+          removeTroupeCollectionRemoveListeners();
           $.ajax({
             url: '/troupes/' + self.model.id,
             type: "DELETE",
@@ -73,20 +80,21 @@ define([
       var errMsg = "You cannot leave a troupe if you are the only member, rather delete it.";
 
       if (!this.canLeave()) {
-        return alert(errMsg);
+        return window.alert(errMsg);
       }
 
       TroupeViews.confirm("Are you sure you want to remove yourself from this troupe?", {
         'click #ok': function() {
+          removeTroupeCollectionRemoveListeners();
           $.ajax({
             url: "/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
             data: "",
             type: "DELETE",
             success: function() {
-              window.location = context().homeUrl;
+              window.location = '/last';
             },
             error: function() {
-              alert(errMsg);
+              window.location = '/last';
             },
             global: false
           });
@@ -97,7 +105,7 @@ define([
 
     getRenderData: function() {
       return _.extend({},
-        window.troupeContext.troupe, {
+        context.getTroupe(), {
         canLeave: this.canLeave(),
         canDelete: this.canDelete()
       });
@@ -137,13 +145,14 @@ define([
       var troupeName = this.$el.find('input[name=name]').val().trim();
       var self = this;
 
-      if(window.troupeContext.troupe.name === troupeName) {
+      if(context.getTroupe().name === troupeName) {
         self.dialog.hide();
         self.dialog = null;
         return;
       }
 
-      window.troupeContext.troupe.name = troupeName;
+      // Why are we doing this again?
+      context.getTroupe().name = troupeName;
 
       $.ajax({
         url: '/troupes/' + context.getTroupeId(),

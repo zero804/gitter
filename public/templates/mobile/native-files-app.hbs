@@ -1,28 +1,17 @@
 <!doctype html>
-<html class="no-js" lang="en" {{#useAppCache}}manifest="/mobile.appcache"{{/useAppCache}}>
+<html lang="en" {{#if appCache}}manifest="{{appCache}}"{{/if}}>
 <head>
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
 	<meta charset="utf-8">
 
-	<title>{{troupeName}} - Troupe</title>
+	<title>Troupe</title>
 
   <link rel="stylesheet" href='/bootstrap/css/trpMobileFiles.css'>
 
-  <script type="text/javascript">
-  window.troupeContext = {{{troupeContext}}};
-  {{#if data}}
-  window.troupePreloads = {{{data}}};
-  {{/if}}
-  </script>
+  {{{ generateTroupeContext troupeContext accessToken=accessToken page='files' }}}
 
-  {{>require_wrapper}}
-
-  {{{bootScript "routers/mobile/native/files-router" skipCdn=true }}}
-
-    <!-- Le fav and touch icons -->
-    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="shortcut icon" href='{{ cdn "images/2/favicon8.ico"}}'>
 
 </head>
 <body>
@@ -40,5 +29,9 @@
       </div>
     </div>
   </div>
+
+  {{>require_wrapper}}
+  {{{bootScript "routers/mobile/native/files-router" }}}
+
 </body>
 </html>

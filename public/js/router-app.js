@@ -20,12 +20,14 @@ require([
   'views/shareSearch/shareSearchView',
   'views/signup/createTroupeView',
   'views/signup/usernameView',
-  'views/app/troupeHeaderView',
+  'views/app/headerView',
   'views/app/troupeSettingsView',
   'views/toolbar/troupeMenu',
   'views/invite/reinviteModal',
   'utils/router',
+  'components/unread-items-client',
   'components/webNotifications', // No ref
+  'components/desktopNotifications', // No ref
   'components/errorReporter',  // No ref
   'filtered-collection', // No ref
   'components/dozy', // Sleep detection No ref
@@ -34,8 +36,8 @@ require([
 ], function($, Backbone, context, AppIntegratedView, chatInputView, ChatCollectionView,
             itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, shareSearchView,
-            createTroupeView, UsernameView, TroupeHeaderView,
-            troupeSettingsView, TroupeMenuView, InviteModal, Router /*, errorReporter , FilteredCollection */) {
+            createTroupeView, UsernameView, HeaderView,
+            troupeSettingsView, TroupeMenuView, InviteModal, Router, unreadItemsClient /*, errorReporter , FilteredCollection */) {
   "use strict";
 
   // Make drop down menus drop down
@@ -48,18 +50,14 @@ require([
   troupeCollection.on("remove", function(model) {
     if(model.id == context.getTroupeId()) {
       // TODO: tell the person that they've been kicked out of the troupe
-      if(window.troupeContext.troupeIsDeleted) {
-        window.location.href = '/last';
-      } else {
-        window.location.reload();
-      }
+      window.location.reload();
     }
   });
 
 
   var appView = new AppIntegratedView({ });
   appView.leftMenuRegion.show(new TroupeMenuView({ }));
-  appView.headerRegion.show(new TroupeHeaderView  ());
+  appView.headerRegion.show(new HeaderView());
   appView.rightToolbarRegion.show(new RightToolbarView());
 
   $('.nano').nanoScroller({ preventPageScrolling: true });
@@ -71,6 +69,10 @@ require([
     collection: itemCollections.chats,
     userCollection: itemCollections.users
   }).render();
+
+  unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
+  unreadItemsClient.monitorViewForUnreadItems($('#toolbar-frame .nano'));
+
 
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
