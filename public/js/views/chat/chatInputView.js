@@ -1,13 +1,15 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
+  'underscore',
   'utils/context',
   'views/base',
   'utils/appevents',
   'hbs!./tmpl/chatInputView',
   'utils/momentWrapper',
+  'utils/safe-html',
   'jquery-placeholder' // No ref
-], function($, context, TroupeViews, appEvents, template, moment) {
+], function($, _, context, TroupeViews, appEvents, template, moment, safeHtml) {
   "use strict";
 
   var PAGE_SIZE = 50;
@@ -87,14 +89,7 @@ define([
         var newHeight = currentLines * lht;
 
         this.$el.height(newHeight);
-        //var frameChat = $('#frame-chat'), isChild = frameChat.find(this.el).length;
-        //if (!isChild) {
-          chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
-          //$('#content-frame').css('bottom', chatPadding);
-        //}
-        //if (wasAtBottom) {
-        //  this.scrollDelegate.scrollToBottom();
-        //}
+        chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
       }
     },
 
@@ -118,8 +113,7 @@ define([
     },
 
     send: function() {
-      this.trigger('save', this.$el.val());
-
+      this.trigger('save', safeHtml(this.$el.val()));
 
       this.$el.val('');
     }
