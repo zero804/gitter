@@ -1,8 +1,17 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-
 var TwitterText   =  require('./twitter-text');
+
+/*
+ * Hey Trouper!
+ *
+ * Bump the version if you modify the behaviour of TwitterText.
+ *
+ */
+exports.metaDataVersion = 2;
+
+
 
 /** This is a nasty exponential algo, but should do us well except if people drop thousands of links into a single message */
 function overlapWithIndices(urls, begin, end) {
@@ -48,10 +57,8 @@ exports.extractUrlsWithIndices = function(text) {
 
 };
 
-/*
- * Hey Trouper!
- *
- * Bump the version if you modify the behaviour of TwitterText.
- *
- */
-exports.version = 2;
+/** For the moment, just pass this on to twitter */
+exports.extractMentionsWithIndices = function(text) {
+  return TwitterText.extractMentionsWithIndices(text);
+};
+

@@ -74,7 +74,8 @@
     "useragent": "2.0.6",
     "express3-handlebars": "~0.4.1",
     "passport-google-oauth": "~0.1.5",
-    "easynexmo": "~0.3.1"
+    "easynexmo": "~0.3.1",
+    "ent": "~0.1.0"
   },
   "devDependencies": {
     "proxyquire": "0.4.0",
