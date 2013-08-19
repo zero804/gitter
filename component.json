@@ -27,8 +27,7 @@
     "fine-uploader": "https://github.com/Troupe/fine-uploader/archive/master.zip",
     "almond": "0.2.5",
     "requirejs": "http://requirejs.org/docs/release/2.1.5/minified/require.js",
-    "zepto": "~1.0.0",
-    "hopscotch": "https://github.com/linkedin/hopscotch/archive/master.zip"
+    "zepto": "~1.0.0"
   },
   "devDependencies": {
     "assert": "~0.0.1",

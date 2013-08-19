@@ -370,15 +370,6 @@ module.exports = function( grunt ) {
         },
         exports: 'Faye'
       },
-      hopscotch: {
-        files: {
-          'output/client-libs/hopscotch/hopscotch-0.11-amd.js': ['output/client-libs/hopscotch/js/hopscotch-0.1.1' + (min ? '.min' : '') + '.js']
-        },
-        modules: {
-
-        },
-        exports: 'window.hopscotch'
-      },
       nanoscroller: {
         files : {
           'output/client-libs/nanoscroller/jquery.nanoscroller.js': ['output/client-libs/nanoscroller/bin/javascripts/jquery.nanoscroller' + (min ? '.min' : '') + '.js']
