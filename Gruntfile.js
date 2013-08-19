@@ -89,6 +89,15 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
+                  name: "homepage-mobile",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
                   name: "routers/mobile/native/chat-router",
                   include: [
                     "utils/tracking",
@@ -98,7 +107,16 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "routers/mobile/web/mobile-app-router",
+                  name: "mobile-app",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "mobile-userhome",
                   include: [
                     "utils/tracking",
                     "views/widgets/avatar",
