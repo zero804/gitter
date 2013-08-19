@@ -328,7 +328,7 @@ var ChatMessageSchema = new Schema({
   text: String,
   urls: Array,
   mentions: Array,
-  metadataVersion: String,
+  metadataVersion: Number,
   sent: { type: Date, "default": Date.now },
   editedAt: { type: Date, "default": null },
   readBy: { type: [ObjectId] },

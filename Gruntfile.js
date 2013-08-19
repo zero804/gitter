@@ -134,25 +134,25 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "router-login",
-                  include: [
+                  name: "router-login",
+                  include: [
                     "utils/tracking",
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
+                    "views/widgets/avatar"
+                  ],
+                  exclude: ["core-libraries"]
+              },
                {
-                  name: "complete-profile",
-                  include: [
+                  name: "complete-profile",
+                  include: [
                     "utils/tracking",
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
+                    "views/widgets/avatar"
+                  ],
+                  exclude: ["core-libraries"]
+              },
               {
-                  name: "login",
-                  exclude: ["core-libraries"]
-             }
+                  name: "login",
+                  exclude: ["core-libraries"]
+             }
           ]
 
         }
@@ -180,7 +180,7 @@ module.exports = function( grunt ) {
       "native-files-router": createClosureConfig('routers/mobile/native/files-router'),
       "native-conversations-router": createClosureConfig('routers/mobile/native/conversations-router'),
       "native-people-router": createClosureConfig('routers/mobile/native/people-router'),
-      "router-login": createClosureConfig('router-login'),
+      "router-login": createClosureConfig('router-login'),
       "complete-profile": createClosureConfig('complete-profile'),
       "login": createClosureConfig('login')
     },
@@ -259,7 +259,9 @@ module.exports = function( grunt ) {
         files: {
           "public/bootstrap/css/trp3.css" : "public/bootstrap/less/trp3.less",
           "public/bootstrap/css/mtrp.css": "public/bootstrap/less/mtrp.less",
+          "public/bootstrap/css/signup.css": "public/bootstrap/less/signup.less",
           "public/bootstrap/css/trpHomePage.css": "public/bootstrap/less/trpHomePage.less",
+          "public/bootstrap/css/homepage-mobile.css": "public/bootstrap/less/homepage-mobile.less",
           "public/bootstrap/css/trpChat.css": "public/bootstrap/less/trpChat.less",
           "public/bootstrap/css/trpFiles.css": "public/bootstrap/less/trpFiles.less",
           "public/bootstrap/css/trpMails.css": "public/bootstrap/less/trpMails.less",

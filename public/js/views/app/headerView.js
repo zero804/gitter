@@ -58,7 +58,8 @@ define([
         headerTitle: troupe && troupe.name || user.displayName,
         isTroupe: !!troupe,
         oneToOne: context.inOneToOneTroupeContext(),
-        user: user
+        user: user,
+        favourite: troupe && troupe.favourite
       };
 
     },

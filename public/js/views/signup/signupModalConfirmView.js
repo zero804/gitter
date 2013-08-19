@@ -2,27 +2,22 @@
 
 define([
   'jquery',
-  'underscore',
-  'views/base',
+  'backbone',
   'hbs!./tmpl/signupModalConfirmView'
-], function($, _, TroupeViews, template) {
+], function($, Backbone, template) {
   "use strict";
 
-  return TroupeViews.Base.extend({
-    template: template,
+  return Backbone.View.extend({
 
-    initialize: function(options) {
-      if(!options) options = {};
-      this.data = options.data;
-      _.bindAll(this, 'onResendLinkClicked');
-    },
+    template: template,
 
     events: {
       "click .button-resend": "onResendLinkClicked"
     },
 
-    getRenderData: function() {
-      return this.data;
+    render: function() {
+      this.$el.html(this.template({email: this.options.email}));
+      return this;
     },
 
     onResendLinkClicked: function(e) {
@@ -32,10 +27,10 @@ define([
         url: "/resendconfirmation",
         dataType: "json",
         data: {
-          email: this.data.email
+          email: this.options.email
         },
         type: "POST",
-        success: function(data) {
+        success: function() {
           self.$el.find(".label-resendsuccess").show();
           self.$el.find(".label-signupsuccess").hide();
         }

@@ -5,11 +5,32 @@ var persistence   = require("./persistence-service"),
     collections   = require("../utils/collections"),
     troupeService = require("./troupe-service"),
     statsService  = require("./stats-service"),
-    TwitterText   =  require('../utils/twitter-text');
+    TwitterText   =  require('../utils/twitter-text'),
+    urlExtractor  = require('../utils/url-extractor');
+
 var ObjectID = require('mongodb').ObjectID;
 
 
+/* @const */
 var MAX_CHAT_EDIT_AGE_SECONDS = 300;
+
+/* @const */
+var HTML_ENTITIES = {
+  '&': '&amp;',
+  '>': '&gt;',
+  '<': '&lt;',
+  '"': '&quot;',
+  "'": '&#39;'
+};
+
+var SAFE_HTML_RE = /[&"'><]/g;
+
+// HTML escaping
+function safe(text) {
+  return text && text.replace(SAFE_HTML_RE, function(character) {
+    return HTML_ENTITIES[character];
+  });
+}
 
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   if(!troupe) return callback("Invalid troupe");
@@ -20,12 +41,14 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   chatMessage.fromUserId = user.id;
   chatMessage.toTroupeId = troupe.id;
   chatMessage.sent = new Date();
-  chatMessage.text = text;
+
+  text = safe(text);
+  chatMessage.text = safe(text);
 
   // Metadata
-  chatMessage.urls            = TwitterText.extractUrlsWithIndices(text);
+  chatMessage.urls            = urlExtractor.extractUrlsWithIndices(text);
   chatMessage.mentions        = TwitterText.extractMentionsWithIndices(text);
-  chatMessage.metadataVersion = TwitterText.version;
+  chatMessage.metadataVersion = urlExtractor.version;
 
   chatMessage.save(function (err) {
     if(err) return callback(err);
