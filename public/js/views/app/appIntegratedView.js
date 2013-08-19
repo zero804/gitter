@@ -111,11 +111,16 @@ define([
       });
 
       if ($(document).width() < 1250) {
-        $("#content-frame, #header-frame, #alert-content, #chat-input").animate({
+        $("#header-frame, #alert-content, #chat-input").animate({
           left: '+=100px'
         }, 350, function() {
         });
       }
+
+      $("#content-frame").animate({
+            paddingRight: '-=100px'
+          }, 350, function() {
+          });
 
       this.rightpanel = false;
     },
@@ -131,11 +136,15 @@ define([
 
         if ($(document).width() < 1250) {
 
-          $("#content-frame, #header-frame, #alert-content, #chat-input").animate({
+          $("#header-frame, #alert-content, #chat-input").animate({
             left: '-=100px'
           }, 350, function() {
           });
 
+          $("#content-frame").animate({
+            paddingRight: '+=100px'
+          }, 350, function() {
+          });
         }
 
         this.rightpanel = true;
