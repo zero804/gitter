@@ -31,8 +31,9 @@ var MAX_LINE_LENGTH = 30;
 var MAX_NOTIFICATION_TEXT = 120;
 var MAX_SMS_LENGTH = 160;
 
-var util = require('util');
-var _ = require('underscore');
+var util  = require('util');
+var _     = require('underscore');
+var ent   = require('ent');
 
 var NotificationMessageGenerator = function(options) {
   this.strategies = options.strategies;
@@ -139,7 +140,7 @@ NotificationMessageGenerator.prototype.fileItemGenerator = function(item) {
 
 NotificationMessageGenerator.prototype.chatItemGenerator = function(item) {
   var name = this.getShortName(item.fromUser.displayName);
-  return name + ': ' + item.text;
+  return name + ': ' + ent.decode(item.text);
 };
 
 module.exports = new NotificationMessageGenerator({
