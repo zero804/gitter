@@ -1228,8 +1228,8 @@ function acceptInviteForAuthenticatedUser(user, invite) {
     }
 
     // use and delete invite
-    statsService.event('invite_accepted', { userId: user.id, inviteId: invite.id});
-    winston.verbose("Invite accepted", { inviteId: invite.id });
+    statsService.event('invite_accepted', { userId: user.id, email: user.email, inviteId: invite.id, new_user: user.status !== 'ACTIVE' });
+    winston.verbose("Invite accepted for authd user", { inviteId: invite.id });
 
     // Either add the user or create a one to one troupe. depending on whether this
     // is a one to one invite or a troupe invite
@@ -1326,7 +1326,7 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
         .then(function(user) {
           // Invite is good to accept
 
-          statsService.event('invite_accepted', { userId: user.id, uri: troupeUri, new_user: user.status !== 'ACTIVE' });
+          statsService.event('invite_accepted', { userId: user.id, email: user.email, uri: troupeUri, new_user: user.status !== 'ACTIVE' });
           winston.verbose("Invite accepted", { confirmationCode: confirmationCode, troupeUri: troupeUri });
 
           var confirmOperation = null;
