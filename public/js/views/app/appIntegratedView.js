@@ -7,11 +7,13 @@ define([
   'log!appIntegratedView',
   'marionette',
   'views/signup/usernameView',
+  'views/profile/profileView',
   'views/app/uiVars',
+  'components/webNotifications',
   'components/modal-region',
   'bootstrap_tooltip',  // no ref
   "nanoscroller"        // no ref
-  ], function($, _, TroupeViews, context, log, Marionette, UsernameView, uiVars, modalRegion) {
+  ], function($, _, TroupeViews, context, log, Marionette, UsernameView, ProfileView, uiVars, notifications, modalRegion) {
   "use strict";
 
   var touchEvents = {
@@ -75,12 +77,37 @@ define([
         }, 100);
       });
 
-      this.ensureProfileIsUsernamed();
+      var profileCompleteTimeout = 60 * 1000;
+      setTimeout(function() {
+        self.ensureSignupIsComplete();
+      }, profileCompleteTimeout);
+    },
+
+    ensureSignupIsComplete: function() {
+      var self = this, noteId = 'completeSignup';
+      if (context().profileNotCompleted || !context().user.username) {
+        notifications.notify({
+          id: noteId,
+          content: "<a href='#'>Click here to complete the signup process</a>",
+          timeout: Infinity,
+          click: function() {
+            notifications.notify({ id: noteId, action: 'hide' });
+            self.ensureProfileIsComplete();
+            self.ensureProfileIsUsernamed();
+          }
+        });
+      }
+    },
+
+    ensureProfileIsComplete: function() {
+      if (context().profileNotCompleted) {
+        new ProfileView.Modal().show();
+      }
     },
 
     ensureProfileIsUsernamed: function() {
       var user = context.getUser();
-      if (user.username === null /* not undefined, in which case the user has not yet loaded */) {
+      if (user && !user.username /* if the context has not yet loaded, what do we do? */) {
         new UsernameView.Modal().show();
       }
     },

@@ -66,6 +66,7 @@ require([
         return requestModal;
       }
 
+      /* now done in complete-profile.js
       if(window.troupeContext.profileNotCompleted) {
         view = new profileView.Modal({ disableClose: true  });
 
@@ -77,6 +78,7 @@ require([
 
         return;
       }
+      */
 
 
       // If the user is accessing another user's home url (trou.pe/user)
