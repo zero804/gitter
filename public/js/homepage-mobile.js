@@ -43,7 +43,7 @@ require([
 
     var homepage = new HomepageRouter();
 
-    $('#signup-button, #login-button').hammer().on('touch', function(event) {
+    $('#button-signup, #button-login').hammer().on('touch', function(event) {
       // stop click events
       event.gesture.preventDefault();
       event.stopPropagation();
