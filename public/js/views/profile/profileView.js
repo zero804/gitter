@@ -202,6 +202,7 @@ define([
 
   var Modal = TroupeViews.Modal.extend({
     initialize: function(options) {
+      options = options ? options : {};
       options.title = context().profileNotCompleted ? "Complete your profile" : "Edit your profile";
       TroupeViews.Modal.prototype.initialize.apply(this, arguments);
       this.view = new View({ });
