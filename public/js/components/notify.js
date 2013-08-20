@@ -85,6 +85,11 @@ define([
       if (className) {
         n.addClass(className);
       }
+
+      // add a click listener
+      if (options.click) {
+        n.on('click', options.click);
+      }
     }
 
     set();

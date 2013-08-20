@@ -1326,7 +1326,7 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
         .then(function(user) {
           // Invite is good to accept
 
-          statsService.event('invite_accepted', { userId: user.id, uri: troupeUri });
+          statsService.event('invite_accepted', { userId: user.id, uri: troupeUri, new_user: user.status !== 'ACTIVE' });
           winston.verbose("Invite accepted", { confirmationCode: confirmationCode, troupeUri: troupeUri });
 
           var confirmOperation = null;
