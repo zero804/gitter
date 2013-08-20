@@ -372,7 +372,7 @@ module.exports = function( grunt ) {
       },
       hopscotch: {
         files: {
-          'output/client-libs/hopscotch/hopscotch-0.11-amd.js': ['output/client-libs/hopscotch/js/hopscotch-0.1.1' + (min ? '.min' : '') + '.js']
+          'output/client-libs/hopscotch/hopscotch-0.11-amd.js': ['output/client-libs/hopscotch/js/hopscotch-0.1.1.js']
         },
         modules: {
 

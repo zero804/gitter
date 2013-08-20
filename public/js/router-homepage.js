@@ -110,4 +110,9 @@ require([
 
   Backbone.history.start();
 
+  require([
+    'tours/home-tour'
+  ], function(tour) {
+    tour.start('home');
+  });
 });

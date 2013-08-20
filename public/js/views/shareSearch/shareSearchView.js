@@ -24,7 +24,8 @@ define([
       'keydown input': 'preventSubmit',
       'mouseover #copy-button' : 'createClipboard',
       'click .removeInvite': 'deselectPerson',
-      'submit #share-form': 'sendInvites'
+      'submit #share-form': 'sendInvites',
+      'click #finished-button': 'closeDialog'
     },
 
     // when instantiated by default (through the controller) this will reflect on troupeContext to determine what the invite is for.
@@ -86,6 +87,10 @@ define([
           that.$el.find('#import-success').slideDown();
         },750);
       }
+    },
+
+    closeDialog: function() {
+      this.dialog.hide();
     },
 
     createClipboard : function() {
@@ -284,7 +289,7 @@ define([
 
       // don't let users submit unless there is at least one invite (show error message in .share-failure  )
       if (this.invites.length === 0) {
-        return alert("Please select at least one user or email address to send to, or press escape to cancel.");
+        return window.alert("Please select at least one user or email address to send to, or press escape to cancel.");
       }
 
       var ajaxEndpoint = (this.data.inviteToTroupe) ? "/troupes/" + context.getTroupeId() + "/invites" : "/api/v1/inviteconnections";

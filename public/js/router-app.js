@@ -104,6 +104,7 @@ require([
 
   Backbone.history.start();
 
+
   // Asynchronously load tracker
   require([
     'utils/tracking'
