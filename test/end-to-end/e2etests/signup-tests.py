@@ -2,7 +2,6 @@ import utils
 import time
 import urllib2
 import unittest
-from nose.plugins.attrib import attr
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -74,7 +73,6 @@ class SignupTests(unittest.TestCase):
 
         assert suggestion.is_displayed()
 
-    @attr('unreliable')
     def testSignupFromHomePage(self):
         self.driver.get(utils.baseUrl("/signout"))
         self.driver.get(utils.baseUrl("/x"))
@@ -98,17 +96,12 @@ class SignupTests(unittest.TestCase):
         inputUser.send_keys(username)
         self.driver.find_element_by_css_selector('#username-form [type=submit]').click()
 
-        time.sleep(1)
+        self.driver.find_element_by_id('displayName').send_keys('Test Testerson')
+        self.driver.find_element_by_id('password').send_keys('password')
+        self.driver.find_element_by_css_selector('#updateprofileform [type=submit]').click()
 
-        assert(self.driver.current_url == utils.baseUrl('/'+username))
 
-        # complete profile
-        form = self.driver.find_element_by_css_selector('#updateprofileform')
-        form.find_element_by_name('displayName').send_keys('Willey Waley')
-        form.find_element_by_name('password').send_keys('123456')
-        form.find_element_by_name('submit').click()
-
-        self.driver.find_element_by_css_selector('.trpHelpBox')
+        self.assertEqual(self.driver.current_url, utils.baseUrl('/'+username))
 
     def tearDown(self):
         self.driver.quit()
