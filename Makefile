@@ -171,7 +171,12 @@ install-client-libs:
 	cp output/client-libs/faye/faye-browser.js public/repo/faye/faye.js
 	cp output/client-libs/filtered-collection/backbone-filtered-collection-amd.js public/repo/filtered-collection/filtered-collection.js
 	cp output/client-libs/hopscotch/hopscotch-0.11-amd.js public/repo/hopscotch/hopscotch.js
-	cp output/client-libs/hopscotch/css/hopscotch-0.1.1.min.css public/repo/hopscotch/hopscotch.css
+
+	mkdir -p public/repo/hopscotch/css/ public/repo/hopscotch/img
+	cp output/client-libs/hopscotch/css/hopscotch-0.1.1.min.css public/repo/hopscotch/css/hopscotch.css
+	cp output/client-libs/hopscotch/img/sprite-green-0.3.png public/repo/hopscotch/img/
+
+	cp output/client-libs/hopscotch/css/hopscotch-0.1.1.min.css public/repo/hopscotch/css/hopscotch.css
 	cp output/client-libs/marionette/lib/core/amd/backbone.marionette.min.js public/repo/marionette/marionette.js
 	cp output/client-libs/fine-uploader/fine-uploader.js public/repo/fine-uploader/fine-uploader.js
 	cp output/client-libs/fine-uploader/client/fineuploader.css public/repo/fine-uploader/fineuploader.less
