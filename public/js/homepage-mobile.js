@@ -43,17 +43,17 @@ require([
 
     var homepage = new HomepageRouter();
 
-    $('#signup-button, #login-button').hammer().on('touch', function(event) {
+    $('#button-signup, #button-login').hammer().on('touch', function(event) {
       // stop click events
       event.gesture.preventDefault();
       event.stopPropagation();
     });
 
-    $('#signup-button').on('tap', function() {
+    $('#button-signup').on('tap', function() {
       homepage.navigate('signup', {trigger: true});
     });
 
-    $('#login-button').on('tap', function() {
+    $('#button-login').on('tap', function() {
       homepage.navigate('login', {trigger: true});
     });
 
