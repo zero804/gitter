@@ -60,7 +60,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
       contextGenerator.generateTroupeContext(req)
     ])
     .spread(function(unreadCount, troupeContext) {
-      var login = !user || troupeContext.profileNotCompleted || accessDenied;
+      var login = !user || accessDenied;
 
       var bootScript;
       if(req.isPhone) {
