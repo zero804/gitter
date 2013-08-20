@@ -7,9 +7,10 @@ define([
   'hbs!./tmpl/shareSearchView',
   'hbs!./tmpl/shareRow',
   'zeroclipboard',
+  'utils/appevents',
   'bootstrap-typeahead', // No reference
   'utils/validate-wrapper' // No reference
-], function($, _, context, TroupeViews, template, rowTemplate, ZeroClipboard) {
+], function($, _, context, TroupeViews, template, rowTemplate, ZeroClipboard, appEvents) {
   "use strict";
 
   function isMobile() {
@@ -87,6 +88,11 @@ define([
           that.$el.find('#import-success').slideDown();
         },750);
       }
+
+      setTimeout(function() {
+        appEvents.trigger('searchSearchView:show');
+      }, 0);
+
     },
 
     closeDialog: function() {
@@ -267,6 +273,7 @@ define([
 
       var invitesEl = this.$el.find("#invites");
       invitesEl.append(rowTemplate({ user: user, value: user.toString() })).scrollTop(invitesEl.height());
+      appEvents.trigger('searchSearchView:select');
     },
 
     deselectPerson: function(e) {
@@ -302,7 +309,7 @@ define([
         data: this.serialize(),
         type: "POST",
         success: function(data) {
-           if(data.failed) {
+          if(data.failed) {
             return;
           }
           self.$el.find('#gmail-connect').hide();
@@ -310,6 +317,10 @@ define([
           self.$el.find('.modal-content').hide();
           self.$el.find('.modal-success').show();
           // self.trigger('share.complete', data);
+          //
+          //
+          appEvents.trigger('searchSearchView:success');
+
         }
       });
     }
