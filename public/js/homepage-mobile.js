@@ -49,11 +49,11 @@ require([
       event.stopPropagation();
     });
 
-    $('#signup-button').on('tap', function() {
+    $('#button-signup').on('tap', function() {
       homepage.navigate('signup', {trigger: true});
     });
 
-    $('#login-button').on('tap', function() {
+    $('#button-login').on('tap', function() {
       homepage.navigate('login', {trigger: true});
     });
 

@@ -4,7 +4,7 @@ PERF_TESTS = test/performance
 MOCHA_REPORTER =
 DATA_MAINT_SCRIPTS = $(shell find ./scripts/datamaintenance -name '*.sh')
 SAUCELABS_REMOTE = http://trevorah:d6b21af1-7ae7-4bed-9c56-c5f9d290712b@ondemand.saucelabs.com:80/wd/hub
-BETA_SITE = http://beta.trou.pe
+BETA_SITE = https://beta.trou.pe
 BASE_URL = http://localhost:5000
 
 clean:
