@@ -21,7 +21,6 @@ class ChatTests(unittest.TestCase):
     def tearDown(self):
         self.driver.quit()
 
-    @attr('unreliable')
     def sendAChatMessage(self):
         textArea = self.driver.find_element_by_id('chat-input-textarea')
         textArea.send_keys(chatMessage)
@@ -71,17 +70,10 @@ class ChatTests(unittest.TestCase):
 
         assert newChatsLoaded > numChatsLoaded, "Infinite scroll did not load older chats"
 
-    @attr('unreliable')
     def editAChatMessage(self):
         self.driverName = os.getenv('driver')
         if self.driverName != 'FIREFOX':
             lastChat = self.driver.find_element_by_css_selector('.trpChatItem')
-
-            actionChain = ActionChains(self.driver)
-            actionChain.move_to_element(self.driver.find_element_by_css_selector('.frame-people'))
-            actionChain.perform()
-
-            time.sleep(0.5)
 
             actionChain = ActionChains(self.driver)
             actionChain.move_to_element(self.driver.find_element_by_css_selector('.trpChatBox'))
