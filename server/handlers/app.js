@@ -23,7 +23,7 @@ function renderHomePage(req, res, next) {
     if(err) {
       next(err);
     } else {
-      var login = !user || troupeContext.profileNotCompleted || accessDenied;
+      var login = !user || accessDenied;
 
       var bootScript;
       if(req.isPhone) {
