@@ -65,6 +65,16 @@ module.exports = {
         }
       );
 
+      app.get('/confirm',
+        middleware.ensureLoggedIn(),
+        function(req, res){
+          winston.verbose("Confirmation authenticated");
+          contextGenerator.generateMiniContext(req, function(err, troupeContext) {
+            res.render('complete-profile', { troupeContext: troupeContext });
+          });
+        });
+
+
       app.get('/confirm/:confirmationCode',
         middleware.authenticate('confirm', { failureRedirect: '/confirm-failed' } ),
         function(req, res){

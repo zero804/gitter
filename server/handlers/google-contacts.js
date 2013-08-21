@@ -44,7 +44,8 @@ var contactOptions = {
     'https://www.googleapis.com/auth/userinfo.profile',
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.google.com/m8/feeds'
-  ]
+  ],
+  state: 'contacts'
 };
 
 var signupOptions = {
@@ -52,11 +53,19 @@ var signupOptions = {
   scope: [
     'https://www.googleapis.com/auth/userinfo.profile',
     'https://www.googleapis.com/auth/userinfo.email'
-  ]
+  ],
+  state: 'signup'
 };
 
 module.exports = {
   install: function(app) {
+
+    // Redirect user to Google OAuth authorization page.
+    //
+    app.get('/google/signup',
+      passport.authorize('google', signupOptions),
+      function(req, res) {});
+
 
     // Redirect user to Google OAuth authorization page.
     //
@@ -80,25 +89,38 @@ module.exports = {
     // OAuth callback. Fetch access token and contacts, and store them.
     //
     app.get('/oauth2callback',
-      middleware.ensureLoggedIn(),
       passport.authorize('google', { failureRedirect: '/' }),
+      middleware.ensureLoggedIn(),
       function(req, res) {
-        getAccessToken(req.user.googleRefreshToken, function(access_token) {
-          fetchContacts(access_token, req.user, function() {
-
-            if(req.session.events) {
-              req.session.events.push('google_import_complete');
+        switch(req.query.state) {
+          case 'signup':
+            if (req.user.status !== 'ACTIVE') {
+              res.redirect('/confirm');
             } else {
-              req.session.events = ['google_import_complete'];
+              res.redirect('/');
             }
+            break;
+          case 'contacts':
+            getAccessToken(req.user.googleRefreshToken, function(access_token) {
+              fetchContacts(access_token, req.user, function() {
 
-            if(req.session.returnOnGoogleAuthComplete) {
-              res.relativeRedirect(req.session.returnOnGoogleAuthComplete);
-            } else {
-              res.relativeRedirect('/#|share');
-            }
-          });
-        });
+                if(req.session.events) {
+                  req.session.events.push('google_import_complete');
+                } else {
+                  req.session.events = ['google_import_complete'];
+                }
+
+                if(req.session.returnOnGoogleAuthComplete) {
+                  res.relativeRedirect(req.session.returnOnGoogleAuthComplete);
+                } else {
+                  res.relativeRedirect('/#|share');
+                }
+              });
+            });
+            break;
+          default:
+            res.redirect('/');
+        }
       });
 
     // Search contacts

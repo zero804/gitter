@@ -111,6 +111,57 @@ class SignupTests(unittest.TestCase):
         else:
             self.assertEqual(self.driver.current_url, utils.baseUrl('/'+username))
 
+    def testGoogleSignup(self):
+        # Clean database
+        utils.resetData(self.driver)
+
+        email   = 'mister.troupe@gmail.com'
+        passwd  = 'Eeboh7othaefitho'
+        name    = 'Mr Troupe'
+        
+        # Sing in into Gmail
+        self.driver.get("https://gmail.com")
+        form = self.driver.find_element_by_css_selector('#gaia_loginform')
+        form.find_element_by_name('Email').send_keys(email)
+        form.find_element_by_name('Passwd').send_keys(passwd)
+        form.find_element_by_name('signIn').click()
+
+        # Revoke access
+        self.driver.get("https://accounts.google.com/b/0/IssuedAuthSubTokens?hl=en_GB")
+        form = self.driver.find_element_by_name('Troupe')
+        form.find_element_by_css_selector('input[type=submit]').click()
+
+        # Trigger Sign Up
+        self.driver.get(utils.baseUrl("/x"))
+        self.driver.find_element_by_id('google-signup').click()
+
+        # Accept oAuth permissions
+        accept = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, 'submit_approve_access')))
+        accept.click()
+
+        self.assertEqual(self.driver.current_url, utils.baseUrl('/confirm'))
+
+        # Select username
+        username = 'mrtroupe' + time.strftime("%Y%m%d%H%M%S", time.gmtime())
+        form = self.driver.find_element_by_id('username-form')
+        form.find_element_by_name('username').send_keys(username)
+        form.find_element_by_name('submit').click()
+
+        # Complete profile
+        troupe_password = 'omgwtfbbq'
+        form = self.driver.find_element_by_id('updateprofileform')
+
+        displayName = form.find_element_by_name('displayName').get_attribute('value')
+        self.assertEqual(displayName, name)
+
+        form.find_element_by_name('password').send_keys(troupe_password)
+        form.find_element_by_name('submit').click()
+      
+        # Welcome page
+        self.driver.find_element_by_css_selector('.trpHelpBox')
+        self.assertEqual(self.driver.current_url, utils.baseUrl('/' + username))
+
+
     def tearDown(self):
         self.driver.quit()
 

@@ -7,7 +7,7 @@ if [ -z "$MONGO_URL" ]; then MONGO_URL=troupe; fi
 
 mongo $MONGO_URL --quiet <<"DELIM"
 
-var q = { email: /@troupetest.local$/ };
+var q = { email: /@troupetest.local$|mister\.troupe@gmail.com/ };
 print('Deleting test users: ' + db.users.count(q));
 db.users.remove(q);
 
