@@ -27,27 +27,6 @@ define([
         collection: this.collection,
         itemView: RequestItemView
       });
-
-      var self = this;
-      function updateVisibility() {
-        self.setVisibility(true);
-      }
-
-      this.setVisibility(false);
-      this.listenTo(this.collection, 'add', updateVisibility);
-      this.listenTo(this.collection, 'remove', updateVisibility);
-      this.listenTo(this.collection, 'reset', updateVisibility);
-    },
-
-    setVisibility: function(animate) {
-      if (this.collection.length > 0) {
-        $('#request-header').show();
-        return (animate) ? this.$el.parent().slideDown() : this.$el.parent().show();
-      }
-      else {
-        $('#request-header').hide();
-        return (animate) ? this.$el.parent().slideUp() : this.$el.parent().hide();
-      }
     },
 
     afterRender: function() {
