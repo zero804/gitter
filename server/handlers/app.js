@@ -17,18 +17,16 @@ var contextGenerator = require('../web/context-generator');
 
 function renderHomePage(req, res, next) {
   var user = req.user;
-  var accessDenied = !req.user;
 
   contextGenerator.generateMiniContext(req, function(err, troupeContext) {
     if(err) {
       next(err);
     } else {
-      var login = !user || accessDenied;
 
       var bootScript;
       if(req.isPhone) {
         bootScript = 'mobile-userhome';
-      } else if(login) {
+      } else if(!user) {
         bootScript = 'router-login';
       } else {
         bootScript = 'router-homepage';
@@ -38,7 +36,7 @@ function renderHomePage(req, res, next) {
         useAppCache: !!nconf.get('web:useAppCache'),
         bootScriptName: bootScript,
         isWebApp: true,
-        troupeName: (req.user && req.user.displayName) || '',
+        troupeName: (user && user.displayName) || '',
         troupeContext: troupeContext,
         agent: req.headers['user-agent']
       });
