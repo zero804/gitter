@@ -119,7 +119,27 @@ define([
       // People View
       this.show('people', new PeopleCollectionView({ collection: userCollection }));
 
+      this.initHideListeners();
     },
+
+    initHideListeners: function() {
+      var self = this;
+
+      toggler('#invite-roster', itemCollections.invites);
+      toggler('#invite-header', itemCollections.invites);
+      toggler('#request-header', itemCollections.requests);
+      toggler('#request-roster', itemCollections.requests);
+
+      function toggler(element, collection) {
+        function toggle() {
+          self.$el.find(element).toggle(collection.length > 0);
+        }
+
+        collection.on('all', toggle);
+        toggle();
+      }
+    },
+
 
     onMailHeaderClick: function() {
       this.toggleMails();
