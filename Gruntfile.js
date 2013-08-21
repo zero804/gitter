@@ -287,11 +287,11 @@ module.exports = function( grunt ) {
           "public/bootstrap/css/trpMails.css": "public/bootstrap/less/trpMails.less",
           "public/bootstrap/css/trpPeople.css": "public/bootstrap/less/trpPeople.less",
           "public/bootstrap/css/trpMobileApp.css": "public/bootstrap/less/trpMobileApp.less",
-          "public/bootstrap/css/trpMobileChat.css": "public/bootstrap/less/trpMobileChat.less",
-          "public/bootstrap/css/trpMobileFiles.css": "public/bootstrap/less/trpMobileFiles.less",
-          "public/bootstrap/css/trpMobileConversations.css": "public/bootstrap/less/trpMobileConversations.less",
-          "public/bootstrap/css/trpMobilePeople.css": "public/bootstrap/less/trpMobilePeople.less"
-
+          "public/bootstrap/css/trpNativeChat.css": "public/bootstrap/less/trpNativeChat.less",
+          "public/bootstrap/css/trpNativeFiles.css": "public/bootstrap/less/trpNativeFiles.less",
+          "public/bootstrap/css/trpNativeConversations.css": "public/bootstrap/less/trpNativeConversations.less",
+          "public/bootstrap/css/trpNativePeople.css": "public/bootstrap/less/trpNativePeople.less",
+          "public/bootstrap/css/trpNativeAccept.css": "public/bootstrap/less/trpNativeAccept.less"
         }
       }
     },

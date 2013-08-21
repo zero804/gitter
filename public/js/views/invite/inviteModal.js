@@ -1,10 +1,11 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'jquery',
   'views/base',
   'utils/context',
   'log!invite-modal-view',
   'hbs!./tmpl/inviteModal'
-], function(TroupeViews, context, log, inviteModalTemplate) {
+], function($, TroupeViews, context, log, inviteModalTemplate) {
   "use strict";
 
   var InviteView = TroupeViews.ConfirmationView.extend({
@@ -16,11 +17,28 @@ define([
 
     initialize: function(options) {
       this.inviteId = options.inviteId;
+      if(this.model) {
+        this.setRerenderOnChange(true);
+      }
     },
 
     getRenderData: function() {
-      var isOneToOne;
       var firstName;
+
+      if(this.model) {
+        var user = this.model.get('fromUser');
+        firstName = user && user.displayName || '';
+        firstName = firstName.split(/\s+/).shift();
+
+        return {
+          isOneToOne: this.model.get('oneToOneInvite'),
+          homeUser: user,
+          firstName: firstName
+        };
+
+      }
+
+      var isOneToOne;
 
       if (context.getHomeUser()) {
         isOneToOne = true;
@@ -35,14 +53,15 @@ define([
 
     accept: function() {
       var userId = context.getUserId();
-      var inviteId = this.inviteId;
+      var inviteId = this.model ? this.model.id : this.inviteId;
 
       $.ajax({
         async: false,
         method: "PUT",
+        context: this,
         url: "/user/" + userId + "/invites/" + inviteId,
-        success: function() {
-          window.location.reload();
+        success: function(data) {
+          this.trigger('invite:accept', data);
         },
         error: function() {
           log("There was an error accepting this invite, please try again later or contact support");
@@ -52,14 +71,16 @@ define([
 
     reject: function() {
       var userId = context.getUserId();
-      var inviteId = this.inviteId;
+      var inviteId = this.model ? this.model.id : this.inviteId;
 
       $.ajax({
         async: false,
+        context: this,
         method: "DELETE",
         url: "/user/" + userId + "/invites/" + inviteId,
         success: function() {
-          window.history.back();
+          this.trigger('invite:reject');
+          //window.history.back();
         },
         error: function() {
           log("There was an error rejecting this invite, please try again later or contact support");
@@ -72,9 +93,10 @@ define([
   return TroupeViews.Modal.extend({
     initialize: function(options) {
 
-      options.view = new InviteView({
-        inviteId: options.inviteId
-      });
+      options.view = new InviteView(options);
+
+      // Proxy all events
+      this.listenTo(options.view, 'all', this.trigger);
 
       TroupeViews.Modal.prototype.initialize.call(this, options);
 

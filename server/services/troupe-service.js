@@ -1209,6 +1209,10 @@ function rejectInviteForAuthenticatedUser(user, invite) {
   });
 }
 
+/**
+ * Accept an invite to a one to one connection or a troupe
+ * @return the promise of a troupe
+ */
 function acceptInviteForAuthenticatedUser(user, invite) {
   return Q.resolve(null).then(function() {
     assert(user, 'User parameter required');
@@ -1243,7 +1247,8 @@ function acceptInviteForAuthenticatedUser(user, invite) {
         sendInviteAcceptedNotice(invite, troupe, isNormalTroupe);
 
         // Regardless of the type, mark things as done
-        return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite);
+        return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite)
+          .thenResolve(troupe);
       });
 
   });
