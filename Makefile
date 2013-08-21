@@ -44,7 +44,7 @@ test-in-browser:
 
 test-in-browser-xunit:
 	mkdir -p output/test-reports
-	node_modules/.bin/mocha-phantomjs -R xunit $(BASE_URL)/test/in-browser/test > ../../output/test-reports/in-browser.xml
+	node_modules/.bin/mocha-phantomjs --timeout 10000 --reporter xunit $(BASE_URL)/test/in-browser/test > ../../output/test-reports/in-browser.xml
 
 test-coverage:
 	rm -rf ./coverage/ cobertura-coverage.xml
