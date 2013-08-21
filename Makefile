@@ -77,6 +77,13 @@ end-to-end-test-saucelabs-ie9:
 	BASE_URL=$(BETA_SITE) \
 	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
 
+end-to-end-test-saucelabs-android:
+	@echo Testing $(BETA_SITE) with android at saucelabs.com
+	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
+	DRIVER=REMOTEANDROID \
+	BASE_URL=$(BETA_SITE) \
+	nosetests --nologcapture --attr 'phone_compatible' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
+
 docs: test-docs
 
 test-docs:
@@ -136,7 +143,7 @@ validate-source: search-js-console
 
 continuous-integration: clean validate-source npm grunt version-files upgrade-data init-test-data test-xunit test-coverage tarball
 
-post-deployment-tests: test-in-browser-xunit end-to-end-test-saucelabs-chrome end-to-end-test-saucelabs-ie9
+post-deployment-tests: test-in-browser-xunit end-to-end-test-saucelabs-chrome end-to-end-test-saucelabs-ie9 end-to-end-test-saucelabs-android
 
 build: clean validate-source npm grunt version-files upgrade-data test-xunit
 

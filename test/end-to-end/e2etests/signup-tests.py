@@ -2,6 +2,7 @@ import utils
 import time
 import urllib2
 import unittest
+from nose.plugins.attrib import attr
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -73,12 +74,15 @@ class SignupTests(unittest.TestCase):
 
         assert suggestion.is_displayed()
 
+    @attr('phone_compatible')
     def testSignupFromHomePage(self):
         self.driver.get(utils.baseUrl("/signout"))
         self.driver.get(utils.baseUrl("/x"))
         emailAddress = 'testuser.' + time.strftime("%Y%m%d%H%M%S", time.gmtime()) + '@troupetest.local'
         self.driver.find_element_by_css_selector('#button-signup').click()
+
         form = self.driver.find_element_by_css_selector('#signup-form')
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, 'email')))
         form.find_element_by_name('email').send_keys(emailAddress)
         form.find_element_by_name('submit').click()
         self.driver.find_element_by_css_selector('.label-signupsuccess')
@@ -100,8 +104,12 @@ class SignupTests(unittest.TestCase):
         self.driver.find_element_by_id('password').send_keys('password')
         self.driver.find_element_by_css_selector('#updateprofileform [type=submit]').click()
 
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, 'content-frame')))
 
-        self.assertEqual(self.driver.current_url, utils.baseUrl('/'+username))
+        if '#' in self.driver.current_url:
+            self.assertEqual(self.driver.current_url, utils.baseUrl('/'+username)+'#')
+        else:
+            self.assertEqual(self.driver.current_url, utils.baseUrl('/'+username))
 
     def tearDown(self):
         self.driver.quit()
