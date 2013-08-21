@@ -112,7 +112,17 @@ require([
           inviteId = window.troupeContext.inviteId;
           if (inviteId) {
             // if the user has an invite from this user show the invite accept / reject modal
-            new InviteModal({ inviteId: inviteId }).show();
+            var inviteModal = new InviteModal({ inviteId: inviteId });
+            inviteModal.show();
+
+            inviteModal.on('invite:accept', function() {
+              window.location.reload();
+            });
+
+            inviteModal.on('invite:reject', function() {
+              window.back();
+            });
+
           } else {
               view = new ConnectUserModalView({ authenticated: !!window.troupeContext.user });
               var connectUserModal = new TroupeViews.Modal({ view: view, disableClose: true });

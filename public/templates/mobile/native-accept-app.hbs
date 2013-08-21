@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en" {{#if appCache}}manifest="{{appCache}}"{{/if}}>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta charset="utf-8">
+  <title>Troupe</title>
+
+  <link rel="stylesheet" href='/bootstrap/css/trpNativeAccept.css'>
+
+  {{{ generateTroupeContext troupeContext accessToken=accessToken page='accept' }}}
+
+  <link rel="shortcut icon" href='{{ cdn "images/2/favicon8.ico"}}'>
+</head>
+<body>
+  {{>require_wrapper}}
+  {{{bootScript "routers/mobile/native/accept-router" }}}
+</body>
+</html>
