@@ -61,12 +61,10 @@ function renderAppPageWithTroupe(req, res, next, page) {
       var login = !user || accessDenied;
 
       var bootScript;
-      if(req.isPhone) {
-        bootScript = 'mobile-app';
-      } else if(login) {
+      if(login) {
         bootScript = 'router-login';
       } else {
-        bootScript = 'router-app';
+        bootScript = req.isPhone ? 'mobile-app' : 'router-app';
       }
 
       res.render(page, {
