@@ -20,10 +20,15 @@ function passthrough(url, options) {
 
 function cdnSingle(url, options) {
   var nonrelative = options && options.nonrelative;
+  var appcache = options && options.appcache;
   var email = options && options.email;
 
   if (email) {
     return nconf.get('email:emailBasePath') + cdnPrefix + "/" + url;
+  }
+
+  if(appcache) {
+    return cdnPrefix + "/" + url;
   }
 
   var prefix = nonrelative ? "https://" : "//";
@@ -36,10 +41,16 @@ function cdnSingle(url, options) {
 
 function cdnMulti(url, options) {
   var email = options && options.email;
+  var appcache = options && options.appcache;
 
   if (email) {
     return nconf.get('email:emailBasePath') + cdnPrefix + "/" + url;
   }
+
+  if(appcache) {
+    return cdnPrefix + "/" + url;
+  }
+
   var x = 0;
   for(var i = 0; i < url.length; i = i + 3) {
     x = x + url.charCodeAt(i);

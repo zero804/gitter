@@ -1,13 +1,13 @@
 CACHE MANIFEST
 
 CACHE:
-{{ cdn 'bootstrap/css/trpNativeConversations.css' }}
+{{ cdn 'bootstrap/css/trpNativeConversations.css'             appcache=true }}
 {{#if minified}}
-{{ cdn 'js/core-libraries.min.js' }}
-{{ cdn 'js/routers/mobile/native/conversations-router.min.js' }}
+{{ cdn 'js/core-libraries.min.js'                             appcache=true }}
+{{ cdn 'js/routers/mobile/native/conversations-router.min.js' appcache=true }}
 {{else}}
-{{ cdn 'js/core-libraries.min.js' }}
-{{ cdn 'js/routers/mobile/native/conversations-router.min.js' }}
+{{ cdn 'js/core-libraries.min.js'                             appcache=true }}
+{{ cdn 'js/routers/mobile/native/conversations-router.min.js' appcache=true }}
 {{/if}}
 
 NETWORK:
