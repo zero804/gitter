@@ -316,7 +316,7 @@ function notifyRecipientsOfInvites(invites) {
             // TODO: add onetoone bits in to this invite
             title: "New Invitation",
             text: text,
-            link: uri,
+            link: '/' + uri,
             sound: "invitation"
           });
 
