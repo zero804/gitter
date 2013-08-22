@@ -6,14 +6,14 @@
   <meta charset="utf-8">
   <title>Troupe</title>
 
-  <link rel="stylesheet" href='/bootstrap/css/trpNativeAccept.css'>
+  <link rel="stylesheet" href='{{ cdn "bootstrap/css/trpNativeAccept.css" appcache=appCache }}'>
 
-  {{{ generateTroupeContext troupeContext accessToken=accessToken page='accept' }}}
+  {{{ generateTroupeContext troupeContext accessToken=accessToken page='accept' appcache=appCache }}}
 
-  <link rel="shortcut icon" href='{{ cdn "images/2/favicon8.ico"}}'>
+  <link rel="shortcut icon" href='{{ cdn "images/2/favicon8.ico" appcache=appCache }}'>
 </head>
 <body>
   {{>require_wrapper}}
-  {{{bootScript "routers/mobile/native/accept-router" }}}
+  {{{bootScript "routers/mobile/native/accept-router" appcache=appCache }}}
 </body>
 </html>
