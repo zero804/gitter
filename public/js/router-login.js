@@ -67,7 +67,7 @@ require([
       }
 
       /* now done in complete-profile.js
-      if(window.troupeContext.profileNotCompleted) {
+      if(!context.isProfileComplete()) {
         view = new profileView.Modal({ disableClose: true  });
 
         view.once('close', function() {
