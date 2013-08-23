@@ -179,6 +179,7 @@ define([
         success: function(data) {
           if(data.success) {
             context.getUser().displayName = data.displayName;
+            context.getUser().status = 'ACTIVE';
             that.trigger('submit.success');
             that.dialog.hide();
 
