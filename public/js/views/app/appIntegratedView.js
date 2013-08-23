@@ -85,7 +85,7 @@ define([
 
     ensureSignupIsComplete: function() {
       var self = this, noteId = 'completeSignup';
-      if (context().profileNotCompleted || !context().user.username) {
+      if (!context.isProfileComplete() || !context().user.username) {
         notifications.notify({
           id: noteId,
           content: "<a href='#'>Click here to complete the signup process</a>",
@@ -100,7 +100,7 @@ define([
     },
 
     ensureProfileIsComplete: function() {
-      if (context().profileNotCompleted) {
+      if (!context.isProfileComplete()) {
         new ProfileView.Modal().show();
       }
     },

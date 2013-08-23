@@ -21,7 +21,7 @@ define([
       if (!options) return;
       this.originalEmail = context.getUser().email;
       this.existingUser = options.existingUser;
-      this.isExistingUser = !context().profileNotCompleted;
+      this.isExistingUser = context.isProfileComplete();
       if (this.compactView) $("#uvTab").hide();
     },
 
@@ -203,7 +203,7 @@ define([
   var Modal = TroupeViews.Modal.extend({
     initialize: function(options) {
       options = options ? options : {};
-      options.title = context().profileNotCompleted ? "Complete your profile" : "Edit your profile";
+      options.title = !context.isProfileComplete() ? "Complete your profile" : "Edit your profile";
       TroupeViews.Modal.prototype.initialize.apply(this, arguments);
       this.view = new View({ });
 
