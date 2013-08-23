@@ -112,15 +112,15 @@ require([
           inviteId = window.troupeContext.inviteId;
           if (inviteId) {
             // if the user has an invite from this user show the invite accept / reject modal
-            var inviteModal = new InviteModal({ inviteId: inviteId });
+            var inviteModal = new InviteModal({ inviteId: inviteId, disableClose: true });
             inviteModal.show();
 
-            inviteModal.on('invite:accept', function() {
+            inviteModal.view.on('invite:accept', function() {
               window.location.reload();
             });
 
-            inviteModal.on('invite:reject', function() {
-              window.back();
+            inviteModal.view.on('invite:reject', function() {
+              window.history.back();
             });
 
           } else {
@@ -181,6 +181,12 @@ require([
               modal.show();
               modal.on('hide', function() {
                 window.location = '/last';
+              });
+              modal.view.on('invite:reject', function() {
+                window.location = '/last';
+              });
+              modal.view.on('invite:accept', function() {
+                window.location.reload();
               });
 
             } else {
