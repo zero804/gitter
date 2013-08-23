@@ -52,6 +52,7 @@ define([
     },
 
     accept: function() {
+      var self = this;
       var userId = context.getUserId();
       var inviteId = this.model ? this.model.id : this.inviteId;
 
@@ -61,7 +62,7 @@ define([
         context: this,
         url: "/user/" + userId + "/invites/" + inviteId,
         success: function(data) {
-          this.trigger('invite:accept', data);
+          self.trigger('invite:accept', data);
         },
         error: function() {
           log("There was an error accepting this invite, please try again later or contact support");
@@ -70,6 +71,7 @@ define([
     },
 
     reject: function() {
+      var self = this;
       var userId = context.getUserId();
       var inviteId = this.model ? this.model.id : this.inviteId;
 
@@ -79,8 +81,7 @@ define([
         method: "DELETE",
         url: "/user/" + userId + "/invites/" + inviteId,
         success: function() {
-          this.trigger('invite:reject');
-          //window.history.back();
+          self.trigger('invite:reject');
         },
         error: function() {
           log("There was an error rejecting this invite, please try again later or contact support");
