@@ -103,6 +103,7 @@ function UserStrategy(options) {
     }
     return {
       id: user.id,
+      status: options.includeEmail ? user.status : undefined,
       username: user.username,
       displayName: user.displayName,
       url: user.getHomeUrl(),
