@@ -307,7 +307,7 @@ function notifyRecipientsOfInvites(invites) {
             uri = troupe.uri;
           } else if(!invite.troupeId && fromUser) {
             text = fromUser.displayName + " has invited you to connect";
-            uri = fromUser.getHomeUrl();
+            uri = fromUser.getHomeUri();
           }
 
           appEvents.userNotification({
