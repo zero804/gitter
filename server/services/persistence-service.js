@@ -124,8 +124,12 @@ UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ username: 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
 
+UserSchema.methods.getHomeUri = function() {
+  return this.username ? this.username : "one-one/" + this.id;
+};
+
 UserSchema.methods.getHomeUrl = function() {
-  return this.username ? "/" + this.username : "/one-one/" + this.id;
+  return '/' + this.getHomeUri();
 };
 
 UserSchema.methods.isConfirmed = function() {
