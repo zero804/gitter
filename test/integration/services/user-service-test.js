@@ -15,7 +15,8 @@ var fixture2 = {};
 describe("User Service", function() {
 
   before(fixtureLoader(fixture2, {
-    user1: { username: true }
+    user1: { username: true },
+    user2: { }
   }));
 
   before(fixtureLoader(fixture));
@@ -296,6 +297,20 @@ describe("User Service", function() {
         })
         .nodeify(done);
     });
+
+    // it('should not allow an email address to be duplicated with another primary', function(done) {
+    //   var userService = testRequire("./services/user-service");
+
+    //   userService.addSecondaryEmail(fixture2.user1, fixture2.user2.email)
+    //     .then(function() {
+    //       assert.fail('Expected failure');
+    //     }, function(err) {
+    //       assert.equal(err, 409);
+    //     })
+    //     .nodeify(done);
+    // });
+
+
   });
 
   after(function() {
