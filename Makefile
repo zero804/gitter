@@ -18,6 +18,8 @@ test:
 		$(TESTS)
 
 perf-test-xunit:
+	npm install
+	mkdir -p output/test-reports
 	NODE_ENV=test XUNIT_FILE=output/test-reports/performance.xml ./node_modules/.bin/mocha \
 		--reporter xunit-file \
 		--timeout 100000 \
@@ -25,6 +27,7 @@ perf-test-xunit:
 		$(PERF_TESTS)
 
 perf-test:
+	npm install
 	NODE_ENV=test ./node_modules/.bin/mocha \
 		--reporter spec \
 		--timeout 100000 \
