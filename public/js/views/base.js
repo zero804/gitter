@@ -539,6 +539,7 @@ define([
 
       $e.insertAfter(this.targetElement);
       var pos = this.getPosition();
+      $e.insertAfter($('body'));
 
       var actualWidth = e.offsetWidth;
       var actualHeight = e.offsetHeight;
