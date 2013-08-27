@@ -75,7 +75,7 @@ define([
       this.chatLines = 2;
       chatPadding = originalChatPadding;
       this.$el.height(this.originalChatInputHeight);
-      //$('#content-frame').css('bottom', chatPadding);
+      $('#frame-chat').css('padding-bottom', chatPadding);
 
     },
 
@@ -89,6 +89,12 @@ define([
         var newHeight = currentLines * lht;
 
         this.$el.height(newHeight);
+        var frameChat = $('#frame-chat'), isChild = frameChat.find(this.el).length;
+        if (!isChild) {
+          chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
+          frameChat.css('padding-bottom', chatPadding);
+        }
+
         chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
       }
     },
