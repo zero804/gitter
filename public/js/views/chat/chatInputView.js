@@ -100,7 +100,7 @@ define([
     },
 
     detectReturn: function(e) {
-      if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey)) {
+      if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/))) {
         if (window._troupeCompactView !== true) this.resetInput();
         e.stopPropagation();
         e.preventDefault();
