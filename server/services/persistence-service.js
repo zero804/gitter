@@ -88,11 +88,17 @@ function serializeEvent(url, operation, model, callback) {
 // --------------------------------------------------------------------
 // Schemas
 // --------------------------------------------------------------------
-
+var UserEmailSchema = new Schema({
+  email:            { type: String },
+  confirmationCode: { type: String },
+  confirmed:        Boolean
+});
+UserEmailSchema.schemaTypeName = 'UserEmailSchema';
 
 var UserSchema = new Schema({
   displayName: { type: String },
-  email: { type: String },
+  email: { type: String },    // The primary email address
+  emails: [UserEmailSchema],  // Secondary email addresses
   username: { type: String },
   newEmail: String,
   confirmationCode: {type: String },
@@ -122,6 +128,7 @@ var UserSchema = new Schema({
 });
 UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ username: 1 }, { unique: true, sparse: true });
+UserSchema.index({ "emails.email" : 1 }, { unique: true });
 UserSchema.schemaTypeName = 'UserSchema';
 
 UserSchema.methods.getHomeUri = function() {
@@ -198,6 +205,7 @@ var TroupeSchema = new Schema({
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });
+TroupeSchema.index({ "users.userId": 1 });
 TroupeSchema.schemaTypeName = 'TroupeSchema';
 
 

@@ -101,6 +101,7 @@ function UserStrategy(options) {
     } else {
       location = undefined;
     }
+
     return {
       id: user.id,
       status: options.includeEmail ? user.status : undefined,
