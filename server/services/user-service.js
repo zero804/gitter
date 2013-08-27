@@ -15,6 +15,7 @@ var collections = require("../utils/collections");
 var Q = require('q');
 var appEvents = require("../app-events");
 var moment = require('moment');
+var _ = require('underscore');
 
 function generateGravatarUrl(email) {
   var url =  "https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon";
@@ -425,6 +426,55 @@ var userService = {
 
   deleteAllUsedInvitesForUser: function(user) {
     persistence.Invite.remove({ userId: user.id, status: "USED" });
+  },
+
+  addSecondaryEmail: function(user, email) {
+    user.emails.push({
+      email:            email,
+      confirmed:        false,
+      confirmationCode: uuid.v4()
+    });
+    return user.saveQ().thenResolve(user);
+  },
+
+  switchPrimaryEmail: function(user, email) {
+    assert(user.isConfirmed(), 'User must be confirmed');
+
+    var secondary = _.find(user.emails, function(userEmail) {
+      return userEmail.email == email;
+    });
+
+    if(!secondary) return Q.reject(404);
+    if(!secondary.confirmed) return Q.reject(403);
+
+    secondary.remove();
+
+    user.emails.push({
+      email: user.email,
+      confirmed: true
+    });
+    user.email = secondary.email;
+    return user.saveQ().thenResolve(user);
+  },
+
+  removeSecondaryEmail: function(user, email) {
+    user.emails = user.emails.filter(function(userEmail) {
+      return userEmail.email !== email;
+    });
+
+    return user.saveQ().thenResolve(user);
+  },
+
+  confirmSecondaryEmail: function(user, confirmationCode) {
+    var userEmail = user.emails.filter(function(userEmail) {
+      return userEmail.confirmationCode == confirmationCode;
+    }).shift();
+
+    if(!userEmail) return Q.reject(404);
+
+    userEmail.confirmed = true;
+
+    return user.saveQ().thenResolve(user);
   }
 
 };
