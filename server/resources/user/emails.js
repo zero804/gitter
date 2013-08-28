@@ -3,14 +3,33 @@
 
 var userService = require("../../services/user-service");
 var _ = require('underscore');
+var crc32 = require('crc32');
 
-function mapUserEmail(userEmail) {
+function mapPrimaryEmail(email) {
   return {
-    id: userEmail.id,
-    email: userEmail.email,
-    status: userEmail.primary ? 'PRIMARY' : (userEmail.confirmed ? 'CONFIRMED' : 'UNCONFIRMED')
+    id: crc32(email),
+    email: email,
+    status: 'PRIMARY'
   };
 }
+
+
+function mapConfirmedEmail(email) {
+  return {
+    id: crc32(email),
+    email: email,
+    status: 'CONFIRMED'
+  };
+}
+
+function mapUnconfirmedEmail(unconfirmedEmail) {
+  return {
+    id: crc32(unconfirmedEmail.email),
+    email: unconfirmedEmail.email,
+    status: 'UNCONFIRMED'
+  };
+}
+
 
 module.exports = {
   index: function(req, res, next) {
@@ -19,14 +38,15 @@ module.exports = {
       return next(403);
     }
 
-    var emails = [ { id: 0, email: user.email, primary: true } ];
-    emails.concat(user.emails);
+    var emails = [ mapPrimaryEmail(user.email) ];
+    emails = emails.concat(user.emails.map(mapConfirmedEmail));
+    emails = emails.concat(user.unconfirmedEmails.map(mapUnconfirmedEmail));
 
-    res.send(emails.map(mapUserEmail));
+    res.send(emails);
   },
 
   show: function(req, res) {
-    res.send(mapUserEmail(req.email));
+    res.send(req.email);
   },
 
   create: function(req, res, next) {
@@ -39,18 +59,17 @@ module.exports = {
     }
 
     return userService.addSecondaryEmail(req.user, req.body.email).then(function(email) {
-      res.send(mapUserEmail(email));
+      res.send({ email: email, status: 'UNCONFIRMED' });
     }).fail(next);
 
   },
 
   update: function(req, res, next) {
-    var userEmail = req.email;
-
-    if(!userEmail.primary && userEmail.confirmed) {
+    var forUpdate = req.email;
+    if(forUpdate.status === 'CONFIRMED') {
       if(req.body.status === 'PRIMARY') {
-        return userService.switchPrimaryEmail(req.user, userEmail.email).then(function() {
-          res.send(userEmail);
+        return userService.switchPrimaryEmail(req.user, forUpdate.email).then(function() {
+          res.send({ email: forUpdate.email, status: 'PRIMARY '});
         }).fail(next);
       }
     }
@@ -71,22 +90,33 @@ module.exports = {
   },
 
   load: function(req, id, callback) {
-    if(!req.user) {
+    var user = req.user;
+
+    if(!user) {
       return callback(403);
     }
 
-    if(id === '0') {
-      return callback(null, {
-        id: 0,
-        email: req.user.email,
-        primary: true
-      });
+    if(id === crc32(user.email)) {
+      return callback(null, mapPrimaryEmail(user.email));
     }
 
-    return callback(null, _.find(req.user.emails, function(userEmail) {
-        return userEmail.id == id;
-      }));
+    var confirmed = _.find(user.emails, function(email) {
+      return crc32(email) === id;
+    });
 
+    if(confirmed) {
+      return callback(null, mapConfirmedEmail(confirmed));
+    }
+
+    var unconfirmed = _.find(user.unconfirmedEmails, function(userEmail) {
+      return crc32(userEmail.email) === id;
+    });
+
+    if(unconfirmed) {
+      return callback(null, mapUnconfirmedEmail(unconfirmed));
+    }
+
+    return callback();
   }
 
 };

@@ -174,11 +174,10 @@ describe("User Service", function() {
 
       userService.addSecondaryEmail(fixture2.user1, newEmail)
         .then(function(user) {
-          assert.equal(user.emails.length, 1);
-          var userEmail = user.emails[0];
+          assert.equal(user.unconfirmedEmails.length, 1);
+          var userEmail = user.unconfirmedEmails[0];
           assert.equal(userEmail.email, newEmail);
           assert(userEmail.confirmationCode, 'Expected a confirmation code');
-          assert.equal(userEmail.confirmed, false);
         })
         .nodeify(done);
     });
@@ -190,11 +189,9 @@ describe("User Service", function() {
       userService.addSecondaryEmail(fixture2.user1, newEmail)
         .then(function(user) {
 
-          assert.equal(user.emails.filter(function(userEmail) { return userEmail.email === newEmail; }).length, 1);
-
           return userService.removeSecondaryEmail(user, newEmail)
             .then(function(user) {
-              assert.equal(user.emails.filter(function(userEmail) { return userEmail.email === newEmail; }).length, 0);
+              assert.equal(user.emails.indexOf(newEmail), -1);
             });
 
         })
@@ -208,13 +205,11 @@ describe("User Service", function() {
 
       userService.addSecondaryEmail(fixture2.user1, newEmail)
         .then(function(user) {
-          var userEmail = user.emails.filter(function(userEmail) { return userEmail.email === newEmail; })[0];
-          assert.equal(userEmail.confirmed, false);
+          var userEmail = user.unconfirmedEmails.filter(function(userEmail) { return userEmail.email === newEmail; })[0];
 
           return userService.confirmSecondaryEmail(fixture2.user1, userEmail.confirmationCode)
             .then(function() {
-              var userEmail2 = user.emails.filter(function(userEmail) { return userEmail.email === newEmail; })[0];
-              assert.equal(userEmail2.confirmed, true);
+              assert.notEqual(user.emails.indexOf(newEmail), -1);
 
             });
 
@@ -228,8 +223,7 @@ describe("User Service", function() {
 
       userService.addSecondaryEmail(fixture2.user1, newEmail)
         .then(function(user) {
-          var userEmail = user.emails.filter(function(userEmail) { return userEmail.email === newEmail; })[0];
-          assert.equal(userEmail.confirmed, false);
+          var userEmail = user.unconfirmedEmails.filter(function(userEmail) { return userEmail.email === newEmail; })[0];
 
           return userService.confirmSecondaryEmail(fixture2.user1, userEmail.confirmationCode + '1')
             .then(function() {
@@ -249,18 +243,15 @@ describe("User Service", function() {
 
       userService.addSecondaryEmail(fixture2.user1, newEmail)
         .then(function(user) {
-          var userEmail = user.emails.filter(function(userEmail) { return userEmail.email === newEmail; })[0];
+          var userEmail = user.unconfirmedEmails.filter(function(userEmail) { return userEmail.email === newEmail; })[0];
 
           return userService.confirmSecondaryEmail(fixture2.user1, userEmail.confirmationCode)
             .then(function() {
 
               return userService.switchPrimaryEmail(fixture2.user1, newEmail)
                 .then(function(user) {
-                  var userEmail = user.emails.filter(function(userEmail) { return userEmail.email === originalEmail; })[0];
-
                   assert.equal(user.email, newEmail);
-                  assert(userEmail, 'Expected the primary email to become a secondary confirmed email address');
-                  assert.equal(userEmail.confirmed, true);
+                  assert(user.emails.indexOf(originalEmail) >= 0, 'Expected the primary email to become a secondary confirmed email address');
                 });
             });
 
@@ -279,7 +270,7 @@ describe("User Service", function() {
             .then(function() {
               assert.fail('Should have failed');
             }, function(err) {
-              assert.equal(err, 403);
+              assert.equal(err, 404);
             });
 
           })
@@ -298,20 +289,64 @@ describe("User Service", function() {
         .nodeify(done);
     });
 
-    // it('should not allow an email address to be duplicated with another primary', function(done) {
-    //   var userService = testRequire("./services/user-service");
+    it('should not allow an email address to be duplicated with another primary', function(done) {
+      var userService = testRequire("./services/user-service");
 
-    //   userService.addSecondaryEmail(fixture2.user1, fixture2.user2.email)
-    //     .then(function() {
-    //       assert.fail('Expected failure');
-    //     }, function(err) {
-    //       assert.equal(err, 409);
-    //     })
-    //     .nodeify(done);
-    // });
+      userService.addSecondaryEmail(fixture2.user1, fixture2.user2.email)
+        .then(function() {
+          assert.fail('Expected failure');
+        }, function(err) {
+          assert.equal(err, 409);
+        })
+        .nodeify(done);
+    });
 
+    it('should not allow an email address to be duplicated with another confirmed secondary', function(done) {
+      var userService = testRequire("./services/user-service");
+      var newEmail = fixture2.generateEmail();
 
+      userService.addSecondaryEmail(fixture2.user2, newEmail)
+        .then(function(user) {
+          var unconfirmedEmail = user.unconfirmedEmails.filter(function(userEmail) { return userEmail.email === newEmail; })[0];
+
+          return userService.confirmSecondaryEmail(user, unconfirmedEmail.confirmationCode)
+            .then(function() {
+              userService.addSecondaryEmail(fixture2.user1, newEmail)
+                .then(function() {
+                  assert.fail('Expected failure');
+                }, function(err) {
+                  assert.equal(err, 409);
+                });
+
+            });
+
+        })
+        .nodeify(done);
+    });
   });
+
+
+  it('should allow an email address to be duplicated with another unconfirmed secondary, and delete other unconfirmeds on confirmation', function(done) {
+    var userService = testRequire("./services/user-service");
+    var newEmail = fixture2.generateEmail();
+
+    userService.addSecondaryEmail(fixture2.user2, newEmail)
+      .then(function() {
+        return userService.addSecondaryEmail(fixture2.user1, newEmail);
+      })
+      .then(function(user1) {
+        var unconfirmedEmail = user1.unconfirmedEmails.filter(function(userEmail) { return userEmail.email === newEmail; })[0];
+        return userService.confirmSecondaryEmail(user1, unconfirmedEmail.confirmationCode);
+      })
+      .then(function() {
+        return userService.findById(fixture2.user2.id);
+      })
+      .then(function(user2) {
+        assert(user2.unconfirmedEmails.filter(function(userEmail) { return userEmail.email === newEmail; }).length === 0);
+      })
+      .nodeify(done);
+  });
+
 
   after(function() {
     fixture2.cleanup();

@@ -88,17 +88,17 @@ function serializeEvent(url, operation, model, callback) {
 // --------------------------------------------------------------------
 // Schemas
 // --------------------------------------------------------------------
-var UserEmailSchema = new Schema({
+var UnconfirmedEmailSchema = new Schema({
   email:            { type: String },
-  confirmationCode: { type: String },
-  confirmed:        Boolean
+  confirmationCode: { type: String }
 });
-UserEmailSchema.schemaTypeName = 'UserEmailSchema';
+UnconfirmedEmailSchema.schemaTypeName = 'UserEmailSchema';
 
 var UserSchema = new Schema({
   displayName: { type: String },
-  email: { type: String },    // The primary email address
-  emails: [UserEmailSchema],  // Secondary email addresses
+  email: { type: String },                     // The primary email address
+  emails: [String],                            // Secondary email addresses
+  unconfirmedEmails: [UnconfirmedEmailSchema], // Unconfirmed email addresses
   username: { type: String },
   newEmail: String,
   confirmationCode: {type: String },
