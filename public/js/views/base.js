@@ -189,7 +189,18 @@ define([
       this.trigger('close');
       this.off();
       this.el._view = null;
+    },
+
+    disableForm: function($form) {
+      $form = $form || this.$el.find('form');
+      $form.find('button, input[type=submit]').attr('disabled', true);
+    },
+
+    enableForm: function($form) {
+      $form = $form || this.$el.find('form');
+      $form.find('button, input[type=submit]').removeAttr('disabled');
     }
+
   });
 
   TroupeViews.Modal =   TroupeViews.Base.extend({
