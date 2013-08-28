@@ -64,7 +64,7 @@ require([
 
   // Setup the ChatView
 
-  var chatCollectionView = new ChatCollectionView({
+  new ChatCollectionView({
     el: $('#frame-chat'),
     collection: itemCollections.chats,
     userCollection: itemCollections.users
@@ -76,14 +76,13 @@ require([
 
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
-    collection: itemCollections.chats,
-    scrollDelegate: chatCollectionView.scrollDelegate
+    collection: itemCollections.chats
   }).render();
 
   new Router({
     routes: [
       { name: "request",          re: /^request\/(\w+)$/,         viewType: RequestDetailView,            collection: itemCollections.requests },
-      { name: "invite",          re: /^invite\/(\w+)$/,           viewType: InviteDetailView,             collection: itemCollections.invites },
+      { name: "invite",           re: /^invite\/(\w+)$/,          viewType: InviteDetailView,             collection: itemCollections.invites },
       { name: "file",             re: /^file\/(\w+)$/,            viewType: FileDetailView,               collection: itemCollections.files },
       { name: "filePreview",      re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: itemCollections.files },
       { name: "fileVersions",     re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: itemCollections.files },
