@@ -429,52 +429,69 @@ var userService = {
   },
 
   addSecondaryEmail: function(user, email) {
-    user.emails.push({
-      email:            email,
-      confirmed:        false,
-      confirmationCode: uuid.v4()
-    });
-    return user.saveQ().thenResolve(user);
+    return persistence.User.findOneQ({ $or: [{ email: email }, { emails: email } ]})
+      .then(function(existing) {
+        if(existing) throw 409; // conflict
+
+        user.unconfirmedEmails.push({
+          email:            email,
+          confirmationCode: uuid.v4()
+        });
+        return user.saveQ().thenResolve(user);
+
+      });
   },
 
   switchPrimaryEmail: function(user, email) {
     assert(user.isConfirmed(), 'User must be confirmed');
 
-    var secondary = _.find(user.emails, function(userEmail) {
-      return userEmail.email == email;
-    });
+    var index = user.emails.indexOf(email);
+    if(index < 0) return Q.reject(404);
+    user.emails.splice(index, 1, user.email);
 
-    if(!secondary) return Q.reject(404);
-    if(!secondary.confirmed) return Q.reject(403);
-
-    secondary.remove();
-
-    user.emails.push({
-      email: user.email,
-      confirmed: true
-    });
-    user.email = secondary.email;
+    user.email = email;
     return user.saveQ().thenResolve(user);
   },
 
   removeSecondaryEmail: function(user, email) {
-    user.emails = user.emails.filter(function(userEmail) {
-      return userEmail.email !== email;
-    });
+    var index = user.emails.indexOf(email);
+    if(index >= 0) {
+      user.emails.splice(index, 1);
+      return user.saveQ().thenResolve(user);
+    }
 
-    return user.saveQ().thenResolve(user);
+    var unconfirmed = user.unconfirmedEmails.filter(function(unconfirmedEmail) {
+      return unconfirmedEmail.email === email;
+    }).shift();
+
+    if(unconfirmed) {
+      unconfirmed.remove();
+      return user.saveQ().thenResolve(user);
+    }
+
+    return Q.reject(404);
   },
 
   confirmSecondaryEmail: function(user, confirmationCode) {
-    var userEmail = user.emails.filter(function(userEmail) {
-      return userEmail.confirmationCode == confirmationCode;
+    var unconfirmed = user.unconfirmedEmails.filter(function(unconfirmedEmail) {
+      return unconfirmedEmail.confirmationCode === confirmationCode;
     }).shift();
 
-    if(!userEmail) return Q.reject(404);
 
-    userEmail.confirmed = true;
+    if(!unconfirmed) return Q.reject(404);
+    unconfirmed.remove();
+    var email = unconfirmed.email;
 
-    return user.saveQ().thenResolve(user);
+    user.emails.push(email);
+
+    return user.saveQ()
+      .then(function() {
+        return persistence.User.updateQ(
+          { 'unconfirmedEmails.email': email },
+          { $pull: { unconfirmedEmails: { email: email } } },
+          { multi: true });
+      })
+      .thenResolve(user);
   }
 
 };
