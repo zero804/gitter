@@ -1,4 +1,4 @@
-/*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'jquery',
   'log!login',
@@ -29,22 +29,6 @@ require([
 
     var defaultEmail = getDefaultEmail();
     if(defaultEmail) $('#email').val(defaultEmail);
-
-    var leftPanelSpacing = (($(document).width() - 320) / 2) + 320;
-
-    $('#panel-signup').css('left', leftPanelSpacing + 'px').show();
-
-    $('#button-signup').on('click', function() {
-      $('#panel-signup, #panel-login').animate( {
-        left: '-=' + leftPanelSpacing + 'px'
-      }, 350);
-    });
-
-    $('#button-back').on('click', function() {
-      $('#panel-signup, #panel-login').animate( {
-        left: '+=' + leftPanelSpacing + 'px'
-      }, 350);
-    });
 
     $('#button-login').on('click', function(e) {
       e.preventDefault();
@@ -78,26 +62,25 @@ require([
     });
 
     function showLoginFailure() {
-      // $('#login-failure').slideUp();
-      $('#login-failure').animate({
+      $('#login-failure').show().animate({
         bottom: '0px'
       }, 350);
     }
 
     function hideLoginFailure() {
-      $('.mtrpLoginFailure').animate( {
+      $('.mtrpLoginFailure').hide().animate( {
         bottom: '-200px'
       }, 350);
     }
 
     function showResetFailure() {
-      $('#resetpwd-failure').animate({
+      $('#resetpwd-failure').show().animate({
         bottom: '0px'
       }, 350);
     }
 
     function showResetSuccess() {
-      $('#resetpwd-confirm').animate({
+      $('#resetpwd-confirm').show().animate({
         bottom: '0px'
       }, 350);
     }
@@ -130,7 +113,6 @@ require([
     }
 
     function sendReset(options) {
-      var that = this;
       var form = $('form#loginform');
       $.ajax({
         url: "/reset",
