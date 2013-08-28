@@ -27,7 +27,7 @@ define([
   var ChatCollectionView = Marionette.CollectionView.extend({
     itemView: chatItemView.ChatItemView,
     itemViewOptions: function() {
-      return { userCollection: this.userCollection/*, scrollDelegate: this.scrollDelegate */};
+      return { userCollection: this.userCollection};
     },
     chatMessageLimit: PAGE_SIZE,
 
