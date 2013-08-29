@@ -4,14 +4,14 @@ define([
   'underscore',
   'views/base',
   'utils/context',
-  'log!appIntegratedView',
+  'utils/appevents',
   'marionette',
   'views/signup/usernameView',
   'views/app/uiVars',
   'components/modal-region',
   'bootstrap_tooltip',  // no ref
   "nanoscroller"        // no ref
-  ], function($, _, TroupeViews, context, log, Marionette, UsernameView, uiVars, modalRegion) {
+  ], function($, _, TroupeViews, context, appEvents, Marionette, UsernameView, uiVars, modalRegion) {
   "use strict";
 
   var touchEvents = {
@@ -60,6 +60,7 @@ define([
       //$(".nano").nanoScroller({ preventPageScrolling: true });
 
       this.dialogRegion = modalRegion;
+      this._leftMenuLockCount = 0;
 
       this.rightPanelRegion.on('show', function() {
         //log("SHOW PANEL");
@@ -135,92 +136,14 @@ define([
     },
 
     showMenu: function() {
-      log("*********** Showing left menu");
-      if (this.leftmenu) return;
-
-
-      if (!window._troupeIsTablet) $("#chat-input-textarea").blur();
-
-      if (this.selectedListIcon == "icon-search") {
-        this.activateSearchList();
-      }
-
-      if ($(window).width() < 1250) {
-
-        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
-          left: "+=280px"
-        }, 350);
-
-
-        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
-          left: "+=280px"
-        }, 350);
-
-        $("#right-panel").animate({
-          right: "-=280px"
-        }, 350);
-      }
-
-      else {
-        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
-          left: "+=280px"
-        }, 350);
-
-
-        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
-          left: "+=180px"
-        }, 350);
-
-        $("#right-panel").animate({
-          right: "-=280px"
-        }, 350);
-      }
-
-
-      $("left-menu-hotspot").hide();
-      this.leftmenu = true;
+      if (this._menuAnimating) return;
+      this.openLeftMenu();
     },
 
     hideMenu: function() {
+      if(this._menuAnimating || this._leftMenuLockCount > 0) return;
 
-      if (!this.leftmenu) return;
-
-      // refocus chat input in case it's lost focus but don't do that on tablets
-      if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
-
-
-      if ($(window).width() < 1250) {
-        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
-          left: "-=280px"
-        }, 350);
-
-
-        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
-          left: "-=280px"
-        }, 350);
-
-        $("#right-panel").animate({
-          right: "+=280px"
-        }, 350);
-      }
-
-      else {
-        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
-          left: "-=280px"
-        }, 350);
-
-
-        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
-          left: "-=180px"
-        }, 350);
-
-        $("#right-panel").animate({
-          right: "+=280px"
-        }, 350);
-      }
-
-      $("left-menu-hotspot").hide();
-      this.leftmenu = false;
+      this.closeLeftMenu();
     },
 
     togglePanel: function(whichPanel) {
@@ -353,6 +276,116 @@ define([
         // }, 250);
         this.profilemenu = false;
       }
+    },
+
+    lockLeftMenuOpen: function() {
+      this._leftMenuLockCount++;
+    },
+
+    unlockLeftMenuOpen: function() {
+      this._leftMenuLockCount--;
+    },
+
+    openLeftMenu: function() {
+      if (this.leftmenu) return;
+
+      if (!window._troupeIsTablet) $("#chat-input-textarea").blur();
+
+      if (this.selectedListIcon == "icon-search") {
+        this.activateSearchList();
+      }
+
+      var self = this;
+      this._menuAnimating = true;
+
+      appEvents.trigger('leftMenu:animationStarting');
+      setTimeout(function() {
+        self._menuAnimating = false;
+        appEvents.trigger('leftMenu:showing');
+        appEvents.trigger('leftMenu:animationComplete');
+      }, 350);
+
+
+      if ($(window).width() < 1250) {
+        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
+          left: "+=280px"
+        }, 350);
+
+
+        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
+          left: "+=280px"
+        }, 350);
+
+        $("#right-panel").animate({
+          right: "-=280px"
+        }, 350);
+      } else {
+        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
+          left: "+=280px"
+        }, 350);
+
+
+        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
+          left: "+=180px"
+        }, 350);
+
+        $("#right-panel").animate({
+          right: "-=280px"
+        }, 350);
+      }
+
+      $("left-menu-hotspot").hide();
+      this.leftmenu = true;
+    },
+
+    closeLeftMenu: function() {
+      if(!this.leftmenu) return;
+      this._leftMenuLockCount = 0;
+
+      // refocus chat input in case it's lost focus but don't do that on tablets
+      if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
+
+      var self = this;
+      this._menuAnimating = true;
+
+      appEvents.trigger('leftMenu:animationStarting');
+      setTimeout(function() {
+        self._menuAnimating = false;
+        appEvents.trigger('leftMenu:hidden');
+        appEvents.trigger('leftMenu:animationComplete');
+      }, 350);
+
+      if ($(window).width() < 1250) {
+        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
+          left: "-=280px"
+        }, 350);
+
+
+        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
+          left: "-=280px"
+        }, 350);
+
+        $("#right-panel").animate({
+          right: "+=280px"
+        }, 350);
+      }
+
+      else {
+        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
+          left: "-=280px"
+        }, 350);
+
+        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
+          left: "-=180px"
+        }, 350);
+
+        $("#right-panel").animate({
+          right: "+=280px"
+        }, 350);
+      }
+
+      $("left-menu-hotspot").hide();
+      this.leftmenu = false;
     }
 
   });

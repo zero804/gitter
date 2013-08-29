@@ -1,10 +1,11 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'jquery',
   'views/base',
   'utils/context',
   'log!invite-modal-view',
   'hbs!./tmpl/inviteModal'
-], function(TroupeViews, context, log, inviteModalTemplate) {
+], function($, TroupeViews, context, log, inviteModalTemplate) {
   "use strict";
 
   var InviteView = TroupeViews.ConfirmationView.extend({
