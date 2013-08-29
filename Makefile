@@ -144,7 +144,7 @@ search-js-console:
 
 validate-source: search-js-console
 
-continuous-integration: clean validate-source npm grunt version-files upgrade-data init-test-data test-xunit test-coverage tarball
+continuous-integration: clean validate-source npm grunt version-files upgrade-data reset-test-data test-xunit test-coverage tarball
 
 post-deployment-tests: test-in-browser-xunit end-to-end-test-saucelabs-chrome end-to-end-test-saucelabs-ie9 end-to-end-test-saucelabs-android
 
