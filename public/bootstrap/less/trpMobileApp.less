@@ -16,6 +16,12 @@ html, body {
   overflow: hidden;
 }
 
+header {
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+}
+
 .sideMenu {
   width: 85%;
   position: absolute;
@@ -26,25 +32,44 @@ html, body {
   position: absolute;
   box-shadow: 0 0 15px black;
   z-index: 1;
-
-  transform: translate3d(0,0,0);
-  -webkit-transform: translate3d(0,0,0);
-  -webkit-transition: all 200ms cubic-bezier(0.6, -0.28, 0.735, 0.045);
-  -moz-transition: all 200ms cubic-bezier(0.6, -0.28, 0.735, 0.045);
-  -o-transition: all 200ms cubic-bezier(0.6, -0.28, 0.735, 0.045);
-  transition: all 200ms cubic-bezier(0.6, -0.28, 0.735, 0.045);
+  .animation(cubic-bezier(0.6, -0.28, 0.735, 0.045));
 }
 
 #mainPage.partiallyOffScreen {
   left: 85%;
-  transform: translate3d(0,0,0);
-  -webkit-transform: translate3d(0,0,0);
-  -webkit-transition: all 200ms linear;
-  -moz-transition: all 200ms linear;
-  -o-transition: all 200ms linear;
-  transition: all 200ms linear;
+  .animation(linear);
 }
 
+#content {
+  height: 100%;
+  box-sizing: border-box;
+  padding-bottom: 69px;
+  position: absolute;
+  padding-top: 50px;
+}
+
+#showUserhomeButton {
+  position: absolute;
+  right: 0;
+  padding-right: 12px;
+  padding-top: 5px;
+}
+
+#chat-input {
+  position: absolute;
+  width: 100%
+}
+
+.animation(@transform) {
+          transform: translate3d(0,0,0);
+  -webkit-transform: translate3d(0,0,0);
+  -webkit-transition: all 200ms @transform;
+     -moz-transition: all 200ms @transform;
+       -o-transition: all 200ms @transform;
+          transition: all 200ms @transform;
+}
+
+// overrides for userhome
 .typeahead {
   max-width: 280px;
   overflow: hidden;
