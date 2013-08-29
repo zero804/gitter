@@ -154,12 +154,22 @@ class SignupTests(unittest.TestCase):
         displayName = form.find_element_by_name('displayName').get_attribute('value')
         self.assertEqual(displayName, name)
 
-        form.find_element_by_name('password').send_keys(troupe_password)
-        form.find_element_by_name('submit').click()
+        # This is correct:
+        #form.find_element_by_name('password').send_keys(troupe_password)
+        #form.find_element_by_name('submit').click()
+
+        # This works on IE:
+        self.driver.find_element_by_id('password').send_keys('password')
+        self.driver.find_element_by_css_selector('#updateprofileform [type=submit]').click()
       
         # Welcome page
         self.driver.find_element_by_css_selector('.trpHelpBox')
-        self.assertEqual(self.driver.current_url, utils.baseUrl('/' + username))
+
+        # IE9 adds a # to the end of the URL, sucks
+        if '#' in self.driver.current_url:
+            self.assertEqual(self.driver.current_url, utils.baseUrl('/'+username)+'#')
+        else:
+            self.assertEqual(self.driver.current_url, utils.baseUrl('/'+username))
 
 
     def tearDown(self):
