@@ -38,6 +38,8 @@ define([
       this.userCollection = options.userCollection;
       //this.scrollDelegate = options.scrollDelegate;
 
+      this.decorator = options.decorator;
+
       this.model.on('change', function() {
         self.onChange();
       });
@@ -62,7 +64,9 @@ define([
     getRenderData: function() {
       var data = this.model.toJSON();
 
-      data.displayName = data.fromUser.displayName;
+      if (data.fromUser) {
+        data.displayName = data.fromUser.displayName;
+      }
 
       return data;
     },
@@ -89,6 +93,7 @@ define([
     afterRender: function() {
       this.renderText();
       this.updateRender();
+      if (this.decorator) this.decorator.enrich(this);
     },
 
     updateRender: function() {
@@ -173,6 +178,7 @@ define([
     },
 
     isOwnMessage: function() {
+      if (this.model.get('fromUser') === null) return false;
       return this.model.get('fromUser').id === context.getUserId();
     },
 

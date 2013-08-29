@@ -24,10 +24,13 @@ define([
 
     getRenderData: function () {
       var d = this.model.toJSON();
-      d.fileIcon = this.model.get('thumbnailUrl');
-      d.previewUrl = '#file/preview/' + d.id;
+      d.fileIcon    = this.model.get('thumbnailUrl');
+      d.previewUrl  = '#file/preview/' + d.id;
       d.versionsUrl = '#file/versions/' + d.id;
-      d.useSpinner = !this.hasThumb();
+      d.useSpinner  = !this.hasThumb();
+      d.showClose   = !this.options.hideClose;
+      d.showActions = !this.options.hideActions;
+      console.log('OPTS: ', this.options, d);
 
       return d;
     },
