@@ -30,7 +30,7 @@
   </div>
 
   <div id="mainPage">
-    <header id="nav-bar">
+    <header id="nav-bar" style="position: absolute; width: 100%; z-index: 1;">
       <div id="showTroupesButton">
         <img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle">
       </div>
@@ -40,6 +40,7 @@
       </a>
     </header>
 
+<div style=" height: 100%; box-sizing: border-box; padding-bottom: 69px; position: absolute; padding-top: 50px; ">
     <div class="contentBody mobile-scroll-class" id="content-frame">
       <div class="frame-chat">
         <div class="trpChatPanel" id="chat-frame">
@@ -47,8 +48,8 @@
         </div>
       </div>
     </div>
-
-    <div class="trpChatInputArea" id="chat-input"></div>
+</div>
+    <div class="trpChatInputArea" id="chat-input" style="position: absolute; width: 100%"></div>
   </div>
 
 </body>
