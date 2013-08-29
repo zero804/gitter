@@ -237,20 +237,39 @@ module.exports = {
       },
 
       function(req, accessToken, refreshToken, profile, done) {
-        if (!refreshToken) {
-          winston.info('passport: Refresh token not available');
-          return done(null, req.user);
+        if (req.user) {
+
+          if (!refreshToken) {
+            winston.info('passport: Refresh token not available');
+            return done(null, req.user);
+          }
+
+          req.user.googleRefreshToken = refreshToken;
+          req.user.save(function(err) {
+            winston.info('passport: User updated with token');
+            if(err) done(err);
+            return done(null, req.user);
+          });
+
+        } else {
+
+          var googleUser = { 
+            displayName:        profile._json.name,
+            email:              profile._json.email,
+            gravatarImageUrl:   profile._json.picture,
+            googleRefreshToken: refreshToken,
+            status:             'PROFILE_NOT_COMPLETED'
+          };
+
+          userService.findOrCreateUserForEmail(googleUser, function(err, user) {
+            if (err) { return done(err); }
+            statsService.userUpdate(user, {source: 'google'});
+            req.logIn(user, function(err) {
+              if (err) { return done(err); }
+              return done(null, user);
+            });
+          });
         }
-
-        req.user.googleRefreshToken = refreshToken;
-        req.user.save(function(err) {
-          winston.info('passport: User updated with token');
-
-          if(err) done(err);
-
-          return done(null, req.user);
-        });
-
       }
     ));
 

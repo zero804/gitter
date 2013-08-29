@@ -29,18 +29,6 @@ require([
   // Asynchronously load tracker
   require(['utils/tracking'], function() { });
 
-  // TODO: remove this and use the confirm stuffs
-  if(context().profileNotCompleted) {
-    var view = new profileView.Modal({ disableClose: true  });
-
-    view.once('close', function() {
-       window.location.reload(true);
-    });
-    view.show();
-
-    return;
-  }
-
   // TODO: stop using localstorage for this, move to context events
   try {
     var ls = window.localStorage;

@@ -3,6 +3,7 @@
 "use strict";
 
 var persistence = require("./persistence-service");
+//var chatService = require("./chat-service");
 var userService = require("./user-service");
 var appEvents = require("../app-events");
 var assert = require("assert");
@@ -233,6 +234,17 @@ function addUserIdToTroupe(userId, troupeId) {
         if(troupe.containsUserId(userId)) {
           return troupe;
         }
+       
+        //userService.findById(userId, function(err, user) { 
+        //  var msg = user.displayName + ' has joined';
+        //  var meta = {
+        //    type: 'user',
+        //    action: 'joined',
+        //    userId: user.userId
+        //  };
+        //  chatService.newRichMessageToTroupe(troupe, user, msg, meta, function(err, msg) {
+        //  });
+        //});
 
         troupe.addUserById(userId);
         return troupe.saveQ()
@@ -307,7 +319,7 @@ function notifyRecipientsOfInvites(invites) {
             uri = troupe.uri;
           } else if(!invite.troupeId && fromUser) {
             text = fromUser.displayName + " has invited you to connect";
-            uri = fromUser.getHomeUrl();
+            uri = fromUser.getHomeUri();
           }
 
           appEvents.userNotification({
@@ -316,7 +328,7 @@ function notifyRecipientsOfInvites(invites) {
             // TODO: add onetoone bits in to this invite
             title: "New Invitation",
             text: text,
-            link: uri,
+            link: '/' + uri,
             sound: "invitation"
           });
 
@@ -1209,6 +1221,10 @@ function rejectInviteForAuthenticatedUser(user, invite) {
   });
 }
 
+/**
+ * Accept an invite to a one to one connection or a troupe
+ * @return the promise of a troupe
+ */
 function acceptInviteForAuthenticatedUser(user, invite) {
   return Q.resolve(null).then(function() {
     assert(user, 'User parameter required');
@@ -1228,8 +1244,8 @@ function acceptInviteForAuthenticatedUser(user, invite) {
     }
 
     // use and delete invite
-    statsService.event('invite_accepted', { userId: user.id, inviteId: invite.id});
-    winston.verbose("Invite accepted", { inviteId: invite.id });
+    statsService.event('invite_accepted', { userId: user.id, email: user.email, inviteId: invite.id, new_user: user.status !== 'ACTIVE' });
+    winston.verbose("Invite accepted for authd user", { inviteId: invite.id });
 
     // Either add the user or create a one to one troupe. depending on whether this
     // is a one to one invite or a troupe invite
@@ -1243,7 +1259,8 @@ function acceptInviteForAuthenticatedUser(user, invite) {
         sendInviteAcceptedNotice(invite, troupe, isNormalTroupe);
 
         // Regardless of the type, mark things as done
-        return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite);
+        return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite)
+          .thenResolve(troupe);
       });
 
   });
@@ -1326,7 +1343,7 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
         .then(function(user) {
           // Invite is good to accept
 
-          statsService.event('invite_accepted', { userId: user.id, uri: troupeUri });
+          statsService.event('invite_accepted', { userId: user.id, email: user.email, uri: troupeUri, new_user: user.status !== 'ACTIVE' });
           winston.verbose("Invite accepted", { confirmationCode: confirmationCode, troupeUri: troupeUri });
 
           var confirmOperation = null;

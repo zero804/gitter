@@ -22,11 +22,25 @@ module.exports = {
       });
     },
 
+    show: function(req, res, next) {
+      var strategy = new restSerializer.InviteStrategy({});
+
+      restSerializer.serialize(req.invite, strategy, function(err, serialized) {
+        if(err) return next(err);
+
+        res.send(serialized);
+      });
+
+    },
+
     update:  function(req, res){
       // accept invite
       troupeService.acceptInviteForAuthenticatedUser(req.user, req.invite)
-        .then(function() {
-          res.send({ success: true });
+        .then(function(troupe) {
+          return troupeService.getUrlForTroupeForUserId(troupe, req.user.id)
+            .then(function(url) {
+              res.send({ success: true, troupeUrl: url, troupeId: troupe.id });
+            });
         })
         .fail(function(err){
           winston.error('Unable to accept invite: ', { exception: err });

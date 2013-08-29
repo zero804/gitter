@@ -103,6 +103,7 @@ function UserStrategy(options) {
     }
     return {
       id: user.id,
+      status: options.includeEmail ? user.status : undefined,
       username: user.username,
       displayName: user.displayName,
       url: user.getHomeUrl(),
@@ -512,6 +513,7 @@ function ChatStrategy(options)  {
       readBy: item.readBy ? item.readBy.length : undefined,
       urls: item.urls || [],
       mentions: item.mentions || [],
+      meta: item.meta || {},
       v: getVersion(item)
     };
 
