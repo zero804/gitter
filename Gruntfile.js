@@ -152,6 +152,15 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
+                  name: "routers/mobile/native/accept-router",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
                   name: "router-login",
                   include: [
                     "utils/tracking",
@@ -200,6 +209,7 @@ module.exports = function( grunt ) {
       "native-files-router": createClosureConfig('routers/mobile/native/files-router'),
       "native-conversations-router": createClosureConfig('routers/mobile/native/conversations-router'),
       "native-people-router": createClosureConfig('routers/mobile/native/people-router'),
+      "native-accept-router": createClosureConfig('routers/mobile/native/accept-router'),
       "router-login": createClosureConfig('router-login'),
       "complete-profile": createClosureConfig('complete-profile'),
       "login": createClosureConfig('login')
@@ -287,11 +297,11 @@ module.exports = function( grunt ) {
           "public/bootstrap/css/trpMails.css": "public/bootstrap/less/trpMails.less",
           "public/bootstrap/css/trpPeople.css": "public/bootstrap/less/trpPeople.less",
           "public/bootstrap/css/trpMobileApp.css": "public/bootstrap/less/trpMobileApp.less",
-          "public/bootstrap/css/trpMobileChat.css": "public/bootstrap/less/trpMobileChat.less",
-          "public/bootstrap/css/trpMobileFiles.css": "public/bootstrap/less/trpMobileFiles.less",
-          "public/bootstrap/css/trpMobileConversations.css": "public/bootstrap/less/trpMobileConversations.less",
-          "public/bootstrap/css/trpMobilePeople.css": "public/bootstrap/less/trpMobilePeople.less"
-
+          "public/bootstrap/css/trpNativeChat.css": "public/bootstrap/less/trpNativeChat.less",
+          "public/bootstrap/css/trpNativeFiles.css": "public/bootstrap/less/trpNativeFiles.less",
+          "public/bootstrap/css/trpNativeConversations.css": "public/bootstrap/less/trpNativeConversations.less",
+          "public/bootstrap/css/trpNativePeople.css": "public/bootstrap/less/trpNativePeople.less",
+          "public/bootstrap/css/trpNativeAccept.css": "public/bootstrap/less/trpNativeAccept.less"
         }
       }
     },
@@ -502,7 +512,7 @@ module.exports = function( grunt ) {
     }
   });
 
-  grunt.loadNpmTasks('grunt-requirejs');
+  grunt.loadNpmTasks('grunt-contrib-requirejs');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-reload');

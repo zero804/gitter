@@ -12,16 +12,14 @@ var Q = require('q');
 exports.generateMiniContext = function(req, callback) {
   var user = req.user;
 
-  return Q.all([ 
+  return Q.all([
       user ? serializeUser(user) : null,
       user ? getWebToken(user) : null
     ])
     .spread(function(serializedUser, token) {
-      var profileNotCompleted = user ? user.status == 'PROFILE_NOT_COMPLETED' : null;
       return createTroupeContext(req, {
         user: serializedUser,
         accessToken: token,
-        profileNotCompleted: profileNotCompleted,
         inUserhome: true
       });
     })
@@ -53,14 +51,13 @@ exports.generateTroupeContext = function(req, callback) {
     user ? serializeUser(user) : null,
     homeUser ? serializeHomeUser(homeUser, !!invite) : undefined, //include email if the user has an invite
     user ? getWebToken(user) : null,
-    troupe && user ? serializeTroupe(troupe, user) : fakeSerializedTroupe(req.uriContext) 
+    troupe && user ? serializeTroupe(troupe, user) : fakeSerializedTroupe(req.uriContext)
   ])
   .spread(function(serializedUser, serializedHomeUser, token, serializedTroupe) {
 
-    var status, profileNotCompleted;
+    var status;
     if(user) {
       status = user.status;
-      profileNotCompleted = (status == 'PROFILE_NOT_COMPLETED') || (status == 'UNCONFIRMED');
     }
 
     return createTroupeContext(req, {
@@ -68,7 +65,6 @@ exports.generateTroupeContext = function(req, callback) {
       homeUser: serializedHomeUser,
       troupe: serializedTroupe,
       accessToken: token,
-      profileNotCompleted: profileNotCompleted,
       inviteId: invite && invite.id,
       accessDenied: accessDenied
     });
@@ -140,7 +136,6 @@ function createTroupeContext(req, options) {
       inUserhome: options.inUserhome,
       accessToken: options.accessToken,
       loginToAccept: req.loginToAccept,
-      profileNotCompleted: options.profileNotCompleted,
       accessDenied: options.accessDenied,
       inviteId: options.inviteId,
       appVersion: appVersion.getCurrentVersion(),

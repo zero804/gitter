@@ -99,7 +99,7 @@ define([
 			function check() {
 				clearTimeout(self.timer);
 
-				var username = self.$el.find('input[name=username]').val();
+				var username = self.getInput();
 
 				// don't check availability of empty username
 				if (!username) return;
@@ -110,7 +110,7 @@ define([
 						text: username
 					},
 					success: function(suggestions) {
-						var username = self.$el.find('input[name=username]').val();
+						var username = self.getInput();
 						var requested = _.findWhere(suggestions, { username: username });
 						if (requested && requested.available) {
 							self.isAvailable(username);
@@ -125,6 +125,10 @@ define([
 			}
 
 			return true;
+		},
+
+		getInput: function() {
+			return this.$el.find('input[name=username]').val().toLowerCase();
 		},
 
 		isAvailable: function (username) {
@@ -159,7 +163,7 @@ define([
 			e.stopPropagation();
 
 			var self = this;
-			var username = this.$el.find('input[name=username]').val();
+			var username = this.getInput();
 
 			if (!username) {
 				error();

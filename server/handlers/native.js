@@ -41,5 +41,8 @@ module.exports = {
       app.get('/mobile/people',
         serveNativeApp('people'));
 
+      app.get('/mobile/accept',
+        serveNativeApp('accept'));
+
     }
 };

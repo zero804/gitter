@@ -1,9 +1,5 @@
-
-@import "trpColours.less";
-@import "trpMobileFonts.less";
-@import "trp3Common.less";
-@import "trp3Mail.less";
-@import "trp3MobileCommon.less";
+@import "trpNative.less";
+@import "trpFiles.less";
 
 body {
 	margin: 0;
@@ -29,36 +25,45 @@ a {
 .contentBody {
 	position: absolute;
 	top: 0;
-	bottom: 0;
-	left:0;
+	left: 0;
 	right: 0;
-
+	bottom: 0px;
+	width: 320px;
+	max-width: 320px;
+	overflow: scroll;
+	-webkit-overflow-scrolling: touch;
 }
 
 .with-back-button {
 	position: absolute;
 	top: 0;
-	bottom: 40px;
+	bottom: 45px;
 	left:0;
 	right: 0;
-	padding-top: 5px;
 }
 
 .mobile-scroll {
 	overflow: scroll;
 	-webkit-overflow-scrolling: touch;
-
 }
 
-.trpMobileMailContainer {
-	padding-left: 5px;
+.trpMobileFilePreview{
+	height: 100%;
+	width: 100%;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
 }
 
-.trpMailRowContainer:last-child {
-	margin-bottom: 50px;
+.trpMobileFilePreviewFrame {
+	border: 0;
+	width: 320px;
 }
 
-.trpMobileMailBack {
+.trpMobileFilePreviewFrame img {
+	width: 320px;
+}
+
+.trpMobileBack {
 	position: fixed;
 	background-color: @trpGreen;
 	bottom: 0px;
@@ -69,8 +74,3 @@ a {
 	padding-top: 16px;
 	color: white;
 }
-
-.trpMobileMailMargin {
-	margin-top: 12px;
-}
-

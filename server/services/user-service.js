@@ -29,11 +29,12 @@ var userService = {
     assert(options.email, 'Email atttribute required');
 
     var user = new persistence.User({
-      displayName:      options.displayName,
-      email:            options.email.toLowerCase(),
-      confirmationCode: uuid.v4(),
-      gravatarImageUrl: generateGravatarUrl(options.email),
-      status:           options.status || "UNCONFIRMED"
+      displayName:        options.displayName,
+      email:              options.email.toLowerCase(),
+      confirmationCode:   uuid.v4(),
+      gravatarImageUrl:   options.gravatarImageUrl || generateGravatarUrl(options.email),
+      googleRefreshToken: options.googleRefreshToken || undefined,
+      status:             options.status || "UNCONFIRMED",
     });
 
     return user.saveQ().then(function() { return user; }).nodeify(callback);

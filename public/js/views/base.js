@@ -189,7 +189,18 @@ define([
       this.trigger('close');
       this.off();
       this.el._view = null;
+    },
+
+    disableForm: function($form) {
+      $form = $form || this.$el.find('form');
+      $form.find('button, input[type=submit]').attr('disabled', true);
+    },
+
+    enableForm: function($form) {
+      $form = $form || this.$el.find('form');
+      $form.find('button, input[type=submit]').removeAttr('disabled');
     }
+
   });
 
   TroupeViews.Modal =   TroupeViews.Base.extend({
@@ -539,6 +550,7 @@ define([
 
       $e.insertAfter(this.targetElement);
       var pos = this.getPosition();
+      $e.insertAfter($('body'));
 
       var actualWidth = e.offsetWidth;
       var actualHeight = e.offsetHeight;
