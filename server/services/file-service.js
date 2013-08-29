@@ -215,7 +215,7 @@ function storeFileVersionInGrid(options, callback) {
   winston.verbose("storeFileVersionInGrid");
 
   var troupeId = options.troupe.id;
-  var creatorUserId = options.user.id;
+  var creatorUserId = options.user ? options.user.id : null;
   var fileName = options.fileName;
   var mimeType = options.mimeType;
   var temporaryFile = options.file; // this is the file path

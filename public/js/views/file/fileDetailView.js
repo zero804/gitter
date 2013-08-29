@@ -30,7 +30,6 @@ define([
       d.useSpinner  = !this.hasThumb();
       d.showClose   = !this.options.hideClose;
       d.showActions = !this.options.hideActions;
-      console.log('OPTS: ', this.options, d);
 
       return d;
     },
