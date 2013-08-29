@@ -19,10 +19,6 @@ define([], function() {
     chatWrapper.style.height = spaceForWrapper + 'px';
   };
 
-  var setPageWidth = function() {
-    document.getElementById('mainPage').style.width = window.innerWidth+"px";
-  };
-
   var resizeChatWrapperToFit = function() {
     if(isPageTooBig()) {
       shrinkChatWrapperToFit();
@@ -36,7 +32,6 @@ define([], function() {
 
   var reset = function() {
     resetChatWrapperSize();
-    setPageWidth();
     hideAddessBar();
     resizeChatWrapperToFit();
   };

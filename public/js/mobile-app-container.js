@@ -12,7 +12,7 @@ define([
   "use strict";
 
   new MobileAppView({
-    el: $('#pageContainer')
+    el: $('#mainPage')
   });
 
   var app = new Marionette.Application();
