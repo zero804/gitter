@@ -26,6 +26,7 @@ require([
   'views/invite/reinviteModal',
   'utils/router',
   'components/unread-items-client',
+  'views/chat/decorator',
   'components/webNotifications', // No ref
   'components/desktopNotifications', // No ref
   'components/errorReporter',  // No ref
@@ -37,7 +38,7 @@ require([
             itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, shareSearchView,
             createTroupeView, UsernameView, HeaderView,
-            troupeSettingsView, TroupeMenuView, ReinviteModal, Router, unreadItemsClient /*, errorReporter , FilteredCollection */) {
+            troupeSettingsView, TroupeMenuView, ReinviteModal, Router, unreadItemsClient, chatDecorator /*, errorReporter , FilteredCollection */) {
   "use strict";
 
   // Make drop down menus drop down
@@ -67,7 +68,8 @@ require([
   new ChatCollectionView({
     el: $('#frame-chat'),
     collection: itemCollections.chats,
-    userCollection: itemCollections.users
+    userCollection: itemCollections.users,
+    decorator: chatDecorator
   }).render();
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));

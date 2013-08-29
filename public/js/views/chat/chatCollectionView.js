@@ -27,7 +27,7 @@ define([
   var ChatCollectionView = Marionette.CollectionView.extend({
     itemView: chatItemView.ChatItemView,
     itemViewOptions: function() {
-      return { userCollection: this.userCollection};
+      return { userCollection: this.userCollection, decorator: this.decorator};
     },
     chatMessageLimit: PAGE_SIZE,
 
@@ -46,6 +46,7 @@ define([
 
       this.initializeSorting();
       this.userCollection = options.userCollection;
+      this.decorator      = options.decorator;
 
       // CODEDEBT: Move unread-item-tracking into it's own module
       this.findChatToTrack();
