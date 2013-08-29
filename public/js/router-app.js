@@ -3,6 +3,7 @@ require([
   'jquery',
   'backbone',
   'utils/context',
+  'utils/appevents',
   'views/app/appIntegratedView',
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
@@ -33,7 +34,7 @@ require([
   'components/dozy', // Sleep detection No ref
   'template/helpers/all', // No ref
   'components/eyeballs' // No ref
-], function($, Backbone, context, AppIntegratedView, chatInputView, ChatCollectionView,
+], function($, Backbone, context, appEvents, AppIntegratedView, chatInputView, ChatCollectionView,
             itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, shareSearchView,
             createTroupeView, UsernameView, HeaderView,
@@ -83,7 +84,7 @@ require([
   new Router({
     routes: [
       { name: "request",          re: /^request\/(\w+)$/,         viewType: RequestDetailView,            collection: itemCollections.requests },
-      { name: "invite",          re: /^invite\/(\w+)$/,           viewType: InviteDetailView,             collection: itemCollections.invites },
+      { name: "invite",           re: /^invite\/(\w+)$/,          viewType: InviteDetailView,             collection: itemCollections.invites },
       { name: "file",             re: /^file\/(\w+)$/,            viewType: FileDetailView,               collection: itemCollections.files },
       { name: "filePreview",      re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: itemCollections.files },
       { name: "fileVersions",     re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: itemCollections.files },
@@ -102,8 +103,16 @@ require([
     regions: [appView.rightPanelRegion, appView.dialogRegion]
   });
 
-  Backbone.history.start();
 
+  if(true) {
+    require([
+      'tours/tour-controller'
+    ], function(tourController) {
+      tourController.init({ appIntegratedView: appView });
+    });
+  }
+
+  Backbone.history.start();
 
   // Asynchronously load tracker
   require([
