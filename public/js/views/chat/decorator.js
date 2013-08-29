@@ -19,14 +19,15 @@ define([
 
     enrich: function(chatItemView) {
       var meta = chatItemView.model.get('meta');
-
-      switch (meta.type) {
-        case 'file':
-          showFileDetail(chatItemView, meta);
-          break;
-        case 'user':
-          break;
-        default:
+      if (meta) {
+        switch (meta.type) {
+          case 'file':
+            showFileDetail(chatItemView, meta);
+            break;
+          case 'user':
+            break;
+          default:
+        }
       }
     }
 
