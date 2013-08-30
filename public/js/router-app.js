@@ -3,6 +3,7 @@ require([
   'jquery',
   'backbone',
   'utils/context',
+  'utils/appevents',
   'views/app/appIntegratedView',
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
@@ -34,7 +35,7 @@ require([
   'components/dozy', // Sleep detection No ref
   'template/helpers/all', // No ref
   'components/eyeballs' // No ref
-], function($, Backbone, context, AppIntegratedView, chatInputView, ChatCollectionView,
+], function($, Backbone, context, appEvents, AppIntegratedView, chatInputView, ChatCollectionView,
             itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, shareSearchView,
             createTroupeView, UsernameView, HeaderView,
@@ -102,6 +103,16 @@ require([
     ],
     regions: [appView.rightPanelRegion, appView.dialogRegion]
   });
+
+
+  if(!window.localStorage.troupeTour) {
+    window.localStorage.troupeTour = 1;
+    require([
+      'tours/tour-controller'
+    ], function(tourController) {
+      tourController.init({ appIntegratedView: appView });
+    });
+  }
 
   Backbone.history.start();
 

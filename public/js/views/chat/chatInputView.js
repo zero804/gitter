@@ -1,7 +1,6 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
-  'underscore',
   'utils/context',
   'views/base',
   'utils/appevents',
@@ -9,7 +8,7 @@ define([
   'utils/momentWrapper',
   'utils/safe-html',
   'jquery-placeholder' // No ref
-], function($, _, context, TroupeViews, appEvents, template, moment, safeHtml) {
+], function($, context, TroupeViews, appEvents, template, moment, safeHtml) {
   "use strict";
 
   var PAGE_SIZE = 50;
