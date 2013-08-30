@@ -105,8 +105,8 @@ require([
   });
 
 
-  if(!window.localStorage.troupeTour) {
-    window.localStorage.troupeTour = 1;
+  if(!window.localStorage.troupeTourApp) {
+    window.localStorage.troupeTourApp = 1;
     require([
       'tours/tour-controller'
     ], function(tourController) {
