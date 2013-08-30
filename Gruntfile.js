@@ -297,6 +297,7 @@ module.exports = function( grunt ) {
           "public/bootstrap/css/trpMails.css": "public/bootstrap/less/trpMails.less",
           "public/bootstrap/css/trpPeople.css": "public/bootstrap/less/trpPeople.less",
           "public/bootstrap/css/trpMobileApp.css": "public/bootstrap/less/trpMobileApp.less",
+          "public/bootstrap/css/trpMobileUserhome.css": "public/bootstrap/less/trpMobileUserhome.less",
           "public/bootstrap/css/trpNativeChat.css": "public/bootstrap/less/trpNativeChat.less",
           "public/bootstrap/css/trpNativeFiles.css": "public/bootstrap/less/trpNativeFiles.less",
           "public/bootstrap/css/trpNativeConversations.css": "public/bootstrap/less/trpNativeConversations.less",

@@ -16,31 +16,40 @@ var isPhone = require('../web/is-phone');
 var contextGenerator = require('../web/context-generator');
 
 function renderHomePage(req, res, next) {
-  var user = req.user;
-
   contextGenerator.generateMiniContext(req, function(err, troupeContext) {
     if(err) {
       next(err);
     } else {
-
-      var bootScript;
       if(req.isPhone) {
-        bootScript = 'mobile-userhome';
-      } else if(!user) {
-        bootScript = 'router-login';
+        renderMobileUserhome(req, res, troupeContext);
       } else {
-        bootScript = 'router-homepage';
+        renderDesktopUserhome(req, res, troupeContext);
       }
-
-      res.render(req.isPhone ? 'mobile/mobile-app' : 'app-template', {
-        useAppCache: !!nconf.get('web:useAppCache'),
-        bootScriptName: bootScript,
-        isWebApp: true,
-        troupeName: (user && user.displayName) || '',
-        troupeContext: troupeContext,
-        agent: req.headers['user-agent']
-      });
     }
+  });
+}
+
+function renderDesktopUserhome(req, res, troupeContext) {
+  var user = req.user;
+
+  res.render('app-template', {
+    useAppCache: !!nconf.get('web:useAppCache'),
+    bootScriptName: user ? 'router-homepage' : 'router-login',
+    troupeName: (req.user && req.user.displayName) || '',
+    troupeContext: troupeContext,
+    agent: req.headers['user-agent']
+  });
+}
+
+function renderMobileUserhome(req, res, troupeContext) {
+  var user = req.user;
+
+  res.render('mobile/mobile-app', {
+    useAppCache: !!nconf.get('web:useAppCache'),
+    bootScriptName: 'mobile-userhome',
+    troupeName: (user && user.displayName) || '',
+    troupeContext: troupeContext,
+    isUserhome: true
   });
 }
 
@@ -70,7 +79,6 @@ function renderAppPageWithTroupe(req, res, next, page) {
       res.render(page, {
         appCache: getAppCache(req),
         login: login,
-        isWebApp: !req.params.mobilePage, // TODO: fix this!
         bootScriptName: bootScript,
         unreadCount: unreadCount && unreadCount[req.user.id],
         troupeName: troupeContext.troupe.name,
