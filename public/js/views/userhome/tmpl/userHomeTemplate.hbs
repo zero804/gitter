@@ -1,48 +1,39 @@
-<span>
-{{#if compactView}}
-<div style="position: fixed; top: 0; bottom: 0; left: 0; right: 0; background-color: white; z-index: 10000; border-top: 2px solid #1dce73" >
-  <div class="trpH1" style="padding: 12px">
-  Welcome to Troupe
-  </div>
-  <div class="trpBodyText" style="padding: 12px">Troupe is still in Beta right now, please visit Troupe in a web browser to get started. <br><br>Once you've added some contacts or created some groups, you can start using Troupe on your mobile.<br><br>
-  <a href="https://itunes.apple.com/app/troupe/id632039322"><div class="trpHomeMenuItem trpButtonBig trpBtnGreen button-signup" href="" id="button-appstore"> Get the Troupe app for iPhone </div></a>
-  </div>
-</div>
-{{else}}
-<div class="trpHelpBox" style="width: 656px; padding: 20px">
+<span id="userhome">
+<div class="trpHelpBox" style="box-sizing: border-box; width: 100%; padding: 20px">
   <p class="trpH1"><span class="trpGreen">Hi there and thank you for trying out Troupe.</span></p><br>
   <p class="trpBodyMedium">With Troupe you can chat invidiually with your colleagues and others.<br>You can also create group conversations and chat with many people together.</p>
 </div>
 <br><br>
 <a href="#|connect" style="text-decoration: none">
-  <div class="trpHelpBox" id="home-add-people" style="width: 314px; text-align: center; margin-right: 14px">
+  <div class="trpHomeActionPanel trpHelpBox" id="home-add-people" style="margin-right: 14px">
     <img src='{{cdn "images/2/icon-round-person.png" }}' style="margin-top: 8px">
-    <p class="trpBodyText">Find and add people</p>
-    <p class="trpBodySmall">Or share your Troupe address with others. <br><span class="trpGreen">{{baseServer}}/{{username}}</span></p>
-  </div></a>
+    <p class="trpBodyText">Invite people to your contact list</p>
+    <p class="trpBodySmall">You can have private conversations<br> and easily add them to Troupes.</p>
+  </div>
+</a>
 
 <a href="#|create">
-  <div class="trpHelpBox" id="home-create-troupe" style="width: 314px; text-align: center">
+  <div class="trpHomeActionPanel trpHelpBox" id="home-create-troupe">
     <img src='{{cdn "images/2/icon-round-group.png" }}' style="margin-top: 8px">
     <p class="trpBodyText">Start a Troupe</p>
-    <p class="trpBodySmall">Create a group and invite others to join. <br><span class="trpGreen">Good uses are for teams or projects.</span></p>
-  </div></a>
+    <p class="trpBodySmall">Create a group and invite others to join. <br>Good uses are for teams or projects.</p>
+  </div>
+</a>
 
 <br><br>
-<div class="trpHelpBox" style="width: 656px; padding: 20px; margin-bottom: 60px">
+<div id="get-troupe" class="trpHelpBox" style="box-sizing: border-box; width: 100%; padding: 20px; margin-bottom: 60px">
   <p class="trpH1"><span class="trpGreen">Get Troupe on your Mac or iPhone</span></p><br>
   <p class="trpBodyMedium">Get notifications whenever somebody is trying to reach you, wherever you are.</p><br>
   <div style="text-align:center">
-    <div style="display:inline-block; width: 220px; padding-right: 20px">
+    <div style="display:inline-block; width: 220px; padding-right: 20px; padding-bottom: 20px;">
       <a href="http://update.trou.pe/troupe-notifier/beta/latest" target="download" style="text-decoration: none"><img src="{{cdn 'images/2/macbook.png' nonrelative=true }}" border="0"><br><span class="trpGreen">Get Troupe for Mac</span></a><iframe name="download" height="0" width="0" style="display:none"></iframe>
     </div>
-    <div style="display:inline-block; width: 220px;">
+    <div style="display:inline-block; width: 220px; padding-right: 20px;">
       <a href="https://itunes.apple.com/app/troupe/id632039322" target="new" style="text-decoration: none"><img src="{{cdn 'images/2/iphone4-white.png' nonrelative=true }}" border="0"><br><span class="trpGreen">Get Troupe for iPhone</span></a>
     </div>
   </div><br>
   <p class="trpBodySmall" style="text-align: center"><span class="trpGreen">Windows and Android apps are coming soon.</span></p>
 </div>
-{{/if}}
 </span>
 {{!--
 <div class="trpHelpBox" style="width: 656px; padding: 20px">

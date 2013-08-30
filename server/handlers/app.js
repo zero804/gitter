@@ -17,18 +17,26 @@ var contextGenerator = require('../web/context-generator');
 
 function renderHomePage(req, res, next) {
   var user = req.user;
-  var accessDenied = !req.user;
 
   contextGenerator.generateMiniContext(req, function(err, troupeContext) {
     if(err) {
       next(err);
     } else {
-      var login = !user || troupeContext.profileNotCompleted || accessDenied;
 
-      res.render('app-template', {
+      var bootScript;
+      if(req.isPhone) {
+        bootScript = 'mobile-userhome';
+      } else if(!user) {
+        bootScript = 'router-login';
+      } else {
+        bootScript = 'router-homepage';
+      }
+
+      res.render(req.isPhone ? 'mobile/mobile-app' : 'app-template', {
         useAppCache: !!nconf.get('web:useAppCache'),
-        bootScriptName: login ? "router-login" : 'router-homepage',
-        troupeName: (req.user && req.user.displayName) || '',
+        bootScriptName: bootScript,
+        isWebApp: true,
+        troupeName: (user && user.displayName) || '',
         troupeContext: troupeContext,
         agent: req.headers['user-agent']
       });
@@ -50,13 +58,20 @@ function renderAppPageWithTroupe(req, res, next, page) {
       contextGenerator.generateTroupeContext(req)
     ])
     .spread(function(unreadCount, troupeContext) {
-      var login = !user || troupeContext.profileNotCompleted || accessDenied;
+      var login = !user || accessDenied;
+
+      var bootScript;
+      if(login) {
+        bootScript = 'router-login';
+      } else {
+        bootScript = req.isPhone ? 'mobile-app' : 'router-app';
+      }
 
       res.render(page, {
         appCache: getAppCache(req),
         login: login,
         isWebApp: !req.params.mobilePage, // TODO: fix this!
-        bootScriptName: login ? "router-login" : "router-app",
+        bootScriptName: bootScript,
         unreadCount: unreadCount && unreadCount[req.user.id],
         troupeName: troupeContext.troupe.name,
         troupeContext: troupeContext,
@@ -192,6 +207,7 @@ module.exports = {
       /* Special homepage for users without usernames */
       app.get('/home',
         middleware.grantAccessForRememberMeTokenMiddleware,
+        isPhoneMiddleware,
         function(req, res, next) {
           if(req.user && req.user.username) {
             res.relativeRedirect(req.user.getHomeUrl());

@@ -74,13 +74,15 @@ class SignupTests(unittest.TestCase):
 
         assert suggestion.is_displayed()
 
-    @attr('unreliable')
+    @attr('phone_compatible')
     def testSignupFromHomePage(self):
         self.driver.get(utils.baseUrl("/signout"))
         self.driver.get(utils.baseUrl("/x"))
         emailAddress = 'testuser.' + time.strftime("%Y%m%d%H%M%S", time.gmtime()) + '@troupetest.local'
         self.driver.find_element_by_css_selector('#button-signup').click()
+
         form = self.driver.find_element_by_css_selector('#signup-form')
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, 'email')))
         form.find_element_by_name('email').send_keys(emailAddress)
         form.find_element_by_name('submit').click()
         self.driver.find_element_by_css_selector('.label-signupsuccess')
@@ -98,17 +100,77 @@ class SignupTests(unittest.TestCase):
         inputUser.send_keys(username)
         self.driver.find_element_by_css_selector('#username-form [type=submit]').click()
 
-        time.sleep(1)
+        self.driver.find_element_by_id('displayName').send_keys('Test Testerson')
+        self.driver.find_element_by_id('password').send_keys('password')
+        self.driver.find_element_by_css_selector('#updateprofileform [type=submit]').click()
 
-        assert(self.driver.current_url == utils.baseUrl('/'+username))
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, 'content-frame')))
 
-        # complete profile
-        form = self.driver.find_element_by_css_selector('#updateprofileform')
-        form.find_element_by_name('displayName').send_keys('Willey Waley')
-        form.find_element_by_name('password').send_keys('123456')
+        if '#' in self.driver.current_url:
+            self.assertEqual(self.driver.current_url, utils.baseUrl('/'+username)+'#')
+        else:
+            self.assertEqual(self.driver.current_url, utils.baseUrl('/'+username))
+
+    def testGoogleSignup(self):
+        # Clean database
+        utils.resetData(self.driver)
+
+        email   = 'mister.troupe@gmail.com'
+        passwd  = 'Eeboh7othaefitho'
+        name    = 'Mr Troupe'
+        
+        # Sing in into Gmail
+        self.driver.get("https://gmail.com")
+        form = self.driver.find_element_by_css_selector('#gaia_loginform')
+        form.find_element_by_name('Email').send_keys(email)
+        form.find_element_by_name('Passwd').send_keys(passwd)
+        form.find_element_by_name('signIn').click()
+
+        # Revoke access
+        self.driver.get("https://accounts.google.com/b/0/IssuedAuthSubTokens?hl=en_GB")
+        form = self.driver.find_element_by_name('Troupe')
+        form.find_element_by_css_selector('input[type=submit]').click()
+
+        # Trigger Sign Up
+        self.driver.get(utils.baseUrl("/x"))
+        self.driver.find_element_by_id('google-signup').click()
+
+        # Accept oAuth permissions
+        accept = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, 'submit_approve_access')))
+        accept.click()
+
+        self.assertEqual(self.driver.current_url, utils.baseUrl('/confirm'))
+
+        # Select username
+        username = 'mrtroupe' + time.strftime("%Y%m%d%H%M%S", time.gmtime())
+        form = self.driver.find_element_by_id('username-form')
+        form.find_element_by_name('username').send_keys(username)
         form.find_element_by_name('submit').click()
 
+        # Complete profile
+        troupe_password = 'omgwtfbbq'
+        form = self.driver.find_element_by_id('updateprofileform')
+
+        displayName = form.find_element_by_name('displayName').get_attribute('value')
+        self.assertEqual(displayName, name)
+
+        # This is correct:
+        #form.find_element_by_name('password').send_keys(troupe_password)
+        #form.find_element_by_name('submit').click()
+
+        # This works on IE:
+        self.driver.find_element_by_id('password').send_keys('password')
+        self.driver.find_element_by_css_selector('#updateprofileform [type=submit]').click()
+      
+        # Welcome page
         self.driver.find_element_by_css_selector('.trpHelpBox')
+
+        # IE9 adds a # to the end of the URL, sucks
+        if '#' in self.driver.current_url:
+            self.assertEqual(self.driver.current_url, utils.baseUrl('/'+username)+'#')
+        else:
+            self.assertEqual(self.driver.current_url, utils.baseUrl('/'+username))
+
 
     def tearDown(self):
         self.driver.quit()
