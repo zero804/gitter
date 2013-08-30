@@ -97,8 +97,8 @@ require([
 
   Backbone.history.start();
 
-  if(!window.localStorage.troupeTour) {
-    window.localStorage.troupeTour = 1;
+  if(!window.localStorage.troupeTourHome) {
+    window.localStorage.troupeTourHome = 1;
     require([
       'tours/tour-controller'
     ], function(tourController) {

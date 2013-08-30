@@ -113,7 +113,7 @@ define([
       {
        id: 'CREATE_TROUPE',
        title: "Create a troupe",
-       content: "A troupe is a collaborative space shared by all its members. You can create as many as you wish. " +
+       content: "A troupe is a collaborative space, shared by all its members. You can create as many as you wish. " +
                 "Create one for a project, one for the theatre club and another for your team. Click this icon to " +
                 "create a troupe",
        target: "#home-create-troupe img",
