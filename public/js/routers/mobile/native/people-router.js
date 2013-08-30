@@ -9,6 +9,7 @@ require([
   'marionette',
   'views/base',
   'hbs!views/people/tmpl/mobilePeopleView',
+  'components/oauth',                 // No Ref
   'components/eyeballs',              // No ref
   'template/helpers/all',             // No ref
   'components/native-context'         // No ref
