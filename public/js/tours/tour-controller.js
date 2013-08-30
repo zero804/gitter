@@ -57,7 +57,7 @@ define([
       {
        id: 'FIND_PEOPLE',
        title: "Find People",
-       content: "Create connections with your colleagues, suppliers and other people you work.",
+       content: "Create connections with your colleagues, suppliers and other people you work with.",
        target: "#home-add-people img",
        placement: "top",
        showSkip: true,
@@ -105,7 +105,7 @@ define([
         id: 'CONNECT_COMPLETE',
         title: "All done!",
         content: "Congratulations, your invites have now been sent. While you're waiting for the recipients to respond, " +
-                  "we'll show you how to setup a troupe.",
+                  "we'll show you how to set up a troupe.",
         target: "finished-button",
         placement: "left",
         delay: 10
@@ -113,7 +113,7 @@ define([
       {
        id: 'CREATE_TROUPE',
        title: "Create a troupe",
-       content: "A troupe is a collobrative space shared by all it's members. You can create as many as you wish. " +
+       content: "A troupe is a collaborative space shared by all its members. You can create as many as you wish. " +
                 "Create one for a project, one for the theatre club and another for your team. Click this icon to " +
                 "create a troupe",
        target: "#home-create-troupe img",
