@@ -57,18 +57,10 @@ define([
       {
        id: 'FIND_PEOPLE',
        title: "Find People",
-       content: "Create connections with your colleagues, suppliers and other people you work with.",
+       content: "Create connections with your colleagues, suppliers and other people you work with.<br><br>" +
+                "Click on the head icon to find and invite people.",
        target: "#home-add-people img",
-       placement: "top",
-       showSkip: true,
-       showNextButton: true,
-       showCTAButton: true,
-       ctaLabel: 'Find your connections',
-       onCTA: function() {
-        if(hopscotch.getCurrStepNum() === getStepNumFor('FIND_PEOPLE')) {
-          window.location.assign('#|connect');
-        }
-       }
+       placement: "top"
       },
       /*
        *
@@ -117,15 +109,7 @@ define([
                 "Create one for a project, one for the theatre club and another for your team. Click this icon to " +
                 "create a troupe",
        target: "#home-create-troupe img",
-       placement: "top",
-       showSkip: true,
-       showCTAButton: true,
-       ctaLabel: 'Create a new Troupe',
-       onCTA: function() {
-        if(hopscotch.getCurrStepNum() === getStepNumFor('CREATE_TROUPE')) {
-          window.location.assign('#|create');
-        }
-       }
+       placement: "top"
       },
       /*
        * Now within the context of a troupe!
@@ -135,16 +119,16 @@ define([
         title: "Choose a name for your troupe",
         content: "This should be a good description of the topic. It doesn't have to be unique. " +
                  "Remember that you can always change it later on if you wish. Some examples: " +
-                 "<em>Project Saturn</em>, <em>Friday Night Comedy Club</em> or <em>Marketing Department<em>",
+                 "<em>Project Zeus</em>, <em>Friday Night Comedy Club</em> or <em>Marketing Department<em>.",
         target: ".trpCreateForm input",
         placement: "left"
       },
       {
         id: 'INVITE_USERS',
         title: "Search for people",
-        content: "For each person that you would like to invite into the troupe, type their email address in and press ENTER. " +
+        content: "For each person that you would like to invite into the troupe, search for them by name or email and press ENTER. " +
                  "You can also import your Google Contacts address book by clicking the '<em>Invite gmail contacts</em>' " +
-                 "button below. Once you've imported them, you'll be able to search contacts by name",
+                 "button below. Once they've been imported, you'll be able to search for people by name.",
         target: ".trpInviteModal input",
         placement: "left",
         onShow: function() {
@@ -323,8 +307,8 @@ define([
         target: "#file-header",
         title: "Files",
         content: "This is where files are shown. To add a file, simply drag it anywhere into the troupe window. " +
-                 "We'll keep all the versions of your files too. Click on a file for more details and to access " +
-                 "other versions",
+                 "We'll keep all the versions of your files too.<br><br>Click on a file for more details or to access " +
+                 "other versions.",
         placement: "left",
         showNextButton: true
       },
@@ -334,10 +318,10 @@ define([
         title: "Email Conversations",
         content: "Any emails you send to <strong>" + emailAddress + "</strong> will be distributed to all members of the troupe, " +
                  "and you can access them here too.<br><br>What's more, any file attachments will be added to the " +
-                 "troupe's files list and we'll even version them too",
+                 "troupe and we'll even version them too.",
         placement: "top",
         showNextButton: true
-      },
+      }
     ]
   };
 
@@ -350,7 +334,7 @@ define([
     tour.stepIds = stepIds;
   }
 
-  homeTour.steps = homeTour.steps.concat(troupeTour.steps.slice(0));
+  homeTour.steps = homeTour.steps.concat(troupeTour.steps.slice(1));
   processTour(troupeTour);
   processTour(homeTour);
 
