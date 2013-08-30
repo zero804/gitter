@@ -21,7 +21,7 @@ define([
       if (!options) return;
       this.originalEmail = context.getUser().email;
       this.existingUser = options.existingUser;
-      this.isExistingUser = !context().profileNotCompleted;
+      this.isExistingUser = context.isProfileComplete();
       if (this.compactView) $("#uvTab").hide();
     },
 
@@ -179,6 +179,7 @@ define([
         success: function(data) {
           if(data.success) {
             context.getUser().displayName = data.displayName;
+            context.getUser().status = 'ACTIVE';
             that.trigger('submit.success');
             that.dialog.hide();
 
@@ -202,7 +203,8 @@ define([
 
   var Modal = TroupeViews.Modal.extend({
     initialize: function(options) {
-      options.title = context().profileNotCompleted ? "Complete your profile" : "Edit your profile";
+      options = options ? options : {};
+      options.title = !context.isProfileComplete() ? "Complete your profile" : "Edit your profile";
       TroupeViews.Modal.prototype.initialize.apply(this, arguments);
       this.view = new View({ });
 

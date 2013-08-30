@@ -9,11 +9,11 @@ require([
   'marionette',
   'views/base',
   'hbs!views/people/tmpl/mobilePeopleView',
-  'components/unread-items-client',
+  'components/oauth',                 // No Ref
   'components/eyeballs',              // No ref
   'template/helpers/all',             // No ref
   'components/native-context'         // No ref
-], function($, _, Backbone, context, MobileRouter, userModels, Marionette, TroupeViews, PersonViewTemplate, unreadItemsClient) {
+], function($, _, Backbone, context, MobileRouter, userModels, Marionette, TroupeViews, PersonViewTemplate) {
   /*jslint browser: true, unused: true */
   "use strict";
 

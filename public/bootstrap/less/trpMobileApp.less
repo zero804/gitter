@@ -1,6 +1,42 @@
+@import "bootstrap/bootstrap.less";
+@import "trpMobileFonts.less";
+@import "trpInvites.less";
 @import "trpColours.less";
-@import "trpMobileChat.less";
+@import "trpNativeChat.less";
+@import "trpButtons.less";
 
 body {
 	background-color: @trpGreen;
+}
+
+.typeahead {
+  max-width: 280px;
+  overflow: hidden;
+
+  li[data-value="undefined"] {
+    display: none;
+  }
+}
+
+#copy-button {
+  display: none;
+}
+
+#userhome {
+
+  br, .trpBodyMedium, .trpBodySmall {
+    display: none;
+  }
+
+  a {
+    .trpHelpBox {
+      box-sizing: border-box;
+      width: 100%;
+      margin-top: 5px;
+    }
+  }
+}
+
+#get-troupe {
+  display: none;
 }

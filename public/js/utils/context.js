@@ -142,6 +142,10 @@ define([
     }
   };
 
+  context.isProfileComplete = function() {
+    return context().user.status !== 'PROFILE_NOT_COMPLETED';
+  };
+
   /**
    * The difference between troupeContext and env.
    * Env is static and will never change.

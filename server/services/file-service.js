@@ -2,6 +2,7 @@
 "use strict";
 
 var persistence = require("./persistence-service");
+var chatService = require("./chat-service");
 var mongoose = require("mongoose");
 var mime = require("mime");
 var winston = require("winston");
@@ -213,8 +214,8 @@ function findByFileName(troupeId, fileName, callback) {
 function storeFileVersionInGrid(options, callback) {
   winston.verbose("storeFileVersionInGrid");
 
-  var troupeId = options.troupeId;
-  var creatorUserId = options.creatorUserId;
+  var troupeId = options.troupe.id;
+  var creatorUserId = options.user ? options.user.id : null;
   var fileName = options.fileName;
   var mimeType = options.mimeType;
   var temporaryFile = options.file; // this is the file path
@@ -297,8 +298,10 @@ function storeFileVersionInGrid(options, callback) {
 }
 
 function storeFile(options, callback) {
-  var fileName = options.fileName;
-  var mimeType = options.mimeType;
+  var fileName  = options.fileName;
+  var mimeType  = options.mimeType;
+  var user      = options.user;
+  var troupe    = options.troupe;
 
   /* Need to correct the mimeType from time to time */
   /* Try figure out a better mimeType for the file */
@@ -314,6 +317,17 @@ function storeFile(options, callback) {
   storeFileVersionInGrid(options, function(err, fileAndVersion) {
     if(err) return callback(err);
     if(fileAndVersion.alreadyExists) return callback(err, fileAndVersion);
+
+    var message = user.displayName + ' uploaded ' + options.fileName;
+    var metadata = {
+      type: 'file',
+      action: 'uploaded',
+      fileId: fileAndVersion.file._id
+    };
+    chatService.newRichMessageToTroupe(troupe, user, message, metadata, function(err, msg) {
+      if (err) return;
+      winston.info("Notification created");
+    });
 
     /** Continue regardless of what happens in generate... */
     callback(err, fileAndVersion);

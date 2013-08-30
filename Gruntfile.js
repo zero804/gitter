@@ -89,6 +89,15 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
+                  name: "homepage-mobile",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
                   name: "routers/mobile/native/chat-router",
                   include: [
                     "utils/tracking",
@@ -98,7 +107,16 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "routers/mobile/web/mobile-app-router",
+                  name: "mobile-app",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "mobile-userhome",
                   include: [
                     "utils/tracking",
                     "views/widgets/avatar",
@@ -134,25 +152,43 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "router-login",
-                  include: [
+                  name: "routers/mobile/native/accept-router",
+                  include: [
                     "utils/tracking",
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
-               {
-                  name: "complete-profile",
-                  include: [
-                    "utils/tracking",
-                    "views/widgets/avatar"
-                  ],
-                  exclude: ["core-libraries"]
-              },
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
               {
-                  name: "login",
-                  exclude: ["core-libraries"]
-             }
+                  name: "router-login",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "complete-profile",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "login",
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "tours/tour-controller",
+                  include: [
+                  ],
+                  exclude: [
+                    "core-libraries",
+                    "router-app"
+                  ]
+              },
           ]
 
         }
@@ -175,13 +211,17 @@ module.exports = function( grunt ) {
       'signup': createClosureConfig('signup'),
       'router-app': createClosureConfig('router-app'),
       "router-homepage": createClosureConfig('router-homepage'),
+      "homepage-mobile" : createClosureConfig('homepage-mobile'),
       "native-chat-router": createClosureConfig('routers/mobile/native/chat-router'),
-      "mobile-app-router": createClosureConfig('routers/mobile/web/mobile-app-router'),
+      "mobile-app": createClosureConfig('mobile-app'),
+      "mobile-userhome": createClosureConfig('mobile-userhome'),
       "native-files-router": createClosureConfig('routers/mobile/native/files-router'),
       "native-conversations-router": createClosureConfig('routers/mobile/native/conversations-router'),
       "native-people-router": createClosureConfig('routers/mobile/native/people-router'),
-      "router-login": createClosureConfig('router-login'),
+      "native-accept-router": createClosureConfig('routers/mobile/native/accept-router'),
+      "router-login": createClosureConfig('router-login'),
       "complete-profile": createClosureConfig('complete-profile'),
+      "tour-controller": createClosureConfig('tours/tour-controller'),
       "login": createClosureConfig('login')
     },
 
@@ -259,17 +299,19 @@ module.exports = function( grunt ) {
         files: {
           "public/bootstrap/css/trp3.css" : "public/bootstrap/less/trp3.less",
           "public/bootstrap/css/mtrp.css": "public/bootstrap/less/mtrp.less",
+          "public/bootstrap/css/signup.css": "public/bootstrap/less/signup.less",
           "public/bootstrap/css/trpHomePage.css": "public/bootstrap/less/trpHomePage.less",
+          "public/bootstrap/css/homepage-mobile.css": "public/bootstrap/less/homepage-mobile.less",
           "public/bootstrap/css/trpChat.css": "public/bootstrap/less/trpChat.less",
           "public/bootstrap/css/trpFiles.css": "public/bootstrap/less/trpFiles.less",
           "public/bootstrap/css/trpMails.css": "public/bootstrap/less/trpMails.less",
           "public/bootstrap/css/trpPeople.css": "public/bootstrap/less/trpPeople.less",
           "public/bootstrap/css/trpMobileApp.css": "public/bootstrap/less/trpMobileApp.less",
-          "public/bootstrap/css/trpMobileChat.css": "public/bootstrap/less/trpMobileChat.less",
-          "public/bootstrap/css/trpMobileFiles.css": "public/bootstrap/less/trpMobileFiles.less",
-          "public/bootstrap/css/trpMobileConversations.css": "public/bootstrap/less/trpMobileConversations.less",
-          "public/bootstrap/css/trpMobilePeople.css": "public/bootstrap/less/trpMobilePeople.less"
-
+          "public/bootstrap/css/trpNativeChat.css": "public/bootstrap/less/trpNativeChat.less",
+          "public/bootstrap/css/trpNativeFiles.css": "public/bootstrap/less/trpNativeFiles.less",
+          "public/bootstrap/css/trpNativeConversations.css": "public/bootstrap/less/trpNativeConversations.less",
+          "public/bootstrap/css/trpNativePeople.css": "public/bootstrap/less/trpNativePeople.less",
+          "public/bootstrap/css/trpNativeAccept.css": "public/bootstrap/less/trpNativeAccept.less"
         }
       }
     },
@@ -347,6 +389,15 @@ module.exports = function( grunt ) {
         modules: {
         },
         exports: 'Faye'
+      },
+      hopscotch: {
+        files: {
+          'output/client-libs/hopscotch/hopscotch-0.11-amd.js': ['output/client-libs/hopscotch/js/hopscotch-0.1.1.js']
+        },
+        modules: {
+
+        },
+        exports: 'window.hopscotch'
       },
       nanoscroller: {
         files : {
@@ -471,7 +522,7 @@ module.exports = function( grunt ) {
     }
   });
 
-  grunt.loadNpmTasks('grunt-requirejs');
+  grunt.loadNpmTasks('grunt-contrib-requirejs');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-reload');

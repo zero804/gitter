@@ -19,8 +19,8 @@ module.exports = {
         if(files.hasOwnProperty(k)) {
           var file = files[k];
           fileService.storeFile({
-            troupeId: req.troupe.id,
-            creatorUserId: req.user.id,
+            troupe: req.troupe,
+            user: req.user,
             fileName: unescape(file.name),
             mimeType: file.type,
             file: file.path

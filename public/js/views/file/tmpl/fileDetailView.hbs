@@ -1,4 +1,6 @@
+{{#if showClose}}
 <a href="#!" class="trpWhite"><div class="trpDetailViewClose">x</div></a>
+{{/if}}
 
 <div class="trpFileVersionThumbnail"><a href="#|{{previewUrl}}" class="link-preview">
 {{#if useSpinner}}
@@ -8,6 +10,7 @@
 {{/if}}
 </a></div>
 
+{{#if showActions}}
 <div class="trpItemDetails">
   <div class="trpFilename" title="{{fileName}}">{{fileName}}</div>
 </div>
@@ -23,4 +26,4 @@
     <div class="trpButtonMenuItem"><a href="#!" class="link-delete trpHand">Delete</a></div>
   </div>
 </div>
-
+{{/if}}

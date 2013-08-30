@@ -15,6 +15,36 @@ var MAX_CHAT_EDIT_AGE_SECONDS = 300;
 
 var ObjectID = require('mongodb').ObjectID;
 
+exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
+  if(!troupe) return callback("Invalid troupe");
+
+  var chatMessage = new persistence.ChatMessage();
+  chatMessage.fromUserId = null;
+  
+  chatMessage.toTroupeId = troupe.id;
+  chatMessage.sent = new Date();
+
+  // Very important that we decode and re-encode!
+  text = ent.decode(text);
+  text = safeHtml(text); // NB don't use ent for encoding as it's a bit overzealous!
+
+  chatMessage.text = text;
+
+  // Metadata
+  chatMessage.urls     = urlExtractor.extractUrlsWithIndices(text);
+  chatMessage.mentions = TwitterText.extractMentionsWithIndices(text);
+  chatMessage._md      = urlExtractor.version;
+  chatMessage.meta     = meta;
+
+  chatMessage.save(function (err) {
+    if(err) return callback(err);
+
+    return callback(null, chatMessage);
+  });
+};
+
+
+
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   if(!troupe) return callback("Invalid troupe");
 
@@ -28,8 +58,6 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   // Very important that we decode and re-encode!
   text = ent.decode(text);
   text = safeHtml(text); // NB don't use ent for encoding as it's a bit overzealous!
-
-  console.log(text);
 
   chatMessage.text = text;
 

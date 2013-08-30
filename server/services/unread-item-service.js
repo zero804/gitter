@@ -411,7 +411,8 @@ function findCreatingUserIdModel(modelName, model) {
       return current.creatorUser.id;
 
     case "chat":
-      return model.fromUser.id;
+      var id = model.fromUser ? model.fromUser.id : null;
+      return id;
 
     case "request":
       return null;

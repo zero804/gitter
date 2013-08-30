@@ -60,13 +60,14 @@ require([
         requestModal.view.on('confirm.request', function(options) {
           var data = {};
           data.email = options.userEmail;
-          requestModal.transitionTo(new TroupeViews.Modal({ disableClose: true, view: new SignupModalConfirmView({ data: data }) }));
+          requestModal.transitionTo(new TroupeViews.Modal({ disableClose: true, view: new SignupModalConfirmView({ email: data.email }) }));
         });
 
         return requestModal;
       }
 
-      if(window.troupeContext.profileNotCompleted) {
+      /* now done in complete-profile.js
+      if(!context.isProfileComplete()) {
         view = new profileView.Modal({ disableClose: true  });
 
         view.once('close', function() {
@@ -77,6 +78,7 @@ require([
 
         return;
       }
+      */
 
 
       // If the user is accessing another user's home url (trou.pe/user)
@@ -110,7 +112,17 @@ require([
           inviteId = window.troupeContext.inviteId;
           if (inviteId) {
             // if the user has an invite from this user show the invite accept / reject modal
-            new InviteModal({ inviteId: inviteId }).show();
+            var inviteModal = new InviteModal({ inviteId: inviteId, disableClose: true });
+            inviteModal.show();
+
+            inviteModal.view.on('invite:accept', function() {
+              window.location.reload();
+            });
+
+            inviteModal.view.on('invite:reject', function() {
+              window.history.back();
+            });
+
           } else {
               view = new ConnectUserModalView({ authenticated: !!window.troupeContext.user });
               var connectUserModal = new TroupeViews.Modal({ view: view, disableClose: true });
@@ -119,7 +131,7 @@ require([
               connectUserModal.view.on('signup.complete', function(options) {
                 var data = {};
                 data.email = options.email;
-                connectUserModal.transitionTo(new TroupeViews.Modal({ disableClose: true, view: new SignupModalConfirmView({ data: data }) }));
+                connectUserModal.transitionTo(new TroupeViews.Modal({ disableClose: true, view: new SignupModalConfirmView({ email: data.email }) }));
               });
 
               connectUserModal.view.on('request.login', function(options) {
@@ -169,6 +181,12 @@ require([
               modal.show();
               modal.on('hide', function() {
                 window.location = '/last';
+              });
+              modal.view.on('invite:reject', function() {
+                window.location = '/last';
+              });
+              modal.view.on('invite:accept', function() {
+                window.location.reload();
               });
 
             } else {

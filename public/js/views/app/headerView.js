@@ -58,18 +58,19 @@ define([
         headerTitle: troupe && troupe.name || user.displayName,
         isTroupe: !!troupe,
         oneToOne: context.inOneToOneTroupeContext(),
-        user: user
+        user: user,
+        favourite: troupe && troupe.favourite
       };
 
     },
 
     updateTitlebar: function(values) {
-      $('title').html(this.getTitlebar(values));
+      document.title = this.getTitlebar(values);
     },
 
     getTitlebar: function(counts) {
       var mainTitle;
-      if (context.getTroupe()) {
+      if (context.getTroupe() && context.getTroupe().name) {
         mainTitle = context.getTroupe().name + " - Troupe";
       } else {
         mainTitle = "Troupe";
