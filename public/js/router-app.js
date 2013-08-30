@@ -105,7 +105,8 @@ require([
   });
 
 
-  if(true) {
+  if(!window.localStorage.troupeTour) {
+    window.localStorage.troupeTour = 1;
     require([
       'tours/tour-controller'
     ], function(tourController) {

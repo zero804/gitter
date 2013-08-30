@@ -54,7 +54,8 @@ module.exports = {
     handlebars.registerHelper('generateTroupeContext', require('./hbs-helpers').generateTroupeContext);
 
     app.locals({
-      googleTrackingId: nconf.get("web:trackingId")
+      googleTrackingId: nconf.get("web:trackingId"),
+      minified: nconf.get('web:minified')
     });
 
     app.engine('hbs', expressHbs.express3({
