@@ -168,7 +168,7 @@ module.exports = function( grunt ) {
                   ],
                   exclude: ["core-libraries"]
               },
-               {
+              {
                   name: "complete-profile",
                   include: [
                     "utils/tracking",
@@ -179,7 +179,16 @@ module.exports = function( grunt ) {
               {
                   name: "login",
                   exclude: ["core-libraries"]
-             }
+              },
+              {
+                  name: "tours/tour-controller",
+                  include: [
+                  ],
+                  exclude: [
+                    "core-libraries",
+                    "router-app"
+                  ]
+              },
           ]
 
         }
@@ -212,6 +221,7 @@ module.exports = function( grunt ) {
       "native-accept-router": createClosureConfig('routers/mobile/native/accept-router'),
       "router-login": createClosureConfig('router-login'),
       "complete-profile": createClosureConfig('complete-profile'),
+      "tour-controller": createClosureConfig('tours/tour-controller'),
       "login": createClosureConfig('login')
     },
 

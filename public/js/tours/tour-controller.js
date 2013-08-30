@@ -41,7 +41,8 @@ define([
     steps: [
       {
         id: 'WELCOME',
-        content: "Welcome to Troupe. This tour will take you through everything you need to know in order to get started. Click next to begin. ",
+        content: "Welcome to Troupe. This tour will take you through everything you need to know in order " +
+                 "to get started. Click next to begin. ",
         target: ".trpHeaderTitle",
         placement: "bottom",
         showNextButton: true,
@@ -56,7 +57,7 @@ define([
       {
        id: 'FIND_PEOPLE',
        title: "Find People",
-       content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
+       content: "Create connections with your colleagues, suppliers and other people you work.",
        target: "#home-add-people img",
        placement: "top",
        showSkip: true,
@@ -74,8 +75,8 @@ define([
        */
       {
         id: 'CONNECT',
-        title: "My Header",
-        content: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Type in an email address and press ENTER.",
+        title: "Search by email address",
+        content: "Type in the email address of the person you want to connect with and then press ENTER.",
         target: "#share-form input",
         placement: "left",
         onShow: function() {
@@ -86,8 +87,8 @@ define([
         }
       },
       {
-        title: "Now send your invitations",
-        content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Click the invite button",
+        title: "Send your invitations",
+        content: "You can add more email addresses. When you're ready, click this button to send your invitations.",
         target: "submit-button",
         delay: 10,
         placement: "bottom",
@@ -103,7 +104,8 @@ define([
       {
         id: 'CONNECT_COMPLETE',
         title: "All done!",
-        content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut la. Now wait for your friends to respond.",
+        content: "Congratulations, your invites have now been sent. While you're waiting for the recipients to respond, " +
+                  "we'll show you how to setup a troupe.",
         target: "finished-button",
         placement: "left",
         delay: 10
@@ -111,7 +113,9 @@ define([
       {
        id: 'CREATE_TROUPE',
        title: "Create a troupe",
-       content: "A troupe Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
+       content: "A troupe is a collobrative space shared by all it's members. You can create as many as you wish. " +
+                "Create one for a project, one for the theatre club and another for your team. Click this icon to " +
+                "create a troupe",
        target: "#home-create-troupe img",
        placement: "top",
        showSkip: true,
@@ -124,18 +128,65 @@ define([
        }
       },
       /*
-       *
+       * Now within the context of a troupe!
        */
       {
         id: 'CREATE_TROUPE_ENTRY',
         title: "Choose a name for your troupe",
-        content: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Type in an email address and press ENTER.",
+        content: "This should be a good description of the topic. It doesn't have to be unique. " +
+                 "Remember that you can always change it later on if you wish. Some examples: " +
+                 "<em>Project Saturn</em>, <em>Friday Night Comedy Club</em> or <em>Marketing Department<em>",
         target: ".trpCreateForm input",
         placement: "left"
       },
-
+      {
+        id: 'INVITE_USERS',
+        title: "Search for people",
+        content: "For each person that you would like to invite into the troupe, type their email address in and press ENTER. " +
+                 "You can also import your Google Contacts address book by clicking the '<em>Invite gmail contacts</em>' " +
+                 "button below. Once you've imported them, you'll be able to search contacts by name",
+        target: ".trpInviteModal input",
+        placement: "left",
+        onShow: function() {
+          appEvents.once('searchSearchView:select', nextStep);
+        },
+        onHide: function() {
+          appEvents.off('searchSearchView:select', nextStep);
+        }
+      },
+      {
+        title: "Now send your invitations",
+        content: "Repeat to add more people. When you're ready, click the button to send the invites out.",
+        target: "#submit-button",
+        delay: 10,
+        placement: "bottom",
+        onShow: function() {
+          appEvents.once('searchSearchView:success', nextStep);
+        },
+        onHide: function() {
+          appEvents.off('searchSearchView:success', nextStep);
+        }
+      },
+      {
+        id: 'INVITE_URL',
+        title: "Another way to invite people",
+        yOffset: -20,
+        content: "Every troupe has a unique link. Share this link out and people can join after requesting access " +
+                 "(don't worry, you'll get to chose whether they can join!).<br><br>Click the copy button to " +
+                 "copy it into your clipboard for sharing.",
+        target: ".trpInviteModal #sharelink",
+        placement: "left",
+        onShow: function() {
+          Backbone.history.once('route', nextStep);
+        },
+        onHide: function() {
+          Backbone.history.off('route', nextStep);
+        }
+      }
     ]
   };
+
+  var emailAddress = context.troupe().get('uri') + '@' + context.env('baseServer');
 
   var onShowHooked;
   var troupeTour = {
@@ -162,7 +213,7 @@ define([
         id: 'CHAT',
         target: "#chat-input-textarea",
         title: "Type in here to chat",
-        content: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Type in an email address and press ENTER.",
+        content: "You can chat by entering your message in this text box and pressing ENTER to send it.",
         placement: "top",
         showNextButton: true,
         onShow: function() {
@@ -177,7 +228,8 @@ define([
         id: 'MENU',
         target: "#menu-toggle",
         title: "Menu",
-        content: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Type in an email address and press ENTER.",
+        content: "Move your mouse over the tab to pull out the navigation menu. From this menu you can access your " +
+                 "connections, your troupes, and action items.<br><br>Move your mouse over the tab to continue the tour.",
         placement: "right",
         onShow: function() {
           if(onShowHooked) return;
@@ -193,7 +245,7 @@ define([
         id: 'MEGAMENU',
         target: "#icon-mega",
         title: "Integrated Menu",
-        content: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Type in an email address and press ENTER.",
+        content: "Access invitations, favourite and recent troupes and troupes with unread items from this menu.",
         placement: "bottom",
         xOffset: -18,
         delay: 450,
@@ -210,7 +262,7 @@ define([
         id: 'TROUPEMENU',
         target: "#icon-troupes",
         title: "Troupes",
-        content: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Type in an email address and press ENTER.",
+        content: "This menu contains a list of all your troupes",
         placement: "bottom",
         xOffset: -18,
         showNextButton: true,
@@ -226,7 +278,7 @@ define([
         id: 'TROUPEONETOONE',
         target: "#icon-user",
         title: "Private Chats",
-        content: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Type in an email address and press ENTER.",
+        content: "For private chats, select this menu",
         placement: "bottom",
         xOffset: -18,
         showNextButton: true,
@@ -242,7 +294,8 @@ define([
         id: 'TROUPESEARCH',
         target: "#icon-search",
         title: "Search",
-        content: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Type in an email address and press ENTER.",
+        content: "Search through all your connections and troupes from this menu. " +
+                 "Or just start typing when the menu is open, and we'll start searching.",
         placement: "bottom",
         xOffset: -18,
         showNextButton: true,
@@ -259,7 +312,8 @@ define([
         id: 'PEOPLE-ROSTER',
         target: "#people-roster",
         title: "People Roster",
-        content: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Type in an email address and press ENTER.",
+        content: "This shows you a list of all the people in the troupe. The dot in the upper left corner indicates " +
+                 "whether they are currently viewing the troupe.<br><br>Click on a person for more details.",
         placement: "left",
         delay: 450,
         showNextButton: true
@@ -268,7 +322,9 @@ define([
         id: 'FILE-LIST',
         target: "#file-header",
         title: "Files",
-        content: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Type in an email address and press ENTER.",
+        content: "This is where files are shown. To add a file, simply drag it anywhere into the troupe window. " +
+                 "We'll keep all the versions of your files too. Click on a file for more details and to access " +
+                 "other versions",
         placement: "left",
         showNextButton: true
       },
@@ -276,60 +332,14 @@ define([
         id: 'MAIL-LIST',
         target: "#mail-header",
         title: "Email Conversations",
-        content: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Type in an email address and press ENTER.",
-        placement: "left",
+        content: "Any emails you send to <strong>" + emailAddress + "</strong> will be distributed to all members of the troupe, " +
+                 "and you can access them here too.<br><br>What's more, any file attachments will be added to the " +
+                 "troupe's files list and we'll even version them too",
+        placement: "top",
         showNextButton: true
       },
     ]
   };
-
-
-  var homeCreateTour = {
-    id: "troupe2",
-    showPrevButton: false,
-    showNextButton: false,
-    onEnd: function() {
-      Backbone.history.on('route', function() {
-        hopscotch.startTour(troupeTour, 1);
-      });
-    },
-    steps: [
-      {
-        id: 'INVITE_USERS',
-        title: "Search for people",
-        content: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Type in an email address and press ENTER.",
-        target: ".trpInviteModal input",
-        placement: "left",
-        onShow: function() {
-          appEvents.once('searchSearchView:select', nextStep);
-        },
-        onHide: function() {
-          appEvents.off('searchSearchView:select', nextStep);
-        }
-      },
-      {
-        title: "Now send your invitations",
-        content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Click the invite button",
-        target: "#submit-button",
-        delay: 10,
-        placement: "bottom",
-        onShow: function() {
-          appEvents.once('searchSearchView:success', nextStep);
-        },
-        onHide: function() {
-          appEvents.off('searchSearchView:success', nextStep);
-        }
-      },
-      {
-        id: 'INVITE_URL',
-        title: "Another way to invite people",
-        content: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Type in an email address and press ENTER.",
-        target: ".trpInviteModal #sharelink",
-        placement: "left"
-      }
-    ]
-  };
-
 
   function processTour(tour) {
     var stepIds = {};
@@ -340,10 +350,9 @@ define([
     tour.stepIds = stepIds;
   }
 
-
+  homeTour.steps = homeTour.steps.concat(troupeTour.steps.slice(0));
   processTour(troupeTour);
   processTour(homeTour);
-  processTour(homeCreateTour);
 
   var running = false;
   hopscotch.listen('start', function() {
@@ -425,21 +434,6 @@ define([
     }
   }
 
-  var troupe = context.troupe();
-
-  function selectTour() {
-    var inTroupeContext = !!troupe.id;
-    if(inTroupeContext) {
-      var state = hopscotch.getState();
-      if(state && state.indexOf('home') >= 0) {
-        return homeCreateTour;
-      }
-
-      return troupeTour;
-    } else {
-      return homeTour;
-    }
-  }
 
   function updateTourOnHistoryChange() {
     var tour = hopscotch.getCurrTour();
@@ -456,6 +450,32 @@ define([
     }
   }
 
+  function resumeOrStartTour() {
+    var troupe = context.troupe();
+    var inTroupeContext = !!troupe.id;
+
+    var state = hopscotch.getState();
+    if(state) {
+      if(state.indexOf('home:') === 0) {
+        // Home tour is in either context
+        hopscotch.startTour(homeTour);
+        return;
+      } else if(state.indexOf('troupe:') === 0) {
+        // Troupe tour is only in troupe context
+        if(inTroupeContext) {
+          hopscotch.startTour(troupeTour);
+          return;
+        }
+      }
+    }
+
+
+    var tour = inTroupeContext ? troupeTour : homeTour;
+    var step = getStepForCurrentHash();
+    if(!step) step = 0;
+    hopscotch.startTour(tour, step);
+  }
+
   return {
     init: function(options) {
       appIntegratedView = options.appIntegratedView;
@@ -464,12 +484,7 @@ define([
         hopscotch.adjustBubblePosition();
       });
 
-      var tour = selectTour();
-      if(tour) {
-        var step = getStepForCurrentHash();
-        if(!step) step = 0;
-        hopscotch.startTour(tour, step);
-      }
+      resumeOrStartTour();
     }
   };
 
