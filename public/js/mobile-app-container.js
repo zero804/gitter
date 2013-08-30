@@ -4,11 +4,12 @@ define([
   'backbone',
   'retina',
   'utils/mobile-resizer',
+  'utils/is-android',
   'views/toolbar/troupeMenu',
   'marionette',
   'views/app/mobileAppView',
   'routers/mobile/web/mobile-app-router'
-  ], function($, Backbone, retina, mobileResizer, TroupeMenu, Marionette, MobileAppView, AppRouter) {
+  ], function($, Backbone, retina, mobileResizer, isAndroid, TroupeMenu, Marionette, MobileAppView, AppRouter) {
   "use strict";
 
   new MobileAppView({
@@ -26,15 +27,16 @@ define([
         el: $('#troupeList')
       }).render();
 
-      mobileResizer.reset();
+      if(!isAndroid()) {
+        mobileResizer.hideAddressBar();
+        window.addEventListener("orientationchange", function() {
+          mobileResizer.hideAddressBar();
+        });
+      }
 
       var fakeWindow = {};
       retina.init(fakeWindow);
       fakeWindow.onload();
-
-      window.addEventListener("orientationchange", function() {
-        mobileResizer.reset();
-      });
   });
 
   app.on('start', function(){
