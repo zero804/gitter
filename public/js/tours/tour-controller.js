@@ -321,6 +321,18 @@ define([
                  "troupe and we'll even version them too.",
         placement: "top",
         showNextButton: true
+      },
+      {
+        id: 'TROUPE-SETTINGS',
+        target: "#uvTab",
+        title: "Get in Touch!",
+        content: "That's the end of the tour, but if you have any questions, suggestions or feedback," +
+                " we'd love to hear from you: click this button to get in touch." +
+                "<br><br>We hope you enjoy collaborating via Troupe.",
+        placement: "top",
+        arrowOffset: 230,
+        xOffset: -210,
+        showNextButton: true
       }
     ]
   };
