@@ -2,19 +2,16 @@
 define(['jquery'], function($) {
   "use strict";
 
-  var hideAddessBar = function() {
+  var pixelsToAllowScrolling = 600;
+
+  var hideAddressBar = function() {
     var $body = $('body');
-    $body.height( $body.height() + 600 );
-    // has to be 1 pixel for Android
+    $body.height( $body.height() + pixelsToAllowScrolling );
     window.scrollTo(0, 1);
     $body.height( window.innerHeight );
   };
 
-  var reset = function() {
-    hideAddessBar();
-  };
-
   return {
-    'reset': reset
+    'hideAddressBar': hideAddressBar
   };
 });
