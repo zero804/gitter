@@ -5,7 +5,7 @@ var troupeService = require('../../services/troupe-service');
 var Q = require('q');
 
 module.exports = function(req, res, next) {
-  var invites = req.body;
+  var invites = req.body.invites;
 
   var promises = invites.map(function(invite) {
 

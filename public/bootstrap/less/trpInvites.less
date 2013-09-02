@@ -1,51 +1,82 @@
+@import "trpButtons.less";
+
+.separate-unit {
+  margin-bottom: 15px;
+}
+
+.cell {
+  display: table-cell;
+  width: 42px;
+}
+
 .trpSearchInviteResult {
   margin-right: 12px;
   vertical-align: middle;
 }
 
 .trpSearchInvites {
-  margin: 15px 0 15px 0;
-  max-height: 110px;
+  max-height: 185px;
   overflow-x: hidden;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  .separate-unit
 }
 
 .trpInviteModal, .trpInviteModal .modal-body {
   overflow: visible;
 }
 
-.trpInviteItem {
-  display: inline-block;
-  width: 200px;
+.trpInviteModal input {
+  box-sizing: border-box;
+  width: 150px;
   padding: 8px 8px 8px 8px;
-  cursor: pointer;
-  margin-right: 4px;
+  height: 34px;
+}
+
+.trpInviteItem {
+  position: relative;
+  display: table;
+  table-layout: fixed;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px 8px 8px 8px;
   margin-bottom: 4px;
   background-color: @trpBgColor;
 }
 
-.trpRemoveInvite {
-  float: right;
-  background-color: @trpRed;
-  width: 12px;
-  height: 12px;
-  border-radius: 50em;
-  color: white;
-  margin-top: 7px;
-  display: none;
+.trpEnterEmailRow {
+  .trpInviteItem;
+  .separate-unit;
 }
 
-.trpInviteItem:hover .trpRemoveInvite {
-  display: inline-block;
+.trpInviteButton {
+  float: right;
+  .trpButton;
+}
+.trpInviteButton.disabled {
+  opacity: 0.5;
+}
+
+.trpInviteAvatar {
+  .trpDisplayPicture;
+  .avatar-xs;
 }
 
 .trpInviteName {
   .trpBodyMedium;
-  display: inline-block;
-  max-width: 130px;
+  box-sizing: border-box;
+  display: table-cell;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   vertical-align: top;
-  padding-top: 4px;
+  line-height: 34px;
+}
+
+#sharelink {
+  -webkit-user-select: text;
+   -khtml-user-select: text;
+     -moz-user-select: text;
+      -ms-user-select: text;
+          user-select: text;
 }
