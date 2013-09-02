@@ -20,7 +20,7 @@ exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
 
   var chatMessage = new persistence.ChatMessage();
   chatMessage.fromUserId = null;
-  
+
   chatMessage.toTroupeId = troupe.id;
   chatMessage.sent = new Date();
 
