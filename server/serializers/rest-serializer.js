@@ -514,6 +514,7 @@ function ChatStrategy(options)  {
       readBy: item.readBy ? item.readBy.length : undefined,
       urls: item.urls || [],
       mentions: item.mentions || [],
+      meta: item.meta || {},
       v: getVersion(item)
     };
 

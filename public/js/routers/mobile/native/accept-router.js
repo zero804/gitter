@@ -5,6 +5,7 @@ require([
   'utils/context',
   'collections/invites',
   'views/invite/inviteModal',
+  'components/oauth',                 // No Ref
   'template/helpers/all',             // No ref
   'components/native-context'         // No ref
 ], function($, Backbone, context, inviteModels, InviteModal) {

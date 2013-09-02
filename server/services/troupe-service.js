@@ -3,6 +3,7 @@
 "use strict";
 
 var persistence = require("./persistence-service");
+//var chatService = require("./chat-service");
 var userService = require("./user-service");
 var appEvents = require("../app-events");
 var assert = require("assert");
@@ -233,6 +234,17 @@ function addUserIdToTroupe(userId, troupeId) {
         if(troupe.containsUserId(userId)) {
           return troupe;
         }
+       
+        //userService.findById(userId, function(err, user) { 
+        //  var msg = user.displayName + ' has joined';
+        //  var meta = {
+        //    type: 'user',
+        //    action: 'joined',
+        //    userId: user.userId
+        //  };
+        //  chatService.newRichMessageToTroupe(troupe, user, msg, meta, function(err, msg) {
+        //  });
+        //});
 
         troupe.addUserById(userId);
         return troupe.saveQ()
