@@ -6,6 +6,8 @@ DATA_MAINT_SCRIPTS = $(shell find ./scripts/datamaintenance -name '*.sh')
 SAUCELABS_REMOTE = http://trevorah:d6b21af1-7ae7-4bed-9c56-c5f9d290712b@ondemand.saucelabs.com:80/wd/hub
 BETA_SITE = https://beta.trou.pe
 BASE_URL = http://localhost:5000
+MAIL_HOST = localhost
+MAIL_PORT = 2525
 
 clean:
 	rm -rf public-processed/ output/ coverage/ cobertura-coverage.xml html-report/
@@ -63,6 +65,8 @@ prepare-for-end-to-end-testing:
 
 end-to-end-test:
 	mkdir -p ./output/test-reports/
+	MAIL_HOST=$(MAIL_HOST) \
+	MAIL_PORT=$(MAIL_PORT) \
 	nosetests -s -v --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests/
 
 end-to-end-test-saucelabs-chrome:
@@ -71,6 +75,8 @@ end-to-end-test-saucelabs-chrome:
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTECHROME \
 	BASE_URL=$(BETA_SITE) \
+	MAIL_HOST=$(MAIL_HOST) \
+	MAIL_PORT=$(MAIL_PORT) \
 	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
 
 end-to-end-test-saucelabs-ie9:
@@ -78,6 +84,8 @@ end-to-end-test-saucelabs-ie9:
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTEIE \
 	BASE_URL=$(BETA_SITE) \
+	MAIL_HOST=$(MAIL_HOST) \
+	MAIL_PORT=$(MAIL_PORT) \
 	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
 
 end-to-end-test-saucelabs-android:
@@ -85,6 +93,8 @@ end-to-end-test-saucelabs-android:
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTEANDROID \
 	BASE_URL=$(BETA_SITE) \
+	MAIL_HOST=$(MAIL_HOST) \
+	MAIL_PORT=$(MAIL_PORT) \
 	nosetests --nologcapture --attr 'phone_compatible' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
 
 docs: test-docs
