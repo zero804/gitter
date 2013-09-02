@@ -5,6 +5,7 @@ var persistence   = require("./persistence-service");
 var statsService  = require("./stats-service");
 var _             = require('underscore');
 var winston       = require('winston');
+var Q             = require('Q');
 
 exports.ingestGoogleContacts = function(user, data, cb) {
   var contacts = [];
@@ -46,7 +47,7 @@ exports.ingestGoogleContacts = function(user, data, cb) {
     statsService.event('import_contacts', {'userId': user.id});
   }
 
-  
+
   cb(null, imported);
 };
 
@@ -57,9 +58,9 @@ exports.find = function(user, pattern, cb) {
   persistence.Contact.find(query).exec(function(err, contacts) {
     var matches = _.inject(contacts, function(accum, contact) {
       var user = {
-        displayName:    contact.name, 
-        email:          contact.emails[0], 
-        avatarUrlSmall: '/avatarForEmail/' + contact.emails[0], 
+        displayName:    contact.name,
+        email:          contact.emails[0],
+        avatarUrlSmall: '/avatarForEmail/' + contact.emails[0],
         imported:       true
       };
       accum.push(user);
@@ -77,4 +78,25 @@ exports.importedGoogleContacts = function(user, cb) {
   persistence.Contact.find(query).exec(function(err, contacts) {
     cb((contacts.length !== 0) ? true : false);
   });
+};
+
+/**
+ * Finds all contacts with the given email address and updates the contact with the userId of the
+ * user that contact belongs to.
+ *
+ * @return promise of contacts
+ */
+exports.updateContactsWithUserId = function(email, userId) {
+  return persistence.Contact.find({ emails: email, contactUserId: { $exists: false } })
+    .execQ()
+    .then(function(contacts) {
+      winston.silly('Updating ' + contacts.length + ' contacts with userId');
+
+      // Update and save all matching contacts
+      return Q.all(contacts.map(function(contact) {
+          contact.contactUserId = userId;
+          return contact.saveQ();
+        }))
+        .thenResolve(contacts);
+    });
 };

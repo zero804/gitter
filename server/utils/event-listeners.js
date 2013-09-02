@@ -9,6 +9,8 @@ exports.installLocalEventListeners = function() {
     require('../services/notifications/notification-generator-service').install();
     require('../services/unread-item-service').install();
 
+    require('../services/contact-signup-notifier').install();
+
     installed = true;
   }
 };

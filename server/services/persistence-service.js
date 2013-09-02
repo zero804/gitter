@@ -523,13 +523,15 @@ UriLookupSchema.schemaTypeName = 'UriLookupSchema';
  * User contacts
  */
 var ContactSchema = new Schema({
-  userId: {type: ObjectId, ref: 'User'},
-  source: String,
-  sourceId: String,
-  name: String,
-  emails: Array
+  userId: { type: ObjectId, ref: 'User' },        // Owner of the contact
+  source: String,                                 // The source of the contact
+  sourceId: String,                               // The ID for the contact used by the source
+  name: String,                                   // Name of the contact
+  emails: [String],                               // Email addresses for the contact
+  contactUserId: { type: ObjectId, ref: 'User' }  // The user referenced by the contact, if they've signed up
 });
 ContactSchema.index({ userId: 1 });
+ContactSchema.index({ emails: 1 });
 ContactSchema.schemaTypeName = 'ContactSchema';
 
 
