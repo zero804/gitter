@@ -104,7 +104,10 @@ exports.hook_queue = function(next, connection) {
       }).fail(function(err) {
         // if any of the mails failed to save, return their error directly to haraka
         winston.error("One of the saves failed: ", { exception: err });
-        return next(DENY);
+
+        // We will die quietly to prevent resends of the message
+        // If we DENY the sending server will attempt a resend
+        return next(OK /* DENY */);
       });
 
   }
