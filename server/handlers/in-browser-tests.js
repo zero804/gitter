@@ -13,6 +13,7 @@ module.exports = {
         '/test/in-browser/test',
         function(req, res) {
           res.render('test/in-browser', {
+            minified: false,
             homeUrl: nconf.get('web:homeurl')
           });
         }
