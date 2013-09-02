@@ -13,11 +13,10 @@ define([
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
-  'oEmbed',
   'template/helpers/linkify',
   'utils/safe-html',
   'bootstrap_tooltip'
-], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, chatItemTemplate, chatInputView, UnreadItemViewMixin, oEmbed, linkify, safeHtml /* tooltip*/) {
+], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml /* tooltip*/) {
 
   "use strict";
 
@@ -86,14 +85,13 @@ define([
       richText = richText.replace(/\n\r?/g, '<br>');
       this.$el.find('.trpChatText').html(richText);
 
-      this.oEmbed();
       this.highlightMention();
+      if (this.decorator) this.decorator.enrich(this);
     },
 
     afterRender: function() {
       this.renderText();
       this.updateRender();
-      if (this.decorator) this.decorator.enrich(this);
     },
 
     updateRender: function() {
@@ -117,18 +115,6 @@ define([
       this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
       this.$el.toggleClass('hasBeenRead', this.hasBeenRead());
       this.$el.toggleClass('isOld', this.isOld());
-    },
-
-    // Note: This must only be called *once* after the element content is set from the model
-    oEmbed: function() {
-      oEmbed.defaults.maxwidth = 370;
-      this.$el.find('.link').each(function(index, el) {
-        oEmbed.parse(el.href, function(embed) {
-          if (embed) {
-            $(el).append('<div class="embed">' + embed.html + '</div>');
-          }
-        });
-      });
     },
 
     highlightMention: function() {
