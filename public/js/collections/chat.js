@@ -49,7 +49,7 @@ define([
     preloadKey: "chatMessages",
     sortByMethods: {
       'sent': function(chat) {
-        var offset = chat.id ? 0 : 10000;
+        var offset = chat.id ? 0 : 300000;
 
         var sent = chat.get('sent');
 
