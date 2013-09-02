@@ -2,6 +2,7 @@
 "use strict";
 
 var persistence = require("./persistence-service");
+var chatService = require("./chat-service");
 var mongoose = require("mongoose");
 var mime = require("mime");
 var winston = require("winston");
@@ -13,6 +14,7 @@ var thumbnailPreviewGeneratorService = require("./thumbnail-preview-generator-se
 var mongooseUtils = require('../utils/mongoose-utils');
 var Fiber = require('../utils/fiber');
 var collections = require("../utils/collections");
+var assert = require('assert');
 
 /* private */
 function getMainFileName(fileId, version) {
@@ -213,13 +215,13 @@ function findByFileName(troupeId, fileName, callback) {
 function storeFileVersionInGrid(options, callback) {
   winston.verbose("storeFileVersionInGrid");
 
-  var troupeId = options.troupeId;
-  var creatorUserId = options.creatorUserId;
+  var troupeId = options.troupeId || options.troupe && options.troupe.id;
+
+  var creatorUserId = options.user ? options.user.id : null;
   var fileName = options.fileName;
   var mimeType = options.mimeType;
   var temporaryFile = options.file; // this is the file path
   var version;
-
 
   findByFileName(troupeId, fileName, function(err, file) {
     if(err) return callback(err);
@@ -297,8 +299,14 @@ function storeFileVersionInGrid(options, callback) {
 }
 
 function storeFile(options, callback) {
-  var fileName = options.fileName;
-  var mimeType = options.mimeType;
+  var fileName  = options.fileName;
+  var mimeType  = options.mimeType;
+  var user      = options.user;
+  var troupe    = options.troupe;
+
+  assert(user, 'Expected options.user');
+  assert(troupe, 'Expected options.troupe');
+  assert(fileName, 'Expected options.fileName');
 
   /* Need to correct the mimeType from time to time */
   /* Try figure out a better mimeType for the file */
@@ -314,6 +322,18 @@ function storeFile(options, callback) {
   storeFileVersionInGrid(options, function(err, fileAndVersion) {
     if(err) return callback(err);
     if(fileAndVersion.alreadyExists) return callback(err, fileAndVersion);
+
+    var message = user.displayName + ' uploaded ' + options.fileName;
+    var metadata = {
+      type: 'file',
+      action: 'uploaded',
+      fileId: fileAndVersion.file._id
+    };
+
+    chatService.newRichMessageToTroupe(troupe, user, message, metadata, function(err/*, msg*/) {
+      if (err) return winston.error('Unable to generate rich text message' +  err, { exception: err });
+      winston.info("Notification created");
+    });
 
     /** Continue regardless of what happens in generate... */
     callback(err, fileAndVersion);

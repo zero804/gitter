@@ -65,12 +65,12 @@ define([
     },
 
     updateTitlebar: function(values) {
-      $('title').html(this.getTitlebar(values));
+      document.title = this.getTitlebar(values);
     },
 
     getTitlebar: function(counts) {
       var mainTitle;
-      if (context.getTroupe()) {
+      if (context.getTroupe() && context.getTroupe().name) {
         mainTitle = context.getTroupe().name + " - Troupe";
       } else {
         mainTitle = "Troupe";

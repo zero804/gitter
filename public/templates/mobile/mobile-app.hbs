@@ -7,7 +7,11 @@
 
   <title>{{troupeName}}</title>
 
-  <link rel="stylesheet" href='/bootstrap/css/trpMobileApp.css'>
+  {{#if isUserhome}}
+  <link rel="stylesheet" href='{{ cdn "bootstrap/css/trpMobileUserhome.css"}}'>
+  {{else}}
+  <link rel="stylesheet" href='{{ cdn "bootstrap/css/trpMobileApp.css"}}'>
+  {{/if}}
 
   {{{ generateTroupeContext troupeContext }}}
 
@@ -25,23 +29,21 @@
     </div>
   </div>
 
-  <div id="troupeListPanel" class="sideMenu">
-    <div id="troupeList"></div>
+  <div id="troupeList" class="sideMenu">
   </div>
 
-  <div id="pageContainer" class="platform">
-    <div id="mainPage">
+  <div id="mainPage">
+    <header>
+      <div id="showTroupesButton">
+        <img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle">
+      </div>
+      <span class="title">{{troupeName}}</span>
+      <a id="showUserhomeButton" href="/home">
+        <img src='{{cdn "images/2/icon-user.png"}}' width="24" height="24">
+      </a>
+    </header>
 
-      <header id="nav-bar">
-        <div id="showTroupesButton">
-          <img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle">
-        </div>
-        <span class="title">{{troupeName}}</span>
-        <a href="/home" style="position: absolute; right: 0; padding-right: 12px; padding-top: 5px;">
-          <img src='{{cdn "images/2/icon-user.png"}}' width="24" height="24">
-        </a>
-      </header>
-
+    <div id="content">
       <div class="contentBody mobile-scroll-class" id="content-frame">
         <div class="frame-chat">
           <div class="trpChatPanel" id="chat-frame">
@@ -49,10 +51,9 @@
           </div>
         </div>
       </div>
-
-      <div class="trpChatInputArea" id="chat-input"></div>
-
     </div>
+
+    <div class="trpChatInputArea" id="chat-input"></div>
   </div>
 
 </body>

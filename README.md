@@ -15,3 +15,6 @@ __Getting Started__
 5.	`./scripts/mongo/init-dev-mongo.sh`
 6.	`./scripts/upgrade-data.sh`
 7.	`node-dev web.js`
+
+__Run Like Production__
+`node web --web:staticContent=public-processed/ --web:minified=true`

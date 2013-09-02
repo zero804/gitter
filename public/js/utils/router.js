@@ -2,12 +2,13 @@
 define([
   'backbone',
   'underscore',
+  'utils/appevents',
   'jquery'
-], function(Backbone, _, $) {
+], function(Backbone, _, appEvents, $) {
   "use strict";
 
   function track(name) {
-    $(document).trigger('track', name);
+    appEvents.trigger('track', name);
   }
 
   var installClickTrigger = _.once(function() {

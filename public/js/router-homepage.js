@@ -6,7 +6,6 @@ require([
   'hbs!views/login/tmpl/loginRequestModalView',
   'views/app/appIntegratedView',
   'views/userhome/userHomeView',
-  'views/profile/profileView',
   'views/app/headerView',
   'views/toolbar/troupeMenu',
   'routers/userhome-router',
@@ -16,7 +15,7 @@ require([
   'components/webNotifications',
   'components/desktopNotifications',
   'template/helpers/all'
-], function(Backbone, TroupeViews, context, loginRequestTemplate,  AppIntegratedView, UserHomeView, profileView, HeaderView, TroupeMenuView, UserhomeRouter, connectUserTemplate /*, errorReporter , dozy, webNotifications,_Helpers*/) {
+], function(Backbone, TroupeViews, context, loginRequestTemplate,  AppIntegratedView, UserHomeView, HeaderView, TroupeMenuView, UserhomeRouter, connectUserTemplate /*, errorReporter , dozy, webNotifications,_Helpers*/) {
 
   "use strict";
 
@@ -97,5 +96,14 @@ require([
   });
 
   Backbone.history.start();
+
+  if(!window.localStorage.troupeTourHome) {
+    window.localStorage.troupeTourHome = 1;
+    require([
+      'tours/tour-controller'
+    ], function(tourController) {
+      tourController.init({ appIntegratedView: appView });
+    });
+  }
 
 });

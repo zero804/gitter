@@ -153,7 +153,7 @@ describe("User Service", function() {
     });
   });
 
-
+  //
   describe('#findUsernameForUserId', function() {
     it('should findUsernameForUserId correctly', function(done) {
       var userService = testRequire("./services/user-service");
