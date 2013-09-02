@@ -10,8 +10,12 @@ var presenceService           = require('./presence-service');
 var emailNotificationService  = require('./email-notification-service');
 
 
+/**
+ * Returns a promise of nothing
+ */
 function updateContacts(email, user) {
   var userId = user.id;
+  winston.silly('Updating contacts for email ' + email + ' to user ' + userId);
 
   return contactService.updateContactsWithUserId(email, userId)
     .then(function(contacts) {
@@ -73,9 +77,9 @@ exports.install = function() {
         if(user.status !== 'ACTIVE') return;
         return updateContacts(email, user);
       })
-
       .fail(function(err) {
         winston.error('Contact signup notifier failed' + err, { exception: err });
+        throw err;
       });
   });
 
@@ -90,6 +94,7 @@ exports.install = function() {
       })
       .fail(function(err) {
         winston.error('Contact signup notifier failed' + err, { exception: err });
+        throw err;
       });
   });
 
