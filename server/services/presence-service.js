@@ -354,15 +354,19 @@ function categorizeUsersByOnlineStatus(userIds, callback) {
   var keys = [key, out_key, ACTIVE_USERS_KEY];
   var values = userIds;
 
+  var d = Q.defer();
+
   scriptManager.run('presence-categorize-users', keys, values, function(err, onlineUsers) {
+    if(err) return d.reject(err);
+
     var result = {};
     if(onlineUsers) onlineUsers.forEach(function(userId) {
       result[userId] = 'online';
     });
-
-    return callback(null, result);
+    return d.resolve(result);
   });
 
+  return d.promise.nodeify(callback);
 }
 
 function categorizeUserTroupesByOnlineStatus(userTroupes, callback) {

@@ -179,8 +179,23 @@ function bind(on) {
 
     onBatchUserBadgeCountUpdate: function(callback) {
       on('batchUserBadgeCountUpdate', callback);
-    }
+    },
 
+    emailConfirmed: function(email, userId) {
+      emit('emailConfirmed', { email: email, userId: userId });
+    },
+
+    onEmailConfirmed: function(callback) {
+      on('emailConfirmed', callback);
+    },
+
+    userAccountActivated: function(userId) {
+      emit('userAccountActivated', { userId: userId });
+    },
+
+    onUserAccountActivated: function(callback) {
+      on('userAccountActivated', callback);
+    },
 
   };
 }

@@ -342,6 +342,10 @@ var userService = {
             // mark user as active after setting the password
             if (user.status === 'PROFILE_NOT_COMPLETED' || user.status === 'UNCONFIRMED') {
               user.status = "ACTIVE";
+
+              postSave.push(function() {
+                appEvents.userAccountActivated(user.id);
+              });
             }
             return user;
           });
@@ -486,6 +490,9 @@ var userService = {
 
     return user.saveQ()
       .then(function() {
+        // Signal that an email address has been confirmed
+        appEvents.emailConfirmed(email, user.id);
+
         return persistence.User.updateQ(
           { 'unconfirmedEmails.email': email },
           { $pull: { unconfirmedEmails: { email: email } } },
