@@ -2,7 +2,7 @@ import unittest
 import os
 import smtplib
 
-class UserInTroupeTests(unittest.TestCase):
+class SMTPSendTest(unittest.TestCase):
 
     def testMailSend(self):
         msg = open(os.path.dirname(os.path.realpath(__file__)) + '/email.msg.eml', 'r');
