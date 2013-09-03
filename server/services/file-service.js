@@ -2,7 +2,7 @@
 "use strict";
 
 var persistence = require("./persistence-service");
-var chatService = require("./chat-service");
+var appEvents = require("../app-events");
 var mongoose = require("mongoose");
 var mime = require("mime");
 var winston = require("winston");
@@ -323,17 +323,7 @@ function storeFile(options, callback) {
     if(err) return callback(err);
     if(fileAndVersion.alreadyExists) return callback(err, fileAndVersion);
 
-    var message = user.displayName + ' uploaded ' + options.fileName;
-    var metadata = {
-      type: 'file',
-      action: 'uploaded',
-      fileId: fileAndVersion.file._id
-    };
-
-    chatService.newRichMessageToTroupe(troupe, user, message, metadata, function(err/*, msg*/) {
-      if (err) return winston.error('Unable to generate rich text message' +  err, { exception: err });
-      winston.info("Notification created");
-    });
+    appEvents.richMessage({eventName: 'newFile', fileName: options.fileName, fileId: fileAndVersion.file._id, troupe: troupe, user: user, file: fileAndVersion});
 
     /** Continue regardless of what happens in generate... */
     callback(err, fileAndVersion);

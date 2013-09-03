@@ -3,7 +3,8 @@
 define([
   'views/file/fileDetailView',
   'collections/instances/integrated-items',
-], function(FileDetailView, itemCollections) {
+  'oEmbed'
+], function(FileDetailView, itemCollections, oEmbed) {
 
   "use strict";
 
@@ -13,6 +14,17 @@ define([
       var view = new FileDetailView({ model: model, hideClose: true, hideActions: true, className: 'rich' });
       chatItemView.$el.find('.trpChatText').append(view.render().el);
     }
+  }
+
+  function embed(chatItemView) {
+    oEmbed.defaults.maxwidth = 370;
+    chatItemView.$el.find('.link').each(function(index, el) {
+      oEmbed.parse(el.href, function(embed) {
+        if (embed) {
+          $(el).append('<div class="embed">' + embed.html + '</div>');
+        }
+      });
+    });
   }
 
   var decorator = {
@@ -29,6 +41,7 @@ define([
           default:
         }
       }
+      embed(chatItemView);
     }
 
   };
