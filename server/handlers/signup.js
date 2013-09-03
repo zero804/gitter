@@ -2,6 +2,7 @@
 "use strict";
 
 var signupService = require("../services/signup-service");
+var userService = require("../services/user-service");
 var middleware = require("../web/middleware");
 var loginUtils = require('../web/login-utils');
 var winston = require('winston');
@@ -83,6 +84,32 @@ module.exports = {
           signupService.confirm(req.user, function(err, user) {
             if (err) {
               winston.error("Signup service confirmation failed", { exception: err } );
+
+              middleware.logoutPreserveSession(req, res, function() {
+                res.redirect(nconf.get('web:homeurl') + "#message-confirmation-failed-already-registered");
+              });
+
+              return;
+            }
+
+            if (user.hasPassword()) {
+              res.relativeRedirect('/' + user.username);
+            } else {
+              contextGenerator.generateMiniContext(req, function(err, troupeContext) {
+                res.render('complete-profile', { troupeContext: troupeContext });
+              });
+            }
+          });
+        });
+
+      app.get('/confirmSecondary/:confirmationCode',
+        middleware.authenticate('confirm', { failureRedirect: '/confirm-failed' } ),
+        function(req, res){
+          winston.verbose("Confirmation authenticated");
+
+          userService.confirmSecondaryEmail(req.user, req.params.confirmationCode, function(err, user) {
+            if (err) {
+              winston.error("user service confirmation failed", { exception: err } );
 
               middleware.logoutPreserveSession(req, res, function() {
                 res.redirect(nconf.get('web:homeurl') + "#message-confirmation-failed-already-registered");
