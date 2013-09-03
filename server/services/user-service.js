@@ -107,6 +107,28 @@ var userService = {
             .nodeify(callback);
   },
 
+  findByEmailsIndexed: function(emails, callback) {
+    emails = emails.map(function(email) { return email.toLowerCase(); });
+
+    return persistence.User.findQ({ $or: [
+              { email: { $in: emails } },
+              { emails: { $in: emails } }
+              ]})
+      .then(function(users) {
+        return users.reduce(function(memo, user) {
+          memo[user.email] = user;
+
+          user.emails.forEach(function(email) {
+            memo[email] = user;
+          });
+
+          return memo;
+        }, {});
+      })
+      .nodeify(callback);
+  },
+
+
   findByUsername: function(username, callback) {
     return persistence.User.findOneQ({username: username.toLowerCase()})
             .nodeify(callback);
