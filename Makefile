@@ -6,6 +6,8 @@ DATA_MAINT_SCRIPTS = $(shell find ./scripts/datamaintenance -name '*.sh')
 SAUCELABS_REMOTE = http://trevorah:d6b21af1-7ae7-4bed-9c56-c5f9d290712b@ondemand.saucelabs.com:80/wd/hub
 BETA_SITE = https://beta.trou.pe
 BASE_URL = http://localhost:5000
+MAIL_HOST = localhost
+MAIL_PORT = 2525
 
 clean:
 	rm -rf public-processed/ output/ coverage/ cobertura-coverage.xml html-report/
@@ -18,6 +20,8 @@ test:
 		$(TESTS)
 
 perf-test-xunit:
+	npm install
+	mkdir -p output/test-reports
 	NODE_ENV=test XUNIT_FILE=output/test-reports/performance.xml ./node_modules/.bin/mocha \
 		--reporter xunit-file \
 		--timeout 100000 \
@@ -25,6 +29,7 @@ perf-test-xunit:
 		$(PERF_TESTS)
 
 perf-test:
+	npm install
 	NODE_ENV=test ./node_modules/.bin/mocha \
 		--reporter spec \
 		--timeout 100000 \
@@ -60,6 +65,8 @@ prepare-for-end-to-end-testing:
 
 end-to-end-test:
 	mkdir -p ./output/test-reports/
+	MAIL_HOST=$(MAIL_HOST) \
+	MAIL_PORT=$(MAIL_PORT) \
 	nosetests -s -v --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests/
 
 end-to-end-test-saucelabs-chrome:
@@ -68,6 +75,8 @@ end-to-end-test-saucelabs-chrome:
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTECHROME \
 	BASE_URL=$(BETA_SITE) \
+	MAIL_HOST=$(MAIL_HOST) \
+	MAIL_PORT=$(MAIL_PORT) \
 	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
 
 end-to-end-test-saucelabs-ie9:
@@ -75,6 +84,8 @@ end-to-end-test-saucelabs-ie9:
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTEIE \
 	BASE_URL=$(BETA_SITE) \
+	MAIL_HOST=$(MAIL_HOST) \
+	MAIL_PORT=$(MAIL_PORT) \
 	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
 
 end-to-end-test-saucelabs-android:
@@ -82,6 +93,8 @@ end-to-end-test-saucelabs-android:
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTEANDROID \
 	BASE_URL=$(BETA_SITE) \
+	MAIL_HOST=$(MAIL_HOST) \
+	MAIL_PORT=$(MAIL_PORT) \
 	nosetests --nologcapture --attr 'phone_compatible' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
 
 docs: test-docs
@@ -141,7 +154,7 @@ search-js-console:
 
 validate-source: search-js-console
 
-continuous-integration: clean validate-source npm grunt version-files upgrade-data init-test-data test-xunit test-coverage tarball
+continuous-integration: clean validate-source npm grunt version-files upgrade-data reset-test-data test-xunit test-coverage tarball
 
 post-deployment-tests: test-in-browser-xunit end-to-end-test-saucelabs-chrome end-to-end-test-saucelabs-ie9 end-to-end-test-saucelabs-android
 
@@ -178,7 +191,12 @@ install-client-libs:
 	cp output/client-libs/faye/faye-browser.js public/repo/faye/faye.js
 	cp output/client-libs/filtered-collection/backbone-filtered-collection-amd.js public/repo/filtered-collection/filtered-collection.js
 	cp output/client-libs/hopscotch/hopscotch-0.11-amd.js public/repo/hopscotch/hopscotch.js
-	cp output/client-libs/hopscotch/css/hopscotch-0.1.1.min.css public/repo/hopscotch/hopscotch.css
+
+	mkdir -p public/repo/hopscotch/css/ public/repo/hopscotch/img
+	cp output/client-libs/hopscotch/css/hopscotch-0.1.1.min.css public/repo/hopscotch/css/hopscotch.css
+	cp output/client-libs/hopscotch/img/sprite-green-0.3.png public/repo/hopscotch/img/
+
+	cp output/client-libs/hopscotch/css/hopscotch-0.1.1.min.css public/repo/hopscotch/css/hopscotch.css
 	cp output/client-libs/marionette/lib/core/amd/backbone.marionette.min.js public/repo/marionette/marionette.js
 	cp output/client-libs/fine-uploader/fine-uploader.js public/repo/fine-uploader/fine-uploader.js
 	cp output/client-libs/fine-uploader/client/fineuploader.css public/repo/fine-uploader/fineuploader.less

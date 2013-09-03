@@ -4,7 +4,11 @@
     require.config = function(c) {
       window.require_config = c;
     }
+    {{#if minified}}
+    {{>require_config_min}}
+    {{else}}
     {{>require_config}}
+    {{/if}}
   })(window);
 
 var require = window.require_config;

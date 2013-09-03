@@ -107,6 +107,28 @@ var userService = {
             .nodeify(callback);
   },
 
+  findByEmailsIndexed: function(emails, callback) {
+    emails = emails.map(function(email) { return email.toLowerCase(); });
+
+    return persistence.User.findQ({ $or: [
+              { email: { $in: emails } },
+              { emails: { $in: emails } }
+              ]})
+      .then(function(users) {
+        return users.reduce(function(memo, user) {
+          memo[user.email] = user;
+
+          user.emails.forEach(function(email) {
+            memo[email] = user;
+          });
+
+          return memo;
+        }, {});
+      })
+      .nodeify(callback);
+  },
+
+
   findByUsername: function(username, callback) {
     return persistence.User.findOneQ({username: username.toLowerCase()})
             .nodeify(callback);
@@ -342,6 +364,10 @@ var userService = {
             // mark user as active after setting the password
             if (user.status === 'PROFILE_NOT_COMPLETED' || user.status === 'UNCONFIRMED') {
               user.status = "ACTIVE";
+
+              postSave.push(function() {
+                appEvents.userAccountActivated(user.id);
+              });
             }
             return user;
           });
@@ -486,6 +512,9 @@ var userService = {
 
     return user.saveQ()
       .then(function() {
+        // Signal that an email address has been confirmed
+        appEvents.emailConfirmed(email, user.id);
+
         return persistence.User.updateQ(
           { 'unconfirmedEmails.email': email },
           { $pull: { unconfirmedEmails: { email: email } } },

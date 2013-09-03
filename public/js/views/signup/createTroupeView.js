@@ -78,10 +78,13 @@ define([
       this.$el.find('#signup-form').validate(validationConfig);
     },
 
-    onFormSubmit: function(e) {
+    onFormSubmit: _.debounce(function(e) {
       if(e) e.preventDefault();
+      this.disableForm();
+
       var that = this;
       var form = this.$el.find('form');
+
       var serializedForm = {
         troupeName: form.find('input[name=troupeName]').val(),
         userId: form.find('input[name=userId]').val()
@@ -95,11 +98,12 @@ define([
         url: '/troupes/',
         wait: true,
         success: function(troupe /*, resp, options*/) {
+          that.enableForm();
           log('response from upgrading one to one troupe', troupe);
           window.location.href = "/" + troupe.get('uri') + "#|share";
         }
       });
-    }
+    }, 1000, true)
 
   });
 

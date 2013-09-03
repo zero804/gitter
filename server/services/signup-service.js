@@ -7,6 +7,7 @@ var emailNotificationService = require("./email-notification-service"),
     uriService = require("./uri-service"),
     winston = require('winston'),
     assert = require('assert'),
+    appEvents = require('../app-events'),
     Q = require('q');
 
 function newUser(options, callback) {
@@ -18,9 +19,6 @@ function newUser(options, callback) {
         return user;
       }).nodeify(callback);
 }
-
-
-
 
 var signupService = module.exports = {
   newSignupFromLandingPage: function(options, callback) {
@@ -81,6 +79,9 @@ var signupService = module.exports = {
       user.save(function(err) {
         if(err) return callback(err);
 
+        // Signal that an email address has been confirmed
+        appEvents.emailConfirmed(newEmail, user.id);
+
         winston.verbose("User email address change complete, finding troupe to redirect to", { id: user.id, status: user.status });
 
         troupeService.updateInvitesForEmailToUserId(newEmail, user.id, function(err) {
@@ -122,6 +123,9 @@ var signupService = module.exports = {
 
     return user.saveQ()
         .then(function() {
+          // Signal that an email address has been confirmed
+          appEvents.emailConfirmed(user.email, user.id);
+
           return troupeService.updateInvitesForEmailToUserId(user.email, user.id)
             .then(function() {
               return Q.all([

@@ -194,5 +194,21 @@ module.exports = {
         baseServerPath: nconf.get("email:emailBasePath")
       }
     });
+  },
+
+  sendContactSignupNotification: function(signupUser, toUser) {
+    var signupDisplayName = signupUser.displayName;
+    var email = toUser.email;
+
+    mailerService.sendEmail({
+      templateFile: "contact_signup_notification",
+      from: 'Troupe <support@troupe.co>',
+      to: email,
+      subject: signupDisplayName + " has joined Troupe",
+      data: {
+        signupDisplayName: signupDisplayName,
+        connectLink: nconf.get("email:emailBasePath") + signupUser.getHomeUrl(),
+      }
+    });
   }
 };

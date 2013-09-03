@@ -102,7 +102,7 @@ function createExpectedFixtures(expected, done) {
 
     return persistence.Contact.createQ({
       name:         f.name    || 'John Doe',
-      emails:       f.emails  || ['john@doe.com'],
+      emails:       f.emails  || [generateEmail()],
       source:       f.source  || 'google',
       userId:       f.userId  || null
     });
@@ -185,6 +185,31 @@ function createExpectedFixtures(expected, done) {
                 });
 
             }));
+        }
+      }
+
+      if(key.match(/^contact/)) {
+        var cu = expected[key];
+
+        if(cu.user) {
+          if(typeof cu.user == 'string') {
+            if(expected[cu.user]) return; // Already specified at the top level
+            expected[cu.user] = {};
+            return createUser(cu.user, {}).then(function(createdUser) {
+              fixture[cu.user] = createdUser;
+            });
+          }
+
+          var fixtureName = 'user' + (++userCounter);
+          expected[fixtureName] = cu.user;
+
+          return createUser(fixtureName, cu.user)
+            .then(function(user) {
+              fixture[fixtureName] = user;
+              cu.user = user;
+            });
+
+
         }
       }
 
@@ -283,5 +308,7 @@ function fixtureLoader(fixture, expected) {
 fixtureLoader.use = function(expected) {
   return createExpectedFixtures(expected);
 };
+
+fixtureLoader.generateEmail = generateEmail;
 
 module.exports = fixtureLoader;
