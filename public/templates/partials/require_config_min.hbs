@@ -1,0 +1,12 @@
+require.config({
+  waitSeconds: 15,
+  paths: {
+    "tours/tour-controller": "tours/tour-controller.min",
+    "ga": "//ssl.google-analytics.com/ga"
+  },
+  shim: {
+    "ga": {
+      exports: "_gaq"
+    }
+  }
+});

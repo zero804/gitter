@@ -233,6 +233,8 @@ function addUserIdToTroupe(userId, troupeId) {
         if(troupe.containsUserId(userId)) {
           return troupe;
         }
+       
+        appEvents.richMessage({eventName: 'userJoined', troupe: troupe, userId: userId});
 
         troupe.addUserById(userId);
         return troupe.saveQ()

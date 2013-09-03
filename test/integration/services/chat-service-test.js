@@ -41,7 +41,7 @@ describe('chatService', function() {
 
   });
 
-  describe('Rich messages', function() {
+  describe('Message entities', function() {
     it('should collect metadata from the message text', function(done) {
 
       chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, 'hey @mauro check https://trou.pe', function(err, chatMessage) {
@@ -60,6 +60,28 @@ describe('chatService', function() {
 
     });
   });
+
+  describe('Decorated messages', function() {
+    it('should save meta information on a message for later decoration', function(done) {
+
+      var plainText = 'Mauro uploaded awesome.png';
+      var meta = {
+        type: 'file',
+        action: 'uploaded',
+        fileId: 1234
+      };
+
+      chatService.newRichMessageToTroupe(fixture.troupe1, fixture.user1, plainText, meta, function(err, chatMessage) {
+        if(err) return done(err);
+
+        assert(!chatMessage.fromUserId, 'Expected fromUserId should to be null');
+        assert(chatMessage.meta === meta, 'Meta has been altered');
+        done();
+      });
+
+    });
+  });
+
 
   before(fixtureLoader(fixture));
 

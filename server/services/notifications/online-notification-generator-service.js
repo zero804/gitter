@@ -38,7 +38,7 @@ var linkTemplates = compile({
 
 var senderStrategies = {
   "chat": function(data) {
-    return data.fromUser.id;
+    return data.fromUser && data.fromUser.id;
   },
   "file": function(data) {
     return data.latestVersion.creatorUser.id;
@@ -94,12 +94,11 @@ function createNotificationMessage(itemType, itemIds, callback) {
 
       serializer.serialize(itemIds, strategy, function(err, serialized) {
         if(err) return callback(err);
-        var senderUserId = null;
 
         var messages = serialized.map(function(data) {
-          if(senderStrategy) {
-            senderUserId = senderStrategy(data);
-          }
+          var senderUserId = senderStrategy && senderStrategy(data);
+
+          if(!senderUserId) return;
 
           // Catch-22, we can't figure out the sender until we've done serialization
           // but we can't calculate the troupeUrl (needed _for_ serialization)
@@ -130,6 +129,7 @@ function createNotificationMessage(itemType, itemIds, callback) {
           return d;
         });
 
+        messages = messages.filter(function(f) { return !!f; });
         callback(null, messages);
       });
   } else {

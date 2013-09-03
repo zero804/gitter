@@ -168,7 +168,7 @@ module.exports = function( grunt ) {
                   ],
                   exclude: ["core-libraries"]
               },
-               {
+              {
                   name: "complete-profile",
                   include: [
                     "utils/tracking",
@@ -179,7 +179,16 @@ module.exports = function( grunt ) {
               {
                   name: "login",
                   exclude: ["core-libraries"]
-             }
+              },
+              {
+                  name: "tours/tour-controller",
+                  include: [
+                  ],
+                  exclude: [
+                    "core-libraries",
+                    "router-app"
+                  ]
+              },
           ]
 
         }
@@ -212,6 +221,7 @@ module.exports = function( grunt ) {
       "native-accept-router": createClosureConfig('routers/mobile/native/accept-router'),
       "router-login": createClosureConfig('router-login'),
       "complete-profile": createClosureConfig('complete-profile'),
+      "tour-controller": createClosureConfig('tours/tour-controller'),
       "login": createClosureConfig('login')
     },
 
@@ -297,6 +307,7 @@ module.exports = function( grunt ) {
           "public/bootstrap/css/trpMails.css": "public/bootstrap/less/trpMails.less",
           "public/bootstrap/css/trpPeople.css": "public/bootstrap/less/trpPeople.less",
           "public/bootstrap/css/trpMobileApp.css": "public/bootstrap/less/trpMobileApp.less",
+          "public/bootstrap/css/trpMobileUserhome.css": "public/bootstrap/less/trpMobileUserhome.less",
           "public/bootstrap/css/trpNativeChat.css": "public/bootstrap/less/trpNativeChat.less",
           "public/bootstrap/css/trpNativeFiles.css": "public/bootstrap/less/trpNativeFiles.less",
           "public/bootstrap/css/trpNativeConversations.css": "public/bootstrap/less/trpNativeConversations.less",
@@ -382,7 +393,7 @@ module.exports = function( grunt ) {
       },
       hopscotch: {
         files: {
-          'output/client-libs/hopscotch/hopscotch-0.11-amd.js': ['output/client-libs/hopscotch/js/hopscotch-0.1.1' + (min ? '.min' : '') + '.js']
+          'output/client-libs/hopscotch/hopscotch-0.11-amd.js': ['output/client-libs/hopscotch/js/hopscotch-0.1.1.js']
         },
         modules: {
 
@@ -512,7 +523,7 @@ module.exports = function( grunt ) {
     }
   });
 
-  grunt.loadNpmTasks('grunt-requirejs');
+  grunt.loadNpmTasks('grunt-contrib-requirejs');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-reload');

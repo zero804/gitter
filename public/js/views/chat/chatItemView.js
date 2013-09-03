@@ -13,11 +13,10 @@ define([
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
-  'oEmbed',
   'template/helpers/linkify',
   'utils/safe-html',
   'bootstrap_tooltip'
-], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, chatItemTemplate, chatInputView, UnreadItemViewMixin, oEmbed, linkify, safeHtml /* tooltip*/) {
+], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml /* tooltip*/) {
 
   "use strict";
 
@@ -37,6 +36,8 @@ define([
 
       this.userCollection = options.userCollection;
       //this.scrollDelegate = options.scrollDelegate;
+
+      this.decorator = options.decorator;
 
       this.model.on('change', function() {
         self.onChange();
@@ -62,7 +63,9 @@ define([
     getRenderData: function() {
       var data = this.model.toJSON();
 
-      data.displayName = data.fromUser.displayName;
+      if (data.fromUser) {
+        data.displayName = data.fromUser.displayName;
+      }
 
       return data;
     },
@@ -82,8 +85,8 @@ define([
       richText = richText.replace(/\n\r?/g, '<br>');
       this.$el.find('.trpChatText').html(richText);
 
-      this.oEmbed();
       this.highlightMention();
+      if (this.decorator) this.decorator.enrich(this);
     },
 
     afterRender: function() {
@@ -112,18 +115,6 @@ define([
       this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
       this.$el.toggleClass('hasBeenRead', this.hasBeenRead());
       this.$el.toggleClass('isOld', this.isOld());
-    },
-
-    // Note: This must only be called *once* after the element content is set from the model
-    oEmbed: function() {
-      oEmbed.defaults.maxwidth = 370;
-      this.$el.find('.link').each(function(index, el) {
-        oEmbed.parse(el.href, function(embed) {
-          if (embed) {
-            $(el).append('<div class="embed">' + embed.html + '</div>');
-          }
-        });
-      });
     },
 
     highlightMention: function() {
@@ -173,6 +164,7 @@ define([
     },
 
     isOwnMessage: function() {
+      if (this.model.get('fromUser') === null) return false;
       return this.model.get('fromUser').id === context.getUserId();
     },
 

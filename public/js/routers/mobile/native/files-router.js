@@ -12,6 +12,7 @@ require([
   'collections/files',
   'views/file/mobileFilePreview',
   'components/unread-items-client',
+  'components/oauth',                 // No Ref
   'components/eyeballs',              // No ref
   'template/helpers/all',             // No ref
   'components/native-context'         // No ref
@@ -35,6 +36,8 @@ require([
   troupe.on('change:name', function() {
     document.title = troupe.get('name');
   });
+
+  unreadItemsClient.monitorViewForUnreadItems($('.mobile-scroll'));
 
   var AppRouter = MobileRouter.extend({
     routes: {

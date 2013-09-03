@@ -27,7 +27,7 @@ define([
   var ChatCollectionView = Marionette.CollectionView.extend({
     itemView: chatItemView.ChatItemView,
     itemViewOptions: function() {
-      return { userCollection: this.userCollection/*, scrollDelegate: this.scrollDelegate */};
+      return { userCollection: this.userCollection, decorator: this.decorator};
     },
     chatMessageLimit: PAGE_SIZE,
 
@@ -46,18 +46,22 @@ define([
 
       this.initializeSorting();
       this.userCollection = options.userCollection;
+      this.decorator      = options.decorator;
 
       // CODEDEBT: Move unread-item-tracking into it's own module
       this.findChatToTrack();
+
       this.listenTo(this.collection, 'add', function() {
         if(this.unreadItemToTrack) return;
         this.findChatToTrack();
       });
+
       this.listenTo(this.collection, 'remove', function(e, model) {
         if(this.unreadItemToTrack && model === this.unreadItemToTrack) {
           this.findChatToTrack();
         }
       });
+
       this.listenTo(this.collection, 'change', function() {
         if(!this.unreadItemToTrack) return;
         if(this.unreadItemToTrack.get('unread')) return;

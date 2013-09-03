@@ -104,12 +104,7 @@ class SignupTests(unittest.TestCase):
         self.driver.find_element_by_id('password').send_keys('password')
         self.driver.find_element_by_css_selector('#updateprofileform [type=submit]').click()
 
-        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, 'content-frame')))
-
-        if '#' in self.driver.current_url:
-            self.assertEqual(self.driver.current_url, utils.baseUrl('/'+username)+'#')
-        else:
-            self.assertEqual(self.driver.current_url, utils.baseUrl('/'+username))
+        self.assertUserhomeIsCurrentPage(username)
 
     def testGoogleSignup(self):
         # Clean database
@@ -148,22 +143,35 @@ class SignupTests(unittest.TestCase):
         form.find_element_by_name('submit').click()
 
         # Complete profile
-        troupe_password = 'omgwtfbbq'
         form = self.driver.find_element_by_id('updateprofileform')
 
         displayName = form.find_element_by_name('displayName').get_attribute('value')
         self.assertEqual(displayName, name)
 
-        form.find_element_by_name('password').send_keys(troupe_password)
-        form.find_element_by_name('submit').click()
+        # This is correct:
+        #form.find_element_by_name('password').send_keys(troupe_password)
+        #form.find_element_by_name('submit').click()
+
+        # This works on IE:
+        self.driver.find_element_by_id('password').send_keys('password')
+        self.driver.find_element_by_css_selector('#updateprofileform [type=submit]').click()
       
-        # Welcome page
-        self.driver.find_element_by_css_selector('.trpHelpBox')
-        self.assertEqual(self.driver.current_url, utils.baseUrl('/' + username))
+        self.assertUserhomeIsCurrentPage(username)
 
 
     def tearDown(self):
         self.driver.quit()
+
+    def assertUserhomeIsCurrentPage(self, username):
+        # wait for page to load
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, 'content-frame')))
+
+        current_url = self.driver.current_url
+        # IE9 adds a # to the end of the URL, sucks
+        if '#' in current_url:
+            self.assertEqual(current_url, utils.baseUrl('/'+username)+'#')
+        else:
+            self.assertEqual(current_url, utils.baseUrl('/'+username))
 
 
 def generateUniqueEmailAddress():
