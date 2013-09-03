@@ -88,18 +88,23 @@ function saveAvatarToGridFS(localPath, gridFSFilename, callback) {
 
 module.exports = {
     install: function(app) {
-      app.get('/avatarForEmail/:email', function(req, res, next) {
-        var email = req.params.email;
-        assert(email, "An email address must be provided in the url");
-        userService.findByEmail(email, function(err, user) {
-          if (err) return next(err);
-          if (!user) {
-            return res.redirect("https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon");
-          }
+      app.get(
+        '/avatarForEmail/:address',
+        middleware.ensureLoggedIn(),
+        function(req, res, next) {
 
-          displayAvatarFor('s', user.id, req, res);
+          var email = req.params.address;
+
+          assert(email, "An email address must be provided in the url");
+          userService.findByEmail(email, function(err, user) {
+            if (err) return next(err);
+            if (!user) {
+              return res.redirect("https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon");
+            }
+
+            displayAvatarFor('s', user.id, req, res);
+          });
         });
-      });
 
       app.get(
         '/avatar',
@@ -117,7 +122,9 @@ module.exports = {
         }
       );
 
-      app.get('/gravatar/:email', function(req, res) {
+      app.get('/gravatar/:email',
+        middleware.ensureLoggedIn(),
+        function(req, res) {
         var email = req.params.email;
         assert(email, "An email address must be provided in the url");
         res.redirect("https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon");
