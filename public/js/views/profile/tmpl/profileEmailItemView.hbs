@@ -1,0 +1,13 @@
+<td>{{email}}</td>
+<td>{{status}}</td>
+<td>
+{{#if isUnconfirmed}}
+    <a class="" id="resendConfirmBtn">Resend Confirmation</a>
+{{/if}}
+{{#if isSecondary}}
+    <a class="" id="makePrimaryBtn">Make Primary</a>
+{{/if}}
+{{#unless isPrimary}}
+    <a class="" id="deleteEmailBtn">Delete</a>
+{{/unless}}
+</td>

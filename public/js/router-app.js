@@ -17,6 +17,8 @@ require([
   'views/people/personDetailView',
   'views/conversation/conversationDetailView',
   'views/profile/profileView',
+  'views/profile/profileEmailView',
+  'views/profile/profileAddEmailView',
   'views/shareSearch/shareSearchView',
   'views/signup/createTroupeView',
   'views/signup/usernameView',
@@ -35,7 +37,7 @@ require([
   'components/eyeballs' // No ref
 ], function($, Backbone, context, AppIntegratedView, chatInputView, ChatCollectionView,
             itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
-            RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, shareSearchView,
+            RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, profileEmailView, profileAddEmailView, shareSearchView,
             createTroupeView, UsernameView, HeaderView,
             troupeSettingsView, TroupeMenuView, ReinviteModal, Router, unreadItemsClient /*, errorReporter , FilteredCollection */) {
   "use strict";
@@ -91,6 +93,8 @@ require([
       { name: "person",           re: /^person\/(\w+)$/,          viewType: PersonDetailView,             collection: itemCollections.users },
 
       { name: "profile",          re: /^profile$/,                viewType: profileView.Modal },
+      { name: "profileEmails",    re: /^profile\/emails$/,        viewType: profileEmailView.Modal },
+      { name: "profileEmailsAdd", re: /^profile\/emails\/add$/,   viewType: profileAddEmailView.Modal },
       { name: "share",            re: /^share$/,                  viewType: shareSearchView.Modal },
       { name: "connect",          re: /^connect$/,                viewType: shareSearchView.Modal,        viewOptions: { overrideContext: true, inviteToConnect: true } },
       { name: "create",           re: /^create$/,                 viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true },
