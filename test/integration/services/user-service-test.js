@@ -178,8 +178,27 @@ describe("User Service", function() {
           var userEmail = user.unconfirmedEmails[0];
           assert.equal(userEmail.email, newEmail);
           assert(userEmail.confirmationCode, 'Expected a confirmation code');
-        })
-        .nodeify(done);
+          // TODO make sure a confirmation is sent
+
+          // test the lookup by unconfirmed email address
+          userService.findByUnconfirmedEmail(userEmail.email, function(err, user1) {
+            if (err) done(err);
+
+            assert(!!user1, "No user found");
+            assert(user.id === user1.id, "Found user does not match");
+
+            // test the lookup by confirmation code
+            userService.findByConfirmationCode(userEmail.confirmationCode, function(err, user2) {
+              if (err) done(err);
+
+              assert(!!user2, "No user found");
+              assert(user.id === user2.id, "Found user does not match");
+              done();
+            });
+
+          });
+
+        });
     });
 
     it('should allow removing of secondary email addresses', function(done) {

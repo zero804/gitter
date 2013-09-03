@@ -59,9 +59,9 @@ var userService = {
 
   findByConfirmationCode: function(confirmationCode, callback) {
 
-    persistence.User.findOne({confirmationCode: confirmationCode}, function(err, user) {
-      callback(err, user);
-    });
+    persistence.User.find().or([{confirmationCode: confirmationCode}, {'unconfirmedEmails.confirmationCode': confirmationCode}]).findOne()
+      .execQ()
+      .nodeify(callback);
   },
 
   requestPasswordReset: function(login, callback) {
@@ -128,6 +128,11 @@ var userService = {
       .nodeify(callback);
   },
 
+
+  findByUnconfirmedEmail: function(email, callback) {
+    return persistence.User.findOneQ({ 'unconfirmedEmails.email': email.toLowerCase() })
+      .nodeify(callback);
+  },
 
   findByUsername: function(username, callback) {
     return persistence.User.findOneQ({username: username.toLowerCase()})
@@ -459,10 +464,15 @@ var userService = {
       .then(function(existing) {
         if(existing) throw 409; // conflict
 
-        user.unconfirmedEmails.push({
-          email:            email,
+        var secondary = {
+          email: email,
           confirmationCode: uuid.v4()
-        });
+        };
+
+        user.unconfirmedEmails.push(secondary);
+
+        emailNotificationService.sendConfirmationForSecondaryEmail(secondary);
+
         return user.saveQ().thenResolve(user);
 
       });
