@@ -4,6 +4,18 @@
 var winston = require("winston");
 var ObjectID = require('mongodb').ObjectID;
 
+function asObjectID(id) {
+  if(!id) {
+    return null;
+  }
+
+  if(typeof id === 'string') {
+    return new ObjectID(id);
+  }
+
+  return id;
+}
+
 function getDateFromObjectId(id) {
   if(!id) {
     winston.silly('Null ID passed into getDateFromObjectId.');
@@ -30,6 +42,8 @@ function getNewObjectIdString() {
   return objectId.valueOf();
 }
 
+
+exports.asObjectID = asObjectID;
 exports.getDateFromObjectId = getDateFromObjectId;
 exports.getTimestampFromObjectId = getTimestampFromObjectId;
 exports.getNewObjectIdString = getNewObjectIdString;

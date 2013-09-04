@@ -9,21 +9,12 @@ var geocodingService = require("./geocoding-service");
 var winston = require("winston");
 var statsService = require("./stats-service");
 var uriLookupService = require("./uri-lookup-service");
-var crypto = require('crypto');
 var assert = require('assert');
 var collections = require("../utils/collections");
 var Q = require('q');
 var appEvents = require("../app-events");
 var moment = require('moment');
-var _ = require('underscore');
-
-function generateGravatarUrl(email) {
-  var url =  "https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon";
-
-  winston.verbose('Gravatar URL ' + url);
-
-  return url;
-}
+var gravatar = require('../utils/gravatar');
 
 var userService = {
   newUser: function(options, callback) {
@@ -33,7 +24,7 @@ var userService = {
       displayName:        options.displayName,
       email:              options.email.toLowerCase(),
       confirmationCode:   uuid.v4(),
-      gravatarImageUrl:   options.gravatarImageUrl || generateGravatarUrl(options.email),
+      gravatarImageUrl:   options.gravatarImageUrl || gravatar.gravatarUrlForEmail(options.email),
       googleRefreshToken: options.googleRefreshToken || undefined,
       status:             options.status || "UNCONFIRMED",
     });
@@ -392,7 +383,7 @@ var userService = {
         return user;
       }
 
-      user.gravatarImageUrl = generateGravatarUrl(email);
+      user.gravatarImageUrl = gravatar.gravatarUrlForEmail(email);
 
 
       return userService.findByEmail(email)
