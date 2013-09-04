@@ -107,17 +107,8 @@ module.exports = {
         function(req, res){
           winston.verbose("Confirmation authenticated");
 
-          userService.confirmSecondaryEmail(req.user, req.params.confirmationCode, function(err, user) {
-            if (err) {
-              winston.error("user service confirmation failed", { exception: err } );
-
-              middleware.logoutPreserveSession(req, res, function() {
-                res.redirect(nconf.get('web:homeurl') + "#message-confirmation-failed-already-registered");
-              });
-
-              return;
-            }
-
+          userService.confirmSecondaryEmail(req.user, req.params.confirmationCode)
+            .then(function(user) {
             if (user.hasPassword()) {
               res.relativeRedirect('/' + user.username);
             } else {
@@ -125,6 +116,13 @@ module.exports = {
                 res.render('complete-profile', { troupeContext: troupeContext });
               });
             }
+          })
+          .fail(function(err) {
+            winston.error("user service confirmation failed", { exception: err } );
+
+            middleware.logoutPreserveSession(req, res, function() {
+              res.redirect(nconf.get('web:homeurl') + "#message-confirmation-failed-already-registered");
+            });
           });
         });
 
