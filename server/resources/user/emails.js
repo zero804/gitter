@@ -69,7 +69,7 @@ module.exports = {
     if(forUpdate.status === 'CONFIRMED') {
       if(req.body.status === 'PRIMARY') {
         return userService.switchPrimaryEmail(req.user, forUpdate.email).then(function() {
-          res.send({ email: forUpdate.email, status: 'PRIMARY '});
+          res.send({ email: forUpdate.email, status: 'PRIMARY'});
         }).fail(next);
       }
     }
@@ -82,7 +82,7 @@ module.exports = {
 
     if(!userEmail.primary) {
       return userService.removeSecondaryEmail(req.user, userEmail.email).then(function() {
-        next(200);
+        res.send({ success: true });
       }).fail(next);
     }
 
