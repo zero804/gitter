@@ -1048,7 +1048,10 @@ function findAllConnectedUserIdsForUserId(userId) {
     { $group: { _id: '$users.userId', number: { $sum: 1 } } },
     { $project: { _id: 1 } }
   ]).then(function(results) {
-    return results.map(function(item) { return item._id; });
+    var a = results
+            .map(function(item) { return item._id; })
+            .filter(function(item) { return "" + item != "" + userId; });
+    return a;
   });
 
 }
@@ -1057,17 +1060,16 @@ function findAllImplicitContactUserIds(userId, callback) {
   userId = mongoUtils.asObjectID(userId);
 
   return persistence.Troupe.aggregateQ([
-    { $match: { 'users.userId': userId, oneToOne: false } },
+    { $match: { 'users.userId': userId } },
     { $project: { 'users.userId': 1, _id: 0 } },
     { $unwind: "$users" },
     { $group: { _id: '$users.userId', number: { $sum: 1 } } },
     { $project: { _id: 1 } }
   ]).then(function(results) {
-    var implicitConnectionUserIds = results
+    return results
           .map(function(item) { return "" + item._id; })
           .filter(function(item) { return item != userId; });
 
-    return implicitConnectionUserIds;
   }).nodeify(callback);
 
 }
