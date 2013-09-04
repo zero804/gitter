@@ -103,7 +103,7 @@ var userService = {
   },
 
   findByEmail: function(email, callback) {
-    return persistence.User.findOneQ({email: email.toLowerCase()})
+    return persistence.User.findOneQ({ $or: [{ email: email.toLowerCase()}, { emails: email.toLowerCase() }]})
             .nodeify(callback);
   },
 
