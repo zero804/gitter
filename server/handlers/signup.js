@@ -103,7 +103,7 @@ module.exports = {
         });
 
       app.get('/confirmSecondary/:confirmationCode',
-        middleware.authenticate('confirm', { failureRedirect: '/confirm-failed' } ),
+        middleware.ensureLoggedIn(),
         function(req, res){
           winston.verbose("Confirmation authenticated");
 

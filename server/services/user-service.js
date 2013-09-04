@@ -59,7 +59,7 @@ var userService = {
 
   findByConfirmationCode: function(confirmationCode, callback) {
 
-    persistence.User.find().or([{confirmationCode: confirmationCode}, {'unconfirmedEmails.confirmationCode': confirmationCode}]).findOne()
+    persistence.User.find().or([{confirmationCode: confirmationCode} /*, {'unconfirmedEmails.confirmationCode': confirmationCode} */]).findOne()
       .execQ()
       .nodeify(callback);
   },

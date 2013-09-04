@@ -131,7 +131,7 @@ module.exports = {
 
         // if the user is unconfirmed, then confirm them
         // if the user has been confirmed, but hasn't populated their profile, we want to go down the same path
-        if (user.status == 'UNCONFIRMED' || user.unconfirmedEmails.length || user.status == 'PROFILE_NOT_COMPLETED' || user.newEmail) {
+        if (user.status == 'UNCONFIRMED' || user.status == 'PROFILE_NOT_COMPLETED' || user.newEmail) {
           statsService.event('confirmation_completed', { userId: user.id, email: user.email });
           return done(null, user);
         } else {

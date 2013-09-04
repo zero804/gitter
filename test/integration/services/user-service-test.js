@@ -187,15 +187,7 @@ describe("User Service", function() {
             assert(!!user1, "No user found");
             assert(user.id === user1.id, "Found user does not match");
 
-            // test the lookup by confirmation code
-            userService.findByConfirmationCode(userEmail.confirmationCode, function(err, user2) {
-              if (err) done(err);
-
-              assert(!!user2, "No user found");
-              assert(user.id === user2.id, "Found user does not match");
-              done();
-            });
-
+            done();
           });
 
         });
