@@ -222,6 +222,9 @@ describe("User Service", function() {
             .then(function() {
               assert.notEqual(user.emails.indexOf(newEmail), -1);
 
+              return userService.findByEmail(newEmail).then(function(u) {
+                assert.equal(user.id, u.id);
+              });
             });
 
           })
