@@ -1,14 +1,15 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var middleware = require('../web/middleware'),
-    im = require('imagemagick'),
-    crypto = require('crypto'),
-    assert = require('assert'),
-    mongoose = require("mongoose"),
-    restSerializer = require("../serializers/rest-serializer"),
-    userService = require('../services/user-service'),
-    Fiber = require("../utils/fiber");
+var middleware      = require('../web/middleware');
+var im              = require('imagemagick');
+var crypto          = require('crypto');
+var assert          = require('assert');
+var mongoose        = require("mongoose");
+var restSerializer  = require("../serializers/rest-serializer");
+var userService     = require('../services/user-service');
+var Fiber           = require("../utils/fiber");
+var gravatar        = require("../utils/gravatar");
 
 function redirectToDefault(size, userId, res) {
   // only used as a safety catch when accessing the version urls,
@@ -16,10 +17,12 @@ function redirectToDefault(size, userId, res) {
   var s = (size == 'm') ? '-m' : '-s';
 
   userService.findById(userId, function(err, user) {
-    if (user)
-      res.redirect(301, "https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(user.email).digest('hex') + "?d=identicon");
-    else
+    if (user) {
+      res.redirect(301, gravatar.gravatarUrlForEmail(user.email));
+    } else {
       res.redirect(301, "/images/2/avatar-default"+s+".png");
+    }
+
   });
 }
 
@@ -99,7 +102,7 @@ module.exports = {
           userService.findByEmail(email, function(err, user) {
             if (err) return next(err);
             if (!user) {
-              return res.redirect("https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon");
+              return res.redirect(gravatar.gravatarUrlForEmail(email));
             }
 
             displayAvatarFor('s', user.id, req, res);
@@ -127,7 +130,8 @@ module.exports = {
         function(req, res) {
         var email = req.params.email;
         assert(email, "An email address must be provided in the url");
-        res.redirect("https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon");
+
+        res.redirect(gravatar.gravatarUrlForEmail(email));
       });
 
       app.get(
