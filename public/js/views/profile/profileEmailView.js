@@ -28,7 +28,7 @@ define([
     },
 
     initialize: function() {
-
+      this.setRerenderOnChange();
     },
 
     getRenderData: function() {
@@ -54,7 +54,7 @@ define([
     },
 
     makePrimary: function() {
-
+      this.model.makePrimary();
     }
   });
 
