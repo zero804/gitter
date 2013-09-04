@@ -86,7 +86,7 @@ function addReverseContacts(userId, dateGenerated) {
                       $set:       { name: user.displayName,
                                     userId: userId,
                                     contactUserId: user._id,
-                                    username: user.username,
+                                    username: user.username || null,
                                     dateGenerated: dateGenerated }
                     },
                     { upsert: true });
@@ -107,8 +107,7 @@ function addImplicitConnections(userId, dateGenerated) {
           return Q.all(users.map(function(user) {
             var emails = [user.email].concat(user.emails);
 
-
-            return persistence.SuggestedContact.findOneAndUpdateQ(
+            return persistence.SuggestedContact.updateQ(
                     { emails:     { $in: emails },
                       userId:     userId },
                     { $inc:       { score: IMPLICIT_CONTACT },
@@ -116,7 +115,7 @@ function addImplicitConnections(userId, dateGenerated) {
                       $set:       { name: user.displayName,
                                     contactUserId: user.id,
                                     userId: userId,
-                                    username: user.username,
+                                    username: user.username || null,
                                     dateGenerated: dateGenerated }
                     },
                     { upsert: true });

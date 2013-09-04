@@ -101,10 +101,11 @@ function createExpectedFixtures(expected, done) {
     winston.verbose('Creating ' + fixtureName);
 
     return persistence.Contact.createQ({
-      name:         f.name    || 'John Doe',
-      emails:       f.emails  || [generateEmail()],
-      source:       f.source  || 'google',
-      userId:       f.userId  || null
+      name:          f.name    || 'John Doe',
+      emails:        f.emails  || [generateEmail()],
+      source:        f.source  || 'google',
+      userId:        f.userId,
+      contactUserId: f.contactUserId
     });
   }
 
@@ -250,6 +251,10 @@ function createExpectedFixtures(expected, done) {
           var expectedContact = expected[key];
 
           expectedContact.userId = fixture[expectedContact.user]._id;
+
+          if(expectedContact.contactUser) {
+            expectedContact.contactUserId = fixture[expectedContact.contactUser]._id;
+          }
 
           return createContact(key, expectedContact)
             .then(function(contact) {
