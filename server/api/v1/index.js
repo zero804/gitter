@@ -52,5 +52,8 @@ module.exports = {
         expressValidator(),
         require('./request-access-new.js'));
 
+    app.get('/api/v1/suggested-contacts',
+        auth,
+        require('./suggested-contacts.js'));
   }
 };

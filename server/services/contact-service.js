@@ -103,29 +103,43 @@ exports.find = function(user, pattern, cb) {
   var re    = new RegExp("\\b" + pattern, "i");
   var query = {'userId': user.id, $or: [{name: re}, {emails: re}]};
 
-  persistence.Contact.find(query).exec(function(err, contacts) {
-    var matches = _.inject(contacts, function(accum, contact) {
-      var user = {
-        displayName:    contact.name,
-        email:          contact.emails[0],
-        avatarUrlSmall: '/avatarForEmail/' + contact.emails[0],
-        imported:       true
-      };
-      accum.push(user);
-      return accum;
-    }, []);
+  return persistence.Contact.find(query)
+    .execQ()
+    .then(function(contacts) {
+      return contacts.map(function(contact) {
+        return {
+          displayName:    contact.name,
+          email:          contact.emails[0],
+          avatarUrlSmall: '/avatarForEmail/' + contact.emails[0],
+          imported:       true
+        };
+      });
+    })
+    .nodeify(cb);
+};
 
-    cb(null, matches);
-  });
 
+exports.findContactsForUserId = function(userId, callback) {
+  return persistence.Contact.find({ userId: userId })
+    .execQ()
+    .nodeify(callback);
+};
+
+exports.findReverseContactsForUserId = function(userId, callback) {
+  return persistence.Contact.find({ contactUserId: userId })
+    .execQ()
+    .nodeify(callback);
 };
 
 exports.importedGoogleContacts = function(user, cb) {
   var query = {'userId': user.id, source: 'google'};
 
-  persistence.Contact.find(query).exec(function(err, contacts) {
-    cb((contacts.length !== 0) ? true : false);
-  });
+  return persistence.Contact.findOne(query)
+    .execQ()
+    .then(function(contact) {
+        return !!contact;
+    })
+    .nodeify(cb);
 };
 
 /**
