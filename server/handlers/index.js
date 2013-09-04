@@ -21,5 +21,6 @@ module.exports = {
     require('./test-data').install(app);
     require('./google-contacts').install(app);
     require('./unawesome-browser').install(app);
+    require('./hooks').install(app);
   }
 };
