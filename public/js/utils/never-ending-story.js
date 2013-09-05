@@ -6,10 +6,9 @@ define(['underscore', 'backbone'], function(_, Backbone) {
   function NeverEndingStory(target, options) {
     this._target = target;
     this._reverse = options && options.reverse;
-    var handler = options && options.reverse ? this.scroll : this.scroll;
     this._prevScrollTop = 0;
     this._prevScrollTime = Date.now();
-    this._scrollHandler = _.debounce(handler.bind(this), 10);
+    this._scrollHandler = _.debounce(this.scroll.bind(this), 10);
     target.addEventListener('scroll', this._scrollHandler, false);
   }
   _.extend(NeverEndingStory.prototype, Backbone.Events, {
