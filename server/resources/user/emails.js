@@ -1,9 +1,13 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var userService = require("../../services/user-service");
-var _ = require('underscore');
-var crc32 = require('crc32');
+var userService       = require("../../services/user-service");
+var _                 = require('underscore');
+var crc32             = require('crc32');
+var expressValidator  = require('express-validator');
+
+
+var validator         = expressValidator();
 
 function mapPrimaryEmail(email) {
   return {
@@ -50,19 +54,24 @@ module.exports = {
   },
 
   create: function(req, res, next) {
-    req.checkBody('email', 'Invalid email address').notEmpty().isEmail();
+      validator(req, res, function(err) {
+        if(err) return next(err);
 
-    var mappedErrors = req.validationErrors(true);
+        req.checkBody('email', 'Invalid email address').notEmpty().isEmail();
 
-    if (mappedErrors) {
-      return next(400, { success: false, validationFailure: true, errors: mappedErrors});
-    }
+        var mappedErrors = req.validationErrors(true);
 
-    return userService.addSecondaryEmail(req.user, req.body.email).then(function(email) {
-      res.send({ email: email, status: 'UNCONFIRMED' });
-    }).fail(next);
+        if (mappedErrors) {
+          return next(400, { success: false, validationFailure: true, errors: mappedErrors});
+        }
 
-  },
+        return userService.addSecondaryEmail(req.user, req.body.email).then(function(email) {
+          res.send({ email: email, status: 'UNCONFIRMED' });
+        }).fail(next);
+
+      });
+
+    },
 
   update: function(req, res, next) {
     var forUpdate = req.email;
