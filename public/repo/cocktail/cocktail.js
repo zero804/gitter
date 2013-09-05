@@ -4,13 +4,13 @@ define([], function (){
 //     (c) 2012 Onsi Fakhouri
 //     Cocktail.js may be freely distributed under the MIT license.
 //     http://github.com/onsi/cocktail
-(function() {
+(function(scope) {
     var Cocktail;
 
     if (typeof exports !== 'undefined') {
         Cocktail = exports;
     } else {
-        Cocktail = this.Cocktail = {};
+        Cocktail = scope.Cocktail = {};
     }
 
     Cocktail.mixins = {};
@@ -84,7 +84,9 @@ define([], function (){
             klass.extend = originalExtend;
         });
     };
-})();
 
-return Cocktail;
+    return Cocktail;
+})(window);
+
+return window.Cocktail;
 });
