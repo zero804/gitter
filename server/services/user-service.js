@@ -46,7 +46,7 @@ var userService = {
 
     var email = options.email.toLowerCase();
 
-    return persistence.User.findOneQ({email: email})
+    return userService.findByEmail(email)
       .then(function(user) {
         if(user) return user;
 
