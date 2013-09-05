@@ -1,10 +1,11 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var winston   = require('winston');
-var appEvents = require("../app-events");
-var bayeux    = require('./bayeux');
-var ent       = require('ent');
+var winston           = require('winston');
+var appEvents         = require("../app-events");
+var bayeux            = require('./bayeux');
+var ent               = require('ent');
+var presenceService   = require("../services/presence-service");
 
 exports.install = function() {
   var bayeuxClient = bayeux.client;
@@ -33,28 +34,26 @@ exports.install = function() {
     }
   });
 
-/**
-TODO: disconnect clients who've been removed from a troupe
   appEvents.localOnly.onUserRemovedFromTroupe(function(options) {
     var userId = options.userId;
-    // TODO: disconnect only those subscriptions specific to the troupe
-    // var troupeId = options.troupeId;
+    var troupeId = options.troupeId;
 
-    bayeux.clientUserLookup.lookupClientIdsForUserId(userId, function(err, clientIds) {
-      if(err) { winston.error("Unable to lookup clientIds for userId"); return; }
-      if(clientIds) {
-        winston.info("Detected user has been removed from troupe. Disconnecting from " + clientIds.length + " faye connections");
+    presenceService.findAllSocketsForUserInTroupe(userId, troupeId, function(err, socketIds) {
+      if(err) winston.error('Error while attempting to disconnect user from troupe' + err, { exception: err });
 
-        clientIds.forEach(function(clientId) {
-          bayeuxEngine.destroyClient(clientId, function() {
-            winston.info("Destroyed client " + clientId);
-          });
+      if(!socketIds || !socketIds.length) return;
+
+      socketIds.forEach(function(clientId) {
+
+        bayeux.engine.destroyClient(clientId, function() {
+          winston.info("Destroyed client " + clientId + " as user was disconnected from troupe");
         });
-      }
+
+      });
+
     });
 
   });
-**/
 
   appEvents.localOnly.onUserNotification(function(data) {
       var userId = data.userId;
