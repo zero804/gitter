@@ -14,6 +14,7 @@ var winston = require("winston");
 var collections = require("../utils/collections");
 var cdn = require('../web/cdn');
 var predicates = collections.predicates;
+var gravatar = require('../utils/gravatar');
 
 // TODO: Fix this, use the CDN and code sign URLS
 function privateCdn(url) {
@@ -101,6 +102,7 @@ function UserStrategy(options) {
     } else {
       location = undefined;
     }
+
     return {
       id: user.id,
       status: options.includeEmail ? user.status : undefined,
@@ -871,6 +873,40 @@ function SearchResultsStrategy(options) {
 
 }
 
+function SuggestedContactStrategy(options) {
+  var userIdStategy = new UserIdStrategy(options);
+
+  this.preload = function(suggestedContacts, callback) {
+    var userIds = suggestedContacts
+                    .map(function(sc) { return sc.contactUserId; })
+                    .filter(function(i) { return !!i; });
+
+    var strategies = [{
+      strategy: userIdStategy,
+      data: userIds
+    }];
+
+    execPreloads(strategies, callback);
+  };
+
+  this.map = function(item) {
+    var user;
+    if(item.contactUserId) {
+      user = userIdStategy.map(item.contactUserId);
+    }
+
+    var firstKnownEmail = item.knownEmails[0];
+    return {
+      userId: user && user.id,
+      displayName: user && user.displayName || item.name,
+      avatarUrl: user && user.avatarUrlSmall || firstKnownEmail && gravatar.gravatarUrlForEmail(firstKnownEmail),
+      username: user && user.username,
+      emails: item.knownEmails
+    };
+  };
+
+}
+
 /* This method should move */
 function serialize(items, strat, callback) {
   if(!items) return callback(null, null);
@@ -1002,6 +1038,7 @@ module.exports = {
   TroupeIdStrategy: TroupeIdStrategy,
   TroupeUserStrategy: TroupeUserStrategy,
   SearchResultsStrategy: SearchResultsStrategy,
+  SuggestedContactStrategy: SuggestedContactStrategy,
   getStrategy: getStrategy,
   execPreloads: execPreloads,
   serialize: serialize,

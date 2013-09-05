@@ -10,6 +10,7 @@ var persistence = testRequire('./services/persistence-service');
 
 var assert = require('assert');
 
+var contactEmailAddress = fixtureLoader.generateEmail();
 var googleJSON = {
   version: '1.0',
   encoding: 'UTF-8',
@@ -55,7 +56,19 @@ var googleJSON = {
         'gd$email':
          [ { rel: 'http://schemas.google.com/g/2005#other',
              address: 'hackers.are.rockstars@gmail.com',
-             primary: 'true' } ] }
+             primary: 'true' } ] },
+
+     { id: { '$t': 'http://www.google.com/m8/feeds/contacts/hackers.are.rockstars%40gmail.com/base/1' },
+       updated: { '$t': '2013-05-15T05:32:20.322Z' },
+       category:
+        [ { scheme: 'http://schemas.google.com/g/2005#kind',
+            term: 'http://schemas.google.com/contact/2008#contact' } ],
+       title: { type: 'text', '$t': 'Bob Builder' },
+       'gd$email':
+        [ { rel: 'http://schemas.google.com/g/2005#other',
+            address: contactEmailAddress,
+            primary: 'true' } ] }
+
       ]
   }
 };
@@ -65,18 +78,26 @@ describe('Contact Service', function() {
   describe('Data ingestion', function() {
     var fixture = {};
 
-    before(fixtureLoader(fixture, { user1: { } }));
+    before(fixtureLoader(fixture, { user1: { }, user2: { email: contactEmailAddress }}));
 
     it('should process Google JSON properly', function(done) {
       var user = fixture.user1;
-      contactService.ingestGoogleContacts(user, googleJSON, function() {
-        persistence.Contact.find({'userId': user.id}).exec(function(err, contacts) {
-          if(err) return done(err);
-          assert(contacts.length == 1);
-          assert(contacts[0].emails[0] == 'hackers.are.rockstars@gmail.com', 'Failed to import.');
-          done();
-        });
-      });
+
+      return contactService.ingestGoogleContacts(user, googleJSON)
+        .then(function() {
+          return persistence.Contact.find({ 'userId': user.id }).execQ();
+        })
+        .then(function(contacts) {
+          assert(contacts.length == 2);
+          var mauro = contacts.filter(function(i) { return i.emails[0] === 'hackers.are.rockstars@gmail.com'; }).shift();
+
+          var contact2 = contacts.filter(function(i) { return i.emails[0] == contactEmailAddress;  }).shift();
+
+          assert(mauro, 'Failed to import mauro.');
+          assert(!!contact2, 'Failed to import contact2.');
+          assert.equal(contact2.contactUserId, fixture.user2.id);
+        })
+        .nodeify(done);
     });
 
     after(function() {

@@ -15,7 +15,8 @@ var fixture2 = {};
 describe("User Service", function() {
 
   before(fixtureLoader(fixture2, {
-    user1: { username: true }
+    user1: { username: true },
+    user2: { }
   }));
 
   before(fixtureLoader(fixture));
@@ -164,6 +165,202 @@ describe("User Service", function() {
     });
 
   });
+
+
+  describe('#secondary-email-addresses', function() {
+    it('should allow adding of secondary email addresses', function(done) {
+      var userService = testRequire("./services/user-service");
+      var newEmail = fixture2.generateEmail();
+
+      userService.addSecondaryEmail(fixture2.user1, newEmail)
+        .then(function(user) {
+          assert.equal(user.unconfirmedEmails.length, 1);
+          var userEmail = user.unconfirmedEmails[0];
+          assert.equal(userEmail.email, newEmail);
+          assert(userEmail.confirmationCode, 'Expected a confirmation code');
+          // TODO make sure a confirmation is sent
+
+          // test the lookup by unconfirmed email address
+          userService.findByUnconfirmedEmail(userEmail.email, function(err, user1) {
+            if (err) done(err);
+
+            assert(!!user1, "No user found");
+            assert(user.id === user1.id, "Found user does not match");
+
+            done();
+          });
+
+        });
+    });
+
+    it('should allow removing of secondary email addresses', function(done) {
+      var userService = testRequire("./services/user-service");
+      var newEmail = fixture2.generateEmail();
+
+      userService.addSecondaryEmail(fixture2.user1, newEmail)
+        .then(function(user) {
+
+          return userService.removeSecondaryEmail(user, newEmail)
+            .then(function(user) {
+              assert.equal(user.emails.indexOf(newEmail), -1);
+            });
+
+        })
+        .nodeify(done);
+    });
+
+
+    it('should allow secondary email addresses to be confirmed', function(done) {
+      var userService = testRequire("./services/user-service");
+      var newEmail = fixture2.generateEmail();
+
+      userService.addSecondaryEmail(fixture2.user1, newEmail)
+        .then(function(user) {
+          var userEmail = user.unconfirmedEmails.filter(function(userEmail) { return userEmail.email === newEmail; })[0];
+
+          return userService.confirmSecondaryEmail(fixture2.user1, userEmail.confirmationCode)
+            .then(function() {
+              assert.notEqual(user.emails.indexOf(newEmail), -1);
+
+              return userService.findByEmail(newEmail).then(function(u) {
+                assert.equal(user.id, u.id);
+              });
+            });
+
+          })
+        .nodeify(done);
+    });
+
+    it('should fail when an invalid confirmation code is used', function(done) {
+      var userService = testRequire("./services/user-service");
+      var newEmail = fixture2.generateEmail();
+
+      userService.addSecondaryEmail(fixture2.user1, newEmail)
+        .then(function(user) {
+          var userEmail = user.unconfirmedEmails.filter(function(userEmail) { return userEmail.email === newEmail; })[0];
+
+          return userService.confirmSecondaryEmail(fixture2.user1, userEmail.confirmationCode + '1')
+            .then(function() {
+              assert.fail('Expected an error');
+            }, function(err) {
+              assert.equal(err, 404);
+            });
+
+          })
+        .nodeify(done);
+    });
+
+    it('should allow a confirmed secondary email address to be switched to primary', function(done) {
+      var userService = testRequire("./services/user-service");
+      var newEmail = fixture2.generateEmail();
+      var originalEmail = fixture2.user1.email;
+
+      userService.addSecondaryEmail(fixture2.user1, newEmail)
+        .then(function(user) {
+          var userEmail = user.unconfirmedEmails.filter(function(userEmail) { return userEmail.email === newEmail; })[0];
+
+          return userService.confirmSecondaryEmail(fixture2.user1, userEmail.confirmationCode)
+            .then(function() {
+
+              return userService.switchPrimaryEmail(fixture2.user1, newEmail)
+                .then(function(user) {
+                  assert.equal(user.email, newEmail);
+                  assert(user.emails.indexOf(originalEmail) >= 0, 'Expected the primary email to become a secondary confirmed email address');
+                });
+            });
+
+          })
+        .nodeify(done);
+    });
+
+    it('should not allow an unconfirmed secondary email address to be switched to primary', function(done) {
+      var userService = testRequire("./services/user-service");
+      var newEmail = fixture2.generateEmail();
+
+      userService.addSecondaryEmail(fixture2.user1, newEmail)
+        .then(function() {
+
+          return userService.switchPrimaryEmail(fixture2.user1, newEmail)
+            .then(function() {
+              assert.fail('Should have failed');
+            }, function(err) {
+              assert.equal(err, 404);
+            });
+
+          })
+        .nodeify(done);
+    });
+
+    it('should not allow an unknown email address to be switched to primary', function(done) {
+      var userService = testRequire("./services/user-service");
+
+      return userService.switchPrimaryEmail(fixture2.user1, 'andrewn@datatribe.net')
+        .then(function() {
+          assert.fail('Should have failed');
+        }, function(err) {
+          assert.equal(err, 404);
+        })
+        .nodeify(done);
+    });
+
+    it('should not allow an email address to be duplicated with another primary', function(done) {
+      var userService = testRequire("./services/user-service");
+
+      userService.addSecondaryEmail(fixture2.user1, fixture2.user2.email)
+        .then(function() {
+          assert.fail('Expected failure');
+        }, function(err) {
+          assert.equal(err, 409);
+        })
+        .nodeify(done);
+    });
+
+    it('should not allow an email address to be duplicated with another confirmed secondary', function(done) {
+      var userService = testRequire("./services/user-service");
+      var newEmail = fixture2.generateEmail();
+
+      userService.addSecondaryEmail(fixture2.user2, newEmail)
+        .then(function(user) {
+          var unconfirmedEmail = user.unconfirmedEmails.filter(function(userEmail) { return userEmail.email === newEmail; })[0];
+
+          return userService.confirmSecondaryEmail(user, unconfirmedEmail.confirmationCode)
+            .then(function() {
+              userService.addSecondaryEmail(fixture2.user1, newEmail)
+                .then(function() {
+                  assert.fail('Expected failure');
+                }, function(err) {
+                  assert.equal(err, 409);
+                });
+
+            });
+
+        })
+        .nodeify(done);
+    });
+  });
+
+
+  it('should allow an email address to be duplicated with another unconfirmed secondary, and delete other unconfirmeds on confirmation', function(done) {
+    var userService = testRequire("./services/user-service");
+    var newEmail = fixture2.generateEmail();
+
+    userService.addSecondaryEmail(fixture2.user2, newEmail)
+      .then(function() {
+        return userService.addSecondaryEmail(fixture2.user1, newEmail);
+      })
+      .then(function(user1) {
+        var unconfirmedEmail = user1.unconfirmedEmails.filter(function(userEmail) { return userEmail.email === newEmail; })[0];
+        return userService.confirmSecondaryEmail(user1, unconfirmedEmail.confirmationCode);
+      })
+      .then(function() {
+        return userService.findById(fixture2.user2.id);
+      })
+      .then(function(user2) {
+        assert(user2.unconfirmedEmails.filter(function(userEmail) { return userEmail.email === newEmail; }).length === 0);
+      })
+      .nodeify(done);
+  });
+
 
   after(function() {
     fixture2.cleanup();

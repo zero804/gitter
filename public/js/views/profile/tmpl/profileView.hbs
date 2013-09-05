@@ -7,7 +7,8 @@
     <div class="trpProfileForm">
       {{#if existingUser}}
         <input type="text" id="displayName" class="trpInput" name="displayName" value="{{displayName}}" placeholder="Click here and type your full name"><br>
-        <input type="email" id="email" placeholder="Change to a new email address" class="trpInput" name="newEmail" value="{{user.email}}"><br>
+        <input type="email" disabled id="email" placeholder="Change to a new email address" class="trpInput" name="newEmail" value="{{user.email}}">
+        <a href="#|profile/emails">Add / Edit</a><br>
         <input type="password" id="password" class="trpInput" name="password" value="" placeholder="Optional: Change password"><br>
       {{else}}
         <input type="text" id="displayName" class="trpInput" name="displayName" value="{{displayName}}" placeholder="Click here and type your name"><br>

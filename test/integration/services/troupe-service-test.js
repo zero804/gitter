@@ -1,6 +1,6 @@
 #!/usr/bin/env mocha --ignore-leaks
 /*jslint node:true, unused:true*/
-/*global describe:true, it:true, before:true */
+/*global describe:true, it:true, before:true, after:false */
 "use strict";
 
 
@@ -1003,7 +1003,53 @@ describe('troupe-service', function() {
 
   });
 
-  before(fixtureLoader(fixture));
+  describe('#findAllImplicitContactUserIds', function() {
+    var fixture2 = {};
 
+    before(fixtureLoader(fixture2, { user1: { }, user2: { }, troupe1: { users: ['user1', 'user2' ] } }));
+
+    it('should work as expected', function(done) {
+      var troupeService = testRequire('./services/troupe-service');
+
+      troupeService.findAllImplicitContactUserIds(fixture2.user1.id)
+        .then(function(userIds) {
+          assert.equal(userIds.length, 1);
+          assert.equal(userIds[0], fixture2.user2.id);
+        })
+        .nodeify(done);
+
+    });
+
+    after(function() {
+      fixture2.cleanup();
+    });
+
+  });
+
+  describe('#findAllConnectedUserIdsForUserId', function() {
+    var fixture2 = {};
+
+    before(fixtureLoader(fixture2, { user1: { }, user2: { }, troupe1: { oneToOne: true, users: ['user1', 'user2' ] } }));
+
+    it('should work as expected', function(done) {
+      var troupeService = testRequire('./services/troupe-service');
+
+      troupeService.findAllConnectedUserIdsForUserId(fixture2.user1.id)
+        .then(function(userIds) {
+          assert.equal(userIds.length, 1);
+          assert.equal(userIds[0], fixture2.user2.id);
+        })
+        .nodeify(done);
+
+    });
+
+    after(function() {
+      fixture2.cleanup();
+    });
+
+  });
+
+
+  before(fixtureLoader(fixture));
 
 });
