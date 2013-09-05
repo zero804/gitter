@@ -15,8 +15,10 @@ define([
   'views/unread-item-view-mixin',
   'template/helpers/linkify',
   'utils/safe-html',
-  'bootstrap_tooltip'
-], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml /* tooltip*/) {
+  'cocktail',
+  'bootstrap_tooltip' // No ref
+], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews,
+  chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml, cocktail /* tooltip*/) {
 
   "use strict";
 
@@ -250,8 +252,8 @@ define([
 
     }
 
-  }).mixin([UnreadItemViewMixin]);
-
+  });
+  cocktail.mixin(ChatItemView, UnreadItemViewMixin);
 
   var ReadByView = Marionette.CollectionView.extend({
     itemView: AvatarView,
@@ -266,7 +268,8 @@ define([
     onClose: function(){
       this.collection.unlisten();
     }
-  }).mixin([TroupeViews.LoadingCollectionMixin]);
+  });
+  cocktail.mixin(ReadByView, TroupeViews.LoadingCollectionMixin);
 
   var ReadByPopover = TroupeViews.Popover.extend({
     initialize: function(options) {

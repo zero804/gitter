@@ -4,8 +4,9 @@ define([
   'hbs!./tmpl/requestDetailView',
   'hbs!./tmpl/rejectConfirmation',
   'views/unread-item-view-mixin',
-  'log!request-detail-view'
-], function(TroupeViews, template, rejectConfirmationTemplate, UnreadItemViewMixin, log){
+  'log!request-detail-view',
+  'cocktail'
+], function(TroupeViews, template, rejectConfirmationTemplate, UnreadItemViewMixin, log, cocktail){
   "use strict";
 
   var View = TroupeViews.Base.extend({
@@ -71,9 +72,8 @@ define([
         }
       });
     }
-
-
-  }).mixin([UnreadItemViewMixin]);
+  });
+  cocktail.mixin(View, UnreadItemViewMixin);
 
   return View;
 });

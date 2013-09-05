@@ -3,8 +3,9 @@ define([
   'views/base',
   'hbs!./tmpl/fileItemView',
   'views/unread-item-view-mixin',
+  'cocktail',
   'bootstrap_tooltip'             // No Ref
-], function(TroupeViews, template, UnreadItemViewMixin) {
+], function(TroupeViews, template, UnreadItemViewMixin, cocktail) {
   "use strict";
 
   var View = TroupeViews.Base.extend({
@@ -45,7 +46,8 @@ define([
       return versions.at(versions.length - 1).get('thumbnailStatus') !== 'GENERATING';
     }
 
-  }).mixin([UnreadItemViewMixin]);
+  });
+  cocktail.mixin(View, UnreadItemViewMixin);
 
   return View;
 });

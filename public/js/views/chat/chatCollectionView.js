@@ -1,50 +1,41 @@
-/* jshint unused:true, browser:true,  strict:true */
-/* global define:false */
+/* jshint unused:true, browser:true,  strict:true *//* global define:false */
 define([
-  'jquery',
   'underscore',
   'utils/context',
   'log!chat-collection-view',
   'collections/chat',
   'views/widgets/avatar',
+  'views/infinite-scroll-mixin',
   'components/unread-items-client',
   'marionette',
   'views/base',
   'utils/appevents',
   './chatItemView',
   'utils/rollers',
-  'utils/never-ending-story',
-  'bootstrap_tooltip'
-], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, appEvents, chatItemView, Rollers, NeverEndingStory /* tooltip*/) {
-
+  'cocktail',
+  'bootstrap_tooltip' // No ref
+], function(_, context, log, chatModels, AvatarView, InfiniteScrollMixin, unreadItemsClient,
+    Marionette, TroupeViews, appEvents, chatItemView, Rollers, cocktail /* tooltip*/) {
   "use strict";
 
+  /** @const */
   var PAGE_SIZE = 15;
 
   /*
-  * View
-  */
+   * View
+   */
   var ChatCollectionView = Marionette.CollectionView.extend({
     itemView: chatItemView.ChatItemView,
     itemViewOptions: function() {
       return { userCollection: this.userCollection, decorator: this.decorator};
     },
-    chatMessageLimit: PAGE_SIZE,
-
+    scrollElementSelector: "#content-frame",
     initialize: function(options) {
       // this.hasLoaded = false;
-
-      var contentFrame = document.querySelector('#content-frame');
+      var contentFrame = document.querySelector(this.scrollElementSelector);
 
       this.rollers = new Rollers(contentFrame);
 
-      var scroll = new NeverEndingStory(contentFrame);
-      scroll.on('approaching.end', function() {
-        this.loadNextMessages();
-      }, this);
-      this.scroll = scroll;
-
-      this.initializeSorting();
       this.userCollection = options.userCollection;
       this.decorator      = options.decorator;
 
@@ -107,11 +98,7 @@ define([
       }
     },
 
-    beforeClose: function() {
-      this.scroll.disable();
-    },
-
-    loadNextMessages: function() {
+    getFetchData: function() {
       log("Loading next message chunk.");
 
       var ids = this.collection.map(function(m) { return m.get('id'); });
@@ -126,31 +113,15 @@ define([
         return;
       }
 
-      var self = this;
-      this.collection.fetch({
-        update: true,
-        add: true,
-        remove: false, // chat messages are never deleted
-        data: {
+      return {
           beforeId: lowestId,
-          limit: this.chatMessageLimit
-        },
-        success: function(data, resp) {
-          self.scroll.loadComplete();
-
-          if(!resp.length) {
-            // turn off infinite scroll if there were no new messages retrieved
-            self.scroll.disable();
-          }
-        },
-        error: function() {
-          self.scroll.loadComplete();
-        }
-      });
+          limit: PAGE_SIZE
+      };
 
     }
 
-  }).mixin([TroupeViews.SortableMarionetteView]);
+  });
+  cocktail.mixin(ChatCollectionView, TroupeViews.SortableMarionetteView, InfiniteScrollMixin);
 
   return ChatCollectionView;
 });
