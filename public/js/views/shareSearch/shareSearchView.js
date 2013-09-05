@@ -12,10 +12,11 @@ define([
   'hbs!./tmpl/shareRow',
   'zeroclipboard',
   'utils/appevents',
+  'collections/suggested-contacts',
   'bootstrap-typeahead', // No reference
   'utils/validate-wrapper' // No reference
 ], function($, _, Backbone, Marionette, context, TroupeViews, cocktail, InfiniteScrollMixin, template,
-  rowTemplate, ZeroClipboard, appEvents) {
+  rowTemplate, ZeroClipboard, appEvents, suggestedContactModels) {
   "use strict";
 
   // appEvents.trigger('searchSearchView:select');
@@ -43,8 +44,6 @@ var ContactModel = Backbone.Model.extend({
     }
   }
 });
-
-var inviteCollection = new Backbone.Collection();
 
 var ContactView = Backbone.View.extend({
     initialize: function(){
@@ -75,7 +74,9 @@ cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionet
     template: template,
 
     events: {
-      'mouseover #copy-button' : 'createClipboard'
+      'mouseover #copy-button' :      'createClipboard',
+      'click #custom-email-button':   'onCustomEmailClick',
+      'change #custom-email':         'onSearchChange'
     },
 
     // when instantiated by default (through the controller) this will reflect on troupeContext to determine what the invite is for.
@@ -89,49 +90,8 @@ cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionet
         this.shareUrl = context.env('basePath') + '/' + context.getTroupe().uri;
         ajaxEndpoint = '/troupes/' + context.getTroupeId() + '/invites';
       }
-
-      $.getJSON('/contacts?q=', function(data) {
-        var array = data.results;
-        array.sort(function(a, b) {
-          if (a.displayName.toLowerCase() > b.displayName.toLowerCase())
-            return 1;
-          if (a.displayName.toLowerCase() < b.displayName.toLowerCase())
-            return -1;
-          // a must be equal to b
-          return 0;
-        });
-
-        array.forEach(function(contact) {
-          var model = new ContactModel({
-            displayName: contact.displayName,
-            email: contact.email,
-            ajaxEndpoint: ajaxEndpoint
-          });
-          inviteCollection.add(model);
-        });
-
-        var $invites = $("#invites");
-
-        var inviteListView = new CollectionView({
-          el: $invites,
-          collection: inviteCollection
-        }).render();
-
-        $('#custom-email-button').on('click', function() {
-          var email = $('#custom-email').val();
-          $('#custom-email').val('');
-          var model = new ContactModel({
-            email: email,
-            ajaxEndpoint: ajaxEndpoint
-          });
-          model.invite();
-
-          inviteCollection.unshift(model);
-          inviteListView.render();
-        });
-
-      });
-
+      this.collection = new suggestedContactModels.Collection();
+      this.collection.fetch();
 
       // [ { userId: }, or { email: } ]
       this.invites = [];
@@ -170,6 +130,32 @@ cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionet
       this.addCleanup(function() {
         if(this.clip) this.clip.destroy();
       });
+    },
+
+    afterRender: function() {
+      new CollectionView({
+        el: this.$el.find("#invites"),
+        collection: this.collection
+      }).render();
+    },
+
+    onSearchChange: function() {
+
+    },
+
+    onCustomEmailClick: function() {
+      var emailField = this.$el.find('#custom-email');
+      var email = emailField.val();
+      emailField.val('');
+
+      var model = new ContactModel({
+        email: email,
+        ajaxEndpoint: ajaxEndpoint
+      });
+      model.invite();
+
+      inviteCollection.unshift(model);
+      inviteListView.render();
     },
 
     closeDialog: function() {

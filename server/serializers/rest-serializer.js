@@ -897,6 +897,7 @@ function SuggestedContactStrategy(options) {
 
     var firstKnownEmail = item.knownEmails[0];
     return {
+      id: item.id,
       userId: user && user.id,
       displayName: user && user.displayName || item.name,
       avatarUrl: user && user.avatarUrlSmall || firstKnownEmail && gravatar.gravatarUrlForEmail(firstKnownEmail),

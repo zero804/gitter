@@ -265,8 +265,19 @@ define([
     }
   });
 
+  exports.SearchResultsCollection = {
+    parse: function(searchResponse) {
+      return searchResponse.results;
+    }
+  };
+
   /* This is a mixin for Backbone.Model */
   exports.ReversableCollectionBehaviour = {
+    initialize: function() {
+      if(this.initialSortBy) {
+        this.setSortBy(this.initialSortBy);
+      }
+    },
 
     setSortBy: function(field) {
       var reverse = false;

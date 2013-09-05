@@ -6,8 +6,8 @@ define([
   'hbs!./tmpl/conversationDetailView',
   'collections/conversations',
   'views/conversation/conversationDetailItemView',
-  'collections/base'
-], function(_, Marionette, TroupeViews, template, conversationModels, ConversationDetailItemView, TroupeCollections) {
+  'cocktail'
+], function(_, Marionette, TroupeViews, template, conversationModels, ConversationDetailItemView) {
   "use strict";
 
   var View = TroupeViews.Base.extend({
@@ -21,13 +21,6 @@ define([
 
       this.model = new conversationModels.ConversationDetail({ id: this.id });
       this.model.bind('change:subject', this.onSubjectChange);
-      _.extend(this.model.emailCollection, TroupeCollections.ReversableCollectionBehaviour);
-      this.model.emailCollection.sortByMethods = {
-          'date': function(email) {
-            return email.get('date');
-          }
-      };
-      this.model.emailCollection.setSortBy('-date');
       this.model.emailCollection.listen();
       this.model.fetch();
 

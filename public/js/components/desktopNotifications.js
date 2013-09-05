@@ -39,7 +39,7 @@ define([
 
       if(Notification) {
         notification = new Notification(title, { body: text, tag: link, icon: '/images/2/logo-mark-green-square.png' });
-        notification.onshow = function() { setTimeout(notification.close, 10000); };
+        notification.onshow = function() { setTimeout(function() { notification.close(); }, 10000); };
         notification.onclick = handleClick;
       } else {
         notification = webkitNotifications.createNotification('/images/2/logo-mark-green-square.png', title, text);
