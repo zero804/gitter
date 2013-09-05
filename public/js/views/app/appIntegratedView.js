@@ -12,9 +12,11 @@ define([
   'views/app/uiVars',
   'components/webNotifications',
   'components/modal-region',
+  'cocktail',
   'bootstrap_tooltip',  // no ref
   "nanoscroller"        // no ref
-  ], function($, _, TroupeViews, context, log, appEvents, Marionette, UsernameView, ProfileView, uiVars, notifications, modalRegion) {
+  ], function($, _, TroupeViews, context, log, appEvents, Marionette, UsernameView, ProfileView, uiVars,
+    notifications, modalRegion, cocktail) {
   "use strict";
 
   var touchEvents = {
@@ -416,7 +418,8 @@ define([
       this.leftmenu = false;
     }
 
-  }).mixin([ TroupeViews.DelayedShowLayoutMixin ]);
+  });
+  cocktail.mixin(AppIntegratedLayout, TroupeViews.DelayedShowLayoutMixin);
 
   return AppIntegratedLayout;
 });

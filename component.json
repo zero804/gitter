@@ -29,7 +29,7 @@
     "requirejs": "http://requirejs.org/docs/release/2.1.5/minified/require.js",
     "zepto": "~1.0.0",
     "hopscotch": "https://github.com/linkedin/hopscotch/archive/master.zip",
-    "backbone.advice": "https://github.com/rhysbrettbowen/Backbone.Advice/archive/06f430429fcf3174fe3a912eb69c0eaf6485bdc7.zip"
+    "cocktail": "https://github.com/onsi/cocktail/archive/master.zip"
   },
   "devDependencies": {
     "assert": "~0.0.1",

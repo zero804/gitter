@@ -1,13 +1,11 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'jquery',
-  'underscore',
-  'backbone',
   'views/base',
   'hbs!./tmpl/fileDetailView',
   'hbs!./tmpl/confirmDelete',
-  'views/unread-item-view-mixin'
-], function($, _, Backbone, TroupeViews, template, confirmDeleteTemplate, UnreadItemViewMixin) {
+  'views/unread-item-view-mixin',
+  'cocktail'
+], function(TroupeViews, template, confirmDeleteTemplate, UnreadItemViewMixin, cocktail) {
   "use strict";
 
   var FileDetailView = TroupeViews.Base.extend({
@@ -64,7 +62,8 @@ define([
       return versions.at(versions.length - 1).get('thumbnailStatus') !== 'GENERATING';
     }
 
-  }).mixin([UnreadItemViewMixin])
+  });
+  cocktail.mixin(FileDetailView, UnreadItemViewMixin);
 
   return FileDetailView;
 });

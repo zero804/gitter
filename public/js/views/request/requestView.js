@@ -4,8 +4,9 @@ define([
   'marionette',
   'hbs!./tmpl/requestView',
   'hbs!./tmpl/requestItemView',
-  'views/unread-item-view-mixin'
-], function(TroupeViews, Marionette, requestViewTemplate, requestItemViewTemplate, UnreadItemViewMixin) {
+  'views/unread-item-view-mixin',
+  'cocktail'
+], function(TroupeViews, Marionette, requestViewTemplate, requestItemViewTemplate, UnreadItemViewMixin, cocktail) {
   "use strict";
 
   var RequestItemView = TroupeViews.Base.extend({
@@ -16,7 +17,8 @@ define([
     initialize: function(/*options*/) {
       this.setRerenderOnChange();
     }
-  }).mixin([UnreadItemViewMixin]);
+  });
+  cocktail.mixin(RequestItemView, UnreadItemViewMixin);
 
   return TroupeViews.Base.extend({
     template: requestViewTemplate,
