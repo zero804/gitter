@@ -3,15 +3,19 @@ define([
   'jquery',
   'underscore',
   'backbone',
+  'marionette',
   'utils/context',
   'views/base',
+  'cocktail',
+  'views/infinite-scroll-mixin',
   'hbs!./tmpl/shareSearchView',
   'hbs!./tmpl/shareRow',
   'zeroclipboard',
   'utils/appevents',
   'bootstrap-typeahead', // No reference
   'utils/validate-wrapper' // No reference
-], function($, _, Backbone, context, TroupeViews, template, rowTemplate, ZeroClipboard, appEvents) {
+], function($, _, Backbone, Marionette, context, TroupeViews, cocktail, InfiniteScrollMixin, template,
+  rowTemplate, ZeroClipboard, appEvents) {
   "use strict";
 
   // appEvents.trigger('searchSearchView:select');
@@ -61,12 +65,11 @@ var ContactView = Backbone.View.extend({
 
 });
 
-var CollectionView = Backbone.Marionette.CollectionView.extend({
+var CollectionView = Marionette.CollectionView.extend({
   itemView: ContactView
 });
 
-  // _.extend(ChatCollectionView.prototype, TroupeViews.SortableMarionetteView);
-
+cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionetteView);
 
   var View = TroupeViews.Base.extend({
     template: template,
