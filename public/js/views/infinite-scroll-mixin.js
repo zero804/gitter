@@ -12,10 +12,9 @@ define([
    */
   return {
     initialize: function() {
-      var scrollElement = document.querySelector(this.scrollElementSelector);
-      this.$el.find().on('scroll', this.onScroll);
+      var scrollElement = this.scrollElementSelector ? /*this.el*/document.querySelector(this.scrollElementSelector) : this.el;
 
-      var scroll = new NeverEndingStory(scrollElement);
+      var scroll = new NeverEndingStory(scrollElement, { reverse: this.reverseScrolling });
       this.listenTo(scroll, 'approaching.end', function() {
         this.loadMore();
       });
