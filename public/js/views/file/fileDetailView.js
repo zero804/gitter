@@ -48,7 +48,7 @@ define([
       modal.on('button.click', function(id) {
         if (id === "yes")
           that.model.destroy({
-          success: function(model, response) {
+          success: function() {
           }
         });
 
@@ -64,8 +64,7 @@ define([
       return versions.at(versions.length - 1).get('thumbnailStatus') !== 'GENERATING';
     }
 
-  });
+  }).mixin([UnreadItemViewMixin])
 
-  _.extend(FileDetailView.prototype, UnreadItemViewMixin);
   return FileDetailView;
 });

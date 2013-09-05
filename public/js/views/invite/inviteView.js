@@ -16,8 +16,7 @@ define([
     initialize: function(/*options*/) {
       this.setRerenderOnChange();
     }
-  });
-  _.extend(InvitesItemView.prototype, UnreadItemViewMixin);
+  }).mixin(UnreadItemViewMixin);
 
   return TroupeViews.Base.extend({
     template: invitesViewTemplate,

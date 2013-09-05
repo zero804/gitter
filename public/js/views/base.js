@@ -4,6 +4,7 @@ define([
   'jquery',
   'underscore',
   'backbone',
+  'backbone.advice',
   'utils/appevents',
   'marionette',
   'hbs!./tmpl/modal',
@@ -12,7 +13,7 @@ define([
   'hbs!./tmpl/confirmationView',
   'log!base-views',
   '../template/helpers/all' // No ref
-], function(require, $, _, Backbone, appEvents, Marionette, modalTemplate, popoverTemplate, loadingTemplate, confirmationViewTemplate, log) {
+], function(require, $, _, Backbone, Advice, appEvents, Marionette, modalTemplate, popoverTemplate, loadingTemplate, confirmationViewTemplate, log) {
   "use strict";
 
   /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */

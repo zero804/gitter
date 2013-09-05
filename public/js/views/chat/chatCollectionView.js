@@ -150,9 +150,7 @@ define([
 
     }
 
-  });
-
-  _.extend(ChatCollectionView.prototype, TroupeViews.SortableMarionetteView);
+  }).mixin([TroupeViews.SortableMarionetteView]);
 
   return ChatCollectionView;
 });
