@@ -1220,7 +1220,7 @@ function acceptInviteForAuthenticatedUser(user, invite) {
     assert(user, 'User parameter required');
     assert(invite, 'invite parameter required');
 
-    if(invite.email !== user.email && invite.userId != user.id) {
+    if(!user.hasEmail(invite.email) && invite.userId != user.id) {
       throw 401;
     }
 
