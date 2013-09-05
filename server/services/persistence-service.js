@@ -14,6 +14,7 @@ var shutdown = require('../utils/shutdown');
 var Fiber = require("../utils/fiber");
 var assert = require("assert");
 
+
 // Install inc and dec number fields in mongoose
 require('mongoose-number')(mongoose);
 
@@ -538,6 +539,23 @@ ContactSchema.index({ emails: 1 });
 ContactSchema.schemaTypeName = 'ContactSchema';
 
 
+/*
+ * User contacts
+ */
+var SuggestedContactSchema = new Schema({
+  userId:        { type: ObjectId, ref: 'User' },           // Owner of the contact
+  contactUserId: { type: ObjectId, ref: 'User' },           // The user referenced by the contact, if they've signed up
+  name:          String,                                    // Name of the contact
+  emails:        [String],                                  // Email addresses for the contact
+  score:         { type: Number, default: 0 },              // Suggestion score
+  username:      String,                                    // Username of the user
+  knownEmails:   [String],                                  // Email addresses the user knows of the contact
+  dateGenerated: { type: Date,   "default": Date.now }      // Generated at
+});
+SuggestedContactSchema.index({ userId: 1 });
+SuggestedContactSchema.index({ emails: 1 });
+SuggestedContactSchema.schemaTypeName = 'SuggestedContactSchema';
+
 
 var User = mongoose.model('User', UserSchema);
 var UserLocationHistory = mongoose.model('UserLocationHistory', UserLocationHistorySchema);
@@ -571,6 +589,7 @@ var PushNotificationDevice = mongoose.model('PushNotificationDevice', PushNotifi
 var UriLookup = mongoose.model('UriLookup', UriLookupSchema);
 
 var Contact = mongoose.model('Contact', ContactSchema);
+var SuggestedContact = mongoose.model('SuggestedContact', SuggestedContactSchema);
 
 
 //
@@ -607,7 +626,8 @@ module.exports = {
     GeoPopulatedPlaceSchema: GeoPopulatedPlaceSchema,
     PushNotificationDeviceSchema: PushNotificationDeviceSchema,
     UriLookupSchema: UriLookupSchema,
-    ContactSchema: ContactSchema
+    ContactSchema: ContactSchema,
+    SuggestedContactSchema: SuggestedContactSchema
   },
   User: User,
   UserTroupeLastAccess: UserTroupeLastAccess,
@@ -633,7 +653,8 @@ module.exports = {
   UserLocationHistory: UserLocationHistory,
   PushNotificationDevice: PushNotificationDevice,
   UriLookup: UriLookup,
-  Contact: Contact
+  Contact: Contact,
+  SuggestedContact: SuggestedContact
 };
 
 process.nextTick(function() {
