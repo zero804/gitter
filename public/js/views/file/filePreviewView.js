@@ -218,7 +218,8 @@ define([
       id: "download",
       text: "Download"
     }],
-    initialize: function() {
+    initialize: function(options) {
+      options.title = 'Files';
       TroupeViews.Modal.prototype.initialize.apply(this, arguments);
       this.view = new PreviewView({ model: this.model, collection: this.collection });
     }
