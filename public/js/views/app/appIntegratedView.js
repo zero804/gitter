@@ -416,9 +416,7 @@ define([
       this.leftmenu = false;
     }
 
-  });
-
-  _.extend(AppIntegratedLayout.prototype, TroupeViews.DelayedShowLayoutMixin);
+  }).mixin([ TroupeViews.DelayedShowLayoutMixin ]);
 
   return AppIntegratedLayout;
 });

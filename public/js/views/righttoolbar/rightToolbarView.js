@@ -177,9 +177,7 @@ define([
       $("#mail-list").slideToggle(350);
     }
 
-  });
-
-  _.extend(RightToolbarLayout.prototype, TroupeViews.DelayedShowLayoutMixin);
+  }).mixin([TroupeViews.DelayedShowLayoutMixin]);
 
   return RightToolbarLayout;
 

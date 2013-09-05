@@ -250,9 +250,7 @@ define([
 
     }
 
-  });
-
-  _.extend(ChatItemView.prototype, UnreadItemViewMixin);
+  }).mixin([UnreadItemViewMixin]);
 
 
   var ReadByView = Marionette.CollectionView.extend({
@@ -268,8 +266,7 @@ define([
     onClose: function(){
       this.collection.unlisten();
     }
-  });
-  _.extend(ReadByView.prototype, TroupeViews.LoadingCollectionMixin);
+  }).mixin([TroupeViews.LoadingCollectionMixin]);
 
   var ReadByPopover = TroupeViews.Popover.extend({
     initialize: function(options) {

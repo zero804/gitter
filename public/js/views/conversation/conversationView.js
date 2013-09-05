@@ -39,8 +39,7 @@ define([
         this.data = getData();
       }
     })
-  });
+  }).mixin([TroupeViews.SortableMarionetteView]);
 
-  _.extend(ConversationCollectionView.prototype, TroupeViews.SortableMarionetteView);
   return ConversationCollectionView;
 });

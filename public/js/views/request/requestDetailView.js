@@ -1,14 +1,11 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'jquery',
-  'underscore',
-  'backbone',
   'views/base',
   'hbs!./tmpl/requestDetailView',
   'hbs!./tmpl/rejectConfirmation',
   'views/unread-item-view-mixin',
   'log!request-detail-view'
-], function($, _, Backbone, TroupeViews, template, rejectConfirmationTemplate, UnreadItemViewMixin, log){
+], function(TroupeViews, template, rejectConfirmationTemplate, UnreadItemViewMixin, log){
   "use strict";
 
   var View = TroupeViews.Base.extend({
@@ -21,7 +18,7 @@ define([
 
     },
 
-    initialize: function(options) {
+    initialize: function() {
       this.setRerenderOnChange();
     },
 
@@ -59,10 +56,10 @@ define([
 
     onReject: function() {
       this.model.destroy({
-        success: function(data) {
+        success: function() {
           window.location.href = "#!";
         },
-        error: function(model, resp, options) {
+        error: function() {
           log("Error rejecting request.");
         }
       });
@@ -76,8 +73,7 @@ define([
     }
 
 
-  });
+  }).mixin([UnreadItemViewMixin]);
 
-  _.extend(View.prototype, UnreadItemViewMixin);
   return View;
 });

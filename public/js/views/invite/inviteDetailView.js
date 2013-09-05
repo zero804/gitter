@@ -90,10 +90,10 @@ define([
 
     onDelete: function() {
       this.model.destroy({
-        success: function(data) {
+        success: function() {
           window.location.href = "#!";
         },
-        error: function(model, resp, options) {
+        error: function() {
           log("Error rejecting request.");
         }
       });
@@ -105,8 +105,7 @@ define([
         }
       });
     }*/
-  });
+  }).mixin([ UnreadItemViewMixin ]);
 
-  _.extend(View.prototype, UnreadItemViewMixin);
   return View;
 });

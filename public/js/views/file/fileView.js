@@ -36,9 +36,7 @@ define([
       });
     }
 
-  });
-
-  _.extend(FileView.prototype, TroupeViews.SortableMarionetteView);
+  }).mixin([TroupeViews.SortableMarionetteView]);
 
   return FileView;
 

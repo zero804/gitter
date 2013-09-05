@@ -180,6 +180,7 @@ install-client-libs:
 	cp output/client-libs/almond/almond.js public/repo/almond/almond.js
 	cp output/client-libs/assert/assert-amd.js public/repo/assert/assert.js
 	cp output/client-libs/backbone/backbone-amd.js public/repo/backbone/backbone.js
+	cp output/client-libs/backbone.advice/advice.js public/repo/backbone.advice/backbone.advice.js
 	cp output/client-libs/backbone.babysitter/lib/amd/backbone.babysitter.min.js public/repo/backbone.babysitter/backbone.babysitter.js
 	cp output/client-libs/backbone.keys/dist/backbone.keys.min.js public/repo/backbone.keys/backbone.keys.js
 	cp output/client-libs/backbone.wreqr/lib/amd/backbone.wreqr.min.js public/repo/backbone.wreqr/backbone.wreqr.js
