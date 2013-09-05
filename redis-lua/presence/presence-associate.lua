@@ -3,6 +3,7 @@ local key_active_users = KEYS[2];
 local key_mobile_users = KEYS[3];
 local key_active_sockets = KEYS[4];
 local key_user_lock = KEYS[5];
+local key_user_sockets = KEYS[6];
 
 local user_id = ARGV[1];
 local socket_id = ARGV[2];
@@ -32,6 +33,7 @@ else
 	user_socket_count = redis.call("ZINCRBY", key_active_users, 1, user_id)
 end
 
+redis.call("SADD", key_user_sockets, socket_id)
 local socket_add_result = redis.call("SADD", key_active_sockets, socket_id)
 
 return { 1, user_socket_count, socket_add_result }

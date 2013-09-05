@@ -28,7 +28,8 @@
     "almond": "0.2.5",
     "requirejs": "http://requirejs.org/docs/release/2.1.5/minified/require.js",
     "zepto": "~1.0.0",
-    "hopscotch": "https://github.com/linkedin/hopscotch/archive/master.zip"
+    "hopscotch": "https://github.com/linkedin/hopscotch/archive/master.zip",
+    "cocktail": "https://github.com/onsi/cocktail/archive/master.zip"
   },
   "devDependencies": {
     "assert": "~0.0.1",

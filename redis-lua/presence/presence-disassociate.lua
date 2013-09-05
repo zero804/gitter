@@ -4,6 +4,7 @@ local key_mobile_users = KEYS[3];
 local key_active_sockets = KEYS[4];
 local key_user_lock = KEYS[5];
 local key_troupe_users = KEYS[6];
+local key_user_sockets = KEYS[7];
 
 local user_id = ARGV[1];
 local socket_id = ARGV[2];
@@ -34,6 +35,7 @@ end
 
 
 local socket_del_result = redis.call("SREM", key_active_sockets, socket_id)
+redis.call("SREM", key_user_sockets, socket_id)
 
 
 
