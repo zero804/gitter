@@ -185,6 +185,7 @@ install-client-libs:
 	cp output/client-libs/backbone.wreqr/lib/amd/backbone.wreqr.min.js public/repo/backbone.wreqr/backbone.wreqr.js
 	cp output/client-libs/bootstrap/bootstrap-tooltip.js public/repo/bootstrap/tooltip.js
 	cp output/client-libs/bootstrap/bootstrap-typeahead.js public/repo/bootstrap/typeahead.js
+	cp output/client-libs/cocktail/cocktail-amd.js public/repo/cocktail/cocktail.js
 	cp output/client-libs/cubism/cubism.v1.min.js public/repo/cubism/cubism.js
 	cp output/client-libs/d3/d3.min.js public/repo/d3/d3.js
 	cp output/client-libs/expect/expect-amd.js public/repo/expect/expect.js

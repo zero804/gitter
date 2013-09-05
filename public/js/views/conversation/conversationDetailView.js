@@ -1,16 +1,13 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-
 define([
-  'jquery',
   'underscore',
-  'backbone',
   'marionette',
   'views/base',
   'hbs!./tmpl/conversationDetailView',
   'collections/conversations',
   'views/conversation/conversationDetailItemView',
   'collections/base'
-], function($, _, Backbone, Marionette, TroupeViews, template, conversationModels, ConversationDetailItemView, TroupeCollections) {
+], function(_, Marionette, TroupeViews, template, conversationModels, ConversationDetailItemView, TroupeCollections) {
   "use strict";
 
   var View = TroupeViews.Base.extend({
@@ -51,7 +48,6 @@ define([
     afterRender: function() {
       var CV = Marionette.CollectionView.extend(TroupeViews.SortableMarionetteView, {
         initialize: function() {
-          this.initializeSorting();
           this.itemsInstantiated = 0;
         }/*,
         // to show the full mail body only for the first mail,
