@@ -18,12 +18,24 @@ define([
   // appEvents.trigger('searchSearchView:success');
 
 var ContactModel = Backbone.Model.extend({
+  ajaxEndpoint: '',
   displayName: '',
   email: '',
   invited: false,
   validate: function(attr) {
     if(!attr.email) {
       return "no email set";
+    }
+    if(!attr.ajaxEndpoint) {
+      return "invalid ajaxEndpoint";
+    }
+  },
+  invite: function() {
+    if(this.isValid() && !this.get('invited')) {
+      $.post(this.get('ajaxEndpoint'), {
+        invites: [{email: this.get('email')}]
+      });
+      this.set('invited', true);
     }
   }
 });
@@ -44,12 +56,7 @@ var ContactView = Backbone.View.extend({
       return this;
     },
     invite: function() {
-      if(this.model.isValid() && !this.model.get('invited')) {
-        $.post('/api/v1/inviteconnections', {
-          invites: [{email: this.model.get('email')}]
-        });
-        this.model.set('invited', true);
-      }
+      this.model.invite();
     }
 
 });
@@ -71,13 +78,13 @@ var CollectionView = Backbone.Marionette.CollectionView.extend({
     // when instantiated by default (through the controller) this will reflect on troupeContext to determine what the invite is for.
     //
     initialize: function(options) {
-
+      var ajaxEndpoint;
       if(context.inUserhomeContext()) {
         this.shareUrl = context.env('basePath') + '/' + context.getUser().username;
-        this.ajaxEndpoint = '/api/v1/inviteconnections';
+        ajaxEndpoint = '/api/v1/inviteconnections';
       } else {
         this.shareUrl = context.env('basePath') + '/' + context.getTroupe().uri;
-        this.ajaxEndpoint = '/troupes/' + context.getTroupeId() + '/invites';
+        ajaxEndpoint = '/troupes/' + context.getTroupeId() + '/invites';
       }
 
       $.getJSON('/contacts?q=', function(data) {
@@ -94,7 +101,8 @@ var CollectionView = Backbone.Marionette.CollectionView.extend({
         array.forEach(function(contact) {
           var model = new ContactModel({
             displayName: contact.displayName,
-            email: contact.email
+            email: contact.email,
+            ajaxEndpoint: ajaxEndpoint
           });
           inviteCollection.add(model);
         });
@@ -109,11 +117,11 @@ var CollectionView = Backbone.Marionette.CollectionView.extend({
         $('#custom-email-button').on('click', function() {
           var email = $('#custom-email').val();
           $('#custom-email').val('');
-          $.post('/api/v1/inviteconnections', {
-            invites: [{email: email}]
+          var model = new ContactModel({
+            email: email,
+            ajaxEndpoint: ajaxEndpoint
           });
-          var model = new ContactModel({email: email});
-          model.set('invited', true);
+          model.invite();
 
           inviteCollection.unshift(model);
           inviteListView.render();
