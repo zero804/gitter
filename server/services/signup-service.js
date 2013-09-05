@@ -7,6 +7,8 @@ var emailNotificationService = require("./email-notification-service"),
     uriService = require("./uri-service"),
     winston = require('winston'),
     assert = require('assert'),
+    appEvents = require('../app-events'),
+    _ = require('underscore'),
     Q = require('q');
 
 function newUser(options, callback) {
@@ -18,9 +20,6 @@ function newUser(options, callback) {
         return user;
       }).nodeify(callback);
 }
-
-
-
 
 var signupService = module.exports = {
   newSignupFromLandingPage: function(options, callback) {
@@ -81,6 +80,9 @@ var signupService = module.exports = {
       user.save(function(err) {
         if(err) return callback(err);
 
+        // Signal that an email address has been confirmed
+        appEvents.emailConfirmed(newEmail, user.id);
+
         winston.verbose("User email address change complete, finding troupe to redirect to", { id: user.id, status: user.status });
 
         troupeService.updateInvitesForEmailToUserId(newEmail, user.id, function(err) {
@@ -122,6 +124,9 @@ var signupService = module.exports = {
 
     return user.saveQ()
         .then(function() {
+          // Signal that an email address has been confirmed
+          appEvents.emailConfirmed(user.email, user.id);
+
           return troupeService.updateInvitesForEmailToUserId(user.email, user.id)
             .then(function() {
               return Q.all([
@@ -144,20 +149,55 @@ var signupService = module.exports = {
   resendConfirmationForUser: function(email, callback) {
     return userService.findByEmail(email)
       .then(function(user) {
-        if(!user) throw 404;
-        if (user.status !== 'UNCONFIRMED') throw 404;
+        if(!user) {
+          signupService.resendSecondaryConfirmation(email, callback);
+          return;
+        }
+
+        if (user.status !== 'UNCONFIRMED') {
+          winston.verbose('The user is not unconfirmed so cannot resend confirmation');
+          return callback(404);
+        }
 
         winston.verbose('Resending confirmation email to new user', { email: user.email });
+
         emailNotificationService.sendConfirmationForNewUser(user);
-        return user;
-      })
-      .nodeify(callback);
+        callback(null, user);
+      });
   },
 
   resendConfirmation: function(options, callback) {
     // This option occurs if the user has possibly lost their session
     // and is trying to get the confirmation sent at a later stage
-    signupService.resendConfirmationForUser(options.email, callback);
+    var email = options.email;
+
+    signupService.resendConfirmationForUser(email, callback);
+   },
+
+  resendSecondaryConfirmation: function(email, callback) {
+    winston.verbose('resendSecondaryConfirmation');
+    return userService.findByUnconfirmedEmail(email)
+      .then(function(user) {
+        if(!user) {
+          winston.verbose('No user with that unconfirmed email address was found.');
+          throw 404;
+        }
+
+        var unconfirmed = user.unconfirmedEmails.filter(function(unconfirmedEmail) {
+          return unconfirmedEmail.email === email;
+        })[0];
+
+        winston.verbose('Resending confirmation email to new user', { email: email });
+
+        emailNotificationService.sendConfirmationForSecondaryEmail({
+          email: email,
+          confirmationCode: unconfirmed.confirmationCode
+        });
+
+        return user;
+      })
+      .nodeify(callback);
+
   },
 
   /**

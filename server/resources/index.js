@@ -50,6 +50,8 @@ module.exports = {
     installUserSubResource('troupes', 'troupes');
     installUserSubResource('invites', 'invites');
     installUserSubResource('connectioninvites', 'connectioninvites');
+    installUserSubResource('emails',  'emails');
+
 
   }
 };

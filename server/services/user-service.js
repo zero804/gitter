@@ -9,20 +9,12 @@ var geocodingService = require("./geocoding-service");
 var winston = require("winston");
 var statsService = require("./stats-service");
 var uriLookupService = require("./uri-lookup-service");
-var crypto = require('crypto');
 var assert = require('assert');
 var collections = require("../utils/collections");
 var Q = require('q');
 var appEvents = require("../app-events");
 var moment = require('moment');
-
-function generateGravatarUrl(email) {
-  var url =  "https://www.gravatar.com/avatar/" + crypto.createHash('md5').update(email).digest('hex') + "?d=identicon";
-
-  winston.verbose('Gravatar URL ' + url);
-
-  return url;
-}
+var gravatar = require('../utils/gravatar');
 
 var userService = {
   newUser: function(options, callback) {
@@ -32,7 +24,7 @@ var userService = {
       displayName:        options.displayName,
       email:              options.email.toLowerCase(),
       confirmationCode:   uuid.v4(),
-      gravatarImageUrl:   options.gravatarImageUrl || generateGravatarUrl(options.email),
+      gravatarImageUrl:   options.gravatarImageUrl || gravatar.gravatarUrlForEmail(options.email),
       googleRefreshToken: options.googleRefreshToken || undefined,
       status:             options.status || "UNCONFIRMED",
     });
@@ -45,7 +37,7 @@ var userService = {
 
     var email = options.email.toLowerCase();
 
-    return persistence.User.findOneQ({email: email})
+    return userService.findByEmail(email)
       .then(function(user) {
         if(user) return user;
 
@@ -58,9 +50,9 @@ var userService = {
 
   findByConfirmationCode: function(confirmationCode, callback) {
 
-    persistence.User.findOne({confirmationCode: confirmationCode}, function(err, user) {
-      callback(err, user);
-    });
+    persistence.User.find().or([{confirmationCode: confirmationCode} /*, {'unconfirmedEmails.confirmationCode': confirmationCode} */]).findOne()
+      .execQ()
+      .nodeify(callback);
   },
 
   requestPasswordReset: function(login, callback) {
@@ -102,8 +94,35 @@ var userService = {
   },
 
   findByEmail: function(email, callback) {
-    return persistence.User.findOneQ({email: email.toLowerCase()})
+    return persistence.User.findOneQ({ $or: [{ email: email.toLowerCase()}, { emails: email.toLowerCase() }]})
             .nodeify(callback);
+  },
+
+  findByEmailsIndexed: function(emails, callback) {
+    emails = emails.map(function(email) { return email.toLowerCase(); });
+
+    return persistence.User.findQ({ $or: [
+              { email: { $in: emails } },
+              { emails: { $in: emails } }
+              ]})
+      .then(function(users) {
+        return users.reduce(function(memo, user) {
+          memo[user.email] = user;
+
+          user.emails.forEach(function(email) {
+            memo[email] = user;
+          });
+
+          return memo;
+        }, {});
+      })
+      .nodeify(callback);
+  },
+
+
+  findByUnconfirmedEmail: function(email, callback) {
+    return persistence.User.findOneQ({ 'unconfirmedEmails.email': email.toLowerCase() })
+      .nodeify(callback);
   },
 
   findByUsername: function(username, callback) {
@@ -341,6 +360,10 @@ var userService = {
             // mark user as active after setting the password
             if (user.status === 'PROFILE_NOT_COMPLETED' || user.status === 'UNCONFIRMED') {
               user.status = "ACTIVE";
+
+              postSave.push(function() {
+                appEvents.userAccountActivated(user.id);
+              });
             }
             return user;
           });
@@ -365,7 +388,7 @@ var userService = {
         return user;
       }
 
-      user.gravatarImageUrl = generateGravatarUrl(email);
+      user.gravatarImageUrl = gravatar.gravatarUrlForEmail(email);
 
 
       return userService.findByEmail(email)
@@ -425,6 +448,80 @@ var userService = {
 
   deleteAllUsedInvitesForUser: function(user) {
     persistence.Invite.remove({ userId: user.id, status: "USED" });
+  },
+
+  addSecondaryEmail: function(user, email) {
+    return persistence.User.findOneQ({ $or: [{ email: email }, { emails: email } ]})
+      .then(function(existing) {
+        if(existing) throw 409; // conflict
+
+        var secondary = {
+          email: email,
+          confirmationCode: uuid.v4()
+        };
+
+        user.unconfirmedEmails.push(secondary);
+
+        emailNotificationService.sendConfirmationForSecondaryEmail(secondary);
+
+        return user.saveQ().thenResolve(user);
+
+      });
+  },
+
+  switchPrimaryEmail: function(user, email) {
+    assert(user.isConfirmed(), 'User must be confirmed');
+
+    var index = user.emails.indexOf(email);
+    if(index < 0) return Q.reject(404);
+    user.emails.splice(index, 1, user.email);
+
+    user.email = email;
+    return user.saveQ().thenResolve(user);
+  },
+
+  removeSecondaryEmail: function(user, email) {
+    var index = user.emails.indexOf(email);
+    if(index >= 0) {
+      user.emails.splice(index, 1);
+      return user.saveQ().thenResolve(user);
+    }
+
+    var unconfirmed = user.unconfirmedEmails.filter(function(unconfirmedEmail) {
+      return unconfirmedEmail.email === email;
+    }).shift();
+
+    if(unconfirmed) {
+      unconfirmed.remove();
+      return user.saveQ().thenResolve(user);
+    }
+
+    return Q.reject(404);
+  },
+
+  confirmSecondaryEmail: function(user, confirmationCode) {
+    var unconfirmed = user.unconfirmedEmails.filter(function(unconfirmedEmail) {
+      return unconfirmedEmail.confirmationCode === confirmationCode;
+    }).shift();
+
+
+    if(!unconfirmed) return Q.reject(404);
+    unconfirmed.remove();
+    var email = unconfirmed.email;
+
+    user.emails.push(email);
+
+    return user.saveQ()
+      .then(function() {
+        // Signal that an email address has been confirmed
+        appEvents.emailConfirmed(email, user.id);
+
+        return persistence.User.updateQ(
+          { 'unconfirmedEmails.email': email },
+          { $pull: { unconfirmedEmails: { email: email } } },
+          { multi: true });
+      })
+      .thenResolve(user);
   }
 
 };

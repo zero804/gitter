@@ -126,6 +126,26 @@ module.exports = {
     });
   },
 
+  sendConfirmationForSecondaryEmail: function (unconfirmed) {
+    assert(unconfirmed.confirmationCode, 'No confirmation code found');
+
+    var confirmLink = nconf.get("email:emailBasePath") + "/confirmSecondary/" + unconfirmed.confirmationCode;
+    var to = unconfirmed.email;
+
+    mailerService.sendEmail({
+      templateFile: "change-email-address",
+      to: to,
+      from: 'Troupe <support@troupe.co>',
+      subject: "Confirm new email address",
+      data: {
+        confirmLink: confirmLink,
+        // originalEmail: unconfirmed.email,
+        newEmail: unconfirmed.email,
+        baseServerPath: nconf.get("email:emailBasePath")
+      }
+    });
+  },
+
   sendNoticeOfEmailChange: function (user, origEmail, newEmail) {
     assert(origEmail, 'origEmail parameter required');
     assert(newEmail, 'newEmail parameter required');
@@ -192,6 +212,22 @@ module.exports = {
         acceptLink: acceptLink,
         senderDisplayName: senderDisplayName,
         baseServerPath: nconf.get("email:emailBasePath")
+      }
+    });
+  },
+
+  sendContactSignupNotification: function(signupUser, toUser) {
+    var signupDisplayName = signupUser.displayName;
+    var email = toUser.email;
+
+    mailerService.sendEmail({
+      templateFile: "contact_signup_notification",
+      from: 'Troupe <support@troupe.co>',
+      to: email,
+      subject: signupDisplayName + " has joined Troupe",
+      data: {
+        signupDisplayName: signupDisplayName,
+        connectLink: nconf.get("email:emailBasePath") + signupUser.getHomeUrl(),
       }
     });
   }

@@ -11,6 +11,7 @@ var presenceService = require("./presence-service");
 var uuid = require('node-uuid');
 var winston = require("winston");
 var collections = require("../utils/collections");
+var mongoUtils = require("../utils/mongo-utils");
 var Q = require("q");
 var ObjectID = require('mongodb').ObjectID;
 var _ = require('underscore');
@@ -233,7 +234,7 @@ function addUserIdToTroupe(userId, troupeId) {
         if(troupe.containsUserId(userId)) {
           return troupe;
         }
-       
+
         appEvents.richMessage({eventName: 'userJoined', troupe: troupe, userId: userId});
 
         troupe.addUserById(userId);
@@ -1013,37 +1014,66 @@ function findAllUserIdsForTroupes(troupeIds, callback) {
     .nodeify(callback);
 }
 
+function findAllUserIdsForTroupe(troupeId) {
+  console.log('findAllUserIdsForTroupe', troupeId);
+
+  return persistence.Troupe.findByIdQ(troupeId, 'users', { lean: true })
+    .then(function(troupe) {
+      if(!troupe) throw 404;
+
+      return troupe.users.map(function(troupeUser) { return troupeUser.userId; });
+    });
+}
+
 function findAllUserIdsForUnconnectedImplicitContacts(userId, callback) {
-  userId = new ObjectID(userId);
+  return Q.all([
+      findAllImplicitContactUserIds(userId),
+      findAllConnectedUserIdsForUserId(userId)
+    ])
+    .spread(function(implicitConnectionUserIds, alreadyConnectedUserIds) {
+      alreadyConnectedUserIds = alreadyConnectedUserIds.map(function(id) { return "" + id; });
+
+      return _.difference(implicitConnectionUserIds, alreadyConnectedUserIds);
+    })
+    .nodeify(callback);
+}
+
+function findAllConnectedUserIdsForUserId(userId) {
+  userId = mongoUtils.asObjectID(userId);
 
   return persistence.Troupe.aggregateQ([
-    { $match: { 'users.userId': userId, oneToOne: false } },
+    { $match: { 'users.userId': userId, oneToOne: true } },
     { $project: { 'users.userId': 1, _id: 0 } },
     { $unwind: "$users" },
     { $group: { _id: '$users.userId', number: { $sum: 1 } } },
     { $project: { _id: 1 } }
   ]).then(function(results) {
-    var implicitConnectionUserIds = results
+    var a = results
+            .map(function(item) { return item._id; })
+            .filter(function(item) { return "" + item != "" + userId; });
+    return a;
+  });
+
+}
+
+function findAllImplicitContactUserIds(userId, callback) {
+  userId = mongoUtils.asObjectID(userId);
+
+  return persistence.Troupe.aggregateQ([
+    { $match: { 'users.userId': userId } },
+    { $project: { 'users.userId': 1, _id: 0 } },
+    { $unwind: "$users" },
+    { $group: { _id: '$users.userId', number: { $sum: 1 } } },
+    { $project: { _id: 1 } }
+  ]).then(function(results) {
+    return results
           .map(function(item) { return "" + item._id; })
           .filter(function(item) { return item != userId; });
 
-    return persistence.Troupe.aggregateQ([
-      { $match: { 'users.userId': userId, oneToOne: true } },
-      { $project: { 'users.userId': 1, _id: 0 } },
-      { $unwind: "$users" },
-      { $group: { _id: '$users.userId', number: { $sum: 1 } } },
-      { $project: { _id: 1 } }
-    ]).then(function(results) {
-
-      var alreadyConnectedUserIds = results
-        .map(function(item) { return "" + item._id; });
-
-      return _.difference(implicitConnectionUserIds, alreadyConnectedUserIds);
-    });
   }).nodeify(callback);
 
-
 }
+
 
 
 /**
@@ -1220,7 +1250,7 @@ function acceptInviteForAuthenticatedUser(user, invite) {
     assert(user, 'User parameter required');
     assert(invite, 'invite parameter required');
 
-    if(invite.email !== user.email && invite.userId != user.id) {
+    if(!user.hasEmail(invite.email) && invite.userId != user.id) {
       throw 401;
     }
 
@@ -1526,6 +1556,8 @@ module.exports = {
   findUnusedInviteToTroupeForUserId: findUnusedInviteToTroupeForUserId,
   findImplicitConnectionBetweenUsers: findImplicitConnectionBetweenUsers,
   findAllUserIdsForUnconnectedImplicitContacts: findAllUserIdsForUnconnectedImplicitContacts,
+  findAllImplicitContactUserIds: findAllImplicitContactUserIds,
+  findAllConnectedUserIdsForUserId: findAllConnectedUserIdsForUserId,
   updateUnconfirmedInvitesForUserId: updateUnconfirmedInvitesForUserId,
   updateUnconfirmedRequestsForUserId: updateUnconfirmedRequestsForUserId,
   getUrlForTroupeForUserId: getUrlForTroupeForUserId,
@@ -1542,6 +1574,7 @@ module.exports = {
   removeUserFromTroupe: removeUserFromTroupe,
 
   findAllUserIdsForTroupes: findAllUserIdsForTroupes,
+  findAllUserIdsForTroupe: findAllUserIdsForTroupe,
   findUserIdsForTroupe: findUserIdsForTroupe,
 
   validateTroupeUrisForUser: validateTroupeUrisForUser,
