@@ -2,51 +2,46 @@
 "use strict";
 
 var troupeService = require("../../services/troupe-service"),
-    restSerializer = require("../../serializers/rest-serializer"),
-    Q = require("q");
+    restSerializer = require("../../serializers/rest-serializer");
 
 module.exports = {
-    index: function(req, res, next) {
-      troupeService.findAllUnusedInvitesForTroupe(req.troupe.id, function(err, invites) {
+  index: function(req, res, next) {
+    troupeService.findAllUnusedInvitesForTroupe(req.troupe.id, function(err, invites) {
+      if(err) return next(err);
+
+      var strategy = new restSerializer.InviteStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });
+
+      restSerializer.serialize(invites, strategy, function(err, serialized) {
         if(err) return next(err);
 
-        var strategy = new restSerializer.InviteStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });
-
-        restSerializer.serialize(invites, strategy, function(err, serialized) {
-          if(err) return next(err);
-
-          res.send(serialized);
-        });
-
-      });
-    },
-
-    create: function(req, res, next) {
-      var invites = req.body;
-
-      var promises = invites.map(function(invite) {
-        return troupeService.createInvite(req.troupe, {
-            fromUser: req.user,
-            email: invite.email,
-            displayName: invite.displayName,
-            userId: invite.userId
-          });
+        res.send(serialized);
       });
 
-      Q.all(promises).then(function() {
-        res.send(invites);
-      }, next);
+    });
+  },
 
-    },
+  create: function(req, res, next) {
+    var invite = req.body;
+    return troupeService.createInvite(req.troupe, {
+        fromUser: req.user,
+        email: invite.email,
+        displayName: invite.displayName,
+        userId: invite.userId
+      })
+      .then(function() {
+        res.send(invite);
+      })
+      .fail(next);
+  },
 
-    destroy: function(req, res, next) {
-      req.invite.remove(function() {
-        res.send({ success: true });
-      });
-    },
+  destroy: function(req, res) {
+    req.invite.remove(function() {
+      res.send({ success: true });
+    });
+  },
 
-    load: function(id, callback){
-      troupeService.findInviteById(id, callback);
-    }
+  load: function(id, callback){
+    troupeService.findInviteById(id, callback);
+  }
 
 };
