@@ -9,7 +9,7 @@ var Q                         = require('q');
 var collections               = require('../utils/collections');
 var redis                     = require("../utils/redis");
 var mongoUtils                = require('../utils/mongo-utils');
-
+var check                     = require('validator').check;
 
 var redisClient               = redis.createClient();
 var redisClient_exists        = Q.nbind(redisClient.exists, redisClient);
@@ -185,6 +185,33 @@ function searchifyResults(skip, limit) {
   };
 }
 
+function addEmailAddress(queryText) {
+  return function(results) {
+    if(results.length === 0 && isValidEmailAddress(queryText)) {
+      results = [{
+        name: queryText,
+        emails: [queryText],
+        knownEmails: [queryText]
+      }];
+    }
+
+    return results;
+  };
+}
+
+function isValidEmailAddress(email) {
+  try {
+    check(email).isEmail();
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
+function escapeRegExp(str) {
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
+
 function findSuggestedContacts(userId, options) {
   var excludeTroupeId = options.excludeTroupeId;
   var excludeConnected = options.excludeConnected;
@@ -197,13 +224,22 @@ function findSuggestedContacts(userId, options) {
         .skip(skip)
         .sort({ score: -1, name: 1 });
 
+  var queryTextSearch;
+
   if(queryText) {
-    var res = createRegExpsForQuery(queryText);
-    query.find({ $or: [ { name: { $all: res } }, { username: { $all: res } }, { knownEmails: { $all: res } }, { emails: queryText } ] });
+    if(isValidEmailAddress(queryText)) {
+
+      queryTextSearch = { $or: [ { knownEmails: new RegExp('^' + escapeRegExp(queryText) )}, { emails: queryText }] };
+    } else {
+      var res = createRegExpsForQuery(queryText);
+      queryTextSearch = { $or: [ { name: { $all: res } }, { username: { $all: res } }, { knownEmails: { $all: res } } ] };
+    }
   }
 
   if(!excludeTroupeId && !excludeConnected) {
-    return query.execQ().then(searchifyResults(skip, limit));
+    if(queryTextSearch) query.find(queryTextSearch);
+
+    return query.execQ().then(addEmailAddress(queryText)).then(searchifyResults(skip, limit));
   }
 
   var ops = [];
@@ -212,10 +248,12 @@ function findSuggestedContacts(userId, options) {
 
   return Q.all(ops)
     .then(function(results) {
+      var terms = [queryTextSearch];
+
       if(excludeTroupeId) {
         var troupeUserIds = results.shift();
 
-        query.find({ $or: [
+        terms.push({ $or: [
           { contactUserId: { $exists: false } },
           { $not: { contactUserId: { $in: troupeUserIds } } }
         ]});
@@ -225,15 +263,20 @@ function findSuggestedContacts(userId, options) {
       if(excludeConnected) {
         var connectedUserIds = results.shift();
 
-        query.find({ $or: [
+        terms.push({ $or: [
           { contactUserId: { $exists: false } },
           { $not: { contactUserId: { $in: connectedUserIds } } }
         ]});
       }
 
-      return query.execQ().then(searchifyResults(skip, limit));
+      query.find({ $and: terms });
+
+      return query.execQ()
+        .then(addEmailAddress(queryText))
+        .then(searchifyResults(skip, limit));
 
     });
+
 
 }
 

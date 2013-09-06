@@ -537,10 +537,11 @@ function findInviteByConfirmationCode(confirmationCode) {
 
 
 function findAllUnusedInvitesForTroupe(troupeId, callback) {
-   persistence.Invite.where('troupeId').equals(troupeId)
+   return persistence.Invite.where('troupeId').equals(troupeId)
       .where('status').equals('UNUSED')
       .sort({ displayName: 'asc', email: 'asc' } )
-      .exec(callback);
+      .execQ()
+      .nodeify(callback);
 }
 
 function findUnusedInviteToTroupeForUserId(userId, troupeId, callback) {
@@ -1015,8 +1016,6 @@ function findAllUserIdsForTroupes(troupeIds, callback) {
 }
 
 function findAllUserIdsForTroupe(troupeId) {
-  console.log('findAllUserIdsForTroupe', troupeId);
-
   return persistence.Troupe.findByIdQ(troupeId, 'users', { lean: true })
     .then(function(troupe) {
       if(!troupe) throw 404;
