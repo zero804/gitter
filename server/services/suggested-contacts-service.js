@@ -4,6 +4,7 @@
 var contactService            = require('./contact-service');
 var troupeService             = require('./troupe-service');
 var userService               = require('./user-service');
+var appEvents                 = require('../app-events');
 var persistence               = require('./persistence-service');
 var Q                         = require('q');
 var collections               = require('../utils/collections');
@@ -14,6 +15,7 @@ var check                     = require('validator').check;
 var redisClient               = redis.createClient();
 var redisClient_exists        = Q.nbind(redisClient.exists, redisClient);
 var redisClient_setex         = Q.nbind(redisClient.setex, redisClient);
+var redisClient_del           = Q.nbind(redisClient.del, redisClient);
 
 /* const */
 var IMPLICIT_CONTACT          = 16;
@@ -310,4 +312,9 @@ exports.fetchSuggestedContactsForUser = function(userId, options) {
     });
 
 };
+
+appEvents.onContactsUpdated(function(data) {
+  var userId = data.userId;
+  redisClient_del('sc:' + userId);
+});
 

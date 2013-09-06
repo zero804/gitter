@@ -203,6 +203,14 @@ function bind(on) {
 
     onUserAccountActivated: function(callback) {
       on('userAccountActivated', callback);
+    },
+
+    contactsUpdated: function(userId) {
+      emit('contactsUpdated', { userId: userId });
+    },
+
+    onContactsUpdated: function(callback) {
+      on('contactsUpdated', callback);
     }
 
   };
