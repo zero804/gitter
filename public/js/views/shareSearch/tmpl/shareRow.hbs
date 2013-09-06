@@ -22,7 +22,16 @@
     {{#if invited}}
       <button class="trpInviteButton disabled">Invited</button>
     {{else}}
-      <button class="trpInviteButton">Invite</button>
+      {{#if connected}}
+      <button class="trpInviteButton disabled">Connected</button>
+      {{else}}
+        {{#if member}}
+        <button class="trpInviteButton disabled">Member</button>
+        {{else}}
+        <button class="trpInviteButton">Invite</button>
+        {{/if}}
+
+      {{/if}}
     {{/if}}
     </div>
 </div>
