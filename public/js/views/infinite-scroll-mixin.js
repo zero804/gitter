@@ -27,11 +27,26 @@ define([
     },
 
     loadMore: function() {
+      // If the collection support pagenation, use it
+      if(this.collection.fetchNext) {
+        this.collection.fetchNext({
+          context: this,
+          noMore: function() {
+            this.scroll.disable();
+          },
+          done: function() {
+            this.scroll.loadComplete();
+          }
+        });
+
+        /* Our work here is done */
+        return;
+      }
+
       var fetchData = this.getFetchData && this.getFetchData.call(this) || {
         skip: this.collection.length,
         limit: PAGE_SIZE
       };
-
 
       if(!fetchData) {
         // No fetch data means nothing to fetch
@@ -44,7 +59,6 @@ define([
       }
 
       this.collection.once('add', onAdd);
-
       var self = this;
       this.collection.fetch({
         update: true,

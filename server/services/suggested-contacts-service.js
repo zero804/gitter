@@ -199,7 +199,7 @@ function findSuggestedContacts(userId, options) {
 
   if(queryText) {
     var res = createRegExpsForQuery(queryText);
-    query.find({ $or: [ { name: { $in: res } }, { username: { $in: res } }, { knownEmails: { $in: res } }, { emails: queryText } ] });
+    query.find({ $or: [ { name: { $all: res } }, { username: { $all: res } }, { knownEmails: { $all: res } }, { emails: queryText } ] });
   }
 
   if(!excludeTroupeId && !excludeConnected) {

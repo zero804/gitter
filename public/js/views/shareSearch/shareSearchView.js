@@ -76,7 +76,8 @@ cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionet
     events: {
       'mouseover #copy-button' :      'createClipboard',
       'click #custom-email-button':   'onCustomEmailClick',
-      'change #custom-email':         'onSearchChange'
+      'change #custom-email':         'onSearchChange',
+      'keyup #custom-email':       'onSearchChange'
     },
 
     // when instantiated by default (through the controller) this will reflect on troupeContext to determine what the invite is for.
@@ -92,7 +93,7 @@ cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionet
       }
       this.collection = new suggestedContactModels.Collection();
       this.collection.fetch();
-
+      this.searchLimited = _.debounce(this.search.bind(this));
       // [ { userId: }, or { email: } ]
       this.invites = [];
 
@@ -140,7 +141,17 @@ cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionet
     },
 
     onSearchChange: function() {
+      var emailField = this.$el.find('#custom-email');
 
+      if(this._prevSearch !== emailField.val()) {
+        this._prevSearch = emailField.val();
+        this.searchLimited();
+      }
+    },
+
+    search: function() {
+      var emailField = this.$el.find('#custom-email');
+      this.collection.query(emailField.val());
     },
 
     onCustomEmailClick: function() {
