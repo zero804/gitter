@@ -1,13 +1,22 @@
 <div class="trpInviteItem">
   <div class="cell">
-    <div class="trpInviteAvatar" style="background-image: url('{{#if user.avatarUrlSmall}}{{user.avatarUrlSmall}}{{else}}/avatarForEmail/{{user.email}}{{/if}}');"></div>
+    <div class="trpInviteAvatar" style="background-image: url('{{avatarUrl}}');"></div>
   </div>
     <div class="trpInviteName">
-      {{#if user.displayName}}
-        {{user.displayName}}
-      {{else}}
-        {{user.email}}
+      {{displayName}}
+      <span>
+      {{#if username}}
+      <span class="trpSmall">@{{username}}</span>
       {{/if}}
+      {{#if emails}}
+      <span class="trpInviteEmails">
+      {{#each emails}}
+      {{#unless @index}}|{{/unless}}
+      {{.}}
+      {{/each}}
+      </span>
+      {{/if}}
+      </span>
     </div>
     <div class="cell">
     {{#if user.invited}}

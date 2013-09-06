@@ -1,7 +1,8 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'utils/never-ending-story'
-], function(NeverEndingStory) {
+  'utils/never-ending-story',
+  'log!infinite-scroll'
+], function(NeverEndingStory, log) {
   "use strict";
 
   /** @const */
@@ -19,6 +20,16 @@ define([
         this.loadMore();
       });
 
+      this.listenTo(this.collection, 'search:newquery', function() {
+        scroll.enable();
+        scroll.scrollToOrigin();
+      });
+
+      this.listenTo(this.collection, 'search:nomore', function() {
+        scroll.disable();
+      });
+
+
       this.scroll = scroll;
     },
 
@@ -31,9 +42,6 @@ define([
       if(this.collection.fetchNext) {
         this.collection.fetchNext({
           context: this,
-          noMore: function() {
-            this.scroll.disable();
-          },
           done: function() {
             this.scroll.loadComplete();
           }

@@ -266,9 +266,7 @@ define([
   });
 
   exports.SearchResultsCollection = {
-    _currentQueryText: undefined,
     parse: function(searchResponse) {
-      var skip = searchResponse.skip;
       var limit = searchResponse.limit;
       if(searchResponse.results.length < limit) {
         this._noMoreData = true;
@@ -289,6 +287,7 @@ define([
       this._skip = 0;
       this._noMoreData = false;
       this.fetchNext({ remove: true });
+      this.trigger('search:newquery');
     },
 
     fetchNext: function(options) {
@@ -309,6 +308,7 @@ define([
       var data = _.extend({}, this._currentQuery, { skip: this._skip });
 
       var self = this;
+      this.trigger('search:next');
       log('Fetch next: ', data);
       this.fetch({
         remove: ('remove' in options) ? options.remove : false,
@@ -318,11 +318,14 @@ define([
         success: function() {
           self._skip = self.length;
           if(self._noMoreData) {
+            self.trigger('search:nomore');
             noMore();
           }
+          self.trigger('search:fetch:complete');
           done();
         },
         error: function() {
+          self.trigger('search:fetch:complete');
           done();
         }
       });
