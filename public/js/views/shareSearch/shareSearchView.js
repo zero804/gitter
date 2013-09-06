@@ -22,48 +22,48 @@ define([
   // appEvents.trigger('searchSearchView:select');
   // appEvents.trigger('searchSearchView:success');
 
-var ContactModel = Backbone.Model.extend({
-  ajaxEndpoint: '',
-  displayName: '',
-  email: '',
-  invited: false,
-  validate: function(attr) {
-    if(!attr.email) {
-      return "no email set";
+  var ContactModel = Backbone.Model.extend({
+    ajaxEndpoint: '',
+    displayName: '',
+    email: '',
+    invited: false,
+    validate: function(attr) {
+      if(!attr.email) {
+        return "no email set";
+      }
+      if(!attr.ajaxEndpoint) {
+        return "invalid ajaxEndpoint";
+      }
+    },
+    invite: function() {
+      if(this.isValid() && !this.get('invited')) {
+        $.post(this.get('ajaxEndpoint'), {
+          invites: [{email: this.get('email')}]
+        });
+        this.set('invited', true);
+      }
     }
-    if(!attr.ajaxEndpoint) {
-      return "invalid ajaxEndpoint";
+  });
+
+  var ContactView = TroupeViews.Base.extend({
+    template: rowTemplate,
+    events: {
+      'click button': 'invite'
+    },
+    initialize: function(){
+      this.listenTo(this.model, 'change', this.render);
+    },
+    invite: function() {
+      //this.model.invite();
     }
-  },
-  invite: function() {
-    if(this.isValid() && !this.get('invited')) {
-      $.post(this.get('ajaxEndpoint'), {
-        invites: [{email: this.get('email')}]
-      });
-      this.set('invited', true);
-    }
-  }
-});
 
-var ContactView = TroupeViews.Base.extend({
-  template: rowTemplate,
-  events: {
-    'click button': 'invite'
-  },
-  initialize: function(){
-    this.listenTo(this.model, 'change', this.render);
-  },
-  invite: function() {
-    //this.model.invite();
-  }
+  });
 
-});
+  var CollectionView = Marionette.CollectionView.extend({
+    itemView: ContactView
+  });
 
-var CollectionView = Marionette.CollectionView.extend({
-  itemView: ContactView
-});
-
-cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionetteView);
+  cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionetteView);
 
   var View = TroupeViews.Base.extend({
     template: template,
@@ -78,54 +78,60 @@ cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionet
     // when instantiated by default (through the controller) this will reflect on troupeContext to determine what the invite is for.
     //
     initialize: function(options) {
+      if(!options) options = {};
+      this._options = options;
+
       var ajaxEndpoint;
-      if(context.inUserhomeContext()) {
-        this.shareUrl = context.env('basePath') + '/' + context.getUser().username;
+      var inviteToConnect = options.inviteToConnect;
+
+      if(inviteToConnect) {
         ajaxEndpoint = '/api/v1/inviteconnections';
       } else {
-        this.shareUrl = context.env('basePath') + '/' + context.getTroupe().uri;
         ajaxEndpoint = '/troupes/' + context.getTroupeId() + '/invites';
       }
       this.collection = new suggestedContactModels.Collection();
-      this.collection.fetch();
+      this.collection.query(this.getQuery());
+
       this.searchLimited = _.debounce(this.search.bind(this));
-      // [ { userId: }, or { email: } ]
       this.invites = [];
 
-      if (options && options.overrideContext === true) {
-        this.data = {
-          inviteToTroupe: options.inviteToTroupe,
-          inviteToConnect: options.inviteToConnect,
-
-          troupe: options.troupe ? options.troupe : context.getTroupe(),
-          user: options.user ? options.user : context.getUser(),
-          importedGoogleContacts: context().importedGoogleContacts
-
-          // , inviteUser: options.inviteUser
-        };
-      }
-      else {
-        this.data = {
-          inviteToTroupe: context.inTroupeContext() || context.inOneToOneTroupeContext(),
-          inviteToConnect: context.inUserhomeContext(),
-
-          troupe: context.getTroupe(),
-          user: context.getUser(),
-          importedGoogleContacts: context().importedGoogleContacts
-        };
-      }
-
-
-      if (this.data.inviteToTroupe && !this.data.troupe) throw new Error("Need a troupe");
-      if (this.data.inviteToConnect && !this.data.user) throw new Error("Need a viewer");
-
-      this.data.uri = (this.data.inviteToTroupe) ? this.data.troupe.uri : this.data.user.username;
-      this.data.basePath = context.env('basePath');
-      this.data.returnToUrl = encodeURIComponent(window.location.pathname + window.location.hash);
 
       this.addCleanup(function() {
         if(this.clip) this.clip.destroy();
       });
+    },
+
+    isConnectMode: function() {
+      if(this._options.inviteToConnect) return true;
+      if(this._options.inviteToTroupe) return false;
+
+      return !context.inTroupeContext() && !context.inOneToOneTroupeContext();
+    },
+
+    getShareUrl: function() {
+      var connectMode = this.isConnectMode();
+
+      return context.env('basePath') + (connectMode ? context.getUser().url : context.getTroupe().url);
+    },
+
+    getRenderData: function() {
+      var connectMode = this.isConnectMode();
+      var user = context.getUser();
+      var troupe = !connectMode && context.getTroupe();
+
+      if (!connectMode && !troupe) throw new Error("Need a troupe");
+
+      var data = {
+        connectMode: connectMode,
+        user: user,
+        troupe: troupe,
+        importedGoogleContacts: context().importedGoogleContacts,
+        shareUrl: this.getShareUrl(),
+        basePath: context.env('basePath'),
+        returnToUrl: encodeURIComponent(window.location.pathname + window.location.hash)
+      };
+
+      return data;
     },
 
     afterRender: function() {
@@ -147,13 +153,21 @@ cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionet
     getQuery: function() {
       var emailField = this.$el.find('#custom-email');
       var q = { q: emailField.val() };
+
+      if(this.isConnectMode()) {
+        q.statusConnect = 1;
+        q.excludeConnected = 1;
+      } else {
+        var troupeId = context.getTroupeId();
+        q.statusToTroupe = troupeId;
+        q.excludeTroupeId = troupeId;
+      }
+
       return q;
     },
 
     search: function() {
       var query = this.getQuery();
-      this.collectionView.scroll.scrollToOrigin();
-      this.collectionView.scroll.enable();
       this.collection.query(query);
     },
 
@@ -182,7 +196,7 @@ cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionet
       ZeroClipboard.setMoviePath( 'repo/zeroclipboard/ZeroClipboard.swf' );
       ZeroClipboard.Client.prototype.zIndex = 100000;
       var clip = new ZeroClipboard.Client();
-      clip.setText( this.shareUrl );
+      clip.setText(this.getShareUrl());
       // clip.glue( 'copy-button');
       // make your own div with your own css property and not use clip.glue()
       var flash_movie = '<div>'+clip.getHTML(width, height)+'</div>';

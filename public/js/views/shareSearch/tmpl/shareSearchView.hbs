@@ -10,26 +10,14 @@
   <div id="invites" class="trpSearchInvites"></div>
   </div>
 
-    {{#inviteToTroupe}}
-    {{#unless importedGoogleContacts}}
+
      <a href='/google/contacts?returnTo={{returnToUrl}}' style="text-decoration: none;">
       <div class="separate-unit" style="display: inline-block;">
         <div class="trpButton trpCopyButton" style="margin-left: 0px">
-          <img src='{{cdn "images/2/icon-gmail.png"}}' style="vertical-align: middle; margin-right: 4px" width="16"> <span style="vertical-align: middle">Invite Gmail contacts</span>
+          <img src='{{cdn "images/2/icon-gmail.png"}}' style="vertical-align: middle; margin-right: 4px" width="16"> <span style="vertical-align: middle">{{#if importedGoogleContacts}}Update{{else}}Invite{{/if}} Gmail contacts</span>
         </div>
       </div>
     </a>
-    {{/unless}}
-    {{/inviteToTroupe}}
-    {{#inviteToConnect}}
-      <a href='/google/contacts?returnTo={{returnToUrl}}' style="text-decoration: none">
-        <div class="separate-unit" style="display: inline-block;">
-          <div class="trpButton trpCopyButton" style="margin-left: 0px">
-            <img src='{{cdn "images/2/icon-gmail.png"}}' style="vertical-align: middle; margin-right: 4px" width="16"> <span style="vertical-align: middle">Add Gmail contacts</span>
-          </div>
-        </div>
-      </a>
-    {{/inviteToConnect}}
 
 </div>
 
@@ -45,7 +33,7 @@
 </div>
 
 <div class="trpModalInfo">
-  <div class="trpBodyMedium" style="display:inline-block;">Or share this: <span class="trpGreen" id="sharelink">{{basePath}}/{{uri}}</span></div>
+  <div class="trpBodyMedium" style="display:inline-block;">Or share this: <span class="trpGreen" id="sharelink">{{shareUrl}}</span></div>
   <div style="display: inline-block; float: right"><div class="trpButton trpCopyButton" id="copy-button"> copy</div></div>
 </div>
 
