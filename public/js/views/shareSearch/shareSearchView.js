@@ -2,7 +2,6 @@
 define([
   'jquery',
   'underscore',
-  'backbone',
   'marionette',
   'utils/context',
   'views/base',
@@ -15,52 +14,75 @@ define([
   'collections/suggested-contacts',
   'bootstrap-typeahead', // No reference
   'utils/validate-wrapper' // No reference
-], function($, _, Backbone, Marionette, context, TroupeViews, cocktail, InfiniteScrollMixin, template,
+], function($, _, Marionette, context, TroupeViews, cocktail, InfiniteScrollMixin, template,
   rowTemplate, ZeroClipboard, appEvents, suggestedContactModels) {
   "use strict";
 
   // appEvents.trigger('searchSearchView:select');
   // appEvents.trigger('searchSearchView:success');
 
-  var ContactModel = Backbone.Model.extend({
-    ajaxEndpoint: '',
-    displayName: '',
-    email: '',
-    invited: false,
-    validate: function(attr) {
-      if(!attr.email) {
-        return "no email set";
-      }
-      if(!attr.ajaxEndpoint) {
-        return "invalid ajaxEndpoint";
-      }
-    },
-    invite: function() {
-      if(this.isValid() && !this.get('invited')) {
-        $.post(this.get('ajaxEndpoint'), {
-          invites: [{email: this.get('email')}]
-        });
-        this.set('invited', true);
-      }
-    }
-  });
+  // var ContactModel = Backbone.Model.extend({
+  //   ajaxEndpoint: '',
+  //   displayName: '',
+  //   email: '',
+  //   invited: false,
+  //   validate: function(attr) {
+  //     if(!attr.email) {
+  //       return "no email set";
+  //     }
+  //     if(!attr.ajaxEndpoint) {
+  //       return "invalid ajaxEndpoint";
+  //     }
+  //   },
+  //   invite: function() {
+  //     if(this.isValid() && !this.get('invited')) {
+
+  //       this.set('invited', true);
+  //     }
+  //   }
+  // });
 
   var ContactView = TroupeViews.Base.extend({
     template: rowTemplate,
+    rerenderOnChange: true,
     events: {
-      'click button': 'invite'
+      'click .trpInviteButton': 'inviteClicked'
     },
-    initialize: function(){
-      this.listenTo(this.model, 'change', this.render);
+    getRenderData: function() {
+      var d = this.model.toJSON();
+      d.invited = d.status === 'invited';
+      return d;
     },
-    invite: function() {
-      //this.model.invite();
+    inviteClicked: function() {
+      this.model.set('status', 'inviting');
+
+      var invite;
+      if(this.model.get('userId')) {
+        invite = { userId: this.model.get('userId') };
+      } else {
+        var email = this.model.get('emails')[0];
+        invite = { email: email };
+      }
+
+      $.ajax({
+        url: this.options.endpoint,
+        contentType: "application/json",
+        dataType: "json",
+        context: this,
+        data: JSON.stringify(invite),
+        type: "POST",
+        success: function() {
+          this.model.set('status', 'invited');
+        }
+      });
+
     }
 
   });
 
   var CollectionView = Marionette.CollectionView.extend({
-    itemView: ContactView
+    itemView: ContactView,
+    itemViewOptions: {}
   });
 
   cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionetteView);
@@ -70,7 +92,6 @@ define([
 
     events: {
       'mouseover #copy-button' :      'createClipboard',
-      'click #custom-email-button':   'onCustomEmailClick',
       'change #custom-email':         'onSearchChange',
       'keyup #custom-email':       'onSearchChange'
     },
@@ -81,14 +102,6 @@ define([
       if(!options) options = {};
       this._options = options;
 
-      var ajaxEndpoint;
-      var inviteToConnect = options.inviteToConnect;
-
-      if(inviteToConnect) {
-        ajaxEndpoint = '/api/v1/inviteconnections';
-      } else {
-        ajaxEndpoint = '/troupes/' + context.getTroupeId() + '/invites';
-      }
       this.collection = new suggestedContactModels.Collection();
       this.collection.query(this.getQuery());
 
@@ -134,10 +147,21 @@ define([
       return data;
     },
 
+    getInviteEndpoint: function() {
+      if(this.isConnectMode()) {
+        return '/api/v1/inviteconnections';
+      } else {
+        return '/troupes/' + context.getTroupeId() + '/invites';
+      }
+    },
+
     afterRender: function() {
       this.collectionView = new CollectionView({
         el: this.$el.find("#invites"),
-        collection: this.collection
+        collection: this.collection,
+        itemViewOptions: {
+          endpoint: this.getInviteEndpoint()
+        }
       }).render();
     },
 
@@ -169,21 +193,6 @@ define([
     search: function() {
       var query = this.getQuery();
       this.collection.query(query);
-    },
-
-    onCustomEmailClick: function() {
-      var emailField = this.$el.find('#custom-email');
-      var email = emailField.val();
-      emailField.val('');
-
-      var model = new ContactModel({
-        email: email,
-        ajaxEndpoint: ajaxEndpoint
-      });
-      model.invite();
-
-      inviteCollection.unshift(model);
-      inviteListView.render();
     },
 
     closeDialog: function() {
