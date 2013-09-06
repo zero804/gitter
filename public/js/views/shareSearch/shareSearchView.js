@@ -45,22 +45,17 @@ var ContactModel = Backbone.Model.extend({
   }
 });
 
-var ContactView = Backbone.View.extend({
-    initialize: function(){
-      this.listenTo(this.model, 'change', this.render);
-    },
-    events: {
-      'click button': 'invite'
-    },
-    render: function() {
-      this.$el.html(rowTemplate({
-        user: this.model.attributes
-      }));
-      return this;
-    },
-    invite: function() {
-      this.model.invite();
-    }
+var ContactView = TroupeViews.Base.extend({
+  template: rowTemplate,
+  events: {
+    'click button': 'invite'
+  },
+  initialize: function(){
+    this.listenTo(this.model, 'change', this.render);
+  },
+  invite: function() {
+    //this.model.invite();
+  }
 
 });
 
@@ -134,7 +129,7 @@ cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionet
     },
 
     afterRender: function() {
-      new CollectionView({
+      this.collectionView = new CollectionView({
         el: this.$el.find("#invites"),
         collection: this.collection
       }).render();
@@ -149,9 +144,17 @@ cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionet
       }
     },
 
-    search: function() {
+    getQuery: function() {
       var emailField = this.$el.find('#custom-email');
-      this.collection.query(emailField.val());
+      var q = { q: emailField.val() };
+      return q;
+    },
+
+    search: function() {
+      var query = this.getQuery();
+      this.collectionView.scroll.scrollToOrigin();
+      this.collectionView.scroll.enable();
+      this.collection.query(query);
     },
 
     onCustomEmailClick: function() {

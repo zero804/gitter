@@ -9,7 +9,8 @@ define(['underscore', 'backbone'], function(_, Backbone) {
     this._prevScrollTop = 0;
     this._prevScrollTime = Date.now();
     this._scrollHandler = _.debounce(this.scroll.bind(this), 10);
-    target.addEventListener('scroll', this._scrollHandler, false);
+
+    this.enable();
   }
   _.extend(NeverEndingStory.prototype, Backbone.Events, {
     scroll: function() {
@@ -40,8 +41,29 @@ define(['underscore', 'backbone'], function(_, Backbone) {
       this.loading = false;
     },
 
+    scrollToOrigin: function() {
+      var target = this._target;
+      if(this._reverse) {
+        var scrollTop = target.scrollHeight - target.clientHeight;
+        target.scrollTop = scrollTop;
+      } else {
+        target.scrollTop = 0;
+      }
+    },
+
+    enable: function() {
+      if(!this._enabled) {
+        this._target.addEventListener('scroll', this._scrollHandler, false);
+        this._enabled = true;
+      }
+    },
+
     disable: function() {
-      this._target.removeEventListener('scroll', this._scrollHandler, false);
+      if(this._enabled) {
+        this._target.removeEventListener('scroll', this._scrollHandler, false);
+        this._enabled = false;
+      }
+
     }
   });
 
