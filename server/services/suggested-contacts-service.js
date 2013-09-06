@@ -176,6 +176,8 @@ function createRegExpsForQuery(queryText) {
 
 function searchifyResults(skip, limit) {
   return function(results) {
+  console.log(results);
+
     return {
       hasMoreResults: undefined,
       limit: limit,
@@ -252,12 +254,10 @@ function findSuggestedContacts(userId, options) {
 
       if(excludeTroupeId) {
         var troupeUserIds = results.shift();
-
         terms.push({ $or: [
-          { contactUserId: { $exists: false } },
-          { $not: { contactUserId: { $in: troupeUserIds } } }
+         { contactUserId: { $exists: false } },
+         { contactUserId: { $nin: troupeUserIds } }
         ]});
-
       }
 
       if(excludeConnected) {
@@ -265,7 +265,7 @@ function findSuggestedContacts(userId, options) {
 
         terms.push({ $or: [
           { contactUserId: { $exists: false } },
-          { $not: { contactUserId: { $in: connectedUserIds } } }
+          { contactUserId: { $nin: connectedUserIds } }
         ]});
       }
 
