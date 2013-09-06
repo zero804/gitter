@@ -21,27 +21,6 @@ define([
   // appEvents.trigger('searchSearchView:select');
   // appEvents.trigger('searchSearchView:success');
 
-  // var ContactModel = Backbone.Model.extend({
-  //   ajaxEndpoint: '',
-  //   displayName: '',
-  //   email: '',
-  //   invited: false,
-  //   validate: function(attr) {
-  //     if(!attr.email) {
-  //       return "no email set";
-  //     }
-  //     if(!attr.ajaxEndpoint) {
-  //       return "invalid ajaxEndpoint";
-  //     }
-  //   },
-  //   invite: function() {
-  //     if(this.isValid() && !this.get('invited')) {
-
-  //       this.set('invited', true);
-  //     }
-  //   }
-  // });
-
   var ContactView = TroupeViews.Base.extend({
     template: rowTemplate,
     rerenderOnChange: true,
@@ -51,6 +30,9 @@ define([
     getRenderData: function() {
       var d = this.model.toJSON();
       d.invited = d.status === 'invited';
+      d.member = d.status === 'member';
+      d.connected = d.status === 'connected';
+
       return d;
     },
     inviteClicked: function() {

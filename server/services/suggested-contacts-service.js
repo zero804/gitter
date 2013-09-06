@@ -190,11 +190,23 @@ function searchifyResults(skip, limit) {
 function addEmailAddress(queryText) {
   return function(results) {
     if(results.length === 0 && isValidEmailAddress(queryText)) {
-      results = [{
-        name: queryText,
-        emails: [queryText],
-        knownEmails: [queryText]
-      }];
+      return userService.findByEmail(queryText)
+        .then(function(user) {
+          if(user) {
+            return [{
+              name: user.displayName,
+              username: user.username,
+              emails: [queryText],
+              knownEmails: [queryText]
+            }];
+          }
+
+          return [{
+            name: queryText,
+            emails: [queryText],
+            knownEmails: [queryText]
+          }];
+        });
     }
 
     return results;
@@ -230,7 +242,6 @@ function findSuggestedContacts(userId, options) {
 
   if(queryText) {
     if(isValidEmailAddress(queryText)) {
-
       queryTextSearch = { $or: [ { knownEmails: new RegExp('^' + escapeRegExp(queryText) )}, { emails: queryText }] };
     } else {
       var res = createRegExpsForQuery(queryText);
@@ -238,7 +249,7 @@ function findSuggestedContacts(userId, options) {
     }
   }
 
-  if(!excludeTroupeId && !excludeConnected) {
+  if(queryText || !excludeTroupeId && !excludeConnected) {
     if(queryTextSearch) query.find(queryTextSearch);
 
     return query.execQ().then(addEmailAddress(queryText)).then(searchifyResults(skip, limit));
