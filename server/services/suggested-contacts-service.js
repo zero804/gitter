@@ -194,6 +194,7 @@ function addEmailAddress(queryText) {
         .then(function(user) {
           if(user) {
             return [{
+              contactUserId: user.id,
               name: user.displayName,
               username: user.username,
               emails: [queryText],

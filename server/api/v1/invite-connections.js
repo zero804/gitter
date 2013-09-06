@@ -2,25 +2,21 @@
 "use strict";
 
 var troupeService = require('../../services/troupe-service');
-var Q = require('q');
 
 module.exports = function(req, res, next) {
-  var invites = req.body.invites;
+  var invite = req.body;
 
-  var promises = invites.map(function(invite) {
-
-    // Null means we're requesting a one-to-one connection
-    return troupeService.createInvite(null, {
-        fromUser: req.user,
-        email: invite.email,
-        displayName: invite.displayName,
-        userId: invite.userId
-      });
-  });
-
-  Q.all(promises).then(function() {
-    res.send(invites);
-  }, next);
+  // Null means we're requesting a one-to-one connection
+  return troupeService.createInvite(null, {
+      fromUser: req.user,
+      email: invite.email,
+      displayName: invite.displayName,
+      userId: invite.userId
+    })
+    .then(function() {
+      res.send(invite);
+    })
+    .fail(next);
 
 
 };
