@@ -14,7 +14,7 @@ define([
     model: Model,
     url: '/api/v1/suggested-contacts'
   });
-  cocktail.mixin(Collection, TroupeCollections.SearchResultsCollection);
+  cocktail.mixin(Collection, TroupeCollections.SearchResultsCollection, TroupeCollections.LoadingMixin);
 
   return {
     Model: Model,
