@@ -4,11 +4,6 @@
   margin-bottom: 15px;
 }
 
-.cell {
-  display: table-cell;
-  width: 42px;
-}
-
 .trpSearchInviteResult {
   margin-right: 12px;
   vertical-align: middle;
@@ -33,10 +28,34 @@
   height: 34px;
 }
 
+// nasty hack to get an expandable centre column
 .trpInviteItem {
-  position: relative;
   display: table;
   table-layout: fixed;
+
+  .avatarContainer {
+    display: table-cell;
+    vertical-align: middle;
+    width: 42px;
+    .trpInviteAvatar {
+      display: block;
+    }
+  }
+
+  .trpInviteName {
+    display: table-cell;
+    vertical-align: middle;
+  }
+
+  .inviteButtonContainer {
+    display: table-cell;
+    vertical-align: middle;
+    width: 60px;
+  }
+}
+
+.trpInviteItem {
+  position: relative;
   box-sizing: border-box;
   width: 100%;
   padding: 8px 8px 8px 8px;
@@ -65,12 +84,9 @@
 .trpInviteName {
   .trpBodyMedium;
   box-sizing: border-box;
-  display: table-cell;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  vertical-align: top;
-  line-height: 34px;
 }
 
 .trpInviteEmails {
