@@ -29,7 +29,6 @@ define([
 
     initialize: function() {
       this.setRerenderOnChange();
-      this.collectionView = this.options.collectionView;
     },
 
     getRenderData: function() {
@@ -79,9 +78,6 @@ define([
   // collection view
   var CollectionView = Marionette.CollectionView.extend({
     itemView: ItemView,
-    itemViewOptions: function() {
-      return { collectionView: this };
-    },
     //loadingView: TroupeViews.Base.extend({ template: function() { return "Loading"; } }),
     initialize: function() {
         this.collection.on('add', function() {
