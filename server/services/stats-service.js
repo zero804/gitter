@@ -108,6 +108,7 @@ exports.userUpdate = function(user, properties) {
       email:      user.email,
       name:       user.displayName,
       username:   user.username,
+      confirmationCode: user.confirmationCode,
       status:     user.status
     };
 
