@@ -122,7 +122,8 @@ define([
 
     hidePanel: function (whichPanel) {
 
-      $("#toolbar-frame, #content-frame, #header-wrapper, #chat-input-wrapper").css({"right" : "0px"});
+      $("#toolbar-frame").css({"right" : "0px"});
+      $("#header-container, #chat-frame").css({"marginRight" : "-=260px"});
 
       $(whichPanel).css({
         "right": '-260px'
@@ -133,9 +134,10 @@ define([
 
     showPanel: function(whichPanel) {
       if (!this.rightpanel) {
+ // #content-frame, #header-wrapper, #chat-input-wrapper
 
-
-        $("#toolbar-frame, #content-frame, #header-wrapper, #chat-input-wrapper").css({"right" :"260px"});
+        $("#toolbar-frame").css({"right" :"260px"});
+        $("#header-container, #chat-frame").css({"marginRight" : "+=260px"});
 
         $(whichPanel).css({
           "right": '0px'
@@ -203,6 +205,12 @@ define([
       }, 350);
 
       $("#chat-frame, #header-container, #chat-input").removeAttr('style');
+
+      // PROBLEM NEED TO DEAL WITH SITUATION WHERE RIGHT MENU IS OPEN
+
+      // if (this.rightpanel) {
+      //   $("#header-container, #chat-frame").css({"marginRight" : "+=260px"});
+      // }
 
       $("#left-menu").css({
         "width": "0px"

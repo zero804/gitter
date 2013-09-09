@@ -123,6 +123,7 @@ a:hover {
 	left: 84px;
 	top: 0px;
 	background-color: @trpGreen;
+  /*background: linear-gradient(to bottom, #1dce73 0%,#18a55f 100%); */
 	height: 100%;
 	color: white;
 	z-index: 1012;
@@ -139,6 +140,8 @@ a:hover {
 .trpMiniLeftMenu {
 	padding-top: 20px;
 	background-color: @trpDarkBlue;
+background: linear-gradient(to bottom, #2c3e51 0%,#17202a 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', endColorstr='#2c3e51',GradientType=0 ); /* IE6-9 */
 	width: 84px;
 	position: fixed;
 	left: 0;
@@ -355,7 +358,7 @@ a:hover {
 	height: 60px;
 	text-align: center;
 	position: fixed;
-	z-index: 1000;
+	z-index: 200;
 	overflow: hidden;
   transform: translate3d(0, 0, 0);
   transition:all .3s ease-in-out; 
@@ -369,8 +372,8 @@ a:hover {
 .trpHeaderContainer {
   display: block;
   text-align: center;
-  margin-left: 160px;
-  margin-right: 300px;
+  margin-left: 130px;
+  margin-right: 280px;
   transform: translate3d(0, 0, 0);
   transition:all .3s ease-in-out; 
   -o-transition:all .3s ease-in-out; 
@@ -457,6 +460,7 @@ a:hover {
 	padding-top: 12px;
 /*	border-top: 2px solid @trpGreen;*/
 	margin: 0;
+  padding-right: 10px;
 }
 
 .trpProfileButton {
@@ -529,8 +533,8 @@ a:hover {
 
 .trpChatPanel {
   display: block;
-	margin-left: 150px;
-	margin-right: 300px;
+	margin-left: 130px;
+	margin-right: 280px;
 /*	min-height: 600px;
 	height: 100%;*/
 	text-align: left;
@@ -551,12 +555,12 @@ a:hover {
   width: 200px;
   padding-right: 40px;
   text-align: left;
-  padding-top: 60px;
+  padding-top: 16px;
   vertical-align: top;
   right: 0;
   top: 0;
   bottom: 0;
-  background-color: @trpBgBlue;
+  background-color: @trpBgColor;
   /*background-color: @trpBgColor;*/
   opacity: 0.95;
   z-index: 200;
@@ -681,8 +685,8 @@ a:hover {
 .trpChatInputArea {
   display: block;
   text-align: center;
-  margin-left: 160px;
-  margin-right: 300px;
+  margin-left: 130px;
+  margin-right: 280px;
   transform: translate3d(0, 0, 0);
   transition:all .3s ease-in-out; 
   -o-transition:all .3s ease-in-out; 
@@ -884,12 +888,12 @@ a:hover {
 	}
 
   .trpHeaderContainer {
-    margin-left: 110px;
+    margin-left: 120px;
     margin-right: 120px;
   }
 
   .trpChatInputArea {
-    margin-left: 110px;
+    margin-left: 120px;
     margin-right: 120px;
   }
 
@@ -915,7 +919,7 @@ a:hover {
     margin-left: 0px; 
   }
 
-  #mail-list, #people-share-troupe-button, #file-header, #mail-header {
+  #mail-list, #file-header, #mail-header {
 		display: none;
 	}
 
@@ -1003,6 +1007,7 @@ a:hover {
 
   .trpHeaderTitle {
     padding-left: 0px;
+    font-size: 20px;
   }
 
   .trpChatDetails {
