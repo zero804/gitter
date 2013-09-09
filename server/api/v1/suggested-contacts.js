@@ -4,6 +4,7 @@
 var suggestedContactsService  = require('../../services/suggested-contacts-service');
 var restSerializer            = require("../../serializers/rest-serializer");
 
+
 module.exports = function(req, res, next) {
   var skip = req.query.skip;
   var limit = req.query.limit;

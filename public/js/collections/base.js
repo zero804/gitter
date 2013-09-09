@@ -94,6 +94,7 @@ define([
 
   });
 
+
   // LiveCollection: a collection with realtime capabilities
   exports.LiveCollection = Backbone.Collection.extend({
     nestedUrl: '',
@@ -143,6 +144,8 @@ define([
       if(this._initialLoadCalled) return;
       this._initialLoadCalled = true;
       triggerFirstLoad();
+
+      this.trigger('loaded');
 
       $('#' + this.modelName + '-amuse').hide('fast', function() {
         $(this).remove();
@@ -264,6 +267,17 @@ define([
       }
     }
   });
+
+  exports.LoadingMixin = {
+    initialize: function() {
+      this.loading = true;
+      this.listenToOnce(this, 'add reset sync', this.loadComplete);
+    },
+    loadComplete: function() {
+      delete this.loading;
+      this.trigger('loaded');
+    }
+  };
 
   exports.SearchResultsCollection = {
     parse: function(searchResponse) {

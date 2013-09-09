@@ -9,13 +9,14 @@ define([
   'views/infinite-scroll-mixin',
   'hbs!./tmpl/shareSearchView',
   'hbs!./tmpl/shareRow',
+  'hbs!./tmpl/noContacts',
   'zeroclipboard',
   'utils/appevents',
   'collections/suggested-contacts',
   'bootstrap-typeahead', // No reference
   'utils/validate-wrapper' // No reference
 ], function($, _, Marionette, context, TroupeViews, cocktail, InfiniteScrollMixin, template,
-  rowTemplate, ZeroClipboard, appEvents, suggestedContactModels) {
+  rowTemplate, noContactsTemplate, ZeroClipboard, appEvents, suggestedContactModels) {
   "use strict";
 
   // appEvents.trigger('searchSearchView:select');
@@ -64,10 +65,21 @@ define([
 
   var CollectionView = Marionette.CollectionView.extend({
     itemView: ContactView,
-    itemViewOptions: {}
+    initialize: function() {
+      var self = this;
+      this.emptyView = TroupeViews.Base.extend({
+        template: noContactsTemplate,
+        getRenderData: function() {
+          var query= self.collection._currentQuery;
+          return { query: query && query.q };
+        }
+      });
+    }
+
   });
 
-  cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionetteView);
+
+  cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionetteView, TroupeViews.LoadingCollectionMixin);
 
   var View = TroupeViews.Base.extend({
     template: template,

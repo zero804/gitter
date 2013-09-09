@@ -797,14 +797,25 @@ define([
   // Mixin for Marionette.CollectionView classes
   TroupeViews.LoadingCollectionMixin = {
     loadingView: TroupeViews.LoadingView,
-    showEmptyView: function() {
+    loadingModel: new Backbone.Model(),
+    initialize: function() {
+      this.showEmptyView = this.showLoadingView;
+    },
+    showLoadingView: function() {
       if(this.collection.loading) {
         var LoadingView = Marionette.getOption(this, "loadingView");
 
-        if (LoadingView && !this._showingEmptyView){
-          this._showingEmptyView = true;
-          var model = new Backbone.Model();
-          this.addItemView(model, LoadingView, 0);
+        var v = this.children.findByModel(this.loadingModel);
+
+        if (LoadingView && !v) {
+          this.addItemView(this.loadingModel, LoadingView, 0);
+          this.listenToOnce(this.collection, 'loaded', function() {
+            this.removeItemView(this.loadingModel);
+
+            if(this.collection.length === 0) {
+              Marionette.CollectionView.prototype.showEmptyView.call(this);
+            }
+          });
         }
         return;
       }
