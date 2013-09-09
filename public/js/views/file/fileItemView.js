@@ -1,15 +1,11 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'jquery',
-  'underscore',
-  'backbone',
-  'marionette',
   'views/base',
   'hbs!./tmpl/fileItemView',
   'views/unread-item-view-mixin',
-  'bootstrap_tooltip'
-], function($, _, Backbone, Marionette, TroupeViews, template, UnreadItemViewMixin /*, Bootstrap*/) {
-  /*jslint browser: true*/
+  'cocktail',
+  'bootstrap_tooltip'             // No Ref
+], function(TroupeViews, template, UnreadItemViewMixin, cocktail) {
   "use strict";
 
   var View = TroupeViews.Base.extend({
@@ -51,7 +47,7 @@ define([
     }
 
   });
-  _.extend(View.prototype, UnreadItemViewMixin);
+  cocktail.mixin(View, UnreadItemViewMixin);
 
   return View;
 });

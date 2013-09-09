@@ -7,25 +7,24 @@
 
   <title>Troupe</title>
 
-  <link rel="stylesheet" href='/bootstrap/css/trpMobileChat.css'>
+  <link rel="stylesheet" href='{{ cdn "bootstrap/css/trpNativeChat.css" appcache=appCache }}'>
 
-  {{{ generateTroupeContext troupeContext accessToken=accessToken page='chat' }}}
+  {{{ generateTroupeContext troupeContext accessToken=accessToken page='chat' appcache=appCache }}}
 
-  <link rel="shortcut icon" href='{{ cdn "images/2/favicon8.ico"}}'>
+  <link rel="shortcut icon" href='{{ cdn "images/2/favicon8.ico" appcache=appCache }}'>
 
 </head>
 <body>
 
   <div class="trpMobileAmuse fade-in" id="chat-amuse">
     <div class="trpMobileAmuseIcon">
-      <img src='{{cdn "images/2/troupe-ajax-guy-green.gif" }}'><br><br>Loading
+      <img src='{{cdn "images/2/troupe-ajax-guy-green.gif" appcache=true }}'><br><br>Loading
     </div>
   </div>
 
 
-  <div id="pageContainer" class="platform">
-    <div id="mainPage">
-
+  <div id="mainPage">
+    <div id="content">
       <div class="contentBody mobile-scroll-class" id="content-frame">
         <div class="frame-chat">
           <div class="trpChatPanel" id="chat-frame">
@@ -33,14 +32,13 @@
           </div>
         </div>
       </div>
-
-      <div class="trpChatInputArea" id="chat-input"></div>
-
     </div>
+
+    <div class="trpChatInputArea" id="chat-input"></div>
   </div>
 
   {{>require_wrapper}}
-  {{{bootScript "routers/mobile/native/chat-router" }}}
+  {{{bootScript "routers/mobile/native/chat-router" appcache=appCache }}}
 
 </body>
 </html>

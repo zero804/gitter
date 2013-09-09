@@ -23,6 +23,7 @@ var troupeEnv = {
   googleTrackingId: nconf.get("web:trackingId"),
   cdns: cdns,
   appVersion: appTag,
+  logging: nconf.get("web:consoleLogging"),
   websockets: {
     fayeUrl: nconf.get('ws:fayeUrl') || "/faye",
     options: {
@@ -41,21 +42,22 @@ exports.bootScript = function(url, parameters) {
   var options = parameters.hash;
 
   var requireScript;
-  var cdn      = (options.skipCdn) ? function(a) { return '/' + a; } : exports.cdn;
+  var cdnFunc  = (options.skipCdn) ? function(a) { return '/' + a; } : cdn;
   var skipCore = options.skipCore;
   var minified = 'minified' in options ? options.minified : minifiedDefault;
   var async    = 'async' in options ? options.async : true;
+  var cdnOptions = { appcache: options.appcache };
 
-  var baseUrl = cdn("js/");
+  var baseUrl = cdnFunc("js/", cdnOptions);
   var asyncScript = async ? "defer='defer' async='true' " : '';
 
   if(minified) {
     if(skipCore) {
-      requireScript = cdn("js/" + url + ".min.js");
+      requireScript = cdnFunc("js/" + url + ".min.js", cdnOptions);
     } else {
       url = url + ".min";
       // note: when the skipCdn flag was introduced it affected this even though this isn't the file that was requested in this invocation
-      requireScript = cdn("js/core-libraries.min.js");
+      requireScript = cdnFunc("js/core-libraries.min.js", cdnOptions);
     }
 
     return "<script type='text/javascript'>\nwindow.require_config.baseUrl = '" + baseUrl + "';</script>\n" +
@@ -63,7 +65,7 @@ exports.bootScript = function(url, parameters) {
 
   }
 
-  requireScript = cdn("repo/requirejs/requirejs.js");
+  requireScript = cdnFunc("repo/requirejs/requirejs.js", cdnOptions);
 
   return "<script type='text/javascript'>window.require_config.baseUrl = '" + baseUrl + "';</script>\n" +
          "<script " + asyncScript + "data-main='" + url + ".js' src='" + requireScript + "' type='text/javascript'></script>";
@@ -88,6 +90,10 @@ exports.generateTroupeContext = function(troupeContext, parameters) {
   var options = parameters.hash;
 
   var env = options ? _.extend({}, troupeEnv, options) : troupeEnv;
+
+  if(options && options.appcache) {
+    env.cdns = [];
+  }
 
   return '<script type="text/javascript">' +
           'window.troupeEnv = ' + JSON.stringify(env) + ';' +

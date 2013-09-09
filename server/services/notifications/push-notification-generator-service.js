@@ -5,7 +5,6 @@ var winston = require("winston");
 var pushNotificationService = require("../push-notification-service");
 var nconf = require('../../utils/config');
 var notificationWindowPeriods = [nconf.get("notifications:notificationDelay") * 1000, nconf.get("notifications:notificationDelay2") * 1000];
-
 var workerQueue = require('../../utils/worker-queue');
 var queue = workerQueue.queue('generate-push-notifications', {}, function() {
   var pushNotificationGateway = require("../../gateways/push-notification-gateway");
@@ -13,30 +12,7 @@ var queue = workerQueue.queue('generate-push-notifications', {}, function() {
   var notificationMessageGenerator = require('../../utils/notification-message-generator');
   var unreadItemService = require('./../unread-item-service');
   var Fiber = require('../../utils/fiber');
-
-  function getTroupeUrl(serilizedTroupe, senderUserId) {
-    /* The URL for non-oneToOne troupes is the trivial case */
-    if(!serilizedTroupe.oneToOne) {
-      return "/" + serilizedTroupe.uri;
-    }
-
-    if(!senderUserId) return null;
-    var userIds = serilizedTroupe.userIds;
-    var otherUserIds = userIds.filter(function(userId) { return userId != senderUserId; });
-    if(otherUserIds.length > 1) {
-      winston.warn("Something has gone wrong. There should be a single user left in the one-to-one troupe!", {
-        troupeId: serilizedTroupe.id,
-        senderUserId: senderUserId,
-        otherUserIds: otherUserIds
-      });
-    }
-
-    var otherUserId = otherUserIds[0];
-
-    if(otherUserId) return "/one-one/" + otherUserId;
-
-    return null;
-  }
+  var basePath = nconf.get('web:basepath');
 
   function serializeItems(troupeId, recipientUserId, items, callback) {
     winston.verbose('serializeItems:', items);
@@ -88,12 +64,16 @@ var queue = workerQueue.queue('generate-push-notifications', {}, function() {
 
         var f = new Fiber();
 
-        var text = notificationMessageGenerator.generateNotificationMessage(troupe, items);
+        var notificationLink = '/mobile/chat#' + troupe.id;
+        var smsLink = basePath + troupe.url;
+
+        var message = notificationMessageGenerator.generateNotificationMessage(troupe, items, smsLink);
 
         pushNotificationGateway.sendUserNotification(userId, {
-            message: text,
+            message: message.notificationText,
+            smsText: message.smsText,
             sound: notificationNumber == 1 ? 'notify.caf' : 'notify-2.caf',
-            link: getTroupeUrl(troupe, userId) + '/chat'
+            link: notificationLink
           }, f.waitor());
 
         f.thenCallback(callback);

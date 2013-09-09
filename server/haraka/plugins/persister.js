@@ -23,7 +23,7 @@ var mimelib = require('mimelib');
 harakaRequire('./utils/event-listeners').installLocalEventListeners();
 
 
-function saveFile(troupeId, creatorUserId, fileName, mimeType, content, callback) {
+function saveFile(troupe, creatorUser, fileName, mimeType, content, callback) {
   temp.open('attachment', function(err, tempFileInfo) {
     var tempFileName = tempFileInfo.path;
 
@@ -31,13 +31,13 @@ function saveFile(troupeId, creatorUserId, fileName, mimeType, content, callback
 
     ws.on("close", function() {
       statsService.event('new_mail_attachment', {
-        troupeId: troupeId,
-        creatorUserId: creatorUserId
+        troupeId: troupe.id,
+        creatorUserId: creatorUser.id
       });
 
       fileService.storeFile({
-        troupeId: troupeId,
-        creatorUserId: creatorUserId,
+        troupe: troupe,
+        user: creatorUser,
         fileName: fileName,
         mimeType: mimeType,
         file: tempFileName
@@ -104,7 +104,10 @@ exports.hook_queue = function(next, connection) {
       }).fail(function(err) {
         // if any of the mails failed to save, return their error directly to haraka
         winston.error("One of the saves failed: ", { exception: err });
-        return next(DENY);
+
+        // We will die quietly to prevent resends of the message
+        // If we DENY the sending server will attempt a resend
+        return next(OK /* DENY */);
       });
 
   }
@@ -162,7 +165,7 @@ function saveMailForTroupe(mail, toAddress, connection, callback) {
 
           var attachment = mail_object.attachments[i];
 
-          saveFile(troupe.id, user.id, attachment.generatedFileName,attachment.contentType,attachment.content, deferred.makeNodeResolver());
+          saveFile(troupe, user, attachment.generatedFileName,attachment.contentType,attachment.content, deferred.makeNodeResolver());
 
           var promise = deferred.promise;
           promise = promise.then(associateFileVersionWithAttachment(attachment));

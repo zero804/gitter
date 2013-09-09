@@ -6,11 +6,10 @@ define([
   'utils/appevents',
   'hbs!./tmpl/chatInputView',
   'utils/momentWrapper',
+  'utils/safe-html',
   'jquery-placeholder' // No ref
-], function($, context, TroupeViews, appEvents, template, moment) {
+], function($, context, TroupeViews, appEvents, template, moment, safeHtml) {
   "use strict";
-
-  var PAGE_SIZE = 50;
 
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
@@ -46,7 +45,6 @@ define([
   var originalChatPadding = chatPadding;
 
   var ChatInputBoxView = TroupeViews.Base.extend({
-    chatMessageLimit: PAGE_SIZE,
 
     events: {
       "keyup": "detectNewLine",
@@ -73,7 +71,7 @@ define([
       this.chatLines = 2;
       chatPadding = originalChatPadding;
       this.$el.height(this.originalChatInputHeight);
-      //$('#content-frame').css('bottom', chatPadding);
+      $('#frame-chat').css('padding-bottom', chatPadding);
 
     },
 
@@ -87,14 +85,13 @@ define([
         var newHeight = currentLines * lht;
 
         this.$el.height(newHeight);
-        //var frameChat = $('#frame-chat'), isChild = frameChat.find(this.el).length;
-        //if (!isChild) {
+        var frameChat = $('#frame-chat'), isChild = frameChat.find(this.el).length;
+        if (!isChild) {
           chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
-          //$('#content-frame').css('bottom', chatPadding);
-        //}
-        //if (wasAtBottom) {
-        //  this.scrollDelegate.scrollToBottom();
-        //}
+          frameChat.css('padding-bottom', chatPadding);
+        }
+
+        chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
       }
     },
 
@@ -105,7 +102,7 @@ define([
     },
 
     detectReturn: function(e) {
-      if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey)) {
+      if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/))) {
         if (window._troupeCompactView !== true) this.resetInput();
         e.stopPropagation();
         e.preventDefault();
@@ -118,8 +115,7 @@ define([
     },
 
     send: function() {
-      this.trigger('save', this.$el.val());
-
+      this.trigger('save', safeHtml(this.$el.val()));
 
       this.$el.val('');
     }

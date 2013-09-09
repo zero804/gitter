@@ -12,6 +12,7 @@ require([
   'collections/files',
   'views/file/mobileFilePreview',
   'components/unread-items-client',
+  'components/oauth',                 // No Ref
   'components/eyeballs',              // No ref
   'template/helpers/all',             // No ref
   'components/native-context'         // No ref
@@ -36,13 +37,7 @@ require([
     document.title = troupe.get('name');
   });
 
-  var MobileLayout = Marionette.Layout.extend({
-    el: 'body',
-    regions: {
-      primary: "#primary-view",
-    }
-  });
-  var layoutManager = new MobileLayout();
+  unreadItemsClient.monitorViewForUnreadItems($('.mobile-scroll'));
 
   var AppRouter = MobileRouter.extend({
     routes: {
@@ -58,16 +53,16 @@ require([
     },
 
     defaultAction: function(/*actions*/){
-      layoutManager.primary.show(new FileView({ collection: this.fileCollection }));
+      this.show('primary', new FileView({ collection: this.fileCollection }));
     },
 
     showFile: function(id) {
       var model = this.fileCollection.get(id);
-      layoutManager.primary.show(new FileDetailView({ model: model }));
+      this.show('primary', new FileDetailView({ model: model }));
     },
 
     previewFile: function(id) {
-      layoutManager.primary.show(new MobileFilePreview({ model: this.fileCollection.get(id) }));
+      this.show('primary', new MobileFilePreview({ model: this.fileCollection.get(id) }));
     }
 
   });

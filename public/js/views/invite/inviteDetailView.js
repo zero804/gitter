@@ -1,16 +1,13 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'jquery',
-  'underscore',
-  'backbone',
   'views/base',
-  'utils/context',
   'views/shareSearch/shareSearchView',
   'hbs!./tmpl/inviteDetailView',
   'hbs!./tmpl/deleteConfirmation',
   'views/unread-item-view-mixin',
-  'log!request-detail-view'
-], function($, _, Backbone, TroupeViews, context, shareSearchView, template, deleteConfirmationTemplate, UnreadItemViewMixin, log){
+  'log!request-detail-view',
+  'cocktail'
+], function(TroupeViews, shareSearchView, template, deleteConfirmationTemplate, UnreadItemViewMixin, log, cocktail){
   "use strict";
 
   var View = TroupeViews.Base.extend({
@@ -22,7 +19,7 @@ define([
       "click #invite-resend-button": "onResendClicked"
     },
 
-    initialize: function(options) {
+    initialize: function() {
       this.setRerenderOnChange();
     },
 
@@ -90,10 +87,10 @@ define([
 
     onDelete: function() {
       this.model.destroy({
-        success: function(data) {
+        success: function() {
           window.location.href = "#!";
         },
-        error: function(model, resp, options) {
+        error: function() {
           log("Error rejecting request.");
         }
       });
@@ -106,7 +103,7 @@ define([
       });
     }*/
   });
+  cocktail.mixin(View, UnreadItemViewMixin);
 
-  _.extend(View.prototype, UnreadItemViewMixin);
   return View;
 });

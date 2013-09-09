@@ -4,23 +4,18 @@ require([
   'views/base',
   'utils/context',
   'hbs!views/login/tmpl/loginRequestModalView',
-  'views/shareSearch/shareSearchView',
   'views/app/appIntegratedView',
   'views/userhome/userHomeView',
-  'collections/instances/troupes',
-  'views/profile/profileView',
-  'views/signup/createTroupeView',
   'views/app/headerView',
   'views/toolbar/troupeMenu',
-  'views/invite/reinviteModal',
-  'utils/router',
+  'routers/userhome-router',
   'hbs!views/connect/tmpl/connectUserTemplate',
   'components/errorReporter',
   'components/dozy',
   'components/webNotifications',
+  'components/desktopNotifications',
   'template/helpers/all'
-], function(Backbone, TroupeViews, context, loginRequestTemplate, shareSearchView, AppIntegratedView, UserHomeView, troupeCollections,
-  profileView, createTroupeView, HeaderView, TroupeMenuView, InviteModal, Router, connectUserTemplate /*, errorReporter , dozy, webNotifications,_Helpers,  _backboneKeys*/) {
+], function(Backbone, TroupeViews, context, loginRequestTemplate,  AppIntegratedView, UserHomeView, HeaderView, TroupeMenuView, UserhomeRouter, connectUserTemplate /*, errorReporter , dozy, webNotifications,_Helpers*/) {
 
   "use strict";
 
@@ -32,18 +27,6 @@ require([
 
   // Asynchronously load tracker
   require(['utils/tracking'], function() { });
-
-  // TODO: remove this and use the confirm stuffs
-  if(context().profileNotCompleted) {
-    var view = new profileView.Modal({ disableClose: true  });
-
-    view.once('close', function() {
-       window.location.reload(true);
-    });
-    view.show();
-
-    return;
-  }
 
   // TODO: stop using localstorage for this, move to context events
   try {
@@ -108,17 +91,19 @@ require([
   }
   catch (e) {}
 
-  new Router({
-      routes: [
-        { name: "profile",        re: /^profile$/,                viewType: profileView.Modal },
-        { name: "create",         re: /^create$/,                 viewType: createTroupeView.Modal, collection: troupeCollections.troupes,   skipModelLoad: true },
-        { name: "share",          re: /^share$/,                  viewType: shareSearchView.Modal },
-        { name: "reinvite",       re: /^reinvite\/(\w+)$/,        viewType: InviteModal,                  collection: troupeCollections.outgoingConnectionInvites, viewOptions: { overrideContext: true, inviteToConnect: true } },
-        { name: "connect",          re: /^connect$/,              viewType: shareSearchView.Modal, viewOptions: { overrideContext: true, inviteToConnect: true } }
-      ],
-      appView: appView
-    });
+  new UserhomeRouter({
+    regions: [appView.rightPanelRegion, appView.dialogRegion]
+  });
 
   Backbone.history.start();
+
+  if(!window.localStorage.troupeTourHome) {
+    window.localStorage.troupeTourHome = 1;
+    require([
+      'tours/tour-controller'
+    ], function(tourController) {
+      tourController.init({ appIntegratedView: appView });
+    });
+  }
 
 });

@@ -4,6 +4,7 @@ define([
   'jquery',
   'underscore',
   'backbone',
+  'utils/appevents',
   'marionette',
   'hbs!./tmpl/modal',
   'hbs!./tmpl/popover',
@@ -11,7 +12,7 @@ define([
   'hbs!./tmpl/confirmationView',
   'log!base-views',
   '../template/helpers/all' // No ref
-], function(require, $, _, Backbone, Marionette, modalTemplate, popoverTemplate, loadingTemplate, confirmationViewTemplate, log) {
+], function(require, $, _, Backbone, appEvents, Marionette, modalTemplate, popoverTemplate, loadingTemplate, confirmationViewTemplate, log) {
   "use strict";
 
   /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
@@ -188,7 +189,18 @@ define([
       this.trigger('close');
       this.off();
       this.el._view = null;
+    },
+
+    disableForm: function($form) {
+      $form = $form || this.$el.find('form');
+      $form.find('button, input[type=submit]').attr('disabled', true);
+    },
+
+    enableForm: function($form) {
+      $form = $form || this.$el.find('form');
+      $form.find('button, input[type=submit]').removeAttr('disabled');
     }
+
   });
 
   TroupeViews.Modal =   TroupeViews.Base.extend({
@@ -538,6 +550,7 @@ define([
 
       $e.insertAfter(this.targetElement);
       var pos = this.getPosition();
+      $e.insertAfter($('body'));
 
       var actualWidth = e.offsetWidth;
       var actualHeight = e.offsetHeight;
@@ -687,7 +700,7 @@ define([
   /* This is a mixin for Marionette.CollectionView */
   TroupeViews.SortableMarionetteView = {
 
-    initializeSorting: function() {
+    initialize: function() {
       this.isRendering = false;
       this.on('before:render', this.onBeforeRenderSort, this);
       this.on('render', this.onRenderSort, this);
@@ -800,7 +813,23 @@ define([
     }
   };
 
+  TroupeViews.DelayedShowLayoutMixin = {
 
+    show: function(regionName, view) {
+      var c = view.collection, self = this;
+      if (c.hasLoaded && !c.hasLoaded()) {
+        // delay showing the view until the collection is loaded.
+        c.once('sync reset', function() {
+          self[regionName].show(view);
+        });
+
+        return;
+      }
+
+      self[regionName].show(view);
+    }
+
+  };
 
   TroupeViews.ConfirmationView = TroupeViews.Base.extend({
     template: confirmationViewTemplate,
@@ -871,6 +900,14 @@ define([
     }
 
    });
+
+  appEvents.once('firstCollectionLoaded', function hideLoadingAmusement() {
+    var h = $('html'), b = $('.trpContentPanel');
+    b.fadeOut({ complete: function() {
+      h.removeClass('loading');
+    }});
+    b.fadeIn({ duration: 'fast' });
+  });
 
   return TroupeViews;
 });

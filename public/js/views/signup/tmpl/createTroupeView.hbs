@@ -1,7 +1,7 @@
 <div class="trpModalTitle">Create a Troupe</div>
 <div class="trpCreateForm">
 	<form id="signup-form">
-		<input placeholder="Choose a name for your Troupe" class="trpInput required" minlength="4" name="troupeName" id="troupeName" autofocus><br>
+		<input placeholder="Choose a name for your Troupe" class="trpInput required" minlength="4" name="troupeName" id="troupeName" autofocus style="width: 85%"><br>
     {{#if userId}}
       <input type="hidden" name="userId" value="{{userId}}">
     {{/if}}
@@ -12,7 +12,7 @@
     </div>
     {{/if}}
 
-		<input type="submit" name="submit" value="Create" class="trpModalButton trpButtonBig trpBtnGreen" />
+		<button type="submit" name="submit" class="trpModalButton trpButtonBig trpBtnGreen" style="margin-top: 20px">Create</button>
 	</form>
 </div>
 <div class="trpModalFailure signup-failure" style="display:none">

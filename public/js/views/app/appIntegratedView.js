@@ -1,14 +1,22 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
+  'underscore',
+  'views/base',
   'utils/context',
   'log!appIntegratedView',
+  'utils/appevents',
   'marionette',
   'views/signup/usernameView',
+  'views/profile/profileView',
   'views/app/uiVars',
+  'components/webNotifications',
+  'components/modal-region',
+  'cocktail',
   'bootstrap_tooltip',  // no ref
   "nanoscroller"        // no ref
-  ], function($, context, log, Marionette, UsernameView, uiVars) {
+  ], function($, _, TroupeViews, context, log, appEvents, Marionette, UsernameView, ProfileView, uiVars,
+    notifications, modalRegion, cocktail) {
   "use strict";
 
   var touchEvents = {
@@ -35,7 +43,7 @@ define([
 
   $('.trpDisplayPicture').tooltip('destroy');
 
-  return Marionette.Layout.extend({
+  var AppIntegratedLayout = Marionette.Layout.extend({
     el: 'body',
     leftmenu: false,
     rightpanel: false,
@@ -60,25 +68,8 @@ define([
 
       //$(".nano").nanoScroller({ preventPageScrolling: true });
 
-      /* This is a special region which acts like a region, but is implemented completely differently */
-      this.dialogRegion = {
-        currentView: null,
-        show: function(view) {
-          if(this.currentView) {
-            this.currentView.fade = false;
-            this.currentView.hideInternal();
-          }
-          this.currentView = view;
-          view.navigable = true;
-          view.show();
-        },
-        close: function() {
-          if(this.currentView) {
-            this.currentView.navigationalHide();
-            this.currentView = null;
-          }
-        }
-      };
+      this.dialogRegion = modalRegion;
+      this._leftMenuLockCount = 0;
 
       this.rightPanelRegion.on('show', function() {
         //log("SHOW PANEL");
@@ -94,12 +85,37 @@ define([
         }, 100);
       });
 
-      this.ensureProfileIsUsernamed();
+      var profileCompleteTimeout = 60 * 1000;
+      setTimeout(function() {
+        self.ensureSignupIsComplete();
+      }, profileCompleteTimeout);
+    },
+
+    ensureSignupIsComplete: function() {
+      var self = this, noteId = 'completeSignup';
+      if (!context.isProfileComplete() || !context().user.username) {
+        notifications.notify({
+          id: noteId,
+          content: "<a href='#'>Click here to complete the signup process</a>",
+          timeout: Infinity,
+          click: function() {
+            notifications.notify({ id: noteId, action: 'hide' });
+            self.ensureProfileIsComplete();
+            self.ensureProfileIsUsernamed();
+          }
+        });
+      }
+    },
+
+    ensureProfileIsComplete: function() {
+      if (!context.isProfileComplete()) {
+        new ProfileView.Modal().show();
+      }
     },
 
     ensureProfileIsUsernamed: function() {
       var user = context.getUser();
-      if (user.username === null /* not undefined, in which case the user has not yet loaded */) {
+      if (user && !user.username /* if the context has not yet loaded, what do we do? */) {
         new UsernameView.Modal().show();
       }
     },
@@ -131,15 +147,33 @@ define([
     },
 
     showMenu: function() {
-      log("*********** Showing left menu");
-      if (this.leftmenu) return;
+      if (this._menuAnimating) return;
+      this.openLeftMenu();
+    },
 
+    hideMenu: function() {
+      if(this._menuAnimating || this._leftMenuLockCount > 0) return;
+      this.closeLeftMenu();
+    },
+
+    openLeftMenu: function() {
+      if (this.leftmenu) return;
 
       if (!window._troupeIsTablet) $("#chat-input-textarea").blur();
 
       if (this.selectedListIcon == "icon-search") {
         this.activateSearchList();
       }
+
+      var self = this;
+      this._menuAnimating = true;
+
+      appEvents.trigger('leftMenu:animationStarting');
+      setTimeout(function() {
+        self._menuAnimating = false;
+        appEvents.trigger('leftMenu:showing');
+        appEvents.trigger('leftMenu:animationComplete');
+      }, 350);
 
       $("#left-menu").css({
         "width": "280px"
@@ -148,26 +182,34 @@ define([
       // $("#content-frame, #header-wrapper, #chat-input-wrapper").css({"left" : "280px"});
 
       $("#chat-frame, #header-container, #chat-input").css({"marginLeft" : "+=280px"});
-
       this.leftmenu = true;
     },
 
-    hideMenu: function() {
-      if (!this.leftmenu) return;
+    closeLeftMenu: function() {
+      if(!this.leftmenu) return;
+      this._leftMenuLockCount = 0;
 
       // refocus chat input in case it's lost focus but don't do that on tablets
       if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
 
-      // $("#content-frame, #header-wrapper, #chat-input-wrapper").css({"left" : "0px"});
+      var self = this;
+      this._menuAnimating = true;
+
+      appEvents.trigger('leftMenu:animationStarting');
+      setTimeout(function() {
+        self._menuAnimating = false;
+        appEvents.trigger('leftMenu:hidden');
+        appEvents.trigger('leftMenu:animationComplete');
+      }, 350);
 
       $("#chat-frame, #header-container, #chat-input").css({"marginLeft" : "-=280px"});
 
       $("#left-menu").css({
         "width": "0px"
       });
-
       this.leftmenu = false;
     },
+
 
     togglePanel: function(whichPanel) {
       if (this.rightpanel) {
@@ -178,7 +220,6 @@ define([
     },
 
     showFiles: function() {
-      log("*** SHOWING FILES ***");
       $("#file-list").css({"width" : "200px" , "padding-left" : "20px"});
       this.files = true;
     },
@@ -319,7 +360,19 @@ define([
         // }, 250);
         this.profilemenu = false;
       }
+    },
+
+    lockLeftMenuOpen: function() {
+      this._leftMenuLockCount++;
+    },
+
+    unlockLeftMenuOpen: function() {
+      this._leftMenuLockCount--;
     }
 
+
   });
+  cocktail.mixin(AppIntegratedLayout, TroupeViews.DelayedShowLayoutMixin);
+
+  return AppIntegratedLayout;
 });

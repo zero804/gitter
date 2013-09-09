@@ -2,19 +2,19 @@
 "use strict";
 
 //var faye = require('faye');
-var faye = require('./faye-temp/faye-node');
-var fayeRedis = require('faye-redis');
-var oauth = require("../services/oauth-service");
-var winston = require("winston");
-var troupeService = require("../services/troupe-service");
-var presenceService = require("../services/presence-service");
-var restful = require("../services/restful");
-var nconf = require("../utils/config");
-var shutdown = require('../utils/shutdown');
-var contextGenerator = require('./context-generator');
-var appVersion = require('./appVersion');
-var userService = require("../services/user-service");
-var Q = require('q');
+var faye              = require('./faye-temp/faye-node');
+var fayeRedis         = require('faye-redis');
+var oauth             = require("../services/oauth-service");
+var winston           = require("winston");
+var troupeService     = require("../services/troupe-service");
+var presenceService   = require("../services/presence-service");
+var restful           = require("../services/restful");
+var nconf             = require("../utils/config");
+var shutdown          = require('../utils/shutdown');
+var contextGenerator  = require('./context-generator');
+var appVersion        = require('./appVersion');
+var userService       = require("../services/user-service");
+var Q                 = require('q');
 
 var appTag = appVersion.getAppTag();
 

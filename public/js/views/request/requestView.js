@@ -4,8 +4,9 @@ define([
   'marionette',
   'hbs!./tmpl/requestView',
   'hbs!./tmpl/requestItemView',
-  'views/unread-item-view-mixin'
-], function(TroupeViews, Marionette, requestViewTemplate, requestItemViewTemplate, UnreadItemViewMixin) {
+  'views/unread-item-view-mixin',
+  'cocktail'
+], function(TroupeViews, Marionette, requestViewTemplate, requestItemViewTemplate, UnreadItemViewMixin, cocktail) {
   "use strict";
 
   var RequestItemView = TroupeViews.Base.extend({
@@ -17,7 +18,7 @@ define([
       this.setRerenderOnChange();
     }
   });
-  _.extend(RequestItemView.prototype, UnreadItemViewMixin);
+  cocktail.mixin(RequestItemView, UnreadItemViewMixin);
 
   return TroupeViews.Base.extend({
     template: requestViewTemplate,
@@ -27,27 +28,6 @@ define([
         collection: this.collection,
         itemView: RequestItemView
       });
-
-      var self = this;
-      function updateVisibility() {
-        self.setVisibility(true);
-      }
-
-      this.setVisibility(false);
-      this.listenTo(this.collection, 'add', updateVisibility);
-      this.listenTo(this.collection, 'remove', updateVisibility);
-      this.listenTo(this.collection, 'reset', updateVisibility);
-    },
-
-    setVisibility: function(animate) {
-      if (this.collection.length > 0) {
-        $('#request-header').show();
-        return (animate) ? this.$el.parent().slideDown() : this.$el.parent().show();
-      }
-      else {
-        $('#request-header').hide();
-        return (animate) ? this.$el.parent().slideUp() : this.$el.parent().hide();
-      }
     },
 
     afterRender: function() {

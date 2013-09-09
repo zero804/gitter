@@ -1,9 +1,10 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
+  'utils/context',
   './realtime',
   'log!eyeballs'
-], function($, realtime, log) {
+], function($, context, realtime, log) {
   "use strict";
 
   var eyesOnState = true;
@@ -13,6 +14,10 @@ define([
 
   function send(value, synchronous) {
     if(!realtime.getClientId()) {
+      return;
+    }
+
+    if(!context.getTroupeId()) {
       return;
     }
 
@@ -191,5 +196,9 @@ define([
     });
   }, PING_POLL);
 
-
+  return {
+    getEyeBalls: function() {
+      return eyesOnState;
+    }
+  };
 });

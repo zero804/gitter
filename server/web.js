@@ -43,8 +43,6 @@ require('./web/express').installFull(app, server, sessionStore);
 
 require('./web/passport').install();
 
-require('./web/passport').install();
-
 require('./utils/event-listeners').installLocalEventListeners();
 
 if(nconf.get('ws:startFayeInPrimaryApp')) {
@@ -53,7 +51,6 @@ if(nconf.get('ws:startFayeInPrimaryApp')) {
 }
 
 require('./handlers/').install(app);
-
 
 require('./services/kue-workers').startWorkers();
 

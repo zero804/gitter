@@ -43,7 +43,8 @@ exports.registerDevice = function(deviceId, deviceType, deviceToken, deviceName,
       deviceName: deviceName,
       timestamp: new Date(),
       appVersion: appVersion,
-      appBuild: appBuild
+      appBuild: appBuild,
+      enabled: true
     },
     { upsert: true },
     function(err, device) {
@@ -97,6 +98,14 @@ exports.findDevicesForUsers = function(userIds, callback) {
   userIds = _.uniq(userIds);
   return PushNotificationDevice
     .where('userId')['in'](userIds)
+    .execQ(callback);
+};
+
+exports.findEnabledDevicesForUsers = function(userIds, callback) {
+  userIds = _.uniq(userIds);
+  return PushNotificationDevice
+    .where('userId')['in'](userIds)
+    .or([ { enabled: true }, { enabled: { $exists: false } } ]) // Exists false === enabled for old devices
     .execQ(callback);
 };
 

@@ -10,6 +10,7 @@ require([
   'utils/mobile-resizer',
   'components/unread-items-client',
   'log!chat-router',
+  'components/oauth',         // No ref
   'components/native-context' // No ref
   ], function(_, $, MobileRouter, chatModels, context, ChatCollectionView, chatInputView, mobileResizer, unreadItemsClient, log) {
   "use strict";

@@ -9,11 +9,11 @@ require([
   'views/conversation/conversationView',
   'views/conversation/conversationDetailView',
   'collections/conversations',
-  'components/unread-items-client',
+  'components/oauth',                 // No Ref
   'components/eyeballs',              // No ref
   'template/helpers/all',             // No ref
   'components/native-context'         // No ref
-], function($, _, Backbone, context, MobileRouter, TroupeViews, ConversationView, conversationDetailView, conversationModels, unreadItemsClient) {
+], function($, _, Backbone, context, MobileRouter, TroupeViews, ConversationView, conversationDetailView, conversationModels) {
   /*jslint browser: true, unused: true */
   "use strict";
 
@@ -44,13 +44,13 @@ require([
 
     defaultAction: function(){
       var view = new ConversationView({ collection: this.collection });
-      this.showView("#primary-view", view);
+      this.show('primary', view);
     },
 
     showConversation: function(id) {
       // why is this not showing anything?
       var view = new conversationDetailView.View({ id: id });
-      this.showView("#primary-view", view);
+      this.show('primary', view);
     }
 
   });
