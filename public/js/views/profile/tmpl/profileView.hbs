@@ -3,12 +3,12 @@
     <div id="frame-profile">{{ widget "avatar" user=user size='s' }}</div>
     <div class="button-choose-avatar trpModalSubtext">Change picture</div>
   </div>
-  <form action="/updateprofile" method="post" id="updateprofileform">
+  <form action="/updateprofile" method="post" id="updateprofileform" style="display: inline-block; text-align: left">
     <div class="trpProfileForm">
       {{#if existingUser}}
         <input type="text" id="displayName" class="trpInput" name="displayName" value="{{displayName}}" placeholder="Click here and type your full name"><br>
         <input type="email" disabled id="email" placeholder="Change to a new email address" class="trpInput" name="newEmail" value="{{user.email}}">
-        <a href="#|profile/emails">Add / Edit</a><br>
+        <a href="#|profile/emails" class="trpButtonMedium trpBtnGreen">Add / Edit</a><br>
         <input type="password" id="password" class="trpInput" name="password" value="" placeholder="Optional: Change password"><br>
       {{else}}
         <input type="text" id="displayName" class="trpInput" name="displayName" value="{{displayName}}" placeholder="Click here and type your name"><br>

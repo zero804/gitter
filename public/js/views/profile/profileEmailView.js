@@ -29,6 +29,7 @@ define([
 
     initialize: function() {
       this.setRerenderOnChange();
+      this.collectionView = this.options.collectionView;
     },
 
     getRenderData: function() {
@@ -48,19 +49,39 @@ define([
       this.model.destroy();
     },
 
-    resendConfirm: function() {
-      var v = new SignupConfirmView({ email: this.model.get('email') });
-      (new TroupeViews.Modal({ view: v })).show();
+    resendConfirm: function(e) {
+      if(e) e.preventDefault();
+      var self = this;
+       $.ajax({
+        url: "/resendconfirmation",
+        dataType: "json",
+        data: {
+          email: self.model.get('email')
+        },
+        type: "POST",
+        success: function() {
+          self.model.trigger('resend-success');
+        }
+      });
+
     },
 
     makePrimary: function() {
-      this.model.makePrimary();
+      var self = this;
+      this.model.makePrimary({
+        success: function() {
+          self.model.trigger('makePrimary-success');
+        }
+      });
     }
   });
 
   // collection view
   var CollectionView = Marionette.CollectionView.extend({
     itemView: ItemView,
+    itemViewOptions: function() {
+      return { collectionView: this };
+    },
     //loadingView: TroupeViews.Base.extend({ template: function() { return "Loading"; } }),
     initialize: function() {
         this.collection.on('add', function() {
@@ -78,7 +99,14 @@ define([
     template: template,
 
     events: {
-      'click #addEmailBtn': 'addEmail'
+      'click #addEmailBtn': 'addEmail',
+      'click #backBtn': 'back'
+    },
+
+    initialize: function() {
+      _.bindAll(this, 'showPrimarySuccess', 'showResendSuccess');
+      this.collection.on('makePrimary-success', this.showPrimarySuccess);
+      this.collection.on('resend-success', this.showResendSuccess);
     },
 
     afterRender: function() {
@@ -90,6 +118,33 @@ define([
     addEmail: function() {
       var m = new AddEmail.Modal({ collection: this.collection });
       this.dialog.transitionTo(m);
+    },
+
+    showMessage: function(message) {
+      this.$el.find('.trpModalSuccess').text(message).slideUp();
+    },
+
+    back: function() {
+      window.location.href = '#|profile';
+    },
+
+    showPrimarySuccess: function() {
+      this.showSuccess("Primary email address changed");
+    },
+
+    showResendSuccess: function() {
+      this.showSuccess("We've email you to confirm the address");
+    },
+
+    showSuccess: function(msg) {
+      var self = this;
+      this.$el.find('.trpModalSuccess').text(msg).show({
+        complete: function() {
+          setTimeout(function() {
+            self.$el.find('.trpModalSuccess').hide();
+          }, 2000);
+        }
+      });
     }
 
   });
