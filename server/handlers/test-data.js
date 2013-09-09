@@ -37,6 +37,19 @@ if(!nconf.get('test:exposeDataForTestingPurposes')) {
         });
       });
 
+      app.get('/testdata/confirmationCodeForSecondary', function(req, res) {
+        var forEmail = req.body.email || req.query.email;
+
+        userService.findByUnconfirmedEmail(forEmail, function(e, user) {
+          if (e || !user) return res.send(404, "No user with that email signed up.");
+
+          var confirmationCode = user.unconfirmedEmails.filter(function(e) { return e.email == forEmail; })[0].confirmationCode;
+          console.log("sending confirmationCode" + confirmationCode);
+
+          res.send(confirmationCode);
+        });
+
+      });
 
       app.get('/testdata/confirmationLink', function(req, res, next) {
 
