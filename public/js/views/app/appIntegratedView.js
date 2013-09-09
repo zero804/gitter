@@ -202,7 +202,7 @@ define([
         appEvents.trigger('leftMenu:animationComplete');
       }, 350);
 
-      $("#chat-frame, #header-container, #chat-input").css({"marginLeft" : "-=280px"});
+      $("#chat-frame, #header-container, #chat-input").removeAttr('style');
 
       $("#left-menu").css({
         "width": "0px"
