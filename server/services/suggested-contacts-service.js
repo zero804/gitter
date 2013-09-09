@@ -114,7 +114,7 @@ function addImplicitConnections(userId, dateGenerated) {
                       userId:     userId },
                     { $inc:       { score: IMPLICIT_CONTACT },
                       $addToSet:  { emails: { $each: emails } },
-                      $set:       { name: user.displayName,
+                      $set:       { name: user.displayName || user.username || user.email.split('@')[0],
                                     contactUserId: user.id,
                                     userId: userId,
                                     username: user.username || null,
