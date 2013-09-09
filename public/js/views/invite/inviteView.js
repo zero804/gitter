@@ -4,8 +4,9 @@ define([
   'marionette',
   'hbs!./tmpl/inviteView',
   'hbs!./tmpl/inviteItemView',
-  'views/unread-item-view-mixin'
-], function(TroupeViews, Marionette, invitesViewTemplate, invitesItemViewTemplate, UnreadItemViewMixin) {
+  'views/unread-item-view-mixin',
+  'cocktail'
+], function(TroupeViews, Marionette, invitesViewTemplate, invitesItemViewTemplate, UnreadItemViewMixin, cocktail) {
   "use strict";
 
   var InvitesItemView = TroupeViews.Base.extend({
@@ -17,7 +18,7 @@ define([
       this.setRerenderOnChange();
     }
   });
-  _.extend(InvitesItemView.prototype, UnreadItemViewMixin);
+  cocktail.mixin(InvitesItemView, UnreadItemViewMixin);
 
   return TroupeViews.Base.extend({
     template: invitesViewTemplate,
@@ -27,27 +28,6 @@ define([
         collection: this.collection,
         itemView: InvitesItemView
       });
-
-      var self = this;
-      function updateVisibility() {
-        self.setVisibility(true);
-      }
-
-      this.setVisibility(false);
-      this.listenTo(this.collection, 'add', updateVisibility);
-      this.listenTo(this.collection, 'remove', updateVisibility);
-      this.listenTo(this.collection, 'reset', updateVisibility);
-    },
-
-    setVisibility: function(animate) {
-      if (this.collection.length > 0) {
-        $('#invite-header').show();
-        return (animate) ? this.$el.parent().slideDown() : this.$el.parent().show();
-      }
-      else {
-        $('#invite-header').hide();
-        return (animate) ? this.$el.parent().slideUp() : this.$el.parent().hide();
-      }
     },
 
     afterRender: function() {

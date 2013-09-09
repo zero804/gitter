@@ -1,10 +1,10 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'jquery',
   'ga',
   'utils/context',
+  'utils/appevents',
   './mixpanel' // No ref
-], function($, _gaq, context) {
+], function(_gaq, context, appEvents) {
   "use strict";
   var trackingId = context.env('googleTrackingId');
   if(trackingId) {
@@ -57,7 +57,7 @@ define([
     }
   }
 
-  $(document).on('track', function(e, routeName) {
+  appEvents.on('track', function(routeName) {
     trackPageView(routeName);
   });
 

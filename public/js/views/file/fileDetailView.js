@@ -1,13 +1,11 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'jquery',
-  'underscore',
-  'backbone',
   'views/base',
   'hbs!./tmpl/fileDetailView',
   'hbs!./tmpl/confirmDelete',
-  'views/unread-item-view-mixin'
-], function($, _, Backbone, TroupeViews, template, confirmDeleteTemplate, UnreadItemViewMixin) {
+  'views/unread-item-view-mixin',
+  'cocktail'
+], function(TroupeViews, template, confirmDeleteTemplate, UnreadItemViewMixin, cocktail) {
   "use strict";
 
   var FileDetailView = TroupeViews.Base.extend({
@@ -24,10 +22,12 @@ define([
 
     getRenderData: function () {
       var d = this.model.toJSON();
-      d.fileIcon = this.model.get('thumbnailUrl');
-      d.previewUrl = '#file/preview/' + d.id;
+      d.fileIcon    = this.model.get('thumbnailUrl');
+      d.previewUrl  = '#file/preview/' + d.id;
       d.versionsUrl = '#file/versions/' + d.id;
-      d.useSpinner = !this.hasThumb();
+      d.useSpinner  = !this.hasThumb();
+      d.showClose   = !this.options.hideClose;
+      d.showActions = !this.options.hideActions;
 
       return d;
     },
@@ -46,7 +46,7 @@ define([
       modal.on('button.click', function(id) {
         if (id === "yes")
           that.model.destroy({
-          success: function(model, response) {
+          success: function() {
           }
         });
 
@@ -63,7 +63,7 @@ define([
     }
 
   });
+  cocktail.mixin(FileDetailView, UnreadItemViewMixin);
 
-  _.extend(FileDetailView.prototype, UnreadItemViewMixin);
   return FileDetailView;
 });

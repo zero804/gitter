@@ -1,6 +1,104 @@
+@import "bootstrap/bootstrap.less";
+@import "trpMobileFonts.less";
+@import "trpInvites.less";
 @import "trpColours.less";
-@import "trpMobileChat.less";
+@import "trpNativeChat.less";
+@import "trpButtons.less";
 
 body {
-	background-color: @trpGreen;
+  background-color: @trpGreen;
+}
+
+@header-height: 50px;
+
+header {
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+  background-color: @trpGreen;
+  line-height: @header-height;
+  text-align: center;
+  height: @header-height;
+}
+
+.title {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+  color: white;
+  .trpH2;
+}
+
+#showTroupesButton {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 5px 5px;
+}
+
+.trpTroupeList a {
+  .trpH3;
+}
+
+.trpTroupeList li {
+  padding-top: 15px;
+}
+
+.sideMenu {
+  width: 85%;
+  height: 100%;
+  position: absolute;
+}
+
+.trpLeftMenuWrapper {
+  height: 100%;
+}
+
+#left-menu-scroll {
+  height: 70%;
+}
+
+#mainPage {
+  box-shadow: 0 0 15px black;
+  z-index: 1;
+  .animation(cubic-bezier(0.6, -0.28, 0.735, 0.045));
+}
+
+#mainPage.partiallyOffScreen {
+  left: 85%;
+  .animation(linear);
+}
+
+#content {
+  padding-top: @header-height;
+}
+
+#showUserhomeButton {
+  position: absolute;
+  right: 0;
+  padding-right: 12px;
+  padding-top: 5px;
+}
+
+.animation(@transform) {
+          transform: translate3d(0,0,0);
+  -webkit-transform: translate3d(0,0,0);
+  -webkit-transition: all 200ms @transform;
+     -moz-transition: all 200ms @transform;
+       -o-transition: all 200ms @transform;
+          transition: all 200ms @transform;
+}
+
+// overrides for userhome
+.typeahead {
+  max-width: 280px;
+  overflow: hidden;
+
+  li[data-value="undefined"] {
+    display: none;
+  }
+}
+
+#copy-button {
+  display: none;
 }

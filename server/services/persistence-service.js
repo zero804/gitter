@@ -124,8 +124,12 @@ UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ username: 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
 
+UserSchema.methods.getHomeUri = function() {
+  return this.username ? this.username : "one-one/" + this.id;
+};
+
 UserSchema.methods.getHomeUrl = function() {
-  return this.username ? "/" + this.username : "/one-one/" + this.id;
+  return '/' + this.getHomeUri();
 };
 
 UserSchema.methods.isConfirmed = function() {
@@ -282,7 +286,7 @@ var InviteSchema = new Schema({
   createdAt:          { type: Date, "default": Date.now },
   emailSentAt:        { type: Date },
   code:               { type: String },
-  status:             { type: String, "enum": ['UNUSED', 'USED'], "default": 'UNUSED'},
+  status:             { type: String, "enum": ['UNUSED', 'USED', 'INVALID'], "default": 'UNUSED'},
   _tv:                { type: 'MongooseNumber', 'default': 0 }
 });
 InviteSchema.schemaTypeName = 'InviteSchema';
@@ -328,11 +332,12 @@ var ChatMessageSchema = new Schema({
   text: String,
   urls: Array,
   mentions: Array,
-  metadataVersion: String,
+  meta: Schema.Types.Mixed,
   sent: { type: Date, "default": Date.now },
   editedAt: { type: Date, "default": null },
   readBy: { type: [ObjectId] },
-  _tv: { type: 'MongooseNumber', 'default': 0 }
+  _tv: { type: 'MongooseNumber', 'default': 0 },
+  _md: Number,          // Meta parse version
 });
 ChatMessageSchema.index({ toTroupeId: 1, sent: -1 });
 ChatMessageSchema.schemaTypeName = 'ChatMessageSchema';
@@ -481,7 +486,9 @@ GeoPopulatedPlaceSchema.schemaTypeName = 'GeoPopulatedPlaceSchema';
   deviceName: String,
   appleToken: Buffer,
   tokenHash: String,
-  deviceType: { type: String, "enum": ['APPLE', 'APPLE-DEV', 'ANDROID', 'TEST']},
+  deviceType: { type: String, "enum": ['APPLE', 'APPLE-DEV', 'ANDROID', 'TEST', 'SMS']},
+  mobileNumber: { type: String },
+  enabled: { type: Boolean, default: true },
   appVersion: String,
   appBuild: String,
   timestamp: Date
@@ -489,6 +496,7 @@ GeoPopulatedPlaceSchema.schemaTypeName = 'GeoPopulatedPlaceSchema';
 PushNotificationDeviceSchema.index({ deviceId: 1 });
 PushNotificationDeviceSchema.index({ userId: 1 });
 PushNotificationDeviceSchema.index({ tokenHash: 1 });
+PushNotificationDeviceSchema.index({ mobileNumber: 1 });
 
 PushNotificationDeviceSchema.schemaTypeName = 'PushNotificationDeviceSchema';
 

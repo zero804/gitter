@@ -1,0 +1,66 @@
+@import "trpNative.less";
+@import "trp3Chat.less";
+@import "troupe-menu/troupe-menu-mobile.less";
+@import "bootstrap/variables.less";
+@import "bootstrap/mixins.less";
+@import "bootstrap/modals.less";
+@import "trpModals.less";
+
+html {
+	height: 100%;
+}
+
+body, #mainPage, #content, .contentBody {
+	height: 100%;
+	width: 100%;
+}
+
+body {
+	margin: 0px;
+	position: relative;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}
+
+html, body {
+	overflow: hidden;
+}
+
+a {
+	text-decoration: none;
+	color: #333;
+}
+
+#mainPage {
+	background-color: #ecf1ec;
+	position: absolute;
+}
+
+#content {
+	box-sizing: border-box;
+	padding-bottom: 69px;
+	position: absolute;
+}
+
+/*Mobile Overrides*/
+
+.contentBody {
+	overflow-y: auto;
+	overflow-x: hidden;
+	-webkit-overflow-scrolling: touch;
+}
+
+.trpChatInputArea {
+	position: absolute;
+	bottom: 0;
+	width: 100%
+}
+
+.avatar-s {
+	position: relative;
+	height: 24px;
+	width: 24px;
+	border-radius: 50em;
+	border: 2px solid white;
+	background-size: contain;
+}

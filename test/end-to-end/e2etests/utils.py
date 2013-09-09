@@ -1,7 +1,9 @@
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.support import expected_conditions as EC
 import urllib2
 import os
 import time
@@ -41,7 +43,7 @@ def driver():
 
     remote = os.getenv('REMOTE_EXECUTOR')
     if remote is None:
-        remote = 'http://10.8.0.14:5555/wd/hub'
+        remote = 'http://0.0.0.0:5555/wd/hub'
 
     if driverName == 'FIREFOX':
         print('Using local Firefox')
@@ -75,12 +77,17 @@ def driver():
         print('Using remote Firefox')
         driver = webdriver.Remote(command_executor=remote, desired_capabilities=DesiredCapabilities.FIREFOX)
 
+    elif driverName == 'REMOTEANDROID':
+        print('Using remote android')
+        caps = webdriver.DesiredCapabilities.ANDROID
+        caps['platform'] = "Linux"
+        caps['version'] = "4.0"
+        driver = webdriver.Remote(command_executor=remote, desired_capabilities=caps)
+
     driver.delete_all_cookies()
     driver.implicitly_wait(30)
 
     driver.get(baseUrl("/signout"))
-
-    driver.find_element_by_css_selector('DIV.trpHomeHeroStripContainer')
 
     driver.delete_all_cookies()
 
@@ -109,9 +116,7 @@ def existingUserlogin(driver, usernameValue, passwordValue):
 
     driver.find_element_by_css_selector('#signin-button').click()
 
-    time.sleep(1)
-
-    driver.find_element_by_css_selector('DIV.trpHeaderWrapper')
+    WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'DIV.trpHeaderWrapper')))
 
 
 def signup(driver):

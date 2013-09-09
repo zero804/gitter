@@ -5,17 +5,11 @@ define([
 ], function ( Handlebars, TwitterText ) {
   "use strict";
 
-  var emailRegex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/gi;
-
-  function embedMailto(email) {
-    return '<a href="mailto:' + email + '">' + email + '</a>';
-  }
-
   function linkify(message, urls) {
-    message = message.replace(emailRegex, embedMailto);
     if (urls && urls.length) {
       message = TwitterText.txt.autoLinkEntities(message, urls, {targetBlank: true, urlClass: 'link'});
     }
+
     return new Handlebars.SafeString(message);
   }
 

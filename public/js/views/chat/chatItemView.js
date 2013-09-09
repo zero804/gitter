@@ -13,10 +13,12 @@ define([
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
-  'oEmbed',
   'template/helpers/linkify',
-  'bootstrap_tooltip'
-], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews, chatItemTemplate, chatInputView, UnreadItemViewMixin, oEmbed, linkify /* tooltip*/) {
+  'utils/safe-html',
+  'cocktail',
+  'bootstrap_tooltip' // No ref
+], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews,
+  chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml, cocktail /* tooltip*/) {
 
   "use strict";
 
@@ -27,7 +29,7 @@ define([
 
     events: {
       'click .trpChatEdit':     'toggleEdit',
-      'keydown textarea':  'detectEscape',
+      'keydown textarea':       'detectEscape',
       'click .trpChatReads':    'showReadBy'
     },
 
@@ -36,6 +38,8 @@ define([
 
       this.userCollection = options.userCollection;
       //this.scrollDelegate = options.scrollDelegate;
+
+      this.decorator = options.decorator;
 
       this.model.on('change', function() {
         self.onChange();
@@ -58,14 +62,12 @@ define([
 
     },
 
-    safe: function(text) {
-      return (''+text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/\n\r?/g, '<br />');
-    },
-
     getRenderData: function() {
       var data = this.model.toJSON();
 
-      data.displayName = data.fromUser.displayName;
+      if (data.fromUser) {
+        data.displayName = data.fromUser.displayName;
+      }
 
       return data;
     },
@@ -81,10 +83,12 @@ define([
 
     renderText: function() {
       // We need to parse the text a little to hyperlink known links and escape html to prevent injection
-      var richText = String(linkify(this.safe(this.model.get('text')), this.model.get('urls')));
+      var richText = linkify(this.model.get('text'), this.model.get('urls')).toString();
+      richText = richText.replace(/\n\r?/g, '<br>');
       this.$el.find('.trpChatText').html(richText);
-      this.oEmbed();
+
       this.highlightMention();
+      if (this.decorator) this.decorator.enrich(this);
     },
 
     afterRender: function() {
@@ -115,24 +119,15 @@ define([
       this.$el.toggleClass('isOld', this.isOld());
     },
 
-    // Note: This must only be called *once* after the element content is set from the model
-    oEmbed: function() {
-      oEmbed.defaults.maxheight = 250;
-      this.$el.find('.link').each(function(index, el) {
-        oEmbed.parse(el.href, function(embed) {
-          if (embed) {
-            $(el).append('<div class="embed">' + embed.html + '</div>');
-          }
-        });
-      });
-    },
-
     highlightMention: function() {
       var self = this;
       _.each(this.model.get('mentions'), function(mention) {
         var re    = new RegExp(mention.screenName, 'i');
         var user  = context().user;
-        if (user.username.match(re) || user.displayName.match(re)) {
+
+        // Note: The context in mobile doesn't have a user,
+        // it's actually populated at a later time over Faye.
+        if (user && (user.username.match(re) || user.displayName.match(re))) {
           $(self.$el).find('.trpChatBox').addClass('mention');
         }
       });
@@ -171,6 +166,7 @@ define([
     },
 
     isOwnMessage: function() {
+      if (this.model.get('fromUser') === null) return false;
       return this.model.get('fromUser').id === context.getUserId();
     },
 
@@ -224,16 +220,16 @@ define([
 
     showInput: function() {
       //var isAtBottom = this.scrollDelegate.isAtBottom();
+      var chatInputText = this.$el.find('.trpChatText');
 
       // create inputview
-      this.$el.find('.trpChatText').html("<textarea class='trpChatInput'>"+this.model.get('text')+"</textarea>").find('textarea').select();
-      this.inputBox = new chatInputView.ChatInputBoxView({ el: this.$el.find('textarea'), scrollDelegate: this.scrollDelegate });
-      this.listenTo(this.inputBox, 'save', this.saveChat);
+      chatInputText.html("<textarea class='trpChatInput'></textarea>");
 
-      // this.$el.find('.trpChatText textarea').focus().on('blur', function() { self.toggleEdit(); });
-      //if (isAtBottom) {
-      //  this.scrollDelegate.$scrollOf.scrollTop(this.scrollDelegate.$container.height());
-      //}
+      var unsafeText = safeHtml.unsafe(this.model.get('text'));
+      var textarea = chatInputText.find('textarea').val(unsafeText).select();
+
+      this.inputBox = new chatInputView.ChatInputBoxView({ el: textarea });
+      this.listenTo(this.inputBox, 'save', this.saveChat);
     },
 
     showReadBy: function() {
@@ -257,9 +253,7 @@ define([
     }
 
   });
-
-  _.extend(ChatItemView.prototype, UnreadItemViewMixin);
-
+  cocktail.mixin(ChatItemView, UnreadItemViewMixin);
 
   var ReadByView = Marionette.CollectionView.extend({
     itemView: AvatarView,
@@ -275,7 +269,7 @@ define([
       this.collection.unlisten();
     }
   });
-  _.extend(ReadByView.prototype, TroupeViews.LoadingCollectionMixin);
+  cocktail.mixin(ReadByView, TroupeViews.LoadingCollectionMixin);
 
   var ReadByPopover = TroupeViews.Popover.extend({
     initialize: function(options) {

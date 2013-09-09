@@ -3,6 +3,7 @@ require([
   'jquery',
   'backbone',
   'utils/context',
+  'utils/appevents',
   'views/app/appIntegratedView',
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
@@ -26,17 +27,19 @@ require([
   'views/invite/reinviteModal',
   'utils/router',
   'components/unread-items-client',
+  'views/chat/decorator',
   'components/webNotifications', // No ref
+  'components/desktopNotifications', // No ref
   'components/errorReporter',  // No ref
   'filtered-collection', // No ref
   'components/dozy', // Sleep detection No ref
   'template/helpers/all', // No ref
   'components/eyeballs' // No ref
-], function($, Backbone, context, AppIntegratedView, chatInputView, ChatCollectionView,
+], function($, Backbone, context, appEvents, AppIntegratedView, chatInputView, ChatCollectionView,
             itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, shareSearchView,
             createTroupeView, UsernameView, HeaderView,
-            troupeSettingsView, TroupeMenuView, InviteModal, Router, unreadItemsClient /*, errorReporter , FilteredCollection */) {
+            troupeSettingsView, TroupeMenuView, ReinviteModal, Router, unreadItemsClient, chatDecorator /*, errorReporter , FilteredCollection */) {
   "use strict";
 
   // Make drop down menus drop down
@@ -66,7 +69,8 @@ require([
   var chatCollectionView = new ChatCollectionView({
     el: $('#content-frame'),
     collection: itemCollections.chats,
-    userCollection: itemCollections.users
+    userCollection: itemCollections.users,
+    decorator: chatDecorator
   }).render();
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
@@ -75,14 +79,13 @@ require([
 
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
-    collection: itemCollections.chats,
-    scrollDelegate: chatCollectionView.scrollDelegate
+    collection: itemCollections.chats
   }).render();
 
   new Router({
     routes: [
       { name: "request",          re: /^request\/(\w+)$/,         viewType: RequestDetailView,            collection: itemCollections.requests },
-      { name: "invite",          re: /^invite\/(\w+)$/,           viewType: InviteDetailView,             collection: itemCollections.invites },
+      { name: "invite",           re: /^invite\/(\w+)$/,          viewType: InviteDetailView,             collection: itemCollections.invites },
       { name: "file",             re: /^file\/(\w+)$/,            viewType: FileDetailView,               collection: itemCollections.files },
       { name: "filePreview",      re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: itemCollections.files },
       { name: "fileVersions",     re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: itemCollections.files },
@@ -95,11 +98,21 @@ require([
       { name: "create",           re: /^create$/,                 viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true },
       { name: "upgradeOneToOne",  re: /^upgradeOneToOne$/,        viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true, viewOptions: { upgradeOneToOne: true } } ,
       { name: "chooseUsername",   re: /^chooseUsername/,          viewType: UsernameView.Modal },
-      { name: "reinvite",         re: /^reinvite\/(\w+)$/,        viewType: InviteModal,                  collection: troupeCollections.outgoingConnectionInvites, viewOptions: { overrideContext: true, inviteToConnect: true } },
+      { name: "reinvite",         re: /^reinvite\/(\w+)$/,        viewType: ReinviteModal,                collection: troupeCollections.outgoingConnectionInvites, viewOptions: { overrideContext: true, inviteToConnect: true } },
       { name: "troupeSettings",   re: /^troupeSettings/,          viewType: troupeSettingsView }
     ],
-    appView: appView
+    regions: [appView.rightPanelRegion, appView.dialogRegion]
   });
+
+
+  if(!window.localStorage.troupeTourApp) {
+    window.localStorage.troupeTourApp = 1;
+    require([
+      'tours/tour-controller'
+    ], function(tourController) {
+      tourController.init({ appIntegratedView: appView });
+    });
+  }
 
   Backbone.history.start();
 

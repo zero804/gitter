@@ -1,15 +1,14 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
-  'underscore',
-  'backbone',
   'marionette',
   './fileItemView',
   'hbs!./tmpl/fileHelpView',
   'hbs!./tmpl/fileAddButton',
   '../base',
+  'cocktail',
   'bootstrap_tooltip'
-], function($, _, Backbone, Marionette, FileItemView, fileHelpTemplate, fileAddButtonView, TroupeViews) {
+], function($, Marionette, FileItemView, fileHelpTemplate, fileAddButtonTemple, TroupeViews, cocktail) {
   "use strict";
 
   var FileView = Marionette.CollectionView.extend({
@@ -19,16 +18,15 @@ define([
     }),
 
      initialize: function() {
-      this.initializeSorting();
-
       var self = this;
+
       this.once('render', function() {
         // no add button for compact view
         if (window._troupeCompactView !== true) {
           // setup the add file button
-          var addFileButton = $(fileAddButtonView());
+          var addFileButton = $.parseHTML(fileAddButtonTemple());
           self.$el.prepend(addFileButton);
-          addFileButton.tooltip({
+          $(addFileButton).tooltip({
             html : true,
             container: "body"
           });
@@ -37,8 +35,7 @@ define([
     }
 
   });
-
-  _.extend(FileView.prototype, TroupeViews.SortableMarionetteView);
+  cocktail.mixin(FileView, TroupeViews.SortableMarionetteView);
 
   return FileView;
 

@@ -3,8 +3,9 @@ define([
   'jquery',
   'utils/context',
   'faye',
+  'utils/appevents',
   'log!realtime'
-], function($, context, Faye, log) {
+], function($, context, Faye, appEvents, log) {
   "use strict";
 
   //Faye.Logging.logLevel = 'debug';
@@ -185,8 +186,6 @@ define([
     // TODO: this stuff below really should find a better home
     if(context.getTroupeId()) {
       client.subscribe('/troupes/' + context.getTroupeId(), function(message) {
-        log("Troupe Subscription!", message);
-
         if(message.notification === 'presence') {
           if(message.status === 'in') {
             $(document).trigger('userLoggedIntoTroupe', message);
@@ -198,9 +197,13 @@ define([
       });
     }
 
-
-    client.connect(function() {});
-
+    if(context.getUserId()) {
+      client.subscribe('/user/' + context.getUserId(), function(message) {
+        if (message.notification === 'user_notification') {
+          appEvents.trigger('user_notification', message);
+        }
+      });
+    }
 
     return client;
   }

@@ -2,6 +2,8 @@
 define([
   'jquery',
   'backbone',
+  'marionette',
+  'views/base',
   'utils/context',
   'fineuploader',
   'hbs!./tmpl/rightToolbar',
@@ -10,11 +12,13 @@ define([
   'views/invite/inviteView',
   'views/file/fileView',
   'views/conversation/conversationView',
-  'views/people/peopleCollectionView'
-], function($, Backbone, context, qq, rightToolbarTemplate, itemCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView) {
+  'views/people/peopleCollectionView',
+  'cocktail'
+], function($, Backbone, Marionette, TroupeViews, context, qq, rightToolbarTemplate, itemCollections,
+  RequestView, InviteView, FileView, ConversationView, PeopleCollectionView, cocktail) {
   "use strict";
 
-  return Backbone.Marionette.Layout.extend({
+  var RightToolbarLayout = Marionette.Layout.extend({
     tagName: "span",
     template: rightToolbarTemplate,
 
@@ -42,8 +46,6 @@ define([
     },
 
     onRender: function() {
-      var self = this;
-
       $('#toolbar-frame').show();
       $('#right-panel').show();
 
@@ -105,11 +107,10 @@ define([
       this.files.show(new FileView({ collection: fileCollection }));
 
       // Conversation View
-      if (context.inOneToOneTroupeContext()) {
-        var conversationView = new ConversationView({
+      if (!context.inOneToOneTroupeContext()) {
+        this.conversations.show(new ConversationView({
           collection: conversationCollection
-        });
-        self.conversations.show(conversationView);
+        }));
       } else {
         $('#mail-list').hide();
       }
@@ -117,7 +118,27 @@ define([
       // People View
       this.people.show(new PeopleCollectionView({ collection: userCollection }));
 
+      this.initHideListeners();
     },
+
+    initHideListeners: function() {
+      var self = this;
+
+      toggler('#invite-roster', itemCollections.invites);
+      toggler('#invite-header', itemCollections.invites);
+      toggler('#request-header', itemCollections.requests);
+      toggler('#request-roster', itemCollections.requests);
+
+      function toggler(element, collection) {
+        function toggle() {
+          self.$el.find(element).toggle(collection.length > 0);
+        }
+
+        collection.on('all', toggle);
+        toggle();
+      }
+    },
+
 
     onMailHeaderClick: function() {
       this.toggleMails();
@@ -156,6 +177,8 @@ define([
     }
 
   });
+  cocktail.mixin(RightToolbarLayout, TroupeViews.DelayedShowLayoutMixin);
 
+  return RightToolbarLayout;
 
 });

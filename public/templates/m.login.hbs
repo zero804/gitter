@@ -19,7 +19,7 @@
 
   {{>require_wrapper}}
 
-  {{{bootScript "login" skipCore=true}}}
+  {{{bootScript "login" }}}
 
   {{>load_font_css}}
 
@@ -44,9 +44,7 @@
             <input name="email" value="" id="email" type="email" class="mtrpLoginFormItem" placeholder="Email address">
             <input name="password" id="password" type="password" class="mtrpLoginFormItem" placeholder="Password">
           </div>
-<!--           <div class="mtrpLoginSignup" id="button-signup">
-            <a href="#" class="trpButtonBig trpBtnGreen" id="new-user">New user</a>
-          </div> -->
+
           <div class="mtrpLoginSubmit" id="button-login">
             <a href="#" class="trpButtonBig trpBtnGreen" id="submit">Login &raquo;</a>
           </div>
@@ -55,22 +53,17 @@
       </div>
     </div>
 
-    <div class="mtrpSignupForm" id="panel-signup" style="display:none">
-      Very sorry, Troupe is invite only<br> at the moment<br>
-       <a href="#" class="mtrpLoginBack trpButtonBig trpBtnGreen" id="button-back">Back</a>
-    </div>
-
-   <div class="mtrpLoginFailure" id="login-failure">
+   <div class="mtrpLoginFailure" id="login-failure" style="display:none">
       <span class="trpModalTitle"><span class="trpWhite">Login failed.</span></span>
       <a href="#" class="trpWhite trpModalFailureText button-request-new-password">Forgot password?</a>
    </div>
 
-   <div class="mtrpLoginFailure" id="resetpwd-failure">
+   <div class="mtrpLoginFailure" id="resetpwd-failure" style="display:none">
       <span class="trpModalTitle"><span class="trpWhite">Can't reset password.</span></span>
       <span class="trpModalBody">Was that the right email address?</span>
    </div>
 
-  <div class="mtrpLoginFailure" id="resetpwd-confirm">
+  <div class="mtrpLoginFailure" id="resetpwd-confirm" style="display:none">
     <div class="trpModalTitle"></div>
     <div class="trpModalBody">We've just sent you an email.</div>
   </div>

@@ -83,11 +83,11 @@
   addProvider("Soundcloud",   ["soundcloud.com/.+","snd.sc/.+"],                  "//soundcloud.com/oembed", {format: 'js'});
   addProvider("twitter",      ["twitter.com/.+"],                                 "//api.twitter.com/1/statuses/oembed.json");
   addProvider("meetup",       ["meetup.(com|ps)/.+"],                             "//api.meetup.com/oembed");
-  addProvider("github",       ["gist.github.com/.+"],                             "//github.com/api/oembed");
   addProvider("vimeo",        ["vimeo.com/groups/.*/videos/.*", "vimeo.com/.*"],  "//vimeo.com/api/oembed.json");
 	addProvider("dailymotion",  ["dailymotion.com/.+"],                             "//www.dailymotion.com/services/oembed");
   addProvider("ustream",      ["ustream.tv/recorded/.*"],                         "//www.ustream.tv/oembed");
   addProvider("photobucket",  ["photobucket.com/(albums|groups)/.+"],             "//photobucket.com/oembed/");
+  addProvider("slideshare",   ["slideshare.net"],                                 "//www.slideshare.net/api/oembed/2",{format:'jsonp'});
 
   // NoEmbed fallbacks (http://noembed.com/)
   addProvider("wikipedia",    ["wikipedia.org/wiki/"],                            "//noembed.com/embed");

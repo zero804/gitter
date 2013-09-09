@@ -27,7 +27,8 @@ define([
     getRenderData: function() {
       var troupe = context.getTroupe();
       var homeUser = context.getHomeUser();
-      var firstName = homeUser.displayName.split(" ").shift();
+      var displayName = homeUser.displayName || '';
+      var firstName = displayName.split(" ").shift();
       return {
         homeUser: homeUser,
         firstName: firstName,

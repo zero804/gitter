@@ -8,6 +8,10 @@ var assert = require("better-assert");
 var fs = require("fs");
 var temp = require("temp");
 
+var fixtureLoader = require('../test-fixtures');
+var fixture = {};
+
+
 describe('file-service', function() {
   var fileService = testRequire("./services/file-service");
   var persistence = testRequire("./services/persistence-service");
@@ -29,8 +33,8 @@ describe('file-service', function() {
             if(err) return done(err);
 
             fileService.storeFile({
-              troupeId: troupe.id,
-              creatorUserId: null,
+              troupe: troupe.id,
+              user: fixture.user1,
               fileName: 'temp.txt',
               mimeType: 'text/text',
               file: info.path
@@ -70,5 +74,7 @@ describe('file-service', function() {
      });
     });
   });
+
+  before(fixtureLoader(fixture));
 
 });

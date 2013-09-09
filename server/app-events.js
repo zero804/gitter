@@ -179,6 +179,14 @@ function bind(on) {
 
     onBatchUserBadgeCountUpdate: function(callback) {
       on('batchUserBadgeCountUpdate', callback);
+    },
+
+    richMessage: function(data) {
+      emit('richMessage', data);
+    },
+
+    onRichMessage: function(callback) {
+      on('richMessage', callback);
     }
 
 
