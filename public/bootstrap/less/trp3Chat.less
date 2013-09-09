@@ -4,8 +4,8 @@
   margin-top: 5px;
 }
 
-.mention {
-  background-color: #FFF68F !important;
+.trpChatBox.mention {
+  color: @trpGreen;
 }
 
 .trpChatContainer {
@@ -35,8 +35,9 @@
 /*	height: 58px;*/
 	vertical-align: top;
 	border-radius: 5px 5px 5px 5px;
-	margin-left: 64px;
+	margin-left: 60px;
 }
+
 
 .trpChatAvatar {
   float: left;
@@ -60,6 +61,10 @@
 	height: 49px;
 }
 
+.trpChatInputBoxTextArea:focus {
+  outline: none;
+}
+
 .trpChatInputBoxTextArea {
   overflow: hidden;
   padding: 0;
@@ -68,7 +73,7 @@
 
 .trpChatItem {
 	display: inline-block;
-	margin-bottom: 16px;
+	margin-bottom: 24px;
 	clear: left;
   width: 100%;
   text-align: left;
@@ -81,7 +86,7 @@
 	vertical-align: top;
 	border-radius: 5px 5px 5px 5px;
   .trpBodyMedium;
-	padding: 7px 12px;
+	padding: 0px 12px;
 	line-height: 150%;
 	margin-left: 48px;
 	color: #333;
@@ -116,7 +121,7 @@
   display: block;
   color: #AAA;
   font-size: 12px;
-  margin: 0;
+  margin: -4px 0 0 0;
   padding: 0;
 }
 
