@@ -700,7 +700,7 @@ define([
   /* This is a mixin for Marionette.CollectionView */
   TroupeViews.SortableMarionetteView = {
 
-    initializeSorting: function() {
+    initialize: function() {
       this.isRendering = false;
       this.on('before:render', this.onBeforeRenderSort, this);
       this.on('render', this.onRenderSort, this);
