@@ -438,6 +438,32 @@ function findAllSocketsForUserInTroupe(userId, troupeId, callback) {
 
 }
 
+function isUserConnectedWithClientType(userId, clientType, callback) {
+  listAllSocketsForUser(userId, function(err, socketIds) {
+    if(err) return callback(err);
+    if(!socketIds || !socketIds.length) return callback(null, false);
+
+    var multi = redisClient.multi();
+    socketIds.forEach(function(socketId) {
+      multi.hmget(keySocketUser(socketId), 'ct');
+    });
+
+    multi.exec(function(err, replies) {
+      if(err) return callback(err);
+
+      var clientTypeBeta = clientType + 'beta';
+
+      for(var i = 0; i < replies.length; i++) {
+        var ct = replies[i][0];
+        if(ct === clientType || ct === clientTypeBeta) return callback(null, true);
+      }
+
+      return callback(null, false);
+    });
+
+  });
+}
+
 function listAllSocketsForUser(userId, callback) {
   redisClient.smembers(keyUserSockets(userId), callback);
 }
@@ -838,6 +864,7 @@ presenceService.listOnlineUsersForTroupes =  listOnlineUsersForTroupes;
 presenceService.categorizeUserTroupesByOnlineStatus = categorizeUserTroupesByOnlineStatus;
 presenceService.findAllSocketsForUserInTroupe = findAllSocketsForUserInTroupe;
 presenceService.listAllSocketsForUser = listAllSocketsForUser;
+presenceService.isUserConnectedWithClientType = isUserConnectedWithClientType;
 
 // Eyeball
 presenceService.clientEyeballSignal =  clientEyeballSignal;
