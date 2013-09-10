@@ -21,6 +21,25 @@
 
 @import "trpInvites.less";
 
+
+/* Transitions */
+
+.transition300ms {
+  transform: translate3d(0, 0, 0);
+  transition:all .3s ease-in-out; 
+  -o-transition:all .3s ease-in-out; 
+  -moz-transition:all .3s ease-in-out; 
+  -webkit-transition:all .3s ease-in-out;
+}
+
+/* Global margins and padding */
+
+@rightMarginFull: 280px;
+@leftMarginFull: 130px;
+
+@rightMarginMid: 108px;
+@leftMarginMid: 120px;
+
 /* MEDIA QUERY DEFINITIONS*/
 
 @mid: ~"(max-width: 1024px)";
@@ -378,11 +397,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 	position: fixed;
 	z-index: 200;
 	overflow: hidden;
-  transform: translate3d(0, 0, 0);
-  transition:all .3s ease-in-out; 
-  -o-transition:all .3s ease-in-out; 
-  -moz-transition:all .3s ease-in-out; 
-  -webkit-transition:all .3s ease-in-out;
+  .transition300ms;
   top: 0;
   padding: 10px 0;
   background-image: -webkit-gradient(
@@ -401,6 +416,12 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   -o-transition:all .3s ease-in-out; 
   -moz-transition:all .3s ease-in-out; 
   -webkit-transition:all .3s ease-in-out;
+
+  @media @mid {
+    margin-left: @leftMarginMid;
+    margin-right: @rightMarginMid;
+  }
+
 }
 
 .trpHeaderFrame {
@@ -555,8 +576,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 
 .trpChatPanel {
   display: block;
-	margin-left: 130px;
-	margin-right: 280px;
+	margin-left: @leftMarginFull;
+	margin-right: @rightMarginFull;
 /*	min-height: 600px;
 	height: 100%;*/
 	text-align: left;
@@ -567,6 +588,11 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   -moz-transition:all .3s ease-in-out; 
   -webkit-transition:all .3s ease-in-out;
   height: 100%;
+
+  @media @mid {
+    margin-left: @leftMarginMid;
+    margin-right: @rightMarginMid;
+  }
 }
 
 .trpToolbar {
@@ -590,13 +616,19 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   -o-transition:all .3s ease-in-out; 
   -moz-transition:all .3s ease-in-out; 
   -webkit-transition:all .3s ease-in-out;
+
+  @media @mid {
+    width: 88px;
+    padding-right: 0px;  
+  }
+
 }
 
 .trpChatInputArea.rightCollapse, .trpHeaderContainer.rightCollapse, .trpChatPanel.rightCollapse {
-  margin-right: 540px;
+  margin-right: 510px;
 
   @media @mid {
-    margin-right: 380px;
+    margin-right: 120px;
   }
 }
 
@@ -630,6 +662,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   width: 100%;
   vertical-align: top;
   padding-left: 20px;
+
+  @media @mid {
+    width: 60px;
+  }
 }
 
 .trpToolbarHeader {
@@ -674,6 +710,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   -o-transition:all .3s ease-in-out; 
   -moz-transition:all .3s ease-in-out;
   -webkit-transition:all .3s ease-in-out;
+
+  @media @mid {
+    right: -235px;
+  }
 }
 
 .trpRightPanel.visible {
@@ -735,6 +775,13 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   -o-transition:all .3s ease-in-out; 
   -moz-transition:all .3s ease-in-out; 
   -webkit-transition:all .3s ease-in-out;
+
+  @media @mid {
+    margin-left: @leftMarginMid;
+    margin-right: @rightMarginMid;
+    padding-right: 12px;
+  }
+
 }
 
 .login-content {
@@ -867,12 +914,35 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 }
 
 
-  .trpHeaderFavourite .avatar-s {
-    width: 32px;
-    height: 32px;
-  }
+.trpHeaderFavourite .avatar-s {
+  width: 32px;
+  height: 32px;
+}
 
-@media screen and (max-width: 1200px) {
+#file-list {
+  @media @mid {
+    position: fixed;
+    right: 0px;
+    width: 0px;
+    top: 0;
+    bottom: 0;
+    background-color: #d3dfd3;
+    padding-top: 20px;
+    transform: translate3d(0, 0, 0);
+    transition:all .3s ease-in-out; 
+    -o-transition:all .3s ease-in-out; 
+    -moz-transition:all .3s ease-in-out; 
+    -webkit-transition:all .3s ease-in-out;
+    overflow: hidden;
+  }
+}
+
+#file-list.visible {
+  width: 240px;
+}
+
+
+/*@media screen and (max-width: 1200px) {
 	.trpChatPanel {
 		margin-right: 280px;
     transform: translate3d(0, 0, 0);
@@ -900,48 +970,14 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
     -webkit-transition:all .3s ease-in-out;
   }
 
-
-  #file-list {
-    width: 180px;
-    padding-left: 0;
-  }
-}
+}*/
 
 @media screen and (max-width:1024px) { 
 
 
-	.trpToolbar {
-		width: 88px;
-    padding-right: 0px;  
-	}
-
-  .trpRightPanel {
-    right: -172px;
-  }
-
-  .trpToolbarContent {
-    width: 60px;
-  }
-
   .trpToolbar .trpMiniActions {
     display: block;
     opacity: 0.8;
-  }
-
-
-	.trpChatPanel {
-		margin-left: 120px;
-		margin-right: 120px;
-	}
-
-  .trpHeaderContainer {
-    margin-left: 120px;
-    margin-right: 120px;
-  }
-
-  .trpChatInputArea {
-    margin-left: 120px;
-    margin-right: 120px;
   }
 
   .trpChatInputArea .avatar-s {
@@ -954,14 +990,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 		height: 24px;
 	}
 
-	.trpChatBox {
-		margin-left: 40px;
-	}
-
-  .trpChatInputBox {
-    margin-left: 40px;
-  }
-
   .trpHeaderFavourite {
     margin-left: 0px; 
   }
@@ -970,30 +998,14 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 		display: none;
 	}
 
-  #file-list {
-    position: fixed;
-    right: 88px;
-    width: 0px;
-    top: 0;
-    bottom: 0;
-    background-color: @trpGreen;
-    padding-top: 70px;
-    transform: translate3d(0, 0, 0);
-    transition:all .3s ease-in-out; 
-    -o-transition:all .3s ease-in-out; 
-    -moz-transition:all .3s ease-in-out; 
-    -webkit-transition:all .3s ease-in-out;
-    overflow: hidden;
-  }
-
   .uv-tab {
     right: 100px;
+    display: none;
   }
 
 }
 
 @media screen and (max-width:550px) { 
-
 
   .trpHeaderFavourite .avatar-s {
     display: none;
