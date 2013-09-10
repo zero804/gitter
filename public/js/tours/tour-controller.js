@@ -127,7 +127,7 @@ define([
         id: 'INVITE_USERS',
         title: "Search for people",
         content: "For each person that you would like to invite into the troupe, search for them by name or email and press ENTER. " +
-                 "You can also import your Google Contacts address book by clicking the '<em>Invite gmail contacts</em>' " +
+                 "You can also import your Google Contacts address book by clicking the '<em>Import gmail contacts</em>' " +
                  "button below. Once they've been imported, you'll be able to search for people by name.",
         target: ".trpInviteModal input",
         placement: "left",
