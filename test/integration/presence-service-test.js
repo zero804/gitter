@@ -707,5 +707,80 @@ describe('presenceService', function() {
     });
   });
 
+  it('user sockets list should be correctly maintained', function(done) {
+    var userId = 'TESTUSER1' + Date.now();
+    var socketId = 'TESTSOCKET1' + Date.now();
+    var troupeId = 'TESTTROUPE1' + Date.now();
+
+    // Connect the socket
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
+      if(err) return done(err);
+
+      presenceService.userSubscribedToTroupe(userId, troupeId, socketId, true, function(err) {
+        if(err) return done(err);
+
+        presenceService.findAllSocketsForUserInTroupe(userId, troupeId, function(err, socketIds) {
+          if(err) return done(err);
+
+          assert.equal(socketIds.length, 1);
+          assert.equal(socketIds[0], socketId);
+
+          // Disconnect the socket
+          presenceService.socketDisconnected(socketId, function(err) {
+            if(err) return done(err);
+
+            presenceService.findAllSocketsForUserInTroupe(userId, troupeId, function(err, socketIds) {
+              if(err) return done(err);
+
+              assert.equal(socketIds.length, 0);
+              done();
+            });
+
+          });
+
+        });
+
+      });
+
+    });
+
+
+  });
+
+
+  it('findAllSocketsForUserInTroupe should work correctly', function(done) {
+    var userId = 'TESTUSER1' + Date.now();
+    var socketId = 'TESTSOCKET1' + Date.now();
+    var troupeId = 'TESTTROUPE1' + Date.now();
+
+    // Connect the socket
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
+      if(err) return done(err);
+
+      presenceService.listAllSocketsForUser(userId, function(err, socketIds) {
+        if(err) return done(err);
+
+        assert.equal(socketIds.length, 1);
+        assert.equal(socketIds[0], socketId);
+
+        // Disconnect the socket
+        presenceService.socketDisconnected(socketId, function(err) {
+          if(err) return done(err);
+
+          presenceService.listAllSocketsForUser(userId, function(err, socketIds) {
+            if(err) return done(err);
+
+            assert.equal(socketIds.length, 0);
+            done();
+          });
+
+        });
+
+      });
+
+    });
+
+
+  });
 });
 

@@ -11,8 +11,6 @@ define([
 ], function($, context, TroupeViews, appEvents, template, moment, safeHtml) {
   "use strict";
 
-  var PAGE_SIZE = 50;
-
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
 
@@ -47,7 +45,6 @@ define([
   var originalChatPadding = chatPadding;
 
   var ChatInputBoxView = TroupeViews.Base.extend({
-    chatMessageLimit: PAGE_SIZE,
 
     events: {
       "keyup": "detectNewLine",

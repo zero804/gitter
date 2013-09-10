@@ -375,6 +375,14 @@ module.exports = function( grunt ) {
         },
         exports: 'Backbone'
       },
+      cocktail: {
+        files : {
+          'output/client-libs/cocktail/cocktail-amd.js': ['output/client-libs/cocktail/Cocktail.js']
+        },
+        modules: {
+        },
+        exports: 'Cocktail'
+      },
       fineuploader: {
         files : {
           'output/client-libs/fine-uploader/fine-uploader.js': ['output/client-libs/fine-uploader/fine-uploader.js-raw']
