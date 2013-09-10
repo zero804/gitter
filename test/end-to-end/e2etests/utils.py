@@ -39,7 +39,7 @@ def secondDriver():
 def driver():
     driverName = os.getenv('DRIVER')
     if driverName is None:
-        driverName = 'CHROME'
+        driverName = 'FIREFOX'
 
     remote = os.getenv('REMOTE_EXECUTOR')
     if remote is None:
