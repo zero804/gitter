@@ -21,7 +21,9 @@
 
 @import "trpInvites.less";
 
+/* MEDIA QUERY DEFINITIONS*/
 
+@mid: ~"(max-width: 1024px)";
 
 html {
 	min-height: 100%;
@@ -132,9 +134,13 @@ a:hover {
 	margin-top: 0px;
 	overflow: hidden;
 	transition:all .3s ease-in-out; 
-	-o-transition:all .3s ease-in-out;; 
-	-moz-transition:all .3s ease-in-out;; 
-	-webkit-transition:all .3s ease-in-out;;
+	-o-transition:all .3s ease-in-out; 
+	-moz-transition:all .3s ease-in-out; 
+	-webkit-transition:all .3s ease-in-out;
+}
+
+.trpLeftMenu.visible {
+  width: 280px;
 }
 
 .trpMiniLeftMenu {
@@ -149,18 +155,30 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 	bottom: 0;
 	z-index: 1013;
 	opacity: 0.95;
-		transition:all .2s ease-in-out;; 
-	-o-transition:all .2s ease-in-out;; 
-	-moz-transition:all .2s ease-in-out;; 
-	-webkit-transition:all .2s ease-in-out;;
+	transition:all .2s ease-in-out; 
+	-o-transition:all .2s ease-in-out; 
+	-moz-transition:all .2s ease-in-out; 
+	-webkit-transition:all .2s ease-in-out;
 }
 
 .trpMiniLeftMenu:hover { 
 	opacity: 1;
 }
 
+.trpMiniLeftMenu:hover .trpMiniLeftMenuContainer {
+  opacity: 1;
+}
+
 .trpLeftMenu:hover + .trpRightPanel {
 	opacity: 1;
+}
+
+.trpMiniLeftMenuContainer {
+  opacity: 0.5;
+  transition:all .2s ease-in-out; 
+  -o-transition:all .2s ease-in-out; 
+  -moz-transition:all .2s ease-in-out; 
+  -webkit-transition:all .2s ease-in-out;
 }
 
 .trpLeftMenu .nano {
@@ -332,7 +350,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 	width: 100%;
 	text-align: center;
 /*	padding-top: 40px;*/
-	top: 70px;
+	top: 0px;
   bottom: 68px;
   right: 0px;
   /* this min height isn't the best solution*/
@@ -367,6 +385,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   -webkit-transition:all .3s ease-in-out;
   top: 0;
   padding: 10px 0;
+  background-image: -webkit-gradient(
+    linear, left top, left bottom, from(rgba(255,255,255,0.96)),
+    to(rgba(255,255,255,0)), color-stop(.8,#FFF)
+  );
 }
 
 .trpHeaderContainer {
@@ -562,13 +584,28 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   bottom: 0;
   background-color: @trpBgColor;
   /*background-color: @trpBgColor;*/
-  opacity: 0.95;
-  z-index: 200;
+  z-index: 400;
   transform: translate3d(0, 0, 0);
   transition:all .3s ease-in-out; 
   -o-transition:all .3s ease-in-out; 
   -moz-transition:all .3s ease-in-out; 
   -webkit-transition:all .3s ease-in-out;
+}
+
+.trpChatInputArea.rightCollapse, .trpHeaderContainer.rightCollapse, .trpChatPanel.rightCollapse {
+  margin-right: 540px;
+
+  @media @mid {
+    margin-right: 380px;
+  }
+}
+
+.trpToolbar.rightCollapse {
+  right: 235px;
+}
+
+.trpChatInputArea.leftCollapse, .trpHeaderContainer.leftCollapse, .trpChatPanel.leftCollapse {
+  margin-left: 400px;
 }
 
 .trpToolbar:hover {
@@ -619,26 +656,28 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 
 .trpRightPanel {
 	position: fixed;
-	width: 240px;
-	right: -260px;
-  padding-left: 20px;
-	top: 0px;
-	bottom: 0px;
+	width: 210px;
+	right: -20px;
+  padding-left: 25px;
+	top: 0;
+	bottom: 0;
 	overflow: hidden;
 	color: white;
 	font-size: 20px;
-	z-index: 12;
-	background-color: #373435;
-	padding-top: 80px;
-	display: none;
+	background-color: #d3dfd3;
+	padding-top: 20px;
 	text-align: left;
-	z-index: 1400;
+	z-index: 300;
   opacity: 0.95;
   transform: translate3d(0, 0, 0);
-  transition:all .3s ease-in-out; 
+  transition:all .3s ease-in-out;
   -o-transition:all .3s ease-in-out; 
-  -moz-transition:all .3s ease-in-out; 
+  -moz-transition:all .3s ease-in-out;
   -webkit-transition:all .3s ease-in-out;
+}
+
+.trpRightPanel.visible {
+  right: 0px;
 }
 
 .trpRightPanel:hover {
@@ -658,11 +697,15 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   display: inline-block;
 	background-color: @trpGreen;
 	position: absolute;
-	right: 20px;
+	right: 28px;
 	text-align: center;
 	.trpBodySmall;
 	padding: 4px 6px;
 	letter-spacing: 1px;
+}
+
+.trpDetailViewContainer {
+  padding-top: 40px;
 }
 
 .trpChatInputWrapper {
@@ -871,6 +914,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 		width: 88px;
     padding-right: 0px;  
 	}
+
+  .trpRightPanel {
+    right: -172px;
+  }
 
   .trpToolbarContent {
     width: 60px;
