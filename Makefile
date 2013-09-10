@@ -67,7 +67,7 @@ end-to-end-test:
 	mkdir -p ./output/test-reports/
 	MAIL_HOST=$(MAIL_HOST) \
 	MAIL_PORT=$(MAIL_PORT) \
-	nosetests -s -v --all-modules test/end-to-end/e2etests/
+	nosetests --nologcapture --attr '!unreliable' --all-modules test/end-to-end/e2etests/
 
 end-to-end-test-saucelabs-chrome:
 	@mkdir -p ./output/test-reports
