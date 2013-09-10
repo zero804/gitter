@@ -202,12 +202,16 @@ define([
     },
 
     showFiles: function() {
-      $("#file-list").css({"width" : "200px" , "padding-left" : "20px"});
+      // $("#file-list").css({"width" : "200px" , "padding-left" : "20px"});
+      $("#header-container, #chat-frame, #chat-input, #toolbar-frame").addClass("rightCollapse");
+      $("#file-list").addClass("visible");
       this.files = true;
     },
 
     hideFiles: function() {
-      $("#file-list").css({"width": "0px", "padding-left" : "0"});
+      // $("#file-list").css({"width": "0px", "padding-left" : "0"});
+      $("#file-list").removeClass("visible");
+      $("#header-container, #chat-frame, #chat-input, #toolbar-frame").removeClass("rightCollapse");
       this.files = false;
     },
 
