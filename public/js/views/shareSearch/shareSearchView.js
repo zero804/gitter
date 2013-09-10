@@ -161,6 +161,7 @@ define([
           endpoint: this.getInviteEndpoint()
         }
       }).render();
+      this.$el.find('#custom-email').placeholder();
     },
 
     onSearchChange: function() {
