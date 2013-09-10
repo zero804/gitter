@@ -204,11 +204,7 @@ function addEmailAddress(queryText) {
             }];
           }
 
-          return [{
-            name: queryText,
-            emails: [queryText],
-            knownEmails: [queryText]
-          }];
+          return [];
         });
     }
 
