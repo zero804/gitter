@@ -37,6 +37,9 @@ define([
       return d;
     },
     inviteClicked: function() {
+      if(this.model.get('status')) {
+        return;
+      }
       this.model.set('status', 'inviting');
 
       var invite;
@@ -87,7 +90,8 @@ define([
     events: {
       'mouseover #copy-button' :      'createClipboard',
       'change #custom-email':         'onSearchChange',
-      'keyup #custom-email':       'onSearchChange'
+      'keyup #custom-email':       'onSearchChange',
+      'click #custom-email-button': 'inviteCustomEmail'
     },
 
     // when instantiated by default (through the controller) this will reflect on troupeContext to determine what the invite is for.
@@ -166,6 +170,30 @@ define([
         this._prevSearch = emailField.val();
         this.searchLimited();
       }
+    },
+
+    inviteCustomEmail: function() {
+      var emailField = this.$el.find('#custom-email');
+      var email = emailField.val();
+      var model = new suggestedContactModels.Model({
+        displayName: email,
+        avatarUrl: '/avatarForEmail/' + email,
+        emails: [email],
+        status: 'inviting'
+      });
+
+      $.ajax({
+        url: this.getInviteEndpoint(),
+        contentType: "application/json",
+        dataType: "json",
+        data: JSON.stringify({email: email}),
+        type: "POST",
+        success: function() {
+          model.set('status', 'invited');
+        }
+      });
+      emailField.val('');
+      this.collection.unshift(model);
     },
 
     getQuery: function() {

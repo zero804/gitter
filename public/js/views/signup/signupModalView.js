@@ -28,7 +28,6 @@ define([
 
     validateForm : function () {
       this.$el.find('#signup-form').validate({
-        debug: true,
         showErrors: function(errorMap, errorList) {
           if (errorList.length > 0) $('.signup-failure').show();
           if (errorList.length === 0) $('.signup-failure').hide();
