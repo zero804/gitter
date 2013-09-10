@@ -51,7 +51,7 @@ define([
     shifted: false,
     alertpanel: false,
     files: false,
-
+    originalRightMargin: "",
     regions: {
       leftMenuRegion: "#left-menu",
       rightPanelRegion: "#right-panel",
@@ -121,29 +121,15 @@ define([
     },
 
     hidePanel: function (whichPanel) {
-
-      $("#toolbar-frame").css({"right" : "0px"});
-      $("#header-container, #chat-frame").css({"marginRight" : "-=260px"});
-
-      $(whichPanel).css({
-        "right": '-260px'
-      });
-
+      $("#chat-frame, #header-container, #chat-input, #toolbar-frame").removeClass('rightCollapse');
+      $(whichPanel).removeClass('visible');
       this.rightpanel = false;
     },
 
     showPanel: function(whichPanel) {
       if (!this.rightpanel) {
- // #content-frame, #header-wrapper, #chat-input-wrapper
-
-        $("#toolbar-frame").css({"right" :"260px"});
-        $("#header-container, #chat-frame").css({"marginRight" : "+=260px"});
-
-        $(whichPanel).css({
-          "right": '0px'
-        }, 350);
-        $(whichPanel).show();
-
+        $("#header-container, #chat-frame, #chat-input, #toolbar-frame").addClass("rightCollapse");
+        $(whichPanel).addClass("visible");
         this.rightpanel = true;
       }
     },
@@ -177,13 +163,9 @@ define([
         appEvents.trigger('leftMenu:animationComplete');
       }, 350);
 
-      $("#left-menu").css({
-        "width": "280px"
-      });
+      $("#left-menu").addClass("visible");
+      $("#header-container, #chat-frame, #chat-input").addClass("leftCollapse");
 
-      // $("#content-frame, #header-wrapper, #chat-input-wrapper").css({"left" : "280px"});
-
-      $("#chat-frame, #header-container, #chat-input").css({"marginLeft" : "+=280px"});
       this.leftmenu = true;
     },
 
@@ -204,17 +186,9 @@ define([
         appEvents.trigger('leftMenu:animationComplete');
       }, 350);
 
-      $("#chat-frame, #header-container, #chat-input").removeAttr('style');
+      $("#header-container, #chat-frame, #chat-input").removeClass("leftCollapse");
+      $("#left-menu").removeClass("visible");
 
-      // PROBLEM NEED TO DEAL WITH SITUATION WHERE RIGHT MENU IS OPEN
-
-      // if (this.rightpanel) {
-      //   $("#header-container, #chat-frame").css({"marginRight" : "+=260px"});
-      // }
-
-      $("#left-menu").css({
-        "width": "0px"
-      });
       this.leftmenu = false;
     },
 
