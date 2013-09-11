@@ -36,9 +36,9 @@ define([
     "mouseleave #header-wrapper":       "onMouseLeaveHeader",
     "keypress":                         "onKeyPress",
     "click #user-icon":                 "toggleMenu",
-    "click #search-icon":                 "toggleMenu",
-    "click #troupe-icon":                 "toggleMenu",
-    "click #folder-icon":               "toggleFiles"
+    "click #search-icon":               "toggleMenu",
+    "click #troupe-icon":               "toggleMenu",
+    "click #troupe-more-actions":       "toggleTroupeMenu"
   };
 
   $('.trpDisplayPicture').tooltip('destroy');
@@ -164,6 +164,7 @@ define([
       }, 350);
 
       $("#left-menu").addClass("visible");
+      $("#mini-left-menu, #mini-left-menu-container").addClass("active");
       $("#header-container, #chat-frame, #chat-input").addClass("leftCollapse");
 
       this.leftmenu = true;
@@ -186,6 +187,7 @@ define([
         appEvents.trigger('leftMenu:animationComplete');
       }, 350);
 
+      $("#mini-left-menu, #mini-left-menu-container").removeClass("active");
       $("#header-container, #chat-frame, #chat-input").removeClass("leftCollapse");
       $("#left-menu").removeClass("visible");
 
@@ -201,26 +203,24 @@ define([
       }
     },
 
-    showFiles: function() {
+    showTroupeMenu: function() {
       // $("#file-list").css({"width" : "200px" , "padding-left" : "20px"});
-      $("#header-container, #chat-frame, #chat-input, #toolbar-frame").addClass("rightCollapse");
-      $("#file-list").addClass("visible");
+      $("#troupe-actions").addClass("visible");
       this.files = true;
     },
 
-    hideFiles: function() {
+    hideTroupeMenu: function() {
       // $("#file-list").css({"width": "0px", "padding-left" : "0"});
-      $("#file-list").removeClass("visible");
-      $("#header-container, #chat-frame, #chat-input, #toolbar-frame").removeClass("rightCollapse");
+      $("#troupe-actions").removeClass("visible");
       this.files = false;
     },
 
-    toggleFiles: function() {
+    toggleTroupeMenu: function() {
       if (this.files) {
-        this.hideFiles();
+        this.hideTroupeMenu();
       }
       else {
-        this.showFiles();
+        this.showTroupeMenu();
       }
     },
 
