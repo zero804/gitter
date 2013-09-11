@@ -358,15 +358,19 @@ function categorizeUsersByOnlineStatus(userIds, callback) {
   var keys = [key, out_key, ACTIVE_USERS_KEY];
   var values = userIds;
 
+  var d = Q.defer();
+
   scriptManager.run('presence-categorize-users', keys, values, function(err, onlineUsers) {
+    if(err) return d.reject(err);
+
     var result = {};
     if(onlineUsers) onlineUsers.forEach(function(userId) {
       result[userId] = 'online';
     });
-
-    return callback(null, result);
+    return d.resolve(result);
   });
 
+  return d.promise.nodeify(callback);
 }
 
 function categorizeUserTroupesByOnlineStatus(userTroupes, callback) {
@@ -432,6 +436,32 @@ function findAllSocketsForUserInTroupe(userId, troupeId, callback) {
 
   });
 
+}
+
+function isUserConnectedWithClientType(userId, clientType, callback) {
+  listAllSocketsForUser(userId, function(err, socketIds) {
+    if(err) return callback(err);
+    if(!socketIds || !socketIds.length) return callback(null, false);
+
+    var multi = redisClient.multi();
+    socketIds.forEach(function(socketId) {
+      multi.hmget(keySocketUser(socketId), 'ct');
+    });
+
+    multi.exec(function(err, replies) {
+      if(err) return callback(err);
+
+      var clientTypeBeta = clientType + 'beta';
+
+      for(var i = 0; i < replies.length; i++) {
+        var ct = replies[i][0];
+        if(ct === clientType || ct === clientTypeBeta) return callback(null, true);
+      }
+
+      return callback(null, false);
+    });
+
+  });
 }
 
 function listAllSocketsForUser(userId, callback) {
@@ -834,6 +864,7 @@ presenceService.listOnlineUsersForTroupes =  listOnlineUsersForTroupes;
 presenceService.categorizeUserTroupesByOnlineStatus = categorizeUserTroupesByOnlineStatus;
 presenceService.findAllSocketsForUserInTroupe = findAllSocketsForUserInTroupe;
 presenceService.listAllSocketsForUser = listAllSocketsForUser;
+presenceService.isUserConnectedWithClientType = isUserConnectedWithClientType;
 
 // Eyeball
 presenceService.clientEyeballSignal =  clientEyeballSignal;

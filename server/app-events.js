@@ -187,8 +187,23 @@ function bind(on) {
 
     onRichMessage: function(callback) {
       on('richMessage', callback);
-    }
+    },
 
+    emailConfirmed: function(email, userId) {
+      emit('emailConfirmed', { email: email, userId: userId });
+    },
+
+    onEmailConfirmed: function(callback) {
+      on('emailConfirmed', callback);
+    },
+
+    userAccountActivated: function(userId) {
+      emit('userAccountActivated', { userId: userId });
+    },
+
+    onUserAccountActivated: function(callback) {
+      on('userAccountActivated', callback);
+    }
 
   };
 }

@@ -253,7 +253,7 @@ module.exports = {
 
         } else {
 
-          var googleUser = { 
+          var googleUser = {
             displayName:        profile._json.name,
             email:              profile._json.email,
             gravatarImageUrl:   profile._json.picture,

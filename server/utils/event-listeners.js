@@ -10,6 +10,8 @@ exports.installLocalEventListeners = function() {
     require('../services/unread-item-service').install();
     require('../services/rich-message-generator').install();
 
+    require('../services/contact-signup-notifier').install();
+
     installed = true;
   }
 };
