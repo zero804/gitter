@@ -32,83 +32,36 @@
   {{/isMobile}}
 
   <div class="trpLeftMenuHotspot" id="left-menu-hotspot"></div>
+
   <div class="trpLeftMenu" id="left-menu"></div>
-  <div class="trpMiniLeftMenu" id="mini-left-menu">
-    <div class="trpMiniLeftMenuContainer" id="mini-left-menu-container">
-      <div class="trpMiniUnread">
-        <div class="trpDisplayPicture avatar-4fd48bda40a7cc9644000003 avatar-s offline" data-original-title="Andrew Newdigate&lt;br&gt;Old Street, England" style="background-image: url(https://dnsjy61awi9j1.cloudfront.net/avatar/s/4fd48bda40a7cc9644000003/5.jpg);">
-          <div class="trpStatus" id="status" data-original-title="" title=""> </div>
-          <div class="trpDPUnreadCount">12</div>
-        </div>
-        <div class="trpDisplayPicture avatar-4fd48c8040a7cc9644000022 avatar-s online" data-original-title="Mike Bartlett&lt;br&gt;Old Street, England" style="background-image: url(https://dnsjy61awi9j1.cloudfront.net/avatar/s/4fd48c8040a7cc9644000022/9.jpg);">
-          <div class="trpStatus" id="status" data-original-title="" title=""> </div>
-        </div>
-        <div class="trpDisplayPicture avatar-505ca287f32781757f00055c avatar-s online" data-original-title="Claire&lt;br&gt;" style="background-image: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1Ik0MWAxdystgoghAkcUvuunAgtgI3LZknTfjZbagzSiiLGTqIw); border-radius: 6px">
-        </div>
-        <div class="trpDisplayPicture avatar-51d146b595e7666866000644 avatar-s offline" data-original-title="Mauro&lt;br&gt;Old Street, England" style="background-image: url(https://www.gravatar.com/avatar/4605adbcd13e20c14e82fcf528b516e6?d=identicon);">
-          <div class="trpStatus" id="status" data-original-title="" title=""> </div>
-        </div>
-        <div class="trpDisplayPicture avatar-51dc0e97ad151df14200004d avatar-s offline" data-original-title="Andy Trevorah&lt;br&gt;" style="background-image: url(https://www.gravatar.com/avatar/9496bed6a195a98d671fbaee17374fae?d=identicon);">
-          <div class="trpStatus" id="status" data-original-title="" title=""> </div>
-        </div>
-      </div>
 
-      <div class="trpMiniFavs">
-        <div class="trpDisplayPicture avatar-4fd48bda40a7cc9644000003 avatar-s offline" data-original-title="Andrew Newdigate&lt;br&gt;Old Street, England" style="background-image: url(https://dnsjy61awi9j1.cloudfront.net/avatar/s/4fd48bda40a7cc9644000003/5.jpg);">
-          <div class="trpStatus" id="status" data-original-title="" title=""> </div>
-        </div>
-        <div class="trpDisplayPicture avatar-4fd48c8040a7cc9644000022 avatar-s online" data-original-title="Mike Bartlett&lt;br&gt;Old Street, England" style="background-image: url(https://dnsjy61awi9j1.cloudfront.net/avatar/s/4fd48c8040a7cc9644000022/9.jpg);">
-          <div class="trpStatus" id="status" data-original-title="" title=""> </div>
-        </div>
-        <div class="trpDisplayPicture avatar-51d146b595e7666866000644 avatar-s offline" data-original-title="Mauro&lt;br&gt;Old Street, England" style="background-image: url(https://www.gravatar.com/avatar/4605adbcd13e20c14e82fcf528b516e6?d=identicon);">
-          <div class="trpStatus" id="status" data-original-title="" title=""> </div>
-        </div>
-        <div class="trpDisplayPicture avatar-51dc0e97ad151df14200004d avatar-s offline" data-original-title="Andy Trevorah&lt;br&gt;" style="background-image: url(https://www.gravatar.com/avatar/9496bed6a195a98d671fbaee17374fae?d=identicon);">
-          <div class="trpStatus" id="status" data-original-title="" title=""> </div>
-        </div>
-      </div>
-      <div class="trpMiniActions" style="position: absolute; bottom: 24px" >
-        <div>
-          <img src='{{cdn "images/2/icon-search@2x.png"}}'/ style="margin-left: 28px; margin-bottom: 14px" width="24" height="24" id="search-icon">
-        </div>
-        <div>
-          <img src='{{cdn "images/2/icon-user@2x.png"}}'/ style="margin-left: 28px; margin-bottom: 14px" width="24" height="24" id="user-icon">
-        </div>
-        <div>
-          <img src='{{cdn "images/2/icon-troupes@2x.png"}}'/ style="margin-left: 28px; margin-bottom: 14px" width="24" height="24" id="troupe-icon">
-        </div>
-        <div class="trpDisplayPicture avatar-51e6b232055b61e50f000005 avatar-s" data-original-title="Mike Bartlett&lt;br&gt;" style="background-image: url(https://www.gravatar.com/avatar/a8b4506ba466eecadc9f4c1b46d400d0?d=identicon); margin-left: 24px; margin-bottom: 14px">
-        </div>
+  <div class="trpMenuTab" id="menu-toggle-button"><img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle">
+    {{#if unreadCount}}
+    <div class="trpUnreadBadge" id="unread-badge" style="display: block;">{{unreadCount}}</div>
+    {{else}}
+    <div class="trpUnreadBadge" id="unread-badge"></div>
+    {{/if}}
+  </div>
+
+
+  <div class="trpHeaderWrapper" id="header-wrapper">
+  </div>
+
+  <div class="trpAlertWrapper" id="alert-panel">
+    <div class="trpAlertContainer">
+      <div class="trpAlertContent" id="alert-content">
       </div>
     </div>
   </div>
 
-<div class="trpMenuTab" id="menu-toggle-button" style='display: none;'><img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle">
-  {{#if unreadCount}}
-  <div class="trpUnreadBadge" id="unread-badge" style="display: block;">{{unreadCount}}</div>
-  {{else}}
-  <div class="trpUnreadBadge" id="unread-badge"></div>
-  {{/if}}
-</div>
-
-
-<div class="trpHeaderWrapper" id="header-wrapper">
-</div>
-
-<div class="trpAlertWrapper" id="alert-panel">
-  <div class="trpAlertContainer">
-    <div class="trpAlertContent" id="alert-content">
+<div class="trpContentPanel primary-scroll" id="content-frame">
+  <div class="trpChatPanel" id="chat-frame" style="width: 100%; min-width: 0;">
+    <div class="trpChatContainer" id="frame-chat">
     </div>
   </div>
-</div>
-
-<div class="trpContentPanel primary-scroll" id="content-wrapper">
-  <div class="trpChatPanel" id="chat-frame">
-    <div class="trpChatContainer" id="content-frame">
-    </div>
+  <div class="trpToolbar" id="toolbar-frame" style="display: none">
   </div>
 </div>
-
 
 <div class="trpRightPanel" id="right-panel" style="display: none">
   <div class="trpImageBigThumbnail" id="image-preview">
@@ -118,12 +71,7 @@
   </div>
 </div>
 
-<div class="trpToolbar" id="toolbar-frame" style="display: none">
-</div>
-
-
-
-<div class="trpChatInputWrapper" id="chat-input-wrapper">
+<div class="trpChatInputWrapper" id="chat-input-wrapper" style="min-height: 60px">
   <div class="trpChatInputArea" id="chat-input">
   </div>
 </div>

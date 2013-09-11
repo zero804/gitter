@@ -68,8 +68,8 @@ require([
 
   // Setup the ChatView
 
-  var chatCollectionView = new ChatCollectionView({
-    el: $('#content-frame'),
+  new ChatCollectionView({
+    el: $('#frame-chat'),
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
     decorator: chatDecorator
