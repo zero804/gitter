@@ -19,9 +19,6 @@ define([
   rowTemplate, noContactsTemplate, ZeroClipboard, appEvents, suggestedContactModels) {
   "use strict";
 
-  // appEvents.trigger('searchSearchView:select');
-  // appEvents.trigger('searchSearchView:success');
-
   var ContactView = TroupeViews.Base.extend({
     template: rowTemplate,
     rerenderOnChange: true,
@@ -59,6 +56,7 @@ define([
         type: "POST",
         success: function() {
           this.model.set('status', 'invited');
+          appEvents.trigger('searchSearchView:success');
         }
       });
 
@@ -233,6 +231,7 @@ define([
         type: "POST",
         success: function() {
           model.set('status', 'invited');
+          appEvents.trigger('searchSearchView:success');
         }
       });
       emailField.val('');

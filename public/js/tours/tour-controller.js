@@ -67,39 +67,39 @@ define([
        */
       {
         id: 'CONNECT',
-        title: "Search by email address",
-        content: "Type in the email address of the person you want to connect with and then press ENTER.",
+        title: "Invite via email",
+        content: "Enter the email address of the person you want to connect with and then click Invite.",
         target: "#share-form input",
         placement: "left",
+        showNextButton: true,
         onShow: function() {
-          appEvents.once('searchSearchView:select', nextStep);
+          appEvents.once('searchSearchView:success', nextStep);
         },
         onHide: function() {
-          appEvents.off('searchSearchView:select', nextStep);
+          appEvents.off('searchSearchView:success', nextStep);
         }
       },
       {
-        title: "Send your invitations",
-        content: "You can add more email addresses. When you're ready, click this button to send your invitations.",
-        target: "submit-button",
-        delay: 10,
+        id: 'CONNECT_LINK',
+        title: "Invite via share link",
+        content: "You can also share this link with your colleagues.",
+        target: "#sharelink",
         placement: "bottom",
-        onShow: function() {
-          appEvents.once('searchSearchView:success', function() {
-            showStep('CONNECT_COMPLETE');
-          });
-        },
-        onHide: function() {
-          appEvents.off('searchSearchView:success');
-        }
+        delay: 100,
+        showNextButton: true
       },
       {
         id: 'CONNECT_COMPLETE',
         title: "All done!",
-        content: "Congratulations, your invites have now been sent. While you're waiting for the recipients to respond, " +
-                  "we'll show you how to set up a troupe.",
-        target: "finished-button",
-        placement: "left",
+        content: "You can invite as many colleagues as you like and when you are finished, click here.",
+        target: ".trpInviteModal .close",
+        placement: "right",
+        onShow: function() {
+          $('.trpInviteModal .close').once('click', nextStep);
+        },
+        onHide: function() {
+          $('.trpInviteModal .close').off('click', nextStep);
+        },
         delay: 10
       },
       {
@@ -125,25 +125,12 @@ define([
       },
       {
         id: 'INVITE_USERS',
-        title: "Search for people",
-        content: "For each person that you would like to invite into the troupe, search for them by name or email and press ENTER. " +
+        title: "Search and add people",
+        content: "For each person that you would like to invite into the troupe, search for them by name or email and then click invite. " +
                  "You can also import your Google Contacts address book by clicking the '<em>Import gmail contacts</em>' " +
                  "button below. Once they've been imported, you'll be able to search for people by name.",
         target: ".trpInviteModal input",
         placement: "left",
-        onShow: function() {
-          appEvents.once('searchSearchView:select', nextStep);
-        },
-        onHide: function() {
-          appEvents.off('searchSearchView:select', nextStep);
-        }
-      },
-      {
-        title: "Now send your invitations",
-        content: "Repeat to add more people. When you're ready, click the button to send the invites out.",
-        target: "#submit-button",
-        delay: 10,
-        placement: "bottom",
         onShow: function() {
           appEvents.once('searchSearchView:success', nextStep);
         },
@@ -152,7 +139,7 @@ define([
         }
       },
       {
-        id: 'INVITE_URL',
+        id: 'INVITE_LINK',
         title: "Another way to invite people",
         yOffset: -20,
         content: "Every troupe has a unique link. Share this link out and people can join after requesting access " +
