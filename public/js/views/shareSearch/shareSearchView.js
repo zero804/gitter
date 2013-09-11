@@ -178,9 +178,11 @@ define([
         showErrors: function(errorMap, errorList) {
           if (errorList.length > 0) {
             $('.share-failure').show();
+            $('.trpModalInfo').hide();
           }
           else {
             $('.share-failure').hide();
+            $('.trpModalInfo').show();
           }
           var errors = "";
           $.each(errorList, function () { errors += this.message + "<br>"; });
