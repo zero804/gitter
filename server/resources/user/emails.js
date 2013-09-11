@@ -67,7 +67,9 @@ module.exports = {
 
         return userService.addSecondaryEmail(req.user, req.body.email).then(function(email) {
           res.send({ email: email, status: 'UNCONFIRMED' });
-        }).fail(next);
+        }).fail(function(errCode) {
+          res.send(errCode);
+        });
 
       });
 
