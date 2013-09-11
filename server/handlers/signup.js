@@ -120,9 +120,7 @@ module.exports = {
           .fail(function(err) {
             winston.error("user service confirmation failed", { exception: err } );
 
-            middleware.logoutPreserveSession(req, res, function() {
-              res.redirect(nconf.get('web:homeurl') + "#message-confirmation-failed-already-registered");
-            });
+            res.relativeRedirect('/last');
           });
         });
 
