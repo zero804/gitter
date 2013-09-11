@@ -1,24 +1,54 @@
 
+.trpChatBox.mention {
+  color: @trpGreen;
+}
 
 .trpChatContainer {
+  text-align: center;
+  max-width: 66em;
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+  padding-right: 12px;
+}
+
+.trpChatInputContainer {
+  text-align: center;
+  max-width: 66em;
+  display: inline-block;
+  width: 100%;
+}
+
+.trpChatInputAvatar {
+  float: left;
 }
 
 .trpChatInputBox {
-	display: inline-block;
+	display: block;
 	background-color: white;
 /*	height: 58px;*/
 	vertical-align: top;
-	width: 404px;
 	border-radius: 5px 5px 5px 5px;
-	margin-left: 12px;
+	margin-left: 60px;
+
+  @media @mid {
+    margin-left: 40px;
+  }
 }
+
 
 .trpChatAvatar {
   float: left;
 }
 
+.trpChatAvatar .avatar-s {
+  width: 32px;
+  height: 32px;
+}
+
 .trpChatInput, .trpChatInputBoxTextArea {
-	display: inline-block;
+	display: block;
 	width: 100%;
 	outline: none;
 	.trpBodyMedium;
@@ -30,16 +60,26 @@
 	height: 49px;
 }
 
+.trpChatInputBoxTextArea:focus {
+  outline: none;
+}
+
 .trpChatInputBoxTextArea {
-  width: 394px;
   overflow: hidden;
+  padding: 0;
+  margin: 0;
 }
 
 .trpChatItem {
 	display: inline-block;
-	margin-bottom: 16px;
-	display: block;
+	margin-bottom: 24px;
 	clear: left;
+  width: 100%;
+  text-align: left;
+}
+
+.trpChatItem iframe {
+  width: 100%;
 }
 
 .trpChatItem {
@@ -58,16 +98,21 @@
 }
 
 .trpChatBox {
-	background-color: white;
+/*	background-color: #f2f5f2;*/
+  background-color: white;
 	min-height: 24px;
 	vertical-align: top;
 	border-radius: 5px 5px 5px 5px;
   .trpBodyMedium;
-	padding: 7px 12px;
+	padding: 0px 12px;
 	line-height: 150%;
-	margin-left: 64px;
+	margin-left: 40px;
 	color: #333;
-  max-width: 380px;
+
+  @media @mid {
+    margin-left: 30px;
+  }
+
 }
 
 .view .trpChatBox {
@@ -97,10 +142,9 @@
 
 .trpChatDetails{
   display: block;
-  max-width: 400px;
-  color: #D6D6D6;
+  color: #AAA;
   font-size: 12px;
-  margin: 0;
+  margin: -4px 0 0 0;
   padding: 0;
 }
 
@@ -183,7 +227,10 @@
 	margin: 0;
 	padding: 0;
   word-wrap: break-word;
-  max-width: 380px;
+}
+
+.trpChatTime {
+  margin-top: -4px;
 }
 
 .frame-chat {
@@ -192,61 +239,11 @@
 
 @media screen and (device-width: 360px), (device-width: 720px), (device-width:320px) {
 
-  .trpChatBox {
-    padding: 6px 8px;
-    margin-left: 32px;
-    display: block;
-  }
-
-  .trpChatInputArea {
-    position: fixed;
-    bottom: 0px;
-    z-index: 5;
-    background-color: white;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-left: 5px;
-  }
-
-  .trpChatInputBox {
-    margin-left: 4px;
-    width: 270px;
-  }
-
   .trpChatPanel {
     padding: 5px;
   }
 
-  .trpChatInputBoxTextArea {
-    width: 220px;
-  }
-
-  .trpChatText {
-    max-width: 255px;
-    line-height: 20px;
-  }
-
 
 }
 
-@media screen and (max-device-width: 1280px) and (orientation: landscape) {
 
-  .trpChatBox {
-
-  }
-  .trpChatText {
-    max-width: 480px;
-
-  }
-
-  .trpChatInputBoxTextArea {
-    width: 420px;
-  }
-
-    .trpChatInputBox {
-    margin-left: 4px;
-    width: 420px;
-  }
-
-
-}

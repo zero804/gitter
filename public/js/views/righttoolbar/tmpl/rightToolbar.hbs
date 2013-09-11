@@ -1,26 +1,37 @@
 <div class="nano">
   <div class="content">
     <div class="trpToolbarContent" id="toolbar-content">
-      <div class="trpToolbarHeader" id="people-header">People</div>
       <div class="trpToolbarList" id="people-roster"></div>
       <div class="trpToolbarHeader" id="request-header" style="display: none;">Requests</div>
       <div class="trpToolbarList" id="request-roster" style="display: none;"></div>
       <div class="trpToolbarHeader" id="invite-header" style="display: none;">Invites</div>
       <div class="trpToolbarList" id="invite-roster" style="display: none;"></div>
-      <div class="trpToolbarHeader" id="file-header">Files</div>
-      <div id="fineUploader"></div>
-      <div class="trpToolbarList" id="file-list"></div>
-      {{#unless isOneToOne}}
-      <div class="trpToolbarHeader" id="mail-header">Mails</div>
-      <div class="trpToolbarList" id="mail-list">
-        <div class="trpMailItem">
-          <div class="trpMailItemPicture" style="background-image: url('/images/2/icon-new-mail-black.png')"></div>
-          <div class="trpMailItemSubject"><a href="mailto:{{troupeEmailAddress}}">New Mail</a></div>
+      <div class="trpTroupeActions" id="troupe-actions">
+        <div class="trpToolbarHeader" id="file-header">Files</div>
+        <div id="fineUploader"></div>
+        <div class="trpToolbarList" id="file-list"></div>
+        {{#unless isOneToOne}}
+        <div class="trpToolbarHeader" id="mail-header">Mails</div>
+        <div class="trpToolbarList" id="mail-list">
+          <div class="trpMailItem">
+            <div class="trpMailItemPicture" style="background-image: url('/images/2/icon-new-mail-black.png')"></div>
+            <div class="trpMailItemSubject"><a href="mailto:{{troupeEmailAddress}}">New Mail</a></div>
+          </div>
+          <div class="frame-conversations">
+          </div>
         </div>
-        <div class="frame-conversations">
-        </div>
+        {{/unless}}
       </div>
-      {{/unless}}
     </div>
+  </div>
+</div>
+<div class="trpMiniActions" style="position: absolute; bottom: 24px" >
+  <div>
+    <img src='{{cdn "images/2/icon-menu-black@2x.png"}}'/ style="margin-left: 28px; margin-bottom: 14px" width="24" height="24" id="troupe-more-actions">
+  </div>
+  <div>
+    <a href="#|troupeSettings">
+      <img src='{{cdn "images/2/icon-settings-black@2x.png"}}'/ style="margin-left: 28px; margin-bottom: 14px" width="24" height="24">
+    </a>
   </div>
 </div>

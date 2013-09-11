@@ -34,8 +34,11 @@ define([
     "mouseenter #toolbar-frame":        "onMouseEnterToolbar",
     "mouseleave #toolbar-frame":        "onMouseLeaveToolbar",
     "mouseleave #header-wrapper":       "onMouseLeaveHeader",
-
-    "keypress":                         "onKeyPress"
+    "keypress":                         "onKeyPress",
+    "click #user-icon":                 "toggleMenu",
+    "click #search-icon":               "toggleMenu",
+    "click #troupe-icon":               "toggleMenu",
+    "click #troupe-more-actions":       "toggleTroupeMenu"
   };
 
   $('.trpDisplayPicture').tooltip('destroy');
@@ -47,7 +50,8 @@ define([
     profilemenu: false,
     shifted: false,
     alertpanel: false,
-
+    files: false,
+    originalRightMargin: "",
     regions: {
       leftMenuRegion: "#left-menu",
       rightPanelRegion: "#right-panel",
@@ -117,50 +121,15 @@ define([
     },
 
     hidePanel: function (whichPanel) {
-
-      $(whichPanel).animate({
-        right: uiVars.hidePanelValue
-      }, 350, function() {
-        $(whichPanel).hide();
-      });
-
-      if ($(document).width() < 1250) {
-        $("#header-frame, #alert-content, #chat-input").animate({
-          left: '+=100px'
-        }, 350, function() {
-        });
-      }
-
-      $("#content-frame").animate({
-            paddingRight: '-=100px'
-          }, 350, function() {
-          });
-
+      $("#chat-frame, #header-container, #chat-input, #toolbar-frame").removeClass('rightCollapse');
+      $(whichPanel).removeClass('visible');
       this.rightpanel = false;
     },
 
     showPanel: function(whichPanel) {
       if (!this.rightpanel) {
-        $(whichPanel).show();
-        $(whichPanel).animate({
-          right: '0px'
-        }, 350, function() {
-      // $("#left-menu").show();
-        });
-
-        if ($(document).width() < 1250) {
-
-          $("#header-frame, #alert-content, #chat-input").animate({
-            left: '-=100px'
-          }, 350, function() {
-          });
-
-          $("#content-frame").animate({
-            paddingRight: '+=100px'
-          }, 350, function() {
-          });
-        }
-
+        $("#header-container, #chat-frame, #chat-input, #toolbar-frame").addClass("rightCollapse");
+        $(whichPanel).addClass("visible");
         this.rightpanel = true;
       }
     },
@@ -172,15 +141,86 @@ define([
 
     hideMenu: function() {
       if(this._menuAnimating || this._leftMenuLockCount > 0) return;
-
       this.closeLeftMenu();
     },
+
+    openLeftMenu: function() {
+      if (this.leftmenu) return;
+
+      if (!window._troupeIsTablet) $("#chat-input-textarea").blur();
+
+      if (this.selectedListIcon == "icon-search") {
+        this.activateSearchList();
+      }
+
+      var self = this;
+      this._menuAnimating = true;
+
+      appEvents.trigger('leftMenu:animationStarting');
+      setTimeout(function() {
+        self._menuAnimating = false;
+        appEvents.trigger('leftMenu:showing');
+        appEvents.trigger('leftMenu:animationComplete');
+      }, 350);
+
+      $("#left-menu").addClass("visible");
+      $("#mini-left-menu, #mini-left-menu-container").addClass("active");
+      $("#header-container, #chat-frame, #chat-input").addClass("leftCollapse");
+
+      this.leftmenu = true;
+    },
+
+    closeLeftMenu: function() {
+      if(!this.leftmenu) return;
+      this._leftMenuLockCount = 0;
+
+      // refocus chat input in case it's lost focus but don't do that on tablets
+      if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
+
+      var self = this;
+      this._menuAnimating = true;
+
+      appEvents.trigger('leftMenu:animationStarting');
+      setTimeout(function() {
+        self._menuAnimating = false;
+        appEvents.trigger('leftMenu:hidden');
+        appEvents.trigger('leftMenu:animationComplete');
+      }, 350);
+
+      $("#mini-left-menu, #mini-left-menu-container").removeClass("active");
+      $("#header-container, #chat-frame, #chat-input").removeClass("leftCollapse");
+      $("#left-menu").removeClass("visible");
+
+      this.leftmenu = false;
+    },
+
 
     togglePanel: function(whichPanel) {
       if (this.rightpanel) {
         this.hidePanel(whichPanel);
       } else {
         this.showPanel(whichPanel);
+      }
+    },
+
+    showTroupeMenu: function() {
+      // $("#file-list").css({"width" : "200px" , "padding-left" : "20px"});
+      $("#troupe-actions").addClass("visible");
+      this.files = true;
+    },
+
+    hideTroupeMenu: function() {
+      // $("#file-list").css({"width": "0px", "padding-left" : "0"});
+      $("#troupe-actions").removeClass("visible");
+      this.files = false;
+    },
+
+    toggleTroupeMenu: function() {
+      if (this.files) {
+        this.hideTroupeMenu();
+      }
+      else {
+        this.showTroupeMenu();
       }
     },
 
@@ -314,109 +354,8 @@ define([
 
     unlockLeftMenuOpen: function() {
       this._leftMenuLockCount--;
-    },
-
-    openLeftMenu: function() {
-      if (this.leftmenu) return;
-
-      if (!window._troupeIsTablet) $("#chat-input-textarea").blur();
-
-      if (this.selectedListIcon == "icon-search") {
-        this.activateSearchList();
-      }
-
-      var self = this;
-      this._menuAnimating = true;
-
-      appEvents.trigger('leftMenu:animationStarting');
-      setTimeout(function() {
-        self._menuAnimating = false;
-        appEvents.trigger('leftMenu:showing');
-        appEvents.trigger('leftMenu:animationComplete');
-      }, 350);
-
-
-      if ($(window).width() < 1250) {
-        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
-          left: "+=280px"
-        }, 350);
-
-
-        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
-          left: "+=280px"
-        }, 350);
-
-        $("#right-panel").animate({
-          right: "-=280px"
-        }, 350);
-      } else {
-        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
-          left: "+=280px"
-        }, 350);
-
-
-        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
-          left: "+=180px"
-        }, 350);
-
-        $("#right-panel").animate({
-          right: "-=280px"
-        }, 350);
-      }
-
-      $("left-menu-hotspot").hide();
-      this.leftmenu = true;
-    },
-
-    closeLeftMenu: function() {
-      if(!this.leftmenu) return;
-      this._leftMenuLockCount = 0;
-
-      // refocus chat input in case it's lost focus but don't do that on tablets
-      if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
-
-      var self = this;
-      this._menuAnimating = true;
-
-      appEvents.trigger('leftMenu:animationStarting');
-      setTimeout(function() {
-        self._menuAnimating = false;
-        appEvents.trigger('leftMenu:hidden');
-        appEvents.trigger('leftMenu:animationComplete');
-      }, 350);
-
-      if ($(window).width() < 1250) {
-        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
-          left: "-=280px"
-        }, 350);
-
-
-        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
-          left: "-=280px"
-        }, 350);
-
-        $("#right-panel").animate({
-          right: "+=280px"
-        }, 350);
-      }
-
-      else {
-        $("#menu-toggle-button, #left-menu-hotspot, #left-menu").animate({
-          left: "-=280px"
-        }, 350);
-
-        $("#content-frame, #alert-content, #header-frame, #chat-input").animate({
-          left: "-=180px"
-        }, 350);
-
-        $("#right-panel").animate({
-          right: "+=280px"
-        }, 350);
-      }
-
-      $("left-menu-hotspot").hide();
-      this.leftmenu = false;
     }
+
 
   });
   cocktail.mixin(AppIntegratedLayout, TroupeViews.DelayedShowLayoutMixin);
