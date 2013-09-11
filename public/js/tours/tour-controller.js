@@ -58,7 +58,7 @@ define([
        id: 'FIND_PEOPLE',
        title: "Find People",
        content: "Create connections with your colleagues, suppliers and other people you work with.<br><br>" +
-                "Click on the head icon to find and invite people.",
+                "Click on the icon to find and invite people.",
        target: "#home-add-people img",
        placement: "top"
       },
@@ -84,7 +84,8 @@ define([
       {
         id: 'CONNECT_LINK',
         title: "Invite via share link",
-        content: "You can also share this link with your colleagues.",
+        content: "This link can also be shared with your colleagues to invite them.<br><br>" +
+                 "You can click on the copy button to copy it to your clipboard.",
         target: "#sharelink",
         placement: "bottom",
         delay: 100,
