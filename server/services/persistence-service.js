@@ -14,6 +14,7 @@ var shutdown = require('../utils/shutdown');
 var Fiber = require("../utils/fiber");
 var assert = require("assert");
 
+
 // Install inc and dec number fields in mongoose
 require('mongoose-number')(mongoose);
 
@@ -88,11 +89,17 @@ function serializeEvent(url, operation, model, callback) {
 // --------------------------------------------------------------------
 // Schemas
 // --------------------------------------------------------------------
-
+var UnconfirmedEmailSchema = new Schema({
+  email:            { type: String },
+  confirmationCode: { type: String }
+});
+UnconfirmedEmailSchema.schemaTypeName = 'UserEmailSchema';
 
 var UserSchema = new Schema({
   displayName: { type: String },
-  email: { type: String },
+  email: { type: String },                     // The primary email address
+  emails: [String],                            // Secondary email addresses
+  unconfirmedEmails: [UnconfirmedEmailSchema], // Unconfirmed email addresses
   username: { type: String },
   newEmail: String,
   confirmationCode: {type: String },
@@ -122,6 +129,7 @@ var UserSchema = new Schema({
 });
 UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ username: 1 }, { unique: true, sparse: true });
+UserSchema.index({ "emails.email" : 1 }, { unique: true });
 UserSchema.schemaTypeName = 'UserSchema';
 
 UserSchema.methods.getHomeUri = function() {
@@ -145,6 +153,9 @@ UserSchema.methods.hasPassword = function() {
   return !!this.passwordHash;
 };
 
+UserSchema.methods.hasEmail = function(email) {
+  return this.email === email || this.emails.some(function(e) { return e.email === email; });
+};
 
 var UserLocationHistorySchema = new Schema({
   userId: ObjectId,
@@ -198,6 +209,7 @@ var TroupeSchema = new Schema({
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });
+TroupeSchema.index({ "users.userId": 1 });
 TroupeSchema.schemaTypeName = 'TroupeSchema';
 
 
@@ -515,15 +527,34 @@ UriLookupSchema.schemaTypeName = 'UriLookupSchema';
  * User contacts
  */
 var ContactSchema = new Schema({
-  userId: {type: ObjectId, ref: 'User'},
-  source: String,
-  sourceId: String,
-  name: String,
-  emails: Array
+  userId: { type: ObjectId, ref: 'User' },        // Owner of the contact
+  source: String,                                 // The source of the contact
+  sourceId: String,                               // The ID for the contact used by the source
+  name: String,                                   // Name of the contact
+  emails: [String],                               // Email addresses for the contact
+  contactUserId: { type: ObjectId, ref: 'User' }  // The user referenced by the contact, if they've signed up
 });
 ContactSchema.index({ userId: 1 });
+ContactSchema.index({ emails: 1 });
 ContactSchema.schemaTypeName = 'ContactSchema';
 
+
+/*
+ * User contacts
+ */
+var SuggestedContactSchema = new Schema({
+  userId:        { type: ObjectId, ref: 'User' },           // Owner of the contact
+  contactUserId: { type: ObjectId, ref: 'User' },           // The user referenced by the contact, if they've signed up
+  name:          String,                                    // Name of the contact
+  emails:        [String],                                  // Email addresses for the contact
+  score:         { type: Number, default: 0 },              // Suggestion score
+  username:      String,                                    // Username of the user
+  knownEmails:   [String],                                  // Email addresses the user knows of the contact
+  dateGenerated: { type: Date,   "default": Date.now }      // Generated at
+});
+SuggestedContactSchema.index({ userId: 1 });
+SuggestedContactSchema.index({ emails: 1 });
+SuggestedContactSchema.schemaTypeName = 'SuggestedContactSchema';
 
 
 var User = mongoose.model('User', UserSchema);
@@ -558,6 +589,7 @@ var PushNotificationDevice = mongoose.model('PushNotificationDevice', PushNotifi
 var UriLookup = mongoose.model('UriLookup', UriLookupSchema);
 
 var Contact = mongoose.model('Contact', ContactSchema);
+var SuggestedContact = mongoose.model('SuggestedContact', SuggestedContactSchema);
 
 
 //
@@ -594,7 +626,8 @@ module.exports = {
     GeoPopulatedPlaceSchema: GeoPopulatedPlaceSchema,
     PushNotificationDeviceSchema: PushNotificationDeviceSchema,
     UriLookupSchema: UriLookupSchema,
-    ContactSchema: ContactSchema
+    ContactSchema: ContactSchema,
+    SuggestedContactSchema: SuggestedContactSchema
   },
   User: User,
   UserTroupeLastAccess: UserTroupeLastAccess,
@@ -620,7 +653,8 @@ module.exports = {
   UserLocationHistory: UserLocationHistory,
   PushNotificationDevice: PushNotificationDevice,
   UriLookup: UriLookup,
-  Contact: Contact
+  Contact: Contact,
+  SuggestedContact: SuggestedContact
 };
 
 process.nextTick(function() {

@@ -115,6 +115,7 @@ describe('haraka-gatekeeper', function() {
         header: {
           "Subject": subject,
           "Date": (new Date()).toString(),
+          "From": from,
           get: function(name) { return this[name]; }
         }
       }

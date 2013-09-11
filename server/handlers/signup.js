@@ -2,6 +2,7 @@
 "use strict";
 
 var signupService = require("../services/signup-service");
+var userService = require("../services/user-service");
 var middleware = require("../web/middleware");
 var loginUtils = require('../web/login-utils');
 var winston = require('winston');
@@ -98,6 +99,28 @@ module.exports = {
                 res.render('complete-profile', { troupeContext: troupeContext });
               });
             }
+          });
+        });
+
+      app.get('/confirmSecondary/:confirmationCode',
+        middleware.ensureLoggedIn(),
+        function(req, res){
+          winston.verbose("Confirmation authenticated");
+
+          userService.confirmSecondaryEmail(req.user, req.params.confirmationCode)
+            .then(function(user) {
+            if (user.hasPassword()) {
+              res.relativeRedirect('/' + user.username);
+            } else {
+              contextGenerator.generateMiniContext(req, function(err, troupeContext) {
+                res.render('complete-profile', { troupeContext: troupeContext });
+              });
+            }
+          })
+          .fail(function(err) {
+            winston.error("user service confirmation failed", { exception: err } );
+
+            res.relativeRedirect('/last');
           });
         });
 
