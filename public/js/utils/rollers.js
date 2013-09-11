@@ -171,7 +171,7 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
       var scrollTop = this._target.scrollTop;
       var clientHeight = this._target.clientHeight;
       var max = scrollTop + clientHeight;
-      var t = document.querySelector('#frame-chat');
+      var t = document.querySelector('#content-frame');
       var children = t.children;
       for(var i = children.length - 1; i >= 0; i--) {
         var child = children[i];

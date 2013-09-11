@@ -50,7 +50,7 @@ require([
       }, 500));
 
       var chatCollectionView = new ChatCollectionView({
-        el: $('#frame-chat'),
+        el: $('#content-frame'),
         collection: chatCollection
       });
 
