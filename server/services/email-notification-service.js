@@ -133,7 +133,7 @@ module.exports = {
     var to = unconfirmed.email;
 
     mailerService.sendEmail({
-      templateFile: "change-email-address",
+      templateFile: "add-email-address",
       to: to,
       from: 'Troupe <support@troupe.co>',
       subject: "Confirm new email address",
