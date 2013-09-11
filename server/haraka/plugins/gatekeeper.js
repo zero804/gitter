@@ -30,7 +30,7 @@ An additional parsed mail object will be stored on transaction.notes.mail
 exports.hook_queue = function (next, connection) {
 
   var mail = {
-    from: parseAddress(connection.transaction.mail_from),
+    from: parseAddress(connection.transaction.header.get("From")),
     subject: connection.transaction.header.get("Subject").replace(/\n/g, ""),
     date: connection.transaction.header.get("Date")
   };
