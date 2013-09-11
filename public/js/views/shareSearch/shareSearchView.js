@@ -90,8 +90,7 @@ define([
     events: {
       'mouseover #copy-button' :      'createClipboard',
       'change #custom-email':         'onSearchChange',
-      'keyup #custom-email':       'onSearchChange',
-      'click #custom-email-button': 'inviteCustomEmail'
+      'keyup #custom-email':       'onSearchChange'
     },
 
     // when instantiated by default (through the controller) this will reflect on troupeContext to determine what the invite is for.
@@ -162,6 +161,35 @@ define([
         }
       }).render();
       this.$el.find('#custom-email').placeholder();
+      var self = this;
+      this.$el.find('form').validate({
+        rules: {
+          email: {
+            required: true,
+            email: true
+          }
+        },
+        messages: {
+          email: {
+            required: "We need to know an email address to invite.",
+            email: "Hmmm, that doesn't look like an email address."
+          }
+        },
+        showErrors: function(errorMap, errorList) {
+          if (errorList.length > 0) {
+            $('.share-failure').show();
+          }
+          else {
+            $('.share-failure').hide();
+          }
+          var errors = "";
+          $.each(errorList, function () { errors += this.message + "<br>"; });
+          $('#failure-text').html(errors);
+        },
+        submitHandler: function() {
+          self.inviteCustomEmail();
+        }
+      });
     },
 
     onSearchChange: function() {
