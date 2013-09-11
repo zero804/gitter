@@ -71,6 +71,8 @@ define([
         content: "Enter the email address of the person you want to connect with and then click Invite.",
         target: "#share-form input",
         placement: "left",
+        yOffset: -20,
+        arrowOffset: 14,
         showNextButton: true,
         onShow: function() {
           appEvents.once('searchSearchView:success', nextStep);
@@ -94,6 +96,8 @@ define([
         content: "You can invite as many colleagues as you like and when you are finished, click here.",
         target: ".trpInviteModal .close",
         placement: "right",
+        yOffset: -20,
+        arrowOffset: 10,
         onShow: function() {
           $('.trpInviteModal .close').once('click', nextStep);
         },
@@ -131,6 +135,8 @@ define([
                  "button below. Once they've been imported, you'll be able to search for people by name.",
         target: ".trpInviteModal input",
         placement: "left",
+        yOffset: -20,
+        arrowOffset: 14,
         onShow: function() {
           appEvents.once('searchSearchView:success', nextStep);
         },
@@ -141,12 +147,11 @@ define([
       {
         id: 'INVITE_LINK',
         title: "Another way to invite people",
-        yOffset: -20,
         content: "Every troupe has a unique link. Share this link out and people can join after requesting access " +
-                 "(don't worry, you'll get to chose whether they can join!).<br><br>Click the copy button to " +
-                 "copy it into your clipboard for sharing.",
+                 "(don't worry, you'll get to chose whether they can join!).<br><br>You can invite more people later on, " +
+                 "so close this invite box to show your new troupe.",
         target: ".trpInviteModal #sharelink",
-        placement: "left",
+        placement: "bottom",
         onShow: function() {
           Backbone.history.once('route', nextStep);
         },
