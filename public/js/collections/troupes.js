@@ -17,7 +17,7 @@ define([
 
       return message;
     }
-  });
+  }, { modelType: 'troupe' });
 
   exports.TroupeCollection = TroupeCollections.LiveCollection.extend({
     model: exports.TroupeModel,

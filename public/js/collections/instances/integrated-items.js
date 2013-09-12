@@ -3,13 +3,13 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'collections/base',
-  'collections/files',
-  'collections/conversations',
-  'collections/users',
-  'collections/chat',
-  'collections/requests',
-  'collections/invites',
+  '../base',
+  '../files',
+  '../conversations',
+  '../users',
+  '../chat',
+  '../requests',
+  '../invites',
   'components/unread-items-client'
 ], function($, _, Backbone, base, fileModels, conversationModels, userModels, chatModels, requestModels, inviteModels, unreadItemsClient) {
   "use strict";
