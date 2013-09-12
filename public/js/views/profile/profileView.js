@@ -96,7 +96,7 @@ define([
       if(!pw.val()) return;
 
       if(!this.oldPasswordVisible) {
-        var field = this.$el.find('#oldPassword');
+        var field = this.$el.find('#old-password');
         field.show();
         field.removeAttr('value');
         field.attr('placeholder', "Type your old password here");

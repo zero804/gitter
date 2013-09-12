@@ -6,7 +6,7 @@ var userService   = require("./user-service");
 var statsService  = require("./stats-service");
 var _             = require('underscore');
 var winston       = require('winston');
-var Q             = require('Q');
+var Q             = require('q');
 
 function indexImportsByEmail(contacts) {
   var result = {};

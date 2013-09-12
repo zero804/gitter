@@ -19,11 +19,12 @@ define([
     initialize: function() {
     },
 
-    makePrimary: function() {
+    makePrimary: function(options) {
       var primary = this.collection.findWhere({ status: "PRIMARY" });
       this.save({ status: "PRIMARY" }, {
         success: function() {
           primary.set('status', 'CONFIRMED');
+          if (options.success) options.success();
         }
       });
     }

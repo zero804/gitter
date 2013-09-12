@@ -19,7 +19,8 @@ define([
 
     events: {
       "submit form": "onFormSubmit",
-      "click #saveEmailBtn": 'submit'
+      "click #saveEmailBtn": 'submit',
+      "click #saveEmailCancelBtn": 'cancel'
     },
 
     afterRender: function() {
@@ -52,7 +53,7 @@ define([
         }
       };
 
-      form.validate(validationConfig);
+      this.validator = form.validate(validationConfig);
 
     },
 
@@ -73,10 +74,15 @@ define([
 
       this.collection.create({ email: this.getEmail() }, {
         success: function() {
-          self.showConfirmation();
+          // self.showConfirmation();
+          self.back();
         },
         error: function() {
-          // TODO show the error received from server
+          self.validator.showErrors({
+            'server-validation': 'Please try another address, that address is likely already used.'
+          });
+
+          return true;
         }
       });
     },
@@ -84,7 +90,17 @@ define([
     showConfirmation: function() {
       var v = new SignupConfirmView({ email: this.getEmail() });
       this.dialog.transitionTo(new TroupeViews.Modal({ view: v }));
+    },
+
+    cancel: function() {
+      if (this.dialog) this.dialog.hide();
+    },
+
+    back: function() {
+      this.cancel();
+      window.location.href="#|profile/emails";
     }
+
   });
 
   var AddEmailModal = TroupeViews.Modal.extend({
