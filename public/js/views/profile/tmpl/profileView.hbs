@@ -3,23 +3,46 @@
     <div id="frame-profile">{{ widget "avatar" user=user size='s' }}</div>
     <div class="button-choose-avatar trpModalSubtext">Change picture</div>
   </div>
-  <form action="/updateprofile" method="post" id="updateprofileform">
+  <form action="/updateprofile" method="post" id="updateprofileform" style="display: inline-block; text-align: left">
     <div class="trpProfileForm">
-      {{#if existingUser}}
-        <input type="text" id="displayName" class="trpInput" name="displayName" value="{{displayName}}" placeholder="Click here and type your full name"><br>
-        <input type="email" disabled id="email" placeholder="Change to a new email address" class="trpInput" name="newEmail" value="{{user.email}}">
-        <a href="#|profile/emails">Add / Edit</a><br>
-        <input type="password" id="password" class="trpInput" name="password" value="" placeholder="Optional: Change password"><br>
-      {{else}}
-        <input type="text" id="displayName" class="trpInput" name="displayName" value="{{displayName}}" placeholder="Click here and type your name"><br>
-        <input type="password" id="password" class="trpInput" name="password" value="" placeholder="Then choose a password"><br>
-      {{/if}}
 
-      {{#existingUser}}
-      <input type="password" id="oldPassword" name="oldPassword" placeholder="Enter your OLD password" class="trpInput hide" name="oldPassword"><br>
-      {{/existingUser}}
+        <div class="trpFormItem">
+          <label for="displayName" class="trpFormLabel">Full Name</label>
+          <input type="text" id="displayName" class="trpInput" name="displayName" value="{{displayName}}" placeholder="Enter your full name"/>
+        </div>
+        {{#existingUser}}
+        <div class="trpFormItem">
+          <label for="newEmail" class="trpFormLabel">Email Address</label>
+          <input type="email" disabled id="email" placeholder="Change to a new email address" class="trpInput" name="newEmail" value="{{user.email}}"/>
+          <a id="manageEmailsBtn" href="#|profile/emails" class="trpFormInputAction" style="text-decoration: none">
+            <img src='{{ cdn "images/2/icon-edit.png"}}' width="16" height="16" title=""/ style="vertical-align: middle; padding-bottom: 1px">
+            <span>CHANGE</span>
+          </a>
+        </div>
+        {{/existingUser}}
+        <div class="trpFormItem">
+          <label for="password" class="trpFormLabel">Password</label>
+          {{#existingUser}}
+          <input type="password" id="password" class="trpInput" name="password" value="" placeholder="It's a secret">
+          {{/existingUser}}
+          {{^existingUser}}
+          <input type="password" id="password" class="trpInput" name="password" value="" placeholder="Choose a password">
+          <br><br>
+          {{/existingUser}}
+        </div>
+<!-- 
+        <input type="text" id="displayName" class="trpInput" name="displayName" value="{{displayName}}" placeholder="Click here and type your name"><br>
+        <input type="password" id="password" class="trpInput" name="password" value="" placeholder="Then choose a password"><br> -->
+        {{#existingUser}}
+        <div class="trpFormItem" id="old-password" style="display: none">
+          <label class="trpFormLabel" for="oldPassword">Old password</label>
+          <input type="password" id="oldPassword" placeholder="Enter your OLD password" class="trpInput" name="oldPassword"/>
+        </div>
+        {{/existingUser}}
     </div>
+    <div style="text-align: center">
     <input type="submit" class="trpButtonBig trpBtnGreen getstarted" name="submit" value="Save">
+    </div>
   </form>
  </div>
  <div class="trpModalFailure form-failure" style="display:none">

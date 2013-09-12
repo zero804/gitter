@@ -1,7 +1,8 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService = require('../../services/troupe-service');
+var troupeService     = require('../../services/troupe-service');
+var restSerializer    = require("../../serializers/rest-serializer");
 
 module.exports = function(req, res, next) {
   var invite = req.body;
@@ -13,10 +14,16 @@ module.exports = function(req, res, next) {
       displayName: invite.displayName,
       userId: invite.userId
     })
-    .then(function() {
-      res.send(invite);
-    })
-    .fail(next);
+    .then(function(result) {
+      if(result.ignored) return res.send(result);
+
+      var strategy = new restSerializer.InviteStrategy({ currentUserId: req.user.id });
+      restSerializer.serialize(result, strategy, function(err, serialized) {
+        if(err) return next(err);
+
+        res.send(serialized);
+      });
+    }, next);
 
 
 };

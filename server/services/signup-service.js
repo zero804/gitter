@@ -85,16 +85,12 @@ var signupService = module.exports = {
 
         winston.verbose("User email address change complete, finding troupe to redirect to", { id: user.id, status: user.status });
 
-        troupeService.updateInvitesForEmailToUserId(newEmail, user.id, function(err) {
-          if(err) return callback(err);
-
           troupeService.findBestTroupeForUser(user, function(err, troupe) {
             if(err) return callback(new Error("Error finding troupes for user"));
 
             return callback(err, user, troupe);
           });
 
-        });
 
       });
     });
@@ -127,16 +123,7 @@ var signupService = module.exports = {
           // Signal that an email address has been confirmed
           appEvents.emailConfirmed(user.email, user.id);
 
-          return troupeService.updateInvitesForEmailToUserId(user.email, user.id)
-            .then(function() {
-              return Q.all([
-                troupeService.updateUnconfirmedInvitesForUserId(user.id),
-                troupeService.updateUnconfirmedRequestsForUserId(user.id)
-                ]);
-            })
-            .then(function() {
-              return user;
-            });
+          return user;
         })
         .nodeify(callback);
 
@@ -257,3 +244,16 @@ var signupService = module.exports = {
   }
 
 };
+
+appEvents.onEmailConfirmed(function(params) {
+  var email = params.email;
+  var userId = params.userId;
+
+  return troupeService.updateInvitesForEmailToUserId(email, userId)
+    .then(function() {
+      return Q.all([
+        troupeService.updateUnconfirmedInvitesForUserId(userId),
+        troupeService.updateUnconfirmedRequestsForUserId(userId)
+        ]);
+    });
+});

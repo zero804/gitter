@@ -2,15 +2,19 @@
 define([
   'jquery',
   'utils/appevents',
+  'utils/context',
   './eyeballs',
   './webNotifications',
   'hbs!./tmpl/request'
-], function($, appEvents, eyeballs, webNotifications, template){
+], function($, appEvents, context, eyeballs, webNotifications, template){
   "use strict";
+
+  if(!context().desktopNotifications) {
+    return;
+  }
 
   var webkitNotifications = window.webkitNotifications;
   var Notification = window.Notification;
-
 
   function listen() {
     appEvents.on('user_notification', function(message) {
