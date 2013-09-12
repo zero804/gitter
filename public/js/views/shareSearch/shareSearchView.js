@@ -204,20 +204,8 @@ define([
 
       if(this._prevSearch !== emailField.val()) {
         this._prevSearch = emailField.val();
-        if(!emailField.val()) {
-          this.appendInvitesAfterSearch();
-        }
-
         this.searchLimited();
       }
-    },
-
-    appendInvitesAfterSearch: function() {
-      this.collection.once('search:fetch:complete', function() {
-        this.invites.forEach(function(inviteModel) {
-          this.collection.unshift(inviteModel);
-        }, this);
-      }, this);
     },
 
     inviteCustomEmail: function() {
@@ -242,7 +230,6 @@ define([
         }
       });
       emailField.val('');
-      this.invites.push(model);
       this.onSearchChange();
     },
 
