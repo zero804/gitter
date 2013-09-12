@@ -131,8 +131,6 @@ function addImplicitConnections(userId, dateGenerated) {
   });
 }
 
-
-
 function addOutgoingInvites(userId, dateGenerated) {
   return Q.all([
       troupeService.findAllUsedInvitesFromUserId(userId),
@@ -187,6 +185,41 @@ function addOutgoingInvites(userId, dateGenerated) {
 
   });
 }
+
+function addIncomingInvites(userId, dateGenerated) {
+  return Q.all([
+      troupeService.findAllUsedInvitesForUserId(userId),
+      troupeService.findAllUnusedInvitesForUserId(userId)
+    ])
+    .spread(function(usedInvites, unusedInvites) {
+      var invites = usedInvites.concat(unusedInvites);
+      var userIds = invites.map(function(i) { return i.fromUserId; });
+
+      return userService.findByIds(userIds)
+        .then(function(users) {
+
+          return Q.all(users.map(function(user) {
+            var emails = [user.email].concat(user.emails);
+
+            return persistence.SuggestedContact.updateQ(
+                    { $or:        [{ userId:     user.userId },
+                                   { emails:     { $in: emails } } ] },
+                    { $inc:       { score: REVERSE_INVITE },
+                      $addToSet:  { emails: { $each: emails } },
+                      $set:       { name: user.displayName || user.username || user.email.split('@')[0],
+                                    contactUserId: user.id,
+                                    userId: userId,
+                                    username: user.username || null,
+                                    dateGenerated: dateGenerated }
+                    },
+                    { upsert: true });
+          }));
+
+        });
+
+  });
+}
+
 /**
  * Generate suggested contacts for a user
  */
@@ -208,7 +241,8 @@ function generateSuggestedContactsForUser(userId) {
           addContacts(userId, dg),
           addReverseContacts(userId, dg),
           addImplicitConnections(userId, dg),
-          addOutgoingInvites(userId, dg)
+          addOutgoingInvites(userId, dg),
+          addIncomingInvites(userId, dg)
         ]);
 
     })
@@ -354,7 +388,7 @@ exports.fetchSuggestedContactsForUser = function(userId, options) {
   return redisClient_exists('sc:' + userId)
     .then(function(exists) {
       if(exists) {
-        //return findSuggestedContacts(userId, options);
+        return findSuggestedContacts(userId, options);
       }
 
       return generateSuggestedContactsForUser(userId)

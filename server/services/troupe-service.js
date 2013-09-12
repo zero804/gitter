@@ -635,6 +635,14 @@ function updateInvitesForEmailToUserId(email, userId, callback) {
     .nodeify(callback);
 }
 
+function findAllUsedInvitesForUserId(userId, callback) {
+  return persistence.InviteUsed.where('userId').equals(userId)
+    .sort({ createdAt: 'asc' } )
+    .execQ()
+    .nodeify(callback);
+}
+
+
 function findAllUnusedInvitesForUserId(userId, callback) {
   return persistence.Invite.where('userId').equals(userId)
     .where('status').equals('UNUSED')
@@ -1577,6 +1585,7 @@ module.exports = {
   findAllUnusedInvitesForTroupe: findAllUnusedInvitesForTroupe,
   findAllUnusedInvitesForEmail: findAllUnusedInvitesForEmail,
   findAllUnusedInvitesForUserId: findAllUnusedInvitesForUserId,
+  findAllUsedInvitesForUserId: findAllUsedInvitesForUserId,
   findAllUsedInvitesFromUserId: findAllUsedInvitesFromUserId,
   findAllUnusedInvitesFromUserId: findAllUnusedInvitesFromUserId,
 
