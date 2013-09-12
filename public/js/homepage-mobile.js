@@ -12,7 +12,7 @@ require([
       routes: {
         'signup': 'showSignup',
         'signup/:email/please-confirm': 'showSignupPleaseConfirm',
-        'login': 'showLogin',
+        'login(/:email)': 'showLogin',
         '*path':  'defaultRoute'
       },
 
@@ -30,8 +30,10 @@ require([
         $('#panelList').removeClass('showingSecondPanel').addClass('showingThirdPanel');
       },
 
-      showLogin: function() {
+      showLogin: function(email) {
         $('.form').hide();
+        loginView.initialEmail = email;
+        loginView.render();
         $('#login-form').show();
         $('#panelList').removeClass('showingThirdPanel').addClass('showingSecondPanel');
       },
@@ -60,6 +62,9 @@ require([
     var signupView = new SignupModalView({el: $('#signup-form')});
     signupView.on('signup.complete', function(data) {
       homepage.navigate('signup/'+data.email+'/please-confirm', {trigger: true});
+    });
+    signupView.on('login.prompt', function(data) {
+      homepage.navigate('login/'+data.email, {trigger: true});
     });
 
     var confirmView = new SignupModalConfirmView({
