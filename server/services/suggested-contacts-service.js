@@ -18,6 +18,8 @@ var redisClient_setex         = Q.nbind(redisClient.setex, redisClient);
 var redisClient_del           = Q.nbind(redisClient.del, redisClient);
 
 /* const */
+var INVITE                    = 64;
+var REVERSE_INVITE            = 32;
 var IMPLICIT_CONTACT          = 16;
 var SCORE_TROUPE_CONTACT      = 4;
 var SCORE_NON_TROUPE_CONTACT  = 2;
@@ -110,8 +112,8 @@ function addImplicitConnections(userId, dateGenerated) {
             var emails = [user.email].concat(user.emails);
 
             return persistence.SuggestedContact.updateQ(
-                    { emails:     { $in: emails },
-                      userId:     userId },
+                    { $or:        [{ userId:     user.userId },
+                                   { emails:     { $in: emails } } ] },
                     { $inc:       { score: IMPLICIT_CONTACT },
                       $addToSet:  { emails: { $each: emails } },
                       $set:       { name: user.displayName || user.username || user.email.split('@')[0],
@@ -129,6 +131,62 @@ function addImplicitConnections(userId, dateGenerated) {
   });
 }
 
+
+
+function addOutgoingInvites(userId, dateGenerated) {
+  return Q.all([
+      troupeService.findAllUsedInvitesFromUserId(userId),
+      troupeService.findAllUnusedInvitesFromUserId(userId),
+    ])
+    .spread(function(usedInvites, unusedInvites) {
+      var invites = usedInvites.concat(unusedInvites);
+      var userIds = invites.map(function(i) { return i.userId; }).filter(function(b) { return !!b; });
+
+      return (userIds.length ? userService.findByIds(userIds) : Q.resolve([]))
+        .then(function(users) {
+          var usersIndexed = collections.indexById(users);
+
+          return Q.all(invites.map(function(invite) {
+            var emails;
+
+            if(invite.userId) {
+              var user = usersIndexed[invite.userId];
+              if(!user) return; // Nothing to insert
+              emails = [user.email].concat(user.emails);
+
+              return persistence.SuggestedContact.updateQ(
+                      { $or:        [{ userId:     invite.userId },
+                                     { emails:     { $in: emails } } ] },
+                      { $inc:       { score: INVITE },
+                        $addToSet:  { emails: { $each: emails } },
+                        $set:       { name: user.displayName || user.username || user.email.split('@')[0],
+                                      contactUserId: user.id,
+                                      userId: userId,
+                                      username: user.username || null,
+                                      dateGenerated: dateGenerated }
+                      },
+                      { upsert: true });
+            } else {
+              var email = invite.email;
+              emails = [email];
+              return persistence.SuggestedContact.updateQ(
+                      { email:      email },
+                      { $inc:       { score: INVITE },
+                        $addToSet:  { emails: { $each: emails },
+                                      knownEmails: { $each: emails } },
+                        $set:       { name: invite.displayName || email.split('@')[0],
+                                      userId: userId,
+                                      dateGenerated: dateGenerated }
+                      },
+                      { upsert: true });
+
+            }
+          }));
+
+        });
+
+  });
+}
 /**
  * Generate suggested contacts for a user
  */
@@ -149,7 +207,8 @@ function generateSuggestedContactsForUser(userId) {
       return Q.all([
           addContacts(userId, dg),
           addReverseContacts(userId, dg),
-          addImplicitConnections(userId, dg)
+          addImplicitConnections(userId, dg),
+          addOutgoingInvites(userId, dg)
         ]);
 
     })
@@ -178,8 +237,6 @@ function createRegExpsForQuery(queryText) {
 
 function searchifyResults(skip, limit) {
   return function(results) {
-  console.log(results);
-
     return {
       hasMoreResults: undefined,
       limit: limit,
@@ -297,7 +354,7 @@ exports.fetchSuggestedContactsForUser = function(userId, options) {
   return redisClient_exists('sc:' + userId)
     .then(function(exists) {
       if(exists) {
-        return findSuggestedContacts(userId, options);
+        //return findSuggestedContacts(userId, options);
       }
 
       return generateSuggestedContactsForUser(userId)
