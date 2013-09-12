@@ -73,6 +73,13 @@ define([
         getRenderData: function() {
           var query= self.collection._currentQuery;
           return { query: query && query.q };
+        },
+        // mobile safari 6.1 will refuse to render without this
+        afterRender: function() {
+          this.el.style.display='none';
+          this.el.style.display='block';
+          var uselessQueryToTriggerReflow = this.el.offsetHeight;
+          uselessQueryToTriggerReflow = uselessQueryToTriggerReflow;
         }
       });
     }
