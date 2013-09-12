@@ -309,8 +309,17 @@ exports.fetchSuggestedContactsForUser = function(userId, options) {
 
 };
 
-appEvents.onContactsUpdated(function(data) {
+appEvents.localOnly.onContactsUpdated(function(data) {
   var userId = data.userId;
   redisClient_del('sc:' + userId);
 });
 
+
+appEvents.localOnly.onNewInvite(function(data) {
+  var fromUserId = data.fromUserId;
+  if(fromUserId) redisClient_del('sc:' + fromUserId);
+
+  var toUserId = data.toUserId;
+  if(toUserId) redisClient_del('sc:' + toUserId);
+
+});
