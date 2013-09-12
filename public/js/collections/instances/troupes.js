@@ -105,7 +105,7 @@ define([
     troupeCollection.trigger('sync');
   });
 
-  var megaCollection = new MegaCollection([], { troupes: troupeCollection, invites: inviteCollection });
+  var megaCollection = new MegaCollection(null, { troupes: troupeCollection, invites: inviteCollection });
 
   return {
     troupes: troupeCollection,
