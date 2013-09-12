@@ -180,6 +180,7 @@ define([
             email: "Hmmm, that doesn't look like an email address."
           }
         },
+        onkeyup: false,
         showErrors: function(errorMap, errorList) {
           if (errorList.length > 0) {
             $('.share-failure').show();
