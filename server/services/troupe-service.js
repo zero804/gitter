@@ -570,6 +570,7 @@ function findUnusedOneToOneInviteFromUserIdToUserId(fromUserId, toUserId) {
     });
 }
 
+
 /**
  * Finds all unconfirmed invites for a recently confirmed user,
  * notifies recipients
@@ -641,6 +642,22 @@ function findAllUnusedInvitesForUserId(userId, callback) {
     .execQ()
     .nodeify(callback);
 }
+
+
+function findAllUnusedInvitesFromUserId(userId, callback) {
+  return persistence.Invite.where('fromUserId').equals(userId)
+    .sort({ createdAt: 'asc' } )
+    .execQ()
+    .nodeify(callback);
+}
+
+function findAllUsedInvitesFromUserId(userId, callback) {
+  return persistence.InviteUsed.where('fromUserId').equals(userId)
+    .sort({ createdAt: 'asc' } )
+    .execQ()
+    .nodeify(callback);
+}
+
 
 function findAllUnusedConnectionInvitesFromUserId(userId, callback) {
   return persistence.Invite.where('fromUserId').equals(userId)
@@ -1560,6 +1577,9 @@ module.exports = {
   findAllUnusedInvitesForTroupe: findAllUnusedInvitesForTroupe,
   findAllUnusedInvitesForEmail: findAllUnusedInvitesForEmail,
   findAllUnusedInvitesForUserId: findAllUnusedInvitesForUserId,
+  findAllUsedInvitesFromUserId: findAllUsedInvitesFromUserId,
+  findAllUnusedInvitesFromUserId: findAllUnusedInvitesFromUserId,
+
   findAllUnusedConnectionInvitesFromUserId: findAllUnusedConnectionInvitesFromUserId,
   findUnusedInviteToTroupeForUserId: findUnusedInviteToTroupeForUserId,
   findImplicitConnectionBetweenUsers: findImplicitConnectionBetweenUsers,
