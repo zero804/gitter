@@ -394,7 +394,7 @@ describe('troupe-service', function() {
         }).nodeify(done);
     });
 
-    it('When two users with implicit connections invite, it should simply create a troupe for them and return null', function(done) {
+    it('When two users with implicit connections invite, it should simply create a troupe for them and return { ignored: true }', function(done) {
       var troupeService = testRequire("./services/troupe-service");
 
       // Have another user invite them to a one to one chat
@@ -402,7 +402,8 @@ describe('troupe-service', function() {
           fromUser: fixture.user1,
           userId: fixture.user2.id
         }).then(function(invite1) {
-          assert.strictEqual(invite1, null);
+          assert(invite1, 'Expected a result');
+          assert.strictEqual(invite1.ignored, true);
 
           return troupeService.findOneToOneTroupe(fixture.user1.id, fixture.user2.id)
             .then(function(troupe) {
