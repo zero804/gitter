@@ -1,17 +1,18 @@
 <div class="nano">
   <div class="content">
     <div class="trpToolbarContent" id="toolbar-content">
+      <div class="trpToolbarHeader" id="people-header">People in this troupe</div>
       <div class="trpToolbarList" id="people-roster"></div>
       <div class="trpToolbarHeader" id="request-header" style="display: none;">Requests</div>
       <div class="trpToolbarList" id="request-roster" style="display: none;"></div>
       <div class="trpToolbarHeader" id="invite-header" style="display: none;">Invites</div>
       <div class="trpToolbarList" id="invite-roster" style="display: none;"></div>
       <div class="trpTroupeActions" id="troupe-actions">
-        <div class="trpToolbarHeader" id="file-header">Files</div>
+        <div class="trpToolbarHeader divider" id="file-header">Files</div>
         <div id="fineUploader"></div>
         <div class="trpToolbarList" id="file-list"></div>
         {{#unless isOneToOne}}
-        <div class="trpToolbarHeader" id="mail-header">Mails</div>
+        <div class="trpToolbarHeader divider" id="mail-header">Mails</div>
         <div class="trpToolbarList" id="mail-list">
           <div class="trpMailItem">
             <div class="trpMailItemPicture" style="background-image: url('/images/2/icon-new-mail-black.png')"></div>
