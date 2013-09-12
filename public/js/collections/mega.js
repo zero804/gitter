@@ -1,7 +1,8 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'backbone',
-  'underscore'
+  'underscore',
+  'filtered-collection'
 ], function(Backbone, _) {
   "use strict";
 
@@ -101,5 +102,21 @@ define([
     }
   });
 
-  return MegaCollection;
+  var LimitedCollection = Backbone.FilteredCollection.extend({
+    initialize: function(models, options) {
+      var troupeList = options.troupes;
+      var inviteList = options.invites;
+      var delegate = new MegaCollection([], { troupes: troupeList, invites: inviteList });
+
+      LimitedCollection.__super__.initialize.call(this, null, {
+        collection: delegate,
+        collectionFilter: function(model) {
+          return delegate.indexOf(model) < 5;
+        }
+      });
+    }
+  });
+
+  return LimitedCollection;
+
 });

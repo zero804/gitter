@@ -1,10 +1,8 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
-  'underscore',
   'views/base',
   'utils/context',
-  'log!appIntegratedView',
   'utils/appevents',
   'marionette',
   'views/signup/usernameView',
@@ -15,7 +13,7 @@ define([
   'cocktail',
   'bootstrap_tooltip',  // no ref
   "nanoscroller"        // no ref
-  ], function($, _, TroupeViews, context, log, appEvents, Marionette, UsernameView, ProfileView, uiVars,
+  ], function($, TroupeViews, context, appEvents, Marionette, UsernameView, ProfileView, uiVars,
     notifications, modalRegion, cocktail) {
   "use strict";
 
@@ -53,6 +51,7 @@ define([
     files: false,
     originalRightMargin: "",
     regions: {
+      smartMenuRegion: "#mini-left-menu-container .trpMiniUnread", // TEMPORARY
       leftMenuRegion: "#left-menu",
       rightPanelRegion: "#right-panel",
       rightToolbarRegion: "#toolbar-frame",

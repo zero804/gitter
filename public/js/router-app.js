@@ -30,6 +30,8 @@ require([
   'utils/router',
   'components/unread-items-client',
   'views/chat/decorator',
+  'views/app/smartCollectionView',
+  'views/widgets/preload', // No ref
   'components/webNotifications', // No ref
   'components/desktopNotifications', // No ref
   'components/errorReporter',  // No ref
@@ -38,10 +40,11 @@ require([
   'template/helpers/all', // No ref
   'components/eyeballs' // No ref
 ], function($, Backbone, context, appEvents, AppIntegratedView, chatInputView, ChatCollectionView,
-            itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
-            RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, profileEmailView, profileAddEmailView, shareSearchView,
-            createTroupeView, UsernameView, HeaderView,
-            troupeSettingsView, TroupeMenuView, ReinviteModal, Router, unreadItemsClient, chatDecorator /*, errorReporter , FilteredCollection */) {
+            itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView,
+            fileVersionsView, RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView,
+            profileView, profileEmailView, profileAddEmailView, shareSearchView, createTroupeView,
+            UsernameView, HeaderView, troupeSettingsView, TroupeMenuView, ReinviteModal, Router,
+            unreadItemsClient, chatDecorator, SmartCollectionView /*, errorReporter , FilteredCollection */) {
   "use strict";
 
   // Make drop down menus drop down
@@ -60,6 +63,7 @@ require([
 
 
   var appView = new AppIntegratedView({ });
+  appView.smartMenuRegion.show(new SmartCollectionView({ collection: troupeCollections.megaCollection }));
   appView.leftMenuRegion.show(new TroupeMenuView({ }));
   appView.headerRegion.show(new HeaderView());
   appView.rightToolbarRegion.show(new RightToolbarView());
