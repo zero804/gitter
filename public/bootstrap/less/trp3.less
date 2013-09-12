@@ -356,7 +356,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 	width: 100%;
 	text-align: center;
 /*	padding-top: 40px;*/
-	top: 0px;
+	top: 70px;
   bottom: 68px;
   right: 0px;
   /* this min height isn't the best solution*/
@@ -375,7 +375,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 
 .trpHeaderWrapper {
 	width: 100%;
-	height: 60px;
+	height: 50px;
 	text-align: center;
 	position: fixed;
 	z-index: 200;
@@ -472,7 +472,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 	color: #333;
 	padding-top: 6px;
 	padding-left: 14px;
-  height: 60px;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden
@@ -481,7 +480,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 .trpHeaderToolbar {
   float: right;
   display: inline-block;
-	height: 60px;
 	vertical-align: top;
 	text-align: left;
 }
@@ -611,9 +609,21 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
     }
   }
 
+  .trpToolbarHeader {
+    padding-left: 20px;
+  }
+
+  .trpToolbarList {
+    padding-left: 20px;
+  }
+
   @media @mid {
     width: 88px;
     padding-right: 0px; 
+
+    #people-header {
+      display: none;
+    }
   }
 
   @media @small {
@@ -672,6 +682,15 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 
   @media @mid {
     width: 60px;
+
+    .trpToolbarHeader.divider {
+      border-top: 1px solid #bfcfbf;
+    }
+
+    .trpToolbarHeader.divider:first-child {
+      border-top: 0;
+    }
+
   }
 }
 
@@ -681,7 +700,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 	text-transform: uppercase;
 	padding-bottom: 8px;
 	cursor: pointer;
-  padding-left: 20px;
 
   &.divider {
     border-top: 1px solid @trpBgAccent;
@@ -697,7 +715,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   display: inline-block;
 	vertical-align: top;
 	padding-bottom: 20px;
-  padding-left: 20px;
 }
 
 .trpRightPanel {
@@ -929,20 +946,18 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
     width: 0px;
     top: 0;
     bottom: 0;
-    background-color: #d3dfd3;
-    padding-top: 20px;
+    background-color: @trpBgColor3;
     .transition300ms;
     overflow: hidden;
+    padding-top: 10px;
+    margin: -10px 0;
   }
   &.visible {
     @media @mid {
   
       width:240px;
-      padding-left: 10px;
       /*box-shadow: 3px 3px #d3dfd3, -1px 3px 3px 2px rgba(68,68,68,0.2);*/
       box-shadow: -2px 1px 6px -2px rgba(50, 50, 50, 0.55);
-      margin: -10px 0;
-      padding-top: 30px;
     }
   }
 }
