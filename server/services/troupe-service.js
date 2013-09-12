@@ -357,6 +357,7 @@ function notifyRecipientsOfInvites(invites) {
 function inviteUserByUserId(troupe, fromUser, toUserId) {
   assert(fromUser, "fromUser expected");
   assert(toUserId, "toUserId expected");
+  if(troupe) assert(!troupe.oneToOne, "Cannot invite members into oneToOne troupes");
 
   // Find the user
   return userService.findById(toUserId)
@@ -370,7 +371,13 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
 
       if(troupe) {
         // Never any chance of an implicit connection for troupe invites, just return false
-        chain = Q.resolve(false);
+        if(troupe.containsUserId(toUserId)) {
+          // Since the troupe is not a oneToOne troupe, it's safe to reference it by it's URI
+          chain = Q.resolve({ ignored: true, userId: toUserId });
+        } else {
+          chain = Q.resolve(null);
+        }
+
       } else {
         // If this invite is for a onetoone and the users have an implicit connection
         // then simply connect them up and be done with it
@@ -379,18 +386,19 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
           .then(function(hasImplicitConnection) {
             if(hasImplicitConnection) {
               return findOrCreateOneToOneTroupe(fromUserId, toUserId)
-                .then(function() {
-                  // Can't really think we should return here, this will have to do
-                  return true;
+                .then(function(troupe) {
+                  if(troupe) {
+                    return { ignored: true, userId: toUserId, url: toUser.getHomeUrl() };
+                  }
                 });
             }
 
-            return false;
+            return null;
           });
       }
 
-      return chain.then(function(hasImplicitConnection) {
-        if(hasImplicitConnection) return null; // No invite needed
+      return chain.then(function(ignored) {
+        if(ignored) return ignored; // No invite needed, ignoring the request
 
         var collection = fromUser.isConfirmed() ? persistence.Invite : persistence.InviteUnconfirmed;
 
@@ -1015,8 +1023,6 @@ function findAllUserIdsForTroupes(troupeIds, callback) {
 }
 
 function findAllUserIdsForTroupe(troupeId) {
-  console.log('findAllUserIdsForTroupe', troupeId);
-
   return persistence.Troupe.findByIdQ(troupeId, 'users', { lean: true })
     .then(function(troupe) {
       if(!troupe) throw 404;
