@@ -183,7 +183,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 }
 
 .trpMiniLeftMenuContainer {
-  opacity: 0.5;
+  opacity: 0.7;
   .transition300ms;
 }
 
@@ -383,10 +383,11 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   .transition300ms;
   top: 0;
   padding: 10px 0;
-  background-image: -webkit-gradient(
+/*  background-image: -webkit-gradient(
     linear, left top, left bottom, from(rgba(255,255,255,0.96)),
     to(rgba(255,255,255,0)), color-stop(.8,#FFF)
-  );
+  );*/
+  background: white;
 }
 
 .trpHeaderContainer {
@@ -589,10 +590,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 /*  border-left: 2px solid @trpGreen;*/
   position: fixed;
   display: inline-block;
-  width: 200px;
-  padding-right: 40px;
+  width: 240px;
+  padding-right: 0px;
   text-align: left;
-  padding-top: 16px;
+  padding-top: 20px;
   vertical-align: top;
   right: 0;
   top: 0;
@@ -668,7 +669,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   display: inline-block;
   width: 100%;
   vertical-align: top;
-  padding-left: 20px;
 
   @media @mid {
     width: 60px;
@@ -679,8 +679,14 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 	font-family: @fontSans;
 	font-size: 12px;
 	text-transform: uppercase;
-	padding-bottom: 4px;
+	padding-bottom: 8px;
 	cursor: pointer;
+  padding-left: 20px;
+
+  &.divider {
+    border-top: 1px solid @trpBgAccent;
+    padding-top: 20px;
+  }
 }
 
 .trpLeftMenu .trpToolbarHeader {
@@ -690,7 +696,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 .trpToolbarList {
   display: inline-block;
 	vertical-align: top;
-	padding-bottom: 12px;
+	padding-bottom: 20px;
+  padding-left: 20px;
 }
 
 .trpRightPanel {
