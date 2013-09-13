@@ -3,19 +3,17 @@
 
 var nconf       = require('../utils/config');
 var request     = require('request');
-var _           = require('underscore');
 var passport    = require('passport');
 var contactService = require("../services/contact-service");
 var middleware  = require("../web/middleware");
+var appEvents   = require('../app-events');
 
 
-var auth_endpoint     = "https://accounts.google.com/o/oauth2/auth";
 var token_endpoint    = "https://accounts.google.com/o/oauth2/token";
 var contacts_endpoint = "https://www.google.com/m8/feeds/contacts/default/full";
 
 var client_id     = nconf.get('googleoauth2:client_id');
 var client_secret = nconf.get('googleoauth2:client_secret');
-var redirect_uri  = nconf.get('web:basepath') + '/oauth2callback';
 
 function getAccessToken(refresh_token, cb) {
   var form = {
@@ -103,6 +101,8 @@ module.exports = {
           case 'contacts':
             getAccessToken(req.user.googleRefreshToken, function(access_token) {
               fetchContacts(access_token, req.user, function() {
+
+                appEvents.contactsUpdated(req.user.id);
 
                 if(req.session.events) {
                   req.session.events.push('google_import_complete');

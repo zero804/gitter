@@ -1,22 +1,27 @@
 
 /* Modals */
 
+@padding: 15px;
+
 .trpModalHeader {
-  padding: 4px 8px 8px 16px;
-  height: 44px;
+  padding: 11px 20px 8px 15px;
+  height: 32px;
   display: block;
 }
 
 .trpModalLogo {
   float: left;
-  padding-top: 8px;
 }
 
 .trpModalTitleHeader {
+  width: 80%;
   float: left;
-  padding-top: 12px;
+  padding-top: 5px;
   .trpH2;
   color: @trpDarkGrey;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .trpModalMenu {
@@ -52,15 +57,15 @@
 
 .trpModalFailure {
   background-color: @trpRed;
-  margin: 0px -24px 0px -24px;
-  padding: 12px 24px 12px 24px;
+  margin: 0px -@padding 0px -@padding;
+  padding: 12px @padding 12px @padding;
   display: block;
 }
 
 .trpModalSuccess {
   background-color: @trpGreen;
-  margin: 0px -24px 0px -24px;
-  padding: 12px 24px 12px 24px;
+  margin: 0px -@padding 0px -@padding;
+  padding: 12px @padding 12px @padding;
   display: block;
   .trpBodyText;
   color: white;
@@ -68,10 +73,11 @@
 
 .trpModalInfo {
   background-color: @trpBgColor;
-  margin: 0px -24px 0px -24px;
-  padding: 12px 24px 10px 24px;
+  margin: 0px -@padding 0px -@padding;
+  padding: 12px @padding 10px @padding;
   display: block;
-  min-height: 28px;
+  // allows floats inside info div
+  .clearfix;
 }
 
 
@@ -156,7 +162,7 @@ body.modal-open {
 
 .modal-header {
   border-radius: 0px;
-  padding: 5px 10px;
+  padding: 0;
   display: block;
 }
 
@@ -165,7 +171,7 @@ body.modal-open {
 }
 
 .modal-body {
-  padding: 24px 24px 0px 24px;
+  padding: @padding @padding 0 @padding;
   max-height: 440px;
   overflow-y: auto;
   display: block;

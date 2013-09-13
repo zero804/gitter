@@ -5,9 +5,7 @@ define([
 ], function(TroupeCollections, context) {
   "use strict";
 
-  var exports = {};
-
-  exports.InviteModel = TroupeCollections.Model.extend({
+  var InviteModel = TroupeCollections.Model.extend({
     idAttribute: "id",
 
     defaults: {
@@ -22,8 +20,8 @@ define([
 
   });
 
-  exports.InviteCollection = TroupeCollections.LiveCollection.extend({
-    model: exports.InviteModel,
+  var InviteCollection = TroupeCollections.LiveCollection.extend({
+    model: InviteModel,
     modelName: 'invite',
     nestedUrl: "invites",
 
@@ -33,8 +31,8 @@ define([
 
   });
 
-  exports.ConnectionInviteCollection = TroupeCollections.LiveCollection.extend({
-    model: exports.InviteModel,
+  var ConnectionInviteCollection = TroupeCollections.LiveCollection.extend({
+    model: InviteModel,
     modelName: 'connectioninvites',
     nestedUrl: "connectioninvites",
 
@@ -44,8 +42,8 @@ define([
 
   });
 
-  exports.TroupeInviteCollection = TroupeCollections.LiveCollection.extend({
-    model: exports.InviteModel,
+  var TroupeInviteCollection = TroupeCollections.LiveCollection.extend({
+    model: InviteModel,
     modelName: 'invite',
     nestedUrl: "invites",
 
@@ -56,6 +54,11 @@ define([
   });
 
 
-  return exports;
+  return {
+    InviteModel: InviteModel,
+    InviteCollection: InviteCollection,
+    ConnectionInviteCollection: ConnectionInviteCollection,
+    TroupeInviteCollection: TroupeInviteCollection
+  };
 
 });

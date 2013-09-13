@@ -1,7 +1,37 @@
-<div class="invite trpInviteItem" data-value="{{value}}">
-  <div class="trpDisplayPicture avatar-xs trpSearchInviteResult {{#user.offline}}offline{{/user.offline}} {{#user.online}}online{{/user.online}}" style="background-image: url('{{#if user.avatarUrlSmall}}{{user.avatarUrlSmall}}{{else}}/avatarForEmail/{{user.email}}{{/if}}');"></div>
-    <div class="trpInviteName">{{#if user.displayName}}{{user.displayName}}{{else}}{{user.email}}{{/if}}</div>
-    <span class="trpRemoveInvite">
-      <img class="removeInvite" data-value="{{value}}" src='{{cdn "images/2/icon-close-white.png" }}' style="vertical-align: top; padding-top: 0px">
-    </span>
+<div class="trpInviteItem">
+  <div class="avatarContainer">
+    <div class="trpInviteAvatar" style="background-image: url('{{avatarUrl}}');"></div>
+  </div>
+    <div class="trpInviteName">
+      {{displayName}}
+      <span>
+      {{#if username}}
+      <span class="trpSmall">@{{username}}</span>
+      {{/if}}
+      {{#if emails}}
+      <span class="trpInviteEmails">
+      {{#each emails}}
+      {{#unless @index}}|{{/unless}}
+      {{.}}
+      {{/each}}
+      </span>
+      {{/if}}
+      </span>
+    </div>
+    <div class="inviteButtonContainer">
+    {{#if invited}}
+      <button class="trpInviteButton disabled">Invited</button>
+    {{else}}
+      {{#if connected}}
+      <button class="trpInviteButton disabled">Connected</button>
+      {{else}}
+        {{#if member}}
+        <button class="trpInviteButton disabled">Member</button>
+        {{else}}
+        <button class="trpInviteButton">Invite</button>
+        {{/if}}
+
+      {{/if}}
+    {{/if}}
+    </div>
 </div>

@@ -411,6 +411,8 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
           query.troupeId = troupe.id;
         }
 
+        var troupeId = troupe ? troupe.id : null;
+
         return collection.findOneQ(query)
           .then(function(existingInvite) {
 
@@ -420,7 +422,7 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
             }
 
             var inviteData = {
-                troupeId: troupe ? troupe.id : null,
+                troupeId: troupeId,
                 fromUserId: fromUserId,
                 userId: toUserId,
                 displayName: null, // Don't set this if we're using a userId
@@ -432,8 +434,11 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
             return  fromUser.isConfirmed() ? createInviteQ(inviteData) : createInviteUnconfirmedQ(inviteData);
 
           }).then(function(invite) {
+
             // Notify the recipient, if the user is confirmed
             if(!fromUser.isConfirmed()) return invite;
+
+            appEvents.newInvite({ fromUserId: fromUserId, inviteId: invite.id, toUserId: toUserId, troupeId: troupeId });
 
             return notifyRecipientsOfInvites([invite])
                     .then(function() {
@@ -494,6 +499,8 @@ function inviteUserByEmail(troupe, fromUser, displayName, email) {
             });
 
           }).then(function(invite) {
+            appEvents.newInvite({ fromUserId: fromUserId, inviteId: invite.id, email: email });
+
             if(troupe) {
               // For new or existing invites, send the user an email
               emailNotificationService.sendInvite(troupe, displayName, email, invite.code, fromUser.displayName);
@@ -545,10 +552,11 @@ function findInviteByConfirmationCode(confirmationCode) {
 
 
 function findAllUnusedInvitesForTroupe(troupeId, callback) {
-   persistence.Invite.where('troupeId').equals(troupeId)
+   return persistence.Invite.where('troupeId').equals(troupeId)
       .where('status').equals('UNUSED')
       .sort({ displayName: 'asc', email: 'asc' } )
-      .exec(callback);
+      .execQ()
+      .nodeify(callback);
 }
 
 function findUnusedInviteToTroupeForUserId(userId, troupeId, callback) {
@@ -570,6 +578,7 @@ function findUnusedOneToOneInviteFromUserIdToUserId(fromUserId, toUserId) {
     });
 }
 
+
 /**
  * Finds all unconfirmed invites for a recently confirmed user,
  * notifies recipients
@@ -582,6 +591,8 @@ function updateUnconfirmedInvitesForUserId(userId) {
         var promises = invites.map(function(invite) {
           return createInviteQ(invite)
             .then(function(newInvite) {
+              appEvents.newInvite({ fromUserId: userId, inviteId: newInvite.id, toUserId: newInvite.userId });
+
               return invite.removeQ()
                 .then(function() {
                   return newInvite;
@@ -632,6 +643,14 @@ function updateInvitesForEmailToUserId(email, userId, callback) {
     .nodeify(callback);
 }
 
+function findAllUsedInvitesForUserId(userId, callback) {
+  return persistence.InviteUsed.where('userId').equals(userId)
+    .sort({ createdAt: 'asc' } )
+    .execQ()
+    .nodeify(callback);
+}
+
+
 function findAllUnusedInvitesForUserId(userId, callback) {
   return persistence.Invite.where('userId').equals(userId)
     .where('status').equals('UNUSED')
@@ -639,6 +658,22 @@ function findAllUnusedInvitesForUserId(userId, callback) {
     .execQ()
     .nodeify(callback);
 }
+
+
+function findAllUnusedInvitesFromUserId(userId, callback) {
+  return persistence.Invite.where('fromUserId').equals(userId)
+    .sort({ createdAt: 'asc' } )
+    .execQ()
+    .nodeify(callback);
+}
+
+function findAllUsedInvitesFromUserId(userId, callback) {
+  return persistence.InviteUsed.where('fromUserId').equals(userId)
+    .sort({ createdAt: 'asc' } )
+    .execQ()
+    .nodeify(callback);
+}
+
 
 function findAllUnusedConnectionInvitesFromUserId(userId, callback) {
   return persistence.Invite.where('fromUserId').equals(userId)
@@ -1571,6 +1606,10 @@ module.exports = {
   findAllUnusedInvitesForTroupe: findAllUnusedInvitesForTroupe,
   findAllUnusedInvitesForEmail: findAllUnusedInvitesForEmail,
   findAllUnusedInvitesForUserId: findAllUnusedInvitesForUserId,
+  findAllUsedInvitesForUserId: findAllUsedInvitesForUserId,
+  findAllUsedInvitesFromUserId: findAllUsedInvitesFromUserId,
+  findAllUnusedInvitesFromUserId: findAllUnusedInvitesFromUserId,
+
   findAllUnusedConnectionInvitesFromUserId: findAllUnusedConnectionInvitesFromUserId,
   findUnusedInviteToTroupeForUserId: findUnusedInviteToTroupeForUserId,
   findImplicitConnectionBetweenUsers: findImplicitConnectionBetweenUsers,
