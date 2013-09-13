@@ -24,7 +24,7 @@ define([
       var troupeList = options.troupes;
       var inviteList = options.invites;
 
-      this.sortLimited = _.debounce(function() { log('limited sort'); this.sort(); }.bind(this), 200);
+      this.sortLimited = _.debounce(function() { this.sort(); }.bind(this), 10);
 
       this.listenTo(troupeList, 'add', this.parentAdd);
       this.listenTo(inviteList, 'add', this.parentAdd);
@@ -124,8 +124,6 @@ define([
     },
 
     underlyingAdd: function(model, collection) {
-      log('underlyingAdd');
-
       var position = collection.indexOf(model);
       if(position >= this.limit) return;
 
@@ -137,37 +135,36 @@ define([
     },
 
     underlyingRemove: function(model) {
-      log('underlyingRemove');
-
       this.underlyingSort();
-      /*
-      log('underlyingRemove', arguments);
-
-      if(this.underlying.contains()) {
-        this.remove(model);
-
-        // pull whatever is at position n
-      }
-      */
     },
 
     underlyingReset: function() {
       log('underlyingReset');
 
       this.underlyingSort();
-      /*
-      log('underlyingReset', arguments);
+    },
 
-      var items = this.underlying.take(5);
-      this.reset(items);
-      */
+    analyse: function() {
+      var orderBreaks = 0;
+      var firstOutOfOrderElement = -1;
+
+      var prev = this.comparator(this.models[0]);
+      for(var i = 1; i < this.models.length; i++) {
+        var curr = this.comparator(this.models[i]);
+        if(curr < prev) {
+          orderBreaks++;
+          if(orderBreaks == 1) {
+            firstOutOfOrderElement = i;
+          } else if(orderBreaks > 1) {
+            break;
+          }
+        }
+      }
+
+      return { breaks: orderBreaks, first: firstOutOfOrderElement };
     },
 
     underlyingSort: function() {
-      log('underlyingSort');
-      log('Underlying: ', this.underlying.pluck('name'));
-      log(' PRESORT: ', this.pluck('name'));
-
       var newItems = this.underlying.chain().take(this.limit);
       var originalOrder = this.underlying.reduce(function(memo, value, index) {
         memo[value.id] = index;
@@ -179,7 +176,7 @@ define([
       self.forEach(function(item) {
         var i = originalOrder[item.id];
 
-        if(i && i >= 0) {
+        if(i >= 0) {
           newItems = newItems.without(item);
           item._sortIndex = i;
         } else {
@@ -197,16 +194,34 @@ define([
         item._sortIndex = i;
         self.add(item, { at: i });
       });
+/*
+      var analysis = this.analyse();
+      var breaks = analysis.breaks;
+      if(breaks === 0) return;
+      if(breaks === 1) {
+        var element = this.models.splice(analysis.first, 1)[0];
 
-      log('ORDER: ', _.pluck(this.models, '_sortIndex'));
-      log('ORDER: ', _.pluck(this.models, 'lastAccessTime'));
+        var to = -1;
+        var ca = this.comparator(element);
+        for(var i = 0; i < this.models.length; i++) {
+          var curr = this.comparator(this.models[i]);
+          if(curr >= ca) {
+            this.models.splice(i, 0, element);
+            to = i;
+            break;
+          }
+        }
+        if(to == -1) {
+          to = this.models.length;
+          this.models.push(element);
+        }
 
+        this.trigger('sort', this, { single: true, from: analysis.first, to: to });
 
+        return;
+      }
+  */
       self.sort();
-
-      log('POSTSORT: ', _.pluck(this.models, '_sortIndex'));
-
-      log('POSTSORT: ', this.pluck('name'));
     }
   });
 

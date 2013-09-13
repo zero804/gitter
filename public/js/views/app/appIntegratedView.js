@@ -51,7 +51,7 @@ define([
     files: false,
     originalRightMargin: "",
     regions: {
-      smartMenuRegion: "#mini-left-menu-container .trpMiniUnread", // TEMPORARY
+      smartMenuRegion: "#smart-bar-items",
       leftMenuRegion: "#left-menu",
       rightPanelRegion: "#right-panel",
       rightToolbarRegion: "#toolbar-frame",
