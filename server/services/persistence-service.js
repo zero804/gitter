@@ -154,7 +154,7 @@ UserSchema.methods.hasPassword = function() {
 };
 
 UserSchema.methods.hasEmail = function(email) {
-  return this.email === email || this.emails.some(function(e) { return e.email === email; });
+  return this.email === email || this.emails.some(function(e) { return e === email; });
 };
 
 var UserLocationHistorySchema = new Schema({
