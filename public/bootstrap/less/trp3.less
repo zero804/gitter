@@ -673,7 +673,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 
 .trpToolbar .nano {
 	height: 100%;
-
 }
 
 .trpToolbarSpacer {
@@ -684,13 +683,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   display: inline-block;
   width: 100%;
   vertical-align: top;
+  height: 100%;
 
   @media @mid {
     width: 60px;
-
-    .trpToolbarHeader.divider {
-      border-top: 1px solid #bfcfbf;
-    }
 
     .trpToolbarHeader.divider:first-child {
       border-top: 0;
@@ -705,12 +701,9 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 	text-transform: uppercase;
 	padding-bottom: 8px;
 	cursor: pointer;
-
-  &.divider {
-    border-top: 1px solid @trpBgAccent;
-    padding-top: 20px;
-  }
+  padding-top: 12px;
 }
+
 
 .trpLeftMenu .trpToolbarHeader {
 	margin-left: 9px;
@@ -720,6 +713,11 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   display: inline-block;
 	vertical-align: top;
 	padding-bottom: 20px;
+  width: 100%;
+
+    &.divider {
+    border-bottom: 1px solid #bfcfbf;
+  }
 }
 
 .trpRightPanel {
@@ -945,6 +943,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 }
 
 .trpTroupeActions {
+  height: 100%;
   @media @mid {
     position: fixed;
     right: 88px;
