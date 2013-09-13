@@ -46,6 +46,7 @@ module.exports = {
     emails = emails.concat(user.emails.map(mapConfirmedEmail));
     emails = emails.concat(user.unconfirmedEmails.map(mapUnconfirmedEmail));
 
+    res.set('CACHE-CONTROL', 'NO-CACHE');
     res.send(emails);
   },
 

@@ -340,13 +340,8 @@ module.exports = {
 
 
             if(req.user) {
-              if(invite.userId == req.user.id) {
-                return troupeService.acceptInviteForAuthenticatedUser(req.user, invite);
-              }
-              // This invite is for somebody else, log the current user out
-              req.logout();
+              return troupeService.acceptInviteForAuthenticatedUser(req.user, invite);
             }
-
 
             return troupeService.acceptInvite(confirmationCode, appUri)
               .then(function(result) {

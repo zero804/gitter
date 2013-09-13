@@ -65,7 +65,7 @@ define([
 
       userEmail: function() {
         return {
-          required: "We need to know your email address",
+          required: "We need to know your email address.",
           email: "Hmmm, that doesn't look like your email address."
         };
       },

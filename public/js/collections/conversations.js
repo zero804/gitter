@@ -1,14 +1,13 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'underscore',
   'utils/context',
   './base',
-  '../utils/momentWrapper'
-], function(_, context, TroupeCollections, moment) {
+  '../utils/momentWrapper',
+  'cocktail'
+], function(context, TroupeCollections, moment, cocktail) {
   "use strict";
-  var exports = {};
 
-  exports.EmailModel = TroupeCollections.Model.extend({
+  var EmailModel = TroupeCollections.Model.extend({
     idAttribute: "id",
 
     defaults: {
@@ -25,23 +24,32 @@ define([
   });
 
   /* Private Embedded Collections */
-  exports.EmailCollection = TroupeCollections.LiveCollection.extend({
-    model: exports.EmailModel,
+  var EmailCollection = TroupeCollections.LiveCollection.extend({
+    model: EmailModel,
     modelName: 'email',
+    initialSortBy: 'date',
+    sortByMethods: {
+        'date': function(email) {
+          return email.get('date');
+        }
+    },
+
     initialize: function(options) {
       this.url = "/troupes/" + context.getTroupeId() + "/conversations/" + options.id;
     }
 
   });
 
-  exports.ConversationDetail = TroupeCollections.Model.extend({
+  cocktail.mixin(EmailCollection, TroupeCollections.ReversableCollectionBehaviour);
+
+  var ConversationDetail = TroupeCollections.Model.extend({
     idAttribute: "id",
 
     defaults: {
     },
 
     initialize: function(options) {
-      this.emailCollection = new exports.EmailCollection({ id: options.id });
+      this.emailCollection = new EmailCollection({ id: options.id });
       this.on('change:emails', this.resetEmails, this);
 
       this.url = "/troupes/" + context.getTroupeId() + "/conversations/" + options.id;
@@ -59,7 +67,7 @@ define([
 
   });
 
-  exports.ConversationModel = TroupeCollections.Model.extend({
+  var ConversationModel = TroupeCollections.Model.extend({
     idAttribute: "id",
     parse: function(response) {
       response.updated = moment.utc(response.updated);
@@ -68,25 +76,27 @@ define([
 
   });
 
-  exports.ConversationCollection = TroupeCollections.LiveCollection.extend({
-    model: exports.ConversationModel,
+  var ConversationCollection = TroupeCollections.LiveCollection.extend({
+    model: ConversationModel,
     modelName: 'conversation',
     nestedUrl: "conversations",
-    preloadKey: 'conversations',
+    initialSortBy: '-updated',
     sortByMethods: {
       'updated': function(conversation) {
         var updated = conversation.get('updated');
         if(!updated) return 0;
         return updated.valueOf();
       }
-    },
-
-    initialize: function() {
-      this.setSortBy('-updated');
     }
   });
-  _.extend(exports.ConversationCollection.prototype, TroupeCollections.ReversableCollectionBehaviour);
+  cocktail.mixin(ConversationCollection, TroupeCollections.ReversableCollectionBehaviour);
 
-  return exports;
+  return {
+    EmailModel: EmailModel,
+    EmailCollection: EmailCollection,
+    ConversationCollection: ConversationCollection,
+    ConversationModel: ConversationModel,
+    ConversationDetail: ConversationDetail,
+  };
 
 });

@@ -1,51 +1,107 @@
+@import "trpButtons.less";
+
+.separate-unit {
+  margin-bottom: 15px;
+}
+
 .trpSearchInviteResult {
   margin-right: 12px;
   vertical-align: middle;
 }
 
 .trpSearchInvites {
-  margin: 15px 0 15px 0;
-  max-height: 110px;
+  max-height: 185px;
   overflow-x: hidden;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  .separate-unit
 }
 
 .trpInviteModal, .trpInviteModal .modal-body {
   overflow: visible;
 }
 
-.trpInviteItem {
-  display: inline-block;
-  width: 200px;
+.trpInviteModal input {
+  box-sizing: border-box;
   padding: 8px 8px 8px 8px;
-  cursor: pointer;
-  margin-right: 4px;
+  height: 34px;
+}
+
+// nasty hack to get an expandable centre column
+.trpInviteItem {
+  display: table;
+  table-layout: fixed;
+
+  .avatarContainer {
+    display: table-cell;
+    vertical-align: middle;
+    width: 42px;
+    .trpInviteAvatar {
+      display: block;
+    }
+  }
+
+  .trpInviteName, input {
+    display: table-cell;
+    vertical-align: middle;
+    width: 100%;
+  }
+
+  .inviteButtonContainer {
+    display: table-cell;
+    vertical-align: middle;
+    width: 60px;
+  }
+}
+
+.trpInviteItem {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px 8px 8px 8px;
   margin-bottom: 4px;
   background-color: @trpBgColor;
+  p {
+    .trpBodyMedium;
+    margin: 0;
+  }
 }
 
-.trpRemoveInvite {
+.trpEnterEmailRow {
+  .trpInviteItem;
+  .separate-unit;
+}
+
+.trpInviteButton {
   float: right;
-  background-color: @trpRed;
-  width: 12px;
-  height: 12px;
-  border-radius: 50em;
-  color: white;
-  margin-top: 7px;
-  display: none;
+  .trpButton;
+}
+.trpInviteButton.disabled {
+  opacity: 0.5;
 }
 
-.trpInviteItem:hover .trpRemoveInvite {
-  display: inline-block;
+.trpInviteAvatar {
+  .trpDisplayPicture;
+  .avatar-xs;
 }
 
 .trpInviteName {
   .trpBodyMedium;
-  display: inline-block;
-  max-width: 130px;
+  box-sizing: border-box;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  vertical-align: top;
-  padding-top: 4px;
+}
+
+.trpInviteEmails {
+  .trpBodySmall;
+  color: @trpDarkGreen;
+}
+
+#sharelink {
+  -webkit-user-select: text;
+   -khtml-user-select: text;
+     -moz-user-select: text;
+      -ms-user-select: text;
+          user-select: text;
 }
