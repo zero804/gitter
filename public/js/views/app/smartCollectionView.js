@@ -9,7 +9,20 @@ define([
 
   var Collection = Marionette.CollectionView.extend({
     tagName: 'div',
-    itemView: TroupeAvatarWidget
+    itemView: TroupeAvatarWidget,
+    initialize: function() {
+      this.listenTo(this.collection, 'sort', this.resort);
+    },
+    resort: function() {
+      var self = this;
+      var children = this.children;
+      var el = self.el;
+
+      self.collection.forEach(function(model) {
+        var av = children.findByModel(model);
+        el.appendChild(av.el);
+      });
+    }
   });
 
   cocktail.mixin(Collection, TroupeViews.SortableMarionetteView);
