@@ -2,8 +2,8 @@
 define([
   'backbone',
   'underscore',
-  'filtered-collection'
-], function(Backbone, _) {
+  'log!smart-list'
+], function(Backbone, _, log) {
   "use strict";
 
   function isInvite(model) {
@@ -24,7 +24,7 @@ define([
       var troupeList = options.troupes;
       var inviteList = options.invites;
 
-      this.sortLimited = _.debounce(function() { this.sort(); }.bind(this), 20);
+      this.sortLimited = _.debounce(function() { log('limited sort'); this.sort(); }.bind(this), 200);
 
       this.listenTo(troupeList, 'add', this.parentAdd);
       this.listenTo(inviteList, 'add', this.parentAdd);
@@ -38,7 +38,6 @@ define([
 
     parentAdd: function(model) {
       this.add(model);
-      this.sortLimited();
     },
 
     parentRemove: function(model) {
@@ -107,38 +106,100 @@ define([
       var collection = options.collection;
 
       this.underlying = collection;
-      this.limit = 5;
+      this.limit = 20;
+      this.comparator = function(item) {
+        return item._sortIndex;
+      };
 
       this.listenTo(collection, 'add', this.underlyingAdd);
       this.listenTo(collection, 'remove', this.underlyingRemove);
       this.listenTo(collection, 'reset', this.underlyingReset);
       this.listenTo(collection, 'sort', this.underlyingSort);
     },
+
     underlyingAdd: function(model, collection) {
+      log('underlyingAdd');
+
       var position = collection.indexOf(model);
       if(position >= this.limit) return;
-      console.log('underlyingAdd', arguments);
-      this.add(model);
-    },
 
-    underlyingRemove: function(model) {
-      console.log('underlyingRemove', arguments);
-
-      if(this.underlying.contains()) {
-        this.remove(model);
-        // pull whatever is at position n
+      model._sortIndex = position;
+      this.add(model, { at: position });
+      while(this.length >= this.limit) {
+        this.pop();
       }
     },
 
+    underlyingRemove: function(model) {
+      log('underlyingRemove');
+
+      this.underlyingSort();
+      /*
+      log('underlyingRemove', arguments);
+
+      if(this.underlying.contains()) {
+        this.remove(model);
+
+        // pull whatever is at position n
+      }
+      */
+    },
+
     underlyingReset: function() {
-      console.log('underlyingReset', arguments);
+      log('underlyingReset');
+
+      this.underlyingSort();
+      /*
+      log('underlyingReset', arguments);
 
       var items = this.underlying.take(5);
       this.reset(items);
+      */
     },
 
     underlyingSort: function() {
-      console.log('underlyingSort', arguments);
+      log('underlyingSort');
+      log('Underlying: ', this.underlying.pluck('name'));
+      log(' PRESORT: ', this.pluck('name'));
+
+      var newItems = this.underlying.chain().take(this.limit);
+      var originalOrder = this.underlying.reduce(function(memo, value, index) {
+        memo[value.id] = index;
+        return memo;
+      }, {});
+
+      var self = this;
+      var removals = [];
+      self.forEach(function(item) {
+        var i = originalOrder[item.id];
+
+        if(i && i >= 0) {
+          newItems = newItems.without(item);
+          item._sortIndex = i;
+        } else {
+          removals.push(item);
+        }
+      });
+
+      // Bulk the operation for performance
+      if(removals.length) {
+        this.remove(removals);
+      }
+
+      newItems.forEach(function(item) {
+        var i = originalOrder[item.id];
+        item._sortIndex = i;
+        self.add(item, { at: i });
+      });
+
+      log('ORDER: ', _.pluck(this.models, '_sortIndex'));
+
+
+      self.sort();
+
+      log('POSTSORT: ', _.pluck(this.models, '_sortIndex'));
+
+      log('POSTSORT: ', this.pluck('name'));
     }
   });
 

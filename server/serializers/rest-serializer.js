@@ -1,20 +1,20 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var userService = require("../services/user-service");
-var chatService = require("../services/chat-service");
-var troupeService = require("../services/troupe-service");
-var fileService = require("../services/file-service");
+var userService       = require("../services/user-service");
+var chatService       = require("../services/chat-service");
+var troupeService     = require("../services/troupe-service");
+var fileService       = require("../services/file-service");
 var unreadItemService = require("../services/unread-item-service");
-var presenceService = require("../services/presence-service");
-var Q = require("q");
-var _ = require("underscore");
-var handlebars = require('handlebars');
-var winston = require("winston");
-var collections = require("../utils/collections");
-var cdn = require('../web/cdn');
-var predicates = collections.predicates;
-var gravatar = require('../utils/gravatar');
+var presenceService   = require("../services/presence-service");
+var Q                 = require("q");
+var _                 = require("underscore");
+var handlebars        = require('handlebars');
+var winston           = require("winston");
+var collections       = require("../utils/collections");
+var cdn               = require('../web/cdn');
+var predicates        = collections.predicates;
+var gravatar          = require('../utils/gravatar');
 
 // TODO: Fix this, use the CDN and code sign URLS
 function privateCdn(url) {
@@ -770,6 +770,7 @@ function TroupeStrategy(options) {
       id: item.id,
       name: troupeName,
       uri: item.uri,
+      avatarUrl: gravatar.gravatarUrlForEmail(troupeUrl + '@trou.pe'),
       oneToOne: item.oneToOne,
       users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
       user: otherUser,
