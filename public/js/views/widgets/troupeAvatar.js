@@ -18,6 +18,19 @@ define([
       // this.addCleanup(function() {
       //   self.stopListening();
       // });
+    },
+    afterRender: function() {
+      this.$el.find(':first-child').tooltip({
+        html : true,
+        placement : function(a, element) {
+          var position = $(element).position();
+          if (position.top < 110){
+              return "bottom";
+          }
+          return "top";
+        },
+        container: "body"
+      });
     }
 
   });
