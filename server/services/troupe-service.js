@@ -1015,7 +1015,6 @@ function findAllUserIdsForTroupes(troupeIds, callback) {
 }
 
 function findAllUserIdsForTroupe(troupeId) {
-  console.log('findAllUserIdsForTroupe', troupeId);
 
   return persistence.Troupe.findByIdQ(troupeId, 'users', { lean: true })
     .then(function(troupe) {
@@ -1250,39 +1249,51 @@ function acceptInviteForAuthenticatedUser(user, invite) {
     assert(user, 'User parameter required');
     assert(invite, 'invite parameter required');
 
-    if(!user.hasEmail(invite.email) && invite.userId != user.id) {
-      throw 401;
+    // check if the invite is associated with this user id
+    // check if the invited email is owned by the user
+    if (invite.userId != user.id && !user.hasEmail(invite.email)) {
+      // associate this email address as a confirmed secondary address for the user
+      return userService.addSecondaryEmail(user, invite.email, true)
+      .then(function() {
+        return userService.confirmSecondaryEmailByAddress(user, invite.email);
+      })
+      .then(onceConfirmed);
+    }
+    else {
+      return onceConfirmed();
     }
 
-    // TODO: this will not be used in future once invites are all delete
-    if(invite.status !== 'UNUSED') {
-      // invite has been used, we can't use it again.
-      winston.verbose("Invite has already been used", { inviteId: invite.id });
-      statsService.event('invite_reused', { userId: user.id, inviteId: invite.id });
+    function onceConfirmed() {
+      // TODO: this will not be used in future once invites are all delete
+      if(invite.status !== 'UNUSED') {
+        // invite has been used, we can't use it again.
+        winston.verbose("Invite has already been used", { inviteId: invite.id });
+        statsService.event('invite_reused', { userId: user.id, inviteId: invite.id });
 
-      throw { alreadyUsed: true };
+        throw { alreadyUsed: true };
+      }
+
+      // use and delete invite
+      statsService.event('invite_accepted', { userId: user.id, email: user.email, inviteId: invite.id, new_user: user.status !== 'ACTIVE' });
+      winston.verbose("Invite accepted for authd user", { inviteId: invite.id });
+
+      // Either add the user or create a one to one troupe. depending on whether this
+      // is a one to one invite or a troupe invite
+      var isNormalTroupe = !!invite.troupeId;
+
+      return (isNormalTroupe ? addUserIdToTroupe(user.id, invite.troupeId)
+                              : createOneToOneTroupe(invite.fromUserId, invite.userId))
+        .then(function(troupe) {
+
+          // once user is added / troupe is created, send email notice
+          sendInviteAcceptedNotice(invite, troupe, isNormalTroupe);
+
+          // Regardless of the type, mark things as done
+          return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite)
+            .thenResolve(troupe);
+        });
+
     }
-
-    // use and delete invite
-    statsService.event('invite_accepted', { userId: user.id, email: user.email, inviteId: invite.id, new_user: user.status !== 'ACTIVE' });
-    winston.verbose("Invite accepted for authd user", { inviteId: invite.id });
-
-    // Either add the user or create a one to one troupe. depending on whether this
-    // is a one to one invite or a troupe invite
-    var isNormalTroupe = !!invite.troupeId;
-
-    return (isNormalTroupe ? addUserIdToTroupe(user.id, invite.troupeId)
-                            : createOneToOneTroupe(invite.fromUserId, invite.userId))
-      .then(function(troupe) {
-
-        // once user is added / troupe is created, send email notice
-        sendInviteAcceptedNotice(invite, troupe, isNormalTroupe);
-
-        // Regardless of the type, mark things as done
-        return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite)
-          .thenResolve(troupe);
-      });
-
   });
 }
 
@@ -1299,7 +1310,7 @@ function findRecipientForInvite(invite) {
   return userService.findByEmail(invite.email);
 }
 
-// Accept an invite, returns callback(err, user, alreadyExists)
+// Accept an invite, must not be used for requests from a logged in user, returns callback(err, user, alreadyExists)
 // NB NB NB user should only ever be set iff the invite is valid
 /**
  * Accepts an invite
