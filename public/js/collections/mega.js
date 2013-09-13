@@ -73,7 +73,7 @@ define([
         return -1;
       }
 
-      if(b.get('unreadItems')) {
+      if(b.get('unreadItems') > 0) {
         return 1;
       }
 
@@ -90,14 +90,20 @@ define([
         return 1;
       }
 
-
       // Otherwise, use the last access time for comparison
       var da = a.get('lastAccessTime');
-      var db = a.get('lastAccessTime');
+      var db = b.get('lastAccessTime');
       var ta = da && da.valueOf() || 0;
       var tb = db && db.valueOf() || 0;
 
-      return - ta - tb;
+
+      // Use the reverse order
+      var c = tb - ta;
+      if(!c) {
+        return defaultCompare();
+      } else {
+        return c;
+      }
     }
   });
 
@@ -193,6 +199,7 @@ define([
       });
 
       log('ORDER: ', _.pluck(this.models, '_sortIndex'));
+      log('ORDER: ', _.pluck(this.models, 'lastAccessTime'));
 
 
       self.sort();
