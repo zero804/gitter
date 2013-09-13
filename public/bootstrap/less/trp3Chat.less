@@ -68,6 +68,7 @@
   overflow: hidden;
   padding: 0;
   margin: 0;
+  background-color: #trpChatInputBoxTextArea;
 }
 
 .trpChatItem {
@@ -85,7 +86,6 @@
 .trpChatItem {
   .embed {
     border: 0px;
-    width: 100%;
     margin-top: 5px;
   }
   .mention {
@@ -93,13 +93,12 @@
   }
   .rich {
     margin-top: 10px;
-    text-align: center;
   }
 }
 
 .trpChatBox {
 /*	background-color: #f2f5f2;*/
-  background-color: white;
+  background-color: @trpBgColor2;
 	min-height: 24px;
 	vertical-align: top;
 	border-radius: 5px 5px 5px 5px;
