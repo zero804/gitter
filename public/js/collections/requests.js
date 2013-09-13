@@ -1,31 +1,26 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'jquery',
-  'underscore',
-  'backbone',
   './base'
-], function($, _, Backbone, TroupeCollections) {
+], function(TroupeCollections) {
   "use strict";
 
-  var exports = {};
-
-  exports.RequestModel = TroupeCollections.Model.extend({
+  var RequestModel = TroupeCollections.Model.extend({
     idAttribute: "id",
 
     defaults: {
-    },
-
-    initialize: function() {
     }
 
   });
 
-  exports.RequestCollection = TroupeCollections.LiveCollection.extend({
-    model: exports.RequestModel,
+  var RequestCollection = TroupeCollections.LiveCollection.extend({
+    model: RequestModel,
     modelName: 'request',
     nestedUrl: "requests"
   });
 
-  return exports;
+  return {
+    RequestModel: RequestModel,
+    RequestCollection: RequestCollection
+  };
 
 });

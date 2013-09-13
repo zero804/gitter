@@ -107,7 +107,7 @@ module.exports = {
         function(req, res){
           winston.verbose("Confirmation authenticated");
 
-          userService.confirmSecondaryEmail(req.user, req.params.confirmationCode)
+          userService.confirmSecondaryEmailByCode(req.user, req.params.confirmationCode)
             .then(function(user) {
             if (user.hasPassword()) {
               res.relativeRedirect('/' + user.username);
