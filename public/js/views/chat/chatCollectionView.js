@@ -26,6 +26,7 @@ define([
    */
   var ChatCollectionView = Marionette.CollectionView.extend({
     itemView: chatItemView.ChatItemView,
+    reverseScrolling: true,
     itemViewOptions: function() {
       return { userCollection: this.userCollection, decorator: this.decorator};
     },

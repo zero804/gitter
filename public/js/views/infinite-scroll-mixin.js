@@ -1,7 +1,8 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'utils/never-ending-story'
-], function(NeverEndingStory) {
+  'utils/never-ending-story',
+  'log!infinite-scroll'
+], function(NeverEndingStory, log) {
   "use strict";
 
   /** @const */
@@ -12,13 +13,22 @@ define([
    */
   return {
     initialize: function() {
-      var scrollElement = document.querySelector(this.scrollElementSelector);
-      this.$el.find().on('scroll', this.onScroll);
+      var scrollElement = this.scrollElementSelector ? /*this.el*/document.querySelector(this.scrollElementSelector) : this.el;
 
-      var scroll = new NeverEndingStory(scrollElement);
+      var scroll = new NeverEndingStory(scrollElement, { reverse: this.reverseScrolling });
       this.listenTo(scroll, 'approaching.end', function() {
         this.loadMore();
       });
+
+      this.listenTo(this.collection, 'search:newquery', function() {
+        scroll.enable();
+        scroll.scrollToOrigin();
+      });
+
+      this.listenTo(this.collection, 'search:nomore', function() {
+        scroll.disable();
+      });
+
 
       this.scroll = scroll;
     },
@@ -28,11 +38,23 @@ define([
     },
 
     loadMore: function() {
+      // If the collection support pagenation, use it
+      if(this.collection.fetchNext) {
+        this.collection.fetchNext({
+          context: this,
+          done: function() {
+            this.scroll.loadComplete();
+          }
+        });
+
+        /* Our work here is done */
+        return;
+      }
+
       var fetchData = this.getFetchData && this.getFetchData.call(this) || {
         skip: this.collection.length,
         limit: PAGE_SIZE
       };
-
 
       if(!fetchData) {
         // No fetch data means nothing to fetch
@@ -45,7 +67,6 @@ define([
       }
 
       this.collection.once('add', onAdd);
-
       var self = this;
       this.collection.fetch({
         update: true,
