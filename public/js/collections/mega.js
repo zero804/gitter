@@ -102,21 +102,58 @@ define([
     }
   });
 
-  var LimitedCollection = Backbone.FilteredCollection.extend({
+  var LimitedCollection = Backbone.Collection.extend({
+    initialize: function(models, options) {
+      var collection = options.collection;
+
+      this.underlying = collection;
+      this.limit = 5;
+
+      this.listenTo(collection, 'add', this.underlyingAdd);
+      this.listenTo(collection, 'remove', this.underlyingRemove);
+      this.listenTo(collection, 'reset', this.underlyingReset);
+      this.listenTo(collection, 'sort', this.underlyingSort);
+    },
+    underlyingAdd: function(model, collection) {
+      var position = collection.indexOf(model);
+      if(position >= this.limit) return;
+      console.log('underlyingAdd', arguments);
+      this.add(model);
+    },
+
+    underlyingRemove: function(model) {
+      console.log('underlyingRemove', arguments);
+
+      if(this.underlying.contains()) {
+        this.remove(model);
+        // pull whatever is at position n
+      }
+    },
+
+    underlyingReset: function() {
+      console.log('underlyingReset', arguments);
+
+      var items = this.underlying.take(5);
+      this.reset(items);
+    },
+
+    underlyingSort: function() {
+      console.log('underlyingSort', arguments);
+    }
+  });
+
+  var Collection = LimitedCollection.extend({
     initialize: function(models, options) {
       var troupeList = options.troupes;
       var inviteList = options.invites;
-      var delegate = new MegaCollection([], { troupes: troupeList, invites: inviteList });
 
-      LimitedCollection.__super__.initialize.call(this, null, {
-        collection: delegate,
-        collectionFilter: function(model) {
-          return delegate.indexOf(model) < 5;
-        }
+      Collection.__super__.initialize.call(this, null, {
+        collection: new MegaCollection([], { troupes: troupeList, invites: inviteList }),
       });
     }
   });
 
-  return LimitedCollection;
+
+  return Collection;
 
 });
