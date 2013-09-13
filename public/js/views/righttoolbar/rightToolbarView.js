@@ -31,11 +31,11 @@ define([
     },
 
     events: {
-      "click #people-header": "onPeopleHeaderClick",
-      "click #request-header": "onRequestHeaderClick",
-      "click #invites-header": "onInvitesHeaderClick",
-      "click #file-header": "onFileHeaderClick",
-      "click #mail-header": "onMailHeaderClick"
+      // "click #people-header": "onPeopleHeaderClick",
+      // "click #request-header": "onRequestHeaderClick",
+      // "click #invites-header": "onInvitesHeaderClick",
+      // "click #file-header": "onFileHeaderClick",
+      // "click #mail-header": "onMailHeaderClick"
     },
 
     initialize: function() {
