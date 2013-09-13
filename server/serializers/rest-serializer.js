@@ -770,7 +770,7 @@ function TroupeStrategy(options) {
       id: item.id,
       name: troupeName,
       uri: item.uri,
-      avatarUrl: gravatar.gravatarUrlForEmail(troupeUrl + '@trou.pe'),
+      avatarUrl: otherUser && otherUser.avatarUrlSmall || gravatar.gravatarUrlForEmail(troupeUrl + '@trou.pe'),
       oneToOne: item.oneToOne,
       users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
       user: otherUser,
