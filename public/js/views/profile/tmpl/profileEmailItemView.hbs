@@ -2,12 +2,12 @@
 <td>{{status}}</td>
 <td>
 {{#if isUnconfirmed}}
-    <button class="trpButtonMedium trpBtnGreen" id="resendConfirmBtn">Resend Confirmation</button>
+    <button class="trpButton" id="resendConfirmBtn">Resend Confirmation</button>
 {{/if}}
 {{#if isSecondary}}
-    <button class="trpButtonMedium trpBtnGreen" id="makePrimaryBtn">Make Primary</button>
+    <button class="trpButton" id="makePrimaryBtn">Make Primary</button>
 {{/if}}
 {{#unless isPrimary}}
-    <button class="trpButtonMedium trpBtnGreen" id="deleteEmailBtn">Delete</button>
+    <button class="trpButton" id="deleteEmailBtn">Delete</button>
 {{/unless}}
 </td>

@@ -30,7 +30,7 @@ exports.install = function() {
 
         break;
       default:
-        winston.error('Unknown operation', {operation: operation });
+        winston.error('Unknown operation', { operation: operation });
     }
   });
 
@@ -39,7 +39,7 @@ exports.install = function() {
     var troupeId = options.troupeId;
 
     presenceService.findAllSocketsForUserInTroupe(userId, troupeId, function(err, socketIds) {
-      if(err) winston.error('Error while attempting to disconnect user from troupe' + err, { exception: err });
+      if(err) return winston.error('Error while attempting to disconnect user from troupe' + err, { exception: err });
 
       if(!socketIds || !socketIds.length) return;
 
