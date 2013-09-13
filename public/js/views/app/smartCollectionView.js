@@ -1,12 +1,19 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'marionette',
+  'views/base',
+  'cocktail',
   'views/widgets/troupeAvatar'
-], function(Marionette, TroupeAvatarWidget) {
+], function(Marionette, TroupeViews, cocktail, TroupeAvatarWidget) {
   "use strict";
 
-  return Marionette.CollectionView.extend({
+  var Collection = Marionette.CollectionView.extend({
     tagName: 'div',
     itemView: TroupeAvatarWidget
   });
+
+  cocktail.mixin(Collection, TroupeViews.SortableMarionetteView);
+
+  return Collection;
+
 });
