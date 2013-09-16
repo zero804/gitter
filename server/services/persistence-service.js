@@ -132,6 +132,14 @@ UserSchema.index({ username: 1 }, { unique: true, sparse: true });
 UserSchema.index({ "emails.email" : 1 }, { unique: true });
 UserSchema.schemaTypeName = 'UserSchema';
 
+UserSchema.methods.getDisplayName = function() {
+  return this.displayName || this.username || this.email && this.email.split('@')[0] || "Unknown";
+};
+
+UserSchema.methods.getAllEmails = function() {
+  return [this.email].concat(this.emails);
+};
+
 UserSchema.methods.getHomeUri = function() {
   return this.username ? this.username : "one-one/" + this.id;
 };

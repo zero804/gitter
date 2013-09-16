@@ -11,6 +11,7 @@ var collections               = require('../utils/collections');
 var redis                     = require("../utils/redis");
 var mongoUtils                = require('../utils/mongo-utils');
 var check                     = require('validator').check;
+var assert                    = require('assert');
 
 var redisClient               = redis.createClient();
 var redisClient_exists        = Q.nbind(redisClient.exists, redisClient);
@@ -29,6 +30,30 @@ var MAX_CACHE_TIME            = 300;
 
 function lower(array) {
   return array.map(function(s) { return s.toLowerCase(); });
+}
+
+function matchingContact(userId, contactUserId, emails) {
+  if(emails && emails.length === 0) emails = null;
+
+  assert(userId, 'userId required');
+  assert(contactUserId || emails && emails.length, 'contactUserId or one or more email addresses required');
+
+  if(contactUserId && !emails) {
+    return { $and:  [{ userId: userId },
+                     { contactUserId: contactUserId }
+                    ]};
+  }
+
+  if(emails && !contactUserId) {
+    return { $and:  [{ userId:   userId },
+                     { emails: { $in: emails } }
+                    ]};
+  }
+
+  return { $and:  [{ userId: userId },
+                   { $or: [ { contactUserId: contactUserId },
+                            { emails:        { $in: emails } } ]}
+                  ]};
 }
 
 function addContacts(userId, dateGenerated) {
@@ -55,9 +80,8 @@ function addContacts(userId, dateGenerated) {
             update.$inc = { score: SCORE_NON_TROUPE_CONTACT };
           }
 
-
           return persistence.SuggestedContact.updateQ(
-                  { emails: { $in: emails }, userId: userId },
+                  matchingContact(userId, contact.contactUserId, emails),
                   update,
                   { upsert: true });
 
@@ -82,9 +106,8 @@ function addReverseContacts(userId, dateGenerated) {
 
             var emails = [user.email].concat(user.emails);
 
-
             return persistence.SuggestedContact.updateQ(
-                    { emails: { $in: emails }, userId: userId },
+                    matchingContact(userId, user._id, emails),
                     { $inc:       { score: REVERSE_CONTACT },
                       $addToSet:  { emails: { $each: emails } },
                       $set:       { name: user.displayName,
@@ -112,11 +135,10 @@ function addImplicitConnections(userId, dateGenerated) {
             var emails = [user.email].concat(user.emails);
 
             return persistence.SuggestedContact.updateQ(
-                    { $or:        [{ userId:     user.userId },
-                                   { emails:     { $in: emails } } ] },
+                    matchingContact(userId, user.id, emails),
                     { $inc:       { score: IMPLICIT_CONTACT },
                       $addToSet:  { emails: { $each: emails } },
-                      $set:       { name: user.displayName || user.username || user.email.split('@')[0],
+                      $set:       { name: user.getDisplayName(),
                                     contactUserId: user.id,
                                     userId: userId,
                                     username: user.username || null,
@@ -138,37 +160,38 @@ function addOutgoingInvites(userId, dateGenerated) {
     ])
     .spread(function(usedInvites, unusedInvites) {
       var invites = usedInvites.concat(unusedInvites);
-      var userIds = invites.map(function(i) { return i.userId; }).filter(function(b) { return !!b; });
+      var inviteeUserIds = invites.map(function(i) { return i.userId; }).filter(function(b) { return !!b; });
 
-      return (userIds.length ? userService.findByIds(userIds) : Q.resolve([]))
-        .then(function(users) {
-          var usersIndexed = collections.indexById(users);
+      return (inviteeUserIds.length ? userService.findByIds(inviteeUserIds) : Q.resolve([]))
+        .then(function(inviteeUsers) {
+          var inviteeUsersIndexed = collections.indexById(inviteeUsers);
 
           return Q.all(invites.map(function(invite) {
             var emails;
 
             if(invite.userId) {
-              var user = usersIndexed[invite.userId];
-              if(!user) return; // Nothing to insert
-              emails = [user.email].concat(user.emails);
+              var inviteeUser = inviteeUsersIndexed[invite.userId];
+              if(!inviteeUser) return; // Nothing to insert
+
+              emails = inviteeUser.getAllEmails();
 
               return persistence.SuggestedContact.updateQ(
-                      { $or:        [{ userId:     invite.userId },
-                                     { emails:     { $in: emails } } ] },
+                      matchingContact(userId, inviteeUser.id, emails),
                       { $inc:       { score: INVITE },
                         $addToSet:  { emails: { $each: emails } },
-                        $set:       { name: user.displayName || user.username || user.email.split('@')[0],
-                                      contactUserId: user.id,
+                        $set:       { name: inviteeUser.getDisplayName(),
+                                      contactUserId: inviteeUser.id,
                                       userId: userId,
-                                      username: user.username || null,
+                                      username: inviteeUser.username || null,
                                       dateGenerated: dateGenerated }
                       },
                       { upsert: true });
             } else {
               var email = invite.email;
               emails = [email];
+
               return persistence.SuggestedContact.updateQ(
-                      { email:      email },
+                      matchingContact(userId, null, emails),
                       { $inc:       { score: INVITE },
                         $addToSet:  { emails: { $each: emails },
                                       knownEmails: { $each: emails } },
@@ -193,23 +216,22 @@ function addIncomingInvites(userId, dateGenerated) {
     ])
     .spread(function(usedInvites, unusedInvites) {
       var invites = usedInvites.concat(unusedInvites);
-      var userIds = invites.map(function(i) { return i.fromUserId; });
+      var inviterUserIds = invites.map(function(i) { return i.fromUserId; });
 
-      return userService.findByIds(userIds)
-        .then(function(users) {
+      return userService.findByIds(inviterUserIds)
+        .then(function(inviterUsers) {
 
-          return Q.all(users.map(function(user) {
-            var emails = [user.email].concat(user.emails);
+          return Q.all(inviterUsers.map(function(inviterUser) {
+            var emails = inviterUser.getAllEmails();
 
             return persistence.SuggestedContact.updateQ(
-                    { $or:        [{ userId:     user.userId },
-                                   { emails:     { $in: emails } } ] },
+                    matchingContact(userId, inviterUser.id, emails),
                     { $inc:       { score: REVERSE_INVITE },
                       $addToSet:  { emails: { $each: emails } },
-                      $set:       { name: user.displayName || user.username || user.email.split('@')[0],
-                                    contactUserId: user.id,
+                      $set:       { name: inviterUser.getDisplayName(),
+                                    contactUserId: inviterUser.id,
                                     userId: userId,
-                                    username: user.username || null,
+                                    username: inviterUser.username || null,
                                     dateGenerated: dateGenerated }
                     },
                     { upsert: true });
