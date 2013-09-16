@@ -112,7 +112,7 @@ function parseAddress(address) {
 }
 
 exports.hook_queue = function(next, connection) {
-  if(connection.transaction.notes.troupeIgnore) {
+  if(connection.transaction.notes && connection.transaction.notes.troupeIgnore) {
     // Switch into passthrough mode
     return next();
   }
