@@ -472,6 +472,12 @@ exports.install = function() {
       winston.warn('No data model in onDataChangeEvent', { data: data});
       return;
     }
+
+    if(model.skipAlerts) {
+      winston.warn('model is set to skipAlerts', { data: data});
+      return;
+    }
+
     var modelId = model.id;
 
     var info = generateNotificationForUrl(url);

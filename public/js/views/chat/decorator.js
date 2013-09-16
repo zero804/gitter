@@ -35,6 +35,9 @@ define([
 
     var iconHtml = '<div class="notification-icon"><a href="'+ meta.url +'"><img src="' + favicon  + '"></a></div>';
     chatItemView.$el.find('.trpChatText').prepend(iconHtml);
+
+    // This could be moved to the template render, is here temporarily.
+    chatItemView.$el.find('.trpChatBox').addClass('transparent');
   }
 
   function showAvatar(chatItemView, meta) {
