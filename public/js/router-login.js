@@ -6,12 +6,13 @@ require([
   'views/base',
   'views/invite/inviteModal',
   'views/login/loginModalView',
+  'views/login/loginAcceptInvite',
   'views/profile/profileView',
   'views/login/loginRequestModalView',
   'views/signup/signupModalConfirmView',
   'views/connect/connectUserView',
   'collections/troupes'
-], function($, context, Backbone, TroupeViews, InviteModal, LoginModalView, profileView, RequestModalView, SignupModalConfirmView, ConnectUserModalView, troupeModels) {
+], function($, context, Backbone, TroupeViews, InviteModal, LoginModalView, LoginAcceptInvite, profileView, RequestModalView, SignupModalConfirmView, ConnectUserModalView, troupeModels) {
   "use strict";
 
   function getDefaultEmail() {
@@ -80,6 +81,12 @@ require([
       }
       */
 
+      // prompt the user whether they want to accept the invite through an existing account
+      // or have us create a new account while accepting
+      if(window.troupeContext.acceptInvitePrompt) {
+        (new LoginAcceptInvite.Modal()).show();
+        return;
+      }
 
       // If the user is accessing another user's home url (trou.pe/user)
       if(window.troupeContext.homeUser) {
@@ -108,7 +115,6 @@ require([
               }
             });
           }
-
           inviteId = window.troupeContext.inviteId;
           if (inviteId) {
             // if the user has an invite from this user show the invite accept / reject modal
