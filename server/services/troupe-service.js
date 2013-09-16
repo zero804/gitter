@@ -895,7 +895,7 @@ function findOneToOneTroupe(fromUserId, toUserId) {
 function findOrCreateOneToOneTroupe(fromUserId, toUserId) {
   assert(fromUserId, 'fromUserId parameter required');
   assert(toUserId, 'toUserId parameter required');
-  assert(fromUserId != toUserId, 'You cannot be in a troupe with yourself.');
+  if(fromUserId === toUserId) throw 417; // You cannot be in a troupe with yourself.
 
   return userService.findById(toUserId)
     .then(function(toUser) {

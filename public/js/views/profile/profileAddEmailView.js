@@ -71,18 +71,16 @@ define([
       if(e) e.preventDefault();
 
       var self = this;
-
       this.collection.create({ email: this.getEmail() }, {
         success: function() {
           // self.showConfirmation();
           self.back();
         },
+        global: false,
         error: function() {
           self.validator.showErrors({
             'server-validation': 'Please try another address, that address is likely already used.'
           });
-
-          return true;
         }
       });
     },
