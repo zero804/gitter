@@ -356,6 +356,7 @@ var ChatMessageSchema = new Schema({
   sent: { type: Date, "default": Date.now },
   editedAt: { type: Date, "default": null },
   readBy: { type: [ObjectId] },
+  skipAlerts: {type: Boolean, "default": false},
   _tv: { type: 'MongooseNumber', 'default': 0 },
   _md: Number,          // Meta parse version
 });
