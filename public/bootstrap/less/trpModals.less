@@ -80,6 +80,24 @@
   .clearfix;
 }
 
+.trpModalExistingUsers {
+  background-color: @trpGreen;
+  color: white;
+  .trpBodyMedium;
+  margin: 0px -@padding 0px -@padding;
+  padding: 12px @padding 12px @padding;
+  cursor: pointer;
+  display: block;
+}
+
+.trpSuggestions {
+  overflow: hidden;
+  background-color: @trpBgColor;
+  margin-left: -@padding;
+  margin-right: -@padding;
+  margin-top: 8px;
+  padding: 12px @padding 20px @padding;
+}
 
 .trpModalSubtext {
   .trpBodySmall;
@@ -105,16 +123,6 @@
 
 .trpModalFooter {
   padding-bottom: 24px;
-}
-
-.trpModalExistingUsers {
-  background-color: @trpGreen;
-  color: white;
-  .trpBodyMedium;
-  margin: 12px -24px 0px -24px;
-  padding: 24px 24px 24px 24px;
-  cursor: pointer;
-  display: block;
 }
 
 /* Bootstrap overrides*/
