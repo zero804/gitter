@@ -181,6 +181,7 @@ define([
           }
         },
         onkeyup: false,
+        onfocusout: false,
         showErrors: function(errorMap, errorList) {
           if (errorList.length > 0) {
             $('.share-failure').show();
