@@ -33,7 +33,7 @@ define([
         break;
     }
 
-    var iconHtml = '<div class="notification-icon"><a href="'+ meta.url +'"><img src="' + favicon  + '"></a></div>"';
+    var iconHtml = '<div class="notification-icon"><a href="'+ meta.url +'"><img src="' + favicon  + '"></a></div>';
     chatItemView.$el.find('.trpChatText').prepend(iconHtml);
   }
 
