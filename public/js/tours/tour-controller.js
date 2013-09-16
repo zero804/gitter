@@ -459,10 +459,11 @@ define([
     }
 
 
-    var tour = inTroupeContext ? troupeTour : homeTour;
-    var step = getStepForCurrentHash();
-    if(!step) step = 0;
-    hopscotch.startTour(tour, step);
+    // dont start the tour in a troupe, it gets in the way
+    if(!inTroupeContext) {
+        var step = getStepForCurrentHash() || 0;
+        hopscotch.startTour(homeTour, step);
+    }
   }
 
   return {
