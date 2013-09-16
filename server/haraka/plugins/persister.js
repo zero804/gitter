@@ -60,12 +60,16 @@ function saveFile(troupe, creatorUser, fileName, mimeType, content, callback) {
 
 
 exports.hook_data = function (next, connection) {
-    // enable mail body parsing
-    connection.transaction.parse_body = 1;
+  // enable mail body parsing
+  connection.transaction.parse_body = 1;
   return next();
 };
 
 exports.hook_queue = function(next, connection) {
+  if(connection.transaction.notes.troupeIgnore) {
+    // Switch into passthrough mode
+    return next();
+  }
 
   // parse the mail so we can extract details for saving
   var mail;
