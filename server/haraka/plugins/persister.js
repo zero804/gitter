@@ -66,10 +66,11 @@ exports.hook_data = function (next, connection) {
 };
 
 exports.hook_queue = function(next, connection) {
-  if(connection.transaction.notes.troupeIgnore) {
+  if(connection.transaction.notes && connection.transaction.notes.troupeIgnore) {
     // Switch into passthrough mode
     return next();
   }
+
 
   // parse the mail so we can extract details for saving
   var mail;
