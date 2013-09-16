@@ -516,6 +516,7 @@ function ChatStrategy(options)  {
       urls: item.urls || [],
       mentions: item.mentions || [],
       meta: item.meta || {},
+      skipAlerts: item.skipAlerts,
       v: getVersion(item)
     };
 
