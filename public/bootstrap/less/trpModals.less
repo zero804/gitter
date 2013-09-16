@@ -55,48 +55,43 @@
   display: block;
 }
 
-.trpModalFailure {
-  background-color: @trpRed;
+.trpModalFooter {
   margin: 0px -@padding 0px -@padding;
   padding: 12px @padding 12px @padding;
   display: block;
 }
 
+.trpModalFailure {
+  .trpModalFooter;
+  background-color: @trpRed;
+}
+
 .trpModalSuccess {
+  .trpModalFooter;
   background-color: @trpGreen;
-  margin: 0px -@padding 0px -@padding;
-  padding: 12px @padding 12px @padding;
-  display: block;
   .trpBodyText;
   color: white;
 }
 
 .trpModalInfo {
+  .trpModalFooter;
   background-color: @trpBgColor;
-  margin: 0px -@padding 0px -@padding;
-  padding: 12px @padding 10px @padding;
-  display: block;
   // allows floats inside info div
   .clearfix;
 }
 
 .trpModalExistingUsers {
+  .trpModalFooter;
   background-color: @trpGreen;
   color: white;
   .trpBodyMedium;
-  margin: 0px -@padding 0px -@padding;
-  padding: 12px @padding 12px @padding;
   cursor: pointer;
-  display: block;
 }
 
 .trpSuggestions {
+  .trpModalFooter;
   overflow: hidden;
   background-color: @trpBgColor;
-  margin-left: -@padding;
-  margin-right: -@padding;
-  margin-top: 8px;
-  padding: 12px @padding 20px @padding;
 }
 
 .trpModalSubtext {
@@ -119,10 +114,6 @@
 .trpModalProfile {
   text-align: center;
   display: block;
-}
-
-.trpModalFooter {
-  padding-bottom: 24px;
 }
 
 /* Bootstrap overrides*/
