@@ -844,6 +844,9 @@ function updateTroupeName(troupeId, troupeName, callback) {
 }
 
 function createOneToOneTroupe(userId1, userId2, callback) {
+  assert(userId1, "Need to provide user 1 id");
+  assert(userId2, "Need to provide user 2 id");
+
   winston.verbose('Creating a oneToOne troupe for ', { userId1: userId1, userId2: userId2 });
   return createTroupeQ({
       name: '',
@@ -1291,6 +1294,7 @@ function acceptInviteForAuthenticatedUser(user, invite) {
   return Q.resolve(null).then(function() {
     assert(user, 'User parameter required');
     assert(invite, 'invite parameter required');
+    winston.verbose('inviteFromUserId', invite.fromUserId);
 
     // check if the invite is associated with this user id
     // check if the invited email is owned by the user
@@ -1318,7 +1322,7 @@ function acceptInviteForAuthenticatedUser(user, invite) {
 
       // use and delete invite
       statsService.event('invite_accepted', { userId: user.id, email: user.email, inviteId: invite.id, new_user: user.status !== 'ACTIVE' });
-      winston.verbose("Invite accepted for authd user", { inviteId: invite.id });
+      winston.verbose("Invite accepted for authd user", { inviteId: invite.id, inviteFromUserId: invite.fromUserId });
 
       // Either add the user or create a one to one troupe. depending on whether this
       // is a one to one invite or a troupe invite

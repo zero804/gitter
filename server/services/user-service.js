@@ -451,6 +451,7 @@ var userService = {
   },
 
   addSecondaryEmail: function(user, email, silent) {
+    winston.verbose("Adding secondary email ", email, " for user ", user.id);
     return persistence.User.findOneQ({ $or: [{ email: email }, { emails: email } ]})
       .then(function(existing) {
         if(existing) throw 409; // conflict
