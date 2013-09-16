@@ -112,6 +112,11 @@ function parseAddress(address) {
 }
 
 exports.hook_queue = function(next, connection) {
+  if(connection.transaction.notes.troupeIgnore) {
+    // Switch into passthrough mode
+    return next();
+  }
+
   winston.verbose("Starting remailer (hook_queue)");
 
   // this has will store the messageIds that need to be saved
