@@ -1586,7 +1586,17 @@ function deleteTroupe(troupe, callback) {
   troupe.status = 'DELETED';
   troupe.dateDeleted = new Date();
   troupe.removeUserById(troupe.users[0].userId);
-  troupe.save(callback);
+  troupe.saveQ()
+    .then(function() {
+      return findAllUnusedInvitesForTroupe(troupe.id);
+    })
+    .then(function(invites) {
+      return Q.all(invites.map(function(invite) {
+        return invite.removeQ();
+      }));
+    })
+    .thenResolve(troupe)
+    .nodeify(callback);
 }
 
 module.exports = {
