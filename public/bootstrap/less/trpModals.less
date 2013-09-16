@@ -55,31 +55,36 @@
   display: block;
 }
 
-.trpModalFailure {
-  background-color: @trpRed;
-  margin: 0px -@padding 0px -@padding;
-  padding: 12px @padding 12px @padding;
-  display: block;
-}
-
-.trpModalSuccess {
-  background-color: @trpGreen;
+.trpModalFooter {
   margin: 0px -@padding 0px -@padding;
   padding: 12px @padding 12px @padding;
   display: block;
   .trpBodyText;
+  // allows floats inside div
+  .clearfix;
+}
+
+.trpModalFailure {
+  .trpModalFooter;
+  background-color: @trpRed;
+}
+
+.trpModalSuccess {
+  .trpModalFooter;
+  background-color: @trpGreen;
   color: white;
 }
 
 .trpModalInfo {
+  .trpModalFooter;
   background-color: @trpBgColor;
-  margin: 0px -@padding 0px -@padding;
-  padding: 12px @padding 10px @padding;
-  display: block;
-  // allows floats inside info div
-  .clearfix;
 }
 
+.trpModalExistingUsers {
+  .trpModalSuccess;
+  .trpBodyMedium;
+  cursor: pointer;
+}
 
 .trpModalSubtext {
   .trpBodySmall;
@@ -100,20 +105,6 @@
 
 .trpModalProfile {
   text-align: center;
-  display: block;
-}
-
-.trpModalFooter {
-  padding-bottom: 24px;
-}
-
-.trpModalExistingUsers {
-  background-color: @trpGreen;
-  color: white;
-  .trpBodyMedium;
-  margin: 12px -24px 0px -24px;
-  padding: 24px 24px 24px 24px;
-  cursor: pointer;
   display: block;
 }
 
