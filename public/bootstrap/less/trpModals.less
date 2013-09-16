@@ -59,6 +59,9 @@
   margin: 0px -@padding 0px -@padding;
   padding: 12px @padding 12px @padding;
   display: block;
+  .trpBodyText;
+  // allows floats inside info div
+  .clearfix;
 }
 
 .trpModalFailure {
@@ -69,29 +72,22 @@
 .trpModalSuccess {
   .trpModalFooter;
   background-color: @trpGreen;
-  .trpBodyText;
   color: white;
 }
 
 .trpModalInfo {
   .trpModalFooter;
   background-color: @trpBgColor;
-  // allows floats inside info div
-  .clearfix;
 }
 
 .trpModalExistingUsers {
-  .trpModalFooter;
-  background-color: @trpGreen;
-  color: white;
+  .trpModalSuccess;
   .trpBodyMedium;
   cursor: pointer;
 }
 
 .trpSuggestions {
-  .trpModalFooter;
-  overflow: hidden;
-  background-color: @trpBgColor;
+  .trpModalInfo;
 }
 
 .trpModalSubtext {
