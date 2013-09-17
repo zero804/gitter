@@ -124,6 +124,13 @@ define([
       this.listenTo(collection, 'sort', this.underlyingSort);
     },
 
+    setLimit: function(limit) {
+      if(limit !== this.limit) {
+        this.limit = limit;
+        this.underlyingSort();
+      }
+    },
+
     underlyingAdd: function(model, collection) {
       var position = collection.indexOf(model);
       if(position >= this.limit) return;
@@ -140,8 +147,6 @@ define([
     },
 
     underlyingReset: function() {
-      log('underlyingReset');
-
       this.underlyingSort();
     },
 
@@ -166,11 +171,14 @@ define([
     },
 
     underlyingSort: function() {
-      var newItems = this.underlying.chain().take(this.limit);
-      var originalOrder = this.underlying.reduce(function(memo, value, index) {
+      var newItems = this.underlying.take(this.limit);
+
+      var originalOrder = newItems.reduce(function(memo, value, index) {
         memo[value.id] = index;
         return memo;
       }, {});
+
+      newItems = _.chain(newItems);
 
       var self = this;
       var removals = [];
