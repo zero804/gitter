@@ -28,6 +28,7 @@ define([
 
       this.listenTo(troupeList, 'add', this.parentAdd);
       this.listenTo(inviteList, 'add', this.parentAdd);
+
       this.listenTo(troupeList, 'change:unreadItems change:name change:favourite change:lastAccessTime', this.sortLimited);
 
     },
