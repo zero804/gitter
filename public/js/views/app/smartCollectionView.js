@@ -30,6 +30,17 @@ define([
         }, 1000);
       });
 
+      this.onResize = this.onResize.bind(this);
+      $(window).resize(this.onResize);
+      this.onResize();
+    },
+
+    onResize: function() {
+      var t = $('.trpMiniActions').offset().top - 15;
+      var space = Math.floor(t/50);
+      if(space > 22) space = 22;
+      if(space < 0) space = 0;
+      this.collection.setLimit(space);
     },
 
     // Build an `itemView` for every model in the collection.
