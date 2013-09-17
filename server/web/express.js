@@ -159,22 +159,15 @@ module.exports = {
 
       // Log some stuff
       var meta = {
-        path: req.path
+        path: req.path,
+        err: err.message
       };
-
-      if(err && err.message) {
-        meta.err = err.message;
-      }
 
       if(status === 500) {
         winston.error("An unexpected error occurred", meta);
-        console.error(err);
-        console.error(err.stack);
-        var stack = "";
-        if(err && err.stack)
-          stack = err.stack.join('\n');
-
-        winston.error('Error: ' + stack);
+        if(err.stack) {
+          winston.error('Error: ' + err.stack);
+        }
       }
 
       if(status === 404) {
@@ -183,21 +176,20 @@ module.exports = {
 
       res.status(status);
 
-      if (req.accepts('html')) {
+      var responseType = req.accepts(['html', 'json']);
+
+      if (responseType === 'html') {
         res.render(template , {
           homeUrl : nconf.get('web:homeurl'),
           message: message,
           stack: nconf.get('express:showStack') && err && err.stack ? linkStack(err.stack) : null
         });
-      }
-
-      // respond with json
-      if (req.accepts('json')) {
+      } else if (responseType === 'json') {
         res.send({ error: message });
-        return;
+      } else {
+        res.type('txt').send(message);
       }
 
-      res.type('txt').send(message);
     });
 
   },
