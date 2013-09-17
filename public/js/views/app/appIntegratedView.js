@@ -27,11 +27,9 @@ define([
     "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
     "mouseenter #menu-toggle":          "onLeftMenuHotspot",
     "mouseenter #content-frame":        "onMouseEnterContentFrame",
-    "mouseenter #header-wrapper":       "onMouseEnterHeader",
     "mouseenter #left-menu":            "onMouseEnterLeftMenu",
     "mouseenter #toolbar-frame":        "onMouseEnterToolbar",
     "mouseleave #toolbar-frame":        "onMouseLeaveToolbar",
-    "mouseleave #header-wrapper":       "onMouseLeaveHeader",
     "keypress":                         "onKeyPress",
     "click #user-icon":                 "toggleMenu",
     "click #search-icon":               "toggleMenu",
@@ -54,8 +52,7 @@ define([
       smartMenuRegion: "#smart-bar-items",
       leftMenuRegion: "#left-menu",
       rightPanelRegion: "#right-panel",
-      rightToolbarRegion: "#toolbar-frame",
-      headerRegion: "#header-wrapper"
+      rightToolbarRegion: "#toolbar-frame"
     },
 
     events: uiVars.isMobile ? touchEvents : mouseEvents,
@@ -120,14 +117,14 @@ define([
     },
 
     hidePanel: function (whichPanel) {
-      $("#chat-frame, #header-container, #chat-input, #toolbar-frame").removeClass('rightCollapse');
+      $("#chat-frame, #chat-input, #toolbar-frame").removeClass('rightCollapse');
       $(whichPanel).removeClass('visible');
       this.rightpanel = false;
     },
 
     showPanel: function(whichPanel) {
       if (!this.rightpanel) {
-        $("#header-container, #chat-frame, #chat-input, #toolbar-frame").addClass("rightCollapse");
+        $("#chat-frame, #chat-input, #toolbar-frame").addClass("rightCollapse");
         $(whichPanel).addClass("visible");
         this.rightpanel = true;
       }
@@ -164,7 +161,7 @@ define([
 
       $("#left-menu").addClass("visible");
       $("#mini-left-menu, #mini-left-menu-container").addClass("active");
-      $("#header-container, #chat-frame, #chat-input").addClass("leftCollapse");
+      $("#chat-frame, #chat-input").addClass("leftCollapse");
 
       this.leftmenu = true;
     },
@@ -187,7 +184,7 @@ define([
       }, 350);
 
       $("#mini-left-menu, #mini-left-menu-container").removeClass("active");
-      $("#header-container, #chat-frame, #chat-input").removeClass("leftCollapse");
+      $("#chat-frame, #chat-input").removeClass("leftCollapse");
       $("#left-menu").removeClass("visible");
 
       this.leftmenu = false;
@@ -315,14 +312,6 @@ define([
     },
 
     /* Header */
-    onMouseEnterHeader: function() {
-      this.showProfileMenu();
-    },
-
-    onMouseLeaveHeader: function() {
-      this.hideProfileMenu();
-    },
-
     showProfileMenu: function() {
       if (!this.profilemenu) {
 

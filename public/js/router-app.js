@@ -23,7 +23,6 @@ require([
   'views/shareSearch/shareSearchView',
   'views/signup/createTroupeView',
   'views/signup/usernameView',
-  'views/app/headerView',
   'views/app/troupeSettingsView',
   'views/toolbar/troupeMenu',
   'views/invite/reinviteModal',
@@ -43,7 +42,7 @@ require([
             itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView,
             fileVersionsView, RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView,
             profileView, profileEmailView, profileAddEmailView, shareSearchView, createTroupeView,
-            UsernameView, HeaderView, troupeSettingsView, TroupeMenuView, ReinviteModal, Router,
+            UsernameView, troupeSettingsView, TroupeMenuView, ReinviteModal, Router,
             unreadItemsClient, chatDecorator, SmartCollectionView /*, errorReporter , FilteredCollection */) {
   "use strict";
 
@@ -65,7 +64,6 @@ require([
   var appView = new AppIntegratedView({ });
   appView.smartMenuRegion.show(new SmartCollectionView({ collection: troupeCollections.megaCollection }));
   appView.leftMenuRegion.show(new TroupeMenuView({ }));
-  appView.headerRegion.show(new HeaderView());
   appView.rightToolbarRegion.show(new RightToolbarView());
 
   $('.nano').nanoScroller({ preventPageScrolling: true });
