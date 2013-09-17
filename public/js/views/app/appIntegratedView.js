@@ -201,13 +201,13 @@ define([
 
     showTroupeMenu: function() {
       // $("#file-list").css({"width" : "200px" , "padding-left" : "20px"});
-      $("#troupe-actions").addClass("visible");
+      $("#troupe-content").addClass("visible");
       this.files = true;
     },
 
     hideTroupeMenu: function() {
       // $("#file-list").css({"width": "0px", "padding-left" : "0"});
-      $("#troupe-actions").removeClass("visible");
+      $("#troupe-content").removeClass("visible");
       this.files = false;
     },
 
