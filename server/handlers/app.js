@@ -1,6 +1,7 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
+var _ = require("underscore");
 var winston = require("winston");
 var troupeService = require("../services/troupe-service");
 var nconf = require('../utils/config');
@@ -340,13 +341,11 @@ module.exports = {
 
 
             if(req.user) {
-              if(invite.userId == req.user.id) {
-                return troupeService.acceptInviteForAuthenticatedUser(req.user, invite);
-              }
-              // This invite is for somebody else, log the current user out
-              req.logout();
+              return troupeService.acceptInviteForAuthenticatedUser(req.user, invite);
             }
-
+            else {
+              // we (must and) have given the user an opportunity to login before coming to this handler
+            }
 
             return troupeService.acceptInvite(confirmationCode, appUri)
               .then(function(result) {
@@ -366,7 +365,59 @@ module.exports = {
           });
       }
 
+      // show a prompt dialog to either login or create a new account
+      function acceptInvitePrompt(req, res, next) {
+
+        // Note: if the invite is already associated with an account then just skip this prompt,
+        // and either the login or signup will work the same. This is not required currently
+        // because the user is given the invite url without the confirm code if they are an existing user.
+
+
+        contextGenerator.generateMiniContext(req, function(err, troupeContext) {
+          if(err) {
+            next(err);
+          } else {
+            res.render('app-template', {
+              useAppCache: !!nconf.get('web:useAppCache'),
+              bootScriptName: 'router-login',
+              troupeName: 'Invite',
+              troupeContext: _.extend(troupeContext, {
+                acceptInvitePrompt: true
+              }),
+              agent: req.headers['user-agent']
+            });
+          }
+        });
+      }
+
+      // will require the user is logged in, who will then inherit the invite
+      app.get('/:appUri/accept/:confirmationCode/login',
+        middleware.ensureLoggedIn(),
+        middleware.ensureValidBrowser,
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        acceptInviteWithConfirmation);
+
+      // will create a new account for the invite (or login the user it already belongs to)
+      app.get('/:appUri/accept/:confirmationCode/signup',
+        middleware.ensureValidBrowser,
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        acceptInviteWithConfirmation);
+
+      // prompt whether the user wants to login to accept invite or create a new account
       app.get('/:appUri/accept/:confirmationCode',
+        middleware.ensureValidBrowser,
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        acceptInvitePrompt);
+
+      /* one to one accept */
+
+      app.get('/one-one/:userId/accept/:confirmationCode/login',
+        middleware.ensureLoggedIn(),
+        middleware.ensureValidBrowser,
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        acceptInviteWithConfirmation);
+
+      app.get('/one-one/:userId/accept/:confirmationCode/signup',
         middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
         acceptInviteWithConfirmation);
@@ -374,6 +425,6 @@ module.exports = {
       app.get('/one-one/:userId/accept/:confirmationCode',
         middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
-        acceptInviteWithConfirmation);
+        acceptInvitePrompt);
     }
 };

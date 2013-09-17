@@ -203,6 +203,22 @@ function bind(on) {
 
     onUserAccountActivated: function(callback) {
       on('userAccountActivated', callback);
+    },
+
+    contactsUpdated: function(userId) {
+      emit('contactsUpdated', { userId: userId });
+    },
+
+    onContactsUpdated: function(callback) {
+      on('contactsUpdated', callback);
+    },
+
+    newInvite: function(options) {
+      emit('newInvite', options);
+    },
+
+    onNewInvite: function(callback) {
+      on('newInvite', callback);
     }
 
   };

@@ -28,6 +28,10 @@ Any invalid troupes will be removed from the transaction.rcpt_to list so that th
 An additional parsed mail object will be stored on transaction.notes.mail
 */
 exports.hook_queue = function (next, connection) {
+  if(connection.transaction.notes && connection.transaction.notes.troupeIgnore) {
+    // Switch into passthrough mode
+    return next();
+  }
 
   var mail = {
     from: parseAddress(connection.transaction.header.get("From")),

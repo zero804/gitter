@@ -1,9 +1,8 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService = require("../../services/troupe-service"),
-    restSerializer = require("../../serializers/rest-serializer"),
-    Q = require("q");
+var troupeService     = require("../../services/troupe-service");
+var restSerializer    = require("../../serializers/rest-serializer");
 
 module.exports = {
     index: function(req, res, next) {
@@ -22,24 +21,29 @@ module.exports = {
     },
 
     create: function(req, res, next) {
-      var invites = req.body;
+      var invite = req.body;
 
-      var promises = invites.map(function(invite) {
-        return troupeService.createInvite(req.troupe, {
-            fromUser: req.user,
-            email: invite.email,
-            displayName: invite.displayName,
-            userId: invite.userId
+      return troupeService.createInvite(req.troupe, {
+          fromUser: req.user,
+          email: invite.email,
+          displayName: invite.displayName,
+          userId: invite.userId
+        })
+        .then(function(result) {
+          if(result.ignored) return res.send(result);
+
+          var strategy = new restSerializer.InviteStrategy({ currentUserId: req.user.id });
+          restSerializer.serialize(result, strategy, function(err, serialized) {
+            if(err) return next(err);
+
+            res.send(serialized);
           });
-      });
 
-      Q.all(promises).then(function() {
-        res.send(invites);
-      }, next);
+        }, next);
 
     },
 
-    destroy: function(req, res, next) {
+    destroy: function(req, res) {
       req.invite.remove(function() {
         res.send({ success: true });
       });

@@ -109,6 +109,7 @@ define([
 
 var Modal = TroupeViews.Modal.extend({
     initialize: function(options) {
+      options.title = 'Create a Troupe';
       TroupeViews.Modal.prototype.initialize.apply(this, arguments);
       this.view = new View(options);
     }

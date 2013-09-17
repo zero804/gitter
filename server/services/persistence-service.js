@@ -132,6 +132,14 @@ UserSchema.index({ username: 1 }, { unique: true, sparse: true });
 UserSchema.index({ "emails.email" : 1 }, { unique: true });
 UserSchema.schemaTypeName = 'UserSchema';
 
+UserSchema.methods.getDisplayName = function() {
+  return this.displayName || this.username || this.email && this.email.split('@')[0] || "Unknown";
+};
+
+UserSchema.methods.getAllEmails = function() {
+  return [this.email].concat(this.emails);
+};
+
 UserSchema.methods.getHomeUri = function() {
   return this.username ? this.username : "one-one/" + this.id;
 };
@@ -154,7 +162,7 @@ UserSchema.methods.hasPassword = function() {
 };
 
 UserSchema.methods.hasEmail = function(email) {
-  return this.email === email || this.emails.some(function(e) { return e.email === email; });
+  return this.email === email || this.emails.some(function(e) { return e === email; });
 };
 
 var UserLocationHistorySchema = new Schema({
@@ -348,6 +356,7 @@ var ChatMessageSchema = new Schema({
   sent: { type: Date, "default": Date.now },
   editedAt: { type: Date, "default": null },
   readBy: { type: [ObjectId] },
+  skipAlerts: {type: Boolean, "default": false},
   _tv: { type: 'MongooseNumber', 'default': 0 },
   _md: Number,          // Meta parse version
 });

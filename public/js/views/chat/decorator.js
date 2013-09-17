@@ -16,6 +16,33 @@ define([
     }
   }
 
+  function showNotificationIcon(chatItemView, meta) {
+    var favicon;
+    switch (meta.service) {
+      case 'github':
+        favicon = 'https://github.com/favicon.ico';
+        break;
+      case 'bitbucket':
+        favicon = 'https://bitbucket.org/favicon.ico';
+        break;
+      case 'jenkins':
+        favicon = 'https://jenkins-ci.org/sites/default/files/jenkins_favicon.ico';
+        break;
+      case 'sprintly':
+        favicon = 'https://sprint.ly/favicon.ico';
+        break;
+    }
+
+    var iconHtml = '<div class="notification-icon"><a href="'+ meta.url +'"><img src="' + favicon  + '"></a></div>';
+    chatItemView.$el.find('.trpChatText').prepend(iconHtml);
+
+    // This could be moved to the template render, is here temporarily.
+    chatItemView.$el.find('.trpChatBox').addClass('transparent');
+  }
+
+  function showAvatar(chatItemView, meta) {
+  }
+
   function embed(chatItemView) {
     oEmbed.defaults.maxwidth = 370;
     chatItemView.$el.find('.link').each(function(index, el) {
@@ -36,7 +63,11 @@ define([
           case 'file':
             showFileDetail(chatItemView, meta);
             break;
+          case 'webhook':
+            showNotificationIcon(chatItemView, meta);
+            break;
           case 'user':
+            showAvatar(chatItemView, meta);
             break;
           default:
         }

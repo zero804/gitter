@@ -65,11 +65,11 @@ define([
       if(!options) options = {};
       if(options.template) this.template = options.template;
 
-      var self = this;
-
       if(this.model) {
+        if(this.rerenderOnChange) this.setRerenderOnChange();
+
         this.listenTo(this.model, 'syncStatusChange', function(newState) {
-          var e = self.$el.find('.view').first();
+          var e = this.$el.find('.view').first();
           if(newState != 'synced')  e.removeClass('synced');
           if(newState != 'syncing')  e.removeClass('syncing');
           if(newState != 'syncerror')  e.removeClass('syncerror');
@@ -80,15 +80,15 @@ define([
       }
 
       this.addCleanup(function() {
-        self.stopListening();
+        this.stopListening();
       });
     },
 
     setRerenderOnChange: function() {
-      this.listenTo(this.model, 'change', this.rerenderOnChange);
+      this.listenTo(this.model, 'change', this.doRerenderOnChange);
     },
 
-    rerenderOnChange: function() {
+    doRerenderOnChange: function() {
       this.removeSubViews(this.$el);
       if (this.$el.tooltip)
         this.$el.tooltip('destroy');
@@ -96,7 +96,7 @@ define([
     },
 
     addCleanup: function(callback) {
-      this.once('cleanup', callback);
+      this.once('cleanup', callback.bind(this));
     },
 
     getRenderData: function() {
@@ -797,14 +797,25 @@ define([
   // Mixin for Marionette.CollectionView classes
   TroupeViews.LoadingCollectionMixin = {
     loadingView: TroupeViews.LoadingView,
-    showEmptyView: function() {
+    loadingModel: new Backbone.Model(),
+    initialize: function() {
+      this.showEmptyView = this.showLoadingView;
+    },
+    showLoadingView: function() {
       if(this.collection.loading) {
         var LoadingView = Marionette.getOption(this, "loadingView");
 
-        if (LoadingView && !this._showingEmptyView){
-          this._showingEmptyView = true;
-          var model = new Backbone.Model();
-          this.addItemView(model, LoadingView, 0);
+        var v = this.children.findByModel(this.loadingModel);
+
+        if (LoadingView && !v) {
+          this.addItemView(this.loadingModel, LoadingView, 0);
+          this.listenToOnce(this.collection, 'loaded', function() {
+            this.removeItemView(this.loadingModel);
+
+            if(this.collection.length === 0) {
+              Marionette.CollectionView.prototype.showEmptyView.call(this);
+            }
+          });
         }
         return;
       }

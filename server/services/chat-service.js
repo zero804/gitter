@@ -36,6 +36,9 @@ exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
   chatMessage._md      = urlExtractor.version;
   chatMessage.meta     = meta;
 
+  // Skip unreaditems
+  chatMessage.skipAlerts = true;
+
   chatMessage.save(function (err) {
     if(err) return callback(err);
 
