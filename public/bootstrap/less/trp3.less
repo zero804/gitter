@@ -433,12 +433,17 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   display: inline-block;
 }
 
-.trpTroupeFavourite, .trpTroupeSettings{
+.trpTroupeMoreActions {
+  display: none;
+}
+
+.trpTroupeFavourite, .trpTroupeSettings, .trpTroupeMoreActions{
   padding: 12px 0 12px 20px;
   @media @mid {
     display: inline-block;
     width: 100%;
     padding-left: 30px;
+    opacity: 0.6;
   }
 }
 
@@ -707,10 +712,13 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   height: 100%;
 
   @media @mid {
-    width: 60px;
 
     .trpToolbarHeader.divider:first-child {
       border-bottom: 0;
+    }
+
+    .trpToolbarList {
+      max-height: 1000px;
     }
 
   }
