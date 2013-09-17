@@ -62,7 +62,7 @@ require([
 
 
   var appView = new AppIntegratedView({ });
-  appView.smartMenuRegion.show(new SmartCollectionView({ collection: troupeCollections.megaCollection }));
+  appView.smartMenuRegion.show(new SmartCollectionView({ collection: troupeCollections.smart }));
   appView.leftMenuRegion.show(new TroupeMenuView({ }));
   appView.rightToolbarRegion.show(new RightToolbarView());
 

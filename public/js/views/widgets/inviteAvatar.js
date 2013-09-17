@@ -2,7 +2,7 @@
 define([
   'jquery',
   'views/base',
-  'hbs!./tmpl/troupeAvatar',
+  'hbs!./tmpl/inviteAvatar',
   'bootstrap_tooltip'
 ], function($, TroupeViews, template) {
 
@@ -14,27 +14,14 @@ define([
     initialize: function(options) {
       // var self = this;
       if(!this.model) this.model = options.troupe;
-      this.hasUnread = false;
-      this.listenTo(this.model, 'change:unreadItems', this.unreadItemsChanged);
-    },
 
-    unreadItemsChanged: function() {
-      var newUnread = this.model.get('unreadItems') > 0;
-      if(this.hasUnread !== newUnread) {
-        this.hasUnread = newUnread;
-        var $e = this.$el.find('.trpDPUnreadCount');
-
-        if(newUnread) {
-          $e.css({ display: 'block' }).removeClass('bounceOut').addClass('animated bounceIn');
-        } else {
-          $e.removeClass('bounceIn').addClass('animated bounceOut');
-          window.setTimeout(function() { $e.css({ display: 'none' }); } , 600);
-        }
-      }
+      // this.listenTo(this.model, 'change', this.avatarChange);
+      // this.addCleanup(function() {
+      //   self.stopListening();
+      // });
     },
 
     afterRender: function() {
-      this.unreadItemsChanged();
       this.$el.find(':first-child').tooltip({
         html : true,
         placement : function(a, element) {
