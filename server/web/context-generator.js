@@ -53,9 +53,13 @@ exports.generateTroupeContext = function(req, callback) {
   var homeUser = req.uriContext.oneToOne && req.uriContext.otherUser; // The users page being looked at
   var accessDenied = !req.uriContext.access;
 
-  var cipher = crypto.createCipher('aes256', '***REMOVED***');
-  var hash   = cipher.update(troupe.id, 'utf8', 'hex') + cipher.final('hex');
-  var troupeHash  = hash;
+  var troupeHash;
+  if(troupe) {
+    var cipher = crypto.createCipher('aes256', '***REMOVED***');
+    var hash   = cipher.update(troupe.id, 'utf8', 'hex') + cipher.final('hex');
+    troupeHash  = hash;
+
+  }
 
   return Q.all([
     user ? serializeUser(user) : null,
