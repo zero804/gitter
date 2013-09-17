@@ -8,10 +8,10 @@ define([
   'components/realtime',
   '../troupes',
   '../invites',
-  '../mega',
+  '../smart',
   'components/unread-items-client',
   'filtered-collection' /* no ref */
-], function($, _, Backbone, context, base, realtime, troupeModels, inviteModels, MegaCollection, unreadItemsClient) {
+], function($, _, Backbone, context, base, realtime, troupeModels, inviteModels, SmartCollection, unreadItemsClient) {
   "use strict";
 
   var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
@@ -105,7 +105,7 @@ define([
     troupeCollection.trigger('sync');
   });
 
-  var megaCollection = new MegaCollection(null, { troupes: troupeCollection, invites: inviteCollection });
+  var smartCollection = new SmartCollection(null, { troupes: troupeCollection, invites: inviteCollection });
 
   return {
     troupes: troupeCollection,
@@ -120,7 +120,7 @@ define([
     incomingTroupeInvites: incomingTroupeInvites,
     outgoingInvites: outgoingInvites,
     outgoingConnectionInvites: outgoingConnectionInvites,
-    megaCollection: megaCollection
+    smart: smartCollection
   };
 
 });

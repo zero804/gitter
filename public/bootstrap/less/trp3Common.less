@@ -1,4 +1,10 @@
 @import "troupe-menu/troupe-menu.less";
+@import "animate.less";
+
+/* Mixin */
+.defaultHidden () {
+  display: none;
+}
 
 .trpDisplayPicture {
 	display: inline-block;
@@ -103,6 +109,7 @@ a .trpDisplayPicture {
 }
 
 .trpDPUnreadCount {
+  .defaultHidden;
   position: absolute;
   top: 5px;
   right: -8px;
@@ -110,8 +117,8 @@ a .trpDisplayPicture {
   border: 1px solid white;
   width: 14px;
   height: 14px;
-  display: block;
   background-color: @trpGreen;
+
   .trpBodyTiny;
 }
 

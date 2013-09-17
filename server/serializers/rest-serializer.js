@@ -648,6 +648,7 @@ function InviteStrategy(options) {
       email: item.email,
       acceptUrl: troupe ? '/' + troupe.uri : fromUser.url,
       name: troupe ? troupe.name : fromUser.displayName,
+      avatarUrl: troupe ? troupe.avatarUrl : fromUser.avatarUrlSmall,
       v: getVersion(item)
     };
   };
