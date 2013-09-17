@@ -1,10 +1,11 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var restSerializer = require("../serializers/rest-serializer");
-var oauthService = require("../services/oauth-service");
+var restSerializer  = require("../serializers/rest-serializer");
+var oauthService    = require("../services/oauth-service");
 var presenceService = require("../services/presence-service");
-var useragent = require("useragent");
+var useragent       = require("useragent");
+var crypto          = require("crypto");
 
 var appVersion = require("./appVersion");
 var Q = require('q');
@@ -52,6 +53,10 @@ exports.generateTroupeContext = function(req, callback) {
   var homeUser = req.uriContext.oneToOne && req.uriContext.otherUser; // The users page being looked at
   var accessDenied = !req.uriContext.access;
 
+  var cipher = crypto.createCipher('aes256', '***REMOVED***');
+  var hash   = cipher.update(troupe.id, 'utf8', 'hex') + cipher.final('hex');
+  var troupeHash  = hash;
+
   return Q.all([
     user ? serializeUser(user) : null,
     homeUser ? serializeHomeUser(homeUser, !!invite) : undefined, //include email if the user has an invite
@@ -73,7 +78,8 @@ exports.generateTroupeContext = function(req, callback) {
       accessToken: token,
       inviteId: invite && invite.id,
       accessDenied: accessDenied,
-      desktopNotifications: desktopNotifications
+      desktopNotifications: desktopNotifications,
+      troupeHash: troupeHash
     });
   })
   .nodeify(callback);
@@ -178,5 +184,6 @@ function createTroupeContext(req, options) {
       importedGoogleContacts: req.user && req.user.googleRefreshToken ? true : false,
       events: events,
       troupeUri: options.troupe ? options.troupe.uri : undefined,
+      troupeHash: options.troupeHash
     };
   }

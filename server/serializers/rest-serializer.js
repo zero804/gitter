@@ -516,6 +516,7 @@ function ChatStrategy(options)  {
       urls: item.urls || [],
       mentions: item.mentions || [],
       meta: item.meta || {},
+      skipAlerts: item.skipAlerts,
       v: getVersion(item)
     };
 
@@ -874,8 +875,118 @@ function SearchResultsStrategy(options) {
 
 }
 
+function SuggestedContactUserStatusStrategy(options) {
+  var userId = options.userId;
+
+  var statii;
+
+  this.preload = function(contacts, callback) {
+    Q.all([
+        troupeService.findAllUnusedConnectionInvitesFromUserId(userId),
+        troupeService.findAllConnectedUserIdsForUserId(userId)
+          .then(function(userIds) {
+            // TODO: just return the users email addresses, no need for full objects
+            return userService.findByIds(userIds);
+          })
+      ])
+      .spread(function(unusedInvites, users) {
+        statii = {};
+
+        unusedInvites.forEach(function(invite) {
+          if(invite.userId) {
+            statii[invite.userId] = 'invited';
+          } else if(invite.email) {
+            statii[invite.email] = 'invited';
+          }
+        });
+
+        users.forEach(function(user) {
+          statii[user.id] = 'connected';
+          statii[user.email] = 'connected';
+          user.emails.forEach(function(email) {
+            statii[email] = 'connected';
+          });
+        });
+
+      })
+      .nodeify(callback);
+  };
+
+  this.map = function(item) {
+    var s;
+    if(item.contactUserId) {
+      s = statii[item.contactUserId];
+      if(s) return s;
+    }
+
+    for(var i = 0; i < item.emails.length; i++) {
+      s = statii[item.emails[i]];
+      if(s) return s;
+    }
+  };
+}
+
+function SuggestedContactTroupeStatusStrategy(options) {
+  var troupeId = options.troupeId;
+
+  var statii;
+
+  this.preload = function(contacts, callback) {
+    Q.all([
+        troupeService.findAllUnusedInvitesForTroupe(troupeId),
+        troupeService.findAllUserIdsForTroupe(troupeId)
+          .then(function(userIds) {
+            // TODO: just return the users email addresses, no need for full objects
+            return userService.findByIds(userIds);
+          })
+      ])
+      .spread(function(unusedInvites, users) {
+        statii = {};
+
+        unusedInvites.forEach(function(invite) {
+          if(invite.userId) {
+            statii[invite.userId] = 'invited';
+          } else if(invite.email) {
+            statii[invite.email] = 'invited';
+          }
+        });
+
+        users.forEach(function(user) {
+          statii[user.id] = 'member';
+          statii[user.email] = 'member';
+          user.emails.forEach(function(email) {
+            statii[email] = 'member';
+          });
+        });
+
+      })
+      .nodeify(callback);
+  };
+
+  this.map = function(item) {
+    var s;
+    if(item.contactUserId) {
+      s = statii[item.contactUserId];
+      if(s) return s;
+    }
+
+    for(var i = 0; i < item.emails.length; i++) {
+      s = statii[item.emails[i]];
+      if(s) return s;
+    }
+  };
+}
+
+
 function SuggestedContactStrategy(options) {
   var userIdStategy = new UserIdStrategy(options);
+  var statusStrategy;
+
+  if(options.statusToUserId) {
+    statusStrategy = new SuggestedContactUserStatusStrategy({ userId: options.statusToUserId });
+  } else if(options.statusToTroupeId) {
+    statusStrategy = new SuggestedContactTroupeStatusStrategy({ troupeId: options.statusToTroupeId });
+  }
 
   this.preload = function(suggestedContacts, callback) {
     var userIds = suggestedContacts
@@ -886,6 +997,15 @@ function SuggestedContactStrategy(options) {
       strategy: userIdStategy,
       data: userIds
     }];
+
+    if(statusStrategy) {
+      strategies.push({
+        strategy: statusStrategy,
+        data: suggestedContacts
+      });
+    }
+
+
 
     execPreloads(strategies, callback);
   };
@@ -898,6 +1018,8 @@ function SuggestedContactStrategy(options) {
 
     var firstKnownEmail = item.knownEmails[0];
     return {
+      id: item.id,
+      status: statusStrategy && statusStrategy.map(item),
       userId: user && user.id,
       displayName: user && user.displayName || item.name,
       avatarUrl: user && user.avatarUrlSmall || firstKnownEmail && gravatar.gravatarUrlForEmail(firstKnownEmail),

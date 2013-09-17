@@ -450,7 +450,8 @@ var userService = {
     persistence.Invite.remove({ userId: user.id, status: "USED" });
   },
 
-  addSecondaryEmail: function(user, email) {
+  addSecondaryEmail: function(user, email, silent) {
+    winston.verbose("Adding secondary email ", email, " for user ", user.id);
     return persistence.User.findOneQ({ $or: [{ email: email }, { emails: email } ]})
       .then(function(existing) {
         if(existing) throw 409; // conflict
@@ -462,7 +463,9 @@ var userService = {
 
         user.unconfirmedEmails.push(secondary);
 
-        emailNotificationService.sendConfirmationForSecondaryEmail(secondary);
+        if (!silent) {
+          emailNotificationService.sendConfirmationForSecondaryEmail(secondary);
+        }
 
         return user.saveQ().thenResolve(user);
 
@@ -500,10 +503,27 @@ var userService = {
   },
 
   confirmSecondaryEmail: function(user, confirmationCode) {
+    return userService.confirmSecondaryEmailByCode(user, confirmationCode);
+  },
+
+  confirmSecondaryEmailByCode: function(user, confirmationCode) {
     var unconfirmed = user.unconfirmedEmails.filter(function(unconfirmedEmail) {
       return unconfirmedEmail.confirmationCode === confirmationCode;
     }).shift();
 
+    return userService.confirmSecondaryUnconfirmed(user, unconfirmed);
+  },
+
+  confirmSecondaryEmailByAddress: function(user, email) {
+    var unconfirmed = user.unconfirmedEmails.filter(function(unconfirmedEmail) {
+      return unconfirmedEmail.email === email;
+    }).shift();
+
+    return userService.confirmSecondaryUnconfirmed(user, unconfirmed);
+  },
+
+  // private
+  confirmSecondaryUnconfirmed: function(user, unconfirmed) {
 
     if(!unconfirmed) return Q.reject(404);
     unconfirmed.remove();
@@ -513,6 +533,7 @@ var userService = {
 
     return user.saveQ()
       .then(function() {
+
         // Signal that an email address has been confirmed
         appEvents.emailConfirmed(email, user.id);
 

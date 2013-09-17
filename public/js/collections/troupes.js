@@ -1,14 +1,12 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'backbone',
   'utils/context',
   './base',
   '../utils/momentWrapper'
-], function(Backbone, context, TroupeCollections, moment) {
+], function(context, TroupeCollections, moment) {
   "use strict";
 
-  var exports = {};
-  exports.TroupeModel = TroupeCollections.Model.extend({
+  var TroupeModel = TroupeCollections.Model.extend({
     idAttribute: "id",
     parse: function(message) {
       if(message.lastAccessTime) {
@@ -19,13 +17,15 @@ define([
     }
   }, { modelType: 'troupe' });
 
-  exports.TroupeCollection = TroupeCollections.LiveCollection.extend({
-    model: exports.TroupeModel,
-    preloadKey: "troupes",
+  var TroupeCollection = TroupeCollections.LiveCollection.extend({
+    model: TroupeModel,
     initialize: function() {
       this.url = "/user/" + context.getUserId() + "/troupes";
     }
   });
 
-  return exports;
+  return {
+    TroupeCollection: TroupeCollection,
+    TroupeModel: TroupeModel
+  };
 });

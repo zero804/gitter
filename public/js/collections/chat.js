@@ -3,13 +3,12 @@ define([
   'underscore',
   'utils/context',
   './base',
-  '../utils/momentWrapper'
-], function(_, context, TroupeCollections, moment) {
+  '../utils/momentWrapper',
+  'cocktail'
+], function(_, context, TroupeCollections, moment, cocktail) {
   "use strict";
 
-  var exports = {};
-
-  exports.ChatModel = TroupeCollections.Model.extend({
+  var ChatModel = TroupeCollections.Model.extend({
     idAttribute: "id",
     parse: function(message) {
       if(message.sent) {
@@ -42,11 +41,11 @@ define([
 
   });
 
-  exports.ChatCollection = TroupeCollections.LiveCollection.extend({
-    model: exports.ChatModel,
+  var ChatCollection = TroupeCollections.LiveCollection.extend({
+    model: ChatModel,
     modelName: 'chat',
     nestedUrl: "chatMessages",
-    preloadKey: "chatMessages",
+    initialSortBy: "sent",
     sortByMethods: {
       'sent': function(chat) {
         var offset = chat.id ? 0 : 300000;
@@ -58,10 +57,6 @@ define([
       }
     },
 
-    initialize: function() {
-      this.setSortBy('sent');
-    },
-
     findModelForOptimisticMerge: function(newModel) {
       var optimisticModel = this.find(function(model) {
         return !model.id && model.get('text') === newModel.get('text');
@@ -70,14 +65,14 @@ define([
       return optimisticModel;
     }
   });
-  _.extend(exports.ChatCollection.prototype, TroupeCollections.ReversableCollectionBehaviour);
+  cocktail.mixin(ChatCollection, TroupeCollections.ReversableCollectionBehaviour);
 
-  exports.ReadByModel = TroupeCollections.Model.extend({
+  var ReadByModel = TroupeCollections.Model.extend({
     idAttribute: "id"
   });
 
-  exports.ReadByCollection = TroupeCollections.LiveCollection.extend({
-    model: exports.ReadByModel,
+  var ReadByCollection = TroupeCollections.LiveCollection.extend({
+    model: ReadByModel,
     modelName: 'chatReadBy',
     initialize: function(models, options) {
       var userCollection = options.userCollection;
@@ -95,5 +90,10 @@ define([
     }
   });
 
-  return exports;
+  return {
+    ReadByModel: ReadByModel,
+    ReadByCollection: ReadByCollection,
+    ChatModel: ChatModel,
+    ChatCollection: ChatCollection
+  };
 });
