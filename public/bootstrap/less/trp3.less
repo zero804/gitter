@@ -433,35 +433,27 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   display: inline-block;
 }
 
-.trpHeaderFavourite {
-	display: inline-block;
-	height: 24px;
-	padding: 5px;
-	vertical-align: top;
-  float: left;
-  margin-left: -30px;
+.trpTroupeFavourite {
+  padding: 10px 0 10px 20px;
 }
 
-.trpHeaderFavourite img {
+.trpTroupeFavourite img {
 	display: none;
+  padding-right: 10px;
 }
 
-.trpHeaderFavourite img.unfavourited {
+.trpTroupeFavourite img.unfavourited {
 	display: inline-block;
   vertical-align: top;
 }
 
-.trpHeaderFavourite.favourited img.unfavourited {
+.trpTroupeFavourite.favourited img.unfavourited {
 	display: none;
 }
 
-.trpHeaderFavourite.favourited img.favourited {
+.trpTroupeFavourite.favourited img.favourited {
 	display: inline-block;
   vertical-align: top;
-}
-
-.trpHeaderFavourite img {
-	padding-top: 5px;
 }
 
 .trpHeaderFavIcon {
@@ -471,10 +463,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 
 .trpHeaderFavIcon:hover {
 	opacity: 1;
-}
-
-.trpHeaderSpacer {
-	.trpHeaderFavourite;
 }
 
 .trpHeaderTitle {
@@ -600,9 +588,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   position: fixed;
   display: inline-block;
   width: 240px;
-  padding-right: 0px;
   text-align: left;
-  padding-top: 20px;
   vertical-align: top;
   right: 0;
   top: 0;
@@ -625,11 +611,15 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 
   .trpToolbarList {
     padding-left: 20px;
+    min-height: 40px;
+    max-height: 140px;
+    overflow: scroll;
   }
 
   @media @mid {
     width: 88px;
     padding-right: 0px;
+    padding-top: 16px;
 
     #people-header {
       display: none;
@@ -724,6 +714,9 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   padding-bottom: 0px;
 }
 
+.divider {
+  border-top: 1px solid @trpBgAccent;
+}
 
 .trpToolbarHeader {
 	font-family: @fontSans;
@@ -732,10 +725,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 	padding-bottom: 8px;
 	cursor: pointer;
   padding-top: 12px;
-
-  &.divider {
-    border-top: 1px solid @trpBgAccent;
-  }
 }
 
 
@@ -747,7 +736,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   display: inline-block;
 	vertical-align: top;
 	padding-bottom: 20px;
-  width: 100%;
 }
 
 .trpRightPanel {
@@ -972,8 +960,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   height: 32px;
 }
 
-.trpTroupeActions {
-  height: 100%;
+.trpTroupeRelatedContent {
   @media @mid {
     position: fixed;
     right: 88px;
@@ -996,41 +983,12 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   }
 }
 
-
-/*.trpTroupeActions.visible {
-  width: 240px;
-}*/
-
-
-/*@media screen and (max-width: 1200px) {
-	.trpChatPanel {
-		margin-right: 280px;
-    transform: translate3d(0, 0, 0);
-    transition:all .3s ease-in-out;
-    -o-transition:all .3s ease-in-out;
-    -moz-transition:all .3s ease-in-out;
-    -webkit-transition:all .3s ease-in-out;
-	}
-
-  .trpHeaderContainer {
-    margin-right: 280px;
-    transform: translate3d(0, 0, 0);
-    transition:all .3s ease-in-out;
-    -o-transition:all .3s ease-in-out;
-    -moz-transition:all .3s ease-in-out;
-    -webkit-transition:all .3s ease-in-out;
-  }
-
-  .trpChatInputArea {
-    margin-right: 280px;
-    transform: translate3d(0, 0, 0);
-    transition:all .3s ease-in-out;
-    -o-transition:all .3s ease-in-out;
-    -moz-transition:all .3s ease-in-out;
-    -webkit-transition:all .3s ease-in-out;
-  }
-
-}*/
+.trpTroupeActions {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding-top: 20px;
+}
 
 @media screen and (max-width:1024px) {
 
