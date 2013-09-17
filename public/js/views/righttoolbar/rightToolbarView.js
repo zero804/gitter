@@ -45,6 +45,20 @@ define([
       });
     },
 
+    serializeData: function() {
+      var user = context.getUser();
+      var troupe = context.getTroupe();
+
+      return {
+        headerTitle: troupe && troupe.name || user.displayName,
+        isTroupe: !!troupe,
+        oneToOne: context.inOneToOneTroupeContext(),
+        user: user,
+        favourite: troupe && troupe.favourite
+      };
+
+    },
+
     onRender: function() {
       $('#toolbar-frame').show();
       $('#right-panel').show();

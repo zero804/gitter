@@ -11,7 +11,8 @@ exports.install = function() {
   var events = {
 
     newFile: function(data) {
-      var message = data.user.displayName + ' uploaded ' + data.fileName;
+      // var message = data.user.displayName + ' uploaded ' + data.fileName;
+      var message = "";
       var meta = {
         type: 'file',
         action: 'uploaded',
