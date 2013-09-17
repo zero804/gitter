@@ -3,47 +3,58 @@
     <div class="trpToolbarContent" id="toolbar-content">
       <div id="people-list">
         <div class="trpToolbarHeader" id="people-header">{{headerTitle}}</div>
-        <div class="trpToolbarList" id="people-roster"></div>
-        <div class="trpToolbarHeader divider" id="request-header" style="display: none;">Requests</div>
-        <div class="trpToolbarList" id="request-roster" style="display: none;"></div>
-        <div class="trpToolbarHeader divider" id="invite-header" style="display: none;">Invites</div>
-        <div class="trpToolbarList" id="invite-roster" style="display: none;"></div>
+        <div class="trpToolbarList divider">
+          <div class="trpToolbarListContent" id="people-roster"></div>
+        </div>
+        <div class="trpToolbarHeader" id="request-header" style="display: none;">Requests</div>
+        <div class="trpToolbarList divider" id="request-list" style="display: none;">
+          <div class="trpToolbarListContent" id="request-roster"></div>
+        </div>
+        <div class="trpToolbarHeader" id="invite-header" style="display: none;">Invites</div>
+        <div class="trpToolbarList divider" id="invite-list" style="display: none;">
+          <div class="trpToolbarListContent" id="invite-roster"></div>
+        </div>
       </div>
       <div class="trpTroupeRelatedContent" id="troupe-content">
-        <div class="trpToolbarHeader divider" id="file-header">Files</div>
+        <div class="trpToolbarHeader" id="file-header">Files</div>
         <div id="fineUploader"></div>
-        <div class="trpToolbarList" id="file-list"></div>
+        <div class="trpToolbarList divider">
+          <div class="trpToolbarListContent" id="file-list"></div>
+        </div>
         {{#unless isOneToOne}}
-        <div class="trpToolbarHeader divider" id="mail-header">Mails</div>
-        <div class="trpToolbarList" id="mail-list">
-          <a href='mailto:{{troupeEmailAddress}}' style="text-decoration: none">
-            <div style="display: inline-block; margin-top: 8px">
-              <div class="trpButton" style="margin-left: 0px">
-              <!-- <img src='{{cdn "images/2/icon-new-mail-black.png"}}' style="vertical-align: middle; margin-right: 4px" width="16"> --> <span style="vertical-align: middle">New Mail</span>
+        <div class="trpToolbarHeader" id="mail-header">Mails</div>
+        <div class="trpToolbarList divider">
+          <div class="trpToolbarListContent" id="mail-list">
+            <a href='mailto:{{troupeEmailAddress}}' style="text-decoration: none">
+              <div style="display: inline-block; margin-top: 8px">
+                <div class="trpButton" style="margin-left: 0px">
+                <!-- <img src='{{cdn "images/2/icon-new-mail-black.png"}}' style="vertical-align: middle; margin-right: 4px" width="16"> --> <span style="vertical-align: middle">New Mail</span>
+                </div>
               </div>
-            </div>
-          </a>
-          <div class="frame-conversations">
+            </a>
+            <div class="frame-conversations"></div>
           </div>
         </div>
         {{/unless}}
       </div>
       <div class="trpTroupeActions">
-        <div class="trpTroupeFavourite divider {{#if troupeContext.troupe.favourite}}favourited{{/if}}">
+        <div class="trpTroupeFavourite divider-top {{#if troupeContext.troupe.favourite}}favourited{{/if}}" style="opacity: 0.6" id="favourite-button">
           <div style="display: inline-block; vertical-align: middle">
             <img src='{{cdn "images/2/icon-favourite-selected.png" }}' class="trpHeaderFavIcon favourited" width="24" height="24">
             <img src='{{cdn "images/2/icon-favourite-unselected.png" }}' class="trpHeaderFavIcon unfavourited" width="24" height="24">
           </div>
-          <div class="trpBodyMedium" style="display: inline-block; vertical-align: middle">Add to Favourites</div>
+          <div class="trpActionsMenuLabel unfavourited">Add to Favourites</div>
+          <div class="trpActionsMenuLabel favourited">Remove from Favourites</div>
         </div>
-        <div class="divider" style="display:none">
-          <img src='{{cdn "images/2/icon-menu-black@2x.png"}}'/ style="margin-left: 28px; margin-bottom: 14px" width="24" height="24" id="troupe-more-actions">
+        <div class="divider" style="display:none;">
+          <img src='{{cdn "images/2/icon-menu-black@2x.png"}}'/ width="24" height="24" id="troupe-more-actions">
         </div>
-        <div class="divider">
-          <a href="#|troupeSettings">
-            <img src='{{cdn "images/2/icon-settings-black@2x.png"}}'/ style="margin-left: 28px; margin-bottom: 14px" width="24" height="24">
-          </a>
-        </div>
+        <a href="#|troupeSettings">
+          <div class="trpTroupeSettings divider-top" style='opacity: 0.6'>
+            <div style="display: inline-block; vertical-align: middle; height: 24px"><img src='{{cdn "images/2/icon-settings-black@2x.png"}}' width="24" height="24"/></div>
+            <div class="trpActionsMenuLabel">Settings</div>
+          </div>
+        </a>
       </div>
     </div>
 
