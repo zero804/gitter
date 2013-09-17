@@ -153,7 +153,7 @@ a:hover {
 
 
 .trpMiniLeftMenu {
-	padding-top: 20px;
+	padding-top: 12px;
 	background-color: @trpDarkBlue;
 background: linear-gradient(to bottom, #2c3e51 0%,#17202a 70%); /* W3C */
 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', endColorstr='#2c3e51',GradientType=0 ); /* IE6-9 */
@@ -433,8 +433,13 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   display: inline-block;
 }
 
-.trpTroupeFavourite {
-  padding: 10px 0 10px 20px;
+.trpTroupeFavourite, .trpTroupeSettings{
+  padding: 12px 0 12px 20px;
+  @media @mid {
+    display: inline-block;
+    width: 100%;
+    padding-left: 30px;
+  }
 }
 
 .trpTroupeFavourite img {
@@ -456,13 +461,35 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   vertical-align: top;
 }
 
-.trpHeaderFavIcon {
-	opacity: 0.5;
-  .transition300ms;
+
+//
+.trpTroupeFavourite .trpActionsMenuLabel {
+  display: none;
 }
 
-.trpHeaderFavIcon:hover {
-	opacity: 1;
+.trpTroupeFavourite .trpActionsMenuLabel.unfavourited {
+  display: inline-block;
+  @media @mid {
+    display: none;
+  }
+}
+
+.trpTroupeFavourite.favourited .trpActionsMenuLabel.unfavourited {
+  display: none;
+  @media @mid {
+    display: none;
+  }
+}
+
+.trpTroupeFavourite.favourited .trpActionsMenuLabel.favourited {
+  display: inline-block;
+  @media @mid {
+    display: none;
+  }
+}
+
+.trpTroupeSettings img {
+  padding-right: 10px;
 }
 
 .trpHeaderTitle {
@@ -610,7 +637,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   }
 
   .trpToolbarList {
-    padding-left: 20px;
     min-height: 40px;
     max-height: 140px;
     overflow: scroll;
@@ -684,7 +710,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
     width: 60px;
 
     .trpToolbarHeader.divider:first-child {
-      border-top: 0;
+      border-bottom: 0;
     }
 
   }
@@ -715,6 +741,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 }
 
 .divider {
+  border-bottom: 1px solid @trpBgAccent;
+}
+
+.divider-top {
   border-top: 1px solid @trpBgAccent;
 }
 
@@ -724,7 +754,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 	text-transform: uppercase;
 	padding-bottom: 8px;
 	cursor: pointer;
-  padding-top: 12px;
+  padding-top: 16px;
 }
 
 
@@ -736,6 +766,11 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   display: inline-block;
 	vertical-align: top;
 	padding-bottom: 20px;
+  width: 100%;
+}
+
+.trpToolbarListContent {
+  padding-left: 20px;
 }
 
 .trpRightPanel {
@@ -988,6 +1023,15 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   bottom: 0;
   width: 100%;
   padding-top: 20px;
+}
+
+.trpActionsMenuLabel {
+  .trpBodyMedium;
+  display: inline-block;
+  vertical-align: middle;
+  @media @mid {
+    display: none;
+  }
 }
 
 @media screen and (max-width:1024px) {
