@@ -7,7 +7,8 @@ define([
   'hbs!./tmpl/chatInputView',
   'utils/momentWrapper',
   'utils/safe-html',
-  'jquery-placeholder' // No ref
+  'jquery-placeholder', // No ref
+  'jquery-sisyphus' // No ref
 ], function($, context, TroupeViews, appEvents, template, moment, safeHtml) {
   "use strict";
 
@@ -24,6 +25,7 @@ define([
       this.inputBox = new ChatInputBoxView({
         el: this.$el.find('.trpChatInputBoxTextArea'),
       });
+      this.$el.find('form').sisyphus({locationBased: true}).restoreAllData();
 
       this.listenTo(this.inputBox, 'save', this.send);
     },
@@ -117,6 +119,7 @@ define([
     send: function() {
       this.trigger('save', safeHtml(this.$el.val()));
 
+      $('#chatInputForm').trigger('reset');
       this.$el.val('');
     }
   });
