@@ -45,7 +45,6 @@ function validateUserForSubTroupeSubscription(options, callback) {
   var message = options.message;
   var clientId = options.clientId;
   var notifyPresenceService = options.notifyPresenceService;
-  var updateLastVisitedTroupe = options.updateLastVisitedTroupe;
 
   var troupeId = match[1];
   return troupeService.findById(troupeId)
@@ -58,9 +57,6 @@ function validateUserForSubTroupeSubscription(options, callback) {
         return false;
       }
 
-      if(!notifyPresenceService && !updateLastVisitedTroupe) return result;
-
-      var ops = [];
       if(notifyPresenceService) {
         var eyeballState = true;
         if(message.ext && 'eyeballs' in message.ext) {
@@ -68,14 +64,10 @@ function validateUserForSubTroupeSubscription(options, callback) {
         }
 
         var userSubscribedToTroupe = Q.denodeify(presenceService.userSubscribedToTroupe);
-        ops.push(userSubscribedToTroupe(userId, troupeId, clientId, eyeballState));
+        return userSubscribedToTroupe(userId, troupeId, clientId, eyeballState);
       }
 
-      if(updateLastVisitedTroupe) {
-        ops.push(userService.saveLastVisitedTroupeforUserId(userId, troupe));
-      }
-
-      return Q.all(ops).thenResolve(result);
+      return result;
     })
     .nodeify(callback);
 }
@@ -277,6 +269,8 @@ var authenticator = {
       message.ext.userId = userId;
 
       if(!troupeId) return callback(message);
+
+      userService.saveLastVisitedTroupeforUserId(userId, troupeId);
 
       // If the troupeId was included, it means we've got a native
       // client and they'll be looking for a snapshot:
