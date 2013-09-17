@@ -112,7 +112,7 @@ define([
       var collection = options.collection;
 
       this.underlying = collection;
-      this.limit = 20;
+      this.limit = options.limit || 10;
       this.comparator = function(item) {
         return item._sortIndex;
       };
@@ -134,7 +134,7 @@ define([
       }
     },
 
-    underlyingRemove: function(model) {
+    underlyingRemove: function() {
       this.underlyingSort();
     },
 
@@ -194,33 +194,7 @@ define([
         item._sortIndex = i;
         self.add(item, { at: i });
       });
-/*
-      var analysis = this.analyse();
-      var breaks = analysis.breaks;
-      if(breaks === 0) return;
-      if(breaks === 1) {
-        var element = this.models.splice(analysis.first, 1)[0];
 
-        var to = -1;
-        var ca = this.comparator(element);
-        for(var i = 0; i < this.models.length; i++) {
-          var curr = this.comparator(this.models[i]);
-          if(curr >= ca) {
-            this.models.splice(i, 0, element);
-            to = i;
-            break;
-          }
-        }
-        if(to == -1) {
-          to = this.models.length;
-          this.models.push(element);
-        }
-
-        this.trigger('sort', this, { single: true, from: analysis.first, to: to });
-
-        return;
-      }
-  */
       self.sort();
     }
   });
