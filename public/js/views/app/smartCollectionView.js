@@ -22,6 +22,14 @@ define([
           $(this).show();
       });
 
+      var $e = this.$el;
+
+      this.listenToOnce(this.collection, 'add sort reset', function() {
+        window.setTimeout(function() {
+          $e.addClass('animated');
+        }, 1000);
+      });
+
     },
 
     // Build an `itemView` for every model in the collection.

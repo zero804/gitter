@@ -1127,13 +1127,15 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
     position: absolute; top: 0; left: 0;
     height: 50px; width: 100%;
     line-height: 50px;
-    transition: all 0.3s ease-in;
-    -webkit-transition: all 0.3s ease-in;
 
     .avatar-s {
     	margin: 0;
     }
+}
 
+.trpSmartBarItems .animated li {
+	transition: all 0.3s ease-in;
+	-webkit-transition: all 0.3s ease-in;
 }
 
 .trpSmartItem (@i) {
@@ -1166,29 +1168,5 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
   #i20  { .trpSmartItem(2000%); }
   #i21  { .trpSmartItem(2100%); }
 
-/*
-  li:nth-child(1) { .trpSmartItem(0%); }
-  li:nth-child(2)   { .trpSmartItem(100%); }
-  li:nth-child(3)   { .trpSmartItem(200%); }
-  li:nth-child(4)   { .trpSmartItem(300%); }
-  li:nth-child(5)   { .trpSmartItem(400%); }
-  li:nth-child(6)   { .trpSmartItem(500%); }
-  li:nth-child(7)   { .trpSmartItem(600%); }
-  li:nth-child(8)   { .trpSmartItem(700%); }
-  li:nth-child(9)   { .trpSmartItem(800%); }
-  li:nth-child(10)  { .trpSmartItem(900%); }
-  li:nth-child(11)  { .trpSmartItem(1000%); }
-  li:nth-child(12)  { .trpSmartItem(1100%); }
-  li:nth-child(13)  { .trpSmartItem(1200%); }
-  li:nth-child(14)  { .trpSmartItem(1300%); }
-  li:nth-child(15)  { .trpSmartItem(1400%); }
-  li:nth-child(16)  { .trpSmartItem(1500%); }
-  li:nth-child(17)  { .trpSmartItem(1600%); }
-  li:nth-child(18)  { .trpSmartItem(1700%); }
-  li:nth-child(19)  { .trpSmartItem(1800%); }
-  li:nth-child(20)  { .trpSmartItem(1900%); }
-  li:nth-child(21)  { .trpSmartItem(2000%); }
-  li:nth-child(22)  { .trpSmartItem(2100%); }
-  */
 }
 
