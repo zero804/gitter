@@ -9,7 +9,7 @@
       {{#if fromUser}}
       <div class="trpChatFrom">{{{displayName}}}</div>
       {{/if}}
-      <div class="trpChatTime">{{widget "timeago" time=sent}}</div>
+      <div class="trpChatTime"> &bull; {{widget "timeago" time=sent}} </div>
       <span class="trpChatEdit"><img src='{{ cdn "images/2/icon-edit.png"}}' width="16" height="16" title=""/ ></span>
       {{#if compactView}}
       {{else}}

@@ -164,7 +164,6 @@
 
 .trpChatTime, .trpChatEdit, .trpChatReads {
 	display: inline-block;
-	float: right;
 }
 
 // by default, don't show the edit icon
@@ -189,7 +188,7 @@
 
 // show the reads icon if it has been read
 .hasBeenRead .trpChatReads {
-  display: block;
+  display: inline-block;
 }
 
 // show the edit and read icons only when hovered over.
@@ -214,8 +213,10 @@
 // gray out the edit and read icons by default
 .trpChatEdit, .trpChatReads {
   opacity: 0.2;
-  padding: 2px 4px 0 0;
   height: 16px;
+  vertical-align: middle;
+  padding-bottom: 2px;
+  display: inline-block;
 }
 
 // if the viewer can edit the message, dont gray it out
@@ -244,7 +245,7 @@
 }
 
 .trpChatTime {
-  margin-top: -4px;
+  opacity: 0.5;
 }
 
 .frame-chat {
