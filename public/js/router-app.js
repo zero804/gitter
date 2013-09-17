@@ -78,8 +78,7 @@ require([
   }).render();
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
-  unreadItemsClient.monitorViewForUnreadItems($('#toolbar-frame .nano'));
-
+  unreadItemsClient.monitorViewForUnreadItems($('#file-list'));
 
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
