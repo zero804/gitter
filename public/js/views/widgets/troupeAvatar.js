@@ -22,13 +22,12 @@ define([
       var newUnread = this.model.get('unreadItems') > 0;
       if(this.hasUnread !== newUnread) {
         this.hasUnread = newUnread;
-        var $e = this.$el.find('.trpDPUnreadCount');
+        var $e = this.$el.find('.trpDisplayPicture');
 
         if(newUnread) {
-          $e.css({ display: 'block' }).removeClass('bounceOut').addClass('animated bounceIn');
+          $e.addClass('unread');
         } else {
-          $e.removeClass('bounceIn').addClass('animated bounceOut');
-          window.setTimeout(function() { $e.css({ display: 'none' }); } , 600);
+          $e.removeClass('unread');
         }
       }
     },
