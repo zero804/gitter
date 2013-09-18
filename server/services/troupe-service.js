@@ -1294,7 +1294,6 @@ function acceptInviteForAuthenticatedUser(user, invite) {
   return Q.resolve(null).then(function() {
     assert(user, 'User parameter required');
     assert(invite, 'invite parameter required');
-    winston.verbose('inviteFromUserId', invite.fromUserId);
 
     // check if the invite is associated with this user id
     // check if the invited email is owned by the user
@@ -1307,10 +1306,10 @@ function acceptInviteForAuthenticatedUser(user, invite) {
       .then(onceConfirmed);
     }
     else {
-      return onceConfirmed();
+      return Q.fcall(onceConfirmed);
     }
 
-    function onceConfirmed() {
+    function onceConfirmed() { // note: the invite is not actually owned by this user yet as that happens async after confirm
       // TODO: this will not be used in future once invites are all delete
       if(invite.status !== 'UNUSED') {
         // invite has been used, we can't use it again.
@@ -1329,7 +1328,7 @@ function acceptInviteForAuthenticatedUser(user, invite) {
       var isNormalTroupe = !!invite.troupeId;
 
       return (isNormalTroupe ? addUserIdToTroupe(user.id, invite.troupeId)
-                              : createOneToOneTroupe(invite.fromUserId, invite.userId))
+                              : createOneToOneTroupe(invite.fromUserId, user.id))
         .then(function(troupe) {
 
           // once user is added / troupe is created, send email notice
