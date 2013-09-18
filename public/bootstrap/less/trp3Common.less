@@ -1,6 +1,18 @@
 @import "troupe-menu/troupe-menu.less";
 @import "animate.less";
 
+@-webkit-keyframes pulsate {
+    0% {-webkit-transform: scale(1, 1); border: 2px solid white;}
+    50% {-webkit-transform: scale(0.9, 0.9);border: 2px solid @trpGreen;}
+    100% {-webkit-transform: scale(1, 1);border: 2px solid white;}
+}
+
+@-webkit-keyframes pulsate-retina {
+    0% {-webkit-transform: scale(1, 1); border: 1px solid white;}
+    50% {-webkit-transform: scale(0.9, 0.9);border: 1px solid @trpGreen;}
+    100% {-webkit-transform: scale(1, 1);border: 1px solid white;}
+}
+
 /* Mixin */
 .defaultHidden () {
   display: none;
@@ -8,6 +20,18 @@
 
 .trpDisplayPicture {
 	display: inline-block;
+
+  &.unread {
+    -webkit-animation: pulsate 1.3s ease-out;
+    -webkit-animation-iteration-count: infinite; 
+  }
+
+  @media @retina {
+    &.unread {
+      -webkit-animation: pulsate-retina 1.3s ease-out;
+      -webkit-animation-iteration-count: infinite; 
+    }
+  }
 }
 
 a .trpDisplayPicture {
