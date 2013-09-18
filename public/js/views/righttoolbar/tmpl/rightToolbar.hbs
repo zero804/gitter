@@ -21,7 +21,7 @@
         <div class="trpToolbarList divider">
           <div class="trpToolbarListContent" id="file-list"></div>
         </div>
-        {{#unless isOneToOne}}
+        {{#unless oneToOne}}
         <div class="trpToolbarHeader" id="mail-header">Mails</div>
         <div class="trpToolbarList divider">
           <div class="trpToolbarListContent" id="mail-list">
@@ -49,12 +49,14 @@
           <div class="trpActionsMenuLabel unfavourited">Add to Favourites</div>
           <div class="trpActionsMenuLabel favourited">Remove from Favourites</div>
         </div>
+        {{#unless oneToOne}}
         <a href="#|troupeSettings">
           <div class="trpTroupeSettings divider-top" style='opacity: 0.6'>
             <div style="display: inline-block; vertical-align: middle; height: 24px"><img src='{{cdn "images/2/icon-settings-black@2x.png"}}' width="24" height="24"/></div>
             <div class="trpActionsMenuLabel">Settings</div>
           </div>
         </a>
+        {{/unless}}
       </div>
     </div>
 
