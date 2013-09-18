@@ -9,6 +9,7 @@ require([
   'views/chat/chatCollectionView',
   'collections/instances/integrated-items',
   'collections/instances/troupes',
+  'collections/useremails',
   'views/righttoolbar/rightToolbarView',
   'views/file/fileDetailView',
   'views/file/filePreviewView',
@@ -38,7 +39,7 @@ require([
   'template/helpers/all', // No ref
   'components/eyeballs' // No ref
 ], function($, Backbone, context, appEvents, AppIntegratedView, chatInputView, ChatCollectionView,
-            itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
+            itemCollections, troupeCollections, UserEmailCollection, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, profileEmailView, profileAddEmailView, shareSearchView,
             createTroupeView, UsernameView, HeaderView,
             troupeSettingsView, TroupeMenuView, ReinviteModal, Router, unreadItemsClient, chatDecorator /*, errorReporter , FilteredCollection */) {
@@ -65,6 +66,9 @@ require([
   appView.rightToolbarRegion.show(new RightToolbarView());
 
   $('.nano').nanoScroller({ preventPageScrolling: true });
+
+  // instantiate user email collection
+  var userEmailCollections = new UserEmailCollection.UserEmailCollection();
 
   // Setup the ChatView
 
@@ -95,8 +99,8 @@ require([
       { name: "person",           re: /^person\/(\w+)$/,          viewType: PersonDetailView,             collection: itemCollections.users },
 
       { name: "profile",          re: /^profile$/,                viewType: profileView.Modal },
-      { name: "profileEmails",    re: /^profile\/emails$/,        viewType: profileEmailView.Modal },
-      { name: "profileEmailsAdd", re: /^profile\/emails\/add$/,   viewType: profileAddEmailView.Modal },
+      { name: "profileEmails",    re: /^profile\/emails$/,        viewType: profileEmailView.Modal,       collection: userEmailCollections, skipModelLoad: true },
+      { name: "profileEmailsAdd", re: /^profile\/emails\/add$/,   viewType: profileAddEmailView.Modal,    collection: userEmailCollections, skipModelLoad: true },
       { name: "share",            re: /^share$/,                  viewType: shareSearchView.Modal },
       { name: "connect",          re: /^connect$/,                viewType: shareSearchView.Modal,        viewOptions: { overrideContext: true, inviteToConnect: true } },
       { name: "create",           re: /^create$/,                 viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true },
