@@ -57,7 +57,7 @@ define([
         success: function() {
           this.model.set('status', 'invited');
           appEvents.trigger('searchSearchView:success');
-          $('#invite-success').show();
+          $('#invite-success').show().find('span').text(this.model.get('displayName') + ' invited');
         }
       });
 
@@ -230,7 +230,7 @@ define([
         success: function() {
           model.set('status', 'invited');
           appEvents.trigger('searchSearchView:success');
-          $('#invite-success').show();
+          $('#invite-success').show().find('span').text(model.get('displayName') + ' invited');
         }
       });
       emailField.val('');
