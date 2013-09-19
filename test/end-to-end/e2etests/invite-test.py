@@ -27,7 +27,6 @@ class InviteTests(unittest.TestCase):
         if(self.driver.current_url.find("/testtroupe1") == -1):
             self.driver.get(utils.baseUrl("/testtroupe1"))
 
-    @attr('unreliable')
     def testInvite(self):
 
         # link = self.driver.find_element_by_css_selector('#people-share-troupe-button')
@@ -38,21 +37,20 @@ class InviteTests(unittest.TestCase):
 
         self.driver.get(utils.baseUrl("/testtroupe1#!|share"))
 
-        form = self.driver.find_element_by_css_selector('form#share-form')
+        form = self.driver.find_element_by_id('share-form')
 
         # type and wait for autocomplete
-        inputBox = form.find_element_by_name('inviteSearch')
+        inputBox = form.find_element_by_id('custom-email')
         inputBox.send_keys('te')
         time.sleep(1)
 
         # expect two elements in the suggestions list
-        suggestions = form.find_elements_by_css_selector('ul.typeahead li')
+        suggestions = form.find_elements_by_css_selector('#invites > div')
         assert len(suggestions) >= 2
 
         # finish typing in a full email address and send invite
         inputBox.send_keys('stuser+invite-test@troupetest.local')
         inputBox.send_keys(Keys.ENTER)
-        form.find_element_by_css_selector('button[type=submit]').click()
 
         time.sleep(0.5)
 
