@@ -768,8 +768,9 @@ function TroupeStrategy(options) {
         troupeUrl = "/" + item.uri;
     }
 
+    // Temporary technique until we add proper avatars for troupe at a later stage
     function getDefaultTroupeAvatar() {
-      var initials = troupeName.split(/\s+/).map(function(s) { return s.charAt(0); }).join('');
+      var initials = troupeName.split(/\s+/).map(function(s) { return s.charAt(0); }).slice(0,2).join('');
       return 'https://avatar-beta.trou.pe/' + item.id + '/' + initials + '.png';
     }
 
