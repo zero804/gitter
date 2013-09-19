@@ -9,7 +9,7 @@ define([
 ], function($, context, TroupeViews, template, ConfirmRemoveModalView, log){
   "use strict";
 
-  return TroupeViews.Base.extend({
+  var View = TroupeViews.Base.extend({
     template: template,
     buttonMenu : false,
     events: {
@@ -66,4 +66,8 @@ define([
     }
 
   });
+
+  View.Modal = TroupeViews.Modal.wrapView(View);
+
+  return View;
 });

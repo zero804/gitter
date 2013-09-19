@@ -460,6 +460,15 @@ module.exports = function( grunt ) {
         },
         exports: 'jQuery'
       },
+      'jquery-sisyphus': {
+        files : {
+          'output/client-libs/sisyphus/jquery.sisyphus-amd.js': ['output/client-libs/sisyphus/sisyphus' + (min ? '.min' : '') + '.js']
+        },
+        modules: {
+          'jquery': 'jQuery'
+        },
+        exports: 'jQuery'
+      },
 
       'scrollfix': {
         files : {

@@ -10,10 +10,9 @@ define([
   'views/signup/signupModalConfirmView',
   'hbs!./tmpl/profileEmailView',
   'hbs!./tmpl/profileEmailItemView',
-  'collections/useremails',
   'utils/validate-wrapper',
   'jquery-placeholder'  // No reference
-], function($, _, Marionette, context, TroupeViews, AddEmail, SignupConfirmView, template, itemViewTemplate, collections, validation) {
+], function($, _, Marionette, context, TroupeViews, AddEmail, SignupConfirmView, template, itemViewTemplate, validation) {
   "use strict";
 
   // email item view
@@ -80,9 +79,7 @@ define([
     itemView: ItemView,
     //loadingView: TroupeViews.Base.extend({ template: function() { return "Loading"; } }),
     initialize: function() {
-        this.collection.on('add', function() {
-
-        });
+      this.collection.fetch();
     },
 
     onAfterItemAdded: function() {
@@ -95,7 +92,6 @@ define([
     template: template,
 
     events: {
-      'click #addEmailBtn': 'addEmail',
       'click #backBtn': 'back'
     },
 
@@ -109,11 +105,6 @@ define([
       this.collectionView = new CollectionView({ collection: this.collection, el: this.$el.find("#emailCollectionView") });
 
       this.collectionView.render();
-    },
-
-    addEmail: function() {
-      var m = new AddEmail.Modal({ collection: this.collection });
-      this.dialog.transitionTo(m);
     },
 
     showMessage: function(message) {
@@ -147,13 +138,10 @@ define([
 
   var Modal = TroupeViews.Modal.extend({
     initialize: function(options) {
-
-      var collection = new collections.UserEmailCollection();
-      collection.fetch();
-
+      options = options || {};
       options.title = "Manage your email addresses";
       TroupeViews.Modal.prototype.initialize.apply(this, arguments);
-      this.view = new View({ collection: collection });
+      this.view = new View(options);
     }
   });
 
