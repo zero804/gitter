@@ -42,6 +42,7 @@ module.exports = function(req, res, next) {
 
       return restSerializer.serializeQ(suggestions, strategy)
         .then(function(serialized) {
+          res.set('CACHE-CONTROL', 'NO-CACHE');
           res.send(serialized);
         });
     })
