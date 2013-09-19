@@ -126,7 +126,7 @@ require([
             });
 
             inviteModal.view.on('invite:reject', function() {
-              window.history.back();
+              window.location = '/last';
             });
 
           } else {

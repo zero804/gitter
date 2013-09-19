@@ -185,6 +185,59 @@ function testSecondaryInviteAcceptance(email, email2, done) {
   });
 }
 
+
+function testSecondaryConnectAcceptance(email, email2, done) {
+  var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+  var troupeService = testRequire.withProxies("./services/troupe-service", {
+    './email-notification-service': emailNotificationServiceMock
+  });
+
+    persistence.User.create({
+      email: email,
+      displayName: 'Test User ' + new Date(),
+      confirmationCode: null,
+      status: "ACTIVE" }, function(err, user) {
+        if(err) return done(err);
+
+        troupeService.createInvite(null, { fromUser: fixture.user1, email: email2 }, function(err, invite) {
+          if(err) return done(err);
+
+          return persistence.Invite.findByIdQ(invite.id)
+            .then(function(invite) {
+              assert(invite, 'Invite does not exist');
+              assert(invite.fromUserId == fixture.user1.id);
+
+              return troupeService.acceptInviteForAuthenticatedUser(user, invite)
+                .then(function(trp) {
+                  assert(invite.fromUserId == fixture.user1.id);
+
+                  persistence.Troupe.findOne({ oneToOne: true, $and: [{ 'users.userId': fixture.user1.id }, { 'users.userId': user.id }] }, function(err, troupe2) {
+                    if(err) return done(err);
+
+                    assert(trp.id === troupe2.id);
+                    assert(troupeService.userHasAccessToTroupe(user, troupe2), 'User has not been granted access to the troupe');
+                    assert(troupeService.userIdHasAccessToTroupe(user.id, troupe2), 'User has not been granted access to the troupe');
+
+                    assert(user.hasEmail(email2), "User did not inherit (as secondary) the email address of the invite");
+
+                    persistence.Invite.findOne({ id: invite.id }, function(err, r2) {
+                      if(err) return done(err);
+
+                      assert(!r2, 'Invite should be deleted');
+                      return done();
+                    });
+                  });
+                })
+                .fail(done);
+
+            });
+
+
+        });
+
+      });
+}
+
 function testInviteRejection(email, done) {
   var troupeUri = 'testtroupe3';
   var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
@@ -340,6 +393,7 @@ function testRequestRejection(email, userStatus, done) {
 
 describe('troupe-service', function() {
 
+
   describe('#acceptRequest()', function() {
 
     it('should allow an ACTIVE user (without a confirmation code) request to be accepted', function(done) {
@@ -377,6 +431,7 @@ describe('troupe-service', function() {
   });
 
   describe('#acceptInviteForAuthenticatedUser', function() {
+
     it('should delete an invite and add user to the troupe', function(done) {
       var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
       testInviteAcceptance(nonExistingEmail, done);
@@ -387,6 +442,13 @@ describe('troupe-service', function() {
       var secondaryEmail = 'testuser' + Date.now() + '.secondary@troupetest.local';
       testSecondaryInviteAcceptance(primaryEmail, secondaryEmail, done);
     });
+
+    it('should create a one to one troupe after adding the invite email address as a secondary address for the logged in user', function(done) {
+      var primaryEmail = 'testuser' + Date.now() + '.primary@troupetest.local';
+      var secondaryEmail = 'testuser' + Date.now() + '.secondary@troupetest.local';
+      testSecondaryConnectAcceptance(primaryEmail, secondaryEmail, done);
+    });
+
   });
 
 
