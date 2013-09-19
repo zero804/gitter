@@ -57,6 +57,9 @@ define([
         success: function() {
           this.model.set('status', 'invited');
           appEvents.trigger('searchSearchView:success');
+          $('.share-failure').hide();
+          $('.trpModalInfo').hide();
+          $('.trpModalSuccess').hide();
           $('#invite-success').show().find('span').text(this.model.get('displayName') + ' invited');
         }
       });
@@ -187,10 +190,12 @@ define([
           if (errorList.length > 0) {
             $('.share-failure').show();
             $('.trpModalInfo').hide();
+            $('.trpModalSuccess').hide();
           }
           else {
             $('.share-failure').hide();
             $('.trpModalInfo').show();
+            $('.trpModalSuccess').hide();
           }
           var errors = "";
           $.each(errorList, function () { errors += this.message + "<br>"; });
@@ -230,6 +235,9 @@ define([
         success: function() {
           model.set('status', 'invited');
           appEvents.trigger('searchSearchView:success');
+          $('.share-failure').hide();
+          $('.trpModalInfo').hide();
+          $('.trpModalSuccess').hide();
           $('#invite-success').show().find('span').text(model.get('displayName') + ' invited');
         }
       });
