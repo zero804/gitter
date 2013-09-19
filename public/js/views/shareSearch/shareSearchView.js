@@ -57,6 +57,7 @@ define([
         success: function() {
           this.model.set('status', 'invited');
           appEvents.trigger('searchSearchView:success');
+          $('#invite-success').show();
         }
       });
 
@@ -229,6 +230,7 @@ define([
         success: function() {
           model.set('status', 'invited');
           appEvents.trigger('searchSearchView:success');
+          $('#invite-success').show();
         }
       });
       emailField.val('');
