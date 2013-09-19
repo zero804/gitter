@@ -57,6 +57,7 @@ define([
 
       collection.forEach(function(model) {
         var av = children.findByModel(model);
+        if(!av) return; // Why?
         av.el.id = 'i' + model._sortIndex;
       });
     },

@@ -768,11 +768,16 @@ function TroupeStrategy(options) {
         troupeUrl = "/" + item.uri;
     }
 
+    function getDefaultTroupeAvatar() {
+      var initials = troupeName.split(/\s+/).map(function(s) { return s.charAt(0); }).join('');
+      return 'https://avatar-beta.trou.pe/' + item.id + '/' + initials + '.png';
+    }
+
     return {
       id: item.id,
       name: troupeName,
       uri: item.uri,
-      avatarUrl: otherUser && otherUser.avatarUrlSmall || gravatar.gravatarUrlForEmail(troupeUrl + '@trou.pe'),
+      avatarUrl: otherUser && otherUser.avatarUrlSmall || getDefaultTroupeAvatar(),
       oneToOne: item.oneToOne,
       users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
       user: otherUser,
