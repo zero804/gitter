@@ -45,6 +45,10 @@
 .trpChatAvatar .avatar-s {
   width: 32px;
   height: 32px;
+  @media @mobile {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 .trpChatInput, .trpChatInputBoxTextArea {
@@ -115,8 +119,6 @@
 }
 
 .trpChatBox {
-/*	background-color: #f2f5f2;*/
-  background-color: @trpBgColor2;
 	min-height: 24px;
 	vertical-align: top;
 	border-radius: 5px 5px 5px 5px;
@@ -128,6 +130,10 @@
 
   @media @mid {
     margin-left: 30px;
+  }
+
+  @media @mobile {
+    margin-left: 24px;
   }
 
 }
