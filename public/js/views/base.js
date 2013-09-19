@@ -476,6 +476,19 @@ define([
     }
   });
 
+  TroupeViews.Modal.wrapView = function(View, customisations) {
+    var Modal = TroupeViews.Modal.extend(customisations);
+
+    Modal.prototype.initialize = function(options) {
+      options = options || {};
+      // todo let the caller to wrapView specify their own initialize which is called instead of below
+      TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+      this.view = new View(options);
+    };
+
+    return Modal;
+  };
+
   TroupeViews.Popover = TroupeViews.Base.extend({
     template: popoverTemplate,
     className: "popover",
