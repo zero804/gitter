@@ -372,6 +372,9 @@ module.exports = {
         // and either the login or signup will work the same. This is not required currently
         // because the user is given the invite url without the confirm code if they are an existing user.
 
+        if (req.user) {
+          return acceptInviteWithConfirmation(req, res); // invite is accepted immediately
+        }
 
         contextGenerator.generateMiniContext(req, function(err, troupeContext) {
           if(err) {
