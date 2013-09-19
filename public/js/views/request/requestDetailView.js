@@ -75,5 +75,7 @@ define([
   });
   cocktail.mixin(View, UnreadItemViewMixin);
 
+  View.Modal = TroupeViews.Modal.wrapView(View);
+
   return View;
 });
