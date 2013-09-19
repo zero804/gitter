@@ -68,7 +68,7 @@ require([
   $('.nano').nanoScroller({ preventPageScrolling: true });
 
   // instantiate user email collection
-  var userEmailCollections = new UserEmailCollection.UserEmailCollection();
+  var userEmailCollection = new UserEmailCollection.UserEmailCollection();
 
   // Setup the ChatView
 
@@ -99,8 +99,8 @@ require([
       { name: "person",           re: /^person\/(\w+)$/,          viewType: PersonDetailView,             collection: itemCollections.users },
 
       { name: "profile",          re: /^profile$/,                viewType: profileView.Modal },
-      { name: "profileEmails",    re: /^profile\/emails$/,        viewType: profileEmailView.Modal,       collection: userEmailCollections, skipModelLoad: true },
-      { name: "profileEmailsAdd", re: /^profile\/emails\/add$/,   viewType: profileAddEmailView.Modal,    collection: userEmailCollections, skipModelLoad: true },
+      { name: "profileEmails",    re: /^profile\/emails$/,        viewType: profileEmailView.Modal,       collection: userEmailCollection, skipModelLoad: true },
+      { name: "profileEmailsAdd", re: /^profile\/emails\/add$/,   viewType: profileAddEmailView.Modal,    collection: userEmailCollection, skipModelLoad: true },
       { name: "share",            re: /^share$/,                  viewType: shareSearchView.Modal },
       { name: "connect",          re: /^connect$/,                viewType: shareSearchView.Modal,        viewOptions: { overrideContext: true, inviteToConnect: true } },
       { name: "create",           re: /^create$/,                 viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true },
