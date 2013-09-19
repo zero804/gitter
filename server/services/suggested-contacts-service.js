@@ -19,6 +19,7 @@ var redisClient_setex         = Q.nbind(redisClient.setex, redisClient);
 var redisClient_del           = Q.nbind(redisClient.del, redisClient);
 
 /* const */
+var PENDING_INVITE            = 128;
 var INVITE                    = 64;
 var REVERSE_INVITE            = 32;
 var IMPLICIT_CONTACT          = 16;
@@ -105,19 +106,7 @@ function addReverseContacts(userId, dateGenerated) {
             if(!user) return;
 
             var emails = [user.email].concat(user.emails);
-
-            return persistence.SuggestedContact.updateQ(
-                    matchingContact(userId, user._id, emails),
-                    { $inc:       { score: REVERSE_CONTACT },
-                      $addToSet:  { emails: { $each: emails } },
-                      $set:       { name: user.displayName,
-                                    userId: userId,
-                                    contactUserId: user._id,
-                                    username: user.username || null,
-                                    dateGenerated: dateGenerated }
-                    },
-                    { upsert: true });
-
+            return increaseContactRanking(user, userId, emails, dateGenerated, REVERSE_CONTACT);
           }));
         });
 
@@ -133,33 +122,16 @@ function addImplicitConnections(userId, dateGenerated) {
 
           return Q.all(users.map(function(user) {
             var emails = [user.email].concat(user.emails);
-
-            return persistence.SuggestedContact.updateQ(
-                    matchingContact(userId, user.id, emails),
-                    { $inc:       { score: IMPLICIT_CONTACT },
-                      $addToSet:  { emails: { $each: emails } },
-                      $set:       { name: user.getDisplayName(),
-                                    contactUserId: user.id,
-                                    userId: userId,
-                                    username: user.username || null,
-                                    dateGenerated: dateGenerated }
-                    },
-                    { upsert: true });
-
+            return increaseContactRanking(user, userId, emails, dateGenerated, IMPLICIT_CONTACT);
           }));
-
 
     });
   });
 }
 
-function addOutgoingInvites(userId, dateGenerated) {
-  return Q.all([
-      troupeService.findAllUsedInvitesFromUserId(userId),
-      troupeService.findAllUnusedInvitesFromUserId(userId),
-    ])
-    .spread(function(usedInvites, unusedInvites) {
-      var invites = usedInvites.concat(unusedInvites);
+function addOutgoingPendingInvites(userId, dateGenerated) {
+  return troupeService.findAllUnusedInvitesFromUserId(userId)
+    .then(function(invites) {
       var inviteeUserIds = invites.map(function(i) { return i.userId; }).filter(function(b) { return !!b; });
 
       return (inviteeUserIds.length ? userService.findByIds(inviteeUserIds) : Q.resolve([]))
@@ -174,33 +146,39 @@ function addOutgoingInvites(userId, dateGenerated) {
               if(!inviteeUser) return; // Nothing to insert
 
               emails = inviteeUser.getAllEmails();
-
-              return persistence.SuggestedContact.updateQ(
-                      matchingContact(userId, inviteeUser.id, emails),
-                      { $inc:       { score: INVITE },
-                        $addToSet:  { emails: { $each: emails } },
-                        $set:       { name: inviteeUser.getDisplayName(),
-                                      contactUserId: inviteeUser.id,
-                                      userId: userId,
-                                      username: inviteeUser.username || null,
-                                      dateGenerated: dateGenerated }
-                      },
-                      { upsert: true });
+              return increaseContactRanking(inviteeUser, userId, emails, dateGenerated, PENDING_INVITE);
             } else {
-              var email = invite.email;
-              emails = [email];
+              return increaseUnconfirmedContactRanking(userId, invite, dateGenerated, PENDING_INVITE);
+            }
+          }));
 
-              return persistence.SuggestedContact.updateQ(
-                      matchingContact(userId, null, emails),
-                      { $inc:       { score: INVITE },
-                        $addToSet:  { emails: { $each: emails },
-                                      knownEmails: { $each: emails } },
-                        $set:       { name: invite.displayName || email.split('@')[0],
-                                      userId: userId,
-                                      dateGenerated: dateGenerated }
-                      },
-                      { upsert: true });
+        });
 
+  });
+}
+
+function addOutgoingConfirmedInvites(userId, dateGenerated) {
+  return Q.all([
+      troupeService.findAllUsedInvitesFromUserId(userId),
+    ])
+    .spread(function(invites) {
+      var inviteeUserIds = invites.map(function(i) { return i.userId; }).filter(function(b) { return !!b; });
+
+      return (inviteeUserIds.length ? userService.findByIds(inviteeUserIds) : Q.resolve([]))
+        .then(function(inviteeUsers) {
+          var inviteeUsersIndexed = collections.indexById(inviteeUsers);
+
+          return Q.all(invites.map(function(invite) {
+            var emails;
+
+            if(invite.userId) {
+              var inviteeUser = inviteeUsersIndexed[invite.userId];
+              if(!inviteeUser) return; // Nothing to insert
+
+              emails = inviteeUser.getAllEmails();
+              return increaseContactRanking(inviteeUser, userId, emails, dateGenerated, INVITE);
+            } else {
+              return increaseUnconfirmedContactRanking(userId, invite, dateGenerated, INVITE);
             }
           }));
 
@@ -223,23 +201,39 @@ function addIncomingInvites(userId, dateGenerated) {
 
           return Q.all(inviterUsers.map(function(inviterUser) {
             var emails = inviterUser.getAllEmails();
-
-            return persistence.SuggestedContact.updateQ(
-                    matchingContact(userId, inviterUser.id, emails),
-                    { $inc:       { score: REVERSE_INVITE },
-                      $addToSet:  { emails: { $each: emails } },
-                      $set:       { name: inviterUser.getDisplayName(),
-                                    contactUserId: inviterUser.id,
-                                    userId: userId,
-                                    username: inviterUser.username || null,
-                                    dateGenerated: dateGenerated }
-                    },
-                    { upsert: true });
+            return increaseContactRanking(inviterUser, userId, emails, dateGenerated, REVERSE_INVITE);
           }));
 
         });
 
   });
+}
+
+function increaseContactRanking(user, userId, emails, dateGenerated, score) {
+  return persistence.SuggestedContact.updateQ(
+          matchingContact(userId, user.id, emails),
+          { $inc:       { score: score },
+            $addToSet:  { emails: { $each: emails } },
+            $set:       { name: user.getDisplayName(),
+                          contactUserId: user.id,
+                          userId: userId,
+                          username: user.username || null,
+                          dateGenerated: dateGenerated }
+          },
+          { upsert: true });
+}
+
+function increaseUnconfirmedContactRanking(userId, invite, dateGenerated, score) {
+  return persistence.SuggestedContact.updateQ(
+        matchingContact(userId, null, [invite.email]),
+        { $inc:       { score: score },
+          $addToSet:  { emails: { $each: [invite.email] },
+                        knownEmails: { $each: [invite.email] } },
+          $set:       { name: invite.displayName || invite.email.split('@')[0],
+                        userId: userId,
+                        dateGenerated: dateGenerated }
+        },
+        { upsert: true });
 }
 
 /**
@@ -263,7 +257,8 @@ function generateSuggestedContactsForUser(userId) {
           addContacts(userId, dg),
           addReverseContacts(userId, dg),
           addImplicitConnections(userId, dg),
-          addOutgoingInvites(userId, dg),
+          addOutgoingPendingInvites(userId, dg),
+          addOutgoingConfirmedInvites(userId, dg),
           addIncomingInvites(userId, dg)
         ]);
 
