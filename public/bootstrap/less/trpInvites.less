@@ -101,6 +101,39 @@
   color: @trpDarkGreen;
 }
 
+#invite-success {
+  @media screen and (max-width: 720px) {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+  }
+  @media not screen and (max-width: 720px) {
+    position: absolute;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    width: 100%;
+    z-index: -1;
+    bottom: -46px;
+  }
+}
+
+#invite-success.hidden {
+  @media screen and (max-width: 720px) {
+    opacity: 0;
+  }
+  @media not screen and (max-width: 720px) {
+    bottom: 0;
+  }
+
+  -webkit-transition: all 1s ease-in-out;
+  -moz-transition: all 1s ease-in-out;
+  -o-transition: all 1s ease-in-out;
+  -ms-transition: all 1s ease-in-out;
+  transition: all 1s ease-in-out;
+
+}
+
+
 #sharelink {
   -webkit-user-select: text;
    -khtml-user-select: text;
