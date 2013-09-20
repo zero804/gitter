@@ -5,9 +5,9 @@ set -e
 MONGO_URL=$1
 if [ -z "$MONGO_URL" ]; then MONGO_URL=troupe; fi
 
-# The password is 123456
-
-# Add some test users
+# NB NB NB NB NB
+# Old versions of Mongo, like the ones deployed on the prod mongo servers aren't so happy
+# about spaces between the lines, so keep it that way
 mongo $MONGO_URL <<"DELIM"
 db.invites.remove({ email: /@troupetest.local$/ });
 function invalidInvite(d) {
@@ -39,7 +39,7 @@ function invalidInvite(d) {
     if(!d.fromUserId) {
       return 'from_user_missing';
     } else {
-      var troupe = db.troupes.findOne({ oneToOne: true, $and: [{ "user.userId": d.fromUserId}, { "user.userId": d.userId } ] });
+      var troupe = db.troupes.findOne({ oneToOne: true, $and: [{ "users.userId": d.fromUserId}, { "users.userId": d.userId } ] });
       if(troupe) {
         return 'already_connected';
       }
