@@ -1,21 +1,24 @@
-
-<div class="trpFileVersionThumbnail"><a href="#|{{previewUrl}}" class="link-preview">{{ widget "avatar" user=user size='m'}}</a></div>
-
-<div class="trpItemDetails">
-  <div class="trpFilename" title="{{fileName}}">{{user.displayName}}</div>
-  <div class="trpFilename" title="{{email}}">{{user.email}}</div>
+ <div class="trpModalTitle">
+    <div style="text-align: center">
+      {{widget "avatar" user=user size='m'}}
+    </div>
+    <div style="text-align: center">
+      {{user.displayName}}<br>
+      {{user.email}}
+    </div>
 </div>
 
-<div class="trpButtonGreen trpFileButton trpButtonDropdown">
-  <div class="trpMainButton">
-    <a href="#!" id="request-accept-button">Accept Request</a>
-  </div>
-</div>
+<div class="trpModalRequestForm" style="text-align: center;" >
+   <a href="#!" id="request-accept-button" style="text-decoration: none">
+    <div class="trpButtonGreen trpButtonBig">
+      Accept Request
+    </div>
+  </a>
 
-<div class="trpButtonGreen trpFileButton trpButtonDropdown">
-  <div class="trpMainButton">
-    <a href="#!" id="request-reject-button">Reject Request</a>
-  </div>
+  <a href="#!" id="request-reject-button" style="text-decoration: none">
+    <div class="trpButtonGreen trpButtonBig">
+      Reject Request
+    </div>
+  </a>
 </div>
-
-<br>
+<br><Br>
