@@ -264,6 +264,20 @@ define([
           });
         });
       }
+
+      if(!compactView) {
+        window.setTimeout(function() {
+          try {
+            var v = self.$el.find('input[type=text], input[type=url], input[type=tel], input[type=number], input[type=color], input[type=email]')[0];
+            if(v) {
+              v.focus();
+              v.select();
+            }
+          } catch(e) {
+          }
+        }, 100);
+
+      }
     },
 
     onClose: function() {
