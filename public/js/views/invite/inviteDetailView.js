@@ -1,16 +1,14 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
-  'underscore',
-  'backbone',
   'views/base',
-  'utils/context',
-  'views/shareSearch/shareSearchView',
   'hbs!./tmpl/inviteDetailView',
   'hbs!./tmpl/deleteConfirmation',
   'views/unread-item-view-mixin',
-  'log!request-detail-view'
-], function($, _, Backbone, TroupeViews, context, shareSearchView, template, deleteConfirmationTemplate, UnreadItemViewMixin, log){
+  'log!request-detail-view',
+  'cocktail',
+  'utils/context'
+], function($, TroupeViews, template, deleteConfirmationTemplate, UnreadItemViewMixin, log, cocktail, context){
   "use strict";
 
   var View = TroupeViews.Base.extend({
@@ -22,7 +20,7 @@ define([
       "click #invite-resend-button": "onResendClicked"
     },
 
-    initialize: function(options) {
+    initialize: function() {
       this.setRerenderOnChange();
     },
 
@@ -37,31 +35,22 @@ define([
     */
 
     onResendClicked: function() {
-      // open up share dialog populated with the email address.
       var email = this.model.get('email');
       var user = this.model.get('user');
-      var invites = [];
 
-      if (email) {
-        invites.push({ email: email });
-      } else if (user && user.id) {
-        invites.push(user);
-      } else {
-        log("Error resending invite");
-      }
-
-
-      var viewOptions = { invites: invites };
+      var invite = email ? { email: email } : user;
 
       // check whether the invite is to a troupe or to the user.
-      if (!this.model.isForTroupe()) {
-        viewOptions.overrideContext = true;
-        viewOptions.inviteToConnect = true;
-      }
+      var endpoint = this.model.isForTroupe() ? '/troupes/' + context.getTroupeId() + '/invites' : '/api/v1/inviteconnections';
 
-      var m = new shareSearchView.Modal(viewOptions);
-      m.show();
-      m.view.sendInvites();
+      $.ajax({
+        url: endpoint,
+        contentType: "application/json",
+        dataType: "json",
+        context: this,
+        data: JSON.stringify(invite),
+        type: "POST"
+      });
     },
 
     onDeleteClicked: function() {
@@ -90,10 +79,10 @@ define([
 
     onDelete: function() {
       this.model.destroy({
-        success: function(data) {
+        success: function() {
           window.location.href = "#!";
         },
-        error: function(model, resp, options) {
+        error: function() {
           log("Error rejecting request.");
         }
       });
@@ -106,7 +95,9 @@ define([
       });
     }*/
   });
+  cocktail.mixin(View, UnreadItemViewMixin);
 
-  _.extend(View.prototype, UnreadItemViewMixin);
+  View.Modal = TroupeViews.Modal.wrapView(View);
+
   return View;
 });

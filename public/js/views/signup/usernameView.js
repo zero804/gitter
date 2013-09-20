@@ -64,7 +64,7 @@ define([
 		},
 
 		renderSuggestions: function(suggestions) {
-			var suggestionsContainer = this.$el.find('.trpSuggestions');
+			var suggestionsContainer = this.$el.find('.name-suggestions');
 
 			for (var a = 0; a < suggestions.length; a++) {
 				var data = {
@@ -75,7 +75,7 @@ define([
 
 				suggestionsContainer.append(suggestionTemplate(data));
 			}
-			$(".name-suggestions").slideDown();
+			suggestionsContainer.slideDown();
 
 		},
 

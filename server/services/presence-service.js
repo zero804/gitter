@@ -40,6 +40,10 @@ function keyTroupeUsers(troupeId) {
   return prefix + "tu:" + troupeId;
 }
 
+function keyUserSockets(troupeId) {
+  return prefix + "us:" + troupeId;
+}
+
 
 // Callback(err);
 function disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback) {
@@ -49,7 +53,7 @@ function disassociateSocketAndDeactivateUserAndTroupe(socketId, userId, callback
   lookupTroupeIdForSocket(socketId, function(err, troupeId) {
     if(err) return callback(err);
 
-    var keys = [keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, keyUserLock(userId), troupeId ? keyTroupeUsers(troupeId) : null];
+    var keys = [keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, keyUserLock(userId), troupeId ? keyTroupeUsers(troupeId) : null, keyUserSockets(userId)];
     var values = [userId, socketId];
 
     scriptManager.run('presence-disassociate', keys, values, function(err, result) {
@@ -122,7 +126,7 @@ function userSocketConnected(userId, socketId, connectionType, client, callback)
 
   var isMobileConnection = connectionType == 'mobile';
 
-  var keys = [keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, keyUserLock(userId)];
+  var keys = [keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, keyUserLock(userId), keyUserSockets(userId)];
   var values = [userId, socketId, Date.now(), isMobileConnection ? 1 : 0, client];
 
   scriptManager.run('presence-associate', keys, values, function(err, result) {
@@ -191,7 +195,7 @@ function socketGarbageCollected(socketId, callback) {
       // Force socket disconnect
       // Technically this should never happen now that sockets are associated at authentication
       // time and therefore we never have a socket and userId at the same time
-      winston.error('Unable to disconnect socket, forcing disconnect' + err, { socketId: socketId });
+      winston.error('Unable to disconnect socket, forcing disconnect: ' + err, { socketId: socketId });
 
       var keys = [keySocketUser(socketId), ACTIVE_SOCKETS_KEY];
       var values = [socketId];
@@ -354,15 +358,19 @@ function categorizeUsersByOnlineStatus(userIds, callback) {
   var keys = [key, out_key, ACTIVE_USERS_KEY];
   var values = userIds;
 
+  var d = Q.defer();
+
   scriptManager.run('presence-categorize-users', keys, values, function(err, onlineUsers) {
+    if(err) return d.reject(err);
+
     var result = {};
     if(onlineUsers) onlineUsers.forEach(function(userId) {
       result[userId] = 'online';
     });
-
-    return callback(null, result);
+    return d.resolve(result);
   });
 
+  return d.promise.nodeify(callback);
 }
 
 function categorizeUserTroupesByOnlineStatus(userTroupes, callback) {
@@ -400,6 +408,64 @@ function categorizeUserTroupesByOnlineStatus(userTroupes, callback) {
     });
 
   }, callback);
+}
+
+function findAllSocketsForUserInTroupe(userId, troupeId, callback) {
+  listAllSocketsForUser(userId, function(err, socketIds) {
+    if(err) return callback(err);
+    if(!socketIds || !socketIds.length) return callback(null, []);
+
+    var multi = redisClient.multi();
+    socketIds.forEach(function(socketId) {
+      multi.hmget(keySocketUser(socketId), 'tid');
+    });
+
+    multi.exec(function(err, replies) {
+      if(err) return callback(err);
+      var result = replies.reduce(function(memo, hash, index) {
+          var tId = hash[0];
+          if(tId === troupeId) {
+            memo.push(socketIds[index]);
+          }
+
+          return memo;
+        }, []);
+
+      return callback(null, result);
+    });
+
+  });
+
+}
+
+function isUserConnectedWithClientType(userId, clientType, callback) {
+  listAllSocketsForUser(userId, function(err, socketIds) {
+    if(err) return callback(err);
+    if(!socketIds || !socketIds.length) return callback(null, false);
+
+    var multi = redisClient.multi();
+    socketIds.forEach(function(socketId) {
+      multi.hmget(keySocketUser(socketId), 'ct');
+    });
+
+    multi.exec(function(err, replies) {
+      if(err) return callback(err);
+
+      var clientTypeBeta = clientType + 'beta';
+
+      for(var i = 0; i < replies.length; i++) {
+        var ct = replies[i][0];
+        if(ct === clientType || ct === clientTypeBeta) return callback(null, true);
+      }
+
+      return callback(null, false);
+    });
+
+  });
+}
+
+function listAllSocketsForUser(userId, callback) {
+  redisClient.smembers(keyUserSockets(userId), callback);
 }
 
 function listOnlineUsers(callback) {
@@ -782,7 +848,7 @@ function validateUsers(callback) {
 }
 
   // Connections and disconnections
-presenceService.userSocketConnected = userSocketConnected,
+presenceService.userSocketConnected = userSocketConnected;
 presenceService.userSubscribedToTroupe =  userSubscribedToTroupe;
 presenceService.socketDisconnected =  socketDisconnected;
 presenceService.socketDisconnectionRequested = socketDisconnectionRequested;
@@ -796,6 +862,9 @@ presenceService.listActiveSockets = listActiveSockets;
 presenceService.listMobileUsers =  listMobileUsers;
 presenceService.listOnlineUsersForTroupes =  listOnlineUsersForTroupes;
 presenceService.categorizeUserTroupesByOnlineStatus = categorizeUserTroupesByOnlineStatus;
+presenceService.findAllSocketsForUserInTroupe = findAllSocketsForUserInTroupe;
+presenceService.listAllSocketsForUser = listAllSocketsForUser;
+presenceService.isUserConnectedWithClientType = isUserConnectedWithClientType;
 
 // Eyeball
 presenceService.clientEyeballSignal =  clientEyeballSignal;

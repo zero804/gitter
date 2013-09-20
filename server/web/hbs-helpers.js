@@ -91,6 +91,7 @@ exports.generateTroupeContext = function(troupeContext, parameters) {
 
   var env = options ? _.extend({}, troupeEnv, options) : troupeEnv;
 
+  /* Disable the use of CDNs if we're using the appcache as douchey appcache doesn't support CDN fetchs */
   if(options && options.appcache) {
     env.cdns = [];
   }

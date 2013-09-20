@@ -7,11 +7,13 @@ define([
   'marionette',
   'collections/base',
   'backbone',
+  'cocktail',
   'utils/momentWrapper'
-], function($, _, assert, TroupeViews, marionette, TroupeCollections, backbone, moment) {
+], function($, _, assert, TroupeViews, marionette, TroupeCollections, Backbone, cocktail, moment) {
+  "use strict";
 
   /* Sorted Collection */
-  var Collection = backbone.Collection.extend({
+  var Collection = Backbone.Collection.extend({
     model: Backbone.Model.extend({sync: function() {}}),
     sortByMethods: {
       'sent': function(chat) {
@@ -35,21 +37,17 @@ define([
 
     sync: function(method, model, options) { if (options.success) options.success(); }
   });
-
-  _.extend(Collection.prototype, TroupeCollections.ReversableCollectionBehaviour);
+  cocktail.mixin(Collection, TroupeCollections.ReversableCollectionBehaviour);
 
   /* Marionette Collection View */
   var View = marionette.CollectionView.extend({
-    itemView: backbone.View.extend({
+    itemView: Backbone.View.extend({
       render: function() {
         this.$el.html(this.model.get('sent')._d.toISOString());
       }
-    }),
-    initialize: function() {
-      this.initializeSorting();
-    }
+    })
   });
-  _.extend(View.prototype, TroupeViews.SortableMarionetteView);
+  cocktail.mixin(View, TroupeViews.SortableMarionetteView);
 
   function createCollection() {
     return new Collection();

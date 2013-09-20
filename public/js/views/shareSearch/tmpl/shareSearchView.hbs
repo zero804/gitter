@@ -1,46 +1,24 @@
 <div class="modal-content trpInviteModal">
-  <form class="form-inline" id="share-form">
-    <div>
-      {{#if inviteToTroupe}}
-        <input type="text" name="inviteSearch" class="trpInput" placeholder="Search your contacts or type an email address to invite" autocomplete="off" style="width: 85%"/><br>
-      {{else}}
-        {{#if importedGoogleContacts}}
-        <input type="text" name="inviteSearch" class="trpInput" placeholder="Search your Gmail contacts or type an email address to invite" autocomplete="off" style="width: 85%"/><br>
-        {{else}}
-        <input type="text" name="inviteSearch" class="trpInput" placeholder="Enter an email address to invite" autocomplete="off" style="width: 85%"/><br>
-        {{/if}}
-      {{/if}}
-    </div>
-    {{#inviteToTroupe}}
-    {{#unless importedGoogleContacts}}
+  <div class="form-inline" id="share-form">
+    <form class="trpEnterEmailRow">
+      <input id="custom-email" type="email" name="email" class="trpInput" placeholder="friend@work.com" autocomplete="off"/>
+      <div class="inviteButtonContainer">
+        <button type="submit" id="custom-email-button" class="trpInviteButton">Invite</button>
+      </div>
+    </form>
+
+
+  <div id="invites" class="trpSearchInvites"></div>
+  </div>
+
+
      <a href='/google/contacts?returnTo={{returnToUrl}}' style="text-decoration: none;">
-      <div style="display: inline-block; margin-top: 8px">
+      <div class="separate-unit" style="display: inline-block;">
         <div class="trpButton trpCopyButton" style="margin-left: 0px">
-          <img src='{{cdn "images/2/icon-gmail.png"}}' style="vertical-align: middle; margin-right: 4px" width="16"> <span style="vertical-align: middle">Invite Gmail contacts</span>
+          <img src='{{cdn "images/2/icon-gmail.png"}}' style="vertical-align: middle; margin-right: 4px" width="16"> <span style="vertical-align: middle">{{#if importedGoogleContacts}}Update{{else}}Connect with{{/if}} Gmail contacts</span>
         </div>
       </div>
     </a>
-    {{/unless}}
-    {{/inviteToTroupe}}
-    {{#inviteToConnect}}
-      <a href='/google/contacts?returnTo={{returnToUrl}}' style="text-decoration: none">
-        <div style="display: inline-block; margin-top: 8px">
-          <div class="trpButton trpCopyButton" style="margin-left: 0px">
-            <img src='{{cdn "images/2/icon-gmail.png"}}' style="vertical-align: middle; margin-right: 4px" width="16"> <span style="vertical-align: middle">Add Gmail contacts</span>
-          </div>
-        </div>
-      </a>
-    {{/inviteToConnect}}
-    <style>button.sendInvites { display: inline-block; } </style>
-
-  <div id="invites" class="trpSearchInvites">
-  </div>
-
-  <div style="margin-top: 20px">
-  <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen sendInvites" id="submit-button">Send Invites</button>
-  <!-- don't display this <a> bit at all if the account has been connected to Google -->
-  </div>
-  </form>
 
 </div>
 
@@ -48,21 +26,16 @@
   <span class="trpModalTitle"><span class="trpModalFailureText" id="failure-text">Invite failed.</span></span>
 </div>
 
-<div class="modal-success">
-  <div class="trpModalTitle">
-    Your invites were sent successfully<br><br>
-    <button class="trpModalButton trpButtonBig trpBtnGreen" id="finished-button">Close</button>
-  </div>
-</div>
-
-{{#if inviteToTroupe}}
 <div class="trpModalInfo">
-  <div class="trpBodyMedium" style="display:inline-block; margin-top: 3px">You can also share this link to invite people: <span class="trpGreen" id="sharelink">{{basePath}}/{{uri}}</span></div>
-  <div style="display: inline-block; float: right"><div class="trpButton trpCopyButton" id="copy-button"> copy</div></div>
+  <span>Or share this: <span id="sharelink">{{shareUrl}}</span></span>
+  <div style="display: inline-block; float: right"><div class="trpButton trpCopyButton" id="copy-button">copy</div></div>
 </div>
-{{/if}}
 
 <div class="trpModalSuccess" id="import-success" style="display:none">
   <div class="trpModalBody" style="padding-bottom: 0"><span class="trpWhite">Successfully connected to Gmail</span></div>
-  <div class="trpModalSubtext" style="padding-bottom: 0"><span class="trpWhite">You can now search and invite your Gmail contacts in the  search box above.</span></div>
+  <div class="trpModalSubtext" style="padding-bottom: 0"><span class="trpWhite">You can now search and invite your Gmail contacts in the search box above.</span></div>
+</div>
+
+<div class="trpModalSuccess hidden" id="invite-success" style="display:none">
+  <span class="trpWhite">Invite Sent</span>
 </div>

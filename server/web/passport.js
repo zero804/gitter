@@ -237,7 +237,10 @@ module.exports = {
       },
 
       function(req, accessToken, refreshToken, profile, done) {
+
         if (req.user) {
+          // Save the access token in the request
+          req.googleAccessToken = accessToken;
 
           if (!refreshToken) {
             winston.info('passport: Refresh token not available');
@@ -253,7 +256,7 @@ module.exports = {
 
         } else {
 
-          var googleUser = { 
+          var googleUser = {
             displayName:        profile._json.name,
             email:              profile._json.email,
             gravatarImageUrl:   profile._json.picture,

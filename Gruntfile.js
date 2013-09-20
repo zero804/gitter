@@ -307,6 +307,7 @@ module.exports = function( grunt ) {
           "public/bootstrap/css/trpMails.css": "public/bootstrap/less/trpMails.less",
           "public/bootstrap/css/trpPeople.css": "public/bootstrap/less/trpPeople.less",
           "public/bootstrap/css/trpMobileApp.css": "public/bootstrap/less/trpMobileApp.less",
+          "public/bootstrap/css/trpMobileUserhome.css": "public/bootstrap/less/trpMobileUserhome.less",
           "public/bootstrap/css/trpNativeChat.css": "public/bootstrap/less/trpNativeChat.less",
           "public/bootstrap/css/trpNativeFiles.css": "public/bootstrap/less/trpNativeFiles.less",
           "public/bootstrap/css/trpNativeConversations.css": "public/bootstrap/less/trpNativeConversations.less",
@@ -373,6 +374,14 @@ module.exports = function( grunt ) {
           'underscore': '_'
         },
         exports: 'Backbone'
+      },
+      cocktail: {
+        files : {
+          'output/client-libs/cocktail/cocktail-amd.js': ['output/client-libs/cocktail/Cocktail.js']
+        },
+        modules: {
+        },
+        exports: 'Cocktail'
       },
       fineuploader: {
         files : {
@@ -453,6 +462,15 @@ module.exports = function( grunt ) {
       'jquery-placeholder': {
         files : {
           'output/client-libs/jquery-placeholder/jquery.placeholder-amd.js': ['output/client-libs/jquery-placeholder/jquery.placeholder' + (min ? '.min' : '') + '.js']
+        },
+        modules: {
+          'jquery': 'jQuery'
+        },
+        exports: 'jQuery'
+      },
+      'jquery-sisyphus': {
+        files : {
+          'output/client-libs/sisyphus/jquery.sisyphus-amd.js': ['output/client-libs/sisyphus/sisyphus' + (min ? '.min' : '') + '.js']
         },
         modules: {
           'jquery': 'jQuery'

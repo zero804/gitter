@@ -2,16 +2,24 @@
 define([
   'utils/router',
   'views/profile/profileView',
+  'views/profile/profileEmailView',
+  'views/profile/profileAddEmailView',
   'views/signup/createTroupeView',
   'collections/instances/troupes',
+  'collections/useremails',
   'views/shareSearch/shareSearchView',
   'views/invite/reinviteModal'
-  ], function(Router, profileView, createTroupeView, troupeCollections, shareSearchView, InviteModal) {
+  ], function(Router, profileView, profileEmailView, profileAddEmailView, createTroupeView, troupeCollections, UserEmailCollection, shareSearchView, InviteModal) {
   "use strict";
+
+  // instantiate user email collection
+  var userEmailCollection = new UserEmailCollection.UserEmailCollection();
 
   return Router.extend({
     routes: [
       { name: "profile",  re: /^profile$/,         viewType: profileView.Modal },
+      { name: "profileEmails",    re: /^profile\/emails$/,        viewType: profileEmailView.Modal, collection: userEmailCollection, skipModelLoad: true },
+      { name: "profileEmailsAdd", re: /^profile\/emails\/add$/,   viewType: profileAddEmailView.Modal, collection: userEmailCollection, skipModelLoad: true },
       { name: "create",   re: /^create$/,          viewType: createTroupeView.Modal, collection: troupeCollections.troupes,   skipModelLoad: true },
       { name: "share",    re: /^share$/,           viewType: shareSearchView.Modal },
       { name: "reinvite", re: /^reinvite\/(\w+)$/, viewType: InviteModal,                  collection: troupeCollections.outgoingConnectionInvites, viewOptions: { overrideContext: true, inviteToConnect: true } },

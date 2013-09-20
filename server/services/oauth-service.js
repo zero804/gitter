@@ -83,8 +83,10 @@ exports.validateToken = function(token, callback) {
 
     persistenceService.OAuthClient.findOne({_id: accessToken.clientId}, function(err, client) {
       if (err || !client) return;
+
       persistenceService.User.findOne({_id: accessToken.userId}, function(err, user) {
-        if (err || !client) return;
+        if (err || !user) return;
+
         var properties = {};
         properties['Last login from ' + client.tag] = new Date();
         statsService.userUpdate(user, properties);

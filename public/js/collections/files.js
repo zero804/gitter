@@ -1,16 +1,14 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'underscore',
   'utils/context',
   'backbone',
   './base',
-  '../utils/momentWrapper'
-], function(_, context, Backbone, TroupeCollections, moment) {
+  '../utils/momentWrapper',
+  'cocktail'
+], function(context, Backbone, TroupeCollections, moment, cocktail) {
   "use strict";
 
-  var exports = {};
-
-  exports.FileVersionModel = TroupeCollections.Model.extend({
+  var FileVersionModel = TroupeCollections.Model.extend({
     parse: function(message) {
       message.createdDate = moment.utc(message.createdDate);
 
@@ -28,29 +26,26 @@ define([
     }
   });
 
-  exports.FileVersionCollection  = Backbone.Collection.extend({
-    model: exports.FileVersionModel
+  var FileVersionCollection  = Backbone.Collection.extend({
+    model: FileVersionModel
   });
 
-  exports.FileModel = TroupeCollections.Model.extend({
+  var FileModel = TroupeCollections.Model.extend({
     idAttribute: "id",
 
     defaults: {
     },
 
     initialize: function() {
-      this.convertArrayToCollection('versions', exports.FileVersionCollection);
+      this.convertArrayToCollection('versions', FileVersionCollection);
     }
   });
 
-  exports.FileCollection = TroupeCollections.LiveCollection.extend({
-    model: exports.FileModel,
+  var FileCollection = TroupeCollections.LiveCollection.extend({
+    model: FileModel,
     modelName: 'file',
     nestedUrl: "files",
-    preloadKey: "files"
-  });
-
-  _.extend(exports.FileCollection.prototype, TroupeCollections.ReversableCollectionBehaviour, {
+    initialSortBy: '-date',
 
     sortByMethods: {
       "date": function(file) {
@@ -61,9 +56,7 @@ define([
     },
 
     initialize: function() {
-      TroupeCollections.LiveCollection.prototype.initialize.apply(this, arguments);
-
-      this.setSortBy('-date');
+      FileCollection.__super__.initialize.apply(this, arguments);
 
       // note: this calls resort a bit too much, because 'versions' is a collection,
       // and a change comes through for each attribute on the new version.
@@ -75,5 +68,12 @@ define([
     }
   });
 
-  return exports;
+  cocktail.mixin(FileCollection, TroupeCollections.ReversableCollectionBehaviour);
+
+  return {
+    FileCollection: FileCollection,
+    FileModel: FileModel,
+    FileVersionCollection: FileVersionCollection,
+    FileVersionModel: FileVersionModel
+  };
 });

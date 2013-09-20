@@ -3,13 +3,12 @@ define([
   'underscore',
   'utils/context',
   './base',
-  '../utils/momentWrapper'
-], function(_, context, TroupeCollections, moment) {
+  '../utils/momentWrapper',
+  'cocktail'
+], function(_, context, TroupeCollections, moment, cocktail) {
   "use strict";
 
-  var exports = {};
-
-  exports.ChatModel = TroupeCollections.Model.extend({
+  var ChatModel = TroupeCollections.Model.extend({
     idAttribute: "id",
     parse: function(message) {
       if(message.sent) {
@@ -42,21 +41,20 @@ define([
 
   });
 
-  exports.ChatCollection = TroupeCollections.LiveCollection.extend({
-    model: exports.ChatModel,
+  var ChatCollection = TroupeCollections.LiveCollection.extend({
+    model: ChatModel,
     modelName: 'chat',
     nestedUrl: "chatMessages",
-    preloadKey: "chatMessages",
+    initialSortBy: "sent",
     sortByMethods: {
       'sent': function(chat) {
-        var sent = chat.get('sent');
-        if(!sent) return 0;
-        return sent.valueOf();
-      }
-    },
+        var offset = chat.id ? 0 : 300000;
 
-    initialize: function() {
-      this.setSortBy('sent');
+        var sent = chat.get('sent');
+
+        if(!sent) return offset;
+        return sent.valueOf() + offset;
+      }
     },
 
     findModelForOptimisticMerge: function(newModel) {
@@ -67,14 +65,14 @@ define([
       return optimisticModel;
     }
   });
-  _.extend(exports.ChatCollection.prototype, TroupeCollections.ReversableCollectionBehaviour);
+  cocktail.mixin(ChatCollection, TroupeCollections.ReversableCollectionBehaviour);
 
-  exports.ReadByModel = TroupeCollections.Model.extend({
+  var ReadByModel = TroupeCollections.Model.extend({
     idAttribute: "id"
   });
 
-  exports.ReadByCollection = TroupeCollections.LiveCollection.extend({
-    model: exports.ReadByModel,
+  var ReadByCollection = TroupeCollections.LiveCollection.extend({
+    model: ReadByModel,
     modelName: 'chatReadBy',
     initialize: function(models, options) {
       var userCollection = options.userCollection;
@@ -92,5 +90,10 @@ define([
     }
   });
 
-  return exports;
+  return {
+    ReadByModel: ReadByModel,
+    ReadByCollection: ReadByCollection,
+    ChatModel: ChatModel,
+    ChatCollection: ChatCollection
+  };
 });

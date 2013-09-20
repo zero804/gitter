@@ -37,11 +37,14 @@ define([
   // one notification when the connection to server is down
   // todo: this might also show when an invalid user operation is attempted.
   $(document).ajaxError(function(ev, jqxhr, settings /*, exception*/) {
-    // for 401 unauthorized, refresh the page to log user's back in.
-
     require(['utils/tracking'], function(tracking) {
       tracking.trackError("Ajax Error", settings.url, jqxhr.status);
     });
+
+    if(jqxhr.status >= 400 && jqxhr.status < 500) {
+      // 400 errors are the problem of the ajax caller, not the global handler
+      return;
+    }
 
     notifications.notify({
       id: 'ajax-error',

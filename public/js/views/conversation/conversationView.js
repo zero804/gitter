@@ -1,12 +1,12 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'underscore',
   'utils/context',
   'marionette',
   'views/base',
   'hbs!./tmpl/conversationItemView',
-  'hbs!./tmpl/conversationHelpView'
-], function(_, context, Marionette, TroupeViews, conversationItemViewTemplate, conversationHelpTemplate){
+  'hbs!./tmpl/conversationHelpView',
+  'cocktail'
+], function(context, Marionette, TroupeViews, conversationItemViewTemplate, conversationHelpTemplate, cocktail){
   "use strict";
 
   function getData() {
@@ -40,7 +40,7 @@ define([
       }
     })
   });
+  cocktail.mixin(ConversationCollectionView, TroupeViews.SortableMarionetteView);
 
-  _.extend(ConversationCollectionView.prototype, TroupeViews.SortableMarionetteView);
   return ConversationCollectionView;
 });

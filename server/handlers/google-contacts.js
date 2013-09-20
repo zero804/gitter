@@ -3,19 +3,17 @@
 
 var nconf       = require('../utils/config');
 var request     = require('request');
-var _           = require('underscore');
 var passport    = require('passport');
 var contactService = require("../services/contact-service");
 var middleware  = require("../web/middleware");
+var appEvents   = require('../app-events');
+var winston     = require('winston');
 
-
-var auth_endpoint     = "https://accounts.google.com/o/oauth2/auth";
 var token_endpoint    = "https://accounts.google.com/o/oauth2/token";
 var contacts_endpoint = "https://www.google.com/m8/feeds/contacts/default/full";
 
 var client_id     = nconf.get('googleoauth2:client_id');
 var client_secret = nconf.get('googleoauth2:client_secret');
-var redirect_uri  = nconf.get('web:basepath') + '/oauth2callback';
 
 function getAccessToken(refresh_token, cb) {
   var form = {
@@ -92,6 +90,30 @@ module.exports = {
       passport.authorize('google', { failureRedirect: '/' }),
       middleware.ensureLoggedIn(),
       function(req, res) {
+        function redirectPostContactImport() {
+          if(req.session.returnOnGoogleAuthComplete) {
+            res.relativeRedirect(req.session.returnOnGoogleAuthComplete);
+          } else {
+            res.relativeRedirect('/#|share');
+          }
+        }
+
+        function contactFetchComplete(err) {
+          if(err) {
+            winston.error("Error while importing google contacts", err);
+            return redirectPostContactImport();
+          }
+          appEvents.contactsUpdated(req.user.id);
+
+          if(req.session.events) {
+            req.session.events.push('google_import_complete');
+          } else {
+            req.session.events = ['google_import_complete'];
+          }
+
+          return redirectPostContactImport();
+        }
+
         switch(req.query.state) {
           case 'signup':
             if (req.user.status !== 'ACTIVE') {
@@ -100,24 +122,17 @@ module.exports = {
               res.redirect('/');
             }
             break;
+
           case 'contacts':
-            getAccessToken(req.user.googleRefreshToken, function(access_token) {
-              fetchContacts(access_token, req.user, function() {
+            // If we have an access token, we don't need a refresh token
+            if(req.googleAccessToken) {
+              return fetchContacts(req.googleAccessToken, req.user, contactFetchComplete);
+            }
 
-                if(req.session.events) {
-                  req.session.events.push('google_import_complete');
-                } else {
-                  req.session.events = ['google_import_complete'];
-                }
-
-                if(req.session.returnOnGoogleAuthComplete) {
-                  res.relativeRedirect(req.session.returnOnGoogleAuthComplete);
-                } else {
-                  res.relativeRedirect('/#|share');
-                }
-              });
+            return getAccessToken(req.user.googleRefreshToken, function(access_token) {
+              fetchContacts(access_token, req.user, contactFetchComplete);
             });
-            break;
+
           default:
             res.redirect('/');
         }

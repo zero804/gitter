@@ -1,8 +1,8 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
-  'underscore',
   'backbone',
+  'marionette',
   'views/base',
   'utils/context',
   'fineuploader',
@@ -12,11 +12,13 @@ define([
   'views/invite/inviteView',
   'views/file/fileView',
   'views/conversation/conversationView',
-  'views/people/peopleCollectionView'
-], function($, _, Backbone, TroupeViews, context, qq, rightToolbarTemplate, itemCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView) {
+  'views/people/peopleCollectionView',
+  'cocktail'
+], function($, Backbone, Marionette, TroupeViews, context, qq, rightToolbarTemplate, itemCollections,
+  RequestView, InviteView, FileView, ConversationView, PeopleCollectionView, cocktail) {
   "use strict";
 
-  var RightToolbarLayout = Backbone.Marionette.Layout.extend({
+  var RightToolbarLayout = Marionette.Layout.extend({
     tagName: "span",
     template: rightToolbarTemplate,
 
@@ -44,8 +46,6 @@ define([
     },
 
     onRender: function() {
-      var self = this;
-
       $('#toolbar-frame').show();
       $('#right-panel').show();
 
@@ -98,26 +98,25 @@ define([
       var userCollection = itemCollections.users;
 
       // Request View
-      this.show('requests', new RequestView({ collection: requestCollection }));
+      this.requests.show(new RequestView({ collection: requestCollection }));
 
       // Invites View
-      this.show('invites', new InviteView({ collection: invitesCollection }));
+      this.invites.show(new InviteView({ collection: invitesCollection }));
 
       // File View
-      this.show('files', new FileView({ collection: fileCollection }));
+      this.files.show(new FileView({ collection: fileCollection }));
 
       // Conversation View
       if (!context.inOneToOneTroupeContext()) {
-        var conversationView = new ConversationView({
+        this.conversations.show(new ConversationView({
           collection: conversationCollection
-        });
-        self.show('conversations', conversationView);
+        }));
       } else {
         $('#mail-list').hide();
       }
 
       // People View
-      this.show('people', new PeopleCollectionView({ collection: userCollection }));
+      this.people.show(new PeopleCollectionView({ collection: userCollection }));
 
       this.initHideListeners();
     },
@@ -178,8 +177,7 @@ define([
     }
 
   });
-
-  _.extend(RightToolbarLayout.prototype, TroupeViews.DelayedShowLayoutMixin);
+  cocktail.mixin(RightToolbarLayout, TroupeViews.DelayedShowLayoutMixin);
 
   return RightToolbarLayout;
 

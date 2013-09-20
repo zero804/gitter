@@ -110,7 +110,6 @@ define([
         dataType: "json",
         data: form.serialize(),
         type: "POST",
-        global: false,
         statusCode: {
           400: function(data) {
             if ($.parseJSON(data.responseText).userExists) {
