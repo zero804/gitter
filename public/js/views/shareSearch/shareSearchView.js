@@ -244,7 +244,14 @@ define([
           model.set('status', 'invited');
           appEvents.trigger('searchSearchView:success');
           popupInviteSuccessBanner(model.get('displayName'));
-        }
+        },
+        context: this,
+        statusCode: {
+          417: function() {
+            this.$el.find('#failure-text').text("It appears that you are attempting to invite yourself. You can't do that.");
+            this.$el.find('.share-failure').show('fast');
+          }
+        },
       });
       emailField.val('');
       this.onSearchChange();
