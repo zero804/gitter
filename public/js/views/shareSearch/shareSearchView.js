@@ -98,7 +98,7 @@ define([
       setTimeout(function() {
         $banner.hide();
       }, 1000);
-    }, 500);
+    }, 4000);
   };
 
   var View = TroupeViews.Base.extend({
