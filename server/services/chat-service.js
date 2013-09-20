@@ -20,7 +20,7 @@ exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
 
   var chatMessage = new persistence.ChatMessage();
   chatMessage.fromUserId = null;
-  
+
   chatMessage.toTroupeId = troupe.id;
   chatMessage.sent = new Date();
 
@@ -35,6 +35,9 @@ exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
   chatMessage.mentions = TwitterText.extractMentionsWithIndices(text);
   chatMessage._md      = urlExtractor.version;
   chatMessage.meta     = meta;
+
+  // Skip unreaditems
+  chatMessage.skipAlerts = true;
 
   chatMessage.save(function (err) {
     if(err) return callback(err);

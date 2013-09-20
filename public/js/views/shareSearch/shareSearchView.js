@@ -2,97 +2,280 @@
 define([
   'jquery',
   'underscore',
+  'marionette',
   'utils/context',
   'views/base',
+  'cocktail',
+  'views/infinite-scroll-mixin',
   'hbs!./tmpl/shareSearchView',
   'hbs!./tmpl/shareRow',
+  'hbs!./tmpl/noContacts',
   'zeroclipboard',
   'utils/appevents',
+  'collections/suggested-contacts',
   'bootstrap-typeahead', // No reference
   'utils/validate-wrapper' // No reference
-], function($, _, context, TroupeViews, template, rowTemplate, ZeroClipboard, appEvents) {
+], function($, _, Marionette, context, TroupeViews, cocktail, InfiniteScrollMixin, template,
+  rowTemplate, noContactsTemplate, ZeroClipboard, appEvents, suggestedContactModels) {
   "use strict";
 
-  function isMobile() {
-    return navigator.userAgent.indexOf('Mobile/') >= 0;
-  }
+  var ContactView = TroupeViews.Base.extend({
+    template: rowTemplate,
+    rerenderOnChange: true,
+    events: {
+      'click .trpInviteButton': 'inviteClicked'
+    },
+    getRenderData: function() {
+      var d = this.model.toJSON();
+      d.invited = d.status === 'invited';
+      d.member = d.status === 'member';
+      d.connected = d.status === 'connected';
 
+      return d;
+    },
+    inviteClicked: function() {
+      if(this.model.get('status')) {
+        return;
+      }
+      this.model.set('status', 'inviting');
+
+      var invite;
+      if(this.model.get('userId')) {
+        invite = { userId: this.model.get('userId') };
+      } else {
+        var email = this.model.get('emails')[0];
+        invite = { email: email };
+      }
+
+      $.ajax({
+        url: this.options.endpoint,
+        contentType: "application/json",
+        dataType: "json",
+        context: this,
+        data: JSON.stringify(invite),
+        type: "POST",
+        success: function() {
+          this.model.set('status', 'invited');
+          appEvents.trigger('searchSearchView:success');
+          popupInviteSuccessBanner(this.model.get('displayName'));
+        }
+      });
+
+    }
+
+  });
+
+  var CollectionView = Marionette.CollectionView.extend({
+    itemView: ContactView,
+    initialize: function() {
+      var self = this;
+      this.emptyView = TroupeViews.Base.extend({
+        template: noContactsTemplate,
+        getRenderData: function() {
+          var query= self.collection._currentQuery;
+          return { query: query && query.q };
+        },
+        // mobile safari 6.1 will refuse to render without this
+        afterRender: function() {
+          this.el.style.display='none';
+          this.el.style.display='block';
+          var uselessQueryToTriggerReflow = this.el.offsetHeight;
+          uselessQueryToTriggerReflow = uselessQueryToTriggerReflow;
+        }
+      });
+    }
+
+  });
+
+  cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionetteView, TroupeViews.LoadingCollectionMixin);
+
+  var popupInviteSuccessBanner = function(name) {
+    var $banner = $('#invite-success');
+    $banner.text(name + ' invited');
+    $banner.show().removeClass('hidden');
+    setTimeout(function() {
+      $banner.addClass('hidden');
+      setTimeout(function() {
+        $banner.hide();
+      }, 1000);
+    }, 4000);
+  };
 
   var View = TroupeViews.Base.extend({
     template: template,
 
     events: {
-      'keydown input': 'preventSubmit',
-      'mouseover #copy-button' : 'createClipboard',
-      'click .removeInvite': 'deselectPerson',
-      'submit #share-form': 'sendInvites',
-      'click #finished-button': 'closeDialog'
+      'mouseover #copy-button' :      'createClipboard',
+      'change #custom-email':         'onSearchChange',
+      'keyup #custom-email':       'onSearchChange'
     },
 
     // when instantiated by default (through the controller) this will reflect on troupeContext to determine what the invite is for.
     //
     initialize: function(options) {
-      // [ { userId: }, or { email: } ]
+      if(!options) options = {};
+      this._options = options;
+
+      this.collection = new suggestedContactModels.Collection();
+      this.collection.query(this.getQuery());
+
+      this.searchLimited = _.debounce(this.search.bind(this));
       this.invites = [];
 
-      if (options && options.overrideContext === true) {
-        this.data = {
-          inviteToTroupe: options.inviteToTroupe,
-          inviteToConnect: options.inviteToConnect,
-
-          troupe: options.troupe ? options.troupe : context.getTroupe(),
-          user: options.user ? options.user : context.getUser(),
-          importedGoogleContacts: context().importedGoogleContacts
-
-          // , inviteUser: options.inviteUser
-        };
-      }
-      else {
-        this.data = {
-          inviteToTroupe: context.inTroupeContext() || context.inOneToOneTroupeContext(),
-          inviteToConnect: context.inUserhomeContext(),
-
-          troupe: context.getTroupe(),
-          user: context.getUser(),
-          importedGoogleContacts: context().importedGoogleContacts
-        };
-      }
-
-
-      if (this.data.inviteToTroupe && !this.data.troupe) throw new Error("Need a troupe");
-      if (this.data.inviteToConnect && !this.data.user) throw new Error("Need a viewer");
-
-      this.data.uri = (this.data.inviteToTroupe) ? this.data.troupe.uri : this.data.user.username;
-      this.data.basePath = context.env('basePath');
-      this.data.returnToUrl = encodeURIComponent(window.location.pathname + window.location.hash);
 
       this.addCleanup(function() {
         if(this.clip) this.clip.destroy();
       });
     },
 
+    isConnectMode: function() {
+      if(this._options.inviteToConnect) return true;
+      if(this._options.inviteToTroupe) return false;
+
+      return !context.inTroupeContext() && !context.inOneToOneTroupeContext();
+    },
+
+    getShareUrl: function() {
+      var connectMode = this.isConnectMode();
+
+      return context.env('basePath') + (connectMode ? context.getUser().url : context.getTroupe().url);
+    },
+
+    getRenderData: function() {
+      var connectMode = this.isConnectMode();
+      var user = context.getUser();
+      var troupe = !connectMode && context.getTroupe();
+
+      if (!connectMode && !troupe) throw new Error("Need a troupe");
+
+      var data = {
+        connectMode: connectMode,
+        user: user,
+        troupe: troupe,
+        importedGoogleContacts: context().importedGoogleContacts,
+        shareUrl: this.getShareUrl(),
+        basePath: context.env('basePath'),
+        returnToUrl: encodeURIComponent(window.location.pathname + window.location.hash)
+      };
+
+      return data;
+    },
+
+    getInviteEndpoint: function() {
+      if(this.isConnectMode()) {
+        return '/api/v1/inviteconnections';
+      } else {
+        return '/troupes/' + context.getTroupeId() + '/invites';
+      }
+    },
+
     afterRender: function() {
-      this.createTypeahead();
-      this.validate();
-      var invites = this.options.invites;
-      if (invites) {
-        for (var a = 0; a < invites.length; a++) {
-          invites[a].toString = this.itemToString;
-          this.selectPerson(invites[a]);
+      this.collectionView = new CollectionView({
+        el: this.$el.find("#invites"),
+        collection: this.collection,
+        itemViewOptions: {
+          endpoint: this.getInviteEndpoint()
         }
+      }).render();
+      this.$el.find('#custom-email').placeholder();
+      var self = this;
+      this.$el.find('form').validate({
+        rules: {
+          email: {
+            required: true,
+            email: true
+          }
+        },
+        messages: {
+          email: {
+            required: "We need to know an email address to invite.",
+            email: "Hmmm, that doesn't look like an email address."
+          }
+        },
+        onkeyup: false,
+        onfocusout: false,
+        showErrors: function(errorMap, errorList) {
+          if (errorList.length > 0) {
+            $('.share-failure').show();
+            $('.trpModalInfo').hide();
+            $('.trpModalSuccess').hide();
+          }
+          else {
+            $('.share-failure').hide();
+            $('.trpModalInfo').show();
+            $('.trpModalSuccess').hide();
+          }
+          var errors = "";
+          $.each(errorList, function () { errors += this.message + "<br>"; });
+          $('#failure-text').html(errors);
+        },
+        submitHandler: function() {
+          self.inviteCustomEmail();
+        }
+      });
+    },
+
+    onSearchChange: function() {
+      var emailField = this.$el.find('#custom-email');
+
+      if(this._prevSearch !== emailField.val()) {
+        this._prevSearch = emailField.val();
+        this.searchLimited();
+      }
+    },
+
+    inviteCustomEmail: function() {
+      var emailField = this.$el.find('#custom-email');
+      var email = emailField.val();
+      var model = new suggestedContactModels.Model({
+        displayName: email,
+        avatarUrl: '/avatarForEmail/' + email,
+        emails: [email],
+        status: 'inviting'
+      });
+
+      $.ajax({
+        url: this.getInviteEndpoint(),
+        contentType: "application/json",
+        dataType: "json",
+        data: JSON.stringify({email: email}),
+        type: "POST",
+        success: function() {
+          model.set('status', 'invited');
+          appEvents.trigger('searchSearchView:success');
+          popupInviteSuccessBanner(model.get('displayName'));
+        },
+        context: this,
+        statusCode: {
+          417: function() {
+            this.$el.find('#failure-text').text("It appears that you are attempting to invite yourself. You can't do that.");
+            this.$el.find('.share-failure').show('fast');
+          }
+        },
+      });
+      emailField.val('');
+      this.onSearchChange();
+    },
+
+    getQuery: function() {
+      var emailField = this.$el.find('#custom-email');
+      var q = { q: emailField.val() };
+
+      if(this.isConnectMode()) {
+        q.statusConnect = 1;
+        q.excludeConnected = 1;
+      } else {
+        var troupeId = context.getTroupeId();
+        q.statusToTroupe = troupeId;
+        q.excludeTroupeId = troupeId;
       }
 
-      if(context.popEvent('google_import_complete')) {
-        var that = this;
-        setTimeout(function(){
-          that.$el.find('#import-success').slideDown();
-        },750);
-      }
+      return q;
+    },
 
-      setTimeout(function() {
-        appEvents.trigger('searchSearchView:show');
-      }, 0);
-
+    search: function() {
+      var query = this.getQuery();
+      this.collection.query(query);
     },
 
     closeDialog: function() {
@@ -105,7 +288,7 @@ define([
       ZeroClipboard.setMoviePath( 'repo/zeroclipboard/ZeroClipboard.swf' );
       ZeroClipboard.Client.prototype.zIndex = 100000;
       var clip = new ZeroClipboard.Client();
-      clip.setText( this.data.basePath + "/" + this.data.uri );
+      clip.setText(this.getShareUrl());
       // clip.glue( 'copy-button');
       // make your own div with your own css property and not use clip.glue()
       var flash_movie = '<div>'+clip.getHTML(width, height)+'</div>';
@@ -120,209 +303,6 @@ define([
           });
       $("#copy-button").before(flash_movie);
       this.clip=clip;
-    },
-
-
-    preventSubmit: function(e) {
-      if (e.keyCode == 13) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-    },
-
-    validate: function() {
-      return this.$el.find('#share-form').validate({
-        rules: {
-          inviteSearch: {
-            email: true
-          }
-        },
-        showErrors: function(/*errorMap, errorList*/) {
-          // don't show errors, just use the .valid() method to tell if
-          // the input is a valid email address
-        }
-
-      });
-    },
-
-    valid: function() {
-      return this.validate().element($('[name=inviteSearch]'));
-    },
-
-    createTypeahead: function() {
-      var self = this;
-      var sources = {}, source;
-      this.$el.find('input[name=inviteSearch]').typeahead({
-        source: function(query, process) {
-
-          source = sources[query] = sources[query] || [];
-
-          if(sources[query].length > 0) return source;
-
-          addEmailOption(source, query);
-
-          // Search users
-          var urlData = { excludeTroupeId: context.getTroupeId(), q: query };
-          $.ajax({ url: '/user', data: urlData, success:
-            function(data) {
-
-              var results = data.results || [];
-              source = sources[query] = sources[query].concat(results);
-
-              installToString(source);
-              process(source);
-            }
-          });
-
-          // Search contacts
-          $.ajax({ url: '/contacts', data: {q: query}, success:
-            function(data) {
-              source = sources[query] = sources[query].concat(data.results);
-
-              installToString(source);
-              process(source);
-            }
-          });
-
-        },
-        sorter: function(items) {
-          return _.sortBy(items, function(o) {
-            return o.displayName ? '' : (o.nonSelectable || o.email);
-          });
-        },
-        matcher: function(item) {
-          var already = _.find(self.invites, function(i) {
-            if (i.userId)
-              return i.userId == item.id;
-            else
-             return i.email == item.email;
-          });
-
-          return !already;
-        },
-        highlighter: function(item) {
-          // modified from bootstrap-typeahead.js
-          var name = item.displayName;
-          var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
-          var str = name.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
-            return '<span class="trpBodyMedium">' + match + '</strong>';
-          });
-
-          var body = (item.email && item.displayName.indexOf('@') == -1) ? str + ' (' + item.email + ')' : str;
-          var html = ((item.avatarUrlSmall) ? '<img src="'+item.avatarUrlSmall+'"  class="trpDisplayPicture avatar-xs trpSearchInviteResult" width="30"/>' : '') + '<span class="trpBodyMedium">' + body + '</span>';
-
-          return html;
-        },
-        updater: function(value) {
-          var item = _.find(source, function(u) {
-            return u.id === value || u.email === value;
-          });
-
-          // validate email address or accept existing user
-          if ((item && item.id) || (item && item.imported) || self.valid()) {
-            self.selectPerson(item);
-
-            return ''; // empty the search box
-          }
-
-          return this.query;
-        },
-        minLength: 2,
-        items: isMobile() ? 3 : 8
-      });
-
-      function addEmailOption(source, query) {
-        if (self.valid()) {
-          // add the query as an email address option
-          // note:  this will provide a diff avatar each key stroke, don't show it in the autocomplete!
-          source.push({ email: query, displayName: query, avatarUrlSmall: '/avatarForEmail/'+query });
-        } else {
-          // add a non-selectable option which says continue typing an email address
-          source.push({ displayName: "Try typing an email address as well.", nonSelectable: true });
-        }
-      }
-
-      function installToString(source) {
-        // install a toString function on each data item so it stores the id in the data-value element attribute
-        _.each(source, function(item) {
-          item.toString = self.itemToString;
-        });
-      }
-
-    },
-
-    itemToString: function() {
-      return this.id || this.email;
-    },
-
-    selectPerson: function(user) {
-      // TODO don't allow adding the same person more than once (alt: don't show them in the autocomplete results)
-      var invite = {};
-
-      if (this.invites.length === 0) {
-        $('.trpSearchInvites').empty();
-      }
-
-      if (user.id)
-        invite.userId = user.id;
-      if (user.email)
-        invite.email = user.email;
-
-      this.invites.push(invite);
-
-      var invitesEl = this.$el.find("#invites");
-      invitesEl.append(rowTemplate({ user: user, value: user.toString() })).scrollTop(invitesEl.height());
-      appEvents.trigger('searchSearchView:select');
-    },
-
-    deselectPerson: function(e) {
-      var value = $(e.target).data('value');
-      this.$el.find('#invites .invite[data-value="'+value+'"]').remove();
-      this.invites = _.filter(this.invites, function(invite) {
-        if (invite.userId)
-          return invite.userId !== value;
-        else
-          return invite.email !== value;
-      });
-    },
-
-    serialize: function() {
-      return JSON.stringify(this.invites);
-    },
-
-    sendInvites: function(e) {
-      if(e) e.preventDefault();
-
-      // don't let users submit unless there is at least one invite (show error message in .share-failure  )
-      if (this.invites.length === 0) {
-        return window.alert("Please select at least one user or email address to send to, or press escape to cancel.");
-      }
-
-      var ajaxEndpoint = (this.data.inviteToTroupe) ? "/troupes/" + context.getTroupeId() + "/invites" : "/api/v1/inviteconnections";
-      var self = this;
-
-      $.ajax({
-        url: ajaxEndpoint,
-        contentType: "application/json",
-        dataType: "json",
-        data: this.serialize(),
-        type: "POST",
-        success: function(data) {
-          if(data.failed) {
-            return;
-          }
-          self.$el.find('#gmail-connect').hide();
-          self.$el.find('#import-success').hide();
-          self.$el.find('.modal-content').hide();
-          self.$el.find('.modal-success').show();
-          // self.trigger('share.complete', data);
-          //
-          //
-          appEvents.trigger('searchSearchView:success');
-
-        }
-      });
     }
 
   });

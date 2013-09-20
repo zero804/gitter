@@ -1,0 +1,13 @@
+<td>{{email}}</td>
+<td>{{status}}</td>
+<td>
+{{#if isUnconfirmed}}
+    <button class="trpButton" id="resendConfirmBtn">Resend Confirmation</button>
+{{/if}}
+{{#if isSecondary}}
+    <button class="trpButton" id="makePrimaryBtn">Make Primary</button>
+{{/if}}
+{{#unless isPrimary}}
+    <button class="trpButton" id="deleteEmailBtn">Delete</button>
+{{/unless}}
+</td>

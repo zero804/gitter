@@ -1,16 +1,13 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-
 define([
-  'jquery',
   'underscore',
-  'backbone',
   'marionette',
   'views/base',
   'hbs!./tmpl/conversationDetailView',
   'collections/conversations',
   'views/conversation/conversationDetailItemView',
-  'collections/base'
-], function($, _, Backbone, Marionette, TroupeViews, template, conversationModels, ConversationDetailItemView, TroupeCollections) {
+  'cocktail'
+], function(_, Marionette, TroupeViews, template, conversationModels, ConversationDetailItemView) {
   "use strict";
 
   var View = TroupeViews.Base.extend({
@@ -24,13 +21,6 @@ define([
 
       this.model = new conversationModels.ConversationDetail({ id: this.id });
       this.model.bind('change:subject', this.onSubjectChange);
-      _.extend(this.model.emailCollection, TroupeCollections.ReversableCollectionBehaviour);
-      this.model.emailCollection.sortByMethods = {
-          'date': function(email) {
-            return email.get('date');
-          }
-      };
-      this.model.emailCollection.setSortBy('-date');
       this.model.emailCollection.listen();
       this.model.fetch();
 
@@ -51,7 +41,6 @@ define([
     afterRender: function() {
       var CV = Marionette.CollectionView.extend(TroupeViews.SortableMarionetteView, {
         initialize: function() {
-          this.initializeSorting();
           this.itemsInstantiated = 0;
         }/*,
         // to show the full mail body only for the first mail,

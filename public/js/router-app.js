@@ -9,6 +9,7 @@ require([
   'views/chat/chatCollectionView',
   'collections/instances/integrated-items',
   'collections/instances/troupes',
+  'collections/useremails',
   'views/righttoolbar/rightToolbarView',
   'views/file/fileDetailView',
   'views/file/filePreviewView',
@@ -18,6 +19,8 @@ require([
   'views/people/personDetailView',
   'views/conversation/conversationDetailView',
   'views/profile/profileView',
+  'views/profile/profileEmailView',
+  'views/profile/profileAddEmailView',
   'views/shareSearch/shareSearchView',
   'views/signup/createTroupeView',
   'views/signup/usernameView',
@@ -36,8 +39,8 @@ require([
   'template/helpers/all', // No ref
   'components/eyeballs' // No ref
 ], function($, Backbone, context, appEvents, AppIntegratedView, chatInputView, ChatCollectionView,
-            itemCollections, troupeCollections, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
-            RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, shareSearchView,
+            itemCollections, troupeCollections, UserEmailCollection, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
+            RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, profileEmailView, profileAddEmailView, shareSearchView,
             createTroupeView, UsernameView, HeaderView,
             troupeSettingsView, TroupeMenuView, ReinviteModal, Router, unreadItemsClient, chatDecorator /*, errorReporter , FilteredCollection */) {
   "use strict";
@@ -64,6 +67,9 @@ require([
 
   $('.nano').nanoScroller({ preventPageScrolling: true });
 
+  // instantiate user email collection
+  var userEmailCollection = new UserEmailCollection.UserEmailCollection();
+
   // Setup the ChatView
 
   new ChatCollectionView({
@@ -84,15 +90,17 @@ require([
 
   new Router({
     routes: [
-      { name: "request",          re: /^request\/(\w+)$/,         viewType: RequestDetailView,            collection: itemCollections.requests },
-      { name: "invite",           re: /^invite\/(\w+)$/,          viewType: InviteDetailView,             collection: itemCollections.invites },
       { name: "file",             re: /^file\/(\w+)$/,            viewType: FileDetailView,               collection: itemCollections.files },
+      { name: "request",          re: /^request\/(\w+)$/,         viewType: RequestDetailView.Modal,            collection: itemCollections.requests },
+      { name: "invite",           re: /^invite\/(\w+)$/,          viewType: InviteDetailView.Modal,             collection: itemCollections.invites },
       { name: "filePreview",      re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: itemCollections.files },
       { name: "fileVersions",     re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: itemCollections.files },
       { name: "mail",             re: /^mail\/(\w+)$/,            viewType: conversationDetailView.Modal, collection: itemCollections.conversations },
-      { name: "person",           re: /^person\/(\w+)$/,          viewType: PersonDetailView,             collection: itemCollections.users },
+      { name: "person",           re: /^person\/(\w+)$/,          viewType: PersonDetailView.Modal,             collection: itemCollections.users },
 
       { name: "profile",          re: /^profile$/,                viewType: profileView.Modal },
+      { name: "profileEmails",    re: /^profile\/emails$/,        viewType: profileEmailView.Modal,       collection: userEmailCollection, skipModelLoad: true },
+      { name: "profileEmailsAdd", re: /^profile\/emails\/add$/,   viewType: profileAddEmailView.Modal,    collection: userEmailCollection, skipModelLoad: true },
       { name: "share",            re: /^share$/,                  viewType: shareSearchView.Modal },
       { name: "connect",          re: /^connect$/,                viewType: shareSearchView.Modal,        viewOptions: { overrideContext: true, inviteToConnect: true } },
       { name: "create",           re: /^create$/,                 viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true },

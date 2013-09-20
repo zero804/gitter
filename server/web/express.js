@@ -148,32 +148,48 @@ module.exports = {
     }
 
     app.use(function(err, req, res, next) {
+      var status = 500;
+      var template = '500';
+      var message = "An unknown error occurred";
+
+      if(err.status) {
+        status = err.status;
+        message = err.name;
+      }
+
+      // Log some stuff
       var meta = {
-        path: req.path
+        path: req.path,
+        err: err.message
       };
-      if(err && err.message) {
-        meta.err = err.message;
+
+      if(status === 500) {
+        winston.error("An unexpected error occurred", meta);
+        if(err.stack) {
+          winston.error('Error: ' + err.stack);
+        }
       }
 
-      console.error(err);
+      if(status === 404) {
+        template = '404';
+      }
 
-      var status = err.status;
+      res.status(status);
 
-      winston.error("An unexpected error occurred", meta);
-      if (status === 404) {
-        res.status(404);
-        res.render('404' , {
-          homeUrl : nconf.get('web:homeurl')
-        });
-       } else {
-        console.error(err.stack);
-        res.status(500);
-        res.render('500' , {
+      var responseType = req.accepts(['html', 'json']);
+
+      if (responseType === 'html') {
+        res.render(template , {
           homeUrl : nconf.get('web:homeurl'),
-          stack: nconf.get('express:showStack') ? linkStack(err.stack) : null
+          message: message,
+          stack: nconf.get('express:showStack') && err && err.stack ? linkStack(err.stack) : null
         });
+      } else if (responseType === 'json') {
+        res.send({ error: message });
+      } else {
+        res.type('txt').send(message);
       }
-      // expressErrorHandler(err, req, res, next);
+
     });
 
   },

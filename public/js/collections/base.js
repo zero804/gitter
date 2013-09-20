@@ -94,6 +94,7 @@ define([
 
   });
 
+
   // LiveCollection: a collection with realtime capabilities
   exports.LiveCollection = Backbone.Collection.extend({
     nestedUrl: '',
@@ -143,6 +144,8 @@ define([
       if(this._initialLoadCalled) return;
       this._initialLoadCalled = true;
       triggerFirstLoad();
+
+      this.trigger('loaded');
 
       $('#' + this.modelName + '-amuse').hide('fast', function() {
         $(this).remove();
@@ -265,8 +268,91 @@ define([
     }
   });
 
+  exports.LoadingMixin = {
+    initialize: function() {
+      this.loading = true;
+      this.listenToOnce(this, 'add reset sync', this.loadComplete);
+    },
+    loadComplete: function() {
+      delete this.loading;
+      this.trigger('loaded');
+    }
+  };
+
+  exports.SearchResultsCollection = {
+    parse: function(searchResponse) {
+      var limit = searchResponse.limit;
+      if(searchResponse.results.length < limit) {
+        this._noMoreData = true;
+      }
+      return searchResponse.results;
+    },
+
+    query: function(query) {
+      if(!query) {
+        query = {};
+      } else if(typeof query === 'string') {
+        query = { q: query };
+      }
+
+      if(_.isEqual(query, this._currentQuery)) return;
+
+      this._currentQuery = query;
+      this._skip = 0;
+      this._noMoreData = false;
+      this.fetchNext({ remove: true });
+      this.trigger('search:newquery');
+    },
+
+    fetchNext: function(options) {
+      function noOp() {}
+
+      if(!options) options = {};
+
+      if(this._noMoreData) return;
+      var context = options.context;
+      var done = options.done || noOp;
+      var noMore = options.noMore || noOp;
+
+      if(context) {
+        done = done.bind(context);
+        noMore = noMore.bind(context);
+      }
+
+      var data = _.extend({}, this._currentQuery, { skip: this._skip });
+
+      var self = this;
+      this.trigger('search:next');
+      log('Fetch next: ', data);
+      this.fetch({
+        remove: ('remove' in options) ? options.remove : false,
+        add: ('add' in options) ? options.add : true,
+        merge: ('merge' in options) ? options.merge : true,
+        data: data,
+        success: function() {
+          self._skip = self.length;
+          if(self._noMoreData) {
+            self.trigger('search:nomore');
+            noMore();
+          }
+          self.trigger('search:fetch:complete');
+          done();
+        },
+        error: function() {
+          self.trigger('search:fetch:complete');
+          done();
+        }
+      });
+    }
+  };
+
   /* This is a mixin for Backbone.Model */
   exports.ReversableCollectionBehaviour = {
+    initialize: function() {
+      if(this.initialSortBy) {
+        this.setSortBy(this.initialSortBy);
+      }
+    },
 
     setSortBy: function(field) {
       var reverse = false;

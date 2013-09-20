@@ -6,6 +6,8 @@ DATA_MAINT_SCRIPTS = $(shell find ./scripts/datamaintenance -name '*.sh')
 SAUCELABS_REMOTE = http://trevorah:d6b21af1-7ae7-4bed-9c56-c5f9d290712b@ondemand.saucelabs.com:80/wd/hub
 BETA_SITE = https://beta.trou.pe
 BASE_URL = http://localhost:5000
+MAIL_HOST = localhost
+MAIL_PORT = 2525
 
 clean:
 	rm -rf public-processed/ output/ coverage/ cobertura-coverage.xml html-report/
@@ -63,7 +65,9 @@ prepare-for-end-to-end-testing:
 
 end-to-end-test:
 	mkdir -p ./output/test-reports/
-	nosetests -s -v --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests/
+	MAIL_HOST=$(MAIL_HOST) \
+	MAIL_PORT=$(MAIL_PORT) \
+	nosetests --nologcapture --attr '!unreliable' --all-modules test/end-to-end/e2etests/
 
 end-to-end-test-saucelabs-chrome:
 	@mkdir -p ./output/test-reports
@@ -71,6 +75,8 @@ end-to-end-test-saucelabs-chrome:
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTECHROME \
 	BASE_URL=$(BETA_SITE) \
+	MAIL_HOST=$(MAIL_HOST) \
+	MAIL_PORT=$(MAIL_PORT) \
 	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
 
 end-to-end-test-saucelabs-ie9:
@@ -78,6 +84,8 @@ end-to-end-test-saucelabs-ie9:
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTEIE \
 	BASE_URL=$(BETA_SITE) \
+	MAIL_HOST=$(MAIL_HOST) \
+	MAIL_PORT=$(MAIL_PORT) \
 	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
 
 end-to-end-test-saucelabs-android:
@@ -85,6 +93,8 @@ end-to-end-test-saucelabs-android:
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTEANDROID \
 	BASE_URL=$(BETA_SITE) \
+	MAIL_HOST=$(MAIL_HOST) \
+	MAIL_PORT=$(MAIL_PORT) \
 	nosetests --nologcapture --attr 'phone_compatible' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
 
 docs: test-docs
@@ -175,6 +185,7 @@ install-client-libs:
 	cp output/client-libs/backbone.wreqr/lib/amd/backbone.wreqr.min.js public/repo/backbone.wreqr/backbone.wreqr.js
 	cp output/client-libs/bootstrap/bootstrap-tooltip.js public/repo/bootstrap/tooltip.js
 	cp output/client-libs/bootstrap/bootstrap-typeahead.js public/repo/bootstrap/typeahead.js
+	cp output/client-libs/cocktail/cocktail-amd.js public/repo/cocktail/cocktail.js
 	cp output/client-libs/cubism/cubism.v1.min.js public/repo/cubism/cubism.js
 	cp output/client-libs/d3/d3.min.js public/repo/d3/d3.js
 	cp output/client-libs/expect/expect-amd.js public/repo/expect/expect.js
@@ -206,6 +217,7 @@ install-client-libs:
 	cp output/client-libs/requirejs/index.js public/repo/requirejs/requirejs.js
 	cp output/client-libs/retina.js-js/src/retina.js public/repo/retina/retina.js
 	cp output/client-libs/scrollfix/scrollfix-amd.js public/repo/scrollfix/scrollfix.js
+	cp output/client-libs/sisyphus/jquery.sisyphus-amd.js public/repo/sisyphus/jquery.sisyphus.js
 	cp output/client-libs/typeahead.js/typeahead.js public/repo/typeahead/typeahead.js
 	cp output/client-libs/underscore/underscore-amd.js public/repo/underscore/underscore.js
 	# cp output/client-libs/zeroclipboard/ZeroClipboard.js public/repo/zeroclipboard/zeroclipboard.js

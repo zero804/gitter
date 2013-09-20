@@ -39,7 +39,7 @@ def secondDriver():
 def driver():
     driverName = os.getenv('DRIVER')
     if driverName is None:
-        driverName = 'CHROME'
+        driverName = 'FIREFOX'
 
     remote = os.getenv('REMOTE_EXECUTOR')
     if remote is None:
@@ -146,8 +146,11 @@ def signup(driver):
     # complete profile
     form = driver.find_element_by_css_selector('#updateprofileform')
     set_text(form.find_element_by_name('displayName'), 'Willey Waley')
-    form.find_element_by_name('password').send_keys('123456')
+    form.find_element_by_id('password').send_keys('123456')
     form.find_element_by_name('submit').click()
+
+    driver.find_element_by_id('hopscotch-cta').click()
+
     return username
 
 
@@ -161,6 +164,10 @@ def getJSON(url):
     response = urllib2.urlopen(baseUrl(url)).read()
     return json.loads(response)
 
+
+def read_url(url):
+    response = urllib2.urlopen(url)
+    return response.read()
 
 # Keys sometimes need to be sent one at a time (firefox),
 # especially when the page is responding to the event, otherwise the full string will not go through
