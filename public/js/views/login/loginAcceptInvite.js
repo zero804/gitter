@@ -20,7 +20,6 @@ define([
     var Modal = TroupeViews.Modal.extend({
         initialize: function(options) {
             options = options ? options : {
-                title: 'Accepting Invite',
                 disableClose: true
             };
             options.view = new View(options);

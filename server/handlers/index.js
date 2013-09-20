@@ -15,7 +15,6 @@ module.exports = {
     require('./mac-app').install(app);
     require('./join-us').install(app);
     require('./ios-app').install(app);
-    require('./token').install(app);
     require('./health-check').install(app);
     require('./installChromeExtension').install(app);
     require('./test-data').install(app);

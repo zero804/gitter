@@ -123,7 +123,6 @@ var UserSchema = new Schema({
       countryCode: String
     }
   },
-  userToken: String, // TODO: move to OAuth,
   googleRefreshToken: String,
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });

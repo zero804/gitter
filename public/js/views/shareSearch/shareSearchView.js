@@ -57,6 +57,7 @@ define([
         success: function() {
           this.model.set('status', 'invited');
           appEvents.trigger('searchSearchView:success');
+          popupInviteSuccessBanner(this.model.get('displayName'));
         }
       });
 
@@ -86,8 +87,19 @@ define([
 
   });
 
-
   cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionetteView, TroupeViews.LoadingCollectionMixin);
+
+  var popupInviteSuccessBanner = function(name) {
+    var $banner = $('#invite-success');
+    $banner.text(name + ' invited');
+    $banner.show().removeClass('hidden');
+    setTimeout(function() {
+      $banner.addClass('hidden');
+      setTimeout(function() {
+        $banner.hide();
+      }, 1000);
+    }, 500);
+  };
 
   var View = TroupeViews.Base.extend({
     template: template,
@@ -186,10 +198,12 @@ define([
           if (errorList.length > 0) {
             $('.share-failure').show();
             $('.trpModalInfo').hide();
+            $('.trpModalSuccess').hide();
           }
           else {
             $('.share-failure').hide();
             $('.trpModalInfo').show();
+            $('.trpModalSuccess').hide();
           }
           var errors = "";
           $.each(errorList, function () { errors += this.message + "<br>"; });
@@ -229,6 +243,7 @@ define([
         success: function() {
           model.set('status', 'invited');
           appEvents.trigger('searchSearchView:success');
+          popupInviteSuccessBanner(model.get('displayName'));
         }
       });
       emailField.val('');

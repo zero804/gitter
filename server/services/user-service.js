@@ -258,23 +258,6 @@ var userService = {
     });
   },
 
-  getUserToken: function(userId, callback) {
-    userService.findById(userId, function(err, user) {
-      if(err) return callback(err);
-      if(!user) return callback(err);
-
-      if(user.userToken) {
-        return callback(err, user.userToken);
-      }
-
-      // TODO: serious revamp of this security. This is not safe.
-      var userToken = uuid.v4();
-      user.userToken = userToken;
-      user.save(); // Async is fine
-      callback(err, userToken);
-    });
-  },
-
   updateInitialPassword: function(userId, password, callback) {
     winston.info("Initial password reset", userId);
 
