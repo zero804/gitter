@@ -1,24 +1,34 @@
 
-<div class="trpFileVersionThumbnail"><a href="#|{{previewUrl}}" class="link-preview">{{ widget "avatar" user=this size='m'}}</a></div>
-
-<div class="trpItemDetails">
-  <div class="trpFilename trpDisplayName" title="{{fileName}}">{{this.displayName}}</div>
+ <div class="trpModalTitle">
+    <div style="text-align: center">
+      {{widget "avatar" user=this size='m'}}
+    </div>
+    <div style="text-align: center">
+      {{this.displayName}}
+    </div>
 </div>
 
 {{#unless troupe.oneToOne}}
 
 {{^isSelf}}}
-<div class="trpButtonGreen trpFileButton trpButtonDropdown">
-  <div class="trpMainButton">
-    <a href="{{this.url}}">Chat Privately</a>
-  </div>
-</div>
+<div class="trpModalRequestForm" style="text-align: center;" >
+  <a href="{{this.url}}" style="text-decoration:none">
+    <div class="trpButtonGreen trpButtonBig">
+        Chat Privately
+    </div>
+  </a>
 
-<div class="trpButtonGreen trpFileButton trpButtonDropdown">
-  <div class="trpMainButton">
-    <a href="#!" id="person-remove-button">Remove from Troupe</a>
-  </div>
+  <a href="#!" id="person-remove-button" style="text-decoration:none">
+    <div class="trpButtonGreen trpButtonBig">
+      Remove from Troupe
+    </div>
+  </a>
 </div>
+<br><Br>
+
+
+
+
 {{/isSelf}}
 
 {{/unless}}
