@@ -1,4 +1,4 @@
-<a href="#!" class="trpWhite"><div class="trpDetailViewClose">x</div></a>
+<!-- <a href="#!" class="trpWhite"><div class="trpDetailViewClose">x</div></a>
 
 <div class=""><a href="#|{{previewUrl}}" class="">{{ widget "avatar" user=user size='m'}}</a></div>
 
@@ -18,3 +18,32 @@
     <a href="#!" id="invite-delete-button">Delete Invite</a>
   </div>
 </div>
+ -->
+
+
+ <div class="trpModalTitle">
+    <div style="text-align: center">
+      {{widget "avatar" user=user size='m'}}
+    </div>
+    <div style="text-align: center">
+      {{user.displayName}}<br>
+      {{email}}
+    </div>
+</div>
+
+<div class="trpModalRequestForm" style="text-align: center;" >
+   <a href="#!" id="invite-resend-button" style="text-decoration: none">
+    <div class="trpButtonGreen trpButtonBig">
+      Resend Invite
+    </div>
+  </a>
+
+  <a href="#!" id="invite-delete-button" style="text-decoration: none">
+    <div class="trpButtonGreen trpButtonBig">
+      Delete Invite
+    </div>
+  </a>
+</div>
+<br><Br>
+
+
