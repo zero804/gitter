@@ -57,10 +57,7 @@ define([
         success: function() {
           this.model.set('status', 'invited');
           appEvents.trigger('searchSearchView:success');
-          $('.share-failure').hide();
-          $('.trpModalInfo').hide();
-          $('.trpModalSuccess').hide();
-          $('#invite-success').show().find('span').text(this.model.get('displayName') + ' invited');
+          popupInviteSuccessBanner(this.model.get('displayName'));
         }
       });
 
@@ -90,8 +87,19 @@ define([
 
   });
 
-
   cocktail.mixin(CollectionView, InfiniteScrollMixin, TroupeViews.SortableMarionetteView, TroupeViews.LoadingCollectionMixin);
+
+  var popupInviteSuccessBanner = function(name) {
+    var $banner = $('#invite-success');
+    $banner.text(name + ' invited');
+    $banner.show().removeClass('hidden');
+    setTimeout(function() {
+      $banner.addClass('hidden');
+      setTimeout(function() {
+        $banner.hide();
+      }, 1000);
+    }, 4000);
+  };
 
   var View = TroupeViews.Base.extend({
     template: template,
@@ -235,10 +243,7 @@ define([
         success: function() {
           model.set('status', 'invited');
           appEvents.trigger('searchSearchView:success');
-          $('.share-failure').hide();
-          $('.trpModalInfo').hide();
-          $('.trpModalSuccess').hide();
-          $('#invite-success').show().find('span').text(model.get('displayName') + ' invited');
+          popupInviteSuccessBanner(model.get('displayName'));
         }
       });
       emailField.val('');
