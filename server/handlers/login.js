@@ -9,6 +9,7 @@ var loginUtils = require("../web/login-utils"),
     assert = require('assert'),
     url = require('url'),
     loginUtils = require('../web/login-utils');
+var contextGenerator = require('../web/context-generator');
 
 module.exports = {
     install: function(app) {
@@ -90,8 +91,10 @@ module.exports = {
 
       app.get('/reset/:confirmationCode',
         middleware.authenticate('passwordreset', { failureRedirect: nconf.get('web:homeurl') + '#passwordResetFailed=true' } ),
-        function(req, res, next) {
-          loginUtils.redirectUserToDefaultTroupe(req, res, next);
+        function(req, res) {
+          contextGenerator.generateMiniContext(req, function(err, troupeContext) {
+            res.render('complete-profile', { troupeContext: troupeContext });
+          });
         });
 
     }
