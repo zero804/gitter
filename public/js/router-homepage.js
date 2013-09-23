@@ -92,18 +92,19 @@ require([
   catch (e) {}
 
   new UserhomeRouter({
-    regions: [appView.rightPanelRegion, appView.dialogRegion]
+    regions: [appView.rightPanelRegion, appView.dialogRegion],
+    rootHandler: function() {
+      if(!window.localStorage.troupeTourHome) {
+        window.localStorage.troupeTourHome = 1;
+        require([
+          'tours/tour-controller'
+        ], function(tourController) {
+          tourController.init({ appIntegratedView: appView });
+        });
+      }
+    }
   });
 
   Backbone.history.start();
-
-  if(!window.localStorage.troupeTourHome) {
-    window.localStorage.troupeTourHome = 1;
-    require([
-      'tours/tour-controller'
-    ], function(tourController) {
-      tourController.init({ appIntegratedView: appView });
-    });
-  }
 
 });

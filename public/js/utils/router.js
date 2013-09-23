@@ -45,20 +45,12 @@ define([
       window.location.hash = hash.replace(/%7C/, '|');
       path = path.replace(/%7C/, '|');
     }
+    if(path) {
+      path = path.replace('!', '');
+      path = path.replace('#', '');
+    }
 
-    var rawFragments = path ? path.split("|") : [];
-
-    var fragments = rawFragments.map(function(fragment) {
-
-      if(fragment.substring(0, 2) === '#!') {
-        fragment = fragment.substring(2);
-      } else if(fragment.substring(0, 1) === '#') {
-        fragment = fragment.substring(1);
-      }
-
-      return fragment;
-
-    });
+    var fragments = path ? path.split("|") : [];
 
     return fragments;
   }
@@ -114,6 +106,7 @@ define([
       if(options) {
         this.regions = options.regions || this.regions;
         this.routes = options.routes || this.routes;
+        this.rootHandler = options.rootHandler || this.rootHandler;
       }
       this.previousFragments = {};
       this.route(/^(.*?)$/, "handle");
@@ -187,7 +180,13 @@ define([
         triggerRegionUpdate(update.region, viewDetails);
 
       }, this);
-    }
+
+      if(fragments.length === 0) {
+        this.rootHandler();
+      }
+    },
+
+    rootHandler: function() {}
 
   });
   return Router;
