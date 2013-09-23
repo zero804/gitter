@@ -61,31 +61,7 @@ require([
 
       // Show a popup to confirm connection invite through signup.
       if (ls.pendingConnectConfirmation) {
-        data = JSON.parse(ls.pendingConnectConfirmation);
-
-        var InviteSuccessView = TroupeViews.Base.extend({
-          template: connectUserTemplate,
-          getRenderData: function() {
-            return data;
-          },
-          afterRender: function() {
-            this.$el.find('.modal-content').hide();
-            this.$el.find('.modal-success').show();
-            this.$el.find('#learn-more-btn').hide();
-          },
-          events: {
-            'click #cancel-button': function(e) {
-              this.remove();
-              if (this.dialog) this.dialog.hide();
-              e.preventDefault();
-            }
-          }
-        });
-        delete ls.pendingConnectConfirmation;
-        (new TroupeViews.Modal({
-          view: new InviteSuccessView()
-        })).show();
-
+        window.location.hash = '#|invitesent';
       }
     }
   }
