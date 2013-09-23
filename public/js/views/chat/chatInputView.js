@@ -12,6 +12,9 @@ define([
 ], function($, context, TroupeViews, appEvents, template, moment, safeHtml) {
   "use strict";
 
+  var chatFrameSelector = '#content-wrapper';
+  var chatFrameProperty = 'margin-bottom';
+
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
 
@@ -43,7 +46,7 @@ define([
     }
   });
 
-  var chatPadding = parseInt($('#frame-chat').css('padding-bottom'),10);
+  var chatPadding = parseInt($(chatFrameSelector).css(chatFrameProperty),10);
   var originalChatPadding = chatPadding;
 
   var ChatInputBoxView = TroupeViews.Base.extend({
@@ -73,7 +76,7 @@ define([
       this.chatLines = 2;
       chatPadding = originalChatPadding;
       this.$el.height(this.originalChatInputHeight);
-      $('#frame-chat').css('padding-bottom', chatPadding);
+      $(chatFrameSelector).css(chatFrameProperty, chatPadding);
 
     },
 
@@ -81,17 +84,21 @@ define([
       var lht = parseInt(this.$el.css('lineHeight'),10);
       var height = this.$el.prop('scrollHeight');
       var currentLines = Math.floor(height / lht);
+      // var wasAtBottom = this.scrollDelegate.isAtBottom();
 
       if (currentLines != this.chatLines) {
         this.chatLines = currentLines;
         var newHeight = currentLines * lht;
 
         this.$el.height(newHeight);
-        var frameChat = $('#frame-chat'), isChild = frameChat.find(this.el).length;
+        var frameChat = $(chatFrameSelector), isChild = frameChat.find(this.el).length;
         if (!isChild) {
           chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
-          frameChat.css('padding-bottom', chatPadding);
+          frameChat.css(chatFrameProperty, chatPadding);
         }
+        //if (wasAtBottom) {
+        //  this.scrollDelegate.scrollToBottom();
+        //}
 
         chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
       }
