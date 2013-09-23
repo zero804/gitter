@@ -26,7 +26,7 @@ require([
   appView.leftMenuRegion.show(new TroupeMenuView());
   appView.smartMenuRegion.show(new SmartCollectionView({ collection: troupeCollections.smart }));
 
-  new UserHomeView({ el: '#chat-frame' }).render();
+  new UserHomeView({ el: '#content-wrapper' }).render();
 
   // Asynchronously load tracker
   require(['utils/tracking'], function() { });
