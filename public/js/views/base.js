@@ -220,7 +220,7 @@ define([
       _.bindAll(this, 'hide', 'onMenuItemClicked');
       _.extend(this.options, options);
 
-      this.view = this.options.view;
+      this.view = this.options.view || this.view;
     },
 
     getRenderData: function() {
