@@ -1570,7 +1570,7 @@ function markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite) {
 
                   return createQ(persistence.InviteUsed, invalidInvite)
                           .then(function() {
-                            return invalidInvite.remove();
+                            return invalidInvite.removeQ();
                           });
 
                 });

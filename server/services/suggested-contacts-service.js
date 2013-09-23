@@ -264,8 +264,16 @@ function generateSuggestedContactsForUser(userId) {
 
     })
     .then(function() {
-      // Always remove the user from his own suggested contacts
-      return persistence.SuggestedContact.removeQ({ userId: userId, contactUserId: userId });
+      return Q.all([
+        // Always remove the user from his own suggested contacts
+        persistence.SuggestedContact.removeQ({ userId: userId, contactUserId: userId }),
+        // Also remove his email address
+        userService.findById(userId)
+          .then(function(user) {
+            var emails = user.getAllEmails();
+            return persistence.SuggestedContact.removeQ({ userId: userId, email: { $in: emails } });
+          })
+        ]);
     })
     .then(function() {
       // TODO: this is not ATOMIC. It could lead to wierd data caching issues later on
@@ -297,19 +305,22 @@ function searchifyResults(skip, limit) {
   };
 }
 
-function addEmailAddress(queryText) {
+function addEmailAddress(currentUserId, queryText) {
   return function(results) {
     if(results.length === 0 && isValidEmailAddress(queryText)) {
       return userService.findByEmail(queryText)
         .then(function(user) {
           if(user) {
-            return [{
-              contactUserId: user.id,
-              name: user.displayName,
-              username: user.username,
-              emails: [queryText],
-              knownEmails: [queryText]
-            }];
+            if(user.id !== currentUserId) {
+              return [{
+                contactUserId: user.id,
+                name: user.displayName,
+                username: user.username,
+                emails: [queryText],
+                knownEmails: [queryText]
+              }];
+
+            }
           }
 
           return [];
@@ -359,7 +370,9 @@ function findSuggestedContacts(userId, options) {
   if(queryText || !excludeTroupeId && !excludeConnected) {
     if(queryTextSearch) query.find(queryTextSearch);
 
-    return query.execQ().then(addEmailAddress(queryText)).then(searchifyResults(skip, limit));
+    return query.execQ()
+      .then(addEmailAddress(userId, queryText))
+      .then(searchifyResults(skip, limit));
   }
 
   var ops = [];
@@ -390,7 +403,7 @@ function findSuggestedContacts(userId, options) {
       query.find({ $and: terms });
 
       return query.execQ()
-        .then(addEmailAddress(queryText))
+        .then(addEmailAddress(userId, queryText))
         .then(searchifyResults(skip, limit));
 
     });
