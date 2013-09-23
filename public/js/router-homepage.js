@@ -48,8 +48,8 @@ require([
   new UserhomeRouter({
     regions: [appView.rightPanelRegion, appView.dialogRegion],
     rootHandler: function() {
-      if(!window.localStorage.troupeTourHome) {
-        window.localStorage.troupeTourHome = 1;
+      if(window.localStorage.startTour) {
+        delete window.localStorage.startTour;
         require([
           'tours/tour-controller'
         ], function(tourController) {
