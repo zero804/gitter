@@ -9,6 +9,7 @@ require([
   var getDisplayNamePasswordModal = function(username) {
     var modal = new ProfileView.Modal({ disableClose: true });
     modal.on('submit.success', function() {
+      window.localStorage.startTour = 1;
       window.location = '/' + username;
     });
     return modal;
