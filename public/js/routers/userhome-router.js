@@ -10,8 +10,9 @@ define([
   'collections/useremails',
   'views/shareSearch/shareSearchView',
   'views/invite/reinviteModal',
-  'hbs!views/connect/tmpl/connectUserTemplate'
-  ], function(Router, TroupeViews, profileView, profileEmailView, profileAddEmailView, createTroupeView, troupeCollections, UserEmailCollection, shareSearchView, InviteModal, connectUserTemplate) {
+  'hbs!views/connect/tmpl/connectUserTemplate',
+  'hbs!views/login/tmpl/loginRequestModalView'
+  ], function(Router, TroupeViews, profileView, profileEmailView, profileAddEmailView, createTroupeView, troupeCollections, UserEmailCollection, shareSearchView, InviteModal, connectUserTemplate, loginRequestTemplate) {
   "use strict";
 
   // instantiate user email collection
@@ -42,6 +43,30 @@ define([
     view: new InviteSuccessView()
   });
 
+  var RequestSuccessView = TroupeViews.Base.extend({
+    template: loginRequestTemplate,
+    getRenderData: function() {
+      var data = window.localStorage.pendingRequestConfirmation;
+      delete window.localStorage.pendingRequestConfirmation;
+      return data;
+    },
+    afterRender: function() {
+      this.$el.find('.modal-content').hide();
+      this.$el.find('.modal-success').show();
+    },
+    events: {
+      'click #cancel-button': function(e) {
+        this.remove();
+        if (this.dialog) this.dialog.hide();
+        e.preventDefault();
+      }
+    }
+  });
+
+  var RequestSuccessViewModal = TroupeViews.Modal.extend({
+    view: new RequestSuccessView()
+  });
+
   return Router.extend({
     routes: [
       { name: "profile",  re: /^profile$/,         viewType: profileView.Modal },
@@ -51,7 +76,8 @@ define([
       { name: "share",    re: /^share$/,           viewType: shareSearchView.Modal },
       { name: "reinvite", re: /^reinvite\/(\w+)$/, viewType: InviteModal,                  collection: troupeCollections.outgoingConnectionInvites, viewOptions: { overrideContext: true, inviteToConnect: true } },
       { name: "connect",  re: /^connect$/,         viewType: shareSearchView.Modal, viewOptions: { overrideContext: true, inviteToConnect: true } },
-      { name: "inviteSent", re: /^invitesent$/, viewType: InviteSuccessViewModal, skipModelLoad: true }
+      { name: "inviteSent", re: /^invitesent$/, viewType: InviteSuccessViewModal, skipModelLoad: true },
+      { name: "joinTroupeRequestSent", re: /^joinrequestsent$/, viewType: RequestSuccessViewModal, skipModelLoad: true },
     ],
     regions: []
   });
