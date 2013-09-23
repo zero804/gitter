@@ -6,7 +6,6 @@ require([
   'hbs!views/login/tmpl/loginRequestModalView',
   'views/app/appIntegratedView',
   'views/userhome/userHomeView',
-  'views/app/headerView',
   'views/toolbar/troupeMenu',
   'routers/userhome-router',
   'hbs!views/connect/tmpl/connectUserTemplate',
@@ -15,13 +14,12 @@ require([
   'components/webNotifications',
   'components/desktopNotifications',
   'template/helpers/all'
-], function(Backbone, TroupeViews, context, loginRequestTemplate,  AppIntegratedView, UserHomeView, HeaderView, TroupeMenuView, UserhomeRouter, connectUserTemplate /*, errorReporter , dozy, webNotifications,_Helpers*/) {
+], function(Backbone, TroupeViews, context, loginRequestTemplate,  AppIntegratedView, UserHomeView, TroupeMenuView, UserhomeRouter, connectUserTemplate /*, errorReporter , dozy, webNotifications,_Helpers*/) {
 
   "use strict";
 
   var appView = new AppIntegratedView();
   appView.leftMenuRegion.show(new TroupeMenuView());
-  appView.headerRegion.show( new HeaderView());
 
   new UserHomeView({ el: '#chat-frame' }).render();
 
