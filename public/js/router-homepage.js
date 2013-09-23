@@ -32,31 +32,9 @@ require([
   try {
     var ls = window.localStorage;
     if (ls) {
-      var data;
-
       // Show a popup to confirm access requests through signup.
       if(ls.pendingRequestConfirmation) {
-        data = ls.pendingRequestConfirmation;
-        var RequestSuccessView = TroupeViews.Base.extend({
-          template: loginRequestTemplate,
-          getRenderData: function() {
-            return data;
-          },
-          afterRender: function() {
-            this.$el.find('.modal-content').hide();
-            this.$el.find('.modal-success').show();
-          },
-          events: {
-            'click #cancel-button': function(e) {
-              this.remove();
-              if (this.dialog) this.dialog.hide();
-              e.preventDefault();
-            }
-          }
-        });
-        delete ls.pendingRequestConfirmation;
-
-        new TroupeViews.Modal({view: new RequestSuccessView() }).show();
+        window.location.hash = '#|joinrequestsent';
       }
 
       // Show a popup to confirm connection invite through signup.
