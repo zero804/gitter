@@ -31,7 +31,7 @@ define([
     "mouseenter #toolbar-frame":        "onMouseEnterToolbar",
     "mouseleave #toolbar-frame":        "onMouseLeaveToolbar",
     "keypress":                         "onKeyPress",
-    "click #user-icon":                 "toggleMenu",
+    "click #left-menu-icon":            "toggleMenu",
     "click #search-icon":               "toggleMenu",
     "click #troupe-icon":               "toggleMenu",
     "click #troupe-more-actions":       "toggleTroupeMenu"
