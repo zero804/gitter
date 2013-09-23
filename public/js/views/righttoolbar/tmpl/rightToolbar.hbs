@@ -26,7 +26,7 @@
         <div class="trpToolbarList divider">
           <div class="trpToolbarListContent" id="mail-list">
             <a href='mailto:{{troupeEmailAddress}}' style="text-decoration: none">
-              <div style="display: inline-block; margin-top: 8px">
+              <div style="display: inline-block; margin-bottom: 8px">
                 <div class="trpButton" style="margin-left: 0px">
                   <span style="vertical-align: middle">New Mail</span>
                 </div>
@@ -41,7 +41,7 @@
         <div class="trpTroupeMoreActions divider-top" id="troupe-more-actions">
           <img src='{{cdn "images/2/icon-menu-black@2x.png"}}'/ width="24" height="24">
         </div>
-        <div class="trpTroupeFavourite divider-top {{#if favourite}}favourited{{/if}}" style="opacity: 0.6" id="favourite-button">
+        <div class="trpTroupeFavourite divider-top {{#if favourite}}favourited{{/if}}" id="favourite-button">
           <div style="display: inline-block; vertical-align: middle">
             <img src='{{cdn "images/2/icon-favourite-selected.png" }}' class="trpHeaderFavIcon favourited" width="24" height="24">
             <img src='{{cdn "images/2/icon-favourite-unselected.png" }}' class="trpHeaderFavIcon unfavourited" width="24" height="24">
@@ -51,7 +51,7 @@
         </div>
         {{#unless oneToOne}}
         <a href="#|troupeSettings">
-          <div class="trpTroupeSettings divider-top" style='opacity: 0.6'>
+          <div class="trpTroupeSettings divider-top">
             <div style="display: inline-block; vertical-align: middle; height: 24px"><img src='{{cdn "images/2/icon-settings-black@2x.png"}}' width="24" height="24"/></div>
             <div class="trpActionsMenuLabel">Settings</div>
           </div>
