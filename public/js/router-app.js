@@ -25,7 +25,6 @@ require([
   'views/signup/createTroupeView',
   'views/signup/usernameView',
   'views/app/troupeSettingsView',
-  'views/toolbar/troupeMenu',
   'views/invite/reinviteModal',
   'utils/router',
   'components/unread-items-client',
@@ -42,8 +41,8 @@ require([
 ], function($, Backbone, context, appEvents, AppIntegratedView, chatInputView, ChatCollectionView,
             itemCollections, troupeCollections, UserEmailCollection, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, profileEmailView, profileAddEmailView, shareSearchView,
-            createTroupeView, UsernameView, 
-            troupeSettingsView, TroupeMenuView, ReinviteModal, Router, unreadItemsClient, chatDecorator, SmartCollectionView /*, errorReporter , FilteredCollection */) {
+            createTroupeView, UsernameView,
+            troupeSettingsView, ReinviteModal, Router, unreadItemsClient, chatDecorator, SmartCollectionView /*, errorReporter , FilteredCollection */) {
   "use strict";
 
   // Make drop down menus drop down
@@ -63,7 +62,6 @@ require([
 
   var appView = new AppIntegratedView({ });
   appView.smartMenuRegion.show(new SmartCollectionView({ collection: troupeCollections.smart }));
-  appView.leftMenuRegion.show(new TroupeMenuView({ }));
   appView.rightToolbarRegion.show(new RightToolbarView());
 
   $('.nano').nanoScroller({ preventPageScrolling: true });
