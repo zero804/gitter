@@ -39,9 +39,11 @@
       </div>
 
       <div class="trpMiniActions">
+        {{#compactView}}
         <div>
           <img src='{{cdn "images/2/icon-menu-white@2x.png"}}'/ style="margin-left: 28px; margin-bottom: 14px" width="24" height="24" id="left-menu-icon">
         </div>
+        {{/compactView}}
         <a href="{{#if user.username}}/{{user.username}}{{else}}/home{{/if}}">
         <div>
           <img src='{{cdn "images/2/icon-home-white@2x.png"}}'/ title="Your homepage" style="margin-left: 28px; margin-bottom: 14px" width="24" height="24" id="home-icon">
