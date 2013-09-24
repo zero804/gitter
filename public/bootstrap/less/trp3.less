@@ -444,12 +444,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 
 }
 
-.trpHeaderFrame {
-  max-width: 66em;
-  width: 100%;
-  display: inline-block;
-}
-
 .trpTroupeMoreActions {
   display: none;
 }
@@ -876,8 +870,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 .trpChatInputArea {
   display: block;
   text-align: center;
-  margin-left: 130px;
-  margin-right: 280px;
+  margin-left: @leftMarginFull;
+  margin-right: @rightMarginFull;
   .transition300ms;
 
   @media @mid {
