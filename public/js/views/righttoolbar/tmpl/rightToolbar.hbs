@@ -19,7 +19,7 @@
         <div class="trpTroupeRelatedContentHolder">
           <div class="trpToolbarHeader" id="file-header">Files</div>
           <div id="fineUploader"></div>
-          <div class="trpToolbarList divider">
+          <div class="trpToolbarList divider {{#oneToOne}}oneToOne{{/oneToOne}}">
             <div class="trpToolbarListContent" id="file-list"></div>
           </div>
           {{#unless oneToOne}}
@@ -36,8 +36,8 @@
               <div class="frame-conversations"></div>
             </div>
           </div>
+          {{/unless}}
         </div>
-        {{/unless}}
       </div>
       <div class="trpTroupeActions">
         <div class="trpTroupeMoreActions divider-top" id="troupe-more-actions">
