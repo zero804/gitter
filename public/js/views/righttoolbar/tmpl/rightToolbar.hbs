@@ -16,23 +16,25 @@
         </div>
       </div>
       <div class="trpTroupeRelatedContent" id="troupe-content">
-        <div class="trpToolbarHeader" id="file-header">Files</div>
-        <div id="fineUploader"></div>
-        <div class="trpToolbarList divider">
-          <div class="trpToolbarListContent" id="file-list"></div>
-        </div>
-        {{#unless oneToOne}}
-        <div class="trpToolbarHeader" id="mail-header">Mails</div>
-        <div class="trpToolbarList divider">
-          <div class="trpToolbarListContent" id="mail-list">
-            <a href='mailto:{{troupeEmailAddress}}' style="text-decoration: none">
-              <div style="display: inline-block; margin-bottom: 8px">
-                <div class="trpButton" style="margin-left: 0px">
-                  <span style="vertical-align: middle">New Mail</span>
+        <div class="trpTroupeRelatedContentHolder">
+          <div class="trpToolbarHeader" id="file-header">Files</div>
+          <div id="fineUploader"></div>
+          <div class="trpToolbarList divider">
+            <div class="trpToolbarListContent" id="file-list"></div>
+          </div>
+          {{#unless oneToOne}}
+          <div class="trpToolbarHeader" id="mail-header">Mails</div>
+          <div class="trpToolbarList divider">
+            <div class="trpToolbarListContent" id="mail-list">
+              <a href='mailto:{{troupeEmailAddress}}' style="text-decoration: none">
+                <div style="display: inline-block; margin-bottom: 8px">
+                  <div class="trpButton" style="margin-left: 0px">
+                    <span style="vertical-align: middle">New Mail</span>
+                  </div>
                 </div>
-              </div>
-            </a>
-            <div class="frame-conversations"></div>
+              </a>
+              <div class="frame-conversations"></div>
+            </div>
           </div>
         </div>
         {{/unless}}
