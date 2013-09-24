@@ -60,6 +60,9 @@ define([
     initialize: function() {
       var self = this;
 
+      // tooltips for the app-template
+      $('#profile-icon, #home-icon').tooltip();
+
       // $('body').append('<span id="fineUploader"></span>');
 
       //$(".nano").nanoScroller({ preventPageScrolling: true });
