@@ -80,7 +80,6 @@ var userService = {
       if(err || !user) return callback(err, user);
 
       user.passwordResetCode = null;
-      user.status = 'PROFILE_NOT_COMPLETED';
       user.passwordHash = null;
       user.save(function(err) {
         if(err) return callback(err);
@@ -351,13 +350,18 @@ var userService = {
           });
       }
 
-      // generates and sets the new password hash
       function testExistingPassword() {
-        return Q.nfcall(sechash.testHash, oldPassword, user.passwordHash)
-          .then(function(match) {
-            if(!match) throw {authFailure: true };
+        if(user.passwordHash) {
+          return Q.nfcall(sechash.testHash, oldPassword, user.passwordHash)
+            .then(function(match) {
+              if(!match && user.passwordHash) throw {authFailure: true };
+              return user;
+            });
+        } else {
+          return Q.fcall(function() {
             return user;
           });
+        }
       }
 
     }
