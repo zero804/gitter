@@ -1,6 +1,7 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'utils/router',
+  'utils/context',
   'views/profile/profileView',
   'views/profile/profileEmailView',
   'views/profile/profileAddEmailView',
@@ -9,15 +10,21 @@ define([
   'collections/useremails',
   'views/shareSearch/shareSearchView',
   'views/invite/reinviteModal'
-  ], function(Router, profileView, profileEmailView, profileAddEmailView, createTroupeView, troupeCollections, UserEmailCollection, shareSearchView, InviteModal) {
+  ], function(Router, context, profileView, profileEmailView, profileAddEmailView, createTroupeView, troupeCollections, UserEmailCollection, shareSearchView, InviteModal) {
   "use strict";
 
   // instantiate user email collection
   var userEmailCollection = new UserEmailCollection.UserEmailCollection();
 
+  var isResettingPassword = context.popEvent('password_reset');
+  var profileOptions = {
+    hasExistingPassword: !isResettingPassword,
+    disableClose: isResettingPassword
+  };
+
   return Router.extend({
     routes: [
-      { name: "profile",  re: /^profile$/,         viewType: profileView.Modal },
+      { name: "profile",  re: /^profile$/,         viewType: profileView.Modal, viewOptions: profileOptions },
       { name: "profileEmails",    re: /^profile\/emails$/,        viewType: profileEmailView.Modal, collection: userEmailCollection, skipModelLoad: true },
       { name: "profileEmailsAdd", re: /^profile\/emails\/add$/,   viewType: profileAddEmailView.Modal, collection: userEmailCollection, skipModelLoad: true },
       { name: "create",   re: /^create$/,          viewType: createTroupeView.Modal, collection: troupeCollections.troupes,   skipModelLoad: true },
