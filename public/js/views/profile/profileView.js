@@ -20,15 +20,14 @@ define([
       _.bindAll(this, 'onFormSubmit', 'onPasswordChange');
       if (!options) return;
       this.originalEmail = context.getUser().email;
-      this.existingUser = options.existingUser;
-      this.isExistingUser = context.isProfileComplete();
+      this.hasExistingPassword = options.hasExistingPassword;
       if (this.compactView) $("#uvTab").hide();
     },
 
     getRenderData: function() {
       var d = {
         user: context.getUser(),
-        existingUser: this.isExistingUser,
+        existingUser: this.hasExistingPassword,
         displayName: context.getUser().displayName
       };
       return d;
@@ -91,7 +90,7 @@ define([
     },
 
     onPasswordChange: function() {
-      if(!this.isExistingUser) return;
+      if(!this.hasExistingPassword) return;
       var pw = this.$el.find('#password');
       if(!pw.val()) return;
 
@@ -118,7 +117,7 @@ define([
           password: validation.rules.password(),
           oldPassword: { required: function() {
               // if this is an existing user and they have set a value for the password field then oldPassword is required as well.
-              return (self.isExistingUser === true && !!self.$el.find('[name=password]').val());
+              return (self.hasExistingPassword === true && !!self.$el.find('[name=password]').val());
             }
           }
         },
@@ -144,7 +143,7 @@ define([
         }
       };
 
-      if (!this.isExistingUser) {
+      if (!this.hasExistingPassword) {
         validationConfig.rules.password.required = true;
       }
 
@@ -203,10 +202,10 @@ define([
 
   var Modal = TroupeViews.Modal.extend({
     initialize: function(options) {
-      options = options ? options : {};
-      options.title = !context.isProfileComplete() ? "Complete your profile" : "Edit your profile";
-      TroupeViews.Modal.prototype.initialize.apply(this, arguments);
-      this.view = new View({ });
+      options = options || {};
+      options.title = options.title || "Edit your profile";
+      TroupeViews.Modal.prototype.initialize.call(this, options);
+      this.view = new View(options);
 
       var self = this;
       this.view.on('submit.success', function(username) {
