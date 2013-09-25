@@ -92,9 +92,9 @@ module.exports = {
       app.get('/reset/:confirmationCode',
         middleware.authenticate('passwordreset', { failureRedirect: nconf.get('web:homeurl') + '#passwordResetFailed=true' } ),
         function(req, res) {
-          contextGenerator.generateMiniContext(req, function(err, troupeContext) {
-            res.render('complete-profile', { troupeContext: troupeContext });
-          });
+          req.session.events = req.session.events || [];
+          req.session.events.push('password_reset');
+          res.redirect('/home#|profile');
         });
 
     }
