@@ -67,7 +67,7 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
 
     isScrolledToBottom: function() {
       var target = this._target;
-      var atBottom = target.scrollTop >= target.scrollHeight - target.clientHeight - 15;
+      var atBottom = target.scrollTop >= target.scrollHeight - target.clientHeight - 15 - 15;
       return atBottom;
     },
 
