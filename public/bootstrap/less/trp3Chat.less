@@ -5,12 +5,10 @@
 
 .trpChatContainer {
   text-align: center;
-  max-width: @fullWidth;
   display: inline-block;
   width: 100%;
   height: 100%;
   overflow: auto;
-  padding-right: 12px;
 }
 
 .trpChatInputContainer {
@@ -18,7 +16,19 @@
   max-width: @fullWidth;
   display: inline-block;
   width: 100%;
-  padding-right: 12px;
+  padding: 0 44px;
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+  box-sizing: border-box;         /* Opera/IE 8+ */
+  @media @small {
+    padding: 0 12px;
+  }
+  @media @mid {
+    padding: 0 32px;
+  }
+  @media @mobile {
+    padding: 0 12px;
+  }
 }
 
 .trpChatInputAvatar {
@@ -26,9 +36,25 @@
 }
 
 .trpChatInputArea {
+
+  @media @mid {
+    .avatar-s {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
   @media @mobile {
     background-color: @trpBgColor;
     padding-top: 5px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+
+    .avatar-s {
+      width: 24px;
+      height:24px;
+    }
   }
 }
 
@@ -43,6 +69,12 @@
 
   @media @mid {
     margin-left: 40px;
+  }
+
+  @media @mobile {
+    background-color: @trpBgColor;
+    margin-left: 24px;
+    padding: 0 12px;
   }
 }
 
@@ -59,6 +91,7 @@
     height: 24px;
   }
 }
+
 
 .trpChatInput, .trpChatInputBoxTextArea {
 	display: block;
@@ -91,10 +124,36 @@
 
 .trpChatItem {
 	display: inline-block;
-	margin-bottom: 24px;
 	clear: left;
   width: 100%;
   text-align: left;
+  padding: 12px 44px;
+  max-width: @fullWidth;
+  -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+  -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+  box-sizing: border-box;         /* Opera/IE 8+ */
+
+  &.unread {
+    background-color: #89e5b6;
+  }
+
+  @media @small {
+    padding: 12px 12px;
+  }
+
+  @media @mid {
+    padding: 12px 32px;
+
+    .avatar-s {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  @media @mobile {
+    padding: 12px 12px;
+  }
+
 }
 
 .trpChatContainer div:first-child .trpChatItem {
@@ -152,7 +211,7 @@
 
 }
 
-.view .trpChatBox {
+.view .trpChatBox, .trpChatItem {
 	-webkit-transition: background-color 0.5s linear;
   -moz-transition: background-color 0.5s linear;
   -o-transition: background-color 0.5s linear;
@@ -160,15 +219,10 @@
 }
 
 .view .trpChatFrom, .trpChatTime {
-	-webkit-transition: color 0.5s linear;
-  -moz-transition: color 0.5s linear;
-  -o-transition: color 0.5s linear;
-  transition: color 0.5s linear;
-}
-
-.view.unread .trpChatBox,
-.view.reading .trpChatBox {
-	background-color: #89e5b6;
+	-webkit-transition: color 0.3s linear;
+  -moz-transition: color 0.3s linear;
+  -o-transition: color 0.3s linear;
+  transition: color 0.3s linear;
 }
 
 .view.unread .trpChatFrom, .view.unread .trpChatTime,
@@ -275,13 +329,6 @@
   position: relative; // required for scroll calculations
 }
 
-@media screen and (device-width: 360px), (device-width: 720px), (device-width:320px) {
 
-  .trpChatPanel {
-    padding: 5px;
-  }
-
-
-}
 
 
