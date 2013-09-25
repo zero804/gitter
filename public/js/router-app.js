@@ -42,7 +42,7 @@ require([
 ], function($, Backbone, context, appEvents, AppIntegratedView, chatInputView, ChatCollectionView,
             itemCollections, troupeCollections, UserEmailCollection, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, profileEmailView, profileAddEmailView, shareSearchView,
-            createTroupeView, UsernameView, 
+            createTroupeView, UsernameView,
             troupeSettingsView, TroupeMenuView, ReinviteModal, Router, unreadItemsClient, chatDecorator, SmartCollectionView /*, errorReporter , FilteredCollection */) {
   "use strict";
 
@@ -85,7 +85,8 @@ require([
 
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
-    collection: itemCollections.chats
+    collection: itemCollections.chats,
+    scrollDelegate: chatCollectionView.rollers
   }).render();
 
   new Router({
