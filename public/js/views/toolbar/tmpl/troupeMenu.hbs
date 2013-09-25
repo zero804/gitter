@@ -1,7 +1,9 @@
  <div class="trpLeftMenuContainer">
   <div class="trpLeftMenuToolbar">
     <ul class="trpLeftMenuToolbarItems">
+      {{#compactView}}
       <li><img src='{{cdn "images/2/icon-target.png"}}' class="trpLeftMenuIcon left-menu-icon selected" id="icon-mega" data-list="list-mega" width="24" height="24"></li>
+      {{/compactView}}
       <li><img src='{{cdn "images/2/icon-troupes.png"}}' class="trpLeftMenuIcon left-menu-icon" id="icon-troupes" data-list="list-troupes" width="24" height="24"></li>
       <li><img src='{{cdn "images/2/icon-user.png"}}' class="trpLeftMenuIcon left-menu-icon" id="icon-user" data-list="list-users" width="24" height="24"></li>
       <li><img src='{{cdn "images/2/icon-search.png"}}' class="trpLeftMenuIcon left-menu-icon" id="icon-search" data-list="list-search" width="24" height="24"></li>
@@ -9,6 +11,7 @@
   </div>
   <div class="nano" id="left-menu-scroll">
     <div class="content trpLeftMenuWrapper">
+      {{#compactView}}
       <div class="trpToolbarList" id="list-mega">
         <div id="invitesList">
           <div class="trpToolbarHeader" id="invitesHeader">Incoming Invites</div>
@@ -27,7 +30,8 @@
           <div id="left-menu-list-recent"></div>
         </div>
       </div>
-      <div class="trpToolbarList" style="display:none" id="list-troupes">
+      {{/compactView}}
+      <div class="trpToolbarList" id="list-troupes">
         <div class="trpToolbarHeader">All your Troupes</div>
         <div id="left-menu-list"></div>
         <div id="incomingTroupeInvites">
