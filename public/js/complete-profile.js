@@ -7,7 +7,10 @@ require([
   "use strict";
 
   var getDisplayNamePasswordModal = function(username) {
-    var modal = new ProfileView.Modal({ disableClose: true });
+    var modal = new ProfileView.Modal({
+      disableClose: true,
+      title: "Complete your profile"
+    });
     modal.on('submit.success', function() {
       window.localStorage.startTour = 1;
       window.location = '/' + username;

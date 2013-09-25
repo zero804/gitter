@@ -8,7 +8,6 @@ var emailNotificationService = require("./email-notification-service"),
     winston = require('winston'),
     assert = require('assert'),
     appEvents = require('../app-events'),
-    _ = require('underscore'),
     Q = require('q');
 
 function newUser(options, callback) {
