@@ -22,8 +22,9 @@ define([
       trpCollections.troupes.on('change', function(model) {
         if (model.id == context.getTroupeId()) {
           // header title
-          $('.trpHeaderTitle').html(model.get('name'));
+          $('.trpHeaderTitle').text(model.get('name'));
           // window / title bar
+          alert("update title");
           self.updateTitlebar(unreadItemsClient.getCounts());
         }
       });
