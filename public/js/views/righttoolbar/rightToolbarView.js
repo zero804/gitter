@@ -8,14 +8,16 @@ define([
   'fineuploader',
   'hbs!./tmpl/rightToolbar',
   'collections/instances/integrated-items',
+  'collections/instances/troupes',
   'views/request/requestView',
   'views/invite/inviteView',
   'views/file/fileView',
   'views/conversation/conversationView',
   'views/people/peopleCollectionView',
-  'cocktail'
+  'cocktail',
+  'components/unread-items-client'
 ], function($, Backbone, Marionette, TroupeViews, context, qq, rightToolbarTemplate, itemCollections,
-  RequestView, InviteView, FileView, ConversationView, PeopleCollectionView, cocktail) {
+   trpCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView, cocktail, unreadItemsClient) {
   "use strict";
 
   var RightToolbarLayout = Marionette.Layout.extend({
@@ -44,6 +46,18 @@ define([
         troupeEmailAddress: context().troupeUri + '@' + context.env('baseServer'),
         isOneToOne: context.getTroupe().oneToOne
       });
+
+      var self = this;
+
+      trpCollections.troupes.on('change', function(model) {
+        if (model.id == context.getTroupeId()) {
+          // header title
+          $('#people-header').html(model.get('name'));
+          // window / title bar
+          self.updateTitlebar(unreadItemsClient.getCounts());
+        }
+      });
+
     },
 
     serializeData: function() {
@@ -57,6 +71,36 @@ define([
         favourite: troupe && troupe.favourite
       };
 
+    },
+
+    updateTitlebar: function(values) {
+      document.title = this.getTitlebar(values);
+    },
+
+    getTitlebar: function(counts) {
+      var mainTitle;
+      if (context.getTroupe() && context.getTroupe().name) {
+        mainTitle = context.getTroupe().name + " - Troupe";
+      } else {
+        mainTitle = "Troupe";
+      }
+
+      // TODO this isn't working properly when updating the troupe name, need to be able to poll unreadItems count not just accept the event
+      var overall = counts.overall;
+      var current = counts.current;
+      if(overall <= 0) {
+        return mainTitle;
+      }
+
+      if(overall <= 10) {
+        if(current > 0) {
+          return String.fromCharCode(0x2789 + overall) + ' ' + mainTitle;
+        }
+
+        return String.fromCharCode(0x277F + overall) + ' ' + mainTitle;
+      }
+
+      return '[' + overall + '] ' + mainTitle;
     },
 
     onRender: function() {
