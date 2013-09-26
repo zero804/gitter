@@ -10,11 +10,12 @@ define([
   'views/app/uiVars',
   'components/webNotifications',
   'components/modal-region',
+  'components/titlebar',
   'cocktail',
   'bootstrap_tooltip',  // no ref
   "nanoscroller"        // no ref
   ], function($, TroupeViews, context, appEvents, Marionette, UsernameView, ProfileView, uiVars,
-    notifications, modalRegion, cocktail) {
+    notifications, modalRegion, TitlebarUpdater, cocktail) {
   "use strict";
 
   var touchEvents = {
@@ -59,6 +60,9 @@ define([
 
     initialize: function() {
       var self = this;
+
+      // Setup the title bar updater
+      new TitlebarUpdater();
 
       // tooltips for the app-template
       $('#profile-icon, #home-icon').tooltip();
