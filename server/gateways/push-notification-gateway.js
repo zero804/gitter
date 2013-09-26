@@ -139,6 +139,7 @@ function sendNotificationToDevice(notification, badge, device) {
     winston.info("push-gateway: Sending apple push notification", { userId: device.userId, notification: notification });
     var note = new apns.Notification();
 
+
     if(badge >= 0) {
       note.badge = badge;
     }
@@ -152,6 +153,9 @@ function sendNotificationToDevice(notification, badge, device) {
     }
 
     if(link) {
+      /* For IOS7 push notifications */
+      note.contentAvailable = true;
+
       note.payload = { 'l': link };
     }
 

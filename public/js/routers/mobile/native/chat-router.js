@@ -31,18 +31,35 @@ require([
 
   var NativeChatRouter = MobileRouter.extend({
     initialize: function() {
-      this.constructor.__super__.initialize.apply(this);
-
-      var chatCollection = new chatModels.ChatCollection([], { troupeId: troupeId, parse: true });
-      var cache = window.localStorage['cache_chat_' + troupeId];
-      if(cache) {
-        cache = JSON.parse(cache);
-        chatCollection.reset(cache, { parse: true });
-        log('Loaded ' + cache.length + ' items from cache');
+      function snapshotSuccess(result) {
+        chatCollection.reset(result, { parse: true });
+        log('Loaded ' + result.length + ' items from cache');
         $('#chat-amuse').hide('fast', function() {
           $(this).remove();
         });
+
       }
+
+      this.constructor.__super__.initialize.apply(this);
+
+      var chatCollection = new chatModels.ChatCollection([], { troupeId: troupeId, parse: true });
+
+
+      var cordova = window.cordova;
+
+      if(cordova) {
+
+        document.addEventListener("deviceready", function() {
+          cordova.exec(snapshotSuccess, function() {}, "ChatSnapshot",
+                   "getChatsForTroupe", [troupeId]);
+        });
+      }
+      /*
+      var cache = window.localStorage['cache_chat_' + troupeId];
+      if(cache) {
+        cache = JSON.parse(cache);
+      }
+      */
 
       chatCollection.listen();
       chatCollection.on('change reset sync add remove', _.debounce(function() {
