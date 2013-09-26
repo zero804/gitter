@@ -118,13 +118,13 @@ function determineDesktopNotifications(user, req) {
 }
 
 function serializeUser(user) {
-  var strategy = new restSerializer.UserStrategy({ includeEmail: true });
+  var strategy = new restSerializer.UserStrategy({ includeEmail: true, includePasswordStatus: true });
 
   return restSerializer.serializeQ(user, strategy);
 }
 
 function serializeUserId(userId) {
-  var strategy = new restSerializer.UserIdStrategy({ includeEmail: true });
+  var strategy = new restSerializer.UserIdStrategy({ includeEmail: true, includePasswordStatus: true  });
 
   return restSerializer.serializeQ(userId, strategy);
 }
