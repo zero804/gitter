@@ -94,7 +94,7 @@ module.exports = {
         function(req, res) {
           req.session.events = req.session.events || [];
           req.session.events.push('password_reset');
-          res.redirect('/home#|profile');
+          res.relativeRedirect(req.user.getHomeUrl());
         });
 
     }

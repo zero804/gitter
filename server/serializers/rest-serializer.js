@@ -106,6 +106,7 @@ function UserStrategy(options) {
     return {
       id: user.id,
       status: options.includeEmail ? user.status : undefined,
+      hasPassword: options.includePasswordStatus ? !!user.passwordHash : undefined,
       username: user.username,
       displayName: user.displayName,
       url: user.getHomeUrl(),
