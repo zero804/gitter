@@ -124,7 +124,7 @@ function serializeUser(user) {
 }
 
 function serializeUserId(userId) {
-  var strategy = new restSerializer.UserIdStrategy({ includeEmail: true });
+  var strategy = new restSerializer.UserIdStrategy({ includeEmail: true, includePasswordStatus: true  });
 
   return restSerializer.serializeQ(userId, strategy);
 }
