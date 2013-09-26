@@ -90,7 +90,7 @@ define([
       var lht = parseInt(this.$el.css('lineHeight'),10);
       var height = this.$el.prop('scrollHeight');
       var currentLines = Math.floor(height / lht);
-      var wasAtBottom = this.scrollDelegate.isScrolledToBottom();
+      var wasAtBottom = (this.scrollDelegate) ? this.scrollDelegate.isScrolledToBottom() : false;
 
       if (currentLines != this.chatLines) {
         this.chatLines = currentLines;
@@ -102,7 +102,7 @@ define([
           chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
           frameChat.css(chatFrameProperty, chatPadding);
         }
-        if (wasAtBottom) {
+        if (wasAtBottom && this.scrollDelegate) {
           this.scrollDelegate.scrollToBottom();
         }
 
