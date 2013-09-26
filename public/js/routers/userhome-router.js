@@ -16,15 +16,9 @@ define([
   // instantiate user email collection
   var userEmailCollection = new UserEmailCollection.UserEmailCollection();
 
-  var isResettingPassword = context.popEvent('password_reset');
-  var profileOptions = {
-    hasExistingPassword: !isResettingPassword,
-    disableClose: isResettingPassword
-  };
-
-  return Router.extend({
+  var router = Router.extend({
     routes: [
-      { name: "profile",  re: /^profile$/,         viewType: profileView.Modal, viewOptions: profileOptions },
+      { name: "profile",  re: /^profile$/,         viewType: profileView.Modal },
       { name: "profileEmails",    re: /^profile\/emails$/,        viewType: profileEmailView.Modal, collection: userEmailCollection, skipModelLoad: true },
       { name: "profileEmailsAdd", re: /^profile\/emails\/add$/,   viewType: profileAddEmailView.Modal, collection: userEmailCollection, skipModelLoad: true },
       { name: "create",   re: /^create$/,          viewType: createTroupeView.Modal, collection: troupeCollections.troupes,   skipModelLoad: true },
@@ -34,5 +28,11 @@ define([
     ],
     regions: []
   });
+
+  if(context.popEvent('password_reset')) {
+    new profileView.Modal({ disableClose: true }).show();
+  }
+
+  return router;
 
 });
