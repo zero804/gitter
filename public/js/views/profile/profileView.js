@@ -20,17 +20,17 @@ define([
       _.bindAll(this, 'onFormSubmit', 'onPasswordChange');
       if (!options) return;
       this.originalEmail = context.getUser().email;
-      this.hasExistingPassword = options.hasExistingPassword;
+      this.hasPassword = context.getUser().hasPassword;
       if (this.compactView) $("#uvTab").hide();
     },
 
     getRenderData: function() {
-      var d = {
+      return {
         user: context.getUser(),
-        existingUser: this.hasExistingPassword,
+        existingUser: this.hasPassword /* this is a bit confusing */,
+        hasPassword: this.hasPassword,
         displayName: context.getUser().displayName
       };
-      return d;
     },
 
     events: {
@@ -90,7 +90,7 @@ define([
     },
 
     onPasswordChange: function() {
-      if(!this.hasExistingPassword) return;
+      if(!this.hasPassword) return;
       var pw = this.$el.find('#password');
       if(!pw.val()) return;
 
@@ -117,7 +117,7 @@ define([
           password: validation.rules.password(),
           oldPassword: { required: function() {
               // if this is an existing user and they have set a value for the password field then oldPassword is required as well.
-              return (self.hasExistingPassword === true && !!self.$el.find('[name=password]').val());
+              return (self.hasPassword && !!self.$el.find('[name=password]').val());
             }
           }
         },
@@ -143,7 +143,7 @@ define([
         }
       };
 
-      if (!this.hasExistingPassword) {
+      if (!this.hasPassword) {
         validationConfig.rules.password.required = true;
       }
 
@@ -179,6 +179,8 @@ define([
           if(data.success) {
             context.getUser().displayName = data.displayName;
             context.getUser().status = 'ACTIVE';
+            context.getUser().hasPassword = true;
+
             that.trigger('submit.success');
             that.dialog.hide();
 

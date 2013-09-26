@@ -22,23 +22,21 @@
         {{/existingUser}}
         <div class="trpFormItem">
           <label for="password" class="trpFormLabel">Password</label>
-          {{#existingUser}}
+          {{#hasPassword}}
           <input type="password" id="password" class="trpInput" name="password" value="" placeholder="It's a secret">
-          {{/existingUser}}
-          {{^existingUser}}
+          {{/hasPassword}}
+          {{^hasPassword}}
           <input type="password" id="password" class="trpInput" name="password" value="" placeholder="Choose a password">
           <br><br>
-          {{/existingUser}}
+          {{/hasPassword}}
         </div>
-<!-- 
-        <input type="text" id="displayName" class="trpInput" name="displayName" value="{{displayName}}" placeholder="Click here and type your name"><br>
-        <input type="password" id="password" class="trpInput" name="password" value="" placeholder="Then choose a password"><br> -->
-        {{#existingUser}}
+
+        {{#hasPassword}}
         <div class="trpFormItem" id="old-password" style="display: none">
           <label class="trpFormLabel" for="oldPassword">Old password</label>
           <input type="password" id="oldPassword" placeholder="Enter your OLD password" class="trpInput" name="oldPassword"/>
         </div>
-        {{/existingUser}}
+        {{/hasPassword}}
     </div>
     <div style="text-align: center">
     <input type="submit" class="trpButtonBig trpBtnGreen getstarted" name="submit" value="Save">
