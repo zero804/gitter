@@ -1,18 +1,17 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
-  'underscore',
   'jquery',
   'routers/mobile/mobile-router',
   'collections/chat',
   'utils/context',
   'views/chat/chatCollectionView',
   'views/chat/chatInputView',
-  'utils/mobile-resizer',
   'components/unread-items-client',
-  'log!chat-router',
+  'components/cache-sync',
   'components/oauth',         // No ref
   'components/native-context' // No ref
-  ], function(_, $, MobileRouter, chatModels, context, ChatCollectionView, chatInputView, mobileResizer, unreadItemsClient, log) {
+  ], function($, MobileRouter, chatModels, context, ChatCollectionView,
+    chatInputView, unreadItemsClient, cacheSync) {
   "use strict";
 
   // TODO: normalise this
@@ -31,29 +30,29 @@ require([
 
   var NativeChatRouter = MobileRouter.extend({
     initialize: function() {
-      function snapshotSuccess(result) {
-        chatCollection.reset(result, { parse: true });
-        log('Loaded ' + result.length + ' items from cache');
-        $('#chat-amuse').hide('fast', function() {
-          $(this).remove();
-        });
+      // function snapshotSuccess(result) {
+      //   chatCollection.reset(result, { parse: true });
+      //   log('Loaded ' + result.length + ' items from cache');
+      //   $('#chat-amuse').hide('fast', function() {
+      //     $(this).remove();
+      //   });
 
-      }
+      // }
 
       this.constructor.__super__.initialize.apply(this);
 
       var chatCollection = new chatModels.ChatCollection([], { troupeId: troupeId, parse: true });
+      cacheSync.install(chatCollection);
 
+      // var cordova = window.cordova;
 
-      var cordova = window.cordova;
+      // if(cordova) {
 
-      if(cordova) {
-
-        document.addEventListener("deviceready", function() {
-          cordova.exec(snapshotSuccess, function() {}, "ChatSnapshot",
-                   "getChatsForTroupe", [troupeId]);
-        });
-      }
+      //   document.addEventListener("deviceready", function() {
+      //     cordova.exec(snapshotSuccess, function() {}, "ChatSnapshot",
+      //              "getChatsForTroupe", [troupeId]);
+      //   });
+      // }
       /*
       var cache = window.localStorage['cache_chat_' + troupeId];
       if(cache) {
@@ -62,9 +61,9 @@ require([
       */
 
       chatCollection.listen();
-      chatCollection.on('change reset sync add remove', _.debounce(function() {
-        window.localStorage['cache_chat_' + troupeId] = JSON.stringify(chatCollection.toJSON());
-      }, 500));
+      // chatCollection.on('change reset sync add remove', _.debounce(function() {
+      //   window.localStorage['cache_chat_' + troupeId] = JSON.stringify(chatCollection.toJSON());
+      // }, 500));
 
       var chatCollectionView = new ChatCollectionView({
         el: $('#frame-chat'),
@@ -80,13 +79,13 @@ require([
         collection: chatCollection
       }).render();
 
-      mobileResizer.reset();
+      // mobileResizer.reset();
 
       // Prevent Header & Footer From Showing Browser Chrome
-      document.addEventListener('touchmove', function(event) {
-         if(event.target.parentNode.className.indexOf('noBounce') != -1 || event.target.className.indexOf('noBounce') != -1 ) {
-        event.preventDefault(); }
-      }, false);
+      // document.addEventListener('touchmove', function(event) {
+      //    if(event.target.parentNode.className.indexOf('noBounce') != -1 || event.target.className.indexOf('noBounce') != -1 ) {
+      //   event.preventDefault(); }
+      // }, false);
     }
   });
 
