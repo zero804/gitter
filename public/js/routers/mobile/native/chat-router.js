@@ -8,7 +8,6 @@ require([
   'views/chat/chatInputView',
   'components/unread-items-client',
   'components/cache-sync',
-  'components/in-app-browser',    // No Ref
   'components/oauth',             // No ref
   'components/native-context'     // No ref
   ], function($, MobileRouter, chatModels, context, ChatCollectionView,
@@ -31,40 +30,11 @@ require([
 
   var NativeChatRouter = MobileRouter.extend({
     initialize: function() {
-      // function snapshotSuccess(result) {
-      //   chatCollection.reset(result, { parse: true });
-      //   log('Loaded ' + result.length + ' items from cache');
-      //   $('#chat-amuse').hide('fast', function() {
-      //     $(this).remove();
-      //   });
-
-      // }
-
       this.constructor.__super__.initialize.apply(this);
 
       var chatCollection = new chatModels.ChatCollection([], { troupeId: troupeId, parse: true });
       cacheSync.install(chatCollection);
-
-      // var cordova = window.cordova;
-
-      // if(cordova) {
-
-      //   document.addEventListener("deviceready", function() {
-      //     cordova.exec(snapshotSuccess, function() {}, "ChatSnapshot",
-      //              "getChatsForTroupe", [troupeId]);
-      //   });
-      // }
-      /*
-      var cache = window.localStorage['cache_chat_' + troupeId];
-      if(cache) {
-        cache = JSON.parse(cache);
-      }
-      */
-
       chatCollection.listen();
-      // chatCollection.on('change reset sync add remove', _.debounce(function() {
-      //   window.localStorage['cache_chat_' + troupeId] = JSON.stringify(chatCollection.toJSON());
-      // }, 500));
 
       var chatCollectionView = new ChatCollectionView({
         el: $('#content-frame'),
