@@ -24,7 +24,7 @@ require([
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
     collection: chatCollection,
-    scrollDelegate: chatCollectionView.rollers
+    rollers: chatCollectionView.rollers
   }).render();
 
   app.addInitializer(function() {

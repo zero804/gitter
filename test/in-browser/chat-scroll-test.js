@@ -139,22 +139,10 @@ define([
     this.collection = new chatModel.ChatCollection();
     this.view = new ChatCollectionView({ collection: this.collection });
 
-    // setup the scroll delegate
-    //this.scrollDelegate = new delegates.DefaultScrollDelegate(this.scrollOf, this.container, 'trpChatItem', findTopMostVisibleUnreadItem);
-    // what do we need to return as the unread item?
     this.topUnreadPosition = null;
-    var self = this;
-    // function findTopMostVisibleUnreadItem(/* itemType */) {
-    //   if (!self.topUnreadPosition)
-    //     return null;
-
-    //   return self.topUnreadPosition;
-    // }
 
     this.newMessage = function() {
-      //this.scrollDelegate.onBeforeItemAdded();
       this.container.height(this.container.height() + 60);
-      //this.scrollDelegate.onAfterItemAdded();
     };
 
   }
