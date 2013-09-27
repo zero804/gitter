@@ -102,7 +102,7 @@ class SignupTests(unittest.TestCase):
 
         self.driver.find_element_by_id('displayName').send_keys('Test Testerson')
         self.driver.find_element_by_id('password').send_keys('password')
-        self.driver.find_element_by_css_selector('#updateprofileform [type=submit]').click()
+        self.driver.find_element_by_css_selector('[data-action=save]').click()
 
         self.assertUserhomeIsCurrentPage(username)
 
@@ -113,7 +113,7 @@ class SignupTests(unittest.TestCase):
         email   = 'mister.troupe@gmail.com'
         passwd  = 'Eeboh7othaefitho'
         name    = 'Mr Troupe'
-        
+
         # Sing in into Gmail
         self.driver.get("https://gmail.com")
         form = self.driver.find_element_by_css_selector('#gaia_loginform')
@@ -154,8 +154,8 @@ class SignupTests(unittest.TestCase):
 
         # This works on IE:
         self.driver.find_element_by_id('password').send_keys('password')
-        self.driver.find_element_by_css_selector('#updateprofileform [type=submit]').click()
-      
+        self.driver.find_element_by_css_selector('[data-action=save]').click()
+
         self.assertUserhomeIsCurrentPage(username)
 
 
