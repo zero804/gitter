@@ -86,7 +86,7 @@ require([
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
     collection: itemCollections.chats,
-    scrollDelegate: chatCollectionView.rollers
+    rollers: chatCollectionView.rollers
   }).render();
 
   new Router({
