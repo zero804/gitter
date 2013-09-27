@@ -59,7 +59,6 @@ define([
           self.onChange();
         }, oldInMS + 50);
       }
-
     },
 
     getRenderData: function() {
