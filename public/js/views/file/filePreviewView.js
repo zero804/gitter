@@ -98,6 +98,9 @@ define([
           return this.download();
         case 'delete':
           return this.deleteFile();
+        case 'versions':
+          window.location.hash = '#|file/versions/' + this.model.id;
+          return;
       }
     },
 
@@ -255,6 +258,7 @@ define([
       options.title = 'Files';
       options.menuItems = [
         { text: "Download", action: "download" },
+        { text: "Versions", action: "versions" },
         { text: "Delete", action: "delete" }
       ];
       TroupeViews.Modal.prototype.initialize.call(this, options);
