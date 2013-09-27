@@ -91,8 +91,21 @@ define([
       this.$el.find('a.link-prev').click();
     },
 
-    onMenuItemClicked: function() {
+    onMenuItemClicked: function(action) {
+      switch (action) {
+        case 'download':
+          return this.download();
+        case 'delete':
+          return this.deleteFile();
+      }
+    },
+
+    download: function() {
       window.location.href = this.model.get("url");
+    },
+
+    deleteFile: function() {
+
     },
 
     supportsModelReplacement: function() {
@@ -214,13 +227,13 @@ define([
 
   var Modal = TroupeViews.Modal.extend({
     className: 'modal trpFilePreview',
-    menuItems: [{
-      id: "download",
-      text: "Download"
-    }],
     initialize: function(options) {
       options.title = 'Files';
-      TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+      options.menuItems = [
+        { text: "Download", action: "download" },
+        // { text: "Delete", action: "delete" }
+      ];
+      TroupeViews.Modal.prototype.initialize.call(this, options);
       this.view = new PreviewView({ model: this.model, collection: this.collection });
     }
   });
