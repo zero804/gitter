@@ -35,6 +35,17 @@ define([
       });
       this.$el.find('form').sisyphus({locationBased: true}).restoreAllData();
 
+      // http://stackoverflow.com/questions/16149083/keyboardshrinksview-makes-lose-focus/18904886#18904886
+      this.$el.find("textarea").on('touchend', function(){
+        var t = $(this);
+
+        window.setTimeout(function() {
+          t.focus();
+        }, 300);
+
+        return true;
+      });
+
       this.listenTo(this.inputBox, 'save', this.send);
     },
 
