@@ -22,6 +22,17 @@ define([
       this.originalEmail = context.getUser().email;
       this.hasPassword = context.getUser().hasPassword;
       if (this.compactView) $("#uvTab").hide();
+
+      this.on('menuItemClicked', this.menuItemClicked);
+    },
+
+    menuItemClicked: function(action) {
+      switch(action) {
+        case 'save':
+          this.$el.find('form#updateprofileform').submit(); return;
+        case 'signout':
+          window.location.href = '/signout'; return;
+      }
     },
 
     getRenderData: function() {
@@ -206,6 +217,15 @@ define([
     initialize: function(options) {
       options = options || {};
       options.title = options.title || "Edit your profile";
+
+      options.menuItems = [
+        { text: 'Save', action: 'save' }
+      ];
+
+      if (context.getUser().hasPassword) {
+        options.menuItems.push({ text: 'Signout', action: 'signout' });
+      }
+
       TroupeViews.Modal.prototype.initialize.call(this, options);
       this.view = new View(options);
 
