@@ -19,7 +19,7 @@ define([
     template: template,
 
     initialize: function(options) {
-      this.scrollDelegate = options.scrollDelegate;
+      this.rollers = options.rollers;
     },
 
     getRenderData: function() {
@@ -31,7 +31,7 @@ define([
     afterRender: function() {
       this.inputBox = new ChatInputBoxView({
         el: this.$el.find('.trpChatInputBoxTextArea'),
-        scrollDelegate: this.scrollDelegate
+        rollers: this.rollers
       });
       this.$el.find('form').sisyphus({locationBased: true}).restoreAllData();
 
@@ -67,7 +67,7 @@ define([
     initialize: function(options) {
       this.chatLines = 2;
 
-      this.scrollDelegate = options.scrollDelegate;
+      this.rollers = options.rollers;
       this.originalChatInputHeight = this.$el.height();
       this.$el.placeholder();
 
@@ -90,7 +90,6 @@ define([
       var lht = parseInt(this.$el.css('lineHeight'),10);
       var height = this.$el.prop('scrollHeight');
       var currentLines = Math.floor(height / lht);
-      var wasAtBottom = (this.scrollDelegate) ? this.scrollDelegate.isScrolledToBottom() : false;
 
       if (currentLines != this.chatLines) {
         this.chatLines = currentLines;
@@ -102,9 +101,12 @@ define([
           chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
           frameChat.css(chatFrameProperty, chatPadding);
         }
-        if (wasAtBottom && this.scrollDelegate) {
-          this.scrollDelegate.scrollToBottom();
-        }
+
+        var self = this;
+        window.setTimeout(function() {
+          self.rollers.adjustScroll();
+        }, 100);
+
 
         chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
       }
