@@ -206,6 +206,11 @@ define([
   TroupeViews.Modal =   TroupeViews.Base.extend({
     template: modalTemplate,
     className: "modal",
+
+    events: {
+      'click .button': 'onMenuItemClicked'
+    },
+
     initialize: function(options) {
       this.options = {
         keyboard: true,
@@ -227,12 +232,14 @@ define([
       return {
         customTitle: !!this.options.title,
         title: this.options.title,
+        hasMenuItems: !!this.options.menuItems.length,
+        menuItems: this.options.menuItems,
         disableClose: this.options.disableClose
       };
     },
 
-    onMenuItemClicked: function(id) {
-      this.view.trigger('menuItemClicked', id);
+    onMenuItemClicked: function(e) {
+      this.view.trigger('menuItemClicked', $(e.target).attr('data-action'));
     },
 
     afterRender: function() {
@@ -242,28 +249,6 @@ define([
       var modalBody = this.$el.find('.modal-body');
       modalBody.append(this.view.render().el);
       this.$el.find('.close').on('click', this.hide);
-
-      /* Render menu items */
-      if(this.options.menuItems) {
-        var menuItems = this.$el.find(".frame-menu-items");
-        var all = [];
-        _.each(this.options.menuItems, function(item) {
-          var menuItem = $(self.make("a", {"href": "#!" }));
-          menuItem.text(item.text);
-          all.push(menuItem);
-
-          menuItem.on('click', function(e) {
-            e.preventDefault();
-            self.onMenuItemClicked(item.id);
-          });
-
-          menuItems.append(menuItem);
-
-          self.addCleanup(function() {
-            _.each(all, function(i) { i.off(); });
-          });
-        });
-      }
 
       if(!compactView) {
         window.setTimeout(function() {
