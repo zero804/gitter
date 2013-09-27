@@ -18,6 +18,7 @@ define([
   };
 
   /* Unlike getTroupe() this returns a Backbone Model, upon which events can be placed, etc */
+  // Note: this troupe model is not connected to the live event updates
   context.troupe = function() {
     if(!troupe) {
       var attributes;

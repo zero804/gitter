@@ -24,13 +24,14 @@ require([
   'views/shareSearch/shareSearchView',
   'views/signup/createTroupeView',
   'views/signup/usernameView',
-  'views/app/headerView',
   'views/app/troupeSettingsView',
   'views/toolbar/troupeMenu',
   'views/invite/reinviteModal',
   'utils/router',
   'components/unread-items-client',
   'views/chat/decorator',
+  'views/app/smartCollectionView',
+  'views/widgets/preload', // No ref
   'components/webNotifications', // No ref
   'components/desktopNotifications', // No ref
   'components/errorReporter',  // No ref
@@ -41,8 +42,8 @@ require([
 ], function($, Backbone, context, appEvents, AppIntegratedView, chatInputView, ChatCollectionView,
             itemCollections, troupeCollections, UserEmailCollection, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, profileEmailView, profileAddEmailView, shareSearchView,
-            createTroupeView, UsernameView, HeaderView,
-            troupeSettingsView, TroupeMenuView, ReinviteModal, Router, unreadItemsClient, chatDecorator /*, errorReporter , FilteredCollection */) {
+            createTroupeView, UsernameView,
+            troupeSettingsView, TroupeMenuView, ReinviteModal, Router, unreadItemsClient, chatDecorator, SmartCollectionView /*, errorReporter , FilteredCollection */) {
   "use strict";
 
   // Make drop down menus drop down
@@ -61,8 +62,8 @@ require([
 
 
   var appView = new AppIntegratedView({ });
+  appView.smartMenuRegion.show(new SmartCollectionView({ collection: troupeCollections.smart }));
   appView.leftMenuRegion.show(new TroupeMenuView({ }));
-  appView.headerRegion.show(new HeaderView());
   appView.rightToolbarRegion.show(new RightToolbarView());
 
   $('.nano').nanoScroller({ preventPageScrolling: true });
@@ -72,25 +73,25 @@ require([
 
   // Setup the ChatView
 
-  new ChatCollectionView({
-    el: $('#frame-chat'),
+  var chatCollectionView = new ChatCollectionView({
+    el: $('#content-frame'),
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
     decorator: chatDecorator
   }).render();
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
-  unreadItemsClient.monitorViewForUnreadItems($('#toolbar-frame .nano'));
-
+  unreadItemsClient.monitorViewForUnreadItems($('#file-list'));
 
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
-    collection: itemCollections.chats
+    collection: itemCollections.chats,
+    scrollDelegate: chatCollectionView.rollers
   }).render();
 
   new Router({
     routes: [
-      { name: "file",             re: /^file\/(\w+)$/,            viewType: FileDetailView,               collection: itemCollections.files },
+      { name: "file",             re: /^file\/(\w+)$/,            viewType: filePreviewView.Modal,               collection: itemCollections.files },
       { name: "request",          re: /^request\/(\w+)$/,         viewType: RequestDetailView.Modal,            collection: itemCollections.requests },
       { name: "invite",           re: /^invite\/(\w+)$/,          viewType: InviteDetailView.Modal,             collection: itemCollections.invites },
       { name: "filePreview",      re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: itemCollections.files },

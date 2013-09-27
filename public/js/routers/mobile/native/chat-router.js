@@ -66,7 +66,7 @@ require([
       // }, 500));
 
       var chatCollectionView = new ChatCollectionView({
-        el: $('#frame-chat'),
+        el: $('#content-frame'),
         collection: chatCollection
       });
 
@@ -76,7 +76,8 @@ require([
 
       new chatInputView.ChatInputView({
         el: $('#chat-input'),
-        collection: chatCollection
+        collection: chatCollection,
+        scrollDelegate: chatCollectionView.rollers
       }).render();
 
       // mobileResizer.reset();

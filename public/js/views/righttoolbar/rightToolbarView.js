@@ -8,14 +8,15 @@ define([
   'fineuploader',
   'hbs!./tmpl/rightToolbar',
   'collections/instances/integrated-items',
+  'collections/instances/troupes',
   'views/request/requestView',
   'views/invite/inviteView',
   'views/file/fileView',
   'views/conversation/conversationView',
   'views/people/peopleCollectionView',
-  'cocktail'
+  'cocktail',
 ], function($, Backbone, Marionette, TroupeViews, context, qq, rightToolbarTemplate, itemCollections,
-  RequestView, InviteView, FileView, ConversationView, PeopleCollectionView, cocktail) {
+   trpCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView, cocktail) {
   "use strict";
 
   var RightToolbarLayout = Marionette.Layout.extend({
@@ -31,11 +32,12 @@ define([
     },
 
     events: {
-      "click #people-header": "onPeopleHeaderClick",
-      "click #request-header": "onRequestHeaderClick",
-      "click #invites-header": "onInvitesHeaderClick",
-      "click #file-header": "onFileHeaderClick",
-      "click #mail-header": "onMailHeaderClick"
+      // "click #people-header": "onPeopleHeaderClick",
+      // "click #request-header": "onRequestHeaderClick",
+      // "click #invites-header": "onInvitesHeaderClick",
+      // "click #file-header": "onFileHeaderClick",
+      // "click #mail-header": "onMailHeaderClick"
+      "click #favourite-button":        "toggleFavourite"
     },
 
     initialize: function() {
@@ -43,6 +45,34 @@ define([
         troupeEmailAddress: context().troupeUri + '@' + context.env('baseServer'),
         isOneToOne: context.getTroupe().oneToOne
       });
+
+      var self = this;
+
+      trpCollections.troupes.on('change:name', function(model) {
+        if (model.id == context.getTroupeId()) {
+          self.updateHeader(model.get('name'));
+        }
+      });
+
+      this.updateHeader(context.getTroupe().name);
+    },
+
+    updateHeader: function(value) {
+      // header title
+      $('#people-header').text(value);
+    },
+
+    serializeData: function() {
+      var user = context.getUser();
+      var troupe = context.getTroupe();
+      return {
+        headerTitle: troupe && troupe.name || user.displayName,
+        isTroupe: !!troupe,
+        oneToOne: context.inOneToOneTroupeContext(),
+        user: user,
+        favourite: troupe && troupe.favourite
+      };
+
     },
 
     onRender: function() {
@@ -80,7 +110,7 @@ define([
               var versions = model.get('versions');
               var hasThumb = versions.at(versions.length - 1).get('thumbnailStatus') !== 'GENERATING';
               if (hasThumb) {
-                window.location.href = "#file/" + response.file.id;
+                window.location.href = "#|file/preview/" + response.file.id;
                 model.off('change', onChange);
               }
             }
@@ -124,10 +154,10 @@ define([
     initHideListeners: function() {
       var self = this;
 
-      toggler('#invite-roster', itemCollections.invites);
+      toggler('#invite-list', itemCollections.invites);
       toggler('#invite-header', itemCollections.invites);
       toggler('#request-header', itemCollections.requests);
-      toggler('#request-roster', itemCollections.requests);
+      toggler('#request-list', itemCollections.requests);
 
       function toggler(element, collection) {
         function toggle() {
@@ -137,6 +167,25 @@ define([
         collection.on('all', toggle);
         toggle();
       }
+    },
+
+    toggleFavourite: function() {
+      var favHeader = $('.trpTroupeFavourite');
+      favHeader.toggleClass('favourited');
+      var isFavourite = favHeader.hasClass('favourited');
+
+      $.ajax({
+        url: '/troupes/' + context.getTroupeId(),
+        contentType: "application/json",
+        dataType: "json",
+        type: "PUT",
+        data: JSON.stringify({ favourite: isFavourite })
+      });
+
+      // The update should happen automatically via a patch operation....
+      //window.troupeContext.troupe.favourite = isFavourite;
+      //var troupe = collections.troupes.get(window.troupeContext.troupe.id);
+      //troupe.set('favourite', isFavourite);
     },
 
 
