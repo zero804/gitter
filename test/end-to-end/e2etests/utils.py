@@ -116,7 +116,7 @@ def existingUserlogin(driver, usernameValue, passwordValue):
 
     driver.find_element_by_css_selector('#signin-button').click()
 
-    WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'DIV.trpHeaderWrapper')))
+    WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, 'mini-left-menu')))
 
 
 def signup(driver):
