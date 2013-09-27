@@ -161,10 +161,9 @@ var userService = {
    * Update the last visited troupe for the user, sending out appropriate events
    * Returns a promise of nothing
    */
-  saveLastVisitedTroupeforUserId: function(userId, troupe, callback) {
-    winston.verbose("Saving last visited Troupe for user: " + userId+ " to troupe " + troupe.id);
+  saveLastVisitedTroupeforUserId: function(userId, troupeId, callback) {
+    winston.verbose("Saving last visited Troupe for user: " + userId+ " to troupe " + troupeId);
 
-    var troupeId = troupe.id;
     var lastAccessTime = new Date();
 
     var setOp = {};

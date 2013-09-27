@@ -59,14 +59,17 @@ define([
           self.onChange();
         }, oldInMS + 50);
       }
-
     },
 
     getRenderData: function() {
       var data = this.model.toJSON();
+      var isMobile = navigator.userAgent.match(/mobile/i) ? true : false;
 
       if (data.fromUser) {
         data.displayName = data.fromUser.displayName;
+        if (isMobile && data.displayName.length > 13) {
+          data.displayName = data.fromUser.displayName.split(" ").shift();
+        }
       }
 
       return data;
