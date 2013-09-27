@@ -147,9 +147,11 @@ def signup(driver):
     form = driver.find_element_by_css_selector('#updateprofileform')
     set_text(form.find_element_by_name('displayName'), 'Willey Waley')
     form.find_element_by_id('password').send_keys('123456')
-    form.find_element_by_name('submit').click()
+    driver.find_element_by_css_selector('[data-action=save]').click()
 
-    driver.find_element_by_id('hopscotch-cta').click()
+    tourcancel = driver.find_element_by_id('hopscotch-cta')
+    if tourcancel.is_displayed():
+        tourcancel.click()
 
     return username
 
