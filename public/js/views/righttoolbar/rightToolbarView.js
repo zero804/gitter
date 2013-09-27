@@ -110,7 +110,6 @@ define([
               var versions = model.get('versions');
               var hasThumb = versions.at(versions.length - 1).get('thumbnailStatus') !== 'GENERATING';
               if (hasThumb) {
-                window.location.href = "#|file/preview/" + response.file.id;
                 model.off('change', onChange);
               }
             }
