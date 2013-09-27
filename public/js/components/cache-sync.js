@@ -8,14 +8,12 @@ define([
 
   function cdvError(callback) {
     return function(error) {
-      log("Error: " + error, error);
       return callback && callback(error);
     };
   }
 
   function cdvSuccess(callback) {
     return function(result) {
-      log('CDV:' + result, result);
       return callback && callback(null, result);
     };
   }
