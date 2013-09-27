@@ -83,7 +83,7 @@ describe("User Service", function() {
   describe("#saveLastVisitedTroupeforUserId", function() {
     it('should record the time each troupe was last accessed by a user', function(done) {
 
-      userService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1, function(err) {
+      userService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, function(err) {
         if(err) return done(err);
 
       persistenceService.User.findById(fixture.user1.id, function(err, user) {
@@ -98,7 +98,7 @@ describe("User Service", function() {
             var after = times[troupeId];
             assert(after, 'Expected a value for last access time');
 
-            userService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1, function(err) {
+            userService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, function(err) {
               if(err) return done(err);
 
               userService.getTroupeLastAccessTimesForUser(fixture.user1.id, function(err, times) {

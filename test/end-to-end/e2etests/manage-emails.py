@@ -23,12 +23,13 @@ class ManageEmailTest(unittest.TestCase):
     def addEmail(self, email):
         # start on the manage email dialog
         self.driver.find_element_by_id('addEmailBtn').click()
+        time.sleep(0.5)
         utils.send_keys(self.driver.find_element_by_css_selector('[name=email]'), email)
         self.driver.find_element_by_id('saveEmailBtn').click()
 
     def testAddEmail(self):
         email = 'secondary' + time.strftime("%Y%m%d%H%M%S", time.gmtime()) + '@troupetest.local'
-        self.driver.find_element_by_id('link-profile').click()
+        self.driver.find_element_by_id('profile-icon').click()
         self.driver.find_element_by_id('manageEmailsBtn').click()
 
         self.addEmail(email)

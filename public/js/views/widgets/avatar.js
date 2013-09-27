@@ -120,7 +120,11 @@ define([
         this.$el.find(':first-child').tooltip({
           html : true,
           placement : function(a, element) {
-            var position = $(element).position();
+
+            var position = $(element).offset();
+            if (($(window).width() - (position.left + $(element).outerWidth())) < 110) {
+              return "left";
+            }
             if (position.top < 110){
                 return "bottom";
             }

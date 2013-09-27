@@ -21,7 +21,15 @@
 
 @import "trpInvites.less";
 
+/* Transitions */
 
+.transition300ms {
+/*  -webkit-transform: translate3d(0, 0, 0);*/
+  transition:all .3s ease-in-out;
+  -o-transition:all .3s ease-in-out;
+  -moz-transition:all .3s ease-in-out;
+  -webkit-transition:all .3s ease-in-out;
+}
 
 html {
 	min-height: 100%;
@@ -31,14 +39,22 @@ body {
 	min-height: 100%;
 	height: 100%;
 	margin: 0;
-	background-color: #ecf1ec;
 	overflow: hidden;
 	/*overflow-x: hidden;*/
+  background-color: @trpBgColor2;
 }
 
 a {
 	text-decoration: none;
 	color: #333;
+}
+
+div {
+/*	transform: translate3d(0, 0, 0);
+	transition:all .1s ease-in-out;
+    -o-transition:all .1s ease-in-out;
+    -moz-transition:all .1s ease-in-out;
+    -webkit-transition:all .1s ease-in-out;*/
 }
 
 
@@ -112,8 +128,8 @@ a:hover {
 .trpLeftMenu {
 	display: inline-block;
 	position: fixed;
-	width: 280px;
-	left: -280px;
+	width: 0px;
+	left: 84px;
 	top: 0px;
 	background-color: @trpGreen;
 	height: 100%;
@@ -122,11 +138,88 @@ a:hover {
 	border-right: 2px solid @trpGreen;
 	padding-top: 18px;
 	margin-top: 0px;
+	overflow: hidden;
+	.transition300ms;
+  -webkit-transform: translate3d(0, 0, 0);
+
+  &.visible {
+    width: 280px;
+/*    box-shadow: 1px 0px 6px 1px rgba(50, 50, 50, 0.55);*/
+    border-right: 4px solid rgba(0,0,0,0.1);
+    background-clip: padding-box;
+  }
+
+  .trpToolbarList {
+    width: 260px;
+  }
+}
+
+
+.trpLeftMenuContainer {
+width: 260px;
+overflow: hidden;
+}
+
+.trpMiniLeftMenu {
+	padding-top: 12px;
+	background-color: @trpDarkBlue;
+background: linear-gradient(to bottom, #2c3e51 0%,#17202a 70%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', endColorstr='#2c3e51',GradientType=0 ); /* IE6-9 */
+	width: 84px;
+	position: fixed;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	z-index: 1013;
+	opacity: 0.95;
+  .transition300ms;
+}
+
+.trpMiniLeftMenu .trpMiniActions {
+  background-color: #17202a;
+  width: 80px;
+}
+
+.trpMiniLeftMenu.active, .trpMiniLeftMenuContainer.active {
+  opacity: 1;
+  -webkit-filter: grayscale(0%);
+  -moz-filter: grayscale(0%);
+  filter: grayscale(0%);  
+}
+
+.trpMiniLeftMenu:hover {
+	opacity: 1;
+}
+
+.trpMiniLeftMenu:hover .trpMiniLeftMenuContainer {
+  opacity: 1;
+  -webkit-filter: grayscale(0%);
+  -moz-filter: grayscale(0%);
+  filter: grayscale(0%);  
+}
+
+.trpLeftMenu:hover + .trpRightPanel {
+	opacity: 1;
+}
+
+.trpMiniLeftMenuContainer {
+  opacity: 0.7;
+  .transition300ms;
+  -webkit-filter: grayscale(70%);
+  -moz-filter: grayscale(70%);
+  filter: grayscale(70%);  
+  margin-left: 2px;
+}
+
+.trpMiniActions {
+  padding-bottom: 11px;
+  position: absolute;
+  bottom: 0px;
 }
 
 .trpLeftMenu .nano {
 	position: absolute;
-	top: 70px;
+	top: 50px;
 	bottom: 100px;
 }
 
@@ -134,6 +227,8 @@ a:hover {
 	position: absolute;
 	bottom: 40px;
 	left: 20px;
+	width: 280px;
+	overflow: hidden;
 }
 
 .trpLeftMenuWrapper {
@@ -147,6 +242,7 @@ a:hover {
 .trpLeftMenuToolbar {
 	padding-left: 26px;
 	padding-bottom: 12px;
+	width: 280px;
 }
 
 .trpLeftMenuToolbarItems {
@@ -203,6 +299,7 @@ a:hover {
   display: inline-block;
 	width: 90px;
 	.trpBodyMedium;
+  font-size: 13px;
 	margin-top: 20px;
 	margin-right: 8px;
 	background-color: white;
@@ -220,6 +317,14 @@ a:hover {
 	height: 40px;
 	width: 40px;
 	z-index: 1000;
+}
+
+.trpUserHome {
+  margin-left: 88px;
+
+  @media @mobile {
+    margin-left: 0px;
+  }
 }
 
 .trpUnreadBadge {
@@ -283,21 +388,22 @@ a:hover {
 
 .trpContentPanel {
 /*  display: inline-block;*/
-  position: absolute;
-/*	background-color: #ecf1ec;*/
+  position: fixed;
+	background-color: #f7faf5;
 	margin-left: 0px;
 /*	height: 100%;*/
 	width: 100%;
 	text-align: center;
 /*	padding-top: 40px;*/
-	top: 60px;
+	top: 0px;
+  bottom: 68px;
   right: 0px;
   /* this min height isn't the best solution*/
   /* we need the content panel to take up the entire middle of the screen*/
   /* so that the mouseover event to close the left menu on it gets triggered */
   min-height: 400px;
-  overflow: auto;
-  bottom: 68px;
+  overflow: none;
+  .transition300ms;
 }
 
 .trpContentSpacer {
@@ -307,88 +413,126 @@ a:hover {
 }
 
 .trpHeaderWrapper {
-  display: inline-block;
 	width: 100%;
-	height: 60px;
-	background-color: white;
+	height: 50px;
 	text-align: center;
 	position: fixed;
-	z-index: 1000;
+	z-index: 200;
 	overflow: hidden;
-	opacity: 0.92;
-/*	border-top: 2px solid @trpGreen;*/
+  .transition300ms;
+  top: 0;
+  padding: 10px 0;
+/*  background-image: -webkit-gradient(
+    linear, left top, left bottom, from(rgba(255,255,255,0.96)),
+    to(rgba(255,255,255,0)), color-stop(.8,#FFF)
+  );*/
+  background: @trpBgColor2;
 }
 
 .trpHeaderContainer {
+  display: block;
+  text-align: center;
+  margin-left: 130px;
+  margin-right: 280px;
+  .transition300ms;
+
+  .trpSettingsButton {
+    @media @mid {
+      display: none;
+    }
+  }
+
+  @media @mid {
+    margin-left: @leftMarginMid;
+    margin-right: @rightMarginMid;
+  }
+
+  @media @small {
+    margin-left: @leftMarginSmall;
+    margin-right: @rightMarginSmall
+  }
+
+}
+
+.trpTroupeMoreActions {
+  display: none;
+}
+
+.trpTroupeFavourite, .trpTroupeSettings, .trpTroupeMoreActions{
+  padding: 12px 0 12px 20px;
+  @media @mid {
+    display: inline-block;
+    width: 100%;
+    padding-left: 30px;
+    opacity: 0.6;
+  }
+}
+
+.trpTroupeFavourite img {
+	display: none;
+  padding-right: 10px;
+}
+
+.trpTroupeFavourite img.unfavourited {
+	display: inline-block;
+  vertical-align: top;
+}
+
+.trpTroupeFavourite.favourited img.unfavourited {
+	display: none;
+}
+
+.trpTroupeFavourite.favourited img.favourited {
+	display: inline-block;
+  vertical-align: top;
+}
+
+
+//
+.trpTroupeFavourite .trpActionsMenuLabel {
+  display: none;
+}
+
+.trpTroupeFavourite .trpActionsMenuLabel.unfavourited {
   display: inline-block;
-  position: relative;
-	background-color: white;
-	text-align: center;
-	overflow: hidden;
+  @media @mid {
+    display: none;
+  }
 }
 
-.trpHeaderFrame {
-	display: inline-block;
-	position: relative;
+.trpTroupeFavourite.favourited .trpActionsMenuLabel.unfavourited {
+  display: none;
+  @media @mid {
+    display: none;
+  }
 }
 
-.trpHeaderFavourite {
-	display: inline-block;
-	width: 24px;
-	height: 24px;
-	padding: 5px;
-	vertical-align: top;
+.trpTroupeFavourite.favourited .trpActionsMenuLabel.favourited {
+  display: inline-block;
+  @media @mid {
+    display: none;
+  }
 }
 
-.trpHeaderFavourite img {
-	display: none;
-}
-
-.trpHeaderFavourite img.unfavourited {
-	display: inline-block;
-}
-
-.trpHeaderFavourite.favourited img.unfavourited {
-	display: none;
-}
-
-.trpHeaderFavourite.favourited img.favourited {
-	display: inline-block;
-}
-
-.trpHeaderFavourite img {
-	padding-top: 10px;
-}
-
-.trpHeaderFavIcon {
-	opacity: 0.5;
-	transition: opacity .5s ease-in-out;
-   -moz-transition: opacity 5s ease-in-out;
-   -webkit-transition: opacity .5s ease-in-out;
-}
-
-.trpHeaderFavIcon:hover {
-	opacity: 1;
-}
-
-.trpHeaderSpacer {
-	.trpHeaderFavourite;
+.trpTroupeSettings img {
+  padding-right: 10px;
 }
 
 .trpHeaderTitle {
-  display: inline-block;
+  display: block;
 	.trpH1;
 	text-align: left;
 	color: #333;
-	padding-top: 12px;
-	padding-left: 20px;
-	height: 60px;
+	padding-top: 6px;
+	padding-left: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden
 }
 
 .trpHeaderToolbar {
+  float: right;
   display: inline-block;
-	min-width: 200px;
-	height: 60px;
 	vertical-align: top;
 	text-align: left;
 }
@@ -396,9 +540,10 @@ a:hover {
 .trpSettingsButton {
   display: inline-block;
 	float: left;
-	padding-top: 16px;
+	padding-top: 12px;
 /*	border-top: 2px solid @trpGreen;*/
 	margin: 0;
+  padding-right: 10px;
 }
 
 .trpProfileButton {
@@ -469,32 +614,121 @@ a:hover {
 }
 
 .trpChatPanel {
-  display: inline-block;
-	min-width: 700px;
-	max-width: 700px;
+  display: block;
+	margin-left: @leftMarginFull;
+	margin-right: @rightMarginFull;
 /*	min-height: 600px;
 	height: 100%;*/
 	text-align: left;
-	padding-top: 40px;
-	border-radius: 5px;
+	text-align: center;
+  .transition300ms;
+  height: 100%;
+
+  @media @mid {
+    margin-left: @leftMarginMid;
+    margin-right: @rightMarginMid;
+  }
+
+  @media @small {
+    margin-left: @leftMarginSmall;
+    margin-right: @rightMarginSmall
+  }
 }
 
 .trpToolbar {
+  color: #333;
+/*  border-left: 2px solid @trpGreen;*/
   position: fixed;
   display: inline-block;
-  min-width: 200px;
-  max-width: 200px;
+  width: 240px;
   text-align: left;
-  margin-top: 40px;
   vertical-align: top;
-  margin-left: -200px;
-  top: 55px;
-  bottom: 85px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: @trpBgColor;
+  z-index: 400;
+  .transition300ms;
+
+ .trpMiniActions {
+    display: none;
+    @media @mid {
+      display: block;
+      opacity: 0.8;
+    }
+  }
+
+  .trpToolbarHeader {
+    padding-left: 20px;
+  }
+
+  .trpToolbarList {
+    min-height: 40px;
+    max-height: 140px;
+    overflow: auto;
+  }
+
+  .oneToOne {
+    max-height: 300px;
+  }
+
+  @media @mid {
+    width: 88px;
+    padding-right: 0px;
+    padding-top: 16px;
+
+    #people-header {
+      display: none;
+    }
+
+    #people-list .trpToolbarListContent
+    {
+      margin-left: 6px;
+    }
+  }
+
+  @media @small {
+    width: 0;
+    padding-right: 0;
+  }
+
+}
+
+.trpChatInputArea.rightCollapse, .trpHeaderContainer.rightCollapse, .trpChatPanel.rightCollapse {
+  margin-right: 510px;
+
+  @media @mid {
+    margin-right: 120px;
+  }
+}
+
+.trpToolbar.rightCollapse {
+  right: 235px;
+}
+
+.trpChatInputArea.leftCollapse, .trpHeaderContainer.leftCollapse, .trpChatPanel.leftCollapse {
+  margin-left: @leftMarginFull;
+
+  @media @mid {
+    margin-left: @leftMarginMid;
+  }
+
+  @media @small {
+    margin-left: @leftMarginSmall;
+  }
+
+}
+
+.trpToolbar:hover {
+  opacity: 1;
+}
+
+.trpRightPanel:hover + .trpToolbar {
+  opacity: 1;
 }
 
 .trpToolbar .nano {
 	height: 100%;
-
 }
 
 .trpToolbarSpacer {
@@ -503,17 +737,68 @@ a:hover {
 
 .trpToolbarContent {
   display: inline-block;
-	width: 200px;
-	vertical-align: top;
+  width: 100%;
+  vertical-align: top;
+  height: 100%;
+
+  @media @mid {
+
+    .trpToolbarHeader.divider:first-child {
+      border-bottom: 0;
+    }
+
+    .trpToolbarList {
+      max-height: 40%;
+    }
+
+    .trpToolbarList .trpDisplayPicture {
+      margin-bottom: 8px;
+    }
+
+  }
+}
+
+#file-nano .content {
+  bottom: 40px;
+}
+
+#file-nano .pane {
+  bottom: 40px;
+}
+
+#file-nano .trpToolbarList {
+  padding-bottom: 0px;
+}
+
+#mail-nano .content {
+  bottom: 40px;
+}
+
+#mail-nano .pane {
+  bottom: 40px;
+}
+
+#mail-nano .trpToolbarList {
+  padding-bottom: 0px;
+}
+
+.divider {
+  border-bottom: 1px solid @trpBgAccent;
+}
+
+.divider-top {
+  border-top: 1px solid @trpBgAccent;
 }
 
 .trpToolbarHeader {
 	font-family: @fontSans;
 	font-size: 12px;
 	text-transform: uppercase;
-	padding-bottom: 4px;
+	padding-bottom: 8px;
 	cursor: pointer;
+  padding-top: 16px;
 }
+
 
 .trpLeftMenu .trpToolbarHeader {
 	margin-left: 9px;
@@ -522,22 +807,42 @@ a:hover {
 .trpToolbarList {
   display: inline-block;
 	vertical-align: top;
-	padding-bottom: 12px;
+	padding-bottom: 20px;
+  width: 100%;
+}
+
+.trpToolbarListContent {
+  padding-left: 20px;
 }
 
 .trpRightPanel {
 	position: fixed;
-	width: 240px;
-	right: -240px;
-	top: 60px;
+	width: 210px;
+	right: -20px;
+  padding-left: 25px;
+	top: 0;
+	bottom: 0;
 	overflow: hidden;
 	color: white;
 	font-size: 20px;
-	z-index: 12;
-	background-color: #ecf1ec;
-	padding-top: 40px;
-	display: none;
+	background-color: #d3dfd3;
+	padding-top: 20px;
 	text-align: left;
+	z-index: 300;
+  opacity: 0.95;
+  .transition300ms;
+
+  @media @mid {
+    right: -235px;
+  }
+}
+
+.trpRightPanel.visible {
+  right: 0px;
+}
+
+.trpRightPanel:hover {
+  opacity: 1;
 }
 
 .trpItemDetails {
@@ -552,31 +857,48 @@ a:hover {
   display: inline-block;
 	background-color: @trpGreen;
 	position: absolute;
-	right: 20px;
+	right: 28px;
 	text-align: center;
 	.trpBodySmall;
 	padding: 4px 6px;
 	letter-spacing: 1px;
 }
 
+.trpDetailViewContainer {
+
+}
+
 .trpChatInputWrapper {
-  display: inline-block;
-	width: 100%;
-	background-color: white;
-	text-align: center;
-	position: fixed;
-	z-index: 1000;
-	overflow: hidden;
-	bottom: 0px;
-  min-height: 78px;
+  width: 100%;
+  min-height: 56px;
+  background-color: @trpBgColor2;
+  text-align: center;
+  position: fixed;
+  z-index: 100;
+  overflow: hidden;
+  bottom: 0px;
+  .transition300ms;
+  padding-top: 8px;
 }
 
 .trpChatInputArea {
-	display: inline-block;
-	position: relative;
-	width: 700px;
-	text-align: left;
-  padding: 10px 0px;
+  display: block;
+  text-align: center;
+  margin-left: @leftMarginFull;
+  margin-right: @rightMarginFull;
+  .transition300ms;
+
+  @media @mid {
+    margin-left: @leftMarginMid;
+    margin-right: @rightMarginMid;
+    padding-right: 12px;
+  }
+
+  @media @small {
+    margin-left: @leftMarginSmall;
+    margin-right: @rightMarginSmall
+  }
+
 }
 
 .login-content {
@@ -594,8 +916,9 @@ a:hover {
 .notification-center {
 	width: 280px;
 	position: fixed;
-	bottom: 50px;
-	z-index: 1500;
+	top: 50px;
+	z-index: 900;
+  left: 82px;
 }
 
 .notification {
@@ -642,6 +965,7 @@ a:hover {
   width: 32px;
   height: 32px;
   overflow: hidden;
+  left: 20px;
 }
 
 .button-choose-avatar input {
@@ -707,3 +1031,185 @@ a:hover {
 .canLeave #leave-troupe {
 	display: inline-block;
 }
+
+
+.trpHeaderFavourite .avatar-s {
+  width: 32px;
+  height: 32px;
+}
+
+.trpTroupeRelatedContent {
+  @media @mid {
+    position: fixed;
+    right: 88px;
+    width: 0px;
+    top: 0;
+    bottom: 0;
+    background-color: @trpBgColor3;
+    .transition300ms;
+    overflow: hidden;
+    padding-top: 10px;
+    margin: -10px 0;
+    -webkit-transform: translate3d(0, 0, 0);
+    border-left: 0px solid rgba(211, 223, 211, 0.6);
+    background-clip: padding-box;
+  }
+  &.visible {
+    @media @mid {
+
+      width:240px;
+      /*box-shadow: 3px 3px #d3dfd3, -1px 3px 3px 2px rgba(68,68,68,0.2);*/
+/*      box-shadow: -2px 1px 6px -2px rgba(50, 50, 50, 0.55);*/
+      border-left: 4px solid rgba(211, 223, 211, 0.6);
+      background-clip: padding-box;
+    }
+  }
+}
+
+.trpTroupeRelatedContentHolder {
+  min-width: 230px;
+  overflow: hidden;
+  height: 100%;
+}
+
+.trpTroupeActions {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding-top: 20px;
+  cursor: pointer;
+}
+
+.trpActionsMenuLabel {
+  .trpBodyMedium;
+  display: inline-block;
+  vertical-align: middle;
+  @media @mid {
+    display: none;
+  }
+}
+
+@media screen and (max-width:1024px) {
+
+  .trpHeaderFavourite {
+    margin-left: 0px;
+  }
+
+  .uv-tab {
+    right: 100px;
+    display: none;
+  }
+
+}
+
+@media screen and (max-width:550px) {
+
+  .trpHeaderFavourite .avatar-s {
+    display: none;
+  }
+
+  .trpChatAvatar {
+    margin-left: 10px;
+    margin-top: 0;
+    margin-bottom: -8px;
+    .transition300ms;
+  }
+
+  .trpChatInputArea .avatar-s {
+    display: none;
+  }
+
+  .trpChatInputBox {
+    margin-left: 0;
+  }
+
+  .trpHeaderFavourite {
+    padding-left: 0px;
+  }
+
+  .trpHeaderTitle {
+    padding-left: 0px;
+    font-size: 20px;
+  }
+
+  .trpChatDetails {
+    margin-left: 24px;
+    .transition300ms;
+    margin-top: -1px;
+  }
+
+  .trpChatFrom {
+    color: #AAA;
+    .transition300ms;
+  }
+
+	.trpChatItem .avatar-s {
+		width: 16px;
+		height: 16px;
+    .transition300ms;
+	}
+
+	.trpChatBox {
+		margin-left: 0px;
+	}
+
+	#request-roster, #invite-roster, #file-list, #mail-list, #people-share-troupe-button {
+
+	}
+
+}
+
+
+/* Andrews Stuffs */
+.trpSmartBarItems ul {
+	position: relative;
+	list-style-type: none;
+	padding: 0;
+}
+
+.trpSmartBarItems li {
+    position: absolute; top: 0; left: 0;
+    height: 46px; 
+    width: 100%;
+    .avatar-s {
+    	margin: 0;
+    }
+}
+
+.trpSmartBarItems .animated li {
+	transition: all 0.3s ease-in;
+	-webkit-transition: all 0.3s ease-in;
+}
+
+.trpSmartItem (@i) {
+  -webkit-transform: translate3d(0, @i, 0);
+  transform: translate3d(0, @i, 0);
+}
+
+
+.trpSmartBarItems {
+  #i0   { .trpSmartItem(0%); }
+  #i1   { .trpSmartItem(100%); }
+  #i2   { .trpSmartItem(200%); }
+  #i3   { .trpSmartItem(300%); }
+  #i4   { .trpSmartItem(400%); }
+  #i5   { .trpSmartItem(500%); }
+  #i6   { .trpSmartItem(600%); }
+  #i7   { .trpSmartItem(700%); }
+  #i8   { .trpSmartItem(800%); }
+  #i9   { .trpSmartItem(900%); }
+  #i10  { .trpSmartItem(1000%); }
+  #i11  { .trpSmartItem(1100%); }
+  #i12  { .trpSmartItem(1200%); }
+  #i13  { .trpSmartItem(1300%); }
+  #i14  { .trpSmartItem(1400%); }
+  #i15  { .trpSmartItem(1500%); }
+  #i16  { .trpSmartItem(1600%); }
+  #i17  { .trpSmartItem(1700%); }
+  #i18  { .trpSmartItem(1800%); }
+  #i19  { .trpSmartItem(1900%); }
+  #i20  { .trpSmartItem(2000%); }
+  #i21  { .trpSmartItem(2100%); }
+
+}
+
