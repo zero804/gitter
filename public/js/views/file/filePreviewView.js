@@ -238,9 +238,8 @@ define([
 
     afterRender: function() {
       var body = this.$el.find('.frame-preview');
-      // todo make this the dialog height instead of window height
       var h = Math.round($(window).height() * 0.7)  - headerHeight;
-      body.height(h);
+      body.css({ minHeight: h });
 
       var w= Math.round($(window).width() * 0.8)  - dialogWidth;
       body.width(w);
