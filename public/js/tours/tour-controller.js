@@ -43,7 +43,7 @@ define([
         id: 'WELCOME',
         content: "Welcome to Troupe. This tour will take you through everything you need to know in order " +
                  "to get started. Click next to begin. ",
-        target: ".trpHeaderTitle",
+        target: "#welcomeBox",
         placement: "bottom",
         showNextButton: true,
         showCTAButton: true,
