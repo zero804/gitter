@@ -36,15 +36,15 @@ require([
       var modal = new TroupeViews.ConfirmationModal({
         confirmationTitle: "Reset Failed",
         body: "That password reset link is invalid.",
-        buttons: [
+        menuItems: [
           {
-            id: "retry-reset",
+            action: "retry-reset",
             text: "Back to login"
           }
         ]
       });
 
-      modal.on('button.click', function() {
+      modal.on('menuItemClicked', function() {
         modal.transitionTo(createLoginModal());
       });
 

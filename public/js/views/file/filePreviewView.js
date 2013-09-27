@@ -113,21 +113,21 @@ define([
       var modal = new TroupeViews.ConfirmationModal({
         title: "Are you sure?",
         body: confirmDeleteTemplate(this.model.toJSON()),
-        buttons: [
-          { id: "yes", text: "Yes", additionalClasses: "" },
-          { id: "no", text: "No"}
+        menuItems: [
+          { action: "yes", text: "Yes", additionalClasses: "" },
+          { action: "no", text: "No"}
         ]
       });
 
-      modal.on('button.click', function(id) {
-        if (id === "yes")
+      modal.on('menuItemClicked', function(action) {
+        if (action === "yes")
           that.model.destroy({
             success: function() {
               window.location.hash = '#';
             }
           });
 
-        modal.off('button.click');
+        modal.off('menuItemClicked');
         modal.hide();
       });
 

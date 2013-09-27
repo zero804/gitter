@@ -34,7 +34,7 @@ define([
 
     onRemoveClicked: function() {
       var thisPerson = this;
-      var view = new ConfirmRemoveModalView({ model: this.model });
+    var view = new ConfirmRemoveModalView({ model: this.model });
       var modal = new TroupeViews.Modal({ view: view  });
 
       view.on('confirm.yes', function() {
