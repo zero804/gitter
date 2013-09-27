@@ -14,3 +14,10 @@
 <div class="modal-body">
 
 </div>
+{{#hasMenuItems}}
+<div class="modal-footer frame-menu-items">
+  {{#each menuItems}}
+  <button class="trpModalButton trpButtonBig trpBtnGreen button" data-action="{{this.action}}">{{this.text}}</button>
+  {{/each}}
+</div>
+{{/hasMenuItems}}

@@ -164,7 +164,7 @@ class SignupTests(unittest.TestCase):
 
     def assertUserhomeIsCurrentPage(self, username):
         # wait for page to load
-        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, 'mini-left-menu')))
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, 'welcomeBox')))
 
         current_url = self.driver.current_url
         # IE9 adds a # to the end of the URL, sucks
