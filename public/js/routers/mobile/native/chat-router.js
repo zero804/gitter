@@ -8,8 +8,9 @@ require([
   'views/chat/chatInputView',
   'components/unread-items-client',
   'components/cache-sync',
-  'components/oauth',         // No ref
-  'components/native-context' // No ref
+  'components/in-app-browser',    // No Ref
+  'components/oauth',             // No ref
+  'components/native-context'     // No ref
   ], function($, MobileRouter, chatModels, context, ChatCollectionView,
     chatInputView, unreadItemsClient, cacheSync) {
   "use strict";
