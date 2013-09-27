@@ -5,9 +5,10 @@ define([
   'underscore',
   'views/base',
   'hbs!./tmpl/filePreviewView',
+  'hbs!./tmpl/confirmDelete',
   'backbone.keys',
   'log!file-preview-view'
-], function($, _, TroupeViews, template, backboneKeys, log) {
+], function($, _, TroupeViews, template, confirmDeleteTemplate, backboneKeys, log) {
   /*jslint browser: true*/
   "use strict";
 
@@ -105,7 +106,29 @@ define([
     },
 
     deleteFile: function() {
+      var that = this;
+      var modal = new TroupeViews.ConfirmationModal({
+        title: "Are you sure?",
+        body: confirmDeleteTemplate(this.model.toJSON()),
+        buttons: [
+          { id: "yes", text: "Yes", additionalClasses: "" },
+          { id: "no", text: "No"}
+        ]
+      });
 
+      modal.on('button.click', function(id) {
+        if (id === "yes")
+          that.model.destroy({
+            success: function() {
+              window.location.hash = '#';
+            }
+          });
+
+        modal.off('button.click');
+        modal.hide();
+      });
+
+      modal.show();
     },
 
     supportsModelReplacement: function() {
@@ -212,6 +235,7 @@ define([
 
     afterRender: function() {
       var body = this.$el.find('.frame-preview');
+      // todo make this the dialog height instead of window height
       var h = Math.round($(window).height() * 0.7)  - headerHeight;
       body.height(h);
 
@@ -231,7 +255,7 @@ define([
       options.title = 'Files';
       options.menuItems = [
         { text: "Download", action: "download" },
-        // { text: "Delete", action: "delete" }
+        { text: "Delete", action: "delete" }
       ];
       TroupeViews.Modal.prototype.initialize.call(this, options);
       this.view = new PreviewView({ model: this.model, collection: this.collection });
