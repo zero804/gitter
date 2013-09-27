@@ -102,7 +102,7 @@ define([
     updateRender: function() {
       this.setState();
 
-      var editIconTooltip = (this.hasBeenEdited()) ? "Edited shortly after being sent": ((this.canEdit()) ? "Edit within 4 minutes of sending" : "It's too late to edit this message.");
+      var editIconTooltip = (this.hasBeenEdited()) ? "Edited shortly after being sent": ((this.canEdit()) ? "Edit within 4 minutes of sending" : ((this.isOwnMessage()) ? "It's too late to edit this message." : "You can't edit someone else's message"));
       var editIcon = this.$el.find('.trpChatEdit [title]');
 
       if (!window._troupeCompactView) {
