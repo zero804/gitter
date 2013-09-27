@@ -237,20 +237,12 @@ module.exports = function( grunt ) {
 
     // default watch configuration
     watch: {
-      reload: {
+      less: {
         files: [
-          'public/js/**/*.js',
-          'public/**/*.hbs',
-          'public/bootstrap/css/*.css'
+          'public/bootstrap/less/*.less'
         ],
-        tasks: 'reload'
-      } //,
-      //less: {
-       // files: [
-        //  'public/**/*.less'
-        //],
-        //tasks: 'less'
-      //}
+        tasks: 'less'
+      }
     },
 
     // default lint configuration, change this to match your setup:
@@ -542,6 +534,8 @@ module.exports = function( grunt ) {
 
   grunt.loadNpmTasks('grunt-contrib-requirejs');
   grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-reload');
   grunt.loadNpmTasks('grunt-bower-require-wrapper');

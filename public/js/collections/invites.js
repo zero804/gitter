@@ -18,7 +18,7 @@ define([
       return !this.get('oneToOneInvite') || this.get('troupeId');
     }
 
-  });
+  }, { modelType: 'invite' });
 
   var InviteCollection = TroupeCollections.LiveCollection.extend({
     model: InviteModel,

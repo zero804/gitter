@@ -17,7 +17,8 @@ define([
   return Marionette.Layout.extend({
     template: template,
     tagName: 'span',
-    selectedListIcon: "icon-mega",
+    selectedListIcon: "icon-troupes",
+    serializeData: function() { return { compactView: window._troupeCompactView }; },
 
     regions: {
       unread: "#left-menu-list-unread",
@@ -50,23 +51,25 @@ define([
     onRender: function() {
       this.$el.find('.nano').nanoScroller(/*{ preventPageScrolling: true }*/);
 
-      // recent troupe view
-      this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentTroupes }));
-
       // normal troupe view
       this.troupes.show(new TroupeCollectionView({collection: troupeCollections.normalTroupes, emptyView: Marionette.ItemView.extend({ template: troupeListItemEmpty })}));
 
       // one to one troupe view
       this.people.show(new TroupeCollectionView({collection: troupeCollections.peopleTroupes, emptyView: Marionette.ItemView.extend({ template: privateTroupeListItemEmpty })}));
 
-      // unread troupe view
-      this.unread.show(new TroupeCollectionView({collection: troupeCollections.unreadTroupes }));
+      if (window._troupeCompactView) {
+        // mega-list: recent troupe view
+        this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentTroupes }));
 
-      // favourite troupe view
-      this.favs.show(new TroupeCollectionView({ collection: troupeCollections.favouriteTroupes }));
+        // mega-list: unread troupe view
+        this.unread.show(new TroupeCollectionView({collection: troupeCollections.unreadTroupes }));
 
-      // incoming invites collection view
-      this.invites.show(new InvitesView({ collection: troupeCollections.incomingInvites }));
+        // mega-list: favourite troupe view
+        this.favs.show(new TroupeCollectionView({ collection: troupeCollections.favouriteTroupes }));
+
+        // mega-list: incoming invites collection view
+        this.invites.show(new InvitesView({ collection: troupeCollections.incomingInvites }));
+      }
 
       // incoming troupe invites view
       this.incomingTroupeInvites.show(new InvitesView({ collection: troupeCollections.incomingTroupeInvites }));
@@ -82,6 +85,11 @@ define([
       this.search.show(this.searchView);
 
       this.initHideListeners();
+
+      var self = this;
+      if (!window._troupeCompactView) {
+        self.showTab('icon-troupes');
+      }
 
     },
 
@@ -109,19 +117,21 @@ define([
     },
 
     toggleMegaList: function() {
-      var c = troupeCollections;
-      var invisibile = (c.unreadTroupes.length === 0 && c.favouriteTroupes.length === 0 && c.recentTroupes.length === 0 && c.incomingInvites.length === 0);
+      if (window._troupeCompactView) {
+        var c = troupeCollections;
+        var invisibile = (c.unreadTroupes.length === 0 && c.favouriteTroupes.length === 0 && c.recentTroupes.length === 0 && c.incomingInvites.length === 0);
 
-      var icon = this.$el.find('#icon-mega');
-      if (invisibile) {
-        icon.hide();
-        if (!this.selectedListIcon || this.selectedListIcon === 'icon-mega') {
-          this.showTab('icon-troupes');
+        var icon = this.$el.find('#icon-mega');
+        if (invisibile) {
+          icon.hide();
+          if (!this.selectedListIcon || this.selectedListIcon === 'icon-mega') {
+            this.showTab('icon-troupes');
+          }
         }
-      }
-      else {
-        icon.show();
-        this.showTab('icon-mega');
+        else {
+          icon.show();
+          this.showTab('icon-mega');
+        }
       }
     },
 

@@ -21,7 +21,7 @@ define([
 
       data.fileIcon = this.model.get('thumbnailUrl');
       data.useSpinner = !this.hasThumb();
-
+      data.previewUrl  = '#file/preview/' + this.model.get('id');
       return data;
     },
 
