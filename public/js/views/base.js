@@ -239,7 +239,11 @@ define([
     },
 
     onMenuItemClicked: function(e) {
-      this.view.trigger('menuItemClicked', $(e.target).attr('data-action'));
+      e.preventDefault();
+
+      var action = $(e.target).attr('data-action');
+      this.view.trigger('menuItemClicked', action);
+      this.trigger('menuItemClicked', action);
     },
 
     afterRender: function() {
@@ -858,15 +862,13 @@ define([
     template: confirmationViewTemplate,
 
     initialize: function(options) {
-      if(options.buttons) this.buttons = options.buttons;
       if(options.body) this.body = options.body;
       if(options.confirmationView) this.confirmationView = options.confirmationView;
     },
 
     getRenderData: function() {
       return {
-        body: this.body,
-        buttons: this.buttons
+        body: this.body
       };
     },
 
@@ -874,26 +876,6 @@ define([
       if(this.confirmationView) {
         this.$el.find('#confirmation').append(this.confirmationView.render().el);
       }
-    },
-
-    events: {
-      "click .button": "buttonClicked"
-    },
-
-    buttonClicked: function(e) {
-      e.preventDefault();
-
-      var id = $(e.target).attr('id');
-
-      if(this.dialog) {
-        this.dialog.trigger('button.click', id);
-      }
-
-      if(this.confirmationView) {
-        this.confirmationView.trigger('button.click', id);
-      }
-
-      this.trigger('button.click', id);
     }
   });
 
