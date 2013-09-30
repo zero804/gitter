@@ -256,9 +256,9 @@ define([
     initialize: function(options) {
       options.title = 'Files';
       options.menuItems = [
-        { text: "Download", action: "download" },
-        { text: "Versions", action: "versions" },
-        { text: "Delete", action: "delete" }
+        { text: "Download", action: "download", class: "trpBtnGreen" },
+        { text: "Versions", action: "versions", class: "trpBtnLightGrey" },
+        { text: "Delete", action: "delete", class: "trpBtnRed" }
       ];
       TroupeViews.Modal.prototype.initialize.call(this, options);
       this.view = new PreviewView({ model: this.model, collection: this.collection });
