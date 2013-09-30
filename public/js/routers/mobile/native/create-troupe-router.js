@@ -29,14 +29,7 @@ require([
     defaultAction: function(){
       var troupeCollection = new troupeModels.TroupeCollection();
 
-      var modal = new createTroupeView.Modal({ disableClose: true, collection: troupeCollection });
-      // inviteModal.on('invite:accept', function(data) {
-      //   window.location.assign('chat#' + data.troupeId);
-      // });
-
-      // inviteModal.on('invite:reject', function() {
-      //   window.location.assign('chat');
-      // });
+      var modal = new createTroupeView.Modal({ disableClose: true, collection: troupeCollection, nativeMode: true });
 
       modal.show();
     }
