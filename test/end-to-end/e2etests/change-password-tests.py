@@ -151,7 +151,7 @@ class ChangePasswordTests(unittest.TestCase):
         self.driver.find_element_by_css_selector('.close').click()
 
     def inviteToTroupe(self, email):
-        self.driver.find_element_by_id('people-share-troupe-button').click()
+        self.driver.get(utils.baseUrl('/#|share'))
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, 'custom-email')))
         self.driver.find_element_by_id('custom-email').send_keys(email)
         self.driver.find_element_by_id('custom-email-button').click()
