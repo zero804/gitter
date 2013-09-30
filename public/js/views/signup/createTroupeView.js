@@ -99,8 +99,11 @@ define([
         wait: true,
         success: function(troupe /*, resp, options*/) {
           that.enableForm();
-          log('response from upgrading one to one troupe', troupe);
-          window.location.href = "/" + troupe.get('uri') + "#|share";
+          if(that.options.nativeMode) {
+            window.location.href = "/mobile/people#" + troupe.id + "|share";
+          } else {
+            window.location.href = "/" + troupe.get('uri') + "#|share";
+          }
         }
       });
     }, 1000, true)
