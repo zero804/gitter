@@ -1,4 +1,6 @@
-from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from nose.plugins.attrib import attr
 import utils
@@ -75,14 +77,10 @@ class ChatTests(unittest.TestCase):
         if self.driverName != 'FIREFOX':
             lastChat = self.driver.find_element_by_css_selector('.trpChatItem')
 
-            actionChain = ActionChains(self.driver)
-            actionChain.move_to_element(self.driver.find_element_by_css_selector('.trpChatBox'))
-            editButton = self.driver.find_element_by_css_selector('.trpChatEdit')
-            actionChain.move_to_element(editButton)
-            actionChain.click()
-            actionChain.perform()
-
-            # self.driver.find_element_by_css_selector('.trpChatEdit').click()
+            self.driver.find_element_by_css_selector('.trpChatBox').click();
+            WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.trpChatEdit')))
+            self.driver.find_element_by_css_selector('.trpChatEdit').click();
+            WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.trpChatInput')))
 
             editInput = lastChat.find_element_by_css_selector('.trpChatInput')
 
