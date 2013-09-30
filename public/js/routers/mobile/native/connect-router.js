@@ -27,14 +27,6 @@ require([
 
     defaultAction: function(){
       var modal = new shareSearchView.Modal({ disableClose: true, inviteToConnect: true });
-      // inviteModal.on('invite:accept', function(data) {
-      //   window.location.assign('chat#' + data.troupeId);
-      // });
-
-      // inviteModal.on('invite:reject', function() {
-      //   window.location.assign('chat');
-      // });
-
       modal.show();
     }
 
