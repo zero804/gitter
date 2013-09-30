@@ -13,8 +13,10 @@ define([
   'zeroclipboard',
   'utils/appevents',
   'collections/suggested-contacts',
-  'bootstrap-typeahead', // No reference
-  'utils/validate-wrapper' // No reference
+  'bootstrap-typeahead',              // No ref
+  'utils/validate-wrapper',           // No ref
+  'jquery-placeholder'                // No ref
+
 ], function($, _, Marionette, context, TroupeViews, cocktail, InfiniteScrollMixin, template,
   rowTemplate, noContactsTemplate, ZeroClipboard, appEvents, suggestedContactModels) {
   "use strict";
@@ -136,9 +138,16 @@ define([
     },
 
     getShareUrl: function() {
-      var connectMode = this.isConnectMode();
+      var url;
+      if(this.isConnectMode()) {
+        var user = context.getUser();
+        url = user && user.url;
+      } else {
+        var troupe = context.getTroupe();
+        url = troupe && troupe.url;
+      }
 
-      return context.env('basePath') + (connectMode ? context.getUser().url : context.getTroupe().url);
+      return context.env('basePath') + url;
     },
 
     getRenderData: function() {
