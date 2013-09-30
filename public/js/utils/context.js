@@ -1,20 +1,24 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'underscore',
   'backbone'
-], function(_, Backbone) {
+], function(Backbone) {
   "use strict";
 
   var ctx = window.troupeContext || {};
-  var troupe, user;
 
-  (function() {
-    var troupeModel, userModel;
+  function getTroupeModel() {
+    var troupeModel;
     if(ctx.troupe) {
       troupeModel = ctx.troupe;
     } else if(ctx.troupeId) {
       troupeModel = { id: ctx.troupeId };
     }
+
+    return new Backbone.Model(troupeModel);
+  }
+
+  function getUserModel() {
+    var userModel;
 
     if(ctx.user) {
       userModel = ctx.user;
@@ -22,16 +26,16 @@ define([
       userModel = { id: ctx.userId };
     }
 
-    troupe = new Backbone.Model(troupeModel);
-    user = new Backbone.Model(userModel);
-  })();
+    return new Backbone.Model(userModel);
+  }
+
+  var troupe = getTroupeModel();
+  var user = getUserModel();
 
   var context = function() {
     return ctx;
   };
 
-  /* Unlike getTroupe() this returns a Backbone Model, upon which events can be placed, etc */
-  // Note: this troupe model is not connected to the live event updates
   context.troupe = function() {
     return troupe;
   };
@@ -41,7 +45,7 @@ define([
   };
 
   function clearOtherAttributes(s, v) {
-    _.each(_.keys(v.attributes), function(key) {
+    Object.keys(v.attributes).forEach(function(key) {
       if(!s.hasOwnProperty(key)) {
         s[key] = null;
       }
@@ -130,8 +134,11 @@ define([
 
   context.testOnly = {
     resetTroupeContext: function(newContext) {
-      troupe = null;
+
       ctx = newContext;
+      troupe = getTroupeModel();
+      user = getUserModel();
+
     }
   };
 
