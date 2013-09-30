@@ -6,7 +6,6 @@ define([
 ], function($, context, log) {
   "use strict";
 
-
   $(document).on('app.version.mismatch', function() {
     try {
       if(window.applicationCache.status == 1) {
