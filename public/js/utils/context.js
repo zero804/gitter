@@ -5,13 +5,26 @@ define([
 ], function(_, Backbone) {
   "use strict";
 
-  /**
-   * This file is VERY MUCH in a state of transition.
-   *
-   * TODO: complete the transition!
-   */
   var ctx = window.troupeContext || {};
   var troupe, user;
+
+  (function() {
+    var troupeModel, userModel;
+    if(ctx.troupe) {
+      troupeModel = ctx.troupe;
+    } else if(ctx.troupeId) {
+      troupeModel = { id: ctx.troupeId };
+    }
+
+    if(ctx.user) {
+      userModel = ctx.user;
+    } else if(ctx.userId) {
+      userModel = { id: ctx.userId };
+    }
+
+    troupe = new Backbone.Model(troupeModel);
+    user = new Backbone.Model(userModel);
+  })();
 
   var context = function() {
     return ctx;
@@ -20,23 +33,11 @@ define([
   /* Unlike getTroupe() this returns a Backbone Model, upon which events can be placed, etc */
   // Note: this troupe model is not connected to the live event updates
   context.troupe = function() {
-    if(!troupe) {
-      var attributes;
-      if(ctx.troupe) {
-        attributes = ctx.troupe;
-      } else {
-        attributes = { id: ctx.troupeId };
-      }
-      troupe = new Backbone.Model(attributes);
-    }
-
     return troupe;
   };
 
   context.getTroupeId = function() {
-    if(troupe) return troupe.id;
-
-    return ctx.troupe && ctx.troupe.id || ctx.troupeId;
+    return troupe.id;
   };
 
   function clearOtherAttributes(s, v) {
@@ -51,47 +52,25 @@ define([
 
   /** TEMP - lets think of a better way to do this... */
   context.setTroupeId = function(value) {
-    if(troupe) {
-      // Clear all attributes
-      troupe.set(clearOtherAttributes({ id: value }, troupe));
-      return;
-    }
-
-    ctx.troupeId = value;
-    if(ctx.troupe && ctx.troupe.id !== value) {
-      ctx.troupe = null;
-    }
+    troupe.set(clearOtherAttributes({ id: value }, troupe));
+    return;
   };
 
   context.setTroupe = function(value) {
-    if(troupe) {
-      troupe.set(clearOtherAttributes(value, troupe));
-      return;
-    }
-
-    var c = context();
-    c.troupe = value;
+    troupe.set(clearOtherAttributes(value, troupe));
   };
 
 
   context.getUserId = function() {
-    var c = context();
-    return c.user && c.user.id || c.userId;
+    return user.id;
   };
 
   context.setUser = function(value) {
-    if(user) {
-      user.set(clearOtherAttributes(value, user));
-      return;
-    }
-
-    var c = context();
-    c.user = value;
+    user.set(clearOtherAttributes(value, user));
   };
 
   context.isAuthed = function() {
-    var c = context();
-    return user && user.id || c.user && c.user.id || c.userId;
+    return !!user.id;
   };
 
   context.getHomeUser = function() {
@@ -99,17 +78,12 @@ define([
   };
 
   context.inTroupeContext = function() {
-    return troupe || ctx.troupe || ctx.troupeId;
+    return !!troupe.id;
   };
 
   context.inOneToOneTroupeContext = function() {
     if(!context.inTroupeContext()) return false;
-    if(troupe) {
-      return troupe.get('oneToOne');
-    }
-
-    var t = ctx.troupe;
-    return t && t.oneToOne;
+    return !!troupe.get('oneToOne');
   };
 
   context.inUserhomeContext = function() {
@@ -118,50 +92,16 @@ define([
   };
 
   context.getUser = function() {
-    if(user) {
-      return user.toJSON();
-    }
-
-    if(ctx.user) {
-      return ctx.user;
-    }
-
-    if(ctx.userId) {
-      return { id: ctx.userId };
-    }
-
-    return null;
+    return user.toJSON();
   };
 
   // Unlike getUser, this returns a backbone model
   context.user = function() {
-    if(!user) {
-      var attributes;
-      if(ctx.user) {
-        attributes = ctx.user;
-      } else {
-        attributes = { id: ctx.userId };
-      }
-      user = new Backbone.Model(attributes);
-    }
-
     return user;
   };
 
   context.getTroupe = function() {
-    if(troupe) {
-      return troupe.toJSON();
-    }
-
-    if(ctx.troupe) {
-      return ctx.troupe;
-    }
-
-    if(ctx.troupeId) {
-      return { id: ctx.troupeId };
-    }
-
-    return null;
+    return troupe.toJSON();
   };
 
   context.popEvent = function(name) {
@@ -176,7 +116,7 @@ define([
   };
 
   context.isProfileComplete = function() {
-    return context().user.status !== 'PROFILE_NOT_COMPLETED';
+    return user.get('status') !== 'PROFILE_NOT_COMPLETED';
   };
 
   /**
