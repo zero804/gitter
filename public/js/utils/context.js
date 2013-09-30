@@ -11,7 +11,7 @@ define([
    * TODO: complete the transition!
    */
   var ctx = window.troupeContext || {};
-  var troupe;
+  var troupe, user;
 
   var context = function() {
     return ctx;
@@ -39,8 +39,8 @@ define([
     return ctx.troupe && ctx.troupe.id || ctx.troupeId;
   };
 
-  function clearOtherAttributes(s) {
-    _.each(_.keys(troupe.attributes), function(key) {
+  function clearOtherAttributes(s, v) {
+    _.each(_.keys(v.attributes), function(key) {
       if(!s.hasOwnProperty(key)) {
         s[key] = null;
       }
@@ -53,7 +53,7 @@ define([
   context.setTroupeId = function(value) {
     if(troupe) {
       // Clear all attributes
-      troupe.set(clearOtherAttributes({ id: value }));
+      troupe.set(clearOtherAttributes({ id: value }, troupe));
       return;
     }
 
@@ -65,7 +65,7 @@ define([
 
   context.setTroupe = function(value) {
     if(troupe) {
-      troupe.set(clearOtherAttributes(value));
+      troupe.set(clearOtherAttributes(value, troupe));
       return;
     }
 
@@ -80,13 +80,18 @@ define([
   };
 
   context.setUser = function(value) {
+    if(user) {
+      user.set(clearOtherAttributes(value, user));
+      return;
+    }
+
     var c = context();
     c.user = value;
   };
 
   context.isAuthed = function() {
     var c = context();
-    return c.user && c.user.id || c.userId;
+    return user && user.id || c.user && c.user.id || c.userId;
   };
 
   context.getHomeUser = function() {
@@ -113,7 +118,34 @@ define([
   };
 
   context.getUser = function() {
-    return ctx.user;
+    if(user) {
+      return user.toJSON();
+    }
+
+    if(ctx.user) {
+      return ctx.user;
+    }
+
+    if(ctx.userId) {
+      return { id: ctx.userId };
+    }
+
+    return null;
+  };
+
+  // Unlike getUser, this returns a backbone model
+  context.user = function() {
+    if(!user) {
+      var attributes;
+      if(ctx.user) {
+        attributes = ctx.user;
+      } else {
+        attributes = { id: ctx.userId };
+      }
+      user = new Backbone.Model(attributes);
+    }
+
+    return user;
   };
 
   context.getTroupe = function() {
