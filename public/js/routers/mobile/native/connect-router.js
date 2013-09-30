@@ -1,0 +1,47 @@
+/*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
+require([
+  'jquery',
+  'backbone',
+  'utils/context',
+  'views/shareSearch/shareSearchView',
+  'components/realtime',
+  'components/oauth',                 // No Ref
+  'template/helpers/all',             // No ref
+  'components/native-context'         // No ref
+], function($, Backbone, context, shareSearchView, realtime) {
+  /*jslint browser: true, unused: true */
+  "use strict";
+
+  // We have to do this so that the context gets populated
+  // At some stage we should generalise this
+  realtime.getClient();
+
+  var AppRouter = Backbone.Router.extend({
+    routes: {
+      '*actions': 'defaultAction'
+    },
+
+    initialize: function() {
+      this.constructor.__super__.initialize.apply(this);
+    },
+
+    defaultAction: function(){
+      var modal = new shareSearchView.Modal({ disableClose: true, inviteToConnect: true });
+      // inviteModal.on('invite:accept', function(data) {
+      //   window.location.assign('chat#' + data.troupeId);
+      // });
+
+      // inviteModal.on('invite:reject', function() {
+      //   window.location.assign('chat');
+      // });
+
+      modal.show();
+    }
+
+  });
+
+  new AppRouter();
+
+  Backbone.history.start();
+
+});
