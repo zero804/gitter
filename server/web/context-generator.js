@@ -35,7 +35,7 @@ exports.generateMiniContext = function(req, callback) {
 exports.generateSocketContext = function(userId, troupeId, callback) {
   return Q.all([
       serializeUserId(userId),
-      serializeTroupeId(troupeId, userId)
+      troupeId && serializeTroupeId(troupeId, userId) || undefined
     ])
     .spread(function(serializedUser, serializedTroupe) {
       return {
