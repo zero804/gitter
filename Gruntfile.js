@@ -161,6 +161,24 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
+                  name: "routers/mobile/native/connect-router",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
+                  name: "routers/mobile/native/create-troupe-router",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
                   name: "router-login",
                   include: [
                     "utils/tracking",
@@ -219,6 +237,8 @@ module.exports = function( grunt ) {
       "native-conversations-router": createClosureConfig('routers/mobile/native/conversations-router'),
       "native-people-router": createClosureConfig('routers/mobile/native/people-router'),
       "native-accept-router": createClosureConfig('routers/mobile/native/accept-router'),
+      "native-connect-router": createClosureConfig('routers/mobile/native/connect-router'),
+      "native-create-troupe-router": createClosureConfig('routers/mobile/native/create-troupe-router'),
       "router-login": createClosureConfig('router-login'),
       "complete-profile": createClosureConfig('complete-profile'),
       "tour-controller": createClosureConfig('tours/tour-controller'),
@@ -312,7 +332,9 @@ module.exports = function( grunt ) {
           "public/bootstrap/css/trpNativeFiles.css": "public/bootstrap/less/trpNativeFiles.less",
           "public/bootstrap/css/trpNativeConversations.css": "public/bootstrap/less/trpNativeConversations.less",
           "public/bootstrap/css/trpNativePeople.css": "public/bootstrap/less/trpNativePeople.less",
-          "public/bootstrap/css/trpNativeAccept.css": "public/bootstrap/less/trpNativeAccept.less"
+          "public/bootstrap/css/trpNativeAccept.css": "public/bootstrap/less/trpNativeAccept.less",
+          "public/bootstrap/css/trpNativeConnect.css": "public/bootstrap/less/trpNativeConnect.less",
+          "public/bootstrap/css/trpNativeCreateTroupe.css": "public/bootstrap/less/trpNativeCreateTroupe.less"
         }
       }
     },

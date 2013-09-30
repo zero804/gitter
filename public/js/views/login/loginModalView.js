@@ -6,7 +6,7 @@ define([
   'utils/context',
   'views/base',
   'hbs!./tmpl/loginModalView',
-  'jquery-placeholder'
+  'jquery-placeholder'           // No ref
 ], function($, _, context, TroupeViews, template) {
   "use strict";
 

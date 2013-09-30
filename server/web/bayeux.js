@@ -268,7 +268,7 @@ var authenticator = {
     var connectionType = parts[2];
     var clientId = message.clientId;
     var client = parts[3];
-    var troupeId = parts[4];
+    var troupeId = parts[4] || undefined;
 
     // Get the presence service involved around about now
     presenceService.userSocketConnected(userId, clientId, connectionType, client, function(err) {
@@ -276,7 +276,9 @@ var authenticator = {
 
       message.ext.userId = userId;
 
-      if(!troupeId) return callback(message);
+      if(troupeId) {
+          userService.saveLastVisitedTroupeforUserId(userId, troupeId);
+      }
 
       // If the troupeId was included, it means we've got a native
       // client and they'll be looking for a snapshot:
