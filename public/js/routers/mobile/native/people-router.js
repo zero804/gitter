@@ -9,31 +9,22 @@ require([
   'marionette',
   'views/base',
   'hbs!views/people/tmpl/mobilePeopleView',
-  'components/oauth',                 // No Ref
-  'components/eyeballs',              // No ref
-  'template/helpers/all',             // No ref
-  'components/native-context'         // No ref
-], function($, _, Backbone, context, MobileRouter, userModels, Marionette, TroupeViews, PersonViewTemplate) {
+  'views/shareSearch/shareSearchView',
+  'components/native-troupe-context',       // No ref
+  'components/oauth',                       // No Ref
+  'components/eyeballs',                    // No ref
+  'template/helpers/all',                   // No ref
+  'components/native-context'               // No ref
+], function($, _, Backbone, context, MobileRouter, userModels, Marionette,
+    TroupeViews, PersonViewTemplate, shareSearchView) {
+
   /*jslint browser: true, unused: true */
   "use strict";
 
-  // TODO: normalise this
-  var troupeId = window.location.hash.substring(1);
-  if(troupeId) {
-    window.location.hash = '';
-  } else {
-    troupeId = window.localStorage.lastTroupeId;
-  }
-
-  if(troupeId) {
-    context.setTroupeId(troupeId);
-    window.localStorage.lastTroupeId = troupeId;
-  }
-
-
   var AppRouter = MobileRouter.extend({
     routes: {
-      '*actions':     'defaultAction'
+      'share':      'shareAction',
+      '*actions':   'defaultAction'
     },
 
     initialize: function() {
@@ -59,6 +50,23 @@ require([
       userCollection.on('change', function(model) {
         $(document).trigger("avatar:change", model.toJSON());
       });
+    },
+
+    shareAction: function() {
+      function openModal() {
+        var modal = new shareSearchView.Modal({ disableClose: false, inviteToConnect: false });
+        modal.show();
+      }
+
+      if(context.troupe().get('url')) {
+        openModal();
+      } else {
+        context.troupe().on('change', function() {
+          openModal();
+        });
+      }
+
+
     },
 
     defaultAction: function(/* actions */){

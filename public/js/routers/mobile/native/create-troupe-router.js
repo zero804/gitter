@@ -6,7 +6,7 @@ require([
   'collections/troupes',
   'views/signup/createTroupeView',
   'components/realtime',
-  'components/oauth',                 // No Ref
+  'components/oauth',                 // No ref
   'template/helpers/all',             // No ref
   'components/native-context'         // No ref
 ], function($, Backbone, context, troupeModels, createTroupeView, realtime) {

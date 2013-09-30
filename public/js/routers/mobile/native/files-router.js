@@ -12,6 +12,7 @@ require([
   'collections/files',
   'views/file/mobileFilePreview',
   'components/unread-items-client',
+  'components/native-troupe-context', // No ref
   'components/oauth',                 // No Ref
   'components/eyeballs',              // No ref
   'template/helpers/all',             // No ref
@@ -19,18 +20,6 @@ require([
 ], function($, Marionette, _, Backbone, context, MobileRouter, TroupeViews, FileView, FileDetailView, fileModels, MobileFilePreview, unreadItemsClient) {
   /*jslint browser: true, unused: true */
   "use strict";
-
-  // TODO: normalise this
-  var troupeId = window.location.hash.substring(1);
-  if(troupeId) {
-    window.location.hash = '';
-  } else {
-    troupeId = window.localStorage.lastTroupeId;
-  }
-  if(troupeId) {
-    context.setTroupeId(troupeId);
-    window.localStorage.lastTroupeId = troupeId;
-  }
 
   var troupe = context.troupe();
   troupe.on('change:name', function() {

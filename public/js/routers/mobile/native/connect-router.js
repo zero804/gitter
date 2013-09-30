@@ -26,8 +26,18 @@ require([
     },
 
     defaultAction: function(){
-      var modal = new shareSearchView.Modal({ disableClose: true, inviteToConnect: true });
-      modal.show();
+      function openModal() {
+        var modal = new shareSearchView.Modal({ disableClose: true, inviteToConnect: true });
+        modal.show();
+      }
+
+      if(context.user().get('url')) {
+        openModal();
+      } else {
+        context.user().on('change', function() {
+          openModal();
+        });
+      }
     }
 
   });
