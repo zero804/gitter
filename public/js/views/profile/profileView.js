@@ -219,11 +219,11 @@ define([
       options.title = options.title || "Edit your profile";
 
       options.menuItems = [
-        { text: 'Save', action: 'save' }
+        { text: 'Save', action: 'save', class: 'trpBtnGreen' }
       ];
 
       if (context.getUser().hasPassword) {
-        options.menuItems.push({ text: 'Signout', action: 'signout' });
+        options.menuItems.push({ text: 'Signout', action: 'signout', class: 'trpBtnLightGrey' });
       }
 
       TroupeViews.Modal.prototype.initialize.call(this, options);
