@@ -34,7 +34,6 @@ var superClientPassword = nconf.get('ws:superClientPassword');
 // This strategy ensures that a user can access a given troupe URL
 function validateUserForTroupeSubscription(options, callback) {
   options.notifyPresenceService = true;
-  options.updateLastVisitedTroupe = true;
   validateUserForSubTroupeSubscription(options, callback);
 }
 
