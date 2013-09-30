@@ -44,5 +44,11 @@ module.exports = {
       app.get('/mobile/accept',
         serveNativeApp('accept'));
 
+      app.get('/mobile/connect',
+        serveNativeApp('connect'));
+
+      app.get('/mobile/createtroupe',
+        serveNativeApp('createtroupe'));
+
     }
 };
