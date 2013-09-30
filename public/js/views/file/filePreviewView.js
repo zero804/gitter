@@ -239,7 +239,7 @@ define([
     afterRender: function() {
       var body = this.$el.find('.frame-preview');
       var h = Math.round($(window).height() * 0.7)  - headerHeight;
-      body.css({ minHeight: h });
+      body.css({ height: h });
 
       var w= Math.round($(window).width() * 0.8)  - dialogWidth;
       body.width(w);
