@@ -814,7 +814,7 @@ function TroupeIdStrategy(options) {
 
   this.map = function(troupeId) {
     var troupe = self.troupes[troupeId];
-    if(!troupeId) {
+    if(!troupe) {
       winston.warn("Unable to locate troupeId ", { troupeId: troupeId });
       return null;
     }
