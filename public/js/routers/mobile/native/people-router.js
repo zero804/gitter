@@ -62,7 +62,7 @@ require([
         modal.once('hide', function() {
           // Only the first user in here
           if(self.userCollection.length === 1) {
-            window.location.href="chat";
+            window.location.href="chat#" + context.troupeId();
           }
         });
 
