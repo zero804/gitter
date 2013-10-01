@@ -35,6 +35,13 @@ define([
 
       return d;
     },
+    // mobile safari 6.1, 7.0 and chrome 29 will refuse to render without this
+    afterRender: function() {
+      this.el.style.display='none';
+      this.el.style.display='block';
+      var uselessQueryToTriggerReflow = this.el.offsetHeight;
+      uselessQueryToTriggerReflow = uselessQueryToTriggerReflow;
+    },
     inviteClicked: function() {
       if(this.model.get('status')) {
         return;
@@ -77,7 +84,7 @@ define([
           var query= self.collection._currentQuery;
           return { query: query && query.q };
         },
-        // mobile safari 6.1 will refuse to render without this
+        // mobile safari 6.1, 7.0 and chrome 29 will refuse to render without this
         afterRender: function() {
           this.el.style.display='none';
           this.el.style.display='block';
