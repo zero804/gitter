@@ -13,12 +13,13 @@ define([
   'zeroclipboard',
   'utils/appevents',
   'collections/suggested-contacts',
+  'log!shareSearchView',
   'bootstrap-typeahead',              // No ref
   'utils/validate-wrapper',           // No ref
   'jquery-placeholder'                // No ref
 
 ], function($, _, Marionette, context, TroupeViews, cocktail, InfiniteScrollMixin, template,
-  rowTemplate, noContactsTemplate, ZeroClipboard, appEvents, suggestedContactModels) {
+  rowTemplate, noContactsTemplate, ZeroClipboard, appEvents, suggestedContactModels, log) {
   "use strict";
 
   var ContactView = TroupeViews.Base.extend({
@@ -116,7 +117,8 @@ define([
     events: {
       'mouseover #copy-button' :      'createClipboard',
       'change #custom-email':         'onSearchChange',
-      'keyup #custom-email':       'onSearchChange'
+      'keyup #custom-email':          'onSearchChange',
+      'click #link-import-google':    'onGoogleImportClicked'
     },
 
     // when instantiated by default (through the controller) this will reflect on troupeContext to determine what the invite is for.
@@ -164,14 +166,20 @@ define([
 
       if (!connectMode && !troupe) throw new Error("Need a troupe");
 
+      var returnToUrl;
+      if(this.options.nativeMode) {
+        returnToUrl = "/native-oauth-complete";
+      } else {
+        returnToUrl = encodeURIComponent(window.location.pathname + window.location.hash);
+      }
+
       var data = {
         connectMode: connectMode,
         user: user,
         troupe: troupe,
         importedGoogleContacts: context().importedGoogleContacts,
         shareUrl: this.getShareUrl(),
-        basePath: context.env('basePath'),
-        returnToUrl: encodeURIComponent(window.location.pathname + window.location.hash)
+        returnToUrl: returnToUrl
       };
 
       return data;
@@ -240,6 +248,25 @@ define([
       }
     },
 
+    openNativeOAuth: function(url) {
+      var self = this;
+      var cordova = window.cordova;
+      cordova.exec(function() {
+        log('OAuth complete');
+        self.search(true);
+      }, function(e) {
+        log('OAuth Error:' + e, e);
+      }, "OAuth", "displayOAuthLogin", [url, "/native-oauth-complete"]);
+
+    },
+
+    onGoogleImportClicked: function(e) {
+      if(this.options.nativeMode) {
+        e.preventDefault();
+        this.openNativeOAuth(e.currentTarget.href);
+      }
+    },
+
     inviteCustomEmail: function() {
       var emailField = this.$el.find('#custom-email');
       var email = emailField.val();
@@ -273,9 +300,13 @@ define([
       this.onSearchChange();
     },
 
-    getQuery: function() {
+    getQuery: function(forceReload) {
       var emailField = this.$el.find('#custom-email');
       var q = { q: emailField.val() };
+
+      if(forceReload) {
+        q._d = Date.now();
+      }
 
       if(this.isConnectMode()) {
         q.statusConnect = 1;
@@ -289,8 +320,9 @@ define([
       return q;
     },
 
-    search: function() {
-      var query = this.getQuery();
+    search: function(forceReload) {
+      log('Executing search: ');
+      var query = this.getQuery(forceReload);
       this.collection.query(query);
     },
 

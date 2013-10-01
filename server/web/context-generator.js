@@ -172,7 +172,7 @@ function fakeSerializedTroupe(uriContext) {
 
 function createTroupeContext(req, options) {
   var events = req.session.events;
-  if(events) { delete req.session.events; }
+  if(events) { req.session.events = []; }
 
   return {
       user: options.user,
