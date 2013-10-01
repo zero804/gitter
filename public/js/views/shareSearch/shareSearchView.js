@@ -40,8 +40,7 @@ define([
     afterRender: function() {
       this.el.style.display='none';
       this.el.style.display='block';
-      var uselessQueryToTriggerReflow = this.el.offsetHeight;
-      uselessQueryToTriggerReflow = uselessQueryToTriggerReflow;
+      this._uselessPropertyToTriggerReflow = this.el.offsetHeight;
     },
     inviteClicked: function() {
       if(this.model.get('status')) {
@@ -89,8 +88,7 @@ define([
         afterRender: function() {
           this.el.style.display='none';
           this.el.style.display='block';
-          var uselessQueryToTriggerReflow = this.el.offsetHeight;
-          uselessQueryToTriggerReflow = uselessQueryToTriggerReflow;
+          this._uselessPropertyToTriggerReflow = this.el.offsetHeight;
         }
       });
     }
@@ -107,7 +105,8 @@ define([
       $banner.addClass('hidden');
       setTimeout(function() {
         $banner.hide();
-      }, 1000);
+        // chrome 29 will refuse to render without a 350ms gap before animation ends
+      }, 650);
     }, 4000);
   };
 
