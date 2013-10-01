@@ -250,9 +250,10 @@ define([
     openNativeOAuth: function(url) {
       var self = this;
       var cordova = window.cordova;
-      cordova.exec(function() {
-        log('OAuth complete');
-        self.search(true);
+      cordova.exec(function(result) {
+        if(result === 'complete') {
+          self.search(true);
+        }
       }, function(e) {
         log('OAuth Error:' + e, e);
       }, "OAuth", "displayOAuthLogin", [url, "/native-oauth-complete"]);
@@ -261,6 +262,7 @@ define([
 
     onGoogleImportClicked: function(e) {
       if(this.options.nativeMode) {
+        log('Using native OAuth');
         e.preventDefault();
         this.openNativeOAuth(e.currentTarget.href);
       }
