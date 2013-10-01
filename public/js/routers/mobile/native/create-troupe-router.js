@@ -29,7 +29,7 @@ require([
     defaultAction: function(){
       var troupeCollection = new troupeModels.TroupeCollection();
 
-      var modal = new createTroupeView.Modal({ disableClose: true, collection: troupeCollection, nativeMode: true });
+      var modal = new createTroupeView.Modal({ disableClose: true, collection: troupeCollection, nativeMode: true, hideHeader: true });
 
       modal.show();
     }

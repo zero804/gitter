@@ -33,6 +33,8 @@ require([
       var userCollection = this.collection = new userModels.UserCollection();
       userCollection.listen();
 
+      this.userCollection = userCollection;
+
       // update online status of user models
       $(document).on('userLoggedIntoTroupe', updateUserStatus);
       $(document).on('userLoggedOutOfTroupe', updateUserStatus);
@@ -53,9 +55,17 @@ require([
     },
 
     shareAction: function() {
+      var self = this;
       function openModal() {
         var modal = new shareSearchView.Modal({ disableClose: false, inviteToConnect: false });
         modal.show();
+        modal.once('hide', function() {
+          // Only the first user in here
+          if(self.userCollection.length === 1) {
+            window.location.href="chat";
+          }
+        });
+
       }
 
       if(context.troupe().get('url')) {
@@ -88,7 +98,6 @@ require([
   });
 
   var troupeApp = new AppRouter();
-
   window.troupeApp = troupeApp;
   Backbone.history.start();
 

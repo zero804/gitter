@@ -94,7 +94,7 @@ define([
         // More needs to be done here!
         window.alert('Realtime communications with the server have been disconnected. Click OK to reload.');
         log("Subscription failed. Reloading");
-        window.location.reload();
+        window.location = '/home';
       }
     }
 
