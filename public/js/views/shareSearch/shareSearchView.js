@@ -39,8 +39,7 @@ define([
     afterRender: function() {
       this.el.style.display='none';
       this.el.style.display='block';
-      var uselessQueryToTriggerReflow = this.el.offsetHeight;
-      uselessQueryToTriggerReflow = uselessQueryToTriggerReflow;
+      this._uselessPropertyToTriggerReflow = this.el.offsetHeight;
     },
     inviteClicked: function() {
       if(this.model.get('status')) {
@@ -88,8 +87,7 @@ define([
         afterRender: function() {
           this.el.style.display='none';
           this.el.style.display='block';
-          var uselessQueryToTriggerReflow = this.el.offsetHeight;
-          uselessQueryToTriggerReflow = uselessQueryToTriggerReflow;
+          this._uselessPropertyToTriggerReflow = this.el.offsetHeight;
         }
       });
     }
