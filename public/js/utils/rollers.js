@@ -170,10 +170,6 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
       return true;
     },
 
-    trackResize: function() {
-
-    },
-
     getBottomMostVisibleElement: function() {
       var scrollTop = this._target.scrollTop;
       var clientHeight = this._target.clientHeight;
