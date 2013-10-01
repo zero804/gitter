@@ -63,7 +63,8 @@ function validateUserForSubTroupeSubscription(options, callback) {
         }
 
         var userSubscribedToTroupe = Q.denodeify(presenceService.userSubscribedToTroupe);
-        return userSubscribedToTroupe(userId, troupeId, clientId, eyeballState);
+        return userSubscribedToTroupe(userId, troupeId, clientId, eyeballState)
+                .thenResolve(true);
       }
 
       return result;
@@ -268,8 +269,8 @@ var authenticator = {
       message.ext.userId = userId;
 
       if(troupeId) {
-	      userService.saveLastVisitedTroupeforUserId(userId, troupeId);
-	  }
+        userService.saveLastVisitedTroupeforUserId(userId, troupeId);
+      }
 
       // If the troupeId was included, it means we've got a native
       // client and they'll be looking for a snapshot:
@@ -300,7 +301,18 @@ var authorisor = {
 
     function deny() {
       message.error = '403::Access denied';
-      winston.error('Socket authorisation failed', message);
+      winston.error('Socket authorisation failed. Disconnecting client.', message);
+
+      process.nextTick(function() {
+        var clientId = message.clientId;
+
+        var engine = server._server._engine;
+        engine.destroyClient(clientId, function() {
+          winston.warn('bayeux: client ' + clientId + ' destroyed');
+        });
+
+      });
+
       callback(message);
     }
 
@@ -384,8 +396,9 @@ var authorisor = {
 
     presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
       if(err) return callback(err);
+
       if(!userId) {
-        winston.warn('bayeux: client not authenticated. Failing authorisation', { clientId: clientId });
+        winston.warn('bayeux: client not authenticated.', { clientId: clientId });
         return callback();
       }
 

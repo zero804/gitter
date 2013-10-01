@@ -89,6 +89,13 @@ define([
           $(document).trigger('realtime:newConnectionEstablished');
         }
       }
+    } else if(message.channel == '/meta/subscribe') {
+      if(message.error && message.error.indexOf('403::') === 0) {
+        // More needs to be done here!
+        window.alert('Realtime communications with the server have been disconnected. Click OK to reload.');
+        log("Subscription failed. Reloading");
+        window.location.reload();
+      }
     }
 
     callback(message);
