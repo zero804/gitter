@@ -12,7 +12,8 @@ define([
   'hbs!./tmpl/confirmationView',
   'log!base-views',
   '../template/helpers/all' // No ref
-], function(require, $, _, Backbone, appEvents, Marionette, modalTemplate, popoverTemplate, loadingTemplate, confirmationViewTemplate, log) {
+], function(require, $, _, Backbone, appEvents, Marionette, modalTemplate, popoverTemplate,
+  loadingTemplate, confirmationViewTemplate, log) {
   "use strict";
 
   /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
@@ -219,6 +220,7 @@ define([
         autoRemove: true,
         menuItems: [],
         disableClose: false,
+        hideHeader: false,
         title: null,
         navigable: false
       };
@@ -230,6 +232,7 @@ define([
 
     getRenderData: function() {
       return {
+        hideHeader: this.options.hideHeader,
         customTitle: !!this.options.title,
         title: this.options.title,
         hasMenuItems: !!this.options.menuItems.length,
