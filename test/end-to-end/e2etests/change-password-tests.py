@@ -141,6 +141,7 @@ class ChangePasswordTests(unittest.TestCase):
         time.sleep(1)
         form.find_element_by_id('password').send_keys(newPassword)
         self.driver.find_element_by_css_selector('[data-action=save]').click()
+        time.sleep(1)
 
     def createTroupe(self):
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, 'home-create-troupe'))).click()
