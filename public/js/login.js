@@ -40,6 +40,11 @@ require([
       hideLoginFailure();
     });
 
+    $('#password, #email').on('click', function() {
+      log("Password blur");
+      hideLoginFailure();
+    });
+
     $("#loginform").submit(function(e) {
       e.preventDefault();
       setDefaultEmail($('#email').val());
