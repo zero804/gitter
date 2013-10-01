@@ -195,7 +195,7 @@ var authenticator = {
       return callback(message);
     }
 
-    winston.info('bayeux: Handshake: ', message);
+    winston.verbose('bayeux: Handshake: ', message);
 
     var ext = message.ext;
 
@@ -494,10 +494,6 @@ module.exports = {
     server.addExtension(subscriptionTimestamp);
 
     client.addExtension(superClient);
-
-    //server.bind('handshake', function(clientId) {
-    //  winston.verbose("Faye handshake: ", { clientId: clientId });
-    //});
 
     server.bind('disconnect', function(clientId) {
       // Warning, this event is called simulateously on
