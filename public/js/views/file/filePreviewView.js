@@ -114,8 +114,8 @@ define([
         title: "Are you sure?",
         body: confirmDeleteTemplate(this.model.toJSON()),
         menuItems: [
-          { action: "yes", text: "Yes", additionalClasses: "" },
-          { action: "no", text: "No"}
+          { action: "yes", text: "Yes", class: "trpBtnRed" },
+          { action: "no", text: "No", class: "trpBtnLightGrey"}
         ]
       });
 
