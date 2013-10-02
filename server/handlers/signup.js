@@ -29,6 +29,13 @@ module.exports = {
         }
       );
 
+      /* This redirection is used by the iOS app */
+      app.get(
+        '/signup',
+        middleware.logout(),
+        function(req, res) {
+          res.relativeRedirect(nconf.get('web:homeurl') + '#signup');
+        });
 
       /*
       Accepts JSON { email, userId, troupeName, invites: [] }
