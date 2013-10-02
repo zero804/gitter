@@ -554,6 +554,8 @@ define([
 
       this.$targetElement.off('mouseenter', this.enter);
       this.$targetElement.off('mouseleave', this.leave);
+
+      this.view.close();
     },
 
     show: function () {

@@ -37,7 +37,6 @@ define([
       var self = this;
 
       this.userCollection = options.userCollection;
-      //this.scrollDelegate = options.scrollDelegate;
 
       this.decorator = options.decorator;
 
@@ -261,12 +260,9 @@ define([
   var ReadByView = Marionette.CollectionView.extend({
     itemView: AvatarView,
     initialize: function(options) {
-      var c = new chatModels.ReadByCollection([], { chatMessageId: this.model.id, userCollection: options.userCollection });
+      var c = new chatModels.ReadByCollection(null, { listen: true, chatMessageId: this.model.id, userCollection: options.userCollection });
       c.loading = true;
       this.collection = c;
-      c.listen(function() {
-        c.fetch();
-      });
     },
     onClose: function(){
       this.collection.unlisten();
