@@ -3,8 +3,9 @@ define([
   'jquery',
   'utils/context',
   'faye',
+  'utils/appevents',
   'log!realtime'
-], function($, context, Faye, log) {
+], function($, context, Faye, appEvents, log) {
   "use strict";
 
   //Faye.Logging.logLevel = 'debug';
@@ -189,6 +190,25 @@ define([
         persistentOutage = false;
         $(document).trigger('realtime:persistentOutageCleared');
       }
+    });
+
+
+    var userSubscription;
+
+    context.user().watch('change:id', function(user) {
+      if(userSubscription) {
+        userSubscription.cancel();
+        userSubscription = null;
+      }
+
+      if(user.id) {
+        userSubscription = client.subscribe('/user/' + user.id, function(message) {
+          if (message.notification === 'user_notification') {
+            appEvents.trigger('user_notification', message);
+          }
+        });
+      }
+
     });
 
     return client;

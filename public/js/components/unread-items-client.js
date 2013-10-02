@@ -574,7 +574,7 @@ define([
 
             $e.removeClass('unread').addClass('reading');
             this._markRead($e, timeout);
-            timeout = timeout + 200;
+            timeout = timeout + 150;
           }
         }
 

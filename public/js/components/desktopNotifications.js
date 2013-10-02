@@ -5,8 +5,7 @@ define([
   'utils/context',
   './eyeballs',
   './webNotifications',
-  'hbs!./tmpl/request',
-  'components/realtime-user-listener'     // No reference
+  'hbs!./tmpl/request'
 ], function($, appEvents, context, eyeballs, webNotifications, template){
   "use strict";
 
