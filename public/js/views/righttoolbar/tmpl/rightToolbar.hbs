@@ -19,12 +19,12 @@
         <div class="trpTroupeRelatedContentHolder">
           <div class="trpToolbarHeader" id="file-header">Files</div>
           <div id="fineUploader"></div>
-          <div class="trpToolbarList divider {{#oneToOne}}oneToOne{{/oneToOne}}">
+          <div class="trpToolbarList divider scroller {{#oneToOne}}oneToOne{{/oneToOne}}">
             <div class="trpToolbarListContent" id="file-list"></div>
           </div>
           {{#unless oneToOne}}
           <div class="trpToolbarHeader" id="mail-header">Mails</div>
-          <div class="trpToolbarList divider">
+          <div class="trpToolbarList divider scroller">
             <div class="trpToolbarListContent" id="mail-list">
               <a href='mailto:{{troupeEmailAddress}}' style="text-decoration: none">
                 <div style="display: inline-block; margin-bottom: 8px">
