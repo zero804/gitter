@@ -188,9 +188,10 @@ define([
         type: "POST",
         success: function(data) {
           if(data.success) {
-            context.getUser().displayName = data.displayName;
-            context.getUser().status = 'ACTIVE';
-            context.getUser().hasPassword = true;
+            var user = context.user();
+            user.set('displayName', data.displayName);
+            user.set('status', 'ACTIVE');
+            user.set('hasPassword', true);
 
             that.trigger('submit.success');
             that.dialog.hide();
