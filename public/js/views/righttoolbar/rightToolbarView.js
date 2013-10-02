@@ -15,8 +15,9 @@ define([
   'views/conversation/conversationView',
   'views/people/peopleCollectionView',
   'cocktail',
+  'utils/uservoice'
 ], function($, Backbone, Marionette, TroupeViews, context, qq, rightToolbarTemplate, itemCollections,
-   trpCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView, cocktail) {
+   trpCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView, cocktail, userVoice) {
   "use strict";
 
   var RightToolbarLayout = Marionette.Layout.extend({
@@ -37,7 +38,8 @@ define([
       // "click #invites-header": "onInvitesHeaderClick",
       // "click #file-header": "onFileHeaderClick",
       // "click #mail-header": "onMailHeaderClick"
-      "click #favourite-button":        "toggleFavourite"
+      "click #favourite-button":        "toggleFavourite",
+      "click #help-button":              "onHelpClicked" 
     },
 
     initialize: function() {
@@ -55,6 +57,8 @@ define([
       });
 
       this.updateHeader(context.getTroupe().name);
+
+
     },
 
     updateHeader: function(value) {
@@ -76,9 +80,11 @@ define([
     },
 
     onRender: function() {
+
       $('#toolbar-frame').show();
       $('#right-panel').show();
 
+      userVoice.install(this.$el.find('#help-button'), context.getUser());
       this.uploader = new qq.FineUploader({
         element: this.$el.find('#fineUploader')[0],
         dragAndDrop: {
@@ -187,6 +193,9 @@ define([
       //troupe.set('favourite', isFavourite);
     },
 
+    onHelpClicked: function() {
+
+    },
 
     onMailHeaderClick: function() {
       this.toggleMails();
