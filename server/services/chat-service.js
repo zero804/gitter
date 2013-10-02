@@ -19,7 +19,8 @@ exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
   if(!troupe) return callback("Invalid troupe");
 
   var chatMessage = new persistence.ChatMessage();
-  chatMessage.fromUserId = null;
+
+  chatMessage.fromUserId = user ? user.id : null;
 
   chatMessage.toTroupeId = troupe.id;
   chatMessage.sent = new Date();
