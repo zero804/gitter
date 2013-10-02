@@ -42,6 +42,7 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
       return true;
     },
 
+    /* Specify an element that should not be scrolled past */
     trackUntil: function(element) {
       if(this._mode != STABLE) {
         this._nopass = element;
@@ -80,12 +81,18 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
       return atBottom;
     },
 
+    /*
+     * Update the scroll position to follow the bottom of the scroll pane
+     */
     updateTrackBottom: function() {
       var target = this._target;
       var scrollTop = target.scrollHeight - target.clientHeight;
       target.scrollTop = scrollTop;
     },
 
+    /*
+     * Scroll to the bottom and switch the mode to TRACK_BOTTOM
+     */
     scrollToBottom: function() {
       var target = this._target;
       var scrollTop = target.scrollHeight - target.clientHeight;
@@ -174,8 +181,9 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
       var scrollTop = this._target.scrollTop;
       var clientHeight = this._target.clientHeight;
       var max = scrollTop + clientHeight;
-      var t = document.querySelector('#content-frame');
-      var children = t.children;
+      var target = this._target;
+      var children = target.children;
+
       for(var i = children.length - 1; i >= 0; i--) {
         var child = children[i];
         if(child.offsetTop < max) {

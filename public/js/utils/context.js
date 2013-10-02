@@ -6,6 +6,13 @@ define([
 
   var ctx = window.troupeContext || {};
 
+  var WatchableModel = Backbone.Model.extend({
+    watch: function(event, callback, context) {
+      this.on(event, callback, context);
+      callback.call(context, this);
+    }
+  });
+
   function getTroupeModel() {
     var troupeModel;
     if(ctx.troupe) {
@@ -14,7 +21,7 @@ define([
       troupeModel = { id: ctx.troupeId };
     }
 
-    return new Backbone.Model(troupeModel);
+    return new WatchableModel(troupeModel);
   }
 
   function getUserModel() {
@@ -26,7 +33,7 @@ define([
       userModel = { id: ctx.userId };
     }
 
-    return new Backbone.Model(userModel);
+    return new WatchableModel(userModel);
   }
 
   var troupe = getTroupeModel();

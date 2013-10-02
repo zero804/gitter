@@ -6,7 +6,8 @@ define([
   'utils/appevents',
   'log!web-notifications',
   'require',
-  './notify' // No ref
+  './notify',                             // No reference,
+  'components/realtime-user-listener'     // No reference
 ], function($, context, template, appEvents, log, require){
   "use strict";
 

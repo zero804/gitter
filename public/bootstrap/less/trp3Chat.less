@@ -164,6 +164,7 @@
   -moz-transition: background-color 0.5s linear;
   -o-transition: background-color 0.5s linear;
   transition: background-color 0.5s linear;
+  border-bottom: 1px solid transparent;
 
   @media @mobile {
     border-bottom: 1px solid #f8fcf7;
@@ -173,7 +174,7 @@
     background-color: #ecf1ed;
   };*/
 
-  &.unread {
+  &.unread, &.reading {
     background-color: #89e5b6;
     border-bottom: 1px solid #93cead;
     -webkit-transition: background-color 0.5s linear;
@@ -256,12 +257,6 @@
   -o-transition: color 0.3s linear;
   transition: color 0.3s linear;
 }
-
-.view.unread .trpChatFrom, .view.unread .trpChatTime,
-.view.reading .trpChatFrom, .view.reading .trpChatTime {
-	color: #6cb697;
-}
-
 
 .trpChatDetails{
   display: block;
