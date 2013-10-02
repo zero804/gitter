@@ -89,7 +89,7 @@ define([
       var scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
       
       if (scrollbarWidth > 0) {
-        $(".trpChatContainer").addClass("scrollchat");
+        $(".trpChatContainer").addClass("scroller");
         $(".trpChatInputArea").addClass("scrollpush");
       }
 
