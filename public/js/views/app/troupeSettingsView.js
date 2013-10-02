@@ -77,10 +77,9 @@ define([
               log('Error attempting to delete troupe', textStatus, e);
             }
           });
-          modal.off('menuItemClicked');
-          modal.hide();
         }
-        if (action === "no") modal.hide();
+        modal.off('menuItemClicked');
+        modal.hide();
       });
 
       modal.show();
