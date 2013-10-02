@@ -74,7 +74,6 @@ describe('chatService', function() {
       chatService.newRichMessageToTroupe(fixture.troupe1, fixture.user1, plainText, meta, function(err, chatMessage) {
         if(err) return done(err);
 
-        assert(!chatMessage.fromUserId, 'Expected fromUserId should to be null');
         assert(chatMessage.meta === meta, 'Meta has been altered');
         done();
       });
