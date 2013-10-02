@@ -21,7 +21,10 @@ var appTag = appVersion.getAppTag();
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
   { re: /^\/troupes\/(\w+)$/,         validator: validateUserForTroupeSubscription },
-  { re: /^\/troupes\/(\w+)\/(\w+)$/,  validator: validateUserForSubTroupeSubscription,  populator: populateSubTroupeCollection},
+  { re: /^\/troupes\/(\w+)\/(\w+)$/,  validator: validateUserForSubTroupeSubscription,  populator: populateSubTroupeCollection },
+  { re: /^\/troupes\/(\w+)\/(\w+)\/(\w+)\/(\w+)$/,
+                                      validator: validateUserForSubTroupeSubscription,  populator: populateSubSubTroupeCollection },
+
   { re: /^\/user\/(\w+)\/(\w+)$/,     validator: validateUserForUserSubscription,       populator: populateSubUserCollection },
   { re: /^\/user\/(\w+)\/troupes\/(\w+)\/unreadItems$/,
                                       validator: validateUserForUserSubscription,       populator: populateUserUnreadItemsCollection },
@@ -143,6 +146,22 @@ function populateSubTroupeCollection(options, callback) {
 
     default:
       winston.error('Unable to provide snapshot for ' + collection);
+  }
+
+  callback(null, [ ]);
+}
+
+function populateSubSubTroupeCollection(options, callback) {
+  var match = options.match;
+  var troupeId = match[1];
+  var collection = match[2];
+  var subId = match[3];
+  var subCollection = match[4];
+
+  switch(collection + '-' + subCollection) {
+    case "chatMessages-readBy":
+      return restful.serializeReadBysForChat(troupeId, subId, callback);
+
   }
 
   callback(null, [ ]);
@@ -334,7 +353,6 @@ var authorisor = {
   },
 
   outgoing: function(message, callback) {
-
     if(message.channel != '/meta/subscribe') {
       return callback(message);
     }

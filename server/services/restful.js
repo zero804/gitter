@@ -155,3 +155,17 @@ exports.serializeUnreadItemsForTroupe = function(troupeId, userId, callback) {
     callback(null, unreadItems);
   });
 };
+
+exports.serializeReadBysForChat = function(troupeId, chatId, callback) {
+  chatService.findById(chatId, function(err, chatMessage) {
+    if(err) return callback(err);
+    var strategy = new restSerializer.UserIdStrategy({});
+
+    restSerializer.serialize(chatMessage.readBy, strategy, function(err, serialized) {
+      if(err) return callback(err);
+      callback(null, serialized);
+    });
+
+  });
+
+};
