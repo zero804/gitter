@@ -273,6 +273,7 @@ define([
     },
 
     onClose: function() {
+      this.view.close();
       this.view.dialog = null;
       this.$el.find('.close').off('click');
     },
@@ -340,7 +341,7 @@ define([
     hide: function ( e ) {
       if(e) e.preventDefault();
       if(this.navigable) {
-        var hash = window.location.hash.replace(/\%7C/g, '|');
+        var hash = window.location.hash.replace(/\%7C/ig, '|');
         var currentFragment;
         if(!hash) {
           currentFragment = '#!';
