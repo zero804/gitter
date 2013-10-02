@@ -16,7 +16,7 @@ define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
     scroll: function() {
       log('scroll');
       var now = Date.now();
-      var st = this._reverse ? this._target.scrollTop : this._target.scrollHeight - this._target.scrollTop;
+      var st = this._reverse ? this._target.scrollTop : this._target.scrollHeight - this._target.scrollTop - this._target.clientHeight;
 
       var delta = st - this._prevScrollTop;
       var timeDelta = now - this._prevScrollTime;
@@ -38,7 +38,7 @@ define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
       // 'gradient: ' + gradient,
       // 'timeDelta: ' + timeDelta].join('  '));
 
-      if((timeToLimit < 300) || (st < 20 && delta < 0)) {
+      if((timeToLimit < 300) || (st < 50 && delta < 0)) {
         log('approaching end');
 
         this.loading = true;
