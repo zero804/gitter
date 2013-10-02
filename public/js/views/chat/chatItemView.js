@@ -38,7 +38,7 @@ define([
 
       this.userCollection = options.userCollection;
 
-      this.decorator = options.decorator;
+      this.decorators = options.decorators;
 
       this.model.on('change', function() {
         self.onChange();
@@ -90,7 +90,12 @@ define([
       this.$el.find('.trpChatText').html(richText);
 
       this.highlightMention();
-      if (this.decorator) this.decorator.enrich(this);
+
+      //if (this.decorator) this.decorator.enrich(this);
+
+      _.each(this.decorators, function(decorator) {
+        decorator.decorate(this);
+      }, this);
     },
 
     afterRender: function() {
