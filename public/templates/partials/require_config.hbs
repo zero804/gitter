@@ -43,11 +43,15 @@ require.config({
     "twitter-text":         "../repo/twitter-text/twitter-text",
 
     "ga": "//ssl.google-analytics.com/ga",
+    "uservoice" : "//widget.uservoice.com/V8cI8nnOUIw1g1ESzL50Qg",
     "in-browser": "/test/in-browser/"
   },
   shim: {
     "ga": {
       exports: "_gaq"
+    },
+    "uservoice": {
+      exports: "window.UserVoice"
     }
   },
   hbs : {

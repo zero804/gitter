@@ -55,8 +55,17 @@ define([
         return window.alert("You need to be the only person in the troupe to delete it.");
       }
 
-      TroupeViews.confirm("Are you sure you want to delete this troupe?", {
-        'click #ok': function() {
+      var modal = new TroupeViews.ConfirmationModal({
+        title: "Are you sure?",
+        body: "This action cannot be undone.",
+        menuItems: [
+          { action: "yes", text: "Yes", class: "trpBtnRed" },
+          { action: "no", text: "No", class: "trpBtnLightGrey"}
+        ]
+      });
+
+       modal.on('menuItemClicked', function(action) {
+        if (action === "yes") {
           removeTroupeCollectionRemoveListeners();
           $.ajax({
             url: '/troupes/' + self.model.id,
@@ -69,7 +78,11 @@ define([
             }
           });
         }
-      });
+        modal.off('menuItemClicked');
+        modal.hide();
+      });
+
+      modal.show();
     },
 
     canLeave: function() {
