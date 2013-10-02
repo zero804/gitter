@@ -3,9 +3,8 @@ define([
   'jquery',
   'utils/context',
   'faye',
-  'utils/appevents',
   'log!realtime'
-], function($, context, Faye, appEvents, log) {
+], function($, context, Faye, log) {
   "use strict";
 
   //Faye.Logging.logLevel = 'debug';
@@ -92,6 +91,8 @@ define([
     } else if(message.channel == '/meta/subscribe') {
       if(message.error && message.error.indexOf('403::') === 0) {
         // More needs to be done here!
+        log('Access denied', message);
+        debugger;
         window.alert('Realtime communications with the server have been disconnected. Click OK to reload.');
         log("Subscription failed. Reloading");
         window.location = '/home';
@@ -189,28 +190,6 @@ define([
         $(document).trigger('realtime:persistentOutageCleared');
       }
     });
-
-    // TODO: this stuff below really should find a better home
-    if(context.getTroupeId()) {
-      client.subscribe('/troupes/' + context.getTroupeId(), function(message) {
-        if(message.notification === 'presence') {
-          if(message.status === 'in') {
-            $(document).trigger('userLoggedIntoTroupe', message);
-          } else if(message.status === 'out') {
-            $(document).trigger('userLoggedOutOfTroupe', message);
-          }
-        }
-
-      });
-    }
-
-    if(context.getUserId()) {
-      client.subscribe('/user/' + context.getUserId(), function(message) {
-        if (message.notification === 'user_notification') {
-          appEvents.trigger('user_notification', message);
-        }
-      });
-    }
 
     return client;
   }

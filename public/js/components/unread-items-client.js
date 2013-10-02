@@ -547,11 +547,13 @@ define([
       var topBound = this._scrollTop;
       var bottomBound = this._scrollBottom;
 
-      log('Looking for items to mark as read between ', topBound, ' and ', bottomBound);
+      log('Looking for items to mark as read between ' + topBound + ' and ' + bottomBound);
 
-      this._scrollTop = 1000000000;
-      this._scrollBottom = 0;
+      // this._scrollTop = 1000000000;
+      // this._scrollBottom = 0;
 
+      this._scrollTop = this._scrollElement.scrollTop;
+      this._scrollBottom = this._scrollTop + this._scrollElement.clientHeight;
 
       var unreadItems = this._scrollElement.querySelectorAll('.unread');
 

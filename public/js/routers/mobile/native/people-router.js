@@ -10,13 +10,15 @@ require([
   'views/base',
   'hbs!views/people/tmpl/mobilePeopleView',
   'views/shareSearch/shareSearchView',
+  'utils/appevents',
+  'components/realtime-troupe-listener',    // No ref
   'components/native-troupe-context',       // No ref
   'components/oauth',                       // No Ref
   'components/eyeballs',                    // No ref
   'template/helpers/all',                   // No ref
   'components/native-context'               // No ref
 ], function($, _, Backbone, context, MobileRouter, userModels, Marionette,
-    TroupeViews, PersonViewTemplate, shareSearchView) {
+    TroupeViews, PersonViewTemplate, shareSearchView, appEvents) {
 
   /*jslint browser: true, unused: true */
   "use strict";
@@ -36,10 +38,10 @@ require([
       this.userCollection = userCollection;
 
       // update online status of user models
-      $(document).on('userLoggedIntoTroupe', updateUserStatus);
-      $(document).on('userLoggedOutOfTroupe', updateUserStatus);
+      appEvents.on('userLoggedIntoTroupe', updateUserStatus);
+      appEvents.on('userLoggedOutOfTroupe', updateUserStatus);
 
-      function updateUserStatus(e, data) {
+      function updateUserStatus(data) {
         var user = userCollection.get(data.userId);
         if (user) {
           // the backbone models have not always come through before the presence events,
