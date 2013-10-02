@@ -28,7 +28,7 @@ define([
     itemView: chatItemView.ChatItemView,
     reverseScrolling: true,
     itemViewOptions: function() {
-      return { userCollection: this.userCollection, decorator: this.decorator};
+      return { userCollection: this.userCollection, decorators: this.decorators};
     },
     scrollElementSelector: "#content-frame",
     initialize: function(options) {
@@ -38,7 +38,7 @@ define([
       this.rollers = new Rollers(contentFrame);
 
       this.userCollection = options.userCollection;
-      this.decorator      = options.decorator;
+      this.decorators     = options.decorators || [];
 
       // CODEDEBT: Move unread-item-tracking into it's own module
       this.findChatToTrack();
