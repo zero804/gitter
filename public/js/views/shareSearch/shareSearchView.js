@@ -254,6 +254,7 @@ define([
         if(result === 'complete') {
           self.search(true);
         }
+
       }, function(e) {
         log('OAuth Error:' + e, e);
       }, "OAuth", "displayOAuthLogin", [url, "/native-oauth-complete"]);
