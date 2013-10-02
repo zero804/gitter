@@ -8,15 +8,17 @@ require([
   'utils/router',
   'views/shareSearch/shareSearchView',
   'components/modal-region',
-  'components/unread-items-client'
-  ], function($, app, chatModels, ChatCollectionView, chatInputView, Router, shareSearchView, modalRegion, unreadItemsClient) {
+  'components/unread-items-client',
+  'views/chat/decorators/fileDecorator',
+  ], function($, app, chatModels, ChatCollectionView, chatInputView, Router, shareSearchView, modalRegion, unreadItemsClient, fileDecorator) {
   "use strict";
 
   var chatCollection = new chatModels.ChatCollection();
   chatCollection.listen();
 
   var chatCollectionView = new ChatCollectionView({
-    collection: chatCollection
+    collection: chatCollection,
+    decorators: [fileDecorator]
   });
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));

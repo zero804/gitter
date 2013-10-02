@@ -29,8 +29,13 @@ require([
   'views/invite/reinviteModal',
   'utils/router',
   'components/unread-items-client',
-  'views/chat/decorator',
   'views/app/smartCollectionView',
+
+  'views/chat/decorators/fileDecorator',
+  'views/chat/decorators/webhookDecorator',
+  'views/chat/decorators/userDecorator',
+  'views/chat/decorators/embedDecorator',
+
   'views/widgets/preload', // No ref
   'components/webNotifications', // No ref
   'components/desktopNotifications', // No ref
@@ -43,7 +48,7 @@ require([
             itemCollections, troupeCollections, UserEmailCollection, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
             RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, profileEmailView, profileAddEmailView, shareSearchView,
             createTroupeView, UsernameView,
-            troupeSettingsView, TroupeMenuView, ReinviteModal, Router, unreadItemsClient, chatDecorator, SmartCollectionView /*, errorReporter , FilteredCollection */) {
+            troupeSettingsView, TroupeMenuView, ReinviteModal, Router, unreadItemsClient, SmartCollectionView, fileDecorator, webhookDecorator, userDecorator, embedDecorator /*, errorReporter , FilteredCollection */) {
   "use strict";
 
   // Make drop down menus drop down
@@ -77,7 +82,7 @@ require([
     el: $('#content-frame'),
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
-    decorator: chatDecorator
+    decorators: [fileDecorator, webhookDecorator, userDecorator, embedDecorator]
   }).render();
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
