@@ -16,6 +16,7 @@ define([
     },
 
     initialize: function(options) {
+      // console.dir(options);
       this.inviteId = options.inviteId;
       if(this.model) {
         this.setRerenderOnChange(true);
@@ -24,7 +25,6 @@ define([
 
     getRenderData: function() {
       var firstName;
-
       if(this.model) {
         var user = this.model.get('fromUser');
         firstName = user && user.displayName || '';
@@ -44,10 +44,13 @@ define([
         isOneToOne = true;
         firstName = context.getHomeUser().displayName.split(" ").shift();
       }
+      var troupeName;
+
       return {
         isOneToOne: isOneToOne,
         homeUser: context.getHomeUser(),
-        firstName: firstName
+        firstName: firstName,
+        troupeName: context.getTroupe().name || ''
       };
     },
 
