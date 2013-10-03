@@ -36,6 +36,13 @@ require([
         collection: chatCollection,
         rollers: chatCollectionView.rollers
       }).render();
+
+
+      // Keep the unread items up to date on the model
+      // This allows the unread items client to mark model items as read
+      unreadItemsClient.syncCollections({
+        'chat': chatCollection
+      });
     }
   });
 

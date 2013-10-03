@@ -30,11 +30,6 @@ require([
     var defaultEmail = getDefaultEmail();
     if(defaultEmail) $('#email').val(defaultEmail);
 
-    $('#signup-login').on('click', function(e) {
-      e.preventDefault();
-      window.location.href = '/signup';
-    });
-
     $('#button-login').on('click', function(e) {
       e.preventDefault();
       submitForm();
