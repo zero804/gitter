@@ -3,6 +3,9 @@
     <div class="trpToolbarContent" id="toolbar-content">
       <div id="people-list">
         <div class="trpHeaderTitle trpToolbarHeader" id="people-header">{{headerTitle}}</div>
+        {{#unless oneToOne}}
+        <div id="troupe-avatar" class="trpDisplayPicture avatar-s" data-original-title="{{troupeName}}" style="background-image: url({{troupeAvatarUrl}});"></div>
+        {{/unless}}
         <div class="trpToolbarList divider">
           <div class="trpToolbarListContent" id="people-roster"></div>
         </div>
@@ -41,7 +44,7 @@
       </div>
       <div class="trpTroupeActions divider-top">
         <div class="trpTroupeMoreActions" id="troupe-more-actions">
-          <img src='{{cdn "images/2/icon-menu-black@2x.png"}}'/ width="24" height="24">
+          <div class="more-button-black" id="right-menu-icon"></div>
         </div>
         <div class="trpTroupeFavourite {{#if favourite}}favourited{{/if}}" id="favourite-button">
           <div style="display: inline-block; vertical-align: middle">

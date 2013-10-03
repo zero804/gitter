@@ -24,7 +24,7 @@ define([
 
     getRenderData: function() {
       return {
-        user: context.getUser()
+        user: context.user()
       };
     },
 
