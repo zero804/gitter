@@ -93,12 +93,11 @@ define([
     } else if(message.channel == '/meta/subscribe') {
       if(message.error && message.error.indexOf('403::') === 0) {
         // More needs to be done here!
-        console.trace();
         log('Access denied', message);
         debugger;
-        window.alert('Realtime communications with the server have been disconnected. Click OK to reload.');
+        //window.alert('Realtime communications with the server have been disconnected. Click OK to reload.');
         log("Subscription failed. Reloading");
-        window.location = '/home';
+        //window.location = '/home';
       }
     }
 
