@@ -3,6 +3,9 @@
     <div class="trpToolbarContent" id="toolbar-content">
       <div id="people-list">
         <div class="trpHeaderTitle trpToolbarHeader" id="people-header">{{headerTitle}}</div>
+        {{#unless oneToOne}}
+        <a id="temp-avatar" class="trpDisplayPicture avatar-s online view" data-original-title="{{troupeName}}" style="background-image: url({{troupeAvatarUrl}}); border-radius: 6px; margin-left: 26px; margin-bottom: 12px;" href="/uw81dr"></a>
+        {{/unless}}
         <div class="trpToolbarList divider">
           <div class="trpToolbarListContent" id="people-roster"></div>
         </div>
