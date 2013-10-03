@@ -58,8 +58,13 @@
   opacity: 0.95;
 }
 
-.trpBtnRed {
+.trpBtnRed:hover {
   opacity: 1;
+}
+
+.trpBtnRed:active {
+  margin-top: 1px;
+  border-bottom: 1px solid @trpRed;
 }
 
 .trpBtnWhite:hover {
@@ -79,6 +84,11 @@
   opacity: 1;
 }
 
+.trpBtnGreen:active {
+  margin-top: 1px;
+  border-bottom: 1px solid @trpGreen;
+}
+
 .trpBtnGrey {
   background-color: @trpDarkGrey;
   color: white;
@@ -93,6 +103,11 @@
 
 .trpBtnLightGrey:hover {
   opacity: 1;
+}
+
+.trpBtnLightGrey:active {
+  margin-top: 1px;
+  border-bottom: 1px solid @trpLightGrey;
 }
 
 .trpCopyButton {
