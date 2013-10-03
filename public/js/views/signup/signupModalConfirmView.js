@@ -22,7 +22,6 @@ define([
     },
 
     onCloseLinkClicked: function() {
-      console.log("close");
       $(".close").click();
     },
 
