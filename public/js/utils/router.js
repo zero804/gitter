@@ -40,10 +40,10 @@ define([
   });
 
   function getFragmentsFromPath(path) {
-    var hash = window.location.hash;
-    if (hash.indexOf('#%7C') === 0) {
-      window.location.hash = hash.replace(/%7C/, '|');
-      path = path.replace(/%7C/, '|');
+    var lowerCaseHash = window.location.hash.toLowerCase();
+    if (lowerCaseHash.indexOf('#%7c') === 0 || lowerCaseHash.indexOf('#!%7c') === 0) {
+      window.location.hash = window.location.hash.replace(/%7c/i, '|');
+      path = path.replace(/%7c/i, '|');
     }
     if(path) {
       path = path.replace('!', '');
