@@ -62,21 +62,18 @@
   opacity: 1;
 }
 
-.trpBtnRed:active {
-  margin-top: 1px;
-  border-bottom: 1px solid @trpRed;
-}
-
 .trpBtnWhite:hover {
   background: rgba(255,255,255,1);
 }
 
 .trpBtnGreen {
+  box-sizing: border-box;
   background-color: @trpGreen;
 /*  background: rgba(29,206,155, 0.95);*/
   opacity: 0.95;
   color: white;
   border-bottom: 2px solid #19b363;
+  border-top: 1px solid transparent;
 }
 
 .trpBtnGreen:hover {
@@ -84,10 +81,6 @@
   opacity: 1;
 }
 
-.trpBtnGreen:active {
-  margin-top: 1px;
-  border-bottom: 1px solid @trpGreen;
-}
 
 .trpBtnGrey {
   background-color: @trpDarkGrey;
@@ -103,11 +96,6 @@
 
 .trpBtnLightGrey:hover {
   opacity: 1;
-}
-
-.trpBtnLightGrey:active {
-  margin-top: 1px;
-  border-bottom: 1px solid @trpLightGrey;
 }
 
 .trpCopyButton {
