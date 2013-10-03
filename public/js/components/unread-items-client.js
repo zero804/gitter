@@ -5,8 +5,9 @@ define([
   'utils/context',
   './realtime',
   'log!unread-items-client',
-  'backbone'
-], function($, _, context, realtime, log, Backbone) {
+  'backbone',
+  'utils/appevents'
+], function($, _, context, realtime, log, Backbone, appEvents) {
   "use strict";
 
   function limit(fn, context, timeout) {
@@ -490,7 +491,7 @@ define([
   // -----------------------------------------------------
 
   var TroupeUnreadItemsViewportMonitor = function(scrollElement, unreadItemStore) {
-    _.bindAll(this, '_eyeballStateChange', '_getBounds');
+    _.bindAll(this, '_getBounds');
 
     this._scrollElement = scrollElement[0] || scrollElement;
 
@@ -501,7 +502,7 @@ define([
     this._scrollTop = 1000000000;
     this._scrollBottom = 0;
 
-    $(document).on('eyeballStateChange', this._eyeballStateChange);
+    appEvents.on('eyeballStateChange', this._eyeballStateChange, this);
 
     this._scrollElement.addEventListener('scroll', this._getBounds, false);
 
@@ -588,7 +589,7 @@ define([
       }, timeout);
     },
 
-    _eyeballStateChange: function(e, newState) {
+    _eyeballStateChange: function(newState) {
       this._inFocus = newState;
       if(newState) {
         this._getBounds();

@@ -156,7 +156,7 @@ define([
       }
     },
 
-    listen: function(callback) {
+    listen: function() {
       if(this.subscription) return;
       var self = this;
 
@@ -165,15 +165,18 @@ define([
       });
 
       realtime.registerForSnapsnots(this.url, function(snapshot) {
+        log('shapshot received');
         self.trigger('request');
         self.set(snapshot, { parse: true, remove: true, add: true, merge: true });
+        log('>preinitload');
         self._onInitialLoad();
+        log('>presync');
         self.trigger('sync');
+        log('>postsync');
       });
 
       this.subscription.errback(function(error) {
         log('Subscription error for ' + self.url, error);
-        if(callback) return callback(error);
       });
     },
 

@@ -41,7 +41,8 @@ define([
   }
 
   var eyeballState = true;
-  $(document).on('eyeballStateChange', function(event, state) {
+
+  appEvents.on('eyeballStateChange', function(state) {
     log('Switching eyeball state to ', state);
     eyeballState = state;
   });
@@ -92,6 +93,7 @@ define([
     } else if(message.channel == '/meta/subscribe') {
       if(message.error && message.error.indexOf('403::') === 0) {
         // More needs to be done here!
+        console.trace();
         log('Access denied', message);
         debugger;
         window.alert('Realtime communications with the server have been disconnected. Click OK to reload.');
@@ -140,7 +142,8 @@ define([
       var error = message.error.split('::')[0];
       if(error === '403') {
         log('Access denied. Will not retry');
-        window.location.reload();
+        //window.location.reload();
+        debugger;
       }
     }
 
