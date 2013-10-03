@@ -7,11 +7,12 @@ require([
   'views/chat/chatInputView',
   'components/unread-items-client',
   'components/cache-sync',
+  'views/chat/decorators/fileDecorator',
   'components/native-troupe-context', // No ref
   'components/oauth',                 // No ref
   'components/native-context'         // No ref
   ], function($, MobileRouter, chatModels, ChatCollectionView,
-    chatInputView, unreadItemsClient, cacheSync) {
+    chatInputView, unreadItemsClient, cacheSync, fileDecorator) {
   "use strict";
 
   var NativeChatRouter = MobileRouter.extend({
@@ -24,7 +25,8 @@ require([
 
       var chatCollectionView = new ChatCollectionView({
         el: $('#content-frame'),
-        collection: chatCollection
+        collection: chatCollection,
+        decorators: [fileDecorator]
       });
 
       unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));

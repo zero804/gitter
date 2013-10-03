@@ -157,11 +157,13 @@ define([
     showMenu: function() {
       if (this._menuAnimating) return;
       this.openLeftMenu();
+      $("#left-menu-icon").addClass("active");
     },
 
     hideMenu: function() {
       if(this._menuAnimating || this._leftMenuLockCount > 0) return;
       this.closeLeftMenu();
+      $("#left-menu-icon").removeClass("active");
     },
 
     openLeftMenu: function() {
@@ -238,9 +240,11 @@ define([
     toggleTroupeMenu: function() {
       if (this.files) {
         this.hideTroupeMenu();
+        $("#right-menu-icon").removeClass("active");
       }
       else {
         this.showTroupeMenu();
+        $("#right-menu-icon").addClass("active");      
       }
     },
 
