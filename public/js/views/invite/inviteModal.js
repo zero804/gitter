@@ -16,7 +16,6 @@ define([
     },
 
     initialize: function(options) {
-      // console.dir(options);
       this.inviteId = options.inviteId;
       if(this.model) {
         this.setRerenderOnChange(true);
