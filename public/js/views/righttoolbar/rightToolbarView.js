@@ -74,7 +74,9 @@ define([
         isTroupe: !!troupe,
         oneToOne: context.inOneToOneTroupeContext(),
         user: user,
-        favourite: troupe && troupe.favourite
+        favourite: troupe && troupe.favourite,
+        troupeAvatarUrl: troupe && troupe.avatarUrl,
+        troupeName: troupe && troupe.name
       };
 
     },
