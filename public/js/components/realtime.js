@@ -55,10 +55,13 @@ define([
       var ext = message.ext;
       var accessToken = context.env('accessToken') || context().accessToken; // THIS SECOND METHOD WILL BE DEPRECATED!
 
-      ext.token = accessToken;
-      ext.troupeId = context.getTroupeId();
-      ext.connType = isMobile() ? 'mobile' : 'online';
-      ext.client = isMobile() ? 'mobweb' : 'web';
+      var mobile =    isMobile();
+
+      ext.token     = accessToken;
+      ext.troupeId  = context.getTroupeId();
+      ext.connType  = mobile ? 'mobile' : 'online';
+      ext.client    = mobile ? 'mobweb' : 'web';
+      ext.eyeballs  = eyeballState ? 1 : 0;
 
     } else if(message.channel == '/meta/subscribe') {
       if(!message.ext) { message.ext = {}; }
