@@ -101,9 +101,15 @@ define([
       var lht = parseInt(this.$el.css('lineHeight'),10);
       var height = this.$el.prop('scrollHeight');
       var currentLines = Math.floor(height / lht);
+      if(currentLines > 10) {
+        currentLines = 10;
+      }
 
       if (currentLines != this.chatLines) {
         this.chatLines = currentLines;
+
+        this.$el.css({ 'overflow-y': currentLines >= 10 ? 'auto' : 'none' });
+
         var newHeight = currentLines * lht;
 
         this.$el.height(newHeight);
@@ -121,6 +127,7 @@ define([
 
         chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
       }
+
     },
 
     detectNewLine: function(e) {
