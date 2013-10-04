@@ -228,7 +228,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 	opacity: 1;
 }
 
-.trpMiniLeftMenu:hover .trpMiniLeftMenuContainer {
+.trpMiniLeftMenu:hover .trpMiniLeftMenuContainer .trpDisplayPicture {
   opacity: 1;
   -webkit-filter: grayscale(0%);
   -moz-filter: grayscale(0%);
@@ -239,13 +239,21 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 	opacity: 1;
 }
 
-.trpMiniLeftMenuContainer {
+.trpMiniLeftMenuContainer .trpDisplayPicture {
   opacity: 0.7;
   .transition300ms;
   -webkit-filter: grayscale(70%);
   -moz-filter: grayscale(70%);
   filter: grayscale(70%);  
   margin-left: 2px;
+
+  &.unread {
+    .transition300ms;
+    opacity: 1;
+    -webkit-filter: grayscale(0%);
+    -moz-filter: grayscale(0%);
+    filter: grayscale(0%); 
+  }
 }
 
 .trpMiniActions {
