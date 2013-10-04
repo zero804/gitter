@@ -118,7 +118,7 @@ function sendAppEventsForUserEyeballsOffTroupe(userInTroupeCount, totalUsersInTr
 }
 
 
-function userSocketConnected(userId, socketId, connectionType, client, callback) {
+function userSocketConnected(userId, socketId, connectionType, client, troupeId, eyeballState, callback) {
   assert(userId, 'userId expected');
   assert(socketId, 'socketId expected');
 
@@ -127,7 +127,7 @@ function userSocketConnected(userId, socketId, connectionType, client, callback)
   var isMobileConnection = connectionType == 'mobile';
 
   var keys = [keySocketUser(socketId), ACTIVE_USERS_KEY, MOBILE_USERS_KEY, ACTIVE_SOCKETS_KEY, keyUserLock(userId), keyUserSockets(userId)];
-  var values = [userId, socketId, Date.now(), isMobileConnection ? 1 : 0, client];
+  var values = [userId, socketId, Date.now(), isMobileConnection ? 1 : 0, client, troupeId];
 
   scriptManager.run('presence-associate', keys, values, function(err, result) {
     if(err) return callback(err);
@@ -154,8 +154,22 @@ function userSocketConnected(userId, socketId, connectionType, client, callback)
       presenceService.emit('userOnline', userId);
     }
 
-    return callback(null, userSocketCount);
+    if(troupeId && eyeballState) {
+      eyeBallsOnTroupe(userId, socketId, troupeId, function(err) {
+        if(err) {
+          winston.error('Unable to signal eyeballs on: ' + err, {
+            userId: userId,
+            socketId: socketId,
+            exception: err
+          });
+        }
 
+        // Ignore the error
+        return callback(null, userSocketCount);
+      });
+    }
+
+    return callback(null, userSocketCount);
   });
 
 }
@@ -206,52 +220,6 @@ function socketGarbageCollected(socketId, callback) {
 
     callback();
   });
-}
-
-//
-// If the socket subscribes to a troupe, associate the socket with a troupe
-// this will be used for eyeball signals
-//
-function userSubscribedToTroupe(userId, troupeId, socketId, eyeballState, callback) {
-  assert(userId, 'userId expected');
-  assert(socketId, 'socketId expected');
-  assert(troupeId, 'troupeId expected');
-
-  winston.verbose('Associate socket and activate troupe', {
-    userId: userId,
-    socketId: socketId,
-    troupeId: troupeId,
-    eyeballState: eyeballState
-  });
-
-  var keys = [keySocketUser(socketId), keyUserLock(userId)];
-  var values = [troupeId];
-
-  scriptManager.run('presence-associate-troupe', keys, values, function(err, result) {
-    if(err) return callback(err);
-
-    if(result === 0) {
-      return callback(409 /* conflict */);
-    }
-
-    if(eyeballState) {
-      eyeBallsOnTroupe(userId, socketId, troupeId, function(err) {
-        if(err) {
-          winston.error('Unable to signal eyeballs on: ' + err, {
-            userId: userId,
-            socketId: socketId,
-            exception: err
-          });
-        }
-
-        // Ignore the error
-        return callback();
-      });
-    } else {
-      return callback();
-    }
-  });
-
 }
 
 function eyeBallsOnTroupe(userId, socketId, troupeId, callback) {
@@ -849,7 +817,6 @@ function validateUsers(callback) {
 
   // Connections and disconnections
 presenceService.userSocketConnected = userSocketConnected;
-presenceService.userSubscribedToTroupe =  userSubscribedToTroupe;
 presenceService.socketDisconnected =  socketDisconnected;
 presenceService.socketDisconnectionRequested = socketDisconnectionRequested;
 

@@ -14,7 +14,6 @@ var shutdown          = require('../utils/shutdown');
 var contextGenerator  = require('./context-generator');
 var appVersion        = require('./appVersion');
 var userService       = require("../services/user-service");
-var Q                 = require('q');
 
 var appTag = appVersion.getAppTag();
 
@@ -36,7 +35,6 @@ var superClientPassword = nconf.get('ws:superClientPassword');
 
 // This strategy ensures that a user can access a given troupe URL
 function validateUserForTroupeSubscription(options, callback) {
-  options.notifyPresenceService = true;
   validateUserForSubTroupeSubscription(options, callback);
 }
 
@@ -44,9 +42,6 @@ function validateUserForTroupeSubscription(options, callback) {
 function validateUserForSubTroupeSubscription(options, callback) {
   var userId = options.userId;
   var match = options.match;
-  var message = options.message;
-  var clientId = options.clientId;
-  var notifyPresenceService = options.notifyPresenceService;
 
   var troupeId = match[1];
   return troupeService.findById(troupeId)
@@ -57,17 +52,6 @@ function validateUserForSubTroupeSubscription(options, callback) {
       if(!result) {
         winston.info("Denied user " + userId + " access to troupe " + troupe.uri);
         return false;
-      }
-
-      if(notifyPresenceService) {
-        var eyeballState = true;
-        if(message.ext && 'eyeballs' in message.ext) {
-          eyeballState = !!message.ext.eyeballs;
-        }
-
-        var userSubscribedToTroupe = Q.denodeify(presenceService.userSubscribedToTroupe);
-        return userSubscribedToTroupe(userId, troupeId, clientId, eyeballState)
-                .thenResolve(true);
       }
 
       return result;
@@ -236,12 +220,13 @@ var authenticator = {
       var connectionType = getConnectionType(ext.connType);
       var client = ext.client || '';
       var troupeId = ext.troupeId || '';
+      var eyeballState = ext.eyeballs || '';
 
       // This is an UGLY UGLY hack, but it's the only
       // way possible to pass the userId to the outgoing extension
       // where we have the clientId (but not the userId)
       var id = message.id || '';
-      message.id = id + ':' + userId + ':' + connectionType + ':' + client + ':' + troupeId;
+      message.id = [id, userId, connectionType, client, troupeId, eyeballState].join(':');
 
       return callback(message);
     });
@@ -269,8 +254,7 @@ var authenticator = {
     }
 
     var parts = fakeId.split(':');
-
-    if(parts.length != 5) {
+    if(parts.length != 6) {
       return callback(message);
     }
 
@@ -280,9 +264,10 @@ var authenticator = {
     var clientId = message.clientId;
     var client = parts[3];
     var troupeId = parts[4] || undefined;
+    var eyeballState = parseInt(parts[5], 10) || 0;
 
     // Get the presence service involved around about now
-    presenceService.userSocketConnected(userId, clientId, connectionType, client, function(err) {
+    presenceService.userSocketConnected(userId, clientId, connectionType, client, troupeId, eyeballState, function(err) {
       if(err) winston.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
 
       message.ext.userId = userId;
