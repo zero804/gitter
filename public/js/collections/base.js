@@ -168,11 +168,8 @@ define([
         log('shapshot received');
         self.trigger('request');
         self.set(snapshot, { parse: true, remove: true, add: true, merge: true });
-        log('>preinitload');
         self._onInitialLoad();
-        log('>presync');
         self.trigger('sync');
-        log('>postsync');
       });
 
       this.subscription.errback(function(error) {
@@ -268,6 +265,25 @@ define([
           log("Unknown operation " + operation + ", ignoring");
 
       }
+    },
+
+    /**
+     * Get a model by ID or wait for the collection to load (probably via a snapshot)
+     * and then return it
+     */
+    getOrWait: function(id, callback) {
+      var model = this.get(id);
+      if(model) return callback(model);
+
+      if(this._loading && this.length === 0) {
+        // we need to wait for models in the collection
+        this.once('reset sync', function() {
+          callback(this.get(id));
+        }, this);
+      } else {
+        callback();
+      }
+
     }
   });
 
