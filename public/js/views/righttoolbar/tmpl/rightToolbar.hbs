@@ -1,45 +1,47 @@
 <!-- <div class="nano">
   <div class="content"> -->
     <div class="trpToolbarContent" id="toolbar-content">
-      <div id="people-list">
-        <div class="trpHeaderTitle trpToolbarHeader" id="people-header">{{headerTitle}}</div>
-        {{#unless oneToOne}}
-        <div id="troupe-avatar" class="trpDisplayPicture avatar-s" data-original-title="{{troupeName}}" style="background-image: url({{troupeAvatarUrl}});"></div>
-        {{/unless}}
-        <div class="trpToolbarList divider">
-          <div class="trpToolbarListContent" id="people-roster"></div>
-        </div>
-        <div class="trpToolbarHeader" id="request-header" style="display: none;">Requests</div>
-        <div class="trpToolbarList divider" id="request-list" style="display: none;">
-          <div class="trpToolbarListContent" id="request-roster"></div>
-        </div>
-        <div class="trpToolbarHeader" id="invite-header" style="display: none;">Invites</div>
-        <div class="trpToolbarList divider" id="invite-list" style="display: none;">
-          <div class="trpToolbarListContent" id="invite-roster"></div>
-        </div>
-      </div>
-      <div class="trpTroupeRelatedContent" id="troupe-content">
-        <div class="trpTroupeRelatedContentHolder">
-          <div class="trpToolbarHeader" id="file-header">Files</div>
-          <div id="fineUploader"></div>
-          <div class="trpToolbarList divider scroller {{#oneToOne}}oneToOne{{/oneToOne}}">
-            <div class="trpToolbarListContent" id="file-list"></div>
-          </div>
+      <div id="toolbar-top-content" style="height:100%; padding-bottom: 200px; box-sizing: border-box;">
+        <div id="people-list">
+          <div class="trpHeaderTitle trpToolbarHeader" id="people-header">{{headerTitle}}</div>
           {{#unless oneToOne}}
-          <div class="trpToolbarHeader" id="mail-header">Mails</div>
-          <div class="trpToolbarList divider scroller">
-            <div class="trpToolbarListContent" id="mail-list">
-              <a href='mailto:{{troupeEmailAddress}}' style="text-decoration: none">
-                <div style="display: inline-block; margin-bottom: 8px">
-                  <div class="trpButton" style="margin-left: 0px">
-                    <span style="vertical-align: middle">New Mail</span>
-                  </div>
-                </div>
-              </a>
-              <div class="frame-conversations"></div>
-            </div>
-          </div>
+          <div id="troupe-avatar" class="trpDisplayPicture avatar-s" data-original-title="{{troupeName}}" style="background-image: url({{troupeAvatarUrl}});"></div>
           {{/unless}}
+          <div class="trpToolbarList divider">
+            <div class="trpToolbarListContent" id="people-roster"></div>
+          </div>
+          <div class="trpToolbarHeader" id="request-header" style="display: none;">Requests</div>
+          <div class="trpToolbarList divider" id="request-list" style="display: none;">
+            <div class="trpToolbarListContent" id="request-roster"></div>
+          </div>
+          <div class="trpToolbarHeader" id="invite-header" style="display: none;">Invites</div>
+          <div class="trpToolbarList divider" id="invite-list" style="display: none;">
+            <div class="trpToolbarListContent" id="invite-roster"></div>
+          </div>
+        </div>
+        <div class="trpTroupeRelatedContent" id="troupe-content">
+          <div class="trpTroupeRelatedContentHolder">
+            <div class="trpToolbarHeader" id="file-header">Files</div>
+            <div id="fineUploader"></div>
+            <div class="trpToolbarList divider scroller {{#oneToOne}}oneToOne{{/oneToOne}}">
+              <div class="trpToolbarListContent" id="file-list"></div>
+            </div>
+            {{#unless oneToOne}}
+            <div class="trpToolbarHeader" id="mail-header">Mails</div>
+            <div class="trpToolbarList scroller">
+              <div class="trpToolbarListContent" id="mail-list">
+                <a href='mailto:{{troupeEmailAddress}}' style="text-decoration: none">
+                  <div style="display: inline-block; margin-bottom: 8px">
+                    <div class="trpButton" style="margin-left: 0px">
+                      <span style="vertical-align: middle">New Mail</span>
+                    </div>
+                  </div>
+                </a>
+                <div class="frame-conversations"></div>
+              </div>
+            </div>
+            {{/unless}}
+          </div>
         </div>
       </div>
       <div class="trpTroupeActions divider-top">
