@@ -109,7 +109,7 @@ define([
       var editIconTooltip = (this.hasBeenEdited()) ? "Edited shortly after being sent": ((this.canEdit()) ? "Edit within 4 minutes of sending" : ((this.isOwnMessage()) ? "It's too late to edit this message." : "You can't edit someone else's message"));
       var editIcon = this.$el.find('.trpChatEdit [title]');
 
-      if (!window._troupeCompactView) {
+      if (!this.compactView) {
         editIcon.tooltip('destroy');
         editIcon.attr('title', editIconTooltip);
         editIcon.tooltip({ container: 'body' });

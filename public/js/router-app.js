@@ -3,7 +3,6 @@ require([
   'jquery',
   'backbone',
   'utils/context',
-  'utils/appevents',
   'views/app/appIntegratedView',
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
@@ -11,7 +10,6 @@ require([
   'collections/instances/troupes',
   'collections/useremails',
   'views/righttoolbar/rightToolbarView',
-  'views/file/fileDetailView',
   'views/file/filePreviewView',
   'views/file/fileVersionsView',
   'views/request/requestDetailView',
@@ -44,11 +42,13 @@ require([
   'components/dozy', // Sleep detection No ref
   'template/helpers/all', // No ref
   'components/eyeballs' // No ref
-], function($, Backbone, context, appEvents, AppIntegratedView, chatInputView, ChatCollectionView,
-            itemCollections, troupeCollections, UserEmailCollection, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
-            RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, profileEmailView, profileAddEmailView, shareSearchView,
-            createTroupeView, UsernameView,
-            troupeSettingsView, TroupeMenuView, ReinviteModal, Router, unreadItemsClient, SmartCollectionView, fileDecorator, webhookDecorator, userDecorator, embedDecorator /*, errorReporter , FilteredCollection */) {
+], function($, Backbone, context, AppIntegratedView, chatInputView, ChatCollectionView,
+            itemCollections, troupeCollections, UserEmailCollection, RightToolbarView,
+            filePreviewView, fileVersionsView, RequestDetailView, InviteDetailView, PersonDetailView,
+            conversationDetailView, profileView, profileEmailView, profileAddEmailView, shareSearchView,
+            createTroupeView, UsernameView, troupeSettingsView, TroupeMenuView, ReinviteModal, Router,
+            unreadItemsClient, SmartCollectionView, FileDecorator, webhookDecorator, userDecorator,
+            embedDecorator /*, errorReporter , FilteredCollection */) {
   "use strict";
 
   // Make drop down menus drop down
@@ -82,7 +82,7 @@ require([
     el: $('#content-frame'),
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
-    decorators: [fileDecorator, webhookDecorator, userDecorator, embedDecorator]
+    decorators: [new FileDecorator(itemCollections.files), webhookDecorator, userDecorator, embedDecorator]
   }).render();
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));

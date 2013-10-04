@@ -2,27 +2,29 @@
 /* global define:false */
 define([
   'views/file/fileDetailView',
-  'collections/instances/integrated-items',
   'log!file-decorator'
-], function(FileDetailView, itemCollections, log) {
-
+], function(FileDetailView, log) {
   "use strict";
 
-  function showFileDetail(chatItemView, meta) {
-    var model = itemCollections.files.get(meta.fileId);
-    log('File model: ', model);
-    if (model) {
-      log('File model found');
-      var view = new FileDetailView({ model: model, hideClose: true, hideActions: true, className: 'rich' });
-      log('chatText el: ', chatItemView.$el.find('.trpChatText'));
-      log('fileDetail view el: ', view.render().el);
-      chatItemView.$el.find('.trpChatText').append(view.render().el);
+  return function FileDecorator(collection) {
+
+    function showFileDetail(chatItemView, meta) {
+      collection.getOrWait(meta.fileId, function(model) {
+        log('File model: ', model);
+        if (model) {
+          log('File model found');
+          var view = new FileDetailView({ model: model, hideClose: true, hideActions: true, className: 'rich' });
+          log('chatText el: ', chatItemView.$el.find('.trpChatText'));
+          log('fileDetail view el: ', view.render().el);
+          chatItemView.$el.find('.trpChatText').append(view.render().el);
+        } else {
+          chatItemView.$el.find('.trpChatText').append("Uploaded a file that has since been deleted.");
+        }
+      });
+
     }
-  }
 
-  var decorator = {
-
-    decorate: function(chatItemView) {
+    this.decorate = function(chatItemView) {
       log('Running fileDecorator', meta);
       var meta = chatItemView.model.get('meta');
       if (meta) {
@@ -32,10 +34,8 @@ define([
             break;
         }
       }
-    }
+    };
 
   };
-
-  return decorator;
 
 });
