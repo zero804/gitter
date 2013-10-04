@@ -275,7 +275,7 @@ define([
       var model = this.get(id);
       if(model) return callback(model);
 
-      if(this._loading && this.length === 0) {
+      if(!this._initialLoadCalled && this.length === 0) {
         // we need to wait for models in the collection
         this.once('reset sync', function() {
           callback(this.get(id));
