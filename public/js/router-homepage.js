@@ -51,14 +51,15 @@ require([
   new UserhomeRouter({
     regions: [appView.rightPanelRegion, appView.dialogRegion],
     rootHandler: function() {
-      if(window.localStorage.startTour) {
-        delete window.localStorage.startTour;
-        require([
-          'tours/tour-controller'
-        ], function(tourController) {
-          tourController.init({ appIntegratedView: appView });
-        });
-      }
+
+      // if(window.localStorage.startTour) {
+      //   delete window.localStorage.startTour;
+      //   require([
+      //     'tours/tour-controller'
+      //   ], function(tourController) {
+      //     tourController.init({ appIntegratedView: appView });
+      //   });
+      // }
     }
   });
 
