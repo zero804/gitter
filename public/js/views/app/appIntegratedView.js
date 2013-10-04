@@ -305,6 +305,9 @@ define([
     },
 
     onKeyPress: function(e) {
+      //  return if user is not copying or pasting
+      if ( e.metaKey || e.ctrlKey ) return true;
+
       // return if a form input has focus
       if ( $("*:focus").is("textarea, input") ) return true;
 
