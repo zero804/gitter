@@ -16,7 +16,7 @@ var fakeEngine = {
 
 
 function FakeClient(socketId, userId, troupeId, script, done) {
-  _.bindAll(this, 'connect', 'associateWithTroupe', 'disconnect', 'signalEyeball', 'next');
+  _.bindAll(this, 'connect', 'disconnect', 'signalEyeball', 'next');
   this.socketId = socketId;
   this.userId = userId;
   this.troupeId = troupeId;
@@ -27,16 +27,7 @@ function FakeClient(socketId, userId, troupeId, script, done) {
 
 FakeClient.prototype = {
   connect: function(callback) {
-    presenceService.userSocketConnected(this.userId, this.socketId, 'test', 'test', callback);
-  },
-
-  associateWithTroupe: function(callback) {
-    var self = this;
-    presenceService.userSubscribedToTroupe(this.userId, this.troupeId, this.socketId, true, function(err) {
-      if(err) return callback(err);
-      self.eyeballSignal = 1;
-      callback();
-    });
+    presenceService.userSocketConnected(this.userId, this.socketId, 'test', 'test', this.troupeId, true, callback);
   },
 
   disconnect: function(callback) {
@@ -68,10 +59,8 @@ FakeClient.prototype = {
       case 0:
         return this.connect(this.next);
       case 1:
-        return this.associateWithTroupe(this.next);
-      case 2:
         return this.signalEyeball(this.next);
-      case 3:
+      case 2:
         return this.disconnect(this.next);
 
       default:
@@ -94,9 +83,9 @@ function doTest(iterations, done) {
 
     var script = [0];
     for(var j = 1; j < i; j++) {
-      script.push(Math.min(2, j));
+      script.push(1);
     }
-    script.push(3);
+    script.push(2);
 
     var c = new FakeClient(socketId, userId, troupeId, script, d.makeNodeResolver());
     c.next();
@@ -144,7 +133,7 @@ describe('presenceService', function() {
     var userId = 'TESTUSER1' + Date.now();
     var socketId = 'TESTSOCKET1' + Date.now();
     var troupeId = 'TESTTROUPE1' + Date.now();
-    var c = new FakeClient(socketId, userId, troupeId, [0,1,2,2,2,2,2,2,2,3], done);
+    var c = new FakeClient(socketId, userId, troupeId, [0,1,1,1,1,1,1,1,1,2], done);
     c.next();
   });
 

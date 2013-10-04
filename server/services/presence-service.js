@@ -167,9 +167,10 @@ function userSocketConnected(userId, socketId, connectionType, client, troupeId,
         // Ignore the error
         return callback(null, userSocketCount);
       });
+    } else {
+      return callback(null, userSocketCount);
     }
 
-    return callback(null, userSocketCount);
   });
 
 }
