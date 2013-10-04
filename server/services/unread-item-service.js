@@ -468,6 +468,7 @@ exports.install = function() {
     var url = data.url;
     var operation = data.operation;
     var model = data.model;
+
     if(!model) {
       winston.warn('No data model in onDataChangeEvent', { data: data});
       return;
@@ -475,6 +476,11 @@ exports.install = function() {
 
     if(model.skipAlerts) {
       winston.warn('model is set to skipAlerts', { data: data});
+      return;
+    }
+
+    if(model.fileName) {
+      winston.warn('Not generating unread items for files', {data: data});
       return;
     }
 

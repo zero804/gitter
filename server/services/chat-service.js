@@ -37,8 +37,8 @@ exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
   chatMessage._md      = urlExtractor.version;
   chatMessage.meta     = meta;
 
-  // Skip unreaditems
-  chatMessage.skipAlerts = true;
+  // Skip UnreadItems, except when new files are uploaded
+  chatMessage.skipAlerts = meta.type === 'file' ? false : true;
 
   chatMessage.save(function (err) {
     if(err) return callback(err);
