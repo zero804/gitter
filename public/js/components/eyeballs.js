@@ -3,8 +3,9 @@ define([
   'jquery',
   'utils/context',
   './realtime',
-  'log!eyeballs'
-], function($, context, realtime, log) {
+  'log!eyeballs',
+  'utils/appevents'
+], function($, context, realtime, log, appEvents) {
   "use strict";
 
   var eyesOnState = true;
@@ -52,7 +53,7 @@ define([
       eyesOnState = false;
       send(0, true);
 
-      $(document).trigger('eyeballStateChange', false);
+      appEvents.trigger('eyeballStateChange', false);
     }
   }
 
@@ -67,7 +68,7 @@ define([
       eyesOnState = true;
       send(1);
 
-      $(document).trigger('eyeballStateChange', true);
+      appEvents.trigger('eyeballStateChange', true);
     }
   }
 

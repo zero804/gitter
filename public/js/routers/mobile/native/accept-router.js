@@ -5,7 +5,6 @@ require([
   'utils/context',
   'collections/invites',
   'views/invite/inviteModal',
-  'components/native-troupe-context', // No ref
   'components/oauth',                 // No Ref
   'template/helpers/all',             // No ref
   'components/native-context'         // No ref

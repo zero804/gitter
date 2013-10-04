@@ -79,8 +79,8 @@ end-to-end-test-saucelabs-chrome:
 	MAIL_PORT=$(MAIL_PORT) \
 	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
 
-end-to-end-test-saucelabs-ie9:
-	@echo Testing $(BETA_SITE) with ie9 at saucelabs.com
+end-to-end-test-saucelabs-ie10:
+	@echo Testing $(BETA_SITE) with ie10 at saucelabs.com
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTEIE \
 	BASE_URL=$(BETA_SITE) \
@@ -156,7 +156,7 @@ validate-source: search-js-console
 
 continuous-integration: clean validate-source npm grunt version-files upgrade-data reset-test-data test-xunit test-coverage tarball
 
-post-deployment-tests: test-in-browser-xunit end-to-end-test-saucelabs-chrome end-to-end-test-saucelabs-ie9 end-to-end-test-saucelabs-android
+post-deployment-tests: test-in-browser-xunit end-to-end-test-saucelabs-chrome end-to-end-test-saucelabs-ie10 end-to-end-test-saucelabs-android
 
 build: clean validate-source npm grunt version-files upgrade-data test-xunit
 

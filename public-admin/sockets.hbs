@@ -144,6 +144,7 @@
       }
 
       function mapUserRows(row) {
+          if(!row) return {};
           return {
               id: row.id,
               name: row.displayName,
@@ -152,6 +153,8 @@
       }
 
       function mapTroupeRows(row) {
+          if(!row) return {};
+
           return {
               id: row.id,
               name: row.name,

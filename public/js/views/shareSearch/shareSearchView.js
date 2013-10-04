@@ -13,12 +13,13 @@ define([
   'zeroclipboard',
   'utils/appevents',
   'collections/suggested-contacts',
+  'log!shareSearchView',
   'bootstrap-typeahead',              // No ref
   'utils/validate-wrapper',           // No ref
   'jquery-placeholder'                // No ref
 
 ], function($, _, Marionette, context, TroupeViews, cocktail, InfiniteScrollMixin, template,
-  rowTemplate, noContactsTemplate, ZeroClipboard, appEvents, suggestedContactModels) {
+  rowTemplate, noContactsTemplate, ZeroClipboard, appEvents, suggestedContactModels, log) {
   "use strict";
 
   var ContactView = TroupeViews.Base.extend({
@@ -34,6 +35,12 @@ define([
       d.connected = d.status === 'connected';
 
       return d;
+    },
+    // mobile safari 6.1, 7.0 and chrome 29 will refuse to render without this
+    afterRender: function() {
+      this.el.style.display='none';
+      this.el.style.display='block';
+      this._uselessPropertyToTriggerReflow = this.el.offsetHeight;
     },
     inviteClicked: function() {
       if(this.model.get('status')) {
@@ -77,12 +84,11 @@ define([
           var query= self.collection._currentQuery;
           return { query: query && query.q };
         },
-        // mobile safari 6.1 will refuse to render without this
+        // mobile safari 6.1, 7.0 and chrome 29 will refuse to render without this
         afterRender: function() {
           this.el.style.display='none';
           this.el.style.display='block';
-          var uselessQueryToTriggerReflow = this.el.offsetHeight;
-          uselessQueryToTriggerReflow = uselessQueryToTriggerReflow;
+          this._uselessPropertyToTriggerReflow = this.el.offsetHeight;
         }
       });
     }
@@ -99,7 +105,8 @@ define([
       $banner.addClass('hidden');
       setTimeout(function() {
         $banner.hide();
-      }, 1000);
+        // chrome 29 will refuse to render without a 350ms gap before animation ends
+      }, 650);
     }, 4000);
   };
 
@@ -109,7 +116,8 @@ define([
     events: {
       'mouseover #copy-button' :      'createClipboard',
       'change #custom-email':         'onSearchChange',
-      'keyup #custom-email':       'onSearchChange'
+      'keyup #custom-email':          'onSearchChange',
+      'click #link-import-google':    'onGoogleImportClicked'
     },
 
     // when instantiated by default (through the controller) this will reflect on troupeContext to determine what the invite is for.
@@ -157,14 +165,20 @@ define([
 
       if (!connectMode && !troupe) throw new Error("Need a troupe");
 
+      var returnToUrl;
+      if(this.options.nativeMode) {
+        returnToUrl = "/native-oauth-complete";
+      } else {
+        returnToUrl = encodeURIComponent(window.location.pathname + window.location.hash);
+      }
+
       var data = {
         connectMode: connectMode,
         user: user,
         troupe: troupe,
         importedGoogleContacts: context().importedGoogleContacts,
         shareUrl: this.getShareUrl(),
-        basePath: context.env('basePath'),
-        returnToUrl: encodeURIComponent(window.location.pathname + window.location.hash)
+        returnToUrl: returnToUrl
       };
 
       return data;
@@ -233,6 +247,28 @@ define([
       }
     },
 
+    openNativeOAuth: function(url) {
+      var self = this;
+      var cordova = window.cordova;
+      cordova.exec(function(result) {
+        if(result === 'complete') {
+          self.search(true);
+        }
+
+      }, function(e) {
+        log('OAuth Error:' + e, e);
+      }, "OAuth", "displayOAuthLogin", [url, "/native-oauth-complete"]);
+
+    },
+
+    onGoogleImportClicked: function(e) {
+      if(this.options.nativeMode) {
+        log('Using native OAuth');
+        e.preventDefault();
+        this.openNativeOAuth(e.currentTarget.href);
+      }
+    },
+
     inviteCustomEmail: function() {
       var emailField = this.$el.find('#custom-email');
       var email = emailField.val();
@@ -266,9 +302,13 @@ define([
       this.onSearchChange();
     },
 
-    getQuery: function() {
+    getQuery: function(forceReload) {
       var emailField = this.$el.find('#custom-email');
       var q = { q: emailField.val() };
+
+      if(forceReload) {
+        q._d = Date.now();
+      }
 
       if(this.isConnectMode()) {
         q.statusConnect = 1;
@@ -282,8 +322,9 @@ define([
       return q;
     },
 
-    search: function() {
-      var query = this.getQuery();
+    search: function(forceReload) {
+      log('Executing search: ');
+      var query = this.getQuery(forceReload);
       this.collection.query(query);
     },
 

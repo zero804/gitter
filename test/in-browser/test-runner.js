@@ -16,7 +16,8 @@ require([
       'in-browser/mixpanel-test',
       'in-browser/realtime-test',
       'in-browser/sortable-marionette-test',
-      'in-browser/unread-items-client-test'
+      'in-browser/unread-items-client-test',
+      'in-browser/rollers-test'
       ], function() {
 
       if (window.mochaPhantomJS) {

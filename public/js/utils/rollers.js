@@ -6,6 +6,9 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
   /** @const */ var TRACK_NO_PASS = 2;
   /** @const */ var STABLE = 3;
 
+  /** Number of pixels we need to be within before we say we're at the bottom */
+  /** @const */ var BOTTOM_MARGIN = 30;
+
   /* Put your scrolling panels on rollers */
   function Rollers(target) {
     this._target = target;
@@ -18,21 +21,28 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
     this._stableElement = null;
     this._mode = TRACK_BOTTOM;
 
-    var self = this;
+    var adjustScroll = this.adjustScroll.bind(this);
     // create an observer instance
     var MutationObserver = window.MutationObserver || window.MozMutationObserver || window.WebKitMutationObserver || LegacyMutations;
-    var observer = new MutationObserver(function(/*mutations*/) {
-      self._mutationHandlers[self._mode]();
-      self._postMutateTop = self._target.scrollTop;
-    });
+    var observer = new MutationObserver(adjustScroll);
 
-    target.addEventListener('scroll', this.trackLocation.bind(this));
+    target.addEventListener('scroll', this.trackLocation.bind(this), false);
+    window.addEventListener('resize', adjustScroll, false);
+    window.addEventListener('focusin', adjustScroll, false);
+    window.addEventListener('focusout', adjustScroll, false);
 
     // pass in the target node, as well as the observer options
     observer.observe(target, { attributes: true, childList: true, characterData: true, subtree: true });
   }
 
   Rollers.prototype = {
+    adjustScroll: function() {
+      this._mutationHandlers[this._mode]();
+      this._postMutateTop = this._target.scrollTop;
+      return true;
+    },
+
+    /* Specify an element that should not be scrolled past */
     trackUntil: function(element) {
       if(this._mode != STABLE) {
         this._nopass = element;
@@ -67,16 +77,22 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
 
     isScrolledToBottom: function() {
       var target = this._target;
-      var atBottom = target.scrollTop >= target.scrollHeight - target.clientHeight - 15;
+      var atBottom = target.scrollTop >= target.scrollHeight - target.clientHeight - BOTTOM_MARGIN;
       return atBottom;
     },
 
+    /*
+     * Update the scroll position to follow the bottom of the scroll pane
+     */
     updateTrackBottom: function() {
       var target = this._target;
       var scrollTop = target.scrollHeight - target.clientHeight;
       target.scrollTop = scrollTop;
     },
 
+    /*
+     * Scroll to the bottom and switch the mode to TRACK_BOTTOM
+     */
     scrollToBottom: function() {
       var target = this._target;
       var scrollTop = target.scrollHeight - target.clientHeight;
@@ -109,7 +125,6 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
 
         // Calculate an record the distance of the stable element to the bottom of the view
         this._stableElementFromBottom = scrollBottom - stableElementTop;
-        //this.trackLocation();
       }
     },
 
@@ -129,24 +144,21 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
         return true;
       }
 
-      var atBottom = target.scrollTop >= target.scrollHeight - target.clientHeight - 15;
+      var atBottom = target.scrollTop >= target.scrollHeight - target.clientHeight - BOTTOM_MARGIN;
 
       if(atBottom) {
         if(this._nopass) {
           if(this._mode != TRACK_NO_PASS) {
-            log('Switching to TRACK_NO_PASS');
             this._mode = TRACK_NO_PASS;
 
           }
         } else {
           if(this._mode != TRACK_BOTTOM) {
-            log('Switching to TRACK_BOTTOM');
             this._mode = TRACK_BOTTOM;
           }
         }
       } else {
         if(this._mode != STABLE) {
-          log('Switching to STABLE');
           this._mode = STABLE;
         }
       }
@@ -165,14 +177,13 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
       return true;
     },
 
-
-
     getBottomMostVisibleElement: function() {
       var scrollTop = this._target.scrollTop;
       var clientHeight = this._target.clientHeight;
       var max = scrollTop + clientHeight;
-      var t = document.querySelector('#frame-chat');
-      var children = t.children;
+      var target = this._target;
+      var children = target.children;
+
       for(var i = children.length - 1; i >= 0; i--) {
         var child = children[i];
         if(child.offsetTop < max) {

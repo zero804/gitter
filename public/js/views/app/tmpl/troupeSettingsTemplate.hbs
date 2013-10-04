@@ -2,19 +2,19 @@
   <form id="troupeSettings">
     <div class="trpBodyMedium">Troupe name<br></div>
     <input type="text" name="name" value="{{name}}"/ class="trpInput" style="margin-top: 8px">
-    <p class="trpBodyMedium">You can delete a Troupe once you are the only person left in the Troupe</p>
-    <div class="trpRequestSubmit">
-      <button type="submit" class="trpModalButton trpButtonBig trpBtnGreen" id="save-troupe-settings">Save</button>
-      <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="cancel-troupe-settings">Cancel</button>
+    <div class="trpRequestSubmit"><br>
+      <button type="submit" class="trpModalButton trpButtonMedium trpBtnGreen" id="save-troupe-settings">Save</button>
+<!--       <button type="button" class="trpModalButton trpButtonMedium trpBtnGrey" id="cancel-troupe-settings">Cancel</button> -->
 
       {{#if canDelete}}
-      <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="delete-troupe">Delete Troupe</button>
+      <button type="button" class="trpModalButton trpButtonMedium trpBtnRed" id="delete-troupe">Delete Troupe</button>
       {{/if}}
 
       {{#if canLeave}}
-      <button type="button" class="trpModalButton trpButtonBig trpBtnGrey" id="leave-troupe">Leave this Troupe</button>
+      <button type="button" class="trpModalButton trpButtonMedium trpBtnLightGrey" id="leave-troupe">Leave this Troupe</button>
       {{/if}}
-
+      <br><br>
+      <p class="trpBodySmall">You can delete a Troupe once you are the only person left in the Troupe</p>
   </div>
   </form>
 </div>

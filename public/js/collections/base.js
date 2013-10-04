@@ -156,7 +156,7 @@ define([
       }
     },
 
-    listen: function(callback) {
+    listen: function() {
       if(this.subscription) return;
       var self = this;
 
@@ -165,6 +165,7 @@ define([
       });
 
       realtime.registerForSnapsnots(this.url, function(snapshot) {
+        log('shapshot received');
         self.trigger('request');
         self.set(snapshot, { parse: true, remove: true, add: true, merge: true });
         self._onInitialLoad();
@@ -173,7 +174,6 @@ define([
 
       this.subscription.errback(function(error) {
         log('Subscription error for ' + self.url, error);
-        if(callback) return callback(error);
       });
     },
 
@@ -265,6 +265,25 @@ define([
           log("Unknown operation " + operation + ", ignoring");
 
       }
+    },
+
+    /**
+     * Get a model by ID or wait for the collection to load (probably via a snapshot)
+     * and then return it
+     */
+    getOrWait: function(id, callback) {
+      var model = this.get(id);
+      if(model) return callback(model);
+
+      if(!this._initialLoadCalled && this.length === 0) {
+        // we need to wait for models in the collection
+        this.once('reset sync', function() {
+          callback(this.get(id));
+        }, this);
+      } else {
+        callback();
+      }
+
     }
   });
 

@@ -50,7 +50,7 @@ class RequestAccessTests(unittest.TestCase):
         # complete profile
         form = self.driver.find_element_by_css_selector('#updateprofileform')
         form.find_element_by_name('password').send_keys('123456')
-        form.find_element_by_name('submit').click()
+        self.driver.find_element_by_css_selector('[data-action=save]').click()
 
         self.driver.find_element_by_css_selector('.trpHelpBox')
 
@@ -85,7 +85,7 @@ class RequestAccessTests(unittest.TestCase):
         time.sleep(1)
         self.driver.find_element_by_id('request-reject-button').click()
         time.sleep(1)
-        self.driver.find_element_by_id('yes').click()
+        self.driver.find_element_by_css_selector('[data-action=yes]').click()
 
     @attr('unreliable')
     def testExistingAuthenticatedRequest(self):
@@ -103,4 +103,4 @@ class RequestAccessTests(unittest.TestCase):
         time.sleep(1)
         self.driver.find_element_by_id('request-reject-button').click()
         time.sleep(1)
-        self.driver.find_element_by_id('yes').click()
+        self.driver.find_element_by_css_selector('[data-action=yes]').click()

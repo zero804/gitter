@@ -6,24 +6,27 @@ require([
   'hbs!views/login/tmpl/loginRequestModalView',
   'views/app/appIntegratedView',
   'views/userhome/userHomeView',
-  'views/app/headerView',
   'views/toolbar/troupeMenu',
   'routers/userhome-router',
   'hbs!views/connect/tmpl/connectUserTemplate',
+  'collections/instances/troupes',
+  'views/app/smartCollectionView',
   'components/errorReporter',
   'components/dozy',
   'components/webNotifications',
   'components/desktopNotifications',
   'template/helpers/all'
-], function(Backbone, TroupeViews, context, loginRequestTemplate,  AppIntegratedView, UserHomeView, HeaderView, TroupeMenuView, UserhomeRouter, connectUserTemplate /*, errorReporter , dozy, webNotifications,_Helpers*/) {
+], function(Backbone, TroupeViews, context, loginRequestTemplate,  AppIntegratedView, UserHomeView, TroupeMenuView, UserhomeRouter, connectUserTemplate, troupeCollections, SmartCollectionView /*, errorReporter , dozy, webNotifications,_Helpers*/) {
 
   "use strict";
 
+  var troupeCollection = troupeCollections.troupes;
+
   var appView = new AppIntegratedView();
   appView.leftMenuRegion.show(new TroupeMenuView());
-  appView.headerRegion.show( new HeaderView());
+  appView.smartMenuRegion.show(new SmartCollectionView({ collection: troupeCollections.smart }));
 
-  new UserHomeView({ el: '#chat-frame' }).render();
+  new UserHomeView({ el: '#content-wrapper' }).render();
 
   // Asynchronously load tracker
   require(['utils/tracking'], function() { });
@@ -32,78 +35,34 @@ require([
   try {
     var ls = window.localStorage;
     if (ls) {
-      var data;
-
       // Show a popup to confirm access requests through signup.
       if(ls.pendingRequestConfirmation) {
-        data = ls.pendingRequestConfirmation;
-        var RequestSuccessView = TroupeViews.Base.extend({
-          template: loginRequestTemplate,
-          getRenderData: function() {
-            return data;
-          },
-          afterRender: function() {
-            this.$el.find('.modal-content').hide();
-            this.$el.find('.modal-success').show();
-          },
-          events: {
-            'click #cancel-button': function(e) {
-              this.remove();
-              if (this.dialog) this.dialog.hide();
-              e.preventDefault();
-            }
-          }
-        });
-        delete ls.pendingRequestConfirmation;
-
-        new TroupeViews.Modal({view: new RequestSuccessView() }).show();
+        window.location.hash = '#|joinrequestsent';
       }
 
       // Show a popup to confirm connection invite through signup.
       if (ls.pendingConnectConfirmation) {
-        data = JSON.parse(ls.pendingConnectConfirmation);
-
-        var InviteSuccessView = TroupeViews.Base.extend({
-          template: connectUserTemplate,
-          getRenderData: function() {
-            return data;
-          },
-          afterRender: function() {
-            this.$el.find('.modal-content').hide();
-            this.$el.find('.modal-success').show();
-            this.$el.find('#learn-more-btn').hide();
-          },
-          events: {
-            'click #cancel-button': function(e) {
-              this.remove();
-              if (this.dialog) this.dialog.hide();
-              e.preventDefault();
-            }
-          }
-        });
-        delete ls.pendingConnectConfirmation;
-        (new TroupeViews.Modal({
-          view: new InviteSuccessView()
-        })).show();
-
+        window.location.hash = '#|invitesent';
       }
     }
   }
   catch (e) {}
 
   new UserhomeRouter({
-    regions: [appView.rightPanelRegion, appView.dialogRegion]
+    regions: [appView.rightPanelRegion, appView.dialogRegion],
+    rootHandler: function() {
+
+      // if(window.localStorage.startTour) {
+      //   delete window.localStorage.startTour;
+      //   require([
+      //     'tours/tour-controller'
+      //   ], function(tourController) {
+      //     tourController.init({ appIntegratedView: appView });
+      //   });
+      // }
+    }
   });
 
   Backbone.history.start();
-
-  if(!window.localStorage.troupeTourHome) {
-    window.localStorage.troupeTourHome = 1;
-    require([
-      'tours/tour-controller'
-    ], function(tourController) {
-      tourController.init({ appIntegratedView: appView });
-    });
-  }
 
 });

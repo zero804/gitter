@@ -8,19 +8,44 @@ var _                         = require('underscore');
 var userService               = require('./user-service');
 var presenceService           = require('./presence-service');
 var emailNotificationService  = require('./email-notification-service');
-
+var collections               = require('../utils/collections');
+var troupeService             = require('./troupe-service');
 
 /**
+ * When an email address is confirmed, find any contacts pointing to that email address,
+ * Update them to 'reference' the user and then email people who know that contact but
+ * are not on troupe and tell them that they've joined
+ *
  * Returns a promise of nothing
  */
 function updateContacts(email, user) {
-  var userId = user.id;
-  winston.silly('Updating contacts for email ' + email + ' to user ' + userId);
+  var contactUserId = user.id;
+  winston.silly('Updating contacts for email ' + email + ' to user ' + contactUserId);
 
-  return contactService.updateContactsWithUserId(email, userId)
+  return contactService.updateContactsWithUserId(email, contactUserId)
     .then(function(contacts) {
       // Make sure we don't notify the same user more than once
       return _.uniq(contacts.map(function(contact) { return contact.userId; }));
+    })
+    .then(function(userIds) {
+      return troupeService.findAllConnectedUserIdsForUserId(contactUserId)
+        .then(function(existingConnectionUserIds) {
+          var hash = collections.hashArray(existingConnectionUserIds);
+          return userIds.filter(function(userId) {
+            if(hash[userId]) {
+              // If the user has an existing contact, exclude them
+              return false;
+            }
+
+            if(userId == contactUserId) {
+              // Don't alert yourself
+              return false;
+            }
+
+            // Otherwise, alert
+            return true;
+          });
+        });
     })
     .then(function(userIds) {
       if(!userIds.length) return;

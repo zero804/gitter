@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <script src="//cdn.optimizely.com/js/241369966.js"></script>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>Start a Troupe</title>
@@ -59,11 +58,10 @@
           <br><br>
         </div>
         <div class="trpHeroSignup">
-          <div class="trpButtonHuge trpHand trpBtnWhite button-signup" href="#!" id="button-signup" style="vertical-align:top"> Get Started<br><span class="trpBodySmall">It's free</span></div>
+          <div class="trpButtonHuge trpHand trpBtnWhite button-signup" href="#!" id="button-signup" style="vertical-align:top; border-bottom: 4px solid #ccc;"> Get Started<br><span class="trpBodySmall">It's free</span></div>
           <div style="vertical-align: top; display: inline-block; margin-top: 24px; padding: 0 12px; align: center"> <span class="trpBodySmall" style="color:white">or 
             <a id="google-signup" href="/google/signup" style="text-decoration: none; color: #333"><div class="trpButton trpHand trpBtnWhite button-signup" style="padding: 16px 16px; margin-left: 12px"><img src='{{ cdn "images/2/icon-gmail.png" }}' width="24" height="24" style="vertical-align: middle; margin-right: 6px;">
             <span style="vertical-align: middle;">Sign Up with Google</span></div></a><span class="trpBodySmall" style="color:white">
-            <div style="margin-top:2px; margin-left: 40px">(Also free, just one click)</div><br>
           </div>
         </div>
 
@@ -156,7 +154,7 @@
 
 
   <br><br>
-<div class="trpButtonHuge trpHand trpBtnGreen button-signup" href="#!" id="button-signup2"> Get Started<br><span class="trpBodySmall">It's free</span></div>
+<div class="trpButtonHuge trpHand trpBtnGreen button-signup" href="#!" id="button-signup2" style="border-bottom: 4px solid #19b363"> Get Started<br><span class="trpBodySmall">It's free</span></div>
 <br><br><br><br><br>
 
     </div>
@@ -172,7 +170,18 @@
 
     <div class="trpHomeAppStripContainer">
       <div class="trpHomeAppStrip">With you anytime, anywhere<br><br></div>
-      <img src='{{ cdn "images/2/hero-image-iphone5.png" }}'><br><br><br><br><br>
+      <div class="trpHeroSignup trpHeroAppStore">
+          <div style="display: inline-block; text-align: center">
+            <img src='{{ cdn "images/2/iphone.png" }}' style="height: 220px; margin-bottom: 20px"/><br>
+          </div>
+          <div style="display: inline-block; text-align: center; margin-left: 90px">
+            <img src='{{ cdn "images/2/macbook-pro.png" }}' style="height: 220px; margin-bottom: 20px"/><br>
+          </div>
+          <div style="display: inline-block; text-align: center; margin-left: 90px">
+            <img src='{{ cdn "images/2/android.png" }}' style="height: 220px; margin-bottom: 20px"/><br>
+          </div>
+        </div>
+        <div class="trpBodySmall trpWhite">Currently available on iOS, OSX, Windows and all mobile web browsers. Android App coming soon.</div><br><br>
     </div>
 
     <div class="trpHomeFooterStripContainer">

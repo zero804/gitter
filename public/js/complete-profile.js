@@ -12,6 +12,7 @@ require([
       title: "Complete your profile"
     });
     modal.on('submit.success', function() {
+      window.localStorage.startTour = 1;
       window.location = '/' + username;
     });
     return modal;

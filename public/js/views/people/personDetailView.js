@@ -4,9 +4,8 @@ define([
   'utils/context',
   'views/base',
   'hbs!./tmpl/personDetailView',
-  './confirmRemoveModalView',
   'log!person-detail-view'
-], function($, context, TroupeViews, template, ConfirmRemoveModalView, log){
+], function($, context, TroupeViews, template, log){
   "use strict";
 
   var View = TroupeViews.Base.extend({
@@ -34,13 +33,19 @@ define([
 
     onRemoveClicked: function() {
       var thisPerson = this;
-      var view = new ConfirmRemoveModalView({ model: this.model });
-      var modal = new TroupeViews.Modal({ view: view  });
 
-      view.on('confirm.yes', function() {
-          modal.off('confirm.yes');
-          modal.hide();
-         $.ajax({
+      var modal = new TroupeViews.ConfirmationModal({
+        title: "Are you sure?",
+        body: "This will remove " + this.model.get('displayName') + " from the Troupe?",
+        menuItems: [
+          { action: "yes", text: "Yes", class: "trpBtnRed" },
+          { action: "no", text: "No", class: "trpBtnLightGrey"}
+        ]
+      });
+
+       modal.on('menuItemClicked', function(action) {
+        if (action === "yes") {
+          $.ajax({
             url: "/troupes/" + context.getTroupeId() + "/users/" + this.model.get('id'),
             data: "",
             type: "DELETE",
@@ -53,12 +58,10 @@ define([
                 window.location.href = "#!";
             }
           });
-      });
-
-      view.on('confirm.no', function() {
-        modal.off('confirm.no');
+        }
+        modal.off('menuItemClicked');
         modal.hide();
-       });
+      });
 
       modal.show();
 

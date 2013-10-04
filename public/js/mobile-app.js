@@ -3,25 +3,35 @@ require([
   'jquery',
   'mobile-app-container',
   'collections/chat',
+  'collections/files',
   'views/chat/chatCollectionView',
   'views/chat/chatInputView',
   'utils/router',
   'views/shareSearch/shareSearchView',
-  'components/modal-region'
-  ], function($, app, chatModels, ChatCollectionView, chatInputView, Router, shareSearchView, modalRegion) {
+  'components/modal-region',
+  'components/unread-items-client',
+  'views/chat/decorators/fileDecorator',
+  ], function($, app, chatModels, fileModels, ChatCollectionView, chatInputView, Router, shareSearchView,
+    modalRegion, unreadItemsClient, FileDecorator) {
   "use strict";
 
   var chatCollection = new chatModels.ChatCollection();
   chatCollection.listen();
 
+  var fileCollection = new fileModels.FileCollection();
+  fileCollection.listen();
+
   var chatCollectionView = new ChatCollectionView({
-    collection: chatCollection
+    collection: chatCollection,
+    decorators: [new FileDecorator(fileCollection)]
   });
+
+  unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
 
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
     collection: chatCollection,
-    scrollDelegate: chatCollectionView.scrollDelegate
+    rollers: chatCollectionView.rollers
   }).render();
 
   app.addInitializer(function() {

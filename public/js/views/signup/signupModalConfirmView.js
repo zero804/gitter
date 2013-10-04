@@ -12,12 +12,17 @@ define([
     template: template,
 
     events: {
-      "click .button-resend": "onResendLinkClicked"
+      "click .button-resend": "onResendLinkClicked",
+      "click .button-close": "onCloseLinkClicked"
     },
 
     render: function() {
       this.$el.html(this.template({email: this.options.email}));
       return this;
+    },
+
+    onCloseLinkClicked: function() {
+      $(".close").click();
     },
 
     onResendLinkClicked: function(e) {

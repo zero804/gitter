@@ -32,7 +32,7 @@ define([
       });
 
       $('.trpMobileAmuseIcon').click(function() {
-        document.location.reload(true);
+        window.location.reload(true);
       });
 
       // prompt response to requests

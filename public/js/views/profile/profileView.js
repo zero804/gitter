@@ -22,6 +22,17 @@ define([
       this.originalEmail = context.getUser().email;
       this.hasPassword = context.getUser().hasPassword;
       if (this.compactView) $("#uvTab").hide();
+
+      this.on('menuItemClicked', this.menuItemClicked);
+    },
+
+    menuItemClicked: function(action) {
+      switch(action) {
+        case 'save':
+          this.$el.find('form#updateprofileform').submit(); return;
+        case 'signout':
+          window.location.href = '/signout'; return;
+      }
     },
 
     getRenderData: function() {
@@ -177,9 +188,10 @@ define([
         type: "POST",
         success: function(data) {
           if(data.success) {
-            context.getUser().displayName = data.displayName;
-            context.getUser().status = 'ACTIVE';
-            context.getUser().hasPassword = true;
+            var user = context.user();
+            user.set('displayName', data.displayName);
+            user.set('status', 'ACTIVE');
+            user.set('hasPassword', true);
 
             that.trigger('submit.success');
             that.dialog.hide();
@@ -206,6 +218,15 @@ define([
     initialize: function(options) {
       options = options || {};
       options.title = options.title || "Edit your profile";
+
+      options.menuItems = [
+        { text: 'Save', action: 'save', class: 'trpBtnGreen' }
+      ];
+
+      if (context.getUser().hasPassword) {
+        options.menuItems.push({ text: 'Signout', action: 'signout', class: 'trpBtnLightGrey' });
+      }
+
       TroupeViews.Modal.prototype.initialize.call(this, options);
       this.view = new View(options);
 

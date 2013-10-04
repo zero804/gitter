@@ -5,9 +5,10 @@ define([
   'underscore',
   'views/base',
   'hbs!./tmpl/filePreviewView',
+  'hbs!./tmpl/confirmDelete',
   'backbone.keys',
   'log!file-preview-view'
-], function($, _, TroupeViews, template, backboneKeys, log) {
+], function($, _, TroupeViews, template, confirmDeleteTemplate, backboneKeys, log) {
   /*jslint browser: true*/
   "use strict";
 
@@ -91,8 +92,46 @@ define([
       this.$el.find('a.link-prev').click();
     },
 
-    onMenuItemClicked: function() {
+    onMenuItemClicked: function(action) {
+      switch (action) {
+        case 'download':
+          return this.download();
+        case 'delete':
+          return this.deleteFile();
+        case 'versions':
+          window.location.hash = '#|file/versions/' + this.model.id;
+          return;
+      }
+    },
+
+    download: function() {
       window.location.href = this.model.get("url");
+    },
+
+    deleteFile: function() {
+      var that = this;
+      var modal = new TroupeViews.ConfirmationModal({
+        title: "Are you sure?",
+        body: confirmDeleteTemplate(this.model.toJSON()),
+        menuItems: [
+          { action: "yes", text: "Yes", class: "trpBtnRed" },
+          { action: "no", text: "No", class: "trpBtnLightGrey"}
+        ]
+      });
+
+      modal.on('menuItemClicked', function(action) {
+        if (action === "yes")
+          that.model.destroy({
+            success: function() {
+              window.location.hash = '#';
+            }
+          });
+
+        modal.off('menuItemClicked');
+        modal.hide();
+      });
+
+      modal.show();
     },
 
     supportsModelReplacement: function() {
@@ -200,7 +239,7 @@ define([
     afterRender: function() {
       var body = this.$el.find('.frame-preview');
       var h = Math.round($(window).height() * 0.7)  - headerHeight;
-      body.height(h);
+      body.css({ height: h });
 
       var w= Math.round($(window).width() * 0.8)  - dialogWidth;
       body.width(w);
@@ -214,13 +253,14 @@ define([
 
   var Modal = TroupeViews.Modal.extend({
     className: 'modal trpFilePreview',
-    menuItems: [{
-      id: "download",
-      text: "Download"
-    }],
     initialize: function(options) {
       options.title = 'Files';
-      TroupeViews.Modal.prototype.initialize.apply(this, arguments);
+      options.menuItems = [
+        { text: "Download", action: "download", class: "trpBtnGreen" },
+        { text: "Versions", action: "versions", class: "trpBtnLightGrey" },
+        { text: "Delete", action: "delete", class: "trpBtnRed" }
+      ];
+      TroupeViews.Modal.prototype.initialize.call(this, options);
       this.view = new PreviewView({ model: this.model, collection: this.collection });
     }
   });

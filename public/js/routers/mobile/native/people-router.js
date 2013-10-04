@@ -10,13 +10,15 @@ require([
   'views/base',
   'hbs!views/people/tmpl/mobilePeopleView',
   'views/shareSearch/shareSearchView',
+  'utils/appevents',
+  'components/realtime-troupe-listener',    // No ref
   'components/native-troupe-context',       // No ref
   'components/oauth',                       // No Ref
   'components/eyeballs',                    // No ref
   'template/helpers/all',                   // No ref
   'components/native-context'               // No ref
 ], function($, _, Backbone, context, MobileRouter, userModels, Marionette,
-    TroupeViews, PersonViewTemplate, shareSearchView) {
+    TroupeViews, PersonViewTemplate, shareSearchView, appEvents) {
 
   /*jslint browser: true, unused: true */
   "use strict";
@@ -33,11 +35,13 @@ require([
       var userCollection = this.collection = new userModels.UserCollection();
       userCollection.listen();
 
-      // update online status of user models
-      $(document).on('userLoggedIntoTroupe', updateUserStatus);
-      $(document).on('userLoggedOutOfTroupe', updateUserStatus);
+      this.userCollection = userCollection;
 
-      function updateUserStatus(e, data) {
+      // update online status of user models
+      appEvents.on('userLoggedIntoTroupe', updateUserStatus);
+      appEvents.on('userLoggedOutOfTroupe', updateUserStatus);
+
+      function updateUserStatus(data) {
         var user = userCollection.get(data.userId);
         if (user) {
           // the backbone models have not always come through before the presence events,
@@ -53,9 +57,17 @@ require([
     },
 
     shareAction: function() {
+      var self = this;
       function openModal() {
         var modal = new shareSearchView.Modal({ disableClose: false, inviteToConnect: false });
         modal.show();
+        modal.once('hide', function() {
+          // Only the first user in here
+          if(self.userCollection.length === 1) {
+            window.location.href="chat#" + context.getTroupeId();
+          }
+        });
+
       }
 
       if(context.troupe().get('url')) {
@@ -88,7 +100,6 @@ require([
   });
 
   var troupeApp = new AppRouter();
-
   window.troupeApp = troupeApp;
   Backbone.history.start();
 
