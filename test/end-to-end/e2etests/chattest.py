@@ -1,13 +1,13 @@
-from selenium.webdriver.common.action_chains import ActionChains
+# -*- coding: utf-8 -*-
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from nose.plugins.attrib import attr
 import utils
 import time
 import os
 import unittest
-
-chatMessage = 'The date and time are now ' + time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime())
-
 
 class ChatTests(unittest.TestCase):
 
@@ -21,9 +21,9 @@ class ChatTests(unittest.TestCase):
     def tearDown(self):
         self.driver.quit()
 
-    def sendAChatMessage(self):
+    def sendAChatMessage(self, message='The date and time are now ' + time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime())):
         textArea = self.driver.find_element_by_id('chat-input-textarea')
-        textArea.send_keys(chatMessage)
+        textArea.send_keys(message)
         textArea.send_keys(Keys.RETURN)
 
         time.sleep(0.5)
@@ -31,13 +31,29 @@ class ChatTests(unittest.TestCase):
         links = [i.text for i in self.driver.find_elements_by_css_selector('.trpChatItem .trpChatText')]
         text = links[len(links) - 1]
 
-        assert text == chatMessage
+        assert text == message
 
         return text
 
     def test1SendAndEditAChatMessage(self):
         self.sendAChatMessage()
         self.editAChatMessage()
+
+    def testChatEncoding(self):
+        self.sendAChatMessage(u'Hello World &<>"£© google.com/#h=p&q=cat and www.query.com/page?a=1&b=2')
+        message = self.getLastMessage()
+        self.assertEqual(u'Hello World &<>"\xa3\xa9 google.com/#h=p&q=cat and www.query.com/page?a=1&b=2', message.text)
+        links = message.find_elements_by_tag_name('a')
+        self.assertEqual('google.com/#h=p&q=cat', links[0].text)
+        self.assertEqual('http://google.com/#h=p&q=cat', links[0].get_attribute('href'))
+        self.assertEqual('www.query.com/page?a=1&b=2', links[1].text)
+        self.assertEqual('http://www.query.com/page?a=1&b=2', links[1].get_attribute('href'))
+
+    def testXSS(self):
+        self.sendAChatMessage('<script>alert();</script>')
+        html = self.getLastMessageHtml()
+        self.assertEqual('&lt;script&gt;alert();&lt;/script&gt;', html)
+
 
     @attr('unreliable')
     def test2ScrollBehaviourThenInfiniteScroll(self):
@@ -75,14 +91,10 @@ class ChatTests(unittest.TestCase):
         if self.driverName != 'FIREFOX':
             lastChat = self.driver.find_element_by_css_selector('.trpChatItem')
 
-            actionChain = ActionChains(self.driver)
-            actionChain.move_to_element(self.driver.find_element_by_css_selector('.trpChatBox'))
-            editButton = self.driver.find_element_by_css_selector('.trpChatEdit')
-            actionChain.move_to_element(editButton)
-            actionChain.click()
-            actionChain.perform()
-
-            # self.driver.find_element_by_css_selector('.trpChatEdit').click()
+            self.driver.find_element_by_css_selector('.trpChatBox').click();
+            WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.trpChatEdit')))
+            self.driver.find_element_by_css_selector('.trpChatEdit').click();
+            WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.trpChatInput')))
 
             editInput = lastChat.find_element_by_css_selector('.trpChatInput')
 
@@ -93,6 +105,12 @@ class ChatTests(unittest.TestCase):
 
             chatElText = self.getLastElement('.trpChatItem').find_element_by_css_selector('.trpChatText')
             assert chatElText.text.find("...an alteration") != -1
+
+    def getLastMessage(self):
+        return self.getLastElement('.trpChatItem').find_element_by_css_selector('.trpChatText')
+
+    def getLastMessageHtml(self):
+        return self.getLastElement('.trpChatItem').find_element_by_css_selector('.trpChatText').get_attribute('innerHTML')
 
     def getLastElement(self, selector, driver=0):
         if not driver:

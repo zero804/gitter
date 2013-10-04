@@ -27,7 +27,7 @@ require([
 
     defaultAction: function(){
       function openModal() {
-        var modal = new shareSearchView.Modal({ disableClose: true, inviteToConnect: true });
+        var modal = new shareSearchView.Modal({ disableClose: true, inviteToConnect: true, nativeMode: true, hideHeader: true });
         modal.show();
       }
 

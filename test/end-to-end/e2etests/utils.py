@@ -66,9 +66,9 @@ def driver():
 
     elif driverName == 'REMOTEIE':
         print('Using remote IE')
-        ie = {'platform': 'WINDOWS 7',
+        ie = {'platform': 'WINDOWS 8',
               'browserName': 'internet explorer',
-              'version': '9',
+              'version': '10',
               'javascriptEnabled': True,
               'ignoreZoomSetting': True}
         driver = webdriver.Remote(command_executor=remote, desired_capabilities=ie)
@@ -116,7 +116,7 @@ def existingUserlogin(driver, usernameValue, passwordValue):
 
     driver.find_element_by_css_selector('#signin-button').click()
 
-    WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'DIV.trpHeaderWrapper')))
+    WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, 'mini-left-menu')))
 
 
 def signup(driver):
@@ -147,9 +147,11 @@ def signup(driver):
     form = driver.find_element_by_css_selector('#updateprofileform')
     set_text(form.find_element_by_name('displayName'), 'Willey Waley')
     form.find_element_by_id('password').send_keys('123456')
-    form.find_element_by_name('submit').click()
+    driver.find_element_by_css_selector('[data-action=save]').click()
 
-    driver.find_element_by_id('hopscotch-cta').click()
+    tourcancel = driver.find_element_by_id('hopscotch-cta')
+    if tourcancel.is_displayed():
+        tourcancel.click()
 
     return username
 

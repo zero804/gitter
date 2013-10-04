@@ -2,26 +2,19 @@
 /*global describe:true, it: true, beforeEach:true, afterEach:true */
 "use strict";
 
-var testRequire = require('./test-require');
-/*
-var logAccess = require('./log-access');
-var presenceService = logAccess(testRequire('./services/presence-service'));
-*/
+var testRequire     = require('./test-require');
+var assert          = require('assert');
+var Q               = require("q");
+
 var presenceService = testRequire('./services/presence-service');
-var redis = testRequire("./utils/redis");
+var redis           = testRequire("./utils/redis");
+var winston         = testRequire("./utils/winston");
+var Fiber           = testRequire("./utils/fiber");
 
-var assert = require('assert');
-var winston = testRequire("./utils/winston");
-var Fiber = testRequire("./utils/fiber");
-
-var Q = require("q");
 
 var fakeEngine = {
   clientExists: function(clientId, callback) { callback(!clientId.match(/^TEST/)); }
 };
-
-
-
 
 describe('presenceService', function() {
   function cleanup(done) {
@@ -55,7 +48,7 @@ describe('presenceService', function() {
   it('should allow a user to connect', function(done) {
     var userId = 'TESTUSER1' + Date.now();
     var socketId = 'TESTSOCKET1' + Date.now();
-    presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', null, null, function(err) {
       if(err) return done(err);
 
       done();
@@ -65,7 +58,7 @@ describe('presenceService', function() {
   it('should allow a user to connect and then disconnect', function(done) {
     var userId = 'TESTUSER1' + Date.now();
     var socketId = 'TESTSOCKET1' + Date.now();
-    presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', null, null, function(err) {
       if(err) return done(err);
 
       presenceService.socketDisconnected(socketId, function(err) {
@@ -89,7 +82,7 @@ describe('presenceService', function() {
       assert(users.length === 0 || users.every(function(id) { return id !== userId; }), 'Expected user _not_ to be online at beginning of test: ', users.join(', '));
 
       // Connect the socket
-      presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
+      presenceService.userSocketConnected(userId, socketId, 'online', 'test', troupeId, true, function(err) {
         if(err) return done(err);
 
         // Check that the lookup code is working as expected
@@ -98,32 +91,27 @@ describe('presenceService', function() {
 
           assert(returnedUserId === userId);
 
-          // Subscribe to a troupe
-          presenceService.userSubscribedToTroupe(userId, troupeId, socketId, true, function(err) {
+          // Make sure that the user appears online
+          presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
             if(err) return done(err);
 
-            // Make sure that the user appears online
-            presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
+            assert(users.some(function(id) { return id === userId; }), 'Expected user to be online');
+
+            // Disconnect the socket
+            presenceService.socketDisconnected(socketId, function(err) {
               if(err) return done(err);
 
-              assert(users.some(function(id) { return id === userId; }), 'Expected user to be online');
-
-              // Disconnect the socket
-              presenceService.socketDisconnected(socketId, function(err) {
+              // Check if the user is still in the troupe
+              presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
                 if(err) return done(err);
 
-                // Check if the user is still in the troupe
-                presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
-                  if(err) return done(err);
+                var notThere = (!users.length || users.every(function(id) { return id !== userId; }));
 
-                  var notThere = (!users.length || users.every(function(id) { return id !== userId; }));
+                assert(notThere, 'Expect user to be offline: online users are: ' + users.join(', '));
 
-                  assert(notThere, 'Expect user to be offline: online users are: ' + users.join(', '));
-
-                  done();
-                });
-
+                done();
               });
+
             });
           });
         });
@@ -147,33 +135,28 @@ describe('presenceService', function() {
       assert(users.length === 0 || users.every(function(id) { return id !== userId; }), 'Expected user _not_ to be online at beginning of test: ', users.join(', '));
 
       // Connect the socket
-      presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
+      presenceService.userSocketConnected(userId, socketId, 'online', 'test', troupeId, false, function(err) {
         if(err) return done(err);
 
-        // Subscribe to a troupe
-        presenceService.userSubscribedToTroupe(userId, troupeId, socketId, false, function(err) {
+        // Make sure that the user appears online
+        presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
           if(err) return done(err);
 
-          // Make sure that the user appears online
-          presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
+          assert(users.indexOf(userId) === -1, 'Expected user to be offline');
+
+          presenceService.clientEyeballSignal(userId, socketId, 1, function(err) {
             if(err) return done(err);
 
-            assert(users.indexOf(userId) === -1, 'Expected user to be offline');
-
-            presenceService.clientEyeballSignal(userId, socketId, 1, function(err) {
+            // Make sure that the user appears online
+            presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
               if(err) return done(err);
 
-              // Make sure that the user appears online
-              presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
-                if(err) return done(err);
+              assert(users.indexOf(userId) !== -1, 'Expected user to be online');
 
-                assert(users.indexOf(userId) !== -1, 'Expected user to be online');
-
-                done();
-              });
+              done();
             });
-
           });
+
         });
       });
     });
@@ -184,31 +167,25 @@ describe('presenceService', function() {
     var socketId = 'TESTSOCKET2' + Date.now();
     var troupeId = 'TESTTROUPE2' + Date.now();
 
-    var d1 = Q.defer();
-    var d2 = Q.defer();
-
     // This simulates three events happening in very quick succession
-    presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
-      if(err) { return d1.reject(); }
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', troupeId, true, function(err) {
+      if(err) { return done(err); }
 
-      presenceService.userSubscribedToTroupe(userId, troupeId, socketId, true, d1.makeNodeResolver());
-      presenceService.socketDisconnected(socketId, d2.makeNodeResolver());
-    });
+      presenceService.socketDisconnected(socketId, function() {
 
-    Q.all([d1.promise, d2.promise]).then(function() {
-      presenceService.categorizeUsersByOnlineStatus([userId], function(err, statii) {
-        assert(!statii[userId]);
+        presenceService.categorizeUsersByOnlineStatus([userId], function(err, statii) {
+          assert(!statii[userId]);
 
-        presenceService.listOnlineUsersForTroupes([troupeId], function(err, troupeOnlineUsers) {
-          assert(troupeOnlineUsers[troupeId].length === 0);
+          presenceService.listOnlineUsersForTroupes([troupeId], function(err, troupeOnlineUsers) {
+            assert(troupeOnlineUsers[troupeId].length === 0);
 
-          done();
+            done();
+          });
+
         });
 
       });
-
-    }, done);
-
+    });
 
   });
 
@@ -237,40 +214,35 @@ describe('presenceService', function() {
     assertUserTroupeStatus(false, function() {
 
       // Connect socket
-      presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
+      presenceService.userSocketConnected(userId, socketId, 'online', 'test', troupeId, true, function(err) {
         if(err) return done(err);
 
-        // Associate socket with troupe
-        presenceService.userSubscribedToTroupe(userId, troupeId, socketId, true, function(err) {
-          if(err) return done(err);
+        // Now the user should be online
+        assertUserTroupeStatus(true, function() {
+          // Signal user as not focused
+          presenceService.clientEyeballSignal(userId, socketId, 0, function(err) {
+            if(err) return done(err);
 
-          // Now the user should be online
-          assertUserTroupeStatus(true, function() {
-            // Signal user as not focused
-            presenceService.clientEyeballSignal(userId, socketId, 0, function(err) {
-              if(err) return done(err);
+            // Should not be in troupe
+            assertUserTroupeStatus(false, function() {
 
-              // Should not be in troupe
-              assertUserTroupeStatus(false, function() {
+              // Signal user as being back in troupe
+              presenceService.clientEyeballSignal(userId, socketId, 1, function(err) {
+                if(err) return done(err);
 
-                // Signal user as being back in troupe
-                presenceService.clientEyeballSignal(userId, socketId, 1, function(err) {
-                  if(err) return done(err);
+                // User should be in troupe
+                assertUserTroupeStatus(true, function() {
 
-                  // User should be in troupe
-                  assertUserTroupeStatus(true, function() {
+                  // Disconnect socket
+                  presenceService.socketDisconnected(socketId, function(err) {
+                    if(err) return done(err);
 
-                    // Disconnect socket
-                    presenceService.socketDisconnected(socketId, function(err) {
-                      if(err) return done(err);
-
-                      // USer should not be in troupe
-                      assertUserTroupeStatus(false, function() {
-                        done();
-
-                      });
+                    // USer should not be in troupe
+                    assertUserTroupeStatus(false, function() {
+                      done();
 
                     });
+
                   });
                 });
               });
@@ -304,29 +276,24 @@ describe('presenceService', function() {
     var troupeId = 'TESTTROUPE4' + Date.now();
 
     // Connect socket
-    presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', troupeId, true, function(err) {
       if(err) return done(err);
 
-      // Associate socket with troupe
-      presenceService.userSubscribedToTroupe(userId, troupeId, socketId, true, function(err) {
-        if(err) return done(err);
+      var signals = [1,0,1,0,1,1,1,1,0,0,0,1];
 
-        var signals = [1,0,1,0,1,1,1,1,0,0,0,1];
+      function doNext() {
+        if(signals.length <= 0) return done();
+        var signal = signals.shift();
 
-        function doNext() {
-          if(signals.length <= 0) return done();
-          var signal = signals.shift();
-
-          presenceService.clientEyeballSignal(userId, socketId, signal, function(err) {
-            assertUserTroupeStatus(signal, function(err, done) {
-              if(err) return done(err);
-              doNext();
-            });
+        presenceService.clientEyeballSignal(userId, socketId, signal, function(err) {
+          assertUserTroupeStatus(signal, function(err, done) {
+            if(err) return done(err);
+            doNext();
           });
-        }
-        doNext();
+        });
+      }
+      doNext();
 
-      });
     });
 
   });
@@ -335,7 +302,7 @@ describe('presenceService', function() {
     var userId = 'TESTUSER4' + Date.now();
     var socketId = 'TESTSOCKET4' + Date.now();
 
-    presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', null, null, function(err) {
       if(err) return done(err);
       presenceService.collectGarbage(fakeEngine, function(err, count) {
         if(err) return done(err);
@@ -356,7 +323,7 @@ describe('presenceService', function() {
     var userId = 'TESTUSER4' + Date.now();
     var socketId = 'TESTSOCKET4' + Date.now();
 
-    presenceService.userSocketConnected(userId, socketId, 'mobile', 'test', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'mobile', 'test', null, null, function(err) {
       if(err) return done(err);
 
       presenceService.listOnlineUsers(function(err, users) {
@@ -374,32 +341,26 @@ describe('presenceService', function() {
     var socketId = 'TESTSOCKET4' + Date.now();
     var troupeId = 'TESTTROUPE4' + Date.now();
 
-    presenceService.userSocketConnected(userId, socketId, 'mobile', 'test', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'mobile', 'test', troupeId, true, function(err) {
       if(err) return done(err);
 
-      presenceService.userSubscribedToTroupe(userId, troupeId, socketId, true, function(err) {
+      presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
         if(err) return done(err);
 
-        presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
+        assert(users.some(function(id) { return id === userId; }), 'Expected user to be online');
+
+        presenceService.clientEyeballSignal(userId, socketId, 0, function(err) {
           if(err) return done(err);
 
-          assert(users.some(function(id) { return id === userId; }), 'Expected user to be online');
-
-          presenceService.clientEyeballSignal(userId, socketId, 0, function(err) {
+          presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
             if(err) return done(err);
 
-            presenceService.findOnlineUsersForTroupe(troupeId, function(err, users) {
-              if(err) return done(err);
+            assert(users.every(function(id) { return id !== userId; }), 'Expected user not to be online (OFFLINE)');
 
-              assert(users.every(function(id) { return id !== userId; }), 'Expected user not to be online (OFFLINE)');
-
-              done();
-            });
-
+            done();
           });
 
         });
-
 
       });
     });
@@ -442,67 +403,49 @@ describe('presenceService', function() {
       });
     }
 
-    presenceService.userSocketConnected(userId, socketId1, 'mobile', 'test', function(err) {
+    presenceService.userSocketConnected(userId, socketId1, 'mobile', 'test', troupeId, true, function(err) {
       if(err) return done(err);
 
-      ensureUserOnlineStatus(false, function() {
+      ensureUserTroupeStatus(true, function() {
 
-        presenceService.userSubscribedToTroupe(userId, troupeId, socketId1, true, function(err) {
-        if(err) return done(err);
+        presenceService.userSocketConnected(userId, socketId2, 'online', 'test', troupeId, true, function(err) {
+          if(err) return done(err);
 
-          ensureUserOnlineStatus(false, function() {
+          ensureUserOnlineStatus(true, function() {
 
-            ensureUserTroupeStatus(true, function() {
+            presenceService.clientEyeballSignal(userId, socketId2, 0, function(err) {
+              if(err) return done(err);
 
-              presenceService.userSocketConnected(userId, socketId2, 'online', 'test', function(err) {
-                if(err) return done(err);
+              // User is still online, but not in the troupe
 
-                ensureUserOnlineStatus(true, function() {
+              ensureUserOnlineStatus(true, function() {
 
-                  ensureUserTroupeStatus(true, function() {
+                // At this moment, the mobile eyeball is still on,
+                ensureUserTroupeStatus(true, function() {
 
-                    presenceService.userSubscribedToTroupe(userId, troupeId, socketId2, true, function(err) {
-                      if(err) return done(err);
+                  // Turn mobile eyeball off
+                  presenceService.clientEyeballSignal(userId, socketId1, 0, function(err) {
+                    if(err) return done(err);
 
-                      presenceService.clientEyeballSignal(userId, socketId2, 0, function(err) {
-                        if(err) return done(err);
+                    ensureUserTroupeStatus(false, function() {
 
-                        // User is still online, but not in the troupe
-
-                        ensureUserOnlineStatus(true, function() {
-
-                          // At this moment, the mobile eyeball is still on,
-                          ensureUserTroupeStatus(true, function() {
-
-                            // Turn mobile eyeball off
-                            presenceService.clientEyeballSignal(userId, socketId1, 0, function(err) {
-                              if(err) return done(err);
-
-                              ensureUserTroupeStatus(false, function() {
-
-                                done();
-
-                              });
-                            });
-                          });
-                        });
-
-                      });
+                      done();
 
                     });
-
                   });
-
                 });
-
               });
 
             });
+
+
+
           });
 
         });
 
       });
+
 
     });
 
@@ -516,7 +459,7 @@ describe('presenceService', function() {
     var userId = 'TESTUSER4' + Date.now();
     var socketId = 'TESTSOCKET5' + Date.now();
     var troupeId = 'TESTTROUPE4' + Date.now();
-    presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', null, null, function(err) {
       if(err) return done(err);
 
       var redisClient = redis.createClient();
@@ -552,8 +495,8 @@ describe('presenceService', function() {
     var socketId2 = 'TESTSOCKET2' + Date.now();
     var troupeId = 'TESTTROUPE1' + Date.now();
 
-    presenceService.userSocketConnected(userId1, socketId1, 'online', 'test', function(err) {
-      presenceService.userSocketConnected(userId2, socketId2, 'mobile', 'test', function(err) {
+    presenceService.userSocketConnected(userId1, socketId1, 'online', 'test', null, null, function(err) {
+      presenceService.userSocketConnected(userId2, socketId2, 'mobile', 'test', null, null, function(err) {
         if(err) return done(err);
 
         var redisClient = redis.createClient();
@@ -602,7 +545,7 @@ describe('presenceService', function() {
     var socketId = 'TESTSOCKET5' + Date.now();
     var troupeId = 'TESTTROUPE4' + Date.now();
 
-    presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', null, null, function(err) {
       if(err) return done(err);
 
       var redisClient = redis.createClient();
@@ -641,10 +584,10 @@ describe('presenceService', function() {
     var userId2 = 'TESTUSER2' + Date.now();
     var socketId2 = 'TESTSOCKET2' + Date.now();
 
-    presenceService.userSocketConnected(userId1, socketId1, 'online', 'test', function(err) {
+    presenceService.userSocketConnected(userId1, socketId1, 'online', 'test', null, null, function(err) {
       if(err) return done(err);
 
-      presenceService.userSocketConnected(userId2, socketId2, 'online', 'test', function(err) {
+      presenceService.userSocketConnected(userId2, socketId2, 'online', 'test', null, null, function(err) {
         if(err) return done(err);
         presenceService.categorizeUsersByOnlineStatus([userId1, userId2], function(err, c) {
           if(err) return done(err);
@@ -666,23 +609,22 @@ describe('presenceService', function() {
     var troupeId = 'TESTTROUPE1' + Date.now();
     var userId3 = 'TESTUSER3' + Date.now();
 
-    presenceService.userSocketConnected(userId1, socketId1, 'online', 'test', function(err) {
+    presenceService.userSocketConnected(userId1, socketId1, 'online', 'test', troupeId, true, function(err) {
       if(err) return done(err);
 
-      presenceService.userSocketConnected(userId2, socketId2, 'online', 'test', function(err) {
+      presenceService.userSocketConnected(userId2, socketId2, 'online', 'test', null, null, function(err) {
         if(err) return done(err);
 
-        presenceService.userSubscribedToTroupe(userId1, troupeId, socketId1, true, function(err) {
+
+        presenceService.categorizeUserTroupesByOnlineStatus([
+            {userId: userId1, troupeId: troupeId },
+            {userId: userId2, troupeId: troupeId },
+            {userId: userId3, troupeId: troupeId }
+            ], function(err, c) {
+
           if(err) return done(err);
 
-
-          presenceService.categorizeUserTroupesByOnlineStatus([
-              {userId: userId1, troupeId: troupeId },
-              {userId: userId2, troupeId: troupeId },
-              {userId: userId3, troupeId: troupeId }
-              ], function(err, c) {
-
-            if(err) return done(err);
+          try {
 
             assert.equal(c.inTroupe.length, 1);
             assert.equal(c.inTroupe[0].userId, userId1);
@@ -697,9 +639,13 @@ describe('presenceService', function() {
             assert.equal(c.offline[0].userId, userId3);
             assert.equal(c.offline[0].troupeId, troupeId);
 
+          } catch(e) {
+            console.error(e);
+            throw e;
+          }
 
-            done();
-          });
+
+          done();
         });
 
 
@@ -713,34 +659,30 @@ describe('presenceService', function() {
     var troupeId = 'TESTTROUPE1' + Date.now();
 
     // Connect the socket
-    presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', troupeId, true, function(err) {
       if(err) return done(err);
 
-      presenceService.userSubscribedToTroupe(userId, troupeId, socketId, true, function(err) {
+      presenceService.findAllSocketsForUserInTroupe(userId, troupeId, function(err, socketIds) {
         if(err) return done(err);
 
-        presenceService.findAllSocketsForUserInTroupe(userId, troupeId, function(err, socketIds) {
+        assert.equal(socketIds.length, 1);
+        assert.equal(socketIds[0], socketId);
+
+        // Disconnect the socket
+        presenceService.socketDisconnected(socketId, function(err) {
           if(err) return done(err);
 
-          assert.equal(socketIds.length, 1);
-          assert.equal(socketIds[0], socketId);
-
-          // Disconnect the socket
-          presenceService.socketDisconnected(socketId, function(err) {
+          presenceService.findAllSocketsForUserInTroupe(userId, troupeId, function(err, socketIds) {
             if(err) return done(err);
 
-            presenceService.findAllSocketsForUserInTroupe(userId, troupeId, function(err, socketIds) {
-              if(err) return done(err);
-
-              assert.equal(socketIds.length, 0);
-              done();
-            });
-
+            assert.equal(socketIds.length, 0);
+            done();
           });
 
         });
 
       });
+
 
     });
 
@@ -754,7 +696,7 @@ describe('presenceService', function() {
     var troupeId = 'TESTTROUPE1' + Date.now();
 
     // Connect the socket
-    presenceService.userSocketConnected(userId, socketId, 'online', 'test', function(err) {
+    presenceService.userSocketConnected(userId, socketId, 'online', 'test', null, null, function(err) {
       if(err) return done(err);
 
       presenceService.listAllSocketsForUser(userId, function(err, socketIds) {

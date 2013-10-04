@@ -17,7 +17,8 @@ require([
   'components/eyeballs',              // No ref
   'template/helpers/all',             // No ref
   'components/native-context'         // No ref
-], function($, Marionette, _, Backbone, context, MobileRouter, TroupeViews, FileView, FileDetailView, fileModels, MobileFilePreview, unreadItemsClient) {
+], function($, Marionette, _, Backbone, context, MobileRouter, TroupeViews,
+  FileView, FileDetailView, fileModels, MobileFilePreview, unreadItemsClient) {
   /*jslint browser: true, unused: true */
   "use strict";
 

@@ -1,20 +1,20 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var userService = require("../services/user-service");
-var chatService = require("../services/chat-service");
-var troupeService = require("../services/troupe-service");
-var fileService = require("../services/file-service");
+var userService       = require("../services/user-service");
+var chatService       = require("../services/chat-service");
+var troupeService     = require("../services/troupe-service");
+var fileService       = require("../services/file-service");
 var unreadItemService = require("../services/unread-item-service");
-var presenceService = require("../services/presence-service");
-var Q = require("q");
-var _ = require("underscore");
-var handlebars = require('handlebars');
-var winston = require("winston");
-var collections = require("../utils/collections");
-var cdn = require('../web/cdn');
-var predicates = collections.predicates;
-var gravatar = require('../utils/gravatar');
+var presenceService   = require("../services/presence-service");
+var Q                 = require("q");
+var _                 = require("underscore");
+var handlebars        = require('handlebars');
+var winston           = require("winston");
+var collections       = require("../utils/collections");
+var cdn               = require('../web/cdn');
+var predicates        = collections.predicates;
+var gravatar          = require('../utils/gravatar');
 
 // TODO: Fix this, use the CDN and code sign URLS
 function privateCdn(url) {
@@ -649,6 +649,7 @@ function InviteStrategy(options) {
       email: item.email,
       acceptUrl: troupe ? '/' + troupe.uri : fromUser.url,
       name: troupe ? troupe.name : fromUser.displayName,
+      avatarUrl: troupe ? troupe.avatarUrl : fromUser.avatarUrlSmall,
       v: getVersion(item)
     };
   };
@@ -768,10 +769,21 @@ function TroupeStrategy(options) {
         troupeUrl = "/" + item.uri;
     }
 
+    // Temporary technique until we add proper avatars for troupe at a later stage
+    function getDefaultTroupeAvatar() {
+      var initials = troupeName.split(/\s+/).map(function(s) { return s.charAt(0); }).slice(0,2).join('').toUpperCase();
+      // TODO: when we move to production, this needs to be behind a CDN
+      //return 'https://avatar-beta.trou.pe/' + item.id + '/' + initials + '.png';
+      ///return 'http://localhost:3000/' + item.id + '/' + initials + '.png';
+      return 'https://d2pu96xiu5jtty.cloudfront.net/' + item.id + '/' + initials + '.png';
+
+    }
+
     return {
       id: item.id,
       name: troupeName,
       uri: item.uri,
+      avatarUrl: otherUser && otherUser.avatarUrlSmall || getDefaultTroupeAvatar(),
       oneToOne: item.oneToOne,
       users: options.mapUsers && !item.oneToOne ? item.users.map(function(troupeUser) { return userIdStategy.map(troupeUser.userId); }) : undefined,
       user: otherUser,
@@ -806,7 +818,7 @@ function TroupeIdStrategy(options) {
 
   this.map = function(troupeId) {
     var troupe = self.troupes[troupeId];
-    if(!troupeId) {
+    if(!troupe) {
       winston.warn("Unable to locate troupeId ", { troupeId: troupeId });
       return null;
     }

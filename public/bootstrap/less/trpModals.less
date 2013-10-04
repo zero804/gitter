@@ -118,17 +118,21 @@
 
 .modal {
   border-radius: 0px;
+  border: 0;
   max-height: 90%;
   overflow: hidden;
 
   @media screen and (max-width: 720px) {
+    position: absolute;
     top: 0px;
     left: 0px;
     width: 100%;
     margin-top: 0px;
     margin-left: 0px;
-    overflow: scroll;
+    overflow-x: hidden;
+    overflow-y: auto;
     max-height: 100%;
+    height: 100%;
   }
 
 }
@@ -159,11 +163,16 @@ body.modal-open {
 
 .modal-footer {
   border-radius: 0px;
+  text-align: left;
 }
 
 .modal-body {
   padding: @padding @padding 0 @padding;
   max-height: 440px;
-  overflow-y: auto;
+  overflow: hidden;
   display: block;
+}
+
+.trpFilePreview .modal-body {
+  max-height: none;
 }

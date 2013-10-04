@@ -3,15 +3,18 @@ define([
   'jquery',
   'underscore',
   'backbone',
-  'collections/base',
-  'collections/files',
-  'collections/conversations',
-  'collections/users',
-  'collections/chat',
-  'collections/requests',
-  'collections/invites',
-  'components/unread-items-client'
-], function($, _, Backbone, base, fileModels, conversationModels, userModels, chatModels, requestModels, inviteModels, unreadItemsClient) {
+  '../base',
+  '../files',
+  '../conversations',
+  '../users',
+  '../chat',
+  '../requests',
+  '../invites',
+  'utils/appevents',
+  'components/unread-items-client',
+  'components/realtime-troupe-listener'     // No reference
+], function($, _, Backbone, base, fileModels, conversationModels, userModels, chatModels,
+  requestModels, inviteModels, appEvents, unreadItemsClient) {
   "use strict";
 
   var requestCollection      = new requestModels.RequestCollection(null, { listen: true });
@@ -22,11 +25,12 @@ define([
   var userCollection         = new userModels.UserCollection(null, { listen: true });
 
   function helpers() {
-    // update online status of user models
-    $(document).on('userLoggedIntoTroupe', updateUserStatus);
-    $(document).on('userLoggedOutOfTroupe', updateUserStatus);
 
-    function updateUserStatus(e, data) {
+    // update online status of user models
+    appEvents.on('userLoggedIntoTroupe', updateUserStatus);
+    appEvents.on('userLoggedOutOfTroupe', updateUserStatus);
+
+    function updateUserStatus(data) {
       var user = userCollection.get(data.userId);
       if (user) {
         // the backbone models have not always come through before the presence events,

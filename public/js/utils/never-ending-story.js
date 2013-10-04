@@ -1,5 +1,5 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-define(['underscore', 'backbone'], function(_, Backbone) {
+define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
   "use strict";
 
   /* Put your scrolling panels on rollers */
@@ -8,14 +8,15 @@ define(['underscore', 'backbone'], function(_, Backbone) {
     this._reverse = options && options.reverse;
     this._prevScrollTop = 0;
     this._prevScrollTime = Date.now();
-    this._scrollHandler = _.debounce(this.scroll.bind(this), 10);
-
+    //this._scrollHandler = _.debounce(this.scroll.bind(this), 10);
+    this._scrollHandler = this.scroll.bind(this);
     this.enable();
   }
   _.extend(NeverEndingStory.prototype, Backbone.Events, {
     scroll: function() {
+      log('scroll');
       var now = Date.now();
-      var st = this._reverse ? this._target.scrollTop : this._target.scrollHeight - this._target.scrollTop;
+      var st = this._reverse ? this._target.scrollTop : this._target.scrollHeight - this._target.scrollTop - this._target.clientHeight;
 
       var delta = st - this._prevScrollTop;
       var timeDelta = now - this._prevScrollTime;
@@ -31,7 +32,15 @@ define(['underscore', 'backbone'], function(_, Backbone) {
         timeToLimit = st / -gradient;
       }
 
-      if(timeToLimit && timeToLimit < 300 || (st < 20 && delta > 0)) {
+      // log(['timeToLimit: ' + timeToLimit,
+      // 'scrollTop: ' + st,
+      // 'delta: ' + delta,
+      // 'gradient: ' + gradient,
+      // 'timeDelta: ' + timeDelta].join('  '));
+
+      if((timeToLimit < 300) || (st < 50 && delta < 0)) {
+        log('approaching end');
+
         this.loading = true;
         this.trigger('approaching.end');
       }
@@ -53,6 +62,7 @@ define(['underscore', 'backbone'], function(_, Backbone) {
 
     enable: function() {
       if(!this._enabled) {
+        log('enabling scroll listener');
         this._target.addEventListener('scroll', this._scrollHandler, false);
         this._enabled = true;
       }
@@ -60,6 +70,7 @@ define(['underscore', 'backbone'], function(_, Backbone) {
 
     disable: function() {
       if(this._enabled) {
+        log('disabling scroll listener');
         this._target.removeEventListener('scroll', this._scrollHandler, false);
         this._enabled = false;
       }

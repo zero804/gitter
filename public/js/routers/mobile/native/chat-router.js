@@ -1,44 +1,36 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
-  'underscore',
   'jquery',
   'routers/mobile/mobile-router',
   'collections/chat',
+  'collections/files',
   'views/chat/chatCollectionView',
   'views/chat/chatInputView',
   'components/unread-items-client',
-  'utils/context',
-  'log!chat-router',
+  'components/cache-sync',
+  'views/chat/decorators/fileDecorator',
   'components/native-troupe-context', // No ref
   'components/oauth',                 // No ref
   'components/native-context'         // No ref
-  ], function(_, $, MobileRouter, chatModels, ChatCollectionView,
-    chatInputView, unreadItemsClient, context, log) {
+  ], function($, MobileRouter, chatModels, fileModels, ChatCollectionView,
+    chatInputView, unreadItemsClient, cacheSync, FileDecorator) {
   "use strict";
 
   var NativeChatRouter = MobileRouter.extend({
     initialize: function() {
       this.constructor.__super__.initialize.apply(this);
-      var troupeId = context.getTroupeId();
-      var chatCollection = new chatModels.ChatCollection();
-      var cache = window.localStorage['cache_chat_' + troupeId];
-      if(cache) {
-        cache = JSON.parse(cache);
-        chatCollection.reset(cache, { parse: true });
-        log('Loaded ' + cache.length + ' items from cache');
-        $('#chat-amuse').hide('fast', function() {
-          $(this).remove();
-        });
-      }
 
+      var chatCollection = new chatModels.ChatCollection();
+      cacheSync.install(chatCollection);
       chatCollection.listen();
-      chatCollection.on('change reset sync add remove', _.debounce(function() {
-        window.localStorage['cache_chat_' + troupeId] = JSON.stringify(chatCollection.toJSON());
-      }, 500));
+
+      var filesCollection = new fileModels.FileCollection();
+      filesCollection.listen();
 
       var chatCollectionView = new ChatCollectionView({
-        el: $('#frame-chat'),
-        collection: chatCollection
+        el: $('#content-frame'),
+        collection: chatCollection,
+        decorators: [new FileDecorator(filesCollection)]
       });
 
       unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
@@ -47,8 +39,16 @@ require([
 
       new chatInputView.ChatInputView({
         el: $('#chat-input'),
-        collection: chatCollection
+        collection: chatCollection,
+        rollers: chatCollectionView.rollers
       }).render();
+
+
+      // Keep the unread items up to date on the model
+      // This allows the unread items client to mark model items as read
+      unreadItemsClient.syncCollections({
+        'chat': chatCollection
+      });
     }
   });
 

@@ -3,7 +3,8 @@ define([
   'ga',
   'utils/context',
   'utils/appevents',
-  './mixpanel' // No ref
+  './mixpanel', // No ref
+  'optimizely'
 ], function(_gaq, context, appEvents) {
   "use strict";
   var trackingId = context.env('googleTrackingId');

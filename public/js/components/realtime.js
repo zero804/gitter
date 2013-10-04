@@ -41,7 +41,8 @@ define([
   }
 
   var eyeballState = true;
-  $(document).on('eyeballStateChange', function(event, state) {
+
+  appEvents.on('eyeballStateChange', function(state) {
     log('Switching eyeball state to ', state);
     eyeballState = state;
   });
@@ -54,10 +55,13 @@ define([
       var ext = message.ext;
       var accessToken = context.env('accessToken') || context().accessToken; // THIS SECOND METHOD WILL BE DEPRECATED!
 
-      ext.token = accessToken;
-      ext.troupeId = context.getTroupeId();
-      ext.connType = isMobile() ? 'mobile' : 'online';
-      ext.client = isMobile() ? 'mobweb' : 'web';
+      var mobile =    isMobile();
+
+      ext.token     = accessToken;
+      ext.troupeId  = context.getTroupeId();
+      ext.connType  = mobile ? 'mobile' : 'online';
+      ext.client    = mobile ? 'mobweb' : 'web';
+      ext.eyeballs  = eyeballState ? 1 : 0;
 
     } else if(message.channel == '/meta/subscribe') {
       if(!message.ext) { message.ext = {}; }
@@ -88,6 +92,15 @@ define([
           log("Realtime reestablished. New id is " + message.clientId);
           $(document).trigger('realtime:newConnectionEstablished');
         }
+      }
+    } else if(message.channel == '/meta/subscribe') {
+      if(message.error && message.error.indexOf('403::') === 0) {
+        // More needs to be done here!
+        log('Access denied', message);
+        debugger;
+        //window.alert('Realtime communications with the server have been disconnected. Click OK to reload.');
+        log("Subscription failed. Reloading");
+        //window.location = '/home';
       }
     }
 
@@ -131,7 +144,8 @@ define([
       var error = message.error.split('::')[0];
       if(error === '403') {
         log('Access denied. Will not retry');
-        window.location.reload();
+        //window.location.reload();
+        debugger;
       }
     }
 
@@ -183,27 +197,24 @@ define([
       }
     });
 
-    // TODO: this stuff below really should find a better home
-    if(context.getTroupeId()) {
-      client.subscribe('/troupes/' + context.getTroupeId(), function(message) {
-        if(message.notification === 'presence') {
-          if(message.status === 'in') {
-            $(document).trigger('userLoggedIntoTroupe', message);
-          } else if(message.status === 'out') {
-            $(document).trigger('userLoggedOutOfTroupe', message);
+
+    var userSubscription;
+
+    context.user().watch('change:id', function(user) {
+      if(userSubscription) {
+        userSubscription.cancel();
+        userSubscription = null;
+      }
+
+      if(user.id) {
+        userSubscription = client.subscribe('/user/' + user.id, function(message) {
+          if (message.notification === 'user_notification') {
+            appEvents.trigger('user_notification', message);
           }
-        }
+        });
+      }
 
-      });
-    }
-
-    if(context.getUserId()) {
-      client.subscribe('/user/' + context.getUserId(), function(message) {
-        if (message.notification === 'user_notification') {
-          appEvents.trigger('user_notification', message);
-        }
-      });
-    }
+    });
 
     return client;
   }

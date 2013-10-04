@@ -77,59 +77,116 @@ describe('Contact Signup Notifier', function() {
   });
 
 
-describe('onUserAccountActivated with offline users', function() {
-  var fixture = {};
+  describe('onUserAccountActivated with offline users', function() {
+    var fixture = {};
 
-  var newUserEmail = fixtureLoader.generateEmail();
+    var newUserEmail = fixtureLoader.generateEmail();
 
-  before(fixtureLoader(fixture, {
-    user1: { },
-    user2: { email: newUserEmail },
-    contact1: { user: 'user1', emails: [newUserEmail] }
-  }));
+    before(fixtureLoader(fixture, {
+      user1: { },
+      user2: { email: newUserEmail },
+      contact1: { user: 'user1', emails: [newUserEmail] }
+    }));
 
-  it('should notify users via email on account activated', function(done) {
-    var user2 = fixture.user2;
+    it('should notify users via email on account activated', function(done) {
+      var user2 = fixture.user2;
 
-    var onEmailConfirmedCb, onUserAccountActivatedCb;
-    var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+      var onEmailConfirmedCb, onUserAccountActivatedCb;
+      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
 
-    var appEventsMock = {
-      localOnly: {
-        onEmailConfirmed: function(pOnEmailConfirmedCb) {
-          onEmailConfirmedCb = pOnEmailConfirmedCb;
+      var appEventsMock = {
+        localOnly: {
+          onEmailConfirmed: function(pOnEmailConfirmedCb) {
+            onEmailConfirmedCb = pOnEmailConfirmedCb;
+          },
+          onUserAccountActivated: function(pOnUserAccountActivatedCb) {
+            onUserAccountActivatedCb = pOnUserAccountActivatedCb;
+          }
         },
-        onUserAccountActivated: function(pOnUserAccountActivatedCb) {
-          onUserAccountActivatedCb = pOnUserAccountActivatedCb;
+        userNotification: function() {
+          assert.fail('No notification should take place');
         }
-      },
-      userNotification: function() {
-        assert.fail('No notification should take place');
-      }
-    };
+      };
 
-    var presenceServiceMock = mockito.mock(testRequire('./services/presence-service'));
+      var presenceServiceMock = mockito.mock(testRequire('./services/presence-service'));
 
 
-    var underTest = testRequire.withProxies('./services/contact-signup-notifier', {
-      './email-notification-service': emailNotificationServiceMock,
-      './presence-service': presenceServiceMock,
-      '../app-events': appEventsMock
+      var underTest = testRequire.withProxies('./services/contact-signup-notifier', {
+        './email-notification-service': emailNotificationServiceMock,
+        './presence-service': presenceServiceMock,
+        '../app-events': appEventsMock
+      });
+      mockito.when(presenceServiceMock).categorizeUsersByOnlineStatus().thenReturn(Q.resolve({}));
+
+      underTest.install();
+
+      return onUserAccountActivatedCb({ userId: user2.id })
+        .then(function() {
+          mockito.verify(emailNotificationServiceMock, once).sendContactSignupNotification();
+        })
+        .nodeify(done);
     });
-    mockito.when(presenceServiceMock).categorizeUsersByOnlineStatus().thenReturn(Q.resolve({}));
 
-    underTest.install();
+    after(function() {
+      fixture.cleanup();
+    });
 
-    return onUserAccountActivatedCb({ userId: user2.id })
-      .then(function() {
-        mockito.verify(emailNotificationServiceMock, once).sendContactSignupNotification();
-      })
-      .nodeify(done);
   });
 
-  after(function() {
-    fixture.cleanup();
-  });
 
-});
+  describe('onUserAccountActivated with users who are already connected', function() {
+    var fixture = {};
+
+    var newUserEmail = fixtureLoader.generateEmail();
+
+    before(fixtureLoader(fixture, {
+      user1: { },
+      user2: { email: newUserEmail },
+      contact1: { user: 'user1', emails: [newUserEmail] },
+      troupe1: { users: ['user1', 'user2'], oneToOne: true }
+    }));
+
+    it('should notify users via email on account activated', function(done) {
+      var user2 = fixture.user2;
+
+      var onEmailConfirmedCb, onUserAccountActivatedCb;
+      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+
+      var appEventsMock = {
+        localOnly: {
+          onEmailConfirmed: function(pOnEmailConfirmedCb) {
+            onEmailConfirmedCb = pOnEmailConfirmedCb;
+          },
+          onUserAccountActivated: function(pOnUserAccountActivatedCb) {
+            onUserAccountActivatedCb = pOnUserAccountActivatedCb;
+          }
+        },
+        userNotification: function() {
+          assert.fail('No notification should take place');
+        }
+      };
+
+      var presenceServiceMock = mockito.mock(testRequire('./services/presence-service'));
+
+      var underTest = testRequire.withProxies('./services/contact-signup-notifier', {
+        './email-notification-service': emailNotificationServiceMock,
+        './presence-service': presenceServiceMock,
+        '../app-events': appEventsMock
+      });
+      mockito.when(presenceServiceMock).categorizeUsersByOnlineStatus().thenReturn(Q.resolve({}));
+
+      underTest.install();
+
+      return onUserAccountActivatedCb({ userId: user2.id })
+        .then(function() {
+          mockito.verify(emailNotificationServiceMock, never).sendContactSignupNotification();
+        })
+        .nodeify(done);
+    });
+
+    after(function() {
+      fixture.cleanup();
+    });
+
+  });
 });

@@ -36,17 +36,17 @@ define([
       var modal = new TroupeViews.ConfirmationModal({
         title: "Reject Request?",
         body: rejectConfirmationTemplate(this.model.toJSON()),
-        buttons: [
-          { id: "yes", text: "Reject", additionalClasses: "" },
-          { id: "no", text: "Cancel"}
+        menuItems: [
+          { action: "yes", text: "Reject", additionalClasses: "" },
+          { action: "no", text: "Cancel"}
         ]
       });
 
-      modal.on('button.click', function(id) {
+      modal.on('menuItemClicked', function(id) {
         if (id === "yes")
           that.onReject();
 
-        modal.off('button.click');
+        modal.off('menuItemClicked');
         modal.hide();
       });
 

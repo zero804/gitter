@@ -14,14 +14,16 @@ var shutdown          = require('../utils/shutdown');
 var contextGenerator  = require('./context-generator');
 var appVersion        = require('./appVersion');
 var userService       = require("../services/user-service");
-var Q                 = require('q');
 
 var appTag = appVersion.getAppTag();
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
   { re: /^\/troupes\/(\w+)$/,         validator: validateUserForTroupeSubscription },
-  { re: /^\/troupes\/(\w+)\/(\w+)$/,  validator: validateUserForSubTroupeSubscription,  populator: populateSubTroupeCollection},
+  { re: /^\/troupes\/(\w+)\/(\w+)$/,  validator: validateUserForSubTroupeSubscription,  populator: populateSubTroupeCollection },
+  { re: /^\/troupes\/(\w+)\/(\w+)\/(\w+)\/(\w+)$/,
+                                      validator: validateUserForSubTroupeSubscription,  populator: populateSubSubTroupeCollection },
+
   { re: /^\/user\/(\w+)\/(\w+)$/,     validator: validateUserForUserSubscription,       populator: populateSubUserCollection },
   { re: /^\/user\/(\w+)\/troupes\/(\w+)\/unreadItems$/,
                                       validator: validateUserForUserSubscription,       populator: populateUserUnreadItemsCollection },
@@ -33,8 +35,6 @@ var superClientPassword = nconf.get('ws:superClientPassword');
 
 // This strategy ensures that a user can access a given troupe URL
 function validateUserForTroupeSubscription(options, callback) {
-  options.notifyPresenceService = true;
-  options.updateLastVisitedTroupe = true;
   validateUserForSubTroupeSubscription(options, callback);
 }
 
@@ -42,10 +42,6 @@ function validateUserForTroupeSubscription(options, callback) {
 function validateUserForSubTroupeSubscription(options, callback) {
   var userId = options.userId;
   var match = options.match;
-  var message = options.message;
-  var clientId = options.clientId;
-  var notifyPresenceService = options.notifyPresenceService;
-  var updateLastVisitedTroupe = options.updateLastVisitedTroupe;
 
   var troupeId = match[1];
   return troupeService.findById(troupeId)
@@ -58,24 +54,7 @@ function validateUserForSubTroupeSubscription(options, callback) {
         return false;
       }
 
-      if(!notifyPresenceService && !updateLastVisitedTroupe) return result;
-
-      var ops = [];
-      if(notifyPresenceService) {
-        var eyeballState = true;
-        if(message.ext && 'eyeballs' in message.ext) {
-          eyeballState = !!message.ext.eyeballs;
-        }
-
-        var userSubscribedToTroupe = Q.denodeify(presenceService.userSubscribedToTroupe);
-        ops.push(userSubscribedToTroupe(userId, troupeId, clientId, eyeballState));
-      }
-
-      if(updateLastVisitedTroupe) {
-        ops.push(userService.saveLastVisitedTroupeforUserId(userId, troupe));
-      }
-
-      return Q.all(ops).thenResolve(result);
+      return result;
     })
     .nodeify(callback);
 }
@@ -156,6 +135,22 @@ function populateSubTroupeCollection(options, callback) {
   callback(null, [ ]);
 }
 
+function populateSubSubTroupeCollection(options, callback) {
+  var match = options.match;
+  var troupeId = match[1];
+  var collection = match[2];
+  var subId = match[3];
+  var subCollection = match[4];
+
+  switch(collection + '-' + subCollection) {
+    case "chatMessages-readBy":
+      return restful.serializeReadBysForChat(troupeId, subId, callback);
+
+  }
+
+  callback(null, [ ]);
+}
+
 function populateUserUnreadItemsCollection(options, callback) {
   var userId = options.userId;
   var match = options.match;
@@ -203,7 +198,7 @@ var authenticator = {
       return callback(message);
     }
 
-    winston.info('bayeux: Handshake: ', message);
+    winston.verbose('bayeux: Handshake: ', message);
 
     var ext = message.ext;
 
@@ -225,12 +220,13 @@ var authenticator = {
       var connectionType = getConnectionType(ext.connType);
       var client = ext.client || '';
       var troupeId = ext.troupeId || '';
+      var eyeballState = ext.eyeballs || '';
 
       // This is an UGLY UGLY hack, but it's the only
       // way possible to pass the userId to the outgoing extension
       // where we have the clientId (but not the userId)
       var id = message.id || '';
-      message.id = id + ':' + userId + ':' + connectionType + ':' + client + ':' + troupeId;
+      message.id = [id, userId, connectionType, client, troupeId, eyeballState].join(':');
 
       return callback(message);
     });
@@ -258,8 +254,7 @@ var authenticator = {
     }
 
     var parts = fakeId.split(':');
-
-    if(parts.length != 5) {
+    if(parts.length != 6) {
       return callback(message);
     }
 
@@ -269,15 +264,16 @@ var authenticator = {
     var clientId = message.clientId;
     var client = parts[3];
     var troupeId = parts[4] || undefined;
+    var eyeballState = parseInt(parts[5], 10) || 0;
 
     // Get the presence service involved around about now
-    presenceService.userSocketConnected(userId, clientId, connectionType, client, function(err) {
+    presenceService.userSocketConnected(userId, clientId, connectionType, client, troupeId, eyeballState, function(err) {
       if(err) winston.error("bayeux: Presence service failed to record socket connection: " + err, { exception: err });
 
       message.ext.userId = userId;
 
       if(troupeId) {
-          userService.saveLastVisitedTroupeforUserId(userId, troupeId);
+        userService.saveLastVisitedTroupeforUserId(userId, troupeId);
       }
 
       // If the troupeId was included, it means we've got a native
@@ -309,7 +305,18 @@ var authorisor = {
 
     function deny() {
       message.error = '403::Access denied';
-      winston.error('Socket authorisation failed', message);
+      winston.error('Socket authorisation failed. Disconnecting client.', message);
+
+      process.nextTick(function() {
+        var clientId = message.clientId;
+
+        var engine = server._server._engine;
+        engine.destroyClient(clientId, function() {
+          winston.warn('bayeux: client ' + clientId + ' destroyed');
+        });
+
+      });
+
       callback(message);
     }
 
@@ -331,7 +338,6 @@ var authorisor = {
   },
 
   outgoing: function(message, callback) {
-
     if(message.channel != '/meta/subscribe') {
       return callback(message);
     }
@@ -393,8 +399,9 @@ var authorisor = {
 
     presenceService.lookupUserIdForSocket(clientId, function(err, userId) {
       if(err) return callback(err);
+
       if(!userId) {
-        winston.warn('bayeux: client not authenticated. Failing authorisation', { clientId: clientId });
+        winston.warn('bayeux: client not authenticated.', { clientId: clientId });
         return callback();
       }
 
@@ -490,10 +497,6 @@ module.exports = {
     server.addExtension(subscriptionTimestamp);
 
     client.addExtension(superClient);
-
-    //server.bind('handshake', function(clientId) {
-    //  winston.verbose("Faye handshake: ", { clientId: clientId });
-    //});
 
     server.bind('disconnect', function(clientId) {
       // Warning, this event is called simulateously on

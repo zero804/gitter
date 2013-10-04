@@ -37,9 +37,8 @@ define([
       var self = this;
 
       this.userCollection = options.userCollection;
-      //this.scrollDelegate = options.scrollDelegate;
 
-      this.decorator = options.decorator;
+      this.decorators = options.decorators;
 
       this.model.on('change', function() {
         self.onChange();
@@ -59,14 +58,17 @@ define([
           self.onChange();
         }, oldInMS + 50);
       }
-
     },
 
     getRenderData: function() {
       var data = this.model.toJSON();
+      var isMobile = navigator.userAgent.match(/mobile/i) ? true : false;
 
       if (data.fromUser) {
         data.displayName = data.fromUser.displayName;
+        if (isMobile && data.displayName.length > 13) {
+          data.displayName = data.fromUser.displayName.split(" ").shift();
+        }
       }
 
       return data;
@@ -88,7 +90,12 @@ define([
       this.$el.find('.trpChatText').html(richText);
 
       this.highlightMention();
-      if (this.decorator) this.decorator.enrich(this);
+
+      //if (this.decorator) this.decorator.enrich(this);
+
+      _.each(this.decorators, function(decorator) {
+        decorator.decorate(this);
+      }, this);
     },
 
     afterRender: function() {
@@ -99,10 +106,10 @@ define([
     updateRender: function() {
       this.setState();
 
-      var editIconTooltip = (this.hasBeenEdited()) ? "Edited shortly after being sent": ((this.canEdit()) ? "Edit within 4 minutes of sending" : "It's too late to edit this message.");
+      var editIconTooltip = (this.hasBeenEdited()) ? "Edited shortly after being sent": ((this.canEdit()) ? "Edit within 4 minutes of sending" : ((this.isOwnMessage()) ? "It's too late to edit this message." : "You can't edit someone else's message"));
       var editIcon = this.$el.find('.trpChatEdit [title]');
 
-      if (!window._troupeCompactView) {
+      if (!this.compactView) {
         editIcon.tooltip('destroy');
         editIcon.attr('title', editIconTooltip);
         editIcon.tooltip({ container: 'body' });
@@ -258,12 +265,9 @@ define([
   var ReadByView = Marionette.CollectionView.extend({
     itemView: AvatarView,
     initialize: function(options) {
-      var c = new chatModels.ReadByCollection([], { chatMessageId: this.model.id, userCollection: options.userCollection });
+      var c = new chatModels.ReadByCollection(null, { listen: true, chatMessageId: this.model.id, userCollection: options.userCollection });
       c.loading = true;
       this.collection = c;
-      c.listen(function() {
-        c.fetch();
-      });
     },
     onClose: function(){
       this.collection.unlisten();

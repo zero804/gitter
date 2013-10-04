@@ -3,7 +3,6 @@ require([
   'jquery',
   'backbone',
   'utils/context',
-  'utils/appevents',
   'views/app/appIntegratedView',
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
@@ -11,7 +10,6 @@ require([
   'collections/instances/troupes',
   'collections/useremails',
   'views/righttoolbar/rightToolbarView',
-  'views/file/fileDetailView',
   'views/file/filePreviewView',
   'views/file/fileVersionsView',
   'views/request/requestDetailView',
@@ -24,13 +22,19 @@ require([
   'views/shareSearch/shareSearchView',
   'views/signup/createTroupeView',
   'views/signup/usernameView',
-  'views/app/headerView',
   'views/app/troupeSettingsView',
   'views/toolbar/troupeMenu',
   'views/invite/reinviteModal',
   'utils/router',
   'components/unread-items-client',
-  'views/chat/decorator',
+  'views/app/smartCollectionView',
+
+  'views/chat/decorators/fileDecorator',
+  'views/chat/decorators/webhookDecorator',
+  'views/chat/decorators/userDecorator',
+  'views/chat/decorators/embedDecorator',
+
+  'views/widgets/preload', // No ref
   'components/webNotifications', // No ref
   'components/desktopNotifications', // No ref
   'components/errorReporter',  // No ref
@@ -38,11 +42,13 @@ require([
   'components/dozy', // Sleep detection No ref
   'template/helpers/all', // No ref
   'components/eyeballs' // No ref
-], function($, Backbone, context, appEvents, AppIntegratedView, chatInputView, ChatCollectionView,
-            itemCollections, troupeCollections, UserEmailCollection, RightToolbarView, FileDetailView, filePreviewView, fileVersionsView,
-            RequestDetailView, InviteDetailView, PersonDetailView, conversationDetailView, profileView, profileEmailView, profileAddEmailView, shareSearchView,
-            createTroupeView, UsernameView, HeaderView,
-            troupeSettingsView, TroupeMenuView, ReinviteModal, Router, unreadItemsClient, chatDecorator /*, errorReporter , FilteredCollection */) {
+], function($, Backbone, context, AppIntegratedView, chatInputView, ChatCollectionView,
+            itemCollections, troupeCollections, UserEmailCollection, RightToolbarView,
+            filePreviewView, fileVersionsView, RequestDetailView, InviteDetailView, PersonDetailView,
+            conversationDetailView, profileView, profileEmailView, profileAddEmailView, shareSearchView,
+            createTroupeView, UsernameView, troupeSettingsView, TroupeMenuView, ReinviteModal, Router,
+            unreadItemsClient, SmartCollectionView, FileDecorator, webhookDecorator, userDecorator,
+            embedDecorator /*, errorReporter , FilteredCollection */) {
   "use strict";
 
   // Make drop down menus drop down
@@ -61,8 +67,8 @@ require([
 
 
   var appView = new AppIntegratedView({ });
+  appView.smartMenuRegion.show(new SmartCollectionView({ collection: troupeCollections.smart }));
   appView.leftMenuRegion.show(new TroupeMenuView({ }));
-  appView.headerRegion.show(new HeaderView());
   appView.rightToolbarRegion.show(new RightToolbarView());
 
   $('.nano').nanoScroller({ preventPageScrolling: true });
@@ -72,25 +78,25 @@ require([
 
   // Setup the ChatView
 
-  new ChatCollectionView({
-    el: $('#frame-chat'),
+  var chatCollectionView = new ChatCollectionView({
+    el: $('#content-frame'),
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
-    decorator: chatDecorator
+    decorators: [new FileDecorator(itemCollections.files), webhookDecorator, userDecorator, embedDecorator]
   }).render();
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
-  unreadItemsClient.monitorViewForUnreadItems($('#toolbar-frame .nano'));
-
+  unreadItemsClient.monitorViewForUnreadItems($('#file-list'));
 
   new chatInputView.ChatInputView({
     el: $('#chat-input'),
-    collection: itemCollections.chats
+    collection: itemCollections.chats,
+    rollers: chatCollectionView.rollers
   }).render();
 
   new Router({
     routes: [
-      { name: "file",             re: /^file\/(\w+)$/,            viewType: FileDetailView,               collection: itemCollections.files },
+      { name: "file",             re: /^file\/(\w+)$/,            viewType: filePreviewView.Modal,               collection: itemCollections.files },
       { name: "request",          re: /^request\/(\w+)$/,         viewType: RequestDetailView.Modal,            collection: itemCollections.requests },
       { name: "invite",           re: /^invite\/(\w+)$/,          viewType: InviteDetailView.Modal,             collection: itemCollections.invites },
       { name: "filePreview",      re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: itemCollections.files },

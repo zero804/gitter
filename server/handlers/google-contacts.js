@@ -62,7 +62,7 @@ module.exports = {
     //
     app.get('/google/signup',
       passport.authorize('google', signupOptions),
-      function(req, res) {});
+      function() {});
 
 
     // Redirect user to Google OAuth authorization page.
@@ -71,7 +71,6 @@ module.exports = {
       middleware.ensureLoggedIn(),
       function(req, res, next) {
         var returnTo = req.query.returnTo;
-
         // No http:// https:// or //hostname url
         // to prevent a possible attack
         //
@@ -82,7 +81,7 @@ module.exports = {
         next();
       },
       passport.authorize('google', contactOptions),
-      function(req, res) { });
+      function() { });
 
     // OAuth callback. Fetch access token and contacts, and store them.
     //
@@ -147,5 +146,14 @@ module.exports = {
           res.send({results: matches});
         });
       });
+
+
+    // Search contacts
+    //
+    app.get('/native-oauth-complete',
+      function(req, res) {
+        res.render('native-oauth-complete');
+      });
+
   }
 };

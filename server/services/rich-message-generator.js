@@ -11,7 +11,8 @@ exports.install = function() {
   var events = {
 
     newFile: function(data) {
-      var message = data.user.displayName + ' uploaded ' + data.fileName;
+      // var message = data.user.displayName + ' uploaded ' + data.fileName;
+      var message = "";
       var meta = {
         type: 'file',
         action: 'uploaded',
@@ -32,7 +33,7 @@ exports.install = function() {
           action: 'joined',
           userId: user.userId
         };
-        chatService.newRichMessageToTroupe(data.troupe, user, message, meta, function(err/*, msg*/) {
+        chatService.newRichMessageToTroupe(data.troupe, null, message, meta, function(err/*, msg*/) {
           if (err) return winston.error('Unable to generate rich text message' +  err, { exception: err });
           winston.info("Notification created");
         });

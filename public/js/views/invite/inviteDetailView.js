@@ -58,17 +58,17 @@ define([
       var modal = new TroupeViews.ConfirmationModal({
         title: "Delete Invite?",
         body: deleteConfirmationTemplate(this.model.toJSON()),
-        buttons: [
-          { id: "yes", text: "Delete", additionalClasses: "" },
-          { id: "no", text: "Cancel"}
+        menuItems: [
+          { action: "yes", text: "Delete", class: "trpBtnRed" },
+          { action: "no", text: "Cancel", class: "trpBtnLightGrey"}
         ]
       });
 
-      modal.on('button.click', function(id) {
+      modal.on('menuItemClicked', function(id) {
         if (id === "yes")
           that.onDelete();
 
-        modal.off('button.click');
+        modal.off('menuItemClicked');
         modal.hide();
       });
 

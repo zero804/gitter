@@ -100,7 +100,7 @@ class NewTroupeTests(unittest.TestCase):
         form.find_element_by_css_selector('#displayName').send_keys('Another Test User')
         form.find_element_by_css_selector('#password').send_keys('123456')
 
-        form.find_element_by_name('submit').click()
+        self.driver.find_element_by_css_selector('[data-action=save]').click()
         time.sleep(2)
         # ensure the troupe name is the same as the one the invite was for
         # header = self.driver.find_element_by_css_selector('DIV.trpHeaderTitle')
