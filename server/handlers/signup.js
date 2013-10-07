@@ -9,7 +9,7 @@ var winston          = require('winston');
 var nconf            = require('../utils/config');
 var isPhone          = require('../web/is-phone');
 var contextGenerator = require('../web/context-generator');
-var statsService     = require("./stats-service");
+var statsService     = require("../services/stats-service");
 
 module.exports = {
 
