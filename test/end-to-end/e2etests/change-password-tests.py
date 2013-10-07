@@ -13,9 +13,9 @@ class ChangePasswordTests(unittest.TestCase):
         self.driver = utils.driver()
         utils.printJobInfo(self.driver)
 
-        self.username = 'testuser' + time.strftime("%Y%m%d%H%M%S", time.gmtime())
+        self.username = utils.getJSON('/testdata/newUser').get('username')
         self.driver.get(utils.baseUrl("/signout"))
-        self.signupFromHomepage(self.username + '@troupetest.local', self.username, 'Mr ' + self.username, 'password');        
+        self.loginFromHomepage(self.username + '@troupetest.local', 'password');
 
     def testNewUserChangesPasswordAtUserhome(self):
         self.changeProfilePassword('password', 'newpassword')
