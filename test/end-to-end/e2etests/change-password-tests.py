@@ -2,12 +2,15 @@ import utils
 import time
 import urllib2
 import unittest
+import uuid
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from nose.plugins.attrib import attr
 
-
+@attr('thread_safe')
 class ChangePasswordTests(unittest.TestCase):
+    _multiprocess_can_split_ = True
 
     def setUp(self):
         self.driver = utils.driver()
@@ -34,7 +37,7 @@ class ChangePasswordTests(unittest.TestCase):
 
     def testInvitedUserCanSetPasswordAtUserhome(self):
         self.createTroupe()
-        invitee = 'testuser' + time.strftime("%Y%m%d%H%M%S", time.gmtime())
+        invitee = 'testuser-' + str(uuid.uuid4())
         self.inviteToTroupe(invitee+'@troupetest.local')
 
         self.driver.get(utils.baseUrl("/signout"))
@@ -54,7 +57,7 @@ class ChangePasswordTests(unittest.TestCase):
 
     def testInvitedUserCanSetPasswordAtTroupe(self):
         self.createTroupe()
-        invitee = 'testuser' + time.strftime("%Y%m%d%H%M%S", time.gmtime())
+        invitee = 'testuser-' + str(uuid.uuid4())
         self.inviteToTroupe(invitee+'@troupetest.local')
 
         self.driver.get(utils.baseUrl("/signout"))
