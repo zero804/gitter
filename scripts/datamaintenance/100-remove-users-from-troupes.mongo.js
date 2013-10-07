@@ -4,17 +4,22 @@ var removeIds = [];
 var requiresModify = false;
 
 function hashTroupeUsers() {
-  return db.troupes.find({}, { _id: 0, 'users.userId': 1 } ).
+  var allUsers = db.troupes.find({}, { _id: 0, 'users.userId': 1 } ).
     map(function(users) {
-      return users.users; }).
-    reduce(function(memo, val) {
+      return users.users;
+    });
+
+    var memo = {};
+
+    allUsers.forEach(function(val) {
       val.forEach(function(troupeUser) {
         if(troupeUser.userId.valueOf()) {
           memo[troupeUser.userId.valueOf()] = true;
         }
       });
-      return memo;
-    }, {});
+    });
+
+    return memo;
 }
 
 function findMissingTroupeUsers() {
