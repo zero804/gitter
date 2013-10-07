@@ -30,7 +30,7 @@ require([
     var defaultEmail = getDefaultEmail();
     if(defaultEmail) $('#email').val(defaultEmail);
 
-    $('#button-login').on('click', function(e) {
+    $('#button-existing-users-login').on('click', function(e) {
       e.preventDefault();
       submitForm();
     });
