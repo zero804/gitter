@@ -31,7 +31,7 @@ var userService = {
     });
 
     return user.saveQ().then(function() {
-        statsService.event('troupe_new_user', {
+        statsService.event('new_user', {
             userId: user.id,
             email: options.email,
             status: status,
