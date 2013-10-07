@@ -4,21 +4,17 @@ from nose.plugins.attrib import attr
 import time
 import unittest
 
-
+@attr('thread_safe')
 class ManageEmailTest(unittest.TestCase):
+    _multiprocess_can_split_ = True
 
     def setUp(self):
         self.driver = utils.driver()
         utils.printJobInfo(self.driver)
-        self.resetData()
         self.username = utils.signup(self.driver)
 
     def tearDown(self):
-        self.resetData()
         self.driver.quit()
-
-    def resetData(self):
-        utils.resetData(self.driver)
 
     def addEmail(self, email):
         # start on the manage email dialog
