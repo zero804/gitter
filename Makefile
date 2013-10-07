@@ -75,22 +75,50 @@ end-to-end-test:
 
 end-to-end-test-saucelabs-chrome:
 	@mkdir -p ./output/test-reports
-	@echo Testing $(BETA_SITE) with chrome at saucelabs.com
+	@echo Testing $(BETA_SITE) with chrome at saucelabs.com (thread safe tests in parallel)
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTECHROME \
 	BASE_URL=$(BETA_SITE) \
 	MAIL_HOST=$(MAIL_HOST) \
 	MAIL_PORT=$(MAIL_PORT) \
-	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
+		nosetests \
+			--processes=30 --process-timeout=180 \
+			--attr '!unreliable','thread_safe' \
+			--nologcapture --with-xunit --xunit-file=./output/test-reports/nosetests.xml \
+			--all-modules test/end-to-end/e2etests
+	@echo Testing $(BETA_SITE) with chrome at saucelabs.com (thread unsafe tests in serial)
+	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
+	DRIVER=REMOTECHROME \
+	BASE_URL=$(BETA_SITE) \
+	MAIL_HOST=$(MAIL_HOST) \
+	MAIL_PORT=$(MAIL_PORT) \
+		nosetests \
+			--attr '!unreliable','!thread_safe' \
+			--nologcapture --with-xunit --xunit-file=./output/test-reports/nosetests.xml \
+			--all-modules test/end-to-end/e2etests
 
 end-to-end-test-saucelabs-ie10:
-	@echo Testing $(BETA_SITE) with ie10 at saucelabs.com
+	@echo Testing $(BETA_SITE) with ie10 at saucelabs.com (thread safe tests in parallel)
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTEIE \
 	BASE_URL=$(BETA_SITE) \
 	MAIL_HOST=$(MAIL_HOST) \
 	MAIL_PORT=$(MAIL_PORT) \
-	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
+		nosetests \
+			--processes=30 --process-timeout=180 \
+			--attr '!unreliable','thread_safe' \
+			--nologcapture --with-xunit --xunit-file=./output/test-reports/nosetests.xml \
+			--all-modules test/end-to-end/e2etests
+	@echo Testing $(BETA_SITE) with ie10 at saucelabs.com (thread unsafe tests in serial)
+	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
+	DRIVER=REMOTEIE \
+	BASE_URL=$(BETA_SITE) \
+	MAIL_HOST=$(MAIL_HOST) \
+	MAIL_PORT=$(MAIL_PORT) \
+		nosetests \
+			--attr '!unreliable','!thread_safe' \
+			--nologcapture --with-xunit --xunit-file=./output/test-reports/nosetests.xml \
+			--all-modules test/end-to-end/e2etests
 
 end-to-end-test-saucelabs-android:
 	@echo Testing $(BETA_SITE) with android at saucelabs.com
