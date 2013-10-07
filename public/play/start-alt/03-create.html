@@ -96,6 +96,17 @@ body {
   opacity: 1;
 }
 
+.trpBtnLightGrey {
+  background-color: #d6d6d6;
+  color: black;
+  opacity: 0.95;
+  border-bottom: 2px solid #ababab;
+}
+
+.trpBtnLightGrey:hover {
+  opacity: 1;
+}
+
 .blue {
   background-color: #17202a;
   color: white;
@@ -103,6 +114,12 @@ body {
 
 .blue-text {
   color: #17202a;
+}
+
+.help {
+  margin-top: 4px;
+  font-size: 0.9em;
+  opacity: 0.8;
 }
 
 </style>
@@ -116,7 +133,8 @@ body {
 <div class="trpStartContainer open blue-text" style="margin-top: 40px">
   <div class="trpStartContent">
     <div style="margin-bottom: 40px"><img src="../../images/2/logo-mark-green-128x128.png" width="128" height="128"></div>
-    <h1>Welcome let's get you started</h1>
+    <h1>Create a group</h1>
+    <p>Group chats are the best way to communicate as a team.</p>
   </div>
 </div>
 
@@ -126,29 +144,13 @@ body {
         <div class="number one">
           <div class="number-text">1</div>
         </div>
-        <div class="label">What's your full name?</div>
+        <div class="label">Choose a name for your first group</div>
         <div class="input">
             <input type="text" class="open" size="30">
         </div>
-    </div>
-
-    <div style="margin-top: 40px">
-        <div class="number one">
-          <div class="number-text">2</div>
-        </div>
-        <div class="label">Pick a username</div>
-        <div class="input">
-            <input type="text" class="open" size="30">
-        </div>
-    </div>
-
-    <div style="margin-top: 40px">
-        <div class="number one">
-          <div class="number-text">2</div>
-        </div>
-        <div class="label">Choose a password</div>
-        <div class="input">
-            <input type="password" class="open" size="30">
+        <div class="help">
+          Good uses are for small companies, project teams, office locations or any topic you can imagine.<br>
+          You can always change it later.
         </div>
     </div>
   </div>
@@ -157,7 +159,7 @@ body {
 <div class="trpStartContainer open blue-text">
   <div class="trpStartContent">
     <div style="margin-top: 40px">
-      <a href="02-create.html" class="trpButtonMedium trpBtnGreen">Next</a>
+      <a href="04-invite.html" class="trpButtonMedium trpBtnGreen">Next</a> <a href="03-invite.html" class="trpButtonMedium trpBtnLightGrey">Skip</a>
 
     </div>
 
