@@ -45,7 +45,7 @@ require([
 
     var homepage = new HomepageRouter();
 
-    $('#button-signup, #button-login').hammer().on('touch', function(event) {
+    $('#button-signup, #button-existing-users-login').hammer().on('touch', function(event) {
       // stop click events
       event.gesture.preventDefault();
       event.stopPropagation();
@@ -55,7 +55,7 @@ require([
       homepage.navigate('signup', {trigger: true});
     });
 
-    $('#button-login').on('tap', function() {
+    $('#button-existing-users-login').on('tap', function() {
       homepage.navigate('login', {trigger: true});
     });
 
