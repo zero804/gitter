@@ -1,0 +1,203 @@
+<html>
+<head>
+<style>
+
+@-webkit-keyframes pulsate {
+    0% {-webkit-transform: scale(1, 1); border: 1px solid @trpGreen;}
+    /*20% {-webkit-transform: scale(1, 1); border: 2px solid white;}*/
+    50% {-webkit-transform: scale(0.75, 0.75);border: 1px solid white;}
+    /*80% {-webkit-transform: scale(1, 1); border: 2px solid white;}*/
+    100% {-webkit-transform: scale(1, 1);border: 1px solid @trpGreen;}
+}
+
+@-webkit-keyframes pulsate-retina {
+    0% {-webkit-transform: scale(1, 1); border: 1px solid white;}
+    50% {-webkit-transform: scale(0.75, 0.75);border: 1px solid @trpGreen;}
+    100% {-webkit-transform: scale(1, 1);border: 1px solid white;}
+}
+
+div {
+      -webkit-transform: translate3d(0, 0, 0);
+}
+
+.left-menu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 88px;
+  bottom: 0;
+  background-color: #17202a;
+}
+
+.left-menu-container {
+  text-align: center;
+/*  opacity: 0.7;*/
+  height: 100%;
+  padding-top: 8px;
+}
+
+.left-menu-container:hover {
+  opacity: 1; 
+}
+
+.item {
+  padding: 10px 0;
+  font-family: HelveticaNeue-Light, Arial, sans-serif;
+  font-size: 13px;
+  letter-spacing:0.1em;
+}
+
+.person {
+  border-radius: 50em;
+  border: 2px solid #ddd;
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+}
+
+.andrew {
+  background-image: url('https://dnsjy61awi9j1.cloudfront.net/avatar/s/4fd48bda40a7cc9644000003/5.jpg');
+}
+
+.andy {
+  background-image: url('https://www.gravatar.com/avatar/9496bed6a195a98d671fbaee17374fae?d=identicon');
+  background-size: contain;
+}
+
+.mike {
+  background-image: url('https://dnsjy61awi9j1.cloudfront.net/avatar/s/4fd48c8040a7cc9644000022/9.jpg');
+  background-size: contain;
+}
+
+.mauro {
+  background-image: url('https://www.gravatar.com/avatar/4605adbcd13e20c14e82fcf528b516e6?d=identicon');
+  background-size: contain;
+}
+
+.troupe {
+  display: inline-block;
+  width: 35px;
+  height: 35px;
+  border-radius: 50em;
+  text-align: center;
+  vertical-align: middle;
+  background-color: rgba(255,255,255,0.1);
+  border: 2px solid;
+}
+
+.item-text {
+  padding-top: 9px;
+}
+
+.st {
+  border-color: #1abc9c;
+  color: white;
+}
+
+.bs {
+  border-color: #2ecc71;
+  color: white;
+}
+
+.mo {
+  border-color: #9b59b6;
+  color: white;
+}
+
+.h {
+  border-color: #3498db;
+  color: white;
+}
+
+.mm {
+  border-color: #e67e22;
+  /*border-color: white;*/
+  color: white;
+  /*color: black;*/
+  /*background-color: #d8ff00*/
+}
+
+.st2 {
+  border-color: #e74c3c;
+  color: white;
+}
+
+.ww {
+  border-color: #f1c40f;
+  /*background-color: #ff5a00;*/
+/*  border-color: white;*/
+  color: white;
+}
+
+.unread {
+  -webkit-animation: pulsate 2s ease-out;
+  -webkit-animation-iteration-count: infinite;
+}
+
+
+</style>
+
+<body>
+
+  <div class="left-menu">
+    <div class="left-menu-container">
+      <div class="item">
+        <div class="person andrew">
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-inner unread">
+          <div class="troupe st">
+            <div class="item-text">ST</div>
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="person mike">
+        </div>
+      </div>
+      <div class="item">
+        <div class="person andy">
+        </div>
+      </div>
+      <div class="item">
+        <div class="troupe ww">
+          <div class="item-text">WW</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="troupe st2">
+          <div class="item-text">ST</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="troupe mm">
+          <div class="item-text">MM</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="person mauro">
+        </div>
+      </div>
+      <div class="item">
+        <div class="troupe h">
+          <div class="item-text">H</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="troupe mo">
+          <div class="item-text">MO</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="troupe bs">
+          <div class="item-text">BS</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+</body>
+</html>
