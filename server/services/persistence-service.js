@@ -135,6 +135,24 @@ UserSchema.methods.getDisplayName = function() {
   return this.displayName || this.username || this.email && this.email.split('@')[0] || "Unknown";
 };
 
+UserSchema.methods.getFirstName = function() {
+  if(this.displayName) {
+    var firstName = this.displayName.split(/\s+/)[0];
+    if(firstName) return firstName;
+  }
+
+  if(this.username) {
+    return this.username;
+  }
+
+  if(this.email) {
+    return this.email.split('@')[0];
+  }
+
+  return "Unknown";
+};
+
+
 UserSchema.methods.getAllEmails = function() {
   return [this.email].concat(this.emails);
 };

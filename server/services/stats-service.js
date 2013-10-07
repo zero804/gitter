@@ -80,7 +80,7 @@ exports.userUpdate = function(user, properties) {
   if(!properties) properties = {};
 
   var createdAt = Math.round(user._id.getTimestamp().getTime() / 1000);
-  var firstName = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
+  var firstName = user.getFirstName();
 
   if (mixpanel_enabled) {
     var mp_properties = {
@@ -93,9 +93,9 @@ exports.userUpdate = function(user, properties) {
       Status:       user.status
     };
 
-    for (var attr in properties) { 
+    for (var attr in properties) {
       var value = properties[attr] instanceof Date ? properties[attr].toISOString() : properties[attr];
-      mp_properties[attr] = value; 
+      mp_properties[attr] = value;
     }
 
 
@@ -113,9 +113,9 @@ exports.userUpdate = function(user, properties) {
       status:     user.status
     };
 
-    for (var attr in properties) { 
+    for (var attr in properties) {
       var value = properties[attr] instanceof Date ? Math.round(properties[attr].getTime() / 1000) : properties[attr];
-      cio_properties[attr] = value; 
+      cio_properties[attr] = value;
     }
 
     cio.identify(user.id, user.email, cio_properties);

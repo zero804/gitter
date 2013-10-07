@@ -125,7 +125,7 @@ NotificationMessageGenerator.prototype.getTroupeDescription = function(troupe) {
 
 
 NotificationMessageGenerator.prototype.getShortName = function(displayName) {
-  if(displayName) return displayName.split(/\s/,1)[0];
+  if(displayName) return displayName && displayName.split(/\s/,1)[0];
 };
 
 NotificationMessageGenerator.prototype.getLine = function(itemType, item) {
