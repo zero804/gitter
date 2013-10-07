@@ -9,6 +9,8 @@ BASE_URL = http://localhost:5000
 MAIL_HOST = localhost
 MAIL_PORT = 2525
 
+.PHONY: clean test perf-test-xunit perf-test test-xunit test-in-browser test-in-browser-xunit test-coverage prepare-for-end-to-end-testing end-to-end-test
+
 clean:
 	rm -rf public-processed/ output/ coverage/ cobertura-coverage.xml html-report/
 
@@ -131,11 +133,11 @@ upgrade-data:
 	./scripts/upgrade-data.sh
 
 maintain-data:
-	$(foreach var,$(DATA_MAINT_SCRIPTS),$(var);)
+	MODIFY=true ./scripts/datamaintenance/execute.sh
 
 # Make a second target
 post-test-maintain-data:
-	$(foreach var,$(DATA_MAINT_SCRIPTS),$(var);)
+	MODIFY=true ./scripts/datamaintenance/execute.sh
 
 
 init-test-data:
