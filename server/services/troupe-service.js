@@ -1406,7 +1406,8 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
             return userService.findOrCreateUserForEmail({
               displayName: invite.displayName || invite.email.replace(/@.*/, ""),
               email: invite.email,
-              status: "PROFILE_NOT_COMPLETED"
+              status: "PROFILE_NOT_COMPLETED",
+              source: 'invite_accept'
             }).then(function(user) {
               return updateInvitesForEmailToUserId(invite.email, user.id)
                 .then(function() {
