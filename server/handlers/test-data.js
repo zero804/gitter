@@ -11,10 +11,11 @@ if(!nconf.get('test:exposeDataForTestingPurposes')) {
   // testing processes
 
   var userService = require("../services/user-service");
-  var troupeService = require("../services/troupe-service");
+  var signupService = require("../services/signup-service");
   var persistence = require('../services/persistence-service');
   var winston = require('winston');
   var child_process = require('child_process');
+  var uuid = require('node-uuid');
 
   winston.warn('Warning: confidential data is being exposed for testing purposes!');
 
@@ -25,6 +26,26 @@ if(!nconf.get('test:exposeDataForTestingPurposes')) {
         child_process.exec('make reset-test-data');
         child_process.execFile('scripts/dataupgrades/005-test-users/001-update.sh');
         res.send(200);
+      });
+
+      app.get('/testdata/newUser', function(req, res) {
+        var name = 'testuser-' + uuid.v4();
+        var options = {
+          displayName: 'Mr ' + name,
+          email: name+'@troupetest.local',
+        };
+
+        userService.newUser(options)
+          .then(signupService.confirmSignup)
+          .then(function(user) {
+              user.userId = user._id;
+              user.password = 'password';
+              user.username = name;
+              return userService.updateProfile(user);
+          })
+          .then(function(user) { res.send(user); })
+          .fail(function(err) { res.send(500, err); });
+
       });
 
       app.get('/testdata/confirmationCodeForEmail', function(req, res/*, next */) {
