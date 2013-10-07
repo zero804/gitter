@@ -75,7 +75,7 @@ end-to-end-test:
 
 end-to-end-test-saucelabs-chrome:
 	@mkdir -p ./output/test-reports
-	@echo Testing $(BETA_SITE) with chrome at saucelabs.com (thread safe tests in parallel)
+	@echo Testing $(BETA_SITE) with chrome at saucelabs.com thread safe tests in parallel
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTECHROME \
 	BASE_URL=$(BETA_SITE) \
@@ -86,7 +86,7 @@ end-to-end-test-saucelabs-chrome:
 			--attr '!unreliable','thread_safe' \
 			--nologcapture --with-xunit --xunit-file=./output/test-reports/nosetests.xml \
 			--all-modules test/end-to-end/e2etests
-	@echo Testing $(BETA_SITE) with chrome at saucelabs.com (thread unsafe tests in serial)
+	@echo Testing $(BETA_SITE) with chrome at saucelabs.com thread unsafe tests in serial
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTECHROME \
 	BASE_URL=$(BETA_SITE) \
@@ -98,7 +98,7 @@ end-to-end-test-saucelabs-chrome:
 			--all-modules test/end-to-end/e2etests
 
 end-to-end-test-saucelabs-ie10:
-	@echo Testing $(BETA_SITE) with ie10 at saucelabs.com (thread safe tests in parallel)
+	@echo Testing $(BETA_SITE) with ie10 at saucelabs.com thread safe tests in parallel
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTEIE \
 	BASE_URL=$(BETA_SITE) \
@@ -109,7 +109,7 @@ end-to-end-test-saucelabs-ie10:
 			--attr '!unreliable','thread_safe' \
 			--nologcapture --with-xunit --xunit-file=./output/test-reports/nosetests.xml \
 			--all-modules test/end-to-end/e2etests
-	@echo Testing $(BETA_SITE) with ie10 at saucelabs.com (thread unsafe tests in serial)
+	@echo Testing $(BETA_SITE) with ie10 at saucelabs.com thread unsafe tests in serial
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTEIE \
 	BASE_URL=$(BETA_SITE) \
