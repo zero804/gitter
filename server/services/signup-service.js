@@ -1,14 +1,15 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var emailNotificationService = require("./email-notification-service"),
-    troupeService = require("./troupe-service"),
-    userService = require("./user-service"),
-    uriService = require("./uri-service"),
-    winston = require('winston'),
-    assert = require('assert'),
-    appEvents = require('../app-events'),
-    Q = require('q');
+var emailNotificationService  = require("./email-notification-service");
+var troupeService             = require("./troupe-service");
+var userService               = require("./user-service");
+var uriService                = require("./uri-service");
+var winston                   = require('winston');
+var assert                    = require('assert');
+var appEvents                 = require('../app-events');
+var Q                         = require('q');
+var userService               = require("./user-service");
 
 function newUser(options, callback) {
   winston.info("New user", options);
@@ -25,6 +26,7 @@ var signupService = module.exports = {
     if(!options.email) return callback('Email address is required');
 
     options.email = options.email.trim().toLowerCase();
+    if(!options.source) options.source = 'landing';
 
     winston.info("New signup ", options);
 

@@ -1,35 +1,44 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var persistence = require("./persistence-service");
-var sechash = require('sechash');
-var emailNotificationService = require("./email-notification-service");
-var uuid = require('node-uuid');
-var geocodingService = require("./geocoding-service");
-var winston = require("winston");
-var statsService = require("./stats-service");
-var uriLookupService = require("./uri-lookup-service");
-var assert = require('assert');
-var collections = require("../utils/collections");
-var Q = require('q');
-var appEvents = require("../app-events");
-var moment = require('moment');
-var gravatar = require('../utils/gravatar');
+var persistence               = require("./persistence-service");
+var sechash                   = require('sechash');
+var emailNotificationService  = require("./email-notification-service");
+var uuid                      = require('node-uuid');
+var geocodingService          = require("./geocoding-service");
+var winston                   = require("winston");
+var statsService              = require("./stats-service");
+var uriLookupService          = require("./uri-lookup-service");
+var assert                    = require('assert');
+var collections               = require("../utils/collections");
+var Q                         = require('q');
+var appEvents                 = require("../app-events");
+var moment                    = require('moment');
+var gravatar                  = require('../utils/gravatar');
 
 var userService = {
   newUser: function(options, callback) {
     assert(options.email, 'Email atttribute required');
 
+    var status = options.status || "UNCONFIRMED";
     var user = new persistence.User({
       displayName:        options.displayName,
       email:              options.email.toLowerCase(),
       confirmationCode:   uuid.v4(),
       gravatarImageUrl:   options.gravatarImageUrl || gravatar.gravatarUrlForEmail(options.email),
       googleRefreshToken: options.googleRefreshToken || undefined,
-      status:             options.status || "UNCONFIRMED",
+      status:             status,
     });
 
-    return user.saveQ().then(function() { return user; }).nodeify(callback);
+    return user.saveQ().then(function() {
+        statsService.event('troupe_new_user', {
+            userId: user.id,
+            email: options.email,
+            status: status,
+            source: options.source
+          });
+        return user;
+      }).nodeify(callback);
   },
 
   findOrCreateUserForEmail: function(options, callback) {
@@ -42,7 +51,6 @@ var userService = {
         if(user) return user;
 
         return userService.newUser(options);
-
       })
       .nodeify(callback);
   },
