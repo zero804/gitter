@@ -11,6 +11,12 @@ describe('phone detection', function() {
     assert(isPhone(userAgent));
   });
 
+  it('detects iPod touch as a phone', function() {
+    var userAgent = 'Mozilla/5.0 (iPod; U; CPU iPhone OS 4_3_3 like Mac OS X; ja-jp) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5';
+    assert(isPhone(userAgent));
+  });
+
+
   it('detects iPad as not a phone', function() {
     var userAgent = 'Mozilla/5.0 (iPad; CPU OS 6_1 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10B141 Safari/8536.25';
     assert(!isPhone(userAgent));
