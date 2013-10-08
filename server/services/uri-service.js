@@ -86,7 +86,7 @@ exports.findUriForUser = function(uri, userId, callback) {
             return { ownUrl: true };
           }
 
-          return troupeService.findOrCreateOneToOneTroupe(userId, user.id)
+          return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, user.id)
             .spread(function(troupe, otherUser, invite) {
               return { oneToOne: true, troupe: troupe, otherUser: otherUser, access: !!troupe, invite: invite };
 

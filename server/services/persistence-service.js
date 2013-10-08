@@ -393,7 +393,7 @@ var EmailSchema = new Schema({
   from: { type: String },
   fromName: { type: String},
   fromUserId: ObjectId,
-  troupeId: ObjectId,
+  troupeId: ObjectId,  // TODO: confirm if this can be removed
   subject: { type : String },
   date: {type: Date },
   preview: {type: String},

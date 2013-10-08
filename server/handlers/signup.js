@@ -1,11 +1,11 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var winston          = require('winston');
 var signupService    = require("../services/signup-service");
 var userService      = require("../services/user-service");
 var middleware       = require("../web/middleware");
 var loginUtils       = require('../web/login-utils');
-var winston          = require('winston');
 var nconf            = require('../utils/config');
 var isPhone          = require('../web/is-phone');
 var contextGenerator = require('../web/context-generator');

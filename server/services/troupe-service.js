@@ -1,22 +1,22 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
+                             /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 /*global require: true, module: true */
 "use strict";
 
-var persistence = require("./persistence-service");
-var userService = require("./user-service");
-var appEvents = require("../app-events");
-var assert = require("assert");
+var persistence              = require("./persistence-service");
+var userService              = require("./user-service");
+var appEvents                = require("../app-events");
+var assert                   = require("assert");
 var emailNotificationService = require("./email-notification-service");
-var presenceService = require("./presence-service");
-var uuid = require('node-uuid');
-var winston = require("winston");
-var collections = require("../utils/collections");
-var mongoUtils = require("../utils/mongo-utils");
-var Q = require("q");
-var ObjectID = require('mongodb').ObjectID;
-var _ = require('underscore');
-var assert = require('assert');
-var statsService = require("../services/stats-service");
+var presenceService          = require("./presence-service");
+var uuid                     = require('node-uuid');
+var winston                  = require("winston");
+var collections              = require("../utils/collections");
+var mongoUtils               = require("../utils/mongo-utils");
+var Q                        = require("q");
+var ObjectID                 = require('mongodb').ObjectID;
+var _                        = require('underscore');
+var assert                   = require('assert');
+var statsService             = require("../services/stats-service");
 
 function ensureExists(value) {
   if(!value) throw 404;
@@ -385,7 +385,7 @@ function inviteUserByUserId(troupe, fromUser, toUserId) {
         chain = findImplicitConnectionBetweenUsers(fromUserId, toUserId)
           .then(function(hasImplicitConnection) {
             if(hasImplicitConnection) {
-              return findOrCreateOneToOneTroupe(fromUserId, toUserId)
+              return findOrCreateOneToOneTroupeIfPossible(fromUserId, toUserId)
                 .then(function(troupe) {
                   if(troupe) {
                     return { ignored: true, userId: toUserId, url: toUser.getHomeUrl() };
@@ -843,22 +843,6 @@ function updateTroupeName(troupeId, troupeName, callback) {
     .nodeify(callback);
 }
 
-function createOneToOneTroupe(userId1, userId2, callback) {
-  assert(userId1, "Need to provide user 1 id");
-  assert(userId2, "Need to provide user 2 id");
-
-  winston.verbose('Creating a oneToOne troupe for ', { userId1: userId1, userId2: userId2 });
-  return createTroupeQ({
-      name: '',
-      oneToOne: true,
-      status: 'ACTIVE',
-      users: [
-        { userId: userId1 },
-        { userId: userId2 }
-      ]
-    }).nodeify(callback);
-}
-
 // Returns true if the two users share a common troupe
 // In future, will also return true if the users share an organisation
 function findImplicitConnectionBetweenUsers(userId1, userId2, callback) {
@@ -889,13 +873,55 @@ function findOneToOneTroupe(fromUserId, toUserId) {
     });
 
 }
+
+/**
+ * Create a one-to-one troupe if one doesn't exist, otherwise return the existing one.
+ *
+ * Does not check if the users have implicit connections - it always creates
+ * the one to one
+ *
+ * NB NB NB: this is not atomic, so if two users try create the same troupe
+ * at the same moment (to the millisecond) things will get nasty!
+ *
+ * @return {troupe} Promise of a troupe
+ */
+function findOrCreateOneToOneTroupe(userId1, userId2) {
+
+  assert(userId1, "Need to provide user 1 id");
+  assert(userId2, "Need to provide user 2 id");
+
+  /* Find the existing one-to-one.... */
+  return persistence.Troupe.findOneQ({
+    $and: [
+      { oneToOne: true },
+      { 'users.userId': userId1 },
+      { 'users.userId': userId2 }
+    ]
+  })
+  .then(function(troupe) {
+    if(troupe) return troupe;
+
+    winston.verbose('Creating a oneToOne troupe for ', { userId1: userId1, userId2: userId2 });
+    return createTroupeQ({
+        name: '',
+        oneToOne: true,
+        status: 'ACTIVE',
+        users: [
+          { userId: userId1 },
+          { userId: userId2 }
+        ]
+      });
+  });
+
+}
+
 /**
  * Find a one-to-one troupe, otherwise create it if possible (if there is an implicit connection),
  * otherwise return the existing invite if possible
  *
  * @return {[ troupe, other-user, invite ]}
  */
-function findOrCreateOneToOneTroupe(fromUserId, toUserId) {
+function findOrCreateOneToOneTroupeIfPossible(fromUserId, toUserId) {
   assert(fromUserId, 'fromUserId parameter required');
   assert(toUserId, 'toUserId parameter required');
   if(fromUserId === toUserId) throw 417; // You cannot be in a troupe with yourself.
@@ -914,16 +940,16 @@ function findOrCreateOneToOneTroupe(fromUserId, toUserId) {
       })];
     })
     .spread(function(toUser, troupe) {
-
       // Found the troupe? Perfect!
       if(troupe) return [ troupe, toUser, null ];
 
       return findImplicitConnectionBetweenUsers(fromUserId, toUserId)
           .then(function(implicitConnection) {
             if(implicitConnection) {
+
               // There is an implicit connection between these two users,
               // automatically create the troupe
-              return createOneToOneTroupe(fromUserId, toUserId)
+              return findOrCreateOneToOneTroupe(fromUserId, toUserId)
                 .then(function(troupe) {
                   return [ troupe, toUser, null ];
                 });
@@ -1291,25 +1317,24 @@ function rejectInviteForAuthenticatedUser(user, invite) {
  * @return the promise of a troupe
  */
 function acceptInviteForAuthenticatedUser(user, invite) {
-  return Q.resolve(null).then(function() {
-    assert(user, 'User parameter required');
-    assert(invite, 'invite parameter required');
+  return Q.resolve(null)
+    .then(function() {
+      assert(user, 'User parameter required');
+      assert(invite, 'invite parameter required');
 
-    // check if the invite is associated with this user id
-    // check if the invited email is owned by the user
-    if (invite.userId != user.id && !user.hasEmail(invite.email)) {
-      // associate this email address as a confirmed secondary address for the user
-      return userService.addSecondaryEmail(user, invite.email, true)
-      .then(function() {
-        return userService.confirmSecondaryEmailByAddress(user, invite.email);
-      })
-      .then(onceConfirmed);
-    }
-    else {
-      return Q.fcall(onceConfirmed);
-    }
+      // check if the invite is associated with this user id
+      // check if the invited email is owned by the user
+      if (invite.userId != user.id && !user.hasEmail(invite.email)) {
 
-    function onceConfirmed() { // note: the invite is not actually owned by this user yet as that happens async after confirm
+        // associate this email address as a confirmed secondary address for the user
+        return userService.addSecondaryEmail(user, invite.email, true)
+          .then(function() {
+            return userService.confirmSecondaryEmailByAddress(user, invite.email);
+          });
+      }
+    })
+    .then(function() {
+      // note: the invite is not actually owned by this user yet as that happens async after confirm
       // TODO: this will not be used in future once invites are all delete
       if(invite.status !== 'UNUSED') {
         // invite has been used, we can't use it again.
@@ -1325,22 +1350,24 @@ function acceptInviteForAuthenticatedUser(user, invite) {
 
       // Either add the user or create a one to one troupe. depending on whether this
       // is a one to one invite or a troupe invite
-      var isNormalTroupe = !!invite.troupeId;
+      if(!!invite.troupeId) {
+        return addUserIdToTroupe(user.id, invite.troupeId);
+      } else {
+        return findOrCreateOneToOneTroupe(invite.fromUserId, user.id)
+          .then(function(troupe) {
+            return troupe;
+          });
+      }
+    })
+    .then(function(troupe) {
+      // once user is added / troupe is created, send email notice
+      sendInviteAcceptedNotice(invite, troupe, /* group troupe */ !troupe.oneToOne);
 
-      return (isNormalTroupe ? addUserIdToTroupe(user.id, invite.troupeId)
-                              : createOneToOneTroupe(invite.fromUserId, user.id))
-        .then(function(troupe) {
+      // Regardless of the type, mark things as done
+      return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite)
+        .thenResolve(troupe);
+    });
 
-          // once user is added / troupe is created, send email notice
-          sendInviteAcceptedNotice(invite, troupe, isNormalTroupe);
-
-          // Regardless of the type, mark things as done
-          return markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite)
-            .thenResolve(troupe);
-        });
-
-    }
-  });
 }
 
 /**
@@ -1443,7 +1470,7 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
           return Q.all([
               confirmOperation,
               isNormalTroupe ? addUserIdToTroupe(user.id, invite.troupeId) :
-                               createOneToOneTroupe(user.id, invite.fromUserId)
+                               findOrCreateOneToOneTroupe(user.id, invite.fromUserId)
             ])
             .spread(function(userSaveResult, troupe) {
               // once user is added / troupe is created, send email notice
@@ -1652,8 +1679,7 @@ module.exports = {
   validateTroupeUrisForUser: validateTroupeUrisForUser,
   updateTroupeName: updateTroupeName,
   findOneToOneTroupe: findOneToOneTroupe,
-  findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
-  createOneToOneTroupe: createOneToOneTroupe,
+  findOrCreateOneToOneTroupeIfPossible: findOrCreateOneToOneTroupeIfPossible,
   createUniqueUri: createUniqueUri,
   deleteTroupe: deleteTroupe,
 
@@ -1664,5 +1690,9 @@ module.exports = {
   acceptInvite: acceptInvite,
   acceptInviteForAuthenticatedUser: acceptInviteForAuthenticatedUser,
   rejectInviteForAuthenticatedUser: rejectInviteForAuthenticatedUser,
-  sendPendingInviteMails: sendPendingInviteMails
+  sendPendingInviteMails: sendPendingInviteMails,
+
+  testOnly: {
+    findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe
+  }
 };
