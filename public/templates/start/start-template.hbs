@@ -7,9 +7,7 @@
   <link href='/bootstrap/css/trpStart.css' rel='stylesheet' type='text/css'>
 </head>
 
-<body>
-<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-
+<body data-page="{{page}}">
 <div class="trpStartContainer trpStartHeader">
   <div class="trpStartContent">
     <div class="trpStartLogo"></div>
@@ -20,6 +18,9 @@
 {{{body}}}
 
 <br><br><br>
-</body>
+{{{ generateTroupeContext troupeContext }}}
 
+{{>require_wrapper}}
+{{{bootScript 'start-app' }}}
+</body>
 </html>

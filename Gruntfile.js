@@ -207,6 +207,14 @@ module.exports = function( grunt ) {
                     "router-app"
                   ]
               },
+              {
+                  name: "start-app",
+                  include: [
+                    "utils/tracking",
+                    "views/widgets/avatar"
+                  ],
+                  exclude: ["core-libraries"]
+              },
           ]
 
         }
@@ -326,7 +334,8 @@ module.exports = function( grunt ) {
           "public/bootstrap/css/trpNativePeople.css": "public/bootstrap/less/trpNativePeople.less",
           "public/bootstrap/css/trpNativeAccept.css": "public/bootstrap/less/trpNativeAccept.less",
           "public/bootstrap/css/trpNativeConnect.css": "public/bootstrap/less/trpNativeConnect.less",
-          "public/bootstrap/css/trpNativeCreateTroupe.css": "public/bootstrap/less/trpNativeCreateTroupe.less"
+          "public/bootstrap/css/trpNativeCreateTroupe.css": "public/bootstrap/less/trpNativeCreateTroupe.less",
+          "public/bootstrap/css/trpStart.css": "public/bootstrap/less/trpStart.less"
         }
       }
     },
