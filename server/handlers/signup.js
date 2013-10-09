@@ -1,14 +1,15 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var signupService = require("../services/signup-service");
-var userService = require("../services/user-service");
-var middleware = require("../web/middleware");
-var loginUtils = require('../web/login-utils');
-var winston = require('winston');
-var nconf = require('../utils/config');
-var isPhone = require('../web/is-phone');
+var winston          = require('winston');
+var signupService    = require("../services/signup-service");
+var userService      = require("../services/user-service");
+var middleware       = require("../web/middleware");
+var loginUtils       = require('../web/login-utils');
+var nconf            = require('../utils/config');
+var isPhone          = require('../web/is-phone');
 var contextGenerator = require('../web/context-generator');
+var statsService     = require("../services/stats-service");
 
 module.exports = {
 
@@ -90,6 +91,8 @@ module.exports = {
 
           signupService.confirm(req.user, function(err, user) {
             if (err) {
+              statsService.event('confirmation_error', { userId: user.id });
+
               winston.error("Signup service confirmation failed", { exception: err } );
 
               middleware.logoutPreserveSession(req, res, function() {
@@ -98,6 +101,8 @@ module.exports = {
 
               return;
             }
+
+            statsService.event('confirmation_success', { userId: user.id, email: user.email });
 
             if (user.hasPassword()) {
               res.relativeRedirect('/' + user.username);
@@ -116,16 +121,20 @@ module.exports = {
 
           userService.confirmSecondaryEmailByCode(req.user, req.params.confirmationCode)
             .then(function(user) {
-            if (user.hasPassword()) {
-              res.relativeRedirect('/' + user.username);
-            } else {
-              contextGenerator.generateMiniContext(req, function(err, troupeContext) {
-                res.render('complete-profile', { troupeContext: troupeContext });
-              });
-            }
-          })
+              statsService.event('confirmation_secondary_success', { userId: user.id });
+
+              if (user.hasPassword()) {
+                res.relativeRedirect('/' + user.username);
+              } else {
+                contextGenerator.generateMiniContext(req, function(err, troupeContext) {
+                  res.render('complete-profile', { troupeContext: troupeContext });
+                });
+              }
+            })
           .fail(function(err) {
             winston.error("user service confirmation failed", { exception: err } );
+
+            statsService.event('confirmation_secondary_fail');
 
             res.relativeRedirect('/last');
           });

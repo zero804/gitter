@@ -1,21 +1,20 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var userService = require('../services/user-service');
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
-var ConfirmStrategy = require('./confirm-strategy').Strategy;
-var winston = require('winston');
-var troupeService = require('../services/troupe-service');
-var BasicStrategy = require('passport-http').BasicStrategy;
-var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
-var BearerStrategy = require('passport-http-bearer').Strategy;
-var oauthService = require('../services/oauth-service');
-var statsService = require("../services/stats-service");
-var nconf = require('../utils/config');
-var loginUtils = require("../web/login-utils");
-var useragent = require('useragent');
-var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+var userService             = require('../services/user-service');
+var passport                = require('passport');
+var LocalStrategy           = require('passport-local').Strategy;
+var ConfirmStrategy         = require('./confirm-strategy').Strategy;
+var winston                 = require('winston');
+var BasicStrategy           = require('passport-http').BasicStrategy;
+var ClientPasswordStrategy  = require('passport-oauth2-client-password').Strategy;
+var BearerStrategy          = require('passport-http-bearer').Strategy;
+var oauthService            = require('../services/oauth-service');
+var statsService            = require("../services/stats-service");
+var nconf                   = require('../utils/config');
+var loginUtils              = require("../web/login-utils");
+var useragent               = require('useragent');
+var GoogleStrategy          = require('passport-google-oauth').OAuth2Strategy;
 
 function loginAndPasswordUserStrategy(req, login, password, done) {
   winston.verbose("Attempting to authenticate ", { email: email });
@@ -261,12 +260,13 @@ module.exports = {
             email:              profile._json.email,
             gravatarImageUrl:   profile._json.picture,
             googleRefreshToken: refreshToken,
-            status:             'PROFILE_NOT_COMPLETED'
+            status:             'PROFILE_NOT_COMPLETED',
+            source:             'google'
           };
 
           userService.findOrCreateUserForEmail(googleUser, function(err, user) {
             if (err) { return done(err); }
-            statsService.userUpdate(user, {source: 'google'});
+            statsService.userUpdate(user, { source: 'google' });
             req.logIn(user, function(err) {
               if (err) { return done(err); }
               return done(null, user);

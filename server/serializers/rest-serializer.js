@@ -771,7 +771,18 @@ function TroupeStrategy(options) {
 
     // Temporary technique until we add proper avatars for troupe at a later stage
     function getDefaultTroupeAvatar() {
-      var initials = troupeName.split(/\s+/).map(function(s) { return s.charAt(0); }).slice(0,2).join('').toUpperCase();
+      var initials;
+      if(troupeName) {
+        initials = troupeName
+                          .split(/[^\w]/)
+                          .filter(function(f) { return f; })
+                          .map(function(s) { return s.charAt(0); })
+                          .slice(0,2)
+                          .join('')
+                          .toUpperCase();
+      } else {
+        initials = '?';
+      }
       // TODO: when we move to production, this needs to be behind a CDN
       //return 'https://avatar-beta.trou.pe/' + item.id + '/' + initials + '.png';
       ///return 'http://localhost:3000/' + item.id + '/' + initials + '.png';

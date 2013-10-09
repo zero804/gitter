@@ -1,16 +1,8 @@
-#!/bin/bash
-
-set -e
-
-MONGO_URL=$1
-if [ -z "$MONGO_URL" ]; then MONGO_URL=troupe; fi
-
-# NB NB NB NB NB
-# Old versions of Mongo, like the ones deployed on the prod mongo servers aren't so happy
-# about spaces between the lines, so keep it that way
-mongo $MONGO_URL <<"DELIM"
-db.invites.remove({ email: /@troupetest.local$/ });
 function invalidInvite(d) {
+  if(d.email && d.email.match(/@troupetest.local$/)) {
+    return "test_email";
+  }
+
   if(d.status !== 'UNUSED') {
     if(d.status === 'USED' || d.status === 'INVALID') {
       var archivedInvite = db.inviteuseds.find({ _id: d._id });
@@ -39,8 +31,7 @@ function invalidInvite(d) {
     if(!d.fromUserId) {
       return 'from_user_missing';
     } else {
-      var troupe = db.troupes.findOne({ oneToOne: true, $and: [{ "users.userId": d.fromUserId}, { "users.userId": d.userId } ] });
-      if(troupe) {
+      if(db.troupes.count({ oneToOne: true, $and: [{ "users.userId": d.fromUserId}, { "users.userId": d.userId } ] })) {
         return 'already_connected';
       }
     }
@@ -52,14 +43,24 @@ function invalidInvite(d) {
     return 'invalid_form_2';
   }
 }
+
 var candidates = [];
+var count = 0;
+var removeIds = [];
+
 db.invites.find().forEach(function(d) {
+  count++;
+
   var reason = invalidInvite(d);
   if(reason) {
     candidates.push({ reason: reason, doc: d });
-    db.invites.remove({ _id: d._id });
+    removeIds.push(d._id);
   }
 });
-printjson(candidates);
 
-DELIM
+printjson({ candidates: candidates, summary: { scanned: count, invalid: candidates.length }});
+
+if(modify && removeIds.length) {
+  db.invites.remove({ _id: { $in: removeIds } });
+}
+quit(removeIds.length ? 1 : 0);

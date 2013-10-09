@@ -135,6 +135,24 @@ UserSchema.methods.getDisplayName = function() {
   return this.displayName || this.username || this.email && this.email.split('@')[0] || "Unknown";
 };
 
+UserSchema.methods.getFirstName = function() {
+  if(this.displayName) {
+    var firstName = this.displayName.split(/\s+/)[0];
+    if(firstName) return firstName;
+  }
+
+  if(this.username) {
+    return this.username;
+  }
+
+  if(this.email) {
+    return this.email.split('@')[0];
+  }
+
+  return "Unknown";
+};
+
+
 UserSchema.methods.getAllEmails = function() {
   return [this.email].concat(this.emails);
 };
@@ -230,6 +248,17 @@ TroupeSchema.methods.containsUserId = function(userId) {
   });
 
   return !!user;
+};
+
+TroupeSchema.methods.getOtherOneToOneUserId = function(knownUserId) {
+  assert(this.oneToOne, 'getOtherOneToOneUserId should only be called on oneToOne troupes');
+  assert(knownUserId, 'knownUserId required');
+
+  var troupeUser = _.find(this.users, function(troupeUser) {
+    return "" + troupeUser.userId != "" + knownUserId;
+  });
+
+  return troupeUser && troupeUser.userId;
 };
 
 TroupeSchema.methods.addUserById = function(userId) {
@@ -375,7 +404,7 @@ var EmailSchema = new Schema({
   from: { type: String },
   fromName: { type: String},
   fromUserId: ObjectId,
-  troupeId: ObjectId,
+  troupeId: ObjectId,  // TODO: confirm if this can be removed
   subject: { type : String },
   date: {type: Date },
   preview: {type: String},
