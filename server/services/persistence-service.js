@@ -250,6 +250,17 @@ TroupeSchema.methods.containsUserId = function(userId) {
   return !!user;
 };
 
+TroupeSchema.methods.getOtherOneToOneUserId = function(knownUserId) {
+  assert(this.oneToOne, 'getOtherOneToOneUserId should only be called on oneToOne troupes');
+  assert(knownUserId, 'knownUserId required');
+
+  var troupeUser = _.find(this.users, function(troupeUser) {
+    return "" + troupeUser.userId != "" + knownUserId;
+  });
+
+  return troupeUser && troupeUser.userId;
+};
+
 TroupeSchema.methods.addUserById = function(userId) {
   var exists = this.users.some(function(user) { return user.userId == userId; });
   if(exists) {

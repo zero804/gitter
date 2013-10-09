@@ -5,7 +5,7 @@ define([
   'views/base',
   'hbs!./tmpl/personDetailView',
   'log!person-detail-view'
-], function($, context, TroupeViews, template, log){
+], function($, context, TroupeViews, template, log) {
   "use strict";
 
   var View = TroupeViews.Base.extend({
@@ -32,8 +32,6 @@ define([
     },
 
     onRemoveClicked: function() {
-      var thisPerson = this;
-
       var modal = new TroupeViews.ConfirmationModal({
         title: "Are you sure?",
         body: "This will remove " + this.model.get('displayName') + " from the Troupe?",
@@ -43,16 +41,14 @@ define([
         ]
       });
 
-       modal.on('menuItemClicked', function(action) {
+      modal.on('menuItemClicked', function(action) {
         if (action === "yes") {
           $.ajax({
             url: "/troupes/" + context.getTroupeId() + "/users/" + this.model.get('id'),
             data: "",
             type: "DELETE",
             success: function() {
-              log("Removed this person");
-              // thisPerson.$el.toggle();
-              if (thisPerson.isSelf)
+              if (this.isSelf)
                 window.location = context.env('homeUrl');
               else
                 window.location.href = "#!";
@@ -61,7 +57,7 @@ define([
         }
         modal.off('menuItemClicked');
         modal.hide();
-      });
+      }, this);
 
       modal.show();
 
