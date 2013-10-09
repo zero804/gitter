@@ -1562,7 +1562,7 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
                 });
             });
 
-        })
+        });
 
     })
     .nodeify(callback);
