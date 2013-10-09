@@ -247,14 +247,9 @@ var signupService = module.exports = {
 };
 
 appEvents.onEmailConfirmed(function(params) {
+  winston.info("Email address confirmed, updating invites and requests", params);
   var email = params.email;
   var userId = params.userId;
 
-  return troupeService.updateInvitesForEmailToUserId(email, userId)
-    .then(function() {
-      return Q.all([
-        troupeService.updateUnconfirmedInvitesForUserId(userId),
-        troupeService.updateUnconfirmedRequestsForUserId(userId)
-        ]);
-    });
+  return troupeService.updateInvitesAndRequestsForConfirmedEmail(email, userId);
 });

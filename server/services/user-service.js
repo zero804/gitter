@@ -518,8 +518,9 @@ var userService = {
 
   // private
   confirmSecondaryUnconfirmed: function(user, unconfirmed) {
-
     if(!unconfirmed) return Q.reject(404);
+    winston.info("Confirming secondary email ", { userId: user.id, email: unconfirmed.email });
+
     unconfirmed.remove();
     var email = unconfirmed.email;
 
@@ -531,6 +532,8 @@ var userService = {
         // Signal that an email address has been confirmed
         appEvents.emailConfirmed(email, user.id);
 
+        // Remove the unconfirmed secondary email address for
+        // any other users who may have tried to register it
         return persistence.User.updateQ(
           { 'unconfirmedEmails.email': email },
           { $pull: { unconfirmedEmails: { email: email } } },
