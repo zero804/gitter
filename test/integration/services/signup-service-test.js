@@ -155,7 +155,7 @@ describe('signup-service', function() {
 
     });
 
-    it('should allow an existing UNCONFIRMED user to request access to a troupe and resend their confirmation email', function(done) {
+    it('should allow an existing UNCONFIRMED user to request access to a troupe', function(done) {
 
       var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
 

@@ -216,7 +216,7 @@ var signupService = module.exports = {
 
               // If the user is attempting to access a troupe, but isn't confirmed,
               // resend the confirmation
-              signupService.resendConfirmationForUser(fromUser.email);
+              emailNotificationService.sendConfirmationForNewUser(fromUser);
 
               // Proceed to the next step with this user
               return fromUser;
