@@ -79,9 +79,9 @@ define([
           // return false to cancel submit
           onComplete: function(id, fileName, response) {
             if(response.success) {
-              context.getUser().avatarUrlSmall = response.user.avatarUrlSmall;
-              context.getUser().avatarUrlMedium = response.user.avatarUrlMedium;
-              $(document).trigger('avatar:change', context.getUser());
+              var userModel = context.user();
+              userModel.set('avatarUrlSmall', response.user.avatarUrlSmall);
+              userModel.set('avatarUrlMedium', response.user.avatarUrlMedium);
             } else {
               // TODO: deal with this!
             }
