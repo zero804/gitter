@@ -14,7 +14,7 @@ class SignupTests(unittest.TestCase):
     def setUp(self):
         self.driver = utils.driver()
         utils.printJobInfo(self.driver)
-        self.existingUsername = utils.signup(self.driver)
+        self.existingUsername = utils.getJSON('/testdata/newUser').get('username')
 
     @attr('thread_safe')
     def testUsernameSelectionUnavailable(self):
@@ -82,8 +82,7 @@ class SignupTests(unittest.TestCase):
         self.driver.find_element_by_css_selector('#button-signup').click()
 
         form = self.driver.find_element_by_css_selector('#signup-form')
-        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, 'email')))
-        form.find_element_by_name('email').send_keys(emailAddress)
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, 'email'))).send_keys(emailAddress)
         form.find_element_by_name('submit').click()
         self.driver.find_element_by_css_selector('.label-signupsuccess')
 
