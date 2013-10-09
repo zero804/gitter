@@ -11,7 +11,6 @@ var assert        = require("assert");
 var mockito       = require('jsmockito').JsMockito;
 var ObjectID      = require('mongodb').ObjectID;
 var persistence   = testRequire("./services/persistence-service");
-var mongoUtils    = testRequire('./utils/mongo-utils');
 var times         = mockito.Verifiers.times;
 var once          = times(1);
 var times         = mockito.Verifiers.times;

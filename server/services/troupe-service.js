@@ -586,7 +586,7 @@ function indexTroupesByUserIdTroupeId(troupes, userId) {
 
   var oneToOneUserIds = troupes
                               .filter(function(t) { return t.oneToOne; })
-                              .map(function(t) { console.log(t); return t.getOtherOneToOneUserId(userId); });
+                              .map(function(t) { return t.getOtherOneToOneUserId(userId); });
 
   return {
     oneToOne: collections.hashArray(oneToOneUserIds),
@@ -1527,10 +1527,6 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
         })
         .then(function(user) {
           var email = invite.email || user.email;
-
-          console.log('USER', user);
-          console.log('invite', invite);
-          console.log('email', email);
 
           return updateInvitesAndRequestsForConfirmedEmail(email, user.id)
             .thenResolve(user);
