@@ -3,6 +3,7 @@
 
 var nconf = require('./config');
 var winston = require("winston");
+var LogstashUDP = require('winston-logstash-udp').LogstashUDP;
 var fs = require('fs');
 var path = require('path');
 var Q = require('q');
@@ -66,6 +67,7 @@ function reopenTransportOnHupSignal() {
 }
 
 
+
 function configureTransports() {
   var defaultLogger = winston['default'];
 
@@ -73,6 +75,13 @@ function configureTransports() {
     winston.remove({ name: name });
   }
 
+  var logstash_opts = {
+    appName:  'Troupe app', 
+    port:     nconf.get('logging:logstash:port'), 
+    host:     nconf.get('logging:logstash:host')
+  };
+
+  winston.add(LogstashUDP, logstash_opts);
 
   if(nconf.get('logging:logToFile') && nconf.get('LOG_FILE')) {
     winston.add(winston.transports.File, {
@@ -117,6 +126,12 @@ function configureTransports() {
       subdomain: nconf.get("logging:logglySubdomain"),
       inputToken: nconf.get("logging:logglyInputToken")
     });
+
+  console.log('Winston transports');
+  console.log(winston['default'].transports);
+
+  return;
+
 
   }
 }

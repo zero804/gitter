@@ -76,7 +76,8 @@
     "passport-google-oauth": "~0.1.5",
     "easynexmo": "~0.3.1",
     "ent": "~0.1.0",
-    "crc32": "~0.2.2"
+    "crc32": "~0.2.2",
+    "winston-logstash-udp": "0.0.4"
   },
   "devDependencies": {
     "proxyquire": "0.4.0",
