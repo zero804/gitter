@@ -26,6 +26,10 @@ h1 {
   }
 }
 
+a {
+  color: #e74c3c;
+}
+
 .blue {
   background-color: @trpDarkBlue;
   color: white;
@@ -46,11 +50,17 @@ h1 {
   opacity: 0.8;
 }
 
-.input input {
-  font-size: 1.3em;
-  padding: 4px;
-  border-radius: 2px;
-
+.input {
+  @media @mobile {
+    margin-top: 10px;
+  }
+  input {
+    font-size: 1.3em;
+    padding: 7px;
+    border-radius: 2px;
+    margin: 0;
+    width: 270px
+  }
 }
 
 .blue-text {
@@ -82,9 +92,12 @@ h1 {
   box-sizing: border-box;
 
   @media @mobile {
-    margin-left: 20px;
+    margin-left: 10px;
     width: 100%;
-    padding-left: 30px;
+    min-width: 320px;
+    max-width: 100%;
+    padding-left: 10px;
+    padding-right: 20px;
   }
 
 }
@@ -135,7 +148,7 @@ h1 {
     width: 24px;
     height: 24px;
 
-    margin-left: -40px;
+    margin-left: 0px;
     margin-right: 10px;
 
     div {
@@ -144,6 +157,14 @@ h1 {
 
   }
 
+}
+
+.trpStartInviteButton {
+  margin-left: 2px;
+  @media @mobile {
+    margin-left: 0px;
+    margin-top: 4px;
+  }
 }
 
 .trpUsernameSuggestion {
