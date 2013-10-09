@@ -1,0 +1,188 @@
+@import "trpFonts.less";
+@import "trpColours.less";
+@import "trpButtons.less";
+@import "trp3Vars.less";
+
+html {
+ @media @mobile {
+  width: 100%;
+  overflow: hidden;
+ }
+}
+
+body {
+  margin: 0;
+  font-family: @fontSans;
+  @media @mobile {
+   width: 100%;
+   overflow: hidden;
+  }
+}
+
+h1 {
+  content: hello;
+  @media @mobile {
+    font-size: 16px;
+  }
+}
+
+.blue {
+  background-color: @trpDarkBlue;
+  color: white;
+}
+
+
+.label {
+  display: inline-block;
+  font-size: 1.3em;
+  @media @mobile {
+    font-size: 1.2em;
+  }
+}
+
+.label2 {
+  display: inline-block;
+  font-size: 1.1em;
+  opacity: 0.8;
+}
+
+.input input {
+  font-size: 1.3em;
+  padding: 4px;
+  border-radius: 2px;
+
+}
+
+.blue-text {
+  color: #17202a;
+}
+
+.help {
+  margin-top: 4px;
+  font-size: 0.9em;
+  opacity: 0.8;
+  @media @mobile {
+    font-size: 0.7em;
+  }
+}
+
+.trpStartContainer {
+  width: 100%;
+  text-align: center;
+}
+
+.trpStartContent {
+  display: inline-block;
+/*  min-width: 320px;*/
+  min-width: 920px;
+  max-width: 920px;
+  text-align: left;
+  margin-left: 60px;
+  padding-left: 20px;
+  box-sizing: border-box;
+
+  @media @mobile {
+    margin-left: 20px;
+    width: 100%;
+    padding-left: 30px;
+  }
+
+}
+
+.trpStartHeader {
+  margin-top: 28px;
+  margin-bottom: 8px;
+}
+
+.trpStartLogo {
+  margin-bottom: 40px;
+  width: 128px;
+  height: 128px;
+  background-image: url('../../images/2/logo-mark-green-128x128.png');
+  background-size: contain;
+  @media @mobile {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 20px;
+  }
+}
+
+.trpStartBody {
+  background-color: @trpDarkBlue;
+  color: white;
+  padding-bottom: 60px;
+}
+
+.trpStartNumber {
+  display: inline-block;
+  width: 35px;
+  height: 35px;
+  border-radius: 50em;
+  text-align: center;
+  vertical-align: middle;
+  background-color: rgba(255,255,255,0.1);
+  border: 2px solid;
+  margin-left: -60px;
+  margin-right: 18px;
+  border-color: #e74c3c;
+  color: white;
+
+  div {
+    padding-top: 6px;
+  }
+
+  @media @mobile {
+    width: 24px;
+    height: 24px;
+
+    margin-left: -40px;
+    margin-right: 10px;
+
+    div {
+      padding-top: 0px;
+    }
+
+  }
+
+}
+
+.trpUsernameSuggestion {
+  cursor: pointer;
+  display: inline-block;
+  background-color: #dadfe5;
+  background-color: #1dce73;
+  border-radius: 2px;
+  color: black;
+  color: #17202a;
+  /*color: white;*/
+  padding: 6px;
+  margin-bottom: 3px;
+  opacity: 0.8;
+}
+
+.trpUserNameSuggestion:hover {
+  opacity: 1;
+}
+
+.trpStartForm {
+  display: inline-block;
+  margin-top: 60px;
+
+  @media @mobile {
+    margin-top: 20px;
+  }
+
+}
+
+.trpStartHelp{
+  display: inline-block; 
+  vertical-align: top; 
+  margin-left: 80px; 
+  max-width: 300px;
+  margin-top: 60px;
+
+  @media @mobile {
+    display: none;
+  }
+}
+
