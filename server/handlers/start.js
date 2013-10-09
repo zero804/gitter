@@ -20,6 +20,11 @@ function startPage(template, options) {
 module.exports = {
 
     install: function(app) {
+      app.get('/start',
+        function(req, res) {
+          res.relativeRedirect('/start/profile');
+        });
+
       app.get('/start/profile',
         startPage('start/profile', {
             title: 'Profile'
