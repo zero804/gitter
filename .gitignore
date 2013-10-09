@@ -52,3 +52,4 @@ v8.log
 *.swp
 *.swo
 .idea
+npm-debug.log

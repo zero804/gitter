@@ -25,7 +25,7 @@ describe('signup-service', function() {
   before(fixtureLoader(fixture));
   before(fixtureLoader(fixture2, {
     troupe1: { },
-    userUnconfirmed1: { status: 'UNCONFIRMED' },
+    userUnconfirmed1: { status: 'UNCONFIRMED', confirmationCode:true },
     userConfirmed1: { username: true }
   }));
 
@@ -155,7 +155,7 @@ describe('signup-service', function() {
 
     });
 
-    it('should allow an existing UNCONFIRMED user to request access to a troupe and resend their confirmation email', function(done) {
+    it('should allow an existing UNCONFIRMED user to request access to a troupe', function(done) {
 
       var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
 

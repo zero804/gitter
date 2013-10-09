@@ -9,6 +9,8 @@ BASE_URL = http://localhost:5000
 MAIL_HOST = localhost
 MAIL_PORT = 2525
 
+.PHONY: clean test perf-test-xunit perf-test test-xunit test-in-browser test-in-browser-xunit test-coverage prepare-for-end-to-end-testing end-to-end-test
+
 clean:
 	rm -rf public-processed/ output/ coverage/ cobertura-coverage.xml html-report/
 
@@ -64,29 +66,59 @@ prepare-for-end-to-end-testing:
 	unzip -o test/end-to-end/chromedriver/chromedriver_mac_26.0.1383.0.zip -d test/end-to-end/chromedriver/
 
 end-to-end-test:
-	mkdir -p ./output/test-reports/
 	MAIL_HOST=$(MAIL_HOST) \
 	MAIL_PORT=$(MAIL_PORT) \
-	nosetests --nologcapture --attr '!unreliable' --all-modules test/end-to-end/e2etests/
+	nosetests --nologcapture --processes=5 --process-timeout=120 --attr '!unreliable','thread_safe' --all-modules test/end-to-end/e2etests
+	MAIL_HOST=$(MAIL_HOST) \
+	MAIL_PORT=$(MAIL_PORT) \
+	nosetests --nologcapture --attr '!unreliable','!thread_safe' --all-modules test/end-to-end/e2etests
 
 end-to-end-test-saucelabs-chrome:
 	@mkdir -p ./output/test-reports
-	@echo Testing $(BETA_SITE) with chrome at saucelabs.com
+	@echo Testing $(BETA_SITE) with chrome at saucelabs.com thread safe tests in parallel
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTECHROME \
 	BASE_URL=$(BETA_SITE) \
 	MAIL_HOST=$(MAIL_HOST) \
 	MAIL_PORT=$(MAIL_PORT) \
-	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
+		nosetests \
+			--processes=30 --process-timeout=180 \
+			--attr '!unreliable','thread_safe' \
+			--nologcapture --with-xunit --xunit-file=./output/test-reports/nosetests.xml \
+			--all-modules test/end-to-end/e2etests
+	@echo Testing $(BETA_SITE) with chrome at saucelabs.com thread unsafe tests in serial
+	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
+	DRIVER=REMOTECHROME \
+	BASE_URL=$(BETA_SITE) \
+	MAIL_HOST=$(MAIL_HOST) \
+	MAIL_PORT=$(MAIL_PORT) \
+		nosetests \
+			--attr '!unreliable','!thread_safe' \
+			--nologcapture --with-xunit --xunit-file=./output/test-reports/nosetests.xml \
+			--all-modules test/end-to-end/e2etests
 
 end-to-end-test-saucelabs-ie10:
-	@echo Testing $(BETA_SITE) with ie10 at saucelabs.com
+	@echo Testing $(BETA_SITE) with ie10 at saucelabs.com thread safe tests in parallel
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTEIE \
 	BASE_URL=$(BETA_SITE) \
 	MAIL_HOST=$(MAIL_HOST) \
 	MAIL_PORT=$(MAIL_PORT) \
-	nosetests --nologcapture --attr '!unreliable' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
+		nosetests \
+			--processes=30 --process-timeout=180 \
+			--attr '!unreliable','thread_safe' \
+			--nologcapture --with-xunit --xunit-file=./output/test-reports/nosetests.xml \
+			--all-modules test/end-to-end/e2etests
+	@echo Testing $(BETA_SITE) with ie10 at saucelabs.com thread unsafe tests in serial
+	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
+	DRIVER=REMOTEIE \
+	BASE_URL=$(BETA_SITE) \
+	MAIL_HOST=$(MAIL_HOST) \
+	MAIL_PORT=$(MAIL_PORT) \
+		nosetests \
+			--attr '!unreliable','!thread_safe' \
+			--nologcapture --with-xunit --xunit-file=./output/test-reports/nosetests.xml \
+			--all-modules test/end-to-end/e2etests
 
 end-to-end-test-saucelabs-android:
 	@echo Testing $(BETA_SITE) with android at saucelabs.com
@@ -131,11 +163,11 @@ upgrade-data:
 	./scripts/upgrade-data.sh
 
 maintain-data:
-	$(foreach var,$(DATA_MAINT_SCRIPTS),$(var);)
+	MODIFY=true ./scripts/datamaintenance/execute.sh
 
 # Make a second target
 post-test-maintain-data:
-	$(foreach var,$(DATA_MAINT_SCRIPTS),$(var);)
+	MODIFY=true ./scripts/datamaintenance/execute.sh
 
 
 init-test-data:

@@ -1,14 +1,15 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var emailNotificationService = require("./email-notification-service"),
-    troupeService = require("./troupe-service"),
-    userService = require("./user-service"),
-    uriService = require("./uri-service"),
-    winston = require('winston'),
-    assert = require('assert'),
-    appEvents = require('../app-events'),
-    Q = require('q');
+var emailNotificationService  = require("./email-notification-service");
+var troupeService             = require("./troupe-service");
+var userService               = require("./user-service");
+var uriService                = require("./uri-service");
+var winston                   = require('winston');
+var assert                    = require('assert');
+var appEvents                 = require('../app-events');
+var Q                         = require('q');
+var userService               = require("./user-service");
 
 function newUser(options, callback) {
   winston.info("New user", options);
@@ -25,6 +26,7 @@ var signupService = module.exports = {
     if(!options.email) return callback('Email address is required');
 
     options.email = options.email.trim().toLowerCase();
+    if(!options.source) options.source = 'landing';
 
     winston.info("New signup ", options);
 
@@ -214,7 +216,7 @@ var signupService = module.exports = {
 
               // If the user is attempting to access a troupe, but isn't confirmed,
               // resend the confirmation
-              signupService.resendConfirmationForUser(fromUser.email);
+              emailNotificationService.sendConfirmationForNewUser(fromUser);
 
               // Proceed to the next step with this user
               return fromUser;
@@ -245,14 +247,9 @@ var signupService = module.exports = {
 };
 
 appEvents.onEmailConfirmed(function(params) {
+  winston.info("Email address confirmed, updating invites and requests", params);
   var email = params.email;
   var userId = params.userId;
 
-  return troupeService.updateInvitesForEmailToUserId(email, userId)
-    .then(function() {
-      return Q.all([
-        troupeService.updateUnconfirmedInvitesForUserId(userId),
-        troupeService.updateUnconfirmedRequestsForUserId(userId)
-        ]);
-    });
+  return troupeService.updateInvitesAndRequestsForConfirmedEmail(email, userId);
 });

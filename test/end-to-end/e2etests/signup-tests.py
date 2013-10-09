@@ -1,7 +1,7 @@
 import utils
-import time
 import urllib2
 import unittest
+import uuid
 from nose.plugins.attrib import attr
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -9,14 +9,16 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 class SignupTests(unittest.TestCase):
+    _multiprocess_can_split_ = True
 
     def setUp(self):
         self.driver = utils.driver()
         utils.printJobInfo(self.driver)
+        self.existingUsername = utils.signup(self.driver)
 
+    @attr('thread_safe')
     def testUsernameSelectionUnavailable(self):
         self.driver.get(utils.baseUrl("/signout"))
-        self.driver.get(utils.baseUrl("/x"))
         emailAddress = generateUniqueEmailAddress()
         self.driver.find_element_by_css_selector('#button-signup').click()
         form = self.driver.find_element_by_css_selector('#signup-form')
@@ -27,16 +29,15 @@ class SignupTests(unittest.TestCase):
         confirmEmailAddress(emailAddress, self.driver)
 
         # choose a username
-        username = 'testuser1'
         inputUser = self.driver.find_element_by_css_selector('input[name=username]')
-        inputUser.send_keys(username)
+        inputUser.send_keys(self.existingUsername)
         errorMessage = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, 'not-valid-message')))
 
         assert errorMessage.is_displayed()
 
+    @attr('thread_safe')
     def testUsernameSelectionAvailable(self):
         self.driver.get(utils.baseUrl("/signout"))
-        self.driver.get(utils.baseUrl("/x"))
         emailAddress = generateUniqueEmailAddress()
         self.driver.find_element_by_css_selector('#button-signup').click()
         form = self.driver.find_element_by_css_selector('#signup-form')
@@ -47,16 +48,16 @@ class SignupTests(unittest.TestCase):
         confirmEmailAddress(emailAddress, self.driver)
 
         # choose a username
-        username = 'testuser' + time.strftime("%Y%m%d%H%M%S", time.gmtime())
+        username = 'testuser-' + str(uuid.uuid4())
         inputUser = self.driver.find_element_by_css_selector('input[name=username]')
         inputUser.send_keys(username)
         validMessage = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, 'valid-message')))
 
         assert validMessage.is_displayed()
 
+    @attr('thread_safe')
     def testUsernameSelectionSuggestions(self):
         self.driver.get(utils.baseUrl("/signout"))
-        self.driver.get(utils.baseUrl("/x"))
         emailAddress = generateUniqueEmailAddress()
         self.driver.find_element_by_css_selector('#button-signup').click()
         form = self.driver.find_element_by_css_selector('#signup-form')
@@ -67,18 +68,17 @@ class SignupTests(unittest.TestCase):
         confirmEmailAddress(emailAddress, self.driver)
 
         # choose a username
-        username = 'testuser1'
         inputUser = self.driver.find_element_by_css_selector('input[name=username]')
-        inputUser.send_keys(username)
-        suggestion = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '[data-username="testuser11"]')))
+        inputUser.send_keys(self.existingUsername)
+        suggestion = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '[data-username="'+self.existingUsername+'1"]')))
 
         assert suggestion.is_displayed()
 
+    @attr('thread_safe')
     @attr('phone_compatible')
     def testSignupFromHomePage(self):
         self.driver.get(utils.baseUrl("/signout"))
-        self.driver.get(utils.baseUrl("/x"))
-        emailAddress = 'testuser.' + time.strftime("%Y%m%d%H%M%S", time.gmtime()) + '@troupetest.local'
+        emailAddress = generateUniqueEmailAddress()
         self.driver.find_element_by_css_selector('#button-signup').click()
 
         form = self.driver.find_element_by_css_selector('#signup-form')
@@ -95,7 +95,7 @@ class SignupTests(unittest.TestCase):
         self.driver.get(utils.baseUrl('/confirm/'+confirmCode))
 
         # choose a username
-        username = 'testuser' + time.strftime("%Y%m%d%H%M%S", time.gmtime())
+        username = 'testuser-' + str(uuid.uuid4())
         inputUser = self.driver.find_element_by_css_selector('input[name=username]')
         inputUser.send_keys(username)
         self.driver.find_element_by_css_selector('#username-form [type=submit]').click()
@@ -137,7 +137,7 @@ class SignupTests(unittest.TestCase):
         self.assertEqual(self.driver.current_url, utils.baseUrl('/confirm'))
 
         # Select username
-        username = 'mrtroupe' + time.strftime("%Y%m%d%H%M%S", time.gmtime())
+        username = 'mrtroupe' + str(uuid.uuid4())
         form = self.driver.find_element_by_id('username-form')
         form.find_element_by_name('username').send_keys(username)
         form.find_element_by_name('submit').click()
@@ -175,7 +175,7 @@ class SignupTests(unittest.TestCase):
 
 
 def generateUniqueEmailAddress():
-    return 'testuser.' + time.strftime("%Y%m%d%H%M%S", time.gmtime()) + '@troupetest.local'
+    return 'testuser-' + str(uuid.uuid4()) + '@troupetest.local'
 
 
 def confirmEmailAddress(emailAddress, driver):
