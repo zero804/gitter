@@ -25,7 +25,7 @@ describe('signup-service', function() {
   before(fixtureLoader(fixture));
   before(fixtureLoader(fixture2, {
     troupe1: { },
-    userUnconfirmed1: { status: 'UNCONFIRMED' },
+    userUnconfirmed1: { status: 'UNCONFIRMED', confirmationCode:true },
     userConfirmed1: { username: true }
   }));
 
