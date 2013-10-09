@@ -579,68 +579,153 @@ function findUnusedOneToOneInviteFromUserIdToUserId(fromUserId, toUserId) {
 }
 
 
-/**
- * Finds all unconfirmed invites for a recently confirmed user,
- * notifies recipients
- * @return {promise} no value
- */
-function updateUnconfirmedInvitesForUserId(userId) {
-  return persistence.InviteUnconfirmed.findQ({ fromUserId: userId })
-      .then(function(invites) {
-        winston.info('Creating ' + invites.length + ' invites for recently confirmed user ' + userId);
-        var promises = invites.map(function(invite) {
-          return createInviteQ(invite)
-            .then(function(newInvite) {
-              appEvents.newInvite({ fromUserId: userId, inviteId: newInvite.id, toUserId: newInvite.userId });
+function indexTroupesByUserIdTroupeId(troupes, userId) {
+  var groupTroupeIds = troupes
+                        .filter(function(t) { return !t.oneToOne; })
+                        .map(function(t) { return t.id; });
 
-              return invite.removeQ()
-                .then(function() {
-                  return newInvite;
-                });
-              });
-        });
+  var oneToOneUserIds = troupes
+                              .filter(function(t) { return t.oneToOne; })
+                              .map(function(t) { return t.getOtherOneToOneUserId(userId); });
 
-        return Q.all(promises)
-          .then(function(invites) {
-            return notifyRecipientsOfInvites(invites);
-          });
-      });
+  return {
+    oneToOne: collections.hashArray(oneToOneUserIds),
+    groupTroupeIds: collections.hashArray(groupTroupeIds)
+  };
 }
 
+
 /**
- * Finds all unconfirmed requests for a recently confirmed user,
- * notifies recipients
- * @return {promise} no value
+ * Update invites and requests, moving them from an email address to a userId.
+ *
+ * Also moves requests and invites from UNCONFIRMED collections
+ *
+ * @returns a promise of nothing
  */
-function updateUnconfirmedRequestsForUserId(userId) {
-  return persistence.RequestUnconfirmed.findQ({ userId: userId })
-      .then(function(requests) {
-        winston.info('Creating ' + requests.length + ' requests for recently confirmed user ' + userId);
+function updateInvitesAndRequestsForConfirmedEmail(email, userId) {
+  assert(email, 'email required');
+  assert(userId, 'userId required');
 
-        var promises = requests.map(function(request) {
-          return createRequestQ(request)
-            .then(function() {
-              return request.removeQ();
-            });
-        });
-
-        return Q.all(promises);
-      });
-}
-
-function updateInvitesForEmailToUserId(email, userId, callback) {
-  return persistence.Invite.updateQ(
-    { email: email },
-    {
-      userId: userId,
-      email: null,
-      displayName: null
-    },
-    { multi: true })
-    .then(function() {
-      return true;
+  return findAllTroupesForUser(userId)
+    .then(function(troupes) {
+      return indexTroupesByUserIdTroupeId(troupes, userId);
     })
-    .nodeify(callback);
+    .then(function(indexedHash) {
+      /*******************************************/
+      /** Step 1: updateInvitesForEmailToUserId **/
+      /*******************************************/
+
+      return persistence.Invite.findQ({ email: email })
+        .then(function(invites) {
+          winston.verbose('Updating ' + invites.length + ' invites from ' + email + ' to userId ' + userId);
+          if(!invites.length) return;
+
+          return Q.all(invites.map(function(invite) {
+              if(invite.troupeId) {
+                // This is an invite to join a troupe
+                if(indexedHash.groupTroupeIds[invite.troupeId]) {
+                  winston.info('Trashing invite as user is already in the troupe');
+
+                  // Already a member of the group? Delete the invite
+                  return invite.removeQ();
+                }
+              } else {
+                if(indexedHash.oneToOne[invite.fromUserId]) {
+                  winston.info('Trashing invite as user is already connected');
+
+                  // Already connect to the inviter? Delete the invite
+                  return invite.removeQ();
+                }
+              }
+
+              invite.email = null;
+              invite.displayName = null;
+              invite.userId = userId;
+              return invite.saveQ();
+            }));
+        })
+        .thenResolve(indexedHash);
+    })
+    .then(function(indexedHash) {
+      /**
+       * Find all unconfirmed invites for a recently confirmed user, notify recipients
+       */
+      return persistence.InviteUnconfirmed.findQ({ fromUserId: userId })
+          .then(function(invites) {
+            winston.info('Creating ' + invites.length + ' invites for recently confirmed user ' + userId);
+
+            var invitesForNotification = [];
+
+            var promises = invites.map(function(invite) {
+              if(invite.troupeId) {
+                // This is an invite to join a troupe
+                if(indexedHash.groupTroupeIds[invite.troupeId]) {
+                  winston.info('Trashing invite as user is already in the troupe');
+
+                  // Already a member of the group? Delete the invite
+                  return invite.removeQ();
+                }
+              } else {
+                if(indexedHash.oneToOne[invite.fromUserId]) {
+                  winston.info('Trashing invite as user is already connected');
+
+                  // Already connect to the inviter? Delete the invite
+                  return invite.removeQ();
+                }
+              }
+
+              return createInviteQ(invite)
+                .then(function(newInvite) {
+                  appEvents.newInvite({ fromUserId: userId, inviteId: newInvite.id, toUserId: newInvite.userId });
+
+                  return invite.removeQ()
+                    .then(function() {
+                      invitesForNotification.push(newInvite);
+                      return newInvite;
+                    });
+                  });
+            });
+
+            // After we're done saving the invites
+            return Q.all(promises)
+              .then(function() {
+                return notifyRecipientsOfInvites(invitesForNotification);
+              });
+          })
+          .thenResolve(indexedHash);
+    })
+    .then(function(indexedHash) {
+      /**
+       * Find all unconfirmed requests for a recently confirmed user
+       */
+      return persistence.RequestUnconfirmed.findQ({ userId: userId })
+        .then(function(requests) {
+          winston.verbose('Updating ' + requests.length + ' requests for userId ' + userId);
+          if(!requests.length) {
+            return;
+          }
+
+          winston.info('Creating ' + requests.length + ' requests for recently confirmed user ' + userId);
+
+          var promises = requests.map(function(request) {
+            if(indexedHash.groupTroupeIds[request.troupeId]) {
+              winston.info('Trashing request user is already in the troupe');
+
+              // Already a member of the group? Delete the invite
+              return request.removeQ();
+            }
+
+            // Otherwise, move the request from unconfirmed to confirmed
+            return createRequestQ(request)
+              .then(function() {
+                return request.removeQ();
+              });
+          });
+
+          return Q.all(promises);
+        });
+    });
+
 }
 
 function findAllUsedInvitesForUserId(userId, callback) {
@@ -1435,15 +1520,16 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
               email: invite.email,
               status: "PROFILE_NOT_COMPLETED",
               source: 'invite_accept'
-            }).then(function(user) {
-              return updateInvitesForEmailToUserId(invite.email, user.id)
-                .then(function() {
-                  return user;
-                });
             });
           }
 
           return user;
+        })
+        .then(function(user) {
+          var email = invite.email || user.email;
+
+          return updateInvitesAndRequestsForConfirmedEmail(email, user.id)
+            .thenResolve(user);
         })
         .then(function(user) {
           // Invite is good to accept
@@ -1455,15 +1541,7 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
           // confirm the user if they are not already.
           if (user.status == 'UNCONFIRMED') {
             user.status = 'PROFILE_NOT_COMPLETED';
-            confirmOperation = user.saveQ()
-                .then(function() {
-                  // Find all the unconfirmed requests and invites for this user and mark them
-                  return Q.all([
-                      updateUnconfirmedInvitesForUserId(user.id),
-                      updateUnconfirmedRequestsForUserId(user.id)
-                    ]);
-
-                });
+            confirmOperation = user.saveQ();
           }
 
           var isNormalTroupe = !!invite.troupeId;
@@ -1657,12 +1735,10 @@ module.exports = {
   findAllUserIdsForUnconnectedImplicitContacts: findAllUserIdsForUnconnectedImplicitContacts,
   findAllImplicitContactUserIds: findAllImplicitContactUserIds,
   findAllConnectedUserIdsForUserId: findAllConnectedUserIdsForUserId,
-  updateUnconfirmedInvitesForUserId: updateUnconfirmedInvitesForUserId,
-  updateUnconfirmedRequestsForUserId: updateUnconfirmedRequestsForUserId,
   getUrlForTroupeForUserId: getUrlForTroupeForUserId,
   inviteUserByUserId: inviteUserByUserId,
 
-  updateInvitesForEmailToUserId: updateInvitesForEmailToUserId,
+  updateInvitesAndRequestsForConfirmedEmail: updateInvitesAndRequestsForConfirmedEmail,
 
   addRequest: addRequest,
   findRequestsByIds: findRequestsByIds,
@@ -1693,6 +1769,7 @@ module.exports = {
   sendPendingInviteMails: sendPendingInviteMails,
 
   testOnly: {
-    findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe
+    findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
+    indexTroupesByUserIdTroupeId: indexTroupesByUserIdTroupeId
   }
 };

@@ -56,8 +56,8 @@ define([
       }
 
       var modal = new TroupeViews.ConfirmationModal({
-        title: "Are you sure?",
-        body: "This action cannot be undone.",
+        title: "Delete this Troupe?",
+        body: "Are you sure you want to delete this troupe? This action cannot be undone.",
         menuItems: [
           { action: "yes", text: "Yes", class: "trpBtnRed" },
           { action: "no", text: "No", class: "trpBtnLightGrey"}
@@ -96,8 +96,17 @@ define([
         return window.alert(errMsg);
       }
 
-      TroupeViews.confirm("Are you sure you want to remove yourself from this troupe?", {
-        'click #ok': function() {
+      var modal = new TroupeViews.ConfirmationModal({
+       title: "Leave?",
+       body: "Are you sure you want to remove yourself from this troupe?",
+       menuItems: [
+         { action: "yes", text: "Yes", class: "trpBtnRed" },
+         { action: "no", text: "No", class: "trpBtnLightGrey"}
+       ]
+      });
+
+      modal.once('menuItemClicked', function(action) {
+        if (action === "yes") {
           removeTroupeCollectionRemoveListeners();
           $.ajax({
             url: "/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
@@ -112,8 +121,10 @@ define([
             global: false
           });
         }
+        modal.hide();
       });
 
+      modal.show();
     },
 
     getRenderData: function() {

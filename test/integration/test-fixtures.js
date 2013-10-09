@@ -88,12 +88,14 @@ function createExpectedFixtures(expected, done) {
 
     // A username of true means generate one
     var username = f.username === true ? generateUsername() : f.username;
+    var confirmationCode = f.confirmationCode === true ? "confirm" + Math.random() : f.confirmationCode;
 
     return persistence.User.createQ({
-      email:        f.email       || generateEmail(),
-      displayName:  f.displayName || generateName(),
-      username:     username,
-      status:       f.status      || 'ACTIVE'
+      email:            f.email       || generateEmail(),
+      displayName:      f.displayName || generateName(),
+      confirmationCode: confirmationCode,
+      username:         username,
+      status:           f.status      || 'ACTIVE'
     });
   }
 

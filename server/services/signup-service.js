@@ -216,7 +216,7 @@ var signupService = module.exports = {
 
               // If the user is attempting to access a troupe, but isn't confirmed,
               // resend the confirmation
-              signupService.resendConfirmationForUser(fromUser.email);
+              emailNotificationService.sendConfirmationForNewUser(fromUser);
 
               // Proceed to the next step with this user
               return fromUser;
@@ -247,14 +247,9 @@ var signupService = module.exports = {
 };
 
 appEvents.onEmailConfirmed(function(params) {
+  winston.info("Email address confirmed, updating invites and requests", params);
   var email = params.email;
   var userId = params.userId;
 
-  return troupeService.updateInvitesForEmailToUserId(email, userId)
-    .then(function() {
-      return Q.all([
-        troupeService.updateUnconfirmedInvitesForUserId(userId),
-        troupeService.updateUnconfirmedRequestsForUserId(userId)
-        ]);
-    });
+  return troupeService.updateInvitesAndRequestsForConfirmedEmail(email, userId);
 });

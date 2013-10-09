@@ -4,23 +4,19 @@
 "use strict";
 
 
-var testRequire = require('../test-require');
+var testRequire   = require('../test-require');
 var fixtureLoader = require('../test-fixtures');
-
-var Q = require("q");
-var assert = require("assert");
-var persistence = testRequire("./services/persistence-service");
-var mockito = require('jsmockito').JsMockito;
-
-var times = mockito.Verifiers.times;
-var once = times(1);
-
+var Q             = require("q");
+var assert        = require("assert");
+var mockito       = require('jsmockito').JsMockito;
+var ObjectID      = require('mongodb').ObjectID;
+var persistence   = testRequire("./services/persistence-service");
+var times         = mockito.Verifiers.times;
+var once          = times(1);
+var times         = mockito.Verifiers.times;
+var once          = times(1);
+var fixture       = {};
 Q.longStackSupport = true;
-
-var times = mockito.Verifiers.times;
-var once = times(1);
-
-var fixture = {};
 
 function testDelayedInvite(email, troupeUri, isOnline, done) {
   var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
@@ -313,7 +309,7 @@ function testRequestAcceptance(email, userStatus, emailNotificationConfirmationM
               return user.saveQ()
                 .then(function() {
                   return Q.all([
-                      troupeService.updateUnconfirmedRequestsForUserId(user.id)
+                      troupeService.updateInvitesAndRequestsForConfirmedEmail(user.email, user.id)
                     ]);
                 });
 
@@ -1163,6 +1159,47 @@ describe('troupe-service', function() {
 
     after(function() {
       fixture2.cleanup();
+    });
+
+  });
+
+
+
+  describe('#indexTroupesByUserIdTroupeId', function() {
+
+    it('should index stuff correctly', function() {
+      var troupeService = testRequire('./services/troupe-service');
+      var userId = new ObjectID();
+      var userIdA = new ObjectID();
+      var userIdB = new ObjectID();
+      var groupTroupeId1 = new ObjectID();
+      var groupTroupeId2 = new ObjectID();
+      var oToTroupeId3 = new ObjectID();
+      var o2oTroupeId4 = new ObjectID();
+
+      var troupes = [new persistence.Troupe({
+        _id: groupTroupeId1
+      }), new persistence.Troupe({
+        _id: groupTroupeId2,
+        oneToOne: false
+      }), new persistence.Troupe({
+        _id: oToTroupeId3,
+        oneToOne: true,
+        users: [{ userId: userId }, { userId: userIdA }]
+      }), new persistence.Troupe({
+        _id: o2oTroupeId4,
+        oneToOne: true,
+        users: [{ userId: userId }, { userId: userIdB }]
+      })];
+
+      var result = troupeService.testOnly.indexTroupesByUserIdTroupeId(troupes, userId);
+      assert(result.oneToOne[userIdA]);
+      assert(result.oneToOne[userIdB]);
+      assert(!result.oneToOne[userId]);
+      assert(result.groupTroupeIds[groupTroupeId1]);
+      assert(result.groupTroupeIds[groupTroupeId2]);
+      assert(!result.groupTroupeIds[oToTroupeId3]);
+
     });
 
   });
