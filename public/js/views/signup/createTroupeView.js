@@ -16,7 +16,7 @@ define([
     template: template,
 
     initialize: function(options) {
-      _.bindAll(this, 'onFormSubmit');
+      _.bindAll(this, 'onFormSubmit', 'onSuccess');
       if (!options) return;
       this.upgradeOneToOne = options.upgradeOneToOne;
       this.existingUser = options.existingUser;
@@ -79,10 +79,11 @@ define([
     },
 
     onFormSubmit: _.debounce(function(e) {
+      if(!this.$el.find('#signup-form').valid()) return;
+
       if(e) e.preventDefault();
       this.disableForm();
 
-      var that = this;
       var form = this.$el.find('form');
 
       var serializedForm = {
@@ -94,20 +95,21 @@ define([
         serializedForm.oneToOneTroupeId = context.getTroupeId();
       }
 
-      that.collection.create(serializedForm, {
+      this.collection.create(serializedForm, {
         url: '/troupes/',
         wait: true,
-        success: function(troupe /*, resp, options*/) {
-          that.enableForm();
-          if(that.options.nativeMode) {
-            window.location.href = "/mobile/people#" + troupe.id + "|share";
-          } else {
-            window.location.href = "/" + troupe.get('uri') + "#|share";
-          }
-        }
+        success: this.onSuccess
       });
-    }, 1000, true)
+    }, 1000, true),
 
+    onSuccess: function(troupe) {
+      this.enableForm();
+      if(this.options.nativeMode) {
+        window.location.href = "/mobile/people#" + troupe.id + "|share";
+      } else {
+        window.location.href = "/" + troupe.get('uri') + "#|share";
+      }
+    }
   });
 
 var Modal = TroupeViews.Modal.extend({
