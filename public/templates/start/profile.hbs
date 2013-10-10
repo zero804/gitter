@@ -6,14 +6,14 @@
 <div class="trpStartContainer trpStartBody" style="">
   <div class="trpStartContent">
 
-    <div class="trpStartForm">
+    <form id="updateprofileform" class="trpStartForm">
       <div style="">
         <div class="trpStartNumber">
           <div>1</div>
         </div>
         <div class="label">What's your full name?</div>
         <div class="input">
-            <input type="text" class="open">
+            <input id="displayName" type="text" name="displayName" class="open">
         </div>
       </div>
 
@@ -25,12 +25,12 @@
           </div>
           <div class="label">Pick a username</div>
           <div class="input">
-              <input type="text" class="open" id="username">
+              <input type="text" class="open" id="username" name="username">
           </div>
           <div class="help">
             <span id="available">This will be your personal address on Troupe<br></span>
             <span id="not-available" style="color: #e74c3c; display: none" >The username you have chosen is not available<br></span>
-            <span class="trpGreen">www.trou.pe/username</span><br>
+            <span class="trpGreen">www.trou.pe/<span id="show-user-name">username</span></span><br>
           </div>
         </div>
         <div class="trpStartHelp" style="display: none">
@@ -51,20 +51,20 @@
         </div>
         <div class="label">Choose a password</div>
         <div class="input">
-            <input type="password" class="open">
+            <input id="password" type="password" name="password" class="open">
         </div>
         <div class="help">
           At least 6 characters.<br>
         </div>
       </div>
-    </div>
+    </form>
   </div>
 </div>
 
 <div class="trpStartContainer blue-text">
   <div class="trpStartContent">
     <div style="margin-top: 40px">
-      <a href="create" class="trpButtonMedium trpBtnGreen">Next</a>
+      <a href="#" id="next-button" class="trpButtonMedium trpBtnGreen">Next</a>
 
     </div>
 

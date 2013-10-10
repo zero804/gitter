@@ -19,9 +19,9 @@ module.exports = {
             req.sanitize('displayName').trim();
             req.sanitize('displayName').xss();
 
-            if(req.body.displayName) req.checkBody('displayName', 'Invalid name').notEmpty().is(/^[^<>]{2,}$/);
-            if(req.body.newEmail) req.checkBody('newEmail', 'Invalid email address').notEmpty().isEmail();
-            if(req.body.username) req.checkBody('username', 'Invalid username').notEmpty().is(/^[a-zA-Z0-9\.\-\_]{3,}$/);
+            if(req.body.hasOwnProperty('displayName')) req.checkBody('displayName', 'Invalid name').notEmpty().is(/^[^<>]{2,}$/);
+            if(req.body.hasOwnProperty('newEmail')) req.checkBody('newEmail', 'Invalid email address').notEmpty().isEmail();
+            if(req.body.hasOwnProperty('username')) req.checkBody('username', 'Invalid username').notEmpty().is(/^[a-zA-Z0-9\.\-\_]{3,}$/);
 
             var mappedErrors = req.validationErrors(true);
 

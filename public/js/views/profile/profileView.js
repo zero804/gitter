@@ -194,7 +194,10 @@ define([
             user.set('hasPassword', true);
 
             that.trigger('submit.success');
-            that.dialog.hide();
+
+            if(that.dialog) {
+              that.dialog.hide();
+            }
 
             if (that.hasChangedEmail(newEmail)) {
               window.alert("Your address will be updated once you confirm the email sent to your new address.");
