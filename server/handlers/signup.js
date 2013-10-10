@@ -107,9 +107,7 @@ module.exports = {
             if (user.hasPassword()) {
               res.relativeRedirect('/' + user.username);
             } else {
-              contextGenerator.generateMiniContext(req, function(err, troupeContext) {
-                res.render('complete-profile', { troupeContext: troupeContext });
-              });
+              res.relativeRedirect('/start');
             }
           });
         });
