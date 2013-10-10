@@ -41,7 +41,6 @@ define([
                             .toUpperCase();
         var colours = ['#1abc9c', '#2ecc71', '#9b59b6', '#3498db', '#e67e22', '#e74c3c', '#f1c40f',
                   '#9b59b6', '#1abc9c'];
-        console.log("Using colour: " + that.hash(this.model.attributes.id) % colours.length);
         var colour = colours[that.hash(this.model.attributes.id) % colours.length];
         return {
           oneToOne: this.model.attributes.oneToOne,
