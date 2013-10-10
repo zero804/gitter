@@ -224,7 +224,7 @@ var signupService = module.exports = {
             return userService.findOrCreateUserForEmail({
                 email: email,
                 displayName: displayName,
-                source: 'signup_with_request'
+                source: toTroupe ? 'signup_with_request' : 'signup_with_connect'
               })
               .then(function(newUser) {
                 emailNotificationService.sendConfirmationForNewUser(newUser);
