@@ -64,6 +64,14 @@ function createTroupeQ(options) {
 }
 
 function createInviteQ(options) {
+
+  // Track invite creation
+  statsService.event('new_invite', {
+    userId: options.fromUserId,
+    toExistingUser: (options.email    ? false : true),
+    oneToOne:       (options.troupeId ? false : true)
+  });
+
   return createQ(persistence.Invite, options);
 }
 
