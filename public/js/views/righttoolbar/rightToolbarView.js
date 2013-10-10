@@ -15,9 +15,10 @@ define([
   'views/conversation/conversationView',
   'views/people/peopleCollectionView',
   'cocktail',
-  'utils/uservoice'
+  'utils/uservoice',
+  'views/widgets/troupeAvatar'
 ], function($, Backbone, Marionette, TroupeViews, context, qq, rightToolbarTemplate, itemCollections,
-   trpCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView, cocktail, userVoice) {
+   trpCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView, cocktail, userVoice, TroupeAvatar) {
   "use strict";
 
   var RightToolbarLayout = Marionette.Layout.extend({
@@ -29,7 +30,8 @@ define([
       invites: "#invite-roster",
       people: "#people-roster",
       files: "#file-list",
-      conversations: ".frame-conversations"
+      conversations: ".frame-conversations",
+      troupeAvatar: "#troupe-avatar-region"
     },
 
     events: {
@@ -76,7 +78,8 @@ define([
         user: user,
         favourite: troupe && troupe.favourite,
         troupeAvatarUrl: troupe && troupe.avatarUrl,
-        troupeName: troupe && troupe.name
+        troupeName: troupe && troupe.name,
+        troupe: troupe
       };
 
     },
@@ -143,6 +146,10 @@ define([
       // File View
       this.files.show(new FileView({ collection: fileCollection }));
 
+
+      if (!context.inOneToOneTroupeContext()) {
+        this.troupeAvatar.show(new TroupeAvatar({ troupe: context.troupe(), noHref: true}));
+      }
       // Conversation View
       if (!context.inOneToOneTroupeContext()) {
         this.conversations.show(new ConversationView({
