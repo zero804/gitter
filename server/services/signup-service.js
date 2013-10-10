@@ -11,48 +11,46 @@ var appEvents                 = require('../app-events');
 var Q                         = require('q');
 var userService               = require("./user-service");
 
-function newUser(options, callback) {
-  winston.info("New user", options);
-
-  return userService.newUser({ displayName: options.displayName, email: options.email })
-      .then(function(user) {
-        emailNotificationService.sendConfirmationForNewUser(user);
-        return user;
-      }).nodeify(callback);
-}
 
 var signupService = module.exports = {
+  /**
+   * A new signup from the landing page
+   * @return the promise of the newly signed up user
+   */
   newSignupFromLandingPage: function(options, callback) {
     if(!options.email) return callback('Email address is required');
 
     options.email = options.email.trim().toLowerCase();
     if(!options.source) options.source = 'landing';
 
-    winston.info("New signup ", options);
+    winston.info("Signup from landing page ", options);
 
     // We shouldn't have duplicate users in the system, so we should:
     //     * Check if the user exists
     //     * If the user exists, have they previously confirmed their email address
     //     * If the user exists AND has a confirmed email address...
     //     * If the user exists but hasn't previously confirmed their email...
+    return userService.findByEmail(options.email)
+      .then(function(user) {
+        /* If the user exists... */
+        if(user) {
+          if(!user.isConfirmed() || !user.hasPassword()) {
+            emailNotificationService.sendConfirmationForNewUser(user);
+          }
 
-    userService.findByEmail(options.email, function(err, user) {
-      if(err) {
-        callback(err, null);
-        return;
-      }
-
-      if(user) {
-        if(!user.isConfirmed() || !user.hasPassword()) {
-          emailNotificationService.sendConfirmationForNewUser(user);
+          return user;
         }
 
-        callback(err, user);
-      } else {
-        newUser(options, callback);
-      }
+        winston.info("New user", options);
 
-    });
+        return userService.findOrCreateUserForEmail(options)
+          .then(function(user) {
+            emailNotificationService.sendConfirmationForNewUser(user);
+            return user;
+          });
+
+      })
+    .nodeify(callback);
   },
 
   confirmEmailChange: function(user, callback) {
@@ -223,9 +221,10 @@ var signupService = module.exports = {
             }
 
             // Otherwise the user doesn't exist: create them first
-            return userService.newUser({
+            return userService.findOrCreateUserForEmail({
                 email: email,
-                displayName: displayName
+                displayName: displayName,
+                source: toTroupe ? 'signup_with_request' : 'signup_with_connect'
               })
               .then(function(newUser) {
                 emailNotificationService.sendConfirmationForNewUser(newUser);

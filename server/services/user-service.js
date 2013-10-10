@@ -16,31 +16,40 @@ var appEvents                 = require("../app-events");
 var moment                    = require('moment');
 var gravatar                  = require('../utils/gravatar');
 
+/**
+ * Creates a new user
+ * @return the promise of a new user
+ */
+function newUser(options, callback) {
+  assert(options.email, 'Email atttribute required');
+
+  var status = options.status || "UNCONFIRMED";
+  var user = new persistence.User({
+    displayName:        options.displayName,
+    email:              options.email.toLowerCase(),
+    confirmationCode:   uuid.v4(),
+    gravatarImageUrl:   options.gravatarImageUrl || gravatar.gravatarUrlForEmail(options.email),
+    googleRefreshToken: options.googleRefreshToken || undefined,
+    status:             status,
+  });
+
+  return user.saveQ().then(function() {
+      statsService.event('new_user', {
+          userId: user.id,
+          email: options.email,
+          status: status,
+          source: options.source
+        });
+
+      statsService.userUpdate(user, {
+        source: options.source
+      });
+
+      return user;
+    }).nodeify(callback);
+}
+
 var userService = {
-  newUser: function(options, callback) {
-    assert(options.email, 'Email atttribute required');
-
-    var status = options.status || "UNCONFIRMED";
-    var user = new persistence.User({
-      displayName:        options.displayName,
-      email:              options.email.toLowerCase(),
-      confirmationCode:   uuid.v4(),
-      gravatarImageUrl:   options.gravatarImageUrl || gravatar.gravatarUrlForEmail(options.email),
-      googleRefreshToken: options.googleRefreshToken || undefined,
-      status:             status,
-    });
-
-    return user.saveQ().then(function() {
-        statsService.event('new_user', {
-            userId: user.id,
-            email: options.email,
-            status: status,
-            source: options.source
-          });
-        return user;
-      }).nodeify(callback);
-  },
-
   findOrCreateUserForEmail: function(options, callback) {
     winston.info("Locating or creating user", options);
 
@@ -50,7 +59,7 @@ var userService = {
       .then(function(user) {
         if(user) return user;
 
-        return userService.newUser(options);
+        return newUser(options);
       })
       .nodeify(callback);
   },

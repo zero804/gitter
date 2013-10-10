@@ -13,8 +13,6 @@ require([
   function($, TroupeViews, UsernameView, SignupModalView, SignupModalConfirmView, LoginModalView, MessagesView) {
     "use strict";
 
-    //var loginFormVisible = false;
-
     function createLoginModal(options) {
       if (!options) options = {};
       options.fromSignup = true;

@@ -10,10 +10,10 @@ bash -l <<"DELIM"
 	echo starting mongo
 	./mongodb.sh &
 
-	sleep 2
+	sleep 5
 
 	echo starting node
-	node-dev web
+	nodemon --watch server web.js
 
 	echo starting interactive shell
 DELIM

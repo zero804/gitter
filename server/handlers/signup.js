@@ -102,8 +102,6 @@ module.exports = {
               return;
             }
 
-            statsService.event('confirmation_success', { userId: user.id, email: user.email });
-
             if (user.hasPassword()) {
               res.relativeRedirect('/' + user.username);
             } else {
