@@ -3,7 +3,14 @@
   <div class="trpDPUnreadCount"></div>
 </a>
 {{else}}
+  {{#if noHref}}
+        <div class="trpDisplayPicture avatar-s trpTroupeAvatar {{colour}}" href="{{url}}" style="border-color: white; text-decoration: none; background-color: {{colour}}">
+          <div class="trpTroupeAvatarText">{{avatarUrl}}{{initials}}</div>
+        </div>
+
+  {{else}}
         <a class="trpDisplayPicture avatar-s trpTroupeAvatar {{colour}}" href="{{url}}" style="border-color: {{colour}}; text-decoration: none">
           <div class="trpTroupeAvatarText">{{avatarUrl}}{{initials}}</div>
         </a>
+  {{/if}}
 {{/if}}
