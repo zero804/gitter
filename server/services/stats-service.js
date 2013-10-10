@@ -8,7 +8,7 @@ var cube_enabled        = nconf.get("stats:cube:enabled")       || false;
 var mixpanel_enabled    = nconf.get("stats:mixpanel:enabled")   || false;
 var customerio_enabled  = nconf.get("stats:customerio:enabled") || false;
 
-var blacklist = ['location_submission','push_notification','mail_bounce','new_mail_attachment','remailed_email','new_file_version','new_file','login_failed','password_reset_invalid','password_reset_completed','invite_rejected','invite_reused','confirmation_reused'];
+var blacklist = ['location_submission','push_notification','mail_bounce','new_mail_attachment','remailed_email','new_file_version','new_file','login_failed','password_reset_invalid','password_reset_completed','invite_reused','confirmation_reused'];
 
 if (cube_enabled) {
   var Cube = require("cube");
@@ -30,14 +30,16 @@ if (customerio_enabled) {
 function isTestUser(email) {
   if (!email) {
     winston.debug("[stats] Didn't receive an email for isTestUser");
-    return true;
+    //return true;
   }
-  if (email.indexOf("troupetest.local") !== -1) return true; else return false;
+  if (email && email.indexOf("troupetest.local") !== -1) return true; else return false;
 }
 
 exports.event = function(eventName, properties) {
 
   if(!properties) properties = {};
+
+  winston.info('[event] ' + eventName + ' ' + JSON.stringify(properties));
 
   // Cube
   if (cube_enabled) {
