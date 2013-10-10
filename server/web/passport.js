@@ -261,12 +261,12 @@ module.exports = {
             gravatarImageUrl:   profile._json.picture,
             googleRefreshToken: refreshToken,
             status:             'PROFILE_NOT_COMPLETED',
-            source:             'google'
+            source:             'landing_google'
           };
 
           userService.findOrCreateUserForEmail(googleUser, function(err, user) {
-            if (err) { return done(err); }
-            statsService.userUpdate(user, { source: 'google' });
+            if (err) return done(err);
+
             req.logIn(user, function(err) {
               if (err) { return done(err); }
               return done(null, user);
