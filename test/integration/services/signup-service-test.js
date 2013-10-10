@@ -178,7 +178,7 @@ describe('signup-service', function() {
       signupService.signupWithAccessRequestToUri(uri, email, displayName)
         .then(function() {
 
-          mockito.verify(userService, never).newUser();
+          mockito.verify(userService, never).findOrCreateUserForEmail();
           mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
           mockito.verify(troupeService, once).addRequest();
 
@@ -217,7 +217,7 @@ describe('signup-service', function() {
         signupService.signupWithAccessRequestToUri(uri, email, displayName)
           .then(function() {
 
-            mockito.verify(userService, never).newUser();
+            mockito.verify(userService, never).findOrCreateUserForEmail();
             mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
             mockito.verify(troupeService, once).inviteUserByUserId();
           })
@@ -249,7 +249,7 @@ describe('signup-service', function() {
      signupService.signupWithAccessRequestToUri(uri, email, displayName)
        .then(function() {
 
-        mockito.verify(userService, once).newUser();
+        mockito.verify(userService, once).findOrCreateUserForEmail();
         mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
         mockito.verify(troupeService, once).inviteUserByUserId();
        })
@@ -283,7 +283,7 @@ describe('signup-service', function() {
         return signupService.signupWithAccessRequestToUri(uri, email, displayName)
           .then(function() {
 
-            mockito.verify(userService, once).newUser();
+            mockito.verify(userService, once).findOrCreateUserForEmail();
             mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
             mockito.verify(troupeService, once).addRequest();
 
