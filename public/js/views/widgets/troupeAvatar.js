@@ -13,7 +13,6 @@ define([
     template: template,
     initialize: function(options) {
       // var self = this;
-      console.dir(options);
       if(!this.model) this.model = options.troupe;
       this.hasUnread = false;
       this.listenTo(this.model, 'change:unreadItems', this.unreadItemsChanged);
