@@ -39,8 +39,8 @@ define([
                             .slice(0,2)
                             .join('')
                             .toUpperCase();
-        var colours = ['#1abc9c', '#2ecc71', '#9b59b6', '#3498db', '#e67e22', '#e74c3c', '#f1c40f',
-                  '#9b59b6', '#1abc9c'];
+        var colours = ['#1abc9c', '#2ecc71', '#9b59b6', '#3498db', '#e74c3c', '#f1c40f',
+                  '#d35400', '#c0392b', '#f39c12', '#e67e22', '#16a085' ,'#2980b9', '#95a5a6' ];
         var colour = colours[that.hash(this.model.attributes.id) % colours.length];
         return {
           oneToOne: this.model.attributes.oneToOne,
