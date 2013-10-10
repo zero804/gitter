@@ -19,7 +19,10 @@ function migrateTroupe(fromTroupeId, toTroupeId) {
     query[attr] = fromTroupeId;
     update.$set[attr] = toTroupeId;
 
-    db[collection].update({ toTroupeId: fromTroupeId },   { $set: { toTroupeId: toTroupeId }}, { multi: true });
+    print(collection + '- ' + db[collection].count(query));
+    db[collection].update(query, update, { multi: true });
   });
+
+  db.troupes.remove({ _id: fromTroupeId });
 
 }
