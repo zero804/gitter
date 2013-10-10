@@ -45,12 +45,14 @@ define([
         return {
           oneToOne: this.model.attributes.oneToOne,
           initials: initials,
-          colour: colour
+          colour: colour,
+          url: this.model.attributes.url
         };
       } else {
         return {
           avatarUrl: this.model.attributes.avatarUrl || "",
-          oneToOne: this.model.attributes.oneToOne
+          oneToOne: this.model.attributes.oneToOne,
+          url: this.model.attributes.url
         };
       }
     },
