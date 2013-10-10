@@ -13,9 +13,13 @@ define([
     template: template,
     initialize: function(options) {
       // var self = this;
+      console.dir(options);
       if(!this.model) this.model = options.troupe;
       this.hasUnread = false;
       this.listenTo(this.model, 'change:unreadItems', this.unreadItemsChanged);
+      if (options.noHref) {
+        this.noHref = options.noHref;
+      }
     },
 
     hash:function(troupeId) {
@@ -27,7 +31,6 @@ define([
 
       return result;
     },
-
 
     getRenderData:function () {
       var that = this;
@@ -46,7 +49,8 @@ define([
           oneToOne: this.model.attributes.oneToOne,
           initials: initials,
           colour: colour,
-          url: this.model.attributes.url
+          url: this.model.attributes.url,
+          noHref: this.noHref
         };
       } else {
         return {
@@ -75,14 +79,7 @@ define([
       this.unreadItemsChanged();
       this.$el.find(':first-child').tooltip({
         html : true,
-        placement : function(a, element) {
-          var position = $(element).position();
-          if (position.top < 110){
-            return "bottom";
-          }
-
-          return "top";
-        },
+        placement : "vertical",
         container: "body"
       });
     }
