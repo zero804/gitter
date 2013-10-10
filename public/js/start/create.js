@@ -13,7 +13,7 @@ define([
     });
 
     createTroupeView.onSuccess = function(troupe) {
-      window.location.href = 'invite?troupeId='+troupe.id;
+      window.location.href = 'invite#'+troupe.id;
     };
 
     $('#next-button').on('click', function() {
