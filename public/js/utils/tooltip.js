@@ -89,7 +89,7 @@ define([
 
       return options
     }
-    
+
   , onenter: function(e) {
      this.enter(e.currentTarget)
   }
@@ -120,7 +120,7 @@ define([
   , onleave: function(e) {
      this.leave(e.currentTarget)
   }
-  
+
   , leave: function (currentTarget) {
       currentTarget = currentTarget || this.$element[0]
       var self = $(currentTarget)[this.type](this._options).data(this.type)
@@ -173,6 +173,11 @@ define([
         actualWidth = $tip[0].offsetWidth
         actualHeight = $tip[0].offsetHeight
 
+        var placement = this.options.placement;
+        if(placement === 'vertical')
+            placement = this.selectBestVerticalPlacement($tip, this.$element);
+        }
+
         switch (placement) {
           case 'bottom':
             tp = {top: pos.top + pos.height, left: pos.left + pos.width / 2 - actualWidth / 2}
@@ -191,7 +196,23 @@ define([
         this.applyPlacement(tp, placement)
         this.$element.trigger('shown')
       }
-    }
+
+  , selectBestVerticalPlacement: function(div, target) {
+      var rect = target[0].getBoundingClientRect();
+      if(rect.top < 60) {
+        return 'bottom';
+      } else {
+        return 'top';
+      }
+      var panel = target.offsetParent();
+      if(!panel) return 'bottom';
+
+      if(target.offset().top + div.height() + 20 >= panel[0].clientHeight) {
+        return 'top';
+      }
+
+      return 'bottom';
+  }
 
   , applyPlacement: function(offset, placement){
       var $tip = this.tip()
