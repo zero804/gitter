@@ -35,10 +35,19 @@ module.exports = {
             title: 'Create'
           }));
 
-      app.get('/start/invite',
-        startPage('start/invite', {
-            title: 'Invite'
-          }));
+      app.get('/start/invite/:troupeId', function(req, res, next) {
+        contextGenerator.generateSocketContext(req.user._id, req.params.troupeId)
+          .then(function(context) {
+            var options = {
+              layout: 'start-template',
+              troupeContext: context,
+              page: 'invite',
+              title: 'Invite'
+            };
+            res.render('start/invite', options);
+          })
+          .fail(next);
+      });
 
       app.get('/start/finish',
         startPage('start/finish', {
