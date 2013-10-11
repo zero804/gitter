@@ -14,8 +14,9 @@ define([
     });
     shareSearchView.afterRender();
 
-    appevents.on('searchSearchView:success', function() {
+    appevents.on('searchSearchView:success', function(name) {
       hasInvitedSomeone = true;
+      $('.help').text(name + ' has been invited.');
     });
 
     $('#next-button').on('click', function() {
