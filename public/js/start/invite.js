@@ -17,6 +17,7 @@ define([
     appevents.on('searchSearchView:success', function(name) {
       hasInvitedSomeone = true;
       $('.help').text(name + ' has been invited.');
+      $('#next-button').removeClass('disabled');
     });
 
     $('#next-button').on('click', function() {
