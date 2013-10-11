@@ -20,6 +20,10 @@ define([
       profileView.onFormSubmit();
     });
 
+    $('#username').on('click', function() {
+      $('.trpStartHelp').show();
+    });
+
     profileView.on('submit.success', function() {
       document.location.href = 'create';
     });
