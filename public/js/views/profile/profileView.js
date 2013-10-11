@@ -17,7 +17,7 @@ define([
     template: template,
 
     initialize: function(options) {
-      _.bindAll(this, 'onFormSubmit', 'onPasswordChange');
+      _.bindAll(this, 'onFormSubmit', 'onPasswordChange', 'onError');
       if (!options) return;
       this.originalEmail = context.getUser().email;
       this.hasPassword = context.getUser().hasPassword;
@@ -140,18 +140,7 @@ define([
             required: "You're trying to change your password. Please enter your old password, or clear the new password field."
           }
         },
-        showErrors: function(errorMap, errorList) {
-          if (errorList.length > 0) {
-            self.$el.find('.form-failure').show();
-          }
-          else {
-            self.$el.find('.form-failure').hide();
-          }
-
-          var errors = "";
-          $.each(errorList, function () { errors += this.message + "<br>"; });
-          self.$el.find('.failure-text').html(errors);
-        }
+        showErrors: this.onError,
       };
 
       if (!this.hasPassword) {
@@ -160,6 +149,19 @@ define([
 
       form.validate(validationConfig);
 
+    },
+
+    onError: function(errorMap, errorList) {
+      if (errorList.length > 0) {
+        this.$el.find('.form-failure').show();
+      }
+      else {
+        this.$el.find('.form-failure').hide();
+      }
+
+      var errors = "";
+      $.each(errorList, function () { errors += this.message + "<br>"; });
+      this.$el.find('.failure-text').html(errors);
     },
 
     hasChangedEmail: function(newEmail) {
