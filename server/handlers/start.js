@@ -42,7 +42,8 @@ module.exports = {
               layout: 'start-template',
               troupeContext: context,
               page: 'invite',
-              title: 'Invite'
+              title: 'Invite',
+              returnToUrl: req.url
             };
             res.render('start/invite', options);
           })
