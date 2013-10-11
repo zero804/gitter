@@ -20,7 +20,7 @@ define([
       profileView.onFormSubmit();
     });
 
-    $('#username').on('click', function() {
+    $('#username').on('focus', function() {
       $('.trpStartHelp').show();
     });
 
