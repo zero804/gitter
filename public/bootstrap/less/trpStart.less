@@ -2,6 +2,7 @@
 @import "trpColours.less";
 @import "trpButtons.less";
 @import "trp3Vars.less";
+@import "trp3Common.less";
 
 html {
  @media @mobile {
@@ -168,22 +169,21 @@ a {
   }
 }
 
-.trpUsernameSuggestion {
-  cursor: pointer;
+.trpSuggestion {
+  background-color: @trpBgColor2;
   display: inline-block;
-  background-color: #dadfe5;
-  background-color: #1dce73;
+  .trpBodySmall;
+  padding: 4px 12px 3px 10px;
   border-radius: 2px;
-  color: black;
-  color: #17202a;
-  /*color: white;*/
-  padding: 6px;
-  margin-bottom: 3px;
-  opacity: 0.8;
+  margin-right: 4px;
 }
 
-.trpUserNameSuggestion:hover {
-  opacity: 1;
+.name-suggestions {
+  color: @trpDarkBlue;
+}
+
+.trpSuggestion {
+  margin-bottom: 4px;
 }
 
 .trpStartForm {
@@ -201,7 +201,6 @@ a {
   vertical-align: top; 
   margin-left: 80px; 
   max-width: 300px;
-  margin-top: 60px;
 
   @media @mobile {
     display: none;
