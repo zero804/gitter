@@ -1,8 +1,9 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var signupService = require("../../services/signup-service"),
-    winston = require('winston');
+var winston        = require('winston');
+var signupService  = require("../../services/signup-service");
+var userAgentStats = require('../../web/useragent-stats');
 
 module.exports = function(req, res) {
   req.sanitize('name').trim();
@@ -30,7 +31,9 @@ module.exports = function(req, res) {
 
   var uri = req.body.appUri;
 
-  signupService.signupWithAccessRequestToUri(uri, req.body.email, req.body.name)
+  var stats = userAgentStats(req.headers['user-agent']);
+
+  signupService.signupWithAccessRequestToUri(uri, req.body.email, req.body.name, stats)
     .then(function() {
       res.send({ success: true });
     }).fail(function(err) {
