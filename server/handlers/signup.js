@@ -10,6 +10,7 @@ var nconf            = require('../utils/config');
 var isPhone          = require('../web/is-phone');
 var contextGenerator = require('../web/context-generator');
 var statsService     = require("../services/stats-service");
+var userAgentStats   = require('../web/useragent-stats');
 
 module.exports = {
 
@@ -54,8 +55,11 @@ module.exports = {
             return next('Email address is required');
           }
 
+          var stats = userAgentStats(req.headers['user-agent']);
+
           signupService.newSignupFromLandingPage({
-            email: email
+            email: email,
+            stats: stats
           }, function(err, user) {
             if(err) {
               winston.error("Error creating new troupe ", { exception: err });

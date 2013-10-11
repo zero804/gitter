@@ -1339,7 +1339,6 @@ function createNewTroupeForExistingUser(options, callback) {
     troupe.addUserById(user.id);
     return troupe.saveQ()
       .then(function() {
-
         if(!invites) return troupe;
 
         var promises = invites.map(function(invite) {
