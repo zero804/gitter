@@ -20,6 +20,7 @@
   border: none;
   display: inline-block;
   vertical-align: top;
+  cursor: pointer;
 }
 
 .trpButtonBig {
@@ -94,6 +95,13 @@
 
 .trpBtnLightGrey:hover {
   opacity: 1;
+}
+
+.trpButtonMedium.disabled,
+.trpButtonMedium[disabled] {
+  cursor: default;
+  background-image: none;
+  opacity: 0.5;
 }
 
 .trpCopyButton {
