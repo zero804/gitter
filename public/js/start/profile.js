@@ -10,6 +10,9 @@ define([
     var profileView = new profile.View({
       el: $('.trpStartContent')
     });
+    profileView.onError = function() {
+      console.log('ERROR!', arguments);
+    };
     profileView.afterRender();
 
     new UsernameView({
