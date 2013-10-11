@@ -11,7 +11,6 @@ var appEvents                 = require('../app-events');
 var Q                         = require('q');
 var userService               = require("./user-service");
 
-
 var signupService = module.exports = {
   /**
    * A new signup from the landing page
@@ -194,7 +193,7 @@ var signupService = module.exports = {
    * users invites and requests will only be processed once the user is confirmed
    * @return promise of nothing
    */
-  signupWithAccessRequestToUri: function(uri, email, displayName) {
+  signupWithAccessRequestToUri: function(uri, email, displayName, stats) {
     assert(uri, 'uri parameter required');
     assert(email, 'email parameter required');
 
@@ -224,6 +223,7 @@ var signupService = module.exports = {
             return userService.findOrCreateUserForEmail({
                 email: email,
                 displayName: displayName,
+                stats: stats,
                 source: toTroupe ? 'signup_with_request' : 'signup_with_connect'
               })
               .then(function(newUser) {

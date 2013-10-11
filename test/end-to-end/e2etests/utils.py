@@ -101,22 +101,15 @@ def resetData(driver):
 def existingUserlogin(driver, usernameValue, passwordValue):
     driver.get(baseUrl("/x"))
 
-    time.sleep(0.5)
+    WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, 'button-existing-users-login'))).click()
 
-    existingButton = driver.find_element_by_css_selector("#button-existing-users-login")
-    existingButton.click()
+    login = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, 'login-content')))
+    WebDriverWait(login, 10).until(EC.visibility_of_element_located((By.ID, 'email'))).send_keys(usernameValue)
+    WebDriverWait(login, 10).until(EC.visibility_of_element_located((By.ID, 'password'))).send_keys(passwordValue)
 
-    time.sleep(0.5)
+    driver.find_element_by_id('signin-button').click()
 
-    name = driver.find_element_by_css_selector('#email')
-    name.send_keys(usernameValue)
-
-    password = driver.find_element_by_css_selector('#password')
-    password.send_keys(passwordValue)
-
-    driver.find_element_by_css_selector('#signin-button').click()
-
-    WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, 'mini-left-menu')))
+    WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'header, #mini-left-menu')))
 
 
 def signup(driver):

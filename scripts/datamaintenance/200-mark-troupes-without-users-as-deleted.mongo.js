@@ -28,14 +28,12 @@ db.troupes.find({ status: 'ACTIVE', users:[] }).forEach(function(d) {
 db.troupes.find({ oneToOne: true }).
   forEach(function(f) {
     count++;
-
     if(f.users.length != 2) return;
-
     var and = { $and: f.users.map(function(tu) { return { 'users.userId': tu.userId } ; }) };
     and.$and.push({ oneToOne: true });
     var c = db.troupes.count(and);
     if(c !== 1) {
-      candidates.push({ reason: 'duplicate-one-to-ones', doc: d });
+      candidates.push({ reason: 'duplicate-one-to-ones', doc: f });
     }
   });
 
