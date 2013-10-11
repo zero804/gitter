@@ -75,13 +75,17 @@ function configureTransports() {
     winston.remove({ name: name });
   }
 
-  var logstash_opts = {
-    appName:  'Troupe app', 
-    port:     nconf.get('logging:logstash:port'), 
-    host:     nconf.get('logging:logstash:host')
-  };
 
-  winston.add(LogstashUDP, logstash_opts);
+  if (nconf.get('logging:logstash:enabled')) {
+
+    var logstash_opts = {
+      appName:  'Troupe app', 
+      port:     nconf.get('logging:logstash:port'), 
+      host:     nconf.get('logging:logstash:host')
+    };
+
+    winston.add(LogstashUDP, logstash_opts);
+  }
 
   if(nconf.get('logging:logToFile') && nconf.get('LOG_FILE')) {
     winston.add(winston.transports.File, {
