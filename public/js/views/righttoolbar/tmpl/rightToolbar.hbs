@@ -4,9 +4,11 @@
       <div id="toolbar-top-content" style="height:100%; padding-bottom: 200px; box-sizing: border-box;">
         <div id="people-list">
           <div class="trpHeaderTitle trpToolbarHeader" id="people-header">{{headerTitle}}</div>
-          {{#unless oneToOne}}
-          <div id="troupe-avatar" class="trpDisplayPicture avatar-s" data-original-title="{{troupeName}}" style="background-image: url({{troupeAvatarUrl}});"></div>
-          {{/unless}}
+            {{#unless oneToOne}}
+              <div id="troupe-avatar-region"></div>
+          <!-- <div id="troupe-avatar" class="trpDisplayPicture avatar-s" data-original-title="{{troupeName}}" style="background-image: url({{troupeAvatarUrl}});"></div> -->
+             {{widget "troupeAvatar" troupe=troupe}}
+            {{/unless}}
           <div class="trpToolbarList divider">
             <div class="trpToolbarListContent" id="people-roster"></div>
           </div>

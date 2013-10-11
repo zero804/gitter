@@ -1,6 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
+var _                       = require('underscore');
 var userService             = require('../services/user-service');
 var passport                = require('passport');
 var LocalStrategy           = require('passport-local').Strategy;
@@ -13,8 +14,8 @@ var oauthService            = require('../services/oauth-service');
 var statsService            = require("../services/stats-service");
 var nconf                   = require('../utils/config');
 var loginUtils              = require("../web/login-utils");
-var useragent               = require('useragent');
 var GoogleStrategy          = require('passport-google-oauth').OAuth2Strategy;
+var useragentStats          = require('./useragent-stats');
 
 function loginAndPasswordUserStrategy(req, login, password, done) {
   winston.verbose("Attempting to authenticate ", { email: email });
@@ -68,21 +69,16 @@ function loginAndPasswordUserStrategy(req, login, password, done) {
       }
 
       // Tracking
+      var properties = useragentStats(req.headers['user-agent']);
+      statsService.userUpdate(user, properties);
 
-      statsService.event("user_login", {
+      statsService.event("user_login", _.extend({
         userId: user.id,
         method: (login.indexOf('@') == -1 ? 'username' : 'email'),
         email: user.email
-      });
+      }, properties));
 
-      var ua = useragent.parse(req.headers['user-agent']);
-      var prefix = ua.os.family.match(/ios|android/i) ? 'mobile' : 'desktop';
 
-      var properties = {};
-      properties[prefix + "_os"]      = ua.os.family;
-      properties[prefix + "_browser"] = ua.family;
-
-      statsService.userUpdate(user, properties);
 
       /* Todo: consider using a seperate object for the security user */
       return done(null, user);
@@ -255,23 +251,50 @@ module.exports = {
 
         } else {
 
-          var googleUser = {
-            displayName:        profile._json.name,
-            email:              profile._json.email,
-            gravatarImageUrl:   profile._json.picture,
-            googleRefreshToken: refreshToken,
-            status:             'PROFILE_NOT_COMPLETED',
-            source:             'landing_google'
-          };
 
-          userService.findOrCreateUserForEmail(googleUser, function(err, user) {
-            if (err) return done(err);
 
-            req.logIn(user, function(err) {
-              if (err) { return done(err); }
-              return done(null, user);
+          return userService.findByEmail(profile._json.email)
+            .then(function(user) {
+              if(user) {
+
+                // Tracking
+                var properties = useragentStats(req.headers['user-agent']);
+                statsService.userUpdate(user, properties);
+
+                statsService.event("user_login", _.extend({
+                  userId: user.id,
+                  method: 'google_oauth',
+                  email: user.email
+                }, properties));
+
+                req.logIn(user, function(err) {
+                  if (err) { return done(err); }
+                  return done(null, user);
+                });
+
+                return;
+              }
+
+              // This is in fact a new user
+              var googleUser = {
+                displayName:        profile._json.name,
+                email:              profile._json.email,
+                gravatarImageUrl:   profile._json.picture,
+                googleRefreshToken: refreshToken,
+                status:             'PROFILE_NOT_COMPLETED',
+                source:             'landing_google'
+              };
+
+              userService.findOrCreateUserForEmail(googleUser, function(err, user) {
+                if (err) return done(err);
+
+                req.logIn(user, function(err) {
+                  if (err) { return done(err); }
+                  return done(null, user);
+                });
+              });
             });
-          });
+
         }
       }
     ));

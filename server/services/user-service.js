@@ -15,6 +15,7 @@ var Q                         = require('q');
 var appEvents                 = require("../app-events");
 var moment                    = require('moment');
 var gravatar                  = require('../utils/gravatar');
+var _                         = require('underscore');
 
 /**
  * Creates a new user
@@ -30,23 +31,25 @@ function newUser(options, callback) {
     confirmationCode:   uuid.v4(),
     gravatarImageUrl:   options.gravatarImageUrl || gravatar.gravatarUrlForEmail(options.email),
     googleRefreshToken: options.googleRefreshToken || undefined,
-    status:             status,
+    status:             status
   });
 
   return user.saveQ().then(function() {
-      statsService.event('new_user', {
+    var optionStats = options.stats || {};
+
+    statsService.event('new_user', _.extend({
           userId: user.id,
           email: options.email,
           status: status,
           source: options.source
-        });
+        }, optionStats));
 
-      statsService.userUpdate(user, {
-        source: options.source
-      });
+    statsService.userUpdate(user, _.extend({
+      source: options.source
+    }, optionStats));
 
-      return user;
-    }).nodeify(callback);
+    return user;
+  }).nodeify(callback);
 }
 
 var userService = {
@@ -320,6 +323,7 @@ var userService = {
 
     return seq.then(saveUser)
             .then(performPostSaveActions)
+            .then(notifyTrackers)
             .nodeify(callback);
 
     function queueDeleteInvites(user) {
@@ -361,6 +365,7 @@ var userService = {
 
               postSave.push(function() {
                 appEvents.userAccountActivated(user.id);
+                statsService.event('profile_completed', { userId: user.id, email: user.email });
               });
             }
             return user;
@@ -444,6 +449,13 @@ var userService = {
 
     function performPostSaveActions(user) {
       postSave.forEach(function(f) { f(); });
+      return user;
+    }
+
+    function notifyTrackers(user) {
+      statsService.userUpdate(user);
+      statsService.event('profile_updated', { userId: user.id, email: user.email });
+
       return user;
     }
 

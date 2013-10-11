@@ -1,14 +1,16 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var uuid = require('node-uuid'),
-    sechash = require('sechash'),
-    winston = require('winston'),
-    redis = require("../utils/redis"),
-    nconf = require('../utils/config'),
-    userService = require('../services/user-service');
-var statsService = require("../services/stats-service");
-var useragent = require('useragent');
+var _                       = require('underscore');
+var uuid                    = require('node-uuid');
+var sechash                 = require('sechash');
+var winston                 = require('winston');
+var redis                   = require("../utils/redis");
+var nconf                   = require('../utils/config');
+var userService             = require('../services/user-service');
+var statsService            = require("../services/stats-service");
+var useragent               = require('useragent');
+var useragentStats          = require('./useragent-stats');
 
 var cookieName = nconf.get('web:cookiePrefix') + 'auth';
 
@@ -28,8 +30,6 @@ function generateAuthToken(req, res, userId, options, callback) {
   });
 
   sechash.strongHash('sha512', token, function(err, hash3) {
-    winston.info("Storing hash for rememberme auth token");
-
     if(err) return callback(err);
 
     var json = JSON.stringify({userId: userId, hash: hash3});
@@ -55,7 +55,7 @@ function validateAuthToken(authCookieValue, callback) {
     /* Auth cookie */
     if(!authCookieValue) return callback();
 
-    winston.info('rememberme: Client has presented a rememberme auth cookie, attempting reauthentication');
+    winston.verbose('rememberme: Client has presented a rememberme auth cookie, attempting reauthentication');
 
     var authToken = authCookieValue.split(":", 2);
 
@@ -123,18 +123,17 @@ module.exports = {
               return fail(err);
             }
 
-            winston.info("rememberme: Passport login succeeded");
+            winston.verbose("rememberme: Passport login succeeded");
 
-            statsService.event('user_login', { userId: userId, method: "auto", email: req.user.email});
-
-            var ua = useragent.parse(req.headers['user-agent']);
-            var prefix = ua.os.family.match(/ios|android/i) ? 'mobile' : 'desktop';
-
-            var properties = {};
-            properties[prefix + "_os"]      = ua.os.family;
-            properties[prefix + "_browser"] = ua.family;
-
+            // Tracking
+            var properties = useragentStats(req.headers['user-agent']);
             statsService.userUpdate(user, properties);
+
+            statsService.event("user_login", _.extend({
+              userId: userId,
+              method: 'auto',
+              email: user.email
+            }, properties));
 
             generateAuthToken(req, res, userId, options, function(err) {
               return next(err);
