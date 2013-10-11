@@ -7,7 +7,7 @@
   <div class="trpStartContent">
 
     <form id="updateprofileform" class="trpStartForm">
-      <div style="">
+      <div id="displayname-area">
         <div class="trpStartNumber">
           <div>1</div>
         </div>
@@ -15,10 +15,13 @@
         <div class="input">
             <input id="displayName" type="text" name="displayName" class="open">
         </div>
+        <div class="help" style="height: 20px">
+          <span style="color: #e74c3c; display: none;" id="name-error">You need to tell us your name.</span><br>
+        </div>
       </div>
 
 
-      <div style="margin-top: 40px">
+      <div style="margin-top: 20px" id="username-area">
         <div style="display: inline-block;">
           <div class="trpStartNumber">
             <div>2</div>
@@ -27,20 +30,23 @@
           <div class="input">
               <input type="text" class="open" id="username" name="username">
           </div>
-          <div class="help" style="height: 60px">
-            <div class="tip-message valid-message">This will be your personal address on Troupe<br></div>
-            <div class="not-valid-message" style="color: #e74c3c; display: none" >The username you have chosen is not available<br></div>
-            <div class="valid-message trpGreen">www.trou.pe/<span id="show-user-name">username</span></div><br>
+          <div class="help" style="height: 44px">
+            <div class="tip-message valid-message">This will be your personal address on Troupe.<br></div>
+            <div class="not-valid-message" style="color: #e74c3c; display: none" >The username you have chosen is not available.<br></div>
+            <div id="username-error" style="color: #e74c3c; display: none">You must pick a valid username.<br></div>
+            <div class="valid-message trpGreen">www.trou.pe/<span id="show-user-name">username</span></div>
           </div>
         </div>
-        <div class="trpStartHelp" style="display: none">
-          <div class="label2" style="margin-top: 6px; margin-bottom: 10px;">Here are some suggestions for you</div>
-          <div class="name-suggestions">
+        <div class="trpStartHelpWrapper" style="display: inline-">
+          <div class="trpStartHelp" style="display: none">
+            <div class="label2" style="margin-top: 6px; margin-bottom: 10px;">Here are some suggestions for you</div>
+            <div class="name-suggestions">
+            </div>
           </div>
         </div>
       </div>
 
-      <div style="margin-top: 20px">
+      <div style="margin-top: 20px" id="password-area">
         <div class="trpStartNumber">
           <div>3</div>
         </div>
@@ -48,8 +54,11 @@
         <div class="input">
             <input id="password" type="password" name="password" class="open">
         </div>
-        <div class="help">
+        <div class="help" id="password-help">
           At least 6 characters.<br>
+        </div>
+        <div class="help" id="password-error" style="display:none">
+          <span style="color: #e74c3c;">You need to choose a password of at least 6 characters.</span><br>
         </div>
       </div>
     </form>
