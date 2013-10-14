@@ -34,7 +34,6 @@ define([
 
 		getSuggestions: function() {
 			var self = this;
-			console.log("Getting Suggestions");
 			$.ajax({
 				url: '/api/v1/usernamesuggestions',
 				success: function(suggestions) {
@@ -64,7 +63,6 @@ define([
 		},
 
 		renderSuggestions: function(suggestions) {
-			console.dir(suggestions);
 			var suggestionsContainer = this.$el.find('.name-suggestions');
 
 			for (var a = 0; a < suggestions.length; a++) {
