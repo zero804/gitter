@@ -86,10 +86,10 @@ define([
     },
 
     setRerenderOnChange: function() {
-      this.listenTo(this.model, 'change', this.doRerenderOnChange);
+      this.listenTo(this.model, 'change', this.rerender);
     },
 
-    doRerenderOnChange: function() {
+    rerender: function() {
       this.removeSubViews(this.$el);
       if (this.$el.tooltip)
         this.$el.tooltip('destroy');
