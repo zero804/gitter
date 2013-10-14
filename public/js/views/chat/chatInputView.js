@@ -7,13 +7,17 @@ define([
   'hbs!./tmpl/chatInputView',
   'utils/momentWrapper',
   'utils/safe-html',
+  'utils/scrollbar-detect',
   'jquery-placeholder', // No ref
   'jquery-sisyphus' // No ref
-], function($, context, TroupeViews, appEvents, template, moment, safeHtml) {
+], function($, context, TroupeViews, appEvents, template, moment, safeHtml, hasScrollBars) {
   "use strict";
 
-  var chatFrameSelector = '#content-wrapper';
-  var chatFrameProperty = 'margin-bottom';
+  /** @const */
+  var MAX_CHAT_HEIGHT = 145;
+
+  /** @const */
+  var EXTRA_PADDING = 10;
 
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
@@ -29,11 +33,19 @@ define([
     },
 
     afterRender: function() {
-      this.inputBox = new ChatInputBoxView({
+      var inputBox = new ChatInputBoxView({
         el: this.$el.find('.trpChatInputBoxTextArea'),
         rollers: this.rollers
       });
-      this.$el.find('form').sisyphus({locationBased: true}).restoreAllData();
+      this.inputBox = inputBox;
+      this.$el.find('form').sisyphus({
+        locationBased: true,
+        timeout: 2,
+        name: 'chat-' + context.getTroupeId(),
+        onRestore: function() {
+          inputBox.trigger('change');
+        }
+      }).restoreAllData();
 
       // http://stackoverflow.com/questions/16149083/keyboardshrinksview-makes-lose-focus/18904886#18904886
       this.$el.find("textarea").on('touchend', function(){
@@ -62,98 +74,107 @@ define([
     }
   });
 
-  var chatPadding = parseInt($(chatFrameSelector).css(chatFrameProperty),10);
-  var originalChatPadding = chatPadding;
+  var ChatCollectionResizer = function(options) {
+    var compact = options.compactView;
+    var rollers = options.rollers;
+    var editMode = options.editMode;
+
+    var el = options.el;
+    var $el = $(el);
+
+    var frameChat = $(compact ? '#content': '#content-wrapper').first();
+
+    this.resetInput = function() {
+      $el.css({ height: '', 'overflow-y': '' });
+
+      var css = {};
+      css[compact ? 'padding-bottom' : 'margin-bottom'] = '';
+      frameChat.css(css);
+      rollers.adjustScroll();
+    };
+
+    this.resizeInput = function() {
+      var scrollHeight = el.scrollHeight;
+      var height = scrollHeight > MAX_CHAT_HEIGHT ? MAX_CHAT_HEIGHT : scrollHeight;
+      var offsetHeight = el.offsetHeight;
+      if(offsetHeight == height) {
+        return;
+      }
+
+      var overflow = height < scrollHeight ? 'scroll' : '';
+      $el.css({ height: height, 'overflow-y': overflow });
+
+      if (!editMode) {
+        var css = {};
+
+        if(compact) {
+          frameChat.css({ 'padding-bottom': (height + EXTRA_PADDING) + 'px'});
+        } else {
+          frameChat.css({ 'margin-bottom': height + 'px'});
+
+        }
+        frameChat.css(css);
+      }
+
+      rollers.adjustScroll();
+      window.setTimeout(function() {
+        rollers.adjustScroll();
+      }, 100);
+    };
+
+  };
 
   var ChatInputBoxView = TroupeViews.Base.extend({
-
     events: {
-      "keyup": "detectNewLine",
-      "keydown":  "detectReturn",
+      "keydown":  "onKeyDown",
       "focusout": "onFocusOut"
     },
 
     // pass in the textarea as el for ChatInputBoxView
     // pass in a scroll delegate
     initialize: function(options) {
-      this.chatLines = 2;
-
-      this.rollers = options.rollers;
-      this.originalChatInputHeight = this.$el.height();
       this.$el.placeholder();
 
-      this.resizeInput();
+      if(hasScrollBars()) {
+        this.$el.addClass("scroller");
+      }
+
+      var chatResizer = new ChatCollectionResizer({
+        compactView: this.compactView,
+        el: this.el,
+        editMode: this.options.editMode,
+        rollers: options.rollers
+      });
+
+      this.chatResizer = chatResizer;
+
+      this.listenTo(this, 'change', function() {
+        chatResizer.resizeInput();
+      });
+
+      chatResizer.resetInput();
     },
 
     onFocusOut: function() {
       if (this.compactView) this.send();
     },
 
-    resetInput: function() {
-      this.chatLines = 2;
-      chatPadding = originalChatPadding;
-      this.$el.height(this.originalChatInputHeight);
-      $(chatFrameSelector).css(chatFrameProperty, chatPadding);
-
-    },
-
-    resizeInput: function() {
-      var lht = parseInt(this.$el.css('lineHeight'),10);
-      var height = this.$el.prop('scrollHeight');
-      var currentLines = Math.floor(height / lht);
-      if(currentLines > 10) {
-        currentLines = 10;
-      }
-
-      if (currentLines != this.chatLines) {
-        this.chatLines = currentLines;
-
-        this.$el.css({ 'overflow-y': currentLines >= 10 ? 'auto' : 'none' });
-
-        var newHeight = currentLines * lht;
-
-        this.$el.height(newHeight);
-        var frameChat = $(chatFrameSelector), isChild = frameChat.find(this.el).length;
-        if (!isChild) {
-          chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
-          frameChat.css(chatFrameProperty, chatPadding);
-        }
-
-        var self = this;
-        window.setTimeout(function() {
-          self.rollers.adjustScroll();
-        }, 100);
-
-
-        chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
-      }
-
-    },
-
-    detectNewLine: function(e) {
-      if (e.keyCode ==13 && (e.ctrlKey || e.shiftKey)) {
-        if (window._troupeCompactView !== true) this.resizeInput();
-      }
-    },
-
-    detectReturn: function(e) {
+    onKeyDown: function(e) {
       if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/))) {
-        if (window._troupeCompactView !== true) this.resetInput();
         e.stopPropagation();
         e.preventDefault();
 
         this.send();
         return;
       }
-
-      if (window._troupeCompactView !== true) this.resizeInput();
+      this.chatResizer.resizeInput();
     },
 
     send: function() {
       this.trigger('save', safeHtml(this.$el.val()));
-
       $('#chatInputForm').trigger('reset');
       this.$el.val('');
+      this.chatResizer.resetInput();
     }
   });
 
