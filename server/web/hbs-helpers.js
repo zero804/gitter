@@ -21,6 +21,7 @@ var troupeEnv = {
   homeUrl: nconf.get('web:homeurl'),
   mixpanelToken: nconf.get("stats:mixpanel:token"),
   googleTrackingId: nconf.get("web:trackingId"),
+  goSquaredTrackingId: nconf.get("web:goSquaredId"),
   cdns: cdns,
   appVersion: appTag,
   logging: nconf.get("web:consoleLogging"),
