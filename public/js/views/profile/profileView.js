@@ -125,6 +125,7 @@ define([
       var validationConfig = {
         rules: {
           displayName: validation.rules.userDisplayName(),
+          username: 'required',
           password: validation.rules.password(),
           oldPassword: { required: function() {
               // if this is an existing user and they have set a value for the password field then oldPassword is required as well.
@@ -169,6 +170,7 @@ define([
     },
 
     onFormSubmit: function(e) {
+      if(!this.$el.find('#updateprofileform').valid()) return;
       if(e) e.preventDefault();
 
       var form = this.$el.find('form#updateprofileform');
@@ -206,16 +208,19 @@ define([
             }
 
           } else {
-            if (data.emailConflict) {
-              window.alert("That email address is already registered, please choose another.");
-            }
-            else if(data.authFailure) {
-              that.$el.find('#oldPassword').val("");
-              window.alert("Your old password is incorrect");
-            }
+            that.onFormSubmitFailure(data);
           }
         }
       });
+    },
+    onFormSubmitFailure: function(err) {
+      if (err.emailConflict) {
+        window.alert("That email address is already registered, please choose another.");
+      }
+      else if(err.authFailure) {
+        this.$el.find('#oldPassword').val("");
+        window.alert("Your old password is incorrect");
+      }
     }
   });
 
