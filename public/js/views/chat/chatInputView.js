@@ -33,11 +33,19 @@ define([
     },
 
     afterRender: function() {
-      this.inputBox = new ChatInputBoxView({
+      var inputBox = new ChatInputBoxView({
         el: this.$el.find('.trpChatInputBoxTextArea'),
         rollers: this.rollers
       });
-      this.$el.find('form').sisyphus({locationBased: true}).restoreAllData();
+      this.inputBox = inputBox;
+      this.$el.find('form').sisyphus({
+        locationBased: true,
+        timeout: 2,
+        name: 'chat-' + context.getTroupeId(),
+        onRestore: function() {
+          inputBox.trigger('change');
+        }
+      }).restoreAllData();
 
       // http://stackoverflow.com/questions/16149083/keyboardshrinksview-makes-lose-focus/18904886#18904886
       this.$el.find("textarea").on('touchend', function(){
@@ -131,14 +139,20 @@ define([
         this.$el.addClass("scroller");
       }
 
-      this.chatResizer = new ChatCollectionResizer({
+      var chatResizer = new ChatCollectionResizer({
         compactView: this.compactView,
         el: this.el,
         editMode: this.options.editMode,
         rollers: options.rollers
       });
 
-      this.chatResizer.resetInput();
+      this.chatResizer = chatResizer;
+
+      this.listenTo(this, 'change', function() {
+        chatResizer.resizeInput();
+      });
+
+      chatResizer.resetInput();
     },
 
     onFocusOut: function() {
