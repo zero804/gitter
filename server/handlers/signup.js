@@ -105,8 +105,15 @@ module.exports = {
             statsService.event('confirmation_success', { userId: user.id, email: user.email });
 
             if (user.hasPassword()) {
+              // user has completed signup
               res.relativeRedirect('/' + user.username);
+            } else if(user.displayName) {
+              // new user has requested access to a troupe
+              contextGenerator.generateMiniContext(req, function(err, troupeContext) {
+                res.render('complete-profile', { troupeContext: troupeContext });
+              });
             } else {
+              // plain new user
               res.relativeRedirect('/start');
             }
           });
