@@ -631,7 +631,7 @@ describe('troupe-service', function() {
               var newUser = result.user;
               assert(!result.alreadyUsed, 'Invite has not already been used');
               assert.equal(newUser.status, 'PROFILE_NOT_COMPLETED');
-              assert.equal(newUser.displayName, displayName);
+              assert.equal(newUser.displayName, undefined);
               assert.equal(newUser.email, email);
 
               return troupeService.findById(fixture.troupe1.id)
