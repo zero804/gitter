@@ -19,6 +19,9 @@ define([
       // var self = this;
       if(!this.model) this.model = options.troupe;
       this.hasUnread = false;
+
+      this.listenTo(this.model, 'change:name', this.change);
+
       this.listenTo(this.model, 'change:unreadItems', this.unreadItemsChanged);
       if (options.noHref) {
         this.noHref = options.noHref;
@@ -71,6 +74,10 @@ define([
           $e.removeClass('unread');
         }
       }
+    },
+
+    change: function() {
+      this.rerender();
     },
 
     afterRender: function() {

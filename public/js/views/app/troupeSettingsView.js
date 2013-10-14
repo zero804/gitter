@@ -169,14 +169,13 @@ define([
       var troupeName = this.$el.find('input[name=name]').val().trim();
       var self = this;
 
-      if(context.getTroupe().name === troupeName) {
+      if(context.troupe().get('name') === troupeName) {
         self.dialog.hide();
         self.dialog = null;
         return;
       }
 
-      // Why are we doing this again?
-      context.getTroupe().name = troupeName;
+      context.troupe().set('name', troupeName);
 
       $.ajax({
         url: '/troupes/' + context.getTroupeId(),
@@ -185,6 +184,7 @@ define([
         type: "PUT",
         data: JSON.stringify({ name: troupeName }),
         success: function() {
+
           self.dialog.hide();
           self.dialog = null;
         }
