@@ -44,9 +44,41 @@ define([
     var profileView = new profile.View({
       el: $('.trpStartContent')
     });
-    profileView.onError = function() {
-      console.log('ERROR!', arguments);
+    profileView.onError = function(errorMap) {
+      if(errorMap.displayName) {
+        showNameError();
+      } else {
+        hideNameError();
+      }
+      if(errorMap.username) {
+        showUsernameError();
+      } else {
+        hideUsernameError();
+      }
+      if(errorMap.password) {
+        showPasswordError();
+      } else {
+        hidePasswordError();
+      }
     };
+    profileView.onFormSubmitFailure = function(data) {
+      if(data.errors && data.errors.displayName) {
+        showNameError();
+      } else {
+        hideNameError();
+      }
+      if(data.errors && data.errors.username) {
+        showUsernameError();
+      } else {
+        hideUsernameError();
+      }
+      if(data.errors && data.errors.password) {
+        showPasswordError();
+      } else {
+        hidePasswordError();
+      }
+    };
+
     profileView.afterRender();
 
     new UsernameView({
@@ -54,9 +86,6 @@ define([
     });
 
     $('#next-button').on('click', function() {
-      showPasswordError();
-      showNameError();
-      showUsernameError();
       profileView.onFormSubmit();
     });
 
