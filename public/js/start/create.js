@@ -16,6 +16,10 @@ define([
       window.location.href = 'invite/'+troupe.id;
     };
 
+    createTroupeView.onError = function(errorMap) {
+      $('.help').text(errorMap.troupeName);
+    };
+
     $('#next-button').on('click', function() {
       createTroupeView.onFormSubmit();
     });

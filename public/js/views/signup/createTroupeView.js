@@ -16,7 +16,7 @@ define([
     template: template,
 
     initialize: function(options) {
-      _.bindAll(this, 'onFormSubmit', 'onSuccess');
+      _.bindAll(this, 'onFormSubmit', 'onSuccess', 'onError');
       if (!options) return;
       this.upgradeOneToOne = options.upgradeOneToOne;
       this.existingUser = options.existingUser;
@@ -62,20 +62,22 @@ define([
           email: validation.messages.troupeName()
         },
 
-        showErrors: function(errorMap, errorList) {
-          if (errorList.length > 0) {
-            $('.signup-failure').show();
-          }
-          else {
-            $('.signup-failure').hide();
-          }
-          var errors = "";
-          $.each(errorList, function () { errors += this.message + "<br>"; });
-          $('#failure-text').html(errors);
-        }
+        showErrors: this.onError
       };
 
       this.$el.find('#signup-form').validate(validationConfig);
+    },
+
+    onError: function(errorMap, errorList) {
+      if (errorList.length > 0) {
+        $('.signup-failure').show();
+      }
+      else {
+        $('.signup-failure').hide();
+      }
+      var errors = "";
+      $.each(errorList, function () { errors += this.message + "<br>"; });
+      $('#failure-text').html(errors);
     },
 
     onFormSubmit: _.debounce(function(e) {
