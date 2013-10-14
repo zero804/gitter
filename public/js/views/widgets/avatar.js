@@ -39,7 +39,9 @@ define([
 
       var isModel = !!this.model;
       if (isModel) {
-        this.listenTo(this.model, 'change', avatarChange);
+        this.listenTo(this.model, 'change', function(model) {
+          avatarChange({}, model);
+        });
       } else {
         // Unfortunately we can't use listenTo with jquery events
         $(document).on('avatar:change', avatarChange);
