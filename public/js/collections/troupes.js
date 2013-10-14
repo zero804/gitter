@@ -21,6 +21,13 @@ define([
     model: TroupeModel,
     initialize: function() {
       this.url = "/user/" + context.getUserId() + "/troupes";
+      this.listenTo(this, 'change:name', this.replicateContext);
+    },
+
+    replicateContext: function(model) {
+      if(model.id === context.getTroupeId()) {
+        context.troupe().set(model.toJSON());
+      }
     }
   });
 
