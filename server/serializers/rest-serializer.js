@@ -108,7 +108,7 @@ function UserStrategy(options) {
       status: options.includeEmail ? user.status : undefined,
       hasPassword: options.includePasswordStatus ? !!user.passwordHash : undefined,
       username: user.username,
-      displayName: user.displayName,
+      displayName: user.getDisplayName(),
       url: user.getHomeUrl(),
       email: options.includeEmail ? user.email : undefined,
       avatarUrlSmall: getAvatarUrl('s'),

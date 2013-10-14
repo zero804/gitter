@@ -1523,7 +1523,6 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
           // status term in the if below can be removed
           if(!user) {
             return userService.findOrCreateUserForEmail({
-              displayName: invite.displayName || invite.email.replace(/@.*/, ""),
               email: invite.email,
               status: "PROFILE_NOT_COMPLETED",
               source: 'invite_accept'
