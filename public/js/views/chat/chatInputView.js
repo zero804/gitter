@@ -7,13 +7,14 @@ define([
   'hbs!./tmpl/chatInputView',
   'utils/momentWrapper',
   'utils/safe-html',
+  'utils/scrollbar-detect',
   'jquery-placeholder', // No ref
   'jquery-sisyphus' // No ref
-], function($, context, TroupeViews, appEvents, template, moment, safeHtml) {
+], function($, context, TroupeViews, appEvents, template, moment, safeHtml, hasScrollBars) {
   "use strict";
 
-  var chatFrameSelector = '#content-wrapper';
-  var chatFrameProperty = 'margin-bottom';
+  /** @const */
+  var maxChatHeight = 150;
 
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
@@ -62,9 +63,6 @@ define([
     }
   });
 
-  var chatPadding = parseInt($(chatFrameSelector).css(chatFrameProperty),10);
-  var originalChatPadding = chatPadding;
-
   var ChatInputBoxView = TroupeViews.Base.extend({
 
     events: {
@@ -76,12 +74,11 @@ define([
     // pass in the textarea as el for ChatInputBoxView
     // pass in a scroll delegate
     initialize: function(options) {
-      this.chatLines = 2;
-
       this.rollers = options.rollers;
-      this.originalChatInputHeight = this.$el.height();
       this.$el.placeholder();
-
+      if(hasScrollBars()) {
+        this.$el.addClass("scroller");
+      }
       this.resizeInput();
     },
 
@@ -90,55 +87,24 @@ define([
     },
 
     resetInput: function() {
-      this.chatLines = 2;
-      chatPadding = originalChatPadding;
-      this.$el.height(this.originalChatInputHeight);
-      $(chatFrameSelector).css(chatFrameProperty, chatPadding);
-
+      this.$el.css({ height: '', 'overflow-y': '' });
     },
 
     resizeInput: function() {
-      var lht = parseInt(this.$el.css('lineHeight'),10);
-      var height = this.$el.prop('scrollHeight');
-      var currentLines = Math.floor(height / lht);
-      if(currentLines > 10) {
-        currentLines = 10;
+      var scrollHeight = this.el.scrollHeight;
+      var height = scrollHeight > maxChatHeight ? maxChatHeight : scrollHeight;
+      var offsetHeight = this.el.offsetHeight;
+      if(offsetHeight == height) {
+        return;
       }
 
-      if (currentLines != this.chatLines) {
-        this.chatLines = currentLines;
-
-        this.$el.css({ 'overflow-y': currentLines >= 10 ? 'auto' : 'none' });
-
-        var newHeight = currentLines * lht;
-
-        this.$el.height(newHeight);
-        var frameChat = $(chatFrameSelector), isChild = frameChat.find(this.el).length;
-        if (!isChild) {
-          chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
-          frameChat.css(chatFrameProperty, chatPadding);
-        }
-
-        var self = this;
-        window.setTimeout(function() {
-          self.rollers.adjustScroll();
-        }, 100);
-
-
-        chatPadding = originalChatPadding + Math.abs(this.originalChatInputHeight - newHeight);
-      }
-
-    },
-
-    detectNewLine: function(e) {
-      if (e.keyCode ==13 && (e.ctrlKey || e.shiftKey)) {
-        if (window._troupeCompactView !== true) this.resizeInput();
-      }
+      var overflow = height < scrollHeight ? 'scroll' : '';
+      this.$el.css({ height: height, 'overflow-y': overflow });
+      return;
     },
 
     detectReturn: function(e) {
       if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/))) {
-        if (window._troupeCompactView !== true) this.resetInput();
         e.stopPropagation();
         e.preventDefault();
 
@@ -146,14 +112,14 @@ define([
         return;
       }
 
-      if (window._troupeCompactView !== true) this.resizeInput();
+      this.resizeInput();
     },
 
     send: function() {
       this.trigger('save', safeHtml(this.$el.val()));
-
       $('#chatInputForm').trigger('reset');
       this.$el.val('');
+      this.resetInput();
     }
   });
 
