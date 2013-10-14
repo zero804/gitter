@@ -2,7 +2,7 @@
     <div class="trpChatInputAvatar">
 	{{ widget "avatar" model=user size='s' showTooltip=false }}
     </div>
-	  <form class="trpChatInputBox">
-	    <textarea class="trpChatInputBoxTextArea" id="chat-input-textarea" placeholder="{{#compactView}}Touch{{/compactView}}{{^compactView}}Click{{/compactView}} here to type a chat message."></textarea>
+	  <form class="trpChatInputBox" name="chat">
+	    <textarea class="trpChatInputBoxTextArea" name="chat" id="chat-input-textarea" placeholder="{{#compactView}}Touch{{/compactView}}{{^compactView}}Click{{/compactView}} here to type a chat message."></textarea>
 	  </form>
 	</div>

@@ -12,10 +12,11 @@ define([
   'components/modal-region',
   'components/titlebar',
   'cocktail',
+  'utils/scrollbar-detect',
   'bootstrap_tooltip',  // no ref
   "nanoscroller"        // no ref
   ], function($, TroupeViews, context, appEvents, Marionette, UsernameView, ProfileView, uiVars,
-    notifications, modalRegion, TitlebarUpdater, cocktail) {
+    notifications, modalRegion, TitlebarUpdater, cocktail, hasScrollBars) {
   "use strict";
 
   var touchEvents = {
@@ -79,22 +80,10 @@ define([
         self.showPanel("#right-panel");
       });
 
-
-      // Some innovative scrollbar measuring stuff
-      var scrollDiv = document.createElement("div");
-      scrollDiv.className = "scrollbar-measure";
-      document.body.appendChild(scrollDiv);
-
-      // Get the scrollbar width
-      var scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
-      
-      if (scrollbarWidth > 0) {
+      if (hasScrollBars()) {
         $(".trpChatContainer").addClass("scroller");
         $(".trpChatInputArea").addClass("scrollpush");
       }
-
-      // Delete the DIV 
-      document.body.removeChild(scrollDiv);
 
       this.rightPanelRegion.on('close', function() {
         window.setTimeout(function() {
@@ -244,7 +233,7 @@ define([
       }
       else {
         this.showTroupeMenu();
-        $("#right-menu-icon").addClass("active");      
+        $("#right-menu-icon").addClass("active");
       }
     },
 
