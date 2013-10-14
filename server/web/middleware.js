@@ -168,7 +168,7 @@ exports.simulateDelay = function(timeout) {
 
 exports.ensureValidBrowser = function(req, res, next) {
   var agent = useragent.parse(req.headers['user-agent']);
-  if(agent.family === 'IE' && agent.major <= 8) {
+  if(agent.family === 'IE' && agent.major <= 9) {
     res.relativeRedirect('/unawesome-browser');
   } else {
     next();
