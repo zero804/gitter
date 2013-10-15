@@ -30,11 +30,13 @@ define([
     events: {
       'click .trpChatEdit':     'toggleEdit',
       'keydown textarea':       'detectEscape',
-      'click .trpChatReads':    'showReadBy'
+      'click .trpChatReadBy':   'showReadBy'
     },
 
     initialize: function(options) {
       var self = this;
+
+      this._oneToOne = context.inOneToOneTroupeContext();
 
       this.userCollection = options.userCollection;
 
@@ -70,8 +72,16 @@ define([
           data.displayName = data.fromUser.displayName.split(" ").shift();
         }
       }
+      data.readByText = this.getReadByText(data.readBy);
 
       return data;
+    },
+
+    getReadByText: function(readByCount) {
+      if(!readByCount) return '';
+
+      if(readByCount > 10) readByCount = 10;
+      return String.fromCharCode(0x2789 + readByCount);
     },
 
     onChange: function() {
@@ -80,7 +90,7 @@ define([
         this.renderText();
       }
 
-      this.updateRender();
+      this.updateRender(this.model.changed);
     },
 
     renderText: function() {
@@ -103,11 +113,25 @@ define([
       this.updateRender();
     },
 
-    updateRender: function() {
+    updateRender: function(changes) {
       this.setState();
 
       var editIconTooltip = (this.hasBeenEdited()) ? "Edited shortly after being sent": ((this.canEdit()) ? "Edit within 4 minutes of sending" : ((this.isOwnMessage()) ? "It's too late to edit this message." : "You can't edit someone else's message"));
       var editIcon = this.$el.find('.trpChatEdit [title]');
+
+      if(changes && 'readBy' in changes) {
+        var readByCount = this.model.get('readBy');
+        var readByLabel = this.$el.find('.readby');
+        if(readByCount) {
+          readByLabel.text(this.getReadByText(readByCount));
+          if(!readByLabel.is(':visible')) {
+            readByLabel.show('fast');
+          }
+        } else {
+          readByLabel.hide();
+          this.$el.find('.readby').text();
+        }
+      }
 
       if (!this.compactView) {
         editIcon.tooltip('destroy');
@@ -122,7 +146,6 @@ define([
       this.$el.toggleClass('canEdit', this.canEdit());
       this.$el.toggleClass('cantEdit', !this.canEdit());
       this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
-      this.$el.toggleClass('hasBeenRead', this.hasBeenRead());
       this.$el.toggleClass('isOld', this.isOld());
     },
 
@@ -239,15 +262,16 @@ define([
       this.listenTo(this.inputBox, 'save', this.saveChat);
     },
 
-    showReadBy: function() {
+    showReadBy: function(event) {
       if(this.readBy) return;
+      event.preventDefault();
 
       this.readBy = new ReadByPopover({
         model: this.model,
         userCollection: this.userCollection,
         placement: 'vertical',
         title: 'Read By',
-        targetElement: this.$el.find('.trpChatReads')[0]
+        targetElement: event.target
       });
 
       var s = this;
