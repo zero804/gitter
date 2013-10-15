@@ -65,8 +65,9 @@ define([
         type: "POST",
         success: function() {
           this.model.set('status', 'invited');
-          appEvents.trigger('searchSearchView:success');
-          popupInviteSuccessBanner(this.model.get('displayName'));
+          var name = this.model.get('displayName');
+          appEvents.trigger('searchSearchView:success', name);
+          popupInviteSuccessBanner(name);
         }
       });
 
@@ -287,8 +288,9 @@ define([
         type: "POST",
         success: function() {
           model.set('status', 'invited');
-          appEvents.trigger('searchSearchView:success');
-          popupInviteSuccessBanner(model.get('displayName'));
+          var name = model.get('displayName');
+          appEvents.trigger('searchSearchView:success', name);
+          popupInviteSuccessBanner(name);
         },
         context: this,
         statusCode: {
