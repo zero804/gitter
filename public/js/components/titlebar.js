@@ -2,19 +2,15 @@
 define([
   'jquery',
   'components/unread-items-client',
-  'collections/instances/troupes',
   'utils/context'
-], function($, unreadItemsClient, trpCollections, context) {
+], function($, unreadItemsClient, context) {
   "use strict";
 
     function TitlebarUpdater () {
         var self = this;
 
-        trpCollections.troupes.on('change:name', function(model) {
-            if (model.id == context.getTroupeId()) {
-              // window / title bar
-              self.updateTitlebar(unreadItemsClient.getCounts());
-            }
+        context.troupe().on('change:name', function() {
+          self.updateTitlebar(unreadItemsClient.getCounts());
         });
 
         function onTroupeUnreadTotalChange(event, values) {
@@ -45,8 +41,9 @@ define([
 
     TitlebarUpdater.prototype.getTitlebar = function(counts) {
       var mainTitle;
-      if (context.getTroupe() && context.getTroupe().name) {
-        mainTitle = context.getTroupe().name + " - Troupe";
+      var name = context.troupe().get('name');
+      if (name) {
+        mainTitle = name + " - Troupe";
       } else {
         mainTitle = "Troupe";
       }

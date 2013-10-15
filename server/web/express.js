@@ -60,7 +60,9 @@ module.exports = {
 
     app.engine('hbs', expressHbs.express3({
       partialsDir: __dirname + '/../../' + nconf.get('web:staticContent') +'/templates/partials',
+      contentHelperName: 'content',
       handlebars: handlebars
+
     }));
 
     // registerAllTemplatesAsPartials(__dirname + '/../../' + nconf.get('web:staticContent') +'/js/views');
@@ -68,6 +70,10 @@ module.exports = {
     app.set('view engine', 'hbs');
     app.set('views', __dirname + '/../../' + nconf.get('web:staticContent') +'/templates');
     app.set('trust proxy', true);
+
+    if(nconf.get('express:viewCache')) {
+      app.enable('view cache');
+    }
 
     if(nconf.get("logging:access") && nconf.get("logging:logStaticAccess")) {
       configureLogging();

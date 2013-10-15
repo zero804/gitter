@@ -37,6 +37,20 @@ define([
 
   }
 
+  var goSquaredTrackingId = context.env('goSquaredTrackingId');
+  if(goSquaredTrackingId) {
+    var GoSquared = window.GoSquared = {};
+    GoSquared.acct = goSquaredTrackingId;
+    (function(w){
+        w._gstc_lt = +new Date;
+        var d = document, g = d.createElement("script");
+        g.type = "text/javascript";
+        g.src = "//d1l6p2sc9645hc.cloudfront.net/tracker.js";
+        var s = d.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(g, s);
+    })(window);
+  }
+
   function trackPageView(routeName) {
     if(window.mixpanel) {
       window.mixpanel.track('pageView', { pageName: routeName });

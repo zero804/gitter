@@ -27,7 +27,7 @@ exports.install = function() {
 
     userJoined: function(data) {
       userService.findById(data.userId, function(err, user) { 
-        var message = user.displayName + ' has joined';
+        var message = user.getDisplayName() + ' has joined';
         var meta = {
           type: 'user',
           action: 'joined',

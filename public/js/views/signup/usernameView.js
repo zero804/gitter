@@ -34,7 +34,6 @@ define([
 
 		getSuggestions: function() {
 			var self = this;
-
 			$.ajax({
 				url: '/api/v1/usernamesuggestions',
 				success: function(suggestions) {
@@ -140,6 +139,7 @@ define([
 
 		isUnavailable: function () {
 			this.valid = false;
+			this.$el.find('.tip-message').hide();
 			this.$el.find('.not-valid-message').show();
 			this.$el.find('.valid-message').hide();
 		},

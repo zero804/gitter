@@ -79,8 +79,8 @@ function configureTransports() {
   if (nconf.get('logging:logstash:enabled')) {
 
     var logstash_opts = {
-      appName:  'Troupe app', 
-      port:     nconf.get('logging:logstash:port'), 
+      appName:  'Troupe app',
+      port:     nconf.get('logging:logstash:port'),
       host:     nconf.get('logging:logstash:host')
     };
 
@@ -118,26 +118,6 @@ function configureTransports() {
     }
   }
 
-  if(nconf.get("logging:loggly")) {
-    //
-    // Requiring `winston-loggly` will expose
-    // `winston.transports.Loggly`
-    //
-    require('winston-loggly');
-
-    winston.add(winston.transports.Loggly, {
-      level: nconf.get("logging:logglyLevel"),
-      subdomain: nconf.get("logging:logglySubdomain"),
-      inputToken: nconf.get("logging:logglyInputToken")
-    });
-
-  console.log('Winston transports');
-  console.log(winston['default'].transports);
-
-  return;
-
-
-  }
 }
 
 configureTransports();
