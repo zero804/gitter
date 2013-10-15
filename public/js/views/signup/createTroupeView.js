@@ -16,7 +16,7 @@ define([
     template: template,
 
     initialize: function(options) {
-      _.bindAll(this, 'onFormSubmit');
+      _.bindAll(this, 'onFormSubmit', 'onSuccess', 'onError');
       if (!options) return;
       this.upgradeOneToOne = options.upgradeOneToOne;
       this.existingUser = options.existingUser;
@@ -62,27 +62,30 @@ define([
           email: validation.messages.troupeName()
         },
 
-        showErrors: function(errorMap, errorList) {
-          if (errorList.length > 0) {
-            $('.signup-failure').show();
-          }
-          else {
-            $('.signup-failure').hide();
-          }
-          var errors = "";
-          $.each(errorList, function () { errors += this.message + "<br>"; });
-          $('#failure-text').html(errors);
-        }
+        showErrors: this.onError
       };
 
       this.$el.find('#signup-form').validate(validationConfig);
     },
 
+    onError: function(errorMap, errorList) {
+      if (errorList.length > 0) {
+        $('.signup-failure').show();
+      }
+      else {
+        $('.signup-failure').hide();
+      }
+      var errors = "";
+      $.each(errorList, function () { errors += this.message + "<br>"; });
+      $('#failure-text').html(errors);
+    },
+
     onFormSubmit: _.debounce(function(e) {
+      if(!this.$el.find('#signup-form').valid()) return;
+
       if(e) e.preventDefault();
       this.disableForm();
 
-      var that = this;
       var form = this.$el.find('form');
 
       var serializedForm = {
@@ -94,20 +97,21 @@ define([
         serializedForm.oneToOneTroupeId = context.getTroupeId();
       }
 
-      that.collection.create(serializedForm, {
+      this.collection.create(serializedForm, {
         url: '/troupes/',
         wait: true,
-        success: function(troupe /*, resp, options*/) {
-          that.enableForm();
-          if(that.options.nativeMode) {
-            window.location.href = "/mobile/people#" + troupe.id + "|share";
-          } else {
-            window.location.href = "/" + troupe.get('uri') + "#|share";
-          }
-        }
+        success: this.onSuccess
       });
-    }, 1000, true)
+    }, 1000, true),
 
+    onSuccess: function(troupe) {
+      this.enableForm();
+      if(this.options.nativeMode) {
+        window.location.href = "/mobile/people#" + troupe.id + "|share";
+      } else {
+        window.location.href = "/" + troupe.get('uri') + "#|share";
+      }
+    }
   });
 
 var Modal = TroupeViews.Modal.extend({
