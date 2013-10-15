@@ -30,8 +30,7 @@ define([
     events: {
       'click .trpChatEdit':     'toggleEdit',
       'keydown textarea':       'detectEscape',
-      'click .trpChatReads':    'showReadBy',
-      'click .readby':          'showReadBy'
+      'click .trpChatReads':    'showReadBy'
     },
 
     initialize: function(options) {
@@ -81,7 +80,7 @@ define([
         this.renderText();
       }
 
-      this.updateRender(this.model.changed);
+      this.updateRender();
     },
 
     renderText: function() {
@@ -104,20 +103,11 @@ define([
       this.updateRender();
     },
 
-    updateRender: function(changes) {
+    updateRender: function() {
       this.setState();
 
       var editIconTooltip = (this.hasBeenEdited()) ? "Edited shortly after being sent": ((this.canEdit()) ? "Edit within 4 minutes of sending" : ((this.isOwnMessage()) ? "It's too late to edit this message." : "You can't edit someone else's message"));
       var editIcon = this.$el.find('.trpChatEdit [title]');
-
-      if(!changes || 'readBy' in changes) {
-        var readByCount = this.model.get('readBy');
-        if(readByCount) {
-          this.$el.find('.readby').text('Read by ' + readByCount);
-        } else {
-          this.$el.find('.readby').text();
-        }
-      }
 
       if (!this.compactView) {
         editIcon.tooltip('destroy');
@@ -249,7 +239,7 @@ define([
       this.listenTo(this.inputBox, 'save', this.saveChat);
     },
 
-    showReadBy: function(event) {
+    showReadBy: function() {
       if(this.readBy) return;
 
       this.readBy = new ReadByPopover({
@@ -257,7 +247,7 @@ define([
         userCollection: this.userCollection,
         placement: 'vertical',
         title: 'Read By',
-        targetElement: event.target
+        targetElement: this.$el.find('.trpChatReads')[0]
       });
 
       var s = this;

@@ -8,13 +8,11 @@ define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
     this._reverse = options && options.reverse;
     this._prevScrollTop = 0;
     this._prevScrollTime = Date.now();
-    //this._scrollHandler = _.debounce(this.scroll.bind(this), 10);
     this._scrollHandler = this.scroll.bind(this);
     this.enable();
   }
   _.extend(NeverEndingStory.prototype, Backbone.Events, {
     scroll: function() {
-      log('scroll');
       var now = Date.now();
       var st = this._reverse ? this._target.scrollTop : this._target.scrollHeight - this._target.scrollTop - this._target.clientHeight;
 
@@ -31,12 +29,6 @@ define(['underscore', 'backbone', 'log!nes'], function(_, Backbone, log) {
         var gradient = delta / timeDelta;
         timeToLimit = st / -gradient;
       }
-
-      // log(['timeToLimit: ' + timeToLimit,
-      // 'scrollTop: ' + st,
-      // 'delta: ' + delta,
-      // 'gradient: ' + gradient,
-      // 'timeDelta: ' + timeDelta].join('  '));
 
       if((timeToLimit < 300) || (st < 50 && delta < 0)) {
         log('approaching end');
