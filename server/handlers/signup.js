@@ -107,7 +107,7 @@ module.exports = {
             if (user.hasPassword()) {
               // user has completed signup
               res.relativeRedirect('/' + user.username);
-            } else if(user.displayName) {
+            } else if(user.getDisplayName()) {
               // new user has requested access to a troupe
               contextGenerator.generateMiniContext(req, function(err, troupeContext) {
                 res.render('complete-profile', { troupeContext: troupeContext });
