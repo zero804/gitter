@@ -223,7 +223,7 @@ install-client-libs:
 	cp output/client-libs/expect/expect-amd.js public/repo/expect/expect.js
 	cp output/client-libs/faye/faye-browser.js public/repo/faye/faye.js
 	cp output/client-libs/filtered-collection/backbone-filtered-collection-amd.js public/repo/filtered-collection/filtered-collection.js
-	cp output/client-libs/hopscotch/hopscotch-0.11-amd.js public/repo/hopscotch/hopscotch.js
+	cp output/client-libs/hopscotch/hopscotch-0.1.2-amd.js public/repo/hopscotch/hopscotch.js
 
 	mkdir -p public/repo/hopscotch/css/ public/repo/hopscotch/img
 	cp output/client-libs/hopscotch/css/hopscotch-0.1.1.min.css public/repo/hopscotch/css/hopscotch.css
