@@ -90,7 +90,10 @@ define([
       var css = {};
       css[compact ? 'padding-bottom' : 'margin-bottom'] = '';
       frameChat.css(css);
-      rollers.adjustScroll();
+
+      if(rollers) {
+        rollers.adjustScroll();
+      }
     };
 
     this.resizeInput = function() {
@@ -116,10 +119,13 @@ define([
         frameChat.css(css);
       }
 
-      rollers.adjustScroll();
-      window.setTimeout(function() {
+      if(rollers) {
         rollers.adjustScroll();
-      }, 100);
+        window.setTimeout(function() {
+          rollers.adjustScroll();
+        }, 100);
+      }
+
     };
 
   };
