@@ -13,7 +13,7 @@
         </div>
         <div class="label">What's your full name?</div>
         <div class="input">
-            <input id="displayName" type="text" name="displayName" class="open">
+            <input id="displayName" type="text" name="displayName" value="{{user.displayName}}" class="open" autofocus>
         </div>
         <div class="help" style="height: 20px">
           <span style="color: #e74c3c; display: none;" id="name-error">You need to tell us your name.</span><br>
@@ -28,7 +28,7 @@
           </div>
           <div class="label">Pick a username</div>
           <div class="input">
-              <input type="text" class="open" id="username" name="username">
+              <input type="text" class="open" id="username" name="username" autocomplete="off">
           </div>
           <div class="help" style="height: 44px">
             <div class="tip-message valid-message">This will be your personal address on Troupe.<br></div>
@@ -52,7 +52,7 @@
         </div>
         <div class="label">Choose a password</div>
         <div class="input">
-            <input id="password" type="password" name="password" class="open">
+            <input id="password" type="password" name="password" class="open" autocomplete="off">
         </div>
         <div class="help" id="password-help">
           At least 6 characters.<br>
