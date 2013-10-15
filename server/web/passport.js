@@ -250,9 +250,6 @@ module.exports = {
           });
 
         } else {
-
-
-
           return userService.findByEmail(profile._json.email)
             .then(function(user) {
               if(user) {
@@ -285,8 +282,12 @@ module.exports = {
                 source:             'landing_google'
               };
 
+              winston.verbose('About to create Google user ', googleUser);
+
               userService.findOrCreateUserForEmail(googleUser, function(err, user) {
                 if (err) return done(err);
+
+                winston.verbose('Created Google user ', user.toObject());
 
                 req.logIn(user, function(err) {
                   if (err) { return done(err); }

@@ -116,7 +116,7 @@ module.exports = {
         switch(req.query.state) {
           case 'signup':
             if (req.user.status !== 'ACTIVE') {
-              res.redirect('/confirm');
+              res.redirect('/start/profile');
             } else {
               res.redirect('/');
             }
