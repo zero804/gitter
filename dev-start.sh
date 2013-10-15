@@ -10,7 +10,7 @@ bash -l <<"DELIM"
 	echo starting mongo
 	./mongodb.sh &
 
-	sleep 5
+	sleep 10
 
 	echo starting node
 	nodemon --watch server web.js
