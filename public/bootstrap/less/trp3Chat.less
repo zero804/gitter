@@ -211,8 +211,15 @@
     background-color: white;
     width: 180px;
     height: 180px;
-
   }
+
+  @media @mobile {
+    .trpFileVersionThumbnail {
+      width: 180px;
+      height: 180px;
+    }
+  }
+
   .notification-icon {
     clear: both;
     text-align: center;
@@ -353,6 +360,10 @@
 	padding: 0;
   word-wrap: break-word;
   .user-select(text);
+
+  a {
+    color: @trpGreen;
+  }
 }
 
 .trpChatTime {

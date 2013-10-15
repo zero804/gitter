@@ -29,17 +29,8 @@ describe('restSerializer', function() {
     });
 
     it('should return the correct display name', function() {
-
-      var user = {
-        displayName: 'Test Testerson',
-        email: 't.testerson@testcorp.com',
-        location: {},
-        getHomeUrl: function(){}
-      };
-
-      var mappedUser = userStrategy.map(user);
-
-      assert.equal(mappedUser.displayName, 'Test Testerson');
+      var mappedUser = userStrategy.map(fixture.user1);
+      assert.equal(mappedUser.displayName, 'Test User 1');
     });
 
   });

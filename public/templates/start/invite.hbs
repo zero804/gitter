@@ -1,0 +1,31 @@
+{{#content "header"}}
+<h1>Finally, let's invite some people to your Troupe</h1>
+<p>If you use Gmail, you can easily choose contacts to add. <br><br>We won't email all of your contacts, you can choose individually who to invite.</p>
+<p><a href="/google/contacts?returnTo={{returnToUrl}}">Add contacts from Gmail</a></p><br>
+{{/content}}
+
+<div class="trpStartContainer open blue" style="padding-bottom: 60px">
+  <div class="trpStartContent">
+    <form style="margin-top: 60px">
+        <div class="trpStartNumber">
+          <div>5</div>
+        </div>
+        <div class="label">Invite people</div>
+        <div class="input">
+            <input id="custom-email" type="email" name="email" class="open" placeholder="email@address.com" autofocus/><button type="submit" id="custom-email-button" value="Invite" class="trpButtonMedium trpBtnGreen trpStartInviteButton">Invite</button>
+        </div>
+        <div id="failure-text" class="help">Type an email address in the field above and click Invite. <br>You can repeat this multiple times to add many people.</div>
+    </form>
+    <div id="invites" class="scroller"></div>
+  </div>
+</div>
+
+<div class="trpStartContainer open blue-text">
+  <div class="trpStartContent">
+    <div style="margin-top: 40px">
+      <a id="next-button" class="trpButtonMedium trpBtnGreen disabled">Next</a>
+
+    </div>
+
+  </div>
+</div>

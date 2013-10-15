@@ -148,7 +148,7 @@ define([
 
 
       if (!context.inOneToOneTroupeContext()) {
-        this.troupeAvatar.show(new TroupeAvatar({ troupe: context.troupe(), noHref: true}));
+        this.troupeAvatar.show(new TroupeAvatar({ troupe: context.troupe(), noHref: true, noUnred: true}));
       }
       // Conversation View
       if (!context.inOneToOneTroupeContext()) {

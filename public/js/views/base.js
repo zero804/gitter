@@ -11,9 +11,10 @@ define([
   'hbs!./tmpl/loading',
   'hbs!./tmpl/confirmationView',
   'log!base-views',
+  'utils/detect-compact',
   '../template/helpers/all' // No ref
 ], function(require, $, _, Backbone, appEvents, Marionette, modalTemplate, popoverTemplate,
-  loadingTemplate, confirmationViewTemplate, log) {
+  loadingTemplate, confirmationViewTemplate, log, detectCompact) {
   "use strict";
 
   /* From http://coenraets.org/blog/2012/01/backbone-js-lessons-learned-and-improved-sample-app/ */
@@ -28,19 +29,14 @@ define([
   var TroupeViews = {};
 
   /* Use the compact views */
-  // var compactView = window.navigator.userAgent.indexOf("Mobile/") !== -1;
-  var compactView = false;
-
+  var compactView = window._troupeCompactView = detectCompact();
 
   // Need to do some testing on Android tablets to get this more accurate
-  var userAgentFragment = navigator.userAgent.match(/(iPhone|iPod|Android|BlackBerry)/);
   var isIE9 = window.navigator.userAgent.indexOf("MSIE 9.0") !== -1;
   var userAgentTabletFragment = navigator.userAgent.match(/(iPad)/);
 
   /* This value is used by the dialogFragment Handlebars helper */
-  if (userAgentFragment) {
-    compactView = true;
-    window._troupeCompactView = true;
+  if (compactView) {
     $('body').addClass('trpCompactView');
   }
 
@@ -86,10 +82,10 @@ define([
     },
 
     setRerenderOnChange: function() {
-      this.listenTo(this.model, 'change', this.doRerenderOnChange);
+      this.listenTo(this.model, 'change', this.rerender);
     },
 
-    doRerenderOnChange: function() {
+    rerender: function() {
       this.removeSubViews(this.$el);
       if (this.$el.tooltip)
         this.$el.tooltip('destroy');

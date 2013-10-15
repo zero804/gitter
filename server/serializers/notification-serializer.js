@@ -41,7 +41,7 @@ function UserStrategy(options) {
     return {
       id: user.id,
       username: user.username,
-      displayName: user.displayName
+      displayName: user.getDisplayName()
     };
   };
 }

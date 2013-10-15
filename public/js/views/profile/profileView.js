@@ -17,7 +17,7 @@ define([
     template: template,
 
     initialize: function(options) {
-      _.bindAll(this, 'onFormSubmit', 'onPasswordChange');
+      _.bindAll(this, 'onFormSubmit', 'onPasswordChange', 'onError');
       if (!options) return;
       this.originalEmail = context.getUser().email;
       this.hasPassword = context.getUser().hasPassword;
@@ -125,6 +125,7 @@ define([
       var validationConfig = {
         rules: {
           displayName: validation.rules.userDisplayName(),
+          username: 'required',
           password: validation.rules.password(),
           oldPassword: { required: function() {
               // if this is an existing user and they have set a value for the password field then oldPassword is required as well.
@@ -140,18 +141,7 @@ define([
             required: "You're trying to change your password. Please enter your old password, or clear the new password field."
           }
         },
-        showErrors: function(errorMap, errorList) {
-          if (errorList.length > 0) {
-            self.$el.find('.form-failure').show();
-          }
-          else {
-            self.$el.find('.form-failure').hide();
-          }
-
-          var errors = "";
-          $.each(errorList, function () { errors += this.message + "<br>"; });
-          self.$el.find('.failure-text').html(errors);
-        }
+        showErrors: this.onError,
       };
 
       if (!this.hasPassword) {
@@ -162,12 +152,26 @@ define([
 
     },
 
+    onError: function(errorMap, errorList) {
+      if (errorList.length > 0) {
+        this.$el.find('.form-failure').show();
+      }
+      else {
+        this.$el.find('.form-failure').hide();
+      }
+
+      var errors = "";
+      $.each(errorList, function () { errors += this.message + "<br>"; });
+      this.$el.find('.failure-text').html(errors);
+    },
+
     hasChangedEmail: function(newEmail) {
       return newEmail && newEmail != this.originalEmail;
     },
 
     onFormSubmit: function(e) {
       if(e) e.preventDefault();
+      if(!this.$el.find('#updateprofileform').valid()) return;
 
       var form = this.$el.find('form#updateprofileform');
       var newEmail = form.find('[name=newEmail]').val();
@@ -194,23 +198,29 @@ define([
             user.set('hasPassword', true);
 
             that.trigger('submit.success');
-            that.dialog.hide();
+
+            if(that.dialog) {
+              that.dialog.hide();
+            }
 
             if (that.hasChangedEmail(newEmail)) {
               window.alert("Your address will be updated once you confirm the email sent to your new address.");
             }
 
           } else {
-            if (data.emailConflict) {
-              window.alert("That email address is already registered, please choose another.");
-            }
-            else if(data.authFailure) {
-              that.$el.find('#oldPassword').val("");
-              window.alert("Your old password is incorrect");
-            }
+            that.onFormSubmitFailure(data);
           }
         }
       });
+    },
+    onFormSubmitFailure: function(err) {
+      if (err.emailConflict) {
+        window.alert("That email address is already registered, please choose another.");
+      }
+      else if(err.authFailure) {
+        this.$el.find('#oldPassword').val("");
+        window.alert("Your old password is incorrect");
+      }
     }
   });
 

@@ -18,8 +18,12 @@ define([
     initialize: function(options) {
       // var self = this;
       if(!this.model) this.model = options.troupe;
-      this.hasUnread = false;
-      this.listenTo(this.model, 'change:unreadItems', this.unreadItemsChanged);
+      
+      if(!options.noUnread) {
+        this.hasUnread = false;
+        this.listenTo(this.model, 'change:name', this.change);
+        this.listenTo(this.model, 'change:unreadItems', this.unreadItemsChanged);
+      }
       if (options.noHref) {
         this.noHref = options.noHref;
       }
@@ -40,7 +44,6 @@ define([
 
       var data = this.model.toJSON();
       data.noHref = this.noHref;
-
       if (!this.model.get('oneToOne')) {
         var initials = this.model.get('name')
                             .split(/[^\w]/)
@@ -55,7 +58,6 @@ define([
         data.initials = initials;
         data.colour = colour;
       }
-
       return data;
     },
 
@@ -71,6 +73,10 @@ define([
           $e.removeClass('unread');
         }
       }
+    },
+
+    change: function() {
+      this.rerender();
     },
 
     afterRender: function() {
