@@ -12,6 +12,7 @@ function startPage(template, options) {
       options.layout = 'start-template';
       options.troupeContext = troupeContext;
       options.page = template.split('/')[1];
+      options.user = req.user;
 
       res.render(template, options);
     });
@@ -36,7 +37,7 @@ module.exports = {
       app.get('/start/create',
         middleware.ensureLoggedIn(),
         startPage('start/create', {
-            title: 'Create'
+            title: 'Create',
           }));
 
       app.get('/start/invite/:troupeId',
