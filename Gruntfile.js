@@ -249,6 +249,7 @@ module.exports = function( grunt ) {
       "native-create-troupe-router": createClosureConfig('routers/mobile/native/create-troupe-router'),
       "router-login": createClosureConfig('router-login'),
       "complete-profile": createClosureConfig('complete-profile'),
+      "start-app": createClosureConfig('start-app'),
       "tour-controller": createClosureConfig('tours/tour-controller'),
       "login": createClosureConfig('login')
     },
