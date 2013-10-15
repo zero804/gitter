@@ -85,7 +85,7 @@ define([
       el: $('.trpStartContent')
     });
 
-    $('#next-button').on('click', function() {
+    $('#next-button, .hidden-iphone-submit-button').on('click', function() {
       profileView.onFormSubmit();
     });
 

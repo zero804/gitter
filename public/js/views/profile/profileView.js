@@ -170,8 +170,8 @@ define([
     },
 
     onFormSubmit: function(e) {
-      if(!this.$el.find('#updateprofileform').valid()) return;
       if(e) e.preventDefault();
+      if(!this.$el.find('#updateprofileform').valid()) return;
 
       var form = this.$el.find('form#updateprofileform');
       var newEmail = form.find('[name=newEmail]').val();
