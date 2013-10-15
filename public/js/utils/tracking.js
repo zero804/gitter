@@ -39,7 +39,7 @@ define([
 
   var goSquaredTrackingId = context.env('goSquaredTrackingId');
   if(goSquaredTrackingId) {
-    var GoSquared = {};
+    var GoSquared = window.GoSquared = {};
     GoSquared.acct = goSquaredTrackingId;
     (function(w){
         w._gstc_lt = +new Date;
