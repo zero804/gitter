@@ -18,11 +18,12 @@ define([
     initialize: function(options) {
       // var self = this;
       if(!this.model) this.model = options.troupe;
-      this.hasUnread = false;
-
-      this.listenTo(this.model, 'change:name', this.change);
-
-      this.listenTo(this.model, 'change:unreadItems', this.unreadItemsChanged);
+      
+      if(!options.noUnread) {
+        this.hasUnread = false;
+        this.listenTo(this.model, 'change:name', this.change);
+        this.listenTo(this.model, 'change:unreadItems', this.unreadItemsChanged);
+      }
       if (options.noHref) {
         this.noHref = options.noHref;
       }
