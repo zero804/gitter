@@ -2,6 +2,7 @@
 "use strict";
 
 var contextGenerator = require('../web/context-generator');
+var middleware = require('../web/middleware');
 
 function startPage(template, options) {
   return function(req, res, next) {
@@ -21,21 +22,26 @@ module.exports = {
 
     install: function(app) {
       app.get('/start',
+        middleware.ensureLoggedIn(),
         function(req, res) {
           res.relativeRedirect('/start/profile');
         });
 
       app.get('/start/profile',
+        middleware.ensureLoggedIn(),
         startPage('start/profile', {
             title: 'Profile'
           }));
 
       app.get('/start/create',
+        middleware.ensureLoggedIn(),
         startPage('start/create', {
             title: 'Create'
           }));
 
-      app.get('/start/invite/:troupeId', function(req, res, next) {
+      app.get('/start/invite/:troupeId',
+        middleware.ensureLoggedIn(),
+        function(req, res, next) {
         contextGenerator.generateSocketContext(req.user._id, req.params.troupeId)
           .then(function(context) {
             var options = {
@@ -51,6 +57,7 @@ module.exports = {
       });
 
       app.get('/start/finish',
+        middleware.ensureLoggedIn(),
         startPage('start/finish', {
             title: 'Finished'
           }));
