@@ -43,7 +43,6 @@ define([
 
       var data = this.model.toJSON();
       data.noHref = this.noHref;
-
       if (!this.model.get('oneToOne')) {
         var initials = this.model.get('name')
                             .split(/[^\w]/)
@@ -58,7 +57,6 @@ define([
         data.initials = initials;
         data.colour = colour;
       }
-
       return data;
     },
 
