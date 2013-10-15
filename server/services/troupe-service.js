@@ -1371,7 +1371,7 @@ function sendInviteAcceptedNotice(invite, troupe, isNormalTroupe) {
   if (isNormalTroupe)
     return; // we don't send notices for invite acceptances to normal troupes
 
-  var findTroupe = getUrlForTroupeForUserId(troupe, invite.userId);
+  var findTroupe = getUrlForTroupeForUserId(troupe, invite.fromUserId);
   var findFromUser = userService.findById(invite.fromUserId);
   var findToUser = userService.findById(invite.userId);
 
