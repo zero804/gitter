@@ -66,12 +66,12 @@ prepare-for-end-to-end-testing:
 	unzip -o test/end-to-end/chromedriver/chromedriver_mac_26.0.1383.0.zip -d test/end-to-end/chromedriver/
 
 end-to-end-test:
-	# MAIL_HOST=$(MAIL_HOST) \
-	# MAIL_PORT=$(MAIL_PORT) \
-	# nosetests --nologcapture --processes=5 --process-timeout=120 --attr '!unreliable','thread_safe' --all-modules test/end-to-end/e2etests
 	MAIL_HOST=$(MAIL_HOST) \
 	MAIL_PORT=$(MAIL_PORT) \
-	nosetests --nologcapture --attr '!unreliable','!thread_safe' --all-modules test/end-to-end/e2etests/chattest.py
+	nosetests --nologcapture --processes=5 --process-timeout=120 --attr '!unreliable','thread_safe' --all-modules test/end-to-end/e2etests
+	MAIL_HOST=$(MAIL_HOST) \
+	MAIL_PORT=$(MAIL_PORT) \
+	nosetests --nologcapture --attr '!unreliable','!thread_safe' --all-modules test/end-to-end/e2etests
 
 end-to-end-test-saucelabs-chrome:
 	@mkdir -p ./output/test-reports

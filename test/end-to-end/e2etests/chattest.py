@@ -14,22 +14,20 @@ class ChatTests(unittest.TestCase):
     def setUp(self):
         self.driver = utils.driver()
         utils.printJobInfo(self.driver)
-        username = utils.signupWithNewTroupe(self.driver)
-        # utils.existingUserlogin(self.driver, username, 'password')
-        # self.driver.get(utils.baseUrl('/testtroupe1'))
+        utils.resetData(self.driver)
+        utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
+        self.driver.get(utils.baseUrl('/testtroupe1'))
 
     def tearDown(self):
         self.driver.quit()
 
     def sendAChatMessage(self, message='The date and time are now ' + time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime())):
-        time.sleep(1000)
-        textArea = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, 'chat-input-textarea')))
+        textArea = self.driver.find_element_by_id('chat-input-textarea')
         textArea.send_keys(message)
         textArea.send_keys(Keys.RETURN)
 
-        # time.sleep(0.5)
+        time.sleep(0.5)
 
-        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.trpChatItem')))
         links = [i.text for i in self.driver.find_elements_by_css_selector('.trpChatItem .trpChatText')]
         text = links[len(links) - 1]
 
@@ -109,11 +107,10 @@ class ChatTests(unittest.TestCase):
             assert chatElText.text.find("...an alteration") != -1
 
     def getLastMessage(self):
-        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.trpChatItem')))
-        return self.driver.find_elements_by_css_selector('.trpChatItem')[-1].find_element_by_css_selector('.trpChatText')
+        return self.getLastElement('.trpChatItem').find_element_by_css_selector('.trpChatText')
 
     def getLastMessageHtml(self):
-        return self.getLastMessage().get_attribute('innerHTML')
+        return self.getLastElement('.trpChatItem').find_element_by_css_selector('.trpChatText').get_attribute('innerHTML')
 
     def getLastElement(self, selector, driver=0):
         if not driver:

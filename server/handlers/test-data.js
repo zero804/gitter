@@ -11,7 +11,6 @@ if(!nconf.get('test:exposeDataForTestingPurposes')) {
   // testing processes
 
   var userService = require("../services/user-service");
-  var troupeService = require("../services/troupe-service");
   var signupService = require("../services/signup-service");
   var persistence = require('../services/persistence-service');
   var winston = require('winston');
@@ -47,19 +46,6 @@ if(!nconf.get('test:exposeDataForTestingPurposes')) {
           .then(function(user) { res.send(user); })
           .fail(function(err) { res.send(500, err); });
 
-      });
-
-      app.get('/testdata/newTroupeForUser', function(req, res) {
-        var id = req.body.id || req.query.id;
-        userService.findById(id)
-        .then(function(user) {
-          return troupeService.createNewTroupeForExistingUser({
-            user: user,
-            name: 'test troupe'
-          });
-        })
-        .then(function(troupe) { res.send(troupe); })
-        .fail(function(err) { res.send(500, err); });
       });
 
       app.get('/testdata/confirmationCodeForEmail', function(req, res/*, next */) {
