@@ -125,29 +125,14 @@ class SignupTests(unittest.TestCase):
         accept = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, 'submit_approve_access')))
         accept.click()
 
-        self.assertEqual(self.driver.current_url, utils.baseUrl('/confirm'))
+        self.assertEqual(self.driver.current_url, utils.baseUrl('/start/profile'))
 
-        # Select username
-        username = 'mrtroupe' + str(uuid.uuid4())
-        form = self.driver.find_element_by_id('username-form')
-        form.find_element_by_name('username').send_keys(username)
-        form.find_element_by_name('submit').click()
-
-        # Complete profile
-        form = self.driver.find_element_by_id('updateprofileform')
-
-        displayName = form.find_element_by_name('displayName').get_attribute('value')
+        displayName = self.driver.find_element_by_name('displayName').get_attribute('value')
         self.assertEqual(displayName, name)
 
-        # This is correct:
-        #form.find_element_by_name('password').send_keys(troupe_password)
-        #form.find_element_by_name('submit').click()
+        self.completeSignupWithoutDisplayName()
 
-        # This works on IE:
-        self.driver.find_element_by_id('password').send_keys('password')
-        self.driver.find_element_by_css_selector('[data-action=save]').click()
-
-        self.assertUserhomeIsCurrentPage(username)
+        self.assertAnyTroupeIsCurrentPage()
 
 
     def tearDown(self):
@@ -170,6 +155,9 @@ class SignupTests(unittest.TestCase):
 
     def completeSignup(self):
         self.driver.find_element_by_css_selector('input[name=displayName]').send_keys('Tester Testerson')
+        self.completeSignupWithoutDisplayName()
+
+    def completeSignupWithoutDisplayName(self):
         self.driver.find_element_by_css_selector('input[name=username]').send_keys('testuser-' + str(uuid.uuid4()))
         self.driver.find_element_by_css_selector('input[name=password]').send_keys('password')
         self.driver.find_element_by_id('next-button').click()
