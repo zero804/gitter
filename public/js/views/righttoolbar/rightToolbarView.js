@@ -75,6 +75,7 @@ define([
         headerTitle: troupe && troupe.name || user.displayName,
         isTroupe: !!troupe,
         oneToOne: context.inOneToOneTroupeContext(),
+        troupeEmailAddress: context().troupeUri + '@' + context.env('baseServer'),
         user: user,
         favourite: troupe && troupe.favourite,
         troupeAvatarUrl: troupe && troupe.avatarUrl,
