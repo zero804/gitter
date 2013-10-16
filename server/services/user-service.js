@@ -24,32 +24,49 @@ var _                         = require('underscore');
 function newUser(options, callback) {
   assert(options.email, 'Email atttribute required');
 
+  var email = options.email.toLowerCase();
+
   var status = options.status || "UNCONFIRMED";
-  var user = new persistence.User({
+
+  var insertFields = {
     displayName:        options.displayName,
-    email:              options.email.toLowerCase(),
     confirmationCode:   uuid.v4(),
     gravatarImageUrl:   options.gravatarImageUrl || gravatar.gravatarUrlForEmail(options.email),
     googleRefreshToken: options.googleRefreshToken || undefined,
     status:             status
+  };
+
+  // Remove undefined fields
+  Object.keys(insertFields).forEach(function(k) {
+    if(insertFields[k] === undefined) {
+      delete insertFields[k];
+    }
   });
 
-  return user.saveQ().then(function() {
-    var optionStats = options.stats || {};
+  return persistence.User.findOneAndUpdateQ(
+    { email: email },
+    {
+      $setOnInsert: insertFields
+    },
+    {
+      upsert: true
+    })
+    .then(function(user) {
+      var optionStats = options.stats || {};
 
-    statsService.event('new_user', _.extend({
-          userId: user.id,
-          email: options.email,
-          status: status,
-          source: options.source
-        }, optionStats));
+      statsService.event('new_user', _.extend({
+            userId: user.id,
+            email: options.email,
+            status: status,
+            source: options.source
+          }, optionStats));
 
-    statsService.userUpdate(user, _.extend({
-      source: options.source
-    }, optionStats));
+      statsService.userUpdate(user, _.extend({
+        source: options.source
+      }, optionStats));
 
-    return user;
-  }).nodeify(callback);
+      return user;
+    }).nodeify(callback);
 }
 
 var userService = {

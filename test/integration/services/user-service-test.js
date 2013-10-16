@@ -2,12 +2,13 @@
 /*global describe:true, it:true, before:true, after:true */
 "use strict";
 
-var testRequire = require('./../test-require');
-var fixtureLoader = require('../test-fixtures');
+var testRequire        = require('./../test-require');
+var fixtureLoader      = require('../test-fixtures');
 var persistenceService = testRequire('./services/persistence-service');
-var userService = testRequire('./services/user-service');
-var signupService = testRequire('./services/signup-service');
-var assert = testRequire("assert");
+var userService        = testRequire('./services/user-service');
+var signupService      = testRequire('./services/signup-service');
+var assert             = testRequire("assert");
+var Q                  = require('q');
 
 var fixture = {};
 var fixture2 = {};
@@ -360,6 +361,24 @@ describe("User Service", function() {
       })
       .nodeify(done);
   });
+
+
+  it('should allow two users with the same email address to be created at the same moment, but only create a single account', function(done) {
+    var userService = testRequire("./services/user-service");
+    var newEmail = fixture2.generateEmail();
+
+    Q.all([
+      userService.findOrCreateUserForEmail({ email: newEmail }),
+      userService.findOrCreateUserForEmail({ email: newEmail })
+      ])
+      .spread(function(user1, user2) {
+        assert.strictEqual(user1.id, user2.id);
+        assert.strictEqual(user1.confirmationCode, user2.confirmationCode);
+      })
+      .nodeify(done);
+  });
+
+
 
 
   after(function() {
