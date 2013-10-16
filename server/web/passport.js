@@ -264,6 +264,16 @@ module.exports = {
                   email: user.email
                 }, properties));
 
+                // Confirm the user email, even if she tried to sign-up
+                // manually in the past and didn't do it.
+                if (user.status == 'UNCONFIRMED') {
+                  user.status = 'PROFILE_NOT_COMPLETED';
+                  user.source = 'landing_google';
+                  user.save(function(err) {
+                    if (err) winston.error("Something went wrong confirming user " + user.email + ": " + err);
+                  });
+                }
+
                 req.logIn(user, function(err) {
                   if (err) { return done(err); }
                   return done(null, user);
