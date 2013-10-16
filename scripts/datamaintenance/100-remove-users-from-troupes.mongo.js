@@ -3,6 +3,17 @@ var count = 0;
 var removeIds = [];
 var requiresModify = false;
 
+/* Mongo 2.2 doesn't support Object.keys */
+function keys(obj) {
+  var result = [];
+  for(var i in obj) {
+    if(obj.hasOwnProperty(i)) {
+      result.push(i);
+    }
+  }
+  return result;
+}
+
 function hashTroupeUsers() {
   var allUsers = db.troupes.find({}, { _id: 0, 'users.userId': 1 } ).
     map(function(users) {
@@ -25,12 +36,12 @@ function hashTroupeUsers() {
 function findMissingTroupeUsers() {
   var troupeUsers = hashTroupeUsers();
 
-  db.users.find({ _id: { $in: Object.keys(troupeUsers).map(function(d) { return new ObjectId(d); }) } }, { _id: 1 }).
+  db.users.find({ _id: { $in: keys(troupeUsers).map(function(d) { return new ObjectId(d); }) } }, { _id: 1 }).
     forEach(function(user) {
       delete troupeUsers[user._id.valueOf()];
     });
 
-  return Object.keys(troupeUsers).map(function(d) { return new ObjectId(d); });
+  return keys(troupeUsers).map(function(d) { return new ObjectId(d); });
 }
 
 function addCandidates(query, reason, update) {
