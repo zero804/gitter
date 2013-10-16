@@ -71,9 +71,11 @@ module.exports = {
     app.set('views', __dirname + '/../../' + nconf.get('web:staticContent') +'/templates');
     app.set('trust proxy', true);
 
-    if(nconf.get('express:viewCache')) {
-      app.enable('view cache');
-    }
+    // THIS IS BROKEN
+    // https://github.com/barc/express-hbs/issues/23
+    // if(nconf.get('express:viewCache')) {
+    //   app.enable('view cache');
+    // }
 
     if(nconf.get("logging:access") && nconf.get("logging:logStaticAccess")) {
       configureLogging();
