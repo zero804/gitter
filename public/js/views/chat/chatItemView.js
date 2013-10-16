@@ -67,7 +67,7 @@ define([
       var isMobile = navigator.userAgent.match(/mobile/i) ? true : false;
 
       if (data.fromUser) {
-        data.displayName = data.fromUser.displayName;
+        data.displayName = data.fromUser.displayName || data.fromUser.fallbackDisplayName;
         if (isMobile && data.displayName.length > 13) {
           data.displayName = data.fromUser.displayName.split(" ").shift();
         }
