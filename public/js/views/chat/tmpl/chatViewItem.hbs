@@ -8,7 +8,7 @@
     <div class="trpChatBox">
       <div class="trpChatDetails">
         {{#if fromUser}}
-        <div class="trpChatFrom">{{{displayName}}}</div>
+        <div class="trpChatFrom">{{displayName}}</div>
         {{/if}}
 
         <div class="trpChatTime"> {{#if fromUser}} &bull; {{/if}} {{widget "timeago" time=sent}} </div>
