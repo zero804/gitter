@@ -119,17 +119,6 @@ def signup(driver):
 
     return username
 
-def signupWithNewTroupe(driver):
-    driver.get(baseUrl("/signout"))
-    userJSON = getJSON('/testdata/newUser')
-    username = userJSON.get('username')
-    id = userJSON.get('_id')
-    getJSON('/testdata/newTroupeForUser?id='+id)
-    time.sleep(5)
-    existingUserlogin(driver, username+'@troupetest.local', 'password')
-
-    return username
-
 
 def screenshot(driver):
     e2edir = os.path.dirname(os.path.abspath(__file__))
