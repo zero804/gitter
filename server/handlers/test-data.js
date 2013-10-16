@@ -35,7 +35,7 @@ if(!nconf.get('test:exposeDataForTestingPurposes')) {
           email: name+'@troupetest.local',
         };
 
-        userService.newUser(options)
+        userService.findOrCreateUserForEmail(options)
           .then(signupService.confirmSignup)
           .then(function(user) {
               user.userId = user._id;
