@@ -23,6 +23,9 @@ module.exports = {
     create: function(req, res, next) {
       var invite = req.body;
 
+      // displayName is not required, but either email or userId is
+      if(!invite.email && !invite.userId) return next(400);
+
       return troupeService.createInvite(req.troupe, {
           fromUser: req.user,
           email: invite.email,

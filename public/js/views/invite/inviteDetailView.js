@@ -38,7 +38,7 @@ define([
       var email = this.model.get('email');
       var user = this.model.get('user');
 
-      var invite = email ? { email: email } : user;
+      var invite = email ? { email: email } : { userId: user.id };
 
       // check whether the invite is to a troupe or to the user.
       var endpoint = this.model.isForTroupe() ? '/troupes/' + context.getTroupeId() + '/invites' : '/api/v1/inviteconnections';
