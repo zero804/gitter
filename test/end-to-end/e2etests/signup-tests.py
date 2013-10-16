@@ -2,6 +2,7 @@ import utils
 import urllib2
 import unittest
 import uuid
+import time
 from nose.plugins.attrib import attr
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -92,18 +93,9 @@ class SignupTests(unittest.TestCase):
 
         # visit confirm link
         self.driver.get(utils.baseUrl('/confirm/'+confirmCode))
+        self.completeSignup()
 
-        # choose a username
-        username = 'testuser-' + str(uuid.uuid4())
-        inputUser = self.driver.find_element_by_css_selector('input[name=username]')
-        inputUser.send_keys(username)
-        self.driver.find_element_by_css_selector('#username-form [type=submit]').click()
-
-        self.driver.find_element_by_id('displayName').send_keys('Test Testerson')
-        self.driver.find_element_by_id('password').send_keys('password')
-        self.driver.find_element_by_css_selector('[data-action=save]').click()
-
-        self.assertUserhomeIsCurrentPage(username)
+        self.assertAnyTroupeIsCurrentPage()
 
     def testGoogleSignup(self):
         # Clean database
@@ -171,6 +163,26 @@ class SignupTests(unittest.TestCase):
             self.assertEqual(current_url, utils.baseUrl('/'+username)+'#')
         else:
             self.assertEqual(current_url, utils.baseUrl('/'+username))
+
+    def assertAnyTroupeIsCurrentPage(self):
+        # wait for page to load
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, 'chat-input-textarea')))
+
+    def completeSignup(self):
+        self.driver.find_element_by_css_selector('input[name=displayName]').send_keys('Tester Testerson')
+        self.driver.find_element_by_css_selector('input[name=username]').send_keys('testuser-' + str(uuid.uuid4()))
+        self.driver.find_element_by_css_selector('input[name=password]').send_keys('password')
+        self.driver.find_element_by_id('next-button').click()
+
+        self.driver.find_element_by_id('troupeName').send_keys('Project Zeus')
+        self.driver.find_element_by_id('next-button').click()
+
+        self.driver.find_element_by_id('custom-email').send_keys('testuser-' + str(uuid.uuid4()) + '@troupetest.local')
+        self.driver.find_element_by_id('custom-email-button').click()
+        time.sleep(1)
+        self.driver.find_element_by_id('next-button').click()
+
+        self.driver.find_element_by_tag_name('a').click()
 
 
 def generateUniqueEmailAddress():
