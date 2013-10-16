@@ -37,7 +37,9 @@ function createBaseFixture() {
       var self = this;
       Object.keys(this).forEach(function(key) {
         var o = self[key];
-        if(o.remove) o.remove();
+        if(o.removeQ) {
+          o.removeQ();
+        }
       });
     }
   };
