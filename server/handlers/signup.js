@@ -21,7 +21,7 @@ module.exports = {
         if(homeurl === '/x') {
           next();
         } else {
-          res.redirect(homeurl);
+          res.relativeRedirect(homeurl);
         }
       });
 
