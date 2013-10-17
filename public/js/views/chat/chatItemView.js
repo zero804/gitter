@@ -22,6 +22,12 @@ define([
 
   "use strict";
 
+  /** @const */
+  var OLD_TIMEOUT = 3600000 /*1 hour*/;
+
+  /** @const */
+  var EDIT_WINDOW = 240000;
+
   var ChatItemView = TroupeViews.Base.extend({
     unreadItemType: 'chat',
     template: chatItemTemplate,
@@ -34,7 +40,6 @@ define([
     },
 
     initialize: function(options) {
-      var self = this;
 
       this._oneToOne = context.inOneToOneTroupeContext();
 
@@ -42,23 +47,18 @@ define([
 
       this.decorators = options.decorators;
 
-      this.model.on('change', function() {
-        self.onChange();
-      });
+      this.listenTo(this.model, 'change', this.onChange);
 
+      var timeChange = this.timeChange.bind(this);
       if (this.isInEditablePeriod()) {
         // update once the message is not editable
-        var notEditableInMS = (this.model.get('sent').valueOf() + 240000) - Date.now();
-        setTimeout(function() {
-          self.onChange();
-        }, notEditableInMS + 50);
+        var notEditableInMS = this.model.get('sent').valueOf() + EDIT_WINDOW - Date.now();
+        setTimeout(timeChange, notEditableInMS + 50);
       }
 
       if (!this.isOld()) {
-        var oldInMS = (this.model.get('sent').valueOf() + 3600000 /*1 hour*/) - Date.now();
-        setTimeout(function() {
-          self.onChange();
-        }, oldInMS + 50);
+        var oldInMS = this.model.get('sent').valueOf() + OLD_TIMEOUT - Date.now();
+        setTimeout(timeChange, oldInMS + 50);
       }
     },
 
@@ -111,14 +111,32 @@ define([
     afterRender: function() {
       this.renderText();
       this.updateRender();
+      this.timeChange();
+
+      if (!this.compactView) {
+        var editIcon = this.$el.find('.trpChatEdit [title]');
+        editIcon.tooltip({ container: 'body', title: this.getEditTooltip.bind(this) });
+      }
+
+    },
+
+    timeChange: function() {
+      this.$el.toggleClass('isEditable', this.isInEditablePeriod());
+      this.$el.toggleClass('canEdit', this.canEdit());
+      this.$el.toggleClass('cantEdit', !this.canEdit());
+      this.$el.toggleClass('isOld', this.isOld());
     },
 
     updateRender: function(changes) {
-      this.setState();
+      if(!changes || 'fromUser' in changes) {
+        this.$el.toggleClass('isViewers', this.isOwnMessage());
+      }
 
-      var editIconTooltip = (this.hasBeenEdited()) ? "Edited shortly after being sent": ((this.canEdit()) ? "Edit within 4 minutes of sending" : ((this.isOwnMessage()) ? "It's too late to edit this message." : "You can't edit someone else's message"));
-      var editIcon = this.$el.find('.trpChatEdit [title]');
+      if(!changes || 'editedAt' in changes) {
+        this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
+      }
 
+      /* Don't run on the initial (changed=undefined) as its done in the template */
       if(changes && 'readBy' in changes) {
         var readByCount = this.model.get('readBy');
         var readByLabel = this.$el.find('.trpChatReadBy');
@@ -132,21 +150,22 @@ define([
           this.$el.find('.trpChatReadBy').text();
         }
       }
-
-      if (!this.compactView) {
-        editIcon.tooltip('destroy');
-        editIcon.attr('title', editIconTooltip);
-        editIcon.tooltip({ container: 'body' });
-      }
     },
 
-    setState: function() {
-      this.$el.toggleClass('isViewers', this.isOwnMessage());
-      this.$el.toggleClass('isEditable', this.isInEditablePeriod());
-      this.$el.toggleClass('canEdit', this.canEdit());
-      this.$el.toggleClass('cantEdit', !this.canEdit());
-      this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
-      this.$el.toggleClass('isOld', this.isOld());
+    getEditTooltip: function() {
+      if(this.hasBeenEdited()) {
+        return "Edited shortly after being sent";
+      }
+
+      if(this.canEdit()) {
+        return "Edit within 4 minutes of sending";
+      }
+
+      if(this.isOwnMessage()) {
+        return "It's too late to edit this message.";
+      }
+
+      return  "You can't edit someone else's message";
     },
 
     highlightMention: function() {
@@ -201,13 +220,13 @@ define([
     },
 
     isInEditablePeriod: function() {
-      var age = (Date.now() - this.model.get('sent').valueOf()) / 1000;
-      return age <= 240;
+      var age = Date.now() - this.model.get('sent').valueOf();
+      return age <= EDIT_WINDOW;
     },
 
     isOld: function() {
-      var age = (Date.now() - this.model.get('sent').valueOf()) / 1000;
-      return age >= 3600;
+      var age = Date.now() - this.model.get('sent').valueOf();
+      return age >= OLD_TIMEOUT;
     },
 
     canEdit: function() {

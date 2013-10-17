@@ -83,13 +83,31 @@
 .trpChatReadBy {
   color: #aaa;
   margin-left: 10px;
+  opacity: 0;
   .trpBodyMedium();
+
+  -webkit-transition: opacity 0.15s ease;
+  -moz-transition: opacity 0.15s ease;
+  -o-transition: opacity 0.15s ease;
+  transition: opacity 0.15s ease;
+
   &:hover {
     color: black;
     text-decoration: none;
   }
 
+  .isViewers & {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .trpChatBox:hover & {
+    opacity: 1;
+  }
+
 }
+
+
 
 .trpChatAvatar {
   float: left;
