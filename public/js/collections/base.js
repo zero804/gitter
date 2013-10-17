@@ -165,7 +165,6 @@ define([
       });
 
       realtime.registerForSnapsnots(this.url, function(snapshot) {
-        log('shapshot received');
         self.trigger('request');
         self.set(snapshot, { parse: true, remove: true, add: true, merge: true });
         self._onInitialLoad();
