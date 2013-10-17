@@ -9,25 +9,24 @@ import time
 import os
 import unittest
 
+@attr('thread_safe')
 class ChatTests(unittest.TestCase):
+    _multiprocess_can_split_ = True
 
     def setUp(self):
         self.driver = utils.driver()
         utils.printJobInfo(self.driver)
-        utils.resetData(self.driver)
-        utils.existingUserlogin(self.driver, 'testuser@troupetest.local', '123456')
-        self.driver.get(utils.baseUrl('/testtroupe1'))
+        utils.signupWithNewTroupe(self.driver)
 
     def tearDown(self):
         self.driver.quit()
 
     def sendAChatMessage(self, message='The date and time are now ' + time.strftime("%Y-%m-%d-%H-%M-%S", time.gmtime())):
-        textArea = self.driver.find_element_by_id('chat-input-textarea')
+        textArea = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, 'chat-input-textarea')))
         textArea.send_keys(message)
         textArea.send_keys(Keys.RETURN)
 
-        time.sleep(0.5)
-
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.trpChatItem')))
         links = [i.text for i in self.driver.find_elements_by_css_selector('.trpChatItem .trpChatText')]
         text = links[len(links) - 1]
 
@@ -92,9 +91,8 @@ class ChatTests(unittest.TestCase):
             lastChat = self.driver.find_element_by_css_selector('.trpChatItem')
 
             self.driver.find_element_by_css_selector('.trpChatBox').click();
-            WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.trpChatEdit')))
-            self.driver.find_element_by_css_selector('.trpChatEdit').click();
-            WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.trpChatInput')))
+            WebDriverWait(lastChat, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.trpChatEdit'))).click();
+            WebDriverWait(lastChat, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.trpChatInput')))
 
             editInput = lastChat.find_element_by_css_selector('.trpChatInput')
 
@@ -107,10 +105,11 @@ class ChatTests(unittest.TestCase):
             assert chatElText.text.find("...an alteration") != -1
 
     def getLastMessage(self):
-        return self.getLastElement('.trpChatItem').find_element_by_css_selector('.trpChatText')
+        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.trpChatItem')))
+        return self.driver.find_elements_by_css_selector('.trpChatItem')[-1].find_element_by_css_selector('.trpChatText')
 
     def getLastMessageHtml(self):
-        return self.getLastElement('.trpChatItem').find_element_by_css_selector('.trpChatText').get_attribute('innerHTML')
+        return self.getLastMessage().get_attribute('innerHTML')
 
     def getLastElement(self, selector, driver=0):
         if not driver:
