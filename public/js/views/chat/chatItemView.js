@@ -121,7 +121,7 @@ define([
 
       if(changes && 'readBy' in changes) {
         var readByCount = this.model.get('readBy');
-        var readByLabel = this.$el.find('.readby');
+        var readByLabel = this.$el.find('.trpChatReadBy');
         if(readByCount) {
           readByLabel.text(this.getReadByText(readByCount));
           if(!readByLabel.is(':visible')) {
@@ -129,7 +129,7 @@ define([
           }
         } else {
           readByLabel.hide();
-          this.$el.find('.readby').text();
+          this.$el.find('.trpChatReadBy').text();
         }
       }
 
