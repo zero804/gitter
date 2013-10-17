@@ -347,7 +347,7 @@ define([
       var self = this;
 
       var url = '/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/unreadItems';
-      var s = realtime.subscribe(url, function(message) {
+      realtime.subscribe(url, function(message) {
         if(message.notification === 'unread_items') {
           store._unreadItemsAdded(message.items);
         } else if(message.notification === 'unread_items_removed') {
@@ -360,11 +360,8 @@ define([
         }
       });
 
-      s.callback(function() {
-        var snapshot = realtime.getSnapshotFor(url);
-        if(snapshot) {
+      realtime.registerForSnapsnots(url, function(snapshot) {
           store.preload(snapshot);
-        }
       });
     }
   });
@@ -685,7 +682,6 @@ define([
 
       /* Store can be optional below */
       new TroupeUnreadNotifier(troupeCollection, unreadItemStore);
-
     },
 
     syncCollections: function(collections) {
@@ -708,7 +704,7 @@ define([
   };
 
   // Mainly useful for testing
-  //unreadItemsClient._store = unreadItemStore;
+  unreadItemsClient.getStore = function() { return _unreadItemStore; };
   unreadItemsClient.DoubleHash = DoubleHash;
   unreadItemsClient.Tarpit = Tarpit;
   unreadItemsClient.UnreadItemStore = UnreadItemStore;
