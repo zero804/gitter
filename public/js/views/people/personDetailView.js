@@ -36,8 +36,8 @@ define([
         title: "Are you sure?",
         body: "This will remove " + this.model.get('displayName') + " from the Troupe?",
         menuItems: [
-          { action: "yes", text: "Yes", class: "trpBtnRed" },
-          { action: "no", text: "No", class: "trpBtnLightGrey"}
+          { action: "yes", text: "Yes", className: "trpBtnRed" },
+          { action: "no", text: "No", className: "trpBtnLightGrey"}
         ]
       });
 
