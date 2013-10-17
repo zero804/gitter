@@ -1,5 +1,6 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'log!chat-input',
   'jquery',
   'utils/context',
   'views/base',
@@ -10,7 +11,7 @@ define([
   'utils/scrollbar-detect',
   'jquery-placeholder', // No ref
   'jquery-sisyphus' // No ref
-], function($, context, TroupeViews, appEvents, template, moment, safeHtml, hasScrollBars) {
+], function(log, $, context, TroupeViews, appEvents, template, moment, safeHtml, hasScrollBars) {
   "use strict";
 
   /** @const */
@@ -88,12 +89,12 @@ define([
       $el.css({ height: '', 'overflow-y': '' });
 
       var css = {};
-      css[compact ? 'padding-bottom' : 'margin-bottom'] = '';
+      // css[compact ? 'padding-bottom' : 'margin-bottom'] = '';
+      css[compact ? 'padding-bottom' : 'bottom'] = '';
       frameChat.css(css);
+      log('Applying ', css, ' to ', frameChat);
 
-      if(rollers) {
-        rollers.adjustScroll();
-      }
+      adjustScroll();
     };
 
     this.resizeInput = function() {
@@ -111,28 +112,31 @@ define([
         var css = {};
 
         if(compact) {
-          frameChat.css({ 'padding-bottom': (height + EXTRA_PADDING) + 'px'});
+          css['padding-bottom'] = (height + EXTRA_PADDING) + 'px';
         } else {
-          frameChat.css({ 'margin-bottom': height + 'px'});
-
+          // css['margin-bottom'] = height + 'px';
+          css['bottom'] = (height + 30) + 'px';
         }
+
+        log('Applying ', css, ' to ', frameChat);
         frameChat.css(css);
       }
 
-      if(rollers) {
-        rollers.adjustScroll();
-        window.setTimeout(function() {
-          rollers.adjustScroll();
-        }, 100);
-      }
-
+      adjustScroll();
     };
+
+    function adjustScroll() {
+      if(!rollers) return;
+      rollers.adjustScrollContinuously(300);
+    }
+
 
   };
 
   var ChatInputBoxView = TroupeViews.Base.extend({
     events: {
       "keydown":  "onKeyDown",
+      "keyup":    "onKeyUp",
       "focusout": "onFocusOut"
     },
 
@@ -165,6 +169,10 @@ define([
       if (this.compactView) this.send();
     },
 
+    onKeyUp: function() {
+      this.chatResizer.resizeInput();
+    },
+
     onKeyDown: function(e) {
       if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/))) {
         e.stopPropagation();
@@ -173,7 +181,6 @@ define([
         this.send();
         return;
       }
-      this.chatResizer.resizeInput();
     },
 
     send: function() {
