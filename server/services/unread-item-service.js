@@ -3,23 +3,25 @@
 
 var troupeService = require("./troupe-service");
 var readByService = require("./readby-service");
-var appEvents = require("../app-events");
-var _ = require("underscore");
-var redis = require("../utils/redis");
-var winston = require("winston");
-var redisClient = redis.createClient();
-var mongoUtils = require('../utils/mongo-utils');
-var Fiber = require('../utils/fiber');
-var RedisBatcher = require('../utils/redis-batcher').RedisBatcher;
-var badgeBatcher = new RedisBatcher('badge', 300);
-var Scripto = require('redis-scripto');
+var appEvents     = require("../app-events");
+var _             = require("underscore");
+var redis         = require("../utils/redis");
+var winston       = require("winston");
+var mongoUtils    = require('../utils/mongo-utils');
+var Fiber         = require('../utils/fiber');
+var RedisBatcher  = require('../utils/redis-batcher').RedisBatcher;
+var Scripto       = require('redis-scripto');
+var Q             = require('q');
+var assert        = require('assert');
+
+var redisClient   = redis.createClient();
+var badgeBatcher  = new RedisBatcher('badge', 300);
 var scriptManager = new Scripto(redisClient);
-var Q = require('q');
-var assert = require('assert');
+
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/unread');
 
 
-var DEFAULT_ITEM_TYPES = ['file', 'chat', 'request'];
+var DEFAULT_ITEM_TYPES = ['chat', 'request'];
 
 function sinceFilter(since) {
   return function(id) {

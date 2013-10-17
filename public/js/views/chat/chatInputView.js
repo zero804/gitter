@@ -18,7 +18,7 @@ define([
   var MAX_CHAT_HEIGHT = 145;
 
   /** @const */
-  var EXTRA_PADDING = 10;
+  var EXTRA_PADDING = 20;
 
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
@@ -42,6 +42,7 @@ define([
       this.$el.find('form').sisyphus({
         locationBased: true,
         timeout: 2,
+        customKeySuffix: 'chat-' + context.getTroupeId(),
         name: 'chat-' + context.getTroupeId(),
         onRestore: function() {
           inputBox.trigger('change');
