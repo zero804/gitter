@@ -59,8 +59,8 @@ define([
         title: "Delete this Troupe?",
         body: "Are you sure you want to delete this troupe? This action cannot be undone.",
         menuItems: [
-          { action: "yes", text: "Yes", class: "trpBtnRed" },
-          { action: "no", text: "No", class: "trpBtnLightGrey"}
+          { action: "yes", text: "Yes", className: "trpBtnRed" },
+          { action: "no", text: "No", className: "trpBtnLightGrey"}
         ]
       });
 
@@ -100,8 +100,8 @@ define([
        title: "Leave?",
        body: "Are you sure you want to remove yourself from this troupe?",
        menuItems: [
-         { action: "yes", text: "Yes", class: "trpBtnRed" },
-         { action: "no", text: "No", class: "trpBtnLightGrey"}
+         { action: "yes", text: "Yes", className: "trpBtnRed" },
+         { action: "no", text: "No", className: "trpBtnLightGrey"}
        ]
       });
 

@@ -59,8 +59,8 @@ define([
         title: "Delete Invite?",
         body: deleteConfirmationTemplate(this.model.toJSON()),
         menuItems: [
-          { action: "yes", text: "Delete", class: "trpBtnRed" },
-          { action: "no", text: "Cancel", class: "trpBtnLightGrey"}
+          { action: "yes", text: "Delete", className: "trpBtnRed" },
+          { action: "no", text: "Cancel", className: "trpBtnLightGrey"}
         ]
       });
 
