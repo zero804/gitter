@@ -79,9 +79,9 @@ define([
 
     getReadByText: function(readByCount) {
       if(!readByCount) return '';
-
+      if(this._oneToOne) return ' ';
       if(readByCount > 10) readByCount = 10;
-      return String.fromCharCode(0x2789 + readByCount);
+      return readByCount;
     },
 
     onChange: function() {
