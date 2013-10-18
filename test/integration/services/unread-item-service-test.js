@@ -231,6 +231,39 @@ describe('emailnotifications', function() {
       .nodeify(done);
   });
 
+  it('should not find someone who has been notified', function(done) {
+    var troupeId = mongoUtils.getNewObjectIdString();
+    var userId = mongoUtils.getNewObjectIdString();
+    var itemType = 'chat';
+    var itemId1 = mongoUtils.getNewObjectIdString();
+    var itemId2 = mongoUtils.getNewObjectIdString();
+    var itemId3 = mongoUtils.getNewObjectIdString();
+
+    var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
+
+    var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+      './troupe-service': troupeServiceMock
+    });
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId]));
+
+    return Q.all([
+        unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),
+        unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId2),
+        unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId3)
+      ])
+      .then(function() {
+        return unreadItemService.markUserAsEmailNotified(userId);
+      })
+      .then(function() {
+        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now());
+      })
+      .then(function(results) {
+        assert(!results[userId]);
+      })
+      .nodeify(done);
+  });
+
   it('should not notify someone who has read their messages', function(done) {
     var troupeId = mongoUtils.getNewObjectIdString();
     var userId = mongoUtils.getNewObjectIdString();
