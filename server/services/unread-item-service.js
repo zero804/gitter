@@ -251,7 +251,7 @@ exports.listTroupeUsersForEmailNotifications = function(sinceTime) {
             return getUnreadItemsForUserTroupeSince(userId, troupeId, time)
               .then(function(items) {
 
-                if(items && items.chat) {
+                if(items && items.chat && items.chat.length) {
                   var v = result[userId];
                   if(!v) {
                     v = { };
