@@ -271,6 +271,27 @@ exports.listTroupeUsersForEmailNotifications = function(sinceTime) {
     });
 };
 
+exports.markUserAsEmailNotified = function(userId) {
+  // NB: this function is not atomic, but it doesn't need to be
+  return Q.ninvoke(redisClient, "hgetall", EMAIL_NOTIFICATION_HASH_KEY)
+    .then(function(troupeUserHash) {
+      return Object.keys(troupeUserHash)
+        .filter(function(hashKey) {
+          var troupeUserId = hashKey.split(':');
+          var hashUserId = troupeUserId[1];
+          return hashUserId == userId;
+        });
+    })
+    .then(function(userTroupeKeys) {
+      var args =[EMAIL_NOTIFICATION_HASH_KEY];
+      args.push.apply(args, userTroupeKeys);
+
+      console.log('KEYS are', args);
+      return Q.npost(redisClient, "hdel", args);
+
+    });
+};
+
 /**
  * Mark many items as read, for a single user and troupe
  */
