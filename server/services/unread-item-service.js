@@ -8,11 +8,11 @@ var _             = require("underscore");
 var redis         = require("../utils/redis");
 var winston       = require("winston");
 var mongoUtils    = require('../utils/mongo-utils');
-var Fiber         = require('../utils/fiber');
 var RedisBatcher  = require('../utils/redis-batcher').RedisBatcher;
 var Scripto       = require('redis-scripto');
 var Q             = require('q');
 var assert        = require('assert');
+
 
 var redisClient   = redis.createClient();
 var badgeBatcher  = new RedisBatcher('badge', 300);
@@ -20,6 +20,7 @@ var scriptManager = new Scripto(redisClient);
 
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/unread');
 
+var EMAIL_NOTIFICATION_HASH_KEY = "unread:email_notify";
 
 var DEFAULT_ITEM_TYPES = ['chat', 'request'];
 
@@ -131,6 +132,13 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
             var userId = userIds[update];
             republishBadgeForUser(userId);
           });
+
+          /**
+           * Put these users on a list of people who may need a reminder email
+           * at a later stage
+           */
+          var timestamp = mongoUtils.getTimestampFromObjectId(itemId);
+          markUsersForEmailNotification(troupeId, userIds, timestamp);
         });
 
     });
@@ -171,7 +179,7 @@ function removeItem(troupeId, itemType, itemId) {
         });
 
   });
-};
+}
 
 /**
  * Mark an item in a troupe as having been read by a user
@@ -186,12 +194,24 @@ function markItemsOfTypeRead(userId, troupeId, itemType, ids) {
 
   var keys = [
       "ub:" + userId,
-      "unread:" + itemType + ":" + userId + ":" + troupeId
+      "unread:" + itemType + ":" + userId + ":" + troupeId,
+      EMAIL_NOTIFICATION_HASH_KEY
     ];
 
-  var values = [troupeId].concat(ids);
+  var values = [troupeId, userId].concat(ids);
 
   return runScript('unread-mark-items-read', keys, values);
+}
+
+function markUsersForEmailNotification(troupeId, userIds, dateNow) {
+  var values = [dateNow];
+  values.push.apply(values, userIds.map(function(f) { return troupeId + ':' + f; }));
+
+  return runScript('unread-mark-users-for-email', [EMAIL_NOTIFICATION_HASH_KEY], values)
+  .fail(function(err) {
+    winston.error('unread-mark-users-for-email failed:' + err, { exception: err });
+  });
+
 }
 
 /**
@@ -207,6 +227,70 @@ function setLastReadTimeForUser(userId, troupeId, lastReadTimestamp) {
     "lrtt:" + userId + ":" + troupeId, lastReadTimestamp);
 }
 
+/**
+ * Returns a hash of hash {user:troupe:ids} of users who have
+ * outstanding notifications since before the specified time
+ * @return a promise of hash
+ */
+exports.listTroupeUsersForEmailNotifications = function(sinceTime) {
+  return Q.ninvoke(redisClient, "hgetall", EMAIL_NOTIFICATION_HASH_KEY)
+    .then(function(troupeUserHash) {
+      var result = {};
+
+      var promises = Object.keys(troupeUserHash)
+        .map(function(key) {
+          var troupeUserId = key.split(':');
+          var time = parseInt(troupeUserHash[key], 10);
+
+          var troupeId = troupeUserId[0];
+          var userId = troupeUserId[1];
+
+          /* Its got to be older that the start time */
+          if(time <= sinceTime) {
+
+            return getUnreadItemsForUserTroupeSince(userId, troupeId, time)
+              .then(function(items) {
+
+                if(items && items.chat && items.chat.length) {
+                  var v = result[userId];
+                  if(!v) {
+                    v = { };
+                    result[userId] = v;
+                  }
+
+                  v[troupeId] = items && items.chat;
+                }
+              });
+          }
+        });
+
+      return Q.all(promises)
+        .then(function() {
+          return result;
+        });
+    });
+};
+
+exports.markUserAsEmailNotified = function(userId) {
+  // NB: this function is not atomic, but it doesn't need to be
+  return Q.ninvoke(redisClient, "hgetall", EMAIL_NOTIFICATION_HASH_KEY)
+    .then(function(troupeUserHash) {
+      return Object.keys(troupeUserHash)
+        .filter(function(hashKey) {
+          var troupeUserId = hashKey.split(':');
+          var hashUserId = troupeUserId[1];
+          return hashUserId == userId;
+        });
+    })
+    .then(function(userTroupeKeys) {
+      var args =[EMAIL_NOTIFICATION_HASH_KEY];
+      args.push.apply(args, userTroupeKeys);
+
+      console.log('KEYS are', args);
+      return Q.npost(redisClient, "hdel", args);
+
+    });
+};
 
 /**
  * Mark many items as read, for a single user and troupe
@@ -313,28 +397,22 @@ exports.getUnreadItems = function(userId, troupeId, itemType, callback) {
     .nodeify(callback);
 };
 
-exports.getUnreadItemsForUserTroupeSince = function(userId, troupeId, since, callback) {
-  var f = new Fiber();
-  exports.getUnreadItems(userId, troupeId, 'chat', f.waitor());
-  exports.getUnreadItems(userId, troupeId, 'file', f.waitor());
-  f.all().then(function(results) {
-    var chatItems = results[0];
-    var fileItems = results[1];
+function getUnreadItemsForUserTroupeSince(userId, troupeId, since, callback) {
+  return exports.getUnreadItems(userId, troupeId, 'chat')
+    .then(function(chatItems) {
+      chatItems = chatItems.filter(sinceFilter(since));
 
-    chatItems = chatItems.filter(sinceFilter(since));
-    fileItems = fileItems.filter(sinceFilter(since));
+      var response = {};
+      if(chatItems.length) {
+        response.chat = chatItems;
+      }
 
-    var response = {};
-    if(chatItems.length) {
-      response.chat = chatItems;
-    }
-    if(fileItems.length) {
-      response.file = fileItems;
-    }
+      return response;
+    })
+    .nodeify(callback);
+}
 
-    callback(null,response);
-  }, callback);
-};
+exports.getUnreadItemsForUserTroupeSince = getUnreadItemsForUserTroupeSince;
 
 exports.getFirstUnreadItem = function(userId, troupeId, itemType, callback) {
     exports.getUnreadItems(userId, troupeId, itemType, function(err, members) {

@@ -1,12 +1,21 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var fs = require("fs");
-var handlebars = require('handlebars');
+var fs          = require('fs');
+var handlebars  = require('handlebars');
+var i18n        = require('./i18n');
 
 // TODO: add caching!
 handlebars.registerHelper('cdn', require('../web/hbs-helpers').cdn);
 
+// register hbs helpers in res.locals' context which provides this.locale
+handlebars.registerHelper('__', function () {
+  return i18n.__.apply(this, arguments);
+});
+
+handlebars.registerHelper('__n', function () {
+  return i18n.__n.apply(this, arguments);
+});
 
 module.exports = {
   compile : function(sourceFile, callback) {
