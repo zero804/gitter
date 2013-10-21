@@ -566,7 +566,7 @@ define([
             self._store._markItemRead(itemType, itemId);
 
             $e.removeClass('unread').addClass('reading');
-            this._markRead($e, timeout);
+            this._addToMarkReadQueue($e);
             timeout = timeout + 150;
           }
         }
@@ -575,10 +575,24 @@ define([
 
     },
 
-    _markRead: function($e, timeout) {
-      setTimeout(function() {
-        $e.removeClass('reading').addClass('read');
-      }, timeout);
+    _scheduleMarkRead: function() {
+      if(this._markQueue.length !== 0 && !this._timer) {
+        var timeout = 300 / this._markQueue.length;
+        this._timer = setTimeout(this._markRead.bind(this), timeout);
+      }
+    },
+
+    _addToMarkReadQueue: function($e) {
+      if(!this._markQueue) this._markQueue = [];
+      this._markQueue.push($e);
+      this._scheduleMarkRead();
+    },
+
+    _markRead: function() {
+      this._timer = null;
+      var $e = this._markQueue.shift();
+      if($e) $e.removeClass('reading').addClass('read');
+      this._scheduleMarkRead();
     },
 
     _eyeballStateChange: function(newState) {
