@@ -282,6 +282,8 @@ define([
     },
 
     showReadBy: function(event) {
+      if (this.compactView) return;
+
       if(this.readBy) return;
       event.preventDefault();
 
