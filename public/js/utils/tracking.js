@@ -43,9 +43,14 @@ define([
     var GoSquared = window.GoSquared = {};
     GoSquared.acct = goSquaredTrackingId;
 
-    if (user.id)
+    if (user.username)
     {
-      GoSquared.UserName = user.id;
+      GoSquared.UserName = user.username;
+      GoSquared.Visitor = {
+        id: user.id,
+        displayName: user.displayName,
+        email: user.email
+      };
     }
 
     (function(w){
