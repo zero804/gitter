@@ -2,8 +2,9 @@
 define([
   'jquery',
   'views/profile/profileView',
-  'views/signup/usernameView'
-], function($, profile, UsernameView) {
+  'views/signup/usernameView',
+  'views/base'
+], function($, profile, UsernameView, TroupeViews) {
   "use strict";
 
   function showPasswordError() {
@@ -61,21 +62,34 @@ define([
         hidePasswordError();
       }
     };
-    profileView.onFormSubmitFailure = function(data) {
-      if(data.errors && data.errors.displayName) {
-        showNameError();
-      } else {
-        hideNameError();
-      }
-      if(data.errors && data.errors.username) {
+    profileView.onFormSubmitFailure = function(err) {
+      hideNameError();
+      hideUsernameError();
+      hidePasswordError();
+
+      if(err.status === 400) {
+        var errors = err.responseJSON.errors;
+        if(errors.displayName) {
+          showNameError();
+        }
+        if(errors.username) {
+          showUsernameError();
+        }
+        if(errors.password) {
+          showPasswordError();
+        }
+      } else if(err.status === 409 && err.responseJSON.usernameConflict) {
         showUsernameError();
       } else {
-        hideUsernameError();
-      }
-      if(data.errors && data.errors.password) {
-        showPasswordError();
-      } else {
-        hidePasswordError();
+        var modal = new TroupeViews.ConfirmationModal({
+          title: "Submit Failed",
+          body: err.responseText,
+          menuItems: [{ text: "OK" }]
+        });
+        modal.on('menuItemClicked', function() {
+          modal.hide();
+        });
+        modal.show();
       }
     };
 

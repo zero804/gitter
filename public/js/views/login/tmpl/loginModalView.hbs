@@ -36,6 +36,12 @@
       <span class="trpModalFailureText">Your account has not yet been activated. Please follow the link from your activation email.</span><br>
       <a href="#" class="trpModalFailureText button-resend-confirmation">Resend confirmation email</a>
     </div>
+    {{#if cookiesDisabled}}
+    <div class="trpModalFailure">
+      <span class="trpModalTitle"><span class="trpWhite">Cookies Disabled</span></span>
+      <span class="trpModalFailureText">Your browser appears to have disabled cookies. Troupe and many other websites require cookies in order to work. Please enable cookies for this site before continuing.</span><br>
+    </div>
+    {{/if}}
   </div>
 <div class="resetpwd-content" style="display:none">
   <div class="trpModalTitle">Reset Password</div>

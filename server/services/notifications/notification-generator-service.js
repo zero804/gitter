@@ -1,16 +1,15 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var appEvents = require("../../app-events");
-
-var winston = require("winston");
-var pushNotificationService = require("../push-notification-service");
-var _ = require("underscore");
-var presenceService = require("./../presence-service");
-var NotificationCollector = require('../../utils/notification-collector');
+var appEvents                          = require("../../app-events");
+var winston                            = require("winston");
+var pushNotificationService            = require("../push-notification-service");
+var _                                  = require("underscore");
+var presenceService                    = require("./../presence-service");
+var NotificationCollector              = require('../../utils/notification-collector');
 var onlineNotificationGeneratorService = require('./online-notification-generator-service');
-var pushNotificationGeneratorService = require('./push-notification-generator-service');
-var mongoUtils = require('../../utils/mongo-utils');
+var pushNotificationGeneratorService   = require('./push-notification-generator-service');
+var mongoUtils                         = require('../../utils/mongo-utils');
 
 function getStartTimeForItems(items) {
   if(!items.length) return null;
