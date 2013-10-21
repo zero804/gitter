@@ -3,7 +3,6 @@ define([], function() {
   "use strict";
   return function() {
     var stringToTest = navigator.platform;
-    console.log(stringToTest);
     if (stringToTest.indexOf('Mac') >-1) return 'Mac';
     if (stringToTest.indexOf('Win') >-1) return 'Windows';
 
