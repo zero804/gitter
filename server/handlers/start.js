@@ -63,5 +63,11 @@ module.exports = {
             title: 'Finished'
           }));
 
+      app.get('/start/apps',
+        middleware.ensureLoggedIn(),
+        startPage('start/apps', {
+            title: 'Finished'
+          }));
+
     }
 };
