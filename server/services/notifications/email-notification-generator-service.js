@@ -12,6 +12,17 @@ var collections              = require('../../utils/collections');
 var nconf                    = require('../../utils/config');
 var emailNotificationService = require('../email-notification-service');
 
+function removeTestIds(ids) {
+
+  // Remove any test user ids that start with USER
+  return ids.filter(function(id) {
+    if(typeof id === 'string') {
+      return id.indexOf('USER') !== 0 && id.indexOf('TROUPE') !== 0;
+    }
+    return true;
+  });
+}
+
 function sendEmailNotifications(since) {
     if(!since) {
       since = moment().subtract('h', nconf.get("notifications:emailDelayHours")).valueOf();
@@ -28,10 +39,11 @@ function sendEmailNotifications(since) {
         /**
          * Step 1: load the required data
          */
-        var userIds = Object.keys(userTroupeUnreadHash);
-        var troupeIds = _.flatten(Object.keys(userTroupeUnreadHash).map(function(userId) {
+        var userIds = removeTestIds(Object.keys(userTroupeUnreadHash));
+
+        var troupeIds = removeTestIds(_.flatten(Object.keys(userTroupeUnreadHash).map(function(userId) {
           return Object.keys(userTroupeUnreadHash[userId]);
-        }));
+        })));
 
         return Q.all([
             userIds,
