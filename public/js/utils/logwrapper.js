@@ -12,14 +12,10 @@ define([], function() {
         p[key] = function() {
           log('>>> ' + key);
 
-          console.groupCollapsed();
-          console.trace();
-
           var result = original.apply(this, arguments);
           if(result !== undefined) {
             log('<<< ' + key + ' < ', result);
           }
-          console.groupEnd();
 
           return result;
         };
