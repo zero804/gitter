@@ -294,7 +294,7 @@ define([
     },
 
     onKeyPress: function(e) {
-      //  return if user is not copying or pasting
+      //  return if user is copying or pasting
       if ( e.metaKey || e.ctrlKey ) return true;
 
       // return if a form input has focus
