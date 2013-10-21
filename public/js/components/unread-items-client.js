@@ -185,12 +185,10 @@ define([
       var newValue = this._count();
 
       if(this._currentCountValue !== newValue) {
-        log('Emitting new count oldValue=', this._currentCountValue, ', newValue=', newValue);
+        // log('Emitting new count oldValue=', this._currentCountValue, ', newValue=', newValue);
 
         this._currentCountValue = newValue;
         this.trigger('newcountvalue', newValue);
-      } else {
-        log('Ignoring count update: oldValue=', this._currentCountValue, ', newValue=', newValue);
       }
     },
 
@@ -301,14 +299,14 @@ define([
 
   TroupeCollectionSync.prototype = {
     _onNewCountValue: function(newValue) {
-      log('Syncing store to collection ', newValue);
+      // log('Syncing store to collection ', newValue);
 
-      log('TroupeCollectionSync: setting value of ' + context.getTroupeId() + ' to ' + newValue);
+      // log('TroupeCollectionSync: setting value of ' + context.getTroupeId() + ' to ' + newValue);
 
       var troupe = this._collection.get(context.getTroupeId());
       if(troupe) {
         troupe.set('unreadItems', newValue);
-        log('Completed successfully');
+        // log('Completed successfully');
         return;
       }
 
@@ -347,7 +345,7 @@ define([
       var self = this;
 
       var url = '/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/unreadItems';
-      var s = realtime.subscribe(url, function(message) {
+      realtime.subscribe(url, function(message) {
         if(message.notification === 'unread_items') {
           store._unreadItemsAdded(message.items);
         } else if(message.notification === 'unread_items_removed') {
@@ -360,11 +358,8 @@ define([
         }
       });
 
-      s.callback(function() {
-        var snapshot = realtime.getSnapshotFor(url);
-        if(snapshot) {
+      realtime.registerForSnapsnots(url, function(snapshot) {
           store.preload(snapshot);
-        }
       });
     }
   });
@@ -548,10 +543,7 @@ define([
       var topBound = this._scrollTop;
       var bottomBound = this._scrollBottom;
 
-      log('Looking for items to mark as read between ' + topBound + ' and ' + bottomBound);
-
-      // this._scrollTop = 1000000000;
-      // this._scrollBottom = 0;
+      // log('Looking for items to mark as read between ' + topBound + ' and ' + bottomBound);
 
       this._scrollTop = this._scrollElement.scrollTop;
       this._scrollBottom = this._scrollTop + this._scrollElement.clientHeight;
@@ -685,7 +677,6 @@ define([
 
       /* Store can be optional below */
       new TroupeUnreadNotifier(troupeCollection, unreadItemStore);
-
     },
 
     syncCollections: function(collections) {
@@ -708,7 +699,7 @@ define([
   };
 
   // Mainly useful for testing
-  //unreadItemsClient._store = unreadItemStore;
+  unreadItemsClient.getStore = function() { return _unreadItemStore; };
   unreadItemsClient.DoubleHash = DoubleHash;
   unreadItemsClient.Tarpit = Tarpit;
   unreadItemsClient.UnreadItemStore = UnreadItemStore;

@@ -80,6 +80,42 @@
 }
 
 
+.trpChatReadBy {
+  display: inline-block;
+  text-align: right;
+  width: 24px;
+  height: 12px;
+  color: black;
+  margin-left: 2px;
+  opacity: 0;
+  background-image: url('../../images/2/icon-read.png');
+  background-repeat: no-repeat;
+  line-height:9px;
+  vertical-align: middle;
+  .trpBodyTiny;
+  .trpHand;
+  -webkit-transition: opacity 0.15s ease;
+  -moz-transition: opacity 0.15s ease;
+  -o-transition: opacity 0.15s ease;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  .trpChatBox:hover & {
+    opacity: 0.4;
+  }
+
+  .isViewers & {
+    opacity: 0.2;
+    visibility: visible;
+  }
+
+}
+
+
+
 .trpChatAvatar {
   float: left;
 }
@@ -275,8 +311,10 @@
   padding: 0;
 }
 
+
 .trpChatTime, .trpChatReads {
 	display: inline-block;
+  color: #AAA;
 }
 
 // by default, don't show the edit icon
@@ -291,16 +329,6 @@
 
 // if the message has been edited always show the edit icon (not just on hover)
 .hasBeenEdited .trpChatEdit {
-  display: inline-block;
-}
-
-// by default, don't show the reads icon
-.trpChatReads {
-  display: none;
-}
-
-// show the reads icon if it has been read
-.hasBeenRead .trpChatReads {
   display: inline-block;
 }
 

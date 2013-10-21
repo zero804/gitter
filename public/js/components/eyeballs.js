@@ -99,7 +99,7 @@ define([
       }
 
       document.addEventListener("resume", function() {
-        log('resume: eyeballs set to ' + eyesOnState);
+        // log('resume: eyeballs set to ' + eyesOnState);
 
         updateLastUserInteraction();
         window.setTimeout(function() {
@@ -110,7 +110,7 @@ define([
       // Cordova specific events
       document.addEventListener("pause", function() {
         eyesOnState = false;
-        log('pause');
+        // log('pause');
 
       }, false);
 
@@ -123,14 +123,14 @@ define([
     // Unfortunately it's not too good as Safari cuts the request off before it
     // goes back to the server
     $(window).on('pageshow', function() {
-      log('pageshow');
+      // log('pageshow');
       updateLastUserInteraction();
 
       eyeballsOn();
     });
 
     $(window).on('pagehide', function() {
-      log('pagehide');
+      // log('pagehide');
       eyeballsOff();
     });
 

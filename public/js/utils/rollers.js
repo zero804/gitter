@@ -35,11 +35,25 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
     observer.observe(target, { attributes: true, childList: true, characterData: true, subtree: true });
   }
 
+  function continuous(cb, ms) {
+    var until = Date.now() + ms;
+    var timer = setInterval(function() {
+      if(Date.now() >= until) {
+        clearInterval(timer);
+      }
+      cb();
+    }, 20);
+  }
+
   Rollers.prototype = {
     adjustScroll: function() {
       this._mutationHandlers[this._mode]();
       this._postMutateTop = this._target.scrollTop;
       return true;
+    },
+
+    adjustScrollContinuously: function(ms) {
+      continuous(this.adjustScroll.bind(this), ms);
     },
 
     /* Specify an element that should not be scrolled past */
@@ -105,10 +119,23 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
       this._postMutateTop = scrollTop;
     },
 
+
+    /*
+     * Scroll to the bottom and switch the mode to TRACK_BOTTOM
+     */
+    scrollToBottomContinuously: function(ms) {
+      continuous(this.scrollToBottom.bind(this), ms);
+    },
+
     updateTrackNoPass: function() {
       var target = this._target;
+      var targetScrollHeight = target.scrollHeight;
+      var targetClientHeight = target.clientHeight;
 
-      var scrollTop = target.scrollHeight - target.clientHeight;
+      // How far down are we?
+      var scrollTop = targetScrollHeight - targetClientHeight;
+
+      // Get the offset of the element that we should not pass
       var nopassOffset = this._nopass.offsetTop - target.offsetTop;
       if(scrollTop < nopassOffset) {
         target.scrollTop = scrollTop;

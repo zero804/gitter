@@ -1,8 +1,10 @@
 local user_badge_key = KEYS[1]
 local user_troupe_key = KEYS[2]
+local email_hash_key = KEYS[3]
 
 -- Values are lrt timestamp, troupeId followed by itemIds,
 local troupe_id = table.remove(ARGV, 1)
+local user_id = table.remove(ARGV, 1)
 local itemIds = ARGV
 
 local updated_badge_count = 0
@@ -20,5 +22,8 @@ for i, itemId in ipairs(itemIds) do
 		end
 	end
 end
+
+-- Remove this user from the list of people who may get an email
+redis.call("HDEL", email_hash_key, troupe_id..':'..user_id)
 
 return updated_badge_count

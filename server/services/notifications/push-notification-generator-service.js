@@ -1,11 +1,12 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var winston = require("winston");
-var pushNotificationService = require("../push-notification-service");
-var nconf = require('../../utils/config');
+var winston                   = require("winston");
+var pushNotificationService   = require("../push-notification-service");
+var nconf                     = require('../../utils/config');
 var notificationWindowPeriods = [nconf.get("notifications:notificationDelay") * 1000, nconf.get("notifications:notificationDelay2") * 1000];
-var workerQueue = require('../../utils/worker-queue');
+var workerQueue               = require('../../utils/worker-queue');
+
 var queue = workerQueue.queue('generate-push-notifications', {}, function() {
   var pushNotificationGateway = require("../../gateways/push-notification-gateway");
   var serializer = require("../../serializers/notification-serializer");

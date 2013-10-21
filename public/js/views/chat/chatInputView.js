@@ -1,5 +1,6 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'log!chat-input',
   'jquery',
   'utils/context',
   'views/base',
@@ -10,14 +11,14 @@ define([
   'utils/scrollbar-detect',
   'jquery-placeholder', // No ref
   'jquery-sisyphus' // No ref
-], function($, context, TroupeViews, appEvents, template, moment, safeHtml, hasScrollBars) {
+], function(log, $, context, TroupeViews, appEvents, template, moment, safeHtml, hasScrollBars) {
   "use strict";
 
   /** @const */
   var MAX_CHAT_HEIGHT = 145;
 
   /** @const */
-  var EXTRA_PADDING = 10;
+  var EXTRA_PADDING = 20;
 
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
@@ -41,6 +42,7 @@ define([
       this.$el.find('form').sisyphus({
         locationBased: true,
         timeout: 2,
+        customKeySuffix: 'chat-' + context.getTroupeId(),
         name: 'chat-' + context.getTroupeId(),
         onRestore: function() {
           inputBox.trigger('change');
@@ -84,16 +86,16 @@ define([
 
     var frameChat = $(compact ? '#content': '#content-wrapper').first();
 
-    this.resetInput = function() {
+    this.resetInput = function(initial) {
       $el.css({ height: '', 'overflow-y': '' });
 
       var css = {};
-      css[compact ? 'padding-bottom' : 'margin-bottom'] = '';
+      // css[compact ? 'padding-bottom' : 'margin-bottom'] = '';
+      css[compact ? 'padding-bottom' : 'bottom'] = '';
       frameChat.css(css);
+      log('Applying ', css, ' to ', frameChat);
 
-      if(rollers) {
-        rollers.adjustScroll();
-      }
+      adjustScroll(initial);
     };
 
     this.resizeInput = function() {
@@ -111,28 +113,35 @@ define([
         var css = {};
 
         if(compact) {
-          frameChat.css({ 'padding-bottom': (height + EXTRA_PADDING) + 'px'});
+          css['padding-bottom'] = (height + EXTRA_PADDING) + 'px';
         } else {
-          frameChat.css({ 'margin-bottom': height + 'px'});
-
+          // css['margin-bottom'] = height + 'px';
+          css['bottom'] = (height + 30) + 'px';
         }
+
+        log('Applying ', css, ' to ', frameChat);
         frameChat.css(css);
       }
 
-      if(rollers) {
-        rollers.adjustScroll();
-        window.setTimeout(function() {
-          rollers.adjustScroll();
-        }, 100);
-      }
-
+      adjustScroll();
     };
+
+    function adjustScroll(initial) {
+      if(!rollers) return;
+      if(initial) {
+        rollers.adjustScroll(300);
+      } else {
+        rollers.adjustScrollContinuously(300);
+      }
+    }
+
 
   };
 
   var ChatInputBoxView = TroupeViews.Base.extend({
     events: {
       "keydown":  "onKeyDown",
+      "keyup":    "onKeyUp",
       "focusout": "onFocusOut"
     },
 
@@ -158,11 +167,15 @@ define([
         chatResizer.resizeInput();
       });
 
-      chatResizer.resetInput();
+      chatResizer.resetInput(true);
     },
 
     onFocusOut: function() {
       if (this.compactView) this.send();
+    },
+
+    onKeyUp: function() {
+      this.chatResizer.resizeInput();
     },
 
     onKeyDown: function(e) {
@@ -173,7 +186,6 @@ define([
         this.send();
         return;
       }
-      this.chatResizer.resizeInput();
     },
 
     send: function() {

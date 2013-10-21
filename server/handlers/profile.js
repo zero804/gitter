@@ -15,7 +15,7 @@ module.exports = {
           expressValidator({}),
 
           // Express request-handler now receives filtered and validated data
-          function(req, res, next) {
+          function(req, res) {
             req.sanitize('displayName').trim();
             req.sanitize('displayName').xss();
 
@@ -26,7 +26,7 @@ module.exports = {
             var mappedErrors = req.validationErrors(true);
 
             if (mappedErrors) {
-              res.send({ success: false, validationFailure: true, errors: mappedErrors});
+              res.send(400, { validationFailure: true, errors: mappedErrors});
               return;
             }
 
@@ -40,22 +40,20 @@ module.exports = {
             }, function(err) {
               if(err) {
                 if(err.authFailure) {
-                  res.send({ authFailure: true });
-                  return;
+                  res.send(401, { authFailure: true });
                 } else if (err.emailConflict) {
-                  res.send({ success: false, emailConflict: true });
-                  return;
+                  res.send(409, { emailConflict: true });
+                } else if(err.usernameConflict) {
+                  res.send(409, { usernameConflict: true });
+                } else{
+                  winston.error("Unable to update profile", { exception: err });
+                  res.send(500, err);
                 }
-
-                winston.error("Unable to update profile", { exception: err });
-                return next(err);
+              } else {
+                res.send({
+                  displayName: req.body.displayName
+                });
               }
-
-              res.send({
-                success: true,
-                displayName: req.body.displayName
-              });
-
             });
           }
         );

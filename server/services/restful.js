@@ -1,32 +1,34 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-
-var troupeService = require("./troupe-service");
-var fileService = require("./file-service");
-
-var restSerializer = require("../serializers/rest-serializer");
-var winston = require('winston');
-
-
-
-
-var userService = require("../services/user-service");
-var unreadItemService = require("../services/unread-item-service");
-var fileService = require("../services/file-service");
-var chatService = require("../services/chat-service");
+var troupeService       = require("./troupe-service");
+var fileService         = require("./file-service");
+var restSerializer      = require("../serializers/rest-serializer");
+var winston             = require('winston');
+var unreadItemService   = require("../services/unread-item-service");
+var fileService         = require("../services/file-service");
+var chatService         = require("../services/chat-service");
 var conversationService = require("../services/conversation-service");
+
+// USEFUL function for testing
+// function slow(cb) {
+//   return function(e,r) {
+//     setTimeout(function() {
+//       console.log('SENDING things BACK SLOWLY', r);
+//       cb(e,r);
+//     }, 3000);
+//   };
+// }
 
 
 exports.serializeTroupesForUser = function(userId, callback) {
+    troupeService.findAllTroupesForUser(userId, function(err, troupes) {
+      if (err) return callback(err);
 
-  troupeService.findAllTroupesForUser(userId, function(err, troupes) {
-    if (err) return callback(err);
+      var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
 
-    var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
-
-    restSerializer.serialize(troupes, strategy, callback);
-  });
+      restSerializer.serialize(troupes, strategy, callback);
+    });
 };
 
 exports.serializeInvitesForUser = function(userId, callback) {
@@ -150,10 +152,7 @@ exports.serializeUsersForTroupe = function(troupeId, userId, callback) {
 };
 
 exports.serializeUnreadItemsForTroupe = function(troupeId, userId, callback) {
-  unreadItemService.getUnreadItemsForUser(userId, troupeId, function(err, unreadItems) {
-    if(err) return callback(err);
-    callback(null, unreadItems);
-  });
+  unreadItemService.getUnreadItemsForUser(userId, troupeId, callback);
 };
 
 exports.serializeReadBysForChat = function(troupeId, chatId, callback) {

@@ -230,5 +230,19 @@ module.exports = {
         connectLink: nconf.get("email:emailBasePath") + signupUser.getHomeUrl(),
       }
     });
+  },
+
+  sendUnreadItemsNotification: function(user, troupesWithUnreadCounts) {
+    mailerService.sendEmail({
+      templateFile: "unread_notification",
+      from: 'Troupe <support@troupe.co>',
+      to: user.email,
+      subject: "Activity on Troupe",
+      data: {
+        user: user,
+        emailBasePath: nconf.get("email:emailBasePath"),
+        troupesWithUnreadCounts: troupesWithUnreadCounts
+      }
+    });
   }
 };
