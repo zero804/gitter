@@ -185,12 +185,10 @@ define([
       var newValue = this._count();
 
       if(this._currentCountValue !== newValue) {
-        log('Emitting new count oldValue=', this._currentCountValue, ', newValue=', newValue);
+        // log('Emitting new count oldValue=', this._currentCountValue, ', newValue=', newValue);
 
         this._currentCountValue = newValue;
         this.trigger('newcountvalue', newValue);
-      } else {
-        log('Ignoring count update: oldValue=', this._currentCountValue, ', newValue=', newValue);
       }
     },
 
@@ -301,14 +299,14 @@ define([
 
   TroupeCollectionSync.prototype = {
     _onNewCountValue: function(newValue) {
-      log('Syncing store to collection ', newValue);
+      // log('Syncing store to collection ', newValue);
 
-      log('TroupeCollectionSync: setting value of ' + context.getTroupeId() + ' to ' + newValue);
+      // log('TroupeCollectionSync: setting value of ' + context.getTroupeId() + ' to ' + newValue);
 
       var troupe = this._collection.get(context.getTroupeId());
       if(troupe) {
         troupe.set('unreadItems', newValue);
-        log('Completed successfully');
+        // log('Completed successfully');
         return;
       }
 
@@ -545,10 +543,7 @@ define([
       var topBound = this._scrollTop;
       var bottomBound = this._scrollBottom;
 
-      log('Looking for items to mark as read between ' + topBound + ' and ' + bottomBound);
-
-      // this._scrollTop = 1000000000;
-      // this._scrollBottom = 0;
+      // log('Looking for items to mark as read between ' + topBound + ' and ' + bottomBound);
 
       this._scrollTop = this._scrollElement.scrollTop;
       this._scrollBottom = this._scrollTop + this._scrollElement.clientHeight;

@@ -86,7 +86,7 @@ define([
 
     var frameChat = $(compact ? '#content': '#content-wrapper').first();
 
-    this.resetInput = function() {
+    this.resetInput = function(initial) {
       $el.css({ height: '', 'overflow-y': '' });
 
       var css = {};
@@ -95,7 +95,7 @@ define([
       frameChat.css(css);
       log('Applying ', css, ' to ', frameChat);
 
-      adjustScroll();
+      adjustScroll(initial);
     };
 
     this.resizeInput = function() {
@@ -126,9 +126,13 @@ define([
       adjustScroll();
     };
 
-    function adjustScroll() {
+    function adjustScroll(initial) {
       if(!rollers) return;
-      rollers.adjustScrollContinuously(300);
+      if(initial) {
+        rollers.adjustScroll(300);
+      } else {
+        rollers.adjustScrollContinuously(300);
+      }
     }
 
 
@@ -163,7 +167,7 @@ define([
         chatResizer.resizeInput();
       });
 
-      chatResizer.resetInput();
+      chatResizer.resetInput(true);
     },
 
     onFocusOut: function() {
