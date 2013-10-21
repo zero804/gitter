@@ -286,7 +286,6 @@ exports.markUserAsEmailNotified = function(userId) {
       var args =[EMAIL_NOTIFICATION_HASH_KEY];
       args.push.apply(args, userTroupeKeys);
 
-      console.log('KEYS are', args);
       return Q.npost(redisClient, "hdel", args);
 
     });
