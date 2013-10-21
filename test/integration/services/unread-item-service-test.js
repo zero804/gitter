@@ -195,5 +195,146 @@ describe('markItemsRead', function() {
   });
 });
 
+describe('emailnotifications', function() {
+  it('should let you know who needs to be notified by email', function(done) {
+    var troupeId = mongoUtils.getNewObjectIdString();
+    var userId = mongoUtils.getNewObjectIdString();
+    var itemType = 'chat';
+    var itemId1 = mongoUtils.getNewObjectIdString();
+    var itemId2 = mongoUtils.getNewObjectIdString();
+    var itemId3 = mongoUtils.getNewObjectIdString();
+
+    var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
+
+    var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+      './troupe-service': troupeServiceMock
+    });
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId]));
+
+    return Q.all([
+        unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),
+        unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId2),
+        unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId3)
+      ])
+      .then(function() {
+        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now());
+      })
+      .then(function(results) {
+        assert(results[userId]);
+        assert(results[userId][troupeId]);
+        assert.equal(results[userId][troupeId].length, 3);
+        assert(results[userId][troupeId].indexOf('' + itemId1) >= 0);
+        assert(results[userId][troupeId].indexOf('' + itemId2) >= 0);
+        assert(results[userId][troupeId].indexOf('' + itemId3) >= 0);
+      })
+      .nodeify(done);
+  });
+
+  it('should not find someone who has been notified', function(done) {
+    var troupeId = mongoUtils.getNewObjectIdString();
+    var userId = mongoUtils.getNewObjectIdString();
+    var itemType = 'chat';
+    var itemId1 = mongoUtils.getNewObjectIdString();
+    var itemId2 = mongoUtils.getNewObjectIdString();
+    var itemId3 = mongoUtils.getNewObjectIdString();
+
+    var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
+
+    var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+      './troupe-service': troupeServiceMock
+    });
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId]));
+
+    return Q.all([
+        unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),
+        unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId2),
+        unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId3)
+      ])
+      .then(function() {
+        return unreadItemService.markUserAsEmailNotified(userId);
+      })
+      .then(function() {
+        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now());
+      })
+      .then(function(results) {
+        assert(!results[userId]);
+      })
+      .nodeify(done);
+  });
+
+  it('should not notify someone who has read their messages', function(done) {
+    var troupeId = mongoUtils.getNewObjectIdString();
+    var userId = mongoUtils.getNewObjectIdString();
+    var itemType = 'chat';
+    var itemId1 = mongoUtils.getNewObjectIdString();
+    var itemId2 = mongoUtils.getNewObjectIdString();
+    var itemId3 = mongoUtils.getNewObjectIdString();
+    var items = {
+      'chat': [itemId1]
+    };
+
+    var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
+
+    var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+      './troupe-service': troupeServiceMock
+    });
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId]));
+
+    return Q.all([
+        unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),
+        unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId2),
+        unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId3)
+      ])
+      .then(function() {
+        unreadItemService.markItemsRead(userId, troupeId, items);
+      })
+      .then(function() {
+        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now());
+      })
+      .then(function(results) {
+        assert(!results[userId]);
+      })
+      .nodeify(done);
+  });
+
+
+  it('should not find messages newer than the cutoff', function(done) {
+    var troupeId = mongoUtils.getNewObjectIdString();
+    var userId = mongoUtils.getNewObjectIdString();
+    var itemType = 'chat';
+    var itemId1 = mongoUtils.getNewObjectIdString();
+    var itemId2 = mongoUtils.getNewObjectIdString();
+    var itemId3 = mongoUtils.getNewObjectIdString();
+    var items = {
+      'chat': [itemId1]
+    };
+
+    var troupeServiceMock = mockito.mock(testRequire('./services/troupe-service'));
+
+    var unreadItemService = testRequire.withProxies("./services/unread-item-service", {
+      './troupe-service': troupeServiceMock
+    });
+
+    mockito.when(troupeServiceMock).findUserIdsForTroupe(troupeId).thenReturn(Q.resolve([userId]));
+
+    return Q.all([
+        unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId1),
+        unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId2),
+        unreadItemService.testOnly.newItem(troupeId, null, itemType, itemId3)
+      ])
+      .then(function() {
+        return unreadItemService.listTroupeUsersForEmailNotifications(Date.now() - 86400000);
+      })
+      .then(function(results) {
+        assert(!results[userId]);
+      })
+      .nodeify(done);
+  });
+
+});
+
 });
 

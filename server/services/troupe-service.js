@@ -1003,6 +1003,16 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
           { userId: userId1 },
           { userId: userId2 }
         ]
+      })
+      .then(function(troupe) {
+        statsService.event('new_troupe', {
+          troupeId: troupe.id,
+          oneToOne: true,
+          userId: userId1.id,
+          oneToOneUpgrade: false
+        });
+
+        return troupe;
       });
   });
 
@@ -1086,6 +1096,14 @@ function upgradeOneToOneTroupe(options, callback) {
       users: origTroupe.users
     })
     .then(function(troupe) {
+
+      statsService.event('new_troupe', {
+        troupeId: troupe.id,
+        userId: fromUser.id,
+        email: fromUser.email,
+        oneToOneUpgrade: true,
+        oneToOne: false
+      });
 
       if(!invites || invites.length === 0) return troupe;
 
@@ -1327,7 +1345,11 @@ function createNewTroupeForExistingUser(options, callback) {
             throw 403;
           }
 
-          return upgradeOneToOneTroupe({ name: name, oneToOneTroupe: troupe, user: user, invites: invites });
+          return upgradeOneToOneTroupe({
+            name: name,
+            oneToOneTroupe: troupe,
+            user: user,
+            invites: invites });
         });
     }
 
@@ -1339,6 +1361,14 @@ function createNewTroupeForExistingUser(options, callback) {
     troupe.addUserById(user.id);
     return troupe.saveQ()
       .then(function() {
+        statsService.event('new_troupe', {
+          troupeId: troupe.id,
+          userId: user.id,
+          email: user.email,
+          oneToOneUpgrade: true,
+          oneToOne: false
+        });
+
         if(!invites) return troupe;
 
         var promises = invites.map(function(invite) {

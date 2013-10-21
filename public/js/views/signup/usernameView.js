@@ -176,19 +176,19 @@ define([
 				data: {
 					username: username
 				},
-				success: function(result) {
-					if (!result.success) {
-						self.isUnavailable();
-					} else {
-						self.trigger('chose', username);
-						self.close();
-					}
+				success: function() {
+					self.trigger('chose', username);
+					self.close();
 				},
 				error: error
 			});
 
-			function error() {
-				self.$el.find('.trpModalFailure').show();
+			function error(err) {
+				if(err.status === 409 && err.responseJSON.usernameConflict) {
+					self.isUnavailable();
+				} else if(err.status < 500) {
+					self.$el.find('.trpModalFailure').show();
+				}
 			}
 
 			return false;

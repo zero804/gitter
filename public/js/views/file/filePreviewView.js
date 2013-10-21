@@ -114,8 +114,8 @@ define([
         title: "Are you sure?",
         body: confirmDeleteTemplate(this.model.toJSON()),
         menuItems: [
-          { action: "yes", text: "Yes", class: "trpBtnRed" },
-          { action: "no", text: "No", class: "trpBtnLightGrey"}
+          { action: "yes", text: "Yes", className: "trpBtnRed" },
+          { action: "no", text: "No", className: "trpBtnLightGrey"}
         ]
       });
 
@@ -256,9 +256,9 @@ define([
     initialize: function(options) {
       options.title = 'Files';
       options.menuItems = [
-        { text: "Download", action: "download", class: "trpBtnGreen" },
-        { text: "Versions", action: "versions", class: "trpBtnLightGrey" },
-        { text: "Delete", action: "delete", class: "trpBtnRed" }
+        { text: "Download", action: "download", className: "trpBtnGreen" },
+        { text: "Versions", action: "versions", className: "trpBtnLightGrey" },
+        { text: "Delete", action: "delete", className: "trpBtnRed" }
       ];
       TroupeViews.Modal.prototype.initialize.call(this, options);
       this.view = new PreviewView({ model: this.model, collection: this.collection });

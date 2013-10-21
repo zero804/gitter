@@ -35,13 +35,7 @@ define([
     },
 
     events: {
-      // "click #people-header": "onPeopleHeaderClick",
-      // "click #request-header": "onRequestHeaderClick",
-      // "click #invites-header": "onInvitesHeaderClick",
-      // "click #file-header": "onFileHeaderClick",
-      // "click #mail-header": "onMailHeaderClick"
-      "click #favourite-button":        "toggleFavourite",
-      "click #help-button":              "onHelpClicked" 
+      "click #favourite-button":        "toggleFavourite"
     },
 
     initialize: function() {
@@ -147,9 +141,8 @@ define([
       // File View
       this.files.show(new FileView({ collection: fileCollection }));
 
-
       if (!context.inOneToOneTroupeContext()) {
-        this.troupeAvatar.show(new TroupeAvatar({ troupe: context.troupe(), noHref: true, noUnred: true}));
+        this.troupeAvatar.show(new TroupeAvatar({ troupe: context.troupe(), noHref: true, noUnread: true}));
       }
       // Conversation View
       if (!context.inOneToOneTroupeContext()) {
@@ -197,52 +190,7 @@ define([
         data: JSON.stringify({ favourite: isFavourite })
       });
 
-      // The update should happen automatically via a patch operation....
-      //window.troupeContext.troupe.favourite = isFavourite;
-      //var troupe = collections.troupes.get(window.troupeContext.troupe.id);
-      //troupe.set('favourite', isFavourite);
-    },
-
-    onHelpClicked: function() {
-
-    },
-
-    onMailHeaderClick: function() {
-      this.toggleMails();
-    },
-
-    onFileHeaderClick: function() {
-      this.toggleFiles();
-    },
-
-    onRequestHeaderClick: function() {
-      this.toggleRightPanel('request-list');
-    },
-
-    onInvitesHeaderClick: function() {
-      this.toggleRightPanel('invites-list');
-    },
-
-    onPeopleHeaderClick: function() {
-      this.toggleRightPanel('people-roster');
-    },
-
-    onAddPeopleClick: function() {
-    },
-
-    toggleRightPanel: function(id) {
-      $('#'+id).slideToggle(350);
-    },
-
-    toggleFiles: function () {
-      $("#file-list").slideToggle(350);
-      $("#fineUploader").toggle();
-    },
-
-    toggleMails: function () {
-      $("#mail-list").slideToggle(350);
     }
-
   });
   cocktail.mixin(RightToolbarLayout, TroupeViews.DelayedShowLayoutMixin);
 

@@ -47,7 +47,7 @@ class ChangePasswordTests(unittest.TestCase):
         self.assertAnyTroupeIsCurrentPage();
         self.driver.get(utils.baseUrl("/home"))
         self.assertUserhomeIsCurrentPage('home')
-        self.setProfilePassword('password')
+        self.setProfileNameAndPassword('Tester Testerson','password')
 
         self.driver.get(utils.baseUrl("/signout"))
 
@@ -65,7 +65,7 @@ class ChangePasswordTests(unittest.TestCase):
         acceptInvite(invitee+'@troupetest.local', self.driver)
         self.driver.find_element_by_id('new-user-signup-button').click()
         self.assertAnyTroupeIsCurrentPage();
-        self.setProfilePassword('password')
+        self.setProfileNameAndPassword('Tester Testerson', 'password')
 
         self.driver.get(utils.baseUrl("/signout"))
 
@@ -136,12 +136,13 @@ class ChangePasswordTests(unittest.TestCase):
         form.find_element_by_id('oldPassword').send_keys(oldPassword)
         self.driver.find_element_by_css_selector('[data-action=save]').click()
 
-    def setProfilePassword(self, newPassword):
+    def setProfileNameAndPassword(self, displayName, newPassword):
         self.driver.find_element_by_id('profile-icon').click()
         
         form = self.driver.find_element_by_id('updateprofileform')
         # wait for form to load
         time.sleep(1)
+        form.find_element_by_id('displayName').send_keys(displayName)
         form.find_element_by_id('password').send_keys(newPassword)
         self.driver.find_element_by_css_selector('[data-action=save]').click()
         time.sleep(1)

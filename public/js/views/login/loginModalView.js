@@ -10,6 +10,18 @@ define([
 ], function($, _, context, TroupeViews, template) {
   "use strict";
 
+  function cookiesDisabled() {
+    if(navigator.cookieEnabled === false) return true;
+    if(!document.cookie) {
+      document.cookie = 'test';
+      var cookiesDisabledTest = !document.cookie;
+      document.cookie = '';
+
+      return cookiesDisabledTest;
+    }
+    return false;
+  }
+
   return TroupeViews.Base.extend({
     template: template,
 
@@ -32,6 +44,7 @@ define([
         autofocusPassword: this.initialEmail && !this.noAutofocus ? 'autofocus' : '',
         troupeUri: this.fromSignup ? null : window.location.pathname.replace(/\//g,''),
         fromSignup: this.fromSignup,
+        cookiesDisabled: cookiesDisabled(),
         isOneToOne: troupe && troupe.oneToOne
       };
     },

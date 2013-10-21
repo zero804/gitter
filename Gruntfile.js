@@ -364,13 +364,6 @@ module.exports = function( grunt ) {
         dest: 'output/client-libs/fine-uploader/fine-uploader.js-raw'
       }
     },
-    wrap: {
-      faye: {
-        src: 'output/client-libs/faye/browser/faye-browser' + (min ? '-min' : '') + '.js',
-        dest: 'output/js-temp/',
-        wrapper: ['var Faye = function(){\n', '\n return Faye; }.call(window);']
-      }
-    },
 
     bowerRequireWrapper: {
       assert: {
@@ -417,15 +410,15 @@ module.exports = function( grunt ) {
       },
       faye: {
         files : {
-          'output/client-libs/faye/faye-browser.js': ['output/js-temp/output/client-libs/faye/browser/faye-browser' + (min ? '-min' : '') + '.js']
+          'output/client-libs/faye/faye-browser.js': ['output/client-libs/faye/browser/faye-browser' + (min ? '-min' : '') + '.js']
         },
         modules: {
         },
-        exports: 'Faye'
+        exports: 'window.Faye'
       },
       hopscotch: {
         files: {
-          'output/client-libs/hopscotch/hopscotch-0.11-amd.js': ['output/client-libs/hopscotch/js/hopscotch-0.1.1.js']
+          'output/client-libs/hopscotch/hopscotch-0.1.2-amd.js': ['output/client-libs/hopscotch/js/hopscotch-0.1.2.js']
         },
         modules: {
 
@@ -465,15 +458,6 @@ module.exports = function( grunt ) {
         modules: {},
         exports: 'expect'
       },
-      'jquery-migrate': {
-        files : {
-          'output/client-libs/jquery/jquery-migrate-amd.js': ['output/client-libs/jquery/jquery-migrate' + (min ? '.min' : '') + '.js']
-        },
-        modules: {
-          'jquery': 'jQuery'
-        },
-        exports: 'jQuery'
-      },
       'jquery.validation':  {
         files : {
           'output/client-libs/jquery.validation/jquery.validate-amd.js': ['output/client-libs/jquery.validation/jquery.validate.js']
@@ -511,26 +495,6 @@ module.exports = function( grunt ) {
         exports: 'ScrollFix'
       },
 
-      'bootstrap_tooltip': {
-        files : {
-          'output/client-libs/bootstrap/bootstrap-tooltip.js': ['output/client-libs/bootstrap/js/bootstrap-tooltip.js']
-        },
-        modules: {
-          'jquery': 'jQuery'
-        },
-        exports: 'jQuery'
-      },
-
-      'typeahead': {
-        files : {
-          'output/client-libs/typeahead.js/typeahead.js': ['output/client-libs/typeahead.js/dist/typeahead' + (min ? '.min' : '') + '.js']
-        },
-        modules: {
-          'jquery': 'jQuery'
-        },
-        exports: 'jQuery'
-      },
-
       'bootstrap-typeahead': {
         files : {
           'output/client-libs/bootstrap/bootstrap-typeahead.js': ['output/client-libs/bootstrap/js/bootstrap-typeahead.js']
@@ -539,16 +503,6 @@ module.exports = function( grunt ) {
           'jquery': 'jQuery'
         },
         exports: 'jQuery'
-      },
-
-      'zepto': {
-        files : {
-          'output/client-libs/zepto/zepto-amd.js': ['output/client-libs/zepto/zepto.min.js']
-        },
-        modules: {
-
-        },
-        exports: 'Zepto'
       },
 
       'zeroclipboard': {
@@ -579,7 +533,6 @@ module.exports = function( grunt ) {
 
   grunt.registerTask('watchr', 'reload watch');
   grunt.registerTask('client-libs', ['concat:fineuploader',
-                              'wrap:faye',
                               'bowerRequireWrapper'
                               ]);
 

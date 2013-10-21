@@ -165,9 +165,20 @@ define([
       });
 
       realtime.registerForSnapsnots(this.url, function(snapshot) {
-        log('shapshot received');
         self.trigger('request');
-        self.set(snapshot, { parse: true, remove: true, add: true, merge: true });
+        /**
+         * Don't remove items from the collections, as there is a greater
+         * chance that they've been added on the client than that they've
+         * been removed from the server. One day we may want to handle the
+         * case that the server object has been removed, but it's not that
+         * likely and doesn't warrant the extra complexity
+         */
+        self.set(snapshot, {
+          parse: true,    /* parse the items */
+          remove: false,  /* used to be true - no longer remove items missing from the snapshot */
+          add: true,      /* add new items */
+          merge: true     /* merge into items that already exist */
+        });
         self._onInitialLoad();
         self.trigger('sync');
       });

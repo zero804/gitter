@@ -18,7 +18,7 @@ define([
     initialize: function(options) {
       // var self = this;
       if(!this.model) this.model = options.troupe;
-      
+
       if(!options.noUnread) {
         this.hasUnread = false;
         this.listenTo(this.model, 'change:name', this.change);
@@ -63,7 +63,7 @@ define([
 
     unreadItemsChanged: function() {
       var newUnread = this.model.get('unreadItems') > 0;
-      if(this.hasUnread !== newUnread) {
+      if(!this.options.noUnread && this.hasUnread !== newUnread) {
         this.hasUnread = newUnread;
         var $e = this.$el.find('.trpDisplayPicture');
 

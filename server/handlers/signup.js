@@ -15,6 +15,16 @@ var userAgentStats   = require('../web/useragent-stats');
 module.exports = {
 
     install: function(app) {
+      app.get('/x', function(req, res, next) {
+        winston.warn('/x is only meant for testing, do not use in production. Use web:homeurl instead.');
+        var homeurl = nconf.get('web:homeurl');
+        if(homeurl === '/x') {
+          next();
+        } else {
+          res.relativeRedirect(homeurl);
+        }
+      });
+
       app.get(nconf.get('web:homeurl'),
         middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,

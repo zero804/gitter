@@ -4,8 +4,9 @@ require([
   'start/profile',
   'start/create',
   'start/invite',
-  'start/finish'
-], function($, bootProfile, bootCreate, bootInvite, bootFinish) {
+  'start/finish',
+  'start/apps'
+], function($, bootProfile, bootCreate, bootInvite, bootFinish, bootApps) {
   "use strict";
 
   var page = $('body').data('page');
@@ -19,6 +20,9 @@ require([
 
     case 'invite':
       return bootInvite();
+
+    case 'apps':
+      return bootApps();
 
     case 'finish':
       return bootFinish();

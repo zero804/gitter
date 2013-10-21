@@ -22,6 +22,12 @@ define([
 
   "use strict";
 
+  /** @const */
+  var OLD_TIMEOUT = 3600000 /*1 hour*/;
+
+  /** @const */
+  var EDIT_WINDOW = 240000;
+
   var ChatItemView = TroupeViews.Base.extend({
     unreadItemType: 'chat',
     template: chatItemTemplate,
@@ -30,33 +36,29 @@ define([
     events: {
       'click .trpChatEdit':     'toggleEdit',
       'keydown textarea':       'detectEscape',
-      'click .trpChatReads':    'showReadBy'
+      'click .trpChatReadBy':   'showReadBy'
     },
 
     initialize: function(options) {
-      var self = this;
+
+      this._oneToOne = context.inOneToOneTroupeContext();
 
       this.userCollection = options.userCollection;
 
       this.decorators = options.decorators;
 
-      this.model.on('change', function() {
-        self.onChange();
-      });
+      this.listenTo(this.model, 'change', this.onChange);
 
+      var timeChange = this.timeChange.bind(this);
       if (this.isInEditablePeriod()) {
         // update once the message is not editable
-        var notEditableInMS = (this.model.get('sent').valueOf() + 240000) - Date.now();
-        setTimeout(function() {
-          self.onChange();
-        }, notEditableInMS + 50);
+        var notEditableInMS = this.model.get('sent').valueOf() + EDIT_WINDOW - Date.now();
+        setTimeout(timeChange, notEditableInMS + 50);
       }
 
       if (!this.isOld()) {
-        var oldInMS = (this.model.get('sent').valueOf() + 3600000 /*1 hour*/) - Date.now();
-        setTimeout(function() {
-          self.onChange();
-        }, oldInMS + 50);
+        var oldInMS = this.model.get('sent').valueOf() + OLD_TIMEOUT - Date.now();
+        setTimeout(timeChange, oldInMS + 50);
       }
     },
 
@@ -65,13 +67,21 @@ define([
       var isMobile = navigator.userAgent.match(/mobile/i) ? true : false;
 
       if (data.fromUser) {
-        data.displayName = data.fromUser.displayName;
+        data.displayName = data.fromUser.displayName || data.fromUser.fallbackDisplayName;
         if (isMobile && data.displayName.length > 13) {
           data.displayName = data.fromUser.displayName.split(" ").shift();
         }
       }
+      data.readByText = this.getReadByText(data.readBy);
 
       return data;
+    },
+
+    getReadByText: function(readByCount) {
+      if(!readByCount) return '';
+      if(this._oneToOne) return ' ';
+      if(readByCount > 10) readByCount = 10;
+      return readByCount;
     },
 
     onChange: function() {
@@ -80,7 +90,7 @@ define([
         this.renderText();
       }
 
-      this.updateRender();
+      this.updateRender(this.model.changed);
     },
 
     renderText: function() {
@@ -101,29 +111,61 @@ define([
     afterRender: function() {
       this.renderText();
       this.updateRender();
-    },
-
-    updateRender: function() {
-      this.setState();
-
-      var editIconTooltip = (this.hasBeenEdited()) ? "Edited shortly after being sent": ((this.canEdit()) ? "Edit within 4 minutes of sending" : ((this.isOwnMessage()) ? "It's too late to edit this message." : "You can't edit someone else's message"));
-      var editIcon = this.$el.find('.trpChatEdit [title]');
+      this.timeChange();
 
       if (!this.compactView) {
-        editIcon.tooltip('destroy');
-        editIcon.attr('title', editIconTooltip);
-        editIcon.tooltip({ container: 'body' });
+        var editIcon = this.$el.find('.trpChatEdit [title]');
+        editIcon.tooltip({ container: 'body', title: this.getEditTooltip.bind(this) });
       }
+
     },
 
-    setState: function() {
-      this.$el.toggleClass('isViewers', this.isOwnMessage());
+    timeChange: function() {
       this.$el.toggleClass('isEditable', this.isInEditablePeriod());
       this.$el.toggleClass('canEdit', this.canEdit());
       this.$el.toggleClass('cantEdit', !this.canEdit());
-      this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
-      this.$el.toggleClass('hasBeenRead', this.hasBeenRead());
       this.$el.toggleClass('isOld', this.isOld());
+    },
+
+    updateRender: function(changes) {
+      if(!changes || 'fromUser' in changes) {
+        this.$el.toggleClass('isViewers', this.isOwnMessage());
+      }
+
+      if(!changes || 'editedAt' in changes) {
+        this.$el.toggleClass('hasBeenEdited', this.hasBeenEdited());
+      }
+
+      /* Don't run on the initial (changed=undefined) as its done in the template */
+      if(changes && 'readBy' in changes) {
+        var readByCount = this.model.get('readBy');
+        var readByLabel = this.$el.find('.trpChatReadBy');
+        if(readByCount) {
+          readByLabel.text(this.getReadByText(readByCount));
+          if(!readByLabel.is(':visible')) {
+            readByLabel.show('fast');
+          }
+        } else {
+          readByLabel.hide();
+          this.$el.find('.trpChatReadBy').text();
+        }
+      }
+    },
+
+    getEditTooltip: function() {
+      if(this.hasBeenEdited()) {
+        return "Edited shortly after being sent";
+      }
+
+      if(this.canEdit()) {
+        return "Edit within 4 minutes of sending";
+      }
+
+      if(this.isOwnMessage()) {
+        return "It's too late to edit this message.";
+      }
+
+      return  "You can't edit someone else's message";
     },
 
     highlightMention: function() {
@@ -178,13 +220,13 @@ define([
     },
 
     isInEditablePeriod: function() {
-      var age = (Date.now() - this.model.get('sent').valueOf()) / 1000;
-      return age <= 240;
+      var age = Date.now() - this.model.get('sent').valueOf();
+      return age <= EDIT_WINDOW;
     },
 
     isOld: function() {
-      var age = (Date.now() - this.model.get('sent').valueOf()) / 1000;
-      return age >= 3600;
+      var age = Date.now() - this.model.get('sent').valueOf();
+      return age >= OLD_TIMEOUT;
     },
 
     canEdit: function() {
@@ -239,15 +281,18 @@ define([
       this.listenTo(this.inputBox, 'save', this.saveChat);
     },
 
-    showReadBy: function() {
+    showReadBy: function(event) {
+      if (this.compactView) return;
+
       if(this.readBy) return;
+      event.preventDefault();
 
       this.readBy = new ReadByPopover({
         model: this.model,
         userCollection: this.userCollection,
         placement: 'vertical',
         title: 'Read By',
-        targetElement: this.$el.find('.trpChatReads')[0]
+        targetElement: event.target
       });
 
       var s = this;

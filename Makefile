@@ -207,6 +207,10 @@ fetch-client-libs:
 make-client-libs:
 	grunt client-libs # --disableMinifiedSource=true
 
+make-jquery:
+	npm install
+	./node_modules/.bin/jquery-builder -v 2.0.3 -e deprecated -m > public/repo/jquery/jquery.js
+
 install-client-libs:
 	ls -d output/client-libs/*|sed -e 's!output/client-libs/!public/repo/!'|sed -e 's!retina.js-js!retina!'|sed -e 's!typeahead.js!typeahead!'|xargs mkdir -p
 	cp output/client-libs/almond/almond.js public/repo/almond/almond.js
@@ -223,7 +227,7 @@ install-client-libs:
 	cp output/client-libs/expect/expect-amd.js public/repo/expect/expect.js
 	cp output/client-libs/faye/faye-browser.js public/repo/faye/faye.js
 	cp output/client-libs/filtered-collection/backbone-filtered-collection-amd.js public/repo/filtered-collection/filtered-collection.js
-	cp output/client-libs/hopscotch/hopscotch-0.11-amd.js public/repo/hopscotch/hopscotch.js
+	cp output/client-libs/hopscotch/hopscotch-0.1.2-amd.js public/repo/hopscotch/hopscotch.js
 
 	mkdir -p public/repo/hopscotch/css/ public/repo/hopscotch/img
 	cp output/client-libs/hopscotch/css/hopscotch-0.1.1.min.css public/repo/hopscotch/css/hopscotch.css
@@ -237,8 +241,6 @@ install-client-libs:
 	cp output/client-libs/hbs/hbs/i18nprecompile.js public/repo/hbs/i18nprecompile.js
 	cp output/client-libs/hbs/Handlebars.js public/repo/hbs/Handlebars.js
 	cp output/client-libs/hbs/hbs/json2.js public/repo/hbs/json2.js
-	cp output/client-libs/jquery/jquery.min.js public/repo/jquery/jquery.js
-	cp output/client-libs/jquery/jquery-migrate-amd.js public/repo/jquery/jquery-migrate.js
 	cp output/client-libs/jquery-placeholder/jquery.placeholder-amd.js public/repo/jquery-placeholder/jquery-placeholder.js
 	cp output/client-libs/jquery.validation/jquery.validate-amd.js public/repo/jquery.validation/jquery.validation.js
 	cp output/client-libs/hammerjs/dist/jquery.hammer.min.js public/repo/hammerjs/jquery.hammer.js
@@ -255,6 +257,5 @@ install-client-libs:
 	# cp output/client-libs/zeroclipboard/ZeroClipboard.js public/repo/zeroclipboard/zeroclipboard.js
 	cp output/client-libs/zeroclipboard/zeroclipboard-amd.js public/repo/zeroclipboard/zeroclipboard.js
 	cp output/client-libs/zeroclipboard/ZeroClipboard.swf public/repo/zeroclipboard/
-	cp output/client-libs/zepto/zepto-amd.js public/repo/zepto/zepto.js
 
-client-libs: clean-temp-client-libs fetch-client-libs make-client-libs clean-client-libs install-client-libs
+client-libs: clean-temp-client-libs make-jquery fetch-client-libs make-client-libs clean-client-libs install-client-libs

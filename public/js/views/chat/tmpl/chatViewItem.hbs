@@ -8,14 +8,25 @@
     <div class="trpChatBox">
       <div class="trpChatDetails">
         {{#if fromUser}}
-        <div class="trpChatFrom">{{{displayName}}}</div>
+        <div class="trpChatFrom">{{displayName}}</div>
         {{/if}}
+
         <div class="trpChatTime"> {{#if fromUser}} &bull; {{/if}} {{widget "timeago" time=sent}} </div>
-        <span class="trpChatEdit"><img src='{{ cdn "images/2/icon-edit.png"}}' width="16" height="16" title=""/ ></span>
         {{#if compactView}}
+          {{#if readByText}}
+          <span class="trpChatReadBy">{{readByText}}</span>
+          {{else}}
+          <span class="trpChatReadBy" style="display:none"></span>
+          {{/if}}
         {{else}}
-        <span class="trpChatReads"><img src='{{ cdn "images/2/icon-read.png"}}' width="16" height="16"/></span>
+          {{#if readByText}}
+          <div class="trpChatReadBy">{{readByText}}</div>
+          {{else}}
+          <div class="trpChatReadBy" style="display:none"></div>
+          {{/if}}
         {{/if}}
+        <span class="trpChatEdit"><img src='{{ cdn "images/2/icon-edit.png"}}' width="16" height="16" title=""/ ></span>
+
       </div>
       <div class="trpChatText"></div>
     </div>

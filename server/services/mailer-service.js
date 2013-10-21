@@ -39,6 +39,7 @@ var queue = workerQueue.queue('email', {}, function() {
   });
 
   return function sendEmailDirect(options, done) {
+
     var htmlTemplateFile = "emails/" + options.templateFile + "_html";
     troupeTemplate.compile(htmlTemplateFile, function(err, htmlTemplate) {
       if(err) return winston.error("Unable to load HTML template", err);

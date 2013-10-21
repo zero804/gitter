@@ -191,35 +191,35 @@ define([
         data: form.serialize(),
         type: "POST",
         success: function(data) {
-          if(data.success) {
-            var user = context.user();
-            user.set('displayName', data.displayName);
-            user.set('status', 'ACTIVE');
-            user.set('hasPassword', true);
+          var user = context.user();
+          user.set('displayName', data.displayName);
+          user.set('status', 'ACTIVE');
+          user.set('hasPassword', true);
 
-            that.trigger('submit.success');
+          that.trigger('submit.success');
 
-            if(that.dialog) {
-              that.dialog.hide();
-            }
-
-            if (that.hasChangedEmail(newEmail)) {
-              window.alert("Your address will be updated once you confirm the email sent to your new address.");
-            }
-
-          } else {
-            that.onFormSubmitFailure(data);
+          if(that.dialog) {
+            that.dialog.hide();
           }
+
+          if (that.hasChangedEmail(newEmail)) {
+            window.alert("Your address will be updated once you confirm the email sent to your new address.");
+          }
+        },
+        error: function(err) {
+          that.onFormSubmitFailure(err);
         }
       });
     },
     onFormSubmitFailure: function(err) {
-      if (err.emailConflict) {
-        window.alert("That email address is already registered, please choose another.");
-      }
-      else if(err.authFailure) {
-        this.$el.find('#oldPassword').val("");
-        window.alert("Your old password is incorrect");
+      if(err.status < 500) {
+        if (err.responseJSON.emailConflict) {
+          window.alert("That email address is already registered, please choose another.");
+        }
+        else if(err.responseJSON.authFailure) {
+          this.$el.find('#oldPassword').val("");
+          window.alert("Your old password is incorrect");
+        }
       }
     }
   });
@@ -230,11 +230,11 @@ define([
       options.title = options.title || "Edit your profile";
 
       options.menuItems = [
-        { text: 'Save', action: 'save', class: 'trpBtnGreen' }
+        { text: 'Save', action: 'save', className: 'trpBtnGreen' }
       ];
 
       if (context.getUser().hasPassword) {
-        options.menuItems.push({ text: 'Signout', action: 'signout', class: 'trpBtnLightGrey' });
+        options.menuItems.push({ text: 'Signout', action: 'signout', className: 'trpBtnLightGrey' });
       }
 
       TroupeViews.Modal.prototype.initialize.call(this, options);
