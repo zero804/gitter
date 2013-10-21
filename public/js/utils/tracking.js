@@ -38,9 +38,21 @@ define([
   }
 
   var goSquaredTrackingId = context.env('goSquaredTrackingId');
+  var user = context.getUser();
   if(goSquaredTrackingId) {
     var GoSquared = window.GoSquared = {};
     GoSquared.acct = goSquaredTrackingId;
+
+    if (user.username)
+    {
+      GoSquared.UserName = user.username;
+      GoSquared.Visitor = {
+        id: user.id,
+        displayName: user.displayName,
+        email: user.email
+      };
+    }
+
     (function(w){
         w._gstc_lt = +new Date;
         var d = document, g = d.createElement("script");

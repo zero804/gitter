@@ -237,6 +237,8 @@ exports.listTroupeUsersForEmailNotifications = function(sinceTime) {
     .then(function(troupeUserHash) {
       var result = {};
 
+      if (!troupeUserHash) return result;
+
       var promises = Object.keys(troupeUserHash)
         .map(function(key) {
           var troupeUserId = key.split(':');
