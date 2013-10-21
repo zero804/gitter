@@ -2,8 +2,9 @@
 define([
   'jquery',
   'views/shareSearch/shareSearchView',
-  'utils/appevents'
-], function($, shareSearch, appevents) {
+  'utils/appevents',
+  'utils/platformDetect'
+], function($, shareSearch, appevents, platformDetect) {
   "use strict";
 
   return function() {
@@ -22,7 +23,12 @@ define([
 
     $('#next-button').on('click', function() {
       if(hasInvitedSomeone) {
-        window.location.href = '/start/finish';
+        if (platformDetect() == 'Mac' || platformDetect() == 'Windows') {
+          window.location.href = '/start/apps';
+        }
+        else {
+          window.location.href = '/start/finish';
+        }
       }
     });
 
