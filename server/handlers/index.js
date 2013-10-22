@@ -23,5 +23,6 @@ module.exports = {
     require('./unawesome-browser').install(app);
     require('./hooks').install(app);
     require('./start').install(app);
+    require('./unsubscribe').install(app);
   }
 };

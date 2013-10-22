@@ -7,6 +7,9 @@ var assert = require('assert');
 var url = require('url');
 var appEvents = require('../app-events');
 
+var crypto = require('crypto');
+var passphrase = 'troupetasticprefs';
+
 module.exports = {
   sendNewTroupeForExistingUser: function (user, troupe) {
     var troupeLink = nconf.get("email:emailBasePath") + "/" + troupe.uri + "#|share";
@@ -233,6 +236,11 @@ module.exports = {
   },
 
   sendUnreadItemsNotification: function(user, troupesWithUnreadCounts) {
+
+    var plaintext = user.id + ',' + 'unread_notifications';
+    var cipher    = crypto.createCipher('aes256', passphrase);
+    var hash      = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
+
     mailerService.sendEmail({
       templateFile: "unread_notification",
       from: 'Troupe <support@troupe.co>',
@@ -241,7 +249,8 @@ module.exports = {
       data: {
         user: user,
         emailBasePath: nconf.get("email:emailBasePath"),
-        troupesWithUnreadCounts: troupesWithUnreadCounts
+        troupesWithUnreadCounts: troupesWithUnreadCounts,
+        unsubscribeHash: hash
       }
     });
   }

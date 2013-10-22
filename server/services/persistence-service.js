@@ -593,6 +593,18 @@ SuggestedContactSchema.index({ userId: 1 });
 SuggestedContactSchema.index({ emails: 1 });
 SuggestedContactSchema.schemaTypeName = 'SuggestedContactSchema';
 
+/*
+ * Notifications opt-out
+ */
+var NotificationsPreferenceSchema = new Schema({
+  userId:  { type: ObjectId, ref: 'User' },
+  optIn:   Schema.Types.Mixed,
+  optOut:  Schema.Types.Mixed
+});
+NotificationsPreferenceSchema.index({ userId: 1} , { unique: true });
+NotificationsPreferenceSchema.schemaTypeName = 'NotificationsPreferenceSchema';
+
+
 
 var User = mongoose.model('User', UserSchema);
 var UserLocationHistory = mongoose.model('UserLocationHistory', UserLocationHistorySchema);
@@ -627,6 +639,8 @@ var UriLookup = mongoose.model('UriLookup', UriLookupSchema);
 
 var Contact = mongoose.model('Contact', ContactSchema);
 var SuggestedContact = mongoose.model('SuggestedContact', SuggestedContactSchema);
+
+var NotificationsPreference = mongoose.model('NotificationsPreference', NotificationsPreferenceSchema);
 
 
 //
@@ -664,7 +678,8 @@ module.exports = {
     PushNotificationDeviceSchema: PushNotificationDeviceSchema,
     UriLookupSchema: UriLookupSchema,
     ContactSchema: ContactSchema,
-    SuggestedContactSchema: SuggestedContactSchema
+    SuggestedContactSchema: SuggestedContactSchema,
+    NotificationsPreferenceSchema: NotificationsPreferenceSchema
   },
   User: User,
   UserTroupeLastAccess: UserTroupeLastAccess,
@@ -691,7 +706,8 @@ module.exports = {
   PushNotificationDevice: PushNotificationDevice,
   UriLookup: UriLookup,
   Contact: Contact,
-  SuggestedContact: SuggestedContact
+  SuggestedContact: SuggestedContact,
+  NotificationsPreference: NotificationsPreference
 };
 
 process.nextTick(function() {
