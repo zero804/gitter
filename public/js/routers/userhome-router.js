@@ -1,7 +1,6 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'utils/router',
-  'utils/context',
   'views/base',
   'views/profile/profileView',
   'views/profile/profileEmailView',
@@ -13,7 +12,7 @@ define([
   'views/invite/reinviteModal',
   'hbs!views/connect/tmpl/connectUserTemplate',
   'hbs!views/login/tmpl/loginRequestModalView'
-  ], function(Router, context, TroupeViews, profileView, profileEmailView, profileAddEmailView, createTroupeView,
+  ], function(Router, TroupeViews, profileView, profileEmailView, profileAddEmailView, createTroupeView,
     troupeCollections, UserEmailCollection, shareSearchView, InviteModal, connectUserTemplate,
     loginRequestTemplate) {
   "use strict";
@@ -86,10 +85,6 @@ define([
     ],
     regions: []
   });
-
-if(context.popEvent('password_reset')) {
-  new profileView.Modal({ disableClose: true }).show();
-}
 
 return router;
 
