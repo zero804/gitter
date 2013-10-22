@@ -84,7 +84,13 @@ function sendEmailNotifications(since) {
                   });
 
                 preferences.verifyUserExpectsNotifications(user.id, 'unread_notifications', function(optedOut) {
-                  if (!optedOut) emailNotificationService.sendUnreadItemsNotification(user, troupeData);
+                  //if (!optedOut) emailNotificationService.sendUnreadItemsNotification(user, troupeData);
+
+                  // FIXME Temporary email whitelist for Beta testing.
+                  var whitelist = ['hackers.are.rockstars@gmail.com', 'mike.bartlett@gmail.com', 'a.trevorah@gmail.com', 'andrew@troupe.co'];
+                  if (whitelist.indexOf(user.email) != -1) {
+                    if (!optedOut) emailNotificationService.sendUnreadItemsNotification(user, troupeData);
+                  }
                 });
               });
 
