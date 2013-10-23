@@ -12,6 +12,8 @@ var contextGenerator = require('../web/context-generator');
 var statsService     = require("../services/stats-service");
 var userAgentStats   = require('../web/useragent-stats');
 
+
+
 module.exports = {
 
     install: function(app) {
@@ -100,7 +102,7 @@ module.exports = {
 
       app.get('/confirm/:confirmationCode',
         middleware.authenticate('confirm', { failureRedirect: '/confirm-failed' } ),
-        function(req, res){
+        function(req, res, next){
           winston.verbose("Confirmation authenticated");
 
           signupService.confirm(req.user, function(err, user) {
@@ -119,15 +121,22 @@ module.exports = {
             if (user.hasPassword()) {
               // user has completed signup
               res.relativeRedirect('/' + user.username);
-            } else if(user.displayName) {
-              // new user has requested access to a troupe
-              contextGenerator.generateMiniContext(req, function(err, troupeContext) {
-                res.render('complete-profile', { troupeContext: troupeContext });
-              });
-            } else {
-              // plain new user
-              res.relativeRedirect('/start');
+              return;
             }
+
+            return signupService.shouldUserPerformStartProcess(user)
+              .then(function(doStartProcess) {
+                if(doStartProcess) {
+                  res.relativeRedirect('/start');
+                  return;
+                }
+
+                contextGenerator.generateMiniContext(req, function(err, troupeContext) {
+                  res.render('complete-profile', { troupeContext: troupeContext });
+                });
+              })
+              .fail(next);
+
           });
         });
 
