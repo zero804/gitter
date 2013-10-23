@@ -87,7 +87,8 @@ function sendEmailNotifications(since) {
                   //if (!optedOut) emailNotificationService.sendUnreadItemsNotification(user, troupeData);
 
                   // FIXME Temporary email whitelist for Beta testing.
-                  var whitelist = ['hackers.are.rockstars@gmail.com', 'mike.bartlett@gmail.com', 'a.trevorah@gmail.com', 'andrew@troupe.co'];
+                  var whitelist = ['hackers.are.rockstars@gmail.com', 'mike.bartlett@gmail.com', 
+                                   'a.trevorah@gmail.com', 'andrew@troupe.co', 'mike@hipgeeks.net'];
                   if (whitelist.indexOf(user.email) != -1) {
                     if (!optedOut) emailNotificationService.sendUnreadItemsNotification(user, troupeData);
                   }
