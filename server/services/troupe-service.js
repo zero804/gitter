@@ -1008,7 +1008,7 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
         statsService.event('new_troupe', {
           troupeId: troupe.id,
           oneToOne: true,
-          userId: userId1.id,
+          userId: userId1,
           oneToOneUpgrade: false
         });
 
