@@ -39,37 +39,42 @@ exports.event = function(eventName, properties) {
 
   if(!properties) properties = {};
 
-  winston.info('[event] ' + eventName + ' ' + JSON.stringify(properties));
+  winston.verbose("[stats]", {event: eventName, properties: properties});
 
-  // Cube
-  if (cube_enabled) {
-    properties.env = nconf.get("stats:envName");
+  try {
 
-    var event = {
-      type: "troupe_" + eventName,
-      time: new Date(),
-      data: properties
-    };
-    cube.send(event);
-  }
+    // Cube
+    if (cube_enabled) {
+      properties.env = nconf.get("stats:envName");
 
-  if (blacklist.indexOf(eventName) == -1) {
-    if (!isTestUser(properties.email)) {
-      winston.verbose("[stats]" , "Logging user to Customer Actions: " + properties.email);
-      // MixPanel
-      if (mixpanel_enabled) {
-        properties.distinct_id = properties.userId;
-        mixpanel.track(eventName, properties, function(err) { if (err) throw err; });
-      }
+      var event = {
+        type: "troupe_" + eventName,
+        time: new Date(),
+        data: properties
+      };
+      cube.send(event);
+    }
 
-      // CustomerIO
-      if (customerio_enabled) {
-        cio.track(properties.userId, eventName, properties);
+    if (blacklist.indexOf(eventName) == -1) {
+      if (!isTestUser(properties.email)) {
+        winston.verbose("[stats]" , "Logging user to Customer Actions: " + properties.email);
+        // MixPanel
+        if (mixpanel_enabled) {
+          properties.distinct_id = properties.userId;
+          mixpanel.track(eventName, properties, function(err) { if (err) throw err; });
+        }
+
+        // CustomerIO
+        if (customerio_enabled) {
+          cio.track(properties.userId, eventName, properties);
+        }
       }
     }
+
+  } catch(err) {
+    winston.error('[stats] Error processing event: ', err, eventName, properties);
   }
 
-  winston.verbose("[stats]", {event: eventName, properties: properties});
 };
 
 exports.userUpdate = function(user, properties) {
@@ -77,49 +82,54 @@ exports.userUpdate = function(user, properties) {
 
   winston.verbose("[stats] Updating user stat");
 
+  try {
+
+    if(!properties) properties = {};
+
+    var createdAt = Math.round(user._id.getTimestamp().getTime() / 1000);
+    var firstName = user.getFirstName();
+
+    if (mixpanel_enabled) {
+      var mp_properties = {
+        $first_name:  firstName,
+        $created_at:  new Date(createdAt).toISOString(),
+        $email:       user.email,
+        $name:        user.displayName,
+        $username:    user.username,
+        $confirmationCode: user.confirmationCode,
+        Status:       user.status
+      };
+
+      for (var attr in properties) {
+        var value = properties[attr] instanceof Date ? properties[attr].toISOString() : properties[attr];
+        mp_properties[attr] = value;
+      }
 
 
-  if(!properties) properties = {};
-
-  var createdAt = Math.round(user._id.getTimestamp().getTime() / 1000);
-  var firstName = user.getFirstName();
-
-  if (mixpanel_enabled) {
-    var mp_properties = {
-      $first_name:  firstName,
-      $created_at:  new Date(createdAt).toISOString(),
-      $email:       user.email,
-      $name:        user.displayName,
-      $username:    user.username,
-      $confirmationCode: user.confirmationCode,
-      Status:       user.status
-    };
-
-    for (var attr in properties) {
-      var value = properties[attr] instanceof Date ? properties[attr].toISOString() : properties[attr];
-      mp_properties[attr] = value;
+      mixpanel.people.set(user.id, mp_properties);
     }
 
+    if (customerio_enabled) {
+      var cio_properties = {
+        first_name: firstName,
+        created_at: createdAt,
+        email:      user.email,
+        name:       user.displayName,
+        username:   user.username,
+        confirmationCode: user.confirmationCode,
+        status:     user.status
+      };
 
-    mixpanel.people.set(user.id, mp_properties);
-  }
+      for (var attr in properties) {
+        var value = properties[attr] instanceof Date ? Math.round(properties[attr].getTime() / 1000) : properties[attr];
+        cio_properties[attr] = value;
+      }
 
-  if (customerio_enabled) {
-    var cio_properties = {
-      first_name: firstName,
-      created_at: createdAt,
-      email:      user.email,
-      name:       user.displayName,
-      username:   user.username,
-      confirmationCode: user.confirmationCode,
-      status:     user.status
-    };
-
-    for (var attr in properties) {
-      var value = properties[attr] instanceof Date ? Math.round(properties[attr].getTime() / 1000) : properties[attr];
-      cio_properties[attr] = value;
+      cio.identify(user.id, user.email, cio_properties);
     }
 
-    cio.identify(user.id, user.email, cio_properties);
+  } catch(err) {
+    winston.error('[stats] Error processing userUpdate: ', err, properties);
   }
+
 };
