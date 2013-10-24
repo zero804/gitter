@@ -113,7 +113,7 @@ class SignupTests(unittest.TestCase):
         form.find_element_by_name('signIn').click()
 
         # Revoke access
-        self.driver.get("https://accounts.google.com/ServiceLogin?service=mail&continue=https://mail.google.com/mail/&hl=en")
+        self.driver.get("https://accounts.google.com/b/0/IssuedAuthSubTokens?hl=en_GB")
         form = self.driver.find_element_by_name('Troupe')
         form.find_element_by_css_selector('input[type=submit]').click()
 
