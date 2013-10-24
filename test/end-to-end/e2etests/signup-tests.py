@@ -125,8 +125,6 @@ class SignupTests(unittest.TestCase):
         accept = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, 'submit_approve_access')))
         accept.click()
 
-        self.assertEqual(self.driver.current_url, utils.baseUrl('/start/profile'))
-
         displayName = self.driver.find_element_by_name('displayName').get_attribute('value')
         self.assertEqual(displayName, name)
 
