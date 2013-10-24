@@ -106,7 +106,7 @@ class SignupTests(unittest.TestCase):
         name    = 'Mr Troupe'
 
         # Sing in into Gmail
-        self.driver.get("https://gmail.com")
+        self.driver.get("https://accounts.google.com/ServiceLogin?service=mail&continue=https://mail.google.com/mail/&hl=en")
         form = self.driver.find_element_by_css_selector('#gaia_loginform')
         form.find_element_by_name('Email').send_keys(email)
         form.find_element_by_name('Passwd').send_keys(passwd)
