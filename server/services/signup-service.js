@@ -204,14 +204,13 @@ var signupService = module.exports = {
 
     return Q.all([
       troupeService.findAllTroupesIdsForUser(userId),           /* 2. */
-      persistence.Request.count({ userId: userId }),            /* 3. */
-      persistence.RequestUnconfirmed.count({ userId: userId }), /* 3. */
-      persistence.Invite.count({ $or: [{ userId: userId }       /* 4a,b. */ ,
+      persistence.Request.countQ({ userId: userId }),            /* 3. */
+      persistence.RequestUnconfirmed.countQ({ userId: userId }), /* 3. */
+      persistence.Invite.countQ({ $or: [{ userId: userId }       /* 4a,b. */ ,
                                       { fromUserId: userId }    /* 4c. */ ] }),
-      persistence.InviteUnconfirmed.count({ $or: [{ userId: userId } /* 4a,b. */,
+      persistence.InviteUnconfirmed.countQ({ $or: [{ userId: userId } /* 4a,b. */,
                                                   { fromUserId: userId } /* 4c. */] }),
     ]).spread(function(troupes, requestCount, unconfirmedRequestCount, inviteCount, unconfirmedInviteCount) {
-      console.log('shouldUserPerformStartProcess:', arguments);
       return !(troupes.length || requestCount || unconfirmedRequestCount || inviteCount || unconfirmedInviteCount);
     });
   },
