@@ -172,6 +172,8 @@ class SignupTests(unittest.TestCase):
 
         self.driver.find_element_by_tag_name('a').click()
 
+        self.driver.find_element_by_tag_name('a').click()
+
 
 def generateUniqueEmailAddress():
     return 'testuser-' + str(uuid.uuid4()) + '@troupetest.local'
