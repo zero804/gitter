@@ -117,6 +117,9 @@ class ChangePasswordTests(unittest.TestCase):
 
     def setProfileNameAndPassword(self, displayName, newPassword):
         self.driver.find_element_by_id('profile-icon').click()
+
+        self.driver.find_element_by_css_selector('input[name=username]').send_keys('testuser-' + str(uuid.uuid4()))
+        self.driver.find_element_by_css_selector('input[name=submit]').click()
         
         form = self.driver.find_element_by_id('updateprofileform')
         # wait for form to load
