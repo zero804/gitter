@@ -1,6 +1,7 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'utils/router',
+  'utils/context',
   'views/base',
   'views/profile/profileView',
   'views/profile/profileEmailView',
@@ -10,10 +11,11 @@ define([
   'collections/useremails',
   'views/shareSearch/shareSearchView',
   'views/invite/reinviteModal',
+  'views/modals/completeYourProfileModal',
   'hbs!views/connect/tmpl/connectUserTemplate',
   'hbs!views/login/tmpl/loginRequestModalView'
-  ], function(Router, TroupeViews, profileView, profileEmailView, profileAddEmailView, createTroupeView,
-    troupeCollections, UserEmailCollection, shareSearchView, InviteModal, connectUserTemplate,
+  ], function(Router, context, TroupeViews, profileView, profileEmailView, profileAddEmailView, createTroupeView,
+    troupeCollections, UserEmailCollection, shareSearchView, InviteModal, completeYourProfileModal, connectUserTemplate,
     loginRequestTemplate) {
   "use strict";
 
@@ -69,11 +71,11 @@ define([
     view: new RequestSuccessView()
   });
 
-
+  var profileModal = context.getUser().username ? profileView.Modal : completeYourProfileModal;
 
   var router = Router.extend({
     routes: [
-    { name: "profile",               re: /^profile$/,                viewType: profileView.Modal },
+    { name: "profile",               re: /^profile$/,                viewType: profileModal },
     { name: "profileEmails",         re: /^profile\/emails$/,        viewType: profileEmailView.Modal,    collection: userEmailCollection, skipModelLoad: true },
     { name: "profileEmailsAdd",      re: /^profile\/emails\/add$/,   viewType: profileAddEmailView.Modal, collection: userEmailCollection, skipModelLoad: true },
     { name: "create",                re: /^create$/,                 viewType: createTroupeView.Modal,    collection: troupeCollections.troupes,   skipModelLoad: true },
