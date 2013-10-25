@@ -1,10 +1,9 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'utils/context',
-  'views/base',
   'views/signup/usernameView',
   'views/profile/profileView'
-], function(context, TroupeViews, UsernameView, ProfileView) {
+], function(context, UsernameView, ProfileView) {
   "use strict";
 
   return UsernameView.Modal.extend({
