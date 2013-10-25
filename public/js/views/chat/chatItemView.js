@@ -176,8 +176,11 @@ define([
 
         // Note: The context in mobile doesn't have a user,
         // it's actually populated at a later time over Faye.
-        if (user && (user.username.match(re) || user.displayName.match(re))) {
-          $(self.$el).find('.trpChatBox').addClass('mention');
+        if (user)
+        {
+          if (user.username && (user.username.match(re) || user.displayName.match(re))) {
+            $(self.$el).find('.trpChatBox').addClass('mention');
+          }
         }
       });
     },
