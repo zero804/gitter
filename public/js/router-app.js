@@ -19,6 +19,7 @@ require([
   'views/profile/profileView',
   'views/profile/profileEmailView',
   'views/profile/profileAddEmailView',
+  'views/modals/completeYourProfileModal',
   'views/shareSearch/shareSearchView',
   'views/signup/createTroupeView',
   'views/signup/usernameView',
@@ -45,7 +46,7 @@ require([
 ], function($, Backbone, context, AppIntegratedView, chatInputView, ChatCollectionView,
             itemCollections, troupeCollections, UserEmailCollection, RightToolbarView,
             filePreviewView, fileVersionsView, RequestDetailView, InviteDetailView, PersonDetailView,
-            conversationDetailView, profileView, profileEmailView, profileAddEmailView, shareSearchView,
+            conversationDetailView, profileView, profileEmailView, profileAddEmailView, completeYourProfileModal, shareSearchView,
             createTroupeView, UsernameView, troupeSettingsView, TroupeMenuView, ReinviteModal, Router,
             unreadItemsClient, SmartCollectionView, FileDecorator, webhookDecorator, userDecorator,
             embedDecorator /*, errorReporter , FilteredCollection */) {
@@ -94,6 +95,8 @@ require([
     rollers: chatCollectionView.rollers
   }).render();
 
+  var profileModal = context.getUser().username ? profileView.Modal : completeYourProfileModal;
+
   new Router({
     routes: [
       { name: "file",             re: /^file\/(\w+)$/,            viewType: filePreviewView.Modal,               collection: itemCollections.files },
@@ -104,7 +107,7 @@ require([
       { name: "mail",             re: /^mail\/(\w+)$/,            viewType: conversationDetailView.Modal, collection: itemCollections.conversations },
       { name: "person",           re: /^person\/(\w+)$/,          viewType: PersonDetailView.Modal,             collection: itemCollections.users },
 
-      { name: "profile",          re: /^profile$/,                viewType: profileView.Modal },
+      { name: "profile",          re: /^profile$/,                viewType: profileModal },
       { name: "profileEmails",    re: /^profile\/emails$/,        viewType: profileEmailView.Modal,       collection: userEmailCollection, skipModelLoad: true },
       { name: "profileEmailsAdd", re: /^profile\/emails\/add$/,   viewType: profileAddEmailView.Modal,    collection: userEmailCollection, skipModelLoad: true },
       { name: "share",            re: /^share$/,                  viewType: shareSearchView.Modal },
