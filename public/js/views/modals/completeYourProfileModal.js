@@ -9,6 +9,9 @@ define([
 
   return UsernameView.Modal.extend({
     initialize: function(options) {
+      options = options || {};
+      options.disableClose = true;
+
       var self = this;
       this.on('chose', function() {
         var modal = new ProfileView.Modal({
