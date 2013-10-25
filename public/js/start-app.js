@@ -11,6 +11,13 @@ require([
 
   var page = $('body').data('page');
 
+  // Asynchronously load tracker
+  require([
+    'utils/tracking'
+  ], function(/*tracking*/) {
+    // No need to do anything here
+  });
+
   switch(page) {
     case 'profile':
       return bootProfile();
@@ -28,10 +35,4 @@ require([
       return bootFinish();
   }
 
-  // Asynchronously load tracker
-  require([
-    'utils/tracking'
-  ], function(/*tracking*/) {
-    // No need to do anything here
-  });
 });
