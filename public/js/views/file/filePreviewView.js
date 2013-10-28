@@ -80,8 +80,9 @@ define([
     },
 
     initialize: function() {
-      _.bindAll(this, 'onMenuItemClicked');
+      _.bindAll(this, 'onMenuItemClicked', 'onModelChange');
       this.on('menuItemClicked', this.onMenuItemClicked);
+      this.on('modelChange', this.onModelChange);
     },
 
     showNext: function() {
@@ -140,7 +141,7 @@ define([
 
     replaceModel: function(model) {
       this.model = model;
-      this.onModelChange();
+      this.trigger('modelChange');
     },
 
     onModelChange: function() {
@@ -254,7 +255,7 @@ define([
   var Modal = TroupeViews.Modal.extend({
     className: 'modal trpFilePreview',
     initialize: function(options) {
-      options.title = 'Files';
+      options.title = this.model.get('fileName');
       options.menuItems = [
         { text: "Download", action: "download", className: "trpBtnGreen" },
         { text: "Versions", action: "versions", className: "trpBtnLightGrey" },
@@ -262,6 +263,11 @@ define([
       ];
       TroupeViews.Modal.prototype.initialize.call(this, options);
       this.view = new PreviewView({ model: this.model, collection: this.collection });
+
+      this.view.on('modelChange', function() {
+        this.setTitle(this.view.model.get('fileName'));
+      }, this);
+
     }
   });
 
