@@ -281,6 +281,12 @@ define([
       }
     },
 
+    setTitle: function(title) {
+      this.options.title = title;
+      // cant seem to call render() twice...
+      this.$el.find('.trpModalTitleHeader').text(title);
+    },
+
     supportsModelReplacement: function() {
       return this.view &&
               this.view.supportsModelReplacement &&
