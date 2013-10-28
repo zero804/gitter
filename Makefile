@@ -105,7 +105,7 @@ end-to-end-test-saucelabs-ie10:
 	MAIL_HOST=$(MAIL_HOST) \
 	MAIL_PORT=$(MAIL_PORT) \
 		nosetests \
-			--processes=30 --process-timeout=180 \
+			--processes=30 --process-timeout=240 \
 			--attr '!unreliable','thread_safe' \
 			--nologcapture --with-xunit --xunit-file=./output/test-reports/nosetests.xml \
 			--all-modules test/end-to-end/e2etests

@@ -65,7 +65,7 @@ define([
       var newUnread = this.model.get('unreadItems') > 0;
       if(!this.options.noUnread && this.hasUnread !== newUnread) {
         this.hasUnread = newUnread;
-        var $e = this.$el.find('.trpDisplayPicture');
+        var $e = this.$el.find('.trpMiniLeftMenuItem, .trpDisplayPicture');
 
         if(newUnread) {
           $e.addClass('unread');
