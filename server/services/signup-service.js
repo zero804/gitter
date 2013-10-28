@@ -10,6 +10,7 @@ var assert                    = require('assert');
 var appEvents                 = require('../app-events');
 var Q                         = require('q');
 var userService               = require("./user-service");
+var persistence               = require("./persistence-service");
 
 var signupService = module.exports = {
   /**
@@ -183,6 +184,35 @@ var signupService = module.exports = {
       })
       .nodeify(callback);
 
+  },
+
+  /**
+   * Given a user, should that user go through the signup process?
+   * The rules are as follows:
+   * 2. If the user belongs to one or more troupes, then no
+   * 3. If the user has requested access to a troupe then no
+   * 4. If the user has
+   *    a) Been invited to a troupe
+   *    b) Been invites to connect with another user
+   *    c) Signed up with a connection request (One-to-one invite on signup) ****
+   * Otherwise, they should go through the startup process
+   * @return {promise} promise of a boolean indicating whether they should go through the start process
+   */
+  shouldUserPerformStartProcess: function(user) {
+    assert(user, 'User required');
+    var userId = user.id;
+
+    return Q.all([
+      troupeService.findAllTroupesIdsForUser(userId),           /* 2. */
+      persistence.Request.countQ({ userId: userId }),            /* 3. */
+      persistence.RequestUnconfirmed.countQ({ userId: userId }), /* 3. */
+      persistence.Invite.countQ({ $or: [{ userId: userId }       /* 4a,b. */ ,
+                                      { fromUserId: userId }    /* 4c. */ ] }),
+      persistence.InviteUnconfirmed.countQ({ $or: [{ userId: userId } /* 4a,b. */,
+                                                  { fromUserId: userId } /* 4c. */] }),
+    ]).spread(function(troupes, requestCount, unconfirmedRequestCount, inviteCount, unconfirmedInviteCount) {
+      return !(troupes.length || requestCount || unconfirmedRequestCount || inviteCount || unconfirmedInviteCount);
+    });
   },
 
   /**

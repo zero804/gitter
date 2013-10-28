@@ -16,11 +16,13 @@ class ChangePasswordTests(unittest.TestCase):
         self.driver = utils.driver()
         utils.printJobInfo(self.driver)
 
-        self.username = utils.getJSON('/testdata/newUser').get('username')
+        userJSON = utils.getJSON('/testdata/newUser')
+        self.username = userJSON.get('username')
+        self.userId = userJSON.get('_id')
         self.driver.get(utils.baseUrl("/signout"))
-        self.loginFromHomepage(self.username + '@troupetest.local', 'password');
 
     def testNewUserChangesPasswordAtUserhome(self):
+        self.loginFromHomepage(self.username + '@troupetest.local', 'password');
         self.changeProfilePassword('password', 'newpassword')
         self.driver.get(utils.baseUrl("/signout"))
         self.loginFromHomepage(self.username, 'newpassword')
@@ -29,6 +31,8 @@ class ChangePasswordTests(unittest.TestCase):
 
     def testNewUserChangesPasswordAtTroupe(self):
         self.createTroupe();
+        self.loginFromHomepage(self.username + '@troupetest.local', 'password');
+        self.assertAnyTroupeIsCurrentPage()
         self.changeProfilePassword('password', 'newpassword')
         self.driver.get(utils.baseUrl("/signout"))
         self.loginFromHomepage(self.username, 'newpassword')
@@ -37,6 +41,8 @@ class ChangePasswordTests(unittest.TestCase):
 
     def testInvitedUserCanSetPasswordAtUserhome(self):
         self.createTroupe()
+        self.loginFromHomepage(self.username + '@troupetest.local', 'password');
+        self.assertAnyTroupeIsCurrentPage()
         invitee = 'testuser-' + str(uuid.uuid4())
         self.inviteToTroupe(invitee+'@troupetest.local')
 
@@ -57,6 +63,8 @@ class ChangePasswordTests(unittest.TestCase):
 
     def testInvitedUserCanSetPasswordAtTroupe(self):
         self.createTroupe()
+        self.loginFromHomepage(self.username + '@troupetest.local', 'password');
+        self.assertAnyTroupeIsCurrentPage()
         invitee = 'testuser-' + str(uuid.uuid4())
         self.inviteToTroupe(invitee+'@troupetest.local')
 
@@ -76,35 +84,6 @@ class ChangePasswordTests(unittest.TestCase):
 
     def tearDown(self):
         self.driver.quit()
-
-    def signupFromHomepage(self, email, username, displayName, password):
-        self.driver.find_element_by_css_selector('#button-signup').click()
-
-        form = self.driver.find_element_by_css_selector('#signup-form')
-        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, 'email')))
-        form.find_element_by_name('email').send_keys(email)
-        form.find_element_by_name('submit').click()
-        self.driver.find_element_by_css_selector('.label-signupsuccess')
-
-        queryurl = utils.baseUrl("/testdata/confirmationCodeForEmail?email=" + email)
-        response = urllib2.urlopen(queryurl)
-        confirmCode = response.read()
-
-        # visit confirm link
-        self.driver.get(utils.baseUrl('/confirm/'+confirmCode))
-
-        # choose a username
-        inputUser = self.driver.find_element_by_css_selector('input[name=username]')
-        inputUser.send_keys(username)
-        self.driver.find_element_by_css_selector('#username-form [type=submit]').click()
-
-        self.driver.find_element_by_id('displayName').send_keys(displayName)
-        self.driver.find_element_by_id('password').send_keys(password)
-        self.driver.find_element_by_css_selector('[data-action=save]').click()
-        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, 'mini-left-menu')))
-        tourcancel = self.driver.find_element_by_id('hopscotch-cta')
-        if tourcancel.is_displayed():
-            tourcancel.click()
 
     def loginFromHomepage(self, email, password):
         utils.existingUserlogin(self.driver, email, password)
@@ -138,6 +117,9 @@ class ChangePasswordTests(unittest.TestCase):
 
     def setProfileNameAndPassword(self, displayName, newPassword):
         self.driver.find_element_by_id('profile-icon').click()
+
+        self.driver.find_element_by_css_selector('input[name=username]').send_keys('testuser-' + str(uuid.uuid4()))
+        self.driver.find_element_by_css_selector('input[name=submit]').click()
         
         form = self.driver.find_element_by_id('updateprofileform')
         # wait for form to load
@@ -148,12 +130,7 @@ class ChangePasswordTests(unittest.TestCase):
         time.sleep(1)
 
     def createTroupe(self):
-        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, 'home-create-troupe'))).click()
-        self.driver.find_element_by_id('troupeName').send_keys('test troupe')
-        self.driver.find_element_by_name('submit').click()
-        self.assertAnyTroupeIsCurrentPage();
-        self.driver.find_element_by_id('custom-email')
-        self.driver.find_element_by_css_selector('.close').click()
+        utils.getJSON('/testdata/newTroupeForUser?id='+self.userId)
 
     def inviteToTroupe(self, email):
         self.driver.get(utils.baseUrl('/#|share'))

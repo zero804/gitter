@@ -1,15 +1,20 @@
 {{#if oneToOne}}
-<a class="trpDisplayPicture avatar-s offline" data-original-title="{{name}}" style="background-image: url({{avatarUrl}});" href="{{url}}">
-  <div class="trpDPUnreadCount"></div>
+<a class="trpMiniLeftMenuItem" href="{{url}}">
+  <div class="trpDisplayPicture avatar-s offline" data-original-title="{{name}}" style="background-image: url({{avatarUrl}});">
+  </div>
 </a>
 {{else}}
   {{#if noHref}}
+  <a class="trpMiniLeftMenuItem">
         <div class="trpDisplayPicture avatar-s trpTroupeAvatar" href="{{url}}" style="border-color: white; text-decoration: none; background-color: {{colour}}" data-original-title="{{name}}">
           <div class="trpTroupeAvatarText">{{initials}}</div>
         </div>
+  </a>
   {{else}}
-        <a class="trpDisplayPicture avatar-s trpTroupeAvatar" href="{{url}}" style="border-color: {{colour}}; text-decoration: none" data-original-title="{{name}}">
+    <a class="trpMiniLeftMenuItem" href="{{url}}">
+        <div class="trpDisplayPicture avatar-s trpTroupeAvatar" style="border-color: {{colour}}; text-decoration: none" data-original-title="{{name}}">
           <div class="trpTroupeAvatarText">{{initials}}</div>
-        </a>
+        </div>
+    </a>
   {{/if}}
 {{/if}}
