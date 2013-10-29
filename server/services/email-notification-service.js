@@ -6,6 +6,8 @@ var nconf = require('../utils/config');
 var assert = require('assert');
 var url = require('url');
 var appEvents = require('../app-events');
+var statsService  = require("./stats-service");
+
 
 var crypto = require('crypto');
 var passphrase = 'troupetasticprefs';
@@ -240,6 +242,8 @@ module.exports = {
     var plaintext = user.id + ',' + 'unread_notifications';
     var cipher    = crypto.createCipher('aes256', passphrase);
     var hash      = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
+
+    statsService.event('unread_notification_sent', {userId: user.id, email: user.email});
 
     mailerService.sendEmail({
       templateFile: "unread_notification",
