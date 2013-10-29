@@ -16,9 +16,9 @@
     {{#each troupesWithUnreadCounts}}
       <tr>
         <td align="center">
-          <p style="color: #404040;display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 18px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0; margin-bottom: 8px">{{troupe.name}}</p>
-          <p style="color: #404040;display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 13px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0; margin-bottom: 4px">{{__n "%d unread message" "%d unread messages" unreadCount}}</p>
-          <p style="color: #404040;display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 15px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0;"><a href="{{../emailBasePath}}{{troupe.url}}" style="color: #1dce73">Read now</a></p>
+          <p style="color: #404040;display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 18px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0; margin-bottom: 8px;">{{troupe.name}}</p>
+          <p style="color: #404040;display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 13px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0; margin-bottom: 4px;">{{__n "%d unread message" "%d unread messages" unreadCount}}</p>
+          <p style="color: #404040;display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 15px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0;"><a href="{{../emailBasePath}}{{troupe.url}}#utm_source=troupe&utm_medium=email&utm_campaign=unread-notifications" style="color: #1dce73">Read now</a></p>
           <br/>
         </td>
       </tr>

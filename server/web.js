@@ -12,12 +12,17 @@ var express = require('express'),
   nconf = require('./utils/config'),
   redis = require('./utils/redis'),
   shutdown = require('./utils/shutdown'),
-  oauth2 = require('./web/oauth2');
+  oauth2 = require('./web/oauth2'),
+  responseTime = require('./utils/response-time');
 
 /* Load express-resource */
 require('express-resource');
 
+
 var app = express();
+
+app.use(responseTime(winston));
+
 var server = http.createServer(app);
 
 var gracefullyClosing = false;

@@ -18,6 +18,7 @@ define([
     initialize: function(options) {
       // var self = this;
       if(!this.model) this.model = options.troupe;
+      this.tooltipPlacement = options.tooltipPlacement || 'vertical';
 
       if(!options.noUnread) {
         this.hasUnread = false;
@@ -84,7 +85,7 @@ define([
 
       this.$el.find('.avatar-s').first().tooltip({
         html : true,
-        placement : 'vertical',
+        placement : this.tooltipPlacement,
         container: "body"
       });
     }

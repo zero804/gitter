@@ -28,6 +28,7 @@ define([
           self.$el.prepend(addFileButton);
           $(addFileButton).tooltip({
             html : true,
+            placement : 'left',
             container: "body"
           });
         }
