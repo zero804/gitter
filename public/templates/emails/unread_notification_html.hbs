@@ -1,10 +1,8 @@
 <span class="heading" style="color: #404040;display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 24px;font-weight: bold;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0;">
-          Hi there
+          You have unread messages on Troupe
         </span>
         <br>
         <span class="body" style="color: #404040;display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 18px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0;">
-          <br><br>
-          This is what you missed while you were away
           <br><br><br><br>
         </span>
       </td>
@@ -20,7 +18,7 @@
         <td align="center">
           <p style="color: #404040;display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 18px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0;">{{troupe.name}}</p>
           <p style="color: #404040;display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 13px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0;">{{__n "%d unread message" "%d unread messages" unreadCount}}</p>
-          <p style="color: #404040;display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 15px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0;"><a href="{{../emailBasePath}}{{troupe.url}}">Read now</a></p>
+          <p style="color: #404040;display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 15px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0;"><a href="{{../emailBasePath}}{{troupe.url}}" style="color: #1dce73">Read now</a></p>
           <br/>
         </td>
       </tr>
@@ -31,7 +29,7 @@
 <tr>
   <td align="center">
     <p style="color: #AAAAAA; display: block;font-family: lucida grande, Geneva, Helvetica, Arial, Sans-serif;font-size: 10px;font-weight: normal;line-height: 100%;margin-top: 0;margin-right: 0;margin-left: 0;">
-      Don't want to receive any more unread notifications? <a href='{{emailBasePath}}/unsubscribe/{{unsubscribeHash}}'>Unsubscribe</a>  
+      Don't want to receive any more unread message notifications? <a href='{{emailBasePath}}/unsubscribe/{{unsubscribeHash}}'>Unsubscribe</a>  
     </p>
   </td>
 </tr>
