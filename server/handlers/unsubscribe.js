@@ -1,9 +1,10 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var crypto      = require('crypto');
-var winston     = require('winston');
-var preferences = require('../services/notifications-preference-service');
+var crypto        = require('crypto');
+var winston       = require('winston');
+var preferences   = require('../services/notifications-preference-service');
+var statsService  = require("../services/stats-service");
 
 var passphrase = 'troupetasticprefs';
 
@@ -26,6 +27,7 @@ module.exports = {
       var notificationType  = parts[1];
 
       winston.info("User " + userId + " opted-out from " + notificationType);
+      statsService.event('unsubscribed_unread_notifications', {userId: userId});
 
       preferences.optOut(userId, notificationType);
       
