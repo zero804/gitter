@@ -142,7 +142,12 @@ define([
       this.files.show(new FileView({ collection: fileCollection }));
 
       if (!context.inOneToOneTroupeContext()) {
-        this.troupeAvatar.show(new TroupeAvatar({ troupe: context.troupe(), noHref: true, noUnread: true}));
+        this.troupeAvatar.show(new TroupeAvatar({
+          troupe: context.troupe(),
+          noHref: true,
+          noUnread: true,
+          tooltipPlacement: 'left'
+        }));
       }
       // Conversation View
       if (!context.inOneToOneTroupeContext()) {
