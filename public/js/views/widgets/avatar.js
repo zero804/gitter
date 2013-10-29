@@ -21,6 +21,7 @@ define([
       this.showStatus = options.showStatus;
       this.avatarSize = options.size ? options.size : 's';
       this.showTooltip = options.showTooltip !== false;
+      this.tooltipPlacement = options.tooltipPlacement || 'vertical';
 
       // once this widget has the id of the user,
       // it will listen to changes on the global user collection,
@@ -121,7 +122,7 @@ define([
       if (this.showTooltip && !window._troupeCompactView && (this.model ? this.model.get('displayName') : this.user.displayName)) {
         this.$el.find(':first-child').tooltip({
           html : true,
-          placement : 'vertical',
+          placement : this.tooltipPlacement,
           container: "body"
         });
       }
