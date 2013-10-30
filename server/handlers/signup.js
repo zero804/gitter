@@ -106,7 +106,7 @@ module.exports = {
         function(req, res, next){
           winston.verbose("Confirmation authenticated");
 
-          signupService.confirm(req.user, function(err, user) {
+          userConfirmationService.confirmSignup(req.user, function(err, user) {
             if (err) {
               statsService.event('confirmation_error', { userId: user.id });
 
