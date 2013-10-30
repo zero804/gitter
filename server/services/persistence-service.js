@@ -1,18 +1,17 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var mongoose = require('mongoose-q')(require('mongoose'), {spread:true});
-
-var Schema = mongoose.Schema;
-var ObjectId = Schema.ObjectId;
+var mongoose      = require('mongoose-q')(require('mongoose'), {spread:true});
+var Schema        = mongoose.Schema;
+var ObjectId      = Schema.ObjectId;
 var mongooseUtils = require('../utils/mongoose-utils');
-var appEvents = require("../app-events");
-var _ = require("underscore");
-var winston = require("winston");
-var nconf = require("../utils/config");
-var shutdown = require('../utils/shutdown');
-var Fiber = require("../utils/fiber");
-var assert = require("assert");
+var appEvents     = require("../app-events");
+var _             = require("underscore");
+var winston       = require("winston");
+var nconf         = require("../utils/config");
+var shutdown      = require('../utils/shutdown');
+var Fiber         = require("../utils/fiber");
+var assert        = require("assert");
 
 
 // Install inc and dec number fields in mongoose
@@ -128,7 +127,7 @@ var UserSchema = new Schema({
 });
 UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ username: 1 }, { unique: true, sparse: true });
-UserSchema.index({ "emails.email" : 1 }, { unique: true });
+UserSchema.index({ "emails.email" : 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
 
 UserSchema.methods.getDisplayName = function() {
