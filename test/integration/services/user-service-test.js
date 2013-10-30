@@ -42,6 +42,22 @@ describe("User Service", function() {
       .nodeify(done);
     });
 
+    it('removes a users password', function(done) {
+      fixtureLoader.use({
+        'user1': {}
+      })
+      .then(function(fixture) {
+        return userService.requestPasswordReset(fixture.user1.email);
+      })
+      .then(function(user) {
+        return userService.findAndUsePasswordResetCode(user.passwordResetCode);
+      })
+      .then(function(user) {
+        assert(!user.hasPassword());
+      })
+      .nodeify(done);
+    });
+
   });
 
   describe("#updateProfile", function() {
