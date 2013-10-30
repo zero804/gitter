@@ -118,6 +118,9 @@ var userService = {
       assert(user, 'User not found');
       user.passwordResetCode = null;
       user.passwordHash = null;
+      if (!user.isConfirmed()) {
+        user.status = 'PROFILE_NOT_COMPLETED';
+      }
       return user.saveQ().thenResolve(user);
     })
     .nodeify(callback);
