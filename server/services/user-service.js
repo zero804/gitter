@@ -94,35 +94,33 @@ var userService = {
 
   requestPasswordReset: function(login, callback) {
     winston.info("Requesting password reset for ", login);
-
-    userService.findByLogin(login, function(err, user) {
-      if(err || !user) return callback(err, user);
-
+    return userService.findByLogin(login)
+    .then(function(user) {
+      assert(user, 'User not found');
       if(user.passwordResetCode) {
         /* Resend the password reset code to the user */
       } else {
         user.passwordResetCode = uuid.v4();
-        user.save(); // Async save
+        return user.saveQ().thenResolve(user);
       }
-
+    })
+    .then(function(user) {
       emailNotificationService.sendPasswordResetForUser(user);
-      callback(err, user);
-    });
+      return user;
+    })
+    .nodeify(callback);
   },
 
   findAndUsePasswordResetCode: function(passwordResetCode, callback) {
     winston.info("Using password reset code", passwordResetCode);
-
-    persistence.User.findOne({passwordResetCode: passwordResetCode}, function(err, user) {
-      if(err || !user) return callback(err, user);
-
+    return persistence.User.findOneQ({passwordResetCode: passwordResetCode})
+    .then(function(user) {
+      assert(user, 'User not found');
       user.passwordResetCode = null;
       user.passwordHash = null;
-      user.save(function(err) {
-        if(err) return callback(err);
-        callback(err, user);
-      });
-    });
+      return user.saveQ().thenResolve(user);
+    })
+    .nodeify(callback);
   },
 
   findById: function(id, callback) {
@@ -367,7 +365,7 @@ var userService = {
               .then(hashAndUpdatePassword);
 
         default:
-          throw "Invalid user status";
+          throw "Invalid user status: " + user.status;
       }
 
 
