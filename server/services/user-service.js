@@ -4,6 +4,7 @@
 var persistence               = require("./persistence-service");
 var sechash                   = require('sechash');
 var emailNotificationService  = require("./email-notification-service");
+var userConfirmationService   = require('./user-confirmation-service');
 var uuid                      = require('node-uuid');
 var geocodingService          = require("./geocoding-service");
 var winston                   = require("winston");
@@ -118,10 +119,14 @@ var userService = {
       assert(user, 'User not found');
       user.passwordResetCode = null;
       user.passwordHash = null;
-      if (!user.isConfirmed()) {
-        user.status = 'PROFILE_NOT_COMPLETED';
-      }
       return user.saveQ().thenResolve(user);
+    })
+    .then(function(user) {
+      if (user.isConfirmed()) {
+        return user;
+      } else {
+        return userConfirmationService.confirmSignup(user);
+      }
     })
     .nodeify(callback);
   },
