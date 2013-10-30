@@ -19,7 +19,6 @@ define([
     initialize: function(options) {
       _.bindAll(this, 'onFormSubmit', 'onPasswordChange', 'onError');
       if (!options) return;
-      this.originalEmail = context.getUser().email;
       this.hasPassword = context.getUser().hasPassword;
       if (this.compactView) $("#uvTab").hide();
 
@@ -165,24 +164,12 @@ define([
       this.$el.find('.failure-text').html(errors);
     },
 
-    hasChangedEmail: function(newEmail) {
-      return newEmail && newEmail != this.originalEmail;
-    },
-
     onFormSubmit: function(e) {
       if(e) e.preventDefault();
       if(!this.$el.find('#updateprofileform').valid()) return;
 
       var form = this.$el.find('form#updateprofileform');
-      var newEmail = form.find('[name=newEmail]').val();
       var that = this;
-
-      if (this.hasChangedEmail(newEmail)) {
-        // ask the user if they are sure they want to change their email address
-        // if successful show a modal that says they will receive a confirmation email.
-        if (!window.confirm("Are you sure you want to change your email?"))
-          return;
-      }
 
       $.ajax({
         url: "/profile",
@@ -201,10 +188,6 @@ define([
           if(that.dialog) {
             that.dialog.hide();
           }
-
-          if (that.hasChangedEmail(newEmail)) {
-            window.alert("Your address will be updated once you confirm the email sent to your new address.");
-          }
         },
         error: function(err) {
           that.onFormSubmitFailure(err);
@@ -213,10 +196,7 @@ define([
     },
     onFormSubmitFailure: function(err) {
       if(err.status < 500) {
-        if (err.responseJSON.emailConflict) {
-          window.alert("That email address is already registered, please choose another.");
-        }
-        else if(err.responseJSON.authFailure) {
+        if(err.responseJSON.authFailure) {
           this.$el.find('#oldPassword').val("");
           window.alert("Your old password is incorrect");
         }

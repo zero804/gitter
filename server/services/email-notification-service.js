@@ -111,26 +111,6 @@ module.exports = {
     });
   },
 
-  sendConfirmationForEmailChange: function (user) {
-    assert(user.confirmationCode, 'User does not have a confirmation code');
-
-    var confirmLink = nconf.get("email:emailBasePath") + "/confirm/" + user.confirmationCode;
-    var to = user.newEmail;
-
-    mailerService.sendEmail({
-      templateFile: "change-email-address",
-      to: to,
-      from: 'Troupe <support@troupe.co>',
-      subject: "Confirm new email address",
-      data: {
-        confirmLink: confirmLink,
-        originalEmail: user.email,
-        newEmail: user.newEmail,
-        baseServerPath: nconf.get("email:emailBasePath")
-      }
-    });
-  },
-
   sendConfirmationForSecondaryEmail: function (unconfirmed) {
     assert(unconfirmed.confirmationCode, 'No confirmation code found');
 
@@ -147,23 +127,6 @@ module.exports = {
         // originalEmail: unconfirmed.email,
         newEmail: unconfirmed.email,
         baseServerPath: nconf.get("email:emailBasePath")
-      }
-    });
-  },
-
-  sendNoticeOfEmailChange: function (user, origEmail, newEmail) {
-    assert(origEmail, 'origEmail parameter required');
-    assert(newEmail, 'newEmail parameter required');
-
-    mailerService.sendEmail({
-      templateFile: "change-email-address-complete",
-      to: [origEmail, newEmail],
-      from: 'Troupe <support@troupe.co>',
-      subject: "Your email address has been successfully changed",
-      data: {
-        baseServerPath: nconf.get("email:emailBasePath"),
-        originalEmail: origEmail,
-        newEmail: newEmail
       }
     });
   },
