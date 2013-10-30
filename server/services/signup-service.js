@@ -11,6 +11,7 @@ var appEvents                 = require('../app-events');
 var Q                         = require('q');
 var userService               = require("./user-service");
 var persistence               = require("./persistence-service");
+var userConfirmationService   = require('./user-confirmation-service');
 
 var signupService = module.exports = {
   /**
@@ -108,25 +109,7 @@ var signupService = module.exports = {
    * Mark a user as confirmed
    * @return promise of a troupe
    */
-  confirmSignup: function(user, callback) {
-    if(!user) return Q.reject(404).nodeify(callback);
-
-    winston.verbose("Confirming user", { id: user.id, status: user.status });
-
-    if (user.status === 'UNCONFIRMED') {
-      user.status = 'PROFILE_NOT_COMPLETED';
-    }
-
-    return user.saveQ()
-        .then(function() {
-          // Signal that an email address has been confirmed
-          appEvents.emailConfirmed(user.email, user.id);
-
-          return user;
-        })
-        .nodeify(callback);
-
-  },
+  confirmSignup: userConfirmationService.confirmSignup,
 
   /**
    * Resend the confirmation email and returns the related user
