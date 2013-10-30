@@ -101,15 +101,9 @@ var signupService = module.exports = {
     if (user.newEmail) {
       return signupService.confirmEmailChange(user, callback);
     } else {
-      return signupService.confirmSignup(user, callback);
+      return userConfirmationService.confirmSignup(user, callback);
     }
   },
-
-  /**
-   * Mark a user as confirmed
-   * @return promise of a troupe
-   */
-  confirmSignup: userConfirmationService.confirmSignup,
 
   /**
    * Resend the confirmation email and returns the related user
