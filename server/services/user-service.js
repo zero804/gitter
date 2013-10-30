@@ -331,7 +331,6 @@ var userService = {
     var password = options.password;
     var oldPassword = options.oldPassword;
     var displayName = options.displayName;
-    var email = options.email;
     var username = options.username;
 
     var postSave = [];
@@ -341,7 +340,6 @@ var userService = {
 
     if(displayName) seq = seq.then(updateDisplayName);
     if(password) seq = seq.then(updatePassword);
-    if(email) seq = seq.then(updateEmail);
     if(username) seq = seq.then(updateUsername);
 
     return seq.then(saveUser)
@@ -409,36 +407,6 @@ var userService = {
         }
       }
 
-    }
-
-    function updateEmail(user) {
-      email = email.toLowerCase();
-
-      if(user.email === email) {
-        // Nothing to do, the user has not changed their email address
-        return user;
-      }
-
-      user.gravatarImageUrl = gravatar.gravatarUrlForEmail(email);
-
-
-      return userService.findByEmail(email)
-        .then(function(existingUser) {
-          if(existingUser) {
-            throw { emailConflict: true };
-          }
-
-          // save the new email address while it is being confirmed
-          user.newEmail = email;
-
-          // update the confirmation code, which will be sent to the new email address
-          user.confirmationCode = uuid.v4();
-
-          postSave.push(function() {
-            emailNotificationService.sendConfirmationForEmailChange(user);
-          });
-          return user;
-        });
     }
 
     function updateUsername(user) {

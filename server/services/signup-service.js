@@ -54,56 +54,7 @@ var signupService = module.exports = {
     .nodeify(callback);
   },
 
-  confirmEmailChange: function(user, callback) {
-    if(!user) return callback(new Error("No user found"));
-    if(!user.newEmail) return callback(new Error("User does not have a newEmail property. Aborting. "));
-
-    if (user.status === 'UNCONFIRMED') {
-      // setting the status marks the user as confirmed
-      user.status = 'PROFILE_NOT_COMPLETED';
-    }
-
-    var origEmail = user.email;
-    var newEmail = user.newEmail;
-
-    // ensure that the email address being changed to is still available.
-    userService.findByEmail(newEmail, function(e, u) {
-      if (e || u) return callback("That email address is already registered");
-
-      user.oldEmail = user.email;
-      user.email = user.newEmail;
-      user.newEmail = null;
-
-      // send an email to confirm that the confirmation of the email address change...was confirmed.
-      emailNotificationService.sendNoticeOfEmailChange(user, origEmail, newEmail);
-
-      user.save(function(err) {
-        if(err) return callback(err);
-
-        // Signal that an email address has been confirmed
-        appEvents.emailConfirmed(newEmail, user.id);
-
-        winston.verbose("User email address change complete, finding troupe to redirect to", { id: user.id, status: user.status });
-
-          troupeService.findBestTroupeForUser(user, function(err, troupe) {
-            if(err) return callback(new Error("Error finding troupes for user"));
-
-            return callback(err, user, troupe);
-          });
-
-
-      });
-    });
-
-  },
-
-  confirm: function(user, callback) {
-    if (user.newEmail) {
-      return signupService.confirmEmailChange(user, callback);
-    } else {
-      return userConfirmationService.confirmSignup(user, callback);
-    }
-  },
+  confirm: userConfirmationService.confirmSignup,
 
   /**
    * Resend the confirmation email and returns the related user

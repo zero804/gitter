@@ -20,7 +20,6 @@ module.exports = {
             req.sanitize('displayName').xss();
 
             if(req.body.hasOwnProperty('displayName')) req.checkBody('displayName', 'Invalid name').notEmpty().is(/^[^<>]{2,}$/);
-            if(req.body.hasOwnProperty('newEmail')) req.checkBody('newEmail', 'Invalid email address').notEmpty().isEmail();
             if(req.body.hasOwnProperty('username')) req.checkBody('username', 'Invalid username').notEmpty().is(/^[a-zA-Z0-9\.\-\_]{3,}$/);
 
             var mappedErrors = req.validationErrors(true);
@@ -35,14 +34,11 @@ module.exports = {
               displayName: req.body.displayName,
               password: req.body.password,
               oldPassword: req.body.oldPassword,
-              email: req.body.newEmail,
               username: req.body.username
             }, function(err) {
               if(err) {
                 if(err.authFailure) {
                   res.send(401, { authFailure: true });
-                } else if (err.emailConflict) {
-                  res.send(409, { emailConflict: true });
                 } else if(err.usernameConflict) {
                   res.send(409, { usernameConflict: true });
                 } else{
