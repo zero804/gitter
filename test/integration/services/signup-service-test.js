@@ -39,6 +39,7 @@ describe('signup-service', function() {
       var signupService = testRequire.withProxies("./services/signup-service", {
         './email-notification-service': emailNotificationServiceMock
       });
+      var userConfirmationService = testRequire('./services/user-confirmation-service');
 
       signupService.newSignupFromLandingPage({
         email: nonExistingEmail.toUpperCase()
@@ -55,7 +56,7 @@ describe('signup-service', function() {
           assert(user.confirmationCode, 'Expected a confirmation code for a new user');
           assert(user.status === 'UNCONFIRMED', 'Expected the user to be unconfirmed');
 
-          signupService.confirm(user, function(err, user) {
+          userConfirmationService.confirmSignup(user, function(err, user) {
             assert(user, 'Expected user to be created');
             assert(user.confirmationCode, 'Expected the user to still have a confirmation code');
             assert(user.status === 'PROFILE_NOT_COMPLETED', 'Expected the user to be PROFILE_NOT_COMPLETED');

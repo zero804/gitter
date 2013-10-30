@@ -54,8 +54,6 @@ var signupService = module.exports = {
     .nodeify(callback);
   },
 
-  confirm: userConfirmationService.confirmSignup,
-
   /**
    * Resend the confirmation email and returns the related user
    * @return the promise of a user
