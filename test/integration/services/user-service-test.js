@@ -22,6 +22,28 @@ describe("User Service", function() {
 
   before(fixtureLoader(fixture));
 
+  describe('using password reset code', function() {
+    it('confirms unconfirmed users', function(done) {
+      fixtureLoader.use({
+        'user1': {
+          status: 'UNCONFIRMED',
+          confirmationCode: true
+        }
+      })
+      .then(function(fixture) {
+        return userService.requestPasswordReset(fixture.user1.email);
+      })
+      .then(function(user) {
+        return userService.findAndUsePasswordResetCode(user.passwordResetCode);
+      })
+      .then(function(user) {
+        assert.equal(user.status, 'PROFILE_NOT_COMPLETED');
+      })
+      .nodeify(done);
+    });
+
+  });
+
   describe("#updateProfile", function() {
     it("should update the name, email, password and status of a user", function(done) {
 
