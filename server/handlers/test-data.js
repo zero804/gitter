@@ -13,6 +13,7 @@ if(!nconf.get('test:exposeDataForTestingPurposes')) {
   var userService = require("../services/user-service");
   var troupeService = require("../services/troupe-service");
   var signupService = require("../services/signup-service");
+  var userConfirmationService = require('../services/user-confirmation-service');
   var persistence = require('../services/persistence-service');
   var winston = require('winston');
   var child_process = require('child_process');
@@ -37,7 +38,7 @@ if(!nconf.get('test:exposeDataForTestingPurposes')) {
         };
 
         userService.findOrCreateUserForEmail(options)
-          .then(signupService.confirmSignup)
+          .then(userConfirmationService.confirmSignup)
           .then(function(user) {
               user.userId = user._id;
               user.password = 'password';
