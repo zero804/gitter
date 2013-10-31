@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+
+<body>
+  <h1>{{troupe.name}} integrations</h1>
+  <ul>
+    {{#each subscriptions}}
+    <li>
+      <form method="POST" action="/troupes/{{../troupe._id}}/hooks/{{@index}}">
+        <input type="hidden" name="_method" value="delete" />
+        <label>{{this}}</label>
+        <input type="submit" value="Delete">
+      </form>
+    </li>
+    {{else}}
+      None
+    {{/each}}
+  </ul>
+
+    <form method="POST" action="/troupes/{{troupe._id}}/hooks">
+      <label>Github</label>
+      <input type="hidden" name="hook" value="github" />
+      <input type="submit" value="Add">
+    </form>
+    <form method="POST" action="/troupes/{{troupe._id}}/hooks">
+      <label>Bitbucket</label>
+      <input type="hidden" name="hook" value="bitbucket" />
+      <input type="submit" value="Add">
+    </form>
+    <form method="POST" action="/troupes/{{troupe._id}}/hooks">
+      <label>Jenkins</label>
+      <input type="hidden" name="hook" value="jenkins" />
+      <input type="submit" value="Add">
+    </form>
+</body>
+</html>

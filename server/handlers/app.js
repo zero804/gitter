@@ -266,6 +266,41 @@ module.exports = {
         uriContextResolverMiddleware,
         redirectToNativeApp('people'));
 
+      app.get('/:appUri/integrations',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        uriContextResolverMiddleware,
+        function (req, res) {
+          res.render('integrations', {
+            subscriptions: hooks,
+            troupe: req.troupe
+          });
+        });
+
+      var hooks = [];
+
+      app.post('/troupes/:id/hooks',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        function (req, res) {
+          hooks.push(req.body.hook);
+          troupeService.findById(req.params.id)
+          .then(function(troupe) {
+            res.redirect('/'+troupe.uri+'/integrations');
+          });
+        });
+
+      app.del('/troupes/:id/hooks/:hookId',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        function (req, res) {
+          hooks.splice(req.params.hookId, 1);
+          troupeService.findById(req.params.id)
+          .then(function(troupe) {
+            res.redirect('/'+troupe.uri+'/integrations');
+          });
+        });
+
       app.get('/:appUri',
         middleware.grantAccessForRememberMeTokenMiddleware,
         uriContextResolverMiddleware,
