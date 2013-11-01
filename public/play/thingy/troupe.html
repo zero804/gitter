@@ -153,7 +153,31 @@ textarea, input { outline: none; }
   font-size: 16px;
   color: white;
   font-weight: 300;
+  margin-top: 10px;
+  padding-top: 10px;
+  margin-left: -20px;
+  padding-left: 20px;
+  height: 60px;
+  cursor: pointer;
+}
+
+.profile.active {
+  background-color: rgba(255,255,255,0.2);
+}
+
+.profile-menu {
+  display: none;
+  box-sizing: border-box;
+  margin-left: -20px;
+  padding-left: 10px;
   margin-bottom: 16px;
+  background-color: rgba(255,255,255,0.2);
+  padding-bottom: 8px;
+  overflow: hidden;
+}
+
+.profile:hover {
+  background-color: rgba(255,255,255,0.2);
 }
 
 .left-menu {
@@ -165,7 +189,6 @@ textarea, input { outline: none; }
   left: 0;
   bottom: 0;
   width: 220px;
-  padding-top: 20px;
   padding-left: 20px;
   overflow: hidden;
   white-space:nowrap;
@@ -198,8 +221,8 @@ textarea, input { outline: none; }
   right: 0;
   top: 0;
   bottom: 0;
-  width: 230px;
-  background-color: rgba(237,241,236,0.6);
+  width: 320px;
+  background-color: rgba(241,242,244,0.7);
   padding-left: 20px;
   padding-top: 10px;
   transition:all .5s ease-in-out;
@@ -227,6 +250,8 @@ textarea, input { outline: none; }
   width: 200px;
   transition-delay: 1s;
   overflow: hidden;
+  padding-top: 16px;
+  cursor: pointer;
 }
 
 .item {
@@ -340,6 +365,7 @@ textarea, input { outline: none; }
 }
 
 .search {
+  margin-top: 8px;
   background-color: transparent;
   border: 1px solid rgba(255,255,255, 0.6);
   border-radius: 6px;
@@ -392,7 +418,7 @@ textarea, input { outline: none; }
   right: 0;
   left: 0;
   margin-left: 252px;
-  margin-right: 252px;
+  margin-right: 338px;
   box-sizing:border-box;
   transition:all 54s ease-in-out;
   -o-transition:all .5s ease-in-out;
@@ -628,11 +654,105 @@ textarea, input { outline: none; }
   -webkit-transition-delay: 0.5s; /* Safari */
 }
 
+@media (max-width: 1280px) {
+  .right-menu {
+    width: 230px;
+  }
+
+  .chats {
+    margin-right: 248px;
+  }
+
+}
+
+@media (max-width: 980px) {
+  .right-menu {
+    width: 50px;
+    transition-delay: 0s;
+  }
+
+  .left-menu {
+    transition-delay: 0.5s;
+  }
+
+  .left-menu-tab {
+    transition-delay: 0s;
+  }
+
+  .title {
+    right: 80px;
+    transition-delay: 0.5s;
+  }
+
+  .chats {
+    margin-right: 70px;
+    padding-right: 10px;
+    transition-delay: 0.5s;
+  }
+
+  .right-menu .heading {
+    width: 0;
+    transition-delay: 0s;
+  }
+
+  .activity-list {
+    width: 0;
+    transition-delay: 0s;
+  }
+}
+
 
 @media (max-width: 700px) {
   .left-menu {
     left: -260px;
     transition-delay: 0s;
+  }
+
+  .left-menu-tab {
+    transition-delay: 0.5s;
+    cursor: default;
+  }
+
+  .left-menu.extended {
+    left: 0;
+    z-index: 100;
+    opacity: 1;
+    transition:all .3s ease-in-out 0.2s;
+  }
+
+  .left-menu-tab.extended {
+    left: -25px;
+    transition-delay: 0s;
+    transition:all .3s ease-in-out;
+    -o-transition:all .3s ease-in-out;
+    -moz-transition:all .3s ease-in-out;
+    -webkit-transition:all .3s ease-in-out;
+  }
+
+  .chats.extended {
+    left: 210px;
+    right: -250px;
+    transition:all .3s ease-in-out;
+    -o-transition:all .3s ease-in-out;
+    -moz-transition:all .3s ease-in-out;
+    -webkit-transition:all .3s ease-in-out;
+  }
+
+  .title.extended {
+    left: 250px;
+    right: -250px;
+    transition:all .3s ease-in-out;
+    -o-transition:all .3s ease-in-out;
+    -moz-transition:all .3s ease-in-out;
+    -webkit-transition:all .3s ease-in-out;
+  }
+
+  .right-menu.extended {
+    right: -250px;
+    transition:all .3s ease-in-out;
+    -o-transition:all .3s ease-in-out;
+    -moz-transition:all .3s ease-in-out;
+    -webkit-transition:all .3s ease-in-out;
   }
 
   .chats {
@@ -653,33 +773,6 @@ textarea, input { outline: none; }
 
 }
 
-@media (max-width: 980px) {
-  .right-menu {
-    width: 50px;
-    transition-delay: 0s;
-  }
-
-  .title {
-    right: 80px;
-  }
-
-  .chats {
-    margin-right: 70px;
-    padding-right: 10px;
-    transition-delay: 0s;
-  }
-
-  .right-menu .heading {
-    width: 0;
-    transition-delay: 0s;
-  }
-
-  .activity-list {
-    width: 0;
-    transition-delay: 0s;
-  }
-}
-
 
 </style>
 
@@ -696,6 +789,20 @@ textarea, input { outline: none; }
       <div>Peter Gibbons</div>
       <div style="display: inline-block; border-radius: 50em; width: 6px; height: 6px; background-color: #1dce73; vertical-align: middle; margin-top: -6px"></div>
       <div style="display: inline-block; font-size: 12px; color: #BBB; margin-top: -6px; vertical-align: middle">Online</div>
+    </div>
+  </div>
+  <div class="profile-menu open">
+    <div class="item">
+      Edit Profile
+    </div>
+    <div class="item">
+      Create an Organisation
+    </div>
+    <div class="item">
+      Get Troupe apps
+    </div>
+    <div class="item">
+      Signout
     </div>
   </div>
   <div id="search open">
@@ -844,7 +951,7 @@ textarea, input { outline: none; }
 
 </div>
 <div id="right-menu" class="right-menu">
-  <div class="people-list" style="height: 80px">
+  <div class="people-list">
     <div class="chat-avatar"><img class="avatar-s" src="https://pbs.twimg.com/profile_images/3557388878/b143b6a24766a4b80d54b11d54f5cd59.jpeg"></div>
     <div class="chat-avatar"><img class="avatar-s" src="https://2.gravatar.com/avatar/19713cd13b43e2f16952fbca7b7b8298?d=https%3A%2F%2Fidenticons.github.com%2Fe23909d8468ff4942ccea268fbbcafd1.png&r=x&s=60"></div>
     <div class="chat-avatar"><img class="avatar-s" src="https://dnsjy61awi9j1.cloudfront.net/avatar/m/4fd48c8040a7cc9644000022/9.jpg"></div>
@@ -1127,6 +1234,15 @@ ol.custom:first-child {
 
 <script>
 
+$(".left-menu-tab").mouseenter(function() {
+  $('.left-menu, .chats, .title, .right-menu, .left-menu-tab').addClass('extended');
+});
+
+$(".left-menu").mouseleave(function() {
+  $('.left-menu, .chats, .title, .right-menu, .left-menu-tab').removeClass('extended');
+  hideProfile();
+});
+
 $( "#code-element" ).click(function(e) {
   $('.chat-item').addClass('blurred');
   $('.chats .activity-item').addClass('blurred');
@@ -1149,6 +1265,34 @@ $("#issue-element").click(function(e) {
   $('#issue-chat-item').removeClass('blurred');
   $('#issue-popover').show();
   e.stopPropagation();
+});
+
+  var profileShown;
+
+function showProfile() {
+  $('.profile').addClass('active');
+  $('.profile-menu').slideDown();
+  profileShown = true;
+}
+
+function hideProfile() {
+  $('.profile-menu').slideUp("fast", function() {
+    $('.profile').removeClass('active');
+  });
+  profileShown = false; 
+}
+
+function toggleProfile() {
+  if (!profileShown) {
+    showProfile();
+  }
+  else {
+    hideProfile();
+  }
+}
+
+$(".profile").click(function() {
+  toggleProfile();
 });
 
 </script>
