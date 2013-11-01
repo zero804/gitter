@@ -10,11 +10,12 @@
 <body style="padding: 15px;">
   <h1>{{troupe.name}} integrations</h1>
   <ul>
-    {{#each subscriptions}}
+    {{#each hooks}}
     <li>
-      <form method="POST" action="/troupes/{{../troupe._id}}/hooks/{{@index}}">
-        <input type="hidden" name="_method" value="delete" />
-        <label>{{this}}</label>
+      <form method="post">
+        <input type="hidden" name="_method" value="delete">
+        <label>{{service}} - {{description}}</label>
+        <input type="hidden" name="id" value="{{_id}}">
         <input type="submit" value="Delete">
       </form>
     </li>
@@ -22,21 +23,12 @@
       <p>None</p>
     {{/each}}
   </ul>
-
-    <form method="POST" action="/troupes/{{troupe._id}}/hooks">
-      <label>Github</label>
-      <input type="hidden" name="hook" value="github" />
-      <input type="submit" value="Add">
-    </form>
-    <form method="POST" action="/troupes/{{troupe._id}}/hooks">
-      <label>Bitbucket</label>
-      <input type="hidden" name="hook" value="bitbucket" />
-      <input type="submit" value="Add">
-    </form>
-    <form method="POST" action="/troupes/{{troupe._id}}/hooks">
-      <label>Jenkins</label>
-      <input type="hidden" name="hook" value="jenkins" />
-      <input type="submit" value="Add">
-    </form>
+  {{#each services}}
+  <form method="post" action="http://localhost:3000/troupes/{{../troupe._id}}/hooks">
+    <input type="hidden" name="service" value="{{this}}">
+    <input type="hidden" name="description" value="placeholder description">
+    <input type="submit" value='Add {{this}} hook'>
+  </form>
+  {{/each}}
 </body>
 </html>

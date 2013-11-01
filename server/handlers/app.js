@@ -11,6 +11,7 @@ var appVersion = require("../web/appVersion");
 var loginUtils = require('../web/login-utils');
 var uriService = require('../services/uri-service');
 var unreadItemService = require('../services/unread-item-service');
+var request = require('request');
 
 var Q = require('q');
 var isPhone = require('../web/is-phone');
@@ -271,33 +272,29 @@ module.exports = {
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         function (req, res) {
-          res.render('integrations', {
-            subscriptions: hooks,
-            troupe: req.troupe
+          request.get({
+            url: 'http://localhost:3000/troupes/'+req.troupe._id+'/hooks',
+            json: true
+          }, function(err, resp, hooks) {
+            res.render('integrations', {
+              hooks: hooks,
+              troupe: req.troupe,
+              services: ['github', 'bitbucket']
+            });
           });
         });
 
-      var hooks = [];
-
-      app.post('/troupes/:id/hooks',
+      app.del('/:appUri/integrations',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
+        uriContextResolverMiddleware,
         function (req, res) {
-          hooks.push(req.body.hook);
-          troupeService.findById(req.params.id)
-          .then(function(troupe) {
-            res.redirect('/'+troupe.uri+'/integrations');
-          });
-        });
-
-      app.del('/troupes/:id/hooks/:hookId',
-        middleware.grantAccessForRememberMeTokenMiddleware,
-        middleware.ensureLoggedIn(),
-        function (req, res) {
-          hooks.splice(req.params.hookId, 1);
-          troupeService.findById(req.params.id)
-          .then(function(troupe) {
-            res.redirect('/'+troupe.uri+'/integrations');
+          request.del({
+            url: 'http://localhost:3000/troupes/'+req.troupe._id+'/hooks/'+req.body.id,
+            json: true
+          },
+          function() {
+            res.redirect('/'+req.troupe.uri+'/integrations');
           });
         });
 
