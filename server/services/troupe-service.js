@@ -36,11 +36,15 @@ function findByIds(ids, callback) {
 }
 
 function findById(id, callback) {
+  assert(mongoUtils.isLikeObjectId(id));
+
   return persistence.Troupe.findByIdQ(id)
     .nodeify(callback);
 }
 
 function findByIdRequired(id) {
+  assert(mongoUtils.isLikeObjectId(id));
+
   return persistence.Troupe.findByIdQ(id)
     .then(ensureExists);
 }
@@ -235,6 +239,9 @@ function validateTroupeUrisForUser(userId, uris, callback) {
  * returns a promise with the troupe
  */
 function addUserIdToTroupe(userId, troupeId) {
+  assert(mongoUtils.isLikeObjectId(userId));
+  assert(mongoUtils.isLikeObjectId(troupeId));
+
   return findByIdRequired(troupeId)
       .then(function(troupe) {
         if(troupe.status != 'ACTIVE') throw { troupeNoLongerActive: true };
@@ -892,8 +899,7 @@ function acceptRequest(request, callback) {
           if(!user) { winston.error("Unable to find user", request.userId); throw "Unable to find user"; }
 
           emailNotificationService.sendRequestAcceptanceToUser(user, troupe);
-
-          return addUserIdToTroupe(userId, troupe)
+          return addUserIdToTroupe(userId, troupe.id)
               .then(function() {
                 return request.removeQ();
               });
