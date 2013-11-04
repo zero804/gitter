@@ -24,9 +24,8 @@
     {{/each}}
   </ul>
   {{#each services}}
-  <form method="post" action="http://localhost:3000/troupes/{{../troupe._id}}/hooks">
+  <form method="post">
     <input type="hidden" name="service" value="{{this}}">
-    <input type="hidden" name="description" value="placeholder description">
     <input type="submit" value='Add {{this}} hook'>
   </form>
   {{/each}}
