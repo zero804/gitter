@@ -24,5 +24,7 @@ module.exports = {
     require('./hooks').install(app);
     require('./start').install(app);
     require('./unsubscribe').install(app);
+    require('./cdn').install(app);
+    require('./version').install(app);
   }
 };

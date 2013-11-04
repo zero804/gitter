@@ -192,7 +192,7 @@ describe('signup-service', function() {
     it('should allow an existing UNCONFIRMED user to invite connection to a user and resend their confirmation email', function(done) {
       var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
 
-      var troupeService = mockito.spy(testRequire.withProxies('./services/troupe-service', {
+      var inviteService = mockito.spy(testRequire.withProxies('./services/invite-service', {
         './email-notification-service': emailNotificationServiceMock
       }));
 
@@ -200,7 +200,7 @@ describe('signup-service', function() {
 
       var signupService = testRequire.withProxies("./services/signup-service", {
         './email-notification-service': emailNotificationServiceMock,
-        './troupe-service': troupeService,
+        './invite-service': inviteService,
         './user-service': userService
       });
 
@@ -220,7 +220,7 @@ describe('signup-service', function() {
 
             mockito.verify(userService, never).findOrCreateUserForEmail();
             mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
-            mockito.verify(troupeService, once).inviteUserByUserId();
+            mockito.verify(inviteService, once).inviteUserByUserId();
           })
           .nodeify(done);
 
@@ -231,7 +231,7 @@ describe('signup-service', function() {
     it('should allow an new unregistered user to invite connection to a user', function(done) {
       var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
 
-      var troupeService = mockito.spy(testRequire.withProxies('./services/troupe-service', {
+      var inviteService = mockito.spy(testRequire.withProxies('./services/invite-service', {
         './email-notification-service': emailNotificationServiceMock
       }));
 
@@ -239,7 +239,7 @@ describe('signup-service', function() {
 
       var signupService = testRequire.withProxies("./services/signup-service", {
         './email-notification-service': emailNotificationServiceMock,
-        './troupe-service': troupeService,
+        './invite-service': inviteService,
         './user-service': userService
       });
 
@@ -252,7 +252,7 @@ describe('signup-service', function() {
 
         mockito.verify(userService, once).findOrCreateUserForEmail();
         mockito.verify(emailNotificationServiceMock, once).sendConfirmationForNewUser();
-        mockito.verify(troupeService, once).inviteUserByUserId();
+        mockito.verify(inviteService, once).inviteUserByUserId();
        })
        .nodeify(done);
 

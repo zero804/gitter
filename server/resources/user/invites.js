@@ -1,14 +1,15 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService = require("../../services/troupe-service"),
-    restSerializer = require("../../serializers/rest-serializer");
+var inviteService = require("../../services/invite-service");
+var troupeService = require("../../services/invite-service");
+var restSerializer = require("../../serializers/rest-serializer");
 var winston = require('winston');
 
 module.exports = {
 
     index: function(req, res, next) {
-      troupeService.findAllUnusedInvitesForUserId(req.user.id, function(err, invites) {
+      inviteService.findAllUnusedInvitesForUserId(req.user.id, function(err, invites) {
         if(err) return next(err);
 
         var strategy = new restSerializer.InviteStrategy({});
@@ -35,7 +36,7 @@ module.exports = {
 
     update:  function(req, res){
       // accept invite
-      troupeService.acceptInviteForAuthenticatedUser(req.user, req.invite)
+      inviteService.acceptInviteForAuthenticatedUser(req.user, req.invite)
         .then(function(troupe) {
           return troupeService.getUrlForTroupeForUserId(troupe, req.user.id)
             .then(function(url) {
@@ -50,7 +51,7 @@ module.exports = {
 
     destroy: function(req, res) {
       // reject invite
-      troupeService.rejectInviteForAuthenticatedUser(req.user, req.invite)
+      inviteService.rejectInviteForAuthenticatedUser(req.user, req.invite)
         .then(function() {
           res.send({ success: true });
         })
@@ -62,7 +63,7 @@ module.exports = {
     },
 
     load: function(id, callback) {
-      troupeService.findInviteById(id, callback);
+      inviteService.findInviteById(id, callback);
     }
 
 };
