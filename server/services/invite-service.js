@@ -1,21 +1,21 @@
-                             /*jshint globalstrict:true, trailing:false, unused:true, node:true */
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 /*global require: true, module: true */
 "use strict";
+
+var assert                   = require("assert");
+var uuid                     = require('node-uuid');
+var winston                  = require("winston");
+var Q                        = require("q");
 
 var persistence              = require("./persistence-service");
 var userService              = require("./user-service");
 var troupeService            = require("./troupe-service");
-var appEvents                = require("../app-events");
-var assert                   = require("assert");
 var emailNotificationService = require("./email-notification-service");
 var presenceService          = require("./presence-service");
-var uuid                     = require('node-uuid');
-var winston                  = require("winston");
+var statsService             = require("../services/stats-service");
+var appEvents                = require("../app-events");
 var collections              = require("../utils/collections");
 var mongoUtils               = require("../utils/mongo-utils");
-var Q                        = require("q");
-var assert                   = require('assert');
-var statsService             = require("../services/stats-service");
 
 /**
  * Like model.createQ, but invokes mongoose middleware
@@ -359,6 +359,30 @@ function findUnusedInviteToTroupeForUserId(userId, troupeId, callback) {
   assert(mongoUtils.isLikeObjectId(troupeId), 'troupeId must be an id');
 
   return persistence.Invite.findOneQ({ troupeId: troupeId, userId: userId, status: 'UNUSED' }).nodeify(callback);
+}
+
+/**
+ * Find a new OR used invite
+ * Returns a promise of { invite: unusedInvite, used: false } or nothing if the confirmation code is not found
+ */
+function findNewOrUsedInviteByConfirmationCode(confirmationCode) {
+  assert(confirmationCode, 'confirmationCode required');
+  return Q.all([
+      persistence.Invite.findOneQ({ code: confirmationCode }),
+      persistence.InviteUsed.findOneQ({ code: confirmationCode })
+    ])
+    .spread(function(unusedInvite, usedInvite) {
+      console.log('FOUND ', arguments);
+      if(unusedInvite) {
+        return { invite: unusedInvite, used: false };
+      }
+
+      if(usedInvite) {
+        return { invite: usedInvite, used: true };
+      }
+
+      return;
+    });
 }
 
 
@@ -926,6 +950,7 @@ module.exports = {
   findAllUnusedInvitesFromUserId: findAllUnusedInvitesFromUserId,
   findAllUnusedConnectionInvitesFromUserId: findAllUnusedConnectionInvitesFromUserId,
   findUnusedInviteToTroupeForUserId: findUnusedInviteToTroupeForUserId,
+  findNewOrUsedInviteByConfirmationCode: findNewOrUsedInviteByConfirmationCode,
   inviteUserByUserId: inviteUserByUserId,
 
   updateInvitesAndRequestsForConfirmedEmail: updateInvitesAndRequestsForConfirmedEmail,
