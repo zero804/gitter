@@ -48,7 +48,7 @@ function acceptInviteWithConfirmation(req, res) {
   var confirmationCode = req.params.confirmationCode;
   var login = Q.nbind(req.login, req);
 
-  troupeService.findInviteByConfirmationCode(confirmationCode)
+  inviteService.findInviteByConfirmationCode(confirmationCode)
     .then(function(invite) {
       if(!invite) throw 404;
 
@@ -77,58 +77,62 @@ function acceptInviteWithConfirmation(req, res) {
 }
 
 // show a prompt dialog to either login or create a new account
-function acceptNewUserInvitePrompt(req, res, next) {
+function acceptNewUserInviteLanding(req, res, next) {
   var confirmationCode = req.params.confirmationCode;
   var appUri = req.params.appUri || 'one-one/' + req.params.userId;
   var user = req.user;
+  var login = Q.nbind(req.login, req);
 
-  return troupeService.findNewOrUsedInviteByConfirmationCode(confirmationCode)
-    .then(function(invite) {
-      if(!invite) {
-        winston.error('Invite with confirmation code not found.', { confirmationCode: confirmationCode });
-        res.relativeRedirect("/" + appUri);
-        return;
+  if(user) {
+    return inviteService.findInviteByConfirmationCode(confirmationCode)
+      .then(function(invite) {
+        /* Can't find the invite? Ignore */
+        if(!invite) return;
+
+        return inviteService.acceptInviteForAuthenticatedUser(user, invite);
+      })
+      .then(function() {
+        return res.relativeRedirect("/" + appUri);
+      });
+  }
+
+  /* We have an unauthenticated user. Has the invite been used before? */
+  return inviteService.findNewOrUsedInviteByConfirmationCode(confirmationCode)
+    .then(function(inviteInfo) {
+      if(!inviteInfo) {
+        winston.error('Invite with confirmation code not found. Redirecting the user to appUri', { confirmationCode: confirmationCode, appUri: appUri });
+        return "redirect";
       }
 
-
-      /* NB NB NB NB
-
-       THIS NEEDS TO BE COMPELTED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-       */
-
-      if(invite.used) {
-        /* Invite has been used already. Don't prompt */
-        if(user) {
-          /* User is already logged in - just go to the troupe */
-          res.relativeRedirect("/" + appUri);
-          return;
-        }
-
-        return inviteService.attemptToReuseNewUserInviteForUnauthedUser(invite.invite)
-          .then(function(user) {
-            if(user) {
-              req.login(user, function(err) {
-                if(err) return next(err);
-
-                res.relativeRedirect("/" + appUri);
-              });
-            } else {
-              res.relativeRedirect("/" + appUri);
-            }
-          });
-
-      } else {
-        /* Invite has not been used */
-        if(user) {
-          return inviteService.acceptNewUserInviteForAuthedUser(invite.invite, user);
-        }
-
-        /* Prompt the user as to whether they're an existing or a new user */
-        appRender.renderAcceptInvitePage(req, res, next);
-
+      if(!inviteInfo.used) {
+        return "prompt";
       }
 
+      return inviteService.acceptInvite(confirmationCode, appUri)
+        .then(function(result) {
+          var user = result.user;
+
+          // Now that we've accept the invite, log the new user in
+          if(user) return login(user);
+        })
+        .thenResolve("redirect");
+
+
+    })
+    .fail(function(err) {
+      winston.error('Unable to accept invite. An error occurred', { exception: err });
+      return "redirect";
+    })
+    .then(function(action) {
+      switch(action) {
+        case "redirect":
+          return res.relativeRedirect("/" + appUri);
+        case "prompt":
+          return appRender.renderAcceptInvitePage(req, res, next);
+      }
+
+      winston.error("Unexpected action while accepting invite" + action);
+      return appRender.renderAcceptInvitePage(req, res, next);
     });
 
 }
@@ -165,7 +169,7 @@ module.exports = {
       app.get('/:appUri/accept/:confirmationCode',
         middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
-        acceptNewUserInvitePrompt);
+        acceptNewUserInviteLanding);
 
       /* one to one accept */
 
@@ -183,7 +187,7 @@ module.exports = {
       app.get('/one-one/:userId/accept/:confirmationCode',
         middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
-        acceptNewUserInvitePrompt);
+        acceptNewUserInviteLanding);
 
     }
 };
