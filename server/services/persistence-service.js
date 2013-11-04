@@ -323,9 +323,9 @@ TroupeRemovedUserSchema.schemaTypeName = 'TroupeRemovedUserSchema';
 //
 var InviteSchema = new Schema({
   troupeId:           { type: ObjectId, "default": null  }, // If this is null, the invite is to connect as a person
-  fromUserId:         { type: ObjectId }, // The user who initiated the invite
+  fromUserId:         { type: ObjectId, required: true }, // The user who initiated the invite
 
-  userId:             { type: ObjectId }, // The userId of the recipient, if they are already a troupe user
+  userId:             { type: ObjectId, "default": null }, // The userId of the recipient, if they are already a troupe user
 
   displayName:        { type: String },   // If !userId, the name of the recipient
   email:              { type: String },   // If !userId, the email address of the recipient
@@ -339,6 +339,16 @@ var InviteSchema = new Schema({
 InviteSchema.schemaTypeName = 'InviteSchema';
 InviteSchema.index({ userId: 1 });
 InviteSchema.index({ email: 1 });
+InviteSchema.path('userId').validate(function(v) {
+    if(!v) {
+      return !!this.email;
+    }
+}, 'Either {PATH} or email must be set');
+InviteSchema.path('email').validate(function(v) {
+    if(!v) {
+      return !!this.userId;
+    }
+}, 'Either {PATH} or userId must be set');
 
 
 var InviteUnconfirmedSchema = mongooseUtils.cloneSchema(InviteSchema);
