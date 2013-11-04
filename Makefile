@@ -53,6 +53,10 @@ test-in-browser-xunit:
 	mkdir -p output/test-reports
 	node_modules/.bin/mocha-phantomjs --timeout 30000 --reporter xunit $(BASE_URL)/test/in-browser/test > ../../output/test-reports/in-browser.xml
 
+rest-test-xunit:
+	mkdir -p output/test-reports
+	NODE_ENV=test BASE_URL=$(BASE_URL) node_modules/.bin/mocha --timeout 4000 --reporter xunit test/rest > output/test-reports/rest.xml
+
 test-coverage:
 	rm -rf ./coverage/ cobertura-coverage.xml
 	mkdir -p output
@@ -188,7 +192,7 @@ validate-source: search-js-console
 
 continuous-integration: clean validate-source npm grunt version-files upgrade-data reset-test-data test-xunit test-coverage tarball
 
-post-deployment-tests: test-in-browser-xunit end-to-end-test-saucelabs-chrome end-to-end-test-saucelabs-ie10 end-to-end-test-saucelabs-android
+post-deployment-tests: test-in-browser-xunit rest-test-xunit end-to-end-test-saucelabs-chrome end-to-end-test-saucelabs-ie10 end-to-end-test-saucelabs-android
 
 build: clean validate-source npm grunt version-files upgrade-data test-xunit
 

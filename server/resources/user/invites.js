@@ -2,7 +2,7 @@
 "use strict";
 
 var inviteService = require("../../services/invite-service");
-var troupeService = require("../../services/invite-service");
+var troupeService = require("../../services/troupe-service");
 var restSerializer = require("../../serializers/rest-serializer");
 var winston = require('winston');
 

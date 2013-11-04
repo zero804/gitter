@@ -12,7 +12,7 @@ if(!nconf.get('test:exposeDataForTestingPurposes')) {
 
   var userService = require("../services/user-service");
   var troupeService = require("../services/troupe-service");
-  var signupService = require("../services/signup-service");
+  var oauthService = require('../services/oauth-service');
   var userConfirmationService = require('../services/user-confirmation-service');
   var persistence = require('../services/persistence-service');
   var winston = require('winston');
@@ -23,6 +23,22 @@ if(!nconf.get('test:exposeDataForTestingPurposes')) {
 
   module.exports = {
     install: function(app) {
+
+      app.get('/testdata/oauthToken', function(req, res, next) {
+        var email = req.query.email;
+
+        if(!email || !email.match(/troupetest\.local$/)) return next(401);
+
+        return userService.findByEmail(email)
+          .then(function(user) {
+            if(!user) throw 404;
+            return oauthService.findOrGenerateWebToken(user.id);
+          })
+          .then(function(token) {
+            res.send(token);
+          })
+          .fail(next);
+      });
 
       app.get('/testdata/reset', function(req, res) {
         child_process.exec('make reset-test-data');
