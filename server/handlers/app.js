@@ -273,7 +273,7 @@ module.exports = {
         uriContextResolverMiddleware,
         function (req, res) {
           request.get({
-            url: 'http://localhost:3000/troupes/'+req.troupe._id+'/hooks',
+            url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks',
             json: true
           }, function(err, resp, hooks) {
             res.render('integrations', {
@@ -290,7 +290,7 @@ module.exports = {
         uriContextResolverMiddleware,
         function (req, res) {
           request.del({
-            url: 'http://localhost:3000/troupes/'+req.troupe._id+'/hooks/'+req.body.id,
+            url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks/'+req.body.id,
             json: true
           },
           function() {
@@ -304,10 +304,10 @@ module.exports = {
         uriContextResolverMiddleware,
         function(req, res) {
           request.post({
-            url: 'http://localhost:3000/troupes/'+req.troupe._id+'/hooks',
+            url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks',
             json: {
               service: req.body.service,
-              returnTo: 'http://localhost:5000'+req.url
+              returnTo: nconf.get('web:basepath')+req.url
             }
           },
           function(err, resp, body) {
