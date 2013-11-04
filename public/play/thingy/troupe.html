@@ -153,12 +153,12 @@ textarea, input { outline: none; }
   font-size: 16px;
   color: white;
   font-weight: 300;
-  margin-top: 10px;
-  padding-top: 10px;
+  padding-top: 8px;
   margin-left: -20px;
-  padding-left: 20px;
-  height: 60px;
+  padding-left: 22px;
+  height: 56px;
   cursor: pointer;
+  margin-top: 6px;
 }
 
 .profile.active {
@@ -189,7 +189,7 @@ textarea, input { outline: none; }
   left: 0;
   bottom: 0;
   width: 220px;
-  padding-left: 20px;
+  padding-left: 10px;
   overflow: hidden;
   white-space:nowrap;
   transition:opacity 0.5s ease-in-out 0s, left .5s ease-in-out 0.5s;
@@ -235,6 +235,18 @@ textarea, input { outline: none; }
 .avatar {
   width: 48px;
   height: 48px;
+  border-radius: 50em;
+}
+
+.avatar-s {
+  width: 30px;
+  height: 30px;
+  border-radius: 50em;
+}
+
+.avatar-xs {
+  width: 16px;
+  height: 16px;
   border-radius: 50em;
 }
 
@@ -428,18 +440,6 @@ textarea, input { outline: none; }
   -webkit-transform: translate3d(0, 0, 0);
 }
 
-.avatar-s {
-  width: 30px;
-  height: 30px;
-  border-radius: 50em;
-}
-
-.avatar-xs {
-  width: 16px;
-  height: 16px;
-  border-radius: 50em;
-}
-
 .chat-person {
   font-size: 12px;
   font-weight: 400;
@@ -532,8 +532,8 @@ textarea, input { outline: none; }
 }
 
 .people-list .chat-avatar {
-  margin-right: 4px;
-  margin-bottom: 10px;
+  margin-right: 8px;
+  margin-bottom: 8px;
 }
 
 .offline {
@@ -773,6 +773,11 @@ textarea, input { outline: none; }
 
 }
 
+@media (max-width: 500px) {
+  .chats .chat-avatar {
+    display: none;
+  }
+}
 
 </style>
 
@@ -793,10 +798,13 @@ textarea, input { outline: none; }
   </div>
   <div class="profile-menu open">
     <div class="item">
-      Edit Profile
+      Create a Troupe
     </div>
     <div class="item">
-      Create an Organisation
+      Add a contact
+    </div>
+    <div class="item">
+      Edit Profile
     </div>
     <div class="item">
       Get Troupe apps
@@ -917,7 +925,7 @@ textarea, input { outline: none; }
       <div class="open chat-person">Nuno</div>
       <div class="open chat-text">sure thing</div>
     </div>
-    <div class="activity-item open" style="font-size: 12px; opacity: 0.6; margin-left: -4px; margin-bottom: 8px; ">
+    <div class="activity-item open" style="font-size: 12px; opacity: 0.6; margin-bottom: 8px; ">
       <div class="activity-avatar act-push">Nuno Job pushed to master</div>
     </div>
     <div class="chat-item">
@@ -930,7 +938,7 @@ textarea, input { outline: none; }
       <div class="open chat-person" style="color: #1dce73">Mike Bartlett</div>
       <div class="open chat-text">awesome, that did the trick!</div>
     </div>
-    <div class="activity-item open" style="font-size: 12px; opacity: 0.6; margin-left: -4px; margin-bottom: 8px; ">
+    <div class="activity-item open" style="font-size: 12px; opacity: 0.6; margin-bottom: 8px; ">
       <div class="activity-avatar act-issue-close">Mike Bartlett closed <span class="issue">#166</span></div>
     </div>
     <br><br><br><br><br>
