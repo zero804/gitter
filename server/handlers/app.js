@@ -298,6 +298,23 @@ module.exports = {
           });
         });
 
+      app.post('/:appUri/integrations',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        uriContextResolverMiddleware,
+        function(req, res) {
+          request.post({
+            url: 'http://localhost:3000/troupes/'+req.troupe._id+'/hooks',
+            json: {
+              service: req.body.service,
+              returnTo: 'http://localhost:5000'+req.url
+            }
+          },
+          function(err, resp, body) {
+            res.redirect(body.configurationURL);
+          });
+        });
+
       app.get('/:appUri',
         middleware.grantAccessForRememberMeTokenMiddleware,
         uriContextResolverMiddleware,
