@@ -323,39 +323,26 @@ function createInvite(troupe, options, callback) {
     }).nodeify(callback);
 }
 
-function findInviteById(id, callback) {
-  assert(mongoUtils.isLikeObjectId(id), 'id must be an id');
-
-  return persistence.Invite.findByIdQ(id)
+function findInviteForTroupeById(troupeId, inviteId, callback) {
+  assert(mongoUtils.isLikeObjectId(troupeId), 'troupeId must be an id');
+  assert(mongoUtils.isLikeObjectId(inviteId), 'inviteId must be an id');
+  return persistence.Invite.findOneQ({ _id: inviteId, troupeId: troupeId })
     .nodeify(callback);
 }
+
+
+function findInviteForUserById(userId, inviteId, callback) {
+  assert(mongoUtils.isLikeObjectId(userId), 'userId must be an id');
+  assert(mongoUtils.isLikeObjectId(inviteId), 'inviteId must be an id');
+
+  return persistence.Invite.findOneQ({ _id: inviteId, $or: [ { fromUserId: userId }, { userId: userId } ] })
+    .nodeify(callback);
+}
+
 
 function findInviteByConfirmationCode(confirmationCode) {
   return persistence.Invite.findOneQ({ code: confirmationCode });
 }
-
-/**
- * Find an invite, whether it's new or been used, by it's confirmation code
- * promise of { invite: invite, used: boolean } or null if not found
- */
-function findNewOrUsedInviteByConfirmationCode(confirmationCode) {
-  return Q.all([
-      persistence.Invite.findOneQ({ code: confirmationCode }),
-      persistence.InviteUsed.findOneQ({ code: confirmationCode })
-    ])
-    .spread(function(unused, used) {
-      if(unused) {
-        return { invite: unused, used: false };
-      }
-
-      if(used) {
-        return { invite: used, used: true };
-      }
-
-      return null;
-    });
-}
-
 
 function findAllUnusedInvitesForTroupe(troupeId, callback) {
   assert(mongoUtils.isLikeObjectId(troupeId), 'id must be an id');
@@ -650,7 +637,7 @@ function sendPendingInviteMails(delaySeconds, callback) {
 
 /**
  * markInviteUsedAndDeleteAllSimilarOutstandingInvites: pretty self explainatory I think
- * @return promise of nothign
+ * @return promise of the number of additional invites removed
  */
 function markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite) {
   assert(invite);
@@ -662,7 +649,7 @@ function markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite) {
       return invite.removeQ()
           .then(function() {
 
-            var similarityQuery = { status: 'UNUSED', userId: invite.userId };
+            var similarityQuery = { status: 'UNUSED', userId: invite.userId, email: invite.email };
             if(invite.troupeId) {
               similarityQuery.troupeId = invite.troupeId;
             } else {
@@ -672,7 +659,7 @@ function markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite) {
 
             return persistence.Invite.findQ(similarityQuery)
               .then(function(invalidInvites) {
-                if(!invalidInvites.length) return;
+                if(!invalidInvites.length) return 0;
 
                 // Delete the invalid invites
                 var promises = invalidInvites.map(function(invalidInvite) {
@@ -685,7 +672,7 @@ function markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite) {
 
                 });
 
-                return Q.all(promises);
+                return Q.all(promises).thenResolve(promises.length);
               });
 
           });
@@ -726,9 +713,10 @@ function acceptInvite(confirmationCode, troupeUri, callback) {
 
             return findRecipientForInvite(usedInvite)
               .then(function(user) {
+
                 /* The invite has already been used. We need to fail authentication (if they have completed their profile), but go to the troupe */
                 winston.verbose("Invite has already been used", { confirmationCode: confirmationCode, troupeUri: troupeUri });
-                statsService.event('invite_reused', { userId: user.id, uri: troupeUri });
+                statsService.event('invite_reused', { userId: user && user.id, uri: troupeUri, confirmationCode: confirmationCode });
 
                 // If the user has clicked on the invite, but hasn't completed their profile (as in does not have a password)
                 // then we'll give them a special dispensation and allow them to access the site (otherwise they'll never get in)
@@ -927,9 +915,9 @@ appEvents.onTroupeDeleted(function(troupeId) {
 
 module.exports = {
   createInvite: createInvite,
-  findInviteById: findInviteById,
+  findInviteForTroupeById: findInviteForTroupeById,
+  findInviteForUserById: findInviteForUserById,
   findInviteByConfirmationCode: findInviteByConfirmationCode,
-  findNewOrUsedInviteByConfirmationCode: findNewOrUsedInviteByConfirmationCode,
   findAllUnusedInvitesForTroupe: findAllUnusedInvitesForTroupe,
   findAllUnusedInvitesForEmail: findAllUnusedInvitesForEmail,
   findAllUnusedInvitesForUserId: findAllUnusedInvitesForUserId,
@@ -946,6 +934,10 @@ module.exports = {
   /* Invite Acceptance */
   acceptInvite: acceptInvite,
   acceptInviteForAuthenticatedUser: acceptInviteForAuthenticatedUser,
-  rejectInviteForAuthenticatedUser: rejectInviteForAuthenticatedUser
+  rejectInviteForAuthenticatedUser: rejectInviteForAuthenticatedUser,
+
+  testOnly: {
+    markInviteUsedAndDeleteAllSimilarOutstandingInvites: markInviteUsedAndDeleteAllSimilarOutstandingInvites
+  }
 
 };

@@ -34,8 +34,8 @@ module.exports = {
       });
     },
 
-    load: function(id, callback) {
-      inviteService.findInviteById(id, callback);
+    load: function(req, id, callback) {
+      inviteService.findInviteForUserById(req.user.id, id, callback);
     }
 
 };

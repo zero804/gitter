@@ -17,60 +17,6 @@ var once          = times(1);
 var fixture       = {};
 Q.longStackSupport = true;
 
-function testDelayedInvite(email, troupeUri, isOnline, done) {
-  var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-  var inviteService = testRequire.withProxies("./services/invite-service", {
-    './email-notification-service': emailNotificationServiceMock,
-    './presence-service': {
-      categorizeUsersByOnlineStatus: function(userIds, callback) {
-          var map = {};
-          for (var a = 0; a < userIds.length; a++)
-            map[userIds[a]] = isOnline;
-          callback(null, map);
-        }
-      }
-  });
-
-  persistence.Troupe.findOne({ uri: troupeUri }, function(err, troupe) {
-    if(err) return done(err);
-
-    persistence.User.create({
-      email: email,
-      displayName: 'Test User ' + new Date(),
-      confirmationCode: null,
-      status: "ACTIVE" }, function(err, user) {
-        if(err) return done(err);
-
-        inviteService.createInvite(troupe, { fromUser: fixture.user1, userId: user.id }, function(err, invite) {
-          if(err) return done(err);
-
-          return persistence.Invite.findByIdQ(invite.id)
-            .then(function(invite) {
-
-              if (isOnline) {
-                assert(!invite.emailSentAt, "The emailSentAt property should be null");
-                mockito.verifyZeroInteractions(emailNotificationServiceMock);
-              } else {
-                assert(invite.emailSentAt, "The emailSentAt property should not be null");
-                mockito.verify(emailNotificationServiceMock, once);
-              }
-
-              return inviteService.sendPendingInviteMails(0, function(err, count) {
-                if (err) return done(err);
-
-                assert(count >= 1, 'Send pending invite emails returned ' + count);
-
-                done();
-              });
-
-            });
-
-
-        });
-
-      });
-  });
-}
 
 function testInviteAcceptance(email, done) {
   var troupeUri = 'testtroupe3';
@@ -515,6 +461,83 @@ describe('troupe-service', function() {
       })
       .nodeify(done);
     });
+
+    var fixture2 = {};
+
+    it('should handle acceptInvite being called more than once, provided the user has not yet got a password', function(done) {
+      var inviteService = testRequire("./services/invite-service");
+      var invite = fixture2.invite1;
+
+      return inviteService.acceptInvite(invite.code, fixture.troupe1.uri)
+        .then(function(result) {
+          assert(result);
+          assert(result.user);
+          assert.equal(result.user.email, fixture2.invite1.email);
+
+          return inviteService.acceptInvite(invite.code, fixture.troupe1.uri)
+            .then(function(result) {
+              assert(result);
+              assert(result.user);
+              assert.equal(result.user.email, fixture2.invite1.email);
+            });
+        })
+        .nodeify(done);
+    });
+
+    it('should handle acceptInvite being called more than once but the user has completed their profile', function(done) {
+      var inviteService = testRequire("./services/invite-service");
+      var userService = testRequire("./services/user-service");
+      var invite = fixture2.invite2;
+      var confirmationCode = invite.code;
+
+      return inviteService.acceptInvite(confirmationCode, fixture.troupe1.uri)
+        .then(function(result) {
+          assert(result);
+          assert(result.user);
+          assert.equal(result.user.email, invite.email);
+
+          return userService.updateProfile({
+            userId: result.user.id,
+            displayName: fixture2.generateName(),
+            password: '123456'
+          });
+        })
+        .then(function() {
+          return inviteService.acceptInvite(confirmationCode, fixture.troupe1.uri);
+        })
+        .then(function(result) {
+          assert(result);
+          assert.equal(result.user, null);
+          assert(result.alreadyUsed);
+        })
+        .nodeify(done);
+    });
+
+    it('should handle acceptInvite being called with an invalid confirmation code', function(done) {
+      var inviteService = testRequire("./services/invite-service");
+
+      return inviteService.acceptInvite('187623871263128736128736128736123876123876', fixture.troupe1.uri)
+        .then(function(result) {
+          assert(result);
+          assert.equal(result.user, null);
+        })
+        .nodeify(done);
+    });
+
+
+
+    before(fixtureLoader(fixture2, {
+      user1: { },
+      user2: { },
+      troupe1: { users: [ 'user1' ]},
+      invite1: { fromUser: 'user1', email: true, code: true },
+      invite2: { fromUser: 'user1', email: true, code: true }
+    }));
+
+    after(function() {
+      fixture2.cleanup();
+    });
+
   });
 
   describe('#rejectInviteForAuthenticatedUser', function() {
@@ -525,10 +548,254 @@ describe('troupe-service', function() {
   });
 
   describe('#sendPendingInviteMails', function() {
+    var fixture2 = {};
+    function fakePresenceService(everyoneIsOnline) {
+      return {
+        categorizeUsersByOnlineStatus: function(userIds, callback) {
+            var map = {};
+            for (var a = 0; a < userIds.length; a++)
+              map[userIds[a]] = everyoneIsOnline;
+            callback(null, map);
+          }
+        };
+    }
+
     it('should send mails for all new invites that were created more than 10 minutes ago, and have not been emailed yet.', function(done) {
-      var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
-      testDelayedInvite(nonExistingEmail, "testtroupe3", true, done);
+      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+      var inviteService = testRequire.withProxies("./services/invite-service", {
+        './email-notification-service': emailNotificationServiceMock,
+        './presence-service': fakePresenceService(true)
+      });
+
+      return inviteService.createInvite(null, { fromUser: fixture2.user1, userId: fixture2.user2.id })
+        .then(function(invite) {
+          return persistence.Invite.findByIdQ(invite.id)
+            .then(function(invite) {
+              assert(!invite.emailSentAt, "The emailSentAt property should be null");
+              mockito.verifyZeroInteractions(emailNotificationServiceMock);
+
+
+              return inviteService.sendPendingInviteMails(0)
+                .then(function(count) {
+                  assert(count >= 1, 'Send pending invite emails returned ' + count);
+                });
+            });
+        })
+      .nodeify(done);
     });
+
+    it('should send mails for all new invites when users are offline', function(done) {
+      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+      var inviteService = testRequire.withProxies("./services/invite-service", {
+        './email-notification-service': emailNotificationServiceMock,
+        './presence-service': fakePresenceService(false)
+      });
+
+      return inviteService.createInvite(null, { fromUser: fixture2.user1, userId: fixture2.user2.id })
+        .then(function(invite) {
+          return persistence.Invite.findByIdQ(invite.id)
+            .then(function(invite) {
+              assert(invite.emailSentAt, "The emailSentAt property should not be null");
+              mockito.verify(emailNotificationServiceMock, once);
+            });
+        })
+      .nodeify(done);
+    });
+
+
+    it('should always send emails for externalInvites.', function(done) {
+      var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
+      var inviteService = testRequire.withProxies("./services/invite-service", {
+        './email-notification-service': emailNotificationServiceMock,
+        './presence-service': fakePresenceService(true)
+      });
+
+      return inviteService.createInvite(null, { fromUser: fixture2.user1, email: fixture2.generateEmail() })
+        .then(function(invite) {
+          return persistence.Invite.findByIdQ(invite.id)
+            .then(function(invite) {
+              assert(invite.emailSentAt, "The emailSentAt property should be set");
+              mockito.verify(emailNotificationServiceMock, once);
+            });
+        })
+      .nodeify(done);
+    });
+
+
+    before(fixtureLoader(fixture2, {
+      user1: { },
+      user2: { },
+      user3: { },
+      invite1: { fromUser: 'user1', user: 'user2' },
+      invite2: { fromUser: 'user1', email: true }
+    }));
+
+    after(function() {
+      fixture2.cleanup();
+    });
+  });
+
+  describe('#findInviteForUserById', function() {
+    var fixture2 = {};
+
+    it('should find invites for users by id, when the user is the inviter', function(done) {
+      var inviteService = testRequire("./services/invite-service");
+      return inviteService.findInviteForUserById(fixture2.user1.id, fixture2.invite1.id)
+        .then(function(invite) {
+          assert(invite);
+          assert.equal(invite.id, fixture2.invite1.id);
+        })
+        .nodeify(done);
+    });
+
+    it('should find invites for users by id, when the user is the invitee', function(done) {
+      var inviteService = testRequire("./services/invite-service");
+      return inviteService.findInviteForUserById(fixture2.user2.id, fixture2.invite1.id)
+        .then(function(invite) {
+          assert(invite);
+          assert.equal(invite.id, fixture2.invite1.id);
+        })
+        .nodeify(done);
+    });
+
+
+    it('should not find invites for users by id, when the user is neither', function(done) {
+      var inviteService = testRequire("./services/invite-service");
+      return inviteService.findInviteForUserById(fixture2.user3.id, fixture2.invite1.id)
+        .then(function(invite) {
+          assert(!invite);
+        })
+        .nodeify(done);
+    });
+
+    before(fixtureLoader(fixture2, {
+      user1: { },
+      user2: { },
+      user3: { },
+      troupe1: { users: [ 'user1' ]},
+      invite1: { fromUser: 'user1', troupe: 'troupe1', user: 'user2' }
+    }));
+
+    after(function() {
+      fixture2.cleanup();
+    });
+
+  });
+
+  describe('#findInviteForTroupeById', function() {
+    var fixture2 = {};
+
+    it('should find invites for troupes by id', function(done) {
+      var inviteService = testRequire("./services/invite-service");
+      return inviteService.findInviteForTroupeById(fixture2.troupe1.id, fixture2.invite1.id)
+        .then(function(invite) {
+          assert(invite);
+          assert.equal(invite.id, fixture2.invite1.id);
+        })
+        .nodeify(done);
+    });
+
+    it('should not find invites for other troupes', function(done) {
+      var inviteService = testRequire("./services/invite-service");
+      return inviteService.findInviteForTroupeById(fixture2.troupe2.id, fixture2.invite1.id)
+        .then(function(invite) {
+          assert(!invite);
+        })
+        .nodeify(done);
+    });
+
+    before(fixtureLoader(fixture2, {
+      user1: { },
+      user2: { },
+      troupe1: { users: [ 'user1' ]},
+      troupe2: { users: [ 'user1' ]},
+      invite1: { fromUser: 'user1', troupe: 'troupe1', user: 'user2' }
+    }));
+
+    after(function() {
+      fixture2.cleanup();
+    });
+
+  });
+
+  describe('#markInviteUsedAndDeleteAllSimilarOutstandingInvites', function() {
+    var fixture2 = {};
+
+    it('should handle external connection invites', function(done) {
+      var inviteService = testRequire("./services/invite-service");
+      return inviteService.testOnly.markInviteUsedAndDeleteAllSimilarOutstandingInvites(fixture2.invite1a)
+        .then(function(updateCount) {
+          assert.strictEqual(updateCount, 1);
+        })
+        .nodeify(done);
+    });
+
+    it('should handle internal connection invites', function(done) {
+      var inviteService = testRequire("./services/invite-service");
+      return inviteService.testOnly.markInviteUsedAndDeleteAllSimilarOutstandingInvites(fixture2.invite2a)
+        .then(function(updateCount) {
+          assert.strictEqual(updateCount, 1);
+        })
+        .nodeify(done);
+    });
+
+    it('should handle internal troupe invites', function(done) {
+      var inviteService = testRequire("./services/invite-service");
+      return inviteService.testOnly.markInviteUsedAndDeleteAllSimilarOutstandingInvites(fixture2.invite3a)
+        .then(function(updateCount) {
+          assert.strictEqual(updateCount, 1);
+        })
+        .nodeify(done);
+    });
+
+
+    it('should handle external troupe invites', function(done) {
+      var inviteService = testRequire("./services/invite-service");
+      return inviteService.testOnly.markInviteUsedAndDeleteAllSimilarOutstandingInvites(fixture2.invite4a)
+        .then(function(updateCount) {
+          assert.strictEqual(updateCount, 1);
+        })
+        .nodeify(done);
+    });
+
+
+    it('should handle the normal case ', function(done) {
+      var inviteService = testRequire("./services/invite-service");
+      return inviteService.testOnly.markInviteUsedAndDeleteAllSimilarOutstandingInvites(fixture2.invite5)
+        .then(function(updateCount) {
+          assert.strictEqual(updateCount, 0);
+        })
+        .nodeify(done);
+    });
+
+    var email = fixtureLoader.generateEmail();
+    before(fixtureLoader(fixture2, {
+      user1: { },
+      user2: { },
+      user3: { },
+
+      troupe1: { },
+
+      invite1a: { fromUser: 'user1', email: email },
+      invite1b: { fromUser: 'user1', email: email },
+
+      invite2a: { fromUser: 'user1', user: 'user2' },
+      invite2b: { fromUser: 'user1', user: 'user2' },
+
+      invite3a: { fromUser: 'user1', user: 'user2', troupe: 'troupe1' },
+      invite3b: { fromUser: 'user1', user: 'user2', troupe: 'troupe1' },
+
+      invite4a: { fromUser: 'user1', email: email , troupe: 'troupe1' },
+      invite4b: { fromUser: 'user2', email: email , troupe: 'troupe1' },
+
+      invite5: { fromUser: 'user1', user: 'user3' }
+
+    }));
+
+    after(function() {
+      fixture2.cleanup();
+    });
+
   });
 
   before(fixtureLoader(fixture));
