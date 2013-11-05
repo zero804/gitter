@@ -46,12 +46,10 @@ describe('/user', function() {
         headers: { Authorization: 'Bearer ' + token }
       })
       .then(function(user) {
-        assert(user.id);
-        assert(user.displayName);
-        assert(user.username);
-        assert(user.url);
-        assert(user.avatarUrlSmall);
-        assert(user.avatarUrlMedium);
+        assert(user.id,'expected an id');
+        assert(user.url, 'expected a url');
+        assert(user.avatarUrlSmall, 'expected a small avatar');
+        assert(user.avatarUrlMedium, 'expected a medium avatar');
       })
       .nodeify(done);
   });
