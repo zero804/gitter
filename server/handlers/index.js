@@ -18,6 +18,7 @@ module.exports = {
     require('./apps').install(app);
     require('./health-check').install(app);
     require('./installChromeExtension').install(app);
+    require('./integrations').install(app);
     require('./test-data').install(app);
     require('./google-contacts').install(app);
     require('./unawesome-browser').install(app);

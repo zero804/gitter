@@ -6,12 +6,11 @@ var winston = require("winston");
 var troupeService = require("../services/troupe-service");
 var nconf = require('../utils/config');
 var middleware = require('../web/middleware');
-var middleware = require('../web/middleware');
+var uriContextResolverMiddleware = require('../web/uri-context-resolver-middleware');
 var appVersion = require("../web/appVersion");
 var loginUtils = require('../web/login-utils');
 var uriService = require('../services/uri-service');
 var unreadItemService = require('../services/unread-item-service');
-var request = require('request');
 
 var Q = require('q');
 var isPhone = require('../web/is-phone');
@@ -87,21 +86,6 @@ function renderAppPageWithTroupe(req, res, next, page) {
         troupeContext: troupeContext,
         agent: req.headers['user-agent']
       });
-    })
-    .fail(next);
-}
-
-function uriContextResolverMiddleware(req, res, next) {
-  var appUri = req.params.appUri;
-
-  uriService.findUriForUser(appUri, req.user && req.user.id)
-    .then(function(result) {
-      if(result.notFound) return next(404);
-
-      req.troupe = result.troupe;
-      req.uriContext = result;
-
-      next();
     })
     .fail(next);
 }
@@ -266,55 +250,6 @@ module.exports = {
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         redirectToNativeApp('people'));
-
-      app.get('/:appUri/integrations',
-        middleware.grantAccessForRememberMeTokenMiddleware,
-        middleware.ensureLoggedIn(),
-        uriContextResolverMiddleware,
-        function (req, res) {
-          request.get({
-            url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks',
-            json: true
-          }, function(err, resp, hooks) {
-            res.render('integrations', {
-              hooks: hooks,
-              troupe: req.troupe,
-              services: ['github', 'bitbucket', 'jenkins', 'travis']
-            });
-          });
-        });
-
-      app.del('/:appUri/integrations',
-        middleware.grantAccessForRememberMeTokenMiddleware,
-        middleware.ensureLoggedIn(),
-        uriContextResolverMiddleware,
-        function (req, res) {
-          request.del({
-            url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks/'+req.body.id,
-            json: true
-          },
-          function() {
-            res.redirect('/'+req.troupe.uri+'/integrations');
-          });
-        });
-
-      app.post('/:appUri/integrations',
-        middleware.grantAccessForRememberMeTokenMiddleware,
-        middleware.ensureLoggedIn(),
-        uriContextResolverMiddleware,
-        function(req, res) {
-          request.post({
-            url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks',
-            json: {
-              service: req.body.service,
-
-            }
-          },
-          function(err, resp, body) {
-            // TODO: Make sure this is properly encoded
-            res.redirect(body.configurationURL + "&returnTo=" + nconf.get('web:basepath') + req.url);
-          });
-        });
 
       app.get('/:appUri',
         middleware.grantAccessForRememberMeTokenMiddleware,
