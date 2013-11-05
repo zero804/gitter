@@ -7,26 +7,26 @@
   <link rel="stylesheet" href='{{cdn "bootstrap/css/trpStart.css" }}' type='text/css'>
 </head>
 
-<body style="padding: 15px;">
-  <h1>{{troupe.name}} integrations</h1>
+<body>
+  <p class="trpBodyMedium">Integrations</p>
   <ul>
     {{#each hooks}}
     <li>
-      <form method="post">
+      <form style="width: 260px;" method="post">
         <input type="hidden" name="_method" value="delete">
-        <label>{{service}} - {{description}}</label>
+        <label class="trpBodySmall">{{service}} - {{#if description}}{{description}}{{else}}<i>no description</i>{{/if}}</label>
         <input type="hidden" name="id" value="{{_id}}">
-        <input type="submit" value="Delete">
+        <input style="float: right;" type="submit" value="Delete">
       </form>
     </li>
     {{else}}
-      <p>None</p>
+      <p class="trpBodySmall">None</p>
     {{/each}}
   </ul>
   {{#each services}}
-  <form method="post">
+  <form style="display: inline-block;" method="post">
     <input type="hidden" name="service" value="{{this}}">
-    <input type="submit" value='Add {{this}} hook'>
+    <input class="trpButtonMedium" type="submit" value='Add {{this}} hook'>
   </form>
   {{/each}}
 </body>
