@@ -4,25 +4,27 @@
   <meta http-equiv="X-UA-Compatible" content="IE=IE9" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
   <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href='{{cdn "bootstrap/css/trpStart.css" }}' type='text/css'>
+  <link rel="stylesheet" href='{{cdn "bootstrap/css/trpHooks.css" }}' type='text/css'>
 </head>
 
 <body>
-  <p class="trpBodyMedium">Integrations</p>
-  <ul>
+  <p class="trpBodyMedium" style="margin-left: 8px">Integrations</p>
     {{#each hooks}}
-    <li>
-      <form style="width: 260px;" method="post">
-        <input type="hidden" name="_method" value="delete">
-        <label class="trpBodySmall">{{service}} - {{#if description}}{{description}}{{else}}<i>no description</i>{{/if}}</label>
-        <input type="hidden" name="id" value="{{_id}}">
-        <input style="float: right;" type="submit" value="Delete">
+    <div class="trpHookItem">
+      <form style="width: 100%" method="post">
+        <div style="display: inline-block; vertical-align: middle; margin-bottom: 2px">
+          <input type="hidden" name="_method" value="delete">
+          <label class="trpBodySmall">
+            <div style="display: inline-block; width: 80px">{{service}}</div>
+            <span>{{#if description}}{{description}}{{else}}<i>no description</i>{{/if}}</span></label>
+          <input type="hidden" name="id" value="{{_id}}">
+        </div>
+        <div style="display: inline-block; float: right"><input type="submit" value="Delete" class="trpButtonSmall trpBtnRed"></div>
       </form>
-    </li>
+    </div>
     {{else}}
       <p class="trpBodySmall">None</p>
     {{/each}}
-  </ul>
   {{#each services}}
   <form style="display: inline-block;" method="post">
     <input type="hidden" name="service" value="{{this}}">
