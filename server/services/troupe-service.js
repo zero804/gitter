@@ -1694,7 +1694,7 @@ function markInviteUsedAndDeleteAllSimilarOutstandingInvites(invite) {
       return invite.removeQ()
           .then(function() {
 
-            var similarityQuery = { status: 'UNUSED', userId: invite.userId };
+            var similarityQuery = { status: 'UNUSED', userId: invite.userId || null, email: invite.email || null };
             if(invite.troupeId) {
               similarityQuery.troupeId = invite.troupeId;
             } else {
