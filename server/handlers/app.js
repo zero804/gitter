@@ -279,7 +279,7 @@ module.exports = {
             res.render('integrations', {
               hooks: hooks,
               troupe: req.troupe,
-              services: ['github', 'bitbucket']
+              services: ['github', 'bitbucket', 'jenkins', 'travis']
             });
           });
         });
@@ -307,11 +307,12 @@ module.exports = {
             url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks',
             json: {
               service: req.body.service,
-              returnTo: nconf.get('web:basepath')+req.url
+
             }
           },
           function(err, resp, body) {
-            res.redirect(body.configurationURL);
+            // TODO: Make sure this is properly encoded
+            res.redirect(body.configurationURL + "&returnTo=" + nconf.get('web:basepath') + req.url);
           });
         });
 
