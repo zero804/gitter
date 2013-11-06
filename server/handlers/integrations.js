@@ -6,6 +6,13 @@ var middleware = require('../web/middleware');
 var request = require('request');
 var uriContextResolverMiddleware = require('../web/uri-context-resolver-middleware');
 
+var serviceDisplayNames = {
+  github: 'GitHub',
+  bitbucket: 'BitBucket',
+  jenkins: 'Jenkins',
+  travis: 'Travis',
+};
+
 module.exports = {
     install: function(app) {
 
@@ -18,10 +25,12 @@ module.exports = {
             url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks',
             json: true
           }, function(err, resp, hooks) {
+            hooks.forEach(function(hook) {
+              hook.serviceDisplayName = serviceDisplayNames[hook.service];
+            });
             res.render('integrations', {
               hooks: hooks,
               troupe: req.troupe,
-              services: ['github', 'bitbucket', 'jenkins', 'travis']
             });
           });
         });
