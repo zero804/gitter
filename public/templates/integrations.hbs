@@ -23,13 +23,26 @@
       </form>
     </div>
     {{else}}
-      <p class="trpBodySmall">None</p>
+      <p class="trpBodySmall">There are currently no integrations configured for this Troupe. </p>
     {{/each}}
-  {{#each services}}
-  <form style="display: inline-block;" method="post">
-    <input type="hidden" name="service" value="{{this}}">
-    <input class="trpButtonMedium" type="submit" value='Add {{this}} hook'>
+    <br>
+    <p class="trpBodyMedium" style="margin-left: 8px">Add an integration</p>
+  <form style="display: inline-block; margin-left: 6px" method="post">
+    <input type="hidden" name="service" value="github">
+    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-github@2x.png"}}' width="16" height="16" style="margin-right: 4px">GitHub</button>
   </form>
-  {{/each}}
+  <form style="display: inline-block;" method="post">
+    <input type="hidden" name="service" value="bitbucket">
+    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-bitbucket@2x.png"}}' width="16" height="16" style="margin-right: 4px">BitBucket</button>
+  </form>
+  <form style="display: inline-block;" method="post">
+    <input type="hidden" name="service" value="jenkins">
+    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-jenkins@2x.png"}}' width="16" height="16" style="margin-right: 4px">Jenkins</button>
+  </form>
+  <form style="display: inline-block;" method="post">
+    <input type="hidden" name="service" value="travis">
+    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-travis@2x.png"}}' width="16" height="16" style="margin-right: 4px">Travis</button>
+  </form>
+
 </body>
 </html>
