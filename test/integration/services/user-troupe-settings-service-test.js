@@ -59,6 +59,15 @@ describe("User Troupe Settings Service", function() {
         assert.equal(settings.human, 1);
         assert.equal(settings.monkey, 0);
       })
+      .then(function() {
+        return userTroupeSettingsService.getAllUserSettings(userId, troupeId);
+      })
+      .then(function(settings) {
+        assert(settings.test);
+        assert(settings.test.value1);
+        assert(settings.test2);
+        assert(settings.test2.human);
+      })
     .nodeify(done);
   });
 
