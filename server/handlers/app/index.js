@@ -1,10 +1,10 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var nconf           = require('../utils/config');
-var middleware      = require('../web/middleware');
-var appRender       = require('./app/render');
-var appMiddleware   = require('./app/middleware');
+var nconf           = require('../../utils/config');
+var middleware      = require('../../web/middleware');
+var appRender       = require('./render');
+var appMiddleware   = require('./middleware');
 
 module.exports = {
     install: function(app) {
@@ -62,8 +62,8 @@ module.exports = {
           }
         });
 
-      require('./app-native-redirects').install(app);
-      require('./app-invites').install(app);
+      require('./native-redirects').install(app);
+      require('./invites').install(app);
 
     }
 };
