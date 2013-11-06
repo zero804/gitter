@@ -1,12 +1,12 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService     = require("../../services/troupe-service");
+var inviteService     = require("../../services/invite-service");
 var restSerializer    = require("../../serializers/rest-serializer");
 
 module.exports = {
     index: function(req, res, next) {
-      troupeService.findAllUnusedInvitesForTroupe(req.troupe.id, function(err, invites) {
+      inviteService.findAllUnusedInvitesForTroupe(req.troupe.id, function(err, invites) {
         if(err) return next(err);
 
         var strategy = new restSerializer.InviteStrategy({ currentUserId: req.user.id, troupeId: req.troupe.id });
@@ -26,7 +26,7 @@ module.exports = {
       // displayName is not required, but either email or userId is
       if(!invite.email && !invite.userId) return next(400);
 
-      return troupeService.createInvite(req.troupe, {
+      return inviteService.createInvite(req.troupe, {
           fromUser: req.user,
           email: invite.email,
           displayName: invite.displayName,
@@ -52,8 +52,8 @@ module.exports = {
       });
     },
 
-    load: function(id, callback){
-      troupeService.findInviteById(id, callback);
+    load: function(req, id, callback) {
+      inviteService.findInviteForTroupeById(req.troupe.id, id, callback);
     }
 
 };

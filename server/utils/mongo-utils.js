@@ -42,7 +42,20 @@ function getNewObjectIdString() {
   return objectId.valueOf();
 }
 
+/**
+ * Checks to see whether something is either a String or ObjectID (hence ObjectID-like)
+ */
+function isLikeObjectId(value) {
+  // value instanceof Object doesn't always work, so we'll do something a bit more hacky
 
+  return value && value._bsontype === 'ObjectID' ||
+          typeof value === 'string' ||
+          value instanceof String ||
+          value instanceof ObjectID;
+}
+
+
+exports.isLikeObjectId = isLikeObjectId;
 exports.asObjectID = asObjectID;
 exports.getDateFromObjectId = getDateFromObjectId;
 exports.getTimestampFromObjectId = getTimestampFromObjectId;

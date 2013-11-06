@@ -219,6 +219,14 @@ function bind(on) {
 
     onNewInvite: function(callback) {
       on('newInvite', callback);
+    },
+
+    troupeDeleted: function(options) {
+      emit('troupeDeleted', options);
+    },
+
+    onTroupeDeleted: function(callback) {
+      on('troupeDeleted', callback);
     }
 
   };

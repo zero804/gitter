@@ -1,14 +1,14 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService = require("../../services/troupe-service"),
-    restSerializer = require("../../serializers/rest-serializer");
+var inviteService = require("../../services/invite-service");
+var restSerializer = require("../../serializers/rest-serializer");
 var winston = require('winston');
 
 module.exports = {
     // Outgoing connection invites.
     index: function(req, res, next) {
-      troupeService.findAllUnusedConnectionInvitesFromUserId(req.user.id, function(err, invites) {
+      inviteService.findAllUnusedConnectionInvitesFromUserId(req.user.id, function(err, invites) {
         if(err) return next(err);
 
         var strategy = new restSerializer.InviteStrategy({});
@@ -34,8 +34,8 @@ module.exports = {
       });
     },
 
-    load: function(id, callback) {
-      troupeService.findInviteById(id, callback);
+    load: function(req, id, callback) {
+      inviteService.findInviteForUserById(req.user.id, id, callback);
     }
 
 };
