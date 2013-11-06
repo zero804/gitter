@@ -64,6 +64,7 @@ module.exports = {
 
       require('./native-redirects').install(app);
       require('./invites').install(app);
+      require('./integrations').install(app);
 
     }
 };

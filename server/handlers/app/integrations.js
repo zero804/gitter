@@ -2,10 +2,10 @@
 "use strict";
 
 var winston = require("winston");
-var nconf = require('../utils/config');
-var middleware = require('../web/middleware');
+var nconf = require('../../utils/config');
+var middleware = require('../../web/middleware');
 var request = require('request');
-var uriContextResolverMiddleware = require('../web/uri-context-resolver-middleware');
+var uriContextResolverMiddleware = require('./middleware').uriContextResolverMiddleware;
 
 var serviceDisplayNames = {
   github: 'GitHub',
