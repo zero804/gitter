@@ -3,15 +3,14 @@
 
 var emailNotificationService  = require("./email-notification-service");
 var troupeService             = require("./troupe-service");
+var inviteService             = require("./invite-service");
 var userService               = require("./user-service");
 var uriService                = require("./uri-service");
 var winston                   = require('winston');
 var assert                    = require('assert');
-var appEvents                 = require('../app-events');
 var Q                         = require('q');
 var userService               = require("./user-service");
 var persistence               = require("./persistence-service");
-var userConfirmationService   = require('./user-confirmation-service');
 
 var signupService = module.exports = {
   /**
@@ -191,7 +190,7 @@ var signupService = module.exports = {
           })
           .then(function(user) {
             var step =  toTroupe ? troupeService.addRequest(toTroupe, user)
-                                 : troupeService.inviteUserByUserId(null, user, toUser.id);
+                                 : inviteService.inviteUserByUserId(null, user, toUser.id);
 
             return step.then(function() {return user; });
           });
@@ -200,11 +199,3 @@ var signupService = module.exports = {
   }
 
 };
-
-appEvents.onEmailConfirmed(function(params) {
-  winston.info("Email address confirmed, updating invites and requests", params);
-  var email = params.email;
-  var userId = params.userId;
-
-  return troupeService.updateInvitesAndRequestsForConfirmedEmail(email, userId);
-});

@@ -1,14 +1,14 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService     = require('../../services/troupe-service');
+var inviteService     = require('../../services/invite-service');
 var restSerializer    = require("../../serializers/rest-serializer");
 
 module.exports = function(req, res, next) {
   var invite = req.body;
 
   // Null means we're requesting a one-to-one connection
-  return troupeService.createInvite(null, {
+  return inviteService.createInvite(null, {
       fromUser: req.user,
       email: invite.email,
       displayName: invite.displayName,

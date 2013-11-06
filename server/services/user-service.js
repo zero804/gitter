@@ -1,22 +1,23 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var persistence               = require("./persistence-service");
 var sechash                   = require('sechash');
+var uuid                      = require('node-uuid');
+var winston                   = require("winston");
+var assert                    = require('assert');
+var Q                         = require('q');
+var moment                    = require('moment');
+var _                         = require('underscore');
+var persistence               = require("./persistence-service");
 var emailNotificationService  = require("./email-notification-service");
 var userConfirmationService   = require('./user-confirmation-service');
-var uuid                      = require('node-uuid');
 var geocodingService          = require("./geocoding-service");
-var winston                   = require("winston");
 var statsService              = require("./stats-service");
 var uriLookupService          = require("./uri-lookup-service");
-var assert                    = require('assert');
-var collections               = require("../utils/collections");
-var Q                         = require('q');
 var appEvents                 = require("../app-events");
-var moment                    = require('moment');
+var collections               = require("../utils/collections");
 var gravatar                  = require('../utils/gravatar');
-var _                         = require('underscore');
+var promiseUtils              = require('../utils/promise-utils');
 
 /**
  * Creates a new user
@@ -333,9 +334,12 @@ var userService = {
     var displayName = options.displayName;
     var username = options.username;
 
+    assert(userId, 'userId expected');
+
     var postSave = [];
 
     var seq = userService.findById(userId)
+      .then(promiseUtils.required)
       .then(queueDeleteInvites);
 
     if(displayName) seq = seq.then(updateDisplayName);

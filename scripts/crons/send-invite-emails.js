@@ -4,10 +4,10 @@
 "use strict";
 
 var shutdown = require('../../server/utils/shutdown');
-var troupeService = require('../../server/services/troupe-service');
+var inviteService = require('../../server/services/invite-service');
 
 var delaySeconds = 10 * 60;
-troupeService.sendPendingInviteMails(delaySeconds, function(err, counts) {
+inviteService.sendPendingInviteMails(delaySeconds, function(err, counts) {
   if(err) {
     console.error(err);
     process.exit(1);
