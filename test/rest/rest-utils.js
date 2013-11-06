@@ -3,7 +3,7 @@
 var rest = require('restler-q');
 var assert = require('assert');
 var Q = require('q');
-var BASE_URL = 'http://localhost:5000/';
+var BASE_URL = process.env.BASE_URL || 'http://localhost:5000/';
 
 var token;
 
@@ -51,6 +51,43 @@ exports.userId = function() {
     });
 };
 
+function wrapRest() {
+  return ['get','post','put','del','head', 'json', 'postJson'].reduce(function(memo, method) {
+    var underlying = rest[method];
+    if(underlying) {
 
+      memo[method] = function() {
+        var args = Array.prototype.slice.apply(arguments);
+        args[0] = BASE_URL + args[0];
+        var index;
+        if(method === 'json' || method == 'postJson') {
+          index = 2;
+        } else {
+          index = 1;
+        }
+        while(args.length < index + 1) args.push(undefined);
+        var opts = args[index];
+        if(!opts) {
+          opts = {};
+          args[index] = opts;
+        }
+        var headers = opts.headers;
+        if(!opts.headers) {
+          headers = {};
+          opts.headers = headers;
+        }
 
+        return exports.token()
+          .then(function(token) {
+            headers.Authorization = 'Bearer ' + token;
+            return underlying.apply(rest, args);
+          });
+      };
+    }
+
+    return memo;
+  }, {});
+}
+
+exports.testRest = wrapRest();
 

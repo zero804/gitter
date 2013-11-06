@@ -20,7 +20,20 @@ exports.getUserSettings = function(userId, troupeId, settingsKey) {
 
       return uts.settings[settingsKey];
     });
+};
 
+exports.getAllUserSettings = function(userId, troupeId) {
+  /* Not sure why mongoose isn't converting these */
+  assert(mongoUtils.isLikeObjectId(userId));
+  assert(mongoUtils.isLikeObjectId(troupeId));
+  userId = mongoUtils.asObjectID(userId);
+  troupeId = mongoUtils.asObjectID(troupeId);
+
+  return persistence.UserTroupeSettings.findOneQ({ userId: userId, troupeId: troupeId }, 'settings', { lean: true })
+    .then(function(uts) {
+      if(!uts) return;
+      return uts.settings || {};
+    });
 };
 
 exports.setUserSettings = function(userId, troupeId, settingsKey, settings) {
@@ -44,7 +57,7 @@ exports.setUserSettings = function(userId, troupeId, settingsKey, settings) {
       });
 
   return d.promise;
-
 };
+
 
 // TODO: remove settings for users removed from troupes, from troupes that have been deleted etc
