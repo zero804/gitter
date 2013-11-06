@@ -24,6 +24,16 @@ define([], function() {
     var iconHtml = '<div class="notification-icon"><a href="'+ meta.url +'"><img src="' + favicon  + '"></a></div>';
     chatItemView.$el.find('.trpChatText').prepend(iconHtml);
 
+    // Only for Github hooks? maybe Bitbucket?
+    // if (meta.commits) {
+    //   var commitsHtml = '<ul>';
+    //   meta.commits.forEach(function(commit) {
+    //     commitsHtml += '<li>' + commit.author + ': <a href="' + commit.url + '" target="_blank">' + commit.message + '</a></li>';
+    //   });
+    //   commitsHtml += '</ul>';
+    //   chatItemView.$el.find('.trpChatText').append(commitsHtml);
+    // }
+
     // This could be moved to the template render, is here temporarily.
     chatItemView.$el.find('.trpChatBox').addClass('transparent');
   }

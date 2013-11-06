@@ -7,7 +7,6 @@ var userSearchService = require("../../services/user-search-service");
 
 module.exports = {
   id: 'resourceUser',
-
   index: function(req, res, next) {
     if(!req.user) {
       return next(403);

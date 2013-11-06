@@ -21,8 +21,10 @@ define([
               badge.text(count);
               if(count > 0) {
                 badge.show();
+                $("#favicon").attr("href","/images/2/favicon-unread.png");
               } else {
                 badge.hide();
+                $("#favicon").attr("href","/images/2/favicon.png");
               }
             }
 

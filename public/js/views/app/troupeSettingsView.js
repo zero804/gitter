@@ -25,7 +25,8 @@ define([
       'submit #troupeSettings': 'saveSettings',
       'click #cancel-troupe-settings' : 'closeSettings',
       'click #delete-troupe': 'deleteTroupe',
-      'click #leave-troupe': 'leaveTroupe'
+      'click #leave-troupe': 'leaveTroupe',
+      'click #show-integrations': 'showIntegrations'
     },
 
     initialize: function() {
@@ -143,6 +144,11 @@ define([
       });
 
       modal.show();
+    },
+
+    showIntegrations: function() {
+      $('#troupeSettings').hide();
+      $('#integrations-iframe').show();
     },
 
     getRenderData: function() {

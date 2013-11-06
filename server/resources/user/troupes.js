@@ -6,6 +6,7 @@ var restSerializer = require("../../serializers/rest-serializer");
 
 module.exports = {
   base: 'troupes',
+  id: 'userTroupe',
   index: function(req, res, next) {
     if(!req.user) {
       return res.send(403);
@@ -27,7 +28,7 @@ module.exports = {
   show: function(req, res, next) {
     var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.resourceUser.id, mapUsers: true });
 
-    restSerializer.serialize(req.troupe, strategy, function(err, serialized) {
+    restSerializer.serialize(req.userTroupe, strategy, function(err, serialized) {
       if(err) return next(err);
 
       res.send(serialized);
@@ -39,7 +40,7 @@ module.exports = {
       if(err) return callback(500);
       if(!troupe) return callback(404);
 
-      if(!troupeService.userHasAccessToTroupe(req.user, troupe)) {
+      if(!troupeService.userHasAccessToTroupe(req.resourceUser, troupe)) {
         return callback(403);
       }
 

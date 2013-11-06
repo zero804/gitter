@@ -90,6 +90,7 @@ module.exports = {
 
     app.use(express.cookieParser());
     app.use(express.bodyParser());
+    app.use(express.methodOverride());
 
     (function fileUploading() {
       var uploadDir = os.tmpDir() + "/troupe-" + os.hostname();
