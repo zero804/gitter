@@ -44,7 +44,6 @@ describe('/user/:id/troupes/:id/settings', function() {
         return testRest.get('user/' + userId + '/troupes/' + troupeId + '/settings/test');
       })
       .then(function(settings) {
-        console.log(settings);
         assert(settings);
       })
       .nodeify(done);
