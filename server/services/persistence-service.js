@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var mongoose      = require('mongoose-q')(require('mongoose'), {spread:true});
+var mongoose      = require('../utils/mongoose-q');
 var Schema        = mongoose.Schema;
 var ObjectId      = Schema.ObjectId;
 var mongooseUtils = require('../utils/mongoose-utils');
@@ -210,7 +210,6 @@ var UserTroupeFavouritesSchema = new Schema({
 UserTroupeFavouritesSchema.index({ userId: 1 });
 UserTroupeFavouritesSchema.schemaTypeName = 'UserTroupeFavourites';
 
-
 //
 // User in a Troupe
 //
@@ -317,6 +316,8 @@ var TroupeRemovedUserSchema = new Schema({
 });
 TroupeRemovedUserSchema.index({ userId: 1 });
 TroupeRemovedUserSchema.schemaTypeName = 'TroupeRemovedUserSchema';
+
+var UserTroupeSettingsSchema = require('./persistence/user-troupe-settings-schema.js');
 
 //
 // An invitation to a person to join a Troupe
@@ -623,6 +624,7 @@ var UserTroupeFavourites = mongoose.model('UserTroupeFavourites', UserTroupeFavo
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var TroupeUser = mongoose.model('TroupeUser', TroupeUserSchema);
 var TroupeRemovedUser = mongoose.model('TroupeRemovedUser', TroupeRemovedUserSchema);
+var UserTroupeSettings = mongoose.model('UserTroupeSettings', UserTroupeSettingsSchema);
 var Email = mongoose.model('Email', EmailSchema);
 var EmailAttachment = mongoose.model('EmailAttachment', EmailAttachmentSchema);
 var Conversation = mongoose.model('Conversation', ConversationSchema);
@@ -672,6 +674,7 @@ module.exports = {
     TroupeSchema: TroupeSchema,
     TroupeUserSchema: TroupeUserSchema,
     TroupeRemovedUserSchema: TroupeRemovedUserSchema,
+    UserTroupeSettingsSchema: UserTroupeSettingsSchema,
     EmailSchema: EmailSchema,
     EmailAttachmentSchema: EmailAttachmentSchema,
     ConversationSchema: ConversationSchema,
@@ -696,6 +699,7 @@ module.exports = {
   Troupe: Troupe,
   TroupeUser: TroupeUser,
   TroupeRemovedUser: TroupeRemovedUser,
+  UserTroupeSettings: UserTroupeSettings,
 	Email: Email,
   EmailAttachment: EmailAttachment,
   Conversation: Conversation,
