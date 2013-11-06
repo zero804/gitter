@@ -227,13 +227,19 @@ exports.sendOnlineNotifications = function(notifications, callback) {
 
               var ns = notificationSettings[notification.userId + ':' + notification.troupeId];
               var notificationSetting = ns && ns.push;
-
+              console.log('NOTIFICATION SETTING ', notificationSetting);
               if(notificationSetting === 'mute') return;
               if(notificationSetting === 'mention') {
                 var user = mentionUsersHash[notification.userId];
+                console.log('USER, ', user);
+
                 var itemType = notification.itemType;
+                console.log('itemType, ', itemType);
+
                 if(itemType != 'chat') return;
                 var chat = message.data;
+                console.log('chat, ', chat);
+
                 if(!user || !chat) return;
 
                 if(!chat.mentions || !chat.mentions.length) return;
@@ -247,6 +253,7 @@ exports.sendOnlineNotifications = function(notifications, callback) {
                   return username && username.match(re) ||
                           displayName && displayName.match(re);
                 });
+                console.log('MENTIONEd?', userMentioned);
 
                 if(!userMentioned) return;
               }
