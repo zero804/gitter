@@ -2,11 +2,11 @@
 "use strict";
 
 var winston         = require("winston");
-var troupeService   = require("../services/troupe-service");
-var inviteService   = require("../services/invite-service");
-var middleware      = require('../web/middleware');
-var appRender       = require('./app/render');
-var appMiddleware   = require('./app/middleware');
+var troupeService   = require("../../services/troupe-service");
+var inviteService   = require("../../services/invite-service");
+var middleware      = require('../../web/middleware');
+var appRender       = require('./render');
+var appMiddleware   = require('./middleware');
 
 var Q = require('q');
 

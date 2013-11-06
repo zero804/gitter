@@ -1,8 +1,8 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var middleware      = require('../web/middleware');
-var appMiddleware   = require('./app/middleware');
+var middleware      = require('../../web/middleware');
+var appMiddleware   = require('./middleware');
 
 function redirectToNativeApp(page) {
   return function(req, res) {
