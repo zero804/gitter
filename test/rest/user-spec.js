@@ -48,8 +48,8 @@ describe('/user', function() {
       .then(function(user) {
         assert(user.id,'expected an id');
         assert(user.url, 'expected a url');
-        assert(user.avatarUrlSmall, 'expected a small avatar');
-        assert(user.avatarUrlMedium, 'expected a medium avatar');
+        // assert(user.avatarUrlSmall, 'expected a small avatar');
+        // assert(user.avatarUrlMedium, 'expected a medium avatar');
       })
       .nodeify(done);
   });
