@@ -14,7 +14,7 @@ module.exports = {
   },
 
   show: function(req, res) {
-    res.json(req.setting.settings);
+    res.json(req.setting.settings || {});
   },
 
   update: function(req, res, next) {
