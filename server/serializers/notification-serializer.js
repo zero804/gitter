@@ -135,6 +135,7 @@ function ChatStrategy(options)  {
       id: item._id,
       text: item.text,
       sent: item.sent,
+      mentions: item.mentions,
       fromUser: options.user ? options.user : userStategy.map(item.fromUserId),
       troupe: troupeStrategy && troupeStrategy.map(item.toTroupeId)
     };

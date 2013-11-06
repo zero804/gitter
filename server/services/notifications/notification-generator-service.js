@@ -10,7 +10,6 @@ var NotificationCollector              = require('../../utils/notification-colle
 var onlineNotificationGeneratorService = require('./online-notification-generator-service');
 var pushNotificationGeneratorService   = require('./push-notification-generator-service');
 var mongoUtils                         = require('../../utils/mongo-utils');
-var preferences                        = require('../notifications-preference-service');
 
 function getStartTimeForItems(items) {
   if(!items.length) return null;

@@ -12,8 +12,9 @@ var fixture = {};
 describe("User Troupe Settings Service", function() {
 
   before(fixtureLoader(fixture, {
-    user1: { username: true },
-    troupe1: { users: ['user1'] }
+    user1: { },
+    user2: { },
+    troupe1: { users: ['user1', 'user2'] }
   }));
 
   after(function() {
@@ -68,7 +69,28 @@ describe("User Troupe Settings Service", function() {
         assert(settings.test2);
         assert(settings.test2.human);
       })
-    .nodeify(done);
+      .nodeify(done);
   });
+
+
+it('should be able to fetch keys for multiple usertroupes', function(done) {
+  var user1Id = fixture.user1.id;
+  var user2Id = fixture.user2.id;
+  var troupeId = fixture.troupe1.id;
+
+  return userTroupeSettingsService.setUserSettings(user1Id, troupeId, 'test3', { bob: 1 })
+    .then(function() {
+      return userTroupeSettingsService.setUserSettings(user2Id, troupeId, 'test3', { bob: 2 });
+    })
+    .then(function() {
+      return userTroupeSettingsService.getMultiUserTroupeSettings([ { userId: user1Id, troupeId: troupeId }, { userId: user2Id, troupeId: troupeId } ], 'test3');
+    })
+    .then(function(results) {
+      assert.equal(Object.keys(results).length, 2);
+      assert.equal(results[user1Id + ':' + troupeId].bob, 1);
+      assert.equal(results[user2Id + ':' + troupeId].bob, 2);
+    })
+    .nodeify(done);
+});
 
 });
