@@ -52,6 +52,10 @@ module.exports = {
             }
           },
           function(err, resp, body) {
+            if(err || !body) {
+              res.send("Unable to perform request. Please try again later.");
+              return;
+            }
             // TODO: Make sure this is properly encoded
             res.redirect(body.configurationURL + "&returnTo=" + nconf.get('web:basepath') + req.url);
           });
