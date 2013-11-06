@@ -1,6 +1,7 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
+var winston = require("winston");
 var nconf = require('../utils/config');
 var middleware = require('../web/middleware');
 var request = require('request');
@@ -25,6 +26,11 @@ module.exports = {
             url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks',
             json: true
           }, function(err, resp, hooks) {
+            if(err) {
+              winston.error('failed to fetch hooks for troupe', { exception: err });
+              res.send(502, 'Unable to perform request. Please try again later.');
+              return;
+            }
             hooks.forEach(function(hook) {
               hook.serviceDisplayName = serviceDisplayNames[hook.service];
             });
@@ -44,7 +50,12 @@ module.exports = {
             url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks/'+req.body.id,
             json: true
           },
-          function() {
+          function(err) {
+            if(err) {
+              winston.error('failed to delete hook for troupe', { exception: err });
+              res.send(502, 'Unable to perform request. Please try again later.');
+              return;
+            }
             res.redirect('/'+req.troupe.uri+'/integrations');
           });
         });
@@ -62,6 +73,7 @@ module.exports = {
           },
           function(err, resp, body) {
             if(err || !body) {
+              winston.error('failed to create hook for troupe', { exception: err });
               res.send("Unable to perform request. Please try again later.");
               return;
             }
