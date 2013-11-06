@@ -22,6 +22,28 @@ exports.getUserSettings = function(userId, troupeId, settingsKey) {
     });
 };
 
+
+exports.getMultiUserTroupeSettings = function(userTroupes, settingsKey) {
+
+  var terms = userTroupes.map(function(userTroupe) {
+    var userId = mongoUtils.asObjectID(userTroupe.userId);
+    var troupeId = mongoUtils.asObjectID(userTroupe.troupeId);
+
+    return { userId: userId, troupeId: troupeId };
+  });
+
+  return persistence.UserTroupeSettings.findQ({ $or: terms }, 'userId troupeId settings.' + settingsKey, { lean: true })
+    .then(function(utses) {
+      var hash = utses.reduce(function(memo, uts) {
+        memo[uts.userId + ':' + uts.troupeId] = uts.settings && uts.settings[settingsKey];
+        return memo;
+      }, {});
+
+      return hash;
+    });
+};
+
+
 exports.getAllUserSettings = function(userId, troupeId) {
   /* Not sure why mongoose isn't converting these */
   assert(mongoUtils.isLikeObjectId(userId));

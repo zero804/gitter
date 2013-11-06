@@ -1,11 +1,14 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var appEvents  = require("../../app-events");
-var winston    = require("winston");
-var Q          = require("q");
-var handlebars = require('handlebars');
-var serializer = require("../../serializers/notification-serializer");
+var winston                   = require('winston');
+var Q                         = require('q');
+var handlebars                = require('handlebars');
+var userTroupeSettingsService = require('../user-troupe-settings-service');
+var userService               = require('../user-service');
+var appEvents                 = require('../../app-events');
+var serializer                = require('../../serializers/notification-serializer');
+var collections               = require('../../utils/collections');
 
 function compile(map) {
   for(var k in map) {
@@ -120,6 +123,7 @@ function createNotificationMessage(itemType, itemIds, callback) {
           data.troupeUrl = url;
 
           var d = {
+            data: data,
             text: template(data),
             sound: 'notify.caf',
             title: titleTemplate ? titleTemplate(data) : null,
@@ -184,42 +188,87 @@ function generateNotificationMessages(notificationsItems, callback) {
 
       callback(null, results);
     })
-    .fail(function(err) {
-      callback(err);
-    });
+    .fail(callback);
+}
+
+function findMentionOnlyUserIds(notifications, notificationSettings) {
+  return notifications.filter(function(n) {
+
+    var ns = notificationSettings[n.userId + ':' + n.troupeId];
+    var notificationSetting = ns && ns.push;
+
+    return notificationSetting === 'mention';
+  }).map(function(n) { return n.userId; });
 }
 
 // Takes an array of notification items, which looks like
 // [{ userId / itemType / itemId / troupeId }]
 exports.sendOnlineNotifications = function(notifications, callback) {
-  winston.verbose("Spooling online notifications", { count: notifications.length });
+  userTroupeSettingsService.getMultiUserTroupeSettings(notifications, 'notifications')
+    .then(function(notificationSettings) {
 
-  generateNotificationMessages(notifications, function(err, notificationsWithMessages) {
-    if(err) {
-      winston.error("Error while generating notification messages: ", { exception: err });
-      return callback(err);
-    }
+      var userIdsOnMention = findMentionOnlyUserIds(notifications, notificationSettings);
 
-    notificationsWithMessages.forEach(function(notificationsWithMessage) {
-      var notification = notificationsWithMessage.notification;
-      var message = notificationsWithMessage.message;
+      return userService.findByIds(userIdsOnMention)
+        .then(function(mentionUsers) {
+          var mentionUsersHash = collections.indexById(mentionUsers);
 
-      var n = {
-        userId: notification.userId,
-        troupeId: notification.troupeId,
-        title: message.title,
-        text: message.text,
-        link: message.link,
-        sound: message.sound
-      };
+          winston.verbose("Spooling online notifications", { count: notifications.length });
 
-      winston.silly("Online notifications: ", n);
-      appEvents.userNotification(n);
-    });
+          generateNotificationMessages(notifications, function(err, notificationsWithMessages) {
+            if(err) {
+              winston.error("Error while generating notification messages: ", { exception: err });
+              return callback(err);
+            }
 
-    return callback();
+            notificationsWithMessages.forEach(function(notificationsWithMessage) {
+              var notification = notificationsWithMessage.notification;
+              var message = notificationsWithMessage.message;
 
-  });
+              var ns = notificationSettings[notification.userId + ':' + notification.troupeId];
+              var notificationSetting = ns && ns.push;
+
+              if(notificationSetting === 'mute') return;
+              if(notificationSetting === 'mention') {
+                var user = mentionUsersHash[notification.userId];
+                var itemType = notification.itemType;
+                if(itemType != 'chat') return;
+                var chat = message.data;
+                if(!user || !chat) return;
+
+                if(!chat.mentions || !chat.mentions.length) return;
+
+                var username = user.username;
+                var displayName = user.displayName;
+
+                var userMentioned = chat.mentions.some(function(mention) {
+                  var re = new RegExp(mention.screenName, 'i');
+
+                  return username && username.match(re) ||
+                          displayName && displayName.match(re);
+                });
+
+                if(!userMentioned) return;
+              }
+
+              var n = {
+                userId: notification.userId,
+                troupeId: notification.troupeId,
+                title: message.title,
+                text: message.text,
+                link: message.link,
+                sound: message.sound
+              };
+
+              winston.silly("Online notifications: ", n);
+              appEvents.userNotification(n);
+            });
+
+            return callback();
+          });
+        });
+    })
+    .fail(callback);
 
 };
 
