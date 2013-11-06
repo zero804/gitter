@@ -9,7 +9,6 @@ define([], function() {
     switch (meta.service) {
       case 'github':
         favicon = 'https://github.com/favicon.ico';
-        console.debug(meta.commits);
         break;
       case 'bitbucket':
         favicon = 'https://bitbucket.org/favicon.ico';
