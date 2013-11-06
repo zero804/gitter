@@ -6,7 +6,7 @@ var userTroupeSettingsService = require("../../services/user-troupe-settings-ser
 module.exports = {
   base: 'settings',
   index: function(req, res, next) {
-    userTroupeSettingsService.getAllUserSettings(req.resourceUser.id, req.troupe.id)
+    userTroupeSettingsService.getAllUserSettings(req.resourceUser.id, req.userTroupe.id)
       .then(function(settings) {
         res.json(settings || {});
       })
@@ -19,7 +19,7 @@ module.exports = {
 
   update: function(req, res, next) {
     var settings = req.body;
-    userTroupeSettingsService.setUserSettings(req.resourceUser.id, req.troupe.id, req.setting.settingsKey, settings)
+    userTroupeSettingsService.setUserSettings(req.resourceUser.id, req.userTroupe.id, req.setting.settingsKey, settings)
       .then(function() {
         res.json(settings);
       })
@@ -27,7 +27,7 @@ module.exports = {
   },
 
   load: function(req, id, callback) {
-    userTroupeSettingsService.getUserSettings(req.resourceUser.id, req.troupe.id, id)
+    userTroupeSettingsService.getUserSettings(req.resourceUser.id, req.userTroupe.id, id)
       .then(function(f) {
         return { settingsKey: id, settings: f };
       })

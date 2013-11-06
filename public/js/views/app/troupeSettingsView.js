@@ -36,7 +36,7 @@ define([
       this.$el.toggleClass('canDelete', this.canDelete());
 
       $.ajax({
-        url: '/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notification',
+        url: '/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
         type: "GET",
         context: this,
         success: function(settings) {
@@ -209,7 +209,7 @@ define([
         data: JSON.stringify({ name: troupeName }),
         success: function() {
           $.ajax({
-            url: '/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notification',
+            url: '/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
             contentType: "application/json",
             dataType: "json",
             type: "PUT",
