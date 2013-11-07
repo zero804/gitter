@@ -5,9 +5,14 @@ var winston                   = require("winston");
 var pushNotificationService   = require("../push-notification-service");
 var userService               = require("../user-service");
 var nconf                     = require('../../utils/config');
-var notificationWindowPeriods = [nconf.get("notifications:notificationDelay") * 1000, nconf.get("notifications:notificationDelay2") * 1000];
 var workerQueue               = require('../../utils/worker-queue');
 var userTroupeSettingsService = require('../user-troupe-settings-service');
+var notificationWindowPeriods = [
+  nconf.get("notifications:notificationDelay") * 1000,
+  nconf.get("notifications:notificationDelay2") * 1000
+];
+/* 10 second window for users on mention */
+var mentionNotificationWindowPeriod = 10000;
 
 function filterUnreadItemsForUserByMention(user, items) {
   var username = user.username;
@@ -161,6 +166,12 @@ exports.queueUserTroupesForNotification = function(userTroupes) {
         var notificationSettings = userTroupeNotificationSettings[userId + ':' + troupeId];
         var pushNotificationSetting = notificationSettings && notificationSettings.push || 'all';
 
+        /* Mute, then don't continue */
+        if(pushNotificationSetting === 'mute') {
+          winston.verbose('User troupe is muted. Skipping notification');
+          return;
+        }
+
         pushNotificationService.canLockForNotification(userId, troupeId, userTroupe.startTime, function(err, notificationNumber) {
           if(err) return winston.error('Error while executing canLockForNotification: ' + err, { exception: err });
 
@@ -169,11 +180,18 @@ exports.queueUserTroupesForNotification = function(userTroupes) {
             return;
           }
 
-          var delay = notificationWindowPeriods[notificationNumber - 1];
-          if(!delay) {
-            // User had already gotten two notifications, that's enough
-            return;
+          var delay;
+          if(pushNotificationSetting === 'mention') {
+            delay = mentionNotificationWindowPeriod;
+          } else {
+            delay = notificationWindowPeriods[notificationNumber - 1];
+            if(!delay) {
+              // User had already gotten two notifications, that's enough
+              return;
+            }
           }
+
+
 
           winston.verbose('Queuing notification ' + notificationNumber + ' to be send to user ' + userId + ' in ' + delay + 'ms');
 
