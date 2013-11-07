@@ -6,7 +6,7 @@ var rest = require('restler-q');
 var assert = require('assert');
 var Q = require('q');
 var restUtils = require('./rest-utils');
-var BASE_URL = 'http://localhost:5000/';
+var BASE_URL = process.env.BASE_URL || 'http://localhost:5000/';
 var token;
 var troupeId;
 

@@ -2,6 +2,19 @@
   <form id="troupeSettings">
     <div class="trpBodyMedium">Troupe name<br></div>
     <input type="text" name="name" value="{{name}}"/ class="trpInput" style="margin-top: 8px">
+    <br><br>
+    <div class="trpBodyMedium" style="margin-bottom: 6px;">
+        Notification Settings
+    </div>
+
+    <select class="trpInput" style="width: 290px" id="notification-options">
+      <option value="all">Notify me for all messages</option>
+      <option value="mention">Notify me when somebody mentions me</option>
+      <option value="mute">Don't notify me at all</option>
+    </select>
+    <br>
+    <div class="trpBodySmall" style="color: #999">Notification settings only apply to you and not to other users.<br>Download <a href="/apps" target="new" class="trpGreen">Troupe Apps</a> on Mac, Windows or iPhone to receive notifications.</div>
+
     <div class="trpRequestSubmit"><br>
       <button type="submit" class="trpModalButton trpButtonMedium trpBtnGreen" id="save-troupe-settings">Save</button>
 <!--       <button type="button" class="trpModalButton trpButtonMedium trpBtnGrey" id="cancel-troupe-settings">Cancel</button> -->
