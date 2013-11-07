@@ -1,15 +1,16 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var express = require('express'),
-  passport = require('passport'),
-  nconf = require('../utils/config'),
-  handlebars = require('handlebars'),
-  expressHbs = require('express-hbs'),
-  winston = require('winston'),
-  fineuploaderExpressMiddleware = require('fineuploader-express-middleware'),
-  fs = require('fs'),
-  os = require('os');
+var express                       = require('express');
+var passport                      = require('passport');
+var nconf                         = require('../utils/config');
+var handlebars                    = require('handlebars');
+var expressHbs                    = require('express-hbs');
+var winston                       = require('winston');
+var fineuploaderExpressMiddleware = require('fineuploader-express-middleware');
+var fs                            = require('fs');
+var os                            = require('os');
+var responseTime                  = require('./response-time');
 
 if(nconf.get('express:showStack')) {
   try {
@@ -36,15 +37,7 @@ function ios6PostCachingFix() {
 module.exports = {
   installFull: function(app, server, sessionStore) {
     function configureLogging() {
-      var accessLogFile = nconf.get("logging:accessLogFile");
-      var stream = accessLogFile ? fs.createWriteStream(accessLogFile, { flags: 'a' }) : null;
-
-      var loggingOptions = {
-        format: nconf.get("logging:loggingFormat"),
-        stream: stream
-      };
-
-      app.use(express.logger(loggingOptions));
+      app.use(responseTime(winston));
     }
 
     handlebars.registerHelper('cdn', require('./hbs-helpers').cdn);

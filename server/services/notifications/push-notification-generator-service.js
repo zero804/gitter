@@ -73,6 +73,8 @@ var queue = workerQueue.queue('generate-push-notifications', {}, function() {
   }
 
   function notifyUserOfActivitySince(userId, troupeId, since, notificationNumber, userSetting, callback) {
+    winston.verbose('notifyUserOfActivitySince: ', { userId: userId, troupeId: troupeId, since: new Date(since), number: notificationNumber, userSetting: userSetting });
+
     userService.findById(userId, function(err, user) {
       if(err) return callback(err);
 
