@@ -101,6 +101,10 @@ define([
         request: {
           endpoint: '/troupes/' + context.getTroupeId() + '/downloads/'
         },
+        showMessage: function(message) {
+          if(message === 'No files to upload.') return;
+          window.alert(message);
+        },
         callbacks: {
           onComplete: function(id, fileName, response) {
             var model;
