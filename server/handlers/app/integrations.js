@@ -22,15 +22,18 @@ module.exports = {
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         function (req, res) {
+          var url = nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks';
+          winston.info('requesting hook list at ' + url);
           request.get({
-            url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks',
+            url: url,
             json: true
           }, function(err, resp, hooks) {
-            if(err) {
-              winston.error('failed to fetch hooks for troupe', { exception: err });
+            if(err || resp.statusCode != 200 || !Array.isArray(hooks)) {
+              winston.error('failed to fetch hooks for troupe', { exception: err, resp: resp, hooks: hooks});
               res.send(502, 'Unable to perform request. Please try again later.');
               return;
             }
+            winston.info('hook list received', { hooks: hooks });
             hooks.forEach(function(hook) {
               hook.serviceDisplayName = serviceDisplayNames[hook.service];
             });
@@ -50,9 +53,9 @@ module.exports = {
             url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks/'+req.body.id,
             json: true
           },
-          function(err) {
-            if(err) {
-              winston.error('failed to delete hook for troupe', { exception: err });
+          function(err, resp) {
+            if(err || resp.statusCode != 200) {
+              winston.error('failed to delete hook for troupe', { exception: err, resp: resp });
               res.send(502, 'Unable to perform request. Please try again later.');
               return;
             }
@@ -72,8 +75,8 @@ module.exports = {
             }
           },
           function(err, resp, body) {
-            if(err || !body) {
-              winston.error('failed to create hook for troupe', { exception: err });
+            if(err || resp.statusCode != 200 || !body) {
+              winston.error('failed to create hook for troupe', { exception: err, resp: resp });
               res.send("Unable to perform request. Please try again later.");
               return;
             }

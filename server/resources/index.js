@@ -47,7 +47,10 @@ module.exports = {
         return r;
     }
 
-    installUserSubResource('troupes', 'troupes');
+    var userTroupeResource = installUserSubResource('troupes', 'troupes');
+    var userSettings = new Resource('settings', require('./user/troupe-settings'), app);
+    userTroupeResource.add(userSettings);
+
     installUserSubResource('invites', 'invites');
     installUserSubResource('connectioninvites', 'connectioninvites');
     installUserSubResource('emails',  'emails');
