@@ -26,7 +26,7 @@ module.exports = {
             url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks',
             json: true
           }, function(err, resp, hooks) {
-            if(err) {
+            if(err || !Array.isArray(hooks)) {
               winston.error('failed to fetch hooks for troupe', { exception: err });
               res.send(502, 'Unable to perform request. Please try again later.');
               return;
