@@ -459,6 +459,7 @@ background-color: rgba(100,100,100, 0.1);
   float: right;
   width: 20px;
   margin-right: 20px;
+  margin-left: 20px;
 }
 
 .title-menu:before {
@@ -485,10 +486,6 @@ background-color: rgba(100,100,100, 0.1);
 
 .title-text {
   margin-right: 20px;
-  height: 50px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow:ellipsis;
 }
 
 .topic {
@@ -507,7 +504,6 @@ background-color: rgba(100,100,100, 0.1);
   position: fixed;
   top: 0;
   bottom: 0;
-  padding-top: 90px;
   right: 0;
   left: 0;
   margin-left: 252px;
