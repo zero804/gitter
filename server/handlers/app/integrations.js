@@ -28,7 +28,7 @@ module.exports = {
             url: url,
             json: true
           }, function(err, resp, hooks) {
-            if(err || !Array.isArray(hooks)) {
+            if(err || resp.statusCode != 200 || !Array.isArray(hooks)) {
               winston.error('failed to fetch hooks for troupe', { exception: err, resp: resp, hooks: hooks});
               res.send(502, 'Unable to perform request. Please try again later.');
               return;
@@ -53,9 +53,9 @@ module.exports = {
             url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks/'+req.body.id,
             json: true
           },
-          function(err) {
-            if(err) {
-              winston.error('failed to delete hook for troupe', { exception: err });
+          function(err, resp) {
+            if(err || resp.statusCode != 200) {
+              winston.error('failed to delete hook for troupe', { exception: err, resp: resp });
               res.send(502, 'Unable to perform request. Please try again later.');
               return;
             }
@@ -75,8 +75,8 @@ module.exports = {
             }
           },
           function(err, resp, body) {
-            if(err || !body) {
-              winston.error('failed to create hook for troupe', { exception: err });
+            if(err || resp.statusCode != 200 || !body) {
+              winston.error('failed to create hook for troupe', { exception: err, resp: resp });
               res.send("Unable to perform request. Please try again later.");
               return;
             }
