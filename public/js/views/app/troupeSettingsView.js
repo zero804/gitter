@@ -8,8 +8,9 @@ define([
   'collections/instances/integrated-items',
   'hbs!./tmpl/troupeSettingsTemplate',
   'log!troupe-settings-view',
-  'utils/validate-wrapper'
-], function($, _, context, TroupeViews, troupeCollections, itemCollections, troupeSettingsTemplate, log, validation) {
+  'utils/validate-wrapper',
+  './integrationSettingsModal'
+], function($, _, context, TroupeViews, troupeCollections, itemCollections, troupeSettingsTemplate, log, validation, IntegrationSettingsModal) {
   "use strict";
 
 
@@ -129,8 +130,7 @@ define([
     },
 
     showIntegrations: function() {
-      $('#troupeSettings').hide();
-      $('#integrations-iframe').show();
+      this.trigger('showIntegrationSettings');
     },
 
     getRenderData: function() {
@@ -203,6 +203,9 @@ define([
         options.title = "Settings";
         TroupeViews.Modal.prototype.initialize.apply(this, arguments);
         this.view = new View({ });
+        this.view.on('showIntegrationSettings', function() {
+           this.transitionTo(new IntegrationSettingsModal({}));
+        }, this);
       }
     });
   });
