@@ -15,6 +15,7 @@ module.exports = function responseTime(winston) {
 
       winston.info('request', {
         method: req.method,
+        status: res.statusCode,
         url: req.url,
         headers: req.headers['user-agent'],
         duration: duration + 'ms',
