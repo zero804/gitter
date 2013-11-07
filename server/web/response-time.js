@@ -14,9 +14,9 @@ module.exports = function responseTime(winston) {
       var duration = new Date() - start;
 
       winston.info('request', {
-        method: req.method, 
-        url: req.url, 
-        headers: req.headers['user-agent'], 
+        method: req.method,
+        url: req.url,
+        headers: req.headers['user-agent'],
         duration: duration + 'ms',
         ip: req.headers['x-forwarded-for'] || 'unknown'
       });
@@ -24,5 +24,5 @@ module.exports = function responseTime(winston) {
 
     next();
   };
-}
+};
 
