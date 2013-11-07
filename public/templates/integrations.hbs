@@ -12,14 +12,15 @@
     {{#each hooks}}
     <div class="trpHookItem">
       <form style="width: 100%" method="post">
-        <div style="display: inline-block; vertical-align: middle; max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px; color: #999">
+        <div style="display: inline-block; float: right"><input type="submit" value="Delete" class="trpButtonSmall trpBtnRed"></div>
+        <div style="margin-right: 120px; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px; color: #999">
           <input type="hidden" name="_method" value="delete">
           <label class="trpBodySmall">
             <div style="display: inline-block; width: 80px; color: #333">{{serviceDisplayName}}</div>
             <span title="{{description}}">{{#if description}}{{description}}{{else}}<i>no description</i>{{/if}}</span></label>
           <input type="hidden" name="id" value="{{_id}}">
         </div>
-        <div style="display: inline-block; float: right"><input type="submit" value="Delete" class="trpButtonSmall trpBtnRed"></div>
+        
       </form>
     </div>
     {{/each}}
