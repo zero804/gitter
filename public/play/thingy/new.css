@@ -4,6 +4,12 @@
     src: url("https://github.global.ssl.fastly.net/assets/octicons-810348ca79b0f83691f16307908e3c3fee103f93.woff") format('woff');
 }
 
+
+@font-face {
+    font-family: "troupe-icons";
+    src: url("troupe-icons.woff") format('woff');
+}
+
 @font-face {
   font-family: 'fontello';
   src: url('font/fontello.eot?2627842');
@@ -225,6 +231,15 @@ background-color: rgba(100,100,100, 0.1);
   transition-delay: 0.5s;
 }
 
+.right-menu-icon:before {
+  font-family: 'troupe-icons';
+  content: '\e81a';
+  margin-right: 8px;
+  opacity: 0.6;
+  width: 12px;
+  font-size: 20px;
+}
+
 .avatar {
   width: 48px;
   height: 48px;
@@ -257,6 +272,18 @@ background-color: rgba(100,100,100, 0.1);
   overflow: hidden;
   padding-top: 16px;
   cursor: pointer;
+}
+
+#right-menu-expander {
+  position: fixed;
+  right: 20px;
+  bottom: 30px;
+  height: 0px;
+  overflow: hidden;
+  margin-top: 13px;
+  margin-left: 3px;
+  box-sizing: border-box;
+  transition-delay: 0s;
 }
 
 .item {
@@ -387,15 +414,15 @@ background-color: rgba(100,100,100, 0.1);
   /*this is weird, the ellipses on the div will apply the div's font. this is actually used in .topic and so we set it here too and set the header differently*/
   font-size: 14px;
   color: rgba(0,0,0,0.6);
-  padding-bottom: 18px;
+  padding-bottom: 12px;
   padding-left: 56px;
-  padding-top: 16px;
+  padding-top: 8px;
   position: fixed;
   top: 0;
   z-index: 1000;
-  background-color: rgba(255,255,255,0.97);
+  background-color: rgba(255,255,255,0.95);
   left: 230px;
-  right: 346px;
+  right: 347px;
   transition:all .5s ease-in-out;
   -o-transition:all .5s ease-in-out;
   -moz-transition:all .5s ease-in-out;
@@ -412,16 +439,26 @@ background-color: rgba(100,100,100, 0.1);
   margin-right: 20px;
 }
 
-.title-menu img {
+.title-menu:before {
+  font-family: 'troupe-icons';
+  /*content: '\e81a';*/
+  content: '\e81e';
+  content: '\e823';
+  margin-right: 8px;
   opacity: 0.3;
+  width: 12px;
+  font-size: 20px;
+  transition:all .5s ease-in-out;
+}
+
+.title:hover .title-menu:before {
+  opacity: 1;
+/*  color: #1dce73;*/
 }
 
 .title-header {
   font-size: 22px;
   color: #333;
-}
-.title:hover .title-menu img {
-  opacity: 0.8;
 }
 
 .title-text {
@@ -434,6 +471,7 @@ background-color: rgba(100,100,100, 0.1);
 
 .topic {
   font-size: 14px;
+  color: #999;
 }
 
 .title-repo:before {
@@ -686,7 +724,7 @@ background-color: rgba(100,100,100, 0.1);
   }
 
   .title {
-    right: 256px;
+    right: 257px;
   }
 
 }
@@ -695,6 +733,11 @@ background-color: rgba(100,100,100, 0.1);
   .right-menu {
     width: 50px;
     transition-delay: 0.5s;
+  }
+
+  #right-menu-expander {
+    height: 22px;
+    transition-delay: 1s;
   }
 
   .left-menu {
@@ -708,11 +751,13 @@ background-color: rgba(100,100,100, 0.1);
   .title {
     right: 80px;
     transition-delay: 0.5s;
+    padding-left: 30px;
   }
 
   .chats {
     margin-right: 70px;
     padding-right: 10px;
+    margin-left: 222px;
     transition-delay: 0.5s;
   }
 
@@ -731,6 +776,10 @@ background-color: rgba(100,100,100, 0.1);
 @media (max-width: 700px) {
   .left-menu {
     left: -260px;
+    transition-delay: 0s;
+  }
+
+  .right-menu {
     transition-delay: 0s;
   }
 
@@ -765,7 +814,8 @@ background-color: rgba(100,100,100, 0.1);
   }
 
   .title.extended {
-    left: 220px;
+    left: 230px;
+    padding-left: 40px;
     right: -250px;
     transition:all .3s ease-in-out;
     -o-transition:all .3s ease-in-out;
@@ -782,13 +832,14 @@ background-color: rgba(100,100,100, 0.1);
   }
 
   .chats {
-    margin-left: 30px;
+    margin-left: 20px;
     transition-delay: 0s;
     padding-right: 10px;
   }
 
   .title {
-    left: 10px;
+    left: 0px;
+    padding-left: 60px;
     transition-delay: 0s;
     -webkit-transition-delay: 0s; /* Safari */
   }
