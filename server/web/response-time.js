@@ -18,7 +18,7 @@ module.exports = function responseTime(winston) {
         url: req.url,
         headers: req.headers['user-agent'],
         duration: duration + 'ms',
-        ip: req.headers['x-forwarded-for'] || 'unknown'
+        ip: req.headers['x-forwarded-for'] || req.ip || 'unknown'
       });
     });
 
