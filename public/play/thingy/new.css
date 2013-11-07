@@ -432,6 +432,28 @@ background-color: rgba(100,100,100, 0.1);
   border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
+.input-area {
+  /*this is weird, the ellipses on the div will apply the div's font. this is actually used in .topic and so we set it here too and set the header differently*/
+  font-size: 14px;
+  color: rgba(0,0,0,0.6);
+  padding-bottom: 12px;
+  padding-left: 56px;
+  padding-top: 8px;
+  position: fixed;
+  bottom: 0;
+  z-index: 1000;
+  background-color: rgba(255,255,255,0.95);
+  left: 230px;
+  right: 347px;
+  transition:all .5s ease-in-out;
+  -o-transition:all .5s ease-in-out;
+  -moz-transition:all .5s ease-in-out;
+  -webkit-transition:all .5s ease-in-out;
+  transition-delay: 0.5s;
+  -webkit-transform: translate3d(0, 0, 0);
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
 .title-menu {
   margin-top: 16px;
   float: right;
@@ -723,7 +745,7 @@ background-color: rgba(100,100,100, 0.1);
     margin-right: 250px;
   }
 
-  .title {
+  .title, .input-area {
     right: 257px;
   }
 
@@ -748,7 +770,7 @@ background-color: rgba(100,100,100, 0.1);
     transition-delay: 0s;
   }
 
-  .title {
+  .title, .input-area {
     right: 80px;
     transition-delay: 0.5s;
     padding-left: 30px;
@@ -837,7 +859,7 @@ background-color: rgba(100,100,100, 0.1);
     padding-right: 10px;
   }
 
-  .title {
+  .title, .input-area {
     left: 0px;
     padding-left: 60px;
     transition-delay: 0s;
