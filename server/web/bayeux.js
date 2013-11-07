@@ -3,8 +3,8 @@
 
 var faye              = require('faye');
 var fayeRedis         = require('faye-redis');
-var oauth             = require('../services/oauth-service');
 var winston           = require('winston');
+var oauth             = require('../services/oauth-service');
 var troupeService     = require('../services/troupe-service');
 var presenceService   = require('../services/presence-service');
 var restful           = require('../services/restful');
