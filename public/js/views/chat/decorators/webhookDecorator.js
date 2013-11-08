@@ -19,6 +19,12 @@ define([], function() {
       case 'sprintly':
         favicon = 'https://sprint.ly/favicon.ico';
         break;
+      case 'travis':
+        favicon = 'https://travis-ci.org/favicon.ico';
+        break;
+      default:
+        favicon = '/favicon.ico';
+        break;
     }
 
     var iconHtml = '<div class="notification-icon"><a href="'+ meta.url +'"><img src="' + favicon  + '"></a></div>';
