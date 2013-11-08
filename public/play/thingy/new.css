@@ -411,9 +411,6 @@ background-color: rgba(100,100,100, 0.1);
 }
 
 .title {
-  /*this is weird, the ellipses on the div will apply the div's font. this is actually used in .topic and so we set it here too and set the header differently*/
-  font-size: 14px;
-  color: rgba(0,0,0,0.6);
   padding-bottom: 12px;
   padding-left: 56px;
   padding-top: 8px;
@@ -433,9 +430,6 @@ background-color: rgba(100,100,100, 0.1);
 }
 
 .input-area {
-  /*this is weird, the ellipses on the div will apply the div's font. this is actually used in .topic and so we set it here too and set the header differently*/
-  font-size: 14px;
-  color: rgba(0,0,0,0.6);
   padding-bottom: 12px;
   padding-left: 56px;
   padding-top: 8px;
@@ -459,7 +453,7 @@ background-color: rgba(100,100,100, 0.1);
 }
 
 .title-menu {
-  margin-top: 16px;
+  margin-top: 12px;
   float: right;
   width: 20px;
   margin-right: 20px;
@@ -495,6 +489,9 @@ background-color: rgba(100,100,100, 0.1);
 .topic {
   font-size: 14px;
   color: #999;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .title-repo:before {
@@ -589,6 +586,7 @@ background-color: rgba(100,100,100, 0.1);
   padding: 6px;
   border-radius: 2px;
   margin-right: 12px;
+  padding-left: 2px;
 }
 /*
 .chat-item:hover {
