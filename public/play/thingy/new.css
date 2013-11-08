@@ -846,7 +846,7 @@ background-color: rgba(100,100,100, 0.1);
   .title.extended {
 /*    left: 230px;*/
     padding-left: 270px;
-    right: -150px;
+    right: -130px;
     transition:all .3s ease-in-out;
     -o-transition:all .3s ease-in-out;
     -moz-transition:all .3s ease-in-out;
@@ -857,7 +857,7 @@ background-color: rgba(100,100,100, 0.1);
   .input-area.extended {
 /*    left: 230px;*/
     padding-left: 270px;
-    right: -150px;
+    right: -130px;
     transition:all .3s ease-in-out;
     -o-transition:all .3s ease-in-out;
     -moz-transition:all .3s ease-in-out;
