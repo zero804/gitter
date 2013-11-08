@@ -189,7 +189,7 @@ background-color: rgba(100,100,100, 0.1);
   padding-left: 10px;
   overflow: hidden;
   white-space:nowrap;
-  z-index: 900;
+  z-index: 1200;
   transition:opacity 0.5s ease-in-out 0s, left .5s ease-in-out 0.5s;
 /*  transition:left .5s ease-in-out;
   -o-transition:all .5s ease-in-out;
@@ -452,6 +452,10 @@ background-color: rgba(100,100,100, 0.1);
   transition-delay: 0.5s;
   -webkit-transform: translate3d(0, 0, 0);
   border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.input-area .chat-item {
+  padding-left: 0;
 }
 
 .title-menu {
@@ -815,9 +819,9 @@ background-color: rgba(100,100,100, 0.1);
 
   .left-menu.extended {
     left: 0;
-    z-index: 100;
     opacity: 1;
     transition:all .3s ease-in-out 0.2s;
+/*    transition-delay: 0.3s;*/
   }
 
   .left-menu-tab.extended {
@@ -831,21 +835,34 @@ background-color: rgba(100,100,100, 0.1);
 
   .chats.extended {
     left: 210px;
-    right: -250px;
+    right: -210px;
     transition:all .3s ease-in-out;
     -o-transition:all .3s ease-in-out;
     -moz-transition:all .3s ease-in-out;
     -webkit-transition:all .3s ease-in-out;
+/*    transition-delay: 0.3s;*/
   }
 
   .title.extended {
-    left: 230px;
-    padding-left: 40px;
-    right: -250px;
+/*    left: 230px;*/
+    padding-left: 270px;
+    right: -150px;
     transition:all .3s ease-in-out;
     -o-transition:all .3s ease-in-out;
     -moz-transition:all .3s ease-in-out;
     -webkit-transition:all .3s ease-in-out;
+/*    transition-delay: 0.3s;*/
+  }
+
+  .input-area.extended {
+/*    left: 230px;*/
+    padding-left: 270px;
+    right: -150px;
+    transition:all .3s ease-in-out;
+    -o-transition:all .3s ease-in-out;
+    -moz-transition:all .3s ease-in-out;
+    -webkit-transition:all .3s ease-in-out;
+/*    transition-delay: 0.3s;*/
   }
 
   .right-menu.extended {
@@ -854,6 +871,7 @@ background-color: rgba(100,100,100, 0.1);
     -o-transition:all .3s ease-in-out;
     -moz-transition:all .3s ease-in-out;
     -webkit-transition:all .3s ease-in-out;
+/*    transition-delay: 0.3s;*/
   }
 
   .chats {
