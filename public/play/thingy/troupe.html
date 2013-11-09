@@ -4,11 +4,15 @@
 <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
 <link href="new.css" rel="stylesheet" type='text/css'>
 <link href="bootstrap.css" rel="stylesheet" type='text/css'>
+<link rel="stylesheet" type="text/css" href="emojify.css">
+<script src="emojify.js"></script>
 </head>
 
 <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 
 <script src="bootstrap.js"></script>
+
+
 
 <body>
 
@@ -208,8 +212,11 @@
 
   <div class="input-area open">
     <div class="chat-item">
+      <div class="emoticon-menu" id="emoticon-menu">
+        
+      </div>
       <div class="chat-avatar"><img class="avatar-s" src="https://dnsjy61awi9j1.cloudfront.net/avatar/m/4fd48c8040a7cc9644000022/9.jpg"/></div>
-      <div class="open chat-text" style="margin-left: 50px"><textarea style="width: 100%; border: 0; resize: none" placeholder="Click here to type a chat message"></textarea></div>
+      <div class="open chat-text" style="margin-left: 50px; margin-right: 50px"><textarea style="width: 100%; border: 0; resize: none" placeholder="Click here to type a chat message"></textarea></div>
     </div>
   </div>
 
@@ -248,7 +255,7 @@
   </div>
 </div>
 
-<div class="popover fade bottom in" style="top: 123px; left: 413px; display: hidden;" id="code-popover"><div class="arrow"></div><h3 class="popover-title">logger/index.js</h3><div class="popover-content">
+<div class="popover fade bottom in" style="top: 133px; left: 433px; display: hidden;" id="code-popover"><div class="arrow"></div><h3 class="popover-title">logger/index.js</h3><div class="popover-content">
  <pre class="prettyprint linenums">
  var verbose = (process.env.NANO_ENV==='testing')
   , logger  = exports
@@ -277,7 +284,7 @@ module.exports = function logging(cfg) {
   </div> 
 </div>
 
-<div class="popover fade bottom in" style="top: 300px; left: 330px; display: hidden;" id="issue-popover"><div class="arrow"></div>
+<div class="popover fade bottom in" style="top: 320px; left: 360px; display: hidden;" id="issue-popover"><div class="arrow"></div>
   <div class="popover-title">
     <div>Issue 155: Problem with subscribing on events from stream</div>
     <div class="closed-badge">Closed</div>
@@ -299,6 +306,43 @@ module.exports = function logging(cfg) {
         <div class="open chat-text">Closed this issue 1 day ago</div>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="popover fade top in" style="top: auto; height: 170px; bottom: 80px; right: 275px; left: auto; width: 200px; display: hidden;" id="emoticon-popover"><div class="arrow"></div>
+  <div class="popover-title">
+    Emoticons<span style="opacity: 0.6; margin-left:20px; float: right">GIFS</span>
+  </div>
+  <div class="popover-content" style="font-size: 14px">
+    :)
+    :laughing:
+    :(
+    :|
+    :expressionless:
+    :blush:
+    :sob:
+    :wink:
+    :wink2:
+    :confused:
+    :sunglasses:
+    :innocent:
+    :angry:
+    :rage:
+    :+1:
+    :-1:
+    :ok_hand:
+    :punch:
+    :v:
+    :clap:
+    :metal:
+    :neckbeard:
+    :scream:
+    :scream_cat:
+    :japanese_ogre:
+    :see_no_evil:
+    :hear_no_evil:
+    :speak_no_evil:
+
   </div>
 </div>
 
@@ -520,6 +564,20 @@ $( "#code-element" ).click(function(e) {
   $('.chats .activity-item').addClass('blurred');
   $('#code-chat-item').removeClass('blurred');
   $('#code-popover').show();
+  e.stopPropagation();
+});
+
+$( "#emoticon-menu" ).click(function(e) {
+  emojify.setConfig({
+            emoticons_enabled: true,
+            people_enabled: true,
+            nature_enabled: true,
+            objects_enabled: true,
+            places_enabled: true,
+            symbols_enabled: true
+      });
+  emojify.run();
+  $('#emoticon-popover').toggle();
   e.stopPropagation();
 });
 
