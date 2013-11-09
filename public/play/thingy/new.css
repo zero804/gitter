@@ -463,8 +463,25 @@ background-color: rgba(100,100,100, 0.1);
 .title-menu:before {
   font-family: 'troupe-icons';
   /*content: '\e81a';*/
-  content: '\e81e';
+/*  content: '\e81e';*/
   content: '\e823';
+  margin-right: 8px;
+  opacity: 0.3;
+  width: 12px;
+  font-size: 20px;
+  transition:all .5s ease-in-out;
+}
+
+.emoticon-menu {
+  float: right;
+  width: 20px;
+  margin-left: 20px;
+}
+
+.emoticon-menu:before {
+  font-family: 'troupe-icons';
+  /*content: '\e81a';*/
+  content: '\e824';
   margin-right: 8px;
   opacity: 0.3;
   width: 12px;
