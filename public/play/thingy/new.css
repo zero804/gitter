@@ -478,6 +478,15 @@ background-color: rgba(100,100,100, 0.1);
   margin-left: 20px;
 }
 
+#emoticon-picker .emojify {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+#emoticon-picker .emojify:hover {
+  opacity: 1;
+}
+
 .emoticon-menu:before {
   font-family: 'troupe-icons';
   /*content: '\e81a';*/
