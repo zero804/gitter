@@ -767,6 +767,39 @@ background-color: rgba(100,100,100, 0.1);
   -webkit-transition-delay: 0.5s; /* Safari */
 }
 
+.new-button-container {
+  margin-right: 10px;
+  margin-top: 30px;
+}
+
+.new-person-button, .new-troupe-button {
+  border: 1px solid white;
+  display: inline-block;
+  box-sizing: border-box;
+  padding: 6px;
+  color: white;
+  text-align: center;
+  width: 50%;
+  cursor: pointer;
+  background-color: rgba(255,255,255,0.2);
+}
+
+.new-person-button:hover, .new-troupe-button:hover {
+  background-color: white;
+  color: #162e34;
+}
+
+.new-person-button {
+  border-radius: 4px 0 0 4px;
+}
+
+.new-troupe-button {
+  border-radius: 0 4px 4px 0;
+  border-left: 0;
+}
+
+
+
 @media (max-width: 1280px) {
   .right-menu {
     width: 250px;
