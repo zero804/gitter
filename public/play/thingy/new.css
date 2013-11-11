@@ -459,6 +459,7 @@ background-color: rgba(100,100,100, 0.1);
   width: 20px;
   margin-right: 20px;
   margin-left: 20px;
+  cursor: pointer;
 }
 
 .title-menu:before {
@@ -500,7 +501,7 @@ background-color: rgba(100,100,100, 0.1);
 }
 
 .title:hover .title-menu:before {
-  opacity: 1;
+  opacity: 0.8;
 /*  color: #1dce73;*/
 }
 
@@ -940,7 +941,7 @@ background-color: rgba(100,100,100, 0.1);
 
   .title, .input-area {
     left: 0px;
-    padding-left: 60px;
+    padding-left: 50px;
     transition-delay: 0s;
     -webkit-transition-delay: 0s; /* Safari */
   }
