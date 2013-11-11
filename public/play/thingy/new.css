@@ -783,7 +783,7 @@ background-color: rgba(100,100,100, 0.1);
   text-align: center;
   width: 50%;
   cursor: pointer;
-  background-color: rgba(255,255,255,0.2);
+  background-color: rgba(255,255,255,0.1);
 }
 
 .new-person-button:hover, .new-troupe-button:hover {
