@@ -575,6 +575,10 @@ $(".left-menu").mouseleave(function() {
   hideProfile();
 });
 
+$("#right-menu-expander").click(function () {
+  $('.chats, .title, .right-menu, .input-area').addClass('expanded');
+});
+
 $( "#code-element" ).click(function(e) {
   $('.chat-item').addClass('blurred');
   $('.chats .activity-item').addClass('blurred');

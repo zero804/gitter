@@ -221,7 +221,7 @@ background-color: rgba(100,100,100, 0.1);
   right: 0;
   top: 0;
   bottom: 0;
-  width: 320px;
+  width: 250px;
   background-color: rgba(241,242,244,0.7);
   padding-left: 20px;
   padding-top: 10px;
@@ -420,7 +420,7 @@ background-color: rgba(100,100,100, 0.1);
   z-index: 1000;
   background-color: rgba(255,255,255,0.95);
   left: 230px;
-  right: 347px;
+   right: 277px;
   transition:all .5s ease-in-out;
   -o-transition:all .5s ease-in-out;
   -moz-transition:all .5s ease-in-out;
@@ -439,7 +439,7 @@ background-color: rgba(100,100,100, 0.1);
   z-index: 1000;
   background-color: rgba(255,255,255,0.95);
   left: 230px;
-  right: 347px;
+  right: 277px;
   transition:all .5s ease-in-out;
   -o-transition:all .5s ease-in-out;
   -moz-transition:all .5s ease-in-out;
@@ -561,7 +561,7 @@ background-color: rgba(100,100,100, 0.1);
   left: 0;
   padding-top: 90px;
   margin-left: 252px;
-  margin-right: 340px;
+  margin-right: 270px;
   box-sizing:border-box;
   transition:all 54s ease-in-out;
   -o-transition:all .5s ease-in-out;
@@ -834,26 +834,22 @@ background-color: rgba(100,100,100, 0.1);
 }
 
 
-
-@media (max-width: 1280px) {
-  .right-menu {
-    width: 250px;
-  }
-
-  .chats {
-    margin-right: 270px;
-  }
-
-  .title, .input-area {
-    right: 277px;
-  }
-
-}
-
 @media (max-width: 980px) {
   .right-menu {
     width: 50px;
     transition-delay: 0.5s;
+  }
+
+  .right-menu.expanded {
+    width: 250px;
+  }
+
+  .chats.expanded {
+    margin-right: 270px;
+  }
+
+  .title.expanded, .input-area.expanded {
+    right: 277px;
   }
 
   #right-menu-expander {
