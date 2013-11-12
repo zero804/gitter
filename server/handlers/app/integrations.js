@@ -30,7 +30,7 @@ module.exports = {
           }, function(err, resp, hooks) {
             if(err || resp.statusCode != 200 || !Array.isArray(hooks)) {
               winston.error('failed to fetch hooks for troupe', { exception: err, resp: resp, hooks: hooks});
-              res.send(502, 'Unable to perform request. Please try again later.');
+              res.send(500, 'Unable to perform request. Please try again later.');
               return;
             }
             winston.info('hook list received', { hooks: hooks });
@@ -56,7 +56,7 @@ module.exports = {
           function(err, resp) {
             if(err || resp.statusCode != 200) {
               winston.error('failed to delete hook for troupe', { exception: err, resp: resp });
-              res.send(502, 'Unable to perform request. Please try again later.');
+              res.send(500, 'Unable to perform request. Please try again later.');
               return;
             }
             res.redirect('/'+req.troupe.uri+'/integrations');
@@ -77,7 +77,7 @@ module.exports = {
           function(err, resp, body) {
             if(err || resp.statusCode != 200 || !body) {
               winston.error('failed to create hook for troupe', { exception: err, resp: resp });
-              res.send("Unable to perform request. Please try again later.");
+              res.send(500, 'Unable to perform request. Please try again later.');
               return;
             }
             // TODO: Make sure this is properly encoded
