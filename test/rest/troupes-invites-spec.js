@@ -6,7 +6,7 @@ var rest = require('restler-q');
 var assert = require('assert');
 var Q = require('q');
 var restUtils = require('./rest-utils');
-var BASE_URL = process.env.BASE_URL || 'http://localhost:5000/';
+var BASE_URL = process.env.BASE_URL || 'http://localhost:5000';
 var token;
 var troupeId;
 
@@ -30,7 +30,7 @@ describe('troupes/:id/invites', function() {
       email: 'testinviterecipient' + Date.now() + '@troupetest.local'
     };
 
-    return rest.postJson(BASE_URL + 'troupes/' + troupeId  + '/invites', sentInvite, {
+    return rest.postJson(BASE_URL + '/troupes/' + troupeId  + '/invites', sentInvite, {
         headers: { Authorization: 'Bearer ' + token }
       })
       .then(function(invite) {
@@ -45,13 +45,13 @@ describe('troupes/:id/invites', function() {
       email: 'testinviterecipient' + Date.now() + '@troupetest.local'
     };
 
-    return rest.postJson(BASE_URL + 'troupes/' + troupeId  + '/invites', sentInvite, {
+    return rest.postJson(BASE_URL + '/troupes/' + troupeId  + '/invites', sentInvite, {
         headers: { Authorization: 'Bearer ' + token }
       })
       .then(function(invite) {
         assert(invite.id);
 
-        return rest.del(BASE_URL + 'troupes/' + troupeId  + '/invites/' + invite.id, {
+        return rest.del(BASE_URL + '/troupes/' + troupeId  + '/invites/' + invite.id, {
           headers: { Authorization: 'Bearer ' + token }
         });
       })
@@ -60,7 +60,7 @@ describe('troupes/:id/invites', function() {
 
 
   it('should index', function(done) {
-    return rest.get(BASE_URL + 'troupes/' + troupeId  + '/invites', {
+    return rest.get(BASE_URL + '/troupes/' + troupeId  + '/invites', {
         headers: { Authorization: 'Bearer ' + token }
       })
       .then(function(invites) {

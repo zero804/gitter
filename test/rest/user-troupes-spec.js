@@ -19,7 +19,7 @@ before(function(done) {
 describe('/user/:id/troupes', function() {
 
   it('should index', function(done) {
-    return testRest.get('user/' + userId + '/troupes')
+    return testRest.get('/user/' + userId + '/troupes')
       .then(function(troupes) {
         assert(Array.isArray(troupes));
       })
@@ -28,10 +28,10 @@ describe('/user/:id/troupes', function() {
 
 
   it('should show', function(done) {
-    return testRest.get('user/' + userId + '/troupes')
+    return testRest.get('/user/' + userId + '/troupes')
       .then(function(troupes) {
         var troupe = troupes[0];
-        return testRest.get('user/' + userId + '/troupes/' + troupe.id);
+        return testRest.get('/user/' + userId + '/troupes/' + troupe.id);
       })
       .then(function(troupe) {
         assert(troupe.id, 'expected an id');
