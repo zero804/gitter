@@ -494,7 +494,7 @@ background-color: rgba(100,100,100, 0.1);
   /*content: '\e81a';*/
   content: '\e824';
   margin-right: 8px;
-  opacity: 0.3;
+  opacity: 0.2;
   width: 12px;
   font-size: 20px;
   transition:all .5s ease-in-out;
@@ -508,6 +508,24 @@ background-color: rgba(100,100,100, 0.1);
 .title-header {
   font-size: 22px;
   color: #333;
+}
+
+.favourite-icon:before {
+  font-family: 'troupe-icons';
+  /*content: '\e81a';*/
+  content: '\e825';
+  margin-right: 8px;
+  opacity: 0.3;
+  width: 12px;
+  font-size: 20px;
+  transition:all .5s ease-in-out;
+  font-style: normal;
+}
+
+.favourite.favourite-icon:before {
+  content : '\e826';
+  color: #f1c40f;
+  opacity: 0.8;
 }
 
 .title-text {
