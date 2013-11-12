@@ -522,6 +522,12 @@ background-color: rgba(100,100,100, 0.1);
   font-style: normal;
 }
 
+.favourite-icon:hover.favourite-icon:before {
+  color: #f1c40f;
+  opacity: 1;
+
+}
+
 .favourite.favourite-icon:before {
   content : '\e826';
   color: #f1c40f;
