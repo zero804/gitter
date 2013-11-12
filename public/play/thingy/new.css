@@ -775,7 +775,7 @@ background-color: rgba(100,100,100, 0.1);
 }
 
 .new-person-button, .new-troupe-button {
-  border: 1px solid white;
+  border: 1px solid rgba(255,255,255,0.6);
   display: inline-block;
   box-sizing: border-box;
   padding: 6px;
@@ -789,15 +789,24 @@ background-color: rgba(100,100,100, 0.1);
 .new-person-button:hover, .new-troupe-button:hover {
   background-color: white;
   color: #162e34;
+  border-color: white;
+}
+
+.new-person-button:hover + .new-troupe-button {
+  border-left: 1px solid white;
 }
 
 .new-person-button {
   border-radius: 4px 0 0 4px;
+  border-right: 0;
 }
 
+/*.new-person-button:hover {
+  border-right: 1px solid cyan;
+}
+*/
 .new-troupe-button {
   border-radius: 0 4px 4px 0;
-  border-left: 0;
 }
 
 
