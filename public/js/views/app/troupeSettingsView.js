@@ -150,7 +150,8 @@ define([
       return _.extend({},
         context.getTroupe(), {
         canLeave: this.canLeave(),
-        canDelete: this.canDelete()
+        canDelete: this.canDelete(),
+        isNativeDesktopApp: context().isNativeDesktopApp
       });
     },
 
