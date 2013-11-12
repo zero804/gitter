@@ -1,0 +1,11 @@
+<div>
+  <img class="notification-icon" src="{{favicon}}"> {{user}} pushed {{commits.length}} commit(s)
+
+  on <a href="https://bitbucket.org/{{repo}}">{{repo}}</a>
+
+  <ul class="commits">
+  {{#each commits}}
+  <li><a href="{{url}}" target="_blank">{{message}}</a></li>
+  {{/each}}
+  </ul>
+</div>
