@@ -142,7 +142,7 @@
       </div>
     </div>
     <div class="title-text">
-      <div class="title-header">Nano</div>
+      <div class="title-header"><i class="favourite-icon"></i>Nano</div>
       <div class="topic">Please file any issues, preferably fix them yourself and send me a pull request.</div>
     </div>
   </div>
@@ -619,6 +619,9 @@ $("#issue-element").click(function(e) {
   e.stopPropagation();
 });
 
+$(".favourite-icon").click(function(e) {
+  $(".favourite-icon").addClass("favourite");
+});
 
 
   var profileShown;
