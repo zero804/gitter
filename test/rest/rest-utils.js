@@ -3,7 +3,7 @@
 var rest = require('restler-q');
 var assert = require('assert');
 var Q = require('q');
-var BASE_URL = process.env.BASE_URL || 'http://localhost:5000/';
+var BASE_URL = process.env.BASE_URL || 'http://localhost:5000';
 
 var token;
 
@@ -12,7 +12,7 @@ exports.token = function() {
     return Q.resolve(token);
   }
 
-  return rest.get(BASE_URL + 'testdata/oauthToken?email=testuser@troupetest.local')
+  return rest.get(BASE_URL + '/testdata/oauthToken?email=testuser@troupetest.local')
     .then(function(pToken) {
       token = pToken;
       return token;
@@ -22,7 +22,7 @@ exports.token = function() {
 exports.troupeId = function() {
   return exports.token()
     .then(function(token) {
-      return rest.get(BASE_URL + 'troupes', {
+      return rest.get(BASE_URL + '/troupes', {
           headers: { Authorization: 'Bearer ' + token }
         })
         .then(function(troupes) {
@@ -38,7 +38,7 @@ exports.troupeId = function() {
 exports.userId = function() {
   return exports.token()
     .then(function(token) {
-      return rest.get(BASE_URL + 'user', {
+      return rest.get(BASE_URL + '/user', {
           headers: { Authorization: 'Bearer ' + token }
         })
         .then(function(users) {

@@ -13,7 +13,7 @@ before(function(done) {
     .then(function(puserId) {
       userId = puserId;
 
-      return testRest.get('user/' + userId + '/troupes');
+      return testRest.get('/user/' + userId + '/troupes');
     })
     .then(function(troupes) {
       var troupe = troupes[0];
@@ -26,7 +26,7 @@ before(function(done) {
 describe('/user/:id/troupes/:id/settings', function() {
 
   it('should index', function(done) {
-    return testRest.get('user/' + userId + '/troupes/' + troupeId + '/settings')
+    return testRest.get('/user/' + userId + '/troupes/' + troupeId + '/settings')
       .then(function(settings) {
         assert(settings);
       })
@@ -34,14 +34,14 @@ describe('/user/:id/troupes/:id/settings', function() {
   });
 
   it('should update and show', function(done) {
-    return testRest.put('user/' + userId + '/troupes/' + troupeId + '/settings/test', {
+    return testRest.put('/user/' + userId + '/troupes/' + troupeId + '/settings/test', {
         data: JSON.stringify({ value: 1 }),
         headers: {
           'Content-Type': 'application/json'
         }
       })
       .then(function() {
-        return testRest.get('user/' + userId + '/troupes/' + troupeId + '/settings/test');
+        return testRest.get('/user/' + userId + '/troupes/' + troupeId + '/settings/test');
       })
       .then(function(settings) {
         assert(settings);

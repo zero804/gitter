@@ -6,7 +6,7 @@ var rest = require('restler-q');
 var assert = require('assert');
 var Q = require('q');
 var restUtils = require('./rest-utils');
-var BASE_URL = process.env.BASE_URL || 'http://localhost:5000/';
+var BASE_URL = process.env.BASE_URL || 'http://localhost:5000';
 var token;
 var troupeId;
 
@@ -27,7 +27,7 @@ describe('troupes/:id/chatMessages', function() {
 
   it('should create', function(done) {
 
-    return rest.postJson(BASE_URL + 'troupes/' + troupeId  + '/chatMessages', { text: 'Rest test'}, {
+    return rest.postJson(BASE_URL + '/troupes/' + troupeId  + '/chatMessages', { text: 'Rest test'}, {
         headers: { Authorization: 'Bearer ' + token }
       })
       .then(function(chat) {
@@ -41,11 +41,11 @@ describe('troupes/:id/chatMessages', function() {
   });
 
   it('should update', function(done) {
-    return rest.postJson(BASE_URL + 'troupes/' + troupeId  + '/chatMessages', { text: 'Rest test'}, {
+    return rest.postJson(BASE_URL + '/troupes/' + troupeId  + '/chatMessages', { text: 'Rest test'}, {
         headers: { Authorization: 'Bearer ' + token }
       })
       .then(function(chat) {
-        return rest.put(BASE_URL + 'troupes/' + troupeId  + '/chatMessages/' + chat.id,
+        return rest.put(BASE_URL + '/troupes/' + troupeId  + '/chatMessages/' + chat.id,
           {
             data: JSON.stringify({ text: 'Rest test edited'}),
             headers: {
@@ -66,7 +66,7 @@ describe('troupes/:id/chatMessages', function() {
   });
 
   it('should index', function(done) {
-    return rest.get(BASE_URL + 'troupes/' + troupeId  + '/chatMessages', {
+    return rest.get(BASE_URL + '/troupes/' + troupeId  + '/chatMessages', {
         headers: { Authorization: 'Bearer ' + token }
       })
       .then(function(chats) {

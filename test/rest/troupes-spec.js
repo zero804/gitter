@@ -6,7 +6,7 @@ var rest = require('restler-q');
 var assert = require('assert');
 var Q = require('q');
 var restUtils = require('./rest-utils');
-var BASE_URL = process.env.BASE_URL || 'http://localhost:5000/';
+var BASE_URL = process.env.BASE_URL || 'http://localhost:5000';
 var token;
 var troupeId;
 
@@ -26,7 +26,7 @@ before(function(done) {
 describe('troupes', function() {
 
   it('should index', function(done) {
-    return rest.get(BASE_URL + 'troupes', {
+    return rest.get(BASE_URL + '/troupes', {
         headers: { Authorization: 'Bearer ' + token }
       })
       .then(function(troupes) {
@@ -39,7 +39,7 @@ describe('troupes', function() {
   });
 
   it('should show', function(done) {
-    return rest.get(BASE_URL + 'troupes/' + troupeId, {
+    return rest.get(BASE_URL + '/troupes/' + troupeId, {
         headers: { Authorization: 'Bearer ' + token }
       })
       .then(function(troupe) {
