@@ -27,7 +27,6 @@ define([
       'click #cancel-troupe-settings' : 'closeSettings',
       'click #delete-troupe': 'deleteTroupe',
       'click #leave-troupe': 'leaveTroupe',
-      'click #show-integrations': 'showIntegrations'
     },
 
     initialize: function() {
@@ -147,10 +146,6 @@ define([
       modal.show();
     },
 
-    showIntegrations: function() {
-      this.trigger('showIntegrationSettings');
-    },
-
     getRenderData: function() {
       return _.extend({},
         context.getTroupe(), {
@@ -230,9 +225,6 @@ define([
         options.title = "Settings";
         TroupeViews.Modal.prototype.initialize.apply(this, arguments);
         this.view = new View({ });
-        this.view.on('showIntegrationSettings', function() {
-           this.transitionTo(new IntegrationSettingsModal({}));
-        }, this);
       }
     });
   });
