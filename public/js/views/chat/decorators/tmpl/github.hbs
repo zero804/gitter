@@ -1,0 +1,27 @@
+<div>
+  <img class="notification-icon" src="{{favicon}}"> {{user}} {{action}} {{human_action}} 
+
+  {{#if commits}}
+  {{commits.length}} commit(s)
+  {{/if}}
+
+  on <a href="https://github.com/{{repo}}">{{repo}}</a>
+
+  {{#if branch}}
+  to {{branch}}
+  {{/if}}
+
+  {{#if title}}
+  : <a href="{{url}}" target="_blank">{{title}}</a>
+  {{else}}
+  (<a href="{{url}}" target="_blank">compare</a>)
+  {{/if}}
+  
+  {{#if commits}}
+  <ul class="commits">
+  {{#each commits}}
+  <li><a href="{{url}}" target="_blank">{{message}}</a></li>
+  {{/each}}
+  </ul>
+  {{/if}}
+</div>
