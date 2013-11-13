@@ -33,25 +33,7 @@
 
   <div class="trpLeftMenuHotspot" id="left-menu-hotspot"></div>
   <div class="trpLeftMenu" id="left-menu"></div>
-  <div class="trpMiniLeftMenu" id="mini-left-menu">
-    <div class="trpMiniLeftMenuContainer" id="mini-left-menu-container">
-      <div class="trpSmartBarItems" id="smart-bar-items">
-      </div>
-
-      <div class="trpMiniActions">
-        <div>
-          <div class="more-button" style="margin-left: 28px; margin-bottom: 14px" width="24" height="24" id="left-menu-icon"></div>
-        </div>
-        <a href="{{#if user.username}}/{{user.username}}{{else}}/home{{/if}}">
-        <div>
-          <img src='{{cdn "images/2/icon-home-white@2x.png"}}'/ title="Welcome screen" style="margin-left: 28px; margin-bottom: 14px" width="24" height="24" id="home-icon">
-        </div>
-        </a>
-
-        <a href="#|profile" id="profile-icon" class="trpProfileAvatarLink" title="Your profile"></a>
-      </div>
-    </div>
-  </div>
+  
 
 <div class="trpMenuTab" id="menu-toggle-button" style='display: none;'><img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle">
   {{#if unreadCount}}
