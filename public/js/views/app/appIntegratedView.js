@@ -180,7 +180,7 @@ define([
 
       $("#left-menu").addClass("visible");
       $("#mini-left-menu, #mini-left-menu-container").addClass("active");
-      $("#chat-frame, #chat-input").addClass("leftCollapse");
+      $("#content-wrapper, #toolbar-frame").addClass("leftCollapse");
 
       this.leftmenu = true;
     },
@@ -203,7 +203,7 @@ define([
       }, 350);
 
       $("#mini-left-menu, #mini-left-menu-container").removeClass("active");
-      $("#chat-frame, #chat-input").removeClass("leftCollapse");
+      $("#content-wrapper, #toolbar-frame").removeClass("leftCollapse");
       $("#left-menu").removeClass("visible");
 
       this.leftmenu = false;

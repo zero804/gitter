@@ -180,15 +180,21 @@ a:hover {
   -webkit-transform: translate3d(0, 0, 0);
   background-clip: padding-box;
 
-  &.visible {
-    width: 280px;
-/*    box-shadow: 1px 0px 6px 1px rgba(50, 50, 50, 0.55);*/
-    border-right: 4px solid rgba(0,0,0,0.1);
-  }
-
   .trpToolbarList {
     width: 260px;
   }
+
+  @media @small {
+    left:-250px;
+
+      &.visible {
+        left: 0px;
+    /*    box-shadow: 1px 0px 6px 1px rgba(50, 50, 50, 0.55);*/
+        border-right: 4px solid rgba(0,0,0,0.1);
+      }
+
+  }
+
 }
 
 .trpLeftMenuProfile {
@@ -792,11 +798,6 @@ a.trpMiniLeftMenuItem {
     }
   }
 
-  @media @small {
-    width: 0;
-    padding-right: 0;
-  }
-
 }
 
 .trpChatInputArea.rightCollapse, .trpHeaderContainer.rightCollapse, .trpChatPanel.rightCollapse {
@@ -811,15 +812,13 @@ a.trpMiniLeftMenuItem {
   right: 235px;
 }
 
-.trpChatInputArea.leftCollapse, .trpHeaderContainer.leftCollapse, .trpChatPanel.leftCollapse {
-  margin-left: @leftMarginFull;
+.trpToolbar.leftCollapse {
+  right: -250px;
+}
 
-  @media @mid {
-    margin-left: @leftMarginMid;
-  }
-
+.trpContentPanel.leftCollapse {
   @media @small {
-    margin-left: @leftMarginSmall;
+    left: @leftMarginFull;
   }
 
 }
