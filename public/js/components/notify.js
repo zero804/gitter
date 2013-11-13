@@ -17,16 +17,16 @@ define([
       if (n.is(':hidden')) {
         // style
         n.show();
-        n.css({ position: 'relative', left: -1 * n.outerWidth() });
-        n.animate({ left: 0 });
+        // n.css({ position: 'relative', left: -1 * n.outerWidth() });
+        n.animate({ width: 280 });
       }
       // restart hide timeout
       n.data('notification-hide-timeout').restart();
     }
 
     function hide() {
-      n.animate({ left: -1 * n.outerWidth()   }, function() {
-        n.hide('slow');
+      n.animate({ width: 0 }, function() {
+        // n.hide('slow');
       });
     }
 
