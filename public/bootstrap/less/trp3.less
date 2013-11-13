@@ -294,9 +294,10 @@ a.trpMiniLeftMenuItem {
 .trpLeftMenuActions {
 	position: absolute;
 	bottom: 40px;
-	left: 20px;
-	width: 280px;
 	overflow: hidden;
+  box-sizing: border-box;
+  padding: 0 10px;
+  width: 100%;
 }
 
 .trpLeftMenuWrapper {
@@ -364,18 +365,43 @@ a.trpMiniLeftMenuItem {
 	padding-left: 8px;
 }
 
-.trpLeftMenuButton, .trpNewTroupeButton {
+.trpNewPersonButton, .trpNewTroupeButton {
+  border: 1px solid rgba(255,255,255,0.6);
   display: inline-block;
-	width: 90px;
-	.trpBodyMedium;
-  font-size: 13px;
-	margin-top: 20px;
-	margin-right: 8px;
-	background-color: white;
-	padding: 12px;
-	color: @trpGreen;
-	text-align: center;
+  box-sizing: border-box;
+  padding: 6px;
+  color: white;
+  text-align: center;
+  width: 50%;
+  cursor: pointer;
+  background-color: rgba(255,255,255,0.1);
+  .trpBodyMedium;
 }
+
+.trpNewPersonButton:hover, .trpNewTroupeButton:hover {
+  background-color: white;
+  color: #162e34;
+  border-color: white;
+}
+
+.trpNewPersonButton:hover + .trpNewTroupeButton {
+  border-left: 1px solid white;
+}
+
+.trpNewPersonButton {
+  border-radius: 4px 0 0 4px;
+  border-right: 0;
+}
+
+/*.trpNewPersonButton:hover {
+  border-right: 1px solid cyan;
+}
+*/
+.trpNewTroupeButton {
+  border-radius: 0 4px 4px 0;
+}
+
+
 
 .trpMenuTab {
   display: inline-block;
