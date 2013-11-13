@@ -184,9 +184,13 @@ define([
 			});
 
 			function error(err) {
-				if(err.status === 409 && err.responseJSON.usernameConflict) {
-					self.isUnavailable();
-				} else if(err.status < 500) {
+				if(err && err.status) {
+					if(err.status === 409 && err.responseJSON.usernameConflict) {
+						self.isUnavailable();
+					} else if(err.status < 500) {
+						self.$el.find('.trpModalFailure').show();
+					}
+				} else {
 					self.$el.find('.trpModalFailure').show();
 				}
 			}

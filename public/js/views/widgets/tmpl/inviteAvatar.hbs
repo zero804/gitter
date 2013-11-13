@@ -1,15 +1,21 @@
 {{#if oneToOneInvite}}
-<a class="trpDisplayPicture avatar-s offline unread" data-original-title="{{name}}" style="background-image: url({{avatarUrl}});" href="{{acceptUrl}}">
-  <div class="trpDPUnreadCount"></div>
+<a class="trpMiniLeftMenuItem unread" href="{{acceptUrl}}">
+  <div class="trpDisplayPicture avatar-s offline unread" data-original-title="{{name}}" style="background-image: url({{avatarUrl}});">
+    <div class="trpDPUnreadCount"></div>
+  </div>
 </a>
 {{else}}
   {{#if noHref}}
-        <div class="trpDisplayPicture avatar-s trpTroupeAvatar unread" href="{{url}}" style="border-color: white; text-decoration: none; background-color: {{colour}}" data-original-title="{{name}}">
+  <a class="trpMiniLeftMenuItem unread">
+        <div class="trpDisplayPicture avatar-s trpTroupeAvatar unread" style="border-color: white; text-decoration: none; background-color: {{colour}}" data-original-title="{{name}}">
           <div class="trpTroupeAvatarText">{{initials}}</div>
         </div>
+  </a>
   {{else}}
-        <a class="trpDisplayPicture avatar-s trpTroupeAvatar unread" href="{{acceptUrl}}" style="border-color: {{colour}}; text-decoration: none" data-original-title="{{name}}">
+  <a class="trpMiniLeftMenuItem unread" href="{{acceptUrl}}">
+        <div class="trpDisplayPicture avatar-s trpTroupeAvatar unread" href="{{acceptUrl}}" style="border-color: {{colour}}; text-decoration: none" data-original-title="{{name}}">
           <div class="trpTroupeAvatarText">{{initials}}</div>
-        </a>
+        </div>
+  </a>
   {{/if}}
 {{/if}}

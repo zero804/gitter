@@ -33,6 +33,7 @@ define([
         if (firstChild.tooltip) {
           firstChild.tooltip({
             html : true,
+            placement : 'left',
             container: "body"
           });
         }

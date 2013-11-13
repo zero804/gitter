@@ -147,6 +147,8 @@ function createExpectedFixtures(expected, done) {
     return persistence.Invite.createQ({
       fromUserId:   f.fromUserId,
       userId:       f.userId,
+      email:        f.email,
+      code:         f.code,
       troupeId:     f.troupeId,
       status:       f.status    || 'UNUSED'
     });
@@ -278,9 +280,16 @@ function createExpectedFixtures(expected, done) {
           var expectedInvite = expected[key];
 
           expectedInvite.fromUserId = fixture[expectedInvite.fromUser]._id;
-          expectedInvite.userId = fixture[expectedInvite.user]._id;
+          expectedInvite.userId = expectedInvite.user && fixture[expectedInvite.user]._id;
           expectedInvite.troupeId = expectedInvite.troupe && fixture[expectedInvite.troupe]._id;
 
+          if(expectedInvite.email === true) {
+            expectedInvite.email =  generateEmail();
+          }
+
+          if(expectedInvite.code === true) {
+            expectedInvite.code =  "confirm" + Math.random();
+          }
           return createInvite(key, expectedInvite)
             .then(function(invite) {
               fixture[key] = invite;

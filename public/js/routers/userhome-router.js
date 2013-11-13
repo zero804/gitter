@@ -88,10 +88,6 @@ define([
     regions: []
   });
 
-if(context.popEvent('password_reset')) {
-  new profileView.Modal({ disableClose: true }).show();
-}
-
 return router;
 
 });

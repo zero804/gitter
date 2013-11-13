@@ -106,7 +106,7 @@ class SignupTests(unittest.TestCase):
         name    = 'Mr Troupe'
 
         # Sing in into Gmail
-        self.driver.get("https://gmail.com")
+        self.driver.get("https://accounts.google.com/ServiceLogin?service=mail&continue=https://mail.google.com/mail/&hl=en")
         form = self.driver.find_element_by_css_selector('#gaia_loginform')
         form.find_element_by_name('Email').send_keys(email)
         form.find_element_by_name('Passwd').send_keys(passwd)
@@ -124,8 +124,6 @@ class SignupTests(unittest.TestCase):
         # Accept oAuth permissions
         accept = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, 'submit_approve_access')))
         accept.click()
-
-        self.assertEqual(self.driver.current_url, utils.baseUrl('/start/profile'))
 
         displayName = self.driver.find_element_by_name('displayName').get_attribute('value')
         self.assertEqual(displayName, name)
@@ -169,6 +167,8 @@ class SignupTests(unittest.TestCase):
         self.driver.find_element_by_id('custom-email-button').click()
         time.sleep(1)
         self.driver.find_element_by_id('next-button').click()
+
+        self.driver.find_element_by_tag_name('a').click()
 
         self.driver.find_element_by_tag_name('a').click()
 

@@ -1,9 +1,10 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var troupeService = require("../../services/troupe-service"),
-    uriService = require("../../services/uri-service"),
-    winston = require('winston');
+var winston       = require('winston');
+var troupeService = require("../../services/troupe-service");
+var inviteService = require("../../services/invite-service");
+var uriService    = require("../../services/uri-service");
 
 module.exports = function(req, res, next) {
   req.checkBody('appUri', 'Invalid appUri').notEmpty();
@@ -26,7 +27,7 @@ module.exports = function(req, res, next) {
 
         if(toUser) {
           // Invite the user to connect
-          return troupeService.inviteUserByUserId(null, req.user, toUser.id);
+          return inviteService.inviteUserByUserId(null, req.user, toUser.id);
         }
 
         if(toTroupe) {

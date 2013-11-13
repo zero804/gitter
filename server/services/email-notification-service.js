@@ -6,6 +6,11 @@ var nconf = require('../utils/config');
 var assert = require('assert');
 var url = require('url');
 var appEvents = require('../app-events');
+var statsService  = require("./stats-service");
+
+
+var crypto = require('crypto');
+var passphrase = 'troupetasticprefs';
 
 module.exports = {
   sendNewTroupeForExistingUser: function (user, troupe) {
@@ -106,26 +111,6 @@ module.exports = {
     });
   },
 
-  sendConfirmationForEmailChange: function (user) {
-    assert(user.confirmationCode, 'User does not have a confirmation code');
-
-    var confirmLink = nconf.get("email:emailBasePath") + "/confirm/" + user.confirmationCode;
-    var to = user.newEmail;
-
-    mailerService.sendEmail({
-      templateFile: "change-email-address",
-      to: to,
-      from: 'Troupe <support@troupe.co>',
-      subject: "Confirm new email address",
-      data: {
-        confirmLink: confirmLink,
-        originalEmail: user.email,
-        newEmail: user.newEmail,
-        baseServerPath: nconf.get("email:emailBasePath")
-      }
-    });
-  },
-
   sendConfirmationForSecondaryEmail: function (unconfirmed) {
     assert(unconfirmed.confirmationCode, 'No confirmation code found');
 
@@ -142,23 +127,6 @@ module.exports = {
         // originalEmail: unconfirmed.email,
         newEmail: unconfirmed.email,
         baseServerPath: nconf.get("email:emailBasePath")
-      }
-    });
-  },
-
-  sendNoticeOfEmailChange: function (user, origEmail, newEmail) {
-    assert(origEmail, 'origEmail parameter required');
-    assert(newEmail, 'newEmail parameter required');
-
-    mailerService.sendEmail({
-      templateFile: "change-email-address-complete",
-      to: [origEmail, newEmail],
-      from: 'Troupe <support@troupe.co>',
-      subject: "Your email address has been successfully changed",
-      data: {
-        baseServerPath: nconf.get("email:emailBasePath"),
-        originalEmail: origEmail,
-        newEmail: newEmail
       }
     });
   },
@@ -233,6 +201,13 @@ module.exports = {
   },
 
   sendUnreadItemsNotification: function(user, troupesWithUnreadCounts) {
+
+    var plaintext = user.id + ',' + 'unread_notifications';
+    var cipher    = crypto.createCipher('aes256', passphrase);
+    var hash      = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
+
+    statsService.event('unread_notification_sent', {userId: user.id, email: user.email});
+
     mailerService.sendEmail({
       templateFile: "unread_notification",
       from: 'Troupe <support@troupe.co>',
@@ -241,7 +216,8 @@ module.exports = {
       data: {
         user: user,
         emailBasePath: nconf.get("email:emailBasePath"),
-        troupesWithUnreadCounts: troupesWithUnreadCounts
+        troupesWithUnreadCounts: troupesWithUnreadCounts,
+        unsubscribeHash: hash
       }
     });
   }

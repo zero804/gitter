@@ -3,6 +3,7 @@
 
 var contactService            = require('./contact-service');
 var troupeService             = require('./troupe-service');
+var inviteService             = require('./invite-service');
 var userService               = require('./user-service');
 var appEvents                 = require('../app-events');
 var persistence               = require('./persistence-service');
@@ -130,7 +131,7 @@ function addImplicitConnections(userId, dateGenerated) {
 }
 
 function addOutgoingPendingInvites(userId, dateGenerated) {
-  return troupeService.findAllUnusedInvitesFromUserId(userId)
+  return inviteService.findAllUnusedInvitesFromUserId(userId)
     .then(function(invites) {
       var inviteeUserIds = invites.map(function(i) { return i.userId; }).filter(function(b) { return !!b; });
 
@@ -159,7 +160,7 @@ function addOutgoingPendingInvites(userId, dateGenerated) {
 
 function addOutgoingConfirmedInvites(userId, dateGenerated) {
   return Q.all([
-      troupeService.findAllUsedInvitesFromUserId(userId),
+      inviteService.findAllUsedInvitesFromUserId(userId),
     ])
     .spread(function(invites) {
       var inviteeUserIds = invites.map(function(i) { return i.userId; }).filter(function(b) { return !!b; });
@@ -189,8 +190,8 @@ function addOutgoingConfirmedInvites(userId, dateGenerated) {
 
 function addIncomingInvites(userId, dateGenerated) {
   return Q.all([
-      troupeService.findAllUsedInvitesForUserId(userId),
-      troupeService.findAllUnusedInvitesForUserId(userId)
+      inviteService.findAllUsedInvitesForUserId(userId),
+      inviteService.findAllUnusedInvitesForUserId(userId)
     ])
     .spread(function(usedInvites, unusedInvites) {
       var invites = usedInvites.concat(unusedInvites);

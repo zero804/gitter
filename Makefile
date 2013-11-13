@@ -51,7 +51,17 @@ test-in-browser:
 
 test-in-browser-xunit:
 	mkdir -p output/test-reports
-	node_modules/.bin/mocha-phantomjs --timeout 30000 --reporter xunit $(BASE_URL)/test/in-browser/test > ../../output/test-reports/in-browser.xml
+	node_modules/.bin/mocha-phantomjs \
+		--timeout 30000 \
+		--reporter xunit \
+		$(BASE_URL)/test/in-browser/test > ../../output/test-reports/in-browser.xml || true
+
+rest-test-xunit:
+	mkdir -p output/test-reports
+	NODE_ENV=test BASE_URL=$(BASE_URL) node_modules/.bin/mocha \
+		--timeout 4000 \
+		--reporter xunit \
+		test/rest > output/test-reports/rest.xml || true
 
 test-coverage:
 	rm -rf ./coverage/ cobertura-coverage.xml
@@ -68,10 +78,10 @@ prepare-for-end-to-end-testing:
 end-to-end-test:
 	MAIL_HOST=$(MAIL_HOST) \
 	MAIL_PORT=$(MAIL_PORT) \
-	nosetests --nologcapture --processes=5 --process-timeout=120 --attr '!unreliable','thread_safe' --all-modules test/end-to-end/e2etests
+	nosetests --nologcapture --processes=5 --process-timeout=120 --attr '!unreliable','thread_safe' --all-modules test/end-to-end/e2etests || true
 	MAIL_HOST=$(MAIL_HOST) \
 	MAIL_PORT=$(MAIL_PORT) \
-	nosetests --nologcapture --attr '!unreliable','!thread_safe' --all-modules test/end-to-end/e2etests
+	nosetests --nologcapture --attr '!unreliable','!thread_safe' --all-modules test/end-to-end/e2etests || true
 
 end-to-end-test-saucelabs-chrome:
 	@mkdir -p ./output/test-reports
@@ -84,8 +94,8 @@ end-to-end-test-saucelabs-chrome:
 		nosetests \
 			--processes=30 --process-timeout=180 \
 			--attr '!unreliable','thread_safe' \
-			--nologcapture --with-xunit --xunit-file=./output/test-reports/nosetests.xml \
-			--all-modules test/end-to-end/e2etests
+			--nologcapture --with-xunit --xunit-file=./output/test-reports/selenium-remote-chrome-1.xml \
+			--all-modules test/end-to-end/e2etests  || true
 	@echo Testing $(BETA_SITE) with chrome at saucelabs.com thread unsafe tests in serial
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTECHROME \
@@ -94,8 +104,8 @@ end-to-end-test-saucelabs-chrome:
 	MAIL_PORT=$(MAIL_PORT) \
 		nosetests \
 			--attr '!unreliable','!thread_safe' \
-			--nologcapture --with-xunit --xunit-file=./output/test-reports/nosetests.xml \
-			--all-modules test/end-to-end/e2etests
+			--nologcapture --with-xunit --xunit-file=./output/test-reports/selenium-remote-chrome-2.xml \
+			--all-modules test/end-to-end/e2etests  || true
 
 end-to-end-test-saucelabs-ie10:
 	@echo Testing $(BETA_SITE) with ie10 at saucelabs.com thread safe tests in parallel
@@ -105,10 +115,10 @@ end-to-end-test-saucelabs-ie10:
 	MAIL_HOST=$(MAIL_HOST) \
 	MAIL_PORT=$(MAIL_PORT) \
 		nosetests \
-			--processes=30 --process-timeout=180 \
+			--processes=30 --process-timeout=240 \
 			--attr '!unreliable','thread_safe' \
-			--nologcapture --with-xunit --xunit-file=./output/test-reports/nosetests.xml \
-			--all-modules test/end-to-end/e2etests
+			--nologcapture --with-xunit --xunit-file=./output/test-reports/selenium-remote-ie10-1.xml \
+			--all-modules test/end-to-end/e2etests  || true
 	@echo Testing $(BETA_SITE) with ie10 at saucelabs.com thread unsafe tests in serial
 	@REMOTE_EXECUTOR=$(SAUCELABS_REMOTE) \
 	DRIVER=REMOTEIE \
@@ -117,8 +127,8 @@ end-to-end-test-saucelabs-ie10:
 	MAIL_PORT=$(MAIL_PORT) \
 		nosetests \
 			--attr '!unreliable','!thread_safe' \
-			--nologcapture --with-xunit --xunit-file=./output/test-reports/nosetests.xml \
-			--all-modules test/end-to-end/e2etests
+			--nologcapture --with-xunit --xunit-file=./output/test-reports/selenium-remote-ie10-2.xml \
+			--all-modules test/end-to-end/e2etests || true
 
 end-to-end-test-saucelabs-android:
 	@echo Testing $(BETA_SITE) with android at saucelabs.com
@@ -127,7 +137,11 @@ end-to-end-test-saucelabs-android:
 	BASE_URL=$(BETA_SITE) \
 	MAIL_HOST=$(MAIL_HOST) \
 	MAIL_PORT=$(MAIL_PORT) \
-	nosetests --nologcapture --attr 'phone_compatible' --with-xunit --xunit-file=./output/test-reports/nosetests.xml --all-modules test/end-to-end/e2etests
+	nosetests --nologcapture \
+		--attr 'phone_compatible' \
+		--with-xunit \
+		--xunit-file=./output/test-reports/selenium-remote-android.xml \
+		--all-modules test/end-to-end/e2etests || true
 
 docs: test-docs
 
@@ -188,7 +202,7 @@ validate-source: search-js-console
 
 continuous-integration: clean validate-source npm grunt version-files upgrade-data reset-test-data test-xunit test-coverage tarball
 
-post-deployment-tests: test-in-browser-xunit end-to-end-test-saucelabs-chrome end-to-end-test-saucelabs-ie10 end-to-end-test-saucelabs-android
+post-deployment-tests: npm test-in-browser-xunit rest-test-xunit end-to-end-test-saucelabs-chrome end-to-end-test-saucelabs-ie10 end-to-end-test-saucelabs-android
 
 build: clean validate-source npm grunt version-files upgrade-data test-xunit
 

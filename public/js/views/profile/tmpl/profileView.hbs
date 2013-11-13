@@ -12,8 +12,8 @@
         </div>
         {{#existingUser}}
         <div class="trpFormItem">
-          <label for="newEmail" class="trpFormLabel">Email Address</label>
-          <input type="email" readonly id="email" placeholder="Change to a new email address" class="trpInput" name="newEmail" value="{{user.email}}"/>
+          <label for="email" class="trpFormLabel">Email Address</label>
+          <input type="email" readonly id="email" class="trpInput" name="email" value="{{user.email}}"/>
           <a id="manageEmailsBtn" href="#|profile/emails" class="trpFormInputAction" style="text-decoration: none">
             <img src='{{ cdn "images/2/icon-edit.png"}}' width="16" height="16" title=""/ style="vertical-align: middle; padding-bottom: 1px">
             <span>CHANGE</span>

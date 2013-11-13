@@ -61,14 +61,12 @@ describe("User Service", function() {
   });
 
   describe("#updateProfile", function() {
-    it("should update the name, email, password and status of a user", function(done) {
+    it("should update the name, password and status of a user", function(done) {
 
       var user1 = fixture.user1;
       var params = {};
       params.userId = user1.id;
       params.displayName = 'Tested User';
-      params.oldEmail = user1.email;
-      params.email = "hopefully-unregistered-user-service-test" + Date.now() + "@troupetest.local";
       params.password = '654321';
       params.oldPassword = '123456';
 
@@ -78,8 +76,6 @@ describe("User Service", function() {
         assertions(e, user, function() {
           // reset test user values, keeping this test atomic
           params.displayName = user1.displayName;
-          params.oldEmail = params.email;
-          params.email = user1.email;
           params.oldPassword = params.password;
           params.password = '123456';
 
@@ -96,7 +92,6 @@ describe("User Service", function() {
         assert.notStrictEqual(user, null);
 
         assert.strictEqual(user.displayName, params.displayName);
-        assert.strictEqual(user.email, params.oldEmail);
         assert.strictEqual(user.newEmail, params.email);
         assert.notStrictEqual(user.confirmationCode, null);
         assert.strictEqual(user.status, oldUserStatus);
@@ -104,15 +99,7 @@ describe("User Service", function() {
         userService.checkPassword(user, params.password, function(matches) {
           assert.equal(matches, true);
 
-          // get the confirmation code and run the confirmation
-          signupService.confirmEmailChange(user, function(e) {
-            assert.strictEqual(e, null);
-            assert.strictEqual(user.email, params.email);
-            // assert.strictEqual(typeof user.newEmail, 'undefined');
-            assert.strictEqual(!user.newEmail, true);
-
-            callback();
-          });
+          callback();
         });
       }
 

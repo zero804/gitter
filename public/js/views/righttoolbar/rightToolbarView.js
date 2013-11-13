@@ -101,6 +101,10 @@ define([
         request: {
           endpoint: '/troupes/' + context.getTroupeId() + '/downloads/'
         },
+        showMessage: function(message) {
+          if(message === 'No files to upload.') return;
+          window.alert(message);
+        },
         callbacks: {
           onComplete: function(id, fileName, response) {
             var model;
@@ -142,7 +146,12 @@ define([
       this.files.show(new FileView({ collection: fileCollection }));
 
       if (!context.inOneToOneTroupeContext()) {
-        this.troupeAvatar.show(new TroupeAvatar({ troupe: context.troupe(), noHref: true, noUnread: true}));
+        this.troupeAvatar.show(new TroupeAvatar({
+          troupe: context.troupe(),
+          noHref: true,
+          noUnread: true,
+          tooltipPlacement: 'left'
+        }));
       }
       // Conversation View
       if (!context.inOneToOneTroupeContext()) {

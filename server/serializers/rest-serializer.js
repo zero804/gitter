@@ -4,6 +4,7 @@
 var userService       = require("../services/user-service");
 var chatService       = require("../services/chat-service");
 var troupeService     = require("../services/troupe-service");
+var inviteService     = require("../services/invite-service");
 var fileService       = require("../services/file-service");
 var unreadItemService = require("../services/unread-item-service");
 var presenceService   = require("../services/presence-service");
@@ -906,7 +907,7 @@ function SuggestedContactUserStatusStrategy(options) {
 
   this.preload = function(contacts, callback) {
     Q.all([
-        troupeService.findAllUnusedConnectionInvitesFromUserId(userId),
+        inviteService.findAllUnusedConnectionInvitesFromUserId(userId),
         troupeService.findAllConnectedUserIdsForUserId(userId)
           .then(function(userIds) {
             // TODO: just return the users email addresses, no need for full objects
@@ -957,7 +958,7 @@ function SuggestedContactTroupeStatusStrategy(options) {
 
   this.preload = function(contacts, callback) {
     Q.all([
-        troupeService.findAllUnusedInvitesForTroupe(troupeId),
+        inviteService.findAllUnusedInvitesForTroupe(troupeId),
         troupeService.findAllUserIdsForTroupe(troupeId)
           .then(function(userIds) {
             // TODO: just return the users email addresses, no need for full objects
