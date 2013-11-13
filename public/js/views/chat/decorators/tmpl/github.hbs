@@ -1,11 +1,11 @@
 <div>
-  <img class="notification-icon" src="{{favicon}}"> {{user}} {{action}} {{human_action}} 
+  <img class="notification-icon" src="{{favicon}}"> <a href="https://github.com/{{user}}">{{user}}</a> {{action}} {{human_action}} 
 
   {{#if commits}}
   {{commits.length}} commit(s)
   {{/if}}
 
-  on <a href="https://github.com/{{repo}}">{{repo}}</a>
+  <a href="https://github.com/{{repo}}">{{repo}}</a>
 
   {{#if branch}}
   to {{branch}}
@@ -14,7 +14,7 @@
   {{#if title}}
   : <a href="{{url}}" target="_blank">{{title}}</a>
   {{else}}
-  (<a href="{{url}}" target="_blank">compare</a>)
+  (<a href="{{url}}" target="_blank">more</a>)
   {{/if}}
   
   {{#if commits}}
