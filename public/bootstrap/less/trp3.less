@@ -173,7 +173,7 @@ a:hover {
 	position: fixed;
 	top: 0;
 	left: 0;
-	width: 40px;
+	width: 30px;
 	height: 100%;
 	z-index: 10;
 	display: inline-block;
@@ -398,16 +398,22 @@ a.trpMiniLeftMenuItem {
 .trpTroupeList {
   display: inline-block;
 	list-style-type: none;
-	margin: 0 0 0 10px;
+	margin: 0 0 0 0px;
   width: 100%;
+  box-sizing: border-box;
+  padding-right: 22px;
+
+  li {
+    padding-left: 10px;
+    margin-right: 10px;
+    box-sizing: border-box;
+  }
 
   li:hover {
-    border-radius: 4px 0 0 4px;
+    border-radius: 0 4px 4px 0;
     width: 100%;
     background-color: rgba(255,255,255,0.2);
   }
-
-
 
 }
 
@@ -430,7 +436,6 @@ a.trpMiniLeftMenuItem {
   box-sizing: border-box;
   padding: 4px 6px 6px 6px;
   margin-bottom: 2px;
-
   color: white;
   text-align: center;
   width: 50%;
@@ -896,7 +901,13 @@ a.trpMiniLeftMenuItem {
     left: @leftMarginFull;
     transition-delay: 0;
   }
+}
 
+.trpChatInputWrapper.leftCollapse {
+  @media @small {
+    left: @leftMarginFull;
+    transition-delay: 0;
+  }
 }
 
 .trpToolbar:hover {
@@ -995,6 +1006,7 @@ a.trpMiniLeftMenuItem {
 .trpLeftMenu .trpToolbarHeader {
 	margin-left: 9px;
   padding-top: 0;
+  padding-bottom: 4px;
 }
 
 .trpLeftMenuList {
@@ -1074,9 +1086,8 @@ a.trpMiniLeftMenuItem {
   z-index: 100;
   overflow: hidden;
   bottom: 0px;
-  .transition300ms;
+  .transition500ms;
   padding-top: 8px;
-
 }
 
 .trpChatInputArea {
