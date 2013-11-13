@@ -8,6 +8,7 @@ define([
   'views/signup/usernameView',
   'views/profile/profileView',
   'views/app/uiVars',
+  'views/widgets/avatar',
   'components/webNotifications',
   'components/modal-region',
   'components/titlebar',
@@ -15,7 +16,7 @@ define([
   'utils/scrollbar-detect',
   'bootstrap_tooltip',  // no ref
   "nanoscroller"        // no ref
-  ], function($, TroupeViews, context, appEvents, Marionette, UsernameView, ProfileView, uiVars,
+  ], function($, TroupeViews, context, appEvents, Marionette, UsernameView, ProfileView, uiVars, AvatarView,
     notifications, modalRegion, TitlebarUpdater, cocktail, hasScrollBars) {
   "use strict";
 
@@ -65,6 +66,11 @@ define([
       // Setup the title bar updater
       new TitlebarUpdater();
 
+      new AvatarView({
+        el: $('#profile-icon'),
+        user: context.getUser(),
+        showTooltip: false
+      }).render();
       // tooltips for the app-template
       $('#profile-icon, #home-icon').tooltip();
 

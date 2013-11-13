@@ -1,11 +1,11 @@
 
-Bacon ipsum dolor sit amet kevin tail sirloin, meatball ground round short ribs shank. Boudin fatback chuck pig. T-bone kielbasa tenderloin boudin biltong ball tip, pork chop flank kevin chuck shankle jowl salami venison drumstick. Swine cow shank venison.
+Hi there,
+
+This is what you missed while you were away.
 
 {{#each troupesWithUnreadCounts}}
-{{troupe.name}}
-{{__n "%d unread chat" "%d unread chats" unreadCount}}
+{{troupe.name}}: {{__n "%d unread message" "%d unread messagess" unreadCount}}
 {{../emailBasePath}}{{troupe.url}}
-
 {{/each}}
 
 Kind regards,

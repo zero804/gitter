@@ -11,6 +11,8 @@ var Q                        = require('q');
 var collections              = require('../../utils/collections');
 var nconf                    = require('../../utils/config');
 var emailNotificationService = require('../email-notification-service');
+var preferences              = require('../notifications-preference-service');
+
 
 function removeTestIds(ids) {
 
@@ -44,6 +46,7 @@ function sendEmailNotifications(since) {
         var troupeIds = removeTestIds(_.flatten(Object.keys(userTroupeUnreadHash).map(function(userId) {
           return Object.keys(userTroupeUnreadHash[userId]);
         })));
+
 
         return Q.all([
             userIds,
@@ -80,7 +83,9 @@ function sendEmailNotifications(since) {
                     return { troupe: t, unreadCount: unreadCount };
                   });
 
-                emailNotificationService.sendUnreadItemsNotification(user, troupeData);
+                preferences.verifyUserExpectsNotifications(user.id, 'unread_notifications', function(optedOut) {
+                  if (!optedOut) emailNotificationService.sendUnreadItemsNotification(user, troupeData);
+                });
               });
 
           }));

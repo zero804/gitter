@@ -3,6 +3,7 @@
 
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
+var inviteService = require('./invite-service');
 var uriLookupService = require("./uri-lookup-service");
 var promiseUtils = require("../utils/promise-utils");
 
@@ -102,7 +103,7 @@ exports.findUriForUser = function(uri, userId, callback) {
             return { troupe: troupe, group: true, access: true };
           }
 
-          return troupeService.findUnusedInviteToTroupeForUserId(userId, troupe.id)
+          return inviteService.findUnusedInviteToTroupeForUserId(userId, troupe.id)
             .then(function(invite) {
               return { troupe: troupe, group: true, access: false, invite: invite };
             });

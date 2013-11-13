@@ -10,35 +10,42 @@ var useragent  = require('useragent');
 var authCookieName = nconf.get('web:cookiePrefix') + 'auth';
 var sessionCookieName = nconf.get('web:cookiePrefix') + 'session';
 
+var bearerLogin = passport.authenticate('bearer', { session: true });
+
+function bearerAuthMiddleware(req, res, next) {
+  // If the user is already logged in, don't check for OAUTH tokens
+  // This could potentially lead to problems if one user is logged in
+  // but another users oauth token is presented, but this is pretty edge
+  // and getting around it would be very ineffiecent
+  if(req.user) return next();
+
+  if (req.headers && req.headers['authorization']) {
+    var parts = req.headers['authorization'].split(' ');
+    if (parts.length == 2) {
+      var scheme = parts[0];
+      if(/OAuth2/.test(scheme)) {
+        // Dodgy hack to sort out problem with RestKit
+        req.headers['authorization'] = 'Bearer ' + parts[1];
+        bearerLogin(req, res, next);
+        return;
+      }
+      if (/Bearer/i.test(scheme)) {
+        bearerLogin(req, res, next);
+        return;
+      }
+    }
+  }
+  next();
+}
+
 /* Ensures that the person is logging in. However, if they present a bearer token,
  * we'll try log them in first
  */
 exports.ensureLoggedIn = function(options) {
   if(!options) options = {};
 
-
-  var bearerLogin = passport.authenticate('bearer', { session: true });
-
   return [
-    function(req, res, next) {
-      if (req.headers && req.headers['authorization']) {
-        var parts = req.headers['authorization'].split(' ');
-        if (parts.length == 2) {
-          var scheme = parts[0];
-          if(/OAuth2/.test(scheme)) {
-            // Dodgy hack to sort out problem with RestKit
-            req.headers['authorization'] = 'Bearer ' + parts[1];
-            bearerLogin(req, res, next);
-            return;
-          }
-          if (/Bearer/i.test(scheme)) {
-            bearerLogin(req, res, next);
-            return;
-          }
-        }
-      }
-      next();
-    },
+    bearerAuthMiddleware,
     function(req, res, next) {
       if (req.isAuthenticated && req.isAuthenticated()) return next();
 
@@ -144,8 +151,10 @@ exports.authenticate = function(scheme, options) {
   };
 };
 
-exports.grantAccessForRememberMeTokenMiddleware = rememberMe.rememberMeMiddleware(/* No Options */);
-
+exports.grantAccessForRememberMeTokenMiddleware = [
+  bearerAuthMiddleware,
+  rememberMe.rememberMeMiddleware(/* No Options */),
+];
 
 exports.generateRememberMeTokenMiddleware = function(req, res, next) {
   if(req.body.rememberMe) {

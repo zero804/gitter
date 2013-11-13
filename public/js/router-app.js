@@ -24,6 +24,7 @@ require([
   'views/signup/createTroupeView',
   'views/signup/usernameView',
   'views/app/troupeSettingsView',
+  'views/app/integrationSettingsModal',
   'views/toolbar/troupeMenu',
   'views/invite/reinviteModal',
   'utils/router',
@@ -47,7 +48,7 @@ require([
             itemCollections, troupeCollections, UserEmailCollection, RightToolbarView,
             filePreviewView, fileVersionsView, RequestDetailView, InviteDetailView, PersonDetailView,
             conversationDetailView, profileView, profileEmailView, profileAddEmailView, completeYourProfileModal, shareSearchView,
-            createTroupeView, UsernameView, troupeSettingsView, TroupeMenuView, ReinviteModal, Router,
+            createTroupeView, UsernameView, troupeSettingsView, IntegrationSettingsModal, TroupeMenuView, ReinviteModal, Router,
             unreadItemsClient, SmartCollectionView, FileDecorator, webhookDecorator, userDecorator,
             embedDecorator /*, errorReporter , FilteredCollection */) {
   "use strict";
@@ -116,7 +117,8 @@ require([
       { name: "upgradeOneToOne",  re: /^upgradeOneToOne$/,        viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true, viewOptions: { upgradeOneToOne: true } } ,
       { name: "chooseUsername",   re: /^chooseUsername/,          viewType: UsernameView.Modal },
       { name: "reinvite",         re: /^reinvite\/(\w+)$/,        viewType: ReinviteModal,                collection: troupeCollections.outgoingConnectionInvites, viewOptions: { overrideContext: true, inviteToConnect: true } },
-      { name: "troupeSettings",   re: /^troupeSettings/,          viewType: troupeSettingsView }
+      { name: "troupeSettings",   re: /^troupeSettings/,          viewType: troupeSettingsView },
+      { name: "integrations",     re: /^integrations/,            viewType: IntegrationSettingsModal }
     ],
     regions: [appView.rightPanelRegion, appView.dialogRegion]
   });

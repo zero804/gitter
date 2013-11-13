@@ -1,18 +1,17 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var mongoose = require('mongoose-q')(require('mongoose'), {spread:true});
-
-var Schema = mongoose.Schema;
-var ObjectId = Schema.ObjectId;
+var mongoose      = require('../utils/mongoose-q');
+var Schema        = mongoose.Schema;
+var ObjectId      = Schema.ObjectId;
 var mongooseUtils = require('../utils/mongoose-utils');
-var appEvents = require("../app-events");
-var _ = require("underscore");
-var winston = require("winston");
-var nconf = require("../utils/config");
-var shutdown = require('../utils/shutdown');
-var Fiber = require("../utils/fiber");
-var assert = require("assert");
+var appEvents     = require("../app-events");
+var _             = require("underscore");
+var winston       = require("winston");
+var nconf         = require("../utils/config");
+var shutdown      = require('../utils/shutdown');
+var Fiber         = require("../utils/fiber");
+var assert        = require("assert");
 
 
 // Install inc and dec number fields in mongoose
@@ -128,7 +127,7 @@ var UserSchema = new Schema({
 });
 UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ username: 1 }, { unique: true, sparse: true });
-UserSchema.index({ "emails.email" : 1 }, { unique: true });
+UserSchema.index({ "emails.email" : 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
 
 UserSchema.methods.getDisplayName = function() {
@@ -210,7 +209,6 @@ var UserTroupeFavouritesSchema = new Schema({
 });
 UserTroupeFavouritesSchema.index({ userId: 1 });
 UserTroupeFavouritesSchema.schemaTypeName = 'UserTroupeFavourites';
-
 
 //
 // User in a Troupe
@@ -319,14 +317,16 @@ var TroupeRemovedUserSchema = new Schema({
 TroupeRemovedUserSchema.index({ userId: 1 });
 TroupeRemovedUserSchema.schemaTypeName = 'TroupeRemovedUserSchema';
 
+var UserTroupeSettingsSchema = require('./persistence/user-troupe-settings-schema.js');
+
 //
 // An invitation to a person to join a Troupe
 //
 var InviteSchema = new Schema({
   troupeId:           { type: ObjectId, "default": null  }, // If this is null, the invite is to connect as a person
-  fromUserId:         { type: ObjectId }, // The user who initiated the invite
+  fromUserId:         { type: ObjectId, required: true }, // The user who initiated the invite
 
-  userId:             { type: ObjectId }, // The userId of the recipient, if they are already a troupe user
+  userId:             { type: ObjectId, "default": null }, // The userId of the recipient, if they are already a troupe user
 
   displayName:        { type: String },   // If !userId, the name of the recipient
   email:              { type: String },   // If !userId, the email address of the recipient
@@ -340,6 +340,16 @@ var InviteSchema = new Schema({
 InviteSchema.schemaTypeName = 'InviteSchema';
 InviteSchema.index({ userId: 1 });
 InviteSchema.index({ email: 1 });
+InviteSchema.path('userId').validate(function(v) {
+    if(!v) {
+      return !!this.email;
+    }
+}, 'Either {PATH} or email must be set');
+InviteSchema.path('email').validate(function(v) {
+    if(!v) {
+      return !!this.userId;
+    }
+}, 'Either {PATH} or userId must be set');
 
 
 var InviteUnconfirmedSchema = mongooseUtils.cloneSchema(InviteSchema);
@@ -593,6 +603,18 @@ SuggestedContactSchema.index({ userId: 1 });
 SuggestedContactSchema.index({ emails: 1 });
 SuggestedContactSchema.schemaTypeName = 'SuggestedContactSchema';
 
+/*
+ * Notifications opt-out
+ */
+var NotificationsPreferenceSchema = new Schema({
+  userId:  { type: ObjectId, ref: 'User' },
+  optIn:   Schema.Types.Mixed,
+  optOut:  Schema.Types.Mixed
+});
+NotificationsPreferenceSchema.index({ userId: 1} , { unique: true });
+NotificationsPreferenceSchema.schemaTypeName = 'NotificationsPreferenceSchema';
+
+
 
 var User = mongoose.model('User', UserSchema);
 var UserLocationHistory = mongoose.model('UserLocationHistory', UserLocationHistorySchema);
@@ -602,6 +624,7 @@ var UserTroupeFavourites = mongoose.model('UserTroupeFavourites', UserTroupeFavo
 var Troupe = mongoose.model('Troupe', TroupeSchema);
 var TroupeUser = mongoose.model('TroupeUser', TroupeUserSchema);
 var TroupeRemovedUser = mongoose.model('TroupeRemovedUser', TroupeRemovedUserSchema);
+var UserTroupeSettings = mongoose.model('UserTroupeSettings', UserTroupeSettingsSchema);
 var Email = mongoose.model('Email', EmailSchema);
 var EmailAttachment = mongoose.model('EmailAttachment', EmailAttachmentSchema);
 var Conversation = mongoose.model('Conversation', ConversationSchema);
@@ -628,6 +651,8 @@ var UriLookup = mongoose.model('UriLookup', UriLookupSchema);
 var Contact = mongoose.model('Contact', ContactSchema);
 var SuggestedContact = mongoose.model('SuggestedContact', SuggestedContactSchema);
 
+var NotificationsPreference = mongoose.model('NotificationsPreference', NotificationsPreferenceSchema);
+
 
 //
 // 8-May-2013: Delete this after it's been rolled into production!
@@ -649,6 +674,7 @@ module.exports = {
     TroupeSchema: TroupeSchema,
     TroupeUserSchema: TroupeUserSchema,
     TroupeRemovedUserSchema: TroupeRemovedUserSchema,
+    UserTroupeSettingsSchema: UserTroupeSettingsSchema,
     EmailSchema: EmailSchema,
     EmailAttachmentSchema: EmailAttachmentSchema,
     ConversationSchema: ConversationSchema,
@@ -664,7 +690,8 @@ module.exports = {
     PushNotificationDeviceSchema: PushNotificationDeviceSchema,
     UriLookupSchema: UriLookupSchema,
     ContactSchema: ContactSchema,
-    SuggestedContactSchema: SuggestedContactSchema
+    SuggestedContactSchema: SuggestedContactSchema,
+    NotificationsPreferenceSchema: NotificationsPreferenceSchema
   },
   User: User,
   UserTroupeLastAccess: UserTroupeLastAccess,
@@ -672,6 +699,7 @@ module.exports = {
   Troupe: Troupe,
   TroupeUser: TroupeUser,
   TroupeRemovedUser: TroupeRemovedUser,
+  UserTroupeSettings: UserTroupeSettings,
 	Email: Email,
   EmailAttachment: EmailAttachment,
   Conversation: Conversation,
@@ -691,7 +719,8 @@ module.exports = {
   PushNotificationDevice: PushNotificationDevice,
   UriLookup: UriLookup,
   Contact: Contact,
-  SuggestedContact: SuggestedContact
+  SuggestedContact: SuggestedContact,
+  NotificationsPreference: NotificationsPreference
 };
 
 process.nextTick(function() {

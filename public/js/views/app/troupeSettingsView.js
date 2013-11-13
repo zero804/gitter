@@ -8,8 +8,9 @@ define([
   'collections/instances/integrated-items',
   'hbs!./tmpl/troupeSettingsTemplate',
   'log!troupe-settings-view',
-  'utils/validate-wrapper'
-], function($, _, context, TroupeViews, troupeCollections, itemCollections, troupeSettingsTemplate, log, validation) {
+  'utils/validate-wrapper',
+  './integrationSettingsModal'
+], function($, _, context, TroupeViews, troupeCollections, itemCollections, troupeSettingsTemplate, log, validation, IntegrationSettingsModal) {
   "use strict";
 
 
@@ -25,7 +26,7 @@ define([
       'submit #troupeSettings': 'saveSettings',
       'click #cancel-troupe-settings' : 'closeSettings',
       'click #delete-troupe': 'deleteTroupe',
-      'click #leave-troupe': 'leaveTroupe'
+      'click #leave-troupe': 'leaveTroupe',
     },
 
     initialize: function() {
@@ -33,6 +34,21 @@ define([
       this.userCollection = itemCollections.users;
       this.$el.toggleClass('canLeave', this.canLeave());
       this.$el.toggleClass('canDelete', this.canDelete());
+
+      $.ajax({
+        url: '/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
+        type: "GET",
+        context: this,
+        success: function(settings) {
+          this.settings = settings && settings.push || "all";
+          this.$el.find("#notification-options").val(this.settings);
+          // this.trigger('settingsLoaded', settings);
+        },
+        error: function() {
+          log('An error occurred while communicating with notification settings');
+        }
+      });
+
     },
 
     closeSettings : function () {
@@ -42,6 +58,9 @@ define([
 
     afterRender: function() {
       this.validateForm();
+      if (this.settings) {
+        this.$el.find("#notification-options").val(this.settings);
+      }
     },
 
     canDelete: function() {
@@ -131,7 +150,9 @@ define([
       return _.extend({},
         context.getTroupe(), {
         canLeave: this.canLeave(),
-        canDelete: this.canDelete()
+        canDelete: this.canDelete(),
+        isNativeDesktopApp: context().isNativeDesktopApp,
+        troupeUrl: '//' + window.location.host + window.location.pathname
       });
     },
 
@@ -169,7 +190,7 @@ define([
       var troupeName = this.$el.find('input[name=name]').val().trim();
       var self = this;
 
-      if(context.troupe().get('name') === troupeName) {
+      if(context.troupe().get('name') === troupeName & this.settings == self.$el.find("#notification-options").val()) {
         self.dialog.hide();
         self.dialog = null;
         return;
@@ -184,9 +205,18 @@ define([
         type: "PUT",
         data: JSON.stringify({ name: troupeName }),
         success: function() {
+          $.ajax({
+            url: '/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
+            contentType: "application/json",
+            dataType: "json",
+            type: "PUT",
+            data: JSON.stringify({ push: self.$el.find("#notification-options").val() }),
+            success: function(data) {
+              self.dialog.hide();
+              self.dialog = null;
+            }
+          });
 
-          self.dialog.hide();
-          self.dialog = null;
         }
       });
     }

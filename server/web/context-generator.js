@@ -117,6 +117,11 @@ function determineDesktopNotifications(user, req) {
 
 }
 
+function isNativeDesktopApp(req) {
+  var agent = useragent.parse(req.headers['user-agent']);
+  return agent.family === 'Other';
+}
+
 function serializeUser(user) {
   var strategy = new restSerializer.UserStrategy({ includeEmail: true, includePasswordStatus: true, exposeRawDisplayName: true });
 
@@ -188,6 +193,7 @@ function createTroupeContext(req, options) {
       importedGoogleContacts: req.user && req.user.googleRefreshToken ? true : false,
       events: events,
       troupeUri: options.troupe ? options.troupe.uri : undefined,
-      troupeHash: options.troupeHash
+      troupeHash: options.troupeHash,
+      isNativeDesktopApp: isNativeDesktopApp(req)
     };
   }

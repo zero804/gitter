@@ -18,6 +18,7 @@ define([
     initialize: function(options) {
       // var self = this;
       if(!this.model) this.model = options.troupe;
+      this.tooltipPlacement = options.tooltipPlacement || 'vertical';
 
       if(!options.noUnread) {
         this.hasUnread = false;
@@ -65,7 +66,7 @@ define([
       var newUnread = this.model.get('unreadItems') > 0;
       if(!this.options.noUnread && this.hasUnread !== newUnread) {
         this.hasUnread = newUnread;
-        var $e = this.$el.find('.trpDisplayPicture');
+        var $e = this.$el.find('.trpMiniLeftMenuItem, .trpDisplayPicture');
 
         if(newUnread) {
           $e.addClass('unread');
@@ -84,7 +85,7 @@ define([
 
       this.$el.find('.avatar-s').first().tooltip({
         html : true,
-        placement : 'vertical',
+        placement : this.tooltipPlacement,
         container: "body"
       });
     }

@@ -5,19 +5,22 @@
 // require('./utils/profiler');
 
 /* Configure winston before all else! */
-var winston = require('./utils/winston');
+var winston  = require('./utils/winston');
 
-var express = require('express'),
-  http = require('http'),
-  nconf = require('./utils/config'),
-  redis = require('./utils/redis'),
-  shutdown = require('./utils/shutdown'),
-  oauth2 = require('./web/oauth2');
+var express  = require('express');
+var http     = require('http');
+var nconf    = require('./utils/config');
+var redis    = require('./utils/redis');
+var shutdown = require('./utils/shutdown');
+var oauth2   = require('./web/oauth2');
 
 /* Load express-resource */
 require('express-resource');
 
+
 var app = express();
+
+
 var server = http.createServer(app);
 
 var gracefullyClosing = false;

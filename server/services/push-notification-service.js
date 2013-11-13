@@ -2,16 +2,16 @@
 "use strict";
 
 var PushNotificationDevice = require("./persistence-service").PushNotificationDevice;
-var winston = require("winston");
-var nconf = require('../utils/config');
-var Fiber = require('../utils/fiber');
-var crypto = require('crypto');
-var _ = require('underscore');
-var redis = require("../utils/redis"),
-    redisClient = redis.createClient();
+var winston                = require("winston");
+var nconf                  = require('../utils/config');
+var Fiber                  = require('../utils/fiber');
+var crypto                 = require('crypto');
+var _                      = require('underscore');
+var redis                  = require("../utils/redis");
+var redisClient            = redis.createClient();
 
-var Scripto = require('redis-scripto');
-var scriptManager = new Scripto(redisClient);
+var Scripto                = require('redis-scripto');
+var scriptManager          = new Scripto(redisClient);
 scriptManager.loadFromDir(__dirname + '/../../redis-lua/notify');
 
 var minimumUserAlertIntervalS = nconf.get("notifications:minimumUserAlertInterval");

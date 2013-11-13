@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=IE9" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+  <link href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href='{{cdn "bootstrap/css/trpHooks.css" }}' type='text/css'>
+</head>
+
+<body style="margin-left: 8px">
+  {{#if hooks}}<p class="trpBodyMedium">Integrations</p>
+    {{#each hooks}}
+    <div class="trpHookItem">
+      <form style="width: 100%" method="post">
+        <div style="display: inline-block; float: right"><input type="submit" value="Delete" class="trpButtonSmall trpBtnRed"></div>
+        <div style="margin-right: 120px; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px; color: #999">
+          <input type="hidden" name="_method" value="delete">
+          <label class="trpBodySmall">
+            <div style="display: inline-block; width: 80px; color: #333">{{serviceDisplayName}}</div>
+            <span title="{{description}}">{{#if description}}{{description}}{{else}}<i>no description</i>{{/if}}</span></label>
+          <input type="hidden" name="id" value="{{_id}}">
+        </div>
+        
+      </form>
+    </div>
+    {{/each}}
+    <br>
+  {{else}}
+  <p class="trpBodyMedium">Notify your troupe of events by integrating with third-party services.</p>
+  {{/if}}
+    <span class="trpBodyMedium">Add an integration</span><br>
+  <form style="display: inline-block; margin-top: 6px" method="post">
+    <input type="hidden" name="service" value="github">
+    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="margin-left: 0; padding-bottom: 8px"><img src='{{cdn "images/2/icon-github@2x.png"}}' width="16" height="16" style="margin-right: 4px">GitHub</button>
+  </form>
+  <form style="display: inline-block;" method="post">
+    <input type="hidden" name="service" value="bitbucket">
+    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-bitbucket@2x.png"}}' width="16" height="16" style="margin-right: 4px">BitBucket</button>
+  </form>
+  <form style="display: inline-block;" method="post">
+    <input type="hidden" name="service" value="jenkins">
+    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-jenkins@2x.png"}}' width="16" height="16" style="margin-right: 4px">Jenkins</button>
+  </form>
+  <form style="display: inline-block;" method="post">
+    <input type="hidden" name="service" value="travis">
+    <button class="trpButtonMedium trpBtnLightGrey" type="submit" style="padding-bottom: 8px"><img src='{{cdn "images/2/icon-travis@2x.png"}}' width="16" height="16" style="margin-right: 4px">Travis</button>
+  </form>
+
+</body>
+</html>
