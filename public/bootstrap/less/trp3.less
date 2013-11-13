@@ -166,14 +166,13 @@ a:hover {
 .trpLeftMenu {
 	display: inline-block;
 	position: fixed;
-	width: 0px;
-	left: 84px;
+	width: 250px;
+	left: 0px;
 	top: 0px;
-	background-color: @trpGreen;
+	background-color: @trpDarkBlue;
 	height: 100%;
 	color: white;
 	z-index: 1012;
-	border-right: 2px solid @trpGreen;
 	padding-top: 18px;
 	margin-top: 0px;
 	overflow: hidden;
@@ -192,6 +191,9 @@ a:hover {
   }
 }
 
+.trpLeftMenuProfile {
+  .trpBodyMedium;
+}
 
 .trpLeftMenuContainer {
 width: 260px;
@@ -299,10 +301,11 @@ a.trpMiniLeftMenuItem {
 
 .trpLeftMenuWrapper {
   display: inline-block;
-	.trpBodyText;
-	padding-left: 20px;
+	.trpBodyMedium;
+	padding-left: 10px;
 	overflow-y: auto;
 	overflow-x: hidden;
+  font-weight: 300;
 }
 
 .trpLeftMenuToolbar {

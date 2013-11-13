@@ -10,15 +10,16 @@ define([
   'views/app/invitesView',
   'hbs!./tmpl/troupeMenu',
   './searchView',
-  "nanoscroller" // No ref!
-], function($, _, Marionette, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView) {
+  'utils/context',
+  'views/widgets/avatar'
+], function($, _, Marionette, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView, context, AvatarView) {
   "use strict";
 
   return Marionette.Layout.extend({
     template: template,
     tagName: 'span',
     selectedListIcon: "icon-troupes",
-    serializeData: function() { return { compactView: window._troupeCompactView }; },
+    serializeData: function() { return { user: context.getUser(), displayName: context.getUser().displayName }; },
 
     regions: {
       unread: "#left-menu-list-unread",
@@ -28,7 +29,7 @@ define([
       incomingTroupeInvites: "#left-menu-list-incoming-troupe-invites",
       recent: "#left-menu-list-recent",
       favs: "#left-menu-list-favourites",
-      troupes: "#left-menu-list",
+      troupes: "#left-menu-list-troupes",
       people: "#left-menu-list-users",
       search: "#left-menu-list-search"
     },
@@ -48,9 +49,14 @@ define([
       });
     },
 
-    onRender: function() {
-      this.$el.find('.nano').nanoScroller(/*{ preventPageScrolling: true }*/);
+    getRenderData: function() {
+      return {
+        user: context.getUser(),
+        displayName: context.getUser().displayName
+      };
+    },
 
+    onRender: function() {
       // normal troupe view
       this.troupes.show(new TroupeCollectionView({collection: troupeCollections.normalTroupes, emptyView: Marionette.ItemView.extend({ template: troupeListItemEmpty })}));
 
@@ -101,7 +107,6 @@ define([
       function toggler(element, collection) {
         function toggle() {
           self.$el.find(element).toggle(collection.length > 0);
-          self.$el.find('.nano').nanoScroller(/*{ preventPageScrolling: true }*/);
           self.toggleMegaList();
         }
 
@@ -169,7 +174,6 @@ define([
         this.activateSearchList();
       }
 
-      this.$el.find('.nano').nanoScroller(/*{ preventPageScrolling: true }*/);
     },
 
     activateSearchList: function() {

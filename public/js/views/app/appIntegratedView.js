@@ -14,8 +14,7 @@ define([
   'components/titlebar',
   'cocktail',
   'utils/scrollbar-detect',
-  'bootstrap_tooltip',  // no ref
-  "nanoscroller"        // no ref
+  'bootstrap_tooltip'  // no ref
   ], function($, TroupeViews, context, appEvents, Marionette, UsernameView, ProfileView, uiVars, AvatarView,
     notifications, modalRegion, TitlebarUpdater, cocktail, hasScrollBars) {
   "use strict";
@@ -52,7 +51,6 @@ define([
     files: false,
     originalRightMargin: "",
     regions: {
-      smartMenuRegion: "#smart-bar-items",
       leftMenuRegion: "#left-menu",
       rightPanelRegion: "#right-panel",
       rightToolbarRegion: "#toolbar-frame"
@@ -283,11 +281,11 @@ define([
     },
 
     onMouseEnterLeftMenu: function() {
-      $(".nano").nanoScroller({ preventPageScrolling: true });
+
     },
 
     onMouseEnterToolbar: function() {
-      $(".nano").nanoScroller({ preventPageScrolling: true });
+
     },
 
     onMouseLeaveToolbar: function() {
