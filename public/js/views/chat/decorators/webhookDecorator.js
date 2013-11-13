@@ -5,6 +5,7 @@ define([
   'hbs!./tmpl/github',
   'hbs!./tmpl/bitbucket',
   'hbs!./tmpl/jenkins',
+  'hbs!./tmpl/travis',
   'hbs!./tmpl/generic',
 ], function(
   TroupeViews, 
