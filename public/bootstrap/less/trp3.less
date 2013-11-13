@@ -1128,7 +1128,12 @@ a.trpMiniLeftMenuItem {
 	position: fixed;
 	top: 50px;
 	z-index: 900;
-  left: 82px;
+  left: 250px;
+
+  @media @small {
+    left: -1px;
+  }
+
 }
 
 .notification {
@@ -1138,6 +1143,7 @@ a.trpMiniLeftMenuItem {
 	.trpBodyMedium;
 	text-align: left;
 	margin: 1px;
+  opacity: 0.95;
 }
 
 .notification a {
