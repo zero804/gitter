@@ -1,6 +1,9 @@
-<div>
-  <img class="notification-icon" src="{{favicon}}"> {{user}} pushed {{commits.length}} commit(s)
+<div class="whicon">
+  <img class="notification-icon" src="{{favicon}}">
+</div>
 
+<div class="whbody">
+ {{user}} pushed {{commits.length}} commit(s)
   on <a href="https://bitbucket.org/{{repo}}">{{repo}}</a>
 
   <ul class="commits">
