@@ -11,6 +11,7 @@ define([
   githubTemplate,
   bitbucketTemplate,
   jenkinsTemplate,
+  travisTemplate,
   genericTemplate
 ) {
 
@@ -32,6 +33,9 @@ define([
     template: jenkinsTemplate
   });
 
+  var TravisView = TroupeViews.Base.extend({
+    template: travisTemplate
+  });
 
   function showNotificationIcon(chatItemView, meta) {
 
@@ -69,6 +73,9 @@ define([
         break;
       case 'jenkins':
         var webhookView = new JenkinsView();
+        break;
+      case 'travis':
+        var webhookView = new TravisView();
         break;
       default:
         var webhookView = new GenericView();
