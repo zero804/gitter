@@ -1,0 +1,565 @@
+<html>
+<head>
+
+<link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Signika:400,300,600' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
+</head>
+
+<style>
+
+@font-face {
+    font-family: "octicons";
+    src: url("https://github.global.ssl.fastly.net/assets/octicons-810348ca79b0f83691f16307908e3c3fee103f93.woff") format('woff');
+}
+
+body {
+  overflow: hidden;
+  height: 100%;
+}
+
+
+textarea, input { outline: none; }
+
+.scroller::-webkit-scrollbar {
+    width: 7px;
+}
+
+/* Track */
+.scroller::-webkit-scrollbar-track {
+/*    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); */
+}
+
+/* Handle */
+.scroller::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.2);
+    margin-right: 1px;
+    .transition300ms;
+}
+.scroller:hover::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.4);
+    margin-right: 1px;
+    .transition300ms;
+}
+.scroller::-webkit-scrollbar-thumb:window-inactive {
+  background: rgba(0,0,0,0.1);
+}
+
+::-webkit-input-placeholder {
+  opacity: 0.5;
+}
+
+.open {
+  font-family: 'Open Sans';
+  font-weight: 300;
+}
+.signika {
+  font-family: 'Signika';
+
+}
+.droid {
+  font-family: 'Droid Sans';
+}
+
+.profile {
+  font-size: 16px;
+  color: white;
+  font-weight: 300;
+  margin-bottom: 12px;
+}
+
+.left-menu {
+  float: left;
+  background-color: #17202a;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 250px;
+  padding-top: 20px;
+  padding-left: 20px;
+}
+
+.content {
+  margin-left: 270px;
+  margin-right: 262px;
+  padding-left: 0;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+}
+
+.right-menu {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 250px;
+/*  background-color: rgba(23,32,42,0.1);*/
+  padding-left: 20px;
+  padding-top: 20px;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+}
+
+.heading {
+  color: #EEE;
+  font-size: 12px;
+  margin-bottom: 2px;
+  font-weight: 400;
+}
+
+.right-menu .heading {
+  color: #333;
+}
+
+.item {
+  cursor: pointer;
+  margin-left: 4px;
+  color: #EEE;
+  font-size: 14px;
+  padding: 3px;
+  padding-left: 10px;
+  border-radius: 4px 0 0 4px;
+}
+
+.item:hover {
+  background-color: rgba(255,255,255,0.2);
+}
+
+.selected {
+  background-color: white;
+  color: #333;
+}
+
+.selected:hover {
+  background-color: white;
+}
+
+.repo:before {
+  font-family: 'octicons';
+  content: '\f001';
+  margin-right: 8px;
+  opacity: 0.8;
+  width: 16px;
+}
+
+.person {
+
+}
+
+.person:before {
+/*  font-family: 'octicons';*/
+/*  content: '\f00a';*/
+  content: "@";
+  margin-right: 8px;
+  opacity: 0.8;
+  width: 12px;
+}
+
+.org {
+
+}
+
+.org:before {
+  font-family: 'octicons';
+  content: '\f037';
+  margin-right: 8px;
+  opacity: 0.8;
+  width: 12px;
+}
+
+
+.room:before {
+  content: '#';
+  margin-right: 8px;
+  opacity: 0.8;
+  width: 12px;
+}
+
+.unread {
+  float: right;
+  background-color: #1dce73;
+  border-radius: 4px;
+  width: 18px;
+  height: 12px;
+  font-size: 10px;
+  margin-right: 22px;
+  padding-bottom: 2px;
+  text-align: center;
+  margin-top: 2px;
+}
+
+.search {
+  background-color: transparent;
+  border: 1px solid rgba(255,255,255, 0.6);
+  border-radius: 6px;
+  width: 230px;
+  font-size: 15px;
+  font-weight: 100;
+  font-family: 'Open Sans';
+  padding: 2px 4px 2px 6px;
+  color: rgba(255,255,255, 0.7);
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 22px;
+  padding-bottom: 18px;
+  padding-left: 32px;
+  padding-top: 18px;
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  background-color: white;
+  left: 270px;
+  right: 270px;
+}
+
+
+.topic {
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+.title-repo:before {
+
+}
+
+.chats {
+  padding-left: 32px;
+  overflow: scroll;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  padding-top: 90px;
+  right: 0;
+  left: 0;
+  margin-left: 262px;
+  margin-right: 262px;
+}
+
+.avatar-s {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+}
+
+.avatar-xs {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+}
+
+.chat-person {
+  font-size: 12px;
+  font-weight: 400;
+  display: inline-block;
+  color: rgba(0,0,0,0.2);
+  vertical-align: top;
+  margin-top: -2px;
+}
+
+.chat-text {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.chat-avatar {
+  float: left;
+  margin-right: 8px;
+}
+
+.filename {
+  background-color: rgba(23,32,42,0.1);
+  padding: 1px;
+  border-radius: 2px 0 0 2px;
+  padding-left: 6px;
+  cursor: pointer;
+  padding-right: 4px;
+}
+
+.filename:hover {
+  background-color: rgba(23,32,42,0.3);
+}
+
+.line-number {
+  background-color: rgba(23,32,42,0.2);
+  padding: 1px;
+  border-radius: 0 2px 2px 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.issue {
+  background-color: rgba(46,204,113,0.2);
+  padding: 1px 4px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.issue:hover {
+  background-color: rgba(46,204,113,0.4);
+}
+
+.issue-open {
+  background-color: rgba(231,76,60,0.2);
+  padding: 1px 4px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.issue-open:hover {
+  background-color: rgba(231,76,60,0.4);
+}
+
+.chat-item {
+  margin-bottom: 12px;
+}
+
+.people-list {
+  margin-top: 12px;
+}
+
+.people-list .chat-avatar {
+  margin-right: 4px;
+  margin-bottom: 4px;
+}
+
+.offline {
+  -webkit-filter: grayscale(80%);
+  -moz-filter: grayscale(80%);
+  filter: grayscale(80%);
+  opacity: 0.3;
+}
+
+.activity-list {
+  font-size: 12px;
+}
+
+.activity-item {
+  margin-bottom: 4px;
+  padding: 2px 6px;
+  border-radius: 2px 0 0 2px;
+  cursor: pointer;
+}
+
+.activity-item:hover {
+  background-color: #eee;
+}
+
+.date {
+  float: right;
+  opacity: 0.3;
+  margin-right: 20px
+}
+
+.act-push:before {
+  font-family: 'octicons';
+  content: '\f005';
+  margin-right: 8px;
+  opacity: 0.8;
+  width: 12px;
+}
+
+.act-issue-open:before {
+  font-family: 'octicons';
+  content: '\f026';
+  margin-right: 8px;
+  opacity: 0.8;
+  width: 12px;
+}
+.act-issue-close:before {
+  font-family: 'octicons';
+  content: '\f028';
+  margin-right: 8px;
+  opacity: 0.8;
+  width: 12px;
+}
+
+</style>
+
+<body>
+
+
+<div id="left-menu" class="left-menu">
+  <div id="profile" class="profile">
+    <img class="avatar" src="https://pbs.twimg.com/profile_images/3557388878/b143b6a24766a4b80d54b11d54f5cd59.jpeg" style="float: left">
+    <div style="vertical-align: top; margin-left: 60px" class="open">
+      <div>Nuno Job</div>
+      <div style="display: inline-block; border-radius: 50em; width: 6px; height: 6px; background-color: #1dce73; vertical-align: middle; margin-top: -6px"></div>
+      <div style="display: inline-block; font-size: 12px; color: #BBB; margin-top: -6px; vertical-align: middle">Online</div>
+    </div>
+  </div>
+  <div id="search open">
+    <input class="search" placeholder="search"/>
+  </div>
+  <div id="favourites" class="list open">
+    <div class="heading">FAVOURITES</div>
+    <div class="item">
+      <span class="org">Percent<span>
+        <div class="unread" style="float: right">6</div>
+    </div>
+    <div class="item selected"><span class="repo">dscape/nano<span></div>
+    <div class="item">
+      <span class="repo">joyent/node<span>
+        <div class="unread" style="float: right">12</div>
+    </div>
+    <div class="item">
+      <span class="person">Oli Evans<span>
+    </div>
+  </div>
+  <br>
+  <div id="unread" class="list open">
+    <div class="heading">UNREAD</div>
+    <div class="item">
+      <span class="room">Percent/payments<span>
+        <div class="unread" style="float: right">2</div>
+    </div>
+    <div class="item">
+      <span class="repo">progrium/dokku<span>
+        <div class="unread" style="float: right">6</div>
+    </div>
+    <div class="item">
+      <span class="org">The Node Firm<span>
+        <div class="unread" style="float: right">6</div>
+    </div>
+    <div class="item">
+      <span class="org">Nodeapps<span>
+      <div class="unread" style="float: right">2</div>
+    </div>
+  </div>
+  <br>
+  <div id="recent" class="list open">
+    <div class="heading">RECENT</div>
+    <div class="item">
+      <span class="repo">andrew/node-saas<span>
+    </div>
+    <div class="item">
+      <span class="room">Percent/auth<span>
+    </div>
+    <div class="item">
+      <span class="person">Andrew Nesbitt<span>
+    </div>
+    <div class="item">
+      <span class="repo">dscape/val<span>
+    </div>
+    <div class="item">
+      <span class="person">Mike Bartlett<span>
+    </div>
+    <div class="item">
+      <span class="person">Mauro Pompillio<span>
+    </div>
+    <div class="item">
+      <span class="repo">dotcloud/docker<span>
+    </div>
+  </div>
+
+</div>
+<div id="content" class="content scroller">
+  <div class="title open repo">dscape/nano<br><span class="topic">Please file any issues, preferably fix them yourself and send me a pull request.</span></div>
+  <div class="chats scroller">
+    <div class="chat-item">
+      <div class="chat-avatar"><img class="avatar-s" src="https://0.gravatar.com/avatar/8ca838dbb449a1359b5a4eadd26abb42?d=https%3A%2F%2Fidenticons.github.com%2F038149be654924d356ad5565e87f8ae9.png&r=x&s=440"/></div>
+      <div class="open chat-person">Alan Shaw</div>
+      <div class="open chat-text">hi, can anyone help me? i keep getting an error on <span class="filename">logger/index.js</span><span class="line-number">18</span></div>
+    </div>
+    <div class="chat-item">
+      <div class="chat-avatar"><img class="avatar-s" src="https://pbs.twimg.com/profile_images/3557388878/b143b6a24766a4b80d54b11d54f5cd59.jpeg"/></div>
+      <div class="open chat-person">Nuno</div>
+      <div class="open chat-text">what error message are you seeing Alan?</div>
+    </div>
+    <div class="chat-item">
+      <div class="chat-avatar"><img class="avatar-s" src="https://0.gravatar.com/avatar/8ca838dbb449a1359b5a4eadd26abb42?d=https%3A%2F%2Fidenticons.github.com%2F038149be654924d356ad5565e87f8ae9.png&r=x&s=440"/></div>
+      <div class="open chat-person">Alan Shaw</div>
+      <div class="open chat-text">Uncaught TypeError: Cannot call method 'assimilate' of undefined</div>
+    </div>
+    <div class="chat-item">
+      <div class="chat-avatar"><img class="avatar-s" src="https://dnsjy61awi9j1.cloudfront.net/avatar/m/4fd48c8040a7cc9644000022/9.jpg"/></div>
+      <div class="open chat-person">Mike Bartlett</div>
+      <div class="open chat-text">i saw the same thing yesterday</div>
+    </div>
+    <div class="chat-item">
+      <div class="chat-avatar"><img class="avatar-s" src="https://pbs.twimg.com/profile_images/3557388878/b143b6a24766a4b80d54b11d54f5cd59.jpeg"/></div>
+      <div class="open chat-person">Nuno</div>
+      <div class="open chat-text">ah, yes. i fixed that this morning as part of <span class="issue">#155</span></div>
+    </div>
+    <div class="chat-item">
+      <div class="chat-avatar"><img class="avatar-s" src="https://pbs.twimg.com/profile_images/3557388878/b143b6a24766a4b80d54b11d54f5cd59.jpeg"/></div>
+      <div class="open chat-person">Nuno</div>
+      <div class="open chat-text">there should be a new release coming out later this evening once i get back from football</div>
+    </div>
+    <div class="chat-item">
+      <div class="chat-avatar"><img class="avatar-s" src="https://0.gravatar.com/avatar/8ca838dbb449a1359b5a4eadd26abb42?d=https%3A%2F%2Fidenticons.github.com%2F038149be654924d356ad5565e87f8ae9.png&r=x&s=440"/></div>
+      <div class="open chat-person">Alan Shaw</div>
+      <div class="open chat-text">cool thanks</div>
+    </div>
+    <div class="chat-item">
+      <div class="chat-avatar"><img class="avatar-s" src="https://dnsjy61awi9j1.cloudfront.net/avatar/m/4fd48c8040a7cc9644000022/9.jpg"/></div>
+      <div class="open chat-person">Mike Bartlett</div>
+      <div class="open chat-text">are you able to take a look at <span class="issue-open">#166</span> too please? it's causing me no end of issues</div>
+    </div>
+    <div class="chat-item">
+      <div class="chat-avatar"><img class="avatar-s" src="https://pbs.twimg.com/profile_images/3557388878/b143b6a24766a4b80d54b11d54f5cd59.jpeg"/></div>
+      <div class="open chat-person">Nuno</div>
+      <div class="open chat-text">sure thing</div>
+    </div>
+    <div class="activity-item open" style="font-size: 12px; opacity: 0.6; margin-left: -4px; margin-bottom: 8px; margin-top: -6px">
+      <div class="activity-avatar act-push">Nuno Job pushed to master</div>
+    </div>
+    <div class="chat-item">
+      <div class="chat-avatar"><img class="avatar-s" src="https://pbs.twimg.com/profile_images/3557388878/b143b6a24766a4b80d54b11d54f5cd59.jpeg"/></div>
+      <div class="open chat-person">Nuno</div>
+      <div class="open chat-text">ok done you want to take a look?</div>
+    </div>
+    <div class="chat-item">
+      <div class="chat-avatar"><img class="avatar-s" src="https://dnsjy61awi9j1.cloudfront.net/avatar/m/4fd48c8040a7cc9644000022/9.jpg"/></div>
+      <div class="open chat-person">Mike Bartlett</div>
+      <div class="open chat-text">awesome, that did the trick!</div>
+    </div>
+    <div class="activity-item open" style="font-size: 12px; opacity: 0.6; margin-left: -4px; margin-bottom: 8px; margin-top: -6px">
+      <div class="activity-avatar act-issue-close">Mike Bartlett closed <span class="issue">#165</span></div>
+    </div>
+    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+  </div>
+
+</div>
+<div id="right-menu" class="right-menu">
+  <div class="heading open">PEOPLE</div>
+  <div class="people-list" style="height: 80px">
+    <div class="chat-avatar"><img class="avatar-s" src="https://pbs.twimg.com/profile_images/3557388878/b143b6a24766a4b80d54b11d54f5cd59.jpeg"></div>
+    <div class="chat-avatar"><img class="avatar-s" src="https://2.gravatar.com/avatar/19713cd13b43e2f16952fbca7b7b8298?d=https%3A%2F%2Fidenticons.github.com%2Fe23909d8468ff4942ccea268fbbcafd1.png&r=x&s=60"></div>
+    <div class="chat-avatar"><img class="avatar-s" src="https://dnsjy61awi9j1.cloudfront.net/avatar/m/4fd48c8040a7cc9644000022/9.jpg"></div>
+    <div class="chat-avatar"><img class="avatar-s" src="https://0.gravatar.com/avatar/8ca838dbb449a1359b5a4eadd26abb42?d=https%3A%2F%2Fidenticons.github.com%2F038149be654924d356ad5565e87f8ae9.png&r=x&s=440"></div>
+    <div class="chat-avatar offline"><img class="avatar-s" src="https://1.gravatar.com/avatar/b1d59a804bd67487c964bc505a8eb892?d=https%3A%2F%2Fidenticons.github.com%2F77edbe5f897a5dbcde49d31bec1537b8.png&r=x&s=60"></div>
+    <div class="chat-avatar offline"><img class="avatar-s" src="https://0.gravatar.com/avatar/a5e27d15f41b352e44ae2867834e0275?d=https%3A%2F%2Fidenticons.github.com%2F4dccd8414a8252a6d2b4ac2119429506.png&r=x&s=60"></div>
+    <div class="chat-avatar offline"><img class="avatar-s" src="https://2.gravatar.com/avatar/d7d0d2012a57ddb301fc1269681035ff?d=https%3A%2F%2Fidenticons.github.com%2F91ad0e71c63f672b8995ce2b21bbd4aa.png&r=x&s=60"></div>
+    <div class="chat-avatar offline"><img class="avatar-s" src="https://1.gravatar.com/avatar/a4fa2e5a04dfad8b71cd83c8becb42a3?d=https%3A%2F%2Fidenticons.github.com%2F7274f01abe1fc0622bd2ff06724950c1.png&r=x&s=60"></div>
+    <div class="chat-avatar offline"><img class="avatar-s" src="https://2.gravatar.com/avatar/a4d36028a8b5a07a29807e14253f5280?d=https%3A%2F%2Fidenticons.github.com%2Fd546b714ed5f4a6ca448cf6532f19576.png&r=x&s=60"></div>
+  </div>
+  <div class="heading open">ACTIVITY</div>
+  <div class="activity-list open" style="margin-top: 8px">
+    <div class="activity-item">
+      <div class="activity-avatar act-push">Nuno Job pushed to master<span class="date">20:48</span></div>
+    </div>
+    <div class="activity-item">
+      <div class="activity-avatar act-issue-open">Pedro opened <span class="issue-open">#221<span class="date">09:20</span></div>
+   </div>
+   <div class="activity-item">
+      <div class="activity-avatar act-issue-close">Mike Bartlett closed <span class="issue">#165</span><span class="date">09:20</span></div>
+   </div>
+  </div>
+</div>
+
+</body>
+</html>
