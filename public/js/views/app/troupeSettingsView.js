@@ -151,7 +151,8 @@ define([
         context.getTroupe(), {
         canLeave: this.canLeave(),
         canDelete: this.canDelete(),
-        isNativeDesktopApp: context().isNativeDesktopApp
+        isNativeDesktopApp: context().isNativeDesktopApp,
+        troupeUrl: '//' + window.location.host + window.location.pathname
       });
     },
 
