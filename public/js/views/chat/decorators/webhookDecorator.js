@@ -6,6 +6,7 @@ define([
   'hbs!./tmpl/bitbucket',
   'hbs!./tmpl/jenkins',
   'hbs!./tmpl/travis',
+  'hbs!./tmpl/sprintly',
   'hbs!./tmpl/generic',
 ], function(
   TroupeViews, 
@@ -13,6 +14,7 @@ define([
   bitbucketTemplate,
   jenkinsTemplate,
   travisTemplate,
+  sprintlyTemplate,
   genericTemplate
 ) {
 
@@ -37,6 +39,11 @@ define([
   var TravisView = TroupeViews.Base.extend({
     template: travisTemplate
   });
+
+  var SprintlyView = TroupeViews.Base.extend({
+    template: sprintlyTemplate
+  });
+
 
   function showNotificationIcon(chatItemView, meta) {
 
@@ -77,6 +84,9 @@ define([
         break;
       case 'travis':
         var webhookView = new TravisView();
+        break;
+      case 'sprintly':
+        var webhookView = new SprintlyView();
         break;
       default:
         var webhookView = new GenericView();
