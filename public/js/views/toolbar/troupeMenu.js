@@ -11,8 +11,8 @@ define([
   'hbs!./tmpl/troupeMenu',
   './searchView',
   'utils/context',
-  'views/widgets/avatar'
-], function($, _, Marionette, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView, context, AvatarView) {
+  'nanoscroller' //no ref
+], function($, _, Marionette, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView, context) {
   "use strict";
 
   return Marionette.Layout.extend({
@@ -35,9 +35,7 @@ define([
     },
 
     events: {
-      "click .left-menu-icon":    "onLeftMenuListIconClick",
-      "mouseenter .left-menu-icon":       "onMouseEnterToolbarItem",
-      "mouseleave .left-menu-icon":       "onMouseLeaveToolbarItem"
+
     },
 
     initialize: function() {
@@ -47,13 +45,6 @@ define([
       $(window).on('showSearch', function() {
         self.showSearch();
       });
-    },
-
-    getRenderData: function() {
-      return {
-        user: context.getUser(),
-        displayName: context.getUser().displayName
-      };
     },
 
     onRender: function() {
@@ -95,7 +86,7 @@ define([
 
     initHideListeners: function() {
       var self = this;
-
+      console.dir(troupeCollections.peopleTroupes.toJ);
       toggler('#unreadTroupesList', troupeCollections.unreadTroupes);
       toggler('#favTroupesList', troupeCollections.favouriteTroupes);
       toggler('#recentTroupesList', troupeCollections.recentTroupes);
@@ -107,7 +98,7 @@ define([
       function toggler(element, collection) {
         function toggle() {
           self.$el.find(element).toggle(collection.length > 0);
-          self.toggleMegaList();
+          self.$el.find('.nano').nanoScroller(/*{ preventPageScrolling: true }*/);
         }
 
         collection.on('all', toggle);
@@ -115,85 +106,9 @@ define([
       }
     },
 
-    toggleMegaList: function() {
-      var c = troupeCollections;
-      var invisibile = (c.unreadTroupes.length === 0 && c.favouriteTroupes.length === 0 && c.recentTroupes.length === 0 && c.incomingInvites.length === 0);
-
-      var icon = this.$el.find('#icon-mega');
-      if (invisibile) {
-        icon.hide();
-        if (!this.selectedListIcon || this.selectedListIcon === 'icon-mega') {
-          this.showTab('icon-troupes');
-        }
-      }
-      else {
-        icon.show();
-        this.showTab('icon-mega');
-      }
-    },
-
-    onLeftMenuListIconClick: function(e) {
-      var selected = $(e.target).attr('id');
-      this.showTab(selected);
-    },
-
-    showTab: function(selected) {
-      // make sure focus is on the search box (even if the tab was already open)
-      if (this.selectedListIcon == 'icon-search') {
-        this.activateSearchList();
-      }
-
-      // just in case the on mouse over event wasn't run
-      this.onMouseEnterToolbarItem({ target: this.$el.find('#' + selected) });
-
-      // if the tab was already open do nothing
-      if(selected === this.selectedListIcon) return;
-
-      // Turn off the old selected list
-      var currentSelection = this.$el.find("#"+this.selectedListIcon);
-      currentSelection.removeClass('selected').fadeTo(100, 0.6);
-      var listElement = currentSelection.data('list');
-
-      this.$el.find("#" + listElement).hide();
-
-      // TODO: We probably want to destroy the list to remove the dom elements
-
-      // enable the new selected list
-      this.selectedListIcon = selected;
-      var newSelection = this.$el.find("#" + this.selectedListIcon);
-
-      newSelection.addClass('selected');
-      listElement = newSelection.data('list');
-
-      this.$el.find("#" + listElement).show();
-
-      // TODO: Related to the above TODO, we probably only want to populate the list now
-
-      // make sure focus is on the search box (must be done now as well, after the elements are actually displayed)
-      if (this.selectedListIcon == 'icon-search') {
-        this.activateSearchList();
-      }
-
-    },
-
     activateSearchList: function() {
       this.$el.find('#list-search-input').focus();
     },
-
-    showSearch: function() {
-      this.showTab('icon-search');
-    },
-
-    onMouseEnterToolbarItem: function(e) {
-      $(e.target).fadeTo(100, 1.0);
-    },
-
-    onMouseLeaveToolbarItem: function(e) {
-      if ($(e.target).hasClass('selected')) return true;
-
-      $(e.target).fadeTo(100, 0.6);
-    }
-
 
   });
 

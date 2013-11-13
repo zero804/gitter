@@ -35,13 +35,9 @@
   <div class="trpLeftMenu" id="left-menu"></div>
   
 
-<div class="trpMenuTab" id="menu-toggle-button" style='display: none;'><img src='{{cdn "images/2/menu-toggle.png" }}' width="40" height="40" id="menu-toggle">
-  {{#if unreadCount}}
-  <div class="trpUnreadBadge" id="unread-badge" style="display: block;">{{unreadCount}}</div>
-  {{else}}
-  <div class="trpUnreadBadge" id="unread-badge"></div>
-  {{/if}}
-</div>
+<div class="trpMenuTab" id="menu-toggle-button">{{#if unreadCount}}{{unreadCount}}{{else}}0{{/if}}</div>
+
+
 
 <div class="trpAlertWrapper" id="alert-panel">
   <div class="trpAlertContainer">
