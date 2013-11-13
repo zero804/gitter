@@ -57,19 +57,17 @@ define([
       // one to one troupe view
       this.people.show(new TroupeCollectionView({collection: troupeCollections.peopleTroupes, emptyView: Marionette.ItemView.extend({ template: privateTroupeListItemEmpty })}));
 
-      if (window._troupeCompactView) {
-        // mega-list: recent troupe view
-        this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentTroupes }));
+      // mega-list: recent troupe view
+      this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentTroupes }));
 
-        // mega-list: unread troupe view
-        this.unread.show(new TroupeCollectionView({collection: troupeCollections.unreadTroupes }));
+      // mega-list: unread troupe view
+      this.unread.show(new TroupeCollectionView({collection: troupeCollections.unreadTroupes }));
 
-        // mega-list: favourite troupe view
-        this.favs.show(new TroupeCollectionView({ collection: troupeCollections.favouriteTroupes }));
+      // mega-list: favourite troupe view
+      this.favs.show(new TroupeCollectionView({ collection: troupeCollections.favouriteTroupes }));
 
-        // mega-list: incoming invites collection view
-        this.invites.show(new InvitesView({ collection: troupeCollections.incomingInvites }));
-      }
+      // mega-list: incoming invites collection view
+      this.invites.show(new InvitesView({ collection: troupeCollections.incomingInvites }));
 
       // incoming troupe invites view
       this.incomingTroupeInvites.show(new InvitesView({ collection: troupeCollections.incomingTroupeInvites }));
@@ -87,10 +85,6 @@ define([
       this.initHideListeners();
 
       var self = this;
-      if (!window._troupeCompactView) {
-        self.showTab('icon-troupes');
-      }
-
     },
 
     initHideListeners: function() {
@@ -117,21 +111,19 @@ define([
     },
 
     toggleMegaList: function() {
-      if (window._troupeCompactView) {
-        var c = troupeCollections;
-        var invisibile = (c.unreadTroupes.length === 0 && c.favouriteTroupes.length === 0 && c.recentTroupes.length === 0 && c.incomingInvites.length === 0);
+      var c = troupeCollections;
+      var invisibile = (c.unreadTroupes.length === 0 && c.favouriteTroupes.length === 0 && c.recentTroupes.length === 0 && c.incomingInvites.length === 0);
 
-        var icon = this.$el.find('#icon-mega');
-        if (invisibile) {
-          icon.hide();
-          if (!this.selectedListIcon || this.selectedListIcon === 'icon-mega') {
-            this.showTab('icon-troupes');
-          }
+      var icon = this.$el.find('#icon-mega');
+      if (invisibile) {
+        icon.hide();
+        if (!this.selectedListIcon || this.selectedListIcon === 'icon-mega') {
+          this.showTab('icon-troupes');
         }
-        else {
-          icon.show();
-          this.showTab('icon-mega');
-        }
+      }
+      else {
+        icon.show();
+        this.showTab('icon-mega');
       }
     },
 
