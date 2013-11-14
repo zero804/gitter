@@ -3,18 +3,16 @@ define([
   'jquery',
   'underscore',
   'marionette',
-  'views/base',
   'collections/instances/troupes',
   'views/toolbar/troupeCollectionView',
   'hbs!views/toolbar/tmpl/troupeListItemEmpty',
   'hbs!views/toolbar/tmpl/privateTroupeListItemEmpty',
   'views/app/invitesView',
   'hbs!./tmpl/troupeMenu',
-  'hbs!./tmpl/profile',
   './searchView',
-  'utils/context',
+  './profileView',
   'nanoscroller' //no ref
-], function($, _, Marionette, TroupeViews, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, profTemp, SearchView, context) {
+], function($, _, Marionette, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView, ProfileView) {
   "use strict";
 
   return Marionette.Layout.extend({
@@ -50,15 +48,6 @@ define([
     },
 
     onRender: function() {
-      var ProfileView = TroupeViews.Base.extend({
-        template: profTemp,
-        getRenderData: function() {
-          return {
-            displayName: context.getUser().displayName,
-            user: context.user()
-          };
-        }
-      });
 
       this.profile.show(new ProfileView());
 
@@ -94,8 +83,6 @@ define([
       this.search.show(this.searchView);
 
       this.initHideListeners();
-
-      var self = this;
     },
 
     initHideListeners: function() {
