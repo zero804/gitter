@@ -35,7 +35,7 @@ define([
     },
 
     events: {
-
+      "click #search-clear-icon" : "onSearchClearIconClick"
     },
 
     initialize: function() {
@@ -44,6 +44,9 @@ define([
       var self = this;
       $(window).on('showSearch', function() {
         self.showSearch();
+      });
+      $(window).on('hideSearch', function() {
+        self.hideSearch();
       });
     },
 
@@ -84,6 +87,11 @@ define([
       var self = this;
     },
 
+    onSearchClearIconClick: function() {
+      $('#list-search-input').val('');
+      this.hideSearch();
+    },
+
     initHideListeners: function() {
       var self = this;
       toggler('#unreadTroupesList', troupeCollections.unreadTroupes);
@@ -107,6 +115,16 @@ define([
 
     activateSearchList: function() {
       this.$el.find('#list-search-input').focus();
+    },
+
+    hideSearch: function() {
+      this.$el.find('#list-search').hide();
+      this.$el.find('#list-mega').show();
+    },
+
+    showSearch: function() {
+      this.$el.find('#list-mega').hide();
+      this.$el.find('#list-search').show();
     },
 
   });
