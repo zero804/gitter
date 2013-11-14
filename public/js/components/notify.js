@@ -26,7 +26,7 @@ define([
 
     function hide() {
       n.animate({ width: 0 }, function() {
-        // n.hide('slow');
+        n.hide();
       });
     }
 
