@@ -22,6 +22,7 @@ define([
       // listen for keypresses on the input
       var self = this;
       this.$input.on('keyup', function(e) {
+        $(window).trigger('showSearch');
         return self.keyPress(e);
       });
     },
@@ -31,6 +32,8 @@ define([
 
       query = query.toLowerCase().trim();
 
+      if (query === '') 
+        $(window).trigger('hideSearch');
       // don't do anything if the search term hasn't changed
       if (query === this.query)
         return;
