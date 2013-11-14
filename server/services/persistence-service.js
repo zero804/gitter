@@ -123,6 +123,7 @@ var UserSchema = new Schema({
     }
   },
   googleRefreshToken: String,
+  usernameSuggestion: { type: String },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 UserSchema.index({ email: 1 }, { unique: true });

@@ -81,6 +81,7 @@ var signupService = module.exports = {
           return userService.findOrCreateUserForEmail({
             source: 'gitterpromo',
             displayName: options.displayName,
+            usernameSuggestion: options.username,
             email: emails.shift()
           });
         });

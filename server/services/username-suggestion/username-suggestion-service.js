@@ -5,7 +5,6 @@
 
 var Q = require('q');
 var _ = require('underscore');
-var userService = require('../user-service');
 var uriLookupService = require('../uri-lookup-service');
 
 var persistence = require('../persistence-service');
@@ -23,6 +22,7 @@ var userInfoServices = [
 ];
 
 var SERVICE_RANKINGS = [
+  'suggestion',
   'twitter',
   'gravatar',
   'facebook',
@@ -77,9 +77,15 @@ function lookupPotentialUsernamesForEmail(email) {
 
 
 function lookupPotentialUsernamesForUser(user) {
-  var promises = [lookupPotentialUsernamesForEmail(user.email)]
+  var promises = lookupSuggestedUsernamesForUser(user)
+                    .concat(lookupPotentialUsernamesForEmail(user.email))
                     .concat(lookupPotentialUsernamesForDisplayName(user.displayName));
   return Q.all(promises);
+}
+
+function lookupSuggestedUsernamesForUser(user) {
+  if(!user.usernameSuggestion) return [];
+  return [{ service: 'suggestion', username: user.usernameSuggestion }];
 }
 
 function lookupPotentialUsernamesForDisplayName(displayName) {
