@@ -10,18 +10,18 @@ define([
   'views/app/invitesView',
   'hbs!./tmpl/troupeMenu',
   './searchView',
-  'utils/context',
+  './profileView',
   'nanoscroller' //no ref
-], function($, _, Marionette, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView, context) {
+], function($, _, Marionette, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView, ProfileView) {
   "use strict";
 
   return Marionette.Layout.extend({
     template: template,
     tagName: 'span',
     selectedListIcon: "icon-troupes",
-    serializeData: function() { return { user: context.getUser(), displayName: context.getUser().displayName }; },
 
     regions: {
+      profile: "#left-menu-profile",
       unread: "#left-menu-list-unread",
       invites: "#left-menu-list-invites",
       outgoingConnectionInvites: "#left-menu-list-outgoing-connection-invites",
@@ -51,6 +51,9 @@ define([
     },
 
     onRender: function() {
+
+      this.profile.show(new ProfileView());
+
       // normal troupe view
       this.troupes.show(new TroupeCollectionView({collection: troupeCollections.normalTroupes, emptyView: Marionette.ItemView.extend({ template: troupeListItemEmpty })}));
 
@@ -83,8 +86,6 @@ define([
       this.search.show(this.searchView);
 
       this.initHideListeners();
-
-      var self = this;
     },
 
     onSearchClearIconClick: function() {
