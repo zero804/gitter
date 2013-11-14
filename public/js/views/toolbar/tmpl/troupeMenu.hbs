@@ -3,7 +3,7 @@
     {{ widget "avatar" user=user size='s' }}
     {{displayName}}
   </div>
-  <input class="trpLeftMenuSearch" placeholder="search"/>
+  <input class="trpLeftMenuSearch" id="list-search-input" placeholder="search"/>
   <div class="nano" id="left-menu-scroll">
     <div class="content trpLeftMenuWrapper">
       <div class="trpToolbarList" id="list-mega">
@@ -34,7 +34,6 @@
       </div>
       <div class="trpToolbarList" style="display:none" id="list-search">
         <div class="trpToolbarHeader">Search</div>
-        <div class="trpTroupeListSearch"><input type="text" class="trpInputSmall" id="list-search-input"></div>
         <ul class="trpTroupeList" id="left-menu-list-search">
         </ul>
       </div>
