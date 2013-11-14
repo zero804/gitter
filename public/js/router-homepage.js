@@ -24,7 +24,6 @@ require([
 
   var appView = new AppIntegratedView();
   appView.leftMenuRegion.show(new TroupeMenuView());
-  appView.smartMenuRegion.show(new SmartCollectionView({ collection: troupeCollections.smart }));
 
   new UserHomeView({ el: '#content-wrapper' }).render();
 
