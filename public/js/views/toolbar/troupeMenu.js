@@ -35,12 +35,13 @@ define([
     },
 
     events: {
-      "click #search-clear-icon" : "onSearchClearIconClick"
+      "click #search-clear-icon" : "onSearchClearIconClick",
+      "click #left-menu-profile" : "onClickProfileMenu"
     },
 
     initialize: function() {
       this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
-
+      this.profileShown = false;
       var self = this;
       $(window).on('showSearch', function() {
         self.showSearch();
@@ -116,6 +117,30 @@ define([
 
     activateSearchList: function() {
       this.$el.find('#list-search-input').focus();
+    },
+
+    showProfile: function() {
+      $('#left-menu-profile').addClass('active');
+      $('#profile-menu').slideDown();
+      $('#left-menu-scroll').addClass('pushed');
+      this.profileShown = true;
+    },
+
+    hideProfile: function() {
+      $('#left-menu-scroll').removeClass('pushed');
+      $('#profile-menu').slideUp("fast", function() {
+        $('#left-menu-profile').removeClass('active');
+      });
+      this.profileShown = false;
+    },
+
+    onClickProfileMenu: function() {
+      if (!this.profileShown) {
+        this.showProfile();
+      }
+      else {
+        this.hideProfile();
+      }
     },
 
     hideSearch: function() {

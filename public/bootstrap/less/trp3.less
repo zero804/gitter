@@ -189,7 +189,7 @@ a:hover {
 	height: 100%;
 	color: white;
 	z-index: 1012;
-	padding-top: 18px;
+	padding-top: 4px;
 	margin-top: 0px;
 	overflow: hidden;
   transition:opacity 0.5s ease-in-out 0s, left .5s ease-in-out 0.3s;
@@ -228,6 +228,61 @@ a:hover {
 
 .trpLeftMenuProfile {
   .trpBodyMedium;
+  padding: 10px 0 10px 10px;
+  cursor: pointer;
+
+  .avatar-s {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.trpLeftMenuProfile.active {
+  background-color: rgba(255,255,255,0.2);
+}
+
+.trpLeftMenuProfileMenu {
+  display: none;
+  box-sizing: border-box;
+  background-color: rgba(255,255,255,0.2);
+  padding-bottom: 12px;
+  overflow: hidden;
+  width: 100%;
+  color: white;
+  .trpBodyMedium;
+  font-weight: 300;
+  line-height: 24px;
+  padding-right: 20px;
+  box-sizing: border-box;
+
+  a {
+    color: white;
+    text-decoration: none;
+  }
+
+  .item {
+    padding-left: 10px;
+    margin-right: 10px;
+  }
+
+  .item:hover {
+    border-radius: 0 4px 4px 0;
+    background-color: rgba(255,255,255,0.2);
+  }
+
+}
+
+.trpLeftMenuProfile:hover {
+  background-color: rgba(255,255,255,0.2);
+}
+
+.trpLeftMenuProfileName {
+  display: inline-block;
+  vertical-align: top; 
+  padding-top: 7px;
+  font-weight: 300;
+  font-size: 16px;
+  margin-left: 8px;
 }
 
 .trpLeftMenuContainer {
@@ -322,13 +377,18 @@ a.trpMiniLeftMenuItem {
 
 .trpLeftMenu .nano {
 	position: absolute;
-	top: 120px;
-	bottom: 90px;
+	top: 124px;
+	bottom: 70px;
+  .transition300ms;
+}
+
+.trpLeftMenu .nano.pushed {
+  margin-top: 80px;
 }
 
 .trpLeftMenuActions {
 	position: absolute;
-	bottom: 40px;
+	bottom: 20px;
 	overflow: hidden;
   box-sizing: border-box;
   padding: 0 10px;
@@ -398,7 +458,7 @@ a.trpMiniLeftMenuItem {
 .trpSearchClear {
   position: relative;
   left: -20px;
-  top: -2px;
+  top: -3px;
   opacity: 0.8;
 }
 
