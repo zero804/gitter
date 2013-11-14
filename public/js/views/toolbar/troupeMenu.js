@@ -3,25 +3,27 @@ define([
   'jquery',
   'underscore',
   'marionette',
+  'views/base',
   'collections/instances/troupes',
   'views/toolbar/troupeCollectionView',
   'hbs!views/toolbar/tmpl/troupeListItemEmpty',
   'hbs!views/toolbar/tmpl/privateTroupeListItemEmpty',
   'views/app/invitesView',
   'hbs!./tmpl/troupeMenu',
+  'hbs!./tmpl/profile',
   './searchView',
   'utils/context',
   'nanoscroller' //no ref
-], function($, _, Marionette, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView, context) {
+], function($, _, Marionette, TroupeViews, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, profTemp, SearchView, context) {
   "use strict";
 
   return Marionette.Layout.extend({
     template: template,
     tagName: 'span',
     selectedListIcon: "icon-troupes",
-    serializeData: function() { return { user: context.getUser(), displayName: context.getUser().displayName }; },
 
     regions: {
+      profile: "#left-menu-profile",
       unread: "#left-menu-list-unread",
       invites: "#left-menu-list-invites",
       outgoingConnectionInvites: "#left-menu-list-outgoing-connection-invites",
@@ -48,6 +50,18 @@ define([
     },
 
     onRender: function() {
+      var ProfileView = TroupeViews.Base.extend({
+        template: profTemp,
+        getRenderData: function() {
+          return {
+            displayName: context.getUser().displayName,
+            user: context.user()
+          };
+        }
+      });
+
+      this.profile.show(new ProfileView());
+
       // normal troupe view
       this.troupes.show(new TroupeCollectionView({collection: troupeCollections.normalTroupes, emptyView: Marionette.ItemView.extend({ template: troupeListItemEmpty })}));
 
