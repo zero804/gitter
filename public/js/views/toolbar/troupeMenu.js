@@ -86,7 +86,6 @@ define([
 
     initHideListeners: function() {
       var self = this;
-      console.dir(troupeCollections.peopleTroupes.toJ);
       toggler('#unreadTroupesList', troupeCollections.unreadTroupes);
       toggler('#favTroupesList', troupeCollections.favouriteTroupes);
       toggler('#recentTroupesList', troupeCollections.recentTroupes);

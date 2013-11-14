@@ -11,6 +11,7 @@ define([
   return TroupeCollectionView.extend({
 
     initialize: function(options) {
+
       this.queries = {}; // { query: results }
       this.troupes = options.troupes;
       this.collection = new Backbone.Collection();
