@@ -36,7 +36,8 @@ define([
     "click #left-menu-icon":            "toggleMenu",
     "click #search-icon":               "toggleMenu",
     "click #troupe-icon":               "toggleMenu",
-    "click #troupe-more-actions":       "toggleTroupeMenu"
+    "click #troupe-more-actions":       "toggleTroupeMenu",
+    "click #favourite-button":          "toggleFavourite"
   };
 
   $('.trpDisplayPicture').tooltip('destroy');
@@ -247,6 +248,20 @@ define([
       } else {
         this.showMenu();
       }
+    },
+
+    toggleFavourite: function() {
+      var favHeader = $('.trpTroupeFavourite');
+      favHeader.toggleClass('favourited');
+      var isFavourite = favHeader.hasClass('favourited');
+
+      $.ajax({
+        url: '/troupes/' + context.getTroupeId(),
+        contentType: "application/json",
+        dataType: "json",
+        type: "PUT",
+        data: JSON.stringify({ favourite: isFavourite })
+      });
     },
 
     toggleAlert: function() {

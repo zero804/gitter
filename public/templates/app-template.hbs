@@ -48,6 +48,15 @@
 
 <div class="trpContentPanel primary-scroll" id="content-wrapper">
   <div class="trpChatPanel" id="chat-frame">
+    <header>
+      <div class="trpTroupeFavourite {{#if troupeContext.troupe.favourite}}favourited{{/if}}" id="favourite-button">
+          <div style="display: inline-block; vertical-align: middle">
+            <img src='{{cdn "images/2/icon-favourite-selected.png" }}' class="trpHeaderFavIcon favourited" width="24" height="24">
+            <img src='{{cdn "images/2/icon-favourite-unselected.png" }}' class="trpHeaderFavIcon unfavourited" width="24" height="24">
+          </div>
+        </div>
+      <h1>{{troupeName}}</h1>
+    </header>
     <div class="trpChatContainer" id="content-frame">
     </div>
   </div>

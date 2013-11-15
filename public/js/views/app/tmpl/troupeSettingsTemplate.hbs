@@ -26,9 +26,11 @@
       {{#if canLeave}}
       <button type="button" class="trpModalButton trpButtonMedium trpBtnLightGrey" id="leave-troupe">Leave this Troupe</button>
       {{/if}}
-      {{#unless isNativeDesktopApp}}
+      {{#if isNativeDesktopApp}}
+      <a href="{{troupeUrl}}#|integrations" target="_blank" class="trpModalButton trpButtonMedium trpBtnLightGrey">Integrations...</a>
+      {{else}}
       <a href="#|integrations" class="trpModalButton trpButtonMedium trpBtnLightGrey">Integrations...</a>
-      {{/unless}}
+      {{/if}}
       <br><br>
       <p class="trpBodySmall">You can delete a Troupe once you are the only person left in the Troupe</p>
   </div>
