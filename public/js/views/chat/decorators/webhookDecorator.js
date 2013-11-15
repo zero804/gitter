@@ -5,12 +5,16 @@ define([
   'hbs!./tmpl/github',
   'hbs!./tmpl/bitbucket',
   'hbs!./tmpl/jenkins',
+  'hbs!./tmpl/travis',
+  'hbs!./tmpl/sprintly',
   'hbs!./tmpl/generic',
 ], function(
   TroupeViews, 
   githubTemplate,
   bitbucketTemplate,
   jenkinsTemplate,
+  travisTemplate,
+  sprintlyTemplate,
   genericTemplate
 ) {
 
@@ -30,6 +34,14 @@ define([
 
   var JenkinsView = TroupeViews.Base.extend({
     template: jenkinsTemplate
+  });
+
+  var TravisView = TroupeViews.Base.extend({
+    template: travisTemplate
+  });
+
+  var SprintlyView = TroupeViews.Base.extend({
+    template: sprintlyTemplate
   });
 
 
@@ -69,6 +81,12 @@ define([
         break;
       case 'jenkins':
         var webhookView = new JenkinsView();
+        break;
+      case 'travis':
+        var webhookView = new TravisView();
+        break;
+      case 'sprintly':
+        var webhookView = new SprintlyView();
         break;
       default:
         var webhookView = new GenericView();

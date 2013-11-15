@@ -221,8 +221,8 @@
 }
 
 
-.trpChatContainer div:first-child .trpChatItem {
-  padding-top: 16px;
+.trpChatContainer > div:first-child {
+  padding-top: 46px;
 }
 
 .trpChatItem iframe {
@@ -262,13 +262,27 @@
     margin-right: 5px;
     margin-left: 3px;
   }
+
   .transparent {
     background: transparent !important;
   }
+
   .commits {
     font-size: 12px;
     list-style: none;
-    padding-left: 3px;
+    padding-left: 0;
+    margin-left: 0;
+  }
+
+  .whicon {
+    display: inline-block;
+    float: left;
+  }
+
+  .whbody {
+    display: inline-block;
+    width: 90%;
+    float: left;
   }
 }
 
