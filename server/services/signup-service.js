@@ -54,6 +54,42 @@ var signupService = module.exports = {
   },
 
   /**
+   * A new signup from the landing page
+   * @return the promise of the newly signed up user
+   */
+  gitterPromotionGithubSignup: function(options) {
+    return Q.fcall(function() {
+      var emails = options.emails;
+
+      assert(Array.isArray(emails), 'Emails must be an array');
+
+      emails = emails
+                .filter(function(f) { return !!f; })
+                .map(function(email) {
+                  return email.toLowerCase();
+                });
+
+      assert(emails && emails.length, 'At least one email address is expected');
+
+      return Q.all(emails.map(function(email) {
+          return userService.findByEmail(email);
+        }))
+        .then(function(existingUsers) {
+          existingUsers = existingUsers.filter(function(f) { return !!f; });
+          if(existingUsers.length) throw new Error('User already exists with email address ' + existingUsers[0]);
+
+          return userService.findOrCreateUserForEmail({
+            source: 'gitterpromo',
+            displayName: options.displayName,
+            usernameSuggestion: options.username,
+            email: emails.shift()
+          });
+        });
+
+    });
+  },
+
+  /**
    * Resend the confirmation email and returns the related user
    * @return the promise of a user
    */

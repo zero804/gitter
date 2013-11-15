@@ -59,7 +59,7 @@ require('./services/kue-workers').startWorkers();
 
 // APIS
 require('./resources/').install(app);
-require('./api/v1/').install(app);
+require('./api/').install(app);
 
 app.get('/oauth/authorize', oauth2.authorization);
 app.post('/oauth/authorize/decision', oauth2.decision);

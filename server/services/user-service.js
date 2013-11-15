@@ -35,7 +35,8 @@ function newUser(options, callback) {
     confirmationCode:   uuid.v4(),
     gravatarImageUrl:   options.gravatarImageUrl || gravatar.gravatarUrlForEmail(options.email),
     googleRefreshToken: options.googleRefreshToken || undefined,
-    status:             status
+    status:             status,
+    usernameSuggestion: options.usernameSuggestion || undefined
   };
 
   // Remove undefined fields
