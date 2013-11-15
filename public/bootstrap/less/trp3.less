@@ -251,6 +251,11 @@ a:hover {
     width: 32px;
     height: 32px;
   }
+
+  @media @mobile {
+    display: none;
+  }
+
 }
 
 .trpLeftMenuProfile.active {
@@ -299,6 +304,10 @@ a:hover {
   font-weight: 300;
   font-size: 16px;
   margin-left: 8px;
+  max-width: 187px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .trpLeftMenuContainer {
@@ -502,7 +511,6 @@ a.trpMiniLeftMenuItem {
     border-radius: 0 4px 4px 0;
     background-color: rgba(255,255,255,0.2);
   }
-
 }
 
 .trpTroupeList a {
