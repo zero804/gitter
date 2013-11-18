@@ -29,7 +29,7 @@ define([
             }
 
             // overall count
-            updateBadge('#unread-badge', values.overall);
+            updateBadge('.unread-count', values.overall);
         }
 
         $(document).on('troupeUnreadTotalChange', onTroupeUnreadTotalChange);
