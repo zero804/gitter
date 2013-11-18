@@ -25,7 +25,6 @@ define([
   };
 
   var mouseEvents = {
-    "click #menu-toggle-button":        "onMenuToggle",
     "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
     "mouseenter #menu-toggle":          "onLeftMenuHotspot",
     "mouseenter #content-frame":        "onMouseEnterContentFrame",
@@ -33,9 +32,6 @@ define([
     "mouseenter #toolbar-frame":        "onMouseEnterToolbar",
     "mouseleave #toolbar-frame":        "onMouseLeaveToolbar",
     "keypress":                         "onKeyPress",
-    "click #left-menu-icon":            "toggleMenu",
-    "click #search-icon":               "toggleMenu",
-    "click #troupe-icon":               "toggleMenu",
     "click #troupe-more-actions":       "toggleTroupeMenu",
     "click #favourite-button":          "toggleFavourite"
   };
@@ -221,13 +217,13 @@ define([
 
     showTroupeMenu: function() {
       // $("#file-list").css({"width" : "200px" , "padding-left" : "20px"});
-      $("#troupe-content").addClass("visible");
+      $("#toolbar-frame").addClass("expanded");
       this.files = true;
     },
 
     hideTroupeMenu: function() {
       // $("#file-list").css({"width": "0px", "padding-left" : "0"});
-      $("#troupe-content").removeClass("visible");
+      $("#toolbar-frame").removeClass("expanded");
       this.files = false;
     },
 
