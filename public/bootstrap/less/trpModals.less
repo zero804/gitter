@@ -173,8 +173,12 @@ body.modal-open {
 .modal-body {
   padding: @padding @padding 0 @padding;
   max-height: 440px;
-  overflow: hidden;
   display: block;
+
+  @media @mobile {
+    overflow: hidden;
+  }
+
 }
 
 .trpFilePreview .modal-body {
