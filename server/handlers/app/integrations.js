@@ -12,6 +12,7 @@ var serviceDisplayNames = {
   bitbucket: 'BitBucket',
   jenkins: 'Jenkins',
   travis: 'Travis',
+  sprintly: 'Sprint.ly'
 };
 
 module.exports = {
