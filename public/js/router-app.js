@@ -42,7 +42,8 @@ require([
   'filtered-collection', // No ref
   'components/dozy', // Sleep detection No ref
   'template/helpers/all', // No ref
-  'components/eyeballs' // No ref
+  'components/eyeballs', // No ref
+  'bootstrap-dropdown' // No ref
 ], function($, Backbone, context, AppIntegratedView, chatInputView, ChatCollectionView,
             itemCollections, troupeCollections, UserEmailCollection, RightToolbarView,
             filePreviewView, fileVersionsView, RequestDetailView, InviteDetailView, PersonDetailView,
