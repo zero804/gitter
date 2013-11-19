@@ -128,10 +128,19 @@ exports.hook_queue = function (next, connection) {
 function sendBounceMail(userIsRegistered, mail, deniedTroupes, nonExistantTroupes, permittedTroupes) {
   winston.verbose("Gateway#sendBounceMail(): I'm gna bounce this mail from " + mail.from + " that silly user can't send to: ", { deniedTroupes: deniedTroupes, nonExistantTroupes: nonExistantTroupes });
 
+  if(!mail || !mail.from) return;
+
   statsService.event('mail_bounce', {
     from: mail.from,
     userIsRegistered: userIsRegistered
   });
+
+  var domainRe = /@(\w+\.)*(trou.pe|troupemail.com)$/i;
+  if(domainRe.exec(mail.from)) {
+    /* Never send emails to anything @trou.pe */
+    winston.error("Gateway#sendBounceMail(): silently ignoring email from " + mail.from);
+    return;
+  }
 
   mailerService.sendEmail({
     templateFile: "bounce-email",
