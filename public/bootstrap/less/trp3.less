@@ -2,7 +2,7 @@
 
 @import "../../repo/fine-uploader/fineuploader.less";
 
-@import "trpColours.less";
+@import "trp3Colours.less";
 //@import "trpWebFonts.less";
 @import "trpFonts.less";
 
@@ -14,6 +14,7 @@
 @import "trp3Mail.less";
 @import "trp3Files.less";
 @import "trp3People.less";
+@import "trpHeader.less";
 
 
 @import "nanoScroller.less";
@@ -24,11 +25,27 @@
 /* Transitions */
 
 .transition300ms {
-/*  -webkit-transform: translate3d(0, 0, 0);*/
+  -webkit-transform: translate3d(0, 0, 0);
   transition:all .3s ease-in-out;
   -o-transition:all .3s ease-in-out;
   -moz-transition:all .3s ease-in-out;
   -webkit-transition:all .3s ease-in-out;
+}
+
+.transition500ms {
+  -webkit-transform: translate3d(0, 0, 0);
+  transition:all .5s ease-in-out;
+  -o-transition:all .5s ease-in-out;
+  -moz-transition:all .5s ease-in-out;
+  -webkit-transition:all .5s ease-in-out;
+}
+
+.transition1s {
+  -webkit-transform: translate3d(0, 0, 0);
+  transition:all .5s ease-in-out;
+  -o-transition:all .5s ease-in-out;
+  -moz-transition:all .5s ease-in-out;
+  -webkit-transition:all .5s ease-in-out;
 }
 
 html {
@@ -41,7 +58,7 @@ body {
 	margin: 0;
 	overflow: hidden;
 	/*overflow-x: hidden;*/
-  background-color: @trpBgColor2;
+  background-color: white;
   .user-select(none);
 }
 
@@ -157,7 +174,7 @@ a:hover {
 	position: fixed;
 	top: 0;
 	left: 0;
-	width: 40px;
+	width: 30px;
 	height: 100%;
 	z-index: 10;
 	display: inline-block;
@@ -166,32 +183,132 @@ a:hover {
 .trpLeftMenu {
 	display: inline-block;
 	position: fixed;
-	width: 0px;
-	left: 84px;
+	width: @leftMarginFull;
+	left: 0px;
 	top: 0px;
-	background-color: @trpGreen;
+	background-color: @trpDarkBlue;
 	height: 100%;
 	color: white;
 	z-index: 1012;
-	border-right: 2px solid @trpGreen;
-	padding-top: 18px;
+	padding-top: 4px;
 	margin-top: 0px;
 	overflow: hidden;
-	.transition300ms;
-  -webkit-transform: translate3d(0, 0, 0);
+  transition:opacity 0.5s ease-in-out 0s, left .5s ease-in-out 0.3s;
   background-clip: padding-box;
+  opacity: 0.9;
 
-  &.visible {
-    width: 280px;
-/*    box-shadow: 1px 0px 6px 1px rgba(50, 50, 50, 0.55);*/
-    border-right: 4px solid rgba(0,0,0,0.1);
+  &:hover {
+    opacity: 1;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  li {
+    padding-top: 2px;
+    line-height: 20px;
   }
 
   .trpToolbarList {
     width: 260px;
   }
+
+  @media @small {
+    left:-250px;
+    transition-delay: 0s;
+
+      &.visible {
+        transition-delay: 0.3s;
+        left: 0px;
+      }
+
+  }
+
 }
 
+.trpLeftMenu .trpToolbarHeader {
+  margin-left: 9px;
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0.6;
+  font-weight: 400;
+
+}
+
+.trpLeftMenuList {
+  margin-bottom: 20px;
+}
+
+
+.trpLeftMenuProfile {
+  .trpBodyMedium;
+  padding: 10px 0 10px 10px;
+  cursor: pointer;
+
+  .avatar-s {
+    border: 1px solid white;
+    width: 32px;
+    height: 32px;
+  }
+
+  @media @mobile {
+    display: none;
+  }
+
+}
+
+.trpLeftMenuProfile.active {
+  background-color: rgba(255,255,255,0.2);
+}
+
+.trpLeftMenuProfileMenu {
+  display: none;
+  box-sizing: border-box;
+  background-color: rgba(255,255,255,0.2);
+  padding-bottom: 12px;
+  overflow: hidden;
+  width: 100%;
+  color: white;
+  .trpBodyMedium;
+  font-weight: 300;
+  line-height: 24px;
+  padding-right: 20px;
+  box-sizing: border-box;
+
+  a {
+    color: white;
+    text-decoration: none;
+  }
+
+  .item {
+    padding-left: 10px;
+    margin-right: 10px;
+  }
+
+  .item:hover {
+    border-radius: 0 4px 4px 0;
+    background-color: rgba(255,255,255,0.2);
+  }
+
+}
+
+.trpLeftMenuProfile:hover {
+  background-color: rgba(255,255,255,0.2);
+}
+
+.trpLeftMenuProfileName {
+  display: inline-block;
+  vertical-align: top; 
+  padding-top: 7px;
+  font-weight: 300;
+  font-size: 16px;
+  margin-left: 8px;
+  max-width: 187px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .trpLeftMenuContainer {
 width: 260px;
@@ -220,7 +337,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 
 .trpMiniLeftMenu.active, .trpMiniLeftMenuContainer.active {
   opacity: 1;
-  -webkit-filter: grayscale(0%);
+  -wtrebkit-filter: grayscale(0%);
   -moz-filter: grayscale(0%);
   filter: grayscale(0%);
   .transition300ms;
@@ -285,24 +402,30 @@ a.trpMiniLeftMenuItem {
 
 .trpLeftMenu .nano {
 	position: absolute;
-	top: 50px;
-	bottom: 100px;
+	top: 124px;
+	bottom: 70px;
+  .transition300ms;
+}
+
+.trpLeftMenu .nano.pushed {
+  margin-top: 80px;
 }
 
 .trpLeftMenuActions {
 	position: absolute;
-	bottom: 40px;
-	left: 20px;
-	width: 280px;
+	bottom: 20px;
 	overflow: hidden;
+  box-sizing: border-box;
+  padding: 0 10px;
+  width: 100%;
 }
 
 .trpLeftMenuWrapper {
   display: inline-block;
-	.trpBodyText;
-	padding-left: 20px;
+	.trpBodyMedium;
 	overflow-y: auto;
 	overflow-x: hidden;
+  font-weight: 300;
 }
 
 .trpLeftMenuToolbar {
@@ -342,10 +465,52 @@ a.trpMiniLeftMenuItem {
 	height: 100px;
 }
 
+.trpLeftMenuSearch {
+  margin-top: 8px;
+  background-color: transparent;
+  border: 1px solid rgba(255,255,255, 0.6);
+  border-radius: 6px;
+  width: 220px;
+  font-size: 15px;
+  font-weight: 100;
+  font-family: 'Open Sans';
+  padding: 2px 4px 2px 6px;
+  color: rgba(255,255,255, 0.7);
+  margin-bottom: 16px;
+  margin-left: 10px;
+}
+
+.trpSearchClear {
+  position: relative;
+  left: -20px;
+  top: -3px;
+  opacity: 0.8;
+}
+
+.trpSearchClear:before {
+  font-family: 'troupe-icons';
+  content: '\e827';
+  font-size: 14px;
+}
+
 .trpTroupeList {
   display: inline-block;
 	list-style-type: none;
-	margin: 0 0 18px 0;
+	margin: 0 0 0 0px;
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 22px;
+
+  li {
+    padding-left: 10px;
+    margin-right: 10px;
+    box-sizing: border-box;
+  }
+
+  li:hover {
+    border-radius: 0 4px 4px 0;
+    background-color: rgba(255,255,255,0.2);
+  }
 }
 
 .trpTroupeList a {
@@ -361,28 +526,74 @@ a.trpMiniLeftMenuItem {
 	padding-left: 8px;
 }
 
-.trpLeftMenuButton, .trpNewTroupeButton {
+.trpNewPersonButton, .trpNewTroupeButton {
+  border: 1px solid rgba(255,255,255,0.6);
   display: inline-block;
-	width: 90px;
-	.trpBodyMedium;
-  font-size: 13px;
-	margin-top: 20px;
-	margin-right: 8px;
-	background-color: white;
-	padding: 12px;
-	color: @trpGreen;
-	text-align: center;
+  box-sizing: border-box;
+  padding: 4px 6px 6px 6px;
+  margin-bottom: 2px;
+  color: white;
+  text-align: center;
+  width: 50%;
+  cursor: pointer;
+  background-color: rgba(255,255,255,0.1);
+  .trpBodyMedium;
+}
+
+.trpNewPersonButton:hover, .trpNewTroupeButton:hover {
+  background-color: white;
+  color: #162e34;
+  border-color: white;
+}
+
+.trpNewPersonButton:hover + .trpNewTroupeButton {
+  border-left: 1px solid white;
+}
+
+.trpNewPersonButton {
+  border-radius: 4px 0 0 4px;
+  border-right: 0;
+}
+
+/*.trpNewPersonButton:hover {
+  border-right: 1px solid cyan;
+}
+*/
+.trpNewTroupeButton {
+  border-radius: 0 4px 4px 0;
 }
 
 .trpMenuTab {
-  display: inline-block;
-	position: fixed;
-	left: 0px;
-	top: 100px;
-	background-color: @trpGreen;
-	height: 40px;
-	width: 40px;
-	z-index: 1000;
+ text-align: center;
+  box-sizing:border-box;
+  color: white;
+  font-family: 'Open Sans';
+  font-size: 12px;
+  position: fixed;
+  left: -25px;
+  padding-top: 5px;
+  padding-right: 5px;
+  top: 110px;
+  width: 25px;
+  height: 30px;
+  z-index: 1000;
+  border-radius: 0 2px 2px 0;
+  background-color: #1dce73;
+  transition:all .5s ease-in-out;
+  -o-transition:all .5s ease-in-out;
+  -moz-transition:all .5s ease-in-out;
+  -webkit-transition:all .5s ease-in-out;
+  transition-delay: 0s;
+
+  @media @small {
+  left: 0;
+  transition-delay: 0.5s;
+
+    &.leftCollapse {
+      left: -25px;
+      transition-delay: 0;
+    }
+  }
 }
 
 .trpUserHome {
@@ -444,6 +655,20 @@ a.trpMiniLeftMenuItem {
 	*/
 }
 
+.trpTroupeUnreadCounter {
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+  display: inline-block;
+  padding: 0 5px 1px 5px;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 14px;
+  color: white;
+  white-space: nowrap;
+  vertical-align: baseline;
+  background-color: #1dce73;
+}
 
 .trpTroupeName {
 	vertical-align: top;
@@ -461,7 +686,7 @@ a.trpMiniLeftMenuItem {
 .trpContentPanel {
 /*  display: inline-block;*/
   position: fixed;
-	background-color: #f7faf5;
+	background-color: white;
 	margin-left: 0px;
 /*	height: 100%;*/
 	width: 100%;
@@ -475,7 +700,7 @@ a.trpMiniLeftMenuItem {
   /* so that the mouseover event to close the left menu on it gets triggered */
   min-height: 400px;
   overflow: none;
-  .transition300ms;
+  .transition500ms;
 }
 
 .trpContentSpacer {
@@ -530,12 +755,12 @@ a.trpMiniLeftMenuItem {
   display: none;
 }
 
-.trpTroupeFavourite, .trpTroupeSettings, .trpTroupeMoreActions, .trpTroupeHelp {
+.trpTroupeSettings, .trpTroupeMoreActions, .trpTroupeHelp {
   padding: 12px 0 12px 20px;
   @media @mid {
     display: inline-block;
     width: 100%;
-    padding-left: 30px;
+    padding-left: 24px;
     opacity: 0.6;
   }
 }
@@ -697,7 +922,7 @@ a.trpMiniLeftMenuItem {
 	height: 100%;*/
 	text-align: left;
 	text-align: center;
-  .transition300ms;
+  .transition500ms;
   height: 100%;
 
   @media @mid {
@@ -724,7 +949,7 @@ a.trpMiniLeftMenuItem {
   bottom: 0;
   background-color: @trpBgColor;
   z-index: 400;
-  .transition300ms;
+  .transition1s;
 
  .trpMiniActions {
     display: none;
@@ -735,7 +960,7 @@ a.trpMiniLeftMenuItem {
   }
 
   .trpToolbarHeader {
-    padding-left: 20px;
+    padding-left: 14px;
   }
 
   .trpToolbarList {
@@ -749,11 +974,15 @@ a.trpMiniLeftMenuItem {
   }
 
   @media @mid {
-    width: 88px;
+    width: 70px;
     padding-right: 0px;
     padding-top: 16px;
 
-    #people-header {
+    &.expanded {
+      width: 240px;
+    }
+
+    #people-header, #request-header {
       display: none;
     }
 
@@ -761,11 +990,6 @@ a.trpMiniLeftMenuItem {
     {
       margin-left: 6px;
     }
-  }
-
-  @media @small {
-    width: 0;
-    padding-right: 0;
   }
 
 }
@@ -782,17 +1006,22 @@ a.trpMiniLeftMenuItem {
   right: 235px;
 }
 
-.trpChatInputArea.leftCollapse, .trpHeaderContainer.leftCollapse, .trpChatPanel.leftCollapse {
-  margin-left: @leftMarginFull;
+.trpToolbar.leftCollapse {
+  right: -250px;
+}
 
-  @media @mid {
-    margin-left: @leftMarginMid;
-  }
-
+.trpContentPanel.leftCollapse {
   @media @small {
-    margin-left: @leftMarginSmall;
+    left: @leftMarginFull;
+    transition-delay: 0;
   }
+}
 
+.trpChatInputWrapper.leftCollapse {
+  @media @small {
+    left: @leftMarginFull;
+    transition-delay: 0;
+  }
 }
 
 .trpToolbar:hover {
@@ -815,7 +1044,7 @@ a.trpMiniLeftMenuItem {
   display: none;
   @media @mid {
     display: inline-block;
-    padding-left: 26px;
+    padding-left: 19px;
     margin-bottom: 13px
   }
 }
@@ -887,11 +1116,6 @@ a.trpMiniLeftMenuItem {
   padding-top: 16px;
 }
 
-
-.trpLeftMenu .trpToolbarHeader {
-	margin-left: 9px;
-}
-
 .trpToolbarList {
   display: inline-block;
 	vertical-align: top;
@@ -900,7 +1124,7 @@ a.trpMiniLeftMenuItem {
 }
 
 .trpToolbarListContent {
-  padding-left: 20px;
+  padding-left: 14px;
 }
 
 .trpRightPanel {
@@ -959,15 +1183,14 @@ a.trpMiniLeftMenuItem {
 .trpChatInputWrapper {
   width: 100%;
   min-height: 56px;
-  background-color: @trpBgColor2;
+  background-color: white;
   text-align: center;
   position: fixed;
   z-index: 100;
   overflow: hidden;
   bottom: 0px;
-  .transition300ms;
+  .transition500ms;
   padding-top: 8px;
-
 }
 
 .trpChatInputArea {
@@ -1004,11 +1227,16 @@ a.trpMiniLeftMenuItem {
 }
 
 .notification-center {
-	width: 280px;
+  width: 0;
 	position: fixed;
 	top: 50px;
 	z-index: 900;
-  left: 82px;
+  left: 250px;
+
+  @media @small {
+    left: -1px;
+  }
+
 }
 
 .notification {
@@ -1018,7 +1246,14 @@ a.trpMiniLeftMenuItem {
 	.trpBodyMedium;
 	text-align: left;
 	margin: 1px;
+  opacity: 0.95;
+  width: 0;
+  height: 52px;
+  overflow: hidden;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
+
 
 .notification a {
 	color: inherit;

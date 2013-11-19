@@ -29,7 +29,6 @@ require([
   'views/invite/reinviteModal',
   'utils/router',
   'components/unread-items-client',
-  'views/app/smartCollectionView',
 
   'views/chat/decorators/fileDecorator',
   'views/chat/decorators/webhookDecorator',
@@ -43,13 +42,14 @@ require([
   'filtered-collection', // No ref
   'components/dozy', // Sleep detection No ref
   'template/helpers/all', // No ref
-  'components/eyeballs' // No ref
+  'components/eyeballs', // No ref
+  'bootstrap-dropdown' // No ref
 ], function($, Backbone, context, AppIntegratedView, chatInputView, ChatCollectionView,
             itemCollections, troupeCollections, UserEmailCollection, RightToolbarView,
             filePreviewView, fileVersionsView, RequestDetailView, InviteDetailView, PersonDetailView,
             conversationDetailView, profileView, profileEmailView, profileAddEmailView, completeYourProfileModal, shareSearchView,
             createTroupeView, UsernameView, troupeSettingsView, IntegrationSettingsModal, TroupeMenuView, ReinviteModal, Router,
-            unreadItemsClient, SmartCollectionView, FileDecorator, webhookDecorator, userDecorator,
+            unreadItemsClient, FileDecorator, webhookDecorator, userDecorator,
             embedDecorator /*, errorReporter , FilteredCollection */) {
   "use strict";
 
@@ -69,11 +69,9 @@ require([
 
 
   var appView = new AppIntegratedView({ });
-  appView.smartMenuRegion.show(new SmartCollectionView({ collection: troupeCollections.smart }));
+
   appView.leftMenuRegion.show(new TroupeMenuView({ }));
   appView.rightToolbarRegion.show(new RightToolbarView());
-
-  $('.nano').nanoScroller({ preventPageScrolling: true });
 
   // instantiate user email collection
   var userEmailCollection = new UserEmailCollection.UserEmailCollection();
