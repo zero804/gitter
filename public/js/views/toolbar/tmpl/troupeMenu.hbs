@@ -1,9 +1,11 @@
  <div class="trpLeftMenuContainer">
   <div id="left-menu-profile" class="trpLeftMenuProfile"></div>
    <div class="trpLeftMenuProfileMenu" id="profile-menu">
+      {{#if hellFreezesOver}}
       <a href="#|profile"><div class="item">
         Edit Profile
       </div></a>
+      {{/if}}
       <a href="/apps" target="_blank"><div class="item">
         Get Troupe apps
       </div></a>
@@ -11,6 +13,7 @@
         Signout
       </div></a>
   </div>
+  {{#if hellFreezesOver}}
   <input class="trpLeftMenuSearch" id="list-search-input" placeholder="search"/><span class="trpSearchClear" id="search-clear-icon"></span>
   <div class="nano" id="left-menu-scroll">
     <div class="content trpLeftMenuWrapper">
@@ -50,4 +53,5 @@
   <div class="trpLeftMenuActions">
     <a href="#|connect" class="trpNewPersonButton" style="text-decoration: none">New Contact</a><a href="#|create" style="text-decoration: none" class="trpNewTroupeButton" id="left-menu-new-troupe-button">New Troupe</a>
   </div>
+  {{/if}}
 </div>
