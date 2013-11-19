@@ -20,16 +20,16 @@ define([
               var badge = $(selector);
               badge.text(count);
               if(count > 0) {
-                badge.show();
+                // badge.show();
                 $("#favicon").attr("href","/images/2/favicon-unread.png");
               } else {
-                badge.hide();
+                // badge.hide();
                 $("#favicon").attr("href","/images/2/favicon.png");
               }
             }
 
             // overall count
-            updateBadge('#unread-badge', values.overall);
+            updateBadge('.unread-count', values.overall);
         }
 
         $(document).on('troupeUnreadTotalChange', onTroupeUnreadTotalChange);

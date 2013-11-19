@@ -34,10 +34,6 @@ define([
       troupeAvatar: "#troupe-avatar-region"
     },
 
-    events: {
-      "click #favourite-button":        "toggleFavourite"
-    },
-
     initialize: function() {
       this.model = new Backbone.Model({
         troupeEmailAddress: context().troupeUri + '@' + context.env('baseServer'),
@@ -184,21 +180,6 @@ define([
         collection.on('all', toggle);
         toggle();
       }
-    },
-
-    toggleFavourite: function() {
-      var favHeader = $('.trpTroupeFavourite');
-      favHeader.toggleClass('favourited');
-      var isFavourite = favHeader.hasClass('favourited');
-
-      $.ajax({
-        url: '/troupes/' + context.getTroupeId(),
-        contentType: "application/json",
-        dataType: "json",
-        type: "PUT",
-        data: JSON.stringify({ favourite: isFavourite })
-      });
-
     }
   });
   cocktail.mixin(RightToolbarLayout, TroupeViews.DelayedShowLayoutMixin);

@@ -3,19 +3,16 @@
     <div class="trpToolbarContent" id="toolbar-content">
       <div id="toolbar-top-content" style="height:100%; padding-bottom: 200px; box-sizing: border-box;">
         <div id="people-list">
-          <div class="trpHeaderTitle trpToolbarHeader" id="people-header">{{headerTitle}}</div>
-            {{#unless oneToOne}}
-              <div id="troupe-avatar-region"></div>
-            {{/unless}}
-          <div class="trpToolbarList divider">
-            <div class="trpToolbarListContent" id="people-roster"></div>
-          </div>
           <div class="trpToolbarHeader" id="request-header" style="display: none;">Requests</div>
-          <div class="trpToolbarList divider" id="request-list" style="display: none;">
+          <div class="trpToolbarList" id="request-list" style="display: none;">
             <div class="trpToolbarListContent" id="request-roster"></div>
           </div>
+          <div class="trpToolbarHeader" id="people-header">People</div>
+          <div class="trpToolbarList">
+            <div class="trpToolbarListContent" id="people-roster"></div>
+          </div>
           <div class="trpToolbarHeader" id="invite-header" style="display: none;">Invites</div>
-          <div class="trpToolbarList divider" id="invite-list" style="display: none;">
+          <div class="trpToolbarList" id="invite-list" style="display: none;">
             <div class="trpToolbarListContent" id="invite-roster"></div>
           </div>
         </div>
@@ -23,7 +20,7 @@
           <div class="trpTroupeRelatedContentHolder">
             <div class="trpToolbarHeader" id="file-header">Files</div>
             <div id="fineUploader"></div>
-            <div class="trpToolbarList divider scroller {{#oneToOne}}oneToOne{{/oneToOne}}">
+            <div class="trpToolbarList scroller {{#oneToOne}}oneToOne{{/oneToOne}}">
               <div class="trpToolbarListContent" id="file-list"></div>
             </div>
             {{#unless oneToOne}}
@@ -48,22 +45,6 @@
         <div class="trpTroupeMoreActions" id="troupe-more-actions">
           <div class="more-button-black" id="right-menu-icon"></div>
         </div>
-        <div class="trpTroupeFavourite {{#if favourite}}favourited{{/if}}" id="favourite-button">
-          <div style="display: inline-block; vertical-align: middle">
-            <img src='{{cdn "images/2/icon-favourite-selected.png" }}' class="trpHeaderFavIcon favourited" width="24" height="24">
-            <img src='{{cdn "images/2/icon-favourite-unselected.png" }}' class="trpHeaderFavIcon unfavourited" width="24" height="24">
-          </div>
-          <div class="trpActionsMenuLabel unfavourited">Add to Favourites</div>
-          <div class="trpActionsMenuLabel favourited">Remove from Favourites</div>
-        </div>
-        {{#unless oneToOne}}
-        <a href="#|troupeSettings" style="text-decoration: none">
-          <div class="trpTroupeSettings">
-            <div style="display: inline-block; vertical-align: middle; height: 24px"><img src='{{cdn "images/2/icon-settings-black@2x.png"}}' width="24" height="24"/></div>
-            <div class="trpActionsMenuLabel" style="margin-top: -4px">Settings</div>
-          </div>
-        </a>
-        {{/unless}}
           <div class="trpTroupeHelp" id="help-button">
             <div style="display: inline-block; vertical-align: middle; height: 24px" id="help-icon"><img src='{{cdn "images/2/icon-help-black@2x.png"}}' width="24" height="24"/></div>
             <div class="trpActionsMenuLabel" style="margin-top: -4px">Support</div>

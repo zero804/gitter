@@ -13,7 +13,6 @@
 
 .trpChatInputContainer {
   text-align: center;
-  max-width: @fullWidth;
   display: inline-block;
   width: 100%;
   padding: 0 44px;
@@ -151,7 +150,6 @@
   overflow: hidden;
   padding: 5px;
   margin: -5px 0 0 -5px;
-  background-color: @trpBgColor2;
   margin-bottom: 12px;
 
   @media @mobile {
@@ -167,7 +165,6 @@
   width: 100%;
   text-align: left;
   padding: 12px 44px;
-  max-width: @fullWidth;
   -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
   -moz-box-sizing: border-box;    /* Firefox, other Gecko */
   box-sizing: border-box;         /* Opera/IE 8+ */
@@ -224,8 +221,8 @@
 }
 
 
-.trpChatContainer div:first-child .trpChatItem {
-  padding-top: 16px;
+.trpChatContainer > div:first-child {
+  padding-top: 46px;
 }
 
 .trpChatItem iframe {
