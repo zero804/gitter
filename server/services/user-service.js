@@ -31,6 +31,7 @@ function newUser(options, callback) {
   var status = options.status || "UNCONFIRMED";
 
   var insertFields = {
+    username:           options.username,
     displayName:        options.displayName,
     confirmationCode:   uuid.v4(),
     gravatarImageUrl:   options.gravatarImageUrl || gravatar.gravatarUrlForEmail(options.email),
@@ -69,7 +70,8 @@ function newUser(options, callback) {
       }, optionStats));
 
       return user;
-    }).nodeify(callback);
+    })
+    .nodeify(callback);
 }
 
 var userService = {
