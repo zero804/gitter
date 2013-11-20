@@ -15,22 +15,6 @@ function uriContextResolverMiddleware(req, res, next) {
     .fail(next);
 }
 
-// TODO preload invites?
-
-function preloadOneToOneTroupeMiddleware(req, res, next) {
-  uriService.findUriForUser("one-one/" + req.params.userId, req.user && req.user.id)
-    .then(function(result) {
-      if(result.notFound) return next(404);
-
-      req.troupe = result.troupe;
-      req.uriContext = result;
-
-      next();
-    })
-    .fail(next);
-
-}
-
 function isPhoneMiddleware(req, res, next) {
   req.isPhone = isPhone(req.headers['user-agent']);
   next();
@@ -47,6 +31,5 @@ function unauthenticatedPhoneRedirectMiddleware(req, res, next) {
 module.exports = exports = {
   uriContextResolverMiddleware: uriContextResolverMiddleware,
   unauthenticatedPhoneRedirectMiddleware: unauthenticatedPhoneRedirectMiddleware,
-  isPhoneMiddleware: isPhoneMiddleware,
-  preloadOneToOneTroupeMiddleware: preloadOneToOneTroupeMiddleware
+  isPhoneMiddleware: isPhoneMiddleware
 };
