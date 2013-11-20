@@ -330,7 +330,7 @@ module.exports = {
           });
 
         } else {
-          return userService.findByEmail(profile._json.email)
+          return userService.findByGithubId(profile._json.id)
             .then(function(user) {
               if(user) {
 
@@ -372,7 +372,7 @@ module.exports = {
 
               winston.verbose('About to create GitHub user ', githubUser);
 
-              userService.findOrCreateUserForEmail(githubUser, function(err, user) {
+              userService.findOrCreateUserForGithubId(githubUser, function(err, user) {
                 if (err) return done(err);
 
                 winston.verbose('Created GitHub user ', user.toObject());

@@ -91,6 +91,19 @@ var userService = {
       .nodeify(callback);
   },
 
+  findOrCreateUserForGithubId: function(options, callback) {
+    winston.info("Locating or creating user", options);
+
+    return userService.findByGithubId(options.githubId)
+      .then(function(user) {
+        if(user) return user;
+
+        return newUser(options);
+      })
+      .nodeify(callback);
+  },
+
+
 
   findByConfirmationCode: function(confirmationCode, callback) {
 
@@ -139,6 +152,11 @@ var userService = {
 
   findById: function(id, callback) {
     return persistence.User.findByIdQ(id).nodeify(callback);
+  },
+
+  findByGithubId: function(githubId, callback) {
+    return persistence.User.findOneQ({githubId: githubId})
+           .nodeify(callback);
   },
 
   findByEmail: function(email, callback) {
