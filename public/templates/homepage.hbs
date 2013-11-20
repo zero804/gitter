@@ -1,195 +1,175 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Troupe - Welcome</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <meta name="apple-itunes-app" content="app-id=632039322"/>
+<html>
+<head>
 
-    <meta property="og:title" content="Troupe - Work smarter">
-    <meta property="og:image" content="http:{{cdn 'images/2/logo-mark-200x200.png' }}">
-    <meta property="og:description" content="The quick and simple way to chat, share and work together. Anytime, anywhere.">
-    <link href='{{cdn "bootstrap/css/trpHomePage.css" }}' rel="stylesheet">
-    <link href='//fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
-    <link rel="shortcut icon" href='{{cdn "images/2/favicon8.ico" }}'>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+<link href='img/favicon.png' rel="shortcut icon">
+<title>Gitter - Chat, for GitHub</title>
 
-    {{>require_wrapper}}
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script>
+  !function(g,s,q,r,d){r=g[r]=g[r]||function(){(r.q=r.q||[]).push(
+  arguments)};d=s.createElement(q);q=s.getElementsByTagName(q)[0];
+  d.src='//d1l6p2sc9645hc.cloudfront.net/tracker.js';q.parentNode.
+  insertBefore(d,q)}(window,document,'script','_gs');
+  
+  _gs('GSN-719739-L');
+</script>
+</head>
 
-    {{{bootScript "signup" }}}
-    {{{generateEnv}}}
+<style>
 
-    <script type="text/javascript">
-    window.profileHasNoUsername = {{ profileHasNoUsername }};
-    window.userId = {{{userId}}};
-    </script>
+@font-face {
+    font-family: "octicons";
+    src: url("https://github.global.ssl.fastly.net/assets/octicons-810348ca79b0f83691f16307908e3c3fee103f93.woff") format('woff');
+}
 
-    <link rel="shortcut icon" href='{{ cdn "images/2/favicon8.ico"}}'>
-    <link rel="apple-touch-icon" href='{{ cdn "images/apple-touch-icon.png" }}'>
-    <link rel="apple-touch-icon" sizes="72x72" href='{{ cdn "images/apple-touch-icon-72x72.png" }}'>
-    <link rel="apple-touch-icon" sizes="114x114" href='{{ cdn "images/apple-touch-icon-114x114.png" }}'>
-  </head>
+body {
+  margin: 0;
+  padding: 0;
+}
 
-  <body>
-  <div class="trpBodyWrapper">
 
-<!--     <div class="trpHomeTopStripContainer">
-      <div class="trpHomeTopStrip">
-        <div class="trpHomeLogo"><img src='{{ cdn "images/2/home-logo-black.png" }}' height="46" width="170"></div>
-        <div class="trpHomeMenu">
-          <div class="trpHomeMenuItem trpPadV14">Apps</div>
-          <div class="trpHomeMenuItem trpPadV14">Support</div>
-          <div class="trpHomeMenuItem trpPadV14 trpHand button-existing-users-login">Sign in</div>
+h1 {
+  font-family: 'Open Sans';
+  font-weight: 300;
+  font-size: 42px;
+
+}
+
+h2 {
+  font-weight: 300;
+  font-family: 'Open Sans';
+  font-size: 30px;
+}
+
+.outer-container {
+
+}
+
+.container {
+  text-align: center;
+}
+
+.strip {
+  width: 920px;
+  display: inline-block;
+  font-family: 'Open Sans';
+  font-weight: 300;
+}
+
+.feature {
+  margin-top: 40px;
+  text-align: left;
+  margin-bottom: 40px;
+}
+
+.button {
+  border-radius: 4px;
+  display: inline-block;
+  padding: 18px 24px;
+}
+
+.button.white {
+  background-color: rgba(255,255,255,0.8);
+  border-bottom: 3px solid rgba(255,255,255,1);
+}
+
+.button.green {
+  color: white;
+  background-color: rgba(29,206,115, 0.9);
+  border-bottom: 3px solid rgba(29,206,115, 1);
+}
+
+.button.green:hover {
+  background-color: rgba(29,206,115, 1);
+}
+
+.interested {
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 6px;
+  padding: 38px 28px;
+  margin: 40px 0;
+}
+
+</style>
+
+<body>
+
+<div class="outer-container" style="">
+  <div class="container" style="background-image: url('{{ cdn "images/2/gitter/splash.jpg" }}'); background-size: cover; padding-top: 20px;">
+    <div class="strip" style="text-align: left"><img src="{{ cdn "images/2/gitter/logo.png" }}" width="200"></div>
+    <Br><br>
+    <div class="strip" style="color:white;"><h1 style="text-shadow: 0 0 0 transparent,1px 1px 2px rgba(0,0,0,0.55);">It's chat. For GitHub.</h1></div>
+    <div class="strip"><img src="{{ cdn "images/2/gitter/screenshot.jpg" }}" width="920" style="border-radius: 2px 2px 0 0"></div>
+  </div>
+  <div class="container" style="background-color: #eee; padding-bottom: 20px" >
+    <div class="strip feature">
+      <div style="display: inline-block; vertical-align: top; max-width: 450px; margin-top: 40px">
+        <h2 style="margin-top: 0">Chat rooms for everything</h2>
+        <div style="text-align: left">Free chat rooms for your public repositories. <br>A bit like IRC only <a href="#smart" rel="" id="anchor1" style="color: #1dce73; text-decoration: none" class="anchorLink">smarter</a>. <p>Chats for private repositories as well as organisations. <br>Create private chat channels.</p><p>Infinite, searchable chat history.</p></div>
       </div>
-    </div> -->
-    <div class="trpHomeHeroStripContainer">
-
-      <div class="trpHomeTopStrip">
-        <div class="trpHomeLogo"><img src='{{ cdn "images/2/logo-mark-green-square-white-text.png" }}' height="64" width="215"></div>
-        <div class="trpHomeMenu">
-          <div class="trpHomeMenuItem trpPadV14 trpHand" id="button-existing-users-login">Existing user login</div>
-        </div>
-    </div>
-
-      <div class="trpHomeHero">
-        <div class="trpHeroText">
-          The quick and simple way to chat, share and<br>work together.<br><br>Anytime, anywhere.
-          <br><br>
-        </div>
-        <div class="trpHeroSignup">
-          <div class="trpButtonHuge trpHand trpBtnWhite button-signup" href="#!" id="button-signup" style="vertical-align:top; border-bottom: 4px solid #ccc;"> Get Started<br><span class="trpBodySmall">It's free</span></div>
-          <div style="vertical-align: top; display: inline-block; margin-top: 24px; padding: 0 12px; align: center"> <span class="trpBodySmall" style="color:white">or 
-            <a id="google-signup" href="/google/signup" style="text-decoration: none; color: #333"><div class="trpButton trpHand trpBtnWhite button-signup" style="padding: 16px 16px; margin-left: 12px"><img src='{{ cdn "images/2/icon-gmail.png" }}' width="24" height="24" style="vertical-align: middle; margin-right: 6px;">
-            <span style="vertical-align: middle;">Sign Up with Google</span></div></a><span class="trpBodySmall" style="color:white">
-          </div>
-        </div>
-
-        <div class="trpHeroImage">
-          <img src='{{ cdn "images/2/home-hero-laptop2.png" }}'>
-        </div>
-      </div>
-    </div>
-
-    <div class="trpHomeMidStripContainer"><br><br>
-      <div class="trpMidStrip">Why you'll love using Troupe</div><br><br>
-      </div>
-
-      <div class="trpFeatures">
-        <div class="trpFeature">
-          <div class="trpFeatureImage bgPurple"><img style="padding-top: 12px" src='{{ cdn "images/2/icon-feature-chat.png" }}' width="24" height="24"></div>
-          <div class="trpFeatureText">
-            <div class="trpFeatureHead">Simple, brilliant chat</div>
-            <div class="trpFeatureBody">Chat individually or in groups. Easily edit or delete mistakes. Know who’s read any message.  Syncronised across devices. <br>The way chat should be.</div>
-          </div>
-        </div>
-
-        <div class="trpFeature">
-          <div class="trpFeatureImage bgGreen" ><img style="padding-top: 11px" src='{{ cdn "images/2/icon-feature-history.png" }}' width="24" height="24"></div>
-           <div class="trpFeatureText">
-            <div class="trpFeatureHead">Infinite chat history</div>
-            <div class="trpFeatureBody">Your conversations are stored forever. <br>All of them, safely in the cloud. <br>Soon  you’ll be able to search them too.</div>
-          </div>
-        </div>
-
-        <div class="trpFeature">
-          <div class="trpFeatureImage bgCyan"><img style="padding-top: 11px" src='{{ cdn "images/2/icon-feature-free2.png" }}' width="24" height="24"></div>
-           <div class="trpFeatureText">
-            <div class="trpFeatureHead">Always free, no ads</div>
-            <div class="trpFeatureBody">There will always be a free version of Troupe. Paid plans with additional features will be launching later.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="trpFeatures">
-        <div class="trpFeature">
-          <div class="trpFeatureImage bgYellow"><img style="padding-top: 11px" src='{{ cdn "images/2/icon-feature-notifications.png" }}' width="24" height="24"></div>
-           <div class="trpFeatureText">
-            <div class="trpFeatureHead">Smart Notifications</div>
-            <div class="trpFeatureBody">Don't get bombarded with notifications everywhere. Our smart notifications will find you on the right device and won't overwhelm you with too many messages.</div>
-          </div>
-        </div>
-
-        <div class="trpFeature">
-          <div class="trpFeatureImage bgPurple"><img style="padding-top: 11px" src='{{ cdn "images/2/icon-feature-location.png" }}' width="24" height="24"></div>
-           <div class="trpFeatureText">
-            <div class="trpFeatureHead">Location Aware</div>
-            <div class="trpFeatureBody">With intelligent location information, everyone knows who’s where. You won’t bug Frank when he’s on holiday in<br> Cape Town. Lucky Frank.</div>
-          </div>
-        </div>
-
-        <div class="trpFeature">
-          <div class="trpFeatureImage bgGrey"><img style="padding-top: 11px" src='{{ cdn "images/2/icon-feature-calendar.png" }}' width="24" height="24"></div>
-           <div class="trpFeatureText">
-            <div class="trpFeatureHead">Calendar Information</div>
-            <div class="trpFeatureBody">Understanding people’s availability can be critical for effective communication. Coming soon. Also for free.</div>
-          </div>
-        </div>
-
-      <div class="trpFeatures">
-        <div class="trpFeature">
-          <div class="trpFeatureImage bgCyan"><img style="padding-top: 11px" src='{{ cdn "images/2/icon-feature-sharing.png" }}' width="24" height="24"></div>
-           <div class="trpFeatureText">
-            <div class="trpFeatureHead">Made for Sharing</div>
-            <div class="trpFeatureBody">Invite anyone to chat, with just one click they’ll be talking with you. <br>It couldn't get easier than that.</div>
-          </div>
-        </div>
-
-        <div class="trpFeature">
-          <div class="trpFeatureImage bgGreen"><img style="padding-top: 11px" src='{{ cdn "images/2/icon-feature-files.png" }}' width="24" height="24"></div>
-           <div class="trpFeatureText">
-            <div class="trpFeatureHead">Share and View Files</div>
-            <div class="trpFeatureBody">Drag and drop or even email files to share with anyone. We keep them all safe and sound in the cloud.</div>
-          </div>
-        </div>
-
-        <div class="trpFeature">
-          <div class="trpFeatureImage bgYellow"><img style="padding-top: 11px" src='{{ cdn "images/2/icon-feature-email.png" }}' width="24" height="24"></div>
-           <div class="trpFeatureText">
-            <div class="trpFeatureHead">Plays Great with Email</div>
-            <div class="trpFeatureBody">Troupe gives all of your group conversations an email address. No more CC’ing nightmares. Reach everyone with just one address.</div>
-          </div>
-        </div>
-      </div>
-
-
-  <br><br>
-<div class="trpButtonHuge trpHand trpBtnGreen button-signup" href="#!" id="button-signup2" style="border-bottom: 4px solid #19b363"> Get Started<br><span class="trpBodySmall">It's free</span></div>
-<br><br><br><br><br>
-
-    </div>
-
-  <!--   <div class="trpHomeVideoStripContainer">
-      <div class="trpHomeVideo">
-        State of the art work collaboration<br>
-        <span class="trpHomeVideoSubtext">Find out more what Troupe can do for your team</span>
-        <br><br><br><br><br>
-        <a href="javascript:alert('Video coming soon!');"><img src='{{ cdn "images/2/icon-video-play.png" }}'></a>
-      </div>
-    </div> -->
-
-    <div class="trpHomeAppStripContainer">
-      <div class="trpHomeAppStrip">With you anytime, anywhere<br><br></div>
-      <div class="trpHeroSignup trpHeroAppStore">
-          <div style="display: inline-block; text-align: center">
-            <img src='{{ cdn "images/2/iphone.png" }}' style="height: 220px; margin-bottom: 20px"/><br>
-          </div>
-          <div style="display: inline-block; text-align: center; margin-left: 90px">
-            <img src='{{ cdn "images/2/macbook-pro.png" }}' style="height: 220px; margin-bottom: 20px"/><br>
-          </div>
-          <div style="display: inline-block; text-align: center; margin-left: 90px">
-            <img src='{{ cdn "images/2/android.png" }}' style="height: 220px; margin-bottom: 20px"/><br>
-          </div>
-        </div>
-        <div class="trpBodySmall trpWhite">Currently available on iOS, OSX, Windows and all mobile web browsers. Android App coming soon.</div><br><br>
-    </div>
-
-    <div class="trpHomeFooterStripContainer">
-      <div class="trpFooterStrip">
-        <a href="#top"><img src='{{ cdn "images/2/logo-mark-green-square-white.png" }}' class="trpLine"></a>
-      </div>
+      <div style="display: inline-block; float: right; vertical-align: top;" style=""><img src="{{ cdn "images/2/gitter/chats.png" }}" width="284" height="284"></div>
     </div>
   </div>
-  </body>
+
+  <div class="container" style="background-color: #162e34; padding: 60px 0">
+    <div class="strip">
+      <span style="opacity: 0.8; color: white";>Interested? Here's how this works. We've already built the chat bit and are thinking about deeply integrating with GitHub. <br>If enough people show interest, we'll make this happen. It's a bit like Kickstarter, but with no cash commitment.<br><br>Click on the signup button below to register your interest. </span><br><br>
+      <a href="http://app.gitter.im/auth" class="button green" id="signup" style="text-decoration: none; color: white">Signup with GitHub</a>
+    </div>
+  </div>
+
+  <div class="container" style="background-color: white; padding: 10px 0">
+<a name="smart" id="smart"> </a>
+    <div class="strip feature">
+      <h2 style="text-align: center">So smart, it even knows the code</h2><br>
+      <div><img src="{{ cdn "images/2/gitter/files.png" }}" width="700"></div><br><br>
+      <h2 style="text-align: center">As well as the issues</h2><br>
+      <div style="text-align: center"><img src="{{ cdn "images/2/gitter/issue.png" }}" width="600"></div>
+    </div>
+  </div>
+
+  <div class="container" style="background-color: #eee">
+    <div class="strip feature">
+      <div style="display: inline-block; vertical-align: top; max-width: 620px; margin-top: 60px">
+        <h2 style="margin-top: 0">Available everywhere that has internets</h2>
+        <div style="text-align: left">In any browser. Apps for Mac, Windows, iPhone and Android.<br>
+          Receive customised notifications.<br><br>Yes, we know, that's a gold iPhone.</p></div>
+      </div>
+      <div style="display: inline-block; float: right; vertical-align: top; margin-right: 80px; margin-top: 10px" style=""><img src="{{ cdn "images/2/gitter/iphone.png" }}" height="284"></div>
+    </div>
+  </div>
+
+  <div class="container" style="background-color: #162e34; padding-bottom: 30px">
+    <div class="strip feature" style="text-align: center">
+      <h2 style="text-align: center; color: white">Other awesome features</h2>
+      <span style="color: white; line-height: 150%">Know who's seen any message. <span style="opacity: 0.6">Edit messages after you've sent them.</span> Webhook integrations with Jenkins, Trello and more.<br>
+      <span style="opacity:0.6;">Automatically embeds content like YouTube, pictures of cats and other stuff.</span> Did we mention our smart notifications?<br>
+      @mentions. Batched notifications. Won't annoy you by making your phone beep on every message. <span style='opacity: 0.6'>Awesome emotigifs. <br>Infinite chat history stored in the cloud. </span>Searchable too, naturally. <span style='opacity: 0.6'>Oh, and a unified activity feed.</span> Phew, that's a lot.</span>
+    </div>
+  </div>
+
+  <div class="container" style="background-color: white; margin: 20px 0;padding: 40px 0">
+    <div class="strip">
+      <span style="color: black";>Interested? Here's how this works. We've already built the chat bit and are thinking about deeply integrating with GitHub. <br>If enough people show interest, we'll make this happen. It's a bit like Kickstarter, but with no cash commitment.<br><br>Click on the signup button below to register your interest. </span><br><br>
+      <a href="http://app.gitter.im/auth" class="button green" id="signup" style="text-decoration: none; color: white">Signup with GitHub</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+$('a').click(function(){
+    console.log('clicked');
+    $('html, body').animate({
+        scrollTop: $( $.attr(this, 'href') ).offset().top
+    }, 500);
+    return false;
+});
+
+</script>
+
+
+</body>
 </html>
