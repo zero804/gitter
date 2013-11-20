@@ -5,7 +5,9 @@ var userService = require('./user-service');
 var troupeService = require('./troupe-service');
 var inviteService = require('./invite-service');
 var uriLookupService = require("./uri-lookup-service");
+var GitHubOrgService = require("./github/github-org-service");
 var promiseUtils = require("../utils/promise-utils");
+var assert = require("assert");
 
 /**
  * Finds who owns a URI
@@ -14,22 +16,13 @@ var promiseUtils = require("../utils/promise-utils");
  *   or { user: user }
  *   or null if the uri doesn't exist
  */
-function findUri(uri, callback) {
+function findUri(currentUser, uri, callback) {
+  assert(currentUser);
+  assert(uri);
+
   uri = uri.toLowerCase();
   if(uri.charAt(0) === '/') {
     uri = uri.substring(1);
-  }
-
-  // Special case for backwards compatibility for
-  // users without usernames
-  if(uri.indexOf('one-one/') === 0) {
-    var userId = uri.split('/')[1];
-    return userService.findById(userId)
-      .then(function(user) {
-        if(user) return { user: user };
-
-        return null;
-      });
   }
 
   return uriLookupService.lookupUri(uri)
@@ -51,7 +44,36 @@ function findUri(uri, callback) {
 
       return null;
     })
+    .then(function(uriLookup) {
+      if(uriLookup) return uriLookup;
+
+      /**
+       * We still don't know what this uri represents
+       * Ask github about this endpoint
+       */
+      var parts = uri.split('/');
+      var userOrOrg = parts[0];
+      if(parts.length === 1) {
+        return findGitHubOrg(currentUser, userOrOrg)
+          .then(function(userInOrg) {
+            if(userInOrg) {
+              return roomService.findOrCreateRoom({ uri: userOrOrg, githubType: 'ORG'})
+                .then(function(troupe) {
+                  return { troupe: troupe };
+                });
+            }
+            return null;
+          });
+      }
+
+
+    })
     .nodeify(callback);
+}
+
+function findGitHubOrg(currentUser, userOrOrg) {
+  var orgService = new GitHubOrgService(currentUser);
+  return orgService.member(userOrOrg, currentUser.username);
 }
 
 exports.findUri = findUri;

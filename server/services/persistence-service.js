@@ -226,6 +226,7 @@ TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
 var TroupeSchema = new Schema({
   name: { type: String },
   uri: { type: String },
+  githubType: { type: String, 'enum': ['REPO', 'USER', 'ORG'], required: true },
   status: { type: String, "enum": ['ACTIVE', 'DELETED'], "default": 'ACTIVE'},
   oneToOne: { type: Boolean, "default": false },
   users: [TroupeUserSchema],
