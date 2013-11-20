@@ -1,7 +1,6 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var nconf       = require('../utils/config');
 var middleware  = require('../web/middleware');
 var passport    = require('passport');
 
@@ -9,7 +8,7 @@ module.exports = {
   install: function(app) {
 
     // TODO: Add state and crosscheck when the oauth callback returns.
-    var signupOptions = { scope: ['user:email'] };
+    var signupOptions = { scope: ['user:email', 'repo'] };
 
     // Redirect user to GitHub OAuth authorization page.
     //
@@ -28,4 +27,4 @@ module.exports = {
       });
 
   }
-}
+};
