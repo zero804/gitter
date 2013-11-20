@@ -11,7 +11,6 @@ module.exports = {
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         function(req, res, next) {
-          console.log(req.params.userOrOrg);
           return uriService.findUri(req.user, req.params.userOrOrg)
             .then(function(uriLookup) {
               if(!uriLookup) throw 404;

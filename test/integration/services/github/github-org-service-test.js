@@ -9,7 +9,7 @@ var GithubOrgService = testRequire('./services/github/github-org-service');
 
 describe('github-org-service', function() {
   it('members should fetch members', function(done) {
-    var gh = new GithubOrgService({ githubAccessToken: '64c1d90a8c60d2ee75fc5b3d3f7881d94559fec8'});
+    var gh = new GithubOrgService({ githubToken: '64c1d90a8c60d2ee75fc5b3d3f7881d94559fec8'});
 
     gh.members('gitterHQ')
       .then(function(members) {
@@ -19,7 +19,7 @@ describe('github-org-service', function() {
   });
 
   it('member should return true if a user is in an org', function(done) {
-    var gh = new GithubOrgService({ githubAccessToken: '64c1d90a8c60d2ee75fc5b3d3f7881d94559fec8'});
+    var gh = new GithubOrgService({ githubToken: '64c1d90a8c60d2ee75fc5b3d3f7881d94559fec8'});
 
     gh.member('gitterHQ','gittertestbot')
       .then(function(isMember) {
@@ -30,7 +30,7 @@ describe('github-org-service', function() {
 
 
   it('member should return true if a user is in an org', function(done) {
-    var gh = new GithubOrgService({ githubAccessToken: '64c1d90a8c60d2ee75fc5b3d3f7881d94559fec8'});
+    var gh = new GithubOrgService({ githubToken: '64c1d90a8c60d2ee75fc5b3d3f7881d94559fec8'});
 
     gh.member('gitterHQ','mydigitalself')
       .then(function(isMember) {
@@ -40,7 +40,7 @@ describe('github-org-service', function() {
   });
 
   it('member should return true if a user is in an org', function(done) {
-    var gh = new GithubOrgService({ githubAccessToken: '64c1d90a8c60d2ee75fc5b3d3f7881d94559fec8'});
+    var gh = new GithubOrgService({ githubToken: '64c1d90a8c60d2ee75fc5b3d3f7881d94559fec8'});
 
     gh.member('gitterHQ','indexzero')
       .then(function(isMember) {
