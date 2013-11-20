@@ -4,8 +4,11 @@
 var github = require('octonode');
 var publicClient = github.client();
 var Q = require('q');
+var assert = require('assert');
 
 function GitHubUserService(user) {
+  assert(!user || user.githubToken, 'User must have a githubToken');
+
   this.user = user;
   this.client = user ? github.client(user.githubToken) : publicClient;
 }
