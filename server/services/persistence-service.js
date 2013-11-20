@@ -124,11 +124,12 @@ var UserSchema = new Schema({
   },
   googleRefreshToken: String,
   githubToken: { type: String, required: true },
-  githubId: Number,
+  githubId: {type: Number, required: true},
   usernameSuggestion: { type: String },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ githubId: 1 }, { unique: true });
 UserSchema.index({ username: 1 }, { unique: true, sparse: true });
 UserSchema.index({ "emails.email" : 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
