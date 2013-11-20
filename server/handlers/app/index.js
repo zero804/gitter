@@ -1,70 +1,62 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var nconf           = require('../../utils/config');
+var uriService      = require('../../services/uri-service');
 var middleware      = require('../../web/middleware');
 var appRender       = require('./render');
-var appMiddleware   = require('./middleware');
 
 module.exports = {
     install: function(app) {
-      app.get('/one-one/:userId',
+      app.get('/:userOrOrg',
         middleware.grantAccessForRememberMeTokenMiddleware,
-        appMiddleware.preloadOneToOneTroupeMiddleware,
+        middleware.ensureLoggedIn(),
         function(req, res, next) {
-          var uriContext = req.uriContext;
-
-          if (req.user && req.params.userId === req.user.id) {
-            res.relativeRedirect(req.user.username ? "/" + req.user.username : nconf.get('web:homeurl'));
-            return;
-          }
-
-          // If the user has a username, use that instead
-          if(uriContext && uriContext.otherUser && uriContext.otherUser.username) {
-            res.relativeRedirect('/' + uriContext.otherUser.username);
-            return;
-          }
-
-          next();
+          console.log(req.params.userOrOrg);
+          return uriService.findUri(req.user, req.params.userOrOrg)
+            .then(function(uriLookup) {
+              if(!uriLookup) throw 404;
+              res.send(uriLookup);
+            })
+            .fail(next);
         },
         appRender.renderMiddleware('app-template')
       );
 
-      /* Special homepage for users without usernames */
-      app.get('/home',
-        middleware.grantAccessForRememberMeTokenMiddleware,
-        appMiddleware.isPhoneMiddleware,
-        function(req, res, next) {
-          if(req.user && req.user.username) {
-            res.relativeRedirect(req.user.getHomeUrl());
-            return;
-          }
+      // /* Special homepage for users without usernames */
+      // app.get('/home',
+      //   middleware.grantAccessForRememberMeTokenMiddleware,
+      //   appMiddleware.isPhoneMiddleware,
+      //   function(req, res, next) {
+      //     if(req.user && req.user.username) {
+      //       res.relativeRedirect(req.user.getHomeUrl());
+      //       return;
+      //     }
 
-          return appRender.renderHomePage(req, res, next);
-        });
+      //     return appRender.renderHomePage(req, res, next);
+      //   });
 
 
-      app.get('/:appUri',
-        middleware.grantAccessForRememberMeTokenMiddleware,
-        appMiddleware.uriContextResolverMiddleware,
-        appMiddleware.isPhoneMiddleware,
-        appMiddleware.unauthenticatedPhoneRedirectMiddleware,
-        function(req, res, next) {
-          if (req.uriContext.ownUrl) {
-            return appRender.renderHomePage(req, res, next);
-          }
+      // app.get('/:appUri',
+      //   middleware.grantAccessForRememberMeTokenMiddleware,
+      //   appMiddleware.uriContextResolverMiddleware,
+      //   appMiddleware.isPhoneMiddleware,
+      //   appMiddleware.unauthenticatedPhoneRedirectMiddleware,
+      //   function(req, res, next) {
+      //     if (req.uriContext.ownUrl) {
+      //       return appRender.renderHomePage(req, res, next);
+      //     }
 
-          if(req.isPhone) {
-            // TODO: this should change from chat-app to a seperate mobile app
-            appRender.renderAppPageWithTroupe(req, res, next, 'mobile/mobile-app');
-          } else {
-            appRender.renderAppPageWithTroupe(req, res, next, 'app-template');
-          }
-        });
+      //     if(req.isPhone) {
+      //       // TODO: this should change from chat-app to a seperate mobile app
+      //       appRender.renderAppPageWithTroupe(req, res, next, 'mobile/mobile-app');
+      //     } else {
+      //       appRender.renderAppPageWithTroupe(req, res, next, 'app-template');
+      //     }
+      //   });
 
-      require('./native-redirects').install(app);
-      require('./invites').install(app);
-      require('./integrations').install(app);
+      // require('./native-redirects').install(app);
+      // require('./invites').install(app);
+      // require('./integrations').install(app);
 
     }
 };
