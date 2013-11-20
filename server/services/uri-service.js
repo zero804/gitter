@@ -17,8 +17,8 @@ var assert = require("assert");
  *   or null if the uri doesn't exist
  */
 function findUri(currentUser, uri, callback) {
-  assert(currentUser);
-  assert(uri);
+  assert(currentUser, 'currentUser required');
+  assert(uri, 'uri required');
 
   uri = uri.toLowerCase();
   if(uri.charAt(0) === '/') {
@@ -92,6 +92,9 @@ exports.findUri = findUri;
  *  { notFound: true }
  */
 exports.findUriForUser = function(currentUser, uri, callback) {
+  assert(currentUser, 'currentUser required');
+  assert(uri, 'uri required');
+
   var userId = currentUser && currentUser.id;
 
   return findUri(currentUser, uri)

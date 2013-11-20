@@ -5,15 +5,11 @@ var uriService  = require('../../services/uri-service');
 var isPhone     = require('../../web/is-phone');
 
 function uriContextResolverMiddleware(req, res, next) {
-  var appUri = req.params.appUri;
-
-  uriService.findUriForUser(appUri, req.user && req.user.id)
+  return uriService.findUriForUser(req.user, req.params.userOrOrg)
     .then(function(result) {
-      if(result.notFound) return next(404);
-
+      if(result.notFound) throw 404;
       req.troupe = result.troupe;
       req.uriContext = result;
-
       next();
     })
     .fail(next);
