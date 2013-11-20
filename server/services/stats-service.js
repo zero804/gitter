@@ -48,7 +48,7 @@ exports.event = function(eventName, properties) {
       properties.env = nconf.get("stats:envName");
 
       var event = {
-        type: "troupe_" + eventName,
+        type: "gitter_" + eventName,
         time: new Date(),
         data: properties
       };
