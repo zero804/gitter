@@ -37,7 +37,9 @@ function newUser(options, callback) {
     gravatarImageUrl:   options.gravatarImageUrl || gravatar.gravatarUrlForEmail(options.email),
     googleRefreshToken: options.googleRefreshToken || undefined,
     status:             status,
-    usernameSuggestion: options.usernameSuggestion || undefined
+    usernameSuggestion: options.usernameSuggestion || undefined,
+    githubToken:        options.githubToken,
+    githubId:           options.githubId
   };
 
   // Remove undefined fields

@@ -24,20 +24,20 @@ mongoose.set('debug', nconf.get("mongo:logQueries"));
 
 mongoose.connect(nconf.get("mongo:url"), {
   server: {
-    readPreference: "primaryPreferred",
-    socketOptions: { keepAlive: 1, connectTimeoutMS: 3000 },
-    auto_reconnect: true,
-    autoReconnect: true
-  },
+            readPreference: "primaryPreferred",
+  socketOptions: { keepAlive: 1, connectTimeoutMS: 3000 },
+  auto_reconnect: true,
+  autoReconnect: true
+          },
   db: {
-    readPreference: "primaryPreferred"
-  },
+        readPreference: "primaryPreferred"
+      },
   replset: {
-    readPreference: "primaryPreferred",
-    socketOptions: { keepAlive: 1, connectTimeoutMS: 2000 },
-    auto_reconnect: true,
-    autoReconnect: true
-  }
+             readPreference: "primaryPreferred",
+  socketOptions: { keepAlive: 1, connectTimeoutMS: 2000 },
+  auto_reconnect: true,
+  autoReconnect: true
+           }
 });
 
 shutdown.addHandler('mongo', 1, function(callback) {
@@ -90,13 +90,13 @@ function serializeEvent(url, operation, model, callback) {
 // --------------------------------------------------------------------
 var UnconfirmedEmailSchema = new Schema({
   email:            { type: String },
-  confirmationCode: { type: String }
+    confirmationCode: { type: String }
 });
 UnconfirmedEmailSchema.schemaTypeName = 'UserEmailSchema';
 
 var UserSchema = new Schema({
-  displayName: { type: String },
-  email: { type: String },                     // The primary email address
+  displayName: { type: String, required: true },
+  email: { type: String, required: true },     // The primary email address
   emails: [String],                            // Secondary email addresses
   unconfirmedEmails: [UnconfirmedEmailSchema], // Unconfirmed email addresses
   username: { type: String, required: true },
@@ -110,20 +110,21 @@ var UserSchema = new Schema({
   lastTroupe: ObjectId,
   location: {
     timestamp: Date,
-    coordinate: {
-      lon: Number,
-      lat: Number
-    },
-    speed: Number,
-    altitude: Number,
-    named: {
-      place: String,
-      region: String,
-      countryCode: String
-    }
+  coordinate: {
+    lon: Number,
+  lat: Number
+  },
+  speed: Number,
+  altitude: Number,
+  named: {
+    place: String,
+    region: String,
+    countryCode: String
+  }
   },
   googleRefreshToken: String,
   githubToken: { type: String, required: true },
+  githubId: Number,
   usernameSuggestion: { type: String },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
