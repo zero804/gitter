@@ -22,6 +22,15 @@ GitHubUserService.prototype.getAuthenticatedUser = function() {
   return d.promise;
 };
 
+GitHubUserService.prototype.getAuthenticatedUserEmails = function() {
+  var d = Q.defer();
+
+  var ghme = this.client.me();
+  ghme.emails(d.makeNodeResolver());
+
+  return d.promise;
+};
+
 GitHubUserService.prototype.getUser = function(user) {
   var d = Q.defer();
 
