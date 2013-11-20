@@ -1,10 +1,9 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'jquery',
   'views/base',
   'hbs!./tmpl/troupeAvatar',
   'bootstrap_tooltip'
-], function($, TroupeViews, template) {
+], function(TroupeViews, template) {
 
   "use strict";
 
