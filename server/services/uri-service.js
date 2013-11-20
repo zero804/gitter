@@ -58,9 +58,8 @@ function findUri(currentUser, uri, callback) {
         return findGitHubOrg(currentUser, userOrOrg)
           .then(function(userInOrg) {
             if(userInOrg) {
-              return roomService.findOrCreateRoom({ uri: userOrOrg, githubType: 'ORG'})
+              return roomService.findOrCreateRoom({ uri: userOrOrg, githubType: 'ORG', user: currentUser })
                 .then(function(troupe) {
-                  console.log('DONE. YOUR TROUPE IS ', troupe);
                   return { troupe: troupe };
                 });
             }
@@ -92,8 +91,10 @@ exports.findUri = findUri;
  *  { troupe: troupe, group: true, access: true/false, invite: invite },
  *  { notFound: true }
  */
-exports.findUriForUser = function(uri, userId, callback) {
-  return findUri(uri)
+exports.findUriForUser = function(currentUser, uri, callback) {
+  var userId = currentUser && currentUser.id;
+
+  return findUri(currentUser, uri)
       .then(function(result) {
         if(!result) {
           return { notFound: true };

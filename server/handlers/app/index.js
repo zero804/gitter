@@ -11,10 +11,11 @@ module.exports = {
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         function(req, res, next) {
-          return uriService.findUri(req.user, req.params.userOrOrg)
+          return uriService.findUriForUser(req.user, req.params.userOrOrg)
             .then(function(uriLookup) {
-              if(!uriLookup) throw 404;
-              res.send(uriLookup);
+              req.troupe = uriLookup.troupe;
+              req.uriContext = uriLookup;
+              next();
             })
             .fail(next);
         },
