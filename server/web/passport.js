@@ -16,6 +16,8 @@ var nconf                   = require('../utils/config');
 var loginUtils              = require("../web/login-utils");
 var GoogleStrategy          = require('passport-google-oauth').OAuth2Strategy;
 var useragentStats          = require('./useragent-stats');
+var GitHubStrategy          = require('passport-github').Strategy;
+
 
 function loginAndPasswordUserStrategy(req, login, password, done) {
   winston.verbose("Attempting to authenticate ", { email: email });
@@ -224,6 +226,7 @@ module.exports = {
       }
     ));
 
+
     passport.use(new GoogleStrategy({
         clientID:     nconf.get('googleoauth2:client_id'),
         clientSecret: nconf.get('googleoauth2:client_secret'),
@@ -305,10 +308,76 @@ module.exports = {
                 });
               });
             });
-
         }
+
       }
     ));
+
+    passport.use(new GitHubStrategy({
+        clientID:     nconf.get('github:client_id'),
+        clientSecret: nconf.get('github:client_secret'),
+        callbackURL:  nconf.get('web:basepath') + '/github/callback',
+        passReqToCallback: true
+      },
+      function(req, accessToken, refreshToken, profile, done) {
+
+        if (req.user) {
+          req.user.githubToken = accessToken;
+          req.user.save(function(err) {
+            winston.info('passport: User updated with token');
+            if(err) done(err);
+            return done(null, req.user);
+          });
+
+        } else {
+          return userService.findByEmail(profile._json.email)
+            .then(function(user) {
+              if(user) {
+
+                // Tracking
+                var properties = useragentStats(req.headers['user-agent']);
+                statsService.userUpdate(user, properties);
+
+                statsService.event("user_login", _.extend({
+                  userId: user.id,
+                  method: 'github_oauth',
+                  email: user.email
+                }, properties));
+
+                req.logIn(user, function(err) {
+                  if (err) { return done(err); }
+                  return done(null, user);
+                });
+
+                return;
+              }
+
+              // This is in fact a new user
+              var githubUser = {
+                username:           profile._json.login,
+                displayName:        profile._json.name,
+                email:              profile._json.email,
+                gravatarImageUrl:   profile._json.avatar_url,
+                githubToken:        accessToken,
+                status:             'ACTIVE',
+                source:             'landing_github'
+              };
+
+              winston.verbose('About to create GitHub user ', githubUser);
+
+              userService.findOrCreateUserForEmail(githubUser, function(err, user) {
+                if (err) return done(err);
+
+                winston.verbose('Created GitHub user ', user.toObject());
+
+                req.logIn(user, function(err) {
+                  if (err) { return done(err); }
+                  return done(null, user);
+                });
+              });
+            });
+        }
+    }));
 
   }
 

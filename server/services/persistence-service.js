@@ -123,6 +123,7 @@ var UserSchema = new Schema({
     }
   },
   googleRefreshToken: String,
+  githubToken: String,
   usernameSuggestion: { type: String },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
