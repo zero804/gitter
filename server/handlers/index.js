@@ -27,5 +27,6 @@ module.exports = {
     require('./start').install(app);
     require('./unsubscribe').install(app);
     require('./version').install(app);
+    require('./github').install(app);
   }
 };
