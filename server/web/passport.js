@@ -359,6 +359,7 @@ module.exports = {
                 email:              profile._json.email,
                 gravatarImageUrl:   profile._json.avatar_url,
                 githubToken:        accessToken,
+                githubId:           profile._json.id,
                 status:             'ACTIVE',
                 source:             'landing_github'
               };
