@@ -25,6 +25,8 @@ function findUri(currentUser, uri, callback) {
     uri = uri.substring(1);
   }
 
+  var userId = currentUser && currentUser.id;
+
   return uriLookupService.lookupUri(uri)
     .then(function(uriLookup) {
       if(!uriLookup) return null;
@@ -39,6 +41,13 @@ function findUri(currentUser, uri, callback) {
       if(uriLookup.troupeId) {
         return troupeService.findById(uriLookup.troupeId)
           .then(function(troupe) {
+            if(!troupe) return null;
+
+            // TODO: some troupes will be open.. deal with that
+            if(troupe.containsUserId(userId)) {
+
+            }
+
             if(troupe) return { troupe: troupe };
           });
       }
@@ -80,6 +89,48 @@ function findGitHubOrg(currentUser, userOrOrg) {
 
 exports.findUri = findUri;
 
+function handleUserUri(currentUser, user) {
+  var userId = currentUser && currentUser.id;
+
+  if(!userId) {
+    return { oneToOne: true, troupe: null, otherUser: user, access: false, invite: null };
+  }
+
+  // Is this the users own site?
+  if(user.id == userId) {
+    return { ownUrl: true };
+  }
+
+  return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, user.id)
+    .spread(function(troupe, otherUser, invite) {
+      return { oneToOne: true, troupe: troupe, otherUser: otherUser, access: !!troupe, invite: invite };
+
+    });
+}
+
+function handleTroupeUri(currentUser, troupe) {
+  var userId = currentUser && currentUser.id;
+
+  if(!userId) {
+    return { troupe: troupe, group: true, access: false };
+  }
+
+  return roomService.isUserAllowedInRoom(currentUser, troupe)
+    .then(function(hasAccess) {
+      return { troupe: troupe, group: true, access: hasAccess };
+
+      // if(troupeService.userIdHasAccessToTroupe(userId, troupe)) {
+      // }
+
+      // return inviteService.findUnusedInviteToTroupeForUserId(userId, troupe.id)
+      //   .then(function(invite) {
+      //     return { troupe: troupe, group: true, access: false, invite: invite };
+      //   });
+
+    });
+
+}
+
 /**
  * findUri - find what the URL belongs to
  * @param  {String}   uri
@@ -95,48 +146,14 @@ exports.findUriForUser = function(currentUser, uri, callback) {
   assert(currentUser, 'currentUser required');
   assert(uri, 'uri required');
 
-  var userId = currentUser && currentUser.id;
-
   return findUri(currentUser, uri)
       .then(function(result) {
         if(!result) {
           return { notFound: true };
         }
 
-        var user = result.user;
-        var troupe = result.troupe;
-
-        if(user) {
-          if(!userId) {
-            return { oneToOne: true, troupe: null, otherUser: user, access: false, invite: null };
-          }
-
-          // Is this the users own site?
-          if(user.id == userId) {
-            return { ownUrl: true };
-          }
-
-          return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, user.id)
-            .spread(function(troupe, otherUser, invite) {
-              return { oneToOne: true, troupe: troupe, otherUser: otherUser, access: !!troupe, invite: invite };
-
-            });
-        }
-
-        if(troupe) {
-          if(!userId) {
-            return { troupe: troupe, group: true, access: false };
-          }
-
-          if(troupeService.userIdHasAccessToTroupe(userId, troupe)) {
-            return { troupe: troupe, group: true, access: true };
-          }
-
-          return inviteService.findUnusedInviteToTroupeForUserId(userId, troupe.id)
-            .then(function(invite) {
-              return { troupe: troupe, group: true, access: false, invite: invite };
-            });
-        }
+        if(result.user) return handleUserUri(currentUser, result.user);
+        if(result.troupe) return handleTroupeUri(currentUser, result.troupe);
 
         throw new Error('Result did not contain user or troupe attributes.');
       })
