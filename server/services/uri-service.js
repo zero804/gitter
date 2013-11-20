@@ -6,7 +6,7 @@ var troupeService = require('./troupe-service');
 var inviteService = require('./invite-service');
 var uriLookupService = require("./uri-lookup-service");
 var GitHubOrgService = require("./github/github-org-service");
-var promiseUtils = require("../utils/promise-utils");
+var roomService = require("./room-service");
 var assert = require("assert");
 
 /**
@@ -26,8 +26,9 @@ function findUri(currentUser, uri, callback) {
   }
 
   return uriLookupService.lookupUri(uri)
-    .then(promiseUtils.required)
     .then(function(uriLookup) {
+      if(!uriLookup) return null;
+
       if(uriLookup.userId) {
         return userService.findById(uriLookup.userId)
           .then(function(user) {
@@ -59,9 +60,11 @@ function findUri(currentUser, uri, callback) {
             if(userInOrg) {
               return roomService.findOrCreateRoom({ uri: userOrOrg, githubType: 'ORG'})
                 .then(function(troupe) {
+                  console.log('DONE. YOUR TROUPE IS ', troupe);
                   return { troupe: troupe };
                 });
             }
+
             return null;
           });
       }

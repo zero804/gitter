@@ -7,7 +7,7 @@ var Q = require('q');
 
 function GitHubOrgService(user) {
   this.user = user;
-  this.client = user ? github.client(user.githubAccessToken) : publicClient;
+  this.client = user ? github.client(user.githubToken) : publicClient;
 }
 
 /**

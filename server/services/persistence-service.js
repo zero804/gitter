@@ -99,7 +99,7 @@ var UserSchema = new Schema({
   email: { type: String },                     // The primary email address
   emails: [String],                            // Secondary email addresses
   unconfirmedEmails: [UnconfirmedEmailSchema], // Unconfirmed email addresses
-  username: { type: String },
+  username: { type: String, required: true },
   newEmail: String,
   confirmationCode: {type: String },
   status: { type: String, "enum": ['UNCONFIRMED', 'PROFILE_NOT_COMPLETED', 'ACTIVE'], "default": 'UNCONFIRMED'},
@@ -123,7 +123,7 @@ var UserSchema = new Schema({
     }
   },
   googleRefreshToken: String,
-  githubToken: String,
+  githubToken: { type: String, required: true },
   usernameSuggestion: { type: String },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
