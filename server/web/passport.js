@@ -344,6 +344,12 @@ module.exports = {
                   email: user.email
                 }, properties));
 
+                // Update user token
+                user.githubToken = accessToken;
+                user.save(function(err) {
+                  if (err) winston.error("Failed to update GH token for user ", user.username);
+                });
+
                 req.logIn(user, function(err) {
                   if (err) { return done(err); }
                   return done(null, user);
