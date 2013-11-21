@@ -9,9 +9,10 @@ define([
   'utils/momentWrapper',
   'utils/safe-html',
   'utils/scrollbar-detect',
+  'collections/instances/integrated-items',
   'jquery-sew', // No ref
   'jquery-sisyphus' // No ref
-], function(log, $, context, TroupeViews, appEvents, template, moment, safeHtml, hasScrollBars) {
+], function(log, $, context, TroupeViews, appEvents, template, moment, safeHtml, hasScrollBars, itemCollections) {
   "use strict";
 
   /** @const */
@@ -49,15 +50,22 @@ define([
         }
       }).restoreAllData();
 
-      var values = [
-        {val:'santiagotactivos', meta:'Santiago Montero'},
-        {val:'johnnyhalife', meta:'Johnny Halife'},
-        {val:'arielflesler', meta:'Ariel Flesler'},
-        {val:'rbajales', meta:'Raul Bajales'}
-        ];
-      if(window.navigator.userAgent.indexOf("Firefox") === -1) {
-        this.$el.find('textarea').sew({values: values});
-      }
+      var self = this;
+      // item collection isnt populated until later. this is a massive hack.
+      window.setTimeout(function() {
+        var suggestions = itemCollections.users.models.map(function(user) {
+          return {
+            val: user.get('username'),
+            meta: user.get('displayName')
+          };
+        }).filter(function(suggestion) {
+          return (suggestion.val && suggestion.meta);
+        });
+
+        if(window.navigator.userAgent.indexOf("Firefox") === -1) {
+          self.$el.find('textarea').sew({values: suggestions});
+        }
+      }, 1000);
 
       // http://stackoverflow.com/questions/16149083/keyboardshrinksview-makes-lose-focus/18904886#18904886
       this.$el.find("textarea").on('touchend', function(){
