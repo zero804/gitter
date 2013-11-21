@@ -698,6 +698,35 @@ function GitHubOrgStrategy(options) {
 
 }
 
+function GitHubRepoStrategy(options) {
+
+  var troupeStrategy = new TroupeStrategy(options);
+  var self = this;
+
+  this.preload = function(repos, callback) {
+    troupeService.findAllByUri(repos, function(err, troupes) {
+      if (err) callback(err);
+ 
+      self.troupes = collections.indexByProperty(troupes, 'uri');
+
+      execPreloads([{
+        strategy: troupeStrategy,
+        data: troupes
+      }], callback);
+    });
+  };
+
+  this.map = function(item) {
+    var room = self.troupes[item];
+    return {
+      name: item,
+      room: room ? troupeStrategy.map(room) : undefined
+    };
+  };
+
+}
+
+
 function TroupeStrategy(options) {
   if(!options) options = {};
 
@@ -1220,5 +1249,6 @@ module.exports = {
   serialize: serialize,
   serializeQ: serializeQ,
   serializeModel: serializeModel,
-  GitHubOrgStrategy: GitHubOrgStrategy
+  GitHubOrgStrategy: GitHubOrgStrategy,
+  GitHubRepoStrategy: GitHubRepoStrategy
 };

@@ -55,6 +55,7 @@ module.exports = {
     installUserSubResource('connectioninvites', 'connectioninvites');
     installUserSubResource('emails',  'emails');
     installUserSubResource('orgs',  'orgs');
+    installUserSubResource('repos',  'repos');
 
   }
 };

@@ -49,5 +49,13 @@ GitHubUserService.prototype.getOrgs = function() {
   return d.promise;
 };
 
+GitHubUserService.prototype.getRepos = function() {
+  var d = Q.defer();
+
+  var ghme = this.client.me();
+  ghme.repos(d.makeNodeResolver());
+
+  return d.promise;
+};
 
 module.exports = GitHubUserService;
