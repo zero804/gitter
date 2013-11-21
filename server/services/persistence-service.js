@@ -96,7 +96,7 @@ UnconfirmedEmailSchema.schemaTypeName = 'UserEmailSchema';
 
 var UserSchema = new Schema({
   displayName: { type: String, required: true },
-  email: { type: String, required: true },     // The primary email address
+  email: { type: String },                     // The primary email address
   emails: [String],                            // Secondary email addresses
   unconfirmedEmails: [UnconfirmedEmailSchema], // Unconfirmed email addresses
   username: { type: String, required: true },

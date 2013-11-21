@@ -29,7 +29,8 @@
     "zepto": "~1.0.0",
     "hopscotch": "https://github.com/linkedin/hopscotch/archive/master.zip",
     "cocktail": "https://github.com/onsi/cocktail/archive/master.zip",
-    "sisyphus": "~1.1.103"
+    "sisyphus": "~1.1.103",
+    "jquery-sew": "git@github.com:trevorah/jquery-sew.git"
   },
   "devDependencies": {
     "assert": "~0.0.1",
