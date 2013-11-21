@@ -26,6 +26,12 @@ function findByUri(uri, callback) {
     .nodeify(callback);
 }
 
+function findAllByUri(uris, callback) {
+  return persistence.Troupe.where('uri').in(uris).execQ()
+    .nodeify(callback);
+}
+
+
 function findByIds(ids, callback) {
   return persistence.Troupe
     .where('_id')['in'](collections.idsIn(ids))
@@ -889,6 +895,7 @@ function deleteTroupe(troupe, callback) {
 
 module.exports = {
   findByUri: findByUri,
+  findAllByUri: findAllByUri,
   findById: findById,
   findByIds: findByIds,
   findAllTroupesForUser: findAllTroupesForUser,

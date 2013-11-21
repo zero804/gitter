@@ -189,7 +189,7 @@ init-test-data:
 
 tarball:
 	mkdir -p output
-	find . -type f -not -name ".*"| grep -Ev '^\./(\.|node_modules/|output/|assets/|mongo-backup-|scripts/mongo-backup-).*'|tar -cv --files-from - |gzip -9 - > output/troupe.tgz
+	find . -type f -not -name ".*"| grep -Ev '^\./(\.|output/|assets/|mongo-backup-|scripts/mongo-backup-).*'|tar -cv --files-from - |gzip -9 - > output/troupe.tgz
 
 search-js-console:
 	if (find public/js -name "*.js" ! -path "*libs*" ! -name log.js |xargs grep -q '\bconsole\b'); then \
@@ -201,6 +201,8 @@ search-js-console:
 validate-source: search-js-console
 
 continuous-integration: clean validate-source npm grunt version-files upgrade-data reset-test-data test-xunit test-coverage tarball
+
+continuous-integration-no-test: clean validate-source npm grunt version-files upgrade-data reset-test-data tarball
 
 post-deployment-tests: npm test-in-browser-xunit rest-test-xunit end-to-end-test-saucelabs-chrome end-to-end-test-saucelabs-ie10 end-to-end-test-saucelabs-android
 

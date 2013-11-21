@@ -24,9 +24,9 @@ var promiseUtils              = require('../utils/promise-utils');
  * @return the promise of a new user
  */
 function newUser(options, callback) {
-  assert(options.email, 'Email atttribute required');
+  //assert(options.email, 'Email atttribute required');
 
-  var email = options.email.toLowerCase();
+  var email = options.email ? options.email.toLowerCase() : null;
 
   var status = options.status || "UNCONFIRMED";
 
@@ -34,7 +34,7 @@ function newUser(options, callback) {
     username:           options.username,
     displayName:        options.displayName,
     confirmationCode:   uuid.v4(),
-    gravatarImageUrl:   options.gravatarImageUrl || gravatar.gravatarUrlForEmail(options.email),
+    gravatarImageUrl:   options.gravatarImageUrl, // || gravatar.gravatarUrlForEmail(options.email),
     googleRefreshToken: options.googleRefreshToken || undefined,
     status:             status,
     usernameSuggestion: options.usernameSuggestion || undefined,
@@ -91,6 +91,19 @@ var userService = {
       .nodeify(callback);
   },
 
+  findOrCreateUserForGithubId: function(options, callback) {
+    winston.info("Locating or creating user", options);
+
+    return userService.findByGithubId(options.githubId)
+      .then(function(user) {
+        if(user) return user;
+
+        return newUser(options);
+      })
+      .nodeify(callback);
+  },
+
+
 
   findByConfirmationCode: function(confirmationCode, callback) {
 
@@ -139,6 +152,11 @@ var userService = {
 
   findById: function(id, callback) {
     return persistence.User.findByIdQ(id).nodeify(callback);
+  },
+
+  findByGithubId: function(githubId, callback) {
+    return persistence.User.findOneQ({githubId: githubId})
+           .nodeify(callback);
   },
 
   findByEmail: function(email, callback) {
