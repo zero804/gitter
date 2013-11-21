@@ -31,12 +31,15 @@ function newUser(options, callback) {
   var status = options.status || "UNCONFIRMED";
 
   var insertFields = {
+    username:           options.username,
     displayName:        options.displayName,
     confirmationCode:   uuid.v4(),
     gravatarImageUrl:   options.gravatarImageUrl || gravatar.gravatarUrlForEmail(options.email),
     googleRefreshToken: options.googleRefreshToken || undefined,
     status:             status,
-    usernameSuggestion: options.usernameSuggestion || undefined
+    usernameSuggestion: options.usernameSuggestion || undefined,
+    githubToken:        options.githubToken,
+    githubId:           options.githubId
   };
 
   // Remove undefined fields
@@ -69,7 +72,8 @@ function newUser(options, callback) {
       }, optionStats));
 
       return user;
-    }).nodeify(callback);
+    })
+    .nodeify(callback);
 }
 
 var userService = {
@@ -86,6 +90,19 @@ var userService = {
       })
       .nodeify(callback);
   },
+
+  findOrCreateUserForGithubId: function(options, callback) {
+    winston.info("Locating or creating user", options);
+
+    return userService.findByGithubId(options.githubId)
+      .then(function(user) {
+        if(user) return user;
+
+        return newUser(options);
+      })
+      .nodeify(callback);
+  },
+
 
 
   findByConfirmationCode: function(confirmationCode, callback) {
@@ -135,6 +152,11 @@ var userService = {
 
   findById: function(id, callback) {
     return persistence.User.findByIdQ(id).nodeify(callback);
+  },
+
+  findByGithubId: function(githubId, callback) {
+    return persistence.User.findOneQ({githubId: githubId})
+           .nodeify(callback);
   },
 
   findByEmail: function(email, callback) {

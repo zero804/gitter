@@ -1,10 +1,9 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'jquery',
   'views/base',
   'hbs!./tmpl/troupeAvatar',
   'bootstrap_tooltip'
-], function($, TroupeViews, template) {
+], function(TroupeViews, template) {
 
   "use strict";
 
@@ -46,13 +45,18 @@ define([
       var data = this.model.toJSON();
       data.noHref = this.noHref;
       if (!this.model.get('oneToOne')) {
-        var initials = this.model.get('name')
-                            .split(/[^\w]/)
-                            .filter(function(f) { return f; })
-                            .map(function(s) { return s.charAt(0); })
-                            .slice(0,2)
-                            .join('')
-                            .toUpperCase();
+        var name = this.model.get('name');
+        var initials;
+        if(name) {
+          initials = name.split(/[^\w]/)
+                         .filter(function(f) { return f; })
+                         .map(function(s) { return s.charAt(0); })
+                         .slice(0,2)
+                         .join('')
+                         .toUpperCase();
+        } else {
+          initials = '?';
+        }
 
         var colour = RING_COLOURS[hash(this.model.id) % RING_COLOURS.length];
 
