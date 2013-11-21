@@ -55,7 +55,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
         appCache: getAppCache(req),
         login: login,
         bootScriptName: bootScript,
-        troupeName: troupeContext.troupe.name,
+        troupeName: troupeContext.troupe.uri,
         troupeContext: troupeContext,
         agent: req.headers['user-agent']
       });
