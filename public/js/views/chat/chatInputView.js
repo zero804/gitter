@@ -9,9 +9,10 @@ define([
   'utils/momentWrapper',
   'utils/safe-html',
   'utils/scrollbar-detect',
-  'jquery-placeholder', // No ref
+  'collections/instances/integrated-items',
+  'jquery-sew', // No ref
   'jquery-sisyphus' // No ref
-], function(log, $, context, TroupeViews, appEvents, template, moment, safeHtml, hasScrollBars) {
+], function(log, $, context, TroupeViews, appEvents, template, moment, safeHtml, hasScrollBars, itemCollections) {
   "use strict";
 
   /** @const */
@@ -48,6 +49,23 @@ define([
           inputBox.trigger('change');
         }
       }).restoreAllData();
+
+      var self = this;
+      // item collection isnt populated until later. this is a massive hack.
+      window.setTimeout(function() {
+        var suggestions = itemCollections.users.models.map(function(user) {
+          return {
+            val: user.get('username'),
+            meta: user.get('displayName')
+          };
+        }).filter(function(suggestion) {
+          return (suggestion.val && suggestion.meta);
+        });
+
+        if(window.navigator.userAgent.indexOf("Firefox") === -1) {
+          self.$el.find('textarea').sew({values: suggestions});
+        }
+      }, 1000);
 
       // http://stackoverflow.com/questions/16149083/keyboardshrinksview-makes-lose-focus/18904886#18904886
       this.$el.find("textarea").on('touchend', function(){
@@ -148,8 +166,6 @@ define([
     // pass in the textarea as el for ChatInputBoxView
     // pass in a scroll delegate
     initialize: function(options) {
-      this.$el.placeholder();
-
       if(hasScrollBars()) {
         this.$el.addClass("scroller");
       }
@@ -179,7 +195,7 @@ define([
     },
 
     onKeyDown: function(e) {
-      if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/))) {
+      if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !$('.-sew-list-container').is(":visible")) {
         e.stopPropagation();
         e.preventDefault();
 
