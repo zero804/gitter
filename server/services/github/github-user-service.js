@@ -40,4 +40,14 @@ GitHubUserService.prototype.getUser = function(user) {
   return d.promise;
 };
 
+GitHubUserService.prototype.getOrgs = function() {
+  var d = Q.defer();
+
+  var ghme = this.client.me();
+  ghme.orgs(d.makeNodeResolver());
+
+  return d.promise;
+};
+
+
 module.exports = GitHubUserService;
