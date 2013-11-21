@@ -13,17 +13,17 @@ var bayeux = require('./web/bayeux');
 var app = express();
 var server;
 
-if(nconf.get("ws:privateKeyFile")) {
-  var options = {
-    key: fs.readFileSync(nconf.get("ws:privateKeyFile")),
-    cert: fs.readFileSync(nconf.get("ws:certificateFile"))
-  };
-  winston.info("Starting https/wss service");
-  server = https.createServer(options, app);
-} else {
+// if(nconf.get("ws:privateKeyFile")) {
+//   var options = {
+//     key: fs.readFileSync(nconf.get("ws:privateKeyFile")),
+//     cert: fs.readFileSync(nconf.get("ws:certificateFile"))
+//   };
+//   winston.info("Starting https/wss service");
+//   server = https.createServer(options, app);
+// } else {
   winston.info("Starting http/ws service");
   server = http.createServer(app);
-}
+// }
 
 
 var RedisStore = require('connect-redis')(express);
