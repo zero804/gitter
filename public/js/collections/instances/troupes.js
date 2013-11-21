@@ -14,6 +14,9 @@ define([
 ], function($, _, Backbone, context, base, realtime, troupeModels, inviteModels, SmartCollection, unreadItemsClient) {
   "use strict";
 
+  var orgsCollection = new troupeModels.OrgCollection(null, { listen: true });
+  orgsCollection.fetch();
+
   var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
   unreadItemsClient.installTroupeListener(troupeCollection);
 
@@ -120,7 +123,8 @@ define([
     incomingTroupeInvites: incomingTroupeInvites,
     outgoingInvites: outgoingInvites,
     outgoingConnectionInvites: outgoingConnectionInvites,
-    smart: smartCollection
+    smart: smartCollection,
+    orgs: orgsCollection
   };
 
 });
