@@ -96,7 +96,7 @@ UnconfirmedEmailSchema.schemaTypeName = 'UserEmailSchema';
 
 var UserSchema = new Schema({
   displayName: { type: String, required: true },
-  email: { type: String, required: true },     // The primary email address
+  email: { type: String },                     // The primary email address
   emails: [String],                            // Secondary email addresses
   unconfirmedEmails: [UnconfirmedEmailSchema], // Unconfirmed email addresses
   username: { type: String, required: true },
@@ -124,11 +124,12 @@ var UserSchema = new Schema({
   },
   googleRefreshToken: String,
   githubToken: { type: String, required: true },
-  githubId: Number,
+  githubId: {type: Number, required: true},
   usernameSuggestion: { type: String },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ githubId: 1 }, { unique: true });
 UserSchema.index({ username: 1 }, { unique: true, sparse: true });
 UserSchema.index({ "emails.email" : 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';

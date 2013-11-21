@@ -1,39 +1,24 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'ga',
   'utils/context',
   'utils/appevents',
   './mixpanel', // No ref
   'optimizely'
-], function(_gaq, context, appEvents) {
+], function(context, appEvents) {
   "use strict";
   var trackingId = context.env('googleTrackingId');
+  var ga;
   if(trackingId) {
-    _gaq.push(['_setAccount', trackingId]);
-    _gaq.push(['_setAllowAnchor',true]);
+        
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    var userId = context.getUserId();
-    if (userId) {
-      _gaq.push(['_setCustomVar',
-          1,
-          'userId',
-          userId,
-          2 // Session level variable
-       ]);
-    }
+    ga = window.ga;
 
-    _gaq.push(['_trackPageview']);
-    _gaq.push(function() {
-      window.setTimeout(function() {
-        var hash = "" + window.location.hash;
-        try {
-          hash = hash.replace(/\butm_\w+=(\+|\w+|%\w\w|\-)*&?/g, "");
-        } catch(e) {
-        }
-
-        window.location.hash = hash;
-      }, 10);
-    });
+    ga('create', 'UA-45918290-1', 'gitter.im');
+    ga('send', 'pageview');
 
   }
 
@@ -69,7 +54,7 @@ define([
     }
 
     if(trackingId) {
-      _gaq.push(['_trackEvent', 'Route', routeName]);
+      ga('send', 'event', 'route', routeName);
     }
 
   }
@@ -80,7 +65,7 @@ define([
     }
 
     if(trackingId) {
-      _gaq.push(['_trackEvent', 'Error', message, file, line]);
+      ga('send', 'event', 'error', message, file, line);
     }
   }
 
