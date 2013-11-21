@@ -24,20 +24,20 @@ mongoose.set('debug', nconf.get("mongo:logQueries"));
 
 mongoose.connect(nconf.get("mongo:url"), {
   server: {
-    readPreference: "primaryPreferred",
-    socketOptions: { keepAlive: 1, connectTimeoutMS: 3000 },
-    auto_reconnect: true,
-    autoReconnect: true
-  },
+            readPreference: "primaryPreferred",
+  socketOptions: { keepAlive: 1, connectTimeoutMS: 3000 },
+  auto_reconnect: true,
+  autoReconnect: true
+          },
   db: {
-    readPreference: "primaryPreferred"
-  },
+        readPreference: "primaryPreferred"
+      },
   replset: {
-    readPreference: "primaryPreferred",
-    socketOptions: { keepAlive: 1, connectTimeoutMS: 2000 },
-    auto_reconnect: true,
-    autoReconnect: true
-  }
+             readPreference: "primaryPreferred",
+  socketOptions: { keepAlive: 1, connectTimeoutMS: 2000 },
+  auto_reconnect: true,
+  autoReconnect: true
+           }
 });
 
 shutdown.addHandler('mongo', 1, function(callback) {
@@ -90,16 +90,16 @@ function serializeEvent(url, operation, model, callback) {
 // --------------------------------------------------------------------
 var UnconfirmedEmailSchema = new Schema({
   email:            { type: String },
-  confirmationCode: { type: String }
+    confirmationCode: { type: String }
 });
 UnconfirmedEmailSchema.schemaTypeName = 'UserEmailSchema';
 
 var UserSchema = new Schema({
-  displayName: { type: String },
-  email: { type: String },                     // The primary email address
+  displayName: { type: String, required: true },
+  email: { type: String, required: true },     // The primary email address
   emails: [String],                            // Secondary email addresses
   unconfirmedEmails: [UnconfirmedEmailSchema], // Unconfirmed email addresses
-  username: { type: String },
+  username: { type: String, required: true },
   newEmail: String,
   confirmationCode: {type: String },
   status: { type: String, "enum": ['UNCONFIRMED', 'PROFILE_NOT_COMPLETED', 'ACTIVE'], "default": 'UNCONFIRMED'},
@@ -110,23 +110,26 @@ var UserSchema = new Schema({
   lastTroupe: ObjectId,
   location: {
     timestamp: Date,
-    coordinate: {
-      lon: Number,
-      lat: Number
-    },
-    speed: Number,
-    altitude: Number,
-    named: {
-      place: String,
-      region: String,
-      countryCode: String
-    }
+  coordinate: {
+    lon: Number,
+  lat: Number
+  },
+  speed: Number,
+  altitude: Number,
+  named: {
+    place: String,
+    region: String,
+    countryCode: String
+  }
   },
   googleRefreshToken: String,
+  githubToken: { type: String, required: true },
+  githubId: {type: Number, required: true},
   usernameSuggestion: { type: String },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ githubId: 1 }, { unique: true });
 UserSchema.index({ username: 1 }, { unique: true, sparse: true });
 UserSchema.index({ "emails.email" : 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
@@ -226,6 +229,7 @@ TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
 var TroupeSchema = new Schema({
   name: { type: String },
   uri: { type: String },
+  githubType: { type: String, 'enum': ['REPO', 'USER', 'ORG'], required: true },
   status: { type: String, "enum": ['ACTIVE', 'DELETED'], "default": 'ACTIVE'},
   oneToOne: { type: Boolean, "default": false },
   users: [TroupeUserSchema],
