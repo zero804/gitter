@@ -28,11 +28,7 @@ if (customerio_enabled) {
 }
 
 function isTestUser(email) {
-  if (!email) {
-    winston.debug("[stats] Didn't receive an email for isTestUser");
-    //return true;
-  }
-  if (email && email.indexOf("troupetest.local") !== -1) return true; else return false;
+  return false;
 }
 
 exports.event = function(eventName, properties) {
@@ -57,7 +53,7 @@ exports.event = function(eventName, properties) {
 
     if (blacklist.indexOf(eventName) == -1) {
       if (!isTestUser(properties.email)) {
-        winston.verbose("[stats]" , "Logging user to Customer Actions: " + properties.email);
+        winston.verbose("[stats]" , "Logging user to Customer Actions: " );
         // MixPanel
         if (mixpanel_enabled) {
           properties.distinct_id = properties.userId;
@@ -78,7 +74,6 @@ exports.event = function(eventName, properties) {
 };
 
 exports.userUpdate = function(user, properties) {
-  if (isTestUser(user.email)) return;
 
   winston.verbose("[stats] Updating user stat");
 

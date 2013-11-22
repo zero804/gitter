@@ -20,7 +20,7 @@ var thrice = times(3);
 var fixture = {};
 var fixture2 = {};
 
-describe('signup-service', function() {
+xdescribe('signup-service', function() {
 
   before(fixtureLoader(fixture));
   before(fixtureLoader(fixture2, {

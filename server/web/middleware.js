@@ -157,14 +157,15 @@ exports.grantAccessForRememberMeTokenMiddleware = [
 ];
 
 exports.generateRememberMeTokenMiddleware = function(req, res, next) {
-  if(req.body.rememberMe) {
+  // TODO: ask people if they want to be remembered (keep it as a user setting?)
+  //if(req.body.rememberMe) {
     rememberMe.generateAuthToken(req, res, req.user.id, {}, function(err) {
       if(err) return next(err);
       next();
     });
-  } else {
-    next();
-  }
+  // } else {
+  //   next();
+  // }
 };
 
 exports.simulateDelay = function(timeout) {

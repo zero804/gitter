@@ -22,7 +22,7 @@ describe("User Service", function() {
 
   before(fixtureLoader(fixture));
 
-  describe('using password reset code', function() {
+  xdescribe('using password reset code', function() {
     it('confirms unconfirmed users', function(done) {
       fixtureLoader.use({
         'user1': {
@@ -60,7 +60,7 @@ describe("User Service", function() {
 
   });
 
-  describe("#updateProfile", function() {
+  xdescribe("#updateProfile", function() {
     it("should update the name, password and status of a user", function(done) {
 
       var user1 = fixture.user1;
@@ -193,7 +193,7 @@ describe("User Service", function() {
   });
 
 
-  describe('#secondary-email-addresses', function() {
+  xdescribe('#secondary-email-addresses', function() {
     it('should allow adding of secondary email addresses', function(done) {
       var userService = testRequire("./services/user-service");
       var newEmail = fixture2.generateEmail();
@@ -366,7 +366,7 @@ describe("User Service", function() {
   });
 
 
-  it('should allow an email address to be duplicated with another unconfirmed secondary, and delete other unconfirmeds on confirmation', function(done) {
+  xit('should allow an email address to be duplicated with another unconfirmed secondary, and delete other unconfirmeds on confirmation', function(done) {
     var userService = testRequire("./services/user-service");
     var newEmail = fixture2.generateEmail();
 
@@ -388,13 +388,13 @@ describe("User Service", function() {
   });
 
 
-  it('should allow two users with the same email address to be created at the same moment, but only create a single account', function(done) {
+  it('should allow two users with the same githubId to be created at the same moment, but only create a single account', function(done) {
     var userService = testRequire("./services/user-service");
-    var newEmail = fixture2.generateEmail();
 
+    var githubId = fixture2.generateGithubId();
     Q.all([
-      userService.findOrCreateUserForEmail({ email: newEmail }),
-      userService.findOrCreateUserForEmail({ email: newEmail })
+      userService.findOrCreateUserForGithubId({ githubId: githubId, username: fixture2.generateUsername(), githubToken: fixture2.generateGithubToken() }),
+      userService.findOrCreateUserForGithubId({ githubId: githubId, username: fixture2.generateUsername(), githubToken: fixture2.generateGithubToken() })
       ])
       .spread(function(user1, user2) {
         assert.strictEqual(user1.id, user2.id);

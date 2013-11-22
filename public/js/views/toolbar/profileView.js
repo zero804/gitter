@@ -9,8 +9,15 @@ define([
   return TroupeViews.Base.extend({
     template: template,
     getRenderData: function() {
+      var displayName;
+      if (context.getUser().displayName = '' || !context.getUser().displayName) {
+        displayName = context.getUser().username;
+      }
+      else {
+        displayName = context.getUser().displayName;
+      }
       return {
-        displayName: context.getUser().displayName,
+        displayName: displayName,
         user: context.user()
       };
     }

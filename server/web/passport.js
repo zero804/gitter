@@ -320,7 +320,6 @@ module.exports = {
         passReqToCallback: true
       },
       function(req, accessToken, refreshToken, profile, done) {
-
         if (req.user) {
           req.user.githubToken = accessToken;
           req.user.save(function(err) {
@@ -341,7 +340,7 @@ module.exports = {
                 statsService.event("user_login", _.extend({
                   userId: user.id,
                   method: 'github_oauth',
-                  email: user.email
+                  username: user.username
                 }, properties));
 
                 // Update user token
@@ -361,7 +360,7 @@ module.exports = {
               // This is in fact a new user
               var githubUser = {
                 username:           profile._json.login,
-                displayName:        profile._json.name,
+                displayName:        profile._json.name || profile._json.login,
                 email:              profile._json.email,
                 gravatarImageUrl:   profile._json.avatar_url,
                 githubToken:        accessToken,
