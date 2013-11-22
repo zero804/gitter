@@ -503,6 +503,7 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
         name: '',
         oneToOne: true,
         status: 'ACTIVE',
+        githubType: 'ONETOONE',
         users: [
           { userId: userId1 },
           { userId: userId2 }
@@ -598,37 +599,37 @@ function findOrCreateOneToOneTroupeIfPossible(fromUserId, toUserId) {
 
 }
 
-/**
- * Take a one to one troupe and turn it into a normal troupe with extra invites
- * @return promise with new troupe
- */
-function upgradeOneToOneTroupe(options, callback) {
-  var name = options.name;
-  var fromUser = options.user;
-  var origTroupe = options.oneToOneTroupe.toObject();
+// /**
+//  * Take a one to one troupe and turn it into a normal troupe with extra invites
+//  * @return promise with new troupe
+//  */
+// function upgradeOneToOneTroupe(options, callback) {
+//   var name = options.name;
+//   var fromUser = options.user;
+//   var origTroupe = options.oneToOneTroupe.toObject();
 
-  // create a new, normal troupe, with the current users from the one to one troupe
-  return createTroupeQ({
-      uri: createUniqueUri(),
-      name: name,
-      status: 'ACTIVE',
-      users: origTroupe.users
-    })
-    .then(function(troupe) {
+//   // create a new, normal troupe, with the current users from the one to one troupe
+//   return createTroupeQ({
+//       uri: createUniqueUri(),
+//       name: name,
+//       status: 'ACTIVE',
+//       users: origTroupe.users
+//     })
+//     .then(function(troupe) {
 
-      statsService.event('new_troupe', {
-        troupeId: troupe.id,
-        userId: fromUser.id,
-        email: fromUser.email,
-        oneToOneUpgrade: true,
-        oneToOne: false
-      });
+//       statsService.event('new_troupe', {
+//         troupeId: troupe.id,
+//         userId: fromUser.id,
+//         email: fromUser.email,
+//         oneToOneUpgrade: true,
+//         oneToOne: false
+//       });
 
-      return troupe;
-    })
-    .nodeify(callback);
+//       return troupe;
+//     })
+//     .nodeify(callback);
 
-}
+// }
 
 function createUniqueUri() {
   var chars = "0123456789abcdefghiklmnopqrstuvwxyz";
@@ -821,61 +822,61 @@ function findLastAccessedTroupeForUser(user, callback) {
 
 }
 
-//
-//
-//
-/**
- * Create a new troupe from a one-to-one troupe and auto-invite users
- * @return promise of a troupe
- */
-function createNewTroupeForExistingUser(options, callback) {
-  return Q.resolve(null).then(function() {
-    var name = options.name;
-    var oneToOneTroupeId = options.oneToOneTroupeId;
-    var user = options.user;
+// //
+// //
+// //
+// /**
+//  * Create a new troupe from a one-to-one troupe and auto-invite users
+//  * @return promise of a troupe
+//  */
+// function createNewTroupeForExistingUser(options, callback) {
+//   return Q.resolve(null).then(function() {
+//     var name = options.name;
+//     // var oneToOneTroupeId = options.oneToOneTroupeId;
+//     var user = options.user;
 
-    name = name ? name.trim() : '';
+//     name = name ? name.trim() : '';
 
-    assert(user, 'user required');
-    assert(name, 'Please provide a troupe name');
+//     assert(user, 'user required');
+//     assert(name, 'Please provide a troupe name');
 
-    if (oneToOneTroupeId) {
-      // find this 1-1 troupe and create a new normal troupe with the additional person(s) invited
-      return findById(oneToOneTroupeId)
-        .then(function(troupe) {
-          if(!userHasAccessToTroupe(user, troupe)) {
-            throw 403;
-          }
+//     // if (oneToOneTroupeId) {
+//     //   // find this 1-1 troupe and create a new normal troupe with the additional person(s) invited
+//     //   return findById(oneToOneTroupeId)
+//     //     .then(function(troupe) {
+//     //       if(!userHasAccessToTroupe(user, troupe)) {
+//     //         throw 403;
+//     //       }
 
-          return upgradeOneToOneTroupe({
-            name: name,
-            oneToOneTroupe: troupe,
-            user: user });
-        });
-    }
+//     //       return upgradeOneToOneTroupe({
+//     //         name: name,
+//     //         oneToOneTroupe: troupe,
+//     //         user: user });
+//     //     });
+//     // }
 
-    // create a troupe normally
-    var troupe = new persistence.Troupe({
-      name: name,
-      uri: createUniqueUri()
-    });
-    troupe.addUserById(user.id);
-    return troupe.saveQ()
-      .then(function() {
-        statsService.event('new_troupe', {
-          troupeId: troupe.id,
-          userId: user.id,
-          email: user.email,
-          oneToOneUpgrade: true,
-          oneToOne: false
-        });
+//     // create a troupe normally
+//     var troupe = new persistence.Troupe({
+//       name: name,
+//       uri: createUniqueUri()
+//     });
+//     troupe.addUserById(user.id);
+//     return troupe.saveQ()
+//       .then(function() {
+//         statsService.event('new_troupe', {
+//           troupeId: troupe.id,
+//           userId: user.id,
+//           email: user.email,
+//           oneToOneUpgrade: true,
+//           oneToOne: false
+//         });
 
-        return troupe;
-      });
+//         return troupe;
+//       });
 
-  }).nodeify(callback);
+//   }).nodeify(callback);
 
-}
+// }
 
 
 function deleteTroupe(troupe, callback) {
@@ -934,7 +935,7 @@ module.exports = {
   updateFavourite: updateFavourite,
   findFavouriteTroupesForUser: findFavouriteTroupesForUser,
   findBestTroupeForUser: findBestTroupeForUser,
-  createNewTroupeForExistingUser: createNewTroupeForExistingUser,
+  // createNewTroupeForExistingUser: createNewTroupeForExistingUser,
   indexTroupesByUserIdTroupeId: indexTroupesByUserIdTroupeId,
 
   addUserIdToTroupe: addUserIdToTroupe,
