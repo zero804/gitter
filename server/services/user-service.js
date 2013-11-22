@@ -62,6 +62,7 @@ function newUser(options, callback) {
 
       statsService.event('new_user', _.extend({
             userId: user.id,
+            username: user.username,
             email: options.email,
             status: status,
             source: options.source
@@ -413,7 +414,7 @@ var userService = {
 
               postSave.push(function() {
                 appEvents.userAccountActivated(user.id);
-                statsService.event('profile_completed', { userId: user.id, email: user.email });
+                statsService.event('profile_completed', { userId: user.id, username: user.username });
               });
             }
             return user;
@@ -472,7 +473,7 @@ var userService = {
 
     function notifyTrackers(user) {
       statsService.userUpdate(user);
-      statsService.event('profile_updated', { userId: user.id, email: user.email });
+      statsService.event('profile_updated', { userId: user.id, username: user.username });
 
       return user;
     }

@@ -341,7 +341,7 @@ module.exports = {
                 statsService.event("user_login", _.extend({
                   userId: user.id,
                   method: 'github_oauth',
-                  email: user.email
+                  username: user.username
                 }, properties));
 
                 // Update user token
