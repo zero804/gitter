@@ -55,5 +55,10 @@ module.exports = {
     app.get('/api/v1/suggested-contacts',
         auth,
         require('./suggested-contacts.js'));
+
+    // No auth for hooks yet
+    // THIS SHOULD BE A PRIVATE API
+    app.post('/api/v1/hook/:hash',
+        require('./hooks'));
   }
 };

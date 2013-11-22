@@ -58,13 +58,12 @@ require('./handlers/').install(app);
 require('./services/kue-workers').startWorkers();
 
 // APIS
-require('./resources/').install(app);
 require('./api/').install(app);
 
+// Our clients
 app.get('/oauth/authorize', oauth2.authorization);
 app.post('/oauth/authorize/decision', oauth2.decision);
 app.post('/oauth/token', oauth2.token);
-app.post('/oauth/bearerLogin', oauth2.bearerLogin);
 
 app.get('/OAuthCallback', function(req, res) {
   res.send(200, 'Can I help you with something?');

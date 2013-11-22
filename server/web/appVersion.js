@@ -14,7 +14,7 @@ try {
 }
 
 var appTag = commit ? commit.substring(0, 6) : 'dev' + Math.floor(Date.now() / 10000);
-var cdnPrefix = commit ? "/s/" + appTag : '';
+var cdnPrefix = commit ? "/_s/" + appTag : '';
 
 
 function getCurrentVersion() {

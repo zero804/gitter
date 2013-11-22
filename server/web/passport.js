@@ -316,7 +316,7 @@ module.exports = {
     passport.use(new GitHubStrategy({
         clientID:     nconf.get('github:client_id'),
         clientSecret: nconf.get('github:client_secret'),
-        callbackURL:  nconf.get('web:basepath') + '/github/callback',
+        callbackURL:  nconf.get('web:basepath') + '/login/callback',
         passReqToCallback: true
       },
       function(req, accessToken, refreshToken, profile, done) {

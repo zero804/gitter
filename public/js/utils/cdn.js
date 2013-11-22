@@ -6,7 +6,7 @@ define([
 
   var hosts = context.env('cdns');
   var hostLength = hosts && hosts.length;
-  var cdnPrefix = context.env('appVersion') ? "/s/" + context.env('appVersion') : '';
+  var cdnPrefix = context.env('appVersion') ? "/_s/" + context.env('appVersion') : '';
 
   function cdnPassthrough(url) {
     return "/" + url;
