@@ -104,6 +104,12 @@ exports.userUpdate = function(user, properties) {
       mixpanel.people.set(user.id, mp_properties);
     }
 
+    var email = user.email;
+
+    if (user.email === '' || !user.email) {
+      email = "noemail@gitter.im";
+    }
+
     if (customerio_enabled) {
       var cio_properties = {
         first_name: firstName,
