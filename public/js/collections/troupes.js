@@ -2,9 +2,8 @@
 define([
   'utils/context',
   './base',
-  '../utils/momentWrapper',
-  'backbone'
-], function(context, TroupeCollections, moment, Backbone) {
+  '../utils/momentWrapper'
+], function(context, TroupeCollections, moment) {
   "use strict";
 
   var TroupeModel = TroupeCollections.Model.extend({
@@ -32,24 +31,8 @@ define([
     }
   });
 
-
-  var OrgModel = TroupeCollections.Model.extend({
-    idAttribute: 'name'
-  });
-
-  var OrgCollection = Backbone.Collection.extend({
-    model: OrgModel,
-    initialize: function() {
-      this.url = "/user/" + context.getUserId() + "/orgs";
-      this.listenTo(this, 'change:name', this.replicateContext);
-    }
-  });
-
-
   return {
     TroupeCollection: TroupeCollection,
-    TroupeModel:      TroupeModel,
-    OrgCollection:    OrgCollection,
-    OrgModel:         OrgModel
+    TroupeModel:      TroupeModel
   };
 });

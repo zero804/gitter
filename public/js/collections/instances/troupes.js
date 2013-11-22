@@ -9,12 +9,13 @@ define([
   '../troupes',
   '../invites',
   '../smart',
+  '../orgs',
   'components/unread-items-client',
   'filtered-collection' /* no ref */
-], function($, _, Backbone, context, base, realtime, troupeModels, inviteModels, SmartCollection, unreadItemsClient) {
+], function($, _, Backbone, context, base, realtime, troupeModels, inviteModels, SmartCollection, orgModels, unreadItemsClient) {
   "use strict";
 
-  var orgsCollection = new troupeModels.OrgCollection(null, { listen: true });
+  var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
   orgsCollection.fetch();
 
   var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });

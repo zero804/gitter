@@ -89,7 +89,6 @@ define([
       this.search.show(this.searchView);
 
       // Organizations collection view
-      console.debug(troupeCollections.orgs);
       this.orgs.show(new OrgCollectionView({ collection: troupeCollections.orgs }));
 
       this.initHideListeners();
