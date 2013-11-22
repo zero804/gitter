@@ -689,8 +689,6 @@ function GitHubOrgStrategy(options) {
   };
 
   this.map = function(item) {
-    console.log('[org] ', item);
-
     var room = self.troupes[item];
     return {
       name: item,
