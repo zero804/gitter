@@ -39,6 +39,8 @@ function createBaseFixture() {
     generateName: generateName,
     generateUri: generateUri,
     generateUsername: generateUsername,
+    generateGithubId: generateGithubId,
+    generateGithubToken: generateGithubToken,
 
     cleanup: function() {
       var self = this;
