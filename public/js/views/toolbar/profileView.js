@@ -10,7 +10,7 @@ define([
     template: template,
     getRenderData: function() {
       var displayName;
-      if (context.getUser().displayName = '' || !context.getUser().displayName) {
+      if (context.getUser().displayName === '' || !context.getUser().displayName) {
         displayName = context.getUser().username;
       }
       else {
