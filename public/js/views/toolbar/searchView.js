@@ -32,7 +32,7 @@ define([
 
       query = query.toLowerCase().trim();
 
-      if (query === '') 
+      if (query === '')
         $(window).trigger('hideSearch');
       // don't do anything if the search term hasn't changed
       if (query === this.query)
@@ -121,8 +121,7 @@ define([
         return;
       }
 
-      var url = '/user';
-      $.ajax({ url: url, data : { q: query, unconnected:1 }, success: function(data) {
+      $.ajax({ url: '/api/v1/user', data : { q: query, unconnected:1 }, success: function(data) {
         if (data.results) {
           if (!self.queries[query]) self.queries[query] = [];
 

@@ -95,7 +95,7 @@ define([
       //     uploadButton: ''
       //   },
       //   request: {
-      //     endpoint: '/troupes/' + context.getTroupeId() + '/downloads/'
+      //     endpoint: '/api/v1/troupes/' + context.getTroupeId() + '/downloads/'
       //   },
       //   showMessage: function(message) {
       //     if(message === 'No files to upload.') return;

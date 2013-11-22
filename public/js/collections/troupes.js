@@ -20,7 +20,7 @@ define([
   var TroupeCollection = TroupeCollections.LiveCollection.extend({
     model: TroupeModel,
     initialize: function() {
-      this.url = "/user/" + context.getUserId() + "/troupes";
+      this.url = "/api/v1/user/" + context.getUserId() + "/troupes";
       this.listenTo(this, 'change:name', this.replicateContext);
     },
 

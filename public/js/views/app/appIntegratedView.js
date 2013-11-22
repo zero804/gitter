@@ -252,7 +252,7 @@ define([
       var isFavourite = favHeader.hasClass('favourited');
 
       $.ajax({
-        url: '/troupes/' + context.getTroupeId(),
+        url: '/api/v1/troupes/' + context.getTroupeId(),
         contentType: "application/json",
         dataType: "json",
         type: "PUT",

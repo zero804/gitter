@@ -18,16 +18,16 @@ var appTag = appVersion.getAppTag();
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
-  { re: /^\/troupes\/(\w+)$/,         validator: validateUserForTroupeSubscription },
-  { re: /^\/troupes\/(\w+)\/(\w+)$/,  validator: validateUserForSubTroupeSubscription,  populator: populateSubTroupeCollection },
-  { re: /^\/troupes\/(\w+)\/(\w+)\/(\w+)\/(\w+)$/,
+  { re: /^\/api\/v1\/troupes\/(\w+)$/,         validator: validateUserForTroupeSubscription },
+  { re: /^\/api\/v1\/troupes\/(\w+)\/(\w+)$/,  validator: validateUserForSubTroupeSubscription,  populator: populateSubTroupeCollection },
+  { re: /^\/api\/v1\/troupes\/(\w+)\/(\w+)\/(\w+)\/(\w+)$/,
                                       validator: validateUserForSubTroupeSubscription,  populator: populateSubSubTroupeCollection },
 
-  { re: /^\/user\/(\w+)\/(\w+)$/,     validator: validateUserForUserSubscription,       populator: populateSubUserCollection },
-  { re: /^\/user\/(\w+)\/troupes\/(\w+)\/unreadItems$/,
+  { re: /^\/api\/v1\/user\/(\w+)\/(\w+)$/,     validator: validateUserForUserSubscription,       populator: populateSubUserCollection },
+  { re: /^\/api\/v1\/user\/(\w+)\/troupes\/(\w+)\/unreadItems$/,
                                       validator: validateUserForUserSubscription,       populator: populateUserUnreadItemsCollection },
-  { re: /^\/user\/(\w+)$/,            validator: validateUserForUserSubscription },
-  { re: /^\/ping$/,                   validator: validateUserForPingSubscription }
+  { re: /^\/api\/v1\/user\/(\w+)$/,            validator: validateUserForUserSubscription },
+  { re: /^\/api\/v1\/ping$/,                   validator: validateUserForPingSubscription }
 ];
 
 var superClientPassword = nconf.get('ws:superClientPassword');
