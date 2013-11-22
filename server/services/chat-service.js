@@ -76,7 +76,7 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
     statsService.event("new_chat", {
       userId: user.id,
       troupeId: troupe.id,
-      email: user.email
+      username: user.username
     });
 
     return callback(null, chatMessage);
