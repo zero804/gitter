@@ -393,8 +393,8 @@ describe("User Service", function() {
 
     var githubId = fixture2.generateGithubId();
     Q.all([
-      userService.findOrCreateUserForGithubId({ githubId: githubId, username: fixture2.generateUsername() }),
-      userService.findOrCreateUserForGithubId({ githubId: githubId, username: fixture2.generateUsername() })
+      userService.findOrCreateUserForGithubId({ githubId: githubId, username: fixture2.generateUsername(), githubToken: fixture2.generateGithubToken() }),
+      userService.findOrCreateUserForGithubId({ githubId: githubId, username: fixture2.generateUsername(), githubToken: fixture2.generateGithubToken() })
       ])
       .spread(function(user1, user2) {
         assert.strictEqual(user1.id, user2.id);
