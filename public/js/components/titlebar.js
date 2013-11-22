@@ -21,10 +21,10 @@ define([
               badge.text(count);
               if(count > 0) {
                 // badge.show();
-                $("#favicon").attr("href","/images/2/favicon-unread.png");
+                $("#favicon").attr("href","/images/2/gitter/favicon-unread.png");
               } else {
                 // badge.hide();
-                $("#favicon").attr("href","/images/2/favicon.png");
+                $("#favicon").attr("href","/images/2/gitter/favicon.png");
               }
             }
 
@@ -47,7 +47,7 @@ define([
       if (name) {
         mainTitle = name + " - Troupe";
       } else {
-        mainTitle = "Troupe";
+        mainTitle = "Gitter";
       }
 
       // TODO this isn't working properly when updating the troupe name, need to be able to poll unreadItems count not just accept the event
