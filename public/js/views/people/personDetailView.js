@@ -25,7 +25,7 @@ define([
       d.isSelf = this.isSelf;
       d.troupe = context.getTroupe();
       // var latestVersion = this.model.get('versions').length - 1;
-      // d.fileIcon = '/troupes/' + context.getTroupeId() + '/thumbnails/' + d.fileName + "?version=" + latestVersion;
+      // d.fileIcon = '/api/v1/troupes/' + context.getTroupeId() + '/thumbnails/' + d.fileName + "?version=" + latestVersion;
       // d.previewUrl = '#file/preview/' + d.id;
       // d.versionsUrl = '#file/versions/' + d.id;
       return d;
@@ -44,7 +44,7 @@ define([
       modal.on('menuItemClicked', function(action) {
         if (action === "yes") {
           $.ajax({
-            url: "/troupes/" + context.getTroupeId() + "/users/" + this.model.get('id'),
+            url: "/api/v1/troupes/" + context.getTroupeId() + "/users/" + this.model.get('id'),
             data: "",
             type: "DELETE",
             success: function() {

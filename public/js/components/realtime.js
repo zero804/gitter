@@ -207,7 +207,7 @@ define([
       }
 
       if(user.id) {
-        userSubscription = client.subscribe('/user/' + user.id, function(message) {
+        userSubscription = client.subscribe('/api/v1/user/' + user.id, function(message) {
           if (message.notification === 'user_notification') {
             appEvents.trigger('user_notification', message);
           }
@@ -250,7 +250,7 @@ define([
     /* Only test the connection if one has already been established */
     if(!client) return;
 
-    client.publish('/ping', { });
+    client.publish('/api/v1/ping', { });
   }
 
 

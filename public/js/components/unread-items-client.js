@@ -269,7 +269,7 @@ define([
       var async = !options || !options.sync;
 
       $.ajax({
-        url: "/troupes/" + context.getTroupeId() + "/unreadItems",
+        url: "/api/v1/troupes/" + context.getTroupeId() + "/unreadItems",
         contentType: "application/json",
         data: JSON.stringify(queue),
         async: async,
@@ -344,7 +344,7 @@ define([
       var store = this._store;
       var self = this;
 
-      var url = '/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/unreadItems';
+      var url = '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/unreadItems';
       realtime.subscribe(url, function(message) {
         if(message.notification === 'unread_items') {
           store._unreadItemsAdded(message.items);
@@ -376,7 +376,7 @@ define([
   TroupeCollectionRealtimeSync.prototype = {
     _subscribe: function() {
        var self = this;
-       realtime.subscribe('/user/' + context.getUserId(), function(message) {
+       realtime.subscribe('/api/v1/user/' + context.getUserId(), function(message) {
         if(message.notification !== 'troupe_unread') return;
         self._handleIncomingMessage(message);
       });

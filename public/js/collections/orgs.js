@@ -13,7 +13,7 @@ define([
   var OrgCollection = Backbone.Collection.extend({
     model: OrgModel,
     initialize: function() {
-      this.url = "/user/" + context.getUserId() + "/orgs";
+      this.url = "/api/v1/user/" + context.getUserId() + "/orgs";
       this.listenTo(this, 'change:name', this.replicateContext);
     }
   });

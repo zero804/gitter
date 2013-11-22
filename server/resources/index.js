@@ -15,7 +15,7 @@ module.exports = {
         app.all(path + '/*', auth);
     });
 
-    var troupesResource = app.resource('troupes',  require('./troupes/troupes'));
+    var troupesResource = app.resource('api/v1/troupes',  require('./troupes/troupes'));
 
     function installTroupeSubResource(resourceName, moduleName) {
         var r = app.resource(resourceName,  require('./troupes/' + moduleName));
@@ -40,7 +40,7 @@ module.exports = {
 
     installTroupeSubResource('unreadItems', 'unread-items');
 
-    var userResource = app.resource('user',  require('./user/user.js'));
+    var userResource = app.resource('api/v1/user',  require('./user/user.js'));
     function installUserSubResource(resourceName, moduleName) {
         var r = new Resource(resourceName, require('./user/' + moduleName), app);
         userResource.add(r);
