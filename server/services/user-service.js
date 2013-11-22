@@ -28,17 +28,15 @@ function newUser(options, callback) {
   assert(githubId, 'githubId required');
   assert(options.githubToken, 'githubToken required');
   assert(options.username, 'username required');
-
-  var email = options.email ? options.email.toLowerCase() : undefined;
+  var email   = options.email ? options.email.toLowerCase() : null;
 
   var insertFields = {
+    githubId:           githubId, 
+    githubToken:        options.githubToken,
     username:           options.username,
     email:              email,
     displayName:        options.displayName,
-    googleRefreshToken: options.googleRefreshToken || undefined,
-    usernameSuggestion: options.usernameSuggestion || undefined,
-    githubToken:        options.githubToken,
-    githubId:           options.githubId
+    googleRefreshToken: options.googleRefreshToken || undefined
   };
 
   // Remove undefined fields
@@ -60,11 +58,11 @@ function newUser(options, callback) {
       var optionStats = options.stats || {};
 
       statsService.event('new_user', _.extend({
-            userId: user.id,
-            email: options.email,
-            username: options.username,
-            source: options.source
-          }, optionStats));
+        userId:   user.id,
+        username: options.username,
+        email:    options.email,
+        source:   options.source
+      }, optionStats));
 
       statsService.userUpdate(user, _.extend({
         source: options.source
