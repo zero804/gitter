@@ -98,40 +98,40 @@ var UserSchema = new Schema({
   displayName: { type: String, required: true },
   email: { type: String },                     // The primary email address
   emails: [String],                            // Secondary email addresses
-  unconfirmedEmails: [UnconfirmedEmailSchema], // Unconfirmed email addresses
+  // unconfirmedEmails: [UnconfirmedEmailSchema], // Unconfirmed email addresses
   username: { type: String, required: true },
-  newEmail: String,
+  // newEmail: String,
   confirmationCode: {type: String },
-  status: { type: String, "enum": ['UNCONFIRMED', 'PROFILE_NOT_COMPLETED', 'ACTIVE'], "default": 'UNCONFIRMED'},
-  passwordHash: { type: String },
-  passwordResetCode: String,
-  avatarVersion: { type: Number, "default": 0 },
+  // status: { type: String, "enum": ['UNCONFIRMED', 'PROFILE_NOT_COMPLETED', 'ACTIVE'], "default": 'UNCONFIRMED'},
+  // passwordHash: { type: String },
+  // passwordResetCode: String,
+  // avatarVersion: { type: Number, "default": 0 },
   gravatarImageUrl: { type: String },
   lastTroupe: ObjectId,
-  location: {
-    timestamp: Date,
-  coordinate: {
-    lon: Number,
-  lat: Number
-  },
-  speed: Number,
-  altitude: Number,
-  named: {
-    place: String,
-    region: String,
-    countryCode: String
-  }
-  },
+  // location: {
+  //   timestamp: Date,
+  //   coordinate: {
+  //     lon: Number,
+  //     lat: Number
+  //   },
+  //   speed: Number,
+  //   altitude: Number,
+  //   named: {
+  //     place: String,
+  //     region: String,
+  //     countryCode: String
+  //   }
+  // },
   googleRefreshToken: String,
   githubToken: { type: String, required: true },
   githubId: {type: Number, required: true},
-  usernameSuggestion: { type: String },
+  // usernameSuggestion: { type: String },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
-UserSchema.index({ email: 1 }, { unique: true });
+// UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ githubId: 1 }, { unique: true });
-UserSchema.index({ username: 1 }, { unique: true, sparse: true });
-UserSchema.index({ "emails.email" : 1 }, { unique: true, sparse: true });
+UserSchema.index({ username: 1 }, { unique: true /*, sparse: true */});
+// UserSchema.index({ "emails.email" : 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
 
 UserSchema.methods.getDisplayName = function() {
