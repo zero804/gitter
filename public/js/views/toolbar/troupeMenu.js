@@ -11,8 +11,9 @@ define([
   'hbs!./tmpl/troupeMenu',
   './searchView',
   './profileView',
+  './orgCollectionView',
   'nanoscroller' //no ref
-], function($, _, Marionette, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView, ProfileView) {
+], function($, _, Marionette, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView, ProfileView, OrgCollectionView) {
   "use strict";
 
   return Marionette.Layout.extend({
@@ -31,7 +32,8 @@ define([
       favs: "#left-menu-list-favourites",
       troupes: "#left-menu-list-troupes",
       people: "#left-menu-list-users",
-      search: "#left-menu-list-search"
+      search: "#left-menu-list-search",
+      orgs: "#left-menu-list-orgs"
     },
 
     events: {
@@ -85,6 +87,9 @@ define([
       // search results collection view
       this.searchView = new SearchView({ troupes: troupeCollections.troupes, $input: this.$el.find('#list-search-input') });
       this.search.show(this.searchView);
+
+      // Organizations collection view
+      this.orgs.show(new OrgCollectionView({ collection: troupeCollections.orgs }));
 
       this.initHideListeners();
     },

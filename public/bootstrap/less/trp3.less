@@ -14,8 +14,6 @@
 @import "trp3Mail.less";
 @import "trp3Files.less";
 @import "trp3People.less";
-@import "trpHeader.less";
-
 
 @import "nanoScroller.less";
 
@@ -76,8 +74,67 @@ div {
 }
 
 header {
+  position: absolute;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  z-index: 1;
   padding: 8px 0 8px 44px;
+  text-align: left;
+
+  .trpTroupeFavourite {
+    display: inline-block;
+    padding-left: 0;
+  }
+
+  h1 {
+    font-family: 'Open Sans';
+    font-weight: 300;
+    font-size: 22px;
+    color: #333;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .dropdown-toggle {
+
+  }
+
+  .settingsCog {
+    position: absolute;
+    right: 15px;
+    top: 18px;
+  }
+
+  .dropdown-toggle:before {
+      font-family: 'troupe-icons';
+      /*content: '\e81a';*/
+    /*  content: '\e81e';*/
+      content: '\e823';
+      margin-right: 8px;
+      width: 12px;
+      font-size: 20px;
+  }
+
+  .dropdown-toggle {
+    opacity: 0.4;
+    transition:all .5s ease-in-out;
+  }
+
+  .dropdown-toggle:hover {
+    opacity: 1;
+  }
+
+  .dropdown-menu {
+    .trpBodyMedium;
+    right: 0;
+    left: auto;
+  }
+
 }
+
 
 .scrollbar-measure {
   width: 100px;
