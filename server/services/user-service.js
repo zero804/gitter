@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var sechash                   = require('sechash');
+// var sechash                   = require('sechash');
 var uuid                      = require('node-uuid');
 var winston                   = require("winston");
 var assert                    = require('assert');
@@ -11,12 +11,12 @@ var _                         = require('underscore');
 var persistence               = require("./persistence-service");
 var emailNotificationService  = require("./email-notification-service");
 var userConfirmationService   = require('./user-confirmation-service');
-var geocodingService          = require("./geocoding-service");
+// var geocodingService          = require("./geocoding-service");
 var statsService              = require("./stats-service");
-var uriLookupService          = require("./uri-lookup-service");
+// var uriLookupService          = require("./uri-lookup-service");
 var appEvents                 = require("../app-events");
 var collections               = require("../utils/collections");
-var promiseUtils              = require('../utils/promise-utils');
+// var promiseUtils              = require('../utils/promise-utils');
 
 /**
  * Creates a new user
@@ -62,6 +62,7 @@ function newUser(options, callback) {
       statsService.event('new_user', _.extend({
             userId: user.id,
             email: options.email,
+            username: options.username,
             status: status,
             source: options.source
           }, optionStats));
