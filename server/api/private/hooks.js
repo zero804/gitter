@@ -6,7 +6,7 @@ var winston       = require('winston');
 var chatService   = require('../../services/chat-service');
 var troupeService = require('../../services/troupe-service');
 
-var passphrase = '***REMOVED***';
+var passphrase = 'wyElt0ian8waunt8';
 
 module.exports = function(req, res) {
   var troupeId;
