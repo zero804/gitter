@@ -6,5 +6,6 @@ module.exports = {
   install: function(app) {
     require('./v1/').install(app);
     require('./private/').install(app);
+    require('../resources/').install(app);
   }
 };

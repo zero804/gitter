@@ -4,7 +4,7 @@
 module.exports = {
     install: function(app) {
       app.get(
-        '/unawesome-browser',
+        '/-/unawesome-browser',
         function(req, res) {
           res.status(406/* Not Acceptable */).render('unawesome-browser', { });
         }

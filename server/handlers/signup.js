@@ -3,7 +3,6 @@
 
 var winston                 = require('winston');
 var signupService           = require("../services/signup-service");
-var userService             = require("../services/user-service");
 var userConfirmationService = require('../services/user-confirmation-service');
 var middleware              = require("../web/middleware");
 var loginUtils              = require('../web/login-utils');
@@ -91,17 +90,7 @@ module.exports = {
         }
       );
 
-      app.get('/confirm',
-        middleware.ensureLoggedIn(),
-        function(req, res){
-          winston.verbose("Confirmation authenticated");
-          contextGenerator.generateMiniContext(req, function(err, troupeContext) {
-            res.render('complete-profile', { troupeContext: troupeContext });
-          });
-        });
-
-
-      app.get('/confirm/:confirmationCode',
+      app.get('/signup/:confirmationCode',
         middleware.authenticate('confirm', { failureRedirect: '/confirm-failed' } ),
         function(req, res, next){
           winston.verbose("Confirmation authenticated");
@@ -140,65 +129,5 @@ module.exports = {
 
           });
         });
-
-      app.get('/confirmSecondary/:confirmationCode',
-        middleware.ensureLoggedIn(),
-        function(req, res){
-          winston.verbose("Confirmation authenticated");
-
-          userService.confirmSecondaryEmailByCode(req.user, req.params.confirmationCode)
-            .then(function(user) {
-              statsService.event('confirmation_secondary_success', { userId: user.id });
-
-              if (user.hasPassword()) {
-                res.relativeRedirect('/' + user.username);
-              } else {
-                contextGenerator.generateMiniContext(req, function(err, troupeContext) {
-                  res.render('complete-profile', { troupeContext: troupeContext });
-                });
-              }
-            })
-          .fail(function(err) {
-            winston.error("user service confirmation failed", { exception: err } );
-
-            statsService.event('confirmation_secondary_fail');
-
-            res.relativeRedirect('/last');
-          });
-        });
-
-      // This can probably go
-      // TODO: remove
-      app.get('/:appUri/confirm/:confirmationCode',
-        middleware.authenticate('confirm', {}),
-        function(req, res/*, next*/) {
-          winston.verbose("Confirmation authenticated");
-
-          /* User has been set passport/accept */
-          userConfirmationService.confirmSignup(req.user)
-            .fail(function(err) {
-              winston.info('[signup] confirmation failed: ' + err, { exception: err });
-            })
-            .fin(function() {
-              res.relativeRedirect("/" + req.params.appUri);
-            });
-
-      });
-
-      app.post('/resendconfirmation',
-        function(req, res) {
-          signupService.resendConfirmation({
-            email: req.body.email
-          }, function(err) {
-            if(err) {
-              winston.error("Nothing to resend", { exception: err });
-              res.send(404);
-            } else {
-              res.send({ success: true });
-            }
-          });
-
-        }
-      );
     }
 };
