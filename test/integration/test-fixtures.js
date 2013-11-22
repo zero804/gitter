@@ -26,6 +26,15 @@ function generateUsername() {
   return '_testuser_' + (++counter) + Date.now();
 }
 
+function generateGithubId() {
+  var hr = process.hrtime();
+  return hr[0] + hr[1];
+}
+
+function generateGithubToken() {
+  return '64c1d90a8c60d2ee75fc5b3d3f7881d94559fec8';
+}
+
 function createBaseFixture() {
   return {
     generateEmail: generateEmail,
@@ -95,8 +104,10 @@ function createExpectedFixtures(expected, done) {
     return persistence.User.createQ({
       email:            f.email       || generateEmail(),
       displayName:      f.displayName || generateName(),
+      githubId:         f.githubId    || generateGithubId(),
+      githubToken:      f.githubToken || generateGithubToken(),
       confirmationCode: confirmationCode,
-      username:         username,
+      username:         username      || generateUsername(),
       status:           f.status      || 'ACTIVE'
     });
   }
@@ -137,6 +148,7 @@ function createExpectedFixtures(expected, done) {
       status: f.status || 'ACTIVE',
       oneToOne: f.oneToOne,
       users: users,
+      githubType: f.githubType || 'ORG',
       dateDeleted: f.dateDeleted
     });
   }
