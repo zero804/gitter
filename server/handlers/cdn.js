@@ -4,8 +4,8 @@
 module.exports = {
     install: function(app) {
       // This really doesn't seem like the right place for this?
-      app.get('/s/cdn/*', function(req, res) {
-        res.redirect(req.path.replace('/s/cdn', ''));
+      app.get('/_s/cdn/*', function(req, res) {
+        res.redirect(req.path.replace('/_s/cdn', ''));
       });
     }
 };

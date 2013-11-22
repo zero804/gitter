@@ -3,6 +3,7 @@
 
 var nconf = require('../utils/config');
 
+/* /apps is reserved on github */
 module.exports = {
     install: function(app) {
       app.get(
