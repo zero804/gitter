@@ -23,22 +23,22 @@ var collections               = require("../utils/collections");
  * @return the promise of a new user
  */
 function newUser(options, callback) {
-  //assert(options.email, 'Email atttribute required');
+  assert(options.githubId, 'githubId atttribute required');
 
-  var email = options.email ? options.email.toLowerCase() : null;
-
-  var status = options.status || "UNCONFIRMED";
+  var email   = options.email ? options.email.toLowerCase() : null;
+  var status  = options.status || "UNCONFIRMED";
 
   var insertFields = {
+    githubId:           options.githubId,
+    githubToken:        options.githubToken,
     username:           options.username,
     displayName:        options.displayName,
     confirmationCode:   uuid.v4(),
-    gravatarImageUrl:   options.gravatarImageUrl, // || gravatar.gravatarUrlForEmail(options.email),
+    gravatarImageUrl:   options.gravatarImageUrl,
     googleRefreshToken: options.googleRefreshToken || undefined,
     status:             status,
+    email:              email,
     usernameSuggestion: options.usernameSuggestion || undefined,
-    githubToken:        options.githubToken,
-    githubId:           options.githubId
   };
 
   // Remove undefined fields
@@ -49,7 +49,7 @@ function newUser(options, callback) {
   });
 
   return persistence.User.findOneAndUpdateQ(
-    { email: email },
+    { githubId: options.githubId },
     {
       $setOnInsert: insertFields
     },
@@ -60,12 +60,12 @@ function newUser(options, callback) {
       var optionStats = options.stats || {};
 
       statsService.event('new_user', _.extend({
-            userId: user.id,
-            email: options.email,
-            username: options.username,
-            status: status,
-            source: options.source
-          }, optionStats));
+        userId:   user.id,
+        username: options.username,
+        email:    options.email,
+        status:   status,
+        source:   options.source
+      }, optionStats));
 
       statsService.userUpdate(user, _.extend({
         source: options.source
