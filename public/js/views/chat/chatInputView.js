@@ -11,7 +11,6 @@ define([
   'utils/scrollbar-detect',
   'collections/instances/integrated-items',
   'jquery-textcomplete', // No ref
-  'jquery-sew', // No ref
   'jquery-sisyphus' // No ref
 ], function(log, $, context, TroupeViews, appEvents, template, moment, safeHtml, hasScrollBars, itemCollections) {
   "use strict";
@@ -51,22 +50,23 @@ define([
         }
       }).restoreAllData();
 
-      var self = this;
-      // item collection isnt populated until later. this is a massive hack.
-      window.setTimeout(function() {
-        var suggestions = itemCollections.users.models.map(function(user) {
-          return {
-            val: user.get('username'),
-            meta: user.get('displayName')
-          };
-        }).filter(function(suggestion) {
-          return (suggestion.val && suggestion.meta);
-        });
-
-        if(window.navigator.userAgent.indexOf("Firefox") === -1) {
-          self.$el.find('textarea').sew({values: suggestions});
-        }
-      }, 1000);
+      this.$el.find('textarea').textcomplete([
+          {
+              match: /\B@(\w*)$/,
+              search: function (term, callback) {
+                  var matches = itemCollections.users.models.map(function(user) {
+                    return user.get('username');
+                  }).filter(function(username) {
+                    return username.indexOf(term) === 0;
+                  });
+                  callback(matches);
+              },
+              index: 1,
+              replace: function (name) {
+                  return '$1@' + name + ' ';
+              }
+          }
+      ]);
 
       // http://stackoverflow.com/questions/16149083/keyboardshrinksview-makes-lose-focus/18904886#18904886
       this.$el.find("textarea").on('touchend', function(){
@@ -196,7 +196,7 @@ define([
     },
 
     onKeyDown: function(e) {
-      if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !$('.-sew-list-container').is(":visible")) {
+      if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !this.$el.parent().find('.dropdown-menu').is(":visible")) {
         e.stopPropagation();
         e.preventDefault();
 
