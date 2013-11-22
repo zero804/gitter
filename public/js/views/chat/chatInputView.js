@@ -1,6 +1,7 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'log!chat-input',
+  'underscore',
   'jquery',
   'utils/context',
   'views/base',
@@ -12,7 +13,7 @@ define([
   'collections/instances/integrated-items',
   'jquery-textcomplete', // No ref
   'jquery-sisyphus' // No ref
-], function(log, $, context, TroupeViews, appEvents, template, moment, safeHtml, hasScrollBars, itemCollections) {
+], function(log, _, $, context, TroupeViews, appEvents, template, moment, safeHtml, hasScrollBars, itemCollections) {
   "use strict";
 
   /** @const */
@@ -53,17 +54,19 @@ define([
       this.$el.find('textarea').textcomplete([
           {
               match: /(^|\s)@(\w*)$/,
-              search: function (term, callback) {
+              search: function(term, callback) {
                   var loggedInUsername = context.user().get('username');
-                  var matches = itemCollections.users.models.map(function(user) {
-                    return user.get('username');
-                  }).filter(function(username) {
+                  var matches = itemCollections.users.models.filter(function(user) {
+                    var username = user.get('username');
                     return username != loggedInUsername && username.indexOf(term) === 0;
                   });
                   callback(matches);
               },
-              replace: function (name) {
-                  return '$1@' + name + ' ';
+              template: function(user) {
+                return _.escape(user.get('username'));
+              },
+              replace: function(user) {
+                  return '$1@' + user.get('username') + ' ';
               }
           }
       ]);
