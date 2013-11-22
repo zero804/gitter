@@ -33,6 +33,6 @@ define([
 
   return {
     TroupeCollection: TroupeCollection,
-    TroupeModel: TroupeModel
+    TroupeModel:      TroupeModel
   };
 });
