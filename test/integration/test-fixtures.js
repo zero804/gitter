@@ -4,9 +4,7 @@
 var testRequire = require('./test-require');
 
 var Q = require("q");
-var assert = require("assert");
 var persistence = testRequire("./services/persistence-service");
-var assert = require('assert');
 var winston = testRequire("./utils/winston");
 var counter = 0;
 
@@ -41,6 +39,8 @@ function createBaseFixture() {
     generateName: generateName,
     generateUri: generateUri,
     generateUsername: generateUsername,
+    generateGithubId: generateGithubId,
+    generateGithubToken: generateGithubToken,
 
     cleanup: function() {
       var self = this;

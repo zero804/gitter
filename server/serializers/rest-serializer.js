@@ -87,23 +87,6 @@ function UserStrategy(options) {
       return cdn("avatar/" + size + "/" + user.id + "/" + user.avatarVersion + ".jpg", { notStatic: true });
     }
 
-    function getLocationDescription(named) {
-      var desc = (named.place) ? named.place : '';
-      desc += (named.region) ? ", " + named.region : '';
-      return desc;
-    }
-
-    var location;
-    if(!options.hideLocation && user.location.timestamp) {
-      location = {
-        description: getLocationDescription(user.location.named),
-        timestamp: formatDate(user.location.timestamp),
-        countryCode: user.location.countryCode
-      };
-    } else {
-      location = undefined;
-    }
-
     return {
       id: user.id,
       status: options.includeEmail ? user.status : undefined,
@@ -115,7 +98,6 @@ function UserStrategy(options) {
       email: options.includeEmail ? user.email : undefined,
       avatarUrlSmall: getAvatarUrl('s'),
       avatarUrlMedium: getAvatarUrl('m'),
-      location: location,
       online: onlineUsers ? onlineUsers.indexOf(user.id) >= 0 : undefined,
       v: getVersion(user)
     };
@@ -678,7 +660,7 @@ function GitHubOrgStrategy(options) {
   this.preload = function(orgs, callback) {
     troupeService.findAllByUri(orgs, function(err, troupes) {
       if (err) callback(err);
- 
+
       self.troupes = collections.indexByProperty(troupes, 'uri');
 
       execPreloads([{
@@ -706,7 +688,7 @@ function GitHubRepoStrategy(options) {
   this.preload = function(repos, callback) {
     troupeService.findAllByUri(repos, function(err, troupes) {
       if (err) callback(err);
- 
+
       self.troupes = collections.indexByProperty(troupes, 'uri');
 
       execPreloads([{
