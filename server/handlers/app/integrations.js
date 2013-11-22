@@ -73,6 +73,7 @@ module.exports = {
             url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks',
             json: {
               service: req.body.service,
+              endpoint: 'gitter'
             }
           },
           function(err, resp, body) {
