@@ -30,7 +30,7 @@ describe('restSerializer', function() {
 
     it('should return the correct display name', function() {
       var mappedUser = userStrategy.map(fixture.user1);
-      assert.equal(mappedUser.displayName, 'Test User 1');
+      assert.equal(mappedUser.displayName, fixture.user1.displayName);
     });
 
   });

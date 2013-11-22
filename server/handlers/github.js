@@ -22,6 +22,7 @@ module.exports = {
       '/github/callback',
       passport.authorize('github', { failureRedirect: '/' }),
       middleware.ensureLoggedIn(),
+      middleware.generateRememberMeTokenMiddleware,
       function(req, res) {
         res.redirect('/');
       });
