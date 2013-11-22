@@ -63,7 +63,7 @@ define([
                   callback(matches);
               },
               template: function(user) {
-                return _.escape(user.get('username')) + ' <small>' + _.escape(user.get('displayName')) + '<small>';
+                return _.escape(user.get('username')) + ' <small>' + _.escape(user.get('displayName')) + '</small>';
               },
               replace: function(user) {
                   return '$1@' + user.get('username') + ' ';
