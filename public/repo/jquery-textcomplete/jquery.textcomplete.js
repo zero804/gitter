@@ -259,6 +259,7 @@ define(["jquery"], function (jQuery){
           position: 'absolute',
           overflow: 'auto',
           'white-space': 'pre-wrap',
+          'text-align': 'left',
           top: 0,
           left: -9999
         }, getStyles(this.$el, properties));
