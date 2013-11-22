@@ -320,7 +320,6 @@ module.exports = {
         passReqToCallback: true
       },
       function(req, accessToken, refreshToken, profile, done) {
-
         if (req.user) {
           req.user.githubToken = accessToken;
           req.user.save(function(err) {
