@@ -52,7 +52,7 @@ define([
 
       this.$el.find('textarea').textcomplete([
           {
-              match: /\B@(\w*)$/,
+              match: /(^|\s)@(\w*)$/,
               search: function (term, callback) {
                   var matches = itemCollections.users.models.map(function(user) {
                     return user.get('username');
@@ -61,7 +61,6 @@ define([
                   });
                   callback(matches);
               },
-              index: 1,
               replace: function (name) {
                   return '$1@' + name + ' ';
               }
