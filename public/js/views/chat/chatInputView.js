@@ -10,6 +10,7 @@ define([
   'utils/safe-html',
   'utils/scrollbar-detect',
   'collections/instances/integrated-items',
+  'jquery-textcomplete', // No ref
   'jquery-sew', // No ref
   'jquery-sisyphus' // No ref
 ], function(log, $, context, TroupeViews, appEvents, template, moment, safeHtml, hasScrollBars, itemCollections) {
