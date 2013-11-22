@@ -122,7 +122,7 @@ define(["jquery"], function (jQuery){
       },
       list: {
         position: 'absolute',
-        top: 0,
+        top: 'initial',
         left: 0,
         zIndex: '100',
         display: 'none'
@@ -267,7 +267,7 @@ define(["jquery"], function (jQuery){
         $span = $('<span></span>').text('&nbsp;').appendTo($div);
         this.$el.before($div);
         position = $span.position();
-        position.top += $span.height() - this.$el.scrollTop();
+        position.bottom = $div.height() - position.top;
         $div.remove();
         return position;
       },
@@ -394,7 +394,11 @@ define(["jquery"], function (jQuery){
       },
 
       setPosition: function (position) {
-        this.$el.css(position);
+        this.$el.css({
+          left: position.left,
+          top: 'initial',
+          bottom: position.bottom
+        });
         return this;
       },
 
