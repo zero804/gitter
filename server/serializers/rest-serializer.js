@@ -80,13 +80,6 @@ function UserStrategy(options) {
   this.map = function(user) {
     if(!user) return null;
 
-    function getAvatarUrl(size) {
-      if(user.avatarVersion === 0) {
-        return user.gravatarImageUrl;
-      }
-      return cdn("avatar/" + size + "/" + user.id + "/" + user.avatarVersion + ".jpg", { notStatic: true });
-    }
-
     return {
       id: user.id,
       status: options.includeEmail ? user.status : undefined,
@@ -96,8 +89,8 @@ function UserStrategy(options) {
       fallbackDisplayName: options.exposeRawDisplayName && user.getDisplayName(),
       url: user.getHomeUrl(),
       email: options.includeEmail ? user.email : undefined,
-      avatarUrlSmall: getAvatarUrl('s'),
-      avatarUrlMedium: getAvatarUrl('m'),
+      avatarUrlSmall: user.gravatarImageUrl,
+      avatarUrlMedium: user.gravatarImageUrl,
       online: onlineUsers ? onlineUsers.indexOf(user.id) >= 0 : undefined,
       v: getVersion(user)
     };
