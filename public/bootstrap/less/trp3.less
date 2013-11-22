@@ -22,6 +22,12 @@
 
 /* Transitions */
 
+@font-face {
+    font-family: "octicons";
+    src: url("https://github.global.ssl.fastly.net/assets/octicons-810348ca79b0f83691f16307908e3c3fee103f93.woff") format('woff');
+}
+
+
 .transition300ms {
   -webkit-transform: translate3d(0, 0, 0);
   transition:all .3s ease-in-out;
@@ -301,6 +307,16 @@ a:hover {
   margin-bottom: 20px;
 }
 
+
+#left-menu-list-orgs {
+  span:before {
+    font-family: 'octicons';
+    content: '\f037';
+    margin-right: 8px;
+    opacity: 0.8;
+    width: 12px;
+  }
+}
 
 .trpLeftMenuProfile {
   .trpBodyMedium;
