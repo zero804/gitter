@@ -6,5 +6,7 @@ module.exports = {
     app.post('/api/private/github_signup',
         require('./github-signup.js'));
 
+    app.get('/api/private/health_check',
+        require('./health-check.js'));
   }
 };
