@@ -23,19 +23,19 @@ var collections               = require("../utils/collections");
  * @return the promise of a new user
  */
 function newUser(options, callback) {
-  //assert(options.email, 'Email atttribute required');
+  var githubId = options.githubId;
 
-  var email = options.email ? options.email.toLowerCase() : null;
+  assert(githubId, 'githubId required');
+  assert(options.githubToken, 'githubToken required');
+  assert(options.username, 'username required');
 
-  var status = options.status || "UNCONFIRMED";
+  var email = options.email ? options.email.toLowerCase() : undefined;
 
   var insertFields = {
     username:           options.username,
+    email:              email,
     displayName:        options.displayName,
-    confirmationCode:   uuid.v4(),
-    gravatarImageUrl:   options.gravatarImageUrl, // || gravatar.gravatarUrlForEmail(options.email),
     googleRefreshToken: options.googleRefreshToken || undefined,
-    status:             status,
     usernameSuggestion: options.usernameSuggestion || undefined,
     githubToken:        options.githubToken,
     githubId:           options.githubId
@@ -49,7 +49,7 @@ function newUser(options, callback) {
   });
 
   return persistence.User.findOneAndUpdateQ(
-    { email: email },
+    { githubId: githubId },
     {
       $setOnInsert: insertFields
     },
@@ -63,7 +63,6 @@ function newUser(options, callback) {
             userId: user.id,
             email: options.email,
             username: options.username,
-            status: status,
             source: options.source
           }, optionStats));
 
