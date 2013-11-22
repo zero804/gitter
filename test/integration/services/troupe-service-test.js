@@ -331,59 +331,41 @@ describe('troupe-service', function() {
     it('#01 should be able to remove a user from a troupe', function(done) {
       var troupeService = testRequire('./services/troupe-service');
 
-      var troupe = new persistence.Troupe({ status: 'ACTIVE' });
-      troupe.addUserById(fixture.user1.id);
-      troupe.addUserById(fixture.user2.id);
-      troupe.save(function(err) {
+      troupeService.removeUserFromTroupe(fixture.troupeForDeletion.id, fixture.user1.id, function(err) {
         if(err) return done(err);
 
-        troupeService.removeUserFromTroupe(troupe.id, fixture.user1.id, function(err) {
+        troupeService.findById(fixture.troupeForDeletion.id, function(err, troupe) {
           if(err) return done(err);
 
-          troupeService.findById(troupe.id, function(err, troupe) {
+          var earlier = new Date(Date.now() - 10000);
+
+          assert.strictEqual(1, troupe.users.length);
+          assert.equal(fixture.user2.id, troupe.users[0].userId);
+
+          persistence.TroupeRemovedUser.find({
+            troupeId: troupe.id,
+            userId: fixture.user1.id,
+            dateDeleted: { $gt: earlier }
+          }, function(err, entry) {
             if(err) return done(err);
 
-            var earlier = new Date(Date.now() - 10000);
+            assert(entry, 'Expected a troupeRemoved entry');
+            done();
 
-            assert.strictEqual(1, troupe.users.length);
-            assert.equal(fixture.user2.id, troupe.users[0].userId);
-
-            persistence.TroupeRemovedUser.find({
-              troupeId: troupe.id,
-              userId: fixture.user1.id,
-              dateDeleted: { $gt: earlier }
-            }, function(err, entry) {
-              if(err) return done(err);
-
-              assert(entry, 'Expected a troupeRemoved entry');
-
-              troupe.remove(function() {
-                done();
-              });
-
-            });
           });
         });
       });
+
     });
 
     it('#02 should not remove a user from a troupe if the user is the last user in the troupe', function(done) {
       var troupeService = testRequire('./services/troupe-service');
 
-      var troupe = new persistence.Troupe({ status: 'ACTIVE' });
-      troupe.addUserById(fixture.user1.id);
-      troupe.save(function(err) {
-        if(err) return done(err);
-
-        troupeService.removeUserFromTroupe(troupe.id, fixture.user1.id, function(err) {
-          assert(err);
-
-          troupe.remove(function() {
-            done();
-          });
-
-        });
+      troupeService.removeUserFromTroupe(fixture.troupeForDeletion.id, fixture.user2.id, function(err) {
+        assert(err);
+        done();
       });
+
     });
   });
 
@@ -392,60 +374,46 @@ describe('troupe-service', function() {
     it('#01 should allow an ACTIVE troupe with a single user to be deleted', function(done) {
       var troupeService = testRequire('./services/troupe-service');
 
-      var troupe = new persistence.Troupe({ status: 'ACTIVE' });
-      troupe.addUserById(fixture.user1.id);
-      troupe.save(function(err) {
+      troupeService.deleteTroupe(fixture.troupeForDeletion2, function(err) {
         if(err) return done(err);
 
-        troupeService.deleteTroupe(troupe, function(err) {
+        troupeService.findById(fixture.troupeForDeletion2.id, function(err, troupe) {
           if(err) return done(err);
 
-          troupeService.findById(troupe.id, function(err, troupe) {
+          var earlier = new Date(Date.now() - 10000);
+
+          persistence.TroupeRemovedUser.find({
+            troupeId: troupe.id,
+            userId: fixture.user1.id,
+            dateDeleted: { $gt: earlier }
+          }, function(err, entry) {
             if(err) return done(err);
 
-            var earlier = new Date(Date.now() - 10000);
+            assert(entry, 'Expected a troupeRemoved entry');
 
-            persistence.TroupeRemovedUser.find({
-              troupeId: troupe.id,
-              userId: fixture.user1.id,
-              dateDeleted: { $gt: earlier }
-            }, function(err, entry) {
-              if(err) return done(err);
+            assert.equal('DELETED', troupe.status);
+            assert.strictEqual(0, troupe.users.length);
 
-              assert(entry, 'Expected a troupeRemoved entry');
+            done();
 
-              assert.equal('DELETED', troupe.status);
-              assert.strictEqual(0, troupe.users.length);
-
-              troupe.remove(function() {
-                done();
-              });
-
-            });
           });
         });
       });
+
     });
 
     it('#02 should NOT allow an ACTIVE troupe with a two users to be deleted', function(done) {
       var troupeService = testRequire('./services/troupe-service');
 
-      var troupe = new persistence.Troupe({ status: 'ACTIVE' });
-      troupe.addUserById(fixture.user1.id);
-      troupe.addUserById(fixture.user2.id);
-
-      troupe.save(function(err) {
-        if(err) return done(err);
-
-        troupeService.deleteTroupe(troupe, function(err) {
-          assert(err);
-          done();
-        });
+      troupeService.deleteTroupe(fixture.troupeForDeletion3, function(err) {
+        assert(err);
+        done();
       });
+
     });
   });
 
-  describe('#findAllUserIdsForUnconnectedImplicitContacts', function() {
+  xdescribe('#findAllUserIdsForUnconnectedImplicitContacts', function() {
     it('should find users who are implicitly connected to one another', function(done) {
       var troupeService = testRequire('./services/troupe-service');
 
@@ -575,6 +543,30 @@ describe('troupe-service', function() {
   });
 
 
-  before(fixtureLoader(fixture));
+  before(fixtureLoader(fixture, {
+    user1: {
+    },
+    user2: {
+    },
+    user3: {
+    },
+    userNoTroupes: {
+    },
+    troupe1: {
+      users: ['user1', 'user2']
+    },
+    troupe2: {
+    },
+    troupeForDeletion: {
+      users: ['user1', 'user2']
+    },
+    troupeForDeletion2: {
+      users: ['user1']
+    },
+    troupeForDeletion3: {
+      users: ['user1', 'user2']
+    }
+
+  }));
 
 });
