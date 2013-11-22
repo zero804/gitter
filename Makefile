@@ -235,8 +235,8 @@ install-client-libs:
 	cp output/client-libs/backbone.babysitter/lib/amd/backbone.babysitter.min.js public/repo/backbone.babysitter/backbone.babysitter.js
 	cp output/client-libs/backbone.keys/dist/backbone.keys.min.js public/repo/backbone.keys/backbone.keys.js
 	cp output/client-libs/backbone.wreqr/lib/amd/backbone.wreqr.min.js public/repo/backbone.wreqr/backbone.wreqr.js
-	cp output/client-libs/bootstrap/bootstrap-tooltip.js public/repo/bootstrap/tooltip.js
-	cp output/client-libs/bootstrap/bootstrap-typeahead.js public/repo/bootstrap/typeahead.js
+	cp output/client-libs/bootstrap/js/bootstrap-tooltip.js public/repo/bootstrap/tooltip.js
+	cp output/client-libs/bootstrap/js/bootstrap-typeahead.js public/repo/bootstrap/typeahead.js
 	cp output/client-libs/cocktail/cocktail-amd.js public/repo/cocktail/cocktail.js
 	cp output/client-libs/cubism/cubism.v1.min.js public/repo/cubism/cubism.js
 	cp output/client-libs/d3/d3.min.js public/repo/d3/d3.js
@@ -268,7 +268,6 @@ install-client-libs:
 	cp output/client-libs/retina.js-js/src/retina.js public/repo/retina/retina.js
 	cp output/client-libs/scrollfix/scrollfix-amd.js public/repo/scrollfix/scrollfix.js
 	cp output/client-libs/sisyphus/jquery.sisyphus-amd.js public/repo/sisyphus/jquery.sisyphus.js
-	cp output/client-libs/typeahead.js/typeahead.js public/repo/typeahead/typeahead.js
 	cp output/client-libs/underscore/underscore-amd.js public/repo/underscore/underscore.js
 	# cp output/client-libs/zeroclipboard/ZeroClipboard.js public/repo/zeroclipboard/zeroclipboard.js
 	cp output/client-libs/zeroclipboard/zeroclipboard-amd.js public/repo/zeroclipboard/zeroclipboard.js
