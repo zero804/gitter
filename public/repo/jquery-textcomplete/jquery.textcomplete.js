@@ -251,7 +251,7 @@ define(["jquery"], function (jQuery){
 
         properties = ['border-width', 'font-family', 'font-size', 'font-style',
           'font-variant', 'font-weight', 'height', 'letter-spacing',
-          'word-spacing', 'line-height', 'text-decoration', 'width',
+          'word-spacing', 'line-height', 'text-decoration', 'text-align', 'width',
           'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
           'margin-top', 'margin-right', 'margin-bottom', 'margin-left'
         ];
@@ -259,7 +259,6 @@ define(["jquery"], function (jQuery){
           position: 'absolute',
           overflow: 'auto',
           'white-space': 'pre-wrap',
-          'text-align': 'left',
           top: 0,
           left: -9999
         }, getStyles(this.$el, properties));
