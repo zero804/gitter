@@ -7,10 +7,7 @@ var fixtureLoader = require('../test-fixtures');
 var fixture = {};
 
 var userSearchService = testRequire('./services/user-search-service');
-var persistence = testRequire('./services/persistence-service');
-
 var assert = require('assert');
-var Q = require('q');
 
 describe("User Search Service", function() {
 
@@ -74,82 +71,58 @@ describe("User Search Service", function() {
   describe("#searchForUsers", function() {
 
     it("should find both test users", function(done) {
-      persistence.User.findOne({ email: "testuser@troupetest.local" }, function(err, user) {
+      var userId = fixture.user1.id;
+
+      userSearchService.searchForUsers(userId, 'tEst', {}, function(err, searchResults) {
         if(err) return done(err);
-        if(!user) return done("Cannot find user");
+        assert(searchResults.results.length >= 2, "Expect some users");
 
-        var userId = user.id;
+        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user1.displayName; } ).length === 0, "Expect test user 1 not to be returned");
+        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user2.displayName; } ).length == 1, "Expect test user 2");
+        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user3.displayName; } ).length == 1, "Expect test user 3");
 
-        userSearchService.searchForUsers(userId, 'tEst', {}, function(err, searchResults) {
-          if(err) return done(err);
-          assert(searchResults.results.length >= 2, "Expect some users");
-
-          assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 1'; } ).length === 0, "Expect test user 1 not to be returned");
-          assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 2'; } ).length == 1, "Expect test user 2");
-          assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 3'; } ).length == 1, "Expect test user 3");
-
-          return done();
-        });
+        return done();
       });
+
 
     });
 
     it("should find one Test Users 2 and 3", function(done) {
-      persistence.User.findOne({ email: "testuser@troupetest.local" }, function(err, user) {
+      var userId = fixture.user1.id;
+
+      userSearchService.searchForUsers(userId, 'tEst user 2', {}, function(err, searchResults) {
         if(err) return done(err);
-        if(!user) return done("Cannot find user");
 
-        var userId = user.id;
+        assert(searchResults.results.length >= 1, "Expect one user: got " + searchResults.results.join(', '));
+        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user2.displayName; } ).length == 1, "Expect test user 2");
 
-        userSearchService.searchForUsers(userId, 'tEst user 2', {}, function(err, searchResults) {
-          if(err) return done(err);
-
-          assert(searchResults.results.length >= 1, "Expect one user: got " + searchResults.results.join(', '));
-          assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 2'; } ).length == 1, "Expect test user 2");
-
-          return done();
-        });
+        return done();
       });
-
     });
 
 
     it("should not find test user three when a testtroupe3 is excluded", function(done) {
-      persistence.Troupe.findOne({ uri: "testtroupe3" }, function(err, troupe) {
+      var userId = fixture.user1.id;
+
+      userSearchService.searchForUsers(userId, 'tEst user', { excludeTroupeId: fixture.troupe3.id }, function(err, searchResults) {
         if(err) return done(err);
-        if(!troupe) return done("Cannot find testtroupe3 ");
 
-        persistence.User.findOne({ email: "testuser@troupetest.local" }, function(err, user) {
-          if(err) return done(err);
-          if(!user) return done("Cannot find user");
+        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user2.displayName; } ).length === 1, "Expected to find test user 2");
+        assert(searchResults.results.filter(function(f) { return f.displayName === fixture.user3.displayName; } ).length === 0, "Expected to not find test user 3");
 
-          var userId = user.id;
-
-          userSearchService.searchForUsers(userId, 'tEst user', { excludeTroupeId: troupe.id }, function(err, searchResults) {
-            if(err) return done(err);
-
-            assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 2'; } ).length === 1, "Expected to find test user 2");
-            assert(searchResults.results.filter(function(f) { return f.displayName === 'Test User 3'; } ).length === 0, "Expected to not find test user 3");
-
-            return done();
-          });
-        });
+        return done();
       });
+
 
     });
 
     it("should not find an unknown users", function(done) {
-      persistence.User.findOne({ email: "testuser@troupetest.local" }, function(err, user) {
+      var userId = fixture.user1.id;
+
+      userSearchService.searchForUsers(userId, 'Noddy Obama McBigbones', {}, function(err, searchResults) {
         if(err) return done(err);
-        if(!user) return done("Cannot find user");
-
-        var userId = user.id;
-
-        userSearchService.searchForUsers(userId, 'Noddy Obama McBigbones', {}, function(err, searchResults) {
-          if(err) return done(err);
-          assert(searchResults.results.length === 0, "Expect no users");
-          return done();
-        });
+        assert(searchResults.results.length === 0, "Expect no users");
+        return done();
       });
 
     });
@@ -158,33 +131,31 @@ describe("User Search Service", function() {
 
 
   describe("#searchUnconnectedUsers", function() {
+    var fixture2 = {};
+    before(fixtureLoader(fixture2, {
+      user1: { },
+      user2: { },
+      user3: { },
+      troupe1: {
+        users: ['user1', 'user2', 'user3']
+      }
+    }));
+    after(function() { fixture2.cleanup(); });
 
     it("should find both test users", function(done) {
 
-      Q.all([
-        persistence.Troupe.createQ({ uri: '/testtroupe' + Date.now() }),
-        persistence.User.createQ({ displayName: fixture.generateName(), email: fixture.generateEmail()}),
-        persistence.User.createQ({ displayName: fixture.generateName(), email: fixture.generateEmail()}),
-        persistence.User.createQ({ displayName: fixture.generateName(), email: fixture.generateEmail()})
-      ]).spread(function(troupe, user1, user2, user3) {
-        troupe.addUserById(user1.id);
-        troupe.addUserById(user2.id);
-        troupe.addUserById(user3.id);
-        return troupe.saveQ().then(function() {
-          return [user1, user2, user3];
-        });
-      }).spread(function(user1, user2, user3) {
-        return userSearchService.searchUnconnectedUsers(user3.id, 'tEst', {})
-          .then(function(searchResults) {
-            assert(searchResults.results.length >= 2, "Expect some users, got " + JSON.stringify(searchResults.results));
 
-            assert(searchResults.results.filter(function(f) { return f.id == user3.id; } ).length === 0, "Expect user3 not to be returned" + JSON.stringify(searchResults.results));
-            assert(searchResults.results.filter(function(f) { return f.id == fixture.user1.id; } ).length === 0, "Expect fixture user 1 not to be returned" + JSON.stringify(searchResults.results));
-            assert(searchResults.results.filter(function(f) { return f.id == user1.id; } ).length == 1, "Expect test user 2" + JSON.stringify(searchResults.results));
-            assert(searchResults.results.filter(function(f) { return f.id == user2.id; } ).length == 1, "Expect test user 3");
+      return userSearchService.searchUnconnectedUsers(fixture2.user3.id, 'tEst', {})
+        .then(function(searchResults) {
+          assert(searchResults.results.length >= 2, "Expect some users, got " + JSON.stringify(searchResults.results));
 
-          });
-      }).nodeify(done);
+          assert(searchResults.results.filter(function(f) { return f.id == fixture2.user3.id; } ).length === 0, "Expect user3 not to be returned" + JSON.stringify(searchResults.results));
+          assert(searchResults.results.filter(function(f) { return f.id == fixture.user1.id; } ).length === 0, "Expect fixture user 1 not to be returned" + JSON.stringify(searchResults.results));
+          assert(searchResults.results.filter(function(f) { return f.id == fixture2.user1.id; } ).length == 1, "Expect test user 2" + JSON.stringify(searchResults.results));
+          assert(searchResults.results.filter(function(f) { return f.id == fixture2.user2.id; } ).length == 1, "Expect test user 3");
+
+        })
+        .nodeify(done);
 
     });
   });
