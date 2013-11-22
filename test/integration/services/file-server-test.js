@@ -1,5 +1,5 @@
 /*jslint node:true, unused:true*/
-/*global describe:true, it:true, before:true */
+/*global describe:true, it:true, before:true, after:true */
 "use strict";
 
 var testRequire = require('../test-require');
@@ -15,6 +15,13 @@ describe('file-service', function() {
   var fileService = testRequire("./services/file-service");
   var mongoose = require('mongoose');
 
+  before(fixtureLoader(fixture, {
+    troupe1: { },
+    user1: { }
+  }));
+
+  after(function() { fixture.cleanup(); });
+
   describe('#deleteFileFromGridStore()', function() {
 
     /*
@@ -25,6 +32,8 @@ describe('file-service', function() {
         fs.write(info.fd, "Hello");
         fs.close(info.fd, function(err) {
           if(err) return done(err);
+
+          console.log('FIXUTRE', fixture);
 
           fileService.storeFile({
             troupe: fixture.troupe1.id,
@@ -51,10 +60,8 @@ describe('file-service', function() {
                   GridStore.exist(db, gridFileName, function(err, result) {
                     if(err) return done(err);
                     if(result) return done("File " + gridFileName + " still exists but should have been deleted");
-                    fixture.troupe1.remove(function(err) {
-                      done(err);
-                    });
 
+                    done();
                   });
 
                 }, 1000);
@@ -69,9 +76,6 @@ describe('file-service', function() {
     });
   });
 
-  before(fixtureLoader({
-    troupe1: { },
-    user1: { }
-  }, fixture));
+
 
 });
