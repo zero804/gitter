@@ -54,10 +54,11 @@ define([
           {
               match: /(^|\s)@(\w*)$/,
               search: function (term, callback) {
+                  var loggedInUsername = context.user().get('username');
                   var matches = itemCollections.users.models.map(function(user) {
                     return user.get('username');
                   }).filter(function(username) {
-                    return username.indexOf(term) === 0;
+                    return username != loggedInUsername && username.indexOf(term) === 0;
                   });
                   callback(matches);
               },
