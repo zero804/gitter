@@ -361,7 +361,7 @@ module.exports = {
               // This is in fact a new user
               var githubUser = {
                 username:           profile._json.login,
-                displayName:        profile._json.name,
+                displayName:        profile._json.name || profile._json.login,
                 email:              profile._json.email,
                 gravatarImageUrl:   profile._json.avatar_url,
                 githubToken:        accessToken,
