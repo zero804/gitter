@@ -18,12 +18,12 @@ var serviceDisplayNames = {
 module.exports = {
     install: function(app) {
 
-      app.get('/:appUri/integrations',
+      app.get('/settings/integrations/:userOrOrg',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         function (req, res) {
-          var url = nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks';
+          var url = nconf.get('webhooks:basepath')+'/troupes/' + req.troupe.id + '/hooks';
           winston.info('requesting hook list at ' + url);
           request.get({
             url: url,
@@ -45,13 +45,13 @@ module.exports = {
           });
         });
 
-      app.del('/:appUri/integrations',
+      app.del('/settings/integrations/:userOrOrg',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         function (req, res) {
           request.del({
-            url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks/'+req.body.id,
+            url: nconf.get('webhooks:basepath') + '/troupes/' + req.troupe.id + '/hooks/'+req.body.id,
             json: true
           },
           function(err, resp) {
@@ -60,19 +60,21 @@ module.exports = {
               res.send(500, 'Unable to perform request. Please try again later.');
               return;
             }
-            res.redirect('/'+req.troupe.uri+'/integrations');
+
+            res.redirect('/settings/integrations/' + req.troupe.uri);
           });
         });
 
-      app.post('/:appUri/integrations',
+      app.post('/settings/integrations/:userOrOrg',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         function(req, res) {
           request.post({
-            url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks',
+            url: nconf.get('webhooks:basepath') + '/troupes/' + req.troupe.id + '/hooks',
             json: {
               service: req.body.service,
+              endpoint: 'gitter'
             }
           },
           function(err, resp, body) {
