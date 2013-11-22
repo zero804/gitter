@@ -33,6 +33,7 @@ function newUser(options, callback) {
   var insertFields = {
     githubId:           githubId, 
     githubToken:        options.githubToken,
+    gravatarImageUrl:   options.gravatarImageUrl,
     username:           options.username,
     email:              email,
     displayName:        options.displayName,
