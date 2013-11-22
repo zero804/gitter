@@ -56,38 +56,68 @@ function createBaseFixture() {
 
 function load(expected, done) {
   if(expected) {
+    // DO THINGS THE NEW SCHOOL WAY
     return createExpectedFixtures(expected, done);
   }
 
-  function only(a) {
-    assert(a.length, "Fixture data is missing");
-    assert(a.length == 1, "Multiple fixture data items found. Expected exactly one: " + JSON.stringify(a));
-    return a[0];
-  }
+  console.error('Using old school fixtures. Try change this sometime old chap.');
+  return createExpectedFixtures({
+    user1: {
+      //email: 'testuser@troupetest.local'
+    },
+    user2: {
+      //email: 'testuser2@troupetest.local'
+    },
+    user3: {
+      //email: 'testuser3@troupetest.local'
+    },
+    userNoTroupes: {
+      //email: 'testuserwithnotroupes@troupetest.local'
+    },
+    troupe1: {
+      //uri: 'testtroupe1',
+      users: ['user1', 'user2']
+    },
+    troupe2: {
+      //uri: 'testtroupe2',
+    },
+    troupe3: {
+      /* This troupe should not include test user 2 */
+      //uri: 'testtroupe3',
+      users: ['user1', 'user3']
+    }
+  }, done);
 
-  var fixture = createBaseFixture();
 
-  Q.all([
-      persistence.User.findQ({ email: 'testuser@troupetest.local' }).then(only).then(function(user) { fixture.user1 = user; }),
-      persistence.User.findQ({ email: 'testuser2@troupetest.local' }).then(only).then(function(user) { fixture.user2 = user; }),
-      persistence.User.findQ({ email: 'testuserwithnotroupes@troupetest.local' }).then(only).then(function(user) { fixture.userNoTroupes = user; }),
-      persistence.Troupe.findQ({ uri: 'testtroupe1' }).then(only).then(function(troupe) { fixture.troupe1 = troupe; }),
-      persistence.Troupe.findQ({ uri: 'testtroupe2' }).then(only).then(function(troupe) { fixture.troupe2 = troupe; })
-    ])
-    .then(function() {
-      assert(fixture.troupe1.containsUserId(fixture.user1.id), 'Test data is broken. User1 should be in troupe1. Troupe1 contains: ' + fixture.troupe1.users.join(','));
-      assert(fixture.troupe1.containsUserId(fixture.user2.id), 'Test data is broken. User1 should be in troupe1');
+  // function only(a) {
+  //   assert(a.length, "Fixture data is missing");
+  //   assert(a.length == 1, "Multiple fixture data items found. Expected exactly one: " + JSON.stringify(a));
+  //   return a[0];
+  // }
 
-      assert(!fixture.troupe1.containsUserId(fixture.userNoTroupes.id), 'Test data is broken. userNoTroupes should not be in troupe1');
-      assert(!fixture.troupe2.containsUserId(fixture.userNoTroupes.id), 'Test data is broken. userNoTroupes should not be in troupe1');
+  // var fixture = createBaseFixture();
 
-      assert(fixture.troupe2.users.length === 0, 'Fixture error: troupe2 should not contain any users');
+  // Q.all([
+  //     persistence.User.findQ({ email: 'testuser@troupetest.local' }).then(only).then(function(user) { fixture.user1 = user; }),
+  //     persistence.User.findQ({ email: 'testuser2@troupetest.local' }).then(only).then(function(user) { fixture.user2 = user; }),
+  //     persistence.User.findQ({ email: 'testuserwithnotroupes@troupetest.local' }).then(only).then(function(user) { fixture.userNoTroupes = user; }),
+  //     persistence.Troupe.findQ({ uri: 'testtroupe1' }).then(only).then(function(troupe) { fixture.troupe1 = troupe; }),
+  //     persistence.Troupe.findQ({ uri: 'testtroupe2' }).then(only).then(function(troupe) { fixture.troupe2 = troupe; })
+  //   ])
+  //   .then(function() {
+  //     assert(fixture.troupe1.containsUserId(fixture.user1.id), 'Test data is broken. User1 should be in troupe1. Troupe1 contains: ' + fixture.troupe1.users.join(','));
+  //     assert(fixture.troupe1.containsUserId(fixture.user2.id), 'Test data is broken. User1 should be in troupe1');
 
-      // For now, keep it safe
-      delete fixture.cleanup;
-      return fixture;
-    })
-    .nodeify(done);
+  //     assert(!fixture.troupe1.containsUserId(fixture.userNoTroupes.id), 'Test data is broken. userNoTroupes should not be in troupe1');
+  //     assert(!fixture.troupe2.containsUserId(fixture.userNoTroupes.id), 'Test data is broken. userNoTroupes should not be in troupe1');
+
+  //     assert(fixture.troupe2.users.length === 0, 'Fixture error: troupe2 should not contain any users');
+
+  //     // For now, keep it safe
+  //     delete fixture.cleanup;
+  //     return fixture;
+  //   })
+  //   .nodeify(done);
 
 }
 
