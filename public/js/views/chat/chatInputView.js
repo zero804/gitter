@@ -71,7 +71,7 @@ define([
               });
             },
             replace: function(issue) {
-                return '$1#' + issue.id + ' ';
+                return '$1#' + issue.number + ' ';
             }
           },
           {
