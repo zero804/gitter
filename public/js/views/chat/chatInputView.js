@@ -1,19 +1,19 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'log!chat-input',
-  'underscore',
   'jquery',
   'utils/context',
   'views/base',
   'utils/appevents',
   'hbs!./tmpl/chatInputView',
+  'hbs!./tmpl/typeaheadList',
   'utils/momentWrapper',
   'utils/safe-html',
   'utils/scrollbar-detect',
   'collections/instances/integrated-items',
   'jquery-textcomplete', // No ref
   'jquery-sisyphus' // No ref
-], function(log, _, $, context, TroupeViews, appEvents, template, moment, safeHtml, hasScrollBars, itemCollections) {
+], function(log, $, context, TroupeViews, appEvents, template, listTemplate, moment, safeHtml, hasScrollBars, itemCollections) {
   "use strict";
 
   /** @const */
@@ -63,7 +63,7 @@ define([
                   callback(matches);
               },
               template: function(user) {
-                return _.escape(user.get('username')) + ' <small>' + _.escape(user.get('displayName')) + '</small>';
+                return listTemplate(user.toJSON());
               },
               replace: function(user) {
                   return '$1@' + user.get('username') + ' ';
