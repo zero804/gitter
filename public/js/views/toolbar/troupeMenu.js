@@ -30,7 +30,6 @@ define([
       incomingTroupeInvites: "#left-menu-list-incoming-troupe-invites",
       recent: "#left-menu-list-recent",
       favs: "#left-menu-list-favourites",
-      troupes: "#left-menu-list-troupes",
       people: "#left-menu-list-users",
       search: "#left-menu-list-search",
       orgs: "#left-menu-list-orgs"
@@ -56,9 +55,6 @@ define([
     onRender: function() {
 
       this.profile.show(new ProfileView());
-
-      // normal troupe view
-      this.troupes.show(new TroupeCollectionView({collection: troupeCollections.normalTroupes, emptyView: Marionette.ItemView.extend({ template: troupeListItemEmpty })}));
 
       // one to one troupe view
       this.people.show(new TroupeCollectionView({collection: troupeCollections.peopleTroupes, emptyView: Marionette.ItemView.extend({ template: privateTroupeListItemEmpty })}));
