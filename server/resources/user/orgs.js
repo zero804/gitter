@@ -16,7 +16,7 @@ module.exports = {
       var orgs = _.map(ghOrgs, function(org) { return org.login; });
       var strategy = new restSerializer.GitHubOrgStrategy({currentUserId: req.user.id});
 
-      restSerializer.serialize(orgs, strategy, function(err, serialized) {
+      restSerializer.serialize(ghOrgs, strategy, function(err, serialized) {
         if(err) return next(err);
         res.send(serialized);
       });
