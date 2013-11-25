@@ -54,6 +54,7 @@ define([
       this.$el.find('textarea').textcomplete([
           {
               match: /(^|\s)#(\w*)$/,
+              maxCount: 8,
               search: function(term, callback) {
                 $.getJSON('/api/v1/troupes/'+context.getTroupeId()+'/issues', { q: term })
                   .done(function(resp) {
@@ -75,6 +76,7 @@ define([
           },
           {
               match: /(^|\s)@(\w*)$/,
+              maxCount: 8,
               search: function(term, callback) {
                   var loggedInUsername = context.user().get('username');
                   var matches = itemCollections.users.models.filter(function(user) {
