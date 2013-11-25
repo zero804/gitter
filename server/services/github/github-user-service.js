@@ -45,7 +45,7 @@ GitHubUserService.prototype.getOrgs = function() {
 
   var ghme = this.client.me();
   ghme.orgs(d.makeNodeResolver());
-
+  
   return d.promise;
 };
 
