@@ -836,6 +836,7 @@ function TroupeStrategy(options) {
       lastAccessTime: lastAccessTimeStategy ? lastAccessTimeStategy.map(item.id) : undefined,
       favourite: favouriteStrategy ? favouriteStrategy.map(item.id) : undefined,
       url: troupeUrl,
+      githubType: item.githubType,
       v: getVersion(item)
     };
   };

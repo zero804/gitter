@@ -6,6 +6,7 @@ var nconf = require('../../utils/config');
 var middleware = require('../../web/middleware');
 var request = require('request');
 var uriContextResolverMiddleware = require('./middleware').uriContextResolverMiddleware;
+var jwt = require('jwt-simple');
 
 var serviceDisplayNames = {
   github: 'GitHub',
@@ -83,8 +84,9 @@ module.exports = {
               res.send(500, 'Unable to perform request. Please try again later.');
               return;
             }
-            // TODO: Make sure this is properly encoded
-            res.redirect(body.configurationURL + "&returnTo=" + nconf.get('web:basepath') + req.url);
+
+            var encryptedUserToken = jwt.encode(req.user.githubToken, nconf.get('jwt:secret'));
+            res.redirect(body.configurationURL + "&t=" + encryptedUserToken + "&returnTo=" + nconf.get('web:basepath') + req.url);
           });
         });
 

@@ -108,7 +108,7 @@ define([
       toggler('#incomingTroupeInvites', troupeCollections.incomingTroupeInvites);
       toggler('#outgoingConnectionInvites', troupeCollections.outgoingConnectionInvites);
       toggler('#incomingConnectionInvites', troupeCollections.incomingConnectionInvites);
-
+      toggler('#UsersList', troupeCollections.peopleTroupes);
       function toggler(element, collection) {
         function toggle() {
           self.$el.find(element).toggle(collection.length > 0);

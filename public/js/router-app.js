@@ -21,6 +21,7 @@ require([
   // 'views/profile/profileAddEmailView',
   // 'views/modals/completeYourProfileModal',
   'views/shareSearch/shareSearchView',
+  'views/shareSearch/inviteView',
   'views/signup/createTroupeView',
   // 'views/signup/usernameView',
   'views/app/troupeSettingsView',
@@ -49,7 +50,7 @@ require([
     RightToolbarView, filePreviewView, fileVersionsView, /* RequestDetailView,*/
     InviteDetailView, PersonDetailView, conversationDetailView, /*profileView,
     profileEmailView, profileAddEmailView,*/ /* completeYourProfileModal,*/
-    shareSearchView, createTroupeView, /*UsernameView,*/ troupeSettingsView,
+    shareSearchView, inviteView, createTroupeView, /*UsernameView,*/ troupeSettingsView,
     IntegrationSettingsModal, TroupeMenuView, /* ReinviteModal, */ Router,
     unreadItemsClient, FileDecorator, webhookDecorator, userDecorator,
     embedDecorator /*, errorReporter , FilteredCollection */) {
@@ -112,6 +113,7 @@ require([
       // { name: "profileEmails",    re: /^profile\/emails$/,        viewType: profileEmailView.Modal,       collection: userEmailCollection, skipModelLoad: true },
       // { name: "profileEmailsAdd", re: /^profile\/emails\/add$/,   viewType: profileAddEmailView.Modal,    collection: userEmailCollection, skipModelLoad: true },
       { name: "share",            re: /^share$/,                  viewType: shareSearchView.Modal },
+      { name: "inv",              re: /^inv$/,                    viewType: inviteView.Modal },
       { name: "connect",          re: /^connect$/,                viewType: shareSearchView.Modal,        viewOptions: { overrideContext: true, inviteToConnect: true } },
       { name: "create",           re: /^create$/,                 viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true },
       // { name: "upgradeOneToOne",  re: /^upgradeOneToOne$/,        viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true, viewOptions: { upgradeOneToOne: true } } ,
