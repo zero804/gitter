@@ -51,25 +51,17 @@ define([
         }
       }).restoreAllData();
 
-      var issues = [
-        {
-          id: '1234',
-          description: 'PC LOAD LETTER'
-        },
-        {
-          id: '1235',
-          description: 'No keyboard detected. Press F1 to resume.'
-        }
-      ];
-
       this.$el.find('textarea').textcomplete([
           {
               match: /(^|\s)#(\w*)$/,
               search: function(term, callback) {
-                var matches = issues.filter(function(issue) {
-                  return issue.id.indexOf(term) === 0;
-                });
-                callback(matches);
+                $.getJSON(window.location.href + '/issues', { q: term })
+                  .done(function(resp) {
+                    callback(resp);
+                  })
+                  .fail(function() {
+                    callback([]);
+                  });
               },
               template: function(issue) {
                 return listTemplate({
