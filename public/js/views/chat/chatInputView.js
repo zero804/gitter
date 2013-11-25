@@ -55,7 +55,7 @@ define([
           {
               match: /(^|\s)#(\w*)$/,
               search: function(term, callback) {
-                $.getJSON(window.location.href + '/issues', { q: term })
+                $.getJSON('/api/v1/troupes/'+context.getTroupeId()+'/issues', { q: term })
                   .done(function(resp) {
                     callback(resp);
                   })
