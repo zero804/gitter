@@ -33,8 +33,6 @@ describe('file-service', function() {
         fs.close(info.fd, function(err) {
           if(err) return done(err);
 
-          console.log('FIXUTRE', fixture);
-
           fileService.storeFile({
             troupe: fixture.troupe1.id,
             user: fixture.user1,

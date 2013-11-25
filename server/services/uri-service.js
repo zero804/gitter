@@ -104,7 +104,6 @@ function handleUserUri(currentUser, user) {
   return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, user.id)
     .spread(function(troupe, otherUser, invite) {
       return { oneToOne: true, troupe: troupe, otherUser: otherUser, access: !!troupe, invite: invite };
-
     });
 }
 
