@@ -6,14 +6,14 @@ define([
   'views/base',
   'utils/appevents',
   'hbs!./tmpl/chatInputView',
-  'hbs!./tmpl/typeaheadList',
+  'hbs!./tmpl/typeaheadListItem',
   'utils/momentWrapper',
   'utils/safe-html',
   'utils/scrollbar-detect',
   'collections/instances/integrated-items',
   'jquery-textcomplete', // No ref
   'jquery-sisyphus' // No ref
-], function(log, $, context, TroupeViews, appEvents, template, listTemplate, moment, safeHtml, hasScrollBars, itemCollections) {
+], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate, moment, safeHtml, hasScrollBars, itemCollections) {
   "use strict";
 
   /** @const */
@@ -53,21 +53,47 @@ define([
 
       this.$el.find('textarea').textcomplete([
           {
-              match: /(^|\s)@(\w*)$/,
-              search: function(term, callback) {
-                  var loggedInUsername = context.user().get('username');
-                  var matches = itemCollections.users.models.filter(function(user) {
-                    var username = user.get('username');
-                    return username != loggedInUsername && username.indexOf(term) === 0;
-                  });
-                  callback(matches);
-              },
-              template: function(user) {
-                return listTemplate(user.toJSON());
-              },
-              replace: function(user) {
-                  return '$1@' + user.get('username') + ' ';
-              }
+            match: /(^|\s)#(\w*)$/,
+            maxCount: 8,
+            search: function(term, callback) {
+              $.getJSON('/api/v1/troupes/'+context.getTroupeId()+'/issues', { q: term })
+                .done(function(resp) {
+                  callback(resp);
+                })
+                .fail(function() {
+                  callback([]);
+                });
+            },
+            template: function(issue) {
+              return listItemTemplate({
+                name: issue.number,
+                description: issue.title
+              });
+            },
+            replace: function(issue) {
+                return '$1#' + issue.id + ' ';
+            }
+          },
+          {
+            match: /(^|\s)@(\w*)$/,
+            maxCount: 8,
+            search: function(term, callback) {
+                var loggedInUsername = context.user().get('username');
+                var matches = itemCollections.users.models.filter(function(user) {
+                  var username = user.get('username');
+                  return username != loggedInUsername && username.indexOf(term) === 0;
+                });
+                callback(matches);
+            },
+            template: function(user) {
+              return listItemTemplate({
+                name: user.get('username'),
+                description: user.get('displayName')
+              });
+            },
+            replace: function(user) {
+                return '$1@' + user.get('username') + ' ';
+            }
           }
       ]);
 
