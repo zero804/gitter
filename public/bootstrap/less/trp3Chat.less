@@ -120,14 +120,17 @@
     font-weight: 300;
     font-size: 14px;
 
-    li>a:hover, .active>a, .active>a:hover {
-      background-color: rgba(52, 152, 219,0.8);
-    }
-
-    li>a {
+    li > a {
       padding: 2px 8px;
       small {
         font-size: smaller;
+        color: rgba(85,85,85,0.4);
+      }
+    }
+
+    li > a:hover, .active > a, .active > a:hover {
+      background-color: rgba(52, 152, 219,0.8);
+      small {
         color: rgba(255,255,255,0.4);
       }
     }
