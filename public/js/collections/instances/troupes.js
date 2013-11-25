@@ -19,10 +19,12 @@ define([
   orgsCollection.fetch();
 
   var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
+  console.dir(troupeCollection);
   unreadItemsClient.installTroupeListener(troupeCollection);
 
   function filterTroupeCollection(filter) {
     var c = new Backbone.FilteredCollection(null, { model: troupeModels.TroupeModel, collection: troupeCollection });
+    console.log("FILTER: " + filter+ " " , c);
     c.setFilter(filter);
     return c;
   }
