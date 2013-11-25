@@ -53,47 +53,47 @@ define([
 
       this.$el.find('textarea').textcomplete([
           {
-              match: /(^|\s)#(\w*)$/,
-              maxCount: 8,
-              search: function(term, callback) {
-                $.getJSON('/api/v1/troupes/'+context.getTroupeId()+'/issues', { q: term })
-                  .done(function(resp) {
-                    callback(resp);
-                  })
-                  .fail(function() {
-                    callback([]);
-                  });
-              },
-              template: function(issue) {
-                return listItemTemplate({
-                  name: issue.id,
-                  description: issue.description
+            match: /(^|\s)#(\w*)$/,
+            maxCount: 8,
+            search: function(term, callback) {
+              $.getJSON('/api/v1/troupes/'+context.getTroupeId()+'/issues', { q: term })
+                .done(function(resp) {
+                  callback(resp);
+                })
+                .fail(function() {
+                  callback([]);
                 });
-              },
-              replace: function(issue) {
-                  return '$1#' + issue.id + ' ';
-              }
+            },
+            template: function(issue) {
+              return listItemTemplate({
+                name: issue.id,
+                description: issue.description
+              });
+            },
+            replace: function(issue) {
+                return '$1#' + issue.id + ' ';
+            }
           },
           {
-              match: /(^|\s)@(\w*)$/,
-              maxCount: 8,
-              search: function(term, callback) {
-                  var loggedInUsername = context.user().get('username');
-                  var matches = itemCollections.users.models.filter(function(user) {
-                    var username = user.get('username');
-                    return username != loggedInUsername && username.indexOf(term) === 0;
-                  });
-                  callback(matches);
-              },
-              template: function(user) {
-                return listItemTemplate({
-                  name: user.get('username'),
-                  description: user.get('displayName')
+            match: /(^|\s)@(\w*)$/,
+            maxCount: 8,
+            search: function(term, callback) {
+                var loggedInUsername = context.user().get('username');
+                var matches = itemCollections.users.models.filter(function(user) {
+                  var username = user.get('username');
+                  return username != loggedInUsername && username.indexOf(term) === 0;
                 });
-              },
-              replace: function(user) {
-                  return '$1@' + user.get('username') + ' ';
-              }
+                callback(matches);
+            },
+            template: function(user) {
+              return listItemTemplate({
+                name: user.get('username'),
+                description: user.get('displayName')
+              });
+            },
+            replace: function(user) {
+                return '$1@' + user.get('username') + ' ';
+            }
           }
       ]);
 
