@@ -66,8 +66,8 @@ define([
             },
             template: function(issue) {
               return listItemTemplate({
-                name: issue.id,
-                description: issue.description
+                name: issue.number,
+                description: issue.title
               });
             },
             replace: function(issue) {
