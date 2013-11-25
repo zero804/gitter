@@ -51,7 +51,36 @@ define([
         }
       }).restoreAllData();
 
+      var issues = [
+        {
+          id: '1234',
+          description: 'PC LOAD LETTER'
+        },
+        {
+          id: '1235',
+          description: 'No keyboard detected. Press F1 to resume.'
+        }
+      ];
+
       this.$el.find('textarea').textcomplete([
+          {
+              match: /(^|\s)#(\w*)$/,
+              search: function(term, callback) {
+                var matches = issues.filter(function(issue) {
+                  return issue.id.indexOf(term) === 0;
+                });
+                callback(matches);
+              },
+              template: function(issue) {
+                return listTemplate({
+                  name: issue.id,
+                  description: issue.description
+                });
+              },
+              replace: function(issue) {
+                  return '$1#' + issue.id + ' ';
+              }
+          },
           {
               match: /(^|\s)@(\w*)$/,
               search: function(term, callback) {
@@ -63,7 +92,10 @@ define([
                   callback(matches);
               },
               template: function(user) {
-                return listTemplate(user.toJSON());
+                return listTemplate({
+                  name: user.get('username'),
+                  description: user.get('displayName')
+                });
               },
               replace: function(user) {
                   return '$1@' + user.get('username') + ' ';
