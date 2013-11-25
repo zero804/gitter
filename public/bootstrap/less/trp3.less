@@ -71,6 +71,11 @@ a {
 	color: #333;
 }
 
+h2 {
+  font-family: @fontSans;
+  color: #162e34;
+}
+
 div {
 /*	transform: translate3d(0, 0, 0);
 	transition:all .1s ease-in-out;
@@ -662,6 +667,29 @@ a.trpMiniLeftMenuItem {
   border-radius: 0 4px 4px 0;
 }
 
+.trpHomeContainer {
+  text-align: left;
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding-left: 40px;
+  .trpBodyText;
+}
+
+.org-list-item {
+  display: inline-block;
+  margin-bottom: 8px;
+  width: 300px;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.org-list-item:hover {
+  background-color: rgba(150,150,150,0.2);
+}
+
 .trpMenuTab {
  text-align: center;
   box-sizing:border-box;
@@ -1033,6 +1061,25 @@ a.trpMiniLeftMenuItem {
     margin-left: @leftMarginSmall;
     margin-right: @rightMarginSmall
   }
+}
+
+.trpHomePanel {
+    display: block;
+    margin-left: @leftMarginFull;
+  /*  min-height: 600px;
+    height: 100%;*/
+    text-align: left;
+    text-align: center;
+    .transition500ms;
+    height: 100%;
+
+    @media @mid {
+      margin-left: @leftMarginMid;
+    }
+
+    @media @small {
+      margin-left: @leftMarginSmall;
+    }
 }
 
 .trpToolbar {
