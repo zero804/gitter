@@ -17,7 +17,7 @@ function findOrCreateRoom(options) {
   var githubType = options.githubType;
   var user = options.user;
 
-  var users = user ? [{ _id: new ObjectID(), userId: user.id }] : [];
+  var users = user ? [{ _id: new ObjectID(), userId: user._id }] : [];
 
   return persistence.Troupe.findOneAndUpdateQ(
     { uri: uri, githubType: githubType },
