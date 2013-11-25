@@ -6,14 +6,14 @@ define([
   'views/base',
   'utils/appevents',
   'hbs!./tmpl/chatInputView',
-  'hbs!./tmpl/typeaheadList',
+  'hbs!./tmpl/typeaheadListItem',
   'utils/momentWrapper',
   'utils/safe-html',
   'utils/scrollbar-detect',
   'collections/instances/integrated-items',
   'jquery-textcomplete', // No ref
   'jquery-sisyphus' // No ref
-], function(log, $, context, TroupeViews, appEvents, template, listTemplate, moment, safeHtml, hasScrollBars, itemCollections) {
+], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate, moment, safeHtml, hasScrollBars, itemCollections) {
   "use strict";
 
   /** @const */
@@ -64,7 +64,7 @@ define([
                   });
               },
               template: function(issue) {
-                return listTemplate({
+                return listItemTemplate({
                   name: issue.id,
                   description: issue.description
                 });
@@ -84,7 +84,7 @@ define([
                   callback(matches);
               },
               template: function(user) {
-                return listTemplate({
+                return listItemTemplate({
                   name: user.get('username'),
                   description: user.get('displayName')
                 });
