@@ -50,12 +50,12 @@ function renderAppPageWithTroupe(req, res, next, page) {
       } else {
         bootScript = req.isPhone ? 'mobile-app' : 'router-app';
       }
-
+      
       res.render(page, {
         appCache: getAppCache(req),
         login: login,
         bootScriptName: bootScript,
-        troupeName: troupeContext.troupe.uri,
+        troupeName: troupeContext.troupe.uri || troupeContext.troupe.name,
         troupeContext: troupeContext,
         agent: req.headers['user-agent']
       });
