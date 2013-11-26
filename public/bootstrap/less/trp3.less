@@ -616,7 +616,6 @@ a.trpMiniLeftMenuItem {
 
   li {
     padding-left: 10px;
-    margin-right: 10px;
     box-sizing: border-box;
   }
 
@@ -1435,7 +1434,6 @@ i.favourited:hover:before {
 	margin: 1px;
   opacity: 0.95;
   width: 0;
-  height: 52px;
   overflow: hidden;
   white-space: nowrap;
   box-sizing: border-box;
@@ -1456,6 +1454,9 @@ i.favourited:hover:before {
 
 .notification-text {
 	.trpBodySmall;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .notification-error {
