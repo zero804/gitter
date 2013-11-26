@@ -679,7 +679,9 @@ function GitHubRepoStrategy(options) {
   var troupeStrategy = new TroupeStrategy(options);
   var self = this;
 
-  this.preload = function(repos, callback) {
+  this.preload = function(userAdminRepos, callback) {
+    var repos = _.map(userAdminRepos, function(repo) { return repo.full_name; });
+
     troupeService.findAllByUri(repos, function(err, troupes) {
       if (err) callback(err);
 
@@ -695,8 +697,9 @@ function GitHubRepoStrategy(options) {
   this.map = function(item) {
     var room = self.troupes[item];
     return {
-      name: item,
-      room: room ? troupeStrategy.map(room) : undefined
+      name:     item.full_name,
+      private:  item.private,
+      room:     room ? troupeStrategy.map(room) : undefined
     };
   };
 
