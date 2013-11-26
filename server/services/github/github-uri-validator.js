@@ -11,7 +11,6 @@ var Q = require('q');
  */
 function validateUri(user, uri) {
   var parts = uri.split('/');
-  console.log('VALIDATEDDDDDD', parts);
   if(parts.length == 1) {
     /** Its a user or org.
      *  We only need to check if it's an org because we'll
@@ -28,7 +27,6 @@ function validateUri(user, uri) {
   }
 
   if(parts.length == 2) {
-    console.log('REPO IS ', uri);
     /* Its a repo */
     var repoService = new GitHubRepoService(user);
     return repoService.getRepo(uri)
