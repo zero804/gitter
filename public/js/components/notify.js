@@ -18,7 +18,7 @@ define([
         // style
         n.show();
         // n.css({ position: 'relative', left: -1 * n.outerWidth() });
-        n.animate({ width: 280 });
+        n.animate({ width: 300 });
       }
       // restart hide timeout
       n.data('notification-hide-timeout').restart();
