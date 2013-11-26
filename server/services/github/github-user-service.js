@@ -5,6 +5,7 @@ var github = require('octonode');
 var publicClient = github.client();
 var Q = require('q');
 var assert = require('assert');
+var wrap = require('./github-cache-wrapper');
 
 function GitHubUserService(user) {
   assert(!user || user.githubToken, 'User must have a githubToken');
@@ -58,4 +59,7 @@ GitHubUserService.prototype.getRepos = function() {
   return d.promise;
 };
 
-module.exports = GitHubUserService;
+module.exports = wrap(GitHubUserService, function() {
+  return [this.user && this.user.username || ''];
+});
+

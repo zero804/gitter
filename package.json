@@ -79,7 +79,8 @@
     "debug": "~0.7.4",
     "octonode": "git://github.com/pksunkara/octonode.git",
     "passport-github": "~0.1.5",
-    "jwt-simple": "~0.1.0"
+    "jwt-simple": "~0.1.0",
+    "snappy-cache": "0.0.4"
   },
   "devDependencies": {
     "proxyquire": "0.4.0",
