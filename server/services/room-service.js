@@ -43,8 +43,6 @@ function localUriLookup(uri) {
  * @returns Promise of a troupe if the user is able to join/create the troupe
  */
 function findOrCreateNonOneToOneRoom(user, troupe, uri) {
-  console.log('> here 3', user, troupe, uri);
-
   if(troupe) {
     return Q.all([
         troupe,
@@ -52,20 +50,14 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
       ]);
   }
 
-  console.log('> here 4', user, troupe, uri);
-
   return validateUri(user, uri)
     .then(function(githubType) {
-      console.log('> here 5', githubType);
-
       /* If we can't determine the type, skip it */
       if(!githubType) return [null, false];
 
       /* Room does not yet exist */
       return permissionsModel(user, 'create', uri, githubType)
         .then(function(access) {
-          console.log('> here 6', access);
-
           if(!access) return [null, access];
 
           return persistence.Troupe.findOneAndUpdateQ(
@@ -81,7 +73,6 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
               upsert: true
             })
             .then(function(troupe) {
-              console.log('> here 7', troupe);
               return [troupe, true];
             });
         });
@@ -124,8 +115,6 @@ function findOrCreateRoom(user, uri) {
   /* First off, try use local data to figure out what this url is for */
   return localUriLookup(uri)
     .then(function(uriLookup) {
-
-      console.log('> here 1', uriLookup);
 
       /* Lookup found a user? */
       if(uriLookup && uriLookup.user) {
