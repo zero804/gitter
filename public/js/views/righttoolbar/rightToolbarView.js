@@ -5,7 +5,7 @@ define([
   'marionette',
   'views/base',
   'utils/context',
-  'fineuploader',
+  // 'fineuploader',
   'hbs!./tmpl/rightToolbar',
   'collections/instances/integrated-items',
   'collections/instances/troupes',
@@ -17,7 +17,7 @@ define([
   'cocktail',
   'utils/uservoice',
   'views/widgets/troupeAvatar'
-], function($, Backbone, Marionette, TroupeViews, context, qq, rightToolbarTemplate, itemCollections,
+], function($, Backbone, Marionette, TroupeViews, context, /*qq,*/ rightToolbarTemplate, itemCollections,
    trpCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView, cocktail, userVoice, TroupeAvatar) {
   "use strict";
 
