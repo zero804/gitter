@@ -38,7 +38,7 @@ function renderHomePage(req, res, next) {
 
 function renderAppPageWithTroupe(req, res, next, page) {
   var user = req.user;
-  var accessDenied = !req.uriContext.access;
+  var accessDenied =  false; //!req.uriContext.access;
 
   contextGenerator.generateTroupeContext(req)
     .then(function(troupeContext) {
@@ -50,7 +50,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
       } else {
         bootScript = req.isPhone ? 'mobile-app' : 'router-app';
       }
-      
+
       res.render(page, {
         appCache: getAppCache(req),
         login: login,

@@ -2,89 +2,151 @@
 "use strict";
 
 var persistence = require('./persistence-service');
-var GitHubOrgService = require('./github/github-org-service');
+var validateUri = require('./github/github-uri-validator');
+var uriLookupService = require("./uri-lookup-service");
 var assert = require("assert");
 var ObjectID = require('mongodb').ObjectID;
 var Q = require('q');
-var winston = require('winston');
+var permissionsModel = require('./permissions-model');
+var userService = require('./user-service');
+var troupeService = require('./troupe-service');
 
-function findOrCreateRoom(options) {
-  assert(options);
-  assert(options.uri);
-  assert(options.githubType);
+function localUriLookup(uri) {
+  return uriLookupService.lookupUri(uri)
+    .then(function(uriLookup) {
+      if(!uriLookup) return null;
 
-  var uri = options.uri;
-  var githubType = options.githubType;
-  var user = options.user;
-
-  var users = user ? [{ _id: new ObjectID(), userId: user._id }] : [];
-
-  return persistence.Troupe.findOneAndUpdateQ(
-    { uri: uri, githubType: githubType },
-    {
-      $setOnInsert: {
-        uri: uri,
-        githubType: githubType,
-        users: users
+      if(uriLookup.userId) {
+        return userService.findById(uriLookup.userId)
+          .then(function(user) {
+            if(user) return { user: user };
+          });
       }
-    },
-    {
-      upsert: true
-    })
-    .then(function(troupe) {
-      if(!user) return troupe;
 
+      if(uriLookup.troupeId) {
+        return troupeService.findById(uriLookup.troupeId)
+          .then(function(troupe) {
+            if(!troupe) return null;
+
+            if(troupe) return { troupe: troupe };
+          });
+      }
+
+      return null;
+    });
+}
+
+/**
+ * Assuming that oneToOne uris have been handled already,
+ * Figure out what this troupe is for
+ *
+ * @returns Promise of a troupe if the user is able to join/create the troupe
+ */
+function findOrCreateNonOneToOneRoom(user, troupe, uri) {
+  console.log('> here 3', user, troupe, uri);
+
+  if(troupe) {
+    return Q.all([
+        troupe,
+        permissionsModel(user, 'join', uri, troupe.githubType)
+      ]);
+  }
+
+  console.log('> here 4', user, troupe, uri);
+
+  return validateUri(user, uri)
+    .then(function(githubType) {
+      console.log('> here 5', githubType);
+
+      /* If we can't determine the type, skip it */
+      if(!githubType) return [null, false];
+
+      /* Room does not yet exist */
+      return permissionsModel(user, 'create', uri, githubType)
+        .then(function(access) {
+          console.log('> here 6', access);
+
+          if(!access) return [null, access];
+
+          return persistence.Troupe.findOneAndUpdateQ(
+            { uri: uri, githubType: githubType },
+            {
+              $setOnInsert: {
+                uri: uri,
+                githubType: githubType,
+                users:  user ? [{ _id: new ObjectID(), userId: user._id }] : []
+              }
+            },
+            {
+              upsert: true
+            })
+            .then(function(troupe) {
+              console.log('> here 7', troupe);
+              return [troupe, true];
+            });
+        });
+    });
+}
+
+/**
+ * Grant or remove the users access to a room
+ */
+function ensureAccessControl(user, troupe, access) {
+  if(troupe) {
+    if(access) {
+      /* In troupe? */
       if(troupe.containsUserId(user.id)) return troupe;
 
       troupe.addUserById(user.id);
       return troupe.saveQ().thenResolve(troupe);
-    });
+    } else {
+      /* No access */
+      if(!troupe.containsUserId(user.id)) return null;
 
-}
-
-function checkIfUserHasAccessToOrg(currentUser, orgName) {
-  var orgService = new GitHubOrgService(currentUser);
-  return orgService.member(orgName, currentUser.username);
-}
-
-function isUserAllowedInRoom(user, troupe) {
-  // TODO: check for open troupe
-  assert(troupe, 'troupe is required');
-  assert(user, 'user must have an id');
-
-  var authCheck;
-  var userId = user && user.id;
-
-  switch(troupe.githubType) {
-    case 'ORG':
-      authCheck = checkIfUserHasAccessToOrg(user, troupe.uri);
-      break;
-
-    case 'REPO':
-      // TODO: add repo level checks
-      authCheck = Q.resolve(true);
-      break;
-
-    default:
-      authCheck = Q.reject('Unknown room type: ' + troupe.githubType);
-  }
-
-  // Update the troupe according to this result
-  return authCheck.then(function(hasAccess) {
-    winston.verbose('Auth check returned: ' + hasAccess);
-
-    var troupeAccess = troupe.containsUserId(userId);
-    if(troupeAccess === hasAccess) return hasAccess;
-
-    if(troupeAccess && !hasAccess) {
-      troupe.removeUserById(userId);
-      return troupe.saveQ().thenResolve(hasAccess);
+      troupe.removeUserById(user.id);
+      return troupe.saveQ().thenResolve(null);
     }
-
-    troupe.addUserById(userId);
-    return troupe.saveQ().thenResolve(hasAccess);
-  });
+  }
 }
 
-exports.findOrCreateRoom    = findOrCreateRoom;
-exports.isUserAllowedInRoom = isUserAllowedInRoom;
+/**
+ * Add a user to a room.
+ * - If the room does not exist, will create the room if the user has permission
+ * - If the room does exist, will add the user to the room if the user has permission
+ * - If the user does not have access, will return null
+ *
+ * @return The promise of a troupe or nothing.
+ */
+function findOrCreateRoom(user, uri) {
+  assert(uri, 'uri required');
+  var userId = user.id;
+
+  /* First off, try use local data to figure out what this url is for */
+  return localUriLookup(uri)
+    .then(function(uriLookup) {
+
+      console.log('> here 1', uriLookup);
+
+      /* Lookup found a user? */
+      if(uriLookup && uriLookup.user) {
+        var otherUserId = uriLookup.user;
+
+        return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, otherUserId.id)
+          .spread(function(troupe, otherUser) {
+            return { oneToOne: true, troupe: troupe, otherUser: otherUser };
+          });
+      }
+
+
+      /* Didn't find a user, but we may have found another room */
+      return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe , uri)
+        .spread(function(troupe, access) {
+          return ensureAccessControl(user, troupe, access);
+        })
+        .then(function(troupe) {
+          return { oneToOne: false, troupe: troupe };
+        });
+    });
+}
+
+exports.findOrCreateRoom = findOrCreateRoom;

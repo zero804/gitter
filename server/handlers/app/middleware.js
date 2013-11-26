@@ -1,15 +1,22 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var uriService  = require('../../services/uri-service');
+var roomService = require('../../services/room-service');
 var isPhone     = require('../../web/is-phone');
 
 function uriContextResolverMiddleware(req, res, next) {
-  return uriService.findUriForUser(req.user, req.params.userOrOrg, req.params.repo)
-    .then(function(result) {
-      if(result.notFound) throw 404;
-      req.troupe = result.troupe;
-      req.uriContext = result;
+  var uri;
+  if(req.params.repo) {
+    uri = req.params.userOrOrg + '/' + req.params.repo;
+  } else {
+    uri = req.params.userOrOrg;
+  }
+
+  return roomService.findOrCreateRoom(req.user, uri)
+    .then(function(uriContext) {
+      if(!uriContext.troupe) throw 404;
+      req.troupe = uriContext.troupe;
+      req.uriContext = uriContext;
       next();
     })
     .fail(next);

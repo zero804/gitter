@@ -15,6 +15,16 @@ function GitHubOrgService(user) {
 }
 
 /**
+ * Returns the details of an org
+ */
+GitHubOrgService.prototype.getOrg = function(org) {
+  var ghorg  = this.client.org(org);
+  var d = Q.defer();
+  ghorg.info(d.makeNodeResolver());
+  return d.promise;
+};
+
+/**
  * Returns the list of users with publisized membership to an organisation
  */
 GitHubOrgService.prototype.members = function(org) {
