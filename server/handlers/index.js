@@ -6,6 +6,7 @@ module.exports = {
     require('./appcache').install(app);
     require('./cdn').install(app);
     require('./native').install(app);
+    require('./signup').install(app);
     require('./signout').install(app);
     require('./login').install(app);
     require('./landing').install(app);
