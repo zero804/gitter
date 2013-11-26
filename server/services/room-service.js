@@ -60,6 +60,11 @@ function isUserAllowedInRoom(user, troupe) {
       authCheck = checkIfUserHasAccessToOrg(user, troupe.uri);
       break;
 
+    case 'REPO':
+      // TODO: add repo level checks
+      authCheck = Q.resolve(true);
+      break;
+
     default:
       authCheck = Q.reject('Unknown room type: ' + troupe.githubType);
   }
