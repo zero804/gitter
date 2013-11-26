@@ -44,6 +44,14 @@ GitHubOrgService.prototype.member = function(org, username) {
       throw err;
     });
 };
+
+GitHubOrgService.prototype.getRepos = function(org) {
+  var ghorg  = this.client.org(org);
+  var d = Q.defer();
+  ghorg.repos(d.makeNodeResolver());
+  return d.promise;
+};
+
 // module.exports = GitHubOrgService;
 module.exports = wrap(GitHubOrgService, function() {
   return [this.user && this.user.username || ''];
