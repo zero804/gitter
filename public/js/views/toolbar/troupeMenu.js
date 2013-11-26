@@ -12,8 +12,9 @@ define([
   './searchView',
   './profileView',
   './orgCollectionView',
+  './repoCollectionView',
   'nanoscroller' //no ref
-], function($, _, Marionette, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView, ProfileView, OrgCollectionView) {
+], function($, _, Marionette, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView, ProfileView, OrgCollectionView, RepoCollectionView) {
   "use strict";
 
   return Marionette.Layout.extend({
@@ -32,7 +33,8 @@ define([
       favs: "#left-menu-list-favourites",
       people: "#left-menu-list-users",
       search: "#left-menu-list-search",
-      orgs: "#left-menu-list-orgs"
+      orgs: "#left-menu-list-orgs",
+      repos: "#left-menu-list-repos"
     },
 
     events: {
@@ -86,6 +88,10 @@ define([
 
       // Organizations collection view
       this.orgs.show(new OrgCollectionView({ collection: troupeCollections.orgs }));
+
+      // Repositories collection view
+      this.repos.show(new RepoCollectionView({ collection: troupeCollections.repos }));
+
 
       this.initHideListeners();
     },
