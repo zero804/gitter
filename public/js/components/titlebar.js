@@ -21,10 +21,10 @@ define([
               badge.text(count);
               if(count > 0) {
                 // badge.show();
-                $("#favicon").attr("href","/images/2/gitter/favicon4-unread.png");
+                $("#favicon").attr("href","/images/2/gitter/favicon5-unread.png");
               } else {
                 // badge.hide();
-                $("#favicon").attr("href","/images/2/gitter/favicon4.png");
+                $("#favicon").attr("href","/images/2/gitter/favicon5.png");
               }
             }
 
