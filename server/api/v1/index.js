@@ -39,15 +39,6 @@ module.exports = {
         auth,
         require('./invite-connections.js'));
 
-    app.post('/api/v1/requestaccessexisting',
-        auth,
-        expressValidator(),
-        require('./request-access-existing.js'));
-
-    app.post('/api/v1/requestaccess',
-        expressValidator(),
-        require('./request-access-new.js'));
-
     app.get('/api/v1/suggested-contacts',
         auth,
         require('./suggested-contacts.js'));
