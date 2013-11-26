@@ -21,7 +21,7 @@ var roomService = testRequire("./services/room-service");
 
 describe('room-service', function() {
   it('should find or create a room for an org', function(done) {
-    return roomService.findOrCreateRoom(fixture.user1, 'gitterhq')
+    return roomService.findOrCreateRoom(fixture.user1, 'gitterTest')
       .then(function(uriContext) {
         assert(!uriContext.oneToOne);
         assert(uriContext.troupe);
