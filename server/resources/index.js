@@ -24,6 +24,7 @@ module.exports = {
     }
 
     installTroupeSubResource('invites', 'invites');
+    installTroupeSubResource('issues', 'issues');
     installTroupeSubResource('requests', 'requests');
     installTroupeSubResource('users', 'users');
     installTroupeSubResource('conversations', 'conversations');

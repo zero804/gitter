@@ -1,13 +1,26 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  'views/base',
+  'marionette',
   'utils/context',
-  'hbs!./tmpl/userHomeTemplate'
-], function(TroupeViews, context, userHomeTemplate) {
+  'collections/instances/troupes',
+  'hbs!./tmpl/userHomeTemplate',
+  './homeOrgCollectionView'
+], function(Marionette, context, troupeCollections, userHomeTemplate, OrgCollectionView) {
   "use strict";
 
-  return TroupeViews.Base.extend({
+  return Marionette.Layout.extend({
     template: userHomeTemplate,
+    tagName: 'div',
+
+    regions: {
+      orgs: "#org-list",
+      repos: "#repos-list"
+    },
+
+    onRender: function() {
+      this.orgs.show(new OrgCollectionView({ collection: troupeCollections.orgs }));
+    },
+
     getRenderData: function() {
       return {
         username: context.getUser().username,
