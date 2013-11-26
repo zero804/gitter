@@ -81,7 +81,7 @@ exports.addHandler = function addHandler(stageName, stageNumber, shutdownHandler
 exports.installUnhandledExceptionHandler = function() {
   //
   // Do nothing
-  return;
+  //return;
 
   //
   process.on('uncaughtException', function(err) {
