@@ -162,6 +162,12 @@ describe('uri-lookup-service', function() {
   });
 
 
+  it('07. repo style', function(done) {
+    return uriLookupService.lookupUri('gitterHQ/cloaked-avenger')
+      .nodeify(done);
+  });
+
+
 
 
   after(function() {
