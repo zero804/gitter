@@ -74,6 +74,7 @@ a {
 h2 {
   font-family: @fontSans;
   color: #162e34;
+  font-weight: 400;
 }
 
 div {
@@ -115,7 +116,8 @@ header {
 
   .trpTroupeFavourite {
     display: inline-block;
-    padding-left: 0;
+    padding-left: 6px;
+    margin-right: 4px;
   }
 
   h1 {
@@ -346,6 +348,13 @@ a:hover {
   width: 12px;
 }
 
+.github-ONETOONE:before {
+  content: "@";
+  margin-right: 8px;
+  opacity: 0.8;
+  width: 12px;
+}
+
 .trpLeftMenuProfile {
   .trpBodyMedium;
   padding: 10px 0 10px 10px;
@@ -369,7 +378,7 @@ a:hover {
 .trpLeftMenuProfileMenu {
   display: none;
   box-sizing: border-box;
-  background-color: rgba(255,255,255,0.2);
+  margin-left: -10px;
   padding-bottom: 12px;
   overflow: hidden;
   width: 100%;
@@ -892,21 +901,54 @@ a.trpMiniLeftMenuItem {
   }
 }
 
-.trpTroupeFavourite img {
+.trpTroupeFavourite i {
 	display: none;
   padding-right: 10px;
 }
 
-.trpTroupeFavourite img.unfavourited {
+i.favourited:before {
+  font-family: 'troupe-icons';
+  /*content: '\e81a';*/
+  content: '\e826';
+  color: #f1c40f;
+  margin-right: 8px;
+  width: 12px;
+  font-size: 20px;
+  transition:all .5s ease-in-out;
+  font-style: normal;
+}
+
+i.unfavourited:before {
+  font-family: 'troupe-icons';
+  /*content: '\e81a';*/
+  content: '\e825';
+  margin-right: 8px;
+  opacity: 0.3;
+  width: 12px;
+  font-size: 20px;
+  transition:all .5s ease-in-out;
+  font-style: normal;
+}
+
+i.unfavourited:hover:before {
+  opacity: 0.8;
+  color: #f1c40f;
+}
+
+i.favourited:hover:before {
+  opacity: 0.8;
+}
+
+.trpTroupeFavourite i.unfavourited {
 	display: inline-block;
   vertical-align: top;
 }
 
-.trpTroupeFavourite.favourited img.unfavourited {
+.trpTroupeFavourite.favourited i.unfavourited {
 	display: none;
 }
 
-.trpTroupeFavourite.favourited img.favourited {
+.trpTroupeFavourite.favourited i.favourited {
 	display: inline-block;
   vertical-align: top;
 }

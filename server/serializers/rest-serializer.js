@@ -666,7 +666,8 @@ function GitHubOrgStrategy(options) {
   this.map = function(item) {
     var room = self.troupes[item];
     return {
-      name: item,
+      name: item.login,
+      avatar_url: item.avatar_url,
       room: room ? troupeStrategy.map(room) : undefined
     };
   };

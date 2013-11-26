@@ -114,7 +114,7 @@ exports.userUpdate = function(user, properties) {
       var cio_properties = {
         first_name: firstName,
         created_at: createdAt,
-        email:      user.email,
+        email:      email,
         name:       user.displayName,
         username:   user.username,
         confirmationCode: user.confirmationCode,
@@ -126,7 +126,7 @@ exports.userUpdate = function(user, properties) {
         cio_properties[attr] = value;
       }
 
-      cio.identify(user.id, user.email, cio_properties);
+      cio.identify(user.id, email, cio_properties);
     }
 
   } catch(err) {

@@ -18,7 +18,8 @@ define([
       }
       return {
         displayName: displayName,
-        user: context.user()
+        user: context.user(),
+        username: context.getUser().username
       };
     }
   });
