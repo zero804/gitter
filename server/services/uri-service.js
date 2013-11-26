@@ -3,9 +3,9 @@
 
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
-var inviteService = require('./invite-service');
 var uriLookupService = require("./uri-lookup-service");
 var GitHubOrgService = require("./github/github-org-service");
+var GitHubRepoService = require("./github/github-repo-service");
 var roomService = require("./room-service");
 var assert = require("assert");
 
@@ -16,16 +16,17 @@ var assert = require("assert");
  *   or { user: user }
  *   or null if the uri doesn't exist
  */
-function findUri(currentUser, uri, callback) {
+function findUri(currentUser, userOrOrg, repo) {
   assert(currentUser, 'currentUser required');
-  assert(uri, 'uri required');
-
-  uri = uri.toLowerCase();
-  if(uri.charAt(0) === '/') {
-    uri = uri.substring(1);
-  }
+  assert(userOrOrg, 'uri required');
 
   var userId = currentUser && currentUser.id;
+  var uri;
+  if(repo) {
+    uri = userOrOrg + '/' + repo;
+  } else {
+    uri = userOrOrg;
+  }
 
   return uriLookupService.lookupUri(uri)
     .then(function(uriLookup) {
@@ -58,16 +59,19 @@ function findUri(currentUser, uri, callback) {
       if(uriLookup) return uriLookup;
 
       /**
+       * Whatever object the user wants to access, it does not
+       * yet exist in gitter. From here on out we'll be creating
+       * something new or rejecting the request
+       *
        * We still don't know what this uri represents
        * Ask github about this endpoint
        */
-      var parts = uri.split('/');
-      var userOrOrg = parts[0];
-      if(parts.length === 1) {
-        return findGitHubOrg(currentUser, userOrOrg)
-          .then(function(userInOrg) {
-            if(userInOrg) {
-              return roomService.findOrCreateRoom({ uri: userOrOrg, githubType: 'ORG', user: currentUser })
+      if(repo) {
+        return findGitHubRepo(currentUser, uri)
+          .then(function(repoInfo) {
+
+            if(repoInfo && repoInfo.permissions && repoInfo.permissions.admin) {
+              return roomService.findOrCreateRoom({ uri: uri, githubType: 'REPO', user: currentUser })
                 .then(function(troupe) {
                   return { troupe: troupe };
                 });
@@ -75,11 +79,31 @@ function findUri(currentUser, uri, callback) {
 
             return null;
           });
+
       }
 
+      /* No repo, must be a org or a user */
+      return findGitHubOrg(currentUser, userOrOrg)
+        .then(function(userInOrg) {
+          if(userInOrg) {
+            return roomService.findOrCreateRoom({ uri: userOrOrg, githubType: 'ORG', user: currentUser })
+              .then(function(troupe) {
+                return { troupe: troupe };
+              });
+          }
 
-    })
-    .nodeify(callback);
+          return null;
+        });
+
+
+
+    });
+}
+exports.findUri = findUri;
+
+function findGitHubRepo(currentUser, repo) {
+  var repoService = new GitHubRepoService(currentUser);
+  return repoService.getRepo(repo);
 }
 
 function findGitHubOrg(currentUser, userOrOrg) {
@@ -87,7 +111,6 @@ function findGitHubOrg(currentUser, userOrOrg) {
   return orgService.member(userOrOrg, currentUser.username);
 }
 
-exports.findUri = findUri;
 
 function handleUserUri(currentUser, user) {
   var userId = currentUser && currentUser.id;
@@ -141,11 +164,12 @@ function handleTroupeUri(currentUser, troupe) {
  *  { troupe: troupe, group: true, access: true/false, invite: invite },
  *  { notFound: true }
  */
-exports.findUriForUser = function(currentUser, uri, callback) {
+exports.findUriForUser = function(currentUser, userOrOrg, repo) {
   assert(currentUser, 'currentUser required');
-  assert(uri, 'uri required');
+  assert(userOrOrg, 'userOrOrg required');
+  assert(!repo || typeof repo === 'string', 'repo required');
 
-  return findUri(currentUser, uri)
+  return findUri(currentUser, userOrOrg, repo)
       .then(function(result) {
         if(!result) {
           return { notFound: true };
@@ -155,7 +179,6 @@ exports.findUriForUser = function(currentUser, uri, callback) {
         if(result.troupe) return handleTroupeUri(currentUser, result.troupe);
 
         throw new Error('Result did not contain user or troupe attributes.');
-      })
-      .nodeify(callback);
+      });
 
 };

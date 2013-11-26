@@ -41,7 +41,7 @@ function lookupUri(uri) {
           return persistence.UriLookup.findOneAndUpdateQ(
             { uri: uri, troupeId: troupe._id },
             { $set: { uri: uri, troupeId: troupe._id }, $unset: { userId: '' } },
-             { upsert: true });
+            { upsert: true });
         }
 
         return null;
