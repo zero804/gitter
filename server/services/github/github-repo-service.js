@@ -23,7 +23,11 @@ GitHubIssueService.prototype.getRepo = function(repo) {
   var ghrepo = this.client.repo(repo);
   var d = Q.defer();
   ghrepo.info(d.makeNodeResolver());
-  return d.promise;
+  return d.promise
+    .fail(function(err) {
+      if(err.statusCode === 404) return;
+      throw err;
+    });
 };
 
 /**
