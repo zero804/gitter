@@ -41,11 +41,6 @@ describe('room-service', function() {
 
   it('should create a room for a repo', function(done) {
     return roomService.findOrCreateRoom(fixture.user1, 'gitterHQ/cloaked-avenger')
-      .then(function(uriContext) {
-        assert(uriContext.oneToOne);
-        assert(uriContext.troupe);
-        assert.equal(uriContext.otherUser.id, fixture.user2.id);
-      })
       .nodeify(done);
   });
 
