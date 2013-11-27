@@ -4,7 +4,7 @@
 var RepoService =  require('../../services/github/github-repo-service');
 
 module.exports = {
-  index: function(req, res) {
+  index: function(req, res, next) {
     var term = req.query.q || '';
 
     var service = new RepoService(req.session.user);
@@ -15,6 +15,9 @@ module.exports = {
       });
 
       res.send(matches);
+    })
+    .fail(function(err) {
+      next(err);
     });
 
   }
