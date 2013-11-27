@@ -5,8 +5,9 @@ var github = require('octonode');
 var publicClient = github.client();
 var Q = require('q');
 var assert = require('assert');
-var parser = require('parse-links');
 var url = require('url');
+var parser = require('parse-links');
+var wrap = require('./github-cache-wrapper');
 
 function GitHubIssueService(user) {
   assert(!user || user.githubToken, 'User must have a githubToken');
@@ -14,6 +15,22 @@ function GitHubIssueService(user) {
   this.user = user;
   this.client = user ? github.client(user.githubToken) : publicClient;
 }
+
+
+/**
+ * Returns the information about the specified repo
+ * @return the promise of information about a repo
+ */
+GitHubIssueService.prototype.getRepo = function(repo) {
+  var ghrepo = this.client.repo(repo);
+  var d = Q.defer();
+  ghrepo.info(d.makeNodeResolver());
+  return d.promise
+    .fail(function(err) {
+      if(err.statusCode === 404) return;
+      throw err;
+    });
+};
 
 function getIssuePage(repo, number, state) {
   var d = Q.defer();
@@ -71,7 +88,7 @@ function getIssuesWithState(repo, state) {
 }
 
 /**
- * Returns a promise of the open issues for a repo
+ * Returns a promise of the issues for a repo
  */
 GitHubIssueService.prototype.getIssues = function() {
   var repo = this.client.repo('twitter/summingbird');
@@ -83,4 +100,7 @@ GitHubIssueService.prototype.getIssues = function() {
     });
 };
 
-module.exports = GitHubIssueService;
+// module.exports = GitHubIssueService;
+module.exports = wrap(GitHubIssueService, function() {
+  return [this.user && this.user.username || ''];
+});

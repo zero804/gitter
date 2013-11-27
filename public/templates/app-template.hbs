@@ -9,14 +9,21 @@
 	<title>{{troupeName}} - Gitter</title>
 
   <style>
-  html.loading .trpContentPanel { background: url("{{ cdn 'images/2/troupe-ajax-guy-green.gif' }}") center no-repeat; height: 90%; }
+
+  @-webkit-keyframes pulsey {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+  }
+
+  html.loading .trpContentPanel { background: url("{{ cdn 'images/2/gitter/logo-mark-grey-64.png' }}") center no-repeat; height: 90%; -webkit-animation: pulsey 2s ease-out; -webkit-animation-iteration-count: infinite;  }
   html.loading .trpContentPanel > * { visibility: hidden; }
   </style>
 
   <link rel="stylesheet" href='{{cdn "bootstrap/css/trp3.css" }}'>
 
     <!-- Le fav and touch icons -->
-    <link id="favicon" rel="shortcut icon" href='{{cdn "images/2/gitter/favicon3.png" }}'>
+    <link id="favicon" rel="shortcut icon" href='{{cdn "images/2/gitter/favicon4.png" }}'>
     {{>load_font_css}}
 </head>
 <body>
@@ -65,7 +72,10 @@
             {{#if hellFreezesOver}}
             <li><a href="#|share">Add someone to this Troupe</a></li>
             {{/if}}
-            <li><a href="#|troupeSettings">Settings</a></li>
+            <li><a href="#|inv">Invite someone to this chat</a>
+            <li role="presentation" class="divider"></li>
+            <li><a href="#|troupeSettings">Notifications</a></li>
+            <li><a href="#|integrations">Integrations</a></li>
           </ul>
         </div>
       </div>
@@ -73,15 +83,6 @@
     </header>
     <div class="trpChatContainer" id="content-frame">
     </div>
-  </div>
-</div>
-
-
-<div class="trpRightPanel" id="right-panel" style="display: none">
-  <div class="trpImageBigThumbnail" id="image-preview">
-  </div>
-  <div class="trpFileDetails">
-    <div class="trpButtonGreen">Download</div>
   </div>
 </div>
 

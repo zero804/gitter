@@ -10,8 +10,8 @@ require([
   'collections/instances/troupes',
   // 'collections/useremails',
   'views/righttoolbar/rightToolbarView',
-  'views/file/filePreviewView',
-  'views/file/fileVersionsView',
+  // 'views/file/filePreviewView',
+  // 'views/file/fileVersionsView',
   // 'views/request/requestDetailView',
   'views/invite/inviteDetailView',
   'views/people/personDetailView',
@@ -47,7 +47,7 @@ require([
   'bootstrap-dropdown' // No ref
 ], function($, Backbone, context, AppIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, troupeCollections, /*UserEmailCollection,*/
-    RightToolbarView, filePreviewView, fileVersionsView, /* RequestDetailView,*/
+    RightToolbarView, /*filePreviewView, fileVersionsView,  RequestDetailView,*/
     InviteDetailView, PersonDetailView, conversationDetailView, /*profileView,
     profileEmailView, profileAddEmailView,*/ /* completeYourProfileModal,*/
     shareSearchView, inviteView, createTroupeView, /*UsernameView,*/ troupeSettingsView,
@@ -101,11 +101,11 @@ require([
 
   new Router({
     routes: [
-      { name: "file",             re: /^file\/(\w+)$/,            viewType: filePreviewView.Modal,               collection: itemCollections.files },
+      // { name: "file",             re: /^file\/(\w+)$/,            viewType: filePreviewView.Modal,               collection: itemCollections.files },
       // { name: "request",          re: /^request\/(\w+)$/,         viewType: RequestDetailView.Modal,            collection: itemCollections.requests },
       { name: "invite",           re: /^invite\/(\w+)$/,          viewType: InviteDetailView.Modal,             collection: itemCollections.invites },
-      { name: "filePreview",      re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: itemCollections.files },
-      { name: "fileVersions",     re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: itemCollections.files },
+      // { name: "filePreview",      re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: itemCollections.files },
+      // { name: "fileVersions",     re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: itemCollections.files },
       { name: "mail",             re: /^mail\/(\w+)$/,            viewType: conversationDetailView.Modal, collection: itemCollections.conversations },
       { name: "person",           re: /^person\/(\w+)$/,          viewType: PersonDetailView.Modal,             collection: itemCollections.users },
 

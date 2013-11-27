@@ -116,7 +116,8 @@ header {
 
   .trpTroupeFavourite {
     display: inline-block;
-    padding-left: 0;
+    padding-left: 6px;
+    margin-right: 4px;
   }
 
   h1 {
@@ -515,12 +516,12 @@ a.trpMiniLeftMenuItem {
 .trpLeftMenu .nano {
 	position: absolute;
 	top: 124px;
-	bottom: 70px;
+	bottom: 10px;
   .transition300ms;
 }
 
 .trpLeftMenu .nano.pushed {
-  margin-top: 80px;
+  margin-top: 60px;
 }
 
 .trpLeftMenuActions {
@@ -615,7 +616,6 @@ a.trpMiniLeftMenuItem {
 
   li {
     padding-left: 10px;
-    margin-right: 10px;
     box-sizing: border-box;
   }
 
@@ -1306,7 +1306,6 @@ i.favourited:hover:before {
 .trpToolbarList {
   display: inline-block;
 	vertical-align: top;
-	padding-bottom: 20px;
   width: 100%;
 }
 
@@ -1434,9 +1433,6 @@ i.favourited:hover:before {
 	margin: 1px;
   opacity: 0.95;
   width: 0;
-  height: 52px;
-  overflow: hidden;
-  white-space: nowrap;
   box-sizing: border-box;
 }
 
@@ -1455,6 +1451,9 @@ i.favourited:hover:before {
 
 .notification-text {
 	.trpBodySmall;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .notification-error {
@@ -1518,9 +1517,9 @@ i.favourited:hover:before {
 
  .trpLoading {
 	 display: inline-block;
-	 background: url('../../images/2/troupe-ajax-guy.gif');
-	 width: 31px;
-	 height: 31px;
+	 background: url('../../images/2/gitter/logo-mark-grey-64.png');
+	 width: 64px;
+	 height: 64px;
 	 vertical-align: text-bottom;
  }
 
