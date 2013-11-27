@@ -24,20 +24,20 @@ mongoose.set('debug', nconf.get("mongo:logQueries"));
 
 mongoose.connect(nconf.get("mongo:url"), {
   server: {
-            readPreference: "primaryPreferred",
-  socketOptions: { keepAlive: 1, connectTimeoutMS: 3000 },
-  auto_reconnect: true,
-  autoReconnect: true
-          },
+    readPreference: "primaryPreferred",
+    socketOptions: { keepAlive: 1, connectTimeoutMS: 3000 },
+    auto_reconnect: true,
+    autoReconnect: true
+  },
   db: {
-        readPreference: "primaryPreferred"
-      },
+    readPreference: "primaryPreferred"
+  },
   replset: {
-             readPreference: "primaryPreferred",
-  socketOptions: { keepAlive: 1, connectTimeoutMS: 2000 },
-  auto_reconnect: true,
-  autoReconnect: true
-           }
+    readPreference: "primaryPreferred",
+    socketOptions: { keepAlive: 1, connectTimeoutMS: 2000 },
+    auto_reconnect: true,
+    autoReconnect: true
+  }
 });
 
 shutdown.addHandler('mongo', 1, function(callback) {
@@ -124,7 +124,10 @@ var UserSchema = new Schema({
   // },
   googleRefreshToken: String,
   githubToken: { type: String, required: true },
-  githubId: {type: Number, required: true},
+  githubId: {type: Number, required: true },
+  permissions: {
+    createRoom: { type: Boolean, 'default': false }
+  },
   // usernameSuggestion: { type: String },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });

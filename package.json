@@ -80,6 +80,7 @@
     "octonode": "~0.3.8",
     "passport-github": "~0.1.5",
     "jwt-simple": "~0.1.0",
+    "parse-links": "~0.1.0",
     "snappy-cache": "0.0.4"
   },
   "devDependencies": {
