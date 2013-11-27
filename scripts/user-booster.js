@@ -30,7 +30,7 @@ function die(error) {
 
 persistence.User.findOneQ({ username: opts.username })
   .then(function(user) {
-    if(user && user.permissions.createRoom) throw "Already boosted";
+    // if(user && user.permissions.createRoom) throw "Already boosted";
 
     var userService = new GitHubUserService(user && user.githubToken ? user : null);
     return userService.getUser(opts.username)
