@@ -4,6 +4,7 @@
 var middleware      = require('../../web/middleware');
 var appRender       = require('./render');
 var appMiddleware   = require('./middleware');
+var limitedReleaseService = require('../../services/limited-release-service');
 
 module.exports = {
     install: function(app) {
@@ -14,7 +15,15 @@ module.exports = {
         appMiddleware.isPhoneMiddleware,
         function(req, res, next) {
           if (req.uriContext.ownUrl) {
-            return appRender.renderHomePage(req, res, next);
+            return limitedReleaseService.shouldUserBeTurnedAway(req.user)
+              .then(function(allow) {
+                if(allow) {
+                  return appRender.renderHomePage(req, res, next);
+                } else {
+                  return res.render('thanks');
+                }
+              })
+              .fail(next);
           }
 
           // if(req.isPhone) {
