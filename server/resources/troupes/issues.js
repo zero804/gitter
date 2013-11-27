@@ -18,7 +18,7 @@ module.exports = {
     })
     .fail(function(err) {
       console.log('broke!', err, err.stack);
-      res.send(500);
+      res.next(err);
     });
 
   }
