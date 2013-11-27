@@ -81,7 +81,8 @@
     "passport-github": "~0.1.5",
     "jwt-simple": "~0.1.0",
     "parse-links": "~0.1.0",
-    "snappy-cache": "0.0.4"
+    "snappy-cache": "0.0.4",
+    "mailchimp-api": "~2.0.4"
   },
   "devDependencies": {
     "proxyquire": "0.4.0",
