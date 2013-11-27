@@ -22,6 +22,10 @@ function repoPermissionsModel(user, right, uri) {
 
       assert.equal(right, 'create');
 
+      // If the user isn't wearing the magic hat, refuse them
+      // permission
+      if(!user.permissions.createRoom) return false;
+
       return repoInfo.permissions && repoInfo.permissions.admin;
     });
 
@@ -31,7 +35,6 @@ function orgPermissionsModel(user, right, uri) {
   // For now, only authenticated users can be members of orgs
   if(!user) return false;
 
-
   var ghuser = new GitHubUserService(user);
   return ghuser.getOrgs()
     .then(function(orgs) {
@@ -39,7 +42,17 @@ function orgPermissionsModel(user, right, uri) {
 
       var org = _.find(orgs, function(org) { return org.login && org.login.toLowerCase() === uri; });
 
-      return !!org;
+      // If the user isn't part of the org, always refuse
+      // them permission
+      if(!org) {
+        return false;
+      }
+
+      // If the user isn't wearing the magic hat, refuse them
+      // permission
+      if(!user.permissions.createRoom) return false;
+
+      return true;
     });
 
 
