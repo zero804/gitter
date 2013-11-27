@@ -19,17 +19,18 @@ var collections = require('../utils/collections');
  */
 function lookupUri(uri) {
   uri = uri.toLowerCase();
-
   return persistence.UriLookup.findOneQ({ uri: uri })
     .then(function(uriLookup) {
       if(uriLookup) return uriLookup;
 
       // Double-check the troupe and user tables to find this uri
+      var repoStyle = uri.indexOf('/') >= 0;
 
       return Q.all([
-        persistence.User.findOneQ({ username: uri }, 'username'),
+        repoStyle ? null : persistence.User.findOneQ({ username: uri }, 'username'),
         persistence.Troupe.findOneQ({ uri: uri }, 'uri')
       ]).spread(function(user, troupe) {
+
         if(user) {
           return persistence.UriLookup.findOneAndUpdateQ(
             { uri: uri, userId: user._id },
@@ -41,11 +42,11 @@ function lookupUri(uri) {
           return persistence.UriLookup.findOneAndUpdateQ(
             { uri: uri, troupeId: troupe._id },
             { $set: { uri: uri, troupeId: troupe._id }, $unset: { userId: '' } },
-             { upsert: true });
+            { upsert: true });
         }
 
         return null;
-    });
+      });
   });
 }
 

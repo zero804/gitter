@@ -5,6 +5,7 @@ var github = require('octonode');
 var publicClient = github.client();
 var Q = require('q');
 var assert = require('assert');
+var wrap = require('./github-cache-wrapper');
 
 function GitHubOrgService(user) {
   assert(!user || user.githubToken, 'User must have a githubToken');
@@ -12,6 +13,16 @@ function GitHubOrgService(user) {
   this.user = user;
   this.client = user ? github.client(user.githubToken) : publicClient;
 }
+
+/**
+ * Returns the details of an org
+ */
+GitHubOrgService.prototype.getOrg = function(org) {
+  var ghorg  = this.client.org(org);
+  var d = Q.defer();
+  ghorg.info(d.makeNodeResolver());
+  return d.promise;
+};
 
 /**
  * Returns the list of users with publisized membership to an organisation
@@ -34,4 +45,14 @@ GitHubOrgService.prototype.member = function(org, username) {
     });
 };
 
-module.exports = GitHubOrgService;
+GitHubOrgService.prototype.getRepos = function(org) {
+  var ghorg  = this.client.org(org);
+  var d = Q.defer();
+  ghorg.repos(d.makeNodeResolver());
+  return d.promise;
+};
+
+// module.exports = GitHubOrgService;
+module.exports = wrap(GitHubOrgService, function() {
+  return [this.user && this.user.username || ''];
+});

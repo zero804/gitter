@@ -1,21 +1,25 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var IssueService =  require('../../services/github/github-issue-service');
+var RepoService =  require('../../services/github/github-repo-service');
 
 module.exports = {
   index: function(req, res) {
     var term = req.query.q || '';
-    var service = new IssueService(req.session.user);
-    service.getIssues().then(function(issues) {
+
+    var service = new RepoService(req.session.user);
+
+    service.getIssues('twbs/bootstrap').then(function(issues) {
       var matches = issues.filter(function(issue) {
         return (''+issue.number).indexOf(term) === 0;
       });
+
       res.send(matches);
     })
     .fail(function(err) {
       console.log('broke!', err, err.stack);
       res.send(500);
     });
+
   }
 };

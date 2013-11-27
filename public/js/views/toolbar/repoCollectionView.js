@@ -3,13 +3,13 @@
 define([
   'marionette',
   'views/base',
-  'hbs!./tmpl/orgListItem'
-], function(Marionette, TroupeViews, orgListItemTemplate) {
+  'hbs!./tmpl/repoListItem'
+], function(Marionette, TroupeViews, repoListItemTemplate) {
   "use strict";
 
-  var OrgItemView = TroupeViews.Base.extend({
+  var RepoItemView = TroupeViews.Base.extend({
     tagName: 'li',
-    template: orgListItemTemplate,
+    template: repoListItemTemplate,
     initialize: function() {
       this.setRerenderOnChange(true);
     }
@@ -18,7 +18,7 @@ define([
   return Marionette.CollectionView.extend({
     tagName: 'ul',
     className: 'trpTroupeList',
-    itemView: OrgItemView
+    itemView: RepoItemView
   });
 
 });

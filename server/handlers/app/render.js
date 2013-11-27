@@ -38,7 +38,7 @@ function renderHomePage(req, res, next) {
 
 function renderAppPageWithTroupe(req, res, next, page) {
   var user = req.user;
-  var accessDenied = !req.uriContext.access;
+  var accessDenied =  false; //!req.uriContext.access;
 
   contextGenerator.generateTroupeContext(req)
     .then(function(troupeContext) {
@@ -55,7 +55,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
         appCache: getAppCache(req),
         login: login,
         bootScriptName: bootScript,
-        troupeName: troupeContext.troupe.uri,
+        troupeName: troupeContext.troupe.uri || troupeContext.troupe.name,
         troupeContext: troupeContext,
         agent: req.headers['user-agent']
       });

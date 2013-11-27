@@ -10,13 +10,17 @@ define([
   '../invites',
   '../smart',
   '../orgs',
+  '../repos',
   'components/unread-items-client',
   'filtered-collection' /* no ref */
-], function($, _, Backbone, context, base, realtime, troupeModels, inviteModels, SmartCollection, orgModels, unreadItemsClient) {
+], function($, _, Backbone, context, base, realtime, troupeModels, inviteModels, SmartCollection, orgModels, repoModels, unreadItemsClient) {
   "use strict";
 
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
   orgsCollection.fetch();
+
+  var reposCollection = new repoModels.ReposCollection(null, { listen: true });
+  reposCollection.fetch();
 
   var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
   unreadItemsClient.installTroupeListener(troupeCollection);
@@ -125,7 +129,8 @@ define([
     outgoingInvites: outgoingInvites,
     outgoingConnectionInvites: outgoingConnectionInvites,
     smart: smartCollection,
-    orgs: orgsCollection
+    orgs: orgsCollection,
+    repos: reposCollection
   };
 
 });

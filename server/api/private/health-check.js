@@ -9,7 +9,6 @@ var winston  = require('winston');
 //TODO: remove
 module.exports = [
   function(req, res, next) {
-    console.log();
     try {
       var db = mongoose.connection.db;
       var adminDb = db.admin();
