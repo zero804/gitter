@@ -24,7 +24,12 @@ function getIssuePage(repo, number, state) {
   }, d.makeNodeResolver());
   return d.promise.then(function(page) {
     return {
-      issues: page[0],
+      issues: page[0].map(function(issue) {
+        return {
+          number: issue.number,
+          title: issue.title
+        };
+      }),
       header: page[1]
     };
   });

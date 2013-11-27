@@ -10,11 +10,6 @@ module.exports = {
     service.getIssues().then(function(issues) {
       var matches = issues.filter(function(issue) {
         return (''+issue.number).indexOf(term) === 0;
-      }).map(function(match) {
-        return {
-          number: match.number,
-          title: match.title
-        };
       });
       res.send(matches);
     })
