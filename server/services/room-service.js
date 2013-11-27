@@ -19,6 +19,8 @@ function localUriLookup(uri) {
       if(uriLookup.userId) {
         return userService.findById(uriLookup.userId)
           .then(function(user) {
+            if(user.username != uri && user.username.toLowerCase() === uri.toLowerCase()) throw { redirect: '/' + user.username };
+
             if(user) return { user: user };
           });
       }
@@ -27,6 +29,7 @@ function localUriLookup(uri) {
         return troupeService.findById(uriLookup.troupeId)
           .then(function(troupe) {
             if(!troupe) return null;
+            if(troupe.uri != uri && troupe.uri.toLowerCase() === uri.toLowerCase()) throw { redirect: '/' + troupe.uri };
 
             if(troupe) return { troupe: troupe };
           });
@@ -50,10 +53,15 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
       ]);
   }
 
+  var lcUri = uri.toLowerCase();
+
+  /* From here on we're going to be doing a create */
   return validateUri(user, uri)
-    .then(function(githubType) {
+    .spread(function(githubType, officialUri) {
       /* If we can't determine the type, skip it */
       if(!githubType) return [null, false];
+
+      if(officialUri != uri && officialUri.toLowerCase() === uri.toLowerCase()) throw { redirect: '/' + officialUri };
 
       /* Room does not yet exist */
       return permissionsModel(user, 'create', uri, githubType)
@@ -61,9 +69,10 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
           if(!access) return [null, access];
 
           return persistence.Troupe.findOneAndUpdateQ(
-            { uri: uri, githubType: githubType },
+            { lcUri: lcUri, githubType: githubType },
             {
               $setOnInsert: {
+                lcUri: lcUri,
                 uri: uri,
                 githubType: githubType,
                 users:  user ? [{ _id: new ObjectID(), userId: user._id }] : []
@@ -130,9 +139,8 @@ function findOrCreateRoom(user, uri) {
           });
       }
 
-
       /* Didn't find a user, but we may have found another room */
-      return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe , uri)
+      return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri)
         .spread(function(troupe, access) {
           return ensureAccessControl(user, troupe, access);
         })

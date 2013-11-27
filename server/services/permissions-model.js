@@ -5,7 +5,6 @@ var GitHubRepoService = require('./github/github-repo-service');
 var GitHubUserService = require('./github/github-user-service');
 var assert = require("assert");
 var _ = require("underscore");
-var Q = require('q');
 var winston = require('winston');
 
 function repoPermissionsModel(user, right, uri) {
@@ -48,9 +47,7 @@ function orgPermissionsModel(user, right, uri) {
         return false;
       }
 
-      // If the user isn't wearing the magic hat, refuse them
-      // permission
-      if(!user.permissions.createRoom) return false;
+      if(right === 'create' && !user.permissions.createRoom) return false;
 
       return true;
     });
@@ -59,7 +56,6 @@ function orgPermissionsModel(user, right, uri) {
 }
 
 function permissionsModel(user, right, uri, roomType) {
-
   function log(x) {
     winston.verbose('Permission', { user: user && user.username, uri: uri, roomType: roomType, granted: x });
     return x;

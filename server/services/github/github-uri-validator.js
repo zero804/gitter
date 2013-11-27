@@ -20,7 +20,7 @@ function validateUri(user, uri) {
     var orgService = new GitHubOrgService(user);
     return orgService.getOrg(uri)
       .then(function(org) {
-        if(org) return 'ORG';
+        if(org) return ['ORG', org.login];
 
         return;
       });
@@ -31,7 +31,7 @@ function validateUri(user, uri) {
     var repoService = new GitHubRepoService(user);
     return repoService.getRepo(uri)
       .then(function(repo) {
-        if(repo) return 'REPO';
+        if(repo) return ['REPO', repo.full_name];
 
         return;
       });

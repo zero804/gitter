@@ -232,6 +232,7 @@ TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
 var TroupeSchema = new Schema({
   name: { type: String },
   uri: { type: String },
+  lcUri: { type: String, 'default': function() { return this.uri ? this.uri.toLowerCase() : null; }  },
   githubType: { type: String, 'enum': ['REPO', /*'USER',*/ 'ORG', 'ONETOONE'], required: true },
   status: { type: String, "enum": ['ACTIVE', 'DELETED'], "default": 'ACTIVE'},
   oneToOne: { type: Boolean, "default": false },
@@ -239,10 +240,15 @@ var TroupeSchema = new Schema({
   dateDeleted: { type: Date },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
-TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });
-TroupeSchema.index({ "users.userId": 1 });
-TroupeSchema.schemaTypeName = 'TroupeSchema';
 
+// Ideally we should never search against URI, only lcURI
+TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });
+TroupeSchema.index({ lcUri: 1 }, { unique: true, sparse: true });
+TroupeSchema.index({ "users.userId": 1 });
+TroupeSchema.pre('save', function (next) {
+  this.lcUri =  this.uri ? this.uri.toLowerCase() : null;
+  next();
+});
 
 TroupeSchema.methods.getUserIds = function() {
   return this.users.map(function(troupeUser) { return troupeUser.userId; });

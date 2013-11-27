@@ -8,7 +8,6 @@
  */
 
 var persistence = require("./persistence-service");
-var assert = require('assert');
 var Q = require('q');
 var _ = require('underscore');
 var collections = require('../utils/collections');
@@ -18,8 +17,9 @@ var collections = require('../utils/collections');
  * @return promise of a UriLookup
  */
 function lookupUri(uri) {
-  uri = uri.toLowerCase();
-  return persistence.UriLookup.findOneQ({ uri: uri })
+  var lcUri = uri.toLowerCase();
+
+  return persistence.UriLookup.findOneQ({ uri: lcUri })
     .then(function(uriLookup) {
       if(uriLookup) return uriLookup;
 
@@ -28,55 +28,26 @@ function lookupUri(uri) {
 
       return Q.all([
         repoStyle ? null : persistence.User.findOneQ({ username: uri }, 'username'),
-        persistence.Troupe.findOneQ({ uri: uri }, 'uri')
+        persistence.Troupe.findOneQ({ lcUri: lcUri }, 'uri')
       ]).spread(function(user, troupe) {
 
         if(user) {
           return persistence.UriLookup.findOneAndUpdateQ(
             { uri: uri, userId: user._id },
-            { $set: { uri: uri, userId: user._id }, $unset: { troupeId: '' } },
+            { $set: { uri: lcUri, userId: user._id }, $unset: { troupeId: '' } },
             { upsert: true });
         }
 
         if(troupe) {
           return persistence.UriLookup.findOneAndUpdateQ(
             { uri: uri, troupeId: troupe._id },
-            { $set: { uri: uri, troupeId: troupe._id }, $unset: { userId: '' } },
+            { $set: { uri: lcUri, troupeId: troupe._id }, $unset: { userId: '' } },
             { upsert: true });
         }
 
         return null;
       });
   });
-}
-
-/**
- * Update the username for a user
- * @return promise of UriLookup
- */
-function updateUsernameForUserId(userId, oldUsername, newUsername) {
-  assert(userId,'UserId parameter expected');
-
-  var op;
-
-  if(newUsername) {
-    // Update an existing URI entry
-    op = persistence.UriLookup.findOneAndUpdateQ(
-        { userId: userId },
-        { $set: { uri: newUsername, userId: userId }, $unset: { troupeId: '' } },
-        { upsert: true });
-  } else {
-    // Remove an existing URI entry
-    op = persistence.UriLookup.findOneAndRemoveQ({ userId: userId });
-  }
-
-  return op.fail(function(err) {
-      if(err.name === 'MongoError' && err.lastErrorObject && err.lastErrorObject.code === 11000) {
-        throw 409; // CONFLICT - uri already used
-      }
-
-      throw err;
-    });
 }
 
 /**
@@ -139,7 +110,6 @@ function findTakenUris(uris) {
 }
 
 exports.lookupUri = lookupUri;
-exports.updateUsernameForUserId = updateUsernameForUserId;
 exports.removeUsernameForUserId = removeUsernameForUserId;
 exports.reserveUriForTroupeId = reserveUriForTroupeId;
 exports.removeUriForTroupeId = removeUriForTroupeId;
