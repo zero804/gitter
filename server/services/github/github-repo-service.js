@@ -90,8 +90,8 @@ function getIssuesWithState(repo, state) {
 /**
  * Returns a promise of the issues for a repo
  */
-GitHubIssueService.prototype.getIssues = function() {
-  var repo = this.client.repo('twitter/summingbird');
+GitHubIssueService.prototype.getIssues = function(repoName) {
+  var repo = this.client.repo(repoName);
   return Q.all([
     getIssuesWithState(repo, 'open'),
     getIssuesWithState(repo, 'closed')
