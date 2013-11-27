@@ -4,11 +4,12 @@
   <head>
     <meta charset="utf-8">
     <title>Troupe - Error</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
     <meta name="google-site-verification" content="nnoWjW8hKT4umkqn1UrCdVHtLs8Q2pDi5ek0x5PUHug" />
     <meta name="apple-itunes-app" content="app-id=632039322"/>
 
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
-    <link rel="shortcut icon" href='{{cdn "images/2/favicon8.ico" }}'>
+    <link rel="shortcut icon" href='{{cdn "images/2/gitter/favicon5-error.png" }}'>
     <style type="text/css">
       body {
         background-color: #ecf1ec;
@@ -16,18 +17,16 @@
 
       .image {
          position: absolute;
-         top: 128px;
-         left: 20%;
-         width: 128px;
-         height: 128px;
+         top: 40%;
+         left: 45%;
          margin-left: -32px; /* Half the width */
       }
 
       .error {
         position: absolute;
-        top: 128px;
-        left: 20%;
-        margin-left: 128px;
+        top: 40%;
+        left: 45%;
+        margin-left: 50px;
         font-family: 'Open Sans', 'Sans';
         font-size: 24px;
         color: #666;
@@ -36,6 +35,21 @@
 
       .error-text {
         font-size: 18px;
+      }
+
+      .error-input {
+        font-size: 22px;
+        border: 0;
+        outline: 0;
+        padding: 0;
+        margin: 0;
+        background: transparent;
+      }
+
+      .error-input:focus {
+        border: 0;
+        outline: 0;
+        
       }
 
       a {
@@ -52,40 +66,40 @@
 
   <body>
 
-    <a href="{{homeUrl}}"><img class="image" src="{{cdn "images/2/sad-face.png"}}" width="128" height="128" title="The sad face"></a>
+    <a href="{{homeUrl}}"><img class="image" src="{{cdn "images/2/gitter/logo-mark-blue-nochat-64.png"}}" width="64" title="The sad face"></a>
 
     <div class="error">
-      SOMETHING BROKE<br><br>
-      <span class="error-text">You're seeing this error because something has broken on our side. That's entirely unacceptable and we apologise. Someone has been notified and we will look into it immediately.<br><br>Apologies for the inconvenience.</span><br><br>
-      <a href="/last">BACK TO TROUPE</a>
+      Gitter<br>
+      <input id="error-text" class="error-input" size="25"><br><br>
       {{#if stack}}
       <pre style="font-size:small">{{{stack}}}</pre>
       {{/if}}
     </div>
 
 
-<script type="text/javascript">
-  {{#if googleTrackingId}}
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', '{{googleTrackingId}}']);
-  _gaq.push(['_setAllowAnchor',true]);
-  _gaq.push(['_trackPageview']);
+<script>
 
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-  {{/if}}
+  var text = "500 error, oh no---------------- :(-------- sorry";
+  var input = $( "#error-text" );
+  input.select();
+  setTimeout(startTyping, 1000, input, text);
 
-  var uvOptions = {};
-  (function() {
-    var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
-    uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/BYBA0YJRpGVi5zrb99UoHQ.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
-  })();
+
+function startTyping(input, text) {
+
+  for ( var i = 0; i < text.length; i++ )
+  {
+    console.log(text.charAt(i));
+    setTimeout(addText,120*i, input, text.charAt(i));
+  }
+}
+
+function addText(i,c) {
+  if (c !== '-') i.val( i.val() + c );
+}
+
+
 </script>
-
 
   </body>
 </html>
