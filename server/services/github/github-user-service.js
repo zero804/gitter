@@ -38,7 +38,11 @@ GitHubUserService.prototype.getUser = function(user) {
   var ghuser = this.client.user(user);
   ghuser.info(d.makeNodeResolver());
 
-  return d.promise;
+  return d.promise
+    .fail(function(err) {
+      if(err.statusCode === 404) return null;
+      throw err;
+    });
 };
 
 GitHubUserService.prototype.getOrgs = function() {
@@ -46,7 +50,7 @@ GitHubUserService.prototype.getOrgs = function() {
 
   var ghme = this.client.me();
   ghme.orgs(d.makeNodeResolver());
-  
+
   return d.promise;
 };
 
