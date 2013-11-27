@@ -4,8 +4,9 @@ define([
   'utils/context',
   'collections/instances/troupes',
   'hbs!./tmpl/userHomeTemplate',
-  './homeOrgCollectionView'
-], function(Marionette, context, troupeCollections, userHomeTemplate, OrgCollectionView) {
+  './homeOrgCollectionView',
+  './homeRepoCollectionView'
+], function(Marionette, context, troupeCollections, userHomeTemplate, OrgCollectionView, RepoCollectionView) {
   "use strict";
 
   return Marionette.Layout.extend({
@@ -14,11 +15,12 @@ define([
 
     regions: {
       orgs: "#org-list",
-      repos: "#repos-list"
+      repos: "#repo-list"
     },
 
     onRender: function() {
       this.orgs.show(new OrgCollectionView({ collection: troupeCollections.orgs }));
+      this.repos.show(new RepoCollectionView({ collection: troupeCollections.repos }));
     },
 
     getRenderData: function() {
