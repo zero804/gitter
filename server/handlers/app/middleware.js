@@ -19,7 +19,13 @@ function uriContextResolverMiddleware(req, res, next) {
       req.uriContext = uriContext;
       next();
     })
-    .fail(next);
+    .fail(function(err) {
+      if(err && err.redirect) {
+        return res.relativeRedirect(err.redirect);
+      }
+
+      next(err);
+    });
 }
 
 function isPhoneMiddleware(req, res, next) {
