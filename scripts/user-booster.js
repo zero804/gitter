@@ -12,12 +12,18 @@ var mc = new mcapi.Mailchimp('a93299794ab67205168e351adb03448e-us3');
 var opts = require("nomnom")
   .option('username', {
     abbr: 'u',
-    required: true,
+    required: false,
     help: 'Username of the user'
   })
   .option('email', {
     abbr: 'e',
     required: false,
+    help: 'Email address of the user'
+  })
+  .option('count', {
+    abbr: 'c',
+    required: false,
+    default: 10,
     help: 'Email address of the user'
   })
   .parse();
@@ -28,79 +34,114 @@ function die(error) {
   process.exit(1);
 }
 
-persistence.User.findOneQ({ username: opts.username })
-  .then(function(user) {
-    // if(user && user.permissions.createRoom) throw "Already boosted";
 
-    var userService = new GitHubUserService(user && user.githubToken ? user : null);
-    return userService.getUser(opts.username)
-      .then(function(githubUser) {
-        return [user, githubUser];
-      });
-  })
-  .spread(function(user, githubUser) {
-    if(!githubUser) throw "Not found";
 
-    var emailPromise;
-    var userService = new GitHubUserService(user && user.githubToken ? user : null);
-
-    if(opts.email) {
-      emailPromise = Q.resolve(opts.email);
-    } else if(user && user.githubToken) {
-      emailPromise = userService.getAuthenticatedUserEmails()
-        .then(function(emails) {
-          if(Array.isArray(emails)) {
-            return emails[0];
-          }
+function boost(username, suggestedEmail) {
+  return persistence.User.findOneQ({ username: username })
+    .then(function(user) {
+      var userService = new GitHubUserService(user && user.githubToken ? user : null);
+      return userService.getUser(username)
+        .then(function(githubUser) {
+          return [user, githubUser];
         });
-    } else {
-      emailPromise = Q.resolve(githubUser.email);
-    }
+    })
+    .spread(function(user, githubUser) {
+      if(!githubUser) throw "Not found";
 
-    return emailPromise.then(function(email) {
-      return [user, githubUser, email];
+      var emailPromise;
+      var userService = new GitHubUserService(user && user.githubToken ? user : null);
+
+      if(suggestedEmail) {
+        emailPromise = Q.resolve(suggestedEmail);
+      } else if(user && user.emails && Array.isArray(user.emails)) {
+        emailPromise = Q.resolve(user.emails[0]);
+      } else if(user && user.githubToken) {
+        emailPromise = userService.getAuthenticatedUserEmails()
+          .then(function(emails) {
+            if(Array.isArray(emails)) {
+              return emails[0];
+            }
+          });
+      } else {
+        emailPromise = Q.resolve(githubUser.email);
+      }
+
+      return emailPromise.then(function(email) {
+        return [user, githubUser, email];
+      });
+    })
+    .spread(function(user, githubUser, email) {
+      if(!email) throw "Unable to obtain email address for " + opts.username;
+
+      if(!user) {
+        user = new persistence.User();
+      }
+
+      user.username = githubUser.login;
+      user.githubId = githubUser.id;
+      user.displayName = githubUser.name;
+      user.gravatarImageUrl = githubUser.avatar_url;
+      user.permissions.createRoom = true;
+
+      return user.saveQ().then(function() {
+        return [user, githubUser, email];
+      });
+    })
+    .spread(function(user, githubUser, email) {
+      var d = Q.defer();
+
+      mc.lists.subscribe({
+        id: '86c3c4db71',
+        merge_vars: {
+          EMAIL: email,
+          FNAME: user.displayName,
+        },
+        double_optin: false,
+        update_existing: true,
+        send_welcome: false,
+        replace_interests: true,
+        email: { email: email }
+      }, function() {
+        d.resolve([user, githubUser, email]);
+      }, function(err) {
+        return d.reject(err);
+      });
+
+      return d.promise;
     });
-  })
-  .spread(function(user, githubUser, email) {
-    if(!email) throw "Unable to obtain email address for " + opts.username;
+}
 
-    if(!user) {
-      user = new persistence.User();
-    }
-
-    user.username = githubUser.login;
-    user.githubId = githubUser.id;
-    user.displayName = githubUser.name;
-    user.gravatarImageUrl = githubUser.avatar_url;
-    user.permissions.createRoom = true;
-
-    return user.saveQ().then(function() {
-      return [user, githubUser, email];
+function boostMany(count) {
+  return persistence.User.find({ $or: [ { 'permissions.createRoom': false }, { 'permissions.createRoom': { $exists: false } }  ] })
+    .sort({ _id: 1 })
+    .limit(count)
+    .execQ()
+    .then(function(users) {
+      Q.all(users.map(function(user) {
+        return boost(user.username)
+          .fail(function(err) {
+            console.error('Failed to boost ' + user.username + ':', err);
+          });
+      }))
+      .then(function() {
+        process.exit(0);
+      })
+      .fail(function(err) {
+        die(err);
+      });
     });
-  })
-  .spread(function(user, githubUser, email) {
-    var d = Q.defer();
+}
 
-    mc.lists.subscribe({
-      id: '86c3c4db71',
-      merge_vars: {
-        EMAIL: email,
-        FNAME: user.displayName,
-      },
-      double_optin: false,
-      update_existing: true,
-      send_welcome: false,
-      replace_interests: true,
-      email: { email: email }
-    }, function() {
-      d.resolve([user, githubUser, email]);
-    }, function(err) {
-      return d.reject(err);
-    });
 
-    return d.promise;
-  })
-  .then(function() {
+var op;
+
+if(opts.username) {
+  op = boost(opts.username, opts.email);
+} else {
+  op = boostMany(parseInt(opts.count, 10));
+}
+
+op.then(function() {
     process.exit(0);
   })
   .fail(function(err) {
