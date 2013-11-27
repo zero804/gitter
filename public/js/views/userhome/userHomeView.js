@@ -24,7 +24,6 @@ define([
     },
 
     serializeData: function() {
-      console.log("createRoom:" + context.getUser().createRoom);
       return {
         createRoom: context.getUser().createRoom
       }
