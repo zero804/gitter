@@ -91,6 +91,7 @@ function UserStrategy(options) {
       email: options.includeEmail ? user.email : undefined,
       avatarUrlSmall: user.gravatarImageUrl,
       avatarUrlMedium: user.gravatarImageUrl,
+      createRoom: user.permissions.createRoom,
       online: onlineUsers ? onlineUsers.indexOf(user.id) >= 0 : undefined,
       v: getVersion(user)
     };

@@ -23,11 +23,19 @@ define([
       this.repos.show(new RepoCollectionView({ collection: troupeCollections.repos }));
     },
 
+    serializeData: function() {
+      console.log("createRoom:" + context.getUser().createRoom);
+      return {
+        createRoom: context.getUser().createRoom
+      }
+    },
+
     getRenderData: function() {
       return {
         username: context.getUser().username,
         basePath: context.env('basePath'),
-        baseServer: context.env('baseServer')
+        baseServer: context.env('baseServer'),
+        canCreate: context.getUser().createRoom
       };
     }
   });
