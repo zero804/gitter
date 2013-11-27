@@ -15,13 +15,13 @@ function GitHubIssueService(user) {
   this.client = user ? github.client(user.githubToken) : publicClient;
 }
 
-function getFirstPage(repo) {
-  return getIssuePage(repo, 1);
-}
-
-function getIssuePage(repo, number) {
+function getIssuePage(repo, number, state) {
   var d = Q.defer();
-  repo.issues(number, 100, d.makeNodeResolver());
+  repo.issues({
+    page: number,
+    per_page: 100,
+    state: state
+  }, d.makeNodeResolver());
   return d.promise.then(function(page) {
     return {
       issues: page[0],
@@ -31,22 +31,24 @@ function getIssuePage(repo, number) {
 }
 
 function getLastPageNumber(header) {
-  var links = parser(header.link);
-  var last = url.parse(links.last, true);
-  return last.query.page;
+  var lastPage = 1;
+  if(header.link) {
+    var links = parser(header.link);
+    if(links.last) {
+      lastPage = url.parse(links.last, true).query.page;
+    }
+  }
+
+  return lastPage;
 }
 
-/**
- * Returns a promise of the open issues for a repo
- */
-GitHubIssueService.prototype.getIssues = function() {
-  var repo = this.client.repo('twbs/bootstrap');
-  return getFirstPage(repo)
+function getIssuesWithState(repo, state) {
+  return getIssuePage(repo, 1, state)
     .then(function(page) {
       var lastPageNumber = getLastPageNumber(page.header);
       var promises = [page];
       for (var i = 2; i <= lastPageNumber; i++) {
-        promises.push(getIssuePage(repo, i));
+        promises.push(getIssuePage(repo, i, state));
       }
       return promises;
     })
@@ -60,6 +62,19 @@ GitHubIssueService.prototype.getIssues = function() {
         return previousIssues.concat(currentIssues);
       }, []);
       return issues;
+    });
+}
+
+/**
+ * Returns a promise of the open issues for a repo
+ */
+GitHubIssueService.prototype.getIssues = function() {
+  var repo = this.client.repo('twitter/summingbird');
+  return Q.all([
+    getIssuesWithState(repo, 'open'),
+    getIssuesWithState(repo, 'closed')
+    ]).spread(function(openIssues, closedIssues) {
+      return openIssues.concat(closedIssues);
     });
 };
 
