@@ -70,7 +70,7 @@
 
     <div class="error">
       Gitter<br>
-      <input id="error-text" class="error-input" size="20"><br><br>
+      <input id="error-text" class="error-input" size="25"><br><br>
       {{#if stack}}
       <pre style="font-size:small">{{{stack}}}</pre>
       {{/if}}
@@ -79,7 +79,7 @@
 
 <script>
 
-  var text = "500 error, oh no---------------- :(";
+  var text = "500 error, oh no---------------- :(-------- sorry";
   var input = $( "#error-text" );
   input.select();
   setTimeout(startTyping, 1000, input, text);
