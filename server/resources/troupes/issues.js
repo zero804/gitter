@@ -5,11 +5,13 @@ var RepoService =  require('../../services/github/github-repo-service');
 
 module.exports = {
   index: function(req, res, next) {
+    if(req.troupe.githubType != 'REPO') return res.send([]);
+
     var term = req.query.q || '';
+    var service = new RepoService(req.user);
+    var repoName = req.troupe.uri;
 
-    var service = new RepoService(req.session.user);
-
-    service.getIssues('twbs/bootstrap').then(function(issues) {
+    service.getIssues(repoName).then(function(issues) {
       var matches = issues.filter(function(issue) {
         return (''+issue.number).indexOf(term) === 0;
       });
