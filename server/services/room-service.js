@@ -118,9 +118,13 @@ function findOrCreateRoom(user, uri) {
 
       /* Lookup found a user? */
       if(uriLookup && uriLookup.user) {
-        var otherUserId = uriLookup.user;
+        var otherUser = uriLookup.user;
 
-        return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, otherUserId.id)
+        if(otherUser.id == userId) {
+          return { ownUrl: true };
+        }
+
+        return troupeService.findOrCreateOneToOneTroupeIfPossible(userId, otherUser.id)
           .spread(function(troupe, otherUser) {
             return { oneToOne: true, troupe: troupe, otherUser: otherUser };
           });
