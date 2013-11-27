@@ -17,6 +17,10 @@ module.exports = {
         };
       });
       res.send(matches);
+    })
+    .fail(function(err) {
+      console.log('broke!', err, err.stack);
+      res.send(500);
     });
   }
 };
