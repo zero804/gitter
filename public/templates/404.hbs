@@ -53,13 +53,20 @@
 
     <a href="{{homeUrl}}"><img class="image" src="{{cdn "images/2/sad-face.png"}}" width="128" height="128" title="The sad face"></a>
 
+
     <div class="error">
       NOT FOUND<br><br>
       <span class="error-text">Oops. Looks like the Troupe or person you are looking for isn't here.<br> Check the address and try again.</span>
       <br><Br>
+      <span class="error-text">OR YOU DON'T HAVE ACCESS TO CREATE THIS GROUP.</span>
+      {{#if user.permission.createRoom}}
+      {{else}}
+      <h1>GITTER IS ON A LIMITED BETA AND YOU CAN'T CREATE ROOMS, SORRY SUCKER</h1>
+      {{/if}}
+
+
       <a href="/last">BACK TO TROUPE</a>
     </div>
-
 
 <script type="text/javascript">
   {{#if googleTrackingId}}
