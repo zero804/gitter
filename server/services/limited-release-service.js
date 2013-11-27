@@ -29,7 +29,7 @@ exports.shouldUserBeTurnedAway = function(user) {
       var orTerms = repoSearchList.concat(orgSearchList).map(function(s) {
         return { githubType: s.type, uri: s.uri };
       });
-      console.log(orTerms);
+
       return persistence.Troupe.countQ({ $or: orTerms });
     })
     .then(function(count) {
