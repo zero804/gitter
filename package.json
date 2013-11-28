@@ -77,7 +77,7 @@
     "i18n": "~0.4.1",
     "restler-q": "0.0.3",
     "debug": "~0.7.4",
-    "octonode": "~0.3.8",
+    "octonode": "git://github.com/troupe/octonode.git",
     "passport-github": "~0.1.5",
     "jwt-simple": "~0.1.0",
     "parse-links": "~0.1.0",
