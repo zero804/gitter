@@ -115,7 +115,7 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
   // Metadata
   chatMessage.urls            = urlExtractor.extractUrlsWithIndices(newText);
   chatMessage.mentions        = TwitterText.extractMentionsWithIndices(newText);
-  chatMessage.issues          = urlExtractor.extractIssuesWithIndices(text);
+  chatMessage.issues          = urlExtractor.extractIssuesWithIndices(newText);
   chatMessage._md             = urlExtractor.version;
 
   chatMessage.save(function(err) {
