@@ -349,12 +349,6 @@ a:hover {
   width: 12px;
 }
 
-.disabled {
-  color: #CCC;
-  cursor: not-allowed;
-}
-
-
 .github-ONETOONE:before {
   content: "@";
   margin-right: 8px;
@@ -613,6 +607,11 @@ a.trpMiniLeftMenuItem {
   font-size: 14px;
 }
 
+.disabled {
+  color: #CCC;
+  cursor: not-allowed;
+}
+
 .trpTroupeList {
   display: inline-block;
 	list-style-type: none;
@@ -630,16 +629,21 @@ a.trpMiniLeftMenuItem {
     border-radius: 0 4px 4px 0;
     background-color: rgba(255,255,255,0.2);
   }
+
+  span {
+    display: inline-block;
+    color: white;
+    white-space: nowrap;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  span.disabled {
+    color: #ccc;
+  }
 }
 
-.trpTroupeList a {
-  display: inline-block;
-	color: white;
-	white-space: nowrap;
-	max-width: 220px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
 
 .trpTroupeListSearch {
 	padding-left: 8px;
