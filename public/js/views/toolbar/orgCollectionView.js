@@ -1,10 +1,11 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 define([
+  'utils/context',
   'marionette',
   'views/base',
   'hbs!./tmpl/orgListItem'
-], function(Marionette, TroupeViews, orgListItemTemplate) {
+], function(context, Marionette, TroupeViews, orgListItemTemplate) {
   "use strict";
 
   var OrgItemView = TroupeViews.Base.extend({
@@ -12,6 +13,13 @@ define([
     template: orgListItemTemplate,
     initialize: function() {
       this.setRerenderOnChange(true);
+    },
+    getRenderData: function() {
+      var data = {};
+      data.org = this.model.toJSON();
+      data.user = context.getUser();
+
+      return data;
     }
   });
 

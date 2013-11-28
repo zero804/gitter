@@ -12,7 +12,7 @@ define([
     template: repoListItemTemplate,
     initialize: function() {
       this.setRerenderOnChange(true);
-    }
+    },
   });
 
   return Marionette.CollectionView.extend({
