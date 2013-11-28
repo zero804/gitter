@@ -652,11 +652,13 @@ function GitHubOrgStrategy(options) {
   var self = this;
 
   this.preload = function(orgs, callback) {
-    troupeService.findAllByUri(orgs, function(err, troupes) {
+    var _orgs = _.map(orgs, function(org) { return org.login; });
+
+    troupeService.findAllByUri(_orgs, function(err, troupes) {
       if (err) callback(err);
 
       self.troupes = collections.indexByProperty(troupes, 'uri');
-
+    
       execPreloads([{
         strategy: troupeStrategy,
         data: troupes
@@ -665,7 +667,7 @@ function GitHubOrgStrategy(options) {
   };
 
   this.map = function(item) {
-    var room = self.troupes[item];
+    var room = self.troupes[item.login];
     return {
       name: item.login,
       avatar_url: item.avatar_url,

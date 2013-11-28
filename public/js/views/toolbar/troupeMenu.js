@@ -13,8 +13,9 @@ define([
   './profileView',
   './orgCollectionView',
   './repoCollectionView',
+  'backbone',
   'nanoscroller' //no ref
-], function($, _, Marionette, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView, ProfileView, OrgCollectionView, RepoCollectionView) {
+], function($, _, Marionette, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView, ProfileView, OrgCollectionView, RepoCollectionView, Backbone) {
   "use strict";
 
   return Marionette.Layout.extend({
@@ -90,7 +91,8 @@ define([
       this.orgs.show(new OrgCollectionView({ collection: troupeCollections.orgs }));
 
       // Repositories collection view
-      this.repos.show(new RepoCollectionView({ collection: troupeCollections.repos }));
+      var reposWithRoom = _.filter(troupeCollections.repos.models, function(repo) { return repo.get('room'); });
+      this.repos.show(new RepoCollectionView({ collection: new Backbone.Collection(reposWithRoom) }));
 
 
       this.initHideListeners();

@@ -1,8 +1,23 @@
-<a href="/{{name}}" style="width: 100%">
-  <span class="github-ORG">{{name}}</span>
-  {{#if unreadItems}}
-  <span style="float: right; padding-right: 7px;">
-    <span class="trpTroupeUnreadCounter">{{unreadItems}}</span>
-  </span>
+{{#if user.createRoom}}
+  <a href="/{{org.name}}" style="width: 100%">
+    <span class="github-ORG">{{org.name}}</span>
+    {{#if org.unreadItems}}
+    <span style="float: right; padding-right: 7px;">
+      <span class="trpTroupeUnreadCounter">{{unreadItems}}</span>
+    </span>
+    {{/if}}
+  </a>
+{{else}}
+  {{#if org.room}}
+    <a href="/{{org.name}}" style="width: 100%">
+      <span class="github-ORG">{{org.name}}</span>
+      {{#if org.unreadItems}}
+      <span style="float: right; padding-right: 7px;">
+        <span class="trpTroupeUnreadCounter">{{unreadItems}}</span>
+      </span>
+      {{/if}}
+    </a>
+  {{else}}
+    <span class="github-ORG disabled">{{org.name}}</span>
   {{/if}}
-</a>
+{{/if}}
