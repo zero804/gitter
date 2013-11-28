@@ -9,7 +9,7 @@ module.exports = {
     if (!req.user) return res.send(403);
 
 
-    repoService.getReposForUser(req.user)
+    repoService.suggestedReposForUser(req.user)
       .then(function(repos) {
         var strategy = new restSerializer.GitHubRepoStrategy({ currentUserId: req.user.id });
 

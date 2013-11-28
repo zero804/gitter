@@ -2,18 +2,16 @@
 "use strict";
 
 var restSerializer  = require("../../serializers/rest-serializer");
-var GithubUser      = require("../../services/github/github-user-service");
-var _               = require('underscore');
+var GithubMe        = require("../../services/github/github-me-service");
 
 module.exports = {
   index: function(req, res, next) {
     if (!req.user) return res.send(403);
 
-    var user = new GithubUser(req.user);
+    var user = new GithubMe(req.user);
 
     user.getOrgs()
     .then(function(ghOrgs) {
-      var orgs = _.map(ghOrgs, function(org) { return org.login; });
       var strategy = new restSerializer.GitHubOrgStrategy({currentUserId: req.user.id});
 
       restSerializer.serialize(ghOrgs, strategy, function(err, serialized) {
