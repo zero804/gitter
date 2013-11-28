@@ -89,36 +89,6 @@ function load(expected, done) {
   }, done);
 
 
-  // function only(a) {
-  //   assert(a.length, "Fixture data is missing");
-  //   assert(a.length == 1, "Multiple fixture data items found. Expected exactly one: " + JSON.stringify(a));
-  //   return a[0];
-  // }
-
-  // var fixture = createBaseFixture();
-
-  // Q.all([
-  //     persistence.User.findQ({ email: 'testuser@troupetest.local' }).then(only).then(function(user) { fixture.user1 = user; }),
-  //     persistence.User.findQ({ email: 'testuser2@troupetest.local' }).then(only).then(function(user) { fixture.user2 = user; }),
-  //     persistence.User.findQ({ email: 'testuserwithnotroupes@troupetest.local' }).then(only).then(function(user) { fixture.userNoTroupes = user; }),
-  //     persistence.Troupe.findQ({ uri: 'testtroupe1' }).then(only).then(function(troupe) { fixture.troupe1 = troupe; }),
-  //     persistence.Troupe.findQ({ uri: 'testtroupe2' }).then(only).then(function(troupe) { fixture.troupe2 = troupe; })
-  //   ])
-  //   .then(function() {
-  //     assert(fixture.troupe1.containsUserId(fixture.user1.id), 'Test data is broken. User1 should be in troupe1. Troupe1 contains: ' + fixture.troupe1.users.join(','));
-  //     assert(fixture.troupe1.containsUserId(fixture.user2.id), 'Test data is broken. User1 should be in troupe1');
-
-  //     assert(!fixture.troupe1.containsUserId(fixture.userNoTroupes.id), 'Test data is broken. userNoTroupes should not be in troupe1');
-  //     assert(!fixture.troupe2.containsUserId(fixture.userNoTroupes.id), 'Test data is broken. userNoTroupes should not be in troupe1');
-
-  //     assert(fixture.troupe2.users.length === 0, 'Fixture error: troupe2 should not contain any users');
-
-  //     // For now, keep it safe
-  //     delete fixture.cleanup;
-  //     return fixture;
-  //   })
-  //   .nodeify(done);
-
 }
 
 
@@ -138,7 +108,8 @@ function createExpectedFixtures(expected, done) {
       githubToken:      f.githubToken || generateGithubToken(),
       confirmationCode: confirmationCode,
       username:         username      || generateUsername(),
-      status:           f.status      || 'ACTIVE'
+      status:           f.status      || 'ACTIVE',
+      permissions:      f.permissions
     });
   }
 

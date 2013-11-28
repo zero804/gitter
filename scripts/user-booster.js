@@ -5,6 +5,7 @@
 
 var persistence = require('../server/services/persistence-service');
 var GitHubUserService = require('../server/services/github/github-user-service');
+var GitHubMeService = require('../server/services/github/github-me-service');
 var Q = require('q');
 var mcapi = require('mailchimp-api');
 var mc = new mcapi.Mailchimp('a93299794ab67205168e351adb03448e-us3');
@@ -49,21 +50,19 @@ function boost(username, suggestedEmail) {
       if(!githubUser) throw "Not found";
 
       var emailPromise;
-      var userService = new GitHubUserService(user && user.githubToken ? user : null);
+      var meService = new GitHubMeService(user && user.githubToken ? user : null);
       if(suggestedEmail) {
         emailPromise = Q.resolve(suggestedEmail);
       } else if(user && user.emails && user.emails.length) {
         emailPromise = Q.resolve(user.emails[0]);
       } else if(user && user.githubToken) {
-        emailPromise = userService.getAuthenticatedUserEmails()
+        emailPromise = meService.getEmails()
           .then(function(emails) {
-            console.dir(emails);
             if(Array.isArray(emails)) {
               return emails[0];
             }
           });
       } else {
-        console.log("4");
         emailPromise = Q.resolve(githubUser.email);
       }
 

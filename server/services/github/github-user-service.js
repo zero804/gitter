@@ -14,24 +14,6 @@ function GitHubUserService(user) {
   this.client = user ? github.client(user.githubToken) : publicClient;
 }
 
-GitHubUserService.prototype.getAuthenticatedUser = function() {
-  var d = Q.defer();
-
-  var ghme = this.client.me();
-  ghme.info(d.makeNodeResolver());
-
-  return d.promise;
-};
-
-GitHubUserService.prototype.getAuthenticatedUserEmails = function() {
-  var d = Q.defer();
-
-  var ghme = this.client.me();
-  ghme.emails(d.makeNodeResolver());
-
-  return d.promise;
-};
-
 GitHubUserService.prototype.getUser = function(user) {
   var d = Q.defer();
 
@@ -43,24 +25,6 @@ GitHubUserService.prototype.getUser = function(user) {
       if(err.statusCode === 404) return null;
       throw err;
     });
-};
-
-GitHubUserService.prototype.getOrgs = function() {
-  var d = Q.defer();
-
-  var ghme = this.client.me();
-  ghme.orgs(d.makeNodeResolver());
-
-  return d.promise;
-};
-
-GitHubUserService.prototype.getRepos = function() {
-  var d = Q.defer();
-
-  var ghme = this.client.me();
-  ghme.repos(d.makeNodeResolver());
-
-  return d.promise;
 };
 
 module.exports = wrap(GitHubUserService, function() {

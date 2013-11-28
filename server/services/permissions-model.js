@@ -2,7 +2,7 @@
 "use strict";
 
 var GitHubRepoService = require('./github/github-repo-service');
-var GitHubUserService = require('./github/github-user-service');
+var GitHubMeService   = require('./github/github-me-service');
 var assert = require("assert");
 var _ = require("underscore");
 var winston = require('winston');
@@ -34,7 +34,7 @@ function orgPermissionsModel(user, right, uri) {
   // For now, only authenticated users can be members of orgs
   if(!user) return false;
 
-  var ghuser = new GitHubUserService(user);
+  var ghuser = new GitHubMeService(user);
   return ghuser.getOrgs()
     .then(function(orgs) {
       uri = uri.toLowerCase();

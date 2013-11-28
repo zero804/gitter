@@ -9,7 +9,7 @@ var fixtureLoader = require('../test-fixtures');
 var fixture = {};
 
 before(fixtureLoader(fixture, {
-  user1: { },
+  user1: { permissions: { createRoom: true } },
   user2: { }
 }));
 
