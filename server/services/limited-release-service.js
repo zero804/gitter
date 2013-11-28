@@ -3,7 +3,7 @@
 
 var repoService = require('./repo-service');
 var persistence = require('./persistence-service');
-var GithubUser  = require("./github/github-user-service");
+var GithubMe  = require("./github/github-me-service");
 var Q           = require('q');
 
 exports.shouldUserBeTurnedAway = function(user) {
@@ -16,7 +16,7 @@ exports.shouldUserBeTurnedAway = function(user) {
 
       /* If we do this operation in series to the getRepos
          we'll get a cached result. Faster + less api calls */
-      var gHuser  = new GithubUser(user);
+      var gHuser  = new GithubMe(user);
       return gHuser.getOrgs()
         .then(function(orgs) {
           return [repos, orgs];
