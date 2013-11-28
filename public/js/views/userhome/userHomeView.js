@@ -5,13 +5,9 @@ define([
   'collections/instances/troupes',
   'hbs!./tmpl/userHomeTemplate',
   './homeOrgCollectionView',
-  './homeRepoCollectionView',
-  'collections/repos'
-], function(Marionette, context, troupeCollections, userHomeTemplate, OrgCollectionView, RepoCollectionView, repoModels) {
+  './homeRepoCollectionView'
+], function(Marionette, context, troupeCollections, userHomeTemplate, OrgCollectionView, RepoCollectionView) {
   "use strict";
-
-  var reposCollection = new repoModels.ReposCollection(null, { listen: true });
-  reposCollection.fetch();
 
   return Marionette.Layout.extend({
     template: userHomeTemplate,
@@ -24,7 +20,7 @@ define([
 
     onRender: function() {
       this.orgs.show(new OrgCollectionView({ collection: troupeCollections.orgs }));
-      this.repos.show(new RepoCollectionView({ collection: reposCollection }));
+      this.repos.show(new RepoCollectionView({ collection: troupeCollections.repos }));
     },
 
     serializeData: function() {
