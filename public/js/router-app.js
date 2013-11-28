@@ -35,7 +35,6 @@ require([
   'views/chat/decorators/webhookDecorator',
   'views/chat/decorators/userDecorator',
   'views/chat/decorators/embedDecorator',
-  'views/chat/decorators/issueDecorator',
 
   'views/widgets/preload', // No ref
   'components/webNotifications', // No ref
@@ -54,7 +53,7 @@ require([
     shareSearchView, inviteView, createTroupeView, /*UsernameView,*/ troupeSettingsView,
     IntegrationSettingsModal, TroupeMenuView, /* ReinviteModal, */ Router,
     unreadItemsClient, FileDecorator, webhookDecorator, userDecorator,
-    embedDecorator, issueDecorator /*, errorReporter , FilteredCollection */) {
+    embedDecorator /*, errorReporter , FilteredCollection */) {
   "use strict";
 
   // Make drop down menus drop down
@@ -86,7 +85,7 @@ require([
     el: $('#content-frame'),
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
-    decorators: [new FileDecorator(itemCollections.files), webhookDecorator, userDecorator, embedDecorator, issueDecorator]
+    decorators: [new FileDecorator(itemCollections.files), webhookDecorator, userDecorator, embedDecorator]
   }).render();
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
