@@ -70,12 +70,14 @@
           </a>
           <ul class="dropdown-menu" role="menu">
             {{#if hellFreezesOver}}
-            <li><a href="#|share">Add someone to this Troupe</a></li>
+            <li><a role="menuitem" tabindex="-1" href="#|share">Add someone to this Troupe</a></li>
             {{/if}}
-            <li><a href="#|inv">Invite someone to this chat</a>
+            <li><a role="menuitem" tabindex="-1" href="#|inv">Invite someone to this chat</a>
             <li role="presentation" class="divider"></li>
-            <li><a href="#|troupeSettings">Notifications</a></li>
-            <li><a href="#|integrations">Integrations</a></li>
+            <li><a role="menuitem" tabindex="-1" href="#|troupeSettings">Notifications</a></li>
+            <li><a role="menuitem" tabindex="-1" href="#|integrations">Integrations</a></li>
+            <li role="presentation" class="divider"></li>
+            <li><a role="menuitem" tabindex="-1" href="http://www.github.com/{{troupeName}}" onclick="window.open('http://www.github.com/{{troupeName}}')">Open in GitHub</a></li>
           </ul>
         </div>
       </div>
