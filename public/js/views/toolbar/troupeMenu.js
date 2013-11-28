@@ -91,8 +91,7 @@ define([
       this.orgs.show(new OrgCollectionView({ collection: troupeCollections.orgs }));
 
       // Repositories collection view
-      var reposWithRoom = _.filter(troupeCollections.repos.models, function(repo) { return repo.get('room'); });
-      this.repos.show(new RepoCollectionView({ collection: new Backbone.Collection(reposWithRoom) }));
+      this.repos.show(new RepoCollectionView({ collection: troupeCollections.repos }));
 
 
       this.initHideListeners();
