@@ -1,10 +1,11 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 define([
+  'utils/context',
   'marionette',
   'views/base',
   'hbs!./tmpl/homeRepoListItem'
-], function(Marionette, TroupeViews, repoListItemTemplate) {
+], function(context, Marionette, TroupeViews, repoListItemTemplate) {
   "use strict";
 
   var TroupeItemView = TroupeViews.Base.extend({
@@ -13,6 +14,13 @@ define([
     template: repoListItemTemplate,
     initialize: function() {
       this.setRerenderOnChange(true);
+    },
+    getRenderData: function() {
+      var data = {};
+      data.repo = this.model.toJSON();
+      data.user = context.getUser();
+
+      return data;
     }
   });
 

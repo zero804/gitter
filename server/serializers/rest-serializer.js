@@ -696,7 +696,7 @@ function GitHubRepoStrategy(options) {
   };
 
   this.map = function(item) {
-    var room = self.troupes[item];
+    var room = self.troupes[item.full_name];
     return {
       name:     item.full_name,
       private:  item.private,
