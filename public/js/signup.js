@@ -12,7 +12,7 @@ require([
       // No need to do anything here
     });
 
-    $('a').click(function(){
+    $('.scroll-link').click(function(){
     $('html, body').animate({
         scrollTop: $( $.attr(this, 'href') ).offset().top
     }, 500);
