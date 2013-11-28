@@ -1,5 +1,5 @@
 /*jslint node: true */
-/*global describe:true, it: true, before:false */
+/*global describe:true, it: true, before:false, after:false */
 "use strict";
 
 var testRequire = require('./test-require');
@@ -36,5 +36,6 @@ describe('restSerializer', function() {
   });
 
   before(fixtureLoader(fixture));
+  after(function() { fixture.cleanup(); });
 
 });

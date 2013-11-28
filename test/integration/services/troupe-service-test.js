@@ -568,5 +568,6 @@ describe('troupe-service', function() {
     }
 
   }));
+  after(function() { fixture.cleanup(); });
 
 });

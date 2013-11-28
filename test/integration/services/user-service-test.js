@@ -129,6 +129,7 @@ describe("User Service", function() {
 
 
   after(function() {
+    fixture.cleanup();
     fixture2.cleanup();
   });
 });
