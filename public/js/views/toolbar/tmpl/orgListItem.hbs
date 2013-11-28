@@ -1,5 +1,5 @@
 {{#if user.createRoom}}
-  <a href="/{{org.name}}" style="width: 100%">
+  <a href="/{{org.name}}" style="width: 100%; display: inline-block">
     <span class="github-ORG">{{org.name}}</span>
     {{#if org.unreadItems}}
     <span style="float: right; padding-right: 7px;">
@@ -9,7 +9,7 @@
   </a>
 {{else}}
   {{#if org.room}}
-    <a href="/{{org.name}}" style="width: 100%">
+    <a href="/{{org.name}}" style="width: 100%; display: inline-block">
       <span class="github-ORG">{{org.name}}</span>
       {{#if org.unreadItems}}
       <span style="float: right; padding-right: 7px;">
