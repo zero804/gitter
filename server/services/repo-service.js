@@ -140,7 +140,7 @@ function suggestedReposForUser(user) {
       return findReposWithRooms(Object.keys(scores))
         .then(function(troupes) {
 
-          if(user.permissions && user.permissions.createRoom) {
+          //if(true || user.permissions && user.permissions.createRoom) {
             /* Can create rooms? */
             troupes.forEach(function(troupe) {
               var s = scores[troupe.uri];
@@ -150,11 +150,11 @@ function suggestedReposForUser(user) {
             });
 
             return scores;
-          }
+          //}
 
-          var troupeUris = lazy(troupes).map(function(t) { return t.uri; }).toArray();
+          //var troupeUris = lazy(troupes).map(function(t) { return t.uri; }).toArray();
 
-          return lazy(scores).pick(troupeUris).toObject();
+          //return lazy(scores).pick(troupeUris).toObject();
         });
     })
     .then(function(scores) {
@@ -167,6 +167,7 @@ function suggestedReposForUser(user) {
                 .map(function(a) {
                   return a[1].repo;
                 })
+                .take(20)
                 .toArray();
     });
 

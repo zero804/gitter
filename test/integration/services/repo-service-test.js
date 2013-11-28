@@ -12,7 +12,7 @@ describe('repoService', function() {
   it('should fetch suggestedReposForUser', function(done) {
     return repoService.suggestedReposForUser(FAKE_USER)
       .then(function(repos) {
-        console.log(repos);
+        assert(repos);
       })
       .nodeify(done);
   });

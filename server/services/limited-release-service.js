@@ -11,7 +11,7 @@ exports.shouldUserBeTurnedAway = function(user) {
   if(user.permissions.createRoom) {
     return Q.resolve(true);
   }
-  return repoService.getReposForUser(user)
+  return repoService.suggestedReposForUser(user)
     .then(function(repos) {
 
       /* If we do this operation in series to the getRepos

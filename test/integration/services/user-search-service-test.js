@@ -1,5 +1,5 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
-/*global describe:true, it:true, before:false */
+/*global describe:true, it:true, before:false, after:false  */
 "use strict";
 
 var testRequire = require('./../test-require');
@@ -161,5 +161,6 @@ describe("User Search Service", function() {
   });
 
   before(fixtureLoader(fixture));
+  after(function() { fixture.cleanup(); });
 
 });
