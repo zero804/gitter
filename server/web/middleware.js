@@ -63,7 +63,7 @@ exports.ensureLoggedIn = function(options) {
       }
 
       if(!options.loginUrl) {
-        return res.relativeRedirect(nconf.get('web:homeurl') + "#login");
+        return res.relativeRedirect("/login");
       }
 
       if(typeof options.loginUrl == "function") {

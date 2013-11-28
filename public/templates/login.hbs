@@ -10,12 +10,12 @@
     <meta name="apple-itunes-app" content="app-id=632039322"/>
 
     <link href='{{cdn "bootstrap/css/trpHomePage.css" }}' rel="stylesheet">
-    <link href='//fonts.googleapis.com/css?family=Open+Sans:300,400' rel='stylesheet' type='text/css'>
     <link id="favicon" rel="shortcut icon" href='{{cdn "images/2/gitter/favicon5.png" }}'>
 
     {{>require_wrapper}}
     {{{bootScript "signup" }}}
     {{{generateEnv}}}
+    {{>load_font_css}}
   </head>
 
   <body>
@@ -122,7 +122,7 @@
         <br><br>You can try login below, if you are a member of the chat you are trying to access, you will be able to join.<br>
         If not, you will be added to our waiting list.
         <br><br>
-        <a href="/login" class="button blur" id="signup" style="text-decoration: none; color: white">Login with GitHub</a>
+        <a href="/login/github" class="button blur" id="signup" style="text-decoration: none; color: white">Login with GitHub</a>
       </div>
       <div class="strip" style="padding-bottom: 60px"></div>
     </div>
