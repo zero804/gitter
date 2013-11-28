@@ -3,6 +3,7 @@
 
 var SnappyCache = require('snappy-cache');
 var Q = require('q');
+var redis = require('../../utils/redis');
 
 function getKeys(method, contextValues, args) {
   var arr = [method]
@@ -15,7 +16,7 @@ function getKeys(method, contextValues, args) {
 }
 
 function wrap(service, contextFunction) {
-  var sc = new SnappyCache({ prefix: 'sc:'});
+  var sc = new SnappyCache({ prefix: 'sc:', redis: redis.createClient() });
 
   Object.keys(service.prototype).forEach(function(value) {
     var v = service.prototype[value];
