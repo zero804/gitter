@@ -12,9 +12,18 @@ module.exports = {
 
     // Redirect user to GitHub OAuth authorization page.
     //
-    app.get('/login',
+    app.get('/login/github',
       passport.authorize('github', signupOptions),
       function() {});
+
+    app.get(
+        '/login',
+        function(req, res) {
+          var userAgent = req.headers['user-agent'] || '';
+          var compactView = userAgent.indexOf("Mobile/") >= 0;
+          res.render('login');
+        }
+      );
 
     // Welcome GitHub users.
     app.get(
