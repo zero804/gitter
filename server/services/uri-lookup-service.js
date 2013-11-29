@@ -69,48 +69,14 @@ function removeUriForTroupeId(troupeId) {
   return persistence.UriLookup.findOneAndRemoveQ({ troupeId: troupeId });
 }
 
-/**
- * Given a bunch of potential uris find those that have been taken
- * @return promise of a hash of taken uris: { uri1: true, uri2: true }
- */
-function findTakenUris(uris) {
-  uris = collections.idsIn(uris);
+function removeBadUri(uri) {
+  var lcUri = uri.toLowerCase();
 
-  var taken = {};
-
-  return persistence.UriLookup.findQ({ uri: { $in: uris } }, 'uri')
-    .then(function(takenUriLookups) {
-
-      takenUriLookups.forEach(function(uriLookup) {
-        taken[uriLookup.uri] = true; // Mark as taken
-      });
-
-    })
-    .then(function() {
-      var stillAvailable = _.difference(uris, Object.keys(taken));
-
-      if(!stillAvailable.length) return;
-
-      return Q.all([
-        persistence.User.findQ({ username: { $in: stillAvailable } }, 'username'),
-        persistence.Troupe.findQ({ uri: { $in: stillAvailable } }, 'uri')
-      ]).spread(function(users, troupes) {
-
-        users.forEach(function(user) {
-          taken[user.username] = true; // Mark as taken
-        });
-
-        troupes.forEach(function(troupe) {
-          taken[troupe.uri] = true; // Mark as taken
-        });
-
-      });
-    })
-    .thenResolve(taken);
+  return persistence.UriLookup.removeQ({ uri: lcUri });
 }
 
 exports.lookupUri = lookupUri;
 exports.removeUsernameForUserId = removeUsernameForUserId;
 exports.reserveUriForTroupeId = reserveUriForTroupeId;
 exports.removeUriForTroupeId = removeUriForTroupeId;
-exports.findTakenUris = findTakenUris;
+exports.removeBadUri = removeBadUri;
