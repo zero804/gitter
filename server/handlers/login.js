@@ -43,6 +43,13 @@ module.exports = {
       middleware.generateRememberMeTokenMiddleware,
       function(req, res) {
         res.redirect('/');
+
+        var user = req.user;
+        if(user) {
+          res.redirect('/' + user.username);
+        } else {
+          res.redirect('/');
+        }
       });
 
   }
