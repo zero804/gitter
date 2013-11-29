@@ -1,0 +1,74 @@
+<html>
+<head>
+
+<link id="favicon" rel="shortcut icon" href='{{cdn "images/2/gitter/favicon5.png" }}'>
+<title>Gitter - Chat, for GitHub</title>
+    {{>require_wrapper}}
+
+    {{{bootScript "signup" }}}
+    {{{generateEnv}}}
+    {{>load_font_css}}
+</head>
+
+<style>
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+
+h1 {
+  font-family: 'Open Sans';
+  font-weight: 300;
+  font-size: 42px;
+
+}
+
+h2 {
+  font-weight: 300;
+  font-family: 'Open Sans';
+  font-size: 30px;
+}
+
+.outer-container {
+  text-align: center;
+  font-family: 'Open Sans';
+  padding-top: 60px;
+}
+
+.write-access {
+  display: inline-block;
+  padding:10px 16px;
+  color: #c0392b;
+  border: 2px solid #c0392b;
+  border-radius: 4px;
+  background-color: rgba(192, 57, 43,0.2)
+}
+
+.container {
+  display: inline-block;
+  width: 960px;
+  font-size: 16px;
+}
+
+</style>
+
+<body>
+
+<div class="outer-container" style="">
+  <div class="write-access">WRITE</div>
+  <div></div><br><Br>
+  <div class="container">
+<br><br>
+    Gitter requires access to GitHub so we can get a list of your private repositories and organisations.<br><Br>
+    Unfortunately, the only scope available to us through GitHub's oAuth options is <i>read/write</i> for private repos and orgs.<br><br>
+    Rest assured we won't modify your repositories unless you add Webhooks, in which case we'll create them for you.
+
+  </div>
+</div>
+
+
+
+</body>
+</html>
