@@ -95,7 +95,7 @@ var UnconfirmedEmailSchema = new Schema({
 UnconfirmedEmailSchema.schemaTypeName = 'UserEmailSchema';
 
 var UserSchema = new Schema({
-  displayName: { type: String, required: true },
+  displayName: { type: String },
   email: { type: String },                     // The primary email address
   emails: [String],                            // Secondary email addresses
   // unconfirmedEmails: [UnconfirmedEmailSchema], // Unconfirmed email addresses
@@ -123,8 +123,8 @@ var UserSchema = new Schema({
   //   }
   // },
   googleRefreshToken: String,
-  githubToken: { type: String, required: true },
-  githubId: {type: Number, required: true },
+  githubToken: { type: String },
+  githubId: {type: Number },
   permissions: {
     createRoom: { type: Boolean, 'default': false }
   },

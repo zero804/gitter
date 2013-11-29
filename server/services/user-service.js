@@ -157,6 +157,12 @@ var userService = {
            .nodeify(callback);
   },
 
+  findByGithubIdOrUsername: function(githubId, username, callback) {
+    return persistence.User.findOneQ({$or: [{githubId: githubId}, {username: username}]})
+           .nodeify(callback);
+  },
+
+
   findByEmail: function(email, callback) {
     return persistence.User.findOneQ({ $or: [{ email: email.toLowerCase()}, { emails: email.toLowerCase() }]})
             .nodeify(callback);
