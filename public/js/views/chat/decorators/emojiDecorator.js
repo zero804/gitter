@@ -923,7 +923,6 @@ define([], function() {
                 } else if (child.nodeType == 3) {
                     var matches = [];
                     if (typeof pattern === 'string') {
-                        console.error('Accepts regex only');
                     } else {
                         var match;
                         while (match = pattern.exec(child.data))
@@ -1006,9 +1005,7 @@ define([], function() {
                     while (r = selected_sets[index].shift()) {
                         // Find and replace matches with <div> tags
                         findText(el, r[0], function (node, match) {
-                            console.debug(el, node);
                             var wrap = document.createElement('div');//this.emojify.defaultConfig.emojify_tag_type);
-                            console.debug(wrap);
                             wrap.setAttribute('class', r[1]);
                             // wrap.setAttribute('alt', ':' + r[1].replace(/emojify /g, '') + ':');
                             wrap.setAttribute('title', ':' + r[1].replace(/emojify /g, '') + ':');
