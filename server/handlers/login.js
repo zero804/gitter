@@ -25,6 +25,16 @@ module.exports = {
         }
       );
 
+    app.get(
+        '/login/explain',
+        function(req, res) {
+          var userAgent = req.headers['user-agent'] || '';
+          var compactView = userAgent.indexOf("Mobile/") >= 0;
+          res.render('github-explain');
+        }
+      );
+
+
     // Welcome GitHub users.
     app.get(
       '/login/callback',
