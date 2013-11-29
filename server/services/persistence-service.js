@@ -132,7 +132,7 @@ var UserSchema = new Schema({
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 // UserSchema.index({ email: 1 }, { unique: true });
-UserSchema.index({ githubId: 1 }, { unique: true });
+UserSchema.index({ githubId: 1 }, { unique: true, sparse: true });
 UserSchema.index({ username: 1 }, { unique: true /*, sparse: true */});
 // UserSchema.index({ "emails.email" : 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
