@@ -2,7 +2,7 @@
   <a href="/{{org.name}}" style="width: 100%; display: inline-block">
     <span class="github-ORG">{{org.name}}</span>
     {{#if org.unreadItems}}
-    <span style="float: right; padding-right: 7px;">
+    <span class="item-unread-badge">
       <span class="trpTroupeUnreadCounter">{{unreadItems}}</span>
     </span>
     {{/if}}
@@ -12,12 +12,12 @@
     <a href="/{{org.name}}" style="width: 100%; display: inline-block">
       <span class="github-ORG">{{org.name}}</span>
       {{#if org.unreadItems}}
-      <span style="float: right; padding-right: 7px;">
+      <span class="item-unread-badge">
         <span class="trpTroupeUnreadCounter">{{unreadItems}}</span>
       </span>
       {{/if}}
     </a>
   {{else}}
-    <span class="github-ORG disabled">{{org.name}}</span>
+    <span class="github-ORG disabled" title="Sorry, you can't create chats yet. We're slowly giving users this ability to control our launch.">{{org.name}}</span>
   {{/if}}
 {{/if}}
