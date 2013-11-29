@@ -17,15 +17,15 @@ define([
       if (n.is(':hidden')) {
         // style
         n.show();
-        // n.css({ position: 'relative', left: -1 * n.outerWidth() });
-        n.animate({ width: 300 });
+        n.css({ position: 'relative', left: -1 * n.outerWidth() });
+        n.animate({ left: 250 });
       }
       // restart hide timeout
       n.data('notification-hide-timeout').restart();
     }
 
     function hide() {
-      n.animate({ width: 0 }, function() {
+      n.animate({ left: 0 }, function() {
         n.hide();
       });
     }

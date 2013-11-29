@@ -18,8 +18,9 @@
 
 @import "nanoScroller.less";
 
-
 @import "trpInvites.less";
+
+@import "emoji/emojify.less";
 
 .banner-red {
   background-color: fade(@trpRed, 90%);
@@ -113,7 +114,7 @@ header {
   background-color: rgba(255, 255, 255, 0.95);
   border-bottom: 1px solid rgba(0,0,0,0.05);
   z-index: 1;
-  padding: 8px 0 8px 44px;
+  padding: 4px 0 8px 44px;
   text-align: left;
 
   .trpTroupeFavourite {
@@ -138,7 +139,7 @@ header {
   .settingsCog {
     position: absolute;
     right: 15px;
-    top: 18px;
+    top: 15px;
   }
 
   .dropdown-toggle:before {
@@ -280,18 +281,17 @@ a:hover {
 	width: @leftMarginFull;
 	left: 0px;
 	top: 0px;
-	background-color: @trpDarkBlue;
+	background-color: lighten(@trpDarkBlue,5%);
 	height: 100%;
 	color: white;
 	z-index: 1012;
 	margin-top: 0px;
 	overflow: hidden;
-  transition:opacity 0.5s ease-in-out 0s, left .5s ease-in-out 0.3s;
+  transition:background-color 0.3s ease-in-out 0s, left .5s ease-in-out 0.3s;
   background-clip: padding-box;
-  opacity: 0.9;
 
   &:hover {
-    opacity: 1;
+    background-color: @trpDarkBlue;
   }
 
   a {
@@ -337,7 +337,7 @@ a:hover {
   font-family: 'octicons';
   content: '\f037';
   margin-right: 8px;
-  opacity: 0.8;
+  opacity: 0.9;
   width: 12px;
 }
 
@@ -345,14 +345,18 @@ a:hover {
   font-family: 'octicons';
   content: '\f001';
   margin-right: 8px;
-  opacity: 0.8;
+  opacity: 0.9;
   width: 12px;
+}
+
+.githib-REPO.disabled:before{
+  opacity: 0.4;
 }
 
 .github-ONETOONE:before {
   content: "@";
   margin-right: 8px;
-  opacity: 0.8;
+  opacity: 0.9;
   width: 12px;
 }
 
@@ -491,6 +495,12 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#17202a', end
 
 a.trpMiniLeftMenuItem {
   text-decoration: none;
+}
+
+.item-unread-badge {
+  float: right; 
+  margin-right: 5px; 
+  margin-top: 5px;
 }
 
 .trpMiniLeftMenuItem.unread:after {
@@ -707,6 +717,10 @@ a.trpMiniLeftMenuItem {
 
 .org-list-item:hover {
   background-color: rgba(150,150,150,0.2);
+}
+
+.org-avatar.disabled {
+  opacity: 0.4;
 }
 
 .trpMenuTab {
@@ -1424,11 +1438,11 @@ i.favourited:hover:before {
 }
 
 .notification-center {
-  width: 0;
+  width: 300px;
 	position: fixed;
-	top: 50px;
+	top: 100px;
 	z-index: 900;
-  left: 250px;
+  left: 0px;
 
   @media @small {
     left: -1px;
@@ -1444,7 +1458,7 @@ i.favourited:hover:before {
 	text-align: left;
 	margin: 1px;
   opacity: 0.95;
-  width: 0;
+  width: 300px;
   box-sizing: border-box;
 }
 
@@ -1497,30 +1511,30 @@ i.favourited:hover:before {
 }
 
 .popover.top .arrow {
-	border-top: 5px solid @trpGreen;
+	border-top: 5px solid @trpDarkBlue;
 }
 
 .popover.left .arrow {
-	border-left: 5px solid @trpGreen;
+	border-left: 5px solid @trpDarkBlue;
 }
 
 .popover.bottom .arrow {
-	border-bottom: 5px solid @trpGreen;
+	border-bottom: 5px solid @trpDarkBlue;
 }
 
 .popover.right .arrow {
-	border-right: 5px solid @trpGreen;
+	border-right: 5px solid @trpDarkBlue;
 }
 
 .popover-inner {
-	background-color: @trpGreen;
+	background-color: @trpDarkBlue;;
 	border-radius: 0;
 	padding: 1px;
 }
 
 .popover-title {
 	color: white;
-	background-color: @trpGreen;
+	background-color: @trpDarkBlue;
 }
 
 .popover-content {
