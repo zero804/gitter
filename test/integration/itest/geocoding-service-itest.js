@@ -8,7 +8,7 @@ var geocodingService = testRequire('./services/geocoding-service');
 
 var assert = require("assert");
 
-describe('geocodingService', function() {
+xdescribe('geocodingService', function() {
   describe('#reverseGeocode()', function() {
     it('should return Oral for 50,50', function(done){
 

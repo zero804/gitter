@@ -10,7 +10,7 @@ var passphrase = 'troupetasticprefs';
 
 module.exports = {
   install: function(app) {
-    app.get('/unsubscribe/:hash', function(req, res) {
+    app.get('/settings/unsubscribe/:hash', function(req, res) {
 
       var plaintext;
 
@@ -30,7 +30,7 @@ module.exports = {
       statsService.event('unsubscribed_unread_notifications', {userId: userId});
 
       preferences.optOut(userId, notificationType);
-      
+
       var msg = "Done. You wont receive notifications like that one in the future.";
 
       res.render('unsubscribe', {layout: 'generic-layout', title: 'Unsubscribe', msg: msg});

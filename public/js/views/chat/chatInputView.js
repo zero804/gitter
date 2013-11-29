@@ -6,12 +6,14 @@ define([
   'views/base',
   'utils/appevents',
   'hbs!./tmpl/chatInputView',
+  'hbs!./tmpl/typeaheadListItem',
   'utils/momentWrapper',
   'utils/safe-html',
   'utils/scrollbar-detect',
-  'jquery-placeholder', // No ref
+  'collections/instances/integrated-items',
+  'jquery-textcomplete', // No ref
   'jquery-sisyphus' // No ref
-], function(log, $, context, TroupeViews, appEvents, template, moment, safeHtml, hasScrollBars) {
+], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate, moment, safeHtml, hasScrollBars, itemCollections) {
   "use strict";
 
   /** @const */
@@ -48,6 +50,52 @@ define([
           inputBox.trigger('change');
         }
       }).restoreAllData();
+
+      this.$el.find('textarea').textcomplete([
+          {
+            match: /(^|\s)#(\w*)$/,
+            maxCount: 8,
+            search: function(term, callback) {
+              $.getJSON('/api/v1/troupes/'+context.getTroupeId()+'/issues', { q: term })
+                .done(function(resp) {
+                  callback(resp);
+                })
+                .fail(function() {
+                  callback([]);
+                });
+            },
+            template: function(issue) {
+              return listItemTemplate({
+                name: issue.number,
+                description: issue.title
+              });
+            },
+            replace: function(issue) {
+                return '$1#' + issue.number + ' ';
+            }
+          },
+          {
+            match: /(^|\s)@(\w*)$/,
+            maxCount: 8,
+            search: function(term, callback) {
+                var loggedInUsername = context.user().get('username');
+                var matches = itemCollections.users.models.filter(function(user) {
+                  var username = user.get('username');
+                  return username != loggedInUsername && username.indexOf(term) === 0;
+                });
+                callback(matches);
+            },
+            template: function(user) {
+              return listItemTemplate({
+                name: user.get('username'),
+                description: user.get('displayName')
+              });
+            },
+            replace: function(user) {
+                return '$1@' + user.get('username') + ' ';
+            }
+          }
+      ]);
 
       // http://stackoverflow.com/questions/16149083/keyboardshrinksview-makes-lose-focus/18904886#18904886
       this.$el.find("textarea").on('touchend', function(){
@@ -148,8 +196,6 @@ define([
     // pass in the textarea as el for ChatInputBoxView
     // pass in a scroll delegate
     initialize: function(options) {
-      this.$el.placeholder();
-
       if(hasScrollBars()) {
         this.$el.addClass("scroller");
       }
@@ -179,7 +225,7 @@ define([
     },
 
     onKeyDown: function(e) {
-      if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/))) {
+      if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !this.$el.parent().find('.dropdown-menu').is(":visible")) {
         e.stopPropagation();
         e.preventDefault();
 

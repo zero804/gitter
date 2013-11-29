@@ -34,6 +34,7 @@ exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
   // Metadata
   chatMessage.urls     = urlExtractor.extractUrlsWithIndices(text);
   chatMessage.mentions = TwitterText.extractMentionsWithIndices(text);
+  chatMessage.issues   = urlExtractor.extractIssuesWithIndices(text);
   chatMessage._md      = urlExtractor.version;
   chatMessage.meta     = meta;
 
@@ -68,6 +69,7 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   // Metadata
   chatMessage.urls            = urlExtractor.extractUrlsWithIndices(text);
   chatMessage.mentions        = TwitterText.extractMentionsWithIndices(text);
+  chatMessage.issues          = urlExtractor.extractIssuesWithIndices(text);
   chatMessage._md             = urlExtractor.version;
 
   chatMessage.save(function (err) {
@@ -76,7 +78,7 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
     statsService.event("new_chat", {
       userId: user.id,
       troupeId: troupe.id,
-      email: user.email
+      username: user.username
     });
 
     return callback(null, chatMessage);
@@ -113,6 +115,7 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
   // Metadata
   chatMessage.urls            = urlExtractor.extractUrlsWithIndices(newText);
   chatMessage.mentions        = TwitterText.extractMentionsWithIndices(newText);
+  chatMessage.issues          = urlExtractor.extractIssuesWithIndices(newText);
   chatMessage._md             = urlExtractor.version;
 
   chatMessage.save(function(err) {

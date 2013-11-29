@@ -41,7 +41,7 @@ define([
       var invite = email ? { email: email } : { userId: user.id };
 
       // check whether the invite is to a troupe or to the user.
-      var endpoint = this.model.isForTroupe() ? '/troupes/' + context.getTroupeId() + '/invites' : '/api/v1/inviteconnections';
+      var endpoint = this.model.isForTroupe() ? '/api/v1/troupes/' + context.getTroupeId() + '/invites' : '/api/v1/inviteconnections';
 
       $.ajax({
         url: endpoint,

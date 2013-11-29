@@ -1,0 +1,20 @@
+<div>
+  {{ widget "avatar" model=user size='s' }}
+  <div class="trpLeftMenuProfileName">{{displayName}}</div>
+</div>
+<div class="trpLeftMenuProfileMenu" id="profile-menu">
+  {{#if hellFreezesOver}}
+  <a href="#|profile"><div class="item">
+    Edit Profile
+  </div></a>
+  {{/if}}
+<!--       <a href="/apps" target="_blank"><div class="item">
+    Get Troupe apps
+  </div></a> -->
+  <a href="/{{username}}"><div class="item">
+    Home
+  </div></a>
+  <a href="/signout"><div class="item">
+    Signout
+  </div></a>
+</div>

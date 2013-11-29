@@ -1,5 +1,5 @@
 /*jslint node: true */
-/*global describe:true, it: true, before:false */
+/*global describe:true, it: true, before:false, after:false */
 "use strict";
 
 var testRequire = require('./test-require');
@@ -30,11 +30,12 @@ describe('restSerializer', function() {
 
     it('should return the correct display name', function() {
       var mappedUser = userStrategy.map(fixture.user1);
-      assert.equal(mappedUser.displayName, 'Test User 1');
+      assert.equal(mappedUser.displayName, fixture.user1.displayName);
     });
 
   });
 
   before(fixtureLoader(fixture));
+  after(function() { fixture.cleanup(); });
 
 });

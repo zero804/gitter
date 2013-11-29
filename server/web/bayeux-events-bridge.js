@@ -14,7 +14,7 @@ exports.install = function() {
 
     var operation = data.operation;
     var model = data.model;
-    var url = "" + data.url;
+    var url = "/api/v1" + data.url;
 
     switch(operation) {
       case 'create':
@@ -63,7 +63,7 @@ exports.install = function() {
       var troupeId = data.troupeId;
       var sound = data.sound;
 
-      var url = "/user/" + userId;
+      var url = "/api/v1/user/" + userId;
       var message = {
          notification: "user_notification",
          title: title,
@@ -81,7 +81,7 @@ exports.install = function() {
     var troupeId = data.troupeId;
     var userId = data.userId;
 
-    bayeuxClient.publish("/troupes/" + troupeId, {
+    bayeuxClient.publish("/api/v1/troupes/" + troupeId, {
       notification: "presence",
       userId: userId,
       status: "in"
@@ -93,7 +93,7 @@ exports.install = function() {
     var troupeId = data.troupeId;
     var userId = data.userId;
 
-    bayeuxClient.publish("/troupes/" + troupeId, {
+    bayeuxClient.publish("/api/v1/troupes/" + troupeId, {
       notification: "presence",
       userId: userId,
       status: "out"
@@ -111,7 +111,7 @@ exports.install = function() {
                   .map(function(key) { return counts[key]; })
                   .reduce(function(a, b) { return a + b; });
 
-    bayeuxClient.publish("/user/" + userId, {
+    bayeuxClient.publish("/api/v1/user/" + userId, {
       notification: "troupe_unread",
       troupeId: troupeId,
       totalUnreadItems: total
@@ -125,7 +125,7 @@ exports.install = function() {
     var troupeId = data.troupeId;
     var items = data.items;
 
-    bayeuxClient.publish("/user/" + userId + '/troupes/' + troupeId + '/unreadItems', {
+    bayeuxClient.publish("/api/v1/user/" + userId + '/troupes/' + troupeId + '/unreadItems', {
       notification: "unread_items",
       items: items
     });
@@ -137,7 +137,7 @@ exports.install = function() {
     var troupeId = data.troupeId;
     var items = data.items;
 
-    bayeuxClient.publish("/user/" + userId + '/troupes/' + troupeId + '/unreadItems', {
+    bayeuxClient.publish("/api/v1/user/" + userId + '/troupes/' + troupeId + '/unreadItems', {
       notification: "unread_items_removed",
       items: items
     });
