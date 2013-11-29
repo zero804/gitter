@@ -11,7 +11,7 @@ var tagFile = __dirname + '/../../GIT_COMMIT';
 
 try {
   if(fs.existsSync(tagFile)) {
-    commit = '' + fs.readFileSync(tagFile).trim();
+    commit = ('' + fs.readFileSync(tagFile)).trim();
   }
 } catch(e) {
 	winston.error('Unable to read GIT_COMMIT: ' + e);
