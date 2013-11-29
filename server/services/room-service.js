@@ -19,19 +19,23 @@ function localUriLookup(uri) {
       if(uriLookup.userId) {
         return userService.findById(uriLookup.userId)
           .then(function(user) {
+            if(!user) return uriLookupService.removeBadUri(uri)
+                                .thenResolve(null);
+
             if(user.username != uri && user.username.toLowerCase() === uri.toLowerCase()) throw { redirect: '/' + user.username };
 
-            if(user) return { user: user };
+            return { user: user };
           });
       }
 
       if(uriLookup.troupeId) {
         return troupeService.findById(uriLookup.troupeId)
           .then(function(troupe) {
-            if(!troupe) return null;
-            if(troupe.uri != uri && troupe.uri.toLowerCase() === uri.toLowerCase()) throw { redirect: '/' + troupe.uri };
+            if(!troupe) return uriLookupService.removeBadUri(uri)
+                                .thenResolve(null);
 
-            if(troupe) return { troupe: troupe };
+            if(troupe.uri != uri && troupe.uri.toLowerCase() === uri.toLowerCase()) throw { redirect: '/' + troupe.uri };
+            return { troupe: troupe };
           });
       }
 
