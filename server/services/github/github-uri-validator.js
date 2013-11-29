@@ -4,12 +4,14 @@
 var GitHubOrgService = require('./github-org-service');
 var GitHubRepoService = require('./github-repo-service');
 var Q = require('q');
+var winston = require('winston');
 
 /**
  * Given a uri, is it a valid repo or valid org?
  * @returns promise of ORG / REPO or null
  */
 function validateUri(user, uri) {
+  winston.verbose('Attempting to validate uri ' + uri + ' with GitHub');
   var parts = uri.split('/');
   if(parts.length == 1) {
     /** Its a user or org.
@@ -20,9 +22,11 @@ function validateUri(user, uri) {
     var orgService = new GitHubOrgService(user);
     return orgService.getOrg(uri)
       .then(function(org) {
+        winston.verbose('URI ' + uri + ' is an org?' + !!org);
+
         if(org) return ['ORG', org.login];
 
-        return;
+        return [];
       });
   }
 
@@ -31,9 +35,11 @@ function validateUri(user, uri) {
     var repoService = new GitHubRepoService(user);
     return repoService.getRepo(uri)
       .then(function(repo) {
+        winston.verbose('URI ' + uri + ' is a repo?' + !!repo);
+
         if(repo) return ['REPO', repo.full_name];
 
-        return;
+        return [];
       });
   }
 
