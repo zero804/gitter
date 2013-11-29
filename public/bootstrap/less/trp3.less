@@ -280,18 +280,17 @@ a:hover {
 	width: @leftMarginFull;
 	left: 0px;
 	top: 0px;
-	background-color: @trpDarkBlue;
+	background-color: lighten(@trpDarkBlue,5%);
 	height: 100%;
 	color: white;
 	z-index: 1012;
 	margin-top: 0px;
 	overflow: hidden;
-  transition:opacity 0.5s ease-in-out 0s, left .5s ease-in-out 0.3s;
+  transition:background-color 0.5s ease-in-out 0s, left .5s ease-in-out 0.3s;
   background-clip: padding-box;
-  opacity: 0.9;
 
   &:hover {
-    opacity: 1;
+    background-color: @trpDarkBlue;
   }
 
   a {
@@ -1432,11 +1431,11 @@ i.favourited:hover:before {
 }
 
 .notification-center {
-  width: 0;
+  width: 300px;
 	position: fixed;
-	top: 50px;
+	top: 100px;
 	z-index: 900;
-  left: 250px;
+  left: 0px;
 
   @media @small {
     left: -1px;
@@ -1452,7 +1451,7 @@ i.favourited:hover:before {
 	text-align: left;
 	margin: 1px;
   opacity: 0.95;
-  width: 0;
+  width: 300px;
   box-sizing: border-box;
 }
 
