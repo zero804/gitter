@@ -62,7 +62,7 @@ define([
         async: false,
         method: "PUT",
         context: this,
-        url: "/user/" + userId + "/invites/" + inviteId,
+        url: "/api/v1/user/" + userId + "/invites/" + inviteId,
         success: function(data) {
           self.trigger('invite:accept', data);
         },
@@ -81,7 +81,7 @@ define([
         async: false,
         context: this,
         method: "DELETE",
-        url: "/user/" + userId + "/invites/" + inviteId,
+        url: "/api/v1/user/" + userId + "/invites/" + inviteId,
         success: function() {
           self.trigger('invite:reject');
         },

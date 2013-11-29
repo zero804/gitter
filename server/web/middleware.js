@@ -63,7 +63,7 @@ exports.ensureLoggedIn = function(options) {
       }
 
       if(!options.loginUrl) {
-        return res.relativeRedirect(nconf.get('web:homeurl') + "#login");
+        return res.relativeRedirect("/login");
       }
 
       if(typeof options.loginUrl == "function") {
@@ -157,14 +157,15 @@ exports.grantAccessForRememberMeTokenMiddleware = [
 ];
 
 exports.generateRememberMeTokenMiddleware = function(req, res, next) {
-  if(req.body.rememberMe) {
+  // TODO: ask people if they want to be remembered (keep it as a user setting?)
+  //if(req.body.rememberMe) {
     rememberMe.generateAuthToken(req, res, req.user.id, {}, function(err) {
       if(err) return next(err);
       next();
     });
-  } else {
-    next();
-  }
+  // } else {
+  //   next();
+  // }
 };
 
 exports.simulateDelay = function(timeout) {
@@ -178,7 +179,7 @@ exports.simulateDelay = function(timeout) {
 exports.ensureValidBrowser = function(req, res, next) {
   var agent = useragent.parse(req.headers['user-agent']);
   if(agent.family === 'IE' && agent.major <= 9) {
-    res.relativeRedirect('/unawesome-browser');
+    res.relativeRedirect('/-/unawesome-browser');
   } else {
     next();
   }

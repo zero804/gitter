@@ -28,11 +28,7 @@ if (customerio_enabled) {
 }
 
 function isTestUser(email) {
-  if (!email) {
-    winston.debug("[stats] Didn't receive an email for isTestUser");
-    //return true;
-  }
-  if (email && email.indexOf("troupetest.local") !== -1) return true; else return false;
+  return false;
 }
 
 exports.event = function(eventName, properties) {
@@ -48,7 +44,7 @@ exports.event = function(eventName, properties) {
       properties.env = nconf.get("stats:envName");
 
       var event = {
-        type: "troupe_" + eventName,
+        type: "gitter_" + eventName,
         time: new Date(),
         data: properties
       };
@@ -57,7 +53,7 @@ exports.event = function(eventName, properties) {
 
     if (blacklist.indexOf(eventName) == -1) {
       if (!isTestUser(properties.email)) {
-        winston.verbose("[stats]" , "Logging user to Customer Actions: " + properties.email);
+        winston.verbose("[stats]" , "Logging user to Customer Actions: " );
         // MixPanel
         if (mixpanel_enabled) {
           properties.distinct_id = properties.userId;
@@ -78,7 +74,6 @@ exports.event = function(eventName, properties) {
 };
 
 exports.userUpdate = function(user, properties) {
-  if (isTestUser(user.email)) return;
 
   winston.verbose("[stats] Updating user stat");
 
@@ -109,11 +104,17 @@ exports.userUpdate = function(user, properties) {
       mixpanel.people.set(user.id, mp_properties);
     }
 
+    var email = user.email;
+
+    if (user.email === '' || !user.email) {
+      email = "noemail@gitter.im";
+    }
+
     if (customerio_enabled) {
       var cio_properties = {
         first_name: firstName,
         created_at: createdAt,
-        email:      user.email,
+        email:      email,
         name:       user.displayName,
         username:   user.username,
         confirmationCode: user.confirmationCode,
@@ -125,7 +126,7 @@ exports.userUpdate = function(user, properties) {
         cio_properties[attr] = value;
       }
 
-      cio.identify(user.id, user.email, cio_properties);
+      cio.identify(user.id, email, cio_properties);
     }
 
   } catch(err) {

@@ -15,18 +15,20 @@
   outline: 0;
 }
 
+.nano .content::-webkit-scrollbar {
+  visibility: hidden;
+}
+
+.has-scrollbar .content::-webkit-scrollbar {
+  visibility: visible;
+}
+
 .nano .content:focus {
   outline: 1 solid red;
 }
 
-.nano .content::-webkit-scrollbar {
-  visibility: hidden;
-}
-.has-scrollbar .content::-webkit-scrollbar {
-  visibility: visible;
-}
 .nano > .pane {
-  background : rgba(0,0,0,.25);
+  background : rgba(0,0,0,0);
   position   : absolute;
   width      : 10px;
   right      : 0;
@@ -34,17 +36,14 @@
   bottom     : 0;
   visibility : hidden\9; /* Target only IE7 and IE8 with this hack */
   opacity    : .01; 
-  -webkit-transition    : .2s;
-  -moz-transition       : .2s;
-  -o-transition         : .2s;
-  transition            : .2s;
+  transition            : opacity .2s;
   -moz-border-radius    : 5px;
   -webkit-border-radius : 5px;  
   border-radius         : 5px;
 }
 .nano > .pane > .slider {
   background: #444;
-  background: rgba(0,0,0,.5);
+  background: rgba(255,255,255,.3);
   position              : relative;
   margin                : 0 1px;
   -moz-border-radius    : 3px;
@@ -57,5 +56,5 @@
 }
 
 .trpLeftMenu .pane {
-    right: 5px;
+    right: 0;
 }

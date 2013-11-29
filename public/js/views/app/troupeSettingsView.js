@@ -36,7 +36,7 @@ define([
       this.$el.toggleClass('canDelete', this.canDelete());
 
       $.ajax({
-        url: '/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
+        url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
         type: "GET",
         context: this,
         success: function(settings) {
@@ -87,7 +87,7 @@ define([
         if (action === "yes") {
           removeTroupeCollectionRemoveListeners();
           $.ajax({
-            url: '/troupes/' + self.model.id,
+            url: '/api/v1/troupes/' + self.model.id,
             type: "DELETE",
             success: function() {
               window.location.href = '/last';
@@ -128,7 +128,7 @@ define([
         if (action === "yes") {
           removeTroupeCollectionRemoveListeners();
           $.ajax({
-            url: "/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
+            url: "/api/v1/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
             data: "",
             type: "DELETE",
             success: function() {
@@ -199,14 +199,14 @@ define([
       context.troupe().set('name', troupeName);
 
       $.ajax({
-        url: '/troupes/' + context.getTroupeId(),
+        url: '/api/v1/troupes/' + context.getTroupeId(),
         contentType: "application/json",
         dataType: "json",
         type: "PUT",
         data: JSON.stringify({ name: troupeName }),
         success: function() {
           $.ajax({
-            url: '/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
+            url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
             contentType: "application/json",
             dataType: "json",
             type: "PUT",

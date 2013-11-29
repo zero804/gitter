@@ -1,33 +1,23 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var express = require('express');
-var fs = require('fs');
-var https = require('https');
-var http = require('http');
-var nconf = require('./utils/config');
-var winston = require('./utils/winston');
+var express  = require('express');
+var http     = require('http');
+var nconf    = require('./utils/config');
+var winston  = require('./utils/winston');
 var shutdown = require('./utils/shutdown');
-var bayeux = require('./web/bayeux');
+var bayeux   = require('./web/bayeux');
+var redis    = require('./utils/redis');
+
+winston.info("Starting http/ws service");
 
 var app = express();
-var server;
-
-if(nconf.get("ws:privateKeyFile")) {
-  var options = {
-    key: fs.readFileSync(nconf.get("ws:privateKeyFile")),
-    cert: fs.readFileSync(nconf.get("ws:certificateFile"))
-  };
-  winston.info("Starting https/wss service");
-  server = https.createServer(options, app);
-} else {
-  winston.info("Starting http/ws service");
-  server = http.createServer(app);
-}
-
+var server = http.createServer(app);
 
 var RedisStore = require('connect-redis')(express);
-var sessionStore = new RedisStore();
+var sessionStore = new RedisStore({
+  client: redis.createClient()
+});
 
 require('./web/express').installSocket(app, server, sessionStore);
 
@@ -39,7 +29,7 @@ app.get('/', function(req, res) {
 
 require('./utils/event-listeners').installLocalEventListeners();
 
-var port = nconf.get("ws:port");
+var port = nconf.get('PORT') || nconf.get("ws:port");
 var bindIp = nconf.get("ws:bindIp");
 
 winston.info("Binding websockets service to " + bindIp + ":" + port);
@@ -64,15 +54,4 @@ shutdown.addHandler('websockets', 10, function(callback) {
   });
 });
 
-var uid = nconf.get("runtime:uid");
-var gid = nconf.get("runtime:gid");
 
-if(uid || gid) {
-
-  process.nextTick(function() {
-      winston.info("Switching to UID/GID: " + uid+ ":" + gid);
-      if(gid) process.setgid(gid);
-      if(uid) process.setuid(uid);
-  });
-
-}

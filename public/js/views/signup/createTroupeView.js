@@ -98,7 +98,7 @@ define([
       }
 
       this.collection.create(serializedForm, {
-        url: '/troupes/',
+        url: '/api/v1/troupes/',
         wait: true,
         success: this.onSuccess
       });

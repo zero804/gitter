@@ -86,7 +86,7 @@ define([
       }
 
       this.chatMessageId = options.chatMessageId;
-      this.url = "/troupes/" + context.getTroupeId() + "/chatMessages/" + this.chatMessageId + "/readBy";
+      this.url = "/api/v1/troupes/" + context.getTroupeId() + "/chatMessages/" + this.chatMessageId + "/readBy";
     }
   });
 

@@ -42,11 +42,11 @@ define([
       }
 
       if(Notification) {
-        notification = new Notification(title, { body: text, tag: link, icon: '/images/2/logo-mark-green-square.png' });
+        notification = new Notification(title, { body: text, tag: link, icon: '/images/2/gitter/logo-mark-blue-64.png' });
         notification.onshow = function() { setTimeout(function() { notification.close(); }, 10000); };
         notification.onclick = handleClick;
       } else {
-        notification = webkitNotifications.createNotification('/images/2/logo-mark-green-square.png', title, text);
+        notification = webkitNotifications.createNotification('/images/2/gitter/logo-mark-blue-64.png', title, text);
         notification.onclick = handleClick;
         notification.show();
       }

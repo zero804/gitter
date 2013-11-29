@@ -183,6 +183,7 @@ module.exports = {
       if (responseType === 'html') {
         res.render(template , {
           homeUrl : nconf.get('web:homeurl'),
+          user: req.user,
           message: message,
           stack: nconf.get('express:showStack') && err && err.stack ? linkStack(err.stack) : null
         });

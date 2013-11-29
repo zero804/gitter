@@ -100,9 +100,7 @@ describe('Contact Service', function() {
         .nodeify(done);
     });
 
-    after(function() {
-      fixture.cleanup();
-    });
+    after(function() { fixture.cleanup(); });
 
   });
 

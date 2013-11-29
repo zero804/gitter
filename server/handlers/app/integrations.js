@@ -6,23 +6,25 @@ var nconf = require('../../utils/config');
 var middleware = require('../../web/middleware');
 var request = require('request');
 var uriContextResolverMiddleware = require('./middleware').uriContextResolverMiddleware;
+var jwt = require('jwt-simple');
 
 var serviceDisplayNames = {
   github: 'GitHub',
   bitbucket: 'BitBucket',
   jenkins: 'Jenkins',
   travis: 'Travis',
+  sprintly: 'Sprint.ly'
 };
 
 module.exports = {
     install: function(app) {
 
-      app.get('/:appUri/integrations',
+      app.get('/settings/integrations/:userOrOrg',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         function (req, res) {
-          var url = nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks';
+          var url = nconf.get('webhooks:basepath')+'/troupes/' + req.troupe.id + '/hooks';
           winston.info('requesting hook list at ' + url);
           request.get({
             url: url,
@@ -44,13 +46,13 @@ module.exports = {
           });
         });
 
-      app.del('/:appUri/integrations',
+      app.del('/settings/integrations/:userOrOrg',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         function (req, res) {
           request.del({
-            url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks/'+req.body.id,
+            url: nconf.get('webhooks:basepath') + '/troupes/' + req.troupe.id + '/hooks/'+req.body.id,
             json: true
           },
           function(err, resp) {
@@ -59,19 +61,21 @@ module.exports = {
               res.send(500, 'Unable to perform request. Please try again later.');
               return;
             }
-            res.redirect('/'+req.troupe.uri+'/integrations');
+
+            res.redirect('/settings/integrations/' + req.troupe.uri);
           });
         });
 
-      app.post('/:appUri/integrations',
+      app.post('/settings/integrations/:userOrOrg',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
         function(req, res) {
           request.post({
-            url: nconf.get('webhooks:basepath')+'/troupes/'+req.troupe._id+'/hooks',
+            url: nconf.get('webhooks:basepath') + '/troupes/' + req.troupe.id + '/hooks',
             json: {
               service: req.body.service,
+              endpoint: 'gitter'
             }
           },
           function(err, resp, body) {
@@ -80,8 +84,9 @@ module.exports = {
               res.send(500, 'Unable to perform request. Please try again later.');
               return;
             }
-            // TODO: Make sure this is properly encoded
-            res.redirect(body.configurationURL + "&returnTo=" + nconf.get('web:basepath') + req.url);
+
+            var encryptedUserToken = jwt.encode(req.user.githubToken, nconf.get('jwt:secret'));
+            res.redirect(body.configurationURL + "&t=" + encryptedUserToken + "&returnTo=" + nconf.get('web:basepath') + req.url);
           });
         });
 

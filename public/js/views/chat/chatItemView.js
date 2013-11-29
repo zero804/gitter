@@ -95,7 +95,21 @@ define([
 
     renderText: function() {
       // We need to parse the text a little to hyperlink known links and escape html to prevent injection
-      var richText = linkify(this.model.get('text'), this.model.get('urls')).toString();
+      var links = (this.model.get('urls') || []);
+
+      if(context().troupe.githubType === 'REPO') {
+        var githubIssuesUrl = 'www.github.com/' + context().troupe.uri + '/issues/';
+        var issueLinks = (this.model.get('issues') || [])
+          .map(function(issue) {
+            return {
+              indices: issue.indices,
+              url: githubIssuesUrl + issue.number
+            };
+          });
+        links = links.concat(issueLinks);
+      }
+
+      var richText = linkify(this.model.get('text'), links).toString();
       richText = richText.replace(/\n\r?/g, '<br>');
       this.$el.find('.trpChatText').html(richText);
 

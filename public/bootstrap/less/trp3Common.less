@@ -1,4 +1,4 @@
-@import "troupe-menu/troupe-menu.less";
+
 @import "animate.less";
 @import "trp3Vars.less";
 
@@ -68,19 +68,21 @@ a .trpDisplayPicture {
 
 .avatar-xs {
   position: relative;
-  border-radius: 50em;
-  border: 2px solid white;
+  border-radius: 4px;
 	width: 20px;
 	height: 20px;
 	background-size: cover;
+}
+
+.org-avatar {
+  border-radius: 4px;
 }
 
 .avatar-s {
 	position: relative;
 	height: 29px;
 	width: 29px;
-	border-radius: 50em;
-	border: 2px solid white;
+	border-radius: 4px;
   background-size: cover;
 
  .trpTroupeAvatarText {
@@ -136,9 +138,9 @@ a .trpDisplayPicture {
 .view.synced {
   opacity: 1.0;
   -webkit-transform: translate3d(0,0,0);
-  transition: opacity 1s ease-in-out;
-  -moz-transition: opacity 1s ease-in-out;
-  -webkit-transition: opacity 1s ease-in-out;
+  transition: opacity 0.2s ease-in-out;
+  -moz-transition: opacity 0.2s ease-in-out;
+  -webkit-transition: opacity 0.2s ease-in-out;
 }
 
 .view.syncing {
@@ -182,8 +184,6 @@ a .trpDisplayPicture {
   width: 14px;
   height: 14px;
   background-color: @trpGreen;
-
-  .trpBodyTiny;
 }
 
 .trpAvatarContainer {

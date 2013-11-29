@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Login to Gitter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="apple-itunes-app" content="app-id=632039322"/>
+
+    <link href='{{cdn "bootstrap/css/trpHomePage.css" }}' rel="stylesheet">
+    <link id="favicon" rel="shortcut icon" href='{{cdn "images/2/gitter/favicon5.png" }}'>
+
+    {{>require_wrapper}}
+    {{{bootScript "signup" }}}
+    {{{generateEnv}}}
+    {{>load_font_css}}
+  </head>
+
+  <body>
+
+
+  <style>
+
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  a {
+    color: #2980b9;
+  }
+
+
+  h1 {
+    font-family: 'Open Sans';
+    font-weight: 300;
+    font-size: 42px;
+    color: white;
+
+  }
+
+  h2 {
+    font-weight: 300;
+    font-family: 'Open Sans';
+    font-size: 30px;
+  }
+
+  .outer-container {
+
+  }
+
+  .container {
+    text-align: center;
+  }
+
+  .strip {
+    width: 920px;
+    display: inline-block;
+    font-family: 'Open Sans';
+    font-weight: 400;
+  }
+
+  .feature {
+    margin-top: 40px;
+    text-align: left;
+    margin-bottom: 40px;
+  }
+
+  .button {
+    border-radius: 4px;
+    display: inline-block;
+    padding: 18px 24px;
+    text-transform:uppercase;
+    transition:all .2s ease-in-out;
+  }
+
+  .button.white {
+    background-color: rgba(255,255,255,0.8);
+    border-bottom: 3px solid rgba(255,255,255,1);
+  }
+
+  .button.blur {
+    color: white;
+    background-color: rgba(255,255,255,0.15);
+  }
+
+  .button.blur:hover {
+   background-color: rgba(255,255,255,0.3);
+  }
+
+  .button.green {
+    color: white;
+    background-color: rgba(29,206,115, 0.9);
+    border-bottom: 3px solid rgba(29,206,115, 1);
+  }
+
+  .button.green:hover {
+    background-color: rgba(29,206,115, 1);
+  }
+
+  .interested {
+    background-color: rgba(0,0,0,0.5);
+    border-radius: 6px;
+    padding: 38px 28px;
+    margin: 40px 0;
+  }
+
+  </style>
+
+  <body>
+
+  <div class="outer-container" style="">
+    <div class="container" style="background-image: url('{{ cdn "images/2/gitter/splash.jpg" }}'); background-size: cover; padding-top: 20px; background-color: #417f6a">
+      <div class="strip" style="text-align: left"><img src="{{ cdn "images/2/gitter/logo-text-white-64.png" }}" height="64"></div>
+      <Br><br><br><br>
+      <div class="strip" style="color:white; text-shadow: 0 0 0 transparent,1px 1px 2px rgba(0,0,0,0.2);">
+        <h1>Gitter is currently in private beta</h1>
+        <br><br>
+        Only a few people are able to create chats at the moment. Members of those chats are able to join in the conversation.
+        <br><br>You can try login below, if you are a member of the chat you are trying to access, you will be able to join.<br>
+        If not, you will be added to our waiting list.
+        <br><br>
+        <a href="/login/github" class="button blur" id="signup" style="text-decoration: none; color: white">Login with GitHub</a>
+      </div>
+      <div class="strip" style="padding-bottom: 60px"></div>
+    </div>
+  </div>
+
+
+  </body>
+</html>
