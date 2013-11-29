@@ -8,6 +8,7 @@ var winston  = require('./utils/winston');
 var shutdown = require('./utils/shutdown');
 var bayeux   = require('./web/bayeux');
 var redis    = require('./utils/redis');
+var appVersion = require('./web/appVersion');
 
 winston.info("Starting http/ws service");
 
@@ -24,7 +25,7 @@ require('./web/express').installSocket(app, server, sessionStore);
 require('./web/passport').install();
 
 app.get('/', function(req, res) {
-  res.send('Nothing to see here. You must be lost.');
+  res.send('Nothing to see here. Move along please. ' + appVersion.getAppTag());
 });
 
 require('./utils/event-listeners').installLocalEventListeners();

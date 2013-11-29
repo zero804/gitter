@@ -7,15 +7,22 @@ var fs = require("fs");
 var winston = require('winston');
 
 var commit;
+var tagFile = __dirname + '/../../GIT_COMMIT';
+
 try {
-	commit = ('' + fs.readFileSync(__dirname + '/../../GIT_COMMIT')).trim();
+  if(fs.existsSync(tagFile)) {
+    commit = '' + fs.readFileSync(tagFile).trim();
+  }
 } catch(e) {
 	winston.error('Unable to read GIT_COMMIT: ' + e);
 }
 
-var appTag = commit ? commit.substring(0, 6) : 'dev' + Math.floor(Date.now() / 10000);
-var cdnPrefix = commit ? "/_s/" + appTag : '';
+if(!commit) {
+  commit = 'dev' + Math.floor(Date.now() / 10000);
+}
 
+var appTag = commit.substring(0, 6);
+var cdnPrefix = commit ? "/_s/" + appTag : '';
 
 function getCurrentVersion() {
   return cdnPrefix;
