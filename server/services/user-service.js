@@ -31,7 +31,7 @@ function newUser(options, callback) {
   var email   = options.email ? options.email.toLowerCase() : null;
 
   var insertFields = {
-    githubId:           githubId, 
+    githubId:           githubId,
     githubToken:        options.githubToken,
     gravatarImageUrl:   options.gravatarImageUrl,
     username:           options.username,
@@ -176,6 +176,7 @@ var userService = {
               { emails: { $in: emails } }
               ]})
       .then(function(users) {
+
         return users.reduce(function(memo, user) {
           memo[user.email] = user;
 

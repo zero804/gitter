@@ -9,8 +9,7 @@
 
 var persistence = require("./persistence-service");
 var Q = require('q');
-var _ = require('underscore');
-var collections = require('../utils/collections');
+var winston = require('winston');
 
 /**
  * Lookup the owner of a URI
@@ -19,9 +18,15 @@ var collections = require('../utils/collections');
 function lookupUri(uri) {
   var lcUri = uri.toLowerCase();
 
+  winston.verbose('URI lookup: ' + uri);
+
   return persistence.UriLookup.findOneQ({ uri: lcUri })
     .then(function(uriLookup) {
+      winston.verbose('URI lookup returned a result? ' + !!uriLookup);
+
       if(uriLookup) return uriLookup;
+
+      winston.verbose('Attempting to search through users and troupes to find ' + uri);
 
       // Double-check the troupe and user tables to find this uri
       var repoStyle = uri.indexOf('/') >= 0;
@@ -30,6 +35,7 @@ function lookupUri(uri) {
         repoStyle ? null : persistence.User.findOneQ({ username: uri }, 'username'),
         persistence.Troupe.findOneQ({ lcUri: lcUri }, 'uri')
       ]).spread(function(user, troupe) {
+        winston.verbose('Found user? ' + !!user + ' found troupe? ' + !!troupe);
 
         if(user) {
           return persistence.UriLookup.findOneAndUpdateQ(

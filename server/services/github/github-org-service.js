@@ -21,7 +21,12 @@ GitHubOrgService.prototype.getOrg = function(org) {
   var ghorg  = this.client.org(org);
   var d = Q.defer();
   ghorg.info(d.makeNodeResolver());
-  return d.promise;
+
+  return d.promise
+    .fail(function(err) {
+      if(err.statusCode === 404) return null;
+      throw err;
+    });
 };
 
 /**

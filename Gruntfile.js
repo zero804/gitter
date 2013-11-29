@@ -66,10 +66,10 @@ module.exports = function( grunt ) {
                   "../repo/requirejs/requirejs"
                 ]
               },
-              {
+              /*{
                   name: "signup",
                   exclude: ["core-libraries"]
-              },
+              },*/
               {
                   name: "router-app",
                   include: [
@@ -87,7 +87,7 @@ module.exports = function( grunt ) {
                     "views/widgets/timeago"
                   ],
                   exclude: ["core-libraries"]
-              },
+              },/*
               {
                   name: "homepage-mobile",
                   include: [
@@ -214,7 +214,7 @@ module.exports = function( grunt ) {
                     "views/widgets/avatar"
                   ],
                   exclude: ["core-libraries"]
-              },
+              },*/
           ]
 
         }
@@ -234,24 +234,24 @@ module.exports = function( grunt ) {
               create_source_map: 'public-processed/js/core-libraries.min.js.map',
             }
           },
-      'signup': createClosureConfig('signup'),
+      // 'signup': createClosureConfig('signup'),
       'router-app': createClosureConfig('router-app'),
       "router-homepage": createClosureConfig('router-homepage'),
       "homepage-mobile" : createClosureConfig('homepage-mobile'),
-      "native-chat-router": createClosureConfig('routers/mobile/native/chat-router'),
-      "mobile-app": createClosureConfig('mobile-app'),
-      "mobile-userhome": createClosureConfig('mobile-userhome'),
-      "native-files-router": createClosureConfig('routers/mobile/native/files-router'),
-      "native-conversations-router": createClosureConfig('routers/mobile/native/conversations-router'),
-      "native-people-router": createClosureConfig('routers/mobile/native/people-router'),
-      "native-accept-router": createClosureConfig('routers/mobile/native/accept-router'),
-      "native-connect-router": createClosureConfig('routers/mobile/native/connect-router'),
-      "native-create-troupe-router": createClosureConfig('routers/mobile/native/create-troupe-router'),
-      "router-login": createClosureConfig('router-login'),
-      "complete-profile": createClosureConfig('complete-profile'),
-      "start-app": createClosureConfig('start-app'),
-      "tour-controller": createClosureConfig('tours/tour-controller'),
-      "login": createClosureConfig('login')
+//       "native-chat-router": createClosureConfig('routers/mobile/native/chat-router'),
+//       "mobile-app": createClosureConfig('mobile-app'),
+//       "mobile-userhome": createClosureConfig('mobile-userhome'),
+//       "native-files-router": createClosureConfig('routers/mobile/native/files-router'),
+//       "native-conversations-router": createClosureConfig('routers/mobile/native/conversations-router'),
+//       "native-people-router": createClosureConfig('routers/mobile/native/people-router'),
+//       "native-accept-router": createClosureConfig('routers/mobile/native/accept-router'),
+//       "native-connect-router": createClosureConfig('routers/mobile/native/connect-router'),
+//       "native-create-troupe-router": createClosureConfig('routers/mobile/native/create-troupe-router'),
+//       "router-login": createClosureConfig('router-login'),
+//       "complete-profile": createClosureConfig('complete-profile'),
+//       "start-app": createClosureConfig('start-app'),
+//       "tour-controller": createClosureConfig('tours/tour-controller'),
+//       "login": createClosureConfig('login')
     },
 
     // headless testing through PhantomJS
