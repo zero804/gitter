@@ -70,6 +70,6 @@ GitHubMeService.prototype.getRepos = function() {
 };
 
 module.exports = wrap(GitHubMeService, function() {
-  return [this.user && this.user.username || ''];
+  return [this.user && this.user.githubToken || ''];
 });
 

@@ -17,6 +17,10 @@ define([
     template: userHomeTemplate,
     tagName: 'div',
 
+    events: {
+      'click #upgrade-auth': 'onUpgradeAuthClick',
+    },
+
     regions: {
       orgs: "#org-list",
       repos: "#repo-list"
@@ -28,19 +32,19 @@ define([
     },
 
     serializeData: function() {
+      var user = context.getUser();
       return {
+        privateRepoScope: !!user.scopes.private_repo,
         createRoom: context.getUser().createRoom
-      }
+      };
     },
 
-    getRenderData: function() {
-      return {
-        username: context.getUser().username,
-        basePath: context.env('basePath'),
-        baseServer: context.env('baseServer'),
-        canCreate: context.getUser().createRoom
-      };
+    onUpgradeAuthClick: function(e) {
+      var target = e.target.href;
+      window.open(target);
+      e.preventDefault();
     }
+
   });
 
 });

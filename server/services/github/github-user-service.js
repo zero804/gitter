@@ -28,6 +28,6 @@ GitHubUserService.prototype.getUser = function(user) {
 };
 
 module.exports = wrap(GitHubUserService, function() {
-  return [this.user && this.user.username || ''];
+  return [this.user && this.user.githubToken || ''];
 });
 
