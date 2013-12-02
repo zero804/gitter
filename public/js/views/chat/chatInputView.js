@@ -99,7 +99,8 @@ define([
                 var loggedInUsername = context.user().get('username');
                 var matches = itemCollections.users.models.filter(function(user) {
                   var username = user.get('username');
-                  return username != loggedInUsername && username.indexOf(term) === 0;
+                  var displayName = (user.get('displayName') || '').toLowerCase();
+                  return username != loggedInUsername && (username.indexOf(term) === 0 || displayName.indexOf(term) === 0);
                 });
                 callback(matches);
             },
