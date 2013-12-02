@@ -2,8 +2,6 @@
 "use strict";
 
 var Q = require('q');
-var url = require('url');
-var parser = require('parse-links');
 var autopage = require('auto-page');
 var wrap = require('./github-cache-wrapper');
 var createClient = require('./github-client');
