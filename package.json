@@ -79,10 +79,10 @@
     "octonode": "git://github.com/pksunkara/octonode.git#f53032c8e9ba4edcda7cc8bca4d6ffca34ba90f4",
     "passport-github": "~0.1.5",
     "jwt-simple": "~0.1.0",
-    "parse-links": "~0.1.0",
     "snappy-cache": "0.0.4",
     "mailchimp-api": "~2.0.4",
-    "lazy.js": "~0.2.1"
+    "lazy.js": "~0.2.1",
+    "auto-page": "0.0.1"
   },
   "devDependencies": {
     "proxyquire": "0.4.0",
