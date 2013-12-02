@@ -74,7 +74,16 @@ function createIntegration(req, res) {
       return;
     }
 
-    var encryptedUserToken = jwt.encode(req.user.githubToken, nconf.get('jwt:secret'));
+    var encryptedUserToken;
+
+    // Pass through the token if we have write access
+    // TODO: deal with private repos too
+    if(req.user.hasGitHubScope('public_repo')) {
+      encryptedUserToken = jwt.encode(req.user.githubToken, nconf.get('jwt:secret'));
+    } else {
+      encryptedUserToken = "";
+    }
+
     res.redirect(body.configurationURL + "&t=" + encryptedUserToken + "&returnTo=" + nconf.get('web:basepath') + req.url);
   });
 

@@ -11,6 +11,8 @@ var Q = require('q');
 var permissionsModel = require('./permissions-model');
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
+var nconf = require('../utils/config');
+var request = require('request');
 
 function localUriLookup(uri) {
   return uriLookupService.lookupUri(uri)
@@ -44,9 +46,31 @@ function localUriLookup(uri) {
     });
 }
 
-function applyHooksForNewRoom() {
-  return Q.resolve();
+function applyAutoHooksForRepoRoom(user, troupe) {
+  assert(user, 'user is required');
+  assert(troupe, 'troupe is required');
+  assert(troupe.githubType === 'REPO', 'Auto hooks can only be used on repo rooms');
+
+  var d = Q.defer();
+
+  request.post({
+    url: nconf.get('webhooks:basepath') + '/troupes/' + troupe.id + '/hooks',
+    json: {
+      service: 'github',
+      endpoint: 'gitter',
+      autoconfigure: 1,
+      repo: troupe.uri /* The URI is also the repo name */
+    }
+  },
+  function(err, resp, body) {
+    if(err) return d.reject(err);
+    d.resolve(body);
+  });
+
+  return d.promise;
 }
+exports.applyAutoHooksForRepoRoom = applyAutoHooksForRepoRoom;
+
 
 /**
  * Assuming that oneToOne uris have been handled already,
@@ -102,8 +126,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
             })
             .then(function(troupe) {
               var hookCreationFailedDueToMissingScope;
-              console.log('TROUPE CREATED', troupe);
-              console.log('NONCE IS ', nonce == troupe._nonce);
+
               if(nonce == troupe._nonce) {
                 /* Created here */
                 var requiredScope = "public_repo";
@@ -114,7 +137,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
                   winston.verbose('Upgrading requirements');
 
                   /* Do this asynchronously */
-                  applyHooksForNewRoom(troupe)
+                  applyAutoHooksForRepoRoom(user, troupe)
                     .catch(function(err) {
                       winston.error("Unable to apply hooks for new room", { exception: err });
                     });

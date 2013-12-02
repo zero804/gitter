@@ -41,6 +41,13 @@ define([
 
     onUpgradeAuthClick: function(e) {
       var target = e.target.href;
+
+      window.addEventListener("message", function(event) {
+        if(event.data === 'oauth_upgrade_complete') {
+          window.location.reload(true);
+        }
+      }, false);
+
       window.open(target);
       e.preventDefault();
     }
