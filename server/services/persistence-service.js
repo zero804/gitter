@@ -279,6 +279,7 @@ var TroupeSchema = new Schema({
   oneToOne: { type: Boolean, "default": false },
   users: [TroupeUserSchema],
   dateDeleted: { type: Date },
+  _nonce: { type: Number },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
 
