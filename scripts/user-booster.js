@@ -40,6 +40,7 @@ function die(error) {
 function boost(username, suggestedEmail) {
   return persistence.User.findOneQ({ username: username })
     .then(function(user) {
+      console.log('Found ', user);
       var userService = new GitHubUserService(user && user.githubToken ? user : null);
       return userService.getUser(username)
         .then(function(githubUser) {
@@ -117,8 +118,12 @@ function boostMany(count) {
     .limit(count)
     .execQ()
     .then(function(users) {
-      Q.all(users.map(function(user) {
+      console.log('Boosting ' + users.map(function(f) { return f.username; }).join(', '));
+      return Q.all(users.map(function(user) {
         return boost(user.username)
+          .then(function() {
+            console.log('Boosted ' + user.username);
+          })
           .fail(function(err) {
             console.error('Failed to boost ' + user.username + ':', err);
           });
