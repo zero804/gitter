@@ -5,7 +5,7 @@
 var isPhone = require('../test-require')('./web/is-phone');
 var assert = require('assert');
 
-describe('phone detection', function() {
+describe.skip('phone detection', function() {
   it('detects iPhone as a phone', function() {
     var userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 6_1 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10B141 Safari/8536.25';
     assert(isPhone(userAgent));
