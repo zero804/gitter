@@ -1152,6 +1152,8 @@ i.favourited:hover:before {
 .trpToolbar {
   color: #333;
 /*  border-left: 2px solid @trpGreen;*/
+  font-family: 'Open Sans';
+  font-size: 14px;
   position: fixed;
   display: inline-block;
   width: 240px;
@@ -1163,6 +1165,20 @@ i.favourited:hover:before {
   background-color: @trpBgColor;
   z-index: 400;
   .transition1s;
+
+  p {
+    font-family: 'Open Sans';
+    font-size: 14px;
+    margin: 0px 0px 5px;
+  }
+
+  small {
+    font-size: 11px;
+  }
+
+  a {
+    color: @trpLightBlue;
+  }
 
  .trpMiniActions {
     display: none;
@@ -1178,8 +1194,12 @@ i.favourited:hover:before {
 
   .trpToolbarList {
     min-height: 40px;
-    max-height: 140px;
     overflow: auto;
+
+    ul {
+      list-style: none;
+      margin: 0px;
+    }
   }
 
   .oneToOne {
