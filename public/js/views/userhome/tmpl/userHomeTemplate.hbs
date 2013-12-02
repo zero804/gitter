@@ -1,22 +1,28 @@
 <div class="trpHomePanel" id="chat-frame">
   <div class="trpHomeContainer" id="content-frame">
     <img src='{{cdn "images/2/gitter/logo-text-blue-64.png" }}' style="margin-top: 20px;"><br><br>
-     
+
     {{^createRoom}}
     <div class="banner-red">
       Gitter is currently in limited beta. You can join chats, but not create them. We will grant you this permission shortly.
     </div>
     {{/createRoom}}
-    
+
+    {{^privateRepoScope}}
+    <div class="banner-red">
+      Want to see your private repositories? <a id="upgrade-auth" href="/login/upgrade?scopes=repo" target="_new">Authorise with GitHub</a>.
+    </div>
+    {{/privateRepoScope}}
+
+
     <div class="org-select">
       <br><h2>YOUR ORGANISATIONS</h2>
-      <div class="org-list" id="org-list" style="margin-left: -10px">     
+      <div class="org-list" id="org-list" style="margin-left: -10px">
       </div>
-
 
       <div class="repo-select">
       <br><br><h2>SUGGESTED REPOSITORIES</h2>
-      <div class="repo-list" id="repo-list" style="margin-left: -10px"> 
+      <div class="repo-list" id="repo-list" style="margin-left: -10px">
         <div class="org-list-item">
           <div class="github-REPO" style="display: inline-block"></div>
           <div style="display: inline-block; width: 200px; vertical-align: middle">dscape/nano<br><span style="font-size: 12px; opacity: 0.5">4 people online</span></div>

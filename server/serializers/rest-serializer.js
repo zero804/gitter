@@ -79,19 +79,25 @@ function UserStrategy(options) {
 
   this.map = function(user) {
     if(!user) return null;
+    var scopes;
 
+    if(options.includeScopes) {
+      scopes = {
+        'public_repo': user.hasGitHubScope('public_repo'),
+        'private_repo': user.hasGitHubScope('repo')
+      };
+    }
     return {
       id: user.id,
       status: options.includeEmail ? user.status : undefined,
-      hasPassword: options.includePasswordStatus ? !!user.passwordHash : undefined,
       username: user.username,
       displayName: options.exposeRawDisplayName ? user.displayName : user.getDisplayName(),
       fallbackDisplayName: options.exposeRawDisplayName && user.getDisplayName(),
       url: user.getHomeUrl(),
-      email: options.includeEmail ? user.email : undefined,
       avatarUrlSmall: user.gravatarImageUrl,
       avatarUrlMedium: user.gravatarImageUrl,
-      createRoom: user.permissions.createRoom,
+      createRoom: options.includePermissions ? user.permissions.createRoom : undefined,
+      scopes: scopes,
       online: onlineUsers ? onlineUsers.indexOf(user.id) >= 0 : undefined,
       v: getVersion(user)
     };
@@ -659,7 +665,7 @@ function GitHubOrgStrategy(options) {
       if (err) callback(err);
 
       self.troupes = collections.indexByProperty(troupes, 'uri');
-    
+
       execPreloads([{
         strategy: troupeStrategy,
         data: troupes

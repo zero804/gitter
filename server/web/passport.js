@@ -188,8 +188,14 @@ module.exports = {
         passReqToCallback: true
       },
       function(req, accessToken, refreshToken, profile, done) {
+        var requestedScopes = req.session.githubRequestedScopes;
+        if(!requestedScopes) return done('Unable to determine requested scope');
+        var scopeHash = requestedScopes.reduce(function(memo, v) { memo[v] = true; return memo; }, {});
+
         if (req.user) {
           req.user.githubToken = accessToken;
+          req.user.githubScopes = scopeHash;
+
           req.user.save(function(err) {
             winston.info('passport: User updated with token');
             if(err) done(err);
@@ -199,13 +205,14 @@ module.exports = {
         } else {
           return userService.findByGithubIdOrUsername(profile._json.id, profile._json.login)
             .then(function(user) {
+              // Update an existing user
               if(user) {
-
-                user.username         =  profile._json.login;
-                user.displayName      =  profile._json.name || profile._json.login;
-                user.gravatarImageUrl =  profile._json.avatar_url;
-                user.githubToken      =  accessToken;
-                user.githubId         =  profile._json.id;
+                user.username         = profile._json.login;
+                user.displayName      = profile._json.name || profile._json.login;
+                user.gravatarImageUrl = profile._json.avatar_url;
+                user.githubToken      = accessToken;
+                user.githubId         = profile._json.id;
+                user.githubScopes     = scopeHash;
 
                 user.save(function(err) {
                   if (err) winston.error("Failed to update GH token for user ", user.username);
@@ -239,6 +246,7 @@ module.exports = {
                 gravatarImageUrl:   profile._json.avatar_url,
                 githubToken:        accessToken,
                 githubId:           profile._json.id,
+                githubScopes:       scopeHash,
                 status:             'ACTIVE',
                 source:             'landing_github'
               };

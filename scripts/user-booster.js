@@ -51,12 +51,12 @@ function boost(username, suggestedEmail) {
       if(!githubUser) throw "Not found";
 
       var emailPromise;
-      var meService = new GitHubMeService(user && user.githubToken ? user : null);
       if(suggestedEmail) {
         emailPromise = Q.resolve(suggestedEmail);
       } else if(user && user.emails && user.emails.length) {
         emailPromise = Q.resolve(user.emails[0]);
       } else if(user && user.githubToken) {
+        var meService = new GitHubMeService(user && user.githubToken ? user : null);
         emailPromise = meService.getEmails()
           .then(function(emails) {
             if(Array.isArray(emails)) {

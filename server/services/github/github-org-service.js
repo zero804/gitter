@@ -59,5 +59,5 @@ GitHubOrgService.prototype.getRepos = function(org) {
 
 // module.exports = GitHubOrgService;
 module.exports = wrap(GitHubOrgService, function() {
-  return [this.user && this.user.username || ''];
+  return [this.user && this.user.githubToken || ''];
 });

@@ -33,6 +33,7 @@ function newUser(options, callback) {
   var insertFields = {
     githubId:           githubId,
     githubToken:        options.githubToken,
+    githubScopes:       options.githubScopes,
     gravatarImageUrl:   options.gravatarImageUrl,
     username:           options.username,
     email:              email,
@@ -131,7 +132,7 @@ var userService = {
 
   findAndUsePasswordResetCode: function(passwordResetCode, callback) {
     winston.info("Using password reset code", passwordResetCode);
-    return persistence.User.findOneQ({passwordResetCode: passwordResetCode})
+    return persistence.User.findOneQ({ passwordResetCode: passwordResetCode })
     .then(function(user) {
       assert(user, 'User not found');
       user.passwordResetCode = null;
@@ -153,12 +154,12 @@ var userService = {
   },
 
   findByGithubId: function(githubId, callback) {
-    return persistence.User.findOneQ({githubId: githubId})
+    return persistence.User.findOneQ({ githubId: githubId })
            .nodeify(callback);
   },
 
   findByGithubIdOrUsername: function(githubId, username, callback) {
-    return persistence.User.findOneQ({$or: [{githubId: githubId}, {username: username}]})
+    return persistence.User.findOneQ({$or: [{ githubId: githubId }, { username: username }]})
            .nodeify(callback);
   },
 
