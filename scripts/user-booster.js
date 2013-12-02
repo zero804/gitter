@@ -27,6 +27,11 @@ var opts = require("nomnom")
     default: 10,
     help: 'Email address of the user'
   })
+  .option('token', {
+    abbr: 't',
+    required: false,
+    help: 'Github token'
+  })
   .parse();
 
 
@@ -41,10 +46,16 @@ function boost(username, suggestedEmail) {
   return persistence.User.findOneQ({ username: username })
     .then(function(user) {
       console.log('Found ', user);
-      var userService = new GitHubUserService(user && user.githubToken ? user : null);
+      var userService = new GitHubUserService(user && user.githubToken ? user : {githubToken : opts.token});
       return userService.getUser(username)
         .then(function(githubUser) {
           return [user, githubUser];
+        }).catch(function(err) {
+          console.log("Shti has happened", err);
+          console.dir(err);
+          console.dir(err.stack);
+
+          throw err;
         });
     })
     .spread(function(user, githubUser) {
