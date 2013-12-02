@@ -47,6 +47,10 @@ module.exports = {
         auth,
         require('./search.js'));
 
+    app.get('/api/v1/repo-info',
+        auth,
+        require('./repo-info.js'));
+
 
   }
 };
