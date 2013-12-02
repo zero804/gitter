@@ -51,6 +51,8 @@ function applyAutoHooksForRepoRoom(user, troupe) {
   assert(troupe, 'troupe is required');
   assert(troupe.githubType === 'REPO', 'Auto hooks can only be used on repo rooms');
 
+  winston.info("Requesting autoconfigured integrations");
+
   var d = Q.defer();
 
   request.post({
@@ -58,6 +60,7 @@ function applyAutoHooksForRepoRoom(user, troupe) {
     json: {
       service: 'github',
       endpoint: 'gitter',
+      githubToken: user.githubToken,
       autoconfigure: 1,
       repo: troupe.uri /* The URI is also the repo name */
     }
