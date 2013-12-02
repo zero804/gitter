@@ -43,5 +43,10 @@ module.exports = {
         auth,
         require('./suggested-contacts.js'));
 
+    app.get('/api/v1/search',
+        auth,
+        require('./search.js'));
+
+
   }
 };

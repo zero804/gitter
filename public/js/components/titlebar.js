@@ -43,9 +43,9 @@ define([
 
     TitlebarUpdater.prototype.getTitlebar = function(counts) {
       var mainTitle;
-      var name = context.troupe().get('name');
+      var name = context().troupeUri;
       if (name) {
-        mainTitle = name + " - Troupe";
+        mainTitle = name + " - Gitter";
       } else {
         mainTitle = "Gitter";
       }
