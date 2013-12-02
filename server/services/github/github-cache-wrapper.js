@@ -16,7 +16,7 @@ function getKeys(method, contextValues, args) {
 }
 
 function wrap(service, contextFunction) {
-  var sc = new SnappyCache({ prefix: 'sc:', redis: redis.createClient() });
+  var sc = new SnappyCache({ prefix: 'sc:', redis: redis.createClient(), ttl: 1800 });
 
   Object.keys(service.prototype).forEach(function(value) {
     var v = service.prototype[value];
