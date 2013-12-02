@@ -17,14 +17,25 @@ define([
       return;
     }
 
-    notifications.notify({
-      content: template({
+    var element = $.parseHTML(template({
         link: message.link,
         title: message.title,
         text: message.text
-      })
+      }));
+
+    if(message.click) {
+      $(element).on('click', message.click);
+    } else if(message.link) {
+      $(element).on('click', function() {
+        window.location.href = message.link;
+      });
+    }
+
+    notifications.notify({
+      content: element
     });
   });
+
 
   $(document).on('app.version.mismatch', function() {
     notifications.notify({
@@ -72,6 +83,7 @@ define([
       action: 'hide'
     });
   });
+
 
   $(window).on('beforeunload', function(){
     $('#notification-center').hide();

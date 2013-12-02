@@ -3,6 +3,7 @@ require([
   'jquery',
   'backbone',
   'utils/context',
+  'utils/appevents',
   'views/app/appIntegratedView',
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
@@ -46,7 +47,7 @@ require([
   'template/helpers/all', // No ref
   'components/eyeballs', // No ref
   'bootstrap-dropdown' // No ref
-], function($, Backbone, context, AppIntegratedView, chatInputView,
+], function($, Backbone, context, appEvents, AppIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, troupeCollections, /*UserEmailCollection,*/
     RightToolbarView, /*filePreviewView, fileVersionsView,  RequestDetailView,*/
     InviteDetailView, PersonDetailView, conversationDetailView, /*profileView,
@@ -126,6 +127,17 @@ require([
     regions: [appView.rightPanelRegion, appView.dialogRegion]
   });
 
+  if(context.popEvent('hooks_require_additional_public_scope')) {
+    setTimeout(function() {
+      appEvents.trigger('user_notification', {
+        click: function() {
+          window.open('/login/upgrade?scopes=public_repo');
+        },
+        title: 'Authorisation',
+        text: 'GIVE US THE POWER!'
+      });
+    }, 2000);
+  }
 
   if(!window.localStorage.troupeTourApp) {
     window.localStorage.troupeTourApp = 1;

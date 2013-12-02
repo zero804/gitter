@@ -44,6 +44,10 @@ function localUriLookup(uri) {
     });
 }
 
+function applyHooksForNewRoom() {
+  return Q.resolve();
+}
+
 /**
  * Assuming that oneToOne uris have been handled already,
  * Figure out what this troupe is for
@@ -81,12 +85,14 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
         .then(function(access) {
           if(!access) return [null, access];
 
+          var nonce = Math.floor(Math.random() * 100000);
           return persistence.Troupe.findOneAndUpdateQ(
             { lcUri: lcUri, githubType: githubType },
             {
               $setOnInsert: {
                 lcUri: lcUri,
                 uri: uri,
+                _nonce: nonce,
                 githubType: githubType,
                 users:  user ? [{ _id: new ObjectID(), userId: user._id }] : []
               }
@@ -95,7 +101,30 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
               upsert: true
             })
             .then(function(troupe) {
-              return [troupe, true];
+              var hookCreationFailedDueToMissingScope;
+              console.log('TROUPE CREATED', troupe);
+              console.log('NONCE IS ', nonce == troupe._nonce);
+              if(nonce == troupe._nonce) {
+                /* Created here */
+                var requiredScope = "public_repo";
+                /* TODO: Later we'll need to handle private repos too */
+                var hasScope = user.hasGitHubScope(requiredScope);
+
+                if(hasScope) {
+                  winston.verbose('Upgrading requirements');
+
+                  /* Do this asynchronously */
+                  applyHooksForNewRoom(troupe)
+                    .catch(function(err) {
+                      winston.error("Unable to apply hooks for new room", { exception: err });
+                    });
+                } else {
+                  winston.verbose('Skipping hook creation. User does not have permissions');
+                  hookCreationFailedDueToMissingScope = true;
+                }
+              }
+
+              return [troupe, true, hookCreationFailedDueToMissingScope];
             });
         });
     });
@@ -108,13 +137,13 @@ function ensureAccessControl(user, troupe, access) {
   if(troupe) {
     if(access) {
       /* In troupe? */
-      if(troupe.containsUserId(user.id)) return troupe;
+      if(troupe.containsUserId(user.id)) return Q.resolve(troupe);
 
       troupe.addUserById(user.id);
       return troupe.saveQ().thenResolve(troupe);
     } else {
       /* No access */
-      if(!troupe.containsUserId(user.id)) return null;
+      if(!troupe.containsUserId(user.id)) return Q.resolve(null);
 
       troupe.removeUserById(user.id);
       return troupe.saveQ().thenResolve(null);
@@ -161,11 +190,11 @@ function findOrCreateRoom(user, uri) {
 
       /* Didn't find a user, but we may have found another room */
       return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri)
-        .spread(function(troupe, access) {
-          return ensureAccessControl(user, troupe, access);
-        })
-        .then(function(troupe) {
-          return { oneToOne: false, troupe: troupe };
+        .spread(function(troupe, access, hookCreationFailedDueToMissingScope) {
+          return ensureAccessControl(user, troupe, access)
+            .then(function(troupe) {
+              return { oneToOne: false, troupe: troupe, hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope };
+            });
         });
     });
 }
