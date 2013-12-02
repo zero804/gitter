@@ -1,17 +1,13 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var github = require('octonode');
-var publicClient = github.client();
 var Q = require('q');
-var assert = require('assert');
 var wrap = require('./github-cache-wrapper');
+var createClient = require('./github-client');
 
 function GitHubMeService(user) {
-  assert(!user || user.githubToken, 'User must have a githubToken');
-
   this.user = user;
-  this.client = user ? github.client(user.githubToken) : publicClient;
+  this.client = createClient(user);
 }
 
 GitHubMeService.prototype.getUser = function() {
@@ -69,7 +65,8 @@ GitHubMeService.prototype.getRepos = function() {
   return d.promise;
 };
 
-module.exports = wrap(GitHubMeService, function() {
-  return [this.user && this.user.githubToken || ''];
-});
+module.exports = GitHubMeService;
+// module.exports = wrap(GitHubMeService, function() {
+//   return [this.user && this.user.githubToken || ''];
+// });
 
