@@ -187,36 +187,17 @@ define([
     saveSettings: function(e) {
       if(e) e.preventDefault();
 
-      var troupeName = this.$el.find('input[name=name]').val().trim();
       var self = this;
 
-      if(context.troupe().get('name') === troupeName & this.settings == self.$el.find("#notification-options").val()) {
-        self.dialog.hide();
-        self.dialog = null;
-        return;
-      }
-
-      context.troupe().set('name', troupeName);
-
       $.ajax({
-        url: '/api/v1/troupes/' + context.getTroupeId(),
+        url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
         contentType: "application/json",
         dataType: "json",
         type: "PUT",
-        data: JSON.stringify({ name: troupeName }),
-        success: function() {
-          $.ajax({
-            url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
-            contentType: "application/json",
-            dataType: "json",
-            type: "PUT",
-            data: JSON.stringify({ push: self.$el.find("#notification-options").val() }),
-            success: function(data) {
-              self.dialog.hide();
-              self.dialog = null;
-            }
-          });
-
+        data: JSON.stringify({ push: self.$el.find("#notification-options").val() }),
+        success: function(data) {
+          self.dialog.hide();
+          self.dialog = null;
         }
       });
     }
