@@ -62,6 +62,4 @@ GitHubIssueService.prototype.getIssues = function(repoName) {
 };
 
 // module.exports = GitHubIssueService;
-module.exports = wrap(GitHubIssueService, function() {
-  return [this.user && this.user.username || ''];
-});
+module.exports = wrap(GitHubIssueService);
