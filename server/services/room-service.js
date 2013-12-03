@@ -159,8 +159,10 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
 
 /**
  * Grant or remove the users access to a room
+ * Makes the troupe reflect the users access to a room
  */
 function ensureAccessControl(user, troupe, access) {
+
   if(troupe) {
     if(access) {
       /* In troupe? */
@@ -176,6 +178,8 @@ function ensureAccessControl(user, troupe, access) {
       return troupe.saveQ().thenResolve(null);
     }
   }
+
+  return Q.resolve(null);
 }
 
 /**
