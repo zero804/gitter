@@ -98,7 +98,7 @@ function findReposWithRooms(repoList) {
   var orTerms = lazy(repoList)
                   .map(function(r) { return { lcUri: r && r.toLowerCase(), githubType: 'REPO' }; })
                   .toArray();
-  var roomsPromise = orTerms.length > 0 ? persistence.Troupe.findQ({ $or: orTerms }, "uri") : Q([]);
+  var roomsPromise = orTerms.length ? persistence.Troupe.findQ({ $or: orTerms }, "uri") : Q.resolve([]);
   return roomsPromise;
 }
 
@@ -139,22 +139,34 @@ function suggestedReposForUser(user) {
     .then(function(scores) {
       return findReposWithRooms(Object.keys(scores))
         .then(function(troupes) {
+          troupes.forEach(function(troupe) {
+            var s = scores[troupe.uri];
+            if(s) {
+              s.score += SCORE_EXISTING;
+            }
+          });
 
-          //if(true || user.permissions && user.permissions.createRoom) {
-            /* Can create rooms? */
-            troupes.forEach(function(troupe) {
-              var s = scores[troupe.uri];
-              if(s) {
-                s.score += SCORE_EXISTING;
-              }
-            });
+          var troupesByUri = lazy(troupes)
+            .reduce(function(memo, v) { memo[v.uri] = v; return memo; }, {});
 
-            return scores;
-          //}
+          return lazy(scores)
+            .pairs()
+            .filter(function(a) {
+              var uri = a[0];
+              var value = a[1];
+              var repo = value.repo;
 
-          //var troupeUris = lazy(troupes).map(function(t) { return t.uri; }).toArray();
+              var existingTroupe = troupesByUri[uri];
 
-          //return lazy(scores).pick(troupeUris).toObject();
+              // If a troupe exists, always let it through
+              // TODO: check permissions in future
+              if(existingTroupe) return true;
+
+              if(repo.permissions && repo.permissions.admin) return true;
+
+              return false;
+            })
+            .toObject();
         });
     })
     .then(function(scores) {
