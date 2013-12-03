@@ -18,3 +18,6 @@ __Getting Started__
 
 __Run Like Production__
 `node web --web:staticContent=public-processed/ --web:minified=true`
+
+__Give Hats To Everyone__
+`db.users.update({ }, { $set: { permissions: { createRoom: true } } }, { multi: true } )`
