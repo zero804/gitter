@@ -63,10 +63,9 @@
       </div>
       <h1>{{troupeName}}</h1>
       {{#unless troupeContext.troupe.oneToOne}}
-      <div class="settingsCog" data-toggle="dropdown">
+      <div class="settingsCog">
         <div class="dropdown">
-          <a class="dropdown-toggle" style="text-decoration: none" data-toggle="dropdown" href="#">
-          </a>
+          <div class="dropdown-toggle" data-toggle="dropdown"></div>
           <ul class="dropdown-menu" role="menu">
             {{#if hellFreezesOver}}
             <li><a role="menuitem" tabindex="-1" href="#|share">Add someone to this Troupe</a></li>
