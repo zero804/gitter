@@ -282,6 +282,7 @@ var TroupeSchema = new Schema({
   _nonce: { type: Number },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
+TroupeSchema.schemaTypeName = 'TroupeSchema';
 
 // Ideally we should never search against URI, only lcURI
 TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });

@@ -9,13 +9,13 @@ function createClient(user) {
   assert(user && user.githubToken, 'User must have a githubToken');
 
   var client = github.client(user.githubToken);
-  client.middlewares.push(function(err, res, body, next) {
-    if(res.statusCode >= 400 && res.statusCode != 404) {
-      winston.error("Github failure", res.headers);
-      winston.error("Github failure", body);
-    }
-    next(err, res, body);
-  });
+  // client.middlewares.push(function(err, res, body, next) {
+  //   if(res.statusCode >= 400 && res.statusCode != 404) {
+  //     winston.error("Github failure", res.headers);
+  //     winston.error("Github failure", body);
+  //   }
+  //   next(err, res, body);
+  // });
 
   return client;
 }

@@ -53,7 +53,7 @@ GitHubOrgService.prototype.getRepos = function(org) {
   return d.promise;
 };
 
-module.exports = GitHubOrgService;
-// module.exports = wrap(GitHubOrgService, function() {
-//   return [this.user && this.user.githubToken || ''];
-// });
+// module.exports = GitHubOrgService;
+module.exports = wrap(GitHubOrgService, function() {
+  return [this.user && this.user.githubToken || ''];
+});
