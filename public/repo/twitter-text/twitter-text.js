@@ -81,9 +81,10 @@ define([], function (){
     }
     var d = {
       text: text,
-      attr: twttr.txt.tagAttrs(attributes)
+      attr: twttr.txt.tagAttrs(attributes),
+      tag: options.linkTag || 'a'
     };
-    return stringSupplant("<a#{attr}>#{text}</a>", d);
+    return stringSupplant("<#{tag}#{attr}>#{text}</#{tag}>", d);
   };
 
   twttr.txt.autoLinkEntities = function(text, entities, options) {
@@ -142,19 +143,19 @@ define([], function (){
 
   twttr.txt.linkToMentionAndList = function(entity, text, options) {
     var at = text.substring(entity.indices[0], entity.indices[0] + 1);
-    console.log(at);
     var user = twttr.txt.htmlEscape(entity.screenName);
     var slashListname = twttr.txt.htmlEscape(entity.listSlug);
     var isList = entity.listSlug && !options.suppressLists;
     var attrs = clone(options.htmlAttrs || {});
     attrs["class"] = (isList ? options.listClass : options.usernameClass);
-    attrs.href = isList ? options.listUrlBase + user + slashListname : options.usernameUrlBase + user;
+    // attrs.href = isList ? options.listUrlBase + user + slashListname : options.usernameUrlBase + user;
     if (!isList && !options.suppressDataScreenName) {
       attrs['data-screen-name'] = user;
     }
-    if (options.targetBlank) {
-      attrs.target = '_blank';
-    }
+    // if (options.targetBlank) {
+    //   attrs.target = '_blank';
+    // }
+    options.linkTag = 'span';
 
     return twttr.txt.linkToTextWithSymbol(entity, at, isList ? user + slashListname : user, attrs, options);
   };
