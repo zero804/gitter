@@ -98,7 +98,8 @@ define([
 
     webNotifications.notify({
       id: 'request-notifications',
-      content: e
+      content: e,
+      timeout: 10000
     });
   }
 
