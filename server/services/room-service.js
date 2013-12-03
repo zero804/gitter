@@ -66,6 +66,7 @@ function applyAutoHooksForRepoRoom(user, troupe) {
     }
   },
   function(err, resp, body) {
+    winston.info("Autoconfiguration of webhooks completed. Success? " + !err);
     if(err) return d.reject(err);
     d.resolve(body);
   });
