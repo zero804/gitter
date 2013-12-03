@@ -118,6 +118,8 @@ define([
             match: /(^|\s):(\w*)$/,
             maxCount: 8,
             search: function(term, callback) {
+              if(term.length < 1) return callback([]);
+
               var emojiList = getEmojiList();
               var matches = emojiList.filter(function(emoji) {
                 return emoji.indexOf(term) === 0;
