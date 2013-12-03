@@ -2,18 +2,20 @@
 define([
   'log!chat-input',
   'jquery',
+  'underscore',
   'utils/context',
   'views/base',
   'utils/appevents',
   'hbs!./tmpl/chatInputView',
   'hbs!./tmpl/typeaheadListItem',
+  'hbs!./tmpl/emojiTypeaheadListItem',
   'utils/momentWrapper',
   'utils/safe-html',
   'utils/scrollbar-detect',
   'collections/instances/integrated-items',
   'jquery-textcomplete', // No ref
   'jquery-sisyphus' // No ref
-], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate, moment, safeHtml, hasScrollBars, itemCollections) {
+], function(log, $, _, context, TroupeViews, appEvents, template, listItemTemplate, emojiListItemTemplate, moment, safeHtml, hasScrollBars, itemCollections) {
   "use strict";
 
   /** @const */
@@ -21,6 +23,22 @@ define([
 
   /** @const */
   var EXTRA_PADDING = 20;
+
+  var emojiListCache = [];
+
+  function getEmojiList() {
+    if(!emojiListCache.length) {
+      _.each(document.styleSheets, function(styleSheet) {
+        _.each(styleSheet.cssRules, function(rules) {
+          if(rules.selectorText && rules.selectorText.indexOf('.emojify.') === 0) {
+            emojiListCache.push(rules.selectorText.substring(9));
+          }
+        });
+      });
+      emojiListCache = emojiListCache.sort();
+    }
+    return emojiListCache;
+  }
 
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
@@ -81,7 +99,8 @@ define([
                 var loggedInUsername = context.user().get('username');
                 var matches = itemCollections.users.models.filter(function(user) {
                   var username = user.get('username');
-                  return username != loggedInUsername && username.indexOf(term) === 0;
+                  var displayName = (user.get('displayName') || '').toLowerCase();
+                  return username != loggedInUsername && (username.indexOf(term) === 0 || displayName.indexOf(term) === 0);
                 });
                 callback(matches);
             },
@@ -93,6 +112,27 @@ define([
             },
             replace: function(user) {
                 return '$1@' + user.get('username') + ' ';
+            }
+          },
+          {
+            match: /(^|\s):(\w*)$/,
+            maxCount: 8,
+            search: function(term, callback) {
+              if(term.length < 1) return callback([]);
+
+              var emojiList = getEmojiList();
+              var matches = emojiList.filter(function(emoji) {
+                return emoji.indexOf(term) === 0;
+              });
+              callback(matches);
+            },
+            template: function(emoji) {
+              return emojiListItemTemplate({
+                emoji: emoji
+              });
+            },
+            replace: function (value) {
+              return '$1:' + value + ': ';
             }
           }
       ]);

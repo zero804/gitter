@@ -24,7 +24,7 @@ describe('room-service', function() {
     return roomService.findOrCreateRoom(fixture.user1, 'gitterTest')
       .then(function(uriContext) {
         assert(!uriContext.oneToOne);
-        assert(uriContext.troupe);
+        assert(!uriContext.troupe);
       })
       .nodeify(done);
   });

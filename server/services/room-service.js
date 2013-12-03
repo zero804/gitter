@@ -11,6 +11,8 @@ var Q = require('q');
 var permissionsModel = require('./permissions-model');
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
+var nconf = require('../utils/config');
+var request = require('request');
 
 function localUriLookup(uri) {
   return uriLookupService.lookupUri(uri)
@@ -43,6 +45,36 @@ function localUriLookup(uri) {
       return null;
     });
 }
+
+function applyAutoHooksForRepoRoom(user, troupe) {
+  assert(user, 'user is required');
+  assert(troupe, 'troupe is required');
+  assert(troupe.githubType === 'REPO', 'Auto hooks can only be used on repo rooms');
+
+  winston.info("Requesting autoconfigured integrations");
+
+  var d = Q.defer();
+
+  request.post({
+    url: nconf.get('webhooks:basepath') + '/troupes/' + troupe.id + '/hooks',
+    json: {
+      service: 'github',
+      endpoint: 'gitter',
+      githubToken: user.githubToken,
+      autoconfigure: 1,
+      repo: troupe.uri /* The URI is also the repo name */
+    }
+  },
+  function(err, resp, body) {
+    winston.info("Autoconfiguration of webhooks completed. Success? " + !err);
+    if(err) return d.reject(err);
+    d.resolve(body);
+  });
+
+  return d.promise;
+}
+exports.applyAutoHooksForRepoRoom = applyAutoHooksForRepoRoom;
+
 
 /**
  * Assuming that oneToOne uris have been handled already,
@@ -81,12 +113,14 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
         .then(function(access) {
           if(!access) return [null, access];
 
+          var nonce = Math.floor(Math.random() * 100000);
           return persistence.Troupe.findOneAndUpdateQ(
             { lcUri: lcUri, githubType: githubType },
             {
               $setOnInsert: {
                 lcUri: lcUri,
                 uri: uri,
+                _nonce: nonce,
                 githubType: githubType,
                 users:  user ? [{ _id: new ObjectID(), userId: user._id }] : []
               }
@@ -95,7 +129,29 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
               upsert: true
             })
             .then(function(troupe) {
-              return [troupe, true];
+              var hookCreationFailedDueToMissingScope;
+
+              if(nonce == troupe._nonce) {
+                /* Created here */
+                var requiredScope = "public_repo";
+                /* TODO: Later we'll need to handle private repos too */
+                var hasScope = user.hasGitHubScope(requiredScope);
+
+                if(hasScope) {
+                  winston.verbose('Upgrading requirements');
+
+                  /* Do this asynchronously */
+                  applyAutoHooksForRepoRoom(user, troupe)
+                    .catch(function(err) {
+                      winston.error("Unable to apply hooks for new room", { exception: err });
+                    });
+                } else {
+                  winston.verbose('Skipping hook creation. User does not have permissions');
+                  hookCreationFailedDueToMissingScope = true;
+                }
+              }
+
+              return [troupe, true, hookCreationFailedDueToMissingScope];
             });
         });
     });
@@ -103,23 +159,27 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
 
 /**
  * Grant or remove the users access to a room
+ * Makes the troupe reflect the users access to a room
  */
 function ensureAccessControl(user, troupe, access) {
+
   if(troupe) {
     if(access) {
       /* In troupe? */
-      if(troupe.containsUserId(user.id)) return troupe;
+      if(troupe.containsUserId(user.id)) return Q.resolve(troupe);
 
       troupe.addUserById(user.id);
       return troupe.saveQ().thenResolve(troupe);
     } else {
       /* No access */
-      if(!troupe.containsUserId(user.id)) return null;
+      if(!troupe.containsUserId(user.id)) return Q.resolve(null);
 
       troupe.removeUserById(user.id);
       return troupe.saveQ().thenResolve(null);
     }
   }
+
+  return Q.resolve(null);
 }
 
 /**
@@ -161,11 +221,11 @@ function findOrCreateRoom(user, uri) {
 
       /* Didn't find a user, but we may have found another room */
       return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri)
-        .spread(function(troupe, access) {
-          return ensureAccessControl(user, troupe, access);
-        })
-        .then(function(troupe) {
-          return { oneToOne: false, troupe: troupe };
+        .spread(function(troupe, access, hookCreationFailedDueToMissingScope) {
+          return ensureAccessControl(user, troupe, access)
+            .then(function(troupe) {
+              return { oneToOne: false, troupe: troupe, hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope };
+            });
         });
     });
 }
