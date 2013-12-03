@@ -151,10 +151,10 @@ test-docs:
 		> docs/test.html
 
 npm:
-	rm -f npm-shrinkwrap.json
-	npm prune
+	#rm -f npm-shrinkwrap.json
+	#npm prune
 	npm install
-	npm shrinkwrap
+	#npm shrinkwrap
 
 lint-configs: config/*.json
 	set -e && for i in $?; do (./node_modules/.bin/jsonlint $$i > /dev/null); done
