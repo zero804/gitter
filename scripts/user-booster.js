@@ -50,12 +50,6 @@ function boost(username, suggestedEmail) {
       return userService.getUser(username)
         .then(function(githubUser) {
           return [user, githubUser];
-        }).catch(function(err) {
-          console.log("Shti has happened", err);
-          console.dir(err);
-          console.dir(err.stack);
-
-          throw err;
         });
     })
     .spread(function(user, githubUser) {
@@ -66,7 +60,7 @@ function boost(username, suggestedEmail) {
         emailPromise = Q.resolve(suggestedEmail);
       } else if(user && user.emails && user.emails.length) {
         emailPromise = Q.resolve(user.emails[0]);
-      } else if(user && user.githubToken) {
+      } else if(user && user.githubToken && user.hasGitHubScope('user:email')) {
         var meService = new GitHubMeService(user && user.githubToken ? user : null);
         emailPromise = meService.getEmails()
           .then(function(emails) {
