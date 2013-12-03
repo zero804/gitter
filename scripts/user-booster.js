@@ -45,17 +45,10 @@ function die(error) {
 function boost(username, suggestedEmail) {
   return persistence.User.findOneQ({ username: username })
     .then(function(user) {
-      console.log('Found ', user);
       var userService = new GitHubUserService(user && user.githubToken ? user : {githubToken : opts.token});
       return userService.getUser(username)
         .then(function(githubUser) {
           return [user, githubUser];
-        }).catch(function(err) {
-          console.log("Shti has happened", err);
-          console.dir(err);
-          console.dir(err.stack);
-
-          throw err;
         });
     })
     .spread(function(user, githubUser) {
@@ -66,7 +59,7 @@ function boost(username, suggestedEmail) {
         emailPromise = Q.resolve(suggestedEmail);
       } else if(user && user.emails && user.emails.length) {
         emailPromise = Q.resolve(user.emails[0]);
-      } else if(user && user.githubToken) {
+      } else if(user && user.githubToken && user.hasGitHubScope('user:email')) {
         var meService = new GitHubMeService(user && user.githubToken ? user : null);
         emailPromise = meService.getEmails()
           .then(function(emails) {
@@ -80,7 +73,13 @@ function boost(username, suggestedEmail) {
 
       return emailPromise.then(function(email) {
         return [user, githubUser, email];
-      });
+      }).catch(function(err) {
+        console.log("Unable to get email for user ", err);
+        console.log(err);
+        console.log(err.stack);
+
+        throw err;
+      })
     })
     .spread(function(user, githubUser, email) {
       if(!email) throw "Unable to obtain email address for " + opts.username;
