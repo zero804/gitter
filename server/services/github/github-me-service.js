@@ -65,8 +65,8 @@ GitHubMeService.prototype.getRepos = function() {
   return d.promise;
 };
 
-module.exports = GitHubMeService;
-// module.exports = wrap(GitHubMeService, function() {
-//   return [this.user && this.user.githubToken || ''];
-// });
+// module.exports = GitHubMeService;
+module.exports = wrap(GitHubMeService, function() {
+  return [this.user && this.user.githubToken || ''];
+});
 
