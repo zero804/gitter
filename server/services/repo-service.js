@@ -98,8 +98,8 @@ function findReposWithRooms(repoList) {
   var orTerms = lazy(repoList)
                   .map(function(r) { return { lcUri: r && r.toLowerCase(), githubType: 'REPO' }; })
                   .toArray();
-
-  return persistence.Troupe.findQ({ $or: orTerms }, "uri");
+  var roomsPromise = orTerms.length > 0 ? persistence.Troupe.findQ({ $or: orTerms }, "uri") : Q([]);
+  return roomsPromise;
 }
 
 function suggestedReposForUser(user) {
