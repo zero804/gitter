@@ -46,7 +46,7 @@ function boost(username, suggestedEmail) {
   return persistence.User.findOneQ({ username: username })
     .then(function(user) {
       console.log('Found ', user);
-      var userService = new GitHubUserService(user && user.githubToken ? user : {githubToken : opts.token});
+      var userService = new GitHubUserService(user && user.githubToken ? user : {githubToken : opts.token || null});
       return userService.getUser(username)
         .then(function(githubUser) {
           return [user, githubUser];
