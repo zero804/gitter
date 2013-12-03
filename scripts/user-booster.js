@@ -73,13 +73,7 @@ function boost(username, suggestedEmail) {
 
       return emailPromise.then(function(email) {
         return [user, githubUser, email];
-      }).catch(function(err) {
-        console.log("Unable to get email for user ", err);
-        console.log(err);
-        console.log(err.stack);
-
-        throw err;
-      })
+      });
     })
     .spread(function(user, githubUser, email) {
       if(!email) throw "Unable to obtain email address for " + opts.username;
