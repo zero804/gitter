@@ -1,7 +1,7 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 'use strict';
 
-var github = require('octonode');
+var github = require('troupe-octonode');
 var assert = require('assert');
 var winston = require('winston');
 
