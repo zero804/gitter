@@ -16,9 +16,10 @@ define([
   'views/people/peopleCollectionView',
   'cocktail',
   'utils/uservoice',
-  'views/widgets/troupeAvatar'
+  'views/widgets/troupeAvatar',
+  './repoInfo'
 ], function($, Backbone, Marionette, TroupeViews, context, /*qq,*/ rightToolbarTemplate, itemCollections,
-   trpCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView, cocktail, userVoice, TroupeAvatar) {
+   trpCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView, cocktail, userVoice, TroupeAvatar, repoInfo) {
   "use strict";
 
   var RightToolbarLayout = Marionette.Layout.extend({
@@ -31,7 +32,8 @@ define([
       people: "#people-roster",
       // files: "#file-list",
       conversations: ".frame-conversations",
-      troupeAvatar: "#troupe-avatar-region"
+      troupeAvatar: "#troupe-avatar-region",
+      repo_info: "#repo-info"
     },
 
     initialize: function() {
@@ -160,6 +162,13 @@ define([
 
       // People View
       this.people.show(new PeopleCollectionView({ collection: userCollection }));
+
+      // Repo info
+      if (context().troupe.githubType === 'REPO') {
+        var repo = new repoInfo.model();
+        repo.fetch({data: $.param({repo: context().troupeUri})});
+        this.repo_info.show(new repoInfo.view({model: repo}));
+      }
 
       this.initHideListeners();
     },

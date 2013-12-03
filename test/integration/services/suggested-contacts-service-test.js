@@ -7,7 +7,7 @@ var fixtureLoader = require('../test-fixtures');
 
 var assert = require('assert');
 
-describe('Suggested Contact Service', function() {
+xdescribe('Suggested Contact Service', function() {
   describe('fetchSuggestedContactsForUser', function() {
     var fixture = {};
 

@@ -15,6 +15,16 @@ function uriContextResolverMiddleware(req, res, next) {
   return roomService.findOrCreateRoom(req.user, uri)
     .then(function(uriContext) {
       if(!uriContext.troupe && !uriContext.ownUrl) throw 404;
+
+      if(uriContext.hookCreationFailedDueToMissingScope) {
+        var events = req.session.events;
+        if(!events) {
+          events = [];
+          req.session.events = events;
+        }
+
+        events.push('hooks_require_additional_public_scope');
+      }
       req.troupe = uriContext.troupe;
       req.uriContext = uriContext;
       next();

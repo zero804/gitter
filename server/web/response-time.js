@@ -10,8 +10,11 @@ module.exports = function responseTime(winston) {
     if (res._responseTime) return next();
     res._responseTime = true;
 
-    res.on('header', function(){
+    res.on('header', function() {
       var duration = new Date() - start;
+
+      if(res.statusCode === 404 && req.url.match(/\.map$/))
+        return;
 
       winston.info('request', {
         method: req.method,

@@ -2,8 +2,9 @@
 "use strict";
 
 var troupeService = require("../../services/troupe-service");
+var roomService = require("../../services/room-service");
 var restSerializer = require("../../serializers/rest-serializer");
-var Fiber = require("../../utils/fiber");
+var Q = require('q');
 
 module.exports = {
   index: function(req, res, next) {
@@ -57,32 +58,33 @@ module.exports = {
   update: function(req, res, next) {
     var troupe = req.troupe;
     var updatedTroupe = req.body;
-    var name = updatedTroupe.name;
 
-    var f = new Fiber();
-
-    if(name) {
-      troupeService.updateTroupeName(troupe.id, name, f.waitor());
-    }
+    var promises = [];
 
     if(updatedTroupe.hasOwnProperty('favourite')) {
-      troupeService.updateFavourite(req.user.id, troupe.id, updatedTroupe.favourite, f.waitor());
+      promises.push(troupeService.updateFavourite(req.user.id, troupe.id, updatedTroupe.favourite));
     }
 
-    f.all().then(function() {
-      troupeService.findById(troupe.id, function(err, troupe) {
+    if(updatedTroupe.autoConfigureHooks) {
+      promises.push(roomService.applyAutoHooksForRepoRoom(req.user, troupe));
+    }
 
-        var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: false });
+    Q.all(promises)
+      .then(function() {
+        troupeService.findById(troupe.id, function(err, troupe) {
 
-        restSerializer.serialize(troupe, strategy, function(err, serialized) {
-          if(err) return next(err);
+          var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id, mapUsers: false });
 
-          res.send(serialized);
+          restSerializer.serialize(troupe, strategy, function(err, serialized) {
+            if(err) return next(err);
+
+            res.send(serialized);
+          });
+
         });
 
-      });
-
-    }, next);
+      })
+      .catch(next);
 
   },
 

@@ -96,7 +96,7 @@ UnconfirmedEmailSchema.schemaTypeName = 'UserEmailSchema';
 
 var UserSchema = new Schema({
   displayName: { type: String },
-  email: { type: String },                     // The primary email address
+  // email: { type: String },                     // The primary email address
   emails: [String],                            // Secondary email addresses
   // unconfirmedEmails: [UnconfirmedEmailSchema], // Unconfirmed email addresses
   username: { type: String, required: true },
@@ -128,6 +128,7 @@ var UserSchema = new Schema({
   permissions: {
     createRoom: { type: Boolean, 'default': false }
   },
+  githubScopes: {type: Schema.Types.Mixed },
   // usernameSuggestion: { type: String },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
@@ -136,6 +137,46 @@ UserSchema.index({ githubId: 1 }, { unique: true, sparse: true });
 UserSchema.index({ username: 1 }, { unique: true /*, sparse: true */});
 // UserSchema.index({ "emails.email" : 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
+
+UserSchema.methods.hasGitHubScope = function(scope) {
+  var githubScopes = this.githubScopes;
+
+  function hasScope() {
+    for(var i = 0; i < arguments.length; i++) {
+      if(githubScopes[arguments[i]]) return true;
+    }
+    return false;
+  }
+
+  if(!githubScopes) {
+    // Legacy user
+    return scope === 'user' ||
+             scope === 'repo'||
+             scope === 'user:email'||
+             scope === 'user:follow'||
+             scope === 'repo:status'||
+             scope === 'notifications';
+  }
+
+  // Crazy github rules codified here....
+  switch(scope) {
+    case 'notifications': return hasScope('notifications', 'repo');
+    case 'user:follow': return hasScope('user:follow', 'user');
+    case 'user:email': return hasScope('user:email', 'user');
+    case 'public_repo': return hasScope('public_repo', 'repo');
+    case 'repo:status': return hasScope('repo:status', 'repo');
+  }
+
+  // The less crazy case
+  return !!githubScopes[scope];
+};
+
+UserSchema.methods.getGitHubScopes = function() {
+  if(!this.githubScopes) return { 'user': true, 'repo': true };
+  return Object.keys(this.githubScopes);
+};
+
+
 
 UserSchema.methods.getDisplayName = function() {
   return this.displayName || this.username || this.email && this.email.split('@')[0] || "Unknown";
@@ -238,8 +279,10 @@ var TroupeSchema = new Schema({
   oneToOne: { type: Boolean, "default": false },
   users: [TroupeUserSchema],
   dateDeleted: { type: Date },
+  _nonce: { type: Number },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
+TroupeSchema.schemaTypeName = 'TroupeSchema';
 
 // Ideally we should never search against URI, only lcURI
 TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });

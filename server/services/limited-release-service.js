@@ -30,7 +30,8 @@ exports.shouldUserBeTurnedAway = function(user) {
         return { githubType: s.type, uri: s.uri };
       });
 
-      return persistence.Troupe.countQ({ $or: orTerms });
+      var countPromise = orTerms.length > 0 ? persistence.Troupe.countQ({ $or: orTerms }) : 0;
+      return countPromise;
     })
     .then(function(count) {
       // If rooms exist, let the user in

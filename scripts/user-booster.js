@@ -27,6 +27,11 @@ var opts = require("nomnom")
     default: 10,
     help: 'Email address of the user'
   })
+  .option('token', {
+    abbr: 't',
+    required: false,
+    help: 'Github token'
+  })
   .parse();
 
 
@@ -40,7 +45,8 @@ function die(error) {
 function boost(username, suggestedEmail) {
   return persistence.User.findOneQ({ username: username })
     .then(function(user) {
-      var userService = new GitHubUserService(user && user.githubToken ? user : null);
+      console.log('Found ', user);
+      var userService = new GitHubUserService(user && user.githubToken ? user : {githubToken : opts.token || null});
       return userService.getUser(username)
         .then(function(githubUser) {
           return [user, githubUser];
@@ -50,12 +56,12 @@ function boost(username, suggestedEmail) {
       if(!githubUser) throw "Not found";
 
       var emailPromise;
-      var meService = new GitHubMeService(user && user.githubToken ? user : null);
       if(suggestedEmail) {
         emailPromise = Q.resolve(suggestedEmail);
       } else if(user && user.emails && user.emails.length) {
         emailPromise = Q.resolve(user.emails[0]);
-      } else if(user && user.githubToken) {
+      } else if(user && user.githubToken && user.hasGitHubScope('user:email')) {
+        var meService = new GitHubMeService(user && user.githubToken ? user : null);
         emailPromise = meService.getEmails()
           .then(function(emails) {
             if(Array.isArray(emails)) {
@@ -117,8 +123,12 @@ function boostMany(count) {
     .limit(count)
     .execQ()
     .then(function(users) {
-      Q.all(users.map(function(user) {
+      console.log('Boosting ' + users.map(function(f) { return f.username; }).join(', '));
+      return Q.all(users.map(function(user) {
         return boost(user.username)
+          .then(function() {
+            console.log('Boosted ' + user.username);
+          })
           .fail(function(err) {
             console.error('Failed to boost ' + user.username + ':', err);
           });

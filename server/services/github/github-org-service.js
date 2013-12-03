@@ -1,17 +1,13 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var github = require('octonode');
-var publicClient = github.client();
 var Q = require('q');
-var assert = require('assert');
 var wrap = require('./github-cache-wrapper');
+var createClient = require('./github-client');
 
 function GitHubOrgService(user) {
-  assert(!user || user.githubToken, 'User must have a githubToken');
-
   this.user = user;
-  this.client = user ? github.client(user.githubToken) : publicClient;
+  this.client = createClient(user);
 }
 
 /**
@@ -59,5 +55,5 @@ GitHubOrgService.prototype.getRepos = function(org) {
 
 // module.exports = GitHubOrgService;
 module.exports = wrap(GitHubOrgService, function() {
-  return [this.user && this.user.username || ''];
+  return [this.user && this.user.githubToken || ''];
 });

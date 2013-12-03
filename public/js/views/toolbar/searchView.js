@@ -12,7 +12,8 @@ define([
 
     initialize: function(options) {
 
-      this.queries = {}; // { query: results }
+      this.user_queries = {}; 
+      this.repo_queries = {};
       this.troupes = options.troupes;
       this.collection = new Backbone.Collection();
       this.selectedIndex = 0;
@@ -70,9 +71,8 @@ define([
       }
 
       // filter the suggestions from the user search service
-      this.getSuggestions(query, function(suggestions) {
+      this.findUsers(query, function(suggestions) {
         var matches = suggestions.filter(isMatch);
-
 
         var troupes = _.map(matches, function(suggestion) {
 
@@ -91,28 +91,54 @@ define([
         });
 
         // add these results as extra's to the local search results
-        self.collection.add(troupes);
+        self.collection.add(_.compact(troupes));
       });
+
+      // filter the suggestions from the repo search service
+      this.findRepos(query, function(suggestions) {
+        var matches = suggestions.filter(isMatch);
+
+        var troupes = _.map(matches, function(suggestion) {
+
+          // check if this result already exists in the search results
+          var exists = !!self.collection.findWhere({ url: suggestion.url });
+
+          if (exists) {
+            return;
+          }
+
+          return new Backbone.Model({
+            id: suggestion.id,
+            name: suggestion.name,
+            url: suggestion.url,
+            ethereal: suggestion.room ? false : true
+          });
+        });
+
+        // add these results as extra's to the local search results
+        self.collection.add(_.compact(troupes));
+      });
+
 
       // set the initial local search results
       self.collection.reset(results);
       self.select(0);
     },
 
-    getSuggestions: function(query, callback) {
+    findUsers: function(query, callback) {
       var self = this;
 
       if (!query)
         return;
 
       // if we have done this query already, don't fetch it again (this could be problematic).
-      if (this.queries[query]) {
-        setTimeout(function() { callback(self.queries[query]); }, 0); // simulate async callback
+      if (this.user_queries[query]) {
+        setTimeout(function() { callback(self.user_queries[query]); }, 0); // simulate async callback
         return;
       }
 
       // if a superset of this query was empty, so is this one
-      var emptyPreviously = _.some(this.queries, function(v,k) {
+      var emptyPreviously = _.some(this.user_queries, function(v,k) {
         return query.toLowerCase().indexOf(k.toLowerCase()) === 0 && v.length === 0;
       });
 
@@ -123,16 +149,55 @@ define([
 
       $.ajax({ url: '/api/v1/user', data : { q: query, unconnected:1 }, success: function(data) {
         if (data.results) {
-          if (!self.queries[query]) self.queries[query] = [];
+          if (!self.user_queries[query]) self.user_queries[query] = [];
 
-          self.queries[query] = _.uniq(self.queries[query].concat(data.results), function(s) {
+          self.user_queries[query] = _.uniq(self.user_queries[query].concat(data.results), function(s) {
             return s.displayName;
           });
 
-          callback(self.queries[query]);
+          callback(self.user_queries[query]);
         }
       }});
     },
+
+    findRepos: function(query, callback) {
+      var self = this;
+
+      if (!query)
+        return;
+
+      // if we have done this query already, don't fetch it again (this could be problematic).
+      if (this.repo_queries[query]) {
+        setTimeout(function() { callback(self.repo_queries[query]); }, 0); // simulate async callback
+        return;
+      }
+
+      // if a superset of this query was empty, so is this one
+      var emptyPreviously = _.some(this.repo_queries, function(v,k) {
+        return query.toLowerCase().indexOf(k.toLowerCase()) === 0 && v.length === 0;
+      });
+
+      if (emptyPreviously) {
+        setTimeout(function() { callback([]); }, 0);
+        return;
+      }
+
+      $.ajax({ url: '/api/v1/search', data : { q: query }, success: function(data) {
+
+        if (data) {
+          if (!self.repo_queries[query]) self.repo_queries[query] = [];
+
+          _.each(data, function(repo) { repo.url = '/' + repo.name; }); 
+          
+          self.repo_queries[query] = _.uniq(self.repo_queries[query].concat(data), function(s) {
+            return s.name;
+          });
+
+          callback(self.repo_queries[query]);
+        }
+      }});
+    },
+
 
     keyPress: function(e) {
       this.keyNavigation(e);
