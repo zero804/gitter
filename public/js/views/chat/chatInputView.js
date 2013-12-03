@@ -30,8 +30,8 @@ define([
     if(!emojiListCache.length) {
       _.each(document.styleSheets, function(styleSheet) {
         _.each(styleSheet.cssRules, function(rules) {
-          if(rules.selectorText && rules.selectorText.indexOf('.emojify.') === 0) {
-            emojiListCache.push(rules.selectorText.substring(9));
+          if(rules.selectorText && rules.selectorText.indexOf('.emoji.') === 0) {
+            emojiListCache.push(rules.selectorText.substring(7));
           }
         });
       });
