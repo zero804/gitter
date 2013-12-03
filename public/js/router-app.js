@@ -159,7 +159,8 @@ require([
       text: 'Your room has been created, but we weren\'t able ' +
             'to integrate with the repository as we need write ' +
             'access to your GitHub repositories. Click here to ' +
-            'give Gitter access to do this.'
+            'give Gitter access to do this.',
+      timeout: 12000
     });
   }
 
