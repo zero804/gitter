@@ -54,3 +54,4 @@ v8.log
 .idea
 npm-debug.log
 docker_build
+npm-shrinkwrap.json
