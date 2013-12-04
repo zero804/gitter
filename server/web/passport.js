@@ -242,7 +242,7 @@ module.exports = {
               var githubUser = {
                 username:           profile._json.login,
                 displayName:        profile._json.name || profile._json.login,
-                email:              profile._json.email,
+                emails:             [profile._json.email],
                 gravatarImageUrl:   profile._json.avatar_url,
                 githubToken:        accessToken,
                 githubId:           profile._json.id,
@@ -250,6 +250,7 @@ module.exports = {
                 status:             'ACTIVE',
                 source:             'landing_github'
               };
+
 
               winston.verbose('About to create GitHub user ', githubUser);
 
