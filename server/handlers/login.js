@@ -10,10 +10,7 @@ module.exports = {
     //
     app.get('/login/github',
       function(req, res, next) {
-        var requestedScopes = ['user:email'];
-        req.session.githubRequestedScopes = requestedScopes;
-
-        passport.authorize('github', { scope: requestedScopes })(req, res, next);
+        passport.authorize('github')(req, res, next);
       },
       function() {});
 
@@ -55,7 +52,6 @@ module.exports = {
           }
 
           var requestedScopes = Object.keys(existing);
-          req.session.githubRequestedScopes = requestedScopes;
           req.session.githubScopeUpgrade = true;
 
           passport.authorize('github', { scope: requestedScopes })(req, res, next);

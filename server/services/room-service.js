@@ -49,7 +49,7 @@ function localUriLookup(uri) {
 function applyAutoHooksForRepoRoom(user, troupe) {
   assert(user, 'user is required');
   assert(troupe, 'troupe is required');
-  assert(troupe.githubType === 'REPO', 'Auto hooks can only be used on repo rooms');
+  assert(troupe.githubType === 'REPO', 'Auto hooks can only be used on repo rooms. This room is a ', troupe.githubType);
 
   winston.info("Requesting autoconfigured integrations");
 
@@ -140,11 +140,14 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
                 if(hasScope) {
                   winston.verbose('Upgrading requirements');
 
-                  /* Do this asynchronously */
-                  applyAutoHooksForRepoRoom(user, troupe)
-                    .catch(function(err) {
-                      winston.error("Unable to apply hooks for new room", { exception: err });
-                    });
+                  if(githubType === 'REPO') {
+                    /* Do this asynchronously */
+                    applyAutoHooksForRepoRoom(user, troupe)
+                      .catch(function(err) {
+                        winston.error("Unable to apply hooks for new room", { exception: err });
+                      });
+                  }
+
                 } else {
                   winston.verbose('Skipping hook creation. User does not have permissions');
                   hookCreationFailedDueToMissingScope = true;

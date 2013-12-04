@@ -187,9 +187,9 @@ module.exports = {
         callbackURL:  nconf.get('web:basepath') + '/login/callback',
         passReqToCallback: true
       },
-      function(req, accessToken, refreshToken, profile, done) {
-        var requestedScopes = req.session.githubRequestedScopes;
-        if(!requestedScopes) return done('Unable to determine requested scope');
+      function(req, accessToken, refreshToken, params, profile, done) {
+
+        var requestedScopes = params.scope.split(/,/);
         var scopeHash = requestedScopes.reduce(function(memo, v) { memo[v] = true; return memo; }, {});
 
         if (req.user) {
