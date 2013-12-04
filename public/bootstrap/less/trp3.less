@@ -20,7 +20,10 @@
 
 @import "trpInvites.less";
 
-@import "emoji/emojify.less";
+img.emoji {
+  height: 20px;
+  width: 20px;
+}
 
 .banner-red {
   background-color: fade(@trpRed, 90%);
@@ -119,9 +122,10 @@ header {
   text-align: left;
 
   .trpTroupeFavourite {
+    cursor: pointer;
     display: inline-block;
-    padding-left: 6px;
-    margin-right: 4px;
+    margin-left: 6px;
+    margin-right: 22px;
   }
 
   h1 {
@@ -154,6 +158,7 @@ header {
   }
 
   .dropdown-toggle {
+    cursor: pointer;
     opacity: 0.4;
     transition:all .5s ease-in-out;
   }
@@ -706,12 +711,14 @@ a.trpMiniLeftMenuItem {
 }
 
 .trpHomeContainer {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
   text-align: left;
   display: inline-block;
   width: 100%;
   height: 100%;
   overflow: auto;
-  padding-left: 40px;
+  padding: 0 40px;
   .trpBodyText;
 }
 
@@ -936,7 +943,6 @@ a.trpMiniLeftMenuItem {
 
 .trpTroupeFavourite i {
 	display: none;
-  padding-right: 10px;
   margin-top: 4px;
 }
 
@@ -945,7 +951,6 @@ i.favourited:before {
   /*content: '\e81a';*/
   content: '\e826';
   color: #f1c40f;
-  margin-right: 8px;
   width: 12px;
   font-size: 20px;
   transition:all .5s ease-in-out;
@@ -956,7 +961,6 @@ i.unfavourited:before {
   font-family: 'troupe-icons';
   /*content: '\e81a';*/
   content: '\e825';
-  margin-right: 8px;
   opacity: 0.3;
   width: 12px;
   font-size: 20px;
@@ -1224,7 +1228,7 @@ i.favourited:hover:before {
       width: 240px;
     }
 
-    #people-header, #request-header {
+    #people-header, #request-header, #repo-info {
       display: none;
     }
 

@@ -9,7 +9,7 @@ var TwitterText   =  require('./twitter-text');
  * Bump the version if you modify the behaviour of TwitterText.
  *
  */
-exports.metaDataVersion = 3;
+exports.metaDataVersion = 4;
 
 
 

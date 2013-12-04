@@ -2,7 +2,6 @@
 define([
   'log!chat-input',
   'jquery',
-  'underscore',
   'utils/context',
   'views/base',
   'utils/appevents',
@@ -13,9 +12,10 @@ define([
   'utils/safe-html',
   'utils/scrollbar-detect',
   'collections/instances/integrated-items',
+  './emoji_list',
   'jquery-textcomplete', // No ref
   'jquery-sisyphus' // No ref
-], function(log, $, _, context, TroupeViews, appEvents, template, listItemTemplate, emojiListItemTemplate, moment, safeHtml, hasScrollBars, itemCollections) {
+], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate, emojiListItemTemplate, moment, safeHtml, hasScrollBars, itemCollections, emojiList) {
   "use strict";
 
   /** @const */
@@ -23,22 +23,6 @@ define([
 
   /** @const */
   var EXTRA_PADDING = 20;
-
-  var emojiListCache = [];
-
-  function getEmojiList() {
-    if(!emojiListCache.length) {
-      _.each(document.styleSheets, function(styleSheet) {
-        _.each(styleSheet.cssRules, function(rules) {
-          if(rules.selectorText && rules.selectorText.indexOf('.emojify.') === 0) {
-            emojiListCache.push(rules.selectorText.substring(9));
-          }
-        });
-      });
-      emojiListCache = emojiListCache.sort();
-    }
-    return emojiListCache;
-  }
 
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
@@ -120,7 +104,6 @@ define([
             search: function(term, callback) {
               if(term.length < 1) return callback([]);
 
-              var emojiList = getEmojiList();
               var matches = emojiList.filter(function(emoji) {
                 return emoji.indexOf(term) === 0;
               });
