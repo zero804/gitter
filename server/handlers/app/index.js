@@ -20,7 +20,8 @@ module.exports = {
                 if(allow) {
                   return appRender.renderHomePage(req, res, next);
                 } else {
-                  return res.render('thanks');
+                  var email = req.user.emails[0];
+                  return res.render('thanks', { email: email, userEmailAccess: req.user.hasGitHubScope('user:email') });
                 }
               })
               .fail(next);

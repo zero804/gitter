@@ -28,7 +28,7 @@ function newUser(options, callback) {
   assert(githubId, 'githubId required');
   assert(options.githubToken, 'githubToken required');
   assert(options.username, 'username required');
-  var email   = options.email ? options.email.toLowerCase() : null;
+  var emails = options.emails || [];
 
   var insertFields = {
     githubId:           githubId,
@@ -36,7 +36,7 @@ function newUser(options, callback) {
     githubScopes:       options.githubScopes,
     gravatarImageUrl:   options.gravatarImageUrl,
     username:           options.username,
-    email:              email,
+    emails:             emails,
     displayName:        options.displayName,
     googleRefreshToken: options.googleRefreshToken || undefined
   };
