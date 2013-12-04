@@ -7,19 +7,19 @@ var _               = require("underscore");
 
 module.exports = function(req, res, next) {
 
-    repoService.getReposForUser(req.user)
-      .then(function(repos) {
-        var strategy = new restSerializer.GitHubRepoStrategy({ currentUserId: req.user.id });
+  repoService.getReposForUser(req.user)
+    .then(function(repos) {
+      var strategy = new restSerializer.GitHubRepoStrategy({ currentUserId: req.user.id });
 
-        var regexp = new RegExp(req.query.q);
-        var filtered_repos = _.filter(repos, function(repo) { return repo.name.match(regexp); });
+      var regexp = new RegExp(req.query.q, 'i');
+      var filtered_repos = _.filter(repos, function(repo) { return repo.name.match(regexp); });
 
-        restSerializer.serialize(filtered_repos, strategy, function(err, serialized) {
-          if(err) return next(err);
+      restSerializer.serialize(filtered_repos, strategy, function(err, serialized) {
+        if(err) return next(err);
 
-          res.send(serialized);
-        });
-      })
-      .fail(next);
+        res.send(serialized);
+      });
+    })
+    .fail(next);
 
 };
