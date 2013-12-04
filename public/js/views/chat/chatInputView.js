@@ -247,10 +247,39 @@ define([
       this.chatResizer.resizeInput();
     },
 
+    setTopic: function(topic) {
+      $.ajax({
+        url: '/api/v1/troupes/' + context.getTroupeId(),
+        contentType: "application/json",
+        dataType: "json",
+        type: "PUT",
+        data: JSON.stringify({ topic: topic })
+      });
+    },
+
+    handleCommands: function() {
+      if (this.$el.val().match(/^\/query @\w+/)) {
+        var user = this.$el.val().match(/\/query @(\w+)/)[1];
+        window.location = '/' + user;
+        return;
+      }
+
+      if (this.$el.val().match(/^\/topic \w+/)) {
+        var topic = this.$el.val().match(/\/topic (.+)/)[1];
+        this.setTopic(topic);
+        this.$el.val('');
+        //window.location.reload();
+        return;
+      }
+    },
+
+
     onKeyDown: function(e) {
       if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !this.$el.parent().find('.dropdown-menu').is(":visible")) {
         e.stopPropagation();
         e.preventDefault();
+
+        this.handleCommands();
 
         this.send();
         return;

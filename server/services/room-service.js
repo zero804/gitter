@@ -98,9 +98,9 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
 
   /* From here on we're going to be doing a create */
   return validateUri(user, uri)
-    .spread(function(githubType, officialUri) {
-      winston.verbose('URI validation ' + uri + ' returned ', { type: githubType, uri: officialUri });
+    .spread(function(githubType, officialUri, topic) {
 
+      winston.verbose('URI validation ' + uri + ' returned ', { type: githubType, uri: officialUri });
       /* If we can't determine the type, skip it */
       if(!githubType) return [null, false];
 
@@ -122,6 +122,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
                 uri: uri,
                 _nonce: nonce,
                 githubType: githubType,
+                topic: topic,
                 users:  user ? [{ _id: new ObjectID(), userId: user._id }] : []
               }
             },

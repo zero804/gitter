@@ -841,6 +841,7 @@ function TroupeStrategy(options) {
     return {
       id: item.id,
       name: troupeName,
+      topic: item.topic,
       uri: item.uri,
       avatarUrl: otherUser && otherUser.avatarUrlSmall || getDefaultTroupeAvatar(),
       oneToOne: item.oneToOne,

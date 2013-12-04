@@ -24,7 +24,7 @@ function validateUri(user, uri) {
       .then(function(org) {
         winston.verbose('URI ' + uri + ' is an org?' + !!org);
 
-        if(org) return ['ORG', org.login];
+        if(org) return ['ORG', org.login, org.name];
 
         return [];
       });
@@ -37,7 +37,7 @@ function validateUri(user, uri) {
       .then(function(repo) {
         winston.verbose('URI ' + uri + ' is a repo?' + !!repo);
 
-        if(repo) return ['REPO', repo.full_name];
+        if(repo) return ['REPO', repo.full_name, repo.description];
 
         return [];
       });

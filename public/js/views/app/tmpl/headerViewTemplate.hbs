@@ -1,0 +1,26 @@
+<div class="trpTroupeFavourite {{#if troupe.favourite}}favourited{{/if}}" id="favourite-button">
+    <div style="display: inline-block; vertical-align: middle">
+      <i class="trpHeaderFavIcon favourited" width="24" height="24"></i>
+      <i class="trpHeaderFavIcon unfavourited" width="24" height="24"></i>
+    </div>
+</div>
+<h1>{{troupe.uri}}</h1>
+<p id="trpTopic">{{{troupe.topic}}}</p>
+{{#unless troupe.oneToOne}}
+<div class="settingsCog">
+  <div class="dropdown">
+    <div class="dropdown-toggle" data-toggle="dropdown"></div>
+    <ul class="dropdown-menu" role="menu">
+      {{#if hellFreezesOver}}
+      <li><a role="menuitem" tabindex="-1" href="#|share">Add someone to this Troupe</a></li>
+      {{/if}}
+      <li><a role="menuitem" tabindex="-1" href="#|inv">Invite someone to this chat</a>
+      <li role="presentation" class="divider"></li>
+      <li><a role="menuitem" tabindex="-1" href="#|troupeSettings">Notifications</a></li>
+      <li><a role="menuitem" tabindex="-1" href="#|integrations">Integrations</a></li>
+      <li role="presentation" class="divider"></li>
+      <li><a role="menuitem" tabindex="-1" href="http://www.github.com/{{troupe.name}}" onclick="window.open('http://www.github.com/{{troupe.name}}')">Open in GitHub</a></li>
+    </ul>
+  </div>
+</div>
+{{/unless}}
