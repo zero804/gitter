@@ -108,8 +108,9 @@ define([
           });
         links = links.concat(issueLinks);
       }
+      var mentions = this.model.get('mentions') || [];
 
-      var richText = linkify(this.model.get('text'), links).toString();
+      var richText = linkify(this.model.get('text'), links, mentions).toString();
       richText = richText.replace(/\n\r?/g, '<br>');
       this.$el.find('.trpChatText').html(richText);
 
@@ -183,8 +184,8 @@ define([
     },
 
     highlightMention: function() {
-      var self = this;
-      _.each(this.model.get('mentions'), function(mention) {
+      var mentions = this.model.get('mentions') || [];
+      mentions.forEach(function(mention) {
         var re    = new RegExp(mention.screenName, 'i');
         var user  = context().user;
 
@@ -193,10 +194,10 @@ define([
         if (user)
         {
           if (user.username && (user.username.match(re) || user.displayName.match(re))) {
-            $(self.$el).find('.trpChatBox').addClass('mention');
+            this.$el.find('.trpChatBox').addClass('mention');
           }
         }
-      });
+      }, this);
     },
 
     detectKeys: function(e) {
