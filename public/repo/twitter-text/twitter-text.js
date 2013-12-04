@@ -155,6 +155,7 @@ define([], function (){
     // if (options.targetBlank) {
     //   attrs.target = '_blank';
     // }
+    options = clone(options || {});
     options.linkTag = 'span';
 
     return twttr.txt.linkToTextWithSymbol(entity, at, isList ? user + slashListname : user, attrs, options);
