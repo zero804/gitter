@@ -66,10 +66,10 @@ module.exports = function( grunt ) {
                   "../repo/requirejs/requirejs"
                 ]
               },
-              /*{
+              {
                   name: "signup",
                   exclude: ["core-libraries"]
-              },*/
+              },
               {
                   name: "router-app",
                   include: [
@@ -234,7 +234,7 @@ module.exports = function( grunt ) {
               create_source_map: 'public-processed/js/core-libraries.min.js.map',
             }
           },
-      // 'signup': createClosureConfig('signup'),
+      'signup': createClosureConfig('signup'),
       'router-app': createClosureConfig('router-app'),
       "router-homepage": createClosureConfig('router-homepage'),
       "homepage-mobile" : createClosureConfig('homepage-mobile'),

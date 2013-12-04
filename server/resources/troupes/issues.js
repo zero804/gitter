@@ -3,6 +3,19 @@
 
 var RepoService =  require('../../services/github/github-repo-service');
 
+function getEightSuggestedIssues(allIssues) {
+  return allIssues.slice(0, 8);
+}
+
+function getMatchingIssues(allIssues, term) {
+  var matches = allIssues.filter(function(issue) {
+    return (''+issue.number).indexOf(term) === 0;
+  }).sort(function(issueA, issueB) {
+    return issueA.number - issueB.number;
+  });
+  return matches;
+}
+
 module.exports = {
   index: function(req, res, next) {
     if(req.troupe.githubType != 'REPO') return res.send([]);
@@ -12,15 +25,9 @@ module.exports = {
     var repoName = req.troupe.uri;
 
     service.getIssues(repoName).then(function(issues) {
-      var matches = issues.filter(function(issue) {
-        return (''+issue.number).indexOf(term) === 0;
-      });
-
+      var matches = term.length ? getMatchingIssues(issues, term) : getEightSuggestedIssues(issues);
       res.send(matches);
     })
-    .fail(function(err) {
-      next(err);
-    });
-
+    .fail(next);
   }
 };

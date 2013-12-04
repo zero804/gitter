@@ -81,9 +81,10 @@ define([], function (){
     }
     var d = {
       text: text,
-      attr: twttr.txt.tagAttrs(attributes)
+      attr: twttr.txt.tagAttrs(attributes),
+      tag: options.linkTag || 'a'
     };
-    return stringSupplant("<a#{attr}>#{text}</a>", d);
+    return stringSupplant("<#{tag}#{attr}>#{text}</#{tag}>", d);
   };
 
   twttr.txt.autoLinkEntities = function(text, entities, options) {
@@ -129,8 +130,8 @@ define([], function (){
         result += twttr.txt.linkToUrl(entity, text, options);
       //} else if (entity.hashtag) {
       //  result += twttr.txt.linkToHashtag(entity, text, options);
-      //} else if (entity.screenName) {
-      //  result += twttr.txt.linkToMentionAndList(entity, text, options);
+      } else if (entity.screenName) {
+       result += twttr.txt.linkToMentionAndList(entity, text, options);
       //} else if (entity.cashtag) {
       //  result += twttr.txt.linkToCashtag(entity, text, options);
       }
@@ -138,6 +139,25 @@ define([], function (){
     }
     result += nonEntity(text.substring(beginIndex, text.length));
     return result;
+  };
+
+  twttr.txt.linkToMentionAndList = function(entity, text, options) {
+    var at = text.substring(entity.indices[0], entity.indices[0] + 1);
+    var user = twttr.txt.htmlEscape(entity.screenName);
+    var slashListname = twttr.txt.htmlEscape(entity.listSlug);
+    var isList = entity.listSlug && !options.suppressLists;
+    var attrs = clone(options.htmlAttrs || {});
+    attrs["class"] = (isList ? options.listClass : options.usernameClass);
+    // attrs.href = isList ? options.listUrlBase + user + slashListname : options.usernameUrlBase + user;
+    if (!isList && !options.suppressDataScreenName) {
+      attrs['data-screen-name'] = user;
+    }
+    // if (options.targetBlank) {
+    //   attrs.target = '_blank';
+    // }
+    options.linkTag = 'span';
+
+    return twttr.txt.linkToTextWithSymbol(entity, at, isList ? user + slashListname : user, attrs, options);
   };
 
   twttr.txt.linkToUrl = function(entity, text, options) {
@@ -179,6 +199,18 @@ define([], function (){
     }
 
     return twttr.txt.linkToText(entity, linkText, attrs, options);
+  };
+
+  twttr.txt.linkToTextWithSymbol = function(entity, symbol, text, attributes, options) {
+    var taggedSymbol = options.symbolTag ? "<" + options.symbolTag + ">" + symbol + "</"+ options.symbolTag + ">" : symbol;
+    text = twttr.txt.htmlEscape(text);
+    var taggedText = options.textWithSymbolTag ? "<" + options.textWithSymbolTag + ">" + text + "</"+ options.textWithSymbolTag + ">" : text;
+
+    if (options.usernameIncludeSymbol || !symbol.match(twttr.txt.regexen.atSigns)) {
+      return twttr.txt.linkToText(entity, taggedSymbol + taggedText, attributes, options);
+    } else {
+      return taggedSymbol + twttr.txt.linkToText(entity, taggedText, attributes, options);
+    }
   };
 
   return twttr;
