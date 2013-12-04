@@ -697,6 +697,19 @@ function updateFavourite(userId, troupeId, isFavourite, callback) {
     .nodeify(callback);
 }
 
+function updateTopic(troupeId, topic, callback) {
+  return findByIdRequired(troupeId)
+    .then(function(troupe) {
+      troupe.topic = topic;
+
+      return troupe.saveQ()
+        .then(function() {
+          return troupe;
+        });
+    })
+    .nodeify(callback);
+}
+
 function findFavouriteTroupesForUser(userId, callback) {
   return persistence.UserTroupeFavourites.findOneQ({ userId: userId})
     .then(function(userTroupeFavourites) {
@@ -968,6 +981,8 @@ module.exports = {
   indexTroupesByUserIdTroupeId: indexTroupesByUserIdTroupeId,
 
   addUserIdToTroupe: addUserIdToTroupe,
-  findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe
+  findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
+
+  updateTopic: updateTopic
 
 };
