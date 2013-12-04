@@ -1,5 +1,14 @@
-.trpChatBox.mention {
-  color: @trpGreen;
+
+.trpChatText .mention {
+  border: 1px solid fade(@trpGrey,50%);
+  background-color: fade(@trpGrey,20%);
+  border-radius: 2px;
+  padding: 1px 4px;
+}
+
+.trpChatBox.mention .trpChatText .mention {
+  border: 1px solid fade(@trpGreen, 50%);
+  background-color: fade(@trpGreen, 20%);
 }
 
 .trpChatContainer {
@@ -264,9 +273,6 @@
   .embed {
     border: 0px;
     margin-top: 5px;
-  }
-  .mention {
-    color: @trpGreen !important;
   }
   .rich {
     margin-top: 10px;
