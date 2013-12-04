@@ -21,7 +21,7 @@ define([
 
     render: function() {
       var room = this.model.toJSON();
-      room.topic = TwitterText.txt.autoLink(TwitterText.txt.htmlEscape(room.topic));
+      if (room.topic) room.topic = TwitterText.txt.autoLink(TwitterText.txt.htmlEscape(room.topic));
       var compiledTemplate = headerViewTemplate({troupe: room});
       $(this.el).html(compiledTemplate);
       return this;
