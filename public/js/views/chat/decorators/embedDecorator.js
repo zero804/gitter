@@ -8,7 +8,7 @@ define([
 
   function embed(chatItemView) {
     oEmbed.defaults.maxwidth = 370;
-    chatItemView.$el.find('.link').each(function(index, el) {
+    chatItemView.$el.find('a.link').each(function(index, el) {
       oEmbed.parse(el.href, function(embed) {
         if (embed) {
           $(el).append('<div class="embed">' + embed.html + '</div>');
