@@ -77,7 +77,7 @@ function boost(username, suggestedEmail) {
       });
     })
     .spread(function(user, githubUser, email) {
-      if(!email) throw "Unable to obtain email address for " + opts.username;
+      // if(!email) throw "Unable to obtain email address for " + opts.username;
 
       if(!user) {
         user = new persistence.User();
@@ -94,6 +94,11 @@ function boost(username, suggestedEmail) {
       });
     })
     .spread(function(user, githubUser, email) {
+      if(!email) {
+        console.log("User " + user.username + " not emailed as we had no address");
+      return;
+      }
+
       var d = Q.defer();
 
       mc.lists.subscribe({
