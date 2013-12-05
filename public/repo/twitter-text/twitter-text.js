@@ -92,8 +92,8 @@ define([], function (){
 
     options = clone(options || {});
 
-    //options.hashtagClass = options.hashtagClass || DEFAULT_HASHTAG_CLASS;
-    //options.hashtagUrlBase = options.hashtagUrlBase || "https://twitter.com/#!/search?q=%23";
+    options.hashtagClass = options.hashtagClass || DEFAULT_HASHTAG_CLASS;
+    options.hashtagUrlBase = options.hashtagUrlBase || "https://twitter.com/#!/search?q=%23";
     //options.cashtagClass = options.cashtagClass || DEFAULT_CASHTAG_CLASS;
     //options.cashtagUrlBase = options.cashtagUrlBase || "https://twitter.com/#!/search?q=%24";
     //options.listClass = options.listClass || DEFAULT_LIST_CLASS;
@@ -129,8 +129,8 @@ define([], function (){
 
       if (entity.url) {
         result += twttr.txt.linkToUrl(entity, text, options);
-      //} else if (entity.hashtag) {
-      //  result += twttr.txt.linkToHashtag(entity, text, options);
+      } else if (entity.hashtag) {
+       result += twttr.txt.linkToHashtag(entity, text, options);
       } else if (entity.screenName) {
        result += twttr.txt.linkToMentionAndList(entity, text, options);
       //} else if (entity.cashtag) {
@@ -213,6 +213,23 @@ define([], function (){
     } else {
       return taggedSymbol + twttr.txt.linkToText(entity, taggedText, attributes, options);
     }
+  };
+
+  twttr.txt.linkToHashtag = function(entity, text, options) {
+    var hash = text.substring(entity.indices[0], entity.indices[0] + 1);
+    var hashtag = twttr.txt.htmlEscape(entity.hashtag);
+    var attrs = clone(options.htmlAttrs || {});
+    attrs.href = options.hashtagUrlBase + hashtag;
+    attrs.title = "#" + hashtag;
+    attrs["class"] = options.hashtagClass;
+    // if (hashtag.charAt(0).match(twttr.txt.regexen.rtl_chars)){
+    //   attrs["class"] += " rtl";
+    // }
+    if (options.targetBlank) {
+      attrs.target = '_blank';
+    }
+
+    return twttr.txt.linkToTextWithSymbol(entity, hash, hashtag, attrs, options);
   };
 
   return twttr;
