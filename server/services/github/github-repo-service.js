@@ -47,7 +47,9 @@ GitHubIssueService.prototype.getIssues = function(repoName) {
     getIssuesWithState(repo, 'open'),
     getIssuesWithState(repo, 'closed')
     ]).spread(function(openIssues, closedIssues) {
-      return openIssues.concat(closedIssues);
+      return openIssues.concat(closedIssues).sort(function(a, b) {
+        return a.number - b.number;
+      });
     });
 };
 
