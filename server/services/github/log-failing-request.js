@@ -5,8 +5,9 @@ var winston    = require('winston');
 
 module.exports = exports = function(request) {
   return function requestWrapper(options, callback) {
+
     request(options, function (error, response, body) {
-      if(error) {
+      if(error || response.statusCode >= 400) {
         winston.error("Error while communicating with GitHub", {
           statusCode: response.statusCode,
           uri: options.uri || options.url,
