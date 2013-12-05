@@ -4,7 +4,6 @@
 var GitHubRepoService = require('./github/github-repo-service');
 var GitHubOrgService   = require('./github/github-org-service');
 var assert = require("assert");
-var _ = require("underscore");
 var winston = require('winston');
 
 function repoPermissionsModel(user, right, uri) {
