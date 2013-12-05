@@ -27,12 +27,12 @@ module.exports = {
               .fail(next);
           }
 
-          // if(req.isPhone) {
-          //   // TODO: this should change from chat-app to a seperate mobile app
-          //   appRender.renderAppPageWithTroupe(req, res, next, 'mobile/mobile-app');
-          // } else {
+          if(req.isPhone) {
+            // TODO: this should change from chat-app to a seperate mobile app
+            appRender.renderAppPageWithTroupe(req, res, next, 'mobile/mobile-app');
+          } else {
             appRender.renderAppPageWithTroupe(req, res, next, 'app-template');
-          // }
+          }
         });
 
       app.get('/:userOrOrg/:repo',
@@ -41,12 +41,12 @@ module.exports = {
         appMiddleware.uriContextResolverMiddleware,
         appMiddleware.isPhoneMiddleware,
         function(req, res, next) {
-          // if(req.isPhone) {
-          //   // TODO: this should change from chat-app to a seperate mobile app
-          //   appRender.renderAppPageWithTroupe(req, res, next, 'mobile/mobile-app');
-          // } else {
+          if(req.isPhone) {
+            // TODO: this should change from chat-app to a seperate mobile app
+            appRender.renderAppPageWithTroupe(req, res, next, 'mobile/mobile-app');
+          } else {
             appRender.renderAppPageWithTroupe(req, res, next, 'app-template');
-          // }
+          }
         });
 
 
