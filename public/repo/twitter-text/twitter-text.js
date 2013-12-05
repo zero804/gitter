@@ -5,7 +5,8 @@ define([], function (){
    *
    * This is a skimmed version of TwitterText to be used client-side. It
    * contains only the autoLinkEntities (and its helper functions) used by
-   * the linkify HandleBars helper.
+   * the linkify HandleBars helper. It is also modified for github style
+   * mentions and issues etc.
    *
    */
 
