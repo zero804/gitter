@@ -7,7 +7,7 @@ var troupeService = require("../../services/troupe-service"),
     _ = require("underscore");
 
 module.exports = {
-  id: 'resourceUser',
+  id: 'resourceTroupeUser',
 
   index: function(req, res, next) {
     var strategy = new restSerializer.UserIdStrategy( { showPresenceForTroupeId: req.troupe.id });
@@ -19,8 +19,8 @@ module.exports = {
   },
 
   destroy: function(req, res, next){
-    var user = req.resourceUser;
-    if(user.id != req.resourceUser.id) {
+    var user = req.resourceTroupeUser;
+    if(user.id != req.resourceTroupeUser.id) {
       // For now, you can only remove yourself from the room
       return next(401);
     }
