@@ -44,6 +44,63 @@ describe('github-org-service', function() {
       .nodeify(done);
   });
 
+
+  it('member should return false if a user is not in an org GITTERHQ', function(done) {
+    var gh = new GithubOrgService({ username: 'mbtesting', githubToken: 'e00b7680cd3665d50ebd6f0fe0ba3e49e2600c67'});
+
+    gh.member('gitterHQ','mbtesting')
+      .then(function(isMember) {
+        assert(!isMember);
+      })
+      .nodeify(done);
+  });
+
+
+  it('member should return false if a user is not in an org TROUPE', function(done) {
+    var gh = new GithubOrgService({ username: 'mbtesting', githubToken: 'e00b7680cd3665d50ebd6f0fe0ba3e49e2600c67'});
+
+    gh.member('troupe','mbtesting')
+      .then(function(isMember) {
+        assert(!isMember);
+      })
+      .nodeify(done);
+  });
+
+
+  it('member should return mtbtesting is not a member of ADOBE', function(done) {
+    var gh = new GithubOrgService({ username: 'mbtesting', githubToken: 'e00b7680cd3665d50ebd6f0fe0ba3e49e2600c67'});
+
+    gh.member('adobe','mbtesting')
+      .then(function(isMember) {
+        assert(!isMember);
+      })
+      .nodeify(done);
+  });
+
+
+  it('member should that suprememoocow is a member of gitterTest', function(done) {
+    var gh = new GithubOrgService({ username: 'suprememoocow', githubToken: '23cc53bcfa09e8ff22a03cf8a73e1115f987b0e6'});
+
+    gh.member('gitterTest','suprememoocow')
+      .then(function(isMember) {
+        assert(!isMember);
+      })
+      .nodeify(done);
+  });
+
+
+  it('member should that suprememoocow is not a member of gitterTest', function(done) {
+    var gh = new GithubOrgService({ username: 'suprememoocow', githubToken: '23cc53bcfa09e8ff22a03cf8a73e1115f987b0e6'});
+
+    gh.member('gitterTest','suprememoocow')
+      .then(function(isMember) {
+        assert(!isMember);
+      })
+      .nodeify(done);
+  });
+
+
+
   it('member should return true if a user is in an org', function(done) {
     var gh = new GithubOrgService(FAKE_USER);
 
@@ -53,6 +110,7 @@ describe('github-org-service', function() {
       })
       .nodeify(done);
   });
+
 
 
 
