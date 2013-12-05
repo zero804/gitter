@@ -87,7 +87,7 @@ util.inherits(Strategy, OAuth2Strategy);
  * @api protected
  */
 Strategy.prototype.userProfile = function(accessToken, done) {
-  if(!accessToken) return done(new InternalOAuthError('accessToken not supplied', err));
+  if(!accessToken) return done(new InternalOAuthError('accessToken not supplied'));
 
   this._oauth2.get(this._userProfileURL, accessToken, function (err, body, res) {
     if (err) { return done(new InternalOAuthError('failed to fetch user profile', err)); }
