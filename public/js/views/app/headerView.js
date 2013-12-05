@@ -4,9 +4,8 @@ define([
   'collections/instances/troupes',
   'jquery',
   'backbone',
-  'hbs!./tmpl/headerViewTemplate',
-  'twitter-text'
-], function(troupesCollection, $, Backbone, headerViewTemplate, TwitterText)  {
+  'hbs!./tmpl/headerViewTemplate'
+], function(troupesCollection, $, Backbone, headerViewTemplate)  {
   "use strict";
 
   var troupes = troupesCollection.troupes;
@@ -21,7 +20,6 @@ define([
 
     render: function() {
       var room = this.model.toJSON();
-      if (room.topic) room.topic = TwitterText.txt.autoLink(TwitterText.txt.htmlEscape(room.topic));
       var compiledTemplate = headerViewTemplate({troupe: room});
       $(this.el).html(compiledTemplate);
       return this;
