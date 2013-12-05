@@ -247,14 +247,6 @@ define([
       this.chatResizer.resizeInput();
     },
 
-    leaveRoom: function() {
-      $.ajax({
-        url: "/api/v1/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
-        data: "",
-        type: "DELETE",
-      });
-    },
-
     setTopic: function(topic) {
       $.ajax({
         url: '/api/v1/troupes/' + context.getTroupeId(),
@@ -268,8 +260,6 @@ define([
     handleCommands: function() {
       if (this.$el.val().match(/^\/query @\w+/)) {
         var user = this.$el.val().match(/\/query @(\w+)/)[1];
-        $('#chatInputForm').trigger('reset');
-        this.$el.val('');
         window.location = '/' + user;
         return;
       }
@@ -281,13 +271,6 @@ define([
         //window.location.reload();
         return;
       }
-
-      if (this.$el.val().match(/^\/leave/)) {
-        this.$el.val('');
-        this.leaveRoom();
-        return;
-      }
-
     },
 
 
