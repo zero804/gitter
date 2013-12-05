@@ -2,7 +2,6 @@
 "use strict";
 
 var Q = require('q');
-var autopage = require('auto-page');
 var wrap = require('./github-cache-wrapper');
 var createClient = require('./github-client');
 
@@ -28,20 +27,15 @@ GitHubIssueService.prototype.getRepo = function(repo) {
 };
 
 function getIssuesWithState(repo, state) {
-  return autopage(function(pageNumber, callback) {
-    var config = {
-      page: pageNumber,
-      per_page: 100,
-      state: state
-    };
-    repo.issues(config, function(err, data, header) {
-      var result = {
-        body: data,
-        header: header
-      };
-      callback(err, result);
-    });
+  var d = Q.defer();
+
+  repo.issues({ state: state }, function(err, body) {
+    if(err) return d.reject(err);
+
+    d.resolve(body);
   });
+
+  return d.promise;
 }
 
 /**

@@ -358,15 +358,6 @@ describe('troupe-service', function() {
 
     });
 
-    it('#02 should not remove a user from a troupe if the user is the last user in the troupe', function(done) {
-      var troupeService = testRequire('./services/troupe-service');
-
-      troupeService.removeUserFromTroupe(fixture.troupeForDeletion.id, fixture.user2.id, function(err) {
-        assert(err);
-        done();
-      });
-
-    });
   });
 
 

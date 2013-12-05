@@ -7,26 +7,32 @@ var troupeService = require("../../services/troupe-service"),
     _ = require("underscore");
 
 module.exports = {
-    index: function(req, res, next) {
-      var strategy = new restSerializer.UserIdStrategy( { showPresenceForTroupeId: req.troupe.id });
+  id: 'resourceTroupeUser',
 
-      restSerializer.serialize(req.troupe.getUserIds(), strategy, function(err, serialized) {
-        if(err) return next(err);
-        res.send(serialized);
-      });
-    },
+  index: function(req, res, next) {
+    var strategy = new restSerializer.UserIdStrategy( { showPresenceForTroupeId: req.troupe.id });
 
-    destroy: function(req, res, next){
-      var user = req.user; // NB NB NB, not the usual req.user, but the req.RESOURCEish user. Capish?
-      troupeService.removeUserFromTroupe(req.troupe._id, user.id, function (err) {
+    restSerializer.serialize(req.troupe.getUserIds(), strategy, function(err, serialized) {
       if(err) return next(err);
-        res.send({ success: true });
-      });
-    },
+      res.send(serialized);
+    });
+  },
 
-    load: function(req, id, callback) {
-      var userInTroupeId = _.find(req.troupe.getUserIds(), function(v) { return v == id;} );
-      userService.findById(userInTroupeId, callback);
+  destroy: function(req, res, next){
+    var user = req.resourceTroupeUser;
+    if(user.id != req.resourceTroupeUser.id) {
+      // For now, you can only remove yourself from the room
+      return next(401);
     }
+    troupeService.removeUserFromTroupe(req.troupe._id, user.id, function (err) {
+    if(err) return next(err);
+      res.send({ success: true });
+    });
+  },
+
+  load: function(req, id, callback) {
+    var userInTroupeId = _.find(req.troupe.getUserIds(), function(v) { return v == id;} );
+    userService.findById(userInTroupeId, callback);
+  }
 
 };

@@ -3,7 +3,7 @@
 
 // Measure request elapsed time.
 
-module.exports = function responseTime(winston) {
+module.exports = function responseTime(winston, minimal) {
   return function(req, res, next){
     var start = new Date();
 
@@ -16,14 +16,24 @@ module.exports = function responseTime(winston) {
       if(res.statusCode === 404 && req.url.match(/\.map$/))
         return;
 
-      winston.info('request', {
-        method: req.method,
-        status: res.statusCode,
-        url: req.url,
-        headers: req.headers['user-agent'],
-        duration: duration + 'ms',
-        ip: req.headers['x-forwarded-for'] || req.ip || 'unknown'
-      });
+      if(!minimal) {
+        winston.info('request', {
+          method: req.method,
+          status: res.statusCode,
+          url: req.url,
+          headers: req.headers['user-agent'],
+          duration: duration + 'ms',
+          ip: req.headers['x-forwarded-for'] || req.ip || 'unknown'
+        });
+      } else {
+        winston.verbose([
+          'request',
+          res.statusCode,
+          req.method,
+          req.url,
+          duration + 'ms'
+          ].join(' '));
+      }
     });
 
     next();
