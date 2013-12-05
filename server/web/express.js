@@ -37,7 +37,7 @@ function ios6PostCachingFix() {
 module.exports = {
   installFull: function(app, server, sessionStore) {
     function configureLogging() {
-      app.use(responseTime(winston));
+      app.use(responseTime(winston, nconf.get('logging:minimalAccess')));
     }
 
     handlebars.registerHelper('cdn', require('./hbs-helpers').cdn);

@@ -257,9 +257,21 @@ define([
       });
     },
 
+    leaveRoom: function() {
+      $.ajax({
+        url: "/api/v1/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
+        data: "",
+        type: "DELETE",
+      });
+    },
+
+
     handleCommands: function() {
       if (this.$el.val().match(/^\/query @\w+/)) {
         var user = this.$el.val().match(/\/query @(\w+)/)[1];
+        // this doesn't entire fix the issue of the chat not clearing properly
+        $('#chatInputForm').trigger('reset');
+        this.$el.val('');
         window.location = '/' + user;
         return;
       }
@@ -271,6 +283,13 @@ define([
         //window.location.reload();
         return;
       }
+
+      if (this.$el.val().match(/^\/leave/)) {
+        this.$el.val('');
+        this.leaveRoom();
+        return;
+      }
+
     },
 
 
