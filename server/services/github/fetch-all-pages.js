@@ -17,12 +17,12 @@ function updatePerPage(options) {
 
   uri.query.per_page = 100;
   delete uri.search;
-  uri = uri.format(uri);
+  uri = url.format(uri);
 
   if(options.uri) {
     options.uri = uri;
   } else if(options.url) {
-    options.uri = uri;
+    options.url = uri;
   }
 
   return options;
