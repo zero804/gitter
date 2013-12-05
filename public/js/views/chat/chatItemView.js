@@ -199,7 +199,6 @@ define([
         var issueNumber = $issue.text().substring(1);
         var url = '/api/v1/troupes/'+context().troupe.id+'/issues/'+issueNumber;
         $.get(url, function(issue) {
-          console.log(arguments);
           if(!issue.state) return;
 
           $issue.removeClass('open closed').addClass(issue.state);
