@@ -28,7 +28,6 @@ function newUser(options, callback) {
   assert(githubId, 'githubId required');
   assert(options.githubToken, 'githubToken required');
   assert(options.username, 'username required');
-  var emails = options.emails || [];
 
   var insertFields = {
     githubId:           githubId,
@@ -36,10 +35,12 @@ function newUser(options, callback) {
     githubScopes:       options.githubScopes,
     gravatarImageUrl:   options.gravatarImageUrl,
     username:           options.username,
-    emails:             emails,
-    displayName:        options.displayName,
-    googleRefreshToken: options.googleRefreshToken || undefined
+    displayName:        options.displayName
   };
+
+  if (options.emails && options.emails.length) {
+    insertFields.emails = options.emails;
+  }
 
   // Remove undefined fields
   Object.keys(insertFields).forEach(function(k) {
