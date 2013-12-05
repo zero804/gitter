@@ -74,7 +74,8 @@ require([
   troupeCollection.on("remove", function(model) {
     if(model.id == context.getTroupeId()) {
       // TODO: tell the person that they've been kicked out of the troupe
-      window.location.reload();
+      // window.location.reload();
+      window.location = '/' + context.user().get('username');
     }
   });
 
