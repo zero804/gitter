@@ -242,7 +242,7 @@ module.exports = {
               var githubUser = {
                 username:           profile._json.login,
                 displayName:        profile._json.name || profile._json.login,
-                emails:             [profile._json.email],
+                emails:             profile._json.email ? [profile._json.email] : [],
                 gravatarImageUrl:   profile._json.avatar_url,
                 githubToken:        accessToken,
                 githubId:           profile._json.id,
