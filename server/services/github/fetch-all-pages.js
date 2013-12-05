@@ -2,9 +2,10 @@
 'use strict';
 
 var parseLinks = require('parse-links');
-var url = require('url');
-var lazy = require('lazy.js');
-var winston = require('winston');
+var url        = require('url');
+var lazy       = require('lazy.js');
+var winston    = require('winston');
+var Q          = require('q');
 
 function updatePerPage(options) {
   if(options.method !== 'GET' && options.method !== undefined) return;
@@ -29,37 +30,26 @@ function updatePerPage(options) {
 }
 
 module.exports = exports = function(request) {
+  function subrequest(options) {
+    var d = Q.defer();
+
+    request(options, function (error, response, body) {
+      if(error) return d.reject(error);
+      d.resolve(JSON.parse(body));
+    });
+
+    return d.promise;
+  }
+
+
   return function requestWrapper(options, callback) {
-
-    /* Don't do multiple callbacks */
-    function callbackOnce(error, response, body) {
-      if(callback) {
-        var temp = callback;
-        callback = null;
-        temp(error, response, body);
-      }
-    }
-
     /* Always fetch 100 items per page */
     options = updatePerPage(options);
 
     request(options, function (error, response, body) {
-      if(error) return callbackOnce(error, response, body);
+      if(error) return callback(error, response, body);
 
       var remaining;
-
-      function subrequestComplete(pageNumber) {
-        return function (error, response, body) {
-          if(error) return callbackOnce(error, response, body);
-
-          pages[pageNumber - 1] = JSON.parse(body);
-
-          if(!--remaining) {
-            var all =lazy(pages).flatten().toArray();
-            callbackOnce(error, response, all);
-          }
-        };
-      }
 
       if(!response.headers.link) {
         return callback(error, response, body);
@@ -73,21 +63,32 @@ module.exports = exports = function(request) {
         if(lastPage > 1) {
           remaining = lastPage - 1;
 
-          var pages = [JSON.parse(body)];
-
           winston.info('Fetching another ' + (lastPage - 1)  + ' pages of results');
 
-          for(var i = 2; i <= lastPage; i++) {
-            var newQuery = lazy(lastParsed.query).assign({ page: i }).toObject();
-            var newUri = lazy(lastParsed).assign({ query: newQuery }).toObject();
-            var pageUrl = url.format(newUri);
-            var newOpts = lazy(options).assign({ url: pageUrl }).toObject();
-            request(newOpts, subrequestComplete(i));
-          }
+          var promises = lazy.range(1, lastPage + 1).map(function(i) {
+              if(i == 1) return JSON.parse(body);
 
+              var uri = url.parse(links.last, true);
+              delete uri.search;
+              uri.query.page = i;
+
+              var pageUrl = url.format(uri);
+
+              var clonedOptions = lazy(options).assign({ uri: pageUrl }).toObject();
+
+              return subrequest(clonedOptions);
+            }).toArray();
+
+          return Q.all(promises)
+            .then(function(results) {
+              var all = lazy(results).flatten().toArray();
+
+              callback(null, response, all);
+            })
+            .catch(function(error) {
+              callback(error);
+            });
         }
-
-        return;
       }
 
       return callback(error, response, body);
