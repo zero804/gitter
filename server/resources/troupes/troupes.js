@@ -92,13 +92,13 @@ module.exports = {
 
   },
 
-  destroy: function(req, res, next) {
-    troupeService.deleteTroupe(req.troupe, function(err) {
-      if(err) return next(err);
+  // destroy: function(req, res, next) {
+  //   troupeService.deleteTroupe(req.troupe, function(err) {
+  //     if(err) return next(err);
 
-      res.send({ success: true });
-    });
-  },
+  //     res.send({ success: true });
+  //   });
+  // },
 
   load: function(req, id, callback) {
     if(!req.user) return callback(401);

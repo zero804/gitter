@@ -306,9 +306,7 @@ function removeUserFromTroupe(troupeId, userId, callback) {
 
       // TODO: Let the user know that they've been removed from the troupe (via email or something)
       troupe.removeUserById(userId);
-      if(troupe.users.length === 0) {
-        return callback("Cannot remove the last user from a troupe");
-      }
+
       troupe.save(callback);
     });
   });
