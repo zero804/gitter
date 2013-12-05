@@ -2,6 +2,7 @@
 "use strict";
 
 var RepoService =  require('../../services/github/github-repo-service');
+var winston = require('winston');
 
 function getEightSuggestedIssues(allIssues) {
   return allIssues.slice(0, 8);
@@ -17,7 +18,7 @@ function getTopEightMatchingIssues(allIssues, term) {
 }
 
 module.exports = {
-  index: function(req, res, next) {
+  index: function(req, res) {
     if(req.troupe.githubType != 'REPO') return res.send([]);
 
     var term = req.query.q || '';
@@ -28,6 +29,9 @@ module.exports = {
       var matches = term.length ? getTopEightMatchingIssues(issues, term) : getEightSuggestedIssues(issues);
       res.send(matches);
     })
-    .fail(next);
+    .fail(function(err) {
+      winston.err('failed to find issues for ' + repoName, err);
+      res.send([]);
+    });
   }
 };
