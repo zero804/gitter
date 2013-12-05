@@ -272,7 +272,7 @@ TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
 //
 var TroupeSchema = new Schema({
   name: { type: String },
-  topic: { type: String },
+  topic: { type: String, 'default':'' },
   uri: { type: String },
   lcUri: { type: String, 'default': function() { return this.uri ? this.uri.toLowerCase() : null; }  },
   githubType: { type: String, 'enum': ['REPO', /*'USER',*/ 'ORG', 'ONETOONE'], required: true },
