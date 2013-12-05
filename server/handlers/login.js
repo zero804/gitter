@@ -72,7 +72,10 @@ module.exports = {
           return;
         }
 
-        res.redirect('/');
+        if(req.session.returnTo) {
+          res.redirect(req.session.returnTo);
+          return;
+        }
 
         var user = req.user;
         if(user) {
