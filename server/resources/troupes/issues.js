@@ -7,12 +7,12 @@ function getEightSuggestedIssues(allIssues) {
   return allIssues.slice(0, 8);
 }
 
-function getMatchingIssues(allIssues, term) {
+function getTopEightMatchingIssues(allIssues, term) {
   var matches = allIssues.filter(function(issue) {
     return (''+issue.number).indexOf(term) === 0;
   }).sort(function(issueA, issueB) {
     return issueA.number - issueB.number;
-  });
+  }).slice(0, 8);
   return matches;
 }
 
@@ -25,7 +25,7 @@ module.exports = {
     var repoName = req.troupe.uri;
 
     service.getIssues(repoName).then(function(issues) {
-      var matches = term.length ? getMatchingIssues(issues, term) : getEightSuggestedIssues(issues);
+      var matches = term.length ? getTopEightMatchingIssues(issues, term) : getEightSuggestedIssues(issues);
       res.send(matches);
     })
     .fail(next);

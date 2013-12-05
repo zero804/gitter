@@ -37,6 +37,7 @@ require([
   'views/chat/decorators/userDecorator',
   'views/chat/decorators/embedDecorator',
   'views/chat/decorators/emojiDecorator',
+  'views/app/headerView',
 
   'views/widgets/preload', // No ref
   'components/webNotifications', // No ref
@@ -55,7 +56,7 @@ require([
     shareSearchView, inviteView, createTroupeView, /*UsernameView,*/ troupeSettingsView,
     IntegrationSettingsModal, TroupeMenuView, /* ReinviteModal, */ Router,
     unreadItemsClient, FileDecorator, webhookDecorator, userDecorator,
-    embedDecorator, emojiDecorator /*, errorReporter , FilteredCollection */) {
+    embedDecorator, emojiDecorator, HeaderView /*, errorReporter , FilteredCollection */) {
   "use strict";
 
   // Make drop down menus drop down
@@ -65,6 +66,11 @@ require([
 
   var troupeCollection = troupeCollections.troupes;
 
+  var appView = new AppIntegratedView({ });
+
+  appView.leftMenuRegion.show(new TroupeMenuView({ }));
+  appView.rightToolbarRegion.show(new RightToolbarView());
+
   troupeCollection.on("remove", function(model) {
     if(model.id == context.getTroupeId()) {
       // TODO: tell the person that they've been kicked out of the troupe
@@ -72,11 +78,12 @@ require([
     }
   });
 
-
-  var appView = new AppIntegratedView({ });
-
-  appView.leftMenuRegion.show(new TroupeMenuView({ }));
-  appView.rightToolbarRegion.show(new RightToolbarView());
+  troupeCollection.on("add", function(model) {
+    if(model.id == context.getTroupeId()) {
+      var headerView = new HeaderView({model: model});
+      headerView.render();
+    }
+  });
 
   // instantiate user email collection
   // var userEmailCollection = new UserEmailCollection.UserEmailCollection();

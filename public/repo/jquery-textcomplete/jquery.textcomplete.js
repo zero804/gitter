@@ -12,22 +12,6 @@ define(["jquery"], function (jQuery){
   'use strict';
 
   /**
-   * Exclusive execution control utility.
-   */
-  var lock = function (func) {
-    var free, locked;
-    free = function () { locked = false; };
-    return function () {
-      var args;
-      if (locked) return;
-      locked = true;
-      args = toArray(arguments);
-      args.unshift(free);
-      func.apply(this, args);
-    };
-  };
-
-  /**
    * Convert arguments into a real array.
    */
   var toArray = function (args) {
@@ -186,13 +170,15 @@ define(["jquery"], function (jQuery){
         }
       },
 
-      searchCallbackFactory: function (free) {
+      searchCallbackFactory: function (term) {
         var self = this;
         return function (data, keep) {
+          // ignore old calbacks
+          if(term != self.term) return;
+
           self.renderList(data);
           if (!keep) {
             // This is the last callback for this search.
-            free();
             self.clearAtNext = true;
           }
         };
@@ -303,12 +289,12 @@ define(["jquery"], function (jQuery){
         return [];
       },
 
-      search: lock(function (free, searchQuery) {
+      search: function (searchQuery) {
         var term, strategy;
         this.strategy = searchQuery[0];
         term = searchQuery[1];
-        this.strategy.search(term, this.searchCallbackFactory(free));
-      })
+        this.strategy.search(term, this.searchCallbackFactory(term));
+      }
     });
 
     /**

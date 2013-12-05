@@ -56,6 +56,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
         login: login,
         bootScriptName: bootScript,
         troupeName: troupeContext.troupe.uri || troupeContext.troupe.name,
+        troupeTopic: troupeContext.troupe.topic,
         troupeContext: troupeContext,
         agent: req.headers['user-agent']
       });
