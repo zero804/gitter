@@ -97,9 +97,8 @@ define([
       if(message.error && message.error.indexOf('403::') === 0) {
         // More needs to be done here!
         log('Access denied', message);
-        debugger;
         //window.alert('Realtime communications with the server have been disconnected. Click OK to reload.');
-        log("Subscription failed. Reloading");
+        window.location.href = "/";
         //window.location = '/home';
       }
     }
@@ -145,7 +144,7 @@ define([
       if(error === '403') {
         log('Access denied. Will not retry');
         //window.location.reload();
-        debugger;
+        window.location.href = "/";
       }
     }
 
