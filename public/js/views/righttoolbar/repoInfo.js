@@ -16,7 +16,6 @@ define([
       this.listenTo(this.model, "change", this.render);
     },
     render: function() {
-      window.repo = this.model;
       var compiledTemplate = repoInfoTemplate(this.model.toJSON());
       $(this.el).html(compiledTemplate);
       return this;

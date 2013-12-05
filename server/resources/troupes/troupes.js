@@ -69,6 +69,10 @@ module.exports = {
       promises.push(roomService.applyAutoHooksForRepoRoom(req.user, troupe));
     }
 
+    if(updatedTroupe.hasOwnProperty('topic')) {
+      promises.push(troupeService.updateTopic(troupe.id, updatedTroupe.topic));
+    }
+
     Q.all(promises)
       .then(function() {
         troupeService.findById(troupe.id, function(err, troupe) {
