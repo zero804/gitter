@@ -37,7 +37,7 @@ module.exports = {
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         function(req, res, next) {
-          var scopes = req.query.scopes.split(/\s*,\s*/);
+          var scopes = req.query.scopes ? req.query.scopes.split(/\s*,\s*/) : '';
           var existing = req.user.githubScopes || { 'user': true, 'user:email': true, 'repo': true };
           var addedScopes = false;
 
