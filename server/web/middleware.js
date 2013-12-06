@@ -47,7 +47,26 @@ exports.ensureLoggedIn = function(options) {
   return [
     bearerAuthMiddleware,
     function(req, res, next) {
-      if (req.isAuthenticated && req.isAuthenticated()) return next();
+      if (req.isAuthenticated && req.isAuthenticated()) {
+        if(!req.user.githubToken && !req.user.githubUserToken) {
+          winston.verbose('Client needs to reauthenticate');
+          exports.logout()(req, res, function() {
+
+            // Are we dealing with an API client? Tell em in HTTP
+            if(req.accepts(['json','html']) === 'json') {
+              winston.error("Use no longer has a token");
+              res.send(401, { success: false, loginRequired: true });
+              return;
+            }
+
+            return res.relativeRedirect("/");
+          });
+
+          return;
+        }
+
+        return next();
+      }
 
       winston.verbose('Client needs to authenticate', options);
 
@@ -99,6 +118,8 @@ exports.logoutPreserveSession = function(req, res, done) {
     done();
   }
 };
+
+
 
 exports.logout = function() {
   return function(req, res, next) {

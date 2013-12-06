@@ -4,6 +4,8 @@
 var middleware  = require('../web/middleware');
 var passport    = require('passport');
 var winston     = require('winston');
+var client      = require("../utils/redis").createClient();
+var lock        = require("redis-lock")(client);
 
 module.exports = {
   install: function(app) {
@@ -70,13 +72,25 @@ module.exports = {
     app.get(
       '/login/callback',
       function(req, res, next) {
-        var handler;
-        if(req.session.githubScopeUpgrade) {
-          handler = passport.authorize('github_upgrade', { failureRedirect: '/login/upgrade-failed' });
-        } else {
-          handler = passport.authorize('github_user', { failureRedirect: '/' });
-        }
-        handler(req, res, next);
+        var code = req.query.code;
+
+        lock("oalock:" + code, function(done) {
+
+            var handler;
+            if(req.session.githubScopeUpgrade) {
+              handler = passport.authorize('github_upgrade', { failureRedirect: '/login/upgrade-failed' });
+            } else {
+              handler = passport.authorize('github_user', { failureRedirect: '/' });
+            }
+
+            handler(req, res, function(err) {
+              done();
+              next(err);
+            });
+
+        });
+
+
       },
 
       middleware.ensureLoggedIn(),

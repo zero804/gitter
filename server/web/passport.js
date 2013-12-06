@@ -1,18 +1,18 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var _                       = require('underscore');
-var userService             = require('../services/user-service');
-var passport                = require('passport');
-var winston                 = require('winston');
-var ClientPasswordStrategy  = require('passport-oauth2-client-password').Strategy;
-var BearerStrategy          = require('passport-http-bearer').Strategy;
-var oauthService            = require('../services/oauth-service');
-var statsService            = require("../services/stats-service");
-var nconf                   = require('../utils/config');
-var GoogleStrategy          = require('passport-google-oauth').OAuth2Strategy;
-var useragentStats          = require('./useragent-stats');
-var GitHubStrategy          = require('troupe-passport-github').Strategy;
+var _                      = require('underscore');
+var userService            = require('../services/user-service');
+var passport               = require('passport');
+var winston                = require('winston');
+var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
+var BearerStrategy         = require('passport-http-bearer').Strategy;
+var oauthService           = require('../services/oauth-service');
+var statsService           = require("../services/stats-service");
+var nconf                  = require('../utils/config');
+var GoogleStrategy         = require('passport-google-oauth').OAuth2Strategy;
+var useragentStats         = require('./useragent-stats');
+var GitHubStrategy         = require('troupe-passport-github').Strategy;
 
 module.exports = {
   install: function() {
