@@ -11,8 +11,11 @@ var logFailingRequest = require('./log-failing-request');
 function createClient(user) {
   assert(user && user.githubToken, 'User must have a githubToken');
 
-  // var client = github.client(user.githubToken, fetchAllPages(request));
-  var client = github.client(user.githubToken, logFailingRequest(request));
+  var client = github.client(user.githubToken,
+                  fetchAllPages(
+                  logFailingRequest(
+                  request)));
+
   return client;
 }
 
