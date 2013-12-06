@@ -175,10 +175,6 @@ module.exports = {
         return;
       }
 
-      next();
-    });
-
-    app.use(function(err, req, res, next) {
       var status = 500;
       var template = '500';
       var message = "An unknown error occurred";

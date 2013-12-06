@@ -42,7 +42,7 @@ module.exports = {
         function(req, res, next) {
           var scopes = req.query.scopes ? req.query.scopes.split(/\s*,\s*/) : [''];
           scopes.push('user'); // Always request user-scope
-          var existing = req.user.githubScopes || { 'user': true, 'user:email': true, 'repo': true };
+          var existing = req.user.githubScopes || { };
           var addedScopes = false;
 
           scopes.forEach(function(scope) {
