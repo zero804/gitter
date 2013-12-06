@@ -45,7 +45,7 @@ describe('github-org-service', function() {
   });
 
 
-  it('member should return false if a user is not in an org GITTERHQ', function(done) {
+  xit('member should return false if a user is not in an org GITTERHQ', function(done) {
     var gh = new GithubOrgService({ username: 'mbtesting', githubToken: 'e00b7680cd3665d50ebd6f0fe0ba3e49e2600c67'});
 
     gh.member('gitterHQ','mbtesting')
@@ -56,7 +56,7 @@ describe('github-org-service', function() {
   });
 
 
-  it('member should return false if a user is not in an org TROUPE', function(done) {
+  xit('member should return false if a user is not in an org TROUPE', function(done) {
     var gh = new GithubOrgService({ username: 'mbtesting', githubToken: 'e00b7680cd3665d50ebd6f0fe0ba3e49e2600c67'});
 
     gh.member('troupe','mbtesting')
@@ -67,7 +67,7 @@ describe('github-org-service', function() {
   });
 
 
-  it('member should return mtbtesting is not a member of ADOBE', function(done) {
+  xit('member should return mtbtesting is not a member of ADOBE', function(done) {
     var gh = new GithubOrgService({ username: 'mbtesting', githubToken: 'e00b7680cd3665d50ebd6f0fe0ba3e49e2600c67'});
 
     gh.member('adobe','mbtesting')
