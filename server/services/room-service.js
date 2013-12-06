@@ -122,7 +122,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
                 uri: uri,
                 _nonce: nonce,
                 githubType: githubType,
-                topic: topic,
+                topic: topic || "",
                 users:  user ? [{ _id: new ObjectID(), userId: user._id }] : []
               }
             },
