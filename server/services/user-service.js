@@ -26,11 +26,11 @@ function newUser(options, callback) {
   var githubId = options.githubId;
 
   assert(githubId, 'githubId required');
-  assert(options.githubToken, 'githubToken required');
   assert(options.username, 'username required');
 
   var insertFields = {
     githubId:           githubId,
+    githubUserToken:    options.githubUserToken,
     githubToken:        options.githubToken,
     githubScopes:       options.githubScopes,
     gravatarImageUrl:   options.gravatarImageUrl,
