@@ -12,7 +12,7 @@ var statsService            = require("../services/stats-service");
 var nconf                   = require('../utils/config');
 var GoogleStrategy          = require('passport-google-oauth').OAuth2Strategy;
 var useragentStats          = require('./useragent-stats');
-var GitHubStrategy          = require('passport-github').Strategy;
+var GitHubStrategy          = require('../passport-github').Strategy;
 
 module.exports = {
   install: function() {
@@ -242,7 +242,7 @@ module.exports = {
               var githubUser = {
                 username:           profile._json.login,
                 displayName:        profile._json.name || profile._json.login,
-                emails:             [profile._json.email],
+                emails:             profile._json.email ? [profile._json.email] : [],
                 gravatarImageUrl:   profile._json.avatar_url,
                 githubToken:        accessToken,
                 githubId:           profile._json.id,
