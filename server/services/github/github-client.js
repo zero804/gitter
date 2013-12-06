@@ -7,7 +7,6 @@ var request = require('request');
 var fetchAllPages = require('./fetch-all-pages');
 var logFailingRequest = require('./log-failing-request');
 
-
 function createClient(user, token) {
   assert(token, 'token required');
 

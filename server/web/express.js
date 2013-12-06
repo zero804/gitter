@@ -7,6 +7,7 @@ var nconf                         = require('../utils/config');
 var handlebars                    = require('handlebars');
 var expressHbs                    = require('express-hbs');
 var winston                       = require('winston');
+var middleware                    = require('./middleware');
 var fineuploaderExpressMiddleware = require('fineuploader-express-middleware');
 var fs                            = require('fs');
 var os                            = require('os');
@@ -148,6 +149,34 @@ module.exports = {
         });
       }).join('\n');
     }
+
+    app.use(function(err, req, res, next) {
+      if(err && err.gitterAction === 'logout_destroy_user_tokens') {
+
+        if(req.user) {
+
+          var user = req.user;
+
+          middleware.logout()(req, res, function() {
+            if(err) winston.warn('Unable to log user out');
+
+            user.githubToken = null;
+            user.githubUserToken = null;
+            user.githubScopes = null;
+            user.save(function() {
+
+              res.redirect('/');
+            });
+          });
+        } else {
+          res.redirect('/');
+        }
+
+        return;
+      }
+
+      next();
+    });
 
     app.use(function(err, req, res, next) {
       var status = 500;

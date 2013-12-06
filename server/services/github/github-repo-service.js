@@ -4,6 +4,7 @@
 var Q = require('q');
 var wrap = require('./github-cache-wrapper');
 var createClient = require('./github-client');
+var badCredentialsCheck = require('./bad-credentials-check');
 
 function GitHubRepoService(user) {
   this.user = user;
@@ -20,6 +21,7 @@ function GitHubRepoService(user) {
   var d = Q.defer();
   ghrepo.info(d.makeNodeResolver());
   return d.promise
+    .fail(badCredentialsCheck)
     .fail(function(err) {
       if(err.statusCode === 404) return;
       throw err;
@@ -35,7 +37,9 @@ function getIssuesWithState(repo, state) {
     d.resolve(body);
   });
 
-  return d.promise;
+  return d.promise
+    .fail(badCredentialsCheck);
+
 }
 
 /**
@@ -50,7 +54,9 @@ function getIssuesWithState(repo, state) {
       return openIssues.concat(closedIssues).sort(function(a, b) {
         return a.number - b.number;
       });
-    });
+    })
+    .fail(badCredentialsCheck);
+
 };
 
 
@@ -60,7 +66,9 @@ GitHubRepoService.prototype.getStarredRepos = function() {
   var ghme = this.client.me();
   ghme.starred(d.makeNodeResolver());
 
-  return d.promise;
+  return d.promise
+    .fail(badCredentialsCheck);
+
 };
 
 GitHubRepoService.prototype.getWatchedRepos = function() {
@@ -69,7 +77,8 @@ GitHubRepoService.prototype.getWatchedRepos = function() {
   var ghme = this.client.me();
   ghme.watched(d.makeNodeResolver());
 
-  return d.promise;
+  return d.promise
+    .fail(badCredentialsCheck);
 };
 
 GitHubRepoService.prototype.getRepos = function() {
@@ -78,7 +87,8 @@ GitHubRepoService.prototype.getRepos = function() {
   var ghme = this.client.me();
   ghme.repos(d.makeNodeResolver());
 
-  return d.promise;
+  return d.promise
+    .fail(badCredentialsCheck);
 };
 
 // module.exports = GitHubRepoService;
