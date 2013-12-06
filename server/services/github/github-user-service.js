@@ -7,7 +7,7 @@ var createClient = require('./github-client');
 
 function GitHubUserService(user) {
   this.user = user;
-  this.client = createClient(user);
+  this.client = createClient.user(user);
 }
 
 GitHubUserService.prototype.getUser = function(user) {
@@ -24,6 +24,6 @@ GitHubUserService.prototype.getUser = function(user) {
 };
 
 module.exports = wrap(GitHubUserService, function() {
-  return [this.user && this.user.githubToken || ''];
+  return [this.user && (this.user.githubUserToken || this.user.githubToken) || ''];
 });
 

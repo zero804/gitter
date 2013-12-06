@@ -79,7 +79,7 @@ function createIntegration(req, res) {
     // Pass through the token if we have write access
     // TODO: deal with private repos too
     if(req.user.hasGitHubScope('public_repo')) {
-      encryptedUserToken = jwt.encode(req.user.githubToken, nconf.get('jwt:secret'));
+      encryptedUserToken = jwt.encode(req.user.getGitHubToken('public_repo'), nconf.get('jwt:secret'));
     } else {
       encryptedUserToken = "";
     }

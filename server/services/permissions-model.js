@@ -56,7 +56,7 @@ function permissionsModel(user, right, uri, roomType) {
     return x;
   }
 
-  assert(!user || user.githubToken, 'User must have a githubToken');
+  assert(user, 'user required');
   assert(right, 'right required');
   assert(right === 'create' ||
     right === 'join', 'Invalid right ' + right);
