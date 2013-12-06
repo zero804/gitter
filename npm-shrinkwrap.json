@@ -1351,9 +1351,9 @@
       "from": "debug@~0.7.4"
     },
     "troupe-octonode": {
-      "version": "0.3.11",
-      "from": "troupe-octonode@latest",
-      "resolved": "https://registry.npmjs.org/troupe-octonode/-/troupe-octonode-0.3.11.tgz",
+      "version": "0.3.12",
+      "from": "troupe-octonode@0.3.12",
+      "resolved": "https://registry.npmjs.org/troupe-octonode/-/troupe-octonode-0.3.12.tgz",
       "dependencies": {
         "request": {
           "version": "2.27.0",
@@ -1455,9 +1455,9 @@
         }
       }
     },
-    "passport-github": {
-      "version": "0.1.5",
-      "from": "passport-github@~0.1.5",
+    "troupe-passport-github": {
+      "version": "0.1.7",
+      "from": "troupe-passport-github@0.1.7",
       "dependencies": {
         "pkginfo": {
           "version": "0.2.3",

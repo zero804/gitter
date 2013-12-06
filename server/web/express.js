@@ -153,6 +153,7 @@ module.exports = {
       var status = 500;
       var template = '500';
       var message = "An unknown error occurred";
+      var stack = err && err.stack;
 
       if(err.status) {
         status = err.status;
@@ -174,6 +175,7 @@ module.exports = {
 
       if(status === 404) {
         template = '404';
+        stack = null;
       }
 
       res.status(status);
@@ -184,8 +186,9 @@ module.exports = {
         res.render(template , {
           homeUrl : nconf.get('web:homeurl'),
           user: req.user,
+          userMissingPrivateRepoScope: req.user && !req.user.hasGitHubScope('repo'),
           message: message,
-          stack: nconf.get('express:showStack') && err && err.stack ? linkStack(err.stack) : null
+          stack: nconf.get('express:showStack') && stack ? linkStack(stack) : null
         });
       } else if (responseType === 'json') {
         res.send({ error: message });

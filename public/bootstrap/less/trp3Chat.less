@@ -8,8 +8,8 @@
 }
 
 .trpChatBox.mention .trpChatText .mention {
-  border: 1px solid fade(@trpGreen, 30%);
-  background-color: fade(@trpGreen, 20%);
+  border: 1px solid fade(@trpLightBlue, 20%);
+  background-color: fade(@trpLightBlue, 20%);
 }
 
 .trpChatText .issue {
@@ -18,6 +18,29 @@
   border-radius: 2px;
   padding: 1px 4px;
   font-size: 13px;
+  color: black;
+}
+
+a.issue:hover {
+  text-decoration: none;
+}
+
+.issue.open {
+  border: 1px solid fade(@trpGreen, 20%);
+  background-color: fade(@trpGreen, 20%);
+}
+
+.issue.open:hover {
+  background-color: fade(@trpGreen, 40%);
+}
+
+.issue.closed {
+  border: 1px solid fade(@trpRed, 20%);
+  background-color: fade(@trpRed, 20%);
+}
+
+.issue.closed:hover {
+  background-color: fade(@trpRed, 40%)
 }
 
 .trpChatContainer {
