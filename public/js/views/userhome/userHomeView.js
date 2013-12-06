@@ -31,7 +31,6 @@ define([
       this.orgs.show(new OrgCollectionView({ collection: troupeCollections.orgs, emptyView: Marionette.ItemView.extend({ template: userHomeEmptyOrgViewTemplate, serializeData: function() {
         var viewData = {};
         viewData.privateRepoScope = !!context.getUser().scopes.private_repo;
-        viewData.hello = "hello";
         return viewData;
       }}) }));
       this.repos.show(new RepoCollectionView({ collection: reposCollection }));
