@@ -3,6 +3,7 @@
 
 var middleware  = require('../web/middleware');
 var passport    = require('passport');
+var winston     = require('winston');
 
 module.exports = {
   install: function(app) {
@@ -85,5 +86,15 @@ module.exports = {
         }
       });
 
+    app.get(
+      '/login/callback',
+      /* 4-nary error handler for /login/callback */
+      function(err, req, res, next) {
+        winston.error("OAuth failed: " + err);
+        if(err.stack) {
+          winston.error("OAuth failure callback", err.stack);
+        }
+        res.redirect("/");
+      });
   }
 };
