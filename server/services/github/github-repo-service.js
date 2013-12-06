@@ -7,7 +7,7 @@ var createClient = require('./github-client');
 
 function GitHubIssueService(user) {
   this.user = user;
-  this.client = createClient(user);
+  this.client = createClient.full(user);
 }
 
 
@@ -55,5 +55,5 @@ GitHubIssueService.prototype.getIssues = function(repoName) {
 
 // module.exports = GitHubIssueService;
 module.exports = wrap(GitHubIssueService, function() {
-  return [this.user && this.user.githubToken || ''];
+  return [this.user && (this.user.githubToken || this.user.githubUserToken) || ''];
 });
