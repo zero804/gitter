@@ -10,18 +10,17 @@ require([
   'routers/userhome-router',
   'hbs!views/connect/tmpl/connectUserTemplate',
   'collections/instances/troupes',
-  'views/app/smartCollectionView',
+  // 'views/app/smartCollectionView',
   'components/errorReporter',
   'components/dozy',
   'components/webNotifications',
   'components/desktopNotifications',
   'template/helpers/all'
-], function(Backbone, TroupeViews, context, loginRequestTemplate,  AppIntegratedView, UserHomeView, TroupeMenuView, UserhomeRouter, connectUserTemplate, troupeCollections, SmartCollectionView /*, errorReporter , dozy, webNotifications,_Helpers*/) {
+], function(Backbone, TroupeViews, context, loginRequestTemplate,  AppIntegratedView, UserHomeView, TroupeMenuView, UserhomeRouter, connectUserTemplate, troupeCollections /*SmartCollectionView*/, errorReporter , dozy, webNotifications,_Helpers) {
 
   "use strict";
 
   var troupeCollection = troupeCollections.troupes;
-
   var appView = new AppIntegratedView();
   appView.leftMenuRegion.show(new TroupeMenuView());
 

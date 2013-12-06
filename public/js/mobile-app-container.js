@@ -7,9 +7,8 @@ define([
   'utils/is-android',
   'views/toolbar/troupeMenu',
   'marionette',
-  'views/app/mobileAppView',
-  'routers/mobile/web/mobile-app-router'
-  ], function($, Backbone, retina, mobileResizer, isAndroid, TroupeMenu, Marionette, MobileAppView, AppRouter) {
+  'views/app/mobileAppView'
+  ], function($, Backbone, retina, mobileResizer, isAndroid, TroupeMenu, Marionette, MobileAppView) {
   "use strict";
 
   new MobileAppView({

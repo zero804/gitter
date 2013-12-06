@@ -3,27 +3,30 @@ require([
   'jquery',
   'mobile-app-container',
   'collections/chat',
-  'collections/files',
+  // 'collections/files',
   'views/chat/chatCollectionView',
   'views/chat/chatInputView',
   'utils/router',
   'views/shareSearch/shareSearchView',
   'components/modal-region',
   'components/unread-items-client',
-  'views/chat/decorators/fileDecorator',
-  ], function($, app, chatModels, fileModels, ChatCollectionView, chatInputView, Router, shareSearchView,
-    modalRegion, unreadItemsClient, FileDecorator) {
+  // 'views/chat/decorators/fileDecorator',
+  ], function($, app, chatModels, /*fileModels,*/ ChatCollectionView, chatInputView, Router, shareSearchView,
+    modalRegion, unreadItemsClient /*FileDecorator*/) {
   "use strict";
 
   var chatCollection = new chatModels.ChatCollection();
   chatCollection.listen();
 
-  var fileCollection = new fileModels.FileCollection();
-  fileCollection.listen();
+
+
+
+  // var fileCollection = new fileModels.FileCollection();
+  // fileCollection.listen();
 
   var chatCollectionView = new ChatCollectionView({
-    collection: chatCollection,
-    decorators: [new FileDecorator(fileCollection)]
+    collection: chatCollection
+    // decorators: [new FileDecorator(fileCollection)]
   });
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
