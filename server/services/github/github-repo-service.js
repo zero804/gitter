@@ -23,7 +23,7 @@ function GitHubRepoService(user) {
   return d.promise
     .fail(badCredentialsCheck)
     .fail(function(err) {
-      if(err.statusCode === 404) return;
+      if(err.statusCode == 404) return;
       throw err;
     });
 };
