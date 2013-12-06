@@ -4,7 +4,6 @@
 "use strict";
 
 var persistence = require('../server/services/persistence-service');
-var GitHubUserService = require('../server/services/github/github-user-service');
 var GitHubMeService = require('../server/services/github/github-me-service');
 var Q = require('q');
 var mcapi = require('mailchimp-api');
