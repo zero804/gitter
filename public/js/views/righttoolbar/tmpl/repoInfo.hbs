@@ -2,10 +2,10 @@
 <p><small>{{language}}</small></p>
 <ul>
   {{#if has_issues}}
-  <li><a href="{{html_url}}/issues">Issues <span class="item-unread-badge trpTroupeUnreadCounter">{{open_issues}}</span></a></li>
+  <li><a href="{{html_url}}/issues">Issues <span class="item-unread-badge trpTroupeInfoBadge">{{open_issues}}</span></a></li>
   {{/if}}
-  <li><a href="{{html_url}}/watchers">Watchers <span class="item-unread-badge trpTroupeUnreadCounter">{{subscribers_count}}</span></a></li>
-  <li><a href="{{html_url}}/stargazers">Stargazers <span class="item-unread-badge trpTroupeUnreadCounter">{{stargazers_count}}</span></a></li>
+  <li><a href="{{html_url}}/watchers">Watchers <span class="item-unread-badge trpTroupeInfoBadge">{{subscribers_count}}</span></a></li>
+  <li><a href="{{html_url}}/stargazers">Stargazers <span class="item-unread-badge trpTroupeInfoBadge">{{stargazers_count}}</span></a></li>
   {{#if has_wiki}}
     <li><a href="{{html_url}}/wiki" targe="_blank">Wiki</a></li>
   {{/if}}
