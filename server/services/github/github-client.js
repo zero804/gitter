@@ -8,10 +8,10 @@ var fetchAllPages = require('./fetch-all-pages');
 var logFailingRequest = require('./log-failing-request');
 
 
-function createClient(user) {
-  assert(user && user.githubToken, 'User must have a githubToken');
+function createClient(user, token) {
+  assert(token, 'token required');
 
-  var client = github.client(user.githubToken,
+  var client = github.client(token,
                   fetchAllPages(
                   logFailingRequest(
                   request)));
@@ -19,4 +19,15 @@ function createClient(user) {
   return client;
 }
 
-module.exports = exports = createClient;
+module.exports = exports = {
+  user: function(user) {
+    assert(user, 'user required');
+    var token = user.githubUserToken || user.githubToken;
+    return createClient(user, token);
+  },
+  full: function(user) {
+    assert(user, 'user required');
+    var token = user.githubToken || user.githubUserToken;
+    return createClient(user, token);
+  }
+};

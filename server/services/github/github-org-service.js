@@ -7,7 +7,7 @@ var createClient = require('./github-client');
 
 function GitHubOrgService(user) {
   this.user = user;
-  this.client = createClient(user);
+  this.client = createClient.user(user);
 }
 
 /**
@@ -55,5 +55,5 @@ GitHubOrgService.prototype.getRepos = function(org) {
 
 // module.exports = GitHubOrgService;
 module.exports = wrap(GitHubOrgService, function() {
-  return [this.user && this.user.githubToken || ''];
+  return [this.user && (this.user.githubUserToken || this.user.githubToken) || ''];
 });

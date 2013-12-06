@@ -11,7 +11,7 @@ module.exports = {
     //
     app.get('/login/github',
       function(req, res, next) {
-        passport.authorize('github')(req, res, next);
+        passport.authorize('github_user', { scope: 'user' })(req, res, next);
       },
       function() {});
 
@@ -38,7 +38,8 @@ module.exports = {
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         function(req, res, next) {
-          var scopes = req.query.scopes ? req.query.scopes.split(/\s*,\s*/) : '';
+          var scopes = req.query.scopes ? req.query.scopes.split(/\s*,\s*/) : [''];
+          scopes.push('user'); // Always request user-scope
           var existing = req.user.githubScopes || { 'user': true, 'user:email': true, 'repo': true };
           var addedScopes = false;
 
@@ -52,18 +53,32 @@ module.exports = {
             return;
           }
 
-          var requestedScopes = Object.keys(existing);
+          var requestedScopes = Object.keys(existing).filter(function(f) { return !!f; });
           req.session.githubScopeUpgrade = true;
 
-          passport.authorize('github', { scope: requestedScopes })(req, res, next);
+          passport.authorize('github_upgrade', { scope: requestedScopes })(req, res, next);
         }
       );
 
+    app.get(
+      '/login/upgrade-failed',
+      function(req, res) {
+        res.render('github-upgrade-failed');
+      });
 
     // Welcome GitHub users.
     app.get(
       '/login/callback',
-      passport.authorize('github', { failureRedirect: '/' }),
+      function(req, res, next) {
+        var handler;
+        if(req.session.githubScopeUpgrade) {
+          handler = passport.authorize('github_upgrade', { failureRedirect: '/login/upgrade-failed' });
+        } else {
+          handler = passport.authorize('github_user', { failureRedirect: '/' });
+        }
+        handler(req, res, next);
+      },
+
       middleware.ensureLoggedIn(),
       middleware.generateRememberMeTokenMiddleware,
       function(req, res) {
