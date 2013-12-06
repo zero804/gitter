@@ -12,7 +12,7 @@ var statsService            = require("../services/stats-service");
 var nconf                   = require('../utils/config');
 var GoogleStrategy          = require('passport-google-oauth').OAuth2Strategy;
 var useragentStats          = require('./useragent-stats');
-var GitHubStrategy          = require('../passport-github').Strategy;
+var GitHubStrategy          = require('troupe-passport-github').Strategy;
 
 module.exports = {
   install: function() {
