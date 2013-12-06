@@ -5,7 +5,7 @@ var Q = require('q');
 var wrap = require('./github-cache-wrapper');
 var createClient = require('./github-client');
 
-function GitHubIssueService(user) {
+function GitHubRepoService(user) {
   this.user = user;
   this.client = createClient.full(user);
 }
@@ -15,7 +15,7 @@ function GitHubIssueService(user) {
  * Returns the information about the specified repo
  * @return the promise of information about a repo
  */
-GitHubIssueService.prototype.getRepo = function(repo) {
+ GitHubRepoService.prototype.getRepo = function(repo) {
   var ghrepo = this.client.repo(repo);
   var d = Q.defer();
   ghrepo.info(d.makeNodeResolver());
@@ -41,7 +41,7 @@ function getIssuesWithState(repo, state) {
 /**
  * Returns a promise of the issues for a repo
  */
-GitHubIssueService.prototype.getIssues = function(repoName) {
+ GitHubRepoService.prototype.getIssues = function(repoName) {
   var repo = this.client.repo(repoName);
   return Q.all([
     getIssuesWithState(repo, 'open'),
@@ -53,7 +53,35 @@ GitHubIssueService.prototype.getIssues = function(repoName) {
     });
 };
 
-// module.exports = GitHubIssueService;
-module.exports = wrap(GitHubIssueService, function() {
+
+GitHubRepoService.prototype.getStarredRepos = function() {
+  var d = Q.defer();
+
+  var ghme = this.client.me();
+  ghme.starred(d.makeNodeResolver());
+
+  return d.promise;
+};
+
+GitHubRepoService.prototype.getWatchedRepos = function() {
+  var d = Q.defer();
+
+  var ghme = this.client.me();
+  ghme.watched(d.makeNodeResolver());
+
+  return d.promise;
+};
+
+GitHubRepoService.prototype.getRepos = function() {
+  var d = Q.defer();
+
+  var ghme = this.client.me();
+  ghme.repos(d.makeNodeResolver());
+
+  return d.promise;
+};
+
+// module.exports = GitHubRepoService;
+module.exports = wrap(GitHubRepoService, function() {
   return [this.user && (this.user.githubToken || this.user.githubUserToken) || ''];
 });
