@@ -15,8 +15,6 @@ require([
     el: $('#troupeList')
   }).render();
 
-  document.getElementById('chat-amuse').style.display = 'none';
-
   new UserHomeView({
     el: $('#frame-chat')
   }).render();
