@@ -6,6 +6,7 @@ var passport    = require('passport');
 var winston     = require('winston');
 var client      = require("../utils/redis").createClient();
 var lock        = require("redis-lock")(client);
+var oauth2      = require('../web/oauth2');
 
 module.exports = {
   install: function(app) {
@@ -125,5 +126,20 @@ module.exports = {
         }
         res.redirect("/");
       });
+
+
+    // ----------------------------------------------------------
+    // OAuth for our own clients
+    // ----------------------------------------------------------
+
+    // Our clients
+    app.get('/login/oauth/authorize', oauth2.authorization);
+    app.post('/login/oauth/authorize/decision', oauth2.decision);
+    app.post('/login/oauth/token', oauth2.token);
+
+    app.get('/login/oauth/callback', function(req, res) {
+      res.send(200, 'Can I help you with something?');
+    });
+
   }
 };
