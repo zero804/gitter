@@ -6,39 +6,28 @@ require([
   'jquery',
   'backbone',
   'views/toolbar/troupeMenu',
-  'marionette',
   'views/app/mobileAppView'
-  ], function(UserhomeRouter, UserHomeView, modalRegion, $, Backbone, TroupeMenu, Marionette, MobileAppView) {
+  ], function(UserhomeRouter, UserHomeView, modalRegion, $, Backbone, TroupeMenu, MobileAppView) {
   "use strict";
 
   new MobileAppView({
     el: $('#mainPage')
   });
 
-  var app = new Marionette.Application();
+  new TroupeMenu({
+    el: $('#troupeList')
+  }).render();
 
-  app.addRegions({
-    content: '#frame-chat'
+  document.getElementById('chat-amuse').style.display = 'none';
+
+  new UserhomeRouter({
+    regions: [null, modalRegion]
   });
 
-  app.addInitializer(function() {
-      new TroupeMenu({
-        el: $('#troupeList')
-      }).render();
-  });
+  new UserHomeView({
+    el: $('#frame-chat')
+  }).render();
 
-  app.on('start', function(){
-    Backbone.history.start();
-  });
+  Backbone.history.start();
 
-  app.addInitializer(function() {
-    document.getElementById('chat-amuse').style.display = 'none';
-
-    new UserhomeRouter({
-      regions: [null, modalRegion]
-    });
-
-  });
-  app.content.show(new UserHomeView());
-  app.start();
 });
