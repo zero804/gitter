@@ -645,9 +645,18 @@
       }
     },
     "oauth2orize": {
-      "version": "0.1.0",
-      "from": "oauth2orize@0.1.0",
-      "resolved": "https://registry.npmjs.org/oauth2orize/-/oauth2orize-0.1.0.tgz"
+      "version": "1.0.0",
+      "from": "oauth2orize@latest",
+      "dependencies": {
+        "uid2": {
+          "version": "0.0.3",
+          "from": "uid2@0.0.x"
+        },
+        "utils-merge": {
+          "version": "1.0.0",
+          "from": "utils-merge@1.x.x"
+        }
+      }
     },
     "passport-http": {
       "version": "0.2.2",
@@ -1352,32 +1361,32 @@
     },
     "troupe-octonode": {
       "version": "0.3.12",
-      "from": "troupe-octonode@0.3.12",
+      "from": "https://registry.npmjs.org/troupe-octonode/-/troupe-octonode-0.3.12.tgz",
       "resolved": "https://registry.npmjs.org/troupe-octonode/-/troupe-octonode-0.3.12.tgz",
       "dependencies": {
         "request": {
           "version": "2.27.0",
-          "from": "request@2.27.x",
+          "from": "request@2.27.0",
           "dependencies": {
             "qs": {
               "version": "0.6.6",
-              "from": "qs@~0.6.0"
+              "from": "qs@0.6.6"
             },
             "json-stringify-safe": {
               "version": "5.0.0",
-              "from": "json-stringify-safe@~5.0.0"
+              "from": "json-stringify-safe@5.0.0"
             },
             "forever-agent": {
               "version": "0.5.0",
-              "from": "forever-agent@~0.5.0"
+              "from": "forever-agent@0.5.0"
             },
             "tunnel-agent": {
               "version": "0.3.0",
-              "from": "tunnel-agent@~0.3.0"
+              "from": "tunnel-agent@0.3.0"
             },
             "http-signature": {
               "version": "0.10.0",
-              "from": "http-signature@~0.10.0",
+              "from": "http-signature@0.10.0",
               "dependencies": {
                 "assert-plus": {
                   "version": "0.1.2",
@@ -1395,49 +1404,49 @@
             },
             "hawk": {
               "version": "1.0.0",
-              "from": "hawk@~1.0.0",
+              "from": "hawk@1.0.0",
               "dependencies": {
                 "hoek": {
                   "version": "0.9.1",
-                  "from": "hoek@0.9.x"
+                  "from": "hoek@0.9.1"
                 },
                 "boom": {
                   "version": "0.4.2",
-                  "from": "boom@0.4.x"
+                  "from": "boom@0.4.2"
                 },
                 "cryptiles": {
                   "version": "0.2.2",
-                  "from": "cryptiles@0.2.x"
+                  "from": "cryptiles@0.2.2"
                 },
                 "sntp": {
                   "version": "0.2.4",
-                  "from": "sntp@0.2.x"
+                  "from": "sntp@0.2.4"
                 }
               }
             },
             "aws-sign": {
               "version": "0.3.0",
-              "from": "aws-sign@~0.3.0"
+              "from": "aws-sign@0.3.0"
             },
             "oauth-sign": {
               "version": "0.3.0",
-              "from": "oauth-sign@~0.3.0"
+              "from": "oauth-sign@0.3.0"
             },
             "cookie-jar": {
               "version": "0.3.0",
-              "from": "cookie-jar@~0.3.0"
+              "from": "cookie-jar@0.3.0"
             },
             "mime": {
               "version": "1.2.11",
-              "from": "mime@~1.2.9"
+              "from": "mime@1.2.11"
             },
             "form-data": {
               "version": "0.1.2",
-              "from": "form-data@~0.1.0",
+              "from": "form-data@0.1.2",
               "dependencies": {
                 "combined-stream": {
                   "version": "0.0.4",
-                  "from": "combined-stream@~0.0.4",
+                  "from": "combined-stream@0.0.4",
                   "dependencies": {
                     "delayed-stream": {
                       "version": "0.0.5",
@@ -1451,7 +1460,7 @@
         },
         "randomstring": {
           "version": "1.0.2",
-          "from": "randomstring@1.x.x"
+          "from": "randomstring@1.0.2"
         }
       }
     },
