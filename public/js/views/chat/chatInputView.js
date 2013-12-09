@@ -24,6 +24,49 @@ define([
   /** @const */
   var EXTRA_PADDING = 20;
 
+  var commandsList = [
+    {
+      command: 'topic foo',
+      description: 'Set room topic to foo',
+      completion: 'topic ',
+      regexp: /^\/topic/,
+      action: function(view) {
+        var topicMatch = view.$el.val().match(/^\/topic (.+)/);
+        if (topicMatch) {
+          var topic = topicMatch[1];
+          view.setTopic(topic);
+          view.$el.val('');
+        }
+      }
+    },
+    {
+      command: 'query @user',
+      description: 'Go private with @user',
+      completion: 'query @',
+      regexp: /^\/query/,
+      action: function(view) {
+        var userMatch = view.$el.val().match(/\/query @(\w+)/);
+        if (!userMatch) return;
+        var user = userMatch[1];
+        // this doesn't entire fix the issue of the chat not clearing properly
+        $('#chatInputForm').trigger('reset');
+        view.$el.val('');
+        window.location = '/' + user;
+      }
+    },
+    {
+      command: 'leave',
+      description: 'Leave the room',
+      completion: 'leave ',
+      regexp: /^\/leave/,
+      action: function(view) {
+        console.debug(view);
+        view.$el.val('');
+        view.leaveRoom();
+      }
+    }
+  ];
+
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
 
@@ -117,7 +160,27 @@ define([
             replace: function (value) {
               return '$1:' + value + ': ';
             }
+          },
+          {
+            match: /(^|\s)\/(\w*)$/,
+            maxCount: 8,
+            search: function(term, callback) {
+              var matches = commandsList.filter(function(cmd) {
+                return cmd.command.indexOf(term) === 0;
+              });
+              callback(matches);
+            },
+            template: function(cmd) {
+              return listItemTemplate({
+                name: cmd.command,
+                description: cmd.description
+              });
+            },
+            replace: function (cmd) {
+              return '$1/' + cmd.completion;
+            }
           }
+
       ]);
 
       // http://stackoverflow.com/questions/16149083/keyboardshrinksview-makes-lose-focus/18904886#18904886
@@ -265,42 +328,22 @@ define([
       });
     },
 
-
-    handleCommands: function() {
-      if (this.$el.val().match(/^\/query @\w+/)) {
-        var user = this.$el.val().match(/\/query @(\w+)/)[1];
-        // this doesn't entire fix the issue of the chat not clearing properly
-        $('#chatInputForm').trigger('reset');
-        this.$el.val('');
-        window.location = '/' + user;
-        return;
-      }
-
-      if (this.$el.val().match(/^\/topic \w+/)) {
-        var topic = this.$el.val().match(/\/topic (.+)/)[1];
-        this.setTopic(topic);
-        this.$el.val('');
-        //window.location.reload();
-        return;
-      }
-
-      if (this.$el.val().match(/^\/leave/)) {
-        this.$el.val('');
-        this.leaveRoom();
-        return;
-      }
-
-    },
-
-
     onKeyDown: function(e) {
       if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !this.$el.parent().find('.dropdown-menu').is(":visible")) {
         e.stopPropagation();
         e.preventDefault();
 
-        this.handleCommands();
+        var cmdsMatched = _.map(commandsList, function(cmd) {
+          if (this.$el.val().match(cmd.regexp)) {
+            cmd.action(this);
+            return true;
+          } else {
+            return false;
+          }
+        }, this);
 
-        this.send();
+        if (!_.some(cmdsMatched)) this.send();
+
         return;
       }
     },
