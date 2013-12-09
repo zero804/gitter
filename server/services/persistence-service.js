@@ -124,6 +124,7 @@ var UserSchema = new Schema({
   // },
   googleRefreshToken: String,
   githubToken: { type: String },
+  githubUserToken: { type: String }, // The scope for this token will always be 'user'
   githubId: {type: Number },
   permissions: {
     createRoom: { type: Boolean, 'default': false }
@@ -138,8 +139,23 @@ UserSchema.index({ username: 1 }, { unique: true /*, sparse: true */});
 // UserSchema.index({ "emails.email" : 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
 
+var LEGACY_DEFAULT_SCOPE = {'user': 1, 'user:email': 1, 'user:follow':1, 'repo':1, 'public_repo': 1};
+
 UserSchema.methods.hasGitHubScope = function(scope) {
+  var githubToken = this.githubToken;
   var githubScopes = this.githubScopes;
+  var githubUserToken = this.githubUserToken;
+
+  if(!githubUserToken && !githubToken) {
+    return false;
+  }
+
+  // Get the simple case out the way
+  if(githubUserToken && (scope === 'user' ||
+             scope === 'user:email'||
+             scope === 'user:follow')) {
+    return true;
+  }
 
   function hasScope() {
     for(var i = 0; i < arguments.length; i++) {
@@ -149,13 +165,11 @@ UserSchema.methods.hasGitHubScope = function(scope) {
   }
 
   if(!githubScopes) {
-    // Legacy user
-    return scope === 'user' ||
-             scope === 'repo'||
-             scope === 'user:email'||
-             scope === 'user:follow'||
-             scope === 'repo:status'||
-             scope === 'notifications';
+    if(githubToken) {
+      return !!LEGACY_DEFAULT_SCOPE[scope];
+    }
+    // Legacy users will need to reauthenticate unfortunately
+    return false;
   }
 
   // Crazy github rules codified here....
@@ -172,11 +186,34 @@ UserSchema.methods.hasGitHubScope = function(scope) {
 };
 
 UserSchema.methods.getGitHubScopes = function() {
-  if(!this.githubScopes) return { 'user': true, 'repo': true };
-  return Object.keys(this.githubScopes);
+  if(!this.githubScopes) {
+    if(this.githubUserToken) {
+      return Object.keys(LEGACY_DEFAULT_SCOPE);
+    } else {
+      return [];
+    }
+  }
+
+  var scopes = Object.keys(this.githubScopes);
+  if(!this.githubUserToken) {
+    return scopes;
+  }
+
+  return scopes.concat(['user', 'user:email', 'user:follow']);
 };
 
+UserSchema.methods.getGitHubToken = function(scope) {
+  if(!scope) return this.githubToken || this.githubUserToken;
 
+  switch(scope) {
+    case 'user':
+    case 'user:email':
+    case 'user:follow':
+      return this.githubUserToken || this.githubToken;
+  }
+
+  return this.githubToken || this.githubUserToken;
+};
 
 UserSchema.methods.getDisplayName = function() {
   return this.displayName || this.username || this.email && this.email.split('@')[0] || "Unknown";
@@ -272,7 +309,7 @@ TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
 //
 var TroupeSchema = new Schema({
   name: { type: String },
-  topic: { type: String },
+  topic: { type: String, 'default':'' },
   uri: { type: String },
   lcUri: { type: String, 'default': function() { return this.uri ? this.uri.toLowerCase() : null; }  },
   githubType: { type: String, 'enum': ['REPO', /*'USER',*/ 'ORG', 'ONETOONE'], required: true },

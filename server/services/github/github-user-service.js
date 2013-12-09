@@ -4,10 +4,11 @@
 var Q = require('q');
 var wrap = require('./github-cache-wrapper');
 var createClient = require('./github-client');
+var badCredentialsCheck = require('./bad-credentials-check');
 
 function GitHubUserService(user) {
   this.user = user;
-  this.client = createClient(user);
+  this.client = createClient.user(user);
 }
 
 GitHubUserService.prototype.getUser = function(user) {
@@ -17,6 +18,7 @@ GitHubUserService.prototype.getUser = function(user) {
   ghuser.info(d.makeNodeResolver());
 
   return d.promise
+    .fail(badCredentialsCheck)
     .fail(function(err) {
       if(err.statusCode === 404) return null;
       throw err;
@@ -24,6 +26,6 @@ GitHubUserService.prototype.getUser = function(user) {
 };
 
 module.exports = wrap(GitHubUserService, function() {
-  return [this.user && this.user.githubToken || ''];
+  return [this.user && (this.user.githubUserToken || this.user.githubToken) || ''];
 });
 

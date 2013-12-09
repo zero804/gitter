@@ -4,10 +4,11 @@
 var Q = require('q');
 var wrap = require('./github-cache-wrapper');
 var createClient = require('./github-client');
+var badCredentialsCheck = require('./bad-credentials-check');
 
-function GitHubIssueService(user) {
+function GitHubRepoService(user) {
   this.user = user;
-  this.client = createClient(user);
+  this.client = createClient.full(user);
 }
 
 
@@ -15,13 +16,14 @@ function GitHubIssueService(user) {
  * Returns the information about the specified repo
  * @return the promise of information about a repo
  */
-GitHubIssueService.prototype.getRepo = function(repo) {
+ GitHubRepoService.prototype.getRepo = function(repo) {
   var ghrepo = this.client.repo(repo);
   var d = Q.defer();
   ghrepo.info(d.makeNodeResolver());
   return d.promise
+    .fail(badCredentialsCheck)
     .fail(function(err) {
-      if(err.statusCode === 404) return;
+      if(err.statusCode == 404) return;
       throw err;
     });
 };
@@ -35,23 +37,61 @@ function getIssuesWithState(repo, state) {
     d.resolve(body);
   });
 
-  return d.promise;
+  return d.promise
+    .fail(badCredentialsCheck);
+
 }
 
 /**
  * Returns a promise of the issues for a repo
  */
-GitHubIssueService.prototype.getIssues = function(repoName) {
+ GitHubRepoService.prototype.getIssues = function(repoName) {
   var repo = this.client.repo(repoName);
   return Q.all([
     getIssuesWithState(repo, 'open'),
     getIssuesWithState(repo, 'closed')
     ]).spread(function(openIssues, closedIssues) {
-      return openIssues.concat(closedIssues);
-    });
+      return openIssues.concat(closedIssues).sort(function(a, b) {
+        return a.number - b.number;
+      });
+    })
+    .fail(badCredentialsCheck);
+
 };
 
-// module.exports = GitHubIssueService;
-module.exports = wrap(GitHubIssueService, function() {
-  return [this.user && this.user.githubToken || ''];
+
+GitHubRepoService.prototype.getStarredRepos = function() {
+  var d = Q.defer();
+
+  var ghme = this.client.me();
+  ghme.starred(d.makeNodeResolver());
+
+  return d.promise
+    .fail(badCredentialsCheck);
+
+};
+
+GitHubRepoService.prototype.getWatchedRepos = function() {
+  var d = Q.defer();
+
+  var ghme = this.client.me();
+  ghme.watched(d.makeNodeResolver());
+
+  return d.promise
+    .fail(badCredentialsCheck);
+};
+
+GitHubRepoService.prototype.getRepos = function() {
+  var d = Q.defer();
+
+  var ghme = this.client.me();
+  ghme.repos(d.makeNodeResolver());
+
+  return d.promise
+    .fail(badCredentialsCheck);
+};
+
+// module.exports = GitHubRepoService;
+module.exports = wrap(GitHubRepoService, function() {
+  return [this.user && (this.user.githubToken || this.user.githubUserToken) || ''];
 });

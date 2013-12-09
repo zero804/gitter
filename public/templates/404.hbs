@@ -10,6 +10,23 @@
 
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
     <link rel="shortcut icon" href='{{cdn "images/2/gitter/favicon5-error.png" }}'>
+
+    <script type="text/javascript">
+    window.addEventListener("message", function(e) {
+      if(e.data !== "oauth_upgrade_complete") return;
+      window.location.reload(true);
+    }, false);
+
+    $(document).ready(function() {
+      $('#upgrade').on('click', function(e) {
+        e.preventDefault();
+        window.open('/login/upgrade?scopes=repo');
+      });
+    });
+
+    </script>
+
+
     <style type="text/css">
       body {
         background-color: #ecf1ec;
@@ -49,7 +66,7 @@
       .error-input:focus {
         border: 0;
         outline: 0;
-        
+
       }
 
       a {
@@ -71,6 +88,13 @@
     <div class="error">
       Gitter<br>
       <input id="error-text" class="error-input" size="55"><br><br>
+
+      {{#if userMissingPrivateRepoScope}}
+      <p>If you're looking to access a private repository, you will need to upgrade your GitHub authentication to
+        allow us to access the list of your private repositories.</p>
+      <p><a id="upgrade" href="/login/upgrade?scopes=repo">Click here to do this now.</a></p>
+      {{/if}}
+
       {{#if stack}}
       <pre style="font-size:small">{{{stack}}}</pre>
       {{/if}}
