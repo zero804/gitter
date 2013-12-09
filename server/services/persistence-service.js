@@ -151,11 +151,10 @@ UserSchema.methods.hasGitHubScope = function(scope) {
   }
 
   // Get the simple case out the way
-  if(githubUserToken && !githubUserToken) {
-    /* There can be only one */
-    return scope === 'user' ||
+  if(githubUserToken && (scope === 'user' ||
              scope === 'user:email'||
-             scope === 'user:follow';
+             scope === 'user:follow')) {
+    return true;
   }
 
   function hasScope() {
