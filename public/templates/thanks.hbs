@@ -110,22 +110,7 @@ p {
             <br>We are adding new users every day on a first come first serve basis.
             <br>
             <br>
-            {{#if userEmailAccess}}
             <p id="upgrade-complete">Keep an eye out for your invite!<p>
-            {{else}}
-            {{#if email}}
-            <div id="upgrade-div">
-
-            <p>We can see from your GitHub public profile that your email address is &ldquo;<strong>{{email}}</strong>&rdquo;. We will email you at this address with your invite when it's your turn.</p>
-            <p><a id="upgrade" href="#" style="color:white">Alternatively, click here to allow us to access your private email addresses on GitHub, and we'll email you using that.<a/>
-            {{else}}
-            <p><a id="upgrade" href="#"  style="color:white">Click here if you would like us to email you when invite is ready. We'll use one of your confirmed GitHub private email addresses.</a></p>
-            {{/if}}
-            </div>
-
-            <p id="upgrade-complete" style="display:none">Thanks. Keep an eye out for your invite!<p>
-            {{/if}}
-
             </div>
           <div></div>
     <div class="strip" style="padding-bottom: 60px"></div>
