@@ -1,32 +1,47 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'jquery',
-  'mobile-app-container',
   'collections/chat',
-  // 'collections/files',
   'views/chat/chatCollectionView',
   'views/chat/chatInputView',
   'utils/router',
   'views/shareSearch/shareSearchView',
   'components/modal-region',
   'components/unread-items-client',
-  // 'views/chat/decorators/fileDecorator',
-  ], function($, app, chatModels, /*fileModels,*/ ChatCollectionView, chatInputView, Router, shareSearchView,
-    modalRegion, unreadItemsClient /*FileDecorator*/) {
+  'backbone',
+  'views/toolbar/troupeMenu',
+  'marionette',
+  'views/app/mobileAppView'
+  ], function($, chatModels, ChatCollectionView, chatInputView, Router, shareSearchView,
+    modalRegion, unreadItemsClient, Backbone, TroupeMenu, Marionette, MobileAppView) {
   "use strict";
+
+  new MobileAppView({
+    el: $('#mainPage')
+  });
+
+  var app = new Marionette.Application();
+
+  app.addRegions({
+    content: '#frame-chat'
+  });
+
+  app.addInitializer(function() {
+      new TroupeMenu({
+        el: $('#troupeList')
+      }).render();
+  });
+
+  app.on('start', function(){
+    Backbone.history.start();
+  });
 
   var chatCollection = new chatModels.ChatCollection();
   chatCollection.listen();
 
 
-
-
-  // var fileCollection = new fileModels.FileCollection();
-  // fileCollection.listen();
-
   var chatCollectionView = new ChatCollectionView({
     collection: chatCollection
-    // decorators: [new FileDecorator(fileCollection)]
   });
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
