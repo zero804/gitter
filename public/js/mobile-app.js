@@ -10,39 +10,26 @@ require([
   'components/unread-items-client',
   'backbone',
   'views/toolbar/troupeMenu',
-  'marionette',
   'views/app/mobileAppView'
   ], function($, chatModels, ChatCollectionView, chatInputView, Router, shareSearchView,
-    modalRegion, unreadItemsClient, Backbone, TroupeMenu, Marionette, MobileAppView) {
+    modalRegion, unreadItemsClient, Backbone, TroupeMenu, MobileAppView) {
   "use strict";
 
   new MobileAppView({
     el: $('#mainPage')
   });
 
-  var app = new Marionette.Application();
-
-  app.addRegions({
-    content: '#frame-chat'
-  });
-
-  app.addInitializer(function() {
-      new TroupeMenu({
-        el: $('#troupeList')
-      }).render();
-  });
-
-  app.on('start', function(){
-    Backbone.history.start();
-  });
+  new TroupeMenu({
+    el: $('#troupeList')
+  }).render();
 
   var chatCollection = new chatModels.ChatCollection();
   chatCollection.listen();
 
-
   var chatCollectionView = new ChatCollectionView({
+    el: $('#frame-chat'),
     collection: chatCollection
-  });
+  }).render();
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
 
@@ -52,16 +39,13 @@ require([
     rollers: chatCollectionView.rollers
   }).render();
 
-  app.addInitializer(function() {
-
-    new Router({
-      routes: [
-        { name: "share",            re: /^share$/,                  viewType: shareSearchView.Modal },
-      ],
-      regions: [null, modalRegion]
-    });
+  new Router({
+    routes: [
+      { name: "share",            re: /^share$/,                  viewType: shareSearchView.Modal },
+    ],
+    regions: [null, modalRegion]
   });
 
-  app.content.show(chatCollectionView);
-  app.start();
+  Backbone.history.start();
+
 });
