@@ -4,11 +4,11 @@
 "use strict";
 
 var persistence = require('../server/services/persistence-service');
-var GitHubUserService = require('../server/services/github/github-user-service');
 var GitHubMeService = require('../server/services/github/github-me-service');
 var Q = require('q');
 var mcapi = require('mailchimp-api');
 var mc = new mcapi.Mailchimp('a93299794ab67205168e351adb03448e-us3');
+var github = require('troupe-octonode');
 
 var opts = require("nomnom")
   .option('username', {
@@ -37,31 +37,39 @@ var opts = require("nomnom")
 
 function die(error) {
   console.error(error);
+  console.error(error.stack);
   process.exit(1);
 }
-
-
 
 function boost(username, suggestedEmail) {
   return persistence.User.findOneQ({ username: username })
     .then(function(user) {
-      console.log('Found ', user);
-      var userService = new GitHubUserService(user && user.githubToken ? user : {githubToken : opts.token || null});
-      return userService.getUser(username)
+      var githubClient = github.client(user && (user.githubToken || user.githubUserToken) || opts.token);
+      var ghuser = githubClient.user(username);
+
+      var d = Q.defer();
+      ghuser.info(d.makeNodeResolver());
+      return d.promise
+        .fail(function(err) {
+          if(err.statusCode === 404) return null;
+          throw err;
+        })
         .then(function(githubUser) {
           return [user, githubUser];
         });
     })
     .spread(function(user, githubUser) {
       if(!githubUser) throw "Not found";
-
+      console.log(user);
+      console.log(user.hasGitHubScope('user:email'));
       var emailPromise;
       if(suggestedEmail) {
         emailPromise = Q.resolve(suggestedEmail);
       } else if(user && user.emails && user.emails.length) {
         emailPromise = Q.resolve(user.emails[0]);
-      } else if(user && user.githubToken && user.hasGitHubScope('user:email')) {
-        var meService = new GitHubMeService(user && user.githubToken ? user : null);
+      } else if(user && user.hasGitHubScope('user:email')) {
+        var meService = new GitHubMeService(user);
+        console.log("got here");
         emailPromise = meService.getEmails()
           .then(function(emails) {
             if(Array.isArray(emails)) {

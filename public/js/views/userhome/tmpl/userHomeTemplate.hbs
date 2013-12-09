@@ -8,12 +8,6 @@
     </div>
     {{/createRoom}}
 
-    {{^privateRepoScope}}
-    <div class="banner-red">
-      <a id="upgrade-auth" style="color: white" href="/login/upgrade?scopes=repo" target="_new">Want to see your private repositories and organisations? Click here to Authorise with GitHub</a>.
-    </div>
-    {{/privateRepoScope}}
-
 
     <div class="org-select">
       <br><h2>YOUR ORGANISATIONS</h2>
@@ -23,6 +17,11 @@
 
       <div class="repo-select">
       <br><br><h2>SUGGESTED REPOSITORIES</h2>
+      {{^privateRepoScope}}
+      <div class="banner-red">
+        <a id="upgrade-auth" style="color: white" href="/login/upgrade?scopes=repo" target="_new">Want to see your private repositories? Click here to Authorise with GitHub</a>.
+      </div>
+      {{/privateRepoScope}}
       <div class="repo-list" id="repo-list" style="margin-left: -10px">
         <div class="org-list-item">
           <div class="github-REPO" style="display: inline-block"></div>

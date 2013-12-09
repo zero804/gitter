@@ -60,7 +60,7 @@ function applyAutoHooksForRepoRoom(user, troupe) {
     json: {
       service: 'github',
       endpoint: 'gitter',
-      githubToken: user.githubToken,
+      githubToken: user.githubToken || user.githubUserToken,
       autoconfigure: 1,
       repo: troupe.uri /* The URI is also the repo name */
     }
@@ -122,7 +122,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
                 uri: uri,
                 _nonce: nonce,
                 githubType: githubType,
-                topic: topic,
+                topic: topic || "",
                 users:  user ? [{ _id: new ObjectID(), userId: user._id }] : []
               }
             },
@@ -150,8 +150,10 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
                   }
 
                 } else {
-                  winston.verbose('Skipping hook creation. User does not have permissions');
-                  hookCreationFailedDueToMissingScope = true;
+                  if(githubType === 'REPO') {
+                    winston.verbose('Skipping hook creation. User does not have permissions');
+                    hookCreationFailedDueToMissingScope = true;
+                  }
                 }
               }
 

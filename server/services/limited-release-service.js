@@ -1,10 +1,10 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var repoService = require('./repo-service');
-var persistence = require('./persistence-service');
-var GithubMe  = require("./github/github-me-service");
-var Q           = require('q');
+var repoService       = require('./repo-service');
+var persistence       = require('./persistence-service');
+var GithubMe          = require("./github/github-me-service");
+var Q                 = require('q');
 
 exports.shouldUserBeTurnedAway = function(user) {
   /* If you're wearing the hat, you're always allowed in */
@@ -17,6 +17,7 @@ exports.shouldUserBeTurnedAway = function(user) {
       /* If we do this operation in series to the getRepos
          we'll get a cached result. Faster + less api calls */
       var gHuser  = new GithubMe(user);
+
       return gHuser.getOrgs()
         .then(function(orgs) {
           return [repos, orgs];

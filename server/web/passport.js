@@ -1,18 +1,18 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var _                       = require('underscore');
-var userService             = require('../services/user-service');
-var passport                = require('passport');
-var winston                 = require('winston');
-var ClientPasswordStrategy  = require('passport-oauth2-client-password').Strategy;
-var BearerStrategy          = require('passport-http-bearer').Strategy;
-var oauthService            = require('../services/oauth-service');
-var statsService            = require("../services/stats-service");
-var nconf                   = require('../utils/config');
-var GoogleStrategy          = require('passport-google-oauth').OAuth2Strategy;
-var useragentStats          = require('./useragent-stats');
-var GitHubStrategy          = require('troupe-passport-github').Strategy;
+var _                      = require('underscore');
+var userService            = require('../services/user-service');
+var passport               = require('passport');
+var winston                = require('winston');
+var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
+var BearerStrategy         = require('passport-http-bearer').Strategy;
+var oauthService           = require('../services/oauth-service');
+var statsService           = require("../services/stats-service");
+var nconf                  = require('../utils/config');
+var GoogleStrategy         = require('passport-google-oauth').OAuth2Strategy;
+var useragentStats         = require('./useragent-stats');
+var GitHubStrategy         = require('troupe-passport-github').Strategy;
 
 module.exports = {
   install: function() {
@@ -181,92 +181,102 @@ module.exports = {
       }
     ));
 
-    passport.use(new GitHubStrategy({
-        clientID:     nconf.get('github:client_id'),
-        clientSecret: nconf.get('github:client_secret'),
-        callbackURL:  nconf.get('web:basepath') + '/login/callback',
-        passReqToCallback: true
-      },
-      function(req, accessToken, refreshToken, params, profile, done) {
+    function githubOauthCallback(req, accessToken, refreshToken, params, profile, done) {
+      var requestedScopes = params.scope.split(/,/);
+      var scopeHash = requestedScopes.reduce(function(memo, v) { memo[v] = true; return memo; }, {});
 
-        var requestedScopes = params.scope.split(/,/);
-        var scopeHash = requestedScopes.reduce(function(memo, v) { memo[v] = true; return memo; }, {});
+      if (req.user && req.session.githubScopeUpgrade) {
+        req.user.githubToken = accessToken;
+        req.user.githubScopes = scopeHash;
 
-        if (req.user) {
-          req.user.githubToken = accessToken;
-          req.user.githubScopes = scopeHash;
+        req.user.save(function(err) {
+          winston.info('passport: User updated with token');
+          if(err) done(err);
+          return done(null, req.user);
+        });
 
-          req.user.save(function(err) {
-            winston.info('passport: User updated with token');
-            if(err) done(err);
-            return done(null, req.user);
-          });
+      } else {
+        return userService.findByGithubIdOrUsername(profile._json.id, profile._json.login)
+          .then(function(user) {
+            // Update an existing user
+            if(user) {
+              user.username         = profile._json.login;
+              user.displayName      = profile._json.name || profile._json.login;
+              user.gravatarImageUrl = profile._json.avatar_url;
+              user.githubId         = profile._json.id;
+              user.githubUserToken  = accessToken;
 
-        } else {
-          return userService.findByGithubIdOrUsername(profile._json.id, profile._json.login)
-            .then(function(user) {
-              // Update an existing user
-              if(user) {
-                user.username         = profile._json.login;
-                user.displayName      = profile._json.name || profile._json.login;
-                user.gravatarImageUrl = profile._json.avatar_url;
-                user.githubToken      = accessToken;
-                user.githubId         = profile._json.id;
-                user.githubScopes     = scopeHash;
+              user.save(function(err) {
+                if (err) winston.error("Failed to update GH token for user ", user.username);
 
-                user.save(function(err) {
-                  if (err) winston.error("Failed to update GH token for user ", user.username);
+                // Tracking
+                var properties = useragentStats(req.headers['user-agent']);
+                statsService.userUpdate(user, properties);
 
-                  // Tracking
-                  var properties = useragentStats(req.headers['user-agent']);
-                  statsService.userUpdate(user, properties);
+                statsService.event("user_login", _.extend({
+                  userId: user.id,
+                  method: 'github_oauth',
+                  username: user.username
+                }, properties));
 
-                  statsService.event("user_login", _.extend({
-                    userId: user.id,
-                    method: 'github_oauth',
-                    username: user.username
-                  }, properties));
-
-                  // Login
-                  req.logIn(user, function(err) {
-                    if (err) { return done(err); }
-                    return done(null, user);
-                  });
-
-                });
-
-                return;
-              }
-
-              // This is in fact a new user
-              var githubUser = {
-                username:           profile._json.login,
-                displayName:        profile._json.name || profile._json.login,
-                emails:             profile._json.email ? [profile._json.email] : [],
-                gravatarImageUrl:   profile._json.avatar_url,
-                githubToken:        accessToken,
-                githubId:           profile._json.id,
-                githubScopes:       scopeHash,
-                status:             'ACTIVE',
-                source:             'landing_github'
-              };
-
-
-              winston.verbose('About to create GitHub user ', githubUser);
-
-              userService.findOrCreateUserForGithubId(githubUser, function(err, user) {
-                if (err) return done(err);
-
-                winston.verbose('Created GitHub user ', user.toObject());
-
+                // Login
                 req.logIn(user, function(err) {
                   if (err) { return done(err); }
                   return done(null, user);
                 });
+
+              });
+
+              return;
+            }
+
+            // This is in fact a new user
+            var githubUser = {
+              username:           profile._json.login,
+              displayName:        profile._json.name || profile._json.login,
+              emails:             profile._json.email ? [profile._json.email] : [],
+              gravatarImageUrl:   profile._json.avatar_url,
+              githubUserToken:    accessToken,
+              githubId:           profile._json.id,
+              status:             'ACTIVE',
+              source:             'landing_github'
+            };
+
+
+            winston.verbose('About to create GitHub user ', githubUser);
+
+            userService.findOrCreateUserForGithubId(githubUser, function(err, user) {
+              if (err) return done(err);
+
+              winston.verbose('Created GitHub user ', user.toObject());
+
+              req.logIn(user, function(err) {
+                if (err) { return done(err); }
+                return done(null, user);
               });
             });
-        }
-    }));
+          });
+      }
+
+    }
+
+    var userStrategy = new GitHubStrategy({
+        clientID:     nconf.get('github:user_client_id'),
+        clientSecret: nconf.get('github:user_client_secret'),
+        callbackURL:  nconf.get('web:basepath') + '/login/callback',
+        passReqToCallback: true
+      }, githubOauthCallback);
+    userStrategy.name = 'github_user';
+    passport.use(userStrategy);
+
+    var upgradeStrategy = new GitHubStrategy({
+        clientID:     nconf.get('github:client_id'),
+        clientSecret: nconf.get('github:client_secret'),
+        callbackURL:  nconf.get('web:basepath') + '/login/callback',
+        passReqToCallback: true
+      }, githubOauthCallback);
+    upgradeStrategy.name = 'github_upgrade';
+    passport.use(upgradeStrategy);
 
   }
 

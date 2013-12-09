@@ -107,6 +107,7 @@ define([
       this.$el.find('.trpChatText').html(richText);
 
       this.highlightMention();
+      this.setIssueStatusClasses();
 
       //if (this.decorator) this.decorator.enrich(this);
 
@@ -190,6 +191,19 @@ define([
           }
         }
       }, this);
+    },
+
+    setIssueStatusClasses: function() {
+      this.$el.find('.trpChatText .issue').each(function() {
+        var $issue = $(this);
+        var issueNumber = $issue.text().substring(1);
+        var url = '/api/v1/troupes/'+context().troupe.id+'/issues/'+issueNumber;
+        $.get(url, function(issue) {
+          if(!issue.state) return;
+
+          $issue.removeClass('open closed').addClass(issue.state);
+        });
+      });
     },
 
     detectKeys: function(e) {

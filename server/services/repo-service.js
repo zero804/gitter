@@ -3,6 +3,7 @@
 
 var GithubMe        = require("./github/github-me-service");
 var GithubOrg       = require("./github/github-org-service");
+var GithubRepo      = require("./github/github-repo-service");
 var persistence     = require("./persistence-service");
 var Q               = require('q');
 var lazy            = require('lazy.js');
@@ -36,11 +37,12 @@ function getReposForUser(user, options) {
   var adminAccessOnly = 'adminAccessOnly' in options ? options.adminAccessOnly : false;
 
   var gHuser  = new GithubMe(user);
+  var ghRepo  = new GithubRepo(user);
   var gHorg   = new GithubOrg(user);
 
   // Fetch all user repos and repos of the orgs he belongs to.
   return Q.all([
-      gHuser.getRepos(),
+      ghRepo.getRepos(),
       gHuser.getOrgs()
         .then(function(orgs) {
           return Q.all(orgs.map(function(org) {
@@ -115,10 +117,10 @@ function suggestedReposForUser(user) {
     };
   }
 
-  var gHuser  = new GithubMe(user);
+  var ghRepo  = new GithubRepo(user);
   return Q.all([
-      gHuser.getStarredRepos().then(map(SCORE_STARRED)),
-      gHuser.getWatchedRepos().then(map(SCORE_WATCHED)),
+      ghRepo.getStarredRepos().then(map(SCORE_STARRED)),
+      ghRepo.getWatchedRepos().then(map(SCORE_WATCHED)),
       getReposForUser(user).then(map(SCORE_OWN))
     ])
     .then(function(all) {
