@@ -10,9 +10,10 @@ require([
   'components/unread-items-client',
   'backbone',
   'views/toolbar/troupeMenu',
-  'views/app/mobileAppView'
+  'views/app/mobileAppView',
+  'views/chat/decorators/emojiDecorator'
   ], function($, chatModels, ChatCollectionView, chatInputView, Router, shareSearchView,
-    modalRegion, unreadItemsClient, Backbone, TroupeMenu, MobileAppView) {
+    modalRegion, unreadItemsClient, Backbone, TroupeMenu, MobileAppView, emojiDecorator) {
   "use strict";
 
   new MobileAppView({
@@ -28,7 +29,8 @@ require([
 
   var chatCollectionView = new ChatCollectionView({
     el: $('#frame-chat'),
-    collection: chatCollection
+    collection: chatCollection,
+    decorators: [emojiDecorator]
   }).render();
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
