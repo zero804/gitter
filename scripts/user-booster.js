@@ -60,7 +60,8 @@ function boost(username, suggestedEmail) {
     })
     .spread(function(user, githubUser) {
       if(!githubUser) throw "Not found";
-
+      console.log(user);
+      console.log(user.hasGitHubScope('user:email'));
       var emailPromise;
       if(suggestedEmail) {
         emailPromise = Q.resolve(suggestedEmail);
@@ -68,6 +69,7 @@ function boost(username, suggestedEmail) {
         emailPromise = Q.resolve(user.emails[0]);
       } else if(user && user.hasGitHubScope('user:email')) {
         var meService = new GitHubMeService(user);
+        console.log("got here");
         emailPromise = meService.getEmails()
           .then(function(emails) {
             if(Array.isArray(emails)) {
