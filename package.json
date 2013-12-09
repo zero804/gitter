@@ -36,7 +36,7 @@
     "ducksnode": "0.1.0",
     "diskspace": "0.1.5",
     "hjs": "*",
-    "oauth2orize": "0.1.0",
+    "oauth2orize": "~1.0.0",
     "passport-http": "0.2.2",
     "passport-oauth2-client-password": "0.1.0",
     "passport-http-bearer": "0.2.0",

@@ -12,7 +12,6 @@ var http     = require('http');
 var nconf    = require('./utils/config');
 var redis    = require('./utils/redis');
 var shutdown = require('./utils/shutdown');
-var oauth2   = require('./web/oauth2');
 
 /* Load express-resource */
 require('express-resource');
@@ -59,15 +58,6 @@ require('./services/kue-workers').startWorkers();
 
 // APIS
 require('./api/').install(app);
-
-// Our clients
-app.get('/oauth/authorize', oauth2.authorization);
-app.post('/oauth/authorize/decision', oauth2.decision);
-app.post('/oauth/token', oauth2.token);
-
-app.get('/OAuthCallback', function(req, res) {
-  res.send(200, 'Can I help you with something?');
-});
 
 if(nconf.get('test:exposeInBrowserTests')) {
   require('./handlers/in-browser-tests').install(app);
