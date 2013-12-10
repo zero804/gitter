@@ -7,7 +7,7 @@ var winston = require('winston');
 function getEightSuggestedIssues(allIssues) {
   return allIssues.slice(0, 8).sort(function(issueA, issueB) {
     return issueB.number - issueA.number;
-  });
+  }).map(trimDownIssue);
 }
 
 function getTopEightMatchingIssues(allIssues, term) {
@@ -15,8 +15,15 @@ function getTopEightMatchingIssues(allIssues, term) {
     return (''+issue.number).indexOf(term) === 0;
   }).sort(function(issueA, issueB) {
     return issueA.number - issueB.number;
-  }).slice(0, 8);
+  }).slice(0, 8).map(trimDownIssue);
   return matches;
+}
+
+function trimDownIssue(issue) {
+  return {
+    title: issue.title,
+    number: issue.number
+  };
 }
 
 module.exports = {
