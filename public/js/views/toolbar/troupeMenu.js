@@ -39,7 +39,8 @@ define([
     },
 
     events: {
-      "click #search-clear-icon" : "onSearchClearIconClick"
+      "click #search-clear-icon" : "onSearchClearIconClick",
+      "click #left-menu-profile" : "onClickProfileMenu"
     },
 
     initialize: function() {
@@ -123,6 +124,11 @@ define([
 
     activateSearchList: function() {
       this.$el.find('#list-search-input').focus();
+    },
+
+    onClickProfileMenu: function() {
+      $('#left-menu-profile').toggleClass('active');
+      $('#left-menu-scroll').toggleClass('pushed');
     },
 
     hideSearch: function() {

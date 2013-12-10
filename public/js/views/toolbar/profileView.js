@@ -8,15 +8,6 @@ define([
 
   return TroupeViews.Base.extend({
     template: template,
-
-    events: {
-      click: 'onClick'
-    },
-
-    onClick: function() {
-      this.$el.parent().toggleClass('active');
-    },
-
     getRenderData: function() {
       var user = context.getUser();
       var userModel = context.user();
