@@ -12,6 +12,7 @@ var fineuploaderExpressMiddleware = require('fineuploader-express-middleware');
 var fs                            = require('fs');
 var os                            = require('os');
 var responseTime                  = require('./response-time');
+var oauthService                  = require('../services/oauth-service');
 
 if(nconf.get('express:showStack')) {
   try {
@@ -163,14 +164,19 @@ module.exports = {
             user.githubToken = null;
             user.githubUserToken = null;
             user.githubScopes = null;
-            user.save(function() {
 
-              res.redirect('/');
+            user.save(function(err) {
+              if(err) winston.error('Unable to save user: ' + err, { exception: err });
+
+              oauthService.removeAllAccessTokensForUser(user.id, function(err) {
+                if(err) { winston.error('Unable to remove access tokens: ' + err, { exception: err }); }
+                res.redirect('/');
+              });
             });
           });
         } else {
           res.redirect('/');
-        }
+      }
 
         return;
       }
