@@ -1,0 +1,117 @@
+  @import "trp3Vars.less";
+
+
+  html {
+    @media @small {
+      height: 100%;
+    }
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    @media @small {
+      height: 100%;
+      overflow: hidden;
+    }
+  }
+
+  a {
+    color: #2980b9;
+  }
+
+
+  h1 {
+    font-family: 'Open Sans';
+    font-weight: 300;
+    font-size: 42px;
+    color: white;
+
+    @media @small {
+      font-size: 24px;
+    }
+
+  }
+
+  h2 {
+    font-weight: 300;
+    font-family: 'Open Sans';
+    font-size: 30px;
+  }
+
+  #beta-description {
+    @media @small {
+      display: none;
+    }
+  }
+
+  .outer-container {
+    @media @small {
+      height: 100%;
+    }
+  }
+
+  .container {
+    text-align: center;
+    @media @small {
+      height: 100%;
+    }
+  }
+
+  .strip {
+    width: 920px;
+    display: inline-block;
+    font-family: 'Open Sans';
+    font-weight: 400;
+    @media @small {
+      width: 100%;
+      padding: 0 30px;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+  }
+
+  .feature {
+    margin-top: 40px;
+    text-align: left;
+    margin-bottom: 40px;
+  }
+
+  .button {
+    border-radius: 4px;
+    display: inline-block;
+    padding: 18px 24px;
+    text-transform:uppercase;
+    transition:all .2s ease-in-out;
+  }
+
+  .button.white {
+    background-color: rgba(255,255,255,0.8);
+    border-bottom: 3px solid rgba(255,255,255,1);
+  }
+
+  .button.blur {
+    color: white;
+    background-color: rgba(255,255,255,0.15);
+  }
+
+  .button.blur:hover {
+   background-color: rgba(255,255,255,0.3);
+  }
+
+  .button.green {
+    color: white;
+    background-color: rgba(29,206,115, 0.9);
+    border-bottom: 3px solid rgba(29,206,115, 1);
+  }
+
+  .button.green:hover {
+    background-color: rgba(29,206,115, 1);
+  }
+
+  .interested {
+    background-color: rgba(0,0,0,0.5);
+    border-radius: 6px;
+    padding: 38px 28px;
+    margin: 40px 0;
+  }

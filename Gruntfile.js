@@ -338,7 +338,8 @@ module.exports = function( grunt ) {
           "public/bootstrap/css/trpNativeCreateTroupe.css": "public/bootstrap/less/trpNativeCreateTroupe.less",
           "public/bootstrap/css/trpStart.css": "public/bootstrap/less/trpStart.less",
           "public/bootstrap/css/trpGeneric.css": "public/bootstrap/less/trpGeneric.less",
-          "public/bootstrap/css/trpHooks.css": "public/bootstrap/less/trpHooks.less"
+          "public/bootstrap/css/trpHooks.css": "public/bootstrap/less/trpHooks.less",
+          "public/bootstrap/css/gitter-login.css": "public/bootstrap/less/gitter-login.less"
         }
       }
     },
