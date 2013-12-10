@@ -23,7 +23,7 @@ define([
   var View = TroupeViews.Base.extend({
     template: troupeSettingsTemplate,
     events: {
-      'submit #troupeSettings': 'saveSettings',
+      'click #save-troupe-settings': 'saveSettings',
       'click #cancel-troupe-settings' : 'closeSettings',
       'click #delete-troupe': 'deleteTroupe',
       'click #leave-troupe': 'leaveTroupe',
