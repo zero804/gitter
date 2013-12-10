@@ -9,7 +9,6 @@
   }
 
   var ua = navigator.userAgent.toLowerCase();
-
   if (ua.indexOf('safari') >= 0) { 
     if (ua.indexOf('chrome') <= 0) {
       loadCss('https://fonts.googleapis.com/css?family=Open+Sans:400');
@@ -19,7 +18,12 @@
     }
   } 
   else {
-    loadCss('https://fonts.googleapis.com/css?family=Open+Sans:400,300'); 
+    if (ua.indexOf('firefox') >=0 ) {
+      loadCss('https://fonts.googleapis.com/css?family=Open+Sans:400,300'); 
+    }
+    else {
+      loadCss('https://fonts.googleapis.com/css?family=Open+Sans:400'); 
+    }
   }
 
   
