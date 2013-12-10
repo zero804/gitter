@@ -51,10 +51,6 @@ header {
   height: 100%;
 }
 
-#left-menu-scroll {
-  height: 100%;
-}
-
 #mainPage {
   box-shadow: 0 0 15px black;
   z-index: 1;
@@ -112,12 +108,7 @@ header {
 
 }
 
-.trpLeftMenuProfile.active {
-  background-color: rgba(255,255,255,0.2);
-}
-
 .trpLeftMenuProfileMenu {
-  display: none;
   box-sizing: border-box;
   margin-left: -10px;
   padding-bottom: 12px;
@@ -158,4 +149,11 @@ header {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.sideMenu .nano {
+  position: absolute;
+  bottom: 10px;
+  top: 114px;
+  -webkit-overflow-scrolling: touch;
 }
