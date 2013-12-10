@@ -19,4 +19,6 @@ require([
     el: $('#frame-chat')
   }).render();
 
+  $('html').removeClass('loading');
+
 });
