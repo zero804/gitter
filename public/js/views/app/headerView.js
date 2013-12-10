@@ -13,7 +13,7 @@ define([
   window.troupes = troupes;
 
   var HeaderView = Backbone.View.extend({
-    el: 'header',
+    el: '#header',
 
     initialize: function() {
       this.listenTo(this.model, "change", this.render);
