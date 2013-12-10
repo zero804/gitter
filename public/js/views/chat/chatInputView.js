@@ -60,7 +60,6 @@ define([
       completion: 'leave ',
       regexp: /^\/leave/,
       action: function(view) {
-        console.debug(view);
         view.$el.val('');
         view.leaveRoom();
       }
