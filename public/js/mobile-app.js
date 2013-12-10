@@ -48,6 +48,8 @@ require([
     regions: [null, modalRegion]
   });
 
+  $('html').removeClass('loading');
+
   Backbone.history.start();
 
 });
