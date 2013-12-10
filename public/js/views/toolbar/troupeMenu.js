@@ -129,16 +129,11 @@ define([
 
     showProfile: function() {
       $('#left-menu-profile').addClass('active');
-      $('#profile-menu').slideDown();
-      $('#left-menu-scroll').addClass('pushed');
       this.profileShown = true;
     },
 
     hideProfile: function() {
-      $('#left-menu-scroll').removeClass('pushed');
-      $('#profile-menu').slideUp("fast", function() {
-        $('#left-menu-profile').removeClass('active');
-      });
+      $('#left-menu-profile').removeClass('active');
       this.profileShown = false;
     },
 

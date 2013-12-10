@@ -9,17 +9,12 @@ define([
   return TroupeViews.Base.extend({
     template: template,
     getRenderData: function() {
-      var displayName;
-      if (context.getUser().displayName === '' || !context.getUser().displayName) {
-        displayName = context.getUser().username;
-      }
-      else {
-        displayName = context.getUser().displayName;
-      }
+      var user = context.getUser();
+      var userModel = context.user();
       return {
-        displayName: displayName,
-        user: context.user(),
-        username: context.getUser().username
+        displayName: user.displayName || user.username,
+        user: userModel,
+        username: user.username
       };
     }
   });

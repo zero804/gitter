@@ -371,24 +371,31 @@ a:hover {
   .trpBodyMedium;
   padding: 10px 0 10px 10px;
   cursor: pointer;
+  height: 30px;
+  overflow: hidden;
 
   .avatar-s {
     width: 32px;
     height: 32px;
   }
 
-  @media @mobile {
-    display: none;
-  }
-
+  -webkit-transition: all 200ms linear;
+     -moz-transition: all 200ms linear;
+       -o-transition: all 200ms linear;
+          transition: all 200ms linear;
 }
 
 .trpLeftMenuProfile.active {
   background-color: rgba(255,255,255,0.2);
+  height: 96px;
+
+  -webkit-transition: all 400ms linear;
+     -moz-transition: all 400ms linear;
+       -o-transition: all 400ms linear;
+          transition: all 400ms linear;
 }
 
 .trpLeftMenuProfileMenu {
-  display: none;
   box-sizing: border-box;
   margin-left: -10px;
   padding-bottom: 12px;
@@ -436,8 +443,9 @@ a:hover {
 }
 
 .trpLeftMenuContainer {
-width: 260px;
-overflow: hidden;
+  height: 100%;
+  width: 260px;
+  overflow: hidden;
 }
 
 .trpMiniLeftMenu {
@@ -532,9 +540,10 @@ a.trpMiniLeftMenuItem {
 }
 
 .trpLeftMenu .nano {
-	position: absolute;
-	top: 124px;
-	bottom: 10px;
+	position: relative;
+  height: 80%;
+	// top: 124px;
+	// bottom: 10px;
   .transition300ms;
 }
 
