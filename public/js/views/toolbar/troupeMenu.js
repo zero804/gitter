@@ -3,6 +3,7 @@ define([
   'jquery',
   'underscore',
   'marionette',
+  'utils/context',
   'collections/instances/troupes',
   'views/toolbar/troupeCollectionView',
   'hbs!views/toolbar/tmpl/troupeListItemEmpty',
@@ -15,7 +16,7 @@ define([
   './repoCollectionView',
   'backbone',
   'nanoscroller' //no ref
-], function($, _, Marionette, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView, ProfileView, OrgCollectionView, RepoCollectionView, Backbone) {
+], function($, _, Marionette, context, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView, ProfileView, OrgCollectionView, RepoCollectionView, Backbone) {
   "use strict";
 
   return Marionette.Layout.extend({
@@ -46,6 +47,10 @@ define([
     initialize: function() {
       this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
       this.profileShown = false;
+      var ua = navigator.userAgent.toLowerCase();
+      if (ua.indexOf('gitter/') >= 0) {
+        this.isGitterApp = true;
+      }
       var self = this;
       $(window).on('showSearch', function() {
         self.showSearch();
@@ -143,6 +148,11 @@ define([
     },
 
     onClickProfileMenu: function() {
+      if (this.isGitterApp) {
+        window.location.href = "/" + context.getUser().username; 
+        return;
+      }
+
       if (!this.profileShown) {
         this.showProfile();
       }
