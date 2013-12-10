@@ -45,6 +45,12 @@ exports.findAccessToken = function(token, callback) {
   persistenceService.OAuthAccessToken.findOne({ token: token }, callback);
 };
 
+
+exports.removeAllAccessTokensForUser = function(userId, callback) {
+  return persistenceService.OAuthAccessToken.removeQ({ userId: userId })
+    .nodeify(callback);
+};
+
 exports.saveAccessToken = function(token, userId, clientId, callback) {
 
   var accessToken = new persistenceService.OAuthAccessToken({

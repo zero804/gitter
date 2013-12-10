@@ -1,5 +1,6 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'jquery',
   'marionette',
   'utils/context',
   'collections/instances/troupes',
@@ -7,8 +8,8 @@ define([
   'hbs!./tmpl/userHomeEmptyOrgView',
   './homeOrgCollectionView',
   './homeRepoCollectionView',
-  'collections/repos',
-], function(Marionette, context, troupeCollections, userHomeTemplate, userHomeEmptyOrgViewTemplate, OrgCollectionView, RepoCollectionView, repoModels) {
+  'collections/repos'
+], function($, Marionette, context, troupeCollections, userHomeTemplate, userHomeEmptyOrgViewTemplate, OrgCollectionView, RepoCollectionView, repoModels) {
   "use strict";
 
   var reposCollection = new repoModels.ReposCollection(null, { listen: true });
@@ -28,6 +29,7 @@ define([
     },
 
     onRender: function() {
+      $('#header-wrapper').hide();
       this.orgs.show(new OrgCollectionView({ collection: troupeCollections.orgs, emptyView: Marionette.ItemView.extend({ template: userHomeEmptyOrgViewTemplate, serializeData: function() {
         var viewData = {};
         viewData.privateRepoScope = !!context.getUser().scopes.private_repo;

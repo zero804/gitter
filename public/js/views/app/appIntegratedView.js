@@ -131,14 +131,14 @@ define([
     },
 
     hidePanel: function (whichPanel) {
-      $("#chat-frame, #chat-input, #toolbar-frame").removeClass('rightCollapse');
+      $("#chat-frame, #chat-input, #toolbar-frame, #header-area").removeClass('rightCollapse');
       $(whichPanel).removeClass('visible');
       this.rightpanel = false;
     },
 
     showPanel: function(whichPanel) {
       if (!this.rightpanel) {
-        $("#chat-frame, #chat-input, #toolbar-frame").addClass("rightCollapse");
+        $("#chat-frame, #chat-input, #toolbar-frame, #header-area").addClass("rightCollapse");
         $(whichPanel).addClass("visible");
         this.rightpanel = true;
       }
@@ -177,7 +177,7 @@ define([
 
       $("#left-menu").addClass("visible");
       $("#mini-left-menu, #mini-left-menu-container").addClass("active");
-      $("#content-wrapper, #toolbar-frame, #menu-toggle-button, #chat-input-wrapper").addClass("leftCollapse");
+      $("#content-wrapper, #toolbar-frame, #menu-toggle-button, #header-wrapper, #chat-input-wrapper").addClass("leftCollapse");
 
       this.leftmenu = true;
     },
@@ -200,7 +200,7 @@ define([
       }, 350);
 
       $("#mini-left-menu, #mini-left-menu-container").removeClass("active");
-      $("#content-wrapper, #toolbar-frame, #menu-toggle-button, #chat-input-wrapper").removeClass("leftCollapse");
+      $("#content-wrapper, #toolbar-frame, #menu-toggle-button, #header-wrapper, #chat-input-wrapper").removeClass("leftCollapse");
       $("#left-menu").removeClass("visible");
 
       this.leftmenu = false;

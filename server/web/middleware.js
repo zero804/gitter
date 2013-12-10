@@ -58,6 +58,10 @@ exports.ensureLoggedIn = function(options) {
               res.send(401, { success: false, loginRequired: true });
               return;
             }
+            /* Not a web client? Give them the message straightup */
+            if(req.headers['authorization']) {
+              return next(401);
+            }
 
             return res.relativeRedirect("/");
           });
