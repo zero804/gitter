@@ -110,92 +110,6 @@ div {
   box-shadow: none;
 }
 
-header {
-  position: absolute;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  width: 100%;
-  background-color: rgba(255, 255, 255, 0.95);
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-  z-index: 1;
-  padding: 4px 0 8px 44px;
-  text-align: left;
-
-  @media @mid {
-    padding: 4px 0 8px 24px;
-  }
-
-  @media @small {
-    padding: 4px 0 8px 44px
-  }
-
-  .trpTroupeFavourite {
-    cursor: pointer;
-    display: inline-block;
-    margin-left: 6px;
-    margin-right: 22px;
-  }
-
-  h1 {
-    font-family: 'Open Sans';
-    font-weight: 300;
-    font-size: 22px;
-    color: #333;
-    display: inline;
-    vertical-align: middle;
-  }
-
-  #trpTopic {
-    font-family: 'Open Sans';
-    font-size: 13px;
-    margin: -5px 0px 0px 50px;
-    color: #999;
-
-    a {
-      color: #666;
-    }
-
-  }
-
-  .dropdown-toggle {
-
-  }
-
-  .settingsCog {
-    position: absolute;
-    right: 15px;
-    top: 15px;
-  }
-
-  .dropdown-toggle:before {
-      font-family: 'troupe-icons';
-      /*content: '\e81a';*/
-    /*  content: '\e81e';*/
-      content: '\e823';
-      margin-right: 8px;
-      width: 12px;
-      font-size: 20px;
-  }
-
-  .dropdown-toggle {
-    cursor: pointer;
-    opacity: 0.4;
-    transition:all .5s ease-in-out;
-  }
-
-  .dropdown-toggle:hover {
-    opacity: 1;
-  }
-
-  .dropdown-menu {
-    .trpBodyMedium;
-    right: 0;
-    left: auto;
-  }
-
-}
-
-
 .scrollbar-measure {
   width: 100px;
   height: 100px;
@@ -937,48 +851,6 @@ a.trpMiniLeftMenuItem {
   display: inline-block;
 }
 
-.trpHeaderWrapper {
-	width: 100%;
-	height: 50px;
-	text-align: center;
-	position: fixed;
-	z-index: 200;
-	overflow: hidden;
-  .transition300ms;
-  top: 0;
-  padding: 10px 0;
-/*  background-image: -webkit-gradient(
-    linear, left top, left bottom, from(rgba(255,255,255,0.96)),
-    to(rgba(255,255,255,0)), color-stop(.8,#FFF)
-  );*/
-  background: @trpBgColor2;
-}
-
-.trpHeaderContainer {
-  display: block;
-  text-align: center;
-  margin-left: 130px;
-  margin-right: 280px;
-  .transition300ms;
-
-  .trpSettingsButton {
-    @media @mid {
-      display: none;
-    }
-  }
-
-  @media @mid {
-    margin-left: @leftMarginMid;
-    margin-right: @rightMarginMid;
-  }
-
-  @media @small {
-    margin-left: @leftMarginSmall;
-    margin-right: @rightMarginSmall
-  }
-
-}
-
 .trpTroupeMoreActions {
   display: none;
 }
@@ -1322,6 +1194,13 @@ i.favourited:hover:before {
   }
 }
 
+.trpHeaderWrapper.leftCollapse {
+  @media @small {
+    left: @leftMarginFull;
+    transition-delay: 0;
+  }
+}
+
 .trpToolbar:hover {
   opacity: 1;
 }
@@ -1488,6 +1367,132 @@ i.favourited:hover:before {
   .transition500ms;
   padding-top: 8px;
 }
+
+
+.trpHeaderWrapper {
+  padding-bottom: 10px;
+  position: fixed;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  top: 0;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  z-index: 1;
+  .transition500ms;
+
+  .trpHeaderArea {
+    display: block;
+    margin-left: @leftMarginFull;
+    margin-right: @rightMarginFull;
+    .transition500ms;
+
+    @media @mid {
+      margin-left: @leftMarginMid;
+      margin-right: @rightMarginMid;
+      padding-right: 12px;
+    }
+
+    @media @small {
+      margin-left: @leftMarginSmall;
+      margin-right: @rightMarginSmall;
+      padding-right: 0px;
+    }
+
+  }
+
+  .trpHeaderContainer {
+    display: inline-block;
+    width: 100%;
+    padding-left: 46px;
+
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;         /* Opera/IE 8+ */
+
+    @media @mid {
+      padding-left: 20px;
+    }
+
+    @media @small {
+      padding-left: 40px;
+    }
+
+  }
+
+  .trpTroupeFavourite {
+    cursor: pointer;
+    display: inline-block;
+    margin-left: 6px;
+    margin-right: 22px;
+
+    @media @mid {
+      margin-left: 16px;
+      margin-right: 13px;
+    }
+
+  }
+
+  h1 {
+    font-family: 'Open Sans';
+    font-weight: 300;
+    font-size: 22px;
+    color: #333;
+    display: inline;
+    vertical-align: middle;
+  }
+
+  #trpTopic {
+    font-family: 'Open Sans';
+    font-size: 13px;
+    margin: -5px 0px 0px 50px;
+    color: #999;
+
+    a {
+      color: #666;
+    }
+
+  }
+
+  .dropdown-toggle {
+
+  }
+
+  .settingsCog {
+    float: right;
+    margin-top: 15px;
+    margin-right: 12px;
+  }
+
+  .dropdown-toggle:before {
+      font-family: 'troupe-icons';
+      /*content: '\e81a';*/
+    /*  content: '\e81e';*/
+      content: '\e823';
+      margin-right: 8px;
+      width: 12px;
+      font-size: 20px;
+  }
+
+  .dropdown-toggle {
+    cursor: pointer;
+    opacity: 0.4;
+    transition:all .5s ease-in-out;
+  }
+
+  .dropdown-toggle:hover {
+    opacity: 1;
+  }
+
+  .dropdown-menu {
+    .trpBodyMedium;
+    right: 0;
+    left: auto;
+  }
+
+}
+
+
 
 .trpChatInputArea {
   display: block;
