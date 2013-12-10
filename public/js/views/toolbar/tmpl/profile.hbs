@@ -1,12 +1,8 @@
-<div>
+<div class="trpLeftMenuProfileHeader">
   {{ widget "avatar" model=user size='s' }}
   <div class="trpLeftMenuProfileName">{{displayName}}</div>
 </div>
 <div class="trpLeftMenuProfileMenu" id="profile-menu">
-  <a href="/{{username}}"><div class="item">
-    Home
-  </div></a>
-  <a href="/signout"><div class="item">
-    Signout
-  </div></a>
+  <a href="/{{username}}"><div class="item">Home</div></a>
+  <a href="/signout"><div class="item">Signout</div></a>
 </div>
