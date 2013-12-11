@@ -23,11 +23,9 @@ module.exports = {
         return r;
     }
 
-    installTroupeSubResource('invites', 'invites');
     installTroupeSubResource('issues', 'issues');
     installTroupeSubResource('requests', 'requests');
     installTroupeSubResource('users', 'users');
-    installTroupeSubResource('conversations', 'conversations');
     installTroupeSubResource('files', 'files');
     installTroupeSubResource('downloads', 'downloads');
     installTroupeSubResource('embedded', 'embedded');
@@ -52,8 +50,6 @@ module.exports = {
     var userSettings = new Resource('settings', require('./user/troupe-settings'), app);
     userTroupeResource.add(userSettings);
 
-    installUserSubResource('invites', 'invites');
-    installUserSubResource('connectioninvites', 'connectioninvites');
     installUserSubResource('emails',  'emails');
     installUserSubResource('orgs',  'orgs');
     installUserSubResource('repos',  'repos');

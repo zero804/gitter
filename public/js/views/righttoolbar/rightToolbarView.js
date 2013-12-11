@@ -9,17 +9,13 @@ define([
   'hbs!./tmpl/rightToolbar',
   'collections/instances/integrated-items',
   'collections/instances/troupes',
-  'views/request/requestView',
-  'views/invite/inviteView',
-  'views/file/fileView',
-  'views/conversation/conversationView',
   'views/people/peopleCollectionView',
   'cocktail',
   'utils/uservoice',
   'views/widgets/troupeAvatar',
   './repoInfo'
 ], function($, Backbone, Marionette, TroupeViews, context, /*qq,*/ rightToolbarTemplate, itemCollections,
-   trpCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView, cocktail, userVoice, TroupeAvatar, repoInfo) {
+   trpCollections, PeopleCollectionView, cocktail, userVoice, TroupeAvatar, repoInfo) {
   "use strict";
 
   var RightToolbarLayout = Marionette.Layout.extend({
@@ -27,11 +23,7 @@ define([
     template: rightToolbarTemplate,
 
     regions: {
-      // requests: "#request-roster",
-      // invites: "#invite-roster",
       people: "#people-roster",
-      // files: "#file-list",
-      conversations: ".frame-conversations",
       troupeAvatar: "#troupe-avatar-region",
       repo_info: "#repo-info"
     },
@@ -128,17 +120,7 @@ define([
       //this.sidebar.show();
 
       // reference collections
-      // var requestCollection = itemCollections.requests;
-      // var invitesCollection = itemCollections.invites;
-      // var fileCollection = itemCollections.files;
-      var conversationCollection = itemCollections.conversations;
       var userCollection = itemCollections.users;
-
-      // Request View
-      // this.requests.show(new RequestView({ collection: requestCollection }));
-
-      // Invites View
-      // this.invites.show(new InviteView({ collection: invitesCollection }));
 
       // File View
       // this.files.show(new FileView({ collection: fileCollection }));
@@ -151,14 +133,6 @@ define([
           tooltipPlacement: 'left'
         }));
       }
-      // Conversation View
-      if (!context.inOneToOneTroupeContext()) {
-        this.conversations.show(new ConversationView({
-          collection: conversationCollection
-        }));
-      } else {
-        $('#mail-list').hide();
-      }
 
       // People View
       this.people.show(new PeopleCollectionView({ collection: userCollection }));
@@ -169,27 +143,8 @@ define([
         repo.fetch({data: $.param({repo: context().troupeUri})});
         this.repo_info.show(new repoInfo.view({model: repo}));
       }
-
-      this.initHideListeners();
     },
 
-    initHideListeners: function() {
-      var self = this;
-
-      toggler('#invite-list', itemCollections.invites);
-      toggler('#invite-header', itemCollections.invites);
-      toggler('#request-header', itemCollections.requests);
-      toggler('#request-list', itemCollections.requests);
-
-      function toggler(element, collection) {
-        function toggle() {
-          self.$el.find(element).toggle(collection.length > 0);
-        }
-
-        collection.on('all', toggle);
-        toggle();
-      }
-    }
   });
   cocktail.mixin(RightToolbarLayout, TroupeViews.DelayedShowLayoutMixin);
 

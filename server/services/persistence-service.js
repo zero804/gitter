@@ -299,7 +299,8 @@ UserTroupeFavouritesSchema.schemaTypeName = 'UserTroupeFavourites';
 // User in a Troupe
 //
 var TroupeUserSchema = new Schema({
-  userId: { type: ObjectId }
+  userId: { type: ObjectId },
+  deactivated: { type: Boolean }
   // In future: role
 });
 TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
@@ -326,6 +327,7 @@ TroupeSchema.schemaTypeName = 'TroupeSchema';
 TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });
 TroupeSchema.index({ lcUri: 1 }, { unique: true, sparse: true });
 TroupeSchema.index({ "users.userId": 1 });
+TroupeSchema.index({ "users.userId": 1,  "users.deactivated": 2 });
 TroupeSchema.pre('save', function (next) {
   this.lcUri =  this.uri ? this.uri.toLowerCase() : null;
   next();
@@ -379,15 +381,22 @@ TroupeSchema.methods.addUserById = function(userId) {
 
 TroupeSchema.methods.removeUserById = function(userId) {
   assert(userId);
+
+  winston.verbose("Troupe.removeUserById", { userId: userId, troupeId: this.id });
+
   // TODO: disable this methods for one-to-one troupes
   var troupeUser = _.find(this.users, function(troupeUser){ return troupeUser.userId == userId; });
+
   if(troupeUser) {
     // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
     this.post('save', function(postNext) {
       var f = new Fiber();
 
-      var url = "/troupes/" + this.id + "/users";
-      serializeEvent(url, "remove", troupeUser, f.waitor());
+      if(!this.oneToOne) {
+        /* Dont mark the user as having been removed from the room */
+        var url = "/troupes/" + this.id + "/users";
+        serializeEvent(url, "remove", troupeUser, f.waitor());
+      }
 
       var userUrl = "/user/" + userId + "/troupes";
       serializeEvent(userUrl, "remove", this, f.waitor());
@@ -398,11 +407,43 @@ TroupeSchema.methods.removeUserById = function(userId) {
       f.all().then(function() { postNext(); }).fail(function(err) { postNext(err); });
     });
 
-    troupeUser.remove();
+    if(this.oneToOne) {
+      troupeUser.deactivated = true;
+    } else {
+      troupeUser.remove();
+    }
+
   } else {
     winston.warn("Troupe.removeUserById: User " + userId + " not in troupe " + this.id);
   }
 };
+
+TroupeSchema.methods.reactivateUserById = function(userId) {
+  assert(userId);
+  assert(this.oneToOne);
+
+  winston.verbose("Troupe.reactivateUserById", { userId: userId, troupeId: this.id });
+
+  // TODO: disable this methods for one-to-one troupes
+  var troupeUser = _.find(this.users, function(troupeUser){ return troupeUser.userId == userId; });
+
+  if(troupeUser) {
+    // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
+    this.post('save', function(postNext) {
+      var f = new Fiber();
+
+      var userUrl = "/user/" + userId + "/troupes";
+      serializeEvent(userUrl, "create", this, f.waitor());
+
+      f.all().then(function() { postNext(); }).fail(function(err) { postNext(err); });
+    });
+
+    troupeUser.deactivated = undefined;
+  } else {
+    winston.warn("Troupe.reactivateUserById: User " + userId + " not in troupe " + this.id);
+  }
+};
+
 
 var TroupeRemovedUserSchema = new Schema({
   userId: { type: ObjectId },

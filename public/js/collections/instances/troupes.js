@@ -7,12 +7,11 @@ define([
   '../base',
   'components/realtime',
   '../troupes',
-  '../invites',
   '../smart',
   '../orgs',
   'components/unread-items-client',
   'filtered-collection' /* no ref */
-], function($, _, Backbone, context, base, realtime, troupeModels, inviteModels, SmartCollection, orgModels, unreadItemsClient) {
+], function($, _, Backbone, context, base, realtime, troupeModels, SmartCollection, orgModels, unreadItemsClient) {
   "use strict";
 
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
@@ -84,38 +83,8 @@ define([
 
   });
 
-  function filterInviteCollection(collection, filter) {
-    var c = new Backbone.FilteredCollection(null, { model: inviteModels.InviteModel, collection: collection });
-    c.setFilter(filter);
-    return c;
-  }
 
-  var inviteCollection = new inviteModels.InviteCollection(null, { listen: true });
-
-  var incomingInvites = filterInviteCollection(inviteCollection, function(m) {
-    return m.get('fromUser').id !== context.getUserId();
-  });
-
-  var outgoingInvites = filterInviteCollection(inviteCollection, function(m) {
-    return m.get('fromUser').id === context.getUserId();
-  });
-
-  var outgoingConnectionInvites = new inviteModels.ConnectionInviteCollection(null, { listen: true });
-
-  var incomingConnectionInvites = filterInviteCollection(incomingInvites, function(m) {
-    return !!m.get('oneToOneInvite');
-  });
-
-  var incomingTroupeInvites = filterInviteCollection(incomingInvites, function(m) {
-    return !m.get('oneToOneInvite');
-  });
-
-  inviteCollection.on('change reset sync add remove', function() {
-    unreadItemsClient.setOtherCount(incomingInvites.length);
-    troupeCollection.trigger('sync');
-  });
-
-  var smartCollection = new SmartCollection(null, { troupes: troupeCollection, invites: inviteCollection });
+  //var smartCollection = new SmartCollection(null, { troupes: troupeCollection });
 
   return {
     troupes: troupeCollection,
@@ -124,13 +93,7 @@ define([
     recentTroupes: recentTroupeCollection,
     unreadTroupes: unreadTroupeCollection,
     favouriteTroupes: favouriteTroupesCollection,
-    inviteCollection: inviteCollection,
-    incomingInvites: incomingInvites,
-    incomingConnectionInvites: incomingConnectionInvites,
-    incomingTroupeInvites: incomingTroupeInvites,
-    outgoingInvites: outgoingInvites,
-    outgoingConnectionInvites: outgoingConnectionInvites,
-    smart: smartCollection,
+    //smart: smartCollection,
     orgs: orgsCollection,
     repos: repoTroupeCollection
   };
