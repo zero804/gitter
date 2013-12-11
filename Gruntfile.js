@@ -236,7 +236,7 @@ module.exports = function( grunt ) {
           },
       'signup': createClosureConfig('signup'),
       'router-app': createClosureConfig('router-app'),
-      "router-homepage": createClosureConfig('router-homepage'),
+      'userhome': createClosureConfig('userhome'),
 //      "homepage-mobile" : createClosureConfig('homepage-mobile'),
 //       "native-chat-router": createClosureConfig('routers/mobile/native/chat-router'),
       "mobile-app": createClosureConfig('mobile-app'),
