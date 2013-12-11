@@ -420,6 +420,16 @@ function rejectRequest(request, callback) {
 function findUserIdsForTroupe(troupeId, callback) {
   return persistence.Troupe.findByIdQ(troupeId, 'users')
     .then(function(troupe) {
+      return troupe.users
+          .filter(function(m) { return m.deactivated; })
+          .map(function(m) { return m.userId; });
+    })
+    .nodeify(callback);
+}
+
+function findUserIdsForTroupeIncludingDeactivated(troupeId, callback) {
+  return persistence.Troupe.findByIdQ(troupeId, 'users')
+    .then(function(troupe) {
       return troupe.users.map(function(m) { return m.userId; });
     })
     .nodeify(callback);
@@ -459,8 +469,7 @@ function findImplicitConnectionBetweenUsers(userId1, userId2, callback) {
  * Does not check if the users have implicit connections - it always creates
  * the one to one
  *
- * NB NB NB: this is not atomic, so if two users try create the same troupe
- * at the same moment (to the millisecond) things will get nasty!
+ * NOTE, the first user should always be the initiating (current) user
  *
  * @return {troupe} Promise of a troupe
  */
@@ -506,8 +515,6 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
           { 'users.userId': userId2 }
           ]})
         .then(function(troupe) {
-          console.log('UPSERT REURNED', troupe);
-
           if(raw.upserted) {
             winston.verbose('Created a oneToOne troupe for ', { userId1: userId1, userId2: userId2 });
 
@@ -520,7 +527,7 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
           } else {
             var saveRequired = false;
             troupe.users.forEach(function(troupeUser) {
-              if(troupeUser.deactivated) {
+              if(troupeUser.deactivated && troupeUser.userId == userId1) {
                 troupe.reactivateUserById(troupeUser.userId);
                 saveRequired = true;
               }
@@ -947,6 +954,7 @@ module.exports = {
   findAllUserIdsForTroupes: findAllUserIdsForTroupes,
   findAllUserIdsForTroupe: findAllUserIdsForTroupe,
   findUserIdsForTroupe: findUserIdsForTroupe,
+  findUserIdsForTroupeIncludingDeactivated: findUserIdsForTroupeIncludingDeactivated,
 
   validateTroupeUrisForUser: validateTroupeUrisForUser,
   updateTroupeName: updateTroupeName,
