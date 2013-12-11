@@ -46,7 +46,6 @@ define([
 
     initialize: function() {
       this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
-      this.profileShown = false;
       var ua = navigator.userAgent.toLowerCase();
       if (ua.indexOf('gitter/') >= 0) {
         this.isGitterApp = true;
@@ -132,33 +131,14 @@ define([
       this.$el.find('#list-search-input').focus();
     },
 
-    showProfile: function() {
-      $('#left-menu-profile').addClass('active');
-      $('#profile-menu').slideDown();
-      $('#left-menu-scroll').addClass('pushed');
-      this.profileShown = true;
-    },
-
-    hideProfile: function() {
-      $('#left-menu-scroll').removeClass('pushed');
-      $('#profile-menu').slideUp("fast", function() {
-        $('#left-menu-profile').removeClass('active');
-      });
-      this.profileShown = false;
-    },
-
     onClickProfileMenu: function() {
       if (this.isGitterApp) {
         window.location.href = "/" + context.getUser().username; 
         return;
       }
 
-      if (!this.profileShown) {
-        this.showProfile();
-      }
-      else {
-        this.hideProfile();
-      }
+      $('#left-menu-profile').toggleClass('active');
+      $('#left-menu-scroll').toggleClass('pushed');
     },
 
     hideSearch: function() {

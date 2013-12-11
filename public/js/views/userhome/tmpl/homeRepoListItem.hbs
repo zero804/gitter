@@ -1,16 +1,9 @@
 {{#if user.createRoom}}
-  <a href="/{{repo.name}}" style="text-decoration: none">
-    <div class="github-REPO" style="display: inline-block; vertical-align: middle"></div>
-    <div class="home-repo" style="display: inline-block; width: 200px; vertical-align: middle">{{repo.name}}</div>
-  </a>
+  <a href="/{{repo.name}}" class="github-REPO">{{repo.name}}</a>
 {{else}}
   {{#if repo.room}}
-    <a href="/{{repo.name}}" style="text-decoration: none">
-      <div class="github-REPO" style="display: inline-block; vertical-align: middle"></div>
-      <div class="home-repo" style="display: inline-block; width: 200px; vertical-align: middle">{{repo.name}}</div>
-    </a>
+    <a href="/{{repo.name}}" class="github-REPO">{{repo.name}}</a>
   {{else}}
-    <div class="github-REPO disabled" style="display: inline-block; vertical-align: middle"></div>
-    <div class="disabled home-repo" title="Sorry, you can't create chats yet. We're slowly giving users this ability to control our launch.">{{repo.name}}</div>
+    <a class="github-REPO disabled" title="Sorry, you can't create chats yet. We're slowly giving users this ability to control our launch.">{{repo.name}}</a>
   {{/if}}
 {{/if}}

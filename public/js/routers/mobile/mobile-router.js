@@ -6,13 +6,11 @@ define([
   'backbone',
   'utils/context',
   'require',
-  'collections/requests',
   'views/widgets/avatar',
-  'views/request/requestDialog',
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
   'template/helpers/all'              // No ref
-], function($, Marionette, TroupeViews, Backbone, context, require, requestModels, AvatarWidget, RequestResponseModal /*, mobileContext, eyeballsClient, unreadItemsClient */) {
+], function($, Marionette, TroupeViews, Backbone, context, require, AvatarWidget /*, mobileContext, eyeballsClient, unreadItemsClient */) {
   "use strict";
 
   var MobileLayout = Marionette.Layout.extend({
@@ -36,19 +34,19 @@ define([
       });
 
       // prompt response to requests
-      if (!context.inOneToOneTroupeContext()) {
-        var requests = new requestModels.RequestCollection();
-        requests.on('all', promptRequest);
-        requests.listen();
-      }
+      // if (!context.inOneToOneTroupeContext()) {
+      //   var requests = new requestModels.RequestCollection();
+      //   requests.on('all', promptRequest);
+      //   requests.listen();
+      // }
 
-      function promptRequest() {
-        if (requests.length > 0) {
-          requests.off('all', promptRequest); // nb must unsubscribe to avoid loop when saving request model.
+      // function promptRequest() {
+      //   if (requests.length > 0) {
+      //     requests.off('all', promptRequest); // nb must unsubscribe to avoid loop when saving request model.
 
-          (new RequestResponseModal({ model: requests.at(0) })).show();
-        }
-      }
+      //     (new RequestResponseModal({ model: requests.at(0) })).show();
+      //   }
+      // }
 
       // Asynchronously load tracker
       require([

@@ -15,48 +15,27 @@
 @import "trp3Mail.less";
 @import "trp3Files.less";
 @import "trp3People.less";
+@import "trpUserhome.less";
 
 @import "nanoScroller.less";
 
 @import "trpInvites.less";
 
-img.emoji {
-  height: 20px;
-  width: 20px;
-}
-
-.banner-red {
-  background-color: fade(@trpRed, 90%);
-  border-radius: 4px;
-  color: white;
-  padding: 4px 6px;
-  font-size: 14px;
-  display: inline-block;
-  margin-bottom: 8px;
-}
-
 .transition300ms {
-  -webkit-transform: translate3d(0, 0, 0);
-  transition:all .3s ease-in-out;
-  -o-transition:all .3s ease-in-out;
-  -moz-transition:all .3s ease-in-out;
-  -webkit-transition:all .3s ease-in-out;
+  .transition(300ms);
 }
 
 .transition500ms {
-  -webkit-transform: translate3d(0, 0, 0);
-  transition:all .5s ease-in-out;
-  -o-transition:all .5s ease-in-out;
-  -moz-transition:all .5s ease-in-out;
-  -webkit-transition:all .5s ease-in-out;
+  .transition(500ms);
 }
 
-.transition1s {
-  -webkit-transform: translate3d(0, 0, 0);
-  transition:all .5s ease-in-out;
-  -o-transition:all .5s ease-in-out;
-  -moz-transition:all .5s ease-in-out;
-  -webkit-transition:all .5s ease-in-out;
+.transition(@time) {
+  -webkit-transform: translate3d(0,0,0);
+          transform: translate3d(0,0,0);
+  -webkit-transition: all @time ease-in-out;
+     -moz-transition: all @time ease-in-out;
+       -o-transition: all @time ease-in-out;
+          transition: all @time ease-in-out;
 }
 
 html {
@@ -82,14 +61,6 @@ h2 {
   font-family: @fontSans;
   color: #162e34;
   font-weight: 400;
-}
-
-div {
-/*	transform: translate3d(0, 0, 0);
-	transition:all .1s ease-in-out;
-    -o-transition:all .1s ease-in-out;
-    -moz-transition:all .1s ease-in-out;
-    -webkit-transition:all .1s ease-in-out;*/
 }
 
 .hidden-input input {
@@ -289,14 +260,6 @@ a:hover {
   width: 12px;
 }
 
-.home-repo {
-  display: inline-block; 
-  width: 200px; 
-  vertical-align: middle;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .githib-REPO.disabled:before{
   opacity: 0.4;
 }
@@ -312,24 +275,29 @@ a:hover {
   .trpBodyMedium;
   padding: 10px 0 10px 10px;
   cursor: pointer;
+  height: 36px;
+  overflow: hidden;
 
   .avatar-s {
     width: 32px;
     height: 32px;
   }
 
-  @media @mobile {
-    display: none;
-  }
-
+  .transition(200ms);
 }
 
 .trpLeftMenuProfile.active {
   background-color: rgba(255,255,255,0.2);
+  height: 96px;
+
+  .transition(400ms);
+}
+
+.trpLeftMenuProfileHeader {
+  padding-bottom: 10px;
 }
 
 .trpLeftMenuProfileMenu {
-  display: none;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   margin-left: -10px;
@@ -389,8 +357,9 @@ a:hover {
 }
 
 .trpLeftMenuContainer {
-width: 260px;
-overflow: hidden;
+  height: 100%;
+  width: 260px;
+  overflow: hidden;
 }
 
 .trpMiniLeftMenu {
@@ -484,14 +453,15 @@ a.trpMiniLeftMenuItem {
 }
 
 .trpLeftMenu .nano {
-	position: absolute;
-	top: 124px;
-	bottom: 10px;
-  .transition300ms;
+  position: absolute;
+  bottom: 10px;
+  top: 114px;
+  .transition(200ms);
 }
 
 .trpLeftMenu .nano.pushed {
   margin-top: 80px;
+  .transition(400ms);
 }
 
 .trpLeftMenuActions {
@@ -657,35 +627,6 @@ a.trpMiniLeftMenuItem {
 */
 .trpNewTroupeButton {
   border-radius: 0 4px 4px 0;
-}
-
-.trpHomeContainer {
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  text-align: left;
-  display: inline-block;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  padding: 0 40px;
-  .trpBodyText;
-}
-
-.org-list-item {
-  display: inline-block;
-  margin-bottom: 8px;
-  width: 300px;
-  padding: 10px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.org-list-item:hover {
-  background-color: rgba(150,150,150,0.2);
-}
-
-.org-avatar.disabled {
-  opacity: 0.4;
 }
 
 .trpMenuTab {
@@ -1101,7 +1042,7 @@ i.favourited:hover:before {
   bottom: 0;
   background-color: @trpBgColor;
   z-index: 400;
-  .transition1s;
+  .transition500ms;
 
   p {
     font-family: 'Open Sans';
