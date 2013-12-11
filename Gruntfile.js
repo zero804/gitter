@@ -80,7 +80,7 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "router-homepage",
+                  name: "userhome",
                   include: [
                     "utils/tracking",
                     "views/widgets/avatar",
