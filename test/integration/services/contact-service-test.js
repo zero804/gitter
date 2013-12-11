@@ -75,7 +75,7 @@ var googleJSON = {
 
 describe('Contact Service', function() {
 
-  describe('Data ingestion', function() {
+  describe.skip('Data ingestion', function() {
     var fixture = {};
 
     before(fixtureLoader(fixture, { user1: { }, user2: { email: contactEmailAddress }}));
@@ -100,9 +100,7 @@ describe('Contact Service', function() {
         .nodeify(done);
     });
 
-    after(function() {
-      fixture.cleanup();
-    });
+    after(function() { fixture.cleanup(); });
 
   });
 

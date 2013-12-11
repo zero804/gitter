@@ -103,7 +103,7 @@ define([
       Backbone.Collection.prototype.constructor.call(this, models, options);
       if(!this.url) {
         var troupeId = options && options.troupeId || context.getTroupeId();
-        this.url = "/troupes/" + troupeId + "/" + this.nestedUrl;
+        this.url = "/api/v1/troupes/" + troupeId + "/" + this.nestedUrl;
       }
 
       this._loading = false;

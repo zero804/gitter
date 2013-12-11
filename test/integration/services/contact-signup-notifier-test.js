@@ -15,7 +15,7 @@ var twice = times(2);
 var thrice = times(3);
 
 
-describe('Contact Signup Notifier', function() {
+xdescribe('Contact Signup Notifier', function() {
 
   describe('onUserAccountActivated with online users', function() {
     var fixture = {};

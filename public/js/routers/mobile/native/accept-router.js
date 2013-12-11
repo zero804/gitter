@@ -23,7 +23,7 @@ require([
 
     defaultAction: function(inviteId){
       var invite = new inviteModels.InviteModel({ id: inviteId });
-      invite.url = '/user/' + context.getUserId() + '/invites/' + inviteId;
+      invite.url = '/api/v1/user/' + context.getUserId() + '/invites/' + inviteId;
       invite.fetch();
 
       var inviteModal = new InviteModal({ model: invite, disableClose: true });

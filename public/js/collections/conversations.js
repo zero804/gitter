@@ -35,7 +35,7 @@ define([
     },
 
     initialize: function(options) {
-      this.url = "/troupes/" + context.getTroupeId() + "/conversations/" + options.id;
+      this.url = "/api/v1/troupes/" + context.getTroupeId() + "/conversations/" + options.id;
     }
 
   });
@@ -52,7 +52,7 @@ define([
       this.emailCollection = new EmailCollection({ id: options.id });
       this.on('change:emails', this.resetEmails, this);
 
-      this.url = "/troupes/" + context.getTroupeId() + "/conversations/" + options.id;
+      this.url = "/api/v1/troupes/" + context.getTroupeId() + "/conversations/" + options.id;
     },
 
     resetEmails: function() {

@@ -26,7 +26,7 @@ define([
     nestedUrl: "invites",
 
     initialize: function() {
-      this.url = "/user/" + context.getUserId() + "/invites";
+      this.url = "/api/v1/user/" + context.getUserId() + "/invites";
     }
 
   });
@@ -37,7 +37,7 @@ define([
     nestedUrl: "connectioninvites",
 
     initialize: function() {
-      this.url = "/user/" + context.getUserId() + "/connectioninvites";
+      this.url = "/api/v1/user/" + context.getUserId() + "/connectioninvites";
     }
 
   });
@@ -48,7 +48,7 @@ define([
     nestedUrl: "invites",
 
     initialize: function() {
-      this.url = "/troupes/" + context.getTroupeId() + "/invites";
+      this.url = "/api/v1/troupes/" + context.getTroupeId() + "/invites";
     }
 
   });

@@ -13,13 +13,14 @@
 	position: absolute;
 	color: white;
 	width: 85%;
-	padding-top: 12px;
 }
 
 .trpToolbarHeader {
 	font-size: 12px;
 	text-transform: uppercase;
 	padding-bottom: 4px;
+	opacity: 0.6;
+	margin-left: 10px
 }
 
 .trpTroupeList {
@@ -27,15 +28,43 @@
 }
 
 .trpLeftMenuWrapper {
-	padding-left: 21px;
-	width: 90%;
+	padding-left: 0;
+	width: 100%;
 }
 
 .trpLeftMenuToolbar {
 	padding-left: 12px;
 }
 
-#left-menu-scroll {
-	height: 350px;
-	-webkit-overflow-scrolling: touch;
+.trpLeftMenuSearch {
+	display: none;
+}
+
+.trpTroupeList {
+  display: inline-block;
+	list-style-type: none;
+	margin: 0;
+  width: 100%;
+  line-height: 14px;
+  margin-bottom: 18px;
+  box-sizing: border-box;
+
+  li {
+  	padding-left: 10px;
+  	line-height: 30px;
+    box-sizing: border-box;
+  }
+
+  li:hover {
+    border-radius: 0 4px 4px 0;
+    background-color: rgba(255,255,255,0.2);
+  }
+}
+
+.trpTroupeList a {
+  display: inline-block;
+	color: white;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }

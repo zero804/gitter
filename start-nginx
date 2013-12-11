@@ -1,3 +1,0 @@
-#!/bin/bash
-DIR="$( cd "$( dirname "$0" )" && pwd )"
-sudo /usr/local/sbin/nginx -c $DIR/nginx/nginx.conf 

@@ -100,7 +100,7 @@ define([
     //chatItemView.$el.find('.trpChatText').prepend(iconHtml);
 
     // This could be moved to the template render, is here temporarily.
-    chatItemView.$el.find('.trpChatBox').addClass('transparent');
+    chatItemView.$el.find('.trpChatBox').addClass('webhook');
   }
 
   var decorator = {

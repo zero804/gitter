@@ -49,6 +49,37 @@ describe('url-extractor', function() {
     assert.equal(urls[0].indices[1], 410);
   });
 
+  describe('isses extraction', function() {
+    it('should find issues in the trivial case', function() {
+      var issues = underTest.extractIssuesWithIndices('#1234');
+      assert.equal(issues.length, 1);
+      assert.equal(issues[0].number, '1234');
+      assert.equal(issues[0].indices[0], 0);
+      assert.equal(issues[0].indices[1], 5);
+    });
 
+    it('should not match mid word', function() {
+      var issues = underTest.extractIssuesWithIndices('abc#1234');
+      assert.equal(issues.length, 0);
+    });
+
+    it('should not match non numeric issues', function() {
+      var issues = underTest.extractIssuesWithIndices('#YOLO');
+      assert.equal(issues.length, 0);
+    });
+
+    it('should find multiple issues', function() {
+      var issues = underTest.extractIssuesWithIndices('#1234 #5678');
+      assert.equal(issues.length, 2);
+      assert.equal(issues[0].number, '1234');
+      assert.equal(issues[0].indices[0], 0);
+      assert.equal(issues[0].indices[1], 5);
+
+      assert.equal(issues[1].number, '5678');
+      assert.equal(issues[1].indices[0], 6);
+      assert.equal(issues[1].indices[1], 11);
+    });
+
+  });
 
 });

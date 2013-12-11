@@ -104,10 +104,10 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, do
 // first, and rendering the `dialog` view.
 
 exports.authorization = [
-  middleware.ensureLoggedIn({ loginUrl: function(req, done) {
+  middleware.ensureLoggedIn(/*{ loginUrl: function(req, done) {
     // Redirect with all the query parameters intact
-    done(null, '/oauth/login?' + url.parse(req.url).query);
-  }}),
+    done(null, '/login?' + url.parse(req.url).query);
+  }}*/),
   server.authorization(function(clientKey, redirectUri, done) {
 
     oauthService.findClientByClientKey(clientKey, function(err, client) {
@@ -156,7 +156,7 @@ exports.decision = [
 // authenticate when making requests to this endpoint.
 
 exports.token = [
-  passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
+  passport.authenticate([/*'basic', */'oauth2-client-password'], { session: false }),
   server.token(),
   server.errorHandler()
 ];

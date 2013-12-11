@@ -1,0 +1,167 @@
+<html>
+<head>
+
+<link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Signika:400,300,600' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
+
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+</head>
+
+<style>
+
+@font-face {
+    font-family: "octicons";
+    src: url("https://github.global.ssl.fastly.net/assets/octicons-810348ca79b0f83691f16307908e3c3fee103f93.woff") format('woff');
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+
+h1 {
+  font-family: 'Open Sans';
+  font-weight: 300;
+  font-size: 42px;
+
+}
+
+h2 {
+  font-weight: 300;
+  font-family: 'Open Sans';
+  font-size: 30px;
+}
+
+.outer-container {
+
+}
+
+.container {
+  text-align: center;
+}
+
+.strip {
+  width: 920px;
+  display: inline-block;
+  font-family: 'Open Sans';
+  font-weight: 300;
+}
+
+.feature {
+  margin-top: 40px;
+  text-align: left;
+  margin-bottom: 40px;
+}
+
+.button {
+  border-radius: 4px;
+  display: inline-block;
+  padding: 18px 24px;
+}
+
+.button.white {
+  background-color: rgba(255,255,255,0.8);
+  border-bottom: 3px solid rgba(255,255,255,1);
+}
+
+.button.green {
+  color: white;
+  background-color: rgba(29,206,115, 0.9);
+  border-bottom: 3px solid rgba(29,206,115, 1);
+}
+
+.button.green:hover {
+  background-color: rgba(29,206,115, 1);
+}
+
+.interested {
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 6px;
+  padding: 38px 28px;
+  margin: 40px 0;
+}
+
+</style>
+
+<body>
+
+<div class="outer-container" style="">
+  <div class="container" style="background-image: url('img/splash.jpg'); padding-top: 20px;">
+    <div class="strip" style="text-align: left"><img src="img/logo2.png" width="200"></div>
+    <Br><br>
+    <div class="strip" style="color:white;"><h1>It's chat. For GitHub.</h1></div>
+    <div class="strip"><img src="img/screenshot.jpg" width="920" style="border-radius: 2px 2px 0 0"></div>
+  </div>
+  <div class="container" style="background-color: #eee; padding-bottom: 20px" >
+    <div class="strip feature"> 
+      <div style="display: inline-block; vertical-align: top; max-width: 450px; margin-top: 40px">
+        <h2 style="margin-top: 0">Chat rooms for everything</h2>
+        <div style="text-align: left">Free chat rooms for your public repositories. <br>A bit like IRC only <a href="#myAnchor" rel="" id="anchor1" style="color: #1dce73; text-decoration: none" class="anchorLink">smarter</a>. <p>Chats for private repositories as well as organisations. <br>Chat privately with people too.</p><p>Infinite, searchable chat history.</p></div>
+      </div>
+      <div style="display: inline-block; float: right; vertical-align: top;" style=""><img src="img/chats.png" width="284" height="284"></div>
+    </div>
+  </div>
+
+  <div class="container" style="background-color: #162e34; padding: 60px 0">
+    <div class="strip">
+      <span style="opacity: 0.8; color: white";>Interested? Here's how this works. We've already built the chat bit and are thinking about deeply integrating with GitHub. <br>If enough people show interest, we'll make this happen. It's a bit like Kickstarter, but with no cash commitment.<br><br>Click on the signup button below to register your interest. </span><br><br>
+      <a href="#smarter" class="button green" id="signup" style="text-decoration: none; color: white">Signup with GitHub</a>
+    </div>
+  </div>
+
+  <div class="container" style="background-color: white; padding: 10px 0">
+<a name="myAnchor" id="myAnchor"> </a>
+    <div class="strip feature">
+      <h2 style="text-align: center">So smart, it even knows the code</h2><br>
+      <div><img src="img/files.png" width="700"></div><br><br>
+      <h2 style="text-align: center">As well as the issues</h2><br>
+      <div style="text-align: center"><img src="img/issue.png" width="600"></div>
+    </div>
+  </div>
+
+  <div class="container" style="background-color: #eee">
+    <div class="strip feature"> 
+      <div style="display: inline-block; vertical-align: top; max-width: 620px; margin-top: 60px">
+        <h2 style="margin-top: 0">Available everywhere that has internets</h2>
+        <div style="text-align: left">In any browser. Apps for Mac, Windows, iPhone and Android.<br>
+          Receive customised notifications.<br><br>Yes, we know, that's a gold iPhone.</p></div>
+      </div>
+      <div style="display: inline-block; float: right; vertical-align: top; margin-right: 80px; margin-top: 10px" style=""><img src="img/iphone.png" height="284"></div>
+    </div>
+  </div>
+
+  <div class="container" style="background-color: #162e34; padding-bottom: 30px">
+    <div class="strip feature" style="text-align: center">
+      <h2 style="text-align: center; color: white">Other awesome features</h2>
+      <span style="color: white; line-height: 150%">Know who's seen any message. <span style="opacity: 0.6">Edit messages after you've sent them.</span> Webhook integrations with Jenkins, Trello and more.<br>
+      <span style="opacity:0.6;">Automatically embeds content like YouTube, pictures of cats and other stuff.</span> Did we mention our smart notifications?<br>
+      @mentions. Batched notifications. Won't annoy you by making your phone beep on every message. <span style='opacity: 0.6'>Awesome emotigifs. Infinite chat history stored in the cloud. </span>Searchable too, naturally. <span style='opacity: 0.6'>Oh, and a unified activity feed.</span> Phew, that's a lot.</span>
+    </div>
+  </div>
+
+  <div class="container" style="background-color: white; margin: 20px 0;padding: 40px 0">
+    <div class="strip">
+      <span style="color: black";>Interested? Here's how this works. We've already built the chat bit and are thinking about deeply integrating with GitHub. <br>If enough people show interest, we'll make this happen. It's a bit like Kickstarter, but with no cash commitment.<br><br>Click on the signup button below to register your interest. </span><br><br>
+      <a href="#smarter" class="button green" id="signup" style="text-decoration: none; color: white">Signup with GitHub</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+$('a').click(function(){
+    console.log('clicked');
+    $('html, body').animate({
+        scrollTop: $( $.attr(this, 'href') ).offset().top
+    }, 500);
+    return false;
+});
+
+</script>
+
+
+</body>
+</html>

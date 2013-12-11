@@ -1,1 +1,18 @@
-<div class="trpTroupeName {{#if unreadItems}}trpTroupeBadge{{/if}}"><a href="{{url}}">{{name}}</a></div>
+{{#if room.ethereal}}
+  {{#if user.createRoom}}
+    <a href="{{room.url}}" class="trpLeftMenuLinkItem">
+      <span class="github-REPO" style="margin-top: 2px">{{room.name}}</span>
+    </a>
+  {{else}}
+    <span class="github-REPO disabled" style="margin-top: 2px">{{room.name}}</span>
+  {{/if}}
+{{else}}
+  <a href="{{room.url}}" class="trpLeftMenuLinkItem">
+    <span class="github-{{room.githubType}}" style="margin-top: 2px">{{room.uri}}{{room.name}}</span>
+    {{#if room.unreadItems}}
+    <span class="item-unread-badge">
+      <span class="trpTroupeUnreadCounter">{{room.unreadItems}}</span>
+    </span>
+    {{/if}}
+  </a>
+{{/if}}

@@ -1,10 +1,11 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 
 define([
+  'utils/context',
   'marionette',
   'views/base',
   'hbs!./tmpl/troupeListItem'
-], function(Marionette, TroupeViews, troupeListItemTemplate) {
+], function(context, Marionette, TroupeViews, troupeListItemTemplate) {
   "use strict";
 
   var TroupeItemView = TroupeViews.Base.extend({
@@ -12,6 +13,13 @@ define([
     template: troupeListItemTemplate,
     initialize: function() {
       this.setRerenderOnChange(true);
+    },
+    getRenderData: function() {
+      var data = {};
+      data.room = this.model.toJSON();
+      data.user = context.getUser();
+
+      return data;
     }
   });
 

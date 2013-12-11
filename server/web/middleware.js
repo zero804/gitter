@@ -47,7 +47,30 @@ exports.ensureLoggedIn = function(options) {
   return [
     bearerAuthMiddleware,
     function(req, res, next) {
-      if (req.isAuthenticated && req.isAuthenticated()) return next();
+      if (req.isAuthenticated && req.isAuthenticated()) {
+        if(!req.user.githubToken && !req.user.githubUserToken) {
+          winston.verbose('Client needs to reauthenticate');
+          exports.logout()(req, res, function() {
+
+            // Are we dealing with an API client? Tell em in HTTP
+            if(req.accepts(['json','html']) === 'json') {
+              winston.error("Use no longer has a token");
+              res.send(401, { success: false, loginRequired: true });
+              return;
+            }
+            /* Not a web client? Give them the message straightup */
+            if(req.headers['authorization']) {
+              return next(401);
+            }
+
+            return res.relativeRedirect("/");
+          });
+
+          return;
+        }
+
+        return next();
+      }
 
       winston.verbose('Client needs to authenticate', options);
 
@@ -63,7 +86,7 @@ exports.ensureLoggedIn = function(options) {
       }
 
       if(!options.loginUrl) {
-        return res.relativeRedirect(nconf.get('web:homeurl') + "#login");
+        return res.relativeRedirect("/login");
       }
 
       if(typeof options.loginUrl == "function") {
@@ -99,6 +122,8 @@ exports.logoutPreserveSession = function(req, res, done) {
     done();
   }
 };
+
+
 
 exports.logout = function() {
   return function(req, res, next) {
@@ -157,14 +182,15 @@ exports.grantAccessForRememberMeTokenMiddleware = [
 ];
 
 exports.generateRememberMeTokenMiddleware = function(req, res, next) {
-  if(req.body.rememberMe) {
+  // TODO: ask people if they want to be remembered (keep it as a user setting?)
+  //if(req.body.rememberMe) {
     rememberMe.generateAuthToken(req, res, req.user.id, {}, function(err) {
       if(err) return next(err);
       next();
     });
-  } else {
-    next();
-  }
+  // } else {
+  //   next();
+  // }
 };
 
 exports.simulateDelay = function(timeout) {
@@ -178,7 +204,7 @@ exports.simulateDelay = function(timeout) {
 exports.ensureValidBrowser = function(req, res, next) {
   var agent = useragent.parse(req.headers['user-agent']);
   if(agent.family === 'IE' && agent.major <= 9) {
-    res.relativeRedirect('/unawesome-browser');
+    res.relativeRedirect('/-/unawesome-browser');
   } else {
     next();
   }

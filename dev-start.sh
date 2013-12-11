@@ -10,7 +10,7 @@ bash -l <<"DELIM"
 	echo starting mongo
 	./mongodb.sh &
 
-	sleep 2
+	sleep 10 
 
 	if [ "$(mongo --quiet --eval 'rs.status().ok')" -eq "0" ]; then
 		echo Replicaset not initialised. Initialising

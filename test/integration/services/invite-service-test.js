@@ -222,7 +222,7 @@ function testInviteRejection(email, done) {
 }
 
 
-describe('troupe-service', function() {
+xdescribe('troupe-service', function() {
 
   describe('#acceptInviteForAuthenticatedUser', function() {
 

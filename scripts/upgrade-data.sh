@@ -9,7 +9,7 @@ if [ -z "$MONGO_HOST" ]; then
 fi;
 
 if [ -z "$MONGO_DB" ]; then
-  MONGO_DB=troupe
+  MONGO_DB=gitter
 fi;
 
 MONGO_URL=$MONGO_HOST/$MONGO_DB

@@ -1,4 +1,4 @@
-                             /*jshint globalstrict:true, trailing:false, unused:true, node:true */
+/*jshint globalstrict:true, trailing:false, unused:true, node:true */
 /*global require: true, module: true */
 "use strict";
 
@@ -25,6 +25,12 @@ function findByUri(uri, callback) {
   return persistence.Troupe.findOneQ({uri: uri})
     .nodeify(callback);
 }
+
+function findAllByUri(uris, callback) {
+  return persistence.Troupe.where('uri').in(uris).execQ()
+    .nodeify(callback);
+}
+
 
 function findByIds(ids, callback) {
   return persistence.Troupe
@@ -300,9 +306,7 @@ function removeUserFromTroupe(troupeId, userId, callback) {
 
       // TODO: Let the user know that they've been removed from the troupe (via email or something)
       troupe.removeUserById(userId);
-      if(troupe.users.length === 0) {
-        return callback("Cannot remove the last user from a troupe");
-      }
+
       troupe.save(callback);
     });
   });
@@ -477,42 +481,62 @@ function findOneToOneTroupe(fromUserId, toUserId) {
  * @return {troupe} Promise of a troupe
  */
 function findOrCreateOneToOneTroupe(userId1, userId2) {
-
   assert(userId1, "Need to provide user 1 id");
   assert(userId2, "Need to provide user 2 id");
 
-  /* Find the existing one-to-one.... */
-  return persistence.Troupe.findOneQ({
-    $and: [
+  userId1 = mongoUtils.asObjectID(userId1);
+  userId2 = mongoUtils.asObjectID(userId2);
+
+  var insertFields = {
+    name: '',
+    oneToOne: true,
+    status: 'ACTIVE',
+    githubType: 'ONETOONE',
+    users: [ { _id: new ObjectID(), userId: userId1 },
+             { _id: new ObjectID(), userId: userId2 }]
+  };
+
+  // Remove undefined fields
+  Object.keys(insertFields).forEach(function(k) {
+    if(insertFields[k] === undefined) {
+      delete insertFields[k];
+    }
+  });
+
+  return persistence.Troupe.updateQ(
+    { $and: [
       { oneToOne: true },
       { 'users.userId': userId1 },
       { 'users.userId': userId2 }
-    ]
-  })
-  .then(function(troupe) {
-    if(troupe) return troupe;
+      ]},
+    {
+      $setOnInsert: insertFields
+    },
+    {
+      upsert: true,
+    }).spread(function(numAffected, raw) {
+      return persistence.Troupe.findOneQ(
+        { $and: [
+          { oneToOne: true },
+          { 'users.userId': userId1 },
+          { 'users.userId': userId2 }
+          ]})
+        .then(function(troupe) {
+          if(raw.upserted) {
+            winston.verbose('Created a oneToOne troupe for ', { userId1: userId1, userId2: userId2 });
 
-    winston.verbose('Creating a oneToOne troupe for ', { userId1: userId1, userId2: userId2 });
-    return createTroupeQ({
-        name: '',
-        oneToOne: true,
-        status: 'ACTIVE',
-        users: [
-          { userId: userId1 },
-          { userId: userId2 }
-        ]
-      })
-      .then(function(troupe) {
-        statsService.event('new_troupe', {
-          troupeId: troupe.id,
-          oneToOne: true,
-          userId: userId1,
-          oneToOneUpgrade: false
+            statsService.event('new_troupe', {
+              troupeId: troupe.id,
+              oneToOne: true,
+              userId: userId1,
+              oneToOneUpgrade: false
+            });
+          }
+
+          return troupe;
         });
 
-        return troupe;
       });
-  });
 
 }
 
@@ -560,69 +584,79 @@ function findOrCreateOneToOneTroupeIfPossible(fromUserId, toUserId) {
       // Found the troupe? Perfect!
       if(troupe) return [ troupe, toUser, null ];
 
-      return findImplicitConnectionBetweenUsers(fromUserId, toUserId)
-          .then(function(implicitConnection) {
-            if(implicitConnection) {
+      // For now, there is no permissions model between users
+      // There is an implicit connection between these two users,
+      // automatically create the troupe
+      return findOrCreateOneToOneTroupe(fromUserId, toUserId)
+        .then(function(troupe) {
+          return [ troupe, toUser, null ];
+        });
 
-              // There is an implicit connection between these two users,
-              // automatically create the troupe
-              return findOrCreateOneToOneTroupe(fromUserId, toUserId)
-                .then(function(troupe) {
-                  return [ troupe, toUser, null ];
-                });
-            }
+      // TODO: setup a permissions model for one to one chats
 
-            // There is no implicit connection between the users, don't create the troupe
-            // However, do tell the caller whether or not this user already has an invite to the
-            // other user to connect
+      // return findImplicitConnectionBetweenUsers(fromUserId, toUserId)
+      //     .then(function(implicitConnection) {
+      //       if(implicitConnection) {
 
-            // Otherwise the users cannot onnect the and the user will need to invite the other user
-            // to connect explicitly.
-            // Check if the user has already invited the other user to connect
+      //         // There is an implicit connection between these two users,
+      //         // automatically create the troupe
+      //         return findOrCreateOneToOneTroupe(fromUserId, toUserId)
+      //           .then(function(troupe) {
+      //             return [ troupe, toUser, null ];
+      //           });
+      //       }
 
-            // Look to see if the other user has invited this user to connect....
-            // NB from and to users are swapped around here as we are looking for the correlorary (sp)
-            return findUnusedOneToOneInviteFromUserIdToUserId(toUserId, fromUserId)
-              .then(function(invite) {
-                return [ null, toUser, invite ];
-              });
+      //       // There is no implicit connection between the users, don't create the troupe
+      //       // However, do tell the caller whether or not this user already has an invite to the
+      //       // other user to connect
 
-          });
+      //       // Otherwise the users cannot onnect the and the user will need to invite the other user
+      //       // to connect explicitly.
+      //       // Check if the user has already invited the other user to connect
+
+      //       // Look to see if the other user has invited this user to connect....
+      //       // NB from and to users are swapped around here as we are looking for the correlorary (sp)
+      //       return findUnusedOneToOneInviteFromUserIdToUserId(toUserId, fromUserId)
+      //         .then(function(invite) {
+      //           return [ null, toUser, invite ];
+      //         });
+
+      //     });
     });
 
 }
 
-/**
- * Take a one to one troupe and turn it into a normal troupe with extra invites
- * @return promise with new troupe
- */
-function upgradeOneToOneTroupe(options, callback) {
-  var name = options.name;
-  var fromUser = options.user;
-  var origTroupe = options.oneToOneTroupe.toObject();
+// /**
+//  * Take a one to one troupe and turn it into a normal troupe with extra invites
+//  * @return promise with new troupe
+//  */
+// function upgradeOneToOneTroupe(options, callback) {
+//   var name = options.name;
+//   var fromUser = options.user;
+//   var origTroupe = options.oneToOneTroupe.toObject();
 
-  // create a new, normal troupe, with the current users from the one to one troupe
-  return createTroupeQ({
-      uri: createUniqueUri(),
-      name: name,
-      status: 'ACTIVE',
-      users: origTroupe.users
-    })
-    .then(function(troupe) {
+//   // create a new, normal troupe, with the current users from the one to one troupe
+//   return createTroupeQ({
+//       uri: createUniqueUri(),
+//       name: name,
+//       status: 'ACTIVE',
+//       users: origTroupe.users
+//     })
+//     .then(function(troupe) {
 
-      statsService.event('new_troupe', {
-        troupeId: troupe.id,
-        userId: fromUser.id,
-        email: fromUser.email,
-        oneToOneUpgrade: true,
-        oneToOne: false
-      });
+//       statsService.event('new_troupe', {
+//         troupeId: troupe.id,
+//         userId: fromUser.id,
+//         email: fromUser.email,
+//         oneToOneUpgrade: true,
+//         oneToOne: false
+//       });
 
-      return troupe;
-    })
-    .nodeify(callback);
+//       return troupe;
+//     })
+//     .nodeify(callback);
 
-}
+// }
 
 function createUniqueUri() {
   var chars = "0123456789abcdefghiklmnopqrstuvwxyz";
@@ -657,6 +691,19 @@ function updateFavourite(userId, troupeId, isFavourite, callback) {
     .then(function() {
       // Fire a realtime event
       appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: isFavourite });
+    })
+    .nodeify(callback);
+}
+
+function updateTopic(troupeId, topic, callback) {
+  return findByIdRequired(troupeId)
+    .then(function(troupe) {
+      troupe.topic = topic;
+
+      return troupe.saveQ()
+        .then(function() {
+          return troupe;
+        });
     })
     .nodeify(callback);
 }
@@ -815,61 +862,61 @@ function findLastAccessedTroupeForUser(user, callback) {
 
 }
 
-//
-//
-//
-/**
- * Create a new troupe from a one-to-one troupe and auto-invite users
- * @return promise of a troupe
- */
-function createNewTroupeForExistingUser(options, callback) {
-  return Q.resolve(null).then(function() {
-    var name = options.name;
-    var oneToOneTroupeId = options.oneToOneTroupeId;
-    var user = options.user;
+// //
+// //
+// //
+// /**
+//  * Create a new troupe from a one-to-one troupe and auto-invite users
+//  * @return promise of a troupe
+//  */
+// function createNewTroupeForExistingUser(options, callback) {
+//   return Q.resolve(null).then(function() {
+//     var name = options.name;
+//     // var oneToOneTroupeId = options.oneToOneTroupeId;
+//     var user = options.user;
 
-    name = name ? name.trim() : '';
+//     name = name ? name.trim() : '';
 
-    assert(user, 'user required');
-    assert(name, 'Please provide a troupe name');
+//     assert(user, 'user required');
+//     assert(name, 'Please provide a troupe name');
 
-    if (oneToOneTroupeId) {
-      // find this 1-1 troupe and create a new normal troupe with the additional person(s) invited
-      return findById(oneToOneTroupeId)
-        .then(function(troupe) {
-          if(!userHasAccessToTroupe(user, troupe)) {
-            throw 403;
-          }
+//     // if (oneToOneTroupeId) {
+//     //   // find this 1-1 troupe and create a new normal troupe with the additional person(s) invited
+//     //   return findById(oneToOneTroupeId)
+//     //     .then(function(troupe) {
+//     //       if(!userHasAccessToTroupe(user, troupe)) {
+//     //         throw 403;
+//     //       }
 
-          return upgradeOneToOneTroupe({
-            name: name,
-            oneToOneTroupe: troupe,
-            user: user });
-        });
-    }
+//     //       return upgradeOneToOneTroupe({
+//     //         name: name,
+//     //         oneToOneTroupe: troupe,
+//     //         user: user });
+//     //     });
+//     // }
 
-    // create a troupe normally
-    var troupe = new persistence.Troupe({
-      name: name,
-      uri: createUniqueUri()
-    });
-    troupe.addUserById(user.id);
-    return troupe.saveQ()
-      .then(function() {
-        statsService.event('new_troupe', {
-          troupeId: troupe.id,
-          userId: user.id,
-          email: user.email,
-          oneToOneUpgrade: true,
-          oneToOne: false
-        });
+//     // create a troupe normally
+//     var troupe = new persistence.Troupe({
+//       name: name,
+//       uri: createUniqueUri()
+//     });
+//     troupe.addUserById(user.id);
+//     return troupe.saveQ()
+//       .then(function() {
+//         statsService.event('new_troupe', {
+//           troupeId: troupe.id,
+//           userId: user.id,
+//           email: user.email,
+//           oneToOneUpgrade: true,
+//           oneToOne: false
+//         });
 
-        return troupe;
-      });
+//         return troupe;
+//       });
 
-  }).nodeify(callback);
+//   }).nodeify(callback);
 
-}
+// }
 
 
 function deleteTroupe(troupe, callback) {
@@ -889,6 +936,7 @@ function deleteTroupe(troupe, callback) {
 
 module.exports = {
   findByUri: findByUri,
+  findAllByUri: findAllByUri,
   findById: findById,
   findByIds: findByIds,
   findAllTroupesForUser: findAllTroupesForUser,
@@ -927,10 +975,12 @@ module.exports = {
   updateFavourite: updateFavourite,
   findFavouriteTroupesForUser: findFavouriteTroupesForUser,
   findBestTroupeForUser: findBestTroupeForUser,
-  createNewTroupeForExistingUser: createNewTroupeForExistingUser,
+  // createNewTroupeForExistingUser: createNewTroupeForExistingUser,
   indexTroupesByUserIdTroupeId: indexTroupesByUserIdTroupeId,
 
   addUserIdToTroupe: addUserIdToTroupe,
-  findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe
+  findOrCreateOneToOneTroupe: findOrCreateOneToOneTroupe,
+
+  updateTopic: updateTopic
 
 };

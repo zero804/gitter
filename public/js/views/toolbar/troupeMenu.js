@@ -3,6 +3,7 @@ define([
   'jquery',
   'underscore',
   'marionette',
+  'utils/context',
   'collections/instances/troupes',
   'views/toolbar/troupeCollectionView',
   'hbs!views/toolbar/tmpl/troupeListItemEmpty',
@@ -10,17 +11,21 @@ define([
   'views/app/invitesView',
   'hbs!./tmpl/troupeMenu',
   './searchView',
-  "nanoscroller" // No ref!
-], function($, _, Marionette, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView) {
+  './profileView',
+  './orgCollectionView',
+  './repoCollectionView',
+  'backbone',
+  'nanoscroller' //no ref
+], function($, _, Marionette, context, troupeCollections, TroupeCollectionView, troupeListItemEmpty, privateTroupeListItemEmpty, InvitesView, template, SearchView, ProfileView, OrgCollectionView, RepoCollectionView, Backbone) {
   "use strict";
 
   return Marionette.Layout.extend({
     template: template,
     tagName: 'span',
     selectedListIcon: "icon-troupes",
-    serializeData: function() { return { compactView: window._troupeCompactView }; },
 
     regions: {
+      profile: "#left-menu-profile",
       unread: "#left-menu-list-unread",
       invites: "#left-menu-list-invites",
       outgoingConnectionInvites: "#left-menu-list-outgoing-connection-invites",
@@ -28,48 +33,50 @@ define([
       incomingTroupeInvites: "#left-menu-list-incoming-troupe-invites",
       recent: "#left-menu-list-recent",
       favs: "#left-menu-list-favourites",
-      troupes: "#left-menu-list",
       people: "#left-menu-list-users",
-      search: "#left-menu-list-search"
+      search: "#left-menu-list-search",
+      orgs: "#left-menu-list-orgs",
+      repos: "#left-menu-list-repos"
     },
 
     events: {
-      "click .left-menu-icon":    "onLeftMenuListIconClick",
-      "mouseenter .left-menu-icon":       "onMouseEnterToolbarItem",
-      "mouseleave .left-menu-icon":       "onMouseLeaveToolbarItem"
+      "click #search-clear-icon" : "onSearchClearIconClick",
+      "click #left-menu-profile" : "onClickProfileMenu"
     },
 
     initialize: function() {
       this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
-
+      var ua = navigator.userAgent.toLowerCase();
+      if (ua.indexOf('gitter/') >= 0) {
+        this.isGitterApp = true;
+      }
       var self = this;
       $(window).on('showSearch', function() {
         self.showSearch();
       });
+      $(window).on('hideSearch', function() {
+        self.hideSearch();
+      });
     },
 
     onRender: function() {
-      this.$el.find('.nano').nanoScroller(/*{ preventPageScrolling: true }*/);
 
-      // normal troupe view
-      this.troupes.show(new TroupeCollectionView({collection: troupeCollections.normalTroupes, emptyView: Marionette.ItemView.extend({ template: troupeListItemEmpty })}));
+      this.profile.show(new ProfileView());
 
       // one to one troupe view
       this.people.show(new TroupeCollectionView({collection: troupeCollections.peopleTroupes, emptyView: Marionette.ItemView.extend({ template: privateTroupeListItemEmpty })}));
 
-      if (window._troupeCompactView) {
-        // mega-list: recent troupe view
-        this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentTroupes }));
+      // mega-list: recent troupe view
+      this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentTroupes }));
 
-        // mega-list: unread troupe view
-        this.unread.show(new TroupeCollectionView({collection: troupeCollections.unreadTroupes }));
+      // mega-list: unread troupe view
+      this.unread.show(new TroupeCollectionView({collection: troupeCollections.unreadTroupes }));
 
-        // mega-list: favourite troupe view
-        this.favs.show(new TroupeCollectionView({ collection: troupeCollections.favouriteTroupes }));
+      // mega-list: favourite troupe view
+      this.favs.show(new TroupeCollectionView({ collection: troupeCollections.favouriteTroupes }));
 
-        // mega-list: incoming invites collection view
-        this.invites.show(new InvitesView({ collection: troupeCollections.incomingInvites }));
-      }
+      // mega-list: incoming invites collection view
+      this.invites.show(new InvitesView({ collection: troupeCollections.incomingInvites }));
 
       // incoming troupe invites view
       this.incomingTroupeInvites.show(new InvitesView({ collection: troupeCollections.incomingTroupeInvites }));
@@ -84,18 +91,23 @@ define([
       this.searchView = new SearchView({ troupes: troupeCollections.troupes, $input: this.$el.find('#list-search-input') });
       this.search.show(this.searchView);
 
+      // Organizations collection view
+      this.orgs.show(new OrgCollectionView({ collection: troupeCollections.orgs }));
+
+      // Repositories collection view
+      this.repos.show(new RepoCollectionView({ collection: troupeCollections.repos }));
+
+
       this.initHideListeners();
+    },
 
-      var self = this;
-      if (!window._troupeCompactView) {
-        self.showTab('icon-troupes');
-      }
-
+    onSearchClearIconClick: function() {
+      $('#list-search-input').val('');
+      this.hideSearch();
     },
 
     initHideListeners: function() {
       var self = this;
-
       toggler('#unreadTroupesList', troupeCollections.unreadTroupes);
       toggler('#favTroupesList', troupeCollections.favouriteTroupes);
       toggler('#recentTroupesList', troupeCollections.recentTroupes);
@@ -103,12 +115,11 @@ define([
       toggler('#incomingTroupeInvites', troupeCollections.incomingTroupeInvites);
       toggler('#outgoingConnectionInvites', troupeCollections.outgoingConnectionInvites);
       toggler('#incomingConnectionInvites', troupeCollections.incomingConnectionInvites);
-
+      toggler('#UsersList', troupeCollections.peopleTroupes);
       function toggler(element, collection) {
         function toggle() {
           self.$el.find(element).toggle(collection.length > 0);
           self.$el.find('.nano').nanoScroller(/*{ preventPageScrolling: true }*/);
-          self.toggleMegaList();
         }
 
         collection.on('all', toggle);
@@ -116,88 +127,29 @@ define([
       }
     },
 
-    toggleMegaList: function() {
-      if (window._troupeCompactView) {
-        var c = troupeCollections;
-        var invisibile = (c.unreadTroupes.length === 0 && c.favouriteTroupes.length === 0 && c.recentTroupes.length === 0 && c.incomingInvites.length === 0);
-
-        var icon = this.$el.find('#icon-mega');
-        if (invisibile) {
-          icon.hide();
-          if (!this.selectedListIcon || this.selectedListIcon === 'icon-mega') {
-            this.showTab('icon-troupes');
-          }
-        }
-        else {
-          icon.show();
-          this.showTab('icon-mega');
-        }
-      }
-    },
-
-    onLeftMenuListIconClick: function(e) {
-      var selected = $(e.target).attr('id');
-      this.showTab(selected);
-    },
-
-    showTab: function(selected) {
-      // make sure focus is on the search box (even if the tab was already open)
-      if (this.selectedListIcon == 'icon-search') {
-        this.activateSearchList();
-      }
-
-      // just in case the on mouse over event wasn't run
-      this.onMouseEnterToolbarItem({ target: this.$el.find('#' + selected) });
-
-      // if the tab was already open do nothing
-      if(selected === this.selectedListIcon) return;
-
-      // Turn off the old selected list
-      var currentSelection = this.$el.find("#"+this.selectedListIcon);
-      currentSelection.removeClass('selected').fadeTo(100, 0.6);
-      var listElement = currentSelection.data('list');
-
-      this.$el.find("#" + listElement).hide();
-
-      // TODO: We probably want to destroy the list to remove the dom elements
-
-      // enable the new selected list
-      this.selectedListIcon = selected;
-      var newSelection = this.$el.find("#" + this.selectedListIcon);
-
-      newSelection.addClass('selected');
-      listElement = newSelection.data('list');
-
-      this.$el.find("#" + listElement).show();
-
-      // TODO: Related to the above TODO, we probably only want to populate the list now
-
-      // make sure focus is on the search box (must be done now as well, after the elements are actually displayed)
-      if (this.selectedListIcon == 'icon-search') {
-        this.activateSearchList();
-      }
-
-      this.$el.find('.nano').nanoScroller(/*{ preventPageScrolling: true }*/);
-    },
-
     activateSearchList: function() {
       this.$el.find('#list-search-input').focus();
     },
 
+    onClickProfileMenu: function() {
+      if (this.isGitterApp) {
+        window.location.href = "/" + context.getUser().username; 
+        return;
+      }
+
+      $('#left-menu-profile').toggleClass('active');
+      $('#left-menu-scroll').toggleClass('pushed');
+    },
+
+    hideSearch: function() {
+      this.$el.find('#list-search').hide();
+      this.$el.find('#list-mega').show();
+    },
+
     showSearch: function() {
-      this.showTab('icon-search');
+      this.$el.find('#list-mega').hide();
+      this.$el.find('#list-search').show();
     },
-
-    onMouseEnterToolbarItem: function(e) {
-      $(e.target).fadeTo(100, 1.0);
-    },
-
-    onMouseLeaveToolbarItem: function(e) {
-      if ($(e.target).hasClass('selected')) return true;
-
-      $(e.target).fadeTo(100, 0.6);
-    }
-
 
   });
 

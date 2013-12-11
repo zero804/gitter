@@ -19,9 +19,9 @@ define([
         UserVoice.push(['autoprompt', {}]);
         UserVoice.push(['addTrigger', element[0], { }]);
         UserVoice.push(['identify', {
-          email: user.email,
-          name: user.displayName,
-          id: user.id
+          username: user.username,
+          id: user.id,
+          email: user.email || ''
         }]);
       });;
       
