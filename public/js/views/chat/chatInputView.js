@@ -2,16 +2,21 @@
 define([
   'log!chat-input',
   'jquery',
+  'underscore',
   'utils/context',
   'views/base',
   'utils/appevents',
   'hbs!./tmpl/chatInputView',
+  'hbs!./tmpl/typeaheadListItem',
+  'hbs!./tmpl/emojiTypeaheadListItem',
   'utils/momentWrapper',
   'utils/safe-html',
   'utils/scrollbar-detect',
-  'jquery-placeholder', // No ref
+  'collections/instances/integrated-items',
+  './emoji_list',
+  'jquery-textcomplete', // No ref
   'jquery-sisyphus' // No ref
-], function(log, $, context, TroupeViews, appEvents, template, moment, safeHtml, hasScrollBars) {
+], function(log, $, _, context, TroupeViews, appEvents, template, listItemTemplate, emojiListItemTemplate, moment, safeHtml, hasScrollBars, itemCollections, emojiList) {
   "use strict";
 
   /** @const */
@@ -19,6 +24,48 @@ define([
 
   /** @const */
   var EXTRA_PADDING = 20;
+
+  var commandsList = [
+    {
+      command: 'topic foo',
+      description: 'Set room topic to foo',
+      completion: 'topic ',
+      regexp: /^\/topic/,
+      action: function(view) {
+        var topicMatch = view.$el.val().match(/^\/topic (.+)/);
+        if (topicMatch) {
+          var topic = topicMatch[1];
+          view.setTopic(topic);
+          view.$el.val('');
+        }
+      }
+    },
+    {
+      command: 'query @user',
+      description: 'Go private with @user',
+      completion: 'query @',
+      regexp: /^\/query/,
+      action: function(view) {
+        var userMatch = view.$el.val().match(/\/query @(\w+)/);
+        if (!userMatch) return;
+        var user = userMatch[1];
+        // this doesn't entire fix the issue of the chat not clearing properly
+        $('#chatInputForm').trigger('reset');
+        view.$el.val('');
+        window.location = '/' + user;
+      }
+    },
+    {
+      command: 'leave',
+      description: 'Leave the room',
+      completion: 'leave ',
+      regexp: /^\/leave/,
+      action: function(view) {
+        view.$el.val('');
+        view.leaveRoom();
+      }
+    }
+  ];
 
   var ChatInputView = TroupeViews.Base.extend({
     template: template,
@@ -48,6 +95,93 @@ define([
           inputBox.trigger('change');
         }
       }).restoreAllData();
+
+      this.$el.find('textarea').textcomplete([
+          {
+            match: /(^|\s)#(\w*)$/,
+            maxCount: 8,
+            search: function(term, callback) {
+              $.getJSON('/api/v1/troupes/'+context.getTroupeId()+'/issues', { q: term })
+                .done(function(resp) {
+                  callback(resp);
+                })
+                .fail(function() {
+                  callback([]);
+                });
+            },
+            template: function(issue) {
+              return listItemTemplate({
+                name: issue.number,
+                description: issue.title
+              });
+            },
+            replace: function(issue) {
+                return '$1#' + issue.number + ' ';
+            }
+          },
+          {
+            match: /(^|\s)@(\w*)$/,
+            maxCount: 8,
+            search: function(term, callback) {
+                var loggedInUsername = context.user().get('username');
+                var matches = itemCollections.users.models.filter(function(user) {
+                  var username = user.get('username');
+                  var displayName = (user.get('displayName') || '').toLowerCase();
+                  return username != loggedInUsername && (username.indexOf(term) === 0 || displayName.indexOf(term) === 0);
+                });
+                callback(matches);
+            },
+            template: function(user) {
+              return listItemTemplate({
+                name: user.get('username'),
+                description: user.get('displayName')
+              });
+            },
+            replace: function(user) {
+                return '$1@' + user.get('username') + ' ';
+            }
+          },
+          {
+            match: /(^|\s):(\w*)$/,
+            maxCount: 8,
+            search: function(term, callback) {
+              if(term.length < 1) return callback(['+1', '-1']);
+
+              var matches = emojiList.filter(function(emoji) {
+                return emoji.indexOf(term) === 0;
+              });
+              callback(matches);
+            },
+            template: function(emoji) {
+              return emojiListItemTemplate({
+                emoji: emoji
+              });
+            },
+            replace: function (value) {
+              return '$1:' + value + ': ';
+            }
+          },
+          {
+            match: /(^|\s)\/(\w*)$/,
+            maxCount: 8,
+            search: function(term, callback) {
+              var matches = commandsList.filter(function(cmd) {
+                return cmd.command.indexOf(term) === 0;
+              });
+              callback(matches);
+            },
+            template: function(cmd) {
+              return listItemTemplate({
+                name: cmd.command,
+                description: cmd.description
+              });
+            },
+            replace: function (cmd) {
+              return '$1/' + cmd.completion;
+            }
+          }
+
+      ]);
 
       // http://stackoverflow.com/questions/16149083/keyboardshrinksview-makes-lose-focus/18904886#18904886
       this.$el.find("textarea").on('touchend', function(){
@@ -148,8 +282,6 @@ define([
     // pass in the textarea as el for ChatInputBoxView
     // pass in a scroll delegate
     initialize: function(options) {
-      this.$el.placeholder();
-
       if(hasScrollBars()) {
         this.$el.addClass("scroller");
       }
@@ -171,21 +303,54 @@ define([
     },
 
     onFocusOut: function() {
-      if (this.compactView) this.send();
+      if(this.compactView && !this.isTypeaheadShowing()) {
+        this.processInput();
+      }
     },
 
     onKeyUp: function() {
       this.chatResizer.resizeInput();
     },
 
+    setTopic: function(topic) {
+      $.ajax({
+        url: '/api/v1/troupes/' + context.getTroupeId(),
+        contentType: "application/json",
+        dataType: "json",
+        type: "PUT",
+        data: JSON.stringify({ topic: topic })
+      });
+    },
+
+    leaveRoom: function() {
+      $.ajax({
+        url: "/api/v1/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
+        data: "",
+        type: "DELETE",
+      });
+    },
+
     onKeyDown: function(e) {
-      if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/))) {
+      if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !this.isTypeaheadShowing()) {
         e.stopPropagation();
         e.preventDefault();
 
-        this.send();
-        return;
+        this.processInput();
+
+        return false;
       }
+    },
+
+    processInput: function() {
+      var cmdsMatched = _.map(commandsList, function(cmd) {
+        if (this.$el.val().match(cmd.regexp)) {
+          cmd.action(this);
+          return true;
+        } else {
+          return false;
+        }
+      }, this);
+      if (!_.some(cmdsMatched)) this.send();
     },
 
     send: function() {
@@ -193,6 +358,10 @@ define([
       $('#chatInputForm').trigger('reset');
       this.$el.val('');
       this.chatResizer.resetInput();
+    },
+
+    isTypeaheadShowing: function() {
+      return this.$el.parent().find('.dropdown-menu').is(":visible");
     }
   });
 

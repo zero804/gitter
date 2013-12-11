@@ -90,46 +90,130 @@ function serializeEvent(url, operation, model, callback) {
 // --------------------------------------------------------------------
 var UnconfirmedEmailSchema = new Schema({
   email:            { type: String },
-  confirmationCode: { type: String }
+    confirmationCode: { type: String }
 });
 UnconfirmedEmailSchema.schemaTypeName = 'UserEmailSchema';
 
 var UserSchema = new Schema({
   displayName: { type: String },
-  email: { type: String },                     // The primary email address
+  // email: { type: String },                     // The primary email address
   emails: [String],                            // Secondary email addresses
-  unconfirmedEmails: [UnconfirmedEmailSchema], // Unconfirmed email addresses
-  username: { type: String },
-  newEmail: String,
+  // unconfirmedEmails: [UnconfirmedEmailSchema], // Unconfirmed email addresses
+  username: { type: String, required: true },
+  // newEmail: String,
   confirmationCode: {type: String },
-  status: { type: String, "enum": ['UNCONFIRMED', 'PROFILE_NOT_COMPLETED', 'ACTIVE'], "default": 'UNCONFIRMED'},
-  passwordHash: { type: String },
-  passwordResetCode: String,
-  avatarVersion: { type: Number, "default": 0 },
+  // status: { type: String, "enum": ['UNCONFIRMED', 'PROFILE_NOT_COMPLETED', 'ACTIVE'], "default": 'UNCONFIRMED'},
+  // passwordHash: { type: String },
+  // passwordResetCode: String,
+  // avatarVersion: { type: Number, "default": 0 },
   gravatarImageUrl: { type: String },
   lastTroupe: ObjectId,
-  location: {
-    timestamp: Date,
-    coordinate: {
-      lon: Number,
-      lat: Number
-    },
-    speed: Number,
-    altitude: Number,
-    named: {
-      place: String,
-      region: String,
-      countryCode: String
-    }
-  },
+  // location: {
+  //   timestamp: Date,
+  //   coordinate: {
+  //     lon: Number,
+  //     lat: Number
+  //   },
+  //   speed: Number,
+  //   altitude: Number,
+  //   named: {
+  //     place: String,
+  //     region: String,
+  //     countryCode: String
+  //   }
+  // },
   googleRefreshToken: String,
-  usernameSuggestion: { type: String },
+  githubToken: { type: String },
+  githubUserToken: { type: String }, // The scope for this token will always be 'user'
+  githubId: {type: Number },
+  permissions: {
+    createRoom: { type: Boolean, 'default': false }
+  },
+  githubScopes: {type: Schema.Types.Mixed },
+  // usernameSuggestion: { type: String },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
-UserSchema.index({ email: 1 }, { unique: true });
-UserSchema.index({ username: 1 }, { unique: true, sparse: true });
-UserSchema.index({ "emails.email" : 1 }, { unique: true, sparse: true });
+// UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ githubId: 1 }, { unique: true, sparse: true });
+UserSchema.index({ username: 1 }, { unique: true /*, sparse: true */});
+// UserSchema.index({ "emails.email" : 1 }, { unique: true, sparse: true });
 UserSchema.schemaTypeName = 'UserSchema';
+
+var LEGACY_DEFAULT_SCOPE = {'user': 1, 'user:email': 1, 'user:follow':1, 'repo':1, 'public_repo': 1};
+
+UserSchema.methods.hasGitHubScope = function(scope) {
+  var githubToken = this.githubToken;
+  var githubScopes = this.githubScopes;
+  var githubUserToken = this.githubUserToken;
+
+  if(!githubUserToken && !githubToken) {
+    return false;
+  }
+
+  // Get the simple case out the way
+  if(githubUserToken && (scope === 'user' ||
+             scope === 'user:email'||
+             scope === 'user:follow')) {
+    return true;
+  }
+
+  function hasScope() {
+    for(var i = 0; i < arguments.length; i++) {
+      if(githubScopes[arguments[i]]) return true;
+    }
+    return false;
+  }
+
+  if(!githubScopes) {
+    if(githubToken) {
+      return !!LEGACY_DEFAULT_SCOPE[scope];
+    }
+    // Legacy users will need to reauthenticate unfortunately
+    return false;
+  }
+
+  // Crazy github rules codified here....
+  switch(scope) {
+    case 'notifications': return hasScope('notifications', 'repo');
+    case 'user:follow': return hasScope('user:follow', 'user');
+    case 'user:email': return hasScope('user:email', 'user');
+    case 'public_repo': return hasScope('public_repo', 'repo');
+    case 'repo:status': return hasScope('repo:status', 'repo');
+  }
+
+  // The less crazy case
+  return !!githubScopes[scope];
+};
+
+UserSchema.methods.getGitHubScopes = function() {
+  if(!this.githubScopes) {
+    if(this.githubUserToken) {
+      return Object.keys(LEGACY_DEFAULT_SCOPE);
+    } else {
+      return [];
+    }
+  }
+
+  var scopes = Object.keys(this.githubScopes);
+  if(!this.githubUserToken) {
+    return scopes;
+  }
+
+  return scopes.concat(['user', 'user:email', 'user:follow']);
+};
+
+UserSchema.methods.getGitHubToken = function(scope) {
+  if(!scope) return this.githubToken || this.githubUserToken;
+
+  switch(scope) {
+    case 'user':
+    case 'user:email':
+    case 'user:follow':
+      return this.githubUserToken || this.githubToken;
+  }
+
+  return this.githubToken || this.githubUserToken;
+};
 
 UserSchema.methods.getDisplayName = function() {
   return this.displayName || this.username || this.email && this.email.split('@')[0] || "Unknown";
@@ -225,17 +309,27 @@ TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
 //
 var TroupeSchema = new Schema({
   name: { type: String },
+  topic: { type: String, 'default':'' },
   uri: { type: String },
+  lcUri: { type: String, 'default': function() { return this.uri ? this.uri.toLowerCase() : null; }  },
+  githubType: { type: String, 'enum': ['REPO', /*'USER',*/ 'ORG', 'ONETOONE'], required: true },
   status: { type: String, "enum": ['ACTIVE', 'DELETED'], "default": 'ACTIVE'},
   oneToOne: { type: Boolean, "default": false },
   users: [TroupeUserSchema],
   dateDeleted: { type: Date },
+  _nonce: { type: Number },
   _tv: { type: 'MongooseNumber', 'default': 0 }
 });
-TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });
-TroupeSchema.index({ "users.userId": 1 });
 TroupeSchema.schemaTypeName = 'TroupeSchema';
 
+// Ideally we should never search against URI, only lcURI
+TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });
+TroupeSchema.index({ lcUri: 1 }, { unique: true, sparse: true });
+TroupeSchema.index({ "users.userId": 1 });
+TroupeSchema.pre('save', function (next) {
+  this.lcUri =  this.uri ? this.uri.toLowerCase() : null;
+  next();
+});
 
 TroupeSchema.methods.getUserIds = function() {
   return this.users.map(function(troupeUser) { return troupeUser.userId; });
@@ -391,6 +485,7 @@ var ChatMessageSchema = new Schema({
   text: String,
   urls: Array,
   mentions: Array,
+  issues: Array,
   meta: Schema.Types.Mixed,
   sent: { type: Date, "default": Date.now },
   editedAt: { type: Date, "default": null },

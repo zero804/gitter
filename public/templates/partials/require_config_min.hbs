@@ -2,14 +2,10 @@ require.config({
   waitSeconds: 15,
   paths: {
     "tours/tour-controller": "tours/tour-controller.min",
-    "ga": "//ssl.google-analytics.com/ga",
-    "uservoice" : "//widget.uservoice.com/V8cI8nnOUIw1g1ESzL50Qg",
+    "uservoice" : "//widget.uservoice.com/Ytskh71stLFzOjhraowHg",
     "optimizely": "//cdn.optimizely.com/js/241369966"
   },
   shim: {
-    "ga": {
-      exports: "_gaq"
-    },
     "uservoice": {
       exports: "window.UserVoice"
     }

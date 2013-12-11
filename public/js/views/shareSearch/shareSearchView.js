@@ -188,7 +188,7 @@ define([
       if(this.isConnectMode()) {
         return '/api/v1/inviteconnections';
       } else {
-        return '/troupes/' + context.getTroupeId() + '/invites';
+        return '/api/v1/troupes/' + context.getTroupeId() + '/invites';
       }
     },
 

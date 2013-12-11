@@ -31,10 +31,6 @@ module.exports = {
         auth,
         require('./ping.js'));
 
-    // No auth for username suggestions yet
-    app.get('/api/v1/usernamesuggestions',
-        require('./username-suggestions.js'));
-
     app.all('/api/v1/sockets', auth);
     app.resource('api/v1/sockets',
         require('./sockets.js'));
@@ -43,17 +39,18 @@ module.exports = {
         auth,
         require('./invite-connections.js'));
 
-    app.post('/api/v1/requestaccessexisting',
-        auth,
-        expressValidator(),
-        require('./request-access-existing.js'));
-
-    app.post('/api/v1/requestaccess',
-        expressValidator(),
-        require('./request-access-new.js'));
-
     app.get('/api/v1/suggested-contacts',
         auth,
         require('./suggested-contacts.js'));
+
+    app.get('/api/v1/search',
+        auth,
+        require('./search.js'));
+
+    app.get('/api/v1/repo-info',
+        auth,
+        require('./repo-info.js'));
+
+
   }
 };

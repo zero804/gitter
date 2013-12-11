@@ -5,7 +5,7 @@ define([
   'marionette',
   'views/base',
   'utils/context',
-  'fineuploader',
+  // 'fineuploader',
   'hbs!./tmpl/rightToolbar',
   'collections/instances/integrated-items',
   'collections/instances/troupes',
@@ -16,9 +16,10 @@ define([
   'views/people/peopleCollectionView',
   'cocktail',
   'utils/uservoice',
-  'views/widgets/troupeAvatar'
-], function($, Backbone, Marionette, TroupeViews, context, qq, rightToolbarTemplate, itemCollections,
-   trpCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView, cocktail, userVoice, TroupeAvatar) {
+  'views/widgets/troupeAvatar',
+  './repoInfo'
+], function($, Backbone, Marionette, TroupeViews, context, /*qq,*/ rightToolbarTemplate, itemCollections,
+   trpCollections, RequestView, InviteView, FileView, ConversationView, PeopleCollectionView, cocktail, userVoice, TroupeAvatar, repoInfo) {
   "use strict";
 
   var RightToolbarLayout = Marionette.Layout.extend({
@@ -26,16 +27,13 @@ define([
     template: rightToolbarTemplate,
 
     regions: {
-      requests: "#request-roster",
-      invites: "#invite-roster",
+      // requests: "#request-roster",
+      // invites: "#invite-roster",
       people: "#people-roster",
-      files: "#file-list",
+      // files: "#file-list",
       conversations: ".frame-conversations",
-      troupeAvatar: "#troupe-avatar-region"
-    },
-
-    events: {
-      "click #favourite-button":        "toggleFavourite"
+      troupeAvatar: "#troupe-avatar-region",
+      repo_info: "#repo-info"
     },
 
     initialize: function() {
@@ -85,65 +83,65 @@ define([
       $('#right-panel').show();
 
       userVoice.install(this.$el.find('#help-button'), context.getUser());
-      this.uploader = new qq.FineUploader({
-        element: this.$el.find('#fineUploader')[0],
-        dragAndDrop: {
-          extraDropzones: [$('body')[0]],
-          hideDropzones: false,
-          disableDefaultDropzone: false
-        },
-        text: {
-          dragZone: '', // text to display
-          dropProcessing: '',
-          waitingForResponse: '',
-          uploadButton: ''
-        },
-        request: {
-          endpoint: '/troupes/' + context.getTroupeId() + '/downloads/'
-        },
-        showMessage: function(message) {
-          if(message === 'No files to upload.') return;
-          window.alert(message);
-        },
-        callbacks: {
-          onComplete: function(id, fileName, response) {
-            var model;
+      // this.uploader = new qq.FineUploader({
+      //   element: this.$el.find('#fineUploader')[0],
+      //   dragAndDrop: {
+      //     extraDropzones: [$('body')[0]],
+      //     hideDropzones: false,
+      //     disableDefaultDropzone: false
+      //   },
+      //   text: {
+      //     dragZone: '', // text to display
+      //     dropProcessing: '',
+      //     waitingForResponse: '',
+      //     uploadButton: ''
+      //   },
+      //   request: {
+      //     endpoint: '/api/v1/troupes/' + context.getTroupeId() + '/downloads/'
+      //   },
+      //   showMessage: function(message) {
+      //     if(message === 'No files to upload.') return;
+      //     window.alert(message);
+      //   },
+      //   callbacks: {
+      //     onComplete: function(id, fileName, response) {
+      //       var model;
 
-            if(response.success) {
-              fileCollection.add(response.file, { merge: true });
+      //       if(response.success) {
+      //         fileCollection.add(response.file, { merge: true });
 
-              model = fileCollection.get(response.file.id);
-              model.on('change', onChange);
-            }
+      //         model = fileCollection.get(response.file.id);
+      //         model.on('change', onChange);
+      //       }
 
-            function onChange() {
-              var versions = model.get('versions');
-              var hasThumb = versions.at(versions.length - 1).get('thumbnailStatus') !== 'GENERATING';
-              if (hasThumb) {
-                model.off('change', onChange);
-              }
-            }
-          }
-        }
-      });
+      //       function onChange() {
+      //         var versions = model.get('versions');
+      //         var hasThumb = versions.at(versions.length - 1).get('thumbnailStatus') !== 'GENERATING';
+      //         if (hasThumb) {
+      //           model.off('change', onChange);
+      //         }
+      //       }
+      //     }
+      //   }
+      // });
 
       //this.sidebar.show();
 
       // reference collections
-      var requestCollection = itemCollections.requests;
-      var invitesCollection = itemCollections.invites;
-      var fileCollection = itemCollections.files;
+      // var requestCollection = itemCollections.requests;
+      // var invitesCollection = itemCollections.invites;
+      // var fileCollection = itemCollections.files;
       var conversationCollection = itemCollections.conversations;
       var userCollection = itemCollections.users;
 
       // Request View
-      this.requests.show(new RequestView({ collection: requestCollection }));
+      // this.requests.show(new RequestView({ collection: requestCollection }));
 
       // Invites View
-      this.invites.show(new InviteView({ collection: invitesCollection }));
+      // this.invites.show(new InviteView({ collection: invitesCollection }));
 
       // File View
-      this.files.show(new FileView({ collection: fileCollection }));
+      // this.files.show(new FileView({ collection: fileCollection }));
 
       if (!context.inOneToOneTroupeContext()) {
         this.troupeAvatar.show(new TroupeAvatar({
@@ -165,6 +163,13 @@ define([
       // People View
       this.people.show(new PeopleCollectionView({ collection: userCollection }));
 
+      // Repo info
+      if (context().troupe.githubType === 'REPO') {
+        var repo = new repoInfo.model();
+        repo.fetch({data: $.param({repo: context().troupeUri})});
+        this.repo_info.show(new repoInfo.view({model: repo}));
+      }
+
       this.initHideListeners();
     },
 
@@ -184,21 +189,6 @@ define([
         collection.on('all', toggle);
         toggle();
       }
-    },
-
-    toggleFavourite: function() {
-      var favHeader = $('.trpTroupeFavourite');
-      favHeader.toggleClass('favourited');
-      var isFavourite = favHeader.hasClass('favourited');
-
-      $.ajax({
-        url: '/troupes/' + context.getTroupeId(),
-        contentType: "application/json",
-        dataType: "json",
-        type: "PUT",
-        data: JSON.stringify({ favourite: isFavourite })
-      });
-
     }
   });
   cocktail.mixin(RightToolbarLayout, TroupeViews.DelayedShowLayoutMixin);

@@ -1,20 +1,24 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
-  './mobile-app-container',
-  'routers/userhome-router',
   'views/userhome/userHomeView',
-  'components/modal-region'
-  ], function(app, UserhomeRouter, UserHomeView, modalRegion) {
+  'jquery',
+  'views/toolbar/troupeMenu',
+  'views/app/mobileAppView'
+  ], function(UserHomeView, $, TroupeMenu, MobileAppView) {
   "use strict";
 
-  app.addInitializer(function() {
-    document.getElementById('chat-amuse').style.display = 'none';
-
-    new UserhomeRouter({
-      regions: [null, modalRegion]
-    });
-
+  new MobileAppView({
+    el: $('#mainPage')
   });
-  app.content.show(new UserHomeView());
-  app.start();
+
+  new TroupeMenu({
+    el: $('#troupeList')
+  }).render();
+
+  new UserHomeView({
+    el: $('#frame-chat')
+  }).render();
+
+  $('html').removeClass('loading');
+
 });

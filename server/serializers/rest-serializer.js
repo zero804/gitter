@@ -79,43 +79,25 @@ function UserStrategy(options) {
 
   this.map = function(user) {
     if(!user) return null;
+    var scopes;
 
-    function getAvatarUrl(size) {
-      if(user.avatarVersion === 0) {
-        return user.gravatarImageUrl;
-      }
-      return cdn("avatar/" + size + "/" + user.id + "/" + user.avatarVersion + ".jpg", { notStatic: true });
-    }
-
-    function getLocationDescription(named) {
-      var desc = (named.place) ? named.place : '';
-      desc += (named.region) ? ", " + named.region : '';
-      return desc;
-    }
-
-    var location;
-    if(!options.hideLocation && user.location.timestamp) {
-      location = {
-        description: getLocationDescription(user.location.named),
-        timestamp: formatDate(user.location.timestamp),
-        countryCode: user.location.countryCode
+    if(options.includeScopes) {
+      scopes = {
+        'public_repo': user.hasGitHubScope('public_repo'),
+        'private_repo': user.hasGitHubScope('repo')
       };
-    } else {
-      location = undefined;
     }
-
     return {
       id: user.id,
       status: options.includeEmail ? user.status : undefined,
-      hasPassword: options.includePasswordStatus ? !!user.passwordHash : undefined,
       username: user.username,
       displayName: options.exposeRawDisplayName ? user.displayName : user.getDisplayName(),
       fallbackDisplayName: options.exposeRawDisplayName && user.getDisplayName(),
       url: user.getHomeUrl(),
-      email: options.includeEmail ? user.email : undefined,
-      avatarUrlSmall: getAvatarUrl('s'),
-      avatarUrlMedium: getAvatarUrl('m'),
-      location: location,
+      avatarUrlSmall: user.gravatarImageUrl,
+      avatarUrlMedium: user.gravatarImageUrl,
+      createRoom: options.includePermissions ? user.permissions.createRoom : undefined,
+      scopes: scopes,
       online: onlineUsers ? onlineUsers.indexOf(user.id) >= 0 : undefined,
       v: getVersion(user)
     };
@@ -518,6 +500,7 @@ function ChatStrategy(options)  {
       readBy: item.readBy ? item.readBy.length : undefined,
       urls: item.urls || [],
       mentions: item.mentions || [],
+      issues: item.issues || [],
       meta: item.meta || {},
       skipAlerts: item.skipAlerts,
       v: getVersion(item)
@@ -670,6 +653,69 @@ function TroupeUserStrategy(options) {
   };
 }
 
+function GitHubOrgStrategy(options) {
+
+  var troupeStrategy = new TroupeStrategy(options);
+  var self = this;
+
+  this.preload = function(orgs, callback) {
+    var _orgs = _.map(orgs, function(org) { return org.login; });
+
+    troupeService.findAllByUri(_orgs, function(err, troupes) {
+      if (err) callback(err);
+
+      self.troupes = collections.indexByProperty(troupes, 'uri');
+
+      execPreloads([{
+        strategy: troupeStrategy,
+        data: troupes
+      }], callback);
+    });
+  };
+
+  this.map = function(item) {
+    var room = self.troupes[item.login];
+    return {
+      name: item.login,
+      avatar_url: item.avatar_url,
+      room: room ? troupeStrategy.map(room) : undefined
+    };
+  };
+
+}
+
+function GitHubRepoStrategy(options) {
+
+  var troupeStrategy = new TroupeStrategy(options);
+  var self = this;
+
+  this.preload = function(userAdminRepos, callback) {
+    var repos = _.map(userAdminRepos, function(repo) { return repo.full_name; });
+
+    troupeService.findAllByUri(repos, function(err, troupes) {
+      if (err) callback(err);
+
+      self.troupes = collections.indexByProperty(troupes, 'uri');
+
+      execPreloads([{
+        strategy: troupeStrategy,
+        data: troupes
+      }], callback);
+    });
+  };
+
+  this.map = function(item) {
+    var room = self.troupes[item.full_name];
+    return {
+      name:     item.full_name,
+      private:  item.private,
+      room:     room ? troupeStrategy.map(room) : undefined
+    };
+  };
+
+}
+
+
 function TroupeStrategy(options) {
   if(!options) options = {};
 
@@ -795,6 +841,7 @@ function TroupeStrategy(options) {
     return {
       id: item.id,
       name: troupeName,
+      topic: item.topic,
       uri: item.uri,
       avatarUrl: otherUser && otherUser.avatarUrlSmall || getDefaultTroupeAvatar(),
       oneToOne: item.oneToOne,
@@ -804,6 +851,7 @@ function TroupeStrategy(options) {
       lastAccessTime: lastAccessTimeStategy ? lastAccessTimeStategy.map(item.id) : undefined,
       favourite: favouriteStrategy ? favouriteStrategy.map(item.id) : undefined,
       url: troupeUrl,
+      githubType: item.githubType,
       v: getVersion(item)
     };
   };
@@ -1191,5 +1239,7 @@ module.exports = {
   execPreloads: execPreloads,
   serialize: serialize,
   serializeQ: serializeQ,
-  serializeModel: serializeModel
+  serializeModel: serializeModel,
+  GitHubOrgStrategy: GitHubOrgStrategy,
+  GitHubRepoStrategy: GitHubRepoStrategy
 };

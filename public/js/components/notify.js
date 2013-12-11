@@ -18,15 +18,15 @@ define([
         // style
         n.show();
         n.css({ position: 'relative', left: -1 * n.outerWidth() });
-        n.animate({ left: 0 });
+        n.animate({ left: 250 });
       }
       // restart hide timeout
       n.data('notification-hide-timeout').restart();
     }
 
     function hide() {
-      n.animate({ left: -1 * n.outerWidth()   }, function() {
-        n.hide('slow');
+      n.animate({ left: 0 }, function() {
+        n.hide();
       });
     }
 

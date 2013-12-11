@@ -1,13 +1,17 @@
 @import "bootstrap/bootstrap.less";
 @import "trpMobileFonts.less";
-@import "trpInvites.less";
-@import "trpColours.less";
+@import "trp3Colours.less";
 @import "trpNativeChat.less";
 @import "trpButtons.less";
 @import "trp3Vars.less";
 
 body {
-  background-color: @trpGreen;
+  background-color: @trpDarkBlue;
+}
+
+h2 {
+  font-size: 18px;
+  color: @trpDarkBlue;
 }
 
 @header-height: 50px;
@@ -16,7 +20,7 @@ header {
   position: absolute;
   width: 100%;
   z-index: 1;
-  background-color: @trpGreen;
+  background-color: @trpDarkBlue;
   line-height: @header-height;
   text-align: center;
   height: @header-height;
@@ -34,15 +38,7 @@ header {
   position: absolute;
   left: 0;
   top: 0;
-  padding: 5px 5px;
-}
-
-.trpTroupeList a {
-  .trpH3;
-}
-
-.trpTroupeList li {
-  padding-top: 15px;
+  padding: 3px 5px;
 }
 
 .sideMenu {
@@ -55,12 +51,12 @@ header {
   height: 100%;
 }
 
-.trpLeftMenuContainer {
-  height: 100%;
+#profile-menu-gitter-apps {
+  display: none;
 }
 
-#left-menu-scroll {
-/*  height: 70%;*/
+.trpLeftMenuContainer {
+  height: 100%;
 }
 
 #mainPage {
@@ -106,4 +102,94 @@ header {
 
 #copy-button {
   display: none;
+}
+
+.github-ORG:before {
+  font-family: 'octicons';
+  content: '\f037';
+  margin-right: 8px;
+  opacity: 0.9;
+  width: 12px;
+}
+
+.github-REPO:before {
+  font-family: 'octicons';
+  content: '\f001';
+  margin-right: 8px;
+  opacity: 0.9;
+  width: 12px;
+}
+
+.githib-REPO.disabled:before{
+  opacity: 0.4;
+}
+
+.github-ONETOONE:before {
+  content: "@";
+  margin-right: 8px;
+  opacity: 0.9;
+  width: 12px;
+}
+
+.trpLeftMenuProfile {
+  .trpBodyMedium;
+  padding: 10px 0 10px 10px;
+  cursor: pointer;
+
+  .avatar-s {
+    width: 32px;
+    height: 32px;
+  }
+
+}
+
+.trpLeftMenuProfileMenu {
+  box-sizing: border-box;
+  margin-left: -10px;
+  padding-bottom: 12px;
+  overflow: hidden;
+  width: 100%;
+  color: white;
+  .trpBodyMedium;
+  font-weight: 300;
+  line-height: 30px;
+  padding-right: 20px;
+  box-sizing: border-box;
+
+  a {
+    color: white;
+    text-decoration: none;
+  }
+
+  .item {
+    padding-left: 10px;
+    margin-right: 10px;
+  }
+
+  .item:hover {
+    border-radius: 0 4px 4px 0;
+    background-color: rgba(255,255,255,0.2);
+  }
+
+}
+
+.trpLeftMenuProfileName {
+  display: inline-block;
+  vertical-align: top;
+  padding-top: 4px;
+  font-weight: 300;
+  font-size: 16px;
+  margin-left: 8px;
+  max-width: 187px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sideMenu .nano {
+  position: absolute;
+  width: 100%;
+  bottom: 10px;
+  top: 130px;
+  -webkit-overflow-scrolling: touch;
 }

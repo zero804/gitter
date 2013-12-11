@@ -23,7 +23,7 @@ define([
   var View = TroupeViews.Base.extend({
     template: troupeSettingsTemplate,
     events: {
-      'submit #troupeSettings': 'saveSettings',
+      'click #save-troupe-settings': 'saveSettings',
       'click #cancel-troupe-settings' : 'closeSettings',
       'click #delete-troupe': 'deleteTroupe',
       'click #leave-troupe': 'leaveTroupe',
@@ -36,7 +36,7 @@ define([
       this.$el.toggleClass('canDelete', this.canDelete());
 
       $.ajax({
-        url: '/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
+        url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
         type: "GET",
         context: this,
         success: function(settings) {
@@ -87,7 +87,7 @@ define([
         if (action === "yes") {
           removeTroupeCollectionRemoveListeners();
           $.ajax({
-            url: '/troupes/' + self.model.id,
+            url: '/api/v1/troupes/' + self.model.id,
             type: "DELETE",
             success: function() {
               window.location.href = '/last';
@@ -128,7 +128,7 @@ define([
         if (action === "yes") {
           removeTroupeCollectionRemoveListeners();
           $.ajax({
-            url: "/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
+            url: "/api/v1/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
             data: "",
             type: "DELETE",
             success: function() {
@@ -187,36 +187,17 @@ define([
     saveSettings: function(e) {
       if(e) e.preventDefault();
 
-      var troupeName = this.$el.find('input[name=name]').val().trim();
       var self = this;
 
-      if(context.troupe().get('name') === troupeName & this.settings == self.$el.find("#notification-options").val()) {
-        self.dialog.hide();
-        self.dialog = null;
-        return;
-      }
-
-      context.troupe().set('name', troupeName);
-
       $.ajax({
-        url: '/troupes/' + context.getTroupeId(),
+        url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
         contentType: "application/json",
         dataType: "json",
         type: "PUT",
-        data: JSON.stringify({ name: troupeName }),
-        success: function() {
-          $.ajax({
-            url: '/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
-            contentType: "application/json",
-            dataType: "json",
-            type: "PUT",
-            data: JSON.stringify({ push: self.$el.find("#notification-options").val() }),
-            success: function(data) {
-              self.dialog.hide();
-              self.dialog = null;
-            }
-          });
-
+        data: JSON.stringify({ push: self.$el.find("#notification-options").val() }),
+        success: function(data) {
+          self.dialog.hide();
+          self.dialog = null;
         }
       });
     }

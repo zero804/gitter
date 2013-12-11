@@ -9,7 +9,7 @@ var TwitterText   =  require('./twitter-text');
  * Bump the version if you modify the behaviour of TwitterText.
  *
  */
-exports.metaDataVersion = 2;
+exports.metaDataVersion = 4;
 
 
 
@@ -60,5 +60,15 @@ exports.extractUrlsWithIndices = function(text) {
 /** For the moment, just pass this on to twitter */
 exports.extractMentionsWithIndices = function(text) {
   return TwitterText.extractMentionsWithIndices(text);
+};
+
+exports.extractIssuesWithIndices = function(text) {
+  return TwitterText.extractHashtagsWithIndices(text)
+    .map(function(hashtagObj) {
+      return {
+        indices: hashtagObj.indices,
+        number: hashtagObj.hashtag
+      };
+    });
 };
 

@@ -7,10 +7,12 @@ var nconf                         = require('../utils/config');
 var handlebars                    = require('handlebars');
 var expressHbs                    = require('express-hbs');
 var winston                       = require('winston');
+var middleware                    = require('./middleware');
 var fineuploaderExpressMiddleware = require('fineuploader-express-middleware');
 var fs                            = require('fs');
 var os                            = require('os');
 var responseTime                  = require('./response-time');
+var oauthService                  = require('../services/oauth-service');
 
 if(nconf.get('express:showStack')) {
   try {
@@ -37,7 +39,7 @@ function ios6PostCachingFix() {
 module.exports = {
   installFull: function(app, server, sessionStore) {
     function configureLogging() {
-      app.use(responseTime(winston));
+      app.use(responseTime(winston, nconf.get('logging:minimalAccess')));
     }
 
     handlebars.registerHelper('cdn', require('./hbs-helpers').cdn);
@@ -150,9 +152,39 @@ module.exports = {
     }
 
     app.use(function(err, req, res, next) {
+      if(err && err.gitterAction === 'logout_destroy_user_tokens') {
+
+        if(req.user) {
+
+          var user = req.user;
+
+          middleware.logout()(req, res, function() {
+            if(err) winston.warn('Unable to log user out');
+
+            user.githubToken = null;
+            user.githubUserToken = null;
+            user.githubScopes = null;
+
+            user.save(function(err) {
+              if(err) winston.error('Unable to save user: ' + err, { exception: err });
+
+              oauthService.removeAllAccessTokensForUser(user.id, function(err) {
+                if(err) { winston.error('Unable to remove access tokens: ' + err, { exception: err }); }
+                res.redirect('/');
+              });
+            });
+          });
+        } else {
+          res.redirect('/');
+      }
+
+        return;
+      }
+
       var status = 500;
       var template = '500';
       var message = "An unknown error occurred";
+      var stack = err && err.stack;
 
       if(err.status) {
         status = err.status;
@@ -174,6 +206,7 @@ module.exports = {
 
       if(status === 404) {
         template = '404';
+        stack = null;
       }
 
       res.status(status);
@@ -183,8 +216,10 @@ module.exports = {
       if (responseType === 'html') {
         res.render(template , {
           homeUrl : nconf.get('web:homeurl'),
+          user: req.user,
+          userMissingPrivateRepoScope: req.user && !req.user.hasGitHubScope('repo'),
           message: message,
-          stack: nconf.get('express:showStack') && err && err.stack ? linkStack(err.stack) : null
+          stack: nconf.get('express:showStack') && stack ? linkStack(stack) : null
         });
       } else if (responseType === 'json') {
         res.send({ error: message });

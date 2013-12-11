@@ -20,16 +20,16 @@ define([
               var badge = $(selector);
               badge.text(count);
               if(count > 0) {
-                badge.show();
-                $("#favicon").attr("href","/images/2/favicon-unread.png");
+                // badge.show();
+                $("#favicon").attr("href","/images/2/gitter/favicon5-unread.png");
               } else {
-                badge.hide();
-                $("#favicon").attr("href","/images/2/favicon.png");
+                // badge.hide();
+                $("#favicon").attr("href","/images/2/gitter/favicon5.png");
               }
             }
 
             // overall count
-            updateBadge('#unread-badge', values.overall);
+            updateBadge('.unread-count', values.overall);
         }
 
         $(document).on('troupeUnreadTotalChange', onTroupeUnreadTotalChange);
@@ -43,11 +43,11 @@ define([
 
     TitlebarUpdater.prototype.getTitlebar = function(counts) {
       var mainTitle;
-      var name = context.troupe().get('name');
+      var name = context().troupeUri;
       if (name) {
-        mainTitle = name + " - Troupe";
+        mainTitle = name + " - Gitter";
       } else {
-        mainTitle = "Troupe";
+        mainTitle = "Gitter";
       }
 
       // TODO this isn't working properly when updating the troupe name, need to be able to poll unreadItems count not just accept the event

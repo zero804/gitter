@@ -14,8 +14,7 @@ define([
   'components/titlebar',
   'cocktail',
   'utils/scrollbar-detect',
-  'bootstrap_tooltip',  // no ref
-  "nanoscroller"        // no ref
+  'bootstrap_tooltip'  // no ref
   ], function($, TroupeViews, context, appEvents, Marionette, UsernameView, ProfileView, uiVars, AvatarView,
     notifications, modalRegion, TitlebarUpdater, cocktail, hasScrollBars) {
   "use strict";
@@ -26,7 +25,6 @@ define([
   };
 
   var mouseEvents = {
-    "click #menu-toggle-button":        "onMenuToggle",
     "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
     "mouseenter #menu-toggle":          "onLeftMenuHotspot",
     "mouseenter #content-frame":        "onMouseEnterContentFrame",
@@ -34,10 +32,8 @@ define([
     "mouseenter #toolbar-frame":        "onMouseEnterToolbar",
     "mouseleave #toolbar-frame":        "onMouseLeaveToolbar",
     "keypress":                         "onKeyPress",
-    "click #left-menu-icon":            "toggleMenu",
-    "click #search-icon":               "toggleMenu",
-    "click #troupe-icon":               "toggleMenu",
-    "click #troupe-more-actions":       "toggleTroupeMenu"
+    "click #troupe-more-actions":       "toggleTroupeMenu",
+    "click #favourite-button":          "toggleFavourite"
   };
 
   $('.trpDisplayPicture').tooltip('destroy');
@@ -52,7 +48,6 @@ define([
     files: false,
     originalRightMargin: "",
     regions: {
-      smartMenuRegion: "#smart-bar-items",
       leftMenuRegion: "#left-menu",
       rightPanelRegion: "#right-panel",
       rightToolbarRegion: "#toolbar-frame"
@@ -136,14 +131,14 @@ define([
     },
 
     hidePanel: function (whichPanel) {
-      $("#chat-frame, #chat-input, #toolbar-frame").removeClass('rightCollapse');
+      $("#chat-frame, #chat-input, #toolbar-frame, #header-area").removeClass('rightCollapse');
       $(whichPanel).removeClass('visible');
       this.rightpanel = false;
     },
 
     showPanel: function(whichPanel) {
       if (!this.rightpanel) {
-        $("#chat-frame, #chat-input, #toolbar-frame").addClass("rightCollapse");
+        $("#chat-frame, #chat-input, #toolbar-frame, #header-area").addClass("rightCollapse");
         $(whichPanel).addClass("visible");
         this.rightpanel = true;
       }
@@ -182,7 +177,7 @@ define([
 
       $("#left-menu").addClass("visible");
       $("#mini-left-menu, #mini-left-menu-container").addClass("active");
-      $("#chat-frame, #chat-input").addClass("leftCollapse");
+      $("#content-wrapper, #toolbar-frame, #menu-toggle-button, #header-wrapper, #chat-input-wrapper").addClass("leftCollapse");
 
       this.leftmenu = true;
     },
@@ -205,7 +200,7 @@ define([
       }, 350);
 
       $("#mini-left-menu, #mini-left-menu-container").removeClass("active");
-      $("#chat-frame, #chat-input").removeClass("leftCollapse");
+      $("#content-wrapper, #toolbar-frame, #menu-toggle-button, #header-wrapper, #chat-input-wrapper").removeClass("leftCollapse");
       $("#left-menu").removeClass("visible");
 
       this.leftmenu = false;
@@ -222,13 +217,13 @@ define([
 
     showTroupeMenu: function() {
       // $("#file-list").css({"width" : "200px" , "padding-left" : "20px"});
-      $("#troupe-content").addClass("visible");
+      $("#toolbar-frame").addClass("expanded");
       this.files = true;
     },
 
     hideTroupeMenu: function() {
       // $("#file-list").css({"width": "0px", "padding-left" : "0"});
-      $("#troupe-content").removeClass("visible");
+      $("#toolbar-frame").removeClass("expanded");
       this.files = false;
     },
 
@@ -249,6 +244,20 @@ define([
       } else {
         this.showMenu();
       }
+    },
+
+    toggleFavourite: function() {
+      var favHeader = $('.trpTroupeFavourite');
+      favHeader.toggleClass('favourited');
+      var isFavourite = favHeader.hasClass('favourited');
+
+      $.ajax({
+        url: '/api/v1/troupes/' + context.getTroupeId(),
+        contentType: "application/json",
+        dataType: "json",
+        type: "PUT",
+        data: JSON.stringify({ favourite: isFavourite })
+      });
     },
 
     toggleAlert: function() {
@@ -283,11 +292,11 @@ define([
     },
 
     onMouseEnterLeftMenu: function() {
-      $(".nano").nanoScroller({ preventPageScrolling: true });
+
     },
 
     onMouseEnterToolbar: function() {
-      $(".nano").nanoScroller({ preventPageScrolling: true });
+
     },
 
     onMouseLeaveToolbar: function() {

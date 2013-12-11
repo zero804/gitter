@@ -17,20 +17,31 @@ define([
       return;
     }
 
-    notifications.notify({
-      content: template({
+    var element = $.parseHTML(template({
         link: message.link,
         title: message.title,
         text: message.text
-      })
+      }));
+
+    if(message.click) {
+      $(element).on('click', message.click);
+    } else if(message.link) {
+      $(element).on('click', function() {
+        window.location.href = message.link;
+      });
+    }
+
+    notifications.notify({
+      content: element
     });
   });
+
 
   $(document).on('app.version.mismatch', function() {
     notifications.notify({
       id: 'app-update',
       className: 'notification',
-      content: "<a href=\"javascript:window.location.reload()\">There is a new version of the application. Please click here to refresh.</a>"
+      content: "<a href=\"javascript:window.location.reload()\">There is a new version of Gitter available. Click here to refresh.</a>"
     });
   });
 
@@ -59,7 +70,7 @@ define([
     notifications.notify({
       id: 'realtime-error',
       className: 'notification-error',
-      content: "We're having problems with our realtime connection at present. Please stand-by",
+      content: "We're having problems with our realtime connection at present.",
       timeout: Infinity
       /* TODO: make this persistent and clear it when the persistentOutageCleared event occurs */
     });
@@ -72,6 +83,7 @@ define([
       action: 'hide'
     });
   });
+
 
   $(window).on('beforeunload', function(){
     $('#notification-center').hide();

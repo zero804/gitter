@@ -95,11 +95,19 @@ define([
 
     renderText: function() {
       // We need to parse the text a little to hyperlink known links and escape html to prevent injection
-      var richText = linkify(this.model.get('text'), this.model.get('urls')).toString();
+      var links = this.model.get('urls') || [];
+      var mentions = this.model.get('mentions') || [];
+      var issues = [];
+      if(context().troupe.githubType === 'REPO') {
+        issues = this.model.get('issues') || [];
+      }
+
+      var richText = linkify(this.model.get('text'), links, mentions, issues).toString();
       richText = richText.replace(/\n\r?/g, '<br>');
       this.$el.find('.trpChatText').html(richText);
 
       this.highlightMention();
+      this.setIssueStatusClasses();
 
       //if (this.decorator) this.decorator.enrich(this);
 
@@ -169,8 +177,8 @@ define([
     },
 
     highlightMention: function() {
-      var self = this;
-      _.each(this.model.get('mentions'), function(mention) {
+      var mentions = this.model.get('mentions') || [];
+      mentions.forEach(function(mention) {
         var re    = new RegExp(mention.screenName, 'i');
         var user  = context().user;
 
@@ -179,9 +187,22 @@ define([
         if (user)
         {
           if (user.username && (user.username.match(re) || user.displayName.match(re))) {
-            $(self.$el).find('.trpChatBox').addClass('mention');
+            this.$el.find('.trpChatBox').addClass('mention');
           }
         }
+      }, this);
+    },
+
+    setIssueStatusClasses: function() {
+      this.$el.find('.trpChatText .issue').each(function() {
+        var $issue = $(this);
+        var issueNumber = $issue.text().substring(1);
+        var url = '/api/v1/troupes/'+context().troupe.id+'/issues/'+issueNumber;
+        $.get(url, function(issue) {
+          if(!issue.state) return;
+
+          $issue.removeClass('open closed').addClass(issue.state);
+        });
       });
     },
 
