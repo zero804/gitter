@@ -5,18 +5,18 @@ define([
   'utils/context',
   'utils/appevents',
   'marionette',
-  'views/signup/usernameView',
-  'views/profile/profileView',
+  // 'views/signup/usernameView',
+  // 'views/profile/profileView',
   'views/app/uiVars',
   'views/widgets/avatar',
-  'components/webNotifications',
+  // 'components/webNotifications',
   'components/modal-region',
   'components/titlebar',
   'cocktail',
   'utils/scrollbar-detect',
   'bootstrap_tooltip'  // no ref
-  ], function($, TroupeViews, context, appEvents, Marionette, UsernameView, ProfileView, uiVars, AvatarView,
-    notifications, modalRegion, TitlebarUpdater, cocktail, hasScrollBars) {
+  ], function($, TroupeViews, context, appEvents, Marionette, /*UsernameView, ProfileView,*/ uiVars, AvatarView,
+    /*notifications,*/ modalRegion, TitlebarUpdater, cocktail, hasScrollBars) {
   "use strict";
 
   var touchEvents = {
@@ -95,40 +95,40 @@ define([
         }, 100);
       });
 
-      var profileCompleteTimeout = 60 * 1000;
-      setTimeout(function() {
-        self.ensureSignupIsComplete();
-      }, profileCompleteTimeout);
+      // var profileCompleteTimeout = 60 * 1000;
+      // setTimeout(function() {
+      //   self.ensureSignupIsComplete();
+      // }, profileCompleteTimeout);
     },
 
-    ensureSignupIsComplete: function() {
-      var self = this, noteId = 'completeSignup';
-      if (!context.isProfileComplete() || !context().user.username) {
-        notifications.notify({
-          id: noteId,
-          content: "<a href='#'>Click here to complete the signup process</a>",
-          timeout: Infinity,
-          click: function() {
-            notifications.notify({ id: noteId, action: 'hide' });
-            self.ensureProfileIsComplete();
-            self.ensureProfileIsUsernamed();
-          }
-        });
-      }
-    },
+    // ensureSignupIsComplete: function() {
+    //   var self = this, noteId = 'completeSignup';
+    //   if (!context.isProfileComplete() || !context().user.username) {
+    //     notifications.notify({
+    //       id: noteId,
+    //       content: "<a href='#'>Click here to complete the signup process</a>",
+    //       timeout: Infinity,
+    //       click: function() {
+    //         notifications.notify({ id: noteId, action: 'hide' });
+    //         self.ensureProfileIsComplete();
+    //         self.ensureProfileIsUsernamed();
+    //       }
+    //     });
+    //   }
+    // },
 
-    ensureProfileIsComplete: function() {
-      if (!context.isProfileComplete()) {
-        new ProfileView.Modal().show();
-      }
-    },
+    // ensureProfileIsComplete: function() {
+    //   if (!context.isProfileComplete()) {
+    //     new ProfileView.Modal().show();
+    //   }
+    // },
 
-    ensureProfileIsUsernamed: function() {
-      var user = context.getUser();
-      if (user && !user.username /* if the context has not yet loaded, what do we do? */) {
-        new UsernameView.Modal().show();
-      }
-    },
+    // ensureProfileIsUsernamed: function() {
+    //   var user = context.getUser();
+    //   if (user && !user.username /* if the context has not yet loaded, what do we do? */) {
+    //     new UsernameView.Modal().show();
+    //   }
+    // },
 
     hidePanel: function (whichPanel) {
       $("#chat-frame, #chat-input, #toolbar-frame, #header-area").removeClass('rightCollapse');
