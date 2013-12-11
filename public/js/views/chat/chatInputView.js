@@ -2,6 +2,7 @@
 define([
   'log!chat-input',
   'jquery',
+  'underscore',
   'utils/context',
   'views/base',
   'utils/appevents',
@@ -15,7 +16,7 @@ define([
   './emoji_list',
   'jquery-textcomplete', // No ref
   'jquery-sisyphus' // No ref
-], function(log, $, context, TroupeViews, appEvents, template, listItemTemplate, emojiListItemTemplate, moment, safeHtml, hasScrollBars, itemCollections, emojiList) {
+], function(log, $, _, context, TroupeViews, appEvents, template, listItemTemplate, emojiListItemTemplate, moment, safeHtml, hasScrollBars, itemCollections, emojiList) {
   "use strict";
 
   /** @const */
@@ -302,7 +303,9 @@ define([
     },
 
     onFocusOut: function() {
-      if (this.compactView) this.send();
+      if(this.compactView && !this.isTypeaheadShowing()) {
+        this.processInput();
+      }
     },
 
     onKeyUp: function() {
@@ -328,23 +331,26 @@ define([
     },
 
     onKeyDown: function(e) {
-      if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !this.$el.parent().find('.dropdown-menu').is(":visible")) {
+      if(e.keyCode == 13 && (!e.ctrlKey && !e.shiftKey) && (!this.$el.val().match(/^\s+$/)) && !this.isTypeaheadShowing()) {
         e.stopPropagation();
         e.preventDefault();
 
-        var cmdsMatched = _.map(commandsList, function(cmd) {
-          if (this.$el.val().match(cmd.regexp)) {
-            cmd.action(this);
-            return true;
-          } else {
-            return false;
-          }
-        }, this);
+        this.processInput();
 
-        if (!_.some(cmdsMatched)) this.send();
-
-        return;
+        return false;
       }
+    },
+
+    processInput: function() {
+      var cmdsMatched = _.map(commandsList, function(cmd) {
+        if (this.$el.val().match(cmd.regexp)) {
+          cmd.action(this);
+          return true;
+        } else {
+          return false;
+        }
+      }, this);
+      if (!_.some(cmdsMatched)) this.send();
     },
 
     send: function() {
@@ -352,6 +358,10 @@ define([
       $('#chatInputForm').trigger('reset');
       this.$el.val('');
       this.chatResizer.resetInput();
+    },
+
+    isTypeaheadShowing: function() {
+      return this.$el.parent().find('.dropdown-menu').is(":visible");
     }
   });
 
