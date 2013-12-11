@@ -1,4 +1,4 @@
-/*jshint globalstrict:true, trailing:false, unused:true, node:true */
+  /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
 exports.install = function(persistenceService) {
@@ -144,12 +144,11 @@ exports.install = function(persistenceService) {
 
   function serializeOneToOneTroupe(operation, troupe) {
     troupe.users.forEach(function(troupeUser) {
+      if(troupeUser.deactivated) return; /* Skip deactivated */
       var currentUserId = troupeUser.userId;
       var url = '/user/' + troupeUser.userId + '/troupes';
 
       var strategy = new restSerializer.TroupeStrategy({ currentUserId: currentUserId });
-
-
 
       restSerializer.serialize(troupe, strategy, function(err, serializedModel) {
         if(err) return winston.error('Error while serializing oneToOne troupe: ' + err, { exception: err });
