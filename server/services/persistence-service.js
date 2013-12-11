@@ -71,6 +71,14 @@ function serializeModelLateBound(model, callback) {
   serializeModel(model, callback);
 }
 
+var restSerializer = null;
+function getRestSerializerLateBound() {
+  if(!restSerializer) {
+    restSerializer = require("../serializers/rest-serializer");
+  }
+  return restSerializer;
+}
+
 function serializeEvent(url, operation, model, callback) {
   winston.verbose("Serializing " + operation + " to " + url);
 
@@ -357,6 +365,8 @@ TroupeSchema.methods.getOtherOneToOneUserId = function(knownUserId) {
 };
 
 TroupeSchema.methods.addUserById = function(userId) {
+  assert(!this.oneToOne);
+
   var exists = this.users.some(function(user) { return user.userId == userId; });
   if(exists) {
     throw new Error("User already exists in this troupe.");
@@ -379,6 +389,20 @@ TroupeSchema.methods.addUserById = function(userId) {
   return this.users.push(troupeUser);
 };
 
+function serializeOneToOneTroupeEvent(userId, operation, model, callback) {
+  var oneToOneUserUrl = '/user/' + userId + '/troupes';
+  var restSerializer = getRestSerializerLateBound();
+
+  var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
+
+  restSerializer.serialize(model, strategy, function(err, serializedModel) {
+    if(err) return callback(err);
+
+    appEvents.dataChange2(oneToOneUserUrl, operation, serializedModel);
+    callback();
+  });
+}
+
 TroupeSchema.methods.removeUserById = function(userId) {
   assert(userId);
 
@@ -396,13 +420,15 @@ TroupeSchema.methods.removeUserById = function(userId) {
         /* Dont mark the user as having been removed from the room */
         var url = "/troupes/" + this.id + "/users";
         serializeEvent(url, "remove", troupeUser, f.waitor());
+
+        var userUrl = "/user/" + userId + "/troupes";
+        serializeEvent(userUrl, "remove", this, f.waitor());
+
+        // TODO: move this in a remove listener somewhere else in the codebase
+        appEvents.userRemovedFromTroupe({ troupeId: this.id, userId: troupeUser.userId });
+      } else {
+        serializeOneToOneTroupeEvent(userId, "remove", this, f.waitor());
       }
-
-      var userUrl = "/user/" + userId + "/troupes";
-      serializeEvent(userUrl, "remove", this, f.waitor());
-
-      // TODO: move this in a remove listener somewhere else in the codebase
-      appEvents.userRemovedFromTroupe({ troupeId: this.id, userId: troupeUser.userId });
 
       f.all().then(function() { postNext(); }).fail(function(err) { postNext(err); });
     });
@@ -430,12 +456,7 @@ TroupeSchema.methods.reactivateUserById = function(userId) {
   if(troupeUser) {
     // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
     this.post('save', function(postNext) {
-      var f = new Fiber();
-
-      var userUrl = "/user/" + userId + "/troupes";
-      serializeEvent(userUrl, "create", this, f.waitor());
-
-      f.all().then(function() { postNext(); }).fail(function(err) { postNext(err); });
+      serializeOneToOneTroupeEvent(userId, "create", this, postNext);
     });
 
     troupeUser.deactivated = undefined;

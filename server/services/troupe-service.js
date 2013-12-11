@@ -453,22 +453,6 @@ function findImplicitConnectionBetweenUsers(userId1, userId2, callback) {
     .nodeify(callback);
 }
 
-function findOneToOneTroupe(fromUserId, toUserId) {
-  if(fromUserId == toUserId) throw "You cannot be in a troupe with yourself.";
-  assert(fromUserId, 'fromUserId parameter required');
-  assert(toUserId, 'fromUserId parameter required');
-
-  /* Find the existing one-to-one.... */
-  return persistence.Troupe.findOneQ({
-        $and: [
-          { oneToOne: true },
-          { 'users.userId': fromUserId },
-          { 'users.userId': toUserId }
-        ]
-    });
-
-}
-
 /**
  * Create a one-to-one troupe if one doesn't exist, otherwise return the existing one.
  *
@@ -554,22 +538,6 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
 
 }
 
-
-/**
- * Find an unused invite from fromUserId to toUserId for toUserId to connect with fromUserId
- * @param  {[type]} fromUserId
- * @param  {[type]} toUserId
- * @return {[type]} promise with invite
- */
-function findUnusedOneToOneInviteFromUserIdToUserId(fromUserId, toUserId) {
-  return persistence.Invite.findOneQ({
-      troupeId: null, // This indicates that it's a one-to-one invite
-      fromUserId: fromUserId,
-      userId: toUserId,
-      status: 'UNUSED'
-    });
-}
-
 /**
  * Find a one-to-one troupe, otherwise create it if possible (if there is an implicit connection),
  * otherwise return the existing invite if possible
@@ -589,8 +557,8 @@ function findOrCreateOneToOneTroupeIfPossible(fromUserId, toUserId) {
       return [toUser, persistence.Troupe.findOneQ({
         $and: [
           { oneToOne: true },
-          { 'users.userId': fromUserId },
-          { 'users.userId': toUserId }
+          { users: { $elemMatch: { userId: fromUserId, deactivated: { $ne: true } } } },
+          { users: { $elemMatch: { userId: toUserId, deactivated: { $ne: true }  } } }
         ]
       })];
     })
@@ -837,6 +805,7 @@ function findBestTroupeForUser(user, callback) {
           return findLastAccessedTroupeForUser(user);
         }
 
+
         return troupe;
       });
 
@@ -853,7 +822,7 @@ function findBestTroupeForUser(user, callback) {
  * @return promise of a troupe (or null)
  */
 function findLastAccessedTroupeForUser(user, callback) {
-  return persistence.Troupe.findQ({ 'users.userId': user.id, 'status': 'ACTIVE' }).then(function(activeTroupes) {
+  return persistence.Troupe.findQ({ users: { $elemMatch: { userId: user.id, deactivated: { $ne: true } }}, status: 'ACTIVE' }).then(function(activeTroupes) {
     if (!activeTroupes || activeTroupes.length === 0) return null;
 
     return userService.getTroupeLastAccessTimesForUser(user.id).then(function(troupeAccessTimes) {
@@ -981,7 +950,6 @@ module.exports = {
 
   validateTroupeUrisForUser: validateTroupeUrisForUser,
   updateTroupeName: updateTroupeName,
-  findOneToOneTroupe: findOneToOneTroupe,
   findOrCreateOneToOneTroupeIfPossible: findOrCreateOneToOneTroupeIfPossible,
   createUniqueUri: createUniqueUri,
   deleteTroupe: deleteTroupe,

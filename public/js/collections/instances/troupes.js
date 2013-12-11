@@ -7,11 +7,10 @@ define([
   '../base',
   'components/realtime',
   '../troupes',
-  '../smart',
   '../orgs',
   'components/unread-items-client',
   'filtered-collection' /* no ref */
-], function($, _, Backbone, context, base, realtime, troupeModels, SmartCollection, orgModels, unreadItemsClient) {
+], function($, _, Backbone, context, base, realtime, troupeModels, orgModels, unreadItemsClient) {
   "use strict";
 
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
