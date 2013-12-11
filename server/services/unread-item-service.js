@@ -105,7 +105,7 @@ function newItem(troupeId, creatorUserId, itemType, itemId) {
   if(!itemType) { winston.error("newitem failed. itemType cannot be null"); return; }
   if(!itemId) { winston.error("newitem failed. itemId cannot be null"); return; }
 
-  return troupeService.findUserIdsForTroupe(troupeId)
+  return troupeService.findUserIdsForTroupeIncludingDeactivated(troupeId)
     .then(function(userIds) {
       if(creatorUserId) {
         userIds = userIds.filter(function(userId) {
