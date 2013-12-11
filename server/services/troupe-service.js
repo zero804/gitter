@@ -100,8 +100,8 @@ function findMemberEmails(id, callback) {
 }
 
 function findAllTroupesForUser(userId, callback) {
-  return persistence.Troupe
-    .where('users.userId', userId)
+  return persistence.Troupe.find({ users: { $elemMatch: { userId: userId, deactivated: { $ne: true } } } })
+//    .where('users.userId', userId)
     .sort({ name: 'asc' })
     .execQ()
     .nodeify(callback);
@@ -522,6 +522,8 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
           { 'users.userId': userId2 }
           ]})
         .then(function(troupe) {
+          console.log('UPSERT REURNED', troupe);
+
           if(raw.upserted) {
             winston.verbose('Created a oneToOne troupe for ', { userId1: userId1, userId2: userId2 });
 
@@ -531,6 +533,18 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
               userId: userId1,
               oneToOneUpgrade: false
             });
+          } else {
+            var saveRequired = false;
+            troupe.users.forEach(function(troupeUser) {
+              if(troupeUser.deactivated) {
+                troupe.reactivateUserById(troupeUser.userId);
+                saveRequired = true;
+              }
+            });
+
+            if(saveRequired) {
+              return troupe.saveQ().thenResolve(troupe);
+            }
           }
 
           return troupe;

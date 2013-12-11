@@ -166,7 +166,6 @@ exports.install = function(persistenceService) {
 
 
       if(model.oneToOne) {
-
         // Because the troupe needs the currentUserId to be set!
         serializeOneToOneTroupe('create', model);
         return next();
@@ -178,9 +177,6 @@ exports.install = function(persistenceService) {
     },
 
     onUpdate: function onTroupeUpdate(model, next) {
-
-
-
       if(model.oneToOne) {
         // Because the troupe needs the
         serializeOneToOneTroupe('update', model);
