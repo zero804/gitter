@@ -37,9 +37,38 @@ a {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  padding: 8px;
-  border-radius: 4px;
-  margin-right: 10px;
+  padding: 5px;
+  border-bottom: 1px dashed #CCC;
+  font-size: 11px;
+
+  form {
+    width: 100%;
+  }
+
+  .action {
+    display: inline-block; 
+    float: right;
+  }
+
+  .details {
+    vertical-align: middle; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    white-space: nowrap; 
+    margin-bottom: 2px; 
+    color: #999;
+
+    p {
+      margin: 0px 0px 2px 0px;
+    }
+  }
+
+  .service {
+    font-size: 13px;
+    display: inline-block; 
+    color: #333;
+  }
+
 }
 
 .trpHookItem:hover {
