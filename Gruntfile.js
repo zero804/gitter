@@ -105,7 +105,7 @@ module.exports = function( grunt ) {
                     "views/widgets/timeago"
                   ],
                   exclude: ["core-libraries"]
-              },
+              },*/
               {
                   name: "mobile-app",
                   include: [
@@ -123,7 +123,7 @@ module.exports = function( grunt ) {
                     "views/widgets/timeago"
                   ],
                   exclude: ["core-libraries"]
-              },
+              },/*
               {
                   name: "routers/mobile/native/files-router",
                   include: [
