@@ -43,7 +43,7 @@ function getIntegrations(req, res) {
 function deleteIntegration(req, res) {
 
   request.del({
-    url: nconf.get('webhooks:basepath') + '/troupes/' + req.troupe.id + '/hooks/'+req.body.id,
+    url: nconf.get('webhooks:basepath') + '/troupes/' + req.troupe.id + '/hooks/' + req.body.id,
     json: true
   },
   function(err, resp) {
@@ -67,6 +67,7 @@ function createIntegration(req, res) {
       endpoint: 'gitter'
     }
   },
+
   function(err, resp, body) {
     if(err || resp.statusCode != 200 || !body) {
       winston.error('failed to create hook for troupe', { exception: err, resp: resp });
@@ -84,7 +85,11 @@ function createIntegration(req, res) {
       encryptedUserToken = "";
     }
 
-    res.redirect(body.configurationURL + "&t=" + encryptedUserToken + "&returnTo=" + nconf.get('web:basepath') + req.url);
+    res.redirect(body.configurationURL + 
+      "&rt=" + resp.body.token + 
+      "&ut=" + encryptedUserToken + 
+      "&returnTo=" + nconf.get('web:basepath') + req.url
+    );
   });
 
 }
