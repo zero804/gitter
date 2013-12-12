@@ -132,6 +132,7 @@ define([
         viewOptions: match.viewOptions,
         skipModelLoad: match.skipModelLoad ? match.skipModelLoad : /* If there is no collection, skipModelLoad=true */ !match.collection,
         name: match.name,
+        validationCheck: match.validationCheck,
         id: result[1]
       };
     },
@@ -168,6 +169,9 @@ define([
         }
 
         var viewDetails = this.getViewDetails(update.fragment);
+        if(viewDetails.validationCheck && !viewDetails.validationCheck()) {
+          viewDetails = null;
+        }
 
         if(!viewDetails) {
           // no match, so we clean up region
