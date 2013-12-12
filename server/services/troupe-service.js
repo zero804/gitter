@@ -15,6 +15,7 @@ var ObjectID                 = require('mongodb').ObjectID;
 var _                        = require('underscore');
 var assert                   = require('assert');
 var statsService             = require("../services/stats-service");
+var permissionsModel          = require("./permissions-model");
 
 function ensureExists(value) {
   if(!value) throw 404;
@@ -695,17 +696,19 @@ function updateFavourite(userId, troupeId, isFavourite, callback) {
     .nodeify(callback);
 }
 
-function updateTopic(troupeId, topic, callback) {
-  return findByIdRequired(troupeId)
-    .then(function(troupe) {
+function updateTopic(user, troupe, topic) {
+  /* First check whether the user has permission to work the topic */
+  return permissionsModel(user, 'admin', troupe.uri, troupe.githubType)
+    .then(function(access) {
+      if(!access) throw 403; /* Forbidden */
+
       troupe.topic = topic;
 
       return troupe.saveQ()
         .then(function() {
           return troupe;
         });
-    })
-    .nodeify(callback);
+    });
 }
 
 function findFavouriteTroupesForUser(userId, callback) {

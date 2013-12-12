@@ -35,14 +35,6 @@ module.exports = {
     app.resource('api/v1/sockets',
         require('./sockets.js'));
 
-    app.post('/api/v1/inviteconnections',
-        auth,
-        require('./invite-connections.js'));
-
-    app.get('/api/v1/suggested-contacts',
-        auth,
-        require('./suggested-contacts.js'));
-
     app.get('/api/v1/search',
         auth,
         require('./search.js'));

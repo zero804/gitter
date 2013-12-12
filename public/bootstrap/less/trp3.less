@@ -235,7 +235,20 @@ a:hover {
   padding-bottom: 2px;
   opacity: 0.6;
   font-weight: 400;
+  width: 240px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  padding-right: 9px;
+}
 
+.trpToolbarHeader .list-toggle {
+  opacity: 0;
+  float: right;
+  .transition300ms;
+}
+
+.trpToolbarHeader:hover >.list-toggle {
+  opacity: 0.8;
 }
 
 .trpLeftMenuList {

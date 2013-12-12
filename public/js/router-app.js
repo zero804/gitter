@@ -14,16 +14,15 @@ require([
   // 'views/file/filePreviewView',
   // 'views/file/fileVersionsView',
   // 'views/request/requestDetailView',
-  'views/invite/inviteDetailView',
+  // 'views/invite/inviteDetailView',
   'views/people/personDetailView',
-  'views/conversation/conversationDetailView',
+  // 'views/conversation//*conversationDetailView'*/,
   // 'views/profile/profileView',
   // 'views/profile/profileEmailView',
   // 'views/profile/profileAddEmailView',
   // 'views/modals/completeYourProfileModal',
-  'views/shareSearch/shareSearchView',
   'views/shareSearch/inviteView',
-  'views/signup/createTroupeView',
+  // 'views/signup//*createTroupeView'*/,
   // 'views/signup/usernameView',
   'views/app/troupeSettingsView',
   'views/app/integrationSettingsModal',
@@ -51,9 +50,9 @@ require([
 ], function($, Backbone, context, appEvents, AppIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, troupeCollections, /*UserEmailCollection,*/
     RightToolbarView, /*filePreviewView, fileVersionsView,  RequestDetailView,*/
-    InviteDetailView, PersonDetailView, conversationDetailView, /*profileView,
+    /*InviteDetailView,*/ PersonDetailView, /*conversationDetailView,*/ /*profileView,
     profileEmailView, profileAddEmailView,*/ /* completeYourProfileModal,*/
-    shareSearchView, inviteView, createTroupeView, /*UsernameView,*/ troupeSettingsView,
+    inviteView, /*createTroupeView,*/ /*UsernameView,*/ troupeSettingsView,
     IntegrationSettingsModal, TroupeMenuView, /* ReinviteModal, */ Router,
     unreadItemsClient, FileDecorator, webhookDecorator, userDecorator,
     embedDecorator, emojiDecorator, HeaderView /*, errorReporter , FilteredCollection */) {
@@ -78,12 +77,7 @@ require([
     }
   });
 
-  troupeCollection.on("add", function(model) {
-    if(model.id == context.getTroupeId()) {
-      var headerView = new HeaderView({model: model});
-      headerView.render();
-    }
-  });
+  new HeaderView({ model: context.troupe(), el: '#header' }).render();
 
   // instantiate user email collection
   // var userEmailCollection = new UserEmailCollection.UserEmailCollection();
@@ -107,29 +101,30 @@ require([
   }).render();
 
   // var profileModal = context.getUser().username ? profileView.Modal : completeYourProfileModal;
+  function integrationsValidationCheck() {
+    return context().permissions.admin;
+  }
 
   new Router({
     routes: [
       // { name: "file",             re: /^file\/(\w+)$/,            viewType: filePreviewView.Modal,               collection: itemCollections.files },
       // { name: "request",          re: /^request\/(\w+)$/,         viewType: RequestDetailView.Modal,            collection: itemCollections.requests },
-      { name: "invite",           re: /^invite\/(\w+)$/,          viewType: InviteDetailView.Modal,             collection: itemCollections.invites },
+      // { name: "invite",           re: /^invite\/(\w+)$/,          viewType: InviteDetailView.Modal,             collection: itemCollections.invites },
       // { name: "filePreview",      re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: itemCollections.files },
       // { name: "fileVersions",     re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: itemCollections.files },
-      { name: "mail",             re: /^mail\/(\w+)$/,            viewType: conversationDetailView.Modal, collection: itemCollections.conversations },
+      // { name: "mail",             re: /^mail\/(\w+)$/,            viewType: conversationDetailView.Modal, collection: itemCollections.conversations },
       { name: "person",           re: /^person\/(\w+)$/,          viewType: PersonDetailView.Modal,             collection: itemCollections.users },
 
       // { name: "profile",          re: /^profile$/,                viewType: profileModal },
       // { name: "profileEmails",    re: /^profile\/emails$/,        viewType: profileEmailView.Modal,       collection: userEmailCollection, skipModelLoad: true },
       // { name: "profileEmailsAdd", re: /^profile\/emails\/add$/,   viewType: profileAddEmailView.Modal,    collection: userEmailCollection, skipModelLoad: true },
-      { name: "share",            re: /^share$/,                  viewType: shareSearchView.Modal },
-      { name: "inv",              re: /^inv$/,                    viewType: inviteView.Modal },
-      { name: "connect",          re: /^connect$/,                viewType: shareSearchView.Modal,        viewOptions: { overrideContext: true, inviteToConnect: true } },
-      { name: "create",           re: /^create$/,                 viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true },
+      { name: "inv",               re: /^inv$/,                    viewType: inviteView.Modal },
+      // { name: "create",           re: /^create$/,                 viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true },
       // { name: "upgradeOneToOne",  re: /^upgradeOneToOne$/,        viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true, viewOptions: { upgradeOneToOne: true } } ,
       // { name: "chooseUsername",   re: /^chooseUsername/,          viewType: UsernameView.Modal },
       // { name: "reinvite",         re: /^reinvite\/(\w+)$/,        viewType: ReinviteModal,                collection: troupeCollections.outgoingConnectionInvites, viewOptions: { overrideContext: true, inviteToConnect: true } },
       { name: "troupeSettings",   re: /^troupeSettings/,          viewType: troupeSettingsView },
-      { name: "integrations",     re: /^integrations/,            viewType: IntegrationSettingsModal }
+      { name: "integrations",     re: /^integrations/,            viewType: IntegrationSettingsModal,  validationCheck: integrationsValidationCheck }
     ],
     regions: [appView.rightPanelRegion, appView.dialogRegion]
   });

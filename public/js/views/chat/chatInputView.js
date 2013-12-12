@@ -13,10 +13,11 @@ define([
   'utils/safe-html',
   'utils/scrollbar-detect',
   'collections/instances/integrated-items',
-  './emoji_list',
+  'utils/emoji',
   'jquery-textcomplete', // No ref
   'jquery-sisyphus' // No ref
-], function(log, $, _, context, TroupeViews, appEvents, template, listItemTemplate, emojiListItemTemplate, moment, safeHtml, hasScrollBars, itemCollections, emojiList) {
+], function(log, $, _, context, TroupeViews, appEvents, template, listItemTemplate,
+  emojiListItemTemplate, moment, safeHtml, hasScrollBars, itemCollections, emoji) {
   "use strict";
 
   /** @const */
@@ -29,14 +30,24 @@ define([
     {
       command: 'topic foo',
       description: 'Set room topic to foo',
+      criteria: function() {
+        return !context.inOneToOneTroupeContext() && context().permissions.admin;
+      },
       completion: 'topic ',
       regexp: /^\/topic/,
       action: function(view) {
         var topicMatch = view.$el.val().match(/^\/topic (.+)/);
         if (topicMatch) {
           var topic = topicMatch[1];
-          view.setTopic(topic);
           view.$el.val('');
+
+          $.ajax({
+            url: '/api/v1/troupes/' + context.getTroupeId(),
+            contentType: "application/json",
+            dataType: "json",
+            type: "PUT",
+            data: JSON.stringify({ topic: topic })
+          });
         }
       }
     },
@@ -60,9 +71,17 @@ define([
       description: 'Leave the room',
       completion: 'leave ',
       regexp: /^\/leave/,
+      criteria: function() {
+        return !context.inOneToOneTroupeContext();
+      },
       action: function(view) {
         view.$el.val('');
-        view.leaveRoom();
+
+        $.ajax({
+          url: "/api/v1/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
+          data: "",
+          type: "DELETE",
+        });
       }
     }
   ];
@@ -145,9 +164,9 @@ define([
             match: /(^|\s):(\w*)$/,
             maxCount: 8,
             search: function(term, callback) {
-              if(term.length < 1) return callback(['+1', '-1']);
+              if(term.length < 1) return callback(['+1', '-1', ]);
 
-              var matches = emojiList.filter(function(emoji) {
+              var matches = emoji.named.filter(function(emoji) {
                 return emoji.indexOf(term) === 0;
               });
               callback(matches);
@@ -166,7 +185,8 @@ define([
             maxCount: 8,
             search: function(term, callback) {
               var matches = commandsList.filter(function(cmd) {
-                return cmd.command.indexOf(term) === 0;
+                var elligible = !cmd.criteria || cmd.criteria();
+                return elligible && cmd.command.indexOf(term) === 0;
               });
               callback(matches);
             },
@@ -310,24 +330,6 @@ define([
 
     onKeyUp: function() {
       this.chatResizer.resizeInput();
-    },
-
-    setTopic: function(topic) {
-      $.ajax({
-        url: '/api/v1/troupes/' + context.getTroupeId(),
-        contentType: "application/json",
-        dataType: "json",
-        type: "PUT",
-        data: JSON.stringify({ topic: topic })
-      });
-    },
-
-    leaveRoom: function() {
-      $.ajax({
-        url: "/api/v1/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
-        data: "",
-        type: "DELETE",
-      });
     },
 
     onKeyDown: function(e) {

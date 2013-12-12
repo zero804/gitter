@@ -1,10 +1,11 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var GitHubRepoService = require('./github/github-repo-service');
+var GitHubRepoService  = require('./github/github-repo-service');
 var GitHubOrgService   = require('./github/github-org-service');
-var assert = require("assert");
-var winston = require('winston');
+var assert             = require("assert");
+var winston            = require('winston');
+var Q                  = require('q');
 
 function repoPermissionsModel(user, right, uri) {
   // For now, only authenticated users can be members of orgs
@@ -18,13 +19,24 @@ function repoPermissionsModel(user, right, uri) {
 
       if(right === 'join') return true;
 
-      assert.equal(right, 'create');
+      /* Need admin permission from here on out */
+      if(!repoInfo.permissions || !repoInfo.permissions.admin) {
+        return false;
+      }
 
-      // If the user isn't wearing the magic hat, refuse them
-      // permission
-      if(!user.permissions.createRoom) return false;
+      if(right === 'create') {
+        // If the user isn't wearing the magic hat, refuse them
+        // permission
+        if(!user.permissions.createRoom) return false;
 
-      return repoInfo.permissions && repoInfo.permissions.admin;
+        return true;
+      }
+
+      if(right === 'admin') {
+        return repoInfo.permissions && repoInfo.permissions.push;
+      }
+
+      assert(false, 'Unknown right ' + right);
     });
 
 }
@@ -42,12 +54,35 @@ function orgPermissionsModel(user, right, uri) {
         return false;
       }
 
-      if(right === 'create' && !user.permissions.createRoom) return false;
+      if(right === 'create') {
+        // If the user isn't wearing the magic hat, refuse them
+        // permission
+        return user.permissions.createRoom;
+      }
 
-      return true;
+      if(right === 'admin' || right === 'join') {
+        return true;
+      }
+
+      assert(false, 'Unknown right ' + right);
     });
 
 
+}
+
+function oneToOnePermissionsModel(user, right/*, uri*/) {
+  // For now, only authenticated users can be in onetoones
+  if(!user) return Q.resolve(false);
+
+  if(right === 'create' || right === 'join') {
+    return Q.resolve(true);
+  }
+
+  if(right === 'admin') {
+    return Q.resolve(false);
+  }
+
+  return Q.reject('Unknown right ' + right);
 }
 
 function permissionsModel(user, right, uri, roomType) {
@@ -58,8 +93,7 @@ function permissionsModel(user, right, uri, roomType) {
 
   assert(user, 'user required');
   assert(right, 'right required');
-  assert(right === 'create' ||
-    right === 'join', 'Invalid right ' + right);
+  assert(right === 'create' || right === 'join' || right === 'admin', 'Invalid right ' + right);
   assert(uri, 'uri required');
   assert(roomType, 'roomType required');
   assert(roomType === 'REPO' ||
@@ -75,7 +109,7 @@ function permissionsModel(user, right, uri, roomType) {
 
     case 'ONETOONE':
       // TODO: a one-to-one permissioning model
-      return true;
+      return oneToOnePermissionsModel(user, right, uri).then(log);
   }
 
 }

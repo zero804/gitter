@@ -2,7 +2,6 @@
 "use strict";
 
 var troupeService       = require("./troupe-service");
-var inviteService       = require("./invite-service");
 
 var fileService         = require("./file-service");
 var restSerializer      = require("../serializers/rest-serializer");
@@ -31,46 +30,6 @@ exports.serializeTroupesForUser = function(userId, callback) {
 
       restSerializer.serialize(troupes, strategy, callback);
     });
-};
-
-exports.serializeInvitesForUser = function(userId, callback) {
-
-  inviteService.findAllUnusedInvitesForUserId(userId, function(err, invites) {
-    if(err) return callback(err);
-
-    var strategy = new restSerializer.InviteStrategy({ currentUserId: userId });
-
-    restSerializer.serialize(invites, strategy, callback);
-
-  });
-
-
-};
-
-exports.serializeInvitesFromUser = function(userId, callback) {
-
-  inviteService.findAllUnusedConnectionInvitesFromUserId(userId, function(err, invites) {
-    if(err) return callback(err);
-
-    var strategy = new restSerializer.InviteStrategy({ currentUserId: userId });
-
-    restSerializer.serialize(invites, strategy, callback);
-
-  });
-
-};
-
-exports.serializeInvitesForTroupe = function(troupeId, userId, callback) {
-
-  inviteService.findAllUnusedInvitesForTroupe(troupeId, function(err, invites) {
-    if(err) return callback(err);
-
-    var strategy = new restSerializer.InviteStrategy({ currentUserId: userId });
-
-    restSerializer.serialize(invites, strategy, callback);
-
-  });
-
 };
 
 exports.serializeRequestsForTroupe = function(troupeId, userId, callback) {

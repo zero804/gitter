@@ -1,11 +1,13 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var restSerializer  = require("../serializers/rest-serializer");
-var oauthService    = require("../services/oauth-service");
-var presenceService = require("../services/presence-service");
-var useragent       = require("useragent");
-var crypto          = require("crypto");
+var restSerializer   = require("../serializers/rest-serializer");
+var oauthService     = require("../services/oauth-service");
+var presenceService  = require("../services/presence-service");
+var useragent        = require("useragent");
+var crypto           = require("crypto");
+var permissionsModel = require("../services/permissions-model");
+var assert           = require("assert");
 
 var appVersion = require("./appVersion");
 var Q = require('q');
@@ -26,7 +28,7 @@ exports.generateMiniContext = function(req, callback) {
         user: serializedUser,
         accessToken: token,
         inUserhome: true,
-        desktopNotifications: desktopNotifications
+        desktopNotifications: desktopNotifications,
       });
     })
     .nodeify(callback);
@@ -48,27 +50,28 @@ exports.generateSocketContext = function(userId, troupeId, callback) {
 
 exports.generateTroupeContext = function(req, callback) {
   var user = req.user;
+  var uriContext = req.uriContext;
+  assert(uriContext);
+
   var troupe = req.uriContext.troupe;
-  var invite = req.uriContext.invite;
   var homeUser = req.uriContext.oneToOne && req.uriContext.otherUser; // The users page being looked at
-  var accessDenied = !req.uriContext.access;
 
   var troupeHash;
   if(troupe) {
     var cipher = crypto.createCipher('aes256', '***REMOVED***');
     var hash   = cipher.update(troupe.id, 'utf8', 'hex') + cipher.final('hex');
     troupeHash  = hash;
-
   }
 
   return Q.all([
     user ? serializeUser(user) : null,
-    homeUser ? serializeHomeUser(homeUser, !!invite) : undefined, //include email if the user has an invite
+    homeUser ? serializeHomeUser(homeUser) : undefined, //include email if the user has an invite
     user ? getWebToken(user) : null,
     troupe && user ? serializeTroupe(troupe, user) : fakeSerializedTroupe(req.uriContext),
-    determineDesktopNotifications(user, req)
+    determineDesktopNotifications(user, req),
+    permissionsModel(user, 'admin', req.uriContext.uri, troupe.githubType)
   ])
-  .spread(function(serializedUser, serializedHomeUser, token, serializedTroupe, desktopNotifications) {
+  .spread(function(serializedUser, serializedHomeUser, token, serializedTroupe, desktopNotifications, adminAccess) {
 
     var status;
     if(user) {
@@ -80,10 +83,11 @@ exports.generateTroupeContext = function(req, callback) {
       homeUser: serializedHomeUser,
       troupe: serializedTroupe,
       accessToken: token,
-      inviteId: invite && invite.id,
-      accessDenied: accessDenied,
       desktopNotifications: desktopNotifications,
-      troupeHash: troupeHash
+      troupeHash: troupeHash,
+      permissions: {
+        admin: adminAccess
+      }
     });
   })
   .nodeify(callback);
@@ -185,15 +189,12 @@ function createTroupeContext(req, options) {
       homeUser: options.homeUser,
       inUserhome: options.inUserhome,
       accessToken: options.accessToken,
-      loginToAccept: req.loginToAccept,
-      accessDenied: options.accessDenied,
-      inviteId: options.inviteId,
       appVersion: appVersion.getCurrentVersion(),
       desktopNotifications: options.desktopNotifications,
-      importedGoogleContacts: req.user && req.user.googleRefreshToken ? true : false,
       events: events,
       troupeUri: options.troupe ? options.troupe.uri : undefined,
       troupeHash: options.troupeHash,
-      isNativeDesktopApp: isNativeDesktopApp(req)
+      isNativeDesktopApp: isNativeDesktopApp(req),
+      permissions: options.permissions
     };
   }

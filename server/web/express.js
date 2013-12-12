@@ -215,6 +215,7 @@ module.exports = {
 
       if (responseType === 'html') {
         res.render(template , {
+          status: status,
           homeUrl : nconf.get('web:homeurl'),
           user: req.user,
           userMissingPrivateRepoScope: req.user && !req.user.hasGitHubScope('repo'),
