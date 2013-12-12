@@ -2,6 +2,7 @@
   {{#unless troupe.oneToOne}}
   <div class="settingsCog">
     <div class="dropdown">
+
       <div class="dropdown-toggle" data-toggle="dropdown"></div>
       <ul class="dropdown-menu" role="menu">
         <li><a role="menuitem" tabindex="-1" href="#|inv">Invite someone to this chat</a>
@@ -12,6 +13,8 @@
         {{/if}}
         <li role="presentation" class="divider"></li>
         <li><a role="menuitem" tabindex="-1" href="http://www.github.com/{{troupe.uri}}" target="_blank">Open in GitHub</a></li>
+        <li role="presentation" class="divider"></li>
+        <li><a role="menuitem" tabindex="-1" href="#" id="leave-room">Leave this room</a></li>
       </ul>
     </div>
   </div>
