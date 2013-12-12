@@ -19,7 +19,7 @@ module.exports = {
           }
 
           // when the viewer is not logged in:
-          var template = isPhone(req.headers['user-agent']) ? 'mobile/homepage' : 'homepage';
+          var template = isPhone(req.headers['user-agent']) ? 'login' : 'homepage';
           res.render(template, { profileHasNoUsername: JSON.stringify(false), userId: JSON.stringify(null) });
         }
       );
