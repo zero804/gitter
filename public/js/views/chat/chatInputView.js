@@ -13,10 +13,11 @@ define([
   'utils/safe-html',
   'utils/scrollbar-detect',
   'collections/instances/integrated-items',
-  './emoji_list',
+  'utils/emoji',
   'jquery-textcomplete', // No ref
   'jquery-sisyphus' // No ref
-], function(log, $, _, context, TroupeViews, appEvents, template, listItemTemplate, emojiListItemTemplate, moment, safeHtml, hasScrollBars, itemCollections, emojiList) {
+], function(log, $, _, context, TroupeViews, appEvents, template, listItemTemplate,
+  emojiListItemTemplate, moment, safeHtml, hasScrollBars, itemCollections, emoji) {
   "use strict";
 
   /** @const */
@@ -145,9 +146,9 @@ define([
             match: /(^|\s):(\w*)$/,
             maxCount: 8,
             search: function(term, callback) {
-              if(term.length < 1) return callback(['+1', '-1']);
+              if(term.length < 1) return callback(['+1', '-1', ]);
 
-              var matches = emojiList.filter(function(emoji) {
+              var matches = emoji.named.filter(function(emoji) {
                 return emoji.indexOf(term) === 0;
               });
               callback(matches);
