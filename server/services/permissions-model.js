@@ -60,7 +60,7 @@ function orgPermissionsModel(user, right, uri) {
         return user.permissions.createRoom;
       }
 
-      if(right === 'admin') {
+      if(right === 'admin' || right === 'join') {
         return true;
       }
 
@@ -74,7 +74,7 @@ function oneToOnePermissionsModel(user, right/*, uri*/) {
   // For now, only authenticated users can be in onetoones
   if(!user) return Q.resolve(false);
 
-  if(right === 'create') {
+  if(right === 'create' || right === 'join') {
     return Q.resolve(true);
   }
 
