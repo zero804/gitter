@@ -525,9 +525,13 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
               oneToOneUpgrade: false
             });
           } else {
+            winston.verbose('Found existing oneToOne troupe for ', { userId1: userId1, userId2: userId2 });
+
             var saveRequired = false;
             troupe.users.forEach(function(troupeUser) {
-              if(troupeUser.deactivated && troupeUser.userId == userId1) {
+              if(troupeUser.deactivated && ("" + troupeUser.userId == "" + userId1)) {
+                winston.verbose('Reactivating one-to-one room for ', { userId1: troupeUser.userId, troupeId: troupe.id });
+
                 troupe.reactivateUserById(troupeUser.userId);
                 saveRequired = true;
               }
