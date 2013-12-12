@@ -22,7 +22,7 @@ function renderHomePage(req, res, next) {
       bootScriptName = 'mobile-userhome';
     } else {
       page = 'app-template';
-      bootScriptName = user ? 'router-homepage' : 'router-login';
+      bootScriptName = user ? 'userhome' : 'router-login';
     }
 
     res.render(page, {

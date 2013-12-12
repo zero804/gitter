@@ -1,26 +1,26 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'backbone',
-  'views/base',
-  'utils/context',
-  'hbs!views/login/tmpl/loginRequestModalView',
+  // 'views/base',
+  // 'utils/context',
+  'utils/router',
+  // 'hbs!views/login/tmpl/loginRequestModalView',
   'views/app/appIntegratedView',
   'views/userhome/userHomeView',
   'views/toolbar/troupeMenu',
-  'routers/userhome-router',
-  'hbs!views/connect/tmpl/connectUserTemplate',
-  'collections/instances/troupes',
+  // 'hbs!views/connect/tmpl/connectUserTemplate',
+  // 'collections/instances/troupes'
   // 'views/app/smartCollectionView',
-  'components/errorReporter',
-  'components/dozy',
-  'components/webNotifications',
-  'components/desktopNotifications',
-  'template/helpers/all'
-], function(Backbone, TroupeViews, context, loginRequestTemplate,  AppIntegratedView, UserHomeView, TroupeMenuView, UserhomeRouter, connectUserTemplate, troupeCollections /*SmartCollectionView*/, errorReporter , dozy, webNotifications,_Helpers) {
+  // 'components/errorReporter',
+  // 'components/dozy',
+  // 'components/webNotifications',
+  // 'components/desktopNotifications',
+  // 'template/helpers/all'
+], function(Backbone, /*TroupeViews, context,*/ Router, /*loginRequestTemplate,*/ AppIntegratedView, UserHomeView, TroupeMenuView/*, connectUserTemplate, troupeCollections, SmartCollectionView, errorReporter , dozy, webNotifications,_Helpers*/) {
 
   "use strict";
 
-  var troupeCollection = troupeCollections.troupes;
+  // var troupeCollection = troupeCollections.troupes;
   var appView = new AppIntegratedView();
   appView.leftMenuRegion.show(new TroupeMenuView());
 
@@ -46,19 +46,10 @@ require([
   }
   catch (e) {}
 
-  new UserhomeRouter({
+  new Router({
+    routes: [],
     regions: [appView.rightPanelRegion, appView.dialogRegion],
-    rootHandler: function() {
-
-      // if(window.localStorage.startTour) {
-      //   delete window.localStorage.startTour;
-      //   require([
-      //     'tours/tour-controller'
-      //   ], function(tourController) {
-      //     tourController.init({ appIntegratedView: appView });
-      //   });
-      // }
-    }
+    rootHandler: function() {}
   });
 
   Backbone.history.start();
