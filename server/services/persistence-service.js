@@ -71,6 +71,14 @@ function serializeModelLateBound(model, callback) {
   serializeModel(model, callback);
 }
 
+var restSerializer = null;
+function getRestSerializerLateBound() {
+  if(!restSerializer) {
+    restSerializer = require("../serializers/rest-serializer");
+  }
+  return restSerializer;
+}
+
 function serializeEvent(url, operation, model, callback) {
   winston.verbose("Serializing " + operation + " to " + url);
 
@@ -299,7 +307,8 @@ UserTroupeFavouritesSchema.schemaTypeName = 'UserTroupeFavourites';
 // User in a Troupe
 //
 var TroupeUserSchema = new Schema({
-  userId: { type: ObjectId }
+  userId: { type: ObjectId },
+  deactivated: { type: Boolean }
   // In future: role
 });
 TroupeUserSchema.schemaTypeName = 'TroupeUserSchema';
@@ -326,6 +335,7 @@ TroupeSchema.schemaTypeName = 'TroupeSchema';
 TroupeSchema.index({ uri: 1 }, { unique: true, sparse: true });
 TroupeSchema.index({ lcUri: 1 }, { unique: true, sparse: true });
 TroupeSchema.index({ "users.userId": 1 });
+TroupeSchema.index({ "users.userId": 1,  "users.deactivated": 2 });
 TroupeSchema.pre('save', function (next) {
   this.lcUri =  this.uri ? this.uri.toLowerCase() : null;
   next();
@@ -355,6 +365,8 @@ TroupeSchema.methods.getOtherOneToOneUserId = function(knownUserId) {
 };
 
 TroupeSchema.methods.addUserById = function(userId) {
+  assert(!this.oneToOne);
+
   var exists = this.users.some(function(user) { return user.userId == userId; });
   if(exists) {
     throw new Error("User already exists in this troupe.");
@@ -377,32 +389,82 @@ TroupeSchema.methods.addUserById = function(userId) {
   return this.users.push(troupeUser);
 };
 
+function serializeOneToOneTroupeEvent(userId, operation, model, callback) {
+  var oneToOneUserUrl = '/user/' + userId + '/troupes';
+  var restSerializer = getRestSerializerLateBound();
+
+  var strategy = new restSerializer.TroupeStrategy({ currentUserId: userId });
+
+  restSerializer.serialize(model, strategy, function(err, serializedModel) {
+    if(err) return callback(err);
+
+    appEvents.dataChange2(oneToOneUserUrl, operation, serializedModel);
+    callback();
+  });
+}
+
 TroupeSchema.methods.removeUserById = function(userId) {
   assert(userId);
+
+  winston.verbose("Troupe.removeUserById", { userId: userId, troupeId: this.id });
+
   // TODO: disable this methods for one-to-one troupes
   var troupeUser = _.find(this.users, function(troupeUser){ return troupeUser.userId == userId; });
+
   if(troupeUser) {
     // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
     this.post('save', function(postNext) {
       var f = new Fiber();
 
-      var url = "/troupes/" + this.id + "/users";
-      serializeEvent(url, "remove", troupeUser, f.waitor());
+      if(!this.oneToOne) {
+        /* Dont mark the user as having been removed from the room */
+        var url = "/troupes/" + this.id + "/users";
+        serializeEvent(url, "remove", troupeUser, f.waitor());
 
-      var userUrl = "/user/" + userId + "/troupes";
-      serializeEvent(userUrl, "remove", this, f.waitor());
+        var userUrl = "/user/" + userId + "/troupes";
+        serializeEvent(userUrl, "remove", this, f.waitor());
 
-      // TODO: move this in a remove listener somewhere else in the codebase
-      appEvents.userRemovedFromTroupe({ troupeId: this.id, userId: troupeUser.userId });
+        // TODO: move this in a remove listener somewhere else in the codebase
+        appEvents.userRemovedFromTroupe({ troupeId: this.id, userId: troupeUser.userId });
+      } else {
+        serializeOneToOneTroupeEvent(userId, "remove", this, f.waitor());
+      }
 
       f.all().then(function() { postNext(); }).fail(function(err) { postNext(err); });
     });
 
-    troupeUser.remove();
+    if(this.oneToOne) {
+      troupeUser.deactivated = true;
+    } else {
+      troupeUser.remove();
+    }
+
   } else {
     winston.warn("Troupe.removeUserById: User " + userId + " not in troupe " + this.id);
   }
 };
+
+TroupeSchema.methods.reactivateUserById = function(userId) {
+  assert(userId);
+  assert(this.oneToOne);
+
+  winston.verbose("Troupe.reactivateUserById", { userId: userId, troupeId: this.id });
+
+  // TODO: disable this methods for one-to-one troupes
+  var troupeUser = _.find(this.users, function(troupeUser){ return troupeUser.userId == userId; });
+
+  if(troupeUser) {
+    // TODO: unfortunately the TroupeUser middleware remove isn't being called as we may have expected.....
+    this.post('save', function(postNext) {
+      serializeOneToOneTroupeEvent(userId, "create", this, postNext);
+    });
+
+    troupeUser.deactivated = undefined;
+  } else {
+    winston.warn("Troupe.reactivateUserById: User " + userId + " not in troupe " + this.id);
+  }
+};
+
 
 var TroupeRemovedUserSchema = new Schema({
   userId: { type: ObjectId },

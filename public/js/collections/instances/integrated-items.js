@@ -4,24 +4,15 @@ define([
   'underscore',
   'backbone',
   '../base',
-  '../files',
-  '../conversations',
   '../users',
   '../chat',
-  '../requests',
-  '../invites',
   'utils/appevents',
   'components/unread-items-client',
   'components/realtime-troupe-listener'     // No reference
-], function($, _, Backbone, base, fileModels, conversationModels, userModels, chatModels,
-  requestModels, inviteModels, appEvents, unreadItemsClient) {
+], function($, _, Backbone, base, userModels, chatModels, appEvents, unreadItemsClient) {
   "use strict";
 
-  var requestCollection      = new requestModels.RequestCollection(null, { listen: true });
-  var troupeInvitesCollection= new inviteModels.TroupeInviteCollection(null, { listen: true });
   var chatCollection         = new chatModels.ChatCollection(null, { listen: true });
-  var fileCollection         = new fileModels.FileCollection(null, { listen: true });
-  var conversationCollection = new conversationModels.ConversationCollection(null, { listen: true });
   var userCollection         = new userModels.UserCollection(null, { listen: true });
 
   function helpers() {
@@ -47,9 +38,7 @@ define([
     // Keep the unread items up to date on the model
     // This allows the unread items client to mark model items as read
     unreadItemsClient.syncCollections({
-      'chat': chatCollection,
-      'request': requestCollection,
-      'file': fileCollection
+      'chat': chatCollection
     });
   }
 
@@ -57,10 +46,6 @@ define([
 
   return {
     chats: chatCollection,
-    requests: requestCollection,
-    invites: troupeInvitesCollection,
-    files: fileCollection,
-    conversations: conversationCollection,
     users: userCollection
   };
 

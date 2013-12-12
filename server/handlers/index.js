@@ -9,7 +9,6 @@ module.exports = {
     require('./signup').install(app);
     require('./signout').install(app);
     require('./login').install(app);
-    require('./landing').install(app);
     require('./legals').install(app);
     require('./apps').install(app);
     require('./test-data').install(app);

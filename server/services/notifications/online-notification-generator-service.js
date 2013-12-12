@@ -21,31 +21,21 @@ function compile(map) {
 
 /* TODO: externalize and internationalise this! */
 var templates = compile({
-  "chat": "{{#if troupe.oneToOne}}{{{text}}}{{else}}{{{fromUser.displayName}}}: {{{text}}}{{/if}}",
-  "file": "{{#if troupe.oneToOne}}New file {{{fileName}}} uploaded{{else}}New file {{{fileName}}} uploaded by {{{latestVersion.creatorUser.displayName}}}{{/if}}",
-  "request": "{{{user.displayName}}} requested access to join {{{troupe.name}}}"
+  "chat": "{{#if troupe.oneToOne}}{{{text}}}{{else}}{{{fromUser.displayName}}}: {{{text}}}{{/if}}"
 });
 
 var titleTemplates = compile({
-  "chat": "{{#if troupe.oneToOne}}New chat from {{{fromUser.displayName}}}{{else}}New chat on {{{troupe.name}}}{{/if}}",
-  "file": "{{#if troupe.oneToOne}}New file from {{{fromUser.displayName}}}{{else}}New file on {{{troupe.name}}}{{/if}}",
-  "request": "New request on {{{troupe.name}}}"
+  "chat": "{{#if troupe.oneToOne}}New chat from {{{fromUser.displayName}}}{{else}}New chat on {{{troupe.name}}}{{/if}}"
 });
 
 var linkTemplates = compile({
-  "chat": "{{{troupeUrl}}}",
-  "file": "{{{troupeUrl}}}#file/{{{id}}}",
-  "request": "{{{troupeUrl}}}#request/{{{id}}}"
+  "chat": "{{{troupeUrl}}}"
 });
 
 var senderStrategies = {
   "chat": function(data) {
     return data.fromUser && data.fromUser.id;
-  },
-  "file": function(data) {
-    return data.latestVersion.creatorUser.id;
-  },
-  request: null // Never need this for one-to-ones as there are no requests
+  }
 };
 
 
@@ -86,7 +76,6 @@ function createNotificationMessage(itemType, itemIds, callback) {
   var senderStrategy = senderStrategies[itemType];
 
   if(!template) {
-    winston.warn("No template for itemType " + itemType);
     return callback(null, null);
   }
 
@@ -94,47 +83,47 @@ function createNotificationMessage(itemType, itemIds, callback) {
   if(Strategy) {
       var strategy = new Strategy({ includeTroupe: true });
 
-      serializer.serialize(itemIds, strategy, function(err, serialized) {
-        if(err) return callback(err);
+    serializer.serialize(itemIds, strategy, function(err, serialized) {
+      if(err) return callback(err);
 
-        var messages = serialized.map(function(data) {
-          var senderUserId = senderStrategy && senderStrategy(data);
+      var messages = serialized.map(function(data) {
+        var senderUserId = senderStrategy && senderStrategy(data);
 
-          if(!senderUserId) return;
+        if(!senderUserId) return;
 
-          // Catch-22, we can't figure out the sender until we've done serialization
-          // but we can't calculate the troupeUrl (needed _for_ serialization)
-          // until we've got the sender. This is only a problem for one to one troupes
-          var url = data.troupe.url;
-          if(!url) {
-            url = data.troupe.urlUserMap && data.troupe.urlUserMap[senderUserId];
-            data.troupe.url = url;
-          }
+        // Catch-22, we can't figure out the sender until we've done serialization
+        // but we can't calculate the troupeUrl (needed _for_ serialization)
+        // until we've got the sender. This is only a problem for one to one troupes
+        var url = data.troupe.url;
+        if(!url) {
+          url = data.troupe.urlUserMap && data.troupe.urlUserMap[senderUserId];
+          data.troupe.url = url;
+        }
 
-          var name = data.troupe.name;
-          if(!name) {
-            name = data.troupe.nameUserMap && data.troupe.nameUserMap[senderUserId];
-            data.troupe.name = name;
-          }
+        var name = data.troupe.name;
+        if(!name) {
+          name = data.troupe.nameUserMap && data.troupe.nameUserMap[senderUserId];
+          data.troupe.name = name;
+        }
 
-          // TODO: sort this ugly hack out
-          // This will fit nicely into the new serializer stuff
-          if(data.versions) { data.latestVersion = data.versions[data.versions.length - 1]; }
-          data.troupeUrl = url;
+        // TODO: sort this ugly hack out
+        // This will fit nicely into the new serializer stuff
+        if(data.versions) { data.latestVersion = data.versions[data.versions.length - 1]; }
+        data.troupeUrl = url;
 
-          var d = {
-            data: data,
-            text: template(data),
-            sound: 'notify.caf',
-            title: titleTemplate ? titleTemplate(data) : null,
-            link: linkTemplate ? linkTemplate(data) : null
-          };
-          return d;
-        });
-
-        messages = messages.filter(function(f) { return !!f; });
-        callback(null, messages);
+        var d = {
+          data: data,
+          text: template(data),
+          // sound: 'notify.caf',
+          title: titleTemplate ? titleTemplate(data) : null,
+          link: linkTemplate ? linkTemplate(data) : null
+        };
+        return d;
       });
+
+      messages = messages.filter(function(f) { return !!f; });
+      callback(null, messages);
+    });
   } else {
     winston.warn("No strategy for itemType " + itemType);
 
@@ -241,13 +230,11 @@ exports.sendOnlineNotifications = function(notifications, callback) {
                 if(!chat.mentions || !chat.mentions.length) return;
 
                 var username = user.username;
-                var displayName = user.displayName;
 
                 var userMentioned = chat.mentions.some(function(mention) {
                   var re = new RegExp(mention.screenName, 'i');
 
-                  return username && username.match(re) ||
-                          displayName && displayName.match(re);
+                  return username && username.match(re);
                 });
 
                 if(!userMentioned) return;
