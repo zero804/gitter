@@ -21,7 +21,7 @@ require([
   // 'views/profile/profileEmailView',
   // 'views/profile/profileAddEmailView',
   // 'views/modals/completeYourProfileModal',
-  // 'views/shareSearch/inviteView',
+  'views/shareSearch/inviteView',
   // 'views/signup//*createTroupeView'*/,
   // 'views/signup/usernameView',
   'views/app/troupeSettingsView',
@@ -52,7 +52,7 @@ require([
     RightToolbarView, /*filePreviewView, fileVersionsView,  RequestDetailView,*/
     /*InviteDetailView,*/ PersonDetailView, /*conversationDetailView,*/ /*profileView,
     profileEmailView, profileAddEmailView,*/ /* completeYourProfileModal,*/
-    /*inviteView,*/ /*createTroupeView,*/ /*UsernameView,*/ troupeSettingsView,
+    inviteView, /*createTroupeView,*/ /*UsernameView,*/ troupeSettingsView,
     IntegrationSettingsModal, TroupeMenuView, /* ReinviteModal, */ Router,
     unreadItemsClient, FileDecorator, webhookDecorator, userDecorator,
     embedDecorator, emojiDecorator, HeaderView /*, errorReporter , FilteredCollection */) {
@@ -120,7 +120,7 @@ require([
       // { name: "profile",          re: /^profile$/,                viewType: profileModal },
       // { name: "profileEmails",    re: /^profile\/emails$/,        viewType: profileEmailView.Modal,       collection: userEmailCollection, skipModelLoad: true },
       // { name: "profileEmailsAdd", re: /^profile\/emails\/add$/,   viewType: profileAddEmailView.Modal,    collection: userEmailCollection, skipModelLoad: true },
-      // { name: "inv",              re: /^inv$/,                    viewType: inviteView.Modal },
+      { name: "inv",               re: /^inv$/,                    viewType: inviteView.Modal },
       // { name: "create",           re: /^create$/,                 viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true },
       // { name: "upgradeOneToOne",  re: /^upgradeOneToOne$/,        viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true, viewOptions: { upgradeOneToOne: true } } ,
       // { name: "chooseUsername",   re: /^chooseUsername/,          viewType: UsernameView.Modal },

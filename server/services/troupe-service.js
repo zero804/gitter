@@ -100,8 +100,8 @@ function findMemberEmails(id, callback) {
 }
 
 function findAllTroupesForUser(userId, callback) {
-  return persistence.Troupe.find({ users: { $elemMatch: { userId: userId, deactivated: { $ne: true } } } })
-//    .where('users.userId', userId)
+  return persistence.Troupe
+    .where('users.userId', userId)
     .sort({ name: 'asc' })
     .execQ()
     .nodeify(callback);
@@ -420,16 +420,6 @@ function rejectRequest(request, callback) {
 function findUserIdsForTroupe(troupeId, callback) {
   return persistence.Troupe.findByIdQ(troupeId, 'users')
     .then(function(troupe) {
-      return troupe.users
-          .filter(function(m) { return m.deactivated; })
-          .map(function(m) { return m.userId; });
-    })
-    .nodeify(callback);
-}
-
-function findUserIdsForTroupeIncludingDeactivated(troupeId, callback) {
-  return persistence.Troupe.findByIdQ(troupeId, 'users')
-    .then(function(troupe) {
       return troupe.users.map(function(m) { return m.userId; });
     })
     .nodeify(callback);
@@ -463,13 +453,30 @@ function findImplicitConnectionBetweenUsers(userId1, userId2, callback) {
     .nodeify(callback);
 }
 
+function findOneToOneTroupe(fromUserId, toUserId) {
+  if(fromUserId == toUserId) throw "You cannot be in a troupe with yourself.";
+  assert(fromUserId, 'fromUserId parameter required');
+  assert(toUserId, 'fromUserId parameter required');
+
+  /* Find the existing one-to-one.... */
+  return persistence.Troupe.findOneQ({
+        $and: [
+          { oneToOne: true },
+          { 'users.userId': fromUserId },
+          { 'users.userId': toUserId }
+        ]
+    });
+
+}
+
 /**
  * Create a one-to-one troupe if one doesn't exist, otherwise return the existing one.
  *
  * Does not check if the users have implicit connections - it always creates
  * the one to one
  *
- * NOTE, the first user should always be the initiating (current) user
+ * NB NB NB: this is not atomic, so if two users try create the same troupe
+ * at the same moment (to the millisecond) things will get nasty!
  *
  * @return {troupe} Promise of a troupe
  */
@@ -524,22 +531,6 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
               userId: userId1,
               oneToOneUpgrade: false
             });
-          } else {
-            winston.verbose('Found existing oneToOne troupe for ', { userId1: userId1, userId2: userId2 });
-
-            var saveRequired = false;
-            troupe.users.forEach(function(troupeUser) {
-              if(troupeUser.deactivated && ("" + troupeUser.userId == "" + userId1)) {
-                winston.verbose('Reactivating one-to-one room for ', { userId1: troupeUser.userId, troupeId: troupe.id });
-
-                troupe.reactivateUserById(troupeUser.userId);
-                saveRequired = true;
-              }
-            });
-
-            if(saveRequired) {
-              return troupe.saveQ().thenResolve(troupe);
-            }
           }
 
           return troupe;
@@ -547,6 +538,22 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
 
       });
 
+}
+
+
+/**
+ * Find an unused invite from fromUserId to toUserId for toUserId to connect with fromUserId
+ * @param  {[type]} fromUserId
+ * @param  {[type]} toUserId
+ * @return {[type]} promise with invite
+ */
+function findUnusedOneToOneInviteFromUserIdToUserId(fromUserId, toUserId) {
+  return persistence.Invite.findOneQ({
+      troupeId: null, // This indicates that it's a one-to-one invite
+      fromUserId: fromUserId,
+      userId: toUserId,
+      status: 'UNUSED'
+    });
 }
 
 /**
@@ -568,8 +575,8 @@ function findOrCreateOneToOneTroupeIfPossible(fromUserId, toUserId) {
       return [toUser, persistence.Troupe.findOneQ({
         $and: [
           { oneToOne: true },
-          { users: { $elemMatch: { userId: fromUserId, deactivated: { $ne: true } } } },
-          { users: { $elemMatch: { userId: toUserId, deactivated: { $ne: true }  } } }
+          { 'users.userId': fromUserId },
+          { 'users.userId': toUserId }
         ]
       })];
     })
@@ -816,7 +823,6 @@ function findBestTroupeForUser(user, callback) {
           return findLastAccessedTroupeForUser(user);
         }
 
-
         return troupe;
       });
 
@@ -833,7 +839,7 @@ function findBestTroupeForUser(user, callback) {
  * @return promise of a troupe (or null)
  */
 function findLastAccessedTroupeForUser(user, callback) {
-  return persistence.Troupe.findQ({ users: { $elemMatch: { userId: user.id, deactivated: { $ne: true } }}, status: 'ACTIVE' }).then(function(activeTroupes) {
+  return persistence.Troupe.findQ({ 'users.userId': user.id, 'status': 'ACTIVE' }).then(function(activeTroupes) {
     if (!activeTroupes || activeTroupes.length === 0) return null;
 
     return userService.getTroupeLastAccessTimesForUser(user.id).then(function(troupeAccessTimes) {
@@ -958,10 +964,10 @@ module.exports = {
   findAllUserIdsForTroupes: findAllUserIdsForTroupes,
   findAllUserIdsForTroupe: findAllUserIdsForTroupe,
   findUserIdsForTroupe: findUserIdsForTroupe,
-  findUserIdsForTroupeIncludingDeactivated: findUserIdsForTroupeIncludingDeactivated,
 
   validateTroupeUrisForUser: validateTroupeUrisForUser,
   updateTroupeName: updateTroupeName,
+  findOneToOneTroupe: findOneToOneTroupe,
   findOrCreateOneToOneTroupeIfPossible: findOrCreateOneToOneTroupeIfPossible,
   createUniqueUri: createUniqueUri,
   deleteTroupe: deleteTroupe,
