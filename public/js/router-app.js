@@ -77,12 +77,7 @@ require([
     }
   });
 
-  troupeCollection.on("add", function(model) {
-    if(model.id == context.getTroupeId()) {
-      var headerView = new HeaderView({model: model});
-      headerView.render();
-    }
-  });
+  new HeaderView({ model: context.troupe(), el: '#header' }).render();
 
   // instantiate user email collection
   // var userEmailCollection = new UserEmailCollection.UserEmailCollection();
@@ -106,6 +101,9 @@ require([
   }).render();
 
   // var profileModal = context.getUser().username ? profileView.Modal : completeYourProfileModal;
+  function integrationsValidationCheck() {
+    return context().permissions.admin;
+  }
 
   new Router({
     routes: [
@@ -126,7 +124,7 @@ require([
       // { name: "chooseUsername",   re: /^chooseUsername/,          viewType: UsernameView.Modal },
       // { name: "reinvite",         re: /^reinvite\/(\w+)$/,        viewType: ReinviteModal,                collection: troupeCollections.outgoingConnectionInvites, viewOptions: { overrideContext: true, inviteToConnect: true } },
       { name: "troupeSettings",   re: /^troupeSettings/,          viewType: troupeSettingsView },
-      { name: "integrations",     re: /^integrations/,            viewType: IntegrationSettingsModal }
+      { name: "integrations",     re: /^integrations/,            viewType: IntegrationSettingsModal,  validationCheck: integrationsValidationCheck }
     ],
     regions: [appView.rightPanelRegion, appView.dialogRegion]
   });

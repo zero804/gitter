@@ -70,7 +70,7 @@ module.exports = {
     }
 
     if(updatedTroupe.hasOwnProperty('topic')) {
-      promises.push(troupeService.updateTopic(troupe.id, updatedTroupe.topic));
+      promises.push(troupeService.updateTopic(req.user, troupe, updatedTroupe.topic));
     }
 
     Q.all(promises)
@@ -89,7 +89,6 @@ module.exports = {
 
       })
       .catch(next);
-
   },
 
   // destroy: function(req, res, next) {
