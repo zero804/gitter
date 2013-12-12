@@ -7,9 +7,9 @@ module.exports = exports = function(request) {
   return function requestWrapper(options, callback) {
 
     request(options, function (error, response, body) {
-      if(error || response.statusCode >= 400) {
+      if(error || response && response.statusCode >= 400) {
         winston.error("Error while communicating with GitHub", {
-          statusCode: response.statusCode,
+          statusCode: response && response.statusCode,
           uri: options.uri || options.url,
           message: body
         });
