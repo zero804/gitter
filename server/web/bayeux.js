@@ -88,12 +88,6 @@ function populateSubUserCollection(options, callback) {
     case "troupes":
       return restful.serializeTroupesForUser(userId, callback);
 
-    case "invites":
-      return restful.serializeInvitesForUser(userId, callback);
-
-    case "connectioninvites":
-      return restful.serializeInvitesFromUser(userId, callback);
-
     default:
       winston.error('Unable to provide snapshot for ' + collection);
   }
@@ -109,23 +103,11 @@ function populateSubTroupeCollection(options, callback) {
   var collection = match[2];
 
   switch(collection) {
-    case "requests":
-      return restful.serializeRequestsForTroupe(troupeId, userId, callback);
-
     case "chatMessages":
       return restful.serializeChatsForTroupe(troupeId, userId, callback);
 
-    case "files":
-      return restful.serializeFilesForTroupe(troupeId, userId, callback);
-
-    case "conversations":
-      return restful.serializeConversationsForTroupe(troupeId, userId, callback);
-
     case "users":
       return restful.serializeUsersForTroupe(troupeId, userId, callback);
-
-    case "invites":
-      return restful.serializeInvitesForTroupe(troupeId, userId, callback);
 
     default:
       winston.error('Unable to provide snapshot for ' + collection);

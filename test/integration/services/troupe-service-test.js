@@ -49,7 +49,6 @@ function testRequestAcceptance(email, userStatus, emailNotificationConfirmationM
                 .then(function() {
                   // Install hooks TODO: fix this!
                   // appEvents.onEmailConfirmed(email, user.id);
-                  return testRequire("./services/invite-service").updateInvitesAndRequestsForConfirmedEmail(email, user.id);
                 });
 
 
@@ -84,122 +83,8 @@ function testRequestAcceptance(email, userStatus, emailNotificationConfirmationM
 }
 
 
-function testRequestRejection(email, userStatus, done) {
-  var emailNotificationServiceMock = mockito.spy(testRequire('./services/email-notification-service'));
-  var troupeService = testRequire.withProxies("./services/troupe-service", {
-    './email-notification-service': emailNotificationServiceMock
-  });
-
-  persistence.User.create({
-    email: email,
-    displayName: 'Test User ' + new Date(),
-    confirmationCode: null,  // IMPORTANT. This is the point of the test!!!
-    status: userStatus }, function(err, user) {
-      if(err) return done(err);
-
-      troupeService.addRequest(fixture.troupe1, user)
-        .then(function(request) {
-
-        troupeService.rejectRequest(request)
-          .then(function() {
-            mockito.verifyZeroInteractions(emailNotificationServiceMock);
-
-            assert(!troupeService.userHasAccessToTroupe(user, fixture.troupe2), 'User has not been granted access to the troupe');
-            assert(!troupeService.userIdHasAccessToTroupe(user.id, fixture.troupe2), 'User has not been granted access to the troupe');
-
-            persistence.Request.findOne({ id: request.id }, function(err, r2) {
-              if(err) return done(err);
-
-              assert(!r2, 'Request should have been deleted');
-              return done();
-            });
-
-        });
-      });
-
-    });
-}
-
 describe('troupe-service', function() {
 
-
-  xdescribe('#acceptRequest()', function() {
-
-    it('should allow an ACTIVE user (without a confirmation code) request to be accepted', function(done) {
-      var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
-
-      testRequestAcceptance(nonExistingEmail, 'ACTIVE', 'sendRequestAcceptanceToUser', done);
-    });
-
-    it('should allow an UNCONFIRMED user (without a confirmation code) request to be accepted', function(done) {
-      var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
-
-      testRequestAcceptance(nonExistingEmail, 'UNCONFIRMED', 'sendRequestAcceptanceToUser', done);
-    });
-
-
-    it('should allow an PROFILE_NOT_COMPLETED user (without a confirmation code) request to be accepted', function(done) {
-      var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
-
-      testRequestAcceptance(nonExistingEmail, 'PROFILE_NOT_COMPLETED', 'sendRequestAcceptanceToUser', done);
-    });
-
-  });
-
-
-  xdescribe('#rejectRequest()', function() {
-    it('should delete a rejected request from an ACTIVE user', function(done) {
-      var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
-      testRequestRejection(nonExistingEmail, 'ACTIVE', done);
-    });
-
-    it('should delete a rejected request from an UNCONFIRMED user', function(done) {
-      var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
-      testRequestRejection(nonExistingEmail, 'UNCONFIRMED', done);
-    });
-  });
-
-  xdescribe('#validateTroupeEmail()', function() {
-    it('should validate correctly for a known user', function(done) {
-      var troupeService = testRequire('./services/troupe-service');
-
-      troupeService.validateTroupeEmail({
-        from: 'testuser@troupetest.local',
-        to: 'testtroupe1@troupetest.local'
-      }, function(err, fromUser) {
-        if(err) return done(err);
-
-        assert(fromUser, 'Validation failed but should have succeeded');
-        done();
-      });
-    });
-
-    it('should not validate for an unknown user', function(done) {
-      var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
-
-      var troupeService = testRequire('./services/troupe-service');
-
-      troupeService.validateTroupeEmail({
-        from: nonExistingEmail,
-        to: 'testtroupe1@troupetest.local'
-      }, function(err, fromUser) {
-        if(err) {
-          if(err === "Access denied") {
-            return done();
-          }
-
-          return done(err);
-        }
-        assert(!fromUser, 'Validation succeeded but should have failed');
-        done();
-      });
-    });
-
-    it('should delete a rejected request from an UNCONFIRMED user', function(done) {
-      var nonExistingEmail = 'testuser' + Date.now() + '@troupetest.local';
-      testRequestRejection(nonExistingEmail, 'UNCONFIRMED', done);
-    });
-  });
 
   describe('#updateFavourite()', function() {
     it('should add a troupe to favourites',function(done) {

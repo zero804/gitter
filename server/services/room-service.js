@@ -233,6 +233,10 @@ function findOrCreateRoom(user, uri) {
               return { oneToOne: false, troupe: troupe, hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope };
             });
         });
+    })
+    .then(function(uriLookup) {
+      if(uriLookup) uriLookup.uri = uri;
+      return uriLookup;
     });
 }
 

@@ -1,7 +1,6 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var _                 = require("underscore");
 var nconf             = require('../../utils/config');
 var contextGenerator  = require('../../web/context-generator');
 
@@ -64,25 +63,6 @@ function renderAppPageWithTroupe(req, res, next, page) {
     .fail(next);
 }
 
-
-function renderAcceptInvitePage(req, res, next) {
-  contextGenerator.generateMiniContext(req, function(err, troupeContext) {
-    if(err) {
-      next(err);
-    } else {
-      res.render('app-template', {
-        useAppCache: !!nconf.get('web:useAppCache'),
-        bootScriptName: 'router-login',
-        troupeName: 'Invite',
-        troupeContext: _.extend(troupeContext, {
-          acceptInvitePrompt: true
-        }),
-        agent: req.headers['user-agent']
-      });
-    }
-  });
-}
-
 function renderMiddleware(template, mobilePage) {
   return function(req, res, next) {
     if(mobilePage) req.params.mobilePage = mobilePage;
@@ -93,6 +73,5 @@ function renderMiddleware(template, mobilePage) {
 module.exports = exports = {
   renderHomePage: renderHomePage,
   renderAppPageWithTroupe: renderAppPageWithTroupe,
-  renderAcceptInvitePage: renderAcceptInvitePage,
   renderMiddleware: renderMiddleware
 };

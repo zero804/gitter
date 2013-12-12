@@ -57,11 +57,11 @@ define([
 
   /** If a PDF plugin is installed, use it directly */
   function pdfViewUrl(url) {
-    if(detectAdobeReader()) {
+    //if(detectAdobeReader()) {
       return url + "?embedded=1";
-    } else {
-      return '/pdfjs/web/viewer.html?file=' + url + "?embedded=1";
-    }
+    //} else {
+    //  return '/pdfjs/web/viewer.html?file=' + url + "?embedded=1";
+    //}
   }
   var displayDirectMimeTypes = {
     'image/jpeg': true,

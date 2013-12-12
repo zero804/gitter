@@ -1,25 +1,13 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var winston                 = require('winston');
 var middleware              = require("../web/middleware");
 var loginUtils              = require('../web/login-utils');
 var nconf                   = require('../utils/config');
 var isPhone                 = require('../web/is-phone');
 
 module.exports = {
-
     install: function(app) {
-      app.get('/x', function(req, res, next) {
-        winston.warn('/x is only meant for testing, do not use in production. Use web:homeurl instead.');
-        var homeurl = nconf.get('web:homeurl');
-        if(homeurl === '/x') {
-          next();
-        } else {
-          res.relativeRedirect(homeurl);
-        }
-      });
-
       app.get(nconf.get('web:homeurl'),
         middleware.ensureValidBrowser,
         middleware.grantAccessForRememberMeTokenMiddleware,
@@ -31,9 +19,25 @@ module.exports = {
           }
 
           // when the viewer is not logged in:
-          var template = isPhone(req.headers['user-agent']) ? 'mobile/homepage' : 'homepage';
+          var template = isPhone(req.headers['user-agent']) ? 'login' : 'homepage';
           res.render(template, { profileHasNoUsername: JSON.stringify(false), userId: JSON.stringify(null) });
         }
       );
+
+      if (nconf.get('web:homeurl') !== '/') {
+        app.get(
+          '/',
+          middleware.grantAccessForRememberMeTokenMiddleware,
+          function(req, res) {
+            if(req.user) {
+              res.relativeRedirect(nconf.get('web:homeurl'));
+              return;
+            }
+
+            res.render('landing');
+          }
+        );
+      }
+
     }
 };

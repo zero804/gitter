@@ -175,6 +175,7 @@ test-reinit-data: maintain-data init-test-data test post-test-maintain-data
 
 reset-test-data: maintain-data init-test-data
 
+
 upgrade-data:
 	./scripts/upgrade-data.sh
 
@@ -191,7 +192,8 @@ init-test-data:
 
 tarball:
 	mkdir -p output
-	find . -type f -not -name ".*"| grep -Ev '^\./(\.|output/|assets/|mongo-backup-|scripts/mongo-backup-|node_modules/).*'|tar -cv --files-from - |gzip -9 - > output/troupe.tgz
+	find . -type f -not -name ".*"| grep -Ev '^\./(\.|coverage/|output/|assets/|mongo-backup-|scripts/mongo-backup-|node_modules/).*'|tar -cv --files-from - |gzip -9 - > output/troupe.tgz
+	tar -cvzf output/assets.tgz -C public-processed .
 
 search-js-console:
 	if (find public/js -name "*.js" ! -path "*libs*" ! -name log.js |xargs grep -q '\bconsole\b'); then \

@@ -1,37 +1,32 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-
 define([
-  'collections/instances/troupes',
-  'jquery',
-  'backbone',
+  'utils/context',
+  'marionette',
   'hbs!./tmpl/headerViewTemplate',
   'twitter-text'
-], function(troupesCollection, $, Backbone, headerViewTemplate, TwitterText)  {
+], function(context, Marionette, headerViewTemplate, TwitterText)  {
   "use strict";
 
-  var troupes = troupesCollection.troupes;
-  window.troupes = troupes;
-
-  var HeaderView = Backbone.View.extend({
-    el: '#header',
-
-    initialize: function() {
-      this.listenTo(this.model, "change", this.render);
+  return Marionette.ItemView.extend({
+    template: headerViewTemplate,
+    modelEvents: {
+        'change': 'render'
     },
-
-    render: function() {
-      var room = this.model.toJSON();
-      if (room.topic) {
-        var safeTopic = TwitterText.txt.htmlEscape(room.topic);
+    serializeData: function() {
+      var troupe = this.model.toJSON();
+      var topic = troupe.topic;
+      if (topic) {
+        var safeTopic = TwitterText.txt.htmlEscape(topic);
         var entities = TwitterText.txt.extractUrlsWithIndices(safeTopic, {extractUrlsWithoutProtocol: true});
-        room.topic = TwitterText.txt.autoLinkEntities(safeTopic, entities, {targetBlank: true});
+        topic = TwitterText.txt.autoLinkEntities(safeTopic, entities, {targetBlank: true});
       }
-      var compiledTemplate = headerViewTemplate({troupe: room});
-      $(this.el).html(compiledTemplate);
-      return this;
+
+      return {
+        permissions: context().permissions,
+        troupe: troupe,
+        topic: topic
+      };
     }
   });
-
-  return HeaderView;
 
 });
