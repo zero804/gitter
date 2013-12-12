@@ -50,6 +50,15 @@ define([
     return m.get('githubType') == "REPO";
   });
 
+  // Sync up with the context
+  troupeCollection.on("add", function(model) {
+    if(model.id == context.getTroupeId()) {
+      model.on('change', function(model) {
+        context.troupe().set(model.changed);
+      });
+    }
+  });
+
 
   // collection of recent troupes only, will be empty at first.
   // doesn't need to be connected to events from the main collection,
