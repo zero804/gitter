@@ -1,10 +1,11 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'jquery',
   'utils/context',
   'marionette',
   'hbs!./tmpl/headerViewTemplate',
   'twitter-text'
-], function(context, Marionette, headerViewTemplate, TwitterText)  {
+], function($, context, Marionette, headerViewTemplate, TwitterText)  {
   "use strict";
 
   return Marionette.ItemView.extend({
@@ -12,6 +13,18 @@ define([
     modelEvents: {
         'change': 'render'
     },
+    events: {
+      'click #leave-room': 'leaveRoom',
+    },
+
+    leaveRoom: function() {
+      $.ajax({
+        url: "/api/v1/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
+        data: "",
+        type: "DELETE",
+      });
+    },
+
     serializeData: function() {
       var troupe = this.model.toJSON();
       var topic = troupe.topic;
