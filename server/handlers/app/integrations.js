@@ -1,12 +1,13 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-var winston = require("winston");
-var nconf = require('../../utils/config');
-var middleware = require('../../web/middleware');
-var request = require('request');
+var winston                      = require("winston");
+var nconf                        = require('../../utils/config');
+var permissionsModel             = require('../../services/permissions-model');
+var middleware                   = require('../../web/middleware');
+var request                      = require('request');
 var uriContextResolverMiddleware = require('./middleware').uriContextResolverMiddleware;
-var jwt = require('jwt-simple');
+var jwt                          = require('jwt-simple');
 
 var serviceDisplayNames = {
   github: 'GitHub',
@@ -85,13 +86,22 @@ function createIntegration(req, res) {
       encryptedUserToken = "";
     }
 
-    res.redirect(body.configurationURL + 
-      "&rt=" + resp.body.token + 
-      "&ut=" + encryptedUserToken + 
+    res.redirect(body.configurationURL +
+      "&rt=" + resp.body.token +
+      "&ut=" + encryptedUserToken +
       "&returnTo=" + nconf.get('web:basepath') + req.url
     );
   });
+}
 
+function adminAccessCheck(req, res, next) {
+  var uriContext = req.uriContext;
+  permissionsModel(req.user, 'admin', uriContext.uri, uriContext.troupe.githubType)
+    .then(function(access) {
+      if(!access) return next(403);
+
+      next();
+    });
 }
 
 module.exports = {
@@ -101,36 +111,42 @@ module.exports = {
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
+        adminAccessCheck,
         getIntegrations);
 
       app.get('/settings/integrations/:userOrOrg/:repo',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
+        adminAccessCheck,
         getIntegrations);
 
       app.del('/settings/integrations/:userOrOrg',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
+        adminAccessCheck,
         deleteIntegration);
 
       app.del('/settings/integrations/:userOrOrg/:repo',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
+        adminAccessCheck,
         deleteIntegration);
 
       app.post('/settings/integrations/:userOrOrg',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
+        adminAccessCheck,
         createIntegration);
 
       app.post('/settings/integrations/:userOrOrg/:repo',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
         uriContextResolverMiddleware,
+        adminAccessCheck,
         createIntegration);
 
     }
