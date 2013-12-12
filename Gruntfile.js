@@ -80,7 +80,7 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
-                  name: "router-homepage",
+                  name: "userhome",
                   include: [
                     "utils/tracking",
                     "views/widgets/avatar",
@@ -105,7 +105,7 @@ module.exports = function( grunt ) {
                     "views/widgets/timeago"
                   ],
                   exclude: ["core-libraries"]
-              },
+              },*/
               {
                   name: "mobile-app",
                   include: [
@@ -123,7 +123,7 @@ module.exports = function( grunt ) {
                     "views/widgets/timeago"
                   ],
                   exclude: ["core-libraries"]
-              },
+              },/*
               {
                   name: "routers/mobile/native/files-router",
                   include: [
@@ -236,7 +236,7 @@ module.exports = function( grunt ) {
           },
       'signup': createClosureConfig('signup'),
       'router-app': createClosureConfig('router-app'),
-      "router-homepage": createClosureConfig('router-homepage'),
+      'userhome': createClosureConfig('userhome'),
 //      "homepage-mobile" : createClosureConfig('homepage-mobile'),
 //       "native-chat-router": createClosureConfig('routers/mobile/native/chat-router'),
       "mobile-app": createClosureConfig('mobile-app'),
