@@ -12,14 +12,13 @@ define([
   'hbs!./tmpl/noContacts',
   'zeroclipboard',
   'utils/appevents',
-  'collections/suggested-contacts',
   'log!shareSearchView',
   'bootstrap-typeahead',              // No ref
   'utils/validate-wrapper',           // No ref
   'jquery-placeholder'                // No ref
 
 ], function($, _, Marionette, context, TroupeViews, cocktail, InfiniteScrollMixin, template,
-  rowTemplate, noContactsTemplate, ZeroClipboard, appEvents, suggestedContactModels, log) {
+  rowTemplate, noContactsTemplate, ZeroClipboard, appEvents, log) {
   "use strict";
 
   var ContactView = TroupeViews.Base.extend({
@@ -126,7 +125,7 @@ define([
       if(!options) options = {};
       this._options = options;
 
-      this.collection = new suggestedContactModels.Collection();
+      //this.collection = new suggestedContactModels.Collection();
       this.collection.query(this.getQuery());
 
       this.searchLimited = _.debounce(this.search.bind(this));

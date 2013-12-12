@@ -9,7 +9,7 @@ define([
   var TroupeModel = TroupeCollections.Model.extend({
     idAttribute: "id",
     parse: function(message) {
-      if(message.lastAccessTime) {
+      if(typeof message.lastAccessTime === 'string') {
         message.lastAccessTime = moment(message.lastAccessTime, moment.defaultFormat);
       }
 
