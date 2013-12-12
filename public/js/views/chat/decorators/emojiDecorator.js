@@ -1,6 +1,6 @@
 /* jshint unused:true, browser:true,  strict:true */
 /* global define:false */
-define(['utils/emoji'], function(emoji) {
+define(['utils/emoji', 'utils/cdn'], function(emoji, cdn) {
 
   "use strict";
 
@@ -50,7 +50,7 @@ define(['utils/emoji'], function(emoji) {
             var emojiImg = document.createElement('img');
             emojiImg.setAttribute('title', ':' + emojiName + ':');
             emojiImg.setAttribute('class', 'emoji');
-            emojiImg.setAttribute('src', '/images/2/gitter/emoji/' + emojiName + '.png');
+            emojiImg.setAttribute('src', cdn('images/2/gitter/emoji/' + emojiName + '.png'));
             emojiImg.setAttribute('align', 'absmiddle');
 
             node.splitText(match.index);
