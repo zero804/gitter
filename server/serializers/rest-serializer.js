@@ -625,6 +625,7 @@ function GitHubOrgStrategy(options) {
   this.map = function(item) {
     var room = self.troupes[item.login];
     return {
+      id: item.id,
       name: item.login,
       avatar_url: item.avatar_url,
       room: room ? troupeStrategy.map(room) : undefined
@@ -656,7 +657,8 @@ function GitHubRepoStrategy(options) {
   this.map = function(item) {
     var room = self.troupes[item.full_name];
     return {
-      name:     item.name,
+      id:       item.id,
+      name:     item.full_name,
       uri:      item.full_name,
       private:  item.private,
       room:     room ? troupeStrategy.map(room) : undefined

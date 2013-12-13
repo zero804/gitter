@@ -7,14 +7,14 @@ define([
   "use strict";
 
   var RepoModel = TroupeCollections.Model.extend({
-    idAttribute: 'name'
+    idAttribute: 'id'
   });
 
   var ReposCollection = Backbone.Collection.extend({
     model: RepoModel,
     initialize: function() {
       this.url = "/api/v1/user/" + context.getUserId() + "/repos";
-      this.listenTo(this, 'change:name', this.replicateContext);
+      // this.listenTo(this, 'change:name', this.replicateContext);
     }
   });
 

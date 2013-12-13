@@ -2,17 +2,16 @@
 
 define([
   'marionette',
-  'views/base',
   'hbs!./tmpl/repoListItem'
-], function(Marionette, TroupeViews, repoListItemTemplate) {
+], function(Marionette, repoListItemTemplate) {
   "use strict";
 
-  var RepoItemView = TroupeViews.Base.extend({
+  var RepoItemView = Marionette.ItemView.extend({
     tagName: 'li',
     template: repoListItemTemplate,
-    initialize: function() {
-      this.setRerenderOnChange(true);
-    },
+    modelEvents: {
+      change: 'render'
+    }
   });
 
   return Marionette.CollectionView.extend({
