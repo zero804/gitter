@@ -1,18 +1,19 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-
 define([
+  'utils/context',
   'jquery',
   'underscore',
   'backbone',
+  'utils/text-filter',
   './troupeCollectionView'
-], function($, _, Backbone, TroupeCollectionView) {
+], function(context, $, _, Backbone, textFilter, TroupeCollectionView) {
   "use strict";
 
   return TroupeCollectionView.extend({
 
     initialize: function(options) {
 
-      this.user_queries = {}; 
+      this.user_queries = {};
       this.repo_queries = {};
       this.troupes = options.troupes;
       this.collection = new Backbone.Collection();
@@ -31,8 +32,6 @@ define([
     search: function(query) {
       var self = this;
 
-      query = query.toLowerCase().trim();
-
       if (query === '')
         $(window).trigger('hideSearch');
       // don't do anything if the search term hasn't changed
@@ -41,87 +40,49 @@ define([
       else
         this.query = query;
 
-      function escapeRegExp(str) {
-        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-      }
-
-      var terms = query.split(' ');
-      var termsRe = new RegExp("\\b(" + _.map(terms, escapeRegExp).join("|") + ")", "i");
+      var filter = textFilter({ query: query, fields: ['name', 'username', 'displayName', 'uri']});
 
       var troupes = this.troupes;
 
       // filter the local troupes collection
-      var results = troupes.filter(isMatch);
-
-      function isMatch(t) {
-
-        function match(string) {
-          return string && string.match(termsRe);
-        }
-
-        if (!query) return false;
-        if(match(t.get ? t.get('name') : t.name)) return true;
-
-        // Matching directly against a username
-        if(match(t.get ? t.get('username') : t.username)) return true;
-        if(match(t.get ? t.get('displayName') : t.displayName)) return true;
-        if(match(t.get ? t.get('url') : t.url)) return true;
-
-        return false;
-      }
+      var results = troupes.filter(filter);
 
       // filter the suggestions from the user search service
       this.findUsers(query, function(suggestions) {
-        var matches = suggestions.filter(isMatch);
-
-        var troupes = _.map(matches, function(suggestion) {
-
-          // check if this result already exists in the search results
-          var exists = !!self.collection.findWhere({ url: suggestion.url });
-
-          if (exists) {
-            return;
-          }
-
-          return new Backbone.Model({
-            id: suggestion.id,
-            name: suggestion.displayName,
-            url: suggestion.url
+        var additional = suggestions.filter(function(user) {
+            return !self.collection.findWhere({ uri: user.username });
+          }).map(function(user) {
+            return new Backbone.Model({
+              name: user.displayName,
+              uri: user.username,
+              oneToOne: true,
+              githubType: 'ONETOONE'
+            });
           });
-        });
 
-        // add these results as extra's to the local search results
-        self.collection.add(_.compact(troupes));
+        self.collection.add(additional);
       });
 
       // filter the suggestions from the repo search service
       this.findRepos(query, function(suggestions) {
-        var matches = suggestions.filter(isMatch);
-
-        var troupes = _.map(matches, function(suggestion) {
-
-          // check if this result already exists in the search results
-          var exists = !!self.collection.findWhere({ url: suggestion.url });
-
-          if (exists) {
-            return;
-          }
-
-          return new Backbone.Model({
-            id: suggestion.id,
-            name: suggestion.name,
-            url: suggestion.url,
-            ethereal: suggestion.room ? false : true
+        var additional = suggestions.filter(function(repo) {
+            return !self.collection.findWhere({ uri: repo.uri });
+          }).map(function(repo) {
+            return new Backbone.Model({
+              id: repo.id,
+              name: repo.uri,
+              uri: repo.uri,
+              ethereal: !repo.room
+            });
           });
-        });
 
-        // add these results as extra's to the local search results
-        self.collection.add(_.compact(troupes));
+        self.collection.add(additional);
       });
 
 
       // set the initial local search results
-      self.collection.reset(results);
+      self.collection.set(results, { remove: true, add: true, merge: true });
+
       self.select(0);
     },
 
@@ -148,6 +109,7 @@ define([
       }
 
       $.ajax({ url: '/api/v1/user', data : { q: query, unconnected:1 }, success: function(data) {
+
         if (data.results) {
           if (!self.user_queries[query]) self.user_queries[query] = [];
 
@@ -182,14 +144,12 @@ define([
         return;
       }
 
-      $.ajax({ url: '/api/v1/search', data : { q: query }, success: function(data) {
+      $.ajax({ url: '/api/v1/user/' + context.getUserId() + '/repos', data : { q: query }, success: function(data) {
 
-        if (data) {
+        if (data.results) {
           if (!self.repo_queries[query]) self.repo_queries[query] = [];
 
-          _.each(data, function(repo) { repo.url = '/' + repo.name; }); 
-          
-          self.repo_queries[query] = _.uniq(self.repo_queries[query].concat(data), function(s) {
+          self.repo_queries[query] = _.uniq(self.repo_queries[query].concat(data.results), function(s) {
             return s.name;
           });
 
@@ -230,7 +190,7 @@ define([
     },
 
     navigateToCurrent: function() {
-      window.location = this.collection.at(this.selectedIndex).get('url');
+      window.location = '/' + this.collection.at(this.selectedIndex).get('uri');
     },
 
     select: function(i) {

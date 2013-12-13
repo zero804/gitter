@@ -1,13 +1,39 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var restSerializer  = require("../../serializers/rest-serializer");
-var repoService     = require("../../services/repo-service");
+var restSerializer   = require("../../serializers/rest-serializer");
+var repoService      = require("../../services/repo-service");
+var createTextFilter = require('text-filter');
+
+function indexQuery(req, res, next) {
+  var options = {
+    limit: req.query.limit,
+    skip: req.query.skip
+  };
+
+  var search = repoService.getReposForUser(req.user);
+
+  return search.then(function(repos) {
+    console.log(repos);
+      var filteredRepos = repos.filter(createTextFilter({ query: req.query.q, fields: ['name', 'full_name', 'description']}));
+
+      var strategy = new restSerializer.SearchResultsStrategy({
+                            resultItemStrategy: new restSerializer.GitHubRepoStrategy({ currentUserId: req.user.id })
+                          });
+
+      return restSerializer.serializeQ({ results: filteredRepos }, strategy);
+    })
+    .then(function(serialized) {
+      res.send(serialized);
+    })
+    .fail(next);
+}
 
 module.exports = {
   index: function(req, res, next) {
-    if (!req.user) return res.send(403);
-
+    if(req.query.q) {
+      return indexQuery(req, res, next);
+    }
 
     repoService.suggestedReposForUser(req.user)
       .then(function(repos) {
