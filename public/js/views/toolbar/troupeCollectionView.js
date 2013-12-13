@@ -1,24 +1,22 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-
 define([
   'utils/context',
   'marionette',
-  'views/base',
   'hbs!./tmpl/troupeListItem'
-], function(context, Marionette, TroupeViews, troupeListItemTemplate) {
+], function(context, Marionette, troupeListItemTemplate) {
   "use strict";
 
-  var TroupeItemView = TroupeViews.Base.extend({
+  var createRoom = context.getUser().createRoom;
+
+  var TroupeItemView = Marionette.ItemView.extend({
     tagName: 'li',
     template: troupeListItemTemplate,
-    initialize: function() {
-      this.setRerenderOnChange(true);
+    modelEvents: {
+      'change': 'render'
     },
-    getRenderData: function() {
-      var data = {};
-      data.room = this.model.toJSON();
-      data.user = context.getUser();
-
+    serializeData: function() {
+      var data = this.model.toJSON();
+      data.createRoom = createRoom;
       return data;
     }
   });
