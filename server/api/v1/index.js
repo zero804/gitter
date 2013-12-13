@@ -35,10 +35,6 @@ module.exports = {
     app.resource('api/v1/sockets',
         require('./sockets.js'));
 
-    app.get('/api/v1/search',
-        auth,
-        require('./search.js'));
-
     app.get('/api/v1/repo-info',
         auth,
         require('./repo-info.js'));

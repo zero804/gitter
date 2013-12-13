@@ -6,6 +6,7 @@ var assert = require('assert');
 var request = require('request');
 var fetchAllPages = require('./fetch-all-pages');
 var logFailingRequest = require('./log-failing-request');
+var requestWithRetry = require('./request-with-retry');
 
 function createClient(user, token) {
   assert(token, 'token required');
@@ -13,7 +14,8 @@ function createClient(user, token) {
   var client = github.client(token,
                   fetchAllPages(
                   logFailingRequest(
-                  request)));
+                  requestWithRetry({ maxRetries: 3 },
+                  request))));
 
   return client;
 }

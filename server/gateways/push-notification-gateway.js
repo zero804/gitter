@@ -113,7 +113,9 @@ apnsConnection.on("error", function(err) {
     });
 
     feedback.on("feedback", function(devices) {
+      if(devices.length) {
         winston.error("Failed delivery. Need to remove the following devices", { deviceCount: devices.length });
+      }
     });
 
     feedback.on("error", function(err) {
