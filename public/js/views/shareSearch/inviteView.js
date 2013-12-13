@@ -25,7 +25,7 @@ define([
     createClipboard : function() {
       if(this.clip) return;
 
-      ZeroClipboard.setMoviePath( cdn('/repo/zeroclipboard/ZeroClipboard.swf') );
+      ZeroClipboard.setMoviePath( cdn('repo/zeroclipboard/ZeroClipboard.swf') );
       ZeroClipboard.Client.prototype.zIndex = 100000;
       var clip = new ZeroClipboard.Client();
       clip.setText(this.getShareUrl());
