@@ -1571,6 +1571,10 @@
           }
         }
       }
+    },
+    "text-filter": {
+      "version": "0.1.0",
+      "from": "text-filter@"
     }
   }
 }

@@ -20,8 +20,7 @@ define([
         UserVoice.push(['addTrigger', element[0], { }]);
         UserVoice.push(['identify', {
           username: user.username,
-          id: user.id,
-          email: user.email || ''
+          id: user.id
         }]);
       });;
       

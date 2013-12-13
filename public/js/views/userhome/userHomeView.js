@@ -12,7 +12,7 @@ define([
 ], function($, Marionette, context, troupeCollections, userHomeTemplate, userHomeEmptyOrgViewTemplate, OrgCollectionView, RepoCollectionView, repoModels) {
   "use strict";
 
-  var reposCollection = new repoModels.ReposCollection(null, { listen: true });
+  var reposCollection = new repoModels.ReposCollection();
   reposCollection.fetch();
 
   return Marionette.Layout.extend({
