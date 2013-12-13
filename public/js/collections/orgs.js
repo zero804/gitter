@@ -7,14 +7,14 @@ define([
   "use strict";
 
   var OrgModel = TroupeCollections.Model.extend({
-    idAttribute: 'name'
+    idAttribute: 'id'
   });
 
   var OrgCollection = Backbone.Collection.extend({
     model: OrgModel,
     initialize: function() {
       this.url = "/api/v1/user/" + context.getUserId() + "/orgs";
-      this.listenTo(this, 'change:name', this.replicateContext);
+      // this.listenTo(this, 'change:name', this.replicateContext);
     }
   });
 
