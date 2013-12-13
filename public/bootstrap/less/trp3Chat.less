@@ -63,11 +63,12 @@ a.issue:hover {
   -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
   -moz-box-sizing: border-box;    /* Firefox, other Gecko */
   box-sizing: border-box;         /* Opera/IE 8+ */
-  @media @small {
-    padding: 0 12px;
-  }
+
   @media @mid {
     padding: 0 32px;
+  }
+  @media @small {
+    padding: 0 32px 0 42px;
   }
   @media @mobile {
     padding: 0 12px;
@@ -275,13 +276,16 @@ a.issue:hover {
   transition: background-color 0.5s linear;
   border-bottom: 1px solid transparent;
 
+  @media @small {
+    padding-left: 10px;
+  }
 /*  &:hover {
     background-color: #ecf1ed;
   };*/
 
   &.unread, &.reading {
     background-color: fade(@trpGreen, 20%);
-    border-bottom: 1px solid fade(@trpGreen, 25%);
+    border-top: 1px solid fade(@trpGreen, 25%);
     -webkit-transition: background-color 0.5s linear;
     -moz-transition: background-color 0.5s linear;
     -o-transition: background-color 0.5s linear;
