@@ -1,7 +1,16 @@
 <div class="trpModalBody">
-  Other members of your organisation can join this chat with this link
+  People can join this chat room with the link below.<br>
 </div>
 <div class="hidden-input">
-<input value="{{url}}" onclick="this.select()"/>
+<input value="{{url}}" onclick="this.select()"/ style="margin-right: 4px;"><div class="trpButtonMedium trpBtnGreen" id="copy-button">Copy</div>
 </div>
+  {{#isRepo}}
+  <span class="trpBodyMedium" style="opacity: 0.6">Only members of private repos can join.<br>For public repos, anyone can join.</span>
+  {{/isRepo}}
+
+  {{#isOrg}}
+  <span class="trpBodyMedium" style="opacity: 0.6">Only members of this organisation can join this chat room.</span>
+  {{/isOrg}}
+</div>
+<br><br>
 

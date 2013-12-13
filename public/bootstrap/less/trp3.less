@@ -64,19 +64,18 @@ h2 {
 }
 
 .hidden-input input {
-  font-family: @fontSans;
-  font-weight: 300;
-  color: @trpDarkBlue;
-  border: 0;
+  .trpBodyMedium;
   outline: 0;
   box-shadow: none;
-  width: 100%;
-  font-size: 20px;
-  padding: 10px 0;
+  width: 320px;
+  padding: 9px;
+  border: 1px solid @trpGrey;
+  background-color: fade(@trpGrey, 50%);
+  border-radius: 4px;
+  color: black;
 }
 
 .hidden-input input:focus {
-  border: 0;
   outline: 0;
   box-shadow: none;
 }
