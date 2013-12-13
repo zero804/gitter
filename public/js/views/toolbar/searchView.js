@@ -5,8 +5,9 @@ define([
   'underscore',
   'backbone',
   'utils/text-filter',
-  './troupeCollectionView'
-], function(context, $, _, Backbone, textFilter, TroupeCollectionView) {
+  './troupeCollectionView',
+  'collections/instances/troupes'
+], function(context, $, _, Backbone, textFilter, TroupeCollectionView, troupeCollections) {
   "use strict";
 
   return TroupeCollectionView.extend({
@@ -47,20 +48,39 @@ define([
       // filter the local troupes collection
       var results = troupes.filter(filter);
 
+      var additional = troupeCollections.orgs.filter(filter).filter(function(org) {
+          return !results.some(function(existing) {
+            return existing.get('uri') == org.get('name');
+          });
+        }).map(function(org) {
+          var name = org.get('name');
+          return new Backbone.Model({
+            id: org.id,
+            name: name,
+            uri: name,
+            url: '/' + name,
+            githubType: 'ORG'
+          });
+        });
+
+      if(additional.length) results = results.concat(additional);
+
       // filter the suggestions from the user search service
       this.findUsers(query, function(suggestions) {
         var additional = suggestions.filter(function(user) {
             return !self.collection.findWhere({ uri: user.username });
           }).map(function(user) {
             return new Backbone.Model({
+              id: user.id,
               name: user.displayName,
               uri: user.username,
+              url: '/' + user.username,
               oneToOne: true,
               githubType: 'ONETOONE'
             });
           });
 
-        self.collection.add(additional);
+          self.collection.set(additional, { remove: false, add: true, merge: true });
       });
 
       // filter the suggestions from the repo search service
@@ -72,11 +92,13 @@ define([
               id: repo.id,
               name: repo.uri,
               uri: repo.uri,
+              url: '/' + repo.uri,
               ethereal: !repo.room
             });
           });
 
-        self.collection.add(additional);
+        self.collection.set(additional, { remove: false, add: true, merge: true });
+
       });
 
 
