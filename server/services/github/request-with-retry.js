@@ -18,6 +18,7 @@ module.exports = exports = function(options, request) {
             winston.error("Error while communicating with GitHub. Retrying in " + backoff + "ms", {
               statusCode: response && response.statusCode,
               uri: options.uri || options.url,
+              error: error,
               message: body
             });
 
