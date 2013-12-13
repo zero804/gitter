@@ -52,6 +52,29 @@ define([
       }
     },
     {
+      command: 'fav',
+      description: 'Toggle the room as a favourite',
+      criteria: function() {
+        return !context.inOneToOneTroupeContext() && context().permissions.admin;
+      },
+      completion: 'fav ',
+      regexp: /^\/fav/,
+      action: function(view) {
+        var isFavourite = !context.troupe().get('favourite');
+
+        $.ajax({
+          url: '/api/v1/troupes/' + context.getTroupeId(),
+          contentType: "application/json",
+          dataType: "json",
+          type: "PUT",
+          data: JSON.stringify({ favourite: isFavourite })
+        });
+
+        view.$el.val('');
+
+      }
+    },
+    {
       command: 'query @user',
       description: 'Go private with @user',
       completion: 'query @',
