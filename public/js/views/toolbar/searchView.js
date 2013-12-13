@@ -59,7 +59,8 @@ define([
             name: name,
             uri: name,
             url: '/' + name,
-            githubType: 'ORG'
+            githubType: 'ORG',
+            ethereal: !org.room
           });
         });
 
@@ -93,6 +94,7 @@ define([
               name: repo.uri,
               uri: repo.uri,
               url: '/' + repo.uri,
+              githubType: 'REPO',
               ethereal: !repo.room
             });
           });

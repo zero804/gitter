@@ -14,7 +14,6 @@ function indexQuery(req, res, next) {
   var search = repoService.getReposForUser(req.user);
 
   return search.then(function(repos) {
-    console.log(repos);
       var filteredRepos = repos.filter(createTextFilter({ query: req.query.q, fields: ['name', 'full_name', 'description']}));
 
       var strategy = new restSerializer.SearchResultsStrategy({
