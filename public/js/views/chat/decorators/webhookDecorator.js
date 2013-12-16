@@ -8,6 +8,7 @@ define([
   'hbs!./tmpl/travis',
   'hbs!./tmpl/sprintly',
   'hbs!./tmpl/generic',
+  'hbs!./tmpl/trello'
 ], function(
   TroupeViews, 
   githubTemplate,
@@ -15,7 +16,8 @@ define([
   jenkinsTemplate,
   travisTemplate,
   sprintlyTemplate,
-  genericTemplate
+  genericTemplate,
+  trelloTemplate
 ) {
 
   "use strict";
@@ -44,6 +46,11 @@ define([
     template: sprintlyTemplate
   });
 
+  var TrelloView = TroupeViews.Base.extend({
+    template: trelloTemplate
+  });
+
+
 
   function showNotificationIcon(chatItemView, meta) {
 
@@ -52,7 +59,8 @@ define([
       bitbucket:  'https://bitbucket.org/favicon.ico',
       jenkins:    'https://jenkins-ci.org/sites/default/files/jenkins_favicon.ico',
       sprintly:   'https://sprint.ly/favicon.ico',
-      travis:     'https://travis-ci.org/favicon.ico'
+      travis:     'https://travis-ci.org/favicon.ico',
+      trello:     'https://trello.com/favicon.ico'
     };
 
     var human_actions = {
@@ -88,6 +96,9 @@ define([
         break;
       case 'sprintly':
         var webhookView = new SprintlyView();
+        break;
+      case 'trello':
+        var webhookView = new TrelloView();
         break;
       default:
         var webhookView = new GenericView();
