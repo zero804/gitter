@@ -14,7 +14,8 @@ var syncHandlebars = require('handlebars');
 var widgetHelpers = require('./widget-prerenderers');
 
 var templateFile = path.normalize(__dirname + '/../../' + nconf.get('web:staticContent') + '/js/views/chat/tmpl/chatViewItem.hbs');
-var chatItemTemplate = syncHandlebars.compile(fs.readFileSync(templateFile, { encoding: 'utf8' }));
+var buffer = fs.readFileSync(templateFile);
+var chatItemTemplate = syncHandlebars.compile(buffer.toString());
 
 module.exports = exports = function(model) {
 
