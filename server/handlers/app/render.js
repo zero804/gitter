@@ -52,9 +52,9 @@ function renderAppPageWithTroupe(req, res, next, page) {
           pageTemplate = 'app-template';
           console.log('>>>', req.uriContext);
           if(req.uriContext.uri.indexOf('/') >= 0) {
-            chatAppLocation = req.uriContext.uri + '/chat';
+            chatAppLocation = '/' + req.uriContext.uri + '/chat';
           } else {
-            chatAppLocation = req.uriContext.uri + '/-/chat';
+            chatAppLocation = '/' + req.uriContext.uri + '/-/chat';
           }
 
           // if(req.isPhone) {
