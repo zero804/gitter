@@ -96,6 +96,14 @@ define([
       }
 
       var online = user.id === currentUserId || !!user.online; // only the people view tries to show avatar status so there is a model object, it won't necessarily work in other cases
+
+      var presenceClass;
+      if (this.showStatus) {
+        presenceClass = online ? 'online' : 'offline';
+      } else {
+        presenceClass = "";
+      }
+
       return {
         id: user.id,
         showBadge: this.showBadge,
@@ -103,8 +111,8 @@ define([
         userDisplayName: user.displayName,
         avatarUrl: avatarUrl,
         avatarSize: this.avatarSize,
-        userLocation: user.location ? user.location.description : "",
         tooltip: this.showTooltip && user.displayName + "<br>" + ((user.location) ? user.location.description : ""),
+        presenceClass: presenceClass,
         online: online,
         offline: !online
       };
@@ -116,9 +124,6 @@ define([
       var dom = this.template(data);
       this.$el.html(dom);
 
-      this.updateAvatar(data);
-      this.updateTooltip(data);
-      this.updatePresence(data);
       if (this.showTooltip && !window._troupeCompactView && (this.model ? this.model.get('displayName') : this.user.displayName)) {
         this.$el.find(':first-child').tooltip({
           html : true,

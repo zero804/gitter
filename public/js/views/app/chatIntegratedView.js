@@ -74,14 +74,14 @@ define([
         $(".trpChatInputArea").addClass("scrollpush");
       }
 
-      this.rightPanelRegion.on('close', function() {
-        window.setTimeout(function() {
-          if(!self.rightPanelRegion.currentView) {
-            //log("CLOSE PANEL");
-            self.hidePanel("#right-panel");
-          }
-        }, 100);
-      });
+      // this.rightPanelRegion.on('close', function() {
+      //   window.setTimeout(function() {
+      //     if(!self.rightPanelRegion.currentView) {
+      //       //log("CLOSE PANEL");
+      //       self.hidePanel("#right-panel");
+      //     }
+      //   }, 100);
+      // });
 
       // var profileCompleteTimeout = 60 * 1000;
       // setTimeout(function() {
@@ -118,27 +118,27 @@ define([
     //   }
     // },
 
-    hidePanel: function (whichPanel) {
-      $("#chat-frame, #chat-input, #toolbar-frame, #header-area").removeClass('rightCollapse');
-      $(whichPanel).removeClass('visible');
-      this.rightpanel = false;
-    },
+    // hidePanel: function (whichPanel) {
+    //   $("#chat-frame, #chat-input, #toolbar-frame, #header-area").removeClass('rightCollapse');
+    //   $(whichPanel).removeClass('visible');
+    //   this.rightpanel = false;
+    // },
 
-    showPanel: function(whichPanel) {
-      if (!this.rightpanel) {
-        $("#chat-frame, #chat-input, #toolbar-frame, #header-area").addClass("rightCollapse");
-        $(whichPanel).addClass("visible");
-        this.rightpanel = true;
-      }
-    },
+    // showPanel: function(whichPanel) {
+    //   if (!this.rightpanel) {
+    //     $("#chat-frame, #chat-input, #toolbar-frame, #header-area").addClass("rightCollapse");
+    //     $(whichPanel).addClass("visible");
+    //     this.rightpanel = true;
+    //   }
+    // },
 
-    togglePanel: function(whichPanel) {
-      if (this.rightpanel) {
-        this.hidePanel(whichPanel);
-      } else {
-        this.showPanel(whichPanel);
-      }
-    },
+    // togglePanel: function(whichPanel) {
+    //   if (this.rightpanel) {
+    //     this.hidePanel(whichPanel);
+    //   } else {
+    //     this.showPanel(whichPanel);
+    //   }
+    // },
 
     toggleFavourite: function() {
       var favHeader = $('.trpTroupeFavourite');
@@ -154,30 +154,30 @@ define([
       });
     },
 
-    /* Header */
-    showProfileMenu: function() {
-      if (!this.profilemenu) {
+    // /* Header */
+    // showProfileMenu: function() {
+    //   if (!this.profilemenu) {
 
-        // $(".trpProfileMenu").animate({
-        //     width: '132px'
-        // }, 250, function () {
+    //     // $(".trpProfileMenu").animate({
+    //     //     width: '132px'
+    //     // }, 250, function () {
 
-        // });
+    //     // });
 
-        $(".trpProfileMenu").fadeIn('fast');
-        this.profilemenu = true;
-      }
-    },
+    //     $(".trpProfileMenu").fadeIn('fast');
+    //     this.profilemenu = true;
+    //   }
+    // },
 
-    hideProfileMenu: function() {
-      if (this.profilemenu) {
-        $(".trpProfileMenu").fadeOut('fast');
-        // $(".trpProfileMenu").animate({
-        //     width: '0px'
-        // }, 250);
-        this.profilemenu = false;
-      }
-    }
+    // hideProfileMenu: function() {
+    //   if (this.profilemenu) {
+    //     $(".trpProfileMenu").fadeOut('fast');
+    //     // $(".trpProfileMenu").animate({
+    //     //     width: '0px'
+    //     // }, 250);
+    //     this.profilemenu = false;
+    //   }
+    // }
   });
   //cocktail.mixin(ChatLayout, TroupeViews.DelayedShowLayoutMixin);
 

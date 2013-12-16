@@ -1,5 +1,5 @@
 <div class="trpHeaderContainer">
-  {{#unless troupe.oneToOne}}
+  {{#unless oneToOne}}
   <div class="settingsCog">
     <div class="dropdown">
 
@@ -19,13 +19,13 @@
     </div>
   </div>
   {{/unless}}
-  <div class="trpTroupeFavourite {{#if troupe.favourite}}favourited{{/if}}" id="favourite-button">
+  <div class="trpTroupeFavourite {{#if troupeFavourite}}favourited{{/if}}" id="favourite-button">
       <div style="display: inline-block; vertical-align: middle">
         <i class="trpHeaderFavIcon favourited" width="24" height="24"></i>
         <i class="trpHeaderFavIcon unfavourited" width="24" height="24"></i>
       </div>
   </div>
-  <h1>{{troupe.name}}</h1>
-  <p id="trpTopic">{{{topic}}}</p>
+  <h1>{{troupeName}}</h1>
+  <p id="trpTopic">{{{troupeTopic}}}</p>
 
 </div>
