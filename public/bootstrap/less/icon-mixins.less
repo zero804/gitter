@@ -1,0 +1,31 @@
+.prepend-org-icon() {
+  .prepend-octicon('\f037')
+}
+
+.prepend-repo-icon() {
+  .prepend-octicon('\f001')
+}
+
+.prepend-121-icon() {
+  &:before {
+    content: '@';
+    position: absolute;
+    left: 0;
+  }
+  position: relative;
+  padding-left: 1.5em;
+}
+
+.prepend-octicon(@charCode) {
+  &:before {
+    font-family: 'octicons';
+    font-style: normal;
+    font-variant: normal;
+    content: @charCode;
+    position: absolute;
+    left: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+  position: relative;
+  padding-left: 1.5em;
+}
