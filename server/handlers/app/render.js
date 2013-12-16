@@ -3,6 +3,7 @@
 
 var nconf             = require('../../utils/config');
 var contextGenerator  = require('../../web/context-generator');
+var assert            = require('assert');
 
 function getAppCache(req) {
   if(!nconf.get('web:useAppCache')) return;
@@ -42,15 +43,32 @@ function renderAppPageWithTroupe(req, res, next, page) {
   contextGenerator.generateTroupeContext(req)
     .then(function(troupeContext) {
       var login = !user || accessDenied;
-
       var bootScript;
-      if(login) {
-        bootScript = 'router-login';
-      } else {
-        bootScript = req.isPhone ? 'mobile-app' : 'router-app';
+      var pageTemplate;
+      switch(page) {
+        case 'app':
+          bootScript = req.isPhone ? 'mobile-app' : 'router-app';
+          pageTemplate = 'app-template';
+
+          // if(req.isPhone) {
+          //   // TODO: this should change from chat-app to a seperate mobile app
+          //   appRender.renderAppPageWithTroupe(req, res, next, 'mobile/mobile-app');
+          // } else {
+          //   appRender.renderAppPageWithTroupe(req, res, next, 'app');
+          // }
+
+          break;
+        case 'chat':
+          bootScript = 'router-chat';
+          pageTemplate = 'chat-template';
+          break;
+        case 'home':
+          // TODO: In future....
+        default:
+          assert(false, 'Unknown page: ' + page);
       }
 
-      res.render(page, {
+      res.render(pageTemplate, {
         appCache: getAppCache(req),
         login: login,
         bootScriptName: bootScript,

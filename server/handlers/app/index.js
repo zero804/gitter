@@ -27,12 +27,7 @@ module.exports = {
               .fail(next);
           }
 
-          if(req.isPhone) {
-            // TODO: this should change from chat-app to a seperate mobile app
-            appRender.renderAppPageWithTroupe(req, res, next, 'mobile/mobile-app');
-          } else {
-            appRender.renderAppPageWithTroupe(req, res, next, 'app-template');
-          }
+          appRender.renderAppPageWithTroupe(req, res, next, 'app');
         });
 
     app.get('/:userOrOrg/-/chat',
@@ -41,7 +36,7 @@ module.exports = {
       appMiddleware.uriContextResolverMiddleware,
       appMiddleware.isPhoneMiddleware,
       function(req, res, next) {
-        appRender.renderAppPageWithTroupe(req, res, next, 'chat-template');
+        appRender.renderAppPageWithTroupe(req, res, next, 'chat');
       });
 
       app.get('/:userOrOrg/:repo',
@@ -50,12 +45,7 @@ module.exports = {
         appMiddleware.uriContextResolverMiddleware,
         appMiddleware.isPhoneMiddleware,
         function(req, res, next) {
-          if(req.isPhone) {
-            // TODO: this should change from chat-app to a seperate mobile app
-            appRender.renderAppPageWithTroupe(req, res, next, 'mobile/mobile-app');
-          } else {
-            appRender.renderAppPageWithTroupe(req, res, next, 'app-template');
-          }
+          appRender.renderAppPageWithTroupe(req, res, next, 'app');
         });
 
       app.get('/:userOrOrg/:repo/chat',
@@ -64,7 +54,7 @@ module.exports = {
         appMiddleware.uriContextResolverMiddleware,
         appMiddleware.isPhoneMiddleware,
         function(req, res, next) {
-          appRender.renderAppPageWithTroupe(req, res, next, 'chat-template');
+          appRender.renderAppPageWithTroupe(req, res, next, 'chat');
         });
 
 
