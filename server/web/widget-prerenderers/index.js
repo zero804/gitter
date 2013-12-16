@@ -16,10 +16,10 @@ var widgetHelpers = ['avatar','timeago'].reduce(function(memo, v) {
   var handlerConstructor = require('./' + v);
   var handler;
 
-  console.log('HC==', handlerConstructor);
 
   if(handlerConstructor.length === 1) {
-    widgetTemplate = syncHandlebars.compile(fs.readFileSync(widgetDir + v + '.hbs', { encoding: 'utf8' }));
+    var buffer = fs.readFileSync(widgetDir + v + '.hbs');
+    widgetTemplate = syncHandlebars.compile(buffer.toString());
     handler = handlerConstructor(widgetTemplate);
   } else {
     handler = handlerConstructor();
