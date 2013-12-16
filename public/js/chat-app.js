@@ -4,7 +4,7 @@ require([
   'backbone',
   'utils/context',
   'utils/appevents',
-  'views/app/appIntegratedView',
+  'views/app/chatIntegratedView',
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
   'collections/instances/integrated-items',
@@ -47,7 +47,7 @@ require([
   'template/helpers/all', // No ref
   'components/eyeballs', // No ref
   'bootstrap-dropdown' // No ref
-], function($, Backbone, context, appEvents, AppIntegratedView, chatInputView,
+], function($, Backbone, context, appEvents, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, troupeCollections, /*UserEmailCollection,*/
     RightToolbarView, /*filePreviewView, fileVersionsView,  RequestDetailView,*/
     /*InviteDetailView,*/ PersonDetailView, /*conversationDetailView,*/ /*profileView,
@@ -65,7 +65,7 @@ require([
 
   var troupeCollection = troupeCollections.troupes;
 
-  var appView = new AppIntegratedView({ el: 'body' });
+  var appView = new ChatIntegratedView({ el: 'body' });
   appView.rightToolbarRegion.show(new RightToolbarView());
 
   troupeCollection.on("remove", function(model) {

@@ -20,7 +20,7 @@ function renderHomePage(req, res, next) {
       page = 'mobile/mobile-app';
       bootScriptName = 'mobile-userhome';
     } else {
-      page = 'chat-template';
+      page = 'app-template';
       bootScriptName = user ? 'userhome' : 'router-login';
     }
 
@@ -47,7 +47,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
       if(login) {
         bootScript = 'router-login';
       } else {
-        bootScript = req.isPhone ? 'mobile-app' : 'chat-app';
+        bootScript = req.isPhone ? 'mobile-app' : 'router-app';
       }
 
       res.render(page, {

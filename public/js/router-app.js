@@ -52,14 +52,14 @@ require([
   var appView = new AppIntegratedView({ });
 
   appView.leftMenuRegion.show(new TroupeMenuView({ }));
-  appView.rightToolbarRegion.show(new RightToolbarView());
+  // appView.rightToolbarRegion.show(new RightToolbarView());
 
-  troupeCollection.on("remove", function(model) {
-    if(model.id == context.getTroupeId()) {
-      // TODO: tell the person that they've been kicked out of the troupe
-      window.location = '/' + context.user().get('username');
-    }
-  });
+  // troupeCollection.on("remove", function(model) {
+  //   if(model.id == context.getTroupeId()) {
+  //     // TODO: tell the person that they've been kicked out of the troupe
+  //     window.location = '/' + context.user().get('username');
+  //   }
+  // });
 
   new HeaderView({ model: context.troupe(), el: '#header' }).render();
 
@@ -96,47 +96,6 @@ require([
     ],
     regions: [appView.rightPanelRegion, appView.dialogRegion]
   });
-
-  function oauthUpgradeCallback(e) {
-    if(e.data !== "oauth_upgrade_complete") return;
-
-    window.removeEventListener("message", oauthUpgradeCallback, false);
-
-    $.ajax({
-      dataType: "json",
-      data: {
-        autoConfigureHooks: 1
-      },
-      type: 'PUT',
-      url: '/api/v1/troupes/' + context.getTroupeId(),
-      success: function() {
-        appEvents.trigger('user_notification', {
-          title: 'Thank You',
-          text: 'Your integrations have been setup.'
-        });
-      }
-    });
-  }
-
-  function promptForHook() {
-    appEvents.trigger('user_notification', {
-      click: function(e) {
-        e.preventDefault();
-        window.addEventListener("message", oauthUpgradeCallback, false);
-        window.open('/login/upgrade?scopes=public_repo');
-      },
-      title: 'Authorisation',
-      text: 'Your room has been created, but we weren\'t able ' +
-            'to integrate with the repository as we need write ' +
-            'access to your GitHub repositories. Click here to ' +
-            'give Gitter access to do this.',
-      timeout: 12000
-    });
-  }
-
-  if(context.popEvent('hooks_require_additional_public_scope')) {
-    setTimeout(promptForHook, 1500);
-  }
 
   if(!window.localStorage.troupeTourApp) {
     window.localStorage.troupeTourApp = 1;
