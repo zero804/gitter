@@ -15,13 +15,20 @@ require([
 
   appView.leftMenuRegion.show(new TroupeMenuView({ }));
 
-  function updateContent(url) {
-    document.getElementById('content-frame').src = url;
+  function updateContent(state) {
+    // TODO: update the title....
+    document.getElementById('content-frame').src = state;
   }
 
-  appEvents.on('navigation', function(url, model) {
-    window.history.pushState(url, model.get('name'), url);
-    updateContent(url);
+  appEvents.on('navigation', function(url, type, title) {
+    var frameUrl = url + '/';
+    if(url.substring(1).indexOf('/') < 0) {
+      frameUrl += '-/';
+    }
+    frameUrl += type;
+
+    window.history.pushState(frameUrl, title, url);
+    updateContent(frameUrl);
   });
 
   // Revert to a previously saved state
