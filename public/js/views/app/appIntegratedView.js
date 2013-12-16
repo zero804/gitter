@@ -13,10 +13,10 @@ define([
   'components/modal-region',
   'components/titlebar',
   'cocktail',
-  'utils/scrollbar-detect',
+  // 'utils/scrollbar-detect',
   'bootstrap_tooltip'  // no ref
   ], function($, TroupeViews, context, appEvents, Marionette, /*UsernameView, ProfileView,*/ uiVars, AvatarView,
-    /*notifications,*/ modalRegion, TitlebarUpdater, cocktail, hasScrollBars) {
+    /*notifications,*/ modalRegion, TitlebarUpdater, cocktail/*, hasScrollBars*/) {
   "use strict";
 
   var touchEvents = {
@@ -79,10 +79,10 @@ define([
       //   self.showPanel("#right-panel");
       // });
 
-      if (hasScrollBars()) {
-        $(".trpChatContainer").addClass("scroller");
-        $(".trpChatInputArea").addClass("scrollpush");
-      }
+      // if (hasScrollBars()) {
+      //   $(".trpChatContainer").addClass("scroller");
+      //   $(".trpChatInputArea").addClass("scrollpush");
+      // }
 
       // this.rightPanelRegion.on('close', function() {
       //   window.setTimeout(function() {
