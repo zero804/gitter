@@ -1,14 +1,14 @@
 {{#if ethereal}}
   {{#if createRoom}}
     <a href="{{url}}" class="trpLeftMenuLinkItem">
-      <span class="github-REPO" style="margin-top: 2px">{{name}}</span>
+      <span class="github-REPO">{{name}}</span>
     </a>
   {{else}}
-    <span class="github-REPO disabled" style="margin-top: 2px">{{name}}</span>
+    <span class="github-REPO disabled">{{name}}</span>
   {{/if}}
 {{else}}
   <a href="{{url}}" class="trpLeftMenuLinkItem">
-    <span class="github-{{githubType}}" style="margin-top: 2px">{{name}}</span>
+    <span class="github-{{githubType}}">{{name}}</span>
     {{#if unreadItems}}
     <span class="item-unread-badge">
       <span class="trpTroupeUnreadCounter">{{unreadItems}}</span>
