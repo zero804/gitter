@@ -16,11 +16,12 @@ define([
   'views/unread-item-view-mixin',
   'template/helpers/linkify',
   'utils/safe-html',
+  'utils/momentWrapper',
   'cocktail',
   'bootstrap_tooltip', // No ref
   'bootstrap-popover' // No ref
 ], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews,
-  issuePopoverTemplate, chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml, cocktail /* tooltip, popover*/) {
+  issuePopoverTemplate, chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml, moment, cocktail /* tooltip, popover*/) {
 
   "use strict";
 
@@ -204,7 +205,7 @@ define([
           if(!issue.state) return;
 
           $issue.removeClass('open closed').addClass(issue.state);
-          $issue.attr('title', 'Issue '+issue.number+': '+issue.title);
+          $issue.attr('title', 'Issue '+issue.number+': '+issue.title+' <span class="issue '+issue.state+'" style="float: right;">'+issue.state+'</span>');
           $issue.popover({
             html: true,
             trigger: 'hover',
@@ -214,6 +215,7 @@ define([
               username: issue.user.login,
               avatarUrl: issue.user.avatar_url,
               description: issue.body,
+              date: moment(issue.created_at).format("LLL")
             })
           });
         });
