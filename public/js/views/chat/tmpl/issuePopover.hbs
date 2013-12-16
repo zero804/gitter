@@ -9,5 +9,9 @@
     <div class="trpChatFrom">@{{username}}</div>
     <div class="trpChatTime"> &bull; {{date}}</div>
   </div>
-  <div class="trpChatText">{{description}}</div>
+  {{#if description}}
+    <div class="trpChatText">{{description}}</div>
+  {{else}}
+    <div class="trpChatText missing">No description given.</div>
+  {{/if}}
 </div>
