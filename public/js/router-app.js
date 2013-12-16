@@ -1,32 +1,15 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
-  'jquery',
-  'backbone',
-  'utils/context',
   'utils/appevents',
   'views/app/appIntegratedView',
   'views/toolbar/troupeMenu',
-  // 'views/chat/chatInputView',
-  // 'views/chat/chatCollectionView',
-  // 'collections/instances/integrated-items',
-  'collections/instances/troupes',
-  // 'views/righttoolbar/rightToolbarView',
-  // 'views/people/personDetailView',
-  // 'views/shareSearch/inviteView',
-  // 'views/app/troupeSettingsView',
-  // 'views/app/integrationSettingsModal',
-  // 'views/toolbar/troupeMenu',
-  // 'utils/router',
-  // 'components/unread-items-client',
   'views/widgets/preload', // No ref
   'components/webNotifications', // No ref
   'components/desktopNotifications', // No ref
   'components/errorReporter',  // No ref
   'template/helpers/all', // No ref
-], function($, Backbone, context, appEvents, AppIntegratedView, TroupeMenuView, troupeCollections) {
+], function(appEvents, AppIntegratedView, TroupeMenuView) {
   "use strict";
-
-  var troupeCollection = troupeCollections.troupes;
 
   var appView = new AppIntegratedView({ });
 
@@ -45,7 +28,6 @@ require([
   window.addEventListener('popstate', function(event) {
     updateContent(event.state);
   });
-
 
   // Asynchronously load tracker
   require([
