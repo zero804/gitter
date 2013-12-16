@@ -2,8 +2,9 @@
 define([
   'utils/context',
   'marionette',
-  'hbs!./tmpl/troupeListItem'
-], function(context, Marionette, troupeListItemTemplate) {
+  'hbs!./tmpl/troupeListItem',
+  'utils/appevents'
+], function(context, Marionette, troupeListItemTemplate, appEvents) {
   "use strict";
 
   var createRoom = context.getUser().createRoom;
@@ -12,12 +13,19 @@ define([
     tagName: 'li',
     template: troupeListItemTemplate,
     modelEvents: {
-      'change': 'render'
+      change: 'render',
+    },
+    events: {
+      click: 'clicked'
     },
     serializeData: function() {
       var data = this.model.toJSON();
       data.createRoom = createRoom;
       return data;
+    },
+    clicked: function(e) {
+      e.preventDefault();
+      appEvents.trigger('navigation', this.model.get('url'), this.model, e);
     }
   });
 
