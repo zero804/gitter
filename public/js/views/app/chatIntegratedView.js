@@ -179,7 +179,7 @@ define([
       }
     }
   });
-  cocktail.mixin(ChatLayout, TroupeViews.DelayedShowLayoutMixin);
+  //cocktail.mixin(ChatLayout, TroupeViews.DelayedShowLayoutMixin);
 
   return ChatLayout;
 });

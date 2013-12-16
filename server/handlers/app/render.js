@@ -22,7 +22,7 @@ function renderHomePage(req, res, next) {
       bootScriptName = 'mobile-userhome';
     } else {
       page = 'app-template';
-      bootScriptName = user ? 'userhome' : 'router-login';
+      bootScriptName = 'userhome';
     }
 
     res.render(page, {
@@ -37,7 +37,7 @@ function renderHomePage(req, res, next) {
 }
 
 
-function renderMainFrame(req, res, next) {
+function renderMainFrame(req, res, next, frame) {
 
   contextGenerator.generateMiniContext(req)
     .then(function(troupeContext) {
@@ -45,9 +45,9 @@ function renderMainFrame(req, res, next) {
       bootScript = req.isPhone ? 'mobile-app' : 'router-app';
       pageTemplate = 'app-template';
       if(req.uriContext.uri.indexOf('/') >= 0) {
-        chatAppLocation = '/' + req.uriContext.uri + '/chat';
+        chatAppLocation = '/' + req.uriContext.uri + '/' + frame;
       } else {
-        chatAppLocation = '/' + req.uriContext.uri + '/-/chat';
+        chatAppLocation = '/' + req.uriContext.uri + '/-/' + frame;
       }
 
       var troupe = req.uriContext.troupe;
