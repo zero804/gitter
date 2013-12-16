@@ -16,9 +16,10 @@ define([
   'template/helpers/linkify',
   'utils/safe-html',
   'cocktail',
-  'bootstrap_tooltip' // No ref
+  'bootstrap_tooltip', // No ref
+  'bootstrap-popover' // No ref
 ], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews,
-  chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml, cocktail /* tooltip*/) {
+  chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml, cocktail /* tooltip, popover*/) {
 
   "use strict";
 
@@ -202,8 +203,13 @@ define([
           if(!issue.state) return;
 
           $issue.removeClass('open closed').addClass(issue.state);
-          $issue.attr('title', issue.title);
-          $issue.tooltip();
+          $issue.attr('title', 'Issue '+issue.number+': '+issue.title);
+          $issue.popover({
+            trigger: 'hover',
+            placement: 'bottom',
+            container: 'body',
+            content: issue.body
+          });
         });
       });
     },
