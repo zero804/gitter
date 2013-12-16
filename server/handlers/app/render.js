@@ -105,6 +105,8 @@ function renderAppPageWithTroupe(req, res, next, page) {
         bootScriptName: bootScript,
         troupeName: troupeContext.troupe.uri || troupeContext.troupe.name,
         troupeTopic: troupeContext.troupe.topic,
+        troupeFavourite: troupeContext.troupe.favourite,
+        user: troupeContext.user,
         troupeContext: troupeContext,
         chatAppLocation: chatAppLocation,
         agent: req.headers['user-agent']

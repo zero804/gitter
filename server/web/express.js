@@ -42,11 +42,12 @@ module.exports = {
       app.use(responseTime(winston, nconf.get('logging:minimalAccess')));
     }
 
-    handlebars.registerHelper('cdn', require('./hbs-helpers').cdn);
-    handlebars.registerHelper('bootScript', require('./hbs-helpers').bootScript);
-    handlebars.registerHelper('isMobile', require('./hbs-helpers').isMobile);
-    handlebars.registerHelper('generateEnv', require('./hbs-helpers').generateEnv);
-    handlebars.registerHelper('generateTroupeContext', require('./hbs-helpers').generateTroupeContext);
+    expressHbs.registerHelper('cdn', require('./hbs-helpers').cdn);
+    expressHbs.registerHelper('bootScript', require('./hbs-helpers').bootScript);
+    expressHbs.registerHelper('isMobile', require('./hbs-helpers').isMobile);
+    expressHbs.registerHelper('generateEnv', require('./hbs-helpers').generateEnv);
+    expressHbs.registerHelper('generateTroupeContext', require('./hbs-helpers').generateTroupeContext);
+    expressHbs.registerAsyncHelper('prerenderView', require('./prerender-helper'));
 
     app.locals({
       googleTrackingId: nconf.get("web:trackingId"),
@@ -56,7 +57,7 @@ module.exports = {
     app.engine('hbs', expressHbs.express3({
       partialsDir: __dirname + '/../../' + nconf.get('web:staticContent') +'/templates/partials',
       contentHelperName: 'content',
-      handlebars: handlebars
+      //handlebars: handlebars
 
     }));
 
