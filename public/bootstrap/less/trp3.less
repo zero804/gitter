@@ -6,6 +6,7 @@
 @import "trp3Colours.less";
 //@import "trpWebFonts.less";
 @import "trpFonts.less";
+@import "icon-mixins.less";
 
 @import "trpModals.less";
 @import "trp3Common.less";
@@ -21,11 +22,11 @@
 
 @import "trpInvites.less";
 
-.transition300ms {
+.transition300ms() {
   .transition(300ms);
 }
 
-.transition500ms {
+.transition500ms() {
   .transition(500ms);
 }
 
@@ -209,8 +210,7 @@ a:hover {
   }
 
   li {
-    padding-top: 2px;
-    line-height: 20px;
+    line-height: 22px;
   }
 
   .trpToolbarList {
@@ -254,31 +254,25 @@ a:hover {
   margin-bottom: 20px;
 }
 
-.github-ORG:before {
-  font-family: 'octicons';
-  content: '\f037';
-  margin-right: 8px;
-  opacity: 0.9;
-  width: 12px;
+.github-ORG {
+  .prepend-org-icon;
+  &:before {
+    font-size: 16px;
+  }
 }
 
-.github-REPO:before {
-  font-family: 'octicons';
-  content: '\f001';
-  margin-right: 8px;
-  opacity: 0.9;
-  width: 12px;
+.github-REPO {
+  .prepend-repo-icon;
+  &:before {
+    font-size: 16px;
+  }
 }
 
-.githib-REPO.disabled:before{
-  opacity: 0.4;
-}
-
-.github-ONETOONE:before {
-  content: "@";
-  margin-right: 8px;
-  opacity: 0.9;
-  width: 12px;
+.github-ONETOONE {
+  .prepend-121-icon;
+  &:before {
+    font-size: 16px;
+  }
 }
 
 .trpLeftMenuProfile {
