@@ -14,7 +14,9 @@ var widgetDir = path.normalize(baseDir + '/js/views/widgets/tmpl/');
 
 
 var widgetHelpers = ['avatar'].reduce(function(memo, v) {
-  var widgetTemplate = syncHandlebars.compile(fs.readFileSync(widgetDir + v + '.hbs', { encoding: 'utf8' }));
+  var buffer = fs.readFileSync(widgetDir + v + '.hbs');
+
+  var widgetTemplate = syncHandlebars.compile( buffer.toString());
   memo[v] = require('./widget-prerenderers/' + v)(widgetTemplate);
   return memo;
   }, {});
