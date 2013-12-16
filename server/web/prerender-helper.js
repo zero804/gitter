@@ -33,7 +33,7 @@ var helpers = {
 
 module.exports = exports = function(template, callback) {
 
-  handlebars(baseDir + template + '.hbs', _.extend({}, this, { helpers: helpers }), function(err, result) {
+  handlebars(baseDir + template + '.hbs', _.extend({}, this, { helpers: helpers, cache: nconf.get('web:cacheTemplates') }), function(err, result) {
     if(err) {
       winston.error("Unabe to prerender: " + err, { exception: err });
       return callback("");
