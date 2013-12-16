@@ -36,13 +36,38 @@ function renderHomePage(req, res, next) {
   });
 }
 
+
+function renderMainFrame(req, res, next) {
+
+  contextGenerator.generateMiniContext(req)
+    .then(function(troupeContext) {
+      var bootScript, pageTemplate, chatAppLocation;
+      bootScript = req.isPhone ? 'mobile-app' : 'router-app';
+      pageTemplate = 'app-template';
+      if(req.uriContext.uri.indexOf('/') >= 0) {
+        chatAppLocation = '/' + req.uriContext.uri + '/chat';
+      } else {
+        chatAppLocation = '/' + req.uriContext.uri + '/-/chat';
+      }
+
+      var troupe = req.uriContext.troupe;
+
+      res.render(pageTemplate, {
+        appCache: getAppCache(req),
+        bootScriptName: bootScript,
+        troupeName: troupe && (troupe.uri || troupe.name),
+        troupeContext: troupeContext,
+        chatAppLocation: chatAppLocation,
+        agent: req.headers['user-agent']
+      });
+    })
+    .fail(next);
+}
+
 function renderAppPageWithTroupe(req, res, next, page) {
-  var user = req.user;
-  var accessDenied =  false; //!req.uriContext.access;
 
   contextGenerator.generateTroupeContext(req)
     .then(function(troupeContext) {
-      var login = !user || accessDenied;
       var bootScript;
       var pageTemplate;
       var chatAppLocation;
@@ -50,7 +75,6 @@ function renderAppPageWithTroupe(req, res, next, page) {
         case 'app':
           bootScript = req.isPhone ? 'mobile-app' : 'router-app';
           pageTemplate = 'app-template';
-          console.log('>>>', req.uriContext);
           if(req.uriContext.uri.indexOf('/') >= 0) {
             chatAppLocation = '/' + req.uriContext.uri + '/chat';
           } else {
@@ -78,7 +102,6 @@ function renderAppPageWithTroupe(req, res, next, page) {
 
       res.render(pageTemplate, {
         appCache: getAppCache(req),
-        login: login,
         bootScriptName: bootScript,
         troupeName: troupeContext.troupe.uri || troupeContext.troupe.name,
         troupeTopic: troupeContext.troupe.topic,
@@ -100,5 +123,6 @@ function renderMiddleware(template, mobilePage) {
 module.exports = exports = {
   renderHomePage: renderHomePage,
   renderAppPageWithTroupe: renderAppPageWithTroupe,
+  renderMainFrame: renderMainFrame,
   renderMiddleware: renderMiddleware
 };

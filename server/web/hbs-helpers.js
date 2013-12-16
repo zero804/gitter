@@ -74,6 +74,7 @@ exports.bootScript = function(url, parameters) {
 };
 
 exports.isMobile = function(agent, options) {
+  console.log('THIS=====', this);
   return ((agent.match(/ipad/i)) ? options.fn(this) : null);
 };
 

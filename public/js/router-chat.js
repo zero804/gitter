@@ -9,25 +9,11 @@ require([
   'views/chat/chatCollectionView',
   'collections/instances/integrated-items',
   'collections/instances/troupes',
-  // 'collections/useremails',
   'views/righttoolbar/rightToolbarView',
-  // 'views/file/filePreviewView',
-  // 'views/file/fileVersionsView',
-  // 'views/request/requestDetailView',
-  // 'views/invite/inviteDetailView',
   'views/people/personDetailView',
-  // 'views/conversation//*conversationDetailView'*/,
-  // 'views/profile/profileView',
-  // 'views/profile/profileEmailView',
-  // 'views/profile/profileAddEmailView',
-  // 'views/modals/completeYourProfileModal',
   'views/shareSearch/inviteView',
-  // 'views/signup//*createTroupeView'*/,
-  // 'views/signup/usernameView',
   'views/app/troupeSettingsView',
   'views/app/integrationSettingsModal',
-  'views/toolbar/troupeMenu',
-  // 'views/invite/reinviteModal',
   'utils/router',
   'components/unread-items-client',
 
@@ -48,14 +34,10 @@ require([
   'components/eyeballs', // No ref
   'bootstrap-dropdown' // No ref
 ], function($, Backbone, context, appEvents, ChatIntegratedView, chatInputView,
-    ChatCollectionView, itemCollections, troupeCollections, /*UserEmailCollection,*/
-    RightToolbarView, /*filePreviewView, fileVersionsView,  RequestDetailView,*/
-    /*InviteDetailView,*/ PersonDetailView, /*conversationDetailView,*/ /*profileView,
-    profileEmailView, profileAddEmailView,*/ /* completeYourProfileModal,*/
-    inviteView, /*createTroupeView,*/ /*UsernameView,*/ troupeSettingsView,
-    IntegrationSettingsModal, TroupeMenuView, /* ReinviteModal, */ Router,
-    unreadItemsClient, FileDecorator, webhookDecorator, userDecorator,
-    embedDecorator, emojiDecorator, HeaderView /*, errorReporter , FilteredCollection */) {
+    ChatCollectionView, itemCollections, troupeCollections, RightToolbarView,
+    PersonDetailView, inviteView, troupeSettingsView, IntegrationSettingsModal,
+    Router, unreadItemsClient, FileDecorator, webhookDecorator, userDecorator,
+    embedDecorator, emojiDecorator, HeaderView) {
   "use strict";
 
   // Make drop down menus drop down
