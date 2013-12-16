@@ -64,7 +64,8 @@ define([
       gollum:         'updated the wiki',
       fork:           'forked',
       member:         'a member',
-      public:         'made public'
+      public:         'made public',
+      watch:          'started watching'
     };
 
 
