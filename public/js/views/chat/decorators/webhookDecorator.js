@@ -63,7 +63,7 @@ define([
       pull_request:   'a Pull Request',
       gollum:         'updated the wiki',
       fork:           'forked',
-      member:         'a member',
+      member:         'as member to',
       public:         'made public',
       watch:          'started watching'
     };
