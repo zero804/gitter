@@ -45,7 +45,7 @@ module.exports = {
       appMiddleware.uriContextResolverMiddleware,
       appMiddleware.isPhoneMiddleware,
       function(req, res, next) {
-        appRender.renderAppPageWithTroupe(req, res, next, 'chat');
+        appRender.renderChatPage(req, res, next);
       });
 
       app.get('/:userOrOrg/:repo',
@@ -63,7 +63,7 @@ module.exports = {
         appMiddleware.uriContextResolverMiddleware,
         appMiddleware.isPhoneMiddleware,
         function(req, res, next) {
-          appRender.renderAppPageWithTroupe(req, res, next, 'chat');
+          appRender.renderChatPage(req, res, next);
         });
 
 
