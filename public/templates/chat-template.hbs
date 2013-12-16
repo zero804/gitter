@@ -37,18 +37,35 @@
     </div>
   {{/isMobile}}
 
-  <div class="trpLeftMenuHotspot" id="left-menu-hotspot"></div>
-  <div class="trpLeftMenu" id="left-menu"></div>
-
-
-<div class="trpMenuTab unread-count" id="menu-toggle-button">{{#if unreadCount}}{{unreadCount}}{{else}}0{{/if}}</div>
-
 <div class="trpAlertWrapper" id="alert-panel">
   <div class="trpAlertContainer">
     <div class="trpAlertContent" id="alert-content">
     </div>
   </div>
 </div>
+
+<div class="trpHeaderWrapper" id="header-wrapper">
+  <div class="trpHeaderArea" id="header">
+  </div>
+</div>
+
+
+<div class="trpContentPanel primary-scroll" id="content-wrapper">
+  <div class="trpChatPanel" id="chat-frame">
+    <div class="trpChatContainer" id="content-frame">
+    </div>
+  </div>
+</div>
+
+<div class="trpToolbar" id="toolbar-frame" style="display: none">
+</div>
+
+<div class="trpChatInputWrapper" id="chat-input-wrapper">
+  <div class="trpChatInputArea" id="chat-input">
+  </div>
+</div>
+
+<div class="trpBlankPage"> </div>
 
 {{{ generateTroupeContext troupeContext }}}
 

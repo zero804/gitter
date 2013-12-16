@@ -9,12 +9,25 @@ require([
   'views/chat/chatCollectionView',
   'collections/instances/integrated-items',
   'collections/instances/troupes',
+  // 'collections/useremails',
   'views/righttoolbar/rightToolbarView',
+  // 'views/file/filePreviewView',
+  // 'views/file/fileVersionsView',
+  // 'views/request/requestDetailView',
+  // 'views/invite/inviteDetailView',
   'views/people/personDetailView',
+  // 'views/conversation//*conversationDetailView'*/,
+  // 'views/profile/profileView',
+  // 'views/profile/profileEmailView',
+  // 'views/profile/profileAddEmailView',
+  // 'views/modals/completeYourProfileModal',
   'views/shareSearch/inviteView',
+  // 'views/signup//*createTroupeView'*/,
+  // 'views/signup/usernameView',
   'views/app/troupeSettingsView',
   'views/app/integrationSettingsModal',
   'views/toolbar/troupeMenu',
+  // 'views/invite/reinviteModal',
   'utils/router',
   'components/unread-items-client',
 
@@ -35,11 +48,14 @@ require([
   'components/eyeballs', // No ref
   'bootstrap-dropdown' // No ref
 ], function($, Backbone, context, appEvents, AppIntegratedView, chatInputView,
-    ChatCollectionView, itemCollections, troupeCollections, RightToolbarView,
-    PersonDetailView, inviteView, troupeSettingsView,
-    IntegrationSettingsModal, TroupeMenuView, Router,
+    ChatCollectionView, itemCollections, troupeCollections, /*UserEmailCollection,*/
+    RightToolbarView, /*filePreviewView, fileVersionsView,  RequestDetailView,*/
+    /*InviteDetailView,*/ PersonDetailView, /*conversationDetailView,*/ /*profileView,
+    profileEmailView, profileAddEmailView,*/ /* completeYourProfileModal,*/
+    inviteView, /*createTroupeView,*/ /*UsernameView,*/ troupeSettingsView,
+    IntegrationSettingsModal, TroupeMenuView, /* ReinviteModal, */ Router,
     unreadItemsClient, FileDecorator, webhookDecorator, userDecorator,
-    embedDecorator, emojiDecorator, HeaderView) {
+    embedDecorator, emojiDecorator, HeaderView /*, errorReporter , FilteredCollection */) {
   "use strict";
 
   // Make drop down menus drop down
@@ -49,9 +65,7 @@ require([
 
   var troupeCollection = troupeCollections.troupes;
 
-  var appView = new AppIntegratedView({ });
-
-  appView.leftMenuRegion.show(new TroupeMenuView({ }));
+  var appView = new AppIntegratedView({ el: 'body' });
   appView.rightToolbarRegion.show(new RightToolbarView());
 
   troupeCollection.on("remove", function(model) {
@@ -67,6 +81,22 @@ require([
   // var userEmailCollection = new UserEmailCollection.UserEmailCollection();
 
   // Setup the ChatView
+
+  var chatCollectionView = new ChatCollectionView({
+    el: $('#content-frame'),
+    collection: itemCollections.chats,
+    userCollection: itemCollections.users,
+    decorators: [new FileDecorator(itemCollections.files), webhookDecorator, userDecorator, embedDecorator, emojiDecorator]
+  }).render();
+
+  unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));
+  // unreadItemsClient.monitorViewForUnreadItems($('#file-list'));
+
+  new chatInputView.ChatInputView({
+    el: $('#chat-input'),
+    collection: itemCollections.chats,
+    rollers: chatCollectionView.rollers
+  }).render();
 
   // var profileModal = context.getUser().username ? profileView.Modal : completeYourProfileModal;
   function integrationsValidationCheck() {
