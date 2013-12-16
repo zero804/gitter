@@ -35,6 +35,15 @@ module.exports = {
           }
         });
 
+    app.get('/:userOrOrg/-/chat',
+      middleware.grantAccessForRememberMeTokenMiddleware,
+      middleware.ensureLoggedIn(),
+      appMiddleware.uriContextResolverMiddleware,
+      appMiddleware.isPhoneMiddleware,
+      function(req, res, next) {
+        appRender.renderAppPageWithTroupe(req, res, next, 'chat-template');
+      });
+
       app.get('/:userOrOrg/:repo',
         middleware.grantAccessForRememberMeTokenMiddleware,
         middleware.ensureLoggedIn(),
@@ -47,6 +56,15 @@ module.exports = {
           } else {
             appRender.renderAppPageWithTroupe(req, res, next, 'app-template');
           }
+        });
+
+      app.get('/:userOrOrg/:repo/chat',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        appMiddleware.uriContextResolverMiddleware,
+        appMiddleware.isPhoneMiddleware,
+        function(req, res, next) {
+          appRender.renderAppPageWithTroupe(req, res, next, 'chat-template');
         });
 
 
