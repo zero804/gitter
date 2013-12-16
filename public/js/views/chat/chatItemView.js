@@ -29,6 +29,9 @@ define([
   var EDIT_WINDOW = 240000;
 
   var ChatItemView = TroupeViews.Base.extend({
+    attributes: {
+      class: 'trpChatItemContainer'
+    },
     unreadItemType: 'chat',
     template: chatItemTemplate,
     isEditing: false,
@@ -197,7 +200,7 @@ define([
       this.$el.find('.trpChatText .issue').each(function() {
         var $issue = $(this);
         var issueNumber = $issue.text().substring(1);
-        var url = '/api/v1/troupes/'+context().troupe.id+'/issues/'+issueNumber;
+        var url = '/api/v1/troupes/'+ context().troupe.id + '/issues/' + issueNumber;
         $.get(url, function(issue) {
           if(!issue.state) return;
 

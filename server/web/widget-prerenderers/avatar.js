@@ -1,11 +1,11 @@
 /*jshint globalstrict: true, trailing: false, unused: true, node: true */
 "use strict";
 
-
 module.exports = exports = function(template) {
   return function avatarWidgetHandler(params) {
     var hash = params.hash;
-    var user = hash.model;
+    var user = hash.model || hash.user;
+
     var avatarSize = hash.avatarSize || 's';
     var showBadge = hash.showBadge;
     var showStatus = hash.showStatus;
@@ -24,7 +24,6 @@ module.exports = exports = function(template) {
       showStatus: showStatus,
       showBadge: showBadge
     });
-    console.log(r);
     return r;
   };
 };

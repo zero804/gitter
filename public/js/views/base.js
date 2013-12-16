@@ -65,6 +65,7 @@ define([
       if(this.model) {
         if(this.rerenderOnChange) this.setRerenderOnChange();
 
+        // TODO: move this into the
         this.listenTo(this.model, 'syncStatusChange', function(newState) {
           var e = this.$el.find('.view').first();
           if(newState != 'synced')  e.removeClass('synced');
@@ -119,7 +120,6 @@ define([
           $(element).replaceWith(widget.el);
       }
 
-
       var dom = $($.parseHTML(this.template(data)));
       dom.addClass("view");
 
@@ -145,9 +145,6 @@ define([
       if(this.model && this.model.syncState) {
         dom.addClass(this.model.syncState);
       }
-
-
-
       this.$el.html(dom);
       return dom;
     },
@@ -167,6 +164,8 @@ define([
     removeSubViews: function($el) {
       $el.find('.view').each(function(index, viewElement) {
         if(viewElement._view) {
+          log('Removing ', viewElement._view);
+
           viewElement._view.close();
           viewElement._view = null;
         }

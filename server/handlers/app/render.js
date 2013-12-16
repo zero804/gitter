@@ -2,7 +2,9 @@
 "use strict";
 
 var nconf             = require('../../utils/config');
+var Q                 = require('q');
 var contextGenerator  = require('../../web/context-generator');
+var restful           = require('../../services/restful');
 
 function getAppCache(req) {
   if(!nconf.get('web:useAppCache')) return;
@@ -64,9 +66,12 @@ function renderMainFrame(req, res, next, frame) {
 }
 
 function renderChatPage(req, res, next) {
+  var troupe = req.uriContext.troupe;
 
-  contextGenerator.generateTroupeContext(req)
-    .then(function(troupeContext) {
+  Q.all([
+    contextGenerator.generateTroupeContext(req),
+    restful.serializeChatsForTroupe(troupe.id, req.user.id, { sort: { sent: 'asc' }, limit: 10 })
+    ]).spread(function(troupeContext, chats) {
 
       res.render('chat-template', {
         appCache: getAppCache(req),
@@ -76,8 +81,10 @@ function renderChatPage(req, res, next) {
         troupeFavourite: troupeContext.troupe.favourite,
         user: troupeContext.user,
         troupeContext: troupeContext,
+        chats: chats,
         agent: req.headers['user-agent']
       });
+
     })
     .fail(next);
 }
