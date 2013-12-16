@@ -45,10 +45,17 @@ function renderAppPageWithTroupe(req, res, next, page) {
       var login = !user || accessDenied;
       var bootScript;
       var pageTemplate;
+      var chatAppLocation;
       switch(page) {
         case 'app':
           bootScript = req.isPhone ? 'mobile-app' : 'router-app';
           pageTemplate = 'app-template';
+          console.log('>>>', req.uriContext);
+          if(req.uriContext.uri.indexOf('/') >= 0) {
+            chatAppLocation = req.uriContext.uri + '/chat';
+          } else {
+            chatAppLocation = req.uriContext.uri + '/-/chat';
+          }
 
           // if(req.isPhone) {
           //   // TODO: this should change from chat-app to a seperate mobile app
@@ -61,6 +68,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
         case 'chat':
           bootScript = 'router-chat';
           pageTemplate = 'chat-template';
+
           break;
         case 'home':
           // TODO: In future....
@@ -75,6 +83,7 @@ function renderAppPageWithTroupe(req, res, next, page) {
         troupeName: troupeContext.troupe.uri || troupeContext.troupe.name,
         troupeTopic: troupeContext.troupe.topic,
         troupeContext: troupeContext,
+        chatAppLocation: chatAppLocation,
         agent: req.headers['user-agent']
       });
     })
