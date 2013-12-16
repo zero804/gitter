@@ -202,6 +202,8 @@ define([
           if(!issue.state) return;
 
           $issue.removeClass('open closed').addClass(issue.state);
+          $issue.attr('title', issue.title);
+          $issue.tooltip();
         });
       });
     },
