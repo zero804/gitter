@@ -10,6 +10,7 @@ var unreadItemService   = require("../services/unread-item-service");
 var fileService         = require("../services/file-service");
 var chatService         = require("../services/chat-service");
 var conversationService = require("../services/conversation-service");
+var Q                   = require('q');
 
 // USEFUL function for testing
 // function slow(cb) {
@@ -45,12 +46,28 @@ exports.serializeRequestsForTroupe = function(troupeId, userId, callback) {
 
 };
 
-exports.serializeChatsForTroupe = function(troupeId, userId, callback) {
+exports.serializeChatsForTroupe = function(troupeId, userId, options, cb) {
+  if(typeof options == 'function' && typeof cb == 'undefined') {
+    cb = options;
+    options = {};
+  }
+
+  if(!options) options = {};
+
+  var d = Q.defer();
+  var callback = d.makeNodeResolver();
+  d = d.promise.nodeify(cb);
+
   function serializeChats(err, chatMessages) {
     if(err) return callback(err);
 
     var strategy = new restSerializer.ChatStrategy({ currentUserId: userId, troupeId: troupeId });
     restSerializer.serialize(chatMessages, strategy, callback);
+  }
+
+  if(options.limit) {
+    chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: options.limit, sort: options.sort }, serializeChats);
+    return d;
   }
 
   unreadItemService.getFirstUnreadItem(userId, troupeId, 'chat', function(err, firstId, totalUnreadItems) {
@@ -81,6 +98,8 @@ exports.serializeChatsForTroupe = function(troupeId, userId, callback) {
     chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: 20 }, serializeChats);
 
   });
+
+  return d;
 };
 
 exports.serializeFilesForTroupe = function(troupeId, userId, callback) {

@@ -151,7 +151,7 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
     q = q.where('_id').lt(beforeId);
   }
 
-  q.sort({ sent: 'desc' })
+  q.sort(options.sort || { sent: 'desc' })
     .limit(options.limit)
     .skip(options.skip)
     .exec(callback);

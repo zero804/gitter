@@ -4,7 +4,6 @@
 var express                       = require('express');
 var passport                      = require('passport');
 var nconf                         = require('../utils/config');
-var handlebars                    = require('handlebars');
 var expressHbs                    = require('express-hbs');
 var winston                       = require('winston');
 var middleware                    = require('./middleware');
@@ -48,6 +47,7 @@ module.exports = {
     expressHbs.registerHelper('generateEnv', require('./hbs-helpers').generateEnv);
     expressHbs.registerHelper('generateTroupeContext', require('./hbs-helpers').generateTroupeContext);
     expressHbs.registerAsyncHelper('prerenderView', require('./prerender-helper'));
+    expressHbs.registerHelper('chatItemPrerender', require('./prerender-chat-helper'));
 
     app.locals({
       googleTrackingId: nconf.get("web:trackingId"),
@@ -56,9 +56,7 @@ module.exports = {
 
     app.engine('hbs', expressHbs.express3({
       partialsDir: __dirname + '/../../' + nconf.get('web:staticContent') +'/templates/partials',
-      contentHelperName: 'content',
-      //handlebars: handlebars
-
+      contentHelperName: 'content'
     }));
 
     // registerAllTemplatesAsPartials(__dirname + '/../../' + nconf.get('web:staticContent') +'/js/views');
@@ -67,11 +65,9 @@ module.exports = {
     app.set('views', __dirname + '/../../' + nconf.get('web:staticContent') +'/templates');
     app.set('trust proxy', true);
 
-    // THIS IS BROKEN
-    // https://github.com/barc/express-hbs/issues/23
-    // if(nconf.get('express:viewCache')) {
-    //   app.enable('view cache');
-    // }
+    if(nconf.get('express:viewCache')) {
+      app.enable('view cache');
+    }
 
     if(nconf.get("logging:access") && nconf.get("logging:logStaticAccess")) {
       configureLogging();

@@ -489,7 +489,9 @@ function ChatStrategy(options)  {
     return {
       id: item._id,
       text: item.text,
+      // sent: formatDate(item.sent),
       sent: formatDate(item.sent),
+      // editedAt: formatDate(item.editedAt),
       editedAt: formatDate(item.editedAt),
       fromUser: options.user ? options.user : userStategy.map(item.fromUserId),
       unread: options.currentUserId ? unreadItemStategy.map(item._id) : true,

@@ -6,12 +6,13 @@ define([
   "use strict";
 
   return {
-    onDomRender: function(dom) {
+    onDomRender: function() {
       if(this.model && this.unreadItemType) {
         var id = this.model.get('id');
         if(!id) id = this.model.cid;
+        var $e = this.$el;
 
-        dom.addClass('model-id-' + id);
+        $e.addClass('model-id-' + id);
 
         var unread = this.model.get('unread');
         if(unread) {
@@ -21,9 +22,9 @@ define([
         }
 
         if(unread) {
-          dom.addClass('unread');
-          dom.data('itemId', id);
-          dom.data('itemType', this.unreadItemType);
+          $e.addClass('unread');
+          $e.data('itemId', id);
+          $e.data('itemType', this.unreadItemType);
           $(document).trigger('unreadItemDisplayed');
         }
       }
