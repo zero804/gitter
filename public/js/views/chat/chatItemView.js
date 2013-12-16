@@ -10,6 +10,7 @@ define([
   'components/unread-items-client',
   'marionette',
   'views/base',
+  'hbs!./tmpl/issuePopover',
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
@@ -19,7 +20,7 @@ define([
   'bootstrap_tooltip', // No ref
   'bootstrap-popover' // No ref
 ], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews,
-  chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml, cocktail /* tooltip, popover*/) {
+  issuePopoverTemplate, chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml, cocktail /* tooltip, popover*/) {
 
   "use strict";
 
@@ -205,10 +206,15 @@ define([
           $issue.removeClass('open closed').addClass(issue.state);
           $issue.attr('title', 'Issue '+issue.number+': '+issue.title);
           $issue.popover({
+            html: true,
             trigger: 'hover',
             placement: 'bottom',
             container: 'body',
-            content: issue.body
+            content: issuePopoverTemplate({
+              username: issue.user.login,
+              avatarUrl: issue.user.avatar_url,
+              description: issue.body,
+            })
           });
         });
       });
