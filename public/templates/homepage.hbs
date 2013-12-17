@@ -91,6 +91,23 @@ h2 {
   margin: 40px 0;
 }
 
+.write-explain {
+  color: white;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 2px;
+}
+
+.write-explain a{
+  opacity: 0.4;
+  color:white;
+  text-decoration: none;
+}
+
+.write-explain a:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
 
 </style>
 
@@ -101,7 +118,7 @@ h2 {
     <div class="strip" style="text-align: left">
       <div style="float: right; font-size: 14px; letter-spacing: 0.5px">
 <!--         <a href="/" class="button" id="about" style="text-decoration: none; color: white; opacity: 0.8" >About</a> -->
-        <a href="/login/github" class="button blur" id="signup" style="text-decoration: none; color: white">Existing user login</a>
+        <a href="/login/github" class="button blur" id="signup" style="text-decoration: none; color: white">Existing user login</a><div class="write-explain"><a href="/login/explain" target="_blank">Requires GitHub write access<a></div>
       </div>
       <img src="{{ cdn "images/2/gitter/logo-text-white-64.png" }}" height="64">
     </div>
