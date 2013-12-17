@@ -113,7 +113,7 @@ define(['jquery'], function (jQuery){
     return this
   }
 
-}(window.jQuery);
+}(jQuery);
 
 return jQuery;
 });
