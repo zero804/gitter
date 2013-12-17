@@ -1,4 +1,4 @@
-define(['jquery'], function (jQuery){
+define(['bootstrap_tooltip'], function (jQuery){
 
 /* ===========================================================
  * bootstrap-popover.js v2.3.2
