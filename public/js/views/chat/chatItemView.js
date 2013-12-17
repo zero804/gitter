@@ -11,6 +11,7 @@ define([
   'marionette',
   'views/base',
   'hbs!./tmpl/issuePopover',
+  'hbs!./tmpl/issuePopoverTitle',
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
@@ -21,7 +22,7 @@ define([
   'bootstrap_tooltip', // No ref
   'bootstrap-popover' // No ref
 ], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews,
-  issuePopoverTemplate, chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml, moment, cocktail /* tooltip, popover*/) {
+  issuePopoverTemplate, issuePopoverTitleTemplate, chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml, moment, cocktail /* tooltip, popover*/) {
 
   "use strict";
 
@@ -205,11 +206,11 @@ define([
           if(!issue.state) return;
 
           $issue.removeClass('open closed').addClass(issue.state);
-          $issue.attr('title', 'Issue '+issue.number+': '+issue.title+' <span class="issue '+issue.state+'" style="float: right;">'+issue.state+'</span>');
+          $issue.attr('title', issuePopoverTitleTemplate(issue));
           $issue.popover({
             html: true,
             trigger: 'hover',
-            placement: 'bottom',
+            placement: 'right',
             container: 'body',
             content: issuePopoverTemplate({
               username: issue.user.login,
