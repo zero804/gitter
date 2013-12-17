@@ -4,8 +4,8 @@
 
 <div class="whbody">
   {{#if from}}
-  Card '{{card}}' {{action}} from '{{from}}' to '{{to}}' on board <a href="{{url}}" target="_blank">{{board}}</a>
+  Card '{{card}}' {{action}} from '{{from}}' to '{{to}}' by {{author}} on board <a href="{{url}}" target="_blank">{{board}}</a>
   {{else}}
-    Card '{{card}}' {{action}} on board <a href="{{url}}" target="_blank">{{board}}</a>
+    Card '{{card}}' {{action}} by {{author}} on board <a href="{{url}}" target="_blank">{{board}}</a>
   {{/if}}
 </div>
