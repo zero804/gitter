@@ -336,6 +336,7 @@ define([
         model: this.model,
         userCollection: this.userCollection,
         placement: 'vertical',
+        height: '88px',
         title: 'Read By',
         targetElement: event.target
       });
