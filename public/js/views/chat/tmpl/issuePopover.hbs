@@ -1,0 +1,30 @@
+<div class="trpChatAvatar">
+  <span>
+    <div class="trpDisplayPicture avatar-s" style="background-image: url({{avatarUrl}});">
+   </div>
+  </span>
+</div>
+<div class="trpChatBox">
+  <div class="trpChatDetails">
+    <div class="trpChatFrom">@{{username}}</div>
+    <div class="trpChatTime"> &bull; {{date}}</div>
+  </div>
+  {{#if description}}
+    <div class="trpChatText">{{description}}</div>
+  {{else}}
+    <div class="trpChatText missing">No description given.</div>
+  {{/if}}
+</div>
+  {{#if assignee}}
+  <div style="float: right;
+  margin-top: 5px;
+  ">
+    <div class="trpDisplayPicture avatar-xxs" style="background-image: url({{assignee.avatar_url}}); vertical-align: middle"></div>
+    <span style="
+    font-size: smaller;
+    vertical-align: middle;
+    color: #AAA;
+    ">{{assignee.login}} is assigned</span>
+  </div>
+  {{/if}}
+

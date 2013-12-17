@@ -16,7 +16,7 @@ img.emoji {
   background-color: fade(@trpLightBlue, 20%);
 }
 
-.trpChatText .issue {
+.issue {
   border: 1px solid fade(@trpGrey,40%);
   background-color: fade(@trpGrey,20%);
   border-radius: 2px;
@@ -486,9 +486,31 @@ a.issue:hover {
   word-wrap: break-word;
   .user-select(text);
 
-  a {
+  a.link {
     color: @trpLightBlue;
   }
+}
+
+.missing {
+  font-size: smaller;
+  opacity: 0.5;
+  font-style: italic;
+}
+
+.issuePopoverTitle {
+  display: inline-block;
+  width: 100%;
+  padding-right: 50px;
+  -moz-box-sizing: border-box;
+       box-sizing: border-box;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.issuePopoverLabel {
+  position: absolute;
+  right: 14px;
 }
 
 .trpChatTime {
@@ -498,7 +520,5 @@ a.issue:hover {
 .frame-chat {
   position: relative; // required for scroll calculations
 }
-
-
 
 

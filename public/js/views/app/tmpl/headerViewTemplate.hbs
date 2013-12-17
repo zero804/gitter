@@ -9,7 +9,11 @@
         <li role="presentation" class="divider"></li>
         <li><a role="menuitem" tabindex="-1" href="#|troupeSettings">Notifications</a></li>
         {{#if permissions.admin}}
-        <li><a role="menuitem" tabindex="-1" href="#|integrations">Integrations</a></li>
+          {{#if isNativeDesktopApp}}
+            <li><a role="menuitem" tabindex="-1" href="{{troupeUrl}}#|integrations" target="_blank">Integrations</a></li>
+          {{else}}
+            <li><a role="menuitem" tabindex="-1" href="#|integrations">Integrations</a></li>
+          {{/if}}
         {{/if}}
         <li role="presentation" class="divider"></li>
         <li><a role="menuitem" tabindex="-1" href="http://www.github.com/{{troupe.uri}}" target="_blank">Open in GitHub</a></li>
