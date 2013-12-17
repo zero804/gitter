@@ -15,3 +15,16 @@
     <div class="trpChatText missing">No description given.</div>
   {{/if}}
 </div>
+{{#if assignee}}
+<div style="
+float: right;
+margin-top: 5px;
+">
+  <div class="trpDisplayPicture avatar-xxs" style="background-image: url({{assignee.avatar_url}});"></div>
+  <span style="
+  font-size: smaller;
+  vertical-align: top;
+  color: #AAA;
+  ">@{{assignee.login}} is assigned</span>
+</div>
+{{/if}}
