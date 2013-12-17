@@ -335,8 +335,9 @@ define([
       this.readBy = new ReadByPopover({
         model: this.model,
         userCollection: this.userCollection,
-        placement: 'vertical',
-        height: '88px',
+        placement: 'bottom',
+        minHeight: '88px',
+        width: '300px',
         title: 'Read By',
         targetElement: event.target
       });
