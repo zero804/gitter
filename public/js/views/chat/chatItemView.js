@@ -19,10 +19,12 @@ define([
   'utils/safe-html',
   'utils/momentWrapper',
   'cocktail',
+  'markdown',
+  'highlight',
   'bootstrap_tooltip', // No ref
   'bootstrap-popover' // No ref
 ], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews,
-  issuePopoverTemplate, issuePopoverTitleTemplate, chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml, moment, cocktail /* tooltip, popover*/) {
+  issuePopoverTemplate, issuePopoverTitleTemplate, chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml, moment, cocktail, markdown, highlight /* tooltip, popover*/) {
 
   "use strict";
 
@@ -107,17 +109,24 @@ define([
       }
 
       var richText = linkify(this.model.get('text'), links, mentions, issues).toString();
-      richText = richText.replace(/\n\r?/g, '<br>');
+      //richText = richText.replace(/\n\r?/g, '<br>');
+      //richText = Markdown.toHTML(richText);
+      richText = markdown(richText);
       this.$el.find('.trpChatText').html(richText);
+
+      if (this.$el.find('pre code').length > 0) {
+        console.debug('code: ', highlight.highlightBlock(this.$el.find('pre code')[0]));
+      }
 
       this.highlightMention();
       this.setIssueStatusClasses();
 
-      //if (this.decorator) this.decorator.enrich(this);
-
       _.each(this.decorators, function(decorator) {
         decorator.decorate(this);
       }, this);
+    },
+
+    beforeRender: function() {
     },
 
     afterRender: function() {
