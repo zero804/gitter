@@ -510,7 +510,7 @@ define([
         container: false,
         placement: 'right',
         width: '',
-        height: ''
+        minHeight: ''
       };
       _.bindAll(this, 'leave', 'enter');
       _.extend(this.options, options);
@@ -529,7 +529,7 @@ define([
 
       $e.find('.popover-title').text(title);
       $e.find('.popover-content > *').append(this.view.render().el);
-      $e.find('.popover-inner').css('width', this.options.width).css('height', this.options.height);
+      $e.find('.popover-inner').css('width', this.options.width).css('min-height', this.options.minHeight);
 
       $e.on('mouseenter', this.enter);
       $e.on('mouseleave', this.leave);
