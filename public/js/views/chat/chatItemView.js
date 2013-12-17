@@ -10,15 +10,19 @@ define([
   'components/unread-items-client',
   'marionette',
   'views/base',
+  'hbs!./tmpl/issuePopover',
+  'hbs!./tmpl/issuePopoverTitle',
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
   'template/helpers/linkify',
   'utils/safe-html',
+  'utils/momentWrapper',
   'cocktail',
-  'bootstrap_tooltip' // No ref
+  'bootstrap_tooltip', // No ref
+  'bootstrap-popover' // No ref
 ], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews,
-  chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml, cocktail /* tooltip*/) {
+  issuePopoverTemplate, issuePopoverTitleTemplate, chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml, moment, cocktail /* tooltip, popover*/) {
 
   "use strict";
 
@@ -200,10 +204,24 @@ define([
         var url = '/api/v1/troupes/'+context().troupe.id+'/issues/'+issueNumber;
         $.get(url, function(issue) {
           if(!issue.state) return;
+          var description = issue.body;
+          // css elipsis overflow cant handle multiline text
+          var shortDescription = (description && description.length > 250) ? description.substring(0,250)+'…' : description;
 
           $issue.removeClass('open closed').addClass(issue.state);
-          $issue.attr('title', issue.title);
-          $issue.tooltip();
+          $issue.attr('title', issuePopoverTitleTemplate(issue));
+          $issue.popover({
+            html: true,
+            trigger: 'hover',
+            placement: 'right',
+            container: 'body',
+            content: issuePopoverTemplate({
+              username: issue.user.login,
+              avatarUrl: issue.user.avatar_url,
+              description: shortDescription,
+              date: moment(issue.created_at).format("LLL")
+            })
+          });
         });
       });
     },

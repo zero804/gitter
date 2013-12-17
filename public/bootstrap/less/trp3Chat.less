@@ -16,7 +16,7 @@ img.emoji {
   background-color: fade(@trpLightBlue, 20%);
 }
 
-.trpChatText .issue {
+.issue {
   border: 1px solid fade(@trpGrey,40%);
   background-color: fade(@trpGrey,20%);
   border-radius: 2px;
@@ -486,9 +486,15 @@ a.issue:hover {
   word-wrap: break-word;
   .user-select(text);
 
-  a {
+  a.link {
     color: @trpLightBlue;
   }
+}
+
+.missing {
+  font-size: smaller;
+  opacity: 0.5;
+  font-style: italic;
 }
 
 .trpChatTime {
@@ -498,7 +504,5 @@ a.issue:hover {
 .frame-chat {
   position: relative; // required for scroll calculations
 }
-
-
 
 
