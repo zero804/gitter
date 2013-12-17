@@ -204,6 +204,9 @@ define([
         var url = '/api/v1/troupes/'+context().troupe.id+'/issues/'+issueNumber;
         $.get(url, function(issue) {
           if(!issue.state) return;
+          var description = issue.body;
+          // css elipsis overflow cant handle multiline text
+          var shortDescription = (description && description.length > 250) ? description.substring(0,250)+'…' : description;
 
           $issue.removeClass('open closed').addClass(issue.state);
           $issue.attr('title', issuePopoverTitleTemplate(issue));
@@ -215,7 +218,7 @@ define([
             content: issuePopoverTemplate({
               username: issue.user.login,
               avatarUrl: issue.user.avatar_url,
-              description: issue.body,
+              description: shortDescription,
               date: moment(issue.created_at).format("LLL")
             })
           });
