@@ -219,7 +219,8 @@ define([
               username: issue.user.login,
               avatarUrl: issue.user.avatar_url,
               description: shortDescription,
-              date: moment(issue.created_at).format("LLL")
+              date: moment(issue.created_at).format("LLL"),
+              assignee: issue.assignee
             })
           });
         });
