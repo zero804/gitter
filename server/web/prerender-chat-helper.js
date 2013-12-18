@@ -13,6 +13,8 @@ var _          = require('underscore');
 var syncHandlebars = require('handlebars');
 var widgetHelpers = require('./widget-prerenderers');
 
+var chatWrapper = syncHandlebars.compile('<div class="trpChatItemContainer model-id-{{id}} {{unreadClass}}">{{{inner}}}</div>');
+
 var templateFile = path.normalize(__dirname + '/../../' + nconf.get('web:staticContent') + '/js/views/chat/tmpl/chatViewItem.hbs');
 var buffer = fs.readFileSync(templateFile);
 var chatItemTemplate = syncHandlebars.compile(buffer.toString());
@@ -27,8 +29,11 @@ module.exports = exports = function(model) {
     displayName: displayName = model.fromUser && model.fromUser.displayName
   }, model, widgetHelpers);
   var result = chatItemTemplate(m);
+  var unreadClass = model.unread ? 'unread' : 'read';
 
-  result = '<div class="trpChatItemContainer model-id-' + model.id + '">' + result + '</div>';
-
-  return result;
+  return chatWrapper({
+    id: model.id,
+    unreadClass: unreadClass,
+    inner: result
+  });
 };

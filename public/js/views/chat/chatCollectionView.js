@@ -28,11 +28,16 @@ define([
     itemView: chatItemView.ChatItemView,
     reverseScrolling: true,
     itemViewOptions: function(item) {
-      var e;
+      var options = {
+        userCollection: this.userCollection,
+        decorators: this.decorators
+      };
+
       if(item && item.id) {
-        e = this.$el.find('.model-id-' + item.id)[0];
+        var e = this.$el.find('.model-id-' + item.id)[0];
+        if(e) options.el = e;
       }
-      return { userCollection: this.userCollection, decorators: this.decorators, el: e };
+      return options;
     },
     scrollElementSelector: "#content-frame",
     initialize: function(options) {
