@@ -490,7 +490,7 @@ function ChatStrategy(options)  {
       id: item._id,
       text: item.text,
       // sent: formatDate(item.sent),
-      sent: formatDate(item.sent),
+      sent: item.sent,
       // editedAt: formatDate(item.editedAt),
       editedAt: formatDate(item.editedAt),
       fromUser: options.user ? options.user : userStategy.map(item.fromUserId),

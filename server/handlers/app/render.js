@@ -6,6 +6,9 @@ var Q                 = require('q');
 var contextGenerator  = require('../../web/context-generator');
 var restful           = require('../../services/restful');
 
+/* How many chats to send back */
+var INITIAL_CHAT_COUNT = 20;
+
 function getAppCache(req) {
   if(!nconf.get('web:useAppCache')) return;
   return req.url + '.appcache';
@@ -70,8 +73,13 @@ function renderChatPage(req, res, next) {
 
   Q.all([
     contextGenerator.generateTroupeContext(req),
-    restful.serializeChatsForTroupe(troupe.id, req.user.id, { sort: { sent: 'asc' }, limit: 10 })
+    restful.serializeChatsForTroupe(troupe.id, req.user.id, { limit: INITIAL_CHAT_COUNT })
     ]).spread(function(troupeContext, chats) {
+
+      // Reverse the order of the chats on the page
+      chats.sort(function(a, b) {
+        return a.sent - b.sent;
+      });
 
       res.render('chat-template', {
         appCache: getAppCache(req),

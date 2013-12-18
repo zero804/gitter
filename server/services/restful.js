@@ -66,7 +66,7 @@ exports.serializeChatsForTroupe = function(troupeId, userId, options, cb) {
   }
 
   if(options.limit) {
-    chatService.findChatMessagesForTroupe(troupeId, { skip: 0, limit: options.limit, sort: options.sort }, serializeChats);
+    chatService.findChatMessagesForTroupe(troupeId, { skip: options.skip || 0, limit: options.limit, sort: options.sort }, serializeChats);
     return d;
   }
 
