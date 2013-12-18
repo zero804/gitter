@@ -508,7 +508,8 @@ define([
         delay: 300,
         container: false,
         placement: 'right',
-        width: ''
+        width: '',
+        minHeight: ''
       };
       _.bindAll(this, 'leave', 'enter');
       _.extend(this.options, options);
@@ -527,7 +528,7 @@ define([
 
       $e.find('.popover-title').text(title);
       $e.find('.popover-content > *').append(this.view.render().el);
-      $e.find('.popover-inner').css('width', this.options.width);
+      $e.find('.popover-inner').css('width', this.options.width).css('min-height', this.options.minHeight);
 
       $e.on('mouseenter', this.enter);
       $e.on('mouseleave', this.leave);
@@ -591,7 +592,7 @@ define([
           tp = {top: pos.top + pos.height, left: pos.left + pos.width / 2 - actualWidth / 2};
           break;
         case 'top':
-          tp = {top: pos.top - actualHeight - this.$targetElement.height(), left: pos.left + pos.width / 2 - actualWidth / 2 - 2};
+          tp = {top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2 - 2};
           break;
         case 'left':
           tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth};
