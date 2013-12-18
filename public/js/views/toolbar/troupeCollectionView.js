@@ -32,7 +32,7 @@ define([
         model.set('lastAccessTime', moment());
       }, 150);
 
-      appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'));
+      appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
     }
   });
 

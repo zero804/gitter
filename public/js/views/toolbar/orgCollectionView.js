@@ -25,7 +25,7 @@ define([
     },
     clicked: function(e) {
       e.preventDefault();
-      appEvents.trigger('navigation', '/' + this.model.get('name'), 'chat', this.model.get('name'));
+      appEvents.trigger('navigation', '/' + this.model.get('name'), 'chat', this.model.get('name'), null);
     }
   });
 

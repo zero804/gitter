@@ -23,7 +23,7 @@ define([
     },
     homeClicked: function(e) {
       e.preventDefault();
-      appEvents.trigger('navigation', context.getUser().url, 'home', ''); // TODO: figure out a title
+      appEvents.trigger('navigation', context.getUser().url, 'home', '', model.id); // TODO: figure out a title
     }
   });
 });
