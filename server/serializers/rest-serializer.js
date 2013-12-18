@@ -13,6 +13,7 @@ var handlebars        = require('handlebars');
 var winston           = require("winston");
 var collections       = require("../utils/collections");
 var predicates        = collections.predicates;
+var marked            = require("marked");
 
 // TODO: Fix this, use the CDN and code sign URLS
 function privateCdn(url) {
@@ -486,9 +487,22 @@ function ChatStrategy(options)  {
   };
 
   this.map = function(item) {
+
+    //var fence = item.text.match(/^ *(`{3,}|~{3,}) *(\S+)? *\n([\s\S]+?)\s*\1 *(?:\n+|$)/);
+    //var html, code;
+    //if (fence) {
+    //  var text = item.text.replace(fence[0], '');
+    //  html = marked(text);
+    //  code = marked(fence[0]);
+    //} else {
+    //  html = marked(item.text);
+    //}
+
     return {
       id: item._id,
       text: item.text,
+      html: item.html,
+      code: item.code,
       sent: formatDate(item.sent),
       editedAt: formatDate(item.editedAt),
       fromUser: options.user ? options.user : userStategy.map(item.fromUserId),

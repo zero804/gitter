@@ -244,6 +244,7 @@ define([
       if(val) {
         var model = this.collection.create({
           text: val,
+          html: safeHtml(val),
           fromUser: context.getUser(),
           sent: moment()
         });
@@ -379,7 +380,8 @@ define([
     },
 
     send: function() {
-      this.trigger('save', safeHtml(this.$el.val()));
+      //this.trigger('save', safeHtml(this.$el.val()));
+      this.trigger('save', this.$el.val());
       $('#chatInputForm').trigger('reset');
       this.$el.val('');
       this.chatResizer.resetInput();
