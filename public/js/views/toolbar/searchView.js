@@ -1,13 +1,14 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'utils/context',
+  'utils/appevents',
   'jquery',
   'underscore',
   'backbone',
   'utils/text-filter',
   './troupeCollectionView',
   'collections/instances/troupes'
-], function(context, $, _, Backbone, textFilter, TroupeCollectionView, troupeCollections) {
+], function(context, appEvents, $, _, Backbone, textFilter, TroupeCollectionView, troupeCollections) {
   "use strict";
 
   return TroupeCollectionView.extend({
@@ -214,7 +215,10 @@ define([
     },
 
     navigateToCurrent: function() {
-      window.location = '/' + this.collection.at(this.selectedIndex).get('uri');
+      var model = this.collection.at(this.selectedIndex);
+      if(!model) return;
+
+      appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'), model.id);
     },
 
     select: function(i) {

@@ -4,6 +4,7 @@ define([
   'underscore',
   'marionette',
   'utils/context',
+  'utils/appevents',
   'collections/instances/troupes',
   'views/toolbar/troupeCollectionView',
   'hbs!views/toolbar/tmpl/privateTroupeListItemEmpty',
@@ -13,7 +14,7 @@ define([
   './orgCollectionView',
   './repoCollectionView',
   'nanoscroller' //no ref
-], function($, _, Marionette, context, troupeCollections, TroupeCollectionView, privateTroupeListItemEmpty, template, SearchView, ProfileView, OrgCollectionView, RepoCollectionView) {
+], function($, _, Marionette, context, appEvents, troupeCollections, TroupeCollectionView, privateTroupeListItemEmpty, template, SearchView, ProfileView, OrgCollectionView, RepoCollectionView) {
   "use strict";
 
   return Marionette.Layout.extend({
@@ -143,7 +144,7 @@ define([
 
     onClickProfileMenu: function() {
       if (this.isGitterApp) {
-        window.location.href = "/" + context.getUser().username;
+        appEvents.trigger('navigation', context.getUser().url, 'home', '');
         return;
       }
 
