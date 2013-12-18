@@ -26,11 +26,13 @@ define([
     },
     clicked: function(e) {
       e.preventDefault();
+      var model = this.model;
+      setTimeout(function() {
+        // Make things feel a bit more responsive, but not too responsive
+        model.set('lastAccessTime', moment());
+      }, 150);
 
-      // Make things feel a bit more responsive
-      this.model.set('lastAccessTime', moment());
-
-      appEvents.trigger('navigation', this.model.get('url'), 'chat', this.model.get('name'));
+      appEvents.trigger('navigation', model.get('url'), 'chat', model.get('name'));
     }
   });
 

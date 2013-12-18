@@ -27,7 +27,7 @@ define([
   var ChatCollectionView = Marionette.CollectionView.extend({
     itemView: chatItemView.ChatItemView,
     reverseScrolling: true,
-    itemViewOptions: function(item, index) {
+    itemViewOptions: function(item) {
       var e;
       if(item && item.id) {
         e = this.$el.find('.model-id-' + item.id)[0];
@@ -40,6 +40,9 @@ define([
       var contentFrame = document.querySelector(this.scrollElementSelector);
 
       this.rollers = new Rollers(contentFrame);
+
+      /* Since there may be preloaded stuff */
+      this.rollers.adjustScroll();
 
       this.userCollection = options.userCollection;
       this.decorators     = options.decorators || [];
