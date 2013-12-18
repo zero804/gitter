@@ -166,8 +166,18 @@ require([
     });
   }
 
+  function showShareModal() {
+    window.location.hash = "!|inv";
+  }
+
   if(context.popEvent('hooks_require_additional_public_scope')) {
-    setTimeout(promptForHook, 1500);
+    setTimeout(promptForHook, 2500);
+  }
+
+  if(context.popEvent('room_created_now')) {
+    if (!context.getTroupe().oneToOne) {
+      setTimeout(showShareModal, 500);
+    }
   }
 
   if(!window.localStorage.troupeTourApp) {

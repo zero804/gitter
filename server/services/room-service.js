@@ -157,7 +157,7 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
                 }
               }
 
-              return [troupe, true, hookCreationFailedDueToMissingScope];
+              return [troupe, true, hookCreationFailedDueToMissingScope, true];
             });
         });
     });
@@ -227,10 +227,10 @@ function findOrCreateRoom(user, uri) {
 
       /* Didn't find a user, but we may have found another room */
       return findOrCreateNonOneToOneRoom(user, uriLookup && uriLookup.troupe, uri)
-        .spread(function(troupe, access, hookCreationFailedDueToMissingScope) {
+        .spread(function(troupe, access, hookCreationFailedDueToMissingScope, didCreate) {
           return ensureAccessControl(user, troupe, access)
             .then(function(troupe) {
-              return { oneToOne: false, troupe: troupe, hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope };
+              return { oneToOne: false, troupe: troupe, hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope, didCreate: didCreate };
             });
         });
     })
