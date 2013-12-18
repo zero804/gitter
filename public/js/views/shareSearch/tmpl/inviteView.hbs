@@ -2,7 +2,7 @@
   People can join this chat room with the link below.<br>
 </div>
 <div class="hidden-input">
-<input value="{{url}}" onclick="this.select()"/ style="margin-right: 4px;"><div class="trpButtonMedium trpBtnGreen" id="copy-button">Copy</div>
+<input value="{{url}}" onclick="this.select()"/ style="margin-right: 4px;">{{#hasFlash}}<div class="trpButtonMedium trpBtnGreen" id="copy-button">Copy</div>{{/hasFlash}}
 </div>
   {{#isRepo}}
   <span class="trpBodyMedium" style="opacity: 0.6">Only members of private repos can join.<br>For public repos, anyone can join.</span>

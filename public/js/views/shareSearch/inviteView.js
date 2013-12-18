@@ -22,6 +22,18 @@ define([
       return context.env('basePath') + context.getTroupe().url;
     },
 
+    detectFlash: function() {
+      if (navigator.plugins != null && navigator.plugins.length > 0){
+              return navigator.plugins["Shockwave Flash"] && true;
+          }
+          if(~navigator.appVersion.indexOf("MSIE") && !~navigator.userAgent.indexOf("Opera")){
+              try{
+                  return new ActiveXObject("ShockwaveFlash.ShockwaveFlash") && true;
+              } catch(e){}
+          }
+          return false;
+    },
+
     createClipboard : function() {
       if(this.clip) return;
 
@@ -51,13 +63,15 @@ define([
 
       if (context.getTroupe().githubType == 'REPO') {
         isRepo = true;
-      } 
+      }
+
       if (context.getTroupe().githubType == 'ORG') {
         isOrg = true;
-      } 
+      }
       // if (context.getTroupe().githubType)
 
       return {
+        hasFlash: this.detectFlash(),
         isRepo : isRepo,
         isOrg : isOrg,
         url: this.getShareUrl()
