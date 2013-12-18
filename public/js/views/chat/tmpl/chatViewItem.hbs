@@ -4,7 +4,7 @@
   {{ widget "avatar" user=fromUser }}
   </div>
   {{/if}}
-  <div class="trpChatBox">
+  <div class="trpChatBox {{webhookClass}}">
     <div class="trpChatDetails">
       {{#if fromUser}}
       <div class="trpChatFrom">{{displayName}}</div>
