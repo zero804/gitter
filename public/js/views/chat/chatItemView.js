@@ -108,15 +108,23 @@ define([
         issues = this.model.get('issues') || [];
       }
 
-      var richText = linkify(this.model.get('text'), links, mentions, issues).toString();
-      //richText = richText.replace(/\n\r?/g, '<br>');
-      //richText = Markdown.toHTML(richText);
-      richText = markdown(richText);
+      var code = this.model.get('text').match(/```[\s\S]*.+```/);
+      var message;
+      if (code) {
+        message = this.model.get('text').replace(code[0], '');
+      } else {
+        message = this.model.get('text');
+      }
+
+
+      console.debug(code, message);
+
+      var richText = linkify(message, links, mentions, issues).toString();
+
+      richText = markdown(richText + code);
       this.$el.find('.trpChatText').html(richText);
 
-      if (this.$el.find('pre code').length > 0) {
-        console.debug('code: ', highlight.highlightBlock(this.$el.find('pre code')[0]));
-      }
+      if (this.$el.find('pre code').length > 0) highlight.highlightBlock(this.$el.find('pre code')[0]);
 
       this.highlightMention();
       this.setIssueStatusClasses();
