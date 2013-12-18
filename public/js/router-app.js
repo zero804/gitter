@@ -28,9 +28,11 @@ require([
   var troupeCollection = troupeCollections.troupes;
   troupeCollection.on("remove", function(model) {
     if(model.id == context.getTroupeId()) {
-      var newLocation = '/' + context.user().get('username');
-      window.history.pushState(newLocation, "", newLocation);
-      updateContent(newLocation);
+      var username = context.user().get('username');
+      var newLocation = '/' + username;
+      var newFrame = newLocation + '/-/home';
+      window.history.pushState(newFrame, "", newLocation);
+      updateContent(newFrame);
     }
   });
 

@@ -386,7 +386,8 @@ define([
       var troupeId = message.troupeId;
       var totalUnreadItems = message.totalUnreadItems;
 
-      if(troupeId === context.getTroupeId()) return;
+      // This no longer makes sense as this is in a different frame
+      // if(troupeId === context.getTroupeId()) return;
 
       log('Updating troupeId' + troupeId + ' to ' + totalUnreadItems);
 
