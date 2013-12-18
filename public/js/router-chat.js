@@ -130,7 +130,6 @@ require([
     setTimeout(promptForHook, 1500);
   }
 
-
   if(context.popEvent('room_created_now')) {
     if (!context.getTroupe().oneToOne) {
       setTimeout(function() {
