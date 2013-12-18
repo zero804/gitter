@@ -3,8 +3,9 @@ define([
   'utils/context',
   'marionette',
   'hbs!./tmpl/troupeListItem',
-  'utils/appevents'
-], function(context, Marionette, troupeListItemTemplate, appEvents) {
+  'utils/appevents',
+  'utils/momentWrapper'
+], function(context, Marionette, troupeListItemTemplate, appEvents, moment) {
   "use strict";
 
   var createRoom = context.getUser().createRoom;
@@ -25,6 +26,10 @@ define([
     },
     clicked: function(e) {
       e.preventDefault();
+
+      // Make things feel a bit more responsive
+      this.model.set('lastAccessTime', moment());
+
       appEvents.trigger('navigation', this.model.get('url'), 'chat', this.model.get('name'));
     }
   });
