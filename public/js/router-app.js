@@ -5,14 +5,13 @@ require([
   'views/app/appIntegratedView',
   'views/toolbar/troupeMenu',
   'collections/instances/troupes',
-  'components/unread-items-frame-client',
   'components/titlebar',
   'views/widgets/preload', // No ref
   'components/webNotifications', // No ref
   'components/desktopNotifications', // No ref
   'components/errorReporter',  // No ref
   'template/helpers/all', // No ref
-], function(appEvents, context, AppIntegratedView, TroupeMenuView, troupeCollections, unreadItemsClient, TitlebarUpdater) {
+], function(appEvents, context, AppIntegratedView, TroupeMenuView, troupeCollections, TitlebarUpdater) {
   "use strict";
 
   var appView = new AppIntegratedView({ });
@@ -70,6 +69,9 @@ require([
       case 'context.troupeId':
         context.setTroupeId(message.troupeId);
         titlebarUpdater.updateTitlebar(message.name);
+        break;
+      case 'navigation':
+        appEvents.trigger('navigation', message.url, message.urlType, message.title);
         break;
     }
   });

@@ -86,7 +86,12 @@ define([
         // this doesn't entire fix the issue of the chat not clearing properly
         $('#chatInputForm').trigger('reset');
         view.$el.val('');
-        window.location = '/' + user;
+
+        var url = '/' + user;
+        var type = user === context.user().get('username') ? 'home' : 'chat';
+        var title = user;
+
+        appEvents.trigger('navigation', url, type, title);
       }
     },
     {
