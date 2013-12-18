@@ -16,11 +16,17 @@ require([
   appView.leftMenuRegion.show(new TroupeMenuView({ }));
 
   function updateContent(state) {
-    // TODO: update the title....
-    document.getElementById('content-frame').src = state;
+    if(state) {
+      // TODO: update the title....
+      document.getElementById('content-frame').src = state;
+    }
   }
 
   appEvents.on('navigation', function(url, type, title) {
+    // This is a bit hacky..
+    // Add a /-/ if the path only has one component
+    // so /moo/ goes to /moo/-/chat but
+    // /moo/foo goes to /moo/foo/chat
     var frameUrl = url + '/';
     if(url.substring(1).indexOf('/') < 0) {
       frameUrl += '-/';
