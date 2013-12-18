@@ -204,7 +204,7 @@ define([
             }
           },
           {
-            match: /(^|\s)\/(\w*)$/,
+            match: /(^)\/(\w*)$/,
             maxCount: 8,
             search: function(term, callback) {
               var matches = commandsList.filter(function(cmd) {

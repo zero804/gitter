@@ -4,6 +4,7 @@
 @import "trpNativeChat.less";
 @import "trpButtons.less";
 @import "trp3Vars.less";
+@import "icon-mixins.less";
 
 body {
   background-color: @trpDarkBlue;
@@ -104,31 +105,26 @@ header {
   display: none;
 }
 
-.github-ORG:before {
-  font-family: 'octicons';
-  content: '\f037';
-  margin-right: 8px;
-  opacity: 0.9;
-  width: 12px;
+.trpLeftMenuLinkItem {
+  width: 100%;
 }
 
-.github-REPO:before {
-  font-family: 'octicons';
-  content: '\f001';
-  margin-right: 8px;
-  opacity: 0.9;
-  width: 12px;
+.item-unread-badge {
+  float: right;
+  padding-bottom: 2px;
+  padding-right: 8px;
 }
 
-.githib-REPO.disabled:before{
-  opacity: 0.4;
+.github-ORG {
+  .prepend-org-icon;
 }
 
-.github-ONETOONE:before {
-  content: "@";
-  margin-right: 8px;
-  opacity: 0.9;
-  width: 12px;
+.github-REPO {
+  .prepend-repo-icon;
+}
+
+.github-ONETOONE {
+  .prepend-121-icon;
 }
 
 .trpLeftMenuProfile {

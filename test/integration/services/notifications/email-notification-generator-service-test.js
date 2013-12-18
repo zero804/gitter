@@ -24,7 +24,7 @@ var sendEmailNotifications = testRequire.withProxies('./services/notifications/e
 
 mockito.when(unreadItemServiceMock).markUserAsEmailNotified().thenReturn();
 
-describe('email-notification-service', function() {
+describe.skip('email-notification-service', function() {
 
   it('should do what it says on the tin', function(done) {
     return sendEmailNotifications(Date.now())

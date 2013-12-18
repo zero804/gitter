@@ -14,7 +14,8 @@ var serviceDisplayNames = {
   bitbucket: 'BitBucket',
   jenkins: 'Jenkins',
   travis: 'Travis',
-  sprintly: 'Sprint.ly'
+  sprintly: 'Sprint.ly',
+  trello: 'Trello'
 };
 
 function getIntegrations(req, res) {
