@@ -44,6 +44,10 @@ require([
 
   parent.postMessage(JSON.stringify({ type: "context.troupeId", troupeId: context.getTroupeId(), name: context.troupe().get('name') }), context.env('basePath'));
 
+  appEvents.on('navigation', function(url, type, title) {
+    parent.postMessage(JSON.stringify({ type: "navigation", url: url, urlType: type, title: title}), context.env('basePath'));
+  });
+
   var appView = new ChatIntegratedView({ el: 'body' });
   appView.rightToolbarRegion.show(new RightToolbarView());
 
