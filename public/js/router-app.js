@@ -5,12 +5,14 @@ require([
   'views/app/appIntegratedView',
   'views/toolbar/troupeMenu',
   'collections/instances/troupes',
+  'components/unread-items-frame-client',
+  'components/titlebar',
   'views/widgets/preload', // No ref
   'components/webNotifications', // No ref
   'components/desktopNotifications', // No ref
   'components/errorReporter',  // No ref
   'template/helpers/all', // No ref
-], function(appEvents, context, AppIntegratedView, TroupeMenuView, troupeCollections) {
+], function(appEvents, context, AppIntegratedView, TroupeMenuView, troupeCollections, unreadItemsClient, TitlebarUpdater) {
   "use strict";
 
   var appView = new AppIntegratedView({ });
@@ -36,6 +38,8 @@ require([
     }
   });
 
+  var titlebarUpdater = new TitlebarUpdater();
+
   appEvents.on('navigation', function(url, type, title) {
     // This is a bit hacky..
     // Add a /-/ if the path only has one component
@@ -46,6 +50,8 @@ require([
       frameUrl += '-/';
     }
     frameUrl += type;
+
+    titlebarUpdater.updateTitlebar(title);
 
     window.history.pushState(frameUrl, title, url);
     updateContent(frameUrl);
@@ -63,6 +69,8 @@ require([
     switch(message.type) {
       case 'context.troupeId':
         context.setTroupeId(message.troupeId);
+        titlebarUpdater.updateTitlebar(message.name);
+        break;
     }
   });
 

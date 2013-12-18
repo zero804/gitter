@@ -8,7 +8,7 @@ define([
   'components/realtime',
   '../troupes',
   '../orgs',
-  'components/unread-items-client',
+  'components/unread-items-frame-client',
   'filtered-collection' /* no ref */
 ], function($, _, Backbone, context, base, realtime, troupeModels, orgModels, unreadItemsClient) {
   "use strict";

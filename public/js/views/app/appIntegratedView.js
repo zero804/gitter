@@ -11,12 +11,11 @@ define([
   'views/widgets/avatar',
   // 'components/webNotifications',
   'components/modal-region',
-  'components/titlebar',
   'cocktail',
   // 'utils/scrollbar-detect',
   'bootstrap_tooltip'  // no ref
   ], function($, TroupeViews, context, appEvents, Marionette, /*UsernameView, ProfileView,*/ uiVars, AvatarView,
-    /*notifications,*/ modalRegion, TitlebarUpdater, cocktail/*, hasScrollBars*/) {
+    /*notifications,*/ modalRegion, cocktail/*, hasScrollBars*/) {
   "use strict";
 
   var touchEvents = {
@@ -54,9 +53,6 @@ define([
 
     initialize: function() {
       var self = this;
-
-      // Setup the title bar updater
-      new TitlebarUpdater();
 
       new AvatarView({
         el: $('#profile-icon'),
