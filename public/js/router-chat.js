@@ -81,22 +81,8 @@ require([
 
   new Router({
     routes: [
-      // { name: "file",             re: /^file\/(\w+)$/,            viewType: filePreviewView.Modal,               collection: itemCollections.files },
-      // { name: "request",          re: /^request\/(\w+)$/,         viewType: RequestDetailView.Modal,            collection: itemCollections.requests },
-      // { name: "invite",           re: /^invite\/(\w+)$/,          viewType: InviteDetailView.Modal,             collection: itemCollections.invites },
-      // { name: "filePreview",      re: /^file\/preview\/(\w+)$/,   viewType: filePreviewView.Modal,        collection: itemCollections.files },
-      // { name: "fileVersions",     re: /^file\/versions\/(\w+)$/,  viewType: fileVersionsView.Modal,       collection: itemCollections.files },
-      // { name: "mail",             re: /^mail\/(\w+)$/,            viewType: conversationDetailView.Modal, collection: itemCollections.conversations },
       { name: "person",           re: /^person\/(\w+)$/,          viewType: PersonDetailView.Modal,             collection: itemCollections.users },
-
-      // { name: "profile",          re: /^profile$/,                viewType: profileModal },
-      // { name: "profileEmails",    re: /^profile\/emails$/,        viewType: profileEmailView.Modal,       collection: userEmailCollection, skipModelLoad: true },
-      // { name: "profileEmailsAdd", re: /^profile\/emails\/add$/,   viewType: profileAddEmailView.Modal,    collection: userEmailCollection, skipModelLoad: true },
-      { name: "inv",               re: /^inv$/,                    viewType: inviteView.Modal },
-      // { name: "create",           re: /^create$/,                 viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true },
-      // { name: "upgradeOneToOne",  re: /^upgradeOneToOne$/,        viewType: createTroupeView.Modal,       collection: troupeCollections.troupes,   skipModelLoad: true, viewOptions: { upgradeOneToOne: true } } ,
-      // { name: "chooseUsername",   re: /^chooseUsername/,          viewType: UsernameView.Modal },
-      // { name: "reinvite",         re: /^reinvite\/(\w+)$/,        viewType: ReinviteModal,                collection: troupeCollections.outgoingConnectionInvites, viewOptions: { overrideContext: true, inviteToConnect: true } },
+      { name: "inv",              re: /^inv$/,                    viewType: inviteView.Modal },
       { name: "troupeSettings",   re: /^troupeSettings/,          viewType: troupeSettingsView },
       { name: "integrations",     re: /^integrations/,            viewType: IntegrationSettingsModal,  validationCheck: integrationsValidationCheck }
     ],
