@@ -85,7 +85,9 @@
     "parse-links": "~0.1.0",
     "async": "~0.2.9",
     "troupe-passport-github": "git://github.com/troupe/passport-github.git#v0.1.8d",
-    "text-filter": "~0.1.0"
+    "text-filter": "~0.1.0",
+    "marked": "~0.2.10",
+    "highlight.js": "~7.5.0"
   },
   "devDependencies": {
     "proxyquire": "0.4.0",
