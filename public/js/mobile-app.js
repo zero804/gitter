@@ -1,6 +1,7 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'jquery',
+  'utils/appevents',
   'collections/chat',
   'views/chat/chatCollectionView',
   'views/chat/chatInputView',
@@ -12,7 +13,7 @@ require([
   'views/toolbar/troupeMenu',
   'views/app/mobileAppView',
   'views/chat/decorators/emojiDecorator'
-  ], function($, chatModels, ChatCollectionView, chatInputView, Router, shareSearchView,
+  ], function($, appEvents, chatModels, ChatCollectionView, chatInputView, Router, shareSearchView,
     modalRegion, unreadItemsClient, Backbone, TroupeMenu, MobileAppView, emojiDecorator) {
   "use strict";
 
@@ -23,6 +24,10 @@ require([
   new TroupeMenu({
     el: $('#troupeList')
   }).render();
+
+  appEvents.on('navigation', function(url) {
+    window.location.href = url;
+  });
 
   var chatCollection = new chatModels.ChatCollection();
   chatCollection.listen();
