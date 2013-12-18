@@ -8,7 +8,6 @@ require([
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
   'collections/instances/integrated-items',
-  'collections/instances/troupes',
   'views/righttoolbar/rightToolbarView',
   'views/people/personDetailView',
   'views/shareSearch/inviteView',
@@ -25,8 +24,6 @@ require([
   'views/app/headerView',
 
   'views/widgets/preload', // No ref
-  'components/webNotifications', // No ref
-  'components/desktopNotifications', // No ref
   'components/errorReporter',  // No ref
   'filtered-collection', // No ref
   'components/dozy', // Sleep detection No ref
@@ -34,7 +31,7 @@ require([
   'components/eyeballs', // No ref
   'bootstrap-dropdown' // No ref
 ], function($, Backbone, context, appEvents, ChatIntegratedView, chatInputView,
-    ChatCollectionView, itemCollections, troupeCollections, RightToolbarView,
+    ChatCollectionView, itemCollections, RightToolbarView,
     PersonDetailView, inviteView, troupeSettingsView, IntegrationSettingsModal,
     Router, unreadItemsClient, FileDecorator, webhookDecorator, userDecorator,
     embedDecorator, emojiDecorator, HeaderView) {
@@ -45,17 +42,10 @@ require([
     $(this).parent().next().toggle();
   });
 
-  var troupeCollection = troupeCollections.troupes;
+  parent.postMessage(JSON.stringify({ type: "context.troupeId", troupeId: context.getTroupeId() }), context.env('basePath'));
 
   var appView = new ChatIntegratedView({ el: 'body' });
   appView.rightToolbarRegion.show(new RightToolbarView());
-
-  troupeCollection.on("remove", function(model) {
-    if(model.id == context.getTroupeId()) {
-      // TODO: tell the person that they've been kicked out of the troupe
-      window.location = '/' + context.user().get('username');
-    }
-  });
 
   new HeaderView({ model: context.troupe(), el: '#header' }).render();
 

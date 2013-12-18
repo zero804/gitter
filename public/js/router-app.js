@@ -1,14 +1,16 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global require:false */
 require([
   'utils/appevents',
+  'utils/context',
   'views/app/appIntegratedView',
   'views/toolbar/troupeMenu',
+  'collections/instances/troupes',
   'views/widgets/preload', // No ref
   'components/webNotifications', // No ref
   'components/desktopNotifications', // No ref
   'components/errorReporter',  // No ref
   'template/helpers/all', // No ref
-], function(appEvents, AppIntegratedView, TroupeMenuView) {
+], function(appEvents, context, AppIntegratedView, TroupeMenuView, troupeCollections) {
   "use strict";
 
   var appView = new AppIntegratedView({ });
@@ -18,9 +20,19 @@ require([
   function updateContent(state) {
     if(state) {
       // TODO: update the title....
+      context.setTroupeId(undefined);
       document.getElementById('content-frame').src = state;
     }
   }
+
+  var troupeCollection = troupeCollections.troupes;
+  troupeCollection.on("remove", function(model) {
+    if(model.id == context.getTroupeId()) {
+      var newLocation = '/' + context.user().get('username');
+      window.history.pushState(newLocation, "", newLocation);
+      updateContent(newLocation);
+    }
+  });
 
   appEvents.on('navigation', function(url, type, title) {
     // This is a bit hacky..
@@ -40,6 +52,16 @@ require([
   // Revert to a previously saved state
   window.addEventListener('popstate', function(event) {
     updateContent(event.state);
+  });
+
+  window.addEventListener('message', function(e) {
+    if(e.origin !== context.env('basePath')) return;
+
+    var message = JSON.parse(e.data);
+    switch(message.type) {
+      case 'context.troupeId':
+        context.setTroupeId(message.troupeId);
+    }
   });
 
   // Asynchronously load tracker
