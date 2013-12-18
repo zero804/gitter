@@ -73,6 +73,15 @@ function parseMessage(text) {
     return text;
   };
 
+  // Extract urls mentions and issues from headers (#8 is <h1>8</h1>) and ignore the <hx> part
+  r.heading = function(text) {
+    text   = '#' + text;
+    issues = issues.concat(urlExtractor.extractIssuesWithIndices(text));
+    return text;
+  };
+
+  console.log(issues);
+
   // Extract urls mentions and issues from lists
   // WIP: indices are relative to the <li> item and don't work in the context of an 
   // entire list or message :(
