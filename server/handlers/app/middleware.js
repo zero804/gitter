@@ -16,14 +16,18 @@ function uriContextResolverMiddleware(req, res, next) {
     .then(function(uriContext) {
       if(!uriContext.troupe && !uriContext.ownUrl) throw 404;
 
-      if(uriContext.hookCreationFailedDueToMissingScope) {
-        var events = req.session.events;
-        if(!events) {
-          events = [];
-          req.session.events = events;
-        }
+      var events = req.session.events;
+      if(!events) {
+        events = [];
+        req.session.events = events;
+      }
 
+      if(uriContext.hookCreationFailedDueToMissingScope) {        
         events.push('hooks_require_additional_public_scope');
+      }
+
+      if(uriContext.didCreate) {        
+        events.push('room_created_now');
       }
       req.troupe = uriContext.troupe;
       req.uriContext = uriContext;
