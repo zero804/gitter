@@ -106,7 +106,7 @@ define([
         issues = this.model.get('issues') || [];
       }
 
-      var html = this.model.get('html');
+      var html = this.model.get('html') || this.model.get('text');
       var linkedHtml = linkify(html, links, mentions, issues).toString();
       this.$el.find('.trpChatText').html(linkedHtml);
 
