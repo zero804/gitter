@@ -154,5 +154,9 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
   q.sort(options.sort || { sent: 'desc' })
     .limit(options.limit || 50)
     .skip(options.skip || 0)
-    .exec(callback);
+    .exec(function(err, results) {
+      if(err) return callback(err);
+
+      return callback(null, results.reverse());
+    });
 };

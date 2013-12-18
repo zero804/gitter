@@ -76,11 +76,6 @@ function renderChatPage(req, res, next) {
     restful.serializeChatsForTroupe(troupe.id, req.user.id, { limit: INITIAL_CHAT_COUNT })
     ]).spread(function(troupeContext, chats) {
 
-      // Reverse the order of the chats on the page
-      chats.sort(function(a, b) {
-        return a.sent - b.sent;
-      });
-
       res.render('chat-template', {
         appCache: getAppCache(req),
         bootScriptName: 'router-chat',
