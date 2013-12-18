@@ -67,7 +67,7 @@ define([
   var recentTroupeCollection = new Backbone.Collection();
 
   // when the list of troupes come in filter them and put them in recentTroupeCollection
-  troupeCollection.on('reset sync', function() {
+  troupeCollection.on('reset sync change:lastAccessTime', function() {
     // filter out troupes that don't have a last access time
     var recentTroupeModels = _.filter(troupeCollection.models, function(v) {
       return !!v.get('lastAccessTime');

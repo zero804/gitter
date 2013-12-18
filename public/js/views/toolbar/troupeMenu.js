@@ -99,7 +99,7 @@ define([
       function toggler(element, collection) {
         function toggle() {
           self.$el.find(element).toggle(collection.length > 0);
-          self.$el.find('.nano').nanoScroller(/*{ preventPageScrolling: true }*/);
+          self.$el.find('.nano').nanoScroller();
         }
 
         collection.on('all', toggle);
