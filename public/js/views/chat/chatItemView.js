@@ -19,12 +19,10 @@ define([
   'utils/safe-html',
   'utils/momentWrapper',
   'cocktail',
-  'markdown',
-  'highlight',
   'bootstrap_tooltip', // No ref
   'bootstrap-popover' // No ref
 ], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews,
-  issuePopoverTemplate, issuePopoverTitleTemplate, chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml, moment, cocktail, markdown, highlight /* tooltip, popover*/) {
+  issuePopoverTemplate, issuePopoverTitleTemplate, chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml, moment, cocktail /* tooltip, popover*/) {
 
   "use strict";
 
@@ -92,7 +90,7 @@ define([
 
     onChange: function() {
       var changed = this.model.changed;
-      if ('text' in changed || 'urls' in changed || 'mentions' in changed) {
+      if ('html' in changed || 'text' in changed || 'urls' in changed || 'mentions' in changed) {
         this.renderText();
       }
 
@@ -108,23 +106,9 @@ define([
         issues = this.model.get('issues') || [];
       }
 
-      var code = this.model.get('text').match(/```[\s\S]*.+```/);
-      var message;
-      if (code) {
-        message = this.model.get('text').replace(code[0], '');
-      } else {
-        message = this.model.get('text');
-      }
-
-
-      console.debug(code, message);
-
-      var richText = linkify(message, links, mentions, issues).toString();
-
-      richText = markdown(richText + code);
-      this.$el.find('.trpChatText').html(richText);
-
-      if (this.$el.find('pre code').length > 0) highlight.highlightBlock(this.$el.find('pre code')[0]);
+      var html = this.model.get('html');
+      var linkedHtml = linkify(html, links, mentions, issues).toString();
+      this.$el.find('.trpChatText').html(linkedHtml);
 
       this.highlightMention();
       this.setIssueStatusClasses();
@@ -269,6 +253,7 @@ define([
       if (this.isEditing) {
         if (this.canEdit() && newText != this.model.get('text')) {
           this.model.set('text', newText);
+          this.model.set('html', safeHtml(newText));
           this.model.save();
         }
 
