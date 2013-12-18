@@ -150,6 +150,16 @@ require([
     setTimeout(promptForHook, 1500);
   }
 
+
+  if(context.popEvent('room_created_now')) {
+    if (!context.getTroupe().oneToOne) {
+      setTimeout(function() {
+        window.location.hash = "!|inv";
+      }, 500);
+    }
+  }
+
+
   if(!window.localStorage.troupeTourApp) {
     window.localStorage.troupeTourApp = 1;
     require([
