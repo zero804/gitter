@@ -40,22 +40,6 @@ function renderHomePage(req, res, next) {
   });
 }
 
-function renderMobileUserHome(req, res, next) {
-  contextGenerator.generateMiniContext(req, function(err, troupeContext) {
-    if(err) return next(err);
-    var user = req.user;
-
-    res.render('mobile/mobile-app', {
-      useAppCache: !!nconf.get('web:useAppCache'),
-      bootScriptName: 'mobile-userhome',
-      troupeName: (user && user.displayName) || '',
-      troupeContext: troupeContext,
-      agent: req.headers['user-agent'],
-      isUserhome: true
-    });
-  });
-}
-
 
 function renderMainFrame(req, res, next, frame) {
   contextGenerator.generateMiniContext(req)
@@ -105,6 +89,22 @@ function renderChatPage(req, res, next) {
     .fail(next);
 }
 
+function renderMobileUserHome(req, res, next) {
+  contextGenerator.generateMiniContext(req, function(err, troupeContext) {
+    if(err) return next(err);
+    var user = req.user;
+
+    res.render('mobile/mobile-app', {
+      useAppCache: !!nconf.get('web:useAppCache'),
+      bootScriptName: 'mobile-userhome',
+      troupeName: (user && user.displayName) || '',
+      troupeContext: troupeContext,
+      agent: req.headers['user-agent'],
+      isUserhome: true
+    });
+  });
+}
+
 function renderMobileChat(req, res, next) {
   var troupe = req.uriContext.troupe;
 
@@ -113,7 +113,7 @@ function renderMobileChat(req, res, next) {
     restful.serializeChatsForTroupe(troupe.id, req.user.id, { limit: INITIAL_CHAT_COUNT })
     ]).spread(function(troupeContext, chats) {
 
-      res.render('app-template', {
+      res.render('mobile/mobile-app', {
         appCache: getAppCache(req),
         bootScriptName: 'mobile-app',
         troupeName: troupeContext.troupe.uri || troupeContext.troupe.name,
