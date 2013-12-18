@@ -42,7 +42,7 @@ require([
     $(this).parent().next().toggle();
   });
 
-  parent.postMessage(JSON.stringify({ type: "context.troupeId", troupeId: context.getTroupeId() }), context.env('basePath'));
+  parent.postMessage(JSON.stringify({ type: "context.troupeId", troupeId: context.getTroupeId(), name: context.troupe().get('name') }), context.env('basePath'));
 
   var appView = new ChatIntegratedView({ el: 'body' });
   appView.rightToolbarRegion.show(new RightToolbarView());

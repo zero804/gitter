@@ -404,81 +404,6 @@ define([
   };
 
 
-  // -----------------------------------------------------
-  // Counts all the unread items in a troupe collection and
-  // publishes notifications on changes
-  // -----------------------------------------------------
-
-  var TroupeUnreadNotifier = function(troupeCollection, store) {
-    this._collection = troupeCollection;
-    this._store = store;
-
-    this._currentStoreValueChanged = _.bind(this._currentStoreValueChanged, this);
-
-    this._recountLimited = limit(this._recount, this, 50);
-    this._collection.on('change:unreadItems', this._recountLimited);
-    this._collection.on('reset', this._recountLimited);
-    this._collection.on('sync', this._recountLimited);
-    this._collection.on('add', this._recountLimited);
-    this._collection.on('remove', this._recountLimited);
-    this._collection.on('destroy', this._recountLimited);
-
-    if(store) {
-      this._store.on('newcountvalue', this._currentStoreValueChanged);
-    }
-
-    this._recountLimited();
-  };
-
-  // storing the previous counts here so we can return it to outside callers,
-  // even though we don't always have a reference to TroupeNotifier internally.
-  // TODO: fix this enormous hack!
-  var counts = {
-    other: 0,
-    overall: null,
-    normal: null,
-    oneToOne: null,
-    current: null
-  };
-
-  TroupeUnreadNotifier.prototype = {
-    _currentStoreValueChanged: function() {
-      this._recountLimited();
-    },
-
-
-    _recount: function() {
-      var self = this;
-      function count(memo, troupe) {
-        if(context.getTroupeId() && troupe.get('id') === context.getTroupeId()) {
-          return memo + (self._store._currentCount() > 0 ? 1 : 0);
-        }
-
-        var c = troupe.get('unreadItems');
-        return memo + (c > 0 ? 1 : 0);
-      }
-
-      var c = this._collection;
-
-      var newTroupeUnreadTotal = c.reduce(count, counts.other);
-      var newPplTroupeUnreadTotal = c.filter(function(trp) { return trp.get('oneToOne'); }).reduce(count, 0);
-      var newNormalTroupeUnreadTotal = c.filter(function(trp) { return !trp.get('oneToOne'); }).reduce(count, 0);
-
-      //if(newTroupeUnreadTotal !== counts.overall ||
-      //   newPplTroupeUnreadTotal !== counts.oneToOne ||
-      //   newNormalTroupeUnreadTotal !== counts.normal) {
-
-        // TODO: fix this enormous hack!
-        counts.overall = newTroupeUnreadTotal;
-        counts.oneToOne = newPplTroupeUnreadTotal;
-        counts.normal = newNormalTroupeUnreadTotal;
-        counts.current = this._store && this._store._currentCount();
-
-        $(document).trigger('troupeUnreadTotalChange', counts);
-      //}
-    }
-
-  };
 
 
   // -----------------------------------------------------
@@ -628,7 +553,7 @@ define([
   function getUnreadItemStore() {
     if(_unreadItemStore) return _unreadItemStore;
 
-    if(context.getUserId() && context.getTroupe()) {
+    if(context.getUserId() && context.troupe().id) {
       _unreadItemStore = new UnreadItemStore();
       new ReadItemSender(_unreadItemStore);
       var realtimeSync = new TroupeUnreadItemRealtimeSync(_unreadItemStore);
@@ -655,22 +580,6 @@ define([
 
   var unreadItemsClient = {
 
-    // This method sucks. TODO: make it not suck
-    getCounts: function() {
-      return {
-        others: counts.other,
-        overall: counts.overall,
-        normal: counts.normal,
-        oneToOne: counts.oneToOne,
-        current: _unreadItemStore ? _unreadItemStore._currentCount() : undefined
-      };
-    },
-
-    setOtherCount: function(count) {
-      counts.other = count;
-      // Note: this should trigger a recount but that is done from the caller because we don't have a reference to the TroupeNotifier instance.
-    },
-
     hasItemBeenMarkedAsRead: function(itemType, itemId) {
       var unreadItemStore = getUnreadItemStoreReq();
 
@@ -679,19 +588,6 @@ define([
       }
 
       return unreadItemStore._hasItemBeenMarkedAsRead(itemType, itemId);
-    },
-
-    installTroupeListener: function(troupeCollection) {
-      var unreadItemStore = getUnreadItemStore();
-
-      new TroupeCollectionRealtimeSync(troupeCollection)._subscribe();
-
-      if(unreadItemStore) {
-        new TroupeCollectionSync(troupeCollection, unreadItemStore);
-      }
-
-      /* Store can be optional below */
-      new TroupeUnreadNotifier(troupeCollection, unreadItemStore);
     },
 
     syncCollections: function(collections) {
@@ -719,8 +615,6 @@ define([
   unreadItemsClient.Tarpit = Tarpit;
   unreadItemsClient.UnreadItemStore = UnreadItemStore;
   unreadItemsClient.TroupeCollectionSync = TroupeCollectionSync;
-  unreadItemsClient.TroupeCollectionRealtimeSync = TroupeCollectionRealtimeSync;
-  unreadItemsClient.TroupeUnreadNotifier = TroupeUnreadNotifier;
 
   return unreadItemsClient;
 });
