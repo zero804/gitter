@@ -25,7 +25,7 @@ function renderHomePage(req, res, next) {
       page = 'mobile/mobile-app';
       bootScriptName = 'mobile-userhome';
     } else {
-      page = 'app-template';
+      page = 'userhome-template';
       bootScriptName = 'userhome';
     }
 
