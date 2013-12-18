@@ -18,7 +18,11 @@ module.exports = {
             return limitedReleaseService.shouldUserBeTurnedAway(req.user)
               .then(function(allow) {
                 if(allow) {
-                  appRender.renderMainFrame(req, res, next, 'home');
+                  if(req.isPhone) {
+                    appRender.renderMobileUserHome(req, res, next, 'home');
+                  } else {
+                    appRender.renderMainFrame(req, res, next, 'home');
+                  }
                 } else {
                   var email = req.user.emails[0];
                   return res.render('thanks', { email: email, userEmailAccess: req.user.hasGitHubScope('user:email') });
@@ -54,7 +58,11 @@ module.exports = {
         appMiddleware.uriContextResolverMiddleware,
         appMiddleware.isPhoneMiddleware,
         function(req, res, next) {
-          appRender.renderMainFrame(req, res, next, 'chat');
+          if(req.isPhone) {
+            appRender.renderMobileChat(req, res, next);
+          } else {
+            appRender.renderMainFrame(req, res, next, 'chat');
+          }
         });
 
       app.get('/:userOrOrg/:repo/chat',
