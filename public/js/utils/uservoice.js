@@ -19,7 +19,7 @@ define([
         UserVoice.push(['autoprompt', {}]);
         UserVoice.push(['addTrigger', element[0], { }]);
         UserVoice.push(['identify', {
-          username: user.username,
+          name: user.username,
           id: user.id
         }]);
       });;

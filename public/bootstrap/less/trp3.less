@@ -836,6 +836,7 @@ i.favourited:before {
   font-size: 20px;
   transition:all .5s ease-in-out;
   font-style: normal;
+  -webkit-font-smoothing: antialiased;
 }
 
 i.unfavourited:before {
@@ -847,6 +848,7 @@ i.unfavourited:before {
   font-size: 20px;
   transition:all .5s ease-in-out;
   font-style: normal;
+  -webkit-font-smoothing: antialiased;
 }
 
 i.unfavourited:hover:before {
@@ -1458,6 +1460,7 @@ i.favourited:hover:before {
 .trpChatInputArea {
   display: block;
   text-align: center;
+  max-height: 160px;
   margin-left: @leftMarginFull;
   margin-right: @rightMarginFull;
   .transition300ms;
