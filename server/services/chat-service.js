@@ -80,10 +80,8 @@ function parseMessage(text) {
     return text;
   };
 
-  console.log(issues);
-
   // Extract urls mentions and issues from lists
-  // WIP: indices are relative to the <li> item and don't work in the context of an 
+  // WIP: indices are relative to the <li> item and don't work in the context of an
   // entire list or message :(
   r.listitem = function(text) {
     // urls      = urls.concat(urlExtractor.extractUrlsWithIndices(text));
@@ -98,7 +96,7 @@ function parseMessage(text) {
   };
 
   // Generate HTML version of the message using our renderer
-  var html = marked(text, {renderer: r});
+  var html = marked(text, { gfm: true, tables: true, sanitize: true, breaks: true, renderer: r});
 
   return {
     text: text,
@@ -130,7 +128,7 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   chatMessage.urls      = parsedMessage.urls;
   chatMessage.mentions  = parsedMessage.mentions;
   chatMessage.issues    = parsedMessage.issues;
-  chatMessage._md = urlExtractor.version;
+  chatMessage._md       = urlExtractor.version;
 
   chatMessage.save(function (err) {
     if(err) return callback(err);

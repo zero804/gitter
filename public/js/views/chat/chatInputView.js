@@ -148,7 +148,7 @@ define([
             match: /(^|\s)#(\w*)$/,
             maxCount: 8,
             search: function(term, callback) {
-              $.getJSON('/api/v1/troupes/'+context.getTroupeId()+'/issues', { q: term })
+              $.getJSON('/api/v1/troupes/' + context.getTroupeId() + '/issues', { q: term })
                 .done(function(resp) {
                   callback(resp);
                 })
@@ -249,7 +249,6 @@ define([
       if(val) {
         var model = this.collection.create({
           text: val,
-          html: safeHtml(val),
           fromUser: context.getUser(),
           sent: moment()
         });
