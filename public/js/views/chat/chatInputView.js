@@ -10,14 +10,13 @@ define([
   'hbs!./tmpl/typeaheadListItem',
   'hbs!./tmpl/emojiTypeaheadListItem',
   'utils/momentWrapper',
-  'utils/safe-html',
   'utils/scrollbar-detect',
   'collections/instances/integrated-items',
   'utils/emoji',
   'jquery-textcomplete', // No ref
   'jquery-sisyphus' // No ref
 ], function(log, $, _, context, TroupeViews, appEvents, template, listItemTemplate,
-  emojiListItemTemplate, moment, safeHtml, hasScrollBars, itemCollections, emoji) {
+  emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji) {
   "use strict";
 
   /** @const */
@@ -384,7 +383,6 @@ define([
     },
 
     send: function() {
-      //this.trigger('save', safeHtml(this.$el.val()));
       this.trigger('save', this.$el.val());
       $('#chatInputForm').trigger('reset');
       this.$el.val('');

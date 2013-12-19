@@ -1,16 +1,18 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var persistence   = require("./persistence-service"),
-    collections   = require("../utils/collections"),
-    troupeService = require("./troupe-service"),
-    statsService  = require("./stats-service"),
-    TwitterText   = require('../utils/twitter-text'),
-    urlExtractor  = require('../utils/url-extractor'),
-    safeHtml      = require('../utils/safe-html'),
-    ent           = require('ent'),
-    marked        = require('marked'),
-    highlight     = require('highlight.js');
+var persistence   = require("./persistence-service");
+var collections   = require("../utils/collections");
+var troupeService = require("./troupe-service");
+var statsService  = require("./stats-service");
+// var TwitterText   = require('../utils/twitter-text');
+var urlExtractor  = require('../utils/url-extractor');
+var safeHtml      = require('../utils/safe-html');
+var ent           = require('ent');
+// var marked        = require('marked');
+// var highlight     = require('highlight.js');
+var processChat   = require('../utils/process-chat');
+var _             = require('underscore');
 
 /* @const */
 var MAX_CHAT_EDIT_AGE_SECONDS = 300;
@@ -34,9 +36,9 @@ exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
   chatMessage.text = text;
 
   // Metadata
-  chatMessage.urls     = urlExtractor.extractUrlsWithIndices(text);
-  chatMessage.mentions = TwitterText.extractMentionsWithIndices(text);
-  chatMessage.issues   = urlExtractor.extractIssuesWithIndices(text);
+  // chatMessage.urls     = urlExtractor.extractUrlsWithIndices(text);
+  // chatMessage.mentions = TwitterText.extractMentionsWithIndices(text);
+  // chatMessage.issues   = urlExtractor.extractIssuesWithIndices(text);
   chatMessage._md      = urlExtractor.version;
   chatMessage.meta     = meta;
 
@@ -50,62 +52,63 @@ exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
   });
 };
 
-function parseMessage(text) {
-  // Important. Do not remove! This encodes html entities (<, >, etc)
-  marked.setOptions({sanitize: true});
 
-  var urls      = [];
-  var mentions  = [];
-  var issues    = [];
+// function parseMessage(text) {
+//   // Important. Do not remove! This encodes html entities (<, >, etc)
+//   marked.setOptions({sanitize: true});
 
-  var r = new marked.Renderer();
+//   var urls      = [];
+//   var mentions  = [];
+//   var issues    = [];
 
-  // Highlight code blocks
-  r.code = function(code) {
-    return '<pre><code>' + highlight.highlightAuto(code).value + '</code></pre>';
-  };
+//   var r = new marked.Renderer();
 
-  // Extract urls mentions and issues from paragraphs
-  r.paragraph = function(text) {
-    urls      = urls.concat(urlExtractor.extractUrlsWithIndices(text));
-    mentions  = mentions.concat(TwitterText.extractMentionsWithIndices(text));
-    issues    = issues.concat(urlExtractor.extractIssuesWithIndices(text));
-    return text;
-  };
+//   // Highlight code blocks
+//   r.code = function(code) {
+//     return '<pre><code>' + highlight.highlightAuto(code).value + '</code></pre>';
+//   };
 
-  // Extract urls mentions and issues from headers (#8 is <h1>8</h1>) and ignore the <hx> part
-  r.heading = function(text) {
-    text   = '#' + text;
-    issues = issues.concat(urlExtractor.extractIssuesWithIndices(text));
-    return text;
-  };
+//   // Extract urls mentions and issues from paragraphs
+//   r.paragraph = function(text) {
+//     urls      = urls.concat(urlExtractor.extractUrlsWithIndices(text));
+//     mentions  = mentions.concat(TwitterText.extractMentionsWithIndices(text));
+//     issues    = issues.concat(urlExtractor.extractIssuesWithIndices(text));
+//     return text;
+//   };
 
-  // Extract urls mentions and issues from lists
-  // WIP: indices are relative to the <li> item and don't work in the context of an
-  // entire list or message :(
-  r.listitem = function(text) {
-    // urls      = urls.concat(urlExtractor.extractUrlsWithIndices(text));
-    // mentions  = mentions.concat(TwitterText.extractMentionsWithIndices(text));
-    // issues    = issues.concat(urlExtractor.extractIssuesWithIndices(text));
-    return '<li>' + text + '</li>';
-  };
+//   // Extract urls mentions and issues from headers (#8 is <h1>8</h1>) and ignore the <hx> part
+//   r.heading = function(text) {
+//     text   = '#' + text;
+//     issues = issues.concat(urlExtractor.extractIssuesWithIndices(text));
+//     return text;
+//   };
 
-  // Do not autolink, we do this client-side
-  r.link = function(href, title, text) {
-    return text;
-  };
+//   // Extract urls mentions and issues from lists
+//   // WIP: indices are relative to the <li> item and don't work in the context of an
+//   // entire list or message :(
+//   r.listitem = function(text) {
+//     // urls      = urls.concat(urlExtractor.extractUrlsWithIndices(text));
+//     // mentions  = mentions.concat(TwitterText.extractMentionsWithIndices(text));
+//     // issues    = issues.concat(urlExtractor.extractIssuesWithIndices(text));
+//     return '<li>' + text + '</li>';
+//   };
 
-  // Generate HTML version of the message using our renderer
-  var html = marked(text, { gfm: true, tables: true, sanitize: true, breaks: true, renderer: r});
+//   // Do not autolink, we do this client-side
+//   r.link = function(href, title, text) {
+//     return text;
+//   };
 
-  return {
-    text: text,
-    html: html,
-    urls: urls,
-    mentions: mentions,
-    issues: issues
-  };
-}
+//   // Generate HTML version of the message using our renderer
+//   var html = marked(text, { gfm: true, tables: true, sanitize: true, breaks: true, renderer: r});
+
+//   return {
+//     text: text,
+//     html: html,
+//     urls: urls,
+//     mentions: mentions,
+//     issues: issues
+//   };
+// }
 
 
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
@@ -121,8 +124,9 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   // Keep the raw message.
   chatMessage.text      = text;
 
-  var parsedMessage = parseMessage(text);
-  chatMessage.html = parsedMessage.html;
+  var parsedMessage = processChat(text);
+  chatMessage.html  = parsedMessage.html;
+  console.log(parsedMessage);
 
   // Metadata
   chatMessage.urls      = parsedMessage.urls;
@@ -165,12 +169,12 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
 
   // Very important that we decode and re-encode!
   newText = ent.decode(newText);
-  newText = safeHtml(newText); // NB don't use ent for encoding as it's a bit overzealous!
+  newText = _.encode(newText); // NB don't use ent for encoding as it's a bit overzealous!
 
   chatMessage.text = newText;
   chatMessage.editedAt = new Date();
 
-  var parsedMessage = parseMessage(newText);
+  var parsedMessage = processChat(newText);
   chatMessage.html = parsedMessage.html;
 
   // Metadata

@@ -13,7 +13,7 @@ var handlebars        = require('handlebars');
 var winston           = require("winston");
 var collections       = require("../utils/collections");
 var predicates        = collections.predicates;
-var marked            = require("marked");
+var processChat       = require('../utils/process-chat');
 
 // TODO: Fix this, use the CDN and code sign URLS
 function privateCdn(url) {
@@ -497,12 +497,20 @@ function ChatStrategy(options)  {
     //} else {
     //  html = marked(item.text);
     //}
+    var html, text;
+    if(item._md < 5) {
+      text = item.text;
+      html = _.decode(text);
+      html = processChat(html);
+    } else {
+      html = item.html;
+      text = item.text;
+    }
 
     return {
       id: item._id,
       text: item.text,
       html: item.html,
-      code: item.code,
       sent: formatDate(item.sent),
       editedAt: formatDate(item.editedAt),
       fromUser: options.user ? options.user : userStategy.map(item.fromUserId),

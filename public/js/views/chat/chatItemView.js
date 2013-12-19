@@ -15,14 +15,12 @@ define([
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
-  'template/helpers/linkify',
-  'utils/safe-html',
   'utils/momentWrapper',
   'cocktail',
   'bootstrap_tooltip', // No ref
   'bootstrap-popover' // No ref
 ], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews,
-  issuePopoverTemplate, issuePopoverTitleTemplate, chatItemTemplate, chatInputView, UnreadItemViewMixin, linkify, safeHtml, moment, cocktail /* tooltip, popover*/) {
+  issuePopoverTemplate, issuePopoverTitleTemplate, chatItemTemplate, chatInputView, UnreadItemViewMixin, moment, cocktail /* tooltip, popover*/) {
 
   "use strict";
 
@@ -95,7 +93,7 @@ define([
 
     onChange: function() {
       var changed = this.model.changed;
-      if ('html' in changed || 'text' in changed || 'urls' in changed || 'mentions' in changed) {
+      if ('html' in changed /*|| 'text' in changed || 'urls' in changed || 'mentions' in changed*/) {
         this.renderText();
       }
 
@@ -104,19 +102,18 @@ define([
 
     renderText: function() {
       // We need to parse the text a little to hyperlink known links and escape html to prevent injection
-      var links = this.model.get('urls') || [];
-      var mentions = this.model.get('mentions') || [];
+      // var links = this.model.get('urls') || [];
+      // var mentions = this.model.get('mentions') || [];
       var issues = [];
       if(context().troupe.githubType === 'REPO') {
         issues = this.model.get('issues') || [];
       }
 
       // Will only use the text when a value hasn't been returned from the server
-      // ................
       var html = this.model.get('html') || _.escape(this.model.get('text'));
 
-      var linkedHtml = linkify(html, links, mentions, issues).toString();
-      this.$el.find('.trpChatText').html(linkedHtml);
+      //var linkedHtml = linkify(html, links, mentions, issues).toString();
+      this.$el.find('.trpChatText').html(html);
 
       this.highlightMention();
       this.setIssueStatusClasses();
@@ -204,7 +201,7 @@ define([
     },
 
     setIssueStatusClasses: function() {
-      this.$el.find('.trpChatText .issue').each(function() {
+      this.$el.find('*[data-link-type="issue"]').each(function() {
         var $issue = $(this);
         var issueNumber = $issue.text().substring(1);
         var url = '/api/v1/troupes/'+ context().troupe.id + '/issues/' + issueNumber;
@@ -326,7 +323,7 @@ define([
       // create inputview
       chatInputText.html("<textarea class='trpChatInput'></textarea>");
 
-      var unsafeText = safeHtml.unsafe(this.model.get('text'));
+      var unsafeText = this.model.get('text');
       var textarea = chatInputText.find('textarea').val(unsafeText).select();
 
       this.inputBox = new chatInputView.ChatInputBoxView({ el: textarea });

@@ -7,7 +7,7 @@ var contextGenerator  = require('../../web/context-generator');
 var restful           = require('../../services/restful');
 
 /* How many chats to send back */
-var INITIAL_CHAT_COUNT = 20;
+var INITIAL_CHAT_COUNT = 10;
 
 function getAppCache(req) {
   if(!nconf.get('web:useAppCache')) return;
