@@ -88,6 +88,7 @@ module.exports = exports = function(model) {
   var m = _.extend({}, model, {
     displayName: displayName = model.fromUser && model.fromUser.displayName,
     text: text,
+    html: model.html || model.text,
     webhookClass: webhookClass
   }, widgetHelpers);
 
