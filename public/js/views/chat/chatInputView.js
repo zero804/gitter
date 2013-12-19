@@ -21,6 +21,7 @@ define([
   "use strict";
 
   /** @const */
+  // trpChatInputArea max-height in trp3.less needs to be adjusted if this changes
   var MAX_CHAT_HEIGHT = 145;
 
   /** @const */
