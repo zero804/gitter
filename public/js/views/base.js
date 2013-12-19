@@ -119,8 +119,8 @@ define([
           widget.render();
           $(element).replaceWith(widget.el);
       }
-
-      var dom = $($.parseHTML(this.template(data)));
+      var generatedText = this.template(data);
+      var dom = $($.parseHTML(generatedText));
       dom.addClass("view");
 
       if(data.renderViews) {

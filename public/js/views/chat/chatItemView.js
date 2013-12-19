@@ -80,7 +80,9 @@ define([
         }
       }
       data.readByText = this.getReadByText(data.readBy);
-
+      if(!data.html) {
+        data.html = _.escape(data.text);
+      }
       return data;
     },
 
@@ -109,7 +111,10 @@ define([
         issues = this.model.get('issues') || [];
       }
 
-      var html = this.model.get('html') || this.model.get('text');
+      // Will only use the text when a value hasn't been returned from the server
+      // ................
+      var html = this.model.get('html') || _.escape(this.model.get('text'));
+
       var linkedHtml = linkify(html, links, mentions, issues).toString();
       this.$el.find('.trpChatText').html(linkedHtml);
 
@@ -119,9 +124,6 @@ define([
       _.each(this.decorators, function(decorator) {
         decorator.decorate(this);
       }, this);
-    },
-
-    beforeRender: function() {
     },
 
     afterRender: function() {
@@ -256,7 +258,7 @@ define([
       if (this.isEditing) {
         if (this.canEdit() && newText != this.model.get('text')) {
           this.model.set('text', newText);
-          this.model.set('html', safeHtml(newText));
+          this.model.set('html', null);
           this.model.save();
         }
 
