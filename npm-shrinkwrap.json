@@ -1608,9 +1608,9 @@
       "from": "text-filter@"
     },
     "marked": {
-      "version": "0.2.10",
-      "from": "marked@git://github.com/chjj/marked.git#abce5d0d6dbad0f7a19f009510a71708f539c4d6",
-      "resolved": "git://github.com/chjj/marked.git#abce5d0d6dbad0f7a19f009510a71708f539c4d6"
+      "version": "0.2.10-b",
+      "from": "marked@git://github.com/gitterHQ/marked.git#ae5b3de555bdaf87f1e812c7fda9337c9c468128",
+      "resolved": "git://github.com/gitterHQ/marked.git#ae5b3de555bdaf87f1e812c7fda9337c9c468128"
     },
     "highlight.js": {
       "version": "7.5.0",
