@@ -10,7 +10,7 @@ define([
   'hbs!./tmpl/generic',
   'hbs!./tmpl/trello'
 ], function(
-  TroupeViews, 
+  TroupeViews,
   githubTemplate,
   bitbucketTemplate,
   jenkinsTemplate,
@@ -53,7 +53,8 @@ define([
 
 
   function showNotificationIcon(chatItemView, meta) {
-
+    // NB NB NB: update the matching list at
+    // server/web/prerender-chat-helper.js
     var favicons = {
       github:     'https://github.com/favicon.ico',
       bitbucket:  'https://bitbucket.org/favicon.ico',
@@ -63,9 +64,11 @@ define([
       trello:     'https://trello.com/favicon.ico'
     };
 
+    // NB NB NB: update the matching list at
+    // server/web/prerender-chat-helper.js
     var human_actions = {
       push:           'pushed',
-      issues:         'an issue',   
+      issues:         'an issue',
       issue_comment:  'commented on an issue',
       commit_comment: 'commented on a commit',
       pull_request:   'a Pull Request',
@@ -79,29 +82,30 @@ define([
 
     var viewData = meta;
     viewData.favicon = favicons[meta.service];
+    var webhookView;
 
     switch (meta.service) {
       case 'github':
         viewData.human_action = human_actions[meta.event];
-        var webhookView = new GithubView();
+        webhookView = new GithubView();
         break;
       case 'bitbucket':
-        var webhookView = new BitbucketView();
+        webhookView = new BitbucketView();
         break;
       case 'jenkins':
-        var webhookView = new JenkinsView();
+        webhookView = new JenkinsView();
         break;
       case 'travis':
-        var webhookView = new TravisView();
+        webhookView = new TravisView();
         break;
       case 'sprintly':
-        var webhookView = new SprintlyView();
+        webhookView = new SprintlyView();
         break;
       case 'trello':
-        var webhookView = new TrelloView();
+        webhookView = new TrelloView();
         break;
       default:
-        var webhookView = new GenericView();
+        webhookView = new GenericView();
         break;
     }
 

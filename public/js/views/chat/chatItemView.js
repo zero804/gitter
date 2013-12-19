@@ -33,6 +33,9 @@ define([
   var EDIT_WINDOW = 240000;
 
   var ChatItemView = TroupeViews.Base.extend({
+    attributes: {
+      class: 'trpChatItemContainer'
+    },
     unreadItemType: 'chat',
     template: chatItemTemplate,
     isEditing: false,
@@ -90,7 +93,7 @@ define([
 
     onChange: function() {
       var changed = this.model.changed;
-      if ('text' in changed || 'urls' in changed || 'mentions' in changed) {
+      if ('html' in changed || 'text' in changed || 'urls' in changed || 'mentions' in changed) {
         this.renderText();
       }
 
@@ -106,18 +109,19 @@ define([
         issues = this.model.get('issues') || [];
       }
 
-      var richText = linkify(this.model.get('text'), links, mentions, issues).toString();
-      richText = richText.replace(/\n\r?/g, '<br>');
-      this.$el.find('.trpChatText').html(richText);
+      var html = this.model.get('html') || this.model.get('text');
+      var linkedHtml = linkify(html, links, mentions, issues).toString();
+      this.$el.find('.trpChatText').html(linkedHtml);
 
       this.highlightMention();
       this.setIssueStatusClasses();
 
-      //if (this.decorator) this.decorator.enrich(this);
-
       _.each(this.decorators, function(decorator) {
         decorator.decorate(this);
       }, this);
+    },
+
+    beforeRender: function() {
     },
 
     afterRender: function() {
@@ -201,7 +205,7 @@ define([
       this.$el.find('.trpChatText .issue').each(function() {
         var $issue = $(this);
         var issueNumber = $issue.text().substring(1);
-        var url = '/api/v1/troupes/'+context().troupe.id+'/issues/'+issueNumber;
+        var url = '/api/v1/troupes/'+ context().troupe.id + '/issues/' + issueNumber;
         $.get(url, function(issue) {
           if(!issue.state) return;
           var description = issue.body;
@@ -252,6 +256,7 @@ define([
       if (this.isEditing) {
         if (this.canEdit() && newText != this.model.get('text')) {
           this.model.set('text', newText);
+          this.model.set('html', safeHtml(newText));
           this.model.save();
         }
 

@@ -18,7 +18,11 @@ module.exports = {
             return limitedReleaseService.shouldUserBeTurnedAway(req.user)
               .then(function(allow) {
                 if(allow) {
-                  return appRender.renderHomePage(req, res, next);
+                  if(req.isPhone) {
+                    appRender.renderMobileUserHome(req, res, next, 'home');
+                  } else {
+                    appRender.renderMainFrame(req, res, next, 'home');
+                  }
                 } else {
                   var email = req.user.emails[0];
                   return res.render('thanks', { email: email, userEmailAccess: req.user.hasGitHubScope('user:email') });
@@ -27,13 +31,26 @@ module.exports = {
               .fail(next);
           }
 
-          if(req.isPhone) {
-            // TODO: this should change from chat-app to a seperate mobile app
-            appRender.renderAppPageWithTroupe(req, res, next, 'mobile/mobile-app');
-          } else {
-            appRender.renderAppPageWithTroupe(req, res, next, 'app-template');
-          }
+          appRender.renderMainFrame(req, res, next, 'chat');
         });
+
+    app.get('/:userOrOrg/-/home',
+      middleware.grantAccessForRememberMeTokenMiddleware,
+      middleware.ensureLoggedIn(),
+      appMiddleware.uriContextResolverMiddleware,
+      appMiddleware.isPhoneMiddleware,
+      function(req, res, next) {
+        appRender.renderHomePage(req, res, next);
+      });
+
+    app.get('/:userOrOrg/-/chat',
+      middleware.grantAccessForRememberMeTokenMiddleware,
+      middleware.ensureLoggedIn(),
+      appMiddleware.uriContextResolverMiddleware,
+      appMiddleware.isPhoneMiddleware,
+      function(req, res, next) {
+        appRender.renderChatPage(req, res, next);
+      });
 
       app.get('/:userOrOrg/:repo',
         middleware.grantAccessForRememberMeTokenMiddleware,
@@ -42,11 +59,19 @@ module.exports = {
         appMiddleware.isPhoneMiddleware,
         function(req, res, next) {
           if(req.isPhone) {
-            // TODO: this should change from chat-app to a seperate mobile app
-            appRender.renderAppPageWithTroupe(req, res, next, 'mobile/mobile-app');
+            appRender.renderMobileChat(req, res, next);
           } else {
-            appRender.renderAppPageWithTroupe(req, res, next, 'app-template');
+            appRender.renderMainFrame(req, res, next, 'chat');
           }
+        });
+
+      app.get('/:userOrOrg/:repo/chat',
+        middleware.grantAccessForRememberMeTokenMiddleware,
+        middleware.ensureLoggedIn(),
+        appMiddleware.uriContextResolverMiddleware,
+        appMiddleware.isPhoneMiddleware,
+        function(req, res, next) {
+          appRender.renderChatPage(req, res, next);
         });
 
 

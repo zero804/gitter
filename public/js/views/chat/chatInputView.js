@@ -86,7 +86,12 @@ define([
         // this doesn't entire fix the issue of the chat not clearing properly
         $('#chatInputForm').trigger('reset');
         view.$el.val('');
-        window.location = '/' + user;
+
+        var url = '/' + user;
+        var type = user === context.user().get('username') ? 'home' : 'chat';
+        var title = user;
+
+        appEvents.trigger('navigation', url, type, title);
       }
     },
     {
@@ -244,6 +249,7 @@ define([
       if(val) {
         var model = this.collection.create({
           text: val,
+          html: safeHtml(val),
           fromUser: context.getUser(),
           sent: moment()
         });
@@ -379,7 +385,8 @@ define([
     },
 
     send: function() {
-      this.trigger('save', safeHtml(this.$el.val()));
+      //this.trigger('save', safeHtml(this.$el.val()));
+      this.trigger('save', this.$el.val());
       $('#chatInputForm').trigger('reset');
       this.$el.val('');
       this.chatResizer.resetInput();
