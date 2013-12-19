@@ -1606,6 +1606,16 @@
     "text-filter": {
       "version": "0.1.0",
       "from": "text-filter@"
+    },
+    "marked": {
+      "version": "0.2.10",
+      "from": "marked@git://github.com/chjj/marked.git#abce5d0d6dbad0f7a19f009510a71708f539c4d6",
+      "resolved": "git://github.com/chjj/marked.git#abce5d0d6dbad0f7a19f009510a71708f539c4d6"
+    },
+    "highlight.js": {
+      "version": "7.5.0",
+      "from": "highlight.js@",
+      "resolved": "https://registry.npmjs.org/highlight.js/-/highlight.js-7.5.0.tgz"
     }
   }
 }
