@@ -4,13 +4,12 @@ define([
   'marionette',
   'views/base',
   'backbone',
-  'utils/context',
   'require',
   'views/widgets/avatar',
   'components/eyeballs',              // No ref
   'components/unread-items-client',   // No ref
   'template/helpers/all'              // No ref
-], function($, Marionette, TroupeViews, Backbone, context, require, AvatarWidget /*, mobileContext, eyeballsClient, unreadItemsClient */) {
+], function($, Marionette, TroupeViews, Backbone, require, AvatarWidget /*, mobileContext, eyeballsClient, unreadItemsClient */) {
   "use strict";
 
   var MobileLayout = Marionette.Layout.extend({

@@ -3,23 +3,29 @@
 define([
   'utils/context',
   'marionette',
-  'views/base',
-  'hbs!./tmpl/orgListItem'
-], function(context, Marionette, TroupeViews, orgListItemTemplate) {
+  'hbs!./tmpl/orgListItem',
+  'utils/appevents'
+], function(context, Marionette, orgListItemTemplate, appEvents) {
   "use strict";
 
-  var OrgItemView = TroupeViews.Base.extend({
+  var OrgItemView = Marionette.ItemView.extend({
     tagName: 'li',
     template: orgListItemTemplate,
-    initialize: function() {
-      this.setRerenderOnChange(true);
+    modelEvents: {
+      change: 'render',
     },
-    getRenderData: function() {
+    events: {
+      click: 'clicked'
+    },
+    serializeData: function() {
       var data = {};
       data.org = this.model.toJSON();
       data.user = context.getUser();
-
       return data;
+    },
+    clicked: function(e) {
+      e.preventDefault();
+      appEvents.trigger('navigation', '/' + this.model.get('name'), 'chat', this.model.get('name'), null);
     }
   });
 

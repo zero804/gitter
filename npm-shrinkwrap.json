@@ -288,20 +288,23 @@
       }
     },
     "express-hbs": {
-      "version": "0.3.0",
-      "from": "express-hbs@~0.3.0",
+      "version": "0.5.2",
+      "from": "express-hbs@latest",
+      "resolved": "https://registry.npmjs.org/express-hbs/-/express-hbs-0.5.2.tgz",
       "dependencies": {
         "readdirp": {
-          "version": "0.3.1",
+          "version": "0.3.2",
           "from": "readdirp@~0.3.1",
+          "resolved": "https://registry.npmjs.org/readdirp/-/readdirp-0.3.2.tgz",
           "dependencies": {
             "graceful-fs": {
               "version": "2.0.1",
               "from": "graceful-fs@~2.0.0"
             },
             "minimatch": {
-              "version": "0.2.12",
+              "version": "0.2.13",
               "from": "minimatch@~0.2.12",
+              "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-0.2.13.tgz",
               "dependencies": {
                 "lru-cache": {
                   "version": "2.5.0",
@@ -318,13 +321,14 @@
       }
     },
     "consolidate": {
-      "version": "0.5.0",
-      "from": "consolidate@0.5.0",
-      "resolved": "https://registry.npmjs.org/consolidate/-/consolidate-0.5.0.tgz"
+      "version": "0.10.0",
+      "from": "consolidate@latest",
+      "resolved": "https://registry.npmjs.org/consolidate/-/consolidate-0.10.0.tgz"
     },
     "handlebars": {
-      "version": "1.0.12",
-      "from": "handlebars@~1.0.8",
+      "version": "1.1.2",
+      "from": "handlebars@latest",
+      "resolved": "https://registry.npmjs.org/handlebars/-/handlebars-1.1.2.tgz",
       "dependencies": {
         "optimist": {
           "version": "0.3.7",
@@ -340,10 +344,6 @@
           "version": "2.3.6",
           "from": "uglify-js@~2.3",
           "dependencies": {
-            "async": {
-              "version": "0.2.9",
-              "from": "async@~0.2.5"
-            },
             "source-map": {
               "version": "0.1.31",
               "from": "source-map@~0.1.7",
@@ -381,12 +381,43 @@
     },
     "hbs": {
       "version": "2.4.0",
-      "from": "hbs@~2.4.0",
+      "from": "hbs@latest",
       "dependencies": {
+        "handlebars": {
+          "version": "1.0.12",
+          "from": "handlebars@1.0.12",
+          "dependencies": {
+            "optimist": {
+              "version": "0.3.7",
+              "from": "optimist@~0.3",
+              "dependencies": {
+                "wordwrap": {
+                  "version": "0.0.2",
+                  "from": "wordwrap@~0.0.2"
+                }
+              }
+            },
+            "uglify-js": {
+              "version": "2.3.6",
+              "from": "uglify-js@~2.3",
+              "dependencies": {
+                "source-map": {
+                  "version": "0.1.31",
+                  "from": "source-map@~0.1.7",
+                  "dependencies": {
+                    "amdefine": {
+                      "version": "0.1.0",
+                      "from": "amdefine@>=0.0.4"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "walk": {
           "version": "2.2.1",
           "from": "walk@2.2.1",
-          "resolved": "https://registry.npmjs.org/walk/-/walk-2.2.1.tgz",
           "dependencies": {
             "forEachAsync": {
               "version": "2.2.0",
@@ -1575,6 +1606,16 @@
     "text-filter": {
       "version": "0.1.0",
       "from": "text-filter@"
+    },
+    "marked": {
+      "version": "0.2.10",
+      "from": "marked@git://github.com/chjj/marked.git#abce5d0d6dbad0f7a19f009510a71708f539c4d6",
+      "resolved": "git://github.com/chjj/marked.git#abce5d0d6dbad0f7a19f009510a71708f539c4d6"
+    },
+    "highlight.js": {
+      "version": "7.5.0",
+      "from": "highlight.js@",
+      "resolved": "https://registry.npmjs.org/highlight.js/-/highlight.js-7.5.0.tgz"
     }
   }
 }

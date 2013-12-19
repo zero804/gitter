@@ -80,6 +80,14 @@ module.exports = function( grunt ) {
                   exclude: ["core-libraries"]
               },
               {
+                  name: "router-chat",
+                  include: [
+                    "views/widgets/avatar",
+                    "views/widgets/timeago"
+                  ],
+                  exclude: ["core-libraries"]
+              },
+              {
                   name: "userhome",
                   include: [
                     "utils/tracking",
@@ -236,6 +244,7 @@ module.exports = function( grunt ) {
           },
       'signup': createClosureConfig('signup'),
       'router-app': createClosureConfig('router-app'),
+      'router-chat': createClosureConfig('router-chat'),
       'userhome': createClosureConfig('userhome'),
 //      "homepage-mobile" : createClosureConfig('homepage-mobile'),
 //       "native-chat-router": createClosureConfig('routers/mobile/native/chat-router'),

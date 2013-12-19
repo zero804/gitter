@@ -2,7 +2,12 @@
 "use strict";
 
 var nconf             = require('../../utils/config');
+var Q                 = require('q');
 var contextGenerator  = require('../../web/context-generator');
+var restful           = require('../../services/restful');
+
+/* How many chats to send back */
+var INITIAL_CHAT_COUNT = 20;
 
 function getAppCache(req) {
   if(!nconf.get('web:useAppCache')) return;
@@ -20,8 +25,8 @@ function renderHomePage(req, res, next) {
       page = 'mobile/mobile-app';
       bootScriptName = 'mobile-userhome';
     } else {
-      page = 'app-template';
-      bootScriptName = user ? 'userhome' : 'router-login';
+      page = 'userhome-template';
+      bootScriptName = 'userhome';
     }
 
     res.render(page, {
@@ -35,43 +40,100 @@ function renderHomePage(req, res, next) {
   });
 }
 
-function renderAppPageWithTroupe(req, res, next, page) {
-  var user = req.user;
-  var accessDenied =  false; //!req.uriContext.access;
 
-  contextGenerator.generateTroupeContext(req)
+function renderMainFrame(req, res, next, frame) {
+  contextGenerator.generateMiniContext(req)
     .then(function(troupeContext) {
-      var login = !user || accessDenied;
-
-      var bootScript;
-      if(login) {
-        bootScript = 'router-login';
+      var chatAppLocation;
+      if(req.uriContext.uri.indexOf('/') >= 0) {
+        chatAppLocation = '/' + req.uriContext.uri + '/' + frame;
       } else {
-        bootScript = req.isPhone ? 'mobile-app' : 'router-app';
+        chatAppLocation = '/' + req.uriContext.uri + '/-/' + frame;
       }
 
-      res.render(page, {
+      var troupe = req.uriContext.troupe;
+
+      res.render('app-template', {
         appCache: getAppCache(req),
-        login: login,
-        bootScriptName: bootScript,
-        troupeName: troupeContext.troupe.uri || troupeContext.troupe.name,
-        troupeTopic: troupeContext.troupe.topic,
+        bootScriptName: 'router-app',
+        troupeName: troupe && (troupe.uri || troupe.name),
         troupeContext: troupeContext,
+        chatAppLocation: chatAppLocation,
         agent: req.headers['user-agent']
       });
     })
     .fail(next);
 }
 
-function renderMiddleware(template, mobilePage) {
-  return function(req, res, next) {
-    if(mobilePage) req.params.mobilePage = mobilePage;
-    renderAppPageWithTroupe(req, res, next, template);
-  };
+function renderChatPage(req, res, next) {
+  var troupe = req.uriContext.troupe;
+
+  Q.all([
+    contextGenerator.generateTroupeContext(req),
+    restful.serializeChatsForTroupe(troupe.id, req.user.id, { limit: INITIAL_CHAT_COUNT })
+    ]).spread(function(troupeContext, chats) {
+
+      res.render('chat-template', {
+        appCache: getAppCache(req),
+        bootScriptName: 'router-chat',
+        troupeName: troupeContext.troupe.uri || troupeContext.troupe.name,
+        troupeTopic: troupeContext.troupe.topic,
+        troupeFavourite: troupeContext.troupe.favourite,
+        user: troupeContext.user,
+        troupeContext: troupeContext,
+        chats: chats,
+        agent: req.headers['user-agent']
+      });
+
+    })
+    .fail(next);
 }
+
+function renderMobileUserHome(req, res, next) {
+  contextGenerator.generateMiniContext(req, function(err, troupeContext) {
+    if(err) return next(err);
+    var user = req.user;
+
+    res.render('mobile/mobile-app', {
+      useAppCache: !!nconf.get('web:useAppCache'),
+      bootScriptName: 'mobile-userhome',
+      troupeName: (user && user.displayName) || '',
+      troupeContext: troupeContext,
+      agent: req.headers['user-agent'],
+      isUserhome: true
+    });
+  });
+}
+
+function renderMobileChat(req, res, next) {
+  var troupe = req.uriContext.troupe;
+
+  Q.all([
+    contextGenerator.generateTroupeContext(req),
+    restful.serializeChatsForTroupe(troupe.id, req.user.id, { limit: INITIAL_CHAT_COUNT })
+    ]).spread(function(troupeContext, chats) {
+
+      res.render('mobile/mobile-app', {
+        appCache: getAppCache(req),
+        bootScriptName: 'mobile-app',
+        troupeName: troupeContext.troupe.uri || troupeContext.troupe.name,
+        troupeTopic: troupeContext.troupe.topic,
+        troupeFavourite: troupeContext.troupe.favourite,
+        user: troupeContext.user,
+        troupeContext: troupeContext,
+        chats: chats,
+        agent: req.headers['user-agent']
+      });
+
+    })
+    .fail(next);
+}
+
 
 module.exports = exports = {
   renderHomePage: renderHomePage,
-  renderAppPageWithTroupe: renderAppPageWithTroupe,
-  renderMiddleware: renderMiddleware
+  renderChatPage: renderChatPage,
+  renderMainFrame: renderMainFrame,
+  renderMobileChat: renderMobileChat,
+  renderMobileUserHome: renderMobileUserHome
 };
