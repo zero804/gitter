@@ -15,6 +15,9 @@ define([
         var issueNumber = this.dataset.issue;
         var $issue = $(this);
 
+        this.target = "github";
+        this.href = "https://github.com/" + context.troupe().get('uri') + "/issues/" + issueNumber;
+
         var url = '/api/v1/troupes/' + context.getTroupeId() + '/issues/' + issueNumber;
         $.get(url, function(issue) {
           if(!issue.state) return;
