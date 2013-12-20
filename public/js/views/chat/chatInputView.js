@@ -10,17 +10,17 @@ define([
   'hbs!./tmpl/typeaheadListItem',
   'hbs!./tmpl/emojiTypeaheadListItem',
   'utils/momentWrapper',
-  'utils/safe-html',
   'utils/scrollbar-detect',
   'collections/instances/integrated-items',
   'utils/emoji',
   'jquery-textcomplete', // No ref
   'jquery-sisyphus' // No ref
 ], function(log, $, _, context, TroupeViews, appEvents, template, listItemTemplate,
-  emojiListItemTemplate, moment, safeHtml, hasScrollBars, itemCollections, emoji) {
+  emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji) {
   "use strict";
 
   /** @const */
+  // trpChatInputArea max-height in trp3.less needs to be adjusted if this changes
   var MAX_CHAT_HEIGHT = 145;
 
   /** @const */
@@ -86,7 +86,12 @@ define([
         // this doesn't entire fix the issue of the chat not clearing properly
         $('#chatInputForm').trigger('reset');
         view.$el.val('');
-        window.location = '/' + user;
+
+        var url = '/' + user;
+        var type = user === context.user().get('username') ? 'home' : 'chat';
+        var title = user;
+
+        appEvents.trigger('navigation', url, type, title);
       }
     },
     {
@@ -143,7 +148,7 @@ define([
             match: /(^|\s)#(\w*)$/,
             maxCount: 8,
             search: function(term, callback) {
-              $.getJSON('/api/v1/troupes/'+context.getTroupeId()+'/issues', { q: term })
+              $.getJSON('/api/v1/troupes/' + context.getTroupeId() + '/issues', { q: term })
                 .done(function(resp) {
                   callback(resp);
                 })
@@ -379,7 +384,7 @@ define([
     },
 
     send: function() {
-      this.trigger('save', safeHtml(this.$el.val()));
+      this.trigger('save', this.$el.val());
       $('#chatInputForm').trigger('reset');
       this.$el.val('');
       this.chatResizer.resetInput();

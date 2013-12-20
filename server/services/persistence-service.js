@@ -545,6 +545,7 @@ var ChatMessageSchema = new Schema({
   fromUserId: ObjectId,
   toTroupeId: ObjectId,  //TODO: rename to troupeId
   text: String,
+  html: String,
   urls: Array,
   mentions: Array,
   issues: Array,

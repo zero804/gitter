@@ -36,8 +36,10 @@ define([
 
       return {
         permissions: context().permissions,
-        troupe: troupe,
-        topic: topic
+        oneToOne: troupe.oneToOne,
+        troupeName: troupe.name,
+        troupeTopic: topic,
+        troupeFavourite: troupe.favourite
       };
     }
   });

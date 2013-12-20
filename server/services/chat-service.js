@@ -1,14 +1,24 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var persistence   = require("./persistence-service"),
-    collections   = require("../utils/collections"),
-    troupeService = require("./troupe-service"),
-    statsService  = require("./stats-service"),
-    TwitterText   = require('../utils/twitter-text'),
-    urlExtractor  = require('../utils/url-extractor'),
-    safeHtml      = require('../utils/safe-html'),
-    ent           = require('ent');
+var persistence   = require("./persistence-service");
+var collections   = require("../utils/collections");
+var troupeService = require("./troupe-service");
+var statsService  = require("./stats-service");
+var urlExtractor  = require('../utils/url-extractor');
+var unsafeHtml    = require('../utils/unsafe-html');
+var ent           = require('ent');
+var processChat   = require('../utils/process-chat');
+var _             = require('underscore');
+
+/*
+ * Hey Trouper!
+ * Bump the version if you modify the behaviour of TwitterText.
+ */
+var VERSION_INITIAL; /* = undefined; All previous versions are null due to a bug */
+var VERSION_SWITCH_TO_SERVER_SIDE_RENDERING = 5;
+
+var CURRENT_META_DATA_VERSION = VERSION_SWITCH_TO_SERVER_SIDE_RENDERING;
 
 /* @const */
 var MAX_CHAT_EDIT_AGE_SECONDS = 300;
@@ -27,15 +37,10 @@ exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
 
   // Very important that we decode and re-encode!
   text = ent.decode(text);
-  text = safeHtml(text); // NB don't use ent for encoding as it's a bit overzealous!
+  text = _.escape(text); // NB don't use ent for encoding as it's a bit overzealous!
 
-  chatMessage.text = text;
-
-  // Metadata
-  chatMessage.urls     = urlExtractor.extractUrlsWithIndices(text);
-  chatMessage.mentions = TwitterText.extractMentionsWithIndices(text);
-  chatMessage.issues   = urlExtractor.extractIssuesWithIndices(text);
-  chatMessage._md      = urlExtractor.version;
+  chatMessage.text     = text;
+  chatMessage._md      = CURRENT_META_DATA_VERSION;
   chatMessage.meta     = meta;
 
   // Skip UnreadItems, except when new files are uploaded
@@ -49,7 +54,6 @@ exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
 };
 
 
-
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   if(!troupe) return callback("Invalid troupe");
 
@@ -60,17 +64,17 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   chatMessage.toTroupeId = troupe.id;
   chatMessage.sent = new Date();
 
-  // Very important that we decode and re-encode!
-  text = ent.decode(text);
-  text = safeHtml(text); // NB don't use ent for encoding as it's a bit overzealous!
+  // Keep the raw message.
+  chatMessage.text      = text;
 
-  chatMessage.text = text;
+  var parsedMessage = processChat(text);
+  chatMessage.html  = parsedMessage.html;
 
   // Metadata
-  chatMessage.urls            = urlExtractor.extractUrlsWithIndices(text);
-  chatMessage.mentions        = TwitterText.extractMentionsWithIndices(text);
-  chatMessage.issues          = urlExtractor.extractIssuesWithIndices(text);
-  chatMessage._md             = urlExtractor.version;
+  chatMessage.urls      = parsedMessage.urls;
+  chatMessage.mentions  = parsedMessage.mentions;
+  chatMessage.issues    = parsedMessage.issues;
+  chatMessage._md       = CURRENT_META_DATA_VERSION;
 
   chatMessage.save(function (err) {
     if(err) return callback(err);
@@ -107,16 +111,19 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
 
   // Very important that we decode and re-encode!
   newText = ent.decode(newText);
-  newText = safeHtml(newText); // NB don't use ent for encoding as it's a bit overzealous!
+  newText = _.escape(newText); // NB don't use ent for encoding as it's a bit overzealous!
 
   chatMessage.text = newText;
   chatMessage.editedAt = new Date();
 
+  var parsedMessage = processChat(newText);
+  chatMessage.html = parsedMessage.html;
+
   // Metadata
-  chatMessage.urls            = urlExtractor.extractUrlsWithIndices(newText);
-  chatMessage.mentions        = TwitterText.extractMentionsWithIndices(newText);
-  chatMessage.issues          = urlExtractor.extractIssuesWithIndices(newText);
-  chatMessage._md             = urlExtractor.version;
+  chatMessage.urls      = parsedMessage.urls;
+  chatMessage.mentions  = parsedMessage.mentions;
+  chatMessage.issues    = parsedMessage.issues;
+  chatMessage._md       = urlExtractor.version;
 
   chatMessage.save(function(err) {
     if(err) return callback(err);
@@ -137,6 +144,24 @@ exports.findById = function(id, callback) {
     .exec(callback);
 };
 
+function massageMessages(message) {
+  if('html' in message && 'text' in message) {
+
+    if(message._md == VERSION_INITIAL) {
+      var text = unsafeHtml(message.text);
+      var d = processChat(text);
+
+      message.text      = text;
+      message.html      = d.html;
+      message.urls      = d.urls;
+      message.mentions  = d.mentions;
+      message.issues    = d.issues;
+    }
+  }
+
+  return message;
+}
+
 exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
   var q = persistence.ChatMessage
     .where('toTroupeId', troupeId);
@@ -151,8 +176,12 @@ exports.findChatMessagesForTroupe = function(troupeId, options, callback) {
     q = q.where('_id').lt(beforeId);
   }
 
-  q.sort({ sent: 'desc' })
-    .limit(options.limit)
-    .skip(options.skip)
-    .exec(callback);
+  q.sort(options.sort || { sent: 'desc' })
+    .limit(options.limit || 50)
+    .skip(options.skip || 0)
+    .exec(function(err, results) {
+      if(err) return callback(err);
+
+      return callback(null, results.map(massageMessages).reverse());
+    });
 };

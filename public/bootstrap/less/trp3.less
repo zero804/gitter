@@ -22,6 +22,8 @@
 
 @import "trpInvites.less";
 
+@import "highlight.less";
+
 .transition300ms() {
   .transition(300ms);
 }
@@ -62,6 +64,12 @@ h2 {
   font-family: @fontSans;
   color: #162e34;
   font-weight: 400;
+}
+
+p {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
 }
 
 .hidden-input input {
@@ -770,12 +778,20 @@ a.trpMiniLeftMenuItem {
 	text-decoration: underline;
 }
 
+.trpFramePanel {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+
 .trpContentPanel {
 /*  display: inline-block;*/
   position: fixed;
 	background-color: white;
 	margin-left: 0px;
-/*	height: 100%;*/
+/*  height is now specified in the html for as it renders better before the css is loaded*/  
 	width: 100%;
 	text-align: center;
 /*	padding-top: 40px;*/
@@ -789,6 +805,8 @@ a.trpMiniLeftMenuItem {
   overflow: none;
   .transition500ms;
 }
+
+
 
 .trpContentSpacer {
 	width: 100%;
@@ -824,6 +842,7 @@ i.favourited:before {
   font-size: 20px;
   transition:all .5s ease-in-out;
   font-style: normal;
+  -webkit-font-smoothing: antialiased;
 }
 
 i.unfavourited:before {
@@ -835,6 +854,7 @@ i.unfavourited:before {
   font-size: 20px;
   transition:all .5s ease-in-out;
   font-style: normal;
+  -webkit-font-smoothing: antialiased;
 }
 
 i.unfavourited:hover:before {
@@ -1390,7 +1410,7 @@ i.favourited:hover:before {
   #trpTopic {
     font-family: 'Open Sans';
     font-size: 13px;
-    margin: -5px 0px 0px 50px;
+    margin: -5px 0px 0px 52px;
     color: #999;
 
     a {
@@ -1446,6 +1466,7 @@ i.favourited:hover:before {
 .trpChatInputArea {
   display: block;
   text-align: center;
+  max-height: 160px;
   margin-left: @leftMarginFull;
   margin-right: @rightMarginFull;
   .transition300ms;
