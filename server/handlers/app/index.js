@@ -31,7 +31,11 @@ module.exports = {
               .fail(next);
           }
 
-          appRender.renderMainFrame(req, res, next, 'chat');
+          if(req.isPhone) {
+            appRender.renderMobileChat(req, res, next);
+          } else {
+            appRender.renderMainFrame(req, res, next, 'chat');
+          }
         });
 
     app.get('/:userOrOrg/-/home',

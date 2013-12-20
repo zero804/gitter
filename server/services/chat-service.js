@@ -5,7 +5,6 @@ var persistence   = require("./persistence-service");
 var collections   = require("../utils/collections");
 var troupeService = require("./troupe-service");
 var statsService  = require("./stats-service");
-var urlExtractor  = require('../utils/url-extractor');
 var unsafeHtml    = require('../utils/unsafe-html');
 var ent           = require('ent');
 var processChat   = require('../utils/process-chat');
@@ -123,7 +122,7 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
   chatMessage.urls      = parsedMessage.urls;
   chatMessage.mentions  = parsedMessage.mentions;
   chatMessage.issues    = parsedMessage.issues;
-  chatMessage._md       = urlExtractor.version;
+  chatMessage._md       = CURRENT_META_DATA_VERSION;
 
   chatMessage.save(function(err) {
     if(err) return callback(err);

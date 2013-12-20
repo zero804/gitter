@@ -13,7 +13,7 @@ define(['utils/context'], function(context) {
     if(!username) return;
 
     if(mentions.some(function(mention) {
-      return mention.screenName == user.username;
+      return mention.screenName == '@' + username;
     })) {
       chatItemView.$el.find('.trpChatBox').addClass('mention');
     }
