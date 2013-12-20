@@ -6,7 +6,7 @@ var collections   = require("../utils/collections");
 var troupeService = require("./troupe-service");
 var statsService  = require("./stats-service");
 var urlExtractor  = require('../utils/url-extractor');
-var safeHtml      = require('../utils/safe-html');
+var unsafeHtml    = require('../utils/unsafe-html');
 var ent           = require('ent');
 var processChat   = require('../utils/process-chat');
 var _             = require('underscore');
@@ -37,7 +37,7 @@ exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
 
   // Very important that we decode and re-encode!
   text = ent.decode(text);
-  text = safeHtml(text); // NB don't use ent for encoding as it's a bit overzealous!
+  text = _.escape(text); // NB don't use ent for encoding as it's a bit overzealous!
 
   chatMessage.text     = text;
   chatMessage._md      = CURRENT_META_DATA_VERSION;
@@ -148,7 +148,7 @@ function massageMessages(message) {
   if('html' in message && 'text' in message) {
 
     if(message._md == VERSION_INITIAL) {
-      var text = _.unescape(message.text);
+      var text = unsafeHtml(message.text);
       var d = processChat(text);
 
       message.text      = text;
