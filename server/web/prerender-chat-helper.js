@@ -60,9 +60,10 @@ module.exports = exports = function(model) {
 
   //data.readByText = this.getReadByText(data.readBy);
   //
-  var text;
   var webhookClass;
   var meta = model.meta;
+  var text = model.text;
+  var html = model.html || model.text;
 
   if(meta && meta.type === 'webhook') {
     var overrides = {};
@@ -77,18 +78,16 @@ module.exports = exports = function(model) {
     if(!template) template = webhookTemplates.generic;
 
     var templateData = _.extend({}, meta, overrides);
-    text = new syncHandlebars.SafeString(template(templateData));
+    html = new syncHandlebars.SafeString(template(templateData));
+
     webhookClass = 'webhook';
   }
 
-  if(!text) {
-    text = model.text;
-  }
 
   var m = _.extend({}, model, {
     displayName: displayName = model.fromUser && model.fromUser.displayName,
     text: text,
-    html: model.html || model.text,
+    html: html,
     webhookClass: webhookClass
   }, widgetHelpers);
 
