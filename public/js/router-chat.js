@@ -18,7 +18,8 @@ require([
 
   'views/chat/decorators/fileDecorator',
   'views/chat/decorators/webhookDecorator',
-  'views/chat/decorators/linkDecorator',
+  'views/chat/decorators/issueDecorator',
+  'views/chat/decorators/mentionDecorator',
   'views/chat/decorators/embedDecorator',
   'views/chat/decorators/emojiDecorator',
   'views/app/headerView',
@@ -33,7 +34,7 @@ require([
 ], function($, Backbone, context, appEvents, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
     PersonDetailView, inviteView, troupeSettingsView, IntegrationSettingsModal,
-    Router, unreadItemsClient, FileDecorator, webhookDecorator, linkDecorator,
+    Router, unreadItemsClient, FileDecorator, webhookDecorator, issueDecorator, mentionDecorator,
     embedDecorator, emojiDecorator, HeaderView) {
   "use strict";
 
@@ -62,7 +63,7 @@ require([
     el: $('#content-frame'),
     collection: itemCollections.chats,
     userCollection: itemCollections.users,
-    decorators: [new FileDecorator(itemCollections.files), webhookDecorator, linkDecorator, embedDecorator, emojiDecorator]
+    decorators: [new FileDecorator(itemCollections.files), webhookDecorator, issueDecorator, mentionDecorator, embedDecorator, emojiDecorator]
   }).render();
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'));

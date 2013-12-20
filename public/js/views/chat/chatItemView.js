@@ -10,8 +10,6 @@ define([
   'components/unread-items-client',
   'marionette',
   'views/base',
-  'hbs!./tmpl/issuePopover',
-  'hbs!./tmpl/issuePopoverTitle',
   'hbs!./tmpl/chatViewItem',
   'views/chat/chatInputView',
   'views/unread-item-view-mixin',
@@ -20,7 +18,7 @@ define([
   'bootstrap_tooltip', // No ref
   'bootstrap-popover' // No ref
 ], function($, _, context, log, chatModels, AvatarView, unreadItemsClient, Marionette, TroupeViews,
-  issuePopoverTemplate, issuePopoverTitleTemplate, chatItemTemplate, chatInputView, UnreadItemViewMixin, moment, cocktail /* tooltip, popover*/) {
+  chatItemTemplate, chatInputView, UnreadItemViewMixin, moment, cocktail /* tooltip, popover*/) {
 
   "use strict";
 
@@ -115,9 +113,6 @@ define([
       //var linkedHtml = linkify(html, links, mentions, issues).toString();
       this.$el.find('.trpChatText').html(html);
 
-      this.highlightMention();
-      this.setIssueStatusClasses();
-
       _.each(this.decorators, function(decorator) {
         decorator.decorate(this);
       }, this);
@@ -181,53 +176,6 @@ define([
       }
 
       return  "You can't edit someone else's message";
-    },
-
-    highlightMention: function() {
-      var mentions = this.model.get('mentions') || [];
-      mentions.forEach(function(mention) {
-        var re    = new RegExp(mention.screenName, 'i');
-        var user  = context().user;
-
-        // Note: The context in mobile doesn't have a user,
-        // it's actually populated at a later time over Faye.
-        if (user)
-        {
-          if (user.username && (user.username.match(re) || user.displayName.match(re))) {
-            this.$el.find('.trpChatBox').addClass('mention');
-          }
-        }
-      }, this);
-    },
-
-    setIssueStatusClasses: function() {
-      this.$el.find('*[data-link-type="issue"]').each(function() {
-        var $issue = $(this);
-        var issueNumber = $issue.text().substring(1);
-        var url = '/api/v1/troupes/'+ context().troupe.id + '/issues/' + issueNumber;
-        $.get(url, function(issue) {
-          if(!issue.state) return;
-          var description = issue.body;
-          // css elipsis overflow cant handle multiline text
-          var shortDescription = (description && description.length > 250) ? description.substring(0,250)+'…' : description;
-
-          $issue.removeClass('open closed').addClass(issue.state);
-          $issue.attr('title', issuePopoverTitleTemplate(issue));
-          $issue.popover({
-            html: true,
-            trigger: 'hover',
-            placement: 'right',
-            container: 'body',
-            content: issuePopoverTemplate({
-              username: issue.user.login,
-              avatarUrl: issue.user.avatar_url,
-              description: shortDescription,
-              date: moment(issue.created_at).format("LLL"),
-              assignee: issue.assignee
-            })
-          });
-        });
-      });
     },
 
     detectKeys: function(e) {

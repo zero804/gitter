@@ -5,12 +5,9 @@ var persistence   = require("./persistence-service");
 var collections   = require("../utils/collections");
 var troupeService = require("./troupe-service");
 var statsService  = require("./stats-service");
-// var TwitterText   = require('../utils/twitter-text');
 var urlExtractor  = require('../utils/url-extractor');
 var safeHtml      = require('../utils/safe-html');
 var ent           = require('ent');
-// var marked        = require('marked');
-// var highlight     = require('highlight.js');
 var processChat   = require('../utils/process-chat');
 var _             = require('underscore');
 
@@ -51,64 +48,6 @@ exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
     return callback(null, chatMessage);
   });
 };
-
-
-// function parseMessage(text) {
-//   // Important. Do not remove! This encodes html entities (<, >, etc)
-//   marked.setOptions({sanitize: true});
-
-//   var urls      = [];
-//   var mentions  = [];
-//   var issues    = [];
-
-//   var r = new marked.Renderer();
-
-//   // Highlight code blocks
-//   r.code = function(code) {
-//     return '<pre><code>' + highlight.highlightAuto(code).value + '</code></pre>';
-//   };
-
-//   // Extract urls mentions and issues from paragraphs
-//   r.paragraph = function(text) {
-//     urls      = urls.concat(urlExtractor.extractUrlsWithIndices(text));
-//     mentions  = mentions.concat(TwitterText.extractMentionsWithIndices(text));
-//     issues    = issues.concat(urlExtractor.extractIssuesWithIndices(text));
-//     return text;
-//   };
-
-//   // Extract urls mentions and issues from headers (#8 is <h1>8</h1>) and ignore the <hx> part
-//   r.heading = function(text) {
-//     text   = '#' + text;
-//     issues = issues.concat(urlExtractor.extractIssuesWithIndices(text));
-//     return text;
-//   };
-
-//   // Extract urls mentions and issues from lists
-//   // WIP: indices are relative to the <li> item and don't work in the context of an
-//   // entire list or message :(
-//   r.listitem = function(text) {
-//     // urls      = urls.concat(urlExtractor.extractUrlsWithIndices(text));
-//     // mentions  = mentions.concat(TwitterText.extractMentionsWithIndices(text));
-//     // issues    = issues.concat(urlExtractor.extractIssuesWithIndices(text));
-//     return '<li>' + text + '</li>';
-//   };
-
-//   // Do not autolink, we do this client-side
-//   r.link = function(href, title, text) {
-//     return text;
-//   };
-
-//   // Generate HTML version of the message using our renderer
-//   var html = marked(text, { gfm: true, tables: true, sanitize: true, breaks: true, renderer: r});
-
-//   return {
-//     text: text,
-//     html: html,
-//     urls: urls,
-//     mentions: mentions,
-//     issues: issues
-//   };
-// }
 
 
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
