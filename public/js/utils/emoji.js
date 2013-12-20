@@ -10,7 +10,7 @@ define([], function() {
 
   var emoticons = [
     [/(^|\s):-*\)(\s|$)/g, 'blush'],
-    [/(^|\s):*o(\s|$)/gi, 'scream'],
+    [/(^|\s):-*o(\s|$)/gi, 'scream'],
     [/(^|\s)(:|;)-*](\s|$)/g, 'smirk'],
     [/(^|\s)(:|;)-*d(\s|$)/gi, 'smiley'],
     [/(^|\s)xd(\s|$)/gi, 'stuck_out_tongue_closed_eyes'],
