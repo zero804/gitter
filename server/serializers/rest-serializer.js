@@ -487,26 +487,6 @@ function ChatStrategy(options)  {
   };
 
   this.map = function(item) {
-
-    //var fence = item.text.match(/^ *(`{3,}|~{3,}) *(\S+)? *\n([\s\S]+?)\s*\1 *(?:\n+|$)/);
-    //var html, code;
-    //if (fence) {
-    //  var text = item.text.replace(fence[0], '');
-    //  html = marked(text);
-    //  code = marked(fence[0]);
-    //} else {
-    //  html = marked(item.text);
-    //}
-    var html, text;
-    if(item._md < 5) {
-      text = item.text;
-      html = _.decode(text);
-      html = processChat(html);
-    } else {
-      html = item.html;
-      text = item.text;
-    }
-
     return {
       id: item._id,
       text: item.text,
