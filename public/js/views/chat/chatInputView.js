@@ -41,6 +41,7 @@ define([
           var topic = topicMatch[1];
           view.$el.val('');
 
+          context.troupe().set('topic', topic);
           $.ajax({
             url: '/api/v1/troupes/' + context.getTroupeId(),
             contentType: "application/json",
