@@ -35,22 +35,24 @@ module.exports = exports = function processChat(text) {
   };
 
   renderer.link = function(href, title, text) {
-    mentions.push({ url: href });
+    urls.push({ url: href });
     return util.format('<a href="%s" rel="nofollow" target="_new" class="link">%s</a>', href, text);
   };
 
   renderer.image = function(href, title, text) {
-    mentions.push({ url: href });
+    urls.push({ url: href });
     return util.format('<img src="%s" alt="%s" rel="nofollow">', href, text);
 
   };
 
   renderer.mention = function(href, title, text) {
-    mentions.push({ screenName: text });
-    return util.format('<span data-link-type="mention" data-screen-name="%s" class="mention">%s</span>', text, text);
+    var screenName = text.charAt(0) === '@' ? text.substring(1) : text;
+    mentions.push({ screenName: screenName });
+    return util.format('<span data-link-type="mention" data-screen-name="%s" class="mention">%s</span>', screenName, text);
   };
 
   renderer.email = function(href, title, text) {
+    urls.push({ url: href });
     return util.format('<a href="%s" rel="nofollow">%s</a>', href, text);
   };
 
