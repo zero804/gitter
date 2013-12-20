@@ -13,7 +13,7 @@ var fixture = {};
 
 
 describe('chatService', function() {
-  
+
   describe('updateChatMessage', function() {
 
     it('should update a recent chat message sent by the same user', function(done) {
@@ -54,7 +54,7 @@ describe('chatService', function() {
         assert(chatMessage.mentions[0].screenName === 'mauro', 'mention should be a valid TwitterText mention entity');
 
         assert(chatMessage.metadataVersion !== 'undefined', 'there should be a metadataVersion');
-  
+
         done();
       });
 
