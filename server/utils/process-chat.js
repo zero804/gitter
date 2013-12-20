@@ -36,7 +36,7 @@ module.exports = exports = function processChat(text) {
 
   renderer.link = function(href, title, text) {
     mentions.push({ url: href });
-    return util.format('<a href="%s" rel="nofollow" class="link">%s</a>', href, text);
+    return util.format('<a href="%s" rel="nofollow" target="_new" class="link">%s</a>', href, text);
   };
 
   renderer.image = function(href, title, text) {
