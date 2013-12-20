@@ -4,8 +4,9 @@ define([
   'utils/context',
   'marionette',
   'hbs!./tmpl/headerViewTemplate',
-  'twitter-text'
-], function($, context, Marionette, headerViewTemplate, TwitterText)  {
+  'utils/autolink',
+  'underscore'
+], function($, context, Marionette, headerViewTemplate, autolink, _)  {
   "use strict";
 
   return Marionette.ItemView.extend({
@@ -29,9 +30,8 @@ define([
       var troupe = this.model.toJSON();
       var topic = troupe.topic;
       if (topic) {
-        var safeTopic = TwitterText.txt.htmlEscape(topic);
-        var entities = TwitterText.txt.extractUrlsWithIndices(safeTopic, {extractUrlsWithoutProtocol: true});
-        topic = TwitterText.txt.autoLinkEntities(safeTopic, entities, {targetBlank: true});
+        var safeTopic = _.escape(topic);
+        topic = autolink(safeTopic);
       }
 
       return {
