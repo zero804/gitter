@@ -36,6 +36,10 @@ define([
         // Turn the moment sent value into a string
         d.sent = sent.format();
       }
+
+      // No need to send html back to the server
+      delete d.html;
+
       return d;
     }
 

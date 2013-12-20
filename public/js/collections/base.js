@@ -26,17 +26,18 @@ define([
 
       this.syncStatus = null;
 
-      this.on('sync', function() {
+      this.listenTo(this, 'sync', function() {
         setStatus('synced');
       });
 
-      this.on('request  ', function() {
+      this.listenTo(this, 'request', function() {
         setStatus('syncing');
       });
 
-      this.on('error', function() {
+      this.listenTo(this, 'error', function() {
         setStatus('syncerror');
       });
+
     },
 
     convertArrayToCollection: function(attr, Collection) {

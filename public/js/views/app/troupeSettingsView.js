@@ -4,36 +4,24 @@ define([
   'underscore',
   'utils/context',
   'views/base',
-  'collections/instances/troupes',
   'collections/instances/integrated-items',
   'hbs!./tmpl/troupeSettingsTemplate',
   'log!troupe-settings-view',
-  'utils/validate-wrapper',
-  './integrationSettingsModal'
-], function($, _, context, TroupeViews, troupeCollections, itemCollections, troupeSettingsTemplate, log, validation, IntegrationSettingsModal) {
+  'utils/validate-wrapper'
+], function($, _, context, TroupeViews, itemCollections, troupeSettingsTemplate, log, validation) {
   "use strict";
 
-
-  // Stop the app router from reloading on troupe 'remove' event
-  function removeTroupeCollectionRemoveListeners() {
-    var troupeCollection = troupeCollections.troupes;
-    troupeCollection.off("remove");
-  }
 
   var View = TroupeViews.Base.extend({
     template: troupeSettingsTemplate,
     events: {
       'click #save-troupe-settings': 'saveSettings',
-      'click #cancel-troupe-settings' : 'closeSettings',
-      'click #delete-troupe': 'deleteTroupe',
-      'click #leave-troupe': 'leaveTroupe',
+      'click #cancel-troupe-settings' : 'closeSettings'
     },
 
     initialize: function() {
-      this.model = troupeCollections.troupes.get(context.getTroupeId());
+      this.model = context.troupe();
       this.userCollection = itemCollections.users;
-      this.$el.toggleClass('canLeave', this.canLeave());
-      this.$el.toggleClass('canDelete', this.canDelete());
 
       $.ajax({
         url: '/api/v1/user/' + context.getUserId() + '/troupes/' + context.getTroupeId() + '/settings/notifications',
@@ -63,94 +51,9 @@ define([
       }
     },
 
-    canDelete: function() {
-      return this.userCollection.length == 1;
-    },
-
-    deleteTroupe: function() {
-      var self = this;
-
-      if (!this.canDelete()) {
-        return window.alert("You need to be the only person in the troupe to delete it.");
-      }
-
-      var modal = new TroupeViews.ConfirmationModal({
-        title: "Delete this Troupe?",
-        body: "Are you sure you want to delete this troupe? This action cannot be undone.",
-        menuItems: [
-          { action: "yes", text: "Yes", className: "trpBtnRed" },
-          { action: "no", text: "No", className: "trpBtnLightGrey"}
-        ]
-      });
-
-       modal.on('menuItemClicked', function(action) {
-        if (action === "yes") {
-          removeTroupeCollectionRemoveListeners();
-          $.ajax({
-            url: '/api/v1/troupes/' + self.model.id,
-            type: "DELETE",
-            success: function() {
-              window.location.href = '/last';
-            },
-            error: function(jqXHR, textStatus, e) {
-              log('Error attempting to delete troupe', textStatus, e);
-            }
-          });
-        }
-        modal.off('menuItemClicked');
-        modal.hide();
-      });
-
-      modal.show();
-    },
-
-    canLeave: function() {
-      return this.userCollection.length > 1;
-    },
-
-    leaveTroupe: function() {
-      var errMsg = "You cannot leave a troupe if you are the only member, rather delete it.";
-
-      if (!this.canLeave()) {
-        return window.alert(errMsg);
-      }
-
-      var modal = new TroupeViews.ConfirmationModal({
-       title: "Leave?",
-       body: "Are you sure you want to remove yourself from this troupe?",
-       menuItems: [
-         { action: "yes", text: "Yes", className: "trpBtnRed" },
-         { action: "no", text: "No", className: "trpBtnLightGrey"}
-       ]
-      });
-
-      modal.once('menuItemClicked', function(action) {
-        if (action === "yes") {
-          removeTroupeCollectionRemoveListeners();
-          $.ajax({
-            url: "/api/v1/troupes/" + context.getTroupeId() + "/users/" + context.getUserId(),
-            data: "",
-            type: "DELETE",
-            success: function() {
-              window.location = '/last';
-            },
-            error: function() {
-              window.location = '/last';
-            },
-            global: false
-          });
-        }
-        modal.hide();
-      });
-
-      modal.show();
-    },
-
     getRenderData: function() {
       return _.extend({},
         context.getTroupe(), {
-        canLeave: this.canLeave(),
-        canDelete: this.canDelete(),
         isNativeDesktopApp: context().isNativeDesktopApp,
         troupeUrl: '//' + window.location.host + window.location.pathname
       });
@@ -195,7 +98,7 @@ define([
         dataType: "json",
         type: "PUT",
         data: JSON.stringify({ push: self.$el.find("#notification-options").val() }),
-        success: function(data) {
+        success: function() {
           self.dialog.hide();
           self.dialog = null;
         }

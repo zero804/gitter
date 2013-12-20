@@ -1,49 +1,54 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
-  'components/unread-items-client',
-  'utils/context'
-], function($, unreadItemsClient, context) {
+  'utils/appevents'
+], function($, appEvents) {
   "use strict";
 
     function TitlebarUpdater () {
         var self = this;
 
-        context.troupe().on('change:name', function() {
-          self.updateTitlebar(unreadItemsClient.getCounts());
-        });
+        function onTroupeUnreadTotalChange(values) {
+          self._counts = values;
+          self.updateTitlebar(null, values);
 
-        function onTroupeUnreadTotalChange(event, values) {
-            self.updateTitlebar(values);
-
-            function updateBadge(selector, count) {
-              var badge = $(selector);
-              badge.text(count);
-              if(count > 0) {
-                // badge.show();
-                $("#favicon").attr("href","/images/2/gitter/favicon5-unread.png");
-              } else {
-                // badge.hide();
-                $("#favicon").attr("href","/images/2/gitter/favicon5.png");
-              }
+          function updateBadge(selector, count) {
+            var badge = $(selector);
+            badge.text(count);
+            if(count > 0) {
+              // badge.show();
+              $("#favicon").attr("href","/images/2/gitter/favicon5-unread.png");
+            } else {
+              // badge.hide();
+              $("#favicon").attr("href","/images/2/gitter/favicon5.png");
             }
+          }
 
-            // overall count
-            updateBadge('.unread-count', values.overall);
+          // overall count
+          updateBadge('.unread-count', values.overall);
         }
 
-        $(document).on('troupeUnreadTotalChange', onTroupeUnreadTotalChange);
-        onTroupeUnreadTotalChange(null, unreadItemsClient.getCounts());
+        appEvents.on('troupeUnreadTotalChange', onTroupeUnreadTotalChange);
 
     }
 
-    TitlebarUpdater.prototype.updateTitlebar = function(values) {
-      document.title = this.getTitlebar(values);
+    TitlebarUpdater.prototype.updateTitlebar = function(name, values) {
+      if(!name) {
+        name = this.name;
+      } else {
+        this.name = name;
+      }
+
+      if(!values) {
+        values = this._counts;
+      }
+
+      var title = this.getTitlebar(name, values);
+      document.title = title;
     };
 
-    TitlebarUpdater.prototype.getTitlebar = function(counts) {
+    TitlebarUpdater.prototype.getTitlebar = function(name, counts) {
       var mainTitle;
-      var name = context().troupeUri;
       if (name) {
         mainTitle = name + " - Gitter";
       } else {

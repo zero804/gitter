@@ -3,15 +3,6 @@
 
 var TwitterText   =  require('./twitter-text');
 
-/*
- * Hey Trouper!
- *
- * Bump the version if you modify the behaviour of TwitterText.
- *
- */
-exports.metaDataVersion = 4;
-
-
 
 /** This is a nasty exponential algo, but should do us well except if people drop thousands of links into a single message */
 function overlapWithIndices(urls, begin, end) {

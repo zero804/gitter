@@ -2,10 +2,15 @@
 require([
   'views/userhome/userHomeView',
   'jquery',
+  'utils/appevents',
   'views/toolbar/troupeMenu',
   'views/app/mobileAppView'
-  ], function(UserHomeView, $, TroupeMenu, MobileAppView) {
+  ], function(UserHomeView, $, appEvents, TroupeMenu, MobileAppView) {
   "use strict";
+
+  appEvents.on('navigation', function(url) {
+    window.location.href = url;
+  });
 
   new MobileAppView({
     el: $('#mainPage')
