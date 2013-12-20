@@ -27,6 +27,7 @@ define([
 
     serializeData: function() {
       var troupe = this.model.toJSON();
+      console.dir(troupe);
       var topic = troupe.topic;
       if (topic) {
         var safeTopic = TwitterText.txt.htmlEscape(topic);
