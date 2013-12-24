@@ -30,7 +30,6 @@ module.exports = {
     },
 
     create: function(req, res, next) {
-      console.log('body is ', req.body);
       var body = req.body;
       return roomService.createChannelForRoom(req.troupe, req.user, body.name)
         .then(function(channelRoom) {
