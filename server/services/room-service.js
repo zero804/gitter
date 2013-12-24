@@ -295,6 +295,7 @@ function createChannelForRoom(parentTroupe, user, name, callback) {
             $setOnInsert: {
               lcUri: lcUri,
               uri: uri,
+              name: name,
               _nonce: nonce,
               githubType: githubType,
               users:  user ? [{ _id: new ObjectID(), userId: user._id }] : []
@@ -311,13 +312,14 @@ function createChannelForRoom(parentTroupe, user, name, callback) {
               var text = "[CHANNEL] New channel *" + name + " created by " + user.username;
               var meta = {
                 uri: newRoom.uri,
+                name: newRoom.name,
                 user: user.username,
                 type: 'webhook',
                 service: 'gitter',
                 event: 'channel'
               };
 
-              return chatService.newRichMessageToTroupe(parentTroupe, user, text, meta)
+              return chatService.newRichMessageToTroupe(parentTroupe, null, text, meta)
                 .thenResolve(newRoom);
             }
             return newRoom;
