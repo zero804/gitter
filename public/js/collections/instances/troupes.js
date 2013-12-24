@@ -47,7 +47,8 @@ define([
 
   // collection of troupes that are Repos
   var repoTroupeCollection = filterTroupeCollection(function(m) {
-    return m.get('githubType') == "REPO";
+    var githubType = m.get('githubType');
+    return githubType === 'REPO' || githubType === 'ORG_CHANNEL' || githubType === 'REPO_CHANNEL';
   });
 
   // Sync up with the context
@@ -67,7 +68,7 @@ define([
   var recentTroupeCollection = new Backbone.Collection();
 
   // when the list of troupes come in filter them and put them in recentTroupeCollection
-  troupeCollection.on('reset sync change:lastAccessTime', function() {
+  troupeCollection.on('reset sync change:lastAccessTime add remove', function() {
     // filter out troupes that don't have a last access time
     var recentTroupeModels = _.filter(troupeCollection.models, function(v) {
       return !!v.get('lastAccessTime');
