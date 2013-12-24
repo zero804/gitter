@@ -13,6 +13,7 @@ var userService = require('./user-service');
 var troupeService = require('./troupe-service');
 var nconf = require('../utils/config');
 var request = require('request');
+var xregexp = require('xregexp').XRegExp;
 
 function localUriLookup(uri) {
   return uriLookupService.lookupUri(uri)
@@ -241,3 +242,83 @@ function findOrCreateRoom(user, uri) {
 }
 
 exports.findOrCreateRoom = findOrCreateRoom;
+
+function findAllChannelsForRoom(troupe, callback) {
+  return troupeService.findByIds(troupe.channels)
+    .nodeify(callback);
+}
+exports.findAllChannelsForRoom = findAllChannelsForRoom;
+
+function findChildChannelRoom(parentTroupe, childTroupeId, callback) {
+  return Q.fcall(function() {
+      if(parentTroupe.channels.some(function(troupeId) { return "" + childTroupeId == "" + troupeId; })) {
+        return troupeService.findById(childTroupeId);
+      } else {
+        return null;
+      }
+    })
+    .nodeify(callback);
+}
+exports.findChildChannelRoom = findChildChannelRoom;
+
+var channelMatcher = xregexp('^\\p{L}+$');
+
+function createChannelForRoom(parentTroupe, user, name, callback) {
+  return Q.fcall(function() {
+    assert(name, 'Name is expected');
+    assert(channelMatcher.test(name), 'Name is must be one or more letters long');
+
+    var uri = parentTroupe.uri + '/*' + name;
+    var lcUri = uri.toLowerCase();
+    var githubType;
+    switch(parentTroupe.githubType) {
+      case 'ORG':
+        githubType = 'ORG_CHANNEL';
+        break;
+      case 'REPO':
+        githubType = 'REPO_CHANNEL';
+        break;
+      default:
+        assert(false, 'Parent room must be an ORG or a REPO');
+    }
+
+    return permissionsModel(user, 'create', uri, githubType)
+      .then(function(access) {
+        if(!access) throw 403;
+
+        var nonce = Math.floor(Math.random() * 100000);
+
+        return persistence.Troupe.findOneAndUpdateQ(
+          { lcUri: lcUri, githubType: githubType },
+          {
+            $setOnInsert: {
+              lcUri: lcUri,
+              uri: uri,
+              _nonce: nonce,
+              githubType: githubType,
+              users:  user ? [{ _id: new ObjectID(), userId: user._id }] : []
+            }
+          },
+          {
+            upsert: true
+          })
+          .then(function(newRoom) {
+            if(newRoom._nonce === nonce) {
+              // Indeed the room was just created right now
+              // Notify people or something at this point I
+              // guess
+            }
+            return newRoom;
+          });
+      });
+   })
+   .then(function(newRoom) {
+    // Add this room to the list of channels
+    // owed by the parent
+    parentTroupe.channels.addToSet(newRoom.id);
+    return parentTroupe.saveQ()
+      .thenResolve(newRoom);
+   })
+   .nodeify(callback);
+}
+exports.createChannelForRoom = createChannelForRoom;

@@ -1616,6 +1616,11 @@
       "version": "7.5.0",
       "from": "highlight.js@",
       "resolved": "https://registry.npmjs.org/highlight.js/-/highlight.js-7.5.0.tgz"
+    },
+    "xregexp": {
+      "version": "2.0.0",
+      "from": "xregexp@",
+      "resolved": "https://registry.npmjs.org/xregexp/-/xregexp-2.0.0.tgz"
     }
   }
 }

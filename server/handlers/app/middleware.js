@@ -12,6 +12,10 @@ function uriContextResolverMiddleware(req, res, next) {
     uri = req.params.userOrOrg;
   }
 
+  if(req.params.channel) {
+    uri = uri + '/*' + req.params.channel;
+  }
+
   return roomService.findOrCreateRoom(req.user, uri)
     .then(function(uriContext) {
       if(!uriContext.troupe && !uriContext.ownUrl) throw 404;
@@ -22,13 +26,14 @@ function uriContextResolverMiddleware(req, res, next) {
         req.session.events = events;
       }
 
-      if(uriContext.hookCreationFailedDueToMissingScope) {        
+      if(uriContext.hookCreationFailedDueToMissingScope) {
         events.push('hooks_require_additional_public_scope');
       }
 
-      if(uriContext.didCreate) {        
+      if(uriContext.didCreate) {
         events.push('room_created_now');
       }
+
       req.troupe = uriContext.troupe;
       req.uriContext = uriContext;
       next();

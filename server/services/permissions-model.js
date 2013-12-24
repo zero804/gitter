@@ -66,9 +66,18 @@ function orgPermissionsModel(user, right, uri) {
 
       assert(false, 'Unknown right ' + right);
     });
-
-
 }
+
+function orgChannelPermissionsModel(user, right, uri) {
+  var orgUri = uri.replace(/\/\*.*$/,'');
+  return orgPermissionsModel(user, right, orgUri);
+}
+
+function repoChannelPermissionsModel(user, right, uri) {
+  var repoUri = uri.replace(/\/\*.*$/,'');
+  return repoPermissionsModel(user, right, repoUri);
+}
+
 
 function oneToOnePermissionsModel(user, right/*, uri*/) {
   // For now, only authenticated users can be in onetoones
@@ -96,9 +105,6 @@ function permissionsModel(user, right, uri, roomType) {
   assert(right === 'create' || right === 'join' || right === 'admin', 'Invalid right ' + right);
   assert(uri, 'uri required');
   assert(roomType, 'roomType required');
-  assert(roomType === 'REPO' ||
-    roomType === 'ORG' ||
-    roomType === 'ONETOONE', 'Invalid roomType ' + roomType);
 
   switch(roomType) {
     case 'REPO':
@@ -110,6 +116,16 @@ function permissionsModel(user, right, uri, roomType) {
     case 'ONETOONE':
       // TODO: a one-to-one permissioning model
       return oneToOnePermissionsModel(user, right, uri).then(log);
+
+    case 'ORG_CHANNEL':
+      return orgChannelPermissionsModel(user, right, uri).then(log);
+
+    case 'REPO_CHANNEL':
+      return repoChannelPermissionsModel(user, right, uri).then(log);
+
+    default:
+      assert(false, 'Invalid roomType ' + roomType);
+      throw 500;
   }
 
 }

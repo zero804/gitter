@@ -87,7 +87,8 @@
     "troupe-passport-github": "git://github.com/troupe/passport-github.git#v0.1.8d",
     "text-filter": "~0.1.0",
     "marked": "git://github.com/gitterHQ/marked.git#ae5b3de555bdaf87f1e812c7fda9337c9c468128",
-    "highlight.js": "~7.5.0"
+    "highlight.js": "~7.5.0",
+    "xregexp": "~2.0.0"
   },
   "devDependencies": {
     "proxyquire": "0.4.0",
