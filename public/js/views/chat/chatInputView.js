@@ -119,7 +119,8 @@ define([
       completion: 'channel ',
       regexp: /^\/channel/,
       criteria: function() {
-        return !context.inOneToOneTroupeContext();
+        var repoType = context.troupe().get('githubType');
+        return repoType === 'REPO' || repoType === 'ORG';
       },
       action: function(view) {
 

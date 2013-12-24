@@ -45,7 +45,7 @@ var favicons = {
   gitter:     'https://gitter.im/images/2/gitter/favicon5.png'
 };
 
-var webhookTemplates = ['bitbucket', 'generic', 'github', 'jenkins', 'sprintly', 'travis', 'trello'].reduce(function(memo, v) {
+var webhookTemplates = ['bitbucket', 'generic', 'github', 'jenkins', 'sprintly', 'travis', 'trello', 'gitter'].reduce(function(memo, v) {
   var templateFile = baseDir + '/js/views/chat/decorators/tmpl/' + v + '.hbs';
   var buffer = fs.readFileSync(templateFile);
   var template = syncHandlebars.compile(buffer.toString());
