@@ -2,22 +2,26 @@
 /* global define:false */
 define([
   'views/base',
+  'utils/context',
   'hbs!./tmpl/github',
   'hbs!./tmpl/bitbucket',
   'hbs!./tmpl/jenkins',
   'hbs!./tmpl/travis',
   'hbs!./tmpl/sprintly',
   'hbs!./tmpl/generic',
-  'hbs!./tmpl/trello'
+  'hbs!./tmpl/trello',
+  'hbs!./tmpl/gitter'
 ], function(
   TroupeViews,
+  context,
   githubTemplate,
   bitbucketTemplate,
   jenkinsTemplate,
   travisTemplate,
   sprintlyTemplate,
   genericTemplate,
-  trelloTemplate
+  trelloTemplate,
+  gitterTemplate
 ) {
 
   "use strict";
@@ -50,7 +54,9 @@ define([
     template: trelloTemplate
   });
 
-
+  var GitterView = TroupeViews.Base.extend({
+    template: gitterTemplate
+  });
 
   function showNotificationIcon(chatItemView, meta) {
     // NB NB NB: update the matching list at
@@ -61,7 +67,8 @@ define([
       jenkins:    'https://jenkins-ci.org/sites/default/files/jenkins_favicon.ico',
       sprintly:   'https://sprint.ly/favicon.ico',
       travis:     'https://travis-ci.org/favicon.ico',
-      trello:     'https://trello.com/favicon.ico'
+      trello:     'https://trello.com/favicon.ico',
+      gitter:     'https://gitter.im/images/2/gitter/favicon5.png'
     };
 
     // NB NB NB: update the matching list at
@@ -82,6 +89,8 @@ define([
 
     var viewData = meta;
     viewData.favicon = favicons[meta.service];
+    viewData.baseUri = context.env('basePath');
+
     var webhookView;
 
     switch (meta.service) {
@@ -103,6 +112,9 @@ define([
         break;
       case 'trello':
         webhookView = new TrelloView();
+        break;
+      case 'gitter':
+        webhookView = new GitterView();
         break;
       default:
         webhookView = new GenericView();

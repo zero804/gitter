@@ -11,6 +11,7 @@ var Q = require('q');
 var permissionsModel = require('./permissions-model');
 var userService = require('./user-service');
 var troupeService = require('./troupe-service');
+var chatService = require('./chat-service');
 var nconf = require('../utils/config');
 var request = require('request');
 var xregexp = require('xregexp').XRegExp;
@@ -261,7 +262,7 @@ function findChildChannelRoom(parentTroupe, childTroupeId, callback) {
 }
 exports.findChildChannelRoom = findChildChannelRoom;
 
-var channelMatcher = xregexp('^\\p{L}+$');
+var channelMatcher = xregexp('^[\\p{L}\\d]+$');
 
 function createChannelForRoom(parentTroupe, user, name, callback) {
   return Q.fcall(function() {
@@ -307,6 +308,17 @@ function createChannelForRoom(parentTroupe, user, name, callback) {
               // Indeed the room was just created right now
               // Notify people or something at this point I
               // guess
+              var text = "[CHANNEL] New channel *" + name + " created by " + user.username;
+              var meta = {
+                uri: newRoom.uri,
+                user: user.username,
+                type: 'webhook',
+                service: 'gitter',
+                event: 'channel'
+              };
+
+              return chatService.newRichMessageToTroupe(parentTroupe, user, text, meta)
+                .thenResolve(newRoom);
             }
             return newRoom;
           });

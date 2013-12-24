@@ -9,6 +9,8 @@ var unsafeHtml    = require('../utils/unsafe-html');
 var ent           = require('ent');
 var processChat   = require('../utils/process-chat');
 var _             = require('underscore');
+var assert        = require('assert');
+var Q             = require('q');
 
 /*
  * Hey Trouper!
@@ -25,67 +27,69 @@ var MAX_CHAT_EDIT_AGE_SECONDS = 300;
 var ObjectID = require('mongodb').ObjectID;
 
 exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
-  if(!troupe) return callback("Invalid troupe");
+  return Q.fcall(function() {
+    assert(troupe, "Invalid troupe");
 
-  var chatMessage = new persistence.ChatMessage();
+    var chatMessage = new persistence.ChatMessage();
 
-  chatMessage.fromUserId = user ? user.id : null;
+    chatMessage.fromUserId = user ? user.id : null;
 
-  chatMessage.toTroupeId = troupe.id;
-  chatMessage.sent = new Date();
+    chatMessage.toTroupeId = troupe.id;
+    chatMessage.sent = new Date();
 
-  // Very important that we decode and re-encode!
-  text = ent.decode(text);
-  text = _.escape(text); // NB don't use ent for encoding as it's a bit overzealous!
+    // Very important that we decode and re-encode!
+    text = ent.decode(text);
+    text = _.escape(text); // NB don't use ent for encoding as it's a bit overzealous!
 
-  chatMessage.text     = text;
-  chatMessage._md      = CURRENT_META_DATA_VERSION;
-  chatMessage.meta     = meta;
+    chatMessage.text     = text;
+    chatMessage._md      = CURRENT_META_DATA_VERSION;
+    chatMessage.meta     = meta;
 
-  // Skip UnreadItems, except when new files are uploaded
-  chatMessage.skipAlerts = meta.type === 'file' ? false : true;
+    // Skip UnreadItems, except when new files are uploaded
+    chatMessage.skipAlerts = meta.type === 'file' ? false : true;
 
-  chatMessage.save(function (err) {
-    if(err) return callback(err);
-
-    return callback(null, chatMessage);
-  });
+    return chatMessage.saveQ()
+      .thenResolve(chatMessage);
+  })
+  .nodeify(callback);
 };
 
 
 exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
-  if(!troupe) return callback("Invalid troupe");
+  return Q.fcall(function() {
+    assert(troupe, "Invalid troupe");
 
-  if(!troupeService.userHasAccessToTroupe(user, troupe)) return callback(403);
+    if(!troupeService.userHasAccessToTroupe(user, troupe)) throw 403;
 
-  var chatMessage = new persistence.ChatMessage();
-  chatMessage.fromUserId = user.id;
-  chatMessage.toTroupeId = troupe.id;
-  chatMessage.sent = new Date();
+    var chatMessage = new persistence.ChatMessage();
+    chatMessage.fromUserId = user.id;
+    chatMessage.toTroupeId = troupe.id;
+    chatMessage.sent       = new Date();
 
-  // Keep the raw message.
-  chatMessage.text      = text;
+    // Keep the raw message.
+    chatMessage.text      = text;
 
-  var parsedMessage = processChat(text);
-  chatMessage.html  = parsedMessage.html;
+    var parsedMessage     = processChat(text);
+    chatMessage.html      = parsedMessage.html;
 
-  // Metadata
-  chatMessage.urls      = parsedMessage.urls;
-  chatMessage.mentions  = parsedMessage.mentions;
-  chatMessage.issues    = parsedMessage.issues;
-  chatMessage._md       = CURRENT_META_DATA_VERSION;
+    // Metadata
+    chatMessage.urls      = parsedMessage.urls;
+    chatMessage.mentions  = parsedMessage.mentions;
+    chatMessage.issues    = parsedMessage.issues;
+    chatMessage._md       = CURRENT_META_DATA_VERSION;
 
-  chatMessage.save(function (err) {
-    if(err) return callback(err);
+    return chatMessage.saveQ()
+      .then(function() {
+        statsService.event("new_chat", {
+          userId: user.id,
+          troupeId: troupe.id,
+          username: user.username
+        });
+      })
+      .thenResolve(chatMessage);
 
-    statsService.event("new_chat", {
-      userId: user.id,
-      troupeId: troupe.id,
-      username: user.username
-    });
-
-    return callback(null, chatMessage);
-  });
+  })
+  .nodeify(callback);
 };
 
 exports.updateChatMessage = function(troupe, chatMessage, user, newText, callback) {

@@ -38,8 +38,8 @@ module.exports = {
         .fail(next);
     },
 
-    show: function(req, res){
-      res.send(500);
+    show: function(req, res, next) {
+      return serialize(req.channel, req, res, next);
     },
 
     edit: function(req, res){

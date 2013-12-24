@@ -41,7 +41,8 @@ var favicons = {
   jenkins:    'https://jenkins-ci.org/sites/default/files/jenkins_favicon.ico',
   sprintly:   'https://sprint.ly/favicon.ico',
   travis:     'https://travis-ci.org/favicon.ico',
-  trello:     'https://trello.com/favicon.ico'
+  trello:     'https://trello.com/favicon.ico',
+  gitter:     'https://gitter.im/images/2/gitter/favicon5.png'
 };
 
 var webhookTemplates = ['bitbucket', 'generic', 'github', 'jenkins', 'sprintly', 'travis', 'trello'].reduce(function(memo, v) {
@@ -66,9 +67,11 @@ module.exports = exports = function(model) {
   var html = model.html || model.text;
 
   if(meta && meta.type === 'webhook') {
-    var overrides = {};
+    var overrides = {
+      favicon: favicons[meta.service],
+      baseUri: nconf.get('web:basepath')
+    };
 
-    overrides.favicon = favicons[meta.service];
 
     if(meta.service === 'github') {
       overrides.human_action = human_actions[meta.event];
