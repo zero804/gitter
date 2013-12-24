@@ -30,6 +30,7 @@ module.exports = {
     installTroupeSubResource('downloads', 'downloads');
     installTroupeSubResource('embedded', 'embedded');
     installTroupeSubResource('thumbnails', 'thumbnails');
+    installTroupeSubResource('channels', 'channels');
 
 
     var chatResource = installTroupeSubResource('chatMessages', 'chat-messages');
