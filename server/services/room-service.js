@@ -1,20 +1,21 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var persistence = require('./persistence-service');
-var validateUri = require('./github/github-uri-validator');
+var persistence      = require('./persistence-service');
+var validateUri      = require('./github/github-uri-validator');
 var uriLookupService = require("./uri-lookup-service");
-var assert = require("assert");
-var winston = require("winston");
-var ObjectID = require('mongodb').ObjectID;
-var Q = require('q');
+var assert           = require("assert");
+var winston          = require("winston");
+var ObjectID         = require('mongodb').ObjectID;
+var Q                = require('q');
 var permissionsModel = require('./permissions-model');
-var userService = require('./user-service');
-var troupeService = require('./troupe-service');
-var chatService = require('./chat-service');
-var nconf = require('../utils/config');
-var request = require('request');
-var xregexp = require('xregexp').XRegExp;
+var userService      = require('./user-service');
+var troupeService    = require('./troupe-service');
+var chatService      = require('./chat-service');
+var nconf            = require('../utils/config');
+var request          = require('request');
+var xregexp          = require('xregexp').XRegExp;
+var serializeEvent   = require('./persistence-service-events').serializeEvent;
 
 function localUriLookup(uri) {
   return uriLookupService.lookupUri(uri)
@@ -79,6 +80,14 @@ exports.applyAutoHooksForRepoRoom = applyAutoHooksForRepoRoom;
 
 
 /**
+ * Private method to push creates out to the bus
+ */
+function serializeCreateEvent(troupe) {
+  var urls = troupe.users.map(function(troupeUser) { return '/user/' + troupeUser.userId + '/troupes'; });
+  serializeEvent(urls, 'create', troupe);
+}
+
+/**
  * Assuming that oneToOne uris have been handled already,
  * Figure out what this troupe is for
  *
@@ -135,6 +144,8 @@ function findOrCreateNonOneToOneRoom(user, troupe, uri) {
               var hookCreationFailedDueToMissingScope;
 
               if(nonce == troupe._nonce) {
+                serializeCreateEvent(troupe);
+
                 /* Created here */
                 var requiredScope = "public_repo";
                 /* TODO: Later we'll need to handle private repos too */
@@ -305,7 +316,10 @@ function createChannelForRoom(parentTroupe, user, name, callback) {
             upsert: true
           })
           .then(function(newRoom) {
+            // TODO handle adding the user in the event that they didn't create the room!
             if(newRoom._nonce === nonce) {
+              serializeCreateEvent(newRoom);
+
               // Indeed the room was just created right now
               // Notify people or something at this point I
               // guess

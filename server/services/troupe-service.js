@@ -15,7 +15,7 @@ var ObjectID                 = require('mongodb').ObjectID;
 var _                        = require('underscore');
 var assert                   = require('assert');
 var statsService             = require("../services/stats-service");
-var permissionsModel          = require("./permissions-model");
+var permissionsModel         = require("./permissions-model");
 
 function ensureExists(value) {
   if(!value) throw 404;
@@ -539,22 +539,6 @@ function findOrCreateOneToOneTroupe(userId1, userId2) {
 
       });
 
-}
-
-
-/**
- * Find an unused invite from fromUserId to toUserId for toUserId to connect with fromUserId
- * @param  {[type]} fromUserId
- * @param  {[type]} toUserId
- * @return {[type]} promise with invite
- */
-function findUnusedOneToOneInviteFromUserIdToUserId(fromUserId, toUserId) {
-  return persistence.Invite.findOneQ({
-      troupeId: null, // This indicates that it's a one-to-one invite
-      fromUserId: fromUserId,
-      userId: toUserId,
-      status: 'UNUSED'
-    });
 }
 
 /**
