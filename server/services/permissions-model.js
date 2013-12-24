@@ -70,11 +70,13 @@ function orgPermissionsModel(user, right, uri) {
 
 function orgChannelPermissionsModel(user, right, uri) {
   var orgUri = uri.replace(/\/\*.*$/,'');
+  winston.verbose('Proxying permission on ' + uri + ' to org permission on ' + orgUri, { user: user && user.username, right: right });
   return orgPermissionsModel(user, right, orgUri);
 }
 
 function repoChannelPermissionsModel(user, right, uri) {
   var repoUri = uri.replace(/\/\*.*$/,'');
+  winston.verbose('Proxying permission on ' + uri + ' to repo permission on ' + repoUri, { user: user && user.username, right: right });
   return repoPermissionsModel(user, right, repoUri);
 }
 
