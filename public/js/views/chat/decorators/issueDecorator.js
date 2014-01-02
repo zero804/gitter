@@ -2,10 +2,11 @@
 /* global define:false */
 define([
   'jquery',
+  'underscore',
   'utils/context',
   'hbs!./tmpl/issuePopover',
   'hbs!./tmpl/issuePopoverTitle',
-], function($, context, issuePopoverTemplate, issuePopoverTitleTemplate) {
+], function($, _, context, issuePopoverTemplate, issuePopoverTitleTemplate) {
   "use strict";
 
   var decorator = {
@@ -36,7 +37,9 @@ define([
             content: issuePopoverTemplate({
               username: issue.user.login,
               avatarUrl: issue.user.avatar_url,
-              description: shortDescription,
+              // description should be rendered with markdown, but this will at least safely
+              // render escaped characters without xss
+              description: _.unescape(shortDescription),
               date: moment(issue.created_at).format("LLL"),
               assignee: issue.assignee
             })
