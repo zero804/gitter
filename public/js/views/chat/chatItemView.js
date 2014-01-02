@@ -307,6 +307,7 @@ define([
 
   var ReadByView = Marionette.CollectionView.extend({
     itemView: AvatarView,
+    className: 'popoverReadBy',
     initialize: function(options) {
       var c = new chatModels.ReadByCollection(null, { listen: true, chatMessageId: this.model.id, userCollection: options.userCollection });
       c.loading = true;
