@@ -3,7 +3,8 @@ define([
   'template/helpers/widget',
   'template/helpers/cdn',
   'template/helpers/dialogFragment',
-  'template/helpers/isMobile'
+  'template/helpers/isMobile',
+  'template/helpers/breaklines'
 ], function() {
   "use strict";
 
