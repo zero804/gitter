@@ -45,6 +45,10 @@ define([
               assignee: issue.assignee
             })
           });
+        }).fail(function(error) {
+          if(error.status === 404) {
+            $issue.replaceWith('#'+issueNumber);
+          }
         });
       });
 
