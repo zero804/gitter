@@ -195,7 +195,7 @@ describe('markItemsRead', function() {
   });
 });
 
-describe('emailnotifications', function() {
+describe.skip('emailnotifications', function() {
   it('should let you know who needs to be notified by email', function(done) {
     var troupeId = mongoUtils.getNewObjectIdString();
     var userId = mongoUtils.getNewObjectIdString();

@@ -19,10 +19,13 @@ define([
   "use strict";
 
   var touchEvents = {
+    "click #menu-toggle-button":        "onMenuToggle",
     "keypress":                         "onKeyPress"
   };
 
   var mouseEvents = {
+    "click #menu-toggle-button":        "onMenuToggle",
+    "mouseenter #left-menu-hotspot":    "onLeftMenuHotspot",
     "mouseenter #content-frame":        "onMouseEnterContentFrame",
     "mouseenter #left-menu":            "onMouseEnterLeftMenu",
     "mouseenter #toolbar-frame":        "onMouseEnterToolbar",
@@ -138,67 +141,67 @@ define([
     //   }
     // },
 
-    // showMenu: function() {
-    //   if (this._menuAnimating) return;
-    //   this.openLeftMenu();
-    //   $("#left-menu-icon").addClass("active");
-    // },
+    showMenu: function() {
+      if (this._menuAnimating) return;
+      this.openLeftMenu();
+      $("#left-menu-icon").addClass("active");
+    },
 
-    // hideMenu: function() {
-    //   if(this._menuAnimating || this._leftMenuLockCount > 0) return;
-    //   this.closeLeftMenu();
-    //   $("#left-menu-icon").removeClass("active");
-    // },
+    hideMenu: function() {
+      if(this._menuAnimating || this._leftMenuLockCount > 0) return;
+      this.closeLeftMenu();
+      $("#left-menu-icon").removeClass("active");
+    },
 
-    // openLeftMenu: function() {
-    //   if (this.leftmenu) return;
+    openLeftMenu: function() {
+      if (this.leftmenu) return;
 
-    //   if (!window._troupeIsTablet) $("#chat-input-textarea").blur();
+      if (!window._troupeIsTablet) $("#chat-input-textarea").blur();
 
-    //   if (this.selectedListIcon == "icon-search") {
-    //     this.activateSearchList();
-    //   }
+      if (this.selectedListIcon == "icon-search") {
+        this.activateSearchList();
+      }
 
-    //   var self = this;
-    //   this._menuAnimating = true;
+      var self = this;
+      this._menuAnimating = true;
 
-    //   appEvents.trigger('leftMenu:animationStarting');
-    //   setTimeout(function() {
-    //     self._menuAnimating = false;
-    //     appEvents.trigger('leftMenu:showing');
-    //     appEvents.trigger('leftMenu:animationComplete');
-    //   }, 350);
+      appEvents.trigger('leftMenu:animationStarting');
+      setTimeout(function() {
+        self._menuAnimating = false;
+        appEvents.trigger('leftMenu:showing');
+        appEvents.trigger('leftMenu:animationComplete');
+      }, 350);
 
-    //   $("#left-menu").addClass("visible");
-    //   $("#mini-left-menu, #mini-left-menu-container").addClass("active");
-    //   $("#content-wrapper, #toolbar-frame, #menu-toggle-button, #header-wrapper, #chat-input-wrapper").addClass("leftCollapse");
+      $("#left-menu").addClass("visible");
+      $("#mini-left-menu, #mini-left-menu-container").addClass("active");
+      $("#content-wrapper, #toolbar-frame, #menu-toggle-button, #header-wrapper, #chat-input-wrapper").addClass("leftCollapse");
 
-    //   this.leftmenu = true;
-    // },
+      this.leftmenu = true;
+    },
 
-    // closeLeftMenu: function() {
-    //   if(!this.leftmenu) return;
-    //   this._leftMenuLockCount = 0;
+    closeLeftMenu: function() {
+      if(!this.leftmenu) return;
+      this._leftMenuLockCount = 0;
 
-    //   // refocus chat input in case it's lost focus but don't do that on tablets
-    //   if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
+      // refocus chat input in case it's lost focus but don't do that on tablets
+      if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
 
-    //   var self = this;
-    //   this._menuAnimating = true;
+      var self = this;
+      this._menuAnimating = true;
 
-    //   appEvents.trigger('leftMenu:animationStarting');
-    //   setTimeout(function() {
-    //     self._menuAnimating = false;
-    //     appEvents.trigger('leftMenu:hidden');
-    //     appEvents.trigger('leftMenu:animationComplete');
-    //   }, 350);
+      appEvents.trigger('leftMenu:animationStarting');
+      setTimeout(function() {
+        self._menuAnimating = false;
+        appEvents.trigger('leftMenu:hidden');
+        appEvents.trigger('leftMenu:animationComplete');
+      }, 350);
 
-    //   $("#mini-left-menu, #mini-left-menu-container").removeClass("active");
-    //   $("#content-wrapper, #toolbar-frame, #menu-toggle-button, #header-wrapper, #chat-input-wrapper").removeClass("leftCollapse");
-    //   $("#left-menu").removeClass("visible");
+      $("#mini-left-menu, #mini-left-menu-container").removeClass("active");
+      $("#content-wrapper, #toolbar-frame, #menu-toggle-button, #header-wrapper, #chat-input-wrapper").removeClass("leftCollapse");
+      $("#left-menu").removeClass("visible");
 
-    //   this.leftmenu = false;
-    // },
+      this.leftmenu = false;
+    },
 
 
     // togglePanel: function(whichPanel) {
@@ -232,17 +235,31 @@ define([
     //   }
     // },
 
-    // toggleMenu: function() {
-    //   if (this.leftmenu) {
-    //     this.hideMenu();
-    //   } else {
-    //     this.showMenu();
-    //   }
-    // },
+    toggleMenu: function() {
+      if (this.leftmenu) {
+        this.hideMenu();
+      } else {
+        this.showMenu();
+      }
+    },
 
-    // activateSearchList: function () {
-    //   $("#list-search-input").focus();
-    // },
+    onMenuToggle: function() {
+      this.toggleMenu();
+    },
+
+    onLeftMenuHotspot: function() {
+      this.showMenu();
+    },
+
+    onMouseEnterContentFrame: function() {
+      if (this.leftmenu) {
+        this.hideMenu();
+      }
+    },
+
+    activateSearchList: function () {
+      $("#list-search-input").focus();
+    },
 
     onKeyPress: function(e) {
       //  return if user is copying or pasting
