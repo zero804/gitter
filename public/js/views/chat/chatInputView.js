@@ -26,6 +26,8 @@ define([
   /** @const */
   var EXTRA_PADDING = 20;
 
+  var SUGGESTED_EMOJI = ['smile', 'worried', '+1', '-1', 'fire', 'sparkles', 'clap', 'shipit'];
+
   var commandsList = [
     {
       command: 'topic foo',
@@ -193,7 +195,7 @@ define([
             match: /(^|\s):(\w*)$/,
             maxCount: 8,
             search: function(term, callback) {
-              if(term.length < 1) return callback(['+1', '-1', ]);
+              if(term.length < 1) return callback(SUGGESTED_EMOJI);
 
               var matches = emoji.named.filter(function(emoji) {
                 return emoji.indexOf(term) === 0;
