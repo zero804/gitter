@@ -20,10 +20,28 @@ define(['utils/context'], function(context) {
     }
   }
 
+  function removeFalseMentions(chatItemView) {
+    var url = '/api/v1/troupes/' + context.getTroupeId() + '/users';
+    $.get(url, function(users) {
+      var usernames = users.map(function(user) {
+        return user.username;
+      });
+
+      chatItemView.$el.find('.trpChatText .mention').each(function() {
+        var username = this.dataset.screenName;
+
+        if(usernames.indexOf(username) === -1) {
+          $(this).replaceWith('@'+username);
+        }
+      });
+    });
+  }
+
   var decorator = {
 
     decorate: function(chatItemView) {
       highlightMention(chatItemView);
+      removeFalseMentions(chatItemView);
     }
 
   };
