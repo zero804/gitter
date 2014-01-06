@@ -28,13 +28,13 @@ define([
       return user.get('username');
     });
 
-      chatItemView.$el.find('.trpChatText .mention').each(function() {
-        var username = this.dataset.screenName;
+    chatItemView.$el.find('.trpChatText .mention').each(function() {
+      var username = this.dataset.screenName;
 
-        if(usernames.indexOf(username) === -1) {
-          $(this).replaceWith('@'+username);
-        }
-      });
+      if(usernames.indexOf(username) === -1) {
+        $(this).replaceWith('@'+username);
+      }
+    });
   }
 
   var decorator = {
