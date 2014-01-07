@@ -3,56 +3,68 @@
 define([
   'views/base',
   'hbs!./tmpl/github',
+  'hbs!./tmpl/githubPush',
   'hbs!./tmpl/bitbucket',
   'hbs!./tmpl/jenkins',
   'hbs!./tmpl/travis',
   'hbs!./tmpl/sprintly',
-  'hbs!./tmpl/generic',
   'hbs!./tmpl/trello'
 ], function(
   TroupeViews,
   githubTemplate,
+  githubPushTemplate,
   bitbucketTemplate,
   jenkinsTemplate,
   travisTemplate,
   sprintlyTemplate,
-  genericTemplate,
   trelloTemplate
 ) {
 
   "use strict";
 
-  var GenericView = TroupeViews.Base.extend({
-    template: genericTemplate
-  });
+  function selectServiceView(service) {
+    var serviceTemplates = {
+      bitbucket:  bitbucketTemplate,
+      jenkins:    jenkinsTemplate,
+      travis:     travisTemplate,
+      sprintly:   sprintlyTemplate,
+      trello:     trelloTemplate
+    };
 
-  var GithubView = TroupeViews.Base.extend({
-    template: githubTemplate
-  });
+    var view = TroupeViews.Base.extend({
+      template: serviceTemplates[service]
+    });
 
-  var BitbucketView = TroupeViews.Base.extend({
-    template: bitbucketTemplate
-  });
+    return view;
+  }
 
-  var JenkinsView = TroupeViews.Base.extend({
-    template: jenkinsTemplate
-  });
+  function selectGithubView(event) {
+    var eventView;
 
-  var TravisView = TroupeViews.Base.extend({
-    template: travisTemplate
-  });
+    switch (event) {
+      case 'push':
+        eventView = TroupeViews.Base.extend({
+          template: githubPushTemplate,
+          events: {
+            'click .toggleCommits': 'toggleCommits'
+          },
+          toggleCommits: function() {
+            this.$el.find('.commits').slideToggle(100);
+          }
+        });
+        break;
+      default:
+        eventView = TroupeViews.Base.extend({
+          template: githubTemplate
+        });
+        break;
+    }
 
-  var SprintlyView = TroupeViews.Base.extend({
-    template: sprintlyTemplate
-  });
-
-  var TrelloView = TroupeViews.Base.extend({
-    template: trelloTemplate
-  });
-
-
+    return eventView;
+  }
 
   function showNotificationIcon(chatItemView, meta) {
+
     // NB NB NB: update the matching list at
     // server/web/prerender-chat-helper.js
     var favicons = {
@@ -79,41 +91,24 @@ define([
       watch:          'started watching'
     };
 
+    var viewData          = meta;
+    viewData.favicon      = favicons[meta.service];
+    viewData.human_action = human_actions[meta.event];
 
-    var viewData = meta;
-    viewData.favicon = favicons[meta.service];
-    var webhookView;
-
+    var klass;
     switch (meta.service) {
       case 'github':
-        viewData.human_action = human_actions[meta.event];
-        webhookView = new GithubView();
-        break;
-      case 'bitbucket':
-        webhookView = new BitbucketView();
-        break;
-      case 'jenkins':
-        webhookView = new JenkinsView();
-        break;
-      case 'travis':
-        webhookView = new TravisView();
-        break;
-      case 'sprintly':
-        webhookView = new SprintlyView();
-        break;
-      case 'trello':
-        webhookView = new TrelloView();
+        klass = selectGithubView(meta.event);
         break;
       default:
-        webhookView = new GenericView();
+        klass = selectServiceView(meta.service);
         break;
     }
 
+    var webhookView = new klass();
+
     webhookView.data = viewData;
     chatItemView.$el.find('.trpChatText').html(webhookView.render().el);
-
-    //var iconHtml = '<img class="notification-icon" src="' + favicons[meta.service]  + '">';
-    //chatItemView.$el.find('.trpChatText').prepend(iconHtml);
 
     // This could be moved to the template render, is here temporarily.
     chatItemView.$el.find('.trpChatBox').addClass('webhook');

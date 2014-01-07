@@ -26,16 +26,15 @@ define([
       // once this widget has the id of the user,
       // it will listen to changes on the global user collection,
       // so that it knows when to update.
-      var avatarChange = _.bind(function(event, data) {
+      var avatarChange = _.bind(function(event, user) {
+        if(user.id !== self.getUserId()) return;
 
-        if(data.id === self.getUserId()) {
-          if(self.user) {
-            self.user = data;
-          }
-
-          // re-rendering every avatar when the presence changes is excessive, especially for the viewer's own avatars
-          self.update();
+        if(self.user) {
+          self.user = user;
         }
+
+        // re-rendering every avatar when the presence changes is excessive, especially for the viewer's own avatars
+        self.update();
       }, this);
 
       var isModel = !!this.model;

@@ -31,7 +31,7 @@ define([
     }
 
     // send out a change event to avatar widgets that are not necessarily connected to a model object.
-    userCollection.on('change', function(model) {
+    userCollection.on('change:username change:displayName change:avatarUrlSmall change:avatarUrlMedium', function(model) {
       $(document).trigger("avatar:change", model.toJSON());
     });
 

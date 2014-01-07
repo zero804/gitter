@@ -63,7 +63,6 @@ define([
         showTooltip: false
       }).render();
 
-      // tooltips for the app-template
       $('#profile-icon, #home-icon').tooltip();
 
       // $('body').append('<span id="fineUploader"></span>');
@@ -117,27 +116,6 @@ define([
     // ensureProfileIsComplete: function() {
     //   if (!context.isProfileComplete()) {
     //     new ProfileView.Modal().show();
-    //   }
-    // },
-
-    // ensureProfileIsUsernamed: function() {
-    //   var user = context.getUser();
-    //   if (user && !user.username /* if the context has not yet loaded, what do we do? */) {
-    //     new UsernameView.Modal().show();
-    //   }
-    // },
-
-    // hidePanel: function (whichPanel) {
-    //   $("#chat-frame, #chat-input, #toolbar-frame, #header-area").removeClass('rightCollapse');
-    //   $(whichPanel).removeClass('visible');
-    //   this.rightpanel = false;
-    // },
-
-    // showPanel: function(whichPanel) {
-    //   if (!this.rightpanel) {
-    //     $("#chat-frame, #chat-input, #toolbar-frame, #header-area").addClass("rightCollapse");
-    //     $(whichPanel).addClass("visible");
-    //     this.rightpanel = true;
     //   }
     // },
 
