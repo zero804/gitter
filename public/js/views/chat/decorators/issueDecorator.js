@@ -31,7 +31,7 @@ define([
           $issue.attr('title', issuePopoverTitleTemplate(issue));
           $issue.popover({
             html: true,
-            trigger: 'hover',
+            trigger: 'manual',
             placement: 'right',
             container: 'body',
             content: issuePopoverTemplate({
@@ -44,6 +44,19 @@ define([
               date: moment(issue.created_at).format("LLL"),
               assignee: issue.assignee
             })
+          });
+          $issue.on('mouseenter', function() {
+            $issue.popover('show');
+          });
+          $issue.on('mouseleave', function() {
+            var $popover = $('.popover');
+            if($popover.is(':hover')) {
+              $popover.one('mouseleave', function() {
+                $issue.popover('hide');
+              });
+            } else {
+              $issue.popover('hide');
+            }
           });
         }).fail(function(error) {
           if(error.status === 404) {
