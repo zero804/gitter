@@ -44,12 +44,12 @@ define([
           var shortDescription = (description && description.length > 250) ? description.substring(0,250)+'…' : description;
 
           $issue.removeClass('open closed').addClass(issue.state);
-          $issue.attr('title', issuePopoverTitleTemplate(issue));
           $issue.popover({
             html: true,
             trigger: 'manual',
             placement: 'right',
             container: 'body',
+            title: issuePopoverTitleTemplate(issue),
             content: issuePopoverTemplate({
               username: issue.user.login,
               avatarUrl: issue.user.avatar_url,
