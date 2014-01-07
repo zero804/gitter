@@ -9,6 +9,22 @@ define([
 ], function($, _, context, issuePopoverTemplate, issuePopoverTitleTemplate) {
   "use strict";
 
+  function makePopoverStayOnHover($issue) {
+    $issue.on('mouseenter', function() {
+      $issue.popover('show');
+    });
+    $issue.on('mouseleave', function() {
+      var $popover = $('.popover');
+      if($popover.is(':hover')) {
+        $popover.one('mouseleave', function() {
+          $issue.popover('hide');
+        });
+      } else {
+        $issue.popover('hide');
+      }
+    });
+  }
+
   var decorator = {
 
     decorate: function(chatItemView) {
@@ -28,15 +44,14 @@ define([
           var shortDescription = (description && description.length > 250) ? description.substring(0,250)+'…' : description;
 
           $issue.removeClass('open closed').addClass(issue.state);
-          $issue.attr('title', issuePopoverTitleTemplate(issue));
           $issue.popover({
             html: true,
-            trigger: 'hover',
+            trigger: 'manual',
             placement: 'right',
             container: 'body',
+            title: issuePopoverTitleTemplate(issue),
             content: issuePopoverTemplate({
-              username: issue.user.login,
-              avatarUrl: issue.user.avatar_url,
+              user: issue.user,
 
               // description should be rendered with markdown, but this will at least safely
               // render escaped characters without xss
@@ -45,6 +60,7 @@ define([
               assignee: issue.assignee
             })
           });
+          makePopoverStayOnHover($issue);
         }).fail(function(error) {
           if(error.status === 404) {
             $issue.replaceWith('#'+issueNumber);

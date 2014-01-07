@@ -39,6 +39,7 @@ define([
         oneToOne: troupe.oneToOne,
         troupeName: troupe.name,
         troupeTopic: topic,
+        troupeUri : troupe.url,
         troupeFavourite: troupe.favourite
       };
     }
