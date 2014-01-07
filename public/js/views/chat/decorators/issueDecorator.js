@@ -51,8 +51,7 @@ define([
             container: 'body',
             title: issuePopoverTitleTemplate(issue),
             content: issuePopoverTemplate({
-              username: issue.user.login,
-              avatarUrl: issue.user.avatar_url,
+              user: issue.user,
 
               // description should be rendered with markdown, but this will at least safely
               // render escaped characters without xss

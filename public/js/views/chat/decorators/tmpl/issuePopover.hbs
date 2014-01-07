@@ -1,12 +1,12 @@
 <div class="trpChatAvatar">
   <span>
-    <div class="trpDisplayPicture avatar-s" style="background-image: url({{avatarUrl}});">
+    <div class="trpDisplayPicture avatar-s" style="background-image: url({{user.avatar_url}});">
    </div>
   </span>
 </div>
 <div class="trpChatBox">
   <div class="trpChatDetails">
-    <div class="trpChatFrom">@{{username}}</div>
+    <div class="trpChatFrom">@{{user.login}}</div>
     <div class="trpChatTime"> &bull; {{date}}</div>
   </div>
   {{#if description}}
