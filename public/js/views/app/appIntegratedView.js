@@ -63,7 +63,6 @@ define([
         showTooltip: false
       }).render();
 
-      // tooltips for the app-template
       $('#profile-icon, #home-icon').tooltip();
 
       // $('body').append('<span id="fineUploader"></span>');
