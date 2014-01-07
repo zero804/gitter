@@ -49,7 +49,6 @@ define([
             'click .toggleCommits': 'toggleCommits'
           },
           toggleCommits: function() {
-            console.debug('toggleCommits');
             this.$el.find('.commits').slideToggle(100);
           }
         });
