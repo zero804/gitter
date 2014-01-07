@@ -12,6 +12,7 @@ require([
   'views/people/personDetailView',
   'views/shareSearch/inviteView',
   'views/app/troupeSettingsView',
+  'views/app/markdownView',
   'views/app/integrationSettingsModal',
   'utils/router',
   'components/unread-items-client',
@@ -33,7 +34,7 @@ require([
   'bootstrap-dropdown' // No ref
 ], function($, Backbone, context, appEvents, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
-    PersonDetailView, inviteView, troupeSettingsView, IntegrationSettingsModal,
+    PersonDetailView, inviteView, troupeSettingsView, markdownView, IntegrationSettingsModal,
     Router, unreadItemsClient, FileDecorator, webhookDecorator, issueDecorator, mentionDecorator,
     embedDecorator, emojiDecorator, HeaderView) {
   "use strict";
@@ -85,6 +86,7 @@ require([
       { name: "person",           re: /^person\/(\w+)$/,          viewType: PersonDetailView.Modal,             collection: itemCollections.users },
       { name: "inv",              re: /^inv$/,                    viewType: inviteView.Modal },
       { name: "troupeSettings",   re: /^troupeSettings/,          viewType: troupeSettingsView },
+      { name: "markdown",         re: /^markdown/,                viewType: markdownView },
       { name: "integrations",     re: /^integrations/,            viewType: IntegrationSettingsModal,  validationCheck: integrationsValidationCheck }
     ],
     regions: [appView.rightPanelRegion, appView.dialogRegion]
