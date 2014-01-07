@@ -1485,6 +1485,95 @@ i.favourited:hover:before {
 
 }
 
+.trpChatInputButtons {
+  position: absolute;
+  right: 8px;
+  top: -4px;
+
+  @media @mobile {
+    display: none;
+  }
+
+  .md-help {
+    opacity: 0.5;
+    .transition300ms;
+  }
+
+  .md-help:hover {
+    opacity: 0.9;
+  }
+
+  .md-help:before { 
+    font-family: 'troupe-icons';
+    content: '\e82d';
+    margin-right: 8px;
+    width: 12px;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .return-send {
+    margin-bottom: 4px;
+    opacity: 0.5;
+    .transition300ms;
+  }
+
+  .return-send.active {
+    color: @trpGreen;
+    opacity: 0.7;
+  }
+
+  .return-send:hover {
+    opacity: 0.9;
+  }
+
+  .return-send:before {
+    font-family: 'troupe-icons';
+    content: '\e82f';
+    margin-right: 8px;
+    width: 12px;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+.markdown-help-content {
+  .trpBodyMedium;
+  width: 100%;
+  border-spacing: 0;
+
+  thead {
+    text-align: left;
+  }
+
+  th {
+
+  }
+
+  tr:first-child td{
+    border-top: 0;
+  }
+
+  tr:nth-child(even) {
+    background-color: fade(@trpDarkBlue, 5%);
+  }
+
+  td {
+    border-top: 1px solid fade(@trpDarkBlue, 10%);
+  }
+
+  a {
+    color: @trpLightBlue;
+  }
+
+  tr {
+    line-height: 30px;
+  }
+
+
+}
+
+
 .login-content {
 	width: 100%;
 }

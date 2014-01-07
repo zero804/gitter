@@ -34,11 +34,10 @@ exports.newRichMessageToTroupe = function(troupe, user, text, meta, callback) {
   chatMessage.toTroupeId = troupe.id;
   chatMessage.sent = new Date();
 
-  // Very important that we decode and re-encode!
-  text = ent.decode(text);
-  text = _.escape(text); // NB don't use ent for encoding as it's a bit overzealous!
+  chatMessage.text  = text;
+  var parsedMessage = processChat(text);
+  chatMessage.html  = parsedMessage.html;
 
-  chatMessage.text     = text;
   chatMessage._md      = CURRENT_META_DATA_VERSION;
   chatMessage.meta     = meta;
 
@@ -64,7 +63,7 @@ exports.newChatMessageToTroupe = function(troupe, user, text, callback) {
   chatMessage.sent = new Date();
 
   // Keep the raw message.
-  chatMessage.text      = text;
+  chatMessage.text = text;
 
   var parsedMessage = processChat(text);
   chatMessage.html  = parsedMessage.html;
@@ -107,12 +106,12 @@ exports.updateChatMessage = function(troupe, chatMessage, user, newText, callbac
     return callback("Permission to edit this chat message is denied.");
   }
 
-
-  // Very important that we decode and re-encode!
-  newText = ent.decode(newText);
-  newText = _.escape(newText); // NB don't use ent for encoding as it's a bit overzealous!
-
   chatMessage.text = newText;
+
+  var parsedMessage = processChat(newText);
+  chatMessage.html  = parsedMessage.html;
+
+
   chatMessage.editedAt = new Date();
 
   var parsedMessage = processChat(newText);

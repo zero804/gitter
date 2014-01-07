@@ -242,8 +242,18 @@ a.issue:hover {
   margin: 4px 0 0 0;
 }
 
+code {
+  border: 1px solid fade(@trpGrey,40%);
+  background-color: fade(@trpGrey,20%);
+  border-radius: 2px;
+  padding: 0 4px;
+  font-size: 14px;
+}
+
 pre code {
   border-radius: 6px;
+  border: none;
+
 }
 
 .trpChatItem {
@@ -290,6 +300,10 @@ pre code {
 
   @media @small {
     padding-left: 10px;
+  }
+
+  @media @mobile {
+    padding-left: 0;
   }
 /*  &:hover {
     background-color: #ecf1ed;
@@ -375,6 +389,14 @@ pre code {
     display: inline-block;
     width: 90%;
     float: left;
+
+    a {
+      cursor: pointer;
+    }
+
+    .commits {
+      display: none;
+    }
   }
 }
 
