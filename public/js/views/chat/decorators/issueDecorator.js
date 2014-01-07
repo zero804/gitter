@@ -9,6 +9,22 @@ define([
 ], function($, _, context, issuePopoverTemplate, issuePopoverTitleTemplate) {
   "use strict";
 
+  function makePopoverStayOnHover($issue) {
+    $issue.on('mouseenter', function() {
+      $issue.popover('show');
+    });
+    $issue.on('mouseleave', function() {
+      var $popover = $('.popover');
+      if($popover.is(':hover')) {
+        $popover.one('mouseleave', function() {
+          $issue.popover('hide');
+        });
+      } else {
+        $issue.popover('hide');
+      }
+    });
+  }
+
   var decorator = {
 
     decorate: function(chatItemView) {
@@ -45,19 +61,7 @@ define([
               assignee: issue.assignee
             })
           });
-          $issue.on('mouseenter', function() {
-            $issue.popover('show');
-          });
-          $issue.on('mouseleave', function() {
-            var $popover = $('.popover');
-            if($popover.is(':hover')) {
-              $popover.one('mouseleave', function() {
-                $issue.popover('hide');
-              });
-            } else {
-              $issue.popover('hide');
-            }
-          });
+          makePopoverStayOnHover($issue);
         }).fail(function(error) {
           if(error.status === 404) {
             $issue.replaceWith('#'+issueNumber);
