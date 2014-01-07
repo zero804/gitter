@@ -119,27 +119,6 @@ define([
     //   }
     // },
 
-    // ensureProfileIsUsernamed: function() {
-    //   var user = context.getUser();
-    //   if (user && !user.username /* if the context has not yet loaded, what do we do? */) {
-    //     new UsernameView.Modal().show();
-    //   }
-    // },
-
-    // hidePanel: function (whichPanel) {
-    //   $("#chat-frame, #chat-input, #toolbar-frame, #header-area").removeClass('rightCollapse');
-    //   $(whichPanel).removeClass('visible');
-    //   this.rightpanel = false;
-    // },
-
-    // showPanel: function(whichPanel) {
-    //   if (!this.rightpanel) {
-    //     $("#chat-frame, #chat-input, #toolbar-frame, #header-area").addClass("rightCollapse");
-    //     $(whichPanel).addClass("visible");
-    //     this.rightpanel = true;
-    //   }
-    // },
-
     showMenu: function() {
       if (this._menuAnimating) return;
       this.openLeftMenu();
