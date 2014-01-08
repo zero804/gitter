@@ -7,8 +7,9 @@ define([
   'collections/instances/integrated-items',
   'hbs!./tmpl/troupeSettingsTemplate',
   'log!troupe-settings-view',
-  'utils/validate-wrapper'
-], function($, _, context, TroupeViews, itemCollections, troupeSettingsTemplate, log, validation) {
+  'utils/validate-wrapper',
+  'components/notifications'
+], function($, _, context, TroupeViews, itemCollections, troupeSettingsTemplate, log, validation, notifications) {
   "use strict";
 
 
@@ -16,7 +17,8 @@ define([
     template: troupeSettingsTemplate,
     events: {
       'click #save-troupe-settings': 'saveSettings',
-      'click #cancel-troupe-settings' : 'closeSettings'
+      'click #cancel-troupe-settings' : 'closeSettings',
+      'click #enable-browser-notifications': 'enableBrowserNotifications'
     },
 
     initialize: function() {
@@ -44,6 +46,10 @@ define([
       this.dialog = null;
     },
 
+    enableBrowserNotifications: function() {
+      notifications.enable();
+    },
+
     afterRender: function() {
       this.validateForm();
       if (this.settings) {
@@ -54,6 +60,8 @@ define([
     getRenderData: function() {
       return _.extend({},
         context.getTroupe(), {
+        showNotificationsButton: notifications.hasNotBeenSetup(),
+        showNotificationsWarning: notifications.hasBeenDenied(),
         isNativeDesktopApp: context().isNativeDesktopApp,
         troupeUrl: '//' + window.location.host + window.location.pathname
       });

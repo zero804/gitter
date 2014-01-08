@@ -14,6 +14,12 @@
       <option value="mention">Notify me when somebody mentions me</option>
       <option value="mute">Don't notify me at all</option>
     </select>
+    {{#if showNotificationsButton}}
+    <button id="enable-browser-notifications">Enable Notifications</button>
+    {{/if}}
+    {{#if showNotificationsWarning}}
+    <span>BLOCKED EH? FINE. YOUR PROBLEM.</span>
+    {{/if}}
     <br>
     <div class="trpBodySmall" style="color: #999">Notification settings only apply to you and not to other users. <br><a href="/apps" target="new">Download Gitter Apps</a> to receive notifications.</div></div>
 
