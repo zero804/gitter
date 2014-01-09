@@ -9,6 +9,54 @@ define([
 ], function($, _, context, issuePopoverTemplate, issuePopoverTitleTemplate) {
   "use strict";
 
+  function getRoomRepo() {
+    var room = context.troupe();
+    if(room.get('githubType') === 'REPO') {
+      return room.get('uri');
+    } else {
+      return '';
+    }
+  }
+
+  function plaintextify($el) {
+    $el.replaceWith($el.text());
+  }
+
+  function preparePopover($issue, issueNumber) {
+    var url = '/api/v1/troupes/' + context.getTroupeId() + '/issues/' + issueNumber;
+    $.get(url, function(issue) {
+      if(!issue.state) return;
+      var description = issue.body;
+
+      // css elipsis overflow cant handle multiline text
+      var shortDescription = (description && description.length > 250) ? description.substring(0,250)+'…' : description;
+
+      $issue.removeClass('open closed').addClass(issue.state);
+      $issue.attr('title', issuePopoverTitleTemplate(issue));
+      $issue.popover({
+        html: true,
+        trigger: 'manual',
+        placement: 'right',
+        container: 'body',
+        title: issuePopoverTitleTemplate(issue),
+        content: issuePopoverTemplate({
+          user: issue.user,
+
+          // description should be rendered with markdown, but this will at least safely
+          // render escaped characters without xss
+          description: _.unescape(shortDescription),
+          date: moment(issue.created_at).format("LLL"),
+          assignee: issue.assignee
+        })
+      });
+      makePopoverStayOnHover($issue);
+    }).fail(function(error) {
+      if(error.status === 404) {
+        plaintextify($issue);
+      }
+    });
+  }
+
   function makePopoverStayOnHover($issue) {
     $issue.on('mouseenter', function() {
       $issue.popover('show');
@@ -28,44 +76,25 @@ define([
   var decorator = {
 
     decorate: function(chatItemView) {
+      var roomRepo = getRoomRepo();
+
       chatItemView.$el.find('*[data-link-type="issue"]').each(function() {
-        var issueNumber = this.dataset.issue;
         var $issue = $(this);
 
-        this.target = "github";
-        this.href = "https://github.com/" + context.troupe().get('uri') + "/issues/" + issueNumber;
+        var repo = this.dataset.issueRepo || roomRepo;
+        var issueNumber = this.dataset.issue;
 
-        var url = '/api/v1/troupes/' + context.getTroupeId() + '/issues/' + issueNumber;
-        $.get(url, function(issue) {
-          if(!issue.state) return;
-          var description = issue.body;
+        if(!repo || !issueNumber) {
+          // this aint no issue I ever saw
+          plaintextify($issue);
+        } else {
+          this.target = "github";
+          this.href = "https://github.com/"+repo+"/issues/"+issueNumber;
 
-          // css elipsis overflow cant handle multiline text
-          var shortDescription = (description && description.length > 250) ? description.substring(0,250)+'…' : description;
-
-          $issue.removeClass('open closed').addClass(issue.state);
-          $issue.popover({
-            html: true,
-            trigger: 'manual',
-            placement: 'right',
-            container: 'body',
-            title: issuePopoverTitleTemplate(issue),
-            content: issuePopoverTemplate({
-              user: issue.user,
-
-              // description should be rendered with markdown, but this will at least safely
-              // render escaped characters without xss
-              description: _.unescape(shortDescription),
-              date: moment(issue.created_at).format("LLL"),
-              assignee: issue.assignee
-            })
-          });
-          makePopoverStayOnHover($issue);
-        }).fail(function(error) {
-          if(error.status === 404) {
-            $issue.replaceWith('#'+issueNumber);
+          if(repo.toLowerCase() === roomRepo.toLowerCase()) {
+            preparePopover($issue, issueNumber);
           }
-        });
+        }
       });
 
     }
