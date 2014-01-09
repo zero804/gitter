@@ -14,7 +14,6 @@ define([
   'collections/instances/integrated-items',
   'utils/emoji',
   'jquery-textcomplete', // No ref
-  'jquery-sisyphus' // No ref
 ], function(log, $, _, context, TroupeViews, appEvents, template, listItemTemplate,
   emojiListItemTemplate, moment, hasScrollBars, itemCollections, emoji) {
   "use strict";
@@ -136,15 +135,6 @@ define([
         rollers: this.rollers
       });
       this.inputBox = inputBox;
-      this.$el.find('form').sisyphus({
-        locationBased: true,
-        timeout: 2,
-        customKeySuffix: 'chat-' + context.getTroupeId(),
-        name: 'chat-' + context.getTroupeId(),
-        onRestore: function() {
-          inputBox.trigger('change');
-        }
-      }).restoreAllData();
 
       this.$el.find('textarea').textcomplete([
           {
