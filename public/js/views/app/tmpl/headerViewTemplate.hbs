@@ -6,7 +6,7 @@
       <ul class="dropdown-menu" role="menu">
         <li><a role="menuitem" tabindex="-1" href="#|inv">Share this chat room</a>
         <li role="presentation" class="divider"></li>
-        <li><a role="menuitem" tabindex="-1" href="#|troupeSettings">Notifications</a></li>
+        <li><a id="notifications-settings-link" role="menuitem" tabindex="-1" href="#|troupeSettings">Notifications</a></li>
         {{#if permissions.admin}}
           {{#if isNativeDesktopApp}}
             <li><a role="menuitem" tabindex="-1" href="{{troupeUrl}}#|integrations" target="_blank">Integrations</a></li>
@@ -29,5 +29,5 @@
       </div>
   </div>
   <h1>{{troupeName}}</h1>
-  <p id="trpTopic">{{#unless oneToOne}}{{{troupeTopic}}}{{/unless}}{{#oneToOne}}<a href="http://github.com{{troupeUri}}">github.com{{troupeUri}}</a>{{/oneToOne}}</p>
+  <p id="trpTopic">{{#unless oneToOne}}{{{troupeTopic}}}{{/unless}}{{#oneToOne}}<a href="http://github.com{{troupeUri}}" target="github">github.com{{troupeUri}}</a>{{/oneToOne}}</p>
 </div>

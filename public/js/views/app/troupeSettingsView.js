@@ -7,8 +7,9 @@ define([
   'collections/instances/integrated-items',
   'hbs!./tmpl/troupeSettingsTemplate',
   'log!troupe-settings-view',
-  'utils/validate-wrapper'
-], function($, _, context, TroupeViews, itemCollections, troupeSettingsTemplate, log, validation) {
+  'utils/validate-wrapper',
+  'components/notifications'
+], function($, _, context, TroupeViews, itemCollections, troupeSettingsTemplate, log, validation, notifications) {
   "use strict";
 
 
@@ -54,6 +55,7 @@ define([
     getRenderData: function() {
       return _.extend({},
         context.getTroupe(), {
+        notificationsBlocked: notifications.hasBeenDenied(),
         isNativeDesktopApp: context().isNativeDesktopApp,
         troupeUrl: '//' + window.location.host + window.location.pathname
       });
