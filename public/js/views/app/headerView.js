@@ -29,7 +29,9 @@ define([
     },
 
     enableBrowserNotifications: function() {
-      notifications.enable();
+      if(context().desktopNotifications) {
+        notifications.enable();
+      }
     },
 
     serializeData: function() {
