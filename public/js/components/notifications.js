@@ -68,6 +68,7 @@ define([
       if(!Notification) return;
 
       if(getPermissionType() === 'granted') {
+        // no need to request permission
         appEvents.on('user_notification', function(message) {
           // if(eyeballs.getEyeBalls()) return;
           showNotification(message);
