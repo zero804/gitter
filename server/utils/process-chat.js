@@ -39,7 +39,7 @@ module.exports = exports = function processChat(text) {
     if(repo) {
       out += util.format(' data-issue-repo="%s"', repo);
     }
-    out += '>' + text + '</a>';
+    out += ' class="issue">' + text + '</a>';
     return out;
   };
 
