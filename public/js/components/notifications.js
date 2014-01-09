@@ -70,13 +70,13 @@ define([
       if(getPermissionType() === 'granted') {
         // no need to request permission
         appEvents.on('user_notification', function(message) {
-          // if(eyeballs.getEyeBalls()) return;
+          if(eyeballs.getEyeBalls()) return;
           showNotification(message);
         });
       } else {
         Notification.requestPermission(function() {
           appEvents.on('user_notification', function(message) {
-            // if(eyeballs.getEyeBalls()) return;
+            if(eyeballs.getEyeBalls()) return;
             showNotification(message);
           });
         });
