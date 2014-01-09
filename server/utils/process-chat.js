@@ -29,9 +29,18 @@ module.exports = exports = function processChat(text) {
     return util.format('<p>%s</p>', text);
   };
 
-  renderer.issue = function(href, title, text) {
-    issues.push({ number: text });
-    return util.format('<a href="#" data-link-type="issue" data-issue="%s" class="issue">%s</a>', href, text);
+  renderer.issue = function(repo, issue, text) {
+    issues.push({
+      number: issue,
+      repo: repo ? repo : undefined
+    });
+
+    var out = '<a href="#" data-link-type="issue" data-issue="' + issue + '"';
+    if(repo) {
+      out += util.format(' data-issue-repo="%s"', repo);
+    }
+    out += '>' + text + '</a>';
+    return out;
   };
 
   renderer.link = function(href, title, text) {

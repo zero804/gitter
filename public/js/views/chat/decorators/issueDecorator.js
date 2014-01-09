@@ -30,10 +30,12 @@ define([
     decorate: function(chatItemView) {
       chatItemView.$el.find('*[data-link-type="issue"]').each(function() {
         var issueNumber = this.dataset.issue;
+        var issueRepo = this.dataset.issueRepo;
         var $issue = $(this);
 
         this.target = "github";
-        this.href = "https://github.com/" + context.troupe().get('uri') + "/issues/" + issueNumber;
+        var linkRepo = issueRepo ? issueRepo : context.troupe().get('uri');
+        this.href = "https://github.com/" + linkRepo + "/issues/" + issueNumber;
 
         var url = '/api/v1/troupes/' + context.getTroupeId() + '/issues/' + issueNumber;
         $.get(url, function(issue) {
@@ -62,9 +64,9 @@ define([
           });
           makePopoverStayOnHover($issue);
         }).fail(function(error) {
-          if(error.status === 404) {
-            $issue.replaceWith('#'+issueNumber);
-          }
+          // if(error.status === 404) {
+          //   $issue.replaceWith(issueNumber);
+          // }
         });
       });
 
