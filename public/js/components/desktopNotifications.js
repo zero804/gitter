@@ -8,9 +8,9 @@ define([
 ], function($, context, webNotifications, template, notifications) {
   "use strict";
 
-  // if(!context().desktopNotifications) {
-  //   return;
-  // }
+  if(!context().desktopNotifications) {
+    return;
+  }
 
   function prompt() {
     var e = $(template());
