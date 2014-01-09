@@ -17,8 +17,7 @@ define([
     template: troupeSettingsTemplate,
     events: {
       'click #save-troupe-settings': 'saveSettings',
-      'click #cancel-troupe-settings' : 'closeSettings',
-      'click #enable-browser-notifications': 'enableBrowserNotifications'
+      'click #cancel-troupe-settings' : 'closeSettings'
     },
 
     initialize: function() {
@@ -46,10 +45,6 @@ define([
       this.dialog = null;
     },
 
-    enableBrowserNotifications: function() {
-      notifications.enable();
-    },
-
     afterRender: function() {
       this.validateForm();
       if (this.settings) {
@@ -60,8 +55,7 @@ define([
     getRenderData: function() {
       return _.extend({},
         context.getTroupe(), {
-        showNotificationsButton: notifications.hasNotBeenSetup(),
-        showNotificationsWarning: notifications.hasBeenDenied(),
+        notificationsBlocked: notifications.hasBeenDenied(),
         isNativeDesktopApp: context().isNativeDesktopApp,
         troupeUrl: '//' + window.location.host + window.location.pathname
       });
