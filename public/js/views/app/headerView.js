@@ -5,8 +5,9 @@ define([
   'marionette',
   'hbs!./tmpl/headerViewTemplate',
   'utils/autolink',
-  'underscore'
-], function($, context, Marionette, headerViewTemplate, autolink, _)  {
+  'underscore',
+  'components/notifications'
+], function($, context, Marionette, headerViewTemplate, autolink, _, notifications)  {
   "use strict";
 
   return Marionette.ItemView.extend({
@@ -16,6 +17,7 @@ define([
     },
     events: {
       'click #leave-room': 'leaveRoom',
+      'click #notifications-settings-link': 'enableBrowserNotifications'
     },
 
     leaveRoom: function() {
@@ -24,6 +26,12 @@ define([
         data: "",
         type: "DELETE",
       });
+    },
+
+    enableBrowserNotifications: function() {
+      if(context().desktopNotifications) {
+        notifications.enable();
+      }
     },
 
     serializeData: function() {
