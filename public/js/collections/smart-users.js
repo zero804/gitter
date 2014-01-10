@@ -20,7 +20,7 @@ define([
     var aName = userA.get('displayName') || userA.get('username');
     var bName = userB.get('displayName') || userB.get('username');
 
-    return bName.localeCompare(aName);
+    return bName.toLowerCase().localeCompare(aName.toLowerCase());
   }
 
   var MegaCollection = Backbone.Collection.extend({
@@ -31,7 +31,7 @@ define([
 
       this.listenTo(userList, 'add', this.parentAdd);
 
-      // this.listenTo(troupeList, 'change:unreadItems change:name change:favourite change:lastAccessTime', this.sortLimited);
+      // this.listenTo(userList, 'change:displayName change:username change:role', this.sortLimited);
 
     },
 
