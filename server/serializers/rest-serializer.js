@@ -13,7 +13,7 @@ var handlebars        = require('handlebars');
 var winston           = require("winston");
 var collections       = require("../utils/collections");
 var predicates        = collections.predicates;
-var processChat       = require('../utils/process-chat');
+var GitHubRepoService = require('../services/github/github-repo-service');
 
 // TODO: Fix this, use the CDN and code sign URLS
 function privateCdn(url) {
@@ -58,21 +58,93 @@ function execPreloads(preloads, callback) {
       });
 }
 
+function UserRoleInTroupeStrategy(options) {
+  var collaborators;
+
+  this.preload = function(unused, callback) {
+    return Q.fcall(function() {
+        if(options.includeRolesForTroupe) return options.includeRolesForTroupe;
+
+        if(options.includeRolesForTroupeId) {
+          return troupeService.findById(options.includeRolesForTroupeId);
+        }
+      })
+      .then(function(troupe) {
+        if(!troupe) return;
+
+        /* Only works for repos */
+        if(troupe.githubType !== 'REPO') return;
+        var userPromise;
+
+        if(options.currentUser) userPromise = Q.resolve(options.currentUser);
+        if(options.currentUserId) {
+          userPromise = userService.findById(options.currentUserId);
+        }
+
+        if(userPromise) {
+          return userPromise.then(function(user) {
+            /* Need a user to perform the magic */
+            if(!user) return;
+
+            var repoService = new GitHubRepoService(user);
+            return repoService.getCollaborators(troupe.uri);
+          });
+        }
+      })
+      .then(function(githubCollaborators) {
+        if(!githubCollaborators) return;
+        collaborators = collections.indexByProperty(githubCollaborators, 'login');
+      })
+      .nodeify(callback);
+  };
+
+  this.map = function(username) {
+    return collaborators && collaborators[username] ? 'collaborator' : undefined;
+  };
+}
+
+function UserPresenceInTroupeStrategy(troupeId) {
+  var onlineUsers;
+
+  this.preload = function(unused, callback) {
+    presenceService.findOnlineUsersForTroupe(troupeId, function(err, result) {
+      if(err) return callback(err);
+      onlineUsers = collections.hashArray(result);
+      callback(null, true);
+    });
+  };
+
+  this.map = function(userId) {
+    return !!onlineUsers[userId];
+  };
+
+}
+
 function UserStrategy(options) {
   options = options ? options : {};
+  var userRoleInTroupeStrategy = options.includeRolesForTroupeId || options.includeRolesForTroupe ? new UserRoleInTroupeStrategy(options) : null;
+  var userPresenceInTroupeStrategy = options.showPresenceForTroupeId ? new UserPresenceInTroupeStrategy(options.showPresenceForTroupeId) : null;
   var onlineUsers;
 
   this.preload = function(users, callback) {
-    if(options.showPresenceForTroupeId) {
-      presenceService.findOnlineUsersForTroupe(options.showPresenceForTroupeId, function(err, result) {
+    var strategies = [];
 
-        if(err) return callback(err);
-        onlineUsers = result;
-        callback(null, true);
+    if(userRoleInTroupeStrategy) {
+      strategies.push({
+        strategy: userRoleInTroupeStrategy,
+        data: null
       });
-    } else {
-      callback(null, true);
     }
+
+    if(userPresenceInTroupeStrategy) {
+      strategies.push({
+        strategy: userPresenceInTroupeStrategy,
+        data: null
+      });
+    }
+    console.log('Strategies', strategies);
+
+    execPreloads(strategies, callback);
   };
 
   this.map = function(user) {
@@ -96,7 +168,8 @@ function UserStrategy(options) {
       avatarUrlMedium: user.gravatarImageUrl,
       createRoom: options.includePermissions ? user.permissions.createRoom : undefined,
       scopes: scopes,
-      online: onlineUsers ? onlineUsers.indexOf(user.id) >= 0 : undefined,
+      online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id),
+      role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username),
       v: getVersion(user)
     };
   };

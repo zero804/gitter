@@ -28,6 +28,21 @@ function GitHubRepoService(user) {
     });
 };
 
+/**
+ *
+ */
+ GitHubRepoService.prototype.getCollaborators = function(repo) {
+  var ghrepo = this.client.repo(repo);
+  var d = Q.defer();
+  ghrepo.collaborators(d.makeNodeResolver());
+  return d.promise
+    .fail(badCredentialsCheck)
+    .fail(function(err) {
+      if(err.statusCode == 404) return;
+      throw err;
+    });
+};
+
 function getIssuesWithState(repo, state) {
   var d = Q.defer();
 
