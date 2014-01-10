@@ -60,6 +60,7 @@ function execPreloads(preloads, callback) {
 
 function UserRoleInTroupeStrategy(options) {
   var collaborators;
+  var ownerLogin;
 
   this.preload = function(unused, callback) {
     return Q.fcall(function() {
@@ -71,7 +72,6 @@ function UserRoleInTroupeStrategy(options) {
       })
       .then(function(troupe) {
         if(!troupe) return;
-
         /* Only works for repos */
         if(troupe.githubType !== 'REPO') return;
         var userPromise;
@@ -85,21 +85,30 @@ function UserRoleInTroupeStrategy(options) {
           return userPromise.then(function(user) {
             /* Need a user to perform the magic */
             if(!user) return;
+            var uri = troupe.uri;
+            ownerLogin = uri.split('/')[0];
 
             var repoService = new GitHubRepoService(user);
-            return repoService.getCollaborators(troupe.uri);
+            return repoService.getCollaborators(uri);
           });
         }
       })
       .then(function(githubCollaborators) {
         if(!githubCollaborators) return;
-        collaborators = collections.indexByProperty(githubCollaborators, 'login');
+        collaborators = {};
+        githubCollaborators.forEach(function(user) {
+          collaborators[user.login] = 'collaborator';
+        });
+
+        // Temporary stop-gap solution until we can figure out
+        // who the admins are
+        collaborators[ownerLogin] = 'admin';
       })
       .nodeify(callback);
   };
 
   this.map = function(username) {
-    return collaborators && collaborators[username] ? 'collaborator' : undefined;
+    return collaborators && collaborators[username];
   };
 }
 
@@ -124,7 +133,6 @@ function UserStrategy(options) {
   options = options ? options : {};
   var userRoleInTroupeStrategy = options.includeRolesForTroupeId || options.includeRolesForTroupe ? new UserRoleInTroupeStrategy(options) : null;
   var userPresenceInTroupeStrategy = options.showPresenceForTroupeId ? new UserPresenceInTroupeStrategy(options.showPresenceForTroupeId) : null;
-  var onlineUsers;
 
   this.preload = function(users, callback) {
     var strategies = [];
@@ -142,7 +150,6 @@ function UserStrategy(options) {
         data: null
       });
     }
-    console.log('Strategies', strategies);
 
     execPreloads(strategies, callback);
   };
