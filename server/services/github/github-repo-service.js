@@ -31,10 +31,10 @@ function GitHubRepoService(user) {
 /**
  *
  */
- GitHubRepoService.prototype.getCollaborators = function(repo) {
+ GitHubRepoService.prototype.getContributors = function(repo) {
   var ghrepo = this.client.repo(repo);
   var d = Q.defer();
-  ghrepo.collaborators(d.makeNodeResolver());
+  ghrepo.contributors(d.makeNodeResolver());
   return d.promise
     .fail(badCredentialsCheck)
     .fail(function(err) {
