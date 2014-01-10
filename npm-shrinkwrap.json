@@ -1748,9 +1748,9 @@
       "resolved": "https://registry.npmjs.org/text-filter/-/text-filter-0.1.0.tgz"
     },
     "marked": {
-      "version": "0.2.11",
-      "from": "marked@git://github.com/gitterHQ/marked.git#v0.2.11",
-      "resolved": "git://github.com/gitterHQ/marked.git#38c9d35edb8a4a8dd42540ff96c45882b639d545",
+      "version": "0.2.12",
+      "from": "marked@git://github.com/gitterHQ/marked.git#v0.2.12",
+      "resolved": "git://github.com/gitterHQ/marked.git#3f60e354b0ac2df2d6608c5876c6ec2c618b2908",
       "dependencies": {
         "xregexp": {
           "version": "2.0.0",
