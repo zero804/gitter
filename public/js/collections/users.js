@@ -1,7 +1,8 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
-  './base'
-], function(TroupeCollections) {
+  './base',
+  './smart-users'
+], function(TroupeCollections, SmartCollection) {
   "use strict";
 
   var UserModel = TroupeCollections.Model.extend({
@@ -14,7 +15,10 @@ define([
     nestedUrl: "users"
   });
 
+  var SmartUserCollection = new SmartCollection(null, { users: new UserCollection() });
+
   return {
+    SmartUserCollection: SmartUserCollection,
     UserCollection: UserCollection,
     UserModel: UserModel
   };
