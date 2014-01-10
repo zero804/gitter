@@ -57,9 +57,6 @@ define([
     {
       command: 'fav',
       description: 'Toggle the room as a favourite',
-      criteria: function() {
-        return !context.inOneToOneTroupeContext() && context().permissions.admin;
-      },
       completion: 'fav ',
       regexp: /^\/fav/,
       action: function(view) {
