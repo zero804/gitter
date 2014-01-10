@@ -784,6 +784,15 @@ a.trpMiniLeftMenuItem {
   width: 100%;
   top: 0;
   left: 0;
+  .transition500ms;
+
+&.leftCollapse {
+  @media @small {
+    left: @leftMarginFull;
+    transition-delay: 0;
+  }
+}
+
 }
 
 .trpContentPanel {
@@ -1144,6 +1153,7 @@ i.favourited:hover:before {
 .trpToolbar.leftCollapse {
   right: -250px;
 }
+
 
 .trpContentPanel.leftCollapse {
   @media @small {
