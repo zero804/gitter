@@ -1,16 +1,20 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService = require("../../services/troupe-service"),
-    userService = require("../../services/user-service"),
-    restSerializer = require("../../serializers/rest-serializer"),
-    _ = require("underscore");
+var troupeService  = require("../../services/troupe-service");
+var userService    = require("../../services/user-service");
+var restSerializer = require("../../serializers/rest-serializer");
+var _              = require("underscore");
 
 module.exports = {
   id: 'resourceTroupeUser',
 
   index: function(req, res, next) {
-    var strategy = new restSerializer.UserIdStrategy( { showPresenceForTroupeId: req.troupe.id });
+    var strategy = new restSerializer.UserIdStrategy({
+      showPresenceForTroupeId: req.troupe.id,
+      includeRolesForTroupe: req.troupe,
+      currentUser: req.user
+    });
 
     restSerializer.serialize(req.troupe.getUserIds(), strategy, function(err, serialized) {
       if(err) return next(err);
