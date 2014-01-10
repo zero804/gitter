@@ -59,7 +59,7 @@ function execPreloads(preloads, callback) {
 }
 
 function UserRoleInTroupeStrategy(options) {
-  var collaborators;
+  var contributors;
   var ownerLogin;
 
   this.preload = function(unused, callback) {
@@ -89,26 +89,26 @@ function UserRoleInTroupeStrategy(options) {
             ownerLogin = uri.split('/')[0];
 
             var repoService = new GitHubRepoService(user);
-            return repoService.getCollaborators(uri);
+            return repoService.getContributors(uri);
           });
         }
       })
-      .then(function(githubCollaborators) {
-        if(!githubCollaborators) return;
-        collaborators = {};
-        githubCollaborators.forEach(function(user) {
-          collaborators[user.login] = 'collaborator';
+      .then(function(githubContributors) {
+        if(!githubContributors) return;
+        contributors = {};
+        githubContributors.forEach(function(user) {
+          contributors[user.login] = 'contributor';
         });
 
         // Temporary stop-gap solution until we can figure out
         // who the admins are
-        collaborators[ownerLogin] = 'admin';
+        contributors[ownerLogin] = 'admin';
       })
       .nodeify(callback);
   };
 
   this.map = function(username) {
-    return collaborators && collaborators[username];
+    return contributors && contributors[username];
   };
 }
 
