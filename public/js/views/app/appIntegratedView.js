@@ -152,7 +152,7 @@ define([
 
       $("#left-menu").addClass("visible");
       $("#mini-left-menu, #mini-left-menu-container").addClass("active");
-      $("#content-wrapper, #toolbar-frame, #menu-toggle-button, #header-wrapper, #chat-input-wrapper").addClass("leftCollapse");
+      $("#iframe-panel, #menu-toggle-button").addClass("leftCollapse");
 
       this.leftmenu = true;
     },
@@ -175,7 +175,7 @@ define([
       }, 350);
 
       $("#mini-left-menu, #mini-left-menu-container").removeClass("active");
-      $("#content-wrapper, #toolbar-frame, #menu-toggle-button, #header-wrapper, #chat-input-wrapper").removeClass("leftCollapse");
+      $("#iframe-panel, #menu-toggle-button").removeClass("leftCollapse");
       $("#left-menu").removeClass("visible");
 
       this.leftmenu = false;
