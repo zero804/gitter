@@ -6,13 +6,21 @@ define([
 ], function(Backbone, _, log) {
   "use strict";
 
-  function compareString(a, b) {
-    a = a ? a.toLowerCase() : '';
-    b = b ? b.toLowerCase() : '';
+  // higher index in array, higher rank
+  var roleRank = ['admin'];
 
-    if(a === b) return 0;
-    if(a > b) return 1;
-    return -1;
+  function compareRoles(userA, userB) {
+    var aRole = userA.get('role');
+    var bRole = userB.get('role');
+
+    return roleRank.indexOf(aRole) - roleRank.indexOf(bRole);
+  }
+
+  function compareNames(userA, userB) {
+    var aName = userA.get('displayName') || userA.get('username');
+    var bName = userB.get('displayName') || userB.get('username');
+
+    return bName.localeCompare(aName);
   }
 
   var MegaCollection = Backbone.Collection.extend({
@@ -39,8 +47,15 @@ define([
       this.remove(model);
     },
 
-    comparator: function(a, b) {
-      return compareString(a.get('name'), b.get('name'));
+    // lower in array is better
+    comparator: function(userA, userB) {
+      var roleDifference = compareRoles(userA, userB);
+
+      if(roleDifference !== 0) {
+        return - roleDifference;
+      } else {
+        return - compareNames(userA, userB);
+      }
     }
   });
 
