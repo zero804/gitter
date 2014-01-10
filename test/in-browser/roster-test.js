@@ -45,7 +45,7 @@ define([
     it("should sort by role", function() {
       var users = [
         new backbone.Model({displayName: 'A'}),
-        new backbone.Model({displayName: 'B', role: 'collaborator'}),
+        new backbone.Model({displayName: 'B', role: 'contributor'}),
         new backbone.Model({displayName: 'C', role: 'admin'})
       ];
 
@@ -59,7 +59,7 @@ define([
     it("should sort by role and trim", function() {
       var users = [
         new backbone.Model({displayName: 'A'}),
-        new backbone.Model({displayName: 'B', role: 'collaborator'}),
+        new backbone.Model({displayName: 'B', role: 'contributor'}),
         new backbone.Model({displayName: 'C', role: 'admin'})
       ];
 
