@@ -2,7 +2,7 @@
 define([
   './base',
   './smart-users'
-], function(TroupeCollections, SmartCollection) {
+], function(TroupeCollections, SmartUserCollection) {
   "use strict";
 
   var UserModel = TroupeCollections.Model.extend({
@@ -14,8 +14,6 @@ define([
     modelName: 'user',
     nestedUrl: "users"
   });
-
-  var SmartUserCollection = new SmartCollection(null, { users: new UserCollection() });
 
   return {
     SmartUserCollection: SmartUserCollection,

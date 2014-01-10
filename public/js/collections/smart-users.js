@@ -146,10 +146,9 @@ define([
 
   var Collection = LimitedCollection.extend({
     initialize: function(models, options) {
+      options.collection = new MegaCollection([], { users: options.users });
 
-      Collection.__super__.initialize.call(this, null, {
-        collection: new MegaCollection([], { users: options.users }),
-      });
+      Collection.__super__.initialize.call(this, models, options);
     }
   });
 
