@@ -7,7 +7,7 @@ define([
   "use strict";
 
   // higher index in array, higher rank
-  var roleRank = ['admin'];
+  var roleRank = ['collaborator', 'admin'];
 
   function compareRoles(userA, userB) {
     var aRole = userA.get('role');
