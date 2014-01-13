@@ -34,9 +34,6 @@ define([
 
       userVoice.install(this.$el.find('#help-button'), context.getUser());
 
-      // reference collections
-      var rosterCollection = itemCollections.roster;
-
       // File View
       // this.files.show(new FileView({ collection: fileCollection }));
 
@@ -50,7 +47,10 @@ define([
       }
 
       // People View
-      this.people.show(new PeopleCollectionView({ collection: rosterCollection }));
+      this.people.show(new PeopleCollectionView({
+        rosterCollection: itemCollections.roster,
+        userCollection: itemCollections.users
+      }));
 
       // Repo info
       if (context().troupe.githubType === 'REPO') {
