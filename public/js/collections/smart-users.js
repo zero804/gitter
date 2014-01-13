@@ -168,6 +168,9 @@ define([
   });
 
 
-  return Collection;
+  return {
+    SortedAndLimited: Collection,
+    Sorted: MegaCollection
+  };
 
 });
