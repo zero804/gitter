@@ -67,8 +67,9 @@ define([
 
   var AllUsersModal = TroupeViews.Modal.extend({
     initialize: function(options) {
+      options = options || {};
       options.title = "People";
-      TroupeViews.Modal.prototype.initialize.apply(this, options);
+      TroupeViews.Modal.prototype.initialize.call(this, options);
       this.view = new PeopleCollectionView(options);
     }
   });
