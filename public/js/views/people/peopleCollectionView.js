@@ -18,6 +18,11 @@ define([
     }
   });
 
+  var PeopleCollectionView = Marionette.CollectionView.extend({
+    tagName: "span",
+    itemView: PeopleItemView
+  });
+
   var RemainingView = backbone.View.extend({
     template: remainingViewTempate,
     initialize: function(options) {
@@ -33,14 +38,12 @@ define([
     }
   });
 
-  return TroupeViews.Base.extend({
+  var ExpandableRosterView = TroupeViews.Base.extend({
     template: peopleCollectionViewTemplate,
 
     initialize: function(options) {
-      this.rosterView = new Marionette.CollectionView({
-        tagName: "span",
-        collection: options.rosterCollection,
-        itemView: PeopleItemView
+      this.rosterView = new PeopleCollectionView({
+        collection: options.rosterCollection
       });
       this.remainingView = new RemainingView({
         roster: options.rosterCollection,
@@ -55,5 +58,9 @@ define([
     }
 
   });
+
+  return {
+    ExpandableRosterView: ExpandableRosterView
+  };
 
 });

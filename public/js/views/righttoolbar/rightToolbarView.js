@@ -47,7 +47,7 @@ define([
       }
 
       // People View
-      this.people.show(new PeopleCollectionView({
+      this.people.show(new PeopleCollectionView.ExpandableRosterView({
         rosterCollection: itemCollections.roster,
         userCollection: itemCollections.users
       }));
