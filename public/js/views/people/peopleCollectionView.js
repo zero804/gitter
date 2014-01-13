@@ -25,6 +25,9 @@ define([
 
   var RemainingView = backbone.View.extend({
     template: remainingViewTempate,
+    events: {
+      'click': 'showUsersModal'
+    },
     initialize: function(options) {
       this.roster = options.roster;
       this.users = options.users;
@@ -35,6 +38,9 @@ define([
       var remainingCount = this.users.length - this.roster.length;
       this.$el.html(this.template({remainingCount: remainingCount}));
       return this;
+    },
+    showUsersModal: function() {
+      new AllUsersModal({collection: this.users}).show();
     }
   });
 
@@ -57,6 +63,14 @@ define([
         .append(this.remainingView.render().el);
     }
 
+  });
+
+  var AllUsersModal = TroupeViews.Modal.extend({
+    initialize: function(options) {
+      options.title = "People";
+      TroupeViews.Modal.prototype.initialize.apply(this, options);
+      this.view = new PeopleCollectionView(options);
+    }
   });
 
   return {
