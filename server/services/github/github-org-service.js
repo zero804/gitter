@@ -8,7 +8,7 @@ var badCredentialsCheck = require('./bad-credentials-check');
 
 function GitHubOrgService(user) {
   this.user = user;
-  this.client = createClient.user(user);
+  this.client = createClient.full(user);
 }
 
 /**
