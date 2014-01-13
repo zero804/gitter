@@ -113,7 +113,8 @@ define([
         tooltip: this.showTooltip && user.displayName + "<br>" + ((user.location) ? user.location.description : ""),
         presenceClass: presenceClass,
         online: online,
-        offline: !online
+        offline: !online,
+        role: user.role
       };
     },
 

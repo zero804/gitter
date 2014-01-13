@@ -126,7 +126,12 @@ exports.serializeUsersForTroupe = function(troupeId, userId, callback) {
   troupeService.findUserIdsForTroupe(troupeId, function(err, userIds) {
     if(err) return callback(err);
 
-    var strategy = new restSerializer.UserIdStrategy( { showPresenceForTroupeId: troupeId });
+    var strategy = new restSerializer.UserIdStrategy({
+      showPresenceForTroupeId: troupeId,
+      includeRolesForTroupeId: troupeId,
+      currentUserId: userId
+    });
+
     restSerializer.serialize(userIds, strategy, callback);
   });
 };
