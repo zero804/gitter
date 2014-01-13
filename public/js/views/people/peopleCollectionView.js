@@ -19,11 +19,12 @@ define([
   });
 
   var PeopleCollectionView = Marionette.CollectionView.extend({
-    tagName: "span",
+    tagName: 'p',
     itemView: PeopleItemView
   });
 
   var RemainingView = backbone.View.extend({
+    tagName: 'p',
     template: remainingViewTempate,
     initialize: function(options) {
       this.roster = options.roster;
@@ -33,7 +34,10 @@ define([
     },
     render: function() {
       var remainingCount = this.users.length - this.roster.length;
-      this.$el.html(this.template({remainingCount: remainingCount}));
+      this.$el.html(this.template({
+        remainingCount: remainingCount,
+        plural: remainingCount > 1
+      }));
       return this;
     }
   });
