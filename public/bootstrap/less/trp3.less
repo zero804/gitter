@@ -1139,6 +1139,25 @@ i.favourited:hover:before {
 
 }
 
+.trpMoreBadge {
+  clear: both;
+  color: #333;
+  border: 1px solid rgba(100,100,100,0.5);
+  display: inline-block;
+  border-radius: 4px;
+  border: 1px solid fade(@trpLightBlue, 20%);
+  background-color: fade(@trpLightBlue, 20%);
+  border-radius: 2px;
+  padding: 0 4px;
+  font-size: 11px;
+  .transition300ms;
+  margin-bottom: 12px;
+}
+
+.trpMoreBadge:hover {
+  background-color: fade(@trpLightBlue, 30%);
+}
+
 .trpChatInputArea.rightCollapse, .trpHeaderContainer.rightCollapse, .trpChatPanel.rightCollapse {
   margin-right: 510px;
 
