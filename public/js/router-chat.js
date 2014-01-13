@@ -85,7 +85,7 @@ require([
   new Router({
     routes: [
       { name: "person",           re: /^person\/(\w+)$/,          viewType: PersonDetailView.Modal,             collection: itemCollections.users },
-      { name: "people",           re: /^people/,                  viewType: peopleCollectionView.Modal,         collection: itemCollections.users, skipModelLoad: true },
+      { name: "people",           re: /^people/,                  viewType: peopleCollectionView.Modal,         collection: itemCollections.sortedUsers, skipModelLoad: true },
       { name: "inv",              re: /^inv$/,                    viewType: inviteView.Modal },
       { name: "troupeSettings",   re: /^troupeSettings/,          viewType: troupeSettingsView },
       { name: "markdown",         re: /^markdown/,                viewType: markdownView },
