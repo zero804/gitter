@@ -176,16 +176,16 @@ a .trpDisplayPicture {
 
 .trpStatus {
   position: absolute;
-  top: 5px;
-  left: -6px;
-  border-radius: 5em;
-  border: 2px solid white;
+  bottom: -2px;
+  left: 10px;
+  border: 1px solid @trpBgColor;
   width: 8px;
-  height: 8px;
+  height: 3px;
   display: block;
+  border-bottom: 0;
 }
 
-.trpDPUnreadCount {
+.DPUnreadCount {
   .defaultHidden;
   position: absolute;
   top: 5px;
@@ -216,6 +216,10 @@ a .trpDisplayPicture {
     border-bottom: 1px solid white;
     height: 100%; width: 100%;
     box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;
+}
+
+.trpDisplayPicture {
+  border-bottom: 2px solid transparent;
 }
 
 .trpDisplayPicture.online .trpStatus{
