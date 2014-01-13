@@ -40,12 +40,16 @@ define([
       return options;
     },
     scrollElementSelector: "#content-frame",
-    initialize: function(options) {
-      // this.hasLoaded = false;
 
+    adjustTopPadding: function() {
       $('.trpChatContainer > div:first-child').css({
         'padding-top' : $('#header-wrapper').height()+15
       });
+    },
+
+    initialize: function(options) {
+      // this.hasLoaded = false;
+      this.adjustTopPadding();
 
       var contentFrame = document.querySelector(this.scrollElementSelector);
 
@@ -107,6 +111,10 @@ define([
     },
 
     onAfterItemAdded: function() {
+      if(this.collection.length === 1) {
+        this.adjustTopPadding();
+      }
+
       if(!this._findingNextUnread) return;
 
       var view = this.children.findByModel(this.unreadItemToTrack);
