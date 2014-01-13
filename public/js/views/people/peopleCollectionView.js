@@ -4,8 +4,9 @@ define([
   'backbone',
   'views/base',
   'hbs!./tmpl/peopleItemView',
-  'hbs!./tmpl/peopleCollectionView'
-], function(Marionette, backbone, TroupeViews, peopleItemViewTemplate, peopleCollectionViewTemplate) {
+  'hbs!./tmpl/peopleCollectionView',
+  'hbs!./tmpl/remainingView'
+], function(Marionette, backbone, TroupeViews, peopleItemViewTemplate, peopleCollectionViewTemplate, remainingViewTempate) {
   "use strict";
 
   var PeopleItemView = TroupeViews.Base.extend({
@@ -18,6 +19,7 @@ define([
   });
 
   var RemainingView = backbone.View.extend({
+    template: remainingViewTempate,
     initialize: function(options) {
       this.roster = options.roster;
       this.users = options.users;
@@ -26,7 +28,7 @@ define([
     },
     render: function() {
       var remainingCount = this.users.length - this.roster.length;
-      this.$el.html('and '+remainingCount+' more');
+      this.$el.html(this.template({remainingCount: remainingCount}));
       return this;
     }
   });
