@@ -42,6 +42,11 @@ define([
     scrollElementSelector: "#content-frame",
     initialize: function(options) {
       // this.hasLoaded = false;
+
+      $('.trpChatContainer > div:first-child').css({
+        'padding-top' : $('#header-wrapper').height()+15
+      });
+
       var contentFrame = document.querySelector(this.scrollElementSelector);
 
       this.rollers = new Rollers(contentFrame);
