@@ -16,7 +16,8 @@ define([
   });
 
   return {
-    SmartUserCollection: SmartUserCollection,
+    RosterCollection: SmartUserCollection.SortedAndLimited,
+    SortedUserCollection: SmartUserCollection.Sorted,
     UserCollection: UserCollection,
     UserModel: UserModel
   };
