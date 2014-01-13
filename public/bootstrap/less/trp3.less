@@ -557,6 +557,7 @@ a.trpMiniLeftMenuItem {
   font-family: 'troupe-icons';
   content: '\e827';
   font-size: 14px;
+  -webkit-font-smoothing: antialiased;
 }
 
 .disabled {
@@ -1067,7 +1068,7 @@ i.favourited:hover:before {
   font-size: 14px;
   position: fixed;
   display: inline-block;
-  width: 240px;
+  width: 260px;
   text-align: left;
   vertical-align: top;
   right: 0;
@@ -1136,6 +1137,25 @@ i.favourited:hover:before {
     }
   }
 
+}
+
+.trpMoreBadge {
+  clear: both;
+  color: #333;
+  border: 1px solid rgba(100,100,100,0.5);
+  display: inline-block;
+  border-radius: 4px;
+  border: 1px solid fade(@trpLightBlue, 20%);
+  background-color: fade(@trpLightBlue, 20%);
+  border-radius: 2px;
+  padding: 0 4px;
+  font-size: 11px;
+  .transition300ms;
+  margin-bottom: 12px;
+}
+
+.trpMoreBadge:hover {
+  background-color: fade(@trpLightBlue, 30%);
 }
 
 .trpChatInputArea.rightCollapse, .trpHeaderContainer.rightCollapse, .trpChatPanel.rightCollapse {

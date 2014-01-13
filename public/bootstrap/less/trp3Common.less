@@ -40,6 +40,8 @@
 .trpDisplayPicture {
 	display: inline-block;
   text-align: center;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
     -webkit-transform: translate3d(0, 0, 0);
   &.unread {
     -webkit-animation: pulsate 3s ease-out;
@@ -92,6 +94,7 @@ a .trpDisplayPicture {
 	width: 29px;
 	border-radius: 4px;
   background-size: cover;
+
 
  .trpTroupeAvatarText {
   .trpBodySmall;
@@ -173,16 +176,16 @@ a .trpDisplayPicture {
 
 .trpStatus {
   position: absolute;
-  top: 5px;
-  left: -6px;
-  border-radius: 5em;
-  border: 2px solid white;
+  bottom: -2px;
+  left: 10px;
+  border: 1px solid @trpBgColor;
   width: 8px;
-  height: 8px;
+  height: 3px;
   display: block;
+  border-bottom: 0;
 }
 
-.trpDPUnreadCount {
+.DPUnreadCount {
   .defaultHidden;
   position: absolute;
   top: 5px;
@@ -200,7 +203,26 @@ a .trpDisplayPicture {
   display: inline-block
 }
 
-.trpDisplayPicture.online .trpStatus {
+.trpDisplayPicture.admin {
+  border-bottom: 2px solid #34495e;
+}
+
+.trpDisplayPicture.contributor {
+  border-bottom: 2px solid #3498db;
+}
+
+.trpDisplayPicture.admin:before, .trpDisplayPicture.contributor:before {
+    position: absolute; display: block; content: '';
+    border-bottom: 1px solid white;
+    height: 100%; width: 100%;
+    box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;
+}
+
+.trpDisplayPicture {
+  border-bottom: 2px solid transparent;
+}
+
+.trpDisplayPicture.online .trpStatus{
   background-color: #06ff00;
 }
 
@@ -211,6 +233,13 @@ a .trpDisplayPicture {
 .trpDisplayPicture.busy .trpStatus {
   background-color: #ff2400;
 }
+
+/*.trpDisplayPicture.online:before {
+  content: '\e830';
+  font-family: 'troupe-icons';
+  font-size: 9px;
+  -webkit-font-smoothing: antialiased;
+}*/
 
 .trpButtonGreen {
 	.trpBodyMedium;

@@ -4,6 +4,7 @@ require([
   'backbone',
   'utils/context',
   'utils/appevents',
+  'views/people/peopleCollectionView',
   'views/app/chatIntegratedView',
   'views/chat/chatInputView',
   'views/chat/chatCollectionView',
@@ -32,7 +33,7 @@ require([
   'template/helpers/all', // No ref
   'components/eyeballs', // No ref
   'bootstrap-dropdown' // No ref
-], function($, Backbone, context, appEvents, ChatIntegratedView, chatInputView,
+], function($, Backbone, context, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
     PersonDetailView, inviteView, troupeSettingsView, markdownView, IntegrationSettingsModal,
     Router, unreadItemsClient, FileDecorator, webhookDecorator, issueDecorator, mentionDecorator,
@@ -84,6 +85,7 @@ require([
   new Router({
     routes: [
       { name: "person",           re: /^person\/(\w+)$/,          viewType: PersonDetailView.Modal,             collection: itemCollections.users },
+      { name: "people",           re: /^people/,                  viewType: peopleCollectionView.Modal,         collection: itemCollections.users, skipModelLoad: true },
       { name: "inv",              re: /^inv$/,                    viewType: inviteView.Modal },
       { name: "troupeSettings",   re: /^troupeSettings/,          viewType: troupeSettingsView },
       { name: "markdown",         re: /^markdown/,                viewType: markdownView },
