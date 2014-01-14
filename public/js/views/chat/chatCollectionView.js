@@ -42,7 +42,6 @@ define([
     scrollElementSelector: "#content-frame",
 
     adjustTopPadding: function() {
-      console.log("ADJUST!");
       $('.trpChatContainer > div:first-child').css({
         'padding-top' : $('#header-wrapper').height()+15
       });
@@ -55,7 +54,6 @@ define([
       var resizer;
       $(window).resize(function(){
         clearTimeout(resizer);
-        console.log('timeout');
         resizer = setTimeout(self.adjustTopPadding, 100);
       });
 
