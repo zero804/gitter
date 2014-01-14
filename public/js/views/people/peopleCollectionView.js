@@ -10,7 +10,7 @@ define([
   "use strict";
 
   var PeopleItemView = TroupeViews.Base.extend({
-    tagName: 'span',
+    tagName: 'li',
     template: peopleItemViewTemplate,
 
     initialize: function(/*options*/) {
@@ -19,7 +19,7 @@ define([
   });
 
   var PeopleCollectionView = Marionette.CollectionView.extend({
-    tagName: 'p',
+    tagName: 'ul',
     className: 'roster',
     itemView: PeopleItemView,
     initialize: function() {
