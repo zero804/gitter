@@ -14,7 +14,7 @@ define([
 
   var chatCollection         = new chatModels.ChatCollection(null, { listen: true });
   var userCollection         = new userModels.UserCollection(null, { listen: true });
-  var rosterCollection       = new userModels.RosterCollection(null, { users: userCollection, limit: 8 });
+  var rosterCollection       = new userModels.RosterCollection(null, { users: userCollection, limit: 18 });
   var sortedUserCollection   = new userModels.SortedUserCollection(null, { users: userCollection});
 
   function helpers() {
