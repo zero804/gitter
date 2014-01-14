@@ -692,7 +692,7 @@ function addTroupeAsFavouriteInLastPosition(userId, troupeId) {
         { upsert: true })
         .then(function() {
           // Fire a realtime event
-          // TODO: fire the full object
+          appEvents.recentRoomsChange({ userId: userId, troupeId: troupeId });
           appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: lastPosition });
         });
     });
@@ -740,7 +740,7 @@ function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
         { upsert: true })
         .then(function() {
           // Fire a realtime event
-          // TODO: fire the full object
+          appEvents.recentRoomsChange({ userId: userId, troupeId: troupeId });
           appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: position });
         });
     });
@@ -766,7 +766,9 @@ function updateFavourite(userId, troupeId, favouritePosition) {
     { })
     .then(function() {
       // Fire a realtime event
-      // TODO: fire the full object
+      appEvents.recentRoomsChange({ userId: userId, troupeId: troupeId });
+
+      // TODO: in future get rid of this but this collection is used by the native clients
       appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: favouritePosition });
     });
 }

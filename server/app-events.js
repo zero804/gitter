@@ -227,6 +227,14 @@ function bind(on) {
 
     onTroupeDeleted: function(callback) {
       on('troupeDeleted', callback);
+    },
+
+    recentRoomsChange: function(options) {
+      emit('recentRoomsChange', options);
+    },
+
+    onRecentRoomsChange: function(callback) {
+      on('recentRoomsChange', callback);
     }
 
   };
