@@ -110,7 +110,7 @@ define([
         userDisplayName: user.displayName,
         avatarUrl: avatarUrl,
         avatarSize: this.avatarSize,
-        tooltip: this.showTooltip && user.displayName + "<br>" + ((user.location) ? user.location.description : ""),
+        showTooltip: this.showTooltip,
         presenceClass: presenceClass,
         online: online,
         offline: !online,
