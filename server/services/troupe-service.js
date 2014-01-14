@@ -671,16 +671,29 @@ function createUniqueUri() {
   return uri;
 }
 
-function updateFavourite(userId, troupeId, isFavourite, callback) {
+function updateFavourite(userId, troupeId, favouritePosition, callback) {
   var setOp = {};
-  setOp['favs.' + troupeId] = '1';
+
   var updateStatement;
   var updateOptions;
 
-  if(isFavourite) {
+  /* Deal with legacy */
+  if(favouritePosition) {
+    if(favouritePosition === true) {
+      favouritePosition = 1000;
+    } else {
+      favouritePosition = parseInt(favouritePosition, 10);
+      if(isNaN(favouritePosition)) {
+        favouritePosition = 1000;
+      }
+    }
+
+    setOp['favs.' + troupeId] = favouritePosition;
     updateStatement = { $set: setOp };
     updateOptions = { upsert: true };
+
   } else {
+    setOp['favs.' + troupeId] = 1;
     updateStatement = { $unset: setOp };
     updateOptions = { };
   }
@@ -691,7 +704,8 @@ function updateFavourite(userId, troupeId, isFavourite, callback) {
     updateOptions)
     .then(function() {
       // Fire a realtime event
-      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: isFavourite });
+      // TODO: fire the full object
+      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: favouritePosition });
     })
     .nodeify(callback);
 }
