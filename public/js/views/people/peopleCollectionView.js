@@ -20,6 +20,7 @@ define([
 
   var PeopleCollectionView = Marionette.CollectionView.extend({
     tagName: 'p',
+    className: 'roster',
     itemView: PeopleItemView,
     initialize: function() {
       this.listenTo(this.collection, 'sort reset', this.render);
@@ -28,6 +29,7 @@ define([
 
   var RemainingView = backbone.View.extend({
     tagName: 'p',
+    className: 'remaining',
     template: remainingViewTempate,
     initialize: function(options) {
       this.roster = options.roster;
@@ -41,6 +43,8 @@ define([
         remainingCount: remainingCount,
         plural: remainingCount > 1
       }));
+      this.$el.toggleClass('showFull', remainingCount > 0);
+      this.$el.toggleClass('showMid', this.roster.length > 8);
       return this;
     }
   });

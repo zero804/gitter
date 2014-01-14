@@ -1134,9 +1134,36 @@ i.favourited:hover:before {
     #people-list .trpToolbarListContent
     {
       margin-left: 6px;
+      padding-right: 20px;
     }
   }
 
+}
+
+#people-list {
+
+  .remaining {
+    display: none;
+    &.showFull {
+      display: initial;
+    }
+  }
+
+  @media @mid {
+    // dont show more than 8 avatars
+    .roster > span:nth-child(n+9) {
+      display:none;
+    }
+
+    .remaining {
+      &.showMid {
+        display: initial;
+      }
+      small {
+        display: none;
+      }
+    }
+  }
 }
 
 .trpMoreBadge {
