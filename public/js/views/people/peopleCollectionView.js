@@ -44,7 +44,7 @@ define([
         plural: remainingCount > 1
       }));
       this.$el.toggleClass('showFull', remainingCount > 0);
-      this.$el.toggleClass('showMid', this.roster.length > 8);
+      this.$el.toggleClass('showMid', this.roster.length > 10);
       return this;
     }
   });
