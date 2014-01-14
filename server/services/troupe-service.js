@@ -15,7 +15,11 @@ var ObjectID                 = require('mongodb').ObjectID;
 var _                        = require('underscore');
 var assert                   = require('assert');
 var statsService             = require("../services/stats-service");
-var permissionsModel          = require("./permissions-model");
+var permissionsModel         = require("./permissions-model");
+var lazy                     = require("lazy.js");
+
+/* const */
+var LEGACY_FAV_POSITION = 1000;
 
 function ensureExists(value) {
   if(!value) throw 404;
@@ -671,41 +675,115 @@ function createUniqueUri() {
   return uri;
 }
 
-function updateFavourite(userId, troupeId, favouritePosition, callback) {
-  var setOp = {};
+function addTroupeAsFavouriteInLastPosition(userId, troupeId) {
+  return findFavouriteTroupesForUser(userId)
+    .then(function(userTroupeFavourites) {
+      var lastPosition = lazy(userTroupeFavourites)
+        .values()
+        .concat(0)
+        .max() + 1;
 
-  var updateStatement;
-  var updateOptions;
+      var setOp = {};
+      setOp['favs.' + troupeId] = lastPosition;
 
-  /* Deal with legacy */
-  if(favouritePosition) {
-    if(favouritePosition === true) {
-      favouritePosition = 1000;
-    } else {
-      favouritePosition = parseInt(favouritePosition, 10);
-      if(isNaN(favouritePosition)) {
-        favouritePosition = 1000;
+      return persistence.UserTroupeFavourites.updateQ(
+        { userId: userId },
+        { $set: setOp },
+        { upsert: true })
+        .then(function() {
+          // Fire a realtime event
+          // TODO: fire the full object
+          appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: lastPosition });
+        });
+    });
+}
+
+
+function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
+  return findFavouriteTroupesForUser(userId)
+    .then(function(userTroupeFavourites) {
+      var values = lazy(userTroupeFavourites)
+        .pairs()
+        .filter(function(a) {
+          return a[1] >= position && a[0] != troupeId;
+        })
+        .tap(console.log)
+        .sortBy(function(a) {
+          return a[1];
+        })
+        .toArray();
+
+      var next = position;
+      for(var i = 1; i < values.length; i++) {
+        var item = values[i];
+
+        if(item[1] > next) {
+          values = values.slice(0, i - 1);
+          break;
+        }
+        item[1]++;
+        next = item[1]++;
       }
+
+      var inc = lazy(values)
+        .map(function(a) {
+          return ['favs.' + a[0], 1];
+        })
+        .toObject();
+
+      var set = {};
+      set['favs.' + troupeId] = position;
+
+      return persistence.UserTroupeFavourites.updateQ(
+        { userId: userId },
+        { $set: set, $inc: inc },
+        { upsert: true })
+        .then(function() {
+          // Fire a realtime event
+          // TODO: fire the full object
+          appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: position });
+        });
+    });
+
+}
+
+function updateFavourite(userId, troupeId, favouritePosition) {
+  if(favouritePosition) {
+    /* Deal with legacy, or when the star button is toggled */
+    if(favouritePosition === true) {
+      return addTroupeAsFavouriteInLastPosition(userId, troupeId);
     }
 
-    setOp['favs.' + troupeId] = favouritePosition;
-    updateStatement = { $set: setOp };
-    updateOptions = { upsert: true };
-
-  } else {
-    setOp['favs.' + troupeId] = 1;
-    updateStatement = { $unset: setOp };
-    updateOptions = { };
+    return addTroupeAsFavouriteInPosition(userId, troupeId, favouritePosition);
   }
+
+  var setOp = {};
+  setOp['favs.' + troupeId] = 1;
 
   return persistence.UserTroupeFavourites.updateQ(
     { userId: userId },
-    updateStatement,
-    updateOptions)
+    { $unset: setOp },
+    { })
     .then(function() {
       // Fire a realtime event
       // TODO: fire the full object
       appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: favouritePosition });
+    });
+}
+
+function findFavouriteTroupesForUser(userId, callback) {
+  return persistence.UserTroupeFavourites.findOneQ({ userId: userId})
+    .then(function(userTroupeFavourites) {
+      if(!userTroupeFavourites || !userTroupeFavourites.favs) return {};
+
+      return lazy(userTroupeFavourites.favs)
+              .pairs()
+              .map(function(a) {
+                // Replace any legacy values with 1000
+                if(a[1] === '1') a[1] = LEGACY_FAV_POSITION;
+                return a;
+              })
+              .toObject();
     })
     .nodeify(callback);
 }
@@ -725,15 +803,6 @@ function updateTopic(user, troupe, topic) {
     });
 }
 
-function findFavouriteTroupesForUser(userId, callback) {
-  return persistence.UserTroupeFavourites.findOneQ({ userId: userId})
-    .then(function(userTroupeFavourites) {
-      if(!userTroupeFavourites || !userTroupeFavourites.favs) return {};
-
-      return userTroupeFavourites.favs;
-    })
-    .nodeify(callback);
-}
 
 function findAllUserIdsForTroupes(troupeIds, callback) {
   if(!troupeIds.length) return callback(null, []);

@@ -91,19 +91,19 @@ describe('troupe-service', function() {
 
       var troupeService = testRequire('./services/troupe-service');
 
-
       function fav(val, callback) {
-        troupeService.updateFavourite(fixture.user1.id, fixture.troupe1.id, val, function(err) {
-          if(err) return done(err);
-
-          troupeService.findFavouriteTroupesForUser(fixture.user1.id, function(err, favs) {
+        troupeService.updateFavourite(fixture.user1.id, fixture.troupe1.id, val)
+          .nodeify(function(err) {
             if(err) return done(err);
 
-            var isInTroupe = !!favs[fixture.troupe1.id];
-            assert(isInTroupe === val, 'Troupe should ' + (val? '': 'not ') + 'be a favourite');
-            callback();
+            troupeService.findFavouriteTroupesForUser(fixture.user1.id, function(err, favs) {
+              if(err) return done(err);
+
+              var isInTroupe = !!favs[fixture.troupe1.id];
+              assert(isInTroupe === val, 'Troupe should ' + (val? '': 'not ') + 'be a favourite');
+              callback();
+            });
           });
-        });
       }
 
       fav(true, function() {
@@ -116,10 +116,56 @@ describe('troupe-service', function() {
         });
       });
 
-
-
     });
 
+    it('should rearrange the order of favourites correctly',function(done) {
+      function getFavs() {
+        return troupeService.findFavouriteTroupesForUser(fixture.user1.id);
+      }
+      var troupeService = testRequire('./services/troupe-service');
+      troupeService.updateFavourite(fixture.user1.id, fixture.troupe1.id, 1)
+        .then(getFavs)
+        .then(function(favs) {
+          assert.equal(favs[fixture.troupe1.id], 1);
+        })
+        .then(function() {
+          return troupeService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 1);
+        })
+        .then(getFavs)
+        .then(function(favs) {
+          assert.equal(favs[fixture.troupe1.id], 2);
+          assert.equal(favs[fixture.troupe2.id], 1);
+        })
+        .then(function() {
+          return troupeService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 3);
+        })
+        .then(getFavs)
+        .then(function(favs) {
+          assert.equal(favs[fixture.troupe1.id], 2);
+          assert.equal(favs[fixture.troupe2.id], 3);
+        })
+        .then(function() {
+          return troupeService.updateFavourite(fixture.user1.id, fixture.troupe3.id, 1);
+        })
+        .then(getFavs)
+        .then(function(favs) {
+          assert.equal(favs[fixture.troupe3.id], 1);
+          assert.equal(favs[fixture.troupe1.id], 2);
+          assert.equal(favs[fixture.troupe2.id], 3);
+        })
+        .then(function() {
+          return troupeService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 2);
+        })
+        .then(getFavs)
+        .then(function(favs) {
+          console.log(favs);
+          assert.equal(favs[fixture.troupe3.id], 1);
+          assert.equal(favs[fixture.troupe2.id], 2);
+          assert.equal(favs[fixture.troupe1.id], 3);
+        })
+
+        .nodeify(done);
+    });
 
   });
 
@@ -432,6 +478,8 @@ describe('troupe-service', function() {
       users: ['user1', 'user2']
     },
     troupe2: {
+    },
+    troupe3: {
     },
     troupeForDeletion: {
       users: ['user1', 'user2']
