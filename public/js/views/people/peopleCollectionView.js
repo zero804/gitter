@@ -20,7 +20,10 @@ define([
 
   var PeopleCollectionView = Marionette.CollectionView.extend({
     tagName: 'p',
-    itemView: PeopleItemView
+    itemView: PeopleItemView,
+    initialize: function() {
+      this.listenTo(this.collection, 'sort reset', this.render);
+    }
   });
 
   var RemainingView = backbone.View.extend({
