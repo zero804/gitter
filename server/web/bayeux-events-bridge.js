@@ -6,6 +6,7 @@ var appEvents         = require("../app-events");
 var bayeux            = require('./bayeux');
 var ent               = require('ent');
 var presenceService   = require("../services/presence-service");
+var restSerializer    = require("../serializers/rest-serializer");
 
 exports.install = function() {
   var bayeuxClient = bayeux.client;
@@ -141,6 +142,27 @@ exports.install = function() {
       notification: "unread_items_removed",
       items: items
     });
+
+  });
+
+  appEvents.localOnly.onRecentRoomsChange(function(data) {
+    var userId = data.userId;
+    var troupeId = data.troupeId;
+
+    var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
+
+    restSerializer.serialize(troupeId, strategy, function(err, serialized) {
+      if(err) return winston.error('Error while serializing troupe: ' + err, { exception: err });
+
+      var message = {
+        operation: 'update',
+        model: serialized
+      };
+
+      bayeuxClient.publish("/api/v1/user/" + userId + '/recentRooms', message);
+    });
+
+
 
   });
 };
