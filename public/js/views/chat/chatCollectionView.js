@@ -40,11 +40,21 @@ define([
       return options;
     },
     scrollElementSelector: "#content-frame",
-    initialize: function(options) {
-      // this.hasLoaded = false;
 
+    adjustTopPadding: function() {
       $('.trpChatContainer > div:first-child').css({
         'padding-top' : $('#header-wrapper').height()+15
+      });
+    },
+
+    initialize: function(options) {
+      // this.hasLoaded = false;
+      this.adjustTopPadding();
+      var self=this;
+      var resizer;
+      $(window).resize(function(){
+        clearTimeout(resizer);
+        resizer = setTimeout(self.adjustTopPadding, 100);
       });
 
       var contentFrame = document.querySelector(this.scrollElementSelector);
@@ -107,6 +117,10 @@ define([
     },
 
     onAfterItemAdded: function() {
+      if(this.collection.length === 1) {
+        this.adjustTopPadding();
+      }
+
       if(!this._findingNextUnread) return;
 
       var view = this.children.findByModel(this.unreadItemToTrack);
