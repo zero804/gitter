@@ -4,7 +4,6 @@ define([
   'collections/users'
 ], function(backbone, collectionLib) {
 
-  // var collection.SmartUserCollection;
   function assert(condition, message) {
     if (!condition) {
       throw message || "Assertion failed";
@@ -36,7 +35,7 @@ define([
       ];
 
       var collection = new backbone.Collection();
-      var roster = new collectionLib.SmartUserCollection(null, { users: collection, limit: 2 });
+      var roster = new collectionLib.RosterCollection(null, { users: collection, limit: 2 });
       collection.add(users);
 
       assertCollection(roster, ['A', 'B']);
@@ -50,7 +49,7 @@ define([
       ];
 
       var collection = new backbone.Collection();
-      var roster = new collectionLib.SmartUserCollection(null, { users: collection, limit: 5 });
+      var roster = new collectionLib.RosterCollection(null, { users: collection, limit: 5 });
       collection.add(users);
 
       assertCollection(roster, ['C', 'B', 'A']);
@@ -64,13 +63,13 @@ define([
       ];
 
       var collection = new backbone.Collection();
-      var roster = new collectionLib.SmartUserCollection(null, { users: collection, limit: 2 });
+      var roster = new collectionLib.RosterCollection(null, { users: collection, limit: 2 });
       collection.add(users);
 
       assertCollection(roster, ['C', 'B']);
     });
 
-    it("should sort work with mike's weird case", function() {
+    it("should work with mike's weird case", function() {
       var users = [{
         "id":"529f4686278f637b8bb75c54",
         "username":"mbtesting",
@@ -103,16 +102,12 @@ define([
       }];
 
       var collection = new backbone.Collection();
-      var roster = new collectionLib.SmartUserCollection(null, { users: collection, limit: 2 });
+      var roster = new collectionLib.RosterCollection(null, { users: collection, limit: 2 });
       collection.add(users);
 
       assertCollection(roster, ['gittertestbot', 'mbtesting']);
     });
 
-    
-
-
   });
-
 
 });

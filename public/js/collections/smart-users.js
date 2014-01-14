@@ -61,7 +61,7 @@ define([
 
   var LimitedCollection = Backbone.Collection.extend({
     initialize: function(models, options) {
-      var collection = options.collection;
+      var collection = new MegaCollection([], { users: options.users });
 
       this.underlying = collection;
       this.limit = options.limit || 10;
@@ -159,17 +159,8 @@ define([
     }
   });
 
-  var Collection = LimitedCollection.extend({
-    initialize: function(models, options) {
-      options.collection = new MegaCollection([], { users: options.users });
-
-      Collection.__super__.initialize.call(this, models, options);
-    }
-  });
-
-
   return {
-    SortedAndLimited: Collection,
+    SortedAndLimited: LimitedCollection,
     Sorted: MegaCollection
   };
 
