@@ -443,7 +443,10 @@ function FavouriteTroupesForUserStrategy(options) {
   };
 
   this.map = function(id) {
-    return self.favs[id] ? true : undefined;
+    var favs = self.favs[id];
+    if(!favs) return undefined;
+    if(favs === '1') return 1000;
+    return favs;
   };
 }
 

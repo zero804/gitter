@@ -27,11 +27,13 @@ var userService = testRequire("./services/user-service");
 
 describe('recent-room-service', function() {
   it('should generateRoomListForUser with favourites', function(done) {
-    return Q.all([
-        troupeService.updateFavourite(fixture.user1.id, fixture.troupe1.id, 2),
-        troupeService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 1),
-        troupeService.updateFavourite(fixture.user1.id, fixture.troupe3.id, true)
-      ])
+    return troupeService.updateFavourite(fixture.user1.id, fixture.troupe1.id, 2)
+      .then(function() {
+        return troupeService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 1);
+      })
+      .then(function() {
+        return troupeService.updateFavourite(fixture.user1.id, fixture.troupe3.id, true);
+      })
       .then(function() {
         return recentRoomService.generateRoomListForUser(fixture.user1);
       })
