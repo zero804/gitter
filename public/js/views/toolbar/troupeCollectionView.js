@@ -4,8 +4,9 @@ define([
   'marionette',
   'hbs!./tmpl/troupeListItem',
   'utils/appevents',
-  'utils/momentWrapper'
-], function(context, Marionette, troupeListItemTemplate, appEvents, moment) {
+  'utils/momentWrapper',
+  'log!item'
+], function(context, Marionette, troupeListItemTemplate, appEvents, moment, log) {
   "use strict";
 
   var createRoom = context.getUser().createRoom;
@@ -24,8 +25,7 @@ define([
       data.createRoom = createRoom;
       return data;
     },
-    clicked: function(e) {
-      e.preventDefault();
+    clicked: function() {
       var model = this.model;
       setTimeout(function() {
         // Make things feel a bit more responsive, but not too responsive
