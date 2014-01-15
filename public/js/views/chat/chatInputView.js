@@ -127,6 +127,8 @@ define([
     },
 
     afterRender: function() {
+      if (!window._troupeIsTablet) $("#chat-input-textarea").focus();
+
       var inputBox = new ChatInputBoxView({
         el: this.$el.find('.trpChatInputBoxTextArea'),
         rollers: this.rollers
