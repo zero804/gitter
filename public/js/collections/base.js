@@ -174,12 +174,21 @@ define([
          * case that the server object has been removed, but it's not that
          * likely and doesn't warrant the extra complexity
          */
-        self.set(snapshot, {
+        var options = {
           parse: true,    /* parse the items */
           remove: false,  /* used to be true - no longer remove items missing from the snapshot */
           add: true,      /* add new items */
           merge: true     /* merge into items that already exist */
-        });
+        };
+
+        if(self.length > 0) {
+          // add one by one
+          self.set(snapshot, options);
+        } else {
+          // trash it and add all in one go
+          self.reset(snapshot, options);
+        }
+
         self._onInitialLoad();
         self.trigger('sync');
       });
