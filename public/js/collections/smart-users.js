@@ -30,6 +30,8 @@ define([
       this.sortLimited = _.debounce(function() { this.sort(); }.bind(this), 10);
 
       this.listenTo(userList, 'add', this.parentAdd);
+      this.listenTo(userList, 'remove', this.parentRemove);
+      this.listenTo(userList, 'reset', this.parentReset);
 
       // this.listenTo(userList, 'change:displayName change:username change:role', this.sortLimited);
 
@@ -45,6 +47,10 @@ define([
 
     parentRemove: function(model) {
       this.remove(model);
+    },
+
+    parentReset: function(collection) {
+      this.reset(collection.models);
     },
 
     // lower in array is better
