@@ -6,18 +6,22 @@ define([
   'utils/context',
   '../base',
   'components/realtime',
+  '../recentRooms',
   '../troupes',
   '../orgs',
   'components/unread-items-frame-client',
   'filtered-collection' /* no ref */
-], function($, _, Backbone, context, base, realtime, troupeModels, orgModels, unreadItemsClient) {
+], function($, _, Backbone, context, base, realtime, recentRoomModels, troupeModels, orgModels, unreadItemsClient) {
   "use strict";
 
   var orgsCollection = new orgModels.OrgCollection(null, { listen: true });
+  // XXX: Why are we doing a fetch on this collection?
   orgsCollection.fetch();
 
   var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
   unreadItemsClient.installTroupeListener(troupeCollection);
+
+  var recentRooms = new recentRoomModels.RoomCollection(null, { listen: true });
 
   function filterTroupeCollection(filter) {
     var c = new Backbone.FilteredCollection(null, { model: troupeModels.TroupeModel, collection: troupeCollection });
@@ -95,6 +99,8 @@ define([
   //var smartCollection = new SmartCollection(null, { troupes: troupeCollection });
 
   return {
+    recentRooms: recentRooms,
+    // TODO: get rid of these collections?
     troupes: troupeCollection,
     peopleTroupes: peopleOnlyTroupeCollection,
     normalTroupes: filteredTroupeCollection,

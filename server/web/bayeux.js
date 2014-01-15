@@ -18,16 +18,24 @@ var appTag = appVersion.getAppTag();
 
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
-  { re: /^\/api\/v1\/troupes\/(\w+)$/,         validator: validateUserForTroupeSubscription },
-  { re: /^\/api\/v1\/troupes\/(\w+)\/(\w+)$/,  validator: validateUserForSubTroupeSubscription,  populator: populateSubTroupeCollection },
+  { re: /^\/api\/v1\/troupes\/(\w+)$/,
+    validator: validateUserForTroupeSubscription },
+  { re: /^\/api\/v1\/troupes\/(\w+)\/(\w+)$/,
+    validator: validateUserForSubTroupeSubscription,
+    populator: populateSubTroupeCollection },
   { re: /^\/api\/v1\/troupes\/(\w+)\/(\w+)\/(\w+)\/(\w+)$/,
-                                      validator: validateUserForSubTroupeSubscription,  populator: populateSubSubTroupeCollection },
-
-  { re: /^\/api\/v1\/user\/(\w+)\/(\w+)$/,     validator: validateUserForUserSubscription,       populator: populateSubUserCollection },
+    validator: validateUserForSubTroupeSubscription,
+    populator: populateSubSubTroupeCollection },
+  { re: /^\/api\/v1\/user\/(\w+)\/(\w+)$/,
+    validator: validateUserForUserSubscription,
+    populator: populateSubUserCollection },
   { re: /^\/api\/v1\/user\/(\w+)\/troupes\/(\w+)\/unreadItems$/,
-                                      validator: validateUserForUserSubscription,       populator: populateUserUnreadItemsCollection },
-  { re: /^\/api\/v1\/user\/(\w+)$/,            validator: validateUserForUserSubscription },
-  { re: /^\/api\/v1\/ping$/,                   validator: validateUserForPingSubscription }
+    validator: validateUserForUserSubscription,
+    populator: populateUserUnreadItemsCollection },
+  { re: /^\/api\/v1\/user\/(\w+)$/,
+    validator: validateUserForUserSubscription },
+  { re: /^\/api\/v1\/ping$/,
+    validator: validateUserForPingSubscription }
 ];
 
 var superClientPassword = nconf.get('ws:superClientPassword');
@@ -87,6 +95,9 @@ function populateSubUserCollection(options, callback) {
   switch(collection) {
     case "troupes":
       return restful.serializeTroupesForUser(userId, callback);
+
+    case "recentRooms":
+      return restful.serializeRecentRoomsForUser(userId, callback);
 
     default:
       winston.error('Unable to provide snapshot for ' + collection);
