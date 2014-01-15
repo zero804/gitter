@@ -90,6 +90,7 @@ define([
 
     focusLeftMenu: function() {
       log('focus');
+      $('#content-frame').blur();
       $('#left-menu').focus();
     },
 
