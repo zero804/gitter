@@ -34,8 +34,8 @@ define([
     initialize: function(options) {
       this.roster = options.roster;
       this.users = options.users;
-      this.listenTo(this.roster, 'add remove', this.render);
-      this.listenTo(this.users, 'add remove', this.render);
+      this.listenTo(this.roster, 'add remove reset', this.render);
+      this.listenTo(this.users, 'add remove reset', this.render);
     },
     render: function() {
       var remainingCount = this.users.length - this.roster.length;
