@@ -255,6 +255,7 @@ var userService = {
       .then(function() {
         // XXX: lastAccessTime should be a date but for some bizarre reason it's not
         // serializing properly
+        appEvents.recentRoomsChange({ userId: userId, troupeId: troupeId });
         appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
       })
       .nodeify(callback);
