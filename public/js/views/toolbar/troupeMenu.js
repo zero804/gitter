@@ -37,7 +37,8 @@ define([
       "click #search-clear-icon" : "onSearchClearIconClick",
       "click #left-menu-profile" : "onClickProfileMenu",
       "click #left-menu-repo-section" : "toggleRepoList",
-      "click #left-menu-users-section" : "togglePrivateChatList"
+      "click #left-menu-users-section" : "togglePrivateChatList",
+      "mousedown .trpLeftMenuWrapper" : "focusLeftMenu"
     },
 
     initialize: function() {
@@ -84,6 +85,10 @@ define([
 
 
       this.initHideListeners();
+    },
+
+    focusLeftMenu: function() {
+      $('#left-menu').focus();
     },
 
     onSearchClearIconClick: function() {
