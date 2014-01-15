@@ -578,11 +578,17 @@ a.trpMiniLeftMenuItem {
     padding-left: 10px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
+    cursor: pointer;
   }
 
   li:hover {
     border-radius: 0 4px 4px 0;
     background-color: rgba(255,255,255,0.2);
+
+    @media @mobile {
+      background-color: transparent;
+    }
+
   }
 
   span {

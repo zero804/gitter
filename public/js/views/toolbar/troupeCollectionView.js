@@ -26,7 +26,6 @@ define([
       return data;
     },
     clicked: function() {
-      log("clicked yo");
       var model = this.model;
       setTimeout(function() {
         // Make things feel a bit more responsive, but not too responsive
