@@ -13,7 +13,7 @@ var handlebars        = require('handlebars');
 var winston           = require("winston");
 var collections       = require("../utils/collections");
 var predicates        = collections.predicates;
-var processChat       = require('../utils/process-chat');
+var util              = require('util');
 
 // TODO: Fix this, use the CDN and code sign URLS
 function privateCdn(url) {
@@ -426,7 +426,8 @@ function LastTroupeAccessTimesForUserStrategy(options) {
   };
 
   this.map = function(id) {
-    return self.times[id] ? self.times[id] : undefined;
+    // No idea why, but sometimes these dates are converted to JSON as {}, hence the weirdness below
+    return self.times[id] ? new Date(self.times[id].valueOf()).toISOString() : undefined;
   };
 }
 

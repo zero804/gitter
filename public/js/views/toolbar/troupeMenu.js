@@ -69,8 +69,8 @@ define([
       // mega-list: unread troupe view
       this.unread.show(new TroupeCollectionView({collection: troupeCollections.unreadTroupes }));
 
-      // mega-list: favourite troupe view
-      this.favs.show(new TroupeCollectionView({ collection: troupeCollections.favouriteTroupes }));
+      // // mega-list: favourite troupe view
+      // this.favs.show(new TroupeCollectionView({ collection: troupeCollections.favouriteTroupes }));
 
       // search results collection view
       this.searchView = new SearchView({ troupes: troupeCollections.troupes, $input: this.$el.find('#list-search-input') });
