@@ -35,7 +35,7 @@ describe('recent-room-service', function() {
         return troupeService.updateFavourite(fixture.user1.id, fixture.troupe3.id, true);
       })
       .then(function() {
-        return recentRoomService.generateRoomListForUser(fixture.user1);
+        return recentRoomService.generateRoomListForUser(fixture.user1.id);
       })
       .then(function(roomList) {
         assert.equal(roomList.length, 3);
@@ -54,7 +54,7 @@ describe('recent-room-service', function() {
         userService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe4.id)
       ])
       .then(function() {
-        return recentRoomService.generateRoomListForUser(fixture.user1);
+        return recentRoomService.generateRoomListForUser(fixture.user1.id);
       })
       .then(function(roomList) {
         assert.equal(roomList.length, 4);

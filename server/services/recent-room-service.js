@@ -6,16 +6,15 @@ var userService   = require('./user-service');
 var troupeService = require('./troupe-service');
 var lazy          = require('lazy.js');
 
-function generateRoomListForUser(user) {
+function generateRoomListForUser(userId) {
   return Q.all([
-      troupeService.findFavouriteTroupesForUser(user.id),
-      userService.getTroupeLastAccessTimesForUser(user.id)
+      troupeService.findFavouriteTroupesForUser(userId),
+      userService.getTroupeLastAccessTimesForUser(userId)
     ])
     .spread(function(favourites, lats) {
-
       var sortedRooms = lazy(favourites)
                               .pairs()
-                              .sortBy(function(a) { return isNaN(a[1]) ? 1000 : a[1]; })
+                              .sortBy(function(a) { return isNaN(a[1]) ? 1000 : a[1]; }) // XXX: ? operation no longer needed
                               .pluck(function(a) { return a[0]; });
 
       var recentTroupeIds = lazy(lats)

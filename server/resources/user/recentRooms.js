@@ -1,22 +1,15 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var recentRoomService = require("../../services/recent-room-service");
-var restSerializer = require("../../serializers/rest-serializer");
+var restful = require("../../services/restful");
 
 module.exports = {
   base: 'recentRooms',
   id: 'recentRoom',
   index: function(req, res, next) {
-    recentRoomService.generateRoomListForUser(req.resourceUser)
-      .then(function(rooms) {
-        var strategy = new restSerializer.TroupeStrategy({ currentUserId: req.user.id });
-
-        restSerializer.serialize(rooms, strategy, function(err, serialized) {
-          if(err) return next(err);
-
-          res.send(serialized);
-        });
+    return restful.serializeRecentRoomsForUser(req.resourceUser.id)
+      .then(function(serialized) {
+        res.send(serialized);
       })
       .fail(next);
   },

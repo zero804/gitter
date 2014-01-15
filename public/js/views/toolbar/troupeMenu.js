@@ -64,7 +64,7 @@ define([
       this.people.show(new TroupeCollectionView({collection: troupeCollections.peopleTroupes, emptyView: Marionette.ItemView.extend({ template: privateTroupeListItemEmpty })}));
 
       // mega-list: recent troupe view
-      this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentTroupes }));
+      this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentRooms }));
 
       // mega-list: unread troupe view
       this.unread.show(new TroupeCollectionView({collection: troupeCollections.unreadTroupes }));
