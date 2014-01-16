@@ -24,6 +24,25 @@
 
 @import "highlight.less";
 
+#unread-banner {
+  position: absolute;
+  bottom: -35px;
+  height: 15px;
+  left: 250px;
+  right: 260px;
+  background-color: fade(@trpGreen, 90%);
+  color: white;
+  margin: 0 40px;
+  padding: 10px;
+  border-radius: 0 0 4px 4px;
+  cursor: pointer;
+  .trpBodyMedium
+}
+
+.hide {
+  display: none;
+}
+
 .transition300ms() {
   .transition(300ms);
 }
