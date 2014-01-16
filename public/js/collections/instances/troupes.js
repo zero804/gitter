@@ -57,7 +57,7 @@ define([
   });
 
   var recentRoomsNonFavourites = filterRecentRoomsCollection(function(m) {
-    return !m.get('favourite');
+    return !m.get('favourite') && !!m.get('lastAccessTime');
   });
 
   // collection of troupes that are Repos
