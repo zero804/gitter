@@ -29,7 +29,7 @@ function generateRoomListForUser(userId) {
                               .pairs()
                               .sortBy(function(a) { return a[1]; }) // Sort on the date
                               .reverse()                            // Reverse the sort (desc)
-                              .first(5)                             // Only pick 5
+                              .first(10)                            // Only pick 10
                               .pluck(function(a) { return a[0]; })  // Pick the troupeId
                               .without(sortedRooms);                // Remove any favourites
 
