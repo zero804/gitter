@@ -6,6 +6,10 @@
   .prepend-octicon('\f001')
 }
 
+.prepend-fav-icon() {
+  .prepend-gittericon('\e826')
+}
+
 .prepend-121-icon() {
   &:before {
     content: '@';
@@ -15,6 +19,30 @@
   position: relative;
   padding-left: 1.5em;
 }
+
+.prepend-channel-icon() {
+  &:before {
+    content: '#';
+    position: absolute;
+    left: 0;
+  }
+  position: relative;
+  padding-left: 1.5em;
+}
+
+.prepend-gittericon(@charCode) {
+    &:before {
+      font-family: 'troupe-icons';
+      font-style: normal;
+      font-variant: normal;
+      content: @charCode;
+      position: absolute;
+      left: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    position: relative;
+    padding-left: 1.5em;
+  }
 
 .prepend-octicon(@charCode) {
   &:before {
@@ -28,4 +56,4 @@
   }
   position: relative;
   padding-left: 1.5em;
-}
+  }
