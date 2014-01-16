@@ -5,17 +5,14 @@ define([
   'marionette',
   'utils/context',
   'utils/appevents',
-  'log!left-menu',
   'collections/instances/troupes',
   'views/toolbar/troupeCollectionView',
-  'hbs!views/toolbar/tmpl/privateTroupeListItemEmpty',
   'hbs!./tmpl/troupeMenu',
   './searchView',
   './profileView',
   './orgCollectionView',
-  './repoCollectionView',
   'nanoscroller' //no ref
-], function($, _, Marionette, context, appEvents, log, troupeCollections, TroupeCollectionView, privateTroupeListItemEmpty, template, SearchView, ProfileView, OrgCollectionView, RepoCollectionView) {
+], function($, _, Marionette, context, appEvents, troupeCollections, TroupeCollectionView, template, SearchView, ProfileView, OrgCollectionView) {
   "use strict";
 
   return Marionette.Layout.extend({
@@ -39,7 +36,7 @@ define([
     },
 
     initialize: function() {
-      this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
+      // this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
       this.repoList = false;
       var ua = navigator.userAgent.toLowerCase();
       if (ua.indexOf('gitter/') >= 0) {
@@ -59,8 +56,8 @@ define([
       this.profile.show(new ProfileView());
 
       // mega-list: recent troupe view
-      this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentRoomNonFavourites }));
-      this.favs.show(new TroupeCollectionView({ collection: troupeCollections.recentRoomFavourites }));
+      this.favs.show(new TroupeCollectionView({ collection: troupeCollections.recentRoomsFavourites }));
+      this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentRoomsNonFavourites }));
 
       // mega-list: unread troupe view
       // this.unread.show(new TroupeCollectionView({collection: troupeCollections.unreadTroupes }));
@@ -79,7 +76,7 @@ define([
       // this.repos.show(new RepoCollectionView({ collection: troupeCollections.repos }));
 
 
-      this.initHideListeners();
+      // this.initHideListeners();
     },
 
     onSearchClearIconClick: function() {
@@ -87,22 +84,22 @@ define([
       this.hideSearch();
     },
 
-    initHideListeners: function() {
-      var self = this;
-      // toggler('#unreadTroupesList', troupeCollections.unreadTroupes);
-      // toggler('#favTroupesList', troupeCollections.favouriteTroupes);
-      // toggler('#recentTroupesList', troupeCollections.recentTroupes);
-      // toggler('#UsersList', troupeCollections.peopleTroupes);
-      function toggler(element, collection) {
-        function toggle() {
-          self.$el.find(element).toggle(collection.length > 0);
-          self.$el.find('.nano').nanoScroller();
-        }
+    // initHideListeners: function() {
+    //   var self = this;
+    //   // toggler('#unreadTroupesList', troupeCollections.unreadTroupes);
+    //   // toggler('#favTroupesList', troupeCollections.favouriteTroupes);
+    //   // toggler('#recentTroupesList', troupeCollections.recentTroupes);
+    //   // toggler('#UsersList', troupeCollections.peopleTroupes);
+    //   function toggler(element, collection) {
+    //     function toggle() {
+    //       self.$el.find(element).toggle(collection.length > 0);
+    //       self.$el.find('.nano').nanoScroller();
+    //     }
 
-        collection.on('all', toggle);
-        toggle();
-      }
-    },
+    //     collection.on('all', toggle);
+    //     toggle();
+    //   }
+    // },
 
     // toggleRepoList: function() {
     //   if (this.repoList) {

@@ -52,7 +52,7 @@ define([
   });
 
   // collection of favourited troupes
-  var recentRoomFavourites = filterRecentRoomsCollection(function(m) {
+  var recentRoomsFavourites = filterRecentRoomsCollection(function(m) {
     return m.get('favourite');
   });
 
@@ -111,7 +111,7 @@ define([
 
   return {
     recentRooms: recentRooms,
-    recentRoomFavourites: recentRoomFavourites,
+    recentRoomsFavourites: recentRoomsFavourites,
     recentRoomsNonFavourites: recentRoomsNonFavourites,
 
     // TODO: get rid of these collections?
