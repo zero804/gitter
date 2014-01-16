@@ -56,8 +56,8 @@ define([
       this.profile.show(new ProfileView());
 
       // mega-list: recent troupe view
-      this.favs.show(new TroupeCollectionView({ collection: troupeCollections.recentRoomsFavourites }));
-      this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentRoomsNonFavourites }));
+      this.favs.show(new TroupeCollectionView({ collection: troupeCollections.recentRoomsFavourites, rerenderOnSort: true }));
+      this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentRoomsNonFavourites, rerenderOnSort: true }));
 
       // mega-list: unread troupe view
       // this.unread.show(new TroupeCollectionView({collection: troupeCollections.unreadTroupes }));

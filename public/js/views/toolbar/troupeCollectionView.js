@@ -44,7 +44,7 @@ define([
           }
           _super(item, container);
         },
-        onCancel: function(item, container, _super) {      
+        onCancel: function(item, container) {
           if ($(container.el).attr('id') == 'list-favs') {
             // do whatever else needs to be done to remove from favourites and store positions
             // TODO: at the moment if you remove all items, the UL takes up space and that makes no sense!
@@ -62,7 +62,7 @@ define([
     onItemClose: function(e) {
       //may not need this e.preventDefault stuff, had this because of the old <A HREF>
       e.preventDefault();
-      var id = this.$(".item-close").attr("data-id");
+      // var id = this.$(".item-close").attr("data-id");
       // DO WHATEVER YOU NEED TO DO TO REMOVE THE ITEM FROM THE LIST
       this.$el.remove();
     },
@@ -80,7 +80,12 @@ define([
   var CollectionView = Marionette.CollectionView.extend({
     tagName: 'ul',
     className: 'trpTroupeList',
-    itemView: TroupeItemView
+    itemView: TroupeItemView,
+    initialize: function(options) {
+      if(options.rerenderOnSort) {
+        this.listenTo(this.collection, 'sort', this.render);
+      }
+    }
   });
 
   cocktail.mixin(CollectionView, TroupeViews.SortableMarionetteView);
