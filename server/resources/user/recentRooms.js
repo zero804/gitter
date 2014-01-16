@@ -5,6 +5,7 @@ var restful = require("../../services/restful");
 var troupeService = require('../../services/troupe-service');
 var restSerializer = require('../../serializers/rest-serializer');
 var Q = require('q');
+var recentRoomService = require('../../services/recent-room-service');
 
 module.exports = {
   base: 'recentRooms',
@@ -28,7 +29,7 @@ module.exports = {
       promises.push(troupeService.updateFavourite(userId, troupeId, updatedTroupe.favourite));
     }
 
-    Q.all(promises)
+    return Q.all(promises)
       .then(function() {
         var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
 
@@ -38,7 +39,17 @@ module.exports = {
         res.send(troupe);
       })
       .fail(next);
+  },
 
+  destroy: function(req, res, next) {
+    var troupe = req.recentRoom;
+    var userId = req.user.id;
+
+    return recentRoomService.removeRecentRoomForUser(userId, troupe.id)
+      .then(function() {
+        res.send('OK');
+      })
+      .fail(next);
   },
 
   load: function(req, id, callback) {
