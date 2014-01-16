@@ -25,20 +25,17 @@ define([
 
     regions: {
       profile: "#left-menu-profile",
-      unread: "#left-menu-list-unread",
-      recent: "#left-menu-list-recent",
-      favs: "#left-menu-list-favourites",
-      people: "#left-menu-list-users",
+      recent: "#list-recents",
+      favs: "#list-favs",
       search: "#left-menu-list-search",
-      orgs: "#left-menu-list-orgs",
-      repos: "#left-menu-list-repos"
+      orgs: "#left-menu-list-orgs"
     },
 
     events: {
       "click #search-clear-icon" : "onSearchClearIconClick",
       "click #left-menu-profile" : "onClickProfileMenu",
-      "click #left-menu-repo-section" : "toggleRepoList",
-      "click #left-menu-users-section" : "togglePrivateChatList"
+      // "click #left-menu-repo-section" : "toggleRepoList",
+      // "click #left-menu-users-section" : "togglePrivateChatList"
     },
 
     initialize: function() {
@@ -61,14 +58,12 @@ define([
 
       this.profile.show(new ProfileView());
 
-      // one to one troupe view
-      this.people.show(new TroupeCollectionView({collection: troupeCollections.peopleTroupes, emptyView: Marionette.ItemView.extend({ template: privateTroupeListItemEmpty })}));
-
       // mega-list: recent troupe view
-      this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentRooms }));
+      this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentRoomNonFavourites }));
+      this.favs.show(new TroupeCollectionView({ collection: troupeCollections.recentRoomFavourites }));
 
       // mega-list: unread troupe view
-      this.unread.show(new TroupeCollectionView({collection: troupeCollections.unreadTroupes }));
+      // this.unread.show(new TroupeCollectionView({collection: troupeCollections.unreadTroupes }));
 
       // // mega-list: favourite troupe view
       // this.favs.show(new TroupeCollectionView({ collection: troupeCollections.favouriteTroupes }));
@@ -81,7 +76,7 @@ define([
       this.orgs.show(new OrgCollectionView({ collection: troupeCollections.orgs }));
 
       // Repositories collection view
-      this.repos.show(new RepoCollectionView({ collection: troupeCollections.repos }));
+      // this.repos.show(new RepoCollectionView({ collection: troupeCollections.repos }));
 
 
       this.initHideListeners();
@@ -94,10 +89,10 @@ define([
 
     initHideListeners: function() {
       var self = this;
-      toggler('#unreadTroupesList', troupeCollections.unreadTroupes);
-      toggler('#favTroupesList', troupeCollections.favouriteTroupes);
-      toggler('#recentTroupesList', troupeCollections.recentTroupes);
-      toggler('#UsersList', troupeCollections.peopleTroupes);
+      // toggler('#unreadTroupesList', troupeCollections.unreadTroupes);
+      // toggler('#favTroupesList', troupeCollections.favouriteTroupes);
+      // toggler('#recentTroupesList', troupeCollections.recentTroupes);
+      // toggler('#UsersList', troupeCollections.peopleTroupes);
       function toggler(element, collection) {
         function toggle() {
           self.$el.find(element).toggle(collection.length > 0);
@@ -109,35 +104,35 @@ define([
       }
     },
 
-    toggleRepoList: function() {
-      if (this.repoList) {
-        $("#left-menu-list-repos").slideUp("fast", function () {
-          $("#repo-toggle").text("SHOW");
-        });
-        this.repoList = false;
-      }
-      else {
-        $("#left-menu-list-repos").slideDown("fast" , function() {
-          $("#repo-toggle").text("HIDE");
-        });
-        this.repoList = true;
-      }
-    },
+    // toggleRepoList: function() {
+    //   if (this.repoList) {
+    //     $("#left-menu-list-repos").slideUp("fast", function () {
+    //       $("#repo-toggle").text("SHOW");
+    //     });
+    //     this.repoList = false;
+    //   }
+    //   else {
+    //     $("#left-menu-list-repos").slideDown("fast" , function() {
+    //       $("#repo-toggle").text("HIDE");
+    //     });
+    //     this.repoList = true;
+    //   }
+    // },
 
-    togglePrivateChatList: function() {
-      if (this.privateChatList) {
-        $("#left-menu-list-users").slideUp("fast", function () {
-          $("#users-toggle").text("SHOW");
-        });
-        this.privateChatList = false;
-      }
-      else {
-        $("#left-menu-list-users").slideDown("fast" , function() {
-          $("#users-toggle").text("HIDE");
-        });
-        this.privateChatList = true;
-      }
-    },
+    // togglePrivateChatList: function() {
+    //   if (this.privateChatList) {
+    //     $("#left-menu-list-users").slideUp("fast", function () {
+    //       $("#users-toggle").text("SHOW");
+    //     });
+    //     this.privateChatList = false;
+    //   }
+    //   else {
+    //     $("#left-menu-list-users").slideDown("fast" , function() {
+    //       $("#users-toggle").text("HIDE");
+    //     });
+    //     this.privateChatList = true;
+    //   }
+    // },
 
     activateSearchList: function() {
       this.$el.find('#list-search-input').focus();

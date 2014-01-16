@@ -23,8 +23,15 @@ define([
 
   var recentRooms = new recentRoomModels.RoomCollection(null, { listen: true });
 
+
   function filterTroupeCollection(filter) {
     var c = new Backbone.FilteredCollection(null, { model: troupeModels.TroupeModel, collection: troupeCollection });
+    c.setFilter(filter);
+    return c;
+  }
+
+  function filterRecentRoomsCollection(filter) {
+    var c = new Backbone.FilteredCollection(null, { model: recentRoomModels.RoomModel, collection: recentRooms });
     c.setFilter(filter);
     return c;
   }
@@ -45,8 +52,12 @@ define([
   });
 
   // collection of favourited troupes
-  var favouriteTroupesCollection = filterTroupeCollection(function(m) {
+  var recentRoomFavourites = filterRecentRoomsCollection(function(m) {
     return m.get('favourite');
+  });
+
+  var recentRoomsNonFavourites = filterRecentRoomsCollection(function(m) {
+    return !m.get('favourite');
   });
 
   // collection of troupes that are Repos
@@ -68,45 +79,48 @@ define([
   // doesn't need to be connected to events from the main collection,
   // because this only changes when the page is refreshed
   // (TODO actually it changes when another window accesses it as well, but this change doesn't get pushed through faye yet)
-  var recentTroupeCollection = new Backbone.Collection();
+  // var recentTroupeCollection = new Backbone.Collection();
 
-  // when the list of troupes come in filter them and put them in recentTroupeCollection
-  troupeCollection.on('reset sync change:lastAccessTime', function() {
-    // filter out troupes that don't have a last access time
-    var recentTroupeModels = _.filter(troupeCollection.models, function(v) {
-      return !!v.get('lastAccessTime');
-    });
+  // // when the list of troupes come in filter them and put them in recentTroupeCollection
+  // troupeCollection.on('reset sync change:lastAccessTime', function() {
+  //   // filter out troupes that don't have a last access time
+  //   var recentTroupeModels = _.filter(troupeCollection.models, function(v) {
+  //     return !!v.get('lastAccessTime');
+  //   });
 
-    // sort the troupes by last accessed
-    recentTroupeModels = _.sortBy(recentTroupeModels, function(v) {
-      var lastAccess = v.get('lastAccessTime');
+  //   // sort the troupes by last accessed
+  //   recentTroupeModels = _.sortBy(recentTroupeModels, function(v) {
+  //     var lastAccess = v.get('lastAccessTime');
 
-      return lastAccess.valueOf();
-    }).reverse();
+  //     return lastAccess.valueOf();
+  //   }).reverse();
 
-    // filter to the most recent 5
-    recentTroupeModels = _.filter(recentTroupeModels, function(v, k) {
-      return k < 5;
-    });
+  //   // filter to the most recent 5
+  //   recentTroupeModels = _.filter(recentTroupeModels, function(v, k) {
+  //     return k < 5;
+  //   });
 
-    // set these as the models for recentTroupeCollection and send out a reset on that collection
-    recentTroupeCollection.reset(recentTroupeModels);
-    recentTroupeCollection.trigger('sync');
+  //   // set these as the models for recentTroupeCollection and send out a reset on that collection
+  //   recentTroupeCollection.reset(recentTroupeModels);
+  //   recentTroupeCollection.trigger('sync');
 
-  });
+  // });
 
 
   //var smartCollection = new SmartCollection(null, { troupes: troupeCollection });
 
   return {
     recentRooms: recentRooms,
+    recentRoomFavourites: recentRoomFavourites,
+    recentRoomsNonFavourites: recentRoomsNonFavourites,
+
     // TODO: get rid of these collections?
     troupes: troupeCollection,
     peopleTroupes: peopleOnlyTroupeCollection,
     normalTroupes: filteredTroupeCollection,
-    recentTroupes: recentTroupeCollection,
+    // recentTroupes: recentTroupeCollection,
     unreadTroupes: unreadTroupeCollection,
-    favouriteTroupes: favouriteTroupesCollection,
+    //favouriteTroupes: favouriteTroupesCollection,
     //smart: smartCollection,
     orgs: orgsCollection,
     repos: repoTroupeCollection
