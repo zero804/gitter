@@ -4,6 +4,7 @@
   <div class="nano" id="left-menu-scroll">
     <div class="content trpLeftMenuWrapper">
       <div class="trpToolbarList" id="list-mega">
+<!-- PROBABLY REMOVE BOTH OF THESE ONCE THIS IS DONE
         <div id="favTroupesList">
           <div class="trpToolbarHeader">Favourites</div>
           <div id="left-menu-list-favourites" class="trpLeftMenuList"></div>
@@ -11,28 +12,15 @@
         <div id="unreadTroupesList">
           <div class="trpToolbarHeader" id="unreadTroupesHeader">Unread Messages</div>
           <div id="left-menu-list-unread" class="trpLeftMenuList"></div>
-        </div>
+        </div> -->
         <div id="recentTroupesList" class="trpLeftMenuList">
           <div class="trpToolbarHeader">All conversations</div>
-          <div id="left-menu-list-recent"></div>
+          <ul class="trpTroupeList list-favourites sortable" id="list-favs"><!-- put filtered favourites in here--></ul>
+          <ul class="trpTroupeList list-recents sortable" id="list-recents"><!-- put filtered recents in here. remember also that notifications will appear in here if they aren't in favourites--></ul>
         </div>
         <div id="OrgsList" class="trpLeftMenuList">
           <div class="trpToolbarHeader">Your Organizations</div>
           <div id="left-menu-list-orgs"></div>
-        </div>
-        <div id="UsersList" class="trpLeftMenuList">
-          <div class="trpToolbarHeader" id="left-menu-users-section">
-            <span class="list-toggle" id="users-toggle">SHOW</span>
-            Private chats
-          </div>
-          <div id="left-menu-list-users" style="display: none"></div>
-        </div>
-        <div id="ReposList" class="trpLeftMenuList">
-          <div class="trpToolbarHeader" id="left-menu-repo-section">
-            <span class="list-toggle" id="repo-toggle">SHOW</span>
-            Your Rooms
-          </div>
-          <div id="left-menu-list-repos" style="display: none"></div>
         </div>
       </div>
       <div class="trpToolbarList" style="display:none" id="list-search">
