@@ -42,9 +42,8 @@ define([
     onItemClose: function(e) {
       //may not need this e.preventDefault stuff, had this because of the old <A HREF>
       e.preventDefault();
-      // var id = this.$(".item-close").attr("data-id");
-      // DO WHATEVER YOU NEED TO DO TO REMOVE THE ITEM FROM THE LIST
-      this.$el.remove();
+      e.stopPropagation();
+      this.model.destroy();
     },
     onRender: function() {
       this.el.dataset.id = this.model.id;
