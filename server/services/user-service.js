@@ -231,6 +231,32 @@ var userService = {
       });
   },
 
+
+  /**
+   * Update the last visited troupe for the user, sending out appropriate events
+   * Returns a promise of nothing
+   */
+  clearLastVisitedTroupeforUserId: function(userId, troupeId) {
+    winston.verbose("Clearing last visited Troupe for user: " + userId+ " to troupe " + troupeId);
+
+    var setOp = {};
+    setOp['troupes.' + troupeId] = 1;
+
+    return Q.all([
+        // Update UserTroupeLastAccess
+        persistence.UserTroupeLastAccess.updateQ(
+           { userId: userId },
+           { $unset: setOp },
+           { upsert: true })
+      ])
+      .then(function() {
+        // XXX: lastAccessTime should be a date but for some bizarre reason it's not
+        // serializing properly
+        appEvents.recentRoomsChange({ userId: userId, troupeId: troupeId });
+        appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, lastAccessTime: null });
+      });
+  },
+
   /**
    * Update the last visited troupe for the user, sending out appropriate events
    * Returns a promise of nothing
@@ -259,7 +285,6 @@ var userService = {
         appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
       })
       .nodeify(callback);
-
   },
 
   /**
