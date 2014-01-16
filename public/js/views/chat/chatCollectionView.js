@@ -73,7 +73,7 @@ define([
       // CODEDEBT: Move unread-item-tracking into it's own module
       this.findChatToTrack();
 
-      this.listenTo(this.collection, 'add', function() {
+      this.listenTo(this.collection, 'add reset', function() {
         if(this.unreadItemToTrack) return;
         this.findChatToTrack();
       });
