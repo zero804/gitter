@@ -89,7 +89,7 @@ define([
             collectionItem.save();
             // if ($(container.el).attr('id') == 'list-favs') {
             //   // do whatever else needs to be done to add to favourites and store positions
-            //   item.addClass("item-fav");
+              item.addClass("item-fav");
             // }
           }
           cancelDrop = false;
