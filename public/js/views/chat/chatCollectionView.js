@@ -40,8 +40,26 @@ define([
       return options;
     },
     scrollElementSelector: "#content-frame",
+
+    adjustTopPadding: function() {
+      var size = '';
+      size = $('#header-wrapper').height()+15 + 'px';
+      // this.CCSStylesheetRuleStyle('trp3.css', '.trpChatContainer > div:first-child', 'padding-top', 'size');
+          try { 
+            document.styleSheets[1].insertRule('.trpChatContainer > div:first-child' + ' {'+'padding-top'+':'+size+'}', document.styleSheets[1].cssRules.length);
+          } catch(err) {try { document.styleSheets[1].addRule('.trpChatContainer > div:first-child', 'padding-top'+':'+size)} catch(err) {}}//IE
+    },
+
     initialize: function(options) {
       // this.hasLoaded = false;
+      this.adjustTopPadding();
+      var self=this;
+      var resizer;
+      $(window).resize(function(){
+        clearTimeout(resizer);
+        resizer = setTimeout(self.adjustTopPadding, 100);
+      });
+
       var contentFrame = document.querySelector(this.scrollElementSelector);
 
       this.rollers = new Rollers(contentFrame);
@@ -102,6 +120,10 @@ define([
     },
 
     onAfterItemAdded: function() {
+      if(this.collection.length === 1) {
+        this.adjustTopPadding();
+      }
+
       if(!this._findingNextUnread) return;
 
       var view = this.children.findByModel(this.unreadItemToTrack);
