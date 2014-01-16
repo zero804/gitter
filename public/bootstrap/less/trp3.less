@@ -603,6 +603,77 @@ a.trpMiniLeftMenuItem {
 	padding-left: 8px;
 }
 
+body.dragging, body.dragging * {
+  cursor: move !important;
+}
+
+.dragged {
+  position: absolute;
+  opacity: 0.5;
+  z-index: 2000;
+}
+
+li:hover.dragged {
+  background-color: transparent;
+}
+
+.dragged .item-close {
+  opacity: 0;
+}
+
+ul li.placeholder {
+  position: relative;
+  height: 25px;
+  background-color: rgba(155,155,155,0.1);
+  border-radius: 0 4px 4px 0;
+  border: 1px dashed rgba(255,255,255,0.2);
+  border-left: 0;
+  color: white;
+}
+
+ul li.placeholder:before {        
+      position: absolute;
+      content: "";
+      width: 0;
+      height: 0;
+      margin-top: -5px;
+      left: -5px;
+      top: -4px;
+      border: 5px solid transparent;
+      border-left-color: red;
+      border-right: none; 
+}
+
+.trpTroupeList li .item-close {
+  display: none;
+}
+
+.trpTroupeList li:hover .item-close {
+  display: inline-block;
+}
+
+.trpTroupeList li:hover .item-unread-badge {
+  display: none;
+}
+
+.item-close {
+  float: right;
+  opacity: 0.3;
+  margin-right: 6px;
+  .transition300ms;
+}
+
+.item-close:hover {
+  opacity: 0.8;
+}
+
+.trpLeftMenuItemClose:before {
+  font-family: 'troupe-icons';
+  content: '\e827';
+  font-size: 14px;
+}
+
+
 .trpNewPersonButton, .trpNewTroupeButton {
   border: 1px solid rgba(255,255,255,0.6);
   display: inline-block;
