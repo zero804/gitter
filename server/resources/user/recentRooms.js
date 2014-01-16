@@ -33,7 +33,7 @@ module.exports = {
       .then(function() {
         var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
 
-        restSerializer.serializeQ(troupeId, strategy);
+        return restSerializer.serializeQ(troupeId, strategy);
       })
       .then(function(troupe) {
         res.send(troupe);
