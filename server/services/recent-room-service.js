@@ -45,5 +45,14 @@ function generateRoomListForUser(userId) {
     });
 
 }
-
 exports.generateRoomListForUser = generateRoomListForUser;
+
+
+function removeRecentRoomForUser(userId, troupeId) {
+  return Q.all([
+      troupeService.updateFavourite(userId, troupeId, false),
+      userService.clearLastVisitedTroupeforUserId(userId, troupeId)
+    ]);
+}
+
+exports.removeRecentRoomForUser = removeRecentRoomForUser;

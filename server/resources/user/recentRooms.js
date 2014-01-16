@@ -2,6 +2,9 @@
 "use strict";
 
 var restful = require("../../services/restful");
+var troupeService = require('../../services/troupe-service');
+var restSerializer = require('../../serializers/rest-serializer');
+var Q = require('q');
 
 module.exports = {
   base: 'recentRooms',
@@ -14,20 +17,42 @@ module.exports = {
       .fail(next);
   },
 
+  update: function(req, res, next) {
+    var troupe = req.recentRoom;
+    var updatedTroupe = req.body;
+    var userId = req.user.id;
+    var troupeId = troupe.id;
+    var promises = [];
+
+    if('favourite' in updatedTroupe) {
+      promises.push(troupeService.updateFavourite(userId, troupeId, updatedTroupe.favourite));
+    }
+
+    Q.all(promises)
+      .then(function() {
+        var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
+
+        restSerializer.serializeQ(troupeId, strategy);
+      })
+      .then(function(troupe) {
+        res.send(troupe);
+      })
+      .fail(next);
+
+  },
+
   load: function(req, id, callback) {
-    // TODO: fix
-    callback(null, true);
+    troupeService.findById(id)
+      .then(function(troupe) {
+        if(!troupe) return;
 
-    // troupeService.findById(id, function(err, troupe) {
-    //   if(err) return callback(500);
-    //   if(!troupe) return callback(404);
+        if(!troupeService.userHasAccessToTroupe(req.resourceUser, troupe)) {
+          throw 403;
+        }
 
-    //   if(!troupeService.userHasAccessToTroupe(req.resourceUser, troupe)) {
-    //     return callback(403);
-    //   }
-
-    //   return callback(null, troupe);
-    // });
+        return troupe;
+      })
+      .nodeify(callback);
   }
 
 };

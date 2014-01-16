@@ -4,8 +4,10 @@ define([
   'marionette',
   'hbs!./tmpl/troupeListItem',
   'utils/appevents',
-  'utils/momentWrapper'
-], function(context, Marionette, troupeListItemTemplate, appEvents, moment) {
+  'utils/momentWrapper',
+  'views/base',
+  'cocktail'
+], function(context, Marionette, troupeListItemTemplate, appEvents, moment, TroupeViews, cocktail) {
   "use strict";
 
   var createRoom = context.getUser().createRoom;
@@ -36,10 +38,14 @@ define([
     }
   });
 
-  return Marionette.CollectionView.extend({
+  var CollectionView = Marionette.CollectionView.extend({
     tagName: 'ul',
     className: 'trpTroupeList',
     itemView: TroupeItemView
   });
+
+  cocktail.mixin(CollectionView, TroupeViews.SortableMarionetteView);
+
+  return CollectionView;
 
 });
