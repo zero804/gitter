@@ -47,6 +47,9 @@ define([
     },
     onRender: function() {
       this.el.dataset.id = this.model.id;
+      if (this.model.attributes.favourite) {
+        this.$el.addClass('item-fav');
+      }
     },
     clicked: function() {
       var model = this.model;
@@ -96,12 +99,12 @@ define([
         },
         onCancel: function(item, container) {
           cancelDrop = true;
-          // if ($(container.el).attr('id') == 'list-favs') {
-          //   // do whatever else needs to be done to remove from favourites and store positions
-          //   // TODO: at the moment if you remove all items, the UL takes up space and that makes no sense!
-          //   item.remove();
-          //   cancelDrop = true;
-          // }
+          if ($(container.el).parent().attr('id') == 'list-favs') {
+            // do whatever else needs to be done to remove from favourites and store positions
+            // TODO: at the moment if you remove all items, the UL takes up space and that makes no sense!
+            item.remove();
+            cancelDrop = true;
+          }
         }
       });
       // $("ul.list-recents").sortable({
