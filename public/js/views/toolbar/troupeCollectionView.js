@@ -21,7 +21,8 @@ define([
       change: 'render',
     },
     events: {
-      click: 'clicked'
+      click: 'clicked', //WHY DOES THIS LOOK DIFFERENT TO NORMAL?
+      'click .item-close': 'onItemClose'
     },
     serializeData: function() {
       var data = this.model.toJSON();
@@ -57,6 +58,13 @@ define([
         pullPlaceholder: false,
         drop: false,
       });
+    },
+    onItemClose: function(e) {
+      //may not need this e.preventDefault stuff, had this because of the old <A HREF>
+      e.preventDefault();
+      var id = this.$(".item-close").attr("data-id");
+      // DO WHATEVER YOU NEED TO DO TO REMOVE THE ITEM FROM THE LIST
+      this.$el.remove();
     },
     clicked: function() {
       var model = this.model;
