@@ -5,6 +5,7 @@ define([
   'marionette',
   'utils/context',
   'utils/appevents',
+  'log!left-menu',
   'collections/instances/troupes',
   'views/toolbar/troupeCollectionView',
   'hbs!views/toolbar/tmpl/privateTroupeListItemEmpty',
@@ -14,7 +15,7 @@ define([
   './orgCollectionView',
   './repoCollectionView',
   'nanoscroller' //no ref
-], function($, _, Marionette, context, appEvents, troupeCollections, TroupeCollectionView, privateTroupeListItemEmpty, template, SearchView, ProfileView, OrgCollectionView, RepoCollectionView) {
+], function($, _, Marionette, context, appEvents, log, troupeCollections, TroupeCollectionView, privateTroupeListItemEmpty, template, SearchView, ProfileView, OrgCollectionView, RepoCollectionView) {
   "use strict";
 
   return Marionette.Layout.extend({

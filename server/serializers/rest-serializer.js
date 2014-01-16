@@ -14,6 +14,7 @@ var winston           = require("winston");
 var collections       = require("../utils/collections");
 var predicates        = collections.predicates;
 var util              = require('util');
+var GitHubRepoService = require('../services/github/github-repo-service');
 
 // TODO: Fix this, use the CDN and code sign URLS
 function privateCdn(url) {
@@ -58,21 +59,100 @@ function execPreloads(preloads, callback) {
       });
 }
 
-function UserStrategy(options) {
-  options = options ? options : {};
+function UserRoleInTroupeStrategy(options) {
+  var contributors;
+  var ownerLogin;
+
+  this.preload = function(unused, callback) {
+    return Q.fcall(function() {
+        if(options.includeRolesForTroupe) return options.includeRolesForTroupe;
+
+        if(options.includeRolesForTroupeId) {
+          return troupeService.findById(options.includeRolesForTroupeId);
+        }
+      })
+      .then(function(troupe) {
+        if(!troupe) return;
+        /* Only works for repos */
+        if(troupe.githubType !== 'REPO') return;
+        var userPromise;
+
+        if(options.currentUser) userPromise = Q.resolve(options.currentUser);
+        if(options.currentUserId) {
+          userPromise = userService.findById(options.currentUserId);
+        }
+
+        if(userPromise) {
+          return userPromise.then(function(user) {
+            /* Need a user to perform the magic */
+            if(!user) return;
+            var uri = troupe.uri;
+            ownerLogin = uri.split('/')[0];
+
+            var repoService = new GitHubRepoService(user);
+            return repoService.getContributors(uri);
+          });
+        }
+      })
+      .then(function(githubContributors) {
+        if(!githubContributors) return;
+        contributors = {};
+        githubContributors.forEach(function(user) {
+          contributors[user.login] = 'contributor';
+        });
+
+        // Temporary stop-gap solution until we can figure out
+        // who the admins are
+        contributors[ownerLogin] = 'admin';
+      })
+      .nodeify(callback);
+  };
+
+  this.map = function(username) {
+    return contributors && contributors[username];
+  };
+}
+
+function UserPresenceInTroupeStrategy(troupeId) {
   var onlineUsers;
 
-  this.preload = function(users, callback) {
-    if(options.showPresenceForTroupeId) {
-      presenceService.findOnlineUsersForTroupe(options.showPresenceForTroupeId, function(err, result) {
-
-        if(err) return callback(err);
-        onlineUsers = result;
-        callback(null, true);
-      });
-    } else {
+  this.preload = function(unused, callback) {
+    presenceService.findOnlineUsersForTroupe(troupeId, function(err, result) {
+      if(err) return callback(err);
+      onlineUsers = collections.hashArray(result);
       callback(null, true);
+    });
+  };
+
+  this.map = function(userId) {
+    return !!onlineUsers[userId];
+  };
+
+}
+
+function UserStrategy(options) {
+  options = options ? options : {};
+  var userRoleInTroupeStrategy = options.includeRolesForTroupeId || options.includeRolesForTroupe ? new UserRoleInTroupeStrategy(options) : null;
+  var userPresenceInTroupeStrategy = options.showPresenceForTroupeId ? new UserPresenceInTroupeStrategy(options.showPresenceForTroupeId) : null;
+
+  this.preload = function(users, callback) {
+    var strategies = [];
+
+    if(userRoleInTroupeStrategy) {
+      strategies.push({
+        strategy: userRoleInTroupeStrategy,
+        data: null
+      });
     }
+
+    if(userPresenceInTroupeStrategy) {
+      strategies.push({
+        strategy: userPresenceInTroupeStrategy,
+        data: null
+      });
+    }
+
+    execPreloads(strategies, callback);
   };
 
   this.map = function(user) {
@@ -96,7 +176,8 @@ function UserStrategy(options) {
       avatarUrlMedium: user.gravatarImageUrl,
       createRoom: options.includePermissions ? user.permissions.createRoom : undefined,
       scopes: scopes,
-      online: onlineUsers ? onlineUsers.indexOf(user.id) >= 0 : undefined,
+      online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id),
+      role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.username),
       v: getVersion(user)
     };
   };

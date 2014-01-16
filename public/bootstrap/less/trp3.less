@@ -345,16 +345,6 @@ a:hover {
   background-color: rgba(255,255,255,0.2);
 }
 
-.trpLeftMenuLinkItem {
-  width: 100%; 
-  display: inline-block;
-  margin-bottom: 2px;
-  
-  span {
-    vertical-align: middle;
-  }
-}
-
 .trpLeftMenuProfileName {
   display: inline-block;
   vertical-align: top; 
@@ -557,6 +547,7 @@ a.trpMiniLeftMenuItem {
   font-family: 'troupe-icons';
   content: '\e827';
   font-size: 14px;
+  -webkit-font-smoothing: antialiased;
 }
 
 .disabled {
@@ -577,11 +568,18 @@ a.trpMiniLeftMenuItem {
     padding-left: 10px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
+    cursor: pointer;
+    padding-bottom: 2px;
   }
 
   li:hover {
     border-radius: 0 4px 4px 0;
     background-color: rgba(255,255,255,0.2);
+
+    @media @mobile {
+      background-color: transparent;
+    }
+
   }
 
   span {
@@ -591,6 +589,8 @@ a.trpMiniLeftMenuItem {
     max-width: 220px;
     overflow: hidden;
     text-overflow: ellipsis;
+    vertical-align: middle;
+
   }
 
   span.disabled {
@@ -1067,7 +1067,7 @@ i.favourited:hover:before {
   font-size: 14px;
   position: fixed;
   display: inline-block;
-  width: 240px;
+  width: 260px;
   text-align: left;
   vertical-align: top;
   right: 0;
@@ -1133,9 +1133,64 @@ i.favourited:hover:before {
     #people-list .trpToolbarListContent
     {
       margin-left: 6px;
+      padding-right: 20px;
     }
   }
 
+}
+
+#people-list {
+
+  .remaining {
+    display: none;
+    &.showFull {
+      display: initial;
+    }
+  }
+
+  @media @mid {
+    // dont show more than 10 avatars
+    .roster > li:nth-child(n+11) {
+      display:none;
+    }
+
+    .remaining {
+      &.showMid {
+        display: initial;
+      }
+      small {
+        display: none;
+      }
+    }
+  }
+}
+
+ul.roster {
+  list-style: none;
+  margin-left: 0;
+
+  li {
+    display: inline-block;
+  }
+}
+
+.trpMoreBadge {
+  clear: both;
+  color: #333;
+  border: 1px solid rgba(100,100,100,0.5);
+  display: inline-block;
+  border-radius: 4px;
+  border: 1px solid fade(@trpLightBlue, 20%);
+  background-color: fade(@trpLightBlue, 20%);
+  border-radius: 2px;
+  padding: 0 4px;
+  font-size: 11px;
+  .transition300ms;
+  margin-bottom: 12px;
+}
+
+.trpMoreBadge:hover {
+  background-color: fade(@trpLightBlue, 30%);
 }
 
 .trpChatInputArea.rightCollapse, .trpHeaderContainer.rightCollapse, .trpChatPanel.rightCollapse {
@@ -1218,10 +1273,6 @@ i.favourited:hover:before {
 
     .trpToolbarList {
       max-height: 40%;
-    }
-
-    .trpToolbarList .trpDisplayPicture {
-      margin-bottom: 8px;
     }
 
   }
@@ -1341,6 +1392,9 @@ i.favourited:hover:before {
   bottom: 0px;
   .transition500ms;
   padding-top: 8px;
+  height: 70px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
 }
 
 
