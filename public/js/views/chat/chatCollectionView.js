@@ -42,9 +42,12 @@ define([
     scrollElementSelector: "#content-frame",
 
     adjustTopPadding: function() {
-      $('.trpChatContainer > div:first-child').css({
-        'padding-top' : $('#header-wrapper').height()+15
-      });
+      var size = '';
+      size = $('#header-wrapper').height()+15 + 'px';
+      // this.CCSStylesheetRuleStyle('trp3.css', '.trpChatContainer > div:first-child', 'padding-top', 'size');
+          try { 
+            document.styleSheets[1].insertRule('.trpChatContainer > div:first-child' + ' {'+'padding-top'+':'+size+'}', document.styleSheets[1].cssRules.length);
+          } catch(err) {try { document.styleSheets[1].addRule('.trpChatContainer > div:first-child', 'padding-top'+':'+size)} catch(err) {}}//IE
     },
 
     initialize: function(options) {
