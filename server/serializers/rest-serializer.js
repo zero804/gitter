@@ -7,6 +7,7 @@ var troupeService     = require("../services/troupe-service");
 var fileService       = require("../services/file-service");
 var unreadItemService = require("../services/unread-item-service");
 var presenceService   = require("../services/presence-service");
+var recentRoomService = require('../services/recent-room-service');
 var Q                 = require("q");
 var _                 = require("underscore");
 var handlebars        = require('handlebars');
@@ -499,7 +500,7 @@ function LastTroupeAccessTimesForUserStrategy(options) {
   var userId = options.userId || options.currentUserId;
 
   this.preload = function(data, callback) {
-    userService.getTroupeLastAccessTimesForUser(userId, function(err, times) {
+    recentRoomService.getTroupeLastAccessTimesForUser(userId, function(err, times) {
       if(err) return callback(err);
       self.times = times;
       callback();
@@ -517,7 +518,7 @@ function FavouriteTroupesForUserStrategy(options) {
   var userId = options.userId || options.currentUserId;
 
   this.preload = function(data, callback) {
-    troupeService.findFavouriteTroupesForUser(userId, function(err, favs) {
+    recentRoomService.findFavouriteTroupesForUser(userId, function(err, favs) {
       if(err) return callback(err);
       self.favs = favs;
       callback();

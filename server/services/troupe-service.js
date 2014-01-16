@@ -675,121 +675,6 @@ function createUniqueUri() {
   return uri;
 }
 
-function addTroupeAsFavouriteInLastPosition(userId, troupeId) {
-  return findFavouriteTroupesForUser(userId)
-    .then(function(userTroupeFavourites) {
-      var lastPosition = lazy(userTroupeFavourites)
-        .values()
-        .concat(0)
-        .max() + 1;
-
-      var setOp = {};
-      setOp['favs.' + troupeId] = lastPosition;
-
-      return persistence.UserTroupeFavourites.updateQ(
-        { userId: userId },
-        { $set: setOp },
-        { upsert: true })
-        .then(function() {
-          // Fire a realtime event
-          appEvents.recentRoomsChange({ userId: userId, troupeId: troupeId });
-          appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: lastPosition });
-        });
-    });
-}
-
-
-function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
-  return findFavouriteTroupesForUser(userId)
-    .then(function(userTroupeFavourites) {
-      var values = lazy(userTroupeFavourites)
-        .pairs()
-        .filter(function(a) {
-          return a[1] >= position && a[0] != troupeId;
-        })
-        .tap(console.log)
-        .sortBy(function(a) {
-          return a[1];
-        })
-        .toArray();
-
-      var next = position;
-      for(var i = 1; i < values.length; i++) {
-        var item = values[i];
-
-        if(item[1] > next) {
-          values = values.slice(0, i - 1);
-          break;
-        }
-        item[1]++;
-        next = item[1]++;
-      }
-
-      var inc = lazy(values)
-        .map(function(a) {
-          return ['favs.' + a[0], 1];
-        })
-        .toObject();
-
-      var set = {};
-      set['favs.' + troupeId] = position;
-
-      return persistence.UserTroupeFavourites.updateQ(
-        { userId: userId },
-        { $set: set, $inc: inc },
-        { upsert: true })
-        .then(function() {
-          // Fire a realtime event
-          appEvents.recentRoomsChange({ userId: userId, troupeId: troupeId });
-          appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: position });
-        });
-    });
-
-}
-
-function updateFavourite(userId, troupeId, favouritePosition) {
-  if(favouritePosition) {
-    /* Deal with legacy, or when the star button is toggled */
-    if(favouritePosition === true) {
-      return addTroupeAsFavouriteInLastPosition(userId, troupeId);
-    }
-
-    return addTroupeAsFavouriteInPosition(userId, troupeId, favouritePosition);
-  }
-
-  var setOp = {};
-  setOp['favs.' + troupeId] = 1;
-
-  return persistence.UserTroupeFavourites.updateQ(
-    { userId: userId },
-    { $unset: setOp },
-    { })
-    .then(function() {
-      // Fire a realtime event
-      appEvents.recentRoomsChange({ userId: userId, troupeId: troupeId });
-
-      // TODO: in future get rid of this but this collection is used by the native clients
-      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: favouritePosition });
-    });
-}
-
-function findFavouriteTroupesForUser(userId, callback) {
-  return persistence.UserTroupeFavourites.findOneQ({ userId: userId})
-    .then(function(userTroupeFavourites) {
-      if(!userTroupeFavourites || !userTroupeFavourites.favs) return {};
-
-      return lazy(userTroupeFavourites.favs)
-              .pairs()
-              .map(function(a) {
-                // Replace any legacy values with 1000
-                if(a[1] === '1') a[1] = LEGACY_FAV_POSITION;
-                return a;
-              })
-              .toObject();
-    })
-    .nodeify(callback);
-}
-
 function updateTopic(user, troupe, topic) {
   /* First check whether the user has permission to work the topic */
   return permissionsModel(user, 'admin', troupe.uri, troupe.githubType)
@@ -883,68 +768,6 @@ function findAllImplicitContactUserIds(userId, callback) {
     return results
           .map(function(item) { return "" + item._id; })
           .filter(function(item) { return item != userId; });
-
-  }).nodeify(callback);
-
-}
-
-
-
-/**
- * Find the best troupe for a user to access
- * @return promise of a troupe or null
- */
-function findBestTroupeForUser(user, callback) {
-  //
-  // This code is invoked when a user's lastAccessedTroupe is no longer valid (for the user)
-  // or the user doesn't have a last accessed troupe. It looks for all the troupes that the user
-  // DOES have access to (by querying the troupes.users collection in mongo)
-  // If the user has a troupe, it takes them to the last one they accessed. If the user doesn't have
-  // any valid troupes, it returns an error.
-  //
-  var op;
-  if (user.lastTroupe) {
-     op = findById(user.lastTroupe)
-      .then(function(troupe) {
-
-        if(!troupe || troupe.status == 'DELETED' || !userHasAccessToTroupe(user, troupe)) {
-          return findLastAccessedTroupeForUser(user);
-        }
-
-        return troupe;
-      });
-
-  } else {
-    op = findLastAccessedTroupeForUser(user);
-  }
-
-  return op.nodeify(callback);
-}
-
-/**
- * Find the last troupe that a user accessed that the user still has access to
- * that hasn't been deleted
- * @return promise of a troupe (or null)
- */
-function findLastAccessedTroupeForUser(user, callback) {
-  return persistence.Troupe.findQ({ 'users.userId': user.id, 'status': 'ACTIVE' }).then(function(activeTroupes) {
-    if (!activeTroupes || activeTroupes.length === 0) return null;
-
-    return userService.getTroupeLastAccessTimesForUser(user.id).then(function(troupeAccessTimes) {
-      activeTroupes.forEach(function(troupe) {
-        troupe.lastAccessTime = troupeAccessTimes[troupe._id];
-      });
-
-      var troupes = _.sortBy(activeTroupes, function(t) {
-        return (t.lastAccessTime) ? t.lastAccessTime : 0;
-      }).reverse();
-
-      var troupe = _.find(troupes, function(troupe) {
-        return userHasAccessToTroupe(user, troupe);
-      });
-
-      return troupe;
-    });
 
   }).nodeify(callback);
 
@@ -1060,9 +883,6 @@ module.exports = {
   createUniqueUri: createUniqueUri,
   deleteTroupe: deleteTroupe,
 
-  updateFavourite: updateFavourite,
-  findFavouriteTroupesForUser: findFavouriteTroupesForUser,
-  findBestTroupeForUser: findBestTroupeForUser,
   // createNewTroupeForExistingUser: createNewTroupeForExistingUser,
   indexTroupesByUserIdTroupeId: indexTroupesByUserIdTroupeId,
 
