@@ -56,14 +56,21 @@ define([
       this.profile.show(new ProfileView());
 
       // mega-list: recent troupe view
-      this.favs.show(new TroupeCollectionView({ collection: troupeCollections.recentRoomsFavourites, rerenderOnSort: true, draggable: true, dropTarget: true }));
-      this.recent.show(new TroupeCollectionView({ collection: troupeCollections.recentRoomsNonFavourites, rerenderOnSort: true, draggable: true, dropTarget: false }));
+      this.favs.show(new TroupeCollectionView({
+        collection: troupeCollections.recentRoomsFavourites,
+        rerenderOnSort: true,
+        draggable: true,
+        dropTarget: true,
+        recentRoomsCollection: troupeCollections.recentRooms
+      }));
 
-      // mega-list: unread troupe view
-      // this.unread.show(new TroupeCollectionView({collection: troupeCollections.unreadTroupes }));
-
-      // // mega-list: favourite troupe view
-      // this.favs.show(new TroupeCollectionView({ collection: troupeCollections.favouriteTroupes }));
+      this.recent.show(new TroupeCollectionView({
+        collection: troupeCollections.recentRoomsNonFavourites,
+        rerenderOnSort: true,
+        draggable: true,
+        dropTarget: false,
+        recentRoomsCollection: troupeCollections.recentRooms
+      }));
 
       // search results collection view
       this.searchView = new SearchView({ troupes: troupeCollections.troupes, $input: this.$el.find('#list-search-input') });
@@ -71,12 +78,6 @@ define([
 
       // Organizations collection view
       this.orgs.show(new OrgCollectionView({ collection: troupeCollections.orgs }));
-
-      // Repositories collection view
-      // this.repos.show(new RepoCollectionView({ collection: troupeCollections.repos }));
-
-
-      // this.initHideListeners();
     },
 
     onSearchClearIconClick: function() {

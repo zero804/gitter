@@ -13,6 +13,15 @@ define([
 ], function($, context, Marionette, troupeListItemTemplate, appEvents, moment,  TroupeViews, cocktail, log) {
   "use strict";
 
+  function getIndexOfElementWithinParent(el) {
+    if(!el || !el.parentElement) return -1;
+    var parent = el.parentElement;
+    for(var i = 0; i < parent.children.length; i++) {
+      if(parent.children[i] === el) return i;
+    }
+    return -1;
+  }
+
   var createRoom = context.getUser().createRoom;
 
   var TroupeItemView = Marionette.ItemView.extend({
@@ -37,6 +46,9 @@ define([
       // DO WHATEVER YOU NEED TO DO TO REMOVE THE ITEM FROM THE LIST
       this.$el.remove();
     },
+    onRender: function() {
+      this.el.dataset.id = this.model.id;
+    },
     clicked: function() {
       var model = this.model;
       setTimeout(function() {
@@ -59,30 +71,38 @@ define([
       if(options.draggable) {
         this.makeDraggable(options.dropTarget);
       }
+      this.recentRoomsCollection = options.recentRoomsCollection;
     },
     makeDraggable: function(drop) {
       var cancelDrop = false;
+      var self = this;
       this.$el.sortable({
         group: 'mega-list',
         pullPlaceholder: false,
         drop: drop,
         onDrop: function (item, container, _super) {
+          var el = item[0];
           if (!cancelDrop) {
+            var favPosition = getIndexOfElementWithinParent(el) + 1;
+            var collectionItem = self.recentRoomsCollection.get(el.dataset.id);
+            collectionItem.set('favourite', favPosition);
+            collectionItem.save();
             // if ($(container.el).attr('id') == 'list-favs') {
             //   // do whatever else needs to be done to add to favourites and store positions
             //   item.addClass("item-fav");
             // }
-            cancelDrop = false;
           }
+          cancelDrop = false;
           _super(item, container);
         },
         onCancel: function(item, container) {
-          if ($(container.el).attr('id') == 'list-favs') {
-            // do whatever else needs to be done to remove from favourites and store positions
-            // TODO: at the moment if you remove all items, the UL takes up space and that makes no sense!
-            item.remove();
-            cancelDrop = true;
-          }
+          cancelDrop = true;
+          // if ($(container.el).attr('id') == 'list-favs') {
+          //   // do whatever else needs to be done to remove from favourites and store positions
+          //   // TODO: at the moment if you remove all items, the UL takes up space and that makes no sense!
+          //   item.remove();
+          //   cancelDrop = true;
+          // }
         }
       });
       // $("ul.list-recents").sortable({
