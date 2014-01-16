@@ -8,7 +8,8 @@ define([
   'utils/momentWrapper',
   'views/base',
   'cocktail',
-  'log!troupeCollView'
+  'log!troupeCollView',
+  'jquery-sortable' // No ref
 ], function($, context, Marionette, troupeListItemTemplate, appEvents, moment,  TroupeViews, cocktail, log) {
   "use strict";
 
@@ -28,36 +29,6 @@ define([
       var data = this.model.toJSON();
       data.createRoom = createRoom;
       return data;
-    },
-    setupSortableListGroups: function() {
-      var cancelDrop = false;
-      $("ul.list-favourites").sortable({
-        group: 'mega-list',
-        pullPlaceholder: false,
-        onDrop: function (item, container, _super) {
-          if (!cancelDrop) {
-            if ($(container.el).attr('id') == 'list-favs') {
-              // do whatever else needs to be done to add to favourites and store positions
-              item.addClass("item-fav");
-            }
-            cancelDrop = false;
-          }
-          _super(item, container);
-        },
-        onCancel: function(item, container) {
-          if ($(container.el).attr('id') == 'list-favs') {
-            // do whatever else needs to be done to remove from favourites and store positions
-            // TODO: at the moment if you remove all items, the UL takes up space and that makes no sense!
-            item.remove();
-            cancelDrop = true;
-          }
-        }
-      });
-      $("ul.list-recents").sortable({
-        group: 'mega-list',
-        pullPlaceholder: false,
-        drop: false,
-      });
     },
     onItemClose: function(e) {
       //may not need this e.preventDefault stuff, had this because of the old <A HREF>
@@ -85,7 +56,41 @@ define([
       if(options.rerenderOnSort) {
         this.listenTo(this.collection, 'sort', this.render);
       }
-    }
+      if(options.draggable) {
+        this.makeDraggable(options.dropTarget);
+      }
+    },
+    makeDraggable: function(drop) {
+      var cancelDrop = false;
+      this.$el.sortable({
+        group: 'mega-list',
+        pullPlaceholder: false,
+        drop: drop,
+        onDrop: function (item, container, _super) {
+          if (!cancelDrop) {
+            // if ($(container.el).attr('id') == 'list-favs') {
+            //   // do whatever else needs to be done to add to favourites and store positions
+            //   item.addClass("item-fav");
+            // }
+            cancelDrop = false;
+          }
+          _super(item, container);
+        },
+        onCancel: function(item, container) {
+          if ($(container.el).attr('id') == 'list-favs') {
+            // do whatever else needs to be done to remove from favourites and store positions
+            // TODO: at the moment if you remove all items, the UL takes up space and that makes no sense!
+            item.remove();
+            cancelDrop = true;
+          }
+        }
+      });
+      // $("ul.list-recents").sortable({
+      //   group: 'mega-list',
+      //   pullPlaceholder: false,
+      //   drop: false,
+      // });
+    },
   });
 
   cocktail.mixin(CollectionView, TroupeViews.SortableMarionetteView);
