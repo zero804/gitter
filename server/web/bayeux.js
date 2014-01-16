@@ -13,6 +13,7 @@ var shutdown          = require('../utils/shutdown');
 var contextGenerator  = require('./context-generator');
 var appVersion        = require('./appVersion');
 var userService       = require('../services/user-service');
+var recentRoomService = require('../services/recent-room-service');
 
 var appTag = appVersion.getAppTag();
 
@@ -265,7 +266,7 @@ var authenticator = {
       message.ext.userId = userId;
 
       if(troupeId) {
-        userService.saveLastVisitedTroupeforUserId(userId, troupeId);
+        recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
       }
 
       // If the troupeId was included, it means we've got a native

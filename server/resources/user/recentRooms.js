@@ -26,7 +26,7 @@ module.exports = {
     var promises = [];
 
     if('favourite' in updatedTroupe) {
-      promises.push(troupeService.updateFavourite(userId, troupeId, updatedTroupe.favourite));
+      promises.push(recentRoomService.updateFavourite(userId, troupeId, updatedTroupe.favourite));
     }
 
     return Q.all(promises)
