@@ -72,12 +72,12 @@ define([
             //   // do whatever else needs to be done to add to favourites and store positions
               item.addClass("item-fav");
             // }
-            cancelDrop = false;
           }
+          cancelDrop = false;
           _super(item, container);
         },
         onCancel: function(item, container) {
-          if ($(container.el).attr('id') == 'list-favs') {
+          if ($(container.el).parent().attr('id') == 'list-favs') {
             // do whatever else needs to be done to remove from favourites and store positions
             // TODO: at the moment if you remove all items, the UL takes up space and that makes no sense!
             item.remove();
