@@ -18,11 +18,6 @@ define([
     events: {
       'click #leave-room': 'leaveRoom',
       'click #notifications-settings-link': 'enableBrowserNotifications',
-      'click #clack-attack': 'ehh'
-    },
-
-    ehh: function() {
-      window.ttt();
     },
 
     leaveRoom: function() {
