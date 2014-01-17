@@ -107,7 +107,6 @@ define([
       if(this._findingNextUnread) return;
 
       var nextUnread = this.collection.findWhere({ unread: true });
-      console.log('chat to track', nextUnread);
 
       this.unreadItemToTrack = nextUnread;
 
