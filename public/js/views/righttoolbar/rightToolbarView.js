@@ -28,7 +28,7 @@ define([
     },
 
     onRender: function() {
-
+      console.log('removeme');
       $('#toolbar-frame').show();
       $('#right-panel').show();
 
