@@ -28,15 +28,28 @@
   position: absolute;
   bottom: -35px;
   height: 15px;
-  left: 250px;
-  right: 260px;
+  left: 0;
+  right: 0;
   background-color: fade(@trpGreen, 90%);
   color: white;
-  margin: 0 40px;
   padding: 10px;
   border-radius: 0 0 4px 4px;
   cursor: pointer;
-  .trpBodyMedium
+  .trpBodyMedium;
+
+  margin-left: @leftMarginFull + 45px;
+  margin-right: @rightMarginFull + 45px;
+  .transition500ms();
+
+  @media @mid {
+    margin-left: @leftMarginMid + 32px;
+    margin-right: @rightMarginMid + 32px;
+  }
+
+  @media @small {
+    margin-left: @leftMarginSmall + 42px;
+    margin-right: @rightMarginSmall + 42px;
+  }
 }
 
 .hide {
