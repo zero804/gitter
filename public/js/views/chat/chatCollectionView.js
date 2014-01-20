@@ -99,7 +99,11 @@ define([
     },
 
     scrollToFirstUnread: function() {
-      this.findChatToTrack();
+      // this.findChatToTrack();
+      var firstUnread = this.collection.findWhere({ unread: true });
+      var firstUnreadView = this.children.findByModel(firstUnread);
+      console.log('!!!!!!!', firstUnreadView)
+      this.rollers.trackUntil(firstUnreadView.el);
       this.rollers.adjustScrollContinuously(200);
     },
 
