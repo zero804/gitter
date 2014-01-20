@@ -14,7 +14,6 @@ var handlebars        = require('handlebars');
 var winston           = require("winston");
 var collections       = require("../utils/collections");
 var predicates        = collections.predicates;
-var util              = require('util');
 var GitHubRepoService = require('../services/github/github-repo-service');
 
 // TODO: Fix this, use the CDN and code sign URLS

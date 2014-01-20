@@ -158,6 +158,7 @@ exports.install = function() {
         operation: 'update',
         model: serialized
       };
+      winston.verbose("bayeux: /api/v1/user/" + userId + '/recentRooms', message);
 
       bayeuxClient.publish("/api/v1/user/" + userId + '/recentRooms', message);
     });

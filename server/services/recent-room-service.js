@@ -3,7 +3,6 @@
 
 var Q             = require('q');
 var lazy          = require('lazy.js');
-var userService   = require('./user-service');
 var troupeService = require('./troupe-service');
 var persistence   = require('./persistence-service');
 var appEvents     = require('../app-events');
@@ -54,15 +53,38 @@ function generateRoomListForUser(userId) {
 
 }
 
+/**
+ * Called when the user removes a room from the left hand menu
+ */
 function removeRecentRoomForUser(userId, troupeId) {
+  winston.verbose('recent-rooms: removeRecentRoomForUser');
   return Q.all([
-      updateFavourite(userId, troupeId, false),
+      clearFavourite(userId, troupeId),
       clearLastVisitedTroupeforUserId(userId, troupeId)
-    ]);
+    ])
+    .then(function() {
+      // TODO: remove this debugging only
+      persistence.UserTroupeFavourites.findOne({ userId: userId }, function(err, after) {
+        winston.verbose('recent-rooms: user favourites after: ', after.toJSON());
+      });
+
+      // Fire a realtime event
+      appEvents.recentRoomsChange({ userId: userId, troupeId: troupeId });
+
+      // TODO: in future get rid of this but this collection is used by the native clients
+      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: null, lastAccessTime: null });
+
+    });
+  // TODO: stop double events
 }
 
 
+/**
+ * Internal call
+ */
 function addTroupeAsFavouriteInLastPosition(userId, troupeId) {
+  winston.verbose('recent-rooms: addTroupeAsFavouriteInLastPosition');
+
   return findFavouriteTroupesForUser(userId)
     .then(function(userTroupeFavourites) {
       var lastPosition = lazy(userTroupeFavourites)
@@ -73,22 +95,24 @@ function addTroupeAsFavouriteInLastPosition(userId, troupeId) {
       var setOp = {};
       setOp['favs.' + troupeId] = lastPosition;
 
+      winston.verbose('recent-rooms: using position ' + lastPosition);
+
       return persistence.UserTroupeFavourites.updateQ(
         { userId: userId },
         { $set: setOp },
         { upsert: true })
-        .then(function() {
-          // Fire a realtime event
-          appEvents.recentRoomsChange({ userId: userId, troupeId: troupeId });
-          appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: lastPosition });
-        });
+        .thenResolve(lastPosition);
     });
 }
 
 
 function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
+  winston.verbose('recent-rooms: addTroupeAsFavouriteInPosition ' + position);
+
   return findFavouriteTroupesForUser(userId)
     .then(function(userTroupeFavourites) {
+      winston.verbose('recent-rooms: user favourites before: ', userTroupeFavourites);
+
       var values = lazy(userTroupeFavourites)
         .pairs()
         .filter(function(a) {
@@ -100,7 +124,8 @@ function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
         .toArray();
 
       var next = position;
-      for(var i = 1; i < values.length; i++) {
+      // NB: used to be i = 1
+      for(var i = 0; i < values.length; i++) {
         var item = values[i];
 
         if(item[1] > next) {
@@ -108,7 +133,7 @@ function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
           break;
         }
         item[1]++;
-        next = item[1]++;
+        next = item[1] + 1;
       }
 
       var inc = lazy(values)
@@ -120,28 +145,19 @@ function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
       var set = {};
       set['favs.' + troupeId] = position;
 
+      winston.verbose('recent-rooms: Issuing changes: ', { set: set, inc: inc });
+
       return persistence.UserTroupeFavourites.updateQ(
         { userId: userId },
         { $set: set, $inc: inc },
         { upsert: true })
-        .then(function() {
-          // Fire a realtime event
-          appEvents.recentRoomsChange({ userId: userId, troupeId: troupeId });
-          appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: position });
-        });
+        .thenResolve(position);
     });
 
 }
 
-function updateFavourite(userId, troupeId, favouritePosition) {
-  if(favouritePosition) {
-    /* Deal with legacy, or when the star button is toggled */
-    if(favouritePosition === true) {
-      return addTroupeAsFavouriteInLastPosition(userId, troupeId);
-    }
-
-    return addTroupeAsFavouriteInPosition(userId, troupeId, favouritePosition);
-  }
+function clearFavourite(userId, troupeId) {
+  winston.verbose('recent-rooms: clearFavourite', { userId: userId, troupeId: troupeId });
 
   var setOp = {};
   setOp['favs.' + troupeId] = 1;
@@ -150,16 +166,45 @@ function updateFavourite(userId, troupeId, favouritePosition) {
     { userId: userId },
     { $unset: setOp },
     { })
-    .then(function() {
-      // Fire a realtime event
-      appEvents.recentRoomsChange({ userId: userId, troupeId: troupeId });
+    .thenResolve(null);
+}
 
-      // TODO: in future get rid of this but this collection is used by the native clients
-      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: favouritePosition });
+function updateFavourite(userId, troupeId, favouritePosition) {
+  winston.verbose('recent-rooms: updateFavourite', { userId: userId, troupeId: troupeId, position: favouritePosition});
+  var op;
+
+  if(favouritePosition) {
+    /* Deal with legacy, or when the star button is toggled */
+    if(favouritePosition === true) {
+      op = addTroupeAsFavouriteInLastPosition(userId, troupeId);
+    } else {
+      op = addTroupeAsFavouriteInPosition(userId, troupeId, favouritePosition);
+    }
+  } else {
+    // Unset the favourite
+    op = clearFavourite(userId, troupeId);
+  }
+
+
+  return op.then(function(position) {
+    winston.verbose('recent-rooms: position is now: ' + position);
+
+    // TODO: remove this debugging only
+    persistence.UserTroupeFavourites.findOne({ userId: userId }, function(err, after) {
+      winston.verbose('recent-rooms: user favourites after: ', after.toJSON());
     });
+
+    // Fire a realtime event
+    appEvents.recentRoomsChange({ userId: userId, troupeId: troupeId });
+
+    // TODO: in future get rid of this but this collection is used by the native clients
+    appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: position });
+  });
+
 }
 
 function findFavouriteTroupesForUser(userId, callback) {
+
   return persistence.UserTroupeFavourites.findOneQ({ userId: userId})
     .then(function(userTroupeFavourites) {
       if(!userTroupeFavourites || !userTroupeFavourites.favs) return {};
@@ -179,11 +224,10 @@ function findFavouriteTroupesForUser(userId, callback) {
 
 
 /**
- * Update the last visited troupe for the user, sending out appropriate events
- * Returns a promise of nothing
+ * Internal call
  */
 function clearLastVisitedTroupeforUserId(userId, troupeId) {
-  winston.verbose("Clearing last visited Troupe for user: " + userId+ " to troupe " + troupeId);
+  winston.verbose("recent-rooms: Clearing last visited Troupe for user: " + userId+ " to troupe " + troupeId);
 
   var setOp = {};
   setOp['troupes.' + troupeId] = 1;
@@ -194,13 +238,7 @@ function clearLastVisitedTroupeforUserId(userId, troupeId) {
          { userId: userId },
          { $unset: setOp },
          { upsert: true })
-    ])
-    .then(function() {
-      // XXX: lastAccessTime should be a date but for some bizarre reason it's not
-      // serializing properly
-      appEvents.recentRoomsChange({ userId: userId, troupeId: troupeId });
-      appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, lastAccessTime: null });
-    });
+    ]);
 }
 
 /**
@@ -208,7 +246,7 @@ function clearLastVisitedTroupeforUserId(userId, troupeId) {
  * Returns a promise of nothing
  */
 function saveLastVisitedTroupeforUserId(userId, troupeId, callback) {
-  winston.verbose("Saving last visited Troupe for user: " + userId+ " to troupe " + troupeId);
+  winston.verbose("recent-rooms: Saving last visited Troupe for user: " + userId+ " to troupe " + troupeId);
 
   var lastAccessTime = new Date();
 
@@ -318,7 +356,6 @@ function findBestTroupeForUser(user, callback) {
   updateFavourite,
   getTroupeLastAccessTimesForUser,
   saveLastVisitedTroupeforUserId,
-  clearLastVisitedTroupeforUserId,
   findBestTroupeForUser
 ].forEach(function(e) {
   exports[e.name] = e;
