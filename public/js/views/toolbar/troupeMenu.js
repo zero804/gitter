@@ -1,7 +1,6 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'jquery',
-  'underscore',
   'marionette',
   'utils/context',
   'utils/appevents',
@@ -12,7 +11,7 @@ define([
   './profileView',
   './orgCollectionView',
   'nanoscroller' //no ref
-], function($, _, Marionette, context, appEvents, troupeCollections, TroupeCollectionView, template, SearchView, ProfileView, OrgCollectionView) {
+], function($, Marionette, context, appEvents, troupeCollections, TroupeCollectionView, template, SearchView, ProfileView, OrgCollectionView) {
   "use strict";
 
   return Marionette.Layout.extend({

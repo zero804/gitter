@@ -8,19 +8,9 @@ define([
   'utils/momentWrapper',
   'views/base',
   'cocktail',
-  'log!troupeCollView',
   'jquery-sortable' // No ref
-], function($, context, Marionette, troupeListItemTemplate, appEvents, moment,  TroupeViews, cocktail, log) {
+], function($, context, Marionette, troupeListItemTemplate, appEvents, moment,  TroupeViews, cocktail) {
   "use strict";
-
-  function getIndexOfElementWithinParent(el) {
-    if(!el || !el.parentElement) return -1;
-    var parent = el.parentElement;
-    for(var i = 0; i < parent.children.length; i++) {
-      if(parent.children[i] === el) return i;
-    }
-    return -1;
-  }
 
   var createRoom = context.getUser().createRoom;
 
@@ -85,7 +75,14 @@ define([
         onDrop: function (item, container, _super) {
           var el = item[0];
           if (!cancelDrop) {
-            var favPosition = getIndexOfElementWithinParent(el) + 1;
+            var previousElement = el.previousElementSibling;
+            var favPosition;
+            if(!previousElement) {
+              favPosition = 1;
+            } else {
+              var previousCollectionItem = self.recentRoomsCollection.get(previousElement.dataset.id);
+              favPosition = previousCollectionItem.get('favourite') + 1;
+            }
             var collectionItem = self.recentRoomsCollection.get(el.dataset.id);
             collectionItem.set('favourite', favPosition);
             collectionItem.save();
