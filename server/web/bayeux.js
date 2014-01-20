@@ -12,7 +12,6 @@ var nconf             = require('../utils/config');
 var shutdown          = require('../utils/shutdown');
 var contextGenerator  = require('./context-generator');
 var appVersion        = require('./appVersion');
-var userService       = require('../services/user-service');
 var recentRoomService = require('../services/recent-room-service');
 
 var appTag = appVersion.getAppTag();

@@ -65,12 +65,66 @@ define([
       }, 50);
       self.url = "/api/v1/user/" + context.getUserId() + "/recentRooms";
       self.listenTo(self, 'change:lastAccessTime change:name change:favourite', delayedSort);
+      self.listenTo(self, 'change:favourite', self.reorderFavs);
       // TODO: replicate changes onto the context
       // this.listenTo(this, 'change:name', this.replicateContext);
     },
 
     operationIsUpToDate: function() {
+      /* Special case for recent rooms as troupe._v doesn't update for fav updates */
       return true;
+    },
+
+    reorderFavs: function(event) {
+      /**
+       * We need to do some special reordering in the event of a favourite being positioned
+       * This is to mirror the changes happening on the server
+       * @see recent-room-service.js@addTroupeAsFavouriteInPosition
+       */
+
+      /* This only applies when a fav has been set */
+      if(!event.changed || !event.changed.favourite) {
+        return;
+      }
+
+      if(this.reordering) return;
+      this.reordering = true;
+
+      var favourite = event.changed.favourite;
+
+      var forUpdate = this
+                        .map(function(room) {
+                          return { id: room.id, favourite: room.get('favourite') };
+                        })
+                        .filter(function(room) {
+                          return room.favourite >= favourite && room.id !== event.id;
+                        });
+
+      forUpdate.sort(function(a, b) {
+        return a.favourite - b.favourite;
+      });
+
+      var next = favourite;
+      for(var i = 0; i < forUpdate.length; i++) {
+        var item = forUpdate[i];
+
+        if(item.favourite > next) {
+          forUpdate = forUpdate.slice(0, i - 1);
+          break;
+        }
+
+        item.favourite++;
+        next = item.favourite + 1;
+      }
+      var self = this;
+      forUpdate.forEach(function(r) {
+        var id = r.id;
+        var value = r.favourite;
+        var t = self.get(id);
+        t.set('favourite', value);
+      });
+
+      delete this.reordering;
     },
 
     // replicateContext: function(model) {
