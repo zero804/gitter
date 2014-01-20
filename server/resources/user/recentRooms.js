@@ -47,7 +47,7 @@ module.exports = {
 
     return recentRoomService.removeRecentRoomForUser(userId, troupe.id)
       .then(function() {
-        res.send('OK');
+        res.send({ success: true });
       })
       .fail(next);
   },
