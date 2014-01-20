@@ -1,8 +1,9 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
   'backbone',
-  'utils/appevents'
-  ], function(backbone, appEvents)  {
+  'utils/appevents',
+  'hbs!./tmpl/unreadBannerTemplate'
+  ], function(backbone, appEvents, template)  {
   "use strict";
 
   var UnreadModel = backbone.Model.extend({
@@ -28,15 +29,11 @@ define([
     render: function() {
       var unreadCount = this.model.get('unreadCount');
 
-      if(unreadCount === 1) {
-        this.$el.text('1 unread message');
-        this.$el.removeClass('hide');
-      } else if(unreadCount > 1) {
-        this.$el.text(unreadCount+' unread messages');
-        this.$el.removeClass('hide');
-      } else {
-        this.$el.addClass('hide');
-      }
+      this.$el.html(template({
+        unreadCount: unreadCount,
+        isPlural: unreadCount > 1
+      }));
+      this.$el.toggleClass('hide', !unreadCount);
     },
     scrollToFirstUnread: function() {
       this.chatCollectionView.scrollToFirstUnread();
