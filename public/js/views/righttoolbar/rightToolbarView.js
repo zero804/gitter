@@ -28,7 +28,6 @@ define([
     },
 
     onRender: function() {
-
       $('#toolbar-frame').show();
       $('#right-panel').show();
 
