@@ -160,10 +160,8 @@ exports.install = function(persistenceService) {
     });
   }
 
-
   mongooseUtils.attachNotificationListenersToSchema(schemas.TroupeSchema, {
     onCreate: function onTroupeCreate(model, next) {
-
 
       if(model.oneToOne) {
         // Because the troupe needs the currentUserId to be set!
