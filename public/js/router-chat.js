@@ -3,6 +3,7 @@ require([
   'jquery',
   'backbone',
   'utils/context',
+  'components/live-context',
   'utils/appevents',
   'views/people/peopleCollectionView',
   'views/app/chatIntegratedView',
@@ -33,7 +34,7 @@ require([
   'template/helpers/all', // No ref
   'components/eyeballs', // No ref
   'bootstrap-dropdown' // No ref
-], function($, Backbone, context, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
+], function($, Backbone, context, liveContext, appEvents, peopleCollectionView, ChatIntegratedView, chatInputView,
     ChatCollectionView, itemCollections, RightToolbarView,
     PersonDetailView, inviteView, troupeSettingsView, markdownView, IntegrationSettingsModal,
     Router, unreadItemsClient, FileDecorator, webhookDecorator, issueDecorator, mentionDecorator,
@@ -93,6 +94,9 @@ require([
     ],
     regions: [appView.rightPanelRegion, appView.dialogRegion]
   });
+
+  // Listen for changes to the room
+  liveContext.syncRoom();
 
   function oauthUpgradeCallback(e) {
     if(e.data !== "oauth_upgrade_complete") return;

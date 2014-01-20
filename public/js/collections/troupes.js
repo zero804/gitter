@@ -21,14 +21,14 @@ define([
     model: TroupeModel,
     initialize: function() {
       this.url = "/api/v1/user/" + context.getUserId() + "/troupes";
-      this.listenTo(this, 'change:name', this.replicateContext);
+      // this.listenTo(this, 'change:name', this.replicateContext);
     },
 
-    replicateContext: function(model) {
-      if(model.id === context.getTroupeId()) {
-        context.troupe().set(model.toJSON());
-      }
-    }
+    // replicateContext: function(model) {
+    //   if(model.id === context.getTroupeId()) {
+    //     context.troupe().set(model.toJSON());
+    //   }
+    // }
   });
 
   return {

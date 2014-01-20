@@ -18,11 +18,12 @@ define([
   // XXX: Why are we doing a fetch on this collection?
   orgsCollection.fetch();
 
-  var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
-  unreadItemsClient.installTroupeListener(troupeCollection);
 
   var recentRooms = new recentRoomModels.RoomCollection(null, { listen: true });
+  unreadItemsClient.installTroupeListener(recentRooms);
 
+  var troupeCollection = new troupeModels.TroupeCollection(null, { listen: true });
+  // unreadItemsClient.installTroupeListener(troupeCollection);
 
   function filterTroupeCollection(filter) {
     var c = new Backbone.FilteredCollection(null, { model: troupeModels.TroupeModel, collection: troupeCollection });
@@ -37,19 +38,19 @@ define([
   }
 
   // collection of normal troupes only
-  var filteredTroupeCollection = filterTroupeCollection(function(m) {
-    return !m.get('oneToOne') /* || m.get('unreadItems') > 0 */;
-  });
+  // var filteredTroupeCollection = filterTroupeCollection(function(m) {
+  //   return !m.get('oneToOne') /* || m.get('unreadItems') > 0 */;
+  // });
 
   // collection of one to one troupes only
-  var peopleOnlyTroupeCollection = filterTroupeCollection(function(m) {
-    return m.get('oneToOne');
-  });
+  // var peopleOnlyTroupeCollection = filterTroupeCollection(function(m) {
+  //   return m.get('oneToOne');
+  // });
 
   // collection of unread troupes only
-  var unreadTroupeCollection = filterTroupeCollection(function(m) {
-    return m.get('unreadItems') > 0;
-  });
+  // var unreadTroupeCollection = filterTroupeCollection(function(m) {
+  //   return m.get('unreadItems') > 0;
+  // });
 
   // collection of favourited troupes
   var recentRoomsFavourites = filterRecentRoomsCollection(function(m) {
@@ -61,9 +62,9 @@ define([
   });
 
   // collection of troupes that are Repos
-  var repoTroupeCollection = filterTroupeCollection(function(m) {
-    return m.get('githubType') == "REPO";
-  });
+  // var repoTroupeCollection = filterTroupeCollection(function(m) {
+  //   return m.get('githubType') == "REPO";
+  // });
 
   // Sync up with the context
   troupeCollection.on("add", function(model) {
@@ -73,7 +74,6 @@ define([
       });
     }
   });
-
 
   // collection of recent troupes only, will be empty at first.
   // doesn't need to be connected to events from the main collection,
@@ -114,16 +114,17 @@ define([
     recentRoomsFavourites: recentRoomsFavourites,
     recentRoomsNonFavourites: recentRoomsNonFavourites,
 
-    // TODO: get rid of these collections?
     troupes: troupeCollection,
-    peopleTroupes: peopleOnlyTroupeCollection,
-    normalTroupes: filteredTroupeCollection,
+    // TODO: get rid of these collections?
+    // troupes: troupeCollection,
+    // peopleTroupes: peopleOnlyTroupeCollection,
+    // normalTroupes: filteredTroupeCollection,
     // recentTroupes: recentTroupeCollection,
-    unreadTroupes: unreadTroupeCollection,
+    // unreadTroupes: unreadTroupeCollection,
     //favouriteTroupes: favouriteTroupesCollection,
     //smart: smartCollection,
     orgs: orgsCollection,
-    repos: repoTroupeCollection
+    // repos: repoTroupeCollection
   };
 
 });
