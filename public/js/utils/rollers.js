@@ -47,7 +47,6 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
 
   Rollers.prototype = {
     adjustScroll: function() {
-      console.log('adjustScroll', this._mode)
       this._mutationHandlers[this._mode]();
       this._postMutateTop = this._target.scrollTop;
       return true;
@@ -59,11 +58,8 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
 
     /* Specify an element that should not be scrolled past */
     trackUntil: function(element) {
-      console.log('track until', element);
-      // if(this._mode != STABLE) {
-        this._nopass = element;
-        this._mode = TRACK_NO_PASS;
-      // }
+      this._nopass = element;
+      this._mode = TRACK_NO_PASS;
     },
 
     cancelTrackUntil: function() {
@@ -101,7 +97,6 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
      * Update the scroll position to follow the bottom of the scroll pane
      */
     updateTrackBottom: function() {
-      console.log('updateTrackBottom');
       var target = this._target;
       var scrollTop = target.scrollHeight - target.clientHeight;
       target.scrollTop = scrollTop;
@@ -127,12 +122,10 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
      * Scroll to the bottom and switch the mode to TRACK_BOTTOM
      */
     scrollToBottomContinuously: function(ms) {
-      console.log('scrollToBottomContinuously');
       continuous(this.scrollToBottom.bind(this), ms);
     },
 
     updateTrackNoPass: function() {
-      console.log('updateTrackNoPass');
       var target = this._target;
       var targetScrollHeight = target.scrollHeight;
       var targetClientHeight = target.clientHeight;
@@ -162,7 +155,6 @@ define(['log!rollers','./legacy-mutations'], function(log, LegacyMutations) {
 
 
     updateStableTracking: function() {
-      console.log('updateStableTracking');
       if(!this._stableElement) return;
       var target = this._target;
 
