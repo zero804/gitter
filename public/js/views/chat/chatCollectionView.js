@@ -99,12 +99,26 @@ define([
     },
 
     scrollToFirstUnread: function() {
-      // this.findChatToTrack();
-      var firstUnread = this.collection.findWhere({ unread: true });
-      var firstUnreadView = this.children.findByModel(firstUnread);
-      console.log('!!!!!!!', firstUnreadView)
-      this.rollers.trackUntil(firstUnreadView.el);
-      this.rollers.adjustScrollContinuously(200);
+      var self = this;
+
+      function findFirstUnread(callback) {
+        var firstUnread = self.collection.findWhere({ unread: true });
+        if(!firstUnread) {
+          self.loadMore();
+          self.collection.once('sync', function() {
+            findFirstUnread(callback);
+          });
+        } else {
+          callback(firstUnread);
+        }
+      }
+
+      findFirstUnread(function(firstUnread) {
+        var firstUnreadView = self.children.findByModel(firstUnread);
+        self.rollers.trackUntil(firstUnreadView.el);
+        self.rollers.adjustScrollContinuously(200);
+      });
+
     },
 
     findChatToTrack: function() {
