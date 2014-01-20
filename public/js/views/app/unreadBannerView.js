@@ -1,6 +1,20 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
-define(['backbone'], function(backbone)  {
+define([
+  'backbone',
+  'utils/appevents'
+  ], function(backbone, appEvents)  {
   "use strict";
+
+  var UnreadModel = backbone.Model.extend({
+    defaults: {
+      unreadCount: 0
+    },
+    initialize: function() {
+      this.listenTo(appEvents, 'unreadItemsCount', function(count) {
+        this.set('unreadCount', count);
+      }, this);
+    }
+  });
 
   return backbone.View.extend({
     events: {
@@ -8,16 +22,21 @@ define(['backbone'], function(backbone)  {
     },
     initialize: function(options) {
       this.chatCollectionView = options.chatCollectionView;
-      this.listenTo(this.collection, 'add reset change', this.render, this);
+      this.model = new UnreadModel();
+      this.listenTo(this.model, 'change', this.render);
     },
     render: function() {
-      var unreadCount = this.collection.where({unread: true}).length;
-      var message = unreadCount+' unread message';
-      if(unreadCount > 1) {
-        message = message+'s';
+      var unreadCount = this.model.get('unreadCount');
+
+      if(unreadCount === 1) {
+        this.$el.text('1 unread message');
+        this.$el.removeClass('hide');
+      } else if(unreadCount > 1) {
+        this.$el.text(unreadCount+' unread messages');
+        this.$el.removeClass('hide');
+      } else {
+        this.$el.addClass('hide');
       }
-      this.$el.toggleClass('hide', unreadCount === 0);
-      this.$el.text(message);
     },
     scrollToFirstUnread: function() {
       this.chatCollectionView.scrollToFirstUnread();
