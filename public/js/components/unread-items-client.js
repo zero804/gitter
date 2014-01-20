@@ -114,6 +114,7 @@ define([
 
         this._currentCountValue = newValue;
         this.trigger('newcountvalue', newValue);
+        appEvents.trigger('unreadItemsCount', newValue);
       }
     },
 
