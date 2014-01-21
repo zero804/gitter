@@ -1402,7 +1402,15 @@ ul.roster {
   .prepend-build-failed-icon;
 }
 
-.build-failure {
+.build-fixed {
+  .prepend-build-passed-icon;
+}
+
+.build-failing, .build-broken {
+   .prepend-build-failed-icon;
+}
+
+.build-failure, .build-failing, .build-broken {
   color: @trpRed;
 
   a {
