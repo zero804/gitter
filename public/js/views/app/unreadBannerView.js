@@ -21,7 +21,7 @@ define([
 
   return backbone.View.extend({
     events: {
-      'click .banner-button': 'scrollToFirstUnread',
+      'click .banner-main-button': 'scrollToFirstUnread',
       'click .banner-side-button': 'dismissAll'
     },
     initialize: function(options) {
