@@ -1,9 +1,11 @@
 /*jshint strict:true, undef:true, unused:strict, browser:true *//* global define:false */
 define([
+  'jquery',
   'backbone',
+  'utils/context',
   'utils/appevents',
   'hbs!./tmpl/unreadBannerTemplate'
-  ], function(backbone, appEvents, template)  {
+  ], function($, backbone, context, appEvents, template)  {
   "use strict";
 
   var UnreadModel = backbone.Model.extend({
@@ -19,7 +21,8 @@ define([
 
   return backbone.View.extend({
     events: {
-      'click': 'scrollToFirstUnread'
+      'click': 'scrollToFirstUnread',
+      'click .banner-button': 'dismissAll'
     },
     initialize: function(options) {
       this.chatCollectionView = options.chatCollectionView;
@@ -37,6 +40,15 @@ define([
     },
     scrollToFirstUnread: function() {
       this.chatCollectionView.scrollToFirstUnread();
+    },
+    dismissAll: function() {
+      $.ajax({
+        url: "/api/v1/troupes/" + context.getTroupeId() + "/unreadItems/all",
+        contentType: "application/json",
+        type: "DELETE",
+      });
+      // dont trigger the banner click event
+      return false;
     }
   });
 

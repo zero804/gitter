@@ -24,8 +24,15 @@ module.exports = {
       });
     },
 
-    load: function(id, callback) {
-      callback("Not supported");
+    destroy: function(req, res, next) {
+      if(req.params.unreadItem.toLowerCase() !== 'all') next(404);
+
+      unreadItemService.markAllChatsRead(req.user.id, req.troupe.id, function(err) {
+        if(err) return next(err);
+
+        res.send(200);
+
+      });
     }
 
 };
