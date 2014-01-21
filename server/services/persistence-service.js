@@ -561,6 +561,25 @@ ChatMessageSchema.index({ toTroupeId: 1, sent: -1 });
 ChatMessageSchema.schemaTypeName = 'ChatMessageSchema';
 
 //
+// A single event
+//
+var EventSchema = new Schema({
+  fromUserId: ObjectId,
+  toTroupeId: ObjectId,  //TODO: rename to troupeId
+  text: String,
+  html: String,
+  meta: Schema.Types.Mixed,
+  payload: Schema.Types.Mixed,
+  sent: { type: Date, "default": Date.now },
+  editedAt: { type: Date, "default": null },
+  _tv: { type: 'MongooseNumber', 'default': 0 },
+  _md: Number,          // Meta parse version
+});
+EventSchema.index({ toTroupeId: 1, sent: -1 });
+EventSchema.schemaTypeName = 'EventSchema';
+
+
+//
 // An email attachment
 //
 var EmailAttachmentSchema = new Schema({
@@ -795,6 +814,7 @@ var Request = mongoose.model('Request', RequestSchema);
 var RequestUnconfirmed = mongoose.model('RequestUnconfirmed', RequestUnconfirmedSchema);
 
 var ChatMessage = mongoose.model('ChatMessage', ChatMessageSchema);
+var Event = mongoose.model('Event', EventSchema);
 var File = mongoose.model('File', FileSchema);
 var FileVersion = mongoose.model('FileVersion', FileVersionSchema);
 
@@ -840,6 +860,7 @@ module.exports = {
     InviteSchema: InviteSchema,
     RequestSchema: RequestSchema,
     ChatMessageSchema: ChatMessageSchema,
+    EventSchema: EventSchema,
     FileSchema: FileSchema,
     FileVersionSchema: FileVersionSchema,
     OAuthClientSchema: OAuthClientSchema,
@@ -868,6 +889,7 @@ module.exports = {
   Request: Request,
   RequestUnconfirmed: RequestUnconfirmed,
 	ChatMessage: ChatMessage,
+  Event: Event,
   File: File,
   FileVersion: FileVersion,
   OAuthClient: OAuthClient,

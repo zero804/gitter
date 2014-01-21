@@ -33,8 +33,8 @@
 }
 
 .transition(@time) {
-   -webkit-transform: translate3d(0,0,0);
-           transform: translate3d(0,0,0);
+/*  -webkit-transform: translate3d(0,0,0);
+          transform: translate3d(0,0,0);*/
   -webkit-transition: all @time ease-in-out;
      -moz-transition: all @time ease-in-out;
        -o-transition: all @time ease-in-out;
@@ -236,6 +236,10 @@ a:hover {
   }
 }
 
+#people-roster {
+  margin-left: 6px;
+}
+
 .trpLeftMenu .trpToolbarHeader {
   margin-left: 9px;
   padding-top: 0;
@@ -246,6 +250,24 @@ a:hover {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   padding-right: 9px;
+}
+
+.trpToolbarHeaderItem {
+  display: inline-block;
+  opacity: 0.5;
+  .transition300ms;
+}
+
+.trpToolbarHeaderItem:hover {
+  opacity: 1;
+}
+
+.trpToolbarHeaderItem:first-child {
+  margin-right: 10px;
+}
+
+.trpToolbarHeaderItem.selected {
+  opacity: 1;
 }
 
 .trpToolbarHeader .list-toggle {
@@ -583,13 +605,71 @@ a.trpMiniLeftMenuItem {
   cursor: not-allowed;
 }
 
+.gtrActivityList {
+  list-style-type: none;
+  margin: 0;
+  .trpBodyMediumSmall;
+
+  .commits {
+    display: none;
+  }
+
+  li {
+    border-bottom: 1px dotted rgba(100,100,100,0.1);
+    padding: 7px 7px 7px 15px;
+    line-height: 20px;
+    cursor: default;
+  }
+
+  li:hover {
+    background-color: rgba(100,100,100,0.1);
+    color: black;
+
+    .gtrActivityItemText .mention {
+      border: 1px solid fade(@trpGrey,50%);
+      background-color: fade(@trpGrey,30%);
+    }
+
+  }
+
+  .activity-detail {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .activity-commit {
+    .activity-detail;
+    margin-left: 2px;
+  }
+
+}
+
+.activity-expand {
+  cursor: pointer;
+
+  ul {
+    list-style: none;
+    margin: 0;
+  }
+
+}
+
+
+
+
+.gtrActivityItemText {
+  vertical-align: middle;
+  display: inline-block;
+  opacity: 0.8;
+}
+
+
 body.dragging .trpTroupeList {
   min-height: 25px;
 }
 
 .trpTroupeList {
-	list-style-type: none;
-	margin: 0 0 0 0px;
+	margin: 0;
   width: 100%;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -1172,7 +1252,7 @@ i.favourited:hover:before {
   font-size: 14px;
   position: fixed;
   display: inline-block;
-  width: 260px;
+  width: @rightMarginFull;
   text-align: left;
   vertical-align: top;
   right: 0;
@@ -1314,6 +1394,89 @@ ul.roster {
   right: -250px;
 }
 
+.build-started, .build-pending{
+  .prepend-build-start-icon;
+}
+
+.build-failure {
+  .prepend-build-failed-icon;
+}
+
+.build-failure {
+  color: @trpRed;
+
+  a {
+    color: red;
+  }
+}
+
+.build-passed, .build-success{
+  .prepend-build-passed-icon;
+}
+
+.trello-card-voted {
+  .prepend-trello-card-vote;
+}
+
+.trello-card-created {
+  .prepend-trello-card-create;
+}
+
+.trello-card-updated {
+  .prepend-trello-card-update;
+}
+
+.trello-card-commented {
+  .prepend-trello-card-update;
+}
+
+.github-push {
+  .prepend-push-icon;
+}
+
+.github-issue-opened {
+  .prepend-issue-opened;
+}
+
+.github-issue-closed {
+  .prepend-issue-closed;
+}
+
+.github-issue-reopened {
+  .prepend-issue-reopened;
+}
+
+.github-member-add {
+  .prepend-member-add;
+}
+
+.github-public {
+  .prepend-public;
+}
+
+.github-watch {
+  .prepend-watch;
+}
+
+.github-wiki {
+  .prepend-wiki;
+}
+
+.github-fork {
+  .prepend-fork;
+}
+
+.github-comment, .github-issue_comment, .github-commit_comment{
+  .prepend-comment;
+}
+
+.github-sync {
+  .prepend-sync;
+}
+
+.github-pull-request {
+  .prepend-pull-request;
+}
 
 .trpContentPanel.leftCollapse {
   @media @small {
@@ -1361,7 +1524,9 @@ ul.roster {
   }
 }
 
-
+.webhook {
+  cursor: pointer;
+}
 
 
 .trpToolbarContent {
@@ -1369,6 +1534,14 @@ ul.roster {
   width: 100%;
   vertical-align: top;
   height: 100%;
+  overflow: auto;
+
+  table, tr, td {
+    border-spacing: 0;
+    padding: 0;
+    margin: 0;
+  }
+
 
   @media @mid {
 
@@ -1431,37 +1604,7 @@ ul.roster {
 }
 
 .trpToolbarListContent {
-  padding-left: 14px;
-}
-
-.trpRightPanel {
-	position: fixed;
-	width: 210px;
-	right: -20px;
-  padding-left: 25px;
-	top: 0;
-	bottom: 0;
-	overflow: hidden;
-	color: white;
-	font-size: 20px;
-	background-color: #d3dfd3;
-	padding-top: 20px;
-	text-align: left;
-	z-index: 300;
-  opacity: 0.95;
-  .transition300ms;
-
-  @media @mid {
-    right: -235px;
-  }
-}
-
-.trpRightPanel.visible {
-  right: 0px;
-}
-
-.trpRightPanel:hover {
-  opacity: 1;
+  padding-left: 10px;
 }
 
 .trpItemDetails {
@@ -1601,6 +1744,37 @@ ul.roster {
     margin-right: 12px;
   }
 
+  .activityFeedToggle {
+    float: right;
+    margin-top: 15px;
+    margin-right: 12px;
+    cursor: pointer;
+    opacity: 0.4;
+    transition:all .5s ease-in-out;
+
+    &.show-activity {
+      color: @trpGreen;
+      opacity: 0.8;
+      transition:all 0.1s ease-in-out;
+    }
+
+  }
+
+  .activityFeedToggle:hover {
+    opacity: 1;
+  }
+
+  .activityFeedToggle:before {
+      font-family: 'troupe-icons';
+      /*content: '\e81a';*/
+    /*  content: '\e81e';*/
+      content: '\e82c';
+      margin-right: 8px;
+      width: 12px;
+      font-size: 20px;
+      -webkit-font-smoothing: antialiased;
+  }
+
   .dropdown-toggle:before {
       font-family: 'troupe-icons';
       /*content: '\e81a';*/
@@ -1628,8 +1802,6 @@ ul.roster {
   }
 
 }
-
-
 
 .trpChatInputArea {
   display: block;
@@ -1867,7 +2039,6 @@ ul.roster {
     bottom: 0;
     background-color: @trpBgColor3;
     .transition300ms;
-    overflow: hidden;
     padding-top: 10px;
     margin: -10px 0;
     -webkit-transform: translate3d(0, 0, 0);
@@ -1888,8 +2059,6 @@ ul.roster {
 
 .trpTroupeRelatedContentHolder {
   min-width: 230px;
-  overflow: hidden;
-  height: 100%;
 }
 
 .trpTroupeActions {
@@ -1899,7 +2068,7 @@ ul.roster {
   padding-top: 4px;
   cursor: pointer;
   background-color: @trpBgColor;
-  margin-bottom: 12px;
+  padding-bottom: 12px;
 }
 
 .trpActionsMenuLabel {

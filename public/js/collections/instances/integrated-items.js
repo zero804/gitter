@@ -6,16 +6,18 @@ define([
   '../base',
   '../users',
   '../chat',
+  '../events',
   'utils/appevents',
   'components/unread-items-client',
   'components/realtime-troupe-listener'     // No reference
-], function($, _, Backbone, base, userModels, chatModels, appEvents, unreadItemsClient) {
+], function($, _, Backbone, base, userModels, chatModels, eventModels, appEvents, unreadItemsClient) {
   "use strict";
 
-  var chatCollection         = new chatModels.ChatCollection(null, { listen: true });
-  var userCollection         = new userModels.UserCollection(null, { listen: true });
-  var rosterCollection       = new userModels.RosterCollection(null, { users: userCollection, limit: 18 });
-  var sortedUserCollection   = new userModels.SortedUserCollection(null, { users: userCollection});
+  var chatCollection          = new chatModels.ChatCollection(null, { listen: true });
+  var userCollection          = new userModels.UserCollection(null, { listen: true });
+  var rosterCollection        = new userModels.RosterCollection(null, { users: userCollection, limit: 18 });
+  var sortedUserCollection    = new userModels.SortedUserCollection(null, { users: userCollection});
+  var eventCollection         = new eventModels.EventCollection(null,  { listen: true });
 
   function helpers() {
 
@@ -50,7 +52,8 @@ define([
     chats: chatCollection,
     users: userCollection,
     sortedUsers: sortedUserCollection,
-    roster: rosterCollection
+    roster: rosterCollection,
+    events: eventCollection
   };
 
 });

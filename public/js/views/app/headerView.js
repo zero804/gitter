@@ -17,7 +17,12 @@ define([
     },
     events: {
       'click #leave-room': 'leaveRoom',
+      'click #activity-feed-toggle' : 'toggleActivityFeed',
       'click #notifications-settings-link': 'enableBrowserNotifications'
+    },
+
+    initialize: function() {
+      this.showActivity = true;
     },
 
     leaveRoom: function() {
@@ -26,6 +31,26 @@ define([
         data: "",
         type: "DELETE",
       });
+    },
+
+    showActivityFeed: function () {
+      $('.webhook').parent().parent().slideDown();
+      $('#activity-feed-toggle').addClass("show-activity");
+    },
+
+    hideActivityFeed: function () {
+      $('.webhook').parent().parent().slideUp();
+      $('#activity-feed-toggle').removeClass("show-activity");
+    },
+
+    toggleActivityFeed: function() {
+      if (this.showActivity) {
+        this.hideActivityFeed();
+        this.showActivity = false;
+      } else {
+        this.showActivityFeed();
+        this.showActivity = true;
+      }
     },
 
     enableBrowserNotifications: function() {
