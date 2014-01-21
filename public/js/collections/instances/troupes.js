@@ -22,7 +22,7 @@ define([
 
   /* Utils for comparators, perhaps this should go somewhere useful? */
   function nullish(a) {
-    return a === null || a === undefined;
+    return a === null || a === undefined || a === 0;
   }
 
   function naturalComparator(a, b) {
@@ -60,13 +60,6 @@ define([
     return c;
   }
 
-  function debouncedResort(collection) {
-    // Debouncing makes things flicker...
-    collection.on('reset sync change:favourite add remove filter-complete', function() {
-      collection.sort();
-    });
-  }
-
   // collection of favourited troupes
   var favourites = filterTroupeCollection(function(m) {
     return m.get('favourite');
@@ -79,7 +72,9 @@ define([
     return naturalComparator(a.get('name'), b.get('name'));
   };
 
-  debouncedResort(favourites);
+  favourites.on('reset sync change:favourite add remove filter-complete', function() {
+    favourites.sort();
+  });
 
   var recentRoomsNonFavourites = filterTroupeCollection(function(m) {
     /* Not a favourite, but has a lastAccessTime */
@@ -92,7 +87,9 @@ define([
    * followed by order of most recent access
    */
   recentRoomsNonFavourites.comparator = function(a, b) {
+    console.log(a.get('unreadItems'), b.get('unreadItems'));
     var c = existenceComparator(a.get('unreadItems'), b.get('unreadItems'));
+    console.log('C IS ', c);
     if(c === 0) {
       /** Both sides have unreadItems, compare by name */
       return naturalComparator(a.get('name'), b.get('name'));
@@ -100,11 +97,19 @@ define([
       /* Neither side has unreadItems, compare by lastAccessTime, descending */
       var aLastAccessTime = a.get('lastAccessTime');
       var bLastAccessTime = b.get('lastAccessTime');
-      return reverseNaturalComparator(aLastAccessTime && aLastAccessTime.valueOf(), bLastAccessTime && b.lastAccessTime.valueOf());
+
+      console.log('comparing ', aLastAccessTime && aLastAccessTime.valueOf(), bLastAccessTime && bLastAccessTime.valueOf());
+
+      return reverseNaturalComparator(aLastAccessTime && aLastAccessTime.valueOf(), bLastAccessTime && bLastAccessTime.valueOf());
     } else return c;
   };
 
-  debouncedResort(recentRoomsNonFavourites);
+  recentRoomsNonFavourites.on('reset sync change:favourite change:lastAccessTime add remove filter-complete', function() {
+    console.log('SORTING recents');
+    recentRoomsNonFavourites.sort();
+    console.log('NEW SORT ORDER IS ',
+    recentRoomsNonFavourites.pluck('name'));
+  });
 
   // collection of troupes that are Repos
   // var repoTroupeCollection = filterTroupeCollection(function(m) {
