@@ -36,6 +36,8 @@ module.exports = {
     var chatReadBy = new Resource('readBy', require('./troupes/chat-read-by'), app);
     chatResource.add(chatReadBy);
 
+    var eventsResource = installTroupeSubResource('events', 'events'); 
+
 
     installTroupeSubResource('unreadItems', 'unread-items');
 

@@ -10,6 +10,7 @@ var unreadItemService   = require("../services/unread-item-service");
 var fileService         = require("../services/file-service");
 var chatService         = require("../services/chat-service");
 var conversationService = require("../services/conversation-service");
+var eventService        = require("../services/event-service");
 var Q                   = require('q');
 
 // USEFUL function for testing
@@ -152,4 +153,11 @@ exports.serializeReadBysForChat = function(troupeId, chatId, callback) {
 
   });
 
+};
+
+exports.serializeEventsForTroupe = function(troupeId, userId, callback) {
+  eventService.findEventsForTroupe(troupeId, {}, function(err, events) {
+    var strategy = new restSerializer.EventStrategy({ currentUserId: userId, troupeId: troupeId });
+    restSerializer.serialize(events, strategy, callback);
+  });
 };
