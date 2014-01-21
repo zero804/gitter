@@ -172,12 +172,10 @@ define([
 
     initialize: function(/*options*/) {
       this.data = {};
-
       this.collectionView = new ItemsView({
          collection: this.collection,
         itemView: ActivityItemView
       });
-
     },
 
     afterRender: function() {
