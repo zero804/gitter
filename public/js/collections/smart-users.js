@@ -17,8 +17,8 @@ define([
   }
 
   function compareNames(userA, userB) {
-    var aName = userA.get('displayName') || userA.get('username');
-    var bName = userB.get('displayName') || userB.get('username');
+    var aName = userA.get('displayName') || userA.get('username') || '';
+    var bName = userB.get('displayName') || userB.get('username') || '';
 
     return bName.toLowerCase().localeCompare(aName.toLowerCase());
   }
