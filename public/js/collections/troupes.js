@@ -52,21 +52,6 @@ define([
         return a.favourite - b.favourite;
       });
 
-      // var next = position;
-      // // NB: used to be i = 1
-      // for(var i = 0; i < values.length; i++) {
-      //   var item = values[i];
-
-      //   if(item[1] > next) {
-      //      Only increment those values before this one
-      //     values.splice(i, values.length);
-      //     break;
-      //   }
-      //   /* This dude needs an increment */
-      //   item[1]++;
-      //   next = item[1];
-      // }
-
       var next = favourite;
       for(var i = 0; i < forUpdate.length; i++) {
         var item = forUpdate[i];
@@ -79,6 +64,7 @@ define([
         item.favourite++;
         next = item.favourite;
       }
+
       var self = this;
       forUpdate.forEach(function(r) {
         var id = r.id;
