@@ -56,17 +56,22 @@
     margin-right: @rightMarginSmall + 42px;
   }
 }
+
 .banner-button {
-  @color: fade(darken(@trpGreen, 5%), 90%);
-  float: right;
-  .trpButtonSmall;
-  .trpBtnGreen;
-  height: 25px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
   padding: 4px 11px;
-  background-color: @color;
+  background-color: fade(@trpGreen, 90%);
+  color: white;
+  border-radius: 0 0 4px 0;
+  border-width: 0 0 0 2px;
+  border-left-color: darken(@trpGreen, 5%);
+  .trpBodySmall;
 
   &:hover {
-    background-color: darken(@color, 5%);
+    background-color: darken(@trpGreen, 5%);
   }
 
 }
