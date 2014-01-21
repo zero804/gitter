@@ -305,6 +305,34 @@ a:hover {
   }
 }
 
+.item-fav .github-ORG {
+  .prepend-fav-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+.item-fav .github-ONETOONE {
+  .prepend-fav-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+.item-fav .github-REPO {
+  .prepend-fav-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
+.item-fav .github-ORG_CHANNEL {
+  .prepend-fav-icon;
+  &:before {
+    font-size: 16px;
+  }
+}
+
 .trpLeftMenuProfile {
   .trpBodyMedium;
   padding: 10px 0 10px 10px;
@@ -369,7 +397,7 @@ a:hover {
 
 .trpLeftMenuProfileName {
   display: inline-block;
-  vertical-align: top; 
+  vertical-align: top;
   padding-top: 4px;
   font-weight: 300;
   font-size: 16px;
@@ -451,8 +479,8 @@ a.trpMiniLeftMenuItem {
 }
 
 .item-unread-badge {
-  float: right; 
-  margin-right: 5px; 
+  float: right;
+  margin-right: 5px;
 }
 
 .trpMiniLeftMenuItem.unread:after {
@@ -636,9 +664,11 @@ a.trpMiniLeftMenuItem {
 }
 
 
+body.dragging .trpTroupeList {
+  min-height: 25px;
+}
+
 .trpTroupeList {
-  display: inline-block;
-	list-style-type: none;
 	margin: 0;
   width: 100%;
   box-sizing: border-box;
@@ -660,18 +690,16 @@ a.trpMiniLeftMenuItem {
     @media @mobile {
       background-color: transparent;
     }
-
   }
 
   span {
     display: inline-block;
     color: white;
     white-space: nowrap;
-    max-width: 220px;
+    max-width: 180px;
     overflow: hidden;
     text-overflow: ellipsis;
     vertical-align: middle;
-
   }
 
   span.disabled {
@@ -683,6 +711,89 @@ a.trpMiniLeftMenuItem {
 .trpTroupeListSearch {
 	padding-left: 8px;
 }
+
+body.dragging, body.dragging * {
+  cursor: move !important;
+}
+
+body.dragging .list-favourites {
+  background-color: rgba(255,255,255,0.1);
+  border-top: 1px dashed rgba(255,255,255,0.2);
+  border-bottom: 1px dashed rgba(255,255,255,0.2);
+}
+
+
+.dragged {
+  position: absolute;
+  opacity: 0.5;
+  z-index: 2000;
+  list-style: none;
+}
+
+li:hover.dragged {
+  background-color: transparent;
+}
+
+.dragged .item-close {
+  opacity: 0;
+}
+
+ul li.placeholder {
+  position: relative;
+  height: 25px;
+  background-color: rgba(155,155,155,0.1);
+  border-radius: 0 4px 4px 0;
+  border: 1px dashed rgba(255,255,255,0.2);
+  border-left: 0;
+  color: white;
+}
+
+ul li.placeholder:before {
+      position: absolute;
+      content: "";
+      width: 0;
+      height: 0;
+      margin-top: -5px;
+      left: -5px;
+      top: -4px;
+      border: 5px solid transparent;
+      border-left-color: red;
+      border-right: none;
+}
+
+.trpTroupeList li .item-close {
+  display: none;
+}
+
+.trpTroupeList li:hover .item-close {
+  display: inline-block;
+}
+
+.trpTroupeList li:hover .item-unread-badge {
+  display: none;
+}
+
+.item-close {
+  float: right;
+  opacity: 0.3;
+  margin-right: 6px;
+  .transition300ms;
+}
+
+.item-close:hover {
+  opacity: 0.8;
+}
+
+#list-search .trpLeftMenuItemClose {
+  display: none;
+}
+
+.trpLeftMenuItemClose:before {
+  font-family: 'troupe-icons';
+  content: '\e827';
+  font-size: 14px;
+}
+
 
 .trpNewPersonButton, .trpNewTroupeButton {
   border: 1px solid rgba(255,255,255,0.6);
@@ -881,7 +992,7 @@ a.trpMiniLeftMenuItem {
   position: fixed;
 	background-color: white;
 	margin-left: 0px;
-/*  height is now specified in the html for as it renders better before the css is loaded*/  
+/*  height is now specified in the html for as it renders better before the css is loaded*/
 	width: 100%;
 	text-align: center;
 /*	padding-top: 40px;*/
@@ -1205,6 +1316,10 @@ i.favourited:hover:before {
 
     &.expanded {
       width: 240px;
+    }
+
+    #activity-header {
+    opacity: 0;
     }
 
     #people-header, #top-header, #request-header, #repo-info {
@@ -1751,7 +1866,7 @@ ul.roster {
     opacity: 0.9;
   }
 
-  .md-help:before { 
+  .md-help:before {
     font-family: 'troupe-icons';
     content: '\e82d';
     margin-right: 8px;

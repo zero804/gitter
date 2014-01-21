@@ -1,10 +1,11 @@
 /*jshint globalstrict:true, trailing:false, unused:true, node:true */
 "use strict";
 
-var troupeService = require("../../services/troupe-service");
-var roomService = require("../../services/room-service");
-var restSerializer = require("../../serializers/rest-serializer");
-var Q = require('q');
+var troupeService     = require("../../services/troupe-service");
+var roomService       = require("../../services/room-service");
+var restSerializer    = require("../../serializers/rest-serializer");
+var recentRoomService = require('../../services/recent-room-service');
+var Q                 = require('q');
 
 module.exports = {
   index: function(req, res, next) {
@@ -62,7 +63,7 @@ module.exports = {
     var promises = [];
 
     if(updatedTroupe.hasOwnProperty('favourite')) {
-      promises.push(troupeService.updateFavourite(req.user.id, troupe.id, updatedTroupe.favourite));
+      promises.push(recentRoomService.updateFavourite(req.user.id, troupe.id, updatedTroupe.favourite));
     }
 
     if(updatedTroupe.autoConfigureHooks) {

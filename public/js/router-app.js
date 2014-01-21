@@ -26,8 +26,8 @@ require([
     }
   }
 
-  var troupeCollection = troupeCollections.troupes;
-  troupeCollection.on("remove", function(model) {
+  var allRoomsCollection = troupeCollections.troupes;
+  allRoomsCollection.on("remove", function(model) {
     if(model.id == context.getTroupeId()) {
       var username = context.user().get('username');
       var newLocation = '/' + username;
