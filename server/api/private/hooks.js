@@ -3,7 +3,7 @@
 
 var crypto        = require('crypto');
 var winston       = require('winston');
-var chatService   = require('../../services/chat-service');
+var eventService  = require('../../services/event-service');
 var troupeService = require('../../services/troupe-service');
 
 var passphrase = 'wyElt0ian8waunt8';
@@ -21,9 +21,10 @@ module.exports = function(req, res) {
 
   var message = req.body.message;
   var meta    = req.body.meta;
+  var payload = req.body.payload;
 
   troupeService.findById(troupeId, function(err, troupe) {
-    chatService.newRichMessageToTroupe(troupe, null, message, meta, function(err) {
+    eventService.newEventToTroupe(troupe, null, message, meta, payload, function(err) {
       if (err) winston.info('Error creating Rich Message');
     });
   });

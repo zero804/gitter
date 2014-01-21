@@ -11,6 +11,7 @@ var fileService         = require("./file-service");
 var chatService         = require("./chat-service");
 var conversationService = require("./conversation-service");
 var recentRoomService   = require("./recent-room-service");
+var eventService        = require("./event-service");
 var Q                   = require('q');
 
 // USEFUL function for testing
@@ -164,4 +165,11 @@ exports.serializeRecentRoomsForUser = function(userId, callback) {
     })
     .nodeify(callback);
 
+};
+
+exports.serializeEventsForTroupe = function(troupeId, userId, callback) {
+  eventService.findEventsForTroupe(troupeId, {}, function(err, events) {
+    var strategy = new restSerializer.EventStrategy({ currentUserId: userId, troupeId: troupeId });
+    restSerializer.serialize(events, strategy, callback);
+  });
 };

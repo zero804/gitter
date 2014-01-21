@@ -39,7 +39,12 @@ define([
     events: {
       'click .trpChatEdit':     'toggleEdit',
       'keydown textarea':       'detectEscape',
-      'click .trpChatReadBy':   'showReadBy'
+      'click .trpChatReadBy':   'showReadBy',
+      'click .webhook': 'expandActivity'
+    },
+
+    expandActivity: function() {
+      $('.webhook .commits').slideToggle("fast");
     },
 
     initialize: function(options) {

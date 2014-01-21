@@ -532,6 +532,51 @@ function FavouriteTroupesForUserStrategy(options) {
   };
 }
 
+function EventStrategy(options) {
+  if(!options) options = {};
+
+  var userStategy = options.user ? null : new UserIdStrategy();
+  var troupeStrategy = options.includeTroupe ? new TroupeIdStrategy(options) : null;
+
+  this.preload = function(items, callback) {
+    var users = items.map(function(i) { return i.fromUserId; });
+
+    var strategies = [];
+
+    // If the user is fixed in options, we don't need to look them up using a strategy...
+    if(userStategy) {
+      strategies.push({
+        strategy: userStategy,
+        data: users
+      });
+    }
+
+    if(troupeStrategy) {
+      strategies.push({
+        strategy: troupeStrategy,
+        data: items.map(function(i) { return i.toTroupeId; })
+      });
+    }
+
+    execPreloads(strategies, callback);
+  };
+
+  this.map = function(item) {
+    return {
+      id: item._id,
+      text: item.text,
+      html: item.html,
+      sent: formatDate(item.sent),
+      editedAt: formatDate(item.editedAt),
+      fromUser: options.user ? options.user : userStategy.map(item.fromUserId),
+      troupe: troupeStrategy ? troupeStrategy.map(item.toTroupeId) : undefined,
+      meta: item.meta || {},
+      payload: item.payload || {},
+      v: getVersion(item)
+    };
+
+  };
+}
 
 
 function ChatStrategy(options)  {
@@ -1059,6 +1104,10 @@ function serializeModel(model, callback) {
       strategy = new ChatStrategy();
       break;
 
+    case 'EventSchema':
+      strategy = new EventStrategy();
+      break;
+
     case 'FileSchema':
       strategy = new FileStrategy();
       break;
@@ -1083,6 +1132,7 @@ module.exports = {
   NotificationStrategy: NotificationStrategy,
   FileStrategy: FileStrategy,
   ChatStrategy: ChatStrategy,
+  EventStrategy: EventStrategy,
   ChatIdStrategy: ChatIdStrategy,
   RequestStrategy: RequestStrategy,
   TroupeStrategy: TroupeStrategy,
