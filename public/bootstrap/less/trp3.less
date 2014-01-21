@@ -27,20 +27,10 @@
 #unread-banner {
   position: absolute;
   bottom: -35px;
-  line-height: 25px;
+  height: 35px;
   left: 0;
   right: 0;
   z-index: -1;
-  background-color: fade(@trpGreen, 90%);
-  color: white;
-  padding: 5px 5px 5px 10px;
-  border-radius: 0 0 4px 4px;
-  cursor: pointer;
-  .trpBodyMedium;
-
-  &:hover {
-    background-color: darken(@trpGreen, 5%);
-  }
 
   margin-left: @leftMarginFull + 45px;
   margin-right: @rightMarginFull + 45px;
@@ -58,6 +48,23 @@
 }
 
 .banner-button {
+  height: 100%;
+  width: 100%;
+  padding: 4px 11px;
+  background-color: fade(@trpGreen, 90%);
+  color: white;
+  border-radius: 0 0 4px 4px;
+  border-width: 0 0 0 0;
+  border-left-color: darken(@trpGreen, 5%);
+  .trpBodyMedium;
+  text-align: left;
+
+  &:hover {
+    background-color: darken(@trpGreen, 5%);
+  }
+}
+
+.banner-side-button {
   position: absolute;
   top: 0;
   right: 0;

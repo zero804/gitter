@@ -21,8 +21,8 @@ define([
 
   return backbone.View.extend({
     events: {
-      'click': 'scrollToFirstUnread',
-      'click .banner-button': 'dismissAll'
+      'click .banner-button': 'scrollToFirstUnread',
+      'click .banner-side-button': 'dismissAll'
     },
     initialize: function(options) {
       this.chatCollectionView = options.chatCollectionView;
@@ -47,8 +47,6 @@ define([
         contentType: "application/json",
         type: "DELETE",
       });
-      // dont trigger the banner click event
-      return false;
     }
   });
 
