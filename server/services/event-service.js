@@ -8,6 +8,14 @@ var ObjectID      = require('mongodb').ObjectID;
 exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback) {
   if(!troupe) return callback("Invalid troupe");
 
+  // Mongo doesn't allow keys starting with . in Mixed Fields
+  if (meta.service == 'travis') {
+    delete payload.config['.result'];
+    payload.matrix.forEach(function(matrix) {
+      delete matrix.config['.result'];
+    });
+  }
+
   var event = new persistence.Event();
 
   event.fromUserId = user ? user.id : null;
