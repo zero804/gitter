@@ -87,9 +87,7 @@ define([
    * followed by order of most recent access
    */
   recentRoomsNonFavourites.comparator = function(a, b) {
-    console.log(a.get('unreadItems'), b.get('unreadItems'));
     var c = existenceComparator(a.get('unreadItems'), b.get('unreadItems'));
-    console.log('C IS ', c);
     if(c === 0) {
       /** Both sides have unreadItems, compare by name */
       return naturalComparator(a.get('name'), b.get('name'));
@@ -98,17 +96,12 @@ define([
       var aLastAccessTime = a.get('lastAccessTime');
       var bLastAccessTime = b.get('lastAccessTime');
 
-      console.log('comparing ', aLastAccessTime && aLastAccessTime.valueOf(), bLastAccessTime && bLastAccessTime.valueOf());
-
       return reverseNaturalComparator(aLastAccessTime && aLastAccessTime.valueOf(), bLastAccessTime && bLastAccessTime.valueOf());
     } else return c;
   };
 
   recentRoomsNonFavourites.on('reset sync change:favourite change:lastAccessTime add remove filter-complete', function() {
-    console.log('SORTING recents');
     recentRoomsNonFavourites.sort();
-    console.log('NEW SORT ORDER IS ',
-    recentRoomsNonFavourites.pluck('name'));
   });
 
   // collection of troupes that are Repos
