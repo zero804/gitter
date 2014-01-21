@@ -41,10 +41,17 @@ define([
         this.$el.addClass('item-fav');
       }
     },
+    clearSearch: function() {
+      $('#list-search-input').val('');
+      $('#list-search').hide();
+      $('#list-mega').show();
+    },
     clicked: function() {
       var model = this.model;
+      var self=this;
       setTimeout(function() {
         // Make things feel a bit more responsive, but not too responsive
+        self.clearSearch();
         model.set('lastAccessTime', moment());
       }, 150);
 
