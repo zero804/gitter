@@ -106,6 +106,15 @@ define([
 
       // Activity
       this.activity.show(new activityStream({collection: itemCollections.events}));
+
+      itemCollections.events.on('add reset sync', function() {
+        
+        if (itemCollections.events.length >0) {
+          this.$el.find('#activity-header').show();
+          itemCollections.events.off('add reset sync', null, this);
+        }
+      }, this);
+
     },
 
   });
