@@ -140,6 +140,7 @@ define([
       }
       if (meta.service == 'travis') {
         build_status = payload.status_message ? payload.status_message.toLowerCase() : '';
+        if (build_status == 'still failing') build_status = 'failing';
       }
 
       // log(JSON.stringify(payload));
