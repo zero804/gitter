@@ -130,13 +130,12 @@ define([
             var multiple_commits = true;
           }
           else {
-            commit_text="whatever";
-            // if (payload.commits[0]) {
-            //   var commit_text = payload.commits[0].message;
-            //   if (commit_text.length > 34) {
-            //     commit_text = commit_text.substr(0,33) + '...';
-            //   }
-            // }
+            if (commits_count != 0) {
+              var commit_text = payload.commits[0].message;
+              if (commit_text.length > 34) {
+                commit_text = commit_text.substr(0,33) + '...';
+              }
+            }
           }
         }
         if (meta.event == 'gollum') {
