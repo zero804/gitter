@@ -324,6 +324,7 @@ module.exports = function( grunt ) {
       production: {
         options: {
           paths: ["public/bootstrap/less"],
+          compress: true,
           yuicompress: true
         },
         files: {
