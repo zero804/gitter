@@ -102,6 +102,9 @@ define([
     return ctx.inUserhome;
   };
 
+  /**
+   * DEPRECATED
+   */
   context.getUser = function() {
     return user.toJSON();
   };
@@ -111,6 +114,9 @@ define([
     return user;
   };
 
+  /**
+   * DEPRECATED
+   */
   context.getTroupe = function() {
     return troupe.toJSON();
   };
