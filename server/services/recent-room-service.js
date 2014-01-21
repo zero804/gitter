@@ -64,11 +64,8 @@ function removeRecentRoomForUser(userId, troupeId) {
     .then(function() {
       // TODO: remove this debugging only
       persistence.UserTroupeFavourites.findOne({ userId: userId }, function(err, after) {
-        winston.verbose('recent-rooms: user favourites after: ', after.toJSON());
+        winston.verbose('recent-rooms: user favourites after: ', after && after.toJSON());
       });
-
-      // Fire a realtime event
-      appEvents.recentRoomsChange({ userId: userId, troupeId: troupeId });
 
       // TODO: in future get rid of this but this collection is used by the native clients
       appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: null, lastAccessTime: null });
@@ -128,11 +125,13 @@ function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
         var item = values[i];
 
         if(item[1] > next) {
-          values = values.slice(0, i - 1);
+          /* Only increment those values before this one */
+          values.splice(i, values.length);
           break;
         }
+        /* This dude needs an increment */
         item[1]++;
-        next = item[1] + 1;
+        next = item[1];
       }
 
       var inc = lazy(values)
@@ -190,11 +189,8 @@ function updateFavourite(userId, troupeId, favouritePosition) {
 
     // TODO: remove this debugging only
     persistence.UserTroupeFavourites.findOne({ userId: userId }, function(err, after) {
-      winston.verbose('recent-rooms: user favourites after: ', after.toJSON());
+      winston.verbose('recent-rooms: user favourites after: ', after && after.toJSON());
     });
-
-    // Fire a realtime event
-    appEvents.recentRoomsChange({ userId: userId, troupeId: troupeId });
 
     // TODO: in future get rid of this but this collection is used by the native clients
     appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, favourite: position });
@@ -276,7 +272,6 @@ function saveLastVisitedTroupeforUserId(userId, troupeId, callback) {
     .then(function() {
       // XXX: lastAccessTime should be a date but for some bizarre reason it's not
       // serializing properly
-      appEvents.recentRoomsChange({ userId: userId, troupeId: troupeId });
       appEvents.dataChange2('/user/' + userId + '/troupes', 'patch', { id: troupeId, lastAccessTime: moment(lastAccessTime).toISOString() });
     })
     .nodeify(callback);

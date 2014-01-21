@@ -145,26 +145,5 @@ exports.install = function() {
 
   });
 
-  appEvents.localOnly.onRecentRoomsChange(function(data) {
-    var userId = data.userId;
-    var troupeId = data.troupeId;
-
-    var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
-
-    restSerializer.serialize(troupeId, strategy, function(err, serialized) {
-      if(err) return winston.error('Error while serializing troupe: ' + err, { exception: err });
-
-      var message = {
-        operation: 'update',
-        model: serialized
-      };
-      winston.verbose("bayeux: /api/v1/user/" + userId + '/recentRooms', message);
-
-      bayeuxClient.publish("/api/v1/user/" + userId + '/recentRooms', message);
-    });
-
-
-
-  });
 };
 

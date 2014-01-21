@@ -53,7 +53,5 @@ module.exports = {
     installUserSubResource('emails',      'emails');
     installUserSubResource('orgs',        'orgs');
     installUserSubResource('repos',       'repos');
-    installUserSubResource('recentRooms', 'recentRooms');
-
   }
 };
