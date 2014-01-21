@@ -56,11 +56,11 @@ define([
 
       // mega-list: recent troupe view
       this.favs.show(new TroupeCollectionView({
-        collection: troupeCollections.recentRoomsFavourites,
+        collection: troupeCollections.favourites,
         rerenderOnSort: true,
         draggable: true,
         dropTarget: true,
-        recentRoomsCollection: troupeCollections.recentRooms
+        roomsCollection: troupeCollections.troupes
       }));
 
       this.recent.show(new TroupeCollectionView({
@@ -68,7 +68,7 @@ define([
         rerenderOnSort: true,
         draggable: true,
         dropTarget: false,
-        recentRoomsCollection: troupeCollections.recentRooms
+        roomsCollection: troupeCollections.troupes
       }));
 
       // search results collection view

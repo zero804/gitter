@@ -4,118 +4,132 @@
 
 var testRequire = require('../test-require');
 var assert = require('assert');
-var Q = require('q');
 var fixtureLoader = require('../test-fixtures');
+var winston = require('winston');
 
-var fixture = {};
-
-before(fixtureLoader(fixture, {
-  user1: { permissions: { createRoom: true } },
-  userNoTroupes: { },
-  troupe1: { users: ['user1'] },
-  troupe2: { users: ['user1'] },
-  troupe3: { users: ['user1'] },
-  troupe4: { users: ['user1'] },
-}));
-
-after(function() {
-  fixture.cleanup();
-});
 
 var recentRoomService = testRequire("./services/recent-room-service");
 var persistenceService = testRequire("./services/persistence-service");
 
+function printFavs(favs) {
+  var f = JSON.parse(JSON.stringify(favs));
+  winston.info('Favourites', f);
+}
+
 describe('recent-room-service', function() {
+  describe('ordering', function() {
+    var fixture = {};
 
-  it('should rearrange the order of favourites correctly',function(done) {
-    function getFavs() {
-      return recentRoomService.findFavouriteTroupesForUser(fixture.user1.id);
-    }
+    before(fixtureLoader(fixture, {
+      user1: { permissions: { createRoom: true } },
+      userNoTroupes: { },
+      troupe1: { users: ['user1'] },
+      troupe2: { users: ['user1'] },
+      troupe3: { users: ['user1'] },
+      troupe4: { users: ['user1'] }
+    }));
 
-    recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe1.id, 1)
-      .then(getFavs)
-      .then(function(favs) {
-        assert.equal(favs[fixture.troupe1.id], 1);
-      })
-      .then(function() {
-        return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 1);
-      })
-      .then(getFavs)
-      .then(function(favs) {
-        assert.equal(favs[fixture.troupe1.id], 2);
-        assert.equal(favs[fixture.troupe2.id], 1);
-      })
-      .then(function() {
-        return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 3);
-      })
-      .then(getFavs)
-      .then(function(favs) {
-        assert.equal(favs[fixture.troupe1.id], 2);
-        assert.equal(favs[fixture.troupe2.id], 3);
-      })
-      .then(function() {
-        return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe3.id, 1);
-      })
-      .then(getFavs)
-      .then(function(favs) {
-        assert.equal(favs[fixture.troupe3.id], 1);
-        assert.equal(favs[fixture.troupe1.id], 2);
-        assert.equal(favs[fixture.troupe2.id], 3);
-      })
-      .then(function() {
-        return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 2);
-      })
-      .then(getFavs)
-      .then(function(favs) {
-        assert.equal(favs[fixture.troupe3.id], 1);
-        assert.equal(favs[fixture.troupe2.id], 2);
-        assert.equal(favs[fixture.troupe1.id], 3);
-      })
+    after(function() {
+      fixture.cleanup();
+    });
 
-      .nodeify(done);
-  });
+    it('should rearrange the order of favourites correctly',function(done) {
 
-  it('should generateRoomListForUser with favourites', function(done) {
-    return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe1.id, 2)
-      .then(function() {
-        return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 1);
-      })
-      .then(function() {
-        return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe3.id, true);
-      })
-      .then(function() {
-        return recentRoomService.generateRoomListForUser(fixture.user1.id);
-      })
-      .then(function(roomList) {
-        assert.equal(roomList.length, 3);
-        assert.equal(roomList[0].id, fixture.troupe2.id);
-        assert.equal(roomList[1].id, fixture.troupe1.id);
-        assert.equal(roomList[2].id, fixture.troupe3.id);
-      })
-      .nodeify(done);
-  });
+      function getFavs() {
+        return recentRoomService.findFavouriteTroupesForUser(fixture.user1.id);
+      }
 
-  it('should generateRoomListForUser with favourites and recents', function(done) {
-    return Q.all([
-        recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe1.id, 2),
-        recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 1),
-        recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe3.id),
-        recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe4.id)
-      ])
-      .then(function() {
-        return recentRoomService.generateRoomListForUser(fixture.user1.id);
-      })
-      .then(function(roomList) {
-        assert.equal(roomList.length, 4);
-        assert.equal(roomList[0].id, fixture.troupe2.id);
-        assert.equal(roomList[1].id, fixture.troupe1.id);
-        assert.equal(roomList[2].id, fixture.troupe3.id);
-        assert.equal(roomList[3].id, fixture.troupe4.id);
-      })
-      .nodeify(done);
+      winston.info('Setting ' + fixture.troupe1.id + ' in position 1');
+
+      recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe1.id, 1)
+        .then(getFavs)
+        .then(function(favs) {
+          printFavs(favs);
+          assert.equal(favs[fixture.troupe1.id], 1);
+        })
+        .then(function() {
+          winston.info('Setting ' + fixture.troupe2.id + ' in position 1');
+          return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 1);
+        })
+        .then(getFavs)
+        .then(function(favs) {
+          printFavs(favs);
+          assert.equal(favs[fixture.troupe1.id], 2);
+          assert.equal(favs[fixture.troupe2.id], 1);
+        })
+        .then(function() {
+          winston.info('Setting ' + fixture.troupe2.id + ' in position 3');
+          return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 3);
+        })
+        .then(getFavs)
+        .then(function(favs) {
+          printFavs(favs);
+          assert.equal(favs[fixture.troupe1.id], 2);
+          assert.equal(favs[fixture.troupe2.id], 3);
+        })
+        .then(function() {
+          winston.info('Setting ' + fixture.troupe3.id + ' in position 1');
+          return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe3.id, 1);
+        })
+        .then(getFavs)
+        .then(function(favs) {
+          printFavs(favs);
+          assert.equal(favs[fixture.troupe3.id], 1);
+          assert.equal(favs[fixture.troupe1.id], 2);
+          assert.equal(favs[fixture.troupe2.id], 3);
+        })
+        .then(function() {
+          winston.info('Setting ' + fixture.troupe2.id + ' in position 2');
+          return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 2);
+        })
+        .then(getFavs)
+        .then(function(favs) {
+          printFavs(favs);
+          assert.equal(favs[fixture.troupe3.id], 1);
+          assert.equal(favs[fixture.troupe2.id], 2);
+          assert.equal(favs[fixture.troupe1.id], 3);
+        })
+        .then(function() {
+          winston.info('Setting ' + fixture.troupe1.id + ' in position 4');
+          return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe1.id, 4);
+        })
+        .then(getFavs)
+        .then(function(favs) {
+          printFavs(favs);
+          assert.equal(favs[fixture.troupe3.id], 1);
+          assert.equal(favs[fixture.troupe2.id], 2);
+          assert.equal(favs[fixture.troupe1.id], 4);
+        })
+        .then(function() {
+          winston.info('Setting ' + fixture.troupe4.id + ' in position 1');
+          return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe4.id, 1);
+        })
+        .then(getFavs)
+        .then(function(favs) {
+          printFavs(favs);
+          assert.equal(favs[fixture.troupe4.id], 1);
+          assert.equal(favs[fixture.troupe3.id], 2);
+          assert.equal(favs[fixture.troupe2.id], 3);
+          assert.equal(favs[fixture.troupe1.id], 4);
+        })
+
+        .nodeify(done);
+    });
+
   });
 
   describe('#updateFavourite()', function() {
+    var fixture = {};
+
+    before(fixtureLoader(fixture, {
+      user1: { permissions: { createRoom: true } },
+      troupe1: { users: ['user1'] }
+    }));
+
+    after(function() {
+      fixture.cleanup();
+    });
+
     it('should add a troupe to favourites',function(done) {
 
       function fav(val, callback) {
@@ -148,6 +162,17 @@ describe('recent-room-service', function() {
   });
 
   describe("#saveLastVisitedTroupeforUserId", function() {
+    var fixture = {};
+
+    before(fixtureLoader(fixture, {
+      user1: { permissions: { createRoom: true } },
+      troupe1: { users: ['user1'] }
+    }));
+
+    after(function() {
+      fixture.cleanup();
+    });
+
     it('should record the time each troupe was last accessed by a user', function(done) {
 
       recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, function(err) {
@@ -186,6 +211,18 @@ describe('recent-room-service', function() {
 
 
   describe('#findBestTroupeForUser', function() {
+    var fixture = {};
+
+    before(fixtureLoader(fixture, {
+      user1: { permissions: { createRoom: true } },
+      userNoTroupes: { },
+      troupe1: { users: ['user1'] }
+    }));
+
+    after(function() {
+      fixture.cleanup();
+    });
+
     it('#01 should return null when a user has no troupes',function(done) {
 
       recentRoomService.saveLastVisitedTroupeforUserId(fixture.userNoTroupes.id, fixture.troupe1.id, function(err) {

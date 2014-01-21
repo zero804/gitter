@@ -63,7 +63,7 @@ define([
       if(options.draggable) {
         this.makeDraggable(options.dropTarget);
       }
-      this.recentRoomsCollection = options.recentRoomsCollection;
+      this.roomsCollection = options.roomsCollection;
     },
     makeDraggable: function(drop) {
       var cancelDrop = false;
@@ -80,10 +80,10 @@ define([
             if(!previousElement) {
               favPosition = 1;
             } else {
-              var previousCollectionItem = self.recentRoomsCollection.get(previousElement.dataset.id);
+              var previousCollectionItem = self.roomsCollection.get(previousElement.dataset.id);
               favPosition = previousCollectionItem.get('favourite') + 1;
             }
-            var collectionItem = self.recentRoomsCollection.get(el.dataset.id);
+            var collectionItem = self.roomsCollection.get(el.dataset.id);
             collectionItem.set('favourite', favPosition);
             collectionItem.save();
             // if ($(container.el).attr('id') == 'list-favs') {
@@ -99,8 +99,8 @@ define([
           var el = item[0];
 
           if ($(container.el).parent().attr('id') == 'list-favs') {
-            var collectionItem = self.recentRoomsCollection.get(el.dataset.id);
-            collectionItem.destroy();
+            var collectionItem = self.roomsCollection.get(el.dataset.id);
+            collectionItem.unset('favourite').save();
 
             // do whatever else needs to be done to remove from favourites and store positions
             // TODO: at the moment if you remove all items, the UL takes up space and that makes no sense!

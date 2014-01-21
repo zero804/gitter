@@ -96,9 +96,6 @@ function populateSubUserCollection(options, callback) {
     case "troupes":
       return restful.serializeTroupesForUser(userId, callback);
 
-    case "recentRooms":
-      return restful.serializeRecentRoomsForUser(userId, callback);
-
     default:
       winston.error('Unable to provide snapshot for ' + collection);
   }
