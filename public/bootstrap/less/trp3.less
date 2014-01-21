@@ -375,7 +375,7 @@ a:hover {
 
 .trpLeftMenuProfileName {
   display: inline-block;
-  vertical-align: top; 
+  vertical-align: top;
   padding-top: 4px;
   font-weight: 300;
   font-size: 16px;
@@ -457,8 +457,8 @@ a.trpMiniLeftMenuItem {
 }
 
 .item-unread-badge {
-  float: right; 
-  margin-right: 5px; 
+  float: right;
+  margin-right: 5px;
 }
 
 .trpMiniLeftMenuItem.unread:after {
@@ -583,8 +583,11 @@ a.trpMiniLeftMenuItem {
   cursor: not-allowed;
 }
 
+body.dragging .trpTroupeList {
+  min-height: 25px;
+}
+
 .trpTroupeList {
-  display: inline-block;
 	list-style-type: none;
 	margin: 0 0 0 0px;
   width: 100%;
@@ -662,7 +665,7 @@ ul li.placeholder {
   color: white;
 }
 
-ul li.placeholder:before {        
+ul li.placeholder:before {
       position: absolute;
       content: "";
       width: 0;
@@ -672,7 +675,7 @@ ul li.placeholder:before {
       top: -4px;
       border: 5px solid transparent;
       border-left-color: red;
-      border-right: none; 
+      border-right: none;
 }
 
 .trpTroupeList li .item-close {
@@ -902,7 +905,7 @@ ul li.placeholder:before {
   position: fixed;
 	background-color: white;
 	margin-left: 0px;
-/*  height is now specified in the html for as it renders better before the css is loaded*/  
+/*  height is now specified in the html for as it renders better before the css is loaded*/
 	width: 100%;
 	text-align: center;
 /*	padding-top: 40px;*/
@@ -1668,7 +1671,7 @@ ul.roster {
     opacity: 0.9;
   }
 
-  .md-help:before { 
+  .md-help:before {
     font-family: 'troupe-icons';
     content: '\e82d';
     margin-right: 8px;
