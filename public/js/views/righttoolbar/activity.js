@@ -103,6 +103,16 @@ define([
         var trello_action = trello_actions[payload.action.type];
       }
 
+      if (meta.service == 'sprintly') {
+        var sprintly_action;
+        if (payload.model == "Item") {
+          sprintly_action = "created";
+        }
+        if (payload.model == "Comment") {
+          sprintly_action = "commented on";
+        }
+      }
+
       // Support branch names with slashes, ie: develop/feature/123-foo
       if (payload.ref) {
         var refs = payload.ref.split('/');
@@ -152,6 +162,7 @@ define([
         branch_name:    branch_name,
         repo:           repo,
         trello_action:  trello_action,
+        sprintly_action: sprintly_action,
         build_status:   build_status,
         multiple_commits: multiple_commits,
         commit_text: commit_text,
@@ -172,12 +183,10 @@ define([
 
     initialize: function(/*options*/) {
       this.data = {};
-
       this.collectionView = new ItemsView({
          collection: this.collection,
         itemView: ActivityItemView
       });
-
     },
 
     afterRender: function() {
