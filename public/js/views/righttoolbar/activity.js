@@ -130,7 +130,7 @@ define([
             var multiple_commits = true;
           }
           else {
-            if (payload.commits[0]) {
+            if (payload.commits.length !=0 ) {
               var commit_text = payload.commits[0].message;
               if (commit_text.length > 34) {
                 commit_text = commit_text.substr(0,33) + '...';
