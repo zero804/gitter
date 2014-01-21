@@ -25,7 +25,7 @@ module.exports = function(req, res) {
 
   troupeService.findById(troupeId, function(err, troupe) {
     eventService.newEventToTroupe(troupe, null, message, meta, payload, function(err) {
-      if (err) winston.info('Error creating Rich Message');
+      if (err) winston.error('Error creating Event: ' + err);
     });
   });
 
