@@ -133,6 +133,10 @@ exports.install = function(persistenceService) {
   attachNotificationListenersToSchema(schemas.ChatMessageSchema, 'chat', function(model) {
     return "/troupes/" + model.toTroupeId + "/chatMessages";
   });
+
+  attachNotificationListenersToSchema(schemas.EventSchema, 'event', function(model) {
+    return '/troupes/' + model.toTroupeId + '/events';
+  });
   /*
   attachNotificationListenersToSchema(schemas.TroupeSchema, 'troupe', function(model) {
     // Never serialize any one-to-one troupe events as that's just silly
