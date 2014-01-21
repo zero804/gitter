@@ -68,6 +68,7 @@ define([
       if (hasScrollBars()) {
         $(".trpChatContainer").addClass("scroller");
         $(".trpChatInputArea").addClass("scrollpush");
+        $("#room-content").addClass("scroller");
       }
 
       // this.rightPanelRegion.on('close', function() {
